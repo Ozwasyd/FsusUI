@@ -1,0 +1,3 @@
+/data/projects/FsusUI/packages/wasm/build/CMakeFiles/ep_wasm.dir
+/data/projects/FsusUI/packages/wasm/build/CMakeFiles/edit_cache.dir
+/data/projects/FsusUI/packages/wasm/build/CMakeFiles/rebuild_cache.dir

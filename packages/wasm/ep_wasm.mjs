@@ -1,0 +1,1 @@
+export { default } from './dist/ep_wasm.mjs'

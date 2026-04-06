@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.web.json",
+  "compilerOptions": {
+    "composite": false,
+    "declaration": false,
+    "lib": ["ES2022", "ES2022.Array", "ES2022.Error", "ES2022.Object", "DOM", "DOM.Iterable", "DOM.AsyncIterable"],
+    "types": ["node", "jsdom"],
+    "skipLibCheck": true
+  },
+  "include": ["packages", "vitest.setup.ts", "typings/env.d.ts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.md",
+    "packages/components/*/style/**",
+    "packages/components/*/styles/**"
+  ]
+}

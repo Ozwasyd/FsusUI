@@ -1,0 +1,8 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+if command -v pnpm >/dev/null 2>&1 \
+	&& pnpm exec commitlint --version >/dev/null 2>&1 \
+	&& [ -f commitlint.config.js ]; then
+	pnpm exec commitlint --config commitlint.config.js --edit "${1}"
+fi

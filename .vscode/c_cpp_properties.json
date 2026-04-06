@@ -1,0 +1,23 @@
+{
+  "configurations": [
+    {
+      "name": "Emscripten (WASM)",
+      "includePath": [
+        "${workspaceFolder}/packages/wasm/src",
+        "${env:EMSDK}/upstream/emscripten/system/include",
+        "${env:EMSDK}/upstream/emscripten/system/lib/libcxx/include",
+        "${env:EMSDK}/upstream/lib/clang/20/include"
+      ],
+      "defines": [
+        "__EMSCRIPTEN__",
+        "__cplusplus=202302L"
+      ],
+      "compilerPath": "${env:EMSDK}/upstream/bin/clang++",
+      "cStandard": "c17",
+      "cppStandard": "c++23",
+      "intelliSenseMode": "clang-x64",
+      "compileCommands": "${workspaceFolder}/packages/wasm/build/compile_commands.json"
+    }
+  ],
+  "version": 4
+}

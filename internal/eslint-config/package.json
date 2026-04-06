@@ -1,0 +1,28 @@
+{
+  "name": "@element-plus/eslint-config",
+  "version": "0.0.1",
+  "description": "ESLint Config (Flat Config, ESLint 10)",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./index.js"
+  },
+  "main": "index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "eslint": "^10.0.0"
+  },
+  "dependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint-plugin-unicorn": "^64.0.0",
+    "eslint-plugin-vue": "^10.8.0",
+    "typescript-eslint": "^8.58.0",
+    "vue-eslint-parser": "^9.4.3",
+    "prettier": "^3.8.1"
+  },
+  "devDependencies": {
+    "eslint": "^10.2.0"
+  }
+}
