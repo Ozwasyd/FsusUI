@@ -13,9 +13,22 @@ dist
 coverage
 packages/element-plus/version.ts
 
+# Local build artifacts
+build/
+CMakeCache.txt
+CMakeFiles/
+*.ninja
+cmake_install.cmake
+.cmake/
+packages/wasm/.cmake-check/
+--help/
+
 # local env files
 *.local
 .eslintcache
 cypress/screenshots/*
 cypress/videos/*
 tmp
+*.tmp
+*.temp
+*.swp

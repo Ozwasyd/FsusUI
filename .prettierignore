@@ -1,4 +1,8 @@
 dist
+build
+CMakeFiles
+.cmake
+packages/wasm/.cmake-check
 node_modules
 coverage
 CHANGELOG.en-US.md

@@ -15,6 +15,7 @@ add_executable(ep_wasm src/ep_wasm.cpp)
 
 # ── Emscripten 链接选项 ──────────────────────────────────
 target_link_options(ep_wasm PRIVATE
+
   # 使用 embind，支持 ES Module 输出
   "-lembind"
 
@@ -45,6 +46,7 @@ target_compile_options(ep_wasm PRIVATE
   "-O3"
   "-std=c++23"
   "-msimd128"
+
   # 严格模式编译
   "-Wall"
   "-Wextra"
