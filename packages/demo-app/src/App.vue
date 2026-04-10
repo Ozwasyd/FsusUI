@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
-import type { UploadRequestOptions } from 'element-plus'
+import type { AutocompleteData } from '../../components/autocomplete'
+import type { UploadProgressEvent, UploadRequestOptions } from '../../components/upload'
 import {
   ElCollapseTransition,
   ElConfigProvider,
@@ -14,8 +15,8 @@ import {
   ElPopperArrow,
   ElPopperContent,
   ElPopperTrigger,
-} from 'element-plus'
-import { FixedSizeList } from '@element-plus/components/virtual-list'
+} from '../../element-plus'
+import { FixedSizeList } from '../../components/virtual-list'
 import {
   ArrowLeft,
   Plus,
@@ -195,6 +196,10 @@ const showSelectFeedback = (value: string) => {
   ElMessage.success(`已选择 ${value}`)
 }
 
+const handleAutocompleteSelect = (item: AutocompleteData[number]) => {
+  showSelectFeedback(String(item.value ?? ''))
+}
+
 const openServiceLoading = () => {
   const instance = ElLoading.service({
     lock: false,
@@ -235,12 +240,16 @@ const toggleDirectiveLoading = () => {
   }, 900)
 }
 
+const createUploadProgressEvent = (percent: number) => {
+  return { percent } as UploadProgressEvent
+}
+
 const mockUpload = (options: UploadRequestOptions) => {
   uploadLog.value = `开始上传 ${options.file.name}`
-  options.onProgress({ percent: 40 })
+  options.onProgress(createUploadProgressEvent(40))
   return new Promise((resolve) => {
     window.setTimeout(() => {
-      options.onProgress({ percent: 100 })
+      options.onProgress(createUploadProgressEvent(100))
       options.onSuccess({ ok: true, name: options.file.name })
       uploadLog.value = `上传成功：${options.file.name}`
       resolve(true)
@@ -489,7 +498,7 @@ const handleRawPopperLeave = () => {
                   v-model="keyword"
                   :fetch-suggestions="querySearch"
                   placeholder="搜索城市或标签"
-                  @select="(item) => showSelectFeedback(item.value)"
+                  @select="handleAutocompleteSelect"
                 />
               </el-form-item>
               <el-form-item label="数量">

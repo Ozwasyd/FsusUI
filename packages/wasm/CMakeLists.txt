@@ -7,7 +7,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Emscripten 工具链标志（必须通过 emcmake cmake 调用）
 if(NOT EMSCRIPTEN)
-  message(FATAL_ERROR "必须使用 Emscripten 工具链: emcmake cmake .")
+  message(STATUS "未检测到 Emscripten 工具链，跳过 ep_wasm 配置；如需构建请使用: emcmake cmake .")
+  return()
 endif()
 
 add_executable(ep_wasm src/ep_wasm.cpp)
