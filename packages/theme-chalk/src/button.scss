@@ -34,7 +34,7 @@ $button-icon-span-gap: map.merge(
   text-align: center;
   box-sizing: border-box;
   outline: none;
-  transition: 0.1s;
+  transition: opacity 0.3s ease, filter 0.3s ease, background-color 0.3s ease;
   font-weight: getCssVar('button', 'font-weight');
   user-select: none;
   vertical-align: middle;
@@ -43,11 +43,12 @@ $button-icon-span-gap: map.merge(
   border: getCssVar('border');
   border-color: getCssVar('button', 'border-color');
 
-  &:hover,
+  &:hover {
+    background-color: inherit;
+    opacity: 0.85;
+  }
+
   &:focus {
-    color: getCssVar('button', 'hover', 'text-color');
-    border-color: getCssVar('button', 'hover', 'border-color');
-    background-color: getCssVar('button', 'hover', 'bg-color');
     outline: none;
   }
 
@@ -59,8 +60,7 @@ $button-icon-span-gap: map.merge(
   }
 
   &:focus-visible {
-    outline: 2px solid getCssVar('button', 'outline-color');
-    outline-offset: 1px;
+    @include a11y-focus-ring(2px, getCssVar('button', 'border-radius'));
   }
 
   > span {
@@ -164,14 +164,17 @@ $button-icon-span-gap: map.merge(
     }
 
     &:not(.is-disabled) {
-      &:hover,
+      &:hover {
+        background-color: transparent;
+        filter: brightness(0.9);
+      }
+
       &:focus {
-        background-color: getCssVar('fill-color', 'light');
+        background-color: transparent;
       }
 
       &:focus-visible {
-        outline: 2px solid getCssVar('button', 'outline-color');
-        outline-offset: 1px;
+        @include a11y-focus-ring(2px, getCssVar('button', 'border-radius'));
       }
 
       &:active {

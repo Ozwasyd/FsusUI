@@ -26,6 +26,11 @@
   }
 }
 
+@keyframes skeleton-zinc-pulse {
+  0%, 100% { background-color: #f4f4f5; opacity: 1; }
+  50% { background-color: #e4e4e7; opacity: 0.6; }
+}
+
 @include b(skeleton) {
   width: 100%;
   @each $unit in (first-line, paragraph) {
@@ -38,7 +43,7 @@
 
   @include when(animated) {
     .#{$namespace}-skeleton__item {
-      @include skeleton-color();
+      animation: skeleton-zinc-pulse 1.5s ease-in-out infinite;
     }
   }
 }

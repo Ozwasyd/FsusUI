@@ -11,7 +11,9 @@
 
   position: relative;
   margin: var(#{getCssVarName('dialog-margin-top')}, 15vh) auto 50px;
-  background: getCssVar('dialog', 'bg-color');
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-radius: getCssVar('dialog', 'border-radius');
   box-shadow: getCssVar('dialog', 'box-shadow');
   box-sizing: border-box;

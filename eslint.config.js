@@ -27,6 +27,13 @@ export default [
   // Vue 3
   ...pluginVue.configs['flat/recommended'],
 
+  {
+    files: ['**/*.vue'],
+    rules: {
+      'no-useless-assignment': 'off',
+    },
+  },
+
   // ── 主配置块 ──
   {
     plugins: { unicorn },

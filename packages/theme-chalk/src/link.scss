@@ -25,8 +25,14 @@
 
   color: getCssVar('link', 'text-color');
 
+  transition: opacity 0.3s ease, filter 0.3s ease;
+
   &:hover {
-    color: getCssVar('link', 'hover-text-color');
+    opacity: 0.85;
+  }
+
+  &:focus-visible {
+    @include a11y-focus-ring(2px, 2px);
   }
 
   @include when(underline) {

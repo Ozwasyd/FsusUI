@@ -197,6 +197,10 @@
     @include when(focus) {
       @include inset-input-border(#{getCssVar('input', 'focus-border-color')});
     }
+
+    &:focus-visible {
+      @include a11y-focus-ring(2px, getCssVarWithDefault('input-border-radius', map.get($input, 'border-radius')));
+    }
   }
 
   @include e(inner) {

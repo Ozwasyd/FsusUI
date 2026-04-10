@@ -1,0 +1,837 @@
+@use 'mixins/mixins' as *;
+@use 'common/var' as *;
+
+$fsus-black: #050505;
+$fsus-text: #09090b;
+$fsus-text-muted: #71717a;
+$fsus-text-soft: #a1a1aa;
+$fsus-border: rgba(9, 9, 11, 0.08);
+$fsus-border-strong: rgba(9, 9, 11, 0.14);
+$fsus-panel-bg: #ffffff;
+$fsus-control-bg: rgba(250, 250, 250, 0.96);
+$fsus-subtle-bg: rgba(244, 244, 245, 0.92);
+$fsus-float-bg: rgba(255, 255, 255, 0.92);
+$fsus-shadow-soft: 0 14px 40px rgba(15, 23, 42, 0.08);
+$fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
+
+@mixin fsus-panel($radius: 24px) {
+  background: $fsus-panel-bg;
+  border: 1px solid $fsus-border;
+  border-radius: $radius;
+  box-shadow: $fsus-shadow-soft;
+}
+
+@mixin fsus-floating($radius: 24px) {
+  background: $fsus-float-bg;
+  border: 1px solid $fsus-border;
+  border-radius: $radius;
+  box-shadow: $fsus-shadow-float;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+@mixin fsus-control($radius: 16px) {
+  background: $fsus-control-bg;
+  border: 1px solid $fsus-border;
+  border-radius: $radius;
+  color: $fsus-text;
+  transition: background-color 0.3s ease, border-color 0.3s ease,
+    box-shadow 0.3s ease, color 0.3s ease, opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+:root {
+  --el-a11y-focus-color: #050505;
+  --el-border-radius-base: 14px;
+  --el-border-radius-small: 10px;
+  --el-border-radius-round: 999px;
+  --el-box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+  --el-box-shadow-light: 0 14px 40px rgba(15, 23, 42, 0.08);
+  --el-box-shadow-lighter: 0 8px 24px rgba(15, 23, 42, 0.06);
+  --el-box-shadow-dark: 0 24px 64px rgba(15, 23, 42, 0.12);
+  --el-bg-color-page: #fafafa;
+  --el-bg-color-overlay: rgba(255, 255, 255, 0.94);
+  --el-fill-color: #f4f4f5;
+  --el-fill-color-light: #fafafa;
+  --el-fill-color-lighter: #fcfcfc;
+  --el-border-color: #e4e4e7;
+  --el-border-color-light: #ececf0;
+  --el-border-color-lighter: #f1f1f3;
+  --el-border-color-extra-light: #f7f7f8;
+  --el-text-color-primary: #09090b;
+  --el-text-color-regular: #71717a;
+  --el-text-color-secondary: #71717a;
+  --el-text-color-placeholder: #a1a1aa;
+  --el-disabled-bg-color: #f4f4f5;
+  --el-disabled-text-color: #a1a1aa;
+  --el-disabled-border-color: #ececf0;
+  --el-font-family: 'Google Sans', 'Helvetica Neue', Helvetica, 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+  --el-card-border-radius: 24px;
+  --el-dialog-border-radius: 24px;
+  --el-popover-border-radius: 20px;
+  --el-messagebox-border-radius: 24px;
+  --el-notification-radius: 22px;
+}
+
+.#{$namespace}-button,
+.#{$namespace}-input__wrapper,
+.#{$namespace}-textarea__inner,
+.#{$namespace}-select-v2__wrapper,
+.#{$namespace}-pagination button,
+.#{$namespace}-pager li,
+.#{$namespace}-menu-item,
+.#{$namespace}-sub-menu__title,
+.#{$namespace}-tabs__item,
+.#{$namespace}-tree-node__content,
+.#{$namespace}-dropdown-menu__item,
+.#{$namespace}-select-dropdown__item,
+.#{$namespace}-select-dropdown__option-item,
+.#{$namespace}-cascader-node,
+.#{$namespace}-upload-dragger,
+.#{$namespace}-table__row,
+.#{$namespace}-table-v2__row,
+.#{$namespace}-tag,
+.#{$namespace}-check-tag,
+.#{$namespace}-timeline-item__node,
+.#{$namespace}-step__icon,
+.#{$namespace}-carousel__button,
+.#{$namespace}-backtop {
+  transition: background-color 0.3s ease, border-color 0.3s ease,
+    box-shadow 0.3s ease, color 0.3s ease, opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.#{$namespace}-button {
+  @include fsus-control(14px);
+  min-height: 40px;
+  padding: 0 16px;
+  box-shadow: none;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+
+  &:hover {
+    background: #ffffff;
+    border-color: $fsus-border-strong;
+    color: $fsus-text;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: none;
+    background: $fsus-subtle-bg;
+  }
+
+  &:focus-visible {
+    @include a11y-focus-ring(2px, 14px);
+  }
+
+  &.is-disabled,
+  &.is-disabled:hover {
+    background: $fsus-subtle-bg;
+    border-color: $fsus-border;
+    color: $fsus-text-soft;
+    transform: none;
+    opacity: 0.72;
+  }
+}
+
+.#{$namespace}-button--primary {
+  background: $fsus-black;
+  border-color: $fsus-black;
+  color: #ffffff;
+
+  &:hover,
+  &:focus {
+    background: rgba(5, 5, 5, 0.88);
+    border-color: rgba(5, 5, 5, 0.88);
+    color: #ffffff;
+  }
+}
+
+.#{$namespace}-button--success {
+  background: rgba(22, 163, 74, 0.08);
+  border-color: rgba(22, 163, 74, 0.18);
+  color: #166534;
+}
+
+.#{$namespace}-button--warning {
+  background: rgba(217, 119, 6, 0.08);
+  border-color: rgba(217, 119, 6, 0.18);
+  color: #92400e;
+}
+
+.#{$namespace}-button--danger {
+  background: rgba(220, 38, 38, 0.08);
+  border-color: rgba(220, 38, 38, 0.18);
+  color: #991b1b;
+}
+
+.#{$namespace}-button--info {
+  background: rgba(113, 113, 122, 0.08);
+  border-color: rgba(113, 113, 122, 0.16);
+  color: $fsus-text-muted;
+}
+
+.#{$namespace}-button.is-text,
+.#{$namespace}-button.is-link,
+.#{$namespace}-button--text {
+  background: transparent;
+  border-color: transparent;
+  color: $fsus-text-muted;
+  min-height: auto;
+  padding-inline: 8px;
+
+  &:hover,
+  &:focus {
+    background: transparent;
+    color: $fsus-text;
+    transform: none;
+  }
+}
+
+.#{$namespace}-input__wrapper,
+.#{$namespace}-textarea__inner,
+.#{$namespace}-select-v2__wrapper,
+.#{$namespace}-date-editor.#{$namespace}-input__wrapper,
+.#{$namespace}-range-editor.#{$namespace}-input__wrapper,
+.#{$namespace}-input-number,
+.#{$namespace}-input-group__append,
+.#{$namespace}-input-group__prepend,
+.#{$namespace}-color-picker__trigger {
+  @include fsus-control(16px);
+  box-shadow: none !important;
+}
+
+.#{$namespace}-input__wrapper,
+.#{$namespace}-select-v2__wrapper,
+.#{$namespace}-date-editor.#{$namespace}-input__wrapper,
+.#{$namespace}-range-editor.#{$namespace}-input__wrapper,
+.#{$namespace}-input-number,
+.#{$namespace}-color-picker__trigger {
+  min-height: 42px;
+
+  &:hover,
+  &:focus-within {
+    background: #ffffff;
+    border-color: $fsus-border-strong;
+    box-shadow: inset 0 0 0 1px rgba(5, 5, 5, 0.12) !important;
+  }
+
+  &:focus-within {
+    @include a11y-focus-ring(2px, 16px);
+  }
+}
+
+.#{$namespace}-textarea__inner {
+  min-height: 112px;
+  padding: 12px 14px;
+
+  &:hover,
+  &:focus {
+    background: #ffffff;
+    border-color: $fsus-border-strong;
+    box-shadow: inset 0 0 0 1px rgba(5, 5, 5, 0.12) !important;
+  }
+
+  &:focus-visible {
+    @include a11y-focus-ring(2px, 16px);
+  }
+}
+
+.#{$namespace}-input__inner,
+.#{$namespace}-textarea__inner,
+.#{$namespace}-range-input,
+.#{$namespace}-select__placeholder,
+.#{$namespace}-select-v2__placeholder {
+  color: $fsus-text;
+
+  &::placeholder {
+    color: $fsus-text-soft;
+  }
+}
+
+.#{$namespace}-input-number {
+  overflow: hidden;
+
+  .#{$namespace}-input__wrapper {
+    background: transparent;
+    border: 0;
+    box-shadow: none !important;
+  }
+
+  .#{$namespace}-input-number__increase,
+  .#{$namespace}-input-number__decrease {
+    background: transparent;
+    color: $fsus-text-muted;
+    border-color: $fsus-border;
+
+    &:hover {
+      color: $fsus-text;
+    }
+  }
+}
+
+.#{$namespace}-checkbox.is-bordered,
+.#{$namespace}-radio.is-bordered,
+.#{$namespace}-checkbox-button__inner,
+.#{$namespace}-radio-button__inner,
+.#{$namespace}-check-tag,
+.#{$namespace}-tag {
+  @include fsus-control(14px);
+  box-shadow: none;
+}
+
+.#{$namespace}-checkbox__inner,
+.#{$namespace}-radio__inner {
+  border-color: rgba(9, 9, 11, 0.18);
+  background: #ffffff;
+}
+
+.#{$namespace}-checkbox__inner:hover,
+.#{$namespace}-radio__inner:hover {
+  border-color: rgba(5, 5, 5, 0.28);
+}
+
+.#{$namespace}-checkbox__input.is-checked .#{$namespace}-checkbox__inner,
+.#{$namespace}-checkbox__input.is-indeterminate .#{$namespace}-checkbox__inner,
+.#{$namespace}-radio__input.is-checked .#{$namespace}-radio__inner,
+.#{$namespace}-checkbox-button.is-checked .#{$namespace}-checkbox-button__inner,
+.#{$namespace}-radio-button.is-active .#{$namespace}-radio-button__inner,
+.#{$namespace}-check-tag.is-checked {
+  background: $fsus-black;
+  border-color: $fsus-black;
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.#{$namespace}-checkbox__input.is-checked + .#{$namespace}-checkbox__label,
+.#{$namespace}-radio__input.is-checked + .#{$namespace}-radio__label {
+  color: $fsus-text;
+  font-weight: 600;
+}
+
+.#{$namespace}-switch__core {
+  background: rgba(161, 161, 170, 0.32);
+  border-color: rgba(161, 161, 170, 0.32);
+  box-shadow: none;
+}
+
+.#{$namespace}-switch__action {
+  box-shadow: none;
+}
+
+.#{$namespace}-switch.is-checked .#{$namespace}-switch__core {
+  background: $fsus-black;
+  border-color: $fsus-black;
+}
+
+.#{$namespace}-card,
+.#{$namespace}-alert,
+.#{$namespace}-descriptions,
+.#{$namespace}-calendar,
+.#{$namespace}-transfer-panel,
+.#{$namespace}-tree,
+.#{$namespace}-collapse,
+.#{$namespace}-table,
+.#{$namespace}-table-v2__root,
+.#{$namespace}-empty,
+.#{$namespace}-result,
+.#{$namespace}-menu:not(.#{$namespace}-menu--horizontal) {
+  @include fsus-panel();
+}
+
+.#{$namespace}-card__header,
+.#{$namespace}-card__footer,
+.#{$namespace}-transfer-panel__header,
+.#{$namespace}-collapse-item__header,
+.#{$namespace}-descriptions__header {
+  border-color: $fsus-border;
+}
+
+.#{$namespace}-collapse,
+.#{$namespace}-collapse-item__wrap {
+  border-color: $fsus-border;
+  background: transparent;
+}
+
+.#{$namespace}-collapse-item__header {
+  min-height: 52px;
+  color: $fsus-text;
+  font-weight: 600;
+}
+
+.#{$namespace}-collapse-item__content,
+.#{$namespace}-alert__description,
+.#{$namespace}-empty__description p,
+.#{$namespace}-result__subtitle,
+.#{$namespace}-descriptions__content,
+.#{$namespace}-statistic__head,
+.#{$namespace}-timeline-item__timestamp,
+.#{$namespace}-page-header__content,
+.#{$namespace}-breadcrumb__inner,
+.#{$namespace}-breadcrumb__separator {
+  color: $fsus-text-muted;
+}
+
+.#{$namespace}-statistic__content,
+.#{$namespace}-result__title p,
+.#{$namespace}-alert__title,
+.#{$namespace}-page-header__title,
+.#{$namespace}-descriptions__title,
+.#{$namespace}-empty__description p,
+.#{$namespace}-breadcrumb__item:last-child .#{$namespace}-breadcrumb__inner {
+  color: $fsus-text;
+}
+
+.#{$namespace}-tag,
+.#{$namespace}-check-tag {
+  color: $fsus-text-muted;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.#{$namespace}-tag:hover,
+.#{$namespace}-check-tag:hover {
+  background: #ffffff;
+  border-color: $fsus-border-strong;
+  color: $fsus-text;
+}
+
+.#{$namespace}-avatar {
+  background: $fsus-subtle-bg;
+  border: 1px solid $fsus-border;
+  color: $fsus-text;
+}
+
+.#{$namespace}-badge__content {
+  background: $fsus-black;
+  border: 0;
+  box-shadow: 0 0 0 2px #ffffff;
+}
+
+.#{$namespace}-dialog,
+.#{$namespace}-drawer,
+.#{$namespace}-message-box,
+.#{$namespace}-message,
+.#{$namespace}-notification,
+.#{$namespace}-popover.#{$namespace}-popper,
+.#{$namespace}-popper.is-light,
+.#{$namespace}-popper.is-dark,
+.#{$namespace}-popper.is-pure,
+.#{$namespace}-select__popper,
+.#{$namespace}-picker__popper,
+.#{$namespace}-dropdown__popper,
+.#{$namespace}-autocomplete-suggestion,
+.#{$namespace}-cascader__dropdown,
+.#{$namespace}-color-picker__panel,
+.#{$namespace}-menu--popup {
+  @include fsus-floating();
+}
+
+.#{$namespace}-popper.is-dark,
+.#{$namespace}-popper.is-light,
+.#{$namespace}-popper.is-pure,
+.#{$namespace}-popover.#{$namespace}-popper,
+.#{$namespace}-message,
+.#{$namespace}-notification,
+.#{$namespace}-message-box,
+.#{$namespace}-dialog,
+.#{$namespace}-drawer {
+  color: $fsus-text;
+}
+
+.#{$namespace}-popper .#{$namespace}-popper__arrow::before {
+  background: $fsus-float-bg;
+  border-color: $fsus-border;
+}
+
+.#{$namespace}-dialog__header,
+.#{$namespace}-drawer__header,
+.#{$namespace}-message-box__header {
+  padding-bottom: 0;
+}
+
+.#{$namespace}-dialog__title,
+.#{$namespace}-drawer__title,
+.#{$namespace}-message-box__title,
+.#{$namespace}-notification__title,
+.#{$namespace}-popover__title {
+  color: $fsus-text;
+  letter-spacing: -0.02em;
+}
+
+.#{$namespace}-dialog__body,
+.#{$namespace}-drawer__body,
+.#{$namespace}-message-box__content,
+.#{$namespace}-notification__content,
+.#{$namespace}-message__content {
+  color: $fsus-text-muted;
+}
+
+.#{$namespace}-message {
+  top: 16px;
+  width: min(480px, calc(100vw - 24px));
+  padding: 12px 16px;
+  border-radius: 18px;
+}
+
+.#{$namespace}-notification {
+  width: min(420px, calc(100vw - 24px));
+}
+
+.#{$namespace}-loading-mask {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.#{$namespace}-loading-spinner {
+  .circular {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border-radius: 999px;
+    background: #f4f4f5;
+    animation: skeleton-zinc-pulse 1.5s ease-in-out infinite;
+  }
+
+  .path {
+    display: none;
+  }
+
+  .#{$namespace}-loading-text {
+    color: $fsus-text-muted;
+    letter-spacing: 0.08em;
+  }
+}
+
+.#{$namespace}-select-dropdown,
+.#{$namespace}-dropdown-menu,
+.#{$namespace}-picker-panel,
+.#{$namespace}-time-panel,
+.#{$namespace}-autocomplete-suggestion,
+.#{$namespace}-cascader-menu,
+.#{$namespace}-cascader-panel,
+.#{$namespace}-color-dropdown,
+.#{$namespace}-color-picker__panel {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.#{$namespace}-select-dropdown__list,
+.#{$namespace}-dropdown__list {
+  padding: 6px;
+}
+
+.#{$namespace}-select-dropdown__item,
+.#{$namespace}-select-dropdown__option-item,
+.#{$namespace}-dropdown-menu__item,
+.#{$namespace}-cascader-node,
+.#{$namespace}-autocomplete-suggestion li,
+.#{$namespace}-picker-panel__shortcut,
+.#{$namespace}-time-panel__btn,
+.#{$namespace}-picker-panel__icon-btn {
+  border-radius: 12px;
+  color: $fsus-text-muted;
+}
+
+.#{$namespace}-select-dropdown__item:hover,
+.#{$namespace}-select-dropdown__item.hover,
+.#{$namespace}-select-dropdown__option-item:hover,
+.#{$namespace}-dropdown-menu__item:hover,
+.#{$namespace}-dropdown-menu__item:focus,
+.#{$namespace}-cascader-node:hover,
+.#{$namespace}-cascader-node.in-active-path,
+.#{$namespace}-cascader-node.is-active,
+.#{$namespace}-autocomplete-suggestion li:hover,
+.#{$namespace}-picker-panel__shortcut:hover,
+.#{$namespace}-time-panel__btn:hover,
+.#{$namespace}-picker-panel__icon-btn:hover {
+  background: $fsus-subtle-bg;
+  color: $fsus-text;
+}
+
+.#{$namespace}-select-dropdown__item.selected,
+.#{$namespace}-select-dropdown__option-item.is-selected,
+.#{$namespace}-cascader-node.is-selectable.in-checked-path,
+.#{$namespace}-cascader-node.is-active {
+  color: $fsus-text;
+  font-weight: 600;
+}
+
+.#{$namespace}-picker-panel__footer,
+.#{$namespace}-picker-panel__sidebar,
+.#{$namespace}-time-panel__footer,
+.#{$namespace}-cascader-panel,
+.#{$namespace}-transfer-panel__footer {
+  border-color: $fsus-border;
+}
+
+.#{$namespace}-date-table td .#{$namespace}-date-table-cell__text,
+.#{$namespace}-month-table td .cell,
+.#{$namespace}-year-table td .cell,
+.#{$namespace}-time-spinner__item {
+  border-radius: 12px;
+}
+
+.#{$namespace}-date-table td.available:hover .#{$namespace}-date-table-cell__text,
+.#{$namespace}-month-table td .cell:hover,
+.#{$namespace}-year-table td .cell:hover,
+.#{$namespace}-time-spinner__item:hover:not(.disabled):not(.active) {
+  background: $fsus-subtle-bg;
+  color: $fsus-text;
+}
+
+.#{$namespace}-date-table td.current:not(.disabled) .#{$namespace}-date-table-cell__text,
+.#{$namespace}-month-table td.current:not(.disabled) .cell,
+.#{$namespace}-year-table td.current:not(.disabled) .cell,
+.#{$namespace}-time-spinner__item.active:not(.disabled) {
+  background: $fsus-black;
+  color: #ffffff;
+}
+
+.#{$namespace}-menu {
+  border-color: $fsus-border;
+}
+
+.#{$namespace}-menu-item,
+.#{$namespace}-sub-menu__title,
+.#{$namespace}-menu-item-group__title {
+  min-height: 44px;
+  color: $fsus-text-muted;
+}
+
+.#{$namespace}-menu-item:hover,
+.#{$namespace}-sub-menu__title:hover,
+.#{$namespace}-menu--horizontal > .#{$namespace}-menu-item:hover,
+.#{$namespace}-menu--horizontal > .#{$namespace}-sub-menu:hover .#{$namespace}-sub-menu__title {
+  background: $fsus-subtle-bg;
+  color: $fsus-text;
+}
+
+.#{$namespace}-menu-item.is-active,
+.#{$namespace}-sub-menu.is-active > .#{$namespace}-sub-menu__title,
+.#{$namespace}-menu--horizontal > .#{$namespace}-menu-item.is-active,
+.#{$namespace}-menu--horizontal > .#{$namespace}-sub-menu.is-active .#{$namespace}-sub-menu__title {
+  background: $fsus-subtle-bg;
+  color: $fsus-text;
+  font-weight: 700;
+  border-bottom-color: transparent !important;
+}
+
+.#{$namespace}-tabs__header {
+  margin-bottom: 18px;
+}
+
+.#{$namespace}-tabs__nav-wrap::after,
+.#{$namespace}-tabs--card > .#{$namespace}-tabs__header,
+.#{$namespace}-tabs--border-card > .#{$namespace}-tabs__header {
+  border-color: $fsus-border;
+  background: transparent;
+}
+
+.#{$namespace}-tabs__active-bar {
+  display: none;
+}
+
+.#{$namespace}-tabs__item {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  color: $fsus-text-muted;
+}
+
+.#{$namespace}-tabs__item:hover,
+.#{$namespace}-tabs__item.is-active {
+  background: $fsus-subtle-bg;
+  color: $fsus-text;
+}
+
+.#{$namespace}-tabs__item.is-active {
+  font-weight: 700;
+}
+
+.#{$namespace}-pagination {
+  gap: 8px;
+  flex-wrap: wrap;
+  color: $fsus-text-muted;
+}
+
+.#{$namespace}-pagination button,
+.#{$namespace}-pager li {
+  @include fsus-control(999px);
+  min-width: 38px;
+  height: 38px;
+  box-shadow: none;
+  color: $fsus-text-muted;
+}
+
+.#{$namespace}-pagination button:hover,
+.#{$namespace}-pager li:hover,
+.#{$namespace}-pager li.is-active {
+  background: $fsus-subtle-bg;
+  border-color: $fsus-border-strong;
+  color: $fsus-text;
+}
+
+.#{$namespace}-pager li.is-active {
+  font-weight: 700;
+}
+
+.#{$namespace}-table,
+.#{$namespace}-table__inner-wrapper,
+.#{$namespace}-table__expanded-cell,
+.#{$namespace}-table-v2__main,
+.#{$namespace}-table-v2__left,
+.#{$namespace}-table-v2__right {
+  background: transparent;
+}
+
+.#{$namespace}-table__inner-wrapper::before {
+  display: none;
+}
+
+.#{$namespace}-table th.#{$namespace}-table__cell,
+.#{$namespace}-table-v2__header-cell {
+  background: rgba(250, 250, 250, 0.92);
+  color: $fsus-text-muted;
+  border-bottom-color: $fsus-border;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.#{$namespace}-table td.#{$namespace}-table__cell,
+.#{$namespace}-table-v2__row,
+.#{$namespace}-table-v2__header-row {
+  border-bottom-color: rgba(9, 9, 11, 0.06);
+}
+
+.#{$namespace}-table .#{$namespace}-table__row:hover > td.#{$namespace}-table__cell,
+.#{$namespace}-table-v2__row:hover,
+.#{$namespace}-table-v2__row.row-hover {
+  background: rgba(244, 244, 245, 0.72);
+}
+
+.#{$namespace}-descriptions__body .#{$namespace}-descriptions__table,
+.#{$namespace}-descriptions__cell {
+  border-color: $fsus-border !important;
+}
+
+.#{$namespace}-descriptions__label.#{$namespace}-descriptions__cell {
+  background: rgba(250, 250, 250, 0.92);
+}
+
+.#{$namespace}-tree {
+  padding: 12px;
+}
+
+.#{$namespace}-tree-node__content {
+  min-height: 36px;
+  border-radius: 12px;
+  color: $fsus-text-muted;
+}
+
+.#{$namespace}-tree-node__content:hover,
+.#{$namespace}-tree-node:focus > .#{$namespace}-tree-node__content,
+.#{$namespace}-tree--highlight-current .#{$namespace}-tree-node.is-current > .#{$namespace}-tree-node__content {
+  background: $fsus-subtle-bg;
+  color: $fsus-text;
+}
+
+.#{$namespace}-tree-node__expand-icon {
+  color: $fsus-text-soft;
+}
+
+.#{$namespace}-upload,
+.#{$namespace}-upload-dragger {
+  width: 100%;
+}
+
+.#{$namespace}-upload-dragger {
+  @include fsus-control(24px);
+  min-height: 180px;
+  border-style: dashed;
+  padding: 28px 20px;
+
+  &:hover,
+  &.is-dragover {
+    background: #ffffff;
+    border-color: rgba(5, 5, 5, 0.2);
+    box-shadow: inset 0 0 0 1px rgba(5, 5, 5, 0.08);
+  }
+}
+
+.#{$namespace}-upload-list__item {
+  @include fsus-control(14px);
+  padding: 10px 12px;
+
+  &:hover {
+    background: #ffffff;
+  }
+}
+
+.#{$namespace}-progress-bar__outer,
+.#{$namespace}-slider__runway {
+  background: $fsus-subtle-bg;
+}
+
+.#{$namespace}-progress-bar__inner,
+.#{$namespace}-slider__bar {
+  background: $fsus-black;
+}
+
+.#{$namespace}-slider__button {
+  border-color: $fsus-black;
+}
+
+.#{$namespace}-rate__item .#{$namespace}-rate__icon {
+  color: #d4d4d8;
+}
+
+.#{$namespace}-rate__item .hover,
+.#{$namespace}-rate__item .#{$namespace}-icon-star-on {
+  color: $fsus-black;
+}
+
+.#{$namespace}-timeline-item__node {
+  background: $fsus-black;
+  box-shadow: 0 0 0 4px rgba(244, 244, 245, 0.92);
+}
+
+.#{$namespace}-step__icon {
+  border-color: rgba(9, 9, 11, 0.12);
+  background: #ffffff;
+}
+
+.#{$namespace}-step__head.is-process,
+.#{$namespace}-step__head.is-success,
+.#{$namespace}-step__title.is-process,
+.#{$namespace}-step__title.is-success {
+  color: $fsus-text;
+  border-color: $fsus-black;
+}
+
+.#{$namespace}-divider__text {
+  background: #fafafa;
+  color: $fsus-text-muted;
+}
+
+.#{$namespace}-skeleton__item {
+  border-radius: 14px;
+}
+
+.#{$namespace}-carousel__button {
+  background: rgba(9, 9, 11, 0.18);
+}
+
+.#{$namespace}-backtop {
+  background: $fsus-black;
+  color: #ffffff;
+  box-shadow: $fsus-shadow-soft;
+}

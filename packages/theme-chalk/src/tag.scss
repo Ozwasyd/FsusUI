@@ -96,13 +96,15 @@ $tag-icon-span-gap: map.merge(
   height: map.get($tag-height, 'default');
   padding: 0 map.get($tag-padding, 'default') - $border-width;
 
-  font-size: getCssVar('tag-font-size');
+  font-size: 0.75rem;
   line-height: 1;
   border-width: $tag-border-width;
   border-style: solid;
   border-radius: getCssVar('tag-border-radius');
   box-sizing: border-box;
   white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 
   @include set-css-var-value('icon-size', 14px);
 

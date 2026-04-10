@@ -1,0 +1,26 @@
+{
+  "name": "demo-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 5173",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 4173",
+    "tunnel": "lt --port 5173 --local-host 127.0.0.1"
+  },
+  "dependencies": {
+    "element-plus": "workspace:*",
+    "@element-plus/theme-chalk": "workspace:*",
+    "@element-plus/icons-vue": "^2.3.2",
+    "vue": "^3.5.32"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.5",
+    "localtunnel": "^2.0.2",
+    "sass": "^1.99.0",
+    "typescript": "^6.0.2",
+    "vite": "^7.1.7",
+    "vue-tsc": "^3.2.6"
+  }
+}

@@ -10,34 +10,15 @@
   vertical-align: middle;
 }
 @include b(spinner-inner) {
-  animation: rotate 2s linear infinite;
-  width: 50px;
-  height: 50px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: #f4f4f5;
+  animation: skeleton-zinc-pulse 1.5s ease-in-out infinite;
 
   & .path {
-    stroke: getCssVar('border-color', 'lighter');
-    stroke-linecap: round;
-    animation: dash 1.5s ease-in-out infinite;
+    display: none;
   }
 }
 
-@keyframes rotate {
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes dash {
-  0% {
-    stroke-dasharray: 1, 150;
-    stroke-dashoffset: 0;
-  }
-  50% {
-    stroke-dasharray: 90, 150;
-    stroke-dashoffset: -35;
-  }
-  100% {
-    stroke-dasharray: 90, 150;
-    stroke-dashoffset: -124;
-  }
-}
+// Keyframes removed as we use skeleton-zinc-pulse

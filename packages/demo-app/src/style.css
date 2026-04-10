@@ -1,0 +1,346 @@
+:root {
+  color-scheme: light;
+  font-family: 'Google Sans', 'Helvetica Neue', Helvetica, 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+  background: #f4f4f5;
+  color: #09090b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(244, 244, 245, 0.96), transparent 24%),
+    radial-gradient(circle at top right, rgba(9, 9, 11, 0.04), transparent 18%),
+    linear-gradient(180deg, #fafafa 0%, #f4f4f5 100%);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.skip-demo-link {
+  position: fixed;
+  top: -100px;
+  left: 16px;
+  z-index: 9999;
+  padding: 10px 14px;
+  background: #050505;
+  color: #fff;
+  border-radius: 999px;
+  text-decoration: none;
+}
+
+.skip-demo-link:focus-visible {
+  top: 16px;
+  outline: 2px solid #050505;
+  outline-offset: 3px;
+}
+
+.demo-shell {
+  min-height: 100vh;
+}
+
+.demo-header {
+  position: sticky;
+  top: 0;
+  z-index: 80;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 20px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.78);
+  border-bottom: 1px solid rgba(9, 9, 11, 0.08);
+}
+
+.demo-brand {
+  display: grid;
+  gap: 6px;
+}
+
+.demo-kicker {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #71717a;
+}
+
+.demo-title {
+  font-size: clamp(28px, 6vw, 64px);
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+  font-weight: 700;
+}
+
+.demo-title::after {
+  content: '.';
+  opacity: 0.28;
+}
+
+.demo-subtitle {
+  max-width: 640px;
+  color: #71717a;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.demo-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.demo-nav a {
+  text-decoration: none;
+  color: #09090b;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(9, 9, 11, 0.08);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.demo-nav a:hover {
+  opacity: 0.8;
+  transform: translateY(-1px);
+}
+
+.demo-main {
+  width: min(1400px, calc(100vw - 24px));
+  margin: 0 auto;
+  padding: 24px 0 120px;
+}
+
+.section {
+  padding: 28px 0 36px;
+}
+
+.section-head {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.section-label {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #71717a;
+}
+
+.section-title {
+  font-size: clamp(22px, 3vw, 34px);
+  letter-spacing: -0.04em;
+  margin: 0;
+}
+
+.section-desc {
+  margin: 0;
+  max-width: 760px;
+  color: #71717a;
+  line-height: 1.7;
+}
+
+.demo-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.demo-card {
+  grid-column: span 4;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(9, 9, 11, 0.08);
+  border-radius: 24px;
+  padding: 20px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.06);
+  display: grid;
+  gap: 14px;
+  min-height: 170px;
+}
+
+.demo-card.wide {
+  grid-column: span 6;
+}
+
+.demo-card.full {
+  grid-column: span 12;
+}
+
+.demo-card h3 {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: -0.03em;
+}
+
+.demo-card p {
+  margin: 0;
+  color: #71717a;
+  line-height: 1.6;
+  font-size: 13px;
+}
+
+.stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.stack.column {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.muted-box {
+  background: rgba(244, 244, 245, 0.9);
+  border: 1px dashed rgba(9, 9, 11, 0.12);
+  border-radius: 18px;
+  padding: 14px;
+}
+
+.demo-phone-frame {
+  width: min(100%, 340px);
+  margin: 0 auto;
+  border-radius: 28px;
+  padding: 14px;
+  background: #050505;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.24);
+}
+
+.demo-phone-screen {
+  border-radius: 18px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.scroll-list {
+  max-height: 220px;
+  overflow: auto;
+  border-radius: 16px;
+  border: 1px solid rgba(9, 9, 11, 0.08);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.scroll-list li {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(9, 9, 11, 0.06);
+}
+
+.scroll-list li:last-child {
+  border-bottom: none;
+}
+
+.virtual-item {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 14px;
+  border-bottom: 1px solid rgba(9, 9, 11, 0.06);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.overlay-demo {
+  position: relative;
+  min-height: 220px;
+  border-radius: 22px;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(244, 244, 245, 0.95), rgba(228, 228, 231, 0.92));
+}
+
+.overlay-panel {
+  position: absolute;
+  inset: auto 20px 20px 20px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.86);
+  border-radius: 18px;
+  border: 1px solid rgba(9, 9, 11, 0.08);
+}
+
+.low-level-popper {
+  padding: 12px 14px;
+  max-width: 220px;
+}
+
+.hero-watermark {
+  min-height: 160px;
+  border-radius: 22px;
+  padding: 24px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, rgba(250, 250, 250, 0.98), rgba(244, 244, 245, 0.94));
+}
+
+.page-spacer {
+  height: 50vh;
+}
+
+@media (max-width: 1100px) {
+  .demo-card,
+  .demo-card.wide {
+    grid-column: span 6;
+  }
+}
+
+@media (max-width: 760px) {
+  .demo-header {
+    position: static;
+    padding: 16px;
+    display: grid;
+  }
+
+  .demo-nav {
+    justify-content: flex-start;
+    overflow: auto;
+    padding-bottom: 4px;
+  }
+
+  .demo-main {
+    width: min(100vw - 16px, 100%);
+    padding-top: 16px;
+  }
+
+  .section {
+    padding: 20px 0 26px;
+  }
+
+  .demo-grid {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+
+  .demo-card,
+  .demo-card.wide,
+  .demo-card.full {
+    grid-column: span 1;
+    border-radius: 20px;
+    padding: 16px;
+  }
+
+  .demo-title {
+    font-size: 34px;
+  }
+}
