@@ -17,9 +17,12 @@ build/
 CMakeCache.txt
 CMakeFiles/
 *.ninja
+.ninja_deps
+.ninja_log
 cmake_install.cmake
 .cmake/
 packages/wasm/.cmake-check/
+packages/wasm/build/
 --help/
 
 # local env files
