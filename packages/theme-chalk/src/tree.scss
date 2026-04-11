@@ -47,6 +47,7 @@
     /* focus */
     > .#{$namespace}-tree-node__content {
       background-color: getCssVar('tree-node-hover-bg-color');
+      @include a11y-focus-ring(2px, getCssVar('border-radius-base'));
     }
   }
 
@@ -63,10 +64,12 @@
     display: flex;
     align-items: center;
     height: getCssVar('tree-node-content-height');
+    padding-right: 10px;
+    border-radius: getCssVar('border-radius-base');
     cursor: pointer;
 
     & > .#{$namespace}-tree-node__expand-icon {
-      padding: 6px;
+      padding: 10px 8px;
       box-sizing: content-box;
     }
     & > label.#{$namespace}-checkbox {

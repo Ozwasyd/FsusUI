@@ -1,5 +1,5 @@
 <template>
-  <span :class="ns.e('total')" :disabled="disabled">
+  <span :class="ns.e('total')" :aria-disabled="disabled">
     {{
       t('el.pagination.total', {
         total,

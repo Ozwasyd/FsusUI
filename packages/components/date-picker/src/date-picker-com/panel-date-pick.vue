@@ -51,7 +51,7 @@
               :visible="timePickerVisible"
               :format="timeFormat"
               :parsed-value="innerDate"
-              @pick="handleTimePick"
+              v-on="timePickerEvents"
             />
           </span>
         </div>
@@ -137,7 +137,7 @@
             :parsed-value="parsedValue"
             :disabled-date="disabledDate"
             :cell-class-name="cellClassName"
-            @pick="handleDatePick"
+            v-on="dateTableEvents"
           />
           <year-table
             v-if="currentView === 'year'"
@@ -328,6 +328,10 @@ const handleDatePick = (value: DateTableEmits, keepOpen?: boolean) => {
   } else if (selectionMode.value === 'dates') {
     emit(value as DatesPickerEmits, true) // set true to keep panel open
   }
+}
+
+const dateTableEvents = {
+  pick: handleDatePick,
 }
 
 const moveByMonth = (forward: boolean) => {
@@ -545,6 +549,10 @@ const handleTimePick = (value: Dayjs, visible: boolean, first: boolean) => {
   if (!first) {
     timePickerVisible.value = visible
   }
+}
+
+const timePickerEvents = {
+  pick: handleTimePick,
 }
 
 const handleVisibleTimeChange = (value: string) => {

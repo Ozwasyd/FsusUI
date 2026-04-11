@@ -3,6 +3,7 @@ import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import defineGetter from '@element-plus/test-utils/define-getter'
 import { ElFormItem as FormItem } from '@element-plus/components/form'
+import { clickClearButton } from '../../../test-utils/dom'
 import Input from '../src/input.vue'
 // Type alias to bypass strict prop checking for HTML fallthrough attrs in tests
 const _Input = Input as any
@@ -259,10 +260,10 @@ describe('Input.vue', () => {
   test('use formatter and parser', () => {
     const val = ref('10000')
     const formatter = (val: string) => {
-      return val.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+      return val.replaceAll(/\B(?=(\d{3})+(?!\d))/g, ',')
     }
     const parser = (val: string) => {
-      return val.replace(/\$\s?|(,*)/g, '')
+      return val.replaceAll(/\$\s?|(,*)/g, '')
     }
 
     const wrapper = mount(() => (
@@ -305,22 +306,23 @@ describe('Input.vue', () => {
 
     test('method:resizeTextarea', async () => {
       const text = ref('TEXT:resizeTextarea')
+      const textareaProps = {
+        autosize: { minRows: 1, maxRows: 1 },
+        type: 'textarea',
+      } as any
       const wrapper = mount({
         setup: () => () =>
-          (
-            <Input
-              ref="textarea"
-              autosize={{ minRows: 1, maxRows: 1 }}
-              type="textarea"
-              v-model={text.value}
-            />
-          ),
+          <Input ref="textarea" v-model={text.value} {...textareaProps} />,
       })
       const refTextarea = wrapper.vm.$refs.textarea as InputInstance
 
       const originMinHeight = (refTextarea.textareaStyle as CSSProperties)
         .minHeight
-      ;(refTextarea.autosize as Exclude<InputAutoSize, boolean>).minRows = 5
+      const textareaAutosize = refTextarea.autosize as unknown as Exclude<
+        InputAutoSize,
+        boolean
+      >
+      textareaAutosize.minRows = 5
 
       refTextarea.resizeTextarea()
       // After this textarea min-height (style)  will change
@@ -371,7 +373,6 @@ describe('Input.vue', () => {
       ))
 
       const el = wrapper.find('input').element
-      wrapper.vm
       const simulateEvent = (text: string, event: string) => {
         el.value = text
         el.dispatchEvent(new Event(event))
@@ -402,11 +403,12 @@ describe('Input.vue', () => {
       ))
 
       const input = wrapper.find('input')
-      const vm = wrapper.vm
       // focus to show clear button
       await input.trigger('focus')
       await nextTick()
-      vm.$el.querySelector('.el-input__clear').click()
+      const clearButton = wrapper.find('.el-input__clear')
+      expect(clearButton.exists()).toBe(true)
+      await clickClearButton(clearButton)
       await nextTick()
       expect(content.value).toEqual('')
       expect(handleClear).toBeCalled()

@@ -6,7 +6,7 @@ import type { LoadingInstance } from '@element-plus/components/loading/src/loadi
 
 describe('loading config', () => {
   it('should render loading component', async () => {
-    let instance: LoadingInstance
+    let instance!: LoadingInstance
     const startLoading = () => {
       instance = ElLoading.service()
     }
@@ -21,7 +21,6 @@ describe('loading config', () => {
     const mask = document.querySelector<HTMLElement>('.ep-loading-mask')
     expect(mask).not.toBeNull()
     expect(mask?.style.zIndex).toBe('10001')
-    // @ts-expect-error
     instance.close()
   })
 })

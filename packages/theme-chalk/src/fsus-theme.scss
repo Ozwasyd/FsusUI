@@ -3,14 +3,15 @@
 
 $fsus-black: #050505;
 $fsus-text: #09090b;
-$fsus-text-muted: #71717a;
-$fsus-text-soft: #a1a1aa;
+$fsus-text-muted: #5f5f68;
+$fsus-text-soft: #7c7c86;
 $fsus-border: rgba(9, 9, 11, 0.08);
 $fsus-border-strong: rgba(9, 9, 11, 0.14);
 $fsus-panel-bg: #ffffff;
 $fsus-control-bg: rgba(250, 250, 250, 0.96);
 $fsus-subtle-bg: rgba(244, 244, 245, 0.92);
 $fsus-float-bg: rgba(255, 255, 255, 0.92);
+$fsus-highlight: rgba(255, 255, 255, 0.74);
 $fsus-shadow-soft: 0 14px 40px rgba(15, 23, 42, 0.08);
 $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 
@@ -18,16 +19,16 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   background: $fsus-panel-bg;
   border: 1px solid $fsus-border;
   border-radius: $radius;
-  box-shadow: $fsus-shadow-soft;
+  box-shadow: inset 0 1px 0 $fsus-highlight, $fsus-shadow-soft;
 }
 
 @mixin fsus-floating($radius: 24px) {
   background: $fsus-float-bg;
-  border: 1px solid $fsus-border;
+  border: 1px solid rgba(9, 9, 11, 0.1);
   border-radius: $radius;
-  box-shadow: $fsus-shadow-float;
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  box-shadow: inset 0 1px 0 $fsus-highlight, $fsus-shadow-float;
+  backdrop-filter: blur(var(--fsus-backdrop-blur, 18px));
+  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur, 18px));
 }
 
 @mixin fsus-control($radius: 16px) {
@@ -42,6 +43,8 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 
 :root {
   --el-a11y-focus-color: #050505;
+  --fsus-backdrop-blur: 18px;
+  --fsus-backdrop-blur-soft: 12px;
   --el-border-radius-base: 14px;
   --el-border-radius-small: 10px;
   --el-border-radius-round: 999px;
@@ -59,14 +62,14 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   --el-border-color-lighter: #f1f1f3;
   --el-border-color-extra-light: #f7f7f8;
   --el-text-color-primary: #09090b;
-  --el-text-color-regular: #71717a;
-  --el-text-color-secondary: #71717a;
-  --el-text-color-placeholder: #a1a1aa;
+  --el-text-color-regular: #5f5f68;
+  --el-text-color-secondary: #5f5f68;
+  --el-text-color-placeholder: #7c7c86;
   --el-disabled-bg-color: #f4f4f5;
-  --el-disabled-text-color: #a1a1aa;
+  --el-disabled-text-color: #7c7c86;
   --el-disabled-border-color: #ececf0;
-  --el-font-family: 'Google Sans', 'Helvetica Neue', Helvetica, 'PingFang SC',
-    'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+  --el-font-family: 'Google Sans', 'Noto Sans SC', 'Noto Sans TC',
+    'Noto Sans JP', ui-sans-serif, system-ui, sans-serif;
   --el-card-border-radius: 24px;
   --el-dialog-border-radius: 24px;
   --el-popover-border-radius: 20px;
@@ -104,7 +107,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 
 .#{$namespace}-button {
   @include fsus-control(14px);
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 16px;
   box-shadow: none;
   font-weight: 600;
@@ -209,7 +212,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-range-editor.#{$namespace}-input__wrapper,
 .#{$namespace}-input-number,
 .#{$namespace}-color-picker__trigger {
-  min-height: 42px;
+  min-height: 44px;
 
   &:hover,
   &:focus-within {
@@ -341,12 +344,87 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   @include fsus-panel();
 }
 
+.#{$namespace}-page-header,
+.#{$namespace}-statistic,
+.#{$namespace}-countdown {
+  @include fsus-panel(18px);
+}
+
+.#{$namespace}-page-header,
+.#{$namespace}-statistic,
+.#{$namespace}-countdown {
+  padding: 14px 16px;
+}
+
 .#{$namespace}-card__header,
 .#{$namespace}-card__footer,
 .#{$namespace}-transfer-panel__header,
 .#{$namespace}-collapse-item__header,
 .#{$namespace}-descriptions__header {
   border-color: $fsus-border;
+}
+
+.#{$namespace}-alert,
+.#{$namespace}-message,
+.#{$namespace}-notification {
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: rgba(9, 9, 11, 0.16);
+  }
+}
+
+.#{$namespace}-alert {
+  padding-left: 16px;
+}
+
+.#{$namespace}-alert__title,
+.#{$namespace}-message__content,
+.#{$namespace}-notification__title {
+  font-weight: 600;
+}
+
+.#{$namespace}-alert__description,
+.#{$namespace}-notification__content,
+.#{$namespace}-message__content {
+  line-height: 1.55;
+}
+
+.#{$namespace}-alert--success,
+.#{$namespace}-message--success,
+.#{$namespace}-notification--success {
+  &::before {
+    background: rgba(22, 163, 74, 0.42);
+  }
+}
+
+.#{$namespace}-alert--warning,
+.#{$namespace}-message--warning,
+.#{$namespace}-notification--warning {
+  &::before {
+    background: rgba(217, 119, 6, 0.42);
+  }
+}
+
+.#{$namespace}-alert--error,
+.#{$namespace}-message--error,
+.#{$namespace}-notification--error {
+  &::before {
+    background: rgba(220, 38, 38, 0.42);
+  }
+}
+
+.#{$namespace}-alert--info,
+.#{$namespace}-message--info,
+.#{$namespace}-notification--info {
+  &::before {
+    background: rgba(113, 113, 122, 0.34);
+  }
 }
 
 .#{$namespace}-collapse,
@@ -454,6 +532,22 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   padding-bottom: 0;
 }
 
+.#{$namespace}-dialog__headerbtn,
+.#{$namespace}-drawer__close-btn,
+.#{$namespace}-notification__closeBtn,
+.#{$namespace}-alert__close-btn {
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 999px;
+}
+
+.#{$namespace}-dialog__headerbtn:focus-visible,
+.#{$namespace}-drawer__close-btn:focus-visible,
+.#{$namespace}-notification__closeBtn:focus-visible,
+.#{$namespace}-alert__close-btn:focus-visible {
+  @include a11y-focus-ring(2px, 999px);
+}
+
 .#{$namespace}-dialog__title,
 .#{$namespace}-drawer__title,
 .#{$namespace}-message-box__title,
@@ -484,8 +578,8 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 
 .#{$namespace}-loading-mask {
   background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(var(--fsus-backdrop-blur-soft, 12px));
+  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur-soft, 12px));
 }
 
 .#{$namespace}-loading-spinner {
@@ -535,8 +629,14 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-picker-panel__shortcut,
 .#{$namespace}-time-panel__btn,
 .#{$namespace}-picker-panel__icon-btn {
+  min-height: 44px;
   border-radius: 12px;
   color: $fsus-text-muted;
+}
+
+.#{$namespace}-cascader-node {
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .#{$namespace}-select-dropdown__item:hover,
@@ -575,6 +675,9 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-month-table td .cell,
 .#{$namespace}-year-table td .cell,
 .#{$namespace}-time-spinner__item {
+  min-width: 40px;
+  min-height: 40px;
+  line-height: 40px;
   border-radius: 12px;
 }
 
@@ -639,7 +742,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 }
 
 .#{$namespace}-tabs__item {
-  height: 40px;
+  height: 44px;
   padding: 0 14px;
   border-radius: 999px;
   color: $fsus-text-muted;
@@ -664,8 +767,8 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-pagination button,
 .#{$namespace}-pager li {
   @include fsus-control(999px);
-  min-width: 38px;
-  height: 38px;
+  min-width: 44px;
+  height: 44px;
   box-shadow: none;
   color: $fsus-text-muted;
 }
@@ -732,7 +835,8 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 }
 
 .#{$namespace}-tree-node__content {
-  min-height: 36px;
+  min-height: 44px;
+  padding-right: 10px;
   border-radius: 12px;
   color: $fsus-text-muted;
 }
@@ -824,6 +928,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 
 .#{$namespace}-skeleton__item {
   border-radius: 14px;
+  transition: opacity 0.28s ease, background-color 0.28s ease;
 }
 
 .#{$namespace}-carousel__button {
@@ -834,4 +939,40 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   background: $fsus-black;
   color: #ffffff;
   box-shadow: $fsus-shadow-soft;
+}
+
+@media (max-width: 760px) {
+  :root {
+    --fsus-backdrop-blur: 10px;
+    --fsus-backdrop-blur-soft: 6px;
+  }
+
+  .#{$namespace}-message,
+  .#{$namespace}-notification {
+    width: min(100vw - 16px, 420px);
+  }
+
+  .#{$namespace}-table th.#{$namespace}-table__cell,
+  .#{$namespace}-table-v2__header-cell {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+  }
+
+  .#{$namespace}-tree {
+    padding: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --fsus-backdrop-blur: 0px;
+    --fsus-backdrop-blur-soft: 0px;
+  }
+
+  .#{$namespace}-skeleton__item,
+  .#{$namespace}-loading-spinner .circular {
+    transition: none;
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+  }
 }

@@ -20,6 +20,8 @@ export const whenTrigger = (
   handler: (e: Event) => void
 ) => {
   return (e: Event) => {
-    isTriggerType(unref(trigger), type) && handler(e)
+    if (isTriggerType(unref(trigger), type)) {
+      handler(e)
+    }
   }
 }

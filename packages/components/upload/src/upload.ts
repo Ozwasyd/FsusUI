@@ -1,4 +1,3 @@
-import { NOOP } from '@vue/shared'
 import { buildProps, definePropType, mutable } from '@element-plus/utils'
 import { ajaxUpload } from './ajax'
 import type { Awaitable, Mutable } from '@element-plus/utils'
@@ -6,6 +5,8 @@ import type { Awaitable, Mutable } from '@element-plus/utils'
 import type { UploadAjaxError } from './ajax'
 import type { ExtractPropTypes } from 'vue'
 import type Upload from './upload.vue'
+
+const NOOP = () => undefined
 
 export const uploadListTypes = ['text', 'picture', 'picture-card'] as const
 

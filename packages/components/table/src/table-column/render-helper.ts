@@ -53,9 +53,12 @@ function useRender<T>(
   const hasTreeColumn = computed<boolean>(() => {
     const { store } = instance.parent
     if (!store) return false
-    const { treeData } = store.states
-    const treeDataValue = treeData.value
-    return treeDataValue && Object.keys(treeDataValue).length > 0
+    return !!store.states.hasTreeData?.value
+  })
+  const firstUserColumnIndex = computed(() => {
+    return owner.value.store.states.columns.value.findIndex(
+      (item) => item.type === 'default'
+    )
   })
 
   const realWidth = ref(parseWidth(props.width))
@@ -153,12 +156,8 @@ function useRender<T>(
           children = originRenderCell(data)
         }
 
-        const { columns } = owner.value.store.states
-        const firstUserColumnIndex = columns.value.findIndex(
-          (item) => item.type === 'default'
-        )
         const shouldCreatePlaceholder =
-          hasTreeColumn.value && data.cellIndex === firstUserColumnIndex
+          hasTreeColumn.value && data.cellIndex === firstUserColumnIndex.value
         const prefix = treeCellPrefix(data, shouldCreatePlaceholder)
         const props = {
           class: 'cell',

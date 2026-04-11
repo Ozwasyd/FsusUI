@@ -3,7 +3,7 @@
     ref="arrowRef"
     :class="ns.e('arrow')"
     :style="arrowStyle"
-    data-popper-arrow
+    v-bind="arrowAttrs"
   />
 </template>
 
@@ -25,6 +25,7 @@ const { arrowOffset, arrowRef, arrowStyle } = inject(
   POPPER_CONTENT_INJECTION_KEY,
   undefined
 )!
+const arrowAttrs = { 'data-popper-arrow': '' }
 
 watch(
   () => props.arrowOffset,

@@ -13,7 +13,7 @@
     :aria-expanded="expanded"
     :aria-disabled="disabled"
     :aria-checked="checked"
-    :data-key="node?.key"
+    v-bind="nodeAttrs"
     @click.stop="handleClick"
     @contextmenu="handleContextMenu"
   >
@@ -34,7 +34,7 @@
           },
           ns.be('node', 'expand-icon'),
         ]"
-        @click.stop="handleExpandIconClick"
+        v-bind="expandIconAttrs"
       >
         <component :is="icon" />
       </el-icon>
@@ -43,8 +43,7 @@
         :model-value="checked"
         :indeterminate="indeterminate"
         :disabled="disabled"
-        @change="handleCheckChange"
-        @click.stop
+        v-bind="checkboxAttrs"
       />
       <el-node-content :node="node" />
     </div>
@@ -64,7 +63,6 @@ import {
   treeNodeEmits,
   treeNodeProps,
 } from './virtual-tree'
-import type { CheckboxValueType } from '@element-plus/components/checkbox'
 
 defineOptions({
   name: 'ElTreeNode',
@@ -84,15 +82,38 @@ const icon = computed(() => {
   return tree?.props.icon ?? CaretRight
 })
 
+const nodeAttrs = computed<Record<string, unknown>>(() => ({
+  'data-key': props.node?.key,
+}))
+
 const handleClick = (e: MouseEvent) => {
   emit('click', props.node, e)
 }
 const handleExpandIconClick = () => {
   emit('toggle', props.node)
 }
-const handleCheckChange = (value: CheckboxValueType) => {
-  emit('check', props.node, value)
+const stopNodeClick = (event: MouseEvent) => {
+  event.stopPropagation()
 }
+const handleCheckboxClick = (event: MouseEvent) => {
+  stopNodeClick(event)
+
+  if (!props.disabled) {
+    emit('check', props.node, !props.checked)
+  }
+}
+
+const expandIconAttrs = {
+  onClick: (event: MouseEvent) => {
+    stopNodeClick(event)
+    handleExpandIconClick()
+  },
+}
+
+const checkboxAttrs = {
+  onClick: handleCheckboxClick,
+}
+
 const handleContextMenu = (event: Event) => {
   if (tree?.instance?.vnode?.props?.['onNodeContextmenu']) {
     event.stopPropagation()

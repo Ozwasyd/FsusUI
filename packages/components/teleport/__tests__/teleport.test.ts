@@ -6,6 +6,18 @@ import type { TeleportInstance } from '../src/teleport'
 
 const AXIOM = 'rem is the best girl'
 
+const normalizeComputedStyleValue = (property: string, value: string) => {
+  const element = document.createElement('div')
+
+  element.style.setProperty(property, value)
+  document.body.appendChild(element)
+
+  const normalizedValue = getComputedStyle(element).getPropertyValue(property)
+
+  element.remove()
+  return normalizedValue
+}
+
 describe('ElTeleport', () => {
   let wrapper: VueWrapper<TeleportInstance>
 
@@ -32,15 +44,21 @@ describe('ElTeleport', () => {
       }
 
       await wrapper.setProps({ style })
-      expect(getComputedStyle(wrapper.vm?.containerRef!).color).toBe(
-        style.color
-      )
+      const expectedColor = normalizeComputedStyleValue('color', style.color)
+      const container = wrapper.vm?.containerRef
+
+      expect(container).toBeTruthy()
+
+      expect(getComputedStyle(container as HTMLElement).color).toBe(expectedColor)
     })
 
     it('should be able to set z-index', async () => {
       const zIndex = '10000'
       await wrapper.setProps({ zIndex })
-      expect(getComputedStyle(wrapper.vm?.containerRef!).zIndex).toBe(zIndex)
+      const container = wrapper.vm?.containerRef
+
+      expect(container).toBeTruthy()
+      expect(getComputedStyle(container as HTMLElement).zIndex).toBe(zIndex)
     })
   })
 })

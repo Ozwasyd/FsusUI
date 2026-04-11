@@ -27,7 +27,6 @@
 </template>
 
 <script lang="ts">
-// @ts-nocheck
 import { computed, defineComponent, inject } from 'vue'
 import {
   ROVING_FOCUS_GROUP_ITEM_INJECTION_KEY,
@@ -43,6 +42,8 @@ import {
   dropdownItemProps,
 } from './dropdown'
 import { DROPDOWN_INJECTION_KEY } from './tokens'
+
+import type { ComponentPublicInstance } from 'vue'
 
 export default defineComponent({
   name: 'DropdownItemImpl',
@@ -74,10 +75,16 @@ export default defineComponent({
       handleMousedown,
     } = inject(ROVING_FOCUS_GROUP_ITEM_INJECTION_KEY, undefined)!
 
+    const assignElementRef = (element: Element | ComponentPublicInstance | undefined) => {
+      const resolvedElement = element instanceof HTMLElement ? element : undefined
+
+      dropdownCollectionItemRef.value = resolvedElement ?? null
+      rovingFocusCollectionItemRef.value = resolvedElement ?? null
+      rovingFocusGroupItemRef.value = resolvedElement ?? null
+    }
+
     const itemRef = composeRefs(
-      dropdownCollectionItemRef,
-      rovingFocusCollectionItemRef,
-      rovingFocusGroupItemRef
+      assignElementRef
     )
 
     const role = computed<string>(() => {

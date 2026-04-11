@@ -114,7 +114,9 @@ const Tabs = defineComponent({
 
           nav$.value?.removeFocus?.()
         }
-      } catch {}
+      } catch {
+        // Ignore rejected beforeLeave hooks and keep current tab unchanged.
+      }
     }
 
     const handleTabClick = (

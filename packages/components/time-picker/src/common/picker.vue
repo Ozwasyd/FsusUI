@@ -16,9 +16,7 @@
     :stop-popper-mouse-event="false"
     :hide-after="0"
     persistent
-    @before-show="onBeforeShow"
-    @show="onShow"
-    @hide="onHide"
+    v-on="tooltipEvents"
   >
     <template #default>
       <el-input
@@ -27,7 +25,7 @@
         ref="inputRef"
         container-role="combobox"
         :model-value="(displayValue as string)"
-        :name="name"
+        v-bind="singleInputAttrs"
         :size="pickerSize"
         :disabled="pickerDisabled"
         :placeholder="placeholder"
@@ -45,18 +43,15 @@
           handleKeydownInput as any
         "
         @change="handleChange"
-        @mousedown="onMouseDownInput"
         @mouseenter="onMouseEnter"
         @mouseleave="onMouseLeave"
-        @touchstart="onTouchStartInput"
-        @click.stop
+        v-on="singleInputNativeEvents"
       >
         <template #prefix>
           <el-icon
             v-if="triggerIcon"
             :class="nsInput.e('icon')"
-            @mousedown.prevent="onMouseDownInput"
-            @touchstart="onTouchStartInput"
+            v-on="triggerIconEvents"
           >
             <component :is="triggerIcon" />
           </el-icon>
@@ -65,7 +60,7 @@
           <el-icon
             v-if="showClose && clearIcon"
             :class="`${nsInput.e('icon')} clear-icon`"
-            @click.stop="onClearIconClick"
+            v-on="clearIconEvents"
           >
             <component :is="clearIcon" />
           </el-icon>
@@ -85,8 +80,7 @@
         <el-icon
           v-if="triggerIcon"
           :class="[nsInput.e('icon'), nsRange.e('icon')]"
-          @mousedown.prevent="onMouseDownInput"
-          @touchstart="onTouchStartInput"
+          v-on="triggerIconEvents"
         >
           <component :is="triggerIcon" />
         </el-icon>
@@ -126,7 +120,7 @@
         <el-icon
           v-if="clearIcon"
           :class="clearIconKls"
-          @click="onClearIconClick"
+          v-on="clearIconEvents"
         >
           <component :is="clearIcon" />
         </el-icon>
@@ -267,8 +261,9 @@ const emitChange = (
   // determine user real change only
   if (isClear || !valueEquals(val, valueOnOpen.value)) {
     emit('change', val)
-    props.validateEvent &&
-      formItem?.validate('change').catch((err) => debugWarn(err))
+    if (props.validateEvent && formItem) {
+      formItem.validate('change').catch((err) => debugWarn(err))
+    }
   }
 }
 const emitInput = (input: SingleOrRange<DateModelType | Dayjs> | null) => {
@@ -353,6 +348,12 @@ const onHide = () => {
   emit('visible-change', false)
 }
 
+const tooltipEvents = {
+  'before-show': onBeforeShow,
+  show: onShow,
+  hide: onHide,
+}
+
 const handleOpen = () => {
   pickerVisible.value = true
 }
@@ -406,8 +407,9 @@ const handleBlurInput = (e?: FocusEvent) => {
           handleChange()
           pickerVisible.value = false
           emit('blur', e)
-          props.validateEvent &&
-            formItem?.validate('blur').catch((err) => debugWarn(err))
+          if (props.validateEvent && formItem) {
+            formItem.validate('blur').catch((err) => debugWarn(err))
+          }
         }
         hasJustTabExitedInput = false
       }
@@ -422,7 +424,7 @@ const pickerDisabled = computed(() => {
 })
 
 const parsedValue = computed(() => {
-  let dayOrDays: DayOrDays
+  let dayOrDays: DayOrDays | undefined
   if (valueIsEmpty.value) {
     if (pickerOptions.value.getDefaultValue) {
       dayOrDays = pickerOptions.value.getDefaultValue()
@@ -437,23 +439,25 @@ const parsedValue = computed(() => {
     }
   }
 
-  if (pickerOptions.value.getRangeAvailableTime) {
+  if (dayOrDays && pickerOptions.value.getRangeAvailableTime) {
     const availableResult = pickerOptions.value.getRangeAvailableTime(
-      dayOrDays!
+      dayOrDays
     )
-    if (!isEqual(availableResult, dayOrDays!)) {
+    if (!isEqual(availableResult, dayOrDays)) {
       dayOrDays = availableResult
-      emitInput(
-        (isArray(dayOrDays)
-          ? dayOrDays.map((_) => _.toDate())
-          : dayOrDays.toDate()) as SingleOrRange<Date>
-      )
+      if (!valueIsEmpty.value) {
+        emitInput(
+          (isArray(dayOrDays)
+            ? dayOrDays.map((_) => _.toDate())
+            : dayOrDays.toDate()) as SingleOrRange<Date>
+        )
+      }
     }
   }
-  if (isArray(dayOrDays!) && dayOrDays.some((day) => !day)) {
+  if (isArray(dayOrDays) && dayOrDays.some((day) => !day)) {
     dayOrDays = [] as unknown as DayOrDays
   }
-  return dayOrDays!
+  return dayOrDays as DayOrDays
 })
 
 const displayValue = computed<UserInput>(() => {
@@ -498,7 +502,10 @@ const onClearIconClick = (event: MouseEvent) => {
     emitChange(null, true)
     showClose.value = false
     pickerVisible.value = false
-    pickerOptions.value.handleClear && pickerOptions.value.handleClear()
+    const clearHandler = pickerOptions.value.handleClear
+    if (clearHandler) {
+      clearHandler()
+    }
   }
 }
 
@@ -535,6 +542,34 @@ const onTouchStartInput = (event: TouchEvent) => {
   ) {
     pickerVisible.value = true
   }
+}
+
+const stopInputClickPropagation = (event: MouseEvent) => {
+  event.stopPropagation()
+}
+
+const handleTriggerIconMouseDown = (event: MouseEvent) => {
+  event.preventDefault()
+  onMouseDownInput(event)
+}
+
+const singleInputAttrs = computed<Record<string, unknown>>(() => ({
+  name: isArray(props.name) ? undefined : props.name,
+}))
+
+const singleInputNativeEvents = {
+  mousedown: onMouseDownInput,
+  touchstart: onTouchStartInput,
+  click: stopInputClickPropagation,
+}
+
+const triggerIconEvents = {
+  mousedown: handleTriggerIconMouseDown,
+  touchstart: onTouchStartInput,
+}
+
+const clearIconEvents = {
+  click: onClearIconClick,
 }
 const isRangeInput = computed(() => {
   return props.type.includes('range')

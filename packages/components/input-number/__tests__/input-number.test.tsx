@@ -3,6 +3,7 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it, test, vi } from 'vitest'
 import { ArrowDown, ArrowUp } from '@element-plus/icons-vue'
 import { ElFormItem } from '@element-plus/components/form'
+import { setTextInputValue } from '../../../test-utils/dom'
 import InputNumber from '../src/input-number.vue'
 
 const mouseup = new Event('mouseup')
@@ -122,7 +123,7 @@ describe('InputNumber.vue', () => {
     const wrapper = mount(() => (
       <InputNumber step-strictly={true} step={2} v-model={num.value} />
     ))
-    await wrapper.find('input').setValue(3)
+    await setTextInputValue(wrapper.find('input'), 3)
     expect(wrapper.find('input').element.value).toEqual('4')
   })
 
@@ -172,7 +173,7 @@ describe('InputNumber.vue', () => {
     ])(
       'each precision accuracy test: $input $output',
       async (input, output) => {
-        await wrapper.find('input').setValue(input)
+        await setTextInputValue(wrapper.find('input'), input)
         expect(wrapper.find('input').element.value).toEqual(`${output}`)
       }
     )
@@ -195,7 +196,7 @@ describe('InputNumber.vue', () => {
     ])(
       'each precision accuracy test: $input $output',
       async (input, output) => {
-        await wrapper.find('input').setValue(input)
+        await setTextInputValue(wrapper.find('input'), input)
         expect(wrapper.find('input').element.value).toEqual(`${output}`)
       }
     )
@@ -304,7 +305,7 @@ describe('InputNumber.vue', () => {
     expect(
       wrapper.getComponent(InputNumber).emitted('update:modelValue')
     ).toHaveLength(2)
-    await wrapper.find('input').setValue(0)
+    await setTextInputValue(wrapper.find('input'), 0)
     expect(wrapper.getComponent(InputNumber).emitted('change')).toHaveLength(3)
     expect(wrapper.getComponent(InputNumber).emitted().change[2]).toEqual([
       0, 2,

@@ -5,6 +5,7 @@ import { get, isEqual, isNil, debounce as lodashDebounce } from 'lodash-unified'
 import { useResizeObserver } from '@vueuse/core'
 import { useLocale, useNamespace } from '@element-plus/hooks'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
+import { filterIndices } from '@element-plus/wasm'
 import {
   ValidateComponentsMap,
   debugWarn,
@@ -29,6 +30,7 @@ const TAG_BASE_WIDTH = {
   default: 42,
   small: 33,
 }
+const WASM_FILTER_THRESHOLD = 2_000
 
 const useSelect = (props: ISelectProps, emit) => {
   // inject
@@ -119,6 +121,140 @@ const useSelect = (props: ISelectProps, emit) => {
 
   const debounce = computed(() => (props.remote ? 300 : 0))
 
+  const filterSourceOptions = computed(() => [
+    ...props.options,
+    ...states.createdOptions,
+  ])
+  const wasmFilteredOptions = ref<OptionType[] | null>(null)
+  const wasmFilterJobId = ref(0)
+
+  const collectFilterGroups = (options: OptionType[]) => {
+    const groups: Array<{
+      item: OptionType
+      options?: Option[]
+      start: number
+      end: number
+    }> = []
+    const labels: string[] = []
+
+    options.forEach((item) => {
+      const groupOptions = getOptions(item)
+
+      if (isArray(groupOptions)) {
+        const start = labels.length
+        groupOptions.forEach((option) => {
+          labels.push(String(getLabel(option) || ''))
+        })
+        groups.push({
+          item,
+          options: groupOptions,
+          start,
+          end: labels.length,
+        })
+        return
+      }
+
+      const start = labels.length
+      labels.push(String(getLabel(item) || ''))
+      groups.push({
+        item,
+        start,
+        end: labels.length,
+      })
+    })
+
+    return {
+      groups,
+      labels,
+    }
+  }
+
+  const buildFilteredOptions = (
+    groups: Array<{
+      item: OptionType
+      options?: Option[]
+      start: number
+      end: number
+    }>,
+    matchedIndexes: Set<number>
+  ) => {
+    const filtered: OptionType[] = []
+
+    groups.forEach(({ item, options, start, end }) => {
+      if (isArray(options)) {
+        const matchedOptions = options.filter((_, optionIndex) => {
+          return matchedIndexes.has(start + optionIndex)
+        })
+
+        if (matchedOptions.length > 0) {
+          filtered.push(
+            {
+              label: getLabel(item),
+              isTitle: true,
+              type: 'Group',
+            },
+            ...matchedOptions,
+            { type: 'Group' }
+          )
+        }
+
+        return
+      }
+
+      if (matchedIndexes.has(start) && end > start) {
+        filtered.push(item)
+      }
+    })
+
+    return filtered
+  }
+
+  const filterGroups = computed(() => collectFilterGroups(filterSourceOptions.value))
+
+  const filterOptionsWithQuery = (
+    options: OptionType[],
+    query: string
+  ) => {
+    const isValidOption = (option: Option): boolean => {
+      const regexp = new RegExp(escapeStringRegexp(query), 'i')
+      return query ? regexp.test(getLabel(option) || '') : true
+    }
+
+    return options.reduce((all, item) => {
+      const groupOptions = getOptions(item)
+
+      if (isArray(groupOptions)) {
+        const filtered = groupOptions.filter(isValidOption)
+
+        if (filtered.length > 0) {
+          all.push(
+            {
+              label: getLabel(item),
+              isTitle: true,
+              type: 'Group',
+            },
+            ...filtered,
+            { type: 'Group' }
+          )
+        }
+      } else if (props.remote || isValidOption(item)) {
+        all.push(item)
+      }
+
+      return all
+    }, [] as OptionType[])
+  }
+
+  const shouldUseWasmFilter = computed(() => {
+    return (
+      props.filterable &&
+      !props.remote &&
+      !isFunction(props.filterMethod) &&
+      states.inputValue.length > 0 &&
+      filterGroups.value.labels.length >= WASM_FILTER_THRESHOLD
+    )
+  })
+
   // filteredOptions includes flatten the data into one dimensional array.
   const emptyText = computed(() => {
     const options = filteredOptions.value
@@ -137,42 +273,15 @@ const useSelect = (props: ISelectProps, emit) => {
     return null
   })
 
-  const filteredOptions = computed(() => {
-    const isValidOption = (o: Option): boolean => {
-      // fill the conditions here.
-      const query = states.inputValue
-      // when query was given, we should test on the label see whether the label contains the given query
-      const regexp = new RegExp(escapeStringRegexp(query), 'i')
-      const containsQueryString = query ? regexp.test(getLabel(o) || '') : true
-      return containsQueryString
-    }
+  const filteredOptions = computed<OptionType[]>(() => {
     if (props.loading) {
       return []
     }
 
-    return [...props.options, ...states.createdOptions].reduce((all, item) => {
-      const options = getOptions(item)
-
-      if (isArray(options)) {
-        const filtered = options.filter(isValidOption)
-
-        if (filtered.length > 0) {
-          all.push(
-            {
-              label: getLabel(item),
-              isTitle: true,
-              type: 'Group',
-            },
-            ...filtered,
-            { type: 'Group' }
-          )
-        }
-      } else if (props.remote || isValidOption(item)) {
-        all.push(item)
-      }
-
-      return all
-    }, []) as OptionType[]
+    return (
+      wasmFilteredOptions.value ??
+      filterOptionsWithQuery(filterSourceOptions.value, states.inputValue)
+    )
   })
 
   const filteredOptionsValueMap = computed(() => {
@@ -753,6 +862,39 @@ const useSelect = (props: ISelectProps, emit) => {
     },
     {
       deep: true,
+    }
+  )
+
+  watch(
+    [filterGroups, () => props.loading, () => states.inputValue, shouldUseWasmFilter],
+    async ([groups, loading, query, useWasm]) => {
+      const currentJobId = wasmFilterJobId.value + 1
+      wasmFilterJobId.value = currentJobId
+      wasmFilteredOptions.value = null
+
+      if (!useWasm || loading) {
+        return
+      }
+
+      try {
+        const matchedIndexes = await filterIndices(groups.labels, query, false)
+
+        if (wasmFilterJobId.value !== currentJobId) {
+          return
+        }
+
+        wasmFilteredOptions.value = buildFilteredOptions(
+          groups.groups,
+          new Set(matchedIndexes)
+        )
+      } catch {
+        if (wasmFilterJobId.value === currentJobId) {
+          wasmFilteredOptions.value = null
+        }
+      }
+    },
+    {
+      immediate: true,
     }
   )
 

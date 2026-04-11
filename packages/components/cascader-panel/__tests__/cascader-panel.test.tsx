@@ -1,6 +1,7 @@
 import { nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { setInputValue as setPanelInputValue } from '../../../test-utils/dom'
 import { Check, Loading } from '@element-plus/icons-vue'
 import CascaderPanel from '../src/index.vue'
 
@@ -243,7 +244,7 @@ describe('CascaderPanel.vue', () => {
   })
 
   test('options change', async () => {
-    const options = ref(NORMAL_OPTIONS)
+    const options = ref<CascaderOption[]>(NORMAL_OPTIONS as CascaderOption[])
     const wrapper = mount(() => <CascaderPanel options={options.value} />)
 
     expect(wrapper.find(NODE).exists()).toBe(true)
@@ -337,19 +338,19 @@ describe('CascaderPanel.vue', () => {
     const secondMenu = wrapper.findAll(MENU)[1]
     const [hzCheckbox, nbCheckbox] = secondMenu.findAll(CHECKBOX)
 
-    await hzCheckbox.find('input').trigger('click')
+    await setPanelInputValue(hzCheckbox)
     expect(hzCheckbox.classes('is-checked')).toBe(true)
     expect(zjCheckbox.classes('is-indeterminate')).toBe(true)
     expect(value.value).toEqual([['zhejiang', 'hangzhou']])
 
-    await nbCheckbox.find('input').trigger('click')
+    await setPanelInputValue(nbCheckbox)
     expect(zjCheckbox.classes('is-checked')).toBe(true)
     expect(value.value).toEqual([
       ['zhejiang', 'hangzhou'],
       ['zhejiang', 'ningbo'],
     ])
 
-    await zjCheckbox.find('input').trigger('click')
+    await setPanelInputValue(zjCheckbox, false)
     expect(zjCheckbox.classes('is-checked')).toBe(false)
     expect(nbCheckbox.classes('is-checked')).toBe(false)
     expect(nbCheckbox.classes('is-checked')).toBe(false)
@@ -393,7 +394,7 @@ describe('CascaderPanel.vue', () => {
     const zjRadio = wrapper.findAll(RADIO)[1]
     expect(zjRadio.exists()).toBe(true)
 
-    await zjRadio.find('input').trigger('click')
+    await setPanelInputValue(zjRadio)
     expect(value.value).toEqual(['zhejiang'])
   })
 
@@ -443,7 +444,7 @@ describe('CascaderPanel.vue', () => {
     expect(shCheckbox.classes('is-checked')).toBe(true)
     expect(shCheckbox2.classes('is-checked')).toBe(false)
 
-    await zjCheckbox.find('input').trigger('click')
+    await setPanelInputValue(zjCheckbox)
     expect(value.value).toEqual([['shanghai'], ['zhejiang']])
   })
 
@@ -584,7 +585,7 @@ describe('CascaderPanel.vue', () => {
     vi.runAllTimers()
     await nextTick()
 
-    await firstMenu.find(CHECKBOX).find('input').trigger('click')
+    await setPanelInputValue(firstMenu.find(CHECKBOX))
 
     const secondMenu = wrapper.findAll(MENU)[1]
     expect(secondMenu.exists()).toBe(true)
@@ -623,7 +624,7 @@ describe('CascaderPanel.vue', () => {
     vi.runAllTimers()
     await nextTick()
     const firstMenu = wrapper.findAll(MENU)[0]
-    await firstMenu.find(RADIO).trigger('click')
+    await setPanelInputValue(firstMenu.find(RADIO))
     expect(firstMenu.find(RADIO).classes('is-checked')).toBe(true)
     expect(firstMenu.find(RADIO).classes('is-indeterminate')).toBe(false)
 

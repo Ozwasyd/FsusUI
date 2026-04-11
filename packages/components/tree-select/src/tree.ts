@@ -113,9 +113,8 @@ export const useTree = (
   })
 
   const cacheOptionsMap = computed(() => {
-    return cacheOptions.value.reduce(
-      (prev, next) => ({ ...prev, [next.value]: next }),
-      {}
+    return Object.fromEntries(
+      cacheOptions.value.map((option) => [option.value, option])
     )
   })
 

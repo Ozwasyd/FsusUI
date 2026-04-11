@@ -35,7 +35,6 @@
 </template>
 
 <script lang="ts">
-// @ts-nocheck
 import {
   computed,
   defineComponent,
@@ -44,7 +43,6 @@ import {
   onBeforeUnmount,
   onMounted,
   reactive,
-  toRef,
 } from 'vue'
 import ElTooltip from '@element-plus/components/tooltip'
 import { throwError } from '@element-plus/utils'
@@ -70,23 +68,26 @@ export default defineComponent({
     const nsMenu = useNamespace('menu')
     const nsMenuItem = useNamespace('menu-item')
     if (!rootMenu) throwError(COMPONENT_NAME, 'can not inject root menu')
+    const rootMenuContext = rootMenu as MenuProvider
+    const itemIndex = computed(() => props.index ?? '')
 
-    const { parentMenu, indexPath } = useMenu(instance, toRef(props, 'index'))
+    const { parentMenu, indexPath } = useMenu(instance, itemIndex)
 
     const subMenu = inject<SubMenuProvider>(`subMenu:${parentMenu.value.uid}`)
     if (!subMenu) throwError(COMPONENT_NAME, 'can not inject sub menu')
+    const subMenuContext = subMenu as SubMenuProvider
 
-    const active = computed(() => props.index === rootMenu.activeIndex)
+    const active = computed(() => props.index === rootMenuContext.activeIndex)
     const item: MenuItemRegistered = reactive({
-      index: props.index,
+      index: itemIndex.value,
       indexPath,
       active,
     })
 
     const handleClick = () => {
       if (!props.disabled) {
-        rootMenu.handleMenuItemClick({
-          index: props.index,
+        rootMenuContext.handleMenuItemClick({
+          index: itemIndex.value,
           indexPath: indexPath.value,
           route: props.route,
         })
@@ -95,18 +96,18 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      subMenu.addSubMenu(item)
-      rootMenu.addMenuItem(item)
+      subMenuContext.addSubMenu(item)
+      rootMenuContext.addMenuItem(item)
     })
 
     onBeforeUnmount(() => {
-      subMenu.removeSubMenu(item)
-      rootMenu.removeMenuItem(item)
+      subMenuContext.removeSubMenu(item)
+      rootMenuContext.removeMenuItem(item)
     })
 
     return {
       parentMenu,
-      rootMenu,
+      rootMenu: rootMenuContext,
       active,
       nsMenu,
       nsMenuItem,

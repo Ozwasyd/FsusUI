@@ -1,7 +1,11 @@
-// @ts-nocheck
 import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import {
+  clickActionButton,
+  clickClearButton,
+  clickPickerCell,
+} from '../../../test-utils/dom'
 import dayjs from 'dayjs'
 import { rAF } from '@element-plus/test-utils/tick'
 import ConfigProvider from '@element-plus/components/config-provider'
@@ -64,19 +68,19 @@ const testDatePickerPanelChange = async (type: 'date' | 'daterange') => {
   const prevYear = document.querySelector<HTMLElement>('button.d-arrow-left')
   const nextMonth = document.querySelector<HTMLElement>('button.arrow-right')
   const nextYear = document.querySelector<HTMLElement>('button.d-arrow-right')
-  prevMonth.click()
+  await clickActionButton(prevMonth)
   await nextTick()
   expect(mode).toBe('month')
   reset()
-  nextMonth.click()
+  await clickActionButton(nextMonth)
   await nextTick()
   expect(mode).toBe('month')
   reset()
-  prevYear.click()
+  await clickActionButton(prevYear)
   await nextTick()
   expect(mode).toBe('year')
   reset()
-  nextYear.click()
+  await clickActionButton(nextYear)
   await nextTick()
   expect(mode).toBe('year')
 }
@@ -137,19 +141,19 @@ describe('DatePicker', () => {
     const arrowLeftYeayElm = document.querySelector(
       '.el-date-picker__prev-btn .d-arrow-left'
     ) as HTMLElement
-    arrowLeftYeayElm.click()
+    await clickActionButton(arrowLeftYeayElm)
     let count = 20
     while (--count) {
-      arrowLeftElm.click()
+      await clickActionButton(arrowLeftElm)
     }
     count = 20
     while (--count) {
-      arrowRightElm.click()
+      await clickActionButton(arrowRightElm)
     }
     await nextTick()
     expect(spans[0].textContent).toContain(date.add(-1, 'year').year())
     expect(spans[1].textContent).toContain(date.format('MMMM'))
-    ;(document.querySelector('td.available') as HTMLElement).click()
+    await clickPickerCell(document.querySelector('td.available') as HTMLElement)
     await nextTick()
     const vm = wrapper.vm as any
     expect(vm.value).toBeDefined()
@@ -167,7 +171,7 @@ describe('DatePicker', () => {
     input.trigger('blur')
     input.trigger('focus')
     await nextTick()
-    ;(document.querySelector('td.available') as HTMLElement).click()
+    await clickPickerCell(document.querySelector('td.available') as HTMLElement)
     await nextTick()
     const vm = wrapper.vm as any
     expect(vm.value).toBeDefined()
@@ -177,7 +181,7 @@ describe('DatePicker', () => {
     const picker = wrapper.findComponent(CommonPicker)
     ;(picker.vm as any).showClose = true
     await nextTick()
-    ;(document.querySelector('.clear-icon') as HTMLElement).click()
+    await clickClearButton(document.querySelector('.clear-icon') as HTMLElement)
     expect(vm.value).toBeNull()
   })
 
@@ -196,7 +200,7 @@ describe('DatePicker', () => {
     input.trigger('blur')
     input.trigger('focus')
     await nextTick()
-    document.querySelector<HTMLElement>('td.available').click()
+    await clickPickerCell(document.querySelector('td.available') as HTMLElement)
     await nextTick()
     const vm = wrapper.vm as any
     expect(vm.value).toBeDefined()
@@ -206,14 +210,14 @@ describe('DatePicker', () => {
     const picker = wrapper.findComponent(CommonPicker)
     ;(picker.vm as any).showClose = true
     await nextTick()
-    document.querySelector<HTMLElement>('.clear-icon').click()
+    await clickClearButton(document.querySelector('.clear-icon') as HTMLElement)
     expect(vm.value).toBeNull()
 
     vm.defaultValue = new Date(2031, 5, 1)
     input.trigger('blur')
     input.trigger('focus')
     await nextTick()
-    document.querySelector<HTMLElement>('td.available').click()
+    await clickPickerCell(document.querySelector('td.available') as HTMLElement)
     await nextTick()
     expect(vm.value).toBeDefined()
     expect(vm.value.getFullYear()).toBe(2031)
@@ -266,7 +270,7 @@ describe('DatePicker', () => {
     expect(keydownHandler).toHaveBeenCalledTimes(1)
     input.trigger('focus')
     await nextTick()
-    ;(document.querySelector('td.available') as HTMLElement).click()
+    await clickPickerCell(document.querySelector('td.available') as HTMLElement)
     await nextTick()
     await rAF()
     expect(changeHandler).toHaveBeenCalledTimes(1)
@@ -339,7 +343,7 @@ describe('DatePicker', () => {
     const shortcut = document.querySelector('.el-picker-panel__shortcut')
     expect(shortcut.textContent).toBe(text)
     expect(document.querySelector('.el-picker-panel__sidebar')).not.toBeNull()
-    ;(shortcut as HTMLElement).click()
+    await clickActionButton(shortcut as HTMLElement)
     await nextTick()
     const vm = wrapper.vm as any
     expect(vm.value.valueOf()).toBe(value.valueOf())
@@ -483,7 +487,9 @@ describe('DatePicker', () => {
     input.trigger('focus')
     await nextTick()
     {
-      ;(document.querySelector('td.available .cell') as HTMLElement).click()
+      await clickPickerCell(
+        document.querySelector('td.available .cell') as HTMLElement
+      )
     }
     input.trigger('focus')
     await nextTick()
@@ -595,7 +601,9 @@ describe('DatePicker', () => {
       await input.trigger('focus')
       await nextTick()
       {
-        ;(document.querySelector('td.available') as HTMLElement).click()
+        await clickPickerCell(
+          document.querySelector('td.available') as HTMLElement
+        )
       }
       await nextTick()
       expect(vm.value).toBe(
@@ -642,7 +650,7 @@ describe('DatePicker', () => {
       await input.trigger('blur')
       await input.trigger('focus')
       await nextTick()
-      ;(document.querySelector('td.available') as HTMLElement).click()
+      await clickPickerCell(document.querySelector('td.available') as HTMLElement)
       await nextTick()
       expect(vm.value).toBe(+dayjs().startOf('M'))
       await wrapper.find('button').trigger('click')
@@ -682,22 +690,22 @@ describe('DatePicker Navigation', () => {
     expect(getYearLabel()).toContain('2000')
     expect(getMonthLabel()).toContain('January')
 
-    prevMonth.click()
+    await clickActionButton(prevMonth)
     await nextTick()
     expect(getYearLabel()).toContain('1999')
     expect(getMonthLabel()).toContain('December')
 
-    prevYear.click()
+    await clickActionButton(prevYear)
     await nextTick()
     expect(getYearLabel()).toContain('1998')
     expect(getMonthLabel()).toContain('December')
 
-    nextMonth.click()
+    await clickActionButton(nextMonth)
     await nextTick()
     expect(getYearLabel()).toContain('1999')
     expect(getMonthLabel()).toContain('January')
 
-    nextYear.click()
+    await clickActionButton(nextYear)
     await nextTick()
     expect(getYearLabel()).toContain('2000')
     expect(getMonthLabel()).toContain('January')
@@ -706,7 +714,7 @@ describe('DatePicker Navigation', () => {
   it('month with fewer dates', async () => {
     // July has 31 days, June has 30
     await initNavigationTest(new Date(2000, 6, 31))
-    prevMonth.click()
+    await clickActionButton(prevMonth)
     await nextTick()
     expect(getYearLabel()).toContain('2000')
     expect(getMonthLabel()).toContain('June')
@@ -715,7 +723,7 @@ describe('DatePicker Navigation', () => {
   it('year with fewer February dates', async () => {
     // February 2008 has 29 days, February 2007 has 28
     await initNavigationTest(new Date(2008, 1, 29))
-    prevYear.click()
+    await clickActionButton(prevYear)
     await nextTick()
     expect(getYearLabel()).toContain('2007')
     expect(getMonthLabel()).toContain('February')
@@ -726,23 +734,23 @@ describe('DatePicker Navigation', () => {
     const yearLabel = document.querySelectorAll(
       '.el-date-picker__header-label'
     )[0]
-    ;(yearLabel as HTMLElement).click()
+    await clickActionButton(yearLabel as HTMLElement)
     await nextTick()
     const year1999Label = document.querySelectorAll('.el-year-table td')[1]
-    ;(year1999Label as HTMLElement).click()
+    await clickPickerCell(year1999Label as HTMLElement)
     await nextTick()
     const juneLabel = document.querySelectorAll('.el-month-table td')[5]
-    ;(juneLabel as HTMLElement).click()
+    await clickPickerCell(juneLabel as HTMLElement)
     await nextTick()
     expect(getYearLabel()).toContain('2001')
     expect(getMonthLabel()).toContain('June')
     const monthLabel = document.querySelectorAll(
       '.el-date-picker__header-label'
     )[1]
-    ;(monthLabel as HTMLElement).click()
+    await clickActionButton(monthLabel as HTMLElement)
     await nextTick()
     const janLabel = document.querySelectorAll('.el-month-table td')[0]
-    ;(janLabel as HTMLElement).click()
+    await clickPickerCell(janLabel as HTMLElement)
     await nextTick()
     expect(getYearLabel()).toContain('2001')
     expect(getMonthLabel()).toContain('January')
@@ -770,7 +778,9 @@ describe('MonthPicker', () => {
       (document.querySelector('.el-month-table') as HTMLElement).style.display
     ).toBe('')
     expect(document.querySelector('.el-year-table')).toBeNull()
-    ;(document.querySelector('.el-month-table .cell') as HTMLElement).click()
+    await clickPickerCell(
+      document.querySelector('.el-month-table .cell') as HTMLElement
+    )
     await nextTick()
     const vm = wrapper.vm as any
     expect(vm.value.getMonth()).toBe(0)
@@ -795,7 +805,9 @@ describe('MonthPicker', () => {
     input.trigger('focus')
     await nextTick()
     {
-      ;(document.querySelector('.el-month-table .cell') as HTMLElement).click()
+      await clickPickerCell(
+        document.querySelector('.el-month-table .cell') as HTMLElement
+      )
     }
     await nextTick()
     expect(wrapper.findComponent(Input).vm.modelValue).toBe('2020-01')
@@ -828,15 +840,17 @@ describe('YearPicker', () => {
     let count = 2
 
     while (--count) {
-      leftBtn.click()
+      await clickActionButton(leftBtn)
     }
     count = 3
     while (--count) {
-      rightBtn.click()
+      await clickActionButton(rightBtn)
     }
 
     await nextTick()
-    ;(document.querySelector('.el-year-table .cell') as HTMLElement).click()
+    await clickPickerCell(
+      document.querySelector('.el-year-table .cell') as HTMLElement
+    )
     await nextTick()
     const vm = wrapper.vm as any
     expect(vm.value.getFullYear()).toBe(2030)
@@ -861,7 +875,7 @@ describe('YearPicker', () => {
     input.trigger('focus')
     await nextTick()
     const cell = document.querySelector('.el-year-table .cell') as HTMLElement
-    cell.click()
+    await clickPickerCell(cell)
     await nextTick()
     expect((wrapper.vm as any).value).toBe(
       dayjs(new Date(Number.parseInt(cell.innerHTML.trim()), 0, 1)).format(
@@ -886,24 +900,22 @@ describe('WeekPicker', () => {
     await nextTick()
     expect(document.querySelector('.is-week-mode')).not.toBeNull()
     // select month still is in week-mode
-    ;(
-      document.querySelectorAll(
-        '.el-date-picker__header-label'
-      )[1] as HTMLElement
-    ).click()
+    await clickActionButton(
+      document.querySelectorAll('.el-date-picker__header-label')[1] as HTMLElement
+    )
     await nextTick()
-    ;(
+    await clickPickerCell(
       document.querySelectorAll('.el-month-table .cell')[7] as HTMLElement
-    ).click()
+    )
     await nextTick()
     expect(document.querySelector('.is-week-mode')).not.toBeNull()
     const numberOfHighlightRows = () =>
       document.querySelectorAll('.el-date-table__row.current').length
-    ;(
+    await clickPickerCell(
       document.querySelector(
         '.el-date-table__row ~ .el-date-table__row td.available'
       ) as HTMLElement
-    ).click()
+    )
     await nextTick()
     const vm = wrapper.vm as any
     expect(vm.value).not.toBeNull()
@@ -912,13 +924,15 @@ describe('WeekPicker', () => {
     await nextTick()
     expect(numberOfHighlightRows()).toBe(1)
     // test: next month should not have highlight
-    ;(document.querySelector('.arrow-right') as HTMLElement).click()
+    await clickActionButton(document.querySelector('.arrow-right') as HTMLElement)
     await nextTick()
     expect(numberOfHighlightRows()).toBe(0)
     // test: next year should not have highlight
-    ;(document.querySelector('.arrow-left') as HTMLElement).click()
+    await clickActionButton(document.querySelector('.arrow-left') as HTMLElement)
     await nextTick()
-    ;(document.querySelector('.d-arrow-right') as HTMLElement).click()
+    await clickActionButton(
+      document.querySelector('.d-arrow-right') as HTMLElement
+    )
     await nextTick()
     expect(numberOfHighlightRows()).toBe(0)
   })
@@ -957,11 +971,11 @@ describe('WeekPicker', () => {
       input.trigger('focus')
       await nextTick()
       // click Wednesday
-      ;(
+      await clickPickerCell(
         document.querySelectorAll(
           '.el-date-table__row ~ .el-date-table__row td'
         )[3] as HTMLElement
-      ).click()
+      )
       await nextTick()
       const vm = wrapper.vm as any
       expect(vm.value).not.toBeNull()
@@ -990,19 +1004,19 @@ describe('DatePicker dates', () => {
       '.el-date-table__row .available'
     ) as NodeListOf<HTMLElement>
     const vm = wrapper.vm as any
-    td[0].click()
+    await clickPickerCell(td[0])
     await nextTick()
     expect(vm.value.length).toBe(1)
-    td[1].click()
+    await clickPickerCell(td[1])
     await nextTick()
     expect(vm.value.length).toBe(2)
     expect(
       document.querySelectorAll('.el-date-table__row .selected').length
     ).toBe(2)
-    td[0].click()
+    await clickPickerCell(td[0])
     await nextTick()
     expect(vm.value.length).toBe(1)
-    td[1].click()
+    await clickPickerCell(td[1])
     await nextTick()
     expect(vm.value.length).toBe(0)
   })
@@ -1095,9 +1109,9 @@ describe('DateRangePicker', () => {
     expect(outterInput.attributes().style).toBeDefined()
     const panels = document.querySelectorAll('.el-date-range-picker__content')
     expect(panels.length).toBe(2)
-    ;(panels[0].querySelector('td.available') as HTMLElement).click()
+    await clickPickerCell(panels[0].querySelector('td.available') as HTMLElement)
     await nextTick()
-    ;(panels[1].querySelector('td.available') as HTMLElement).click()
+    await clickPickerCell(panels[1].querySelector('td.available') as HTMLElement)
     await nextTick()
     inputs[0].trigger('blur')
     inputs[0].trigger('focus')
@@ -1142,9 +1156,9 @@ describe('DateRangePicker', () => {
     await nextTick()
 
     const panels = document.querySelectorAll('.el-date-range-picker__content')
-    ;(panels[1].querySelector('td.available') as HTMLElement).click()
+    await clickPickerCell(panels[1].querySelector('td.available') as HTMLElement)
     await nextTick()
-    ;(panels[0].querySelector('td.available') as HTMLElement).click()
+    await clickPickerCell(panels[0].querySelector('td.available') as HTMLElement)
     await nextTick()
     inputs[0].trigger('blur')
     inputs[0].trigger('focus')
@@ -1174,9 +1188,9 @@ describe('DateRangePicker', () => {
     inputs[0].trigger('focus')
     await nextTick()
     const panels = document.querySelectorAll('.el-date-range-picker__content')
-    ;(panels[1].querySelector('td.available') as HTMLElement).click()
+    await clickPickerCell(panels[1].querySelector('td.available') as HTMLElement)
     await nextTick()
-    ;(panels[0].querySelector('td.available') as HTMLElement).click()
+    await clickPickerCell(panels[0].querySelector('td.available') as HTMLElement)
     await nextTick()
     ;(wrapper.vm as any).value = ''
     inputs[0].trigger('blur')
@@ -1200,18 +1214,18 @@ describe('DateRangePicker', () => {
       'td.available'
     )
 
-    ;(availableTds[0] as HTMLElement).click()
+    await clickPickerCell(availableTds[0] as HTMLElement)
     await nextTick()
-    ;(availableTds[1] as HTMLElement).click()
+    await clickPickerCell(availableTds[1] as HTMLElement)
     await nextTick()
 
     expect(availableTds[0].classList.contains('in-range')).toBeTruthy()
     expect(availableTds[0].classList.contains('start-date')).toBeTruthy()
     expect(availableTds[1].classList.contains('in-range')).toBeTruthy()
     expect(availableTds[1].classList.contains('end-date')).toBeTruthy()
-    ;(availableTds[1] as HTMLElement).click()
+    await clickPickerCell(availableTds[1] as HTMLElement)
     await nextTick()
-    ;(availableTds[0] as HTMLElement).click()
+    await clickPickerCell(availableTds[0] as HTMLElement)
     await nextTick()
 
     expect(availableTds[0].classList.contains('in-range')).toBeTruthy()
@@ -1247,9 +1261,13 @@ describe('DateRangePicker', () => {
     )
     expect(left.textContent).toBe('2000  October')
     expect(right.textContent).toBe('2000  December')
-    ;(panels[1].querySelector('.d-arrow-right') as HTMLElement).click()
+    await clickActionButton(
+      panels[1].querySelector('.d-arrow-right') as HTMLElement
+    )
     await nextTick()
-    ;(panels[1].querySelector('.arrow-right') as HTMLElement).click()
+    await clickActionButton(
+      panels[1].querySelector('.arrow-right') as HTMLElement
+    )
     await nextTick()
     expect(left.textContent).toBe('2000  October')
     expect(right.textContent).toBe('2002  January')
@@ -1305,9 +1323,9 @@ describe('DateRangePicker', () => {
     await nextTick()
     const panels = document.querySelectorAll('.el-date-range-picker__content')
     expect(panels.length).toBe(2)
-    ;(panels[0].querySelector('td.available') as HTMLElement).click()
+    await clickPickerCell(panels[0].querySelector('td.available') as HTMLElement)
     await nextTick()
-    ;(panels[1].querySelector('td.available') as HTMLElement).click()
+    await clickPickerCell(panels[1].querySelector('td.available') as HTMLElement)
     await nextTick()
     expect((wrapper.vm as any).value.toString()).toBe(
       ['01/05 2021', '01/06 2021'].toString()
@@ -1355,10 +1373,10 @@ describe('MonthRange', () => {
     const panels = document.querySelectorAll('.el-date-range-picker__content')
     expect(panels.length).toBe(2)
     const p0 = <HTMLElement>panels[0].querySelector('td:not(.disabled)')
-    p0.click()
+    await clickPickerCell(p0)
     await nextTick()
     const p1 = <HTMLElement>panels[1].querySelector('td:not(.disabled)')
-    p1.click()
+    await clickPickerCell(p1)
     await nextTick()
     inputs[0].trigger('blur')
     inputs[0].trigger('focus')
@@ -1376,9 +1394,9 @@ describe('MonthRange', () => {
     expect(inputs[0].element.value.length).toBe(7)
     expect(inputs[1].element.value.length).toBe(7)
     // reverse selection
-    p1.click()
+    await clickPickerCell(p1)
     await nextTick()
-    p0.click()
+    await clickPickerCell(p0)
     await nextTick()
     expect(vm.value[0].getTime() < vm.value[1].getTime()).toBeTruthy()
   })
@@ -1395,18 +1413,18 @@ describe('MonthRange', () => {
     const table = document.querySelector('.el-month-table')
     const tds = (table as HTMLTableElement).querySelectorAll('td')
 
-    ;(tds[0] as HTMLElement).click()
+    await clickPickerCell(tds[0] as HTMLElement)
     await nextTick()
-    ;(tds[1] as HTMLElement).click()
+    await clickPickerCell(tds[1] as HTMLElement)
     await nextTick()
 
     expect(tds[0].classList.contains('in-range')).toBeTruthy()
     expect(tds[0].classList.contains('start-date')).toBeTruthy()
     expect(tds[1].classList.contains('in-range')).toBeTruthy()
     expect(tds[1].classList.contains('end-date')).toBeTruthy()
-    ;(tds[1] as HTMLElement).click()
+    await clickPickerCell(tds[1] as HTMLElement)
     await nextTick()
-    ;(tds[0] as HTMLElement).click()
+    await clickPickerCell(tds[0] as HTMLElement)
     await nextTick()
 
     expect(tds[0].classList.contains('in-range')).toBeTruthy()
@@ -1443,7 +1461,9 @@ describe('MonthRange', () => {
     )
     expect(left.textContent).toContain(2000)
     expect(right.textContent).toContain(2002)
-    ;(panels[1].querySelector('.d-arrow-right') as HTMLElement).click()
+    await clickActionButton(
+      panels[1].querySelector('.d-arrow-right') as HTMLElement
+    )
     await nextTick()
     expect(left.textContent).toContain(2000)
     expect(right.textContent).toContain(2003)
@@ -1579,10 +1599,10 @@ describe('MonthRange', () => {
     const input = wrapper.find('input')
     input.trigger('focus')
     await nextTick()
-    ;(document.querySelector('td.disabled') as HTMLElement).click()
+    await clickPickerCell(document.querySelector('td.disabled') as HTMLElement)
     await nextTick()
     expect(pickHandler).toHaveBeenCalledTimes(0)
-    ;(document.querySelector('td.available') as HTMLElement).click()
+    await clickPickerCell(document.querySelector('td.available') as HTMLElement)
     await nextTick()
     expect(pickHandler).toHaveBeenCalledTimes(1)
   })
@@ -1605,9 +1625,11 @@ describe('MonthRange', () => {
     input.trigger('blur')
     input.trigger('focus')
     await nextTick()
-    document
-      .querySelector('.el-picker-panel__sidebar .el-picker-panel__shortcut')
-      .click()
+    await clickActionButton(
+      document.querySelector(
+        '.el-picker-panel__sidebar .el-picker-panel__shortcut'
+      ) as HTMLElement
+    )
     await nextTick()
     const vm = wrapper.vm as any
     expect(vm.value).toBeDefined()

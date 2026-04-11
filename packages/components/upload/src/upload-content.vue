@@ -28,8 +28,7 @@
 
 <script lang="ts" setup>
 import { shallowRef } from 'vue'
-import { isPlainObject } from '@vue/shared'
-import { cloneDeep, isEqual } from 'lodash-unified'
+import { cloneDeep, isEqual, isPlainObject } from 'lodash-unified'
 import { useNamespace } from '@element-plus/hooks'
 import { entriesOf, isFunction } from '@element-plus/utils'
 import { useFormDisabled } from '@element-plus/components/form'
@@ -65,7 +64,7 @@ const uploadFiles = (files: File[]) => {
   const { autoUpload, limit, fileList, multiple, onStart, onExceed } = props
 
   if (limit && fileList.length + files.length > limit) {
-    onExceed(files, fileList)
+    onExceed?.(files, fileList)
     return
   }
 
@@ -76,7 +75,7 @@ const uploadFiles = (files: File[]) => {
   for (const file of files) {
     const rawFile = file as UploadRawFile
     rawFile.uid = genFileId()
-    onStart(rawFile)
+    onStart?.(rawFile)
     if (autoUpload) upload(rawFile)
   }
 }
@@ -105,7 +104,7 @@ const upload = async (rawFile: UploadRawFile): Promise<void> => {
   }
 
   if (hookResult === false) {
-    props.onRemove(rawFile)
+    props.onRemove?.(rawFile)
     return
   }
 
@@ -159,7 +158,7 @@ const doUpload = async (
   try {
     beforeData = await resolveData(beforeData ?? data, rawFile)
   } catch {
-    props.onRemove(rawFile)
+    props.onRemove?.(rawFile)
     return
   }
 
@@ -173,14 +172,14 @@ const doUpload = async (
     filename,
     action,
     onProgress: (evt) => {
-      onProgress(evt, rawFile)
+      onProgress?.(evt, rawFile)
     },
     onSuccess: (res) => {
-      onSuccess(res, rawFile)
+      onSuccess?.(res, rawFile)
       delete requests.value[uid]
     },
     onError: (err) => {
-      onError(err, rawFile)
+      onError?.(err, rawFile)
       delete requests.value[uid]
     },
   }

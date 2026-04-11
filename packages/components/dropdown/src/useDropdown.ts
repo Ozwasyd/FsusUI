@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { computed, inject, ref } from 'vue'
 import { addClass, generateId } from '@element-plus/utils'
 import { EVENT_CODE } from '@element-plus/constants'
@@ -16,17 +15,36 @@ export const useDropdown = () => {
   }
 }
 
+type DropdownLegacyInstance = {
+  props: {
+    hideOnClick: boolean
+    splitButton: boolean
+    tabindex: string | number
+  }
+  handleClick: () => void
+  hide: () => void
+}
+
+type DropdownVNodeContainer = {
+  subTree?: {
+    el?: Element | null
+  }
+}
+
 export const initDropdownDomEvent = (
-  dropdownChildren,
-  triggerElm,
-  _instance
+  dropdownChildren: DropdownVNodeContainer | undefined,
+  triggerElm: HTMLElement,
+  _instance: DropdownLegacyInstance
 ) => {
   const ns = useNamespace('dropdown')
   const menuItems = ref<Nullable<HTMLButtonElement[]>>(null)
   const menuItemsArray = ref<Nullable<HTMLElement[]>>(null)
   const dropdownElm = ref<Nullable<HTMLElement>>(null)
   const listId = ref(`dropdown-menu-${generateId()}`)
-  dropdownElm.value = dropdownChildren?.subTree.el
+  dropdownElm.value =
+    dropdownChildren?.subTree?.el instanceof HTMLElement
+      ? dropdownChildren.subTree.el
+      : null
 
   function removeTabindex() {
     triggerElm.setAttribute('tabindex', '-1')
@@ -35,7 +53,7 @@ export const initDropdownDomEvent = (
     })
   }
 
-  function resetTabindex(ele) {
+  function resetTabindex(ele?: HTMLElement | null) {
     removeTabindex()
     ele?.setAttribute('tabindex', '0')
   }
@@ -44,8 +62,8 @@ export const initDropdownDomEvent = (
     const code = ev.code
     if ([EVENT_CODE.up, EVENT_CODE.down].includes(code)) {
       removeTabindex()
-      resetTabindex(menuItems.value[0])
-      menuItems.value[0].focus()
+      resetTabindex(menuItems.value?.[0])
+      menuItems.value?.[0]?.focus()
       ev.preventDefault()
       ev.stopPropagation()
     } else if (code === EVENT_CODE.enter) {
@@ -55,26 +73,28 @@ export const initDropdownDomEvent = (
     }
   }
 
-  function handleItemKeyDown(ev) {
+  function handleItemKeyDown(ev: KeyboardEvent) {
     const code = ev.code
-    const target = ev.target
-    const currentIndex = menuItemsArray.value.indexOf(target)
-    const max = menuItemsArray.value.length - 1
-    let nextIndex
+    const target = ev.target as HTMLElement | null
+    const currentIndex = menuItemsArray.value?.indexOf(target as HTMLElement) ?? -1
+    const max = (menuItemsArray.value?.length ?? 0) - 1
     if ([EVENT_CODE.up, EVENT_CODE.down].includes(code)) {
-      if (code === EVENT_CODE.up) {
-        nextIndex = currentIndex !== 0 ? currentIndex - 1 : 0
-      } else {
-        nextIndex = currentIndex < max ? currentIndex + 1 : max
-      }
+      const nextIndex =
+        code === EVENT_CODE.up
+          ? currentIndex !== 0
+            ? currentIndex - 1
+            : 0
+          : currentIndex < max
+            ? currentIndex + 1
+            : max
       removeTabindex()
-      resetTabindex(menuItems.value[nextIndex])
-      menuItems.value[nextIndex].focus()
+      resetTabindex(menuItems.value?.[nextIndex])
+      menuItems.value?.[nextIndex]?.focus()
       ev.preventDefault()
       ev.stopPropagation()
     } else if (code === EVENT_CODE.enter) {
       triggerElmFocus()
-      target.click()
+      target?.click()
       if (_instance.props.hideOnClick) {
         _instance.hide()
       }
@@ -85,12 +105,12 @@ export const initDropdownDomEvent = (
   }
 
   function initAria() {
-    dropdownElm.value.setAttribute('id', listId.value)
+    dropdownElm.value?.setAttribute('id', listId.value)
     triggerElm.setAttribute('aria-haspopup', 'list')
     triggerElm.setAttribute('aria-controls', listId.value)
     if (!_instance.props.splitButton) {
       triggerElm.setAttribute('role', 'button')
-      triggerElm.setAttribute('tabindex', _instance.props.tabindex)
+      triggerElm.setAttribute('tabindex', `${_instance.props.tabindex}`)
       addClass(triggerElm, ns.b('selfdefine'))
     }
   }
@@ -101,6 +121,10 @@ export const initDropdownDomEvent = (
   }
 
   function initDomOperation() {
+    if (!dropdownElm.value) {
+      return
+    }
+
     menuItems.value = dropdownElm.value.querySelectorAll(
       "[tabindex='-1']"
     ) as unknown as HTMLButtonElement[]

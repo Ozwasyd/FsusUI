@@ -146,7 +146,7 @@ function useRender<T>(props: Partial<TableBodyProps<T>>) {
   const wrappedRowRender = (row: T, $index: number) => {
     const store = props.store
     const { isRowExpanded, assertRowKey } = store
-    const { treeData, lazyTreeNodeMap, childrenColumnName, rowKey } =
+    const { hasTreeData, treeData, lazyTreeNodeMap, childrenColumnName, rowKey } =
       store.states
     const columns = store.states.columns.value
     const hasExpandColumn = columns.some(({ type }) => type === 'expand')
@@ -187,11 +187,25 @@ function useRender<T>(props: Partial<TableBodyProps<T>>) {
         // Use a two dimensional array avoid modifying $index
         return [[tr]]
       }
-    } else if (Object.keys(treeData.value).length) {
+    } else if (hasTreeData.value) {
       assertRowKey()
+      const identityCache = new WeakMap<object, string | number>()
+      const getCachedRowIdentity = (currentRow: T) => {
+        if (!currentRow || typeof currentRow !== 'object') {
+          return getRowIdentity(currentRow, rowKey.value)
+        }
+
+        if (identityCache.has(currentRow as object)) {
+          return identityCache.get(currentRow as object)
+        }
+
+        const identity = getRowIdentity(currentRow, rowKey.value)
+        identityCache.set(currentRow as object, identity)
+        return identity
+      }
       // TreeTable 时，rowKey 必须由用户设定，不使用 getKeyOfRow 计算
       // 在调用 rowRender 函数时，仍然会计算 rowKey，不太好的操作
-      const key = getRowIdentity(row, rowKey.value)
+      const key = getCachedRowIdentity(row)
       let cur = treeData.value[key]
       let treeRowData = null
       if (cur) {
@@ -223,7 +237,7 @@ function useRender<T>(props: Partial<TableBodyProps<T>>) {
               noLazyChildren: false,
               loading: false,
             }
-            const childKey = getRowIdentity(node, rowKey.value)
+            const childKey = getCachedRowIdentity(node)
             if (childKey === undefined || childKey === null) {
               throw new Error('For nested data item, row-key is required.')
             }

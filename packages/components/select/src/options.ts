@@ -19,7 +19,7 @@ export default defineComponent({
     }
 
     return () => {
-      const children = slots.default?.()!
+      const children = slots.default?.() ?? []
       const filteredOptions: any[] = []
 
       function filterOptions(children?: VNodeNormalizedChildren) {
@@ -44,7 +44,7 @@ export default defineComponent({
       }
 
       if (children.length) {
-        filterOptions(children![0]?.children)
+        filterOptions(children[0]?.children)
       }
 
       if (!isSameOptions(filteredOptions, cachedOptions)) {

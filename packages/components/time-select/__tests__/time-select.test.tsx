@@ -45,8 +45,8 @@ describe('TimeSelect', () => {
     input.trigger('focus')
     await nextTick()
     const elms = document.querySelectorAll('.is-disabled')
-    const elm = elms[elms.length - 1]
-    expect(elm.textContent).toBe('14:30')
+    const elm = elms.item(elms.length - 1)
+    expect(elm?.textContent).toBe('14:30')
   })
 
   it('set maxTime', async () => {

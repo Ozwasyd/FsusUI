@@ -2,9 +2,10 @@
   <div :class="ns.b('panel')">
     <p :class="ns.be('panel', 'header')">
       <el-checkbox
-        v-model="allChecked"
+        :model-value="allChecked"
         :indeterminate="isIndeterminate"
         :validate-event="false"
+        @update:model-value="handleAllCheckedModelValueChange"
         @change="handleAllCheckedChange"
       >
         {{ title }}
@@ -61,6 +62,7 @@ import { transferPanelEmits, transferPanelProps } from './transfer-panel'
 import { useCheck, usePropsAlias } from './composables'
 
 import type { VNode } from 'vue'
+import type { CheckboxValueType } from '@element-plus/components/checkbox'
 import type { TransferPanelState } from './transfer-panel'
 
 defineOptions({
@@ -99,6 +101,12 @@ const hasNoMatch = computed(
 const hasFooter = computed(() => !isEmpty(slots.default!()[0].children))
 
 const { checked, allChecked, query } = toRefs(panelState)
+
+const handleAllCheckedModelValueChange = (value: CheckboxValueType) => {
+  if (typeof value === 'boolean') {
+    allChecked.value = value
+  }
+}
 
 defineExpose({
   /** @description filter keyword */

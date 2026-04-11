@@ -29,9 +29,11 @@
           >
             {{ closeText }}
           </div>
-          <el-icon v-else :class="ns.e('close-btn')" @click="close">
-            <Close />
-          </el-icon>
+          <span v-else :class="ns.e('close-btn')" @click="close">
+            <el-icon>
+              <Close />
+            </el-icon>
+          </span>
         </template>
       </div>
     </div>

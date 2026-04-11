@@ -42,7 +42,7 @@
               v-if="collapseTags && selected.length"
               @after-leave="resetInputHeight"
             >
-              <span :class="tagWrapperKls">
+              <span v-if="selected.length" :class="tagWrapperKls">
                 <el-tag
                   v-for="item in showTagList"
                   :key="getValueKey(item)"
@@ -115,6 +115,7 @@
             </transition>
             <transition v-if="!collapseTags" @after-leave="resetInputHeight">
               <span
+                v-if="selected.length"
                 :class="tagWrapperKls"
                 :style="
                   prefixWidth && selected.length

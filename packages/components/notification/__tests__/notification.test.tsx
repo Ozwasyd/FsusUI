@@ -1,6 +1,7 @@
 import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, test, vi } from 'vitest'
+import { clickCloseButton } from '../../../test-utils/dom'
 import { TypeComponentsMap } from '@element-plus/utils'
 import { EVENT_CODE } from '@element-plus/constants'
 import { notificationTypes } from '../src/notification'
@@ -110,6 +111,7 @@ describe('Notification.vue', () => {
         expect(wrapper.findComponent(TypeComponentsMap[type]).exists()).toBe(
           true
         )
+        expect(wrapper.classes()).toContain(`el-notification--${type}`)
       }
     })
 
@@ -119,7 +121,7 @@ describe('Notification.vue', () => {
       const type = 'some-type'
       const wrapper = _mount({
         props: {
-          // @ts-expect-error
+          // @ts-expect-error invalid notification type is intentional for the guard test
           type,
         },
       })
@@ -143,7 +145,7 @@ describe('Notification.vue', () => {
 
       const closeBtn = wrapper.find('.el-notification__closeBtn')
       expect(closeBtn.exists()).toBe(true)
-      await closeBtn.trigger('click')
+      await clickCloseButton(closeBtn)
       expect(onClose).toHaveBeenCalled()
     })
 

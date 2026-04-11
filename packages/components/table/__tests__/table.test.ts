@@ -1,9 +1,9 @@
-// @ts-nocheck
 import { nextTick } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import ElCheckbox from '@element-plus/components/checkbox'
 import triggerEvent from '@element-plus/test-utils/trigger-event'
 import { rAF } from '@element-plus/test-utils/tick'
+import { clickActionButton, setCheckboxValue } from '../../../test-utils/dom'
 import ElTable from '../src/table.vue'
 import ElTableColumn from '../src/table-column'
 import { doubleWait, getTestData, mount } from './table-test-common'
@@ -466,7 +466,7 @@ describe('Table.vue', () => {
     it('select', async () => {
       const wrapper = createTable('select')
       await doubleWait()
-      wrapper.findAll('.el-checkbox')[1].trigger('click')
+      await setCheckboxValue(wrapper.findAll('.el-checkbox')[1])
       expect(wrapper.vm.result.length).toEqual(2)
       expect(wrapper.vm.result[1]).toHaveProperty('name')
       expect(wrapper.vm.result[1]['name']).toEqual(getTestData()[0].name)
@@ -476,7 +476,7 @@ describe('Table.vue', () => {
     it('selection-change', async () => {
       const wrapper = createTable('selection-change')
       await doubleWait()
-      wrapper.findAll('.el-checkbox')[1].trigger('click')
+      await setCheckboxValue(wrapper.findAll('.el-checkbox')[1])
       expect(wrapper.vm.result.length).toEqual(1)
       wrapper.unmount()
     })
@@ -565,7 +565,7 @@ describe('Table.vue', () => {
       const footer = wrapper.find('.el-table__footer')
       expect(footer).not.toBeUndefined()
       const cells = footer.findAll('.cell')
-      expect(cells[cells.length - 1].text()).toEqual('459')
+      expect(cells.at(-1)?.text()).toEqual('459')
       wrapper.unmount()
     })
 
@@ -734,7 +734,7 @@ describe('Table.vue', () => {
             <el-table-column prop="name" />
             <el-table-column prop="release" />
             <el-table-column prop="director" />
-            <el-table-column prop="runtime"/>
+            <el-table-column prop="runtime" sortable />
           </el-table>
         `,
         data() {
@@ -744,10 +744,10 @@ describe('Table.vue', () => {
 
       const vm = wrapper.vm
       await doubleWait()
-      const lastCells = wrapper.findAll(
-        '.el-table__body-wrapper tbody tr td:last-child'
-      )
-      expect(lastCells.map((node) => node.text())).toEqual([
+      const getRuntimeCells = () =>
+        wrapper.findAll('.el-table__body-wrapper tbody tr td:last-child')
+
+      expect(getRuntimeCells().map((node) => node.text())).toEqual([
         '80',
         '92',
         '92',
@@ -755,12 +755,13 @@ describe('Table.vue', () => {
         '100',
       ])
       await doubleWait()
-      vm.testData = vm.testData.map((data) =>
-        Object.assign(data, { runtime: -data.runtime })
-      )
+      vm.testData = vm.testData.map((data) => ({
+        ...data,
+        runtime: -data.runtime,
+      }))
       vm.$refs.table.sort('runtime', 'ascending')
       await doubleWait()
-      expect(lastCells.map((node) => node.text())).toEqual([
+      expect(getRuntimeCells().map((node) => node.text())).toEqual([
         '-100',
         '-95',
         '-92',
@@ -906,7 +907,7 @@ describe('Table.vue', () => {
       const secondRow = vm.$el.querySelectorAll('.el-table__row')[1]
       expect([...secondRow.classList]).toContain('current-row')
 
-      vm.$el.querySelector('.clear').click()
+      await clickActionButton(vm.$el.querySelector('.clear'))
       await doubleWait()
       expect([...secondRow.classList]).not.toContain('current-row')
 
@@ -1242,7 +1243,7 @@ describe('Table.vue', () => {
         `,
         data() {
           const testData = getTestData() as any
-          testData[testData.length - 1].children = [
+          testData.at(-1)!.children = [
             {
               name: "A Bug's Life copy 1",
               release: '2008-1-25-1',
@@ -1302,7 +1303,7 @@ describe('Table.vue', () => {
         `,
         data() {
           const testData = getTestData() as any
-          testData[testData.length - 1].childrenTest = [
+          testData.at(-1)!.childrenTest = [
             {
               name: "A Bug's Life copy 1",
               release: '2008-1-25-1',
@@ -1367,7 +1368,7 @@ describe('Table.vue', () => {
         `,
         data() {
           const testData = getTestData() as any
-          testData[testData.length - 1].children = [
+          testData.at(-1)!.children = [
             {
               name: "A Bug's Life copy 1",
               release: '2003-5-30-1',
@@ -1393,7 +1394,7 @@ describe('Table.vue', () => {
           },
           closeExpandRow() {
             const testData = this.testData
-            const row = testData[testData.length - 1].children[0]
+            const row = testData.at(-1)!.children[0]
             this.$refs.table.toggleRowExpansion(row)
           },
         },
@@ -1550,7 +1551,7 @@ describe('Table.vue', () => {
       },
     })
     await doubleWait()
-    wrapper.findAll('.el-checkbox')[2].trigger('click')
+    await setCheckboxValue(wrapper.findAll('.el-checkbox')[2])
     await doubleWait()
     expect(wrapper.vm.selected.length).toEqual(3)
   })

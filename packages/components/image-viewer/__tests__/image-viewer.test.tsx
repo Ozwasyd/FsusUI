@@ -2,6 +2,7 @@ import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, test } from 'vitest'
 import { IMAGE_SUCCESS } from '@element-plus/test-utils/mock'
+import { clickCloseButton } from '../../../test-utils/dom'
 import ImageViewer from '../src/image-viewer.vue'
 
 async function doubleWait() {
@@ -16,7 +17,7 @@ describe('<image-viewer />', () => {
     await doubleWait()
     const viewer = wrapper.find('.el-image-viewer__wrapper')
     expect(viewer.exists()).toBe(true)
-    await wrapper.find('.el-image-viewer__close').trigger('click')
+    await clickCloseButton(wrapper, '.el-image-viewer__close')
     expect(wrapper.emitted('close')).toEqual([[]])
     wrapper.unmount()
   })

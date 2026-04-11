@@ -1,12 +1,16 @@
 import { computed, defineComponent, nextTick, onMounted, ref } from 'vue'
 import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { hasClass } from '@element-plus/utils'
 
 import { useLockscreen } from '../use-lockscreen'
 import { useNamespace } from '../use-namespace'
 
 const kls = 'el-popup-parent--hidden'
+const waitForCleanup = async () => {
+  await vi.advanceTimersByTimeAsync(250)
+  await nextTick()
+}
 
 const Comp = defineComponent({
   setup() {
@@ -21,6 +25,17 @@ const Comp = defineComponent({
 })
 
 describe('useLockscreen', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+
+  afterEach(() => {
+    vi.clearAllTimers()
+    vi.useRealTimers()
+    document.body.className = ''
+    document.body.style.width = ''
+  })
+
   it('should lock screen when trigger is true', async () => {
     const wrapper = mount({
       setup: () => () => <Comp />,
@@ -29,11 +44,9 @@ describe('useLockscreen', () => {
     expect(hasClass(document.body, kls)).toBe(true)
 
     wrapper.unmount()
-    await nextTick()
+    await waitForCleanup()
 
-    setTimeout(() => {
-      expect(hasClass(document.body, kls)).toBe(false)
-    }, 250)
+    expect(hasClass(document.body, kls)).toBe(false)
   })
 
   it('should cleanup when unmounted', async () => {
@@ -47,11 +60,9 @@ describe('useLockscreen', () => {
     expect(hasClass(document.body, kls)).toBe(true)
 
     shouldRender.value = false
-    await nextTick()
+    await waitForCleanup()
 
-    setTimeout(() => {
-      expect(hasClass(document.body, kls)).toBe(false)
-    }, 250)
+    expect(hasClass(document.body, kls)).toBe(false)
   })
 
   it('should render a different namespace than the given one', async () => {
@@ -77,5 +88,10 @@ describe('useLockscreen', () => {
     )
 
     wrapper.unmount()
+    await waitForCleanup()
+
+    expect(hasClass(document.body, `${namespace}-lock-parent--hidden`)).toBe(
+      false
+    )
   })
 })

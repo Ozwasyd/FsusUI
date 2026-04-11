@@ -1,14 +1,19 @@
-// @ts-nocheck
 import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, test, vi } from 'vitest'
+import { clickActionButton } from '../../../test-utils/dom'
 
 import Menu from '../src/menu'
 import MenuGroup from '../src/menu-item-group.vue'
 import MenuItem from '../src/menu-item.vue'
 import SubMenu from '../src/sub-menu'
 
-const _mount = (template: string, options = {}) =>
+type MenuTestOptions = Record<string, unknown>
+type MenuExposed = {
+  open: (index: string) => void
+}
+
+const _mount = (template: string, options: MenuTestOptions = {}) =>
   mount({
     components: {
       'el-menu': Menu,
@@ -56,12 +61,12 @@ describe('menu', () => {
         <el-menu-item index="2" ref="item2">订单管理</el-menu-item>
       </el-menu>`
     )
-    const instance = wrapper.vm.$el
+    const instance = wrapper.vm.$el as HTMLElement
     const item1 = await wrapper.findComponent({ ref: 'item1' })
     // const item2 = await wrapper.findComponent({ ref: 'item2' })
 
     expect(
-      window.getComputedStyle(instance)._values['--el-menu-bg-color']
+      window.getComputedStyle(instance).getPropertyValue('--el-menu-bg-color')
     ).toEqual(backgroundColor)
 
     // We can not test final style, so comment it out for now.
@@ -74,32 +79,27 @@ describe('menu', () => {
     // expect(item1.vm.$el.style.backgroundColor).toEqual('rgb(204, 0, 0)')
   })
   test('menu-item click', async () => {
+    const handleMenuItemClick = vi.fn()
     const wrapper = _mount(
       `<el-menu>
         <el-menu-item @click="onMenuItemClick" index="1" ref="item1">处理中心</el-menu-item>
         <el-menu-item index="2" ref="item2">订单管理</el-menu-item>
       </el-menu>`,
       {
-        data() {
-          return {
-            clicksCount: 0,
-          }
-        },
         methods: {
-          onMenuItemClick(item) {
-            expect(item).toMatchObject({
-              index: '1',
-              indexPath: ['1'],
-            })
-            this.clicksCount = this.clicksCount + 1
-          },
+          onMenuItemClick: handleMenuItemClick,
         },
       }
     )
     const item1 = await wrapper.findComponent({ ref: 'item1' })
     await item1.trigger('click')
     await nextTick()
-    expect((wrapper.vm as any).clicksCount).toEqual(1)
+    expect(handleMenuItemClick).toHaveBeenCalledWith(
+      expect.objectContaining({
+        index: '1',
+        indexPath: ['1'],
+      })
+    )
   })
   test('menu-item disabled', async () => {
     const wrapper = _mount(
@@ -144,20 +144,14 @@ describe('menu', () => {
               <template #title>导航二</template>
             </el-menu-item>
           </el-menu>
-          <button @click="open"></button>
         </div>
       `,
-      {
-        methods: {
-          open() {
-            this.$refs.menu.open('1')
-          },
-        },
-      }
+      {}
     )
 
-    const button = wrapper.find('button')
-    button.trigger('click')
+    ;(
+      wrapper.findComponent({ ref: 'menu' }).vm.$.exposed as MenuExposed
+    ).open('1')
 
     await nextTick()
 
@@ -293,7 +287,9 @@ describe('submenu', () => {
     )
     const submenu = await wrapper.findComponent({ ref: 'submenu' })
     const submenuItem2 = await wrapper.findComponent({ ref: 'submenuItem2' })
-    submenu.vm.$el.querySelector('.el-sub-menu__title').click()
+    await clickActionButton(
+      submenu.vm.$el.querySelector('.el-sub-menu__title') as HTMLElement
+    )
     await nextTick()
     expect(submenu.classes()).toContain('is-opened')
     submenuItem2.trigger('click')
@@ -386,7 +382,9 @@ describe('other', () => {
       </el-menu>`
     )
     const submenu2 = await wrapper.findComponent({ ref: 'submenu2' })
-    submenu2.vm.$el.querySelector('.el-sub-menu__title').click()
+    await clickActionButton(
+      submenu2.vm.$el.querySelector('.el-sub-menu__title') as HTMLElement
+    )
     await nextTick()
     const submenu1 = await wrapper.findComponent({ ref: 'submenu1' })
     expect(submenu1.classes().includes('is-opened')).toBeFalsy()

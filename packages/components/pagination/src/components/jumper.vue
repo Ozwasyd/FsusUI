@@ -1,11 +1,10 @@
 <template>
-  <span :class="ns.e('jump')" :disabled="disabled">
+  <span :class="ns.e('jump')" :aria-disabled="disabled">
     <span :class="[ns.e('goto')]">{{ t('el.pagination.goto') }}</span>
     <el-input
+      v-bind="inputAttrs"
       :size="size"
       :class="[ns.e('editor'), ns.is('in-pagination')]"
-      :min="1"
-      :max="pageCount"
       :disabled="disabled"
       :model-value="innerValue"
       :validate-event="false"
@@ -37,6 +36,10 @@ const ns = useNamespace('pagination')
 const { pageCount, disabled, currentPage, changeEvent } = usePagination()
 const userInput = ref<number | string>()
 const innerValue = computed(() => userInput.value ?? currentPage?.value)
+const inputAttrs = computed<Record<string, unknown>>(() => ({
+  min: 1,
+  max: pageCount?.value,
+}))
 
 function handleInput(val: number | string) {
   userInput.value = val ? +val : ''

@@ -4,6 +4,7 @@ import {
   getCurrentInstance,
   h,
   nextTick,
+  onBeforeUnmount,
   onMounted,
   provide,
   reactive,
@@ -142,7 +143,9 @@ export default defineComponent({
       // expand all subMenus of the menu item
       indexPath.forEach((index) => {
         const subMenu = subMenus.value[index]
-        subMenu && openMenu(index, subMenu.indexPath)
+        if (subMenu) {
+          openMenu(index, subMenu.indexPath)
+        }
       })
     }
 
@@ -258,25 +261,34 @@ export default defineComponent({
 
     // Common computer monitor FPS is 60Hz, which means 60 redraws per second. Calculation formula: 1000ms/60 ≈ 16.67ms, In order to avoid a certain chance of repeated triggering when `resize`, set wait to 16.67 * 2 = 33.34
     const debounce = (fn: () => void, wait = 33.34) => {
-      let timmer: ReturnType<typeof setTimeout> | null
+      let timmer: ReturnType<typeof setTimeout> | null = null
       return () => {
-        timmer && clearTimeout(timmer)
+        if (timmer) {
+          clearTimeout(timmer)
+        }
         timmer = setTimeout(() => {
           fn()
         }, wait)
       }
     }
 
+    const syncSliceIndex = () => {
+      sliceIndex.value = -1
+      nextTick(() => {
+        sliceIndex.value = calcSliceIndex()
+      })
+    }
+
+    const debouncedSyncSliceIndex = debounce(syncSliceIndex)
+
     let isFirstTimeRender = true
     const handleResize = () => {
-      const callback = () => {
-        sliceIndex.value = -1
-        nextTick(() => {
-          sliceIndex.value = calcSliceIndex()
-        })
-      }
       // execute callback directly when first time resize to avoid shaking
-      isFirstTimeRender ? callback() : debounce(callback)()
+      if (isFirstTimeRender) {
+        syncSliceIndex()
+      } else {
+        debouncedSyncSliceIndex()
+      }
       isFirstTimeRender = false
     }
 
@@ -293,7 +305,9 @@ export default defineComponent({
     watch(
       () => props.collapse,
       (value) => {
-        if (value) openedMenus.value = []
+        if (value) {
+          openedMenus.value = []
+        }
       }
     )
 
@@ -352,6 +366,10 @@ export default defineComponent({
     }
 
     // lifecycle
+    onBeforeUnmount(() => {
+      resizeStopper?.()
+    })
+
     onMounted(() => {
       if (props.mode === 'horizontal') {
         new Menubar(instance.vnode.el!, nsMenu.namespace.value)

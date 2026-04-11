@@ -90,17 +90,23 @@
   }
 
   & .#{$namespace}-alert__close-btn {
+    @include icon-button(44px, 999px);
     font-size: getCssVar('alert', 'close-font-size');
     opacity: 1;
     position: absolute;
-    top: 12px;
-    right: 15px;
-    cursor: pointer;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+
+    &:focus-visible {
+      @include a11y-focus-ring(2px, 999px);
+    }
 
     @include when(customed) {
       font-style: normal;
       font-size: getCssVar('alert', 'close-customed-font-size');
-      top: 9px;
+      top: 10px;
+      transform: none;
     }
   }
 }

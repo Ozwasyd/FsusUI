@@ -10,7 +10,6 @@
   >
     <el-focus-trap
       :trapped="trapped"
-      :trap-on-focus-in="true"
       :focus-trap-el="contentRef"
       :focus-start-el="focusStartRef"
       @focus-after-trapped="onFocusAfterTrapped"
@@ -34,7 +33,6 @@ import {
   unref,
   watch,
 } from 'vue'
-import { NOOP } from '@vue/shared'
 import { isNil } from 'lodash-unified'
 import ElFocusTrap from '@element-plus/components/focus-trap'
 import { formItemContextKey } from '@element-plus/components/form'
@@ -48,6 +46,8 @@ import {
 } from './composables'
 
 import type { WatchStopHandle } from 'vue'
+
+const NOOP = () => {}
 
 defineOptions({
   name: 'ElPopperContent',
@@ -106,7 +106,9 @@ let triggerTargetAriaStopWatch: WatchStopHandle | undefined = undefined
 
 const updatePopper = (shouldUpdateZIndex = true) => {
   update()
-  shouldUpdateZIndex && updateZIndex()
+  if (shouldUpdateZIndex) {
+    updateZIndex()
+  }
 }
 
 const togglePopperAlive = () => {
@@ -133,9 +135,11 @@ onMounted(() => {
           [role, () => props.ariaLabel, ariaModal, () => props.id],
           (watches) => {
             ;['role', 'aria-label', 'aria-modal', 'id'].forEach((key, idx) => {
-              isNil(watches[idx])
-                ? el.removeAttribute(key)
-                : el.setAttribute(key, watches[idx]!)
+              if (isNil(watches[idx])) {
+                el.removeAttribute(key)
+              } else {
+                el.setAttribute(key, watches[idx]!)
+              }
             })
           },
           { immediate: true }

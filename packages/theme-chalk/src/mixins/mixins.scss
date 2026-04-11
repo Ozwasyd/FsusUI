@@ -1,3 +1,6 @@
+@use 'sass:map';
+@use 'sass:string';
+
 @use 'function' as *;
 @use '../common/var' as *;
 // forward mixins
@@ -6,11 +9,14 @@
 @forward '_var';
 @use 'config' as *;
 
+$B: null;
+$E: null;
+
 // Break-points
 @mixin res($key, $map: $breakpoints) {
   // loop breakpoint Map, return if present
-  @if map-has-key($map, $key) {
-    @media only screen and #{unquote(map-get($map, $key))} {
+  @if map.has-key($map, $key) {
+    @media only screen and #{string.unquote(map.get($map, $key))} {
       @content;
     }
   } @else {
@@ -59,6 +65,33 @@
   @if $radius != 0px and $radius != 0 {
     border-radius: #{$radius};
   }
+}
+
+@mixin icon-button($size: 44px, $radius: 999px, $padding: 0, $fixed: false) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  @if $fixed {
+    width: $size;
+    height: $size;
+  } @else {
+    min-width: $size;
+    min-height: $size;
+  }
+  padding: $padding;
+  cursor: pointer;
+  border-radius: $radius;
+}
+
+@mixin ghost-icon-button(
+  $size: 44px,
+  $radius: 999px,
+  $padding: 0,
+  $fixed: false
+) {
+  @include icon-button($size, $radius, $padding, $fixed);
+  border: none;
+  background: transparent;
 }
 
 // BEM
@@ -222,15 +255,6 @@
           border-#{$adjacency}-color: transparent;
         }
       }
-    }
-  }
-}
-
-// dark
-@mixin dark($block) {
-  html.dark {
-    @include b($block) {
-      @content;
     }
   }
 }

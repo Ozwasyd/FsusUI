@@ -36,21 +36,18 @@
       </el-icon>
     </span>
     <el-input
+      v-bind="inputAttrs"
       :id="id"
       ref="input"
       type="number"
-      :step="step"
       :model-value="displayValue"
       :placeholder="placeholder"
       :readonly="readonly"
       :disabled="inputNumberDisabled"
       :size="inputNumberSize"
-      :max="max"
-      :min="min"
-      :name="name"
       :label="label"
       :validate-event="false"
-      @wheel.prevent
+      v-on="inputEvents"
       @keydown.up.prevent="increase"
       @keydown.down.prevent="decrease"
       @blur="handleBlur"
@@ -139,6 +136,17 @@ const controlsAtRight = computed(() => {
 const inputNumberSize = useFormSize()
 const inputNumberDisabled = useFormDisabled()
 
+const inputAttrs = computed<Record<string, unknown>>(() => ({
+  step: props.step,
+  max: props.max,
+  min: props.min,
+  name: props.name,
+}))
+
+const inputEvents = {
+  wheel: (event: WheelEvent) => event.preventDefault(),
+}
+
 const displayValue = computed(() => {
   if (data.userInput !== null) {
     return data.userInput
@@ -213,7 +221,9 @@ const verifyValue = (
     if (valueOnClear === null) {
       return null
     }
-    newVal = isString(valueOnClear) ? ({ min, max } as Record<string, number>)[valueOnClear]! : valueOnClear
+    newVal = isString(valueOnClear)
+      ? ({ min, max } as Record<string, number>)[valueOnClear]!
+      : (valueOnClear as unknown as number)
   }
   if (stepStrictly) {
     newVal = toPrecision(Math.round(newVal / step) * step, precision)
@@ -223,7 +233,9 @@ const verifyValue = (
   }
   if (newVal > max || newVal < min) {
     newVal = newVal > max ? max : min
-    update && emit(UPDATE_MODEL_EVENT, newVal)
+    if (update) {
+      emit(UPDATE_MODEL_EVENT, newVal)
+    }
   }
   return newVal
 }

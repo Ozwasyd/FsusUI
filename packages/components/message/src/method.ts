@@ -32,7 +32,7 @@ let seed = 1
 const normalizeOptions = (params?: MessageParams) => {
   const options: MessageOptions =
     !params || isString(params) || isVNode(params) || isFunction(params)
-      ? { message: params }
+      ? { message: params as MessageOptions['message'] }
       : params
 
   const normalized = {

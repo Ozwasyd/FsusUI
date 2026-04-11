@@ -1,6 +1,7 @@
 import { nextTick, reactive } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { clickActionButton } from '../../../test-utils/dom'
 import Carousel from '../src/carousel.vue'
 import CarouselItem from '../src/carousel-item.vue'
 
@@ -157,13 +158,15 @@ describe('Carousel', () => {
     expect(items[0].classList.contains('is-active')).toBeTruthy()
     expect(items[1].classList.contains('is-in-stage')).toBeTruthy()
     expect(items[6].classList.contains('is-in-stage')).toBeTruthy()
-    await items[1].click()
+    await clickActionButton(items[1] as HTMLElement)
     await wait()
     expect(items[1].classList.contains('is-active')).toBeTruthy()
-    await wrapper.vm.$el.querySelector('.el-carousel__arrow--left').click()
+    await clickActionButton(
+      wrapper.vm.$el.querySelector('.el-carousel__arrow--left') as HTMLElement
+    )
     await wait()
     expect(items[0].classList.contains('is-active')).toBeTruthy()
-    await items[6].click()
+    await clickActionButton(items[6] as HTMLElement)
     await wait()
     expect(items[6].classList.contains('is-active')).toBeTruthy()
   })

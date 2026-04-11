@@ -31,7 +31,7 @@ export const useAttrs = (
 
   return computed(() =>
     fromPairs(
-      Object.entries(instance.proxy?.$attrs!).filter(
+      Object.entries(instance.proxy?.$attrs ?? {}).filter(
         ([key]) =>
           !allExcludeKeys.value.includes(key) &&
           !(excludeListeners && LISTENER_PREFIX.test(key))

@@ -1,6 +1,7 @@
 import { nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
+import { clickActionButton } from '../../../test-utils/dom'
 import { ElFormItem as FormItem } from '@element-plus/components/form'
 import Rate from '../src/rate.vue'
 
@@ -39,7 +40,7 @@ describe('Rate.vue', () => {
       target: secondStar,
       offsetX: 0,
     } as any as MouseEvent)
-    secondStar.click()
+    await clickActionButton(secondStar)
     vm.resetCurrentValue()
     expect(value.value).toEqual(0.5)
   })
@@ -85,7 +86,7 @@ describe('Rate.vue', () => {
 
     const thirdStar = wrapper.findAll('.el-rate__item')[2]
       .element as HTMLElement
-    thirdStar.click()
+    clickActionButton(thirdStar)
 
     expect(value1.value).toEqual(3)
   })
@@ -114,13 +115,13 @@ describe('Rate.vue', () => {
 
     const fourthStar = wrapper.findAll('.el-rate__item')[3]
       .element as HTMLElement
-    fourthStar.click()
+    clickActionButton(fourthStar)
 
     expect(value.value).toEqual(4)
     expect(changeCount.value).toEqual(0)
     const fifthStar = wrapper.findAll('.el-rate__item')[4]
       .element as HTMLElement
-    fifthStar.click()
+    clickActionButton(fifthStar)
     expect(value.value).toEqual(5)
     expect(changeCount.value).toEqual(1)
   })
@@ -137,13 +138,13 @@ describe('Rate.vue', () => {
 
     const fourthStar = wrapper.findAll('.el-rate__item')[3]
       .element as HTMLElement
-    fourthStar.click()
+    clickActionButton(fourthStar)
 
     expect(value.value).toEqual(0)
     expect(changeCount.value).toEqual(1)
     const fifthStar = wrapper.findAll('.el-rate__item')[4]
       .element as HTMLElement
-    fifthStar.click()
+    clickActionButton(fifthStar)
     expect(value.value).toEqual(5)
     expect(changeCount.value).toEqual(2)
   })

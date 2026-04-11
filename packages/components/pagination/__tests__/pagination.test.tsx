@@ -21,10 +21,21 @@ const assertCurrent = (wrapper: VueWrapper<any>, page: number) => {
     String(page)
   )
 }
+
+const findLastPage = (wrapper: VueWrapper<any>) => {
+  const pages = wrapper.findAll('.el-pagination .el-pager li.number')
+
+  expect(pages.length).toBeGreaterThan(0)
+  return pages.at(-1)!
+}
+
 const assertPages = (wrapper: VueWrapper<any>, total: number) => {
-  expect(wrapper.find('.el-pagination .el-pager li:last-child').text()).toBe(
-    String(total)
-  )
+  expect(findLastPage(wrapper).text()).toBe(String(total))
+}
+
+const flushPaginationUpdate = async () => {
+  await nextTick()
+  await nextTick()
 }
 
 describe('Pagination', () => {
@@ -206,10 +217,10 @@ describe('Pagination', () => {
       // total pages = Math.ceil(total / pageSize)
       assertPages(wrapper, 10)
       pageSize.value = 20
-      await nextTick()
+      await flushPaginationUpdate()
       assertPages(wrapper, 5)
       pageSize.value = 55
-      await nextTick()
+      await flushPaginationUpdate()
       assertPages(wrapper, 2)
     })
     test('test currentPage change', async () => {
@@ -227,7 +238,7 @@ describe('Pagination', () => {
       assertCurrent(wrapper, 2)
       defaultCurrentPage.value = 1
       assertCurrent(wrapper, 2) // still 2
-      await wrapper.find('.el-pager li:last-child').trigger('click')
+      await findLastPage(wrapper).trigger('click')
       assertCurrent(wrapper, 10)
       await wrapper.find('button.btn-prev').trigger('click')
       assertCurrent(wrapper, 9)
@@ -246,12 +257,12 @@ describe('Pagination', () => {
 
       assertPages(wrapper, 10)
       pageCount.value = 20
-      await nextTick()
+      await flushPaginationUpdate()
       assertPages(wrapper, 20)
-      await wrapper.find('.el-pager li:last-child').trigger('click')
+      await findLastPage(wrapper).trigger('click')
       assertCurrent(wrapper, 20)
       pageCount.value = 5
-      await nextTick()
+      await flushPaginationUpdate()
       // side effect, if currentPage is greater than pageCount
       // currentPage should change accordingly
       assertPages(wrapper, 5)
@@ -291,7 +302,7 @@ describe('Pagination', () => {
       const next = wrapper.find('.el-pagination .btn-next')
       const pagers = wrapper.findAll('.el-pagination .el-pager .number')
       const first = pagers[0]
-      const last = pagers[pagers.length - 1]
+      const last = pagers.at(-1)!
 
       expect(prev.attributes('aria-label')).toBe('Go to previous page')
       expect(next.attributes('aria-label')).toBe('Go to next page')

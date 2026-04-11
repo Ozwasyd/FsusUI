@@ -8,6 +8,7 @@ import type { Table, TableProps } from '../table/defaults'
 function useTree<T>(watcherData: WatcherPropsData<T>) {
   const expandRowKeys = ref<string[]>([])
   const treeData = ref<unknown>({})
+  const hasTreeData = ref(false)
   const indent = ref(16)
   const lazy = ref(false)
   const lazyTreeNodeMap = ref({})
@@ -132,6 +133,7 @@ function useTree<T>(watcherData: WatcherPropsData<T>) {
       }
     }
     treeData.value = newTreeData
+    hasTreeData.value = Object.keys(newTreeData).length > 0
     instance.store?.updateTableScrollY()
   }
 
@@ -218,6 +220,7 @@ function useTree<T>(watcherData: WatcherPropsData<T>) {
     states: {
       expandRowKeys,
       treeData,
+      hasTreeData,
       indent,
       lazy,
       lazyTreeNodeMap,

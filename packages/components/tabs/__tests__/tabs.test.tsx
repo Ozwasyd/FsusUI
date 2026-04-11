@@ -1,6 +1,7 @@
 import { defineComponent, nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, test, vi } from 'vitest'
+import { clickCloseButton } from '../../../test-utils/dom'
 import { EVENT_CODE } from '@element-plus/constants'
 import Tabs from '../src/tabs'
 import TabPane from '../src/tab-pane.vue'
@@ -255,7 +256,7 @@ describe('Tabs.vue', () => {
     expect(navItemsWrapper[1].classes('is-active')).toBe(true)
 
     // remove one tab, check panes length
-    await navItemsWrapper[1].find('.is-icon-close').trigger('click')
+    await clickCloseButton(navItemsWrapper[1], '.is-icon-close')
 
     panesWrapper = wrapper.findAllComponents(TabPane)
     navItemsWrapper = navWrapper.findAll('.el-tabs__item')
@@ -345,7 +346,7 @@ describe('Tabs.vue', () => {
     expect(panesWrapper.length).toEqual(3)
     expect(navItemsWrapper[2].classes('is-active')).toBe(true)
 
-    await navItemsWrapper[2].find('.is-icon-close').trigger('click')
+    await clickCloseButton(navItemsWrapper[2], '.is-icon-close')
 
     panesWrapper = wrapper.findAllComponents(TabPane)
     navItemsWrapper = navWrapper.findAll('.el-tabs__item')

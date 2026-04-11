@@ -14,6 +14,28 @@ import { DynamicSizeList } from '..'
 import type { ListExposes } from '../src/types'
 type ListRef = ListExposes
 
+const { estimateRowHeights } = vi.hoisted(() => ({
+  estimateRowHeights: vi.fn(
+    async (
+      textLengths: number[],
+      rowWidth: number,
+      charWidth = 14,
+      lineHeight = 22,
+      padding = 16
+    ) => {
+      const charactersPerLine = Math.max(1, Math.floor(rowWidth / charWidth))
+      return textLengths.map((textLength) => {
+        const lineCount = Math.max(1, Math.ceil(textLength / charactersPerLine))
+        return lineCount * lineHeight + padding
+      })
+    }
+  ),
+}))
+
+vi.mock('@element-plus/wasm', () => ({
+  estimateRowHeights,
+}))
+
 const onItemRendered = vi.fn()
 const WINDOW_KLS = 'window'
 const ITEM_KLS = 'item'
@@ -83,6 +105,33 @@ describe('<dynamic-size-list />', () => {
   })
 
   describe('scroll functionality', () => {
+    it('should prime large text datasets with wasm row height estimates', async () => {
+      const data = Array.from({ length: 2_001 }, (_, index) => ({
+        label: index === 2_000 ? 'x'.repeat(160) : 'x'.repeat(48),
+      }))
+      const wrapper = mount({
+        props: {
+          data,
+          estimatedItemSize: 20,
+          itemSize: () => 20,
+          total: data.length,
+          width: 240,
+        },
+      })
+      const listRef = wrapper.vm.$refs.listRef as ListRef
+
+      await nextTick()
+      await Promise.resolve()
+      await nextTick()
+      await Promise.resolve()
+      await nextTick()
+
+      expect(estimateRowHeights).toHaveBeenCalled()
+      expect(
+        Number.parseInt(wrapper.find(ITEM_SELECTOR).element.style.height)
+      ).toBeGreaterThan(20)
+    })
+
     it("should update inner container's height after scroll dispatched", async () => {
       const wrapper = mount()
       const listRef = wrapper.vm.$refs.listRef as ListRef

@@ -1,8 +1,8 @@
 <template>
-  <div ref="contentRef" :style="contentStyle" data-tooltip-v2-root>
-    <div v-if="!nowrap" :data-side="side" :class="contentClass">
+  <div ref="contentRef" :style="contentStyle" v-bind="rootAttrs">
+    <div v-if="!nowrap" :class="contentClass" v-bind="contentAttrs">
       <slot :content-style="contentStyle" :content-class="contentClass" />
-      <el-visually-hidden :id="contentId" role="tooltip">
+      <el-visually-hidden v-bind="visuallyHiddenAttrs">
         <template v-if="ariaLabel">
           {{ ariaLabel }}
         </template>
@@ -68,6 +68,17 @@ const side = computed(() => {
   return placement.value.split('-')[0]
 })
 
+const rootAttrs = { 'data-tooltip-v2-root': '' }
+
+const contentAttrs = computed<Record<string, unknown>>(() => ({
+  'data-side': side.value,
+}))
+
+const visuallyHiddenAttrs = computed<Record<string, unknown>>(() => ({
+  id: unref(contentId),
+  role: 'tooltip',
+}))
+
 const contentStyle = computed<CSSProperties>(() => {
   return {
     position: unref(strategy),
@@ -83,8 +94,10 @@ const arrowStyle = computed<CSSProperties>(() => {
   const { arrow } = unref(middlewareData)
 
   return {
-    [`--${ns.namespace.value}-tooltip-v2-arrow-x`]: `${arrow?.x}px` || '',
-    [`--${ns.namespace.value}-tooltip-v2-arrow-y`]: `${arrow?.y}px` || '',
+    [`--${ns.namespace.value}-tooltip-v2-arrow-x`]:
+      arrow?.x != null ? `${arrow.x}px` : '',
+    [`--${ns.namespace.value}-tooltip-v2-arrow-y`]:
+      arrow?.y != null ? `${arrow.y}px` : '',
   }
 })
 

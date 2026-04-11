@@ -1,4 +1,5 @@
 import { describe, expect, test, vi } from 'vitest'
+import { clickCloseButton } from '../../../test-utils/dom'
 import { EVENT_CODE } from '@element-plus/constants'
 
 import makeMount from '@element-plus/test-utils/make-mount'
@@ -53,7 +54,7 @@ describe('<upload-list />', () => {
         },
       })
 
-      await wrapper.find('.el-icon--close').trigger('click')
+      await clickCloseButton(wrapper, '.el-icon--close')
       expect(remove).toHaveBeenCalled()
 
       await wrapper.find('.el-upload-list__item').trigger('keydown', {
@@ -68,6 +69,15 @@ describe('<upload-list />', () => {
 
       await wrapper.find('.el-upload-list__item-delete').trigger('click')
       expect(remove).toHaveBeenCalledTimes(3)
+    })
+
+    test('remove action stays keyboard reachable', async () => {
+      const wrapper = mount()
+
+      await wrapper.find('.el-upload-list__item').trigger('focus')
+
+      const closeButton = wrapper.find('.el-icon--close')
+      expect(closeButton.attributes('aria-label')).toBe('Delete')
     })
   })
 })

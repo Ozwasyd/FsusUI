@@ -3,16 +3,9 @@
     <li
       v-for="file in files"
       :key="file.uid || file.name"
-      :class="[
-        nsUpload.be('list', 'item'),
-        nsUpload.is(file.status),
-        { focusing },
-      ]"
+      :class="[nsUpload.be('list', 'item'), nsUpload.is(file.status)]"
       tabindex="0"
       @keydown.delete="!disabled && handleRemove(file)"
-      @focus="focusing = true"
-      @blur="focusing = false"
-      @click="focusing = false"
     >
       <slot :file="file">
         <img
@@ -28,9 +21,11 @@
           v-if="file.status === 'uploading' || listType !== 'picture-card'"
           :class="nsUpload.be('list', 'item-info')"
         >
-          <a
+          <button
+            type="button"
             :class="nsUpload.be('list', 'item-name')"
-            @click.prevent="handlePreview(file)"
+            :aria-label="t('el.upload.preview')"
+            @click="handlePreviewClick(file)"
           >
             <el-icon :class="nsIcon.m('document')">
               <Document />
@@ -41,7 +36,7 @@
             >
               {{ file.name }}
             </span>
-          </a>
+          </button>
           <el-progress
             v-if="file.status === 'uploading'"
             :type="listType === 'picture-card' ? 'circle' : 'line'"
@@ -65,16 +60,17 @@
             <Check />
           </el-icon>
         </label>
-        <el-icon
+        <button
           v-if="!disabled"
+          type="button"
           :class="nsIcon.m('close')"
-          @click="handleRemove(file)"
+          :aria-label="t('el.upload.delete')"
+          @click.stop="handleRemove(file)"
         >
-          <Close />
-        </el-icon>
-        <!-- Due to close btn only appears when li gets focused disappears after li gets blurred, thus keyboard navigation can never reach close btn-->
-        <!-- This is a bug which needs to be fixed -->
-        <!-- TODO: Fix the incorrect navigation interaction -->
+          <el-icon>
+            <Close />
+          </el-icon>
+        </button>
         <i v-if="!disabled" :class="nsIcon.m('close-tip')">{{
           t('el.upload.deleteTip')
         }}</i>
@@ -82,21 +78,25 @@
           v-if="listType === 'picture-card'"
           :class="nsUpload.be('list', 'item-actions')"
         >
-          <span
+          <button
+            type="button"
             :class="nsUpload.be('list', 'item-preview')"
-            @click="handlePreview(file)"
+            :aria-label="t('el.upload.preview')"
+            @click.stop="handlePreviewClick(file)"
           >
             <el-icon :class="nsIcon.m('zoom-in')"><zoom-in /></el-icon>
-          </span>
-          <span
+          </button>
+          <button
             v-if="!disabled"
+            type="button"
             :class="nsUpload.be('list', 'item-delete')"
-            @click="handleRemove(file)"
+            :aria-label="t('el.upload.delete')"
+            @click.stop="handleRemove(file)"
           >
             <el-icon :class="nsIcon.m('delete')">
               <Delete />
             </el-icon>
-          </span>
+          </button>
         </span>
       </slot>
     </li>
@@ -104,7 +104,7 @@
   </transition-group>
 </template>
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { ElIcon } from '@element-plus/components/icon'
 import {
   Check,
@@ -134,13 +134,15 @@ const nsIcon = useNamespace('icon')
 const nsList = useNamespace('list')
 const disabled = useFormDisabled()
 
-const focusing = ref(false)
-
 const containerKls = computed(() => [
   nsUpload.b('list'),
   nsUpload.bm('list', props.listType),
   nsUpload.is('disabled', props.disabled),
 ])
+
+const handlePreviewClick = (file: UploadFile) => {
+  props.handlePreview?.(file)
+}
 
 const handleRemove = (file: UploadFile) => {
   emit('remove', file)

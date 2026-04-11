@@ -22,8 +22,7 @@
       :transition="`${nsSelectV2.namespace.value}-zoom-in-top`"
       trigger="click"
       :persistent="persistent"
-      @before-show="handleMenuEnter"
-      @hide="states.inputValue = states.displayInputValue"
+      v-on="tooltipEvents"
     >
       <template #default>
         <div
@@ -166,7 +165,7 @@
               <input
                 :id="id"
                 ref="inputRef"
-                v-model-text="states.displayInputValue"
+                :value="states.displayInputValue"
                 :autocomplete="autocomplete"
                 aria-autocomplete="list"
                 aria-haspopup="listbox"
@@ -184,7 +183,6 @@
                 type="text"
                 :name="name"
                 :unselectable="expanded ? 'on' : undefined"
-                @update:modelValue="onUpdateInputValue"
                 @focus="handleFocus"
                 @blur="handleBlur"
                 @input="onInput"
@@ -216,7 +214,7 @@
               <input
                 :id="id"
                 ref="inputRef"
-                v-model-text="states.displayInputValue"
+                :value="states.displayInputValue"
                 aria-autocomplete="list"
                 aria-haspopup="listbox"
                 :aria-labelledby="label"
@@ -241,7 +239,6 @@
                 @keydown.down.stop.prevent="onKeyboardNavigate('forward')"
                 @keydown.enter.stop.prevent="onKeyboardSelect"
                 @keydown.esc.stop.prevent="handleEsc"
-                @update:modelValue="onUpdateInputValue"
               />
             </div>
             <span
@@ -278,7 +275,7 @@
             <el-icon
               v-if="showClearBtn && clearIcon"
               :class="[nsSelectV2.e('caret'), nsInput.e('icon')]"
-              @click.prevent.stop="handleClear"
+              v-on="clearIconEvents"
             >
               <component :is="clearIcon" />
             </el-icon>
@@ -297,7 +294,6 @@
           :data="filteredOptions"
           :width="popperSize"
           :hovering-index="states.hoveringIndex"
-          :scrollbar-always-on="scrollbarAlwaysOn"
         >
           <template #default="scope">
             <slot v-bind="scope" />
@@ -322,7 +318,6 @@ import {
   provide,
   reactive,
   toRefs,
-  vModelText,
 } from 'vue'
 import { isArray } from '@element-plus/utils'
 import { ClickOutside } from '@element-plus/directives'
@@ -342,7 +337,7 @@ export default defineComponent({
     ElTooltip,
     ElIcon,
   },
-  directives: { ClickOutside, ModelText: vModelText },
+  directives: { ClickOutside },
   props: SelectProps,
   emits: [
     UPDATE_MODEL_EVENT,
@@ -387,9 +382,26 @@ export default defineComponent({
       onKeyboardSelect: API.onKeyboardSelect,
     } as any)
 
+    const tooltipEvents = {
+      'before-show': API.handleMenuEnter,
+      hide: () => {
+        API.states.inputValue = API.states.displayInputValue
+      },
+    }
+
+    const clearIconEvents = {
+      click: (event: MouseEvent) => {
+        event.preventDefault()
+        event.stopPropagation()
+        API.handleClear()
+      },
+    }
+
     return {
       ...API,
       modelValue,
+      tooltipEvents,
+      clearIconEvents,
     }
   },
 })

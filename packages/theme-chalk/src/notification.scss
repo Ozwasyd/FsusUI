@@ -39,7 +39,7 @@
   }
 
   @include e(title) {
-    font-weight: bold;
+    font-weight: 600;
     font-size: getCssVar('notification-title-font-size');
     line-height: getCssVar('notification-icon-size');
     color: getCssVar('notification-title-color');
@@ -65,12 +65,16 @@
   }
 
   & .#{$namespace}-notification__closeBtn {
+    @include icon-button(44px, 999px);
     position: absolute;
-    top: 18px;
-    right: 15px;
-    cursor: pointer;
+    top: 10px;
+    right: 8px;
     color: getCssVar('notification-close-color');
     font-size: getCssVar('notification-close-font-size');
+
+    &:focus-visible {
+      @include a11y-focus-ring(2px, 999px);
+    }
 
     &:hover {
       color: getCssVar('notification-close-hover-color');

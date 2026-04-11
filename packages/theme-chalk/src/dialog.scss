@@ -11,9 +11,9 @@
 
   position: relative;
   margin: var(#{getCssVarName('dialog-margin-top')}, 15vh) auto 50px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: getCssVar('bg-color', 'overlay');
+  backdrop-filter: blur(var(--el-overlay-backdrop-blur, 16px));
+  -webkit-backdrop-filter: blur(var(--el-overlay-backdrop-blur, 16px));
   border-radius: getCssVar('dialog', 'border-radius');
   box-shadow: getCssVar('dialog', 'box-shadow');
   box-sizing: border-box;
@@ -76,7 +76,7 @@
     );
 
     .#{$namespace}-dialog__close {
-      color: getCssVar('color', 'info');
+      color: getCssVar('text-color', 'secondary');
       font-size: inherit;
     }
 
@@ -85,6 +85,10 @@
       .#{$namespace}-dialog__close {
         color: getCssVar('color', 'primary');
       }
+    }
+
+    &:focus-visible {
+      @include a11y-focus-ring(2px, 999px);
     }
   }
 

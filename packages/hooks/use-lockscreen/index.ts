@@ -1,5 +1,4 @@
-import { isRef, onScopeDispose, watch } from 'vue'
-import { computed } from '@vue/reactivity'
+import { computed, isRef, onScopeDispose, watch } from 'vue'
 import {
   addClass,
   getScrollBarWidth,
@@ -46,11 +45,25 @@ export const useLockscreen = (
   let scrollBarWidth = 0
   let withoutHiddenClass = false
   let bodyWidth = '0'
+  let cleanupTimer: ReturnType<typeof setTimeout> | undefined
+
+  const clearCleanupTimer = () => {
+    if (cleanupTimer) {
+      clearTimeout(cleanupTimer)
+      cleanupTimer = undefined
+    }
+  }
 
   const cleanup = () => {
-    setTimeout(() => {
-      removeClass(document?.body, hiddenCls.value)
-      if (withoutHiddenClass && document) {
+    clearCleanupTimer()
+    cleanupTimer = setTimeout(() => {
+      cleanupTimer = undefined
+      if (!isClient || typeof document === 'undefined') {
+        return
+      }
+
+      removeClass(document.body, hiddenCls.value)
+      if (withoutHiddenClass) {
         document.body.style.width = bodyWidth
       }
     }, 200)
@@ -60,6 +73,8 @@ export const useLockscreen = (
       cleanup()
       return
     }
+
+    clearCleanupTimer()
 
     withoutHiddenClass = !hasClass(document.body, hiddenCls.value)
     if (withoutHiddenClass) {

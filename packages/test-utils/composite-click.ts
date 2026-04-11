@@ -3,8 +3,10 @@ import triggerEvent from './trigger-event'
 
 import type { DOMWrapper, VueWrapper } from '@vue/test-utils'
 
+type ElementWrapper<T extends Element = Element> = DOMWrapper<T, T>
+
 const triggerCompositeClick = async <
-  T extends VueWrapper<any> | DOMWrapper<Element>
+  T extends VueWrapper<any> | ElementWrapper
 >(
   wrapper: T
 ) => {

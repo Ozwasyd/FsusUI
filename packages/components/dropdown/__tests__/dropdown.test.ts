@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, test, vi } from 'vitest'
@@ -14,14 +13,29 @@ import DropdownMenu from '../src/dropdown-menu.vue'
 const MOUSE_ENTER_EVENT = 'mouseenter'
 const MOUSE_LEAVE_EVENT = 'mouseleave'
 const CONTEXTMENU = 'contextmenu'
+const buttonName = Button.name || 'ElButton'
+const dropdownName = Dropdown.name || 'ElDropdown'
+const dropdownItemName = DropdownItem.name || 'ElDropdownItem'
+const dropdownMenuName = DropdownMenu.name || 'ElDropdownMenu'
 
-const _mount = (template: string, data, otherObj?) =>
+type MountDataFactory = () => Record<string, unknown>
+type MountExtraOptions = Record<string, unknown>
+type DropdownRefExposed = {
+  handleOpen: () => void
+  handleClose: () => void
+}
+
+const _mount = (
+  template: string,
+  data: MountDataFactory,
+  otherObj?: MountExtraOptions
+) =>
   mount({
     components: {
-      [Button.name]: Button,
-      [Dropdown.name]: Dropdown,
-      [DropdownItem.name]: DropdownItem,
-      [DropdownMenu.name]: DropdownMenu,
+      [buttonName]: Button,
+      [dropdownName]: Dropdown,
+      [dropdownItemName]: DropdownItem,
+      [dropdownMenuName]: DropdownMenu,
     },
     template,
     data,
@@ -210,7 +224,11 @@ describe('Dropdown', () => {
       })
     )
     await nextTick()
-    const dropdown = wrapper.vm
+    const dropdown = wrapper.vm as typeof wrapper.vm & {
+      $refs: {
+        refDropdown: DropdownRefExposed
+      }
+    }
     const content = wrapper.findComponent(ElTooltip).vm as InstanceType<
       typeof ElTooltip
     >
@@ -392,6 +410,47 @@ describe('Dropdown', () => {
     ).toBe('0')
   })
 
+  test('dropdown menu typeahead search', async () => {
+    const wrapper = _mount(
+      `
+      <el-dropdown ref="b" placement="right" :hide-on-click="false">
+        <span class="el-dropdown-link" ref="a">
+          dropdown<i class="el-icon-arrow-down el-icon--right"></i>
+        </span>
+        <template #dropdown>
+          <el-dropdown-menu ref="dropdown-menu">
+            <el-dropdown-item ref="apple">Apple</el-dropdown-item>
+            <el-dropdown-item>Orange</el-dropdown-item>
+            <el-dropdown-item ref="cherry">Cherry</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+      `,
+      () => ({})
+    )
+    await nextTick()
+    const triggerElm = wrapper.find('.el-tooltip__trigger')
+    await triggerElm.trigger(MOUSE_ENTER_EVENT)
+    await rAF()
+
+    const firstItem = wrapper
+      .findComponent({ ref: 'apple' })
+      .find('.el-dropdown-menu__item')
+    await firstItem.trigger('focus')
+    await firstItem.trigger('keydown', {
+      key: 'c',
+      code: 'KeyC',
+    })
+    await rAF()
+
+    expect(
+      wrapper
+        .findComponent({ ref: 'cherry' })
+        .find('.el-dropdown-menu__item')
+        .element.getAttribute('tabindex')
+    ).toBe('0')
+  })
+
   test('max height', async () => {
     const wrapper = _mount(
       `
@@ -504,11 +563,13 @@ describe('Dropdown', () => {
     )
     await nextTick()
     expect(
-      wrapper
-        .findComponent({
-          name: 'DropdownItemImpl',
-        })
-        .find('.el-dropdown-menu__item').element.dataset.customAttribute
+      (
+        wrapper
+          .findComponent({
+            name: 'DropdownItemImpl',
+          })
+          .find('.el-dropdown-menu__item').element as HTMLElement
+      ).dataset.customAttribute
     ).toBe('hello')
   })
 
@@ -786,7 +847,9 @@ describe('Dropdown', () => {
 
       await nextTick()
       const { selector } = usePopperContainerId()
-      expect(document.body.querySelector(selector.value).innerHTML).not.toBe('')
+      expect(
+        document.body.querySelector(selector.value)?.innerHTML
+      ).not.toBe('')
     })
 
     test('should not mount on the popper container', async () => {
@@ -812,7 +875,7 @@ describe('Dropdown', () => {
 
       await nextTick()
       const { selector } = usePopperContainerId()
-      expect(document.body.querySelector(selector.value).innerHTML).toBe('')
+      expect(document.body.querySelector(selector.value)?.innerHTML).toBe('')
     })
   })
 })

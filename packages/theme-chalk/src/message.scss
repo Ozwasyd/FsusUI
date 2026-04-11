@@ -30,7 +30,7 @@
 
   @include when(closable) {
     .#{$namespace}-message__content {
-      padding-right: 31px;
+      padding-right: 44px;
     }
   }
 
@@ -74,24 +74,29 @@
   @include e(content) {
     padding: 0;
     font-size: 14px;
-    line-height: 1;
+    line-height: 1.5;
     &:focus {
       outline-width: 0;
     }
   }
 
   & .#{$namespace}-message__closeBtn {
+    @include icon-button(44px, 999px);
     position: absolute;
     top: 50%;
-    right: 19px;
+    right: 8px;
     transform: translateY(-50%);
-    cursor: pointer;
     color: getCssVar('message', 'close-icon-color');
     font-size: getCssVar('message', 'close-size');
 
     &:focus {
       outline-width: 0;
     }
+
+    &:focus-visible {
+      @include a11y-focus-ring(2px, 999px);
+    }
+
     &:hover {
       color: getCssVar('message', 'close-hover-color');
     }

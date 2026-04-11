@@ -1,6 +1,7 @@
 import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
+import { clickPickerCell } from '../../../test-utils/dom'
 import updateLocale from 'dayjs/plugin/updateLocale'
 import dayjs from 'dayjs'
 import Calendar from '../src/calendar.vue'
@@ -15,6 +16,12 @@ const setDayjsWeekStart = (weekStart = 0) => {
   })
 }
 
+const queryCalendarRows = (wrapper: { element: unknown }) => {
+  return Array.from(
+    (wrapper.element as HTMLElement).querySelectorAll('.el-calendar-table__row')
+  ) as HTMLElement[]
+}
+
 describe('Calendar.vue', () => {
   it('create', async () => {
     const wrapper = mount({
@@ -26,9 +33,9 @@ describe('Calendar.vue', () => {
     const titleEl = wrapper.find('.el-calendar__title')
     expect(/2019.*April/.test(titleEl.element?.innerHTML)).toBeTruthy()
     expect(wrapper.element.querySelectorAll('thead th').length).toBe(7)
-    const rows = wrapper.element.querySelectorAll('.el-calendar-table__row')
+    const rows = queryCalendarRows(wrapper)
     expect(rows.length).toBe(5)
-    ;(rows[4].lastElementChild as HTMLElement).click()
+    await clickPickerCell(rows[4].lastElementChild as HTMLElement)
 
     await nextTick()
     expect(/2019.*May/.test(titleEl.element.innerHTML)).toBeTruthy()
@@ -45,7 +52,7 @@ describe('Calendar.vue', () => {
     ))
     const titleEl = wrapper.find('.el-calendar__title')
     expect(/2019.*March/.test(titleEl.element.innerHTML)).toBeTruthy()
-    const rows = wrapper.element.querySelectorAll('.el-calendar-table__row')
+    const rows = queryCalendarRows(wrapper)
     expect(rows.length).toBe(4)
     expect(
       wrapper.element.querySelector('.el-calendar__button-group')
@@ -59,7 +66,7 @@ describe('Calendar.vue', () => {
     ))
     const titleEl = wrapper.find('.el-calendar__title')
     expect(/2021.*January/.test(titleEl.element.innerHTML)).toBeTruthy()
-    const rows = wrapper.element.querySelectorAll('.el-calendar-table__row')
+    const rows = queryCalendarRows(wrapper)
     expect(rows.length).toBe(5)
     expect(
       wrapper.element.querySelector('.el-calendar__button-group')
@@ -76,10 +83,10 @@ describe('Calendar.vue', () => {
       '.el-calendar-table.is-range'
     )
     expect(dateTables.length).toBe(2)
-    const rows = wrapper.element.querySelectorAll('.el-calendar-table__row')
+    const rows = queryCalendarRows(wrapper)
     expect(rows.length).toBe(5)
-    const cell = rows[rows.length - 1].firstElementChild as HTMLElement
-    cell.click()
+    const cell = Array.from(rows).at(-1)?.firstElementChild as HTMLElement
+    await clickPickerCell(cell)
 
     await nextTick()
 
@@ -98,10 +105,10 @@ describe('Calendar.vue', () => {
       '.el-calendar-table.is-range'
     )
     expect(dateTables.length).toBe(3)
-    const rows = wrapper.element.querySelectorAll('.el-calendar-table__row')
+    const rows = queryCalendarRows(wrapper)
     expect(rows.length).toBe(8)
-    const cell = rows[rows.length - 1].firstElementChild as HTMLElement
-    cell.click()
+    const cell = rows.at(-1)?.firstElementChild as HTMLElement
+    await clickPickerCell(cell)
 
     await nextTick()
 
@@ -192,10 +199,10 @@ describe('Calendar.vue', () => {
       '.el-calendar-table.is-range'
     )
     expect(dateTables.length).toBe(3)
-    const rows = wrapper.element.querySelectorAll('.el-calendar-table__row')
+    const rows = queryCalendarRows(wrapper)
     expect(rows.length).toBe(6)
-    const cell = rows[rows.length - 1].firstElementChild as HTMLElement
-    cell.click()
+    const cell = rows.at(-1)?.firstElementChild as HTMLElement
+    await clickPickerCell(cell)
 
     await nextTick()
 
@@ -213,10 +220,10 @@ describe('Calendar.vue', () => {
       '.el-calendar-table.is-range'
     )
     expect(dateTables.length).toBe(2)
-    const rows = wrapper.element.querySelectorAll('.el-calendar-table__row')
+    const rows = queryCalendarRows(wrapper)
     expect(rows.length).toBe(4)
-    const cell = rows[rows.length - 1].firstElementChild as HTMLElement
-    cell.click()
+    const cell = rows.at(-1)?.firstElementChild as HTMLElement
+    await clickPickerCell(cell)
 
     await nextTick()
 

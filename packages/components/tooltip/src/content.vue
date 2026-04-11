@@ -12,9 +12,7 @@
         v-show="shouldShow"
         :id="id"
         ref="contentRef"
-        v-bind="$attrs"
-        :aria-label="ariaLabel"
-        :aria-hidden="ariaHidden"
+        v-bind="popperContentAttrs"
         :boundaries-padding="boundariesPadding"
         :fallback-placements="fallbackPlacements"
         :gpu-acceleration="gpuAcceleration"
@@ -45,7 +43,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, onBeforeUnmount, ref, unref, watch } from 'vue'
+import { computed, inject, onBeforeUnmount, ref, unref, useAttrs, watch } from 'vue'
 import { onClickOutside } from '@vueuse/core'
 import { useNamespace, usePopperContainerId } from '@element-plus/hooks'
 import { composeEventHandlers } from '@element-plus/utils'
@@ -59,6 +57,7 @@ defineOptions({
 })
 
 const props = defineProps(useTooltipContentProps)
+const attrs = useAttrs()
 
 const { selector } = usePopperContainerId()
 const ns = useNamespace('tooltip')
@@ -108,6 +107,12 @@ const appendTo = computed(() => {
 const contentStyle = computed(() => (props.style ?? {}) as any)
 
 const ariaHidden = computed(() => !unref(open))
+
+const popperContentAttrs = computed<Record<string, unknown>>(() => ({
+  ...attrs,
+  ariaLabel: props.ariaLabel,
+  ariaHidden: ariaHidden.value,
+}))
 
 const onTransitionLeave = () => {
   onHide()

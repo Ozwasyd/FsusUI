@@ -1,7 +1,7 @@
-// @ts-nocheck
 import { markRaw } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, test, vi } from 'vitest'
+import { clickActionButton, clickCloseButton } from '../../../test-utils/dom'
 import { rAF } from '@element-plus/test-utils/tick'
 import { triggerNativeCompositeClick } from '@element-plus/test-utils/composite-click'
 import { QuestionFilled as QuestionFilledIcon } from '@element-plus/icons-vue'
@@ -116,7 +116,7 @@ describe('MessageBox', () => {
     const btn = document.querySelector(
       '.el-message-box__close'
     ) as HTMLButtonElement
-    btn.click()
+    await clickCloseButton(btn)
     await rAF()
     expect(msgAction).toEqual('close')
   })
@@ -143,7 +143,7 @@ describe('MessageBox', () => {
     const btn = document
       .querySelector(selector)
       .querySelector('.el-button--primary') as HTMLButtonElement
-    btn.click()
+    await clickActionButton(btn)
     await rAF()
     const msgbox: HTMLElement = document.querySelector(selector)
     expect(msgbox).toBe(null)
@@ -205,7 +205,7 @@ describe('MessageBox', () => {
     const closeBtn = document.querySelector(
       '.el-message-box__close'
     ) as HTMLButtonElement
-    closeBtn.click()
+    await clickCloseButton(closeBtn)
     await rAF()
     expect(msgAction).toEqual('cancel')
   })
@@ -223,11 +223,11 @@ describe('MessageBox', () => {
       },
     })
     await rAF()
-    ;(
+    await clickActionButton(
       document.querySelector(
         '.el-message-box__btns .el-button--primary'
       ) as HTMLButtonElement
-    ).click()
+    )
     await rAF()
     expect(msgAction).toEqual('confirm')
   })
@@ -244,7 +244,7 @@ describe('MessageBox', () => {
       const btn = document.querySelector(
         '.el-message-box__btns .el-button--primary'
       ) as HTMLButtonElement
-      btn.click()
+      await clickActionButton(btn)
       await rAF()
       expect(msgAction).toEqual('confirm')
     })
@@ -258,7 +258,7 @@ describe('MessageBox', () => {
       )
       await rAF()
       const btn = document.querySelector('.el-message-box__btns .el-button')
-      ;(btn as HTMLButtonElement).click()
+      await clickActionButton(btn as HTMLButtonElement)
       await rAF()
       expect(msgAction).toEqual('cancel')
     })
@@ -336,7 +336,7 @@ describe('MessageBox', () => {
       })
       await rAF()
       const msgbox: HTMLElement = document.querySelector(selector)!
-      const msgboxDialog = msgbox?.querySelector('[role="dialog"]')!
+      const msgboxDialog = msgbox.querySelector('[role="dialog"]')!
       expect(msgboxDialog.getAttribute('aria-label')).toBe(title)
       expect(msgboxDialog.getAttribute('aria-labelledby')).toBeFalsy()
     })

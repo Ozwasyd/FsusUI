@@ -11,7 +11,7 @@
     </el-tooltip-trigger>
     <el-tooltip-content
       ref="contentRef"
-      :aria-label="ariaLabel"
+      v-bind="tooltipContentAttrs"
       :boundaries-padding="boundariesPadding"
       :content="content"
       :disabled="disabled"
@@ -111,6 +111,10 @@ const { onOpen, onClose } = useDelayedToggle({
 const controlled = computed(
   () => isBoolean(props.visible) && !hasUpdateHandler.value
 )
+
+const tooltipContentAttrs = computed(() => ({
+  ariaLabel: props.ariaLabel,
+}))
 
 provide(TOOLTIP_INJECTION_KEY, {
   controlled,

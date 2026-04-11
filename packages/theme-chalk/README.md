@@ -1,6 +1,8 @@
 # element-theme-chalk
 
-> element component chalk theme.
+FsusUI ships a single default component theme through `theme-chalk`.
+Importing `index.scss` or `index.css` applies the full FSUS design tokens and component styles by default.
+There is no separate dark bundle or alternate theme entry.
 
 ## Installation
 
@@ -39,3 +41,5 @@ import 'element-plus/lib/theme-chalk/select.css'
 
 // ...
 ```
+
+All on-demand component styles share the same default FSUS theme baseline.

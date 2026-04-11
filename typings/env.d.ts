@@ -16,9 +16,21 @@ declare global {
   }
 }
 
+declare module '@vue/runtime-dom' {
+  export interface InputHTMLAttributes {
+    'true-value'?: boolean | number | string
+    'false-value'?: boolean | number | string
+  }
+}
+
 declare module '@vue/runtime-core' {
   export interface App {
     [INSTALLED_KEY]?: boolean
+  }
+
+  export interface GlobalDirectives {
+    vLoading: typeof import('../packages/components/loading')['vLoading']
+    vInfiniteScroll: typeof import('../packages/components/infinite-scroll')['default']
   }
 
   export interface GlobalComponents {
@@ -37,9 +49,21 @@ declare module '*.vue' {
   export default component
 }
 
+declare module '*.css' {}
+
 // theme-chalk side-effect style imports
 declare module '@element-plus/theme-chalk/*.css' {}
 declare module '@element-plus/theme-chalk/src/*.scss' {}
 declare module '@element-plus/theme-chalk/src/**/*.scss' {}
+
+declare module '*.mjs' {
+  const mod: any
+  export default mod
+}
+
+declare module '*.wasm' {
+  const src: string
+  export default src
+}
 
 export {}

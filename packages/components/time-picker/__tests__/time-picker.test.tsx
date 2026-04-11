@@ -1,7 +1,7 @@
-// @ts-nocheck
 import { computed, nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { clickActionButton, clickPickerCell } from '../../../test-utils/dom'
 import dayjs from 'dayjs'
 import triggerEvent from '@element-plus/test-utils/trigger-event'
 import { rAF } from '@element-plus/test-utils/tick'
@@ -10,18 +10,18 @@ import sleep from '@element-plus/test-utils/sleep'
 import TimePicker from '../src/time-picker'
 import Picker from '../src/common/picker.vue'
 
-const makeRange = (start, end) => {
-  const result = []
+const makeRange = (start: number, end: number) => {
+  const result: number[] = []
   for (let i = start; i <= end; i++) {
     result.push(i)
   }
   return result
 }
 
-const getSpinnerTextAsArray = (dom, selector) => {
+const getSpinnerTextAsArray = (dom: ParentNode, selector: string) => {
   return Array.prototype.slice
     .call(dom.querySelectorAll(selector))
-    .map((node) => Number(node.textContent))
+    .map((node: Node) => Number(node.textContent))
 }
 
 afterEach(() => {
@@ -78,7 +78,7 @@ describe('TimePicker', () => {
   })
 
   it('select time', async () => {
-    const value = ref('')
+    const value = ref<Date | string>('')
     const wrapper = mount(() => <TimePicker v-model={value.value} />)
 
     const input = wrapper.find('input')
@@ -97,14 +97,14 @@ describe('TimePicker', () => {
       '.el-time-spinner__item'
     )[20] as any
     // click hour, minute, second one at a time.
-    hourEl.click()
+    await clickPickerCell(hourEl)
     await nextTick()
-    minuteEl.click()
+    await clickPickerCell(minuteEl)
     await nextTick()
-    secondEl.click()
+    await clickPickerCell(secondEl)
     await nextTick()
 
-    const date = value.value
+    const date = value.value as Date
     expect(hourEl.classList.contains('is-active')).toBeTruthy()
     expect(minuteEl.classList.contains('is-active')).toBeTruthy()
     expect(secondEl.classList.contains('is-active')).toBeTruthy()
@@ -121,13 +121,17 @@ describe('TimePicker', () => {
     input.trigger('blur')
     input.trigger('focus')
     await nextTick()
-    ;(document.querySelector('.el-time-panel__btn.cancel') as any).click()
+    await clickActionButton(
+      document.querySelector('.el-time-panel__btn.cancel') as HTMLElement
+    )
 
     expect(value.value).toBe('')
     input.trigger('blur')
     input.trigger('focus')
     await nextTick()
-    ;(document.querySelector('.el-time-panel__btn.confirm') as any).click()
+    await clickActionButton(
+      document.querySelector('.el-time-panel__btn.confirm') as HTMLElement
+    )
     expect(value.value).toBeInstanceOf(Date)
   })
 
@@ -153,15 +157,17 @@ describe('TimePicker', () => {
     const secondEl = secondsEl.querySelectorAll(
       '.el-time-spinner__item'
     )[20] as any
-    hourEl.click()
+    await clickPickerCell(hourEl)
     await nextTick()
-    minuteEl.click()
+    await clickPickerCell(minuteEl)
     await nextTick()
-    secondEl.click()
+    await clickPickerCell(secondEl)
     await nextTick()
 
     // click confirm button
-    ;(document.querySelector('.el-time-panel__btn.confirm') as any).click()
+    await clickActionButton(
+      document.querySelector('.el-time-panel__btn.confirm') as HTMLElement
+    )
     const date = value.value
     expect(date.getHours()).toBe(4)
     expect(date.getMinutes()).toBe(36)
@@ -171,7 +177,9 @@ describe('TimePicker', () => {
     input.trigger('blur')
     input.trigger('focus')
     await nextTick()
-    ;(document.querySelector('.el-time-panel__btn.cancel') as any).click()
+    await clickActionButton(
+      document.querySelector('.el-time-panel__btn.cancel') as HTMLElement
+    )
     expect(date.getHours()).toBe(4)
     expect(date.getMinutes()).toBe(36)
     expect(date.getSeconds()).toBe(20)
@@ -199,16 +207,16 @@ describe('TimePicker', () => {
     const focusHandler = vi.fn()
     const blurHandler = vi.fn()
     const keydownHandler = vi.fn()
+    const eventListeners = {
+      onChange: changeHandler,
+      onFocus: focusHandler,
+      onBlur: blurHandler,
+      onKeydown: keydownHandler,
+    } as any
 
     const value = ref(new Date(2016, 9, 10, 18, 40))
     const wrapper = mount(() => (
-      <TimePicker
-        v-model={value.value}
-        onChange={changeHandler}
-        onFocus={focusHandler}
-        onBlur={blurHandler}
-        onKeydown={keydownHandler}
-      />
+      <TimePicker v-model={value.value} {...eventListeners} />
     ))
 
     const input = wrapper.find('input')
@@ -232,10 +240,12 @@ describe('TimePicker', () => {
     const list = document.querySelectorAll('.el-time-spinner__list')
     const hoursEl = list[0]
     const hourEl = hoursEl.querySelectorAll('.el-time-spinner__item')[4] as any
-    hourEl.click()
+    await clickPickerCell(hourEl)
     await nextTick()
     expect(changeHandler).toHaveBeenCalledTimes(0)
-    ;(document.querySelector('.el-time-panel__btn.confirm') as any).click()
+    await clickActionButton(
+      document.querySelector('.el-time-panel__btn.confirm') as HTMLElement
+    )
     await nextTick()
     await nextTick() // onchange is triggered by props.modelValue update
     expect(changeHandler).toHaveBeenCalledTimes(1)
@@ -296,12 +306,12 @@ describe('TimePicker', () => {
     const disabledHours = getSpinnerTextAsArray(hoursEl, '.is-disabled')
     expect(disabledHours).toEqual(disabledHoursArr)
     const hourSpinners = hoursEl.querySelectorAll('.el-time-spinner__item')
-    ;(hourSpinners[18] as any).click()
+    await clickPickerCell(hourSpinners[18] as HTMLElement)
     await nextTick()
     const disabledMinutes = getSpinnerTextAsArray(minutesEl, '.is-disabled')
     expect(disabledMinutes.every((t) => t > 30 && t < 50)).toBeTruthy()
     expect(disabledMinutes.length).toEqual(19)
-    ;(hourSpinners[22] as any).click()
+    await clickPickerCell(hourSpinners[22] as HTMLElement)
     await nextTick()
     const enabledMinutes = getSpinnerTextAsArray(
       minutesEl,
@@ -567,7 +577,9 @@ describe('TimePicker(range)', () => {
     await nextTick()
     // For skipping Transition animation
     await rAF()
-    ;(document.querySelector('.el-time-panel__btn.cancel') as any).click()
+    await clickActionButton(
+      document.querySelector('.el-time-panel__btn.cancel') as HTMLElement
+    )
     await rAF()
 
     expect(value.value).toEqual(cancelDates)
@@ -578,7 +590,9 @@ describe('TimePicker(range)', () => {
     input.trigger('blur')
     input.trigger('focus')
     await nextTick()
-    ;(document.querySelector('.el-time-panel__btn.confirm') as any).click()
+    await clickActionButton(
+      document.querySelector('.el-time-panel__btn.confirm') as HTMLElement
+    )
     expect(Array.isArray(value.value)).toBeTruthy()
     value.value.forEach((v: unknown) => {
       expect(v).toBeInstanceOf(Date)
@@ -644,7 +658,9 @@ describe('TimePicker(range)', () => {
       ':not(.is-disabled)'
     )
     expect(rightEndbledHours).toEqual([11, 12, 13, 14, 15, 16])
-    ;(leftHoursEl.querySelectorAll('.el-time-spinner__item')[12] as any).click()
+    await clickPickerCell(
+      leftHoursEl.querySelectorAll('.el-time-spinner__item')[12] as HTMLElement
+    )
     await nextTick()
     const NextRightEndbledHours = getSpinnerTextAsArray(
       rightHoursEl,

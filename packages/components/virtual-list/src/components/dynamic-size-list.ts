@@ -1,4 +1,6 @@
+import { nextTick, reactive } from 'vue'
 import { throwError } from '@element-plus/utils'
+import { batchEstimateRowHeights } from '../hooks/use-wasm-row-height'
 
 import createList from '../builders/build-list'
 
@@ -13,11 +15,134 @@ import {
 } from '../defaults'
 import type { VirtualizedListProps } from '../props'
 
-import type { ItemSize, ListCache, ListItem } from '../types'
+import type {
+  Instance,
+  ItemSize,
+  ListCache,
+  ListExposes,
+  ListItem,
+} from '../types'
 
 type Props = VirtualizedListProps
 
 const SCOPE = 'ElDynamicSizeList'
+const DEFAULT_WASM_TEXT_KEYS = ['label', 'text', 'title', 'name', 'content']
+
+const resolveWasmTextKey = (items: unknown[]) => {
+  const record = items.find(
+    (item) => item && typeof item === 'object' && !Array.isArray(item)
+  ) as Record<string, unknown> | undefined
+
+  if (!record) {
+    return null
+  }
+
+  return (
+    DEFAULT_WASM_TEXT_KEYS.find((key) => typeof record[key] === 'string') ||
+    null
+  )
+}
+
+const resolveWasmRowWidth = (props: Props, instance: Instance): number => {
+  if (typeof props.width === 'number') {
+    return props.width
+  }
+
+  const exposes = instance.exposed as Partial<ListExposes> | undefined
+  return exposes?.windowRef?.value?.clientWidth || 0
+}
+
+const getItemStyleCacheGetter = (instance: Instance) => {
+  const getter = instance.exposed?.getItemStyleCache
+
+  if (typeof getter === 'function') {
+    return getter
+  }
+
+  if (getter && typeof getter.value === 'function') {
+    return getter.value
+  }
+
+  return null
+}
+
+const resetItemStyleCache = (instance: Instance) => {
+  const getItemStyleCache = getItemStyleCacheGetter(instance)
+  const itemStyleCache = getItemStyleCache?.(false, false, false)
+
+  if (!itemStyleCache) {
+    return
+  }
+
+  Object.keys(itemStyleCache).forEach((key) => {
+    delete itemStyleCache[key]
+  })
+}
+
+const hydrateCacheWithEstimatedHeights = async (
+  props: Props,
+  instance: Instance,
+  cache: ListCache,
+  remainingRetries = 2
+) => {
+  if (isHorizontal(props.layout) || !Array.isArray(props.data) || props.data.length === 0) {
+    return
+  }
+
+  const textKey = resolveWasmTextKey(props.data)
+  if (!textKey) {
+    return
+  }
+
+  const rowWidth = resolveWasmRowWidth(props, instance)
+  if (!rowWidth) {
+    if (remainingRetries > 0) {
+      nextTick(() => {
+        void hydrateCacheWithEstimatedHeights(
+          props,
+          instance,
+          cache,
+          remainingRetries - 1
+        )
+      })
+    }
+    return
+  }
+
+  const estimatedHeights = await batchEstimateRowHeights(
+    props.data as Record<string, unknown>[],
+    textKey,
+    {
+      rowWidth,
+    }
+  )
+
+  if (!estimatedHeights?.length) {
+    return
+  }
+
+  const measuredCount = Math.min(props.total, estimatedHeights.length)
+  if (measuredCount === 0) {
+    return
+  }
+
+  cache.items = {}
+
+  let offset = 0
+  for (let index = 0; index < measuredCount; index++) {
+    const size = Math.max(1, Math.round(estimatedHeights[index]))
+    cache.items[index] = {
+      offset,
+      size,
+    }
+    offset += size
+  }
+
+  cache.estimatedItemSize = Math.max(1, Math.round(offset / measuredCount))
+  cache.lastVisitedIndex = measuredCount - 1
+  resetItemStyleCache(instance)
+  instance.proxy?.$forceUpdate()
+}
 const getItemFromCache = (
   props: Props,
   index: number,
@@ -219,21 +344,28 @@ const DynamicSizeList = createList({
     return stopIndex
   },
 
-  initCache({ estimatedItemSize = DEFAULT_DYNAMIC_LIST_ITEM_SIZE }, instance) {
-    const cache = {
+  initCache(props, instance) {
+    const { estimatedItemSize = DEFAULT_DYNAMIC_LIST_ITEM_SIZE } = props
+    const cache = reactive({
       items: {},
       estimatedItemSize,
       lastVisitedIndex: -1,
-    } as ListCache
+    }) as ListCache
 
     cache.clearCacheAfterIndex = (index: number, forceUpdate = true) => {
       cache.lastVisitedIndex = Math.min(cache.lastVisitedIndex, index - 1)
-      instance.exposed?.getItemStyleCache(-1)
+      resetItemStyleCache(instance)
 
       if (forceUpdate) {
         instance.proxy?.$forceUpdate()
       }
     }
+
+    nextTick(() => {
+      void hydrateCacheWithEstimatedHeights(props, instance, cache).catch(() => {
+        // Fall back to the existing JS sizing path when WASM priming is unavailable.
+      })
+    })
 
     return cache
   },

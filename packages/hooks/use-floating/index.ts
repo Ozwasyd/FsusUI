@@ -22,16 +22,17 @@ export type UseFloatingProps = ToRefs<{
   strategy: Strategy
 }>
 
+type ReferenceElement = Parameters<typeof computePosition>[0]
 type ElementRef = Parameters<typeof unrefElement>['0']
 
 const unrefReference = (
   elRef: ElementRef | Ref<VirtualElement | undefined>
-) => {
+): ReferenceElement | undefined => {
   if (!isClient) return
-  if (!elRef) return elRef
+  if (!elRef) return undefined
   const unrefEl = unrefElement(elRef as ElementRef)
   if (unrefEl) return unrefEl
-  return isRef(elRef) ? unrefEl : (elRef as VirtualElement)
+  return isRef(elRef) ? undefined : (elRef as VirtualElement)
 }
 
 export const getPositionDataWithUnit = <T extends Record<string, number>>(
@@ -47,7 +48,7 @@ export const useFloating = ({
   placement,
   strategy,
 }: UseFloatingProps) => {
-  const referenceRef = ref<HTMLElement | VirtualElement>()
+  const referenceRef = ref<ReferenceElement>()
   const contentRef = ref<HTMLElement>()
   const x = ref<number>()
   const y = ref<number>()

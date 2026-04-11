@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.5",
+    "@vitejs/plugin-vue-jsx": "^5.1.5",
     "localtunnel": "^2.0.2",
     "sass": "^1.99.0",
     "typescript": "^6.0.2",

@@ -25,6 +25,27 @@ function isAllStrings(values: unknown[]): values is string[] {
   return values.every((v) => typeof v === 'string')
 }
 
+function groupRowsByValue<T>(
+  rows: T[],
+  getBucketKey: (row: T) => string | number
+) {
+  const bucketMap = new Map<string | number, T[]>()
+
+  for (const row of rows) {
+    const key = getBucketKey(row)
+    const bucket = bucketMap.get(key)
+
+    if (bucket) {
+      bucket.push(row)
+      continue
+    }
+
+    bucketMap.set(key, [row])
+  }
+
+  return bucketMap
+}
+
 /**
  * 尝试用 WASM 加速排序。
  * 返回排序后的数组，若不满足 WASM 条件则返回 null（调用方降级）。
@@ -40,22 +61,9 @@ export async function trySortWithWasm<T extends AnyRow>(
   const values: unknown[] = array.map((row) => get(row, sortProp))
 
   if (isAllNumbers(values)) {
-    // 建立带原始索引的辅助数组，用 WASM 排好后映射回原数组
-    const indexed = values.map((v, i) => ({ v, i }))
-    indexed.sort((a, b) => ascending ? a.v - b.v : b.v - a.v)
-    // 利用 WASM 排序（直接排 indexed.map(x=>x.v)，保持 stable sort）
-    const sortedVals = await sortNumbers(
-      indexed.map((x) => x.v),
-      ascending
-    )
+    const sortedVals = await sortNumbers(values, ascending)
     // 重建原行顺序（稳定排序：相同值时保留原顺序）
-    const indexMap = new Map<number, T[]>()
-    for (const row of array) {
-      const v = get(row, sortProp) as number
-      const bucket = indexMap.get(v) ?? []
-      bucket.push(row)
-      indexMap.set(v, bucket)
-    }
+    const indexMap = groupRowsByValue(array, (row) => get(row, sortProp) as number)
     const usedMap = new Map<number, number>()
     return sortedVals.map((v) => {
       const bucket = indexMap.get(v)!
@@ -68,13 +76,7 @@ export async function trySortWithWasm<T extends AnyRow>(
   if (isAllStrings(values)) {
     // 与数字同理：WASM 排序字符串键，再映射回原行
     const sorted = await sortStrings(values as string[], ascending, 'zh-CN')
-    const indexMap = new Map<string, T[]>()
-    for (const row of array) {
-      const v = get(row, sortProp) as string
-      const bucket = indexMap.get(v) ?? []
-      bucket.push(row)
-      indexMap.set(v, bucket)
-    }
+    const indexMap = groupRowsByValue(array, (row) => get(row, sortProp) as string)
     const usedMap = new Map<string, number>()
     return sorted.map((v) => {
       const bucket = indexMap.get(v)!

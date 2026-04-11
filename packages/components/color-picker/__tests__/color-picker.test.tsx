@@ -1,6 +1,7 @@
 import { nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
+import { clickActionButton, clickClearButton } from '../../../test-utils/dom'
 import { ElFormItem } from '@element-plus/components/form'
 import ColorPicker from '../src/color-picker.vue'
 import type { ComponentPublicInstance } from 'vue'
@@ -75,7 +76,9 @@ describe('Color-picker', () => {
     const wrapper = mount(() => <ColorPicker v-model={color.value} />)
 
     await wrapper.find('.el-color-picker__trigger').trigger('click')
-    document.querySelector<HTMLElement>('.el-color-dropdown__btn')?.click()
+    await clickActionButton(
+      document.querySelector<HTMLElement>('.el-color-dropdown__btn')!
+    )
     await nextTick()
     expect(color.value).toEqual('#FF0000')
     wrapper.unmount()
@@ -87,7 +90,9 @@ describe('Color-picker', () => {
     ))
 
     await wrapper.find('.el-color-picker__trigger').trigger('click')
-    document.querySelector<HTMLElement>('.el-color-dropdown__btn')?.click()
+    await clickActionButton(
+      document.querySelector<HTMLElement>('.el-color-dropdown__btn')!
+    )
     await nextTick()
     expect(color.value).toEqual('#FF0000FF')
     wrapper.unmount()
@@ -135,7 +140,7 @@ describe('Color-picker', () => {
     const clearBtn = document.querySelector<HTMLElement>(
       '.el-color-dropdown__link-btn'
     )
-    clearBtn!.click()
+    await clickClearButton(clearBtn!)
     expect(color.value).toEqual(null)
     wrapper.unmount()
   })
@@ -299,22 +304,22 @@ describe('Color-picker', () => {
       predefineDom.querySelectorAll('.el-color-predefine__color-selector')
         .length === 9
     ).toBeTruthy()
-    predefineDom
-      .querySelector<HTMLElement>(
+    await clickActionButton(
+      predefineDom.querySelector<HTMLElement>(
         '.el-color-predefine__color-selector:nth-child(4)'
-      )
-      ?.click()
+      )!
+    )
     await nextTick()
     expect(colorPickerWrapper.vm.color.get('hue')).toEqual(180)
     expect(colorPickerWrapper.vm.color.get('saturation')).toEqual(65)
     expect(colorPickerWrapper.vm.color.get('value')).toEqual(20)
     expect(colorPickerWrapper.vm.color.get('alpha')).toEqual(50)
 
-    predefineDom
-      .querySelector<HTMLElement>(
+    await clickActionButton(
+      predefineDom.querySelector<HTMLElement>(
         '.el-color-predefine__color-selector:nth-child(3)'
-      )
-      ?.click()
+      )!
+    )
     await nextTick()
     expect(colorPickerWrapper.vm.color.get('hue')).toEqual(250)
     expect(colorPickerWrapper.vm.color.get('saturation')).toEqual(54)
@@ -345,11 +350,11 @@ describe('Color-picker', () => {
       ref: 'predefine',
     })
     const predefineDom = predefineWrapper.element as HTMLElement
-    predefineDom
-      .querySelector<HTMLElement>(
+    await clickActionButton(
+      predefineDom.querySelector<HTMLElement>(
         '.el-color-predefine__color-selector:nth-child(4)'
-      )
-      ?.click()
+      )!
+    )
     await nextTick()
     expect(
       predefineWrapper

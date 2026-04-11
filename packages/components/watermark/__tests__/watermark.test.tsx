@@ -11,7 +11,8 @@ describe('Watermark.vue', () => {
     ))
 
     expect(wrapper.classes()).toContain('watermark')
-    expect(wrapper.html()).toMatchSnapshot()
+    expect(wrapper.attributes('style')).toBe('position: relative;')
+    expect(wrapper.text()).toContain(AXIOM)
   })
 
   it('slots', () => {

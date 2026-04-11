@@ -19,36 +19,47 @@ import type { TableColumnCtx } from '../table-column/defaults'
 import type { Table, TableRefs } from '../table/defaults'
 import type { StoreFilter } from '.'
 
+const wasmSortJobs = new WeakMap<object, number>()
+
 /**
  * WASM 加速排序（大数据集）+ JS 降级（小数据集/自定义排序）。
  * 完全保持 Element Plus 排序语义——外部无感知。
  */
-const sortData = (data, states) => {
+const sortData = (data, states, applySortedData) => {
   const sortingColumn = states.sortingColumn
   if (!sortingColumn || typeof sortingColumn.sortable === 'string') {
+    wasmSortJobs.delete(states)
     return data
   }
 
-  // WASM 加速路径：仅对大数据集且无自定义排序时触发
-  if (shouldUseWasm(data, sortingColumn)) {
-    const ascending = states.sortOrder !== 'descending'
-    // 异步，但返回原始同步结果占位，WASM 完成后触发响应式更新
-    trySortWithWasm(data, states.sortProp, ascending).then((sorted) => {
-      if (sorted) {
-        // 直接替换 data.value 内容（保持引用），触发 Vue 响应式
-        data.splice(0, data.length, ...sorted)
-      }
-    })
-  }
-
-  // 同步 JS 降级（WASM 未就绪时的初始渲染 / 小数据集）
-  return orderBy(
+  const fallbackSortedData = orderBy(
     data,
     states.sortProp,
     states.sortOrder,
     sortingColumn.sortMethod,
     sortingColumn.sortBy
   )
+
+  // WASM 加速路径：仅对大数据集且无自定义排序时触发
+  if (shouldUseWasm(data, sortingColumn)) {
+    const ascending = states.sortOrder !== 'descending'
+    const sortJobId = (wasmSortJobs.get(states) || 0) + 1
+    wasmSortJobs.set(states, sortJobId)
+
+    // 异步，但返回同步回退结果占位，WASM 完成后仅在当前任务仍有效时替换可见数据
+    trySortWithWasm(data, states.sortProp, ascending).then((sorted) => {
+      if (!sorted || wasmSortJobs.get(states) !== sortJobId) {
+        return
+      }
+
+      applySortedData(sorted)
+    })
+
+    return fallbackSortedData
+  }
+
+  wasmSortJobs.delete(states)
+  return fallbackSortedData
 }
 
 const doFlattenColumns = (columns) => {
@@ -192,7 +203,8 @@ function useWatcher<T>() {
         }
       }
     } else {
-      deleted = selection.value.filter((item) => !data.value.includes(item))
+      const dataSet = new Set(data.value)
+      deleted = selection.value.filter((item) => !dataSet.has(item))
     }
     if (deleted.length) {
       const newSelection = selection.value.filter(
@@ -234,6 +246,7 @@ function useWatcher<T>() {
     let selectionChanged = false
     let childrenCount = 0
     const rowKey = instance?.store?.states?.rowKey.value
+    const childrenCountCache = new Map<string, number>()
     data.value.forEach((row, index) => {
       const rowIndex = index + childrenCount
       if (selectable.value) {
@@ -248,7 +261,10 @@ function useWatcher<T>() {
           selectionChanged = true
         }
       }
-      childrenCount += getChildrenCount(getRowIdentity(row, rowKey))
+      childrenCount += getChildrenCount(
+        getRowIdentity(row, rowKey),
+        childrenCountCache
+      )
     })
 
     if (selectionChanged) {
@@ -279,21 +295,25 @@ function useWatcher<T>() {
     }
 
     let selectedMap
+    let selectionSet
     if (rowKey.value) {
       selectedMap = getKeysMap(selection.value, rowKey.value)
+    } else {
+      selectionSet = new Set(selection.value)
     }
     const isSelected = function (row) {
       if (selectedMap) {
         return !!selectedMap[getRowIdentity(row, rowKey.value)]
       } else {
-        return selection.value.includes(row)
+        return selectionSet.has(row)
       }
     }
     let isAllSelected_ = true
     let selectedCount = 0
     let childrenCount = 0
+    const keyProp = instance?.store?.states?.rowKey.value
+    const childrenCountCache = new Map<string, number>()
     for (let i = 0, j = (data.value || []).length; i < j; i++) {
-      const keyProp = instance?.store?.states?.rowKey.value
       const rowIndex = i + childrenCount
       const item = data.value[i]
       const isRowSelectable =
@@ -306,7 +326,10 @@ function useWatcher<T>() {
       } else {
         selectedCount++
       }
-      childrenCount += getChildrenCount(getRowIdentity(item, keyProp))
+      childrenCount += getChildrenCount(
+        getRowIdentity(item, keyProp),
+        childrenCountCache
+      )
     }
 
     if (selectedCount === 0) isAllSelected_ = false
@@ -314,17 +337,28 @@ function useWatcher<T>() {
   }
 
   // gets the number of all child nodes by rowKey
-  const getChildrenCount = (rowKey: string) => {
+  const getChildrenCount = (
+    rowKey: string,
+    cache = new Map<string, number>()
+  ) => {
     if (!instance || !instance.store) return 0
+    if (!rowKey) return 0
+
+    const cachedCount = cache.get(rowKey)
+    if (cachedCount !== undefined) {
+      return cachedCount
+    }
+
     const { treeData } = instance.store.states
     let count = 0
     const children = treeData.value[rowKey]?.children
     if (children) {
       count += children.length
       children.forEach((childKey) => {
-        count += getChildrenCount(childKey)
+        count += getChildrenCount(childKey, cache)
       })
     }
+    cache.set(rowKey, count)
     return count
   }
 
@@ -378,6 +412,8 @@ function useWatcher<T>() {
       sortingColumn: sortingColumn.value,
       sortProp: sortProp.value,
       sortOrder: sortOrder.value,
+    }, (sortedData) => {
+      data.value = sortedData
     })
   }
 

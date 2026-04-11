@@ -1,10 +1,5 @@
 <template>
-  <svg
-    viewBox="0 0 79 86"
-    version="1.1"
-    xmlns="http://www.w3.org/2000/svg"
-    xmlns:xlink="http://www.w3.org/1999/xlink"
-  >
+  <svg v-bind="svgAttrs" viewBox="0 0 79 86" version="1.1">
     <defs>
       <linearGradient
         :id="`linearGradient-1-${id}`"
@@ -102,9 +97,9 @@
           <g id="Rectangle-Copy-17" transform="translate(53.000000, 45.000000)">
             <use
               id="Mask"
+              v-bind="getMaskUseAttrs()"
               :fill="`var(${ns.cssVarBlockName('fill-color-8')})`"
               transform="translate(8.500000, 18.000000) scale(-1, 1) translate(-8.500000, -18.000000) "
-              :xlink:href="`#path-3-${id}`"
             />
             <polygon
               id="Rectangle-Copy"
@@ -135,4 +130,13 @@ defineOptions({
 
 const ns = useNamespace('empty')
 const id = useId()
+
+const svgAttrs = {
+  xmlns: 'http://www.w3.org/2000/svg',
+  'xmlns:xlink': 'http://www.w3.org/1999/xlink',
+}
+
+const getMaskUseAttrs = () => ({
+  'xlink:href': `#path-3-${id}`,
+})
 </script>

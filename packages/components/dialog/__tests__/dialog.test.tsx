@@ -1,6 +1,7 @@
 import { markRaw, nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, test, vi } from 'vitest'
+import { clickCloseButton } from '../../../test-utils/dom'
 import { rAF } from '@element-plus/test-utils/tick'
 import triggerCompositeClick from '@element-plus/test-utils/composite-click'
 import { Delete } from '@element-plus/icons-vue'
@@ -141,7 +142,7 @@ describe('Dialog.vue', () => {
     const wrapper = mount(<Dialog modelValue={true}>{AXIOM}</Dialog>)
 
     await nextTick()
-    await wrapper.find('.el-dialog__headerbtn').trigger('click')
+    await clickCloseButton(wrapper, '.el-dialog__headerbtn')
     expect(wrapper.vm.visible).toBe(false)
   })
 
@@ -179,7 +180,7 @@ describe('Dialog.vue', () => {
       )
 
       await nextTick()
-      await wrapper.find('.el-dialog__headerbtn').trigger('click')
+      await clickCloseButton(wrapper, '.el-dialog__headerbtn')
       expect(beforeClose).toHaveBeenCalled()
     })
 
@@ -194,7 +195,7 @@ describe('Dialog.vue', () => {
         </Dialog>
       )
       await nextTick()
-      await wrapper.find('.el-dialog__headerbtn').trigger('click')
+      await clickCloseButton(wrapper, '.el-dialog__headerbtn')
       expect(beforeClose).toHaveBeenCalled()
       expect(wrapper.vm.visible).toBe(true)
     })
@@ -240,7 +241,7 @@ describe('Dialog.vue', () => {
       await nextTick()
       await rAF()
       await nextTick()
-      await wrapper.find('.el-dialog__headerbtn').trigger('click')
+      await clickCloseButton(wrapper, '.el-dialog__headerbtn')
       await wrapper.setProps({
         // manually setting this prop because that Transition is not available in testing,
         // updating model value event was emitted via transition hooks.

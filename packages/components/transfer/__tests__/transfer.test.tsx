@@ -1,8 +1,31 @@
 import { nextTick, reactive, ref } from 'vue'
 import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+import { setTextInputValue } from '../../../test-utils/dom'
 import Transfer from '../src/transfer.vue'
 import type { TransferDataItem, renderContent } from '../src/transfer'
+
+const { filterIndices } = vi.hoisted(() => ({
+  filterIndices: vi.fn(
+    async (data: string[], keyword: string, caseSensitive = false) => {
+      const normalizedKeyword = caseSensitive
+        ? keyword
+        : keyword.toLowerCase()
+
+      return data.reduce<number[]>((matched, item, index) => {
+        const normalizedItem = caseSensitive ? item : item.toLowerCase()
+        if (normalizedItem.includes(normalizedKeyword)) {
+          matched.push(index)
+        }
+        return matched
+      }, [])
+    }
+  ),
+}))
+
+vi.mock('@element-plus/wasm', () => ({
+  filterIndices,
+}))
 
 describe('Transfer', () => {
   const getTestData = () => {
@@ -47,9 +70,31 @@ describe('Transfer', () => {
     ))
     const leftList: any = wrapper.findComponent({ name: 'ElTransferPanel' })
     leftList.vm.query = '1'
-    await leftList.find('input').setValue('1')
+    await setTextInputValue(leftList.find('input'), '1')
     expect(leftList.vm.filteredData.length).toBe(1)
   })
+
+  it('filterable large dataset keeps default matching semantics', async () => {
+    const value = ref([])
+    const data = Array.from({ length: 1_001 }, (_, index) => ({
+      key: index + 1,
+      label: index === 917 ? 'Wasm Match' : `备选项 ${index + 1}`,
+      disabled: false,
+    }))
+
+    const wrapper = mount(() => (
+      <Transfer v-model={value.value} filterable data={data} />
+    ))
+
+    const leftList: any = wrapper.findComponent({ name: 'ElTransferPanel' })
+    leftList.vm.query = 'match'
+    await setTextInputValue(leftList.find('input'), 'match')
+    await nextTick()
+
+    expect(filterIndices).toHaveBeenCalled()
+    expect(leftList.vm.filteredData.length).toBe(1)
+    expect(leftList.vm.filteredData[0].label).toBe('Wasm Match')
+  }, 10000)
 
   it('transfer', async () => {
     const value = ref([1, 4])

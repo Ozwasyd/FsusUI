@@ -12,7 +12,7 @@
     trigger="click"
     :transition="`${ns.namespace.value}-zoom-in-top`"
     persistent
-    @hide="setShowPicker(false)"
+    v-on="tooltipEvents"
   >
     <template #content>
       <div v-click-outside="handleClickOutside" @keydown.esc="handleEsc">
@@ -34,7 +34,7 @@
               v-model="customInput"
               :validate-event="false"
               size="small"
-              @keyup.enter="handleConfirm"
+              v-on="customInputEvents"
               @blur="handleConfirm"
             />
           </span>
@@ -63,11 +63,9 @@
         ref="triggerRef"
         :class="btnKls"
         role="button"
+        v-bind="triggerAriaAttrs"
         :aria-label="buttonAriaLabel"
         :aria-labelledby="buttonAriaLabelledby"
-        :aria-description="
-          t('el.colorpicker.description', { color: modelValue || '' })
-        "
         :aria-disabled="colorDisabled"
         :tabindex="colorDisabled ? -1 : tabindex"
         @keydown="handleKeyDown"
@@ -223,6 +221,12 @@ const buttonAriaLabelledby = computed<string | undefined>(() => {
   return isLabeledByFormItem.value ? formItem?.labelId : undefined
 })
 
+const triggerAriaAttrs = computed<Record<string, unknown>>(() => ({
+  'aria-description': t('el.colorpicker.description', {
+    color: props.modelValue || '',
+  }),
+}))
+
 const btnKls = computed(() => {
   return [
     ns.b('picker'),
@@ -245,6 +249,10 @@ function displayedRgb(color: Color, showAlpha: boolean) {
 
 function setShowPicker(value: boolean) {
   showPicker.value = value
+}
+
+const tooltipEvents = {
+  hide: () => setShowPicker(false),
 }
 
 const debounceSetShowPicker = debounce(setShowPicker, 100, { leading: true })
@@ -279,6 +287,20 @@ function handleTrigger() {
 
 function handleConfirm() {
   color.fromString(customInput.value)
+}
+
+const handleInputKeyup = (event: KeyboardEvent) => {
+  if (
+    event.code === EVENT_CODE.enter ||
+    event.code === EVENT_CODE.numpadEnter ||
+    event.key === 'Enter'
+  ) {
+    handleConfirm()
+  }
+}
+
+const customInputEvents = {
+  keyup: handleInputKeyup,
 }
 
 function confirmValue() {
@@ -374,7 +396,9 @@ watch(
   () => currentColor.value,
   (val) => {
     customInput.value = val
-    shouldActiveChange && emit('activeChange', val)
+    if (shouldActiveChange) {
+      emit('activeChange', val)
+    }
     shouldActiveChange = true
   }
 )

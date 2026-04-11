@@ -6,8 +6,7 @@
     :class="ns.b()"
     :wrap-class="ns.e('wrap')"
     :view-class="[ns.e('list'), ns.is('empty', isEmpty)]"
-    @mousemove="handleMouseMove"
-    @mouseleave="clearHoverZone"
+    v-on="scrollbarEvents"
   >
     <el-cascader-node
       v-for="node in nodes"
@@ -125,6 +124,12 @@ export default defineComponent({
       hoverZone.value.innerHTML = ''
       clearHoverTimer()
     }
+
+    const scrollbarEvents = {
+      mousemove: handleMouseMove,
+      mouseleave: clearHoverZone,
+    }
+
     return {
       ns,
       panel,
@@ -136,6 +141,7 @@ export default defineComponent({
       handleExpand,
       handleMouseMove,
       clearHoverZone,
+      scrollbarEvents,
     }
   },
 })

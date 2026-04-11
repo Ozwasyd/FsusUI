@@ -1,13 +1,42 @@
-// @ts-nocheck
 import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, test, vi } from 'vitest'
+import { setCheckboxValue } from '../../../test-utils/dom'
 import defineGetter from '@element-plus/test-utils/define-getter'
 import Tree from '../src/tree.vue'
 import Button from '../../button/src/button.vue'
 import type Node from '../src/model/node'
 
 const ALL_NODE_COUNT = 9
+
+type TreeTestNode = {
+  id: number
+  label: string
+  children?: TreeTestNode[]
+  disabled?: boolean
+  c?: TreeTestNode[]
+  [key: string]: any
+}
+
+type TreeTestVm = {
+  currentNode: TreeTestNode | null
+  nodeExpended: boolean
+  defaultExpandedKeys: number[]
+  defaultCheckedKeys: number[]
+  clickedNode: TreeTestNode | null
+  count: number
+  data: TreeTestNode[]
+  defaultProps: {
+    children: string
+    label: string
+    disabled?: string
+  }
+  [key: string]: any
+}
+
+type TreeInstance = InstanceType<typeof Tree> & {
+  data: TreeTestNode[]
+}
 
 const getTreeVm = (props = '', options = {}) => {
   const wrapper = mount(
@@ -83,7 +112,7 @@ const getTreeVm = (props = '', options = {}) => {
       options
     )
   )
-  return { wrapper, vm: wrapper.vm }
+  return { wrapper, vm: wrapper.vm as unknown as TreeTestVm }
 }
 
 const getDisableTreeVm = (props = '', options = {}) => {
@@ -160,7 +189,7 @@ const getDisableTreeVm = (props = '', options = {}) => {
       options
     )
   )
-  return { wrapper, vm: wrapper.vm }
+  return { wrapper, vm: wrapper.vm as unknown as TreeTestVm }
 }
 
 describe('Tree.vue', () => {
@@ -199,7 +228,7 @@ describe('Tree.vue', () => {
     await firstNodeContentWrapper.trigger('click')
     await nextTick() // because node click method to expaned is async
 
-    expect(vm.clickedNode.label).toEqual('一级 1')
+    expect(vm.clickedNode?.label).toEqual('一级 1')
     expect(firstNodeWrapper.classes('is-expanded')).toBe(true)
     expect(firstNodeWrapper.classes('is-current')).toBe(true)
 
@@ -396,7 +425,7 @@ describe('Tree.vue', () => {
     )
 
     expect(secondNodeCheckboxWrapper.exists()).toBe(true)
-    await secondNodeCheckboxWrapper.trigger('click')
+    await setCheckboxValue(secondNodeCheckboxWrapper)
 
     expect(treeVm.getCheckedNodes().length).toEqual(3)
     expect(treeVm.getCheckedNodes(true).length).toEqual(2)
@@ -409,7 +438,7 @@ describe('Tree.vue', () => {
       '.el-tree-node__children .el-tree-node__content .el-checkbox'
     )
 
-    await secondNodefirstLeafCheckboxWrapper.trigger('click')
+    await setCheckboxValue(secondNodefirstLeafCheckboxWrapper, false)
     expect(treeVm.getCheckedNodes().length).toEqual(1)
   })
 
@@ -431,7 +460,7 @@ describe('Tree.vue', () => {
       secondNodeContentWrapper.find('.el-checkbox')
     expect(secondNodeCheckboxWrapper.exists()).toBe(true)
 
-    await secondNodeCheckboxWrapper.trigger('click')
+    await setCheckboxValue(secondNodeCheckboxWrapper)
     await nextTick()
 
     expect(handleCheckMockFunction.mock.calls.length).toBe(1)
@@ -450,7 +479,7 @@ describe('Tree.vue', () => {
       '.el-tree-node__content'
     )[1]
     const secondNodeCheckWrapper = secondNodeContentWrapper.find('.el-checkbox')
-    await secondNodeCheckWrapper.trigger('click')
+    await setCheckboxValue(secondNodeCheckWrapper)
 
     expect(treeVm.getCheckedNodes().length).toEqual(3)
     expect(treeVm.getCheckedNodes(true).length).toEqual(2)
@@ -464,7 +493,7 @@ describe('Tree.vue', () => {
       `:props="defaultProps" show-checkbox node-key="id"`
     )
     const treeWrapper = wrapper.findComponent(Tree)
-    const tree = treeWrapper.vm as InstanceType<typeof Tree>
+    const tree = treeWrapper.vm as TreeInstance
 
     tree.setCheckedKeys([111])
     expect(tree.getCheckedNodes().length).toEqual(3)
@@ -488,7 +517,7 @@ describe('Tree.vue', () => {
       `:props="defaultProps" checkStrictly show-checkbox node-key="id"`
     )
     const treeWrapper = wrapper.findComponent(Tree)
-    const tree = treeWrapper.vm as InstanceType<typeof Tree>
+    const tree = treeWrapper.vm as TreeInstance
 
     tree.setCheckedKeys([111])
     expect(tree.getCheckedNodes().length).toEqual(1)
@@ -512,7 +541,7 @@ describe('Tree.vue', () => {
       `:props="defaultProps" show-checkbox node-key="id"`
     )
     const treeWrapper = wrapper.findComponent(Tree)
-    const tree = treeWrapper.vm as InstanceType<typeof Tree>
+    const tree = treeWrapper.vm as TreeInstance
 
     tree.setChecked(111, true, true)
     expect(tree.getCheckedNodes().length).toEqual(3)
@@ -528,7 +557,7 @@ describe('Tree.vue', () => {
       `:props="defaultProps" show-checkbox node-key="id"`
     )
     const treeWrapper = wrapper.findComponent(Tree)
-    const tree = treeWrapper.vm as InstanceType<typeof Tree>
+    const tree = treeWrapper.vm as TreeInstance
 
     tree.setCheckedKeys([1, 11, 111, 2], false)
     expect(tree.getCheckedNodes().length).toEqual(6)
@@ -557,7 +586,7 @@ describe('Tree.vue', () => {
     tree.setCurrentKey(111)
     expect(tree.store.currentNode.data.id).toEqual(111)
 
-    tree.setCurrentKey(null)
+    tree.setCurrentKey(undefined)
     expect(tree.store.currentNode).toEqual(null)
   })
 
@@ -566,13 +595,13 @@ describe('Tree.vue', () => {
       `:props="defaultProps" show-checkbox node-key="id"`
     )
     const treeWrapper = wrapper.findComponent(Tree)
-    const tree = treeWrapper.vm as InstanceType<typeof Tree>
+    const tree = treeWrapper.vm as TreeInstance
 
     tree.setCurrentKey(111)
     await nextTick()
     expect(wrapper.find('.is-current').exists()).toBeTruthy()
 
-    tree.setCurrentKey(null)
+    tree.setCurrentKey(undefined)
     await nextTick()
     expect(wrapper.find('.is-current').exists()).toBeFalsy()
   })
@@ -582,7 +611,7 @@ describe('Tree.vue', () => {
       `:props="defaultProps" show-checkbox node-key="id"`
     )
     const treeWrapper = wrapper.findComponent(Tree)
-    const tree = treeWrapper.vm as InstanceType<typeof Tree>
+    const tree = treeWrapper.vm as TreeInstance
 
     tree.setCurrentKey(1)
     await nextTick()
@@ -619,7 +648,7 @@ describe('Tree.vue', () => {
     } as Node)
     expect(tree.store.currentNode.data.id).toEqual(111)
 
-    tree.setCurrentKey(null)
+    tree.setCurrentKey(undefined)
     expect(tree.store.currentNode).toEqual(null)
   })
 
@@ -628,7 +657,7 @@ describe('Tree.vue', () => {
       `:props="defaultProps" show-checkbox node-key="id"`
     )
     const treeWrapper = wrapper.findComponent(Tree)
-    const tree = treeWrapper.vm as InstanceType<typeof Tree>
+    const tree = treeWrapper.vm as TreeInstance
 
     tree.setCurrentNode({
       id: 111,
@@ -637,7 +666,7 @@ describe('Tree.vue', () => {
     await nextTick()
     expect(wrapper.find('.is-current').exists()).toBeTruthy()
 
-    tree.setCurrentKey(null)
+    tree.setCurrentKey(undefined)
     await nextTick()
     expect(wrapper.find('.is-current').exists()).toBeFalsy()
   })
@@ -648,7 +677,7 @@ describe('Tree.vue', () => {
     )
     await nextTick()
     const treeWrapper = wrapper.findComponent(Tree)
-    const tree = treeWrapper.vm as InstanceType<typeof Tree>
+    const tree = treeWrapper.vm as TreeInstance
 
     tree.setCurrentNode({
       id: 1,
@@ -691,7 +720,7 @@ describe('Tree.vue', () => {
     tree.setCurrentKey(111)
     expect(tree.getCurrentKey()).toEqual(111)
 
-    tree.setCurrentKey(null)
+    tree.setCurrentKey(undefined)
     expect(tree.getCurrentKey()).toEqual(null)
   })
 
@@ -700,7 +729,7 @@ describe('Tree.vue', () => {
       `:props="defaultProps" show-checkbox node-key="id"`
     )
     const treeWrapper = wrapper.findComponent(Tree)
-    const tree = treeWrapper.vm as InstanceType<typeof Tree>
+    const tree = treeWrapper.vm as TreeInstance
 
     tree.setCurrentKey(111)
     expect(tree.getCurrentNode().id).toEqual(111)
@@ -722,9 +751,9 @@ describe('Tree.vue', () => {
 
     tree.setCurrentKey(1)
     expect(tree.getCurrentNode().id).toEqual(1)
-    tree.remove(1)
+    tree.remove(tree.getNode(1)!)
 
-    expect(tree.data[0].id).toEqual(2)
+    expect((tree.data[0] as TreeTestNode).id).toEqual(2)
     expect(tree.getNode(1)).toEqual(null)
     expect(tree.getCurrentNode()).toEqual(null)
   })
@@ -732,7 +761,7 @@ describe('Tree.vue', () => {
   test('append', async () => {
     const { wrapper } = getTreeVm(`:props="defaultProps" node-key="id"`)
     const treeWrapper = wrapper.findComponent(Tree)
-    const tree = treeWrapper.vm as InstanceType<typeof Tree>
+    const tree = treeWrapper.vm as TreeInstance
 
     const nodeData = { id: 88, label: '88' }
     tree.append(nodeData, tree.getNode(1))
@@ -744,7 +773,7 @@ describe('Tree.vue', () => {
   test('insertBefore', async () => {
     const { wrapper } = getTreeVm(`:props="defaultProps" node-key="id"`)
     const treeWrapper = wrapper.findComponent(Tree)
-    const tree = treeWrapper.vm as InstanceType<typeof Tree>
+    const tree = treeWrapper.vm as TreeInstance
 
     const nodeData = { id: 88, label: '88' }
     tree.insertBefore(nodeData, tree.getNode(11))
@@ -756,7 +785,7 @@ describe('Tree.vue', () => {
   test('insertAfter', async () => {
     const { wrapper } = getTreeVm(`:props="defaultProps" node-key="id"`)
     const treeWrapper = wrapper.findComponent(Tree)
-    const tree = treeWrapper.vm as InstanceType<typeof Tree>
+    const tree = treeWrapper.vm as TreeInstance
 
     const nodeData = { id: 88, label: '88' }
     tree.insertAfter(nodeData, tree.getNode(11))
@@ -785,7 +814,7 @@ describe('Tree.vue', () => {
     )[3]
     const secondNodeCheckboxWrapper =
       secondNodeContentWrapper.find('.el-checkbox')
-    await secondNodeCheckboxWrapper.trigger('click')
+    await setCheckboxValue(secondNodeCheckboxWrapper)
     expect(
       (treeWrapper.vm as InstanceType<typeof Tree>).getCheckedNodes().length
     ).toEqual(1)
@@ -797,7 +826,7 @@ describe('Tree.vue', () => {
     const secondNodefirstLeafCheckboxWrapper = secondTreeNodeWrapper.find(
       '.el-tree-node__children .el-tree-node__content .el-checkbox'
     )
-    await secondNodefirstLeafCheckboxWrapper.trigger('click')
+    await setCheckboxValue(secondNodefirstLeafCheckboxWrapper)
     expect(
       (treeWrapper.vm as InstanceType<typeof Tree>).getCheckedNodes().length
     ).toEqual(2)
@@ -1091,7 +1120,7 @@ describe('Tree.vue', () => {
     await nextTick() // third next tick for updating props.node.expanded
 
     expect(vm.nodeExpended).toEqual(true)
-    expect(vm.currentNode.label).toEqual('region1')
+    expect(vm.currentNode?.label).toEqual('region1')
 
     await firstNodeContentWrapper.trigger('click')
     await nextTick()
@@ -1099,7 +1128,7 @@ describe('Tree.vue', () => {
     await nextTick()
 
     expect(vm.nodeExpended).toEqual(false)
-    expect(vm.currentNode.label).toEqual('region1')
+    expect(vm.currentNode?.label).toEqual('region1')
   })
 
   test('updateKeyChildren', async () => {

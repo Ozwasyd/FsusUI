@@ -36,9 +36,11 @@
         <!-- Caution here, message could've been compromised, never use user's input as message -->
         <p v-else :class="ns.e('content')" v-html="message" />
       </slot>
-      <el-icon v-if="showClose" :class="ns.e('closeBtn')" @click.stop="close">
-        <Close />
-      </el-icon>
+      <span v-if="showClose" :class="ns.e('closeBtn')" @click.stop="close">
+        <el-icon>
+          <Close />
+        </el-icon>
+      </span>
     </div>
   </transition>
 </template>

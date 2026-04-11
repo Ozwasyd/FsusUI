@@ -1,9 +1,11 @@
-// @ts-nocheck
 import { describe, expect, it, vi } from 'vitest'
 import triggerEvent from '@element-plus/test-utils/trigger-event'
+import { setCheckboxValue } from '../../../test-utils/dom'
 import ElTable from '../src/table.vue'
 import ElTableColumn from '../src/table-column'
 import { doubleWait, getTestData, mount } from './table-test-common'
+
+type TableMountOptions = Record<string, unknown>
 
 vi.mock('lodash-unified', async () => {
   return {
@@ -19,12 +21,12 @@ vi.mock('lodash-unified', async () => {
 describe('table column', () => {
   describe('column attributes', () => {
     const createTable = function (
-      props1?,
-      props2?,
-      props3?,
-      props4?,
-      opts?,
-      tableProps?
+      props1?: string,
+      props2?: string,
+      props3?: string,
+      props4?: string,
+      opts?: TableMountOptions,
+      tableProps?: string
     ) {
       return mount(
         Object.assign(
@@ -43,7 +45,7 @@ describe('table column', () => {
         `,
 
             created() {
-              this.testData = getTestData()
+              ;(this as TableMountOptions & { testData: ReturnType<typeof getTestData> }).testData = getTestData()
             },
           },
           opts
@@ -270,7 +272,7 @@ describe('table column', () => {
         })
 
         it('select all', async () => {
-          wrapper.find('.el-checkbox').trigger('click')
+          await setCheckboxValue(wrapper.find('.el-checkbox'))
           await doubleWait()
           expect(wrapper.vm.selected.length).toEqual(5)
           wrapper.unmount()
@@ -280,7 +282,7 @@ describe('table column', () => {
           const wrapper2 = createTable('selection')
 
           await doubleWait()
-          wrapper2.findAll('.el-checkbox')[1].trigger('click')
+          await setCheckboxValue(wrapper2.findAll('.el-checkbox')[1])
 
           await doubleWait()
           expect(wrapper2.vm.selected.length).toEqual(1)

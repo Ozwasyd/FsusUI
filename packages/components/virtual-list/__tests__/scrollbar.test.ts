@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { nextTick } from '@vue/runtime-core'
+import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import Scrollbar from '../src/components/scrollbar'
@@ -78,12 +77,12 @@ describe('virtual scrollbar', () => {
      *  thumbSize: 33   // scrollbar.ts computed thumbSize
      *  thumb translateY: (0 / (400 - 100)) * (100 - 25) -> 0  // (scrollTop / (scrollHeight - clientHeight)) * (clientHeight - thumbSize)
      */
-    const initializeStyle =
-      'height: 33px; transform: translateY(0px); webkit-transform: translateY(0px); width: 100%;'
-
-    expect(wrapper.find('.el-scrollbar__thumb').attributes('style')).toContain(
-      initializeStyle
+    const initializeStyle = wrapper.find('.el-scrollbar__thumb').attributes(
+      'style'
     )
+    expect(initializeStyle).toContain('height: 33px;')
+    expect(initializeStyle).toContain('transform: translateY(0px);')
+    expect(initializeStyle).toContain('width: 100%;')
 
     const e = document.createEvent('MouseEvents')
     const clientY = 20
@@ -108,9 +107,9 @@ describe('virtual scrollbar', () => {
 
     await nextTick()
 
-    expect(
-      wrapper.find('.el-scrollbar__thumb').attributes('style')
-    ).not.toContain(initializeStyle)
+    expect(wrapper.find('.el-scrollbar__thumb').attributes('style')).not.toBe(
+      initializeStyle
+    )
   })
 
   it('horizontal track height/width', async () => {

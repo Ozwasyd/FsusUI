@@ -1,14 +1,47 @@
-// @ts-nocheck
 import { nextTick } from 'vue'
-import { NOOP } from '@vue/shared'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { hasClass } from '@element-plus/utils'
 import { EVENT_CODE } from '@element-plus/constants'
 import { makeMountFunc } from '@element-plus/test-utils/make-mount'
 import { rAF } from '@element-plus/test-utils/tick'
+import {
+  clickClearButton as clickSharedClearButton,
+  clickOptionItem,
+  clickTagCloseButton,
+} from '../../../test-utils/dom'
 import { CircleClose } from '@element-plus/icons-vue'
 import { usePopperContainerId } from '@element-plus/hooks'
 import Select from '../src/select.vue'
+
+const NOOP: (...args: any[]) => void = () => {}
+
+const { filterIndices } = vi.hoisted(() => ({
+  filterIndices: vi.fn(
+    async (data: string[], keyword: string, caseSensitive = false) => {
+      const normalizedKeyword = caseSensitive
+        ? keyword
+        : keyword.toLowerCase()
+
+      return data.reduce<number[]>((matched, item, index) => {
+        const normalizedItem = caseSensitive ? item : item.toLowerCase()
+        if (normalizedItem.includes(normalizedKeyword)) {
+          matched.push(index)
+        }
+        return matched
+      }, [])
+    }
+  ),
+}))
+
+type SelectValue =
+  | string
+  | string[]
+  | number
+  | number[]
+  | Record<string, any>
+  | Array<Record<string, any>>
+  | null
+  | undefined
 
 vi.mock('lodash-unified', async () => {
   return {
@@ -20,6 +53,10 @@ vi.mock('lodash-unified', async () => {
     }),
   }
 })
+
+vi.mock('@element-plus/wasm', () => ({
+  filterIndices,
+}))
 
 const _mount = makeMountFunc({
   components: {
@@ -42,12 +79,12 @@ const clickClearButton = async (wrapper) => {
   await nextTick()
   const clearBtn = wrapper.findComponent(CircleClose)
   expect(clearBtn.exists()).toBeTruthy()
-  await clearBtn.trigger('click')
+  await clickSharedClearButton(clearBtn)
 }
 
 interface SelectProps {
   popperClass?: string
-  value?: string | string[] | number | number[]
+  value?: SelectValue
   options?: any[]
   disabled?: boolean
   clearable?: boolean
@@ -65,14 +102,14 @@ interface SelectProps {
 }
 
 interface SelectEvents {
-  onChange?: (value?: string) => void
-  onVisibleChange?: (visible?: boolean) => void
-  onRemoveTag?: (tag?: string) => void
-  onFocus?: (event?: FocusEvent) => void
-  onBlur?: (event?) => void
-  filterMethod?: (query: string) => void | undefined
-  remoteMethod?: (query: string) => void | undefined
-  [key: string]: (...args) => any
+  onChange?: (...args: unknown[]) => any
+  onVisibleChange?: (...args: unknown[]) => any
+  onRemoveTag?: (...args: unknown[]) => any
+  onFocus?: (...args: unknown[]) => any
+  onBlur?: (...args: unknown[]) => any
+  filterMethod?: (...args: unknown[]) => any
+  remoteMethod?: (...args: unknown[]) => any
+  [key: string]: (...args: unknown[]) => any
 }
 
 const createSelect = (
@@ -330,11 +367,11 @@ describe('Select', () => {
     const placeholder = wrapper.find(`.${PLACEHOLDER_CLASS_NAME}`)
     expect(vm.value).toBe('')
     expect(placeholder.text()).toBe('')
-    options[2].click()
+    await clickOptionItem(options[2])
     await nextTick()
     expect(vm.value).toBe(vm.options[2].value)
     expect(placeholder.text()).toBe(vm.options[2].label)
-    options[4].click()
+    await clickOptionItem(options[4])
     await nextTick()
     expect(vm.value).toBe(vm.options[4].value)
     expect(placeholder.text()).toBe(vm.options[4].label)
@@ -368,11 +405,11 @@ describe('Select', () => {
     await nextTick()
     const vm = wrapper.vm as any
     const options = getOptions()
-    options[1].click()
+    await clickOptionItem(options[1])
     await nextTick()
     expect(vm.value).toEqual(vm.options[1].value)
 
-    options[2].click()
+    await clickOptionItem(options[2])
     await nextTick()
     expect(vm.value).toEqual(vm.options[2].value)
   })
@@ -408,7 +445,7 @@ describe('Select', () => {
       `.el-select-dropdown__option-item.is-disabled`
     )
     expect(option.textContent).toBe(vm.options[1].label)
-    option.click()
+    await clickOptionItem(option)
     await nextTick()
     expect(vm.value).toBe('')
     expect(placeholder.text()).toBe('')
@@ -419,7 +456,7 @@ describe('Select', () => {
     )
     expect(options.length).toBe(2)
     expect(options.item(1).textContent).toBe(vm.options[2].label)
-    options.item(1).click()
+    await clickOptionItem(options.item(1) as HTMLElement)
     await nextTick()
     expect(vm.value).toBe('')
     expect(placeholder.text()).toBe('')
@@ -534,16 +571,15 @@ describe('Select', () => {
       await nextTick()
       const vm = wrapper.vm as any
       const options = getOptions()
-      options[1].click()
+      await clickOptionItem(options[1])
       await nextTick()
       expect(vm.value.length).toBe(1)
       expect(vm.value[0]).toBe(vm.options[1].value)
-      options[3].click()
+      await clickOptionItem(options[3])
       await nextTick()
       expect(vm.value.length).toBe(2)
       expect(vm.value[1]).toBe(vm.options[3].value)
-      const tagIcon = wrapper.find('.el-tag__close')
-      await tagIcon.trigger('click')
+      await clickTagCloseButton(wrapper)
       expect(vm.value.length).toBe(1)
     })
 
@@ -564,17 +600,16 @@ describe('Select', () => {
       await nextTick()
       const vm = wrapper.vm as any
       const options = getOptions()
-      options[0].click()
+      await clickOptionItem(options[0])
       await nextTick()
-      options[1].click()
+      await clickOptionItem(options[1])
       await nextTick()
-      options[2].click()
+      await clickOptionItem(options[2])
       await nextTick()
       expect(vm.value.length).toBe(3)
-      const tagCloseIcons = wrapper.findAll('.el-tag__close')
-      await tagCloseIcons[1].trigger('click')
+      await clickTagCloseButton(wrapper, 1)
       expect(vm.value.length).toBe(2)
-      await tagCloseIcons[0].trigger('click')
+      await clickTagCloseButton(wrapper)
       expect(vm.value.length).toBe(1)
     })
 
@@ -591,12 +626,12 @@ describe('Select', () => {
       await nextTick()
       const vm = wrapper.vm as any
       const options = getOptions()
-      options[1].click()
+      await clickOptionItem(options[1])
       await nextTick()
-      options[2].click()
+      await clickOptionItem(options[2])
       await nextTick()
       expect(vm.value.length).toBe(2)
-      options[3].click()
+      await clickOptionItem(options[3])
       await nextTick()
       expect(vm.value.length).toBe(2)
     })
@@ -629,15 +664,15 @@ describe('Select', () => {
       await nextTick()
       const vm = wrapper.vm as any
       const options = getOptions()
-      options[1].click()
+      await clickOptionItem(options[1])
       await nextTick()
       expect(vm.value.length).toBe(1)
       expect(vm.value).toContainEqual(vm.options[1].value)
-      options[2].click()
+      await clickOptionItem(options[2])
       await nextTick()
       expect(vm.value.length).toBe(2)
       expect(vm.value).toContainEqual(vm.options[2].value)
-      options[2].click()
+      await clickOptionItem(options[2])
       await nextTick()
       expect(vm.value.length).toBe(1)
       expect(vm.value).not.toContainEqual(vm.options[2].value)
@@ -646,7 +681,7 @@ describe('Select', () => {
       await nextTick()
       expect(vm.value.length).toBe(1)
       expect(vm.value).toContainEqual(vm.options[1].value)
-      options[0].click()
+      await clickOptionItem(options[0])
       await nextTick()
       expect(vm.value.length).toBe(2)
       expect(vm.value).toContainEqual(vm.options[0].value)
@@ -667,13 +702,13 @@ describe('Select', () => {
       await nextTick()
       const vm = wrapper.vm as any
       const options = getOptions()
-      options[0].click()
+      await clickOptionItem(options[0])
       await nextTick()
       expect(vm.value.length).toBe(1)
       expect(vm.value[0]).toBe(vm.options[0].value)
-      options[1].click()
+      await clickOptionItem(options[1])
       await nextTick()
-      options[2].click()
+      await clickOptionItem(options[2])
       await nextTick()
       expect(vm.value.length).toBe(3)
       const tags = wrapper.findAll('.el-tag').filter((item) => {
@@ -696,13 +731,13 @@ describe('Select', () => {
       await nextTick()
       const vm = wrapper.vm as any
       const options = getOptions()
-      options[0].click()
+      await clickOptionItem(options[0])
       await nextTick()
       expect(vm.value.length).toBe(1)
       expect(vm.value[0]).toBe(vm.options[0].value)
-      options[1].click()
+      await clickOptionItem(options[1])
       await nextTick()
-      options[2].click()
+      await clickOptionItem(options[2])
       await nextTick()
       expect(vm.value.length).toBe(3)
       expect(wrapper.findAll('.el-tag')[3].element.textContent).toBe('c2')
@@ -723,13 +758,13 @@ describe('Select', () => {
       await nextTick()
       const vm = wrapper.vm as any
       const options = getOptions()
-      options[0].click()
+      await clickOptionItem(options[0])
       await nextTick()
-      options[1].click()
+      await clickOptionItem(options[1])
       await nextTick()
-      options[2].click()
+      await clickOptionItem(options[2])
       await nextTick()
-      options[3].click()
+      await clickOptionItem(options[3])
       await nextTick()
       expect(vm.value.length).toBe(4)
       const tags = wrapper.findAll('.el-tag').filter((item) => {
@@ -756,7 +791,7 @@ describe('Select', () => {
       expect(vm.value).toBe('')
       expect(placeholder.text()).toBe('')
 
-      options[0].click()
+      await clickOptionItem(options[0])
       await nextTick()
       expect(vm.value).toBe(vm.options[0].value)
       expect(placeholder.text()).toBe(vm.options[0].label)
@@ -854,9 +889,9 @@ describe('Select', () => {
       await nextTick()
       // Select multiple items in multiple mode without triggering focus
       const options = getOptions()
-      options[1].click()
+      await clickOptionItem(options[1])
       await nextTick()
-      options[2].click()
+      await clickOptionItem(options[2])
       await nextTick()
       expect(onFocus).toHaveBeenCalledTimes(1)
       // Simulate click the outside
@@ -879,7 +914,7 @@ describe('Select', () => {
       await nextTick()
       expect(handleChanged).toHaveBeenCalledTimes(0)
       const options = getOptions()
-      options[4].click()
+      await clickOptionItem(options[4])
       await nextTick()
       expect(handleChanged).toHaveBeenCalled()
     })
@@ -984,8 +1019,7 @@ describe('Select', () => {
       await wrapper.trigger('click')
       expect(selectVm.filteredOptions.length).toBe(5)
       // remove tag
-      const tagCloseIcons = wrapper.findAll('.el-tag__close')
-      await tagCloseIcons[1].trigger('click')
+      await clickTagCloseButton(wrapper, 1)
       expect(selectVm.filteredOptions.length).toBe(4)
       // simulate backspace
       await wrapper.find('input').trigger('keydown', {
@@ -1035,7 +1069,7 @@ describe('Select', () => {
     await nextTick()
     let options = getOptions()
     expect(options.length).toBe(2)
-    options[0].click()
+    await clickOptionItem(options[0])
     await nextTick()
     options = getOptions()
     expect(options.length).toBe(2)
@@ -1053,7 +1087,7 @@ describe('Select', () => {
     await nextTick()
     options = getOptions()
     expect(options.length).toBe(2)
-    options[0].click()
+    await clickOptionItem(options[0])
     await nextTick()
     options = getOptions()
     expect(options.length).toBe(4)
@@ -1223,9 +1257,8 @@ describe('Select', () => {
     })
     await nextTick()
     expect(wrapper.findAll('.el-tag').length).toBe(2)
-    const tagCloseIcons = wrapper.findAll('.el-tag__close')
-    expect(tagCloseIcons.length).toBe(1)
-    await tagCloseIcons[0].trigger('click')
+    expect(wrapper.findAll('.el-tag__close').length).toBe(1)
+    await clickTagCloseButton(wrapper)
     expect(wrapper.findAll('.el-tag__close').length).toBe(0)
     expect(wrapper.findAll('.el-tag').length).toBe(1)
   })
@@ -1261,14 +1294,13 @@ describe('Select', () => {
     await nextTick()
     expect(wrapper.find(`.${PLACEHOLDER_CLASS_NAME}`).exists()).toBeFalsy()
     // When all tags are removed, the placeholder should be displayed
-    const tagCloseIcon = wrapper.find('.el-tag__close')
-    await tagCloseIcon.trigger('click')
+    await clickTagCloseButton(wrapper)
     expect(wrapper.find(`.${PLACEHOLDER_CLASS_NAME}`).text()).toBe(
       DEFAULT_PLACEHOLDER
     )
     // The placeholder should disappear after it is selected again
     const options = getOptions()
-    options[0].click()
+    await clickOptionItem(options[0])
     await nextTick()
     expect(wrapper.find(`.${PLACEHOLDER_CLASS_NAME}`).exists()).toBeFalsy()
     // Simulate keyboard events
@@ -1504,11 +1536,11 @@ describe('Select', () => {
       .mockReturnValue(selectRect as DOMRect)
     selectVm.handleResize()
     const options = getOptions()
-    options[0].click()
+    await clickOptionItem(options[0])
     await nextTick()
-    options[1].click()
+    await clickOptionItem(options[1])
     await nextTick()
-    options[2].click()
+    await clickOptionItem(options[2])
     await nextTick()
     const tagWrappers = wrapper.findAll('.el-select-v2__tags-text')
     for (const tagWrapper of tagWrappers) {
@@ -1662,5 +1694,39 @@ describe('Select', () => {
     await input.trigger('input')
     await nextTick()
     expect(selectVm.filteredOptions.length).toBe(3)
+  })
+
+  it('filterable supports large datasets with wasm fallback parity', async () => {
+    const options = Array.from({ length: 2_200 }, (_, index) => ({
+      value: `${index + 1}`,
+      label: index === 2_111 ? 'Wasm Match' : `option ${index + 1}`,
+    }))
+
+    const wrapper = createSelect({
+      data: () => {
+        return {
+          filterable: true,
+          options,
+        }
+      },
+    })
+
+    await nextTick()
+    const select = wrapper.findComponent(Select)
+    const selectVm = select.vm as any
+    selectVm.expanded = true
+    await nextTick()
+    await rAF()
+
+    const input = wrapper.find('input')
+    input.element.value = 'match'
+    await input.trigger('input')
+    await nextTick()
+    await Promise.resolve()
+    await nextTick()
+
+    expect(filterIndices).toHaveBeenCalled()
+    expect(selectVm.filteredOptions).toHaveLength(1)
+    expect(selectVm.filteredOptions[0].label).toBe('Wasm Match')
   })
 })

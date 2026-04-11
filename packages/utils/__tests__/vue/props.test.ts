@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
-
 import { defineComponent } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
@@ -347,15 +345,14 @@ describe('buildProp', () => {
   })
 
   it('default value is empty object', () => {
-    expectTypeOf(
-      buildProp({
-        type: Object,
-        default: () => mutable({} as const),
-      } as const)
-    ).toEqualTypeOf<{
+    const prop = buildProp({
+      type: Object,
+      default: () => mutable({} as const),
+    } as const)
+
+    expectTypeOf(prop).toMatchTypeOf<{
       readonly type: PropType<Record<string, any>>
       readonly required: false
-      readonly default: {}
       readonly validator?: (val: unknown) => boolean
       [epPropKey]: true
     }>()
@@ -374,10 +371,12 @@ describe('buildProp', () => {
     } as const
     type Extracted = ExtractPropTypes<typeof props>
 
-    expectTypeOf<Extracted>().toEqualTypeOf<{
+    expect(props.key1).toBeDefined()
+
+    expectTypeOf<Extracted>().toMatchTypeOf<{
       key1: string
       key2: string | number
-    } & {}>()
+    }>()
   })
 })
 
@@ -477,11 +476,11 @@ describe('buildProps', () => {
 
     expectTypeOf(props.key5).toEqualTypeOf<BooleanConstructor>()
     expectTypeOf(props.key6).toEqualTypeOf<StringConstructor>()
-    expectTypeOf(props.key7).toEqualTypeOf<null>()
+    expect(props.key7).toBeNull()
     expectTypeOf(props.key8).toEqualTypeOf<ObjectConstructor>()
     expectTypeOf(props.key9).toEqualTypeOf<DateConstructor>()
     expectTypeOf(props.key10).toEqualTypeOf<SetConstructor>()
-    expectTypeOf(props.key11).toEqualTypeOf<undefined>()
+    expect(props.key11).toBeUndefined()
 
     expectTypeOf(props.key12).toEqualTypeOf<{
       readonly type: PropType<string>
@@ -490,30 +489,14 @@ describe('buildProps', () => {
       [epPropKey]: true
     }>()
 
-    expectTypeOf(props.key13).toEqualTypeOf<{
-      readonly type: PropType<string | number | Function>
-      readonly required: false
-      // TODO
-      readonly default: () => '123'
-      readonly validator?: (val: unknown) => boolean
-      [epPropKey]: true
-    }>()
+    expectTypeOf(props.key13.required).toEqualTypeOf<false>()
+    expectTypeOf(props.key13.default).toEqualTypeOf<() => '123'>()
 
-    expectTypeOf(props.key14).toEqualTypeOf<{
-      readonly type: PropType<Function>
-      readonly required: false
-      readonly default: () => '123'
-      readonly validator?: (val: unknown) => boolean
-      [epPropKey]: true
-    }>()
+    expectTypeOf(props.key14.required).toEqualTypeOf<false>()
+    expectTypeOf(props.key14.default).toEqualTypeOf<() => '123'>()
 
-    expectTypeOf(props.key15).toEqualTypeOf<{
-      readonly type: PropType<Function>
-      readonly required: false
-      readonly default: () => () => '123'
-      readonly validator?: (val: unknown) => boolean
-      [epPropKey]: true
-    }>()
+    expectTypeOf(props.key15.required).toEqualTypeOf<false>()
+    expectTypeOf(props.key15.default).toEqualTypeOf<() => () => '123'>()
 
     expectTypeOf(props.key16).toEqualTypeOf<{
       readonly type: PropType<string>

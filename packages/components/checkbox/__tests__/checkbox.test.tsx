@@ -1,6 +1,7 @@
 import { nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, test } from 'vitest'
+import { setCheckboxValue } from '../../../test-utils/dom'
 import { ElFormItem } from '@element-plus/components/form'
 import Checkbox from '../src/checkbox.vue'
 import CheckboxButton from '../src/checkbox-button.vue'
@@ -15,9 +16,9 @@ describe('Checkbox', () => {
 
     expect(wrapper.classes()).toContain('el-checkbox')
     expect(wrapper.classes()).not.toContain('is-disabled')
-    await wrapper.trigger('click')
+    await setCheckboxValue(wrapper)
     expect(wrapper.classes()).toContain('is-checked')
-    await wrapper.trigger('click')
+    await setCheckboxValue(wrapper, false)
     expect(wrapper.classes('is-checked')).toBe(false)
   })
 
@@ -100,7 +101,7 @@ describe('Checkbox', () => {
         <Checkbox v-model={checked.value} onChange={onChange} label="Foobar" />
       ))
 
-      await wrapper.trigger('click')
+      await setCheckboxValue(wrapper)
       expect(data.value).toBe(true)
     })
 
@@ -114,7 +115,7 @@ describe('Checkbox', () => {
         </Checkbox>
       ))
 
-      await wrapper.trigger('click')
+      await setCheckboxValue(wrapper)
       expect(data.value).toBe(true)
     })
 
@@ -130,7 +131,7 @@ describe('Checkbox', () => {
         </ElFormItem>
       ))
 
-      await wrapper.findComponent(Checkbox).trigger('click')
+      await setCheckboxValue(wrapper.findComponent(Checkbox), false)
       expect(data.value).toBe(false)
     })
   })
@@ -152,11 +153,11 @@ describe('Checkbox', () => {
 
     expect(checkList.value.length).toBe(0)
 
-    await wrapper.findComponent({ ref: 'a' }).trigger('click')
+    await setCheckboxValue(wrapper.findComponent({ ref: 'a' }))
     expect(checkList.value.length).toBe(1)
     expect(checkList.value).toContain('a')
 
-    await wrapper.findComponent({ ref: 'b' }).trigger('click')
+    await setCheckboxValue(wrapper.findComponent({ ref: 'b' }))
     expect(checkList.value.length).toBe(2)
     expect(checkList.value).toContain('a')
     expect(checkList.value).toContain('b')
@@ -177,7 +178,7 @@ describe('Checkbox', () => {
       },
     })
 
-    await wrapper.findComponent({ ref: 'a' }).trigger('click')
+    await setCheckboxValue(wrapper.findComponent({ ref: 'a' }))
     expect(checkList.value.length).toBe(1)
     expect(checkList.value).toContain('a')
   })
@@ -197,7 +198,7 @@ describe('Checkbox', () => {
       },
     })
 
-    await wrapper.findComponent({ ref: 'a' }).trigger('click')
+    await setCheckboxValue(wrapper.findComponent({ ref: 'a' }))
     await nextTick()
     expect(data.value.length).toBe(1)
     expect(data.value).toEqual(['a'])
@@ -219,7 +220,7 @@ describe('Checkbox', () => {
     })
 
     expect(checkList.value.length).toBe(0)
-    await wrapper.findComponent({ ref: 'a' }).trigger('click')
+    await setCheckboxValue(wrapper.findComponent({ ref: 'a' }))
     expect(checkList.value).toEqual(['a'])
   })
 
@@ -233,10 +234,10 @@ describe('Checkbox', () => {
       ))
 
       const checkbox = wrapper.findComponent(Checkbox)
-      await checkbox.trigger('click')
+      await setCheckboxValue(checkbox, false)
       await nextTick()
       expect(checked.value).toBe(3)
-      await checkbox.trigger('click')
+      await setCheckboxValue(checkbox)
       await nextTick()
       expect(checked.value).toBe('a')
     })
@@ -252,10 +253,10 @@ describe('Checkbox', () => {
         />
       ))
 
-      await wrapper.trigger('click')
+      await setCheckboxValue(wrapper, false)
       await nextTick()
       expect(checked.value).toBe(3)
-      await wrapper.trigger('click')
+      await setCheckboxValue(wrapper)
       await nextTick()
       expect(checked.value).toBe('a')
     })
@@ -268,10 +269,10 @@ describe('Checkbox', () => {
         </Checkbox>
       ))
 
-      await wrapper.trigger('click')
+      await setCheckboxValue(wrapper, false)
       await nextTick()
       expect(checked.value).toBe(3)
-      await wrapper.trigger('click')
+      await setCheckboxValue(wrapper)
       await nextTick()
       expect(checked.value).toBe('a')
     })
@@ -304,7 +305,7 @@ describe('Checkbox', () => {
     ))
 
     const checkbox = wrapper.find('.el-checkbox')
-    await checkbox.trigger('click')
+    await setCheckboxValue(checkbox)
     expect(checklist.value[0]).toEqual('')
   })
 
@@ -319,7 +320,7 @@ describe('Checkbox', () => {
     ))
 
     const checkbox = wrapper.find('.el-checkbox')
-    await checkbox.trigger('click')
+    await setCheckboxValue(checkbox)
     expect(checklist.value[0]).toEqual({ a: 1 })
     expect(checkbox.classes()).contains('is-checked')
   })
@@ -345,11 +346,11 @@ describe('Checkbox', () => {
     expect(checklist.value.length).toBe(1)
     const checkboxA1 = wrapper.findComponent({ ref: 'a1' })
     const checkboxA2 = wrapper.findComponent({ ref: 'a2' })
-    await checkboxA2.trigger('click')
+    await setCheckboxValue(checkboxA2)
     expect(checklist.value).toEqual([{ a: 1 }, { a: 2 }])
     expect(checkboxA1.classes()).contains('is-checked')
     expect(checkboxA2.classes()).contains('is-checked')
-    await checkboxA1.trigger('click')
+    await setCheckboxValue(checkboxA1, false)
     expect(checklist.value).toEqual([{ a: 2 }])
     expect(checkboxA1.classes()).not.contains('is-checked')
   })
@@ -363,9 +364,9 @@ describe('check-button', () => {
     ))
 
     expect(wrapper.classes()).toContain('el-checkbox-button')
-    await wrapper.trigger('click')
+    await setCheckboxValue(wrapper)
     expect(wrapper.classes()).toContain('is-checked')
-    await wrapper.trigger('click')
+    await setCheckboxValue(wrapper, false)
     expect(wrapper.classes('is-checked')).toBe(false)
   })
 
@@ -388,7 +389,7 @@ describe('check-button', () => {
       <CheckboxButton v-model={checked.value} onChange={onChange} />
     ))
 
-    await wrapper.trigger('click')
+    await setCheckboxValue(wrapper)
     expect(data.value).toBe(true)
   })
 
@@ -409,9 +410,9 @@ describe('check-button', () => {
       },
     })
 
-    await wrapper.findComponent({ ref: 'a' }).trigger('click')
+    await setCheckboxValue(wrapper.findComponent({ ref: 'a' }))
     expect(data.value).toEqual(['a'])
-    await wrapper.findComponent({ ref: 'b' }).trigger('click')
+    await setCheckboxValue(wrapper.findComponent({ ref: 'b' }))
     expect(data.value).toEqual(['a', 'b'])
   })
 
@@ -439,8 +440,9 @@ describe('check-button', () => {
     expect(checkList.value.length).toBe(2)
     expect(checkbox.classes()).contains('is-checked')
     expect(
-      checkbox.find('.el-checkbox-button__inner').attributes('style')
-    ).contains('border-color: #ff0000;')
+      (checkbox.find('.el-checkbox-button__inner').element as HTMLElement).style
+        .borderColor
+    ).toBe('rgb(255, 0, 0)')
   })
 
   test('button group tag', () => {
@@ -475,10 +477,10 @@ describe('check-button', () => {
 
     expect(checkList.value.length).toBe(2)
 
-    await wrapper.findComponent({ ref: 'a' }).trigger('click')
+    await setCheckboxValue(wrapper.findComponent({ ref: 'a' }), false)
     expect(checkList.value.length).toBe(2)
 
-    await wrapper.findComponent({ ref: 'c' }).trigger('click')
+    await setCheckboxValue(wrapper.findComponent({ ref: 'c' }))
     expect(checkList.value.length).toBe(3)
     expect(checkList.value).toEqual(['a', 'b', 'c'])
 
@@ -487,10 +489,10 @@ describe('check-button', () => {
 
     checkList.value = []
     await nextTick()
-    await wrapper.findComponent({ ref: 'a' }).trigger('click')
-    await wrapper.findComponent({ ref: 'd' }).trigger('click')
+    await setCheckboxValue(wrapper.findComponent({ ref: 'a' }))
+    await setCheckboxValue(wrapper.findComponent({ ref: 'd' }))
     expect(checkList.value).toEqual(['a', 'd'])
-    await wrapper.findComponent({ ref: 'a' }).trigger('click')
+    await setCheckboxValue(wrapper.findComponent({ ref: 'a' }), false)
     expect(checkList.value).toEqual(['a', 'd'])
     expect(wrapper.findComponent({ ref: 'a' }).vm.isDisabled).toBe(true)
   })
@@ -511,7 +513,7 @@ describe('check-button', () => {
     })
 
     expect(checkList.value.length).toBe(0)
-    await wrapper.findComponent({ ref: 'a' }).trigger('click')
+    await setCheckboxValue(wrapper.findComponent({ ref: 'a' }))
     expect(checkList.value).toEqual(['a'])
   })
 

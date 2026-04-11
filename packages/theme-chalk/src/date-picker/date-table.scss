@@ -33,8 +33,8 @@
   }
 
   td {
-    width: 32px;
-    height: 30px;
+    width: getCssVar('datepicker-cell-width');
+    height: getCssVar('datepicker-cell-height');
     padding: 4px 0;
     box-sizing: border-box;
     text-align: center;
@@ -42,19 +42,19 @@
     position: relative;
 
     @include b(date-table-cell) {
-      height: 30px;
+      height: getCssVar('datepicker-cell-height');
       padding: 3px 0;
       box-sizing: border-box;
       @include b(date-table-cell__text) {
-        width: 24px;
-        height: 24px;
+        width: getCssVar('datepicker-cell-inner-size');
+        height: getCssVar('datepicker-cell-inner-size');
         display: block;
         margin: 0 auto;
-        line-height: 24px;
+        line-height: getCssVar('datepicker-cell-inner-size');
         position: absolute;
         left: 50%;
         transform: translateX(-50%);
-        border-radius: 50%;
+        border-radius: 999px;
       }
     }
 
@@ -158,5 +158,16 @@
     color: getCssVar('datepicker-header-text-color');
     font-weight: 400;
     border-bottom: solid 1px getCssVar('border-color-lighter');
+  }
+}
+
+@media (max-width: 760px) {
+  .#{$namespace}-date-table td {
+    width: getCssVar('datepicker-cell-touch-width');
+    height: getCssVar('datepicker-cell-touch-height');
+
+    .#{$namespace}-date-table-cell {
+      height: getCssVar('datepicker-cell-touch-height');
+    }
   }
 }

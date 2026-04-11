@@ -33,8 +33,6 @@
           v-bind="attrs"
           :type="showPassword ? (passwordVisible ? 'text' : 'password') : type"
           :disabled="inputDisabled"
-          :formatter="formatter"
-          :parser="parser"
           :readonly="readonly"
           :autocomplete="autocomplete"
           :tabindex="tabindex"
@@ -64,21 +62,25 @@
                 <component :is="suffixIcon" />
               </el-icon>
             </template>
-            <el-icon
+            <span
               v-if="showClear"
               :class="[nsInput.e('icon'), nsInput.e('clear')]"
               @mousedown.prevent="NOOP"
               @click="clear"
             >
-              <circle-close />
-            </el-icon>
-            <el-icon
+              <el-icon>
+                <circle-close />
+              </el-icon>
+            </span>
+            <span
               v-if="showPwdVisible"
               :class="[nsInput.e('icon'), nsInput.e('password')]"
               @click="handlePasswordVisible"
             >
-              <component :is="passwordIcon" />
-            </el-icon>
+              <el-icon>
+                <component :is="passwordIcon" />
+              </el-icon>
+            </span>
             <span v-if="isWordLimitVisible" :class="nsInput.e('count')">
               <span :class="nsInput.e('count-inner')">
                 {{ textLength }} / {{ attrs.maxlength }}
@@ -184,6 +186,7 @@ import { UPDATE_MODEL_EVENT } from '@element-plus/constants'
 import { calcTextareaHeight } from './utils'
 import { inputEmits, inputProps } from './input'
 import type { StyleValue } from 'vue'
+import type { InputAutoSize } from './input'
 
 type TargetElement = HTMLInputElement | HTMLTextAreaElement
 
@@ -347,8 +350,11 @@ const resizeTextarea = () => {
   if (!isClient || type !== 'textarea' || !textarea.value) return
 
   if (autosize) {
-    const minRows = isObject(autosize) ? autosize.minRows : undefined
-    const maxRows = isObject(autosize) ? autosize.maxRows : undefined
+    const textareaAutosize = isObject(autosize)
+      ? (autosize as Exclude<InputAutoSize, boolean>)
+      : undefined
+    const minRows = textareaAutosize?.minRows
+    const maxRows = textareaAutosize?.maxRows
     const textareaStyle = calcTextareaHeight(textarea.value, minRows, maxRows)
 
     // If the scrollbar is displayed, the height of the textarea needs more space than the calculated height.
@@ -362,7 +368,7 @@ const resizeTextarea = () => {
 
     nextTick(() => {
       // NOTE: Force repaint to make sure the style set above is applied.
-      textarea.value!.offsetHeight
+      void textarea.value?.offsetHeight
       textareaCalcStyle.value = textareaStyle
     })
   } else {
@@ -437,7 +443,7 @@ const handleCompositionStart = (event: CompositionEvent) => {
 const handleCompositionUpdate = (event: CompositionEvent) => {
   emit('compositionupdate', event)
   const text = (event.target as HTMLInputElement)?.value
-  const lastCharacter = text[text.length - 1] || ''
+  const lastCharacter = text.at(-1) ?? ''
   isComposing.value = !isKorean(lastCharacter)
 }
 

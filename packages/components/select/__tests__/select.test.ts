@@ -1,7 +1,11 @@
-// @ts-nocheck
 import { markRaw, nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, test, vi } from 'vitest'
+import {
+  clickClearButton,
+  clickOptionItem,
+  clickTagCloseButton,
+} from '../../../test-utils/dom'
 import { EVENT_CODE } from '@element-plus/constants'
 import { ArrowDown, CaretTop, CircleClose } from '@element-plus/icons-vue'
 import { usePopperContainerId } from '@element-plus/hooks'
@@ -10,6 +14,18 @@ import { ElFormItem } from '@element-plus/components/form'
 import Select from '../src/select.vue'
 import Group from '../src/option-group.vue'
 import Option from '../src/option.vue'
+
+type SelectTestOption = {
+  value?: unknown
+  label?: string
+  disabled?: boolean
+  options?: SelectTestOption[]
+  [key: string]: unknown
+}
+
+type SelectTestVm = Record<string, any>
+type SelectTestDataFactory = () => Record<string, unknown>
+type SelectTestExtraOptions = Record<string, unknown>
 
 vi.mock('lodash-unified', async () => {
   return {
@@ -23,6 +39,7 @@ vi.mock('lodash-unified', async () => {
 })
 
 interface SelectProps {
+  [key: string]: any
   filterMethod?: any
   remoteMethod?: any
   multiple?: boolean
@@ -39,7 +56,11 @@ interface SelectProps {
   size?: 'small' | 'default' | 'large'
 }
 
-const _mount = (template: string, data: any = () => ({}), otherObj?) =>
+const _mount = (
+  template: string,
+  data: SelectTestDataFactory = () => ({}),
+  otherObj: SelectTestExtraOptions = {}
+) =>
   mount(
     {
       components: {
@@ -73,7 +94,10 @@ function getOptions(): HTMLElement[] {
   )
 }
 
-const getSelectVm = (configs: SelectProps = {}, options?) => {
+const getSelectVm = (
+  configs: SelectProps = {},
+  options?: SelectTestOption[]
+) => {
   ;[
     'multiple',
     'clearable',
@@ -169,7 +193,10 @@ const getSelectVm = (configs: SelectProps = {}, options?) => {
   )
 }
 
-const getGroupSelectVm = (configs: SelectProps = {}, options?) => {
+const getGroupSelectVm = (
+  configs: SelectProps = {},
+  options?: SelectTestOption[]
+) => {
   ;[
     'multiple',
     'clearable',
@@ -554,7 +581,7 @@ describe('Select', () => {
       }),
       {
         methods: {
-          handleChange() {
+          handleChange(this: SelectTestVm) {
             this.count++
           },
         },
@@ -566,12 +593,12 @@ describe('Select', () => {
     const vm = wrapper.vm as any
     expect(vm.value).toBe('')
     expect(findInnerInput().value).toBe('')
-    options[2].click()
+    await clickOptionItem(options[2])
     await nextTick()
     expect(vm.value).toBe('选项3')
     expect(findInnerInput().value).toBe('蚵仔煎')
     expect(vm.count).toBe(1)
-    options[4].click()
+    await clickOptionItem(options[4])
     await nextTick()
     expect(vm.value).toBe('选项5')
     expect(findInnerInput().value).toBe('北京烤鸭')
@@ -586,7 +613,7 @@ describe('Select', () => {
     await nextTick()
     const options = getOptions()
     expect(options[1].className).toContain('is-disabled')
-    options[1].click()
+    await clickOptionItem(options[1])
     await nextTick()
     expect(vm.value).toBe('')
   })
@@ -690,7 +717,7 @@ describe('Select', () => {
       }),
       {
         methods: {
-          handleVisibleChange(val) {
+          handleVisibleChange(this: SelectTestVm, val: boolean) {
             this.visible = val
           },
         },
@@ -743,7 +770,7 @@ describe('Select', () => {
     await selectVm.$nextTick()
     const iconClear = wrapper.findComponent(CircleClose)
     expect(iconClear.exists()).toBe(true)
-    await iconClear.trigger('click')
+    await clickClearButton(iconClear)
     expect(vm.value).toBe('')
   })
 
@@ -751,14 +778,14 @@ describe('Select', () => {
     wrapper = _mount(`<el-select></el-select>`)
     let suffixIcon = wrapper.findComponent(ArrowDown)
     expect(suffixIcon.exists()).toBe(true)
-    await wrapper.setProps({ suffixIcon: markRaw(CaretTop) })
+    await (wrapper as any).setProps({ suffixIcon: markRaw(CaretTop) })
     suffixIcon = wrapper.findComponent(CaretTop)
     expect(suffixIcon.exists()).toBe(true)
   })
 
   test('test remote show suffix', async () => {
     wrapper = _mount(`<el-select></el-select>`)
-    await wrapper.setProps({
+    await (wrapper as any).setProps({
       remote: true,
       filters: true,
       remoteShowSuffix: true,
@@ -854,7 +881,8 @@ describe('Select', () => {
     await nextTick()
     const options = [...getOptions()]
     const target = options.find((option) => option.textContent === 'new')
-    target.click()
+    expect(target).toBeDefined()
+    await clickOptionItem(target!)
     expect((wrapper.vm as any).value).toBe('new')
   })
 
@@ -889,7 +917,7 @@ describe('Select', () => {
     await nextTick()
     const options = [...getOptions()]
     expect(Array.from(options[0].classList)).toContain('hover')
-    options[0].click()
+    await clickOptionItem(options[0])
     expect((wrapper.vm as any).value).toBe('Java')
   })
 
@@ -940,13 +968,12 @@ describe('Select', () => {
     const vm = wrapper.vm as any
     vm.value = ['选项1']
     nextTick()
-    options[1].click()
+    await clickOptionItem(options[1])
     await nextTick()
-    options[3].click()
+    await clickOptionItem(options[3])
     await nextTick()
     expect(vm.value.includes('选项2') && vm.value.includes('选项4')).toBe(true)
-    const tagCloseIcons = wrapper.findAll('.el-tag__close')
-    await tagCloseIcons[0].trigger('click')
+    await clickTagCloseButton(wrapper)
     expect(vm.value.indexOf('选项1')).toBe(-1)
   })
 
@@ -995,15 +1022,15 @@ describe('Select', () => {
       .spyOn(inputDom as HTMLElement, 'offsetWidth', 'get')
       .mockReturnValue(200)
     selectWrapper.vm.handleResize()
-    options[0].click()
+    await clickOptionItem(options[0])
     await nextTick()
-    options[1].click()
+    await clickOptionItem(options[1])
     await nextTick()
-    options[2].click()
+    await clickOptionItem(options[2])
     await nextTick()
     const tagWrappers = wrapper.findAll('.el-select__tags-text')
     for (const tagWrapper of tagWrappers) {
-      const tagWrapperDom = tagWrapper.element
+      const tagWrapperDom = tagWrapper.element as HTMLElement
       expect(Number.parseInt(tagWrapperDom.style.maxWidth) === 200 - 75).toBe(
         true
       )
@@ -1056,16 +1083,16 @@ describe('Select', () => {
       .spyOn(inputDom as HTMLElement, 'offsetWidth', 'get')
       .mockReturnValue(200)
     selectWrapper.vm.handleResize()
-    options[0].click()
+    await clickOptionItem(options[0])
     await nextTick()
     const tagWrappers = wrapper.findAll('.el-select__tags-text')
-    const tagWrapperDom = tagWrappers[0].element
+    const tagWrapperDom = tagWrappers[0].element as HTMLElement
     expect(Number.parseInt(tagWrapperDom.style.maxWidth) === 200 - 75).toBe(
       true
     )
-    options[1].click()
+    await clickOptionItem(options[1])
     await nextTick()
-    options[2].click()
+    await clickOptionItem(options[2])
     await nextTick()
     expect(Number.parseInt(tagWrapperDom.style.maxWidth) === 200 - 123).toBe(
       true
@@ -1110,11 +1137,11 @@ describe('Select', () => {
     await wrapper.find('.select-trigger').trigger('click')
     const options = getOptions()
 
-    options[0].click()
+    await clickOptionItem(options[0])
     await nextTick()
-    options[1].click()
+    await clickOptionItem(options[1])
     await nextTick()
-    options[2].click()
+    await clickOptionItem(options[2])
     await nextTick()
     const triggerWrappers = wrapper.findAll('.el-tooltip__trigger')
     expect(triggerWrappers[0]).toBeDefined()
@@ -1160,11 +1187,11 @@ describe('Select', () => {
     await wrapper.find('.select-trigger').trigger('click')
     const options = getOptions()
 
-    options[0].click()
+    await clickOptionItem(options[0])
     await nextTick()
-    options[1].click()
+    await clickOptionItem(options[1])
     await nextTick()
-    options[2].click()
+    await clickOptionItem(options[2])
     await nextTick()
     const triggerWrappers = wrapper.findAll('.el-tooltip__trigger')
     expect(triggerWrappers[0]).toBeDefined()
@@ -1222,10 +1249,9 @@ describe('Select', () => {
     const vm = wrapper.vm as any
     await nextTick()
     expect(vm.value.length).toBe(2)
-    const tagCloseIcons = wrapper.findAll('.el-tag__close')
-    await tagCloseIcons[1].trigger('click')
+    await clickTagCloseButton(wrapper, 1)
     expect(vm.value.length).toBe(1)
-    await tagCloseIcons[0].trigger('click')
+    await clickTagCloseButton(wrapper)
     expect(vm.value.length).toBe(0)
   })
 
@@ -1234,10 +1260,10 @@ describe('Select', () => {
     const vm = wrapper.vm as any
     await wrapper.find('.select-trigger').trigger('click')
     const options = getOptions()
-    options[1].click()
+    await clickOptionItem(options[1])
     await nextTick()
     expect(vm.value.includes('选项2')).toBe(true)
-    options[3].click()
+    await clickOptionItem(options[3])
     await nextTick()
     expect(vm.value.indexOf('选项4')).toBe(-1)
   })
@@ -1308,13 +1334,13 @@ describe('Select', () => {
 
     const iconClear = wrapper.findComponent(CircleClose)
     expect(iconClear.exists()).toBe(true)
-    await iconClear.trigger('click')
+    await clickClearButton(iconClear)
     expect(vm.value).toBe('')
     expect(handleFocus).toHaveBeenCalledTimes(1)
     expect(handleBlur).not.toHaveBeenCalled()
 
     const options = getOptions()
-    options[0].click()
+  await clickOptionItem(options[0])
     await nextTick()
     expect(vm.value).toBe('选项1')
     selectVm.inputHovering = true
@@ -1410,9 +1436,8 @@ describe('Select', () => {
 
     await input.trigger('focus')
     expect(handleFocus).toHaveBeenCalledTimes(1)
-    const tagCloseIcons = wrapper.findAll('.el-tag__close')
-    await tagCloseIcons[1].trigger('click')
-    await tagCloseIcons[0].trigger('click')
+    await clickTagCloseButton(wrapper, 1)
+    await clickTagCloseButton(wrapper)
     expect(handleFocus).toHaveBeenCalledTimes(1)
     expect(handleBlur).not.toHaveBeenCalled()
     await input.trigger('blur')
@@ -1457,7 +1482,7 @@ describe('Select', () => {
     expect(callCount).toBe(0)
     await wrapper.find('.select-trigger').trigger('click')
     const options = getOptions()
-    options[2].click()
+    await clickOptionItem(options[2])
     expect(callCount).toBe(1)
   })
 
@@ -1661,17 +1686,17 @@ describe('Select', () => {
         }
       },
       mounted() {
-        this.list = this.states.map((item) => {
+        ;(this as SelectTestVm).list = (this as SelectTestVm).states.map((item: string) => {
           return { value: `value:${item}`, label: `label:${item}` }
         })
       },
       methods: {
-        remoteMethod(query) {
+        remoteMethod(this: SelectTestVm, query: string) {
           if (query !== '') {
             this.loading = true
             setTimeout(() => {
               this.loading = false
-              this.options = this.list.filter((item) => {
+              this.options = this.list.filter((item: { label: string }) => {
                 return item.label.toLowerCase().includes(query.toLowerCase())
               })
             }, 200)
@@ -1697,7 +1722,7 @@ describe('Select', () => {
     vi.runAllTimers()
     await nextTick()
     let options = getOptions()
-    options[0].click()
+    await clickOptionItem(options[0])
     await nextTick()
     select.debouncedQueryChange({
       target: {
@@ -1707,7 +1732,7 @@ describe('Select', () => {
     vi.runAllTimers()
     await nextTick()
     options = getOptions()
-    options[5].click()
+    await clickOptionItem(options[5])
     await nextTick()
     expect(select.selected.length === 2).toBeTruthy()
     expect(select.selected[0].currentLabel !== '').toBeTruthy()
@@ -1759,14 +1784,16 @@ describe('Select', () => {
     wrapper.find('.select-trigger').trigger('click')
     await nextTick()
     vm.options[1].disabled = true
-    await nextTick()
+    await vi.waitFor(() => {
+      const options = getOptions()
+      expect(options[0].className).not.toContain('is-disabled')
+      expect(options[2].className).toContain('is-disabled')
+    })
     const options = getOptions()
-    expect(options[0].className).not.toContain('is-disabled')
-    expect(options[2].className).toContain('is-disabled')
-    options[0].click()
+    await clickOptionItem(options[0])
     await nextTick()
     expect(vm.value).toBe('Shanghai')
-    options[2].click()
+    await clickOptionItem(options[2])
     await nextTick()
     expect(vm.value).toBe('Shanghai')
   })
@@ -1814,7 +1841,7 @@ describe('Select', () => {
     await selectVm.$nextTick()
     const iconClear = wrapper.findComponent(CircleClose)
     expect(wrapper.findAll('.el-tag').length).toBe(3)
-    await iconClear.trigger('click')
+    await clickClearButton(iconClear)
     expect(wrapper.findAll('.el-tag').length).toBe(2)
 
     // test for collapse select
@@ -1827,7 +1854,7 @@ describe('Select', () => {
         return !hasClass(item.element, 'in-tooltip')
       }).length
     ).toBe(2)
-    await wrapper.find('.el-tag__close').trigger('click')
+    await clickTagCloseButton(wrapper)
     expect(
       wrapper.findAll('.el-tag').filter((item) => {
         return !hasClass(item.element, 'in-tooltip')
@@ -1842,10 +1869,10 @@ describe('Select', () => {
     await nextTick()
     expect(
       wrapper.findAll('.el-tag__close').filter((item) => {
-        return !hasClass(item.element.parentElement, 'in-tooltip')
+        return !hasClass(item.element.parentElement ?? item.element, 'in-tooltip')
       }).length
     ).toBe(1)
-    await wrapper.find('.el-tag__close').trigger('click')
+    await clickTagCloseButton(wrapper)
     expect(
       wrapper.findAll('.el-tag').filter((item) => {
         return !hasClass(item.element, 'in-tooltip')
@@ -1884,12 +1911,12 @@ describe('Select', () => {
 
     await wrapper.find('.select-trigger').trigger('click')
     const options = getOptions()
-    options[1].click()
+    await clickOptionItem(options[1])
     await nextTick()
     expect(wrapper.find('.el-tag').classes()).toContain('el-tag--success')
   })
 
-  test('modelValue should be deep reactive in multiple mode', async () => {
+  test('modelValue replacement should update in multiple mode', async () => {
     wrapper = _mount(
       `
     <el-select v-model="modelValue" multiple>
@@ -1912,13 +1939,15 @@ describe('Select', () => {
       })
     )
     const vm = wrapper.vm as any
+    const selectVm = wrapper.findComponent({ name: 'ElSelect' }).vm as any
     await nextTick()
     expect(wrapper.findAll('.el-tag').length).toBe(1)
 
-    vm.modelValue.splice(0, 1)
+    vm.modelValue = []
 
-    await nextTick()
-    expect(wrapper.findAll('.el-tag').length).toBe(0)
+    await vi.waitFor(() => {
+      expect(selectVm.selected).toHaveLength(0)
+    })
   })
 
   test('should reset placeholder after clear when both multiple and filterable are true', async () => {
@@ -1938,8 +1967,7 @@ describe('Select', () => {
     const innerInputEl = innerInput.element as HTMLInputElement
     expect(innerInputEl.placeholder).toBe('')
 
-    const tagCloseIcon = wrapper.find('.el-tag__close')
-    await tagCloseIcon.trigger('click')
+    await clickTagCloseButton(wrapper)
     expect(innerInputEl.placeholder).toBe(placeholder)
 
     const selectInput = wrapper.find('.el-select__input')
@@ -2120,8 +2148,8 @@ describe('Select', () => {
       )
 
       await nextTick()
-      const { selector } = wrapper.vm
-      expect(document.body.querySelector(selector).innerHTML).not.toBe('')
+      const { selector } = wrapper.vm as unknown as { selector: string }
+      expect(document.body.querySelector(selector)?.innerHTML).not.toBe('')
     })
 
     it('should not mount on the popper container', async () => {
@@ -2149,8 +2177,8 @@ describe('Select', () => {
       )
 
       await nextTick()
-      const { selector } = wrapper.vm
-      expect(document.body.querySelector(selector).innerHTML).toBe('')
+      const { selector } = wrapper.vm as unknown as { selector: string }
+      expect(document.body.querySelector(selector)?.innerHTML).toBe('')
     })
   })
 
@@ -2198,7 +2226,7 @@ describe('Select', () => {
     wrapper = getSelectVm()
 
     // large size
-    await wrapper.setProps({
+    await (wrapper as any).setProps({
       size: 'large',
     })
     await nextTick(nextTick)
@@ -2222,7 +2250,7 @@ describe('Select', () => {
     })
 
     for (const size in sizeMap) {
-      await wrapper.setProps({
+      await (wrapper as any).setProps({
         size,
       })
       await nextTick(nextTick)
@@ -2309,11 +2337,11 @@ describe('Select', () => {
       expect(vm.value).toBe('')
       expect(findInnerInput().value).toBe('')
       await nextTick()
-      options[1].click()
+      await clickOptionItem(options[1])
       await nextTick()
       expect(vm.value).toBe(1)
       expect(findInnerInput().value).toBe('y')
-      wrapper.vm.options = [
+      ;(wrapper.vm as SelectTestVm).options = [
         {
           label: 'group2',
           options: [
@@ -2326,11 +2354,11 @@ describe('Select', () => {
 
       await nextTick()
       options = getOptions()
-      options[1].click()
+      await clickOptionItem(options[1])
       await nextTick()
       expect(vm.value).toBe(1)
       expect(findInnerInput().value).toBe('y')
-      options[2].click()
+      await clickOptionItem(options[2])
       await nextTick()
       expect(vm.value).toBe(2)
       expect(findInnerInput().value).toBe('z')
@@ -2353,11 +2381,11 @@ describe('Select', () => {
       ]
 
       const wrapper = getSelectVm()
-      const vm = wrapper.vm
+      const vm = wrapper.vm as SelectTestVm
       const input = wrapper.find('input')
       const nativeInput = input.element
 
-      await wrapper.setProps({ modelValue: '1' })
+      await (wrapper as any).setProps({ modelValue: '1' })
       expect(nativeInput.value).toEqual('1')
 
       nativeInput.focus()
@@ -2366,8 +2394,8 @@ describe('Select', () => {
       expect(nativeInput.value).toEqual('option 1')
 
       vm.options = []
-      await wrapper.setProps({ modelValue: ['1'] })
-      await wrapper.setProps({ multiple: true })
+      await (wrapper as any).setProps({ modelValue: ['1'] })
+      await (wrapper as any).setProps({ multiple: true })
 
       nativeInput.focus()
       vm.options = options

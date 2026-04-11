@@ -2,6 +2,7 @@
 import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, test, vi } from 'vitest'
+import { clickCloseButton } from '../../../test-utils/dom'
 import { rAF } from '@element-plus/test-utils/tick'
 import Drawer from '../src/drawer.vue'
 import Button from '../../button/src/button.vue'
@@ -179,7 +180,7 @@ describe('Drawer', () => {
     await nextTick()
     const vm = wrapper.vm as any
 
-    await wrapper.find('.el-drawer__close-btn').trigger('click')
+    await clickCloseButton(wrapper, '.el-drawer__close-btn')
     await nextTick()
     await rAF()
     await nextTick()
@@ -233,7 +234,7 @@ describe('Drawer', () => {
     const classes = 'some-custom-class'
     const wrapper = _mount(
       `
-      <el-drawer :title='title' v-model='visible' ref='drawer' custom-class='${classes}'>
+      <el-drawer :title='title' v-model='visible' ref='drawer' class='${classes}'>
         <span>${content}</span>
       </el-drawer>
       `,

@@ -1,4 +1,5 @@
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { filterIndices } from '@element-plus/wasm'
 import { isFunction } from '@element-plus/utils'
 import { CHECKED_CHANGE_EVENT } from '../transfer-panel'
 import { usePropsAlias } from './use-props-alias'
@@ -12,15 +13,39 @@ import type {
   TransferPanelState,
 } from '../transfer-panel'
 
+const WASM_TRANSFER_FILTER_THRESHOLD = 1_000
+
 export const useCheck = (
   props: TransferPanelProps,
   panelState: TransferPanelState,
   emit: SetupContext<TransferPanelEmits>['emit']
 ) => {
   const propsAlias = usePropsAlias(props)
+  const filterSourceData = computed(() => [...props.data])
+  const filterLabels = computed(() => {
+    return filterSourceData.value.map((item) => {
+      return String(
+        item[propsAlias.value.label] || item[propsAlias.value.key]
+      )
+    })
+  })
+  const wasmFilterJobId = ref(0)
+  const wasmMatchedIndexes = ref<Set<number> | null>(null)
+  const shouldUseWasmFilter = computed(() => {
+    return (
+      !isFunction(props.filterMethod) &&
+      panelState.query.length > 0 &&
+      filterLabels.value.length >= WASM_TRANSFER_FILTER_THRESHOLD
+    )
+  })
 
   const filteredData = computed(() => {
-    return props.data.filter((item) => {
+    const matchedIndexes = wasmMatchedIndexes.value
+    if (matchedIndexes) {
+      return filterSourceData.value.filter((_, index) => matchedIndexes.has(index))
+    }
+
+    return filterSourceData.value.filter((item) => {
       if (isFunction(props.filterMethod)) {
         return props.filterMethod(panelState.query, item)
       } else {
@@ -44,9 +69,9 @@ export const useCheck = (
     if (noChecked && hasChecked) {
       return checkedLength > 0
         ? hasChecked
-            .replace(/\${checked}/g, checkedLength.toString())
-            .replace(/\${total}/g, dataLength.toString())
-        : noChecked.replace(/\${total}/g, dataLength.toString())
+            .replaceAll(/\${checked}/g, checkedLength.toString())
+            .replaceAll(/\${total}/g, dataLength.toString())
+        : noChecked.replaceAll(/\${total}/g, dataLength.toString())
     } else {
       return `${checkedLength}/${dataLength}`
     }
@@ -61,9 +86,10 @@ export const useCheck = (
     const checkableDataKeys = checkableData.value.map(
       (item) => item[propsAlias.value.key]
     )
+    const checkedSet = new Set(panelState.checked)
     panelState.allChecked =
       checkableDataKeys.length > 0 &&
-      checkableDataKeys.every((item) => panelState.checked.includes(item))
+      checkableDataKeys.every((item) => checkedSet.has(item))
   }
 
   const handleAllCheckedChange = (value: CheckboxValueType) => {
@@ -94,14 +120,44 @@ export const useCheck = (
   })
 
   watch(
-    () => props.data,
+    [filterLabels, () => panelState.query, shouldUseWasmFilter],
+    async ([labels, query, useWasm]) => {
+      const currentJobId = wasmFilterJobId.value + 1
+      wasmFilterJobId.value = currentJobId
+      wasmMatchedIndexes.value = null
+
+      if (!useWasm) {
+        return
+      }
+
+      try {
+        const matchedIndexes = await filterIndices(labels, query, false)
+
+        if (wasmFilterJobId.value !== currentJobId) {
+          return
+        }
+
+        wasmMatchedIndexes.value = new Set(matchedIndexes)
+      } catch {
+        if (wasmFilterJobId.value === currentJobId) {
+          wasmMatchedIndexes.value = null
+        }
+      }
+    },
+    {
+      immediate: true,
+    }
+  )
+
+  watch(
+    filterSourceData,
     () => {
       const checked: TransferKey[] = []
-      const filteredDataKeys = filteredData.value.map(
-        (item) => item[propsAlias.value.key]
+      const filteredDataKeys = new Set(
+        filteredData.value.map((item) => item[propsAlias.value.key])
       )
       panelState.checked.forEach((item) => {
-        if (filteredDataKeys.includes(item)) {
+        if (filteredDataKeys.has(item)) {
           checked.push(item)
         }
       })
@@ -121,12 +177,12 @@ export const useCheck = (
         return
 
       const checked: TransferKey[] = []
-      const checkableDataKeys = checkableData.value.map(
-        (item) => item[propsAlias.value.key]
+      const checkableDataKeys = new Set(
+        checkableData.value.map((item) => item[propsAlias.value.key])
       )
 
       val.forEach((item) => {
-        if (checkableDataKeys.includes(item)) {
+        if (checkableDataKeys.has(item)) {
           checked.push(item)
         }
       })

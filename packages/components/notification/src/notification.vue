@@ -7,7 +7,7 @@
     <div
       v-show="visible"
       :id="id"
-      :class="[ns.b(), customClass, horizontalClass]"
+      :class="[ns.b(), customClass, horizontalClass, typeClass]"
       :style="positionStyle"
       role="alert"
       @mouseenter="clearTimer"
@@ -30,9 +30,11 @@
             <p v-else v-html="message" />
           </slot>
         </div>
-        <el-icon v-if="showClose" :class="ns.e('closeBtn')" @click.stop="close">
-          <Close />
-        </el-icon>
+        <span v-if="showClose" :class="ns.e('closeBtn')" @click.stop="close">
+          <el-icon>
+            <Close />
+          </el-icon>
+        </span>
       </div>
     </div>
   </transition>

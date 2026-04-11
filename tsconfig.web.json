@@ -12,7 +12,7 @@
   },
   "vueCompilerOptions": {
     "target": 3.5,
-    "strictTemplates": false
+    "strictTemplates": true
   },
   "include": ["packages", "typings/components.d.ts", "typings/env.d.ts"],
   "exclude": [

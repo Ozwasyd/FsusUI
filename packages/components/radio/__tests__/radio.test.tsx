@@ -1,6 +1,7 @@
 import { nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, test } from 'vitest'
+import { setRadioValue } from '../../../test-utils/dom'
 import { ElFormItem } from '@element-plus/components/form'
 import Radio from '../src/radio.vue'
 import RadioGroup from '../src/radio-group.vue'
@@ -13,7 +14,7 @@ describe('Radio', () => {
     const radio = ref('')
     const wrapper = mount(() => <Radio v-model={radio.value} label="a" />)
     expect(wrapper.classes()).toContain('el-radio')
-    await wrapper.trigger('click')
+    await setRadioValue(wrapper)
     expect(wrapper.classes()).toContain('is-checked')
   })
 
@@ -44,7 +45,7 @@ describe('Radio', () => {
     const wrapper = mount(() => (
       <Radio v-model={radio.value} label="3" onChange={handleChange} />
     ))
-    await wrapper.trigger('click')
+    await setRadioValue(wrapper)
     await nextTick()
     expect(changeData.value).toEqual('3')
   })
@@ -82,7 +83,7 @@ describe('Radio group', () => {
     await nextTick()
     const [radio1, radio2] = wrapper.findAll('.el-radio')
     expect(radio1.classes()).toContain('is-checked')
-    await radio2.trigger('click')
+    await setRadioValue(radio2)
     expect(radio2.classes()).toContain('is-checked')
     expect(radio.value).toEqual(6)
   })
@@ -137,7 +138,7 @@ describe('Radio group', () => {
 
     const [radio1, radio2] = wrapper.findAll('.el-radio')
     expect(radio1.classes()).toContain('is-checked')
-    await radio2.trigger('click')
+    await setRadioValue(radio2)
     expect(radio.value).toEqual(3)
     expect(radio1.classes()).toContain('is-checked')
   })
@@ -156,8 +157,8 @@ describe('Radio group', () => {
         <Radio label={9}>9</Radio>
       </RadioGroup>
     ))
-    const radio2 = wrapper.findAll('.el-radio').at(1)
-    await radio2?.trigger('click')
+    const radio2 = wrapper.findAll('.el-radio').at(1)!
+    await setRadioValue(radio2)
     await nextTick()
     expect(data.value).toEqual(6)
   })
@@ -198,7 +199,7 @@ describe('Radio group', () => {
     const [radio1, radio2] = wrapper.findAll('.el-radio-button')
     expect(radio1.classes()).toContain('is-active')
     expect(wrapper.findAll('.is-disabled').length).toBe(3)
-    await radio2.trigger('click')
+    await setRadioValue(radio2)
     expect(radio.value).toEqual(3)
     expect(radio1.classes()).toContain('is-active')
   })
@@ -220,7 +221,7 @@ describe('Radio Button', () => {
     ))
     const [radio1, radio2] = wrapper.findAll('.el-radio-button')
     expect(radio1.classes()).toContain('is-active')
-    await radio2.trigger('click')
+    await setRadioValue(radio2)
     expect(radio2.classes()).toContain('is-active')
     expect(radio.value).toEqual(6)
   })
@@ -238,9 +239,12 @@ describe('Radio Button', () => {
       </RadioGroup>
     ))
     const radio1 = wrapper.find('.el-radio-button')
-    expect(radio1.find('span').attributes('style')).toContain(
-      'background-color: rgb(0, 0, 0); border-color: #000; box-shadow: -1px 0 0 0 #000; color: rgb(255, 255, 0);'
-    )
+    const style = (radio1.find('span').element as HTMLElement).style
+
+    expect(style.backgroundColor).toBe('rgb(0, 0, 0)')
+    expect(style.borderColor).toBe('rgb(0, 0, 0)')
+    expect(style.boxShadow).toBe('-1px 0 0 0 #000')
+    expect(style.color).toBe('rgb(255, 255, 0)')
   })
   it('change event', async () => {
     const radio = ref(3)
@@ -259,8 +263,8 @@ describe('Radio Button', () => {
         <RadioButton label={9}>9</RadioButton>
       </RadioGroup>
     ))
-    const radio2 = wrapper.findAll('.el-radio-button').at(1)
-    await radio2?.trigger('click')
+    const radio2 = wrapper.findAll('.el-radio-button').at(1)!
+    await setRadioValue(radio2)
     expect(radio.value).toEqual(6)
   })
   it('change event only triggers on user input', async () => {

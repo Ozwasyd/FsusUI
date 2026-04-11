@@ -73,18 +73,15 @@
   }
 
   @include e(headerbtn) {
+    @include ghost-icon-button(44px, 999px);
     position: absolute;
-    top: getCssVar('messagebox-padding-primary');
-    right: getCssVar('messagebox-padding-primary');
-    padding: 0;
-    border: none;
+    top: 10px;
+    right: 10px;
     outline: none;
-    background: transparent;
     font-size: var(
       #{getCssVarName('message-close-size')},
       map.get($message, 'close-size')
     );
-    cursor: pointer;
 
     .#{$namespace}-message-box__close {
       color: getCssVar('color-info');
@@ -96,6 +93,10 @@
       .#{$namespace}-message-box__close {
         color: getCssVar('color-primary');
       }
+    }
+
+    &:focus-visible {
+      @include a11y-focus-ring(2px, 999px);
     }
   }
 

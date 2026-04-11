@@ -1,6 +1,11 @@
 import { nextTick, reactive, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, test, vi } from 'vitest'
+import {
+  clickClearButton,
+  clickPickerCell,
+  clickTagCloseButton,
+} from '../../../test-utils/dom'
 import { EVENT_CODE } from '@element-plus/constants'
 import triggerEvent from '@element-plus/test-utils/trigger-event'
 import { ArrowDown, Check, CircleClose } from '@element-plus/icons-vue'
@@ -99,10 +104,10 @@ describe('Cascader.vue', () => {
     const trigger = wrapper.find(TRIGGER)
 
     await trigger.trigger('click')
-    ;(document.querySelector(NODE) as HTMLElement).click()
+    await clickPickerCell(document.querySelector(NODE) as HTMLElement)
     await nextTick()
     expect(handleExpandChange).toBeCalledWith(['zhejiang'])
-    ;(document.querySelectorAll(NODE)[1] as HTMLElement).click()
+    await clickPickerCell(document.querySelectorAll(NODE)[1] as HTMLElement)
     await nextTick()
     expect(handleChange).toBeCalledWith(['zhejiang', 'hangzhou'])
     expect(value.value).toEqual(['zhejiang', 'hangzhou'])
@@ -164,7 +169,7 @@ describe('Cascader.vue', () => {
     expect(wrapper.findComponent(ArrowDown).exists()).toBe(true)
     await trigger.trigger('mouseenter')
     expect(wrapper.findComponent(ArrowDown).exists()).toBe(false)
-    await wrapper.findComponent(CircleClose).trigger('click')
+    await clickClearButton(wrapper.findComponent(CircleClose))
     expect(wrapper.find('input').element.value).toBe('')
     expect(
       wrapper.findComponent(Cascader).vm.getCheckedNodes(false)?.length
@@ -203,7 +208,7 @@ describe('Cascader.vue', () => {
     expect(tags.length).toBe(2)
     expect(firstTag.text()).toBe('Zhejiang / Hangzhou')
     expect(secondTag.text()).toBe('Zhejiang / Ningbo')
-    await firstTag.find('.el-tag__close').trigger('click')
+    await clickTagCloseButton(firstTag)
     expect(wrapper.findAll(TAG).length).toBe(1)
     expect(value.value).toEqual([['zhejiang', 'ningbo']])
   })
@@ -321,11 +326,11 @@ describe('Cascader.vue', () => {
     const hzSuggestion = suggestions[0]
     expect(suggestions.length).toBe(1)
     expect(hzSuggestion.textContent).toBe('Zhejiang / Hangzhou')
-    hzSuggestion.click()
+    await clickPickerCell(hzSuggestion)
     await nextTick()
     expect(wrapper.findComponent(Check).exists()).toBeTruthy()
     expect(value.value).toEqual(['zhejiang', 'hangzhou'])
-    hzSuggestion.click()
+    await clickPickerCell(hzSuggestion)
     await nextTick()
     expect(value.value).toEqual(['zhejiang', 'hangzhou'])
   })
@@ -347,10 +352,10 @@ describe('Cascader.vue', () => {
     await input.trigger('input')
     await nextTick()
     const hzSuggestion = document.querySelector(SUGGESTION_ITEM) as HTMLElement
-    hzSuggestion.click()
+    await clickPickerCell(hzSuggestion)
     await nextTick()
     expect(value.value).toEqual([['zhejiang', 'hangzhou']])
-    hzSuggestion.click()
+    await clickPickerCell(hzSuggestion)
     await nextTick()
     expect(value.value).toEqual([])
   })
@@ -459,9 +464,9 @@ describe('Cascader.vue', () => {
   })
 
   test('should be able to trigger togglePopperVisible outside the component', async () => {
-    let cascader: InstanceType<typeof ElCascader>
+    const cascader = ref<InstanceType<typeof ElCascader>>()
     const clickFn = () => {
-      cascader.togglePopperVisible()
+      cascader.value?.togglePopperVisible()
     }
     const wrapper = _mount(() => (
       <div>
@@ -470,7 +475,7 @@ describe('Cascader.vue', () => {
       </div>
     ))
 
-    cascader = wrapper.findComponent(Cascader).vm
+    cascader.value = wrapper.findComponent(Cascader).vm
     const dropdown = wrapper.findComponent(ArrowDown).element as HTMLDivElement
     expect(dropdown.style.display).not.toBe('none')
     const button = wrapper.find('button')

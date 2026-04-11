@@ -1,22 +1,5 @@
 <template>
-  <el-tooltip
-    ref="popperRef"
-    :visible="suggestionVisible"
-    :placement="placement"
-    :fallback-placements="['bottom-start', 'top-start']"
-    :popper-class="[ns.e('popper'), popperClass]"
-    :teleported="teleported"
-    :gpu-acceleration="false"
-    pure
-    manual-mode
-    effect="light"
-    trigger="click"
-    :transition="`${ns.namespace.value}-zoom-in-top`"
-    persistent
-    role="listbox"
-    @before-show="onSuggestionShow"
-    @hide="onHide"
-  >
+  <el-tooltip ref="popperRef" v-bind="tooltipBindings" v-on="tooltipEvents">
     <div
       ref="listboxRef"
       :class="[ns.b(), $attrs.class]"
@@ -25,13 +8,13 @@
       aria-haspopup="listbox"
       :aria-expanded="suggestionVisible"
       :aria-owns="listboxId"
+      @mousedown="handleMouseDown"
     >
       <el-input
         ref="inputRef"
-        v-bind="attrs"
+        v-bind="inputAttrs"
         :clearable="clearable"
         :disabled="disabled"
-        :name="name"
         :model-value="modelValue"
         @input="handleInput"
         @change="handleChange"
@@ -43,7 +26,6 @@
         @keydown.enter="handleKeyEnter"
         @keydown.tab="close"
         @keydown.esc="handleKeyEscape"
-        @mousedown="handleMouseDown"
       >
         <template v-if="$slots.prepend" #prepend>
           <slot name="prepend" />
@@ -123,6 +105,7 @@ import type { AutocompleteData } from './autocomplete'
 import type { StyleValue } from 'vue'
 import type { TooltipInstance } from '@element-plus/components/tooltip'
 import type { InputInstance } from '@element-plus/components/input'
+import type { Placement } from '@element-plus/components/popper'
 
 const COMPONENT_NAME = 'ElAutocomplete'
 defineOptions({
@@ -154,6 +137,25 @@ const loading = ref(false)
 
 const listboxId = computed(() => ns.b(String(generateId())))
 const styles = computed(() => rawAttrs.style as StyleValue)
+const fallbackPlacements: Placement[] = ['bottom-start', 'top-start']
+const inputAttrs = computed(() => ({
+  ...attrs.value,
+  name: props.name,
+}))
+const tooltipBindings = computed(() => ({
+  visible: suggestionVisible.value,
+  placement: props.placement,
+  fallbackPlacements,
+  popperClass: [ns.e('popper'), props.popperClass],
+  teleported: props.teleported,
+  gpuAcceleration: false,
+  pure: true,
+  effect: 'light',
+  trigger: 'click' as const,
+  transition: `${ns.namespace.value}-zoom-in-top`,
+  persistent: true,
+  role: 'listbox' as const,
+}))
 
 const suggestionVisible = computed(() => {
   const isValidData = suggestions.value.length > 0
@@ -179,6 +181,11 @@ const onSuggestionShow = () => {
 
 const onHide = () => {
   highlightedIndex.value = -1
+}
+
+const tooltipEvents = {
+  'before-show': onSuggestionShow,
+  hide: onHide,
 }
 
 const getData = async (queryString: string) => {
@@ -259,7 +266,9 @@ const handleBlur = (evt: FocusEvent) => {
       ignoreFocusEvent = true
       return
     }
-    activated.value && close()
+    if (activated.value) {
+      close()
+    }
     emit('blur', evt)
   })
 }
@@ -348,7 +357,9 @@ const highlight = (index: number) => {
 }
 
 onClickOutside(listboxRef, () => {
-  suggestionVisible.value && close()
+  if (suggestionVisible.value) {
+    close()
+  }
 })
 
 onMounted(() => {

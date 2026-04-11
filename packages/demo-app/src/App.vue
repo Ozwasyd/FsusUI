@@ -1,39 +1,150 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref } from 'vue'
 import type { AutocompleteData } from '../../components/autocomplete'
 import type { UploadProgressEvent, UploadRequestOptions } from '../../components/upload'
 import {
-  ElCollapseTransition,
-  ElConfigProvider,
-  ElImageViewer,
   ElLoading,
   ElMessage,
   ElMessageBox,
   ElNotification,
   ElOverlay,
-  ElPopper,
   ElPopperArrow,
   ElPopperContent,
   ElPopperTrigger,
 } from '../../element-plus'
-import { FixedSizeList } from '../../components/virtual-list'
 import {
   ArrowLeft,
   Plus,
   Search,
   UploadFilled,
 } from '@element-plus/icons-vue'
+import { demoComponents } from './demo-components'
+import {
+  autocompleteDemoAttrs,
+  cascaderOptions,
+  cityOptions,
+  defaultFormModel,
+  feedbackCopy,
+  gallerySlides,
+  galleryUrls,
+  rawPopperContentAttrs,
+  sections,
+  selectV2Options,
+  tableData,
+  tableV2Columns,
+  tableV2Data,
+  timelineItems,
+  transferData,
+  treeData,
+  treeV2Props,
+} from './demo-data'
+import type { FeedbackTone } from './demo-data'
 
-const sections = [
-  { id: 'overview', label: '概览' },
-  { id: 'entry', label: '输入' },
-  { id: 'data', label: '数据展示' },
-  { id: 'navigation', label: '导航与反馈' },
-  { id: 'advanced', label: '高级能力' },
-]
+import type {
+  CascaderValue,
+  CheckboxGroupValueType,
+  CollapseModelValue,
+  TabPaneName,
+  TransferKey,
+} from '../../element-plus'
+
+const {
+  FixedSizeList,
+  ElAffix,
+  ElAlert,
+  ElAside,
+  ElAutocomplete,
+  ElAvatar,
+  ElBacktop,
+  ElBadge,
+  ElBreadcrumb,
+  ElBreadcrumbItem,
+  ElButton,
+  ElCalendar,
+  ElCard,
+  ElCarousel,
+  ElCarouselItem,
+  ElCascader,
+  ElCascaderPanel,
+  ElCheckbox,
+  ElCheckboxGroup,
+  ElCheckTag,
+  ElCol,
+  ElCollapse,
+  ElCollapseItem,
+  ElCollapseTransition,
+  ElColorPicker,
+  ElConfigProvider,
+  ElContainer,
+  ElCountdown,
+  ElDatePicker,
+  ElDescriptions,
+  ElDescriptionsItem,
+  ElDialog,
+  ElDivider,
+  ElDrawer,
+  ElDropdown,
+  ElDropdownItem,
+  ElDropdownMenu,
+  ElEmpty,
+  ElFooter,
+  ElForm,
+  ElFormItem,
+  ElHeader,
+  ElIcon,
+  ElImage,
+  ElImageViewer,
+  ElInput,
+  ElInputNumber,
+  ElLink,
+  ElMain,
+  ElMenu,
+  ElMenuItem,
+  ElMenuItemGroup,
+  ElOption,
+  ElPageHeader,
+  ElPagination,
+  ElPopconfirm,
+  ElPopover,
+  ElPopper,
+  ElProgress,
+  ElRadio,
+  ElRadioGroup,
+  ElRate,
+  ElResult,
+  ElRow,
+  ElScrollbar,
+  ElSelect,
+  ElSelectV2,
+  ElSlider,
+  ElSkeleton,
+  ElSpace,
+  ElStatistic,
+  ElStep,
+  ElSteps,
+  ElSubMenu,
+  ElSwitch,
+  ElTabPane,
+  ElTable,
+  ElTableColumn,
+  ElTableV2,
+  ElTabs,
+  ElTag,
+  ElText,
+  ElTimePicker,
+  ElTimeSelect,
+  ElTimeline,
+  ElTimelineItem,
+  ElTooltip,
+  ElTransfer,
+  ElTree,
+  ElTreeSelect,
+  ElTreeV2,
+  ElUpload,
+  ElWatermark,
+} = demoComponents
 
 const keyword = ref('')
-const cityOptions = ['上海', '北京', '深圳', '杭州', '广州', '成都']
 const querySearch = (query: string, callback: (items: Array<{ value: string }>) => void) => {
   const result = cityOptions
     .filter((item) => item.toLowerCase().includes(query.toLowerCase()))
@@ -41,31 +152,20 @@ const querySearch = (query: string, callback: (items: Array<{ value: string }>) 
   callback(result)
 }
 
-const makeSvg = (label: string, background: string) => {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="480" height="280" viewBox="0 0 480 280"><rect width="480" height="280" rx="32" fill="${background}" /><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="36" fill="#ffffff">${label}</text></svg>`
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`
-}
-
-const galleryUrls = [
-  makeSvg('FsusUI Hero', '#050505'),
-  makeSvg('Glass Surface', '#27272a'),
-  makeSvg('Mobile Layout', '#71717a'),
-]
-
 const badgeValue = ref(12)
 const checkTagChecked = ref(true)
-const sliderValue = ref(36)
+const sliderValue = ref<number | number[]>(36)
 const rateValue = ref(4.5)
-const switchValue = ref(true)
-const inputNumberValue = ref(8)
+const switchValue = ref<boolean | string | number>(true)
+const inputNumberValue = ref<number | undefined>(8)
 const selectValue = ref('studio')
 const selectV2Value = ref('hangzhou')
-const radioValue = ref('a')
-const checkboxValue = ref(['设计系统', '移动优先'])
-const timeSelectValue = ref('10:00')
-const activeTab = ref('summary')
+const radioValue = ref<boolean | string | number>('a')
+const checkboxValue = ref<CheckboxGroupValueType>(['设计系统', '移动优先'])
+const timeSelectValue = ref<string | undefined>('10:00')
+const activeTab = ref<TabPaneName>('summary')
 const currentPage = ref(2)
-const activeCollapse = ref(['1'])
+const activeCollapse = ref<CollapseModelValue>(['1'])
 const dialogVisible = ref(false)
 const drawerVisible = ref(false)
 const overlayVisible = ref(false)
@@ -74,13 +174,21 @@ const transitionVisible = ref(true)
 const infiniteCount = ref(20)
 const directiveLoading = ref(true)
 const rawPopperVisible = ref(false)
-const colorValue = ref('#050505')
-const cascaderValue = ref<string[]>(['guide', 'token'])
-const cascaderPanelValue = ref<string[]>(['component', 'button'])
+const rawPopperTriggerRef = ref<HTMLElement>()
+const rawPopperContentRef = ref<{
+  updatePopper: (shouldUpdateZIndex?: boolean) => void
+  popperContentRef?: HTMLElement | { value?: HTMLElement | null } | null
+} | null>(null)
+const colorValue = ref<string | null>('#050505')
+const cascaderValue = ref<CascaderValue>(['guide', 'token'])
+const cascaderPanelValue = ref<CascaderValue>(['component', 'button'])
 const timeValue = ref(new Date())
-const timeRangeValue = ref([new Date(), new Date(Date.now() + 1000 * 60 * 45)])
+const timeRangeValue = ref<[Date, Date]>([
+  new Date(),
+  new Date(Date.now() + 1000 * 60 * 45),
+])
 const dateValue = ref(new Date())
-const dateRangeValue = ref([
+const dateRangeValue = ref<[Date, Date]>([
   new Date(Date.now() - 1000 * 60 * 60 * 24 * 2),
   new Date(),
 ])
@@ -88,101 +196,13 @@ const countdownTarget = ref(Date.now() + 1000 * 60 * 60 * 6)
 const treeSelectValue = ref('visual')
 const uploadLog = ref('尚未上传文件')
 const carouselIndex = ref(0)
+const timeoutHandles = new Set<number>()
+const activeLoadingInstances = new Set<{ close: () => void }>()
 
-const formModel = reactive({
-  project: 'FsusUI Demo',
-  owner: 'Design Ops',
-  stage: 'beta',
-  agree: true,
-})
-
-const selectV2Options = [
-  { label: 'Hangzhou', value: 'hangzhou' },
-  { label: 'Shanghai', value: 'shanghai' },
-  { label: 'Tokyo', value: 'tokyo' },
-  { label: 'Berlin', value: 'berlin' },
-]
-
-const cascaderOptions = [
-  {
-    value: 'guide',
-    label: '设计规范',
-    children: [
-      { value: 'token', label: 'Token 系统' },
-      { value: 'motion', label: '动效策略' },
-    ],
-  },
-  {
-    value: 'component',
-    label: '组件层',
-    children: [
-      { value: 'button', label: 'Button' },
-      { value: 'overlay', label: 'Overlay' },
-    ],
-  },
-]
-
-const transferData = Array.from({ length: 8 }, (_, index) => ({
-  key: index + 1,
-  label: `资源 ${index + 1}`,
-  disabled: index === 5,
-}))
-const transferValue = ref([2, 4])
-
-const treeData = [
-  {
-    id: 'foundation',
-    value: 'foundation',
-    label: '基础层',
-    children: [
-      { id: 'visual', value: 'visual', label: '视觉 Token' },
-      { id: 'motion', value: 'motion', label: '动效模式' },
-    ],
-  },
-  {
-    id: 'patterns',
-    value: 'patterns',
-    label: '模式层',
-    children: [
-      { id: 'mobile', value: 'mobile', label: '移动端布局' },
-      { id: 'desktop', value: 'desktop', label: '桌面端布局' },
-    ],
-  },
-]
-
-const treeV2Props = {
-  value: 'value',
-  label: 'label',
-  children: 'children',
-}
+const formModel = reactive({ ...defaultFormModel })
+const transferValue = ref<TransferKey[]>([2, 4])
 
 const menuIndex = ref('1-1')
-
-const tableData = [
-  { date: '2026-04-06', name: '视觉一致性', address: '设计评审中' },
-  { date: '2026-04-07', name: '交互焦点环', address: '验收通过' },
-  { date: '2026-04-08', name: '骨架屏过渡', address: '联调中' },
-]
-
-const tableV2Columns = [
-  { key: 'name', dataKey: 'name', title: '组件', width: 180 },
-  { key: 'status', dataKey: 'status', title: '状态', width: 120 },
-  { key: 'owner', dataKey: 'owner', title: '负责人', width: 140 },
-]
-
-const tableV2Data = [
-  { id: 1, name: 'Button', status: 'Ready', owner: 'UI' },
-  { id: 2, name: 'Dialog', status: 'Review', owner: 'UX' },
-  { id: 3, name: 'Table', status: 'Demo', owner: 'FE' },
-  { id: 4, name: 'Tree', status: 'Demo', owner: 'FE' },
-  { id: 5, name: 'Upload', status: 'Mocked', owner: 'FE' },
-]
-
-const timelineItems = [
-  { timestamp: '09:00', label: '主题 Token 初始化' },
-  { timestamp: '11:30', label: '移动端断点整理' },
-  { timestamp: '15:00', label: '交互与焦点审查' },
-]
 
 const virtualRows = computed(() =>
   Array.from({ length: 120 }, (_, index) => `虚拟列表第 ${index + 1} 项`)
@@ -191,6 +211,40 @@ const virtualRows = computed(() =>
 const infiniteRows = computed(() =>
   Array.from({ length: infiniteCount.value }, (_, index) => `无限滚动内容 ${index + 1}`)
 )
+
+const scheduleTimeout = (callback: () => void, delay: number) => {
+  const timerId = window.setTimeout(() => {
+    timeoutHandles.delete(timerId)
+    callback()
+  }, delay)
+
+  timeoutHandles.add(timerId)
+  return timerId
+}
+
+const resolveElement = (candidate: unknown) => {
+  if (candidate instanceof HTMLElement) {
+    return candidate
+  }
+
+  if (candidate && typeof candidate === 'object' && 'value' in candidate) {
+    const maybeRef = candidate as { value?: unknown }
+    return maybeRef.value instanceof HTMLElement ? maybeRef.value : null
+  }
+
+  return null
+}
+
+const scrollFocusedElementIntoView = (event: FocusEvent) => {
+  const target = event.target
+  if (target instanceof HTMLElement) {
+    target.scrollIntoView({
+      block: 'nearest',
+      inline: 'nearest',
+      behavior: 'smooth',
+    })
+  }
+}
 
 const showSelectFeedback = (value: string) => {
   ElMessage.success(`已选择 ${value}`)
@@ -206,7 +260,9 @@ const openServiceLoading = () => {
     text: '正在模拟骨架优先加载...',
     background: 'rgba(255,255,255,0.72)',
   })
-  window.setTimeout(() => {
+  activeLoadingInstances.add(instance)
+  scheduleTimeout(() => {
+    activeLoadingInstances.delete(instance)
     instance.close()
   }, 1200)
 }
@@ -220,11 +276,20 @@ const openMessageBox = async () => {
   }
 }
 
-const openNotification = () => {
+const openGlobalMessage = (tone: FeedbackTone) => {
+  ElMessage({
+    type: tone,
+    message: feedbackCopy[tone].message,
+    showClose: true,
+    grouping: true,
+  })
+}
+
+const openNotification = (tone: FeedbackTone = 'success') => {
   ElNotification({
-    title: '验收提醒',
-    message: '当前 demo 服务已就绪，可继续在手机端复核。',
-    type: 'success',
+    title: feedbackCopy[tone].title,
+    message: feedbackCopy[tone].notification,
+    type: tone,
   })
 }
 
@@ -235,7 +300,7 @@ const loadMore = () => {
 
 const toggleDirectiveLoading = () => {
   directiveLoading.value = true
-  window.setTimeout(() => {
+  scheduleTimeout(() => {
     directiveLoading.value = false
   }, 900)
 }
@@ -248,7 +313,7 @@ const mockUpload = (options: UploadRequestOptions) => {
   uploadLog.value = `开始上传 ${options.file.name}`
   options.onProgress(createUploadProgressEvent(40))
   return new Promise((resolve) => {
-    window.setTimeout(() => {
+    scheduleTimeout(() => {
       options.onProgress(createUploadProgressEvent(100))
       options.onSuccess({ ok: true, name: options.file.name })
       uploadLog.value = `上传成功：${options.file.name}`
@@ -257,13 +322,74 @@ const mockUpload = (options: UploadRequestOptions) => {
   })
 }
 
-const handleRawPopperEnter = () => {
-  rawPopperVisible.value = true
+const updateRawPopperPosition = () => {
+  rawPopperContentRef.value?.updatePopper()
 }
 
-const handleRawPopperLeave = () => {
+const closeRawPopper = () => {
   rawPopperVisible.value = false
 }
+
+const toggleRawPopper = async (event?: Event) => {
+  event?.preventDefault()
+  rawPopperVisible.value = !rawPopperVisible.value
+
+  if (rawPopperVisible.value) {
+    await nextTick()
+    updateRawPopperPosition()
+  }
+}
+
+const handleRawPopperKeydown = (event: Event) => {
+  if (!(event instanceof KeyboardEvent)) {
+    return
+  }
+
+  if (event.key === 'Enter' || event.key === ' ') {
+    void toggleRawPopper(event)
+    return
+  }
+
+  if (event.key === 'Escape') {
+    closeRawPopper()
+  }
+}
+
+const handleRawPopperPointerdown = (event: PointerEvent) => {
+  if (!rawPopperVisible.value) return
+
+  const target = event.target
+  if (!(target instanceof Node)) return
+
+  const contentEl = resolveElement(rawPopperContentRef.value?.popperContentRef)
+
+  if (
+    rawPopperTriggerRef.value?.contains(target)
+    || contentEl?.contains(target)
+  ) {
+    return
+  }
+
+  closeRawPopper()
+}
+
+onMounted(() => {
+  document.addEventListener('pointerdown', handleRawPopperPointerdown)
+})
+
+onUnmounted(() => {
+  for (const timerId of timeoutHandles) {
+    window.clearTimeout(timerId)
+  }
+  timeoutHandles.clear()
+
+  for (const instance of activeLoadingInstances) {
+    instance.close()
+  }
+  activeLoadingInstances.clear()
+
+  document.removeEventListener('pointerdown', handleRawPopperPointerdown)
+})
 </script>
 
 <template>
@@ -293,6 +419,7 @@ const handleRawPopperLeave = () => {
           v-for="section in sections"
           :key="section.id"
           :href="`#${section.id}`"
+          @focus="scrollFocusedElementIntoView"
         >{{ section.label }}</a>
       </nav>
     </header>
@@ -345,22 +472,57 @@ const handleRawPopperLeave = () => {
           <article class="demo-card">
             <h3>Alert / Badge / Avatar</h3>
             <p>用于检查信息提示层级与灰阶视觉。</p>
-            <el-alert
-              title="当前为验收环境"
-              type="info"
-              :closable="false"
-            />
-            <div class="stack">
-              <el-badge :value="badgeValue">
-                <el-button>通知中心</el-button>
-              </el-badge>
-              <el-avatar :size="44">
-                FS
-              </el-avatar>
-              <el-avatar
-                :size="44"
-                :src="galleryUrls[1]"
+            <div class="semantic-alert-stack alert-cluster">
+              <el-alert
+                class="neutral-alert"
+                title="当前为验收环境"
+                description="保持单色基调的同时，用图标、标题和强调边界区分状态。"
+                type="info"
+                :closable="false"
+                show-icon
               />
+              <el-alert
+                class="neutral-alert"
+                title="移动端命中区已提高"
+                description="按钮、输入框与层级节点会统一向 44px 左右的可点按尺寸靠拢。"
+                type="success"
+                :closable="false"
+                show-icon
+              />
+              <el-alert
+                class="neutral-alert"
+                title="表格需要横向滚动复核"
+                description="小屏保留表格结构，不做卡片化重构，重点检查滚动与标题可读性。"
+                type="warning"
+                :closable="false"
+                show-icon
+              />
+            </div>
+            <div class="identity-stack">
+              <el-badge
+                class="monochrome-badge"
+                :value="badgeValue"
+              >
+                <el-button
+                  plain
+                  class="surface-button"
+                >
+                  通知中心
+                </el-button>
+              </el-badge>
+              <div class="avatar-stack">
+                <el-avatar
+                  class="profile-avatar"
+                  :size="48"
+                >
+                  FS
+                </el-avatar>
+                <el-avatar
+                  class="profile-avatar"
+                  :size="48"
+                  :src="galleryUrls[1]"
+                />
+              </div>
             </div>
           </article>
 
@@ -390,23 +552,36 @@ const handleRawPopperLeave = () => {
             <p>检查布局骨架在小尺寸下是否仍有阅读呼吸感。</p>
             <div class="demo-phone-frame">
               <div class="demo-phone-screen">
-                <el-container>
-                  <el-header style="background:#050505;color:#fff;display:flex;align-items:center;">
-                    FsusUI
+                <el-container class="container-showcase">
+                  <el-header class="container-showcase__header">
+                    <div>
+                      <div class="container-showcase__kicker">
+                        workspace
+                      </div>
+                      <strong>FsusUI</strong>
+                    </div>
                   </el-header>
-                  <el-container>
+                  <el-container class="container-showcase__body">
                     <el-aside
-                      width="72px"
-                      style="background:#fafafa;padding:12px;"
+                      width="92px"
+                      class="container-showcase__aside"
                     >
-                      Aside
+                      <span>Aside</span>
+                      <small>Navigation</small>
                     </el-aside>
-                    <el-main style="min-height:120px;">
-                      Main
+                    <el-main class="container-showcase__main">
+                      <div class="container-showcase__panel">
+                        <div class="container-showcase__kicker">
+                          content
+                        </div>
+                        <strong>Main</strong>
+                        <p>字重、字距与灰阶层次统一回到同一设计系统。</p>
+                      </div>
                     </el-main>
                   </el-container>
-                  <el-footer style="background:#fafafa;">
-                    Footer
+                  <el-footer class="container-showcase__footer">
+                    <span>Footer</span>
+                    <small>Meta</small>
                   </el-footer>
                 </el-container>
               </div>
@@ -436,28 +611,54 @@ const handleRawPopperLeave = () => {
             <p>大面积展示品牌水印、图片与轮播，便于查看毛玻璃与边界处理。</p>
             <el-watermark content="FsusUI">
               <div class="hero-watermark">
-                <el-carousel
-                  height="180px"
-                  indicator-position="outside"
-                  @change="carouselIndex = $event"
-                >
-                  <el-carousel-item
-                    v-for="(url, index) in galleryUrls"
-                    :key="url"
-                  >
-                    <el-card
-                      shadow="never"
-                      style="height:100%;border:none;display:grid;place-items:center;background:transparent;"
+                <div class="hero-watermark-grid">
+                  <div class="hero-carousel-shell">
+                    <el-carousel
+                      class="hero-carousel"
+                      height="260px"
+                      arrow="always"
+                      @change="carouselIndex = $event"
                     >
-                      <el-image
-                        :src="url"
-                        fit="cover"
-                        style="width:100%;height:140px;border-radius:18px;"
-                      />
-                      <el-text>轮播 {{ index + 1 }} / {{ galleryUrls.length }}</el-text>
-                    </el-card>
-                  </el-carousel-item>
-                </el-carousel>
+                      <el-carousel-item
+                        v-for="slide in gallerySlides"
+                        :key="slide.url"
+                      >
+                        <div class="hero-slide">
+                          <div class="hero-slide-copy">
+                            <span class="demo-kicker">{{ slide.tag }}</span>
+                            <strong>{{ slide.title }}</strong>
+                            <p>{{ slide.summary }}</p>
+                          </div>
+                          <el-image
+                            :src="slide.url"
+                            fit="cover"
+                            class="hero-slide-image"
+                          />
+                        </div>
+                      </el-carousel-item>
+                    </el-carousel>
+                    <div class="hero-carousel-meta">
+                      <span class="demo-kicker">Slide {{ carouselIndex + 1 }} / {{ gallerySlides.length }}</span>
+                      <p>Watermark、Carousel 与 Image 分层布局，避免被内层 Card 和容器高度裁切。</p>
+                    </div>
+                  </div>
+
+                  <el-card
+                    shadow="never"
+                    class="hero-preview-card"
+                  >
+                    <div class="hero-preview-head">
+                      <span class="demo-kicker">Preview Card</span>
+                      <span class="hero-index">0{{ carouselIndex + 1 }}</span>
+                    </div>
+                    <el-image
+                      :src="gallerySlides[carouselIndex].url"
+                      fit="cover"
+                      class="hero-preview-image"
+                    />
+                    <p>{{ gallerySlides[carouselIndex].summary }}</p>
+                  </el-card>
+                </div>
               </div>
             </el-watermark>
           </article>
@@ -497,7 +698,7 @@ const handleRawPopperLeave = () => {
                 <el-autocomplete
                   v-model="keyword"
                   :fetch-suggestions="querySearch"
-                  placeholder="搜索城市或标签"
+                  v-bind="autocompleteDemoAttrs"
                   @select="handleAutocompleteSelect"
                 />
               </el-form-item>
@@ -577,7 +778,10 @@ const handleRawPopperLeave = () => {
               :options="cascaderOptions"
             />
             <div class="stack">
-              <el-color-picker v-model="colorValue" />
+              <el-color-picker
+                :model-value="colorValue ?? undefined"
+                @update:model-value="colorValue = $event"
+              />
               <el-slider
                 v-model="sliderValue"
                 :max="100"
@@ -688,58 +892,104 @@ const handleRawPopperLeave = () => {
           <article class="demo-card">
             <h3>Descriptions / Result / Empty</h3>
             <p>说明性组件与结果页组件。</p>
-            <el-descriptions
-              :column="2"
-              border
-            >
-              <el-descriptions-item label="主题">
-                极简黑白灰
-              </el-descriptions-item>
-              <el-descriptions-item label="主强调">
-                Brand Black
-              </el-descriptions-item>
-              <el-descriptions-item label="状态">
-                Ready
-              </el-descriptions-item>
-              <el-descriptions-item label="适配">
-                Mobile
-              </el-descriptions-item>
-            </el-descriptions>
-            <el-result
-              icon="success"
-              title="验收通过"
-              sub-title="交互和视觉都已进入复核阶段"
-            />
-            <el-empty description="空状态也保持留白与节奏" />
+            <div class="semantic-data-stack">
+              <el-descriptions
+                class="monochrome-descriptions"
+                :column="1"
+                border
+              >
+                <el-descriptions-item label="主题">
+                  极简黑白灰
+                </el-descriptions-item>
+                <el-descriptions-item label="主强调">
+                  Brand Black
+                </el-descriptions-item>
+                <el-descriptions-item label="状态">
+                  Ready
+                </el-descriptions-item>
+                <el-descriptions-item label="适配">
+                  Mobile
+                </el-descriptions-item>
+              </el-descriptions>
+              <el-result
+                class="monochrome-result"
+                icon="success"
+                title="验收通过"
+                sub-title="交互和视觉都已进入复核阶段"
+              >
+                <template #icon>
+                  <div
+                    class="result-orbit"
+                    aria-hidden="true"
+                  />
+                </template>
+                <template #extra>
+                  <el-button
+                    plain
+                    class="surface-button"
+                  >
+                    查看验收报告
+                  </el-button>
+                </template>
+              </el-result>
+              <el-empty
+                class="monochrome-empty"
+                description="空状态也保持留白与节奏"
+              >
+                <template #image>
+                  <div
+                    class="empty-wireframe"
+                    aria-hidden="true"
+                  >
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                </template>
+                <el-button
+                  plain
+                  class="surface-button"
+                >
+                  添加首个模块
+                </el-button>
+              </el-empty>
+            </div>
           </article>
 
           <article class="demo-card wide">
             <h3>Table / TableV2</h3>
             <p>普通表格与虚拟表格并列验证。</p>
-            <el-table
-              :data="tableData"
-              style="width:100%;margin-bottom:12px;"
-            >
-              <el-table-column
-                prop="date"
-                label="日期"
-                width="120"
+            <div class="table-scroll-shell">
+              <el-table
+                :data="tableData"
+                class="table-review"
+                style="min-width:560px;margin-bottom:12px;"
+              >
+                <el-table-column
+                  prop="date"
+                  label="日期"
+                  width="140"
+                />
+                <el-table-column
+                  prop="name"
+                  label="模块"
+                  min-width="180"
+                />
+                <el-table-column
+                  prop="address"
+                  label="状态"
+                  min-width="180"
+                />
+              </el-table>
+            </div>
+            <div class="table-scroll-shell">
+              <el-table-v2
+                :columns="tableV2Columns"
+                :data="tableV2Data"
+                :width="680"
+                :height="220"
               />
-              <el-table-column
-                prop="name"
-                label="模块"
-              />
-              <el-table-column
-                prop="address"
-                label="状态"
-              />
-            </el-table>
-            <el-table-v2
-              :columns="tableV2Columns"
-              :data="tableV2Data"
-              :width="520"
-              :height="220"
-            />
+            </div>
           </article>
 
           <article class="demo-card">
@@ -766,10 +1016,12 @@ const handleRawPopperLeave = () => {
           <article class="demo-card">
             <h3>Skeleton / Divider / Space</h3>
             <p>重点确认骨架脉冲替代传统 spinner。</p>
-            <el-skeleton
-              animated
-              :rows="4"
-            />
+            <div class="skeleton-preview">
+              <el-skeleton
+                animated
+                :rows="4"
+              />
+            </div>
             <el-divider content-position="left">
               分割线
             </el-divider>
@@ -789,23 +1041,21 @@ const handleRawPopperLeave = () => {
           <article class="demo-card wide">
             <h3>Tree / TreeSelect / TreeV2</h3>
             <p>树形结构同时覆盖传统树、树选择器和虚拟树。</p>
-            <div class="stack column">
+            <div class="stack column tree-stack">
               <el-tree
                 :data="treeData"
                 node-key="id"
-                default-expand-all
               />
               <el-tree-select
                 v-model="treeSelectValue"
                 :data="treeData"
                 node-key="value"
-                default-expand-all
               />
               <el-tree-v2
                 :data="treeData"
                 :height="220"
                 :props="treeV2Props"
-                :item-size="36"
+                :item-size="44"
               />
             </div>
           </article>
@@ -813,10 +1063,7 @@ const handleRawPopperLeave = () => {
           <article class="demo-card full">
             <h3>Scrollbar / VirtualList / InfiniteScroll</h3>
             <p>滚动相关组件统一放在一起，直接检查长内容在手机端的表现。</p>
-            <div
-              class="demo-grid"
-              style="grid-template-columns:repeat(3,minmax(0,1fr));"
-            >
+            <div class="scroll-cluster">
               <div class="muted-box">
                 <el-scrollbar height="220px">
                   <p
@@ -827,10 +1074,10 @@ const handleRawPopperLeave = () => {
                   </p>
                 </el-scrollbar>
               </div>
-              <div class="muted-box">
+              <div class="muted-box virtual-shell">
                 <FixedSizeList
                   :height="220"
-                  :width="320"
+                  width="100%"
                   :total="virtualRows.length"
                   :item-size="44"
                 >
@@ -846,7 +1093,7 @@ const handleRawPopperLeave = () => {
               </div>
               <ul
                 v-infinite-scroll="loadMore"
-                class="scroll-list"
+                class="scroll-list infinite-shell"
               >
                 <li
                   v-for="item in infiniteRows"
@@ -1025,12 +1272,18 @@ const handleRawPopperLeave = () => {
             <el-dialog
               v-model="dialogVisible"
               title="Dialog 示例"
+              destroy-on-close
+              close-on-click-modal
+              close-on-press-escape
             >
               <p>对话框使用半透明背景和模糊效果。</p>
             </el-dialog>
             <el-drawer
               v-model="drawerVisible"
               title="Drawer 示例"
+              destroy-on-close
+              close-on-click-modal
+              close-on-press-escape
             >
               <p>抽屉也用于检查悬浮层的阅读节奏。</p>
             </el-drawer>
@@ -1058,10 +1311,23 @@ const handleRawPopperLeave = () => {
             <h3>Message / Notification / MessageBox / Loading</h3>
             <p>全局 API 统一从这里触发，便于验收交互链路。</p>
             <div class="stack">
-              <el-button @click="ElMessage.success('消息已发送')">
-                Message
+              <el-button @click="openGlobalMessage('success')">
+                Success Message
               </el-button>
-              <el-button @click="openNotification">
+              <el-button
+                plain
+                @click="openGlobalMessage('warning')"
+              >
+                Warning Message
+              </el-button>
+              <el-button
+                type="danger"
+                plain
+                @click="openGlobalMessage('error')"
+              >
+                Error Message
+              </el-button>
+              <el-button @click="openNotification('info')">
                 Notification
               </el-button>
               <el-button @click="openMessageBox">
@@ -1073,7 +1339,7 @@ const handleRawPopperLeave = () => {
             </div>
             <div
               v-loading="directiveLoading"
-              class="muted-box"
+              :class="['muted-box', 'loading-demo-box', { 'is-busy': directiveLoading }]"
             >
               <p>这是 `v-loading` 指令示例区域。</p>
               <el-button
@@ -1105,18 +1371,25 @@ const handleRawPopperLeave = () => {
           <article class="demo-card">
             <h3>Collapse / CollapseTransition</h3>
             <p>一个标准折叠组件，一个底层过渡组件。</p>
-            <el-collapse v-model="activeCollapse">
-              <el-collapse-item
-                title="折叠项目 A"
-                name="1"
-              >
-                内容 A
+            <el-collapse
+              v-model="activeCollapse"
+              class="collapse-review"
+            >
+              <el-collapse-item name="1">
+                <template #title>
+                  <span class="collapse-item-title">折叠项目 A</span>
+                </template>
+                <div class="collapse-item-copy">
+                  内容 A
+                </div>
               </el-collapse-item>
-              <el-collapse-item
-                title="折叠项目 B"
-                name="2"
-              >
-                内容 B
+              <el-collapse-item name="2">
+                <template #title>
+                  <span class="collapse-item-title">折叠项目 B</span>
+                </template>
+                <div class="collapse-item-copy">
+                  内容 B
+                </div>
               </el-collapse-item>
             </el-collapse>
             <el-button
@@ -1140,11 +1413,15 @@ const handleRawPopperLeave = () => {
             <p>大图预览能力。</p>
             <div class="stack">
               <el-image
+                class="inline-image-preview"
                 :src="galleryUrls[0]"
                 fit="cover"
-                style="width:120px;height:80px;border-radius:14px;"
               />
-              <el-button @click="imageViewerVisible = true">
+              <el-button
+                plain
+                class="surface-button"
+                @click="imageViewerVisible = true"
+              >
                 打开 ImageViewer
               </el-button>
             </div>
@@ -1158,27 +1435,44 @@ const handleRawPopperLeave = () => {
           <article class="demo-card">
             <h3>Popover Low-level Popper</h3>
             <p>直接组合 Popper Trigger / Content / Arrow，验证低层导出。</p>
-            <ElPopper>
+            <ElPopper role="dialog">
               <ElPopperTrigger
+                id="raw-popper-panel"
                 :open="rawPopperVisible"
-                :on-mouseenter="handleRawPopperEnter"
-                :on-mouseleave="handleRawPopperLeave"
+                :on-click="toggleRawPopper"
+                :on-keydown="handleRawPopperKeydown"
               >
-                <el-button plain>
+                <button
+                  ref="rawPopperTriggerRef"
+                  type="button"
+                  class="raw-popper-button"
+                  :aria-expanded="rawPopperVisible"
+                  aria-controls="raw-popper-panel"
+                  @focus="scrollFocusedElementIntoView"
+                >
                   原始 Popper
-                </el-button>
+                </button>
               </ElPopperTrigger>
               <ElPopperContent
+                ref="rawPopperContentRef"
+                v-bind="rawPopperContentAttrs"
                 :visible="rawPopperVisible"
-                placement="bottom"
+                :reference-el="rawPopperTriggerRef || undefined"
+                :trigger-target-el="rawPopperTriggerRef || undefined"
+                placement="bottom-start"
+                :offset="10"
+                strategy="fixed"
                 effect="light"
+                popper-class="low-level-popper-surface"
               >
                 <div
                   class="low-level-popper"
-                  @mouseenter="handleRawPopperEnter"
-                  @mouseleave="handleRawPopperLeave"
                 >
-                  原始 Popper 组合已生效。
+                  <div class="demo-kicker">
+                    low-level popper
+                  </div>
+                  <strong>定位已锁定到触发按钮左侧起点。</strong>
+                  <p>点击按钮可打开或关闭，点击卡片外区域会自动收起。</p>
                   <ElPopperArrow />
                 </div>
               </ElPopperContent>
@@ -1214,7 +1508,10 @@ const handleRawPopperLeave = () => {
           <article class="demo-card wide">
             <h3>Card / Statistic / Progress / Result 组合面板</h3>
             <p>用于检查同一块画面里的多组件混排能力。</p>
-            <el-card shadow="never">
+            <el-card
+              shadow="never"
+              class="metric-panel"
+            >
               <div
                 class="stack"
                 style="justify-content:space-between;align-items:flex-start;"
@@ -1237,10 +1534,18 @@ const handleRawPopperLeave = () => {
                 />
               </div>
               <el-result
+                class="monochrome-result compact-result"
                 icon="info"
                 title="结构化混排"
                 sub-title="卡片、统计、进度和结果组件可共同出现。"
-              />
+              >
+                <template #icon>
+                  <div
+                    class="result-orbit result-orbit--compact"
+                    aria-hidden="true"
+                  />
+                </template>
+              </el-result>
             </el-card>
           </article>
         </div>

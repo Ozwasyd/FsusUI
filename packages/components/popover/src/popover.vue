@@ -1,34 +1,5 @@
 <template>
-  <el-tooltip
-    ref="tooltipRef"
-    v-bind="$attrs"
-    :trigger="trigger"
-    :placement="placement"
-    :disabled="disabled"
-    :visible="visible"
-    :transition="transition"
-    :popper-options="popperOptions"
-    :tabindex="tabindex"
-    :content="content"
-    :offset="offset"
-    :show-after="showAfter"
-    :hide-after="hideAfter"
-    :auto-close="autoClose"
-    :show-arrow="showArrow"
-    :aria-label="title"
-    :effect="effect"
-    :enterable="enterable"
-    :popper-class="kls"
-    :popper-style="style"
-    :teleported="teleported"
-    :persistent="persistent"
-    :gpu-acceleration="gpuAcceleration"
-    @update:visible="onUpdateVisible"
-    @before-show="beforeEnter"
-    @before-hide="beforeLeave"
-    @show="afterEnter"
-    @hide="afterLeave"
-  >
+  <el-tooltip ref="tooltipRef" v-bind="tooltipBindings" v-on="tooltipEvents">
     <template v-if="$slots.reference">
       <slot name="reference" />
     </template>
@@ -44,7 +15,7 @@
   </el-tooltip>
 </template>
 <script lang="ts" setup>
-import { computed, ref, unref } from 'vue'
+import { computed, ref, unref, useAttrs } from 'vue'
 import { ElTooltip } from '@element-plus/components/tooltip'
 import { addUnit } from '@element-plus/utils'
 import { useNamespace } from '@element-plus/hooks'
@@ -57,6 +28,7 @@ defineOptions({
 
 const props = defineProps(popoverProps)
 const emit = defineEmits(popoverEmits)
+const attrs = useAttrs()
 
 const updateEventKeyRaw = `onUpdate:visible` as const
 
@@ -86,6 +58,37 @@ const kls = computed(() => {
 const gpuAcceleration = computed(() => {
   return props.transition === `${ns.namespace.value}-fade-in-linear`
 })
+const tooltipBindings = computed(() => ({
+  ...attrs,
+  trigger: props.trigger,
+  placement: props.placement,
+  disabled: props.disabled,
+  visible: props.visible,
+  transition: props.transition,
+  popperOptions: props.popperOptions,
+  tabindex: props.tabindex,
+  content: props.content,
+  offset: props.offset,
+  showAfter: props.showAfter,
+  hideAfter: props.hideAfter,
+  autoClose: props.autoClose,
+  showArrow: props.showArrow,
+  ariaLabel: props.title,
+  effect: props.effect,
+  enterable: props.enterable,
+  popperClass: kls.value,
+  popperStyle: style.value,
+  teleported: props.teleported,
+  persistent: props.persistent,
+  gpuAcceleration: gpuAcceleration.value,
+}))
+const tooltipEvents = computed(() => ({
+  'update:visible': onUpdateVisible.value,
+  'before-show': beforeEnter,
+  'before-hide': beforeLeave,
+  show: afterEnter,
+  hide: afterLeave,
+}))
 
 const hide = () => {
   tooltipRef.value?.hide()

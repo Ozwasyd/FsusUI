@@ -106,11 +106,10 @@ const handleScroll = () => {
   }
 }
 
-// TODO: refactor method overrides, due to script setup dts
-// @ts-nocheck
-function scrollTo(xCord: number, yCord?: number): void
-function scrollTo(options: ScrollToOptions): void
-function scrollTo(arg1: unknown, arg2?: number) {
+const scrollTo: {
+  (xCord: number, yCord?: number): void
+  (options: ScrollToOptions): void
+} = (arg1: number | ScrollToOptions, arg2?: number) => {
   if (isObject(arg1)) {
     wrapRef.value!.scrollTo(arg1)
   } else if (isNumber(arg1) && isNumber(arg2)) {

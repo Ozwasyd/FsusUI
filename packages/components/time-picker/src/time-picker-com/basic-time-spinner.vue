@@ -10,8 +10,7 @@
         :view-class="ns.be('spinner', 'list')"
         noresize
         tag="ul"
-        @mouseenter="emitSelectRange(item)"
-        @mousemove="adjustCurrentSpinner(item)"
+        v-on="getScrollbarEvents(item)"
       >
         <li
           v-for="(disabled, key) in timeList[item]"
@@ -191,6 +190,11 @@ const adjustCurrentSpinner = (type: TimeUnit) => {
   adjustSpinner(type, unref(timePartials)[type])
 }
 
+const getScrollbarEvents = (type: TimeUnit) => ({
+  mouseenter: () => emitSelectRange(type),
+  mousemove: () => adjustCurrentSpinner(type),
+})
+
 const adjustSpinners = () => {
   adjustCurrentSpinner('hours')
   adjustCurrentSpinner('minutes')
@@ -327,7 +331,9 @@ const bindScrollEvent = () => {
 
 onMounted(() => {
   nextTick(() => {
-    !props.arrowControl && bindScrollEvent()
+    if (!props.arrowControl) {
+      bindScrollEvent()
+    }
     adjustSpinners()
     // set selection on the first hour part
     if (props.role === 'start') emitSelectRange('hours')

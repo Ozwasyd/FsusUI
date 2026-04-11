@@ -1,12 +1,13 @@
 {
   "name": "@element-plus/theme-chalk",
   "version": "0.1.0",
-  "description": "Element component chalk theme.",
+  "description": "FsusUI default component theme.",
   "keywords": [
     "vue-components",
     "element-plus",
     "theme-chalk",
-    "theme-light"
+    "fsus",
+    "fsus-theme"
   ],
   "homepage": "https://github.com/element-plus/element-plus/blob/dev/packages/theme-chalk/README.md",
   "bugs": {

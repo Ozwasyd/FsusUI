@@ -1,13 +1,13 @@
 <template>
-  <teleport v-if="container" :to="container" :disabled="disabled">
+  <VueTeleport v-if="container" :to="container" :disabled="disabled">
     <div ref="containerRef" :class="ns.b()" :style="containerStyle">
       <slot />
     </div>
-  </teleport>
+  </VueTeleport>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { Teleport as VueTeleport, computed, ref } from 'vue'
 import { useNamespace } from '@element-plus/hooks'
 import { teleportProps } from './teleport'
 import type { StyleValue } from 'vue'

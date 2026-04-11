@@ -62,7 +62,12 @@ const onNormalOpen = () => {
 }
 
 const onDelayOpen = () => {
-  unref(isOpenDelayed) ? onDelayedOpen() : onNormalOpen()
+  if (unref(isOpenDelayed)) {
+    onDelayedOpen()
+    return
+  }
+
+  onNormalOpen()
 }
 
 const onOpen = onNormalOpen

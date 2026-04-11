@@ -159,9 +159,7 @@
             :range-state="rangeState"
             :disabled-date="disabledDate"
             :cell-class-name="cellClassName"
-            @changerange="handleChangeRange"
-            @pick="handleRangePick"
-            @select="onSelect"
+            v-on="dateTableEvents"
           />
         </div>
         <div :class="[ppNs.e('content'), drpNs.e('content')]" class="is-right">
@@ -219,9 +217,7 @@
             :range-state="rangeState"
             :disabled-date="disabledDate"
             :cell-class-name="cellClassName"
-            @changerange="handleChangeRange"
-            @pick="handleRangePick"
-            @select="onSelect"
+            v-on="dateTableEvents"
           />
         </div>
       </div>
@@ -536,6 +532,12 @@ const handleRangePick = (
 
   if (!close || showTime.value) return
   handleRangeConfirm()
+}
+
+const dateTableEvents = {
+  changerange: handleChangeRange,
+  pick: handleRangePick,
+  select: onSelect,
 }
 
 const minTimePickerVisible = ref(false)

@@ -51,8 +51,7 @@
   }
 
   &:focus-visible {
-    outline: 1px solid getCssVar('pagination-hover-color');
-    outline-offset: -1px;
+    @include a11y-focus-ring(2px, getCssVar('pagination-border-radius'));
   }
 }
 

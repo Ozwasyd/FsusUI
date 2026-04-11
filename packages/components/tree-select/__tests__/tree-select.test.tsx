@@ -1,11 +1,11 @@
 import { nextTick, reactive, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, test, vi } from 'vitest'
+import { setCheckboxValue } from '../../../test-utils/dom'
 import TreeSelect from '../src/tree-select.vue'
 
 import type { RenderFunction } from 'vue'
 import type { VueWrapper } from '@vue/test-utils'
-import type ElSelect from '@element-plus/components/select'
 import type ElTree from '@element-plus/components/tree'
 
 const createComponent = ({
@@ -121,7 +121,7 @@ describe('TreeSelect.vue', () => {
 
     await tree
       .findAll('.el-select-dropdown__item')
-      .slice(-1)[0]
+      .at(-1)!
       .trigger('click')
     await nextTick()
     expect(select.vm.modelValue).toBe(111)
@@ -196,7 +196,7 @@ describe('TreeSelect.vue', () => {
 
     await tree
       .findAll('.el-select-dropdown__item')
-      .slice(-1)[0]
+      .at(-1)!
       .trigger('click')
     await nextTick()
     expect(select.vm.modelValue).toEqual([11, 111])
@@ -207,7 +207,7 @@ describe('TreeSelect.vue', () => {
     expect(select.vm.modelValue).toEqual([1, 11, 111])
     expect(wrapperRef.getCheckedKeys()).toEqual([1, 11, 111])
 
-    await tree.findAll('.el-checkbox')[1].trigger('click')
+    await setCheckboxValue(tree.findAll('.el-checkbox')[1], false)
     await nextTick()
     expect(select.vm.modelValue).toEqual([1, 111])
     expect(wrapperRef.getCheckedKeys()).toEqual([1, 111])
@@ -398,12 +398,12 @@ describe('TreeSelect.vue', () => {
 
     // check child node when folder node checked,
     // value.value will be 111
-    await tree.findAll('.el-tree-node__content').slice(-1)[0].trigger('click')
+    await tree.findAll('.el-tree-node__content').at(-1)!.trigger('click')
     await nextTick()
     expect(select.vm.modelValue).equal(111)
 
     // unselect when has child checked
-    await tree.findAll('.el-tree-node__content').slice(-1)[0].trigger('click')
+    await tree.findAll('.el-tree-node__content').at(-1)!.trigger('click')
     await nextTick()
     expect(select.vm.modelValue).toBe(undefined)
   })
@@ -665,12 +665,12 @@ describe('TreeSelect.vue', () => {
     expect(select.vm.modelValue).equal(1)
 
     // can correctly choose another
-    await nodes.slice(-1)[0].trigger('click')
+    await nodes.at(-1)!.trigger('click')
     await nextTick()
     expect(select.vm.modelValue).equal(2)
 
     // again
-    await nodes.slice(-1)[0].trigger('click')
+    await nodes.at(-1)!.trigger('click')
     await nextTick()
     expect(select.vm.modelValue).equal(2)
   })

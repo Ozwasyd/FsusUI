@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { nextTick } from 'vue'
-import { NOOP } from '@vue/shared'
 import { describe, expect, test, vi } from 'vitest'
 import { makeMountFunc } from '@element-plus/test-utils/make-mount'
 import Tree from '../src/tree.vue'
@@ -19,6 +18,7 @@ const NODE_NUMBER = 5
 const TREE_NODE_CLASS_NAME = '.el-tree-node'
 const TREE_NODE_CONTENT_CLASS_NAME = '.el-tree-node__content'
 const TREE_NODE_EXPAND_ICON_CLASS_NAME = '.el-tree-node__expand-icon'
+const NOOP = () => {}
 
 const getUniqueId = () => {
   return id++

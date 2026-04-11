@@ -491,9 +491,6 @@ describe('Form', () => {
             ref="formRef"
             model={form}
             rules={rules}
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
-            onSubmit="return false"
           >
             <FormItem prop="name" label="name">
               <Input v-model={form.name} />

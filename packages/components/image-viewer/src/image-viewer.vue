@@ -26,23 +26,33 @@
         <!-- ACTIONS -->
         <div :class="[ns.e('btn'), ns.e('actions')]">
           <div :class="ns.e('actions__inner')">
-            <el-icon @click="handleActions('zoomOut')">
-              <ZoomOut />
-            </el-icon>
-            <el-icon @click="handleActions('zoomIn')">
-              <ZoomIn />
-            </el-icon>
+            <span :class="ns.e('action')" @click="handleActions('zoomOut')">
+              <el-icon>
+                <ZoomOut />
+              </el-icon>
+            </span>
+            <span :class="ns.e('action')" @click="handleActions('zoomIn')">
+              <el-icon>
+                <ZoomIn />
+              </el-icon>
+            </span>
             <i :class="ns.e('actions__divider')" />
-            <el-icon @click="toggleMode">
-              <component :is="mode.icon" />
-            </el-icon>
+            <span :class="ns.e('action')" @click="toggleMode">
+              <el-icon>
+                <component :is="mode.icon" />
+              </el-icon>
+            </span>
             <i :class="ns.e('actions__divider')" />
-            <el-icon @click="handleActions('anticlockwise')">
-              <RefreshLeft />
-            </el-icon>
-            <el-icon @click="handleActions('clockwise')">
-              <RefreshRight />
-            </el-icon>
+            <span :class="ns.e('action')" @click="handleActions('anticlockwise')">
+              <el-icon>
+                <RefreshLeft />
+              </el-icon>
+            </span>
+            <span :class="ns.e('action')" @click="handleActions('clockwise')">
+              <el-icon>
+                <RefreshRight />
+              </el-icon>
+            </span>
           </div>
         </div>
         <!-- CANVAS -->
@@ -209,7 +219,9 @@ function registerEventListener() {
     switch (e.code) {
       // ESC
       case EVENT_CODE.esc:
-        props.closeOnPressEscape && hide()
+        if (props.closeOnPressEscape) {
+          hide()
+        }
         break
       // SPACE
       case EVENT_CODE.space:

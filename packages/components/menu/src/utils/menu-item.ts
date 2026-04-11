@@ -1,12 +1,10 @@
-// @ts-nocheck
 import { triggerEvent } from '@element-plus/utils'
 import { EVENT_CODE } from '@element-plus/constants'
 import SubMenu from './submenu'
 
 class MenuItem {
-  public submenu: SubMenu = null
+  public submenu: SubMenu | null = null
   constructor(public domNode: HTMLElement, namespace: string) {
-    this.submenu = null
     this.init(namespace)
   }
 
@@ -25,14 +23,17 @@ class MenuItem {
       switch (event.code) {
         case EVENT_CODE.down: {
           triggerEvent(event.currentTarget as HTMLElement, 'mouseenter')
-          this.submenu && this.submenu.gotoSubIndex(0)
+          if (this.submenu) {
+            this.submenu.gotoSubIndex(0)
+          }
           prevDef = true
           break
         }
         case EVENT_CODE.up: {
           triggerEvent(event.currentTarget as HTMLElement, 'mouseenter')
-          this.submenu &&
+          if (this.submenu) {
             this.submenu.gotoSubIndex(this.submenu.subMenuItems.length - 1)
+          }
           prevDef = true
           break
         }

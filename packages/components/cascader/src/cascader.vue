@@ -20,7 +20,7 @@
     effect="light"
     pure
     persistent
-    @hide="hideSuggestionPanel"
+    v-on="tooltipEvents"
   >
     <template #default>
       <div
@@ -54,7 +54,7 @@
               v-if="clearBtnVisible"
               key="clear"
               :class="[nsInput.e('icon'), 'icon-circle-close']"
-              @click.stop="handleClear"
+              v-on="clearIconEvents"
             >
               <circle-close />
             </el-icon>
@@ -62,7 +62,7 @@
               v-else
               key="arrow-down"
               :class="cascaderIconKls"
-              @click.stop="togglePopperVisible()"
+              v-on="arrowIconEvents"
             >
               <arrow-down />
             </el-icon>
@@ -158,7 +158,7 @@
         tag="ul"
         :class="nsCascader.e('suggestion-panel')"
         :view-class="nsCascader.e('suggestion-list')"
-        @keydown="handleSuggestionKeyDown"
+        v-on="suggestionPanelEvents"
       >
         <template v-if="suggestions.length">
           <li
@@ -189,7 +189,6 @@
 
 <script lang="ts" setup>
 import { computed, nextTick, onMounted, ref, useAttrs, watch } from 'vue'
-import { isPromise } from '@vue/shared'
 import { cloneDeep, debounce } from 'lodash-unified'
 import { useCssVar, useResizeObserver } from '@vueuse/core'
 import ElCascaderPanel from '@element-plus/components/cascader-panel'
@@ -227,6 +226,15 @@ import type {
   CascaderValue,
   Tag,
 } from '@element-plus/components/cascader-panel'
+
+const isPromiseLike = (value: unknown): value is PromiseLike<unknown> => {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'then' in value &&
+    typeof value.then === 'function'
+  )
+}
 
 const popperOptions: Partial<Options> = {
   modifiers: [
@@ -396,6 +404,10 @@ const hideSuggestionPanel = () => {
   filtering.value = false
 }
 
+const tooltipEvents = {
+  hide: hideSuggestionPanel,
+}
+
 const genTag = (node: CascaderNode): Tag => {
   const { showAllLevels, separator } = props
   return {
@@ -488,7 +500,9 @@ const focusFirstNode = () => {
 
   if (firstNode) {
     firstNode.focus()
-    !filtering.value && firstNode.click()
+    if (!filtering.value) {
+      firstNode.click()
+    }
   }
 }
 
@@ -532,7 +546,7 @@ const handleComposition = (event: CompositionEvent) => {
     isOnComposition.value = false
     nextTick(() => handleInput(text))
   } else {
-    const lastCharacter = text[text.length - 1] || ''
+    const lastCharacter = text.at(-1) ?? ''
     isOnComposition.value = !isKorean(lastCharacter)
   }
 }
@@ -582,7 +596,9 @@ const handleSuggestionClick = (node: CascaderNode) => {
   if (multiple.value) {
     cascaderPanelRef.value?.handleCheckChange(node, !checked, false)
   } else {
-    !checked && cascaderPanelRef.value?.handleCheckChange(node, true, false)
+    if (!checked) {
+      cascaderPanelRef.value?.handleCheckChange(node, true, false)
+    }
     togglePopperVisible(false)
   }
 }
@@ -610,9 +626,31 @@ const handleSuggestionKeyDown = (e: KeyboardEvent) => {
   }
 }
 
+const handleClearIconClick = (event: MouseEvent) => {
+  event.stopPropagation()
+  handleClear()
+}
+
+const handleArrowIconClick = (event: MouseEvent) => {
+  event.stopPropagation()
+  togglePopperVisible()
+}
+
+const clearIconEvents = {
+  click: handleClearIconClick,
+}
+
+const arrowIconEvents = {
+  click: handleArrowIconClick,
+}
+
+const suggestionPanelEvents = {
+  keydown: handleSuggestionKeyDown,
+}
+
 const handleDelete = () => {
   const tags = presentTags.value
-  const lastTag = tags[tags.length - 1]
+  const lastTag = tags.at(-1)
   pressDeleteCount = searchInputValue.value ? 0 : pressDeleteCount + 1
 
   if (!lastTag || !pressDeleteCount || (props.collapseTags && tags.length > 1))
@@ -646,7 +684,7 @@ const handleFilter = debounce(() => {
 
   const passed = props.beforeFilter(value)
 
-  if (isPromise(passed)) {
+  if (isPromiseLike(passed)) {
     passed.then(calculateSuggestions).catch(() => {
       /* prevent log error */
     })
@@ -658,11 +696,17 @@ const handleFilter = debounce(() => {
 }, props.debounce)
 
 const handleInput = (val: string, e?: KeyboardEvent) => {
-  !popperVisible.value && togglePopperVisible(true)
+  if (!popperVisible.value) {
+    togglePopperVisible(true)
+  }
 
   if (e?.isComposing) return
 
-  val ? handleFilter() : hideSuggestionPanel()
+  if (val) {
+    handleFilter()
+  } else {
+    hideSuggestionPanel()
+  }
 }
 
 const getInputInnerHeight = (inputInner: HTMLElement): number =>

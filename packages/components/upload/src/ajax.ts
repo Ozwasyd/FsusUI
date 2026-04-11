@@ -1,5 +1,5 @@
 import { isNil } from 'lodash-unified'
-import { isArray, throwError } from '@element-plus/utils'
+import { throwError } from '@element-plus/utils'
 import type {
   UploadProgressEvent,
   UploadRequestHandler,
@@ -61,7 +61,7 @@ export const ajaxUpload: UploadRequestHandler = (option) => {
 
   if (xhr.upload) {
     xhr.upload.addEventListener('progress', (evt) => {
-      const progressEvt = evt as UploadProgressEvent
+      const progressEvt = evt as unknown as UploadProgressEvent
       progressEvt.percent = evt.total > 0 ? (evt.loaded / evt.total) * 100 : 0
       option.onProgress(progressEvt)
     })
@@ -70,8 +70,16 @@ export const ajaxUpload: UploadRequestHandler = (option) => {
   const formData = new FormData()
   if (option.data) {
     for (const [key, value] of Object.entries(option.data)) {
-      if (isArray(value) && value.length) formData.append(key, ...(value as [Blob, string]))
-      else formData.append(key, value)
+      if (Array.isArray(value) && value.length) {
+        const [file, filename] = value as [string | Blob, string]
+        if (file instanceof Blob) {
+          formData.append(key, file, filename)
+        } else {
+          formData.append(key, file)
+        }
+      } else {
+        formData.append(key, value as string | Blob)
+      }
     }
   }
   formData.append(option.filename, option.file, option.file.name)

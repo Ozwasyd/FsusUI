@@ -1,18 +1,14 @@
 <template>
   <el-only-child
     v-if="!virtualTriggering"
-    v-bind="$attrs"
-    :aria-controls="ariaControls"
-    :aria-describedby="ariaDescribedby"
-    :aria-expanded="ariaExpanded"
-    :aria-haspopup="ariaHaspopup"
+    v-bind="onlyChildAttrs"
   >
     <slot />
   </el-only-child>
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, onBeforeUnmount, onMounted, watch } from 'vue'
+import { computed, inject, onBeforeUnmount, onMounted, useAttrs, watch } from 'vue'
 import { isNil } from 'lodash-unified'
 import { unrefElement } from '@vueuse/core'
 import { ElOnlyChild } from '@element-plus/components/slot'
@@ -29,6 +25,7 @@ defineOptions({
 })
 
 const props = defineProps(popperTriggerProps)
+const attrs = useAttrs()
 
 const { role, triggerRef } = inject(POPPER_INJECTION_KEY, undefined)!
 
@@ -55,6 +52,14 @@ const ariaHaspopup = computed<string | undefined>(() => {
 const ariaExpanded = computed<string | undefined>(() => {
   return ariaHaspopup.value ? `${props.open}` : undefined
 })
+
+const onlyChildAttrs = computed<Record<string, unknown>>(() => ({
+  ...attrs,
+  'aria-controls': ariaControls.value,
+  'aria-describedby': ariaDescribedby.value,
+  'aria-expanded': ariaExpanded.value,
+  'aria-haspopup': ariaHaspopup.value,
+}))
 
 let virtualTriggerAriaStopWatch: WatchStopHandle | undefined = undefined
 
@@ -109,9 +114,11 @@ onMounted(() => {
               'aria-haspopup',
               'aria-expanded',
             ].forEach((key, idx) => {
-              isNil(watches[idx])
-                ? el.removeAttribute(key)
-                : el.setAttribute(key, watches[idx]!)
+              if (isNil(watches[idx])) {
+                el.removeAttribute(key)
+              } else {
+                el.setAttribute(key, watches[idx]!)
+              }
             })
           },
           { immediate: true }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { buildProps, definePropType, iconPropType } from '@element-plus/utils'
 import { EVENT_CODE } from '@element-plus/constants'
 import { createCollectionWithScope } from '@element-plus/components/collection'
@@ -13,14 +12,16 @@ import type { Placement } from '@element-plus/components/popper'
 import type { ComponentInternalInstance, ComputedRef } from 'vue'
 import type { Nullable } from '@element-plus/utils'
 
+export type DropdownRole = 'menu' | 'navigation' | 'group'
+
 export interface IElDropdownInstance {
   instance?: ComponentInternalInstance
-  dropdownSize?: ComputedRef<string>
+  dropdownSize?: ComputedRef<string | undefined>
   handleClick?: () => void
-  commandHandler?: (...arg) => void
+  commandHandler?: (...args: any[]) => void
   show?: () => void
   hide?: () => void
-  trigger?: ComputedRef<string>
+  trigger?: ComputedRef<string[]>
   hideOnClick?: ComputedRef<boolean>
   triggerElm?: ComputedRef<Nullable<HTMLButtonElement>>
 }
@@ -81,7 +82,7 @@ export const dropdownProps = buildProps({
     default: false,
   },
   role: {
-    type: String,
+    type: definePropType<DropdownRole>(String),
     default: 'menu',
   },
   buttonProps: {

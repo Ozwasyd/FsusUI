@@ -10,7 +10,10 @@ const useAutoResize = (props: AutoResizerProps) => {
 
   let resizerStopper: ReturnType<typeof useResizeObserver>['stop']
   onMounted(() => {
-    resizerStopper = useResizeObserver(sizer, ([entry]) => {
+    resizerStopper = useResizeObserver(sizer, (entries) => {
+      const entry = entries[0]
+      if (!entry) return
+
       const { width, height } = entry.contentRect
       const { paddingLeft, paddingRight, paddingTop, paddingBottom } =
         getComputedStyle(entry.target)

@@ -31,7 +31,7 @@ $directions: rtl, ltr, ttb, btt;
 
   &__header {
     align-items: center;
-    color: rgb(114, 118, 123);
+    color: getCssVar('text-color', 'regular');
     display: flex;
     margin-bottom: 32px;
     padding: getCssVar('drawer-padding-primary');
@@ -46,6 +46,7 @@ $directions: rtl, ltr, ttb, btt;
     flex: 1;
     line-height: inherit;
     font-size: 1rem;
+    color: getCssVar('text-color', 'primary');
   }
 
   @include e(footer) {
@@ -56,17 +57,26 @@ $directions: rtl, ltr, ttb, btt;
 
   &__close-btn {
     display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
     border: none;
     cursor: pointer;
     font-size: getCssVar('font-size-extra-large');
     color: inherit;
     background-color: transparent;
     outline: none;
+    border-radius: 999px;
     &:focus,
     &:hover {
       i {
         color: getCssVar('color-primary');
       }
+    }
+
+    &:focus-visible {
+      @include a11y-focus-ring(2px, 999px);
     }
   }
 

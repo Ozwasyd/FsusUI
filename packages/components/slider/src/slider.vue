@@ -24,42 +24,22 @@
     >
       <div :class="ns.e('bar')" :style="barStyle" />
       <slider-button
-        :id="!range ? inputId : undefined"
+        v-bind="firstButtonAttrs"
         ref="firstButton"
         :model-value="firstValue"
         :vertical="vertical"
         :tooltip-class="tooltipClass"
         :placement="placement"
-        role="slider"
-        :aria-label="
-          range || !isLabeledByFormItem ? firstButtonLabel : undefined
-        "
-        :aria-labelledby="
-          !range && isLabeledByFormItem ? elFormItem?.labelId : undefined
-        "
-        :aria-valuemin="min"
-        :aria-valuemax="range ? secondValue : max"
-        :aria-valuenow="firstValue"
-        :aria-valuetext="firstValueText"
-        :aria-orientation="vertical ? 'vertical' : 'horizontal'"
-        :aria-disabled="sliderDisabled"
         @update:model-value="setFirstValue"
       />
       <slider-button
         v-if="range"
+        v-bind="secondButtonAttrs"
         ref="secondButton"
         :model-value="secondValue"
         :vertical="vertical"
         :tooltip-class="tooltipClass"
         :placement="placement"
-        role="slider"
-        :aria-label="secondButtonLabel"
-        :aria-valuemin="firstValue"
-        :aria-valuemax="max"
-        :aria-valuenow="secondValue"
-        :aria-valuetext="secondValueText"
-        :aria-orientation="vertical ? 'vertical' : 'horizontal'"
-        :aria-disabled="sliderDisabled"
         @update:model-value="setSecondValue"
       />
       <div v-if="showStops">
@@ -99,7 +79,6 @@
       :controls="showInputControls"
       :min="min"
       :max="max"
-      :debounce="debounce"
       :size="sliderInputSize"
       @update:model-value="setFirstValue"
       @change="emitChange"
@@ -206,6 +185,32 @@ const secondValueText = computed<string>(() => {
     ? props.formatValueText(secondValue.value)
     : `${secondValue.value}`
 })
+
+const firstButtonAttrs = computed<Record<string, unknown>>(() => ({
+  id: !props.range ? inputId.value : undefined,
+  role: 'slider',
+  'aria-label':
+    props.range || !isLabeledByFormItem.value ? firstButtonLabel.value : undefined,
+  'aria-labelledby':
+    !props.range && isLabeledByFormItem.value ? elFormItem?.labelId : undefined,
+  'aria-valuemin': props.min,
+  'aria-valuemax': props.range ? secondValue.value : props.max,
+  'aria-valuenow': firstValue.value,
+  'aria-valuetext': firstValueText.value,
+  'aria-orientation': props.vertical ? 'vertical' : 'horizontal',
+  'aria-disabled': sliderDisabled.value,
+}))
+
+const secondButtonAttrs = computed<Record<string, unknown>>(() => ({
+  role: 'slider',
+  'aria-label': secondButtonLabel.value,
+  'aria-valuemin': firstValue.value,
+  'aria-valuemax': props.max,
+  'aria-valuenow': secondValue.value,
+  'aria-valuetext': secondValueText.value,
+  'aria-orientation': props.vertical ? 'vertical' : 'horizontal',
+  'aria-disabled': sliderDisabled.value,
+}))
 
 const sliderKls = computed(() => [
   ns.b(),

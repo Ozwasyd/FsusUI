@@ -1,10 +1,9 @@
-// @ts-nocheck
 import { triggerEvent } from '@element-plus/utils'
 import { EVENT_CODE } from '@element-plus/constants'
 import type MenuItem from './menu-item'
 
 class SubMenu {
-  public subMenuItems: NodeList
+  public subMenuItems!: NodeListOf<HTMLElement>
   public subIndex = 0
   constructor(public parent: MenuItem, public domNode: ParentNode) {
     this.subIndex = 0
@@ -12,7 +11,7 @@ class SubMenu {
   }
 
   init(): void {
-    this.subMenuItems = this.domNode.querySelectorAll('li')
+    this.subMenuItems = this.domNode.querySelectorAll<HTMLElement>('li')
     this.addListeners()
   }
 
@@ -22,13 +21,13 @@ class SubMenu {
     } else if (idx < 0) {
       idx = this.subMenuItems.length - 1
     }
-    ;(this.subMenuItems[idx] as HTMLElement).focus()
+    this.subMenuItems[idx]?.focus()
     this.subIndex = idx
   }
 
   addListeners(): void {
     const parentNode = this.parent.domNode
-    Array.prototype.forEach.call(this.subMenuItems, (el: Element) => {
+    this.subMenuItems.forEach((el) => {
       el.addEventListener('keydown', (event: KeyboardEvent) => {
         let prevDef = false
         switch (event.code) {
@@ -49,7 +48,7 @@ class SubMenu {
           case EVENT_CODE.enter:
           case EVENT_CODE.space: {
             prevDef = true
-            ;(event.currentTarget as HTMLElement).click()
+            ;(event.currentTarget as HTMLElement | null)?.click()
             break
           }
         }

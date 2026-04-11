@@ -8,9 +8,11 @@
     <span :class="ns.e('content')">
       <slot />
     </span>
-    <el-icon v-if="closable" :class="ns.e('close')" @click.stop="handleClose">
-      <Close />
-    </el-icon>
+    <span v-if="closable" :class="ns.e('close')" @click.stop="handleClose">
+      <el-icon>
+        <Close />
+      </el-icon>
+    </span>
   </span>
   <transition v-else :name="`${ns.namespace.value}-zoom-in-center`" appear>
     <span
@@ -21,9 +23,11 @@
       <span :class="ns.e('content')">
         <slot />
       </span>
-      <el-icon v-if="closable" :class="ns.e('close')" @click.stop="handleClose">
-        <Close />
-      </el-icon>
+      <span v-if="closable" :class="ns.e('close')" @click.stop="handleClose">
+        <el-icon>
+          <Close />
+        </el-icon>
+      </span>
     </span>
   </transition>
 </template>

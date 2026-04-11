@@ -1,4 +1,3 @@
-import { NOOP } from '@vue/shared'
 import { buildProps, definePropType } from '@element-plus/utils'
 import { uploadBaseProps } from './upload'
 
@@ -11,6 +10,8 @@ import type {
 } from './upload'
 import type UploadContent from './upload-content.vue'
 import type { UploadAjaxError } from './ajax'
+
+const NOOP = () => undefined
 
 export const uploadContentProps = buildProps({
   ...uploadBaseProps,

@@ -1,6 +1,7 @@
 import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, test, vi } from 'vitest'
+import { clickActionButton } from '../../../test-utils/dom'
 import Collapse from '../src/collapse.vue'
 import CollapseItem from '../src/collapse-item.vue'
 import type { VueWrapper } from '@vue/test-utils'
@@ -44,11 +45,11 @@ describe('Collapse.vue', () => {
     )
     expect(collapseItemWrappers[0].vm.isActive).toBe(true)
 
-    collapseItemHeaderEls[2].click()
+    await clickActionButton(collapseItemHeaderEls[2] as HTMLElement)
     await nextTick()
     expect(collapseItemWrappers[0].vm.isActive).toBe(true)
     expect(collapseItemWrappers[2].vm.isActive).toBe(true)
-    collapseItemHeaderEls[0].click()
+    await clickActionButton(collapseItemHeaderEls[0] as HTMLElement)
     await nextTick()
     expect(collapseItemWrappers[0].vm.isActive).toBe(false)
   })
@@ -90,11 +91,11 @@ describe('Collapse.vue', () => {
     )
     expect(collapseItemWrappers[0].vm.isActive).toBe(true)
 
-    collapseItemHeaderEls[2].click()
+    await clickActionButton(collapseItemHeaderEls[2] as HTMLElement)
     await nextTick()
     expect(collapseItemWrappers[0].vm.isActive).toBe(false)
     expect(collapseItemWrappers[2].vm.isActive).toBe(true)
-    collapseItemHeaderEls[0].click()
+    await clickActionButton(collapseItemHeaderEls[0] as HTMLElement)
     await nextTick()
     expect(collapseItemWrappers[0].vm.isActive).toBe(true)
     expect(collapseItemWrappers[2].vm.isActive).toBe(false)
@@ -139,13 +140,13 @@ describe('Collapse.vue', () => {
     expect(collapseItemWrappers[0].vm.isActive).toBe(true)
     expect((vm as any).activeNames).toEqual(['1'])
     expect(onChange).not.toHaveBeenCalled()
-    collapseItemHeaderEls[2].click()
+    await clickActionButton(collapseItemHeaderEls[2] as HTMLElement)
     await nextTick()
     expect(onChange).toHaveBeenCalledTimes(1)
     expect(collapseItemWrappers[0].vm.isActive).toBe(true)
     expect(collapseItemWrappers[2].vm.isActive).toBe(true)
     expect((vm as any).activeNames).toEqual(['1', '3'])
-    collapseItemHeaderEls[0].click()
+    await clickActionButton(collapseItemHeaderEls[0] as HTMLElement)
     await nextTick()
     expect(onChange).toHaveBeenCalledTimes(2)
     expect(collapseItemWrappers[0].vm.isActive).toBe(false)

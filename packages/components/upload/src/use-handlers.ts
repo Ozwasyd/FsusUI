@@ -58,15 +58,15 @@ export const useHandlers = (
     console.error(err)
     file.status = 'fail'
     uploadFiles.value.splice(uploadFiles.value.indexOf(file), 1)
-    props.onError(err, file, uploadFiles.value)
-    props.onChange(file, uploadFiles.value)
+    props.onError?.(err, file, uploadFiles.value)
+    props.onChange?.(file, uploadFiles.value)
   }
 
   const handleProgress: UploadContentProps['onProgress'] = (evt, rawFile) => {
     const file = getFile(rawFile)
     if (!file) return
 
-    props.onProgress(evt, file, uploadFiles.value)
+    props.onProgress?.(evt, file, uploadFiles.value)
     file.status = 'uploading'
     file.percentage = Math.round(evt.percent)
   }
@@ -80,8 +80,8 @@ export const useHandlers = (
 
     file.status = 'success'
     file.response = response
-    props.onSuccess(response, file, uploadFiles.value)
-    props.onChange(file, uploadFiles.value)
+    props.onSuccess?.(response, file, uploadFiles.value)
+    props.onChange?.(file, uploadFiles.value)
   }
 
   const handleStart: UploadContentProps['onStart'] = (file) => {
@@ -99,11 +99,11 @@ export const useHandlers = (
         uploadFile.url = URL.createObjectURL(file)
       } catch (err: unknown) {
         debugWarn(SCOPE, (err as Error).message)
-        props.onError(err as Error, uploadFile, uploadFiles.value)
+        props.onError?.(err as Error, uploadFile, uploadFiles.value)
       }
     }
     uploadFiles.value = [...uploadFiles.value, uploadFile]
-    props.onChange(uploadFile, uploadFiles.value)
+    props.onChange?.(uploadFile, uploadFiles.value)
   }
 
   const handleRemove: UploadContentProps['onRemove'] = async (
@@ -116,7 +116,7 @@ export const useHandlers = (
       abort(file)
       const fileList = uploadFiles.value
       fileList.splice(fileList.indexOf(file), 1)
-      props.onRemove(file, fileList)
+      props.onRemove?.(file, fileList)
       revokeFileObjectURL(file)
     }
 
@@ -147,7 +147,7 @@ export const useHandlers = (
           try {
             file.url = URL.createObjectURL(raw)
           } catch (err: unknown) {
-            props.onError(err as Error, file, uploadFiles.value)
+            props.onError?.(err as Error, file, uploadFiles.value)
           }
         }
         return file
