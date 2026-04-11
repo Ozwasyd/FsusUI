@@ -1,0 +1,74 @@
+name: Publish GitHub Package
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: publish-github-package-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+          registry-url: https://npm.pkg.github.com
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build GitHub Packages artifact
+        run: pnpm run build:github-package
+
+      - name: Resolve package metadata
+        id: package
+        run: |
+          echo "name=$(node -p \"require('./dist/element-plus/package.json').name\")" >> "$GITHUB_OUTPUT"
+          echo "version=$(node -p \"require('./dist/element-plus/package.json').version\")" >> "$GITHUB_OUTPUT"
+
+      - name: Check existing package version
+        id: existing
+        working-directory: ./dist/element-plus
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if npm view "${{ steps.package.outputs.name }}@${{ steps.package.outputs.version }}" version --registry=https://npm.pkg.github.com >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish package
+        if: steps.existing.outputs.exists != 'true'
+        working-directory: ./dist/element-plus
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm publish
+
+      - name: Skip duplicate version
+        if: steps.existing.outputs.exists == 'true'
+        run: |
+          echo "Package ${{ steps.package.outputs.name }}@${{ steps.package.outputs.version }} already exists on GitHub Packages. Skipping publish."
