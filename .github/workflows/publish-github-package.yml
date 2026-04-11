@@ -54,8 +54,10 @@ jobs:
       - name: Resolve package metadata
         id: package
         run: |
-          echo "name=$(node -p \"require('./dist/element-plus/package.json').name\")" >> "$GITHUB_OUTPUT"
-          echo "version=$(node -p \"require('./dist/element-plus/package.json').version\")" >> "$GITHUB_OUTPUT"
+          name="$(node -p 'require("./dist/element-plus/package.json").name')"
+          version="$(node -p 'require("./dist/element-plus/package.json").version')"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Check existing package version
         id: existing
