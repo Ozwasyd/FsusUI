@@ -37,6 +37,12 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
           registry-url: https://npm.pkg.github.com
 
+      - name: Setup Emscripten SDK
+        uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
