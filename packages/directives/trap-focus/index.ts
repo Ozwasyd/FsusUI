@@ -62,8 +62,12 @@ const TrapFocus: ObjectDirective = {
       el[FOCUSABLE_CHILDREN] = obtainAllFocusableElements(el)
     })
   },
-  unmounted() {
-    FOCUS_STACK.shift()
+  unmounted(el: TrapFocusElement) {
+    const index = FOCUS_STACK.lastIndexOf(el)
+    if (index !== -1) {
+      FOCUS_STACK.splice(index, 1)
+    }
+
     if (FOCUS_STACK.length === 0) {
       document.removeEventListener('keydown', FOCUS_HANDLER)
     }

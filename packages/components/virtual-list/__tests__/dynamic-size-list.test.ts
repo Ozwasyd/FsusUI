@@ -21,14 +21,14 @@ const { estimateRowHeights } = vi.hoisted(() => ({
       rowWidth: number,
       charWidth = 14,
       lineHeight = 22,
-      padding = 16
+      padding = 16,
     ) => {
       const charactersPerLine = Math.max(1, Math.floor(rowWidth / charWidth))
       return textLengths.map((textLength) => {
         const lineCount = Math.max(1, Math.ceil(textLength / charactersPerLine))
         return lineCount * lineHeight + padding
       })
-    }
+    },
   ),
 }))
 
@@ -43,7 +43,7 @@ const ITEM_SELECTOR = `.${ITEM_KLS}`
 const BASE_SIZE = 25 * 100 // base size * total
 
 const widths = Array.from({ length: 100 }).map(
-  () => 25 + Math.floor(Math.random() * 5) + 1
+  () => 25 + Math.floor(Math.random() * 5) + 1,
 ) // greater than 26 less or equal to 30
 
 const mount = makeMount(
@@ -68,7 +68,7 @@ const mount = makeMount(
       width: 50,
       onItemRendered,
     },
-  }
+  },
 )
 
 let cleanup: () => void
@@ -105,6 +105,15 @@ describe('<dynamic-size-list />', () => {
   })
 
   describe('scroll functionality', () => {
+    it('should expose resetAfterIndex for dynamic recalculation', async () => {
+      const wrapper = mount()
+      const listRef = wrapper.vm.$refs.listRef as ListRef
+
+      await nextTick()
+
+      expect(typeof listRef.resetAfterIndex).toBe('function')
+    })
+
     it('should prime large text datasets with wasm row height estimates', async () => {
       const data = Array.from({ length: 2_001 }, (_, index) => ({
         label: index === 2_000 ? 'x'.repeat(160) : 'x'.repeat(48),
@@ -128,7 +137,7 @@ describe('<dynamic-size-list />', () => {
 
       expect(estimateRowHeights).toHaveBeenCalled()
       expect(
-        Number.parseInt(wrapper.find(ITEM_SELECTOR).element.style.height)
+        Number.parseInt(wrapper.find(ITEM_SELECTOR).element.style.height),
       ).toBeGreaterThan(20)
     })
 
@@ -151,7 +160,7 @@ describe('<dynamic-size-list />', () => {
       listRef.scrollTo(200)
       await nextTick()
       expect(Number.parseInt(listRef.innerRef.style.height)).toBeGreaterThan(
-        estimatedTotalSize
+        estimatedTotalSize,
       )
 
       // when using scrollTo method, the list consists of
@@ -163,11 +172,11 @@ describe('<dynamic-size-list />', () => {
       // so the base case is that our window's height has been updated for at least 10 times
       // the height should be only be updated at most 5(the biggest size) * 11
       expect(Number.parseInt(listRef.innerRef.style.height)).toBeGreaterThan(
-        BASE_SIZE + 1 * 10
+        BASE_SIZE + 1 * 10,
       )
 
       expect(Number.parseInt(listRef.innerRef.style.height)).toBeLessThan(
-        BASE_SIZE + 5 * 12
+        BASE_SIZE + 5 * 12,
       )
 
       expect(wrapper.findAll(ITEM_SELECTOR).length).toBeGreaterThan(8)
@@ -198,7 +207,7 @@ describe('<dynamic-size-list />', () => {
       listRef.scrollTo(200)
       await nextTick()
       expect(Number.parseInt(listRef.innerRef.style.width)).toBeGreaterThan(
-        estimatedTotalSize
+        estimatedTotalSize,
       )
 
       // when using scrollTo method, the list consists of
@@ -210,11 +219,11 @@ describe('<dynamic-size-list />', () => {
       // so the base case is that our window's width has been updated for at least 10 times
       // the width should be only be updated at most 5(the biggest size) * 11
       expect(Number.parseInt(listRef.innerRef.style.width)).toBeGreaterThan(
-        BASE_SIZE + 1 * 9
+        BASE_SIZE + 1 * 9,
       )
 
       expect(Number.parseInt(listRef.innerRef.style.width)).toBeLessThan(
-        BASE_SIZE + 5 * 11
+        BASE_SIZE + 5 * 11,
       )
       expect(wrapper.findAll(ITEM_SELECTOR).length).toBeLessThanOrEqual(9)
     })
@@ -234,38 +243,38 @@ describe('<dynamic-size-list />', () => {
       // at the bottom of the list since the maximum visible items to display is 4.
       // minus the cache size 3 the first item should be item 4.
       expect(
-        Number.parseInt(wrapper.find(ITEM_SELECTOR).text())
+        Number.parseInt(wrapper.find(ITEM_SELECTOR).text()),
       ).toBeLessThanOrEqual(4)
       // smart alignment
       listRef.scrollToItem(20, SMART_ALIGNMENT)
       await nextTick()
       expect(
-        Number.parseInt(wrapper.find(ITEM_SELECTOR).text())
+        Number.parseInt(wrapper.find(ITEM_SELECTOR).text()),
       ).toBeLessThanOrEqual(15)
 
       listRef.scrollToItem(21, SMART_ALIGNMENT)
       await nextTick()
       expect(
-        Number.parseInt(wrapper.find(ITEM_SELECTOR).text())
+        Number.parseInt(wrapper.find(ITEM_SELECTOR).text()),
       ).toBeLessThanOrEqual(15)
 
       listRef.scrollToItem(10, START_ALIGNMENT)
       await nextTick()
       expect(
-        Number.parseInt(wrapper.find(ITEM_SELECTOR).text())
+        Number.parseInt(wrapper.find(ITEM_SELECTOR).text()),
       ).toBeLessThanOrEqual(7)
 
       listRef.scrollToItem(20, END_ALIGNMENT)
       await nextTick()
       expect(
-        Number.parseInt(wrapper.find(ITEM_SELECTOR).text())
+        Number.parseInt(wrapper.find(ITEM_SELECTOR).text()),
       ).toBeLessThanOrEqual(14)
 
       listRef.scrollTo(200)
       await nextTick()
       listRef.scrollToItem(5)
       expect(
-        Number.parseInt(wrapper.find(ITEM_SELECTOR).text())
+        Number.parseInt(wrapper.find(ITEM_SELECTOR).text()),
       ).toBeLessThanOrEqual(4)
     })
   })

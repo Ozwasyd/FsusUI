@@ -1,5 +1,5 @@
-import { computed, ref, watch } from 'vue'
-import { filterIndices } from '@element-plus/wasm'
+import { computed, watch } from 'vue'
+import { filterIndicesSync, warmupWasm } from '@element-plus/wasm'
 import { isFunction } from '@element-plus/utils'
 import { CHECKED_CHANGE_EVENT } from '../transfer-panel'
 import { usePropsAlias } from './use-props-alias'
@@ -15,22 +15,28 @@ import type {
 
 const WASM_TRANSFER_FILTER_THRESHOLD = 1_000
 
+const isAsciiOnly = (value: string) => {
+  for (let index = 0; index < value.length; index++) {
+    if (value.charCodeAt(index) > 0x7f) {
+      return false
+    }
+  }
+
+  return true
+}
+
 export const useCheck = (
   props: TransferPanelProps,
   panelState: TransferPanelState,
-  emit: SetupContext<TransferPanelEmits>['emit']
+  emit: SetupContext<TransferPanelEmits>['emit'],
 ) => {
   const propsAlias = usePropsAlias(props)
   const filterSourceData = computed(() => [...props.data])
   const filterLabels = computed(() => {
     return filterSourceData.value.map((item) => {
-      return String(
-        item[propsAlias.value.label] || item[propsAlias.value.key]
-      )
+      return String(item[propsAlias.value.label] || item[propsAlias.value.key])
     })
   })
-  const wasmFilterJobId = ref(0)
-  const wasmMatchedIndexes = ref<Set<number> | null>(null)
   const shouldUseWasmFilter = computed(() => {
     return (
       !isFunction(props.filterMethod) &&
@@ -38,11 +44,28 @@ export const useCheck = (
       filterLabels.value.length >= WASM_TRANSFER_FILTER_THRESHOLD
     )
   })
+  const canUseWasmFilter = computed(() => {
+    return (
+      shouldUseWasmFilter.value &&
+      isAsciiOnly(panelState.query) &&
+      filterLabels.value.every((label) => isAsciiOnly(label))
+    )
+  })
 
   const filteredData = computed(() => {
-    const matchedIndexes = wasmMatchedIndexes.value
-    if (matchedIndexes) {
-      return filterSourceData.value.filter((_, index) => matchedIndexes.has(index))
+    if (canUseWasmFilter.value) {
+      const matchedIndexes = filterIndicesSync(
+        filterLabels.value,
+        panelState.query,
+        false,
+      )
+
+      if (matchedIndexes) {
+        const matchedIndexSet = new Set(matchedIndexes)
+        return filterSourceData.value.filter((_, index) =>
+          matchedIndexSet.has(index),
+        )
+      }
     }
 
     return filterSourceData.value.filter((item) => {
@@ -50,7 +73,7 @@ export const useCheck = (
         return props.filterMethod(panelState.query, item)
       } else {
         const label = String(
-          item[propsAlias.value.label] || item[propsAlias.value.key]
+          item[propsAlias.value.label] || item[propsAlias.value.key],
         )
         return label.toLowerCase().includes(panelState.query.toLowerCase())
       }
@@ -58,7 +81,7 @@ export const useCheck = (
   })
 
   const checkableData = computed(() =>
-    filteredData.value.filter((item) => !item[propsAlias.value.disabled])
+    filteredData.value.filter((item) => !item[propsAlias.value.disabled]),
   )
 
   const checkedSummary = computed(() => {
@@ -84,7 +107,7 @@ export const useCheck = (
 
   const updateAllChecked = () => {
     const checkableDataKeys = checkableData.value.map(
-      (item) => item[propsAlias.value.key]
+      (item) => item[propsAlias.value.key],
     )
     const checkedSet = new Set(panelState.checked)
     panelState.allChecked =
@@ -112,7 +135,7 @@ export const useCheck = (
         emit(CHECKED_CHANGE_EVENT, val)
         panelState.checkChangeByUser = true
       }
-    }
+    },
   )
 
   watch(checkableData, () => {
@@ -120,51 +143,30 @@ export const useCheck = (
   })
 
   watch(
-    [filterLabels, () => panelState.query, shouldUseWasmFilter],
-    async ([labels, query, useWasm]) => {
-      const currentJobId = wasmFilterJobId.value + 1
-      wasmFilterJobId.value = currentJobId
-      wasmMatchedIndexes.value = null
-
-      if (!useWasm) {
-        return
-      }
-
-      try {
-        const matchedIndexes = await filterIndices(labels, query, false)
-
-        if (wasmFilterJobId.value !== currentJobId) {
-          return
-        }
-
-        wasmMatchedIndexes.value = new Set(matchedIndexes)
-      } catch {
-        if (wasmFilterJobId.value === currentJobId) {
-          wasmMatchedIndexes.value = null
-        }
+    canUseWasmFilter,
+    (useWasm) => {
+      if (useWasm) {
+        warmupWasm()
       }
     },
     {
       immediate: true,
-    }
+    },
   )
 
-  watch(
-    filterSourceData,
-    () => {
-      const checked: TransferKey[] = []
-      const filteredDataKeys = new Set(
-        filteredData.value.map((item) => item[propsAlias.value.key])
-      )
-      panelState.checked.forEach((item) => {
-        if (filteredDataKeys.has(item)) {
-          checked.push(item)
-        }
-      })
-      panelState.checkChangeByUser = false
-      panelState.checked = checked
-    }
-  )
+  watch(filterSourceData, () => {
+    const checked: TransferKey[] = []
+    const filteredDataKeys = new Set(
+      filteredData.value.map((item) => item[propsAlias.value.key]),
+    )
+    panelState.checked.forEach((item) => {
+      if (filteredDataKeys.has(item)) {
+        checked.push(item)
+      }
+    })
+    panelState.checkChangeByUser = false
+    panelState.checked = checked
+  })
 
   watch(
     () => props.defaultChecked,
@@ -178,7 +180,7 @@ export const useCheck = (
 
       const checked: TransferKey[] = []
       const checkableDataKeys = new Set(
-        checkableData.value.map((item) => item[propsAlias.value.key])
+        checkableData.value.map((item) => item[propsAlias.value.key]),
       )
 
       val.forEach((item) => {
@@ -191,7 +193,7 @@ export const useCheck = (
     },
     {
       immediate: true,
-    }
+    },
   )
 
   return {

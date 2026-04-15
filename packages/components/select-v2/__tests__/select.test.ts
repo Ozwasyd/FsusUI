@@ -15,23 +15,35 @@ import Select from '../src/select.vue'
 
 const NOOP: (...args: any[]) => void = () => {}
 
-const { filterIndices } = vi.hoisted(() => ({
-  filterIndices: vi.fn(
-    async (data: string[], keyword: string, caseSensitive = false) => {
-      const normalizedKeyword = caseSensitive
-        ? keyword
-        : keyword.toLowerCase()
+const { filterIndicesSync, warmupWasm, setWasmReady } = vi.hoisted(() => {
+  let wasmReady = true
 
-      return data.reduce<number[]>((matched, item, index) => {
-        const normalizedItem = caseSensitive ? item : item.toLowerCase()
-        if (normalizedItem.includes(normalizedKeyword)) {
-          matched.push(index)
+  return {
+    filterIndicesSync: vi.fn(
+      (data: string[], keyword: string, caseSensitive = false) => {
+        if (!wasmReady) {
+          return null
         }
-        return matched
-      }, [])
-    }
-  ),
-}))
+
+        const normalizedKeyword = caseSensitive
+          ? keyword
+          : keyword.toLowerCase()
+
+        return data.reduce<number[]>((matched, item, index) => {
+          const normalizedItem = caseSensitive ? item : item.toLowerCase()
+          if (normalizedItem.includes(normalizedKeyword)) {
+            matched.push(index)
+          }
+          return matched
+        }, [])
+      },
+    ),
+    warmupWasm: vi.fn(),
+    setWasmReady: (value: boolean) => {
+      wasmReady = value
+    },
+  }
+})
 
 type SelectValue =
   | string
@@ -55,7 +67,8 @@ vi.mock('lodash-unified', async () => {
 })
 
 vi.mock('@element-plus/wasm', () => ({
-  filterIndices,
+  filterIndicesSync,
+  warmupWasm,
 }))
 
 const _mount = makeMountFunc({
@@ -120,7 +133,7 @@ const createSelect = (
       empty?: string
       default?: string
     }
-  } = {}
+  } = {},
 ) => {
   const emptySlot =
     (options.slots &&
@@ -149,6 +162,8 @@ const createSelect = (
         :placeholder="placeholder"
         :allow-create="allowCreate"
         :remote="remote"
+        :no-match-text="noMatchText"
+        :no-data-text="noDataText"
         :reserve-keyword="reserveKeyword"
         :scrollbar-always-on="scrollbarAlwaysOn"
         :teleported="teleported"
@@ -191,6 +206,8 @@ const createSelect = (
           reserveKeyword: false,
           multipleLimit: 0,
           placeholder: DEFAULT_PLACEHOLDER,
+          noMatchText: undefined,
+          noDataText: undefined,
           scrollbarAlwaysOn: false,
           popperAppendToBody: undefined,
           teleported: undefined,
@@ -205,13 +222,13 @@ const createSelect = (
         onBlur: NOOP,
         ...options.methods,
       },
-    }
+    },
   )
 }
 
 function getOptions(): HTMLElement[] {
   return Array.from(
-    document.querySelectorAll<HTMLElement>(`.${OPTION_ITEM_CLASS_NAME}`)
+    document.querySelectorAll<HTMLElement>(`.${OPTION_ITEM_CLASS_NAME}`),
   )
 }
 
@@ -224,6 +241,8 @@ const DEFAULT_PLACEHOLDER = 'Select'
 describe('Select', () => {
   afterEach(() => {
     document.body.innerHTML = ''
+    setWasmReady(true)
+    vi.clearAllMocks()
   })
 
   it('create', async () => {
@@ -241,7 +260,7 @@ describe('Select', () => {
     await nextTick()
     const vm = wrapper.vm as any
     const options = Array.from(
-      document.querySelectorAll(`.${OPTION_ITEM_CLASS_NAME}`)
+      document.querySelectorAll(`.${OPTION_ITEM_CLASS_NAME}`),
     )
     const result = options.every((option, index) => {
       const text = option.textContent
@@ -258,7 +277,7 @@ describe('Select', () => {
     })
     await nextTick()
     expect([...document.querySelector('.el-popper').classList]).toContain(
-      'custom-dropdown'
+      'custom-dropdown',
     )
   })
 
@@ -285,7 +304,7 @@ describe('Select', () => {
     const vm = wrapper.vm as any
     await nextTick()
     expect(wrapper.find(`.${PLACEHOLDER_CLASS_NAME}`).text()).toBe(
-      vm.options[1].label
+      vm.options[1].label,
     )
   })
 
@@ -330,7 +349,7 @@ describe('Select', () => {
     const vm = wrapper.vm as any
     await nextTick()
     expect(wrapper.find(`.${PLACEHOLDER_CLASS_NAME}`).text()).toBe(
-      vm.options[0].label
+      vm.options[0].label,
     )
     expect(vm.value).toEqual(vm.options[0].value)
   })
@@ -414,6 +433,33 @@ describe('Select', () => {
     expect(vm.value).toEqual(vm.options[2].value)
   })
 
+  it('uses object label as placeholder when value-key model value is not in options', async () => {
+    const wrapper = createSelect({
+      data: () => {
+        return {
+          options: [
+            {
+              value: { id: 1, label: 'option 1' },
+              label: 'option 1',
+            },
+            {
+              value: { id: 2, label: 'option 2' },
+              label: 'option 2',
+            },
+          ],
+          value: { id: 999, label: 'custom option label' },
+          valueKey: 'id',
+          filterable: true,
+        }
+      },
+    })
+
+    await nextTick()
+
+    const placeholder = wrapper.find(`.${PLACEHOLDER_CLASS_NAME}`)
+    expect(placeholder.text()).toBe('custom option label')
+  })
+
   it('disabled option', async () => {
     const wrapper = createSelect({
       data: () => {
@@ -442,7 +488,7 @@ describe('Select', () => {
     const vm = wrapper.vm as any
     const placeholder = wrapper.find(`.${PLACEHOLDER_CLASS_NAME}`)
     const option = document.querySelector<HTMLElement>(
-      `.el-select-dropdown__option-item.is-disabled`
+      `.el-select-dropdown__option-item.is-disabled`,
     )
     expect(option.textContent).toBe(vm.options[1].label)
     await clickOptionItem(option)
@@ -452,7 +498,7 @@ describe('Select', () => {
     vm.options[2].disabled = true
     await nextTick()
     const options = document.querySelectorAll<HTMLElement>(
-      `.el-select-dropdown__option-item.is-disabled`
+      `.el-select-dropdown__option-item.is-disabled`,
     )
     expect(options.length).toBe(2)
     expect(options.item(1).textContent).toBe(vm.options[2].label)
@@ -472,7 +518,7 @@ describe('Select', () => {
     })
     await nextTick()
     expect(wrapper.find(`.${WRAPPER_CLASS_NAME}`).classes()).toContain(
-      'is-disabled'
+      'is-disabled',
     )
   })
 
@@ -528,9 +574,9 @@ describe('Select', () => {
         })
         await nextTick()
         expect(wrapper.find(`.${PLACEHOLDER_CLASS_NAME}`).text()).toBe(
-          placeholder
+          placeholder,
         )
-      }
+      },
     )
 
     it.each([
@@ -552,9 +598,9 @@ describe('Select', () => {
         })
         await nextTick()
         expect(wrapper.find(`.${PLACEHOLDER_CLASS_NAME}`).text()).toBe(
-          placeholder
+          placeholder,
         )
-      }
+      },
     )
   })
 
@@ -1111,7 +1157,7 @@ describe('Select', () => {
           name: 'ElPopperContent',
         })
         .find('.empty-slot')
-        .exists()
+        .exists(),
     ).toBeTruthy()
   })
 
@@ -1226,7 +1272,7 @@ describe('Select', () => {
         .findComponent({
           name: 'ElPopperContent',
         })
-        .findAll('.custom-renderer').length
+        .findAll('.custom-renderer').length,
     ).toBeGreaterThan(0)
   })
 
@@ -1296,7 +1342,7 @@ describe('Select', () => {
     // When all tags are removed, the placeholder should be displayed
     await clickTagCloseButton(wrapper)
     expect(wrapper.find(`.${PLACEHOLDER_CLASS_NAME}`).text()).toBe(
-      DEFAULT_PLACEHOLDER
+      DEFAULT_PLACEHOLDER,
     )
     // The placeholder should disappear after it is selected again
     const options = getOptions()
@@ -1310,7 +1356,7 @@ describe('Select', () => {
     })
     await nextTick()
     expect(wrapper.find(`.${PLACEHOLDER_CLASS_NAME}`).text()).toBe(
-      DEFAULT_PLACEHOLDER
+      DEFAULT_PLACEHOLDER,
     )
   })
 
@@ -1546,7 +1592,7 @@ describe('Select', () => {
     for (const tagWrapper of tagWrappers) {
       const tagWrapperDom = tagWrapper.element
       expect(
-        Number.parseInt(tagWrapperDom.style.maxWidth) === selectRect.width - 42
+        Number.parseInt(tagWrapperDom.style.maxWidth) === selectRect.width - 42,
       ).toBe(true)
     }
     mockSelectWidth.mockRestore()
@@ -1617,7 +1663,7 @@ describe('Select', () => {
       await nextTick()
       const { selector } = usePopperContainerId()
       expect(document.body.querySelector(selector.value)!.innerHTML).not.toBe(
-        ''
+        '',
       )
     })
 
@@ -1722,11 +1768,161 @@ describe('Select', () => {
     input.element.value = 'match'
     await input.trigger('input')
     await nextTick()
-    await Promise.resolve()
-    await nextTick()
 
-    expect(filterIndices).toHaveBeenCalled()
+    expect(filterIndicesSync).toHaveBeenCalled()
     expect(selectVm.filteredOptions).toHaveLength(1)
     expect(selectVm.filteredOptions[0].label).toBe('Wasm Match')
+  })
+
+  it('should close the dropdown when tab or esc is pressed inside the list', async () => {
+    const wrapper = createSelect()
+    const select = wrapper.findComponent(Select)
+    const selectVm = select.vm as any
+
+    selectVm.expanded = true
+    await nextTick()
+    await rAF()
+
+    document.querySelector<HTMLElement>('.el-vl__wrapper')?.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        code: EVENT_CODE.tab,
+      }),
+    )
+    await nextTick()
+    expect(selectVm.expanded).toBe(false)
+
+    selectVm.expanded = true
+    await nextTick()
+    await rAF()
+    document.querySelector<HTMLElement>('.el-vl__wrapper')?.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        code: EVENT_CODE.esc,
+      }),
+    )
+    await nextTick()
+    expect(selectVm.expanded).toBe(false)
+  })
+
+  it('should show no-match text when filtering returns no options', async () => {
+    const wrapper = createSelect({
+      data: () => ({
+        filterable: true,
+        noMatchText: 'No matched options',
+        noDataText: 'No options',
+      }),
+    })
+
+    await wrapper.trigger('click')
+    const input = wrapper.find('input')
+    input.element.value = 'missing-option'
+    await input.trigger('input')
+    await nextTick()
+
+    expect(
+      document.querySelector<HTMLElement>('.el-select-v2__empty')?.textContent,
+    ).toBe('No matched options')
+  })
+
+  it('should fall back to JS filtering on cold start and use wasm on later queries', async () => {
+    setWasmReady(false)
+    const options = Array.from({ length: 2_200 }, (_, index) => ({
+      value: `${index + 1}`,
+      label: index === 1_765 ? 'Wasm Match' : `option ${index + 1}`,
+    }))
+
+    const wrapper = createSelect({
+      data: () => ({
+        filterable: true,
+        options,
+      }),
+    })
+
+    await wrapper.trigger('click')
+    const selectVm = wrapper.findComponent(Select).vm as any
+    const input = wrapper.find('input')
+
+    input.element.value = 'match'
+    await input.trigger('input')
+    await nextTick()
+
+    expect(warmupWasm).toHaveBeenCalled()
+    expect(selectVm.filteredOptions).toHaveLength(1)
+    expect(selectVm.filteredOptions[0].label).toBe('Wasm Match')
+
+    vi.clearAllMocks()
+    setWasmReady(true)
+    input.element.value = 'option 12'
+    await input.trigger('input')
+    await nextTick()
+
+    expect(filterIndicesSync).toHaveBeenCalled()
+    expect(warmupWasm).not.toHaveBeenCalled()
+  })
+
+  it('should keep non-ascii filtering on the JS path', async () => {
+    const options = Array.from({ length: 2_200 }, (_, index) => ({
+      value: `${index + 1}`,
+      label: index === 1_024 ? 'Éclair' : `option ${index + 1}`,
+    }))
+
+    const wrapper = createSelect({
+      data: () => ({
+        filterable: true,
+        options,
+      }),
+    })
+
+    await wrapper.trigger('click')
+    const selectVm = wrapper.findComponent(Select).vm as any
+    const input = wrapper.find('input')
+
+    input.element.value = 'é'
+    await input.trigger('input')
+    await nextTick()
+
+    expect(filterIndicesSync).not.toHaveBeenCalled()
+    expect(selectVm.filteredOptions).toHaveLength(1)
+    expect(selectVm.filteredOptions[0].label).toBe('Éclair')
+  })
+
+  it('should render variable-height mode without undefined item sizes', async () => {
+    const wrapper = createSelect({
+      data: () => ({
+        filterable: true,
+        estimatedOptionHeight: 28,
+        options: [
+          {
+            value: '1',
+            label: 'A very long option label that should still render safely',
+          },
+          {
+            value: '2',
+            label: 'Another long option label for variable-height mode',
+          },
+          {
+            value: '3',
+            label: 'Short label',
+          },
+        ],
+      }),
+    })
+
+    await wrapper.trigger('click')
+    await nextTick()
+
+    expect(
+      getOptions().every((option) => option.style.height !== 'undefinedpx'),
+    ).toBe(true)
+
+    const input = wrapper.find('input')
+    input.element.value = 'long'
+    await input.trigger('input')
+    await nextTick()
+
+    expect(
+      getOptions().every((option) => option.style.height !== 'undefinedpx'),
+    ).toBe(true)
   })
 })

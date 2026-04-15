@@ -1,18 +1,64 @@
-import { onBeforeUnmount, onMounted, watchEffect } from 'vue'
+import { onBeforeUnmount, watchEffect } from 'vue'
 import { addUnit } from '@element-plus/utils'
 import type { ComputedRef, Ref } from 'vue'
+
+const INTERACTIVE_DRAG_EXCLUDE_SELECTOR = [
+  'button',
+  'input',
+  'textarea',
+  'select',
+  'option',
+  'a',
+  '[role="button"]',
+].join(', ')
 
 export const useDraggable = (
   targetRef: Ref<HTMLElement | undefined>,
   dragRef: Ref<HTMLElement | undefined>,
-  draggable: ComputedRef<boolean>
+  draggable: ComputedRef<boolean>,
 ) => {
   let transform = {
     offsetX: 0,
     offsetY: 0,
   }
+  let onMousemove: ((e: MouseEvent) => void) | null = null
+  let onMouseup: (() => void) | null = null
+
+  const cleanupDocumentListeners = () => {
+    if (onMousemove) {
+      document.removeEventListener('mousemove', onMousemove)
+      onMousemove = null
+    }
+
+    if (onMouseup) {
+      document.removeEventListener('mouseup', onMouseup)
+      onMouseup = null
+    }
+  }
+
+  const shouldSkipDrag = (
+    target: EventTarget | null,
+    dragEl: HTMLElement | undefined,
+  ) => {
+    if (!(target instanceof HTMLElement) || !dragEl) {
+      return false
+    }
+
+    const interactiveElement = target.closest(INTERACTIVE_DRAG_EXCLUDE_SELECTOR)
+    return (
+      !!interactiveElement &&
+      interactiveElement !== dragEl &&
+      dragEl.contains(interactiveElement)
+    )
+  }
 
   const onMousedown = (e: MouseEvent) => {
+    if (e.button !== 0 || shouldSkipDrag(e.target, dragRef.value)) {
+      return
+    }
+
+    cleanupDocumentListeners()
+
     const downX = e.clientX
     const downY = e.clientY
     const { offsetX, offsetY } = transform
@@ -31,14 +77,14 @@ export const useDraggable = (
     const maxLeft = clientWidth - targetLeft - targetWidth + offsetX
     const maxTop = clientHeight - targetTop - targetHeight + offsetY
 
-    const onMousemove = (e: MouseEvent) => {
+    onMousemove = (e: MouseEvent) => {
       const moveX = Math.min(
         Math.max(offsetX + e.clientX - downX, minLeft),
-        maxLeft
+        maxLeft,
       )
       const moveY = Math.min(
         Math.max(offsetY + e.clientY - downY, minTop),
-        maxTop
+        maxTop,
       )
 
       transform = {
@@ -48,43 +94,35 @@ export const useDraggable = (
 
       if (targetRef.value) {
         targetRef.value.style.transform = `translate(${addUnit(
-          moveX
+          moveX,
         )}, ${addUnit(moveY)})`
       }
     }
 
-    const onMouseup = () => {
-      document.removeEventListener('mousemove', onMousemove)
-      document.removeEventListener('mouseup', onMouseup)
+    onMouseup = () => {
+      cleanupDocumentListeners()
     }
 
     document.addEventListener('mousemove', onMousemove)
     document.addEventListener('mouseup', onMouseup)
   }
 
-  const onDraggable = () => {
-    if (dragRef.value && targetRef.value) {
-      dragRef.value.addEventListener('mousedown', onMousedown)
-    }
-  }
+  watchEffect((onCleanup) => {
+    const dragEl = dragRef.value
+    const targetEl = targetRef.value
 
-  const offDraggable = () => {
-    if (dragRef.value && targetRef.value) {
-      dragRef.value.removeEventListener('mousedown', onMousedown)
+    if (!draggable.value || !dragEl || !targetEl) {
+      return
     }
-  }
 
-  onMounted(() => {
-    watchEffect(() => {
-      if (draggable.value) {
-        onDraggable()
-      } else {
-        offDraggable()
-      }
+    dragEl.addEventListener('mousedown', onMousedown)
+    onCleanup(() => {
+      dragEl.removeEventListener('mousedown', onMousedown)
+      cleanupDocumentListeners()
     })
   })
 
   onBeforeUnmount(() => {
-    offDraggable()
+    cleanupDocumentListeners()
   })
 }

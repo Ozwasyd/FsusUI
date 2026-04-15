@@ -50,6 +50,12 @@ export function useTree(
   )
 
   const {
+    hiddenNodeKeySet,
+    doFilter,
+    isForceHiddenExpandIcon,
+  } = useFilter(props, tree)
+
+  const {
     isIndeterminate,
     isChecked,
     toggleCheckbox,
@@ -60,11 +66,6 @@ export function useTree(
     setChecked,
     setCheckedKeys,
   } = useCheck(props, tree)
-
-  const { doFilter, hiddenNodeKeySet, isForceHiddenExpandIcon } = useFilter(
-    props,
-    tree
-  )
 
   const valueKey = computed(() => {
     return props.props?.value || TreeOptionsEnum.KEY
@@ -207,7 +208,7 @@ export function useTree(
       toggleExpand(node)
     }
     if (props.showCheckbox && props.checkOnClickNode && !node.disabled) {
-      toggleCheckbox(node, !isChecked(node), true)
+      toggleCheckbox(node, !isChecked(node), true, hiddenNodeKeySet)
     }
   }
 
@@ -219,7 +220,7 @@ export function useTree(
   }
 
   function handleNodeCheck(node: TreeNode, checked: CheckboxValueType) {
-    toggleCheckbox(node, checked)
+    toggleCheckbox(node, checked, true, hiddenNodeKeySet)
   }
 
   function expandNode(node: TreeNode) {

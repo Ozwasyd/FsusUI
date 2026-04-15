@@ -90,13 +90,13 @@ const createList = ({
         const startIndex = getStartIndexForOffset(
           props,
           scrollOffset,
-          unref(dynamicSizeCache)
+          unref(dynamicSizeCache),
         )
         const stopIndex = getStopIndexForStartIndex(
           props,
           startIndex,
           scrollOffset,
-          unref(dynamicSizeCache)
+          unref(dynamicSizeCache),
         )
 
         const cacheBackward =
@@ -113,7 +113,7 @@ const createList = ({
       })
 
       const estimatedTotalSize = computed(() =>
-        getEstimatedTotalSize(props, unref(dynamicSizeCache))
+        getEstimatedTotalSize(props, unref(dynamicSizeCache)),
       )
 
       const _isHorizontal = computed(() => isHorizontal(props.layout))
@@ -144,7 +144,7 @@ const createList = ({
       })
 
       const clientSize = computed(() =>
-        _isHorizontal.value ? props.width : props.height
+        _isHorizontal.value ? props.width : props.height,
       )
 
       // methods
@@ -152,7 +152,7 @@ const createList = ({
         {
           atStartEdge: computed(() => states.value.scrollOffset <= 0),
           atEndEdge: computed(
-            () => states.value.scrollOffset >= estimatedTotalSize.value
+            () => states.value.scrollOffset >= estimatedTotalSize.value,
           ),
           layout: computed(() => props.layout),
         },
@@ -165,10 +165,10 @@ const createList = ({
           scrollTo(
             Math.min(
               states.value.scrollOffset + offset,
-              estimatedTotalSize.value - (clientSize.value as number)
-            )
+              estimatedTotalSize.value - (clientSize.value as number),
+            ),
           )
-        }
+        },
       )
 
       const emitEvents = () => {
@@ -194,7 +194,7 @@ const createList = ({
 
         const scrollOffset = Math.max(
           0,
-          Math.min(scrollTop, scrollHeight - clientHeight)
+          Math.min(scrollTop, scrollHeight - clientHeight),
         )
 
         states.value = {
@@ -240,7 +240,7 @@ const createList = ({
 
         scrollOffset = Math.max(
           0,
-          Math.min(scrollOffset, scrollWidth - clientWidth)
+          Math.min(scrollOffset, scrollWidth - clientWidth),
         )
 
         states.value = {
@@ -267,8 +267,8 @@ const createList = ({
         scrollTo(
           Math.min(
             estimatedTotalSize.value - (clientSize.value as number),
-            offset
-          )
+            offset,
+          ),
         )
       }
 
@@ -291,7 +291,7 @@ const createList = ({
 
       const scrollToItem = (
         idx: number,
-        alignment: Alignment = AUTO_ALIGNMENT
+        alignment: Alignment = AUTO_ALIGNMENT,
       ) => {
         const { scrollOffset } = unref(states)
 
@@ -302,8 +302,8 @@ const createList = ({
             idx,
             alignment,
             scrollOffset,
-            unref(dynamicSizeCache)
-          )
+            unref(dynamicSizeCache),
+          ),
         )
       }
 
@@ -313,7 +313,7 @@ const createList = ({
         const itemStyleCache = getItemStyleCache.value(
           clearCache && itemSize,
           clearCache && layout,
-          clearCache && direction
+          clearCache && direction,
         )
 
         let style: CSSProperties
@@ -356,6 +356,10 @@ const createList = ({
         if (window) {
           window.scrollTop = 0
         }
+      }
+
+      const resetAfterIndex = (index: number, forceUpdate = true) => {
+        dynamicSizeCache.value?.clearCacheAfterIndex?.(index, forceUpdate)
       }
 
       // life cycles
@@ -428,6 +432,7 @@ const createList = ({
         scrollTo,
         scrollToItem,
         resetScrollTop,
+        resetAfterIndex,
       }
 
       expose({
@@ -437,6 +442,7 @@ const createList = ({
         scrollTo,
         scrollToItem,
         resetScrollTop,
+        resetAfterIndex,
         states,
       })
 
@@ -481,7 +487,7 @@ const createList = ({
               index: i,
               isScrolling: useIsScrolling ? states.isScrolling : undefined,
               style: getItemStyle(i),
-            })
+            }),
           )
         }
       }
@@ -497,7 +503,7 @@ const createList = ({
             ? {
                 default: () => children,
               }
-            : children
+            : children,
         ),
       ]
 
@@ -522,7 +528,7 @@ const createList = ({
           ref: 'windowRef',
           key: 0,
         },
-        !isString(Container) ? { default: () => [InnerNode] } : [InnerNode]
+        !isString(Container) ? { default: () => [InnerNode] } : [InnerNode],
       )
 
       return h(
@@ -531,7 +537,7 @@ const createList = ({
           key: 0,
           class: [ns.e('wrapper'), states.scrollbarAlwaysOn ? 'always-on' : ''],
         },
-        [listContainer, scrollbar]
+        [listContainer, scrollbar],
       )
     },
   })

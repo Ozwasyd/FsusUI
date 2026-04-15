@@ -8,7 +8,10 @@
           tag="div"
           :view-class="ns.e('list')"
         >
-          <el-roving-focus-group v-bind="rovingFocusGroupBindings" v-on="rovingFocusGroupEvents">
+          <el-roving-focus-group
+            v-bind="rovingFocusGroupBindings"
+            v-on="rovingFocusGroupEvents"
+          >
             <el-dropdown-collection>
               <slot name="dropdown" />
             </el-dropdown-collection>
@@ -52,12 +55,9 @@ import {
   computed,
   defineComponent,
   getCurrentInstance,
-  onBeforeUnmount,
   provide,
   ref,
   toRef,
-  unref,
-  watch,
 } from 'vue'
 import ElButton from '@element-plus/components/button'
 import ElTooltip from '@element-plus/components/tooltip'
@@ -99,8 +99,12 @@ export default defineComponent({
     const ns = useNamespace('dropdown')
     const { t } = useLocale()
 
-    const triggeringElementRef = ref<(ComponentPublicInstance & { $el: HTMLElement }) | null>(null)
-    const referenceElementRef = ref<(ComponentPublicInstance & { $el: HTMLElement }) | null>(null)
+    const triggeringElementRef = ref<
+      (ComponentPublicInstance & { $el: HTMLElement }) | null
+    >(null)
+    const referenceElementRef = ref<
+      (ComponentPublicInstance & { $el: HTMLElement }) | null
+    >(null)
     const popperRef = ref<InstanceType<typeof ElTooltip> | null>(null)
     const contentRef = ref<HTMLElement | null>(null)
     const scrollbar = ref(null)
@@ -109,7 +113,7 @@ export default defineComponent({
     const triggerKeys = [EVENT_CODE.enter, EVENT_CODE.space, EVENT_CODE.down]
     const triggerTargetEl = computed(() => contentRef.value ?? undefined)
     const virtualRef = computed<Measurable | undefined>(
-      () => triggeringElementRef.value?.$el ?? undefined
+      () => triggeringElementRef.value?.$el ?? undefined,
     )
 
     const wrapStyle = computed<CSSProperties>(() => ({
@@ -177,47 +181,6 @@ export default defineComponent({
       'aria-label': t('el.dropdown.toggleDropdown'),
     }))
 
-    // The goal of this code is to focus on the tooltip triggering element when it is hovered.
-    // This is a temporary fix for where closing the dropdown through pointerleave event focuses on a
-    // completely different element. For a permanent solution, remove all calls to any "element.focus()"
-    // that are triggered through pointer enter/leave events.
-    watch(
-      [triggeringElementRef, trigger],
-      ([triggeringElement, trigger], [prevTriggeringElement]) => {
-        if (prevTriggeringElement?.$el?.removeEventListener) {
-          prevTriggeringElement.$el.removeEventListener(
-            'pointerenter',
-            onAutofocusTriggerEnter
-          )
-        }
-        if (triggeringElement?.$el?.removeEventListener) {
-          triggeringElement.$el.removeEventListener(
-            'pointerenter',
-            onAutofocusTriggerEnter
-          )
-        }
-        if (
-          triggeringElement?.$el?.addEventListener &&
-          trigger.includes('hover')
-        ) {
-          triggeringElement.$el.addEventListener(
-            'pointerenter',
-            onAutofocusTriggerEnter
-          )
-        }
-      },
-      { immediate: true }
-    )
-
-    onBeforeUnmount(() => {
-      if (triggeringElementRef.value?.$el?.removeEventListener) {
-        triggeringElementRef.value.$el.removeEventListener(
-          'pointerenter',
-          onAutofocusTriggerEnter
-        )
-      }
-    })
-
     function handleClick() {
       handleClose()
     }
@@ -236,20 +199,11 @@ export default defineComponent({
       emit('command', ...args)
     }
 
-    function onAutofocusTriggerEnter() {
-      triggeringElementRef.value?.$el?.focus()
-    }
-
     function onItemEnter() {
       // NOOP for now
     }
 
     function onItemLeave() {
-      const contentEl = unref(contentRef)
-
-      if (trigger.value.includes('hover')) {
-        contentEl?.focus()
-      }
       currentTabId.value = null
     }
 

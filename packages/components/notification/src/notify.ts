@@ -8,8 +8,14 @@ import {
 } from '@element-plus/utils'
 import NotificationConstructor from './notification.vue'
 import { notificationTypes } from './notification'
+import {
+  deleteNotificationBaseOffset,
+  GAP_SIZE,
+  setNotificationBaseOffset,
+} from './instance'
 
 import type { AppContext, Ref, VNode } from 'vue'
+import type { Mutable } from '@element-plus/utils'
 import type {
   NotificationOptions,
   NotificationProps,
@@ -29,8 +35,6 @@ const notifications: Record<
   'bottom-right': [],
 }
 
-// the gap size between each notification
-const GAP_SIZE = 16
 let seed = 1
 
 const notify: NotifyFn & Partial<Notify> & { _context: AppContext | null } =
@@ -43,14 +47,15 @@ const notify: NotifyFn & Partial<Notify> & { _context: AppContext | null } =
 
     const position = options.position || 'top-right'
 
-    let verticalOffset = options.offset || 0
+    const baseOffset = (options.offset || 0) + GAP_SIZE
+    let verticalOffset = baseOffset
     notifications[position].forEach(({ vm }) => {
       verticalOffset += (vm.el?.offsetHeight || 0) + GAP_SIZE
     })
-    verticalOffset += GAP_SIZE
 
     const id = `notification_${seed++}`
     const userOnClose = options.onClose
+    setNotificationBaseOffset(id, baseOffset)
     const props: Partial<NotificationProps> = {
       ...options,
       offset: verticalOffset,
@@ -91,6 +96,7 @@ const notify: NotifyFn & Partial<Notify> & { _context: AppContext | null } =
 
     // clean notification element preventing mem leak
     vm.props!.onDestroy = () => {
+      deleteNotificationBaseOffset(id)
       render(null, container)
     }
 
@@ -145,20 +151,20 @@ export function close(
   if (!vm) return
   // calling user's on close function before notification gets removed from DOM.
   userOnClose?.(vm)
+  deleteNotificationBaseOffset(id)
 
   // note that this is called @before-leave, that's why we were able to fetch this property.
   const removedHeight = vm.el!.offsetHeight
-  const verticalPos = position.split('-')[0]
   orientedNotifications.splice(idx, 1)
   const len = orientedNotifications.length
   if (len < 1) return
   // starting from the removing item.
   for (let i = idx; i < len; i++) {
     // new position equals the current offsetTop minus removed height plus 16px(the gap size between each item)
-    const { el, component } = orientedNotifications[i].vm
-    const pos =
-      Number.parseInt(el!.style[verticalPos], 10) - removedHeight - GAP_SIZE
-    component!.props.offset = pos
+    const { component } = orientedNotifications[i].vm
+    const props = component!.props as Mutable<NotificationProps>
+    const pos = props.offset - removedHeight - GAP_SIZE
+    props.offset = pos
   }
 }
 

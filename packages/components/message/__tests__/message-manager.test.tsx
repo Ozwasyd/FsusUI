@@ -1,12 +1,19 @@
 import { h, nextTick, ref } from 'vue'
 import { describe, expect, it, test, vi } from 'vitest'
-import { getStyle } from '@element-plus/utils'
 import { rAF } from '@element-plus/test-utils/tick'
 import { ElMessage } from '..'
 import Message from '../src/method'
 
 const selector = '.el-message'
 // TODO: testing the original transition with `nextTick`'
+
+const getMessagePosition = (elm: Element): number => {
+  const element = elm as HTMLElement
+  return (
+    Number.parseFloat(element.style.top || '0') +
+    Number.parseFloat(element.style.getPropertyValue('--el-message-stack-y') || '0')
+  )
+}
 
 describe('Message on command', () => {
   test('it should get component handle', async () => {
@@ -89,12 +96,9 @@ describe('Message on command', () => {
     const elements = document.querySelectorAll(selector)
     expect(elements.length).toBe(3)
 
-    const getTopValue = (elm: Element): number =>
-      Number.parseInt(getStyle(elm as HTMLElement, 'top'), 10)
-
     const topValues: number[] = []
     elements.forEach((e) => {
-      topValues.push(getTopValue(e))
+      topValues.push(getMessagePosition(e))
     })
 
     for (let i = 1; i < topValues.length; i++) {
@@ -113,16 +117,33 @@ describe('Message on command', () => {
     const elements = document.querySelectorAll(selector)
     expect(elements.length).toBe(2)
 
-    const getTopValue = (elm: Element): number =>
-      Number.parseFloat(getStyle(elm as HTMLElement, 'top'))
-
-    const firstElementTop = getTopValue(elements[0])
-    const secondElementTop = getTopValue(elements[1])
+    const firstElementTop = getMessagePosition(elements[0])
+    const secondElementTop = getMessagePosition(elements[1])
 
     expect(firstElementTop).toBe(offset)
     expect(secondElementTop).toBe(offset + space)
 
     messages.forEach((m) => m.close())
+  })
+
+  test('it should restack subsequent messages through transform offset changes', async () => {
+    const messages = [
+      Message({ duration: 0 }),
+      Message({ duration: 0 }),
+      Message({ duration: 0 }),
+    ]
+
+    await rAF()
+    const elements = document.querySelectorAll(selector) as NodeListOf<HTMLElement>
+    expect(elements[2].style.getPropertyValue('--el-message-stack-y')).toBe('40px')
+
+    messages[1].close()
+    await rAF()
+
+    expect(elements[2].style.getPropertyValue('--el-message-stack-y')).toBe('20px')
+
+    messages[0].close()
+    messages[2].close()
   })
 
   test('it should have 4 other types of message', () => {

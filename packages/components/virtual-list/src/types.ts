@@ -44,12 +44,12 @@ export type ScrollDir = 'forwards' | 'backwards'
 export type ListItemSizer<T, P extends InitListCacheFunc<T>> = (
   props: T,
   index: number,
-  cache: ReturnType<P>
+  cache: ReturnType<P>,
 ) => number
 
 export type GetEstimatedTotalSize<
   T,
-  P extends InitCacheFunc<T, GridCache | ListCache>
+  P extends InitCacheFunc<T, GridCache | ListCache>,
 > = (props: T, cache: ReturnType<P>) => number
 
 export type GetOffset<T, P extends InitListCacheFunc<T>> = (
@@ -57,22 +57,22 @@ export type GetOffset<T, P extends InitListCacheFunc<T>> = (
   idx: number,
   alignment: Alignment,
   offset: number,
-  cache: ReturnType<P>
+  cache: ReturnType<P>,
 ) => number
 
 export type GetStartIndexForOffset<
   T,
-  P extends InitCacheFunc<T, GridCache | ListCache>
+  P extends InitCacheFunc<T, GridCache | ListCache>,
 > = (props: T, offset: number, cache: ReturnType<P>) => number
 
 export type GetStopIndexForStartIndex<
   T,
-  P extends InitCacheFunc<T, GridCache | ListCache>
+  P extends InitCacheFunc<T, GridCache | ListCache>,
 > = (
   props: T,
   startIndex: number,
   scrollOffset: number,
-  cache: ReturnType<P>
+  cache: ReturnType<P>,
 ) => number
 
 export type PropValidator<T> = (props: T) => void
@@ -83,7 +83,7 @@ export type InitGridCacheFunc<T> = InitCacheFunc<T, GridCache>
 
 export type ListConstructorProps<
   T,
-  P extends InitListCacheFunc<T> = InitListCacheFunc<T>
+  P extends InitListCacheFunc<T> = InitListCacheFunc<T>,
 > = {
   name?: string
   getItemOffset: ListItemSizer<T, P>
@@ -111,6 +111,8 @@ export type SharedExposes = {
 export type ListExposes = {
   scrollTo: (offset: number) => void
   scrollToItem: (idx: number, alignment?: Alignment) => void
+  resetScrollTop: () => void
+  resetAfterIndex?: (idx: number, forceUpdate?: boolean) => void
   states: {
     scrollDir: Direction
     scrollOffset: number
@@ -128,7 +130,7 @@ export type GridExposes = {
   scrollToItem: (
     columnIndex?: number,
     rowIndex?: number,
-    alignment?: Alignment
+    alignment?: Alignment,
   ) => void
 } & SharedExposes
 
@@ -142,18 +144,18 @@ export type GetGridOffset<T, P extends InitGridCacheFunc<T>> = (
   alignment: Alignment,
   offset: number,
   cache: ReturnType<P>,
-  scrollbarWidth: number
+  scrollbarWidth: number,
 ) => number
 
 export type GetPosition<T, P extends InitGridCacheFunc<T>> = (
   props: T,
   index: number,
-  cache: ReturnType<P>
+  cache: ReturnType<P>,
 ) => [number, number]
 
 export type GridConstructorProps<
   T,
-  P extends InitGridCacheFunc<T> = InitGridCacheFunc<T>
+  P extends InitGridCacheFunc<T> = InitGridCacheFunc<T>,
 > = {
   name?: string
   // columns getter
@@ -205,7 +207,7 @@ export type GridItemRenderedEvtParams = {
 export type GridScrollOptions = { scrollLeft?: number; scrollTop?: number }
 
 export type GridItemKeyGetter = <
-  T extends { [key: string | number]: any }
+  T extends { [key: string | number]: any },
 >(args: {
   columnIndex: number
   data: T

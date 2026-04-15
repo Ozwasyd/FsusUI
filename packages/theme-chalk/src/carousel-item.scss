@@ -56,3 +56,10 @@
     transition: getCssVar('transition-duration', 'fast');
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .#{$namespace}-carousel__item.is-animating,
+  .#{$namespace}-carousel__item--card {
+    transition-duration: 1ms !important;
+  }
+}

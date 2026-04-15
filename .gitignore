@@ -11,6 +11,9 @@ node_modules
 # Bundle
 dist
 coverage
+.husky/_/
+packages/demo-app/dist/
+packages/wasm/dist/
 
 # Local build artifacts
 build/

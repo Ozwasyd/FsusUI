@@ -5,7 +5,7 @@ import { get, isEqual, isNil, debounce as lodashDebounce } from 'lodash-unified'
 import { useResizeObserver } from '@vueuse/core'
 import { useLocale, useNamespace } from '@element-plus/hooks'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
-import { filterIndices } from '@element-plus/wasm'
+import { filterIndicesSync, warmupWasm } from '@element-plus/wasm'
 import {
   ValidateComponentsMap,
   debugWarn,
@@ -31,6 +31,16 @@ const TAG_BASE_WIDTH = {
   small: 33,
 }
 const WASM_FILTER_THRESHOLD = 2_000
+
+const isAsciiOnly = (value: string) => {
+  for (let index = 0; index < value.length; index++) {
+    if (value.charCodeAt(index) > 0x7f) {
+      return false
+    }
+  }
+
+  return true
+}
 
 const useSelect = (props: ISelectProps, emit) => {
   // inject
@@ -85,7 +95,8 @@ const useSelect = (props: ISelectProps, emit) => {
   const selectDisabled = computed(() => props.disabled || elForm?.disabled)
 
   const popupHeight = computed(() => {
-    const totalHeight = filteredOptions.value.length * 34
+    const optionHeight = props.estimatedOptionHeight ?? props.itemHeight
+    const totalHeight = filteredOptions.value.length * optionHeight
     return totalHeight > props.height ? props.height : totalHeight
   })
 
@@ -107,16 +118,16 @@ const useSelect = (props: ISelectProps, emit) => {
   })
 
   const iconComponent = computed(() =>
-    props.remote && props.filterable ? '' : ArrowUp
+    props.remote && props.filterable ? '' : ArrowUp,
   )
 
   const iconReverse = computed(
-    () => iconComponent.value && nsSelectV2.is('reverse', expanded.value)
+    () => iconComponent.value && nsSelectV2.is('reverse', expanded.value),
   )
 
   const validateState = computed(() => elFormItem?.validateState || '')
   const validateIcon = computed(
-    () => ValidateComponentsMap[validateState.value]
+    () => ValidateComponentsMap[validateState.value],
   )
 
   const debounce = computed(() => (props.remote ? 300 : 0))
@@ -125,8 +136,6 @@ const useSelect = (props: ISelectProps, emit) => {
     ...props.options,
     ...states.createdOptions,
   ])
-  const wasmFilteredOptions = ref<OptionType[] | null>(null)
-  const wasmFilterJobId = ref(0)
 
   const collectFilterGroups = (options: OptionType[]) => {
     const groups: Array<{
@@ -176,7 +185,7 @@ const useSelect = (props: ISelectProps, emit) => {
       start: number
       end: number
     }>,
-    matchedIndexes: Set<number>
+    matchedIndexes: Set<number>,
   ) => {
     const filtered: OptionType[] = []
 
@@ -194,7 +203,7 @@ const useSelect = (props: ISelectProps, emit) => {
               type: 'Group',
             },
             ...matchedOptions,
-            { type: 'Group' }
+            { type: 'Group' },
           )
         }
 
@@ -209,12 +218,11 @@ const useSelect = (props: ISelectProps, emit) => {
     return filtered
   }
 
-  const filterGroups = computed(() => collectFilterGroups(filterSourceOptions.value))
+  const filterGroups = computed(() =>
+    collectFilterGroups(filterSourceOptions.value),
+  )
 
-  const filterOptionsWithQuery = (
-    options: OptionType[],
-    query: string
-  ) => {
+  const filterOptionsWithQuery = (options: OptionType[], query: string) => {
     const isValidOption = (option: Option): boolean => {
       const regexp = new RegExp(escapeStringRegexp(query), 'i')
       return query ? regexp.test(getLabel(option) || '') : true
@@ -234,7 +242,7 @@ const useSelect = (props: ISelectProps, emit) => {
               type: 'Group',
             },
             ...filtered,
-            { type: 'Group' }
+            { type: 'Group' },
           )
         }
       } else if (props.remote || isValidOption(item)) {
@@ -255,6 +263,18 @@ const useSelect = (props: ISelectProps, emit) => {
     )
   })
 
+  const isAsciiFilterQuery = computed(() => isAsciiOnly(states.inputValue))
+  const hasOnlyAsciiFilterLabels = computed(() =>
+    filterGroups.value.labels.every((label) => isAsciiOnly(label)),
+  )
+  const canUseWasmFilter = computed(() => {
+    return (
+      shouldUseWasmFilter.value &&
+      isAsciiFilterQuery.value &&
+      hasOnlyAsciiFilterLabels.value
+    )
+  })
+
   // filteredOptions includes flatten the data into one dimensional array.
   const emptyText = computed(() => {
     const options = filteredOptions.value
@@ -263,7 +283,7 @@ const useSelect = (props: ISelectProps, emit) => {
     } else {
       if (props.remote && states.inputValue === '' && options.length === 0)
         return false
-      if (props.filterable && states.inputValue && options.length > 0) {
+      if (props.filterable && states.inputValue && options.length === 0) {
         return props.noMatchText || t('el.select.noMatch')
       }
       if (options.length === 0) {
@@ -278,10 +298,22 @@ const useSelect = (props: ISelectProps, emit) => {
       return []
     }
 
-    return (
-      wasmFilteredOptions.value ??
-      filterOptionsWithQuery(filterSourceOptions.value, states.inputValue)
-    )
+    if (canUseWasmFilter.value) {
+      const matchedIndexes = filterIndicesSync(
+        filterGroups.value.labels,
+        states.inputValue,
+        false,
+      )
+
+      if (matchedIndexes) {
+        return buildFilteredOptions(
+          filterGroups.value.groups,
+          new Set(matchedIndexes),
+        )
+      }
+    }
+
+    return filterOptionsWithQuery(filterSourceOptions.value, states.inputValue)
   })
 
   const filteredOptionsValueMap = computed(() => {
@@ -294,13 +326,13 @@ const useSelect = (props: ISelectProps, emit) => {
   })
 
   const optionsAllDisabled = computed(() =>
-    filteredOptions.value.every((option) => getDisabled(option))
+    filteredOptions.value.every((option) => getDisabled(option)),
   )
 
   const selectSize = useFormSize()
 
   const collapseTagSize = computed(() =>
-    'small' === selectSize.value ? 'small' : 'default'
+    'small' === selectSize.value ? 'small' : 'default',
   )
 
   const tagMaxWidth = computed(() => {
@@ -360,7 +392,7 @@ const useSelect = (props: ISelectProps, emit) => {
         filteredOptionsValueMap.value.has(props.modelValue[len - 1])
       ) {
         const { index } = filteredOptionsValueMap.value.get(
-          props.modelValue[len - 1]
+          props.modelValue[len - 1],
         )
         return index
       }
@@ -386,11 +418,11 @@ const useSelect = (props: ISelectProps, emit) => {
   })
 
   const showTagList = computed(() =>
-    states.cachedOptions.slice(0, props.maxCollapseTags)
+    states.cachedOptions.slice(0, props.maxCollapseTags),
   )
 
   const collapseTagList = computed(() =>
-    states.cachedOptions.slice(props.maxCollapseTags)
+    states.cachedOptions.slice(props.maxCollapseTags),
   )
 
   // hooks
@@ -663,7 +695,7 @@ const useSelect = (props: ISelectProps, emit) => {
 
   const onKeyboardNavigate = (
     direction: 'forward' | 'backward',
-    hoveringIndex: number = undefined
+    hoveringIndex: number = undefined,
   ) => {
     const options = filteredOptions.value
     if (
@@ -714,7 +746,7 @@ const useSelect = (props: ISelectProps, emit) => {
       onSelect(
         filteredOptions.value[states.hoveringIndex],
         states.hoveringIndex,
-        false
+        false,
       )
     }
   }
@@ -803,13 +835,16 @@ const useSelect = (props: ISelectProps, emit) => {
         const options = filteredOptions.value
         const selectedItemIndex = options.findIndex(
           (option) =>
-            getValueKey(getValue(option)) === getValueKey(props.modelValue)
+            getValueKey(getValue(option)) === getValueKey(props.modelValue),
         )
         if (~selectedItemIndex) {
           states.selectedLabel = getLabel(options[selectedItemIndex])
           updateHoveringIndex(selectedItemIndex)
         } else {
-          states.selectedLabel = getValueKey(props.modelValue)
+          const selectedLabel = isObject(props.modelValue)
+            ? getLabel(props.modelValue)
+            : undefined
+          states.selectedLabel = selectedLabel || getValueKey(props.modelValue)
         }
       } else {
         states.selectedLabel = ''
@@ -848,7 +883,7 @@ const useSelect = (props: ISelectProps, emit) => {
     },
     {
       deep: true,
-    }
+    },
   )
 
   watch(
@@ -862,40 +897,19 @@ const useSelect = (props: ISelectProps, emit) => {
     },
     {
       deep: true,
-    }
+    },
   )
 
   watch(
-    [filterGroups, () => props.loading, () => states.inputValue, shouldUseWasmFilter],
-    async ([groups, loading, query, useWasm]) => {
-      const currentJobId = wasmFilterJobId.value + 1
-      wasmFilterJobId.value = currentJobId
-      wasmFilteredOptions.value = null
-
-      if (!useWasm || loading) {
-        return
-      }
-
-      try {
-        const matchedIndexes = await filterIndices(groups.labels, query, false)
-
-        if (wasmFilterJobId.value !== currentJobId) {
-          return
-        }
-
-        wasmFilteredOptions.value = buildFilteredOptions(
-          groups.groups,
-          new Set(matchedIndexes)
-        )
-      } catch {
-        if (wasmFilterJobId.value === currentJobId) {
-          wasmFilteredOptions.value = null
-        }
+    canUseWasmFilter,
+    (useWasm) => {
+      if (useWasm) {
+        warmupWasm()
       }
     },
     {
       immediate: true,
-    }
+    },
   )
 
   // fix the problem that scrollTop is not reset in filterable mode
@@ -909,7 +923,7 @@ const useSelect = (props: ISelectProps, emit) => {
       if (!val) {
         resetHoveringIndex()
       }
-    }
+    },
   )
 
   onMounted(() => {

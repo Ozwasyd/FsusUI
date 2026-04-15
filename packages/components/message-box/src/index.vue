@@ -380,11 +380,12 @@ export default defineComponent({
       }
     })
 
-    function doClose() {
+    function doClose(action: Action = state.action || 'close') {
       if (!visible.value) return
+      state.action = action
       visible.value = false
       nextTick(() => {
-        if (state.action) emit('action', state.action)
+        emit('action', action)
       })
     }
 
@@ -413,7 +414,7 @@ export default defineComponent({
       if (state.beforeClose) {
         state.beforeClose?.(action, state, doClose)
       } else {
-        doClose()
+        doClose(action)
       }
     }
 

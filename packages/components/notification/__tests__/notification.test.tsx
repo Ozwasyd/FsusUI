@@ -43,6 +43,7 @@ describe('Notification.vue', () => {
       expect(wrapper.vm.positionStyle).toEqual(
         expect.objectContaining({
           top: '0px',
+          '--el-notification-stack-y': '0px',
         })
       )
     })
@@ -92,6 +93,7 @@ describe('Notification.vue', () => {
       expect(wrapper.vm.positionStyle).toEqual(
         expect.objectContaining({
           top: '0px',
+          '--el-notification-stack-y': '0px',
           zIndex: 9999,
         })
       )

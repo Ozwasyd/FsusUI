@@ -189,3 +189,12 @@
     opacity: 0;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog-fade-enter-active,
+  .dialog-fade-leave-active,
+  .dialog-fade-enter-active .#{$namespace}-overlay-dialog,
+  .dialog-fade-leave-active .#{$namespace}-overlay-dialog {
+    animation-duration: 1ms !important;
+  }
+}

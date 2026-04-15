@@ -12,63 +12,118 @@
  */
 
 #include <algorithm>
+#include <charconv>
 #include <cmath>
+#include <cstddef>
+#include <cctype>
 #include <cstdint>
-#include <cstring>
 #include <emscripten/bind.h>
+#include <emscripten/emscripten.h>
+#include <format>
 #include <ranges>
 #include <span>
+#include <stdexcept>
 #include <string>
+#include <string_view>
 #include <vector>
-#include <format>
 
 using namespace emscripten;
+
+namespace
+{
+constexpr auto asciiToLower = [](unsigned char c) {
+  return static_cast<char>(std::tolower(c));
+};
+
+void sortNumbersBuffer(std::span<double> data, bool ascending)
+{
+  if (ascending)
+  {
+    std::ranges::sort(data);
+    return;
+  }
+
+  std::ranges::sort(data, std::ranges::greater{});
+}
+
+void estimateRowHeightsBuffer(std::span<const std::int32_t> textLengths,
+                              double rowWidth,
+                              double charWidth,
+                              double lineHeight,
+                              double padding,
+                              std::span<double> output)
+{
+  const double charsPerLine = std::max(1.0, std::floor(rowWidth / charWidth));
+
+  for (std::size_t i = 0; i < textLengths.size(); ++i)
+  {
+    const int lines = static_cast<int>(
+      std::ceil(static_cast<double>(textLengths[i]) / charsPerLine));
+    output[i] = lines * lineHeight + padding;
+  }
+}
+
+bool parseHexRgb(std::string_view hex, std::uint32_t& rgbValue)
+{
+  if (hex.size() != 7 || hex.front() != '#')
+    return false;
+
+  const auto digits = hex.substr(1);
+  const auto [ptr, ec] = std::from_chars(
+    digits.data(), digits.data() + digits.size(), rgbValue, 16);
+
+  if (ec != std::errc{} || ptr != digits.data() + digits.size())
+    throw std::invalid_argument("invalid hex color");
+
+  return true;
+}
+} // namespace
+
+extern "C"
+{
+EMSCRIPTEN_KEEPALIVE void sort_numbers_buffer(double* data,
+                                              std::size_t len,
+                                              int ascending)
+{
+  sortNumbersBuffer({data, len}, ascending != 0);
+}
+
+EMSCRIPTEN_KEEPALIVE void estimate_row_heights_buffer(
+  const std::int32_t* lengths,
+  std::size_t len,
+  double rowWidth,
+  double charWidth,
+  double lineHeight,
+  double padding,
+  double* out)
+{
+  estimateRowHeightsBuffer(
+    {lengths, len}, rowWidth, charWidth, lineHeight, padding, {out, len});
+}
+}
 
 // ─────────────────────────────────
 // § 1  大型数组排序（数字 / 字符串）
 // ─────────────────────────────────
 
 /**
- * 对 Float64Array 原地排序（升序 / 降序）。
- * 前端传入 JS TypedArray，Emscripten 自动 memory-map。
+ * 对字符串数组原地排序。
+ * 注意：当前实现仍然是字节序排序，locale 语义保留在 TS 包装层兼容处理。
  */
-void sortNumbers(val arr, bool ascending)
-{
-  const unsigned len = arr["length"].as<unsigned>();
-  std::vector<double> buf(len);
-  for (unsigned i = 0; i < len; ++i)
-    buf[i] = arr[i].as<double>();
-
-  if (ascending)
-    std::ranges::sort(buf);
-  else
-    std::ranges::sort(buf, std::ranges::greater{});
-
-  for (unsigned i = 0; i < len; ++i)
-    arr.set(i, val(buf[i]));
-}
-
-/**
- * 对字符串数组原地排序，支持本地化（locale-aware）。
- * locale 示例："zh-CN"、"en-US"。
- */
-void sortStrings(val arr, bool ascending, [[maybe_unused]] std::string locale)
+void sortStrings(val arr, bool ascending)
 {
   const unsigned len = arr["length"].as<unsigned>();
   std::vector<std::string> buf(len);
   for (unsigned i = 0; i < len; ++i)
     buf[i] = arr[i].as<std::string>();
 
-  // C++23 标准 ranges + lambda 排序
   if (ascending)
   {
-    std::ranges::sort(buf, [](const std::string &a, const std::string &b)
-                      { return a < b; });
+    std::ranges::sort(buf, std::ranges::less{});
   }
   else
   {
-    std::ranges::sort(buf, [](const std::string &a, const std::string &b)
-                      { return a > b; });
+    std::ranges::sort(buf, std::ranges::greater{});
   }
 
   for (unsigned i = 0; i < len; ++i)
@@ -89,32 +144,28 @@ val filterIndices(val arr, std::string keyword, bool caseSensitive)
   val result = val::array();
   unsigned resultLen = 0;
 
-  if (!caseSensitive)
+  if (caseSensitive)
   {
-    // 转小写
-    std::ranges::transform(keyword, keyword.begin(),
-                           [](unsigned char c)
-                           { return std::tolower(c); });
+    for (unsigned i = 0; i < len; ++i)
+    {
+      std::string item = arr[i].as<std::string>();
+      if (item.contains(keyword))
+        result.set(resultLen++, val(i));
+    }
+
+    return result;
   }
+
+  std::ranges::transform(keyword, keyword.begin(), asciiToLower);
 
   for (unsigned i = 0; i < len; ++i)
   {
     std::string item = arr[i].as<std::string>();
-    if (!caseSensitive)
-    {
-      std::string lower = item;
-      std::ranges::transform(lower, lower.begin(),
-                             [](unsigned char c)
-                             { return std::tolower(c); });
-      if (lower.find(keyword) != std::string::npos)
-        result.set(resultLen++, val(i));
-    }
-    else
-    {
-      if (item.find(keyword) != std::string::npos)
-        result.set(resultLen++, val(i));
-    }
+    std::ranges::transform(item, item.begin(), asciiToLower);
+    if (item.contains(keyword))
+      result.set(resultLen++, val(i));
   }
+
   return result;
 }
 
@@ -161,8 +212,7 @@ RGB hslToRgb(double h, double s, double l)
 /** RGB → HSL */
 HSL rgbToHsl(double r, double g, double b)
 {
-  double max = std::max({r, g, b});
-  double min = std::min({r, g, b});
+  const auto [min, max] = std::minmax({r, g, b});
   double h = 0, s = 0, l = (max + min) / 2;
   if (max != min)
   {
@@ -181,16 +231,16 @@ HSL rgbToHsl(double r, double g, double b)
 
 /**
  * HEX string (#RRGGBB) → CSS "hsl(H, S%, L%)" string
- * 暴露给 JS 的高层接口，避免多次往返。
  */
 std::string hexToHsl(std::string hex)
 {
-  if (hex.size() < 7)
+  std::uint32_t rgbValue = 0;
+  if (!parseHexRgb(hex, rgbValue))
     return "";
-  unsigned int rgb_val = std::stoul(hex.substr(1), nullptr, 16);
-  double r = ((rgb_val >> 16) & 0xFF) / 255.0;
-  double g = ((rgb_val >> 8) & 0xFF) / 255.0;
-  double b = (rgb_val & 0xFF) / 255.0;
+
+  double r = ((rgbValue >> 16) & 0xFF) / 255.0;
+  double g = ((rgbValue >> 8) & 0xFF) / 255.0;
+  double b = (rgbValue & 0xFF) / 255.0;
   auto [h, s, l] = rgbToHsl(r, g, b);
   return std::format("hsl({:.1f},{:.1f}%,{:.1f}%)",
                      h * 360, s * 100, l * 100);
@@ -235,27 +285,6 @@ double clampAndRound(double value, double min, double max, int precision)
 // § 5  VirtualList 行高批量估算
 // ─────────────────────────────────
 
-/**
- * 根据每项文本长度批量估算行高（像素）。
- * rowWidth: 行宽（px），charWidth: 均值字符宽，lineHeight: 单行高，padding: 上下内边距。
- * 返回 JS Float64Array（各行像素高度）。
- */
-val estimateRowHeights(val textLengths, double rowWidth,
-                       double charWidth, double lineHeight,
-                       double padding)
-{
-  const unsigned len = textLengths["length"].as<unsigned>();
-  val result = val::global("Float64Array").new_(val(len));
-  for (unsigned i = 0; i < len; ++i)
-  {
-    int textLen = textLengths[i].as<int>();
-    double charsPerLine = std::max(1.0, std::floor(rowWidth / charWidth));
-    int lines = static_cast<int>(std::ceil(textLen / charsPerLine));
-    result.set(i, val(lines * lineHeight + padding));
-  }
-  return result;
-}
-
 // ─────────────────────────────────
 // § 6  版本查询
 // ─────────────────────────────────
@@ -266,24 +295,11 @@ std::string version() { return "1.0.0-es2022"; }
 // ─────────────────────────────────
 EMSCRIPTEN_BINDINGS(ep_wasm)
 {
-  // 排序
-  function("sortNumbers", &sortNumbers);
   function("sortStrings", &sortStrings);
-
-  // 过滤
   function("filterIndices", &filterIndices);
-
-  // 颜色
   function("hexToHsl", &hexToHsl);
   function("hslToHex", &hslToHex);
-
-  // 数字精度
   function("roundToPrecision", &roundToPrecision);
   function("clampAndRound", &clampAndRound);
-
-  // 虚拟列表行高
-  function("estimateRowHeights", &estimateRowHeights);
-
-  // 版本
   function("version", &version);
 }

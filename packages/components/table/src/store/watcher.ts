@@ -9,7 +9,11 @@ import {
   orderBy,
   toggleRowStatus,
 } from '../util'
-import { shouldUseWasm, trySortWithWasm } from '../composables/use-wasm-sort'
+import {
+  shouldUseWasm,
+  trySortWithWasmSync,
+  warmupWasmSort,
+} from '../composables/use-wasm-sort'
 import useExpand from './expand'
 import useCurrent from './current'
 import useTree from './tree'
@@ -19,16 +23,13 @@ import type { TableColumnCtx } from '../table-column/defaults'
 import type { Table, TableRefs } from '../table/defaults'
 import type { StoreFilter } from '.'
 
-const wasmSortJobs = new WeakMap<object, number>()
-
 /**
  * WASM 加速排序（大数据集）+ JS 降级（小数据集/自定义排序）。
  * 完全保持 Element Plus 排序语义——外部无感知。
  */
-const sortData = (data, states, applySortedData) => {
+const sortData = (data, states) => {
   const sortingColumn = states.sortingColumn
   if (!sortingColumn || typeof sortingColumn.sortable === 'string') {
-    wasmSortJobs.delete(states)
     return data
   }
 
@@ -37,28 +38,20 @@ const sortData = (data, states, applySortedData) => {
     states.sortProp,
     states.sortOrder,
     sortingColumn.sortMethod,
-    sortingColumn.sortBy
+    sortingColumn.sortBy,
   )
 
   // WASM 加速路径：仅对大数据集且无自定义排序时触发
   if (shouldUseWasm(data, sortingColumn)) {
     const ascending = states.sortOrder !== 'descending'
-    const sortJobId = (wasmSortJobs.get(states) || 0) + 1
-    wasmSortJobs.set(states, sortJobId)
+    const wasmSortedData = trySortWithWasmSync(data, states.sortProp, ascending)
+    if (wasmSortedData) {
+      return wasmSortedData
+    }
 
-    // 异步，但返回同步回退结果占位，WASM 完成后仅在当前任务仍有效时替换可见数据
-    trySortWithWasm(data, states.sortProp, ascending).then((sorted) => {
-      if (!sorted || wasmSortJobs.get(states) !== sortJobId) {
-        return
-      }
-
-      applySortedData(sorted)
-    })
-
-    return fallbackSortedData
+    warmupWasmSort()
   }
 
-  wasmSortJobs.delete(states)
   return fallbackSortedData
 }
 
@@ -129,10 +122,10 @@ function useWatcher<T>() {
       updateChildFixed(column)
     })
     fixedColumns.value = _columns.value.filter(
-      (column) => column.fixed === true || column.fixed === 'left'
+      (column) => column.fixed === true || column.fixed === 'left',
     )
     rightFixedColumns.value = _columns.value.filter(
-      (column) => column.fixed === 'right'
+      (column) => column.fixed === 'right',
     )
     if (
       fixedColumns.value.length > 0 &&
@@ -208,7 +201,7 @@ function useWatcher<T>() {
     }
     if (deleted.length) {
       const newSelection = selection.value.filter(
-        (item) => !deleted.includes(item)
+        (item) => !deleted.includes(item),
       )
       selection.value = newSelection
       instance.emit('selection-change', newSelection.slice())
@@ -222,7 +215,7 @@ function useWatcher<T>() {
   const toggleRowSelection = (
     row: T,
     selected = undefined,
-    emitChange = true
+    emitChange = true,
   ) => {
     const changed = toggleRowStatus(selection.value, row, selected)
     if (changed) {
@@ -263,14 +256,14 @@ function useWatcher<T>() {
       }
       childrenCount += getChildrenCount(
         getRowIdentity(row, rowKey),
-        childrenCountCache
+        childrenCountCache,
       )
     })
 
     if (selectionChanged) {
       instance.emit(
         'selection-change',
-        selection.value ? selection.value.slice() : []
+        selection.value ? selection.value.slice() : [],
       )
     }
     instance.emit('select-all', selection.value)
@@ -328,7 +321,7 @@ function useWatcher<T>() {
       }
       childrenCount += getChildrenCount(
         getRowIdentity(item, keyProp),
-        childrenCountCache
+        childrenCountCache,
       )
     }
 
@@ -339,7 +332,7 @@ function useWatcher<T>() {
   // gets the number of all child nodes by rowKey
   const getChildrenCount = (
     rowKey: string,
-    cache = new Map<string, number>()
+    cache = new Map<string, number>(),
   ) => {
     if (!instance || !instance.store) return 0
     if (!rowKey) return 0
@@ -393,12 +386,12 @@ function useWatcher<T>() {
         {
           columns: columns.value,
         },
-        columnId
+        columnId,
       )
       if (column && column.filterMethod) {
         sourceData = sourceData.filter((row) => {
           return values.some((value) =>
-            column.filterMethod.call(null, value, row, column)
+            column.filterMethod.call(null, value, row, column),
           )
         })
       }
@@ -412,8 +405,6 @@ function useWatcher<T>() {
       sortingColumn: sortingColumn.value,
       sortProp: sortProp.value,
       sortOrder: sortOrder.value,
-    }, (sortedData) => {
-      data.value = sortedData
     })
   }
 
@@ -443,8 +434,8 @@ function useWatcher<T>() {
           {
             columns: columns.value,
           },
-          key
-        )
+          key,
+        ),
       )
       keys.forEach((key) => {
         const column = columns_.find((col) => col.id === key)

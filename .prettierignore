@@ -2,6 +2,10 @@ dist
 build
 CMakeFiles
 .cmake
+.husky/_/
+packages/demo-app/dist
+packages/wasm/dist
+packages/wasm/build
 packages/wasm/.cmake-check
 node_modules
 coverage

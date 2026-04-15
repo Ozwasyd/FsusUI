@@ -21,8 +21,16 @@ import { useProps } from './useProps'
 
 import { selectV2InjectionKey } from './token'
 
-import type { ItemProps } from '@element-plus/components/virtual-list'
+import type {
+  ItemProps,
+  ListExposes,
+} from '@element-plus/components/virtual-list'
 import type { Option, OptionItemProps } from './select.types'
+
+type SelectListInstance = ListExposes & {
+  resetAfterIndex?: (index: number, forceUpdate?: boolean) => void
+  resetScrollTop?: () => void
+}
 
 export default defineComponent({
   name: 'ElSelectDropdown',
@@ -42,19 +50,64 @@ export default defineComponent({
 
     const cachedHeights = ref<Array<number>>([])
 
-    const listRef = ref()
+    const listRef = ref<SelectListInstance | null>(null)
 
     const size = computed(() => props.data.length)
+    const estimatedOptionHeight = computed(
+      () => select.props.estimatedOptionHeight ?? select.props.itemHeight,
+    )
     watch(
       () => size.value,
       () => {
-        select.popper.value.updatePopper?.()
-      }
+        select.popper.value?.updatePopper?.()
+      },
     )
 
     const isSized = computed(() =>
-      isUndefined(select.props.estimatedOptionHeight)
+      isUndefined(select.props.estimatedOptionHeight),
     )
+    const getDefaultItemHeight = () => estimatedOptionHeight.value
+
+    const resetAfterIndex = (index = 0) => {
+      listRef.value?.resetAfterIndex?.(index)
+    }
+
+    const syncCachedHeights = () => {
+      if (isSized.value) {
+        cachedHeights.value = []
+        return
+      }
+
+      cachedHeights.value = props.data.map((_, index) => {
+        return cachedHeights.value[index] ?? getDefaultItemHeight()
+      })
+      resetAfterIndex(0)
+      select.popper.value?.updatePopper?.()
+    }
+
+    const updateItemHeight = (index: number, height: number) => {
+      if (isSized.value || !Number.isFinite(height) || height <= 0) {
+        return
+      }
+
+      const nextHeight = Math.max(1, Math.ceil(height))
+      if (cachedHeights.value[index] === nextHeight) {
+        return
+      }
+
+      cachedHeights.value[index] = nextHeight
+      resetAfterIndex(index)
+      select.popper.value?.updatePopper?.()
+    }
+
+    watch(
+      [() => props.data, () => props.width, estimatedOptionHeight],
+      () => {
+        syncCachedHeights()
+      },
+      { immediate: true },
+    )
+
     const listProps = computed(() => {
       if (isSized.value) {
         return {
@@ -63,8 +116,9 @@ export default defineComponent({
       }
 
       return {
-        estimatedSize: select.props.estimatedOptionHeight,
-        itemSize: (idx: number) => cachedHeights.value[idx],
+        estimatedItemSize: estimatedOptionHeight.value,
+        itemSize: (idx: number) =>
+          cachedHeights.value[idx] ?? getDefaultItemHeight(),
       }
     })
 
@@ -114,14 +168,14 @@ export default defineComponent({
     const isItemHovering = (target: number) => props.hoveringIndex === target
 
     const scrollToItem = (index: number) => {
-      const list = listRef.value as any
+      const list = listRef.value
       if (list) {
         list.scrollToItem(index)
       }
     }
 
     const resetScrollTop = () => {
-      const list = listRef.value as any
+      const list = listRef.value
       if (list) {
         list.resetScrollTop()
       }
@@ -136,12 +190,13 @@ export default defineComponent({
       isItemSelected,
       scrollToItem,
       resetScrollTop,
+      resetAfterIndex,
     })
 
     const Item = (itemProps: ItemProps<any>) => {
       const { index, data, style } = itemProps
       const sized = unref(isSized)
-      const { itemSize, estimatedSize } = unref(listProps)
+      const { itemSize, estimatedItemSize } = unref(listProps)
       const { modelValue } = select.props
       const { onSelect, onHover } = select
       const item = data[index]
@@ -150,7 +205,8 @@ export default defineComponent({
           <GroupItem
             item={item}
             style={style}
-            height={(sized ? itemSize : estimatedSize) as number}
+            height={(sized ? itemSize : estimatedItemSize) as number}
+            onResize={(height: number) => updateItemHeight(index, height)}
           />
         )
       }
@@ -168,6 +224,7 @@ export default defineComponent({
           item={item}
           onSelect={onSelect}
           onHover={onHover}
+          onResize={(height: number) => updateItemHeight(index, height)}
         >
           {{
             default: (props: OptionItemProps) =>
@@ -189,7 +246,7 @@ export default defineComponent({
     }
 
     const onEscOrTab = () => {
-      select.expanded = false
+      select.expanded.value = false
     }
 
     const onKeydown = (e: KeyboardEvent) => {

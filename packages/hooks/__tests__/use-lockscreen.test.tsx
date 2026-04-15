@@ -52,7 +52,7 @@ describe('useLockscreen', () => {
   it('should cleanup when unmounted', async () => {
     const shouldRender = ref(true)
     mount({
-      setup: () => () => shouldRender.value ? <Comp /> : undefined,
+      setup: () => () => (shouldRender.value ? <Comp /> : undefined),
     })
 
     await nextTick()
@@ -71,7 +71,7 @@ describe('useLockscreen', () => {
       setup() {
         const ns = useNamespace(
           'lock',
-          computed(() => namespace)
+          computed(() => namespace),
         )
         const trigger = ref(false)
         useLockscreen(trigger, { ns })
@@ -84,14 +84,41 @@ describe('useLockscreen', () => {
 
     await nextTick()
     expect(hasClass(document.body, `${namespace}-lock-parent--hidden`)).toBe(
-      true
+      true,
     )
 
     wrapper.unmount()
     await waitForCleanup()
 
     expect(hasClass(document.body, `${namespace}-lock-parent--hidden`)).toBe(
-      false
+      false,
     )
+  })
+
+  it('should keep the body locked until the last consumer releases it', async () => {
+    const showFirst = ref(true)
+    const showSecond = ref(true)
+
+    mount({
+      setup: () => () => (
+        <>
+          {showFirst.value ? <Comp /> : undefined}
+          {showSecond.value ? <Comp /> : undefined}
+        </>
+      ),
+    })
+
+    await nextTick()
+    expect(hasClass(document.body, kls)).toBe(true)
+
+    showFirst.value = false
+    await nextTick()
+    await waitForCleanup()
+    expect(hasClass(document.body, kls)).toBe(true)
+
+    showSecond.value = false
+    await nextTick()
+    await waitForCleanup()
+    expect(hasClass(document.body, kls)).toBe(false)
   })
 })

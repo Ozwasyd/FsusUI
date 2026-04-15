@@ -1,9 +1,13 @@
 import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
-import { describe, expect, test } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 import makeScroll from '@element-plus/test-utils/make-scroll'
 import defineGetter from '@element-plus/test-utils/define-getter'
 import Scrollbar from '../src/scrollbar.vue'
+
+afterEach(() => {
+  vi.restoreAllMocks()
+})
 
 describe('ScrollBar', () => {
   test('vertical', async () => {
@@ -20,21 +24,21 @@ describe('ScrollBar', () => {
     const offsetHeightRestore = defineGetter(
       scrollDom,
       'offsetHeight',
-      outerHeight
+      outerHeight,
     )
     const scrollHeightRestore = defineGetter(
       scrollDom,
       'scrollHeight',
-      innerHeight
+      innerHeight,
     )
 
     await makeScroll(scrollDom, 'scrollTop', 100)
     expect(wrapper.find('.is-vertical div').attributes('style')).toContain(
-      'height: 80px; transform: translateY(50%);'
+      'height: 80px; transform: translateY(50%);',
     )
     await makeScroll(scrollDom, 'scrollTop', 300)
     expect(wrapper.find('.is-vertical div').attributes('style')).toContain(
-      'height: 80px; transform: translateY(150%);'
+      'height: 80px; transform: translateY(150%);',
     )
     offsetHeightRestore()
     scrollHeightRestore()
@@ -54,21 +58,21 @@ describe('ScrollBar', () => {
     const offsetWidthRestore = defineGetter(
       scrollDom,
       'offsetWidth',
-      outerWidth
+      outerWidth,
     )
     const scrollWidthRestore = defineGetter(
       scrollDom,
       'scrollWidth',
-      innerWidth
+      innerWidth,
     )
 
     await makeScroll(scrollDom, 'scrollLeft', 100)
     expect(wrapper.find('.is-horizontal div').attributes('style')).toContain(
-      'width: 80px; transform: translateX(50%);'
+      'width: 80px; transform: translateX(50%);',
     )
     await makeScroll(scrollDom, 'scrollLeft', 300)
     expect(wrapper.find('.is-horizontal div').attributes('style')).toContain(
-      'width: 80px; transform: translateX(150%);'
+      'width: 80px; transform: translateX(150%);',
     )
     offsetWidthRestore()
     scrollWidthRestore()
@@ -90,39 +94,39 @@ describe('ScrollBar', () => {
     const offsetHeightRestore = defineGetter(
       scrollDom,
       'offsetHeight',
-      outerHeight
+      outerHeight,
     )
     const scrollHeightRestore = defineGetter(
       scrollDom,
       'scrollHeight',
-      innerHeight
+      innerHeight,
     )
     const offsetWidthRestore = defineGetter(
       scrollDom,
       'offsetWidth',
-      outerWidth
+      outerWidth,
     )
     const scrollWidthRestore = defineGetter(
       scrollDom,
       'scrollWidth',
-      innerWidth
+      innerWidth,
     )
 
     await makeScroll(scrollDom, 'scrollTop', 100)
     await makeScroll(scrollDom, 'scrollLeft', 100)
     expect(wrapper.find('.is-vertical div').attributes('style')).toContain(
-      'height: 80px; transform: translateY(50%);'
+      'height: 80px; transform: translateY(50%);',
     )
     expect(wrapper.find('.is-horizontal div').attributes('style')).toContain(
-      'width: 80px; transform: translateX(50%);'
+      'width: 80px; transform: translateX(50%);',
     )
     await makeScroll(scrollDom, 'scrollTop', 300)
     await makeScroll(scrollDom, 'scrollLeft', 300)
     expect(wrapper.find('.is-vertical div').attributes('style')).toContain(
-      'height: 80px; transform: translateY(150%);'
+      'height: 80px; transform: translateY(150%);',
     )
     expect(wrapper.find('.is-horizontal div').attributes('style')).toContain(
-      'width: 80px; transform: translateX(150%);'
+      'width: 80px; transform: translateX(150%);',
     )
 
     offsetHeightRestore()
@@ -141,7 +145,7 @@ describe('ScrollBar', () => {
     ))
 
     expect(wrapper.find('.el-scrollbar__wrap').attributes('style')).toContain(
-      'height: 204px;'
+      'height: 204px;',
     )
   })
 
@@ -155,7 +159,7 @@ describe('ScrollBar', () => {
     ))
 
     expect(wrapper.find('.el-scrollbar__wrap').attributes('style')).toContain(
-      'max-height: 204px;'
+      'max-height: 204px;',
     )
   })
 
@@ -198,22 +202,22 @@ describe('ScrollBar', () => {
     const offsetHeightRestore = defineGetter(
       scrollDom,
       'offsetHeight',
-      outerHeight
+      outerHeight,
     )
     const scrollHeightRestore = defineGetter(
       scrollDom,
       'scrollHeight',
-      innerHeight
+      innerHeight,
     )
     const offsetWidthRestore = defineGetter(
       scrollDom,
       'offsetWidth',
-      outerWidth
+      outerWidth,
     )
     const scrollWidthRestore = defineGetter(
       scrollDom,
       'scrollWidth',
-      innerWidth
+      innerWidth,
     )
 
     scrollbar.setScrollTop(100)
@@ -221,10 +225,10 @@ describe('ScrollBar', () => {
     scrollbar.setScrollLeft(100)
     await nextTick()
     expect(wrapper.find('.is-vertical div').attributes('style')).toContain(
-      'height: 80px; transform: translateY(0%);'
+      'height: 80px; transform: translateY(0%);',
     )
     expect(wrapper.find('.is-horizontal div').attributes('style')).toContain(
-      'width: 80px; transform: translateX(0%);'
+      'width: 80px; transform: translateX(0%);',
     )
 
     offsetHeightRestore()
@@ -247,17 +251,17 @@ describe('ScrollBar', () => {
     const offsetHeightRestore = defineGetter(
       scrollDom,
       'offsetHeight',
-      outerHeight
+      outerHeight,
     )
     const scrollHeightRestore = defineGetter(
       scrollDom,
       'scrollHeight',
-      innerHeight
+      innerHeight,
     )
 
     await makeScroll(scrollDom, 'scrollTop', 0)
     expect(wrapper.find('.is-vertical div').attributes('style')).toContain(
-      'height: 20px; transform: translateY(0%);'
+      'height: 20px; transform: translateY(0%);',
     )
     offsetHeightRestore()
     scrollHeightRestore()
@@ -273,7 +277,7 @@ describe('ScrollBar', () => {
     ))
 
     expect(
-      wrapper.find('.el-scrollbar__view').element instanceof HTMLUListElement
+      wrapper.find('.el-scrollbar__view').element instanceof HTMLUListElement,
     ).toBeTruthy()
   })
 
@@ -282,7 +286,7 @@ describe('ScrollBar', () => {
     const wrapper = mount(() => <Scrollbar wrap-style={wrapStyle} />)
 
     expect(wrapper.find('.el-scrollbar__wrap').attributes('style')).toContain(
-      wrapStyle
+      wrapStyle,
     )
   })
 
@@ -298,7 +302,7 @@ describe('ScrollBar', () => {
     const wrapper = mount(() => <Scrollbar view-style={viewStyle} />)
 
     expect(wrapper.find('.el-scrollbar__view').attributes('style')).toContain(
-      viewStyle
+      viewStyle,
     )
   })
 
@@ -307,5 +311,32 @@ describe('ScrollBar', () => {
     const wrapper = mount(() => <Scrollbar view-class={viewClass} />)
 
     expect(wrapper.find('.el-scrollbar__view').classes()).toContain(viewClass)
+  })
+
+  test('should cleanup document listeners when thumb unmounts during drag', async () => {
+    const removeEventListenerSpy = vi.spyOn(document, 'removeEventListener')
+
+    const wrapper = mount(() => (
+      <Scrollbar style="height: 200px;" always>
+        <div style="height: 500px;"></div>
+      </Scrollbar>
+    ))
+
+    await nextTick()
+    await wrapper.find('.el-scrollbar__thumb').trigger('mousedown', {
+      button: 0,
+      clientY: 10,
+    })
+
+    wrapper.unmount()
+
+    expect(removeEventListenerSpy).toHaveBeenCalledWith(
+      'mousemove',
+      expect.any(Function),
+    )
+    expect(removeEventListenerSpy).toHaveBeenCalledWith(
+      'mouseup',
+      expect.any(Function),
+    )
   })
 })

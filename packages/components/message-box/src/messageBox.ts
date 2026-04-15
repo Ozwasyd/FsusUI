@@ -26,7 +26,7 @@ import type {
 // component default merge props & data
 
 const messageInstance = new Map<
-  ComponentPublicInstance<{ doClose: () => void }>, // marking doClose as function
+  ComponentPublicInstance<{ doClose: (action?: Action) => void }>,
   {
     options: any
     callback: Callback | undefined
@@ -127,7 +127,7 @@ const showMessage = (options: any, appContext?: AppContext | null) => {
   const vm = instance.proxy as ComponentPublicInstance<
     {
       visible: boolean
-      doClose: () => void
+      doClose: (action?: Action) => void
     } & MessageBoxState
   >
 
@@ -227,14 +227,9 @@ function messageBoxFactory(boxType: typeof MESSAGE_BOX_VARIANTS[number]) {
 }
 
 MessageBox.close = () => {
-  // instance.setupInstall.doClose()
-  // instance.setupInstall.state.visible = false
-
   messageInstance.forEach((_, vm) => {
-    vm.doClose()
+    vm.doClose('close')
   })
-
-  messageInstance.clear()
 }
 ;(MessageBox as IElMessageBox)._context = null
 

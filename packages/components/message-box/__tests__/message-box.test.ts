@@ -10,6 +10,10 @@ import { ElMessageBox } from '..'
 
 const selector = '.el-overlay'
 const QuestionFilled = markRaw(QuestionFilledIcon)
+const silencePromise = <T>(promise: Promise<T>) => {
+  promise.catch(() => undefined)
+  return promise
+}
 
 vi.mock('@element-plus/utils/error', () => ({
   debugWarn: vi.fn(),
@@ -31,20 +35,26 @@ const _mount = (invoker: () => void) => {
 
 describe('MessageBox', () => {
   afterEach(async () => {
+    const suppressUnhandledClose = (event: PromiseRejectionEvent) => {
+      event.preventDefault()
+    }
+
+    window.addEventListener('unhandledrejection', suppressUnhandledClose)
     MessageBox.close()
-    document.body.innerHTML = ''
     await rAF()
+    window.removeEventListener('unhandledrejection', suppressUnhandledClose)
+    document.body.innerHTML = ''
   })
 
   test('create and close', async () => {
-    MessageBox({
+    silencePromise(MessageBox({
       type: 'success',
       title: '消息',
       message: '这是一段内容',
       customStyle: {
         width: '100px',
       },
-    })
+    }))
     const msgbox: HTMLElement = document.querySelector(selector)
 
     expect(msgbox).toBeDefined()
@@ -66,17 +76,17 @@ describe('MessageBox', () => {
   })
 
   test('invoke with strings', () => {
-    MessageBox({ title: '消息', message: '这是一段内容' })
+    silencePromise(MessageBox({ title: '消息', message: '这是一段内容' }))
     const msgbox = document.querySelector(selector)
     expect(msgbox).toBeDefined()
   })
 
   test('custom icon', async () => {
-    MessageBox({
+    silencePromise(MessageBox({
       type: 'warning',
       icon: QuestionFilled,
       message: '这是一段内容',
-    })
+    }))
     await rAF()
     const icon = document.querySelector('.el-message-box__status')
 
@@ -87,11 +97,11 @@ describe('MessageBox', () => {
   })
 
   test('html string', async () => {
-    MessageBox({
+    silencePromise(MessageBox({
       title: 'html string',
       dangerouslyUseHTMLString: true,
       message: '<strong>html string</strong>',
-    })
+    }))
     await rAF()
     const message = document.querySelector('.el-message-box__message strong')
     expect(message.textContent).toEqual('html string')
@@ -100,14 +110,14 @@ describe('MessageBox', () => {
   test('distinguish cancel and close', async () => {
     let msgAction = ''
     const invoker = () => {
-      MessageBox({
+      silencePromise(MessageBox({
         title: '消息',
         message: '这是一段内容',
         distinguishCancelAndClose: true,
         callback: (action) => {
           msgAction = action
         },
-      })
+      }))
     }
 
     _mount(invoker)
@@ -122,10 +132,10 @@ describe('MessageBox', () => {
   })
 
   test('alert', async () => {
-    MessageBox.alert('这是一段内容', {
+    silencePromise(MessageBox.alert('这是一段内容', {
       title: '标题名称',
       type: 'warning',
-    })
+    }))
     await rAF()
     await triggerNativeCompositeClick(document.querySelector(selector))
     await rAF()
@@ -135,10 +145,10 @@ describe('MessageBox', () => {
   })
 
   test('confirm', async () => {
-    MessageBox.confirm('这是一段内容', {
+    silencePromise(MessageBox.confirm('这是一段内容', {
       title: '标题名称',
       type: 'warning',
-    })
+    }))
     await rAF()
     const btn = document
       .querySelector(selector)
@@ -150,10 +160,10 @@ describe('MessageBox', () => {
   })
 
   test('autofocus', async () => {
-    MessageBox.alert('这是一段内容', {
+    silencePromise(MessageBox.alert('这是一段内容', {
       autofocus: false,
       title: '标题名称',
-    })
+    }))
     await rAF()
     const btnElm = document.querySelector(
       '.el-message-box__btns .el-button--primary'
@@ -163,11 +173,11 @@ describe('MessageBox', () => {
   })
 
   test('prompt', async () => {
-    MessageBox.prompt('这是一段内容', {
+    silencePromise(MessageBox.prompt('这是一段内容', {
       title: '标题名称',
       inputPattern: /test/,
       inputErrorMessage: 'validation failed',
-    })
+    }))
     await rAF()
     const inputElm = document
       .querySelector(selector)
@@ -180,10 +190,10 @@ describe('MessageBox', () => {
   })
 
   test('prompt: focus on textarea', async () => {
-    MessageBox.prompt('这是一段内容', {
+    silencePromise(MessageBox.prompt('这是一段内容', {
       inputType: 'textarea',
       title: '标题名称',
-    })
+    }))
     await rAF()
     const textareaElm = document
       .querySelector(selector)
@@ -194,13 +204,13 @@ describe('MessageBox', () => {
 
   test('callback', async () => {
     let msgAction = ''
-    MessageBox({
+    silencePromise(MessageBox({
       title: '消息',
       message: '这是一段内容',
       callback: (action) => {
         msgAction = action
       },
-    })
+    }))
     await rAF()
     const closeBtn = document.querySelector(
       '.el-message-box__close'
@@ -210,9 +220,36 @@ describe('MessageBox', () => {
     expect(msgAction).toEqual('cancel')
   })
 
+  test('close helper should resolve callbacks and promises', async () => {
+    let callbackAction = ''
+    let rejectedAction = ''
+
+    silencePromise(MessageBox({
+      title: '消息',
+      message: '这是一段内容',
+      callback: (action) => {
+        callbackAction = action
+      },
+    }))
+    await rAF()
+    MessageBox.close()
+    await rAF()
+    expect(callbackAction).toEqual('close')
+
+    MessageBox.confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+      distinguishCancelAndClose: true,
+    }).catch((action) => {
+      rejectedAction = action
+    })
+    await rAF()
+    MessageBox.close()
+    await rAF()
+    expect(rejectedAction).toEqual('close')
+  })
+
   test('beforeClose', async () => {
     let msgAction = ''
-    MessageBox({
+    silencePromise(MessageBox({
       callback: (action) => {
         msgAction = action
       },
@@ -221,7 +258,7 @@ describe('MessageBox', () => {
       beforeClose: (_, __, done) => {
         done()
       },
-    })
+    }))
     await rAF()
     await clickActionButton(
       document.querySelector(
@@ -282,20 +319,20 @@ describe('MessageBox', () => {
 
   describe('append to', () => {
     it('should append to body if parameter is not provided', () => {
-      MessageBox({
+      silencePromise(MessageBox({
         title: 'append to test',
         message: 'append to test',
-      })
+      }))
       const msgbox: HTMLElement = document.querySelector(`body > ${selector}`)
       expect(msgbox).toBeDefined()
     })
 
     it('should append to body if element does not exist', () => {
-      MessageBox({
+      silencePromise(MessageBox({
         title: 'append to test',
         message: 'append to test',
         appendTo: '.not-existing-selector',
-      })
+      }))
       const msgbox: HTMLElement = document.querySelector(`body > ${selector}`)
       expect(msgbox).toBeDefined()
     })
@@ -303,11 +340,11 @@ describe('MessageBox', () => {
     it('should append to HtmlElement provided', () => {
       const htmlElement = document.createElement('div')
       document.body.appendChild(htmlElement)
-      MessageBox({
+      silencePromise(MessageBox({
         title: 'append to test',
         message: 'append to test',
         appendTo: htmlElement,
-      })
+      }))
       const msgbox: HTMLElement = htmlElement.querySelector(selector)
       expect(msgbox).toBeDefined()
     })
@@ -316,11 +353,11 @@ describe('MessageBox', () => {
       const htmlElement = document.createElement('div')
       htmlElement.className = 'custom-html-element'
       document.body.appendChild(htmlElement)
-      MessageBox({
+      silencePromise(MessageBox({
         title: 'append to test',
         message: 'append to test',
         appendTo: '.custom-html-element',
-      })
+      }))
       const msgbox: HTMLElement = htmlElement.querySelector(selector)
       expect(msgbox).toBeDefined()
     })
@@ -329,11 +366,11 @@ describe('MessageBox', () => {
   describe('accessibility', () => {
     test('title attribute should set aria-label', async () => {
       const title = 'Hello World'
-      MessageBox({
+      silencePromise(MessageBox({
         type: 'success',
         title,
         message: '这是一段内容',
-      })
+      }))
       await rAF()
       const msgbox: HTMLElement = document.querySelector(selector)!
       const msgboxDialog = msgbox.querySelector('[role="dialog"]')!
@@ -342,10 +379,10 @@ describe('MessageBox', () => {
     })
 
     test('aria-describedby should point to modal body when not prompt', async () => {
-      MessageBox({
+      silencePromise(MessageBox({
         type: 'success',
         message: '这是一段内容',
-      })
+      }))
       await rAF()
       const msgbox: HTMLElement = document.querySelector(selector)!
       const msgboxDialog = msgbox.querySelector('[role="dialog"]')!
@@ -359,9 +396,9 @@ describe('MessageBox', () => {
 
     test('aria-describedby should not be used when prompt; label attached to input', async () => {
       const message = '这是一段内容'
-      MessageBox.prompt(message, {
+      silencePromise(MessageBox.prompt(message, {
         type: 'success',
-      })
+      }))
       await rAF()
       const msgbox: HTMLElement = document.querySelector(selector)!
       const msgboxDialog = msgbox.querySelector('[role="dialog"]')!

@@ -810,6 +810,51 @@ describe('Virtual Tree', () => {
     )
   })
 
+  test('filtered parent checking should not select hidden descendants', async () => {
+    const { treeRef, wrapper } = createTree({
+      data() {
+        return {
+          showCheckbox: true,
+          defaultExpandedKeys: ['1'],
+          data: [
+            {
+              id: '1',
+              label: 'node-1',
+              children: [
+                {
+                  id: '1-1',
+                  label: 'node-1-1',
+                },
+                {
+                  id: '1-2',
+                  label: 'node-1-2',
+                },
+              ],
+            },
+          ],
+          filterMethod(query: string, node: TreeNodeData) {
+            return node.label.includes(query)
+          },
+        }
+      },
+    })
+
+    await nextTick()
+    treeRef.filter('1-2')
+    await nextTick()
+
+    const nodes = wrapper.findAll(TREE_NODE_CLASS_NAME)
+    expect(nodes.map((node) => node.text()).toString()).toBe(
+      ['node-1', 'node-1-2'].toString()
+    )
+
+    await nodes[0].find('.el-checkbox').trigger('click')
+    await nextTick()
+
+    expect(treeRef.getCheckedKeys().toString()).toBe(['1-2'].toString())
+    expect(treeRef.getHalfCheckedKeys().toString()).toBe(['1'].toString())
+  })
+
   describe('events', () => {
     test('current-change', async () => {
       const onCurrentChange = vi.fn()

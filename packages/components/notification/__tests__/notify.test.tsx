@@ -8,6 +8,16 @@ import type { NotificationHandle } from '../src/notification'
 
 const selector = '.el-notification'
 
+const getNotificationPosition = (elm: Element): number => {
+  const element = elm as HTMLElement
+  return (
+    Number.parseFloat(element.style.top || '0') +
+    Number.parseFloat(
+      element.style.getPropertyValue('--el-notification-stack-y') || '0'
+    )
+  )
+}
+
 describe('Notification on command', () => {
   afterEach(() => {
     closeAll()
@@ -111,6 +121,33 @@ describe('Notification on command', () => {
     await nextTick()
     expect(htmlElement.querySelector(selector)).toBeNull()
   })
+
+  it('should stack notifications through transform offsets and restack after close', async () => {
+    const handles = [
+      Notification({ duration: 0 }),
+      Notification({ duration: 0 }),
+      Notification({ duration: 0 }),
+    ]
+
+    await rAF()
+    const elements = document.querySelectorAll(selector) as NodeListOf<HTMLElement>
+    expect(getNotificationPosition(elements[0])).toBe(16)
+    expect(getNotificationPosition(elements[1])).toBe(32)
+    expect(elements[2].style.getPropertyValue('--el-notification-stack-y')).toBe(
+      '32px'
+    )
+
+    handles[1].close()
+    await rAF()
+
+    expect(elements[2].style.getPropertyValue('--el-notification-stack-y')).toBe(
+      '16px'
+    )
+
+    handles[0].close()
+    handles[2].close()
+  })
+
   describe('context inheritance', () => {
     it('should globally inherit context correctly', () => {
       expect(ElNotification._context).toBe(null)

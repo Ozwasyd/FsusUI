@@ -104,3 +104,15 @@
     stroke-dashoffset: -120px;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .#{$namespace}-loading-mask {
+    transition-duration: 1ms !important;
+  }
+
+  .#{$namespace}-loading-spinner .circular,
+  .#{$namespace}-loading-spinner .path {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

@@ -34,10 +34,18 @@ import {
 } from './dropdown'
 import { DROPDOWN_INJECTION_KEY } from './tokens'
 
+import type { DefineComponent } from 'vue'
+
+const DropdownCollectionItem =
+  ElDropdownCollectionItem as unknown as DefineComponent<{
+    disabled?: boolean
+    textValue?: string
+  }>
+
 export default defineComponent({
   name: 'ElDropdownItem',
   components: {
-    ElDropdownCollectionItem,
+    ElDropdownCollectionItem: DropdownCollectionItem,
     ElRovingFocusItem,
     ElDropdownItemImpl,
   },
@@ -51,7 +59,7 @@ export default defineComponent({
     const textContent = computed(() => unref(itemRef)?.textContent ?? '')
     const { onItemEnter, onItemLeave } = inject(
       DROPDOWN_INJECTION_KEY,
-      undefined
+      undefined,
     )!
 
     const handlePointerMove = composeEventHandlers(
@@ -84,7 +92,7 @@ export default defineComponent({
         if (!e.defaultPrevented) {
           target?.focus()
         }
-      })
+      }),
     )
 
     const handlePointerLeave = composeEventHandlers(
@@ -94,7 +102,7 @@ export default defineComponent({
       },
       whenMouse((e) => {
         onItemLeave(e)
-      })
+      }),
     )
 
     const handleClick = composeEventHandlers(
@@ -114,7 +122,7 @@ export default defineComponent({
           elDropdown.handleClick?.()
         }
         elDropdown.commandHandler?.(props.command, _instance, e)
-      }
+      },
     )
 
     // direct usage of v-bind={ ...$props, ...$attrs } causes type errors

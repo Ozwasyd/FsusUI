@@ -16,12 +16,13 @@ $directions: rtl, ltr, ttb, btt;
   flex-direction: column;
   box-shadow: getCssVar('box-shadow', 'dark');
   overflow: hidden;
-
-  transition: all getCssVar('transition-duration');
+  transition: transform getCssVar('transition-duration')
+    getCssVar('transition-function-fast-bezier');
+  will-change: transform;
 
   @each $direction in $directions {
     .#{$direction} {
-      transform: translate(0, 0);
+      transform: translate3d(0, 0, 0);
     }
   }
 
@@ -123,7 +124,15 @@ $directions: rtl, ltr, ttb, btt;
 .#{$namespace}-drawer-fade {
   &-enter-active,
   &-leave-active {
-    transition: all getCssVar('transition-duration');
+    transition: opacity getCssVar('transition-duration')
+      getCssVar('transition-function-fast-bezier');
+
+    @each $direction in $directions {
+      .#{$direction} {
+        transition: transform getCssVar('transition-duration')
+          getCssVar('transition-function-fast-bezier');
+      }
+    }
   }
 
   &-enter-from,
@@ -150,21 +159,47 @@ $directions: rtl, ltr, ttb, btt;
     @each $direction in $directions {
       .#{$direction} {
         @if $direction == ltr {
-          transform: translateX(-100%);
+          transform: translate3d(-100%, 0, 0);
         }
 
         @if $direction == rtl {
-          transform: translateX(100%);
+          transform: translate3d(100%, 0, 0);
         }
 
         @if $direction == ttb {
-          transform: translateY(-100%);
+          transform: translate3d(0, -100%, 0);
         }
 
         @if $direction == btt {
-          transform: translateY(100%);
+          transform: translate3d(0, 100%, 0);
         }
       }
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .#{$namespace}-drawer,
+  .#{$namespace}-drawer-fade-enter-active,
+  .#{$namespace}-drawer-fade-leave-active,
+  .#{$namespace}-drawer-fade-enter-active .ltr,
+  .#{$namespace}-drawer-fade-enter-active .rtl,
+  .#{$namespace}-drawer-fade-enter-active .ttb,
+  .#{$namespace}-drawer-fade-enter-active .btt,
+  .#{$namespace}-drawer-fade-leave-active .ltr,
+  .#{$namespace}-drawer-fade-leave-active .rtl,
+  .#{$namespace}-drawer-fade-leave-active .ttb,
+  .#{$namespace}-drawer-fade-leave-active .btt {
+    transition-duration: 1ms !important;
+  }
+
+  .#{$namespace}-drawer-fade-enter-from,
+  .#{$namespace}-drawer-fade-leave-to {
+    .ltr,
+    .rtl,
+    .ttb,
+    .btt {
+      transform: translate3d(0, 0, 0) !important;
     }
   }
 }

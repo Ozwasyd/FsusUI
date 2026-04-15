@@ -36,7 +36,7 @@ describe('v-trap-focus', () => {
       </div>
     ))
     expect(
-      (wrapper.element as TrapFocusElement)[FOCUSABLE_CHILDREN].length
+      (wrapper.element as TrapFocusElement)[FOCUSABLE_CHILDREN].length,
     ).toBe(1)
   })
 
@@ -59,7 +59,7 @@ describe('v-trap-focus', () => {
       </div>
     ))
     expect(
-      (wrapper.element as TrapFocusElement)[FOCUSABLE_CHILDREN].length
+      (wrapper.element as TrapFocusElement)[FOCUSABLE_CHILDREN].length,
     ).toBe(5)
   })
 
@@ -133,7 +133,7 @@ describe('v-trap-focus', () => {
             TrapFocus,
           },
         },
-      }
+      },
     )
 
     const initialElements = (wrapper.element as TrapFocusElement)[
@@ -148,7 +148,53 @@ describe('v-trap-focus', () => {
     await nextTick()
 
     expect(
-      (wrapper.element as TrapFocusElement)[FOCUSABLE_CHILDREN].length
+      (wrapper.element as TrapFocusElement)[FOCUSABLE_CHILDREN].length,
     ).toBe(2)
+  })
+
+  test('should keep outer trap active after nested trap unmounts', async () => {
+    wrapper = mount(
+      defineComponent({
+        data() {
+          return {
+            showInner: true,
+          }
+        },
+        render() {
+          return (
+            <div v-trap-focus>
+              <button class="outer-start" />
+              {this.showInner ? (
+                <div v-trap-focus>
+                  <button class="inner-only" />
+                </div>
+              ) : null}
+              <button class="outer-end" />
+            </div>
+          )
+        },
+      }),
+      {
+        attachTo: document.body,
+        global: {
+          directives: {
+            TrapFocus,
+          },
+        },
+      },
+    )
+
+    await nextTick()
+    await wrapper.setData({
+      showInner: false,
+    })
+    await nextTick()
+
+    const endButton = wrapper.find('.outer-end')
+    await endButton.trigger('keydown', {
+      code: 'Tab',
+    })
+
+    expect(document.activeElement).toBe(wrapper.find('.outer-start').element)
   })
 })

@@ -52,7 +52,7 @@ const thumbStyle = computed(() =>
     size: props.size,
     move: props.move,
     bar: bar.value,
-  })
+  }),
 )
 
 const offsetRatio = computed(
@@ -63,7 +63,7 @@ const offsetRatio = computed(
     instance.value![bar.value.offset] ** 2 /
     scrollbar.wrapElement![bar.value.scrollSize] /
     props.ratio /
-    thumb.value![bar.value.offset]
+    thumb.value![bar.value.offset],
 )
 
 const clickThumbHandler = (e: MouseEvent) => {
@@ -86,7 +86,7 @@ const clickTrackHandler = (e: MouseEvent) => {
 
   const offset = Math.abs(
     (e.target as HTMLElement).getBoundingClientRect()[bar.value.direction] -
-      e[bar.value.client]
+      e[bar.value.client],
   )
   const thumbHalf = thumb.value[bar.value.offset] / 2
   const thumbPositionPercentage =
@@ -98,9 +98,15 @@ const clickTrackHandler = (e: MouseEvent) => {
     100
 }
 
+const cleanupDocumentListeners = () => {
+  document.removeEventListener('mousemove', mouseMoveDocumentHandler)
+  document.removeEventListener('mouseup', mouseUpDocumentHandler)
+}
+
 const startDrag = (e: MouseEvent) => {
   e.stopImmediatePropagation()
   cursorDown = true
+  cleanupDocumentListeners()
   document.addEventListener('mousemove', mouseMoveDocumentHandler)
   document.addEventListener('mouseup', mouseUpDocumentHandler)
   originalOnSelectStart = document.onselectstart
@@ -130,8 +136,7 @@ const mouseMoveDocumentHandler = (e: MouseEvent) => {
 const mouseUpDocumentHandler = () => {
   cursorDown = false
   thumbState.value[bar.value.axis] = 0
-  document.removeEventListener('mousemove', mouseMoveDocumentHandler)
-  document.removeEventListener('mouseup', mouseUpDocumentHandler)
+  cleanupDocumentListeners()
   restoreOnselectstart()
   if (cursorLeave) visible.value = false
 }
@@ -147,8 +152,8 @@ const mouseLeaveScrollbarHandler = () => {
 }
 
 onBeforeUnmount(() => {
+  cleanupDocumentListeners()
   restoreOnselectstart()
-  document.removeEventListener('mouseup', mouseUpDocumentHandler)
 })
 
 const restoreOnselectstart = () => {
@@ -159,11 +164,11 @@ const restoreOnselectstart = () => {
 useEventListener(
   toRef(scrollbar, 'scrollbarElement'),
   'mousemove',
-  mouseMoveScrollbarHandler
+  mouseMoveScrollbarHandler,
 )
 useEventListener(
   toRef(scrollbar, 'scrollbarElement'),
   'mouseleave',
-  mouseLeaveScrollbarHandler
+  mouseLeaveScrollbarHandler,
 )
 </script>

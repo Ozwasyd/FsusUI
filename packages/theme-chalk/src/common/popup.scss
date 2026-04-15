@@ -7,11 +7,13 @@
 }
 
 .v-modal-enter {
-  animation: v-modal-in getCssVar('transition-duration-fast') ease;
+  animation: v-modal-in getCssVar('transition-duration-fast')
+    getCssVar('transition-function-fast-bezier');
 }
 
 .v-modal-leave {
-  animation: v-modal-out getCssVar('transition-duration-fast') ease forwards;
+  animation: v-modal-out getCssVar('transition-duration-fast')
+    getCssVar('transition-function-fast-bezier') forwards;
 }
 
 @keyframes v-modal-in {
@@ -38,6 +40,13 @@
   height: 100%;
   opacity: getCssVar('popup-modal-opacity');
   background: getCssVar('popup-modal-bg-color');
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v-modal-enter,
+  .v-modal-leave {
+    animation-duration: 1ms !important;
+  }
 }
 
 @include b(popup-parent) {

@@ -31,9 +31,18 @@ import {
 } from './tokens'
 import { focusFirst, getFocusIntent, reorderArray } from './utils'
 
+import type { DefineComponent } from 'vue'
+
+const RovingFocusCollectionItem =
+  ElRovingFocusCollectionItem as unknown as DefineComponent<{
+    id?: string
+    focusable?: boolean
+    active?: boolean
+  }>
+
 export default defineComponent({
   components: {
-    ElRovingFocusCollectionItem,
+    ElRovingFocusCollectionItem: RovingFocusCollectionItem,
   },
   props: {
     focusable: {
@@ -49,12 +58,12 @@ export default defineComponent({
   setup(props, { emit }) {
     const { currentTabbedId, loop, onItemFocus, onItemShiftTab } = inject(
       ROVING_FOCUS_GROUP_INJECTION_KEY,
-      undefined
+      undefined,
     )!
 
     const { getItems } = inject(
       ROVING_FOCUS_COLLECTION_INJECTION_KEY,
-      undefined
+      undefined,
     )!
 
     const id = useId()
@@ -70,7 +79,7 @@ export default defineComponent({
         } else {
           onItemFocus(unref(id))
         }
-      }
+      },
     )
 
     const handleFocus = composeEventHandlers(
@@ -79,7 +88,7 @@ export default defineComponent({
       },
       () => {
         onItemFocus(unref(id))
-      }
+      },
     )
 
     const handleKeydown = composeEventHandlers(
@@ -98,7 +107,7 @@ export default defineComponent({
         if (focusIntent) {
           e.preventDefault()
           const items = getItems<typeof props>().filter(
-            (item) => item.focusable
+            (item) => item.focusable,
           )
 
           let elements = items.map((item) => item.ref!)
@@ -128,7 +137,7 @@ export default defineComponent({
             focusFirst(elements)
           })
         }
-      }
+      },
     )
 
     const isCurrentTab = computed(() => currentTabbedId.value === unref(id))

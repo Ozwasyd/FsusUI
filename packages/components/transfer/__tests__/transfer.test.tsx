@@ -1,33 +1,51 @@
 import { nextTick, reactive, ref } from 'vue'
 import { mount } from '@vue/test-utils'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { setTextInputValue } from '../../../test-utils/dom'
 import Transfer from '../src/transfer.vue'
 import type { TransferDataItem, renderContent } from '../src/transfer'
 
-const { filterIndices } = vi.hoisted(() => ({
-  filterIndices: vi.fn(
-    async (data: string[], keyword: string, caseSensitive = false) => {
-      const normalizedKeyword = caseSensitive
-        ? keyword
-        : keyword.toLowerCase()
+const { filterIndicesSync, warmupWasm, setWasmReady } = vi.hoisted(() => {
+  let wasmReady = true
 
-      return data.reduce<number[]>((matched, item, index) => {
-        const normalizedItem = caseSensitive ? item : item.toLowerCase()
-        if (normalizedItem.includes(normalizedKeyword)) {
-          matched.push(index)
+  return {
+    filterIndicesSync: vi.fn(
+      (data: string[], keyword: string, caseSensitive = false) => {
+        if (!wasmReady) {
+          return null
         }
-        return matched
-      }, [])
-    }
-  ),
-}))
+
+        const normalizedKeyword = caseSensitive
+          ? keyword
+          : keyword.toLowerCase()
+
+        return data.reduce<number[]>((matched, item, index) => {
+          const normalizedItem = caseSensitive ? item : item.toLowerCase()
+          if (normalizedItem.includes(normalizedKeyword)) {
+            matched.push(index)
+          }
+          return matched
+        }, [])
+      },
+    ),
+    warmupWasm: vi.fn(),
+    setWasmReady: (value: boolean) => {
+      wasmReady = value
+    },
+  }
+})
 
 vi.mock('@element-plus/wasm', () => ({
-  filterIndices,
+  filterIndicesSync,
+  warmupWasm,
 }))
 
 describe('Transfer', () => {
+  afterEach(() => {
+    setWasmReady(true)
+    vi.clearAllMocks()
+  })
+
   const getTestData = () => {
     const data = []
     for (let i = 1; i <= 15; i++) {
@@ -78,7 +96,7 @@ describe('Transfer', () => {
     const value = ref([])
     const data = Array.from({ length: 1_001 }, (_, index) => ({
       key: index + 1,
-      label: index === 917 ? 'Wasm Match' : `备选项 ${index + 1}`,
+      label: index === 917 ? 'Wasm Match' : `option ${index + 1}`,
       disabled: false,
     }))
 
@@ -91,10 +109,64 @@ describe('Transfer', () => {
     await setTextInputValue(leftList.find('input'), 'match')
     await nextTick()
 
-    expect(filterIndices).toHaveBeenCalled()
+    expect(filterIndicesSync).toHaveBeenCalled()
     expect(leftList.vm.filteredData.length).toBe(1)
     expect(leftList.vm.filteredData[0].label).toBe('Wasm Match')
   }, 10000)
+
+  it('warms wasm on cold start and keeps filtering with JS until ready', async () => {
+    setWasmReady(false)
+    const value = ref([])
+    const data = Array.from({ length: 1_001 }, (_, index) => ({
+      key: index + 1,
+      label: index === 499 ? 'Deferred Match' : `option ${index + 1}`,
+      disabled: false,
+    }))
+
+    const wrapper = mount(() => (
+      <Transfer v-model={value.value} filterable data={data} />
+    ))
+
+    const leftList: any = wrapper.findComponent({ name: 'ElTransferPanel' })
+    leftList.vm.query = 'match'
+    await setTextInputValue(leftList.find('input'), 'match')
+    await nextTick()
+
+    expect(warmupWasm).toHaveBeenCalled()
+    expect(leftList.vm.filteredData.length).toBe(1)
+    expect(leftList.vm.filteredData[0].label).toBe('Deferred Match')
+
+    vi.clearAllMocks()
+    setWasmReady(true)
+    leftList.vm.query = '500'
+    await setTextInputValue(leftList.find('input'), '500')
+    await nextTick()
+
+    expect(filterIndicesSync).toHaveBeenCalled()
+    expect(warmupWasm).not.toHaveBeenCalled()
+  })
+
+  it('keeps non-ascii queries on the JS path', async () => {
+    const value = ref([])
+    const data = Array.from({ length: 1_001 }, (_, index) => ({
+      key: index + 1,
+      label: index === 777 ? 'Éclair' : `option ${index + 1}`,
+      disabled: false,
+    }))
+
+    const wrapper = mount(() => (
+      <Transfer v-model={value.value} filterable data={data} />
+    ))
+
+    const leftList: any = wrapper.findComponent({ name: 'ElTransferPanel' })
+    leftList.vm.query = 'é'
+    await setTextInputValue(leftList.find('input'), 'é')
+    await nextTick()
+
+    expect(filterIndicesSync).not.toHaveBeenCalled()
+    expect(leftList.vm.filteredData.length).toBe(1)
+    expect(leftList.vm.filteredData[0].label).toBe('Éclair')
+  })
 
   it('transfer', async () => {
     const value = ref([1, 4])
@@ -139,7 +211,7 @@ describe('Transfer', () => {
     const label = wrapper.find('.el-transfer-panel__header .el-checkbox__label')
     expect(label.text().includes('表1')).toBeTruthy()
     expect(
-      wrapper.find('.el-transfer-panel__list .el-checkbox__label span').text()
+      wrapper.find('.el-transfer-panel__list .el-checkbox__label span').text(),
     ).toBe('1 - 备选项 1')
     expect(label.find('span').text()).toBe('no')
   })
@@ -170,7 +242,7 @@ describe('Transfer', () => {
       ElTransfer.vm.addToRight()
       await nextTick()
       const targetItems = wrapper.findAll(
-        '.el-transfer__buttons + .el-transfer-panel .el-transfer-panel__body .el-checkbox__label span'
+        '.el-transfer__buttons + .el-transfer-panel .el-transfer-panel__body .el-checkbox__label span',
       )
       expect(targetItems.map((item) => item.text())).toStrictEqual([
         '备选项 1',
@@ -195,7 +267,7 @@ describe('Transfer', () => {
       ElTransfer.vm.addToRight()
       await nextTick()
       const targetItems = wrapper.findAll(
-        '.el-transfer__buttons + .el-transfer-panel .el-transfer-panel__body .el-checkbox__label span'
+        '.el-transfer__buttons + .el-transfer-panel .el-transfer-panel__body .el-checkbox__label span',
       )
       expect(targetItems.map((item) => item.text())).toStrictEqual([
         '备选项 1',
@@ -220,7 +292,7 @@ describe('Transfer', () => {
       ElTransfer.vm.addToRight()
       await nextTick()
       const targetItems = wrapper.findAll(
-        '.el-transfer__buttons + .el-transfer-panel .el-transfer-panel__body .el-checkbox__label span'
+        '.el-transfer__buttons + .el-transfer-panel .el-transfer-panel__body .el-checkbox__label span',
       )
       expect(targetItems.map((item) => item.text())).toStrictEqual([
         '备选项 2',

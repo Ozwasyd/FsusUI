@@ -80,17 +80,21 @@ export function useCheck(props: TreeProps, tree: Ref<Tree | undefined>) {
   const toggleCheckbox = (
     node: TreeNode,
     isChecked: CheckboxValueType,
-    nodeClick = true
+    nodeClick = true,
+    hiddenNodeKeySet?: Ref<Set<TreeKey>>,
   ) => {
     const checkedKeySet = checkedKeys.value
     const toggle = (node: TreeNode, checked: CheckboxValueType) => {
       checkedKeySet[checked ? SetOperationEnum.ADD : SetOperationEnum.DELETE](
-        node.key
+        node.key,
       )
       const children = node.children
       if (!props.checkStrictly && children) {
         children.forEach((childNode) => {
-          if (!childNode.disabled) {
+          if (
+            !childNode.disabled &&
+            !hiddenNodeKeySet?.value.has(childNode.key)
+          ) {
             toggle(childNode, checked)
           }
         })

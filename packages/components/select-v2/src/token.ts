@@ -5,8 +5,8 @@ import type { TooltipInstance } from '@element-plus/components/tooltip'
 
 export interface SelectV2Context {
   props: ExtractPropTypes<typeof SelectProps>
-  expanded: boolean
-  popper: Ref<TooltipInstance>
+  expanded: Ref<boolean>
+  popper: Ref<TooltipInstance | null>
   onSelect: (option: Option, index: number, byClick?: boolean) => void
   onHover: (idx: number) => void
   onKeyboardNavigate: (direction: 'forward' | 'backward') => void
@@ -14,7 +14,7 @@ export interface SelectV2Context {
 }
 
 export const selectV2InjectionKey: InjectionKey<SelectV2Context> = Symbol(
-  'ElSelectV2Injection'
+  'ElSelectV2Injection',
 )
 export type IOptionProps = ExtractPropTypes<typeof OptionProps>
 export type ISelectProps = ExtractPropTypes<typeof SelectProps>

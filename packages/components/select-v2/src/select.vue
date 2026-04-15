@@ -258,7 +258,7 @@
               nsSelectV2.e('placeholder'),
               nsSelectV2.is(
                 'transparent',
-                multiple ? modelValue.length === 0 : !hasModelValue
+                multiple ? modelValue.length === 0 : !hasModelValue,
               ),
             ]"
           >
@@ -312,13 +312,7 @@
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  provide,
-  reactive,
-  toRefs,
-} from 'vue'
+import { computed, defineComponent, provide, reactive, toRefs } from 'vue'
 import { isArray } from '@element-plus/utils'
 import { ClickOutside } from '@element-plus/directives'
 import ElTooltip from '@element-plus/components/tooltip'
@@ -329,6 +323,8 @@ import ElSelectMenu from './select-dropdown'
 import useSelect from './useSelect'
 import { selectV2InjectionKey } from './token'
 import { SelectProps } from './defaults'
+
+import type { ISelectProps } from './token'
 export default defineComponent({
   name: 'ElSelectV2',
   components: {
@@ -366,21 +362,24 @@ export default defineComponent({
         ...toRefs(props),
         modelValue,
       }),
-      emit
+      emit,
     )
-    // TODO, remove the any cast to align the actual API.
+
+    const selectProps = reactive({
+      ...toRefs(props),
+      height: API.popupHeight,
+      modelValue,
+    }) as ISelectProps
+
     provide(selectV2InjectionKey, {
-      props: reactive({
-        ...toRefs(props),
-        height: API.popupHeight,
-        modelValue,
-      }),
+      props: selectProps,
+      expanded: API.expanded,
       popper: API.popper,
       onSelect: API.onSelect,
       onHover: API.onHover,
       onKeyboardNavigate: API.onKeyboardNavigate,
       onKeyboardSelect: API.onKeyboardSelect,
-    } as any)
+    })
 
     const tooltipEvents = {
       'before-show': API.handleMenuEnter,

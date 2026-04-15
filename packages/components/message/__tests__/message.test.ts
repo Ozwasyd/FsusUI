@@ -37,7 +37,11 @@ describe('Message.vue', () => {
       expect(wrapper.text()).toEqual(AXIOM)
       expect(vm.visible).toBe(true)
       expect(vm.iconComponent).toBe(TypeComponentsMap['info'])
-      expect(vm.customStyle).toEqual({ top: '16px', zIndex: 2001 })
+      expect(vm.customStyle).toEqual({
+        top: '16px',
+        zIndex: 2001,
+        '--el-message-stack-y': '0px',
+      })
     })
 
     test('should be able to render VNode', () => {

@@ -177,3 +177,15 @@
     background-position: 100%;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .#{$namespace}-progress-bar__inner {
+    transition-duration: 1ms !important;
+  }
+
+  .#{$namespace}-progress-bar__inner--indeterminate,
+  .#{$namespace}-progress-bar__inner--striped-flow {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

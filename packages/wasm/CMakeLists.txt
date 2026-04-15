@@ -24,6 +24,8 @@ target_link_options(ep_wasm PRIVATE
   "-sEXPORT_ES6=1"
   "-sMODULARIZE=1"
   "-sEXPORT_NAME=createEpWasm"
+  "-sEXPORTED_FUNCTIONS=['_malloc','_free','_sort_numbers_buffer','_estimate_row_heights_buffer']"
+  "-sEXPORTED_RUNTIME_METHODS=['HEAP32','HEAPF64']"
 
   # 内存配置：初始 4 MB，最大 256 MB，允许增长
   "-sINITIAL_MEMORY=4MB"

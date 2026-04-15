@@ -47,6 +47,7 @@ import { EVENT_CODE } from '@element-plus/constants'
 import { ElIcon } from '@element-plus/components/icon'
 import { useGlobalComponentSettings } from '@element-plus/components/config-provider'
 import { notificationEmits, notificationProps } from './notification'
+import { getNotificationBaseOffset } from './instance'
 
 import type { CSSProperties } from 'vue'
 
@@ -83,10 +84,19 @@ const verticalProperty = computed(() =>
   props.position.startsWith('top') ? 'top' : 'bottom'
 )
 
+const baseOffset = computed(() =>
+  getNotificationBaseOffset(props.id, props.offset)
+)
+
+const stackOffset = computed(() => props.offset - baseOffset.value)
+
 const positionStyle = computed<CSSProperties>(() => {
   return {
-    [verticalProperty.value]: `${props.offset}px`,
+    [verticalProperty.value]: `${baseOffset.value}px`,
     zIndex: props.zIndex ?? currentZIndex.value,
+    '--el-notification-stack-y': `${
+      verticalProperty.value === 'top' ? stackOffset.value : -stackOffset.value
+    }px`,
   }
 })
 

@@ -91,10 +91,12 @@ const lastOffset = computed(() => getLastOffset(props.id))
 const offset = computed(
   () => getOffsetOrSpace(props.id, props.offset) + lastOffset.value
 )
+const stackOffset = computed(() => offset.value - props.offset)
 const bottom = computed((): number => height.value + offset.value)
 const customStyle = computed<CSSProperties>(() => ({
-  top: `${offset.value}px`,
+  top: `${props.offset}px`,
   zIndex: currentZIndex.value,
+  '--el-message-stack-y': `${stackOffset.value}px`,
 }))
 
 function startTimer() {

@@ -16,6 +16,17 @@
   --demo-surface: rgba(255, 255, 255, 0.82);
   --demo-surface-strong: rgba(255, 255, 255, 0.92);
   --demo-surface-muted: rgba(244, 244, 245, 0.92);
+  --demo-motion-duration: var(--el-transition-duration, 0.3s);
+  --demo-motion-duration-fast: var(--el-transition-duration-fast, 0.2s);
+  --demo-motion-duration-slow: 2.1s;
+  --demo-motion-ease: var(
+    --el-transition-function-ease-in-out-bezier,
+    cubic-bezier(0.645, 0.045, 0.355, 1)
+  );
+  --demo-motion-ease-emphasis: var(
+    --el-transition-function-fast-bezier,
+    cubic-bezier(0.23, 1, 0.32, 1)
+  );
 }
 
 * {
@@ -148,7 +159,9 @@ textarea {
   font-size: 12px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition:
+    opacity var(--demo-motion-duration) var(--demo-motion-ease-emphasis),
+    transform var(--demo-motion-duration) var(--demo-motion-ease-emphasis);
 }
 
 .demo-nav a:hover {
@@ -367,7 +380,10 @@ textarea {
   border: 1px dashed rgba(9, 9, 11, 0.12);
   border-radius: 18px;
   padding: 14px;
-  transition: opacity 0.28s ease, filter 0.28s ease, transform 0.28s ease;
+  transition:
+    opacity var(--demo-motion-duration-fast) var(--demo-motion-ease),
+    filter var(--demo-motion-duration-fast) var(--demo-motion-ease),
+    transform var(--demo-motion-duration-fast) var(--demo-motion-ease);
 }
 
 .demo-phone-frame {
@@ -564,7 +580,8 @@ textarea {
   inset: 0;
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
   transform: translateX(-100%);
-  animation: skeleton-sweep 2.1s ease-in-out infinite;
+  animation: skeleton-sweep var(--demo-motion-duration-slow)
+    var(--demo-motion-ease) infinite;
   pointer-events: none;
 }
 
@@ -957,7 +974,10 @@ textarea {
   font-weight: 600;
   letter-spacing: 0.04em;
   cursor: pointer;
-  transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+  transition:
+    background-color var(--demo-motion-duration-fast) var(--demo-motion-ease),
+    color var(--demo-motion-duration-fast) var(--demo-motion-ease),
+    transform var(--demo-motion-duration-fast) var(--demo-motion-ease);
 }
 
 .raw-popper-button:hover {
@@ -1191,6 +1211,7 @@ textarea {
 @media (prefers-reduced-motion: reduce) {
   .demo-nav a,
   .muted-box,
+  .raw-popper-button,
   .skeleton-preview::after {
     transition: none;
     animation: none;
