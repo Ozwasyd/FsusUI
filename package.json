@@ -16,7 +16,7 @@
     "format": "prettier --write --cache .",
     "lint": "eslint . --max-warnings 0 --cache",
     "lint:fix": "pnpm run lint --fix",
-    "publish:github-package": "pnpm run build:github-package && pnpm --dir ./dist/element-plus publish --no-git-checks",
+    "publish:github-package": "pnpm run build:github-package && cd ./dist/element-plus && npm publish",
     "typecheck": "run-p typecheck:web typecheck:node typecheck:vite-config typecheck:vitest",
     "typecheck:web": "vue-tsc -p tsconfig.web.json --composite false --noEmit",
     "typecheck:node": "tsc -p tsconfig.node.json --noEmit",
