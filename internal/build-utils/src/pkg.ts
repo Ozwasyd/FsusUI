@@ -1,4 +1,5 @@
 import findWorkspacePackages from '@pnpm/find-workspace-packages'
+import path from 'node:path'
 import { projRoot } from './paths'
 
 import type { ProjectManifest } from '@pnpm/types'
@@ -29,9 +30,37 @@ export const getPackageDependencies = (
   }
 }
 
+const excludedDirs = new Set(['node_modules', 'dist', 'demo-app'])
+const excludedSegmentFragments = ['test', 'mock']
+const excludedBasenames = new Set(['gulpfile.ts', 'gulpfile.js', 'gulpfile.mjs', 'gulpfile.cjs'])
+const excludedFilenamePatterns = [
+  /^build\.config\.[^.]+$/u,
+  /^vite\.config\.[^.]+$/u,
+  /^[^.]+\.config\.[^.]+$/u,
+]
+
+function shouldExcludeFile(filePath: string) {
+  const normalizedPath = filePath.split(path.sep)
+  const basename = path.basename(filePath)
+
+  if (
+    normalizedPath.some((segment) => {
+      return (
+        excludedDirs.has(segment) ||
+        excludedSegmentFragments.some((fragment) => segment.includes(fragment))
+      )
+    })
+  ) {
+    return true
+  }
+
+  if (excludedBasenames.has(basename)) {
+    return true
+  }
+
+  return excludedFilenamePatterns.some((pattern) => pattern.test(basename))
+}
+
 export const excludeFiles = (files: string[]) => {
-  const excludes = ['node_modules', 'test', 'mock', 'gulpfile', 'dist', 'demo-app']
-  return files.filter(
-    (path) => !excludes.some((exclude) => path.includes(exclude))
-  )
+  return files.filter((filePath) => !shouldExcludeFile(filePath))
 }

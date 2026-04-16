@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process'
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -112,6 +112,52 @@ function assertPublicInterfaceMatches(sourcePackageJson, distPackageJson) {
   }
 }
 
+function collectUnexpectedBuildArtifacts(rootDir, currentDir = rootDir) {
+  const unexpected = []
+  const entries = readdirSync(currentDir, { withFileTypes: true })
+
+  for (const entry of entries) {
+    const absolutePath = path.join(currentDir, entry.name)
+    const relativePath = path.relative(rootDir, absolutePath)
+
+    if (entry.isDirectory()) {
+      if (
+        relativePath === 'es/node_modules' ||
+        relativePath === 'lib/node_modules'
+      ) {
+        unexpected.push(relativePath)
+        continue
+      }
+
+      unexpected.push(...collectUnexpectedBuildArtifacts(rootDir, absolutePath))
+      continue
+    }
+
+    if (
+      /^build\.config\.[^.]+$/u.test(entry.name) ||
+      /^vite\.config\.[^.]+$/u.test(entry.name) ||
+      entry.name === 'gulpfile.ts' ||
+      entry.name === 'gulpfile.js' ||
+      entry.name === 'gulpfile.mjs' ||
+      entry.name === 'gulpfile.cjs'
+    ) {
+      unexpected.push(relativePath)
+    }
+  }
+
+  return unexpected
+}
+
+function assertDistArtifactShape(rootDir) {
+  const unexpectedArtifacts = collectUnexpectedBuildArtifacts(rootDir)
+
+  if (unexpectedArtifacts.length > 0) {
+    throw new Error(
+      `Unexpected build-time artifacts found in dist/element-plus: ${unexpectedArtifacts.join(', ')}`
+    )
+  }
+}
+
 function resolveRepositoryContext() {
   const envRepo = process.env.GITHUB_REPOSITORY
   if (envRepo) {
@@ -169,6 +215,7 @@ const repositoryGitUrl = `${repositoryWebUrl}.git`
 const packageJson = JSON.parse(readFileSync(distPackagePath, 'utf8'))
 
 assertPublicInterfaceMatches(sourcePackageJson, packageJson)
+assertDistArtifactShape(distRoot)
 
 packageJson.name = packageName
 packageJson.repository = {
