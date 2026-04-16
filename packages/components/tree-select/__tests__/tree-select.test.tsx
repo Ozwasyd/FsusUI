@@ -1,12 +1,47 @@
 import { nextTick, reactive, ref } from 'vue'
 import { mount } from '@vue/test-utils'
-import { describe, expect, test, vi } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { setCheckboxValue } from '../../../test-utils/dom'
 import TreeSelect from '../src/tree-select.vue'
 
 import type { RenderFunction } from 'vue'
 import type { VueWrapper } from '@vue/test-utils'
 import type ElTree from '@element-plus/components/tree'
+
+const { filterIndicesSync, warmupWasm, setWasmReady } = vi.hoisted(() => {
+  let wasmReady = false
+
+  return {
+    filterIndicesSync: vi.fn(
+      (data: string[], keyword: string, caseSensitive = false) => {
+        if (!wasmReady) {
+          return null
+        }
+
+        const normalizedKeyword = caseSensitive
+          ? keyword
+          : keyword.toLowerCase()
+
+        return data.reduce((result: number[], item, index) => {
+          const haystack = caseSensitive ? item : item.toLowerCase()
+          if (haystack.includes(normalizedKeyword)) {
+            result.push(index)
+          }
+          return result
+        }, [])
+      }
+    ),
+    warmupWasm: vi.fn(),
+    setWasmReady: (nextValue: boolean) => {
+      wasmReady = nextValue
+    },
+  }
+})
+
+vi.mock('@element-plus/wasm', () => ({
+  filterIndicesSync,
+  warmupWasm,
+}))
 
 const createComponent = ({
   slots = {},
@@ -76,6 +111,12 @@ const createComponent = ({
 }
 
 describe('TreeSelect.vue', () => {
+  beforeEach(() => {
+    setWasmReady(false)
+    filterIndicesSync.mockClear()
+    warmupWasm.mockClear()
+  })
+
   test('render test', async () => {
     const { wrapper, tree } = createComponent({
       props: {
@@ -224,6 +265,96 @@ describe('TreeSelect.vue', () => {
     await nextTick()
     expect(tree.findAll('.el-tree-node:not(.is-hidden)').length).toBe(1)
   })
+
+  test('filter uses wasm fast path for large default tree filtering', async () => {
+    setWasmReady(true)
+
+    const children = Array.from({ length: 600 }, (_, index) => ({
+      value: index + 10,
+      label: index === 357 ? '命中节点' : `子节点 ${index}`,
+    }))
+
+    const { tree } = createComponent({
+      props: {
+        filterable: true,
+        data: [
+          {
+            value: 1,
+            label: '根节点',
+            children,
+          },
+        ],
+      },
+    })
+
+    expect(warmupWasm).toHaveBeenCalledTimes(1)
+
+    tree.vm.filter('命中节点')
+    await nextTick()
+
+    expect(filterIndicesSync).toHaveBeenCalledTimes(1)
+    expect(tree.vm.getNode(1).visible).toBe(true)
+    expect(tree.vm.getNode(10 + 357).visible).toBe(true)
+  })
+
+  test(
+    'filter falls back to js path when wasm is unavailable',
+    async () => {
+      const children = Array.from({ length: 600 }, (_, index) => ({
+      value: index + 10,
+      label: index === 24 ? '后备命中' : `子节点 ${index}`,
+      }))
+
+      const { tree } = createComponent({
+        props: {
+          filterable: true,
+          data: [
+            {
+              value: 1,
+              label: '根节点',
+              children,
+            },
+          ],
+        },
+      })
+
+      tree.vm.filter('后备命中')
+      await nextTick()
+
+      expect(filterIndicesSync).toHaveBeenCalledTimes(1)
+      expect(tree.vm.getNode(1).visible).toBe(true)
+      expect(tree.vm.getNode(10 + 24).visible).toBe(true)
+    },
+    10000
+  )
+
+  test(
+    'custom filter method does not use wasm fast path',
+    async () => {
+      setWasmReady(true)
+
+      const { tree } = createComponent({
+        props: {
+          filterable: true,
+          data: Array.from({ length: 600 }, (_, index) => ({
+            value: index,
+            label: `节点 ${index}`,
+          })),
+          filterNodeMethod: (value: string, data: { label: string }) => {
+            if (!value) return true
+            return data.label.endsWith(value)
+          },
+        },
+      })
+
+      tree.vm.filter('199')
+      await nextTick()
+
+      expect(filterIndicesSync).not.toHaveBeenCalled()
+      expect(warmupWasm).not.toHaveBeenCalled()
+    },
+    10000
+  )
 
   test('props', async () => {
     const { wrapper, select, tree } = createComponent({

@@ -15,6 +15,38 @@ import type {
   TreeStoreOptions,
 } from '../tree.type'
 
+const getInternalWasmFilter = (filterNodeMethod: FilterNodeMethodFunction) => {
+  return typeof filterNodeMethod?.__epWasmFilter === 'function'
+    ? filterNodeMethod.__epWasmFilter
+    : null
+}
+
+const applyWasmFilter = (
+  store: TreeStore,
+  visibleNodeKeys: Set<TreeKey>,
+  value: FilterValue
+) => {
+  const lazy = store.lazy
+
+  const traverse = function (node: TreeStore | Node) {
+    const childNodes = (node as TreeStore).root
+      ? (node as TreeStore).root.childNodes
+      : (node as Node).childNodes
+
+    childNodes.forEach((child) => {
+      child.visible = visibleNodeKeys.has(child.key)
+
+      traverse(child)
+
+      if (value && child.visible && !child.isLeaf && !lazy) {
+        child.expand()
+      }
+    })
+  }
+
+  traverse(store)
+}
+
 export default class TreeStore {
   currentNode: Node
   currentNodeKey: TreeKey
@@ -67,6 +99,16 @@ export default class TreeStore {
   filter(value: FilterValue): void {
     const filterNodeMethod = this.filterNodeMethod
     const lazy = this.lazy
+    const wasmFilter = getInternalWasmFilter(filterNodeMethod)
+
+    if (value && wasmFilter) {
+      const fastFilterResult = wasmFilter(value)
+      if (fastFilterResult) {
+        applyWasmFilter(this, fastFilterResult.visibleNodeKeys, value)
+        return
+      }
+    }
+
     const traverse = function (node: TreeStore | Node) {
       const childNodes = (node as TreeStore).root
         ? (node as TreeStore).root.childNodes

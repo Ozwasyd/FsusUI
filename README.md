@@ -1,8 +1,14 @@
 # FsusUI
 
-> Element Plus 私有改造版 — ES2022 · TypeScript 6 · WebAssembly (C++23)
+> 基于 Element Plus 体系维护的 Vue 3 组件库工作区（pnpm monorepo）— ES2022 · TypeScript 6 · WebAssembly (C++23)
 
-## 关键改造点
+## 项目简介
+
+- 本仓库目录名为 `FsusUI`，但多数包名、源码目录与导出命名仍沿用 `element-plus` 体系。
+- 工作区由 `pnpm-workspace.yaml` 定义，覆盖 `packages/*` 与 `internal/*`。
+- 对外主入口包目前仍为 `packages/element-plus`（包名 `element-plus`）。
+
+核心特性（以仓库现状为准）：
 
 | 维度 | 原 Element Plus | FsusUI |
 |------|----------------|--------|
@@ -15,43 +21,35 @@
 | 运行时 | Node 16 | **Node 22** |
 | ESLint | 8（旧格式） | **10（Flat Config）** |
 
-## 与 Element Plus 的合约兼容性
+## 与 Element Plus 的关系与命名现状
 
-所有组件 props / emits / slots / expose 与 Element Plus 主线保持**完全一致**。  
-现有项目无需修改任何代码即可切换。
+- 这是一个以 Element Plus 包结构为主体的代码库分支/改造版本；具体行为以本仓库代码与构建产物为准。
+- 文档与描述会避免“完全兼容”等无法从仓库自动证明的强断言；若你在迁移中遇到不一致，应以实际构建与运行结果为准。
 
-## WASM 加速模块
+## 快速开始
 
-```
-packages/wasm/
-├── src/ep_wasm.cpp   # C++23 源码（排序/过滤/颜色/精度/行高）
-├── CMakeLists.txt    # Emscripten 构建配置
-├── build.sh          # 一键构建脚本
-├── index.ts          # TypeScript Promise-based 封装
-└── dist/             # 构建产物（.wasm + .mjs）
-```
+环境要求：`node >= 22`、`pnpm >= 10`（根 `package.json` 的 `packageManager` 为 `pnpm@10.33.0`）。
 
-**构建 WASM**（需安装 emsdk）：
 ```bash
+pnpm install
+
+# 启动 demo（Vite dev server: 5173）
+pnpm -C packages/demo-app dev
+```
+
+## 常用命令
+
+```bash
+pnpm build
+pnpm test
+pnpm typecheck
+pnpm lint
+
+pnpm build:theme
 pnpm build:wasm
 ```
 
-**集成点**：
-- `packages/components/table/src/composables/use-wasm-sort.ts` — 表格列排序（≥5000 行走 WASM）
-- `packages/components/virtual-list/src/hooks/use-wasm-row-height.ts` — 虚拟列表行高估算（≥2000 项）
+## 详细文档
 
-## 开发
-
-```bash
-# 安装依赖
-pnpm install
-
-# 构建
-pnpm build
-
-# 测试
-pnpm test
-
-# 类型检查
-pnpm typecheck
-```
+- 项目主文档：`docs/project-overview.md`
+- 与 Element Plus 不同点的接入指南：`docs/element-plus-integration.md`

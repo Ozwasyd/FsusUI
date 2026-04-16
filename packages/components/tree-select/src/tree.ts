@@ -3,6 +3,7 @@ import { computed, nextTick, toRefs, watch } from 'vue'
 import { isEqual, pick } from 'lodash-unified'
 import { UPDATE_MODEL_EVENT } from '@element-plus/constants'
 import { isFunction } from '@element-plus/utils'
+import { filterIndicesSync, warmupWasm } from '@element-plus/wasm'
 import ElTree from '@element-plus/components/tree'
 import TreeSelectOption from './tree-select-option'
 import {
@@ -17,6 +18,8 @@ import type { Ref } from 'vue'
 import type ElSelect from '@element-plus/components/select'
 import type Node from '@element-plus/components/tree/src/model/node'
 import type { TreeNodeData } from '@element-plus/components/tree/src/tree.type'
+
+const TREE_SELECT_WASM_FILTER_THRESHOLD = 500
 
 export const useTree = (
   props,
@@ -79,6 +82,71 @@ export const useTree = (
     }
   }
 
+  const canUseWasmFilter = computed(() => {
+    if (props.filterNodeMethod || props.lazy) {
+      return false
+    }
+
+    const { value, label, children } = propsMap.value
+    return (
+      (typeof value === 'string' || value === undefined) &&
+      (typeof label === 'string' || label === undefined) &&
+      (typeof children === 'string' || children === undefined)
+    )
+  })
+
+  const wasmFilterIndex = computed(() => {
+    if (!canUseWasmFilter.value) {
+      return null
+    }
+
+    const labels: string[] = []
+    const nodeKeys: Array<string | number> = []
+    const parentKeyByNodeKey = new Map<string | number, string | number>()
+
+    treeEach(
+      props.data || [],
+      (node, index, siblings, parent) => {
+        const nodeKey = getNodeValByProp('value', node)
+        if (nodeKey === undefined || nodeKey === null) {
+          return
+        }
+
+        nodeKeys.push(nodeKey)
+        parentKeyByNodeKey.set(
+          nodeKey,
+          parent ? getNodeValByProp('value', parent) : undefined
+        )
+
+        const label = getNodeValByProp('label', node)
+        labels.push(typeof label === 'string' ? label : '')
+      },
+      (data) => getNodeValByProp('children', data)
+    )
+
+    if (labels.length < TREE_SELECT_WASM_FILTER_THRESHOLD) {
+      return null
+    }
+
+    return {
+      labels,
+      nodeKeys,
+      parentKeyByNodeKey,
+    }
+  })
+
+  watch(
+    wasmFilterIndex,
+    (index) => {
+      if (index) {
+        warmupWasm()
+      }
+    },
+    {
+      immediate: true,
+    }
+  )
+
   const defaultExpandedParentKeys = toValidArray(props.modelValue)
     .map((value) => {
       return treeFind(
@@ -118,6 +186,40 @@ export const useTree = (
     )
   })
 
+  const filterNodeMethod = (value, data, node) => {
+    if (props.filterNodeMethod)
+      return props.filterNodeMethod(value, data, node)
+    if (!value) return true
+    return getNodeValByProp('label', data)?.includes(value)
+  }
+
+  filterNodeMethod.__epWasmFilter = (value: string) => {
+    const index = wasmFilterIndex.value
+    if (!index || !value) {
+      return null
+    }
+
+    const matchedIndices = filterIndicesSync(index.labels, value, true)
+    if (!matchedIndices) {
+      return null
+    }
+
+    const visibleNodeKeys = new Set<string | number>()
+    matchedIndices.forEach((matchedIndex) => {
+      let nodeKey = index.nodeKeys[matchedIndex]
+      while (nodeKey !== undefined && nodeKey !== null) {
+        if (visibleNodeKeys.has(nodeKey)) {
+          break
+        }
+
+        visibleNodeKeys.add(nodeKey)
+        nodeKey = index.parentKeyByNodeKey.get(nodeKey)
+      }
+    })
+
+    return { visibleNodeKeys }
+  }
+
   return {
     ...pick(toRefs(props), Object.keys(ElTree.props)),
     ...attrs,
@@ -151,12 +253,7 @@ export const useTree = (
           : undefined
       )
     },
-    filterNodeMethod: (value, data, node) => {
-      if (props.filterNodeMethod)
-        return props.filterNodeMethod(value, data, node)
-      if (!value) return true
-      return getNodeValByProp('label', data)?.includes(value)
-    },
+    filterNodeMethod,
     onNodeClick: (data, node, e) => {
       attrs.onNodeClick?.(data, node, e)
 
