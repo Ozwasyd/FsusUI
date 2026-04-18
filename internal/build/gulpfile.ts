@@ -48,6 +48,9 @@ export default series(
   withTaskName('createOutput', () => mkdir(epOutput, { recursive: true })),
   withTaskName('buildWasmAssets', () => run('pnpm run -C packages/wasm build:wasm')),
   withTaskName('buildWasmPackage', () => run('pnpm run -C packages/wasm build')),
+  withTaskName('buildIconsVuePackage', () =>
+    run('pnpm run -C packages/icons-vue build')
+  ),
 
   parallel(
     runTask('buildFullBundle'),
