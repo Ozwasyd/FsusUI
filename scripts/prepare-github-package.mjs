@@ -15,6 +15,12 @@ const sourcePackagePath = path.join(
   'element-plus',
   'package.json'
 )
+const workspaceRoots = ['packages', 'internal']
+const installDependencyFields = [
+  'dependencies',
+  'peerDependencies',
+  'optionalDependencies',
+]
 
 if (!existsSync(distPackagePath)) {
   throw new Error(
@@ -158,6 +164,102 @@ function assertDistArtifactShape(rootDir) {
   }
 }
 
+function collectWorkspaceVersions() {
+  const versions = new Map()
+
+  for (const workspaceRoot of workspaceRoots) {
+    const rootPath = path.join(repoRoot, workspaceRoot)
+    if (!existsSync(rootPath)) continue
+
+    const entries = readdirSync(rootPath, { withFileTypes: true })
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue
+
+      const manifestPath = path.join(rootPath, entry.name, 'package.json')
+      if (!existsSync(manifestPath)) continue
+
+      const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
+      if (manifest.name && manifest.version) {
+        versions.set(manifest.name, manifest.version)
+      }
+    }
+  }
+
+  return versions
+}
+
+function normalizeWorkspaceSpecifier(specifier, packageName, workspaceVersions) {
+  if (typeof specifier !== 'string' || !specifier.startsWith('workspace:')) {
+    return specifier
+  }
+
+  const resolvedVersion = workspaceVersions.get(packageName)
+  if (!resolvedVersion) {
+    throw new Error(
+      `Unable to resolve workspace version for dependency "${packageName}" with specifier "${specifier}".`
+    )
+  }
+
+  const workspaceRange = specifier.slice('workspace:'.length).trim()
+  if (workspaceRange === '*' || workspaceRange === '') {
+    return resolvedVersion
+  }
+
+  if (workspaceRange === '^') {
+    return `^${resolvedVersion}`
+  }
+
+  if (workspaceRange === '~') {
+    return `~${resolvedVersion}`
+  }
+
+  if (workspaceRange.startsWith('^')) {
+    return `^${resolvedVersion}`
+  }
+
+  if (workspaceRange.startsWith('~')) {
+    return `~${resolvedVersion}`
+  }
+
+  return workspaceRange
+}
+
+function normalizeWorkspaceProtocols(packageJson, workspaceVersions) {
+  for (const field of installDependencyFields) {
+    const dependencies = packageJson[field]
+    if (!dependencies) continue
+
+    for (const [dependencyName, specifier] of Object.entries(dependencies)) {
+      dependencies[dependencyName] = normalizeWorkspaceSpecifier(
+        specifier,
+        dependencyName,
+        workspaceVersions
+      )
+    }
+  }
+}
+
+function assertNoWorkspaceProtocolsRemain(packageJson) {
+  const remaining = []
+
+  for (const field of installDependencyFields) {
+    const dependencies = packageJson[field]
+    if (!dependencies) continue
+
+    for (const [dependencyName, specifier] of Object.entries(dependencies)) {
+      if (typeof specifier === 'string' && specifier.startsWith('workspace:')) {
+        remaining.push(`${field}.${dependencyName}=${specifier}`)
+      }
+    }
+  }
+
+  if (remaining.length > 0) {
+    throw new Error(
+      `Workspace protocols remain in published manifest: ${remaining.join(', ')}`
+    )
+  }
+}
+
 function resolveRepositoryContext() {
   const envRepo = process.env.GITHUB_REPOSITORY
   if (envRepo) {
@@ -213,6 +315,7 @@ const scope = packageName.slice(1).split('/')[0]
 const repositoryWebUrl = `${repository.serverUrl}/${repository.owner}/${repository.repo}`
 const repositoryGitUrl = `${repositoryWebUrl}.git`
 const packageJson = JSON.parse(readFileSync(distPackagePath, 'utf8'))
+const workspaceVersions = collectWorkspaceVersions()
 
 assertPublicInterfaceMatches(sourcePackageJson, packageJson)
 assertDistArtifactShape(distRoot)
@@ -229,6 +332,9 @@ packageJson.bugs = {
 packageJson.publishConfig = {
   registry: registryUrl,
 }
+
+normalizeWorkspaceProtocols(packageJson, workspaceVersions)
+assertNoWorkspaceProtocolsRemain(packageJson)
 
 writeFileSync(distPackagePath, `${JSON.stringify(packageJson, null, 2)}\n`)
 writeFileSync(distNpmrcPath, `@${scope}:registry=${registryUrl}\n`)
