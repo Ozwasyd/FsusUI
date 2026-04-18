@@ -32,9 +32,7 @@
             v-if="(showText || $slots.default) && textInside"
             :class="ns.be('bar', 'innerText')"
           >
-            <slot :percentage="percentage">
-              <span>{{ content }}</span>
-            </slot>
+            <slot :percentage="percentage">{{ content }}</slot>
           </div>
         </div>
       </div>
@@ -72,7 +70,7 @@
       :style="{ fontSize: `${progressTextSize}px` }"
     >
       <slot :percentage="percentage">
-        <span v-if="!status">{{ content }}</span>
+        <template v-if="!status">{{ content }}</template>
         <el-icon v-else><component :is="statusIcon" /></el-icon>
       </slot>
     </div>

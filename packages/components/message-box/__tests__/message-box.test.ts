@@ -60,7 +60,7 @@ describe('MessageBox', () => {
     expect(msgbox).toBeDefined()
     await rAF()
     expect(
-      msgbox.querySelector('.el-message-box__title span').textContent
+      msgbox.querySelector('.el-message-box__title').textContent?.trim()
     ).toEqual('消息')
     expect(
       msgbox.querySelector('.el-message-box__message').querySelector('p')

@@ -38,7 +38,7 @@ const resolveElementPlusChunk = (id: string) => {
     return 'ep-installer'
   }
 
-  if (id.includes('/node_modules/@element-plus/icons-vue/')) {
+  if (id.includes('/packages/icons-vue/') || id.includes('/node_modules/@element-plus/icons-vue/')) {
     return 'ep-icons'
   }
 }
@@ -99,6 +99,7 @@ export default defineConfig({
       '@element-plus/hooks',
       '@element-plus/locale',
       '@element-plus/utils',
+      '@element-plus/icons-vue',
       '@element-plus/wasm',
     ],
     include: [
@@ -136,6 +137,9 @@ export default defineConfig({
       ),
       '@element-plus/utils': fileURLToPath(
         new URL('../utils', import.meta.url)
+      ),
+      '@element-plus/icons-vue': fileURLToPath(
+        new URL('../icons-vue/src/index.ts', import.meta.url)
       ),
       '@element-plus/wasm': fileURLToPath(
         new URL('../wasm/index.ts', import.meta.url)

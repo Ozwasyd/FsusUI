@@ -10,14 +10,10 @@
       </slot>
     </div>
     <div v-if="title || $slots.title" :class="ns.e('title')">
-      <slot name="title">
-        <p>{{ title }}</p>
-      </slot>
+      <slot name="title">{{ title }}</slot>
     </div>
     <div v-if="subTitle || $slots['sub-title']" :class="ns.e('subtitle')">
-      <slot name="sub-title">
-        <p>{{ subTitle }}</p>
-      </slot>
+      <slot name="sub-title">{{ subTitle }}</slot>
     </div>
     <div v-if="$slots.extra" :class="ns.e('extra')">
       <slot name="extra" />

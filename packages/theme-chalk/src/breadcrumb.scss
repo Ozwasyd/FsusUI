@@ -3,7 +3,7 @@
 @use 'common/var' as *;
 
 @include b(breadcrumb) {
-  font-size: 14px;
+  font-size: getCssVar('font-size', 'base');
   line-height: 1;
   @include utils-clearfix;
 

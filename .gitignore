@@ -37,3 +37,16 @@ tmp
 *.tmp
 *.temp
 *.swp
+
+# One-off local migration helpers
+/extract_all.mjs
+/finish_phase1.mjs
+/fix_css.mjs
+/map-vars.mjs
+/parse_and_split.mjs
+/phase2_4_5.js
+/process.mjs
+/process_button.js
+/process_theme.js
+/run_decouple.mjs
+/split-fsus-theme.mjs

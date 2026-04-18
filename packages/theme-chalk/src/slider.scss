@@ -162,7 +162,7 @@ $slider-height: map.merge(
     @include e(marks-text) {
       position: absolute;
       transform: translateX(-50%);
-      font-size: 14px;
+      font-size: getCssVar('font-size', 'base');
       color: getCssVar('color-info');
       margin-top: 15px;
       white-space: pre;

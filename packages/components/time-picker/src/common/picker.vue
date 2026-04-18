@@ -544,30 +544,23 @@ const onTouchStartInput = (event: TouchEvent) => {
   }
 }
 
-const stopInputClickPropagation = (event: MouseEvent) => {
-  event.stopPropagation()
-}
-
-const handleTriggerIconMouseDown = (event: MouseEvent) => {
-  event.preventDefault()
-  onMouseDownInput(event)
-}
-
 const singleInputAttrs = computed<Record<string, unknown>>(() => ({
   name: isArray(props.name) ? undefined : props.name,
 }))
-
 const singleInputNativeEvents = {
   mousedown: onMouseDownInput,
   touchstart: onTouchStartInput,
-  click: stopInputClickPropagation,
+  click: (event: MouseEvent) => {
+    event.stopPropagation()
+  },
 }
-
 const triggerIconEvents = {
-  mousedown: handleTriggerIconMouseDown,
+  mousedown: (event: MouseEvent) => {
+    event.preventDefault()
+    onMouseDownInput(event)
+  },
   touchstart: onTouchStartInput,
 }
-
 const clearIconEvents = {
   click: onClearIconClick,
 }

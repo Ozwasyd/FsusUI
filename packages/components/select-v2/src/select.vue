@@ -35,9 +35,7 @@
             nsSelectV2.is('disabled', selectDisabled),
           ]"
         >
-          <div v-if="$slots.prefix">
-            <slot name="prefix" />
-          </div>
+          <slot v-if="$slots.prefix" name="prefix" />
           <div v-if="multiple" :class="nsSelectV2.e('selection')">
             <template v-if="collapseTags && modelValue.length > 0">
               <div

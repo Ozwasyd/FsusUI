@@ -7,17 +7,13 @@
     </div>
     <div :class="ns.e('content')">
       <div v-if="$slots.prefix || prefix" :class="ns.e('prefix')">
-        <slot name="prefix">
-          <span>{{ prefix }}</span>
-        </slot>
+        <slot name="prefix">{{ prefix }}</slot>
       </div>
       <span :class="ns.e('number')" :style="valueStyle">
         {{ displayValue }}
       </span>
       <div v-if="$slots.suffix || suffix" :class="ns.e('suffix')">
-        <slot name="suffix">
-          <span>{{ suffix }}</span>
-        </slot>
+        <slot name="suffix">{{ suffix }}</slot>
       </div>
     </div>
   </div>

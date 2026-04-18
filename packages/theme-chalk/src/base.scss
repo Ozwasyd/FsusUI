@@ -6,15 +6,15 @@
   position: absolute;
   top: -9999px;
   left: 1rem;
-  background: #050505;
-  color: #fff;
+  background: getCssVar('color', 'primary');
+  color: getCssVar('color', 'white');
   padding: 0.5rem 1rem;
   z-index: 9999;
   font-weight: bold;
 
   &:focus-visible {
     top: 1rem;
-    outline: 2px solid #050505;
+    outline: 2px solid getCssVar('color', 'primary');
     outline-offset: 2px;
   }
 }

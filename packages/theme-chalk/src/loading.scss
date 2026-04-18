@@ -55,7 +55,7 @@
   .#{$namespace}-loading-text {
     color: getCssVar('text-color', 'regular');
     margin: 3px 0;
-    font-size: 14px;
+    font-size: getCssVar('font-size', 'base');
   }
 
   .circular {

@@ -23,7 +23,9 @@
         @click="addToLeft"
       >
         <el-icon><arrow-left /></el-icon>
-        <span v-if="!isUndefined(buttonTexts[0])">{{ buttonTexts[0] }}</span>
+        <template v-if="!isUndefined(buttonTexts[0])">
+          {{ buttonTexts[0] }}
+        </template>
       </el-button>
       <el-button
         type="primary"
@@ -31,7 +33,9 @@
         :disabled="isEmpty(checkedState.leftChecked)"
         @click="addToRight"
       >
-        <span v-if="!isUndefined(buttonTexts[1])">{{ buttonTexts[1] }}</span>
+        <template v-if="!isUndefined(buttonTexts[1])">
+          {{ buttonTexts[1] }}
+        </template>
         <el-icon><arrow-right /></el-icon>
       </el-button>
     </div>

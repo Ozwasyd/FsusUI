@@ -1,7 +1,6 @@
 import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, test, vi } from 'vitest'
-import { clickCloseButton } from '../../../test-utils/dom'
 import { TypeComponentsMap } from '@element-plus/utils'
 import { EVENT_CODE } from '@element-plus/constants'
 import { notificationTypes } from '../src/notification'
@@ -147,7 +146,7 @@ describe('Notification.vue', () => {
 
       const closeBtn = wrapper.find('.el-notification__closeBtn')
       expect(closeBtn.exists()).toBe(true)
-      await clickCloseButton(closeBtn)
+      await closeBtn.trigger('click')
       expect(onClose).toHaveBeenCalled()
     })
 

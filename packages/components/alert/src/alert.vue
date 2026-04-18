@@ -29,11 +29,9 @@
           >
             {{ closeText }}
           </div>
-          <span v-else :class="ns.e('close-btn')" @click="close">
-            <el-icon>
-              <Close />
-            </el-icon>
-          </span>
+          <el-icon v-else :class="ns.e('close-btn')" v-on="closeIconEvents">
+            <Close />
+          </el-icon>
         </template>
       </div>
     </div>
@@ -74,5 +72,9 @@ const isBoldTitle = computed(() => {
 const close = (evt: MouseEvent) => {
   visible.value = false
   emit('close', evt)
+}
+
+const closeIconEvents = {
+  click: close,
 }
 </script>

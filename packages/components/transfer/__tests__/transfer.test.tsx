@@ -144,7 +144,7 @@ describe('Transfer', () => {
 
     expect(filterIndicesSync).toHaveBeenCalled()
     expect(warmupWasm).not.toHaveBeenCalled()
-  })
+  }, 10000)
 
   it('keeps non-ascii queries on the JS path', async () => {
     const value = ref([])

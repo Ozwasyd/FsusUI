@@ -1,8 +1,6 @@
 <template>
   <el-tooltip ref="tooltipRef" v-bind="tooltipBindings" v-on="tooltipEvents">
-    <template v-if="$slots.reference">
-      <slot name="reference" />
-    </template>
+    <slot v-if="$slots.reference" name="reference" />
 
     <template #content>
       <div v-if="title" :class="ns.e('title')" role="title">

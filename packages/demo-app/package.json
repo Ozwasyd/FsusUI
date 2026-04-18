@@ -12,7 +12,7 @@
   "dependencies": {
     "element-plus": "workspace:*",
     "@element-plus/theme-chalk": "workspace:*",
-    "@element-plus/icons-vue": "^2.3.2",
+    "@element-plus/icons-vue": "workspace:*",
     "vue": "^3.5.32"
   },
   "devDependencies": {

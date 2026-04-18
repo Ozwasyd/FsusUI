@@ -9,9 +9,7 @@
     @mouseenter="hoverItem"
     @click.stop="selectOptionClick"
   >
-    <slot>
-      <span>{{ currentLabel }}</span>
-    </slot>
+    <slot>{{ currentLabel }}</slot>
   </li>
 </template>
 

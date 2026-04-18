@@ -1,6 +1,5 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, test } from 'vitest'
-import { clickCloseButton } from '../../../test-utils/dom'
 import Tag from '../src/tag.vue'
 
 const AXIOM = 'Rem is the best girl'
@@ -42,7 +41,7 @@ describe('Tag.vue', () => {
     const closeBtn = comp.find('.el-tag .el-tag__close')
     expect(closeBtn.exists()).toBe(true)
 
-    await clickCloseButton(closeBtn)
+    await closeBtn.trigger('click')
     expect(comp.emitted().close).toBeTruthy()
   })
 

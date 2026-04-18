@@ -32,7 +32,7 @@
     width: 20px;
     line-height: 20px;
     margin: 10px 0 10px 10px;
-    border-radius: 3px;
+    border-radius: getCssVar('border-radius', 'small');
     text-align: center;
     font-size: 12px;
     color: getCssVar('text-color', 'primary');
@@ -129,7 +129,7 @@
 
     &:focus-visible {
       box-shadow: 0 0 2px 2px getCssVar('color-primary') inset;
-      border-radius: 3px;
+      border-radius: getCssVar('border-radius', 'small');
     }
 
     & .is-icon-close {
@@ -179,7 +179,7 @@
     > .#{$namespace}-tabs__header .#{$namespace}-tabs__nav {
       border: 1px solid getCssVar('border-color-light');
       border-bottom: none;
-      border-radius: 4px 4px 0 0;
+      border-radius: getCssVar('border-radius', 'base') 4px 0 0;
       box-sizing: border-box;
     }
     > .#{$namespace}-tabs__header .#{$namespace}-tabs__active-bar {
@@ -468,7 +468,7 @@
       }
 
       .#{$namespace}-tabs__nav {
-        border-radius: 4px 0 0 4px;
+        border-radius: getCssVar('border-radius', 'base') 0 0 4px;
         border-bottom: 1px solid getCssVar('border-color-light');
         border-right: none;
       }

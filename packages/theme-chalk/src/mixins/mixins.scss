@@ -60,7 +60,7 @@ $E: null;
 
 // A11y
 @mixin a11y-focus-ring($offset: 2px, $radius: 0px) {
-  outline: 2px solid var(--el-a11y-focus-color, #050505);
+  outline: 2px solid var(--el-a11y-focus-color, getCssVar('color', 'primary'));
   outline-offset: #{$offset};
   @if $radius != 0px and $radius != 0 {
     border-radius: #{$radius};

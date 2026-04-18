@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "jsx": "preserve",
+    "lib": ["ES2022", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "types": [],
+    "strict": true,
+    "noImplicitAny": true,
+    "declaration": true,
+    "declarationDir": "./dist/types",
+    "rootDir": "./src",
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowArbitraryExtensions": true,
+    "ignoreDeprecations": "6.0"
+  },
+  "references": [{ "path": "./tsconfig.build.json" }],
+  "include": ["./src/**/*"]
+}

@@ -37,9 +37,7 @@
         @close="closeViewer"
         @switch="switchViewer"
       >
-        <div v-if="$slots.viewer">
-          <slot name="viewer" />
-        </div>
+        <slot v-if="$slots.viewer" name="viewer" />
       </image-viewer>
     </template>
   </div>

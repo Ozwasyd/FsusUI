@@ -43,7 +43,7 @@
       }
 
       @include e(title) {
-        font-size: 14px;
+        font-size: getCssVar('font-size', 'base');
         font-weight: 500;
       }
     }

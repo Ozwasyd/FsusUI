@@ -78,7 +78,7 @@
 
   @include e(content) {
     padding: 0;
-    font-size: 14px;
+    font-size: getCssVar('font-size', 'base');
     line-height: 1.5;
     &:focus {
       outline-width: 0;

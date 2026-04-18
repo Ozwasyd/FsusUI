@@ -5,14 +5,10 @@
     @click="handleClick"
     @keydown.self.enter.space="handleKeydown"
   >
-    <template v-if="drag">
-      <upload-dragger :disabled="disabled" @file="uploadFiles">
-        <slot />
-      </upload-dragger>
-    </template>
-    <template v-else>
+    <upload-dragger v-if="drag" :disabled="disabled" @file="uploadFiles">
       <slot />
-    </template>
+    </upload-dragger>
+    <slot v-else />
     <input
       ref="inputRef"
       :class="ns.e('input')"

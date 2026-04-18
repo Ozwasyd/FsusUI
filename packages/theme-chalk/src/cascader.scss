@@ -73,7 +73,7 @@
 
     .icon-arrow-down {
       transition: transform getCssVar('transition-duration');
-      font-size: 14px;
+      font-size: getCssVar('font-size', 'base');
 
       @include when(reverse) {
         transform: rotateZ(180deg);
@@ -169,6 +169,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    column-gap: 10px;
     height: 34px;
     padding: 0 15px;
     text-align: left;
@@ -183,10 +184,6 @@
     &.is-checked {
       color: getCssVar('cascader', 'menu-selected-text-color');
       font-weight: bold;
-    }
-
-    > span {
-      margin-right: 10px;
     }
   }
 

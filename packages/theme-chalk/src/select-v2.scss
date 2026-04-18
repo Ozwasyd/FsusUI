@@ -130,7 +130,7 @@ $input-inline-start: map.get($input-padding-horizontal, 'default') !default;
     margin: 0;
     text-align: center;
     color: getCssVar('text-color', 'secondary');
-    font-size: 14px;
+    font-size: getCssVar('font-size', 'base');
   }
 
   @include e(popper) {

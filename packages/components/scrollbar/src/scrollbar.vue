@@ -19,16 +19,15 @@
         <slot />
       </component>
     </div>
-    <template v-if="!native">
-      <bar
-        ref="barRef"
-        :height="sizeHeight"
-        :width="sizeWidth"
-        :always="always"
-        :ratio-x="ratioX"
-        :ratio-y="ratioY"
-      />
-    </template>
+    <bar
+      v-if="!native"
+      ref="barRef"
+      :height="sizeHeight"
+      :width="sizeWidth"
+      :always="always"
+      :ratio-x="ratioX"
+      :ratio-y="ratioY"
+    />
   </div>
 </template>
 <script lang="ts" setup>

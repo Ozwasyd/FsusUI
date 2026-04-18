@@ -47,7 +47,7 @@
                 >
                   <component :is="iconComponent" />
                 </el-icon>
-                <span>{{ title }}</span>
+                {{ title }}
               </div>
               <button
                 v-if="showClose"

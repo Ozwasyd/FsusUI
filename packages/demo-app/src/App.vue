@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Layout from './Layout.vue'
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref } from 'vue'
 import type { AutocompleteData } from '../../components/autocomplete'
 import type { UploadProgressEvent, UploadRequestOptions } from '../../components/upload'
@@ -28,7 +29,6 @@ import {
   gallerySlides,
   galleryUrls,
   rawPopperContentAttrs,
-  sections,
   selectV2Options,
   tableData,
   tableV2Columns,
@@ -393,60 +393,27 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <a
-    class="skip-demo-link"
-    href="#main-content"
-  >跳到主要内容</a>
+  <el-config-provider size="large">
+    <Layout title="FsusUI Minimalist Refactor">
+      <div class="demo-catalog">
+        <header class="demo-catalog-header">
+          <h1>Visual Consistency Refactoring</h1>
+          <p class="lead">The Intellectual Minimalist (FsusUI 2026)</p>
+          <div class="meta-info">
+            <span>Theme: <code>Swiss Graphic Design / Ivy Style</code></span>
+            <span>Tokens: <code>Paper White & Ink Black</code></span>
+          </div>
+        </header>
 
-  <div class="demo-shell">
-    <header class="demo-header">
-      <div class="demo-brand">
-        <div class="demo-kicker">
-          FsusUI Component Demo
-        </div>
-        <div class="demo-title">
-          Monochrome Review
-        </div>
-        <p class="demo-subtitle">
-          这是一个独立的 Vite 验收项目，用于集中检查组件库在桌面端与手机端的视觉一致性、骨架优先加载与焦点无障碍表现。
-        </p>
-      </div>
-      <nav
-        class="demo-nav"
-        aria-label="页面分区导航"
-      >
-        <a
-          v-for="section in sections"
-          :key="section.id"
-          :href="`#${section.id}`"
-          @focus="scrollFocusedElementIntoView"
-        >{{ section.label }}</a>
-      </nav>
-    </header>
-
-    <main
-      id="main-content"
-      class="demo-main"
-    >
-      <section
-        id="overview"
-        class="section"
-      >
-        <div class="section-head">
-          <span class="section-label">Overview</span>
-          <h2 class="section-title">
-            基础预览与品牌入口
-          </h2>
-          <p class="section-desc">
-            聚合展示品牌视觉、基础导航、跳转、毛玻璃与徽标组件，便于快速判断整体气质。
-          </p>
-        </div>
-
-        <div class="demo-grid">
-          <article class="demo-card wide">
-            <h3>Affix / Backtop / Button</h3>
-            <p>吸顶入口、回到顶部与主按钮对焦点环做集中检查。</p>
-            <div class="stack">
+        <main class="demo-content-grid">
+          <section id="components" class="demo-section">
+            <h2 class="section-title">Core Atoms</h2>
+            
+            <div class="demo-grid">
+              <article class="demo-card wide">
+                <h3>Affix / Backtop / Button</h3>
+                <p>吸顶入口、回到顶部与主按钮对焦点环做集中检查。</p>
+                <div class="stack">
               <el-affix :offset="84">
                 <el-button
                   type="primary"
@@ -1548,13 +1515,10 @@ onUnmounted(() => {
               </el-result>
             </el-card>
           </article>
-        </div>
-      </section>
-
-      <div
-        class="page-spacer"
-        aria-hidden="true"
-      />
-    </main>
-  </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </Layout>
+  </el-config-provider>
 </template>

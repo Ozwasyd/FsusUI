@@ -3,10 +3,7 @@
     <div v-if="!nowrap" :class="contentClass" v-bind="contentAttrs">
       <slot :content-style="contentStyle" :content-class="contentClass" />
       <el-visually-hidden v-bind="visuallyHiddenAttrs">
-        <template v-if="ariaLabel">
-          {{ ariaLabel }}
-        </template>
-        <slot v-else />
+        <slot>{{ ariaLabel }}</slot>
       </el-visually-hidden>
       <slot name="arrow" :style="arrowStyle" :side="side" />
     </div>

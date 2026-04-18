@@ -14,7 +14,7 @@
 
 @include b(table-filter) {
   border: solid 1px getCssVar('border-color-lighter');
-  border-radius: 2px;
+  border-radius: getCssVar('border-radius', 'small');
   background-color: $color-white;
   box-shadow: map.get($dropdown, 'menu-box-shadow');
   box-sizing: border-box;

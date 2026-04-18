@@ -40,7 +40,7 @@
     >
       <slot name="content">
         <span v-if="rawContent" v-html="content" />
-        <span v-else>{{ content }}</span>
+        <template v-else>{{ content }}</template>
       </slot>
       <el-popper-arrow v-if="showArrow" :arrow-offset="arrowOffset" />
     </el-tooltip-content>

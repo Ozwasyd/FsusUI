@@ -28,7 +28,7 @@
     padding: 0 20px;
     font-weight: 500;
     color: getCssVar('text-color', 'primary');
-    font-size: 14px;
+    font-size: getCssVar('font-size', 'base');
 
     @include when(left) {
       left: 20px;

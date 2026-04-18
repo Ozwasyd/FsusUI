@@ -3,7 +3,6 @@ import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import defineGetter from '@element-plus/test-utils/define-getter'
 import { ElFormItem as FormItem } from '@element-plus/components/form'
-import { clickClearButton } from '../../../test-utils/dom'
 import Input from '../src/input.vue'
 // Type alias to bypass strict prop checking for HTML fallthrough attrs in tests
 const _Input = Input as any
@@ -74,7 +73,7 @@ describe('Input.vue', () => {
       const nativeInput = inputElm.element
       expect(nativeInput.value).toMatchInlineSnapshot(`"12🌚"`)
 
-      const elCount = wrapper.find('.el-input__count-inner')
+      const elCount = wrapper.find('.el-input__count')
       expect(elCount.exists()).toBe(true)
       expect(elCount.text()).toMatchInlineSnapshot(`"4 / 4"`)
 
@@ -406,9 +405,10 @@ describe('Input.vue', () => {
       // focus to show clear button
       await input.trigger('focus')
       await nextTick()
+      wrapper.vm
       const clearButton = wrapper.find('.el-input__clear')
       expect(clearButton.exists()).toBe(true)
-      await clickClearButton(clearButton)
+      await clearButton.trigger('click')
       await nextTick()
       expect(content.value).toEqual('')
       expect(handleClear).toBeCalled()

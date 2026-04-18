@@ -37,7 +37,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 14px;
+    font-size: getCssVar('font-size', 'base');
     background: getCssVar('fill-color', 'light');
     color: getCssVar('text-color', 'placeholder');
     vertical-align: middle;

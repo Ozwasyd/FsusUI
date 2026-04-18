@@ -156,13 +156,9 @@
     align-items: center;
     color: getCssVar('color-info');
     font-size: 12px;
-
-    .#{$namespace}-input__count-inner {
-      background: getCssVar('fill-color', 'blank');
-      line-height: initial;
-      display: inline-block;
-      padding-left: 8px;
-    }
+    background: getCssVar('fill-color', 'blank');
+    line-height: initial;
+    padding-left: 8px;
   }
 
   @include e(wrapper) {

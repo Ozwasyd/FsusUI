@@ -1,6 +1,5 @@
 import { h, nextTick } from 'vue'
 import { describe, expect, test, vi } from 'vitest'
-import { clickCloseButton } from '../../../test-utils/dom'
 import makeMount from '@element-plus/test-utils/make-mount'
 import { rAF } from '@element-plus/test-utils/tick'
 import { TypeComponentsMap } from '@element-plus/utils'
@@ -116,7 +115,7 @@ describe('Message.vue', () => {
 
       const closeBtn = wrapper.find('.el-message__closeBtn')
       expect(closeBtn.exists()).toBe(true)
-      await clickCloseButton(closeBtn)
+      await closeBtn.trigger('click')
       expect((wrapper.vm as unknown as MessageInstance).visible).toBe(false)
     })
 

@@ -25,7 +25,7 @@
         >
           <div :class="nsDay.b()">
             <slot name="date-cell" :data="getSlotData(cell)">
-              <span>{{ cell.text }}</span>
+              {{ cell.text }}
             </slot>
           </div>
         </td>

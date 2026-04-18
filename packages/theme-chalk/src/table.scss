@@ -16,7 +16,7 @@
   width: 100%;
   max-width: 100%;
   background-color: getCssVar('table-bg-color');
-  font-size: 14px;
+  font-size: getCssVar('font-size', 'base');
   color: getCssVar('table-text-color');
 
   @include e(inner-wrapper) {
@@ -237,7 +237,7 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: #ff4d51;
+      background: getCssVar('color', 'danger');
       margin-right: 5px;
       vertical-align: middle;
     }
@@ -593,7 +593,7 @@
 
     & i {
       color: getCssVar('color-info');
-      font-size: 14px;
+      font-size: getCssVar('font-size', 'base');
       vertical-align: middle;
     }
   }

@@ -20,21 +20,33 @@
       <div :class="ns.e('group')">
         <h2 :class="ns.e('title')" v-text="title" />
         <div
+          v-if="$slots.default"
           v-show="message"
           :class="ns.e('content')"
-          :style="!!title ? undefined : { margin: 0 }"
+          :style="contentStyle"
         >
-          <slot>
-            <p v-if="!dangerouslyUseHTMLString">{{ message }}</p>
-            <!-- Caution here, message could've been compromised, never use user's input as message -->
-            <p v-else v-html="message" />
-          </slot>
+          <slot />
         </div>
-        <span v-if="showClose" :class="ns.e('closeBtn')" @click.stop="close">
-          <el-icon>
-            <Close />
-          </el-icon>
-        </span>
+        <div
+          v-else-if="message && dangerouslyUseHTMLString"
+          :class="ns.e('content')"
+          :style="contentStyle"
+          v-html="message"
+        />
+        <div
+          v-else-if="message"
+          :class="ns.e('content')"
+          :style="contentStyle"
+        >
+          {{ message }}
+        </div>
+        <el-icon
+          v-if="showClose"
+          :class="ns.e('closeBtn')"
+          v-on="closeBtnEvents"
+        >
+          <Close />
+        </el-icon>
       </div>
     </div>
   </transition>
@@ -99,6 +111,15 @@ const positionStyle = computed<CSSProperties>(() => {
     }px`,
   }
 })
+const contentStyle = computed<CSSProperties | undefined>(() =>
+  props.title ? undefined : { margin: 0 }
+)
+const closeBtnEvents = {
+  click: (event: MouseEvent) => {
+    event.stopPropagation()
+    close()
+  },
+}
 
 function startTimer() {
   if (props.duration > 0) {

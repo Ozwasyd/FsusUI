@@ -81,7 +81,7 @@
             @close="deleteTag(tag)"
           >
             <template v-if="tag.isCollapseTag === false">
-              <span>{{ tag.text }}</span>
+              {{ tag.text }}
             </template>
             <template v-else>
               <el-tooltip
@@ -90,9 +90,7 @@
                 placement="bottom"
                 effect="light"
               >
-                <template #default>
-                  <span>{{ tag.text }}</span>
-                </template>
+                <template #default>{{ tag.text }}</template>
                 <template #content>
                   <div :class="nsCascader.e('collapse-tags')">
                     <div
@@ -112,7 +110,7 @@
                         disable-transitions
                         @close="deleteTag(tag2)"
                       >
-                        <span>{{ tag2.text }}</span>
+                        {{ tag2.text }}
                       </el-tag>
                     </div>
                   </div>
@@ -171,11 +169,10 @@
             :tabindex="-1"
             @click="handleSuggestionClick(item)"
           >
-            <span>{{ item.text }}</span>
-            <el-icon v-if="item.checked">
+{{ item.text }}<el-icon v-if="item.checked">
               <check />
             </el-icon>
-          </li>
+</li>
         </template>
         <slot v-else name="empty">
           <li :class="nsCascader.e('empty-text')">
@@ -626,22 +623,18 @@ const handleSuggestionKeyDown = (e: KeyboardEvent) => {
   }
 }
 
-const handleClearIconClick = (event: MouseEvent) => {
-  event.stopPropagation()
-  handleClear()
-}
-
-const handleArrowIconClick = (event: MouseEvent) => {
-  event.stopPropagation()
-  togglePopperVisible()
-}
-
 const clearIconEvents = {
-  click: handleClearIconClick,
+  click: (event: MouseEvent) => {
+    event.stopPropagation()
+    handleClear()
+  },
 }
 
 const arrowIconEvents = {
-  click: handleArrowIconClick,
+  click: (event: MouseEvent) => {
+    event.stopPropagation()
+    togglePopperVisible()
+  },
 }
 
 const suggestionPanelEvents = {

@@ -118,7 +118,7 @@
 
   .#{bem('upload', 'text')} {
     color: getCssVar('text-color', 'regular');
-    font-size: 14px;
+    font-size: getCssVar('font-size', 'base');
     text-align: center;
 
     em {
@@ -146,12 +146,12 @@
   position: relative;
   @include e(item) {
     transition: all 0.5s cubic-bezier(0.55, 0, 0.1, 1);
-    font-size: 14px;
+    font-size: getCssVar('font-size', 'base');
     color: getCssVar('text-color', 'regular');
     margin-bottom: 5px;
     position: relative;
     box-sizing: border-box;
-    border-radius: 4px;
+    border-radius: getCssVar('border-radius', 'base');
     width: 100%;
 
     .#{bem('progress')} {
@@ -573,7 +573,7 @@
     .btn {
       display: inline-block;
       color: $color-white;
-      font-size: 14px;
+      font-size: getCssVar('font-size', 'base');
       cursor: pointer;
       vertical-align: middle;
       transition: getCssVar('transition-md-fade');
@@ -625,7 +625,7 @@
     padding: 0 10px;
     margin: 0;
     line-height: 36px;
-    font-size: 14px;
+    font-size: getCssVar('font-size', 'base');
     color: getCssVar('text-color', 'primary');
   }
 

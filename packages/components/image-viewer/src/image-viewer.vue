@@ -11,49 +11,37 @@
 
         <!-- CLOSE -->
         <span :class="[ns.e('btn'), ns.e('close')]" @click="hide">
-          <el-icon><Close /></el-icon>
+          <Close />
         </span>
 
         <!-- ARROW -->
         <template v-if="!isSingle">
           <span :class="arrowPrevKls" @click="prev">
-            <el-icon><ArrowLeft /></el-icon>
+            <ArrowLeft />
           </span>
           <span :class="arrowNextKls" @click="next">
-            <el-icon><ArrowRight /></el-icon>
+            <ArrowRight />
           </span>
         </template>
         <!-- ACTIONS -->
         <div :class="[ns.e('btn'), ns.e('actions')]">
-          <div :class="ns.e('actions__inner')">
-            <span :class="ns.e('action')" @click="handleActions('zoomOut')">
-              <el-icon>
-                <ZoomOut />
-              </el-icon>
-            </span>
-            <span :class="ns.e('action')" @click="handleActions('zoomIn')">
-              <el-icon>
-                <ZoomIn />
-              </el-icon>
-            </span>
-            <i :class="ns.e('actions__divider')" />
-            <span :class="ns.e('action')" @click="toggleMode">
-              <el-icon>
-                <component :is="mode.icon" />
-              </el-icon>
-            </span>
-            <i :class="ns.e('actions__divider')" />
-            <span :class="ns.e('action')" @click="handleActions('anticlockwise')">
-              <el-icon>
-                <RefreshLeft />
-              </el-icon>
-            </span>
-            <span :class="ns.e('action')" @click="handleActions('clockwise')">
-              <el-icon>
-                <RefreshRight />
-              </el-icon>
-            </span>
-          </div>
+          <span :class="ns.e('action')" v-on="zoomOutEvents">
+            <ZoomOut />
+          </span>
+          <span :class="ns.e('action')" v-on="zoomInEvents">
+            <ZoomIn />
+          </span>
+          <i :class="ns.e('actions__divider')" />
+          <span :class="ns.e('action')" v-on="toggleModeEvents">
+            <component :is="mode.icon" />
+          </span>
+          <i :class="ns.e('actions__divider')" />
+          <span :class="ns.e('action')" v-on="anticlockwiseEvents">
+            <RefreshLeft />
+          </span>
+          <span :class="ns.e('action')" v-on="clockwiseEvents">
+            <RefreshRight />
+          </span>
         </div>
         <!-- CANVAS -->
         <div :class="ns.e('canvas')">
@@ -92,7 +80,6 @@ import { throttle } from 'lodash-unified'
 import { useLocale, useNamespace, useZIndex } from '@element-plus/hooks'
 import { EVENT_CODE } from '@element-plus/constants'
 import { isNumber, keysOf } from '@element-plus/utils'
-import ElIcon from '@element-plus/components/icon'
 import {
   ArrowLeft,
   ArrowRight,
@@ -316,6 +303,12 @@ function toggleMode() {
   mode.value = modes[modeNames[nextIndex]]
   reset()
 }
+
+const zoomOutEvents = { click: () => handleActions('zoomOut') }
+const zoomInEvents = { click: () => handleActions('zoomIn') }
+const toggleModeEvents = { click: toggleMode }
+const anticlockwiseEvents = { click: () => handleActions('anticlockwise') }
+const clockwiseEvents = { click: () => handleActions('clockwise') }
 
 function setActiveItem(index: number) {
   const len = props.urlList.length

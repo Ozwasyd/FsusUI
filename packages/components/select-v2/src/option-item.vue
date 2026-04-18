@@ -14,7 +14,7 @@
     @click.stop="selectOptionClick"
   >
     <slot :item="item" :index="index" :disabled="disabled">
-      <span>{{ getLabel(item) }}</span>
+      {{ getLabel(item) }}
     </slot>
   </li>
 </template>

@@ -50,7 +50,7 @@ $color-picker-size: map.merge($common-component-size, $color-picker-size);
     margin: 0 0 8px 8px;
     width: 20px;
     height: 20px;
-    border-radius: 4px;
+    border-radius: getCssVar('border-radius', 'base');
     cursor: pointer;
 
     &:nth-child(10n + 1) {
@@ -64,7 +64,7 @@ $color-picker-size: map.merge($common-component-size, $color-picker-size);
     > div {
       display: flex;
       height: 100%;
-      border-radius: 3px;
+      border-radius: getCssVar('border-radius', 'small');
     }
 
     @include when(alpha) {
@@ -297,7 +297,7 @@ $color-picker-size: map.merge($common-component-size, $color-picker-size);
   @include e(mask) {
     height: map.get($color-picker-size, 'default')-2px;
     width: map.get($color-picker-size, 'default')-2px;
-    border-radius: 4px;
+    border-radius: getCssVar('border-radius', 'base');
     position: absolute;
     top: 1px;
     left: 1px;
@@ -316,7 +316,7 @@ $color-picker-size: map.merge($common-component-size, $color-picker-size);
     width: map.get($color-picker-size, 'default');
     padding: 4px;
     border: 1px solid getCssVar('border-color');
-    border-radius: 4px;
+    border-radius: getCssVar('border-radius', 'base');
     font-size: 0;
     position: relative;
     cursor: pointer;

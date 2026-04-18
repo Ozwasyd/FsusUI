@@ -43,7 +43,7 @@ describe('Calendar.vue', () => {
     const date = vm.value
     expect(date.getFullYear()).toBe(2019)
     expect(date.getMonth()).toBe(4)
-    expect(wrapper.find('.is-selected span').element.innerHTML).toBe('4')
+    expect(wrapper.find('.is-selected').text()).toContain('4')
   })
 
   it('range', () => {

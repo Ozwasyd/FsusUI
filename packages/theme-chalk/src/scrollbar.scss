@@ -59,7 +59,7 @@
     right: 2px;
     bottom: 2px;
     z-index: 1;
-    border-radius: 4px;
+    border-radius: getCssVar('border-radius', 'base');
 
     @include when(vertical) {
       width: 6px;

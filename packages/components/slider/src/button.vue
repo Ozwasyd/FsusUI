@@ -22,9 +22,7 @@
       :disabled="!showTooltip"
       persistent
     >
-      <template #content>
-        <span>{{ formatValue }}</span>
-      </template>
+      <template #content>{{ formatValue }}</template>
       <div :class="[ns.e('button'), { hover: hovering, dragging }]" />
     </el-tooltip>
   </div>

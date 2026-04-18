@@ -1,6 +1,5 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, test } from 'vitest'
-import { clickCloseButton } from '../../../test-utils/dom'
 import { TypeComponentsMap } from '@element-plus/utils'
 import Alert from '../src/alert.vue'
 
@@ -48,7 +47,7 @@ describe('Alert.vue', () => {
     const closeBtn = wrapper.find('.el-alert__close-btn')
     expect(closeBtn.exists()).toBe(true)
 
-    await clickCloseButton(closeBtn)
+    await closeBtn.trigger('click')
     expect(wrapper.emitted()).toBeDefined()
   })
 })

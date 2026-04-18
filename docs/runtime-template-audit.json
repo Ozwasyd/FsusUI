@@ -1,0 +1,1157 @@
+{
+  "generatedAt": "2026-04-18T04:25:58.368Z",
+  "totals": {
+    "filesScanned": 127,
+    "totalNodes": 971,
+    "totalIssues": 0,
+    "totalPotentialSavings": 0,
+    "deprecatedSyntaxCount": 0,
+    "byRisk": {},
+    "byCategory": {}
+  },
+  "files": [
+    {
+      "file": "packages/components/affix/src/affix.vue",
+      "nodeCount": 3,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/alert/src/alert.vue",
+      "nodeCount": 12,
+      "componentCount": 5,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/autocomplete/src/autocomplete.vue",
+      "nodeCount": 14,
+      "componentCount": 5,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/avatar/src/avatar.vue",
+      "nodeCount": 5,
+      "componentCount": 2,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/backtop/src/backtop.vue",
+      "nodeCount": 5,
+      "componentCount": 3,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/badge/src/badge.vue",
+      "nodeCount": 4,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/breadcrumb/src/breadcrumb-item.vue",
+      "nodeCount": 6,
+      "componentCount": 2,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/breadcrumb/src/breadcrumb.vue",
+      "nodeCount": 2,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/button/src/button-group.vue",
+      "nodeCount": 2,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/button/src/button.vue",
+      "nodeCount": 9,
+      "componentCount": 5,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/calendar/src/calendar.vue",
+      "nodeCount": 17,
+      "componentCount": 6,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/calendar/src/date-table.vue",
+      "nodeCount": 8,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/card/src/card.vue",
+      "nodeCount": 7,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/carousel/src/carousel-item.vue",
+      "nodeCount": 3,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/carousel/src/carousel.vue",
+      "nodeCount": 15,
+      "componentCount": 7,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/cascader-panel/src/index.vue",
+      "nodeCount": 2,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/cascader-panel/src/menu.vue",
+      "nodeCount": 7,
+      "componentCount": 4,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/cascader-panel/src/node.vue",
+      "nodeCount": 11,
+      "componentCount": 9,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/cascader/src/cascader.vue",
+      "nodeCount": 21,
+      "componentCount": 13,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/check-tag/src/check-tag.vue",
+      "nodeCount": 2,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/checkbox/src/checkbox-button.vue",
+      "nodeCount": 5,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/checkbox/src/checkbox-group.vue",
+      "nodeCount": 2,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/checkbox/src/checkbox.vue",
+      "nodeCount": 7,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/col/src/col.vue",
+      "nodeCount": 2,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/collapse-transition/src/collapse-transition.vue",
+      "nodeCount": 2,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/collapse/src/collapse-item.vue",
+      "nodeCount": 9,
+      "componentCount": 3,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/collapse/src/collapse.vue",
+      "nodeCount": 2,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/collection/src/collection-item.vue",
+      "nodeCount": 1,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/collection/src/collection.vue",
+      "nodeCount": 1,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/color-picker/src/color-picker.vue",
+      "nodeCount": 21,
+      "componentCount": 12,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/container/src/aside.vue",
+      "nodeCount": 2,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/container/src/container.vue",
+      "nodeCount": 2,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/container/src/footer.vue",
+      "nodeCount": 2,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/container/src/header.vue",
+      "nodeCount": 2,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/container/src/main.vue",
+      "nodeCount": 2,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/countdown/src/countdown.vue",
+      "nodeCount": 2,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/descriptions/src/description.vue",
+      "nodeCount": 10,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/descriptions/src/descriptions-row.vue",
+      "nodeCount": 8,
+      "componentCount": 5,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/dialog/src/dialog-content.vue",
+      "nodeCount": 11,
+      "componentCount": 2,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/dialog/src/dialog.vue",
+      "nodeCount": 10,
+      "componentCount": 5,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/divider/src/divider.vue",
+      "nodeCount": 3,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/drawer/src/drawer.vue",
+      "nodeCount": 17,
+      "componentCount": 6,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/dropdown/src/dropdown-item-impl.vue",
+      "nodeCount": 5,
+      "componentCount": 2,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/dropdown/src/dropdown-item.vue",
+      "nodeCount": 4,
+      "componentCount": 3,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/dropdown/src/dropdown-menu.vue",
+      "nodeCount": 2,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/dropdown/src/dropdown.vue",
+      "nodeCount": 14,
+      "componentCount": 10,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/empty/src/empty.vue",
+      "nodeCount": 9,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/empty/src/img-empty.vue",
+      "nodeCount": 24,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/focus-trap/src/focus-trap.vue",
+      "nodeCount": 1,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/form/src/form-item.vue",
+      "nodeCount": 9,
+      "componentCount": 3,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/form/src/form.vue",
+      "nodeCount": 2,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/icon/src/icon.vue",
+      "nodeCount": 2,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/image-viewer/src/image-viewer.vue",
+      "nodeCount": 26,
+      "componentCount": 10,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/image/src/image.vue",
+      "nodeCount": 9,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/input-number/src/input-number.vue",
+      "nodeCount": 10,
+      "componentCount": 7,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/input/src/input.vue",
+      "nodeCount": 26,
+      "componentCount": 10,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/link/src/link.vue",
+      "nodeCount": 6,
+      "componentCount": 2,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/menu/src/menu-collapse-transition.vue",
+      "nodeCount": 2,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/menu/src/menu-item-group.vue",
+      "nodeCount": 5,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/menu/src/menu-item.vue",
+      "nodeCount": 7,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/message-box/src/index.vue",
+      "nodeCount": 26,
+      "componentCount": 14,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/message/src/message.vue",
+      "nodeCount": 10,
+      "componentCount": 6,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/notification/src/notification.vue",
+      "nodeCount": 12,
+      "componentCount": 5,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/page-header/src/page-header.vue",
+      "nodeCount": 19,
+      "componentCount": 3,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/popconfirm/src/popconfirm.vue",
+      "nodeCount": 9,
+      "componentCount": 5,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/popover/src/popover.vue",
+      "nodeCount": 4,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/popper/src/arrow.vue",
+      "nodeCount": 1,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/popper/src/content.vue",
+      "nodeCount": 3,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/popper/src/popper.vue",
+      "nodeCount": 1,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/popper/src/trigger.vue",
+      "nodeCount": 2,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/progress/src/progress.vue",
+      "nodeCount": 14,
+      "componentCount": 2,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/radio/src/radio-button.vue",
+      "nodeCount": 4,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/radio/src/radio-group.vue",
+      "nodeCount": 2,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/radio/src/radio.vue",
+      "nodeCount": 6,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/rate/src/rate.vue",
+      "nodeCount": 9,
+      "componentCount": 6,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/result/src/result.vue",
+      "nodeCount": 10,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/roving-focus-group/src/roving-focus-group-impl.vue",
+      "nodeCount": 1,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/roving-focus-group/src/roving-focus-group.vue",
+      "nodeCount": 3,
+      "componentCount": 2,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/roving-focus-group/src/roving-focus-item.vue",
+      "nodeCount": 2,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/row/src/row.vue",
+      "nodeCount": 2,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/scrollbar/src/bar.vue",
+      "nodeCount": 2,
+      "componentCount": 2,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/scrollbar/src/scrollbar.vue",
+      "nodeCount": 5,
+      "componentCount": 2,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/scrollbar/src/thumb.vue",
+      "nodeCount": 3,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/select-v2/src/group-item.vue",
+      "nodeCount": 3,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/select-v2/src/option-item.vue",
+      "nodeCount": 2,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/select-v2/src/select.vue",
+      "nodeCount": 38,
+      "componentCount": 13,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/select/src/option-group.vue",
+      "nodeCount": 5,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/select/src/option.vue",
+      "nodeCount": 2,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/select/src/select-dropdown.vue",
+      "nodeCount": 6,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/select/src/select.vue",
+      "nodeCount": 38,
+      "componentCount": 17,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/skeleton/src/skeleton-item.vue",
+      "nodeCount": 2,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/skeleton/src/skeleton.vue",
+      "nodeCount": 5,
+      "componentCount": 2,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/slider/src/button.vue",
+      "nodeCount": 3,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/slider/src/slider.vue",
+      "nodeCount": 10,
+      "componentCount": 4,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/statistic/src/statistic.vue",
+      "nodeCount": 9,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/steps/src/item.vue",
+      "nodeCount": 19,
+      "componentCount": 6,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/steps/src/steps.vue",
+      "nodeCount": 2,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/switch/src/switch.vue",
+      "nodeCount": 22,
+      "componentCount": 12,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/table/src/filter-panel.vue",
+      "nodeCount": 16,
+      "componentCount": 7,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/table/src/table.vue",
+      "nodeCount": 26,
+      "componentCount": 9,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/tabs/src/tab-bar.vue",
+      "nodeCount": 1,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/tabs/src/tab-pane.vue",
+      "nodeCount": 2,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/tag/src/tag.vue",
+      "nodeCount": 9,
+      "componentCount": 5,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/teleport/src/teleport.vue",
+      "nodeCount": 3,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/text/src/text.vue",
+      "nodeCount": 2,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/time-select/src/time-select.vue",
+      "nodeCount": 4,
+      "componentCount": 4,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/timeline/src/timeline-item.vue",
+      "nodeCount": 12,
+      "componentCount": 2,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/tooltip-v2/src/arrow.vue",
+      "nodeCount": 1,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/tooltip-v2/src/content.vue",
+      "nodeCount": 6,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/tooltip-v2/src/root.vue",
+      "nodeCount": 1,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/tooltip-v2/src/tooltip.vue",
+      "nodeCount": 11,
+      "componentCount": 8,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/tooltip-v2/src/trigger.vue",
+      "nodeCount": 4,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/tooltip/src/content.vue",
+      "nodeCount": 4,
+      "componentCount": 3,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/tooltip/src/tooltip.vue",
+      "nodeCount": 7,
+      "componentCount": 4,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/tooltip/src/trigger.vue",
+      "nodeCount": 2,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/transfer/src/transfer-panel.vue",
+      "nodeCount": 12,
+      "componentCount": 5,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/transfer/src/transfer.vue",
+      "nodeCount": 12,
+      "componentCount": 8,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/tree-v2/src/tree-node.vue",
+      "nodeCount": 6,
+      "componentCount": 4,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/tree-v2/src/tree.vue",
+      "nodeCount": 5,
+      "componentCount": 2,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/tree/src/tree-node.vue",
+      "nodeCount": 11,
+      "componentCount": 8,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/tree/src/tree.vue",
+      "nodeCount": 6,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/upload/src/upload-content.vue",
+      "nodeCount": 5,
+      "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/upload/src/upload-dragger.vue",
+      "nodeCount": 2,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/upload/src/upload-list.vue",
+      "nodeCount": 27,
+      "componentCount": 14,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/upload/src/upload.vue",
+      "nodeCount": 13,
+      "componentCount": 4,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/visual-hidden/src/visual-hidden.vue",
+      "nodeCount": 2,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/watermark/src/watermark.vue",
+      "nodeCount": 2,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    }
+  ]
+}

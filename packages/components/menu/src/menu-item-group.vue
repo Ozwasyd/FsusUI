@@ -1,8 +1,7 @@
 <template>
   <li :class="ns.b()">
     <div :class="ns.e('title')">
-      <template v-if="!$slots.title">{{ title }}</template>
-      <slot v-else name="title" />
+      <slot name="title">{{ title }}</slot>
     </div>
     <ul>
       <slot />

@@ -5,14 +5,10 @@
     :style="{ backgroundColor: color }"
     @click="handleClick"
   >
-    <span :class="ns.e('content')">
-      <slot />
-    </span>
-    <span v-if="closable" :class="ns.e('close')" @click.stop="handleClose">
-      <el-icon>
-        <Close />
-      </el-icon>
-    </span>
+    <slot />
+    <el-icon v-if="closable" :class="ns.e('close')" v-on="closeIconEvents">
+      <Close />
+    </el-icon>
   </span>
   <transition v-else :name="`${ns.namespace.value}-zoom-in-center`" appear>
     <span
@@ -20,14 +16,10 @@
       :style="{ backgroundColor: color }"
       @click="handleClick"
     >
-      <span :class="ns.e('content')">
-        <slot />
-      </span>
-      <span v-if="closable" :class="ns.e('close')" @click.stop="handleClose">
-        <el-icon>
-          <Close />
-        </el-icon>
-      </span>
+      <slot />
+      <el-icon v-if="closable" :class="ns.e('close')" v-on="closeIconEvents">
+        <Close />
+      </el-icon>
     </span>
   </transition>
 </template>
@@ -69,5 +61,12 @@ const handleClose = (event: MouseEvent) => {
 
 const handleClick = (event: MouseEvent) => {
   emit('click', event)
+}
+
+const closeIconEvents = {
+  click: (event: MouseEvent) => {
+    event.stopPropagation()
+    handleClose(event)
+  },
 }
 </script>

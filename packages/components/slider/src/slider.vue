@@ -42,23 +42,21 @@
         :placement="placement"
         @update:model-value="setSecondValue"
       />
-      <div v-if="showStops">
+      <template v-if="showStops">
         <div
           v-for="(item, key) in stops"
           :key="key"
           :class="ns.e('stop')"
           :style="getStopStyle(item)"
         />
-      </div>
+      </template>
       <template v-if="markList.length > 0">
-        <div>
+        <template v-for="(item, key) in markList" :key="key">
           <div
-            v-for="(item, key) in markList"
-            :key="key"
             :style="getStopStyle(item.position)"
             :class="[ns.e('stop'), ns.e('marks-stop')]"
           />
-        </div>
+        </template>
         <div :class="ns.e('marks')">
           <slider-marker
             v-for="(item, key) in markList"

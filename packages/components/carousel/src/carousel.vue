@@ -56,7 +56,7 @@
         @click.stop="handleIndicatorClick(index)"
       >
         <button :class="ns.e('button')">
-          <span v-if="hasLabel">{{ item.props.label }}</span>
+          <template v-if="hasLabel">{{ item.props.label }}</template>
         </button>
       </li>
     </ul>

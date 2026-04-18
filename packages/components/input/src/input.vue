@@ -62,29 +62,22 @@
                 <component :is="suffixIcon" />
               </el-icon>
             </template>
-            <span
+            <el-icon
               v-if="showClear"
               :class="[nsInput.e('icon'), nsInput.e('clear')]"
-              @mousedown.prevent="NOOP"
-              @click="clear"
+              v-on="clearIconEvents"
             >
-              <el-icon>
-                <circle-close />
-              </el-icon>
-            </span>
-            <span
+              <circle-close />
+            </el-icon>
+            <el-icon
               v-if="showPwdVisible"
               :class="[nsInput.e('icon'), nsInput.e('password')]"
-              @click="handlePasswordVisible"
+              v-on="passwordIconEvents"
             >
-              <el-icon>
-                <component :is="passwordIcon" />
-              </el-icon>
-            </span>
+              <component :is="passwordIcon" />
+            </el-icon>
             <span v-if="isWordLimitVisible" :class="nsInput.e('count')">
-              <span :class="nsInput.e('count-inner')">
-                {{ textLength }} / {{ attrs.maxlength }}
-              </span>
+              {{ textLength }} / {{ attrs.maxlength }}
             </span>
             <el-icon
               v-if="validateState && validateIcon && needStatusIcon"
@@ -491,6 +484,18 @@ const clear = () => {
   emit('change', '')
   emit('clear')
   emit('input', '')
+}
+
+const clearIconEvents = {
+  mousedown: (event: MouseEvent) => {
+    event.preventDefault()
+    NOOP()
+  },
+  click: clear,
+}
+
+const passwordIconEvents = {
+  click: handlePasswordVisible,
 }
 
 watch(

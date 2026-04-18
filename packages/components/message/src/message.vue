@@ -36,11 +36,9 @@
         <!-- Caution here, message could've been compromised, never use user's input as message -->
         <p v-else :class="ns.e('content')" v-html="message" />
       </slot>
-      <span v-if="showClose" :class="ns.e('closeBtn')" @click.stop="close">
-        <el-icon>
-          <Close />
-        </el-icon>
-      </span>
+      <el-icon v-if="showClose" :class="ns.e('closeBtn')" v-on="closeBtnEvents">
+        <Close />
+      </el-icon>
     </div>
   </transition>
 </template>
@@ -98,6 +96,12 @@ const customStyle = computed<CSSProperties>(() => ({
   zIndex: currentZIndex.value,
   '--el-message-stack-y': `${stackOffset.value}px`,
 }))
+const closeBtnEvents = {
+  click: (event: MouseEvent) => {
+    event.stopPropagation()
+    close()
+  },
+}
 
 function startTimer() {
   if (props.duration === 0) return

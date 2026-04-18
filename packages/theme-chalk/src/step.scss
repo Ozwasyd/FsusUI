@@ -60,7 +60,7 @@
     align-items: center;
     width: 24px;
     height: 24px;
-    font-size: 14px;
+    font-size: getCssVar('font-size', 'base');
     box-sizing: border-box;
     background: getCssVar('bg-color');
     transition: 0.15s ease-out;

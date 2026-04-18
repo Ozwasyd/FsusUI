@@ -121,7 +121,7 @@ describe('Carousel', () => {
   it('label', async () => {
     wrapper = createComponent(undefined, 3, true)
     await nextTick()
-    expect(wrapper.find('.el-carousel__button span').text()).toBe('1')
+    expect(wrapper.find('.el-carousel__button').text()).toBe('1')
   })
 
   describe('manual control', () => {
