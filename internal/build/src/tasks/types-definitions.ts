@@ -88,6 +88,10 @@ export const generateTypesDefinitions = async () => {
   })
 
   await Promise.all(tasks)
+
+  // This task runs in its own child process via `pnpm run start generateTypesDefinitions`.
+  // ts-morph can leave the event loop open after emit, so exit explicitly once outputs exist.
+  process.exit(0)
 }
 
 async function addSourceFiles(project: Project) {
