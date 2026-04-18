@@ -1,4 +1,3 @@
-import process from 'process'
 import path from 'path'
 import { mkdir, readFile, writeFile } from 'fs/promises'
 import consola from 'consola'
@@ -14,6 +13,7 @@ import {
   projRoot,
 } from '@element-plus/build-utils'
 import { pathRewriter } from '../utils'
+import type { TaskFunction } from 'gulp'
 import type { CompilerOptions, SourceFile } from 'ts-morph'
 
 const TSCONFIG_PATH = path.resolve(projRoot, 'tsconfig.web.json')
@@ -22,7 +22,7 @@ const outDir = path.resolve(buildOutput, 'types')
 /**
  * fork = require( https://github.com/egoist/vue-dts-gen/blob/main/src/index.ts
  */
-export const generateTypesDefinitions = async () => {
+const runGenerateTypesDefinitions = async () => {
   const compilerOptions: CompilerOptions = {
     emitDeclarationOnly: true,
     declaration: true,
@@ -88,10 +88,10 @@ export const generateTypesDefinitions = async () => {
   })
 
   await Promise.all(tasks)
+}
 
-  // This task runs in its own child process via `pnpm run start generateTypesDefinitions`.
-  // ts-morph can leave the event loop open after emit, so exit explicitly once outputs exist.
-  process.exit(0)
+export const generateTypesDefinitions: TaskFunction = (done) => {
+  runGenerateTypesDefinitions().then(() => done(), done)
 }
 
 async function addSourceFiles(project: Project) {

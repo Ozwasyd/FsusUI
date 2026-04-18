@@ -30,7 +30,7 @@ export const getPackageDependencies = (
   }
 }
 
-const excludedDirs = new Set(['node_modules', 'dist', 'demo-app'])
+const excludedDirs = new Set(['node_modules', 'dist', 'demo-app', 'build'])
 const excludedSegmentFragments = ['test', 'mock']
 const excludedBasenames = new Set(['gulpfile.ts', 'gulpfile.js', 'gulpfile.mjs', 'gulpfile.cjs'])
 const excludedFilenamePatterns = [
