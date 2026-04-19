@@ -10,9 +10,11 @@
     "tunnel": "lt --port 5173 --local-host 127.0.0.1"
   },
   "dependencies": {
-    "element-plus": "workspace:*",
-    "@element-plus/theme-chalk": "workspace:*",
     "@element-plus/icons-vue": "workspace:*",
+    "@element-plus/theme-chalk": "workspace:*",
+    "@fontsource/google-sans": "^5.2.1",
+    "@fontsource/noto-sans-sc": "^5.2.9",
+    "element-plus": "workspace:*",
     "vue": "^3.5.32"
   },
   "devDependencies": {

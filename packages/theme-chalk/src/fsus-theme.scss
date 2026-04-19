@@ -298,7 +298,6 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 
 .#{$namespace}-checkbox__input.is-checked .#{$namespace}-checkbox__inner,
 .#{$namespace}-checkbox__input.is-indeterminate .#{$namespace}-checkbox__inner,
-.#{$namespace}-radio__input.is-checked .#{$namespace}-radio__inner,
 .#{$namespace}-checkbox-button.is-checked .#{$namespace}-checkbox-button__inner,
 .#{$namespace}-radio-button.is-active .#{$namespace}-radio-button__inner,
 .#{$namespace}-check-tag.is-checked {
@@ -306,6 +305,20 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   border-color: $fsus-black;
   color: #ffffff;
   box-shadow: none;
+}
+
+// Radio: 「环 + 点」极简风格，不填充黑色背景
+.#{$namespace}-radio__input.is-checked .#{$namespace}-radio__inner {
+  background: #ffffff;
+  border-color: $fsus-black;
+  border-width: 2px;
+  box-shadow: none;
+}
+
+.#{$namespace}-radio__input.is-checked .#{$namespace}-radio__inner::after {
+  background-color: $fsus-black;
+  width: 6px;
+  height: 6px;
 }
 
 .#{$namespace}-checkbox__input.is-checked + .#{$namespace}-checkbox__label,
@@ -427,9 +440,49 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   }
 }
 
-.#{$namespace}-collapse,
+// Alert is-light 变体：移除彩色背景，左侧条纹已足够传达语义
+.#{$namespace}-alert--success.is-light,
+.#{$namespace}-alert--warning.is-light,
+.#{$namespace}-alert--error.is-light,
+.#{$namespace}-alert--info.is-light {
+  background-color: $fsus-panel-bg;
+  color: $fsus-text;
+}
+
+.#{$namespace}-alert--success.is-light .#{$namespace}-alert__description,
+.#{$namespace}-alert--warning.is-light .#{$namespace}-alert__description,
+.#{$namespace}-alert--error.is-light .#{$namespace}-alert__description,
+.#{$namespace}-alert--info.is-light .#{$namespace}-alert__description {
+  color: $fsus-text-muted;
+}
+
+// 保留语义图标颜色
+.#{$namespace}-alert--success.is-light .#{$namespace}-alert__icon { color: getCssVar('color-success'); }
+.#{$namespace}-alert--warning.is-light .#{$namespace}-alert__icon { color: getCssVar('color-warning'); }
+.#{$namespace}-alert--error.is-light .#{$namespace}-alert__icon { color: getCssVar('color-error'); }
+.#{$namespace}-alert--info.is-light .#{$namespace}-alert__icon { color: getCssVar('color-info'); }
+
+.#{$namespace}-collapse {
+  overflow: hidden; // 裁剪子元素 border 在圆角外侧的溢出
+  border-color: $fsus-border;
+}
+
+.#{$namespace}-collapse-item:last-child {
+  margin-bottom: 0;
+
+  .#{$namespace}-collapse-item__header,
+  .#{$namespace}-collapse-item__wrap {
+    border-bottom: none;
+  }
+}
+
 .#{$namespace}-collapse-item__wrap {
   border-color: $fsus-border;
+  background: transparent;
+}
+
+.#{$namespace}-collapse-item__wrap,
+.#{$namespace}-collapse-item__header {
   background: transparent;
 }
 
@@ -503,10 +556,14 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-picker__popper,
 .#{$namespace}-dropdown__popper,
 .#{$namespace}-autocomplete-suggestion,
-.#{$namespace}-cascader__dropdown,
 .#{$namespace}-color-picker__panel,
 .#{$namespace}-menu--popup {
   @include fsus-floating();
+}
+
+.#{$namespace}-cascader__dropdown {
+  @include fsus-floating();
+  overflow: hidden;
 }
 
 .#{$namespace}-popper.is-dark,
@@ -976,3 +1033,25 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
     animation-iteration-count: 1;
   }
 }
+.#{$namespace}-button-group > .#{$namespace}-button + .#{$namespace}-button {
+  margin-left: -1px;
+}
+.#{$namespace}-button-group > .#{$namespace}-button:not(:first-child):not(:last-child) {
+  border-radius: 0;
+}
+.#{$namespace}-button-group > .#{$namespace}-button:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.#{$namespace}-button-group > .#{$namespace}-button:last-child {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.#{$namespace}-color-picker__trigger {
+  width: 44px;
+  height: 44px;
+  padding: 4px;
+  box-sizing: border-box;
+}
+

@@ -46,7 +46,8 @@ $directions: rtl, ltr, ttb, btt;
     margin: 0;
     flex: 1;
     line-height: inherit;
-    font-size: 1rem;
+    font-size: 1.125rem;
+    font-weight: 600;
     color: getCssVar('text-color', 'primary');
   }
 

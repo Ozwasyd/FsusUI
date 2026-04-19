@@ -30,7 +30,7 @@ $input-inline-start: map.get($input-padding-horizontal, 'default') !default;
     cursor: pointer;
     padding: 1px 30px 1px 0;
     border: 1px solid getCssVar('border-color');
-    border-radius: getCssVar('border-radius-base');
+    border-radius: getCssVar('border-radius-small');
     background-color: getCssVar('fill-color', 'blank');
     transition: getCssVar('transition', 'duration');
 

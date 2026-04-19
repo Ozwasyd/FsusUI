@@ -4,13 +4,17 @@
 @include b(popconfirm) {
   @include e(main) {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 4px 0 12px;
   }
   @include e(icon) {
-    margin-right: 5px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-size: 16px;
   }
   @include e(action) {
     text-align: right;
-    margin-top: 8px;
+    margin-top: 4px;
   }
 }

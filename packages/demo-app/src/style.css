@@ -282,36 +282,25 @@ textarea {
 .alert-cluster .neutral-alert {
   position: relative;
   border: 1px solid var(--demo-border);
+  border-inline-start: 2px solid rgba(5, 5, 5, 0.72);
   border-radius: var(--el-border-radius-base);
   background: var(--demo-surface-strong);
   color: var(--demo-text-strong);
   box-shadow: inset 0 1px 0 var(--demo-highlight);
 }
 
-.alert-cluster .neutral-alert::before {
-  content: '';
-  position: absolute;
-  inset: 12px auto 12px 0;
-  width: 2px;
-  border-radius: var(--el-border-radius-round);
-  background: rgba(5, 5, 5, 0.72);
+.alert-cluster .neutral-alert.el-alert--success {
+  border-inline-start-color: rgba(39, 39, 42, 0.72);
 }
 
-.alert-cluster .neutral-alert.el-alert--success::before {
-  background: rgba(39, 39, 42, 0.72);
-}
-
-.alert-cluster .neutral-alert.el-alert--warning::before {
-  background: rgba(82, 82, 91, 0.72);
+.alert-cluster .neutral-alert.el-alert--warning {
+  border-inline-start-color: rgba(82, 82, 91, 0.72);
 }
 
 .alert-cluster .neutral-alert .el-alert__icon {
   color: var(--demo-text-strong);
-  background: var(--demo-surface-muted);
-  border: 1px solid var(--demo-border);
-  border-radius: var(--el-border-radius-round);
-  padding: 8px;
-  box-sizing: content-box;
+  opacity: 0.8;
+  margin-top: 2px;
 }
 
 .alert-cluster .neutral-alert .el-alert__title {
@@ -375,6 +364,7 @@ textarea {
   background: rgba(244, 244, 245, 0.9);
   border: 1px dashed rgba(9, 9, 11, 0.12);
   border-radius: var(--el-border-radius-base);
+  overflow: hidden;
   padding: 14px;
   transition:
     opacity var(--demo-motion-duration-fast) var(--demo-motion-ease),
@@ -787,8 +777,7 @@ textarea {
 }
 
 .monochrome-descriptions .el-descriptions__table {
-  overflow: hidden;
-  border-radius: var(--el-border-radius-base);
+  width: 100%;
 }
 
 .monochrome-descriptions .el-descriptions__cell {
@@ -927,7 +916,7 @@ textarea {
 
 .collapse-review .el-collapse-item__header {
   min-height: 52px;
-  padding-inline: 4px;
+  padding-inline: 20px;
   background: transparent;
   color: var(--demo-text-strong);
   font-weight: 600;
@@ -939,7 +928,7 @@ textarea {
 }
 
 .collapse-review .el-collapse-item__content {
-  padding: 0 4px 14px;
+  padding: 0 20px 14px;
   color: var(--demo-text-muted);
   line-height: 1.7;
 }

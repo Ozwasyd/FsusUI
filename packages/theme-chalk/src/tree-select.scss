@@ -27,10 +27,21 @@
       // padding-left move to `el-tree-node__expand-icon`
       padding-left: 0;
 
-      // fix: select height > tree node height
-      // https://github.com/yujinpan/el-select-tree/pull/33
-      height: 20px;
-      line-height: 20px;
+      // let tree node dictate its own height instead of capping at 20px
+      height: auto;
+      line-height: normal;
+    }
+
+    // 修复：tree-node__content 在 popper 内不使用固定高度，避免与 dropdown item 双层堆叠错位
+    .#{$namespace}-tree-node__content {
+      height: auto;
+      min-height: 36px;
+    }
+
+    // 修复：禁止 tree 节点在 popper 内显示自己的 focus ring（焦点语义由 input trigger 承担）
+    .#{$namespace}-tree-node:focus > .#{$namespace}-tree-node__content {
+      outline: none;
+      background-color: transparent;
     }
   }
 }

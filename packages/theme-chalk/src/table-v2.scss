@@ -59,6 +59,8 @@
 
   @include e('root') {
     position: relative;
+    border-radius: getCssVar('border-radius-base');
+    overflow: hidden;
 
     // for showing the scrollbar when mouse is on the root table
     &:hover {

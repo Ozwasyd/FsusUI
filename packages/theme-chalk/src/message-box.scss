@@ -223,15 +223,29 @@
 }
 
 .fade-in-linear-enter-active {
+  animation: modal-fade-in getCssVar('transition-duration');
+
   .#{$namespace}-overlay-message-box {
     animation: msgbox-fade-in getCssVar('transition-duration');
   }
 }
 
 .fade-in-linear-leave-active {
+  animation: modal-fade-out getCssVar('transition-duration');
+
   .#{$namespace}-overlay-message-box {
     animation: msgbox-fade-in getCssVar('transition-duration') reverse;
   }
+}
+
+@keyframes modal-fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes modal-fade-out {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 @keyframes msgbox-fade-in {

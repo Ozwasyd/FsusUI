@@ -26,14 +26,23 @@
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    opacity: 0.8;
+    opacity: 0;
     cursor: pointer;
     box-sizing: border-box;
     user-select: none;
+    transition: opacity getCssVar('transition-duration');
 
     > svg {
       width: 1em;
       height: 1em;
+    }
+  }
+
+  @include e(wrapper) {
+    &:hover {
+      .#{$namespace}-image-viewer__btn {
+        opacity: 0.8;
+      }
     }
   }
 

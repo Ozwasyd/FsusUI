@@ -188,7 +188,7 @@ $font-family: map.merge(
   (
     // default family
     '':
-      "'Google Sans', 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif"
+      "'Google Sans', 'Noto Sans SC', 'Noto Sans CJK SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', 'Helvetica Neue', Helvetica, Arial, sans-serif"
   ),
   $font-family
 );
@@ -464,14 +464,14 @@ $select-tags-prefix-padding: map.merge(
 $alert: () !default;
 $alert: map.merge(
   (
-    'padding': 8px 16px,
+    'padding': 10px 16px,
     'border-radius-base': getCssVar('border-radius-base'),
     'title-font-size': 13px,
     'description-font-size': 12px,
     'close-font-size': 12px,
     'close-customed-font-size': 13px,
     'icon-size': 16px,
-    'icon-large-size': 28px,
+    'icon-large-size': 20px,
   ),
   $alert
 );
@@ -547,7 +547,7 @@ $input: map.merge(
     'focus-border': getCssVar('color-primary'),
     'transparent-border': 0 0 0 1px transparent inset,
     'border-color': getCssVar('border-color'),
-    'border-radius': getCssVar('border-radius-base'),
+    'border-radius': getCssVar('border-radius-small'),
     'bg-color': getCssVar('fill-color', 'blank'),
     'icon-color': getCssVar('text-color-placeholder'),
     'placeholder-color': getCssVar('text-color-placeholder'),
@@ -615,7 +615,7 @@ $cascader: map.merge(
     'menu-selected-text-color': getCssVar('color-primary'),
     'menu-fill': getCssVar('bg-color', 'overlay'),
     'menu-font-size': getCssVar('font-size-base'),
-    'menu-radius': getCssVar('border-radius-base'),
+    'menu-radius': getCssVar('border-radius-small'),
     'menu-border': solid 1px getCssVar('border-color-light'),
     'menu-wrap-height': 220px,
     'menu-shadow': getCssVar('box-shadow-light'),

@@ -1,12 +1,11 @@
 import {
+  Check,
   CircleCheck,
   CircleClose,
-  CircleCloseFilled,
   Close,
   InfoFilled,
   Loading,
-  SuccessFilled,
-  WarningFilled,
+  Warning,
 } from '@element-plus/icons-vue'
 import { definePropType } from './props'
 
@@ -24,16 +23,15 @@ export const CloseComponents = {
 
 export const TypeComponents = {
   Close,
-  SuccessFilled,
+  Check,
   InfoFilled,
-  WarningFilled,
-  CircleCloseFilled,
+  Warning,
 }
 
 export const TypeComponentsMap = {
-  success: SuccessFilled,
-  warning: WarningFilled,
-  error: CircleCloseFilled,
+  success: Check,
+  warning: Warning,
+  error: Close,
   info: InfoFilled,
 }
 

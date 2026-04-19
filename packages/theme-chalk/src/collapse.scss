@@ -19,7 +19,7 @@
   }
   @include e(header) {
     width: 100%;
-    padding: 0;
+    padding: 0 20px;
     border: none;
     display: flex;
     align-items: center;
@@ -58,7 +58,7 @@
   }
 
   @include e(content) {
-    padding-bottom: 25px;
+    padding: 0 20px 25px;
     font-size: getCssVar('collapse-content-font-size');
     color: getCssVar('collapse-content-text-color');
     line-height: 1.769230769230769;

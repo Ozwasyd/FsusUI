@@ -10,6 +10,7 @@
 @include b(vl) {
   @include e(wrapper) {
     position: relative;
+    overflow: hidden;
     &:hover {
       @include showScrollbar();
     }

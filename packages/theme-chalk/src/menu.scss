@@ -15,6 +15,8 @@
   list-style: none;
   cursor: pointer;
   position: relative;
+  border-radius: getCssVar('border-radius-small');
+  margin: 2px 6px;
   transition: border-color getCssVar('transition-duration'),
     background-color getCssVar('transition-duration'),
     color getCssVar('transition-duration');
@@ -52,6 +54,9 @@
 
 @include b(menu) {
   border-right: solid 1px getCssVar('menu-border-color');
+  border-radius: getCssVar('border-radius-base');
+  overflow: hidden;
+  padding: 4px 0;
   list-style: none;
   position: relative;
   margin: 0;
@@ -212,6 +217,7 @@
     }
   }
   @include m(popup) {
+    overflow: hidden;
     z-index: 100;
     min-width: 200px;
     border: none;

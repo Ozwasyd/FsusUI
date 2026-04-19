@@ -154,6 +154,7 @@ $dropdown-menu-padding-vertical: map.merge(
   background-color: getCssVar('bg-color', 'overlay');
   border: none;
   border-radius: getCssVar('border-radius-base');
+  overflow: hidden;
   box-shadow: none;
   list-style: none;
 

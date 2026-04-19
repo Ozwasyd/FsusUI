@@ -9,6 +9,7 @@
 
 @include b(tree) {
   position: relative;
+  overflow: hidden;
   cursor: default;
   background: getCssVar('fill-color', 'blank');
   color: getCssVar('tree-text-color');
@@ -47,7 +48,7 @@
     /* focus */
     > .#{$namespace}-tree-node__content {
       background-color: getCssVar('tree-node-hover-bg-color');
-      @include a11y-focus-ring(2px, getCssVar('border-radius-base'));
+      box-shadow: inset 0 0 0 2px var(--el-a11y-focus-color, #{getCssVar('color-primary')});
     }
   }
 

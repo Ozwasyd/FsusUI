@@ -76,9 +76,12 @@ $descriptions-cell-font-size: map.merge(
 
   @include e(body) {
     background-color: getCssVar('fill-color', 'blank');
+    border-radius: getCssVar('border-radius-base');
+    overflow: hidden;
 
     .#{$namespace}-descriptions__table {
-      border-collapse: collapse;
+      border-collapse: separate;
+      border-spacing: 0;
       width: 100%;
 
       .#{$namespace}-descriptions__cell {
@@ -103,8 +106,15 @@ $descriptions-cell-font-size: map.merge(
 
       &.is-bordered {
         .#{$namespace}-descriptions__cell {
-          border: getCssVar('descriptions-table-border');
+          border-right: getCssVar('descriptions-table-border');
+          border-bottom: getCssVar('descriptions-table-border');
           padding: map.get($descriptions-bordered-cell-padding, 'default');
+          &:first-child {
+            border-left: getCssVar('descriptions-table-border');
+          }
+        }
+        tr:first-child .#{$namespace}-descriptions__cell {
+          border-top: getCssVar('descriptions-table-border');
         }
       }
 
