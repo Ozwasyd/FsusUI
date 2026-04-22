@@ -13,7 +13,7 @@
     "clean": "pnpm run clean:dist && pnpm run -r --parallel clean",
     "clean:dist": "rimraf dist",
     "build": "pnpm run -C internal/build start",
-    "build:demo": "pnpm run -C packages/demo-app build",
+    "build:demo": "pnpm run -C packages/wasm build:wasm && pnpm run -C packages/demo-app build",
     "build:github-package": "pnpm run build && node ./scripts/prepare-github-package.mjs",
     "build:theme": "pnpm run -C packages/theme-chalk build",
     "build:wasm": "bash ./packages/wasm/build.sh",
