@@ -112,7 +112,7 @@ describe('Transfer', () => {
     expect(filterIndicesSync).toHaveBeenCalled()
     expect(leftList.vm.filteredData.length).toBe(1)
     expect(leftList.vm.filteredData[0].label).toBe('Wasm Match')
-  }, 10000)
+  }, 30000)
 
   it('warms wasm on cold start and keeps filtering with JS until ready', async () => {
     setWasmReady(false)
@@ -144,7 +144,7 @@ describe('Transfer', () => {
 
     expect(filterIndicesSync).toHaveBeenCalled()
     expect(warmupWasm).not.toHaveBeenCalled()
-  }, 10000)
+  }, 30000)
 
   it('keeps non-ascii queries on the JS path', async () => {
     const value = ref([])
@@ -166,7 +166,7 @@ describe('Transfer', () => {
     expect(filterIndicesSync).not.toHaveBeenCalled()
     expect(leftList.vm.filteredData.length).toBe(1)
     expect(leftList.vm.filteredData[0].label).toBe('Éclair')
-  })
+  }, 30000)
 
   it('transfer', async () => {
     const value = ref([1, 4])

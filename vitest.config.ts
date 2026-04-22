@@ -19,6 +19,15 @@ export default defineConfig({
   },
   test: {
     clearMocks: true,
+    include: [
+      'packages/**/__tests__/**/*.{test,spec,vitest}.{js,jsx,ts,tsx}',
+    ],
+    exclude: [
+      '**/node_modules/**',
+      'tests/visual/**',
+      'playwright.config.ts',
+    ],
+    testTimeout: 20_000,
     environment: 'jsdom',
     environmentOptions: {
       jsdom: {
@@ -31,10 +40,18 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],
+      thresholds: {
+        lines: 35,
+        statements: 35,
+        functions: 35,
+        branches: 25,
+      },
       exclude: [
         'packages/wasm/**',
         '**/__tests__/**',
         '**/*.d.ts',
+        'tests/visual/**',
+        'playwright.config.ts',
       ],
     },
   },

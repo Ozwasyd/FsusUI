@@ -11,6 +11,24 @@ import type { CarouselInstance } from '../src/instance'
 const wait = (ms = 100) =>
   new Promise((resolve) => setTimeout(() => resolve(0), ms))
 
+const waitForActiveItem = async (
+  wrapper: VueWrapper<any>,
+  index: number,
+  timeout = 300
+) => {
+  const startedAt = Date.now()
+  while (Date.now() - startedAt < timeout) {
+    await nextTick()
+    await wait(10)
+    const items = wrapper.vm.$el.querySelectorAll('.el-carousel__item')
+    if (items[index]?.classList.contains('is-active')) {
+      return items
+    }
+  }
+
+  return wrapper.vm.$el.querySelectorAll('.el-carousel__item')
+}
+
 const generateCarouselItems = (count = 3, hasLabel = false) => {
   const list = Array.from({ length: count }, (_, index) => index + 1)
   return list.map((i) =>
@@ -59,11 +77,9 @@ describe('Carousel', () => {
       interval: 50,
     })
 
-    await nextTick()
-    await wait(10)
-    const items = wrapper.vm.$el.querySelectorAll('.el-carousel__item')
+    const items = await waitForActiveItem(wrapper, 0)
     expect(items[0].classList.contains('is-active')).toBeTruthy()
-    await wait(60)
+    await waitForActiveItem(wrapper, 1, 500)
     expect(items[1].classList.contains('is-active')).toBeTruthy()
   })
 
@@ -191,11 +207,9 @@ describe('Carousel', () => {
       'pause-on-hover': false,
     })
 
-    await nextTick()
+    await waitForActiveItem(wrapper, 0)
     await wrapper.find('.el-carousel').trigger('mouseenter')
-    const items = wrapper.vm.$el.querySelectorAll('.el-carousel__item')
-    await nextTick()
-    await wait(60)
+    const items = await waitForActiveItem(wrapper, 1, 500)
     expect(items[1].classList.contains('is-active')).toBeTruthy()
   })
   it('should guarantee order of indicators', async () => {

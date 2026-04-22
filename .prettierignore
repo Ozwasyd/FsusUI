@@ -9,6 +9,8 @@ packages/wasm/build
 packages/wasm/.cmake-check
 node_modules
 coverage
+playwright-report
+test-results
 CHANGELOG.en-US.md
 pnpm-lock.yaml
 docs/components.d.ts

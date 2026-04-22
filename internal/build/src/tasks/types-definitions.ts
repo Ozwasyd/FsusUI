@@ -59,7 +59,7 @@ const runGenerateTypesDefinitions = async () => {
     const emitOutput = sourceFile.getEmitOutput()
     const emitFiles = emitOutput.getOutputFiles()
     if (emitFiles.length === 0) {
-      consola.warn(
+      consola.info(
         chalk.yellow(`Skipping file with no declaration output: ${chalk.bold(relativePath)}`)
       )
       return

@@ -1,0 +1,12 @@
+name: Quality Gates
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  quality:
+    uses: ./.github/workflows/_quality.yml

@@ -262,16 +262,18 @@ describe('table column', () => {
       }
 
       describe('= selection', () => {
-        const wrapper = createTable('selection')
-
         it('render', async () => {
+          const wrapper = createTable('selection')
           await doubleWait()
           expect(wrapper.findAll('.el-checkbox').length).toEqual(
             getTestData().length + 1
           )
+          wrapper.unmount()
         })
 
         it('select all', async () => {
+          const wrapper = createTable('selection')
+          await doubleWait()
           await setCheckboxValue(wrapper.find('.el-checkbox'))
           await doubleWait()
           expect(wrapper.vm.selected.length).toEqual(5)
@@ -292,9 +294,8 @@ describe('table column', () => {
       })
 
       describe('= index', () => {
-        const wrapper = createTable('index')
-
         it('render', async () => {
+          const wrapper = createTable('index')
           await doubleWait()
           expect(
             wrapper
@@ -487,9 +488,9 @@ describe('table column', () => {
     })
 
     describe('click sortable column', () => {
-      const wrapper = createTable('', '', '', 'sortable')
-
       it('ascending', async () => {
+        const wrapper = createTable('', '', '', 'sortable')
+        await doubleWait()
         const elm = wrapper.find('.caret-wrapper')
 
         elm.trigger('click')
@@ -504,11 +505,16 @@ describe('table column', () => {
           '95',
           '100',
         ])
+        wrapper.unmount()
       })
 
       it('descending', async () => {
+        const wrapper = createTable('', '', '', 'sortable')
+        await doubleWait()
         const elm = wrapper.find('.caret-wrapper')
 
+        elm.trigger('click')
+        await doubleWait()
         elm.trigger('click')
         await doubleWait()
         const lastCells = wrapper.findAll(

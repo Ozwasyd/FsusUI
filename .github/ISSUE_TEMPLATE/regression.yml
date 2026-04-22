@@ -1,0 +1,24 @@
+name: Regression
+description: Report behavior that used to work and now fails.
+title: "[Regression]: "
+labels: ["bug", "regression"]
+body:
+  - type: textarea
+    id: regression
+    attributes:
+      label: Regression details
+      description: What changed, and which version/commit introduced it?
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Describe affected components, flows, and severity.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Add screenshots, failing test output, or diffs if available.

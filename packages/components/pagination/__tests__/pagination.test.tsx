@@ -87,12 +87,11 @@ describe('Pagination', () => {
   })
 
   describe('test layout & layout reactive change', () => {
-    const layoutRef = ref('')
-    const wrapper = mount(() => (
-      <Pagination total={100} layout={layoutRef.value}></Pagination>
-    ))
-
     test('layout empty', async () => {
+      const layoutRef = ref('')
+      const wrapper = mount(() => (
+        <Pagination total={100} layout={layoutRef.value}></Pagination>
+      ))
       await nextTick()
       expect(wrapper.find('.el-pagination').exists()).toBe(false)
     })
@@ -106,8 +105,12 @@ describe('Pagination', () => {
     ]
     layoutSelectorPairs.forEach(([layout], idx) => {
       test(`layout with only '${layout}'`, async () => {
+        const layoutRef = ref('')
+        const wrapper = mount(() => (
+          <Pagination total={100} layout={layoutRef.value}></Pagination>
+        ))
         layoutRef.value = layout
-        await nextTick()
+        await flushPaginationUpdate()
         for (const [i, layoutSelectorPair] of layoutSelectorPairs.entries()) {
           expect(wrapper.find(layoutSelectorPair[1]).exists()).toBe(i === idx)
         }
@@ -115,8 +118,12 @@ describe('Pagination', () => {
     })
 
     test(`layout with '->, total'`, async () => {
+      const layoutRef = ref('')
+      const wrapper = mount(() => (
+        <Pagination total={100} layout={layoutRef.value}></Pagination>
+      ))
       layoutRef.value = '->, total'
-      await nextTick()
+      await flushPaginationUpdate()
       assertElementsExistence(
         wrapper,
         ['.el-pagination__total', '.el-pagination__rightwrapper'],

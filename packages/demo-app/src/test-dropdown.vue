@@ -1,3 +1,14 @@
+<script setup lang="ts">
+import { demoComponents } from './demo-components'
+
+const {
+  ElButton,
+  ElDropdown,
+  ElDropdownItem,
+  ElDropdownMenu,
+} = demoComponents
+</script>
+
 <template>
   <el-dropdown trigger="click">
     <el-button>

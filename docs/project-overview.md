@@ -11,6 +11,8 @@
 
 - 仓库名与主题描述已体现 `FsusUI`，但多数包名与导出仍沿用 `element-plus` 体系；下文会同时使用两者以保持准确。
 - 与 Element Plus 的差异点及接入注意事项请参考：`docs/element-plus-integration.md`。
+- 工程维护与质量门交接请参考：`docs/engineering-handoff.md`。
+- 发布治理与 Changesets 流程请参考：`docs/release-governance.md`。
 
 ## 1. 项目定位（一句话）
 

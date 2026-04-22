@@ -1,0 +1,26 @@
+name: Bug report
+description: Report a runtime bug, regression, or packaging failure.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What broke and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: Provide reproduction steps, repo, or screenshots.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include FsusUI version, Vue version, browser/OS, and package manager.
+    validations:
+      required: true

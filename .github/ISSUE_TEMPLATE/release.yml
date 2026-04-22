@@ -1,0 +1,24 @@
+name: Release issue
+description: Track a release-specific problem or packaging request.
+title: "[Release]: "
+labels: ["release"]
+body:
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What release/package is affected?
+    validations:
+      required: true
+  - type: textarea
+    id: blockers
+    attributes:
+      label: Blockers
+      description: List failing checks, packaging issues, or missing release notes.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected outcome
+      description: Describe the desired release result.

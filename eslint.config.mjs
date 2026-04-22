@@ -35,6 +35,20 @@ export default [
       'ssr-testing/cases/*',
       'docs/.vitepress/i18n/*',
       'docs/.vitepress/crowdin/*',
+      'test-results/**',
+      'tests/visual/**/*.png',
+      'tests/visual/**/__screenshots__/**',
+      'extract_all.mjs',
+      'finish_phase1.mjs',
+      'fix_css.mjs',
+      'map-vars.mjs',
+      'parse_and_split.mjs',
+      'phase2_4_5.js',
+      'process.mjs',
+      'process_button.js',
+      'process_theme.js',
+      'run_decouple.mjs',
+      'split-fsus-theme.mjs',
     ],
   },
 
@@ -149,6 +163,18 @@ export default [
       'no-empty': 'off',
       'vue/prefer-import-from-vue': 'off',
       'unicorn/prefer-object-from-entries': 'off',
+    },
+  },
+
+  {
+    files: [
+      'scripts/**/*.{js,mjs,ts}',
+      'packages/icons-vue/build/**/*.{js,mjs,ts}',
+      'playwright.config.ts',
+      '.github/**/*.{js,mjs,ts}',
+    ],
+    rules: {
+      'no-console': 'off',
     },
   },
 ]

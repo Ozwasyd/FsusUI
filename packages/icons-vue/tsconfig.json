@@ -15,8 +15,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "allowArbitraryExtensions": true,
-    "ignoreDeprecations": "6.0"
+    "allowArbitraryExtensions": true
   },
   "references": [{ "path": "./tsconfig.build.json" }],
   "include": ["./src/**/*"]

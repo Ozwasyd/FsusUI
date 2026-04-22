@@ -3,6 +3,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { build } from 'esbuild'
 import Vue from 'unplugin-vue/esbuild'
+import type { Format } from 'esbuild'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -13,10 +14,10 @@ await rm(distDir, { recursive: true, force: true })
 await mkdir(distDir, { recursive: true })
 
 const entries = [
-  { entry: 'src/index.ts', outfile: 'dist/index.js', format: 'esm' },
-  { entry: 'src/index.ts', outfile: 'dist/index.cjs', format: 'cjs' },
-  { entry: 'src/global.ts', outfile: 'dist/global.js', format: 'esm' },
-  { entry: 'src/global.ts', outfile: 'dist/global.cjs', format: 'cjs' },
+  { entry: 'src/index.ts', outfile: 'dist/index.js', format: 'esm' as Format },
+  { entry: 'src/index.ts', outfile: 'dist/index.cjs', format: 'cjs' as Format },
+  { entry: 'src/global.ts', outfile: 'dist/global.js', format: 'esm' as Format },
+  { entry: 'src/global.ts', outfile: 'dist/global.cjs', format: 'cjs' as Format },
 ]
 
 for (const item of entries) {

@@ -16,7 +16,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  quality:
+    uses: ./.github/workflows/_quality.yml
+
   publish:
+    needs: quality
     runs-on: ubuntu-latest
     timeout-minutes: 30
 

@@ -156,10 +156,6 @@ describe('InputNumber.vue', () => {
   })
 
   describe('precision accuracy 2', () => {
-    const num = ref(0)
-    const wrapper = mount(() => (
-      <InputNumber precision={2} v-model={num.value} />
-    ))
     it.each([
       [1.1111111111, '1.11'],
       [17.275, '17.28'],
@@ -173,17 +169,19 @@ describe('InputNumber.vue', () => {
     ])(
       'each precision accuracy test: $input $output',
       async (input, output) => {
+        const num = ref(0)
+        const wrapper = mount(() => (
+          <InputNumber precision={2} v-model={num.value} />
+        ))
         await setTextInputValue(wrapper.find('input'), input)
+        await wrapper.find('input').trigger('blur')
+        await nextTick()
         expect(wrapper.find('input').element.value).toEqual(`${output}`)
       }
     )
   })
 
   describe('precision accuracy 3', () => {
-    const num = ref(0)
-    const wrapper = mount(() => (
-      <InputNumber precision={3} v-model={num.value} />
-    ))
     it.each([
       [1.1111111111, '1.111'],
       [17.275, '17.275'],
@@ -196,7 +194,13 @@ describe('InputNumber.vue', () => {
     ])(
       'each precision accuracy test: $input $output',
       async (input, output) => {
+        const num = ref(0)
+        const wrapper = mount(() => (
+          <InputNumber precision={3} v-model={num.value} />
+        ))
         await setTextInputValue(wrapper.find('input'), input)
+        await wrapper.find('input').trigger('blur')
+        await nextTick()
         expect(wrapper.find('input').element.value).toEqual(`${output}`)
       }
     )

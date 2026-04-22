@@ -570,9 +570,10 @@ for (const [epName, lucideName] of Object.entries(EP_TO_LUCIDE)) {
   const fileName = epName
     .replace(/([A-Z])/g, '-$1')
     .replace(/^-/, '')
-    .toLowerCase() + '.vue'
+    .toLowerCase()
+  const componentFileName = `${fileName}.vue`
 
-  const filePath = path.join(COMPONENTS_DIR, fileName)
+  const filePath = path.join(COMPONENTS_DIR, componentFileName)
 
   let svgContent = ''
 
@@ -584,7 +585,7 @@ for (const [epName, lucideName] of Object.entries(EP_TO_LUCIDE)) {
     // 使用自定义 SVG 路径
     svgContent = CUSTOM_SVG_PATHS[epName]
       .split('\n')
-      .map(l => '    ' + l.trim())
+      .map((line) => `    ${line.trim()}`)
       .join('\n')
     custom++
   } else {

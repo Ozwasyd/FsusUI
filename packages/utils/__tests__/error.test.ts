@@ -3,9 +3,7 @@ import { debugWarn, throwError } from '..'
 
 describe('error', () => {
   it('throwError should work', () => {
-    expect(() =>
-      throwError('scope', 'message')
-    ).toThrowErrorMatchingInlineSnapshot('"[scope] message"')
+    expect(() => throwError('scope', 'message')).toThrow('[scope] message')
   })
 
   it('debugWarn should work', () => {

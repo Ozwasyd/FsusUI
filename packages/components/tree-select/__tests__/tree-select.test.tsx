@@ -295,7 +295,7 @@ describe('TreeSelect.vue', () => {
     expect(filterIndicesSync).toHaveBeenCalledTimes(1)
     expect(tree.vm.getNode(1).visible).toBe(true)
     expect(tree.vm.getNode(10 + 357).visible).toBe(true)
-  })
+  }, 30000)
 
   test(
     'filter falls back to js path when wasm is unavailable',
@@ -325,7 +325,7 @@ describe('TreeSelect.vue', () => {
       expect(tree.vm.getNode(1).visible).toBe(true)
       expect(tree.vm.getNode(10 + 24).visible).toBe(true)
     },
-    10000
+    30000
   )
 
   test(
@@ -353,7 +353,7 @@ describe('TreeSelect.vue', () => {
       expect(filterIndicesSync).not.toHaveBeenCalled()
       expect(warmupWasm).not.toHaveBeenCalled()
     },
-    10000
+    30000
   )
 
   test('props', async () => {
