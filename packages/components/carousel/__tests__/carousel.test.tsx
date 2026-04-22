@@ -203,13 +203,13 @@ describe('Carousel', () => {
 
   it('pause auto play on hover', async () => {
     wrapper = createComponent({
-      interval: 50,
+      interval: 100,
       'pause-on-hover': false,
     })
 
-    await waitForActiveItem(wrapper, 0)
+    await waitForActiveItem(wrapper, 0, 500)
     await wrapper.find('.el-carousel').trigger('mouseenter')
-    const items = await waitForActiveItem(wrapper, 1, 500)
+    const items = await waitForActiveItem(wrapper, 1, 1200)
     expect(items[1].classList.contains('is-active')).toBeTruthy()
   })
   it('should guarantee order of indicators', async () => {

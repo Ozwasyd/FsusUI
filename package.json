@@ -6,8 +6,11 @@
   ],
   "scripts": {
     "test": "vitest",
-    "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage",
+    "ensure:wasm": "node ./scripts/ensure-wasm-artifacts.mjs",
+    "test:run": "run-s ensure:wasm _test:run",
+    "test:coverage": "run-s ensure:wasm _test:coverage",
+    "_test:run": "vitest run",
+    "_test:coverage": "vitest run --coverage",
     "test:visual": "playwright test",
     "audit:templates": "node ./scripts/audit-template-dom.mjs",
     "clean": "pnpm run clean:dist && pnpm run -r --parallel clean",

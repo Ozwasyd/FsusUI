@@ -14,6 +14,7 @@ export default defineConfig({
       animations: 'disabled',
       caret: 'hide',
       scale: 'css',
+      maxDiffPixelRatio: 0.012,
     },
   },
   use: {

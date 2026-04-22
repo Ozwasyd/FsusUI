@@ -18,6 +18,11 @@ import type { CompilerOptions, SourceFile } from 'ts-morph'
 
 const TSCONFIG_PATH = path.resolve(projRoot, 'tsconfig.web.json')
 const outDir = path.resolve(buildOutput, 'types')
+const iconsVueTypesEntry = path.resolve(
+  projRoot,
+  'packages/icons-vue/dist/index.d.ts'
+)
+const wasmTypesEntry = path.resolve(projRoot, 'packages/wasm/dist/index.d.ts')
 
 /**
  * fork = require( https://github.com/egoist/vue-dts-gen/blob/main/src/index.ts
@@ -28,6 +33,14 @@ const runGenerateTypesDefinitions = async () => {
     declaration: true,
     outDir,
     baseUrl: projRoot,
+    paths: {
+      '@element-plus/icons-vue': [iconsVueTypesEntry],
+      '@element-plus/icons-vue/*': [
+        path.resolve(projRoot, 'packages/icons-vue/dist/*'),
+      ],
+      '@element-plus/wasm': [wasmTypesEntry],
+      '@element-plus/wasm/*': [path.resolve(projRoot, 'packages/wasm/dist/*')],
+    },
     preserveSymlinks: true,
     skipLibCheck: true,
     noImplicitAny: false,
@@ -44,47 +57,36 @@ const runGenerateTypesDefinitions = async () => {
   typeCheck(project)
   consola.success('Type check passed!')
 
-  await project.emit({
+  const emitOutput = project.emitToMemory({
     emitOnlyDtsFiles: true,
   })
+  const emitFiles = emitOutput.getFiles()
+  if (emitFiles.length === 0) {
+    consola.info(chalk.yellow('No declaration files were emitted.'))
+    return
+  }
 
-  const tasks = sourceFiles.map(async (sourceFile) => {
-    const relativePath = path.relative(pkgRoot, sourceFile.getFilePath())
+  const tasks = emitFiles.map(async (outputFile) => {
+    const filepath = outputFile.filePath
+    const relativePath = path.relative(outDir, filepath)
+
     consola.trace(
       chalk.yellow(
         `Generating definition for file: ${chalk.bold(relativePath)}`
       )
     )
 
-    const emitOutput = sourceFile.getEmitOutput()
-    const emitFiles = emitOutput.getOutputFiles()
-    if (emitFiles.length === 0) {
-      consola.info(
-        chalk.yellow(`Skipping file with no declaration output: ${chalk.bold(relativePath)}`)
-      )
-      return
-    }
-
-    const subTasks = emitFiles.map(async (outputFile) => {
-      const filepath = outputFile.getFilePath()
-      await mkdir(path.dirname(filepath), {
-        recursive: true,
-      })
-
-      await writeFile(
-        filepath,
-        pathRewriter('esm')(outputFile.getText()),
-        'utf8'
-      )
-
-      consola.success(
-        chalk.green(
-          `Definition for file: ${chalk.bold(relativePath)} generated`
-        )
-      )
+    await mkdir(path.dirname(filepath), {
+      recursive: true,
     })
 
-    await Promise.all(subTasks)
+    await writeFile(filepath, pathRewriter('esm')(outputFile.text), 'utf8')
+
+    consola.success(
+      chalk.green(
+        `Definition for file: ${chalk.bold(relativePath)} generated`
+      )
+    )
   })
 
   await Promise.all(tasks)
@@ -98,8 +100,15 @@ async function addSourceFiles(project: Project) {
   project.addSourceFileAtPath(path.resolve(projRoot, 'typings/env.d.ts'))
 
   const globSourceFile = '**/*.{js?(x),ts?(x),vue}'
+  const workspaceExternalPackages = [
+    '!demo-app/**/*',
+    '!icons-svg/**/*',
+    '!icons-vue/**/*',
+    '!theme-chalk/**/*',
+    '!wasm/**/*',
+  ]
   const filePaths = excludeFiles(
-    await glob([globSourceFile, '!element-plus/**/*'], {
+    await glob([globSourceFile, '!element-plus/**/*', ...workspaceExternalPackages], {
       cwd: pkgRoot,
       absolute: true,
       onlyFiles: true,
