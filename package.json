@@ -6,9 +6,10 @@
   ],
   "scripts": {
     "test": "vitest",
+    "ensure:icons": "node ./scripts/ensure-icons-artifacts.mjs",
     "ensure:wasm": "node ./scripts/ensure-wasm-artifacts.mjs",
-    "test:run": "run-s ensure:wasm _test:run",
-    "test:coverage": "run-s ensure:wasm _test:coverage",
+    "test:run": "run-s ensure:icons ensure:wasm _test:run",
+    "test:coverage": "run-s ensure:icons ensure:wasm _test:coverage",
     "_test:run": "vitest run",
     "_test:coverage": "vitest run --coverage",
     "test:visual": "playwright test",
