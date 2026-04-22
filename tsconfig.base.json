@@ -15,6 +15,8 @@
     "rootDir": ".",
     "types": [],
     "paths": {
+      "@element-plus/icons-vue": ["./packages/icons-vue/src/index.ts"],
+      "@element-plus/icons-vue/*": ["./packages/icons-vue/src/*"],
       "@element-plus/*": ["./packages/*"]
     }
   }
