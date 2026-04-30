@@ -232,7 +232,13 @@ function registerEventListener() {
         break
     }
   })
+  const escHandler = throttle((e: KeyboardEvent) => {
+    if (e.code === EVENT_CODE.esc && props.closeOnPressEscape) {
+      hide()
+    }
+  })
   const mousewheelHandler = throttle((e: WheelEvent) => {
+    e.preventDefault()
     const delta = e.deltaY || e.deltaX
     handleActions(delta < 0 ? 'zoomIn' : 'zoomOut', {
       zoomRate: props.zoomRate,
@@ -241,8 +247,10 @@ function registerEventListener() {
   })
 
   scopeEventListener.run(() => {
-    useEventListener(document, 'keydown', keydownHandler)
-    useEventListener(document, 'wheel', mousewheelHandler)
+    // ESC 全局响应，方便用户随时关闭；其余快捷键仅在 wrapper 聚焦时生效
+    useEventListener(document, 'keydown', escHandler)
+    useEventListener(wrapper, 'keydown', keydownHandler)
+    useEventListener(wrapper, 'wheel', mousewheelHandler, { passive: false })
   })
 }
 
@@ -338,14 +346,14 @@ function handleActions(action: ImageViewerAction, options = {}) {
     case 'zoomOut':
       if (transform.value.scale > minScale) {
         transform.value.scale = Number.parseFloat(
-          (transform.value.scale / zoomRate).toFixed(3)
+          (transform.value.scale / zoomRate).toFixed(3),
         )
       }
       break
     case 'zoomIn':
       if (transform.value.scale < maxScale) {
         transform.value.scale = Number.parseFloat(
-          (transform.value.scale * zoomRate).toFixed(3)
+          (transform.value.scale * zoomRate).toFixed(3),
         )
       }
       break

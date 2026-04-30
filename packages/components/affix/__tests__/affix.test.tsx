@@ -191,4 +191,39 @@ describe('Affix.vue', () => {
     mockAffixRect.mockRestore()
     mockDocumentRect.mockRestore()
   })
+
+  test('offset=0 default produces top:0px when fixed', async () => {
+    const wrapper = _mount(() => <Affix offset={0}>{AXIOM}</Affix>)
+    await nextTick()
+    const mockAffixRect = vi
+      .spyOn(wrapper.find('.el-affix').element, 'getBoundingClientRect')
+      .mockReturnValue({
+        height: 40,
+        width: 1000,
+        top: -100,
+        bottom: -80,
+      } as DOMRect)
+    const mockDocumentRect = vi
+      .spyOn(document.documentElement, 'getBoundingClientRect')
+      .mockReturnValue({
+        height: 200,
+        width: 1000,
+        top: 0,
+        bottom: 200,
+      } as DOMRect)
+    await makeScroll(document.documentElement, 'scrollTop', 200)
+    expect(wrapper.find('.el-affix--fixed').exists()).toBe(true)
+    expect(wrapper.find('.el-affix--fixed').attributes('style')).toContain(
+      'top: 0px;'
+    )
+    mockAffixRect.mockRestore()
+    mockDocumentRect.mockRestore()
+  })
+
+  test('non-existent target selector throws ElementPlusError', () => {
+    // Affix validates the target selector and throws if element is not found
+    expect(() => {
+      _mount(() => <Affix target=".non-existent-container">{AXIOM}</Affix>)
+    }).toThrow('[ElAffix] Target is not existed: .non-existent-container')
+  })
 })

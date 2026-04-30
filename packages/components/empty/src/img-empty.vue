@@ -1,5 +1,5 @@
 <template>
-  <svg v-bind="svgAttrs" viewBox="0 0 160 160" version="1.1">
+  <svg v-bind="svgAttrs" viewBox="0 0 160 160" version="1.1" stroke-linejoin="round" stroke-linecap="round">
     <g
       id="Illustrations"
       fill="none"

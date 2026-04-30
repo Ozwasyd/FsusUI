@@ -59,3 +59,79 @@ describe('<image-viewer />', () => {
     wrapper.unmount()
   })
 })
+
+describe('<image-viewer /> keyboard and pointer scope', () => {
+  test('closes on document escape even when wrapper is not focused', async () => {
+    const wrapper = mount(<ImageViewer urlList={[IMAGE_SUCCESS]} />)
+
+    await doubleWait()
+    document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape' }))
+    await doubleWait()
+
+    expect(wrapper.emitted('close')).toEqual([[]])
+    wrapper.unmount()
+  })
+
+  test('does not close on document escape when closeOnPressEscape is false', async () => {
+    const wrapper = mount(
+      <ImageViewer urlList={[IMAGE_SUCCESS]} closeOnPressEscape={false} />
+    )
+
+    await doubleWait()
+    document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Escape' }))
+    await doubleWait()
+
+    expect(wrapper.emitted('close')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  test('arrow and zoom shortcuts only work on wrapper keydown', async () => {
+    const wrapper = mount(
+      <ImageViewer urlList={[IMAGE_SUCCESS, IMAGE_SUCCESS]} />
+    )
+
+    await doubleWait()
+    const viewer = wrapper.find('.el-image-viewer__wrapper')
+    const vm = wrapper.vm as any
+    vm.loading = false
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { code: 'ArrowRight' }))
+    await doubleWait()
+    expect(vm.activeIndex).toBe(0)
+
+    await viewer.trigger('keydown', { code: 'ArrowRight' })
+    await doubleWait()
+    expect(vm.activeIndex).toBe(1)
+
+    const scaleBeforeWrapperZoom = vm.transform.scale
+    document.dispatchEvent(new KeyboardEvent('keydown', { code: 'ArrowUp' }))
+    await doubleWait()
+    expect(vm.transform.scale).toBe(scaleBeforeWrapperZoom)
+
+    await viewer.trigger('keydown', { code: 'ArrowUp' })
+    await doubleWait()
+    expect(vm.transform.scale).toBeGreaterThan(scaleBeforeWrapperZoom)
+    wrapper.unmount()
+  })
+
+  test('wheel zoom only works on wrapper', async () => {
+    const wrapper = mount(<ImageViewer urlList={[IMAGE_SUCCESS]} />)
+
+    await doubleWait()
+    const viewer = wrapper.find('.el-image-viewer__wrapper')
+    const vm = wrapper.vm as any
+    vm.loading = false
+    const initialScale = vm.transform.scale
+
+    document.dispatchEvent(
+      new WheelEvent('wheel', { deltaY: -120, cancelable: true })
+    )
+    await doubleWait()
+    expect(vm.transform.scale).toBe(initialScale)
+
+    await viewer.trigger('wheel', { deltaY: -120 })
+    await doubleWait()
+    expect(vm.transform.scale).toBeGreaterThan(initialScale)
+    wrapper.unmount()
+  })
+})

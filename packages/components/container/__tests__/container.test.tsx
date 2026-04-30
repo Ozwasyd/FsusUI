@@ -1,3 +1,4 @@
+import { nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, test } from 'vitest'
 import { getCssVariable } from '@element-plus/test-utils/dom'
@@ -45,6 +46,69 @@ describe('Container.vue', () => {
       expect((wrapper.vm as any).$el.classList.contains('is-vertical')).toBe(true)
     })
   })
+
+  test('only Main child is not vertical', () => {
+    const wrapper = mount(() => (
+      <Container>
+        <Main />
+      </Container>
+    ))
+    expect(wrapper.classes('is-vertical')).toBe(false)
+  })
+
+  test('Aside + Main is not vertical', () => {
+    const wrapper = mount(() => (
+      <Container>
+        <Aside />
+        <Main />
+      </Container>
+    ))
+    expect(wrapper.classes('is-vertical')).toBe(false)
+  })
+
+  test('Header + Main + Footer is vertical', () => {
+    const wrapper = mount(() => (
+      <Container>
+        <Header />
+        <Main />
+        <Footer />
+      </Container>
+    ))
+    expect(wrapper.classes('is-vertical')).toBe(true)
+  })
+
+  test('full four-zone layout renders without crash', () => {
+    const wrapper = mount(() => (
+      <Container>
+        <Header />
+        <Container>
+          <Aside />
+          <Main />
+        </Container>
+        <Footer />
+      </Container>
+    ))
+    expect(wrapper.classes()).toContain('el-container')
+    expect(wrapper.find('.el-header').exists()).toBe(true)
+    expect(wrapper.find('.el-aside').exists()).toBe(true)
+    expect(wrapper.find('.el-main').exists()).toBe(true)
+    expect(wrapper.find('.el-footer').exists()).toBe(true)
+  })
+
+  test('empty Container renders without crash', () => {
+    const wrapper = mount(() => <Container />)
+    expect(wrapper.classes()).toContain('el-container')
+  })
+
+  test('direction=horizontal overrides auto-detection even with Header', () => {
+    const wrapper = mount(() => (
+      <Container direction="horizontal">
+        <Header />
+        <Main />
+      </Container>
+    ))
+    expect(wrapper.classes('is-vertical')).toBe(false)
+  })
 })
 
 describe('Header', () => {
@@ -58,6 +122,12 @@ describe('Header', () => {
     const vm = wrapper.vm
     expect(getCssVariable(vm.$el, '--el-header-height')).toEqual('100px')
   })
+
+  test('header without height prop has no CSS variable set', () => {
+    const wrapper = mount(() => <Header />)
+    const vm = wrapper.vm
+    expect(getCssVariable(vm.$el, '--el-header-height').trim()).toBe('')
+  })
 })
 
 describe('Aside', () => {
@@ -70,6 +140,12 @@ describe('Aside', () => {
     const wrapper = mount(() => <Aside width="200px" />)
     const vm = wrapper.vm
     expect(getCssVariable(vm.$el, '--el-aside-width')).toEqual('200px')
+  })
+
+  test('aside without width prop has no CSS variable set', () => {
+    const wrapper = mount(() => <Aside />)
+    const vm = wrapper.vm
+    expect(getCssVariable(vm.$el, '--el-aside-width').trim()).toBe('')
   })
 })
 
@@ -90,5 +166,20 @@ describe('Footer', () => {
     const wrapper = mount(() => <Footer height="100px" />)
     const vm = wrapper.vm
     expect(getCssVariable(vm.$el, '--el-footer-height')).toEqual('100px')
+  })
+
+  test('footer height CSS variable updates reactively', async () => {
+    const h = ref('60px')
+    const wrapper = mount({
+      setup() {
+        return () => <Footer height={h.value} />
+      },
+    })
+    // Use element.style.getPropertyValue for reliable CSS variable access in jsdom
+    const el = wrapper.vm.$el as HTMLElement
+    expect(el.style.getPropertyValue('--el-footer-height')).toEqual('60px')
+    h.value = '120px'
+    await nextTick()
+    expect(el.style.getPropertyValue('--el-footer-height')).toEqual('120px')
   })
 })

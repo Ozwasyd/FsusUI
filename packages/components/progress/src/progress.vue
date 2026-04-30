@@ -42,7 +42,7 @@
       :class="ns.b('circle')"
       :style="{ height: `${width}px`, width: `${width}px` }"
     >
-      <svg viewBox="0 0 100 100">
+      <svg viewBox="0 0 100 100" stroke-linejoin="round">
         <path
           :class="ns.be('circle', 'track')"
           :d="trackPath"
@@ -98,10 +98,10 @@ defineOptions({
 })
 
 const STATUS_COLOR_MAP: Record<string, string> = {
-  success: '#13ce66',
-  exception: '#ff4949',
-  warning: '#e6a23c',
-  default: '#20a0ff',
+  success: 'var(--el-color-success)',
+  exception: 'var(--el-color-danger)',
+  warning: 'var(--el-color-warning)',
+  default: 'var(--fsus-scholarly-blue)',
 }
 
 const props = defineProps(progressProps)

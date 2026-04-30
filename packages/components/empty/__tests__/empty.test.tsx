@@ -62,3 +62,14 @@ describe('Empty.vue', () => {
     expect(wrapper.find('.el-empty__bottom').text()).toEqual(AXIOM)
   })
 })
+
+describe('Empty.vue svg visual regressions', () => {
+  test('default illustration keeps rounded stroke caps and joins', () => {
+    const wrapper = mount(() => <Empty />)
+    const svg = wrapper.find('.el-empty__image svg')
+
+    expect(svg.exists()).toBe(true)
+    expect(svg.attributes('stroke-linejoin')).toBe('round')
+    expect(svg.attributes('stroke-linecap')).toBe('round')
+  })
+})

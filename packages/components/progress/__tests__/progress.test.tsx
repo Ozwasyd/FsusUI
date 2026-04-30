@@ -162,4 +162,51 @@ describe('Progress.vue', () => {
 
     expect(wrapper.find('.el-progress__text').text()).toBe('自定义内容')
   })
+
+  // STATUS_COLOR_MAP applies to the SVG path stroke (circle/dashboard type).
+  // Line-type bar color for status is handled by CSS classes, not inline style.
+  test('status=success circle stroke uses CSS variable', () => {
+    const wrapper = mount(() => (
+      <Progress type="circle" percentage={100} status="success" />
+    ))
+    expect(
+      wrapper.find('.el-progress-circle__path').attributes('stroke')
+    ).toBe('var(--el-color-success)')
+  })
+
+  test('status=exception circle stroke uses CSS variable', () => {
+    const wrapper = mount(() => (
+      <Progress type="circle" percentage={0} status="exception" />
+    ))
+    expect(
+      wrapper.find('.el-progress-circle__path').attributes('stroke')
+    ).toBe('var(--el-color-danger)')
+  })
+
+  test('status=warning circle stroke uses CSS variable', () => {
+    const wrapper = mount(() => (
+      <Progress type="circle" percentage={50} status="warning" />
+    ))
+    expect(
+      wrapper.find('.el-progress-circle__path').attributes('stroke')
+    ).toBe('var(--el-color-warning)')
+  })
+
+  test('no status prop circle uses fsus-scholarly-blue CSS variable', () => {
+    const wrapper = mount(() => <Progress type="circle" percentage={30} />)
+    expect(
+      wrapper.find('.el-progress-circle__path').attributes('stroke')
+    ).toBe('var(--fsus-scholarly-blue)')
+  })
+})
+
+describe('Progress.vue svg token regressions', () => {
+  test('dashboard keeps rounded stroke joins and fsus default color', () => {
+    const wrapper = mount(() => <Progress type="dashboard" percentage={40} />)
+
+    expect(wrapper.find('svg').attributes('stroke-linejoin')).toBe('round')
+    expect(
+      wrapper.find('.el-progress-circle__path').attributes('stroke')
+    ).toBe('var(--fsus-scholarly-blue)')
+  })
 })

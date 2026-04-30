@@ -30,6 +30,10 @@
       // let tree node dictate its own height instead of capping at 20px
       height: auto;
       line-height: normal;
+
+      // 修复：display:list-item + min-height:44px 导致文字贴顶，改用 flex 居中
+      display: flex;
+      align-items: center;
     }
 
     // 修复：tree-node__content 在 popper 内不使用固定高度，避免与 dropdown item 双层堆叠错位

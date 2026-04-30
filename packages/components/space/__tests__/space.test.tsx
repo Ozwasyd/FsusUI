@@ -132,4 +132,36 @@ describe('Space.vue', () => {
       'min-width: 50%'
     )
   })
+
+  it('zero children renders nothing (Space returns null)', async () => {
+    const wrapper = mount(<Space></Space>)
+    await nextTick()
+    // Space explicitly returns null when no valid children are provided
+    expect(wrapper.find('.el-space').exists()).toBe(false)
+  })
+
+  it('single element child renders exactly one el-space__item with no spacer', async () => {
+    const wrapper = mount(
+      <Space size="large">
+        <div>only</div>
+      </Space>
+    )
+    await nextTick()
+    const items = wrapper.findAll('.el-space__item')
+    expect(items).toHaveLength(1)
+    // no spacer inserted when only one child
+    expect(wrapper.element.children).toHaveLength(1)
+  })
+
+  it('alignment prop applied to el-space style', async () => {
+    const wrapper = mount(
+      <Space alignment="flex-start">
+        {['a', 'b'].map((v) => v)}
+      </Space>
+    )
+    await nextTick()
+    expect(wrapper.find('.el-space').attributes('style')).toContain(
+      'align-items: flex-start'
+    )
+  })
 })

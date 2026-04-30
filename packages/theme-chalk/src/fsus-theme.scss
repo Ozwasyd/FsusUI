@@ -2,6 +2,7 @@
 @use 'common/var' as *;
 
 $fsus-black: #050505;
+$fsus-scholarly-blue: #2A599C;
 $fsus-text: #09090b;
 $fsus-text-muted: #5f5f68;
 $fsus-text-soft: #7c7c86;
@@ -31,7 +32,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur, 18px));
 }
 
-@mixin fsus-control($radius: 16px) {
+@mixin fsus-control($radius: 8px) {
   background: $fsus-control-bg;
   border: 1px solid $fsus-border;
   border-radius: $radius;
@@ -42,11 +43,12 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 }
 
 :root {
-  --el-a11y-focus-color: #050505;
+  --el-a11y-focus-color: #2A599C;
+  --fsus-scholarly-blue: #2A599C;
   --fsus-backdrop-blur: 18px;
   --fsus-backdrop-blur-soft: 12px;
-  --el-border-radius-base: 14px;
-  --el-border-radius-small: 10px;
+  --el-border-radius-base: 8px;
+  --el-border-radius-small: 6px;
   --el-border-radius-round: 999px;
   --el-box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
   --el-box-shadow-light: 0 14px 40px rgba(15, 23, 42, 0.08);
@@ -106,7 +108,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 }
 
 .#{$namespace}-button {
-  @include fsus-control(14px);
+  @include fsus-control(8px);
   min-height: 44px;
   padding: 0 16px;
   box-shadow: none;
@@ -126,7 +128,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   }
 
   &:focus-visible {
-    @include a11y-focus-ring(2px, 14px);
+    @include a11y-focus-ring(2px, 8px);
   }
 
   &.is-disabled,
@@ -146,8 +148,8 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 
   &:hover,
   &:focus {
-    background: rgba(5, 5, 5, 0.88);
-    border-color: rgba(5, 5, 5, 0.88);
+    background: $fsus-scholarly-blue;
+    border-color: $fsus-scholarly-blue;
     color: #ffffff;
   }
 }
@@ -217,12 +219,12 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   &:hover,
   &:focus-within {
     background: #ffffff;
-    border-color: $fsus-border-strong;
-    box-shadow: inset 0 0 0 1px rgba(5, 5, 5, 0.12) !important;
+    border-color: $fsus-scholarly-blue;
+    box-shadow: inset 0 0 0 1px rgba(42, 89, 156, 0.25) !important;
   }
 
   &:focus-within {
-    @include a11y-focus-ring(2px, 16px);
+    @include a11y-focus-ring(2px, 8px);
   }
 }
 
@@ -233,12 +235,12 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   &:hover,
   &:focus {
     background: #ffffff;
-    border-color: $fsus-border-strong;
-    box-shadow: inset 0 0 0 1px rgba(5, 5, 5, 0.12) !important;
+    border-color: $fsus-scholarly-blue;
+    box-shadow: inset 0 0 0 1px rgba(42, 89, 156, 0.25) !important;
   }
 
   &:focus-visible {
-    @include a11y-focus-ring(2px, 16px);
+    @include a11y-focus-ring(2px, 8px);
   }
 }
 
@@ -353,8 +355,17 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-table-v2__root,
 .#{$namespace}-empty,
 .#{$namespace}-result,
-.#{$namespace}-menu:not(.#{$namespace}-menu--horizontal) {
+.#{$namespace}-menu:not(.#{$namespace}-menu--horizontal):not(.#{$namespace}-sub-menu .#{$namespace}-menu):not(.#{$namespace}-menu--popup-container) {
   @include fsus-panel();
+}
+
+// 嵌套子菜单容器重置 fsus-panel 样式，避免出现多层嵌套面板的视觉错位
+.#{$namespace}-sub-menu .#{$namespace}-menu,
+.#{$namespace}-menu--popup-container {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
 }
 
 .#{$namespace}-page-header,
@@ -543,11 +554,17 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   box-shadow: 0 0 0 2px #ffffff;
 }
 
+// 模态层：保留毛玻璃（backdrop-filter 在固定全屏层上无滚动副作用）
 .#{$namespace}-dialog,
 .#{$namespace}-drawer,
 .#{$namespace}-message-box,
 .#{$namespace}-message,
-.#{$namespace}-notification,
+.#{$namespace}-notification {
+  @include fsus-floating();
+}
+
+// 功能性下拉层：不透明白底，不使用 backdrop-filter，
+// 避免 blur 边缘虚化以及父容器滚动时因 GPU composite layer 重建导致的生硬跳动
 .#{$namespace}-popover.#{$namespace}-popper,
 .#{$namespace}-popper.is-light,
 .#{$namespace}-popper.is-dark,
@@ -558,11 +575,17 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-autocomplete-suggestion,
 .#{$namespace}-color-picker__panel,
 .#{$namespace}-menu--popup {
-  @include fsus-floating();
+  background: $fsus-panel-bg;
+  border: 1px solid rgba(9, 9, 11, 0.1);
+  border-radius: 24px;
+  box-shadow: inset 0 1px 0 $fsus-highlight, $fsus-shadow-float;
 }
 
 .#{$namespace}-cascader__dropdown {
-  @include fsus-floating();
+  background: $fsus-panel-bg;
+  border: 1px solid rgba(9, 9, 11, 0.1);
+  border-radius: 24px;
+  box-shadow: inset 0 1px 0 $fsus-highlight, $fsus-shadow-float;
   overflow: hidden;
 }
 
@@ -795,7 +818,9 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 }
 
 .#{$namespace}-tabs__active-bar {
-  display: none;
+  background-color: $fsus-scholarly-blue;
+  height: 2px;
+  border-radius: 2px;
 }
 
 .#{$namespace}-tabs__item {
@@ -808,7 +833,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-tabs__item:hover,
 .#{$namespace}-tabs__item.is-active {
   background: $fsus-subtle-bg;
-  color: $fsus-text;
+  color: $fsus-scholarly-blue;
 }
 
 .#{$namespace}-tabs__item.is-active {
@@ -851,6 +876,13 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   background: transparent;
 }
 
+// body-wrapper 自带 border-radius:8px + overflow:hidden 会把行截成小圆角，
+// 与外层 el-table 的 24px 圆角之间产生透明缝隙（父色漏出）。
+// 统一交由外层 24px overflow:hidden 裁剪，内层不再重复截角。
+.#{$namespace}-table__body-wrapper {
+  border-radius: 0;
+}
+
 .#{$namespace}-table__inner-wrapper::before {
   display: none;
 }
@@ -880,7 +912,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 
 .#{$namespace}-descriptions__body .#{$namespace}-descriptions__table,
 .#{$namespace}-descriptions__cell {
-  border-color: $fsus-border !important;
+  border-color: $fsus-border-strong !important;
 }
 
 .#{$namespace}-descriptions__label.#{$namespace}-descriptions__cell {
@@ -951,12 +983,17 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   border-color: $fsus-black;
 }
 
+.#{$namespace}-rate {
+  // 覆盖 fill-color CSS 变量，消除拟物化金色，符合 design.md 极简主义规范
+  --el-rate-fill-color: #{$fsus-black};
+}
+
 .#{$namespace}-rate__item .#{$namespace}-rate__icon {
   color: #d4d4d8;
 }
 
 .#{$namespace}-rate__item .hover,
-.#{$namespace}-rate__item .#{$namespace}-icon-star-on {
+.#{$namespace}-rate__item .#{$namespace}-rate__icon.is-active {
   color: $fsus-black;
 }
 
@@ -1053,5 +1090,47 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   height: 44px;
   padding: 4px;
   box-sizing: border-box;
+}
+
+// 隐藏色块上叠加的 ArrowDown / Close 图标，色块本身已能传达可点击语义
+.#{$namespace}-color-picker__icon,
+.#{$namespace}-color-picker__empty {
+  display: none !important;
+}
+
+// ─── ImageViewer ────────────────────────────────────────────────────────────
+// 遮罩：深色系毛玻璃（纯黑纱 → 深暖黑 + backdrop-filter）
+.#{$namespace}-image-viewer__mask {
+  opacity: 1;
+  background: rgba(5, 5, 5, 0.78);
+  backdrop-filter: blur(24px) saturate(120%);
+  -webkit-backdrop-filter: blur(24px) saturate(120%);
+}
+
+// 操作按钮（close / prev / next）：fsus-floating 风格，去除硬编码深灰背景与白边
+.#{$namespace}-image-viewer__btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 4px 16px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: opacity getCssVar('transition-duration'), background getCssVar('transition-duration');
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.22);
+  }
+}
+
+// 底部工具栏：同上，圆角改为 24px（与浮动面板一致）
+.#{$namespace}-image-viewer__actions {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 24px;
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 4px 16px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
