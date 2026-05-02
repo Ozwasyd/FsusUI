@@ -67,7 +67,6 @@ import {
 import { ElIcon } from '@element-plus/components/icon'
 import { useNamespace } from '@element-plus/hooks'
 import { rateEmits, rateProps } from './rate'
-import type { iconPropType } from '@element-plus/utils'
 import type { CSSProperties, Component } from 'vue'
 
 function getValueFromMap<T>(
@@ -179,14 +178,17 @@ const componentMap = computed(() => {
 const decimalIconComponent = computed(() =>
   getValueFromMap(props.modelValue, componentMap.value)
 )
+const normalizeIconComponent = (icon: string | Component | undefined) =>
+  isString(icon) || icon === undefined ? icon : markRaw(icon)
+
 const voidComponent = computed(() =>
   rateDisabled.value
     ? isString(props.disabledVoidIcon)
       ? props.disabledVoidIcon
-      : (markRaw(props.disabledVoidIcon) as typeof iconPropType)
+      : normalizeIconComponent(props.disabledVoidIcon)
     : isString(props.voidIcon)
     ? props.voidIcon
-    : (markRaw(props.voidIcon) as typeof iconPropType)
+    : normalizeIconComponent(props.voidIcon)
 )
 const activeComponent = computed(() =>
   getValueFromMap(currentValue.value, componentMap.value)

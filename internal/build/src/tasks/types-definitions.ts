@@ -34,6 +34,7 @@ const runGenerateTypesDefinitions = async () => {
     outDir,
     baseUrl: projRoot,
     paths: {
+      '@element-plus/*': [path.resolve(projRoot, 'packages/*')],
       '@element-plus/icons-vue': [iconsVueTypesEntry],
       '@element-plus/icons-vue/*': [
         path.resolve(projRoot, 'packages/icons-vue/dist/*'),
@@ -169,6 +170,6 @@ function typeCheck(project: Project) {
     .getPreEmitDiagnostics()
     .filter((diagnostic) => diagnostic.getCode() !== 7056)
   if (diagnostics.length > 0) {
-    consola.warn(project.formatDiagnosticsWithColorAndContext(diagnostics))
+    throw new Error(project.formatDiagnosticsWithColorAndContext(diagnostics))
   }
 }
