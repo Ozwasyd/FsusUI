@@ -2,14 +2,6 @@ import { buildProps, iconPropType } from '@element-plus/utils'
 
 export const dialogContentProps = buildProps({
   /**
-   * @description whether to align the header and footer in center
-   */
-  center: Boolean,
-  /**
-   * @description whether to align the dialog both horizontally and vertically
-   */
-  alignCenter: Boolean,
-  /**
    * @description custom close icon, default is Close
    */
   closeIcon: {

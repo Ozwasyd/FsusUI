@@ -183,43 +183,6 @@
   @include e(btns-reverse) {
     flex-direction: row-reverse;
   }
-
-  // centerAlign 布局
-  @include m(center) {
-    @include e(title) {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    @include e(status) {
-      position: relative;
-      top: auto;
-      padding-right: 5px;
-      text-align: center;
-      transform: translateY(-1px);
-    }
-
-    @include e(message) {
-      margin-left: 0;
-    }
-
-    @include e(btns) {
-      justify-content: center;
-    }
-
-    @include e(content) {
-      $padding-horizontal: calc(
-        #{getCssVar('messagebox', 'padding-primary')} + 12px
-      );
-
-      padding-left: $padding-horizontal;
-      padding-right: $padding-horizontal;
-
-      text-align: center;
-    }
-  }
 }
 
 .fade-in-linear-enter-active {

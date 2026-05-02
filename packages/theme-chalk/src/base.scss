@@ -18,3 +18,9 @@
     outline-offset: 2px;
   }
 }
+
+svg {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 0.2px; // subtle "ink spread" effect
+}

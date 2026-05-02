@@ -42,5 +42,5 @@
     "ep"
   ],
   "unocss.root": "./docs",
-  "cmake.sourceDirectory": "/data/projects/FsusUI/packages/wasm"
+  "cmake.sourceDirectory": "/home/lyuaoss/projects/FsusUI/packages/wasm"
 }

@@ -130,28 +130,30 @@
   }
 
   thead {
-    color: getCssVar('table-header-text-color');
+    color: getCssVar('text-color', 'primary');
 
     th {
       font-weight: 600;
+      background-color: getCssVar('bg-color', 'page') !important;
+      border-bottom: 1px solid getCssVar('border-color', 'dark') !important;
     }
 
     &.is-group {
       th.#{$namespace}-table__cell {
-        background: getCssVar('fill-color', 'light');
+        background: getCssVar('bg-color', 'page');
       }
     }
   }
 
   tfoot {
     td.#{$namespace}-table__cell {
-      background-color: getCssVar('table-row-hover-bg-color');
-      color: getCssVar('table-text-color');
+      background-color: getCssVar('bg-color', 'page');
+      color: getCssVar('text-color', 'primary');
     }
   }
 
   .#{$namespace}-table__cell {
-    padding: map.get($table-padding, 'default');
+    padding: 16px 0;
     min-width: 0;
     box-sizing: border-box;
     text-overflow: ellipsis;
@@ -159,13 +161,7 @@
     position: relative;
     text-align: left;
     z-index: getCssVar('table-index');
-    @include when(center) {
-      text-align: center;
-    }
-
-    @include when(right) {
-      text-align: right;
-    }
+    border-right: none !important;
 
     &.gutter {
       width: 15px;
@@ -637,7 +633,8 @@
 
   @include m(enable-row-hover) {
     .#{$namespace}-table__body tr:hover > td.#{$namespace}-table__cell {
-      background-color: getCssVar('table-row-hover-bg-color');
+      background-color: getCssVar('bg-color', 'page');
+      color: getCssVar('color', 'scholarly-blue');
     }
   }
 

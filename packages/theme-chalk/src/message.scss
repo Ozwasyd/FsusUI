@@ -10,7 +10,7 @@
   width: fit-content;
   max-width: calc(100% - 32px);
   box-sizing: border-box;
-  border-radius: getCssVar('border-radius-base');
+  border-radius: getCssVar('message', 'border-radius');
   border-width: getCssVar('border-width');
   border-style: getCssVar('border-style');
   border-color: getCssVar('message', 'border-color');
@@ -19,6 +19,9 @@
   top: 20px;
   transform: translate3d(-50%, var(--el-message-stack-y, 0px), 0);
   background-color: getCssVar('message', 'bg-color');
+  backdrop-filter: getCssVar('bg-color', 'overlay-blur');
+  -webkit-backdrop-filter: getCssVar('bg-color', 'overlay-blur');
+  box-shadow: getCssVar('box-shadow', 'light');
   transition:
     opacity getCssVar('transition-duration')
       getCssVar('transition-function-fast-bezier'),
@@ -29,8 +32,16 @@
   align-items: center;
   will-change: transform, opacity;
 
-  @include when(center) {
-    justify-content: center;
+  // The "Punctuation" Motif (Grey Dot)
+  &::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: getCssVar('color-info');
+    opacity: 0.6;
   }
 
   @include when(closable) {

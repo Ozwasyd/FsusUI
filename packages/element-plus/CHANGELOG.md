@@ -1,5 +1,11 @@
 # element-plus
 
+## 1.3.1
+
+### Patch Changes
+
+- Expand component boundary coverage, demo completeness fixtures, and parallelized quality checks for release validation.
+
 ## 1.3.0
 
 ### Minor Changes

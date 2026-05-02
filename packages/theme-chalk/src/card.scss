@@ -10,9 +10,12 @@
   border-radius: getCssVar('card', 'border-radius');
   border: 1px solid getCssVar('card', 'border-color');
   background-color: getCssVar('card', 'bg-color');
+  backdrop-filter: getCssVar('bg-color', 'overlay-blur');
+  -webkit-backdrop-filter: getCssVar('bg-color', 'overlay-blur');
   overflow: hidden;
   color: getCssVar('text-color', 'primary');
-  transition: getCssVar('transition-duration');
+  transition: all getCssVar('transition-duration');
+  box-shadow: getCssVar('box-shadow', 'lighter');
 
   @include when(always-shadow) {
     box-shadow: getCssVar('box-shadow', 'light');
@@ -22,14 +25,30 @@
     &:hover,
     &:focus {
       box-shadow: getCssVar('box-shadow', 'light');
+      transform: translateY(-2px);
     }
   }
 
   @include e(header) {
-    padding: calc(#{getCssVar('card', 'padding')} - 2px)
-      getCssVar('card', 'padding');
+    padding: 16px getCssVar('card', 'padding');
     border-bottom: 1px solid getCssVar('card', 'border-color');
     box-sizing: border-box;
+    font-weight: 600;
+    color: getCssVar('text-color', 'primary');
+    position: relative;
+
+    // Dot motif for headers
+    &::before {
+      content: '';
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background-color: getCssVar('color-info');
+    }
   }
 
   @include e(body) {

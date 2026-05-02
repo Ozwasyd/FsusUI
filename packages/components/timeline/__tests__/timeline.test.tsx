@@ -154,18 +154,4 @@ describe('TimeLine.vue', () => {
     expect(dotWrapper.text()).toEqual('dot')
     expect(wrapper.find('.el-timeline-item__node').exists()).toBe(false)
   })
-
-  test('center', () => {
-    const wrapper = mount(() => (
-      <TimeLine>
-        {activities.map((_, index) => (
-          <TimeLineItem key={index} center={index === 1} />
-        ))}
-      </TimeLine>
-    ))
-
-    const timestampWrappers = wrapper.findAll('.el-timeline-item')
-
-    expect(timestampWrappers[1].classes()).toContain('el-timeline-item__center')
-  })
 })

@@ -34,7 +34,7 @@ $button-icon-span-gap: map.merge(
   text-align: center;
   box-sizing: border-box;
   outline: none;
-  transition: opacity 0.3s ease, filter 0.3s ease, background-color 0.3s ease;
+  transition: all 0.3s getCssVar('transition-function-ease-in-out-bezier');
   font-weight: getCssVar('button', 'font-weight');
   user-select: none;
   vertical-align: middle;
@@ -274,6 +274,19 @@ $button-icon-span-gap: map.merge(
   @each $type in (primary, success, warning, danger, info) {
     @include m($type) {
       @include button-variant($type);
+
+      @if $type == 'primary' {
+        &:hover,
+        &:focus {
+          background-color: getCssVar('color', 'scholarly-blue');
+          border-color: getCssVar('color', 'scholarly-blue');
+          box-shadow: getCssVar('box-shadow', 'light');
+          transform: translateY(-1px);
+        }
+        &:active {
+          transform: translateY(0);
+        }
+      }
     }
   }
 

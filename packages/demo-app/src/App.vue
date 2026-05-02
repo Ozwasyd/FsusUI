@@ -13,6 +13,7 @@ import {
   ElPopperContent,
   ElPopperTrigger,
 } from '../../element-plus'
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import {
   ArrowLeft,
   Plus,
@@ -60,6 +61,7 @@ const {
   ElBreadcrumb,
   ElBreadcrumbItem,
   ElButton,
+  ElButtonGroup,
   ElCalendar,
   ElCard,
   ElCarousel,
@@ -67,6 +69,7 @@ const {
   ElCascader,
   ElCascaderPanel,
   ElCheckbox,
+  ElCheckboxButton,
   ElCheckboxGroup,
   ElCheckTag,
   ElCol,
@@ -102,6 +105,7 @@ const {
   ElMenuItem,
   ElMenuItemGroup,
   ElOption,
+  ElOptionGroup,
   ElPageHeader,
   ElPagination,
   ElPopconfirm,
@@ -109,6 +113,7 @@ const {
   ElPopper,
   ElProgress,
   ElRadio,
+  ElRadioButton,
   ElRadioGroup,
   ElRate,
   ElResult,
@@ -118,6 +123,7 @@ const {
   ElSelectV2,
   ElSlider,
   ElSkeleton,
+  ElSkeletonItem,
   ElSpace,
   ElStatistic,
   ElStep,
@@ -125,6 +131,7 @@ const {
   ElSubMenu,
   ElSwitch,
   ElTabPane,
+  ElAutoResizer,
   ElTable,
   ElTableColumn,
   ElTableV2,
@@ -136,6 +143,7 @@ const {
   ElTimeline,
   ElTimelineItem,
   ElTooltip,
+  ElTooltipV2,
   ElTransfer,
   ElTree,
   ElTreeSelect,
@@ -143,6 +151,10 @@ const {
   ElUpload,
   ElWatermark,
 } = demoComponents
+
+const iconGallery = Object.entries(ElementPlusIconsVue)
+  .map(([name, component]) => ({ name, component }))
+  .sort((first, second) => first.name.localeCompare(second.name))
 
 const keyword = ref('')
 const querySearch = (query: string, callback: (items: Array<{ value: string }>) => void) => {
@@ -161,7 +173,9 @@ const inputNumberValue = ref<number | undefined>(8)
 const selectValue = ref('studio')
 const selectV2Value = ref('hangzhou')
 const radioValue = ref<boolean | string | number>('a')
+const radioButtonValue = ref<boolean | string | number>('desktop')
 const checkboxValue = ref<CheckboxGroupValueType>(['设计系统', '移动优先'])
+const checkboxButtonValue = ref<CheckboxGroupValueType>(['Desktop', 'A11y'])
 const timeSelectValue = ref<string | undefined>('10:00')
 const activeTab = ref<TabPaneName>('summary')
 const currentPage = ref(2)
@@ -429,6 +443,14 @@ onUnmounted(() => {
               <el-button text>
                 文本按钮
               </el-button>
+              <el-button-group>
+                <el-button plain>
+                  上一步
+                </el-button>
+                <el-button plain>
+                  下一步
+                </el-button>
+              </el-button-group>
             </div>
             <el-backtop
               :right="20"
@@ -569,6 +591,32 @@ onUnmounted(() => {
                 <el-text line-clamp="2">
                   这段文字用于检查截断、灰阶字色与移动端布局是否保持克制的阅读宽度。
                 </el-text>
+                <el-text type="info">
+                  {{ iconGallery.length }} 个图标全部展示
+                </el-text>
+                <el-scrollbar
+                  height="320px"
+                  class="muted-box"
+                >
+                  <el-space wrap>
+                    <el-tooltip
+                      v-for="icon in iconGallery"
+                      :key="icon.name"
+                      :content="icon.name"
+                      :teleported="false"
+                    >
+                      <el-button
+                        size="small"
+                        plain
+                      >
+                        <el-icon>
+                          <component :is="icon.component" />
+                        </el-icon>
+                        {{ icon.name }}
+                      </el-button>
+                    </el-tooltip>
+                  </el-space>
+                </el-scrollbar>
               </div>
             </ElConfigProvider>
           </article>
@@ -686,6 +734,12 @@ onUnmounted(() => {
               <el-checkbox label="设计系统" />
               <el-checkbox label="移动优先" />
               <el-checkbox label="A11y" />
+              <el-checkbox label="禁用项" disabled />
+            </el-checkbox-group>
+            <el-checkbox-group v-model="checkboxButtonValue">
+              <el-checkbox-button label="Desktop" />
+              <el-checkbox-button label="Mobile" />
+              <el-checkbox-button label="A11y" />
             </el-checkbox-group>
             <el-radio-group v-model="radioValue">
               <el-radio label="a">
@@ -694,6 +748,20 @@ onUnmounted(() => {
               <el-radio label="b">
                 方案 B
               </el-radio>
+              <el-radio
+                label="c"
+                disabled
+              >
+                方案 C
+              </el-radio>
+            </el-radio-group>
+            <el-radio-group v-model="radioButtonValue">
+              <el-radio-button label="desktop">
+                桌面
+              </el-radio-button>
+              <el-radio-button label="mobile">
+                手机
+              </el-radio-button>
             </el-radio-group>
             <div class="stack">
               <el-switch
@@ -713,21 +781,36 @@ onUnmounted(() => {
             <el-select
               v-model="selectValue"
               placeholder="选择团队"
+              clearable
               style="width:100%;"
             >
-              <el-option
-                label="Studio"
-                value="studio"
-              />
-              <el-option
-                label="Platform"
-                value="platform"
-              />
+              <el-option-group label="核心团队">
+                <el-option
+                  label="Studio"
+                  value="studio"
+                />
+                <el-option
+                  label="Platform"
+                  value="platform"
+                />
+              </el-option-group>
+              <el-option-group label="支持团队">
+                <el-option
+                  label="Design Ops"
+                  value="design-ops"
+                />
+                <el-option
+                  label="QA"
+                  value="qa"
+                  disabled
+                />
+              </el-option-group>
             </el-select>
             <el-select-v2
               v-model="selectV2Value"
               :options="selectV2Options"
               placeholder="选择城市"
+              clearable
               style="width:100%;"
             />
             <el-cascader
@@ -957,6 +1040,21 @@ onUnmounted(() => {
                 :height="220"
               />
             </div>
+            <div
+              class="table-scroll-shell"
+              style="height:240px;"
+            >
+              <el-auto-resizer>
+                <template #default="{ width }">
+                  <el-table-v2
+                    :columns="tableV2Columns"
+                    :data="tableV2Data"
+                    :width="Math.max(width, 320)"
+                    :height="220"
+                  />
+                </template>
+              </el-auto-resizer>
+            </div>
           </article>
 
           <article class="demo-card">
@@ -988,6 +1086,13 @@ onUnmounted(() => {
                 animated
                 :rows="4"
               />
+              <el-skeleton animated>
+                <template #template>
+                  <el-skeleton-item variant="image" />
+                  <el-skeleton-item variant="h3" />
+                  <el-skeleton-item variant="text" />
+                </template>
+              </el-skeleton>
             </div>
             <el-divider content-position="left">
               分割线
@@ -1167,6 +1272,19 @@ onUnmounted(() => {
                   Tooltip
                 </el-button>
               </el-tooltip>
+              <el-tooltip-v2
+                always-on
+                show-arrow
+                placement="top"
+                :teleported="false"
+              >
+                <template #trigger>
+                  <el-button plain>
+                    Tooltip V2
+                  </el-button>
+                </template>
+                Tooltip V2 示例
+              </el-tooltip-v2>
               <el-popover
                 placement="bottom"
                 title="Popover"

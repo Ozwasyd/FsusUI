@@ -12,6 +12,8 @@ $directions: rtl, ltr, ttb, btt;
   position: absolute;
   box-sizing: border-box;
   background-color: getCssVar('drawer', 'bg-color');
+  backdrop-filter: getCssVar('bg-color', 'overlay-blur');
+  -webkit-backdrop-filter: getCssVar('bg-color', 'overlay-blur');
   display: flex;
   flex-direction: column;
   box-shadow: getCssVar('box-shadow', 'dark');
@@ -20,23 +22,27 @@ $directions: rtl, ltr, ttb, btt;
     getCssVar('transition-function-fast-bezier');
   will-change: transform;
 
-  @each $direction in $directions {
-    .#{$direction} {
-      transform: translate3d(0, 0, 0);
-    }
-  }
-
-  &__sr-focus:focus {
-    outline: none !important;
-  }
-
+  // The "Punctuation" Motif (Grey Dot) in header
   &__header {
     align-items: center;
-    color: getCssVar('text-color', 'regular');
+    color: getCssVar('text-color', 'primary');
     display: flex;
-    margin-bottom: 32px;
+    margin-bottom: 0;
     padding: getCssVar('drawer-padding-primary');
-    padding-bottom: 0;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 16px;
+      top: 38px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: getCssVar('color-info');
+      opacity: 0.6;
+    }
+
     & > :first-child {
       flex: 1;
     }
@@ -45,10 +51,11 @@ $directions: rtl, ltr, ttb, btt;
   &__title {
     margin: 0;
     flex: 1;
-    line-height: inherit;
-    font-size: 1.125rem;
-    font-weight: 600;
+    line-height: 1.2;
+    font-size: 1.5rem;
+    font-weight: 700;
     color: getCssVar('text-color', 'primary');
+    letter-spacing: -0.02em;
   }
 
   @include e(footer) {

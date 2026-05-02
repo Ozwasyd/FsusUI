@@ -41,10 +41,6 @@ export const alertProps = buildProps({
    * @description whether show icon
    */
   showIcon: Boolean,
-  /**
-   * @description should content be placed in center.
-   */
-  center: Boolean,
   effect: {
     type: String,
     values: alertEffects,

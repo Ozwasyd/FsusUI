@@ -27,12 +27,6 @@ export const stepsProps = buildProps({
     values: ['horizontal', 'vertical'],
   },
   /**
-   * @description center title and description
-   */
-  alignCenter: {
-    type: Boolean,
-  },
-  /**
    * @description whether to apply simple theme
    */
   simple: {

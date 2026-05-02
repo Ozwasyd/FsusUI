@@ -171,6 +171,7 @@ export default [
       'scripts/**/*.{js,mjs,ts}',
       'packages/icons-vue/build/**/*.{js,mjs,ts}',
       'playwright.config.ts',
+      'playwright.reuse.config.ts',
       '.github/**/*.{js,mjs,ts}',
     ],
     rules: {

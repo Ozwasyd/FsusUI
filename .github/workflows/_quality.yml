@@ -39,6 +39,10 @@ jobs:
   unit:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ['1/4', '2/4', '3/4', '4/4']
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -54,7 +58,9 @@ jobs:
           version: 5.0.4
           actions-cache-folder: emsdk-cache
       - run: pnpm install --frozen-lockfile
-      - run: pnpm test:run
+      - run: pnpm run ensure:icons
+      - run: pnpm run ensure:wasm
+      - run: pnpm exec vitest run --shard=${{ matrix.shard }}
 
   coverage:
     runs-on: ubuntu-latest
@@ -125,6 +131,10 @@ jobs:
   visual:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [desktop-light, mobile-light, desktop-dark, mobile-dark]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -141,12 +151,12 @@ jobs:
           actions-cache-folder: emsdk-cache
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test:visual
+      - run: pnpm test:visual -- --project=${{ matrix.project }}
       - uses: actions/upload-artifact@v4
         if: failure()
         continue-on-error: true
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.project }}
           path: |
             playwright-report
             test-results

@@ -44,15 +44,6 @@ describe('Steps.vue', () => {
     )
   })
 
-  test('alignCenter', () => {
-    const wrapper = _mount(() => (
-      <Steps alignCenter>
-        <Step />
-      </Steps>
-    ))
-    expect(wrapper.find('.el-step').classes()).toContain('is-center')
-  })
-
   test('direction', () => {
     const wrapper = _mount(() => (
       <Steps direction="vertical">
@@ -65,7 +56,7 @@ describe('Steps.vue', () => {
 
   test('simple', () => {
     const wrapper = _mount(() => (
-      <Steps simple direction="vertical" space={100} alignCenter>
+      <Steps simple direction="vertical" space={100}>
         <Step />
       </Steps>
     ))

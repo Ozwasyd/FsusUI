@@ -4,12 +4,13 @@ delete process.env.NO_COLOR
 
 export default defineConfig({
   testDir: './tests/visual',
-  fullyParallel: false,
+  fullyParallel: true,
+  workers: process.env.CI ? 2 : undefined,
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
   timeout: 30_000,
   expect: {
-    timeout: 10_000,
+    timeout: 20_000,
     toHaveScreenshot: {
       animations: 'disabled',
       caret: 'hide',

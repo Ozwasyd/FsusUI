@@ -6,66 +6,84 @@
   @include set-component-css-var('alert', $alert);
 
   width: 100%;
-  padding: getCssVar('alert', 'padding');
+  padding: 16px 24px;
   margin: 0;
   box-sizing: border-box;
   border-radius: getCssVar('alert', 'border-radius-base');
   position: relative;
-  background-color: getCssVar('color', 'white');
+  background-color: getCssVar('bg-color', 'page');
+  border: 1px solid getCssVar('border-color-lighter');
   overflow: hidden;
   opacity: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   transition: opacity getCssVar('transition-duration', 'fast');
 
+  // The "Punctuation" Motif (Grey Dot)
+  &::before {
+    content: '';
+    position: absolute;
+    top: 22px;
+    left: 12px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: getCssVar('color-info');
+    opacity: 0.8;
+  }
+
   @include when(light) {
+    background-color: getCssVar('bg-color', 'page');
+    color: getCssVar('text-color', 'primary');
+
+    .#{$namespace}-alert__close-btn {
+      color: getCssVar('text-color', 'secondary');
+    }
+  }
+
+  @include when(dark) {
+    background-color: getCssVar('color', 'black');
+    color: getCssVar('color', 'white');
+    border-color: getCssVar('color', 'black');
+
+    .#{$namespace}-alert__title {
+      color: getCssVar('color', 'white');
+    }
+
+    .#{$namespace}-alert__description {
+      color: getCssVar('text-color', 'placeholder');
+    }
+
     .#{$namespace}-alert__close-btn {
       color: getCssVar('text-color', 'placeholder');
     }
   }
 
-  @include when(dark) {
-    .#{$namespace}-alert__close-btn {
-      color: getCssVar('color', 'white');
-    }
-    .#{$namespace}-alert__description {
-      color: getCssVar('color', 'white');
-    }
-  }
-
-  @include when(center) {
-    justify-content: center;
-  }
-
   @each $type in (success, info, warning, error) {
     @include m($type) {
-      @include css-var-from-global(
-        ('alert', 'bg-color'),
-        ('color', $type, 'light-9')
-      );
+      // Subtle accent line instead of full background
+      border-left: 3px solid getCssVar('color', $type);
 
       &.is-light {
-        background-color: getCssVar('alert', 'bg-color');
-        color: getCssVar('color', $type);
-
-        .#{$namespace}-alert__description {
+        .#{$namespace}-alert__icon {
           color: getCssVar('color', $type);
         }
       }
 
       &.is-dark {
-        background-color: getCssVar('color', $type);
-        color: getCssVar('color', 'white');
+        // Dark mode keeps it scholarly, no neon colors
+        border-left-color: getCssVar('color', $type);
       }
     }
   }
 
   @include e(content) {
-    display: table-cell;
-    padding: 0 8px;
+    padding: 0 12px;
+    flex: 1;
   }
 
   & .#{$namespace}-alert__icon {
+    margin-top: 2px;
     font-size: getCssVar('alert', 'icon-size');
     width: getCssVar('alert', 'icon-size');
 
@@ -77,26 +95,34 @@
 
   @include e(title) {
     font-size: getCssVar('alert', 'title-font-size');
-    line-height: 18px;
-    vertical-align: text-top;
+    line-height: 20px;
+    font-weight: 600;
+    color: getCssVar('text-color', 'primary');
+
     @include when(bold) {
-      font-weight: bold;
+      font-weight: 700;
     }
   }
 
   & .#{$namespace}-alert__description {
     font-size: getCssVar('alert', 'description-font-size');
-    margin: 5px 0 0 0;
+    line-height: 1.6;
+    margin: 8px 0 0 0;
+    color: getCssVar('text-color', 'regular');
   }
 
   & .#{$namespace}-alert__close-btn {
-    @include icon-button(44px, 999px);
+    @include icon-button(32px, 999px);
     font-size: getCssVar('alert', 'close-font-size');
-    opacity: 1;
+    opacity: 0.6;
     position: absolute;
-    top: 50%;
-    right: 8px;
-    transform: translateY(-50%);
+    top: 12px;
+    right: 12px;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 1;
+    }
 
     &:focus-visible {
       @include a11y-focus-ring(2px, 999px);
@@ -105,8 +131,7 @@
     @include when(customed) {
       font-style: normal;
       font-size: getCssVar('alert', 'close-customed-font-size');
-      top: 10px;
-      transform: none;
+      top: 14px;
     }
   }
 }

@@ -42,8 +42,6 @@
               ref="dialogContentRef"
               v-bind="$attrs"
               :custom-class="customClass"
-              :center="center"
-              :align-center="alignCenter"
               :close-icon="closeIcon"
               :draggable="draggable"
               :fullscreen="fullscreen"

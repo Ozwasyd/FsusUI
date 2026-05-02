@@ -26,6 +26,17 @@
     &.hover,
     &:hover {
       background-color: map.get($select-option, 'hover-background');
+      color: getCssVar('color', 'scholarly-blue');
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 4px;
+        bottom: 4px;
+        width: 2px;
+        background-color: getCssVar('color', 'scholarly-blue');
+      }
     }
 
     &.selected {

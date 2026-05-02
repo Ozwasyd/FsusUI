@@ -69,7 +69,7 @@
             <div :id="contentId" :class="ns.e('content')">
               <div :class="ns.e('container')">
                 <el-icon
-                  v-if="iconComponent && !center && hasMessage"
+                  v-if="iconComponent && hasMessage"
                   :class="[ns.e('status'), typeClass]"
                 >
                   <component :is="iconComponent" />
@@ -229,7 +229,6 @@ export default defineComponent({
       type: Boolean,
       default: true,
     },
-    center: Boolean,
     draggable: Boolean,
     roundButton: {
       default: false,

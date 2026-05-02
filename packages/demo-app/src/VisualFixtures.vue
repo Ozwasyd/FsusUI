@@ -1,33 +1,62 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import { demoComponents } from './demo-components'
+import type { CheckboxGroupValueType } from '../../element-plus'
 
 const {
+  ElAutoResizer,
+  ElAlert,
+  ElBadge,
   ElButton,
+  ElButtonGroup,
   ElCascader,
+  ElCheckboxButton,
+  ElCheckboxGroup,
+  ElCollapseTransition,
+  ElCol,
   ElDatePicker,
   ElDialog,
   ElDrawer,
   ElDropdown,
   ElDropdownItem,
   ElDropdownMenu,
+  ElEmpty,
   ElInput,
   ElInputNumber,
+  ElIcon,
   ElOption,
+  ElOptionGroup,
   ElPagination,
   ElPopover,
+  ElProgress,
+  ElRadioButton,
+  ElRadioGroup,
+  ElRow,
+  ElScrollbar,
   ElSelect,
   ElSelectV2,
+  ElSkeleton,
+  ElSkeletonItem,
   ElSpace,
+  ElSwitch,
   ElTable,
   ElTableColumn,
   ElTableV2,
+  ElTag,
+  ElText,
   ElTimePicker,
   ElTooltip,
+  ElTooltipV2,
   ElTree,
   ElTreeSelect,
   ElUpload,
+  ElVisuallyHidden,
 } = demoComponents
+
+const iconGallery = Object.entries(ElementPlusIconsVue)
+  .map(([name, component]) => ({ name, component }))
+  .sort((first, second) => first.name.localeCompare(second.name))
 
 const props = defineProps<{
   mode: string
@@ -39,6 +68,8 @@ const inputValue = ref('FsusUI')
 const inputNumberValue = ref<number | undefined>(12.34)
 const selectValue = ref('studio')
 const selectV2Value = ref('hangzhou')
+const checkboxButtonValue = ref<CheckboxGroupValueType>(['Desktop', 'A11y'])
+const radioButtonValue = ref<boolean | string | number>('desktop')
 const cascaderValue = ref<any>(['guide', 'token'])
 const currentPage = ref(2)
 const dateValue = ref(new Date('2026-04-22T09:00:00+08:00'))
@@ -46,6 +77,8 @@ const timeValue = ref(new Date('2026-04-22T10:30:00+08:00'))
 const dialogVisible = ref(true)
 const drawerVisible = ref(true)
 const dropdownVisible = ref(false)
+const switchValue = ref(true)
+const transitionVisible = ref(true)
 
 const selectOptions = [
   { label: 'Studio', value: 'studio' },
@@ -133,6 +166,14 @@ const pageTitle = computed(() => {
       return 'Visual Fixtures / Data'
     case 'surfaces':
       return 'Visual Fixtures / Surfaces'
+    case 'states':
+      return 'Visual Fixtures / Boundary States'
+    case 'overlays':
+      return 'Visual Fixtures / Overlay Boundaries'
+    case 'data-boundaries':
+      return 'Visual Fixtures / Data Boundaries'
+    case 'icons':
+      return 'Visual Fixtures / Icons'
     default:
       return 'Visual Fixtures'
   }
@@ -177,9 +218,22 @@ const drawerSize = computed(() => (isCompact.value ? '100%' : '40%'))
       <article class="fixture-card">
         <h2>Input</h2>
         <el-space fill>
-          <el-input v-model="inputValue" placeholder="请输入关键字" />
+          <el-input v-model="inputValue" placeholder="请输入关键字" clearable />
           <el-input model-value="Readonly" readonly />
+          <el-input model-value="Disabled" disabled />
           <el-input model-value="" placeholder="Empty state" clearable />
+        </el-space>
+      </article>
+
+      <article class="fixture-card">
+        <h2>Button Group</h2>
+        <el-space fill>
+          <el-button-group>
+            <el-button>Prev</el-button>
+            <el-button type="primary">Next</el-button>
+          </el-button-group>
+          <el-button loading>Loading</el-button>
+          <el-button disabled>Disabled</el-button>
         </el-space>
       </article>
 
@@ -190,13 +244,18 @@ const drawerSize = computed(() => (isCompact.value ? '100%' : '40%'))
 
       <article class="fixture-card">
         <h2>Select</h2>
-        <el-select v-model="selectValue" :teleported="false">
-          <el-option
-            v-for="option in selectOptions"
-            :key="option.value"
-            :label="option.label"
-            :value="option.value"
-          />
+        <el-select v-model="selectValue" :teleported="false" clearable>
+          <el-option-group label="Teams">
+            <el-option
+              v-for="option in selectOptions"
+              :key="option.value"
+              :label="option.label"
+              :value="option.value"
+            />
+          </el-option-group>
+          <el-option-group label="Disabled">
+            <el-option label="Archive" value="archive" disabled />
+          </el-option-group>
         </el-select>
       </article>
 
@@ -216,6 +275,21 @@ const drawerSize = computed(() => (isCompact.value ? '100%' : '40%'))
           :options="cascaderOptions"
           :teleported="false"
         />
+      </article>
+
+      <article class="fixture-card">
+        <h2>Choice Buttons</h2>
+        <el-space fill>
+          <el-checkbox-group v-model="checkboxButtonValue">
+            <el-checkbox-button label="Desktop" />
+            <el-checkbox-button label="Mobile" />
+            <el-checkbox-button label="A11y" />
+          </el-checkbox-group>
+          <el-radio-group v-model="radioButtonValue">
+            <el-radio-button label="desktop">Desktop</el-radio-button>
+            <el-radio-button label="mobile">Mobile</el-radio-button>
+          </el-radio-group>
+        </el-space>
       </article>
 
       <article class="fixture-card">
@@ -271,6 +345,30 @@ const drawerSize = computed(() => (isCompact.value ? '100%' : '40%'))
         <div class="fixture-scroll-shell">
           <el-table-v2 :columns="tableV2Columns" :data="tableV2Data" :width="tableV2Width" :height="220" />
         </div>
+        <div class="fixture-scroll-shell" style="height: 240px; margin-top: 12px">
+          <el-auto-resizer>
+            <template #default="{ width }">
+              <el-table-v2
+                :columns="tableV2Columns"
+                :data="tableV2Data"
+                :width="Math.max(width, 320)"
+                :height="220"
+              />
+            </template>
+          </el-auto-resizer>
+        </div>
+      </article>
+
+      <article class="fixture-card">
+        <h2>Skeleton Item</h2>
+        <el-skeleton animated>
+          <template #template>
+            <el-skeleton-item variant="image" />
+            <el-skeleton-item variant="h3" />
+            <el-skeleton-item variant="text" />
+            <el-skeleton-item variant="text" />
+          </template>
+        </el-skeleton>
       </article>
 
       <article class="fixture-card">
@@ -292,6 +390,279 @@ const drawerSize = computed(() => (isCompact.value ? '100%' : '40%'))
     </section>
 
     <section
+      v-else-if="mode === 'states'"
+      v-bind="{ 'data-testid': 'fixture-states' }"
+      class="fixture-grid"
+    >
+      <article class="fixture-card">
+        <h2>Empty / Disabled / Loading</h2>
+        <el-space fill>
+          <el-input model-value="" placeholder="Empty input" clearable />
+          <el-input model-value="Readonly boundary" readonly />
+          <el-input model-value="Disabled boundary" disabled />
+          <el-button loading>Loading action</el-button>
+          <el-button disabled>Disabled action</el-button>
+        </el-space>
+      </article>
+
+      <article class="fixture-card">
+        <h2>Text Overflow</h2>
+        <el-space fill>
+          <el-text truncated>
+            This is a deliberately long boundary string that should stay inside
+            the fixture card without changing the visual system.
+          </el-text>
+          <el-tag>short</el-tag>
+          <el-tag type="warning">very-long-tag-label-boundary</el-tag>
+          <el-alert
+            title="Long state message"
+            description="Long descriptions, compact cards, and status icons share this state fixture."
+            type="warning"
+            show-icon
+            :closable="false"
+          />
+        </el-space>
+      </article>
+
+      <article class="fixture-card">
+        <h2>Binary Controls</h2>
+        <el-space fill>
+          <el-switch
+            :model-value="switchValue"
+            active-text="On"
+            inactive-text="Off"
+            @update:model-value="switchValue = $event === true"
+          />
+          <el-radio-group v-model="radioButtonValue">
+            <el-radio-button label="desktop">Desktop</el-radio-button>
+            <el-radio-button label="mobile">Mobile</el-radio-button>
+          </el-radio-group>
+          <el-checkbox-group v-model="checkboxButtonValue">
+            <el-checkbox-button label="Desktop" />
+            <el-checkbox-button label="Mobile" disabled />
+            <el-checkbox-button label="A11y" />
+          </el-checkbox-group>
+        </el-space>
+      </article>
+
+      <article class="fixture-card">
+        <h2>Assistive / Transition</h2>
+        <el-visually-hidden>Assistive text boundary</el-visually-hidden>
+        <el-button @click="transitionVisible = !transitionVisible">
+          Toggle transition
+        </el-button>
+        <el-collapse-transition>
+          <div v-show="transitionVisible" class="fixture-note">
+            Collapse transition content
+          </div>
+        </el-collapse-transition>
+        <el-badge :value="99">
+          <el-button>Badge boundary</el-button>
+        </el-badge>
+      </article>
+    </section>
+
+    <section
+      v-else-if="mode === 'overlays'"
+      v-bind="{ 'data-testid': 'fixture-overlays' }"
+      class="fixture-grid"
+    >
+      <article class="fixture-card">
+        <h2>Tooltip / Popover</h2>
+        <el-space>
+          <el-tooltip
+            :visible="true"
+            content="Visible tooltip boundary"
+            :teleported="false"
+          >
+            <el-button>Tooltip</el-button>
+          </el-tooltip>
+          <el-tooltip-v2
+            always-on
+            show-arrow
+            placement="right"
+            :teleported="false"
+          >
+            <template #trigger>
+              <el-button>Tooltip V2</el-button>
+            </template>
+            Tooltip V2 overlay
+          </el-tooltip-v2>
+          <el-popover
+            :visible="true"
+            title="Popover boundary"
+            content="Persistent popover content"
+            :teleported="false"
+          >
+            <template #reference>
+              <el-button>Popover</el-button>
+            </template>
+          </el-popover>
+        </el-space>
+      </article>
+
+      <article class="fixture-card">
+        <h2>Dropdown</h2>
+        <el-dropdown
+          trigger="click"
+          :hide-on-click="false"
+          :teleported="false"
+        >
+          <span class="dropdown-trigger-proxy">
+            <el-button>Open Dropdown</el-button>
+          </span>
+          <template #dropdown>
+            <div class="dropdown-menu-proxy">
+              <el-dropdown-menu>
+                <el-dropdown-item>Primary</el-dropdown-item>
+                <el-dropdown-item divided>Separated</el-dropdown-item>
+                <el-dropdown-item disabled>Disabled</el-dropdown-item>
+              </el-dropdown-menu>
+            </div>
+          </template>
+        </el-dropdown>
+      </article>
+
+      <article class="fixture-card fixture-card--wide">
+        <h2>Dialog</h2>
+        <el-dialog
+          v-model="dialogVisible"
+          title="Boundary Dialog"
+          :append-to-body="false"
+          :modal="false"
+          :width="dialogWidth"
+        >
+          <p>Dialog boundary content with footer actions and close affordance.</p>
+          <template #footer>
+            <el-button>Cancel</el-button>
+            <el-button type="primary">Confirm</el-button>
+          </template>
+        </el-dialog>
+      </article>
+
+      <article class="fixture-card fixture-card--wide">
+        <h2>Drawer</h2>
+        <el-drawer
+          v-model="drawerVisible"
+          :append-to-body="false"
+          :modal="false"
+          :size="drawerSize"
+          title="Boundary Drawer"
+        >
+          <p>Drawer boundary content remains mounted in fixture scope.</p>
+        </el-drawer>
+      </article>
+    </section>
+
+    <section
+      v-else-if="mode === 'data-boundaries'"
+      v-bind="{ 'data-testid': 'fixture-data-boundaries' }"
+      class="fixture-grid"
+    >
+      <article class="fixture-card fixture-card--wide">
+        <h2>Empty Table / Overflow Table</h2>
+        <div class="fixture-scroll-shell">
+          <el-table :data="[]" empty-text="No boundary rows" style="width: 100%; min-width: 520px">
+            <el-table-column prop="date" label="Date" width="140" />
+            <el-table-column prop="name" label="Name" min-width="220" />
+            <el-table-column prop="address" label="Status" min-width="220" />
+          </el-table>
+        </div>
+      </article>
+
+      <article class="fixture-card fixture-card--wide">
+        <h2>Auto Resized Virtual Table</h2>
+        <div class="fixture-scroll-shell" style="height: 260px">
+          <el-auto-resizer>
+            <template #default="{ width }">
+              <el-table-v2
+                :columns="tableV2Columns"
+                :data="tableV2Data"
+                :width="Math.max(width, 320)"
+                :height="240"
+              />
+            </template>
+          </el-auto-resizer>
+        </div>
+      </article>
+
+      <article class="fixture-card">
+        <h2>Empty States</h2>
+        <el-empty description="No data boundary">
+          <el-button>Reset</el-button>
+        </el-empty>
+      </article>
+
+      <article class="fixture-card">
+        <h2>Tree Boundaries</h2>
+        <el-space fill>
+          <el-tree :data="[]" empty-text="No tree nodes" />
+          <el-tree-select
+            model-value=""
+            :data="[]"
+            placeholder="No tree options"
+            :teleported="false"
+          />
+        </el-space>
+      </article>
+
+      <article class="fixture-card">
+        <h2>Progress / Pagination</h2>
+        <el-space fill>
+          <el-progress :percentage="0" />
+          <el-progress :percentage="100" status="success" />
+          <el-pagination
+            v-model:current-page="currentPage"
+            layout="prev, pager, next, total"
+            :page-size="1"
+            :total="1"
+            :small="isCompact"
+          />
+        </el-space>
+      </article>
+
+      <article class="fixture-card">
+        <h2>Grid Boundaries</h2>
+        <el-row :gutter="12" justify="space-between" align="middle">
+          <el-col :span="12">
+            <div class="fixture-note">Col 12</div>
+          </el-col>
+          <el-col :span="12">
+            <div class="fixture-note">Col 12</div>
+          </el-col>
+        </el-row>
+      </article>
+    </section>
+
+    <section
+      v-else-if="mode === 'icons'"
+      v-bind="{ 'data-testid': 'fixture-icons' }"
+      class="fixture-grid"
+    >
+      <article class="fixture-card fixture-card--wide">
+        <h2>Icon Gallery</h2>
+        <p class="fixture-note">{{ iconGallery.length }} icons</p>
+        <el-scrollbar height="520px">
+          <el-space wrap>
+            <el-tooltip
+              v-for="icon in iconGallery"
+              :key="icon.name"
+              :content="icon.name"
+              :teleported="false"
+            >
+              <el-button size="small" plain>
+                <el-icon>
+                  <component :is="icon.component" />
+                </el-icon>
+                {{ icon.name }}
+              </el-button>
+            </el-tooltip>
+          </el-space>
+        </el-scrollbar>
+      </article>
+    </section>
+
+    <section
       v-else
       v-bind="{ 'data-testid': 'fixture-surfaces' }"
       class="fixture-grid"
@@ -307,6 +678,18 @@ const drawerSize = computed(() => (isCompact.value ? '100%' : '40%'))
           >
             <el-button>Tooltip</el-button>
           </el-tooltip>
+
+          <el-tooltip-v2
+            always-on
+            show-arrow
+            placement="top"
+            :teleported="false"
+          >
+            <template #trigger>
+              <el-button>Tooltip V2</el-button>
+            </template>
+            Tooltip V2 state
+          </el-tooltip-v2>
 
           <el-popover
             :visible="true"
@@ -376,6 +759,28 @@ const drawerSize = computed(() => (isCompact.value ? '100%' : '40%'))
         >
           <p>Drawer spacing and header actions are validated here.</p>
         </el-drawer>
+      </article>
+
+      <article class="fixture-card fixture-card--wide">
+        <h2>Icon Gallery</h2>
+        <p class="fixture-note">{{ iconGallery.length }} icons</p>
+        <el-scrollbar height="360px">
+          <el-space wrap>
+            <el-tooltip
+              v-for="icon in iconGallery"
+              :key="icon.name"
+              :content="icon.name"
+              :teleported="false"
+            >
+              <el-button size="small" plain>
+                <el-icon>
+                  <component :is="icon.component" />
+                </el-icon>
+                {{ icon.name }}
+              </el-button>
+            </el-tooltip>
+          </el-space>
+        </el-scrollbar>
       </article>
     </section>
   </main>

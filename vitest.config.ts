@@ -21,11 +21,13 @@ export default defineConfig({
     clearMocks: true,
     include: [
       'packages/**/__tests__/**/*.{test,spec,vitest}.{js,jsx,ts,tsx}',
+      'tests/boundary/**/*.{test,spec,vitest}.{js,jsx,ts,tsx}',
     ],
     exclude: [
       '**/node_modules/**',
       'tests/visual/**',
       'playwright.config.ts',
+      'playwright.reuse.config.ts',
     ],
     testTimeout: 20_000,
     environment: 'jsdom',
@@ -52,6 +54,7 @@ export default defineConfig({
         '**/*.d.ts',
         'tests/visual/**',
         'playwright.config.ts',
+        'playwright.reuse.config.ts',
       ],
     },
   },

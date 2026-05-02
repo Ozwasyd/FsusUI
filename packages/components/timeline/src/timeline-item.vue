@@ -1,5 +1,5 @@
 <template>
-  <li :class="[ns.b(), { [ns.e('center')]: center }]">
+  <li :class="[ns.b()]">
     <div :class="ns.e('tail')" />
     <div
       v-if="!$slots.dot"

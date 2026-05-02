@@ -96,9 +96,6 @@ export interface ElMessageBoxOptions {
   /** Custom class name of confirm button */
   confirmButtonClass?: string
 
-  /** Whether to align the content in center */
-  center?: boolean
-
   /** Whether MessageBox can be drag */
   draggable?: boolean
 

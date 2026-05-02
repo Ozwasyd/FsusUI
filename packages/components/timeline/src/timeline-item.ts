@@ -18,13 +18,6 @@ export const timelineItemProps = buildProps({
     default: false,
   },
   /**
-   * @description whether vertically centered
-   */
-  center: {
-    type: Boolean,
-    default: false,
-  },
-  /**
    * @description position of timestamp
    */
   placement: {

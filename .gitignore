@@ -52,3 +52,4 @@ tmp
 /process_theme.js
 /run_decouple.mjs
 /split-fsus-theme.mjs
+.vscode/settings.json

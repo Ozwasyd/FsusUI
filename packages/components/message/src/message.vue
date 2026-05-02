@@ -11,7 +11,6 @@
       :class="[
         ns.b(),
         { [ns.m(type)]: type && !icon },
-        ns.is('center', center),
         ns.is('closable', showClose),
         customClass,
       ]"

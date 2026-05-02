@@ -12,8 +12,8 @@
   position: relative;
   margin: var(#{getCssVarName('dialog-margin-top')}, 15vh) auto 50px;
   background: getCssVar('bg-color', 'overlay');
-  backdrop-filter: blur(var(--el-overlay-backdrop-blur, 16px));
-  -webkit-backdrop-filter: blur(var(--el-overlay-backdrop-blur, 16px));
+  backdrop-filter: getCssVar('bg-color', 'overlay-blur');
+  -webkit-backdrop-filter: getCssVar('bg-color', 'overlay-blur');
   border-radius: getCssVar('dialog', 'border-radius');
   box-shadow: getCssVar('dialog', 'box-shadow');
   box-sizing: border-box;
@@ -110,20 +110,6 @@
     padding-top: 10px;
     text-align: right;
     box-sizing: border-box;
-  }
-
-  // 内容居中布局
-  @include m(center) {
-    text-align: center;
-
-    @include e(body) {
-      text-align: initial;
-      padding: 25px calc(#{getCssVar('dialog-padding-primary')} + 5px) 30px;
-    }
-
-    @include e(footer) {
-      text-align: inherit;
-    }
   }
 }
 

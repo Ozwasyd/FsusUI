@@ -109,17 +109,6 @@ describe('Dialog.vue', () => {
     wrapper.unmount()
   })
 
-  test('should center dialog', async () => {
-    const wrapper = mount(
-      <Dialog modelValue={true} center={true}>
-        {AXIOM}
-      </Dialog>
-    )
-
-    await nextTick()
-    expect(wrapper.find('.el-dialog--center').exists()).toBe(true)
-  })
-
   test('should show close button', async () => {
     const wrapper = mount(<Dialog modelValue={true}>{AXIOM}</Dialog>)
 

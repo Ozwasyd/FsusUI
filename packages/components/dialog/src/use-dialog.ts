@@ -58,9 +58,6 @@ export const useDialog = (
   })
 
   const overlayDialogStyle = computed<CSSProperties>(() => {
-    if (props.alignCenter) {
-      return { display: 'flex' }
-    }
     return {}
   })
 

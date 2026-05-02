@@ -46,33 +46,47 @@ test.beforeEach(async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
 })
 
+const visualFixtures = [
+  { mode: 'forms', testId: 'fixture-forms', screenshot: 'visual-forms.png' },
+  { mode: 'data', testId: 'fixture-data', screenshot: 'visual-data.png' },
+  {
+    mode: 'surfaces',
+    testId: 'fixture-surfaces',
+    screenshot: 'visual-surfaces.png',
+    openDropdown: true,
+  },
+  { mode: 'states', testId: 'fixture-states', screenshot: 'visual-states.png' },
+  {
+    mode: 'overlays',
+    testId: 'fixture-overlays',
+    screenshot: 'visual-overlays.png',
+    openDropdown: true,
+  },
+  {
+    mode: 'data-boundaries',
+    testId: 'fixture-data-boundaries',
+    screenshot: 'visual-data-boundaries.png',
+  },
+  { mode: 'icons', testId: 'fixture-icons', screenshot: 'visual-icons.png' },
+] as const
+
 test('home smoke page stays stable', async ({ page }) => {
   await page.goto(buildVisualUrl(null, test.info().project.name))
   await stabilizePage(page)
   await expect(page).toHaveScreenshot('home-smoke.png')
 })
 
-test('forms fixtures stay stable', async ({ page }) => {
-  await page.goto(buildVisualUrl('forms', test.info().project.name))
-  await stabilizePage(page)
-  await expect(page.locator('[data-testid="fixture-forms"]')).toHaveScreenshot(
-    'visual-forms.png'
-  )
-})
+for (const fixture of visualFixtures) {
+  test(`${fixture.mode} fixtures stay stable`, async ({ page }) => {
+    await page.goto(buildVisualUrl(fixture.mode, test.info().project.name))
+    await stabilizePage(page)
 
-test('data fixtures stay stable', async ({ page }) => {
-  await page.goto(buildVisualUrl('data', test.info().project.name))
-  await stabilizePage(page)
-  await expect(page.locator('[data-testid="fixture-data"]')).toHaveScreenshot(
-    'visual-data.png'
-  )
-})
+    if ('openDropdown' in fixture && fixture.openDropdown) {
+      await page.locator('.dropdown-trigger-proxy button').click({ force: true })
+    }
 
-test('surfaces fixtures stay stable', async ({ page }) => {
-  await page.goto(buildVisualUrl('surfaces', test.info().project.name))
-  await stabilizePage(page)
-  await page.locator('.dropdown-trigger-proxy button').click({ force: true })
-  await expect(page.locator('[data-testid="fixture-surfaces"]')).toHaveScreenshot(
-    'visual-surfaces.png'
-  )
-})
+    await expect(page.locator(`[data-testid="${fixture.testId}"]`)).toHaveScreenshot(
+      fixture.screenshot
+    )
+  })
+}
