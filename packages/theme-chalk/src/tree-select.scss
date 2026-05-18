@@ -8,44 +8,83 @@
 
 @include b(tree-select) {
   @include e(popper) {
-    // padding-left same with select option
-    .#{$namespace}-tree-node__expand-icon {
-      margin-left: 8px;
+    .#{$namespace}-tree {
+      background: transparent;
+      padding: 6px 0;
     }
 
-    // remove icon when show checkbox
-    .#{$namespace}-tree-node.is-checked
-      > .#{$namespace}-tree-node__content
-      .#{$namespace}-select-dropdown__item.selected::after {
-      content: none;
-    }
-
-    .#{$namespace}-select-dropdown__item {
-      flex: 1;
+    // 容器层：彻底透明，不干扰视觉
+    .#{$namespace}-tree-node__content {
+      height: 44px !important; // 统一 44px
       background: transparent !important;
-
-      // padding-left move to `el-tree-node__expand-icon`
-      padding-left: 0;
-
-      // let tree node dictate its own height instead of capping at 20px
-      height: auto;
-      line-height: normal;
-
-      // 修复：display:list-item + min-height:44px 导致文字贴顶，改用 flex 居中
+      padding: 0 !important;
       display: flex;
       align-items: center;
+      margin: 2px 0;
+
+      &:hover {
+        background: transparent !important;
+      }
     }
 
-    // 修复：tree-node__content 在 popper 内不使用固定高度，避免与 dropdown item 双层堆叠错位
-    .#{$namespace}-tree-node__content {
-      height: auto;
-      min-height: 36px;
+    // 重点：通过缩进补齐，确保高亮块起始位置统一
+    .#{$namespace}-tree-node__expand-icon {
+      margin-left: 12px !important;
+      margin-right: 0 !important;
+      width: 24px;
+      text-align: center;
     }
 
-    // 修复：禁止 tree 节点在 popper 内显示自己的 focus ring（焦点语义由 input trigger 承担）
+    // 核心：高亮块，它必须完整包裹文字
+    .#{$namespace}-select-dropdown__item {
+      flex: 1;
+      height: 44px !important;
+      padding: 0 20px !important; // 极致呼吸感，确保文字远离边框
+      margin: 0 8px !important;
+      border-radius: 14px !important;
+      display: flex;
+      align-items: center;
+      background: transparent !important;
+      color: getCssVar('text-color', 'primary');
+      font-weight: 500;
+      position: relative;
+      overflow: visible;
+
+      span {
+        position: relative;
+        z-index: 1;
+      }
+
+      // 强调色：只在 hover/selected 时出现
+      &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 14px;
+        z-index: 0;
+        transition: all getCssVar('transition-duration');
+      }
+
+      &:hover, &.hover {
+        background: rgba(42, 89, 156, 0.08) !important;
+        outline: 1.5px solid var(--fsus-scholarly-blue) !important;
+        outline-offset: -1px;
+        color: var(--fsus-scholarly-blue) !important;
+      }
+    }
+
+    .#{$namespace}-tree-node.is-current > .#{$namespace}-tree-node__content .#{$namespace}-select-dropdown__item {
+      background: rgba(42, 89, 156, 0.05) !important;
+      color: var(--fsus-scholarly-blue) !important;
+      font-weight: 700;
+      outline: 1px solid rgba(42, 89, 156, 0.1);
+    }
+
     .#{$namespace}-tree-node:focus > .#{$namespace}-tree-node__content {
-      outline: none;
-      background-color: transparent;
+      outline: none !important;
     }
   }
 }

@@ -34,7 +34,12 @@ $button-icon-span-gap: map.merge(
   text-align: center;
   box-sizing: border-box;
   outline: none;
-  transition: all 0.3s getCssVar('transition-function-ease-in-out-bezier');
+  transition: background-color getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
+    border-color getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
+    color getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
+    box-shadow getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
+    transform getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
+    opacity getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier');
   font-weight: getCssVar('button', 'font-weight');
   user-select: none;
   vertical-align: middle;

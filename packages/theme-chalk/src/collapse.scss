@@ -31,11 +31,11 @@
     border-bottom: 1px solid getCssVar('collapse-border-color');
     font-size: getCssVar('collapse-header-font-size');
     font-weight: 500;
-    transition: border-bottom-color getCssVar('transition-duration');
+    transition: border-bottom-color getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier');
     outline: none;
     @include e(arrow) {
       margin: 0 8px 0 auto;
-      transition: transform getCssVar('transition-duration');
+      transition: transform getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier');
       font-weight: 300;
       @include when(active) {
         transform: rotate(90deg);

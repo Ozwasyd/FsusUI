@@ -1,4 +1,5 @@
 // CSS3 var
+@use 'sass:map';
 @use 'common/var' as *;
 @use 'mixins/var' as *;
 @use 'mixins/mixins' as *;
@@ -89,4 +90,41 @@
 
   // Svg
   @include css-var-from-global('svg-monochrome-grey', 'border-color');
+}
+
+// for dark
+.dark {
+  color-scheme: dark;
+
+  @include set-css-main-vars;
+  @include set-css-var-value(('color', 'scholarly-blue'), $color-scholarly-blue-dark);
+
+  @include set-css-var-value('color-white', map.get($colors-dark, 'white'));
+  @include set-css-var-value('color-black', map.get($colors-dark, 'black'));
+
+  // --el-color-#{$type}
+  // --el-color-#{$type}-light-{$i}
+  @each $type in (primary, success, warning, danger, error, info) {
+    @include set-css-color-type($colors-dark, $type);
+  }
+
+  // Background --el-bg-color-#{$type}
+  @include set-component-css-var('bg-color', $bg-color-dark);
+  // --el-text-color-#{$type}
+  @include set-component-css-var('text-color', $text-color-dark);
+  // --el-border-color-#{$type}
+  @include set-component-css-var('border-color', $border-color-dark);
+  // Fill --el-fill-color-#{$type}
+  @include set-component-css-var('fill-color', $fill-color-dark);
+
+  // Box-shadow
+  // --el-box-shadow-#{$type}
+  @include set-component-css-var('box-shadow', $box-shadow-dark);
+
+  // Disable base
+  @include set-component-css-var('disabled', $disabled);
+
+  // overlay & mask
+  @include set-component-css-var('overlay-color', $overlay-color);
+  @include set-component-css-var('mask-color', $mask-color);
 }

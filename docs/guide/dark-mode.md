@@ -1,40 +1,35 @@
 # 暗色模式
 
-FsusUI 支持暗色模式，通过 CSS 变量实现，与亮色模式完全解耦。
+FsusUI 2026 版内置了两种暗色模式的支持方式：**自动系统级自适应**和**手动切换**。
 
 ---
 
 ## 如何启用
 
-### 方式一：静态启用
+### 方式一：自动适应系统偏好 (Auto-Adaptation)
 
-在 HTML 根元素添加 `dark` class：
+**这是最推荐也是最省心的方式。**
 
-```html
-<html class="dark">
-  <head></head>
-  <body></body>
-</html>
-```
+从 `v2.0-REWRITE` 开始，FsusUI 默认内置了基于 CSS 媒体查询 `@media (prefers-color-scheme: dark)` 的暗色模式支持。
 
-### 方式二：动态切换（推荐）
+这意味着：**只要你引入了 FsusUI 的主题 CSS，调用端无需编写任何额外的 JavaScript 代码，组件库即可自动根据用户的操作系统或浏览器的偏好设置，无缝切换明暗模式。**
 
-推荐使用 [useDark | VueUse](https://vueuse.org/core/useDark/) 实现响应式切换：
+为了防止自动切换与手动强制覆盖冲突，自动切换仅在 `<html>` 标签上**没有** `.light` 类时生效。
+
+### 方式二：手动切换 (Manual Toggle)
+
+如果你的应用需要提供一个显式的切换开关（例如顶部的明暗模式切换按钮），你可以继续使用手动模式，或者结合 [useDark | VueUse](https://vueuse.org/core/useDark/) 实现。
+
+手动模式的优先级高于系统自适应。在 HTML 根元素添加 `dark` class 强制暗色，或添加 `light` class 强制亮色：
 
 ```ts
 import { useDark, useToggle } from '@vueuse/core'
 
+// 强制模式切换逻辑
+// 注意：使用 useDark 时，它会自动在 html 上添加 'dark' class。
+// 如果要彻底覆盖默认系统行为，你可能还需要在关闭暗色时显式添加 'light' class。
 const isDark = useDark()
 const toggleDark = useToggle(isDark)
-```
-
-### 引入暗色样式
-
-无论哪种方式，都需要在入口文件中引入暗色 CSS：
-
-```ts
-// main.ts
-import 'element-plus/theme-chalk/dark/css-vars.css'
 ```
 
 ---

@@ -256,7 +256,7 @@
         #{getCssVarName('input-icon-color')},
         map.get($input, 'icon-color')
       );
-      transition: all getCssVar('transition-duration');
+      transition: color getCssVar('transition-duration'), opacity getCssVar('transition-duration');
       pointer-events: none;
     }
 
@@ -291,7 +291,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: all getCssVar('transition-duration');
+    transition: color getCssVar('transition-duration'), opacity getCssVar('transition-duration');
     margin-left: 8px;
   }
 

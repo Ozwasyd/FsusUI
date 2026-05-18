@@ -14,7 +14,8 @@
   -webkit-backdrop-filter: getCssVar('bg-color', 'overlay-blur');
   overflow: hidden;
   color: getCssVar('text-color', 'primary');
-  transition: all getCssVar('transition-duration');
+  transition: transform getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
+    box-shadow getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier');
   box-shadow: getCssVar('box-shadow', 'lighter');
 
   @include when(always-shadow) {

@@ -165,7 +165,7 @@ $radio-font-size: map.merge(
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%) scale(0);
-      transition: transform 0.15s ease-in;
+      transition: transform getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier');
     }
   }
 

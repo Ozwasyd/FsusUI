@@ -40,6 +40,33 @@ $colors: map.deep-merge(
   $colors
 );
 
+$colors-dark: () !default;
+$colors-dark: map.deep-merge(
+  (
+    'white': #0f0f11,
+    'black': #fcfcfc,
+    'primary': (
+      'base': #fcfcfc,
+    ),
+    'success': (
+      'base': #22c55e,
+    ),
+    'warning': (
+      'base': #f59e0b,
+    ),
+    'danger': (
+      'base': #ef4444,
+    ),
+    'error': (
+      'base': #ef4444,
+    ),
+    'info': (
+      'base': #71717a,
+    ),
+  ),
+  $colors-dark
+);
+
 $color-white: map.get($colors, 'white') !default;
 $color-black: map.get($colors, 'black') !default;
 $color-primary: map.get($colors, 'primary', 'base') !default;
@@ -51,6 +78,7 @@ $color-info: map.get($colors, 'info', 'base') !default;
 
 // Scholarly Blue for functional feedback
 $color-scholarly-blue: #2a599c !default;
+$color-scholarly-blue-dark: #3b6fc2 !default;
 
 // https://sass-lang.com/documentation/values/maps#immutability
 // mix colors with white/black to generate light/dark level
@@ -109,6 +137,18 @@ $text-color: map.merge(
   $text-color
 );
 
+$text-color-dark: () !default;
+$text-color-dark: map.merge(
+  (
+    'primary': #fcfcfc,
+    'regular': #a1a1aa,
+    'secondary': #71717a,
+    'placeholder': #52525b,
+    'disabled': #3f3f46,
+  ),
+  $text-color-dark
+);
+
 $border-color: () !default;
 $border-color: map.merge(
   (
@@ -120,6 +160,19 @@ $border-color: map.merge(
     'darker': #a1a1aa,
   ),
   $border-color
+);
+
+$border-color-dark: () !default;
+$border-color-dark: map.merge(
+  (
+    '': #27272a,
+    'light': #1a1a1e,
+    'lighter': #151518,
+    'extra-light': #0f0f11,
+    'dark': #3f3f46,
+    'darker': #52525b,
+  ),
+  $border-color-dark
 );
 
 $fill-color: () !default;
@@ -136,6 +189,20 @@ $fill-color: map.merge(
   $fill-color
 );
 
+$fill-color-dark: () !default;
+$fill-color-dark: map.merge(
+  (
+    '': #1a1a1e,
+    'light': #27272a,
+    'lighter': #3f3f46,
+    'extra-light': #52525b,
+    'dark': #0f0f11,
+    'darker': #09090b,
+    'blank': #0f0f11,
+  ),
+  $fill-color-dark
+);
+
 // Background
 $bg-color: () !default;
 $bg-color: map.merge(
@@ -145,6 +212,16 @@ $bg-color: map.merge(
     'overlay': rgba(252, 252, 252, 0.75),
   ),
   $bg-color
+);
+
+$bg-color-dark: () !default;
+$bg-color-dark: map.merge(
+  (
+    '': #0f0f11,
+    'page': #0a0a0c,
+    'overlay': rgba(15, 15, 17, 0.85),
+  ),
+  $bg-color-dark
 );
 
 // Border
@@ -187,6 +264,30 @@ $box-shadow: map.merge(
     ),
   ),
   $box-shadow
+);
+
+$box-shadow-dark: () !default;
+$box-shadow-dark: map.merge(
+  (
+    '': (
+      0px 32px 64px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    ),
+    'light': (
+      0px 14px 40px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    ),
+    'lighter': (
+      0px 8px 24px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    ),
+    'dark': (
+      0px 24px 64px rgba(0, 0, 0, 0.55),
+      0px 10px 24px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    ),
+  ),
+  $box-shadow-dark
 );
 
 // Typography
@@ -1406,8 +1507,9 @@ $transition: map.merge(
 $transition-duration: () !default;
 $transition-duration: map.merge(
   (
-    '': 0.3s,
-    'fast': 0.2s,
+    '': 0.22s,
+    'fast': 0.18s,
+    'slow': 0.38s,
   ),
   $transition-duration
 );
@@ -1415,8 +1517,11 @@ $transition-duration: map.merge(
 $transition-function: () !default;
 $transition-function: map.merge(
   (
-    'ease-in-out-bezier': cubic-bezier(0.645, 0.045, 0.355, 1),
-    'fast-bezier': cubic-bezier(0.23, 1, 0.32, 1),
+    'ease-in-out-bezier': cubic-bezier(0.4, 0, 0.2, 1),
+    'fast-bezier': cubic-bezier(0.2, 0, 0, 1),
+    'standard': cubic-bezier(0.4, 0, 0.2, 1),
+    'out': cubic-bezier(0, 0, 0.2, 1),
+    'in': cubic-bezier(0.4, 0, 1, 1),
   ),
   $transition-function
 );

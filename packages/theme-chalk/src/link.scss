@@ -25,7 +25,8 @@
 
   color: getCssVar('link', 'text-color');
 
-  transition: opacity 0.3s ease, filter 0.3s ease;
+  transition: opacity getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
+    filter getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier');
 
   &:hover {
     opacity: 0.85;

@@ -1,72 +1,67 @@
 @use 'mixins/mixins' as *;
 @use 'common/var' as *;
 
-$fsus-black: #050505;
-$fsus-scholarly-blue: #2A599C;
-$fsus-text: #09090b;
-$fsus-text-muted: #5f5f68;
-$fsus-text-soft: #7c7c86;
-$fsus-border: rgba(9, 9, 11, 0.08);
-$fsus-border-strong: rgba(9, 9, 11, 0.14);
-$fsus-panel-bg: #ffffff;
-$fsus-control-bg: rgba(250, 250, 250, 0.96);
-$fsus-subtle-bg: rgba(244, 244, 245, 0.92);
-$fsus-float-bg: rgba(255, 255, 255, 0.92);
-$fsus-highlight: rgba(255, 255, 255, 0.74);
-$fsus-shadow-soft: 0 14px 40px rgba(15, 23, 42, 0.08);
-$fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
-
 @mixin fsus-panel($radius: 24px) {
-  background: $fsus-panel-bg;
-  border: 1px solid $fsus-border;
+  background: var(--el-bg-color);
+  border: 1px solid var(--el-border-color);
   border-radius: $radius;
-  box-shadow: inset 0 1px 0 $fsus-highlight, $fsus-shadow-soft;
+  box-shadow: inset 0 1px 0 var(--fsus-highlight, rgba(255, 255, 255, 0.1)), var(--el-box-shadow-light);
 }
 
 @mixin fsus-floating($radius: 24px) {
-  background: $fsus-float-bg;
-  border: 1px solid rgba(9, 9, 11, 0.1);
+  background: var(--el-bg-color-overlay);
+  border: 1px solid var(--el-border-color-light);
   border-radius: $radius;
-  box-shadow: inset 0 1px 0 $fsus-highlight, $fsus-shadow-float;
-  backdrop-filter: blur(var(--fsus-backdrop-blur, 18px));
-  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur, 18px));
+  box-shadow: inset 0 1px 0 var(--fsus-highlight, rgba(255, 255, 255, 0.1)), var(--el-box-shadow);
+  backdrop-filter: blur(var(--fsus-backdrop-blur, 40px));
+  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur, 40px));
 }
 
 @mixin fsus-control($radius: 8px) {
-  background: $fsus-control-bg;
-  border: 1px solid $fsus-border;
+  background: var(--el-fill-color-lighter);
+  border: 1px solid var(--el-border-color);
   border-radius: $radius;
-  color: $fsus-text;
-  transition: background-color 0.3s ease, border-color 0.3s ease,
-    box-shadow 0.3s ease, color 0.3s ease, opacity 0.3s ease,
-    transform 0.3s ease;
+  color: var(--el-text-color-primary);
+  transition: background-color getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
+    border-color getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
+    box-shadow getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
+    color getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
+    opacity getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
+    transform getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier');
 }
 
+/* FsusUI Theme v2.0-REWRITE */
 :root {
-  --el-a11y-focus-color: #2A599C;
+  --el-color-primary: #0F0F11;
+  --el-bg-color: #FFFFFF;
+  --el-bg-color-page: #F7F7F8;
+  --el-bg-color-overlay: rgba(255, 255, 255, 0.85);
   --fsus-scholarly-blue: #2A599C;
-  --fsus-backdrop-blur: 18px;
-  --fsus-backdrop-blur-soft: 12px;
-  --el-border-radius-base: 8px;
-  --el-border-radius-small: 6px;
-  --el-border-radius-round: 999px;
-  --el-box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
-  --el-box-shadow-light: 0 14px 40px rgba(15, 23, 42, 0.08);
-  --el-box-shadow-lighter: 0 8px 24px rgba(15, 23, 42, 0.06);
-  --el-box-shadow-dark: 0 24px 64px rgba(15, 23, 42, 0.12);
-  --el-bg-color-page: #fafafa;
-  --el-bg-color-overlay: rgba(255, 255, 255, 0.94);
-  --el-fill-color: #f4f4f5;
-  --el-fill-color-light: #fafafa;
-  --el-fill-color-lighter: #fcfcfc;
-  --el-border-color: #e4e4e7;
+  --el-color-info: #A1A1AA;
+  --el-border-color: #E4E4E7;
   --el-border-color-light: #ececf0;
   --el-border-color-lighter: #f1f1f3;
   --el-border-color-extra-light: #f7f7f8;
-  --el-text-color-primary: #09090b;
+  --el-text-color-primary: #0F0F11;
   --el-text-color-regular: #5f5f68;
   --el-text-color-secondary: #5f5f68;
   --el-text-color-placeholder: #7c7c86;
+  
+  --el-a11y-focus-color: var(--fsus-scholarly-blue);
+  --fsus-backdrop-blur: 40px;
+  --fsus-backdrop-blur-soft: 20px;
+  --fsus-backdrop-saturate: 120%;
+  --fsus-highlight: rgba(255, 255, 255, 0.8);
+  --el-border-radius-base: 8px;
+  --el-border-radius-small: 6px;
+  --el-border-radius-round: 999px;
+  --el-box-shadow: 0 32px 64px rgba(0, 0, 0, 0.08);
+  --el-box-shadow-light: 0 14px 40px rgba(0, 0, 0, 0.08);
+  --el-box-shadow-lighter: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --el-box-shadow-dark: 0 24px 64px rgba(0, 0, 0, 0.12);
+  --el-fill-color: #f4f4f5;
+  --el-fill-color-light: #fafafa;
+  --el-fill-color-lighter: #fcfcfc;
   --el-disabled-bg-color: #f4f4f5;
   --el-disabled-text-color: #7c7c86;
   --el-disabled-border-color: #ececf0;
@@ -76,7 +71,48 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   --el-dialog-border-radius: 24px;
   --el-popover-border-radius: 20px;
   --el-messagebox-border-radius: 24px;
-  --el-notification-radius: 22px;
+  --el-notification-radius: 20px;
+}
+
+@mixin dark-mode-tokens {
+  --el-color-primary: #F0F0F4;
+  --el-bg-color: #121214;
+  --el-bg-color-page: #09090B;
+  --el-bg-color-overlay: rgba(18, 18, 20, 0.85);
+  --fsus-scholarly-blue: #4B79CC;
+  --el-color-info: #71717A;
+  --el-border-color: #27272A;
+  --el-border-color-light: #3F3F46;
+  --el-border-color-lighter: #303036;
+  --el-border-color-extra-light: #1D1D20;
+  --el-text-color-primary: #F0F0F4;
+  --el-text-color-regular: #A1A1AA;
+  --el-text-color-secondary: #A1A1AA;
+  --el-text-color-placeholder: #71717A;
+  --el-a11y-focus-color: var(--fsus-scholarly-blue);
+  
+  --fsus-highlight: rgba(255, 255, 255, 0.05);
+  --el-box-shadow: 0 32px 64px rgba(0, 0, 0, 0.4);
+  --el-box-shadow-light: 0 14px 40px rgba(0, 0, 0, 0.4);
+  --el-box-shadow-lighter: 0 8px 24px rgba(0, 0, 0, 0.3);
+  --el-box-shadow-dark: 0 24px 64px rgba(0, 0, 0, 0.5);
+  --el-fill-color: #1D1D20;
+  --el-fill-color-light: #27272A;
+  --el-fill-color-lighter: #1D1D20;
+  --el-disabled-bg-color: #1D1D20;
+  --el-disabled-border-color: #27272A;
+}
+
+// Support manual toggle
+html.dark {
+  @include dark-mode-tokens;
+}
+
+// Support automatic system preference
+@media (prefers-color-scheme: dark) {
+  html:not(.light) {
+    @include dark-mode-tokens;
+  }
 }
 
 .#{$namespace}-button,
@@ -102,9 +138,12 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-step__icon,
 .#{$namespace}-carousel__button,
 .#{$namespace}-backtop {
-  transition: background-color 0.3s ease, border-color 0.3s ease,
-    box-shadow 0.3s ease, color 0.3s ease, opacity 0.3s ease,
-    transform 0.3s ease;
+  transition: background-color getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
+    border-color getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
+    box-shadow getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
+    color getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
+    opacity getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
+    transform getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier');
 }
 
 .#{$namespace}-button {
@@ -116,40 +155,40 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   letter-spacing: 0.01em;
 
   &:hover {
-    background: #ffffff;
-    border-color: $fsus-border-strong;
-    color: $fsus-text;
+    background: var(--el-bg-color);
+    border-color: var(--el-border-color-light);
+    color: var(--el-text-color-primary);
     transform: translateY(-1px);
   }
 
   &:active {
     transform: none;
-    background: $fsus-subtle-bg;
+    background: var(--el-fill-color);
   }
 
   &:focus-visible {
-    @include a11y-focus-ring(2px, 8px);
+    @include a11y-focus-ring($radius: 8px);
   }
 
   &.is-disabled,
   &.is-disabled:hover {
-    background: $fsus-subtle-bg;
-    border-color: $fsus-border;
-    color: $fsus-text-soft;
+    background: var(--el-disabled-bg-color);
+    border-color: var(--el-disabled-border-color);
+    color: var(--el-disabled-text-color);
     transform: none;
     opacity: 0.72;
   }
 }
 
 .#{$namespace}-button--primary {
-  background: $fsus-black;
-  border-color: $fsus-black;
-  color: #ffffff;
+  background: var(--el-color-primary);
+  border-color: var(--el-color-primary);
+  color: var(--el-bg-color);
 
   &:hover,
   &:focus {
-    background: $fsus-scholarly-blue;
-    border-color: $fsus-scholarly-blue;
+    background: var(--fsus-scholarly-blue);
+    border-color: var(--fsus-scholarly-blue);
     color: #ffffff;
   }
 }
@@ -175,7 +214,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-button--info {
   background: rgba(113, 113, 122, 0.08);
   border-color: rgba(113, 113, 122, 0.16);
-  color: $fsus-text-muted;
+  color: var(--el-text-color-primary)-muted;
 }
 
 .#{$namespace}-button.is-text,
@@ -183,14 +222,14 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-button--text {
   background: transparent;
   border-color: transparent;
-  color: $fsus-text-muted;
+  color: var(--el-text-color-primary)-muted;
   min-height: auto;
   padding-inline: 8px;
 
   &:hover,
   &:focus {
     background: transparent;
-    color: $fsus-text;
+    color: var(--el-text-color-primary);
     transform: none;
   }
 }
@@ -198,18 +237,20 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-input__wrapper,
 .#{$namespace}-textarea__inner,
 .#{$namespace}-select-v2__wrapper,
+.#{$namespace}-select__wrapper,
 .#{$namespace}-date-editor.#{$namespace}-input__wrapper,
 .#{$namespace}-range-editor.#{$namespace}-input__wrapper,
 .#{$namespace}-input-number,
 .#{$namespace}-input-group__append,
 .#{$namespace}-input-group__prepend,
 .#{$namespace}-color-picker__trigger {
-  @include fsus-control(16px);
+  @include fsus-control(8px);
   box-shadow: none !important;
 }
 
 .#{$namespace}-input__wrapper,
 .#{$namespace}-select-v2__wrapper,
+.#{$namespace}-select__wrapper,
 .#{$namespace}-date-editor.#{$namespace}-input__wrapper,
 .#{$namespace}-range-editor.#{$namespace}-input__wrapper,
 .#{$namespace}-input-number,
@@ -217,14 +258,11 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   min-height: 44px;
 
   &:hover,
+  &.is-focus,
   &:focus-within {
-    background: #ffffff;
-    border-color: $fsus-scholarly-blue;
-    box-shadow: inset 0 0 0 1px rgba(42, 89, 156, 0.25) !important;
-  }
-
-  &:focus-within {
-    @include a11y-focus-ring(2px, 8px);
+    background: var(--el-bg-color);
+    border-color: var(--fsus-scholarly-blue);
+    box-shadow: inset 0 0 0 1.5px var(--fsus-scholarly-blue) !important;
   }
 }
 
@@ -234,13 +272,9 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 
   &:hover,
   &:focus {
-    background: #ffffff;
-    border-color: $fsus-scholarly-blue;
-    box-shadow: inset 0 0 0 1px rgba(42, 89, 156, 0.25) !important;
-  }
-
-  &:focus-visible {
-    @include a11y-focus-ring(2px, 8px);
+    background: var(--el-bg-color);
+    border-color: var(--fsus-scholarly-blue);
+    box-shadow: inset 0 0 0 1.5px var(--fsus-scholarly-blue) !important;
   }
 }
 
@@ -249,99 +283,158 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-range-input,
 .#{$namespace}-select__placeholder,
 .#{$namespace}-select-v2__placeholder {
-  color: $fsus-text;
+  color: var(--el-text-color-primary);
 
   &::placeholder {
-    color: $fsus-text-soft;
+    color: var(--el-text-color-placeholder);
   }
 }
 
 .#{$namespace}-input-number {
+  @include fsus-control(8px);
   overflow: hidden;
+  padding: 0;
+  display: inline-flex;
+  align-items: stretch;
 
   .#{$namespace}-input__wrapper {
-    background: transparent;
-    border: 0;
+    background: transparent !important;
+    border: none !important;
     box-shadow: none !important;
+    flex: 1;
+    padding: 0 12px;
   }
 
   .#{$namespace}-input-number__increase,
   .#{$namespace}-input-number__decrease {
     background: transparent;
-    color: $fsus-text-muted;
-    border-color: $fsus-border;
+    color: var(--el-text-color-regular);
+    border: none;
+    width: 38px;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, color 0.2s;
 
     &:hover {
-      color: $fsus-text;
+      background: var(--el-fill-color);
+      color: var(--el-text-color-primary);
     }
   }
+
+  .#{$namespace}-input-number__decrease {
+    border-right: 1px solid var(--el-border-color-lighter);
+  }
+
+  .#{$namespace}-input-number__increase {
+    border-left: 1px solid var(--el-border-color-lighter);
+  }
+}
+
+.#{$namespace}-checkbox-button__inner,
+.#{$namespace}-radio-button__inner {
+  @include fsus-control(8px);
+  box-shadow: none !important; // override element plus default border logic
+  background: transparent;
+  border-color: transparent;
+  color: var(--el-text-color-regular);
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  font-weight: 500;
+}
+
+.#{$namespace}-checkbox-button:first-child .#{$namespace}-checkbox-button__inner,
+.#{$namespace}-radio-button:first-child .#{$namespace}-radio-button__inner {
+  border-left: none;
+}
+
+.#{$namespace}-checkbox-group,
+.#{$namespace}-radio-group {
+  background: var(--el-fill-color-light);
+  border-radius: 10px;
+  padding: 2px;
+  display: inline-flex;
+  gap: 2px;
+}
+
+.#{$namespace}-checkbox-button.is-checked .#{$namespace}-checkbox-button__inner,
+.#{$namespace}-radio-button.is-active .#{$namespace}-radio-button__inner {
+  background: var(--el-bg-color);
+  color: var(--el-text-color-primary);
+  border-color: transparent;
+  box-shadow: var(--el-box-shadow-lighter) !important;
 }
 
 .#{$namespace}-checkbox.is-bordered,
 .#{$namespace}-radio.is-bordered,
-.#{$namespace}-checkbox-button__inner,
-.#{$namespace}-radio-button__inner,
 .#{$namespace}-check-tag,
 .#{$namespace}-tag {
-  @include fsus-control(14px);
+  @include fsus-control(8px);
   box-shadow: none;
 }
 
 .#{$namespace}-checkbox__inner,
 .#{$namespace}-radio__inner {
-  border-color: rgba(9, 9, 11, 0.18);
-  background: #ffffff;
+  border-color: var(--el-border-color-light);
+  background: var(--el-bg-color);
 }
 
 .#{$namespace}-checkbox__inner:hover,
 .#{$namespace}-radio__inner:hover {
-  border-color: rgba(5, 5, 5, 0.28);
+  border-color: var(--el-border-color);
 }
 
 .#{$namespace}-checkbox__input.is-checked .#{$namespace}-checkbox__inner,
 .#{$namespace}-checkbox__input.is-indeterminate .#{$namespace}-checkbox__inner,
-.#{$namespace}-checkbox-button.is-checked .#{$namespace}-checkbox-button__inner,
-.#{$namespace}-radio-button.is-active .#{$namespace}-radio-button__inner,
 .#{$namespace}-check-tag.is-checked {
-  background: $fsus-black;
-  border-color: $fsus-black;
-  color: #ffffff;
+  background: var(--el-color-primary);
+  border-color: var(--el-color-primary);
+  color: var(--el-bg-color);
   box-shadow: none;
 }
 
 // Radio: 「环 + 点」极简风格，不填充黑色背景
 .#{$namespace}-radio__input.is-checked .#{$namespace}-radio__inner {
-  background: #ffffff;
-  border-color: $fsus-black;
+  background: var(--el-bg-color);
+  border-color: var(--el-color-primary);
   border-width: 2px;
   box-shadow: none;
 }
 
 .#{$namespace}-radio__input.is-checked .#{$namespace}-radio__inner::after {
-  background-color: $fsus-black;
+  background-color: var(--el-color-primary);
   width: 6px;
   height: 6px;
 }
 
 .#{$namespace}-checkbox__input.is-checked + .#{$namespace}-checkbox__label,
 .#{$namespace}-radio__input.is-checked + .#{$namespace}-radio__label {
-  color: $fsus-text;
-  font-weight: 600;
+  color: var(--el-text-color-primary);
+  font-weight: 500;
 }
 
 .#{$namespace}-switch__core {
-  background: rgba(161, 161, 170, 0.32);
-  border-color: rgba(161, 161, 170, 0.32);
+  background: var(--el-fill-color);
+  border-color: var(--el-fill-color);
   box-shadow: none;
 }
 
 .#{$namespace}-switch__action {
   box-shadow: none;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+html.dark .#{$namespace}-switch__action {
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .#{$namespace}-switch.is-checked .#{$namespace}-switch__core {
-  background: $fsus-black;
-  border-color: $fsus-black;
+  background: var(--fsus-scholarly-blue);
+  border-color: var(--fsus-scholarly-blue);
 }
 
 .#{$namespace}-card,
@@ -356,7 +449,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-empty,
 .#{$namespace}-result,
 .#{$namespace}-menu:not(.#{$namespace}-menu--horizontal):not(.#{$namespace}-sub-menu .#{$namespace}-menu):not(.#{$namespace}-menu--popup-container) {
-  @include fsus-panel();
+  @include fsus-panel(24px);
 }
 
 // 嵌套子菜单容器重置 fsus-panel 样式，避免出现多层嵌套面板的视觉错位
@@ -382,10 +475,14 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 
 .#{$namespace}-card__header,
 .#{$namespace}-card__footer,
-.#{$namespace}-transfer-panel__header,
 .#{$namespace}-collapse-item__header,
 .#{$namespace}-descriptions__header {
-  border-color: $fsus-border;
+  border-color: var(--el-border-color);
+}
+
+.#{$namespace}-transfer-panel__header {
+  border-color: var(--el-border-color);
+  background: var(--el-fill-color-light);
 }
 
 .#{$namespace}-alert,
@@ -399,7 +496,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
     position: absolute;
     inset: 0 auto 0 0;
     width: 4px;
-    background: rgba(9, 9, 11, 0.16);
+    background: var(--el-border-color);
   }
 }
 
@@ -423,7 +520,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-message--success,
 .#{$namespace}-notification--success {
   &::before {
-    background: rgba(22, 163, 74, 0.42);
+    background: #166534;
   }
 }
 
@@ -431,7 +528,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-message--warning,
 .#{$namespace}-notification--warning {
   &::before {
-    background: rgba(217, 119, 6, 0.42);
+    background: #92400e;
   }
 }
 
@@ -439,7 +536,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-message--error,
 .#{$namespace}-notification--error {
   &::before {
-    background: rgba(220, 38, 38, 0.42);
+    background: #991b1b;
   }
 }
 
@@ -447,7 +544,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-message--info,
 .#{$namespace}-notification--info {
   &::before {
-    background: rgba(113, 113, 122, 0.34);
+    background: var(--fsus-scholarly-blue);
   }
 }
 
@@ -456,15 +553,15 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-alert--warning.is-light,
 .#{$namespace}-alert--error.is-light,
 .#{$namespace}-alert--info.is-light {
-  background-color: $fsus-panel-bg;
-  color: $fsus-text;
+  background-color: var(--el-bg-color);
+  color: var(--el-text-color-primary);
 }
 
 .#{$namespace}-alert--success.is-light .#{$namespace}-alert__description,
 .#{$namespace}-alert--warning.is-light .#{$namespace}-alert__description,
 .#{$namespace}-alert--error.is-light .#{$namespace}-alert__description,
 .#{$namespace}-alert--info.is-light .#{$namespace}-alert__description {
-  color: $fsus-text-muted;
+  color: var(--el-text-color-regular);
 }
 
 // 保留语义图标颜色
@@ -475,7 +572,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 
 .#{$namespace}-collapse {
   overflow: hidden; // 裁剪子元素 border 在圆角外侧的溢出
-  border-color: $fsus-border;
+  border-color: var(--el-border-color);
 }
 
 .#{$namespace}-collapse-item:last-child {
@@ -488,7 +585,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 }
 
 .#{$namespace}-collapse-item__wrap {
-  border-color: $fsus-border;
+  border-color: var(--el-border-color);
   background: transparent;
 }
 
@@ -499,7 +596,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 
 .#{$namespace}-collapse-item__header {
   min-height: 52px;
-  color: $fsus-text;
+  color: var(--el-text-color-primary);
   font-weight: 600;
 }
 
@@ -513,7 +610,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-page-header__content,
 .#{$namespace}-breadcrumb__inner,
 .#{$namespace}-breadcrumb__separator {
-  color: $fsus-text-muted;
+  color: var(--el-text-color-regular);
 }
 
 .#{$namespace}-statistic__content,
@@ -523,44 +620,72 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-descriptions__title,
 .#{$namespace}-empty__description,
 .#{$namespace}-breadcrumb__item:last-child .#{$namespace}-breadcrumb__inner {
-  color: $fsus-text;
+  color: var(--el-text-color-primary);
 }
 
 .#{$namespace}-tag,
 .#{$namespace}-check-tag {
-  color: $fsus-text-muted;
+  color: var(--el-text-color-regular);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  background: rgba(161, 161, 170, 0.06);
+  border-color: var(--el-border-color-light);
+  border-radius: 8px !important;
 }
 
 .#{$namespace}-tag:hover,
 .#{$namespace}-check-tag:hover {
-  background: #ffffff;
-  border-color: $fsus-border-strong;
-  color: $fsus-text;
+  background: var(--el-bg-color);
+  border-color: var(--el-border-color);
+  color: var(--el-text-color-primary);
 }
 
 .#{$namespace}-avatar {
-  background: $fsus-subtle-bg;
-  border: 1px solid $fsus-border;
-  color: $fsus-text;
+  background: var(--el-fill-color);
+  border: 1px solid var(--el-border-color);
+  color: var(--el-text-color-primary);
 }
 
-.#{$namespace}-badge__content {
-  background: $fsus-black;
-  border: 0;
-  box-shadow: 0 0 0 2px #ffffff;
+.#{$namespace}-transfer__button {
+  @include fsus-control(999px);
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.is-with-texts {
+    width: auto;
+    padding: 0 16px;
+  }
 }
 
-// 模态层：保留毛玻璃（backdrop-filter 在固定全屏层上无滚动副作用）
+.#{$namespace}-badge__content.is-dot {
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--el-bg-color);
+}
+
+// 模态层：毛玻璃效果 (backdrop-filter: blur(16px) + rgba(252, 252, 252, 0.5))
+.#{$namespace}-overlay {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background-color: rgba(0, 0, 0, 0.12) !important;
+}
+
 .#{$namespace}-dialog,
 .#{$namespace}-drawer,
-.#{$namespace}-message-box,
+.#{$namespace}-message-box {
+  @include fsus-floating(24px);
+  border: none;
+}
+
 .#{$namespace}-message,
 .#{$namespace}-notification {
-  @include fsus-floating();
+  @include fsus-floating(18px);
 }
 
 // 功能性下拉层：不透明白底，不使用 backdrop-filter，
@@ -575,17 +700,21 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-autocomplete-suggestion,
 .#{$namespace}-color-picker__panel,
 .#{$namespace}-menu--popup {
-  background: $fsus-panel-bg;
-  border: 1px solid rgba(9, 9, 11, 0.1);
-  border-radius: 24px;
-  box-shadow: inset 0 1px 0 $fsus-highlight, $fsus-shadow-float;
+  background: var(--el-bg-color-overlay);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid var(--el-border-color-light);
+  border-radius: 20px;
+  box-shadow: inset 0 1px 0 var(--fsus-highlight), var(--el-box-shadow);
 }
 
 .#{$namespace}-cascader__dropdown {
-  background: $fsus-panel-bg;
-  border: 1px solid rgba(9, 9, 11, 0.1);
-  border-radius: 24px;
-  box-shadow: inset 0 1px 0 $fsus-highlight, $fsus-shadow-float;
+  background: var(--el-bg-color-overlay);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid var(--el-border-color-light);
+  border-radius: 20px;
+  box-shadow: inset 0 1px 0 var(--fsus-highlight), var(--el-box-shadow);
   overflow: hidden;
 }
 
@@ -598,12 +727,12 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-message-box,
 .#{$namespace}-dialog,
 .#{$namespace}-drawer {
-  color: $fsus-text;
+  color: var(--el-text-color-primary);
 }
 
 .#{$namespace}-popper .#{$namespace}-popper__arrow::before {
-  background: $fsus-float-bg;
-  border-color: $fsus-border;
+  background: var(--el-bg-color-overlay);
+  border-color: var(--el-border-color-light);
 }
 
 .#{$namespace}-dialog__header,
@@ -616,16 +745,24 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-drawer__close-btn,
 .#{$namespace}-notification__closeBtn,
 .#{$namespace}-alert__close-btn {
+  position: absolute;
+  top: getCssVar('dialog-padding-primary');
+  right: getCssVar('dialog-padding-primary');
+  margin: 0;
   min-width: 44px;
   min-height: 44px;
   border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(25%, -25%); // Slight offset for optical balance at the corner
 }
 
 .#{$namespace}-dialog__headerbtn:focus-visible,
 .#{$namespace}-drawer__close-btn:focus-visible,
 .#{$namespace}-notification__closeBtn:focus-visible,
 .#{$namespace}-alert__close-btn:focus-visible {
-  @include a11y-focus-ring(2px, 999px);
+  @include a11y-focus-ring($radius: 999px);
 }
 
 .#{$namespace}-dialog__title,
@@ -633,7 +770,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-message-box__title,
 .#{$namespace}-notification__title,
 .#{$namespace}-popover__title {
-  color: $fsus-text;
+  color: var(--el-text-color-primary);
   letter-spacing: -0.02em;
 }
 
@@ -642,7 +779,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-message-box__content,
 .#{$namespace}-notification__content,
 .#{$namespace}-message__content {
-  color: $fsus-text-muted;
+  color: var(--el-text-color-regular);
 }
 
 .#{$namespace}-message {
@@ -662,14 +799,20 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur-soft, 12px));
 }
 
+@keyframes punctuation-zinc-pulse {
+  0% { transform: scale(1); opacity: 1; background-color: var(--el-text-color-regular); }
+  50% { transform: scale(0.85); opacity: 0.5; background-color: var(--fsus-scholarly-blue); }
+  100% { transform: scale(1); opacity: 1; background-color: var(--el-text-color-regular); }
+}
+
 .#{$namespace}-loading-spinner {
   .circular {
     display: inline-block;
-    width: 24px;
-    height: 24px;
+    width: 6px;
+    height: 6px;
     border-radius: 999px;
-    background: #f4f4f5;
-    animation: skeleton-zinc-pulse 1.5s ease-in-out infinite;
+    background: var(--el-text-color-regular);
+    animation: punctuation-zinc-pulse 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   }
 
   .path {
@@ -677,8 +820,12 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   }
 
   .#{$namespace}-loading-text {
-    color: $fsus-text-muted;
-    letter-spacing: 0.08em;
+    color: var(--el-text-color-regular);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 12px;
   }
 }
 
@@ -710,13 +857,21 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-time-panel__btn,
 .#{$namespace}-picker-panel__icon-btn {
   min-height: 44px;
-  border-radius: 12px;
-  color: $fsus-text-muted;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  line-height: normal;
+  border-radius: 14px; // Unified with 20px popper - 6px padding
+  color: var(--el-text-color-regular);
+  margin: 2px 0;
+  padding: 0 16px;
+  position: relative;
+  box-sizing: border-box;
 }
 
 .#{$namespace}-cascader-node {
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .#{$namespace}-select-dropdown__item:hover,
@@ -731,16 +886,19 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-picker-panel__shortcut:hover,
 .#{$namespace}-time-panel__btn:hover,
 .#{$namespace}-picker-panel__icon-btn:hover {
-  background: $fsus-subtle-bg;
-  color: $fsus-text;
+  background: rgba(42, 89, 156, 0.08); // Scholarly blue light
+  color: var(--fsus-scholarly-blue);
+  outline: 1px solid var(--fsus-scholarly-blue);
+  outline-offset: -1px;
 }
 
 .#{$namespace}-select-dropdown__item.selected,
 .#{$namespace}-select-dropdown__option-item.is-selected,
 .#{$namespace}-cascader-node.is-selectable.in-checked-path,
 .#{$namespace}-cascader-node.is-active {
-  color: $fsus-text;
-  font-weight: 600;
+  background: rgba(42, 89, 156, 0.05);
+  color: var(--fsus-scholarly-blue);
+  font-weight: 700;
 }
 
 .#{$namespace}-picker-panel__footer,
@@ -748,7 +906,7 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-time-panel__footer,
 .#{$namespace}-cascader-panel,
 .#{$namespace}-transfer-panel__footer {
-  border-color: $fsus-border;
+  border-color: var(--el-border-color);
 }
 
 .#{$namespace}-date-table td .#{$namespace}-date-table-cell__text,
@@ -758,50 +916,50 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   min-width: 40px;
   min-height: 40px;
   line-height: 40px;
-  border-radius: 12px;
+  border-radius: 14px;
 }
 
 .#{$namespace}-date-table td.available:hover .#{$namespace}-date-table-cell__text,
 .#{$namespace}-month-table td .cell:hover,
 .#{$namespace}-year-table td .cell:hover,
 .#{$namespace}-time-spinner__item:hover:not(.disabled):not(.active) {
-  background: $fsus-subtle-bg;
-  color: $fsus-text;
+  background: var(--el-fill-color);
+  color: var(--el-text-color-primary);
 }
 
 .#{$namespace}-date-table td.current:not(.disabled) .#{$namespace}-date-table-cell__text,
 .#{$namespace}-month-table td.current:not(.disabled) .cell,
 .#{$namespace}-year-table td.current:not(.disabled) .cell,
 .#{$namespace}-time-spinner__item.active:not(.disabled) {
-  background: $fsus-black;
-  color: #ffffff;
+  background: var(--el-color-primary);
+  color: var(--el-bg-color);
 }
 
 .#{$namespace}-menu {
-  border-color: $fsus-border;
+  border-color: var(--el-border-color);
 }
 
 .#{$namespace}-menu-item,
 .#{$namespace}-sub-menu__title,
 .#{$namespace}-menu-item-group__title {
   min-height: 44px;
-  color: $fsus-text-muted;
+  color: var(--el-text-color-regular);
 }
 
 .#{$namespace}-menu-item:hover,
 .#{$namespace}-sub-menu__title:hover,
 .#{$namespace}-menu--horizontal > .#{$namespace}-menu-item:hover,
 .#{$namespace}-menu--horizontal > .#{$namespace}-sub-menu:hover .#{$namespace}-sub-menu__title {
-  background: $fsus-subtle-bg;
-  color: $fsus-text;
+  background: var(--el-fill-color);
+  color: var(--el-text-color-primary);
 }
 
 .#{$namespace}-menu-item.is-active,
 .#{$namespace}-sub-menu.is-active > .#{$namespace}-sub-menu__title,
 .#{$namespace}-menu--horizontal > .#{$namespace}-menu-item.is-active,
 .#{$namespace}-menu--horizontal > .#{$namespace}-sub-menu.is-active .#{$namespace}-sub-menu__title {
-  background: $fsus-subtle-bg;
-  color: $fsus-text;
+  background: var(--el-fill-color);
+  color: var(--el-text-color-primary);
   font-weight: 700;
   border-bottom-color: transparent !important;
 }
@@ -813,12 +971,12 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-tabs__nav-wrap::after,
 .#{$namespace}-tabs--card > .#{$namespace}-tabs__header,
 .#{$namespace}-tabs--border-card > .#{$namespace}-tabs__header {
-  border-color: $fsus-border;
+  border-color: var(--el-border-color);
   background: transparent;
 }
 
 .#{$namespace}-tabs__active-bar {
-  background-color: $fsus-scholarly-blue;
+  background-color: var(--fsus-scholarly-blue);
   height: 2px;
   border-radius: 2px;
 }
@@ -827,13 +985,13 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   height: 44px;
   padding: 0 14px;
   border-radius: 999px;
-  color: $fsus-text-muted;
+  color: var(--el-text-color-regular);
 }
 
 .#{$namespace}-tabs__item:hover,
 .#{$namespace}-tabs__item.is-active {
-  background: $fsus-subtle-bg;
-  color: $fsus-scholarly-blue;
+  background: var(--el-fill-color);
+  color: var(--fsus-scholarly-blue);
 }
 
 .#{$namespace}-tabs__item.is-active {
@@ -841,9 +999,13 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 }
 
 .#{$namespace}-pagination {
-  gap: 8px;
+  gap: 12px;
   flex-wrap: wrap;
-  color: $fsus-text-muted;
+  color: var(--el-text-color-regular);
+}
+
+.#{$namespace}-pager {
+  gap: 8px;
 }
 
 .#{$namespace}-pagination button,
@@ -852,19 +1014,24 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   min-width: 44px;
   height: 44px;
   box-shadow: none;
-  color: $fsus-text-muted;
+  border-color: transparent; // Minimalist: no border by default
+  background: transparent;
+  color: var(--el-text-color-regular);
 }
 
 .#{$namespace}-pagination button:hover,
-.#{$namespace}-pager li:hover,
-.#{$namespace}-pager li.is-active {
-  background: $fsus-subtle-bg;
-  border-color: $fsus-border-strong;
-  color: $fsus-text;
+.#{$namespace}-pager li:hover {
+  background: var(--el-fill-color-light);
+  border-color: var(--el-border-color-lighter);
+  color: var(--el-text-color-primary);
 }
 
 .#{$namespace}-pager li.is-active {
+  background: var(--el-color-primary) !important;
+  border-color: var(--el-color-primary) !important;
+  color: var(--el-bg-color) !important;
   font-weight: 700;
+  box-shadow: var(--el-box-shadow-lighter);
 }
 
 .#{$namespace}-table,
@@ -889,9 +1056,10 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 
 .#{$namespace}-table th.#{$namespace}-table__cell,
 .#{$namespace}-table-v2__header-cell {
-  background: rgba(250, 250, 250, 0.92);
-  color: $fsus-text-muted;
-  border-bottom-color: $fsus-border;
+  background: var(--el-fill-color-light);
+  color: var(--el-text-color-regular);
+  border-bottom-color: var(--el-border-color);
+  border-right: none !important; // Minimalist: no vertical borders
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -901,22 +1069,23 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-table td.#{$namespace}-table__cell,
 .#{$namespace}-table-v2__row,
 .#{$namespace}-table-v2__header-row {
-  border-bottom-color: rgba(9, 9, 11, 0.06);
+  border-bottom-color: var(--el-border-color-extra-light);
+  border-right: none; // Minimalist: no vertical borders
 }
 
 .#{$namespace}-table .#{$namespace}-table__row:hover > td.#{$namespace}-table__cell,
 .#{$namespace}-table-v2__row:hover,
 .#{$namespace}-table-v2__row.row-hover {
-  background: rgba(244, 244, 245, 0.72);
+  background: var(--el-fill-color);
 }
 
 .#{$namespace}-descriptions__body .#{$namespace}-descriptions__table,
 .#{$namespace}-descriptions__cell {
-  border-color: $fsus-border-strong !important;
+  border-color: var(--el-border-color) !important;
 }
 
 .#{$namespace}-descriptions__label.#{$namespace}-descriptions__cell {
-  background: rgba(250, 250, 250, 0.92);
+  background: var(--el-fill-color-light);
 }
 
 .#{$namespace}-tree {
@@ -926,19 +1095,19 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-tree-node__content {
   min-height: 44px;
   padding-right: 10px;
-  border-radius: 12px;
-  color: $fsus-text-muted;
+  border-radius: 14px;
+  color: var(--el-text-color-regular);
 }
 
 .#{$namespace}-tree-node__content:hover,
 .#{$namespace}-tree-node:focus > .#{$namespace}-tree-node__content,
 .#{$namespace}-tree--highlight-current .#{$namespace}-tree-node.is-current > .#{$namespace}-tree-node__content {
-  background: $fsus-subtle-bg;
-  color: $fsus-text;
+  background: var(--el-fill-color);
+  color: var(--el-text-color-primary);
 }
 
 .#{$namespace}-tree-node__expand-icon {
-  color: $fsus-text-soft;
+  color: var(--el-text-color-placeholder);
 }
 
 .#{$namespace}-upload,
@@ -954,9 +1123,9 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 
   &:hover,
   &.is-dragover {
-    background: #ffffff;
-    border-color: rgba(5, 5, 5, 0.2);
-    box-shadow: inset 0 0 0 1px rgba(5, 5, 5, 0.08);
+    background: var(--el-bg-color);
+    border-color: var(--el-border-color);
+    box-shadow: inset 0 0 0 1px var(--el-border-color-light);
   }
 }
 
@@ -965,74 +1134,119 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   padding: 10px 12px;
 
   &:hover {
-    background: #ffffff;
+    background: var(--el-bg-color);
   }
 }
 
 .#{$namespace}-progress-bar__outer,
 .#{$namespace}-slider__runway {
-  background: $fsus-subtle-bg;
+  background: var(--el-fill-color);
+  height: 4px !important; // Thinner for intellectual feel
 }
 
 .#{$namespace}-progress-bar__inner,
 .#{$namespace}-slider__bar {
-  background: $fsus-black;
+  background: var(--el-color-primary);
+  height: 4px !important;
 }
 
 .#{$namespace}-slider__button {
-  border-color: $fsus-black;
+  width: 14px;
+  height: 14px;
+  border-width: 2px;
+  border-color: var(--el-color-primary);
+  background-color: var(--el-bg-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: scale(1.15);
+  }
 }
 
 .#{$namespace}-rate {
   // 覆盖 fill-color CSS 变量，消除拟物化金色，符合 design.md 极简主义规范
-  --el-rate-fill-color: #{$fsus-black};
+  --el-rate-fill-color: var(--el-color-primary);
 }
 
 .#{$namespace}-rate__item .#{$namespace}-rate__icon {
-  color: #d4d4d8;
+  color: var(--el-border-color);
 }
 
 .#{$namespace}-rate__item .hover,
 .#{$namespace}-rate__item .#{$namespace}-rate__icon.is-active {
-  color: $fsus-black;
+  color: var(--el-color-primary);
+}
+
+.#{$namespace}-timeline {
+  padding-left: 20px;
+}
+
+.#{$namespace}-timeline-item__tail {
+  border-left: 1px solid var(--el-border-color-lighter);
+  left: 5px;
 }
 
 .#{$namespace}-timeline-item__node {
-  background: $fsus-black;
-  box-shadow: 0 0 0 4px rgba(244, 244, 245, 0.92);
+  width: 11px;
+  height: 11px;
+  left: 0;
+  background: var(--el-color-primary);
+  box-shadow: 0 0 0 3px var(--el-bg-color);
+}
+
+.#{$namespace}-calendar__header .#{$namespace}-button-group .#{$namespace}-button {
+  @include fsus-control(8px);
+  min-height: 36px;
+  margin-left: 4px;
+}
+
+.#{$namespace}-step__line {
+  background-color: var(--el-border-color-lighter);
 }
 
 .#{$namespace}-step__icon {
-  border-color: rgba(9, 9, 11, 0.12);
-  background: #ffffff;
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+  font-weight: 700;
+  border-width: 1.5px;
+  border-color: var(--el-border-color-light);
+  background: var(--el-bg-color);
+}
+
+.#{$namespace}-breadcrumb__separator {
+  margin: 0 12px;
+  font-weight: 400;
+  opacity: 0.5;
 }
 
 .#{$namespace}-step__head.is-process,
 .#{$namespace}-step__head.is-success,
 .#{$namespace}-step__title.is-process,
 .#{$namespace}-step__title.is-success {
-  color: $fsus-text;
-  border-color: $fsus-black;
+  color: var(--el-text-color-primary);
+  border-color: var(--el-color-primary);
 }
 
 .#{$namespace}-divider__text {
-  background: #fafafa;
-  color: $fsus-text-muted;
+  background: var(--el-bg-color-page);
+  color: var(--el-text-color-regular);
 }
 
 .#{$namespace}-skeleton__item {
-  border-radius: 14px;
+  border-radius: 8px;
   transition: opacity 0.28s ease, background-color 0.28s ease;
 }
 
 .#{$namespace}-carousel__button {
-  background: rgba(9, 9, 11, 0.18);
+  background: var(--el-border-color);
 }
 
 .#{$namespace}-backtop {
-  background: $fsus-black;
-  color: #ffffff;
-  box-shadow: $fsus-shadow-soft;
+  background: var(--el-color-primary);
+  color: var(--el-bg-color);
+  box-shadow: var(--el-box-shadow-light);
 }
 
 @media (max-width: 760px) {
@@ -1090,6 +1304,31 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
   height: 44px;
   padding: 4px;
   box-sizing: border-box;
+  border: 1px solid var(--el-border-color);
+  border-radius: 8px;
+  
+  &:hover,
+  &.is-focus {
+    border-color: var(--fsus-scholarly-blue);
+    box-shadow: inset 0 0 0 1px var(--fsus-scholarly-blue) !important;
+  }
+}
+
+.#{$namespace}-color-picker__color {
+  border-radius: 4px;
+  border: 1px solid var(--el-border-color-light);
+}
+
+.#{$namespace}-link {
+  font-weight: 500;
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--fsus-scholarly-blue);
+    &::after {
+      border-bottom-color: var(--fsus-scholarly-blue);
+    }
+  }
 }
 
 // 隐藏色块上叠加的 ArrowDown / Close 图标，色块本身已能传达可点击语义
@@ -1103,8 +1342,8 @@ $fsus-shadow-float: 0 24px 64px rgba(15, 23, 42, 0.12);
 .#{$namespace}-image-viewer__mask {
   opacity: 1;
   background: rgba(5, 5, 5, 0.78);
-  backdrop-filter: blur(24px) saturate(120%);
-  -webkit-backdrop-filter: blur(24px) saturate(120%);
+  backdrop-filter: blur(var(--fsus-backdrop-blur, 24px)) saturate(var(--fsus-backdrop-saturate, 120%));
+  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur, 24px)) saturate(var(--fsus-backdrop-saturate, 120%));
 }
 
 // 操作按钮（close / prev / next）：fsus-floating 风格，去除硬编码深灰背景与白边

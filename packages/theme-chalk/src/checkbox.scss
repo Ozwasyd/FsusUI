@@ -219,9 +219,12 @@ $checkbox-bordered-input-width: map.merge(
     height: getCssVar('checkbox-input-height');
     background-color: getCssVar('checkbox-bg-color');
     z-index: getCssVar('index-normal');
-    transition: border-color 0.25s cubic-bezier(0.71, -0.46, 0.29, 1.46),
-      background-color 0.25s cubic-bezier(0.71, -0.46, 0.29, 1.46),
-      outline 0.25s cubic-bezier(0.71, -0.46, 0.29, 1.46);
+    transition: border-color getCssVar('transition-duration')
+        getCssVar('transition-function-ease-in-out-bezier'),
+      background-color getCssVar('transition-duration')
+        getCssVar('transition-function-ease-in-out-bezier'),
+      outline getCssVar('transition-duration')
+        getCssVar('transition-function-ease-in-out-bezier');
 
     &:hover {
       border-color: getCssVar('checkbox-input-border-color-hover');

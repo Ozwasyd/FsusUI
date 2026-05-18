@@ -72,7 +72,7 @@
     }
 
     .icon-arrow-down {
-      transition: transform getCssVar('transition-duration');
+      transition: transform getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier');
       font-size: getCssVar('font-size', 'base');
 
       @include when(reverse) {

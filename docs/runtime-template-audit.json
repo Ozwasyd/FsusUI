@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-04-18T04:25:58.368Z",
+  "generatedAt": "2026-05-16T23:47:56.398Z",
   "totals": {
     "filesScanned": 127,
-    "totalNodes": 971,
+    "totalNodes": 958,
     "totalIssues": 0,
     "totalPotentialSavings": 0,
     "deprecatedSyntaxCount": 0,
@@ -435,7 +435,7 @@
     },
     {
       "file": "packages/components/empty/src/img-empty.vue",
-      "nodeCount": 24,
+      "nodeCount": 11,
       "componentCount": 0,
       "potentialSavings": 0,
       "manualReviewCount": 0,

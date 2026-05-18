@@ -99,7 +99,7 @@
     font-size: 12px;
 
     transform: rotate(0deg);
-    transition: transform getCssVar('transition-duration') ease-in-out;
+    transition: transform getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier');
 
     &.expanded {
       transform: rotate(90deg);

@@ -2,6 +2,21 @@
 @use 'common/transition.scss';
 @use 'icon.scss';
 
+:root {
+  color-scheme: light dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 .skip-link {
   position: absolute;
   top: -9999px;
@@ -22,5 +37,6 @@
 svg {
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 0.2px; // subtle "ink spread" effect
+  stroke-width: 1.2px;
+  paint-order: stroke fill;
 }

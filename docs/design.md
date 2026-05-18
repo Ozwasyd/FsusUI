@@ -41,15 +41,15 @@ FsusUI 2026 版的设计语言被定义为 **"The Intellectual Minimalist" (高�
 ### 核心调色板
 
 - **核心黑 (The Ink | 墨)**: `#0F0F11` (极深的微暖黑色)。
-  - _应用_: 所有主要文本、品牌 Logo 以及强力 CTA（主要）按钮。质感犹如高质量的打印油墨。
-- **核心白 (The Paper | 纸)**: `#FCFCFC` 或 `#F7F7F8`。
-  - _应用_: 用于主背景和容器填充。这是一种非常微妙的暖灰白中性色，用来模拟高级书写纸张，不仅缓解视觉疲劳，更是营造 "Ivy Style" 奢华感的关键。
+  - _应用_: 所有主要文本、品牌 Logo 以及强力 CTA（主要）按钮。质感犹如高质量的打印油墨。暗色模式下翻转为柔软的暖纸白 `#F0F0F4`，以减轻视觉疲劳。
+- **核心白 (The Paper | 纸)**: `#FFFFFF` (浮层面板) 或 `#F7F7F8` (页面底色)。
+  - _应用_: 用于主背景和容器填充。不仅缓解视觉疲劳，更是营造 "Ivy Style" 奢华感的关键。暗色模式下映射为深沉的 `#121214` (浮层) 与 `#09090B` (底色)。
 - **品牌灰 (The Dot | 点)**: `#A1A1AA` 或 `#8E8E93`。
   - _应用_: 直接从 Logo 的句点提取。用于次要文本、极其微妙的边框线以及未激活/禁用状态。
 
 ### 点睛色
 
-- **强调色 (The Fountain Pen | 钢笔)**: **`#2A599C` (Scholarly Blue 学术蓝)**。
+- **强调色 (The Fountain Pen | 钢笔)**: **`#2A599C` (Scholarly Blue 学术蓝)** (暗色模式为 `#4B79CC`)。
   - _应用_: 为了确保无障碍访问 (Accessibility) 和明确的交互反馈，我们引入了这种让人联想到经典钢笔墨水的低饱和深蓝色。它绝不喧宾夺主，完美契合学院派审美。**严格限制仅用于功能性 UX 反馈**（例如：文本链接、激活的 Tab 标签、Input 焦点环 Focus Rings，以及部分按钮的 Hover 状态）。
 
 ---
@@ -113,3 +113,35 @@ FsusUI 2026 版的设计语言被定义为 **"The Intellectual Minimalist" (高�
 - **Don't** 使用高饱和度、荧光色、渐变霓虹灯等“数字廉价感”色彩。点缀色必须保持学术和克制。
 - **Don't** 过度设计。如果一个边框线或底纹阴影不能起到明确结构层级或强化交互的作用，立刻删除它。让字体本身成为建筑。
 - **Don't** 使用粗糙、生硬的原生浏览器组件默认蓝圈，永远使用系统提供的 Focus Rings 处理。
+
+---
+
+## 8. 运行时 Token 映射表 (Token Mapping)
+
+为确保设计稿与代码实现的一一对应，FsusUI 使用以下映射逻辑：
+
+### 8.1 核心色彩 (Core Colors)
+
+| 视觉概念 | 设计稿取值 (Light) | 运行时 Token | 设计稿取值 (Dark) |
+| :--- | :--- | :--- | :--- |
+| **墨 (Ink)** | `#0F0F11` | `--el-color-primary` | `#F0F0F4` |
+| **纸 (Paper)** | `#FFFFFF` | `--el-bg-color` | `#121214` |
+| **底 (Page)** | `#F7F7F8` | `--el-bg-color-page` | `#09090B` |
+| **学术蓝 (Scholarly Blue)** | `#2A599C` | `--fsus-scholarly-blue` | `#4B79CC` |
+| **点 (The Dot)** | `#A1A1AA` | `--el-color-info` | `#71717A` |
+| **边框 (Border)** | `#E4E4E7` | `--el-border-color` | `#27272A` |
+
+### 8.2 空间与材质 (Space & Surface)
+
+| 视觉概念 | 属性 | 运行时 Token | 备注 |
+| :--- | :--- | :--- | :--- |
+| **微控件圆角** | `8px` | `--el-border-radius-base` | Button, Input 等 |
+| **浮动面板圆角** | `24px` | `--el-card-border-radius` | Dialog, Card, Drawer |
+| **毛玻璃模糊** | `40px` | `--fsus-backdrop-blur` | 浮动层背景 |
+| **多层微阴影** | - | `--el-box-shadow` | 见 `common/var.scss` |
+
+### 8.3 交互状态 (States)
+
+- **Focus Ring**: `1px inset var(--fsus-scholarly-blue)`
+- **Disabled**: 背景 `fill-color-light`, 文字 `text-color-placeholder`
+- **Transition**: 统一使用 `cubic-bezier(0.4, 0, 0.2, 1)` (Standard Ease)
