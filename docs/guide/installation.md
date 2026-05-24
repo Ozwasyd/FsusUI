@@ -4,18 +4,14 @@
 
 FsusUI 要求以下最低版本的运行环境：
 
-| 环境 | 版本 |
-|------|------|
-| Node.js | `22.x` |
-| pnpm | `10.33.0` |
-| TypeScript | `6.0.x` |
-| Vue | `^3.5.0` |
+| 环境       | 版本      |
+| ---------- | --------- |
+| Node.js    | `22.x`    |
+| pnpm       | `10.33.0` |
+| TypeScript | `6.0.x`   |
+| Vue        | `^3.5.0`  |
 
-FsusUI 支持所有现代浏览器最近两个主版本（不支持 IE）。
-
-| 版本 | Chrome | Edge | Firefox | Safari |
-|------|--------|------|---------|--------|
-| 当前 | ≥ 85 | ≥ 85 | ≥ 79 | ≥ 14.1 |
+FsusUI 的构建目标为 `ES2022`。对浏览器能力的保守基线按 Chromium `106+` 估算；其他现代浏览器需具备等效的 ES2022 支持能力。
 
 ### SCSS 编译器
 
@@ -40,12 +36,14 @@ export default defineConfig({
 
 FsusUI 发布在 **GitHub Packages**，不发布到 npm 公共仓库。安装前需要配置 GitHub Packages 认证。
 
+当前正式安装名为 `@ozwasyd/element-plus`。这个 scope 来自仓库所有者，和发布工件中的 `.npmrc` 保持一致。
+
 ### 第一步：配置 .npmrc
 
 在项目根目录或用户目录 `~/.npmrc` 中添加：
 
 ```ini
-@element-plus:registry=https://npm.pkg.github.com
+@ozwasyd:registry=https://npm.pkg.github.com
 //npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
 ```
 
@@ -54,7 +52,7 @@ FsusUI 发布在 **GitHub Packages**，不发布到 npm 公共仓库。安装前
 ### 第二步：安装包
 
 ```bash
-pnpm install element-plus
+pnpm install @ozwasyd/element-plus
 ```
 
 ### Sass 源码依赖（可选）
@@ -95,5 +93,14 @@ FsusUI 内置 WASM 加速模块，在特定场景下自动启用，无需额外�
 
 - **Table 排序**：当表格行数 ≥ 5000 时，自动启用 WASM 加速排序，低于阈值时使用纯 JS。
 - **VirtualList 行高预估**：当列表项 ≥ 2000 时，自动启用 WASM 动态行高预估，低于阈值时自动降级。
+- **MarkdownRenderer**：内置 raw HTML Markdown 渲染器，产物包含 `markdown_basic.js/.wasm` 与 `markdown_simd.js/.wasm`，组件本身不包含 Markdown 样式。
 
-若需要在项目中重新编译 WASM 模块，需要 Emscripten `5.0.4`。详见 [工程维护交接](../engineering-handoff.md#wasm)。
+若需要在项目中重新编译 WASM 模块，需要 Emscripten `5.0.4`：
+
+```bash
+pnpm run build:wasm
+pnpm run check:markdown-wasm
+pnpm run check:markdown-wasm-runtime
+```
+
+详见 [工程维护交接](../engineering-handoff.md#wasm)。

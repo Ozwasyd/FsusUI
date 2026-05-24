@@ -1,4 +1,4 @@
-import type { InjectionKey, Ref } from 'vue'
+import type { ComputedRef, InjectionKey, Ref } from 'vue'
 
 import type { CarouselItemProps } from './carousel-item'
 
@@ -22,6 +22,8 @@ export type CarouselItemContext = {
 export type CarouselContext = {
   root: Ref<HTMLElement | undefined>
   items: Ref<CarouselItemContext[]>
+  dragOffset: ComputedRef<number>
+  isDragging: Ref<boolean>
   isCardType: Ref<boolean>
   isVertical: Ref<boolean>
   loop: boolean

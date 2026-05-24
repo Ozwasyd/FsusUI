@@ -17,6 +17,14 @@ declare global {
 }
 
 declare module '@vue/runtime-dom' {
+  export interface HTMLAttributes {
+    'data-audit-active'?: string | boolean
+    'data-audit-component'?: string
+    'data-audit-focus'?: string | boolean
+    'data-audit-target'?: string | boolean
+    'data-testid'?: string
+  }
+
   export interface InputHTMLAttributes {
     'true-value'?: boolean | number | string
     'false-value'?: boolean | number | string
@@ -29,8 +37,8 @@ declare module '@vue/runtime-core' {
   }
 
   export interface GlobalDirectives {
-    vLoading: typeof import('../packages/components/loading')['vLoading']
-    vInfiniteScroll: typeof import('../packages/components/infinite-scroll')['default']
+    vLoading: (typeof import('../packages/components/loading'))['vLoading']
+    vInfiniteScroll: (typeof import('../packages/components/infinite-scroll'))['default']
   }
 
   export interface GlobalComponents {
@@ -40,12 +48,23 @@ declare module '@vue/runtime-core' {
   export interface ComponentCustomProperties {
     vShow: typeof vShow
   }
+
+  export interface ComponentCustomProps {
+    dataAuditActive?: string | boolean
+    dataAuditComponent?: string
+    dataAuditFocus?: string | boolean
+    dataAuditTarget?: string | boolean
+  }
 }
 
 // .vue file shim for regular tsc (vitest type-check)
 declare module '*.vue' {
   import type { DefineComponent } from 'vue'
-  const component: DefineComponent<Record<string, unknown>, Record<string, unknown>, any>
+  const component: DefineComponent<
+    Record<string, unknown>,
+    Record<string, unknown>,
+    any
+  >
   export default component
 }
 

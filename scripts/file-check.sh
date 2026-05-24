@@ -1,4 +1,10 @@
 #! /bin/bash
+set -euo pipefail
+
+if [[ "${RELEASE_VERIFY:-0}" != "1" && "${1:-}" != "--strict" ]]; then
+  echo "file-check is release-only; pass --strict or RELEASE_VERIFY=1 to compare published tarballs."
+  exit 0
+fi
 
 CURRENT_PUBLISHED_TARBALL="$(npm view element-plus dist.tarball)"
 

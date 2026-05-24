@@ -48,6 +48,26 @@ pnpm verify:release
 - `test:visual`：Playwright 多项目截图与 smoke 通过，不重建基线
 - `verify:release`：`verify` 和 `build:github-package` 一并通过
 
+## WASM
+
+本仓库的 WASM 包位于 `packages/wasm`，当前构建会生成：
+
+- `ep_wasm.mjs/.wasm`：表格排序、虚拟列表行高等通用加速能力。
+- `markdown_basic.js/.wasm`：Markdown raw HTML 渲染器的标量 fallback。
+- `markdown_simd.js/.wasm`：Markdown raw HTML 渲染器的 SIMD 版本。
+
+维护 Markdown 渲染器时，优先跑下面的窄门：
+
+```bash
+pnpm run build:wasm
+pnpm run check:markdown-wasm
+pnpm run check:markdown-wasm-runtime
+pnpm run check:markdown-no-js-path
+pnpm run check:markdown-extreme
+```
+
+MarkdownRenderer 组件不携带 Markdown CSS，也不会自动激活 Mermaid/KaTeX；业务侧需要通过 `placeholders-ready` 事件接管占位符激活。
+
 ## 3. 质量门分工
 
 ### 本地入口

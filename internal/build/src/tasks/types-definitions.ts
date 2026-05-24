@@ -20,7 +20,7 @@ const TSCONFIG_PATH = path.resolve(projRoot, 'tsconfig.web.json')
 const outDir = path.resolve(buildOutput, 'types')
 const iconsVueTypesEntry = path.resolve(
   projRoot,
-  'packages/icons-vue/dist/index.d.ts'
+  'packages/icons-vue/dist/index.d.ts',
 )
 const wasmTypesEntry = path.resolve(projRoot, 'packages/wasm/dist/index.d.ts')
 
@@ -73,8 +73,8 @@ const runGenerateTypesDefinitions = async () => {
 
     consola.trace(
       chalk.yellow(
-        `Generating definition for file: ${chalk.bold(relativePath)}`
-      )
+        `Generating definition for file: ${chalk.bold(relativePath)}`,
+      ),
     )
 
     await mkdir(path.dirname(filepath), {
@@ -84,9 +84,7 @@ const runGenerateTypesDefinitions = async () => {
     await writeFile(filepath, pathRewriter('esm')(outputFile.text), 'utf8')
 
     consola.success(
-      chalk.green(
-        `Definition for file: ${chalk.bold(relativePath)} generated`
-      )
+      chalk.green(`Definition for file: ${chalk.bold(relativePath)} generated`),
     )
   })
 
@@ -99,6 +97,9 @@ export const generateTypesDefinitions: TaskFunction = (done) => {
 
 async function addSourceFiles(project: Project) {
   project.addSourceFileAtPath(path.resolve(projRoot, 'typings/env.d.ts'))
+  project.addSourceFileAtPath(
+    path.resolve(projRoot, 'typings/vite-worker.d.ts'),
+  )
 
   const globSourceFile = '**/*.{js?(x),ts?(x),vue}'
   const workspaceExternalPackages = [
@@ -109,17 +110,20 @@ async function addSourceFiles(project: Project) {
     '!wasm/**/*',
   ]
   const filePaths = excludeFiles(
-    await glob([globSourceFile, '!element-plus/**/*', ...workspaceExternalPackages], {
-      cwd: pkgRoot,
-      absolute: true,
-      onlyFiles: true,
-    })
+    await glob(
+      [globSourceFile, '!element-plus/**/*', ...workspaceExternalPackages],
+      {
+        cwd: pkgRoot,
+        absolute: true,
+        onlyFiles: true,
+      },
+    ),
   )
   const epPaths = excludeFiles(
     await glob(globSourceFile, {
       cwd: epRoot,
       onlyFiles: true,
-    })
+    }),
   )
 
   const sourceFiles: SourceFile[] = []
@@ -145,7 +149,7 @@ async function addSourceFiles(project: Project) {
           const lang = scriptSetup?.lang || script?.lang || 'js'
           const sourceFile = project.createSourceFile(
             `${path.relative(process.cwd(), file)}.${lang}`,
-            content
+            content,
           )
           sourceFiles.push(sourceFile)
         }
@@ -157,7 +161,7 @@ async function addSourceFiles(project: Project) {
     ...epPaths.map(async (file) => {
       const content = await readFile(path.resolve(epRoot, file), 'utf-8')
       sourceFiles.push(
-        project.createSourceFile(path.resolve(pkgRoot, file), content)
+        project.createSourceFile(path.resolve(pkgRoot, file), content),
       )
     }),
   ])

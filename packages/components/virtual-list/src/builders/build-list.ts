@@ -4,15 +4,23 @@ import {
   defineComponent,
   getCurrentInstance,
   h,
-  nextTick,
   onMounted,
+  onBeforeUnmount,
   onUpdated,
   ref,
   resolveDynamicComponent,
   unref,
 } from 'vue'
 import { hasOwn, isClient, isNumber, isString } from '@element-plus/utils'
-import { useNamespace } from '@element-plus/hooks'
+import {
+  applyFsusInteractiveMotionVars,
+  resolveFsusInteractiveMotion,
+  resolveFsusRenderPipelineCache,
+  useFsusRenderPipelineRuntime,
+  useFsusMotionRuntime,
+  useNamespace,
+} from '@element-plus/hooks'
+import { useGlobalConfig } from '@element-plus/components/config-provider'
 import { useCache } from '../hooks/use-cache'
 import useWheel from '../hooks/use-wheel'
 import Scrollbar from '../components/scrollbar'
@@ -21,6 +29,7 @@ import { virtualizedListProps } from '../props'
 import {
   AUTO_ALIGNMENT,
   BACKWARD,
+  DEFAULT_DYNAMIC_LIST_ITEM_SIZE,
   FORWARD,
   HORIZONTAL,
   ITEM_RENDER_EVT,
@@ -34,6 +43,8 @@ import {
 import type { CSSProperties, Slot, VNode, VNodeChild } from 'vue'
 import type { Alignment, ListConstructorProps } from '../types'
 import type { VirtualizedListProps } from '../props'
+
+const SCROLL_MOTION_IDLE_MS = 320
 
 const createList = ({
   name,
@@ -56,19 +67,24 @@ const createList = ({
       const instance = getCurrentInstance()!
 
       const ns = useNamespace('vl')
+      const motionRuntime = useFsusMotionRuntime()
+      const renderPipelineConfig = useGlobalConfig('renderPipeline')
 
       const dynamicSizeCache = ref(initCache(props, instance))
 
       const getItemStyleCache = useCache()
+      let resetFrame = 0
       // refs
       // here windowRef and innerRef can be type of HTMLElement
       // or user defined component type, depends on the type passed
       // by user
       const windowRef = ref<HTMLElement>()
       const innerRef = ref<HTMLElement>()
+      const wrapperRef = ref<HTMLElement>()
       const scrollbarRef = ref()
       const states = ref({
         isScrolling: false,
+        isScrollMotion: false,
         scrollDir: 'forward',
         scrollOffset: isNumber(props.initScrollOffset)
           ? props.initScrollOffset
@@ -79,8 +95,42 @@ const createList = ({
       })
 
       // computed
+      const renderPipelineRuntime = useFsusRenderPipelineRuntime({
+        componentName: name ?? 'ElVirtualList',
+        config: renderPipelineConfig,
+        estimate: computed(() => ({
+          items: props.total ?? 0,
+          nodes: props.total ?? 0,
+        })),
+        source: computed(() => props.total ?? 0),
+      })
+      const resolvedRenderPipelineConfig = renderPipelineRuntime.config
+      const renderPipelineHardwareAttrs = renderPipelineRuntime.hardwareAttrs
+
+      const estimatedItemPixelSize = computed(() =>
+        Math.max(
+          1,
+          props.estimatedItemSize ??
+            (isNumber(props.itemSize)
+              ? props.itemSize
+              : DEFAULT_DYNAMIC_LIST_ITEM_SIZE),
+        ),
+      )
+
+      const renderPipelineStrategy = renderPipelineRuntime.strategy
+
+      const effectiveCache = computed(() =>
+        resolveFsusRenderPipelineCache({
+          budgeted: renderPipelineConfig.value !== undefined,
+          config: resolvedRenderPipelineConfig.value,
+          estimatedItemSize: estimatedItemPixelSize.value,
+          explicitCache: props.cache,
+          strategy: renderPipelineStrategy.value,
+        }),
+      )
+
       const itemsToRender = computed(() => {
-        const { total, cache } = props
+        const { total } = props
         const { isScrolling, scrollDir, scrollOffset } = unref(states)
 
         if (total === 0) {
@@ -99,6 +149,7 @@ const createList = ({
           unref(dynamicSizeCache),
         )
 
+        const cache = effectiveCache.value
         const cacheBackward =
           !isScrolling || scrollDir === BACKWARD ? Math.max(1, cache) : 1
         const cacheForward =
@@ -123,7 +174,11 @@ const createList = ({
           position: 'relative',
           [`overflow-${_isHorizontal.value ? 'x' : 'y'}`]: 'scroll',
           WebkitOverflowScrolling: 'touch',
-          willChange: 'transform',
+          willChange:
+            renderPipelineRuntime.compositor.value &&
+            states.value.isScrollMotion
+              ? 'transform'
+              : undefined,
         },
         {
           direction: props.direction,
@@ -205,7 +260,11 @@ const createList = ({
           updateRequested: false,
         }
 
-        nextTick(resetIsScrolling)
+        scheduleResetIsScrolling()
+        triggerScrollMotion(
+          _isHorizontal.value ? scrollOffset - _states.scrollOffset : 0,
+          _isHorizontal.value ? 0 : scrollOffset - _states.scrollOffset,
+        )
       }
 
       const scrollHorizontally = (e: Event) => {
@@ -251,7 +310,11 @@ const createList = ({
           updateRequested: false,
         }
 
-        nextTick(resetIsScrolling)
+        scheduleResetIsScrolling()
+        triggerScrollMotion(
+          _isHorizontal.value ? scrollOffset - _states.scrollOffset : 0,
+          _isHorizontal.value ? 0 : scrollOffset - _states.scrollOffset,
+        )
       }
 
       const onScroll = (e: Event) => {
@@ -272,21 +335,48 @@ const createList = ({
         )
       }
 
+      const onScrollbarStartMove = () => {
+        states.value = {
+          ...unref(states),
+          isScrollbarDragging: true,
+          isScrolling: true,
+        }
+        if (resetFrame) {
+          cancelAnimationFrame(resetFrame)
+          resetFrame = 0
+        }
+      }
+
+      const onScrollbarStopMove = () => {
+        states.value = {
+          ...unref(states),
+          isScrollbarDragging: false,
+        }
+        scheduleResetIsScrolling()
+        scheduleScrollMotionEnd()
+      }
+
       const scrollTo = (offset: number) => {
         offset = Math.max(offset, 0)
+        const previousOffset = unref(states).scrollOffset
 
-        if (offset === unref(states).scrollOffset) {
+        if (offset === previousOffset) {
           return
         }
 
         states.value = {
           ...unref(states),
+          isScrolling: true,
           scrollOffset: offset,
-          scrollDir: getScrollDir(unref(states).scrollOffset, offset),
+          scrollDir: getScrollDir(previousOffset, offset),
           updateRequested: true,
         }
 
-        nextTick(resetIsScrolling)
+        scheduleResetIsScrolling()
+        triggerScrollMotion(
+          _isHorizontal.value ? offset - previousOffset : 0,
+          _isHorizontal.value ? 0 : offset - previousOffset,
+        )
       }
 
       const scrollToItem = (
@@ -341,14 +431,92 @@ const createList = ({
 
       // TODO:
       // perf optimization here, reset isScrolling with debounce.
+      let scrollMotionTimer: ReturnType<typeof setTimeout> | undefined
+      let scrollMotionFrame = 0
+      let lastScrollMotionAt = 0
+
+      const scheduleResetIsScrolling = () => {
+        if (resetFrame) return
+        resetFrame = requestAnimationFrame(resetIsScrolling)
+      }
+
+      const syncScrollMotionClasses = (active: boolean) => {
+        const wrapper = wrapperRef.value
+        if (!wrapper) return
+
+        wrapper.classList.remove(
+          ns.is('scrolling'),
+          ns.is('scrolling-forward'),
+          ns.is('scrolling-backward'),
+        )
+        if (!active) return
+
+        wrapper.classList.add(
+          ns.is('scrolling'),
+          ns.is(`scrolling-${states.value.scrollDir}`),
+        )
+      }
+
+      const clearScrollMotionSchedule = () => {
+        if (scrollMotionTimer) {
+          clearTimeout(scrollMotionTimer)
+          scrollMotionTimer = undefined
+        }
+        if (scrollMotionFrame) {
+          cancelAnimationFrame(scrollMotionFrame)
+          scrollMotionFrame = 0
+        }
+      }
+
+      const clearScrollMotionState = () => {
+        states.value.isScrollMotion = false
+        syncScrollMotionClasses(false)
+      }
+
+      const scheduleScrollMotionEnd = () => {
+        clearScrollMotionSchedule()
+        if (states.value.isScrollbarDragging) return
+        const armTimer = () => {
+          scrollMotionFrame = 0
+          scrollMotionTimer = setTimeout(
+            clearScrollMotionState,
+            motionRuntime.value.scrollIdleMs || SCROLL_MOTION_IDLE_MS,
+          )
+        }
+
+        if (typeof requestAnimationFrame !== 'function') {
+          armTimer()
+          return
+        }
+
+        scrollMotionFrame = requestAnimationFrame(() => {
+          scrollMotionFrame = requestAnimationFrame(armTimer)
+        })
+      }
+
+      const triggerScrollMotion = (deltaX = 0, deltaY = 0) => {
+        if (!motionRuntime.value.enabled) return
+        const now =
+          typeof performance !== 'undefined' ? performance.now() : Date.now()
+        applyFsusInteractiveMotionVars(
+          wrapperRef.value,
+          resolveFsusInteractiveMotion({
+            deltaX,
+            deltaY,
+            elapsedMs: lastScrollMotionAt ? now - lastScrollMotionAt : 16,
+            runtime: motionRuntime.value,
+          }),
+        )
+        lastScrollMotionAt = now
+        states.value.isScrollMotion = true
+        syncScrollMotionClasses(true)
+        scheduleScrollMotionEnd()
+      }
 
       const resetIsScrolling = () => {
-        // timer = null
-
+        resetFrame = 0
         states.value.isScrolling = false
-        nextTick(() => {
-          getItemStyleCache.value(-1, null, null)
-        })
+        getItemStyleCache.value(-1, null, null)
       }
 
       const resetScrollTop = () => {
@@ -376,6 +544,14 @@ const createList = ({
         }
 
         emitEvents()
+      })
+
+      onBeforeUnmount(() => {
+        if (resetFrame) {
+          cancelAnimationFrame(resetFrame)
+          resetFrame = 0
+        }
+        clearScrollMotionSchedule()
       })
 
       onUpdated(() => {
@@ -419,15 +595,21 @@ const createList = ({
         clientSize,
         estimatedTotalSize,
         windowStyle,
+        wrapperRef,
         windowRef,
         innerRef,
         innerStyle,
         itemsToRender,
         scrollbarRef,
         states,
+        effectiveCache,
+        renderPipelineHardwareAttrs,
+        renderPipelineStrategy,
         getItemStyle,
         onScroll,
         onScrollbarScroll,
+        onScrollbarStartMove,
+        onScrollbarStopMove,
         onWheel,
         scrollTo,
         scrollToItem,
@@ -437,6 +619,7 @@ const createList = ({
 
       expose({
         windowRef,
+        wrapperRef,
         innerRef,
         getItemStyleCache,
         scrollTo,
@@ -464,8 +647,13 @@ const createList = ({
         total,
         onScroll,
         onScrollbarScroll,
+        onScrollbarStartMove,
+        onScrollbarStopMove,
         onWheel,
         states,
+        effectiveCache,
+        renderPipelineStrategy,
+        renderPipelineHardwareAttrs,
         useIsScrolling,
         windowStyle,
         ns,
@@ -496,6 +684,7 @@ const createList = ({
         h(
           Inner as VNode,
           {
+            class: ns.e('inner'),
             style: innerStyle,
             ref: 'innerRef',
           },
@@ -510,7 +699,10 @@ const createList = ({
       const scrollbar = h(Scrollbar, {
         ref: 'scrollbarRef',
         clientSize,
+        class: states.isScrollMotion ? ns.is('scrolling') : '',
         layout,
+        onStartMove: onScrollbarStartMove,
+        onStopMove: onScrollbarStopMove,
         onScroll: onScrollbarScroll,
         ratio: (clientSize * 100) / this.estimatedTotalSize,
         scrollFrom:
@@ -522,6 +714,7 @@ const createList = ({
         Container as VNode,
         {
           class: [ns.e('window'), className],
+          ...renderPipelineHardwareAttrs,
           style: windowStyle,
           onScroll,
           onWheel,
@@ -535,7 +728,20 @@ const createList = ({
         'div',
         {
           key: 0,
-          class: [ns.e('wrapper'), states.scrollbarAlwaysOn ? 'always-on' : ''],
+          class: [
+            ns.e('wrapper'),
+            states.scrollbarAlwaysOn ? 'always-on' : '',
+            ns.is('scrolling', states.isScrollMotion),
+            ns.is('vertical', layout !== HORIZONTAL),
+            ns.is('horizontal', layout === HORIZONTAL),
+            states.isScrollMotion ? ns.is(`scrolling-${states.scrollDir}`) : '',
+          ],
+          'data-fsus-render-cache': effectiveCache,
+          ...renderPipelineHardwareAttrs,
+          'data-fsus-render-items': total,
+          'data-fsus-render-pipeline': 'virtual-list',
+          'data-fsus-render-strategy': renderPipelineStrategy,
+          ref: 'wrapperRef',
         },
         [listContainer, scrollbar],
       )

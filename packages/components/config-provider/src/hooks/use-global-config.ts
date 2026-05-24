@@ -17,9 +17,7 @@ import type { MaybeRef } from 'vue'
 import type { App, Ref } from 'vue'
 import type { ConfigProviderContext } from '../constants'
 
-// this is meant to fix global methods like `ElMessage(opts)`, this way we can inject current locale
-// into the component as default injection value.
-// refer to: https://github.com/element-plus/element-plus/issues/2610#issuecomment-887965266
+// Fallback for global methods without an app context.
 const globalConfig = ref<ConfigProviderContext>()
 
 export function useGlobalConfig<
@@ -111,7 +109,7 @@ export const provideGlobalConfig = (
     size: computed(() => context.value.size || ''),
   })
 
-  if (global || !globalConfig.value) {
+  if (!app && (global || !globalConfig.value)) {
     globalConfig.value = context.value
   }
   return context

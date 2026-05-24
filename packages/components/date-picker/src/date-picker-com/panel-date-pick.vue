@@ -129,32 +129,38 @@
           </span>
         </div>
         <div :class="ppNs.e('content')" @keydown="handleKeydownTable">
-          <date-table
-            v-if="currentView === 'date'"
-            ref="currentViewRef"
-            :selection-mode="selectionMode"
-            :date="innerDate"
-            :parsed-value="parsedValue"
-            :disabled-date="disabledDate"
-            :cell-class-name="cellClassName"
-            v-on="dateTableEvents"
-          />
-          <year-table
-            v-if="currentView === 'year'"
-            ref="currentViewRef"
-            :date="innerDate"
-            :disabled-date="disabledDate"
-            :parsed-value="parsedValue"
-            @pick="handleYearPick"
-          />
-          <month-table
-            v-if="currentView === 'month'"
-            ref="currentViewRef"
-            :date="innerDate"
-            :parsed-value="parsedValue"
-            :disabled-date="disabledDate"
-            @pick="handleMonthPick"
-          />
+          <div
+            :key="dateViewKey"
+            :class="[dpNs.e('view'), dateViewMotionClass]"
+            v-bind="dateViewAuditAttrs"
+          >
+            <date-table
+              v-if="currentView === 'date'"
+              ref="currentViewRef"
+              :selection-mode="selectionMode"
+              :date="innerDate"
+              :parsed-value="parsedValue"
+              :disabled-date="disabledDate"
+              :cell-class-name="cellClassName"
+              v-on="dateTableEvents"
+            />
+            <year-table
+              v-if="currentView === 'year'"
+              ref="currentViewRef"
+              :date="innerDate"
+              :disabled-date="disabledDate"
+              :parsed-value="parsedValue"
+              @pick="handleYearPick"
+            />
+            <month-table
+              v-if="currentView === 'month'"
+              ref="currentViewRef"
+              :date="innerDate"
+              :parsed-value="parsedValue"
+              :disabled-date="disabledDate"
+              @pick="handleMonthPick"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -231,6 +237,7 @@ import type {
 } from '../props/basic-date-table'
 
 type DatePickType = PanelDatePickProps['type']
+type DateViewMotion = 'next' | 'prev' | 'drill-in' | 'drill-out'
 // todo
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const timeWithinRange = (_: ConfigType, __: any, ___: string) => true
@@ -335,12 +342,14 @@ const dateTableEvents = {
 }
 
 const moveByMonth = (forward: boolean) => {
+  dateViewMotion.value = forward ? 'next' : 'prev'
   const action = forward ? 'add' : 'subtract'
   innerDate.value = innerDate.value[action](1, 'month')
   handlePanelChange('month')
 }
 
 const moveByYear = (forward: boolean) => {
+  dateViewMotion.value = forward ? 'next' : 'prev'
   const currentDate = innerDate.value
   const action = forward ? 'add' : 'subtract'
 
@@ -353,6 +362,26 @@ const moveByYear = (forward: boolean) => {
 }
 
 const currentView = ref('date')
+const dateViewMotion = ref<DateViewMotion>('next')
+
+const dateViewMotionClass = computed(
+  () => `${dpNs.namespace.value}-date-picker-view-${dateViewMotion.value}`
+)
+
+const dateViewAuditAttrs = computed(() => ({
+  'data-fsus-date-view': currentView.value,
+  'data-fsus-date-view-motion': dateViewMotion.value,
+}))
+
+const dateViewKey = computed(() => {
+  if (currentView.value === 'date') {
+    return `date-${year.value}-${month.value}-${selectionMode.value}`
+  }
+  if (currentView.value === 'month') {
+    return `month-${year.value}-${selectionMode.value}`
+  }
+  return `year-${Math.floor(year.value / 10)}-${selectionMode.value}`
+})
 
 const yearLabel = computed(() => {
   const yearTranslation = t('el.datepicker.year')
@@ -406,6 +435,7 @@ const keyboardMode = computed<string>(() => {
 const hasShortcuts = computed(() => !!shortcuts.length)
 
 const handleMonthPick = async (month: number) => {
+  dateViewMotion.value = 'drill-in'
   innerDate.value = innerDate.value.startOf('month').month(month)
   if (selectionMode.value === 'month') {
     emit(innerDate.value, false)
@@ -421,6 +451,7 @@ const handleMonthPick = async (month: number) => {
 }
 
 const handleYearPick = async (year: number) => {
+  dateViewMotion.value = 'drill-in'
   if (selectionMode.value === 'year') {
     innerDate.value = innerDate.value.startOf('year').year(year)
     emit(innerDate.value, false)
@@ -437,6 +468,7 @@ const handleYearPick = async (year: number) => {
 }
 
 const showPicker = async (view: 'month' | 'year') => {
+  dateViewMotion.value = 'drill-out'
   currentView.value = view
   await nextTick()
   handleFocusPicker()

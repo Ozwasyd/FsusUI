@@ -32,25 +32,32 @@ export default defineComponent({
           ;(el as any).dataset = {}
         }
 
+        let scrollWidth: string
         if (hasClass(el, ns.m('collapse'))) {
           removeClass(el, ns.m('collapse'))
           el.dataset.oldOverflow = el.style.overflow
-          el.dataset.scrollWidth = el.clientWidth.toString()
+          scrollWidth = el.clientWidth.toString()
           addClass(el, ns.m('collapse'))
         } else {
           addClass(el, ns.m('collapse'))
           el.dataset.oldOverflow = el.style.overflow
-          el.dataset.scrollWidth = el.clientWidth.toString()
+          scrollWidth = el.clientWidth.toString()
           removeClass(el, ns.m('collapse'))
         }
 
-        el.style.width = `${el.scrollWidth}px`
-        el.style.overflow = 'hidden'
+        el.dataset.scrollWidth = scrollWidth
+        requestAnimationFrame(() => {
+          el.style.width = `${scrollWidth}px`
+          el.style.overflow = 'hidden'
+        })
       },
 
       onLeave(el: HTMLElement) {
         addClass(el, 'horizontal-collapse-transition')
-        el.style.width = `${el.dataset.scrollWidth}px`
+        const scrollWidth = el.dataset.scrollWidth
+        requestAnimationFrame(() => {
+          el.style.width = `${scrollWidth}px`
+        })
       },
     } as BaseTransitionProps<HTMLElement> as TransitionProps
 

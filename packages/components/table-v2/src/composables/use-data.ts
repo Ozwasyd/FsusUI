@@ -25,13 +25,17 @@ export const useData = (
     if (!_expandedRowKeys || !_expandedRowKeys.length) return data
 
     const array: any[] = []
-    const keysSet = new Set()
-    _expandedRowKeys.forEach((x) => keysSet.add(x))
+    const keysSet = new Set(_expandedRowKeys)
+    const stack: any[] = []
 
-    let copy: any[] = data.slice()
-    copy.forEach((x) => (depths[x[rowKey]] = 0))
-    while (copy.length > 0) {
-      const item = copy.shift()!
+    for (let index = data.length - 1; index >= 0; index--) {
+      const item = data[index]
+      depths[item[rowKey]] = 0
+      stack.push(item)
+    }
+
+    while (stack.length > 0) {
+      const item = stack.pop()!
 
       array.push(item)
       if (
@@ -39,10 +43,12 @@ export const useData = (
         Array.isArray(item.children) &&
         item.children.length > 0
       ) {
-        copy = [...item.children, ...copy]
-        item.children.forEach(
-          (child: any) => (depths[child[rowKey]] = depths[item[rowKey]] + 1)
-        )
+        const depth = depths[item[rowKey]] + 1
+        for (let index = item.children.length - 1; index >= 0; index--) {
+          const child = item.children[index]
+          depths[child[rowKey]] = depth
+          stack.push(child)
+        }
       }
     }
 

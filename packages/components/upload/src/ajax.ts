@@ -25,7 +25,7 @@ export class UploadAjaxError extends Error {
 function getError(
   action: string,
   option: UploadRequestOptions,
-  xhr: XMLHttpRequest
+  xhr: XMLHttpRequest,
 ) {
   let msg: string
   if (xhr.response) {
@@ -39,14 +39,30 @@ function getError(
   return new UploadAjaxError(msg, xhr.status, option.method, action)
 }
 
-function getBody(xhr: XMLHttpRequest): XMLHttpRequestResponseType {
+function getBody(xhr: XMLHttpRequest) {
+  if (xhr.responseType && xhr.responseType !== 'text') {
+    return xhr.response
+  }
+
   const text = xhr.responseText || xhr.response
   if (!text) {
     return text
   }
 
+  if (typeof text !== 'string') {
+    return text
+  }
+
+  const trimmed = text.trim()
+  if (
+    trimmed === '' ||
+    (trimmed[0] !== '{' && trimmed[0] !== '[' && trimmed[0] !== '"')
+  ) {
+    return text
+  }
+
   try {
-    return JSON.parse(text)
+    return JSON.parse(trimmed)
   } catch {
     return text
   }

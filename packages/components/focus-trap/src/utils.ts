@@ -5,6 +5,7 @@ const focusReason = ref<'pointer' | 'keyboard'>()
 const lastUserFocusTimestamp = ref<number>(0)
 const lastAutomatedFocusTimestamp = ref<number>(0)
 let focusReasonUserCount = 0
+const focusableCache = new WeakMap<HTMLElement, HTMLElement[]>()
 
 export type FocusLayer = {
   paused: boolean
@@ -15,8 +16,12 @@ export type FocusLayer = {
 export type FocusStack = FocusLayer[]
 
 export const obtainAllFocusableElements = (
-  element: HTMLElement
+  element: HTMLElement,
 ): HTMLElement[] => {
+  const canUseCache = element !== document.body
+  const cached = canUseCache ? focusableCache.get(element) : undefined
+  if (cached) return cached
+
   const nodes: HTMLElement[] = []
   const walker = document.createTreeWalker(element, NodeFilter.SHOW_ELEMENT, {
     acceptNode: (
@@ -25,7 +30,7 @@ export const obtainAllFocusableElements = (
         hidden: boolean
         type: string
         tabIndex: number
-      }
+      },
     ) => {
       const isHiddenInput = node.tagName === 'INPUT' && node.type === 'hidden'
       if (node.disabled || node.hidden || isHiddenInput)
@@ -37,12 +42,21 @@ export const obtainAllFocusableElements = (
   })
   while (walker.nextNode()) nodes.push(walker.currentNode as HTMLElement)
 
+  if (canUseCache) {
+    focusableCache.set(element, nodes)
+  }
   return nodes
+}
+
+export const invalidateFocusableCache = (element?: HTMLElement) => {
+  if (element) {
+    focusableCache.delete(element)
+  }
 }
 
 export const getVisibleElement = (
   elements: HTMLElement[],
-  container: HTMLElement
+  container: HTMLElement,
 ) => {
   for (const element of elements) {
     if (!isHidden(element, container)) return element
@@ -65,19 +79,19 @@ export const isHidden = (element: HTMLElement, container: HTMLElement) => {
 export const getEdges = (container: HTMLElement) => {
   const focusable = obtainAllFocusableElements(container)
   const first = getVisibleElement(focusable, container)
-  const last = getVisibleElement(focusable.reverse(), container)
+  const last = getVisibleElement([...focusable].reverse(), container)
   return [first, last]
 }
 
 const isSelectable = (
-  element: any
+  element: any,
 ): element is HTMLInputElement & { select: () => void } => {
   return element instanceof HTMLInputElement && 'select' in element
 }
 
 export const tryFocus = (
   element?: HTMLElement | { focus: () => void } | null,
-  shouldSelect?: boolean
+  shouldSelect?: boolean,
 ) => {
   if (element && element.focus) {
     const prevFocusedElement = document.activeElement
@@ -131,7 +145,7 @@ const createFocusableStack = () => {
 
 export const focusFirstDescendant = (
   elements: HTMLElement[],
-  shouldSelect = false
+  shouldSelect = false,
 ) => {
   const prevFocusedElement = document.activeElement
   for (const element of elements) {
@@ -187,7 +201,7 @@ export const useFocusReason = (): {
 }
 
 export const createFocusOutPreventedEvent = (
-  detail: CustomEventInit['detail']
+  detail: CustomEventInit['detail'],
 ) => {
   return new CustomEvent(FOCUSOUT_PREVENTED, {
     ...FOCUSOUT_PREVENTED_OPTS,

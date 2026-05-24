@@ -159,6 +159,47 @@ describe('DatePicker', () => {
     expect(vm.value).toBeDefined()
   })
 
+  it('uses keyed animated views for panel navigation', async () => {
+    const wrapper = _mount(
+      `<el-date-picker
+        v-model="value"
+    />`,
+      () => ({ value: new Date(2026, 4, 24) })
+    )
+
+    const input = wrapper.find('input')
+    input.trigger('blur')
+    input.trigger('focus')
+    await nextTick()
+
+    const initialView = document.querySelector<HTMLElement>(
+      '.el-date-picker__view'
+    )
+    expect(initialView?.dataset.fsusDateView).toBe('date')
+
+    const nextMonth = document.querySelector<HTMLElement>(
+      '.el-date-picker__next-btn .arrow-right'
+    )
+    await clickActionButton(nextMonth)
+    await nextTick()
+
+    const movedView = document.querySelector<HTMLElement>(
+      '.el-date-picker__view[data-fsus-date-view-motion="next"]'
+    )
+    expect(movedView?.dataset.fsusDateView).toBe('date')
+
+    const yearLabel = document.querySelectorAll<HTMLElement>(
+      '.el-date-picker__header-label'
+    )[0]
+    await clickActionButton(yearLabel)
+    await nextTick()
+
+    const yearView = document.querySelector<HTMLElement>(
+      '.el-date-picker__view[data-fsus-date-view="year"]'
+    )
+    expect(yearView?.dataset.fsusDateViewMotion).toBe('drill-out')
+  })
+
   it('defaultTime and clear value', async () => {
     const wrapper = _mount(
       `<el-date-picker

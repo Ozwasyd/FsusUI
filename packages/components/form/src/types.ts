@@ -5,7 +5,7 @@ import type {
   ValidateFieldsError,
 } from 'async-validator'
 import type { ComponentSize } from '@element-plus/constants'
-import type { Arrayable } from '@element-plus/utils'
+import type { Arrayable, FsusResult } from '@element-plus/utils'
 import type { MaybeRef } from 'vue'
 import type {
   FormItemProp,
@@ -100,7 +100,7 @@ export type FormRules<
   >
 >
 
-export type FormValidationResult = Promise<boolean>
+export type FormValidationResult = Promise<FsusResult<boolean>>
 export type FormValidateCallback = (
   isValid: boolean,
   invalidFields?: ValidateFieldsError

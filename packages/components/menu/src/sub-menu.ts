@@ -89,13 +89,13 @@ export default defineComponent({
         version: '2.3.0',
         ref: 'https://element-plus.org/en-US/component/menu.html#submenu-attributes',
       },
-      computed(() => props.popperAppendToBody !== undefined)
+      computed(() => props.popperAppendToBody !== undefined),
     )
 
     const instance = getCurrentInstance()!
     const { indexPath, parentMenu } = useMenu(
       instance,
-      computed(() => props.index)
+      computed(() => props.index),
     )
     const nsMenu = useNamespace('menu')
     const nsSubMenu = useNamespace('sub-menu')
@@ -119,7 +119,7 @@ export default defineComponent({
     const currentPlacement = computed<Placement>(() =>
       mode.value === 'horizontal' && isFirstLevel.value
         ? 'bottom-start'
-        : 'right-start'
+        : 'right-start',
     )
     const subMenuTitleIcon = computed(() => {
       return (mode.value === 'horizontal' && isFirstLevel.value) ||
@@ -130,10 +130,10 @@ export default defineComponent({
             : props.expandCloseIcon
           : ArrowDown
         : props.collapseCloseIcon && props.collapseOpenIcon
-        ? opened.value
-          ? props.collapseOpenIcon
-          : props.collapseCloseIcon
-        : ArrowRight
+          ? opened.value
+            ? props.collapseOpenIcon
+            : props.collapseCloseIcon
+          : ArrowRight
     })
     const isFirstLevel = computed(() => {
       return subMenu.level === 0
@@ -145,7 +145,7 @@ export default defineComponent({
     const menuTransitionName = computed(() =>
       rootMenu.props.collapse
         ? `${nsMenu.namespace.value}-zoom-in-left`
-        : `${nsMenu.namespace.value}-zoom-in-top`
+        : `${nsMenu.namespace.value}-zoom-in-top`,
     )
     const fallbackPlacements = computed<Placement[]>(() =>
       mode.value === 'horizontal' && isFirstLevel.value
@@ -166,7 +166,7 @@ export default defineComponent({
             'bottom-end',
             'top-start',
             'top-end',
-          ]
+          ],
     )
     const opened = computed(() => rootMenu.openedMenus.includes(props.index))
     const active = computed(() => {
@@ -224,7 +224,7 @@ export default defineComponent({
 
     const handleMouseenter = (
       event: MouseEvent | FocusEvent,
-      showTimeout = props.showTimeout
+      showTimeout = props.showTimeout,
     ) => {
       if (event.type === 'focus') {
         return
@@ -263,7 +263,7 @@ export default defineComponent({
         () =>
           !mouseInChild.value &&
           rootMenu.closeMenu(props.index, indexPath.value),
-        props.hideTimeout
+        props.hideTimeout,
       ))
 
       if (appendToBody.value && deepDispatch) {
@@ -275,7 +275,7 @@ export default defineComponent({
 
     watch(
       () => rootMenu.props.collapse,
-      (value) => handleCollapseToggle(Boolean(value))
+      (value) => handleCollapseToggle(Boolean(value)),
     )
 
     // provide
@@ -334,7 +334,7 @@ export default defineComponent({
               isString(subMenuTitleIcon.value)
                 ? h(instance.appContext.components[subMenuTitleIcon.value])
                 : h(subMenuTitleIcon.value),
-          }
+          },
         ),
       ]
 
@@ -357,7 +357,6 @@ export default defineComponent({
               teleported: appendToBody.value,
               fallbackPlacements: fallbackPlacements.value,
               transition: menuTransitionName.value,
-              gpuAcceleration: false,
             },
             {
               content: () =>
@@ -385,9 +384,9 @@ export default defineComponent({
                         ],
                         style: ulStyle.value,
                       },
-                      [slots.default?.()]
+                      [slots.default?.()],
                     ),
-                  ]
+                  ],
                 ),
               default: () =>
                 h(
@@ -396,9 +395,9 @@ export default defineComponent({
                     class: nsSubMenu.e('title'),
                     onClick: handleClick,
                   },
-                  titleTag
+                  titleTag,
                 ),
-            }
+            },
           )
         : h(Fragment, {}, [
             h(
@@ -408,7 +407,7 @@ export default defineComponent({
                 ref: verticalTitleRef,
                 onClick: handleClick,
               },
-              titleTag
+              titleTag,
             ),
             h(
               ElCollapseTransition,
@@ -423,11 +422,11 @@ export default defineComponent({
                         class: [nsMenu.b(), nsMenu.m('inline')],
                         style: ulStyle.value,
                       },
-                      [slots.default?.()]
+                      [slots.default?.()],
                     ),
-                    [[vShow, opened.value]]
+                    [[vShow, opened.value]],
                   ),
-              }
+              },
             ),
           ])
 
@@ -447,7 +446,7 @@ export default defineComponent({
           onMouseleave: () => handleMouseleave(true),
           onFocus: handleMouseenter,
         },
-        [child]
+        [child],
       )
     }
   },

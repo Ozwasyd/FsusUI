@@ -1,6 +1,11 @@
-import { computed, watch } from 'vue'
-import { filterIndicesSync, warmupWasm } from '@element-plus/wasm'
-import { isFunction } from '@element-plus/utils'
+import { computed, ref, watch } from 'vue'
+import {
+  createAsciiFilterIndex,
+  ensureWasmReady,
+  filterAsciiIndicesSync,
+  isWasmReady,
+} from '@element-plus/wasm'
+import { isFsusErr, isFunction } from '@element-plus/utils'
 import { CHECKED_CHANGE_EVENT } from '../transfer-panel'
 import { usePropsAlias } from './use-props-alias'
 
@@ -14,6 +19,26 @@ import type {
 } from '../transfer-panel'
 
 const WASM_TRANSFER_FILTER_THRESHOLD = 1_000
+
+const getSymmetricDiff = <T>(next: T[], prev: T[]) => {
+  const nextSet = new Set(next)
+  const prevSet = new Set(prev)
+  const diff: T[] = []
+
+  for (const item of next) {
+    if (!prevSet.has(item)) {
+      diff.push(item)
+    }
+  }
+
+  for (const item of prev) {
+    if (!nextSet.has(item)) {
+      diff.push(item)
+    }
+  }
+
+  return diff
+}
 
 const isAsciiOnly = (value: string) => {
   for (let index = 0; index < value.length; index++) {
@@ -31,6 +56,27 @@ export const useCheck = (
   emit: SetupContext<TransferPanelEmits>['emit'],
 ) => {
   const propsAlias = usePropsAlias(props)
+  const wasmFilterVersion = ref(0)
+  const wasmFilterError = ref<unknown>(null)
+  let wasmFilterReadyPromise: Promise<unknown> | null = null
+
+  const requestWasmFilterReady = () => {
+    if (wasmFilterReadyPromise) return
+    wasmFilterReadyPromise = ensureWasmReady()
+      .then((result) => {
+        wasmFilterReadyPromise = null
+        if (isFsusErr(result)) {
+          wasmFilterError.value = result.error
+          return
+        }
+        wasmFilterVersion.value++
+      })
+      .catch((error) => {
+        wasmFilterReadyPromise = null
+        wasmFilterError.value = error
+      })
+  }
+
   const filterSourceData = computed(() => [...props.data])
   const filterLabels = computed(() => {
     return filterSourceData.value.map((item) => {
@@ -51,21 +97,32 @@ export const useCheck = (
       filterLabels.value.every((label) => isAsciiOnly(label))
     )
   })
+  const wasmFilterIndex = computed(() =>
+    canUseWasmFilter.value ? createAsciiFilterIndex(filterLabels.value) : null,
+  )
 
   const filteredData = computed(() => {
     if (canUseWasmFilter.value) {
-      const matchedIndexes = filterIndicesSync(
-        filterLabels.value,
+      void wasmFilterVersion.value
+      if (wasmFilterError.value) {
+        throw wasmFilterError.value
+      }
+
+      if (!isWasmReady()) {
+        requestWasmFilterReady()
+        return []
+      }
+
+      const matchedIndexes = filterAsciiIndicesSync(
+        wasmFilterIndex.value!,
         panelState.query,
         false,
       )
 
-      if (matchedIndexes) {
-        const matchedIndexSet = new Set(matchedIndexes)
-        return filterSourceData.value.filter((_, index) =>
-          matchedIndexSet.has(index),
-        )
-      }
+      const matchedIndexSet = new Set(matchedIndexes)
+      return filterSourceData.value.filter((_, index) =>
+        matchedIndexSet.has(index),
+      )
     }
 
     return filterSourceData.value.filter((item) => {
@@ -127,9 +184,7 @@ export const useCheck = (
       updateAllChecked()
 
       if (panelState.checkChangeByUser) {
-        const movedKeys = val
-          .concat(oldVal)
-          .filter((v) => !val.includes(v) || !oldVal.includes(v))
+        const movedKeys = getSymmetricDiff(val, oldVal)
         emit(CHECKED_CHANGE_EVENT, val, movedKeys)
       } else {
         emit(CHECKED_CHANGE_EVENT, val)
@@ -146,7 +201,7 @@ export const useCheck = (
     canUseWasmFilter,
     (useWasm) => {
       if (useWasm) {
-        warmupWasm()
+        requestWasmFilterReady()
       }
     },
     {

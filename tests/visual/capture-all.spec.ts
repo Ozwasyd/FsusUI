@@ -1,6 +1,38 @@
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
+import type { Page } from '@playwright/test'
+import { attachPageDiagnostics } from '../support/page-diagnostics'
 
-const sections = [
+type VisualSection = {
+  name: string
+  testId: string
+  action?: (page: Page) => Promise<void>
+}
+
+const diagnostics = new WeakMap<Page, string[]>()
+
+const stabilizePage = async (page: Page) => {
+  await page.addStyleTag({
+    content: `
+      *, *::before, *::after {
+        transition-duration: 0s !important;
+        animation-duration: 0s !important;
+        animation-delay: 0s !important;
+        scroll-behavior: auto !important;
+      }
+    `,
+  })
+}
+
+test.beforeEach(async ({ page }) => {
+  diagnostics.set(page, attachPageDiagnostics(page))
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+})
+
+test.afterEach(async ({ page }) => {
+  expect(diagnostics.get(page) ?? []).toEqual([])
+})
+
+const sections: VisualSection[] = [
   { name: 'basic', testId: 'section-basic' },
   { name: 'form', testId: 'section-form' },
   { name: 'data', testId: 'section-data' },
@@ -19,7 +51,11 @@ const sections = [
 for (const theme of ['light', 'dark']) {
   for (const section of sections) {
     test(`capture ${section.name} in ${theme} mode`, async ({ page }) => {
-      await page.goto(`/?visual=${section.name}&theme=${theme}`, { waitUntil: 'networkidle' })
+      await page.goto(`/?visual=${section.name}&theme=${theme}`, {
+        waitUntil: 'domcontentloaded',
+      })
+      await stabilizePage(page)
+
       const locator = page.locator(`[data-testid="${section.testId}"]`)
       await expect(locator).toBeVisible()
       

@@ -1,0 +1,28 @@
+# Source package guard: release publishing uses dist/element-plus.
+# Keep direct source publishes from leaking repo sources or local credentials.
+src/
+__tests__/
+tests/
+scripts/
+build/
+coverage/
+node_modules/
+.env
+.env.*
+.npmrc
+.npmrc.*
+*.map
+*.ts
+*.tsx
+*.vue
+*.cpp
+*.c
+*.cc
+*.h
+*.hpp
+*.pem
+*.key
+*.p12
+*.pfx
+*.tgz
+*.tar.gz

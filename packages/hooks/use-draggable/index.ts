@@ -21,8 +21,25 @@ export const useDraggable = (
     offsetX: 0,
     offsetY: 0,
   }
+  let pendingTransform: typeof transform | null = null
+  let rafId = 0
   let onMousemove: ((e: MouseEvent) => void) | null = null
   let onMouseup: (() => void) | null = null
+
+  const flushTransform = () => {
+    rafId = 0
+    if (!pendingTransform || !targetRef.value) return
+    targetRef.value.style.transform = `translate(${addUnit(
+      pendingTransform.offsetX,
+    )}, ${addUnit(pendingTransform.offsetY)})`
+    pendingTransform = null
+  }
+
+  const scheduleTransformWrite = () => {
+    if (!rafId) {
+      rafId = requestAnimationFrame(flushTransform)
+    }
+  }
 
   const cleanupDocumentListeners = () => {
     if (onMousemove) {
@@ -34,6 +51,12 @@ export const useDraggable = (
       document.removeEventListener('mouseup', onMouseup)
       onMouseup = null
     }
+
+    if (rafId) {
+      cancelAnimationFrame(rafId)
+      rafId = 0
+    }
+    pendingTransform = null
   }
 
   const shouldSkipDrag = (
@@ -91,12 +114,8 @@ export const useDraggable = (
         offsetX: moveX,
         offsetY: moveY,
       }
-
-      if (targetRef.value) {
-        targetRef.value.style.transform = `translate(${addUnit(
-          moveX,
-        )}, ${addUnit(moveY)})`
-      }
+      pendingTransform = transform
+      scheduleTransformWrite()
     }
 
     onMouseup = () => {

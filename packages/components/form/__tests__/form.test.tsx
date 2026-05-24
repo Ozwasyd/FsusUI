@@ -86,11 +86,11 @@ describe('Form', () => {
     const formItems = wrapper.findAll<HTMLElement>('.el-form-item__content')
     const marginLeft = Number.parseInt(
       formItems[0].element.style.marginLeft,
-      10
+      10,
     )
     const marginLeft1 = Number.parseInt(
       formItems[1].element.style.marginLeft,
-      10
+      10,
     )
     expect(marginLeft).toEqual(marginLeft1)
 
@@ -100,11 +100,11 @@ describe('Form', () => {
     const formItems1 = wrapper.findAll<HTMLElement>('.el-form-item__content')
     const marginRight = Number.parseInt(
       formItems1[0].element.style.marginRight,
-      10
+      10,
     )
     const marginRight1 = Number.parseInt(
       formItems1[1].element.style.marginRight,
-      10
+      10,
     )
     expect(marginRight).toEqual(marginRight1)
   })
@@ -145,7 +145,7 @@ describe('Form', () => {
 
     const formItemLabels = wrapper.findAll<HTMLElement>('.el-form-item__label')
     const formItemLabelWraps = wrapper.findAll<HTMLElement>(
-      '.el-form-item__label-wrap'
+      '.el-form-item__label-wrap',
     )
 
     const labelWrapMarginLeft1 = formItemLabelWraps[0].element.style.marginLeft
@@ -155,7 +155,7 @@ describe('Form', () => {
 
     const labelWidth0 = Number.parseInt(
       formItemLabels[0].element.style.width,
-      10
+      10,
     )
     expect(labelWidth0).toEqual(150)
     const labelWidth1 = formItemLabels[1].element.style.width
@@ -224,13 +224,13 @@ describe('Form', () => {
       },
     })
     expect(wrapper.findComponent({ ref: 'labelTop' }).classes()).toContain(
-      'el-form--label-top'
+      'el-form--label-top',
     )
     expect(wrapper.findComponent({ ref: 'labelLeft' }).classes()).toContain(
-      'el-form--label-left'
+      'el-form--label-left',
     )
     expect(wrapper.findComponent({ ref: 'labelRight' }).classes()).toContain(
-      'el-form--label-right'
+      'el-form--label-right',
     )
   })
 
@@ -254,7 +254,7 @@ describe('Form', () => {
       },
     })
     expect(wrapper.findComponent(FormItem).classes()).toContain(
-      'el-form-item--small'
+      'el-form-item--small',
     )
   })
 
@@ -287,10 +287,8 @@ describe('Form', () => {
     const form = wrapper.findComponent(Form).vm as FormInstance
 
     vi.useFakeTimers()
-    const valid = await form
-      .validate()
-      .then(() => true)
-      .catch(() => false)
+    const result = await form.validate()
+    const valid = result.ok && result.value
     vi.runAllTimers()
     vi.useRealTimers()
 
@@ -426,7 +424,7 @@ describe('Form', () => {
       .vm as FormItemInstance
     const addressField = wrapper.findComponent({ ref: 'address' })
       .vm as FormItemInstance
-    await form.validate().catch(() => undefined)
+    await form.validate()
     await nextTick()
     expect(nameField.validateMessage).toBe('Please input name')
     expect(addressField.validateMessage).toBe('Please input address')
@@ -464,7 +462,7 @@ describe('Form', () => {
     const form = wrapper.findComponent({ ref: 'form' }).vm as FormInstance
     form.scrollToField('name')
     expect(scrollIntoViewMock).toHaveBeenCalledWith(
-      wrapper.findComponent({ ref: 'formItem' }).element
+      wrapper.findComponent({ ref: 'formItem' }).element,
     )
 
     window.HTMLElement.prototype.scrollIntoView = oldScrollIntoView
@@ -487,11 +485,7 @@ describe('Form', () => {
           ],
         })
         return () => (
-          <Form
-            ref="formRef"
-            model={form}
-            rules={rules}
-          >
+          <Form ref="formRef" model={form} rules={rules}>
             <FormItem prop="name" label="name">
               <Input v-model={form.name} />
             </FormItem>
@@ -507,8 +501,11 @@ describe('Form', () => {
     function validate() {
       return (vm.$refs.formRef as FormInstance)
         .validate()
-        .then(() => ({ valid: true, fields: undefined }))
-        .catch((fields) => ({ valid: false, fields }))
+        .then((result) =>
+          result.ok
+            ? { valid: result.value, fields: undefined }
+            : { valid: false, fields: result.error.cause },
+        )
     }
 
     let res = await validate()
@@ -551,9 +548,7 @@ describe('Form', () => {
       },
     })
 
-    await (wrapper.vm.$refs.formRef as FormInstance)
-      .validate()
-      .catch(() => undefined)
+    await (wrapper.vm.$refs.formRef as FormInstance).validate()
     const ageField = wrapper.findComponent({ ref: 'age' })
     expect(ageField.classes('is-success')).toBe(true)
     expect(ageField.classes()).toContain('is-success')

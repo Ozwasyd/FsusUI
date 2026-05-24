@@ -55,6 +55,7 @@ export default defineComponent({
     const cursorTop = ref(0)
     const cursorLeft = ref(0)
     const background = ref('hsl(0, 100%, 50%)')
+    let dragRect: Pick<DOMRect, 'height' | 'left' | 'top' | 'width'> | undefined
     const colorValue = computed(() => {
       const hue = props.color.get('hue')
       const value = props.color.get('value')
@@ -75,9 +76,14 @@ export default defineComponent({
       background.value = `hsl(${props.color.get('hue')}, 100%, 50%)`
     }
 
-    function handleDrag(event: MouseEvent | TouchEvent) {
+    function measureDragRect() {
       const el = instance.vnode.el!
-      const rect = el.getBoundingClientRect()
+      const { height, left, top, width } = el.getBoundingClientRect()
+      return { height, left, top, width }
+    }
+
+    function handleDrag(event: MouseEvent | TouchEvent) {
+      const rect = dragRect || measureDragRect()
       const { clientX, clientY } = getClientXY(event)
 
       let left = clientX - rect.left
@@ -101,16 +107,20 @@ export default defineComponent({
       () => colorValue.value,
       () => {
         update()
-      }
+      },
     )
     // mounted
     onMounted(() => {
       draggable(instance.vnode.el as HTMLElement, {
+        start: () => {
+          dragRect = measureDragRect()
+        },
         drag: (event) => {
           handleDrag(event)
         },
         end: (event) => {
           handleDrag(event)
+          dragRect = undefined
         },
       })
 

@@ -11,7 +11,7 @@
 ## 消息提示（Alert）
 
 ```ts
-import { ElMessageBox } from 'element-plus'
+import { ElMessageBox } from '@ozwasyd/element-plus'
 
 ElMessageBox.alert('这是提示内容', '标题', {
   confirmButtonText: '确认',
@@ -21,24 +21,26 @@ ElMessageBox.alert('这是提示内容', '标题', {
 ## 确认消息（Confirm）
 
 ```ts
-ElMessageBox.confirm('确认执行此操作吗？', '警告', {
+const result = await ElMessageBox.confirm('确认执行此操作吗？', '警告', {
   type: 'warning',
-}).then(() => {
-  // 用户点击确认
-}).catch(() => {
-  // 用户取消或关闭
 })
+if (result.ok) {
+  // 用户点击确认
+} else {
+  // 用户取消或关闭，result.error.code === 'aborted'
+}
 ```
 
 ## 提交内容（Prompt）
 
 ```ts
-ElMessageBox.prompt('请输入邮箱', '提示', {
+const result = await ElMessageBox.prompt('请输入邮箱', '提示', {
   inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
   inputErrorMessage: '邮箱格式不正确',
-}).then(({ value }) => {
-  console.log('输入：', value)
 })
+if (result.ok) {
+  console.log('输入：', result.value.value)
+}
 ```
 
 ## HTML 内容
@@ -49,7 +51,7 @@ ElMessageBox.prompt('请输入邮箱', '提示', {
 
 ## 区分取消与关闭
 
-设置 `distinguishCancelAndClose: true` 后，Promise reject 回调的参数分别为 `'cancel'`（取消按钮）和 `'close'`（关闭按钮/ESC）。
+设置 `distinguishCancelAndClose: true` 后，取消和关闭都会返回 `ok: false`，`error.message` 分别为 `'cancel'` 或 `'close'`。
 
 ---
 

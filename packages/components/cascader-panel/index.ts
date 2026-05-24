@@ -1,8 +1,12 @@
 import CascaderPanel from './src/index.vue'
 import type { App } from 'vue'
-import type { SFCWithInstall } from '@element-plus/utils'
+import {
+  registerFsusDefaultRenderPipelineComponentPolicies,
+  type SFCWithInstall,
+} from '@element-plus/utils'
 
 CascaderPanel.install = (app: App): void => {
+  registerFsusDefaultRenderPipelineComponentPolicies([CascaderPanel])
   app.component(CascaderPanel.name!, CascaderPanel)
 }
 

@@ -1,6 +1,15 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { fsusOk } from '@element-plus/utils'
 
-const { sortNumbersSync, sortStringsSync, warmupWasm } = vi.hoisted(() => ({
+const {
+  ensureWasmReady,
+  isWasmReady,
+  sortNumbersSync,
+  sortStringsSync,
+  warmupWasm,
+} = vi.hoisted(() => ({
+  ensureWasmReady: vi.fn(() => Promise.resolve({ ok: true, value: undefined })),
+  isWasmReady: vi.fn(() => true),
   sortNumbersSync: vi.fn((data: number[], ascending = true) => {
     const sorted = [...data].sort((a, b) => a - b)
     return ascending ? sorted : sorted.reverse()
@@ -13,12 +22,16 @@ const { sortNumbersSync, sortStringsSync, warmupWasm } = vi.hoisted(() => ({
 }))
 
 vi.mock('@element-plus/wasm', () => ({
+  ensureWasmReady,
+  isWasmReady,
   sortNumbersSync,
   sortStringsSync,
   warmupWasm,
 }))
 
 import {
+  ensureWasmSortReady,
+  isWasmSortReady,
   trySortWithWasmSync,
   warmupWasmSort,
 } from '../src/composables/use-wasm-sort'
@@ -41,7 +54,7 @@ describe('useWasmSort', () => {
     expect(sortNumbersSync).toHaveBeenCalledTimes(1)
   })
 
-  it('should fall back to JS semantics for non-ascii string datasets', () => {
+  it('should keep non-ascii string datasets on the JS primary path', () => {
     const rows = Array.from({ length: 5_000 }, (_, index) => ({
       id: index,
       label: index === 4_999 ? 'Éclair' : `item-${index}`,
@@ -56,5 +69,12 @@ describe('useWasmSort', () => {
   it('should warm the wasm module on demand', () => {
     warmupWasmSort()
     expect(warmupWasm).toHaveBeenCalledTimes(1)
+  })
+
+  it('should expose required wasm readiness helpers', async () => {
+    await expect(ensureWasmSortReady()).resolves.toEqual(fsusOk(undefined))
+    expect(ensureWasmReady).toHaveBeenCalledTimes(1)
+    expect(isWasmSortReady()).toBe(true)
+    expect(isWasmReady).toHaveBeenCalledTimes(1)
   })
 })

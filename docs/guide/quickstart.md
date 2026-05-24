@@ -13,8 +13,8 @@
 ```ts
 // main.ts
 import { createApp } from 'vue'
-import ElementPlus from 'element-plus'
-import 'element-plus/dist/index.css'
+import ElementPlus from '@ozwasyd/element-plus'
+import '@ozwasyd/element-plus/dist/index.css'
 import App from './App.vue'
 
 const app = createApp(App)
@@ -29,7 +29,7 @@ app.mount('#app')
 ```json
 {
   "compilerOptions": {
-    "types": ["element-plus/global"]
+    "types": ["@ozwasyd/element-plus/global"]
   }
 }
 ```
@@ -82,7 +82,7 @@ FsusUI 支持通过 [unplugin-element-plus](https://github.com/element-plus/unpl
 </template>
 
 <script setup lang="ts">
-import { ElButton } from 'element-plus'
+import { ElButton } from '@ozwasyd/element-plus'
 </script>
 ```
 
@@ -100,18 +100,28 @@ export default defineConfig({
 
 ## 全局配置
 
-注册 FsusUI 时，可以传入全局配置对象，设置表单组件的默认 `size` 和弹出层的 `zIndex`（默认 `2000`）。
+注册 FsusUI 时，可以传入全局配置对象，设置组件默认 `size`、弹出层 `zIndex`，以及文档级 `themeMode`。
 
 **全量引入方式：**
 
 ```ts
 // main.ts
 import { createApp } from 'vue'
-import ElementPlus from 'element-plus'
+import ElementPlus from '@ozwasyd/element-plus'
 import App from './App.vue'
 
 const app = createApp(App)
 app.use(ElementPlus, { size: 'small', zIndex: 3000 })
+```
+
+如果你希望主题稳定跟随系统或支持显式强制模式，直接在这里加上 `themeMode`：
+
+```ts
+app.use(ElementPlus, {
+  size: 'small',
+  zIndex: 3000,
+  themeMode: 'system',
+})
 ```
 
 **按需引入方式（通过 ConfigProvider）：**
@@ -119,18 +129,21 @@ app.use(ElementPlus, { size: 'small', zIndex: 3000 })
 ```vue
 <!-- App.vue -->
 <template>
-  <el-config-provider :size="size" :z-index="zIndex">
+  <el-config-provider :size="size" :z-index="zIndex" :theme-mode="themeMode">
     <app />
   </el-config-provider>
 </template>
 
 <script setup lang="ts">
-import { ElConfigProvider } from 'element-plus'
+import { ElConfigProvider } from '@ozwasyd/element-plus'
 
 const zIndex = 3000
 const size = 'small'
+const themeMode = 'system'
 </script>
 ```
+
+`themeMode` 支持 `'light' | 'dark' | 'system'`。完整行为和 SSR 接入方式见 [暗色模式](./dark-mode.md)。
 
 ---
 
@@ -149,5 +162,6 @@ pnpm dev
 ## 下一步
 
 - [主题定制](./theming.md) — 了解如何修改 FsusUI 的色彩与样式变量
+- [暗色模式](./dark-mode.md) — 接入 `themeMode`、跟随系统主题、处理 SSR 首帧
 - [国际化](./i18n.md) — 配置多语言支持
 - [组件文档](../components/overview.md) — 查阅各组件的完整 API

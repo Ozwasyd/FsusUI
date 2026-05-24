@@ -1,6 +1,10 @@
 import { computed, inject, onMounted, ref, unref, watch } from 'vue'
 import { isUndefined } from 'lodash-unified'
-import { usePopper } from '@element-plus/hooks'
+import {
+  useFsusRenderPipelineHardwareProfile,
+  usePopper,
+} from '@element-plus/hooks'
+import { useGlobalConfig } from '@element-plus/components/config-provider'
 import { POPPER_INJECTION_KEY } from '../constants'
 import { buildPopperOptions, unwrapMeasurableEl } from '../utils'
 
@@ -13,11 +17,14 @@ const DEFAULT_ARROW_OFFSET = 0
 export const usePopperContent = (props: PopperContentProps) => {
   const { popperInstanceRef, contentRef, triggerRef, role } = inject(
     POPPER_INJECTION_KEY,
-    undefined
+    undefined,
   )!
 
   const arrowRef = ref<HTMLElement>()
   const arrowOffset = ref<number>()
+  const renderPipelineConfig = useGlobalConfig('renderPipeline')
+  const renderHardware =
+    useFsusRenderPipelineHardwareProfile(renderPipelineConfig)
 
   const eventListenerModifier = computed(() => {
     return {
@@ -47,15 +54,19 @@ export const usePopperContent = (props: PopperContentProps) => {
       onFirstUpdate: () => {
         update()
       },
-      ...buildPopperOptions(props, [
-        unref(arrowModifier),
-        unref(eventListenerModifier),
-      ]),
+      ...buildPopperOptions(
+        {
+          ...props,
+          gpuAcceleration:
+            props.gpuAcceleration ?? renderHardware.compositor.value,
+        },
+        [unref(arrowModifier), unref(eventListenerModifier)],
+      ),
     }
   })
 
   const computedReference = computed(
-    () => unwrapMeasurableEl(props.referenceEl) || unref(triggerRef)
+    () => unwrapMeasurableEl(props.referenceEl) || unref(triggerRef),
   )
 
   const { attributes, state, styles, update, forceUpdate, instanceRef } =
@@ -68,7 +79,7 @@ export const usePopperContent = (props: PopperContentProps) => {
       () => unref(computedReference)?.getBoundingClientRect(),
       () => {
         update()
-      }
+      },
     )
   })
 

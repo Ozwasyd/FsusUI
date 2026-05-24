@@ -1,8 +1,12 @@
 import CollapseTransition from './src/collapse-transition.vue'
 import type { App } from 'vue'
-import type { SFCWithInstall } from '@element-plus/utils'
+import {
+  registerFsusDefaultRenderPipelineComponentPolicies,
+  type SFCWithInstall,
+} from '@element-plus/utils'
 
 CollapseTransition.install = (app: App): void => {
+  registerFsusDefaultRenderPipelineComponentPolicies([CollapseTransition])
   app.component(CollapseTransition.name!, CollapseTransition)
 }
 

@@ -29,7 +29,7 @@
 ## 服务方式调用
 
 ```ts
-import { ElLoading } from 'element-plus'
+import { ElLoading } from '@ozwasyd/element-plus'
 
 const loadingInstance = ElLoading.service({
   target: '#my-container',

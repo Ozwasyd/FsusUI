@@ -1,6 +1,9 @@
 import { createVNode, render } from 'vue'
 import {
   debugWarn,
+  createFsusError,
+  fsusErr,
+  fsusOk,
   hasOwn,
   isClient,
   isElement,
@@ -22,6 +25,7 @@ import type {
   MessageBoxData,
   MessageBoxState,
 } from './message-box.type'
+import type { FsusResult } from '@element-plus/utils'
 
 // component default merge props & data
 
@@ -30,10 +34,21 @@ const messageInstance = new Map<
   {
     options: any
     callback: Callback | undefined
-    resolve: (res: any) => void
-    reject: (reason?: any) => void
+    resolve: (res: FsusResult<MessageBoxData>) => void
   }
 >()
+const scopedMessageInstances = new WeakMap<AppContext, typeof messageInstance>()
+
+const getMessageBoxScope = (appContext?: AppContext | null) => {
+  if (!appContext) return messageInstance
+
+  let scope = scopedMessageInstances.get(appContext)
+  if (!scope) {
+    scope = new Map()
+    scopedMessageInstances.set(appContext, scope)
+  }
+  return scope
+}
 
 const getAppendToElement = (props: any): HTMLElement => {
   let appendTo: HTMLElement | null = document.body
@@ -49,7 +64,7 @@ const getAppendToElement = (props: any): HTMLElement => {
     if (!isElement(appendTo)) {
       debugWarn(
         'ElMessageBox',
-        'the appendTo option is not an HTMLElement. Falling back to document.body.'
+        'the appendTo option is not an HTMLElement. Falling back to document.body.',
       )
       appendTo = document.body
     }
@@ -60,7 +75,7 @@ const getAppendToElement = (props: any): HTMLElement => {
 const initInstance = (
   props: any,
   container: HTMLElement,
-  appContext: AppContext | null = null
+  appContext: AppContext | null = null,
 ) => {
   const vnode = createVNode(
     MessageBoxConstructor,
@@ -71,7 +86,7 @@ const initInstance = (
             ? props.message
             : () => props.message,
         }
-      : null
+      : null,
   )
   vnode.appContext = appContext
   render(vnode, container)
@@ -85,19 +100,20 @@ const genContainer = () => {
 
 const showMessage = (options: any, appContext?: AppContext | null) => {
   const container = genContainer()
+  const scopedInstances = getMessageBoxScope(appContext)
   // Adding destruct method.
   // when transition leaves emitting `vanish` evt. so that we can do the clean job.
   options.onVanish = () => {
     // not sure if this causes mem leak, need proof to verify that.
     // maybe calling out like 1000 msg-box then close them all.
     render(null, container)
-    messageInstance.delete(vm) // Remove vm to avoid mem leak.
+    scopedInstances.delete(vm) // Remove vm to avoid mem leak.
     // here we were suppose to call document.body.removeChild(container.firstElementChild)
     // but render(null, container) did that job for us. so that we do not call that directly
   }
 
   options.onAction = (action: Action) => {
-    const currentMsg = messageInstance.get(vm)!
+    const currentMsg = scopedInstances.get(vm)!
     let resolve: Action | { value: string; action: Action }
     if (options.showInput) {
       resolve = { value: vm.inputValue, action }
@@ -109,12 +125,12 @@ const showMessage = (options: any, appContext?: AppContext | null) => {
     } else {
       if (action === 'cancel' || action === 'close') {
         if (options.distinguishCancelAndClose && action !== 'cancel') {
-          currentMsg.reject('close')
+          currentMsg.resolve(fsusErr(createFsusError('aborted', 'close')))
         } else {
-          currentMsg.reject('cancel')
+          currentMsg.resolve(fsusErr(createFsusError('aborted', 'cancel')))
         }
       } else {
-        currentMsg.resolve(resolve)
+        currentMsg.resolve(fsusOk(resolve as MessageBoxData))
       }
     }
   }
@@ -144,13 +160,17 @@ const showMessage = (options: any, appContext?: AppContext | null) => {
 
 async function MessageBox(
   options: ElMessageBoxOptions,
-  appContext?: AppContext | null
-): Promise<MessageBoxData>
+  appContext?: AppContext | null,
+): Promise<FsusResult<MessageBoxData>>
 function MessageBox(
   options: ElMessageBoxOptions | string | VNode,
-  appContext: AppContext | null = null
-): Promise<{ value: string; action: Action } | Action> {
-  if (!isClient) return Promise.reject()
+  appContext: AppContext | null = null,
+): Promise<FsusResult<MessageBoxData>> {
+  if (!isClient) {
+    return Promise.resolve(
+      fsusErr(createFsusError('infra', 'message_box_requires_client')),
+    )
+  }
   let callback: Callback | undefined
   if (isString(options) || isVNode(options)) {
     options = {
@@ -160,24 +180,25 @@ function MessageBox(
     callback = options.callback
   }
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const vm = showMessage(
       options,
-      appContext ?? (MessageBox as IElMessageBox)._context
+      appContext ?? (MessageBox as IElMessageBox)._context,
     )
     // collect this vm in order to handle upcoming events.
-    messageInstance.set(vm, {
+    getMessageBoxScope(
+      appContext ?? (MessageBox as IElMessageBox)._context,
+    ).set(vm, {
       options,
       callback,
       resolve,
-      reject,
     })
   })
 }
 
 const MESSAGE_BOX_VARIANTS = ['alert', 'confirm', 'prompt'] as const
 const MESSAGE_BOX_DEFAULT_OPTS: Record<
-  typeof MESSAGE_BOX_VARIANTS[number],
+  (typeof MESSAGE_BOX_VARIANTS)[number],
   Partial<ElMessageBoxOptions>
 > = {
   alert: { closeOnPressEscape: false, closeOnClickModal: false },
@@ -187,16 +208,16 @@ const MESSAGE_BOX_DEFAULT_OPTS: Record<
 
 MESSAGE_BOX_VARIANTS.forEach((boxType) => {
   ;(MessageBox as IElMessageBox)[boxType] = messageBoxFactory(
-    boxType
+    boxType,
   ) as ElMessageBoxShortcutMethod
 })
 
-function messageBoxFactory(boxType: typeof MESSAGE_BOX_VARIANTS[number]) {
+function messageBoxFactory(boxType: (typeof MESSAGE_BOX_VARIANTS)[number]) {
   return (
     message: string | VNode,
     title: string | ElMessageBoxOptions,
     options?: ElMessageBoxOptions,
-    appContext?: AppContext | null
+    appContext?: AppContext | null,
   ) => {
     let titleOrOpts = ''
     if (isObject(title)) {
@@ -219,17 +240,19 @@ function messageBoxFactory(boxType: typeof MESSAGE_BOX_VARIANTS[number]) {
         options,
         {
           boxType,
-        }
+        },
       ),
-      appContext
+      appContext,
     )
   }
 }
 
 MessageBox.close = () => {
-  messageInstance.forEach((_, vm) => {
-    vm.doClose('close')
-  })
+  getMessageBoxScope((MessageBox as IElMessageBox)._context).forEach(
+    (_, vm) => {
+      vm.doClose('close')
+    },
+  )
 }
 ;(MessageBox as IElMessageBox)._context = null
 

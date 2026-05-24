@@ -72,13 +72,47 @@ function useEvent<T>(props: TableHeaderProps<T>, emit) {
           event.clientX - (dragState.value as any).startMouseLeft
         const proxyLeft = (dragState.value as any).startLeft + deltaLeft
 
-        resizeProxy.style.left = `${Math.max(minLeft, proxyLeft)}px`
+        scheduleResizeProxyMove(Math.max(minLeft, proxyLeft))
+      }
+
+      let resizeProxyFrame = 0
+      let resizeProxyLeft = (dragState.value as any).startLeft
+      const flushResizeProxyMove = () => {
+        resizeProxyFrame = 0
+        const translateX = resizeProxyLeft - (dragState.value as any).startLeft
+        resizeProxy.style.transform = `translate3d(${translateX}px, 0, 0)`
+      }
+      const scheduleResizeProxyMove = (proxyLeft: number) => {
+        resizeProxyLeft = proxyLeft
+        if (resizeProxyFrame) return
+
+        if (typeof requestAnimationFrame !== 'function') {
+          flushResizeProxyMove()
+          return
+        }
+
+        resizeProxyFrame = requestAnimationFrame(flushResizeProxyMove)
+      }
+      const clearResizeProxyMove = () => {
+        if (resizeProxyFrame && typeof cancelAnimationFrame === 'function') {
+          cancelAnimationFrame(resizeProxyFrame)
+        }
+        resizeProxyFrame = 0
+      }
+      const finishResizeProxyMove = () => {
+        if (resizeProxyFrame) {
+          clearResizeProxyMove()
+          flushResizeProxyMove()
+        }
+        resizeProxy.style.left = `${resizeProxyLeft}px`
+        resizeProxy.style.transform = ''
       }
 
       const handleMouseUp = () => {
         if (dragging.value) {
           const { startColumnLeft, startLeft } = dragState.value as any
-          const finalLeft = Number.parseInt(resizeProxy.style.left, 10)
+          finishResizeProxyMove()
+          const finalLeft = resizeProxyLeft
           const columnWidth = finalLeft - startColumnLeft
           column.width = column.realWidth = columnWidth
           table?.emit(
@@ -86,7 +120,7 @@ function useEvent<T>(props: TableHeaderProps<T>, emit) {
             column.width,
             startLeft - startColumnLeft,
             column,
-            event
+            event,
           )
           requestAnimationFrame(() => {
             props.store.scheduleLayout(false, true)
@@ -100,6 +134,7 @@ function useEvent<T>(props: TableHeaderProps<T>, emit) {
 
         document.removeEventListener('mousemove', handleMouseMove)
         document.removeEventListener('mouseup', handleMouseUp)
+        clearResizeProxyMove()
         document.onselectstart = null
         document.ondragstart = null
 
@@ -155,7 +190,7 @@ function useEvent<T>(props: TableHeaderProps<T>, emit) {
   const handleSortClick = (
     event: Event,
     column: TableColumnCtx<T>,
-    givenOrder: string | boolean
+    givenOrder: string | boolean,
   ) => {
     event.stopPropagation()
     const order =

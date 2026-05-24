@@ -4,9 +4,9 @@
 
 ## 项目简介
 
-- 本仓库目录名为 `FsusUI`，但多数包名、源码目录与导出命名仍沿用 `element-plus` 体系。
+- 本仓库目录名为 `FsusUI`，但多数源码目录与导出命名仍沿用 `element-plus` 体系。
 - 工作区由 `pnpm-workspace.yaml` 定义，覆盖 `packages/*` 与 `internal/*`。
-- 对外主入口包目前仍为 `packages/element-plus`（包名 `element-plus`）。
+- 工作区源码主入口仍位于 `packages/element-plus`（源码包名 `element-plus`），对外 GitHub Packages 安装名为 `@ozwasyd/element-plus`。
 
 核心特性（以仓库现状为准）：
 
@@ -29,6 +29,8 @@
 ## 快速开始
 
 环境要求：`node >= 22`、`pnpm >= 10`（根 `package.json` 的 `packageManager` 为 `pnpm@10.33.0`）。
+
+外部业务项目接入请直接使用 [`@ozwasyd/element-plus`](./docs/guide/installation.md)；下面的命令是仓库开发/联调用法。
 
 ```bash
 pnpm install

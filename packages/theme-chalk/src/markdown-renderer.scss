@@ -1,0 +1,226 @@
+.markdown-renderer {
+  position: relative;
+  min-width: 0;
+  container-type: inline-size;
+  overflow-anchor: none;
+}
+
+.markdown-renderer__loading {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--fsus-space-3, 12px);
+  align-items: center;
+  min-block-size: var(--fsus-markdown-loading-min-height, 12rem);
+  padding: var(--fsus-space-4, 16px);
+  color: var(--el-text-color-regular);
+}
+
+.markdown-renderer__loading-spinner {
+  inline-size: 18px;
+  block-size: 18px;
+  border: 2px solid var(--el-border-color-light);
+  border-block-start-color: var(--fsus-color-accent, #2a599c);
+  border-radius: 50%;
+  animation: markdown-renderer-spin 800ms linear infinite;
+}
+
+.markdown-renderer__loading-text {
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.markdown-renderer__loading-line {
+  grid-column: 1 / -1;
+  block-size: 10px;
+  overflow: hidden;
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--fsus-color-accent, #2a599c) 14%, transparent),
+      transparent
+    ),
+    var(--el-fill-color-light);
+  background-size: 220% 100%;
+  border-radius: var(--fsus-radius-control, 8px);
+  animation: markdown-renderer-shimmer 1300ms ease-in-out infinite;
+}
+
+.markdown-renderer__loading-line:nth-child(4) {
+  inline-size: 82%;
+}
+
+.markdown-renderer__loading-line:nth-child(5) {
+  inline-size: 68%;
+}
+
+.markdown-renderer__loading-line:nth-child(6) {
+  inline-size: 76%;
+}
+
+.markdown-renderer__loading-pulse {
+  position: sticky;
+  z-index: 1;
+  inset-block-end: var(--fsus-space-3, 12px);
+  inset-inline-start: calc(100% - 30px);
+  display: block;
+  inline-size: 18px;
+  block-size: 18px;
+  margin-block-start: -18px;
+  border-radius: 50%;
+  background: var(--fsus-color-accent, #2a599c);
+  box-shadow: 0 0 0 0
+    color-mix(in srgb, var(--fsus-color-accent, #2a599c) 32%, transparent);
+  opacity: 0.72;
+  pointer-events: none;
+  animation: markdown-renderer-pulse 1100ms ease-out infinite;
+}
+
+@keyframes markdown-renderer-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes markdown-renderer-shimmer {
+  0% {
+    background-position: 180% 0;
+  }
+  100% {
+    background-position: -80% 0;
+  }
+}
+
+@keyframes markdown-renderer-pulse {
+  70% {
+    box-shadow: 0 0 0 9px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .markdown-renderer__loading-spinner,
+  .markdown-renderer__loading-line,
+  .markdown-renderer__loading-pulse {
+    animation: none;
+  }
+}
+
+.markdown-renderer [data-fsus-render-sync] {
+  display: contents;
+}
+
+.markdown-renderer__virtual-spacer {
+  flex: none;
+  min-height: 0;
+  pointer-events: none;
+}
+
+.markdown-renderer__virtual-unit {
+  contain: layout style paint;
+  overflow-anchor: none;
+}
+
+.markdown-renderer__virtual-unit[data-fsus-compositor='enabled'] {
+  transform: translate3d(0, 0, 0);
+}
+
+.markdown-renderer.is-rendering
+  .markdown-renderer__virtual-unit[data-fsus-compositor='enabled'] {
+  will-change: transform;
+}
+
+.markdown-renderer__virtual-unit[data-fsus-content-visibility='enabled'] {
+  content-visibility: auto;
+  contain-intrinsic-size: auto var(--fsus-render-unit-intrinsic-size, 320px);
+}
+
+.markdown-renderer[data-fsus-render-hardware='cpu-threaded']
+  .markdown-renderer__virtual-unit {
+  content-visibility: visible;
+  transform: none;
+  will-change: auto;
+}
+
+.markdown-renderer .markdown-renderer__paragraph,
+.markdown-renderer .markdown-renderer__paragraph *,
+.markdown-renderer .markdown-renderer__text,
+.markdown-renderer .markdown-renderer__text--inline-code,
+.markdown-renderer .markdown-renderer__list-item,
+.markdown-renderer .markdown-renderer__list-item--inline-code {
+  text-align: start;
+  text-align-last: auto;
+  text-justify: auto;
+  word-spacing: normal;
+  letter-spacing: normal;
+}
+
+.markdown-renderer .markdown-renderer__text,
+.markdown-renderer .markdown-renderer__list-item,
+.markdown-renderer td,
+.markdown-renderer th,
+.markdown-renderer blockquote {
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.markdown-renderer a {
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+
+.markdown-renderer code {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.markdown-renderer pre code {
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.markdown-renderer .markdown-renderer__mermaid,
+.markdown-renderer .markdown-renderer__latex {
+  max-inline-size: 100%;
+  margin-block: var(--fsus-markdown-embed-margin, 1rem);
+  overflow: auto;
+}
+
+.markdown-renderer .markdown-renderer__mermaid[data-mermaid-rendered='true'] {
+  inline-size: fit-content;
+  max-inline-size: min(100%, var(--fsus-markdown-diagram-max-width, 32rem));
+  margin-inline: auto;
+}
+
+.markdown-renderer .markdown-renderer__mermaid > svg {
+  display: block;
+  inline-size: auto;
+  max-inline-size: min(100%, var(--fsus-markdown-diagram-max-width, 32rem));
+  block-size: auto;
+  max-block-size: min(60vh, var(--fsus-markdown-diagram-max-height, 28rem));
+  margin-inline: auto;
+}
+
+.markdown-renderer .markdown-renderer__mermaid > svg:not([width]) {
+  inline-size: min(100%, var(--fsus-markdown-diagram-max-width, 32rem));
+}
+
+.markdown-renderer .markdown-renderer__latex > math,
+.markdown-renderer .markdown-renderer__latex > svg {
+  max-inline-size: 100%;
+}
+
+@media (max-width: 44rem) {
+  .markdown-renderer .markdown-renderer__text,
+  .markdown-renderer .markdown-renderer__list-item {
+    text-align: start;
+    text-align-last: auto;
+    text-justify: auto;
+    word-spacing: normal;
+    letter-spacing: normal;
+  }
+}

@@ -1,0 +1,178 @@
+@mixin fsus-core-tokens {
+  --fsus-ink: #0f0f11;
+  --fsus-paper: #ffffff;
+  --fsus-page: #f7f7f8;
+  --fsus-surface-overlay: rgba(255, 255, 255, 0.85);
+  --fsus-overlay-color: rgba(252, 252, 252, 0.5);
+  --fsus-scholarly-blue: #2a599c;
+  --fsus-dot-gray: #a1a1aa;
+  --fsus-border: #e4e4e7;
+  --fsus-border-light: #ececf0;
+  --fsus-border-lighter: #f1f1f3;
+  --fsus-border-extra-light: #f7f7f8;
+  --fsus-text-regular: #5f5f68;
+  --fsus-text-placeholder: #7c7c86;
+  --fsus-highlight: rgba(255, 255, 255, 0.8);
+
+  --fsus-radius-control: 8px;
+  --fsus-radius-control-small: 6px;
+  --fsus-radius-panel: 24px;
+  --fsus-radius-floating: 24px;
+  --fsus-radius-popover: 20px;
+  --fsus-radius-pill: 999px;
+
+  --fsus-space-1: 4px;
+  --fsus-space-2: 8px;
+  --fsus-space-3: 12px;
+  --fsus-space-4: 16px;
+  --fsus-space-5: 20px;
+  --fsus-space-6: 24px;
+  --fsus-space-8: 32px;
+  --fsus-control-height: 44px;
+  --fsus-control-height-compact: 40px;
+  --fsus-icon-target: 40px;
+  --fsus-mobile-page-padding: 16px;
+  --fsus-desktop-page-padding: 24px;
+  --fsus-floating-viewport-gap: 24px;
+  --fsus-floating-viewport-gap-double: 48px;
+  --fsus-floating-safe-width: calc(
+    100vw - var(--fsus-floating-viewport-gap-double)
+  );
+  --fsus-floating-max-width: min(
+    420px,
+    calc(100vw - var(--fsus-floating-viewport-gap))
+  );
+  --fsus-notification-max-width: min(
+    480px,
+    calc(100vw - var(--fsus-floating-viewport-gap))
+  );
+  --fsus-dialog-mobile-min-width: 280px;
+  --fsus-dialog-mobile-max-width: calc(100vw - var(--fsus-space-8));
+  --fsus-demo-max-width: 1200px;
+  --fsus-audit-max-width: 1440px;
+
+  --fsus-backdrop-blur: 40px;
+  --fsus-backdrop-blur-soft: 20px;
+  --fsus-backdrop-blur-overlay: 16px;
+  --fsus-backdrop-saturate: 120%;
+  --fsus-motion-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --fsus-motion-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --fsus-motion-control: 260ms;
+  --fsus-motion-control-fast: 160ms;
+  --fsus-motion-slider-follow: 96ms;
+  --fsus-motion-slider-release: 220ms;
+  --fsus-motion-panel: 420ms;
+  --fsus-motion-overlay: 300ms;
+  --fsus-motion-blur: 0.35px;
+  --fsus-motion-slider-blur: 0.28px;
+  --fsus-motion-scroll-blur: 0px;
+  --fsus-motion-scroll-offset: 2px;
+  --fsus-motion-scroll-max-offset: 4px;
+  --fsus-motion-scroll-settle: 120ms;
+  --fsus-motion-scroll-trail-opacity: 0.46;
+  --fsus-motion-drag-max-offset: 4px;
+  --fsus-motion-drag-blur: 0.28px;
+  --fsus-motion-drag-scale: 0.08;
+  --fsus-motion-drag-trail-opacity: 0.46;
+  --fsus-motion-trail: rgba(42, 89, 156, 0.16);
+  --fsus-motion-slider-trail: rgba(42, 89, 156, 0.2);
+  --fsus-motion-spring-stiffness: 300;
+  --fsus-motion-spring-damping: 30;
+  --fsus-motion-spring-mass: 0.82;
+  --fsus-motion-scroll-idle: 130ms;
+  --fsus-state-hover-bg: rgba(42, 89, 156, 0.055);
+  --fsus-state-selected-bg: rgba(42, 89, 156, 0.05);
+  --fsus-state-emphasis-bg: rgba(42, 89, 156, 0.08);
+  --fsus-state-focus-border: rgba(42, 89, 156, 0.28);
+
+  --fsus-shadow-panel: 0 32px 64px rgba(0, 0, 0, 0.08);
+  --fsus-shadow-panel-light: 0 14px 40px rgba(0, 0, 0, 0.08);
+  --fsus-shadow-panel-lighter: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --fsus-shadow-panel-dark: 0 24px 64px rgba(0, 0, 0, 0.12);
+  --fsus-shadow-floating: 0 24px 60px rgba(15, 23, 42, 0.12);
+
+  --el-color-primary: var(--fsus-ink);
+  --el-bg-color: var(--fsus-paper);
+  --el-bg-color-page: var(--fsus-page);
+  --el-bg-color-overlay: var(--fsus-surface-overlay);
+  --el-color-info: var(--fsus-dot-gray);
+  --el-border-color: var(--fsus-border);
+  --el-border-color-light: var(--fsus-border-light);
+  --el-border-color-lighter: var(--fsus-border-lighter);
+  --el-border-color-extra-light: var(--fsus-border-extra-light);
+  --el-text-color-primary: var(--fsus-ink);
+  --el-text-color-regular: var(--fsus-text-regular);
+  --el-text-color-secondary: var(--fsus-text-regular);
+  --el-text-color-placeholder: var(--fsus-text-placeholder);
+  --el-a11y-focus-color: var(--fsus-scholarly-blue);
+  --el-border-radius-base: var(--fsus-radius-control);
+  --el-border-radius-small: var(--fsus-radius-control-small);
+  --el-border-radius-round: var(--fsus-radius-pill);
+  --el-box-shadow: var(--fsus-shadow-panel);
+  --el-box-shadow-light: var(--fsus-shadow-panel-light);
+  --el-box-shadow-lighter: var(--fsus-shadow-panel-lighter);
+  --el-box-shadow-dark: var(--fsus-shadow-panel-dark);
+  --el-fill-color: #f4f4f5;
+  --el-fill-color-light: #fafafa;
+  --el-fill-color-lighter: #fcfcfc;
+  --el-disabled-bg-color: #f4f4f5;
+  --el-disabled-text-color: var(--fsus-text-placeholder);
+  --el-disabled-border-color: var(--fsus-border-light);
+  --el-card-border-radius: var(--fsus-radius-panel);
+  --el-dialog-border-radius: var(--fsus-radius-panel);
+  --el-popover-border-radius: var(--fsus-radius-popover);
+  --el-messagebox-border-radius: var(--fsus-radius-panel);
+  --el-notification-radius: var(--fsus-radius-popover);
+}
+
+@mixin fsus-dark-tokens {
+  --fsus-ink: #f0f0f4;
+  --fsus-paper: #121214;
+  --fsus-page: #09090b;
+  --fsus-surface-overlay: rgba(18, 18, 20, 0.85);
+  --fsus-overlay-color: rgba(18, 18, 20, 0.7);
+  --fsus-scholarly-blue: #4b79cc;
+  --fsus-dot-gray: #71717a;
+  --fsus-border: #27272a;
+  --fsus-border-light: #3f3f46;
+  --fsus-border-lighter: #303036;
+  --fsus-border-extra-light: #1d1d20;
+  --fsus-text-regular: #a1a1aa;
+  --fsus-text-placeholder: #71717a;
+  --fsus-highlight: rgba(255, 255, 255, 0.05);
+  --fsus-shadow-panel: 0 32px 64px rgba(0, 0, 0, 0.4);
+  --fsus-shadow-panel-light: 0 14px 40px rgba(0, 0, 0, 0.4);
+  --fsus-shadow-panel-lighter: 0 8px 24px rgba(0, 0, 0, 0.3);
+  --fsus-shadow-panel-dark: 0 24px 64px rgba(0, 0, 0, 0.5);
+  --fsus-shadow-floating: 0 24px 60px rgba(0, 0, 0, 0.5);
+  --fsus-motion-trail: rgba(75, 121, 204, 0.22);
+  --fsus-motion-slider-trail: rgba(75, 121, 204, 0.28);
+  --fsus-state-hover-bg: rgba(75, 121, 204, 0.12);
+  --fsus-state-selected-bg: rgba(75, 121, 204, 0.1);
+  --fsus-state-emphasis-bg: rgba(75, 121, 204, 0.16);
+  --fsus-state-focus-border: rgba(75, 121, 204, 0.36);
+
+  --el-color-primary: var(--fsus-ink);
+  --el-bg-color: var(--fsus-paper);
+  --el-bg-color-page: var(--fsus-page);
+  --el-bg-color-overlay: var(--fsus-surface-overlay);
+  --el-color-info: var(--fsus-dot-gray);
+  --el-border-color: var(--fsus-border);
+  --el-border-color-light: var(--fsus-border-light);
+  --el-border-color-lighter: var(--fsus-border-lighter);
+  --el-border-color-extra-light: var(--fsus-border-extra-light);
+  --el-text-color-primary: var(--fsus-ink);
+  --el-text-color-regular: var(--fsus-text-regular);
+  --el-text-color-secondary: var(--fsus-text-regular);
+  --el-text-color-placeholder: var(--fsus-text-placeholder);
+  --el-a11y-focus-color: var(--fsus-scholarly-blue);
+  --el-box-shadow: var(--fsus-shadow-panel);
+  --el-box-shadow-light: var(--fsus-shadow-panel-light);
+  --el-box-shadow-lighter: var(--fsus-shadow-panel-lighter);
+  --el-box-shadow-dark: var(--fsus-shadow-panel-dark);
+  --el-fill-color: #1d1d20;
+  --el-fill-color-light: #27272a;
+  --el-fill-color-lighter: #1d1d20;
+  --el-disabled-bg-color: #1d1d20;
+  --el-disabled-border-color: var(--fsus-border);
+}

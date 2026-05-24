@@ -46,6 +46,7 @@ export const useCarouselItem = (
 
   // computed
   const { isCardType, isVertical } = carouselContext
+  const { dragOffset } = carouselContext
 
   // methods
 
@@ -164,6 +165,7 @@ export const useCarouselItem = (
     carouselItemRef,
     active,
     animating,
+    dragOffset,
     hover,
     inStage,
     isVertical,

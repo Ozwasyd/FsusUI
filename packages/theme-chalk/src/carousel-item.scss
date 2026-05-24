@@ -17,12 +17,24 @@
     }
 
     @include when(animating) {
-      transition: transform 0.4s ease-in-out;
+      filter: blur(
+        var(--fsus-interactive-motion-blur, var(--fsus-motion-blur, 0.35px))
+      );
+      transition:
+        transform var(--fsus-motion-panel, 420ms)
+          var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1)),
+        filter var(--fsus-motion-control-fast, 160ms)
+          var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
+      will-change: transform, filter;
     }
 
     @include m(card) {
       width: 50%;
-      transition: transform 0.4s ease-in-out;
+      transition:
+        transform var(--fsus-motion-panel, 420ms)
+          var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1)),
+        filter var(--fsus-motion-control-fast, 160ms)
+          var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
 
       &.is-in-stage {
         cursor: pointer;

@@ -14,7 +14,6 @@
       'left',
     ]"
     :stop-popper-mouse-event="false"
-    :gpu-acceleration="false"
     placement="bottom-start"
     :transition="`${nsCascader.namespace.value}-zoom-in-top`"
     effect="light"
@@ -95,7 +94,7 @@
                   <div :class="nsCascader.e('collapse-tags')">
                     <div
                       v-for="(tag2, idx) in allPresentTags.slice(
-                        maxCollapseTags
+                        maxCollapseTags,
                       )"
                       :key="idx"
                       :class="nsCascader.e('collapse-tag')"
@@ -124,7 +123,10 @@
             type="text"
             :class="nsCascader.e('search-input')"
             :placeholder="presentText ? '' : inputPlaceholder"
-            @input="(e) => handleInput(searchInputValue, e as unknown as KeyboardEvent)"
+            @input="
+              (e) =>
+                handleInput(searchInputValue, e as unknown as KeyboardEvent)
+            "
             @click.stop="togglePopperVisible(true)"
             @keydown.delete="handleDelete"
             @compositionstart="handleComposition"
@@ -169,10 +171,11 @@
             :tabindex="-1"
             @click="handleSuggestionClick(item)"
           >
-{{ item.text }}<el-icon v-if="item.checked">
+            {{ item.text
+            }}<el-icon v-if="item.checked">
               <check />
             </el-icon>
-</li>
+          </li>
         </template>
         <slot v-else name="empty">
           <li :class="nsCascader.e('empty-text')">
@@ -289,26 +292,26 @@ const cascaderStyle = computed<StyleValue>(() => {
 
 const isDisabled = computed(() => props.disabled || form?.disabled)
 const inputPlaceholder = computed(
-  () => props.placeholder || t('el.cascader.placeholder')
+  () => props.placeholder || t('el.cascader.placeholder'),
 )
 const currentPlaceholder = computed(() =>
   searchInputValue.value ||
   presentTags.value.length > 0 ||
   isOnComposition.value
     ? ''
-    : inputPlaceholder.value
+    : inputPlaceholder.value,
 )
 const realSize = useFormSize()
 const tagSize = computed(() =>
-  ['small'].includes(realSize.value) ? 'small' : 'default'
+  ['small'].includes(realSize.value) ? 'small' : 'default',
 )
 const multiple = computed(() => !!props.props.multiple)
 const readonly = computed(() => !props.filterable || multiple.value)
 const searchKeyword = computed(() =>
-  multiple.value ? searchInputValue.value : inputValue.value
+  multiple.value ? searchInputValue.value : inputValue.value,
 )
 const checkedNodes: ComputedRef<CascaderNode[]> = computed(
-  () => cascaderPanelRef.value?.checkedNodes || []
+  () => cascaderPanelRef.value?.checkedNodes || [],
 )
 const clearBtnVisible = computed(() => {
   if (
@@ -487,11 +490,11 @@ const focusFirstNode = () => {
 
   if (filtering.value && suggestionPanel.value) {
     firstNode = suggestionPanel.value.$el.querySelector(
-      `.${nsCascader.e('suggestion-item')}`
+      `.${nsCascader.e('suggestion-item')}`,
     )
   } else {
     firstNode = cascaderPanelRef.value?.$el.querySelector(
-      `.${nsCascader.b('node')}[tabindex="-1"]`
+      `.${nsCascader.b('node')}[tabindex="-1"]`,
     )
   }
 
@@ -512,7 +515,7 @@ const updateStyle = () => {
 
   if (suggestionPanelEl) {
     const suggestionList = suggestionPanelEl.querySelector(
-      `.${nsCascader.e('suggestion-list')}`
+      `.${nsCascader.e('suggestion-list')}`,
     )
     suggestionList.style.minWidth = `${inputInner.offsetWidth}px`
   }
@@ -612,8 +615,8 @@ const handleSuggestionKeyDown = (e: KeyboardEvent) => {
         getSibling(
           target,
           distance,
-          `.${nsCascader.e('suggestion-item')}[tabindex="-1"]`
-        ) as HTMLElement
+          `.${nsCascader.e('suggestion-item')}[tabindex="-1"]`,
+        ) as HTMLElement,
       )
       break
     }
@@ -704,7 +707,7 @@ const handleInput = (val: string, e?: KeyboardEvent) => {
 
 const getInputInnerHeight = (inputInner: HTMLElement): number =>
   Number.parseFloat(
-    useCssVar(nsInput.cssVarName('input-height')!, inputInner).value ?? '0'
+    useCssVar(nsInput.cssVarName('input-height')!, inputInner).value ?? '0',
   ) - 2
 
 watch(filtering, updatePopperPosition)

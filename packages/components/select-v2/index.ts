@@ -1,9 +1,13 @@
 import Select from './src/select.vue'
 
 import type { App } from 'vue'
-import type { SFCWithInstall } from '@element-plus/utils'
+import {
+  registerFsusDefaultRenderPipelineComponentPolicies,
+  type SFCWithInstall,
+} from '@element-plus/utils'
 
 Select.install = (app: App): void => {
+  registerFsusDefaultRenderPipelineComponentPolicies([Select])
   app.component(Select.name!, Select)
 }
 

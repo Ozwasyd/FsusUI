@@ -9,26 +9,148 @@
 
 @include b(vl) {
   @include e(wrapper) {
+    --fsus-interactive-motion-strength: 0;
+    --fsus-interactive-motion-offset-x: 0px;
+    --fsus-interactive-motion-offset-y: 0px;
+    --fsus-interactive-motion-glow: 0px;
+    --fsus-interactive-motion-blur: 0px;
+    --fsus-interactive-motion-scale: 1;
+    --fsus-interactive-motion-trail-opacity: 0;
+    --fsus-interactive-motion-edge-size: 32px;
+    --fsus-interactive-motion-settle: var(--fsus-motion-scroll-settle, 120ms);
+
     position: relative;
     overflow: hidden;
+
     &:hover {
       @include showScrollbar();
     }
+
     &.always-on {
       @include showScrollbar();
+    }
+
+    &.is-scrolling {
+      @include showScrollbar();
+    }
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      z-index: 1;
+      height: 32px;
+      pointer-events: none;
+      opacity: 0;
+      transition:
+        opacity 90ms var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+        transform var(--fsus-interactive-motion-settle, 120ms)
+          var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));
+    }
+
+    &::before {
+      top: 0;
+      background: linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--fsus-scholarly-blue) 18%, transparent),
+        transparent
+      );
+      transform: translate3d(0, -10px, 0);
+    }
+
+    &::after {
+      bottom: 0;
+      background: linear-gradient(
+        to top,
+        color-mix(in srgb, var(--fsus-scholarly-blue) 18%, transparent),
+        transparent
+      );
+      transform: translate3d(0, 10px, 0);
+    }
+
+    &.is-vertical.is-scrolling-backward::before,
+    &.is-scrolling-y-backward::before,
+    &.is-vertical.is-scrolling-forward::after,
+    &.is-scrolling-y-forward::after {
+      opacity: var(--fsus-interactive-motion-trail-opacity, 0.28);
+      transform: translate3d(0, 0, 0);
+    }
+
+    &.is-scrolling .#{$namespace}-vl__inner > * {
+      filter: none;
+      transform: translate3d(
+        var(--fsus-interactive-motion-offset-x, 0px),
+        var(--fsus-interactive-motion-offset-y, 0px),
+        0
+      );
+    }
+
+    &[data-fsus-render-hardware='cpu-threaded'].is-scrolling
+      .#{$namespace}-vl__inner
+      > * {
+      transform: none;
+    }
+
+    &[data-fsus-compositor='enabled'].is-scrolling
+      .#{$namespace}-vl__inner
+      > * {
+      will-change: transform;
+    }
+
+    &[data-fsus-content-visibility='enabled'] .#{$namespace}-vl__inner > * {
+      content-visibility: auto;
+      contain-intrinsic-size: auto var(--fsus-render-unit-intrinsic-size, 48px);
+    }
+
+    &.is-scrolling .#{$namespace}-virtual-scrollbar,
+    .#{$namespace}-virtual-scrollbar.is-scrolling {
+      filter: none;
+    }
+
+    &.is-scrolling .#{$namespace}-scrollbar__thumb,
+    .#{$namespace}-virtual-scrollbar.is-scrolling
+      .#{$namespace}-scrollbar__thumb {
+      box-shadow:
+        0 0 0 1px
+          color-mix(in srgb, var(--fsus-scholarly-blue) 18%, transparent),
+        0 0 var(--fsus-interactive-motion-glow, 18px)
+          var(--fsus-motion-trail, rgba(42, 89, 156, 0.16));
     }
   }
 }
 
 .#{$namespace}-vl__window {
   scrollbar-width: none;
+  overscroll-behavior: contain;
+
   &::-webkit-scrollbar {
     display: none;
   }
 }
+
+.#{$namespace}-vl__inner {
+  transform: translate3d(0, 0, 0);
+
+  > * {
+    filter: none;
+    transform: translate3d(0, 0, 0);
+    transition:
+      filter 1ms linear,
+      transform var(--fsus-interactive-motion-settle, 120ms)
+        var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));
+    will-change: auto;
+  }
+}
+
 @include b(virtual-scrollbar) {
+  z-index: 2;
   opacity: 0;
-  transition: opacity 340ms ease-out;
+  transition:
+    opacity 340ms ease-out,
+    filter 1ms var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
+
   &.always-on {
     opacity: 1;
   }

@@ -125,6 +125,6 @@
   @include set-component-css-var('disabled', $disabled);
 
   // overlay & mask
-  @include set-component-css-var('overlay-color', $overlay-color);
+  @include set-component-css-var('overlay-color', $overlay-color-dark);
   @include set-component-css-var('mask-color', $mask-color);
 }

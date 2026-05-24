@@ -11,7 +11,11 @@ import {
 import { messageConfig } from '@element-plus/components/config-provider'
 import MessageConstructor from './message.vue'
 import { messageDefaults, messageTypes } from './message'
-import { instances } from './instance'
+import {
+  bindMessageToScope,
+  getMessageScope,
+  unbindMessageFromScope,
+} from './instance'
 
 import type { MessageContext } from './instance'
 import type { AppContext } from 'vue'
@@ -49,7 +53,7 @@ const normalizeOptions = (params?: MessageParams) => {
     if (!isElement(appendTo)) {
       debugWarn(
         'ElMessage',
-        'the appendTo option is not an HTMLElement. Falling back to document.body.'
+        'the appendTo option is not an HTMLElement. Falling back to document.body.',
       )
       appendTo = document.body
     }
@@ -61,17 +65,19 @@ const normalizeOptions = (params?: MessageParams) => {
 }
 
 const closeMessage = (instance: MessageContext) => {
-  const idx = instances.indexOf(instance)
+  const scopedInstances = getMessageScope(instance.vnode.appContext)
+  const idx = scopedInstances.indexOf(instance)
   if (idx === -1) return
 
-  instances.splice(idx, 1)
+  scopedInstances.splice(idx, 1)
+  unbindMessageFromScope(instance.id)
   const { handler } = instance
   handler.close()
 }
 
 const createMessage = (
   { appendTo, ...options }: MessageParamsNormalized,
-  context?: AppContext | null
+  context?: AppContext | null,
 ): MessageContext => {
   const id = `message_${seed++}`
   const userOnClose = options.onClose
@@ -105,7 +111,7 @@ const createMessage = (
             ? props.message
             : () => props.message,
         }
-      : null
+      : null,
   )
   vnode.appContext = context || message._context
 
@@ -137,19 +143,23 @@ const createMessage = (
 const message: MessageFn &
   Partial<Message> & { _context: AppContext | null } = (
   options = {},
-  context
+  context,
 ) => {
   if (!isClient) return { close: () => undefined }
+  const scopedInstances = getMessageScope(context ?? message._context)
 
-  if (isNumber(messageConfig.max) && instances.length >= messageConfig.max) {
+  if (
+    isNumber(messageConfig.max) &&
+    scopedInstances.length >= messageConfig.max
+  ) {
     return { close: () => undefined }
   }
 
   const normalized = normalizeOptions(options)
 
-  if (normalized.grouping && instances.length) {
-    const instance = instances.find(
-      ({ vnode: vm }) => vm.props?.message === normalized.message
+  if (normalized.grouping && scopedInstances.length) {
+    const instance = scopedInstances.find(
+      ({ vnode: vm }) => vm.props?.message === normalized.message,
     )
     if (instance) {
       instance.props.repeatNum += 1
@@ -160,7 +170,8 @@ const message: MessageFn &
 
   const instance = createMessage(normalized, context)
 
-  instances.push(instance)
+  bindMessageToScope(instance.id, scopedInstances)
+  scopedInstances.push(instance)
   return instance.handler
 }
 
@@ -172,7 +183,7 @@ messageTypes.forEach((type) => {
 })
 
 export function closeAll(type?: messageType): void {
-  for (const instance of instances) {
+  for (const instance of getMessageScope(message._context).slice()) {
     if (!type || type === instance.props.type) {
       instance.handler.close()
     }

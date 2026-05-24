@@ -40,20 +40,38 @@ export const useSlide = (
     return Math.max(initData.firstValue, initData.secondValue)
   })
 
+  const valueToPercent = (value: number) =>
+    ((value - props.min) / (props.max - props.min)) * 100
+
+  const normalizePercent = (percent: number) => {
+    if (!Number.isFinite(percent)) return 0
+    if (percent < 0) return 0
+    if (percent > 100) return 100
+    return percent
+  }
+
+  const firstPosition = computed(() =>
+    initData.dragging
+      ? normalizePercent(initData.firstPosition)
+      : valueToPercent(initData.firstValue)
+  )
+
+  const secondPosition = computed(() =>
+    initData.dragging
+      ? normalizePercent(initData.secondPosition)
+      : valueToPercent(initData.secondValue)
+  )
+
   const barSize = computed(() => {
     return props.range
-      ? `${
-          (100 * (maxValue.value - minValue.value)) / (props.max - props.min)
-        }%`
-      : `${
-          (100 * (initData.firstValue - props.min)) / (props.max - props.min)
-        }%`
+      ? Math.abs(secondPosition.value - firstPosition.value)
+      : firstPosition.value
   })
 
   const barStart = computed(() => {
     return props.range
-      ? `${(100 * (minValue.value - props.min)) / (props.max - props.min)}%`
-      : '0%'
+      ? Math.min(firstPosition.value, secondPosition.value)
+      : 0
   })
 
   const runwayStyle = computed<CSSProperties>(() => {
@@ -61,14 +79,21 @@ export const useSlide = (
   })
 
   const barStyle = computed<CSSProperties>(() => {
+    const sizeRatio = normalizePercent(barSize.value) / 100
+    const startOffset = (barStart.value / 100) * initData.sliderSize
+
     return props.vertical
       ? {
-          height: barSize.value,
-          bottom: barStart.value,
+          bottom: '0px',
+          height: '100%',
+          transform: `translate3d(0, ${-startOffset}px, 0) scaleY(${sizeRatio})`,
+          transformOrigin: 'center bottom',
         }
       : {
-          width: barSize.value,
-          left: barStart.value,
+          left: '0px',
+          transform: `translate3d(${startOffset}px, 0, 0) scaleX(${sizeRatio})`,
+          transformOrigin: 'left center',
+          width: '100%',
         }
   })
 
@@ -114,15 +139,25 @@ export const useSlide = (
 
   const setFirstValue = (firstValue: number | undefined) => {
     initData.firstValue = firstValue!
+    initData.firstPosition = valueToPercent(firstValue!)
     _emit(props.range ? [minValue.value, maxValue.value] : firstValue!)
   }
 
   const setSecondValue = (secondValue: number) => {
     initData.secondValue = secondValue
+    initData.secondPosition = valueToPercent(secondValue)
 
     if (props.range) {
       _emit([minValue.value, maxValue.value])
     }
+  }
+
+  const setFirstPosition = (percent: number) => {
+    initData.firstPosition = normalizePercent(percent)
+  }
+
+  const setSecondPosition = (percent: number) => {
+    initData.secondPosition = normalizePercent(percent)
   }
 
   const _emit = (val: Arrayable<number>) => {
@@ -201,7 +236,9 @@ export const useSlide = (
     onSliderWrapperPrevent,
     onSliderClick,
     onSliderDown,
+    setFirstPosition,
     setFirstValue,
+    setSecondPosition,
     setSecondValue,
   }
 }

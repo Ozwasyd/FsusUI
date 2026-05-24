@@ -12,7 +12,6 @@
     :popper-class="[`${nsDate.namespace.value}-picker__popper`, popperClass]"
     :popper-options="elPopperOptions"
     :fallback-placements="['bottom', 'top', 'right', 'left']"
-    :gpu-acceleration="false"
     :stop-popper-mouse-event="false"
     :hide-after="0"
     persistent
@@ -21,10 +20,10 @@
     <template #default>
       <el-input
         v-if="!isRangeInput"
-        :id="(id as string | undefined)"
+        :id="id as string | undefined"
         ref="inputRef"
         container-role="combobox"
-        :model-value="(displayValue as string)"
+        :model-value="displayValue as string"
         v-bind="singleInputAttrs"
         :size="pickerSize"
         :disabled="pickerDisabled"
@@ -70,7 +69,7 @@
         v-else
         ref="inputRef"
         :class="rangeInputKls"
-        :style="($attrs.style as any)"
+        :style="$attrs.style as any"
         @click="handleFocusInput"
         @mouseenter="onMouseEnter"
         @mouseleave="onMouseLeave"
@@ -117,11 +116,7 @@
           @input="handleEndInput"
           @change="handleEndChange"
         />
-        <el-icon
-          v-if="clearIcon"
-          :class="clearIconKls"
-          v-on="clearIconEvents"
-        >
+        <el-icon v-if="clearIcon" :class="clearIconKls" v-on="clearIconEvents">
           <component :is="clearIcon" />
         </el-icon>
       </div>
@@ -256,7 +251,7 @@ watch(pickerVisible, (val) => {
 })
 const emitChange = (
   val: TimePickerDefaultProps['modelValue'] | null,
-  isClear?: boolean
+  isClear?: boolean,
 ) => {
   // determine user real change only
   if (isClear || !valueEquals(val, valueOnOpen.value)) {
@@ -271,7 +266,7 @@ const emitInput = (input: SingleOrRange<DateModelType | Dayjs> | null) => {
     let formatted
     if (isArray(input)) {
       formatted = input.map((item) =>
-        formatter(item, props.valueFormat, lang.value)
+        formatter(item, props.valueFormat, lang.value),
       )
     } else if (input) {
       formatted = formatter(input, props.valueFormat, lang.value)
@@ -432,7 +427,7 @@ const parsedValue = computed(() => {
   } else {
     if (isArray(props.modelValue)) {
       dayOrDays = props.modelValue.map((d) =>
-        parseDate(d, props.valueFormat, lang.value)
+        parseDate(d, props.valueFormat, lang.value),
       ) as [Dayjs, Dayjs]
     } else {
       dayOrDays = parseDate(props.modelValue, props.valueFormat, lang.value)!
@@ -440,16 +435,14 @@ const parsedValue = computed(() => {
   }
 
   if (dayOrDays && pickerOptions.value.getRangeAvailableTime) {
-    const availableResult = pickerOptions.value.getRangeAvailableTime(
-      dayOrDays
-    )
+    const availableResult = pickerOptions.value.getRangeAvailableTime(dayOrDays)
     if (!isEqual(availableResult, dayOrDays)) {
       dayOrDays = availableResult
       if (!valueIsEmpty.value) {
         emitInput(
           (isArray(dayOrDays)
             ? dayOrDays.map((_) => _.toDate())
-            : dayOrDays.toDate()) as SingleOrRange<Date>
+            : dayOrDays.toDate()) as SingleOrRange<Date>,
         )
       }
     }
@@ -488,7 +481,7 @@ const isTimePicker = computed(() => props.type.startsWith('time'))
 const isDatesPicker = computed(() => props.type === 'dates')
 
 const triggerIcon = computed(
-  () => props.prefixIcon || (isTimeLikePicker.value ? Clock : Calendar)
+  () => props.prefixIcon || (isTimeLikePicker.value ? Clock : Calendar),
 )
 
 const showClose = ref(false)
@@ -603,7 +596,7 @@ const handleChange = () => {
         emitInput(
           (isArray(value)
             ? value.map((_) => _.toDate())
-            : value.toDate()) as DateOrDates
+            : value.toDate()) as DateOrDates,
         )
         userInput.value = null
       }
@@ -749,7 +742,7 @@ const handleEndChange = () => {
 
 const pickerOptions = ref<Partial<PickerOptions>>({})
 const onSetPickerOption = <T extends keyof PickerOptions>(
-  e: [T, PickerOptions[T]]
+  e: [T, PickerOptions[T]],
 ) => {
   pickerOptions.value[e[0]] = e[1]
   pickerOptions.value.panelReady = true
@@ -762,7 +755,7 @@ const onCalendarChange = (e: [Date, null | Date]) => {
 const onPanelChange = (
   value: [Dayjs, Dayjs],
   mode: 'month' | 'year',
-  view: unknown
+  view: unknown,
 ) => {
   emit('panel-change', value, mode, view)
 }

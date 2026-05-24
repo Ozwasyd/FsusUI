@@ -24,7 +24,7 @@ const getInternalWasmFilter = (filterNodeMethod: FilterNodeMethodFunction) => {
 const applyWasmFilter = (
   store: TreeStore,
   visibleNodeKeys: Set<TreeKey>,
-  value: FilterValue
+  value: FilterValue,
 ) => {
   const lazy = store.lazy
 
@@ -104,6 +104,10 @@ export default class TreeStore {
     if (value && wasmFilter) {
       const fastFilterResult = wasmFilter(value)
       if (fastFilterResult) {
+        if (fastFilterResult.pending) {
+          return
+        }
+
         applyWasmFilter(this, fastFilterResult.visibleNodeKeys, value)
         return
       }
@@ -157,7 +161,7 @@ export default class TreeStore {
 
   insertBefore(
     data: TreeNodeData,
-    refData: TreeKey | TreeNodeData | Node
+    refData: TreeKey | TreeNodeData | Node,
   ): void {
     const refNode = this.getNode(refData)
     refNode.parent.insertBefore({ data }, refNode)
@@ -165,7 +169,7 @@ export default class TreeStore {
 
   insertAfter(
     data: TreeNodeData,
-    refData: TreeKey | TreeNodeData | Node
+    refData: TreeKey | TreeNodeData | Node,
   ): void {
     const refNode = this.getNode(refData)
     refNode.parent.insertAfter({ data }, refNode)
@@ -243,7 +247,7 @@ export default class TreeStore {
 
   getCheckedNodes(
     leafOnly = false,
-    includeHalfChecked = false
+    includeHalfChecked = false,
   ): TreeNodeData[] {
     const checkedNodes: TreeNodeData[] = []
     const traverse = function (node: TreeStore | Node) {
@@ -326,16 +330,16 @@ export default class TreeStore {
   _setCheckedKeys(
     key: TreeKey,
     leafOnly = false,
-    checkedKeys: { [key: string]: boolean }
+    checkedKeys: { [key: string]: boolean },
   ): void {
     const allNodes = this._getAllNodes().sort((a, b) => b.level - a.level)
     const cache = Object.create(null)
-    const keys = Object.keys(checkedKeys)
+    const keySet = new Set(Object.keys(checkedKeys))
     allNodes.forEach((node) => node.setChecked(false, false))
     for (let i = 0, j = allNodes.length; i < j; i++) {
       const node = allNodes[i]
       const nodeKey = node.data[key].toString()
-      const checked = keys.includes(nodeKey)
+      const checked = keySet.has(nodeKey)
       if (!checked) {
         if (node.checked && !cache[nodeKey]) {
           node.setChecked(false, false)
@@ -404,7 +408,7 @@ export default class TreeStore {
   setChecked(
     data: TreeKey | TreeNodeData,
     checked: boolean,
-    deep: boolean
+    deep: boolean,
   ): void {
     const node = this.getNode(data)
 

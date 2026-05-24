@@ -14,7 +14,16 @@ import {
 import { throttle } from 'lodash-unified'
 import { useResizeObserver } from '@vueuse/core'
 import { debugWarn, flattedChildren, isString } from '@element-plus/utils'
-import { useOrderedChildren } from '@element-plus/hooks'
+import {
+  applyFsusInteractiveMotionVars,
+  fsusDecayOverflow,
+  resetFsusInteractiveMotionVars,
+  resolveFsusInteractiveMotion,
+  useFsusDrag,
+  useFsusMotionRuntime,
+  useFsusSpring,
+  useOrderedChildren,
+} from '@element-plus/hooks'
 import { carouselContextKey } from './constants'
 
 import type { SetupContext } from 'vue'
@@ -26,7 +35,7 @@ const THROTTLE_TIME = 300
 export const useCarousel = (
   props: CarouselProps,
   emit: SetupContext<CarouselEmits>['emit'],
-  componentName: string
+  componentName: string,
 ) => {
   const {
     children: items,
@@ -34,7 +43,7 @@ export const useCarousel = (
     removeChild: removeItem,
   } = useOrderedChildren<CarouselItemContext>(
     getCurrentInstance()!,
-    'ElCarouselItem'
+    'ElCarouselItem',
   )
 
   const slots = useSlots()
@@ -46,10 +55,20 @@ export const useCarousel = (
   const root = ref<HTMLDivElement>()
   const containerHeight = ref<number>(0)
   const isItemsTwoLength = ref(true)
+  const dragOffsetRaw = ref(0)
+  const dragMotion = useFsusDrag()
+  const motionRuntime = useFsusMotionRuntime()
+  const dragSpring = useFsusSpring(dragOffsetRaw, {
+    damping: 30,
+    mass: 0.74,
+    stiffness: 360,
+  })
+  const dragStartIndex = ref(-1)
+  const isDragging = dragMotion.isDragging
 
   // computed
   const arrowDisplay = computed(
-    () => props.arrow !== 'never' && !unref(isVertical)
+    () => props.arrow !== 'never' && !unref(isVertical),
   )
 
   const hasLabel = computed(() => {
@@ -58,6 +77,9 @@ export const useCarousel = (
 
   const isCardType = computed(() => props.type === 'card')
   const isVertical = computed(() => props.direction === 'vertical')
+  const dragOffset = computed(() =>
+    motionRuntime.value.enabled ? dragSpring.value.value : dragOffsetRaw.value
+  )
 
   const containerStyle = computed(() => {
     if (props.height !== 'auto') {
@@ -77,7 +99,7 @@ export const useCarousel = (
       setActiveItem(index)
     },
     THROTTLE_TIME,
-    { trailing: true }
+    { trailing: true },
   )
 
   const throttledIndicatorHover = throttle((index: number) => {
@@ -97,8 +119,22 @@ export const useCarousel = (
   }
 
   function startTimer() {
-    if (props.interval <= 0 || !props.autoplay || timer.value) return
+    if (
+      props.interval <= 0 ||
+      !props.autoplay ||
+      timer.value ||
+      (typeof document !== 'undefined' && document.hidden)
+    )
+      return
     timer.value = setInterval(() => playSlides(), props.interval)
+  }
+
+  function handleVisibilityChange() {
+    if (document.hidden) {
+      pauseTimer()
+    } else {
+      startTimer()
+    }
   }
 
   const playSlides = () => {
@@ -112,7 +148,7 @@ export const useCarousel = (
   function setActiveItem(index: number | string) {
     if (isString(index)) {
       const filteredItems = items.value.filter(
-        (item) => item.props.name === index
+        (item) => item.props.name === index,
       )
       if (filteredItems.length > 0) {
         index = items.value.indexOf(filteredItems[0])
@@ -173,7 +209,7 @@ export const useCarousel = (
 
   function handleMouseLeave() {
     hover.value = false
-    startTimer()
+    if (!isDragging.value) startTimer()
   }
 
   function handleButtonEnter(arrow: 'left' | 'right') {
@@ -208,6 +244,143 @@ export const useCarousel = (
 
   function next() {
     setActiveItem(activeIndex.value + 1)
+  }
+
+  function getDragSize() {
+    const rootEl = root.value
+    if (!rootEl) return 0
+
+    return unref(isVertical) ? rootEl.offsetHeight : rootEl.offsetWidth
+  }
+
+  function canDragFromCurrentIndex(offset: number) {
+    if (props.loop) return true
+    if (offset > 0 && activeIndex.value <= 0) return false
+    return !(offset < 0 && activeIndex.value >= items.value.length - 1)
+  }
+
+  function dampDragOffset(offset: number) {
+    if (canDragFromCurrentIndex(offset)) return offset
+
+    return Math.sign(offset) * fsusDecayOverflow(Math.abs(offset), 96)
+  }
+
+  function shouldIgnoreDragStart(event: PointerEvent) {
+    if (event.button !== 0) return true
+    const target = event.target as HTMLElement | null
+    return Boolean(
+      target?.closest(
+        [
+          '.el-carousel__arrow',
+          '.el-carousel__indicator',
+          '.el-carousel__button',
+          'a',
+          'button',
+          'input',
+          'select',
+          'textarea',
+          '[contenteditable="true"]',
+          '[role="button"]',
+        ].join(',')
+      )
+    )
+  }
+
+  function setPointerCaptureSafely(event: PointerEvent) {
+    try {
+      root.value?.setPointerCapture?.(event.pointerId)
+    } catch {
+      // Synthetic pointer events do not always register an active pointer.
+    }
+  }
+
+  function releasePointerCaptureSafely(event: PointerEvent) {
+    try {
+      root.value?.releasePointerCapture?.(event.pointerId)
+    } catch {
+      // The pointer can already be released after cancellation or synthetic tests.
+    }
+  }
+
+  function handlePointerDown(event: PointerEvent) {
+    if (shouldIgnoreDragStart(event) || items.value.length <= 1) return
+
+    event.preventDefault()
+    pauseTimer()
+    dragStartIndex.value = activeIndex.value
+    dragOffsetRaw.value = 0
+    dragSpring.stop()
+    dragMotion.start({
+      x: event.clientX,
+      y: event.clientY,
+    })
+    applyFsusInteractiveMotionVars(
+      root.value,
+      resolveFsusInteractiveMotion({
+        axis: unref(isVertical) ? 'y' : 'x',
+        deltaX: unref(isVertical) ? 0 : 24,
+        deltaY: unref(isVertical) ? 24 : 0,
+        kind: 'carousel',
+        runtime: motionRuntime.value,
+      }),
+    )
+    setPointerCaptureSafely(event)
+  }
+
+  function handlePointerMove(event: PointerEvent) {
+    if (!isDragging.value) return
+
+    event.preventDefault()
+    const drag = dragMotion.move({
+      x: event.clientX,
+      y: event.clientY,
+    })
+    applyFsusInteractiveMotionVars(
+      root.value,
+      resolveFsusInteractiveMotion({
+        axis: unref(isVertical) ? 'y' : 'x',
+        deltaX: unref(isVertical) ? 0 : drag.deltaX,
+        deltaY: unref(isVertical) ? drag.deltaY : 0,
+        elapsedMs: 16,
+        kind: 'carousel',
+        runtime: motionRuntime.value,
+      }),
+    )
+    const offset = unref(isVertical) ? drag.totalY : drag.totalX
+
+    dragOffsetRaw.value = dampDragOffset(offset)
+  }
+
+  function settleDrag(event: PointerEvent) {
+    if (!isDragging.value) return
+
+    const size = getDragSize()
+    const offset = dragOffsetRaw.value
+    const velocity = dragMotion.end()
+    const threshold = Math.max(48, size * 0.18)
+    const velocityThreshold =
+      motionRuntime.value.preset === 'expressive' ? 0.32 : 0.4
+    const movedForward =
+      offset < -threshold || (offset < 0 && velocity > velocityThreshold)
+    const movedBackward =
+      offset > threshold || (offset > 0 && velocity > velocityThreshold)
+
+    releasePointerCaptureSafely(event)
+    dragOffsetRaw.value = 0
+    resetFsusInteractiveMotionVars(root.value)
+
+    if (activeIndex.value === dragStartIndex.value) {
+      if (movedForward) {
+        next()
+      } else if (movedBackward) {
+        prev()
+      } else {
+        resetItemPosition(activeIndex.value)
+      }
+    }
+
+    dragStartIndex.value = -1
+    if (!hover.value) startTimer()
   }
 
   function resetTimer() {
@@ -253,26 +426,26 @@ export const useCarousel = (
       if (prev > -1) {
         emit('change', current, prev)
       }
-    }
+    },
   )
   watch(
     () => props.autoplay,
     (autoplay) => {
       autoplay ? startTimer() : pauseTimer()
-    }
+    },
   )
   watch(
     () => props.loop,
     () => {
       setActiveItem(activeIndex.value)
-    }
+    },
   )
 
   watch(
     () => props.interval,
     () => {
       resetTimer()
-    }
+    },
   )
 
   const resizeObserver = shallowRef<ReturnType<typeof useResizeObserver>>()
@@ -285,23 +458,27 @@ export const useCarousel = (
       },
       {
         immediate: true,
-      }
+      },
     )
 
     resizeObserver.value = useResizeObserver(root.value, () => {
       resetItemPosition()
     })
+    document.addEventListener('visibilitychange', handleVisibilityChange)
     startTimer()
   })
 
   onBeforeUnmount(() => {
     pauseTimer()
+    document.removeEventListener('visibilitychange', handleVisibilityChange)
     if (root.value && resizeObserver.value) resizeObserver.value.stop()
   })
 
   // provide
   provide(carouselContextKey, {
     root,
+    dragOffset,
+    isDragging,
     isCardType,
     isVertical,
     items,
@@ -318,6 +495,7 @@ export const useCarousel = (
     arrowDisplay,
     hasLabel,
     hover,
+    isDragging,
     isCardType,
     items,
     isVertical,
@@ -328,6 +506,10 @@ export const useCarousel = (
     handleIndicatorClick,
     handleMouseEnter,
     handleMouseLeave,
+    handlePointerCancel: settleDrag,
+    handlePointerDown,
+    handlePointerMove,
+    handlePointerUp: settleDrag,
     setActiveItem,
     prev,
     next,

@@ -8,83 +8,133 @@
 
 @include b(tree-select) {
   @include e(popper) {
-    .#{$namespace}-tree {
-      background: transparent;
-      padding: 6px 0;
+    &.#{$namespace}-popper {
+      background: getCssVar('bg-color') !important;
+      border: 1px solid getCssVar('border-color-light');
+      box-shadow:
+        inset 0 1px 0 var(--fsus-highlight),
+        var(--fsus-shadow-floating, #{getCssVar('box-shadow')});
+      overflow: hidden;
     }
 
-    // 容器层：彻底透明，不干扰视觉
+    .#{$namespace}-tree {
+      background: transparent;
+      padding: 6px;
+    }
+
+    // TreeSelect uses the tree row itself as the single interaction surface.
     .#{$namespace}-tree-node__content {
       height: 44px !important; // 统一 44px
+      min-height: 44px;
       background: transparent !important;
-      padding: 0 !important;
       display: flex;
       align-items: center;
       margin: 2px 0;
+      padding-right: 0 !important;
+      border-radius: 14px;
+      box-sizing: border-box;
+      color: getCssVar('text-color', 'regular');
+      overflow: hidden;
 
       &:hover {
         background: transparent !important;
+        box-shadow: none !important;
+        color: var(--fsus-scholarly-blue);
       }
     }
 
-    // 重点：通过缩进补齐，确保高亮块起始位置统一
     .#{$namespace}-tree-node__expand-icon {
-      margin-left: 12px !important;
-      margin-right: 0 !important;
-      width: 24px;
-      text-align: center;
+      flex: 0 0 32px;
+      width: 32px;
+      height: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 !important;
+      margin: 0 !important;
+      position: relative;
+      z-index: 1;
+      opacity: 0 !important;
     }
 
-    // 核心：高亮块，它必须完整包裹文字
     .#{$namespace}-select-dropdown__item {
       flex: 1;
-      height: 44px !important;
-      padding: 0 20px !important; // 极致呼吸感，确保文字远离边框
-      margin: 0 8px !important;
-      border-radius: 14px !important;
+      min-width: 0;
+      height: 100% !important;
+      padding: 0 12px !important;
+      margin: 0 !important;
+      border-radius: 0 !important;
       display: flex;
       align-items: center;
       background: transparent !important;
-      color: getCssVar('text-color', 'primary');
-      font-weight: 500;
+      box-shadow: none !important;
+      color: inherit !important;
+      font-weight: inherit;
+      outline: none !important;
       position: relative;
-      overflow: visible;
+      z-index: 0;
+      overflow: hidden !important;
+      text-overflow: ellipsis;
+      white-space: nowrap;
 
       span {
         position: relative;
         z-index: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
-      // 强调色：只在 hover/selected 时出现
+      &::before,
       &::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        border-radius: 14px;
-        z-index: 0;
-        transition: all getCssVar('transition-duration');
+        content: none !important;
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
       }
 
       &:hover, &.hover {
-        background: rgba(42, 89, 156, 0.08) !important;
-        outline: 1.5px solid var(--fsus-scholarly-blue) !important;
-        outline-offset: -1px;
-        color: var(--fsus-scholarly-blue) !important;
+        background: transparent !important;
+        outline: none !important;
+        box-shadow: none !important;
+        color: inherit !important;
       }
     }
 
-    .#{$namespace}-tree-node.is-current > .#{$namespace}-tree-node__content .#{$namespace}-select-dropdown__item {
-      background: rgba(42, 89, 156, 0.05) !important;
+    .#{$namespace}-tree-node__content > .#{$namespace}-tree-node__expand-icon + .#{$namespace}-select-dropdown__item {
+      margin-left: -32px !important;
+      padding-left: 44px !important;
+    }
+
+    .#{$namespace}-tree-node.is-current > .#{$namespace}-tree-node__content {
+      background: transparent !important;
       color: var(--fsus-scholarly-blue) !important;
       font-weight: 700;
-      outline: 1px solid rgba(42, 89, 156, 0.1);
+      box-shadow: none;
+    }
+
+    .#{$namespace}-tree-node.is-current > .#{$namespace}-tree-node__content .#{$namespace}-select-dropdown__item {
+      background: transparent !important;
+      box-shadow: none !important;
+      outline: none !important;
+      color: inherit !important;
+      font-weight: inherit;
+    }
+
+    .#{$namespace}-tree-node.is-current > .#{$namespace}-tree-node__content .#{$namespace}-select-dropdown__item,
+    .#{$namespace}-tree-node__content:hover > .#{$namespace}-select-dropdown__item,
+    .#{$namespace}-tree-node:focus > .#{$namespace}-tree-node__content .#{$namespace}-select-dropdown__item {
+      background: rgba(42, 89, 156, 0.08) !important;
+      border-radius: 14px !important;
     }
 
     .#{$namespace}-tree-node:focus > .#{$namespace}-tree-node__content {
       outline: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      color: var(--fsus-scholarly-blue);
     }
   }
 }

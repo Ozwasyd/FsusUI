@@ -4,6 +4,7 @@
     :class="[ns.e('button-wrapper'), { hover: hovering, dragging }]"
     :style="wrapperStyle"
     :tabindex="disabled ? -1 : 0"
+    @pointerdown="onButtonDown"
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
     @mousedown="onButtonDown"
@@ -56,6 +57,7 @@ const initData = reactive<SliderButtonInitData>({
   startPosition: 0,
   newPosition: 0,
   oldValue: props.modelValue,
+  velocity: 0,
 })
 
 const {

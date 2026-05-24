@@ -28,7 +28,7 @@ export const popperCoreConfigProps = buildProps({
   },
   gpuAcceleration: {
     type: Boolean,
-    default: true,
+    default: undefined,
   },
   /**
    * @description offset of the Tooltip

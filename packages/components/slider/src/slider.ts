@@ -24,6 +24,8 @@ export interface SliderInitData {
   oldValue?: Arrayable<number>
   dragging: boolean
   sliderSize: number
+  firstPosition: number
+  secondPosition: number
 }
 
 export const sliderProps = buildProps({

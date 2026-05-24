@@ -45,15 +45,21 @@ const DynamicDomainForm = defineComponent({
 
     const submitForm = async () => {
       if (!formRef.value) return
-      try {
-        const validate = props.onSubmit
-          ? formRef.value.validate(props.onSubmit as any)
-          : formRef.value.validate()
+      const result = props.onSubmit
+        ? await formRef.value.validate(props.onSubmit as any)
+        : await formRef.value.validate()
 
-        await validate
+      if (props.onSubmit) {
+        return
+      }
+
+      if (result.ok && result.value) {
         props.onSuccess?.()
-      } catch (e) {
-        props.onError?.(e)
+        return
+      }
+
+      if (result.ok === false) {
+        props.onError?.(result.error.cause)
       }
     }
 

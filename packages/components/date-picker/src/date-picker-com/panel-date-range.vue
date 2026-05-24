@@ -151,16 +151,22 @@
             </button>
             <div>{{ leftLabel }}</div>
           </div>
-          <date-table
-            selection-mode="range"
-            :date="leftDate"
-            :min-date="minDate"
-            :max-date="maxDate"
-            :range-state="rangeState"
-            :disabled-date="disabledDate"
-            :cell-class-name="cellClassName"
-            v-on="dateTableEvents"
-          />
+          <div
+            :key="leftViewKey"
+            :class="[drpNs.e('view'), dateRangeViewMotionClass]"
+            v-bind="dateRangeViewAuditAttrs"
+          >
+            <date-table
+              selection-mode="range"
+              :date="leftDate"
+              :min-date="minDate"
+              :max-date="maxDate"
+              :range-state="rangeState"
+              :disabled-date="disabledDate"
+              :cell-class-name="cellClassName"
+              v-on="dateTableEvents"
+            />
+          </div>
         </div>
         <div :class="[ppNs.e('content'), drpNs.e('content')]" class="is-right">
           <div :class="drpNs.e('header')">
@@ -209,16 +215,22 @@
             </button>
             <div>{{ rightLabel }}</div>
           </div>
-          <date-table
-            selection-mode="range"
-            :date="rightDate"
-            :min-date="minDate"
-            :max-date="maxDate"
-            :range-state="rangeState"
-            :disabled-date="disabledDate"
-            :cell-class-name="cellClassName"
-            v-on="dateTableEvents"
-          />
+          <div
+            :key="rightViewKey"
+            :class="[drpNs.e('view'), dateRangeViewMotionClass]"
+            v-bind="dateRangeViewAuditAttrs"
+          >
+            <date-table
+              selection-mode="range"
+              :date="rightDate"
+              :min-date="minDate"
+              :max-date="maxDate"
+              :range-state="rangeState"
+              :disabled-date="disabledDate"
+              :cell-class-name="cellClassName"
+              v-on="dateTableEvents"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -273,6 +285,7 @@ import DateTable from './basic-date-table.vue'
 import type { Dayjs } from 'dayjs'
 
 type ChangeType = 'min' | 'max'
+type DateRangeViewMotion = 'next' | 'prev'
 type UserInput = {
   min: string | null
   max: string | null
@@ -296,6 +309,7 @@ const defaultValue = toRef(pickerBase.props, 'defaultValue')
 const { lang } = useLocale()
 const leftDate = ref<Dayjs>(dayjs().locale(lang.value))
 const rightDate = ref<Dayjs>(dayjs().locale(lang.value).add(1, unit))
+const dateRangeViewMotion = ref<DateRangeViewMotion>('next')
 
 const {
   minDate,
@@ -357,6 +371,23 @@ const rightMonth = computed(() => {
 
 const hasShortcuts = computed(() => !!shortcuts.value.length)
 
+const dateRangeViewMotionClass = computed(
+  () =>
+    `${ppNs.namespace.value}-date-picker-view-${dateRangeViewMotion.value}`
+)
+
+const dateRangeViewAuditAttrs = computed(() => ({
+  'data-fsus-date-view-motion': dateRangeViewMotion.value,
+}))
+
+const leftViewKey = computed(
+  () => `left-${leftDate.value.year()}-${leftDate.value.month()}`
+)
+
+const rightViewKey = computed(
+  () => `right-${rightDate.value.year()}-${rightDate.value.month()}`
+)
+
 const minVisibleDate = computed(() => {
   if (dateUserInput.value.min !== null) return dateUserInput.value.min
   if (minDate.value) return minDate.value.format(dateFormat.value)
@@ -401,6 +432,7 @@ const isValidValue = (date: [Dayjs, Dayjs]) => {
 }
 
 const leftPrevYear = () => {
+  dateRangeViewMotion.value = 'prev'
   leftDate.value = leftDate.value.subtract(1, 'year')
   if (!props.unlinkPanels) {
     rightDate.value = leftDate.value.add(1, 'month')
@@ -409,6 +441,7 @@ const leftPrevYear = () => {
 }
 
 const leftPrevMonth = () => {
+  dateRangeViewMotion.value = 'prev'
   leftDate.value = leftDate.value.subtract(1, 'month')
   if (!props.unlinkPanels) {
     rightDate.value = leftDate.value.add(1, 'month')
@@ -417,6 +450,7 @@ const leftPrevMonth = () => {
 }
 
 const rightNextYear = () => {
+  dateRangeViewMotion.value = 'next'
   if (!props.unlinkPanels) {
     leftDate.value = leftDate.value.add(1, 'year')
     rightDate.value = leftDate.value.add(1, 'month')
@@ -427,6 +461,7 @@ const rightNextYear = () => {
 }
 
 const rightNextMonth = () => {
+  dateRangeViewMotion.value = 'next'
   if (!props.unlinkPanels) {
     leftDate.value = leftDate.value.add(1, 'month')
     rightDate.value = leftDate.value.add(1, 'month')
@@ -437,21 +472,25 @@ const rightNextMonth = () => {
 }
 
 const leftNextYear = () => {
+  dateRangeViewMotion.value = 'next'
   leftDate.value = leftDate.value.add(1, 'year')
   handlePanelChange('year')
 }
 
 const leftNextMonth = () => {
+  dateRangeViewMotion.value = 'next'
   leftDate.value = leftDate.value.add(1, 'month')
   handlePanelChange('month')
 }
 
 const rightPrevYear = () => {
+  dateRangeViewMotion.value = 'prev'
   rightDate.value = rightDate.value.subtract(1, 'year')
   handlePanelChange('year')
 }
 
 const rightPrevMonth = () => {
+  dateRangeViewMotion.value = 'prev'
   rightDate.value = rightDate.value.subtract(1, 'month')
   handlePanelChange('month')
 }

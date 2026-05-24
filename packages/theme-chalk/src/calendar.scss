@@ -9,6 +9,9 @@
 
   @include e(header) {
     display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
     justify-content: space-between;
     padding: 12px 20px;
     border-bottom: getCssVar('calendar', 'header-border-bottom');
@@ -17,10 +20,139 @@
   @include e(title) {
     color: getCssVar('text-color');
     align-self: center;
+    min-width: 0;
+    font-weight: 600;
+  }
+
+  @include e(button-group) {
+    flex: 0 0 auto;
+
+    .#{$namespace}-button-group {
+      display: inline-flex;
+      gap: 2px;
+      padding: 3px;
+      border: 1px solid getCssVar('border-color-lighter');
+      border-radius: var(--fsus-radius-control, 8px);
+      background:
+        linear-gradient(
+          180deg,
+          color-mix(in srgb, #{getCssVar('fill-color', 'blank')} 92%, transparent),
+          color-mix(in srgb, #{getCssVar('fill-color', 'light')} 90%, transparent)
+        );
+      box-shadow: inset 0 1px 0 var(--fsus-highlight, rgba(255, 255, 255, 0.72));
+    }
+
+    .#{$namespace}-button-group > .#{$namespace}-button {
+      float: none;
+      min-height: 32px;
+      height: 32px;
+      margin: 0;
+      padding: 0 13px;
+      border: 0;
+      border-radius: calc(var(--fsus-radius-control, 8px) - 2px) !important;
+      background: transparent;
+      color: getCssVar('text-color', 'regular');
+      box-shadow: none;
+      font-weight: 600;
+      transition:
+        background-color var(--fsus-calendar-cell-duration, 180ms)
+          var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+        color var(--fsus-calendar-cell-duration, 180ms)
+          var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+        box-shadow var(--fsus-calendar-cell-duration, 180ms)
+          var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+        transform var(--fsus-calendar-cell-duration, 180ms)
+          var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+
+      &:hover,
+      &:focus-visible {
+        opacity: 1;
+        color: var(--fsus-scholarly-blue, #{getCssVar('color-primary')});
+        background: color-mix(
+          in srgb,
+          var(--fsus-scholarly-blue, #{getCssVar('color-primary')}) 8%,
+          transparent
+        );
+      }
+
+      &:active {
+        transform: translate3d(0, 1px, 0);
+        color: var(--fsus-scholarly-blue, #{getCssVar('color-primary')});
+        background: color-mix(
+          in srgb,
+          var(--fsus-scholarly-blue, #{getCssVar('color-primary')}) 12%,
+          transparent
+        );
+        box-shadow: inset 0 0 0 1px
+          color-mix(
+            in srgb,
+            var(--fsus-scholarly-blue, #{getCssVar('color-primary')}) 16%,
+            transparent
+          );
+      }
+    }
   }
 
   @include e(body) {
+    position: relative;
+    overflow: hidden;
     padding: 12px 20px 35px;
+    transform-origin: center top;
+    will-change: opacity, transform;
+
+    @include when(motion-forward) {
+      animation: #{$namespace}-calendar-motion-forward
+        var(--fsus-calendar-view-duration, 360ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+    }
+
+    @include when(motion-backward) {
+      animation: #{$namespace}-calendar-motion-backward
+        var(--fsus-calendar-view-duration, 360ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+    }
+
+    @include when(motion-neutral) {
+      animation: #{$namespace}-calendar-motion-neutral
+        var(--fsus-calendar-view-duration, 360ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+    }
+  }
+}
+
+@keyframes #{$namespace}-calendar-motion-forward {
+  from {
+    opacity: 0;
+    transform: translate3d(18px, 0, 0) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes #{$namespace}-calendar-motion-backward {
+  from {
+    opacity: 0;
+    transform: translate3d(-18px, 0, 0) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes #{$namespace}-calendar-motion-neutral {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0) scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
@@ -45,7 +177,13 @@
     border-bottom: getCssVar('calendar', 'border');
     border-right: getCssVar('calendar', 'border');
     vertical-align: top;
-    transition: background-color getCssVar('transition-duration', 'fast') ease;
+    transition:
+      background-color var(--fsus-calendar-cell-duration, 180ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+      color var(--fsus-calendar-cell-duration, 180ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+      box-shadow var(--fsus-calendar-cell-duration, 180ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
 
     @include when(selected) {
       background-color: getCssVar('calendar', 'selected-bg-color');
@@ -72,9 +210,33 @@
     box-sizing: border-box;
     padding: 8px;
     height: getCssVar('calendar', 'cell-width');
+    border-radius: var(--fsus-radius-control, 8px);
+    transition:
+      background-color var(--fsus-calendar-cell-duration, 180ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+      box-shadow var(--fsus-calendar-cell-duration, 180ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+      transform var(--fsus-calendar-cell-duration, 180ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+
     &:hover {
       cursor: pointer;
       background-color: getCssVar('calendar', 'selected-bg-color');
+      box-shadow: inset 0 0 0 1px rgba(42, 89, 156, 0.12);
+      transform: translate3d(0, -1px, 0);
     }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .#{$namespace}-calendar__body,
+  .#{$namespace}-calendar-table td,
+  .#{$namespace}-calendar-day {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+
+  .#{$namespace}-calendar-day:hover {
+    transform: none;
   }
 }

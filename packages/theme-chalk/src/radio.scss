@@ -182,8 +182,9 @@ $radio-font-size: map.merge(
 
     &:focus-visible {
       & + .#{$namespace}-radio__inner {
-        outline: 2px solid getCssVar('radio-input-border-color-hover');
-        outline-offset: 1px;
+        border-color: var(--fsus-scholarly-blue);
+        outline: none;
+        box-shadow: inset 0 0 0 1px var(--fsus-scholarly-blue);
         border-radius: getCssVar('radio-input-border-radius');
       }
     }
@@ -192,7 +193,7 @@ $radio-font-size: map.merge(
   &:focus:not(:focus-visible):not(.is-focus):not(:active):not(.is-disabled) {
     /*获得焦点时 样式提醒*/
     .#{$namespace}-radio__inner {
-      box-shadow: 0 0 2px 2px getCssVar('radio-input-border-color-hover');
+      box-shadow: inset 0 0 0 1px var(--fsus-scholarly-blue);
     }
   }
 

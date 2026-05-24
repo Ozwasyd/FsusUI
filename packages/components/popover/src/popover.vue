@@ -53,9 +53,6 @@ const kls = computed(() => {
   return [ns.b(), props.popperClass!, { [ns.m('plain')]: !!props.content }]
 })
 
-const gpuAcceleration = computed(() => {
-  return props.transition === `${ns.namespace.value}-fade-in-linear`
-})
 const tooltipBindings = computed(() => ({
   ...attrs,
   trigger: props.trigger,
@@ -78,7 +75,6 @@ const tooltipBindings = computed(() => ({
   popperStyle: style.value,
   teleported: props.teleported,
   persistent: props.persistent,
-  gpuAcceleration: gpuAcceleration.value,
 }))
 const tooltipEvents = computed(() => ({
   'update:visible': onUpdateVisible.value,

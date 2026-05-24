@@ -105,8 +105,8 @@ $checkbox-bordered-input-width: map.merge(
 
   input:focus-visible {
     & + .#{$namespace}-checkbox__inner {
-      outline: 2px solid getCssVar('checkbox-input-border-color-hover');
-      outline-offset: 1px;
+      outline: none;
+      box-shadow: inset 0 0 0 1px var(--fsus-scholarly-blue);
       border-radius: getCssVar('checkbox-border-radius');
     }
   }

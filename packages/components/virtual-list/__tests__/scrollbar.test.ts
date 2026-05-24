@@ -6,7 +6,7 @@ import { ScrollbarDirKey } from '../src/defaults'
 
 describe('virtual scrollbar', () => {
   async function testInlineStyle(
-    layout: 'vertical' | 'horizontal' = 'vertical'
+    layout: 'vertical' | 'horizontal' = 'vertical',
   ) {
     const wrapper = mount({
       template: `<scrollbar visible layout="${layout}" :total="100" :ratio="25" :client-size="100" :scroll-from="20"></scrollbar>`,
@@ -16,28 +16,37 @@ describe('virtual scrollbar', () => {
     })
     await nextTick()
     const scrollbar = wrapper.findComponent(Scrollbar)
-    const styles = getComputedStyle(scrollbar.vm.$el)
+    const element = scrollbar.vm.$el as HTMLElement
+    const computedStyles = getComputedStyle(element)
+    const styles = element.style
+    const edgeKey = ScrollbarDirKey[layout]
+
+    expect(computedStyles.display).toBe('block')
+    expect(computedStyles.position).toBe('absolute')
 
     Object.entries({
-      display: 'block',
-      position: 'absolute',
-      // width: 'vertical' !== layout ? '100%' : '6px',
-      // height: 'vertical' !== layout ? '6px' : 'auto',
-      [ScrollbarDirKey[layout]]: '2px',
-      right: '2px',
-      bottom: '2px',
-      'border-radius': '4px',
+      [edgeKey]: '8px',
+      ...(layout === 'vertical'
+        ? {
+            right: '4px',
+          }
+        : {
+            bottom: '4px',
+          }),
+      'border-radius': 'var(--fsus-radius-pill, 999px)',
     }).forEach(([key, value]) =>
-      expect(`${key}: ${styles.getPropertyValue(key)}`).toBe(`${key}: ${value}`)
+      expect(`${key}: ${styles.getPropertyValue(key)}`).toBe(
+        `${key}: ${value}`,
+      ),
     )
   }
 
   it('vertical inline style', async () => {
-    testInlineStyle('vertical')
+    await testInlineStyle('vertical')
   })
 
-  it('horizontal inline style', () => {
-    testInlineStyle('horizontal')
+  it('horizontal inline style', async () => {
+    await testInlineStyle('horizontal')
   })
 
   it('click track', async () => {
@@ -77,9 +86,9 @@ describe('virtual scrollbar', () => {
      *  thumbSize: 33   // scrollbar.ts computed thumbSize
      *  thumb translateY: (0 / (400 - 100)) * (100 - 25) -> 0  // (scrollTop / (scrollHeight - clientHeight)) * (clientHeight - thumbSize)
      */
-    const initializeStyle = wrapper.find('.el-scrollbar__thumb').attributes(
-      'style'
-    )
+    const initializeStyle = wrapper
+      .find('.el-scrollbar__thumb')
+      .attributes('style')
     expect(initializeStyle).toContain('height: 33px;')
     expect(initializeStyle).toContain('transform: translateY(0px);')
     expect(initializeStyle).toContain('width: 100%;')
@@ -101,14 +110,14 @@ describe('virtual scrollbar', () => {
       false,
       false,
       0,
-      null
+      null,
     )
     el.dispatchEvent(e)
 
     await nextTick()
 
     expect(wrapper.find('.el-scrollbar__thumb').attributes('style')).not.toBe(
-      initializeStyle
+      initializeStyle,
     )
   })
 
@@ -141,12 +150,13 @@ describe('virtual scrollbar', () => {
     await nextTick()
 
     expect(
-      (wrapper.find('.el-virtual-scrollbar').element as HTMLElement).style.width
-    ).toContain('198px') // clientSize - props.endGap = 200 - 2 = 198
+      (wrapper.find('.el-virtual-scrollbar').element as HTMLElement).style
+        .width,
+    ).toContain('184px') // clientSize - startGap - endGap = 200 - 8 - 8 = 184
 
     expect(
       (wrapper.find('.el-virtual-scrollbar').element as HTMLElement).style
-        .height
+        .height,
     ).toContain('6px') // fixed 6
   })
 
@@ -172,11 +182,12 @@ describe('virtual scrollbar', () => {
 
     expect(
       (wrapper.find('.el-virtual-scrollbar').element as HTMLElement).style
-        .height
-    ).toContain('98px') // clientSize - props.endGap = 100 - 2 = 98
+        .height,
+    ).toContain('84px') // clientSize - startGap - endGap = 100 - 8 - 8 = 84
 
     expect(
-      (wrapper.find('.el-virtual-scrollbar').element as HTMLElement).style.width
+      (wrapper.find('.el-virtual-scrollbar').element as HTMLElement).style
+        .width,
     ).toContain('6px') // fixed 6
   })
 
@@ -203,7 +214,7 @@ describe('virtual scrollbar', () => {
 
     expect(
       (wrapper.find('.el-virtual-scrollbar').element as HTMLElement).style
-        .height
-    ).toContain('92px') // clientSize - props.endGap = 100 - 8 = 92
+        .height,
+    ).toContain('84px') // clientSize - startGap - endGap = 100 - 8 - 8 = 84
   })
 })

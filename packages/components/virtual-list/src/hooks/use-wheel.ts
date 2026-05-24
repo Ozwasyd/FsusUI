@@ -1,9 +1,13 @@
 // @ts-nocheck
-import { cAF, isFirefox, rAF } from '@element-plus/utils'
+import { isFirefox, rAF } from '@element-plus/utils'
+import { normalizeFsusWheelDelta } from '@element-plus/hooks'
 import { HORIZONTAL, VERTICAL } from '../defaults'
 
 import type { ComputedRef } from 'vue'
 import type { LayoutDirection } from '../types'
+
+const WHEEL_SCROLL_EASE = 0.32
+const WHEEL_SCROLL_EPSILON = 0.5
 
 const LayoutKeys = {
   [HORIZONTAL]: 'deltaX',
@@ -20,10 +24,11 @@ type ListWheelHandler = (offset: number) => void
 
 const useWheel = (
   { atEndEdge, atStartEdge, layout }: ListWheelState,
-  onWheelDelta: ListWheelHandler
+  onWheelDelta: ListWheelHandler,
 ) => {
-  let frameHandle: number
-  let offset = 0
+  let frameHandle: number | null = null
+  let targetOffset = 0
+  let currentOffset = 0
 
   // let scrollLock = false
   // let lockHandle = null
@@ -41,23 +46,55 @@ const useWheel = (
     return edgeReached
   }
 
+  const scheduleWheelFlush = () => {
+    if (frameHandle) return
+    frameHandle = rAF(() => {
+      frameHandle = null
+
+      const distance = targetOffset - currentOffset
+      const nextOffset =
+        Math.abs(distance) <= WHEEL_SCROLL_EPSILON
+          ? targetOffset
+          : currentOffset + distance * WHEEL_SCROLL_EASE
+      const delta = nextOffset - currentOffset
+
+      currentOffset = nextOffset
+      if (delta !== 0) {
+        onWheelDelta(delta)
+      }
+
+      if (Math.abs(targetOffset - currentOffset) > WHEEL_SCROLL_EPSILON) {
+        scheduleWheelFlush()
+      } else {
+        targetOffset = 0
+        currentOffset = 0
+      }
+    })
+  }
+
   const onWheel = (e: WheelEvent) => {
-    cAF(frameHandle)
+    const newOffset = normalizeFsusWheelDelta(e[LayoutKeys[layout.value]], {
+      deltaMode: e.deltaMode,
+      maxDiscreteDeltaPx: 64,
+      viewportSizePx:
+        e.currentTarget instanceof HTMLElement
+          ? e.currentTarget.clientHeight
+          : 0,
+    })
 
-    const newOffset = e[LayoutKeys[layout.value]]
+    if (
+      hasReachedEdge(targetOffset) &&
+      hasReachedEdge(targetOffset + newOffset)
+    )
+      return
 
-    if (hasReachedEdge(offset) && hasReachedEdge(offset + newOffset)) return
-
-    offset += newOffset
+    targetOffset += newOffset
 
     if (!isFirefox()) {
       e.preventDefault()
     }
 
-    frameHandle = rAF(() => {
-      onWheelDelta(offset)
-      offset = 0
-    })
+    scheduleWheelFlush()
   }
 
   return {

@@ -63,14 +63,14 @@ function useTree<T>(watcherData: WatcherPropsData<T>) {
         }
       },
       childrenColumnName.value,
-      lazyColumnIdentifier.value
+      lazyColumnIdentifier.value,
     )
     return res
   }
 
   const updateTreeData = (
     ifChangeExpandRowKeys = false,
-    ifExpandAll = instance.store?.states.defaultExpandAll.value
+    ifExpandAll = instance.store?.states.defaultExpandAll.value,
   ) => {
     const nested = normalizedData.value
     const normalizedLazyNode_ = normalizedLazyNode.value
@@ -79,21 +79,22 @@ function useTree<T>(watcherData: WatcherPropsData<T>) {
     if (keys.length) {
       const oldTreeData = unref(treeData)
       const rootLazyRowKeys = []
+      const expandedKeySet = new Set(expandRowKeys.value || [])
       const getExpanded = (oldValue, key) => {
         if (ifChangeExpandRowKeys) {
           if (expandRowKeys.value) {
-            return ifExpandAll || expandRowKeys.value.includes(key)
+            return ifExpandAll || expandedKeySet.has(key)
           } else {
             return !!(ifExpandAll || oldValue?.expanded)
           }
         } else {
           const included =
-            ifExpandAll ||
-            (expandRowKeys.value && expandRowKeys.value.includes(key))
+            ifExpandAll || (expandRowKeys.value && expandedKeySet.has(key))
           return !!(oldValue?.expanded || included)
         }
       }
       // 合并 expanded 与 display，确保数据刷新后，状态不变
+      const rootLazyRowKeySet = new Set()
       keys.forEach((key) => {
         const oldValue = oldTreeData[key]
         const newValue = { ...nested[key] }
@@ -103,6 +104,7 @@ function useTree<T>(watcherData: WatcherPropsData<T>) {
           newValue.loaded = !!loaded
           newValue.loading = !!loading
           rootLazyRowKeys.push(key)
+          rootLazyRowKeySet.add(key)
         }
         newTreeData[key] = newValue
       })
@@ -112,7 +114,7 @@ function useTree<T>(watcherData: WatcherPropsData<T>) {
         lazyKeys.forEach((key) => {
           const oldValue = oldTreeData[key]
           const lazyNodeChildren = normalizedLazyNode_[key].children
-          if (rootLazyRowKeys.includes(key)) {
+          if (rootLazyRowKeySet.has(key)) {
             // 懒加载的 root 节点，更新一下原有的数据，原来的 children 一定是空数组
             if (newTreeData[key].children.length !== 0) {
               throw new Error('[ElTable]children must be an empty array.')
@@ -133,7 +135,7 @@ function useTree<T>(watcherData: WatcherPropsData<T>) {
       }
     }
     treeData.value = newTreeData
-    hasTreeData.value = Object.keys(newTreeData).length > 0
+    hasTreeData.value = keys.length > 0
     instance.store?.updateTableScrollY()
   }
 
@@ -141,20 +143,20 @@ function useTree<T>(watcherData: WatcherPropsData<T>) {
     () => expandRowKeys.value,
     () => {
       updateTreeData(true)
-    }
+    },
   )
 
   watch(
     () => normalizedData.value,
     () => {
       updateTreeData()
-    }
+    },
   )
   watch(
     () => normalizedLazyNode.value,
     () => {
       updateTreeData()
-    }
+    },
   )
 
   const updateTreeExpandKeys = (value: string[]) => {

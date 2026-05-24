@@ -1,97 +1,173 @@
 # 暗色模式
 
-FsusUI 2026 版内置了两种暗色模式的支持方式：**自动系统级自适应**和**手动切换**。
+FsusUI 当前主题入口 `@ozwasyd/element-plus/theme-chalk` 已内置明暗双套 token，并默认包含基于 `prefers-color-scheme` 的系统级自适应。
+
+如果你的应用只需要“跟随系统”，引入主题 CSS 就够了；如果你需要持久化用户选择、SSR 首帧一致性、或显式强制 `light`/`dark`，请使用本页的 `themeMode` / `syncThemeMode` 接入方式。
 
 ---
 
-## 如何启用
+## 默认行为
 
-### 方式一：自动适应系统偏好 (Auto-Adaptation)
-
-**这是最推荐也是最省心的方式。**
-
-从 `v2.0-REWRITE` 开始，FsusUI 默认内置了基于 CSS 媒体查询 `@media (prefers-color-scheme: dark)` 的暗色模式支持。
-
-这意味着：**只要你引入了 FsusUI 的主题 CSS，调用端无需编写任何额外的 JavaScript 代码，组件库即可自动根据用户的操作系统或浏览器的偏好设置，无缝切换明暗模式。**
-
-为了防止自动切换与手动强制覆盖冲突，自动切换仅在 `<html>` 标签上**没有** `.light` 类时生效。
-
-### 方式二：手动切换 (Manual Toggle)
-
-如果你的应用需要提供一个显式的切换开关（例如顶部的明暗模式切换按钮），你可以继续使用手动模式，或者结合 [useDark | VueUse](https://vueuse.org/core/useDark/) 实现。
-
-手动模式的优先级高于系统自适应。在 HTML 根元素添加 `dark` class 强制暗色，或添加 `light` class 强制亮色：
+只要引入主题样式，组件会自动跟随系统主题：
 
 ```ts
-import { useDark, useToggle } from '@vueuse/core'
-
-// 强制模式切换逻辑
-// 注意：使用 useDark 时，它会自动在 html 上添加 'dark' class。
-// 如果要彻底覆盖默认系统行为，你可能还需要在关闭暗色时显式添加 'light' class。
-const isDark = useDark()
-const toggleDark = useToggle(isDark)
+import ElementPlus from '@ozwasyd/element-plus'
+import '@ozwasyd/element-plus/dist/index.css'
 ```
+
+内置规则位于 `packages/theme-chalk/src/fsus-theme.scss`：
+
+- `html.dark`：强制暗色
+- `html.light`：强制亮色
+- `@media (prefers-color-scheme: dark) { html:not(.light) { ... } }`：系统自适应
+
+这意味着调用端不写任何 JS，也能获得基础的 dark mode。
 
 ---
 
-## 自定义暗色变量
+## 推荐接入方式
 
-### 通过 CSS 覆盖
+### 方式一：安装时声明 `themeMode`
 
-新建 `styles/dark/css-vars.css`：
+适合业务应用根入口。
+
+```ts
+import { createApp } from 'vue'
+import ElementPlus from '@ozwasyd/element-plus'
+import '@ozwasyd/element-plus/dist/index.css'
+import App from './App.vue'
+
+const app = createApp(App)
+
+app.use(ElementPlus, {
+  themeMode: 'system',
+})
+
+app.mount('#app')
+```
+
+`themeMode` 支持三种值：
+
+- `system`：跟随系统主题，不强制写入 `.dark` / `.light`
+- `dark`：强制暗色
+- `light`：强制亮色
+
+### 方式二：在根 `ConfigProvider` 中声明
+
+适合应用运行时会切换主题模式的场景。
+
+```vue
+<template>
+  <el-config-provider :theme-mode="themeMode">
+    <App />
+  </el-config-provider>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const themeMode = ref<'light' | 'dark' | 'system'>('system')
+</script>
+```
+
+### 方式三：在挂载前直接同步
+
+适合你要在 Vue 启动前先应用本地持久化主题，避免首帧闪烁。
+
+```ts
+import { syncThemeMode } from '@ozwasyd/element-plus'
+
+const storedThemeMode = localStorage.getItem('theme-mode')
+syncThemeMode(
+  storedThemeMode === 'dark' || storedThemeMode === 'light'
+    ? storedThemeMode
+    : 'system'
+)
+```
+
+`syncThemeMode()` 会同步这些状态到 `<html>`：
+
+- `class="dark"` 或 `class="light"`（仅显式模式）
+- `data-theme-mode="light|dark|system"`
+- `data-theme-resolved="light|dark"`
+- `style.colorScheme`
+
+---
+
+## 调用端自定义暗色变量
+
+### CSS 变量覆盖
+
+如果你要覆盖“暗色态”变量，**不要只写 `html.dark`**。在 `system` 模式下，FsusUI 不会强制添加 `.dark`，而是通过媒体查询切换 token。
+
+推荐同时覆盖显式暗色与系统解析后的暗色态：
 
 ```css
-html.dark {
-  /* 背景 */
-  --el-bg-color: #0F0F11;
-  --el-bg-color-page: #0A0A0C;
-  --el-bg-color-overlay: #1A1A1E;
-
-  /* 文本 */
-  --el-text-color-primary: #FCFCFC;
-  --el-text-color-secondary: #A1A1AA;
-
-  /* 边框 */
-  --el-border-color: #27272A;
-  --el-border-color-light: #3F3F46;
+html.dark,
+html[data-theme-resolved='dark'] {
+  --el-bg-color: #121214;
+  --el-bg-color-page: #09090b;
+  --el-bg-color-overlay: rgba(18, 18, 20, 0.88);
+  --el-text-color-primary: #f0f0f4;
+  --el-text-color-secondary: #a1a1aa;
+  --el-border-color: #27272a;
+  --el-border-color-light: #3f3f46;
 }
 ```
 
-在入口文件中，**在 element-plus 暗色样式之后**引入：
+入口只需要继续引入主主题样式：
 
 ```ts
-// main.ts
-import 'element-plus/theme-chalk/dark/css-vars.css'
-import './styles/dark/css-vars.css'
+import '@ozwasyd/element-plus/dist/index.css'
+import './styles/dark.css'
 ```
 
-### 通过 SCSS 覆盖
+### SCSS 变量覆盖
+
+构建期定制请继续走 `theme-chalk/src/common/var.scss`，直接覆盖 dark map：
 
 ```scss
-/* styles/element/index.scss */
-@forward 'element-plus/theme-chalk/src/dark/var.scss' with (
-  $bg-color: (
-    'page': #0A0A0C,
-    '': #0F0F11,
-    'overlay': #1A1A1E,
-  )
+@forward '@ozwasyd/element-plus/theme-chalk/src/common/var.scss' with (
+  $colors-dark: (
+    'primary': (
+      'base': #4b79cc,
+    ),
+  ),
+  $bg-color-dark: (
+    'page': #09090b,
+    '': #121214,
+    'overlay': #16161a,
+  ),
+  $text-color-dark: (
+    'primary': #f0f0f4,
+    'regular': #a1a1aa,
+    'secondary': #8b8b95,
+  ),
 );
 ```
 
-```ts
-// main.ts
-import './styles/element/index.scss'
-```
+然后在你的主题入口中先引入这个变量文件，再引入 FsusUI。
 
 ---
 
-## FsusUI 暗色设计规范
+## SSR 与首帧一致性
 
-FsusUI 暗色模式遵循与亮色相同的「高智感极简主义」原则：
+如果你的站点会持久化用户主题选择，推荐：
 
-- **背景**：使用 `#0F0F11`（极深微暖黑），避免纯 `#000000`
-- **文本**：主文本使用 `#FCFCFC`，次要文本使用 `#A1A1AA`
-- **强调色**：学术蓝 `#2A599C` 在暗色模式下适当调亮至 `#3B6FC2`，维持对比度
-- **毛玻璃**：暗色下浮动层使用 `rgba(15, 15, 17, 0.85)` + `backdrop-filter: blur(40px)`
+1. 服务端直接输出 `<html class="dark">` 或 `<html class="light">`
+2. 客户端在挂载前调用 `syncThemeMode(storedThemeMode)`
+3. Vue 根部再用 `themeMode` 保持运行时状态一致
 
-> 详细设计规范见 [design.md](../design.md)。
+这样可以避免“用户已选亮色，但系统是暗色，首帧仍短暂闪黑”的问题。
+
+---
+
+## 设计基线
+
+FsusUI 暗色模式仍遵循 [design.md](../design.md) 的同一套视觉语言：
+
+- 背景基线：`#121214` / `#09090B`
+- 主文本：`#F0F0F4`
+- 次文本：`#A1A1AA`
+- 强调色：学术蓝在暗色下提升为 `#4B79CC`
+- 浮层：深色半透明背景配合 `backdrop-filter: blur(40px)`

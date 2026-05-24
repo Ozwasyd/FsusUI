@@ -1,6 +1,11 @@
 import { buildProps, definePropType } from '@element-plus/utils'
 import type { ExtractPropTypes } from 'vue'
-import type { RouteLocationRaw } from 'vue-router'
+import type { NavigationFailure, RouteLocationRaw } from 'vue-router'
+
+export type BreadcrumbRouterLike = {
+  push: (to: RouteLocationRaw) => Promise<void | NavigationFailure>
+  replace: (to: RouteLocationRaw) => Promise<void | NavigationFailure>
+}
 
 export const breadcrumbItemProps = buildProps({
   /**
@@ -16,6 +21,9 @@ export const breadcrumbItemProps = buildProps({
   replace: {
     type: Boolean,
     default: false,
+  },
+  routerInstance: {
+    type: definePropType<BreadcrumbRouterLike>(Object),
   },
 } as const)
 export type BreadcrumbItemProps = ExtractPropTypes<typeof breadcrumbItemProps>

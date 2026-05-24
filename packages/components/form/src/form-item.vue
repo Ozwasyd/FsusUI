@@ -55,7 +55,10 @@ import { clone } from 'lodash-unified'
 import { refDebounced } from '@vueuse/core'
 import {
   addUnit,
+  createFsusError,
   ensureArray,
+  fsusErr,
+  fsusOk,
   getProp,
   isBoolean,
   isFunction,
@@ -287,26 +290,25 @@ const doValidate = async (rules: RuleItem[]): Promise<true> => {
     })
     .catch((err: FormValidateFailure) => {
       onValidationFailed(err as FormValidateFailure)
-      return Promise.reject(err)
+      throw err
     })
 }
 
 const validate: FormItemContext['validate'] = async (trigger, callback) => {
   // skip validation if its resetting
   if (isResettingField || !props.prop) {
-    return false
+    return fsusOk(false)
   }
 
-  const hasCallback = isFunction(callback)
   if (!validateEnabled.value) {
     callback?.(false)
-    return false
+    return fsusOk(false)
   }
 
   const rules = getFilteredRule(trigger)
   if (rules.length === 0) {
     callback?.(true)
-    return true
+    return fsusOk(true)
   }
 
   setValidationState('validating')
@@ -314,12 +316,16 @@ const validate: FormItemContext['validate'] = async (trigger, callback) => {
   return doValidate(rules)
     .then(() => {
       callback?.(true)
-      return true as const
+      return fsusOk(true)
     })
     .catch((err: FormValidateFailure) => {
       const { fields } = err
       callback?.(false, fields)
-      return hasCallback ? false : Promise.reject(fields)
+      return fsusErr(
+        createFsusError('validation', 'form_item_validation_failed', {
+          cause: fields,
+        }),
+      )
     })
 }
 

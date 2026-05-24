@@ -12,7 +12,7 @@ FsusUI 允许在全局层面预设组件 props 的默认值，减少模板中的
 
 ```ts
 // main.ts
-import { ElButton } from 'element-plus'
+import { ElButton } from '@ozwasyd/element-plus'
 
 ElButton.setPropsDefaults({
   type: 'primary',

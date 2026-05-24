@@ -132,7 +132,6 @@ export default defineComponent({
       effect: props.effect,
       fallbackPlacements,
       popperOptions: props.popperOptions,
-      gpuAcceleration: false,
       hideAfter: trigger.value.includes('hover') ? props.hideTimeout : 0,
       placement: props.placement,
       popperClass: [ns.e('popper'), props.popperClass],

@@ -1,14 +1,18 @@
 import { buildProps, definePropType } from '@element-plus/utils'
 import { useSizeProp } from '@element-plus/hooks'
+import { motionModes, motionPresets } from './motion'
+import { isRenderPipelineConfigValid } from './render-pipeline'
+import { themeModes } from './theme-mode'
 
 import type { ExtractPropTypes } from 'vue'
 import type { Language } from '@element-plus/locale'
-import type { ButtonConfigContext } from '@element-plus/components/button'
-import type { MessageConfigContext } from '@element-plus/components/message'
-
-export type ExperimentalFeatures = {
-  // TO BE Defined
-}
+import type {
+  ButtonConfigContract,
+  ExperimentalFeatures,
+  MessageConfigContract,
+  MotionConfigContract,
+  RenderPipelineConfigContract,
+} from './config-contract'
 
 export const configProviderProps = buildProps({
   /**
@@ -25,6 +29,29 @@ export const configProviderProps = buildProps({
     type: definePropType<Language>(Object),
   },
   /**
+   * @description controls the document theme mode at the application root
+   */
+  themeMode: {
+    type: String,
+    values: themeModes,
+  },
+  /**
+   * @description controls global motion mode and preset at the application root
+   */
+  motion: {
+    type: definePropType<MotionConfigContract>(Object),
+    validator: (config: MotionConfigContract) =>
+      (!config.mode || motionModes.includes(config.mode)) &&
+      (!config.preset || motionPresets.includes(config.preset)),
+  },
+  /**
+   * @description controls the shared render pipeline runtime budget.
+   */
+  renderPipeline: {
+    type: definePropType<RenderPipelineConfigContract>(Object),
+    validator: isRenderPipelineConfigValid,
+  },
+  /**
    * @description global component size
    */
   size: useSizeProp,
@@ -32,7 +59,7 @@ export const configProviderProps = buildProps({
    * @description button related configuration, [see the following table](#button-attributes)
    */
   button: {
-    type: definePropType<ButtonConfigContext>(Object),
+    type: definePropType<ButtonConfigContract>(Object),
   },
   /**
    * @description features at experimental stage to be added, all features are default to be set to false                                                                                | ^[object]
@@ -51,7 +78,7 @@ export const configProviderProps = buildProps({
    * @description message related configuration, [see the following table](#message-attributes)
    */
   message: {
-    type: definePropType<MessageConfigContext>(Object),
+    type: definePropType<MessageConfigContract>(Object),
   },
   /**
    * @description global Initial zIndex

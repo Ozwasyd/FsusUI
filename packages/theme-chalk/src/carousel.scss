@@ -16,6 +16,25 @@
     overflow: hidden;
   }
 
+  &:not(.is-disabled) {
+    touch-action: pan-y;
+  }
+
+  @include when(dragging) {
+    cursor: grabbing;
+
+    .#{$namespace}-carousel__item {
+      filter: blur(
+        var(--fsus-interactive-motion-blur, var(--fsus-motion-blur, 0.35px))
+      );
+      will-change: transform, filter;
+    }
+  }
+
+  @include m(vertical) {
+    touch-action: pan-x;
+  }
+
   @include e(container) {
     position: relative;
     height: 300px;

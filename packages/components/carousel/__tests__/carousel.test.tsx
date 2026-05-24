@@ -59,6 +59,7 @@ describe('Carousel', () => {
 
   afterEach(() => {
     wrapper.unmount()
+    delete document.documentElement.dataset.fsusMotion
   })
 
   it('create', () => {
@@ -211,6 +212,52 @@ describe('Carousel', () => {
     await wrapper.find('.el-carousel').trigger('mouseenter')
     const items = await waitForActiveItem(wrapper, 1, 1200)
     expect(items[1].classList.contains('is-active')).toBeTruthy()
+  })
+  it('uses drag threshold to settle to the next item', async () => {
+    document.documentElement.dataset.fsusMotion = 'disabled'
+    wrapper = createComponent(
+      {
+        autoplay: false,
+      },
+      3
+    )
+
+    await waitForActiveItem(wrapper, 0)
+
+    const carousel = wrapper.find<HTMLElement>('.el-carousel')
+    vi.spyOn(carousel.element, 'offsetWidth', 'get').mockImplementation(() => 300)
+
+    const createPointerEvent = (type: string, clientX: number) => {
+      const event = new MouseEvent(type, {
+        bubbles: true,
+        button: 0,
+        cancelable: true,
+        clientX,
+        clientY: 10,
+      }) as PointerEvent
+      Object.defineProperty(event, 'pointerId', {
+        configurable: true,
+        value: 1,
+      })
+      return event
+    }
+
+    carousel.element.dispatchEvent(createPointerEvent('pointerdown', 220))
+    carousel.element.dispatchEvent(createPointerEvent('pointermove', 120))
+    await nextTick()
+
+    expect(carousel.classes()).toContain('is-dragging')
+    expect(
+      (carousel.element.querySelector('.el-carousel__item') as HTMLElement).style
+        .transform
+    ).toContain('translateX(-100px)')
+
+    carousel.element.dispatchEvent(createPointerEvent('pointerup', 120))
+    await nextTick()
+
+    const items = carousel.element.querySelectorAll('.el-carousel__item')
+    expect(items[1].classList.contains('is-active')).toBeTruthy()
+    expect(carousel.classes()).not.toContain('is-dragging')
   })
   it('should guarantee order of indicators', async () => {
     const data = reactive([1, 2, 3, 4])

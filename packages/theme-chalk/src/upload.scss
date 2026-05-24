@@ -145,7 +145,9 @@
   list-style: none;
   position: relative;
   @include e(item) {
-    transition: all 0.5s cubic-bezier(0.55, 0, 0.1, 1);
+    transition: opacity 0.5s cubic-bezier(0.55, 0, 0.1, 1),
+      transform 0.5s cubic-bezier(0.55, 0, 0.1, 1),
+      background-color 0.5s cubic-bezier(0.55, 0, 0.1, 1);
     font-size: getCssVar('font-size', 'base');
     color: getCssVar('text-color', 'regular');
     margin-bottom: 5px;
@@ -248,8 +250,7 @@
       }
 
       &:focus-visible {
-        @include a11y-focus-ring(2px, getCssVar('border-radius-base'));
-        outline-offset: 2px;
+        @include a11y-focus-ring(1px, getCssVar('border-radius-base'));
       }
 
       &:hover,

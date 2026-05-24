@@ -9,13 +9,96 @@
 }
 
 @include b(scrollbar) {
+  --fsus-interactive-motion-strength: 0;
+  --fsus-interactive-motion-offset-x: 0px;
+  --fsus-interactive-motion-offset-y: 0px;
+  --fsus-interactive-motion-glow: 0px;
+  --fsus-interactive-motion-blur: 0px;
+  --fsus-interactive-motion-scale: 1;
+  --fsus-interactive-motion-trail-opacity: 0;
+  --fsus-interactive-motion-edge-size: 32px;
+  --fsus-interactive-motion-thumb-spread: 0px;
+  --fsus-interactive-motion-settle: var(--fsus-motion-scroll-settle, 120ms);
+  --fsus-scrollbar-track-edge-gap: var(--fsus-space-2, 8px);
+  --fsus-scrollbar-track-cross-gap: var(--fsus-space-1, 4px);
+
   overflow: hidden;
   position: relative;
   height: 100%;
 
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    height: var(--fsus-interactive-motion-edge-size, 32px);
+    pointer-events: none;
+    opacity: 0;
+    mix-blend-mode: multiply;
+    transition:
+      height var(--fsus-motion-control-fast, 160ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+      opacity 80ms var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+      transform var(--fsus-interactive-motion-settle, 120ms)
+        var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));
+  }
+
+  &::before {
+    top: 0;
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--fsus-scholarly-blue) 28%, transparent),
+      transparent
+    );
+    transform: translate3d(0, -14px, 0);
+  }
+
+  &::after {
+    bottom: 0;
+    background: linear-gradient(
+      to top,
+      color-mix(in srgb, var(--fsus-scholarly-blue) 28%, transparent),
+      transparent
+    );
+    transform: translate3d(0, 14px, 0);
+  }
+
+  @include when(scrolling-y-backward) {
+    &::before {
+      opacity: max(
+        var(--fsus-interactive-motion-trail-opacity, 0.28),
+        0.24
+      );
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @include when(scrolling-y-forward) {
+    &::after {
+      opacity: max(
+        var(--fsus-interactive-motion-trail-opacity, 0.28),
+        0.24
+      );
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @include when(thumb-dragging) {
+    &::before,
+    &::after {
+      opacity: max(
+        var(--fsus-interactive-motion-trail-opacity, 0.36),
+        0.34
+      );
+    }
+  }
+
   @include e(wrap) {
     overflow: auto;
     height: 100%;
+    overscroll-behavior: contain;
 
     @include m(hidden-default) {
       scrollbar-width: none;
@@ -36,11 +119,42 @@
       #{getCssVarName('scrollbar-bg-color')},
       map.get($scrollbar, 'bg-color')
     );
-    transition: getCssVar('transition-duration') background-color;
+    transition:
+      getCssVar('transition-duration') background-color,
+      transform var(--fsus-motion-control-fast, 160ms)
+        var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1)),
+      box-shadow 90ms var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
     opacity: var(
       #{getCssVarName('scrollbar-opacity')},
       map.get($scrollbar, 'opacity')
     );
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      inset: calc(0px - var(--fsus-interactive-motion-thumb-spread, 0px));
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0;
+      transition:
+        opacity 80ms var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+        box-shadow var(--fsus-motion-control-fast, 160ms)
+          var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
+    }
+
+    &::before {
+      background: color-mix(
+        in srgb,
+        var(--fsus-scholarly-blue) 16%,
+        transparent
+      );
+    }
+
+    &::after {
+      box-shadow: 0 0 var(--fsus-interactive-motion-glow, 0px)
+        color-mix(in srgb, var(--fsus-scholarly-blue) 42%, transparent);
+    }
 
     &:hover {
       background-color: var(
@@ -58,12 +172,14 @@
     position: absolute;
     right: 2px;
     bottom: 2px;
-    z-index: 1;
+    z-index: 2;
     border-radius: getCssVar('border-radius', 'base');
 
     @include when(vertical) {
       width: 6px;
-      top: 2px;
+      top: var(--fsus-scrollbar-track-edge-gap, 8px);
+      right: var(--fsus-scrollbar-track-cross-gap, 4px);
+      bottom: var(--fsus-scrollbar-track-edge-gap, 8px);
 
       > div {
         width: 100%;
@@ -72,10 +188,82 @@
 
     @include when(horizontal) {
       height: 6px;
-      left: 2px;
+      left: var(--fsus-scrollbar-track-edge-gap, 8px);
+      right: var(--fsus-scrollbar-track-edge-gap, 8px);
+      bottom: var(--fsus-scrollbar-track-cross-gap, 4px);
 
       > div {
         height: 100%;
+      }
+    }
+  }
+
+  @include e(view) {
+    > * {
+      filter: none;
+      transform: translate3d(0, 0, 0);
+      transition:
+        filter 1ms linear,
+        transform var(--fsus-interactive-motion-settle, 120ms)
+          var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));
+      will-change: transform;
+    }
+  }
+
+  @include when(scrolling) {
+    .#{$namespace}-scrollbar__view > * {
+      filter: none;
+      transform: translate3d(
+        var(--fsus-interactive-motion-offset-x, 0px),
+        var(--fsus-interactive-motion-offset-y, 0px),
+        0
+      );
+    }
+
+    .#{$namespace}-scrollbar__thumb {
+      box-shadow:
+        0 0 0 1px
+          color-mix(in srgb, var(--fsus-scholarly-blue) 28%, transparent),
+        0 0 var(--fsus-interactive-motion-glow, 18px)
+          var(--fsus-motion-trail, rgba(42, 89, 156, 0.16));
+
+      &::before {
+        opacity: calc(
+          var(--fsus-interactive-motion-trail-opacity, 0.28) * 0.72
+        );
+      }
+
+      &::after {
+        opacity: var(--fsus-interactive-motion-trail-opacity, 0.28);
+      }
+    }
+  }
+
+  @include when(thumb-dragging) {
+    .#{$namespace}-scrollbar__thumb {
+      background-color: color-mix(
+        in srgb,
+        var(--fsus-scholarly-blue) 72%,
+        var(#{getCssVarName('scrollbar-hover-bg-color')})
+      );
+      opacity: 1;
+      box-shadow:
+        0 0 0 1px color-mix(in srgb, var(--fsus-scholarly-blue) 42%, white),
+        0 0 var(--fsus-interactive-motion-glow, 28px)
+          color-mix(in srgb, var(--fsus-scholarly-blue) 34%, transparent);
+
+      &::before {
+        opacity: max(
+          calc(var(--fsus-interactive-motion-trail-opacity, 0.36) * 0.9),
+          0.28
+        );
+      }
+
+      &::after {
+        opacity: max(
+          var(--fsus-interactive-motion-trail-opacity, 0.36),
+          0.32
+        );
       }
     }
   }

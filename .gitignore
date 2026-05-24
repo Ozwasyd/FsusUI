@@ -1,26 +1,36 @@
 # Editor directories and files
-.idea
+.idea/
+.vscode/settings.json
 
-# Package Manager
-node_modules
-.pnpm-debug.log*
+# Package manager and dependency state
+node_modules/
+.pnpm-store/
+pnpm-debug.log*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # System
 .DS_Store
+Thumbs.db
 
-# Bundle
-dist
-coverage
-playwright-report
-test-results
+# Bundles, reports, and generated visual evidence
+/dist/
+/coverage/
+/playwright-report/
+/test-results/
+/blob-report/
+/screenshots/
 .husky/_/
 packages/demo-app/dist/
+packages/icons-vue/dist/
 packages/wasm/dist/
+internal/*/dist/
 
 # Local build artifacts
-build/
-CMakeCache.txt
-CMakeFiles/
+/build/
+/CMakeCache.txt
+/CMakeFiles/
 *.ninja
 .ninja_deps
 .ninja_log
@@ -28,17 +38,48 @@ cmake_install.cmake
 .cmake/
 packages/wasm/.cmake-check/
 packages/wasm/build/
+*.tsbuildinfo
+.vite/
+.turbo/
+.cache/
 --help/
 
-# local env files
+# Local env and scratch files
+.env
+.env.*
+!.env.example
+.npmrc.local
+.npmrc.*
+!.npmrc.example
+.secrets/
+.secret/
+secrets/
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.csr
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
 *.local
 .eslintcache
-cypress/screenshots/*
-cypress/videos/*
-tmp
+cypress/screenshots/
+cypress/videos/
+/tmp/
+/temp/
+tmp/
+*.log
+*.pid
 *.tmp
 *.temp
 *.swp
+*.swo
+*.tgz
+*.tar.gz
+*.pack
 
 # One-off local migration helpers
 /extract_all.mjs
@@ -52,4 +93,3 @@ tmp
 /process_theme.js
 /run_decouple.mjs
 /split-fsus-theme.mjs
-.vscode/settings.json

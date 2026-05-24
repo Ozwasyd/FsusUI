@@ -59,9 +59,9 @@ $E: null;
 }
 
 // A11y
-@mixin a11y-focus-ring($offset: 1.5px, $radius: 0px) {
-  outline: #{$offset} solid var(--fsus-scholarly-blue, #2a599c) !important;
-  outline-offset: -1px;
+@mixin a11y-focus-ring($offset: 1px, $radius: 0px) {
+  outline: none !important;
+  box-shadow: inset 0 0 0 #{$offset} var(--fsus-scholarly-blue, #2a599c) !important;
   @if $radius != 0px and $radius != 0 {
     border-radius: #{$radius};
   }

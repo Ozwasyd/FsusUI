@@ -26,13 +26,13 @@ const revokeFileObjectURL = (file: UploadFile) => {
 
 export const useHandlers = (
   props: UploadProps,
-  uploadRef: ShallowRef<UploadContentInstance | undefined>
+  uploadRef: ShallowRef<UploadContentInstance | undefined>,
 ) => {
   const uploadFiles = useVModel(
     props as Omit<UploadProps, 'fileList'> & { fileList: UploadFiles },
     'fileList',
     undefined,
-    { passive: true }
+    { passive: true },
   )
 
   const getFile = (rawFile: UploadRawFile) =>
@@ -44,10 +44,11 @@ export const useHandlers = (
 
   function clearFiles(
     /** @default ['ready', 'uploading', 'success', 'fail'] */
-    states: UploadStatus[] = ['ready', 'uploading', 'success', 'fail']
+    states: UploadStatus[] = ['ready', 'uploading', 'success', 'fail'],
   ) {
+    const stateSet = new Set(states)
     uploadFiles.value = uploadFiles.value.filter(
-      (row) => !states.includes(row.status)
+      (row) => !stateSet.has(row.status),
     )
   }
 
@@ -73,7 +74,7 @@ export const useHandlers = (
 
   const handleSuccess: UploadContentProps['onSuccess'] = (
     response,
-    rawFile
+    rawFile,
   ) => {
     const file = getFile(rawFile)
     if (!file) return
@@ -107,7 +108,7 @@ export const useHandlers = (
   }
 
   const handleRemove: UploadContentProps['onRemove'] = async (
-    file
+    file,
   ): Promise<void> => {
     const uploadFile = file instanceof File ? getFile(file) : file
     if (!uploadFile) throwError(SCOPE, 'file to be removed not found')
@@ -129,9 +130,11 @@ export const useHandlers = (
   }
 
   function submit() {
-    uploadFiles.value
-      .filter(({ status }) => status === 'ready')
-      .forEach(({ raw }) => raw && uploadRef.value?.upload(raw))
+    for (const { raw, status } of uploadFiles.value) {
+      if (status === 'ready' && raw) {
+        uploadRef.value?.upload(raw)
+      }
+    }
   }
 
   watch(
@@ -152,7 +155,7 @@ export const useHandlers = (
         }
         return file
       })
-    }
+    },
   )
 
   watch(
@@ -163,7 +166,7 @@ export const useHandlers = (
         file.status ||= 'success'
       }
     },
-    { immediate: true, deep: true }
+    { immediate: true, deep: true },
   )
 
   return {

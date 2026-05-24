@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import triggerEvent from '@element-plus/test-utils/trigger-event'
+import { rAF } from '@element-plus/test-utils/tick'
 import { setCheckboxValue } from '../../../test-utils/dom'
 import ElTable from '../src/table.vue'
 import ElTableColumn from '../src/table-column'
@@ -26,7 +26,7 @@ describe('table column', () => {
       props3?: string,
       props4?: string,
       opts?: TableMountOptions,
-      tableProps?: string
+      tableProps?: string,
     ) {
       return mount(
         Object.assign(
@@ -45,11 +45,15 @@ describe('table column', () => {
         `,
 
             created() {
-              ;(this as TableMountOptions & { testData: ReturnType<typeof getTestData> }).testData = getTestData()
+              ;(
+                this as TableMountOptions & {
+                  testData: ReturnType<typeof getTestData>
+                }
+              ).testData = getTestData()
             },
           },
-          opts
-        )
+          opts,
+        ),
       )
     }
 
@@ -82,20 +86,20 @@ describe('table column', () => {
       const wrapper = createTable(
         'fixed label="test1" width="100px"',
         'fixed="right" label="test2"',
-        'fixed="left" label="test3"'
+        'fixed="left" label="test3"',
       )
       await doubleWait()
       const leftFixedHeaderColumns = wrapper.findAll(
-        '.el-table__header .el-table-fixed-column--left'
+        '.el-table__header .el-table-fixed-column--left',
       )
       const leftFixedBodyColumns = wrapper.findAll(
-        '.el-table__body .el-table-fixed-column--left'
+        '.el-table__body .el-table-fixed-column--left',
       )
       const rightFixedHeaderColumns = wrapper.findAll(
-        '.el-table__header .el-table-fixed-column--right'
+        '.el-table__header .el-table-fixed-column--right',
       )
       const rightFixedBodyColumns = wrapper.findAll(
-        '.el-table__body .el-table-fixed-column--right'
+        '.el-table__body .el-table-fixed-column--right',
       )
       expect(leftFixedHeaderColumns).toHaveLength(2)
       expect(leftFixedBodyColumns).toHaveLength(10)
@@ -106,16 +110,16 @@ describe('table column', () => {
       expect(leftFixedHeaderColumns.at(1).classes()).toContain('is-last-column')
       expect(rightFixedHeaderColumns.at(0).text()).toBe('test2')
       expect(rightFixedHeaderColumns.at(0).classes()).toContain(
-        'is-first-column'
+        'is-first-column',
       )
       expect(getComputedStyle(leftFixedHeaderColumns.at(0).element).left).toBe(
-        '0px'
+        '0px',
       )
       expect(getComputedStyle(leftFixedHeaderColumns.at(1).element).left).toBe(
-        '100px'
+        '100px',
       )
       expect(
-        getComputedStyle(rightFixedHeaderColumns.at(0).element).right
+        getComputedStyle(rightFixedHeaderColumns.at(0).element).right,
       ).toBe('0px')
       wrapper.unmount()
     })
@@ -127,12 +131,71 @@ describe('table column', () => {
         '',
         '',
         {},
-        'border'
+        'border',
       )
       await doubleWait()
       const firstCol = wrapper.find('thead th')
-      triggerEvent(firstCol.element, 'mousemove')
-      triggerEvent(firstCol.element, 'mousedown')
+      const tableEl = wrapper.find('.el-table').element as HTMLElement
+      const resizeProxy = wrapper.find('.el-table__column-resize-proxy')
+        .element as HTMLElement
+      const mockTableRect = vi
+        .spyOn(tableEl, 'getBoundingClientRect')
+        .mockReturnValue({
+          bottom: 120,
+          height: 120,
+          left: 0,
+          right: 480,
+          top: 0,
+          width: 480,
+          x: 0,
+          y: 0,
+        } as DOMRect)
+      const mockColumnRect = vi
+        .spyOn(firstCol.element, 'getBoundingClientRect')
+        .mockReturnValue({
+          bottom: 40,
+          height: 40,
+          left: 0,
+          right: 120,
+          top: 0,
+          width: 120,
+          x: 0,
+          y: 0,
+        } as DOMRect)
+
+      firstCol.element.dispatchEvent(
+        new MouseEvent('mousemove', {
+          bubbles: true,
+          clientX: 116,
+        }),
+      )
+      firstCol.element.dispatchEvent(
+        new MouseEvent('mousedown', {
+          bubbles: true,
+          button: 0,
+          clientX: 116,
+        }),
+      )
+      document.dispatchEvent(
+        new MouseEvent('mousemove', {
+          bubbles: true,
+          clientX: 156,
+        }),
+      )
+      expect(resizeProxy.style.left).toBe('120px')
+      expect(resizeProxy.style.transform).toBe('')
+      await rAF()
+      expect(resizeProxy.style.transform).toContain('translate3d(40px')
+      document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
+      expect(resizeProxy.style.left).toBe('160px')
+      expect(resizeProxy.style.transform).toBe('')
+      expect(
+        (wrapper.findComponent(ElTable).vm as any).store.states.columns.value[0]
+          .width,
+      ).toBe(160)
+
+      mockTableRect.mockRestore()
+      mockColumnRect.mockRestore()
       wrapper.unmount()
     })
 
@@ -147,10 +210,10 @@ describe('table column', () => {
 
       await doubleWait()
       const cells = wrapper.findAll(
-        '.el-table__body-wrapper tbody tr td:first-child'
+        '.el-table__body-wrapper tbody tr td:first-child',
       )
       expect(cells.map((n) => n.text())).toEqual(
-        getTestData().map((o) => `[${o.name}]`)
+        getTestData().map((o) => `[${o.name}]`),
       )
       wrapper.unmount()
     })
@@ -166,7 +229,7 @@ describe('table column', () => {
       const wrapper = createTable(
         'align="left"',
         'align="right"',
-        'align="center"'
+        'align="center"',
       )
       await doubleWait()
       const len = getTestData().length + 1
@@ -180,7 +243,7 @@ describe('table column', () => {
       const wrapper = createTable(
         'class-name="column-1"',
         'class-name="column-2 column-class-a"',
-        'class-name="column-class-a"'
+        'class-name="column-class-a"',
       )
       await doubleWait()
       const len = getTestData().length + 1
@@ -266,7 +329,7 @@ describe('table column', () => {
           const wrapper = createTable('selection')
           await doubleWait()
           expect(wrapper.findAll('.el-checkbox').length).toEqual(
-            getTestData().length + 1
+            getTestData().length + 1,
           )
           wrapper.unmount()
         })
@@ -300,7 +363,7 @@ describe('table column', () => {
           expect(
             wrapper
               .findAll('.el-table__body-wrapper tbody tr td:first-child')
-              .map((node) => node.text())
+              .map((node) => node.text()),
           ).toEqual(['1', '2', '3', '4', '5'])
           wrapper.unmount()
         })
@@ -350,7 +413,7 @@ describe('table column', () => {
           const wrapper = createInstance()
           await doubleWait()
           expect(wrapper.findAll('td.el-table__expand-column').length).toEqual(
-            5
+            5,
           )
           wrapper.unmount()
         })
@@ -371,7 +434,7 @@ describe('table column', () => {
           '',
           '',
           "sortable :sort-orders=\"['descending', 'ascending']\"",
-          {}
+          {},
         )
 
         await doubleWait()
@@ -380,7 +443,7 @@ describe('table column', () => {
 
         await doubleWait()
         const lastCells = wrapper.findAll(
-          '.el-table__body-wrapper tbody tr td:last-child'
+          '.el-table__body-wrapper tbody tr td:last-child',
         )
         expect(lastCells.map((node) => node.text())).toEqual([
           '100',
@@ -411,7 +474,7 @@ describe('table column', () => {
                 return 0
               },
             },
-          }
+          },
         )
 
         await doubleWait()
@@ -420,7 +483,7 @@ describe('table column', () => {
 
         await doubleWait()
         const lastCells = wrapper.findAll(
-          '.el-table__body-wrapper tbody tr td:last-child'
+          '.el-table__body-wrapper tbody tr td:last-child',
         )
         expect(lastCells.map((node) => node.text())).toEqual([
           '100',
@@ -447,7 +510,7 @@ describe('table column', () => {
 
         await doubleWait()
         const lastCells = wrapper.findAll(
-          '.el-table__body-wrapper tbody tr td:last-child'
+          '.el-table__body-wrapper tbody tr td:last-child',
         )
         expect(lastCells.map((node) => node.text())).toEqual([
           '100',
@@ -465,7 +528,7 @@ describe('table column', () => {
           '',
           '',
           '',
-          {}
+          {},
         )
 
         await doubleWait()
@@ -474,7 +537,7 @@ describe('table column', () => {
 
         await doubleWait()
         const lastCells = wrapper.findAll(
-          '.el-table__body-wrapper tbody tr td:last-child'
+          '.el-table__body-wrapper tbody tr td:last-child',
         )
         expect(lastCells.map((node) => node.text())).toEqual([
           '80',
@@ -496,7 +559,7 @@ describe('table column', () => {
         elm.trigger('click')
         await doubleWait()
         const lastCells = wrapper.findAll(
-          '.el-table__body-wrapper tbody tr td:last-child'
+          '.el-table__body-wrapper tbody tr td:last-child',
         )
         expect(lastCells.map((node) => node.text())).toEqual([
           '80',
@@ -518,7 +581,7 @@ describe('table column', () => {
         elm.trigger('click')
         await doubleWait()
         const lastCells = wrapper.findAll(
-          '.el-table__body-wrapper tbody tr td:last-child'
+          '.el-table__body-wrapper tbody tr td:last-child',
         )
         expect(lastCells.map((node) => node.text())).toEqual([
           '100',
@@ -737,28 +800,28 @@ describe('table column', () => {
         .findAll('.el-table__header tr')
         .map((item) => item.findAll('.el-table-fixed-column--left'))
       const lfbcolumns = wrapper.findAll(
-        '.el-table__body .el-table-fixed-column--left'
+        '.el-table__body .el-table-fixed-column--left',
       )
       const rfhcolumns = wrapper
         .findAll('.el-table__header tr')
         .map((item) => item.findAll('.el-table-fixed-column--right'))
       const rfbcolumns = wrapper.findAll(
-        '.el-table__body .el-table-fixed-column--right'
+        '.el-table__body .el-table-fixed-column--right',
       )
       expect(lfbcolumns).toHaveLength(15)
       expect(rfbcolumns).toHaveLength(10)
       expect(lfhcolumns.at(0).at(0).classes()).toContain('is-last-column')
       expect(lfhcolumns.at(1).at(1).classes()).toContain('is-last-column')
       expect(getComputedStyle(lfhcolumns.at(1).at(1).element).left).toBe(
-        '200px'
+        '200px',
       )
       expect(getComputedStyle(lfhcolumns.at(2).at(1).element).left).toBe(
-        '100px'
+        '100px',
       )
       expect(rfhcolumns.at(0).at(0).classes()).toContain('is-first-column')
       expect(rfhcolumns.at(1).at(0).classes()).toContain('is-first-column')
       expect(getComputedStyle(rfhcolumns.at(1).at(0).element).right).toBe(
-        '50px'
+        '50px',
       )
       wrapper.unmount()
     })
@@ -864,7 +927,7 @@ describe('table column', () => {
       })
       await doubleWait()
       expect(
-        wrapper.find('.hidden-columns').find('.other-component').exists()
+        wrapper.find('.hidden-columns').find('.other-component').exists(),
       ).toBeFalsy()
     })
 
@@ -903,7 +966,7 @@ describe('table column', () => {
       })
       await doubleWait()
       expect(wrapper.find('.hidden-columns').text().trim()).not.toContain(
-        'Hello World'
+        'Hello World',
       )
     })
   })
@@ -939,7 +1002,7 @@ describe('table column', () => {
       wrapper.vm.label = 'NAME'
       wrapper.vm.$nextTick(() => {
         expect(wrapper.find('.el-table__header th .cell').text()).toEqual(
-          'NAME'
+          'NAME',
         )
         wrapper.unmount()
       })
@@ -973,7 +1036,7 @@ describe('table column', () => {
       wrapper.vm.align = 'right'
       wrapper.vm.$nextTick(() => {
         expect(
-          wrapper.findAll('.el-table__body td.is-right').length > 0
+          wrapper.findAll('.el-table__body td.is-right').length > 0,
         ).toBeTruthy()
         wrapper.unmount()
       })
@@ -1003,36 +1066,36 @@ describe('table column', () => {
       })
       await doubleWait()
       expect(
-        wrapper.findAll('.el-table__header th.is-left').length
+        wrapper.findAll('.el-table__header th.is-left').length,
       ).toBeGreaterThanOrEqual(0)
       expect(wrapper.findAll('.el-table__header th.is-center').length).toEqual(
-        0
+        0,
       )
       expect(wrapper.findAll('.el-table__header th.is-right').length).toEqual(0)
       wrapper.vm.align = 'right'
       await doubleWait()
       expect(wrapper.findAll('.el-table__header th.is-left').length).toEqual(0)
       expect(wrapper.findAll('.el-table__header th.is-center').length).toEqual(
-        0
+        0,
       )
       expect(
-        wrapper.findAll('.el-table__header th.is-right').length
+        wrapper.findAll('.el-table__header th.is-right').length,
       ).toBeGreaterThanOrEqual(0)
       wrapper.vm.headerAlign = 'center'
       await doubleWait()
       expect(wrapper.findAll('.el-table__header th.is-left').length).toEqual(0)
       expect(
-        wrapper.findAll('.el-table__header th.is-center').length
+        wrapper.findAll('.el-table__header th.is-center').length,
       ).toBeGreaterThanOrEqual(0)
       expect(wrapper.findAll('.el-table__header th.is-right').length).toEqual(0)
       wrapper.vm.headerAlign = null
       await doubleWait()
       expect(wrapper.findAll('.el-table__header th.is-left').length).toEqual(0)
       expect(wrapper.findAll('.el-table__header th.is-center').length).toEqual(
-        0
+        0,
       )
       expect(
-        wrapper.findAll('.el-table__header th.is-right').length
+        wrapper.findAll('.el-table__header th.is-right').length,
       ).toBeGreaterThanOrEqual(0)
       wrapper.unmount()
     })
@@ -1062,19 +1125,19 @@ describe('table column', () => {
 
       await doubleWait()
       expect(wrapper.find('.el-table__body col').attributes('width')).toEqual(
-        '100'
+        '100',
       )
 
       wrapper.vm.width = 200
       await doubleWait()
       expect(wrapper.find('.el-table__body col').attributes('width')).toEqual(
-        '200'
+        '200',
       )
 
       wrapper.vm.width = '300px'
       await doubleWait()
       expect(wrapper.find('.el-table__body col').attributes('width')).toEqual(
-        '300'
+        '300',
       )
       wrapper.unmount()
     })
@@ -1104,19 +1167,19 @@ describe('table column', () => {
 
       await doubleWait()
       expect(wrapper.find('.el-table__body col').attributes('width')).toEqual(
-        '100'
+        '100',
       )
 
       wrapper.vm.width = 200
       await doubleWait()
       expect(wrapper.find('.el-table__body col').attributes('width')).toEqual(
-        '200'
+        '200',
       )
 
       wrapper.vm.width = '300px'
       await doubleWait()
       expect(wrapper.find('.el-table__body col').attributes('width')).toEqual(
-        '300'
+        '300',
       )
       wrapper.unmount()
     })
@@ -1320,7 +1383,7 @@ describe('table column', () => {
               testData: getTableData(),
             }
           },
-        })
+        }),
       )
     }
 

@@ -7,7 +7,7 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "start": "node --require tsx/cjs ../../node_modules/.bin/gulp -f gulpfile.ts",
+    "start": "node ../../scripts/with-node-heap.mjs node --require tsx/cjs ../../node_modules/.bin/gulp -f gulpfile.ts",
     "dev": "pnpm run stub",
     "stub": "unbuild --stub"
   },

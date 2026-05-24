@@ -104,15 +104,11 @@
     &:focus-visible {
       & + .#{$namespace}-radio-button__inner {
         border-left: getCssVar('border');
-        border-left-color: getCssVarWithDefault(
-          'radio-button-checked-border-color',
-          map.get($radio-button, 'checked-border-color')
-        );
-        outline: 2px solid getCssVar('radio-button-checked-border-color');
-        outline-offset: 1px;
+        border-color: var(--fsus-scholarly-blue);
+        outline: none;
+        box-shadow: inset 0 0 0 1px var(--fsus-scholarly-blue);
         z-index: 2;
         border-radius: getCssVar('border-radius-base');
-        box-shadow: none;
       }
     }
 

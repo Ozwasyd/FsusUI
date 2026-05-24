@@ -134,6 +134,7 @@ const dropdownWidth = ref('')
 const activated = ref(false)
 const suggestionDisabled = ref(false)
 const loading = ref(false)
+const suggestionCache = new Map<string, AutocompleteData>()
 
 const listboxId = computed(() => ns.b(String(generateId())))
 const styles = computed(() => rawAttrs.style as StyleValue)
@@ -148,7 +149,6 @@ const tooltipBindings = computed(() => ({
   fallbackPlacements,
   popperClass: [ns.e('popper'), props.popperClass],
   teleported: props.teleported,
-  gpuAcceleration: false,
   pure: true,
   effect: 'light',
   trigger: 'click' as const,
@@ -167,7 +167,7 @@ const suggestionLoading = computed(() => !props.hideLoading && loading.value)
 const refInput = computed<HTMLInputElement[]>(() => {
   if (inputRef.value) {
     return Array.from<HTMLInputElement>(
-      inputRef.value.$el.querySelectorAll('input')
+      inputRef.value.$el.querySelectorAll('input'),
     )
   }
   return []
@@ -190,12 +190,20 @@ const tooltipEvents = {
 
 const getData = async (queryString: string) => {
   if (suggestionDisabled.value) return
+  const cached = suggestionCache.get(queryString)
+  if (cached) {
+    suggestions.value = cached
+    highlightedIndex.value = props.highlightFirstItem ? 0 : -1
+    loading.value = false
+    return
+  }
 
   const cb = (suggestionList: AutocompleteData) => {
     loading.value = false
     if (suggestionDisabled.value) return
 
     if (isArray(suggestionList)) {
+      suggestionCache.set(queryString, suggestionList)
       suggestions.value = suggestionList
       highlightedIndex.value = props.highlightFirstItem ? 0 : -1
     } else {
@@ -333,10 +341,10 @@ const highlight = (index: number) => {
     index = suggestions.value.length - 1
   }
   const suggestion = regionRef.value!.querySelector(
-    `.${ns.be('suggestion', 'wrap')}`
+    `.${ns.be('suggestion', 'wrap')}`,
   )!
   const suggestionList = suggestion.querySelectorAll<HTMLElement>(
-    `.${ns.be('suggestion', 'list')} li`
+    `.${ns.be('suggestion', 'list')} li`,
   )!
   const highlightItem = suggestionList[index]
   const scrollTop = suggestion.scrollTop
@@ -352,7 +360,7 @@ const highlight = (index: number) => {
   // TODO: use Volar generate dts to fix it.
   ;(inputRef.value as any).ref!.setAttribute(
     'aria-activedescendant',
-    `${listboxId.value}-item-${highlightedIndex.value}`
+    `${listboxId.value}-item-${highlightedIndex.value}`,
   )
 }
 
@@ -369,7 +377,7 @@ onMounted(() => {
   ;(inputRef.value as any).ref!.setAttribute('aria-controls', 'id')
   ;(inputRef.value as any).ref!.setAttribute(
     'aria-activedescendant',
-    `${listboxId.value}-item-${highlightedIndex.value}`
+    `${listboxId.value}-item-${highlightedIndex.value}`,
   )
   // get readonly attr
   readonly = (inputRef.value as any).ref!.hasAttribute('readonly')

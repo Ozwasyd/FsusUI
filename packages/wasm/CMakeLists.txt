@@ -24,14 +24,14 @@ target_link_options(ep_wasm PRIVATE
   "-sEXPORT_ES6=1"
   "-sMODULARIZE=1"
   "-sEXPORT_NAME=createEpWasm"
-  "-sEXPORTED_FUNCTIONS=['_malloc','_free','_sort_numbers_buffer','_estimate_row_heights_buffer']"
-  "-sEXPORTED_RUNTIME_METHODS=['HEAP32','HEAPF64']"
+  "-sEXPORTED_FUNCTIONS=['_malloc','_free','_sort_numbers_buffer','_estimate_row_heights_buffer','_filter_ascii_indices_buffer']"
+  "-sEXPORTED_RUNTIME_METHODS=['HEAPU8','HEAP32','HEAPF64']"
 
   # 内存配置：初始 4 MB，最大 256 MB，允许增长
   "-sINITIAL_MEMORY=4MB"
   "-sMAXIMUM_MEMORY=256MB"
   "-sALLOW_MEMORY_GROWTH=1"
-  "-sSTACK_SIZE=1MB"
+  "-sTOTAL_STACK=1MB"
 
   # 优化：O3 + SIMD（ES2022 目标浏览器均支持）
   "-O3"
@@ -39,14 +39,10 @@ target_link_options(ep_wasm PRIVATE
 
   # 关闭 Emscripten 异常（使用 C++ 原生异常）
   "-sDISABLE_EXCEPTION_CATCHING=0"
-
-  # 输出文件名
-  "-o" "${CMAKE_CURRENT_BINARY_DIR}/ep_wasm.mjs"
 )
 
 target_compile_options(ep_wasm PRIVATE
   "-O3"
-  "-std=c++23"
   "-msimd128"
 
   # 严格模式编译
@@ -57,4 +53,7 @@ target_compile_options(ep_wasm PRIVATE
 # 设置输出到 dist/ 目录
 set_target_properties(ep_wasm PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/dist"
+  SUFFIX ".mjs"
 )
+
+add_subdirectory(markdown)

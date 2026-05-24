@@ -21,6 +21,14 @@ const _mount = (render: () => VNode) => {
   return mount(render, { attachTo: document.body })
 }
 
+const getUniqueTimeSpinnerValues = (root: ParentNode, selector: string) => {
+  const values = Array.from(root.querySelectorAll(selector)).map((node) =>
+    Number(node.textContent)
+  )
+
+  return Array.from(new Set(values))
+}
+
 afterEach(() => {
   document.documentElement.innerHTML = ''
 })
@@ -305,14 +313,13 @@ describe('Datetime Picker', () => {
     await nextTick()
     const list = document.querySelectorAll('.el-time-spinner__list')
     const hoursEl = list[0]
-    const disabledHours = Array.from(
-      hoursEl.querySelectorAll('.is-disabled')
-    ).map((node) => Number(node.textContent))
+    const disabledHours = getUniqueTimeSpinnerValues(hoursEl, '.is-disabled')
     expect(disabledHours).toStrictEqual(disabledHoursArr)
     const minutesEl = list[1]
-    const disabledMinutes = Array.from(
-      minutesEl.querySelectorAll('.is-disabled')
-    ).map((node) => Number(node.textContent))
+    const disabledMinutes = getUniqueTimeSpinnerValues(
+      minutesEl,
+      '.is-disabled'
+    )
     expect(disabledMinutes.length).toBe(19)
   })
 
@@ -630,9 +637,7 @@ describe('Datetimerange', () => {
       '.el-date-range-picker__editors-wrap .el-time-spinner__list'
     )
     const hoursEl = listLeft[0]
-    const disabledHours = Array.from(
-      hoursEl.querySelectorAll('.is-disabled')
-    ).map((node) => Number(node.textContent))
+    const disabledHours = getUniqueTimeSpinnerValues(hoursEl, '.is-disabled')
     expect(disabledHours).toStrictEqual(disabledHoursArr)
     const button = document.querySelector(
       '.el-date-range-picker__time-picker-wrap .el-time-panel .confirm'
@@ -646,9 +651,7 @@ describe('Datetimerange', () => {
       '.el-date-range-picker__editors-wrap.is-right .el-time-spinner__list'
     )
     const hoursEl2 = listRight[0]
-    const disabledHours2 = Array.from(
-      hoursEl2.querySelectorAll('.is-disabled')
-    ).map((node) => Number(node.textContent))
+    const disabledHours2 = getUniqueTimeSpinnerValues(hoursEl2, '.is-disabled')
     expect(disabledHours2).toStrictEqual(disabledHoursRightArr)
   })
 

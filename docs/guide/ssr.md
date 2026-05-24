@@ -13,7 +13,7 @@ FsusUI 内部使用自增 ID 管理无障碍属性。在 SSR 中，服务端与�
 ```ts
 // main.ts
 import { createApp } from 'vue'
-import { ID_INJECTION_KEY } from 'element-plus'
+import { ID_INJECTION_KEY } from '@ozwasyd/element-plus'
 import App from './App.vue'
 
 const app = createApp(App)
@@ -32,7 +32,7 @@ app.provide(ID_INJECTION_KEY, {
 ```ts
 // main.ts
 import { createApp } from 'vue'
-import { ZINDEX_INJECTION_KEY } from 'element-plus'
+import { ZINDEX_INJECTION_KEY } from '@ozwasyd/element-plus'
 import App from './App.vue'
 
 const app = createApp(App)

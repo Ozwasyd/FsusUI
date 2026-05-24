@@ -10,9 +10,10 @@ import {
   toggleRowStatus,
 } from '../util'
 import {
+  ensureWasmSortReady,
+  isWasmSortReady,
   shouldUseWasm,
   trySortWithWasmSync,
-  warmupWasmSort,
 } from '../composables/use-wasm-sort'
 import useExpand from './expand'
 import useCurrent from './current'
@@ -24,35 +25,35 @@ import type { Table, TableRefs } from '../table/defaults'
 import type { StoreFilter } from '.'
 
 /**
- * WASM 加速排序（大数据集）+ JS 降级（小数据集/自定义排序）。
- * 完全保持 Element Plus 排序语义——外部无感知。
+ * WASM-first sorting for eligible large primitive datasets.
+ * Non-eligible paths such as custom sort callbacks stay on the JS primary path.
  */
-const sortData = (data, states) => {
+const sortData = (data, states, requestWasmReady?: () => void) => {
   const sortingColumn = states.sortingColumn
   if (!sortingColumn || typeof sortingColumn.sortable === 'string') {
     return data
   }
 
-  const fallbackSortedData = orderBy(
+  if (shouldUseWasm(data, sortingColumn)) {
+    const ascending = states.sortOrder !== 'descending'
+    if (!isWasmSortReady()) {
+      requestWasmReady?.()
+      return data
+    }
+
+    const wasmSortedData = trySortWithWasmSync(data, states.sortProp, ascending)
+    if (wasmSortedData) {
+      return wasmSortedData
+    }
+  }
+
+  return orderBy(
     data,
     states.sortProp,
     states.sortOrder,
     sortingColumn.sortMethod,
     sortingColumn.sortBy,
   )
-
-  // WASM 加速路径：仅对大数据集且无自定义排序时触发
-  if (shouldUseWasm(data, sortingColumn)) {
-    const ascending = states.sortOrder !== 'descending'
-    const wasmSortedData = trySortWithWasmSync(data, states.sortProp, ascending)
-    if (wasmSortedData) {
-      return wasmSortedData
-    }
-
-    warmupWasmSort()
-  }
-
-  return fallbackSortedData
 }
 
 const doFlattenColumns = (columns) => {
@@ -94,6 +95,8 @@ function useWatcher<T>() {
   const selectable: Ref<(row: T, index: number) => boolean> = ref(null)
   const filters: Ref<StoreFilter> = ref({})
   const filteredData = ref(null)
+  const wasmSortError = ref<unknown>(null)
+  let wasmSortReadyPromise: Promise<void> | null = null
   const sortingColumn = ref(null)
   const sortProp = ref(null)
   const sortOrder = ref(null)
@@ -200,8 +203,9 @@ function useWatcher<T>() {
       deleted = selection.value.filter((item) => !dataSet.has(item))
     }
     if (deleted.length) {
+      const deletedSet = new Set(deleted)
       const newSelection = selection.value.filter(
-        (item) => !deleted.includes(item),
+        (item) => !deletedSet.has(item),
       )
       selection.value = newSelection
       instance.emit('selection-change', newSelection.slice())
@@ -378,34 +382,58 @@ function useWatcher<T>() {
   }
 
   const execFilter = () => {
-    let sourceData = unref(_data)
-    Object.keys(filters.value).forEach((columnId) => {
-      const values = filters.value[columnId]
-      if (!values || values.length === 0) return
-      const column = getColumnById(
-        {
-          columns: columns.value,
-        },
-        columnId,
-      )
-      if (column && column.filterMethod) {
-        sourceData = sourceData.filter((row) => {
-          return values.some((value) =>
-            column.filterMethod.call(null, value, row, column),
-          )
-        })
-      }
-    })
+    const activeFilters = Object.keys(filters.value)
+      .map((columnId) => {
+        const values = filters.value[columnId]
+        if (!values || values.length === 0) return null
+        const column = getColumnById(
+          {
+            columns: columns.value,
+          },
+          columnId,
+        )
+        return column && column.filterMethod ? { column, values } : null
+      })
+      .filter(Boolean)
 
-    filteredData.value = sourceData
+    if (activeFilters.length === 0) {
+      filteredData.value = unref(_data)
+      return
+    }
+
+    filteredData.value = unref(_data).filter((row) =>
+      activeFilters.every(({ column, values }) =>
+        values.some((value) =>
+          column.filterMethod.call(null, value, row, column),
+        ),
+      ),
+    )
   }
 
   const execSort = () => {
+    if (wasmSortError.value) {
+      throw wasmSortError.value
+    }
+
     data.value = sortData(filteredData.value, {
       sortingColumn: sortingColumn.value,
       sortProp: sortProp.value,
       sortOrder: sortOrder.value,
-    })
+    }, requestWasmSortReady)
+  }
+
+  const requestWasmSortReady = () => {
+    if (wasmSortReadyPromise) return
+    wasmSortReadyPromise = ensureWasmSortReady()
+      .then(() => {
+        wasmSortReadyPromise = null
+        execSort()
+        scheduleLayout(false)
+      })
+      .catch((error) => {
+        wasmSortReadyPromise = null
+        wasmSortError.value = error
+      })
   }
 
   // 根据 filters 与 sort 去过滤 data

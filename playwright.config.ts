@@ -1,13 +1,22 @@
 import { defineConfig, devices } from '@playwright/test'
+import {
+  createPlaywrightReporter,
+  resolvePlaywrightWorkers,
+  resolveTestPort,
+} from './scripts/test-parallelism'
 
 delete process.env.NO_COLOR
 
+const previewPort = resolveTestPort('FSUS_VISUAL_PREVIEW_PORT', 4173)
+const previewBaseUrl = `http://127.0.0.1:${previewPort}`
+
 export default defineConfig({
   testDir: './tests/visual',
+  outputDir: 'test-results/visual-preview',
   fullyParallel: true,
-  workers: process.env.CI ? 2 : undefined,
+  workers: resolvePlaywrightWorkers(),
   retries: process.env.CI ? 2 : 0,
-  reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
+  reporter: createPlaywrightReporter('visual-preview'),
   timeout: 30_000,
   expect: {
     timeout: 20_000,
@@ -19,7 +28,7 @@ export default defineConfig({
     },
   },
   use: {
-    baseURL: 'http://127.0.0.1:4173',
+    baseURL: previewBaseUrl,
     locale: 'zh-CN',
     timezoneId: 'Asia/Shanghai',
     colorScheme: 'light',
@@ -61,8 +70,8 @@ export default defineConfig({
   ],
   webServer: {
     command:
-      'pnpm run build:demo && pnpm -C packages/demo-app preview --host 127.0.0.1 --port 4173',
-    url: 'http://127.0.0.1:4173',
+      `pnpm run prepare:test-artifacts && pnpm -C packages/demo-app build && pnpm -C packages/demo-app preview --host 127.0.0.1 --port ${previewPort} --strictPort`,
+    url: previewBaseUrl,
     reuseExistingServer: !process.env.CI,
     timeout: 240_000,
   },

@@ -147,6 +147,9 @@ export const publicComponentBoundaries: Record<string, ComponentBoundaryCoverage
     fixtureModes: ['states'],
   }),
   loading: entry(pluginBoundaries, { fixtureModes: ['states', 'overlays'] }),
+  'markdown-renderer': entry([...dataBoundaries, 'overflow-virtual'], {
+    fixtureModes: ['data-boundaries'],
+  }),
   menu: entry([...simpleBoundaries, 'model-value', 'keyboard-focus', 'event'], {
     fixtureModes: ['overlays'],
   }),

@@ -55,10 +55,10 @@ $colors-dark: map.deep-merge(
       'base': #f59e0b,
     ),
     'danger': (
-      'base': #ef4444,
+      'base': #d06a6a,
     ),
     'error': (
-      'base': #ef4444,
+      'base': #d06a6a,
     ),
     'info': (
       'base': #71717a,
@@ -350,11 +350,22 @@ $common-component-size: map.merge(
 $overlay-color: () !default;
 $overlay-color: map.merge(
   (
-    '': rgba(0, 0, 0, 0.8),
-    'light': rgba(0, 0, 0, 0.7),
-    'lighter': rgba(0, 0, 0, 0.5),
+    '': rgba(252, 252, 252, 0.5),
+    'light': rgba(252, 252, 252, 0.5),
+    'lighter': rgba(252, 252, 252, 0.5),
   ),
   $overlay-color
+);
+
+// overlay dark
+$overlay-color-dark: () !default;
+$overlay-color-dark: map.merge(
+  (
+    '': rgba(15, 15, 17, 0.7),
+    'light': rgba(15, 15, 17, 0.7),
+    'lighter': rgba(15, 15, 17, 0.7),
+  ),
+  $overlay-color-dark
 );
 
 // mask
@@ -513,7 +524,7 @@ $select: map.merge(
     'close-hover-color': getCssVar('text-color-secondary'),
     'input-color': getCssVar('text-color-placeholder'),
     'multiple-input-color': getCssVar('text-color-regular'),
-    'input-focus-border-color': getCssVar('color-primary'),
+    'input-focus-border-color': getCssVar('color-scholarly-blue'),
     'input-font-size': 14px,
   ),
   $select
@@ -659,7 +670,7 @@ $input: map.merge(
     'placeholder-color': getCssVar('text-color-placeholder'),
     'hover-border-color': getCssVar('border-color-hover'),
     'clear-hover-color': getCssVar('text-color-secondary'),
-    'focus-border-color': getCssVar('color-primary'),
+    'focus-border-color': getCssVar('color-scholarly-blue'),
     'width': 100%,
   ),
   $input
@@ -1428,6 +1439,7 @@ $empty: map.merge(
     'image-width': 160px,
     'description-margin-top': 20px,
     'bottom-margin-top': 20px,
+    'border-color': getCssVar('border-color'),
     'fill-color-0': getCssVar('color-white'),
     'fill-color-1': #fcfcfd,
     'fill-color-2': #f8f9fb,

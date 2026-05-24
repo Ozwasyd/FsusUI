@@ -1,5 +1,6 @@
 import type { AppContext, CSSProperties, Component, VNode } from 'vue'
 import type { ComponentSize } from '@element-plus/constants'
+import type { FsusResult } from '@element-plus/utils'
 
 type MessageType = '' | 'success' | 'warning' | 'info' | 'error'
 
@@ -177,12 +178,12 @@ export type ElMessageBoxShortcutMethod = ((
   title: ElMessageBoxOptions['title'],
   options?: ElMessageBoxOptions,
   appContext?: AppContext | null
-) => Promise<MessageBoxData>) &
+) => Promise<FsusResult<MessageBoxData>>) &
   ((
     message: ElMessageBoxOptions['message'],
     options?: ElMessageBoxOptions,
     appContext?: AppContext | null
-  ) => Promise<MessageBoxData>)
+  ) => Promise<FsusResult<MessageBoxData>>)
 
 export interface IElMessageBox {
   _context: AppContext | null
@@ -194,7 +195,7 @@ export interface IElMessageBox {
   (
     options: ElMessageBoxOptions,
     appContext?: AppContext | null
-  ): Promise<MessageBoxData>
+  ): Promise<FsusResult<MessageBoxData>>
 
   /** Show an alert message box */
   alert: ElMessageBoxShortcutMethod

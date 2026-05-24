@@ -34,14 +34,16 @@ const on = {
 
   enter(el: RendererElement) {
     el.dataset.oldOverflow = el.style.overflow
-    if (el.scrollHeight !== 0) {
-      el.style.maxHeight = `${el.scrollHeight}px`
-    } else {
-      el.style.maxHeight = 0
-    }
-    el.style.paddingTop = el.dataset.oldPaddingTop
-    el.style.paddingBottom = el.dataset.oldPaddingBottom
-    el.style.overflow = 'hidden'
+    const scrollHeight = el.scrollHeight
+    const paddingTop = el.dataset.oldPaddingTop
+    const paddingBottom = el.dataset.oldPaddingBottom
+
+    requestAnimationFrame(() => {
+      el.style.maxHeight = scrollHeight !== 0 ? `${scrollHeight}px` : 0
+      el.style.paddingTop = paddingTop
+      el.style.paddingBottom = paddingBottom
+      el.style.overflow = 'hidden'
+    })
   },
 
   afterEnter(el: RendererElement) {
@@ -59,15 +61,20 @@ const on = {
     el.dataset.oldPaddingBottom = el.style.paddingBottom
     el.dataset.oldOverflow = el.style.overflow
 
-    el.style.maxHeight = `${el.scrollHeight}px`
-    el.style.overflow = 'hidden'
+    const scrollHeight = el.scrollHeight
+    requestAnimationFrame(() => {
+      el.style.maxHeight = `${scrollHeight}px`
+      el.style.overflow = 'hidden'
+    })
   },
 
   leave(el: RendererElement) {
     if (el.scrollHeight !== 0) {
-      el.style.maxHeight = 0
-      el.style.paddingTop = 0
-      el.style.paddingBottom = 0
+      requestAnimationFrame(() => {
+        el.style.maxHeight = 0
+        el.style.paddingTop = 0
+        el.style.paddingBottom = 0
+      })
     }
   },
 

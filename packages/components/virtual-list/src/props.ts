@@ -130,8 +130,8 @@ const scrollbarSize = {
   default: 6,
 } as const
 
-const startGap = { type: Number, default: 0 } as const
-const endGap = { type: Number, default: 2 } as const
+const startGap = { type: Number, default: 8 } as const
+const endGap = { type: Number, default: 8 } as const
 
 export const virtualizedGridProps = buildProps({
   columnCache: cache,

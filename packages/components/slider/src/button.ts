@@ -21,6 +21,7 @@ export type SliderButtonProps = ExtractPropTypes<typeof sliderButtonProps>
 
 export const sliderButtonEmits = {
   [UPDATE_MODEL_EVENT]: (value: number) => isNumber(value),
+  dragPosition: (value: number) => isNumber(value),
 }
 export type SliderButtonEmits = typeof sliderButtonEmits
 
@@ -42,4 +43,5 @@ export interface SliderButtonInitData {
   startPosition: number
   newPosition: number
   oldValue: number
+  velocity: number
 }

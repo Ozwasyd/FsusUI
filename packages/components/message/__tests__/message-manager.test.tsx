@@ -1,5 +1,5 @@
 import { h, nextTick, ref } from 'vue'
-import { describe, expect, it, test, vi } from 'vitest'
+import { afterEach, describe, expect, it, test, vi } from 'vitest'
 import { rAF } from '@element-plus/test-utils/tick'
 import { ElMessage } from '..'
 import Message from '../src/method'
@@ -14,6 +14,12 @@ const getMessagePosition = (elm: Element): number => {
     Number.parseFloat(element.style.getPropertyValue('--el-message-stack-y') || '0')
   )
 }
+
+afterEach(async () => {
+  Message.closeAll()
+  await rAF()
+  await nextTick()
+})
 
 describe('Message on command', () => {
   test('it should get component handle', async () => {
@@ -185,6 +191,7 @@ describe('Message on command', () => {
     const i = ref(0)
 
     Message({
+      duration: 0,
       message: () => h('div', i.value),
     })
 

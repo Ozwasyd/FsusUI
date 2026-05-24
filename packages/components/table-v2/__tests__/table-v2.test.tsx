@@ -1,6 +1,7 @@
-import { h, ref } from 'vue'
+import { computed, defineComponent, h, nextTick, provide, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, test } from 'vitest'
+import { configProviderContextKey } from '@element-plus/components/config-provider'
 import TableV2 from '../src/table-v2'
 import type {
   TableV2HeaderRowCellRendererParams,
@@ -54,6 +55,44 @@ describe('TableV2.vue', () => {
     const cell = wrapper.find('.el-table-v2__row-cell')
     expect(cell.exists()).toBe(true)
     expect(cell.find('span').text()).toBe(customText)
+  })
+
+  test('inherits render pipeline budget through virtual grid', async () => {
+    const columns = ref(generateColumns(10))
+    const data = ref(generateData(columns.value, 200))
+    const PipelineTable = defineComponent({
+      setup() {
+        provide(
+          configProviderContextKey,
+          computed(
+            () =>
+              ({
+                renderPipeline: {
+                  mode: 'enabled',
+                  budget: { overscanPx: 300 },
+                },
+              }) as any,
+          ),
+        )
+        return () => (
+          <TableV2
+            columns={columns.value}
+            data={data.value}
+            width={700}
+            height={400}
+            rowHeight={50}
+          />
+        )
+      },
+    })
+
+    const wrapper = mount(PipelineTable)
+    await nextTick()
+
+    const grid = wrapper.find('[data-fsus-render-pipeline="virtual-grid"]')
+    expect(grid.exists()).toBe(true)
+    expect(grid.attributes('data-fsus-render-strategy')).toBe('chunked-main')
+    expect(grid.attributes('data-fsus-render-row-cache')).toBe('6')
   })
 
   test('slots header-cell', async () => {

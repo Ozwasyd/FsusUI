@@ -8,14 +8,40 @@ import type { RenderFunction } from 'vue'
 import type { VueWrapper } from '@vue/test-utils'
 import type ElTree from '@element-plus/components/tree'
 
-const { filterIndicesSync, warmupWasm, setWasmReady } = vi.hoisted(() => {
+const {
+  createAsciiFilterIndex,
+  ensureWasmReady,
+  filterIndicesSync,
+  isWasmReady,
+  setWasmReady,
+} = vi.hoisted(() => {
   let wasmReady = false
+  let readinessResolvers: Array<() => void> = []
+  const wasmReadyResult = { ok: true, value: undefined } as const
+
+  const flushReadiness = () => {
+    const resolvers = readinessResolvers
+    readinessResolvers = []
+    resolvers.forEach((resolve) => resolve())
+  }
 
   return {
+    ensureWasmReady: vi.fn(
+      () =>
+        new Promise<typeof wasmReadyResult>((resolve) => {
+          if (wasmReady) {
+            resolve(wasmReadyResult)
+            return
+          }
+
+          readinessResolvers.push(() => resolve(wasmReadyResult))
+        }),
+    ),
+    createAsciiFilterIndex: vi.fn((labels: string[]) => labels),
     filterIndicesSync: vi.fn(
       (data: string[], keyword: string, caseSensitive = false) => {
         if (!wasmReady) {
-          return null
+          throw new Error('WASM is not ready')
         }
 
         const normalizedKeyword = caseSensitive
@@ -29,18 +55,23 @@ const { filterIndicesSync, warmupWasm, setWasmReady } = vi.hoisted(() => {
           }
           return result
         }, [])
-      }
+      },
     ),
-    warmupWasm: vi.fn(),
+    isWasmReady: vi.fn(() => wasmReady),
     setWasmReady: (nextValue: boolean) => {
       wasmReady = nextValue
+      if (nextValue) {
+        flushReadiness()
+      }
     },
   }
 })
 
 vi.mock('@element-plus/wasm', () => ({
-  filterIndicesSync,
-  warmupWasm,
+  createAsciiFilterIndex,
+  ensureWasmReady,
+  filterAsciiIndicesSync: filterIndicesSync,
+  isWasmReady,
 }))
 
 const createComponent = ({
@@ -48,7 +79,7 @@ const createComponent = ({
   props = {},
 }: {
   slots?: Record<string, any>
-  props?: typeof TreeSelect['props']
+  props?: (typeof TreeSelect)['props']
 } = {}) => {
   const wrapperRef = ref<any>()
   const defaultData = ref([
@@ -94,15 +125,13 @@ const createComponent = ({
     },
     {
       attachTo: 'body',
-    }
+    },
   )
 
   return {
     wrapper,
     getWrapperRef: () =>
-      new Promise<any>((resolve) =>
-        nextTick(() => resolve(wrapperRef.value!))
-      ),
+      new Promise<any>((resolve) => nextTick(() => resolve(wrapperRef.value!))),
     select: wrapper.findComponent({ name: 'ElSelect' }) as VueWrapper<any>,
     tree: wrapper.findComponent({ name: 'ElTree' }) as VueWrapper<
       InstanceType<typeof ElTree>
@@ -114,7 +143,8 @@ describe('TreeSelect.vue', () => {
   beforeEach(() => {
     setWasmReady(false)
     filterIndicesSync.mockClear()
-    warmupWasm.mockClear()
+    ensureWasmReady.mockClear()
+    isWasmReady.mockClear()
   })
 
   test('render test', async () => {
@@ -130,7 +160,6 @@ describe('TreeSelect.vue', () => {
     expect(tree.findAll('.el-tree > .el-tree-node').length).toBe(1)
     expect(tree.findAll('.el-tree .el-tree-node').length).toBe(3)
     expect(tree.findAll('.el-tree .el-select-dropdown__item').length).toBe(3)
-
     ;(wrapper.findComponent(TreeSelect).vm as any).data[0].children = []
 
     await nextTick()
@@ -160,10 +189,7 @@ describe('TreeSelect.vue', () => {
     expect(select.vm.modelValue).toBe(11)
     expect(wrapperRef.getCheckedKeys()).toEqual([11])
 
-    await tree
-      .findAll('.el-select-dropdown__item')
-      .at(-1)!
-      .trigger('click')
+    await tree.findAll('.el-select-dropdown__item').at(-1)!.trigger('click')
     await nextTick()
     expect(select.vm.modelValue).toBe(111)
     expect(wrapperRef.getCheckedKeys()).toEqual([111])
@@ -235,10 +261,7 @@ describe('TreeSelect.vue', () => {
     expect(select.vm.modelValue).toEqual([11])
     expect(wrapperRef.getCheckedKeys()).toEqual([11])
 
-    await tree
-      .findAll('.el-select-dropdown__item')
-      .at(-1)!
-      .trigger('click')
+    await tree.findAll('.el-select-dropdown__item').at(-1)!.trigger('click')
     await nextTick()
     expect(select.vm.modelValue).toEqual([11, 111])
     expect(wrapperRef.getCheckedKeys()).toEqual([11, 111])
@@ -271,7 +294,7 @@ describe('TreeSelect.vue', () => {
 
     const children = Array.from({ length: 600 }, (_, index) => ({
       value: index + 10,
-      label: index === 357 ? '命中节点' : `子节点 ${index}`,
+      label: index === 357 ? 'target node' : `node ${index}`,
     }))
 
     const { tree } = createComponent({
@@ -280,16 +303,16 @@ describe('TreeSelect.vue', () => {
         data: [
           {
             value: 1,
-            label: '根节点',
+            label: 'root',
             children,
           },
         ],
       },
     })
 
-    expect(warmupWasm).toHaveBeenCalledTimes(1)
+    expect(ensureWasmReady).toHaveBeenCalledTimes(1)
 
-    tree.vm.filter('命中节点')
+    tree.vm.filter('target node')
     await nextTick()
 
     expect(filterIndicesSync).toHaveBeenCalledTimes(1)
@@ -297,64 +320,62 @@ describe('TreeSelect.vue', () => {
     expect(tree.vm.getNode(10 + 357).visible).toBe(true)
   }, 30000)
 
-  test(
-    'filter falls back to js path when wasm is unavailable',
-    async () => {
-      const children = Array.from({ length: 600 }, (_, index) => ({
+  test('filter suspends default wasm path until readiness', async () => {
+    const children = Array.from({ length: 600 }, (_, index) => ({
       value: index + 10,
-      label: index === 24 ? '后备命中' : `子节点 ${index}`,
-      }))
+      label: index === 24 ? 'pending node' : `node ${index}`,
+    }))
 
-      const { tree } = createComponent({
-        props: {
-          filterable: true,
-          data: [
-            {
-              value: 1,
-              label: '根节点',
-              children,
-            },
-          ],
-        },
-      })
-
-      tree.vm.filter('后备命中')
-      await nextTick()
-
-      expect(filterIndicesSync).toHaveBeenCalledTimes(1)
-      expect(tree.vm.getNode(1).visible).toBe(true)
-      expect(tree.vm.getNode(10 + 24).visible).toBe(true)
-    },
-    30000
-  )
-
-  test(
-    'custom filter method does not use wasm fast path',
-    async () => {
-      setWasmReady(true)
-
-      const { tree } = createComponent({
-        props: {
-          filterable: true,
-          data: Array.from({ length: 600 }, (_, index) => ({
-            value: index,
-            label: `节点 ${index}`,
-          })),
-          filterNodeMethod: (value: string, data: { label: string }) => {
-            if (!value) return true
-            return data.label.endsWith(value)
+    const { tree } = createComponent({
+      props: {
+        filterable: true,
+        data: [
+          {
+            value: 1,
+            label: 'root',
+            children,
           },
+        ],
+      },
+    })
+
+    tree.vm.filter('pending node')
+    await nextTick()
+
+    expect(ensureWasmReady).toHaveBeenCalled()
+    expect(filterIndicesSync).not.toHaveBeenCalled()
+    setWasmReady(true)
+    await nextTick()
+    await nextTick()
+
+    expect(filterIndicesSync).toHaveBeenCalledTimes(1)
+    expect(tree.vm.getNode(1).visible).toBe(true)
+    expect(tree.vm.getNode(10 + 24).visible).toBe(true)
+  }, 30000)
+
+  test('custom filter method does not use wasm fast path', async () => {
+    setWasmReady(true)
+
+    const { tree } = createComponent({
+      props: {
+        filterable: true,
+        data: Array.from({ length: 600 }, (_, index) => ({
+          value: index,
+          label: `节点 ${index}`,
+        })),
+        filterNodeMethod: (value: string, data: { label: string }) => {
+          if (!value) return true
+          return data.label.endsWith(value)
         },
-      })
+      },
+    })
 
-      tree.vm.filter('199')
-      await nextTick()
+    tree.vm.filter('199')
+    await nextTick()
 
-      expect(filterIndicesSync).not.toHaveBeenCalled()
-      expect(warmupWasm).not.toHaveBeenCalled()
-    },
-    30000
-  )
+    expect(filterIndicesSync).not.toHaveBeenCalled()
+    expect(ensureWasmReady).not.toHaveBeenCalled()
+  }, 30000)
 
   test('props', async () => {
     const { wrapper, select, tree } = createComponent({
@@ -403,7 +424,7 @@ describe('TreeSelect.vue', () => {
       props: {
         renderContent: (
           h: RenderFunction,
-          { data }: { data: { label: string } }
+          { data }: { data: { label: string } },
         ) => {
           return `123${data.label}`
         },
@@ -561,13 +582,13 @@ describe('TreeSelect.vue', () => {
 
     await tree.findAll('.el-tree-node__content')[0].trigger('click')
     expect(
-      tree.findAll('.el-tree-node__children')[0].attributes('style')
+      tree.findAll('.el-tree-node__children')[0].attributes('style'),
     ).toContain('display: none;')
 
     await wrapper.setProps({ expandOnClickNode: true } as any)
     await tree.findAll('.el-tree-node__content')[0].trigger('click')
     expect(
-      tree.findAll('.el-tree-node__children')[0].attributes('style')
+      tree.findAll('.el-tree-node__children')[0].attributes('style'),
     ).not.toContain('display: none;')
   })
 
@@ -672,14 +693,14 @@ describe('TreeSelect.vue', () => {
         checkStrictly: true,
         onCheck: (
           node: any,
-          { checkedKeys, checkedNodes, halfCheckedKeys, halfCheckedNodes }: any
+          { checkedKeys, checkedNodes, halfCheckedKeys, halfCheckedNodes }: any,
         ) =>
           onCheck(
             node.value,
             checkedKeys,
             checkedNodes.map((item: any) => item.value),
             halfCheckedKeys,
-            halfCheckedNodes.map((item: any) => item.value)
+            halfCheckedNodes.map((item: any) => item.value),
           ),
         onCheckChange: (node: any) => onCheckChange(node.value),
       },

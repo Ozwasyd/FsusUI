@@ -2,6 +2,8 @@ import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import { clickPickerCell } from '../../../test-utils/dom'
+import ConfigProvider from '@element-plus/components/config-provider'
+import Chinese from '@element-plus/locale/lang/zh-cn'
 import updateLocale from 'dayjs/plugin/updateLocale'
 import dayjs from 'dayjs'
 import Calendar from '../src/calendar.vue'
@@ -22,6 +24,13 @@ const queryCalendarRows = (wrapper: { element: unknown }) => {
   ) as HTMLElement[]
 }
 
+const expectCalendarTitle = (
+  titleEl: { element: Element },
+  expected: string
+) => {
+  expect(titleEl.element.textContent?.trim()).toBe(expected)
+}
+
 describe('Calendar.vue', () => {
   it('create', async () => {
     const wrapper = mount({
@@ -31,14 +40,14 @@ describe('Calendar.vue', () => {
       },
     })
     const titleEl = wrapper.find('.el-calendar__title')
-    expect(/2019.*April/.test(titleEl.element?.innerHTML)).toBeTruthy()
+    expectCalendarTitle(titleEl, 'April 2019')
     expect(wrapper.element.querySelectorAll('thead th').length).toBe(7)
     const rows = queryCalendarRows(wrapper)
     expect(rows.length).toBe(5)
     await clickPickerCell(rows[4].lastElementChild as HTMLElement)
 
     await nextTick()
-    expect(/2019.*May/.test(titleEl.element.innerHTML)).toBeTruthy()
+    expectCalendarTitle(titleEl, 'May 2019')
     const vm = wrapper.vm as any
     const date = vm.value
     expect(date.getFullYear()).toBe(2019)
@@ -51,7 +60,7 @@ describe('Calendar.vue', () => {
       <Calendar range={[new Date(2019, 2, 4), new Date(2019, 2, 24)]} />
     ))
     const titleEl = wrapper.find('.el-calendar__title')
-    expect(/2019.*March/.test(titleEl.element.innerHTML)).toBeTruthy()
+    expectCalendarTitle(titleEl, 'March 2019')
     const rows = queryCalendarRows(wrapper)
     expect(rows.length).toBe(4)
     expect(
@@ -65,7 +74,7 @@ describe('Calendar.vue', () => {
       <Calendar range={[new Date(2021, 1, 2), new Date(2021, 1, 28)]} />
     ))
     const titleEl = wrapper.find('.el-calendar__title')
-    expect(/2021.*January/.test(titleEl.element.innerHTML)).toBeTruthy()
+    expectCalendarTitle(titleEl, 'January 2021')
     const rows = queryCalendarRows(wrapper)
     expect(rows.length).toBe(5)
     expect(
@@ -78,7 +87,7 @@ describe('Calendar.vue', () => {
       <Calendar range={[new Date(2019, 3, 14), new Date(2019, 4, 18)]} />
     ))
     const titleEl = wrapper.find('.el-calendar__title')
-    expect(/2019.*April/.test(titleEl.element.innerHTML)).toBeTruthy()
+    expectCalendarTitle(titleEl, 'April 2019')
     const dateTables = wrapper.element.querySelectorAll(
       '.el-calendar-table.is-range'
     )
@@ -90,7 +99,7 @@ describe('Calendar.vue', () => {
 
     await nextTick()
 
-    expect(/2019.*May/.test(titleEl.element.innerHTML)).toBeTruthy()
+    expectCalendarTitle(titleEl, 'May 2019')
     expect(cell?.classList.contains('is-selected')).toBeTruthy()
   })
 
@@ -100,7 +109,7 @@ describe('Calendar.vue', () => {
       <Calendar range={[new Date(2021, 1, 2), new Date(2021, 2, 21)]} />
     ))
     const titleEl = wrapper.find('.el-calendar__title')
-    expect(/2021.*January/.test(titleEl.element.innerHTML)).toBeTruthy()
+    expectCalendarTitle(titleEl, 'January 2021')
     const dateTables = wrapper.element.querySelectorAll(
       '.el-calendar-table.is-range'
     )
@@ -112,7 +121,7 @@ describe('Calendar.vue', () => {
 
     await nextTick()
 
-    expect(/2021.*March/.test(titleEl.element.innerHTML)).toBeTruthy()
+    expectCalendarTitle(titleEl, 'March 2021')
     expect(cell?.classList.contains('is-selected')).toBeTruthy()
   })
 
@@ -184,9 +193,17 @@ describe('Calendar.vue', () => {
     const prevBtn = btns.at(0)
     const nextBtn = btns.at(2)
     await prevBtn?.trigger('click')
+    await nextTick()
     expect(wrapper.find('.is-selected').text()).toBe('1')
+    expect(
+      wrapper.find('.el-calendar__body').attributes('data-motion-direction')
+    ).toBe('backward')
     await nextBtn?.trigger('click')
+    await nextTick()
     expect(wrapper.find('.is-selected').text()).toBe('1')
+    expect(
+      wrapper.find('.el-calendar__body').attributes('data-motion-direction')
+    ).toBe('forward')
   })
 
   it('range two years', async () => {
@@ -194,7 +211,7 @@ describe('Calendar.vue', () => {
       <Calendar range={[new Date(2022, 0, 1), new Date(2022, 0, 31)]} />
     ))
     const titleEl = wrapper.find('.el-calendar__title')
-    expect(/2021.*December/.test(titleEl.element.innerHTML)).toBeTruthy()
+    expectCalendarTitle(titleEl, 'December 2021')
     const dateTables = wrapper.element.querySelectorAll(
       '.el-calendar-table.is-range'
     )
@@ -206,7 +223,7 @@ describe('Calendar.vue', () => {
 
     await nextTick()
 
-    expect(/2022.*January/.test(titleEl.element.innerHTML)).toBeTruthy()
+    expectCalendarTitle(titleEl, 'January 2022')
     expect(cell?.classList.contains('is-selected')).toBeTruthy()
   })
 
@@ -215,7 +232,7 @@ describe('Calendar.vue', () => {
       <Calendar range={[new Date(2021, 11, 20), new Date(2022, 0, 10)]} />
     ))
     const titleEl = wrapper.find('.el-calendar__title')
-    expect(/2021.*December/.test(titleEl.element.innerHTML)).toBeTruthy()
+    expectCalendarTitle(titleEl, 'December 2021')
     const dateTables = wrapper.element.querySelectorAll(
       '.el-calendar-table.is-range'
     )
@@ -227,7 +244,7 @@ describe('Calendar.vue', () => {
 
     await nextTick()
 
-    expect(/2022.*January/.test(titleEl.element.innerHTML)).toBeTruthy()
+    expectCalendarTitle(titleEl, 'January 2022')
     expect(cell?.classList.contains('is-selected')).toBeTruthy()
   })
 
@@ -243,5 +260,15 @@ describe('Calendar.vue', () => {
 
     expect(wrapper.find('.el-calendar__header').text()).toEqual(AXIOM)
     expect(wrapper.find('.current.is-today').text()).toEqual(AXIOM)
+  })
+
+  it('formats title by current locale order', () => {
+    const wrapper = mount(() => (
+      <ConfigProvider locale={Chinese}>
+        <Calendar modelValue={new Date('2026-05-01')} />
+      </ConfigProvider>
+    ))
+
+    expectCalendarTitle(wrapper.find('.el-calendar__title'), '2026年5月')
   })
 })

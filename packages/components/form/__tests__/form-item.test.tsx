@@ -77,7 +77,10 @@ describe('ElFormItem', () => {
         await nextTick()
         await rAF()
 
-        expect(emailInput.validate('')).resolves.toBe(true)
+        await expect(emailInput.validate('')).resolves.toMatchObject({
+          ok: true,
+          value: true,
+        })
       })
 
       it('should be able to validate successfully with callback', async () => {
@@ -87,7 +90,10 @@ describe('ElFormItem', () => {
         await rAF()
         const callback = vi.fn()
 
-        expect(emailInput.validate('', callback)).resolves.toBe(true)
+        await expect(emailInput.validate('', callback)).resolves.toMatchObject({
+          ok: true,
+          value: true,
+        })
         await rAF()
 
         expect(callback).toHaveBeenCalledWith(true)
@@ -107,14 +113,20 @@ describe('ElFormItem', () => {
     describe('it fails', () => {
       it('should be able to validate without callback', async () => {
         const emailInput = formItemRef.value!
-        expect(emailInput.validate('')).rejects.toHaveProperty('email')
+        await expect(emailInput.validate('')).resolves.toMatchObject({
+          ok: false,
+          error: { code: 'validation' },
+        })
         expect(console.warn).toHaveBeenCalled()
       })
 
       it('should be able to validate with callback without throwing rejection', async () => {
         const emailInput = formItemRef.value!
         const callback = vi.fn()
-        expect(emailInput.validate('', callback)).resolves.toBe(false)
+        await expect(emailInput.validate('', callback)).resolves.toMatchObject({
+          ok: false,
+          error: { code: 'validation' },
+        })
         expect(console.warn).toHaveBeenCalled()
         await rAF()
         expect(callback).toHaveBeenCalled()
@@ -123,7 +135,10 @@ describe('ElFormItem', () => {
       it('should emit validate event', async () => {
         const emailInput = formItemRef.value!
         const callback = vi.fn()
-        expect(emailInput.validate('', callback)).resolves.toBe(false)
+        await expect(emailInput.validate('', callback)).resolves.toMatchObject({
+          ok: false,
+          error: { code: 'validation' },
+        })
         expect(console.warn).toHaveBeenCalled()
         await rAF()
         expect(findForm().emitted('validate')).toEqual([

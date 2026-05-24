@@ -1,5 +1,12 @@
 # element-plus
 
+## 1.4.0
+
+### Minor Changes
+
+- Add the raw HTML Markdown renderer, Result mode, and the Fsus Render Pipeline with GPU/CPU acceleration policy.
+- Rework demo-app stress coverage, virtual rendering, motion convergence, and release package hardening.
+
 ## 1.3.1
 
 ### Patch Changes

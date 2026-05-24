@@ -1,4 +1,4 @@
-import type { TreeNodeData } from '@element-plus/components/tree/src/tree.type'
+import type { TreeNodeData } from '@element-plus/components/tree'
 
 export function isValidValue(val: any) {
   return val || val === 0

@@ -1,6 +1,7 @@
 import { nextTick } from 'vue'
 import { mount as _mount } from '@vue/test-utils'
-import { vi } from 'vitest'
+import type { VueWrapper } from '@vue/test-utils'
+import { afterEach, vi } from 'vitest'
 
 vi.mock('lodash-unified', async () => {
   return {
@@ -18,10 +19,31 @@ export async function doubleWait() {
   await nextTick()
 }
 
-export const mount = (opt: any) =>
-  _mount<any>(opt, {
+const mountedWrappers = new Set<VueWrapper<any>>()
+
+afterEach(() => {
+  mountedWrappers.forEach((wrapper) => wrapper.unmount())
+  mountedWrappers.clear()
+})
+
+export const mount = (opt: any) => {
+  const wrapper = _mount<any>(opt, {
     attachTo: 'body',
   })
+  const unmount = wrapper.unmount.bind(wrapper)
+  let mounted = true
+
+  wrapper.unmount = () => {
+    if (!mounted) return
+
+    mounted = false
+    mountedWrappers.delete(wrapper)
+    unmount()
+  }
+
+  mountedWrappers.add(wrapper)
+  return wrapper
+}
 
 export function getTestData() {
   return [

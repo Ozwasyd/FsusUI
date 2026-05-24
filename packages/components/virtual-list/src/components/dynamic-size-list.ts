@@ -363,7 +363,7 @@ const DynamicSizeList = createList({
 
     nextTick(() => {
       void hydrateCacheWithEstimatedHeights(props, instance, cache).catch(() => {
-        // Fall back to the existing JS sizing path when WASM priming is unavailable.
+        throwError(SCOPE, 'WASM row-height priming failed.')
       })
     })
 

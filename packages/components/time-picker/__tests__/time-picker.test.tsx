@@ -5,6 +5,7 @@ import { clickActionButton, clickPickerCell } from '../../../test-utils/dom'
 import dayjs from 'dayjs'
 import triggerEvent from '@element-plus/test-utils/trigger-event'
 import { rAF } from '@element-plus/test-utils/tick'
+import defineGetter from '@element-plus/test-utils/define-getter'
 import { ElFormItem } from '@element-plus/components/form'
 import sleep from '@element-plus/test-utils/sleep'
 import TimePicker from '../src/time-picker'
@@ -19,9 +20,11 @@ const makeRange = (start: number, end: number) => {
 }
 
 const getSpinnerTextAsArray = (dom: ParentNode, selector: string) => {
-  return Array.prototype.slice
+  const values = Array.prototype.slice
     .call(dom.querySelectorAll(selector))
     .map((node: Node) => Number(node.textContent))
+
+  return Array.from(new Set(values))
 }
 
 afterEach(() => {
@@ -91,10 +94,10 @@ describe('TimePicker', () => {
     const secondsEl = list[2]
     const hourEl = hoursEl.querySelectorAll('.el-time-spinner__item')[4] as any
     const minuteEl = minutesEl.querySelectorAll(
-      '.el-time-spinner__item'
+      '.el-time-spinner__item',
     )[36] as any
     const secondEl = secondsEl.querySelectorAll(
-      '.el-time-spinner__item'
+      '.el-time-spinner__item',
     )[20] as any
     // click hour, minute, second one at a time.
     await clickPickerCell(hourEl)
@@ -105,9 +108,9 @@ describe('TimePicker', () => {
     await nextTick()
 
     const date = value.value as Date
-    expect(hourEl.classList.contains('is-active')).toBeTruthy()
-    expect(minuteEl.classList.contains('is-active')).toBeTruthy()
-    expect(secondEl.classList.contains('is-active')).toBeTruthy()
+    expect(getSpinnerTextAsArray(hoursEl, '.is-active')).toEqual([4])
+    expect(getSpinnerTextAsArray(minutesEl, '.is-active')).toEqual([36])
+    expect(getSpinnerTextAsArray(secondsEl, '.is-active')).toEqual([20])
     expect(date.getHours()).toBe(4)
     expect(date.getMinutes()).toBe(36)
     expect(date.getSeconds()).toBe(20)
@@ -122,7 +125,7 @@ describe('TimePicker', () => {
     input.trigger('focus')
     await nextTick()
     await clickActionButton(
-      document.querySelector('.el-time-panel__btn.cancel') as HTMLElement
+      document.querySelector('.el-time-panel__btn.cancel') as HTMLElement,
     )
 
     expect(value.value).toBe('')
@@ -130,7 +133,7 @@ describe('TimePicker', () => {
     input.trigger('focus')
     await nextTick()
     await clickActionButton(
-      document.querySelector('.el-time-panel__btn.confirm') as HTMLElement
+      document.querySelector('.el-time-panel__btn.confirm') as HTMLElement,
     )
     expect(value.value).toBeInstanceOf(Date)
   })
@@ -152,10 +155,10 @@ describe('TimePicker', () => {
     const secondsEl = list[2]
     const hourEl = hoursEl.querySelectorAll('.el-time-spinner__item')[4] as any
     const minuteEl = minutesEl.querySelectorAll(
-      '.el-time-spinner__item'
+      '.el-time-spinner__item',
     )[36] as any
     const secondEl = secondsEl.querySelectorAll(
-      '.el-time-spinner__item'
+      '.el-time-spinner__item',
     )[20] as any
     await clickPickerCell(hourEl)
     await nextTick()
@@ -166,7 +169,7 @@ describe('TimePicker', () => {
 
     // click confirm button
     await clickActionButton(
-      document.querySelector('.el-time-panel__btn.confirm') as HTMLElement
+      document.querySelector('.el-time-panel__btn.confirm') as HTMLElement,
     )
     const date = value.value
     expect(date.getHours()).toBe(4)
@@ -178,7 +181,7 @@ describe('TimePicker', () => {
     input.trigger('focus')
     await nextTick()
     await clickActionButton(
-      document.querySelector('.el-time-panel__btn.cancel') as HTMLElement
+      document.querySelector('.el-time-panel__btn.cancel') as HTMLElement,
     )
     expect(date.getHours()).toBe(4)
     expect(date.getMinutes()).toBe(36)
@@ -200,6 +203,260 @@ describe('TimePicker', () => {
     const secondsDom = spinnerDom[2]
     expect(minutesDom).not.toBeUndefined()
     expect(secondsDom).toBeUndefined()
+  })
+
+  it('does not reset spinner scroll position on mousemove', async () => {
+    const value = ref(new Date(2016, 9, 10, 18, 40))
+    const wrapper = mount(() => <TimePicker v-model={value.value} />)
+
+    const input = wrapper.find('input')
+    await input.trigger('focus')
+    await nextTick()
+    await rAF()
+    await rAF()
+
+    const spinner = document.querySelector<HTMLElement>(
+      '.el-time-spinner__wrapper',
+    )!
+    const scrollWrap = spinner.querySelector<HTMLElement>(
+      '.el-scrollbar__wrap',
+    )!
+    let scrollTop = 0
+    let scrollWrites = 0
+    Object.defineProperty(scrollWrap, 'scrollTop', {
+      configurable: true,
+      get: () => scrollTop,
+      set: (value) => {
+        scrollWrites += 1
+        scrollTop = Number(value)
+      },
+    })
+
+    spinner.dispatchEvent(new MouseEvent('mousemove', { bubbles: true }))
+    spinner.dispatchEvent(new MouseEvent('mousemove', { bubbles: true }))
+    spinner.dispatchEvent(new MouseEvent('mousemove', { bubbles: true }))
+
+    expect(scrollWrites).toBe(0)
+    await rAF()
+    expect(scrollWrites).toBe(0)
+  })
+
+  it('coalesces spinner scroll changes into one animation frame', async () => {
+    const value = ref(new Date(2016, 9, 10, 18, 40))
+    const wrapper = mount(() => <TimePicker v-model={value.value} />)
+
+    const input = wrapper.find('input')
+    await input.trigger('focus')
+    await nextTick()
+    await rAF()
+    await rAF()
+
+    const spinner = document.querySelector<HTMLElement>(
+      '.el-time-spinner__wrapper',
+    )!
+    const scrollWrap = spinner.querySelector<HTMLElement>(
+      '.el-scrollbar__wrap',
+    )!
+    const firstItem = spinner.querySelector<HTMLElement>(
+      '.el-time-spinner__item',
+    )!
+    firstItem.style.height = '32px'
+
+    scrollWrap.scrollTop = 32 * (2 * 24 + 19)
+    scrollWrap.dispatchEvent(new Event('scroll'))
+    scrollWrap.scrollTop = 32 * (2 * 24 + 20)
+    scrollWrap.dispatchEvent(new Event('scroll'))
+    scrollWrap.scrollTop = 32 * (2 * 24 + 21)
+    scrollWrap.dispatchEvent(new Event('scroll'))
+
+    expect(value.value.getHours()).toBe(18)
+    await rAF()
+    await nextTick()
+    expect(
+      spinner.querySelector<HTMLElement>('.el-time-spinner__item.is-active')
+        ?.textContent,
+    ).toBe('21')
+    expect(value.value.getHours()).toBe(18)
+
+    await sleep(360)
+    await rAF()
+    expect(value.value.getHours()).toBe(21)
+  })
+
+  it('smooths spinner wheel scroll over animation frames', async () => {
+    const value = ref(new Date(2016, 9, 10, 18, 40))
+    const wrapper = mount(() => <TimePicker v-model={value.value} />)
+
+    const input = wrapper.find('input')
+    await input.trigger('focus')
+    await nextTick()
+    await rAF()
+    await rAF()
+
+    const spinner = document.querySelector<HTMLElement>(
+      '.el-time-spinner__wrapper',
+    )!
+    const scrollWrap = spinner.querySelector<HTMLElement>(
+      '.el-scrollbar__wrap',
+    )!
+    const firstItem = spinner.querySelector<HTMLElement>(
+      '.el-time-spinner__item',
+    )!
+    firstItem.style.height = '32px'
+
+    const scrollHeightRestore = defineGetter(scrollWrap, 'scrollHeight', 6000)
+    const clientHeightRestore = defineGetter(scrollWrap, 'clientHeight', 192)
+    let scrollTop = 32 * (3 * 24 + 18)
+    Object.defineProperty(scrollWrap, 'scrollTop', {
+      configurable: true,
+      get: () => scrollTop,
+      set: (value) => {
+        scrollTop = Number(value)
+      },
+    })
+
+    const prevented = !scrollWrap.dispatchEvent(
+      new WheelEvent('wheel', {
+        bubbles: true,
+        cancelable: true,
+        deltaY: 120,
+      }),
+    )
+
+    expect(prevented).toBe(true)
+    expect(scrollTop).toBe(32 * (3 * 24 + 18))
+
+    await rAF()
+    expect(scrollTop).toBeGreaterThan(32 * (3 * 24 + 18))
+    expect(scrollTop).toBeLessThan(32 * (3 * 24 + 18) + 32)
+
+    scrollHeightRestore()
+    clientHeightRestore()
+  })
+
+  it('marks spinner recenter scrolls as silent', async () => {
+    const value = ref(new Date(2016, 9, 10, 18, 40))
+    const wrapper = mount(() => <TimePicker v-model={value.value} />)
+
+    const input = wrapper.find('input')
+    await input.trigger('focus')
+    await nextTick()
+    await rAF()
+    await rAF()
+
+    const spinner = document.querySelector<HTMLElement>(
+      '.el-time-spinner__wrapper',
+    )!
+    const scrollWrap = spinner.querySelector<HTMLElement>(
+      '.el-scrollbar__wrap',
+    )!
+    const firstItem = spinner.querySelector<HTMLElement>(
+      '.el-time-spinner__item',
+    )!
+    firstItem.style.height = '32px'
+
+    let scrollTop = 0
+    const scrollWrites: Array<{ silent?: string; value: number }> = []
+    Object.defineProperty(scrollWrap, 'scrollTop', {
+      configurable: true,
+      get: () => scrollTop,
+      set: (value) => {
+        scrollTop = Number(value)
+        scrollWrites.push({
+          silent: scrollWrap.dataset.fsusSilentScroll,
+          value: scrollTop,
+        })
+      },
+    })
+
+    const cycleCount =
+      spinner.querySelectorAll('.el-time-spinner__item').length / 24
+    const middleCycle = Math.floor(cycleCount / 2)
+    const edgeCycle = cycleCount - 1
+
+    scrollWrap.scrollTop = 32 * (edgeCycle * 24 + 13)
+    scrollWrap.dispatchEvent(new Event('scroll'))
+    await rAF()
+    await nextTick()
+    expect(
+      spinner.querySelector<HTMLElement>('.el-time-spinner__item.is-active')
+        ?.textContent,
+    ).toBe('13')
+    expect(value.value.getHours()).toBe(18)
+
+    await sleep(360)
+    await rAF()
+    expect(value.value.getHours()).toBe(13)
+    expect(scrollWrites).toContainEqual({
+      silent: 'true',
+      value: 32 * (middleCycle * 24 + 13),
+    })
+  })
+
+  it('keeps spinner buffer position while safely away from edges', async () => {
+    const value = ref(new Date(2016, 9, 10, 18, 40))
+    const wrapper = mount(() => <TimePicker v-model={value.value} />)
+
+    const input = wrapper.find('input')
+    await input.trigger('focus')
+    await nextTick()
+    await rAF()
+    await rAF()
+
+    const spinner = document.querySelector<HTMLElement>(
+      '.el-time-spinner__wrapper',
+    )!
+    const scrollWrap = spinner.querySelector<HTMLElement>(
+      '.el-scrollbar__wrap',
+    )!
+    const firstItem = spinner.querySelector<HTMLElement>(
+      '.el-time-spinner__item',
+    )!
+    firstItem.style.height = '32px'
+
+    const cycleCount =
+      spinner.querySelectorAll('.el-time-spinner__item').length / 24
+    const middleCycle = Math.floor(cycleCount / 2)
+    const safeCycle = middleCycle + 1
+    const middleTarget = 32 * (middleCycle * 24 + 13)
+    const safeTarget = 32 * (safeCycle * 24 + 13)
+
+    let scrollTop = 0
+    const scrollWrites: Array<{ silent?: string; value: number }> = []
+    Object.defineProperty(scrollWrap, 'scrollTop', {
+      configurable: true,
+      get: () => scrollTop,
+      set: (value) => {
+        scrollTop = Number(value)
+        scrollWrites.push({
+          silent: scrollWrap.dataset.fsusSilentScroll,
+          value: scrollTop,
+        })
+      },
+    })
+
+    scrollWrap.scrollTop = safeTarget + 12
+    scrollWrites.length = 0
+    scrollWrap.dispatchEvent(new Event('scroll'))
+    await rAF()
+    await nextTick()
+    expect(
+      spinner.querySelector<HTMLElement>('.el-time-spinner__item.is-active')
+        ?.textContent,
+    ).toBe('13')
+    expect(value.value.getHours()).toBe(18)
+
+    await sleep(360)
+    await rAF()
+
+    expect(value.value.getHours()).toBe(13)
+    expect(scrollWrites).toContainEqual({
+      silent: 'true',
+      value: safeTarget,
+    })
+    expect(scrollWrites.some((write) => write.value === middleTarget)).toBe(
+      false,
+    )
   })
 
   it('event change, focus, blur, keydown', async () => {
@@ -244,7 +501,7 @@ describe('TimePicker', () => {
     await nextTick()
     expect(changeHandler).toHaveBeenCalledTimes(0)
     await clickActionButton(
-      document.querySelector('.el-time-panel__btn.confirm') as HTMLElement
+      document.querySelector('.el-time-panel__btn.confirm') as HTMLElement,
     )
     await nextTick()
     await nextTick() // onchange is triggered by props.modelValue update
@@ -315,11 +572,11 @@ describe('TimePicker', () => {
     await nextTick()
     const enabledMinutes = getSpinnerTextAsArray(
       minutesEl,
-      ':not(.is-disabled)'
+      ':not(.is-disabled)',
     )
     const enabledSeconds = getSpinnerTextAsArray(
       secondsEl,
-      ':not(.is-disabled)'
+      ':not(.is-disabled)',
     )
     expect(enabledMinutes).toEqual([0])
     expect(enabledSeconds).toEqual([0])
@@ -426,7 +683,7 @@ describe('TimePicker', () => {
     await input.trigger('mousedown')
     await nextTick()
     expect((wrapper.findComponent(Picker).vm as any).pickerVisible).toEqual(
-      false
+      false,
     )
   })
 
@@ -437,7 +694,7 @@ describe('TimePicker', () => {
     await input.trigger('mousedown')
     await nextTick()
     expect((wrapper.findComponent(Picker).vm as any).pickerVisible).toEqual(
-      false
+      false,
     )
   })
 
@@ -456,7 +713,7 @@ describe('TimePicker', () => {
       ),
       {
         attachTo: document.body,
-      }
+      },
     )
     const input = wrapper.find('input')
     input.trigger('focus')
@@ -468,7 +725,7 @@ describe('TimePicker', () => {
 
     expect(activeHours).toEqual(20)
     const hoursElWrapperList = document.querySelectorAll(
-      '.el-time-spinner__wrapper'
+      '.el-time-spinner__wrapper',
     )
     const hoursElWrapper = hoursElWrapperList[0]
     const hoursElArrowDown: Element | null =
@@ -507,7 +764,7 @@ describe('TimePicker(range)', () => {
       () => <TimePicker v-model={value.value} size="small" is-range={true} />,
       {
         attachTo: document.body,
-      }
+      },
     )
 
     expect(wrapper.find('.el-range-editor--small').exists()).toBeTruthy()
@@ -518,7 +775,7 @@ describe('TimePicker(range)', () => {
     // For skipping Transition animation
     await rAF()
     const list = document.querySelectorAll(
-      '.el-time-spinner__list .el-time-spinner__item.is-active'
+      '.el-time-spinner__list .el-time-spinner__item.is-active',
     )
 
     ;['18', '40', '00', '19', '40', '00'].forEach((_, i) => {
@@ -542,7 +799,7 @@ describe('TimePicker(range)', () => {
       ),
       {
         attachTo: document.body,
-      }
+      },
     )
 
     const input = wrapper.find('input')
@@ -552,7 +809,7 @@ describe('TimePicker(range)', () => {
     // For skipping Transition animation
     await rAF()
     const list = document.querySelectorAll(
-      '.el-time-spinner__list .el-time-spinner__item.is-active'
+      '.el-time-spinner__list .el-time-spinner__item.is-active',
     )
 
     ;['10', '20', '00', '11', '10', '00'].forEach((_, i) => {
@@ -578,20 +835,20 @@ describe('TimePicker(range)', () => {
     // For skipping Transition animation
     await rAF()
     await clickActionButton(
-      document.querySelector('.el-time-panel__btn.cancel') as HTMLElement
+      document.querySelector('.el-time-panel__btn.cancel') as HTMLElement,
     )
     await rAF()
 
     expect(value.value).toEqual(cancelDates)
     expect((wrapper.findComponent(Picker).vm as any).pickerVisible).toEqual(
-      false
+      false,
     )
     expect(document.querySelector('.el-picker-panel')).toBeNull()
     input.trigger('blur')
     input.trigger('focus')
     await nextTick()
     await clickActionButton(
-      document.querySelector('.el-time-panel__btn.confirm') as HTMLElement
+      document.querySelector('.el-time-panel__btn.confirm') as HTMLElement,
     )
     expect(Array.isArray(value.value)).toBeTruthy()
     value.value.forEach((v: unknown) => {
@@ -649,22 +906,22 @@ describe('TimePicker(range)', () => {
     const leftHoursEl = list[0]
     const leftEndbledHours = getSpinnerTextAsArray(
       leftHoursEl,
-      ':not(.is-disabled)'
+      ':not(.is-disabled)',
     )
     expect(leftEndbledHours).toEqual([8, 9, 10, 11, 12])
     const rightHoursEl = list[3]
     const rightEndbledHours = getSpinnerTextAsArray(
       rightHoursEl,
-      ':not(.is-disabled)'
+      ':not(.is-disabled)',
     )
     expect(rightEndbledHours).toEqual([11, 12, 13, 14, 15, 16])
     await clickPickerCell(
-      leftHoursEl.querySelectorAll('.el-time-spinner__item')[12] as HTMLElement
+      leftHoursEl.querySelectorAll('.el-time-spinner__item')[12] as HTMLElement,
     )
     await nextTick()
     const NextRightEndbledHours = getSpinnerTextAsArray(
       rightHoursEl,
-      ':not(.is-disabled)'
+      ':not(.is-disabled)',
     )
     expect(NextRightEndbledHours).toEqual([12, 13, 14, 15, 16])
   })
@@ -714,13 +971,13 @@ describe('TimePicker(range)', () => {
             }
           },
         },
-      }
+      },
     )
 
     await nextTick()
 
     expect((wrapper.findComponent(Picker).vm as any).elPopperOptions).toEqual(
-      ElPopperOptions
+      ElPopperOptions,
     )
   })
 
@@ -740,7 +997,7 @@ describe('TimePicker(range)', () => {
       ),
       {
         attachTo: document.body,
-      }
+      },
     )
 
     const input = wrapper.find('input')
@@ -754,17 +1011,17 @@ describe('TimePicker(range)', () => {
     expect(
       list[0]
         .querySelector('.el-time-spinner__item.is-active')
-        .innerHTML.split(' ').length
+        .innerHTML.split(' ').length,
     ).toBe(2)
     expect(
       list[1]
         .querySelector('.el-time-spinner__item.is-active')
-        .innerHTML.split(' ').length
+        .innerHTML.split(' ').length,
     ).toBe(1)
     expect(
       list[2]
         .querySelector('.el-time-spinner__item.is-active')
-        .innerHTML.split(' ').length
+        .innerHTML.split(' ').length,
     ).toBe(1)
   })
 
@@ -782,7 +1039,7 @@ describe('TimePicker(range)', () => {
       const timePickerInput = wrapper.find('.el-input__inner')
       expect(formItem.attributes().role).toBeFalsy()
       expect(formItemLabel.attributes().for).toBe(
-        timePickerInput.attributes().id
+        timePickerInput.attributes().id,
       )
     })
 
@@ -800,7 +1057,7 @@ describe('TimePicker(range)', () => {
       expect(formItem.attributes().role).toBeFalsy()
       expect(timePickerInput.attributes().id).toBe('foobar')
       expect(formItemLabel.attributes().for).toBe(
-        timePickerInput.attributes().id
+        timePickerInput.attributes().id,
       )
     })
 

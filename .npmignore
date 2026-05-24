@@ -1,0 +1,5 @@
+# This repository root is private and should not be published directly.
+*
+!README.md
+!LICENSE
+!package.json

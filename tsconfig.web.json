@@ -3,7 +3,16 @@
   "compilerOptions": {
     "jsx": "preserve",
     "jsxImportSource": "vue",
-    "lib": ["ES2022", "ES2022.Array", "ES2022.Error", "ES2022.Object", "ES2022.String", "DOM", "DOM.Iterable", "DOM.AsyncIterable"],
+    "lib": [
+      "ES2022",
+      "ES2022.Array",
+      "ES2022.Error",
+      "ES2022.Object",
+      "ES2022.String",
+      "DOM",
+      "DOM.Iterable",
+      "DOM.AsyncIterable"
+    ],
     "types": [],
     "composite": false,
     "skipLibCheck": true,
@@ -14,7 +23,12 @@
     "target": 3.5,
     "strictTemplates": true
   },
-  "include": ["packages", "typings/components.d.ts", "typings/env.d.ts"],
+  "include": [
+    "packages",
+    "typings/components.d.ts",
+    "typings/env.d.ts",
+    "typings/vite-worker.d.ts"
+  ],
   "exclude": [
     "node_modules",
     "**/dist",

@@ -53,6 +53,7 @@ import { ElImageViewer } from '@element-plus/components/image-viewer'
 import { ElInput } from '@element-plus/components/input'
 import { ElInputNumber } from '@element-plus/components/input-number'
 import { ElLink } from '@element-plus/components/link'
+import { ElMarkdownRenderer } from '@element-plus/components/markdown-renderer'
 import {
   ElMenu,
   ElMenuItem,
@@ -106,7 +107,7 @@ import { ElWatermark } from '@element-plus/components/watermark'
 
 import type { Plugin } from 'vue'
 
-export default [
+export const allComponents = [
   ElAffix,
   ElAlert,
   ElAutocomplete,
@@ -157,6 +158,7 @@ export default [
   ElInput,
   ElInputNumber,
   ElLink,
+  ElMarkdownRenderer,
   ElMenu,
   ElMenuItem,
   ElMenuItemGroup,
@@ -207,3 +209,49 @@ export default [
   ElUpload,
   ElWatermark,
 ] as Plugin[]
+
+export const coreComponents = [
+  ElButton,
+  ElButtonGroup,
+  ElConfigProvider,
+  ElIcon,
+  ElInput,
+  ElOption,
+  ElOptionGroup,
+  ElSelect,
+  ElScrollbar,
+  ElSpace,
+  ElMarkdownRenderer,
+  ElText,
+] as Plugin[]
+
+export const advancedComponents = [
+  ElAutoResizer,
+  ElCascader,
+  ElCascaderPanel,
+  ElDatePicker,
+  ElTable,
+  ElTableColumn,
+  ElTableV2,
+  ElTimePicker,
+  ElTransfer,
+  ElTree,
+  ElTreeSelect,
+  ElTreeV2,
+  ElUpload,
+  ElWatermark,
+] as Plugin[]
+
+export const optionalComponents = allComponents.filter(
+  (component) =>
+    !coreComponents.includes(component) &&
+    !advancedComponents.includes(component),
+)
+
+export const componentGroups = {
+  core: coreComponents,
+  optional: optionalComponents,
+  advanced: advancedComponents,
+} as const
+
+export default allComponents

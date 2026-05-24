@@ -20,7 +20,6 @@
       trigger="click"
       :transition="`${nsSelect.namespace.value}-zoom-in-top`"
       :stop-popper-mouse-event="false"
-      :gpu-acceleration="false"
       :persistent="persistent"
       @show="handleMenuEnter"
     >
@@ -414,7 +413,7 @@ export default defineComponent({
      */
     popperOptions: {
       type: Object as PropType<Partial<Options>>,
-      default: () => ({} as Partial<Options>),
+      default: () => ({}) as Partial<Options>,
     },
     /**
      * @description whether options are loaded from server
@@ -694,7 +693,7 @@ export default defineComponent({
         'empty',
         !props.allowCreate &&
           Boolean(unref(query)) &&
-          unref(filteredOptionsCount) === 0
+          unref(filteredOptionsCount) === 0,
       ),
     ])
 
@@ -732,7 +731,7 @@ export default defineComponent({
         setSelected,
         queryChange,
         groupQueryChange,
-      }) as unknown as SelectContext
+      }) as unknown as SelectContext,
     )
 
     onMounted(() => {
@@ -758,7 +757,7 @@ export default defineComponent({
           const prefix = refEl.querySelector(`.${nsInput.e('prefix')}`)
           prefixWidth.value = Math.max(
             prefix.getBoundingClientRect().width + 11,
-            30
+            30,
           )
         }
       })

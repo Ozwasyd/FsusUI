@@ -5,7 +5,10 @@
         v-for="item in spinnerItems"
         :key="item"
         :ref="(scrollbar: unknown) => setRef(scrollbar as any, item)"
-        :class="ns.be('spinner', 'wrapper')"
+        :class="[
+          ns.be('spinner', 'wrapper'),
+          ns.is('scrolling', scrollingTypes[item]),
+        ]"
         wrap-style="max-height: inherit;"
         :view-class="ns.be('spinner', 'list')"
         noresize
@@ -13,21 +16,32 @@
         v-on="getScrollbarEvents(item)"
       >
         <li
-          v-for="(disabled, key) in timeList[item]"
-          :key="key"
+          v-for="option in circularTimeList[item]"
+          :key="`${option.cycle}-${option.value}`"
           :class="[
             ns.be('spinner', 'item'),
-            ns.is('active', key === timePartials[item]),
-            ns.is('disabled', disabled),
+            ns.is(
+              'active',
+              option.value === timePartials[item] &&
+                option.cycle === activeCycles[item],
+            ),
+            ns.is('disabled', option.disabled),
           ]"
-          @click="handleClick(item, { value: key, disabled })"
+          v-bind="{
+            'data-time-value': option.value,
+            'data-time-cycle': option.cycle,
+          }"
+          @click="handleClick(item, option)"
         >
           <template v-if="item === 'hours'">
-            {{ ('0' + (amPmMode ? key % 12 || 12 : key)).slice(-2)
-            }}{{ getAmPmFlag(key) }}
+            {{
+              ('0' + (amPmMode ? option.value % 12 || 12 : option.value)).slice(
+                -2,
+              )
+            }}{{ getAmPmFlag(option.value) }}
           </template>
           <template v-else>
-            {{ ('0' + key).slice(-2) }}
+            {{ ('0' + option.value).slice(-2) }}
           </template>
         </li>
       </el-scrollbar>
@@ -77,13 +91,25 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, ref, unref, watch } from 'vue'
-import { debounce } from 'lodash-unified'
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  reactive,
+  ref,
+  unref,
+  watch,
+} from 'vue'
 import { vRepeatClick } from '@element-plus/directives'
 import ElScrollbar from '@element-plus/components/scrollbar'
 import ElIcon from '@element-plus/components/icon'
 import { ArrowDown, ArrowUp } from '@element-plus/icons-vue'
-import { useNamespace } from '@element-plus/hooks'
+import {
+  normalizeFsusWheelDelta,
+  useFsusMotionRuntime,
+  useNamespace,
+} from '@element-plus/hooks'
 import { getStyle } from '@element-plus/utils'
 import { timeUnits } from '../constants'
 import { buildTimeList } from '../utils'
@@ -99,11 +125,15 @@ const props = defineProps(basicTimeSpinnerProps)
 const emit = defineEmits(['change', 'select-range', 'set-option'])
 
 const ns = useNamespace('time')
+const motionRuntime = useFsusMotionRuntime()
+const circularSpinnerCycles = 7
+const circularSpinnerMiddleCycle = Math.floor(circularSpinnerCycles / 2)
+const circularSpinnerRecenterEdgeCycles = 0
 
 const { getHoursList, getMinutesList, getSecondsList } = getTimeLists(
   props.disabledHours,
   props.disabledMinutes,
-  props.disabledSeconds
+  props.disabledSeconds,
 )
 
 // data
@@ -118,19 +148,67 @@ const listRefsMap: Record<TimeUnit, Ref<ScrollbarInstance | undefined>> = {
   minutes: listMinutesRef,
   seconds: listSecondsRef,
 }
+const activeCycles = reactive<Record<TimeUnit, number>>({
+  hours: circularSpinnerMiddleCycle,
+  minutes: circularSpinnerMiddleCycle,
+  seconds: circularSpinnerMiddleCycle,
+})
+const scrollingTypes = reactive<Record<TimeUnit, boolean>>({
+  hours: false,
+  minutes: false,
+  seconds: false,
+})
+const resetScrollTimers: Partial<Record<TimeUnit, number>> = {}
+const pendingSpinnerScrolls: Partial<
+  Record<TimeUnit, { cycle: number; value: number }>
+> = {}
+const pendingScrollTypes: Partial<Record<TimeUnit, boolean>> = {}
+const programmaticScrollTypes: Partial<Record<TimeUnit, boolean>> = {}
+const itemHeightCache: Partial<Record<TimeUnit, number>> = {}
+const smoothWheelStates: Partial<
+  Record<TimeUnit, { current: number; target: number; frame: number }>
+> = {}
+const wheelHandlers: Partial<Record<TimeUnit, (event: WheelEvent) => void>> = {}
+let spinnerScrollFrame = 0
+let handleScrollFrame = 0
+let hasPendingDisplayChange = false
+let isFlushingDisplayChange = false
 
 // computed
 const spinnerItems = computed(() => {
   return props.showSeconds ? timeUnits : timeUnits.slice(0, 2)
 })
 
-const timePartials = computed<Record<TimeUnit, number>>(() => {
+const propTimePartials = computed<Record<TimeUnit, number>>(() => {
   const { spinnerDate } = props
   const hours = spinnerDate.hour()
   const minutes = spinnerDate.minute()
   const seconds = spinnerDate.second()
   return { hours, minutes, seconds }
 })
+
+const displayPartials = reactive<Record<TimeUnit, number>>({
+  hours: 0,
+  minutes: 0,
+  seconds: 0,
+})
+
+watch(
+  propTimePartials,
+  (nextPartials) => {
+    if (isScrolling) return
+    displayPartials.hours = nextPartials.hours
+    displayPartials.minutes = nextPartials.minutes
+    displayPartials.seconds = nextPartials.seconds
+  },
+  { immediate: true },
+)
+
+const timePartials = computed<Record<TimeUnit, number>>(() => ({
+  hours: displayPartials.hours,
+  minutes: displayPartials.minutes,
+  seconds: displayPartials.seconds,
+}))
 
 const timeList = computed(() => {
   const { hours, minutes } = unref(timePartials)
@@ -139,6 +217,49 @@ const timeList = computed(() => {
     minutes: getMinutesList(hours, props.role),
     seconds: getSecondsList(hours, minutes, props.role),
   }
+})
+
+const circularTimeList = computed<
+  Record<
+    TimeUnit,
+    Array<{
+      value: number
+      disabled: boolean
+      cycle: number
+    }>
+  >
+>(() => {
+  const result: Record<
+    TimeUnit,
+    Array<{
+      value: number
+      disabled: boolean
+      cycle: number
+    }>
+  > = {
+    hours: [],
+    minutes: [],
+    seconds: [],
+  }
+
+  for (const type of spinnerItems.value) {
+    const list = timeList.value[type]
+
+    result[type] = Array.from(
+      { length: list.length * circularSpinnerCycles },
+      (_, index) => {
+        const value = index % list.length
+
+        return {
+          value,
+          disabled: list[value],
+          cycle: Math.floor(index / list.length),
+        }
+      },
+    )
+  }
+
+  return result
 })
 
 const arrowControlTimeList = computed<Record<TimeUnit, TimeList>>(() => {
@@ -151,10 +272,20 @@ const arrowControlTimeList = computed<Record<TimeUnit, TimeList>>(() => {
   }
 })
 
-const debouncedResetScroll = debounce((type) => {
+const resetScroll = (type: TimeUnit) => {
   isScrolling = false
-  adjustCurrentSpinner(type)
-}, 200)
+  scrollingTypes[type] = false
+  alignCurrentSpinner(type)
+  flushDisplayChange()
+}
+
+const scheduleResetScroll = (type: TimeUnit) => {
+  window.clearTimeout(resetScrollTimers[type])
+  resetScrollTimers[type] = window.setTimeout(
+    () => resetScroll(type),
+    motionRuntime.value.scrollIdleMs || 200,
+  )
+}
 
 const getAmPmFlag = (hour: number) => {
   const shouldShowAmPm = !!props.amPmMode
@@ -190,9 +321,21 @@ const adjustCurrentSpinner = (type: TimeUnit) => {
   adjustSpinner(type, unref(timePartials)[type])
 }
 
+const shouldRecenterSpinner = (cycle: number) =>
+  cycle <= circularSpinnerRecenterEdgeCycles ||
+  cycle >= circularSpinnerCycles - circularSpinnerRecenterEdgeCycles - 1
+
+const resolveIdleAlignCycle = (type: TimeUnit) => {
+  const cycle = activeCycles[type]
+  return shouldRecenterSpinner(cycle) ? circularSpinnerMiddleCycle : cycle
+}
+
+const alignCurrentSpinner = (type: TimeUnit) => {
+  adjustSpinner(type, unref(timePartials)[type], resolveIdleAlignCycle(type))
+}
+
 const getScrollbarEvents = (type: TimeUnit) => ({
   mouseenter: () => emitSelectRange(type),
-  mousemove: () => adjustCurrentSpinner(type),
 })
 
 const adjustSpinners = () => {
@@ -204,22 +347,127 @@ const adjustSpinners = () => {
 const getScrollbarElement = (el: HTMLElement) =>
   el.querySelector(`.${ns.namespace.value}-scrollbar__wrap`) as HTMLElement
 
-const adjustSpinner = (type: TimeUnit, value: number) => {
+const getCycleSize = (type: TimeUnit) => unref(timeList)[type].length
+
+const positiveModulo = (value: number, total: number) => {
+  return ((value % total) + total) % total
+}
+
+const getCircularScrollTop = (type: TimeUnit, value: number, cycle: number) => {
+  return (cycle * getCycleSize(type) + value) * typeItemHeight(type)
+}
+
+const setActiveCycle = (type: TimeUnit, cycle: number) => {
+  activeCycles[type] = Math.max(0, Math.min(circularSpinnerCycles - 1, cycle))
+}
+
+const clearSpinnerScrollFrame = () => {
+  if (!spinnerScrollFrame) return
+  window.cancelAnimationFrame(spinnerScrollFrame)
+  spinnerScrollFrame = 0
+}
+
+const clearHandleScrollFrame = () => {
+  if (!handleScrollFrame) return
+  window.cancelAnimationFrame(handleScrollFrame)
+  handleScrollFrame = 0
+}
+
+const clearSmoothWheelFrame = (type: TimeUnit) => {
+  const state = smoothWheelStates[type]
+  if (!state?.frame) return
+  window.cancelAnimationFrame(state.frame)
+  state.frame = 0
+}
+
+const clearSmoothWheelState = (type: TimeUnit) => {
+  clearSmoothWheelFrame(type)
+  delete smoothWheelStates[type]
+}
+
+const markProgrammaticScroll = (type: TimeUnit) => {
+  programmaticScrollTypes[type] = true
+  const scrollbar = unref(listRefsMap[type])
+  const wrap = scrollbar?.$el ? getScrollbarElement(scrollbar.$el) : undefined
+  if (wrap) wrap.dataset.fsusSilentScroll = 'true'
+
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      programmaticScrollTypes[type] = false
+      if (wrap?.dataset.fsusSilentScroll === 'true') {
+        delete wrap.dataset.fsusSilentScroll
+      }
+    })
+  })
+}
+
+const writeSpinnerScroll = (
+  type: TimeUnit,
+  value: number,
+  cycle = circularSpinnerMiddleCycle,
+) => {
   if (props.arrowControl) return
   const scrollbar = unref(listRefsMap[type])
   if (scrollbar && scrollbar.$el) {
+    clearSmoothWheelState(type)
+    markProgrammaticScroll(type)
     getScrollbarElement(scrollbar.$el).scrollTop = Math.max(
       0,
-      value * typeItemHeight(type)
+      getCircularScrollTop(type, value, cycle),
     )
   }
 }
 
+const flushPendingSpinnerScrolls = () => {
+  clearSpinnerScrollFrame()
+  for (const type of spinnerItems.value) {
+    const pending = pendingSpinnerScrolls[type]
+    if (!pending) continue
+
+    delete pendingSpinnerScrolls[type]
+    writeSpinnerScroll(type, pending.value, pending.cycle)
+  }
+}
+
+const scheduleSpinnerScroll = (
+  type: TimeUnit,
+  value: number,
+  cycle = circularSpinnerMiddleCycle,
+) => {
+  setActiveCycle(type, cycle)
+  pendingSpinnerScrolls[type] = { cycle, value }
+
+  if (spinnerScrollFrame) return
+  if (typeof window.requestAnimationFrame !== 'function') {
+    flushPendingSpinnerScrolls()
+    return
+  }
+  spinnerScrollFrame = window.requestAnimationFrame(flushPendingSpinnerScrolls)
+}
+
+const adjustSpinner = (
+  type: TimeUnit,
+  value: number,
+  cycle = circularSpinnerMiddleCycle,
+) => {
+  if (props.arrowControl) return
+  scheduleSpinnerScroll(type, value, cycle)
+}
+
+const scheduleAdjustCurrentSpinner = (type: TimeUnit) => {
+  adjustSpinner(type, unref(timePartials)[type])
+}
+
 const typeItemHeight = (type: TimeUnit): number => {
+  const cached = itemHeightCache[type]
+  if (cached) return cached
+
   const scrollbar = unref(listRefsMap[type])
   const listItem = scrollbar?.$el.querySelector('li')
   if (listItem) {
-    return Number.parseFloat(getStyle(listItem, 'height')) || 0
+    const height = Number.parseFloat(getStyle(listItem, 'height')) || 0
+    if (height) itemHeightCache[type] = height
+    return height
   }
   return 0
 }
@@ -251,7 +499,7 @@ const findNextUnDisabled = (
   type: TimeUnit,
   now: number,
   step: number,
-  total: number
+  total: number,
 ) => {
   let next = (now + step + total) % total
   const list = unref(timeList)[type]
@@ -261,72 +509,204 @@ const findNextUnDisabled = (
   return next
 }
 
-const modifyDateField = (type: TimeUnit, value: number) => {
+const buildDisplayDate = () => {
+  const { hours, minutes, seconds } = displayPartials
+  return props.spinnerDate.hour(hours).minute(minutes).second(seconds)
+}
+
+const emitDisplayChange = () => {
+  isFlushingDisplayChange = true
+  emit('change', buildDisplayDate())
+  nextTick(() => {
+    isFlushingDisplayChange = false
+  })
+}
+
+const flushDisplayChange = () => {
+  if (!hasPendingDisplayChange) return
+  hasPendingDisplayChange = false
+  emitDisplayChange()
+}
+
+const modifyDateField = (
+  type: TimeUnit,
+  value: number,
+  { immediate = true } = {},
+) => {
   const list = unref(timeList)[type]
   const isDisabled = list[value]
   if (isDisabled) return
 
-  const { hours, minutes, seconds } = unref(timePartials)
+  displayPartials[type] = value
 
-  let changeTo
-  switch (type) {
-    case 'hours':
-      changeTo = props.spinnerDate.hour(value).minute(minutes).second(seconds)
-      break
-    case 'minutes':
-      changeTo = props.spinnerDate.hour(hours).minute(value).second(seconds)
-      break
-    case 'seconds':
-      changeTo = props.spinnerDate.hour(hours).minute(minutes).second(value)
-      break
+  if (immediate) {
+    hasPendingDisplayChange = false
+    emitDisplayChange()
+  } else {
+    hasPendingDisplayChange = true
   }
-  emit('change', changeTo)
 }
 
 const handleClick = (
   type: TimeUnit,
-  { value, disabled }: { value: number; disabled: boolean }
+  {
+    value,
+    disabled,
+    cycle = circularSpinnerMiddleCycle,
+  }: { value: number; disabled: boolean; cycle?: number },
 ) => {
   if (!disabled) {
     modifyDateField(type, value)
     emitSelectRange(type)
-    adjustSpinner(type, value)
+    adjustSpinner(type, value, cycle)
   }
 }
 
-const handleScroll = (type: TimeUnit) => {
-  isScrolling = true
-  debouncedResetScroll(type)
-  const value = Math.min(
-    Math.round(
-      (getScrollbarElement(unref(listRefsMap[type])!.$el).scrollTop -
-        (scrollBarHeight(type) * 0.5 - 10) / typeItemHeight(type) +
-        3) /
-        typeItemHeight(type)
-    ),
-    type === 'hours' ? 23 : 59
-  )
-  modifyDateField(type, value)
+const flushPendingScrollTypes = () => {
+  clearHandleScrollFrame()
+  for (const type of spinnerItems.value) {
+    if (!pendingScrollTypes[type]) continue
+    pendingScrollTypes[type] = false
+    handleScrollFrame = 0
+    commitScroll(type)
+  }
 }
 
-const scrollBarHeight = (type: TimeUnit) => {
-  return unref(listRefsMap[type])!.$el.offsetHeight
+const scheduleHandleScroll = (type: TimeUnit) => {
+  if (programmaticScrollTypes[type]) return
+
+  isScrolling = true
+  scrollingTypes[type] = true
+  pendingScrollTypes[type] = true
+  scheduleResetScroll(type)
+
+  if (handleScrollFrame) return
+  if (typeof window.requestAnimationFrame !== 'function') {
+    flushPendingScrollTypes()
+    return
+  }
+  handleScrollFrame = window.requestAnimationFrame(flushPendingScrollTypes)
+}
+
+const commitScroll = (type: TimeUnit) => {
+  const itemHeight = typeItemHeight(type)
+  if (!itemHeight) return
+
+  const scrollbarElement = getScrollbarElement(unref(listRefsMap[type])!.$el)
+  const cycleSize = getCycleSize(type)
+  const rawIndex = Math.round(scrollbarElement.scrollTop / itemHeight)
+  const value = positiveModulo(rawIndex, cycleSize)
+  const cycle = Math.floor(rawIndex / cycleSize)
+  const previousValue = unref(timePartials)[type]
+  setActiveCycle(type, cycle)
+  if (value !== previousValue) {
+    modifyDateField(type, value, { immediate: false })
+  }
+}
+
+const getMaxSpinnerScrollTop = (type: TimeUnit) => {
+  const scrollbar = unref(listRefsMap[type])
+  if (!scrollbar?.$el) return 0
+
+  const wrap = getScrollbarElement(scrollbar.$el)
+  return Math.max(0, wrap.scrollHeight - wrap.clientHeight)
+}
+
+const clampSpinnerScrollTop = (type: TimeUnit, value: number) =>
+  Math.min(getMaxSpinnerScrollTop(type), Math.max(0, value))
+
+const normalizeWheelDelta = (
+  type: TimeUnit,
+  event: WheelEvent,
+  wrap: HTMLElement,
+) =>
+  normalizeFsusWheelDelta(event.deltaY, {
+    deltaMode: event.deltaMode,
+    maxDiscreteDeltaPx: Math.max(24, Math.min(typeItemHeight(type), 40)),
+    viewportSizePx: wrap.clientHeight,
+  })
+
+const flushSmoothWheel = (type: TimeUnit) => {
+  const state = smoothWheelStates[type]
+  const scrollbar = unref(listRefsMap[type])
+  if (!state || !scrollbar?.$el) return
+
+  state.frame = 0
+  const wrap = getScrollbarElement(scrollbar.$el)
+  const distance = state.target - state.current
+  const next =
+    Math.abs(distance) <= 0.75 ? state.target : state.current + distance * 0.34
+
+  state.current = next
+  wrap.scrollTop = next
+
+  if (Math.abs(state.target - state.current) > 0.75) {
+    state.frame = window.requestAnimationFrame(() => flushSmoothWheel(type))
+  }
+}
+
+const scheduleSmoothWheel = (type: TimeUnit) => {
+  const state = smoothWheelStates[type]
+  if (!state || state.frame) return
+  state.frame = window.requestAnimationFrame(() => flushSmoothWheel(type))
+}
+
+const handleWheel = (type: TimeUnit, event: WheelEvent) => {
+  if (!motionRuntime.value.enabled || event.ctrlKey) return
+
+  const scrollbar = unref(listRefsMap[type])
+  if (!scrollbar?.$el) return
+
+  const wrap = getScrollbarElement(scrollbar.$el)
+  const delta = normalizeWheelDelta(type, event, wrap)
+  if (!delta) return
+
+  event.preventDefault()
+  const state =
+    smoothWheelStates[type] ||
+    (smoothWheelStates[type] = {
+      current: wrap.scrollTop,
+      target: wrap.scrollTop,
+      frame: 0,
+    })
+
+  if (!state.frame) {
+    state.current = wrap.scrollTop
+    state.target = wrap.scrollTop
+  }
+  state.target = clampSpinnerScrollTop(type, state.target + delta)
+  scheduleSmoothWheel(type)
 }
 
 const bindScrollEvent = () => {
   const bindFunction = (type: TimeUnit) => {
     const scrollbar = unref(listRefsMap[type])
     if (scrollbar && scrollbar.$el) {
-      getScrollbarElement(scrollbar.$el).onscroll = () => {
-        // TODO: scroll is emitted when set scrollTop programmatically
-        // should find better solutions in the future!
-        handleScroll(type)
-      }
+      const wrap = getScrollbarElement(scrollbar.$el)
+      wrap.onscroll = () => scheduleHandleScroll(type)
+      wrap.dataset.fsusCustomWheel = 'true'
+      wheelHandlers[type] = (event) => handleWheel(type, event)
+      wrap.addEventListener('wheel', wheelHandlers[type]!, { passive: false })
     }
   }
   bindFunction('hours')
   bindFunction('minutes')
   bindFunction('seconds')
+}
+
+const unbindScrollEvent = () => {
+  for (const type of timeUnits) {
+    const scrollbar = unref(listRefsMap[type])
+    const handler = wheelHandlers[type]
+    if (scrollbar?.$el) {
+      const wrap = getScrollbarElement(scrollbar.$el)
+      wrap.onscroll = null
+      delete wrap.dataset.fsusCustomWheel
+      if (handler) wrap.removeEventListener('wheel', handler)
+    }
+    clearSmoothWheelState(type)
+    delete wheelHandlers[type]
+  }
 }
 
 onMounted(() => {
@@ -340,6 +720,15 @@ onMounted(() => {
   })
 })
 
+onBeforeUnmount(() => {
+  for (const timer of Object.values(resetScrollTimers)) {
+    window.clearTimeout(timer)
+  }
+  unbindScrollEvent()
+  clearSpinnerScrollFrame()
+  clearHandleScrollFrame()
+})
+
 const setRef = (scrollbar: ScrollbarInstance, type: TimeUnit) => {
   listRefsMap[type].value = scrollbar
 }
@@ -350,8 +739,8 @@ emit('set-option', [`${props.role}_emitSelectRange`, emitSelectRange])
 watch(
   () => props.spinnerDate,
   () => {
-    if (isScrolling) return
+    if (isScrolling || isFlushingDisplayChange) return
     adjustSpinners()
-  }
+  },
 )
 </script>

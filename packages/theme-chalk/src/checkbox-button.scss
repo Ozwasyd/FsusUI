@@ -66,6 +66,16 @@
     position: absolute;
     margin: 0;
     z-index: -1;
+
+    &:focus-visible {
+      & + .#{$namespace}-checkbox-button__inner {
+        border-color: var(--fsus-scholarly-blue);
+        outline: none;
+        box-shadow: inset 0 0 0 1px var(--fsus-scholarly-blue);
+        border-radius: getCssVar('border-radius-base');
+        z-index: 2;
+      }
+    }
   }
 
   &.is-checked {

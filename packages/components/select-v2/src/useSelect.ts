@@ -5,7 +5,12 @@ import { get, isEqual, isNil, debounce as lodashDebounce } from 'lodash-unified'
 import { useResizeObserver } from '@vueuse/core'
 import { useLocale, useNamespace } from '@element-plus/hooks'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
-import { filterIndicesSync, warmupWasm } from '@element-plus/wasm'
+import {
+  createAsciiFilterIndex,
+  ensureWasmReady,
+  filterAsciiIndicesSync,
+  isWasmReady,
+} from '@element-plus/wasm'
 import {
   ValidateComponentsMap,
   debugWarn,
@@ -88,6 +93,26 @@ const useSelect = (props: ISelectProps, emit) => {
   const selectRef = ref(null)
   const selectionRef = ref(null) // tags ref
   const calculatorRef = ref<HTMLElement>(null)
+  const wasmFilterVersion = ref(0)
+  const wasmFilterError = ref<unknown>(null)
+  let wasmFilterReadyPromise: Promise<void> | null = null
+
+  const requestWasmFilterReady = () => {
+    if (wasmFilterReadyPromise) return
+    wasmFilterReadyPromise = ensureWasmReady()
+      .then((result) => {
+        wasmFilterReadyPromise = null
+        if (!result.ok) {
+          wasmFilterError.value = result.error
+          return
+        }
+        wasmFilterVersion.value++
+      })
+      .catch((error) => {
+        wasmFilterReadyPromise = null
+        wasmFilterError.value = error
+      })
+  }
 
   // the controller of the expanded popup
   const expanded = ref(false)
@@ -274,6 +299,11 @@ const useSelect = (props: ISelectProps, emit) => {
       hasOnlyAsciiFilterLabels.value
     )
   })
+  const wasmFilterIndex = computed(() =>
+    canUseWasmFilter.value
+      ? createAsciiFilterIndex(filterGroups.value.labels)
+      : null,
+  )
 
   // filteredOptions includes flatten the data into one dimensional array.
   const emptyText = computed(() => {
@@ -299,18 +329,26 @@ const useSelect = (props: ISelectProps, emit) => {
     }
 
     if (canUseWasmFilter.value) {
-      const matchedIndexes = filterIndicesSync(
-        filterGroups.value.labels,
+      void wasmFilterVersion.value
+      if (wasmFilterError.value) {
+        throw wasmFilterError.value
+      }
+
+      if (!isWasmReady()) {
+        requestWasmFilterReady()
+        return []
+      }
+
+      const matchedIndexes = filterAsciiIndicesSync(
+        wasmFilterIndex.value!,
         states.inputValue,
         false,
       )
 
-      if (matchedIndexes) {
-        return buildFilteredOptions(
-          filterGroups.value.groups,
-          new Set(matchedIndexes),
-        )
-      }
+      return buildFilteredOptions(
+        filterGroups.value.groups,
+        new Set(matchedIndexes),
+      )
     }
 
     return filterOptionsWithQuery(filterSourceOptions.value, states.inputValue)
@@ -904,7 +942,7 @@ const useSelect = (props: ISelectProps, emit) => {
     canUseWasmFilter,
     (useWasm) => {
       if (useWasm) {
-        warmupWasm()
+        requestWasmFilterReady()
       }
     },
     {

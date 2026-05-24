@@ -1,11 +1,15 @@
 import MessageBox from './src/messageBox'
 
 import type { App } from 'vue'
-import type { SFCWithInstall } from '@element-plus/utils'
+import {
+  registerFsusRenderPipelineComponentPolicyByName,
+  type SFCWithInstall,
+} from '@element-plus/utils'
 
 const _MessageBox = MessageBox as SFCWithInstall<typeof MessageBox>
 
 _MessageBox.install = (app: App) => {
+  registerFsusRenderPipelineComponentPolicyByName('ElMessageBox')
   _MessageBox._context = app._context
   app.config.globalProperties.$msgbox = _MessageBox
   app.config.globalProperties.$messageBox = _MessageBox

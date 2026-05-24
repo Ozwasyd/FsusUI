@@ -19,27 +19,64 @@
 - 若你的目标浏览器/运行环境低于 ES2022（例如需要兼容更老浏览器），需要在业务侧自行做更强的转译与 polyfill 策略；本仓库不承诺提供向下兼容输出。
 - 根 `package.json` 对开发环境要求：`node >= 22`、`pnpm >= 10`（用于构建与仓库内联调，不等同于业务运行时要求）。
 
-### A2. 安装与入口（命名并存）
+### A2. 安装与入口（发布名 vs 源码名）
 
-当前对外主入口包仍为 `element-plus`（仓库名为 `FsusUI`，但包命名体系尚未整体切换）。
+当前对外 GitHub Packages 主包为 `@ozwasyd/element-plus`。仓库内部源码主入口仍位于 `packages/element-plus`，源码包名保持 `element-plus`，两者不要混用。
 
-- 整包安装入口：`element-plus`
-- 主题包：`@element-plus/theme-chalk`
-- 图标包：`@element-plus/icons-vue`
-- WASM 包：`@element-plus/wasm`（可选性能层）
+- 业务项目整包安装入口：`@ozwasyd/element-plus`
+- 全局类型入口：`@ozwasyd/element-plus/global`
+- 语言包子路径：`@ozwasyd/element-plus/es/locale/lang/*`
+- 业务项目通常不需要单独安装 theme / wasm 工作区包，优先直接消费主包工件
 
 ### A3. 样式引入建议（业务侧）
 
 业务侧优先按“发布产物”方式引入样式（而不是照搬仓库联调用的源码态 SCSS）：
 
-- 推荐：`element-plus/dist/index.css`（来自 `packages/element-plus/package.json` 的 `style: dist/index.css`）
-- 可选：`@element-plus/theme-chalk/index.css`（主题包入口，适用于显式依赖主题包的场景）
+- 推荐：`@ozwasyd/element-plus/dist/index.css`（主包内的发布样式入口）
 
 不推荐在业务项目中直接引入：
 
-- `@element-plus/theme-chalk/src/index.scss`
+- `@ozwasyd/element-plus/theme-chalk/src/index.scss`
 
 原因：这是仓库联调友好的源码态入口，业务侧是否具备一致的 SCSS 构建、变量/路径解析与副作用配置不确定。
+
+### A3.1. 暗色模式接入（业务侧）
+
+FsusUI 当前主题包已经内置明暗 token 和 `prefers-color-scheme` 自适应，所以：
+
+- 只要引入主题 CSS，就已经具备“跟随系统”的基础能力
+- 如果业务侧要持久化用户主题选择，建议在安装时显式传入 `themeMode`
+
+```ts
+app.use(ElementPlus, {
+  themeMode: 'system',
+})
+```
+
+或在根部使用：
+
+```vue
+<el-config-provider :theme-mode="themeMode">
+  <App />
+</el-config-provider>
+```
+
+接入侧需要了解的真实行为：
+
+- `themeMode: 'dark'` 会写入 `html.dark`
+- `themeMode: 'light'` 会写入 `html.light`
+- `themeMode: 'system'` 不强制写 class，而是保留系统媒体查询切换，并同步 `data-theme-resolved`
+
+如果你要写“仅暗色态”自定义 CSS，推荐命中：
+
+```css
+html.dark,
+html[data-theme-resolved='dark'] {
+  /* your overrides */
+}
+```
+
+这样既兼容显式 dark，也兼容 system 模式下解析出的暗色态。
 
 ### A4. WASM 注意事项（业务侧）
 

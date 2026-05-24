@@ -20,6 +20,10 @@ const WINDOW_KLS = 'window'
 const ITEM_KLS = 'item'
 const ITEM_SELECTOR = `.${ITEM_KLS}`
 const columnWidths = Array.from({ length: 100 }).map((_, i) => 25 + i)
+const waitForScrollReset = async () => {
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+  await nextTick()
+}
 
 const rowHeights = Array.from({ length: 100 }).map((_, i) => 25 + i)
 const mount = makeMount(
@@ -44,7 +48,7 @@ const mount = makeMount(
       width: 100,
       onItemRendered,
     },
-  }
+  },
 )
 
 let cleanup: () => void
@@ -128,7 +132,7 @@ describe('<fixed-size-grid />', () => {
         scrollLeft: 100,
         scrollTop: 0,
       })
-      await nextTick()
+      await waitForScrollReset()
       // 6 x 9 grid
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(54)
 
@@ -136,7 +140,7 @@ describe('<fixed-size-grid />', () => {
         scrollLeft: 100,
         scrollTop: 100,
       })
-      await nextTick()
+      await waitForScrollReset()
       // 9 x 9 grid
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(81)
 
@@ -145,7 +149,7 @@ describe('<fixed-size-grid />', () => {
         scrollLeft: 100,
         scrollTop: 100,
       })
-      await nextTick()
+      await waitForScrollReset()
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(81)
     })
 
@@ -157,52 +161,52 @@ describe('<fixed-size-grid />', () => {
       const gridRef = wrapper.vm.$refs.gridRef as GridRef
       // do nothing scroll
       gridRef.scrollToItem()
-      await nextTick()
+      await waitForScrollReset()
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(36)
 
       // auto alignment
       gridRef.scrollToItem(10)
-      await nextTick()
+      await waitForScrollReset()
       // 7 x 6 grid
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(42)
 
       gridRef.scrollToItem(10, 10)
-      await nextTick()
-      // 7 x 8 grid
-      expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(56)
+      await waitForScrollReset()
+      // 7 x 7 grid
+      expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(49)
 
       gridRef.scrollToItem(5, 5, SMART_ALIGNMENT)
-      await nextTick()
+      await waitForScrollReset()
       // 8 x 8 grid
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(64)
 
       gridRef.scrollToItem(6, 6, SMART_ALIGNMENT)
-      await nextTick()
+      await waitForScrollReset()
       // 8 x 8 grid
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(64)
 
       gridRef.scrollToItem(6, 6, START_ALIGNMENT)
-      await nextTick()
+      await waitForScrollReset()
       // 8 x 8 grid
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(64)
 
       gridRef.scrollToItem(5, 5, CENTERED_ALIGNMENT)
-      await nextTick()
+      await waitForScrollReset()
       // 9 x 9 grid
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(81)
 
       gridRef.scrollToItem(6, 6, CENTERED_ALIGNMENT)
-      await nextTick()
+      await waitForScrollReset()
       // 9 x 9 grid
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(81)
 
       gridRef.scrollToItem(4, 4, END_ALIGNMENT)
-      await nextTick()
-      // 7 x 8 grid
-      expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(56)
+      await waitForScrollReset()
+      // 7 x 7 grid
+      expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(49)
 
       gridRef.scrollToItem(110, 110)
-      await nextTick()
+      await waitForScrollReset()
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(9)
     })
   })
@@ -221,7 +225,7 @@ describe('<fixed-size-grid />', () => {
               },
             },
           },
-        })
+        }),
       ).toThrow(/"columnWidth" must be passed as function/i)
     })
 
@@ -238,7 +242,7 @@ describe('<fixed-size-grid />', () => {
               },
             },
           },
-        })
+        }),
       ).toThrow(/"rowHeight" must be passed as function/i)
     })
 

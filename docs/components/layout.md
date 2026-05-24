@@ -47,7 +47,7 @@
 引入 CSS 后可使用响应式隐藏类：
 
 ```ts
-import 'element-plus/theme-chalk/display.css'
+import '@ozwasyd/element-plus/theme-chalk/display.css'
 ```
 
 可用类名：`hidden-xs-only`、`hidden-sm-only`、`hidden-sm-and-down`、`hidden-sm-and-up`、`hidden-md-only`、`hidden-md-and-down`、`hidden-md-and-up`、`hidden-lg-only`、`hidden-lg-and-down`、`hidden-lg-and-up`、`hidden-xl-only`

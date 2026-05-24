@@ -1,8 +1,9 @@
-import { nextTick } from 'vue'
+import { computed, defineComponent, nextTick, provide } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { hasClass } from '@element-plus/utils'
 import { EVENT_CODE } from '@element-plus/constants'
 import { makeMountFunc } from '@element-plus/test-utils/make-mount'
+import { configProviderContextKey } from '@element-plus/components/config-provider'
 import { rAF } from '@element-plus/test-utils/tick'
 import {
   clickClearButton as clickSharedClearButton,
@@ -15,14 +16,40 @@ import Select from '../src/select.vue'
 
 const NOOP: (...args: any[]) => void = () => {}
 
-const { filterIndicesSync, warmupWasm, setWasmReady } = vi.hoisted(() => {
+const {
+  createAsciiFilterIndex,
+  ensureWasmReady,
+  filterIndicesSync,
+  isWasmReady,
+  setWasmReady,
+} = vi.hoisted(() => {
   let wasmReady = true
+  let readinessResolvers: Array<() => void> = []
+  const wasmReadyResult = { ok: true, value: undefined } as const
+
+  const flushReadiness = () => {
+    const resolvers = readinessResolvers
+    readinessResolvers = []
+    resolvers.forEach((resolve) => resolve())
+  }
 
   return {
+    ensureWasmReady: vi.fn(
+      () =>
+        new Promise<typeof wasmReadyResult>((resolve) => {
+          if (wasmReady) {
+            resolve(wasmReadyResult)
+            return
+          }
+
+          readinessResolvers.push(() => resolve(wasmReadyResult))
+        }),
+    ),
+    createAsciiFilterIndex: vi.fn((labels: string[]) => labels),
     filterIndicesSync: vi.fn(
       (data: string[], keyword: string, caseSensitive = false) => {
         if (!wasmReady) {
-          return null
+          throw new Error('WASM is not ready')
         }
 
         const normalizedKeyword = caseSensitive
@@ -38,9 +65,12 @@ const { filterIndicesSync, warmupWasm, setWasmReady } = vi.hoisted(() => {
         }, [])
       },
     ),
-    warmupWasm: vi.fn(),
+    isWasmReady: vi.fn(() => wasmReady),
     setWasmReady: (value: boolean) => {
       wasmReady = value
+      if (value) {
+        flushReadiness()
+      }
     },
   }
 })
@@ -67,13 +97,40 @@ vi.mock('lodash-unified', async () => {
 })
 
 vi.mock('@element-plus/wasm', () => ({
-  filterIndicesSync,
-  warmupWasm,
+  createAsciiFilterIndex,
+  ensureWasmReady,
+  filterAsciiIndicesSync: filterIndicesSync,
+  isWasmReady,
 }))
 
 const _mount = makeMountFunc({
   components: {
     'el-select': Select,
+  },
+})
+
+const RenderPipelineProvider = defineComponent({
+  setup(_, { slots }) {
+    provide(
+      configProviderContextKey,
+      computed(
+        () =>
+          ({
+            renderPipeline: {
+              mode: 'enabled',
+              budget: { overscanPx: 280 },
+            },
+          }) as any,
+      ),
+    )
+    return () => slots.default?.()
+  },
+})
+
+const _mountWithPipeline = makeMountFunc({
+  components: {
+    'el-select': Select,
+    RenderPipelineProvider,
   },
 })
 
@@ -253,6 +310,38 @@ describe('Select', () => {
     const select = wrapper.findComponent(Select)
     await wrapper.trigger('click')
     expect((select.vm as any).expanded).toBeTruthy()
+  })
+
+  it('inherits render pipeline budget through virtual option list', async () => {
+    const wrapper = _mountWithPipeline(
+      `
+        <render-pipeline-provider>
+          <el-select
+            v-model="value"
+            :options="options"
+            :teleported="false"
+            scrollbar-always-on
+          />
+        </render-pipeline-provider>
+      `,
+      {
+        data() {
+          return {
+            options: createData(1000),
+            value: '',
+          }
+        },
+      },
+    )
+
+    await wrapper.findComponent(Select).trigger('click')
+    await nextTick()
+    await rAF()
+
+    const list = wrapper.find('[data-fsus-render-pipeline="virtual-list"]')
+    expect(list.exists()).toBe(true)
+    expect(list.attributes('data-fsus-render-strategy')).toBe('chunked-main')
+    expect(Number(list.attributes('data-fsus-render-cache'))).toBeGreaterThan(2)
   })
 
   it('options rendered correctly', async () => {
@@ -1742,7 +1831,7 @@ describe('Select', () => {
     expect(selectVm.filteredOptions.length).toBe(3)
   })
 
-  it('filterable supports large datasets with wasm fallback parity', async () => {
+  it('filterable supports large datasets with required wasm parity', async () => {
     const options = Array.from({ length: 2_200 }, (_, index) => ({
       value: `${index + 1}`,
       label: index === 2_111 ? 'Wasm Match' : `option ${index + 1}`,
@@ -1825,7 +1914,7 @@ describe('Select', () => {
     ).toBe('No matched options')
   })
 
-  it('should fall back to JS filtering on cold start and use wasm on later queries', async () => {
+  it('should suspend default filtering on cold start and use wasm after readiness', async () => {
     setWasmReady(false)
     const options = Array.from({ length: 2_200 }, (_, index) => ({
       value: `${index + 1}`,
@@ -1847,18 +1936,25 @@ describe('Select', () => {
     await input.trigger('input')
     await nextTick()
 
-    expect(warmupWasm).toHaveBeenCalled()
+    expect(ensureWasmReady).toHaveBeenCalled()
+    expect(filterIndicesSync).not.toHaveBeenCalled()
+    expect(selectVm.filteredOptions).toHaveLength(0)
+
+    vi.clearAllMocks()
+    setWasmReady(true)
+    await nextTick()
+    await nextTick()
+    expect(filterIndicesSync).toHaveBeenCalled()
     expect(selectVm.filteredOptions).toHaveLength(1)
     expect(selectVm.filteredOptions[0].label).toBe('Wasm Match')
 
     vi.clearAllMocks()
-    setWasmReady(true)
     input.element.value = 'option 12'
     await input.trigger('input')
     await nextTick()
 
     expect(filterIndicesSync).toHaveBeenCalled()
-    expect(warmupWasm).not.toHaveBeenCalled()
+    expect(ensureWasmReady).not.toHaveBeenCalled()
   })
 
   it('should keep non-ascii filtering on the JS path', async () => {

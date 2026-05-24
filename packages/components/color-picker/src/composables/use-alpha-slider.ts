@@ -17,6 +17,13 @@ export const useAlphaSlider = (props: AlphaSliderProps) => {
 
   const thumb = shallowRef<HTMLElement>()
   const bar = shallowRef<HTMLElement>()
+  let dragMetrics:
+    | {
+        rect: Pick<DOMRect, 'height' | 'left' | 'top' | 'width'>
+        thumbHeight: number
+        thumbWidth: number
+      }
+    | undefined
 
   function handleClick(event: MouseEvent | TouchEvent) {
     const target = event.target
@@ -26,38 +33,43 @@ export const useAlphaSlider = (props: AlphaSliderProps) => {
     }
   }
 
-  function handleDrag(event: MouseEvent | TouchEvent) {
+  function measureDragMetrics() {
     if (!bar.value || !thumb.value) return
-
     const el = instance.vnode.el as HTMLElement
-    const rect = el.getBoundingClientRect()
+    const { height, left, top, width } = el.getBoundingClientRect()
+    return {
+      rect: { height, left, top, width },
+      thumbHeight: thumb.value.offsetHeight,
+      thumbWidth: thumb.value.offsetWidth,
+    }
+  }
+
+  function handleDrag(event: MouseEvent | TouchEvent) {
+    const metrics = dragMetrics || measureDragMetrics()
+    if (!metrics) return
+
+    const { rect, thumbHeight, thumbWidth } = metrics
     const { clientX, clientY } = getClientXY(event)
 
     if (!props.vertical) {
       let left = clientX - rect.left
-      left = Math.max(thumb.value.offsetWidth / 2, left)
-      left = Math.min(left, rect.width - thumb.value.offsetWidth / 2)
+      left = Math.max(thumbWidth / 2, left)
+      left = Math.min(left, rect.width - thumbWidth / 2)
 
       props.color.set(
         'alpha',
-        Math.round(
-          ((left - thumb.value.offsetWidth / 2) /
-            (rect.width - thumb.value.offsetWidth)) *
-            100
-        )
+        Math.round(((left - thumbWidth / 2) / (rect.width - thumbWidth)) * 100),
       )
     } else {
       let top = clientY - rect.top
-      top = Math.max(thumb.value.offsetHeight / 2, top)
-      top = Math.min(top, rect.height - thumb.value.offsetHeight / 2)
+      top = Math.max(thumbHeight / 2, top)
+      top = Math.min(top, rect.height - thumbHeight / 2)
 
       props.color.set(
         'alpha',
         Math.round(
-          ((top - thumb.value.offsetHeight / 2) /
-            (rect.height - thumb.value.offsetHeight)) *
-            100
-        )
+          ((top - thumbHeight / 2) / (rect.height - thumbHeight)) * 100,
+        ),
       )
     }
   }
@@ -67,6 +79,13 @@ export const useAlphaSlider = (props: AlphaSliderProps) => {
     bar,
     handleDrag,
     handleClick,
+    measureDragMetrics,
+    resetDragMetrics: () => {
+      dragMetrics = undefined
+    },
+    setDragMetrics: () => {
+      dragMetrics = measureDragMetrics()
+    },
   }
 }
 
@@ -76,7 +95,12 @@ export const useAlphaSliderDOM = (
     bar,
     thumb,
     handleDrag,
-  }: Pick<ReturnType<typeof useAlphaSlider>, 'bar' | 'thumb' | 'handleDrag'>
+    resetDragMetrics,
+    setDragMetrics,
+  }: Pick<
+    ReturnType<typeof useAlphaSlider>,
+    'bar' | 'thumb' | 'handleDrag' | 'resetDragMetrics' | 'setDragMetrics'
+  >,
 ) => {
   const instance = getCurrentInstance()!
 
@@ -96,7 +120,7 @@ export const useAlphaSliderDOM = (
 
     if (!el) return 0
     return Math.round(
-      (alpha * (el.offsetWidth - thumb.value.offsetWidth / 2)) / 100
+      (alpha * (el.offsetWidth - thumb.value.offsetWidth / 2)) / 100,
     )
   }
 
@@ -109,7 +133,7 @@ export const useAlphaSliderDOM = (
 
     if (!el) return 0
     return Math.round(
-      (alpha * (el.offsetHeight - thumb.value.offsetHeight / 2)) / 100
+      (alpha * (el.offsetHeight - thumb.value.offsetHeight / 2)) / 100,
     )
   }
 
@@ -131,11 +155,15 @@ export const useAlphaSliderDOM = (
     if (!bar.value || !thumb.value) return
 
     const dragConfig = {
+      start: () => {
+        setDragMetrics()
+      },
       drag: (event: MouseEvent | TouchEvent) => {
         handleDrag(event)
       },
       end: (event: MouseEvent | TouchEvent) => {
         handleDrag(event)
+        resetDragMetrics()
       },
     }
 
@@ -146,11 +174,11 @@ export const useAlphaSliderDOM = (
 
   watch(
     () => props.color.get('alpha'),
-    () => update()
+    () => update(),
   )
   watch(
     () => props.color.value,
-    () => update()
+    () => update(),
   )
 
   const rootKls = computed(() => [ns.b(), ns.is('vertical', props.vertical)])

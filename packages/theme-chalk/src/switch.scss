@@ -138,8 +138,8 @@ $switch-content-padding: map.merge(
 
     &:focus-visible {
       & ~ .#{$namespace}-switch__core {
-        outline: 2px solid getCssVar('switch-on-color');
-        outline-offset: 1px;
+        outline: none;
+        box-shadow: inset 0 0 0 1px var(--fsus-scholarly-blue);
       }
     }
   }
@@ -160,12 +160,19 @@ $switch-content-padding: map.merge(
     box-sizing: border-box;
     background: getCssVar('switch-off-color');
     cursor: pointer;
-    transition: border-color getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
-      background-color getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier');
+    transition:
+      border-color getCssVar('transition-duration')
+        getCssVar('transition-function-ease-in-out-bezier'),
+      background-color getCssVar('transition-duration')
+        getCssVar('transition-function-ease-in-out-bezier');
 
     .#{$namespace}-switch__inner {
       width: 100%;
-      transition: all getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier');
+      transition:
+        padding getCssVar('transition-duration')
+          getCssVar('transition-function-ease-in-out-bezier'),
+        color getCssVar('transition-duration')
+          getCssVar('transition-function-ease-in-out-bezier');
       height: map.get($switch-button-size, 'default');
       display: flex;
       justify-content: center;
@@ -179,17 +186,28 @@ $switch-content-padding: map.merge(
         user-select: none;
         @include utils-ellipsis;
       }
-      padding: 0 #{map.get($switch-content-padding, 'default')} 0 calc(#{map.get(
-              $switch-button-size,
-              'default'
-            )} + 2px);
+      padding: 0 #{map.get($switch-content-padding, 'default')} 0
+        calc(#{map.get($switch-button-size, 'default')} + 2px);
     }
 
     .#{$namespace}-switch__action {
       position: absolute;
       left: 1px;
       border-radius: getCssVar('border-radius-circle');
-      transition: all getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier');
+      transition:
+        left getCssVar('transition-duration')
+          getCssVar('transition-function-ease-in-out-bezier'),
+        transform var(--fsus-motion-control, 260ms)
+          var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1)),
+        filter var(--fsus-motion-control-fast, 160ms)
+          var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+        box-shadow var(--fsus-motion-control-fast, 160ms)
+          var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+        color getCssVar('transition-duration')
+          getCssVar('transition-function-ease-in-out-bezier'),
+        background-color getCssVar('transition-duration')
+          getCssVar('transition-function-ease-in-out-bezier');
+      will-change: transform, filter;
       width: map.get($switch-button-size, 'default');
       height: map.get($switch-button-size, 'default');
       background-color: getCssVar('color-white');
@@ -214,10 +232,8 @@ $switch-content-padding: map.merge(
       }
 
       .#{$namespace}-switch__inner {
-        padding: 0 calc(#{map.get($switch-button-size, 'default')} + 2px) 0 #{map.get(
-            $switch-content-padding,
-            'default'
-          )};
+        padding: 0 calc(#{map.get($switch-button-size, 'default')} + 2px) 0
+          #{map.get($switch-content-padding, 'default')};
       }
     }
   }
@@ -269,10 +285,8 @@ $switch-content-padding: map.merge(
 
         .#{$namespace}-switch__inner {
           height: map.get($switch-button-size, $size);
-          padding: 0 #{map.get($switch-content-padding, $size)} 0 calc(#{map.get(
-                  $switch-button-size,
-                  $size
-                )} + 2px);
+          padding: 0 #{map.get($switch-content-padding, $size)} 0
+            calc(#{map.get($switch-button-size, $size)} + 2px);
         }
 
         .#{$namespace}-switch__action {
@@ -288,10 +302,8 @@ $switch-content-padding: map.merge(
           }
 
           .#{$namespace}-switch__inner {
-            padding: 0 calc(#{map.get($switch-button-size, $size)} + 2px) 0 #{map.get(
-                $switch-content-padding,
-                $size
-              )};
+            padding: 0 calc(#{map.get($switch-button-size, $size)} + 2px) 0
+              #{map.get($switch-content-padding, $size)};
           }
         }
       }

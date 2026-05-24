@@ -14,7 +14,12 @@ import {
   PKG_CAMELCASE_LOCAL_NAME,
   PKG_CAMELCASE_NAME,
 } from '@element-plus/build-constants'
-import { epOutput, epRoot, localeRoot } from '@element-plus/build-utils'
+import {
+  epOutput,
+  epRoot,
+  localeRoot,
+  pkgRoot,
+} from '@element-plus/build-utils'
 import { version } from '../../../../packages/element-plus/version'
 import { ElementPlusAlias } from '../plugins/element-plus-alias'
 import {
@@ -38,6 +43,13 @@ const ignoreRollupWarning = (warning: { code?: string; exporter?: string; id?: s
 }
 
 async function buildFullEntry(minify: boolean) {
+  const externalPackage = await generateExternal({ full: true })
+  const wasmSourceEntry = path.resolve(pkgRoot, 'wasm/index.ts')
+  const external = (id: string) =>
+    externalPackage(id) ||
+    id === './ep_wasm.mjs' ||
+    id.endsWith('/packages/wasm/ep_wasm.mjs') ||
+    id.endsWith('/packages/wasm/dist/ep_wasm.mjs')
   const vueMacrosPlugins = await VueMacros({
     setupComponent: false,
     setupSFC: false,
@@ -49,6 +61,12 @@ async function buildFullEntry(minify: boolean) {
     },
   })
   const plugins: Plugin[] = [
+    {
+      name: 'element-plus-wasm-source',
+      resolveId(id) {
+        if (id === '@element-plus/wasm') return wasmSourceEntry
+      },
+    },
     ElementPlusAlias(),
     ...vueMacrosPlugins,
     nodeResolve({
@@ -85,7 +103,7 @@ async function buildFullEntry(minify: boolean) {
       warn(warning)
     },
     plugins,
-    external: await generateExternal({ full: true }),
+    external,
     treeshake: true,
   })
   await writeBundles(bundle, [

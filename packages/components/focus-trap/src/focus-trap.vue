@@ -21,6 +21,7 @@ import {
   focusFirstDescendant,
   focusableStack,
   getEdges,
+  invalidateFocusableCache,
   isFocusCausedByUserEvent,
   obtainAllFocusableElements,
   tryFocus,
@@ -62,6 +63,7 @@ export default defineComponent({
     const forwardRef = ref<HTMLElement | undefined>()
     let lastFocusBeforeTrapped: HTMLElement | null
     let lastFocusAfterTrapped: HTMLElement | null
+    let focusableObserver: MutationObserver | undefined
 
     const { focusReason } = useFocusReason()
 
@@ -144,7 +146,7 @@ export default defineComponent({
           forwardRef.value = focusTrapEl
         }
       },
-      { immediate: true }
+      { immediate: true },
     )
 
     watch([forwardRef], ([forwardRef], [oldForwardRef]) => {
@@ -152,11 +154,23 @@ export default defineComponent({
         forwardRef.addEventListener('keydown', onKeydown)
         forwardRef.addEventListener('focusin', onFocusIn)
         forwardRef.addEventListener('focusout', onFocusOut)
+        focusableObserver = new MutationObserver(() =>
+          invalidateFocusableCache(forwardRef),
+        )
+        focusableObserver.observe(forwardRef, {
+          childList: true,
+          subtree: true,
+          attributes: true,
+          attributeFilter: ['disabled', 'hidden', 'tabindex', 'style', 'class'],
+        })
       }
       if (oldForwardRef) {
         oldForwardRef.removeEventListener('keydown', onKeydown)
         oldForwardRef.removeEventListener('focusin', onFocusIn)
         oldForwardRef.removeEventListener('focusout', onFocusOut)
+        invalidateFocusableCache(oldForwardRef)
+        focusableObserver?.disconnect()
+        focusableObserver = undefined
       }
     })
 
@@ -230,7 +244,7 @@ export default defineComponent({
       if (trapContainer) {
         focusableStack.push(focusLayer)
         const prevFocusedElement = trapContainer.contains(
-          document.activeElement
+          document.activeElement,
         )
           ? lastFocusBeforeTrapped
           : document.activeElement
@@ -239,7 +253,7 @@ export default defineComponent({
         if (!isPrevFocusContained) {
           const focusEvent = new Event(
             FOCUS_AFTER_TRAPPED,
-            FOCUS_AFTER_TRAPPED_OPTS
+            FOCUS_AFTER_TRAPPED_OPTS,
           )
           trapContainer.addEventListener(FOCUS_AFTER_TRAPPED, trapOnFocus)
           trapContainer.dispatchEvent(focusEvent)
@@ -255,7 +269,7 @@ export default defineComponent({
               if (focusStartEl === 'first') {
                 focusFirstDescendant(
                   obtainAllFocusableElements(trapContainer),
-                  true
+                  true,
                 )
               }
               if (
@@ -311,11 +325,13 @@ export default defineComponent({
           } else {
             stopTrap()
           }
-        }
+        },
       )
     })
 
     onBeforeUnmount(() => {
+      focusableObserver?.disconnect()
+      focusableObserver = undefined
       if (props.trapped) {
         stopTrap()
       }

@@ -21,7 +21,7 @@
     "*.svg"
   ],
   "scripts": {
-    "optimize": "svgo -f . -o ."
+    "optimize": "node ../../scripts/with-node-heap.mjs svgo -f . -o ."
   },
   "devDependencies": {
     "svgo": "^4.0.0"

@@ -13,26 +13,48 @@ import type { UseNamespaceReturn, UseZIndexReturn } from '@element-plus/hooks'
 import type { LoadingInstance } from './loading'
 import type { LoadingOptionsResolved } from '..'
 import type { LoadingOptions } from './types'
-import type { CSSProperties } from 'vue'
+import type { AppContext, CSSProperties } from 'vue'
 
 let fullscreenInstance: LoadingInstance | undefined = undefined
+const fullscreenInstances = new WeakMap<AppContext, LoadingInstance>()
+
+const getFullscreenInstance = (appContext?: AppContext | null) =>
+  appContext ? fullscreenInstances.get(appContext) : fullscreenInstance
+
+const setFullscreenInstance = (
+  instance: LoadingInstance | undefined,
+  appContext?: AppContext | null,
+) => {
+  if (appContext) {
+    if (instance) {
+      fullscreenInstances.set(appContext, instance)
+    } else {
+      fullscreenInstances.delete(appContext)
+    }
+    return
+  }
+
+  fullscreenInstance = instance
+}
 
 export const Loading = function (
-  options: LoadingOptions = {}
+  options: LoadingOptions = {},
+  appContext?: AppContext | null,
 ): LoadingInstance {
   if (!isClient) return undefined as any
 
   const resolved = resolveOptions(options)
 
-  if (resolved.fullscreen && fullscreenInstance) {
-    return fullscreenInstance
+  const currentFullscreenInstance = getFullscreenInstance(appContext)
+  if (resolved.fullscreen && currentFullscreenInstance) {
+    return currentFullscreenInstance
   }
 
   const instance = createLoadingComponent({
     ...resolved,
     closed: () => {
       resolved.closed?.()
-      if (resolved.fullscreen) fullscreenInstance = undefined
+      if (resolved.fullscreen) setFullscreenInstance(undefined, appContext)
     },
   })
 
@@ -65,7 +87,7 @@ export const Loading = function (
   nextTick(() => (instance.visible.value = resolved.visible))
 
   if (resolved.fullscreen) {
-    fullscreenInstance = instance
+    setFullscreenInstance(instance, appContext)
   }
   return instance
 }
@@ -96,7 +118,7 @@ const resolveOptions = (options: LoadingOptions): LoadingOptionsResolved => {
 const addStyle = async (
   options: LoadingOptionsResolved,
   parent: HTMLElement,
-  instance: LoadingInstance
+  instance: LoadingInstance,
 ) => {
   // Compatible with the instance data format of vue@3.2.12 and earlier versions #12351
   const { nextZIndex } =
@@ -141,7 +163,7 @@ const addStyle = async (
 const addClassList = (
   options: LoadingOptions,
   parent: HTMLElement,
-  instance: LoadingInstance
+  instance: LoadingInstance,
 ) => {
   // Compatible with the instance data format of vue@3.2.12 and earlier versions #12351
   const ns =

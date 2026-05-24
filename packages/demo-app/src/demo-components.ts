@@ -49,6 +49,7 @@ import {
   ElInputNumber,
   ElLink,
   ElMain,
+  ElMarkdownRenderer,
   ElMenu,
   ElMenuItem,
   ElMenuItemGroup,
@@ -101,13 +102,19 @@ import {
   ElTreeV2,
   ElUpload,
   ElWatermark,
+  ElTooltipV2,
+  FixedSizeList,
+  DynamicSizeList,
+  FixedSizeGrid,
+  DynamicSizeGrid,
+  ElVisuallyHidden,
 } from '../../element-plus'
-import { ElTooltipV2 } from '../../components/tooltip-v2'
-import { FixedSizeList } from '../../components/virtual-list'
-import { ElVisuallyHidden } from '../../components/visual-hidden'
 
 export const demoComponents = {
   FixedSizeList,
+  DynamicSizeList,
+  FixedSizeGrid,
+  DynamicSizeGrid,
   ElVisuallyHidden,
   ElAffix,
   ElAlert,
@@ -159,6 +166,7 @@ export const demoComponents = {
   ElInputNumber,
   ElLink,
   ElMain,
+  ElMarkdownRenderer,
   ElMenu,
   ElMenuItem,
   ElMenuItemGroup,

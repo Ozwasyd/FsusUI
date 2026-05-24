@@ -5,7 +5,6 @@
     :show-arrow="false"
     :fallback-placements="['bottom', 'top', 'right', 'left']"
     :offset="0"
-    :gpu-acceleration="false"
     :popper-class="[ns.be('picker', 'panel'), ns.b('dropdown'), popperClass]"
     :stop-popper-mouse-event="false"
     effect="light"
@@ -193,7 +192,7 @@ const color = reactive(
     enableAlpha: props.showAlpha,
     format: props.colorFormat || '',
     value: props.modelValue,
-  })
+  }),
 ) as Color
 
 const showPicker = ref(false)
@@ -389,7 +388,7 @@ watch(
       shouldActiveChange = false
       color.fromString(newVal)
     }
-  }
+  },
 )
 
 watch(
@@ -400,7 +399,7 @@ watch(
       emit('activeChange', val)
     }
     shouldActiveChange = true
-  }
+  },
 )
 
 watch(
@@ -409,7 +408,7 @@ watch(
     if (!props.modelValue && !showPanelColor.value) {
       showPanelColor.value = true
     }
-  }
+  },
 )
 
 watch(
@@ -420,7 +419,7 @@ watch(
       sv.value?.update()
       alpha.value?.update()
     })
-  }
+  },
 )
 
 provide(colorPickerContextKey, {

@@ -53,5 +53,12 @@ export async function batchEstimateRowHeights<T extends Record<string, unknown>>
     return typeof val === 'string' ? val.length : 6 // 默认 6 字符
   })
 
-  return estimateRowHeights(textLengths, rowWidth, charWidth, lineHeight, padding)
+  const result = await estimateRowHeights(
+    textLengths,
+    rowWidth,
+    charWidth,
+    lineHeight,
+    padding,
+  )
+  return result.ok ? result.value : null
 }

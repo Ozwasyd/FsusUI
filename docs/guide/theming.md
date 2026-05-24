@@ -72,7 +72,7 @@ SCSS 变量文件路径：`packages/theme-chalk/src/common/var.scss`
 
 ```scss
 /* styles/element/index.scss */
-@forward 'element-plus/theme-chalk/src/common/var.scss' with (
+@forward '@ozwasyd/element-plus/theme-chalk/src/common/var.scss' with (
   $colors: (
     'primary': (
       'base': #2A599C,  /* FsusUI 学术蓝 */
@@ -86,8 +86,8 @@ SCSS 变量文件路径：`packages/theme-chalk/src/common/var.scss`
 ```ts
 // main.ts
 import { createApp } from 'vue'
-import './styles/element/index.scss'  /* 放在 element-plus 之前 */
-import ElementPlus from 'element-plus'
+import './styles/element/index.scss'  /* 放在 @ozwasyd/element-plus 之前 */
+import ElementPlus from '@ozwasyd/element-plus'
 import App from './App.vue'
 
 const app = createApp(App)

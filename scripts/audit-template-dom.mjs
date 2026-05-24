@@ -15,8 +15,22 @@ const rootDir = path.resolve(__dirname, '..')
 const docsDir = path.join(rootDir, 'docs')
 const reportJsonPath = path.join(docsDir, 'runtime-template-audit.json')
 const reportMdPath = path.join(docsDir, 'runtime-template-audit.md')
+const pathArgs = process.argv
+  .flatMap((arg, index, args) => {
+    if (arg === '--paths') return (args[index + 1] ?? '').split(',')
+    if (arg.startsWith('--paths='))
+      return arg.slice('--paths='.length).split(',')
+    return []
+  })
+  .filter(Boolean)
+const incremental = process.argv.includes('--incremental')
+const sourcePatterns = pathArgs.length
+  ? pathArgs
+  : incremental
+    ? ['packages/components/**/src/*.vue']
+    : ['packages/components/**/src/*.vue']
 
-const componentFiles = await fg('packages/components/**/src/*.vue', {
+const componentFiles = await fg(sourcePatterns, {
   cwd: rootDir,
   absolute: true,
 })
@@ -78,7 +92,10 @@ for (const file of componentFiles.sort()) {
   const templateSource = templateBlock.content
   const templateAst = parseTemplate(templateSource, { comments: false })
   const templateLineOffset = templateBlock.loc.start.line - 1
-  const deprecatedFindings = findDeprecatedSyntax(templateSource, templateLineOffset)
+  const deprecatedFindings = findDeprecatedSyntax(
+    templateSource,
+    templateLineOffset,
+  )
   const analysis = analyzeTemplateAst(templateAst, templateLineOffset)
 
   report.push({
@@ -87,7 +104,7 @@ for (const file of componentFiles.sort()) {
     componentCount: analysis.componentCount,
     potentialSavings: analysis.issues.reduce(
       (sum, issue) => sum + issue.estimatedSavings,
-      0
+      0,
     ),
     manualReviewCount: analysis.issues.filter((issue) => issue.manualReview)
       .length,
@@ -102,27 +119,32 @@ const markdown = buildMarkdown(report, totals)
 await mkdir(docsDir, { recursive: true })
 await writeFile(
   reportJsonPath,
-  `${JSON.stringify({ generatedAt: new Date().toISOString(), totals, files: report }, null, 2)}\n`
+  `${JSON.stringify({ generatedAt: new Date().toISOString(), totals, files: report }, null, 2)}\n`,
 )
 await writeFile(reportMdPath, markdown)
 
 console.log(
-  `Template audit complete: ${report.length} files -> ${path.relative(rootDir, reportMdPath)}`
+  `Template audit complete: ${report.length} files -> ${path.relative(rootDir, reportMdPath)}`,
 )
 
 function buildTotals(files) {
   const totalIssues = files.reduce((sum, item) => sum + item.issues.length, 0)
   const totalNodes = files.reduce((sum, item) => sum + item.nodeCount, 0)
-  const totalSavings = files.reduce((sum, item) => sum + item.potentialSavings, 0)
+  const totalSavings = files.reduce(
+    (sum, item) => sum + item.potentialSavings,
+    0,
+  )
   const deprecatedSyntaxCount = files.reduce(
     (sum, item) => sum + item.deprecatedSyntax.length,
-    0
+    0,
   )
 
-  const byRisk = files.flatMap((item) => item.issues).reduce((acc, issue) => {
-    acc[issue.risk] = (acc[issue.risk] ?? 0) + 1
-    return acc
-  }, {})
+  const byRisk = files
+    .flatMap((item) => item.issues)
+    .reduce((acc, issue) => {
+      acc[issue.risk] = (acc[issue.risk] ?? 0) + 1
+      return acc
+    }, {})
 
   const byCategory = files
     .flatMap((item) => item.issues)
@@ -158,7 +180,7 @@ function buildMarkdown(files, totals) {
       item.deprecatedSyntax.map((finding) => ({
         file: item.file,
         ...finding,
-      }))
+      })),
     )
     .slice(0, 20)
 
@@ -180,7 +202,7 @@ function buildMarkdown(files, totals) {
         .slice(0, 3)
         .map(
           (issue) =>
-            `L${issue.line} ${issue.category} [${issue.risk}] - ${issue.summary}`
+            `L${issue.line} ${issue.category} [${issue.risk}] - ${issue.summary}`,
         )
         .join('；')
 
@@ -194,7 +216,7 @@ function buildMarkdown(files, totals) {
       : deprecatedHits
           .map(
             (finding) =>
-              `- \`${finding.file}:L${finding.line}\` 命中 ${finding.label}`
+              `- \`${finding.file}:L${finding.line}\` 命中 ${finding.label}`,
           )
           .join('\n')
 
@@ -263,7 +285,9 @@ function analyzeTemplateAst(ast, templateLineOffset) {
       }
       case NodeTypes.IF:
         maybeCollectIfDuplicateIssue(node, templateLineOffset, issues)
-        node.branches.forEach((branch) => branch.children.forEach((child) => visit(child, node)))
+        node.branches.forEach((branch) =>
+          branch.children.forEach((child) => visit(child, node)),
+        )
         return
       case NodeTypes.FOR:
         node.children.forEach((child) => visit(child, node))
@@ -303,7 +327,9 @@ function maybeCollectWrapperIssue(node, parent, templateLineOffset, issues) {
   if (preserveWrapper) return
 
   const tokens = extractNodeTokens(node)
-  const matchedTitleToken = titleLikeTokens.find((token) => tokens.includes(token))
+  const matchedTitleToken = titleLikeTokens.find((token) =>
+    tokens.includes(token),
+  )
   const childName = describeChild(child)
   const isTitleLike = Boolean(matchedTitleToken)
   const wrapsSlotLike =
@@ -358,7 +384,7 @@ function hasAdjacentMeaningfulText(node, parent, child) {
     (sibling) =>
       sibling !== node &&
       ((sibling.type === NodeTypes.TEXT && sibling.content.trim().length > 0) ||
-        sibling.type === NodeTypes.INTERPOLATION)
+        sibling.type === NodeTypes.INTERPOLATION),
   )
 }
 
@@ -437,9 +463,15 @@ function inspectNodeProps(node) {
     hasDirective = true
     hasEvent ||= prop.name === 'on'
     hasVFor ||= prop.name === 'for'
-    hasRef ||= prop.name === 'bind' && prop.arg?.type === NodeTypes.SIMPLE_EXPRESSION && prop.arg.content === 'ref'
+    hasRef ||=
+      prop.name === 'bind' &&
+      prop.arg?.type === NodeTypes.SIMPLE_EXPRESSION &&
+      prop.arg.content === 'ref'
 
-    if (prop.name === 'bind' && prop.arg?.type === NodeTypes.SIMPLE_EXPRESSION) {
+    if (
+      prop.name === 'bind' &&
+      prop.arg?.type === NodeTypes.SIMPLE_EXPRESSION
+    ) {
       const arg = prop.arg.content
       hasClass ||= arg === 'class'
       hasStyle ||= arg === 'style'
@@ -542,7 +574,8 @@ function findDeprecatedSyntax(templateSource, templateLineOffset) {
       findings.push({
         category: check.category,
         label: check.label,
-        line: templateLineOffset + getLineNumber(templateSource, match.index ?? 0),
+        line:
+          templateLineOffset + getLineNumber(templateSource, match.index ?? 0),
       })
     }
   }

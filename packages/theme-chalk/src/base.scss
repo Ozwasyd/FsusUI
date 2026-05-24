@@ -6,6 +6,30 @@
   color-scheme: light dark;
 }
 
+:root[data-fsus-motion='reduced'],
+:root[data-fsus-motion='disabled'] {
+  --fsus-motion-control: 1ms;
+  --fsus-motion-control-fast: 1ms;
+  --fsus-motion-slider-follow: 1ms;
+  --fsus-motion-slider-release: 1ms;
+  --fsus-motion-panel: 1ms;
+  --fsus-motion-overlay: 1ms;
+  --fsus-motion-blur: 0px;
+  --fsus-motion-slider-blur: 0px;
+  --fsus-motion-scroll-blur: 0px;
+  --fsus-motion-scroll-offset: 0px;
+  --fsus-motion-scroll-max-offset: 0px;
+  --fsus-motion-scroll-settle: 1ms;
+  --fsus-motion-scroll-trail-opacity: 0;
+  --fsus-motion-drag-max-offset: 0px;
+  --fsus-motion-drag-blur: 0px;
+  --fsus-motion-drag-scale: 0;
+  --fsus-motion-drag-trail-opacity: 0;
+  --fsus-motion-trail: transparent;
+  --fsus-motion-slider-trail: transparent;
+  --fsus-motion-scroll-idle: 1ms;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -29,8 +53,8 @@
 
   &:focus-visible {
     top: 1rem;
-    outline: 2px solid getCssVar('color', 'primary');
-    outline-offset: 2px;
+    outline: none;
+    box-shadow: inset 0 0 0 1px var(--fsus-scholarly-blue);
   }
 }
 

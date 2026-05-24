@@ -4,11 +4,13 @@
  * 策略：
  *   - 行数 >= WASM_THRESHOLD（默认 5000）且列值全为数字或全为字符串时，
  *     走 WASM SIMD 排序（比 JS Array.sort 快 2-4x）。
- *   - 否则降级回原 orderBy 实现，保持语义完全一致。
+ *   - 小数据、混合类型、非 ASCII 字符串与用户自定义排序保持 JS primary path。
  *
  * 与 Element Plus 公共合约无关，仅内部使用。
  */
 import {
+  ensureWasmReady,
+  isWasmReady,
   sortNumbersSync,
   sortStringsSync,
   warmupWasm,
@@ -66,7 +68,7 @@ function groupRowsByValue<T>(
 
 /**
  * 尝试用 WASM 加速排序。
- * 返回排序后的数组，若不满足 WASM 条件则返回 null（调用方降级）。
+ * 返回排序后的数组，若不满足 WASM 条件则返回 null（调用方走 JS primary path）。
  */
 export function trySortWithWasmSync<T extends AnyRow>(
   array: T[],
@@ -80,9 +82,6 @@ export function trySortWithWasmSync<T extends AnyRow>(
 
   if (isAllNumbers(values)) {
     const sortedVals = sortNumbersSync(values, ascending)
-    if (!sortedVals) {
-      return null
-    }
 
     // 重建原行顺序（稳定排序：相同值时保留原顺序）
     const indexMap = groupRowsByValue(
@@ -101,9 +100,6 @@ export function trySortWithWasmSync<T extends AnyRow>(
   if (isAllAsciiStrings(values)) {
     // 与数字同理：WASM 排序字符串键，再映射回原行
     const sorted = sortStringsSync(values, ascending, 'zh-CN')
-    if (!sorted) {
-      return null
-    }
 
     const indexMap = groupRowsByValue(
       array,
@@ -118,11 +114,19 @@ export function trySortWithWasmSync<T extends AnyRow>(
     })
   }
 
-  return null // 混合类型或对象值：降级到 JS
+  return null // 混合类型或对象值：JS primary path
 }
 
 export function warmupWasmSort(): void {
   warmupWasm()
+}
+
+export function ensureWasmSortReady() {
+  return ensureWasmReady()
+}
+
+export function isWasmSortReady(): boolean {
+  return isWasmReady()
 }
 
 /**

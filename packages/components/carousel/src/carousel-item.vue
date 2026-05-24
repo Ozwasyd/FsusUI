@@ -44,6 +44,7 @@ const {
   hover,
   inStage,
   isVertical,
+  dragOffset,
   translate,
   isCardType,
   scale,
@@ -53,7 +54,7 @@ const {
 
 const itemStyle = computed<CSSProperties>(() => {
   const translateType = `translate${unref(isVertical) ? 'Y' : 'X'}`
-  const _translate = `${translateType}(${unref(translate)}px)`
+  const _translate = `${translateType}(${unref(translate) + unref(dragOffset)}px)`
   const _scale = `scale(${unref(scale)})`
   const transform = [_translate, _scale].join(' ')
 

@@ -13,6 +13,16 @@
       1px solid getCssVar('datepicker', 'border-color'),
       getCssVar('box-shadow', 'light')
     );
+    border-radius: var(--fsus-radius-floating, 24px);
+    box-shadow: var(
+      --fsus-shadow-floating,
+      0 24px 60px rgba(15, 23, 42, 0.12)
+    );
+    transform-origin: top left;
+
+    &[data-popper-placement^='top'] {
+      transform-origin: bottom left;
+    }
   }
 }
 

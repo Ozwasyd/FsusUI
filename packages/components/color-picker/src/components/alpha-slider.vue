@@ -20,13 +20,22 @@ defineOptions({
 
 const props = defineProps(alphaSliderProps)
 
-const { bar, thumb, handleDrag, handleClick } = useAlphaSlider(props)
+const {
+  bar,
+  thumb,
+  handleDrag,
+  handleClick,
+  resetDragMetrics,
+  setDragMetrics,
+} = useAlphaSlider(props)
 
 const { rootKls, barKls, barStyle, thumbKls, thumbStyle, update } =
   useAlphaSliderDOM(props, {
     bar,
     thumb,
     handleDrag,
+    resetDragMetrics,
+    setDragMetrics,
   })
 
 defineExpose({

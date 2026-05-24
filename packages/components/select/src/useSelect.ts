@@ -84,7 +84,7 @@ export const useSelect = (props, states: States, ctx) => {
       scope: 'props',
       ref: 'https://element-plus.org/en-US/component/select.html#select-attributes',
     },
-    computed(() => props.suffixTransition === false)
+    computed(() => props.suffixTransition === false),
   )
 
   // template refs
@@ -111,7 +111,7 @@ export const useSelect = (props, states: States, ctx) => {
   const { form, formItem } = useFormItem()
 
   const readonly = computed(
-    () => !props.filterable || props.multiple || !states.visible
+    () => !props.filterable || props.multiple || !states.visible,
   )
 
   const selectDisabled = computed(() => props.disabled || form?.disabled)
@@ -133,13 +133,13 @@ export const useSelect = (props, states: States, ctx) => {
   const iconComponent = computed(() =>
     props.remote && props.filterable && !props.remoteShowSuffix
       ? ''
-      : props.suffixIcon
+      : props.suffixIcon,
   )
   const iconReverse = computed(() =>
     ns.is(
       'reverse',
-      iconComponent.value && states.visible && props.suffixTransition
-    )
+      iconComponent.value && states.visible && props.suffixTransition,
+    ),
   )
 
   // Consistent with the processing of Form in the input component
@@ -147,7 +147,7 @@ export const useSelect = (props, states: States, ctx) => {
     () =>
       form?.statusIcon &&
       formItem?.validateState &&
-      ValidateComponentsMap[formItem?.validateState]
+      ValidateComponentsMap[formItem?.validateState],
   )
 
   const debounce = computed(() => (props.remote ? 300 : 0))
@@ -175,18 +175,22 @@ export const useSelect = (props, states: States, ctx) => {
 
   const optionsArray = computed(() => {
     const list = Array.from(states.options.values())
-    const newList = []
-    optionList.value.forEach((item) => {
-      const index = list.findIndex((i) => i.currentLabel === item)
-      if (index > -1) {
-        newList.push(list[index])
+    if (optionList.value.length === 0) return list
+
+    const optionByLabel = new Map()
+    list.forEach((option) => {
+      if (!optionByLabel.has(option.currentLabel)) {
+        optionByLabel.set(option.currentLabel, option)
       }
     })
+    const newList = optionList.value
+      .map((item) => optionByLabel.get(item))
+      .filter(Boolean)
     return newList.length >= list.length ? newList : list
   })
 
   const cachedOptionsArray = computed(() =>
-    Array.from(states.cachedOptions.values())
+    Array.from(states.cachedOptions.values()),
   )
 
   const showNewOption = computed(() => {
@@ -208,7 +212,7 @@ export const useSelect = (props, states: States, ctx) => {
   const selectSize = useFormSize()
 
   const collapseTagSize = computed(() =>
-    ['small'].includes(selectSize.value) ? 'small' : 'default'
+    ['small'].includes(selectSize.value) ? 'small' : 'default',
   )
 
   const dropMenuVisible = computed({
@@ -227,7 +231,7 @@ export const useSelect = (props, states: States, ctx) => {
       nextTick(() => {
         resetInputHeight()
       })
-    }
+    },
   )
 
   watch(
@@ -243,7 +247,7 @@ export const useSelect = (props, states: States, ctx) => {
       if (hasValue) {
         states.currentPlaceholder = ''
       }
-    }
+    },
   )
 
   watch(
@@ -272,7 +276,7 @@ export const useSelect = (props, states: States, ctx) => {
     {
       flush: 'post',
       deep: true,
-    }
+    },
   )
 
   watch(
@@ -347,7 +351,7 @@ export const useSelect = (props, states: States, ctx) => {
         }
       }
       ctx.emit('visible-change', val)
-    }
+    },
   )
 
   watch(
@@ -379,21 +383,23 @@ export const useSelect = (props, states: States, ctx) => {
     },
     {
       flush: 'post',
-    }
+    },
   )
 
   watch(
     () => states.hoverIndex,
-    (val) => {
+    (val, oldVal) => {
+      if (isNumber(oldVal) && oldVal > -1) {
+        const previous = optionsArray.value[oldVal]
+        if (previous) previous.hover = false
+      }
       if (isNumber(val) && val > -1) {
         hoverOption.value = optionsArray.value[val] || {}
       } else {
         hoverOption.value = {}
       }
-      optionsArray.value.forEach((option) => {
-        option.hover = hoverOption.value === option
-      })
-    }
+      if (hoverOption.value) hoverOption.value.hover = true
+    },
   )
 
   // methods
@@ -401,14 +407,14 @@ export const useSelect = (props, states: States, ctx) => {
     nextTick(() => {
       if (!reference.value) return
       const input = reference.value.$el.querySelector(
-        'input'
+        'input',
       ) as HTMLInputElement
       originClientHeight =
         originClientHeight ||
         (input.clientHeight > 0 ? input.clientHeight + 2 : 0)
       const _tags = tags.value
       const cssVarOfSelectSize = getComputedStyle(input).getPropertyValue(
-        ns.cssVarName('input-height')
+        ns.cssVarName('input-height'),
       )
       const gotSize =
         Number.parseFloat(cssVarOfSelectSize) ||
@@ -433,7 +439,7 @@ export const useSelect = (props, states: States, ctx) => {
                   ? _tags.clientHeight +
                       (_tags.clientHeight > sizeInMap ? 6 : 0)
                   : 0,
-                sizeInMap
+                sizeInMap,
               )) - 2
         }px`)
 
@@ -513,13 +519,13 @@ export const useSelect = (props, states: States, ctx) => {
    */
   const checkDefaultFirstOption = () => {
     const optionsInDropdown = optionsArray.value.filter(
-      (n) => n.visible && !n.disabled && !n.states.groupDisabled
+      (n) => n.visible && !n.disabled && !n.states.groupDisabled,
     )
     const userCreatedOption = optionsInDropdown.find((n) => n.created)
     const firstOriginOption = optionsInDropdown[0]
     states.hoverIndex = getValueIndex(
       optionsArray.value,
-      userCreatedOption || firstOriginOption
+      userCreatedOption || firstOriginOption,
     )
   }
 
@@ -575,8 +581,8 @@ export const useSelect = (props, states: States, ctx) => {
     const label = isObjectValue
       ? value.label
       : !isNull && !isUndefined
-      ? value
-      : ''
+        ? value
+        : ''
     const newOption = {
       value,
       currentLabel: label,
@@ -590,19 +596,19 @@ export const useSelect = (props, states: States, ctx) => {
   const resetHoverIndex = () => {
     setTimeout(() => {
       const valueKey = props.valueKey
+      const optionIndexByValue = new Map(
+        optionsArray.value.map((item, index) => [getValueKey(item), index]),
+      )
       if (!props.multiple) {
-        states.hoverIndex = optionsArray.value.findIndex((item) => {
-          return getValueKey(item) === getValueKey(states.selected)
-        })
+        states.hoverIndex =
+          optionIndexByValue.get(getValueKey(states.selected)) ?? -1
       } else {
         if (states.selected.length > 0) {
           states.hoverIndex = Math.min.apply(
             null,
             states.selected.map((selected) => {
-              return optionsArray.value.findIndex((item) => {
-                return get(item, valueKey) === get(selected, valueKey)
-              })
-            })
+              return optionIndexByValue.get(get(selected, valueKey)) ?? -1
+            }),
           )
         } else {
           states.hoverIndex = -1
@@ -750,17 +756,17 @@ export const useSelect = (props, states: States, ctx) => {
     let target = null
 
     if (targetOption?.value) {
-      const options = optionsArray.value.filter(
-        (item) => item.value === targetOption.value
+      const matched = optionsArray.value.find(
+        (item) => item.value === targetOption.value,
       )
-      if (options.length > 0) {
-        target = options[0].$el
+      if (matched) {
+        target = matched.$el
       }
     }
 
     if (tooltipRef.value && target) {
       const menu = tooltipRef.value?.popperRef?.contentRef?.querySelector?.(
-        `.${ns.be('dropdown', 'wrap')}`
+        `.${ns.be('dropdown', 'wrap')}`,
       )
       if (menu) {
         scrollIntoView(menu as HTMLElement, target)
@@ -794,7 +800,7 @@ export const useSelect = (props, states: States, ctx) => {
   const toggleLastOptionHitState = (hit?: boolean) => {
     if (!Array.isArray(states.selected)) return
     const lastNotDisabledIndex = getLastNotDisabledIndex(
-      states.selected.map((it) => it.value)
+      states.selected.map((it) => it.value),
     )
     const option = states.selected[lastNotDisabledIndex]
     if (!option) return
@@ -915,15 +921,15 @@ export const useSelect = (props, states: States, ctx) => {
   const optionsAllDisabled = computed(() =>
     optionsArray.value
       .filter((option) => option.visible)
-      .every((option) => option.disabled)
+      .every((option) => option.disabled),
   )
 
   const showTagList = computed(() =>
-    props.multiple ? states.selected.slice(0, props.maxCollapseTags) : []
+    props.multiple ? states.selected.slice(0, props.maxCollapseTags) : [],
   )
 
   const collapseTagList = computed(() =>
-    props.multiple ? states.selected.slice(props.maxCollapseTags) : []
+    props.multiple ? states.selected.slice(props.maxCollapseTags) : [],
   )
 
   const navigateOptions = (direction) => {

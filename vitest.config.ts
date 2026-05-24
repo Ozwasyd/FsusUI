@@ -2,6 +2,7 @@ import { defineConfig } from 'vitest/config'
 import Vue from '@vitejs/plugin-vue'
 import VueJsx from '@vitejs/plugin-vue-jsx'
 import VueMacros from 'unplugin-vue-macros/vite'
+import { resolveVitestWorkers } from './scripts/test-parallelism'
 
 export default defineConfig({
   plugins: [
@@ -19,6 +20,8 @@ export default defineConfig({
   },
   test: {
     clearMocks: true,
+    fileParallelism: true,
+    maxWorkers: resolveVitestWorkers(),
     include: [
       'packages/**/__tests__/**/*.{test,spec,vitest}.{js,jsx,ts,tsx}',
       'tests/boundary/**/*.{test,spec,vitest}.{js,jsx,ts,tsx}',

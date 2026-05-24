@@ -19,8 +19,9 @@
 #include <cstdint>
 #include <emscripten/bind.h>
 #include <emscripten/emscripten.h>
-#include <format>
-#include <ranges>
+#include <functional>
+#include <iomanip>
+#include <sstream>
 #include <span>
 #include <stdexcept>
 #include <string>
@@ -35,15 +36,65 @@ constexpr auto asciiToLower = [](unsigned char c) {
   return static_cast<char>(std::tolower(c));
 };
 
+unsigned char toAsciiLower(unsigned char c)
+{
+  if (c >= 'A' && c <= 'Z')
+  {
+    return static_cast<unsigned char>(c + ('a' - 'A'));
+  }
+
+  return c;
+}
+
+bool containsAsciiKeyword(const unsigned char* label,
+                          std::int32_t labelLength,
+                          const unsigned char* keyword,
+                          std::int32_t keywordLength,
+                          bool caseSensitive)
+{
+  if (keywordLength <= 0)
+    return true;
+  if (labelLength < keywordLength)
+    return false;
+
+  for (std::int32_t index = 0; index <= labelLength - keywordLength; ++index)
+  {
+    bool matched = true;
+    for (std::int32_t keywordIndex = 0; keywordIndex < keywordLength;
+         ++keywordIndex)
+    {
+      unsigned char left = label[index + keywordIndex];
+      unsigned char right = keyword[keywordIndex];
+
+      if (!caseSensitive)
+      {
+        left = toAsciiLower(left);
+        right = toAsciiLower(right);
+      }
+
+      if (left != right)
+      {
+        matched = false;
+        break;
+      }
+    }
+
+    if (matched)
+      return true;
+  }
+
+  return false;
+}
+
 void sortNumbersBuffer(std::span<double> data, bool ascending)
 {
   if (ascending)
   {
-    std::ranges::sort(data);
+    std::sort(data.begin(), data.end());
     return;
   }
 
-  std::ranges::sort(data, std::ranges::greater{});
+  std::sort(data.begin(), data.end(), std::greater<>{});
 }
 
 void estimateRowHeightsBuffer(std::span<const std::int32_t> textLengths,
@@ -100,6 +151,35 @@ EMSCRIPTEN_KEEPALIVE void estimate_row_heights_buffer(
   estimateRowHeightsBuffer(
     {lengths, len}, rowWidth, charWidth, lineHeight, padding, {out, len});
 }
+
+EMSCRIPTEN_KEEPALIVE std::int32_t filter_ascii_indices_buffer(
+  const unsigned char* labels,
+  const std::int32_t* offsets,
+  const std::int32_t* lengths,
+  std::int32_t count,
+  const unsigned char* keyword,
+  std::int32_t keywordLength,
+  int caseSensitive,
+  std::int32_t* out)
+{
+  std::int32_t matchedCount = 0;
+
+  for (std::int32_t index = 0; index < count; ++index)
+  {
+    const auto offset = offsets[index];
+    const auto length = lengths[index];
+    if (containsAsciiKeyword(labels + offset,
+                             length,
+                             keyword,
+                             keywordLength,
+                             caseSensitive != 0))
+    {
+      out[matchedCount++] = index;
+    }
+  }
+
+  return matchedCount;
+}
 }
 
 // ─────────────────────────────────
@@ -119,11 +199,11 @@ void sortStrings(val arr, bool ascending)
 
   if (ascending)
   {
-    std::ranges::sort(buf, std::ranges::less{});
+    std::sort(buf.begin(), buf.end(), std::less<>{});
   }
   else
   {
-    std::ranges::sort(buf, std::ranges::greater{});
+    std::sort(buf.begin(), buf.end(), std::greater<>{});
   }
 
   for (unsigned i = 0; i < len; ++i)
@@ -149,20 +229,20 @@ val filterIndices(val arr, std::string keyword, bool caseSensitive)
     for (unsigned i = 0; i < len; ++i)
     {
       std::string item = arr[i].as<std::string>();
-      if (item.contains(keyword))
+      if (item.find(keyword) != std::string::npos)
         result.set(resultLen++, val(i));
     }
 
     return result;
   }
 
-  std::ranges::transform(keyword, keyword.begin(), asciiToLower);
+  std::transform(keyword.begin(), keyword.end(), keyword.begin(), asciiToLower);
 
   for (unsigned i = 0; i < len; ++i)
   {
     std::string item = arr[i].as<std::string>();
-    std::ranges::transform(item, item.begin(), asciiToLower);
-    if (item.contains(keyword))
+    std::transform(item.begin(), item.end(), item.begin(), asciiToLower);
+    if (item.find(keyword) != std::string::npos)
       result.set(resultLen++, val(i));
   }
 
@@ -242,8 +322,10 @@ std::string hexToHsl(std::string hex)
   double g = ((rgbValue >> 8) & 0xFF) / 255.0;
   double b = (rgbValue & 0xFF) / 255.0;
   auto [h, s, l] = rgbToHsl(r, g, b);
-  return std::format("hsl({:.1f},{:.1f}%,{:.1f}%)",
-                     h * 360, s * 100, l * 100);
+  std::ostringstream out;
+  out << std::fixed << std::setprecision(1)
+      << "hsl(" << h * 360 << ',' << s * 100 << "%," << l * 100 << "%)";
+  return out.str();
 }
 
 /**
@@ -255,7 +337,12 @@ std::string hslToHex(double h, double s, double l)
   unsigned int ri = static_cast<unsigned int>(std::round(r * 255));
   unsigned int gi = static_cast<unsigned int>(std::round(g * 255));
   unsigned int bi = static_cast<unsigned int>(std::round(b * 255));
-  return std::format("#{:02X}{:02X}{:02X}", ri, gi, bi);
+  std::ostringstream out;
+  out << '#' << std::uppercase << std::hex << std::setfill('0')
+      << std::setw(2) << ri
+      << std::setw(2) << gi
+      << std::setw(2) << bi;
+  return out.str();
 }
 
 // ─────────────────────────────────

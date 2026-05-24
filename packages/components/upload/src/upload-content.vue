@@ -26,7 +26,7 @@
 import { shallowRef } from 'vue'
 import { cloneDeep, isEqual, isPlainObject } from 'lodash-unified'
 import { useNamespace } from '@element-plus/hooks'
-import { entriesOf, isFunction } from '@element-plus/utils'
+import { isFunction } from '@element-plus/utils'
 import { useFormDisabled } from '@element-plus/components/form'
 import UploadDragger from './upload-dragger.vue'
 import { uploadContentProps } from './upload-content'
@@ -49,8 +49,8 @@ const props = defineProps(uploadContentProps)
 const ns = useNamespace('upload')
 const disabled = useFormDisabled()
 
-const requests = shallowRef<Record<string, XMLHttpRequest | Promise<unknown>>>(
-  {}
+const requests = shallowRef(
+  new Map<string, XMLHttpRequest | Promise<unknown>>(),
 )
 const inputRef = shallowRef<HTMLInputElement>()
 
@@ -119,13 +119,13 @@ const upload = async (rawFile: UploadRawFile): Promise<void> => {
     Object.assign(file, {
       uid: rawFile.uid,
     }),
-    beforeData
+    beforeData,
   )
 }
 
 const resolveData = async (
   data: UploadContentProps['data'],
-  rawFile: UploadRawFile
+  rawFile: UploadRawFile,
 ): Promise<Record<string, any>> => {
   if (isFunction(data)) {
     return data(rawFile)
@@ -136,7 +136,7 @@ const resolveData = async (
 
 const doUpload = async (
   rawFile: UploadRawFile,
-  beforeData?: UploadContentProps['data']
+  beforeData?: UploadContentProps['data'],
 ) => {
   const {
     headers,
@@ -172,15 +172,15 @@ const doUpload = async (
     },
     onSuccess: (res) => {
       onSuccess?.(res, rawFile)
-      delete requests.value[uid]
+      requests.value.delete(String(uid))
     },
     onError: (err) => {
       onError?.(err, rawFile)
-      delete requests.value[uid]
+      requests.value.delete(String(uid))
     },
   }
   const request = httpRequest(options)
-  requests.value[uid] = request
+  requests.value.set(String(uid), request)
   if (request instanceof Promise) {
     request.then(options.onSuccess, options.onError)
   }
@@ -204,12 +204,13 @@ const handleKeydown = () => {
 }
 
 const abort = (file?: UploadFile) => {
-  const _reqs = entriesOf(requests.value).filter(
-    file ? ([uid]) => String(file.uid) === uid : () => true
+  const targetUid = file ? String(file.uid) : undefined
+  const _reqs = Array.from(requests.value.entries()).filter(([uid]) =>
+    targetUid ? uid === targetUid : true,
   )
   _reqs.forEach(([uid, req]) => {
     if (req instanceof XMLHttpRequest) req.abort()
-    delete requests.value[uid]
+    requests.value.delete(String(uid))
   })
 }
 

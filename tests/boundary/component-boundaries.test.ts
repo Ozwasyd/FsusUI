@@ -1,5 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import fg from 'fast-glob'
 import { describe, expect, it } from 'vitest'
 import {
   boundaryTypes,
@@ -21,12 +22,15 @@ const publicComponentDirs = readdirSync(componentsRoot, {
 const rootIndexSource = readFileSync(rootComponentsIndex, 'utf8')
 const rootExportedComponentDirs = Array.from(
   rootIndexSource.matchAll(/^export \* from '\.\/([^']+)'/gm),
-  (match) => match[1]
+  (match) => match[1],
 ).sort()
 
 const unitTestExists = (componentDir: string) => {
   const testDir = resolve(componentsRoot, componentDir, '__tests__')
-  return existsSync(testDir) && readdirSync(testDir).some((file) => file.includes('.test.'))
+  return (
+    existsSync(testDir) &&
+    readdirSync(testDir).some((file) => file.includes('.test.'))
+  )
 }
 
 const exportStatements = (componentDir: string) => {
@@ -43,7 +47,7 @@ describe('component boundary coverage registry', () => {
     for (const componentDir of publicComponentDirs) {
       expect(
         publicComponentBoundaries[componentDir],
-        `${componentDir} is missing from component boundary coverage`
+        `${componentDir} is missing from component boundary coverage`,
       ).toBeDefined()
     }
   })
@@ -52,7 +56,7 @@ describe('component boundary coverage registry', () => {
     for (const componentDir of rootExportedComponentDirs) {
       expect(
         publicComponentBoundaries[componentDir],
-        `${componentDir} is exported from packages/components but missing boundary coverage`
+        `${componentDir} is exported from packages/components but missing boundary coverage`,
       ).toBeDefined()
     }
   })
@@ -62,19 +66,25 @@ describe('component boundary coverage registry', () => {
 
     for (const componentDir of publicComponentDirs) {
       const coverage = publicComponentBoundaries[componentDir]
-      expect(coverage.exports, `${componentDir} must cover all public exports`).toBe('all')
-      expect(coverage.boundaries.length, `${componentDir} must list boundaries`).toBeGreaterThan(0)
+      expect(
+        coverage.exports,
+        `${componentDir} must cover all public exports`,
+      ).toBe('all')
+      expect(
+        coverage.boundaries.length,
+        `${componentDir} must list boundaries`,
+      ).toBeGreaterThan(0)
 
       for (const boundary of coverage.boundaries) {
         expect(
           validBoundaryTypes.has(boundary),
-          `${componentDir} declares unknown boundary ${boundary}`
+          `${componentDir} declares unknown boundary ${boundary}`,
         ).toBe(true)
       }
 
       expect(
         exportStatements(componentDir).length,
-        `${componentDir} must expose public exports from index.ts`
+        `${componentDir} must expose public exports from index.ts`,
       ).toBeGreaterThan(0)
     }
   })
@@ -82,15 +92,36 @@ describe('component boundary coverage registry', () => {
   it('has unit tests or visual fixture coverage for each public package', () => {
     for (const componentDir of publicComponentDirs) {
       const coverage = publicComponentBoundaries[componentDir]
-      const coveredBy = coverage.coveredBy ?? groupedComponentCoverage[componentDir]
+      const coveredBy =
+        coverage.coveredBy ?? groupedComponentCoverage[componentDir]
       const hasDirectUnitTest = unitTestExists(componentDir)
       const hasGroupedUnitTest = coveredBy ? unitTestExists(coveredBy) : false
       const hasFixture = Boolean(coverage.fixtureModes?.length)
 
       expect(
         hasDirectUnitTest || hasGroupedUnitTest || hasFixture,
-        `${componentDir} must have unit tests, grouped tests, or fixture coverage`
+        `${componentDir} must have unit tests, grouped tests, or fixture coverage`,
       ).toBe(true)
+    }
+  })
+
+  it('keeps demo-app runtime imports behind the demo contract', async () => {
+    const demoFiles = await fg('packages/demo-app/src/**/*.{ts,vue}', {
+      cwd: process.cwd(),
+      absolute: true,
+    })
+    const forbiddenDeepImport =
+      /from ['"]\.\.\/\.\.\/components\/(?!.*style\/css)/
+
+    for (const file of demoFiles) {
+      const source = readFileSync(file, 'utf8')
+        .split('\n')
+        .filter((line) => !line.trimStart().startsWith('import type '))
+        .join('\n')
+      expect(
+        forbiddenDeepImport.test(source),
+        `${file} must import runtime components through demo-contract/element-plus boundaries`,
+      ).toBe(false)
     }
   })
 })

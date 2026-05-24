@@ -13,6 +13,10 @@ import { DynamicSizeList } from '..'
 
 import type { ListExposes } from '../src/types'
 type ListRef = ListExposes
+const waitForScrollReset = async () => {
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+  await nextTick()
+}
 
 const { estimateRowHeights } = vi.hoisted(() => ({
   estimateRowHeights: vi.fn(
@@ -24,10 +28,11 @@ const { estimateRowHeights } = vi.hoisted(() => ({
       padding = 16,
     ) => {
       const charactersPerLine = Math.max(1, Math.floor(rowWidth / charWidth))
-      return textLengths.map((textLength) => {
+      const heights = textLengths.map((textLength) => {
         const lineCount = Math.max(1, Math.ceil(textLength / charactersPerLine))
         return lineCount * lineHeight + padding
       })
+      return { ok: true, value: heights }
     },
   ),
 }))
@@ -158,7 +163,7 @@ describe('<dynamic-size-list />', () => {
 
       // scroll 200px is approximately ~7(size 30px) - ~8(size 26px) items away.
       listRef.scrollTo(200)
-      await nextTick()
+      await waitForScrollReset()
       expect(Number.parseInt(listRef.innerRef.style.height)).toBeGreaterThan(
         estimatedTotalSize,
       )
@@ -205,7 +210,7 @@ describe('<dynamic-size-list />', () => {
 
       // scroll 200px is approximately ~7(size 30px) - ~8(size 26px) items away.
       listRef.scrollTo(200)
-      await nextTick()
+      await waitForScrollReset()
       expect(Number.parseInt(listRef.innerRef.style.width)).toBeGreaterThan(
         estimatedTotalSize,
       )
@@ -236,7 +241,7 @@ describe('<dynamic-size-list />', () => {
       const listRef = wrapper.vm.$refs.listRef as ListRef
       // auto alignment
       listRef.scrollToItem(10)
-      await nextTick()
+      await waitForScrollReset()
       // when scroll to item 10 the estimated offset should be 250
       // the original grid position is 0, so it should return 200 (offset 250 - size 50)
       // to scrollTo method to handle, which at this time the scrollTo item should be placed
@@ -247,32 +252,33 @@ describe('<dynamic-size-list />', () => {
       ).toBeLessThanOrEqual(4)
       // smart alignment
       listRef.scrollToItem(20, SMART_ALIGNMENT)
-      await nextTick()
+      await waitForScrollReset()
       expect(
         Number.parseInt(wrapper.find(ITEM_SELECTOR).text()),
       ).toBeLessThanOrEqual(15)
 
       listRef.scrollToItem(21, SMART_ALIGNMENT)
-      await nextTick()
+      await waitForScrollReset()
       expect(
         Number.parseInt(wrapper.find(ITEM_SELECTOR).text()),
       ).toBeLessThanOrEqual(15)
 
       listRef.scrollToItem(10, START_ALIGNMENT)
-      await nextTick()
+      await waitForScrollReset()
       expect(
         Number.parseInt(wrapper.find(ITEM_SELECTOR).text()),
       ).toBeLessThanOrEqual(7)
 
       listRef.scrollToItem(20, END_ALIGNMENT)
-      await nextTick()
+      await waitForScrollReset()
       expect(
         Number.parseInt(wrapper.find(ITEM_SELECTOR).text()),
       ).toBeLessThanOrEqual(14)
 
       listRef.scrollTo(200)
-      await nextTick()
+      await waitForScrollReset()
       listRef.scrollToItem(5)
+      await waitForScrollReset()
       expect(
         Number.parseInt(wrapper.find(ITEM_SELECTOR).text()),
       ).toBeLessThanOrEqual(4)

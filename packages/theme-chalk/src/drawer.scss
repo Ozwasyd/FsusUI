@@ -22,7 +22,6 @@ $directions: rtl, ltr, ttb, btt;
     getCssVar('transition-function-fast-bezier');
   will-change: transform;
 
-  // The "Punctuation" Motif (Grey Dot) in header
   &__header {
     align-items: center;
     color: getCssVar('text-color', 'primary');
@@ -30,18 +29,6 @@ $directions: rtl, ltr, ttb, btt;
     margin-bottom: 0;
     padding: getCssVar('drawer-padding-primary');
     position: relative;
-
-    &::before {
-      content: '';
-      position: absolute;
-      left: 16px;
-      top: 38px;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background-color: getCssVar('color-info');
-      opacity: 0.6;
-    }
 
     & > :first-child {
       flex: 1;

@@ -55,8 +55,8 @@
 | on-progress | 文件上传进度变化时的钩子 | `(evt: UploadProgressEvent, uploadFile: UploadFile, uploadFiles: UploadFiles) => void` | — |
 | on-change | 文件状态改变时的钩子（选取、上传成功、失败均会触发） | `(uploadFile: UploadFile, uploadFiles: UploadFiles) => void` | — |
 | on-exceed | 文件数超出 `limit` 时的钩子 | `(files: File[], uploadFiles: UploadUserFile[]) => void` | — |
-| before-upload | 上传前钩子，返回 `false` 或 rejected Promise 时中止上传 | `(rawFile: UploadRawFile) => Awaitable<void \| boolean \| File \| Blob>` | — |
-| before-remove | 移除前钩子，返回 `false` 或 rejected Promise 时中止删除 | `(uploadFile: UploadFile, uploadFiles: UploadFiles) => Awaitable<boolean>` | — |
+| before-upload | 上传前钩子，返回 `false` 或 rejected Promise 时中止上传；内部按 Result Mode 归一为可恢复失败，不向外抛出 | `(rawFile: UploadRawFile) => Awaitable<void \| boolean \| File \| Blob>` | — |
+| before-remove | 移除前钩子，返回 `false` 或 rejected Promise 时中止删除；内部按 Result Mode 归一为可恢复失败，不向外抛出 | `(uploadFile: UploadFile, uploadFiles: UploadFiles) => Awaitable<boolean>` | — |
 | file-list / v-model:file-list | 已上传的文件列表 | `UploadUserFile[]` | `[]` |
 | list-type | 文件列表类型 | `'text' \| 'picture' \| 'picture-card'` | `text` |
 | auto-upload | 是否自动上传 | `boolean` | `true` |

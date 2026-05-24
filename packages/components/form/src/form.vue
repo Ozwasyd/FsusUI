@@ -6,7 +6,14 @@
 
 <script lang="ts" setup>
 import { computed, provide, reactive, toRefs, watch } from 'vue'
-import { debugWarn, isFunction } from '@element-plus/utils'
+import {
+  createFsusError,
+  debugWarn,
+  fsusErr,
+  fsusOk,
+  isFsusErr,
+  isFunction,
+} from '@element-plus/utils'
 import { useNamespace } from '@element-plus/hooks'
 import { useFormSize } from './hooks'
 import { formContextKey } from './constants'
@@ -95,51 +102,49 @@ const validate = async (
 
 const doValidateField = async (
   props: Arrayable<FormItemProp> = []
-): Promise<boolean> => {
-  if (!isValidatable.value) return false
+): FormValidationResult => {
+  if (!isValidatable.value) return fsusOk(false)
 
   const fields = obtainValidateFields(props)
-  if (fields.length === 0) return true
+  if (fields.length === 0) return fsusOk(true)
 
   let validationErrors: ValidateFieldsError = {}
   for (const field of fields) {
-    try {
-      await field.validate('')
-    } catch (fields) {
+    const fieldResult = await field.validate('')
+    if (isFsusErr(fieldResult)) {
       validationErrors = {
         ...validationErrors,
-        ...(fields as ValidateFieldsError),
+        ...((fieldResult.error.cause ?? {}) as ValidateFieldsError),
       }
     }
   }
 
-  if (Object.keys(validationErrors).length === 0) return true
-  return Promise.reject(validationErrors)
+  if (Object.keys(validationErrors).length === 0) return fsusOk(true)
+  return fsusErr(
+    createFsusError('validation', 'form_validation_failed', {
+      cause: validationErrors,
+    }),
+  )
 }
 
 const validateField: FormContext['validateField'] = async (
   modelProps = [],
   callback
 ) => {
-  const shouldThrow = !isFunction(callback)
-  try {
-    const result = await doValidateField(modelProps)
-    // When result is false meaning that the fields are not validatable
-    if (result === true) {
-      callback?.(result)
+  const result = await doValidateField(modelProps)
+  if (!isFsusErr(result)) {
+    if (result.value === true) {
+      callback?.(result.value)
     }
     return result
-  } catch (e) {
-    if (e instanceof Error) throw e
-
-    const invalidFields = e as ValidateFieldsError
-
-    if (props.scrollToError) {
-      scrollToField(Object.keys(invalidFields)[0])
-    }
-    callback?.(false, invalidFields)
-    return shouldThrow && Promise.reject(invalidFields)
   }
+
+  const invalidFields = (result.error.cause ?? {}) as ValidateFieldsError
+  if (props.scrollToError) {
+    scrollToField(Object.keys(invalidFields)[0])
+  }
+  callback?.(false, invalidFields)
+  return result
 }
 
 const scrollToField = (prop: FormItemProp) => {
@@ -153,7 +158,9 @@ watch(
   () => props.rules,
   () => {
     if (props.validateOnRuleChange) {
-      validate().catch((err) => debugWarn(err))
+      void validate().then((result) => {
+        if (isFsusErr(result)) debugWarn(new Error(result.error.message))
+      })
     }
   },
   { deep: true }

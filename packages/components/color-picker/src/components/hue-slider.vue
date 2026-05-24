@@ -48,6 +48,13 @@ export default defineComponent({
     // data
     const thumbLeft = ref(0)
     const thumbTop = ref(0)
+    let dragMetrics:
+      | {
+          rect: Pick<DOMRect, 'height' | 'left' | 'top' | 'width'>
+          thumbHeight: number
+          thumbWidth: number
+        }
+      | undefined
     // computed
     const hueValue = computed(() => {
       return props.color.get('hue')
@@ -57,7 +64,7 @@ export default defineComponent({
       () => hueValue.value,
       () => {
         update()
-      }
+      },
     )
 
     // methods
@@ -69,33 +76,40 @@ export default defineComponent({
       }
     }
 
-    function handleDrag(event: MouseEvent | TouchEvent) {
+    function measureDragMetrics() {
       if (!bar.value || !thumb.value) return
-
       const el = instance.vnode.el as HTMLElement
-      const rect = el.getBoundingClientRect()
+      const { height, left, top, width } = el.getBoundingClientRect()
+      return {
+        rect: { height, left, top, width },
+        thumbHeight: thumb.value.offsetHeight,
+        thumbWidth: thumb.value.offsetWidth,
+      }
+    }
+
+    function handleDrag(event: MouseEvent | TouchEvent) {
+      const metrics = dragMetrics || measureDragMetrics()
+      if (!metrics) return
+
+      const { rect, thumbHeight, thumbWidth } = metrics
       const { clientX, clientY } = getClientXY(event)
       let hue
 
       if (!props.vertical) {
         let left = clientX - rect.left
-        left = Math.min(left, rect.width - thumb.value.offsetWidth / 2)
-        left = Math.max(thumb.value.offsetWidth / 2, left)
+        left = Math.min(left, rect.width - thumbWidth / 2)
+        left = Math.max(thumbWidth / 2, left)
 
         hue = Math.round(
-          ((left - thumb.value.offsetWidth / 2) /
-            (rect.width - thumb.value.offsetWidth)) *
-            360
+          ((left - thumbWidth / 2) / (rect.width - thumbWidth)) * 360,
         )
       } else {
         let top = clientY - rect.top
 
-        top = Math.min(top, rect.height - thumb.value.offsetHeight / 2)
-        top = Math.max(thumb.value.offsetHeight / 2, top)
+        top = Math.min(top, rect.height - thumbHeight / 2)
+        top = Math.max(thumbHeight / 2, top)
         hue = Math.round(
-          ((top - thumb.value.offsetHeight / 2) /
-            (rect.height - thumb.value.offsetHeight)) *
-            360
+          ((top - thumbHeight / 2) / (rect.height - thumbHeight)) * 360,
         )
       }
       props.color.set('hue', hue)
@@ -111,7 +125,7 @@ export default defineComponent({
 
       if (!el) return 0
       return Math.round(
-        (hue * (el.offsetWidth - thumb.value.offsetWidth / 2)) / 360
+        (hue * (el.offsetWidth - thumb.value.offsetWidth / 2)) / 360,
       )
     }
 
@@ -124,7 +138,7 @@ export default defineComponent({
 
       if (!el) return 0
       return Math.round(
-        (hue * (el.offsetHeight - thumb.value.offsetHeight / 2)) / 360
+        (hue * (el.offsetHeight - thumb.value.offsetHeight / 2)) / 360,
       )
     }
 
@@ -138,11 +152,15 @@ export default defineComponent({
       if (!bar.value || !thumb.value) return
 
       const dragConfig = {
+        start: () => {
+          dragMetrics = measureDragMetrics()
+        },
         drag: (event: MouseEvent | TouchEvent) => {
           handleDrag(event)
         },
         end: (event: MouseEvent | TouchEvent) => {
           handleDrag(event)
+          dragMetrics = undefined
         },
       }
 

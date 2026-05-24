@@ -25,7 +25,7 @@ const ScrollBar = defineComponent({
   props: virtualizedScrollbarProps,
   emits: ['scroll', 'start-move', 'stop-move'],
   setup(props, { emit }) {
-    const GAP = computed(() => props.startGap + props.endGap) // top 2 + bottom 2 | left 2 + right 2
+    const GAP = computed(() => props.startGap + props.endGap)
 
     const nsVirtualScrollbar = useNamespace('virtual-scrollbar')
     const nsScrollbar = useNamespace('scrollbar')
@@ -47,19 +47,19 @@ const ScrollBar = defineComponent({
 
     const trackSize = computed(() => props.clientSize! - unref(GAP))
 
-    const trackStyle = computed<CSSProperties>(() => ({
-      position: 'absolute',
-      width: `${
-        HORIZONTAL === props.layout ? trackSize.value : props.scrollbarSize
-      }px`,
-      height: `${
-        HORIZONTAL === props.layout ? props.scrollbarSize : trackSize.value
-      }px`,
-      [ScrollbarDirKey[props.layout]]: '2px',
-      right: '2px',
-      bottom: '2px',
-      borderRadius: '4px',
-    }))
+    const trackStyle = computed<CSSProperties>(() => {
+      const horizontal = HORIZONTAL === props.layout
+
+      return {
+        position: 'absolute',
+        width: `${horizontal ? trackSize.value : props.scrollbarSize}px`,
+        height: `${horizontal ? props.scrollbarSize : trackSize.value}px`,
+        [ScrollbarDirKey[props.layout]]: `${props.startGap}px`,
+        right: horizontal ? undefined : '4px',
+        bottom: horizontal ? '4px' : undefined,
+        borderRadius: 'var(--fsus-radius-pill, 999px)',
+      }
+    })
 
     const thumbSize = computed(() => {
       const ratio = props.ratio!
@@ -76,8 +76,8 @@ const ScrollBar = defineComponent({
       return Math.floor(
         Math.min(
           Math.max(ratio * clientSize, SCROLLBAR_MIN_SIZE),
-          SCROLLBAR_MAX_SIZE
-        )
+          SCROLLBAR_MAX_SIZE,
+        ),
       )
     })
 
@@ -98,14 +98,14 @@ const ScrollBar = defineComponent({
           size: thumb,
           move: state.traveled,
         },
-        props.layout
+        props.layout,
       )
 
       return style
     })
 
     const totalSteps = computed(() =>
-      Math.floor(props.clientSize! - thumbSize.value - unref(GAP))
+      Math.floor(props.clientSize! - thumbSize.value - unref(GAP)),
     )
 
     const attachEvents = () => {
@@ -207,10 +207,7 @@ const ScrollBar = defineComponent({
       frameHandle = rAF(() => {
         state.traveled = Math.max(
           props.startGap,
-          Math.min(
-            distance,
-            totalSteps.value // 2 is the top value
-          )
+          Math.min(distance, totalSteps.value),
         )
         emit('scroll', distance, totalSteps.value)
       })
@@ -219,7 +216,7 @@ const ScrollBar = defineComponent({
     const clickTrackHandler = (e: MouseEvent) => {
       const offset = Math.abs(
         (e.target as HTMLElement).getBoundingClientRect()[bar.value.direction] -
-          e[bar.value.client]
+          e[bar.value.client],
       )
       const thumbHalf = thumbRef.value![bar.value.offset] / 2
       const distance = offset - thumbHalf
@@ -243,7 +240,7 @@ const ScrollBar = defineComponent({
          *    traveled = (v * clientSize) / (clientSize / totalSteps) --> (v * clientSize) * (totalSteps / clientSize) --> v * totalSteps
          */
         state.traveled = Math.ceil(v! * totalSteps.value)
-      }
+      },
     )
 
     onBeforeUnmount(() => {
@@ -273,8 +270,8 @@ const ScrollBar = defineComponent({
             style: thumbStyle.value,
             onMousedown: onThumbMouseDown,
           },
-          []
-        )
+          [],
+        ),
       )
     }
   },

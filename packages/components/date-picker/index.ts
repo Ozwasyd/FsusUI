@@ -1,11 +1,15 @@
 import DatePicker from './src/date-picker'
 
 import type { App } from 'vue'
-import type { SFCWithInstall } from '@element-plus/utils'
+import {
+  registerFsusDefaultRenderPipelineComponentPolicies,
+  type SFCWithInstall,
+} from '@element-plus/utils'
 
 const _DatePicker = DatePicker as SFCWithInstall<typeof DatePicker>
 
 _DatePicker.install = (app: App) => {
+  registerFsusDefaultRenderPipelineComponentPolicies([_DatePicker])
   app.component(_DatePicker.name!, _DatePicker)
 }
 

@@ -99,7 +99,7 @@ describe('Slider', () => {
 
     expect(
       (document.querySelector(`.${TOOLTIP_CLASS}`) as HTMLElement).dataset
-        .popperPlacement
+        .popperPlacement,
     ).toBe(PLACEMENT)
   })
 
@@ -115,7 +115,7 @@ describe('Slider', () => {
         ),
         {
           attachTo: document.body,
-        }
+        },
       )
 
       const slider = wrapper.findComponent({ name: 'ElSliderButton' })
@@ -123,7 +123,7 @@ describe('Slider', () => {
       vi.spyOn(
         wrapper.find('.el-slider__runway').element,
         'clientWidth',
-        'get'
+        'get',
       ).mockImplementation(() => 200)
       slider.trigger('mousedown', { clientX: 0 })
 
@@ -158,14 +158,14 @@ describe('Slider', () => {
         ),
         {
           attachTo: document.body,
-        }
+        },
       )
 
       const slider = wrapper.findComponent({ name: 'ElSliderButton' })
       vi.spyOn(
         wrapper.find('.el-slider__runway').element,
         'clientHeight',
-        'get'
+        'get',
       ).mockImplementation(() => 200)
       slider.trigger('mousedown', { clientY: 0 })
 
@@ -187,6 +187,133 @@ describe('Slider', () => {
       await nextTick()
       expect(value.value).toBe(50)
     })
+
+    it('coalesces drag movement into animation frames', async () => {
+      vi.useRealTimers()
+      const value = ref(0)
+      const inputValues: SliderProps['modelValue'][] = []
+      const wrapper = mount(
+        () => (
+          <div style="width: 200px;">
+            <Slider
+              v-model={value.value}
+              onInput={(val) => inputValues.push(val)}
+            />
+          </div>
+        ),
+        {
+          attachTo: document.body,
+        },
+      )
+      const frameCallbacks: FrameRequestCallback[] = []
+      const requestAnimationFrameSpy = vi
+        .spyOn(window, 'requestAnimationFrame')
+        .mockImplementation((callback) => {
+          frameCallbacks.push(callback)
+          return frameCallbacks.length
+        })
+      const cancelAnimationFrameSpy = vi
+        .spyOn(window, 'cancelAnimationFrame')
+        .mockImplementation((handle) => {
+          frameCallbacks[handle - 1] = () => undefined
+        })
+
+      vi.spyOn(
+        wrapper.find('.el-slider__runway').element,
+        'clientWidth',
+        'get',
+      ).mockImplementation(() => 200)
+      const slider = wrapper.findComponent({ name: 'ElSliderButton' })
+      await slider.trigger('mousedown', { clientX: 0 })
+
+      window.dispatchEvent(new MouseEvent('mousemove', { clientX: 40 }))
+      window.dispatchEvent(new MouseEvent('mousemove', { clientX: 80 }))
+      window.dispatchEvent(new MouseEvent('mousemove', { clientX: 150 }))
+      await nextTick()
+
+      expect(value.value).toBe(0)
+      expect(inputValues).toEqual([])
+      expect(frameCallbacks.length).toBeGreaterThan(0)
+
+      for (const callback of [...frameCallbacks]) {
+        callback(16)
+      }
+      expect(slider.vm.formatValue).toBe(75)
+      await nextTick()
+
+      expect(value.value).toBe(75)
+      expect(inputValues).toEqual([75])
+
+      window.dispatchEvent(new MouseEvent('mouseup', { clientX: 150 }))
+      requestAnimationFrameSpy.mockRestore()
+      cancelAnimationFrameSpy.mockRestore()
+    })
+
+    it('keeps the handle and bar aligned during fast overdrag', async () => {
+      vi.useRealTimers()
+      const value = ref(0)
+      const wrapper = mount(
+        () => (
+          <div style="width: 200px;">
+            <Slider v-model={value.value} />
+          </div>
+        ),
+        {
+          attachTo: document.body,
+        },
+      )
+      const frameCallbacks: FrameRequestCallback[] = []
+      const requestAnimationFrameSpy = vi
+        .spyOn(window, 'requestAnimationFrame')
+        .mockImplementation((callback) => {
+          frameCallbacks.push(callback)
+          return frameCallbacks.length
+        })
+      const cancelAnimationFrameSpy = vi
+        .spyOn(window, 'cancelAnimationFrame')
+        .mockImplementation((handle) => {
+          frameCallbacks[handle - 1] = () => undefined
+        })
+
+      vi.spyOn(
+        wrapper.find('.el-slider__runway').element,
+        'clientWidth',
+        'get',
+      ).mockImplementation(() => 200)
+
+      const slider = wrapper.findComponent({ name: 'ElSliderButton' })
+      await slider.trigger('mousedown', { clientX: 0 })
+      window.dispatchEvent(new MouseEvent('mousemove', { clientX: 80 }))
+      window.dispatchEvent(new MouseEvent('mousemove', { clientX: 300 }))
+
+      for (const callback of [...frameCallbacks]) {
+        callback(16)
+      }
+      await nextTick()
+
+      const buttonStyle =
+        wrapper.find('.el-slider__button-wrapper').attributes('style') ?? ''
+      const barStyle = wrapper.find('.el-slider__bar').attributes('style') ?? ''
+      const buttonTranslateX = Number(
+        buttonStyle.match(/translate3d\(([-\d.]+)px, 0, 0\)/)?.[1],
+      )
+      const barScaleX = Number(barStyle.match(/scaleX\(([-\d.]+)\)/)?.[1])
+      const motionOffsetX = Number.parseFloat(
+        (
+          wrapper.find('.el-slider').element as HTMLElement
+        ).style.getPropertyValue('--fsus-interactive-motion-offset-x'),
+      )
+
+      expect(buttonTranslateX / 200).toBeCloseTo(barScaleX, 4)
+      expect(buttonTranslateX).toBe(200)
+      expect(barScaleX).toBe(1)
+      expect(motionOffsetX).toBeLessThan(0)
+      expect(slider.vm.formatValue).toBe(100)
+
+      window.dispatchEvent(new MouseEvent('mouseup', { clientX: 300 }))
+      requestAnimationFrameSpy.mockRestore()
+      cancelAnimationFrameSpy.mockRestore()
+    })
   })
 
   describe('accessibility', () => {
@@ -197,13 +324,13 @@ describe('Slider', () => {
       const slider = wrapper.findComponent({ name: 'ElSliderButton' })
 
       slider.vm.onKeyDown(
-        new KeyboardEvent('keydown', { key: EVENT_CODE.right })
+        new KeyboardEvent('keydown', { key: EVENT_CODE.right }),
       )
       await nextTick()
       expect(value.value).toBe(1)
 
       slider.vm.onKeyDown(
-        new KeyboardEvent('keydown', { key: EVENT_CODE.left })
+        new KeyboardEvent('keydown', { key: EVENT_CODE.left }),
       )
       await nextTick()
       expect(value.value).toBe(0)
@@ -220,7 +347,7 @@ describe('Slider', () => {
       expect(value.value).toBe(1)
 
       slider.vm.onKeyDown(
-        new KeyboardEvent('keydown', { key: EVENT_CODE.down })
+        new KeyboardEvent('keydown', { key: EVENT_CODE.down }),
       )
       await nextTick()
       expect(value.value).toBe(0)
@@ -234,13 +361,13 @@ describe('Slider', () => {
 
       const slider = wrapper.findComponent({ name: 'ElSliderButton' })
       slider.vm.onKeyDown(
-        new KeyboardEvent('keydown', { key: EVENT_CODE.pageUp })
+        new KeyboardEvent('keydown', { key: EVENT_CODE.pageUp }),
       )
       await nextTick()
       expect(value.value).toBe(3)
 
       slider.vm.onKeyDown(
-        new KeyboardEvent('keydown', { key: EVENT_CODE.pageDown })
+        new KeyboardEvent('keydown', { key: EVENT_CODE.pageDown }),
       )
       await nextTick()
       expect(value.value).toBe(-1)
@@ -254,7 +381,7 @@ describe('Slider', () => {
 
       const slider = wrapper.findComponent({ name: 'ElSliderButton' })
       slider.vm.onKeyDown(
-        new KeyboardEvent('keydown', { key: EVENT_CODE.home })
+        new KeyboardEvent('keydown', { key: EVENT_CODE.home }),
       )
       await nextTick()
       expect(value.value).toBe(-5)
@@ -276,7 +403,7 @@ describe('Slider', () => {
       ),
       {
         attachTo: document.body,
-      }
+      },
     )
 
     const mockClientWidth = vi
@@ -338,7 +465,7 @@ describe('Slider', () => {
     const mockRectLeft = vi
       .spyOn(
         wrapper.find('.el-slider__runway').element,
-        'getBoundingClientRect'
+        'getBoundingClientRect',
       )
       .mockImplementation(() => {
         return {
@@ -371,7 +498,7 @@ describe('Slider', () => {
     const mockRectLeft = vi
       .spyOn(
         wrapper.find('.el-slider__runway').element,
-        'getBoundingClientRect'
+        'getBoundingClientRect',
       )
       .mockImplementation(() => {
         return {
@@ -445,13 +572,13 @@ describe('Slider', () => {
       () => <Slider height="200px" v-model={value.value} vertical />,
       {
         attachTo: document.body,
-      }
+      },
     )
 
     const mockRectBottom = vi
       .spyOn(
         wrapper.find('.el-slider__runway').element,
-        'getBoundingClientRect'
+        'getBoundingClientRect',
       )
       .mockImplementation(() => {
         return {
@@ -482,7 +609,7 @@ describe('Slider', () => {
       },
       {
         attachTo: document.body,
-      }
+      },
     )
 
     await nextTick()
@@ -524,13 +651,13 @@ describe('Slider', () => {
         ),
         {
           attachTo: document.body,
-        }
+        },
       )
 
       const mockRectLeft = vi
         .spyOn(
           wrapper.find('.el-slider__runway').element,
-          'getBoundingClientRect'
+          'getBoundingClientRect',
         )
         .mockImplementation(() => {
           return {
@@ -612,7 +739,7 @@ describe('Slider', () => {
       expect(marks.length).toBe(2)
       expect(stops.length).toBe(2)
       expect(getComputedStyle(marks[marks.length - 1].element).color).toBe(
-        'rgb(255, 85, 0)'
+        'rgb(255, 85, 0)',
       )
     })
   })

@@ -1,9 +1,14 @@
 // @ts-nocheck
-import { computed, nextTick, toRefs, watch } from 'vue'
+import { computed, nextTick, ref, toRefs, watch } from 'vue'
 import { isEqual, pick } from 'lodash-unified'
 import { UPDATE_MODEL_EVENT } from '@element-plus/constants'
 import { isFunction } from '@element-plus/utils'
-import { filterIndicesSync, warmupWasm } from '@element-plus/wasm'
+import {
+  createAsciiFilterIndex,
+  ensureWasmReady,
+  filterAsciiIndicesSync,
+  isWasmReady,
+} from '@element-plus/wasm'
 import ElTree from '@element-plus/components/tree'
 import TreeSelectOption from './tree-select-option'
 import {
@@ -16,10 +21,22 @@ import {
 import type { CacheOption } from './cache-options'
 import type { Ref } from 'vue'
 import type ElSelect from '@element-plus/components/select'
-import type Node from '@element-plus/components/tree/src/model/node'
-import type { TreeNodeData } from '@element-plus/components/tree/src/tree.type'
+import type { TreeNodeData } from '@element-plus/components/tree'
+
+type TreeNodeInstance = NonNullable<
+  ReturnType<InstanceType<typeof ElTree>['getNode']>
+>
 
 const TREE_SELECT_WASM_FILTER_THRESHOLD = 500
+const isAsciiOnly = (value: string) => {
+  for (let index = 0; index < value.length; index++) {
+    if (value.charCodeAt(index) > 0x7f) {
+      return false
+    }
+  }
+
+  return true
+}
 
 export const useTree = (
   props,
@@ -66,6 +83,34 @@ export const useTree = (
     isLeaf: 'isLeaf',
     ...props.props,
   }))
+  const wasmFilterError = ref<unknown>(null)
+  let wasmFilterReadyPromise: Promise<void> | null = null
+  let pendingWasmFilterValue: string | null = null
+
+  const requestWasmFilterReady = (value?: string) => {
+    if (value) {
+      pendingWasmFilterValue = value
+    }
+
+    if (wasmFilterReadyPromise) return
+    wasmFilterReadyPromise = ensureWasmReady()
+      .then((result) => {
+        wasmFilterReadyPromise = null
+        if (!result.ok) {
+          wasmFilterError.value = result.error
+          return
+        }
+        const nextFilterValue = pendingWasmFilterValue
+        pendingWasmFilterValue = null
+        if (nextFilterValue) {
+          tree.value?.filter(nextFilterValue)
+        }
+      })
+      .catch((error) => {
+        wasmFilterReadyPromise = null
+        wasmFilterError.value = error
+      })
+  }
 
   const getNodeValByProp = (
     prop: 'value' | 'label' | 'children' | 'disabled' | 'isLeaf',
@@ -75,7 +120,7 @@ export const useTree = (
     if (isFunction(propVal)) {
       return propVal(
         data,
-        tree.value?.getNode(getNodeValByProp('value', data)) as Node
+        tree.value?.getNode(getNodeValByProp('value', data)) as TreeNodeInstance,
       )
     } else {
       return data[propVal as string]
@@ -128,7 +173,12 @@ export const useTree = (
       return null
     }
 
+    if (!labels.every((label) => isAsciiOnly(label))) {
+      return null
+    }
+
     return {
+      filterIndex: createAsciiFilterIndex(labels),
       labels,
       nodeKeys,
       parentKeyByNodeKey,
@@ -139,7 +189,7 @@ export const useTree = (
     wasmFilterIndex,
     (index) => {
       if (index) {
-        warmupWasm()
+        requestWasmFilterReady()
       }
     },
     {
@@ -199,10 +249,20 @@ export const useTree = (
       return null
     }
 
-    const matchedIndices = filterIndicesSync(index.labels, value, true)
-    if (!matchedIndices) {
+    if (!isAsciiOnly(value)) {
       return null
     }
+
+    if (wasmFilterError.value) {
+      throw wasmFilterError.value
+    }
+
+    if (!isWasmReady()) {
+      requestWasmFilterReady(value)
+      return { pending: true }
+    }
+
+    const matchedIndices = filterAsciiIndicesSync(index.filterIndex, value, true)
 
     const visibleNodeKeys = new Set<string | number>()
     matchedIndices.forEach((matchedIndex) => {

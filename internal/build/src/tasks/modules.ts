@@ -1,3 +1,4 @@
+import path from 'node:path'
 import { rollup } from 'rollup'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
@@ -25,6 +26,13 @@ const ignoreRollupWarning = (warning: { code?: string; exporter?: string; id?: s
 }
 
 export const buildModules = async () => {
+  const externalPackage = await generateExternal({ full: false })
+  const wasmSourceEntry = path.resolve(pkgRoot, 'wasm/index.ts')
+  const external = (id: string) =>
+    externalPackage(id) ||
+    id === './ep_wasm.mjs' ||
+    id.endsWith('/packages/wasm/ep_wasm.mjs') ||
+    id.endsWith('/packages/wasm/dist/ep_wasm.mjs')
   const input = excludeFiles(
     await glob('**/*.{js,ts,vue}', {
       cwd: pkgRoot,
@@ -49,6 +57,12 @@ export const buildModules = async () => {
       warn(warning)
     },
     plugins: [
+      {
+        name: 'element-plus-wasm-source',
+        resolveId(id) {
+          if (id === '@element-plus/wasm') return wasmSourceEntry
+        },
+      },
       ElementPlusAlias(),
       ...vueMacrosPlugins,
       json(),
@@ -64,7 +78,7 @@ export const buildModules = async () => {
         },
       }),
     ],
-    external: await generateExternal({ full: false }),
+    external,
     treeshake: false,
   })
   await writeBundles(

@@ -15,6 +15,7 @@ pnpm verify
 pnpm test:coverage
 pnpm test:visual
 pnpm run build:github-package
+pnpm test:consumer-install
 ```
 
 ## 2. Changesets 流程
@@ -42,7 +43,8 @@ pnpm run build:github-package
 2. `pnpm test:coverage`
 3. `pnpm test:visual`
 4. `pnpm run build:github-package`
-5. 检查 `dist/element-plus/package.json`
+5. `pnpm test:consumer-install`
+6. 检查 `dist/element-plus/package.json`
 
 发布工件检查重点：
 
@@ -50,6 +52,7 @@ pnpm run build:github-package
 - 不残留 `workspace:` 依赖协议
 - `@element-plus/icons-vue` 等工作区依赖已被归一化为可消费 semver
 - `publishConfig.registry` 指向 GitHub Packages
+- consumer fixture 可以从 tarball 安装并通过 `vue-tsc` / `vite build`
 
 workspace 依赖归一化由 `scripts/prepare-github-package.mjs` 负责，当前要求它处理：
 
@@ -113,8 +116,10 @@ workspace 依赖归一化由 `scripts/prepare-github-package.mjs` 负责，当�
 本轮治理已固定这些工程接口：
 
 - `verify`
+- `check:consumer-contract`
 - `verify:release`
 - `test:coverage`
+- `test:consumer-install`
 - `test:visual`
 - quality workflow
 - Changesets 基础目录与模板

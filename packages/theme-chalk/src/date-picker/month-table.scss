@@ -83,7 +83,7 @@
     &:focus-visible {
       outline: none;
       .cell {
-        outline: 2px solid getCssVar('datepicker-active-color');
+        box-shadow: inset 0 0 0 1px var(--fsus-scholarly-blue);
       }
     }
   }

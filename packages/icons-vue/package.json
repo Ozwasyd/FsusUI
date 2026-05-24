@@ -50,10 +50,10 @@
   "unpkg": "dist/index.iife.min.js",
   "jsdelivr": "dist/index.iife.min.js",
   "scripts": {
-    "build": "pnpm run build:generate && run-p build:build build:types",
-    "build:generate": "tsx build/generate.ts",
-    "build:build": "NODE_ENV=production tsx build/build.ts",
-    "build:types": "vue-tsc --declaration --emitDeclarationOnly"
+    "build": "node ../../scripts/with-node-heap.mjs pnpm run build:generate && node ../../scripts/with-node-heap.mjs run-p build:build build:types",
+    "build:generate": "node ../../scripts/with-node-heap.mjs tsx build/generate.ts",
+    "build:build": "NODE_ENV=production node ../../scripts/with-node-heap.mjs tsx build/build.ts",
+    "build:types": "node ../../scripts/with-node-heap.mjs vue-tsc --declaration --emitDeclarationOnly"
   },
   "peerDependencies": {
     "vue": "^3.2.0"

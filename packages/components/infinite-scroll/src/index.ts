@@ -47,13 +47,19 @@ type InfiniteScrollEl = HTMLElement & {
     cb: InfiniteScrollCallback
     onScroll: () => void
     observer?: MutationObserver
+    options: ScrollOptions
   }
 }
 
 const getScrollOptions = (
   el: HTMLElement,
-  instance: ComponentPublicInstance
+  instance: ComponentPublicInstance,
 ): ScrollOptions => {
+  const cachedOptions = (el as InfiniteScrollEl)[SCOPE]?.options
+  if (cachedOptions) {
+    return cachedOptions
+  }
+
   return Object.entries(attributes).reduce((acm, [name, option]) => {
     const { type, default: defaultValue } = option
     const attrVal = el.getAttribute(`infinite-scroll-${name}`)
@@ -72,6 +78,21 @@ const destroyObserver = (el: InfiniteScrollEl) => {
     observer.disconnect()
     delete el[SCOPE].observer
   }
+}
+
+const refreshScrollOptions = (el: InfiniteScrollEl) => {
+  el[SCOPE].options = Object.entries(attributes).reduce(
+    (acm, [name, option]) => {
+      const { type, default: defaultValue } = option
+      const attrVal = el.getAttribute(`infinite-scroll-${name}`)
+      let value = el[SCOPE].instance[attrVal] ?? attrVal ?? defaultValue
+      value = value === 'false' ? false : value
+      value = type(value)
+      acm[name] = Number.isNaN(value) ? defaultValue : value
+      return acm
+    },
+    {} as ScrollOptions,
+  )
 }
 
 const handleScroll = (el: InfiniteScrollEl, cb: InfiniteScrollCallback) => {
@@ -148,11 +169,13 @@ const InfiniteScroll: ObjectDirective<
       cb,
       onScroll,
       lastScrollTop: containerEl.scrollTop,
+      options: {} as ScrollOptions,
     }
+    refreshScrollOptions(el)
 
     if (immediate) {
       const observer = new MutationObserver(
-        throttle(checkFull.bind(null, el, cb), CHECK_INTERVAL)
+        throttle(checkFull.bind(null, el, cb), CHECK_INTERVAL),
       )
       el[SCOPE].observer = observer
       observer.observe(el, { childList: true, subtree: true })
@@ -171,6 +194,7 @@ const InfiniteScroll: ObjectDirective<
     if (!el[SCOPE]) {
       await nextTick()
     } else {
+      refreshScrollOptions(el)
       const { containerEl, cb, observer } = el[SCOPE]
       if (containerEl.clientHeight && observer) {
         checkFull(el, cb)

@@ -1,7 +1,8 @@
 // @ts-nocheck
-import { nextTick } from 'vue'
+import { computed, defineComponent, nextTick, provide } from 'vue'
 import { describe, expect, test, vi } from 'vitest'
 import { makeMountFunc } from '@element-plus/test-utils/make-mount'
+import { configProviderContextKey } from '@element-plus/components/config-provider'
 import Tree from '../src/tree.vue'
 import type {
   FilterMethod,
@@ -53,6 +54,31 @@ const data = createData(4, 30, NODE_NUMBER)
 const _mount = makeMountFunc({
   components: {
     'el-tree': Tree,
+  },
+})
+
+const RenderPipelineProvider = defineComponent({
+  setup(_, { slots }) {
+    provide(
+      configProviderContextKey,
+      computed(
+        () =>
+          ({
+            renderPipeline: {
+              mode: 'enabled',
+              budget: { overscanPx: 130 },
+            },
+          }) as any,
+      ),
+    )
+    return () => slots.default?.()
+  },
+})
+
+const _mountWithPipeline = makeMountFunc({
+  components: {
+    'el-tree': Tree,
+    RenderPipelineProvider,
   },
 })
 
@@ -190,6 +216,33 @@ describe('Virtual Tree', () => {
     expect(treeVm.flattenTree.length).toEqual(NODE_NUMBER)
     const iconWrapper = wrapper.find(TREE_NODE_EXPAND_ICON_CLASS_NAME)
     expect(iconWrapper.find('svg').exists()).toBeTruthy()
+  })
+
+  test('inherits render pipeline budget through FixedSizeList', async () => {
+    const wrapper = _mountWithPipeline(
+      `
+        <render-pipeline-provider>
+          <el-tree :data="data" :height="104" :item-size="26" />
+        </render-pipeline-provider>
+      `,
+      {
+        data() {
+          return {
+            data: Array.from({ length: 20 }, (_, index) => ({
+              id: index + 1,
+              label: `node-${index + 1}`,
+            })),
+          }
+        },
+      },
+    )
+
+    await nextTick()
+
+    const root = wrapper.find('[data-fsus-render-pipeline="virtual-list"]')
+    expect(root.exists()).toBe(true)
+    expect(root.attributes('data-fsus-render-strategy')).toBe('chunked-main')
+    expect(root.attributes('data-fsus-render-cache')).toBe('5')
   })
 
   test('click node', async () => {

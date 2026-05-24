@@ -41,6 +41,8 @@ const visible = ref(false)
 
 let cursorDown = false
 let cursorLeave = false
+let dragStartClient = 0
+let dragStartScroll = 0
 let originalOnSelectStart:
   | ((this: GlobalEventHandlers, ev: Event) => any)
   | null = isClient ? document.onselectstart : null
@@ -66,6 +68,48 @@ const offsetRatio = computed(
     thumb.value![bar.value.offset],
 )
 
+const LONG_RANGE_TRACK_DENSITY = 420
+
+const getScrollRange = () => {
+  const wrap = scrollbar.wrapElement
+  if (!wrap || !instance.value || !thumb.value) return 0
+
+  return Math.max(0, wrap[bar.value.scrollSize] - wrap[bar.value.offset])
+}
+
+const getTrackTravel = () => {
+  if (!instance.value || !thumb.value) return 0
+
+  return Math.max(
+    1,
+    instance.value[bar.value.offset] - thumb.value[bar.value.offset],
+  )
+}
+
+const isLongRangeScroll = () =>
+  getScrollRange() / getTrackTravel() > LONG_RANGE_TRACK_DENSITY
+
+const resolveLongRangeDragOffset = (
+  event: MouseEvent,
+  fallbackScrollOffset: number,
+) => {
+  if (!scrollbar.wrapElement || !isLongRangeScroll())
+    return fallbackScrollOffset
+
+  const pointerDelta = event[bar.value.client] - dragStartClient
+  const trackTravel = getTrackTravel()
+  if (!trackTravel) return fallbackScrollOffset
+
+  const scrollRange = getScrollRange()
+  const dragRatio = Math.min(1, Math.abs(pointerDelta) / trackTravel)
+  const precisionRatio = 0.12 + 0.88 * dragRatio ** 3
+
+  return (
+    dragStartScroll +
+    pointerDelta * (scrollRange / trackTravel) * precisionRatio
+  )
+}
+
 const clickThumbHandler = (e: MouseEvent) => {
   // prevent click event of middle and right button
   e.stopPropagation()
@@ -76,6 +120,8 @@ const clickThumbHandler = (e: MouseEvent) => {
 
   const el = e.currentTarget as HTMLDivElement
   if (!el) return
+  dragStartClient = e[bar.value.client]
+  dragStartScroll = scrollbar.wrapElement?.[bar.value.scroll] || 0
   thumbState.value[bar.value.axis] =
     el[bar.value.offset] -
     (e[bar.value.client] - el.getBoundingClientRect()[bar.value.direction])
@@ -83,6 +129,27 @@ const clickThumbHandler = (e: MouseEvent) => {
 
 const clickTrackHandler = (e: MouseEvent) => {
   if (!thumb.value || !instance.value || !scrollbar.wrapElement) return
+
+  if (isLongRangeScroll()) {
+    const thumbRect = thumb.value.getBoundingClientRect()
+    const clickPosition = e[bar.value.client]
+    const thumbStart = thumbRect[bar.value.direction]
+    const thumbEnd = thumbStart + thumb.value[bar.value.offset]
+    const direction =
+      clickPosition < thumbStart ? -1 : clickPosition > thumbEnd ? 1 : 0
+
+    if (direction) {
+      const pageStep = Math.max(
+        scrollbar.wrapElement[bar.value.offset] * 0.85,
+        240,
+      )
+      scrollbar.moveThumbDrag(
+        bar.value.axis,
+        scrollbar.wrapElement[bar.value.scroll] + direction * pageStep,
+      )
+    }
+    return
+  }
 
   const offset = Math.abs(
     (e.target as HTMLElement).getBoundingClientRect()[bar.value.direction] -
@@ -106,6 +173,7 @@ const cleanupDocumentListeners = () => {
 const startDrag = (e: MouseEvent) => {
   e.stopImmediatePropagation()
   cursorDown = true
+  scrollbar.startThumbDrag()
   cleanupDocumentListeners()
   document.addEventListener('mousemove', mouseMoveDocumentHandler)
   document.addEventListener('mouseup', mouseUpDocumentHandler)
@@ -128,14 +196,19 @@ const mouseMoveDocumentHandler = (e: MouseEvent) => {
   const thumbPositionPercentage =
     ((offset - thumbClickPosition) * 100 * offsetRatio.value) /
     instance.value[bar.value.offset]
-  scrollbar.wrapElement![bar.value.scroll] =
+  const scrollOffset =
     (thumbPositionPercentage * scrollbar.wrapElement![bar.value.scrollSize]) /
     100
+  scrollbar.moveThumbDrag(
+    bar.value.axis,
+    resolveLongRangeDragOffset(e, scrollOffset),
+  )
 }
 
 const mouseUpDocumentHandler = () => {
   cursorDown = false
   thumbState.value[bar.value.axis] = 0
+  scrollbar.endThumbDrag()
   cleanupDocumentListeners()
   restoreOnselectstart()
   if (cursorLeave) visible.value = false
@@ -152,6 +225,9 @@ const mouseLeaveScrollbarHandler = () => {
 }
 
 onBeforeUnmount(() => {
+  if (cursorDown) {
+    scrollbar.endThumbDrag()
+  }
   cleanupDocumentListeners()
   restoreOnselectstart()
 })

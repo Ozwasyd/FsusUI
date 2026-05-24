@@ -16,10 +16,11 @@
     height: 2px;
     background-color: getCssVar('color-primary');
     z-index: 1;
-    transition: width getCssVar('transition-duration')
-        getCssVar('transition-function-ease-in-out-bezier'),
-      transform getCssVar('transition-duration')
-        getCssVar('transition-function-ease-in-out-bezier');
+    transition:
+      width var(--fsus-motion-control, 260ms)
+        cubic-bezier(0.2, 0.8, 0.2, 1),
+      transform var(--fsus-motion-control, 260ms)
+        cubic-bezier(0.2, 0.8, 0.2, 1);
     list-style: none;
   }
   @include e(new-tab) {
@@ -37,7 +38,9 @@
     font-size: 12px;
     color: getCssVar('text-color', 'primary');
     cursor: pointer;
-    transition: all 0.15s;
+    transition: border-color 0.15s,
+      color 0.15s,
+      background-color 0.15s;
 
     .is-icon-plus {
       height: inherit;
@@ -121,6 +124,15 @@
     font-weight: 500;
     color: getCssVar('text-color', 'primary');
     position: relative;
+    transition:
+      color var(--fsus-motion-control-fast, 160ms)
+        cubic-bezier(0.2, 0.8, 0.2, 1),
+      background-color var(--fsus-motion-control-fast, 160ms)
+        cubic-bezier(0.2, 0.8, 0.2, 1),
+      box-shadow var(--fsus-motion-control-fast, 160ms)
+        cubic-bezier(0.2, 0.8, 0.2, 1),
+      transform var(--fsus-motion-control-fast, 160ms)
+        cubic-bezier(0.2, 0.8, 0.2, 1);
 
     &:focus,
     &:focus:active {
@@ -128,15 +140,17 @@
     }
 
     &:focus-visible {
-      box-shadow: 0 0 2px 2px getCssVar('color-primary') inset;
+      box-shadow: inset 0 0 0 1px var(--fsus-scholarly-blue);
       border-radius: getCssVar('border-radius', 'small');
     }
 
     & .is-icon-close {
       border-radius: 50%;
       text-align: center;
-      transition: all getCssVar('transition-duration')
-        getCssVar('transition-function-ease-in-out-bezier');
+      transition: background-color getCssVar('transition-duration')
+          getCssVar('transition-function-ease-in-out-bezier'),
+        color getCssVar('transition-duration')
+          getCssVar('transition-function-ease-in-out-bezier');
       margin-left: 5px;
 
       &:before {
@@ -248,8 +262,12 @@
       content: none;
     }
     > .#{$namespace}-tabs__header .#{$namespace}-tabs__item {
-      transition: all getCssVar('transition-duration')
-        getCssVar('transition-function-ease-in-out-bezier');
+      transition: border-color getCssVar('transition-duration')
+          getCssVar('transition-function-ease-in-out-bezier'),
+        color getCssVar('transition-duration')
+          getCssVar('transition-function-ease-in-out-bezier'),
+        background-color getCssVar('transition-duration')
+          getCssVar('transition-function-ease-in-out-bezier');
       border: 1px solid transparent;
       margin-top: -1px;
       color: getCssVar('text-color', 'secondary');

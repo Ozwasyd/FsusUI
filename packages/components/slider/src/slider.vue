@@ -17,8 +17,10 @@
         ns.e('runway'),
         { 'show-input': showInput && !range },
         ns.is('disabled', sliderDisabled),
+        ns.is('dragging', initData.dragging),
       ]"
       :style="runwayStyle"
+      @pointerdown="onSliderDown"
       @mousedown="onSliderDown"
       @touchstart="onSliderDown"
     >
@@ -30,6 +32,7 @@
         :vertical="vertical"
         :tooltip-class="tooltipClass"
         :placement="placement"
+        @drag-position="setFirstPosition"
         @update:model-value="setFirstValue"
       />
       <slider-button
@@ -40,6 +43,7 @@
         :vertical="vertical"
         :tooltip-class="tooltipClass"
         :placement="placement"
+        @drag-position="setSecondPosition"
         @update:model-value="setSecondValue"
       />
       <template v-if="showStops">
@@ -118,6 +122,8 @@ const initData = reactive<SliderInitData>({
   oldValue: 0,
   dragging: false,
   sliderSize: 1,
+  firstPosition: 0,
+  secondPosition: 100,
 })
 
 const {
@@ -135,7 +141,9 @@ const {
   onSliderWrapperPrevent,
   onSliderClick,
   onSliderDown,
+  setFirstPosition,
   setFirstValue,
+  setSecondPosition,
   setSecondValue,
 } = useSlide(props, initData, emit)
 
@@ -147,7 +155,7 @@ const { inputId, isLabeledByFormItem } = useFormItemInputId(props, {
 
 const sliderWrapperSize = useFormSize()
 const sliderInputSize = computed(
-  () => props.inputSize || sliderWrapperSize.value
+  () => props.inputSize || sliderWrapperSize.value,
 )
 
 const groupLabel = computed<string>(() => {
@@ -188,7 +196,9 @@ const firstButtonAttrs = computed<Record<string, unknown>>(() => ({
   id: !props.range ? inputId.value : undefined,
   role: 'slider',
   'aria-label':
-    props.range || !isLabeledByFormItem.value ? firstButtonLabel.value : undefined,
+    props.range || !isLabeledByFormItem.value
+      ? firstButtonLabel.value
+      : undefined,
   'aria-labelledby':
     !props.range && isLabeledByFormItem.value ? elFormItem?.labelId : undefined,
   'aria-valuemin': props.min,
@@ -234,6 +244,12 @@ const { sliderWrapper } = useLifecycle(props, initData, resetSize)
 const { firstValue, secondValue, sliderSize } = toRefs(initData)
 
 const updateDragging = (val: boolean) => {
+  if (val) {
+    const valueToPercent = (value: number) =>
+      ((value - props.min) / (props.max - props.min)) * 100
+    initData.firstPosition = valueToPercent(initData.firstValue)
+    initData.secondPosition = valueToPercent(initData.secondValue)
+  }
   initData.dragging = val
 }
 

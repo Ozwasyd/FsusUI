@@ -12,7 +12,6 @@
       :visible="dropdownMenuVisible"
       :teleported="teleported"
       :popper-class="[nsSelectV2.e('popper'), popperClass]"
-      :gpu-acceleration="false"
       :stop-popper-mouse-event="false"
       :popper-options="popperOptions"
       :fallback-placements="['bottom-start', 'top-start', 'right', 'left']"

@@ -13,9 +13,9 @@
     "access": "public"
   },
   "scripts": {
-    "build": "run-p \"build:*\"",
-    "build:contributor": "tsx src/contributor.ts",
-    "build:components": "tsx src/components.ts",
+    "build": "node ../../scripts/with-node-heap.mjs run-p \"build:*\"",
+    "build:contributor": "node ../../scripts/with-node-heap.mjs tsx src/contributor.ts",
+    "build:components": "node ../../scripts/with-node-heap.mjs tsx src/components.ts",
     "dev": "DEV=1 pnpm run build"
   },
   "devDependencies": {

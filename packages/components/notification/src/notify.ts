@@ -35,11 +35,43 @@ const notifications: Record<
   'bottom-right': [],
 }
 
+const scopedNotifications = new WeakMap<
+  AppContext,
+  Record<NotificationOptions['position'], NotificationQueue>
+>()
+const notificationScopes = new Map<
+  string,
+  Record<NotificationOptions['position'], NotificationQueue>
+>()
+
+const createQueues = (): Record<
+  NotificationOptions['position'],
+  NotificationQueue
+> => ({
+  'top-left': [],
+  'top-right': [],
+  'bottom-left': [],
+  'bottom-right': [],
+})
+
+const getNotificationQueues = (context?: AppContext | null) => {
+  if (!context) return notifications
+
+  let queues = scopedNotifications.get(context)
+  if (!queues) {
+    queues = createQueues()
+    scopedNotifications.set(context, queues)
+  }
+  return queues
+}
+
 let seed = 1
 
 const notify: NotifyFn & Partial<Notify> & { _context: AppContext | null } =
   function (options = {}, context: AppContext | null = null) {
     if (!isClient) return { close: () => undefined }
+    const currentContext = context ?? notify._context
+    const queues = getNotificationQueues(currentContext)
 
     if (typeof options === 'string' || isVNode(options)) {
       options = { message: options }
@@ -49,7 +81,7 @@ const notify: NotifyFn & Partial<Notify> & { _context: AppContext | null } =
 
     const baseOffset = (options.offset || 0) + GAP_SIZE
     let verticalOffset = baseOffset
-    notifications[position].forEach(({ vm }) => {
+    queues[position].forEach(({ vm }) => {
       verticalOffset += (vm.el?.offsetHeight || 0) + GAP_SIZE
     })
 
@@ -76,7 +108,7 @@ const notify: NotifyFn & Partial<Notify> & { _context: AppContext | null } =
     if (!isElement(appendTo)) {
       debugWarn(
         'ElNotification',
-        'the appendTo option is not an HTMLElement. Falling back to document.body.'
+        'the appendTo option is not an HTMLElement. Falling back to document.body.',
       )
       appendTo = document.body
     }
@@ -90,9 +122,9 @@ const notify: NotifyFn & Partial<Notify> & { _context: AppContext | null } =
         ? {
             default: () => props.message,
           }
-        : null
+        : null,
     )
-    vm.appContext = context ?? notify._context
+    vm.appContext = currentContext
 
     // clean notification element preventing mem leak
     vm.props!.onDestroy = () => {
@@ -102,7 +134,8 @@ const notify: NotifyFn & Partial<Notify> & { _context: AppContext | null } =
 
     // instances will remove this item when close function gets called. So we do not need to worry about it.
     render(vm, container)
-    notifications[position].push({ vm })
+    queues[position].push({ vm })
+    notificationScopes.set(id, queues)
     appendTo.appendChild(container.firstElementChild!)
 
     return {
@@ -139,12 +172,13 @@ notificationTypes.forEach((type) => {
 export function close(
   id: string,
   position: NotificationOptions['position'],
-  userOnClose?: (vm: VNode) => void
+  userOnClose?: (vm: VNode) => void,
 ): void {
   // maybe we can store the index when inserting the vm to notification list.
-  const orientedNotifications = notifications[position]
+  const orientedNotifications =
+    notificationScopes.get(id)?.[position] ?? notifications[position]
   const idx = orientedNotifications.findIndex(
-    ({ vm }) => vm.component?.props.id === id
+    ({ vm }) => vm.component?.props.id === id,
   )
   if (idx === -1) return
   const { vm } = orientedNotifications[idx]
@@ -152,6 +186,7 @@ export function close(
   // calling user's on close function before notification gets removed from DOM.
   userOnClose?.(vm)
   deleteNotificationBaseOffset(id)
+  notificationScopes.delete(id)
 
   // note that this is called @before-leave, that's why we were able to fetch this property.
   const removedHeight = vm.el!.offsetHeight
@@ -170,8 +205,10 @@ export function close(
 
 export function closeAll(): void {
   // loop through all directions, close them at once.
-  for (const orientedNotifications of Object.values(notifications)) {
-    orientedNotifications.forEach(({ vm }) => {
+  for (const orientedNotifications of Object.values(
+    getNotificationQueues(notify._context),
+  )) {
+    orientedNotifications.slice().forEach(({ vm }) => {
       // same as the previous close method, we'd like to make sure lifecycle gets handle properly.
       ;(vm.component!.exposed as { visible: Ref<boolean> }).visible.value =
         false

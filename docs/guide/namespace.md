@@ -25,7 +25,7 @@ FsusUI 的组件 CSS 类名默认以 `el` 为前缀（如 `el-button`、`el-inpu
 
 ```scss
 /* styles/element/index.scss */
-@forward 'element-plus/theme-chalk/src/mixins/config.scss' with (
+@forward '@ozwasyd/element-plus/theme-chalk/src/mixins/config.scss' with (
   $namespace: 'ep'
 );
 ```

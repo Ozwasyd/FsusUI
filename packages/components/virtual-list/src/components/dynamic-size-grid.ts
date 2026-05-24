@@ -42,7 +42,7 @@ const getItemFromCache = (
   props: Props,
   index: number,
   gridCache: GridCache,
-  type: CacheItemType
+  type: CacheItemType,
 ) => {
   const [cachedItems, sizer, lastVisited] = [
     gridCache[type],
@@ -81,7 +81,7 @@ const bs = (
   low: number,
   high: number,
   offset: number,
-  type: CacheItemType
+  type: CacheItemType,
 ) => {
   while (low <= high) {
     const mid = low + floor((high - low) / 2)
@@ -104,7 +104,7 @@ const es = (
   gridCache: GridCache,
   idx: number,
   offset: number,
-  type: CacheItemType
+  type: CacheItemType,
 ) => {
   const total = type === 'column' ? props.totalColumn : props.totalRow
   let exponent = 1
@@ -124,7 +124,7 @@ const findItem = (
   props: Props,
   gridCache: GridCache,
   offset: number,
-  type: CacheItemType
+  type: CacheItemType,
 ) => {
   const [cache, lastVisitedIndex] = [
     gridCache[type],
@@ -143,7 +143,7 @@ const findItem = (
 
 const getEstimatedTotalHeight = (
   { totalRow }: Props,
-  { estimatedRowHeight, lastVisitedRowIndex, row }: GridCache
+  { estimatedRowHeight, lastVisitedRowIndex, row }: GridCache,
 ) => {
   let sizeOfVisitedRows = 0
 
@@ -163,7 +163,7 @@ const getEstimatedTotalHeight = (
 }
 const getEstimatedTotalWidth = (
   { totalColumn }: Props,
-  { column, estimatedColumnWidth, lastVisitedColumnIndex }: GridCache
+  { column, estimatedColumnWidth, lastVisitedColumnIndex }: GridCache,
 ) => {
   let sizeOfVisitedColumns = 0
 
@@ -194,7 +194,7 @@ const getOffset = (
   scrollOffset: number,
   cache: GridCache,
   type: CacheItemType,
-  scrollBarWidth: number
+  scrollBarWidth: number,
 ) => {
   const [size, estimatedSizeAssociates] = [
     type === 'row' ? props.height : props.width,
@@ -258,7 +258,7 @@ const DynamicSizeGrid = createGrid({
     alignment,
     scrollLeft,
     cache,
-    scrollBarWidth
+    scrollBarWidth,
   ) =>
     getOffset(
       props,
@@ -267,7 +267,7 @@ const DynamicSizeGrid = createGrid({
       scrollLeft,
       cache,
       'column',
-      scrollBarWidth
+      scrollBarWidth,
     ),
 
   getRowOffset: (
@@ -276,7 +276,7 @@ const DynamicSizeGrid = createGrid({
     alignment,
     scrollTop,
     cache,
-    scrollBarWidth: number
+    scrollBarWidth: number,
   ) =>
     getOffset(
       props,
@@ -285,7 +285,7 @@ const DynamicSizeGrid = createGrid({
       scrollTop,
       cache,
       'row',
-      scrollBarWidth
+      scrollBarWidth,
     ),
 
   getColumnStartIndexForOffset: (props, scrollLeft, cache) =>
@@ -300,7 +300,7 @@ const DynamicSizeGrid = createGrid({
     let stopIndex = startIndex
     while (stopIndex < props.totalColumn - 1 && offset < maxOffset) {
       stopIndex++
-      offset += getItemFromCache(props, startIndex, cache, 'column').size
+      offset += getItemFromCache(props, stopIndex, cache, 'column').size
     }
     return stopIndex
   },
@@ -329,14 +329,14 @@ const DynamicSizeGrid = createGrid({
   injectToInstance: (instance, cache) => {
     const resetAfter = (
       { columnIndex, rowIndex }: Indices,
-      forceUpdate?: boolean
+      forceUpdate?: boolean,
     ) => {
       forceUpdate = isUndefined(forceUpdate) ? true : forceUpdate
 
       if (isNumber(columnIndex)) {
         cache.value.lastVisitedColumnIndex = Math.min(
           cache.value.lastVisitedColumnIndex,
-          columnIndex - 1
+          columnIndex - 1,
         )
       }
 
@@ -344,7 +344,7 @@ const DynamicSizeGrid = createGrid({
         // console.log(rowIndex)
         cache.value.lastVisitedRowIndex = Math.min(
           cache.value.lastVisitedRowIndex,
-          rowIndex - 1
+          rowIndex - 1,
         )
       }
 
@@ -355,13 +355,13 @@ const DynamicSizeGrid = createGrid({
 
     const resetAfterColumnIndex = (
       columnIndex: number,
-      forceUpdate: boolean
+      forceUpdate: boolean,
     ) => {
       resetAfter(
         {
           columnIndex,
         },
-        forceUpdate
+        forceUpdate,
       )
     }
 
@@ -370,7 +370,7 @@ const DynamicSizeGrid = createGrid({
         {
           rowIndex,
         },
-        forceUpdate
+        forceUpdate,
       )
     }
 
@@ -407,7 +407,7 @@ const DynamicSizeGrid = createGrid({
           `
           "columnWidth" must be passed as function,
             instead ${typeof columnWidth} was given.
-        `
+        `,
         )
       }
 
@@ -417,7 +417,7 @@ const DynamicSizeGrid = createGrid({
           `
           "rowHeight" must be passed as function,
             instead ${typeof rowHeight} was given.
-        `
+        `,
         )
       }
     }

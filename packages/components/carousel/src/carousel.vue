@@ -2,6 +2,10 @@
   <div
     ref="root"
     :class="carouselClasses"
+    @pointercancel="handlePointerCancel"
+    @pointerdown="handlePointerDown"
+    @pointermove="handlePointerMove"
+    @pointerup="handlePointerUp"
     @mouseenter.stop="handleMouseEnter"
     @mouseleave.stop="handleMouseLeave"
   >
@@ -84,6 +88,7 @@ const {
   arrowDisplay,
   hasLabel,
   hover,
+  isDragging,
   isCardType,
   items,
   isVertical,
@@ -93,6 +98,10 @@ const {
   handleIndicatorClick,
   handleMouseEnter,
   handleMouseLeave,
+  handlePointerCancel,
+  handlePointerDown,
+  handlePointerMove,
+  handlePointerUp,
   setActiveItem,
   prev,
   next,
@@ -107,6 +116,9 @@ const carouselClasses = computed(() => {
   const classes = [ns.b(), ns.m(props.direction)]
   if (unref(isCardType)) {
     classes.push(ns.m('card'))
+  }
+  if (unref(isDragging)) {
+    classes.push(ns.is('dragging'))
   }
   return classes
 })

@@ -20,21 +20,19 @@ export const checkNode = (el: HTMLElement) => {
 
 export const sortByOriginalOrder = (
   oldNodes: CascaderNode[],
-  newNodes: CascaderNode[]
+  newNodes: CascaderNode[],
 ) => {
-  const newNodesCopy = newNodes.slice(0)
-  const newIds = newNodesCopy.map((node) => node.uid)
+  const remainingNodes = new Map(newNodes.map((node) => [node.uid, node]))
   const res = oldNodes.reduce((acc, item) => {
-    const index = newIds.indexOf(item.uid)
-    if (index > -1) {
-      acc.push(item)
-      newNodesCopy.splice(index, 1)
-      newIds.splice(index, 1)
+    const matchedNode = remainingNodes.get(item.uid)
+    if (matchedNode) {
+      acc.push(matchedNode)
+      remainingNodes.delete(item.uid)
     }
     return acc
   }, [] as CascaderNode[])
 
-  res.push(...newNodesCopy)
+  res.push(...remainingNodes.values())
 
   return res
 }

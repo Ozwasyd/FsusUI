@@ -141,6 +141,9 @@ export default defineConfig({
       '@element-plus/icons-vue': fileURLToPath(
         new URL('../icons-vue/src/index.ts', import.meta.url)
       ),
+      '@element-plus/theme-chalk/src': fileURLToPath(
+        new URL('../theme-chalk/src', import.meta.url)
+      ),
       '@element-plus/wasm': fileURLToPath(
         new URL('../wasm/index.ts', import.meta.url)
       ),

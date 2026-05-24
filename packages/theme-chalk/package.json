@@ -25,7 +25,7 @@
   "style": "index.css",
   "scripts": {
     "clean": "rimraf dist",
-    "build": "node --require @esbuild-kit/cjs-loader ../../node_modules/.bin/gulp"
+    "build": "node ../../scripts/with-node-heap.mjs node --require @esbuild-kit/cjs-loader ../../node_modules/.bin/gulp"
   },
   "devDependencies": {
     "@element-plus/build": "workspace:*",

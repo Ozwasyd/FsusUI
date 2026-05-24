@@ -38,7 +38,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
+import type { FormInstance, FormRules } from '@ozwasyd/element-plus'
 
 const formRef = ref<FormInstance>()
 const form = ref({ username: '' })
@@ -47,11 +47,14 @@ const rules: FormRules = {
 }
 
 const submit = async () => {
-  await formRef.value?.validate()
+  const result = await formRef.value?.validate()
+  if (!result?.ok || !result.value) return
   // 校验通过，执行提交
 }
 </script>
 ```
+
+`validate()` 与 `validateField()` 返回 `Promise<FsusResult<boolean>>`。校验失败时返回 `ok: false`，`error.code` 为 `validation`，原始 `ValidateFieldsError` 保存在 `error.cause`；不再用 rejected Promise 表示普通校验失败。
 
 ## 自定义校验规则
 

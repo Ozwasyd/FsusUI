@@ -1,8 +1,9 @@
 // @ts-nocheck
-import { nextTick } from 'vue'
+import { computed, defineComponent, nextTick, provide } from 'vue'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import makeMount from '@element-plus/test-utils/make-mount'
 import makeScroll from '@element-plus/test-utils/make-scroll'
+import { configProviderContextKey } from '@element-plus/components/config-provider'
 import setupMock from '../setup-mock'
 import {
   CENTERED_ALIGNMENT,
@@ -23,6 +24,10 @@ const WINDOW_KLS = 'window'
 const WINDOW_SELECTOR = `.${WINDOW_KLS}`
 const ITEM_KLS = 'item'
 const ITEM_SELECTOR = `.${ITEM_KLS}`
+const waitForScrollReset = async () => {
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+  await nextTick()
+}
 const mount = makeMount(
   {
     template: `<fixed-size-list v-bind="$attrs" ref="listRef">
@@ -44,7 +49,54 @@ const mount = makeMount(
       width: 50,
       onItemRendered,
     },
-  }
+  },
+)
+
+const RenderPipelineProvider = defineComponent({
+  setup(_, { slots }) {
+    provide(
+      configProviderContextKey,
+      computed(
+        () =>
+          ({
+            renderPipeline: {
+              mode: 'enabled',
+              budget: { overscanPx: 200 },
+            },
+          }) as any,
+      ),
+    )
+    return () => slots.default?.()
+  },
+})
+
+const mountWithPipeline = makeMount(
+  {
+    template: `
+      <render-pipeline-provider>
+        <fixed-size-list v-bind="$attrs" ref="listRef">
+          <template #default="{index, style}">
+            <div class="${ITEM_KLS}" :style="style">item {{ index }}</div>
+          </template>
+        </fixed-size-list>
+      </render-pipeline-provider>
+    `,
+    components: {
+      FixedSizeList,
+      RenderPipelineProvider,
+    },
+  },
+  {
+    props: {
+      cache: 3,
+      className: WINDOW_KLS,
+      height: 100,
+      total: 100,
+      itemSize: 25,
+      width: 50,
+      onItemRendered,
+    },
+  },
 )
 
 let cleanup: () => void
@@ -74,9 +126,25 @@ describe('<fixed-size-list />', () => {
     expect(
       wrapper
         .find(WINDOW_SELECTOR)
-        .element.firstElementChild.getAttribute('style')
+        .element.firstElementChild.getAttribute('style'),
     ).toBe('height: 2500px; width: 100%;')
     expect(onItemRendered).toHaveBeenCalledTimes(1)
+  })
+
+  it('uses the global render pipeline budget when enabled', async () => {
+    const wrapper = mountWithPipeline()
+
+    await nextTick()
+
+    const root = wrapper.find('.el-vl__wrapper')
+    expect(root.attributes('data-fsus-render-pipeline')).toBe('virtual-list')
+    expect(root.attributes('data-fsus-render-strategy')).toBe('chunked-main')
+    expect(root.attributes('data-fsus-render-hardware')).toMatch(
+      /gpu-compositor|cpu-threaded/,
+    )
+    expect(root.attributes('data-fsus-compositor')).toMatch(/enabled|disabled/)
+    expect(root.attributes('data-fsus-render-cache')).toBe('8')
+    expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(12)
   })
 
   it('should render 0 item when total is 0', async () => {
@@ -99,7 +167,7 @@ describe('<fixed-size-list />', () => {
     await makeScroll(
       (wrapper.vm.$refs.listRef as ListRef).windowRef,
       'scrollTop',
-      0
+      0,
     )
     expect(wrapper.find(ITEM_SELECTOR).text()).toContain(0)
 
@@ -110,7 +178,7 @@ describe('<fixed-size-list />', () => {
     await makeScroll(
       (wrapper.vm.$refs.listRef as ListRef).windowRef,
       'scrollLeft',
-      0
+      0,
     )
 
     expect(wrapper.find(ITEM_SELECTOR).text()).toContain(0)
@@ -161,7 +229,7 @@ describe('<fixed-size-list />', () => {
     expect(
       wrapper
         .find(WINDOW_SELECTOR)
-        .element.firstElementChild.getAttribute('style')
+        .element.firstElementChild.getAttribute('style'),
     ).toBe('height: 100%; width: 2500px;')
   })
 
@@ -194,7 +262,7 @@ describe('<fixed-size-list />', () => {
       wrapper
         .find(WINDOW_SELECTOR)
         .element.getAttribute('style')
-        .includes(`direction: ${RTL}`)
+        .includes(`direction: ${RTL}`),
     ).toBe(true)
     const style = wrapper.find(ITEM_SELECTOR).element.getAttribute('style')
     expect(style).toContain('right')
@@ -236,11 +304,12 @@ describe('<fixed-size-list />', () => {
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(7)
 
       listRef.scrollTo(100)
-      await nextTick()
+      await waitForScrollReset()
 
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(10)
 
       listRef.scrollTo(200)
+      await waitForScrollReset()
 
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(10)
     })
@@ -259,11 +328,12 @@ describe('<fixed-size-list />', () => {
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(5)
 
       listRef.scrollTo(100)
-      await nextTick()
+      await waitForScrollReset()
 
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(8)
 
       listRef.scrollTo(200)
+      await waitForScrollReset()
 
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(8)
     })
@@ -283,7 +353,7 @@ describe('<fixed-size-list />', () => {
 
       // item size is 25 total number is 10 so the boundary is offset 250
       listRef.scrollTo(275)
-      await nextTick()
+      await waitForScrollReset()
 
       // when it reaches the boundary, it should only render visible ones.
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(4)
@@ -303,27 +373,27 @@ describe('<fixed-size-list />', () => {
 
       listRef.scrollToItem(10)
 
-      await nextTick()
+      await waitForScrollReset()
 
       expect(wrapper.find(ITEM_SELECTOR).text()).toContain(4)
 
       listRef.scrollToItem(20)
-      await nextTick()
+      await waitForScrollReset()
       expect(wrapper.find(ITEM_SELECTOR).text()).toContain(14)
       // out bounds
       listRef.scrollToItem(101)
-      await nextTick()
+      await waitForScrollReset()
       expect(wrapper.find(ITEM_SELECTOR).text()).toContain(93)
 
       // start alignment
       listRef.scrollToItem(10, START_ALIGNMENT)
-      await nextTick()
+      await waitForScrollReset()
       // 10 - 3 (cache)
       expect(wrapper.find(ITEM_SELECTOR).text()).toContain(7)
 
       // center alignment
       listRef.scrollToItem(10, CENTERED_ALIGNMENT)
-      await nextTick()
+      await waitForScrollReset()
       // 10th item should be positioned in the middle, at position 3
       // so there were 2 items left in the viewport
       // also we have 3 cache items.
@@ -331,15 +401,15 @@ describe('<fixed-size-list />', () => {
       expect(wrapper.find(ITEM_SELECTOR).text()).toContain(5)
       // centered alignment nearing the left boundary
       listRef.scrollToItem(1, CENTERED_ALIGNMENT)
-      await nextTick()
+      await waitForScrollReset()
       // centered alignment nearing the right boundary
       listRef.scrollToItem(101, CENTERED_ALIGNMENT)
-      await nextTick()
+      await waitForScrollReset()
       expect(wrapper.find(ITEM_SELECTOR).text()).toContain(93)
 
       // end alignment
       listRef.scrollToItem(10, END_ALIGNMENT)
-      await nextTick()
+      await waitForScrollReset()
       // 10th item should be positioned at the end of the viewport
       // the viewport is size of 4, so there were 3 items left
       // and we have cache of 3, so the first item should be
@@ -348,11 +418,11 @@ describe('<fixed-size-list />', () => {
 
       // smart alignment
       listRef.scrollToItem(10, SMART_ALIGNMENT)
-      await nextTick()
+      await waitForScrollReset()
       expect(wrapper.find(ITEM_SELECTOR).text()).toContain(4)
 
       listRef.scrollToItem(100, SMART_ALIGNMENT)
-      await nextTick()
+      await waitForScrollReset()
       expect(wrapper.find(ITEM_SELECTOR).text()).toContain(93)
     })
   })

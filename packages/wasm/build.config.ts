@@ -12,6 +12,7 @@ export default defineBuildConfig({
     },
   },
   externals: [
+    '@element-plus/utils',
     // WASM glue 作为外部资源，由 Vite/打包器处理
     './ep_wasm.mjs',
   ],

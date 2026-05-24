@@ -7,5 +7,9 @@ export default ElConfigProvider
 
 export * from './src/config-provider'
 export * from './src/config-provider-props'
+export * from './src/config-contract'
 export * from './src/constants'
 export * from './src/hooks/use-global-config'
+export * from './src/motion'
+export * from './src/render-pipeline'
+export * from './src/theme-mode'

@@ -1,6 +1,7 @@
 {
   "name": "@element-plus/wasm",
   "version": "1.0.0",
+  "type": "module",
   "description": "WebAssembly acceleration layer for FsusUI (C++23 / Emscripten)",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -13,11 +14,14 @@
     }
   },
   "sideEffects": false,
+  "dependencies": {
+    "@element-plus/utils": "workspace:*"
+  },
   "scripts": {
-    "build:wasm": "bash ./build.sh",
-    "build": "unbuild",
+    "build:wasm": "node ../../scripts/with-node-heap.mjs bash ./build.sh",
+    "build": "node ../../scripts/with-node-heap.mjs unbuild",
     "dev": "pnpm run stub",
-    "stub": "unbuild --stub",
+    "stub": "node ../../scripts/with-node-heap.mjs unbuild --stub",
     "clean": "rimraf dist build"
   },
   "devDependencies": {

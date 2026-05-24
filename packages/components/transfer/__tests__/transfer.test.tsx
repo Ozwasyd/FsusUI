@@ -5,14 +5,40 @@ import { setTextInputValue } from '../../../test-utils/dom'
 import Transfer from '../src/transfer.vue'
 import type { TransferDataItem, renderContent } from '../src/transfer'
 
-const { filterIndicesSync, warmupWasm, setWasmReady } = vi.hoisted(() => {
+const {
+  createAsciiFilterIndex,
+  ensureWasmReady,
+  filterIndicesSync,
+  isWasmReady,
+  setWasmReady,
+} = vi.hoisted(() => {
   let wasmReady = true
+  let readinessResolvers: Array<() => void> = []
+  const wasmReadyResult = { ok: true, value: undefined } as const
+
+  const flushReadiness = () => {
+    const resolvers = readinessResolvers
+    readinessResolvers = []
+    resolvers.forEach((resolve) => resolve())
+  }
 
   return {
+    ensureWasmReady: vi.fn(
+      () =>
+        new Promise<typeof wasmReadyResult>((resolve) => {
+          if (wasmReady) {
+            resolve(wasmReadyResult)
+            return
+          }
+
+          readinessResolvers.push(() => resolve(wasmReadyResult))
+        }),
+    ),
+    createAsciiFilterIndex: vi.fn((labels: string[]) => labels),
     filterIndicesSync: vi.fn(
       (data: string[], keyword: string, caseSensitive = false) => {
         if (!wasmReady) {
-          return null
+          throw new Error('WASM is not ready')
         }
 
         const normalizedKeyword = caseSensitive
@@ -28,16 +54,21 @@ const { filterIndicesSync, warmupWasm, setWasmReady } = vi.hoisted(() => {
         }, [])
       },
     ),
-    warmupWasm: vi.fn(),
+    isWasmReady: vi.fn(() => wasmReady),
     setWasmReady: (value: boolean) => {
       wasmReady = value
+      if (value) {
+        flushReadiness()
+      }
     },
   }
 })
 
 vi.mock('@element-plus/wasm', () => ({
-  filterIndicesSync,
-  warmupWasm,
+  createAsciiFilterIndex,
+  ensureWasmReady,
+  filterAsciiIndicesSync: filterIndicesSync,
+  isWasmReady,
 }))
 
 describe('Transfer', () => {
@@ -114,7 +145,7 @@ describe('Transfer', () => {
     expect(leftList.vm.filteredData[0].label).toBe('Wasm Match')
   }, 30000)
 
-  it('warms wasm on cold start and keeps filtering with JS until ready', async () => {
+  it('suspends default filtering on cold start and uses wasm after readiness', async () => {
     setWasmReady(false)
     const value = ref([])
     const data = Array.from({ length: 1_001 }, (_, index) => ({
@@ -132,18 +163,25 @@ describe('Transfer', () => {
     await setTextInputValue(leftList.find('input'), 'match')
     await nextTick()
 
-    expect(warmupWasm).toHaveBeenCalled()
+    expect(ensureWasmReady).toHaveBeenCalled()
+    expect(filterIndicesSync).not.toHaveBeenCalled()
+    expect(leftList.vm.filteredData.length).toBe(0)
+
+    vi.clearAllMocks()
+    setWasmReady(true)
+    await nextTick()
+    await nextTick()
+    expect(filterIndicesSync).toHaveBeenCalled()
     expect(leftList.vm.filteredData.length).toBe(1)
     expect(leftList.vm.filteredData[0].label).toBe('Deferred Match')
 
     vi.clearAllMocks()
-    setWasmReady(true)
     leftList.vm.query = '500'
     await setTextInputValue(leftList.find('input'), '500')
     await nextTick()
 
     expect(filterIndicesSync).toHaveBeenCalled()
-    expect(warmupWasm).not.toHaveBeenCalled()
+    expect(ensureWasmReady).not.toHaveBeenCalled()
   }, 30000)
 
   it('keeps non-ascii queries on the JS path', async () => {

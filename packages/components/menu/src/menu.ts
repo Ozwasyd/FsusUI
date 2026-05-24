@@ -31,9 +31,13 @@ import ElSubMenu from './sub-menu'
 import { useMenuCssVar } from './use-menu-css-var'
 
 import type { MenuItemClicked, MenuProvider, SubMenuProvider } from './types'
-import type { NavigationFailure, Router } from 'vue-router'
+import type { NavigationFailure, RouteLocationRaw } from 'vue-router'
 import type { ExtractPropTypes, VNode, VNodeArrayChildren } from 'vue'
 import type { UseResizeObserverReturn } from '@vueuse/core'
+
+type RouterLike = {
+  push: (to: RouteLocationRaw) => Promise<void | NavigationFailure>
+}
 
 export const menuProps = buildProps({
   mode: {
@@ -68,6 +72,9 @@ export const menuProps = buildProps({
     type: Boolean,
     default: true,
   },
+  routerInstance: {
+    type: definePropType<RouterLike>(Object),
+  },
   popperEffect: {
     type: String,
     values: ['dark', 'light'],
@@ -90,7 +97,7 @@ export const menuEmits = {
     index: string,
     indexPath: string[],
     item: MenuItemClicked,
-    routerResult?: Promise<void | NavigationFailure>
+    routerResult?: Promise<void | NavigationFailure>,
   ) =>
     isString(index) &&
     checkIndexPath(indexPath) &&
@@ -107,7 +114,13 @@ export default defineComponent({
 
   setup(props, { emit, slots, expose }) {
     const instance = getCurrentInstance()!
-    const router = instance.appContext.config.globalProperties.$router as Router
+    const router = computed(
+      () =>
+        props.routerInstance ??
+        (instance.appContext.config.globalProperties.$router as
+          | RouterLike
+          | undefined),
+    )
     const menu = ref<HTMLUListElement>()
     const nsMenu = useNamespace('menu')
     const nsSubMenu = useNamespace('sub-menu')
@@ -118,7 +131,7 @@ export default defineComponent({
     const openedMenus = ref<MenuProvider['openedMenus']>(
       props.defaultOpeneds && !props.collapse
         ? props.defaultOpeneds.slice(0)
-        : []
+        : [],
     )
     const activeIndex = ref<MenuProvider['activeIndex']>(props.defaultActive)
     const items = ref<MenuProvider['items']>({})
@@ -155,7 +168,7 @@ export default defineComponent({
       // collapse all menu that are not under current menu item
       if (props.uniqueOpened) {
         openedMenus.value = openedMenus.value.filter((index: string) =>
-          indexPath.includes(index)
+          indexPath.includes(index),
         )
       }
       openedMenus.value.push(index)
@@ -188,7 +201,7 @@ export default defineComponent({
     }
 
     const handleMenuItemClick: MenuProvider['handleMenuItemClick'] = (
-      menuItem
+      menuItem,
     ) => {
       if (props.mode === 'horizontal' || props.collapse) {
         openedMenus.value = []
@@ -197,9 +210,9 @@ export default defineComponent({
       const { index, indexPath } = menuItem
       if (isNil(index) || isNil(indexPath)) return
 
-      if (props.router && router) {
+      if (props.router && router.value) {
         const route = menuItem.route || index
-        const routerResult = router.push(route).then((res) => {
+        const routerResult = router.value.push(route).then((res) => {
           if (!res) activeIndex.value = index
           return res
         })
@@ -208,7 +221,7 @@ export default defineComponent({
           index,
           indexPath,
           { index, indexPath, route },
-          routerResult
+          routerResult,
         )
       } else {
         activeIndex.value = index
@@ -236,16 +249,16 @@ export default defineComponent({
         (item) =>
           // remove comment type node #12634
           item.nodeName !== '#comment' &&
-          (item.nodeName !== '#text' || item.nodeValue)
+          (item.nodeName !== '#text' || item.nodeValue),
       ) as HTMLElement[]
       const moreItemWidth = 64
       const paddingLeft = Number.parseInt(
         getComputedStyle(menu.value!).paddingLeft,
-        10
+        10,
       )
       const paddingRight = Number.parseInt(
         getComputedStyle(menu.value!).paddingRight,
-        10
+        10,
       )
       const menuWidth = menu.value!.clientWidth - paddingLeft - paddingRight
       let calcWidth = 0
@@ -299,7 +312,7 @@ export default defineComponent({
           activeIndex.value = ''
         }
         updateActiveIndex(currentActive)
-      }
+      },
     )
 
     watch(
@@ -308,7 +321,7 @@ export default defineComponent({
         if (value) {
           openedMenus.value = []
         }
-      }
+      },
     )
 
     watch(items.value, initMenu)
@@ -355,7 +368,7 @@ export default defineComponent({
           closeMenu,
           handleMenuItemClick,
           handleSubMenuClick,
-        })
+        }),
       )
       provide<SubMenuProvider>(`subMenu:${instance.uid}`, {
         addSubMenu,
@@ -419,11 +432,11 @@ export default defineComponent({
                     {
                       class: nsSubMenu.e('icon-more'),
                     },
-                    { default: () => h(More) }
+                    { default: () => h(More) },
                   ),
                 default: () => slotMore,
-              }
-            )
+              },
+            ),
           )
         }
       }
@@ -443,7 +456,7 @@ export default defineComponent({
             [nsMenu.m('collapse')]: props.collapse,
           },
         },
-        [...slot, ...vShowMore]
+        [...slot, ...vShowMore],
       )
 
       if (props.collapseTransition && props.mode === 'vertical') {

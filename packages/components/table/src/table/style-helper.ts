@@ -2,6 +2,7 @@
 import {
   computed,
   nextTick,
+  onBeforeUnmount,
   onMounted,
   ref,
   unref,
@@ -20,7 +21,7 @@ function useStyle<T>(
   props: TableProps<T>,
   layout: TableLayout<T>,
   store: Store<T>,
-  table: Table<T>
+  table: Table<T>,
 ) {
   const isHidden = ref(false)
   const renderExpanded = ref(null)
@@ -48,6 +49,60 @@ function useStyle<T>(
   const headerScrollHeight = ref(0)
   const footerScrollHeight = ref(0)
   const appendScrollHeight = ref(0)
+  let layoutFrame = 0
+  let syncPositionFrame = 0
+  let wheelScrollFrame = 0
+  let pendingWheelScrollLeft = 0
+  let pendingWheelScrollTop = 0
+
+  const cancelFrame = (frame: number) => {
+    if (frame && typeof cancelAnimationFrame === 'function') {
+      cancelAnimationFrame(frame)
+    }
+  }
+
+  const scheduleFrame = (
+    currentFrame: number,
+    callback: () => void,
+    setFrame: (frame: number) => void,
+  ) => {
+    cancelFrame(currentFrame)
+
+    if (typeof requestAnimationFrame !== 'function') {
+      callback()
+      setFrame(0)
+      return
+    }
+
+    const nextFrame = requestAnimationFrame(() => {
+      setFrame(0)
+      callback()
+    })
+    setFrame(nextFrame)
+  }
+
+  const scheduleLayoutFrame = () => {
+    scheduleFrame(layoutFrame, doLayout, (frame) => {
+      layoutFrame = frame
+    })
+  }
+
+  const scheduleSyncPositionFrame = () => {
+    scheduleFrame(syncPositionFrame, syncPosition, (frame) => {
+      syncPositionFrame = frame
+    })
+  }
+
+  onBeforeUnmount(() => {
+    cancelFrame(layoutFrame)
+    cancelFrame(syncPositionFrame)
+    cancelFrame(wheelScrollFrame)
+    layoutFrame = 0
+    syncPositionFrame = 0
+    wheelScrollFrame = 0
+    pendingWheelScrollLeft = 0
+    pendingWheelScrollTop = 0
+  })
 
   watchEffect(() => {
     layout.setHeight(props.height)
@@ -63,7 +118,7 @@ function useStyle<T>(
     },
     {
       immediate: true,
-    }
+    },
   )
   watch(
     () => props.data,
@@ -73,7 +128,7 @@ function useStyle<T>(
     {
       immediate: true,
       deep: true,
-    }
+    },
   )
   watchEffect(() => {
     if (props.expandRowKeys) {
@@ -86,10 +141,48 @@ function useStyle<T>(
     if (table.hoverState) table.hoverState = null
   }
 
+  const flushWheelScroll = () => {
+    wheelScrollFrame = 0
+    const bodyWrapper = table.refs.bodyWrapper
+    if (!bodyWrapper) {
+      pendingWheelScrollLeft = 0
+      pendingWheelScrollTop = 0
+      return
+    }
+
+    const deltaLeft = pendingWheelScrollLeft
+    const deltaTop = pendingWheelScrollTop
+    pendingWheelScrollLeft = 0
+    pendingWheelScrollTop = 0
+
+    if (deltaLeft) {
+      bodyWrapper.scrollLeft += deltaLeft
+    }
+    if (deltaTop) {
+      bodyWrapper.scrollTop += deltaTop
+    }
+    if (deltaLeft || deltaTop) {
+      scheduleSyncPositionFrame()
+    }
+  }
+
+  const scheduleWheelScroll = (deltaLeft = 0, deltaTop = 0) => {
+    pendingWheelScrollLeft += deltaLeft
+    pendingWheelScrollTop += deltaTop
+    if (wheelScrollFrame) return
+
+    if (typeof requestAnimationFrame !== 'function') {
+      flushWheelScroll()
+      return
+    }
+
+    wheelScrollFrame = requestAnimationFrame(flushWheelScroll)
+  }
+
   const handleHeaderFooterMousewheel = (event, data) => {
     const { pixelX, pixelY } = data
     if (Math.abs(pixelX) >= Math.abs(pixelY)) {
-      table.refs.bodyWrapper.scrollLeft += data.pixelX / 5
+      scheduleWheelScroll(data.pixelX / 5, 0)
     }
   }
 
@@ -113,13 +206,13 @@ function useStyle<T>(
       layout.updateElsHeight()
     }
     layout.updateColumnsWidth()
-    requestAnimationFrame(syncPosition)
+    scheduleSyncPositionFrame()
   }
   onMounted(async () => {
     await nextTick()
     store.updateColumns()
     bindEvents()
-    requestAnimationFrame(doLayout)
+    scheduleLayoutFrame()
 
     const el: HTMLElement = table.vnode.el as HTMLElement
     const tableHeader: HTMLElement = table.refs.headerWrapper
@@ -151,7 +244,7 @@ function useStyle<T>(
   const setScrollClassByEl = (el: HTMLElement, className: string) => {
     if (!el) return
     const classList = Array.from(el.classList).filter(
-      (item) => !item.startsWith('is-scrolling-')
+      (item) => !item.startsWith('is-scrolling-'),
     )
     classList.push(layout.scrollX.value ? className : 'is-scrolling-none')
     el.className = classList.join(' ')
@@ -195,10 +288,10 @@ function useStyle<T>(
       useEventListener(
         table.refs.scrollBarRef.wrapRef,
         'scroll',
-        syncPosition,
+        scheduleSyncPositionFrame,
         {
           passive: true,
-        }
+        },
       )
     }
     if (props.fit) {
@@ -347,9 +440,9 @@ function useStyle<T>(
       ) {
         event.preventDefault()
       }
-      bodyWrapper.scrollTop += Math.ceil(data.pixelY / 5)
+      scheduleWheelScroll(0, Math.ceil(data.pixelY / 5))
     } else {
-      bodyWrapper.scrollLeft += Math.ceil(data.pixelX / 5)
+      scheduleWheelScroll(Math.ceil(data.pixelX / 5), 0)
     }
   }
 

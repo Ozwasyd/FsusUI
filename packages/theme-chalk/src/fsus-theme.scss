@@ -1,106 +1,58 @@
 @use 'mixins/mixins' as *;
 @use 'common/var' as *;
+@use 'common/fsus-tokens' as *;
 
-@mixin fsus-panel($radius: 24px) {
+@mixin fsus-panel($radius: var(--fsus-radius-panel)) {
   background: var(--el-bg-color);
   border: 1px solid var(--el-border-color);
   border-radius: $radius;
-  box-shadow: inset 0 1px 0 var(--fsus-highlight, rgba(255, 255, 255, 0.1)), var(--el-box-shadow-light);
+  box-shadow:
+    inset 0 1px 0 var(--fsus-highlight, rgba(255, 255, 255, 0.1)),
+    var(--el-box-shadow-light);
 }
 
-@mixin fsus-floating($radius: 24px) {
+@mixin fsus-floating($radius: var(--fsus-radius-floating)) {
   background: var(--el-bg-color-overlay);
   border: 1px solid var(--el-border-color-light);
   border-radius: $radius;
-  box-shadow: inset 0 1px 0 var(--fsus-highlight, rgba(255, 255, 255, 0.1)), var(--el-box-shadow);
-  backdrop-filter: blur(var(--fsus-backdrop-blur, 40px));
-  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur, 40px));
+  box-shadow:
+    inset 0 1px 0 var(--fsus-highlight, rgba(255, 255, 255, 0.1)),
+    var(--el-box-shadow);
+  backdrop-filter: blur(var(--fsus-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur));
 }
 
-@mixin fsus-control($radius: 8px) {
+@mixin fsus-control($radius: var(--fsus-radius-control)) {
   background: var(--el-fill-color-lighter);
   border: 1px solid var(--el-border-color);
   border-radius: $radius;
   color: var(--el-text-color-primary);
-  transition: background-color getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
-    border-color getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
-    box-shadow getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
-    color getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
-    opacity getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
-    transform getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier');
+  transition:
+    background-color getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    border-color getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    box-shadow getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    color getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    opacity getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    transform getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier');
 }
 
 /* FsusUI Theme v2.0-REWRITE */
 :root {
-  --el-color-primary: #0F0F11;
-  --el-bg-color: #FFFFFF;
-  --el-bg-color-page: #F7F7F8;
-  --el-bg-color-overlay: rgba(255, 255, 255, 0.85);
-  --fsus-scholarly-blue: #2A599C;
-  --el-color-info: #A1A1AA;
-  --el-border-color: #E4E4E7;
-  --el-border-color-light: #ececf0;
-  --el-border-color-lighter: #f1f1f3;
-  --el-border-color-extra-light: #f7f7f8;
-  --el-text-color-primary: #0F0F11;
-  --el-text-color-regular: #5f5f68;
-  --el-text-color-secondary: #5f5f68;
-  --el-text-color-placeholder: #7c7c86;
-  
-  --el-a11y-focus-color: var(--fsus-scholarly-blue);
-  --fsus-backdrop-blur: 40px;
-  --fsus-backdrop-blur-soft: 20px;
-  --fsus-backdrop-saturate: 120%;
-  --fsus-highlight: rgba(255, 255, 255, 0.8);
-  --el-border-radius-base: 8px;
-  --el-border-radius-small: 6px;
-  --el-border-radius-round: 999px;
-  --el-box-shadow: 0 32px 64px rgba(0, 0, 0, 0.08);
-  --el-box-shadow-light: 0 14px 40px rgba(0, 0, 0, 0.08);
-  --el-box-shadow-lighter: 0 8px 24px rgba(0, 0, 0, 0.06);
-  --el-box-shadow-dark: 0 24px 64px rgba(0, 0, 0, 0.12);
-  --el-fill-color: #f4f4f5;
-  --el-fill-color-light: #fafafa;
-  --el-fill-color-lighter: #fcfcfc;
-  --el-disabled-bg-color: #f4f4f5;
-  --el-disabled-text-color: #7c7c86;
-  --el-disabled-border-color: #ececf0;
-  --el-font-family: 'Google Sans', 'Noto Sans SC', 'Noto Sans TC',
-    'Noto Sans JP', ui-sans-serif, system-ui, sans-serif;
-  --el-card-border-radius: 24px;
-  --el-dialog-border-radius: 24px;
-  --el-popover-border-radius: 20px;
-  --el-messagebox-border-radius: 24px;
-  --el-notification-radius: 20px;
+  @include fsus-core-tokens;
+
+  --el-font-family:
+    'Google Sans', 'Noto Sans SC', 'Noto Sans TC', 'Noto Sans JP',
+    ui-sans-serif, system-ui, sans-serif;
 }
 
 @mixin dark-mode-tokens {
-  --el-color-primary: #F0F0F4;
-  --el-bg-color: #121214;
-  --el-bg-color-page: #09090B;
-  --el-bg-color-overlay: rgba(18, 18, 20, 0.85);
-  --fsus-scholarly-blue: #4B79CC;
-  --el-color-info: #71717A;
-  --el-border-color: #27272A;
-  --el-border-color-light: #3F3F46;
-  --el-border-color-lighter: #303036;
-  --el-border-color-extra-light: #1D1D20;
-  --el-text-color-primary: #F0F0F4;
-  --el-text-color-regular: #A1A1AA;
-  --el-text-color-secondary: #A1A1AA;
-  --el-text-color-placeholder: #71717A;
-  --el-a11y-focus-color: var(--fsus-scholarly-blue);
-  
-  --fsus-highlight: rgba(255, 255, 255, 0.05);
-  --el-box-shadow: 0 32px 64px rgba(0, 0, 0, 0.4);
-  --el-box-shadow-light: 0 14px 40px rgba(0, 0, 0, 0.4);
-  --el-box-shadow-lighter: 0 8px 24px rgba(0, 0, 0, 0.3);
-  --el-box-shadow-dark: 0 24px 64px rgba(0, 0, 0, 0.5);
-  --el-fill-color: #1D1D20;
-  --el-fill-color-light: #27272A;
-  --el-fill-color-lighter: #1D1D20;
-  --el-disabled-bg-color: #1D1D20;
-  --el-disabled-border-color: #27272A;
+  @include fsus-dark-tokens;
 }
 
 // Support manual toggle
@@ -138,26 +90,36 @@ html.dark {
 .#{$namespace}-step__icon,
 .#{$namespace}-carousel__button,
 .#{$namespace}-backtop {
-  transition: background-color getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
-    border-color getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
-    box-shadow getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
-    color getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
-    opacity getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
-    transform getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier');
+  transition:
+    background-color getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    border-color getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    box-shadow getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    color getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    opacity getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    transform getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier');
 }
 
 .#{$namespace}-button {
   @include fsus-control(8px);
+  background: transparent;
+  color: var(--el-text-color-primary);
   min-height: 44px;
   padding: 0 16px;
   box-shadow: none;
   font-weight: 600;
   letter-spacing: 0.01em;
 
-  &:hover {
-    background: var(--el-bg-color);
-    border-color: var(--el-border-color-light);
-    color: var(--el-text-color-primary);
+  &:hover,
+  &:focus {
+    background: var(--el-fill-color-light);
+    border-color: var(--fsus-scholarly-blue);
+    color: var(--fsus-scholarly-blue);
     transform: translateY(-1px);
   }
 
@@ -214,7 +176,7 @@ html.dark {
 .#{$namespace}-button--info {
   background: rgba(113, 113, 122, 0.08);
   border-color: rgba(113, 113, 122, 0.16);
-  color: var(--el-text-color-primary)-muted;
+  color: var(--el-text-color-regular);
 }
 
 .#{$namespace}-button.is-text,
@@ -222,7 +184,7 @@ html.dark {
 .#{$namespace}-button--text {
   background: transparent;
   border-color: transparent;
-  color: var(--el-text-color-primary)-muted;
+  color: var(--el-text-color-regular);
   min-height: auto;
   padding-inline: 8px;
 
@@ -315,7 +277,9 @@ html.dark {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s, color 0.2s;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
 
     &:hover {
       background: var(--el-fill-color);
@@ -347,7 +311,8 @@ html.dark {
   font-weight: 500;
 }
 
-.#{$namespace}-checkbox-button:first-child .#{$namespace}-checkbox-button__inner,
+.#{$namespace}-checkbox-button:first-child
+  .#{$namespace}-checkbox-button__inner,
 .#{$namespace}-radio-button:first-child .#{$namespace}-radio-button__inner {
   border-left: none;
 }
@@ -361,12 +326,31 @@ html.dark {
   gap: 2px;
 }
 
+.#{$namespace}-transfer-panel__list.#{$namespace}-checkbox-group {
+  display: block;
+  gap: 0;
+  padding: 6px 0;
+  background: transparent;
+  border-radius: 0;
+
+  &.is-filterable {
+    padding-top: 0;
+  }
+}
+
 .#{$namespace}-checkbox-button.is-checked .#{$namespace}-checkbox-button__inner,
 .#{$namespace}-radio-button.is-active .#{$namespace}-radio-button__inner {
   background: var(--el-bg-color);
   color: var(--el-text-color-primary);
   border-color: transparent;
   box-shadow: var(--el-box-shadow-lighter) !important;
+}
+
+.#{$namespace}-checkbox-button.is-focus .#{$namespace}-checkbox-button__inner,
+.#{$namespace}-radio-button:focus-within .#{$namespace}-radio-button__inner {
+  border-color: var(--fsus-scholarly-blue) !important;
+  box-shadow: inset 0 0 0 1px var(--fsus-scholarly-blue) !important;
+  z-index: 2;
 }
 
 .#{$namespace}-checkbox.is-bordered,
@@ -391,22 +375,32 @@ html.dark {
 .#{$namespace}-checkbox__input.is-checked .#{$namespace}-checkbox__inner,
 .#{$namespace}-checkbox__input.is-indeterminate .#{$namespace}-checkbox__inner,
 .#{$namespace}-check-tag.is-checked {
-  background: var(--el-color-primary);
-  border-color: var(--el-color-primary);
-  color: var(--el-bg-color);
+  background: var(--fsus-scholarly-blue);
+  border-color: var(--fsus-scholarly-blue);
+  color: #fcfcfc;
   box-shadow: none;
+}
+
+.#{$namespace}-checkbox__input.is-checked
+  .#{$namespace}-checkbox__inner::after {
+  border-color: #fcfcfc;
+}
+
+.#{$namespace}-checkbox__input.is-indeterminate
+  .#{$namespace}-checkbox__inner::before {
+  background-color: #fcfcfc;
 }
 
 // Radio: 「环 + 点」极简风格，不填充黑色背景
 .#{$namespace}-radio__input.is-checked .#{$namespace}-radio__inner {
   background: var(--el-bg-color);
-  border-color: var(--el-color-primary);
+  border-color: var(--fsus-scholarly-blue);
   border-width: 2px;
   box-shadow: none;
 }
 
 .#{$namespace}-radio__input.is-checked .#{$namespace}-radio__inner::after {
-  background-color: var(--el-color-primary);
+  background-color: var(--fsus-scholarly-blue);
   width: 6px;
   height: 6px;
 }
@@ -417,13 +411,43 @@ html.dark {
   font-weight: 500;
 }
 
+.#{$namespace}-switch {
+  --fsus-switch-core-width: 40px;
+  --fsus-switch-action-size: 16px;
+}
+
+.#{$namespace}-switch--large {
+  --fsus-switch-core-width: 50px;
+  --fsus-switch-action-size: 20px;
+}
+
+.#{$namespace}-switch--small {
+  --fsus-switch-core-width: 30px;
+  --fsus-switch-action-size: 12px;
+}
+
 .#{$namespace}-switch__core {
   background: var(--el-fill-color);
   border-color: var(--el-fill-color);
   box-shadow: none;
+  transition:
+    background-color var(--fsus-motion-control) var(--fsus-motion-standard),
+    border-color var(--fsus-motion-control) var(--fsus-motion-standard),
+    box-shadow var(--fsus-motion-control) var(--fsus-motion-standard);
 }
 
 .#{$namespace}-switch__action {
+  left: 1px !important;
+  filter: blur(0);
+  transform: translate3d(0, 0, 0);
+  transition:
+    transform var(--fsus-motion-control) var(--fsus-motion-emphasized),
+    filter var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    box-shadow var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    background-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    border-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    color var(--fsus-motion-control-fast) var(--fsus-motion-standard);
+  will-change: transform, filter;
   box-shadow: none;
   border: 1px solid rgba(0, 0, 0, 0.04);
 }
@@ -437,6 +461,24 @@ html.dark .#{$namespace}-switch__action {
   border-color: var(--fsus-scholarly-blue);
 }
 
+.#{$namespace}-switch.is-checked
+  .#{$namespace}-switch__core
+  .#{$namespace}-switch__action {
+  left: 1px !important;
+  transform: translate3d(
+    calc(var(--fsus-switch-core-width) - var(--fsus-switch-action-size) - 2px),
+    0,
+    0
+  );
+}
+
+.#{$namespace}-switch.is-sliding .#{$namespace}-switch__action,
+.#{$namespace}-switch:active .#{$namespace}-switch__action {
+  filter: blur(var(--fsus-interactive-motion-blur, var(--fsus-motion-blur)));
+  box-shadow: 0 0 var(--fsus-interactive-motion-glow, 14px)
+    var(--fsus-motion-trail);
+}
+
 .#{$namespace}-card,
 .#{$namespace}-alert,
 .#{$namespace}-descriptions,
@@ -448,8 +490,14 @@ html.dark .#{$namespace}-switch__action {
 .#{$namespace}-table-v2__root,
 .#{$namespace}-empty,
 .#{$namespace}-result,
-.#{$namespace}-menu:not(.#{$namespace}-menu--horizontal):not(.#{$namespace}-sub-menu .#{$namespace}-menu):not(.#{$namespace}-menu--popup-container) {
+.#{$namespace}-menu:not(.#{$namespace}-menu--horizontal):not(
+    .#{$namespace}-sub-menu .#{$namespace}-menu
+  ):not(.#{$namespace}-menu--popup-container) {
   @include fsus-panel(24px);
+}
+
+.#{$namespace}-descriptions {
+  padding: 14px 16px;
 }
 
 // 嵌套子菜单容器重置 fsus-panel 样式，避免出现多层嵌套面板的视觉错位
@@ -565,10 +613,18 @@ html.dark .#{$namespace}-switch__action {
 }
 
 // 保留语义图标颜色
-.#{$namespace}-alert--success.is-light .#{$namespace}-alert__icon { color: getCssVar('color-success'); }
-.#{$namespace}-alert--warning.is-light .#{$namespace}-alert__icon { color: getCssVar('color-warning'); }
-.#{$namespace}-alert--error.is-light .#{$namespace}-alert__icon { color: getCssVar('color-error'); }
-.#{$namespace}-alert--info.is-light .#{$namespace}-alert__icon { color: getCssVar('color-info'); }
+.#{$namespace}-alert--success.is-light .#{$namespace}-alert__icon {
+  color: getCssVar('color-success');
+}
+.#{$namespace}-alert--warning.is-light .#{$namespace}-alert__icon {
+  color: getCssVar('color-warning');
+}
+.#{$namespace}-alert--error.is-light .#{$namespace}-alert__icon {
+  color: getCssVar('color-error');
+}
+.#{$namespace}-alert--info.is-light .#{$namespace}-alert__icon {
+  color: getCssVar('color-info');
+}
 
 .#{$namespace}-collapse {
   overflow: hidden; // 裁剪子元素 border 在圆角外侧的溢出
@@ -642,6 +698,13 @@ html.dark .#{$namespace}-switch__action {
   color: var(--el-text-color-primary);
 }
 
+.#{$namespace}-check-tag.is-checked,
+.#{$namespace}-check-tag.is-checked:hover {
+  background: var(--fsus-scholarly-blue);
+  border-color: var(--fsus-scholarly-blue);
+  color: #fcfcfc;
+}
+
 .#{$namespace}-avatar {
   background: var(--el-fill-color);
   border: 1px solid var(--el-border-color);
@@ -669,17 +732,17 @@ html.dark .#{$namespace}-switch__action {
   border: 2px solid var(--el-bg-color);
 }
 
-// 模态层：毛玻璃效果 (backdrop-filter: blur(16px) + rgba(252, 252, 252, 0.5))
+// 模态层：毛玻璃效果由全局 token 控制，避免各浮层重复裸写。
 .#{$namespace}-overlay {
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  background-color: rgba(0, 0, 0, 0.12) !important;
+  backdrop-filter: blur(var(--fsus-backdrop-blur-overlay));
+  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur-overlay));
+  background-color: var(--fsus-overlay-color) !important;
 }
 
 .#{$namespace}-dialog,
 .#{$namespace}-drawer,
 .#{$namespace}-message-box {
-  @include fsus-floating(24px);
+  @include fsus-floating;
   border: none;
 }
 
@@ -699,22 +762,27 @@ html.dark .#{$namespace}-switch__action {
 .#{$namespace}-dropdown__popper,
 .#{$namespace}-autocomplete-suggestion,
 .#{$namespace}-color-picker__panel,
-.#{$namespace}-menu--popup {
+.#{$namespace}-menu--popup,
+.#{$namespace}-tooltip-v2__content {
   background: var(--el-bg-color-overlay);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
+  backdrop-filter: blur(var(--fsus-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur));
   border: 1px solid var(--el-border-color-light);
-  border-radius: 20px;
-  box-shadow: inset 0 1px 0 var(--fsus-highlight), var(--el-box-shadow);
+  border-radius: var(--fsus-radius-popover);
+  box-shadow:
+    inset 0 1px 0 var(--fsus-highlight),
+    var(--el-box-shadow);
 }
 
 .#{$namespace}-cascader__dropdown {
   background: var(--el-bg-color-overlay);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
+  backdrop-filter: blur(var(--fsus-backdrop-blur));
+  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur));
   border: 1px solid var(--el-border-color-light);
-  border-radius: 20px;
-  box-shadow: inset 0 1px 0 var(--fsus-highlight), var(--el-box-shadow);
+  border-radius: var(--fsus-radius-popover);
+  box-shadow:
+    inset 0 1px 0 var(--fsus-highlight),
+    var(--el-box-shadow);
   overflow: hidden;
 }
 
@@ -726,13 +794,49 @@ html.dark .#{$namespace}-switch__action {
 .#{$namespace}-notification,
 .#{$namespace}-message-box,
 .#{$namespace}-dialog,
-.#{$namespace}-drawer {
+.#{$namespace}-drawer,
+.#{$namespace}-tooltip-v2__content {
   color: var(--el-text-color-primary);
 }
 
-.#{$namespace}-popper .#{$namespace}-popper__arrow::before {
+.#{$namespace}-popper .#{$namespace}-popper__arrow::before,
+.#{$namespace}-popper.is-dark .#{$namespace}-popper__arrow::before,
+.#{$namespace}-popper.is-light .#{$namespace}-popper__arrow::before,
+.#{$namespace}-popper.is-pure .#{$namespace}-popper__arrow::before,
+.#{$namespace}-popover.#{$namespace}-popper
+  .#{$namespace}-popper__arrow::before {
   background: var(--el-bg-color-overlay);
   border-color: var(--el-border-color-light);
+}
+
+.#{$namespace}-tooltip-v2__content,
+.#{$namespace}-tooltip-v2__content.is-dark {
+  --#{$namespace}-tooltip-v2-padding: 8px 12px;
+  --#{$namespace}-tooltip-v2-border-radius: var(--fsus-radius-popover);
+  max-width: var(--fsus-floating-safe-width);
+  overflow-wrap: anywhere;
+  white-space: normal;
+  background: var(--el-bg-color-overlay);
+  border-color: var(--el-border-color-light);
+}
+
+.#{$namespace}-tooltip-v2__content > * {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+@each $side in (top, right, bottom, left) {
+  .#{$namespace}-tooltip-v2__content[data-side^='#{$side}']
+    .#{$namespace}-tooltip-v2__arrow::before {
+    border-#{$side}-color: var(--el-bg-color-overlay);
+  }
+
+  .#{$namespace}-tooltip-v2__content[data-side^='#{$side}']
+    .#{$namespace}-tooltip-v2__arrow::after {
+    border-#{$side}-color: var(--el-border-color-light);
+  }
 }
 
 .#{$namespace}-dialog__header,
@@ -755,7 +859,15 @@ html.dark .#{$namespace}-switch__action {
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: translate(25%, -25%); // Slight offset for optical balance at the corner
+  transform: translate(
+    25%,
+    -25%
+  ); // Slight offset for optical balance at the corner
+}
+
+.#{$namespace}-drawer__close-btn {
+  top: getCssVar('drawer-padding-primary');
+  right: getCssVar('drawer-padding-primary');
 }
 
 .#{$namespace}-dialog__headerbtn:focus-visible,
@@ -782,15 +894,33 @@ html.dark .#{$namespace}-switch__action {
   color: var(--el-text-color-regular);
 }
 
+.#{$namespace}-dialog__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--fsus-space-2);
+}
+
+.#{$namespace}-dialog__footer .dialog-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--fsus-space-2);
+  width: 100%;
+}
+
+.#{$namespace}-dialog__footer .#{$namespace}-button + .#{$namespace}-button {
+  margin-left: 0;
+}
+
 .#{$namespace}-message {
-  top: 16px;
-  width: min(480px, calc(100vw - 24px));
-  padding: 12px 16px;
+  top: var(--fsus-space-4);
+  width: var(--fsus-notification-max-width);
+  padding: var(--fsus-space-3) var(--fsus-space-4);
   border-radius: 18px;
 }
 
 .#{$namespace}-notification {
-  width: min(420px, calc(100vw - 24px));
+  width: var(--fsus-floating-max-width);
 }
 
 .#{$namespace}-loading-mask {
@@ -800,9 +930,21 @@ html.dark .#{$namespace}-switch__action {
 }
 
 @keyframes punctuation-zinc-pulse {
-  0% { transform: scale(1); opacity: 1; background-color: var(--el-text-color-regular); }
-  50% { transform: scale(0.85); opacity: 0.5; background-color: var(--fsus-scholarly-blue); }
-  100% { transform: scale(1); opacity: 1; background-color: var(--el-text-color-regular); }
+  0% {
+    transform: scale(1);
+    opacity: 1;
+    background-color: var(--el-text-color-regular);
+  }
+  50% {
+    transform: scale(0.85);
+    opacity: 0.5;
+    background-color: var(--fsus-scholarly-blue);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+    background-color: var(--el-text-color-regular);
+  }
 }
 
 .#{$namespace}-loading-spinner {
@@ -886,19 +1028,103 @@ html.dark .#{$namespace}-switch__action {
 .#{$namespace}-picker-panel__shortcut:hover,
 .#{$namespace}-time-panel__btn:hover,
 .#{$namespace}-picker-panel__icon-btn:hover {
-  background: rgba(42, 89, 156, 0.08); // Scholarly blue light
+  background: var(--fsus-state-hover-bg);
   color: var(--fsus-scholarly-blue);
-  outline: 1px solid var(--fsus-scholarly-blue);
-  outline-offset: -1px;
+  outline: none;
+  box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);
 }
 
 .#{$namespace}-select-dropdown__item.selected,
 .#{$namespace}-select-dropdown__option-item.is-selected,
 .#{$namespace}-cascader-node.is-selectable.in-checked-path,
 .#{$namespace}-cascader-node.is-active {
-  background: rgba(42, 89, 156, 0.05);
+  background: var(--fsus-state-selected-bg);
   color: var(--fsus-scholarly-blue);
   font-weight: 700;
+}
+
+.#{$namespace}-select-dropdown__option-item {
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  background: transparent !important;
+  border-radius: 0;
+  outline: none;
+}
+
+.#{$namespace}-select-dropdown__option-item::before {
+  content: '';
+  position: absolute;
+  inset: 2px 6px;
+  border-radius: 10px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.#{$namespace}-select-dropdown__option-item > * {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.#{$namespace}-select-dropdown__option-item.hover,
+.#{$namespace}-select-dropdown__option-item:hover {
+  background: transparent !important;
+  outline: none;
+}
+
+.#{$namespace}-select-dropdown__option-item.is-selected::before {
+  background: var(--fsus-state-selected-bg);
+}
+
+.#{$namespace}-select-dropdown__option-item:not(.is-disabled):hover::before,
+.#{$namespace}-select-dropdown__option-item.hover:not(.is-disabled)::before {
+  background: var(--fsus-state-emphasis-bg);
+  box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .#{$namespace}-select-dropdown__item:hover,
+  .#{$namespace}-select-dropdown__item.hover,
+  .#{$namespace}-select-dropdown__option-item:hover,
+  .#{$namespace}-dropdown-menu__item:hover,
+  .#{$namespace}-dropdown-menu__item:focus,
+  .#{$namespace}-cascader-node:hover,
+  .#{$namespace}-autocomplete-suggestion li:hover,
+  .#{$namespace}-picker-panel__shortcut:hover,
+  .#{$namespace}-time-panel__btn:hover,
+  .#{$namespace}-picker-panel__icon-btn:hover {
+    background: transparent;
+    color: var(--el-text-color-regular);
+    box-shadow: none;
+    outline: none;
+  }
+
+  .#{$namespace}-select-dropdown__item:active,
+  .#{$namespace}-dropdown-menu__item:active,
+  .#{$namespace}-cascader-node:active,
+  .#{$namespace}-autocomplete-suggestion li:active,
+  .#{$namespace}-picker-panel__shortcut:active,
+  .#{$namespace}-time-panel__btn:active,
+  .#{$namespace}-picker-panel__icon-btn:active {
+    background: var(--fsus-state-hover-bg);
+    color: var(--fsus-scholarly-blue);
+    box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);
+  }
+
+  .#{$namespace}-select-dropdown__option-item:hover::before,
+  .#{$namespace}-select-dropdown__option-item.hover::before {
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .#{$namespace}-select-dropdown__option-item:active::before {
+    background: var(--fsus-state-emphasis-bg);
+    box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);
+  }
 }
 
 .#{$namespace}-picker-panel__footer,
@@ -907,6 +1133,19 @@ html.dark .#{$namespace}-switch__action {
 .#{$namespace}-cascader-panel,
 .#{$namespace}-transfer-panel__footer {
   border-color: var(--el-border-color);
+}
+
+.#{$namespace}-picker__popper.#{$namespace}-popper {
+  border-radius: var(--fsus-radius-floating);
+  box-shadow: var(--fsus-shadow-floating);
+}
+
+.#{$namespace}-date-range-picker__content.is-left {
+  --fsus-datepicker-range-divider: color-mix(
+    in srgb,
+    var(--el-border-color) 56%,
+    transparent
+  );
 }
 
 .#{$namespace}-date-table td .#{$namespace}-date-table-cell__text,
@@ -919,15 +1158,19 @@ html.dark .#{$namespace}-switch__action {
   border-radius: 14px;
 }
 
-.#{$namespace}-date-table td.available:hover .#{$namespace}-date-table-cell__text,
+.#{$namespace}-date-table
+  td.available:hover
+  .#{$namespace}-date-table-cell__text,
 .#{$namespace}-month-table td .cell:hover,
 .#{$namespace}-year-table td .cell:hover,
 .#{$namespace}-time-spinner__item:hover:not(.disabled):not(.active) {
-  background: var(--el-fill-color);
+  background: var(--fsus-state-hover-bg);
   color: var(--el-text-color-primary);
 }
 
-.#{$namespace}-date-table td.current:not(.disabled) .#{$namespace}-date-table-cell__text,
+.#{$namespace}-date-table
+  td.current:not(.disabled)
+  .#{$namespace}-date-table-cell__text,
 .#{$namespace}-month-table td.current:not(.disabled) .cell,
 .#{$namespace}-year-table td.current:not(.disabled) .cell,
 .#{$namespace}-time-spinner__item.active:not(.disabled) {
@@ -935,8 +1178,255 @@ html.dark .#{$namespace}-switch__action {
   color: var(--el-bg-color);
 }
 
+.#{$namespace}-date-editor .#{$namespace}-input__inner::selection,
+.#{$namespace}-date-editor .#{$namespace}-range-input::selection {
+  background: var(--fsus-state-emphasis-bg);
+  color: var(--el-text-color-primary);
+}
+
+.#{$namespace}-date-picker .#{$namespace}-picker-panel__content,
+.#{$namespace}-date-range-picker__content {
+  position: relative;
+  overflow: hidden;
+}
+
+.#{$namespace}-date-picker__view,
+.#{$namespace}-date-range-picker__view {
+  width: 100%;
+  transform-origin: center top;
+  will-change: opacity, transform;
+
+  > .#{$namespace}-date-table,
+  > .#{$namespace}-month-table,
+  > .#{$namespace}-year-table {
+    width: 100%;
+  }
+}
+
+.#{$namespace}-date-picker-view-next {
+  animation: #{$namespace}-date-picker-view-next 380ms
+    cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.#{$namespace}-date-picker-view-prev {
+  animation: #{$namespace}-date-picker-view-prev 380ms
+    cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.#{$namespace}-date-picker-view-drill-in {
+  animation: #{$namespace}-date-picker-view-drill-in 320ms
+    cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.#{$namespace}-date-picker-view-drill-out {
+  animation: #{$namespace}-date-picker-view-drill-out 320ms
+    cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes #{$namespace}-date-picker-view-next {
+  from {
+    opacity: 0;
+    transform: translate3d(20px, 0, 0) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes #{$namespace}-date-picker-view-prev {
+  from {
+    opacity: 0;
+    transform: translate3d(-20px, 0, 0) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes #{$namespace}-date-picker-view-drill-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes #{$namespace}-date-picker-view-drill-out {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -10px, 0) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .#{$namespace}-date-picker-view-next,
+  .#{$namespace}-date-picker-view-prev,
+  .#{$namespace}-date-picker-view-drill-in,
+  .#{$namespace}-date-picker-view-drill-out {
+    animation: none;
+  }
+}
+
+.#{$namespace}-time-panel {
+  border-radius: var(--fsus-radius-popover);
+  overflow: hidden;
+}
+
+.#{$namespace}-time-panel__content {
+  border-radius: var(--fsus-radius-popover) var(--fsus-radius-popover) 0 0;
+  box-sizing: border-box;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 18%,
+    #000 82%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 18%,
+    #000 82%,
+    transparent 100%
+  );
+  padding: 6px 8px 4px;
+
+  &::before,
+  &::after {
+    display: none;
+  }
+}
+
+.#{$namespace}-time-spinner__wrapper .#{$namespace}-scrollbar__wrap {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+}
+
+.#{$namespace}-time-spinner__wrapper .#{$namespace}-scrollbar__bar {
+  display: none;
+}
+
+.#{$namespace}-time-spinner__wrapper.#{$namespace}-scrollbar {
+  &.#{$namespace}-scrollbar.is-scrolling .#{$namespace}-scrollbar__view > * {
+    transform: none;
+    transition: none;
+  }
+
+  &::before,
+  &::after {
+    display: none;
+  }
+}
+
+.#{$namespace}-time-spinner__item {
+  height: 32px;
+  min-height: 32px;
+  min-width: 0;
+  line-height: 32px;
+  margin: 0 4px;
+  border-radius: 12px;
+  outline: none;
+  transition:
+    opacity var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    background-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    color var(--fsus-motion-control-fast) var(--fsus-motion-standard);
+}
+
+.#{$namespace}-time-spinner__wrapper.is-scrolling
+  .#{$namespace}-time-spinner__item:not(.is-active) {
+  opacity: 0.72;
+}
+
+.#{$namespace}-time-spinner__item:hover:not(.is-disabled):not(.is-active):not(
+    .disabled
+  ):not(.active) {
+  background: var(--fsus-state-emphasis-bg);
+  color: var(--fsus-scholarly-blue);
+}
+
+.#{$namespace}-time-spinner__item.is-active:not(.is-disabled),
+.#{$namespace}-time-spinner__item.active:not(.disabled) {
+  background: var(--el-fill-color);
+  box-shadow: none;
+  color: var(--el-text-color-primary);
+  font-weight: 700;
+}
+
+.#{$namespace}-time-panel__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  height: 44px;
+  line-height: normal;
+  padding: 6px 10px;
+  box-sizing: border-box;
+}
+
+.#{$namespace}-time-panel__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 32px;
+  height: 32px;
+  line-height: 32px;
+  margin: 0;
+  padding: 0 12px;
+  border-radius: var(--el-border-radius-base);
+  color: var(--el-text-color-regular);
+  font-weight: 600;
+}
+
+.#{$namespace}-time-panel__btn:hover {
+  background: var(--fsus-state-emphasis-bg);
+  color: var(--fsus-scholarly-blue);
+}
+
+.#{$namespace}-time-panel__btn.confirm {
+  color: var(--fsus-scholarly-blue);
+  font-weight: 700;
+}
+
 .#{$namespace}-menu {
   border-color: var(--el-border-color);
+}
+
+.#{$namespace}-menu.#{$namespace}-menu--horizontal {
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px;
+}
+
+.#{$namespace}-menu.#{$namespace}-menu--horizontal > .#{$namespace}-menu-item,
+.#{$namespace}-menu.#{$namespace}-menu--horizontal
+  > .#{$namespace}-sub-menu
+  > .#{$namespace}-sub-menu__title {
+  height: 48px;
+  min-height: 48px;
+  margin: 0;
+  border: 0 !important;
+  border-radius: var(--el-border-radius-base);
+  background-clip: padding-box;
+  line-height: 48px;
 }
 
 .#{$namespace}-menu-item,
@@ -949,7 +1439,9 @@ html.dark .#{$namespace}-switch__action {
 .#{$namespace}-menu-item:hover,
 .#{$namespace}-sub-menu__title:hover,
 .#{$namespace}-menu--horizontal > .#{$namespace}-menu-item:hover,
-.#{$namespace}-menu--horizontal > .#{$namespace}-sub-menu:hover .#{$namespace}-sub-menu__title {
+.#{$namespace}-menu--horizontal
+  > .#{$namespace}-sub-menu:hover
+  .#{$namespace}-sub-menu__title {
   background: var(--el-fill-color);
   color: var(--el-text-color-primary);
 }
@@ -957,7 +1449,9 @@ html.dark .#{$namespace}-switch__action {
 .#{$namespace}-menu-item.is-active,
 .#{$namespace}-sub-menu.is-active > .#{$namespace}-sub-menu__title,
 .#{$namespace}-menu--horizontal > .#{$namespace}-menu-item.is-active,
-.#{$namespace}-menu--horizontal > .#{$namespace}-sub-menu.is-active .#{$namespace}-sub-menu__title {
+.#{$namespace}-menu--horizontal
+  > .#{$namespace}-sub-menu.is-active
+  .#{$namespace}-sub-menu__title {
   background: var(--el-fill-color);
   color: var(--el-text-color-primary);
   font-weight: 700;
@@ -1073,7 +1567,15 @@ html.dark .#{$namespace}-switch__action {
   border-right: none; // Minimalist: no vertical borders
 }
 
-.#{$namespace}-table .#{$namespace}-table__row:hover > td.#{$namespace}-table__cell,
+.#{$namespace}-table .cell,
+.#{$namespace}-table-v2__cell-text {
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.#{$namespace}-table
+  .#{$namespace}-table__row:hover
+  > td.#{$namespace}-table__cell,
 .#{$namespace}-table-v2__row:hover,
 .#{$namespace}-table-v2__row.row-hover {
   background: var(--el-fill-color);
@@ -1101,7 +1603,9 @@ html.dark .#{$namespace}-switch__action {
 
 .#{$namespace}-tree-node__content:hover,
 .#{$namespace}-tree-node:focus > .#{$namespace}-tree-node__content,
-.#{$namespace}-tree--highlight-current .#{$namespace}-tree-node.is-current > .#{$namespace}-tree-node__content {
+.#{$namespace}-tree--highlight-current
+  .#{$namespace}-tree-node.is-current
+  > .#{$namespace}-tree-node__content {
   background: var(--el-fill-color);
   color: var(--el-text-color-primary);
 }
@@ -1142,25 +1646,125 @@ html.dark .#{$namespace}-switch__action {
 .#{$namespace}-slider__runway {
   background: var(--el-fill-color);
   height: 4px !important; // Thinner for intellectual feel
+  transition:
+    background-color var(--fsus-motion-control) var(--fsus-motion-standard),
+    box-shadow var(--fsus-motion-control) var(--fsus-motion-standard);
+}
+
+.#{$namespace}-slider__runway {
+  overflow: visible;
+  position: relative;
+  touch-action: none;
 }
 
 .#{$namespace}-progress-bar__inner,
 .#{$namespace}-slider__bar {
-  background: var(--el-color-primary);
+  background: var(--fsus-scholarly-blue);
+  filter: blur(0);
   height: 4px !important;
+  transition:
+    width var(--fsus-motion-control) var(--fsus-motion-standard),
+    height var(--fsus-motion-control) var(--fsus-motion-standard),
+    left var(--fsus-motion-control) var(--fsus-motion-standard),
+    bottom var(--fsus-motion-control) var(--fsus-motion-standard),
+    transform var(--fsus-motion-slider-release) var(--fsus-motion-standard),
+    filter var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    box-shadow var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    background-color var(--fsus-motion-control) var(--fsus-motion-standard);
+  will-change: transform, filter;
+}
+
+.#{$namespace}-slider__bar {
+  border-radius: var(--fsus-radius-pill);
+  transform: translateZ(0);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -5px -10px;
+    pointer-events: none;
+    border-radius: inherit;
+    opacity: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      color-mix(in srgb, var(--fsus-scholarly-blue) 34%, transparent) 72%,
+      color-mix(in srgb, var(--fsus-scholarly-blue) 58%, transparent) 100%
+    );
+    filter: blur(5px);
+    transform: translate3d(
+      var(--fsus-interactive-motion-offset-x, 0px),
+      var(--fsus-interactive-motion-offset-y, 0px),
+      0
+    );
+    transition:
+      opacity var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+      transform var(--fsus-interactive-motion-settle, 120ms)
+        var(--fsus-motion-standard);
+  }
+}
+
+.#{$namespace}-slider__button-wrapper {
+  transform: translateZ(0);
+  transition: transform var(--fsus-motion-slider-release)
+    var(--fsus-motion-standard);
+  touch-action: none;
+  will-change: transform;
 }
 
 .#{$namespace}-slider__button {
   width: 14px;
   height: 14px;
   border-width: 2px;
-  border-color: var(--el-color-primary);
+  border-color: var(--fsus-scholarly-blue);
   background-color: var(--el-bg-color);
+  filter: blur(0);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-  transition: transform 0.2s;
+  transition:
+    transform var(--fsus-motion-control-fast) var(--fsus-motion-emphasized),
+    filter var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    box-shadow var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    border-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    background-color var(--fsus-motion-control-fast) var(--fsus-motion-standard);
+  will-change: transform, filter;
 
   &:hover {
     transform: scale(1.15);
+  }
+}
+
+.#{$namespace}-slider__button.dragging {
+  filter: blur(
+    var(--fsus-interactive-motion-blur, var(--fsus-motion-slider-blur))
+  );
+  box-shadow:
+    0 0 var(--fsus-interactive-motion-glow, 18px)
+      var(--fsus-motion-slider-trail),
+    0 3px 10px rgba(0, 0, 0, 0.12);
+  transform: translate3d(
+      var(--fsus-interactive-motion-offset-x, 0px),
+      var(--fsus-interactive-motion-offset-y, 0px),
+      0
+    )
+    scale(var(--fsus-interactive-motion-scale, 1.08));
+}
+
+.#{$namespace}-slider__button-wrapper.dragging {
+  transition: none;
+}
+
+.#{$namespace}-slider__runway.is-dragging .#{$namespace}-slider__bar {
+  filter: blur(
+    var(--fsus-interactive-motion-blur, var(--fsus-motion-slider-blur))
+  );
+  box-shadow: 0 0 var(--fsus-interactive-motion-glow, 14px)
+    var(--fsus-motion-slider-trail);
+  transition:
+    filter var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    box-shadow var(--fsus-motion-control-fast) var(--fsus-motion-standard);
+
+  &::after {
+    opacity: var(--fsus-interactive-motion-trail-opacity, 0.42);
   }
 }
 
@@ -1188,17 +1792,18 @@ html.dark .#{$namespace}-switch__action {
 }
 
 .#{$namespace}-timeline-item__node {
-  width: 11px;
-  height: 11px;
-  left: 0;
-  background: var(--el-color-primary);
+  width: 8px;
+  height: 8px;
+  left: 1px;
+  background: var(--fsus-scholarly-blue);
+  border-color: var(--fsus-scholarly-blue);
   box-shadow: 0 0 0 3px var(--el-bg-color);
 }
 
-.#{$namespace}-calendar__header .#{$namespace}-button-group .#{$namespace}-button {
-  @include fsus-control(8px);
-  min-height: 36px;
-  margin-left: 4px;
+.#{$namespace}-calendar__header
+  .#{$namespace}-button-group
+  .#{$namespace}-button {
+  min-height: 32px;
 }
 
 .#{$namespace}-step__line {
@@ -1223,10 +1828,15 @@ html.dark .#{$namespace}-switch__action {
 
 .#{$namespace}-step__head.is-process,
 .#{$namespace}-step__head.is-success,
+.#{$namespace}-step__head.is-finish,
 .#{$namespace}-step__title.is-process,
-.#{$namespace}-step__title.is-success {
-  color: var(--el-text-color-primary);
-  border-color: var(--el-color-primary);
+.#{$namespace}-step__title.is-success,
+.#{$namespace}-step__title.is-finish,
+.#{$namespace}-step__description.is-process,
+.#{$namespace}-step__description.is-success,
+.#{$namespace}-step__description.is-finish {
+  color: var(--fsus-scholarly-blue);
+  border-color: var(--fsus-scholarly-blue);
 }
 
 .#{$namespace}-divider__text {
@@ -1236,7 +1846,9 @@ html.dark .#{$namespace}-switch__action {
 
 .#{$namespace}-skeleton__item {
   border-radius: 8px;
-  transition: opacity 0.28s ease, background-color 0.28s ease;
+  transition:
+    opacity 0.28s ease,
+    background-color 0.28s ease;
 }
 
 .#{$namespace}-carousel__button {
@@ -1260,6 +1872,24 @@ html.dark .#{$namespace}-switch__action {
     width: min(100vw - 16px, 420px);
   }
 
+  .#{$namespace}-dialog:not(.is-fullscreen) {
+    min-width: min(
+      var(--fsus-dialog-mobile-min-width),
+      var(--fsus-dialog-mobile-max-width)
+    );
+    max-width: var(--fsus-dialog-mobile-max-width);
+    margin-top: var(--fsus-space-6);
+    margin-bottom: var(--fsus-space-6);
+  }
+
+  .#{$namespace}-dialog__body {
+    overflow-wrap: anywhere;
+  }
+
+  .#{$namespace}-dialog__footer .dialog-footer {
+    flex-wrap: nowrap;
+  }
+
   .#{$namespace}-table th.#{$namespace}-table__cell,
   .#{$namespace}-table-v2__header-cell {
     font-size: 11px;
@@ -1278,16 +1908,26 @@ html.dark .#{$namespace}-switch__action {
   }
 
   .#{$namespace}-skeleton__item,
-  .#{$namespace}-loading-spinner .circular {
+  .#{$namespace}-loading-spinner .circular,
+  .#{$namespace}-slider__bar,
+  .#{$namespace}-slider__button,
+  .#{$namespace}-slider__button-wrapper {
     transition: none;
     animation-duration: 0.01ms;
     animation-iteration-count: 1;
+  }
+
+  .#{$namespace}-slider__runway.is-dragging .#{$namespace}-slider__bar,
+  .#{$namespace}-slider__button.dragging {
+    filter: none;
+    box-shadow: none;
   }
 }
 .#{$namespace}-button-group > .#{$namespace}-button + .#{$namespace}-button {
   margin-left: -1px;
 }
-.#{$namespace}-button-group > .#{$namespace}-button:not(:first-child):not(:last-child) {
+.#{$namespace}-button-group
+  > .#{$namespace}-button:not(:first-child):not(:last-child) {
   border-radius: 0;
 }
 .#{$namespace}-button-group > .#{$namespace}-button:first-child {
@@ -1299,6 +1939,17 @@ html.dark .#{$namespace}-switch__action {
   border-bottom-left-radius: 0;
 }
 
+.#{$namespace}-calendar__button-group
+  .#{$namespace}-button-group
+  > .#{$namespace}-button,
+.#{$namespace}-calendar__button-group
+  .#{$namespace}-button-group
+  > .#{$namespace}-button
+  + .#{$namespace}-button {
+  margin-left: 0;
+  border-radius: calc(var(--fsus-radius-control, 8px) - 2px) !important;
+}
+
 .#{$namespace}-color-picker__trigger {
   width: 44px;
   height: 44px;
@@ -1306,7 +1957,7 @@ html.dark .#{$namespace}-switch__action {
   box-sizing: border-box;
   border: 1px solid var(--el-border-color);
   border-radius: 8px;
-  
+
   &:hover,
   &.is-focus {
     border-color: var(--fsus-scholarly-blue);
@@ -1314,8 +1965,58 @@ html.dark .#{$namespace}-switch__action {
   }
 }
 
+.#{$namespace}-color-picker__panel.#{$namespace}-popper {
+  padding: 12px;
+  border-radius: 24px;
+}
+
+.#{$namespace}-color-dropdown {
+  overflow: visible;
+}
+
+.#{$namespace}-color-dropdown__main-wrapper {
+  margin-bottom: 10px;
+}
+
+.#{$namespace}-color-svpanel,
+.#{$namespace}-color-hue-slider,
+.#{$namespace}-color-alpha-slider {
+  overflow: hidden;
+  border-radius: var(--el-border-radius-base);
+  box-shadow: inset 0 0 0 1px var(--el-border-color-light);
+}
+
+.#{$namespace}-color-svpanel__white,
+.#{$namespace}-color-svpanel__black,
+.#{$namespace}-color-hue-slider__bar,
+.#{$namespace}-color-alpha-slider__bar {
+  border-radius: inherit;
+}
+
+.#{$namespace}-color-hue-slider {
+  background-color: transparent;
+}
+
+.#{$namespace}-color-hue-slider.is-vertical {
+  padding: 0;
+}
+
+.#{$namespace}-color-hue-slider__thumb,
+.#{$namespace}-color-alpha-slider__thumb {
+  border-color: var(--el-border-color-light);
+  border-radius: 999px;
+  background: var(--el-bg-color);
+  box-shadow: 0 1px 4px rgba(15, 15, 17, 0.18);
+}
+
+.#{$namespace}-color-dropdown__value .#{$namespace}-input__wrapper,
+.#{$namespace}-color-dropdown__btn,
+.#{$namespace}-color-dropdown__link-btn {
+  border-radius: var(--el-border-radius-base);
+}
+
 .#{$namespace}-color-picker__color {
-  border-radius: 4px;
+  border-radius: var(--el-border-radius-small);
   border: 1px solid var(--el-border-color-light);
 }
 
@@ -1342,8 +2043,10 @@ html.dark .#{$namespace}-switch__action {
 .#{$namespace}-image-viewer__mask {
   opacity: 1;
   background: rgba(5, 5, 5, 0.78);
-  backdrop-filter: blur(var(--fsus-backdrop-blur, 24px)) saturate(var(--fsus-backdrop-saturate, 120%));
-  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur, 24px)) saturate(var(--fsus-backdrop-saturate, 120%));
+  backdrop-filter: blur(var(--fsus-backdrop-blur, 24px))
+    saturate(var(--fsus-backdrop-saturate, 120%));
+  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur, 24px))
+    saturate(var(--fsus-backdrop-saturate, 120%));
 }
 
 // 操作按钮（close / prev / next）：fsus-floating 风格，去除硬编码深灰背景与白边
@@ -1352,10 +2055,14 @@ html.dark .#{$namespace}-switch__action {
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 999px;
   color: #ffffff;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 4px 16px rgba(0, 0, 0, 0.32);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 4px 16px rgba(0, 0, 0, 0.32);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  transition: opacity getCssVar('transition-duration'), background getCssVar('transition-duration');
+  transition:
+    opacity getCssVar('transition-duration'),
+    background getCssVar('transition-duration');
 
   &:hover {
     background: rgba(255, 255, 255, 0.22);
@@ -1366,10 +2073,306 @@ html.dark .#{$namespace}-switch__action {
 .#{$namespace}-image-viewer__actions {
   background: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 24px;
+  border-radius: var(--fsus-radius-panel);
   color: #ffffff;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 4px 16px rgba(0, 0, 0, 0.32);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 4px 16px rgba(0, 0, 0, 0.32);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
 
+@media (hover: none) and (pointer: coarse) {
+  .#{$namespace}-button,
+  .#{$namespace}-checkbox,
+  .#{$namespace}-checkbox-button,
+  .#{$namespace}-radio,
+  .#{$namespace}-radio-button,
+  .#{$namespace}-select,
+  .#{$namespace}-select-v2,
+  .#{$namespace}-dropdown-menu__item,
+  .#{$namespace}-select-dropdown__item,
+  .#{$namespace}-select-dropdown__option-item,
+  .#{$namespace}-cascader-node,
+  .#{$namespace}-autocomplete-suggestion li,
+  .#{$namespace}-picker-panel__shortcut,
+  .#{$namespace}-picker-panel__icon-btn,
+  .#{$namespace}-time-panel__btn,
+  .#{$namespace}-time-spinner__item,
+  .#{$namespace}-menu-item,
+  .#{$namespace}-sub-menu__title,
+  .#{$namespace}-tabs__item,
+  .#{$namespace}-pagination button,
+  .#{$namespace}-pager li,
+  .#{$namespace}-tree-node__content,
+  .#{$namespace}-table__row,
+  .#{$namespace}-table-v2__row,
+  .#{$namespace}-tag,
+  .#{$namespace}-check-tag,
+  .#{$namespace}-upload-dragger,
+  .#{$namespace}-upload-list__item,
+  .#{$namespace}-color-picker__trigger,
+  .#{$namespace}-link,
+  .#{$namespace}-backtop {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .#{$namespace}-button:not(.is-disabled):hover,
+  .#{$namespace}-button:not(.is-disabled):focus {
+    transform: none;
+    box-shadow: none !important;
+    outline: none;
+  }
+
+  .#{$namespace}-button:not(.#{$namespace}-button--primary):not(
+      .#{$namespace}-button--success
+    ):not(.#{$namespace}-button--warning):not(
+      .#{$namespace}-button--danger
+    ):not(.#{$namespace}-button--info):not(.is-disabled):hover,
+  .#{$namespace}-button:not(.#{$namespace}-button--primary):not(
+      .#{$namespace}-button--success
+    ):not(.#{$namespace}-button--warning):not(
+      .#{$namespace}-button--danger
+    ):not(.#{$namespace}-button--info):not(.is-disabled):focus {
+    background: transparent;
+    border-color: var(--el-border-color);
+    color: var(--el-text-color-primary);
+  }
+
+  .#{$namespace}-button--primary:not(.is-disabled):hover,
+  .#{$namespace}-button--primary:not(.is-disabled):focus {
+    background: var(--el-color-primary);
+    border-color: var(--el-color-primary);
+    color: var(--el-bg-color);
+  }
+
+  .#{$namespace}-button--success:not(.is-disabled):hover,
+  .#{$namespace}-button--success:not(.is-disabled):focus {
+    background: rgba(22, 163, 74, 0.08);
+    border-color: rgba(22, 163, 74, 0.18);
+    color: #166534;
+  }
+
+  .#{$namespace}-button--warning:not(.is-disabled):hover,
+  .#{$namespace}-button--warning:not(.is-disabled):focus {
+    background: rgba(217, 119, 6, 0.08);
+    border-color: rgba(217, 119, 6, 0.18);
+    color: #92400e;
+  }
+
+  .#{$namespace}-button--danger:not(.is-disabled):hover,
+  .#{$namespace}-button--danger:not(.is-disabled):focus {
+    background: rgba(220, 38, 38, 0.08);
+    border-color: rgba(220, 38, 38, 0.18);
+    color: #991b1b;
+  }
+
+  .#{$namespace}-button--info:not(.is-disabled):hover,
+  .#{$namespace}-button--info:not(.is-disabled):focus {
+    background: rgba(113, 113, 122, 0.08);
+    border-color: rgba(113, 113, 122, 0.16);
+    color: var(--el-text-color-regular);
+  }
+
+  .#{$namespace}-button.is-text:not(.is-disabled):hover,
+  .#{$namespace}-button.is-text:not(.is-disabled):focus,
+  .#{$namespace}-button.is-link:not(.is-disabled):hover,
+  .#{$namespace}-button.is-link:not(.is-disabled):focus,
+  .#{$namespace}-button--text:not(.is-disabled):hover,
+  .#{$namespace}-button--text:not(.is-disabled):focus {
+    background: transparent;
+    border-color: transparent;
+    color: var(--el-text-color-regular);
+  }
+
+  .#{$namespace}-button:not(.is-disabled):active {
+    background: var(--fsus-state-hover-bg);
+    border-color: var(--fsus-state-focus-border);
+    color: var(--fsus-scholarly-blue);
+    box-shadow:
+      inset 0 0 0 1px var(--fsus-state-focus-border),
+      0 0 12px var(--fsus-motion-trail) !important;
+    transform: translate3d(0, 1px, 0) scale(0.985);
+  }
+
+  .#{$namespace}-button--primary:not(.is-disabled):active {
+    background: var(--fsus-scholarly-blue);
+    border-color: var(--fsus-scholarly-blue);
+    color: #ffffff;
+    box-shadow: 0 0 14px var(--fsus-motion-trail) !important;
+  }
+
+  .#{$namespace}-select-dropdown__item:not(.selected):hover,
+  .#{$namespace}-select-dropdown__item.hover:not(.selected),
+  .#{$namespace}-dropdown-menu__item:not(.is-disabled):hover,
+  .#{$namespace}-dropdown-menu__item:not(.is-disabled):focus,
+  .#{$namespace}-cascader-node:not(.is-active):not(.in-active-path):hover,
+  .#{$namespace}-autocomplete-suggestion li:hover,
+  .#{$namespace}-picker-panel__shortcut:hover,
+  .#{$namespace}-time-panel__btn:not(.confirm):hover,
+  .#{$namespace}-picker-panel__icon-btn:hover,
+  .#{$namespace}-time-spinner__item:hover:not(.is-disabled):not(.is-active):not(
+      .disabled
+    ):not(.active),
+  .#{$namespace}-date-table
+    td.available:not(.current):hover
+    .#{$namespace}-date-table-cell__text,
+  .#{$namespace}-month-table td:not(.current) .cell:hover,
+  .#{$namespace}-year-table td:not(.current) .cell:hover {
+    background: transparent;
+    color: var(--el-text-color-regular);
+    box-shadow: none !important;
+    outline: none;
+  }
+
+  .#{$namespace}-select-dropdown__item:not(.selected):active,
+  .#{$namespace}-dropdown-menu__item:not(.is-disabled):active,
+  .#{$namespace}-cascader-node:not(.is-disabled):active,
+  .#{$namespace}-autocomplete-suggestion li:active,
+  .#{$namespace}-picker-panel__shortcut:active,
+  .#{$namespace}-time-panel__btn:not(.confirm):active,
+  .#{$namespace}-picker-panel__icon-btn:active {
+    background: var(--fsus-state-hover-bg);
+    color: var(--fsus-scholarly-blue);
+    box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);
+    transform: translate3d(0, 1px, 0);
+  }
+
+  .#{$namespace}-select-dropdown__option-item:not(.is-selected):hover::before,
+  .#{$namespace}-select-dropdown__option-item.hover:not(.is-selected)::before {
+    background: transparent;
+    box-shadow: none !important;
+  }
+
+  .#{$namespace}-select-dropdown__option-item:not(.is-selected):active::before {
+    background: var(--fsus-state-emphasis-bg);
+    box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);
+  }
+
+  .#{$namespace}-menu-item:not(.is-active):hover,
+  .#{$namespace}-menu-item:not(.is-active):focus,
+  .#{$namespace}-sub-menu:not(.is-active)
+    > .#{$namespace}-sub-menu__title:hover,
+  .#{$namespace}-sub-menu:not(.is-active)
+    > .#{$namespace}-sub-menu__title:focus,
+  .#{$namespace}-tabs__item:not(.is-active):hover,
+  .#{$namespace}-tabs__item:not(.is-active):focus,
+  .#{$namespace}-pagination button:not(:disabled):hover,
+  .#{$namespace}-pagination button:not(:disabled):focus,
+  .#{$namespace}-pager li:not(.is-active):hover,
+  .#{$namespace}-pager li:not(.is-active):focus,
+  .#{$namespace}-tree-node:not(.is-current)
+    > .#{$namespace}-tree-node__content:hover,
+  .#{$namespace}-tree-node:not(.is-current):focus
+    > .#{$namespace}-tree-node__content,
+  .#{$namespace}-table
+    .#{$namespace}-table__row:hover
+    > td.#{$namespace}-table__cell,
+  .#{$namespace}-table-v2__row:hover,
+  .#{$namespace}-table-v2__row.row-hover,
+  .#{$namespace}-upload-list__item:hover {
+    background: transparent;
+    color: var(--el-text-color-regular);
+    box-shadow: none !important;
+    outline: none;
+  }
+
+  .#{$namespace}-menu-item:not(.is-active):active,
+  .#{$namespace}-sub-menu:not(.is-active)
+    > .#{$namespace}-sub-menu__title:active,
+  .#{$namespace}-tabs__item:not(.is-active):active,
+  .#{$namespace}-pagination button:not(:disabled):active,
+  .#{$namespace}-pager li:not(.is-active):active,
+  .#{$namespace}-tree-node:not(.is-current)
+    > .#{$namespace}-tree-node__content:active,
+  .#{$namespace}-upload-list__item:active {
+    background: var(--fsus-state-hover-bg);
+    color: var(--fsus-scholarly-blue);
+    box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);
+    transform: translate3d(0, 1px, 0);
+  }
+
+  .#{$namespace}-tag:hover,
+  .#{$namespace}-check-tag:not(.is-checked):hover {
+    background: rgba(161, 161, 170, 0.06);
+    border-color: var(--el-border-color-light);
+    color: var(--el-text-color-regular);
+    transform: none;
+  }
+
+  .#{$namespace}-tag:active,
+  .#{$namespace}-check-tag:not(.is-disabled):active {
+    background: var(--fsus-state-hover-bg);
+    border-color: var(--fsus-state-focus-border);
+    color: var(--fsus-scholarly-blue);
+    box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);
+    transform: translate3d(0, 1px, 0) scale(0.985);
+  }
+
+  .#{$namespace}-checkbox__inner:hover,
+  .#{$namespace}-radio__inner:hover {
+    border-color: var(--el-border-color-light);
+  }
+
+  .#{$namespace}-checkbox-button.is-focus:not(.is-checked)
+    .#{$namespace}-checkbox-button__inner,
+  .#{$namespace}-radio-button:not(.is-active):focus-within
+    .#{$namespace}-radio-button__inner {
+    border-color: var(--el-border-color) !important;
+    box-shadow: none !important;
+    z-index: auto;
+  }
+
+  .#{$namespace}-upload-dragger:hover {
+    background: var(--el-fill-color-lighter);
+    border-color: var(--el-border-color);
+    box-shadow: none !important;
+  }
+
+  .#{$namespace}-upload-dragger:active {
+    background: var(--fsus-state-hover-bg);
+    border-color: var(--fsus-state-focus-border);
+    box-shadow:
+      inset 0 0 0 1px var(--fsus-state-focus-border),
+      0 0 14px var(--fsus-motion-trail) !important;
+    transform: translate3d(0, 1px, 0);
+  }
+
+  .#{$namespace}-color-picker__trigger:hover:not(.is-focus) {
+    border-color: var(--el-border-color);
+    box-shadow: none !important;
+  }
+
+  .#{$namespace}-color-picker__trigger:active {
+    border-color: var(--fsus-state-focus-border);
+    box-shadow:
+      inset 0 0 0 1px var(--fsus-state-focus-border),
+      0 0 12px var(--fsus-motion-trail) !important;
+    transform: translate3d(0, 1px, 0) scale(0.985);
+  }
+
+  .#{$namespace}-link:hover {
+    color: inherit;
+
+    &::after {
+      border-bottom-color: transparent;
+    }
+  }
+
+  .#{$namespace}-backtop:hover {
+    background: var(--el-color-primary);
+    color: var(--el-bg-color);
+    transform: none;
+  }
+
+  .#{$namespace}-backtop:active {
+    background: var(--fsus-scholarly-blue);
+    color: var(--el-bg-color);
+    box-shadow: 0 0 14px var(--fsus-motion-trail);
+    transform: translate3d(0, 1px, 0) scale(0.96);
+  }
+
+  .#{$namespace}-image-viewer__btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+}

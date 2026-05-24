@@ -1,5 +1,11 @@
-dist
-node_modules
-lib
+.sass-cache/
+node_modules/
 npm-debug*
-coverage
+yarn-debug*
+pnpm-debug*
+coverage/
+dist/
+lib/
+es/
+*.tsbuildinfo
+*.log
