@@ -81,7 +81,7 @@ const storedThemeMode = localStorage.getItem('theme-mode')
 syncThemeMode(
   storedThemeMode === 'dark' || storedThemeMode === 'light'
     ? storedThemeMode
-    : 'system'
+    : 'system',
 )
 ```
 
@@ -142,7 +142,7 @@ import './styles/dark.css'
     'primary': #f0f0f4,
     'regular': #a1a1aa,
     'secondary': #8b8b95,
-  ),
+  )
 );
 ```
 
@@ -157,6 +157,31 @@ import './styles/dark.css'
 1. 服务端直接输出 `<html class="dark">` 或 `<html class="light">`
 2. 客户端在挂载前调用 `syncThemeMode(storedThemeMode)`
 3. Vue 根部再用 `themeMode` 保持运行时状态一致
+
+## 测试与截图脚本
+
+Playwright、人工截图或下游 AGENTS 工具需要强制主题时，不要直接改
+`document.documentElement.classList`。使用 FsusUI 提供的测试 helper：
+
+```ts
+import { installThemeModeTestHelper } from '@ozwasyd/element-plus'
+
+installThemeModeTestHelper({
+  persist: true,
+  storageKey: 'fsus.ui.themeMode',
+})
+```
+
+安装后浏览器脚本可以调用：
+
+```ts
+await page.evaluate(() => {
+  window.__fsusUiThemeMode?.set('dark')
+})
+```
+
+helper 会复用 `syncThemeMode()`，同步 `<html>` 的 class、`data-theme-mode`、
+`data-theme-resolved` 和 `color-scheme`，并按需写入指定 storage key。
 
 这样可以避免“用户已选亮色，但系统是暗色，首帧仍短暂闪黑”的问题。
 

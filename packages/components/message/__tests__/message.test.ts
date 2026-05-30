@@ -76,6 +76,19 @@ describe('Message.vue', () => {
 
       expect(wrapper.find(`.${tagClass}`).exists()).toBe(false)
     })
+
+    test('renders SQL-like and XSS-like strings as inert text by default', () => {
+      const payload =
+        `'; DROP TABLE users; -- <img src=x onerror="alert(1)">`
+      const wrapper = _mount({
+        props: {
+          message: payload,
+        },
+      })
+
+      expect(wrapper.text()).toContain(payload)
+      expect(wrapper.find('img').exists()).toBe(false)
+    })
   })
 
   describe('Message.type', () => {

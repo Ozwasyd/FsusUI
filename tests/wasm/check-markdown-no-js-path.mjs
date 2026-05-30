@@ -119,4 +119,4 @@ for (const relativePath of editorVueFiles) {
   }
 }
 
-console.log('[markdown-no-js-path] ok')
+process.stdout.write('[markdown-no-js-path] ok\n')

@@ -7,7 +7,7 @@ import {
   onUnmounted,
   watch,
 } from 'vue'
-import { addClass, isClient, rAF, removeClass } from '@element-plus/utils'
+import { addClass, cAF, isClient, rAF, removeClass } from '@element-plus/utils'
 import { useNamespace } from '@element-plus/hooks'
 import useLayoutObserver from '../layout-observer'
 import { removePopper } from '../util'
@@ -27,11 +27,14 @@ export default defineComponent({
     const { wrappedRowRender, tooltipContent, tooltipTrigger } =
       useRender(props)
     const { onColumnsChange, onScrollableChange } = useLayoutObserver(parent!)
+    let hoverFrame = 0
 
     watch(props.store.states.hoverRow, (newVal: any, oldVal: any) => {
       if (!props.store.states.isComplex.value || !isClient) return
 
-      rAF(() => {
+      if (hoverFrame) cAF(hoverFrame)
+      hoverFrame = rAF(() => {
+        hoverFrame = 0
         // just get first level children; fix #9723
         const el = instance?.vnode.el as HTMLElement
         const rows = Array.from(el?.children || []).filter((e) =>
@@ -49,6 +52,10 @@ export default defineComponent({
     })
 
     onUnmounted(() => {
+      if (hoverFrame) {
+        cAF(hoverFrame)
+        hoverFrame = 0
+      }
       removePopper?.()
     })
 

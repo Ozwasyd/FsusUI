@@ -13,7 +13,7 @@ import {
   shallowRef,
   watch,
 } from 'vue'
-import { useMutationObserver } from '@vueuse/core'
+import { useMutationObserver } from '@element-plus/hooks/use-runtime'
 import { watermarkProps } from './watermark'
 import { getPixelRatio, getStyleStr, reRendering } from './utils'
 import useClips, { FontGap } from './useClips'

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { onMounted, onUpdated, shallowRef, watch } from 'vue'
-import { useEventListener } from '@vueuse/core'
+import { useEventListener } from '@element-plus/hooks/use-runtime'
 import { EVENT_CODE } from '@element-plus/constants'
 import { useNamespace } from '@element-plus/hooks'
 import type TreeStore from './tree-store'

@@ -24,7 +24,7 @@ import {
   useSlots,
   watch,
 } from 'vue'
-import { eagerComputed } from '@vueuse/core'
+import { eagerComputed } from '@element-plus/hooks/use-runtime'
 import { throwError } from '@element-plus/utils'
 import { useNamespace } from '@element-plus/hooks'
 import { tabsRootContextKey } from './constants'

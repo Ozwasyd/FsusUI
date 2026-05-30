@@ -14,7 +14,7 @@ import {
   unref,
   watch,
 } from 'vue'
-import { useEventListener } from '@vueuse/core'
+import { useEventListener } from '@element-plus/hooks/use-runtime'
 import { composeEventHandlers } from '@element-plus/utils'
 import {
   ROVING_FOCUS_COLLECTION_INJECTION_KEY,

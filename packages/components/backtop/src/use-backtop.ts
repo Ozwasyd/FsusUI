@@ -1,5 +1,5 @@
 import { onMounted, ref, shallowRef } from 'vue'
-import { useEventListener, useThrottleFn } from '@vueuse/core'
+import { useEventListener, useThrottleFn } from '@element-plus/hooks/use-runtime'
 import { throwError } from '@element-plus/utils'
 import type { SetupContext } from 'vue'
 import type { BacktopEmits, BacktopProps } from './backtop'

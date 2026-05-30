@@ -1,16 +1,16 @@
 <template>
   <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="1"
-    stroke-linecap="round"
     stroke-linejoin="round"
+    stroke-linecap="round"
+    stroke-width="32"
+    stroke="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 1024 1024"
   >
-    <circle cx="12" cy="12" r="1" />
-    <circle cx="12" cy="5" r="1" />
-    <circle cx="12" cy="19" r="1" />
+    <path
+      fill="currentColor"
+      d="M176 416a112 112 0 1 1 0 224 112 112 0 0 1 0-224m336 0a112 112 0 1 1 0 224 112 112 0 0 1 0-224m336 0a112 112 0 1 1 0 224 112 112 0 0 1 0-224"
+    />
   </svg>
 </template>
 <script lang="ts" setup>

@@ -1,18 +1,17 @@
 <template>
   <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="1"
-    stroke-linecap="round"
     stroke-linejoin="round"
+    stroke-linecap="round"
+    stroke-width="32"
+    stroke="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 1024 1024"
   >
-    <circle cx="12" cy="12" r="10" />
-    <line x1="22" x2="18" y1="12" y2="12" />
-    <line x1="6" x2="2" y1="12" y2="12" />
-    <line x1="12" x2="12" y1="6" y2="2" />
-    <line x1="12" x2="12" y1="22" y2="18" />
+    <path fill="currentColor" d="M480 512h64v320h-64z" />
+    <path
+      fill="currentColor"
+      d="M192 896h640a64 64 0 0 0-64-64H256a64 64 0 0 0-64 64m64-128h512a128 128 0 0 1 128 128v64H128v-64a128 128 0 0 1 128-128m256-256a192 192 0 1 0 0-384 192 192 0 0 0 0 384m0 64a256 256 0 1 1 0-512 256 256 0 0 1 0 512"
+    />
   </svg>
 </template>
 <script lang="ts" setup>

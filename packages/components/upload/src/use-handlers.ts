@@ -1,6 +1,6 @@
 import { watch } from 'vue'
 import { isNil } from 'lodash-unified'
-import { useVModel } from '@vueuse/core'
+import { useVModel } from '@element-plus/hooks/use-runtime'
 import { debugWarn, throwError } from '@element-plus/utils'
 import { genFileId } from './upload'
 import type { ShallowRef } from 'vue'

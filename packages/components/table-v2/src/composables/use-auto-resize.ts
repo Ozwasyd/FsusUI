@@ -1,5 +1,5 @@
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { useResizeObserver } from '@vueuse/core'
+import { useResizeObserver } from '@element-plus/hooks/use-runtime'
 
 import type { AutoResizerProps } from '../auto-resizer'
 

@@ -113,6 +113,23 @@ describe('MessageBox', () => {
     expect(message.textContent).toEqual('html string')
   })
 
+  test('renders SQL-like and XSS-like strings as inert text by default', async () => {
+    const payload =
+      `'; DROP TABLE users; -- <img src=x onerror="alert(1)">`
+
+    silencePromise(
+      MessageBox({
+        title: 'safe text',
+        message: payload,
+      }),
+    )
+    await rAF()
+
+    const message = document.querySelector('.el-message-box__message')
+    expect(message?.textContent).toContain(payload)
+    expect(message?.querySelector('img')).toBeNull()
+  })
+
   test('distinguish cancel and close', async () => {
     let msgAction = ''
     const invoker = () => {

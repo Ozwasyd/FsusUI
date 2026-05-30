@@ -75,7 +75,7 @@ import {
   shallowRef,
   watch,
 } from 'vue'
-import { useEventListener } from '@vueuse/core'
+import { useEventListener } from '@element-plus/hooks/use-runtime'
 import { throttle } from 'lodash-unified'
 import { useLocale, useNamespace, useZIndex } from '@element-plus/hooks'
 import { EVENT_CODE } from '@element-plus/constants'

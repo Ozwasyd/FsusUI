@@ -14,13 +14,13 @@ vi.mock('@element-plus/utils/error', () => ({
 const AXIOM = 'Rem is the best girl'
 
 describe('<ElTooltip />', () => {
-  const createComponent = (props = {}, content: string | VNode = '') =>
+  const createComponent = (props = {}, content?: string | VNode) =>
     mount(
       <Tooltip
         {...props}
         v-slots={{
           default: () => AXIOM,
-          content: () => content,
+          ...(content === undefined ? {} : { content: () => content }),
         }}
       />,
       {
@@ -53,6 +53,22 @@ describe('<ElTooltip />', () => {
       expect(document.querySelector('#test')?.innerHTML).toContain(
         'test appendTo props'
       )
+    })
+
+    it('renders SQL-like and XSS-like content as inert text by default', async () => {
+      const payload =
+        `'; DROP TABLE users; -- <img src=x onerror="alert(1)">`
+      wrapper = createComponent(
+        {
+          content: payload,
+          visible: true,
+        }
+      )
+      await nextTick()
+      await rAF()
+
+      expect(document.body.textContent).toContain(payload)
+      expect(document.body.querySelector('.el-tooltip__popper img')).toBeNull()
     })
   })
 

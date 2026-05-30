@@ -1,5 +1,11 @@
 # element-plus
 
+## 1.4.1
+
+### Patch Changes
+
+- Harden FsusUI release packaging for Vite consumers, including static WASM asset resolution, theme-mode test helpers, render-pipeline diagnostics, DOM virtualization scheduling, and chunk-budgeted consumer smoke validation.
+
 ## 1.4.0
 
 ### Minor Changes

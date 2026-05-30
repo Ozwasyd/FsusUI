@@ -147,7 +147,7 @@ import {
   useSlots,
   watch,
 } from 'vue'
-import { useResizeObserver } from '@vueuse/core'
+import { useResizeObserver } from '@element-plus/hooks/use-runtime'
 import { isNil } from 'lodash-unified'
 import { ElIcon } from '@element-plus/components/icon'
 import {

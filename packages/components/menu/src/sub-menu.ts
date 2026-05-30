@@ -14,7 +14,7 @@ import {
   watch,
   withDirectives,
 } from 'vue'
-import { useTimeoutFn } from '@vueuse/core'
+import { useTimeoutFn } from '@element-plus/hooks/use-runtime'
 import ElCollapseTransition from '@element-plus/components/collapse-transition'
 import ElTooltip from '@element-plus/components/tooltip'
 import {

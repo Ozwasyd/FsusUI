@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :class="uploadKls" :style="uploadStyle">
     <upload-list
       v-if="isPictureCard && showFileList"
       :disabled="disabled"
@@ -48,6 +48,7 @@
 <script lang="ts" setup>
 import { computed, onBeforeUnmount, provide, shallowRef } from 'vue'
 import { useFormDisabled } from '@element-plus/components/form'
+import { useNamespace } from '@element-plus/hooks'
 import { uploadContextKey } from './constants'
 import UploadList from './upload-list.vue'
 import UploadContent from './upload-content.vue'
@@ -58,6 +59,7 @@ import type {
   UploadContentInstance,
   UploadContentProps,
 } from './upload-content'
+import type { CSSProperties } from 'vue'
 
 defineOptions({
   name: 'ElUpload',
@@ -66,6 +68,7 @@ defineOptions({
 const props = defineProps(uploadProps)
 
 const disabled = useFormDisabled()
+const ns = useNamespace('upload')
 
 const uploadRef = shallowRef<UploadContentInstance>()
 const {
@@ -82,6 +85,13 @@ const {
 } = useHandlers(props, uploadRef)
 
 const isPictureCard = computed(() => props.listType === 'picture-card')
+const uploadKls = computed(() => [
+  ns.b('field'),
+  ns.is('media-field', props.mediaField),
+])
+const uploadStyle = computed<CSSProperties>(() => ({
+  '--el-upload-media-aspect-ratio': props.mediaAspectRatio,
+}))
 
 const uploadContentProps = computed<UploadContentProps>(() => ({
   ...props,

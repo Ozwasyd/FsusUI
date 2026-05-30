@@ -23,6 +23,40 @@
   @include set-component-css-var('upload', $upload);
 }
 
+@include b(upload-field) {
+  box-sizing: border-box;
+
+  @include when(media-field) {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+
+    > .#{$namespace}-upload {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    > .#{$namespace}-upload > *:not(input) {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      aspect-ratio: var(--#{$namespace}-upload-media-aspect-ratio, 16 / 9);
+      min-width: 0;
+      box-sizing: border-box;
+    }
+
+    .#{$namespace}-upload-dragger {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      aspect-ratio: var(--#{$namespace}-upload-media-aspect-ratio, 16 / 9);
+      min-height: 0;
+    }
+  }
+}
+
 @include b(upload) {
   @include utils-inline-flex-center;
 

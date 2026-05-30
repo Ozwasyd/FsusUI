@@ -29,6 +29,16 @@ describe('Empty.vue', () => {
     expect(wrapper.find('.el-empty__description').text()).toEqual(AXIOM)
   })
 
+  test('should render description layout and width props', () => {
+    const wrapper = mount(() => (
+      <Empty description={AXIOM} descriptionLayout="wide" descriptionWidth={360} />
+    ))
+    const description = wrapper.find('.el-empty__description')
+
+    expect(description.classes()).toContain('el-empty__description--wide')
+    expect(description.attributes('style')).toContain('max-width: 360px')
+  })
+
   test('should render image slots', () => {
     const wrapper = mount(() => (
       <Empty

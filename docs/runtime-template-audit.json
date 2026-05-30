@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-05-16T23:47:56.398Z",
+  "generatedAt": "2026-05-30T09:44:46.972Z",
   "totals": {
-    "filesScanned": 127,
-    "totalNodes": 958,
+    "filesScanned": 131,
+    "totalNodes": 1009,
     "totalIssues": 0,
     "totalPotentialSavings": 0,
     "deprecatedSyntaxCount": 0,
@@ -102,7 +102,7 @@
     },
     {
       "file": "packages/components/calendar/src/calendar.vue",
-      "nodeCount": 17,
+      "nodeCount": 16,
       "componentCount": 6,
       "potentialSavings": 0,
       "manualReviewCount": 0,
@@ -524,6 +524,15 @@
       "issues": []
     },
     {
+      "file": "packages/components/markdown-renderer/src/markdown-renderer.vue",
+      "nodeCount": 10,
+      "componentCount": 0,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
       "file": "packages/components/menu/src/menu-collapse-transition.vue",
       "nodeCount": 2,
       "componentCount": 1,
@@ -650,6 +659,15 @@
       "issues": []
     },
     {
+      "file": "packages/components/public-shell/src/public-shell.vue",
+      "nodeCount": 32,
+      "componentCount": 3,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
       "file": "packages/components/radio/src/radio-button.vue",
       "nodeCount": 4,
       "componentCount": 0,
@@ -680,6 +698,15 @@
       "file": "packages/components/rate/src/rate.vue",
       "nodeCount": 9,
       "componentCount": 6,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/responsive-collection/src/responsive-collection.vue",
+      "nodeCount": 7,
+      "componentCount": 0,
       "potentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
@@ -950,6 +977,15 @@
       "file": "packages/components/text/src/text.vue",
       "nodeCount": 2,
       "componentCount": 1,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/theme-mode-toggle/src/theme-mode-toggle.vue",
+      "nodeCount": 3,
+      "componentCount": 2,
       "potentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],

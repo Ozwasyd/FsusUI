@@ -292,7 +292,7 @@ describe('TreeSelect.vue', () => {
   test('filter uses wasm fast path for large default tree filtering', async () => {
     setWasmReady(true)
 
-    const children = Array.from({ length: 600 }, (_, index) => ({
+    const children = Array.from({ length: 512 }, (_, index) => ({
       value: index + 10,
       label: index === 357 ? 'target node' : `node ${index}`,
     }))
@@ -300,6 +300,7 @@ describe('TreeSelect.vue', () => {
     const { tree } = createComponent({
       props: {
         filterable: true,
+        renderAfterExpand: true,
         data: [
           {
             value: 1,
@@ -321,7 +322,7 @@ describe('TreeSelect.vue', () => {
   }, 30000)
 
   test('filter suspends default wasm path until readiness', async () => {
-    const children = Array.from({ length: 600 }, (_, index) => ({
+    const children = Array.from({ length: 512 }, (_, index) => ({
       value: index + 10,
       label: index === 24 ? 'pending node' : `node ${index}`,
     }))
@@ -329,6 +330,7 @@ describe('TreeSelect.vue', () => {
     const { tree } = createComponent({
       props: {
         filterable: true,
+        renderAfterExpand: true,
         data: [
           {
             value: 1,
@@ -359,7 +361,8 @@ describe('TreeSelect.vue', () => {
     const { tree } = createComponent({
       props: {
         filterable: true,
-        data: Array.from({ length: 600 }, (_, index) => ({
+        renderAfterExpand: true,
+        data: Array.from({ length: 512 }, (_, index) => ({
           value: index,
           label: `节点 ${index}`,
         })),

@@ -94,6 +94,11 @@ function fileUrlToPath(fileUrl: string): string {
 }
 
 async function resolveRuntimeUrl(url: string): Promise<string> {
+  const nodeLocalRuntimeUrl = resolveNodeLocalRuntimeUrl(url)
+  if (nodeLocalRuntimeUrl) {
+    return nodeLocalRuntimeUrl
+  }
+
   if (!url.startsWith('/')) {
     return url
   }
@@ -119,4 +124,38 @@ async function resolveRuntimeUrl(url: string): Promise<string> {
   }
 
   return url
+}
+
+function resolveNodeLocalRuntimeUrl(url: string): string | null {
+  if (!/^https?:\/\//u.test(url)) {
+    return null
+  }
+
+  const nodeProcess = (globalThis as { process?: { cwd(): string } }).process
+  if (!nodeProcess) {
+    return null
+  }
+
+  let parsed: URL
+  try {
+    parsed = new URL(url)
+  } catch {
+    return null
+  }
+
+  if (!['localhost', '127.0.0.1', '0.0.0.0'].includes(parsed.hostname)) {
+    return null
+  }
+
+  const cwd = nodeProcess.cwd().replace(/\\/g, '/').replace(/\/+$/, '')
+  const pathname = decodeURIComponent(parsed.pathname)
+  const filePath = pathname.startsWith('/@fs/')
+    ? pathname.slice('/@fs'.length)
+    : pathname.startsWith(`${cwd}/`)
+      ? pathname
+      : pathname.startsWith('/packages/wasm/dist/')
+        ? `${cwd}${pathname}`
+        : null
+
+  return filePath ? `file://${filePath}` : null
 }

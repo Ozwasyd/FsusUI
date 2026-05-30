@@ -66,12 +66,14 @@ import { ElPopconfirm } from '@element-plus/components/popconfirm'
 import { ElPopover } from '@element-plus/components/popover'
 import { ElPopper } from '@element-plus/components/popper'
 import { ElProgress } from '@element-plus/components/progress'
+import { ElPublicShell } from '@element-plus/components/public-shell'
 import {
   ElRadio,
   ElRadioButton,
   ElRadioGroup,
 } from '@element-plus/components/radio'
 import { ElRate } from '@element-plus/components/rate'
+import { ElResponsiveCollection } from '@element-plus/components/responsive-collection'
 import { ElResult } from '@element-plus/components/result'
 import { ElRow } from '@element-plus/components/row'
 import { ElScrollbar } from '@element-plus/components/scrollbar'
@@ -93,6 +95,7 @@ import { ElAutoResizer, ElTableV2 } from '@element-plus/components/table-v2'
 import { ElTabPane, ElTabs } from '@element-plus/components/tabs'
 import { ElTag } from '@element-plus/components/tag'
 import { ElText } from '@element-plus/components/text'
+import { ElThemeModeToggle } from '@element-plus/components/theme-mode-toggle'
 import { ElTimePicker } from '@element-plus/components/time-picker'
 import { ElTimeSelect } from '@element-plus/components/time-select'
 import { ElTimeline, ElTimelineItem } from '@element-plus/components/timeline'
@@ -169,10 +172,12 @@ export const allComponents = [
   ElPopover,
   ElPopper,
   ElProgress,
+  ElPublicShell,
   ElRadio,
   ElRadioButton,
   ElRadioGroup,
   ElRate,
+  ElResponsiveCollection,
   ElResult,
   ElRow,
   ElScrollbar,
@@ -196,6 +201,7 @@ export const allComponents = [
   ElTabPane,
   ElTag,
   ElText,
+  ElThemeModeToggle,
   ElTimePicker,
   ElTimeSelect,
   ElTimeline,

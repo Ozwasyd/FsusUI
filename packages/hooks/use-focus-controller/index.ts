@@ -1,5 +1,5 @@
 import { getCurrentInstance, ref, shallowRef, watch } from 'vue'
-import { useEventListener } from '@vueuse/core'
+import { useEventListener } from '../use-runtime'
 import { isFunction } from '@element-plus/utils'
 import type { ShallowRef } from 'vue'
 

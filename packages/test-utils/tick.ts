@@ -11,7 +11,7 @@ export default tick
 // in order to test transitions, we need to use
 // await rAF() after firing transition events.
 export const rAF = async () => {
-  return new Promise((res) => {
+  await new Promise((res) => {
     requestAnimationFrame(() => {
       requestAnimationFrame(async () => {
         res(null)
@@ -19,4 +19,7 @@ export const rAF = async () => {
       })
     })
   })
+  await nextTick()
+  await new Promise((res) => setTimeout(res, 20))
+  await nextTick()
 }

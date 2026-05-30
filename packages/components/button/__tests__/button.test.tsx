@@ -79,6 +79,13 @@ describe('Button.vue', () => {
     expect(wrapper.classes()).toContain('is-link')
   })
 
+  it('inline action', () => {
+    const wrapper = mount(() => <Button text inlineAction />)
+
+    expect(wrapper.classes()).toContain('is-inline-action')
+    expect(wrapper.classes()).toContain('is-text')
+  })
+
   test('render text', () => {
     const wrapper = mount(() => (
       <Button

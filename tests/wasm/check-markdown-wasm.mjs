@@ -72,4 +72,4 @@ if (failed) {
   process.exit(1)
 }
 
-console.log('[markdown-wasm] ok artifacts=basic+simd')
+process.stdout.write('[markdown-wasm] ok artifacts=basic+simd\n')

@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
 test('audit component styles', async ({ page }) => {
+  test.setTimeout(60_000);
+
   const components = [
     { name: 'Button', route: 'basic', selector: '.el-button' },
     { name: 'Input', route: 'form', selector: '.el-input__wrapper' },

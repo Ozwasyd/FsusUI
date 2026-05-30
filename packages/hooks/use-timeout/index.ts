@@ -1,4 +1,4 @@
-import { tryOnScopeDispose } from '@vueuse/core'
+import { tryOnScopeDispose } from '../use-runtime'
 
 export function useTimeout() {
   let timeoutHandle: number

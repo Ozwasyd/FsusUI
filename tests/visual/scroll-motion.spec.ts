@@ -101,6 +101,8 @@ test('scroll containers expose unified motion without text blur while scrolling'
     const thumbStyle = window.getComputedStyle(thumb)
 
     return {
+      compositor: wrapper.getAttribute('data-fsus-compositor'),
+      hardware: wrapper.getAttribute('data-fsus-render-hardware'),
       itemFilter: itemStyle.filter,
       itemTransform: itemStyle.transform,
       thumbFilter: thumbStyle.filter,
@@ -108,7 +110,14 @@ test('scroll containers expose unified motion without text blur while scrolling'
     }
   })
 
-  expect(treeMotion.itemTransform).not.toBe('none')
+  if (
+    treeMotion.hardware === 'cpu-threaded' ||
+    treeMotion.compositor === 'disabled'
+  ) {
+    expect(treeMotion.itemTransform).toBe('none')
+  } else {
+    expect(treeMotion.itemTransform).not.toBe('none')
+  }
   expect(blurRadius(treeMotion.itemFilter)).toBeLessThanOrEqual(0.05)
   expect(blurRadius(treeMotion.thumbFilter)).toBeLessThanOrEqual(0.05)
   expect(treeMotion.thumbShadow).not.toBe('none')
@@ -129,7 +138,9 @@ test('scroll containers expose unified motion without text blur while scrolling'
 
   const scrollbarMotion = await scrollbar.evaluate((element) => {
     const item = element.querySelector<HTMLElement>('.el-scrollbar__view > *')
-    const thumb = element.querySelector<HTMLElement>('.el-scrollbar__thumb')
+    const thumb = element.querySelector<HTMLElement>(
+      '.el-scrollbar__bar.is-vertical .el-scrollbar__thumb',
+    )
 
     if (!item || !thumb) {
       throw new Error('Scrollbar motion internals are missing')

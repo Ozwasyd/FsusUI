@@ -46,6 +46,7 @@ declare module '@vue/runtime-core' {
     ElInput: typeof import('element-plus')['ElInput']
     ElInputNumber: typeof import('element-plus')['ElInputNumber']
     ElLink: typeof import('element-plus')['ElLink']
+    ElMarkdownRenderer: typeof import('element-plus')['ElMarkdownRenderer']
     ElMain: typeof import('element-plus')['ElMain']
     ElMenu: typeof import('element-plus')['ElMenu']
     ElMenuItem: typeof import('element-plus')['ElMenuItem']
@@ -58,6 +59,7 @@ declare module '@vue/runtime-core' {
     ElPopper: typeof import('element-plus')['ElPopper']
     ElPopover: typeof import('element-plus')['ElPopover']
     ElProgress: typeof import('element-plus')['ElProgress']
+    ElPublicShell: typeof import('element-plus')['ElPublicShell']
     ElRadio: typeof import('element-plus')['ElRadio']
     ElRadioButton: typeof import('element-plus')['ElRadioButton']
     ElRadioGroup: typeof import('element-plus')['ElRadioGroup']
@@ -94,8 +96,10 @@ declare module '@vue/runtime-core' {
     ElDescriptions: typeof import('element-plus')['ElDescriptions']
     ElDescriptionsItem: typeof import('element-plus')['ElDescriptionsItem']
     ElResult: typeof import('element-plus')['ElResult']
+    ElResponsiveCollection: typeof import('element-plus')['ElResponsiveCollection']
     ElSelectV2: typeof import('element-plus')['ElSelectV2']
     ElWatermark: typeof import('element-plus')['ElWatermark']
+    ElThemeModeToggle: typeof import('element-plus')['ElThemeModeToggle']
   }
 
   interface ComponentCustomProperties {

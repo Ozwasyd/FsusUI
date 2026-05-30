@@ -50,12 +50,17 @@ export type FsusRenderPipelineMode = 'auto' | 'enabled' | 'disabled'
 export type FsusRenderPipelineWorkerMode = 'auto' | 'enabled' | 'disabled'
 export type FsusRenderPipelineHardwareMode = 'auto' | 'gpu' | 'cpu'
 export type FsusRenderPipelineCompositorMode = 'auto' | 'enabled' | 'disabled'
+export type FsusRenderPipelineAdaptiveMode = 'auto' | 'enabled' | 'disabled'
 export type FsusRenderHardwareProfile = 'gpu-compositor' | 'cpu-threaded'
 export type FsusRenderPipelineStrategy =
   | 'sync'
   | 'chunked-main'
   | 'chunked-worker'
   | 'disabled'
+export type FsusRenderSchedulerPriority =
+  | 'user-blocking'
+  | 'visible'
+  | 'background'
 
 export type FsusRenderPipelineEstimate = {
   htmlBytes?: number
@@ -73,6 +78,7 @@ export type FsusRenderPipelineAccelerationConfig = {
 }
 
 export type FsusRenderPipelineConfig = {
+  adaptive?: FsusRenderPipelineAdaptiveMode
   mode?: FsusRenderPipelineMode
   worker?: FsusRenderPipelineWorkerMode
   thresholds?: {
@@ -96,6 +102,7 @@ export type FsusResolvedRenderPipelineAcceleration = {
 }
 
 export type FsusResolvedRenderPipelineConfig = {
+  adaptive: FsusRenderPipelineAdaptiveMode
   mode: FsusRenderPipelineMode
   worker: FsusRenderPipelineWorkerMode
   thresholds: {
@@ -148,21 +155,69 @@ export type FsusWorkerExecutorOptions = {
   serializeError?: (error: unknown) => unknown
 }
 
+export type FsusRenderPipelineWorkerPoolMode = 'runtime' | 'shared'
+
 export type FsusRenderPipelineWorkerOptions = FsusWorkerExecutorOptions & {
   createWorker: () => Worker
+  pool?: FsusRenderPipelineWorkerPoolMode
+  poolKey?: string
 }
 
 export type FsusRenderPipelineDiagnosticEvent = {
+  adapterId?: string
+  budget?: {
+    frameMs: number
+    layerBudget: number
+    measureBatch: number
+    overscanPx: number
+  }
+  cache?: 'hit' | 'miss' | 'bypass'
   durationMs?: number
   error?: FsusErrorDetail
+  fallbackReason?: string
+  phase?: string
   pendingCount?: number
+  queueDepth?: number
   strategy: FsusRenderPipelineStrategy
+  timestamp?: number
   type:
     | 'render-start'
     | 'render-complete'
     | 'render-error'
+    | 'strategy-cache'
     | 'worker-fallback'
     | FsusWorkerExecutorEventType
+}
+
+export type FsusRenderPipelineDiagnosticSink = (
+  event: FsusRenderPipelineDiagnosticEvent,
+) => void
+
+export type FsusRenderPipelineDomAttrs = Record<string, string>
+
+export type FsusRenderPipelineUnitAttrsOptions = {
+  baseAttrs?: FsusRenderPipelineDomAttrs | null
+  disableContentVisibilityOnOverflow?: boolean
+  layerBudget?: number
+  renderedCount?: number
+  unitIndex?: number
+}
+
+export type FsusRenderPipelineDiagnosticsBuffer = {
+  clear: () => void
+  push: (event: FsusRenderPipelineDiagnosticEvent) => void
+  snapshot: () => readonly FsusRenderPipelineDiagnosticEvent[]
+}
+
+export type FsusRenderPipelineAdaptiveSignals = {
+  queueDepth?: number
+  rafDriftMs?: number
+  renderDurationMs?: number
+}
+
+export type FsusRenderSchedulerTaskOptions = {
+  priority?: FsusRenderSchedulerPriority
+  signal?: AbortSignal
 }
 
 export type FsusRenderPipelineAdapter<TSource, TUnit> = {
@@ -247,6 +302,7 @@ export type FsusRenderPipelineRuntimeState<TSource, TUnit> =
   }
 
 const defaultRenderPipelineConfig: FsusResolvedRenderPipelineConfig = {
+  adaptive: 'auto',
   mode: 'auto',
   worker: 'auto',
   thresholds: {
@@ -296,6 +352,11 @@ const normalizeCompositorMode = (
 ): FsusRenderPipelineCompositorMode =>
   mode === 'enabled' || mode === 'disabled' ? mode : 'auto'
 
+const normalizeAdaptiveMode = (
+  mode: unknown,
+): FsusRenderPipelineAdaptiveMode =>
+  mode === 'enabled' || mode === 'disabled' ? mode : 'auto'
+
 export const resolveFsusRenderPipelineConfig = (
   config?: FsusRenderPipelineConfig | null,
   hardwareProfile?: FsusRenderHardwareProfile,
@@ -307,6 +368,7 @@ export const resolveFsusRenderPipelineConfig = (
     : defaultRenderPipelineConfig
 
   return {
+    adaptive: normalizeAdaptiveMode(config?.adaptive),
     mode:
       config?.mode === 'enabled' || config?.mode === 'disabled'
         ? config.mode
@@ -361,6 +423,139 @@ export const resolveFsusRenderPipelineConfig = (
   }
 }
 
+const clampNumber = (value: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, value))
+
+const roundBudgetNumber = (value: number) => Math.round(value * 100) / 100
+
+export const resolveFsusAdaptiveRenderPipelineConfig = (
+  config: FsusResolvedRenderPipelineConfig,
+  hardwareProfile: FsusRenderHardwareProfile,
+  signals: FsusRenderPipelineAdaptiveSignals = {},
+): FsusResolvedRenderPipelineConfig => {
+  if (config.adaptive === 'disabled') return config
+
+  const hasRuntimeSignals =
+    signals.queueDepth !== undefined ||
+    signals.rafDriftMs !== undefined ||
+    signals.renderDurationMs !== undefined
+  if (!hasRuntimeSignals) return config
+
+  const frameMs = Math.max(1, config.budget.frameMs)
+  const renderDurationMs = signals.renderDurationMs ?? 0
+  const rafDriftMs = signals.rafDriftMs ?? 0
+  const queueDepth = signals.queueDepth ?? 0
+  let factor = hardwareProfile === 'cpu-threaded' ? 0.75 : 1
+
+  if (
+    queueDepth > 2 ||
+    renderDurationMs > frameMs * 4 ||
+    rafDriftMs > frameMs * 2
+  ) {
+    factor *= 0.75
+  } else if (renderDurationMs > frameMs * 2 || rafDriftMs > frameMs) {
+    factor *= 0.875
+  } else if (
+    config.adaptive === 'enabled' ||
+    (hardwareProfile === 'gpu-compositor' &&
+      queueDepth === 0 &&
+      renderDurationMs > 0 &&
+      renderDurationMs < frameMs * 0.75 &&
+      rafDriftMs < frameMs * 0.5)
+  ) {
+    factor *= 1.1
+  }
+
+  const clamped = clampNumber(factor, 0.5, 1.5)
+
+  return {
+    ...config,
+    budget: {
+      frameMs: Math.max(1, roundBudgetNumber(config.budget.frameMs * clamped)),
+      measureBatch: Math.max(
+        1,
+        Math.floor(config.budget.measureBatch * clamped),
+      ),
+      overscanPx: Math.max(1, Math.floor(config.budget.overscanPx * clamped)),
+    },
+    acceleration: {
+      ...config.acceleration,
+      layerBudget: Math.max(
+        1,
+        Math.floor(config.acceleration.layerBudget * clamped),
+      ),
+    },
+  }
+}
+
+const DEFAULT_DIAGNOSTICS_BUFFER_LIMIT = 128
+const diagnosticSinks = new Set<FsusRenderPipelineDiagnosticSink>()
+
+const readRenderPipelineNow = () =>
+  typeof performance !== 'undefined' && typeof performance.now === 'function'
+    ? performance.now()
+    : Date.now()
+
+export const createFsusRenderPipelineDiagnosticsBuffer = (
+  limit = DEFAULT_DIAGNOSTICS_BUFFER_LIMIT,
+): FsusRenderPipelineDiagnosticsBuffer => {
+  const events: FsusRenderPipelineDiagnosticEvent[] = []
+  const normalizedLimit = Math.max(
+    1,
+    Math.floor(
+      typeof limit === 'number' && Number.isFinite(limit)
+        ? limit
+        : DEFAULT_DIAGNOSTICS_BUFFER_LIMIT,
+    ),
+  )
+
+  return {
+    clear: () => {
+      events.length = 0
+    },
+    push: (event) => {
+      events.push(event)
+      if (events.length > normalizedLimit) {
+        events.splice(0, events.length - normalizedLimit)
+      }
+    },
+    snapshot: () => events.slice(),
+  }
+}
+
+const renderPipelineDiagnosticsBuffer =
+  createFsusRenderPipelineDiagnosticsBuffer()
+
+const emitFsusRenderPipelineDiagnostic = (
+  event: FsusRenderPipelineDiagnosticEvent,
+) => {
+  const normalized = {
+    timestamp: readRenderPipelineNow(),
+    ...event,
+  }
+  renderPipelineDiagnosticsBuffer.push(normalized)
+  for (const sink of Array.from(diagnosticSinks)) {
+    sink(normalized)
+  }
+}
+
+export const registerFsusRenderPipelineDiagnosticSink = (
+  sink: FsusRenderPipelineDiagnosticSink,
+) => {
+  diagnosticSinks.add(sink)
+  return () => {
+    diagnosticSinks.delete(sink)
+  }
+}
+
+export const getFsusRenderPipelineDiagnosticsSnapshot = () =>
+  renderPipelineDiagnosticsBuffer.snapshot()
+
+export const clearFsusRenderPipelineDiagnostics = () => {
+  renderPipelineDiagnosticsBuffer.clear()
+  diagnosticSinks.clear()
+}
+
 export const shouldUseFsusRenderPipeline = (
   estimate: FsusRenderEstimate,
   config: FsusResolvedRenderPipelineConfig,
@@ -396,44 +591,6 @@ const isReducedMotionPreferred = () =>
   typeof window.matchMedia === 'function' &&
   window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-let cachedWebglRenderer: string | undefined
-
-const readWebglRenderer = () => {
-  if (cachedWebglRenderer !== undefined) return cachedWebglRenderer
-  if (typeof document === 'undefined') return ''
-
-  try {
-    const canvas = document.createElement('canvas')
-    const context =
-      canvas.getContext('webgl') ??
-      (canvas.getContext('experimental-webgl') as WebGLRenderingContext | null)
-    if (!context) {
-      cachedWebglRenderer = ''
-      return cachedWebglRenderer
-    }
-
-    const debugInfo = context.getExtension('WEBGL_debug_renderer_info')
-    if (!debugInfo) {
-      context.getExtension('WEBGL_lose_context')?.loseContext()
-      cachedWebglRenderer = ''
-      return cachedWebglRenderer
-    }
-
-    const renderer = context.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
-    context.getExtension('WEBGL_lose_context')?.loseContext()
-    cachedWebglRenderer = typeof renderer === 'string' ? renderer : ''
-    return cachedWebglRenderer
-  } catch {
-    cachedWebglRenderer = ''
-    return cachedWebglRenderer
-  }
-}
-
-const isSoftwareRenderer = (renderer: string) =>
-  /swiftshader|llvmpipe|softpipe|software rasterizer|software renderer/i.test(
-    renderer,
-  )
-
 const resolveAutoHardwareProfile = (): FsusRenderHardwareProfile => {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     return 'cpu-threaded'
@@ -450,11 +607,6 @@ const resolveAutoHardwareProfile = (): FsusRenderHardwareProfile => {
   }
 
   if (isReducedMotionPreferred()) {
-    return 'cpu-threaded'
-  }
-
-  const renderer = readWebglRenderer()
-  if (renderer && isSoftwareRenderer(renderer)) {
     return 'cpu-threaded'
   }
 
@@ -493,16 +645,57 @@ export const resolveFsusRenderPipelineContentVisibilityEnabled = (
 export const resolveFsusRenderPipelineHardwareAttrs = ({
   compositor,
   contentVisibility,
+  layerBudget,
   hardwareProfile,
 }: {
   compositor: boolean
   contentVisibility: boolean
+  layerBudget?: number
   hardwareProfile: FsusRenderHardwareProfile
 }) => ({
   'data-fsus-compositor': compositor ? 'enabled' : 'disabled',
   'data-fsus-content-visibility': contentVisibility ? 'enabled' : 'disabled',
+  'data-fsus-render-layer-budget': String(
+    Math.max(1, Math.floor(positive(layerBudget, 1))),
+  ),
   'data-fsus-render-hardware': hardwareProfile,
 })
+
+export const resolveFsusRenderPipelineUnitAttrs = ({
+  baseAttrs,
+  disableContentVisibilityOnOverflow = false,
+  layerBudget,
+  renderedCount,
+  unitIndex,
+}: FsusRenderPipelineUnitAttrsOptions): FsusRenderPipelineDomAttrs => {
+  const attrs: FsusRenderPipelineDomAttrs = { ...(baseAttrs ?? {}) }
+  const attrBudget = Number(attrs['data-fsus-render-layer-budget'])
+  const normalizedLayerBudget = Math.max(
+    1,
+    Math.floor(
+      positive(layerBudget, Number.isFinite(attrBudget) ? attrBudget : 1),
+    ),
+  )
+  const overRenderedBudget =
+    typeof renderedCount === 'number' &&
+    Number.isFinite(renderedCount) &&
+    renderedCount > normalizedLayerBudget
+  const overUnitBudget =
+    typeof unitIndex === 'number' &&
+    Number.isFinite(unitIndex) &&
+    unitIndex >= normalizedLayerBudget
+
+  attrs['data-fsus-render-layer-budget'] = String(normalizedLayerBudget)
+
+  if (overRenderedBudget || overUnitBudget) {
+    attrs['data-fsus-compositor'] = 'disabled'
+    if (disableContentVisibilityOnOverflow || overRenderedBudget) {
+      attrs['data-fsus-content-visibility'] = 'disabled'
+    }
+  }
+
+  return attrs
+}
 
 export const useFsusRenderPipelineHardwareProfile = (
   config?: MaybeRef<FsusRenderPipelineConfig | null | undefined>,
@@ -533,6 +726,7 @@ export const useFsusRenderPipelineHardwareProfile = (
       compositor: compositor.value,
       contentVisibility: contentVisibility.value,
       hardwareProfile: profile.value,
+      layerBudget: resolvedConfig.value.acceleration.layerBudget,
     }),
   )
 
@@ -601,6 +795,89 @@ type FsusRenderPipelineStrategyResolverEntry = {
 
 const strategyResolvers = new Set<FsusRenderPipelineStrategyResolverEntry>()
 let strategyResolverOrder = 0
+let strategyResolverVersion = 0
+
+type FsusRenderPipelineStrategyCacheEntry = {
+  durationMs?: number
+  strategy: FsusRenderPipelineStrategy
+  updatedAt: number
+}
+
+const STRATEGY_CACHE_LIMIT = 128
+const strategyCache = new Map<string, FsusRenderPipelineStrategyCacheEntry>()
+
+const stringifyRenderPipelineConfigSignature = (
+  config: FsusResolvedRenderPipelineConfig,
+  canUseWorker: boolean,
+) =>
+  [
+    config.adaptive,
+    config.mode,
+    config.worker,
+    config.thresholds.htmlBytes,
+    config.thresholds.estimatedNodes,
+    config.thresholds.itemCount,
+    config.budget.frameMs,
+    config.budget.overscanPx,
+    config.budget.measureBatch,
+    config.acceleration.mode,
+    config.acceleration.compositor,
+    config.acceleration.contentVisibility,
+    config.acceleration.layerBudget,
+    canUseWorker ? 'worker' : 'main',
+    strategyResolverVersion,
+  ].join('|')
+
+const readAdapterFingerprint = <TSource, TUnit>(
+  adapter: FsusRenderPipelineAdapter<TSource, TUnit>,
+  source: TSource,
+) => {
+  try {
+    return adapter.fingerprint(source)
+  } catch {
+    return ''
+  }
+}
+
+const createStrategyCacheKey = <TSource, TUnit>({
+  adapter,
+  canUseWorker,
+  config,
+  source,
+}: {
+  adapter: FsusRenderPipelineAdapter<TSource, TUnit> | null
+  canUseWorker: boolean
+  config: FsusResolvedRenderPipelineConfig
+  source: TSource
+}) => {
+  if (!adapter) return ''
+  const fingerprint = readAdapterFingerprint(adapter, source)
+  if (!fingerprint) return ''
+  return [
+    adapter.id,
+    fingerprint,
+    stringifyRenderPipelineConfigSignature(config, canUseWorker),
+  ].join('\u0000')
+}
+
+const getCachedStrategy = (cacheKey: string) =>
+  cacheKey ? strategyCache.get(cacheKey) : undefined
+
+const setCachedStrategy = (
+  cacheKey: string,
+  entry: Omit<FsusRenderPipelineStrategyCacheEntry, 'updatedAt'>,
+) => {
+  if (!cacheKey) return
+  strategyCache.delete(cacheKey)
+  strategyCache.set(cacheKey, {
+    ...entry,
+    updatedAt: readRenderPipelineNow(),
+  })
+  if (strategyCache.size > STRATEGY_CACHE_LIMIT) {
+    const firstKey = strategyCache.keys().next().value
+    if (firstKey) strategyCache.delete(firstKey)
+  }
+}
 
 export const registerFsusRenderPipelineStrategyResolver = (
   resolver: FsusRenderPipelineStrategyResolver,
@@ -615,13 +892,19 @@ export const registerFsusRenderPipelineStrategyResolver = (
     resolver,
   }
   strategyResolvers.add(entry)
+  strategyResolverVersion += 1
+  strategyCache.clear()
   return () => {
     strategyResolvers.delete(entry)
+    strategyResolverVersion += 1
+    strategyCache.clear()
   }
 }
 
 export const clearFsusRenderPipelineStrategyResolvers = () => {
   strategyResolvers.clear()
+  strategyResolverVersion += 1
+  strategyCache.clear()
 }
 
 export const resolveFsusRenderPipelineComponentPolicy = (
@@ -730,38 +1013,149 @@ export const resolveFsusRenderPipelineCache = ({
 export const useFsusRenderScheduler = (
   budget: MaybeRef<{ frameMs?: number } | undefined> = undefined,
 ) => {
-  const pending = new Set<() => void>()
-  let frame = 0
+  type SchedulerEntry = {
+    cleanup: (() => void) | null
+    priority: FsusRenderSchedulerPriority
+    task: () => void
+  }
+
+  const queues: Record<FsusRenderSchedulerPriority, Set<SchedulerEntry>> = {
+    background: new Set(),
+    'user-blocking': new Set(),
+    visible: new Set(),
+  }
+  let cancelFlush: (() => void) | null = null
+
+  const priorities: FsusRenderSchedulerPriority[] = [
+    'user-blocking',
+    'visible',
+    'background',
+  ]
+
+  const hasPending = () =>
+    priorities.some((priority) => queues[priority].size > 0)
+
+  const getNextEntry = () => {
+    for (const priority of priorities) {
+      const entry = queues[priority].values().next().value
+      if (entry) return entry
+    }
+    return null
+  }
+
+  const removeEntry = (entry: SchedulerEntry) => {
+    queues[entry.priority].delete(entry)
+    entry.cleanup?.()
+    entry.cleanup = null
+  }
 
   const flush = () => {
-    frame = 0
+    cancelFlush = null
     const startedAt =
       typeof performance !== 'undefined' ? performance.now() : Date.now()
     const frameMs =
       unref(budget)?.frameMs ?? defaultRenderPipelineConfig.budget.frameMs
 
-    for (const task of Array.from(pending)) {
-      pending.delete(task)
-      task()
+    let entry = getNextEntry()
+    while (entry) {
+      removeEntry(entry)
+      entry.task()
 
       const now =
         typeof performance !== 'undefined' ? performance.now() : Date.now()
-      if (pending.size && now - startedAt >= frameMs) {
-        frame = requestAnimationFrame(flush)
+      if (hasPending() && now - startedAt >= frameMs) {
+        requestFlush()
         return
       }
+      entry = getNextEntry()
     }
   }
 
-  const schedule = (task: () => void) => {
-    pending.add(task)
-    if (!frame) frame = requestAnimationFrame(flush)
+  const requestFlush = () => {
+    if (cancelFlush) return
+
+    const scheduler = (
+      globalThis as {
+        scheduler?: {
+          postTask?: (
+            callback: () => void,
+            options?: { priority?: string },
+          ) => Promise<unknown>
+        }
+      }
+    ).scheduler
+
+    if (typeof scheduler?.postTask === 'function') {
+      let cancelled = false
+      cancelFlush = () => {
+        cancelled = true
+      }
+      void scheduler
+        .postTask(
+          () => {
+            if (!cancelled) flush()
+          },
+          { priority: 'user-blocking' },
+        )
+        .catch(() => {
+          if (!cancelled) flush()
+        })
+      return
+    }
+
+    if (
+      queues.background.size > 0 &&
+      queues['user-blocking'].size === 0 &&
+      queues.visible.size === 0 &&
+      typeof requestIdleCallback === 'function'
+    ) {
+      const idle = requestIdleCallback(() => flush())
+      cancelFlush = () => cancelIdleCallback(idle)
+      return
+    }
+
+    if (typeof requestAnimationFrame === 'function') {
+      const frame = requestAnimationFrame(flush)
+      cancelFlush = () => cancelAnimationFrame(frame)
+      return
+    }
+
+    const timeout = setTimeout(flush, 0)
+    cancelFlush = () => clearTimeout(timeout)
+  }
+
+  const schedule = (
+    task: () => void,
+    options: FsusRenderSchedulerTaskOptions = {},
+  ) => {
+    const priority = options.priority ?? 'visible'
+    if (options.signal?.aborted) return () => undefined
+
+    const entry: SchedulerEntry = {
+      cleanup: null,
+      priority,
+      task,
+    }
+
+    const cancel = () => removeEntry(entry)
+    if (options.signal) {
+      options.signal.addEventListener('abort', cancel, { once: true })
+      entry.cleanup = () => options.signal?.removeEventListener('abort', cancel)
+    }
+
+    queues[priority].add(entry)
+    requestFlush()
+    return cancel
   }
 
   const cancel = () => {
-    if (frame) cancelAnimationFrame(frame)
-    frame = 0
-    pending.clear()
+    cancelFlush?.()
+    cancelFlush = null
+    for (const priority of priorities) {
+      for (const entry of queues[priority]) {
+        removeEntry(entry)
+      }
+    }
   }
 
   onBeforeUnmount(cancel)
@@ -1100,9 +1494,64 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
   }
 }
 
+type AnyFsusWorkerExecutor = ReturnType<
+  typeof createFsusWorkerExecutor<unknown, unknown>
+>
+
+type FsusSharedWorkerExecutorEntry = {
+  executor: AnyFsusWorkerExecutor
+  listeners: Set<(event: FsusWorkerExecutorEvent) => void>
+}
+
+const sharedWorkerExecutors = new Map<string, FsusSharedWorkerExecutorEntry>()
+
+const getSharedWorkerExecutor = <TRequest, TResponse>({
+  createWorker,
+  listener,
+  options,
+  poolKey,
+}: {
+  createWorker: () => Worker
+  listener: (event: FsusWorkerExecutorEvent) => void
+  options: FsusWorkerExecutorOptions
+  poolKey: string
+}) => {
+  let entry = sharedWorkerExecutors.get(poolKey)
+  if (!entry) {
+    const listeners = new Set<(event: FsusWorkerExecutorEvent) => void>()
+    entry = {
+      executor: createFsusWorkerExecutor<unknown, unknown>(createWorker, {
+        ...options,
+        name: options.name ?? poolKey,
+        onEvent: (event) => {
+          options.onEvent?.(event)
+          for (const activeListener of Array.from(listeners)) {
+            activeListener(event)
+          }
+        },
+      }),
+      listeners,
+    }
+    sharedWorkerExecutors.set(poolKey, entry)
+  }
+
+  entry.listeners.add(listener)
+  return {
+    cleanup: () => {
+      entry?.listeners.delete(listener)
+    },
+    executor: entry.executor as ReturnType<
+      typeof createFsusWorkerExecutor<TRequest, TResponse>
+    >,
+  }
+}
+
+const isWindowViewport = (viewport: FsusViewport): viewport is Window =>
+  typeof Window !== 'undefined' && viewport instanceof Window
+
 const getViewportScrollTop = (viewport: FsusViewport | null) => {
   if (!viewport) return 0
-  if (viewport instanceof Window) {
+  if (isWindowViewport(viewport)) {
     return viewport.scrollY || document.documentElement.scrollTop || 0
   }
   return viewport.scrollTop
@@ -1110,7 +1559,7 @@ const getViewportScrollTop = (viewport: FsusViewport | null) => {
 
 const getViewportHeight = (viewport: FsusViewport | null) => {
   if (!viewport) return 0
-  if (viewport instanceof Window) {
+  if (isWindowViewport(viewport)) {
     return viewport.innerHeight
   }
   return viewport.clientHeight
@@ -1118,11 +1567,56 @@ const getViewportHeight = (viewport: FsusViewport | null) => {
 
 const setViewportScrollTop = (viewport: FsusViewport | null, value: number) => {
   if (!viewport) return
-  if (viewport instanceof Window) {
+  if (isWindowViewport(viewport)) {
     viewport.scrollTo({ top: value })
     return
   }
   viewport.scrollTop = value
+}
+
+const findFirstVirtualItemAtOffset = <TUnit>(
+  items: readonly FsusVirtualWindowItem<TUnit>[],
+  offset: number,
+) => {
+  let low = 0
+  let high = items.length - 1
+  let result = items.length
+
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2)
+    const item = items[mid]
+    if (item.offset + item.size >= offset) {
+      result = mid
+      high = mid - 1
+    } else {
+      low = mid + 1
+    }
+  }
+
+  return Math.min(result, items.length)
+}
+
+const findFirstVirtualItemAfterOffset = <TUnit>(
+  items: readonly FsusVirtualWindowItem<TUnit>[],
+  offset: number,
+  start = 0,
+) => {
+  let low = start
+  let high = items.length - 1
+  let result = items.length
+
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2)
+    const item = items[mid]
+    if (item.offset > offset) {
+      result = mid
+      high = mid - 1
+    } else {
+      low = mid + 1
+    }
+  }
+
+  return Math.min(result, items.length)
 }
 
 export const useFsusVirtualWindow = <TUnit>(options: {
@@ -1130,6 +1624,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   getKey: (unit: TUnit, index: number) => string
   getViewport: () => FsusViewport | null
   measureBatch?: MaybeRef<number | undefined>
+  minVisibleItems?: MaybeRef<number | undefined>
   overscanPx?: MaybeRef<number | undefined>
   units: Ref<readonly TUnit[]>
 }) => {
@@ -1154,6 +1649,14 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     })
   })
 
+  const itemIndexByKey = computed(() => {
+    const indexByKey = new Map<string, FsusVirtualWindowItem<TUnit>>()
+    for (const item of itemMeta.value) {
+      indexByKey.set(item.key, item)
+    }
+    return indexByKey
+  })
+
   const totalSize = computed(() => {
     const items = itemMeta.value
     const last = items[items.length - 1]
@@ -1167,21 +1670,15 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     const endOffset = scrollOffset.value + viewportSize.value + overscan
     const items = itemMeta.value
 
-    let start = 0
-    while (
-      start < items.length &&
-      items[start].offset + items[start].size < startOffset
-    ) {
-      start += 1
-    }
-
-    let end = start
-    while (end < items.length && items[end].offset <= endOffset) {
-      end += 1
-    }
+    const start = findFirstVirtualItemAtOffset(items, startOffset)
+    const end = findFirstVirtualItemAfterOffset(items, endOffset, start)
+    const minVisibleItems = Math.max(
+      1,
+      Math.floor(positive(unref(options.minVisibleItems), 1)),
+    )
 
     return {
-      end: Math.min(items.length, Math.max(end, start + 1)),
+      end: Math.min(items.length, Math.max(end, start + minVisibleItems)),
       start,
     }
   })
@@ -1208,6 +1705,10 @@ export const useFsusVirtualWindow = <TUnit>(options: {
 
   const scheduleViewportRead = () => {
     if (scrollFrame) return
+    if (typeof requestAnimationFrame !== 'function') {
+      readViewport()
+      return
+    }
     scrollFrame = requestAnimationFrame(() => {
       scrollFrame = 0
       readViewport()
@@ -1240,7 +1741,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         continue
       }
 
-      const item = itemMeta.value.find((entry) => entry.key === key)
+      const item = itemIndexByKey.value.get(key)
       nextSizes.set(key, nextSize)
       if (item && item.index < range.value.start) {
         scrollCorrection += nextSize - item.size
@@ -1259,14 +1760,22 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     }
 
     if (pendingMeasurements.size) {
-      measurementFrame = requestAnimationFrame(flushMeasurements)
+      if (typeof requestAnimationFrame === 'function') {
+        measurementFrame = requestAnimationFrame(flushMeasurements)
+      } else {
+        flushMeasurements()
+      }
     }
   }
 
   const queueMeasurement = (key: string, size: number) => {
     pendingMeasurements.set(key, size)
     if (!measurementFrame) {
-      measurementFrame = requestAnimationFrame(flushMeasurements)
+      if (typeof requestAnimationFrame === 'function') {
+        measurementFrame = requestAnimationFrame(flushMeasurements)
+      } else {
+        flushMeasurements()
+      }
     }
   }
 
@@ -1297,18 +1806,18 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     viewport?.addEventListener('scroll', scheduleViewportRead, {
       passive: true,
     })
-    if (viewport instanceof Window) {
+    if (viewport && isWindowViewport(viewport)) {
       viewport.addEventListener('resize', scheduleViewportRead)
-    } else {
+    } else if (typeof window !== 'undefined') {
       window.addEventListener('resize', scheduleViewportRead)
     }
   }
 
   const disconnect = () => {
     viewport?.removeEventListener('scroll', scheduleViewportRead)
-    if (viewport instanceof Window) {
+    if (viewport && isWindowViewport(viewport)) {
       viewport.removeEventListener('resize', scheduleViewportRead)
-    } else {
+    } else if (typeof window !== 'undefined') {
       window.removeEventListener('resize', scheduleViewportRead)
     }
     viewport = null
@@ -1318,14 +1827,25 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     void nextTick(connect)
   })
 
-  watch(options.units, () => {
+  watch(options.units, (nextUnits) => {
+    const nextKeys = new Set(
+      nextUnits.map((unit, index) => options.getKey(unit, index)),
+    )
+    const nextSizes = new Map(sizes.value)
+    for (const key of Array.from(nextSizes.keys())) {
+      if (!nextKeys.has(key)) nextSizes.delete(key)
+    }
+    sizes.value = nextSizes
+    triggerRef(sizes)
     void nextTick(readViewport)
   })
 
   onBeforeUnmount(() => {
     disconnect()
-    if (scrollFrame) cancelAnimationFrame(scrollFrame)
-    if (measurementFrame) cancelAnimationFrame(measurementFrame)
+    if (typeof cancelAnimationFrame === 'function') {
+      if (scrollFrame) cancelAnimationFrame(scrollFrame)
+      if (measurementFrame) cancelAnimationFrame(measurementFrame)
+    }
     for (const observer of observers.values()) {
       observer.disconnect()
     }
@@ -1368,10 +1888,25 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   > | null = null
   let workerExecutorAdapter: FsusRenderPipelineAdapter<TSource, TUnit> | null =
     null
+  let workerExecutorShared = false
+  let workerExecutorSharedCleanup: (() => void) | null = null
+  const adaptiveSignals = shallowRef<FsusRenderPipelineAdaptiveSignals>({})
 
   const recordDiagnostic = (event: FsusRenderPipelineDiagnosticEvent) => {
-    diagnostics.value = [...diagnostics.value.slice(-31), event]
-    options.onDiagnostic?.(event)
+    const nextEvent = {
+      adapterId: adapter.value?.id,
+      budget: {
+        frameMs: config.value.budget.frameMs,
+        layerBudget: config.value.acceleration.layerBudget,
+        measureBatch: config.value.budget.measureBatch,
+        overscanPx: config.value.budget.overscanPx,
+      },
+      timestamp: readRenderPipelineNow(),
+      ...event,
+    }
+    diagnostics.value = [...diagnostics.value.slice(-31), nextEvent]
+    options.onDiagnostic?.(nextEvent)
+    emitFsusRenderPipelineDiagnostic(nextEvent)
   }
 
   const sourceRef = computed(() => unref(options.source))
@@ -1379,11 +1914,34 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   const hardwareRuntime = useFsusRenderPipelineHardwareProfile(
     computed(() => unref(options.config)),
   )
-  const config = hardwareRuntime.config
+  const config = computed(() =>
+    resolveFsusAdaptiveRenderPipelineConfig(
+      hardwareRuntime.config.value,
+      hardwareRuntime.profile.value,
+      adaptiveSignals.value,
+    ),
+  )
   const hardwareProfile = hardwareRuntime.profile
-  const compositor = hardwareRuntime.compositor
-  const contentVisibility = hardwareRuntime.contentVisibility
-  const hardwareAttrs = hardwareRuntime.attrs
+  const compositor = computed(() =>
+    resolveFsusRenderPipelineCompositorEnabled(
+      config.value,
+      hardwareProfile.value,
+    ),
+  )
+  const contentVisibility = computed(() =>
+    resolveFsusRenderPipelineContentVisibilityEnabled(
+      config.value,
+      hardwareProfile.value,
+    ),
+  )
+  const hardwareAttrs = computed(() =>
+    resolveFsusRenderPipelineHardwareAttrs({
+      compositor: compositor.value,
+      contentVisibility: contentVisibility.value,
+      hardwareProfile: hardwareProfile.value,
+      layerBudget: config.value.acceleration.layerBudget,
+    }),
+  )
 
   const componentPolicy = computed<FsusRenderPipelineComponentPolicy | null>(
     () => {
@@ -1434,7 +1992,18 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     )
   })
 
+  const strategyCacheKey = computed(() =>
+    createStrategyCacheKey({
+      adapter: adapter.value,
+      canUseWorker: canUseWorker.value,
+      config: config.value,
+      source: sourceRef.value,
+    }),
+  )
+
   const strategy = computed<FsusRenderPipelineStrategy>(() => {
+    const cached = getCachedStrategy(strategyCacheKey.value)
+    if (cached) return cached.strategy
     if (policy.value) return policy.value.strategy
     return chooseFsusRenderPipelineStrategy(
       estimate.value,
@@ -1442,6 +2011,17 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       canUseWorker.value,
     )
   })
+
+  const clearWorkerExecutor = () => {
+    workerExecutorSharedCleanup?.()
+    workerExecutorSharedCleanup = null
+    if (workerExecutor && !workerExecutorShared) {
+      workerExecutor.dispose()
+    }
+    workerExecutor = null
+    workerExecutorAdapter = null
+    workerExecutorShared = false
+  }
 
   const getWorkerExecutor = (
     activeAdapter: FsusRenderPipelineAdapter<TSource, TUnit>,
@@ -1453,27 +2033,60 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       return workerExecutor
     }
 
-    workerExecutor?.dispose()
+    clearWorkerExecutor()
     workerExecutorAdapter = activeAdapter
+    const workerEventListener = (event: FsusWorkerExecutorEvent) => {
+      recordDiagnostic({
+        durationMs: event.durationMs,
+        error: event.error,
+        pendingCount: event.pendingCount,
+        queueDepth: event.pendingCount,
+        strategy: renderedStrategy.value,
+        type: event.type,
+      })
+      adaptiveSignals.value = {
+        ...adaptiveSignals.value,
+        queueDepth: event.pendingCount,
+      }
+    }
+    const executorOptions: FsusWorkerExecutorOptions = {
+      idleTerminateMs: workerOptions.idleTerminateMs,
+      name: workerOptions.name ?? activeAdapter.id,
+      requestTimeoutMs: workerOptions.requestTimeoutMs,
+      serializeError: workerOptions.serializeError,
+    }
+
+    if (workerOptions.pool === 'shared') {
+      const shared = getSharedWorkerExecutor<
+        TSource,
+        FsusRenderPipelineDocument<TUnit> | null
+      >({
+        createWorker: workerOptions.createWorker,
+        listener: workerEventListener,
+        options: {
+          ...executorOptions,
+          onEvent: workerOptions.onEvent,
+        },
+        poolKey:
+          workerOptions.poolKey ?? workerOptions.name ?? activeAdapter.id,
+      })
+      workerExecutor = shared.executor
+      workerExecutorShared = true
+      workerExecutorSharedCleanup = shared.cleanup
+      return workerExecutor
+    }
+
     workerExecutor = createFsusWorkerExecutor<
       TSource,
       FsusRenderPipelineDocument<TUnit> | null
     >(workerOptions.createWorker, {
-      idleTerminateMs: workerOptions.idleTerminateMs,
-      name: workerOptions.name ?? activeAdapter.id,
+      ...executorOptions,
       onEvent: (event) => {
         workerOptions.onEvent?.(event)
-        recordDiagnostic({
-          durationMs: event.durationMs,
-          error: event.error,
-          pendingCount: event.pendingCount,
-          strategy: renderedStrategy.value,
-          type: event.type,
-        })
+        workerEventListener(event)
       },
-      requestTimeoutMs: workerOptions.requestTimeoutMs,
-      serializeError: workerOptions.serializeError,
     })
+    workerExecutorShared = false
 
     return workerExecutor
   }
@@ -1503,6 +2116,8 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
         if (!signal.aborted) {
           recordDiagnostic({
             error: workerError,
+            fallbackReason: workerError.message,
+            phase: 'prepare',
             strategy: 'chunked-worker',
             type: 'worker-fallback',
           })
@@ -1537,12 +2152,23 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     const input = sourceRef.value
     const activeAdapter = adapter.value
     const activeStrategy = strategy.value
+    const activeStrategyCacheKey = strategyCacheKey.value
+    const activeStrategyCacheEntry = getCachedStrategy(activeStrategyCacheKey)
     const startedAt = now()
 
     loading.value = true
     error.value = null
     renderedStrategy.value = activeStrategy
-    recordDiagnostic({ strategy: activeStrategy, type: 'render-start' })
+    recordDiagnostic({
+      cache: activeStrategyCacheKey
+        ? activeStrategyCacheEntry
+          ? 'hit'
+          : 'miss'
+        : 'bypass',
+      phase: 'prepare',
+      strategy: activeStrategy,
+      type: 'render-start',
+    })
 
     if (!activeAdapter) {
       const missingAdapterError = createFsusError(
@@ -1554,6 +2180,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       loading.value = false
       recordDiagnostic({
         error: missingAdapterError,
+        phase: 'prepare',
         strategy: activeStrategy,
         type: 'render-error',
       })
@@ -1573,18 +2200,36 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     }
 
     if (isFsusOk(nextDocument)) {
+      const durationMs = now() - startedAt
       documentRef.value = nextDocument.value
+      setCachedStrategy(activeStrategyCacheKey, {
+        durationMs,
+        strategy: renderedStrategy.value,
+      })
+      adaptiveSignals.value = {
+        ...adaptiveSignals.value,
+        queueDepth: workerExecutor?.getPendingCount() ?? 0,
+        renderDurationMs: durationMs,
+      }
       recordDiagnostic({
-        durationMs: now() - startedAt,
+        durationMs,
+        phase: 'commit',
         strategy: renderedStrategy.value,
         type: 'render-complete',
       })
     } else {
+      const durationMs = now() - startedAt
       error.value = nextDocument.error
       documentRef.value = null
+      adaptiveSignals.value = {
+        ...adaptiveSignals.value,
+        queueDepth: workerExecutor?.getPendingCount() ?? 0,
+        renderDurationMs: durationMs,
+      }
       recordDiagnostic({
-        durationMs: now() - startedAt,
+        durationMs,
         error: nextDocument.error,
+        phase: 'commit',
         strategy: renderedStrategy.value,
         type: 'render-error',
       })
@@ -1598,9 +2243,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   onBeforeUnmount(() => {
     taskId += 1
     controller?.abort()
-    workerExecutor?.dispose()
-    workerExecutor = null
-    workerExecutorAdapter = null
+    clearWorkerExecutor()
   })
 
   return {

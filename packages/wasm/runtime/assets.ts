@@ -1,26 +1,32 @@
 export type MarkdownAssetKind = 'simd' | 'basic'
 
-const isPackagedDistRuntime = () => {
-  try {
-    const pathname = new URL(import.meta.url).pathname.replace(/\\/g, '/')
-    return /\/dist\/[^/]+\.(?:mjs|js|cjs)$/.test(pathname)
-  } catch {
-    return false
-  }
-}
-
-const resolveMarkdownRuntimeUrl = (fileName: string) => {
-  const prefix = isPackagedDistRuntime() ? './' : '../dist/'
-  return new URL(`${prefix}${fileName}`, import.meta.url).href
-}
-
-export function resolveMarkdownAsset(kind: MarkdownAssetKind): {
+export interface WasmAssetUrlPair {
   moduleUrl: string
   wasmUrl: string
-} {
-  const fileBase = kind === 'simd' ? 'markdown_simd' : 'markdown_basic'
-  return {
-    moduleUrl: resolveMarkdownRuntimeUrl(`${fileBase}.js`),
-    wasmUrl: resolveMarkdownRuntimeUrl(`${fileBase}.wasm`),
-  }
+}
+
+const epWasmAsset = {
+  moduleUrl: new URL('../dist/ep_wasm.mjs', import.meta.url).href,
+  wasmUrl: new URL('../dist/ep_wasm.wasm', import.meta.url).href,
+} as const satisfies WasmAssetUrlPair
+
+const markdownAssets = {
+  basic: {
+    moduleUrl: new URL('../dist/markdown_basic.js', import.meta.url).href,
+    wasmUrl: new URL('../dist/markdown_basic.wasm', import.meta.url).href,
+  },
+  simd: {
+    moduleUrl: new URL('../dist/markdown_simd.js', import.meta.url).href,
+    wasmUrl: new URL('../dist/markdown_simd.wasm', import.meta.url).href,
+  },
+} as const satisfies Record<MarkdownAssetKind, WasmAssetUrlPair>
+
+export function resolveEpWasmAsset(): WasmAssetUrlPair {
+  return epWasmAsset
+}
+
+export function resolveMarkdownAsset(
+  kind: MarkdownAssetKind,
+): WasmAssetUrlPair {
+  return markdownAssets[kind]
 }

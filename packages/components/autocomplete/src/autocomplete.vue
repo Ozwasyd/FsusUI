@@ -85,7 +85,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, useAttrs as useRawAttrs } from 'vue'
 import { debounce } from 'lodash-unified'
-import { onClickOutside } from '@vueuse/core'
+import { onClickOutside } from '@element-plus/hooks/use-runtime'
 import { Loading } from '@element-plus/icons-vue'
 import { useAttrs, useNamespace } from '@element-plus/hooks'
 import { generateId, isArray, throwError } from '@element-plus/utils'

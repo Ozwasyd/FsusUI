@@ -6,7 +6,7 @@
         <img-empty />
       </slot>
     </div>
-    <div :class="ns.e('description')">
+    <div :class="descriptionKls" :style="descriptionStyle">
       <slot name="description">{{ emptyDescription }}</slot>
     </div>
     <div v-if="$slots.default" :class="ns.e('bottom')">
@@ -37,5 +37,12 @@ const emptyDescription = computed(
 )
 const imageStyle = computed<CSSProperties>(() => ({
   width: addUnit(props.imageSize),
+}))
+const descriptionKls = computed(() => [
+  ns.e('description'),
+  ns.em('description', props.descriptionLayout),
+])
+const descriptionStyle = computed<CSSProperties>(() => ({
+  maxWidth: addUnit(props.descriptionWidth),
 }))
 </script>

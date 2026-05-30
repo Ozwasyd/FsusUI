@@ -20,7 +20,7 @@
     <template #default>
       <el-input
         v-if="!isRangeInput"
-        :id="id as string | undefined"
+        :id="singleInputId"
         ref="inputRef"
         container-role="combobox"
         :model-value="displayValue as string"
@@ -84,7 +84,7 @@
           <component :is="triggerIcon" />
         </el-icon>
         <input
-          :id="id && id[0]"
+          :id="rangeStartInputId"
           autocomplete="off"
           :name="name && name[0]"
           :placeholder="startPlaceholder"
@@ -102,7 +102,7 @@
           <span :class="nsRange.b('separator')">{{ rangeSeparator }}</span>
         </slot>
         <input
-          :id="id && id[1]"
+          :id="rangeEndInputId"
           autocomplete="off"
           :name="name && name[1]"
           :placeholder="endPlaceholder"
@@ -155,7 +155,7 @@ import {
   watch,
 } from 'vue'
 import { isEqual } from 'lodash-unified'
-import { onClickOutside } from '@vueuse/core'
+import { onClickOutside } from '@element-plus/hooks/use-runtime'
 import { useLocale, useNamespace } from '@element-plus/hooks'
 import { useFormItem, useFormSize } from '@element-plus/components/form'
 import ElInput from '@element-plus/components/input'
@@ -228,6 +228,15 @@ const rangeInputKls = computed(() => [
   pickerSize ? nsRange.bm('editor', pickerSize.value) : '',
   attrs.class,
 ])
+const singleInputId = computed(() =>
+  Array.isArray(props.id) ? undefined : props.id
+)
+const rangeStartInputId = computed(() =>
+  Array.isArray(props.id) ? props.id[0] : undefined
+)
+const rangeEndInputId = computed(() =>
+  Array.isArray(props.id) ? props.id[1] : undefined
+)
 
 const clearIconKls = computed(() => [
   nsInput.e('icon'),

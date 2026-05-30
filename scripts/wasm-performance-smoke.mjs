@@ -24,6 +24,16 @@ const measure = async (label, fn) => {
   }
 }
 
+const unwrapResult = (label, result) => {
+  if (result?.ok === true) {
+    return result.value
+  }
+
+  throw new Error(
+    `${label} failed: ${result?.error?.message ?? JSON.stringify(result)}`,
+  )
+}
+
 const assertArrayEqual = (label, actual, expected) => {
   if (actual.length !== expected.length) {
     throw new Error(
@@ -64,7 +74,7 @@ globalThis.fetch = async (input, init) => {
 
 try {
   const wasm = await import('../packages/wasm/dist/index.mjs')
-  await wasm.ensureWasmReady()
+  unwrapResult('ensureWasmReady', await wasm.ensureWasmReady())
 
   const numericData = Array.from(
     { length: 100_000 },
@@ -74,7 +84,9 @@ try {
     [...numericData].sort((a, b) => a - b),
   )
   const wasmNumberSort = await measure('wasm number sort', () =>
-    wasm.sortNumbers(numericData, true),
+    wasm.sortNumbers(numericData, true).then((result) =>
+      unwrapResult('sortNumbers', result),
+    ),
   )
   assertArrayEqual('number sort', wasmNumberSort.value, jsNumberSort.value)
 
@@ -93,7 +105,9 @@ try {
     return matched
   })
   const wasmFilter = await measure('wasm ascii filter', () =>
-    wasm.filterAsciiIndices(asciiFilterIndex, filterKeyword, false),
+    wasm.filterAsciiIndices(asciiFilterIndex, filterKeyword, false).then(
+      (result) => unwrapResult('filterAsciiIndices', result),
+    ),
   )
   assertArrayEqual('string filter', wasmFilter.value, jsFilter.value)
 
@@ -118,6 +132,8 @@ try {
       charWidth,
       lineHeight,
       padding,
+    ).then((result) =>
+      unwrapResult('estimateRowHeights', result),
     ),
   )
   assertArrayEqual('row heights', wasmHeights.value, jsHeights.value)

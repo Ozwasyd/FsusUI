@@ -52,7 +52,7 @@ import {
   useAttrs as useRawAttrs,
   watch,
 } from 'vue'
-import { useEventListener, useThrottleFn } from '@vueuse/core'
+import { useEventListener, useThrottleFn } from '@element-plus/hooks/use-runtime'
 import { useAttrs, useLocale, useNamespace } from '@element-plus/hooks'
 import ImageViewer from '@element-plus/components/image-viewer'
 import {

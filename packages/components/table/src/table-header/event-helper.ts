@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { getCurrentInstance, inject, ref } from 'vue'
+import { getCurrentInstance, inject, onBeforeUnmount, ref } from 'vue'
 import {
   addClass,
   hasClass,
@@ -14,6 +14,29 @@ import type { TableColumnCtx } from '../table-column/defaults'
 function useEvent<T>(props: TableHeaderProps<T>, emit) {
   const instance = getCurrentInstance()
   const parent = inject(TABLE_INJECTION_KEY)
+  let layoutFrame = 0
+  const scheduleLayoutAfterResize = () => {
+    if (typeof requestAnimationFrame !== 'function') {
+      props.store.scheduleLayout(false, true)
+      return
+    }
+
+    if (layoutFrame && typeof cancelAnimationFrame === 'function') {
+      cancelAnimationFrame(layoutFrame)
+    }
+    layoutFrame = requestAnimationFrame(() => {
+      layoutFrame = 0
+      props.store.scheduleLayout(false, true)
+    })
+  }
+
+  onBeforeUnmount(() => {
+    if (layoutFrame && typeof cancelAnimationFrame === 'function') {
+      cancelAnimationFrame(layoutFrame)
+    }
+    layoutFrame = 0
+  })
+
   const handleFilterClick = (event: Event) => {
     event.stopPropagation()
     return
@@ -122,9 +145,7 @@ function useEvent<T>(props: TableHeaderProps<T>, emit) {
             column,
             event,
           )
-          requestAnimationFrame(() => {
-            props.store.scheduleLayout(false, true)
-          })
+          scheduleLayoutAfterResize()
           document.body.style.cursor = ''
           dragging.value = false
           draggingColumn.value = null

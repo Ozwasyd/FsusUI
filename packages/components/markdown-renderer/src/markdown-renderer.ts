@@ -16,6 +16,10 @@ export const markdownRendererProps = buildProps({
     type: Boolean,
     default: false,
   },
+  sanitizeHtml: {
+    type: Boolean,
+    default: true,
+  },
   allowLatex: {
     type: Boolean,
     default: true,

@@ -13,7 +13,7 @@ import {
   useDocumentVisibility,
   useResizeObserver,
   useWindowFocus,
-} from '@vueuse/core'
+} from '@element-plus/hooks/use-runtime'
 import {
   buildProps,
   capitalize,

@@ -1,7 +1,6 @@
 import { defineComponent, nextTick } from 'vue'
 import { config, mount, shallowMount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import * as vueuse from '@vueuse/core'
 import {
   usePopperContainer,
   usePopperContainerId,
@@ -9,10 +8,17 @@ import {
 import { ID_INJECTION_KEY } from '../use-id'
 
 const AXIOM = 'rem is the best girl'
+const clientState = vi.hoisted(() => ({
+  isClient: true,
+}))
 
-vi.mock('@vueuse/core', () => {
+vi.mock('@element-plus/utils', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@element-plus/utils')>()
   return {
-    isClient: true,
+    ...actual,
+    get isClient() {
+      return clientState.isClient
+    },
   }
 })
 
@@ -40,11 +46,12 @@ describe('usePopperContainer', () => {
   })
 
   it('should not append container to the DOM root', async () => {
-    ;(vueuse as any).isClient = false
+    clientState.isClient = false
     const { vm } = mountComponent()
     await nextTick()
     const { selector } = vm as any
     expect(document.body.querySelector(selector.value)).toBeNull()
+    clientState.isClient = true
   })
 })
 

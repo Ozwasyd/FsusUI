@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, inject, onMounted, ref } from 'vue'
-import { useResizeObserver } from '@vueuse/core'
+import { useResizeObserver } from '@element-plus/hooks/use-runtime'
 import { useNamespace } from '@element-plus/hooks'
 import { selectKey } from './token'
 

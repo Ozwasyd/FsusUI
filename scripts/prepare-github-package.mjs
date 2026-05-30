@@ -254,6 +254,69 @@ function rewriteWorkerRuntimeReferences(rootDir) {
   return rewritten
 }
 
+function rewriteEmscriptenWasmFallbackReferences(rootDir) {
+  const candidates = collectPublishFiles(rootDir).filter((filePath) => {
+    return ['.js', '.mjs', '.cjs'].includes(path.extname(filePath))
+  })
+  const wasmFallbackPattern =
+    /new URL\((['"])(ep_wasm|markdown_basic|markdown_simd)\.wasm\1,\s*import\.meta\.url\)/g
+  let rewritten = 0
+
+  for (const filePath of candidates) {
+    const original = readFileSync(filePath, 'utf8')
+    const next = original.replace(
+      wasmFallbackPattern,
+      'new URL(/* @vite-ignore */ $1$2.wasm$1, import.meta.url)',
+    )
+
+    if (next !== original) {
+      writeFileSync(filePath, next)
+      rewritten += 1
+    }
+  }
+
+  return rewritten
+}
+
+function assertViteSafeWasmRuntime(rootDir) {
+  const violations = []
+  const dynamicMarkdownResolverPatterns = [
+    /new URL\(`[^`]*\$\{/u,
+    /\$\{prefix\}\$\{fileName\}/u,
+    /\bresolveMarkdownRuntimeUrl\b/u,
+    /\bisPackagedDistRuntime\b/u,
+  ]
+  const unhandledWasmFallbackPattern =
+    /new URL\(\s*['"](?:ep_wasm|markdown_basic|markdown_simd)\.wasm['"]\s*,\s*import\.meta\.url\)/u
+
+  for (const filePath of collectPublishFiles(rootDir)) {
+    if (!['.js', '.mjs', '.cjs'].includes(path.extname(filePath))) continue
+
+    const relativePath = path.relative(rootDir, filePath)
+    const content = readFileSync(filePath, 'utf8')
+
+    if (
+      dynamicMarkdownResolverPatterns.some((pattern) => pattern.test(content))
+    ) {
+      violations.push(
+        `${relativePath}: contains a dynamic Markdown WASM asset resolver`,
+      )
+    }
+
+    if (unhandledWasmFallbackPattern.test(content)) {
+      violations.push(
+        `${relativePath}: contains an unhandled Emscripten WASM fallback URL`,
+      )
+    }
+  }
+
+  if (violations.length > 0) {
+    throw new Error(
+      `WASM runtime is not Vite-safe for consumers:\n${violations.join('\n')}`,
+    )
+  }
+}
+
 function assertNoSecretsOrRawSources(rootDir) {
   const violations = []
 
@@ -520,6 +583,7 @@ const packageJson = JSON.parse(readFileSync(distPackagePath, 'utf8'))
 const workspaceVersions = collectWorkspaceVersions()
 let prunedSourceMaps = 0
 let rewrittenWorkerReferences = 0
+let rewrittenWasmFallbackReferences = 0
 
 if (strict) {
   assertPublicInterfaceMatches(sourcePackageJson, packageJson)
@@ -528,6 +592,9 @@ if (strict) {
   stripSourceMappingUrlReferences(distRoot)
   prunedSourceMaps = pruneSourceMaps(distRoot)
   rewrittenWorkerReferences = rewriteWorkerRuntimeReferences(distRoot)
+  rewrittenWasmFallbackReferences =
+    rewriteEmscriptenWasmFallbackReferences(distRoot)
+  assertViteSafeWasmRuntime(distRoot)
 }
 
 packageJson.name = packageName
@@ -558,5 +625,5 @@ if (strict) {
 }
 
 console.log(
-  `Prepared ${packageJson.name}@${packageJson.version} for GitHub Packages from ${repository.owner}/${repository.repo} with ${rewrittenSelfReferences.replacementCount} self-reference rewrites across ${rewrittenSelfReferences.updatedFiles} files, ${rewrittenWorkerReferences} worker references rewritten, and ${prunedSourceMaps} source maps pruned.`,
+  `Prepared ${packageJson.name}@${packageJson.version} for GitHub Packages from ${repository.owner}/${repository.repo} with ${rewrittenSelfReferences.replacementCount} self-reference rewrites across ${rewrittenSelfReferences.updatedFiles} files, ${rewrittenWorkerReferences} worker references rewritten, ${rewrittenWasmFallbackReferences} WASM fallback references rewritten, and ${prunedSourceMaps} source maps pruned.`,
 )

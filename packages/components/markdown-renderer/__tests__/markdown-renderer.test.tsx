@@ -8,6 +8,11 @@ import {
   renderMarkdownResultWithRuntime,
 } from '@element-plus/wasm'
 import { createFsusError, fsusErr, fsusOk } from '@element-plus/utils'
+import {
+  clearMarkdownRendererRuntimeCache,
+  getMarkdownRendererRuntimeCache,
+  setMarkdownRendererRuntimeCache,
+} from '../src/markdown-renderer-cache'
 
 import type {
   MarkdownRuntimeHtmlResult,
@@ -108,6 +113,7 @@ const flushRenderer = async () => {
 describe('MarkdownRenderer.vue', () => {
   beforeEach(() => {
     vi.useFakeTimers()
+    clearMarkdownRendererRuntimeCache()
     renderMarkdownChunks.mockReset()
     renderMarkdownHtml.mockReset()
     renderMarkdownResult.mockReset()
@@ -121,6 +127,7 @@ describe('MarkdownRenderer.vue', () => {
   })
 
   afterEach(() => {
+    clearMarkdownRendererRuntimeCache()
     vi.runOnlyPendingTimers()
     vi.useRealTimers()
   })
@@ -215,6 +222,75 @@ describe('MarkdownRenderer.vue', () => {
         baseUrl: null,
       }),
     )
+  })
+
+  test('sanitizes runtime html by default before committing to the DOM', async () => {
+    const unsafeHtml = [
+      '<h1>Safe heading</h1>',
+      '<script>alert("xss")</script>',
+      '<img src="x" onerror="alert(1)">',
+      '<a href="javascript:alert(1)">bad link</a>',
+      '<p style="background:url(javascript:alert(1))">styled</p>',
+    ].join('')
+
+    renderMarkdownHtml.mockResolvedValue(fsusOk(makeHtmlResult(unsafeHtml)))
+    renderMarkdownResult.mockResolvedValue(
+      fsusOk(makeResult('# Unsafe', unsafeHtml)),
+    )
+
+    const wrapper = mount(MarkdownRenderer, {
+      props: { content: '# Unsafe', allowHtml: true },
+    })
+    await flushRenderer()
+
+    expect(wrapper.html()).toContain('<h1>Safe heading</h1>')
+    expect(wrapper.find('script').exists()).toBe(false)
+    expect(wrapper.find('img').attributes('onerror')).toBeUndefined()
+    expect(wrapper.find('a').attributes('href')).toBeUndefined()
+    expect(wrapper.find('p').attributes('style')).toBeUndefined()
+    expect(wrapper.html()).not.toContain('javascript:')
+    expect(wrapper.html()).not.toContain('onerror')
+    expect(wrapper.emitted('render-complete')?.[0]?.[0]).toEqual(
+      expect.objectContaining({
+        html: expect.not.stringContaining('javascript:'),
+      }),
+    )
+  })
+
+  test('sanitizes initial html before the async render path settles', () => {
+    const wrapper = mount(MarkdownRenderer, {
+      props: {
+        initialHtml:
+          '<p>prefill</p><img src="x" onerror="alert(1)"><script>alert(1)</script>',
+      },
+    })
+
+    expect(wrapper.html()).toContain('<p>prefill</p>')
+    expect(wrapper.find('script').exists()).toBe(false)
+    expect(wrapper.find('img').attributes('onerror')).toBeUndefined()
+  })
+
+  test('allows trusted callers to opt out of markdown html sanitizing', async () => {
+    const unsafeHtml =
+      '<img src="x" onerror="alert(1)"><script>alert("trusted")</script>'
+
+    renderMarkdownHtml.mockResolvedValue(fsusOk(makeHtmlResult(unsafeHtml)))
+    renderMarkdownResult.mockResolvedValue(
+      fsusOk(makeResult('trusted', unsafeHtml)),
+    )
+
+    const wrapper = mount(MarkdownRenderer, {
+      props: {
+        content: 'trusted',
+        allowHtml: true,
+        sanitizeHtml: false,
+      },
+    })
+    await flushRenderer()
+
+    expect(wrapper.find('img').attributes('onerror')).toBe('alert(1)')
+    expect(wrapper.find('script').exists()).toBe(true)
+    expect(wrapper.html()).toContain('trusted')
   })
 
   test('emits placeholders from the raw html contract', async () => {
@@ -374,6 +450,86 @@ describe('MarkdownRenderer.vue', () => {
     ).toBe(wrapper.attributes('data-fsus-render-hardware'))
     expect(wrapper.html()).toContain('<h1>Chunked</h1>')
     expect(wrapper.emitted('render-complete')?.[0]?.[0]).toEqual(result)
+  })
+
+  test('sanitizes chunked markdown units and emitted chunk results', async () => {
+    const source = `${'# Unsafe large\n\n'}${'Paragraph\n\n'.repeat(700)}`
+    const result = makeChunkResult(source, '<h1>Chunked</h1>', {
+      chunks: [
+        {
+          key: 'md-unsafe-0',
+          kind: 'paragraph',
+          html: '<img src="x" onerror="alert(1)"><a href="javascript:alert(1)">bad</a>',
+          estimatedSize: 48,
+          htmlStartOffset: 0,
+          htmlEndOffset: 84,
+        },
+      ],
+    })
+    renderMarkdownChunks.mockResolvedValue(fsusOk(result))
+
+    const wrapper = mount(MarkdownRenderer, {
+      props: { content: source, allowHtml: true },
+    })
+    await flushRenderer()
+
+    expect(wrapper.find('img').attributes('onerror')).toBeUndefined()
+    expect(wrapper.find('a').attributes('href')).toBeUndefined()
+    expect(wrapper.html()).not.toContain('javascript:')
+    expect(wrapper.emitted('render-complete')?.[0]?.[0]).toEqual(
+      expect.objectContaining({
+        chunks: [
+          expect.objectContaining({
+            html: expect.not.stringContaining('javascript:'),
+          }),
+        ],
+      }),
+    )
+  })
+
+  test('reuses cached chunk results for matching markdown fingerprints', async () => {
+    const source = `${'# Cached large\n\n'}${'Cached paragraph\n\n'.repeat(700)}`
+    const result = makeChunkResult(source, '<h1>Cached</h1><p>Chunk body</p>')
+    renderMarkdownChunks.mockResolvedValue(fsusOk(result))
+
+    const first = mount(MarkdownRenderer, {
+      props: { content: source },
+    })
+    await flushRenderer()
+    first.unmount()
+
+    const second = mount(MarkdownRenderer, {
+      props: { content: source },
+    })
+    await flushRenderer()
+
+    expect(renderMarkdownChunks).toHaveBeenCalledTimes(1)
+    expect(second.emitted('render-complete')?.[0]?.[0]).toEqual(result)
+  })
+
+  test('does not cache oversized markdown chunk results', () => {
+    const hugeHtml = 'x'.repeat(3 * 1024 * 1024 + 1)
+    const result = makeChunkResult('huge cached large', hugeHtml, {
+      chunks: [
+        {
+          key: 'md-huge-0',
+          kind: 'paragraph',
+          html: '<p>Huge paragraph</p>',
+          estimatedSize: 48,
+          htmlStartOffset: 0,
+          htmlEndOffset: 21,
+        },
+      ],
+    })
+
+    setMarkdownRendererRuntimeCache('chunks', 'oversized', result)
+
+    expect(
+      getMarkdownRendererRuntimeCache<MarkdownRuntimeChunkResult>(
+        'chunks',
+        'oversized',
+      ),
+    ).toBeNull()
   })
 
   test('uses a safe fallback and emits render-error when runtime fails', async () => {

@@ -8,6 +8,11 @@ export const boundaryTypes = [
   'slot',
   'event',
   'keyboard-focus',
+  'responsive-desktop-mobile',
+  'responsive-tiny',
+  'safe-text',
+  'injection-payload',
+  'raw-html-opt-in',
   'teleport-popper',
   'overflow-virtual',
   'unmount-cleanup',
@@ -65,14 +70,33 @@ const pluginBoundaries: BoundaryType[] = [
   'unmount-cleanup',
 ]
 
+const responsiveBoundaries: BoundaryType[] = [
+  'responsive-desktop-mobile',
+  'responsive-tiny',
+]
+
+const rawHtmlOptInBoundaries: BoundaryType[] = [
+  'safe-text',
+  'injection-payload',
+  'raw-html-opt-in',
+]
+
 const entry = (
   boundaries: BoundaryType[],
   options: Omit<ComponentBoundaryCoverage, 'exports' | 'boundaries'> = {}
 ): ComponentBoundaryCoverage => ({
   exports: 'all',
-  boundaries,
+  boundaries: Array.from(new Set([...boundaries, ...responsiveBoundaries])),
   ...options,
 })
+
+export const rawHtmlBoundaryComponents = [
+  'markdown-renderer',
+  'message',
+  'message-box',
+  'notification',
+  'tooltip',
+] as const
 
 export const publicComponentBoundaries: Record<string, ComponentBoundaryCoverage> = {
   affix: entry(['default-render', 'props-state', 'event', 'unmount-cleanup'], {
@@ -147,17 +171,17 @@ export const publicComponentBoundaries: Record<string, ComponentBoundaryCoverage
     fixtureModes: ['states'],
   }),
   loading: entry(pluginBoundaries, { fixtureModes: ['states', 'overlays'] }),
-  'markdown-renderer': entry([...dataBoundaries, 'overflow-virtual'], {
+  'markdown-renderer': entry([...dataBoundaries, 'overflow-virtual', ...rawHtmlOptInBoundaries], {
     fixtureModes: ['data-boundaries'],
   }),
   menu: entry([...simpleBoundaries, 'model-value', 'keyboard-focus', 'event'], {
     fixtureModes: ['overlays'],
   }),
-  message: entry(pluginBoundaries, { fixtureModes: ['overlays'] }),
-  'message-box': entry([...pluginBoundaries, 'keyboard-focus', 'teleport-popper'], {
+  message: entry([...pluginBoundaries, ...rawHtmlOptInBoundaries], { fixtureModes: ['overlays'] }),
+  'message-box': entry([...pluginBoundaries, 'keyboard-focus', 'teleport-popper', ...rawHtmlOptInBoundaries], {
     fixtureModes: ['overlays'],
   }),
-  notification: entry(pluginBoundaries, { fixtureModes: ['overlays'] }),
+  notification: entry([...pluginBoundaries, ...rawHtmlOptInBoundaries], { fixtureModes: ['overlays'] }),
   overlay: entry(overlayBoundaries, { fixtureModes: ['overlays'] }),
   'page-header': entry([...simpleBoundaries, 'event'], { fixtureModes: ['states'] }),
   pagination: entry([...formBoundaries, 'event'], { fixtureModes: ['data-boundaries'] }),
@@ -167,8 +191,14 @@ export const publicComponentBoundaries: Record<string, ComponentBoundaryCoverage
   progress: entry([...simpleBoundaries, 'empty-null-undefined'], {
     fixtureModes: ['data-boundaries'],
   }),
+  'public-shell': entry([...simpleBoundaries, 'event', 'overflow-virtual'], {
+    fixtureModes: ['states'],
+  }),
   radio: entry(formBoundaries, { fixtureModes: ['forms', 'states'] }),
   rate: entry([...formBoundaries, 'keyboard-focus'], { fixtureModes: ['forms'] }),
+  'responsive-collection': entry([...dataBoundaries, 'overflow-virtual'], {
+    fixtureModes: ['data-boundaries'],
+  }),
   result: entry(simpleBoundaries, { fixtureModes: ['states'] }),
   'roving-focus-group': entry(['default-render', 'event', 'keyboard-focus', 'unmount-cleanup']),
   row: entry([...simpleBoundaries, 'overflow-virtual'], { fixtureModes: ['data-boundaries'] }),
@@ -198,12 +228,15 @@ export const publicComponentBoundaries: Record<string, ComponentBoundaryCoverage
   tag: entry([...simpleBoundaries, 'event'], { fixtureModes: ['states'] }),
   teleport: entry(['default-render', 'teleport-popper', 'unmount-cleanup']),
   text: entry([...simpleBoundaries, 'empty-null-undefined'], { fixtureModes: ['states'] }),
+  'theme-mode-toggle': entry([...formBoundaries, 'event'], {
+    fixtureModes: ['states'],
+  }),
   'time-picker': entry([...formBoundaries, 'teleport-popper'], {
     fixtureModes: ['forms', 'data-boundaries'],
   }),
   'time-select': entry([...formBoundaries, 'teleport-popper'], { fixtureModes: ['forms'] }),
   timeline: entry(dataBoundaries, { fixtureModes: ['data-boundaries'] }),
-  tooltip: entry(overlayBoundaries, { fixtureModes: ['overlays'] }),
+  tooltip: entry([...overlayBoundaries, ...rawHtmlOptInBoundaries], { fixtureModes: ['overlays'] }),
   'tooltip-v2': entry(overlayBoundaries, { fixtureModes: ['overlays'] }),
   transfer: entry([...formBoundaries, 'overflow-virtual'], { fixtureModes: ['forms'] }),
   tree: entry([...dataBoundaries, 'keyboard-focus'], { fixtureModes: ['data-boundaries'] }),

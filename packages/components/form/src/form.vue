@@ -12,7 +12,6 @@ import {
   fsusErr,
   fsusOk,
   isFsusErr,
-  isFunction,
 } from '@element-plus/utils'
 import { useNamespace } from '@element-plus/hooks'
 import { useFormSize } from './hooks'

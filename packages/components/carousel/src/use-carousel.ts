@@ -12,7 +12,7 @@ import {
   watch,
 } from 'vue'
 import { throttle } from 'lodash-unified'
-import { useResizeObserver } from '@vueuse/core'
+import { useResizeObserver } from '@element-plus/hooks/use-runtime'
 import { debugWarn, flattedChildren, isString } from '@element-plus/utils'
 import {
   applyFsusInteractiveMotionVars,

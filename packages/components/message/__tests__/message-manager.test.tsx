@@ -58,9 +58,10 @@ describe('Message on command', () => {
     const elements = document.querySelectorAll(selector)
     expect(elements.length).toBe(4)
     Message.closeAll()
-    await rAF()
-    expect(onClose).toHaveBeenCalledTimes(4)
-    expect(document.querySelectorAll(selector).length).toBe(0)
+    await vi.waitFor(() => {
+      expect(onClose).toHaveBeenCalledTimes(4)
+      expect(document.querySelectorAll(selector).length).toBe(0)
+    })
   })
 
   test('it should close all messages of the specified type', async () => {
@@ -90,9 +91,10 @@ describe('Message on command', () => {
     expect(elements.length).toBe(6)
     expect(successElements.length).toBe(4)
     Message.closeAll(success)
-    await rAF()
-    expect(onClose).toHaveBeenCalledTimes(4)
-    expect(document.querySelectorAll(selector).length).toBe(2)
+    await vi.waitFor(() => {
+      expect(onClose).toHaveBeenCalledTimes(4)
+      expect(document.querySelectorAll(selector).length).toBe(2)
+    })
     Message.closeAll()
   })
 

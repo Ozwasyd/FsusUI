@@ -3,6 +3,7 @@
 import { pathToFileURL } from 'node:url'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { TextDecoder, TextEncoder } from 'node:util'
 
 function assert(condition, message) {
   if (!condition) {
@@ -391,7 +392,7 @@ async function main() {
   await renderWithKind('simd')
   await renderNestedListWithKind('basic')
   await renderNestedListWithKind('simd')
-  console.log('[markdown-wasm-runtime] ok basic+simd')
+  process.stdout.write('[markdown-wasm-runtime] ok basic+simd\n')
 }
 
 async function renderNestedListWithKind(kind) {

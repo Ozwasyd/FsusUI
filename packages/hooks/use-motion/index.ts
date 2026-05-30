@@ -9,12 +9,12 @@ import {
   watch,
 } from 'vue'
 import {
-  useMotionValue as createMotionValue,
-  useSpring as createSpringValue,
-  useVelocity as createVelocityValue,
-} from 'motion-v'
+  motionValue as createMotionValue,
+  springValue as createSpringValue,
+} from 'motion-dom'
 
 import type { ComputedRef, MaybeRef, Ref } from 'vue'
+import type { MotionValue } from 'motion-dom'
 
 export type FsusMotionMode = 'enabled' | 'reduced' | 'disabled'
 export type FsusMotionPreset = 'standard' | 'smooth' | 'expressive'
@@ -50,7 +50,7 @@ export type FsusWheelDeltaOptions = {
   viewportSizePx?: number
 }
 
-type MotionValueLike<T> = ReturnType<typeof createMotionValue<T>>
+type MotionValueLike<T extends string | number> = MotionValue<T>
 
 type SpringOverrides = Partial<FsusMotionRuntime['spring']>
 
@@ -519,13 +519,10 @@ export const useFsusSpring = (
 ) => {
   const runtime = useFsusMotionRuntime()
   const source = createMotionValue(unref(initial))
-  const spring = createSpringValue(
-    source,
-    computed(() => ({
-      ...runtime.value.spring,
-      ...unref(overrides),
-    })),
-  ) as MotionValueLike<number>
+  const spring = createSpringValue(source, {
+    ...runtime.value.spring,
+    ...unref(overrides),
+  }) as MotionValueLike<number>
   const value = shallowRef(spring.get()) as Ref<number>
 
   const unsubscribe = spring.on('change', (latest) => {
@@ -573,14 +570,20 @@ export const useFsusSpring = (
 }
 
 export const useFsusVelocity = (source: MotionValueLike<number>) => {
-  const velocity = createVelocityValue(source) as MotionValueLike<number>
+  const velocity = createMotionValue(
+    source.getVelocity(),
+  ) as MotionValueLike<number>
   const value = shallowRef(velocity.get()) as Ref<number>
   const unsubscribe = velocity.on('change', (latest) => {
     value.value = latest
   })
+  const unsubscribeSource = source.on('change', () => {
+    velocity.set(source.getVelocity())
+  })
 
   onBeforeUnmount(() => {
     unsubscribe()
+    unsubscribeSource()
     velocity.destroy()
   })
 

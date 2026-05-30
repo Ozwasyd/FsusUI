@@ -18,7 +18,7 @@
 
 <script lang="ts" setup>
 import { computed, inject, onBeforeUnmount, ref, toRef } from 'vue'
-import { useEventListener } from '@vueuse/core'
+import { useEventListener } from '@element-plus/hooks/use-runtime'
 import { isClient, throwError } from '@element-plus/utils'
 import { useNamespace } from '@element-plus/hooks'
 import { scrollbarContextKey } from './constants'

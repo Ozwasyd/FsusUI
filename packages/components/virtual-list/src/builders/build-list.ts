@@ -16,6 +16,7 @@ import {
   applyFsusInteractiveMotionVars,
   resolveFsusInteractiveMotion,
   resolveFsusRenderPipelineCache,
+  resolveFsusRenderPipelineUnitAttrs,
   useFsusRenderPipelineRuntime,
   useFsusMotionRuntime,
   useNamespace,
@@ -105,7 +106,8 @@ const createList = ({
         source: computed(() => props.total ?? 0),
       })
       const resolvedRenderPipelineConfig = renderPipelineRuntime.config
-      const renderPipelineHardwareAttrs = renderPipelineRuntime.hardwareAttrs
+      const baseRenderPipelineHardwareAttrs =
+        renderPipelineRuntime.hardwareAttrs
 
       const estimatedItemPixelSize = computed(() =>
         Math.max(
@@ -161,6 +163,18 @@ const createList = ({
           startIndex,
           stopIndex,
         ]
+      })
+
+      const renderPipelineHardwareAttrs = computed(() => {
+        const [start, end] = itemsToRender.value
+        const renderedCount = end >= start ? end - start + 1 : 0
+        return resolveFsusRenderPipelineUnitAttrs({
+          baseAttrs: baseRenderPipelineHardwareAttrs.value,
+          disableContentVisibilityOnOverflow: true,
+          layerBudget:
+            resolvedRenderPipelineConfig.value.acceleration.layerBudget,
+          renderedCount,
+        })
       })
 
       const estimatedTotalSize = computed(() =>

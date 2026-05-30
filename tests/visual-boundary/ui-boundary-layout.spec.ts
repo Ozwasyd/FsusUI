@@ -49,6 +49,14 @@ type BoundaryReport = {
 const diagnostics = new WeakMap<Page, string[]>()
 const expectedScreenshotsPerProject =
   auditComponents.length * auditStateNames.length
+const expectedBoundaryProjectNames = [
+  'desktop-light',
+  'mobile-light',
+  'tiny-light',
+  'desktop-dark',
+  'mobile-dark',
+  'tiny-dark',
+] as const
 const screenshotRoot = path.join(
   process.cwd(),
   'screenshots',
@@ -62,7 +70,10 @@ const getVisualVariant = (projectName: string): VisualVariant => {
       return { theme: 'dark', compact: false }
     case 'mobile-dark':
       return { theme: 'dark', compact: true }
+    case 'tiny-dark':
+      return { theme: 'dark', compact: true }
     case 'mobile-light':
+    case 'tiny-light':
       return { theme: 'light', compact: true }
     default:
       return { theme: 'light', compact: false }
@@ -127,7 +138,8 @@ const emptyReport = (): BoundaryReport => ({
   actualScreenshots: 0,
   clippingIssues: [],
   diagnostics: [],
-  expectedScreenshots: expectedScreenshotsPerProject * 4,
+  expectedScreenshots:
+    expectedScreenshotsPerProject * expectedBoundaryProjectNames.length,
   generatedAt: new Date().toISOString(),
   invisibleIssues: [],
   missing: [],
@@ -284,6 +296,16 @@ const collectComponentLayoutIssues = async (
 test.beforeEach(async ({ page }) => {
   diagnostics.set(page, attachPageDiagnostics(page))
   await page.emulateMedia({ reducedMotion: 'reduce' })
+})
+
+test('boundary audit projects cover desktop, mobile, and tiny viewports', async (
+  { browserName },
+  testInfo
+) => {
+  expect(browserName).toBeTruthy()
+  const projectNames = testInfo.config.projects.map((project) => project.name)
+
+  expect(projectNames).toEqual(expect.arrayContaining(expectedBoundaryProjectNames))
 })
 
 test('captures manual boundary layout screenshots and report', async ({

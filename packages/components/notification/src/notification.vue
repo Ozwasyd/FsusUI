@@ -53,7 +53,7 @@
 </template>
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
-import { useEventListener, useTimeoutFn } from '@vueuse/core'
+import { useEventListener, useTimeoutFn } from '@element-plus/hooks/use-runtime'
 import { CloseComponents, TypeComponentsMap } from '@element-plus/utils'
 import { EVENT_CODE } from '@element-plus/constants'
 import { ElIcon } from '@element-plus/components/icon'

@@ -1,19 +1,20 @@
 <template>
   <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="1"
-    stroke-linecap="round"
     stroke-linejoin="round"
+    stroke-linecap="round"
+    stroke-width="32"
+    stroke="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 1024 1024"
   >
-    <path d="M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.6 2.14a2 2 0 0 1 .14 2.2L16.79 15" />
-    <path d="M11 12 5.12 2.2" />
-    <path d="m13 12 5.88-9.8" />
-    <path d="M8 7h8" />
-    <circle cx="12" cy="17" r="5" />
-    <path d="M12 18v-2h-.5" />
+    <path
+      fill="currentColor"
+      d="M512 896a256 256 0 1 0 0-512 256 256 0 0 0 0 512m0 64a320 320 0 1 1 0-640 320 320 0 0 1 0 640"
+    />
+    <path
+      fill="currentColor"
+      d="M576 128H448v200a286.7 286.7 0 0 1 64-8c19.52 0 40.832 2.688 64 8zm64 0v219.648c24.448 9.088 50.56 20.416 78.4 33.92L757.44 128zm-256 0H266.624l39.04 253.568c27.84-13.504 53.888-24.832 78.336-33.92zM229.312 64h565.376a32 32 0 0 1 31.616 36.864L768 480c-113.792-64-199.104-96-256-96s-142.208 32-256 96l-58.304-379.136A32 32 0 0 1 229.312 64"
+    />
   </svg>
 </template>
 <script lang="ts" setup>

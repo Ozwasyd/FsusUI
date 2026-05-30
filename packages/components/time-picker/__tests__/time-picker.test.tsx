@@ -270,7 +270,7 @@ describe('TimePicker', () => {
     scrollWrap.dispatchEvent(new Event('scroll'))
 
     expect(value.value.getHours()).toBe(18)
-    await rAF()
+    await new Promise((resolve) => requestAnimationFrame(resolve))
     await nextTick()
     expect(
       spinner.querySelector<HTMLElement>('.el-time-spinner__item.is-active')
@@ -278,9 +278,9 @@ describe('TimePicker', () => {
     ).toBe('21')
     expect(value.value.getHours()).toBe(18)
 
-    await sleep(360)
-    await rAF()
-    expect(value.value.getHours()).toBe(21)
+    await vi.waitFor(() => {
+      expect(value.value.getHours()).toBe(21)
+    })
   })
 
   it('smooths spinner wheel scroll over animation frames', async () => {
@@ -376,20 +376,19 @@ describe('TimePicker', () => {
 
     scrollWrap.scrollTop = 32 * (edgeCycle * 24 + 13)
     scrollWrap.dispatchEvent(new Event('scroll'))
-    await rAF()
-    await nextTick()
-    expect(
-      spinner.querySelector<HTMLElement>('.el-time-spinner__item.is-active')
-        ?.textContent,
-    ).toBe('13')
-    expect(value.value.getHours()).toBe(18)
+    await vi.waitFor(() => {
+      expect(
+        spinner.querySelector<HTMLElement>('.el-time-spinner__item.is-active')
+          ?.textContent,
+      ).toBe('13')
+    })
 
-    await sleep(360)
-    await rAF()
-    expect(value.value.getHours()).toBe(13)
-    expect(scrollWrites).toContainEqual({
-      silent: 'true',
-      value: 32 * (middleCycle * 24 + 13),
+    await vi.waitFor(() => {
+      expect(value.value.getHours()).toBe(13)
+      expect(scrollWrites).toContainEqual({
+        silent: 'true',
+        value: 32 * (middleCycle * 24 + 13),
+      })
     })
   })
 
@@ -438,21 +437,19 @@ describe('TimePicker', () => {
     scrollWrap.scrollTop = safeTarget + 12
     scrollWrites.length = 0
     scrollWrap.dispatchEvent(new Event('scroll'))
-    await rAF()
-    await nextTick()
-    expect(
-      spinner.querySelector<HTMLElement>('.el-time-spinner__item.is-active')
-        ?.textContent,
-    ).toBe('13')
-    expect(value.value.getHours()).toBe(18)
+    await vi.waitFor(() => {
+      expect(
+        spinner.querySelector<HTMLElement>('.el-time-spinner__item.is-active')
+          ?.textContent,
+      ).toBe('13')
+    })
 
-    await sleep(360)
-    await rAF()
-
-    expect(value.value.getHours()).toBe(13)
-    expect(scrollWrites).toContainEqual({
-      silent: 'true',
-      value: safeTarget,
+    await vi.waitFor(() => {
+      expect(value.value.getHours()).toBe(13)
+      expect(scrollWrites).toContainEqual({
+        silent: 'true',
+        value: safeTarget,
+      })
     })
     expect(scrollWrites.some((write) => write.value === middleTarget)).toBe(
       false,

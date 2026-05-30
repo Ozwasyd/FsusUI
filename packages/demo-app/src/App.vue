@@ -54,6 +54,7 @@
         :is="routeSection.component"
         v-if="routeSection"
         :key="props.mode"
+        :compact="props.compact"
       />
     </Transition>
   </div>
@@ -76,6 +77,7 @@ import DataSection from './sections/DataSection.vue'
 import FeedbackSection from './sections/FeedbackSection.vue'
 import FormSection from './sections/FormSection.vue'
 import IconsSection from './sections/IconsSection.vue'
+import IssuePrimitivesSection from './sections/IssuePrimitivesSection.vue'
 import MarkdownStressSection from './sections/MarkdownStressSection.vue'
 import NavigationSection from './sections/NavigationSection.vue'
 import OthersSection from './sections/OthersSection.vue'
@@ -122,6 +124,12 @@ const demoSections: DemoSection[] = [
   },
   { id: 'others', label: 'Others', component: markRaw(OthersSection), estimate: 1200 },
   { id: 'icons', label: 'Icons', component: markRaw(IconsSection), estimate: 2600 },
+  {
+    id: 'issue-primitives',
+    label: 'Issue #1',
+    component: markRaw(IssuePrimitivesSection),
+    estimate: 1200,
+  },
 ]
 
 const routeSections = new Map<string, DemoSection | { component: object }>([

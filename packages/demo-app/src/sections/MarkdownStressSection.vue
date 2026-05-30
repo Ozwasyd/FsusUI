@@ -315,19 +315,20 @@ const handlePreviewScroll = ({
     status: status.value,
   }
 
-  if (
+  const isRegression =
     previousDebugScrollTop &&
     scrollTop < previousDebugScrollTop - 160 &&
     visibleSection < previousDebugSection
-  ) {
-    console.warn('[markdown-stress-scroll-regression]', {
-      previousScrollTop: previousDebugScrollTop,
-      previousSection: previousDebugSection,
-      ...payload,
+  window.dispatchEvent(
+    new CustomEvent('fsus:markdown-stress-scroll-debug', {
+      detail: {
+        regression: Boolean(isRegression),
+        previousScrollTop: previousDebugScrollTop,
+        previousSection: previousDebugSection,
+        ...payload,
+      },
     })
-  } else {
-    console.debug('[markdown-stress-scroll]', payload)
-  }
+  )
 
   previousDebugScrollTop = scrollTop
   previousDebugSection = visibleSection

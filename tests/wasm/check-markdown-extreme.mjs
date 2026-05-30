@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
 import { readFileSync } from 'node:fs'
+import { Buffer } from 'node:buffer'
+import { performance } from 'node:perf_hooks'
+import { TextDecoder, TextEncoder } from 'node:util'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import {
   buildMarkdownExtremeCorpus,
@@ -45,6 +48,7 @@ function readStructured(raw, fallback, label) {
   } catch (error) {
     throw new Error(
       `[markdown-extreme] invalid ${label} payload: ${error instanceof Error ? error.message : String(error)}`,
+      { cause: error },
     )
   }
 }
@@ -437,9 +441,10 @@ async function assertKind(kind, source) {
     enabled.placeholders.length === disabled.placeholders.length,
     `[markdown-extreme] placeholder count should not depend on enabled flags: ${kind}`,
   )
-  console.log(
+  process.stdout.write(
     `[markdown-extreme] ok ${kind} | enabled=${enabled.elapsedMs.toFixed(1)}ms disabled=${disabled.elapsedMs.toFixed(1)}ms`,
   )
+  process.stdout.write('\n')
 }
 
 async function main() {
@@ -456,9 +461,10 @@ async function main() {
 
   await assertKind('basic', source)
   await assertKind('simd', source)
-  console.log(
+  process.stdout.write(
     `[markdown-extreme] ok | chars=${stats.length} bytes=${stats.byteLength} lines=${stats.lineCount} hash=${stats.hash}`,
   )
+  process.stdout.write('\n')
 }
 
 main().catch((error) => {

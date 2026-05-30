@@ -12,7 +12,7 @@ import {
   useElementBounding,
   useEventListener,
   useWindowSize,
-} from '@vueuse/core'
+} from '@element-plus/hooks/use-runtime'
 import { addUnit, getScrollContainer, throwError } from '@element-plus/utils'
 import { useNamespace } from '@element-plus/hooks'
 import { affixEmits, affixProps } from './affix'
@@ -32,13 +32,14 @@ const target = shallowRef<HTMLElement>()
 const root = shallowRef<HTMLDivElement>()
 const scrollContainer = shallowRef<HTMLElement | Window>()
 const { height: windowHeight } = useWindowSize()
+const rootBounding = useElementBounding(root, { windowScroll: false })
 const {
   height: rootHeight,
   width: rootWidth,
   top: rootTop,
   bottom: rootBottom,
   update: updateRoot,
-} = useElementBounding(root, { windowScroll: false })
+} = rootBounding
 const targetRect = useElementBounding(target)
 
 const fixed = ref(false)
@@ -112,8 +113,11 @@ onMounted(() => {
   if (props.target) {
     target.value =
       document.querySelector<HTMLElement>(props.target) ?? undefined
-    if (!target.value)
+    if (!target.value) {
+      rootBounding.stop()
+      targetRect.stop()
       throwError(COMPONENT_NAME, `Target is not existed: ${props.target}`)
+    }
   } else {
     target.value = document.documentElement
   }

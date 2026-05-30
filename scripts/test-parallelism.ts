@@ -22,6 +22,9 @@ export const resolveVitestWorkers = () =>
 export const resolvePlaywrightWorkers = () =>
   resolveWorkerCount('FSUS_PLAYWRIGHT_WORKERS')
 
+export const resolveDomLayoutWorkers = () =>
+  positiveInteger(process.env.FSUS_DOM_LAYOUT_WORKERS) ?? 1
+
 export const resolveTestPort = (specificEnv: string, fallback: number) =>
   positiveInteger(process.env[specificEnv]) ?? fallback
 

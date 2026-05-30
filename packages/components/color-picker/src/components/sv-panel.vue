@@ -112,8 +112,9 @@ export default defineComponent({
     // mounted
     onMounted(() => {
       draggable(instance.vnode.el as HTMLElement, {
-        start: () => {
+        start: (event) => {
           dragRect = measureDragRect()
+          handleDrag(event)
         },
         drag: (event) => {
           handleDrag(event)

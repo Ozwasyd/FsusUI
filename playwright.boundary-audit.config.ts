@@ -44,6 +44,14 @@ export default defineConfig({
       },
     },
     {
+      name: 'tiny-light',
+      use: {
+        ...devices['Pixel 7'],
+        colorScheme: 'light',
+        viewport: { width: 320, height: 900 },
+      },
+    },
+    {
       name: 'desktop-dark',
       use: {
         ...devices['Desktop Chrome'],
@@ -57,6 +65,14 @@ export default defineConfig({
         ...devices['Pixel 7'],
         colorScheme: 'dark',
         viewport: { width: 412, height: 1200 },
+      },
+    },
+    {
+      name: 'tiny-dark',
+      use: {
+        ...devices['Pixel 7'],
+        colorScheme: 'dark',
+        viewport: { width: 320, height: 900 },
       },
     },
   ],

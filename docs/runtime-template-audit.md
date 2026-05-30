@@ -1,11 +1,11 @@
 # Runtime Template Audit
 
-Generated at: 2026-05-16T23:47:56.398Z
+Generated at: 2026-05-30T09:44:46.972Z
 
 ## Summary
 
-- Scanned files: 127
-- Total element/component nodes: 958
+- Scanned files: 131
+- Total element/component nodes: 1009
 - Total findings: 0
 - Estimated removable nodes: 0
 - Deprecated syntax hits: 0

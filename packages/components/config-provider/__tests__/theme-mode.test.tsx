@@ -2,7 +2,12 @@ import { nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import ConfigProvider from '../src/config-provider'
-import { clearThemeMode, syncThemeMode } from '../src/theme-mode'
+import {
+  applyThemeModeForTesting,
+  clearThemeMode,
+  installThemeModeTestHelper,
+  syncThemeMode,
+} from '../src/theme-mode'
 
 type MatchMediaController = ReturnType<typeof createMatchMediaController>
 
@@ -20,7 +25,10 @@ const createMatchMediaController = (initialMatches = false) => {
     get matches() {
       return matches
     },
-    addEventListener(_type: string, listener: EventListenerOrEventListenerObject | null) {
+    addEventListener(
+      _type: string,
+      listener: EventListenerOrEventListenerObject | null,
+    ) {
       if (!listener) return
 
       const normalizedListener = (event: MediaQueryListEvent) => {
@@ -37,7 +45,7 @@ const createMatchMediaController = (initialMatches = false) => {
     },
     removeEventListener(
       _type: string,
-      listener: EventListenerOrEventListenerObject | null
+      listener: EventListenerOrEventListenerObject | null,
     ) {
       if (!listener) return
 
@@ -47,11 +55,13 @@ const createMatchMediaController = (initialMatches = false) => {
       listeners.delete(normalizedListener)
       listenerMap.delete(listener)
     },
-    addListener(callback: (this: MediaQueryList, ev: MediaQueryListEvent) => any) {
+    addListener(
+      callback: (this: MediaQueryList, ev: MediaQueryListEvent) => any,
+    ) {
       this.addEventListener('change', callback as EventListener)
     },
     removeListener(
-      callback: (this: MediaQueryList, ev: MediaQueryListEvent) => any
+      callback: (this: MediaQueryList, ev: MediaQueryListEvent) => any,
     ) {
       this.removeEventListener('change', callback as EventListener)
     },
@@ -90,11 +100,14 @@ describe('theme-mode', () => {
   beforeEach(() => {
     originalMatchMedia = window.matchMedia
     matchMediaController = createMatchMediaController(false)
-    window.matchMedia = matchMediaController.matchMedia as typeof window.matchMedia
+    window.matchMedia =
+      matchMediaController.matchMedia as typeof window.matchMedia
     clearThemeMode()
   })
 
   afterEach(() => {
+    window.__fsusUiThemeMode = undefined
+    window.localStorage.clear()
     clearThemeMode()
     if (originalMatchMedia) {
       window.matchMedia = originalMatchMedia
@@ -158,5 +171,35 @@ describe('theme-mode', () => {
 
     wrapper.unmount()
     expect(document.documentElement.dataset.themeMode).toBeUndefined()
+  })
+
+  it('applies explicit modes through the test helper with optional persistence', () => {
+    const applied = applyThemeModeForTesting('dark', {
+      persist: true,
+      storageKey: 'fsus-test-theme',
+    })
+
+    expect(applied).toBe('dark')
+    expect(document.documentElement.classList.contains('dark')).toBe(true)
+    expect(document.documentElement.dataset.themeMode).toBe('dark')
+    expect(document.documentElement.dataset.themeResolved).toBe('dark')
+    expect(window.localStorage.getItem('fsus-test-theme')).toBe('dark')
+  })
+
+  it('installs a browser-callable theme helper for screenshot tooling', () => {
+    const helper = installThemeModeTestHelper({
+      persist: true,
+      storageKey: 'fsus-test-theme',
+    })
+
+    expect(helper).toBe(window.__fsusUiThemeMode)
+    expect(window.__fsusUiThemeMode?.set('light')).toBe('light')
+    expect(document.documentElement.classList.contains('light')).toBe(true)
+    expect(window.localStorage.getItem('fsus-test-theme')).toBe('light')
+
+    window.__fsusUiThemeMode?.clear()
+
+    expect(document.documentElement.dataset.themeMode).toBeUndefined()
+    expect(window.localStorage.getItem('fsus-test-theme')).toBeNull()
   })
 })

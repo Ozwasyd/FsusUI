@@ -21,6 +21,7 @@ import {
   applyFsusInteractiveMotionVars,
   resolveFsusInteractiveMotion,
   resolveFsusRenderPipelineCache,
+  resolveFsusRenderPipelineUnitAttrs,
   useFsusRenderPipelineRuntime,
   useFsusMotionRuntime,
   useNamespace,
@@ -136,7 +137,8 @@ const createGrid = ({
         })),
       })
       const resolvedRenderPipelineConfig = renderPipelineRuntime.config
-      const renderPipelineHardwareAttrs = renderPipelineRuntime.hardwareAttrs
+      const baseRenderPipelineHardwareAttrs =
+        renderPipelineRuntime.hardwareAttrs
 
       const estimatedColumnPixelSize = computed(() =>
         Math.max(
@@ -252,6 +254,21 @@ const createGrid = ({
           startIndex,
           stopIndex,
         ]
+      })
+
+      const renderPipelineHardwareAttrs = computed(() => {
+        const [columnStart, columnEnd] = columnsToRender.value
+        const [rowStart, rowEnd] = rowsToRender.value
+        const renderedColumnCount =
+          columnEnd >= columnStart ? columnEnd - columnStart + 1 : 0
+        const renderedRowCount = rowEnd >= rowStart ? rowEnd - rowStart + 1 : 0
+        return resolveFsusRenderPipelineUnitAttrs({
+          baseAttrs: baseRenderPipelineHardwareAttrs.value,
+          disableContentVisibilityOnOverflow: true,
+          layerBudget:
+            resolvedRenderPipelineConfig.value.acceleration.layerBudget,
+          renderedCount: renderedColumnCount * renderedRowCount,
+        })
       })
 
       const estimatedTotalHeight = computed(() =>

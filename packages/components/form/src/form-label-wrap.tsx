@@ -10,7 +10,7 @@ import {
   ref,
   watch,
 } from 'vue'
-import { useResizeObserver } from '@vueuse/core'
+import { useResizeObserver } from '@element-plus/hooks/use-runtime'
 import { throwError } from '@element-plus/utils'
 import { useNamespace } from '@element-plus/hooks'
 import { formContextKey, formItemContextKey } from './constants'

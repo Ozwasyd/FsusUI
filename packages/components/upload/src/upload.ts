@@ -188,6 +188,17 @@ export const uploadBaseProps = buildProps({
    * @description maximum number of uploads allowed
    */
   limit: Number,
+  /**
+   * @description render upload as a responsive media field
+   */
+  mediaField: Boolean,
+  /**
+   * @description aspect ratio used by responsive media field surfaces
+   */
+  mediaAspectRatio: {
+    type: String,
+    default: '16 / 9',
+  },
 } as const)
 
 export const uploadProps = buildProps({

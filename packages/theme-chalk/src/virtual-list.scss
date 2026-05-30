@@ -91,6 +91,14 @@
       .#{$namespace}-vl__inner
       > * {
       transform: none;
+      will-change: auto;
+    }
+
+    &[data-fsus-compositor='disabled'].is-scrolling
+      .#{$namespace}-vl__inner
+      > * {
+      transform: none;
+      will-change: auto;
     }
 
     &[data-fsus-compositor='enabled'].is-scrolling

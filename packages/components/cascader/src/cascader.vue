@@ -190,7 +190,7 @@
 <script lang="ts" setup>
 import { computed, nextTick, onMounted, ref, useAttrs, watch } from 'vue'
 import { cloneDeep, debounce } from 'lodash-unified'
-import { useCssVar, useResizeObserver } from '@vueuse/core'
+import { useCssVar, useResizeObserver } from '@element-plus/hooks/use-runtime'
 import ElCascaderPanel from '@element-plus/components/cascader-panel'
 import ElInput from '@element-plus/components/input'
 import ElTooltip from '@element-plus/components/tooltip'

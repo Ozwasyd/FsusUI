@@ -6,7 +6,9 @@ import {
   boundaryTypes,
   groupedComponentCoverage,
   publicComponentBoundaries,
+  rawHtmlBoundaryComponents,
 } from './component-boundaries'
+import { auditComponentNames } from '../../packages/demo-app/src/ui-audit-manifest'
 
 const componentsRoot = resolve(process.cwd(), 'packages/components')
 const rootComponentsIndex = resolve(componentsRoot, 'index.ts')
@@ -41,6 +43,31 @@ const exportStatements = (componentDir: string) => {
     .map((line) => line.trim())
     .filter((line) => line.startsWith('export '))
 }
+
+const visualAuditExclusions = new Set([
+  'collection',
+  'focus-trap',
+  'infinite-scroll',
+  'loading',
+  'message',
+  'message-box',
+  'notification',
+  'roving-focus-group',
+  'slot',
+  'teleport',
+  'virtual-list',
+])
+
+const visualAuditNameOverrides: Record<string, string> = {
+  'visual-hidden': 'ElVisuallyHidden',
+}
+
+const toAuditComponentName = (componentDir: string) =>
+  visualAuditNameOverrides[componentDir] ??
+  `El${componentDir
+    .split('-')
+    .map((part) => `${part[0]?.toUpperCase() ?? ''}${part.slice(1)}`)
+    .join('')}`
 
 describe('component boundary coverage registry', () => {
   it('tracks every component package index', () => {
@@ -89,6 +116,39 @@ describe('component boundary coverage registry', () => {
     }
   })
 
+  it('declares responsive boundary coverage for every public component', () => {
+    for (const componentDir of publicComponentDirs) {
+      const coverage = publicComponentBoundaries[componentDir]
+
+      expect(
+        coverage.boundaries,
+        `${componentDir} must be covered by desktop/mobile boundary audit`,
+      ).toContain('responsive-desktop-mobile')
+      expect(
+        coverage.boundaries,
+        `${componentDir} must be covered by tiny viewport boundary audit`,
+      ).toContain('responsive-tiny')
+    }
+  })
+
+  it('declares explicit default-safe raw HTML contracts for raw-capable components', () => {
+    for (const componentDir of rawHtmlBoundaryComponents) {
+      const coverage = publicComponentBoundaries[componentDir]
+
+      expect(coverage.boundaries, `${componentDir} must cover safe text`).toContain(
+        'safe-text',
+      )
+      expect(
+        coverage.boundaries,
+        `${componentDir} must cover SQL/XSS-like payload strings`,
+      ).toContain('injection-payload')
+      expect(
+        coverage.boundaries,
+        `${componentDir} must document the raw HTML opt-in boundary`,
+      ).toContain('raw-html-opt-in')
+    }
+  })
+
   it('has unit tests or visual fixture coverage for each public package', () => {
     for (const componentDir of publicComponentDirs) {
       const coverage = publicComponentBoundaries[componentDir]
@@ -101,6 +161,20 @@ describe('component boundary coverage registry', () => {
       expect(
         hasDirectUnitTest || hasGroupedUnitTest || hasFixture,
         `${componentDir} must have unit tests, grouped tests, or fixture coverage`,
+      ).toBe(true)
+    }
+  })
+
+  it('keeps visual boundary audit aligned with renderable public components', () => {
+    const auditNames = new Set(auditComponentNames)
+
+    for (const componentDir of publicComponentDirs) {
+      if (visualAuditExclusions.has(componentDir)) continue
+
+      const auditName = toAuditComponentName(componentDir)
+      expect(
+        auditNames.has(auditName as (typeof auditComponentNames)[number]),
+        `${componentDir} must have a UI boundary audit fixture named ${auditName}`,
       ).toBe(true)
     }
   })

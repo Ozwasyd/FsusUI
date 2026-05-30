@@ -36,8 +36,19 @@
   @include e(description) {
     margin-top: getCssVar('empty-description-margin-top');
     margin-bottom: 0;
+    max-width: getCssVar('empty-description-max-width', none);
     font-size: getCssVar('font-size', 'base');
     color: getCssVar('text-color', 'secondary');
+    line-height: 1.75;
+    overflow-wrap: anywhere;
+
+    @include m(narrow) {
+      @include set-css-var-value(('empty-description-max-width'), 18rem);
+    }
+
+    @include m(wide) {
+      @include set-css-var-value(('empty-description-max-width'), 24rem);
+    }
   }
 
   @include e(bottom) {

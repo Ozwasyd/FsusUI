@@ -1,3 +1,5 @@
+import { Buffer } from 'node:buffer'
+
 export const DEFAULT_MARKDOWN_EXTREME_SIZE = 500_000
 
 export function normalizeMarkdownExtremeSize(value) {
@@ -35,7 +37,7 @@ export function buildMarkdownExtremeCorpus(
     '| Column A | Column B | Column C |',
     '| --- | ---: | :--- |',
     '| short | 42 | text |',
-    '| very-long-cell | ' + 'cell-value-'.repeat(64) + ' | end |',
+    `| very-long-cell | ${'cell-value-'.repeat(64)} | end |`,
     '',
     '```ts',
     'const value = "<unsafe>& markdown";',
@@ -79,13 +81,7 @@ export function buildMarkdownExtremeCorpus(
         `## Boundary Section ${blockIndex}`,
         `Paragraph ${blockIndex} with repeated words ${'longword'.repeat((blockIndex % 7) + 1)} and inline math \\(n_${blockIndex}^2 + \\beta\\).`,
         blockIndex % 5 === 0
-          ? '```mermaid\nflowchart LR;\nN' +
-            blockIndex +
-            '["Node ' +
-            blockIndex +
-            '"] --> M' +
-            blockIndex +
-            '("Next");\n```'
+          ? `\`\`\`mermaid\nflowchart LR;\nN${blockIndex}["Node ${blockIndex}"] --> M${blockIndex}("Next");\n\`\`\``
           : '- list item alpha\n- list item beta\n- list item gamma',
         blockIndex % 9 === 0
           ? '$$\n\\sum_{i=1}^{n} \\frac{i^2}{n}\n$$'

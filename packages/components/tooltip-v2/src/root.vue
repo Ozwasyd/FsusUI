@@ -12,7 +12,7 @@ import {
   unref,
   watch,
 } from 'vue'
-import { useTimeoutFn } from '@vueuse/core'
+import { useTimeoutFn } from '@element-plus/hooks/use-runtime'
 import { useId, useNamespace } from '@element-plus/hooks'
 import { isNumber, isPropAbsent } from '@element-plus/utils'
 import { TOOLTIP_V2_OPEN, tooltipV2RootKey } from './constants'

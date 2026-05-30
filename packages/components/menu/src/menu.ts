@@ -12,7 +12,7 @@ import {
   watch,
   watchEffect,
 } from 'vue'
-import { useResizeObserver } from '@vueuse/core'
+import { useResizeObserver } from '@element-plus/hooks/use-runtime'
 import { isNil } from 'lodash-unified'
 import ElIcon from '@element-plus/components/icon'
 import { More } from '@element-plus/icons-vue'
@@ -33,7 +33,7 @@ import { useMenuCssVar } from './use-menu-css-var'
 import type { MenuItemClicked, MenuProvider, SubMenuProvider } from './types'
 import type { NavigationFailure, RouteLocationRaw } from 'vue-router'
 import type { ExtractPropTypes, VNode, VNodeArrayChildren } from 'vue'
-import type { UseResizeObserverReturn } from '@vueuse/core'
+import type { UseResizeObserverReturn } from '@element-plus/hooks/use-runtime'
 
 type RouterLike = {
   push: (to: RouteLocationRaw) => Promise<void | NavigationFailure>

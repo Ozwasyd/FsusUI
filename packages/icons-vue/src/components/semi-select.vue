@@ -1,14 +1,16 @@
 <template>
   <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="1"
-    stroke-linecap="round"
     stroke-linejoin="round"
+    stroke-linecap="round"
+    stroke-width="32"
+    stroke="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 1024 1024"
   >
-    <path d="M5 12h14" />
+    <path
+      fill="currentColor"
+      d="M128 448h768q64 0 64 64t-64 64H128q-64 0-64-64t64-64"
+    />
   </svg>
 </template>
 <script lang="ts" setup>

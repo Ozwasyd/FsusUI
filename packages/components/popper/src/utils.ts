@@ -1,4 +1,4 @@
-import { unrefElement } from '@vueuse/core'
+import { unrefElement } from '@element-plus/hooks/use-runtime'
 import { isClient } from '@element-plus/utils'
 
 import type { ComponentPublicInstance } from 'vue'

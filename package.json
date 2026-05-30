@@ -83,14 +83,13 @@
     "@floating-ui/dom": "^1.7.6",
     "@popperjs/core": "npm:@sxzz/popperjs-es@^2.11.7",
     "@types/lodash-es": "^4.17.6",
-    "@vueuse/core": "^14.2.1",
     "async-validator": "^4.2.5",
     "dayjs": "^1.11.20",
     "escape-html": "^1.0.3",
     "lodash-es": "^4.17.21",
     "lodash-unified": "^1.0.3",
     "memoize-one": "^6.0.0",
-    "motion-v": "^2.2.1",
+    "motion-dom": "^12.40.0",
     "normalize-wheel-es": "^1.2.0"
   },
   "devDependencies": {

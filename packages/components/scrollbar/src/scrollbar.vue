@@ -43,7 +43,7 @@ import {
   ref,
   watch,
 } from 'vue'
-import { useEventListener, useResizeObserver } from '@vueuse/core'
+import { useEventListener, useResizeObserver } from '@element-plus/hooks/use-runtime'
 import { addUnit, debugWarn, isNumber, isObject } from '@element-plus/utils'
 import {
   applyFsusInteractiveMotionVars,

@@ -1,0 +1,26 @@
+@use 'mixins/mixins' as *;
+
+@include b(theme-mode-toggle) {
+  display: inline-flex;
+  min-width: 0;
+  vertical-align: middle;
+
+  @include m(desktop) {
+    @media (max-width: 767px) {
+      display: none;
+    }
+  }
+
+  @include m(mobile) {
+    @media (min-width: 768px) {
+      display: none;
+    }
+  }
+
+  @include when(compact) {
+    .#{$namespace}-radio-button__inner {
+      min-width: 36px;
+      padding-inline: 10px;
+    }
+  }
+}

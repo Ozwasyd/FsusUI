@@ -241,6 +241,29 @@ $button-icon-span-gap: map.merge(
     }
   }
 
+  @include when(inline-action) {
+    min-height: 36px;
+    height: auto;
+    padding-inline: 4px;
+    white-space: normal;
+    vertical-align: baseline;
+
+    > span {
+      min-width: 0;
+      text-align: inherit;
+      overflow-wrap: anywhere;
+    }
+
+    @include when(text) {
+      padding-block: 0;
+    }
+
+    @include when(link) {
+      min-height: 36px;
+      padding-inline: 4px;
+    }
+  }
+
   @include m(text) {
     border-color: transparent;
     background: transparent;

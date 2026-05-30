@@ -454,10 +454,6 @@ const adjustSpinner = (
   scheduleSpinnerScroll(type, value, cycle)
 }
 
-const scheduleAdjustCurrentSpinner = (type: TimeUnit) => {
-  adjustSpinner(type, unref(timePartials)[type])
-}
-
 const typeItemHeight = (type: TimeUnit): number => {
   const cached = itemHeightCache[type]
   if (cached) return cached
@@ -569,6 +565,7 @@ const flushPendingScrollTypes = () => {
     pendingScrollTypes[type] = false
     handleScrollFrame = 0
     commitScroll(type)
+    scheduleResetScroll(type)
   }
 }
 
@@ -578,7 +575,6 @@ const scheduleHandleScroll = (type: TimeUnit) => {
   isScrolling = true
   scrollingTypes[type] = true
   pendingScrollTypes[type] = true
-  scheduleResetScroll(type)
 
   if (handleScrollFrame) return
   if (typeof window.requestAnimationFrame !== 'function') {

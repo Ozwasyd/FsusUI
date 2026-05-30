@@ -507,6 +507,12 @@
         </el-container>
       </AuditCard>
 
+      <AuditCard name="ElMarkdownRenderer" :state="auditState">
+        <div class="audit-markdown-frame">
+          <el-markdown-renderer :content="markdownAuditContent" />
+        </div>
+      </AuditCard>
+
       <AuditCard name="ElMenu" :state="auditState">
         <el-menu :default-active="active ? '2' : '1'" :default-openeds="active ? ['sub'] : []">
           <el-menu-item index="1">Dashboard</el-menu-item>
@@ -575,6 +581,34 @@
 
       <AuditCard name="ElPageHeader" :state="auditState">
         <el-page-header content="Detail" title="Back" />
+      </AuditCard>
+
+      <AuditCard name="ElPublicShell" :state="auditState">
+        <el-public-shell
+          brand="Fsus"
+          brand-href="#brand"
+          :nav-items="shellNavItems"
+          active-nav="docs"
+          auth-label="Sign in"
+          auth-href="#auth"
+          :show-search="false"
+          :sticky="false"
+          max-width="100%"
+        >
+          <p class="audit-public-shell-copy">
+            Public shell content
+          </p>
+          <template #desktop-actions>
+            <el-button size="small">
+              Action
+            </el-button>
+          </template>
+          <template #mobile-actions>
+            <el-button size="small">
+              Go
+            </el-button>
+          </template>
+        </el-public-shell>
       </AuditCard>
 
       <AuditCard name="ElPagination" :state="auditState">
@@ -690,6 +724,30 @@
             <el-button type="primary">Confirm</el-button>
           </template>
         </el-result>
+      </AuditCard>
+
+      <AuditCard name="ElResponsiveCollection" :state="auditState">
+        <el-responsive-collection
+          :items="responsiveCollectionItems"
+          row-key="name"
+          :compact="compact"
+        >
+          <template #table>
+            <el-table
+              :data="responsiveCollectionItems"
+              size="small"
+              height="132"
+            >
+              <el-table-column prop="name" label="Name" />
+              <el-table-column prop="state" label="State" />
+            </el-table>
+          </template>
+          <template #card="{ item }">
+            <div class="audit-responsive-card" role="listitem">
+              {{ formatCollectionItem(item) }}
+            </div>
+          </template>
+        </el-responsive-collection>
       </AuditCard>
 
       <AuditCard name="ElRow" :state="auditState">
@@ -857,6 +915,15 @@
         <el-text :type="active ? 'primary' : undefined">
           Editorial text sample
         </el-text>
+      </AuditCard>
+
+      <AuditCard name="ElThemeModeToggle" :state="auditState">
+        <el-theme-mode-toggle
+          :model-value="themeMode"
+          :compact="compact"
+          data-audit-focus
+          data-audit-target
+        />
       </AuditCard>
 
       <AuditCard name="ElTimePicker" :state="auditState">
@@ -1031,6 +1098,45 @@ const activeText = computed(() => {
 
   return active.value ? 'Active value' : ''
 })
+const themeMode = computed(() => (props.theme === 'dark' ? 'dark' : 'light'))
+const markdownAuditContent = computed(() =>
+  props.boundary
+    ? `# Markdown\n\n${boundaryText}\n\n\`inline-code-boundary-token\``
+    : '# Markdown\n\nCompact rendered content.'
+)
+const shellNavItems = computed(() => [
+  {
+    key: 'home',
+    label: props.boundary ? `Home ${boundaryText}` : 'Home',
+    href: '#home',
+  },
+  {
+    key: 'docs',
+    label: props.boundary ? `Docs ${boundaryText}` : 'Docs',
+    href: '#docs',
+  },
+  {
+    key: 'api',
+    label: props.boundary ? `API ${boundaryText}` : 'API',
+    href: '#api',
+  },
+])
+const responsiveCollectionItems = computed(() => [
+  {
+    name: props.boundary ? `Alpha ${boundaryText}` : 'Alpha',
+    state: active.value ? 'Active' : 'Ready',
+  },
+  {
+    name: props.boundary ? `Beta ${boundaryText}` : 'Beta',
+    state: 'Review',
+  },
+])
+const formatCollectionItem = (item: unknown) => {
+  if (!item || typeof item !== 'object') return String(item)
+
+  const row = item as { name?: unknown; state?: unknown }
+  return `${String(row.name ?? '')} - ${String(row.state ?? '')}`
+}
 const readCssVar = (name: string, fallback: string) => {
   if (typeof window === 'undefined') return fallback
   return (

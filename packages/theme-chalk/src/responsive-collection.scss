@@ -1,0 +1,30 @@
+@use 'mixins/mixins' as *;
+@use 'mixins/var' as *;
+
+@include b(responsive-collection) {
+  min-width: 0;
+
+  @include e(desktop) {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+  }
+
+  @include e(compact) {
+    display: grid;
+    min-width: 0;
+    border: 1px solid getCssVar('border-color-lighter');
+    border-radius: getCssVar('border-radius-base');
+    overflow: hidden;
+    background: getCssVar('bg-color');
+
+    > * {
+      min-width: 0;
+    }
+
+    > * + * {
+      border-top: 1px solid getCssVar('border-color-lighter');
+    }
+  }
+}

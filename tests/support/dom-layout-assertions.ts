@@ -480,19 +480,32 @@ export const assertScrollMotionState = async (
   })
   await expect(host).toHaveClass(/is-scrolling/)
 
+  await scrollTarget.evaluate((element) => {
+    const maxScrollTop = Math.max(0, element.scrollHeight - element.clientHeight)
+    const current = element.scrollTop
+    const next =
+      current + 32 <= maxScrollTop ? current + 32 : Math.max(0, current - 32)
+
+    if (next !== current) {
+      element.scrollTop = next
+    }
+    element.dispatchEvent(new Event('scroll'))
+  })
+  await expect(host).toHaveClass(/is-scrolling/)
+
   const readMetrics = () =>
     host.evaluate((element) => {
       const content =
         element.querySelector<HTMLElement>('.el-vl__inner > *') ??
         element.querySelector<HTMLElement>('.el-scrollbar__view > *')
-      const blurRadius = (filter: string) => {
-        const match = /blur\(([\d.]+)px\)/.exec(filter)
-        return match ? Number.parseFloat(match[1]) : 0
-      }
+      const verticalThumb = element.querySelector<HTMLElement>(
+        '.el-scrollbar__bar.is-vertical .el-scrollbar__thumb',
+      )
       const thumbs = Array.from(
         element.querySelectorAll<HTMLElement>('.el-scrollbar__thumb'),
       )
       const thumb =
+        verticalThumb ??
         thumbs.find((candidate) => {
           const style = getComputedStyle(candidate)
           return style.boxShadow !== 'none'

@@ -81,6 +81,19 @@ describe('Notification.vue', () => {
       expect(HTMLWrapper.find(`.${tagClass}`).exists()).toBe(false)
     })
 
+    test('renders SQL-like and XSS-like strings as inert text by default', () => {
+      const payload =
+        `'; DROP TABLE users; -- <img src=x onerror="alert(1)">`
+      const wrapper = _mount({
+        props: {
+          message: payload,
+        },
+      })
+
+      expect(wrapper.text()).toContain(payload)
+      expect(wrapper.find('img').exists()).toBe(false)
+    })
+
     test('should be able to render z-index style with zIndex flag', async () => {
       const wrapper = _mount({
         props: {

@@ -1,5 +1,5 @@
 import { nextTick, onMounted, ref } from 'vue'
-import { useEventListener } from '@vueuse/core'
+import { useEventListener } from '@element-plus/hooks/use-runtime'
 import type { SliderInitData, SliderProps } from '../slider'
 
 export const useLifecycle = (

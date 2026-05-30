@@ -14,6 +14,7 @@
       ns.is('circle', circle),
       ns.is('text', text),
       ns.is('link', link),
+      ns.is('inline-action', inlineAction),
       ns.is('has-bg', bg),
     ]"
     :style="buttonStyle"

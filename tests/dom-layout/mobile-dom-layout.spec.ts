@@ -180,6 +180,104 @@ const skipUnlessTouchViewport = async (page: Page) => {
   )
 }
 
+const isNetworkChangedDiagnostic = (event: string) =>
+  event.includes('net::ERR_NETWORK_CHANGED')
+
+const resetPageDiagnostics = (page: Page) => {
+  const pageDiagnostics = diagnostics.get(page)
+  if (pageDiagnostics) pageDiagnostics.length = 0
+}
+
+const readPageDiagnostics = (page: Page) => [...(diagnostics.get(page) ?? [])]
+
+const isOnlyNetworkChangedDiagnostics = (events: readonly string[]) =>
+  events.length > 0 && events.every(isNetworkChangedDiagnostic)
+
+const gotoDomRoute = async (
+  page: Page,
+  url: string,
+  readySelector: string,
+) => {
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    resetPageDiagnostics(page)
+
+    let navigationError: unknown
+    try {
+      await page.goto(url, { waitUntil: 'networkidle' })
+    } catch (error) {
+      navigationError = error
+    }
+
+    await waitForStableLayout(page).catch((error: unknown) => {
+      navigationError ??= error
+    })
+
+    const readyCount = await page
+      .locator(readySelector)
+      .first()
+      .count()
+      .catch(() => 0)
+    const currentDiagnostics = readPageDiagnostics(page)
+
+    if (readyCount > 0 && currentDiagnostics.length === 0) return
+
+    const retriable =
+      isOnlyNetworkChangedDiagnostics(currentDiagnostics) ||
+      String(navigationError ?? '').includes('net::ERR_NETWORK_CHANGED')
+
+    if (!retriable || attempt === 2) {
+      if (navigationError && currentDiagnostics.length === 0) {
+        throw navigationError
+      }
+      return
+    }
+  }
+}
+
+const readStableElementBox = async (locator: Locator) => {
+  await expect(locator).toBeVisible()
+
+  return locator.evaluate(
+    async (element): Promise<{
+      height: number
+      width: number
+      x: number
+      y: number
+    }> => {
+      const readBox = () => {
+        const rect = element.getBoundingClientRect()
+        return {
+          height: rect.height,
+          width: rect.width,
+          x: rect.left,
+          y: rect.top,
+        }
+      }
+      const distance = (
+        left: ReturnType<typeof readBox>,
+        right: ReturnType<typeof readBox>,
+      ) =>
+        Math.max(
+          Math.abs(left.x - right.x),
+          Math.abs(left.y - right.y),
+          Math.abs(left.width - right.width),
+          Math.abs(left.height - right.height),
+        )
+
+      let previous = readBox()
+      for (let attempt = 0; attempt < 8; attempt += 1) {
+        await new Promise<void>((resolve) => {
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+        })
+        const next = readBox()
+        if (distance(previous, next) <= 0.5) return next
+        previous = next
+      }
+      return previous
+    },
+  )
+}
+
 const exerciseAuditState = async (
   page: Page,
   component: (typeof auditComponents)[number],
@@ -242,10 +340,11 @@ const assertComponentChunkDomLayout = async (
 ) => {
   const issues: DomLayoutIssue[] = []
 
-  await page.goto(buildDomBoundaryUrl(state, testInfo.project.name), {
-    waitUntil: 'networkidle',
-  })
-  await waitForStableLayout(page)
+  await gotoDomRoute(
+    page,
+    buildDomBoundaryUrl(state, testInfo.project.name),
+    '[data-audit-component]',
+  )
 
   await expect(page.locator('[data-audit-component]')).toHaveCount(
     auditComponents.length,
@@ -308,10 +407,11 @@ test('tree-v2 exposes tokenized scroll motion state and recovers', async ({
   page,
 }, testInfo) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' })
-  await page.goto(buildDomVisualUrl('data', testInfo.project.name), {
-    waitUntil: 'networkidle',
-  })
-  await waitForStableLayout(page)
+  await gotoDomRoute(
+    page,
+    buildDomVisualUrl('data', testInfo.project.name),
+    '[data-testid="tree-v2-container"]',
+  )
 
   await assertScrollMotionState(
     page.locator('[data-testid="tree-v2-container"] .el-vl__wrapper').first(),
@@ -330,10 +430,11 @@ test('tree-v2 virtual scrollbar drag keeps motion and avoids clipped thumb caps'
   page,
 }, testInfo) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' })
-  await page.goto(buildDomVisualUrl('data', testInfo.project.name), {
-    waitUntil: 'networkidle',
-  })
-  await waitForStableLayout(page)
+  await gotoDomRoute(
+    page,
+    buildDomVisualUrl('data', testInfo.project.name),
+    '[data-testid="tree-v2-container"]',
+  )
 
   const wrapper = page
     .locator('[data-testid="tree-v2-container"] .el-vl__wrapper')
@@ -423,10 +524,11 @@ test('scrollbar exposes tokenized scroll motion state and recovers', async ({
 }, testInfo) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' })
 
-  await page.goto(buildDomVisualUrl('basic', testInfo.project.name), {
-    waitUntil: 'networkidle',
-  })
-  await waitForStableLayout(page)
+  await gotoDomRoute(
+    page,
+    buildDomVisualUrl('basic', testInfo.project.name),
+    '.demo-block',
+  )
 
   const scrollbarBlock = page.locator('.demo-block', { hasText: 'Scrollbar' })
   const scrollbar = scrollbarBlock.locator('.el-scrollbar').first()
@@ -506,10 +608,11 @@ test('slider drag exposes smooth tokenized follow motion', async ({
   page,
 }, testInfo) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' })
-  await page.goto(buildDomVisualUrl('form', testInfo.project.name), {
-    waitUntil: 'networkidle',
-  })
-  await waitForStableLayout(page)
+  await gotoDomRoute(
+    page,
+    buildDomVisualUrl('form', testInfo.project.name),
+    '.demo-block',
+  )
 
   const sliderBlock = page.locator('.demo-block').filter({
     has: page.getByRole('heading', { exact: true, name: 'Slider' }),
@@ -630,10 +733,11 @@ test('carousel drag exposes threshold motion without screenshots', async ({
   page,
 }, testInfo) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' })
-  await page.goto(buildDomBoundaryUrl('active', testInfo.project.name), {
-    waitUntil: 'networkidle',
-  })
-  await waitForStableLayout(page)
+  await gotoDomRoute(
+    page,
+    buildDomBoundaryUrl('active', testInfo.project.name),
+    '[data-audit-component="ElCarousel"] .el-carousel',
+  )
 
   const carousel = page
     .locator('[data-audit-component="ElCarousel"] .el-carousel')
@@ -704,10 +808,11 @@ test('time picker spinner scroll stays frame-coalesced and recovers', async ({
   page,
 }, testInfo) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' })
-  await page.goto(buildDomVisualUrl('form', testInfo.project.name), {
-    waitUntil: 'networkidle',
-  })
-  await waitForStableLayout(page)
+  await gotoDomRoute(
+    page,
+    buildDomVisualUrl('form', testInfo.project.name),
+    '.demo-block',
+  )
 
   await page.locator('input[placeholder="Pick time"]').first().click()
 
@@ -747,10 +852,11 @@ test('time picker spinner scroll stays frame-coalesced and recovers', async ({
 test('table scroll bridge and column resize stay frame-coalesced', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildDomVisualUrl('data', testInfo.project.name), {
-    waitUntil: 'networkidle',
-  })
-  await waitForStableLayout(page)
+  await gotoDomRoute(
+    page,
+    buildDomVisualUrl('data', testInfo.project.name),
+    '.demo-block',
+  )
 
   const block = page.locator('.demo-block').filter({
     has: page.getByRole('heading', {
@@ -823,10 +929,11 @@ test('color picker drag updates from cached geometry without sticky state', asyn
   page,
 }, testInfo) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' })
-  await page.goto(buildDomVisualUrl('form', testInfo.project.name), {
-    waitUntil: 'networkidle',
-  })
-  await waitForStableLayout(page)
+  await gotoDomRoute(
+    page,
+    buildDomVisualUrl('form', testInfo.project.name),
+    '.demo-block',
+  )
 
   const block = page.locator('.demo-block').filter({
     has: page.getByRole('heading', { exact: true, name: 'ColorPicker' }),
@@ -836,10 +943,24 @@ test('color picker drag updates from cached geometry without sticky state', asyn
   const panel = page.locator('.el-color-svpanel').last()
   const cursor = panel.locator('.el-color-svpanel__cursor')
   await expect(panel).toBeVisible()
+  await waitForStableLayout(page)
+  await expect
+    .poll(
+      () =>
+        cursor.evaluate(
+          (element) =>
+            Number.parseFloat((element as HTMLElement).style.top) || 0,
+        ),
+      {
+        message: 'ColorPicker cursor initializes before cached drag geometry',
+        timeout: 1200,
+      },
+    )
+    .toBeGreaterThan(0)
 
-  const box = await panel.boundingBox()
-  expect(box).not.toBeNull()
-  if (!box) return
+  const box = await readStableElementBox(panel)
+  expect(box.width).toBeGreaterThan(0)
+  expect(box.height).toBeGreaterThan(0)
 
   await page.mouse.move(box.x + box.width * 0.2, box.y + box.height * 0.8)
   await page.mouse.down()
@@ -894,10 +1015,11 @@ test('color picker drag updates from cached geometry without sticky state', asyn
 test('feedback dialog keeps a stable mobile footer layout', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildDomVisualUrl('feedback', testInfo.project.name), {
-    waitUntil: 'networkidle',
-  })
-  await waitForStableLayout(page)
+  await gotoDomRoute(
+    page,
+    buildDomVisualUrl('feedback', testInfo.project.name),
+    '.demo-block',
+  )
 
   await page
     .locator('.demo-block', { hasText: 'Dialog / Drawer' })
@@ -960,10 +1082,11 @@ test('basic touch controls do not leave sticky hover or focus surfaces', async (
   page,
 }, testInfo) => {
   await skipUnlessTouchViewport(page)
-  await page.goto(buildDomVisualUrl('basic', testInfo.project.name), {
-    waitUntil: 'networkidle',
-  })
-  await waitForStableLayout(page)
+  await gotoDomRoute(
+    page,
+    buildDomVisualUrl('basic', testInfo.project.name),
+    '.demo-block',
+  )
 
   await expectNoStickyTouchSurface(
     page
@@ -993,10 +1116,11 @@ test('navigation touch controls do not leave sticky hover surfaces', async ({
   page,
 }, testInfo) => {
   await skipUnlessTouchViewport(page)
-  await page.goto(buildDomVisualUrl('navigation', testInfo.project.name), {
-    waitUntil: 'networkidle',
-  })
-  await waitForStableLayout(page)
+  await gotoDomRoute(
+    page,
+    buildDomVisualUrl('navigation', testInfo.project.name),
+    '.demo-block',
+  )
 
   await expectNoStickyTouchSurface(
     page.locator('.el-sub-menu__title').first(),
@@ -1023,10 +1147,11 @@ test('data touch controls do not leave sticky hover surfaces', async ({
   page,
 }, testInfo) => {
   await skipUnlessTouchViewport(page)
-  await page.goto(buildDomVisualUrl('data', testInfo.project.name), {
-    waitUntil: 'networkidle',
-  })
-  await waitForStableLayout(page)
+  await gotoDomRoute(
+    page,
+    buildDomVisualUrl('data', testInfo.project.name),
+    '.demo-block',
+  )
 
   await expectNoStickyTouchSurface(page.locator('.el-pager li').nth(1), {
     maxBackgroundAlpha: 1,
@@ -1059,10 +1184,11 @@ test('select touch option does not leave sticky hover surfaces', async ({
   page,
 }, testInfo) => {
   await skipUnlessTouchViewport(page)
-  await page.goto(buildDomVisualUrl('form', testInfo.project.name), {
-    waitUntil: 'networkidle',
-  })
-  await waitForStableLayout(page)
+  await gotoDomRoute(
+    page,
+    buildDomVisualUrl('form', testInfo.project.name),
+    '.demo-block',
+  )
 
   await page
     .locator('.demo-block')
@@ -1088,10 +1214,11 @@ test('select-v2 touch option does not leave sticky hover surfaces', async ({
   page,
 }, testInfo) => {
   await skipUnlessTouchViewport(page)
-  await page.goto(buildDomVisualUrl('form', testInfo.project.name), {
-    waitUntil: 'networkidle',
-  })
-  await waitForStableLayout(page)
+  await gotoDomRoute(
+    page,
+    buildDomVisualUrl('form', testInfo.project.name),
+    '.demo-block',
+  )
 
   await page
     .locator('.demo-block')

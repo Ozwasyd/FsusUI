@@ -1,13 +1,16 @@
-/* eslint-disable import/first */
-let isClientMocked = false
-
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cAF, rAF } from '..'
 
-vi.mock('@vueuse/core', () => ({
+const clientState = vi.hoisted(() => ({
+  isClient: false,
+}))
+
+vi.mock('../browser', () => ({
   get isClient() {
-    return isClientMocked
+    return clientState.isClient
   },
+  isFirefox: () => false,
+  isIOS: false,
 }))
 
 describe('raf', () => {
@@ -20,7 +23,7 @@ describe('raf', () => {
   })
 
   it('CSR should work', () => {
-    isClientMocked = true
+    clientState.isClient = true
 
     const fn = vi.fn()
     rAF(() => fn('first'))
@@ -62,7 +65,7 @@ describe('raf', () => {
   })
 
   it('SSR should work', () => {
-    isClientMocked = false
+    clientState.isClient = false
 
     const fn = vi.fn()
     rAF(() => fn('first'))

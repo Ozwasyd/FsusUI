@@ -27,6 +27,21 @@ describe('<upload />', () => {
       await nextTick()
       expect(wrapper.find('.el-upload-dragger').exists()).toBe(true)
     })
+
+    test('media field rendering', () => {
+      const wrapper = mount(() => (
+        <Upload mediaField mediaAspectRatio="1200 / 630">
+          <div class="media-surface">{AXIOM}</div>
+        </Upload>
+      ))
+
+      expect(wrapper.classes()).toContain('el-upload-field')
+      expect(wrapper.classes()).toContain('is-media-field')
+      expect(wrapper.attributes('style')).toContain(
+        '--el-upload-media-aspect-ratio: 1200 / 630'
+      )
+      expect(wrapper.find('.media-surface').text()).toBe(AXIOM)
+    })
   })
 
   describe('functionality', () => {

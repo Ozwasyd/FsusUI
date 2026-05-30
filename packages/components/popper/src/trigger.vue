@@ -10,7 +10,7 @@
 <script lang="ts" setup>
 import { computed, inject, onBeforeUnmount, onMounted, useAttrs, watch } from 'vue'
 import { isNil } from 'lodash-unified'
-import { unrefElement } from '@vueuse/core'
+import { unrefElement } from '@element-plus/hooks/use-runtime'
 import { ElOnlyChild } from '@element-plus/components/slot'
 import { useForwardRef } from '@element-plus/hooks'
 import { isElement } from '@element-plus/utils'

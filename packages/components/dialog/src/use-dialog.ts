@@ -6,7 +6,7 @@ import {
   ref,
   watch,
 } from 'vue'
-import { useTimeoutFn } from '@vueuse/core'
+import { useTimeoutFn } from '@element-plus/hooks/use-runtime'
 
 import { isUndefined } from 'lodash-unified'
 import {

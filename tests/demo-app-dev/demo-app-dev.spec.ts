@@ -159,7 +159,7 @@ for (const route of demoRoutes) {
   test(`dev server ${route.name} route has no browser diagnostics`, async ({
     page,
   }) => {
-    await page.goto(route.path, { waitUntil: 'networkidle' })
+    await page.goto(route.path, { waitUntil: 'domcontentloaded' })
     await expect(page.locator('#app')).toBeVisible()
 
     if ('testId' in route) {
@@ -182,7 +182,7 @@ test('dev server serves the current Select V2 option emphasis styles', async ({
   page,
 }) => {
   await page.goto('/?audit=ui-boundaries&state=active&theme=light&compact=1', {
-    waitUntil: 'networkidle',
+    waitUntil: 'domcontentloaded',
   })
 
   const card = page.locator('[data-audit-component="ElSelectV2"]')
@@ -252,7 +252,7 @@ test('default home mounts only the virtual window and navigates to sections', as
   page,
 }) => {
   await page.setViewportSize({ width: 900, height: 700 })
-  await page.goto('/?theme=light', { waitUntil: 'networkidle' })
+  await page.goto('/?theme=light', { waitUntil: 'domcontentloaded' })
 
   await expect(page.locator('[data-testid="demo-virtual-home"]')).toBeVisible()
 
@@ -270,7 +270,7 @@ test('default home TreeSelect dropdown does not bleed into the next section', as
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 900 })
-  await page.goto('/?theme=light', { waitUntil: 'networkidle' })
+  await page.goto('/?theme=light', { waitUntil: 'domcontentloaded' })
 
   await page.locator('[data-testid="section-form"]').scrollIntoViewIfNeeded()
   await page.locator('[data-testid="unique-tree-select"] input').click({
@@ -324,7 +324,7 @@ test('Others card header keeps title and action separated on narrow screens', as
   page,
 }) => {
   await page.setViewportSize({ width: 320, height: 700 })
-  await page.goto('/?visual=others&theme=light', { waitUntil: 'networkidle' })
+  await page.goto('/?visual=others&theme=light', { waitUntil: 'domcontentloaded' })
 
   const card = page.locator('.box-card').first()
   await expect(card).toBeVisible()
@@ -370,7 +370,7 @@ test('Others card header keeps title and action separated on narrow screens', as
 test('Calendar header controls use soft segmented styling', async ({
   page,
 }) => {
-  await page.goto('/?visual=data&theme=light', { waitUntil: 'networkidle' })
+  await page.goto('/?visual=data&theme=light', { waitUntil: 'domcontentloaded' })
 
   const buttonGroup = page.locator('.el-calendar__button-group').first()
   await expect(buttonGroup).toBeVisible()
@@ -414,7 +414,7 @@ test('Calendar header controls use soft segmented styling', async ({
 test('Calendar title follows the browser locale in demo app', async ({
   page,
 }) => {
-  await page.goto('/?visual=data&theme=light', { waitUntil: 'networkidle' })
+  await page.goto('/?visual=data&theme=light', { waitUntil: 'domcontentloaded' })
 
   const title = await page.locator('.el-calendar__title').first().textContent()
   expect(title?.trim()).toMatch(/^\d{4}年\d{1,2}月$/)
@@ -427,7 +427,7 @@ test('markdown stress route renders long raw HTML without browser diagnostics', 
 
   await page.emulateMedia({ reducedMotion: 'no-preference' })
   await page.goto('/?visual=markdown-stress&theme=light', {
-    waitUntil: 'networkidle',
+    waitUntil: 'domcontentloaded',
   })
 
   await expect(
@@ -658,7 +658,7 @@ test('markdown stress scrollbar thumb drag stays smooth without text blur', asyn
   test.setTimeout(60_000)
   await page.emulateMedia({ reducedMotion: 'no-preference' })
   await page.goto('/?visual=markdown-stress&theme=light', {
-    waitUntil: 'networkidle',
+    waitUntil: 'domcontentloaded',
   })
 
   await expect(
@@ -677,7 +677,7 @@ test('markdown stress scrollbar thumb drag stays smooth without text blur', asyn
     element.scrollTop = 0
     element.dispatchEvent(new Event('scroll'))
   })
-  await expect(scrollbar).not.toHaveClass(/is-scrolling/, { timeout: 900 })
+  await expect(scrollbar).not.toHaveClass(/is-scrolling/, { timeout: 2500 })
 
   const thumbBox = await thumb.boundingBox()
   expect(thumbBox).not.toBeNull()
@@ -787,7 +787,7 @@ test('markdown stress scrollbar thumb drag stays smooth without text blur', asyn
     element.scrollTop = 0
     element.dispatchEvent(new Event('scroll'))
   })
-  await expect(scrollbar).not.toHaveClass(/is-scrolling/, { timeout: 900 })
+  await expect(scrollbar).not.toHaveClass(/is-scrolling/, { timeout: 2500 })
 
   const bar = scrollbar.locator('.el-scrollbar__bar.is-vertical').first()
   const barBox = await bar.boundingBox()

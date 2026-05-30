@@ -301,7 +301,7 @@ import {
   toRefs,
   unref,
 } from 'vue'
-import { useResizeObserver } from '@vueuse/core'
+import { useResizeObserver } from '@element-plus/hooks/use-runtime'
 import { placements } from '@popperjs/core'
 import { ClickOutside } from '@element-plus/directives'
 import { useId, useLocale, useNamespace } from '@element-plus/hooks'

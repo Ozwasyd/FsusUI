@@ -6,18 +6,25 @@ import type { VirtualizedProps } from '../props'
 const MAX_MEMOIZED_STYLE_CACHE = 64
 
 const memoizeWithLimit = <T extends (...args: any[]) => any>(fn: T) => {
-  const cache = new Map<string, ReturnType<T>>()
+  const cache: Array<{
+    args: Parameters<T>
+    value: ReturnType<T>
+  }> = []
   return ((...args: Parameters<T>) => {
-    const key = JSON.stringify(args)
-    const cached = cache.get(key)
-    if (cached) return cached
+    const cachedIndex = cache.findIndex(
+      (entry) =>
+        entry.args.length === args.length &&
+        entry.args.every((value, index) => Object.is(value, args[index])),
+    )
+    if (cachedIndex >= 0) {
+      const [cached] = cache.splice(cachedIndex, 1)
+      cache.push(cached)
+      return cached.value
+    }
 
     const value = fn(...args)
-    cache.set(key, value)
-    if (cache.size > MAX_MEMOIZED_STYLE_CACHE) {
-      const firstKey = cache.keys().next().value
-      if (firstKey) cache.delete(firstKey)
-    }
+    cache.push({ args, value })
+    if (cache.length > MAX_MEMOIZED_STYLE_CACHE) cache.shift()
     return value
   }) as T
 }

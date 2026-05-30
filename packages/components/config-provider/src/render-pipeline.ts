@@ -9,6 +9,14 @@ export const renderPipelineWorkerModes = [
 export type RenderPipelineWorkerMode =
   (typeof renderPipelineWorkerModes)[number]
 
+export const renderPipelineAdaptiveModes = [
+  'auto',
+  'enabled',
+  'disabled',
+] as const
+export type RenderPipelineAdaptiveMode =
+  (typeof renderPipelineAdaptiveModes)[number]
+
 export const renderPipelineHardwareModes = ['auto', 'gpu', 'cpu'] as const
 export type RenderPipelineHardwareMode =
   (typeof renderPipelineHardwareModes)[number]
@@ -41,6 +49,7 @@ export type RenderPipelineAccelerationConfig = {
 }
 
 export type RenderPipelineConfigContract = {
+  adaptive?: RenderPipelineAdaptiveMode
   mode?: RenderPipelineMode
   worker?: RenderPipelineWorkerMode
   thresholds?: RenderPipelineThresholds
@@ -49,6 +58,7 @@ export type RenderPipelineConfigContract = {
 }
 
 export type ResolvedRenderPipelineConfig = {
+  adaptive: RenderPipelineAdaptiveMode
   mode: RenderPipelineMode
   worker: RenderPipelineWorkerMode
   thresholds: Required<RenderPipelineThresholds>
@@ -57,6 +67,7 @@ export type ResolvedRenderPipelineConfig = {
 }
 
 export const defaultRenderPipelineConfig: ResolvedRenderPipelineConfig = {
+  adaptive: 'auto',
   mode: 'auto',
   worker: 'auto',
   thresholds: {
@@ -87,6 +98,11 @@ const normalizeWorkerMode = (mode?: string): RenderPipelineWorkerMode =>
     ? (mode as RenderPipelineWorkerMode)
     : defaultRenderPipelineConfig.worker
 
+const normalizeAdaptiveMode = (mode?: string): RenderPipelineAdaptiveMode =>
+  renderPipelineAdaptiveModes.includes(mode as RenderPipelineAdaptiveMode)
+    ? (mode as RenderPipelineAdaptiveMode)
+    : defaultRenderPipelineConfig.adaptive
+
 const normalizeHardwareMode = (mode?: string): RenderPipelineHardwareMode =>
   renderPipelineHardwareModes.includes(mode as RenderPipelineHardwareMode)
     ? (mode as RenderPipelineHardwareMode)
@@ -107,6 +123,7 @@ const normalizePositiveNumber = (value: unknown, fallback: number) =>
 export const normalizeRenderPipelineConfig = (
   config?: RenderPipelineConfigContract | null,
 ): ResolvedRenderPipelineConfig => ({
+  adaptive: normalizeAdaptiveMode(config?.adaptive),
   mode: normalizeMode(config?.mode),
   worker: normalizeWorkerMode(config?.worker),
   thresholds: {
@@ -165,6 +182,7 @@ export const isRenderPipelineConfigValid = (
 ) =>
   (!config.mode || renderPipelineModes.includes(config.mode)) &&
   (!config.worker || renderPipelineWorkerModes.includes(config.worker)) &&
+  (!config.adaptive || renderPipelineAdaptiveModes.includes(config.adaptive)) &&
   (!config.acceleration?.mode ||
     renderPipelineHardwareModes.includes(config.acceleration.mode)) &&
   (!config.acceleration?.compositor ||

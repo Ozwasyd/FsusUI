@@ -1,5 +1,5 @@
 import { watch } from 'vue'
-import { useEventListener } from '@vueuse/core'
+import { useEventListener } from '../use-runtime'
 import type { Ref } from 'vue'
 
 export const usePreventGlobal = <E extends keyof DocumentEventMap>(

@@ -1,6 +1,6 @@
 # MarkdownRenderer Markdown 渲染器
 
-基于 FsusBlog raw HTML Markdown WASM 渲染器的无样式组件。
+基于 FsusBlog Markdown WASM 渲染器的无样式组件。
 
 > 该组件只负责输出 raw HTML，不包含 Markdown 排版样式，也不会内置激活 Mermaid 或 KaTeX。
 
@@ -31,7 +31,9 @@ WASM 渲染器会保留 Mermaid、LaTeX/KaTeX 相关的 HTML、MathML、SVG 或 
 
 ## Raw HTML 安全边界
 
-`allow-html` 默认关闭。默认情况下，Markdown 源码中的 HTML 会被转义，避免把不可信内容直接注入页面。只有在调用方确认内容可信时才应开启 `allow-html`。
+`allow-html` 默认关闭。默认情况下，Markdown 源码中的 HTML 会被转义，避免把不可信内容直接注入页面。组件提交到 DOM 前还会默认执行一层 HTML sanitize，覆盖 `initial-html`、HTML fast path、完整结果和 chunked 结果。
+
+只有在调用方确认内容可信时才应开启 `allow-html`。如业务已经在上游完成可信 HTML 过滤，并且需要保留完整 HTML 能力，可以显式设置 `:sanitize-html="false"` 关闭组件层 sanitize。
 
 ## Fsus 显式段落组
 
@@ -128,6 +130,7 @@ chunk 边界由 WASM 渲染流程产出，类型包括 `heading`、`paragraph`�
 | content       | Markdown 源文本                     | `string`                                        | `''`      |
 | initial-html  | 初始 HTML，用于首帧占位             | `string`                                        | `''`      |
 | allow-html    | 是否允许 Markdown 源码中的 raw HTML | `boolean`                                       | `false`   |
+| sanitize-html | DOM 提交前是否清理不安全 HTML       | `boolean`                                       | `true`    |
 | allow-latex   | 是否启用 LaTeX/MathML 输出          | `boolean`                                       | `true`    |
 | allow-mermaid | 是否启用 Mermaid 输出               | `boolean`                                       | `true`    |
 | mode          | 渲染模式元数据                      | `'article' \| 'about' \| 'preview' \| 'editor'` | `article` |

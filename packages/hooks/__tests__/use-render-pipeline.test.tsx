@@ -5,22 +5,30 @@ import {
   chooseFsusRenderPipelineStrategy,
   clearFsusRenderPipelineAdapters,
   clearFsusRenderPipelineComponentPolicies,
+  clearFsusRenderPipelineDiagnostics,
   clearFsusRenderPipelineStrategyResolvers,
   createFsusWorkerExecutor,
+  createFsusRenderPipelineDiagnosticsBuffer,
+  getFsusRenderPipelineDiagnosticsSnapshot,
   getFsusRenderPipelineAdapter,
   getFsusRenderPipelineComponentPolicy,
+  registerFsusRenderPipelineDiagnosticSink,
   registerFsusRenderPipelineAdapter,
   registerFsusRenderPipelineComponentPolicy,
   registerFsusRenderPipelineStrategyResolver,
+  resolveFsusAdaptiveRenderPipelineConfig,
   resolveFsusRenderPipelineCompositorEnabled,
   resolveFsusRenderPipelineComponentPolicy,
   resolveFsusRenderPipelineCache,
   resolveFsusRenderPipelineConfig,
   resolveFsusRenderPipelineContentVisibilityEnabled,
   resolveFsusRenderPipelineHardwareProfile,
+  resolveFsusRenderPipelineHardwareAttrs,
+  resolveFsusRenderPipelineUnitAttrs,
   shouldUseFsusRenderPipeline,
   useFsusRenderPipelineHardwareProfile,
   useFsusRenderPipelineRuntime,
+  useFsusRenderScheduler,
   useFsusVirtualWindow,
 } from '../use-render-pipeline'
 
@@ -76,6 +84,7 @@ class TestWorker {
 describe('use-render-pipeline', () => {
   afterEach(() => {
     TestWorker.instances = []
+    clearFsusRenderPipelineDiagnostics()
     vi.unstubAllGlobals()
     vi.useRealTimers()
   })
@@ -138,6 +147,41 @@ describe('use-render-pipeline', () => {
     ).toBe(true)
   })
 
+  it('adapts render budgets within the configured clamp', () => {
+    const config = resolveFsusRenderPipelineConfig({
+      adaptive: 'enabled',
+      budget: { frameMs: 8, measureBatch: 32, overscanPx: 800 },
+    })
+
+    const degraded = resolveFsusAdaptiveRenderPipelineConfig(
+      config,
+      'cpu-threaded',
+      { queueDepth: 3, renderDurationMs: 80 },
+    )
+    expect(degraded.budget.frameMs).toBeGreaterThanOrEqual(4)
+    expect(degraded.budget.frameMs).toBeLessThan(config.budget.frameMs)
+    expect(degraded.budget.measureBatch).toBeGreaterThanOrEqual(16)
+    expect(degraded.budget.overscanPx).toBeGreaterThanOrEqual(400)
+
+    const expanded = resolveFsusAdaptiveRenderPipelineConfig(
+      config,
+      'gpu-compositor',
+      { queueDepth: 0, renderDurationMs: 1 },
+    )
+    expect(expanded.budget.measureBatch).toBeGreaterThan(
+      config.budget.measureBatch,
+    )
+    expect(expanded.budget.overscanPx).toBeGreaterThan(config.budget.overscanPx)
+
+    const disabledConfig = { ...config, adaptive: 'disabled' as const }
+    const disabled = resolveFsusAdaptiveRenderPipelineConfig(
+      disabledConfig,
+      'cpu-threaded',
+      { queueDepth: 9, renderDurationMs: 1_000 },
+    )
+    expect(disabled).toBe(disabledConfig)
+  })
+
   it('exposes hardware attrs through the runtime hook', () => {
     let hardware:
       | ReturnType<typeof useFsusRenderPipelineHardwareProfile>
@@ -182,6 +226,52 @@ describe('use-render-pipeline', () => {
     wrapper.unmount()
   })
 
+  it('derives per-unit DOM performance attrs from the shared layer budget', () => {
+    const baseAttrs = resolveFsusRenderPipelineHardwareAttrs({
+      compositor: true,
+      contentVisibility: true,
+      hardwareProfile: 'gpu-compositor',
+      layerBudget: 2,
+    })
+
+    expect(
+      resolveFsusRenderPipelineUnitAttrs({
+        baseAttrs,
+        layerBudget: 2,
+        unitIndex: 1,
+      }),
+    ).toMatchObject({
+      'data-fsus-compositor': 'enabled',
+      'data-fsus-content-visibility': 'enabled',
+      'data-fsus-render-layer-budget': '2',
+    })
+
+    expect(
+      resolveFsusRenderPipelineUnitAttrs({
+        baseAttrs,
+        layerBudget: 2,
+        unitIndex: 2,
+      }),
+    ).toMatchObject({
+      'data-fsus-compositor': 'disabled',
+      'data-fsus-content-visibility': 'enabled',
+      'data-fsus-render-layer-budget': '2',
+    })
+
+    expect(
+      resolveFsusRenderPipelineUnitAttrs({
+        baseAttrs,
+        disableContentVisibilityOnOverflow: true,
+        layerBudget: 2,
+        renderedCount: 3,
+      }),
+    ).toMatchObject({
+      'data-fsus-compositor': 'disabled',
+      'data-fsus-content-visibility': 'disabled',
+      'data-fsus-render-layer-budget': '2',
+    })
+  })
+
   it('allows render strategies to be hot-plugged without component changes', () => {
     const config = resolveFsusRenderPipelineConfig()
     const unregister = registerFsusRenderPipelineStrategyResolver((context) =>
@@ -223,6 +313,42 @@ describe('use-render-pipeline', () => {
     )
 
     unregisterLow()
+  })
+
+  it('schedules render tasks by priority and supports cancellation', async () => {
+    const frames: FrameRequestCallback[] = []
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      frames.push(callback)
+      return frames.length
+    })
+    vi.stubGlobal('cancelAnimationFrame', vi.fn())
+
+    const calls: string[] = []
+    let scheduler: ReturnType<typeof useFsusRenderScheduler> | undefined
+    const Probe = defineComponent({
+      setup() {
+        scheduler = useFsusRenderScheduler(ref({ frameMs: 100 }))
+        return () => h('div')
+      },
+    })
+
+    const wrapper = mount(Probe)
+    scheduler!.schedule(() => calls.push('background'), {
+      priority: 'background',
+    })
+    const cancelVisible = scheduler!.schedule(() => calls.push('visible'), {
+      priority: 'visible',
+    })
+    scheduler!.schedule(() => calls.push('user-blocking'), {
+      priority: 'user-blocking',
+    })
+    cancelVisible()
+
+    frames.shift()?.(0)
+    await nextTick()
+
+    expect(calls).toEqual(['user-blocking', 'background'])
+    wrapper.unmount()
   })
 
   it('registers component render policies separately from component code', () => {
@@ -302,6 +428,53 @@ describe('use-render-pipeline', () => {
     unregisterPolicy()
     unregisterAdapter()
     clearFsusRenderPipelineAdapters()
+  })
+
+  it('publishes diagnostics through local and registered buffers', async () => {
+    const buffer = createFsusRenderPipelineDiagnosticsBuffer(2)
+    const unregisterSink = registerFsusRenderPipelineDiagnosticSink((event) =>
+      buffer.push(event),
+    )
+    let pipeline:
+      | ReturnType<typeof useFsusRenderPipelineRuntime<string, string>>
+      | undefined
+
+    const Probe = defineComponent({
+      setup() {
+        pipeline = useFsusRenderPipelineRuntime<string, string>({
+          adapter: {
+            id: 'diagnostic-runtime',
+            canUseWorker: () => false,
+            estimate: () => ({ items: 900 }),
+            estimateSize: () => 20,
+            fingerprint: (value) => value,
+            keyOf: (unit) => unit,
+            prepare: async (value) => ({ units: [value] }),
+          },
+          config: { mode: 'enabled' },
+          source: 'diagnostic source',
+        })
+        return () => h('div')
+      },
+    })
+
+    const wrapper = mount(Probe)
+    await pipeline!.render()
+
+    expect(pipeline!.diagnostics.value[0]).toMatchObject({
+      adapterId: 'diagnostic-runtime',
+      cache: 'miss',
+      type: 'render-start',
+    })
+    expect(buffer.snapshot()).toHaveLength(2)
+    expect(
+      getFsusRenderPipelineDiagnosticsSnapshot().some(
+        (event) => event.adapterId === 'diagnostic-runtime',
+      ),
+    ).toBe(true)
+
+    unregisterSink()
+    wrapper.unmount()
   })
 
   it('derives virtual cache from the shared render budget only for chunked strategies', () => {
@@ -395,6 +568,44 @@ describe('use-render-pipeline', () => {
     await nextTick()
 
     expect(wrapper.find('[data-row="row-7"]').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('supports an opt-in initial floor for virtual window items', () => {
+    const units = ref(
+      Array.from({ length: 10 }, (_, index) => ({
+        key: `chunk-${index}`,
+        label: `Chunk ${index}`,
+      })),
+    )
+
+    const Probe = defineComponent({
+      setup() {
+        const virtualWindow = useFsusVirtualWindow({
+          estimateSize: () => 400,
+          getKey: (unit) => unit.key,
+          getViewport: () => null,
+          minVisibleItems: ref(3),
+          overscanPx: ref(0),
+          units,
+        })
+
+        return () =>
+          h(
+            'div',
+            virtualWindow.visibleItems.value.map((item) =>
+              h('div', { 'data-row': item.key }, item.unit.label),
+            ),
+          )
+      },
+    })
+
+    const wrapper = mount(Probe)
+    expect(wrapper.findAll('[data-row]').map((row) => row.text())).toEqual([
+      'Chunk 0',
+      'Chunk 1',
+      'Chunk 2',
+    ])
     wrapper.unmount()
   })
 
@@ -570,6 +781,66 @@ describe('use-render-pipeline', () => {
     expect(pipeline!.renderedStrategy.value).toBe('chunked-worker')
     expect(pipeline!.document.value?.units).toEqual(['worker:source'])
     expect(prepare).not.toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  it('shares worker executors by pool key without coupling runtimes', async () => {
+    vi.stubGlobal('Worker', TestWorker)
+    const adapter = {
+      id: 'shared-worker-runtime',
+      canUseWorker: () => true,
+      estimate: () => ({ items: 800 }),
+      estimateSize: () => 20,
+      fingerprint: (value: string) => value,
+      keyOf: (unit: string) => unit,
+      prepare: async (value: string) => ({ units: [`main:${value}`] }),
+      worker: {
+        createWorker: () => new TestWorker() as unknown as Worker,
+        pool: 'shared' as const,
+        poolKey: 'shared-worker-test',
+        requestTimeoutMs: 1_000,
+      },
+    }
+    const firstSource = ref('first')
+    const secondSource = ref('second')
+    let first:
+      | ReturnType<typeof useFsusRenderPipelineRuntime<string, string>>
+      | undefined
+    let second:
+      | ReturnType<typeof useFsusRenderPipelineRuntime<string, string>>
+      | undefined
+
+    const Probe = defineComponent({
+      setup() {
+        first = useFsusRenderPipelineRuntime<string, string>({
+          adapter,
+          config: { mode: 'enabled', worker: 'enabled' },
+          source: firstSource,
+        })
+        second = useFsusRenderPipelineRuntime<string, string>({
+          adapter,
+          config: { mode: 'enabled', worker: 'enabled' },
+          source: secondSource,
+        })
+        return () => h('div')
+      },
+    })
+
+    const wrapper = mount(Probe)
+    const firstRender = first!.render()
+    const secondRender = second!.render()
+    const worker = TestWorker.instances[0]
+
+    expect(TestWorker.instances).toHaveLength(1)
+    expect(worker.posts).toHaveLength(2)
+
+    worker.resolve({ units: ['worker:first'] }, 0)
+    worker.resolve({ units: ['worker:second'] }, 1)
+    await firstRender
+    await secondRender
+
+    expect(first!.document.value?.units).toEqual(['worker:first'])
+    expect(second!.document.value?.units).toEqual(['worker:second'])
     wrapper.unmount()
   })
 

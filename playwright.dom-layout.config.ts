@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 import {
   createPlaywrightReporter,
-  resolvePlaywrightWorkers,
+  resolveDomLayoutWorkers,
   resolveTestPort,
 } from './scripts/test-parallelism'
 
@@ -14,7 +14,7 @@ export default defineConfig({
   testDir: './tests/dom-layout',
   outputDir: 'test-results/dom-layout',
   fullyParallel: true,
-  workers: resolvePlaywrightWorkers(),
+  workers: resolveDomLayoutWorkers(),
   reporter: createPlaywrightReporter('dom-layout'),
   timeout: 600_000,
   expect: {
@@ -66,7 +66,7 @@ export default defineConfig({
   ],
   webServer: {
     command:
-      `pnpm run ensure:wasm && pnpm -C packages/demo-app exec vite --host 127.0.0.1 --port ${domLayoutPort} --strictPort`,
+      `pnpm run build:demo && pnpm -C packages/demo-app exec vite preview --host 127.0.0.1 --port ${domLayoutPort} --strictPort`,
     url: domLayoutBaseUrl,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

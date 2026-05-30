@@ -44,7 +44,7 @@
 
 <script lang="ts" setup>
 import { computed, inject, onBeforeUnmount, ref, unref, useAttrs, watch } from 'vue'
-import { onClickOutside } from '@vueuse/core'
+import { onClickOutside } from '@element-plus/hooks/use-runtime'
 import { useNamespace, usePopperContainerId } from '@element-plus/hooks'
 import { composeEventHandlers } from '@element-plus/utils'
 import { ElPopperContent } from '@element-plus/components/popper'

@@ -52,7 +52,7 @@ import {
 } from 'vue'
 import AsyncValidator from 'async-validator'
 import { clone } from 'lodash-unified'
-import { refDebounced } from '@vueuse/core'
+import { refDebounced } from '@element-plus/hooks/use-runtime'
 import {
   addUnit,
   createFsusError,
@@ -61,7 +61,6 @@ import {
   fsusOk,
   getProp,
   isBoolean,
-  isFunction,
   isString,
 } from '@element-plus/utils'
 import { useId, useNamespace } from '@element-plus/hooks'

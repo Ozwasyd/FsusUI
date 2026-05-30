@@ -74,6 +74,10 @@ export const buttonProps = buildProps({
    */
   link: Boolean,
   /**
+   * @description render as an inline action with a mobile-safe touch target
+   */
+  inlineAction: Boolean,
+  /**
    * @description determine whether the text button background color is always on
    */
   bg: Boolean,
