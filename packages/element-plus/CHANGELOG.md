@@ -1,5 +1,11 @@
 # element-plus
 
+## 1.4.2
+
+### Patch Changes
+
+- Publish the completed public API surface for theme, icons, WASM, Markdown runtime, PublicShell, MarkdownRenderer, MarkdownEditor, MessageBox, and Result helpers.
+
 ## 1.4.1
 
 ### Patch Changes

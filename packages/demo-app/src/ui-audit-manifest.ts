@@ -58,6 +58,7 @@ export const auditComponentNames = [
   'ElInputNumber',
   'ElLink',
   'ElMain',
+  'ElMarkdownEditor',
   'ElMarkdownRenderer',
   'ElMenu',
   'ElMenuItem',

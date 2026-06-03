@@ -11,9 +11,16 @@
     <div class="audit-grid">
       <AuditCard name="FixedSizeList" :state="auditState">
         <div class="audit-virtual-frame audit-virtual-frame--list">
-          <fixed-size-list :item-size="44" :total="12" :width="260" :height="176">
+          <fixed-size-list
+            :item-size="44"
+            :total="12"
+            :width="260"
+            :height="176"
+          >
             <template #default="{ index, style }">
-              <div :style="style" class="audit-virtual-row">Fixed row {{ index }}</div>
+              <div :style="style" class="audit-virtual-row">
+                Fixed row {{ index }}
+              </div>
             </template>
           </fixed-size-list>
         </div>
@@ -29,7 +36,9 @@
             :height="176"
           >
             <template #default="{ index, style }">
-              <div :style="style" class="audit-virtual-row">Dynamic row {{ index }}</div>
+              <div :style="style" class="audit-virtual-row">
+                Dynamic row {{ index }}
+              </div>
             </template>
           </dynamic-size-list>
         </div>
@@ -116,7 +125,7 @@
       <AuditCard name="ElBacktop" :state="auditState">
         <div class="audit-scroll-shell">
           <div class="audit-scroll-content">Scroll shell</div>
-        <el-backtop :right="16" :bottom="16" :visibility-height="0" />
+          <el-backtop :right="16" :bottom="16" :visibility-height="0" />
         </div>
       </AuditCard>
 
@@ -135,7 +144,11 @@
 
       <AuditCard name="ElBreadcrumbItem" :state="auditState">
         <el-breadcrumb separator="/">
-          <el-breadcrumb-item :to="{ path: '/' }">Current item</el-breadcrumb-item>
+          <el-breadcrumb-item :to="{ path: '/' }"
+            >
+Current item
+</el-breadcrumb-item
+          >
         </el-breadcrumb>
       </AuditCard>
 
@@ -175,7 +188,11 @@
       </AuditCard>
 
       <AuditCard name="ElCarousel" :state="auditState">
-        <el-carousel height="120px" :autoplay="false" :initial-index="active ? 1 : 0">
+        <el-carousel
+          height="120px"
+          :autoplay="false"
+          :initial-index="active ? 1 : 0"
+        >
           <el-carousel-item v-for="item in 3" :key="item">
             <div class="audit-carousel-panel">Slide {{ item }}</div>
           </el-carousel-item>
@@ -183,7 +200,11 @@
       </AuditCard>
 
       <AuditCard name="ElCarouselItem" :state="auditState">
-        <el-carousel height="120px" :autoplay="false" :initial-index="active ? 1 : 0">
+        <el-carousel
+          height="120px"
+          :autoplay="false"
+          :initial-index="active ? 1 : 0"
+        >
           <el-carousel-item>
             <div class="audit-carousel-panel">Carousel item</div>
           </el-carousel-item>
@@ -228,7 +249,11 @@
       </AuditCard>
 
       <AuditCard name="ElCheckTag" :state="auditState">
-        <el-check-tag :checked="active" data-audit-target>Check tag</el-check-tag>
+        <el-check-tag :checked="active" data-audit-target
+          >
+Check tag
+</el-check-tag
+        >
       </AuditCard>
 
       <AuditCard name="ElCol" :state="auditState">
@@ -240,8 +265,16 @@
 
       <AuditCard name="ElCollapse" :state="auditState">
         <el-collapse :model-value="active ? ['1', '2'] : ['1']">
-          <el-collapse-item title="Consistency" name="1">First panel</el-collapse-item>
-          <el-collapse-item title="Interaction" name="2">Second panel</el-collapse-item>
+          <el-collapse-item title="Consistency" name="1"
+            >
+First panel
+</el-collapse-item
+          >
+          <el-collapse-item title="Interaction" name="2"
+            >
+Second panel
+</el-collapse-item
+          >
         </el-collapse>
       </AuditCard>
 
@@ -254,11 +287,17 @@
       </AuditCard>
 
       <AuditCard name="ElCollapseTransition" :state="auditState">
-        <el-button data-audit-target @click="transitionVisible = !transitionVisible">
+        <el-button
+          data-audit-target
+          @click="transitionVisible = !transitionVisible"
+        >
           Toggle
         </el-button>
         <el-collapse-transition>
-          <div v-show="active || transitionVisible" class="audit-transition-box">
+          <div
+            v-show="active || transitionVisible"
+            class="audit-transition-box"
+          >
             Transition content
           </div>
         </el-collapse-transition>
@@ -313,7 +352,11 @@
 
       <AuditCard name="ElDescriptionsItem" :state="auditState">
         <el-descriptions :column="1" border>
-          <el-descriptions-item label="Item">Description cell</el-descriptions-item>
+          <el-descriptions-item label="Item"
+            >
+Description cell
+</el-descriptions-item
+          >
         </el-descriptions>
       </AuditCard>
 
@@ -371,14 +414,23 @@
 
       <AuditCard name="ElDropdown" :state="auditState">
         <el-dropdown trigger="click" :show-timeout="0" :teleported="false">
-          <el-button type="primary" data-audit-focus data-audit-target data-audit-active>
+          <el-button
+            type="primary"
+            data-audit-focus
+            data-audit-target
+            data-audit-active
+          >
             Dropdown
             <el-icon class="el-icon--right"><ArrowDown /></el-icon>
           </el-button>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item>Action one</el-dropdown-item>
-              <el-dropdown-item :disabled="!active">Action two</el-dropdown-item>
+              <el-dropdown-item :disabled="!active"
+                >
+Action two
+</el-dropdown-item
+              >
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -386,7 +438,11 @@
 
       <AuditCard name="ElDropdownItem" :state="auditState">
         <el-dropdown trigger="click" :show-timeout="0" :teleported="false">
-          <el-button data-audit-active data-audit-target>Dropdown item</el-button>
+          <el-button data-audit-active data-audit-target
+            >
+Dropdown item
+</el-button
+          >
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item :divided="active">Item action</el-dropdown-item>
@@ -397,7 +453,11 @@
 
       <AuditCard name="ElDropdownMenu" :state="auditState">
         <el-dropdown trigger="click" :show-timeout="0" :teleported="false">
-          <el-button data-audit-active data-audit-target>Dropdown menu</el-button>
+          <el-button data-audit-active data-audit-target
+            >
+Dropdown menu
+</el-button
+          >
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item>Menu action</el-dropdown-item>
@@ -459,7 +519,11 @@
 
       <AuditCard name="ElImageViewer" :state="auditState">
         <el-image class="audit-image" :src="imageData" fit="cover" />
-        <el-button data-audit-active data-audit-target @click="imageViewerVisible = true">
+        <el-button
+          data-audit-active
+          data-audit-target
+          @click="imageViewerVisible = true"
+        >
           Preview
         </el-button>
         <el-image-viewer
@@ -507,6 +571,18 @@
         </el-container>
       </AuditCard>
 
+      <AuditCard name="ElMarkdownEditor" :state="auditState">
+        <div class="audit-markdown-editor-frame">
+          <el-markdown-editor
+            :model-value="markdownEditorAuditContent"
+            default-mode="split"
+            :min-rows="4"
+            data-audit-focus
+            data-audit-target
+          />
+        </div>
+      </AuditCard>
+
       <AuditCard name="ElMarkdownRenderer" :state="auditState">
         <div class="audit-markdown-frame">
           <el-markdown-renderer :content="markdownAuditContent" />
@@ -514,7 +590,10 @@
       </AuditCard>
 
       <AuditCard name="ElMenu" :state="auditState">
-        <el-menu :default-active="active ? '2' : '1'" :default-openeds="active ? ['sub'] : []">
+        <el-menu
+          :default-active="active ? '2' : '1'"
+          :default-openeds="active ? ['sub'] : []"
+        >
           <el-menu-item index="1">Dashboard</el-menu-item>
           <el-sub-menu index="sub">
             <template #title>Workspace</template>
@@ -575,7 +654,11 @@
           <el-overlay v-if="active" :z-index="1">
             <div class="audit-overlay-panel">Overlay content</div>
           </el-overlay>
-          <el-button v-else data-audit-focus data-audit-target>Overlay trigger</el-button>
+          <el-button v-else data-audit-focus data-audit-target
+            >
+Overlay trigger
+</el-button
+          >
         </div>
       </AuditCard>
 
@@ -595,18 +678,12 @@
           :sticky="false"
           max-width="100%"
         >
-          <p class="audit-public-shell-copy">
-            Public shell content
-          </p>
+          <p class="audit-public-shell-copy">Public shell content</p>
           <template #desktop-actions>
-            <el-button size="small">
-              Action
-            </el-button>
+            <el-button size="small"> Action </el-button>
           </template>
           <template #mobile-actions>
-            <el-button size="small">
-              Go
-            </el-button>
+            <el-button size="small"> Go </el-button>
           </template>
         </el-public-shell>
       </AuditCard>
@@ -665,7 +742,11 @@
           <el-popper-trigger>
             <el-button>Arrow</el-button>
           </el-popper-trigger>
-          <el-popper-content :visible="true"><el-popper-arrow />Arrow content</el-popper-content>
+          <el-popper-content :visible="true"
+            >
+<el-popper-arrow />Arrow content
+</el-popper-content
+          >
         </el-popper>
       </AuditCard>
 
@@ -683,7 +764,11 @@
           <el-popper-trigger>
             <el-button data-audit-focus data-audit-target>Trigger</el-button>
           </el-popper-trigger>
-          <el-popper-content v-if="active" :visible="true" placement="bottom-start">
+          <el-popper-content
+            v-if="active"
+            :visible="true"
+            placement="bottom-start"
+          >
             Triggered content
           </el-popper-content>
         </el-popper>
@@ -797,8 +882,14 @@
       <AuditCard name="ElSkeleton" :state="auditState">
         <el-skeleton style="width: 240px" animated>
           <template #template>
-            <el-skeleton-item variant="image" style="width: 100%; height: 88px" />
-            <el-skeleton-item variant="text" style="width: 80%; margin-top: 12px" />
+            <el-skeleton-item
+              variant="image"
+              style="width: 100%; height: 88px"
+            />
+            <el-skeleton-item
+              variant="text"
+              style="width: 80%; margin-top: 12px"
+            />
           </template>
         </el-skeleton>
       </AuditCard>
@@ -848,7 +939,11 @@
       </AuditCard>
 
       <AuditCard name="ElSwitch" :state="auditState">
-        <el-switch :model-value="active" active-text="Open" inactive-text="Closed" />
+        <el-switch
+          :model-value="active"
+          active-text="Open"
+          inactive-text="Closed"
+        />
       </AuditCard>
 
       <AuditCard name="ElTabPane" :state="auditState">
@@ -960,7 +1055,11 @@
 
       <AuditCard name="ElTimelineItem" :state="auditState">
         <el-timeline>
-          <el-timeline-item timestamp="2026/05/20">Timeline item</el-timeline-item>
+          <el-timeline-item timestamp="2026/05/20"
+            >
+Timeline item
+</el-timeline-item
+          >
         </el-timeline>
       </AuditCard>
 
@@ -1075,7 +1174,7 @@ const props = withDefaults(
     compact: false,
     state: 'focus',
     theme: 'light',
-  }
+  },
 )
 
 const boundaryText =
@@ -1083,10 +1182,10 @@ const boundaryText =
 const auditTitle = computed(() =>
   props.boundary
     ? 'FsusUI Component Boundary Audit'
-    : 'FsusUI Component State Audit'
+    : 'FsusUI Component State Audit',
 )
 const auditState = computed<UiAuditState>(() =>
-  auditStateNames.includes(props.state) ? props.state : 'focus'
+  auditStateNames.includes(props.state) ? props.state : 'focus',
 )
 const active = computed(() => auditState.value === 'active')
 const activeText = computed(() => {
@@ -1102,7 +1201,12 @@ const themeMode = computed(() => (props.theme === 'dark' ? 'dark' : 'light'))
 const markdownAuditContent = computed(() =>
   props.boundary
     ? `# Markdown\n\n${boundaryText}\n\n\`inline-code-boundary-token\``
-    : '# Markdown\n\nCompact rendered content.'
+    : '# Markdown\n\nCompact rendered content.',
+)
+const markdownEditorAuditContent = computed(() =>
+  props.boundary
+    ? `## Editor\n\n${boundaryText}\n\n[Audit link](https://example.com)`
+    : '## Editor\n\nCompact editable content.',
 )
 const shellNavItems = computed(() => [
   {
@@ -1172,7 +1276,9 @@ watch(auditState, () => {
 const cascaderOptions = computed(() => [
   {
     value: 'guide',
-    label: props.boundary ? 'Guide / extremely long discipline branch' : 'Guide',
+    label: props.boundary
+      ? 'Guide / extremely long discipline branch'
+      : 'Guide',
     children: [
       {
         value: 'docs',
@@ -1183,19 +1289,23 @@ const cascaderOptions = computed(() => [
     ],
   },
 ])
-const selectV2Options = computed(() => Array.from({ length: props.boundary ? 24 : 6 }, (_, idx) => ({
-  value: `Option ${idx + 1}`,
-  label: props.boundary
-    ? `Option ${idx + 1} - ${boundaryText}`
-    : `Option ${idx + 1}`,
-})))
-const transferData = computed(() => Array.from({ length: props.boundary ? 18 : 6 }, (_, idx) => ({
-  key: idx + 1,
-  label: props.boundary
-    ? `Option ${idx + 1} - ${boundaryText}`
-    : `Option ${idx + 1}`,
-  disabled: idx === 4,
-})))
+const selectV2Options = computed(() =>
+  Array.from({ length: props.boundary ? 24 : 6 }, (_, idx) => ({
+    value: `Option ${idx + 1}`,
+    label: props.boundary
+      ? `Option ${idx + 1} - ${boundaryText}`
+      : `Option ${idx + 1}`,
+  })),
+)
+const transferData = computed(() =>
+  Array.from({ length: props.boundary ? 18 : 6 }, (_, idx) => ({
+    key: idx + 1,
+    label: props.boundary
+      ? `Option ${idx + 1} - ${boundaryText}`
+      : `Option ${idx + 1}`,
+    disabled: idx === 4,
+  })),
+)
 const formModel = reactive({ name: 'FsusUI', region: 'one' })
 const tableData = computed(() => [
   {
@@ -1221,11 +1331,13 @@ const tableV2Columns = computed(() => [
     width: props.boundary ? 180 : 120,
   },
 ])
-const tableV2Data = computed(() => Array.from({ length: props.boundary ? 80 : 8 }, (_, id) => ({
-  id,
-  name: props.boundary ? `Row ${id} ${boundaryText}` : `Row ${id}`,
-  state: id % 2 === 0 ? 'Ready' : 'Review',
-})))
+const tableV2Data = computed(() =>
+  Array.from({ length: props.boundary ? 80 : 8 }, (_, id) => ({
+    id,
+    name: props.boundary ? `Row ${id} ${boundaryText}` : `Row ${id}`,
+    state: id % 2 === 0 ? 'Ready' : 'Review',
+  })),
+)
 const treeData = computed(() => [
   {
     value: 'level-1',
@@ -1237,35 +1349,44 @@ const treeData = computed(() => [
         children: [
           {
             value: 'level-1-1-1',
-            label: props.boundary ? `Level three ${boundaryText}` : 'Level three',
+            label: props.boundary
+              ? `Level three ${boundaryText}`
+              : 'Level three',
           },
         ],
       },
     ],
   },
 ])
-const treeDataV2 = computed(() => Array.from({ length: props.boundary ? 240 : 80 }, (_, id) => ({
-  id,
-  label: props.boundary ? `Node ${id} ${boundaryText}` : `Node ${id}`,
-  children:
-    id === 0
-      ? [
-          {
-            id: 1000,
-            label: props.boundary ? `Nested node ${boundaryText}` : 'Nested node',
-          },
-        ]
-      : undefined,
-})))
+const treeDataV2 = computed(() =>
+  Array.from({ length: props.boundary ? 240 : 80 }, (_, id) => ({
+    id,
+    label: props.boundary ? `Node ${id} ${boundaryText}` : `Node ${id}`,
+    children:
+      id === 0
+        ? [
+            {
+              id: 1000,
+              label: props.boundary
+                ? `Nested node ${boundaryText}`
+                : 'Nested node',
+            },
+          ]
+        : undefined,
+  })),
+)
 
-const querySearch = (_queryString: string, cb: (items: { value: string }[]) => void) => {
+const querySearch = (
+  _queryString: string,
+  cb: (items: { value: string }[]) => void,
+) => {
   cb(
     props.boundary
       ? [
           { value: `FsusUI ${boundaryText}` },
           { value: `Element Plus ${boundaryText}` },
         ]
-      : [{ value: 'FsusUI' }, { value: 'Element Plus' }]
+      : [{ value: 'FsusUI' }, { value: 'Element Plus' }],
   )
 }
 </script>

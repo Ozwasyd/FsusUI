@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-05-30T09:44:46.972Z",
+  "generatedAt": "2026-06-03T13:21:38.554Z",
   "totals": {
-    "filesScanned": 131,
-    "totalNodes": 1009,
+    "filesScanned": 132,
+    "totalNodes": 1027,
     "totalIssues": 0,
     "totalPotentialSavings": 0,
     "deprecatedSyntaxCount": 0,
@@ -518,6 +518,15 @@
       "file": "packages/components/link/src/link.vue",
       "nodeCount": 6,
       "componentCount": 2,
+      "potentialSavings": 0,
+      "manualReviewCount": 0,
+      "deprecatedSyntax": [],
+      "issues": []
+    },
+    {
+      "file": "packages/components/markdown-editor/src/markdown-editor.vue",
+      "nodeCount": 18,
+      "componentCount": 1,
       "potentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
