@@ -5,8 +5,11 @@ import {
   createFsusError,
   fsusErr,
   fsusOk,
+  getFsusErrorMessage,
   isFsusErr,
   isFsusOk,
+  isFsusResult,
+  isTruthyFsusOk,
 } from '../../packages/element-plus/result'
 
 import type {
@@ -22,6 +25,9 @@ describe('result mode public API', () => {
 
     expect(isFsusOk(ok)).toBe(true)
     expect(isFsusErr(err)).toBe(true)
+    expect(isFsusResult(ok)).toBe(true)
+    expect(isTruthyFsusOk(ok)).toBe(true)
+    expect(getFsusErrorMessage(err, 'fallback')).toBe('runtime unavailable')
     expect(err.error.code).toBe('infra')
   })
 

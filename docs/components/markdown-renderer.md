@@ -2,7 +2,7 @@
 
 基于 FsusBlog Markdown WASM 渲染器的无样式组件。
 
-> 该组件只负责输出 raw HTML，不包含 Markdown 排版样式，也不会内置激活 Mermaid 或 KaTeX。
+> 该组件不携带完整文章排版主题，但会在 DOM 提交后执行通用 feature activation：heading id、hash/external link 属性、CSP nonce、Mermaid/LaTeX 占位符和代码块高亮挂点都会由 FsusUI 统一归一。
 
 ---
 
@@ -16,14 +16,17 @@
 </template>
 ```
 
-## Mermaid 与 KaTeX
+## Mermaid、KaTeX 与代码激活
 
-WASM 渲染器会保留 Mermaid、LaTeX/KaTeX 相关的 HTML、MathML、SVG 或 placeholder 信息。组件不会引入 `mermaid`、`katex` 或对应样式；如需业务侧激活，监听 `placeholders-ready` 获取占位符和完整渲染结果。
+WASM 渲染器会保留 Mermaid、LaTeX/KaTeX 相关的 HTML、MathML、SVG 或 placeholder 信息。组件提交 DOM 后会调用 public `markdown-runtime` 的 activation 层，统一标记 Mermaid、LaTeX 和 `language-*` 代码块，并修正 heading/hash/external link。业务侧可以监听 `features-activated` 获取稳定 activation 结果；仍可监听 `placeholders-ready` 读取占位符和完整渲染结果。
 
 ```vue
 <template>
   <el-markdown-renderer
     :content="content"
+    csp-nonce="request-csp-nonce"
+    :features="{ latex: true, mermaid: true, codeHighlight: true }"
+    @features-activated="onFeaturesActivated"
     @placeholders-ready="onPlaceholdersReady"
   />
 </template>
@@ -125,25 +128,28 @@ chunk 边界由 WASM 渲染流程产出，类型包括 `heading`、`paragraph`�
 
 ### Attributes
 
-| 属性名        | 说明                                | 类型                                            | 默认值    |
-| ------------- | ----------------------------------- | ----------------------------------------------- | --------- |
-| content       | Markdown 源文本                     | `string`                                        | `''`      |
-| initial-html  | 初始 HTML，用于首帧占位             | `string`                                        | `''`      |
-| allow-html    | 是否允许 Markdown 源码中的 raw HTML | `boolean`                                       | `false`   |
-| sanitize-html | DOM 提交前是否清理不安全 HTML       | `boolean`                                       | `true`    |
-| allow-latex   | 是否启用 LaTeX/MathML 输出          | `boolean`                                       | `true`    |
-| allow-mermaid | 是否启用 Mermaid 输出               | `boolean`                                       | `true`    |
-| mode          | 渲染模式元数据                      | `'article' \| 'about' \| 'preview' \| 'editor'` | `article` |
-| base-url      | 渲染元数据中的基础 URL              | `string \| null`                                | `null`    |
+| 属性名        | 说明                                    | 类型                                            | 默认值    |
+| ------------- | --------------------------------------- | ----------------------------------------------- | --------- |
+| content       | Markdown 源文本                         | `string`                                        | `''`      |
+| initial-html  | 初始 HTML，用于首帧占位                 | `string`                                        | `''`      |
+| allow-html    | 是否允许 Markdown 源码中的 raw HTML     | `boolean`                                       | `false`   |
+| sanitize-html | DOM 提交前是否清理不安全 HTML           | `boolean`                                       | `true`    |
+| allow-latex   | 是否启用 LaTeX/MathML 输出              | `boolean`                                       | `true`    |
+| allow-mermaid | 是否启用 Mermaid 输出                   | `boolean`                                       | `true`    |
+| mode          | 渲染模式元数据                          | `'article' \| 'about' \| 'preview' \| 'editor'` | `article` |
+| base-url      | 渲染元数据与 link activation 的基础 URL | `string \| null`                                | `null`    |
+| csp-nonce     | 写入 renderer 内动态 style 的 CSP nonce | `string \| null`                                | `null`    |
+| features      | DOM feature activation 开关             | `MarkdownFeatureActivationFeatureOptions`       | —         |
 
 ### Events
 
-| 事件名             | 说明                                             |
-| ------------------ | ------------------------------------------------ |
-| render-complete    | 渲染完成，参数为完整 `MarkdownRenderResult`      |
-| render-error       | WASM runtime 渲染失败，参数为 `FsusErrorDetail`  |
-| placeholders-ready | 占位符可用，参数为 `placeholders` 与完整渲染结果 |
-| render-profile     | 渲染阶段耗时可用，参数为 `MarkdownRuntimeProfile` |
+| 事件名             | 说明                                                              |
+| ------------------ | ----------------------------------------------------------------- |
+| render-complete    | 渲染完成，参数为完整 `MarkdownRenderResult`                       |
+| render-error       | WASM runtime 渲染失败，参数为 `FsusErrorDetail`                   |
+| features-activated | DOM feature activation 完成，参数为 activation 结果与完整渲染结果 |
+| placeholders-ready | 占位符可用，参数为 `placeholders` 与完整渲染结果                  |
+| render-profile     | 渲染阶段耗时可用，参数为 `MarkdownRuntimeProfile`                 |
 
 ### Exposes
 

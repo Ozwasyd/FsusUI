@@ -26,6 +26,9 @@ packages/demo-app/dist/
 packages/icons-vue/dist/
 packages/wasm/dist/
 internal/*/dist/
+tests/fixtures/**/dist/
+tests/fixtures/**/node_modules/
+tests/fixtures/**/.pnpm-store/
 
 # Local build artifacts
 /build/
@@ -51,6 +54,8 @@ packages/wasm/build/
 .npmrc.local
 .npmrc.*
 !.npmrc.example
+tests/fixtures/**/.npmrc
+tests/fixtures/**/.npmrc.*
 .secrets/
 .secret/
 secrets/

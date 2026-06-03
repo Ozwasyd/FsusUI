@@ -45,6 +45,27 @@
       "import": "./es/result.mjs",
       "require": "./lib/result.js"
     },
+    "./theme": {
+      "types": "./es/theme.d.ts",
+      "import": "./es/theme.mjs",
+      "require": "./lib/theme.js"
+    },
+    "./icons-vue": {
+      "types": "./es/icons-vue.d.ts",
+      "import": "./es/icons-vue.mjs",
+      "require": "./lib/icons-vue.js"
+    },
+    "./wasm": {
+      "types": "./es/wasm.d.ts",
+      "import": "./es/wasm.mjs",
+      "require": "./lib/wasm.js"
+    },
+    "./markdown-runtime": {
+      "types": "./es/markdown-runtime.d.ts",
+      "import": "./es/markdown-runtime.mjs",
+      "require": "./lib/markdown-runtime.js"
+    },
+    "./dist/public-shell-critical.css": "./dist/public-shell-critical.css",
     "./es/*.mjs": {
       "types": "./es/*.d.ts",
       "import": "./es/*.mjs"

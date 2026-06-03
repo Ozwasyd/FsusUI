@@ -6,11 +6,14 @@ tests/
 scripts/
 build/
 coverage/
+fixtures/
+examples/
 node_modules/
 .env
 .env.*
 .npmrc
 .npmrc.*
+*.local
 *.map
 *.ts
 *.tsx

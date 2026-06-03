@@ -53,6 +53,7 @@ import { ElImageViewer } from '@element-plus/components/image-viewer'
 import { ElInput } from '@element-plus/components/input'
 import { ElInputNumber } from '@element-plus/components/input-number'
 import { ElLink } from '@element-plus/components/link'
+import { ElMarkdownEditor } from '@element-plus/components/markdown-editor'
 import { ElMarkdownRenderer } from '@element-plus/components/markdown-renderer'
 import {
   ElMenu,
@@ -161,6 +162,7 @@ export const allComponents = [
   ElInput,
   ElInputNumber,
   ElLink,
+  ElMarkdownEditor,
   ElMarkdownRenderer,
   ElMenu,
   ElMenuItem,
@@ -228,6 +230,7 @@ export const coreComponents = [
   ElScrollbar,
   ElSpace,
   ElMarkdownRenderer,
+  ElMarkdownEditor,
   ElText,
 ] as Plugin[]
 

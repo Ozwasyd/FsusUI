@@ -1,7 +1,10 @@
 import { buildProps } from '@element-plus/utils'
 
 import type { ExtractPropTypes, PropType } from 'vue'
-import type { MarkdownRenderMode } from '@element-plus/wasm'
+import type {
+  MarkdownFeatureActivationFeatureOptions,
+  MarkdownRenderMode,
+} from '@element-plus/wasm'
 
 export const markdownRendererProps = buildProps({
   content: {
@@ -36,6 +39,14 @@ export const markdownRendererProps = buildProps({
   baseUrl: {
     type: String as PropType<string | null>,
     default: null,
+  },
+  cspNonce: {
+    type: String as PropType<string | null>,
+    default: null,
+  },
+  features: {
+    type: Object as PropType<MarkdownFeatureActivationFeatureOptions>,
+    default: undefined,
   },
 } as const)
 

@@ -117,6 +117,27 @@ export const publicShellProps = buildProps({
     type: String,
     default: '64rem',
   },
+  /**
+   * @description desktop brand/navigation gap
+   */
+  navGap: {
+    type: String,
+    default: '2rem',
+  },
+  /**
+   * @description mobile navigation item gap
+   */
+  mobileNavGap: {
+    type: String,
+    default: '1.5rem',
+  },
+  /**
+   * @description mobile search width
+   */
+  mobileSearchWidth: {
+    type: String,
+    default: '7rem',
+  },
 } as const)
 
 export const publicShellEmits = {

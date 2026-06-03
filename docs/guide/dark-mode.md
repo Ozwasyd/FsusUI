@@ -75,7 +75,7 @@ const themeMode = ref<'light' | 'dark' | 'system'>('system')
 适合你要在 Vue 启动前先应用本地持久化主题，避免首帧闪烁。
 
 ```ts
-import { syncThemeMode } from '@ozwasyd/element-plus'
+import { syncThemeMode } from '@ozwasyd/element-plus/theme'
 
 const storedThemeMode = localStorage.getItem('theme-mode')
 syncThemeMode(
@@ -164,7 +164,7 @@ Playwright、人工截图或下游 AGENTS 工具需要强制主题时，不要�
 `document.documentElement.classList`。使用 FsusUI 提供的测试 helper：
 
 ```ts
-import { installThemeModeTestHelper } from '@ozwasyd/element-plus'
+import { installThemeModeTestHelper } from '@ozwasyd/element-plus/theme'
 
 installThemeModeTestHelper({
   persist: true,
@@ -182,6 +182,17 @@ await page.evaluate(() => {
 
 helper 会复用 `syncThemeMode()`，同步 `<html>` 的 class、`data-theme-mode`、
 `data-theme-resolved` 和 `color-scheme`，并按需写入指定 storage key。
+
+业务运行时需要持久化和订阅 resolved theme 时，优先使用稳定子路径：
+
+```ts
+import {
+  readThemeMode,
+  subscribeThemeMode,
+  syncThemeMode,
+  writeThemeMode,
+} from '@ozwasyd/element-plus/theme'
+```
 
 这样可以避免“用户已选亮色，但系统是暗色，首帧仍短暂闪黑”的问题。
 

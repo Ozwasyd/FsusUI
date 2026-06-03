@@ -6,8 +6,11 @@ import {
   fsusOk,
   fsusTry,
   fsusTryAsync,
+  getFsusErrorMessage,
   isFsusErr,
   isFsusOk,
+  isFsusResult,
+  isTruthyFsusOk,
   mapFsusResult,
   toFsusError,
 } from '../result'
@@ -29,13 +32,27 @@ describe('FsusResult', () => {
 
   it('maps and binds only successful values', () => {
     expect(mapFsusResult(fsusOk(2), (value) => value * 3)).toEqual(fsusOk(6))
-    expect(
-      bindFsusResult(fsusOk(2), (value) => fsusOk(String(value))),
-    ).toEqual(fsusOk('2'))
+    expect(bindFsusResult(fsusOk(2), (value) => fsusOk(String(value)))).toEqual(
+      fsusOk('2'),
+    )
 
     const err = fsusErr<number>(createFsusError('timeout', 'too slow'))
     expect(mapFsusResult(err, (value) => value * 3)).toBe(err)
     expect(bindFsusResult(err, (value) => fsusOk(String(value)))).toBe(err)
+  })
+
+  it('exposes public result shape and truthy/error helpers', () => {
+    const ok = fsusOk('ready')
+    const empty = fsusOk('')
+    const err = fsusErr(createFsusError('infra', 'runtime unavailable'))
+
+    expect(isFsusResult(ok)).toBe(true)
+    expect(isFsusResult({ ok: false, error: { code: 'nope' } })).toBe(false)
+    expect(isTruthyFsusOk(ok)).toBe(true)
+    expect(isTruthyFsusOk(empty)).toBe(false)
+    expect(getFsusErrorMessage(err, 'fallback')).toBe('runtime unavailable')
+    expect(getFsusErrorMessage(new Error('boom'), 'fallback')).toBe('boom')
+    expect(getFsusErrorMessage(null, 'fallback')).toBe('fallback')
   })
 
   it('normalizes common platform errors', () => {

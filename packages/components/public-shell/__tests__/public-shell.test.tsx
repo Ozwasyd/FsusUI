@@ -19,8 +19,26 @@ describe('PublicShell.vue', () => {
     expect(
       wrapper
         .find('.el-public-shell__nav-link.is-active[data-public-nav="archive"]')
-        .exists()
+        .exists(),
     ).toBe(true)
+  })
+
+  test('exposes layout invariants through public css variables', () => {
+    const wrapper = mount(PublicShell, {
+      props: {
+        brand: 'Fsus',
+        maxWidth: '72rem',
+        mobileNavGap: '1rem',
+        mobileSearchWidth: '8rem',
+        navGap: '2.5rem',
+      },
+    })
+
+    const style = wrapper.attributes('style')
+    expect(style).toContain('--el-public-shell-max-width: 72rem')
+    expect(style).toContain('--el-public-shell-nav-gap: 2.5rem')
+    expect(style).toContain('--el-public-shell-mobile-nav-gap: 1rem')
+    expect(style).toContain('--el-public-shell-mobile-search-width: 8rem')
   })
 
   test('emits spa search without native navigation', async () => {

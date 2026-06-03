@@ -77,6 +77,7 @@ import {
 } from '@element-plus/hooks'
 import {
   MARKDOWN_RENDERER_SURFACE_CLASSES as markdownSurfaceClasses,
+  activateMarkdownFeatures,
   buildMarkdownRenderResult,
   escapeMarkdownHtml,
   normalizeMarkdownSource,
@@ -103,6 +104,7 @@ import type {
   MarkdownRenderResult,
   MarkdownRenderChunk,
   MarkdownRenderRequest,
+  MarkdownFeatureActivationResult,
   MarkdownRuntimeChunkResult,
   MarkdownRuntimeHtmlResult,
   MarkdownRuntimeProfile,
@@ -121,6 +123,11 @@ const emit = defineEmits<{
   (
     event: 'placeholders-ready',
     placeholders: MarkdownRenderResult['placeholders'],
+    result: MarkdownRenderResult,
+  ): void
+  (
+    event: 'features-activated',
+    activation: MarkdownFeatureActivationResult,
     result: MarkdownRenderResult,
   ): void
   (event: 'render-profile', profile: MarkdownRuntimeProfile): void
@@ -568,6 +575,31 @@ const buildFallbackResult = (source: string): MarkdownRenderResult =>
     source,
   })
 
+const resolveMarkdownFeatureOptions = () => ({
+  codeHighlight: props.features?.codeHighlight ?? true,
+  cspNonce: props.features?.cspNonce ?? true,
+  externalLink: props.features?.externalLink ?? true,
+  hashLink: props.features?.hashLink ?? true,
+  headingSlug: props.features?.headingSlug ?? true,
+  latex: props.features?.latex ?? props.allowLatex,
+  mermaid: props.features?.mermaid ?? props.allowMermaid,
+})
+
+const activateRenderedFeatures = async (result: MarkdownRenderResult) => {
+  await nextTick()
+
+  const root = rootEl.value
+  if (!root) return
+
+  const activation = await activateMarkdownFeatures({
+    baseUrl: props.baseUrl,
+    cspNonce: props.cspNonce,
+    features: resolveMarkdownFeatureOptions(),
+    root,
+  })
+  emit('features-activated', activation, result)
+}
+
 const performRender = async () => {
   const taskId = ++currentTaskId
   const source = normalizeMarkdownSource(props.content)
@@ -619,9 +651,10 @@ const performRender = async () => {
         timings: resolvedResult.timings,
       })
       emit('placeholders-ready', resolvedResult.placeholders, resolvedResult)
-      emit('render-complete', resolvedResult)
       await nextTick()
       virtualWindow.readViewport()
+      await activateRenderedFeatures(resolvedResult)
+      emit('render-complete', resolvedResult)
       scheduleMeasurementWarmup()
       return
     }
@@ -659,6 +692,7 @@ const performRender = async () => {
     const resolvedResult = resolveMarkdownRenderResult(result.value)
 
     await commitRenderedContent(resolvedResult.html, true)
+    await activateRenderedFeatures(resolvedResult)
     emit('render-profile', {
       engine: resolvedResult.engine,
       phase: 'full-result',
@@ -674,6 +708,7 @@ const performRender = async () => {
 
     const fallback = buildFallbackResult(source)
     await commitRenderedContent(fallback.html, true)
+    await activateRenderedFeatures(fallback)
     emit(
       'render-error',
       toFsusError(error, 'markdown_renderer_render_failed', 'infra'),
@@ -696,6 +731,8 @@ watch(
     props.allowMermaid,
     props.mode,
     props.baseUrl,
+    props.cspNonce,
+    props.features,
   ],
   () => {
     if (debounceTimer) {

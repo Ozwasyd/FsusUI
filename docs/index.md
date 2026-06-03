@@ -20,18 +20,18 @@ FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Mini
 
 ## 使用指南
 
-| 文档                                       | 说明                                               |
-| ------------------------------------------ | -------------------------------------------------- |
-| [安装](./guide/installation.md)            | 环境要求、通过 GitHub Packages 安装、配置 `.npmrc` |
-| [快速开始](./guide/quickstart.md)          | 全量引入、按需引入、全局配置                       |
-| [主题定制](./guide/theming.md)             | CSS 变量覆盖、SCSS 变量、FsusUI 学术蓝配色规范     |
-| [暗色模式](./guide/dark-mode.md)           | 接入 `themeMode`、跟随系统主题、自定义暗色变量     |
-| [国际化](./guide/i18n.md)                  | 多语言切换、Day.js 时区配置                        |
-| [自定义命名空间](./guide/namespace.md)     | 修改组件 CSS 类名前缀                              |
-| [服务端渲染 (SSR)](./guide/ssr.md)         | SSR 水合错误处理、Teleport 注入                    |
-| [自定义默认值](./guide/custom-defaults.md) | `setPropsDefaults` 用法与限制                      |
-| [Render Pipeline](./guide/render-pipeline.md) | 统一渲染预算、外部 adapter、Worker 与虚拟挂载   |
-| [Result Mode](./guide/result-mode.md)      | `FsusResult<T>`、错误码、可恢复失败迁移与 release gate |
+| 文档                                          | 说明                                                   |
+| --------------------------------------------- | ------------------------------------------------------ |
+| [安装](./guide/installation.md)               | 环境要求、通过 GitHub Packages 安装、配置 `.npmrc`     |
+| [快速开始](./guide/quickstart.md)             | 全量引入、按需引入、全局配置                           |
+| [主题定制](./guide/theming.md)                | CSS 变量覆盖、SCSS 变量、FsusUI 学术蓝配色规范         |
+| [暗色模式](./guide/dark-mode.md)              | 接入 `themeMode`、跟随系统主题、自定义暗色变量         |
+| [国际化](./guide/i18n.md)                     | 多语言切换、Day.js 时区配置                            |
+| [自定义命名空间](./guide/namespace.md)        | 修改组件 CSS 类名前缀                                  |
+| [服务端渲染 (SSR)](./guide/ssr.md)            | SSR 水合错误处理、Teleport 注入                        |
+| [自定义默认值](./guide/custom-defaults.md)    | `setPropsDefaults` 用法与限制                          |
+| [Render Pipeline](./guide/render-pipeline.md) | 统一渲染预算、外部 adapter、Worker 与虚拟挂载          |
+| [Result Mode](./guide/result-mode.md)         | `FsusResult<T>`、错误码、可恢复失败迁移与 release gate |
 
 ---
 
@@ -45,7 +45,9 @@ FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Mini
 | 图标 Icon                        | [components/icon.md](./components/icon.md)                           |
 | 链接 Link                        | [components/link.md](./components/link.md)                           |
 | 文本 Text                        | [components/text.md](./components/text.md)                           |
+| 公共页面外壳 PublicShell         | [components/public-shell.md](./components/public-shell.md)           |
 | Markdown 渲染器 MarkdownRenderer | [components/markdown-renderer.md](./components/markdown-renderer.md) |
+| Markdown 编辑器 MarkdownEditor   | [components/markdown-editor.md](./components/markdown-editor.md)     |
 | 滚动条 Scrollbar                 | [components/scrollbar.md](./components/scrollbar.md)                 |
 | 间距 Space                       | [components/space.md](./components/space.md)                         |
 | 布局 Layout                      | [components/layout.md](./components/layout.md)                       |

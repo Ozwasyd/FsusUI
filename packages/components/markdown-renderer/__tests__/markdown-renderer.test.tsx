@@ -26,9 +26,13 @@ vi.mock('@element-plus/wasm', async () => {
     await vi.importActual<typeof import('@element-plus/wasm')>(
       '@element-plus/wasm',
     )
+  const runtime = await vi.importActual<
+    typeof import('../../../wasm/markdown-runtime')
+  >('../../../wasm/markdown-runtime')
 
   return {
     ...actual,
+    activateMarkdownFeatures: runtime.activateMarkdownFeatures,
     renderMarkdownChunksWithRuntime: vi.fn(),
     renderMarkdownHtmlWithRuntime: vi.fn(),
     renderMarkdownResultWithRuntime: vi.fn(),
@@ -145,7 +149,9 @@ describe('MarkdownRenderer.vue', () => {
     })
     await flushRenderer()
 
-    expect(wrapper.html()).toContain('<h1>Title</h1>')
+    const heading = wrapper.find('h1')
+    expect(heading.text()).toBe('Title')
+    expect(heading.attributes('data-markdown-heading')).toBe('title')
     expect(wrapper.find('[data-markdown-renderer="wasm"]').exists()).toBe(true)
     expect(wrapper.emitted('render-profile')).toHaveLength(2)
     expect(wrapper.emitted('render-complete')).toHaveLength(1)
@@ -243,7 +249,9 @@ describe('MarkdownRenderer.vue', () => {
     })
     await flushRenderer()
 
-    expect(wrapper.html()).toContain('<h1>Safe heading</h1>')
+    const heading = wrapper.find('h1')
+    expect(heading.text()).toBe('Safe heading')
+    expect(heading.attributes('data-markdown-heading')).toBe('safe-heading')
     expect(wrapper.find('script').exists()).toBe(false)
     expect(wrapper.find('img').attributes('onerror')).toBeUndefined()
     expect(wrapper.find('a').attributes('href')).toBeUndefined()
@@ -320,6 +328,59 @@ describe('MarkdownRenderer.vue', () => {
     const events = wrapper.emitted('placeholders-ready')
     expect(events).toHaveLength(1)
     expect(events?.[0]?.[0]).toEqual(result.placeholders)
+  })
+
+  test('activates common markdown features after committing the full result', async () => {
+    const html = [
+      '<h2>Activation Title</h2>',
+      '<a href="#activation-title">hash</a>',
+      '<a href="https://example.com/docs">external</a>',
+      '<style>.markdown-probe{color:red}</style>',
+      '<figure class="markdown-renderer__mermaid" data-mermaid-placeholder="true"></figure>',
+      '<span class="markdown-renderer__latex" data-latex-placeholder="true"></span>',
+      '<pre><code class="language-ts">const ok = true</code></pre>',
+    ].join('')
+    renderMarkdownHtml.mockResolvedValue(fsusOk(makeHtmlResult(html)))
+    renderMarkdownResult.mockResolvedValue(
+      fsusOk(makeResult('activation', html)),
+    )
+
+    const wrapper = mount(MarkdownRenderer, {
+      props: {
+        baseUrl: 'https://fsus.local/docs',
+        content: 'activation',
+        cspNonce: 'nonce-1',
+        sanitizeHtml: false,
+      },
+    })
+    await flushRenderer()
+
+    expect(wrapper.find('h2').attributes('id')).toBe('activation-title')
+    expect(
+      wrapper.find('a[href^="#"]').attributes('data-markdown-hash-link'),
+    ).toBe('true')
+    expect(
+      wrapper.find('a[href^="https://example.com"]').attributes('target'),
+    ).toBe('_blank')
+    expect(wrapper.find('style').element.nonce).toBe('nonce-1')
+    expect(
+      wrapper
+        .find('.markdown-renderer__mermaid')
+        .attributes('data-markdown-feature-activated'),
+    ).toBe('mermaid')
+    expect(
+      wrapper
+        .find('.markdown-renderer__latex')
+        .attributes('data-markdown-feature-activated'),
+    ).toBe('latex')
+    expect(
+      wrapper.find('code').attributes('data-markdown-feature-activated'),
+    ).toBe('code-highlight')
+    expect(wrapper.emitted('features-activated')?.[0]?.[0]).toEqual(
+      expect.objectContaining({
+        errors: [],
+      }),
+    )
   })
 
   test('keeps the scroll anchor when the full result changes html', async () => {
@@ -448,7 +509,9 @@ describe('MarkdownRenderer.vue', () => {
         .find('[data-fsus-render-unit]')
         .attributes('data-fsus-render-hardware'),
     ).toBe(wrapper.attributes('data-fsus-render-hardware'))
-    expect(wrapper.html()).toContain('<h1>Chunked</h1>')
+    const heading = wrapper.find('h1')
+    expect(heading.text()).toBe('Chunked')
+    expect(heading.attributes('data-markdown-heading')).toBe('chunked')
     expect(wrapper.emitted('render-complete')?.[0]?.[0]).toEqual(result)
   })
 

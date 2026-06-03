@@ -156,13 +156,19 @@ watch(
   () => props.searchQuery,
   (value) => {
     searchValue.value = value
-  }
+  },
 )
 
 const shellKls = computed(() => [ns.b(), ns.is('sticky', props.sticky)])
-const headerKls = computed(() => [ns.e('header'), ns.is('sticky', props.sticky)])
+const headerKls = computed(() => [
+  ns.e('header'),
+  ns.is('sticky', props.sticky),
+])
 const shellStyle = computed<CSSProperties>(() => ({
+  '--el-public-shell-mobile-nav-gap': props.mobileNavGap,
+  '--el-public-shell-mobile-search-width': props.mobileSearchWidth,
   '--el-public-shell-max-width': props.maxWidth,
+  '--el-public-shell-nav-gap': props.navGap,
 }))
 
 const navLinkKls = (key: string) => [

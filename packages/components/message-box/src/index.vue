@@ -253,7 +253,7 @@ export default defineComponent({
       size: btnSize,
     } = useGlobalComponentSettings(
       'message-box',
-      computed(() => props.buttonSize)
+      computed(() => props.buttonSize),
     )
 
     const { t } = locale
@@ -270,6 +270,7 @@ export default defineComponent({
       cancelButtonClass: '',
       confirmButtonText: '',
       confirmButtonClass: '',
+      center: false,
       customClass: '',
       customStyle: {},
       dangerouslyUseHTMLString: false,
@@ -310,7 +311,7 @@ export default defineComponent({
     const inputId = useId()
 
     const iconComponent = computed(
-      () => state.icon || TypeComponentsMap[state.type] || ''
+      () => state.icon || TypeComponentsMap[state.type] || '',
     )
     const hasMessage = computed(() => !!state.message)
     const rootRef = ref<HTMLElement>()
@@ -329,7 +330,7 @@ export default defineComponent({
           validate()
         }
       },
-      { immediate: true }
+      { immediate: true },
     )
 
     watch(
@@ -360,7 +361,7 @@ export default defineComponent({
           state.editorErrorMessage = ''
           state.validateError = false
         }
-      }
+      },
     )
 
     const draggable = computed(() => props.draggable)

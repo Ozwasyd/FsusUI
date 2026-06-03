@@ -29,10 +29,9 @@ export interface FsusErrorDetail {
   traceId?: string
 }
 
-export type FsusResult<
-  T,
-  E extends FsusErrorDetail = FsusErrorDetail,
-> = { ok: true; value: T } | { ok: false; error: E }
+export type FsusResult<T, E extends FsusErrorDetail = FsusErrorDetail> =
+  | { ok: true; value: T }
+  | { ok: false; error: E }
 
 const fsusErrorCodes = new Set<FsusErrorCode>([
   'validation',
@@ -101,12 +100,34 @@ export const createFsusError = (
 
 export const fsusOk = <T>(value: T): FsusResult<T> => ({ ok: true, value })
 
-export const fsusErr = <
-  T = never,
-  E extends FsusErrorDetail = FsusErrorDetail,
->(
+export const fsusErr = <T = never, E extends FsusErrorDetail = FsusErrorDetail>(
   error: E,
 ): FsusResult<T, E> => ({ ok: false, error })
+
+export const isFsusResult = (value: unknown): value is FsusResult<unknown> => {
+  if (!value || typeof value !== 'object') return false
+
+  const payload = value as {
+    error?: unknown
+    ok?: unknown
+    value?: unknown
+  }
+
+  if (payload.ok === true) {
+    return 'value' in payload
+  }
+
+  if (
+    payload.ok !== false ||
+    !payload.error ||
+    typeof payload.error !== 'object'
+  ) {
+    return false
+  }
+
+  const error = payload.error as { code?: unknown; message?: unknown }
+  return isFsusErrorCode(error.code) && typeof error.message === 'string'
+}
 
 export const isFsusOk = <T, E extends FsusErrorDetail>(
   result: FsusResult<T, E>,
@@ -115,6 +136,33 @@ export const isFsusOk = <T, E extends FsusErrorDetail>(
 export const isFsusErr = <T, E extends FsusErrorDetail>(
   result: FsusResult<T, E>,
 ): result is { ok: false; error: E } => !result.ok
+
+export const isTruthyFsusOk = (value: unknown): boolean =>
+  isFsusResult(value) && value.ok === true && Boolean(value.value)
+
+export const getFsusErrorMessage = (
+  value: unknown,
+  fallback = 'fsus_unknown_error',
+): string => {
+  if (isFsusResult(value) && value.ok === false) {
+    return value.error.message || fallback
+  }
+
+  if (value && typeof value === 'object') {
+    const payload = value as { error?: unknown; message?: unknown }
+    if (typeof payload.message === 'string' && payload.message) {
+      return payload.message
+    }
+    if (payload.error && typeof payload.error === 'object') {
+      const error = payload.error as { message?: unknown }
+      if (typeof error.message === 'string' && error.message) {
+        return error.message
+      }
+    }
+  }
+
+  return typeof value === 'string' && value ? value : fallback
+}
 
 export const toFsusError = (
   error: unknown,
@@ -176,8 +224,7 @@ export const bindFsusResult = <
 >(
   result: FsusResult<T, E>,
   binder: (value: T) => FsusResult<U, E>,
-): FsusResult<U, E> =>
-  isFsusOk(result) ? binder(result.value) : result
+): FsusResult<U, E> => (isFsusOk(result) ? binder(result.value) : result)
 
 export const fsusTry = <T>(
   fn: () => T,

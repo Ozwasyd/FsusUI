@@ -66,7 +66,7 @@ pnpm run check:markdown-no-js-path
 pnpm run check:markdown-extreme
 ```
 
-MarkdownRenderer 组件不携带 Markdown CSS，也不会自动激活 Mermaid/KaTeX；业务侧需要通过 `placeholders-ready` 事件接管占位符激活。
+MarkdownRenderer 组件不携带完整文章排版主题，但会通过 public `markdown-runtime` 自动归一 heading id、hash/external link、CSP nonce、Mermaid/LaTeX 占位符和代码块高亮挂点；业务侧通过 `features-activated` 和 `placeholders-ready` 接入业务 glue。
 
 ## 3. 质量门分工
 

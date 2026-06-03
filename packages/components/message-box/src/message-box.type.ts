@@ -24,6 +24,7 @@ export declare interface MessageBoxState {
   icon: string | Component
   customClass: string
   customStyle: CSSProperties
+  center: boolean
   showInput: boolean
   inputValue: string
   inputPlaceholder: string
@@ -73,7 +74,7 @@ export interface ElMessageBoxOptions {
   beforeClose?: (
     action: Action,
     instance: MessageBoxState,
-    done: () => void
+    done: () => void,
   ) => void
 
   /** Custom class name for MessageBox */
@@ -81,6 +82,9 @@ export interface ElMessageBoxOptions {
 
   /** Custom inline style for MessageBox */
   customStyle?: CSSProperties
+
+  /** Whether to align message box content in the center layout */
+  center?: boolean
 
   /** MessageBox closing callback if you don't prefer Promise */
   callback?: Callback
@@ -177,16 +181,16 @@ export type ElMessageBoxShortcutMethod = ((
   message: ElMessageBoxOptions['message'],
   title: ElMessageBoxOptions['title'],
   options?: ElMessageBoxOptions,
-  appContext?: AppContext | null
+  appContext?: AppContext | null,
 ) => Promise<FsusResult<MessageBoxData>>) &
   ((
     message: ElMessageBoxOptions['message'],
     options?: ElMessageBoxOptions,
-    appContext?: AppContext | null
+    appContext?: AppContext | null,
   ) => Promise<FsusResult<MessageBoxData>>)
 
 export interface IElMessageBox {
-  _context: AppContext | null
+  _context: AppContext | null;
 
   /** Show a message box */
   // (message: string, title?: string, type?: string): Promise<MessageBoxData>
@@ -194,7 +198,7 @@ export interface IElMessageBox {
   /** Show a message box */
   (
     options: ElMessageBoxOptions,
-    appContext?: AppContext | null
+    appContext?: AppContext | null,
   ): Promise<FsusResult<MessageBoxData>>
 
   /** Show an alert message box */

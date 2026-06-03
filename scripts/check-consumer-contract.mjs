@@ -65,7 +65,10 @@ const requiredSnippets = new Map([
   ['docs/index.md', [`\`${packageName}\``]],
   [
     'docs/guide/installation.md',
-    [`@${packageName.slice(1).split('/')[0]}:registry=${registryUrl}`, `pnpm install ${packageName}`],
+    [
+      `@${packageName.slice(1).split('/')[0]}:registry=${registryUrl}`,
+      `pnpm install ${packageName}`,
+    ],
   ],
   [
     'docs/guide/quickstart.md',
@@ -79,7 +82,7 @@ const requiredSnippets = new Map([
     'docs/guide/dark-mode.md',
     [
       `import ElementPlus from '${packageName}'`,
-      `import { syncThemeMode } from '${packageName}'`,
+      `import { syncThemeMode } from '${packageName}/theme'`,
     ],
   ],
   [
@@ -104,7 +107,11 @@ expectEqual(
   rootPackage.peerDependencies?.vue,
   'packages/element-plus peerDependencies.vue',
 )
-expectEqual(sourcePackage.homepage, repositoryWebUrl, 'packages/element-plus homepage')
+expectEqual(
+  sourcePackage.homepage,
+  repositoryWebUrl,
+  'packages/element-plus homepage',
+)
 expectEqual(
   sourcePackage.bugs?.url,
   `${repositoryWebUrl}/issues`,
@@ -122,13 +129,17 @@ for (const relativePath of consumerDocs) {
 
   for (const snippet of forbiddenSnippets) {
     if (content.includes(snippet)) {
-      errors.push(`${relativePath} still contains stale consumer contract snippet: ${snippet}`)
+      errors.push(
+        `${relativePath} still contains stale consumer contract snippet: ${snippet}`,
+      )
     }
   }
 
   for (const snippet of requiredSnippets.get(relativePath) || []) {
     if (!content.includes(snippet)) {
-      errors.push(`${relativePath} is missing required contract snippet: ${snippet}`)
+      errors.push(
+        `${relativePath} is missing required contract snippet: ${snippet}`,
+      )
     }
   }
 }
@@ -139,13 +150,13 @@ const installationGuide = readFileSync(
 )
 
 if (!installationGuide.includes(registryUrl)) {
-  errors.push('docs/guide/installation.md must mention the GitHub Packages registry URL.')
+  errors.push(
+    'docs/guide/installation.md must mention the GitHub Packages registry URL.',
+  )
 }
 
 if (errors.length > 0) {
-  throw new Error(
-    `Consumer contract drift detected:\n- ${errors.join('\n- ')}`,
-  )
+  throw new Error(`Consumer contract drift detected:\n- ${errors.join('\n- ')}`)
 }
 
 console.log(`Consumer contract matches ${packageName} and ${registryUrl}.`)

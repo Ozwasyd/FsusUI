@@ -25,11 +25,11 @@ export const copyFiles = () =>
     copyFile(epPackage, path.join(epOutput, 'package.json')),
     copyFile(
       path.resolve(projRoot, 'README.md'),
-      path.resolve(epOutput, 'README.md')
+      path.resolve(epOutput, 'README.md'),
     ),
     copyFile(
       path.resolve(projRoot, 'global.d.ts'),
-      path.resolve(epOutput, 'global.d.ts')
+      path.resolve(epOutput, 'global.d.ts'),
     ),
   ])
 
@@ -37,7 +37,7 @@ export const copyTypesDefinitions: TaskFunction = (done) => {
   const src = path.resolve(buildOutput, 'types', 'packages')
   const copyTypes = (module: Module) =>
     withTaskName(`copyTypes:${module}`, () =>
-      copy(src, buildConfig[module].output.path)
+      copy(src, buildConfig[module].output.path),
     )
 
   return parallel(copyTypes('esm'), copyTypes('cjs'))(done)
@@ -47,7 +47,11 @@ export const copyFullStyle = async () => {
   await mkdir(path.resolve(epOutput, 'dist'), { recursive: true })
   await copyFile(
     path.resolve(epOutput, 'theme-chalk/index.css'),
-    path.resolve(epOutput, 'dist/index.css')
+    path.resolve(epOutput, 'dist/index.css'),
+  )
+  await copyFile(
+    path.resolve(epOutput, 'theme-chalk/el-public-shell-critical.css'),
+    path.resolve(epOutput, 'dist/public-shell-critical.css'),
   )
 }
 
@@ -97,8 +101,8 @@ export const copyWasmRuntimeAssets = async () => {
       targets.map(async (target) => {
         await mkdir(path.dirname(target), { recursive: true })
         await copyFile(source, target)
-      })
-    )
+      }),
+    ),
   )
 }
 
@@ -108,7 +112,7 @@ export default series(
 
   parallel(
     withTaskName('ensureWasmArtifacts', () => run('pnpm run ensure:wasm')),
-    withTaskName('ensureIconsVueArtifacts', () => run('pnpm run ensure:icons'))
+    withTaskName('ensureIconsVueArtifacts', () => run('pnpm run ensure:icons')),
   ),
 
   parallel(
@@ -118,13 +122,13 @@ export default series(
     withTaskName('buildModules', buildModules),
     series(
       withTaskName('buildThemeChalk', () =>
-        run('pnpm run -C packages/theme-chalk build')
+        run('pnpm run -C packages/theme-chalk build'),
       ),
-      copyFullStyle
-    )
+      copyFullStyle,
+    ),
   ),
 
-  parallel(copyTypesDefinitions, copyFiles, copyWasmRuntimeAssets)
+  parallel(copyTypesDefinitions, copyFiles, copyWasmRuntimeAssets),
 )
 
 export * from './src'

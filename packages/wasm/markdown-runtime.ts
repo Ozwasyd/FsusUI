@@ -130,6 +130,296 @@ export interface MarkdownRuntimeProfile {
   timings: MarkdownRenderTimings
 }
 
+export type MarkdownFeatureActivationKind =
+  | 'code-highlight'
+  | 'csp-style'
+  | 'external-link'
+  | 'hash-link'
+  | 'heading'
+  | 'latex'
+  | 'mermaid'
+
+export interface MarkdownFeatureActivationFeatureOptions {
+  codeHighlight?: boolean
+  cspNonce?: boolean
+  externalLink?: boolean
+  hashLink?: boolean
+  headingSlug?: boolean
+  latex?: boolean
+  mermaid?: boolean
+}
+
+export interface MarkdownFeatureActivationItem {
+  count: number
+  kind: MarkdownFeatureActivationKind
+}
+
+export interface MarkdownFeatureActivationError {
+  kind: MarkdownFeatureActivationKind
+  message: string
+}
+
+export interface MarkdownFeatureActivationResult {
+  activated: readonly MarkdownFeatureActivationItem[]
+  errors: readonly MarkdownFeatureActivationError[]
+}
+
+export type MarkdownFeatureAdapter = (
+  element: HTMLElement,
+) => void | Promise<void>
+
+export interface MarkdownFeatureActivationOptions {
+  baseUrl?: string | null
+  codeHighlightAdapter?: MarkdownFeatureAdapter
+  cspNonce?: string | null
+  features?: MarkdownFeatureActivationFeatureOptions
+  latexAdapter?: MarkdownFeatureAdapter
+  mermaidAdapter?: MarkdownFeatureAdapter
+  root: ParentNode
+}
+
+const defaultMarkdownFeatureOptions: Required<MarkdownFeatureActivationFeatureOptions> =
+  {
+    codeHighlight: true,
+    cspNonce: true,
+    externalLink: true,
+    hashLink: true,
+    headingSlug: true,
+    latex: true,
+    mermaid: true,
+  }
+
+const toMarkdownFeatureOptions = (
+  features: MarkdownFeatureActivationFeatureOptions | undefined,
+) => ({
+  ...defaultMarkdownFeatureOptions,
+  ...(features ?? {}),
+})
+
+const pushActivation = (
+  activated: MarkdownFeatureActivationItem[],
+  kind: MarkdownFeatureActivationKind,
+  count: number,
+) => {
+  if (count > 0) activated.push({ count, kind })
+}
+
+const createActivationError = (
+  kind: MarkdownFeatureActivationKind,
+  error: unknown,
+): MarkdownFeatureActivationError => ({
+  kind,
+  message:
+    error instanceof Error
+      ? error.message
+      : typeof error === 'string'
+        ? error
+        : `${kind}_activation_failed`,
+})
+
+const slugifyMarkdownHeading = (value: string, fallback: string) => {
+  const slug = value
+    .trim()
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\p{Letter}\p{Number}]+/gu, '-')
+    .replace(/^-+|-+$/g, '')
+
+  return slug || fallback
+}
+
+const collectExistingIds = (root: ParentNode) =>
+  new Set(
+    Array.from(root.querySelectorAll<HTMLElement>('[id]'))
+      .map((element) => element.id)
+      .filter(Boolean),
+  )
+
+const reserveUniqueId = (ids: Set<string>, base: string) => {
+  let id = base
+  let suffix = 2
+  while (ids.has(id)) {
+    id = `${base}-${suffix}`
+    suffix += 1
+  }
+  ids.add(id)
+  return id
+}
+
+const activateHeadingSlugs = (root: ParentNode) => {
+  const ids = collectExistingIds(root)
+  let count = 0
+  Array.from(root.querySelectorAll<HTMLElement>('h1,h2,h3,h4,h5,h6')).forEach(
+    (heading, index) => {
+      if (!heading.id) {
+        heading.id = reserveUniqueId(
+          ids,
+          slugifyMarkdownHeading(
+            heading.textContent ?? '',
+            `section-${index + 1}`,
+          ),
+        )
+      }
+      heading.dataset.markdownHeading = heading.id
+      count += 1
+    },
+  )
+  return count
+}
+
+const isExternalMarkdownUrl = (href: string, baseUrl?: string | null) => {
+  if (/^(?:mailto|tel):/i.test(href)) return false
+  if (href.startsWith('#')) return false
+
+  try {
+    const fallbackBase =
+      baseUrl ??
+      (typeof window !== 'undefined' && window.location?.href
+        ? window.location.href
+        : 'https://fsus.local/')
+    const current = new URL(fallbackBase)
+    const target = new URL(href, current)
+    return target.origin !== current.origin
+  } catch {
+    return false
+  }
+}
+
+const addRelToken = (element: HTMLAnchorElement, token: string) => {
+  const tokens = new Set(
+    (element.getAttribute('rel') ?? '').split(/\s+/).filter(Boolean),
+  )
+  tokens.add(token)
+  element.setAttribute('rel', Array.from(tokens).join(' '))
+}
+
+const activateLinks = (
+  root: ParentNode,
+  baseUrl?: string | null,
+): { external: number; hash: number } => {
+  let external = 0
+  let hash = 0
+
+  Array.from(root.querySelectorAll<HTMLAnchorElement>('a[href]')).forEach(
+    (anchor) => {
+      const href = anchor.getAttribute('href') ?? ''
+      if (href.startsWith('#')) {
+        anchor.dataset.markdownHashLink = 'true'
+        hash += 1
+        return
+      }
+
+      if (!isExternalMarkdownUrl(href, baseUrl)) return
+
+      anchor.target = '_blank'
+      addRelToken(anchor, 'noopener')
+      addRelToken(anchor, 'noreferrer')
+      anchor.dataset.markdownExternalLink = 'true'
+      external += 1
+    },
+  )
+
+  return { external, hash }
+}
+
+const activateCspNonce = (root: ParentNode, nonce?: string | null) => {
+  if (!nonce) return 0
+
+  let count = 0
+  Array.from(root.querySelectorAll<HTMLStyleElement>('style')).forEach(
+    (style) => {
+      if (!style.nonce) {
+        style.nonce = nonce
+        count += 1
+      }
+    },
+  )
+  return count
+}
+
+const markElements = async (
+  root: ParentNode,
+  selector: string,
+  kind: MarkdownFeatureActivationKind,
+  adapter: MarkdownFeatureAdapter | undefined,
+) => {
+  const elements = Array.from(root.querySelectorAll<HTMLElement>(selector))
+  for (const element of elements) {
+    if (adapter) await adapter(element)
+    element.dataset.markdownFeatureActivated = kind
+  }
+  return elements.length
+}
+
+export const activateMarkdownFeatures = async (
+  options: MarkdownFeatureActivationOptions,
+): Promise<MarkdownFeatureActivationResult> => {
+  const features = toMarkdownFeatureOptions(options.features)
+  const activated: MarkdownFeatureActivationItem[] = []
+  const errors: MarkdownFeatureActivationError[] = []
+
+  if (features.headingSlug) {
+    pushActivation(activated, 'heading', activateHeadingSlugs(options.root))
+  }
+
+  if (features.externalLink || features.hashLink) {
+    const links = activateLinks(options.root, options.baseUrl)
+    if (features.externalLink) {
+      pushActivation(activated, 'external-link', links.external)
+    }
+    if (features.hashLink) {
+      pushActivation(activated, 'hash-link', links.hash)
+    }
+  }
+
+  if (features.cspNonce) {
+    pushActivation(
+      activated,
+      'csp-style',
+      activateCspNonce(options.root, options.cspNonce),
+    )
+  }
+
+  for (const [kind, selector, adapter] of [
+    [
+      'mermaid',
+      '.markdown-renderer__mermaid,[data-mermaid-placeholder],[data-mermaid-rendered]',
+      options.mermaidAdapter,
+    ],
+    [
+      'latex',
+      '.markdown-renderer__latex,[data-latex-placeholder],[data-latex-rendered]',
+      options.latexAdapter,
+    ],
+    [
+      'code-highlight',
+      'pre code[class*="language-"]',
+      options.codeHighlightAdapter,
+    ],
+  ] as const) {
+    if (
+      (kind === 'mermaid' && !features.mermaid) ||
+      (kind === 'latex' && !features.latex) ||
+      (kind === 'code-highlight' && !features.codeHighlight)
+    ) {
+      continue
+    }
+
+    try {
+      pushActivation(
+        activated,
+        kind,
+        await markElements(options.root, selector, kind, adapter),
+      )
+    } catch (error) {
+      errors.push(createActivationError(kind, error))
+    }
+  }
+
+  return { activated, errors }
+}
+
 type MarkdownModule = {
   HEAPU8: Uint8Array
   memory?: WebAssembly.Memory

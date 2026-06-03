@@ -179,23 +179,36 @@ function MessageBox(
   } else {
     callback = options.callback
   }
+  const normalizedOptions = normalizeMessageBoxOptions(options)
+  callback = normalizedOptions.callback
 
   return new Promise((resolve) => {
     const vm = showMessage(
-      options,
+      normalizedOptions,
       appContext ?? (MessageBox as IElMessageBox)._context,
     )
     // collect this vm in order to handle upcoming events.
     getMessageBoxScope(
       appContext ?? (MessageBox as IElMessageBox)._context,
     ).set(vm, {
-      options,
+      options: normalizedOptions,
       callback,
       resolve,
     })
   })
 }
 
+const MESSAGE_BOX_BASE_DEFAULT_OPTS: Partial<ElMessageBoxOptions> = {
+  autofocus: true,
+  center: false,
+  closeOnClickModal: true,
+  closeOnHashChange: true,
+  closeOnPressEscape: true,
+  lockScroll: true,
+  showClose: true,
+  showConfirmButton: true,
+  type: '',
+}
 const MESSAGE_BOX_VARIANTS = ['alert', 'confirm', 'prompt'] as const
 const MESSAGE_BOX_DEFAULT_OPTS: Record<
   (typeof MESSAGE_BOX_VARIANTS)[number],
@@ -204,6 +217,23 @@ const MESSAGE_BOX_DEFAULT_OPTS: Record<
   alert: { closeOnPressEscape: false, closeOnClickModal: false },
   confirm: { showCancelButton: true },
   prompt: { showCancelButton: true, showInput: true },
+}
+
+const normalizeMessageBoxOptions = (
+  options: ElMessageBoxOptions,
+): ElMessageBoxOptions => {
+  const boxType = options.boxType ?? ''
+  const variantDefaults =
+    boxType === 'alert' || boxType === 'confirm' || boxType === 'prompt'
+      ? MESSAGE_BOX_DEFAULT_OPTS[boxType]
+      : undefined
+
+  return {
+    ...MESSAGE_BOX_BASE_DEFAULT_OPTS,
+    ...variantDefaults,
+    ...options,
+    boxType,
+  }
 }
 
 MESSAGE_BOX_VARIANTS.forEach((boxType) => {
@@ -230,18 +260,12 @@ function messageBoxFactory(boxType: (typeof MESSAGE_BOX_VARIANTS)[number]) {
     }
 
     return MessageBox(
-      Object.assign(
-        {
-          title: titleOrOpts,
-          message,
-          type: '',
-          ...MESSAGE_BOX_DEFAULT_OPTS[boxType],
-        },
-        options,
-        {
-          boxType,
-        },
-      ),
+      normalizeMessageBoxOptions({
+        title: titleOrOpts,
+        message,
+        ...options,
+        boxType,
+      }),
       appContext,
     )
   }

@@ -7,6 +7,9 @@ export {
   fsusTryAsync,
   isFsusErr,
   isFsusOk,
+  isFsusResult,
+  isTruthyFsusOk,
+  getFsusErrorMessage,
   mapFsusResult,
   toFsusError,
 } from '@element-plus/utils'

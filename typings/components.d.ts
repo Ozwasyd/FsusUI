@@ -51,6 +51,7 @@ declare module '@vue/runtime-core' {
     ElInput: typeof import('../packages/element-plus')['ElInput']
     ElInputNumber: typeof import('../packages/element-plus')['ElInputNumber']
     ElLink: typeof import('../packages/element-plus')['ElLink']
+    ElMarkdownEditor: typeof import('../packages/element-plus')['ElMarkdownEditor']
     ElMarkdownRenderer: typeof import('../packages/element-plus')['ElMarkdownRenderer']
     ElMain: typeof import('../packages/element-plus')['ElMain']
     ElMenu: typeof import('../packages/element-plus')['ElMenu']

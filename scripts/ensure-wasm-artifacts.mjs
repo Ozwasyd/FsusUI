@@ -9,12 +9,14 @@ const force =
   process.env.FORCE_REBUILD === '1' || process.argv.includes('--force')
 const dryRun = process.argv.includes('--dry-run')
 
-const requiredArtifacts = [
+const bundleArtifacts = [
   resolve(root, 'packages/wasm/dist/index.mjs'),
   resolve(root, 'packages/wasm/dist/index.cjs'),
   resolve(root, 'packages/wasm/dist/index.d.ts'),
   resolve(root, 'packages/wasm/dist/index.d.mts'),
   resolve(root, 'packages/wasm/dist/index.d.cts'),
+]
+const nativeArtifacts = [
   resolve(root, 'packages/wasm/dist/ep_wasm.mjs'),
   resolve(root, 'packages/wasm/dist/ep_wasm.wasm'),
   resolve(root, 'packages/wasm/dist/markdown_basic.js'),
@@ -22,15 +24,17 @@ const requiredArtifacts = [
   resolve(root, 'packages/wasm/dist/markdown_simd.js'),
   resolve(root, 'packages/wasm/dist/markdown_simd.wasm'),
 ]
-const fingerprintPath = resolve(
+const bundleFingerprintPath = resolve(
   root,
   'packages/wasm/dist/.artifact-fingerprint',
 )
-const fingerprintInputs = [
+const nativeFingerprintPath = resolve(
+  root,
+  'packages/wasm/dist/.native-artifact-fingerprint',
+)
+const bundleFingerprintInputs = [
   'packages/wasm/package.json',
   'packages/wasm/build.config.ts',
-  'packages/wasm/build.sh',
-  'packages/wasm/CMakeLists.txt',
   'packages/wasm/index.ts',
   'packages/wasm/markdown.ts',
   'packages/wasm/markdown-runtime.ts',
@@ -38,6 +42,10 @@ const fingerprintInputs = [
   'packages/wasm/runtime/emscripten.ts',
   'packages/wasm/runtime/serialized.ts',
   'packages/wasm/runtime/utf8.ts',
+].map((file) => resolve(root, file))
+const nativeFingerprintInputs = [
+  'packages/wasm/build.sh',
+  'packages/wasm/CMakeLists.txt',
   'packages/wasm/markdown/CMakeLists.txt',
   'packages/wasm/markdown/include/markdown_contract.hpp',
   'packages/wasm/markdown/src/markdown_contract.cpp',
@@ -49,9 +57,9 @@ const fingerprintInputs = [
   'packages/wasm/src/ep_wasm.cpp',
 ].map((file) => resolve(root, file))
 
-const hashInputs = async () => {
+const hashInputs = async (inputs) => {
   const hash = createHash('sha256')
-  for (const file of fingerprintInputs) {
+  for (const file of inputs) {
     hash.update(file)
     hash.update(await readFile(file))
   }
@@ -69,9 +77,9 @@ const exists = async (file) => {
   }
 }
 
-const getMissingArtifacts = async () => {
+const getMissingArtifacts = async (artifacts) => {
   const checks = await Promise.all(
-    requiredArtifacts.map(async (artifact) => ({
+    artifacts.map(async (artifact) => ({
       artifact,
       exists: await exists(artifact),
     })),
@@ -103,51 +111,111 @@ const run = (command, args) =>
     })
   })
 
-const currentFingerprint = await hashInputs()
-let cachedFingerprint = null
-try {
-  cachedFingerprint = (await readFile(fingerprintPath, 'utf8')).trim()
-} catch {
-  // cache miss
+const readFingerprint = async (file) => {
+  try {
+    return (await readFile(file, 'utf8')).trim()
+  } catch {
+    return null
+  }
 }
 
-const missingArtifacts = await getMissingArtifacts()
-const staleReasons = []
+const currentBundleFingerprint = await hashInputs(bundleFingerprintInputs)
+const currentNativeFingerprint = await hashInputs(nativeFingerprintInputs)
+const cachedBundleFingerprint = await readFingerprint(bundleFingerprintPath)
+const cachedNativeFingerprint = await readFingerprint(nativeFingerprintPath)
+const missingBundleArtifacts = await getMissingArtifacts(bundleArtifacts)
+const missingNativeArtifacts = await getMissingArtifacts(nativeArtifacts)
+const bundleStaleReasons = []
+const nativeStaleReasons = []
+let shouldWriteNativeFingerprint = false
+let rebuiltBundleArtifacts = false
 
 if (force) {
-  staleReasons.push('force rebuild requested')
+  nativeStaleReasons.push('force rebuild requested')
+  bundleStaleReasons.push('force rebuild requested')
 }
 
-if (missingArtifacts.length > 0) {
-  staleReasons.push(
-    `missing artifacts: ${missingArtifacts.map(toRelativePath).join(', ')}`,
+if (missingNativeArtifacts.length > 0) {
+  nativeStaleReasons.push(
+    `missing native artifacts: ${missingNativeArtifacts
+      .map(toRelativePath)
+      .join(', ')}`,
   )
 }
 
-if (cachedFingerprint === null) {
-  staleReasons.push('artifact fingerprint is missing')
-} else if (cachedFingerprint !== currentFingerprint) {
-  staleReasons.push('artifact fingerprint changed')
+if (cachedNativeFingerprint === null) {
+  if (missingNativeArtifacts.length > 0 || force) {
+    nativeStaleReasons.push('native artifact fingerprint is missing')
+  } else {
+    shouldWriteNativeFingerprint = true
+  }
+} else if (cachedNativeFingerprint !== currentNativeFingerprint) {
+  nativeStaleReasons.push('native artifact fingerprint changed')
 }
 
-if (staleReasons.length > 0) {
+if (missingBundleArtifacts.length > 0) {
+  bundleStaleReasons.push(
+    `missing bundle artifacts: ${missingBundleArtifacts
+      .map(toRelativePath)
+      .join(', ')}`,
+  )
+}
+
+if (cachedBundleFingerprint === null) {
+  bundleStaleReasons.push('bundle artifact fingerprint is missing')
+} else if (cachedBundleFingerprint !== currentBundleFingerprint) {
+  bundleStaleReasons.push('bundle artifact fingerprint changed')
+}
+
+if (nativeStaleReasons.length > 0) {
   if (dryRun) {
     console.info(
       [
-        '[ensure-wasm] Artifacts are stale or missing; dry-run skipped rebuild.',
-        ...staleReasons.map((reason) => `  - ${reason}`),
+        '[ensure-wasm] Native artifacts are stale or missing; dry-run skipped rebuild.',
+        ...nativeStaleReasons.map((reason) => `  - ${reason}`),
       ].join('\n'),
     )
     process.exit(0)
   }
   console.info(
     [
-      '[ensure-wasm] Building stale or missing packages/wasm artifacts...',
-      ...staleReasons.map((reason) => `  - ${reason}`),
+      '[ensure-wasm] Building stale or missing packages/wasm native artifacts...',
+      ...nativeStaleReasons.map((reason) => `  - ${reason}`),
     ].join('\n'),
   )
   await run('pnpm', ['run', '_build:wasm:artifacts'])
-  await writeFile(fingerprintPath, `${currentFingerprint}\n`)
-} else {
-  console.info('[ensure-wasm] Reusing existing packages/wasm/dist artifacts.')
+  await writeFile(bundleFingerprintPath, `${currentBundleFingerprint}\n`)
+  await writeFile(nativeFingerprintPath, `${currentNativeFingerprint}\n`)
+  process.exit(0)
 }
+
+if (bundleStaleReasons.length > 0) {
+  if (dryRun) {
+    console.info(
+      [
+        '[ensure-wasm] Bundle artifacts are stale or missing; dry-run skipped rebuild.',
+        ...bundleStaleReasons.map((reason) => `  - ${reason}`),
+      ].join('\n'),
+    )
+    process.exit(0)
+  }
+  console.info(
+    [
+      '[ensure-wasm] Building stale or missing packages/wasm bundle artifacts...',
+      ...bundleStaleReasons.map((reason) => `  - ${reason}`),
+    ].join('\n'),
+  )
+  await run('pnpm', ['run', '-C', 'packages/wasm', 'build'])
+  await writeFile(bundleFingerprintPath, `${currentBundleFingerprint}\n`)
+  rebuiltBundleArtifacts = true
+}
+
+if (shouldWriteNativeFingerprint && !dryRun) {
+  await writeFile(nativeFingerprintPath, `${currentNativeFingerprint}\n`)
+}
+
+console.info(
+  rebuiltBundleArtifacts
+    ? '[ensure-wasm] packages/wasm/dist artifacts are ready.'
+    : '[ensure-wasm] Reusing existing packages/wasm/dist artifacts.',
+)

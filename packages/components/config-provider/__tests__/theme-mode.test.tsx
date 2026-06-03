@@ -6,7 +6,11 @@ import {
   applyThemeModeForTesting,
   clearThemeMode,
   installThemeModeTestHelper,
+  readThemeMode,
+  subscribeThemeMode,
   syncThemeMode,
+  useThemeMode,
+  writeThemeMode,
 } from '../src/theme-mode'
 
 type MatchMediaController = ReturnType<typeof createMatchMediaController>
@@ -130,7 +134,7 @@ describe('theme-mode', () => {
   })
 
   it('tracks system preference changes without forcing classes', () => {
-    syncThemeMode('system')
+    expect(syncThemeMode('system')).toBe('light')
 
     expect(document.documentElement.classList.contains('light')).toBe(false)
     expect(document.documentElement.classList.contains('dark')).toBe(false)
@@ -143,6 +147,34 @@ describe('theme-mode', () => {
     expect(document.documentElement.classList.contains('dark')).toBe(false)
     expect(document.documentElement.dataset.themeResolved).toBe('dark')
     expect(document.documentElement.style.colorScheme).toBe('dark')
+  })
+
+  it('exposes storage-backed public theme runtime helpers', () => {
+    const changes: string[] = []
+    const unsubscribe = subscribeThemeMode((detail) => {
+      changes.push(`${detail.mode}:${detail.resolved}`)
+    })
+
+    expect(readThemeMode({ storageKey: 'fsus-test-theme' })).toBe('system')
+    expect(
+      writeThemeMode('dark', {
+        storageKey: 'fsus-test-theme',
+      }),
+    ).toBe('dark')
+    expect(window.localStorage.getItem('fsus-test-theme')).toBe('dark')
+    expect(readThemeMode({ storageKey: 'fsus-test-theme' })).toBe('dark')
+
+    const runtime = useThemeMode({
+      storageKey: 'fsus-test-theme',
+    })
+    expect(runtime.mode).toBe('dark')
+    expect(runtime.setMode('light')).toBe('light')
+    expect(runtime.resolved).toBe('light')
+    expect(window.localStorage.getItem('fsus-test-theme')).toBe('light')
+
+    unsubscribe()
+    expect(changes).toContain('dark:dark')
+    expect(changes).toContain('light:light')
   })
 
   it('restores the parent theme mode when a nested provider unmounts', async () => {

@@ -7,5 +7,7 @@ coverage/
 dist/
 lib/
 es/
+.vite/
+.cache/
 *.tsbuildinfo
 *.log

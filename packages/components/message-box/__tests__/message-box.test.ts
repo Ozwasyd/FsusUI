@@ -100,6 +100,19 @@ describe('MessageBox', () => {
     expect(icon.querySelector('svg').innerHTML).toBe(svg.innerHTML)
   })
 
+  test('normalizes center before initial render', async () => {
+    silencePromise(
+      MessageBox.confirm('centered confirm', {
+        center: true,
+      }),
+    )
+    await rAF()
+
+    expect(document.querySelector('.el-message-box')?.className).toContain(
+      'el-message-box--center',
+    )
+  })
+
   test('html string', async () => {
     silencePromise(
       MessageBox({
@@ -114,8 +127,7 @@ describe('MessageBox', () => {
   })
 
   test('renders SQL-like and XSS-like strings as inert text by default', async () => {
-    const payload =
-      `'; DROP TABLE users; -- <img src=x onerror="alert(1)">`
+    const payload = `'; DROP TABLE users; -- <img src=x onerror="alert(1)">`
 
     silencePromise(
       MessageBox({

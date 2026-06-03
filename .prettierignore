@@ -7,6 +7,9 @@ packages/demo-app/dist
 packages/icons-vue/dist
 packages/wasm/dist
 internal/*/dist
+tests/fixtures/**/dist
+tests/fixtures/**/node_modules
+tests/fixtures/**/.pnpm-store
 packages/wasm/build
 packages/wasm/.cmake-check
 node_modules
@@ -27,6 +30,8 @@ secrets
 *.tgz
 *.tar.gz
 *.pack
+tests/fixtures/**/.npmrc
+tests/fixtures/**/.npmrc.*
 .vite
 .turbo
 .cache
