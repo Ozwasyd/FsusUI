@@ -454,6 +454,8 @@ function rewritePublishedSelfReferences(rootDir, packageName) {
   let replacementCount = 0
 
   for (const filePath of candidates) {
+    if (!existsSync(filePath)) continue
+
     const original = readFileSync(filePath, 'utf8')
     let rewritten = original
 

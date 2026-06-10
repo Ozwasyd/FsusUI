@@ -98,12 +98,12 @@ describe('<fixed-size-grid />', () => {
       const gridRef = wrapper.vm.$refs.gridRef as GridRef
 
       makeScroll(unref(gridRef.windowRef), 'scrollTop', 100)
-      await nextTick()
+      await waitForScrollReset()
       // 8 x 5 grid
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(40)
 
       makeScroll(unref(gridRef.windowRef), 'scrollLeft', 100)
-      await nextTick()
+      await waitForScrollReset()
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(64)
     })
 
@@ -114,11 +114,11 @@ describe('<fixed-size-grid />', () => {
 
       const gridRef = wrapper.vm.$refs.gridRef as GridRef
       makeScroll(unref(gridRef.windowRef), 'scrollTop', 0)
-      await nextTick()
+      await waitForScrollReset()
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(36)
 
       makeScroll(unref(gridRef.windowRef), 'scrollLeft', 0)
-      await nextTick()
+      await waitForScrollReset()
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(36)
     })
 

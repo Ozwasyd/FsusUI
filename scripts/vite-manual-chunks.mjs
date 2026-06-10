@@ -6,6 +6,56 @@ const sanitizeChunkName = (name) =>
     .replaceAll(/[\\/]/g, '-')
     .replaceAll(/[^a-zA-Z0-9-_]/g, '')
 
+const emptyChunkPronePackages = new Set([
+  'd3-chord',
+  'd3-contour',
+  'd3-delaunay',
+  'd3-drag',
+  'd3-dsv',
+  'd3-fetch',
+  'd3-force',
+  'd3-geo',
+  'd3-hierarchy',
+  'd3-polygon',
+  'd3-quadtree',
+  'd3-random',
+  'delaunator',
+  'robust-predicates',
+])
+
+const resolveMermaidRuntimeChunk = (id) => {
+  const mermaidChunk = id.match(
+    /\/node_modules\/mermaid\/dist\/chunks\/mermaid\.(?:core|esm\.min)\/([^/]+)\.mjs$/,
+  )
+  if (mermaidChunk) {
+    return `vendor-mermaid-${sanitizeChunkName(mermaidChunk[1])}`
+  }
+
+  if (
+    id.includes('/node_modules/mermaid/dist/mermaid.core.mjs') ||
+    id.includes('/node_modules/mermaid/dist/mermaid.esm.min.mjs')
+  ) {
+    return 'vendor-mermaid-core'
+  }
+
+  const parserChunk = id.match(
+    /\/node_modules\/@mermaid-js\/parser\/dist\/chunks\/mermaid-parser\.core\/([^/]+)\.mjs$/,
+  )
+  if (parserChunk) {
+    return `vendor-mermaid-parser-${sanitizeChunkName(parserChunk[1])}`
+  }
+
+  if (
+    id.includes(
+      '/node_modules/@mermaid-js/parser/dist/mermaid-parser.core.mjs',
+    )
+  ) {
+    return 'vendor-mermaid-parser-core'
+  }
+
+  return undefined
+}
+
 const resolveScopedPackageChunk = (id) => {
   const pkgMatch = id.match(/\/node_modules\/(@[^/]+\/[^/]+|[^/]+)/)
   if (!pkgMatch) return undefined
@@ -13,6 +63,10 @@ const resolveScopedPackageChunk = (id) => {
   const packageName = pkgMatch[1]
   if (packageName === '@ozwasyd/element-plus') return undefined
   if (packageName === 'lodash-unified') return undefined
+  if (packageName === 'mermaid' || packageName === '@mermaid-js/parser') {
+    return undefined
+  }
+  if (emptyChunkPronePackages.has(packageName)) return undefined
   if (packageName === 'lodash' || packageName === 'lodash-es') {
     return 'vendor-lodash'
   }
@@ -111,6 +165,9 @@ export const resolveFsusViteManualChunk = (moduleId) => {
   if (id.includes('/node_modules/vue/') || id.includes('/node_modules/@vue/')) {
     return 'vue-vendor'
   }
+
+  const mermaidChunk = resolveMermaidRuntimeChunk(id)
+  if (mermaidChunk) return mermaidChunk
 
   if (id.includes('/node_modules/')) {
     return resolveScopedPackageChunk(id)

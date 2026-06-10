@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   activateMarkdownFeatures,
   defaultCodeHighlightAdapter,
@@ -13,13 +13,6 @@ const featureModuleMocks = vi.hoisted(() => ({
   shikiCodeToHtml: vi.fn(),
 }))
 
-vi.mock('mermaid', () => ({
-  default: {
-    initialize: featureModuleMocks.mermaidInitialize,
-    render: featureModuleMocks.mermaidRender,
-  },
-}))
-
 vi.mock('katex', () => ({
   default: {
     renderToString: featureModuleMocks.katexRenderToString,
@@ -27,12 +20,51 @@ vi.mock('katex', () => ({
   renderToString: featureModuleMocks.katexRenderToString,
 }))
 
-vi.mock('shiki', () => ({
-  codeToHtml: featureModuleMocks.shikiCodeToHtml,
+vi.mock('shiki/core', () => ({
+  createHighlighterCore: vi.fn(async () => ({
+    codeToHtml: featureModuleMocks.shikiCodeToHtml,
+  })),
+}))
+
+vi.mock('shiki/engine/javascript', () => ({
+  createJavaScriptRegexEngine: vi.fn(() => ({})),
+}))
+
+vi.mock('shiki/dist/langs/bash.mjs', () => ({
+  default: { name: 'bash' },
+}))
+
+vi.mock('shiki/dist/langs/csharp.mjs', () => ({
+  default: { name: 'csharp' },
+}))
+
+vi.mock('shiki/dist/langs/javascript.mjs', () => ({
+  default: { name: 'javascript' },
+}))
+
+vi.mock('shiki/dist/langs/typescript.mjs', () => ({
+  default: { name: 'typescript' },
+}))
+
+vi.mock('shiki/dist/themes/github-dark.mjs', () => ({
+  default: { name: 'github-dark' },
+}))
+
+vi.mock('shiki/dist/themes/github-light.mjs', () => ({
+  default: { name: 'github-light' },
 }))
 
 describe('markdown feature activation runtime', () => {
+  const globalWithMermaid = globalThis as typeof globalThis & {
+    mermaid?: unknown
+  }
+
   beforeEach(() => {
+    globalWithMermaid.mermaid = {
+      initialize: featureModuleMocks.mermaidInitialize,
+      render: featureModuleMocks.mermaidRender,
+    }
+
     featureModuleMocks.katexRenderToString.mockReset()
     featureModuleMocks.mermaidInitialize.mockReset()
     featureModuleMocks.mermaidRender.mockReset()
@@ -51,6 +83,10 @@ describe('markdown feature activation runtime', () => {
     featureModuleMocks.shikiCodeToHtml.mockResolvedValue(
       '<pre class="shiki" style="background:#fff"><code><span style="color:#24292e">const ok = true</span></code></pre>',
     )
+  })
+
+  afterEach(() => {
+    delete globalWithMermaid.mermaid
   })
 
   it('normalizes headings, links, csp styles, placeholders, and code blocks', async () => {

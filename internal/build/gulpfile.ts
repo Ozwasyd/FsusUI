@@ -1,5 +1,6 @@
 import path from 'path'
-import { copyFile, mkdir } from 'fs/promises'
+import { copyFile, mkdir, stat } from 'fs/promises'
+import { setTimeout as sleep } from 'timers/promises'
 import { copy } from 'fs-extra'
 import { parallel, series } from 'gulp'
 import {
@@ -20,6 +21,21 @@ import {
 import type { TaskFunction } from 'gulp'
 import type { Module } from './src'
 
+const waitForPath = async (target: string) => {
+  let lastError: unknown
+  for (let attempt = 0; attempt < 100; attempt += 1) {
+    try {
+      await stat(target)
+      return
+    } catch (error) {
+      lastError = error
+      await sleep(50)
+    }
+  }
+
+  throw lastError
+}
+
 export const copyFiles = () =>
   Promise.all([
     copyFile(epPackage, path.join(epOutput, 'package.json')),
@@ -37,20 +53,30 @@ export const copyTypesDefinitions: TaskFunction = (done) => {
   const src = path.resolve(buildOutput, 'types', 'packages')
   const copyTypes = (module: Module) =>
     withTaskName(`copyTypes:${module}`, () =>
-      copy(src, buildConfig[module].output.path),
+      waitForPath(src).then(() => copy(src, buildConfig[module].output.path)),
     )
 
   return parallel(copyTypes('esm'), copyTypes('cjs'))(done)
 }
 
 export const copyFullStyle = async () => {
+  const fullStyleSource = path.resolve(epOutput, 'theme-chalk/index.css')
+  const criticalStyleSource = path.resolve(
+    epOutput,
+    'theme-chalk/el-public-shell-critical.css',
+  )
+
+  await Promise.all([
+    waitForPath(fullStyleSource),
+    waitForPath(criticalStyleSource),
+  ])
   await mkdir(path.resolve(epOutput, 'dist'), { recursive: true })
   await copyFile(
-    path.resolve(epOutput, 'theme-chalk/index.css'),
+    fullStyleSource,
     path.resolve(epOutput, 'dist/index.css'),
   )
   await copyFile(
-    path.resolve(epOutput, 'theme-chalk/el-public-shell-critical.css'),
+    criticalStyleSource,
     path.resolve(epOutput, 'dist/public-shell-critical.css'),
   )
 }
@@ -115,17 +141,17 @@ export default series(
     withTaskName('ensureIconsVueArtifacts', () => run('pnpm run ensure:icons')),
   ),
 
-  parallel(
-    withTaskName('buildFullBundle', buildFullBundle),
-    withTaskName('generateTypesDefinitions', generateTypesDefinitions),
+  series(
     withTaskName('buildHelper', buildHelper),
     withTaskName('buildModules', buildModules),
+    withTaskName('generateTypesDefinitions', generateTypesDefinitions),
     series(
       withTaskName('buildThemeChalk', () =>
         run('pnpm run -C packages/theme-chalk build'),
       ),
       copyFullStyle,
     ),
+    withTaskName('buildFullBundle', buildFullBundle),
   ),
 
   parallel(copyTypesDefinitions, copyFiles, copyWasmRuntimeAssets),

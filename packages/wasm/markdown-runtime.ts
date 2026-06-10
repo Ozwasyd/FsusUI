@@ -683,14 +683,26 @@ type MermaidRuntime = {
   ) => Promise<{ svg: string }> | { svg: string } | string
 }
 
+const mermaidRuntimeUrl =
+  'https://cdn.jsdelivr.net/npm/mermaid@10.9.6/dist/mermaid.esm.min.mjs'
+
+type GlobalMermaidRuntime = typeof globalThis & {
+  mermaid?: MermaidRuntime | { default?: MermaidRuntime }
+}
+
 type KatexRuntime = {
   renderToString?: (source: string, options: Record<string, unknown>) => string
+}
+
+type ShikiRenderOptions = {
+  lang: string
+  theme: string
 }
 
 type ShikiRuntime = {
   codeToHtml?: (
     source: string,
-    options: Record<string, unknown>,
+    options: ShikiRenderOptions,
   ) => string | Promise<string>
 }
 
@@ -700,12 +712,23 @@ const resolveDefaultModule = <T>(module: T | { default?: T }) =>
     ? (module as { default: T }).default
     : (module as T)
 
-const loadMermaidRuntime = async () =>
-  resolveDefaultModule<MermaidRuntime>(
-    (await import('mermaid')) as unknown as
-      | MermaidRuntime
-      | { default?: MermaidRuntime },
+let mermaidRuntimePromise: Promise<MermaidRuntime> | null = null
+
+const loadMermaidRuntime = async () => {
+  const globalMermaid = (globalThis as GlobalMermaidRuntime).mermaid
+  if (globalMermaid) {
+    return resolveDefaultModule<MermaidRuntime>(globalMermaid)
+  }
+
+  mermaidRuntimePromise ??= import(/* @vite-ignore */ mermaidRuntimeUrl).then(
+    (module) =>
+      resolveDefaultModule<MermaidRuntime>(
+        module as unknown as MermaidRuntime | { default?: MermaidRuntime },
+      ),
   )
+
+  return mermaidRuntimePromise
+}
 
 const loadKatexRuntime = async () =>
   resolveDefaultModule<KatexRuntime>(
@@ -714,12 +737,47 @@ const loadKatexRuntime = async () =>
       | { default?: KatexRuntime },
   )
 
-const loadShikiRuntime = async () =>
-  resolveDefaultModule<ShikiRuntime>(
-    (await import('shiki')) as unknown as
-      | ShikiRuntime
-      | { default?: ShikiRuntime },
-  )
+let shikiRuntimePromise: Promise<ShikiRuntime> | null = null
+
+const loadShikiRuntime = async () => {
+  shikiRuntimePromise ??= (async () => {
+    const [
+      { createHighlighterCore },
+      { createJavaScriptRegexEngine },
+      javascript,
+      typescript,
+      bash,
+      csharp,
+      githubLight,
+      githubDark,
+    ] = await Promise.all([
+      import('shiki/core'),
+      import('shiki/engine/javascript'),
+      import('shiki/dist/langs/javascript.mjs'),
+      import('shiki/dist/langs/typescript.mjs'),
+      import('shiki/dist/langs/bash.mjs'),
+      import('shiki/dist/langs/csharp.mjs'),
+      import('shiki/dist/themes/github-light.mjs'),
+      import('shiki/dist/themes/github-dark.mjs'),
+    ])
+    const highlighter = await createHighlighterCore({
+      engine: createJavaScriptRegexEngine(),
+      langs: [
+        javascript.default,
+        typescript.default,
+        bash.default,
+        csharp.default,
+      ].flat(),
+      themes: [githubLight.default, githubDark.default],
+    })
+
+    return {
+      codeToHtml: (source, options) => highlighter.codeToHtml(source, options),
+    }
+  })()
+
+  return shikiRuntimePromise
+}
 
 let markdownMermaidRenderId = 0
 
@@ -792,7 +850,7 @@ export const defaultMermaidAdapter: MarkdownFeatureAdapter = async (
   try {
     const mermaid = await loadMermaidRuntime()
     if (typeof mermaid.render !== 'function') {
-      throw new Error('mermaid_render_unavailable')
+      throw createMarkdownRuntimeError('infra', 'mermaid_render_unavailable')
     }
 
     mermaid.initialize?.({
@@ -854,7 +912,7 @@ export const defaultLatexAdapter: MarkdownFeatureAdapter = async (
   try {
     const katex = await loadKatexRuntime()
     if (typeof katex.renderToString !== 'function') {
-      throw new Error('katex_render_unavailable')
+      throw createMarkdownRuntimeError('infra', 'katex_render_unavailable')
     }
 
     const styleRoot = context
@@ -912,7 +970,7 @@ const renderShikiHtml = async (
   theme: string,
 ) => {
   if (typeof shiki.codeToHtml !== 'function') {
-    throw new Error('shiki_code_to_html_unavailable')
+    throw createMarkdownRuntimeError('infra', 'shiki_code_to_html_unavailable')
   }
 
   try {

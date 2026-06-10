@@ -1,5 +1,13 @@
 # element-plus
 
+## 1.5.0
+
+### Minor Changes
+
+- Add default Markdown feature adapters for Mermaid, KaTeX, and code highlighting.
+- Improve Markdown, virtual scrolling, and DOM rendering performance for high-density views.
+- Harden GitHub Packages release boundary checks and remove stale repository notes from the release branch.
+
 ## 1.4.2
 
 ### Patch Changes
