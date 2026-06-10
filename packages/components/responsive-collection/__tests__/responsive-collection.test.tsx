@@ -41,10 +41,54 @@ describe('ResponsiveCollection.vue', () => {
 
     expect(wrapper.classes()).toContain('is-compact')
     expect(wrapper.find('[role="list"]').attributes('aria-label')).toBe(
-      'Article list'
+      'Article list',
     )
     expect(wrapper.findAll('.compact-card').map((card) => card.text())).toEqual(
-      ['First', 'Second']
+      ['First', 'Second'],
     )
+  })
+
+  test('mounts only the active branch initially in lazy strategy', async () => {
+    const wrapper = mount(ResponsiveCollection, {
+      props: {
+        compact: false,
+        items,
+      },
+      slots: {
+        table: '<div class="desktop-table">desktop</div>',
+        card: '<article class="compact-card">compact</article>',
+      },
+    })
+
+    expect(wrapper.find('.desktop-table').exists()).toBe(true)
+    expect(wrapper.find('.compact-card').exists()).toBe(false)
+
+    await wrapper.setProps({ compact: true })
+
+    expect(wrapper.find('.desktop-table').exists()).toBe(true)
+    expect(wrapper.find('.compact-card').exists()).toBe(true)
+    expect(
+      (
+        wrapper.find('.el-responsive-collection__desktop')
+          .element as HTMLElement
+      ).style.display,
+    ).toBe('none')
+  })
+
+  test('can preserve the legacy eager two-branch DOM strategy', () => {
+    const wrapper = mount(ResponsiveCollection, {
+      props: {
+        compact: false,
+        items,
+        renderStrategy: 'show-both',
+      },
+      slots: {
+        table: '<div class="desktop-table">desktop</div>',
+        card: '<article class="compact-card">compact</article>',
+      },
+    })
+
+    expect(wrapper.find('.desktop-table').exists()).toBe(true)
+    expect(wrapper.find('.compact-card').exists()).toBe(true)
   })
 })

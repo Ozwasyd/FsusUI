@@ -8,6 +8,16 @@ export type ResponsiveCollectionRowKey =
   | number
   | ((item: unknown, index: number) => string | number)
 
+export const responsiveCollectionRenderStrategies = [
+  'show-both',
+  'lazy-branch',
+  'desktop-only',
+  'compact-only',
+] as const
+
+export type ResponsiveCollectionRenderStrategy =
+  (typeof responsiveCollectionRenderStrategies)[number]
+
 export const responsiveCollectionProps = buildProps({
   /**
    * @description collection items shared by desktop and compact slots
@@ -20,7 +30,11 @@ export const responsiveCollectionProps = buildProps({
    * @description row key field or resolver
    */
   rowKey: {
-    type: definePropType<ResponsiveCollectionRowKey>([String, Number, Function]),
+    type: definePropType<ResponsiveCollectionRowKey>([
+      String,
+      Number,
+      Function,
+    ]),
     default: undefined,
   },
   /**
@@ -36,6 +50,14 @@ export const responsiveCollectionProps = buildProps({
   compactQuery: {
     type: String,
     default: '(max-width: 639px)',
+  },
+  /**
+   * @description controls whether responsive branches are mounted eagerly or lazily
+   */
+  renderStrategy: {
+    type: definePropType<ResponsiveCollectionRenderStrategy>(String),
+    values: responsiveCollectionRenderStrategies,
+    default: 'lazy-branch',
   },
   /**
    * @description accessible label for compact list mode

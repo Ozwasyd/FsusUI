@@ -16,6 +16,9 @@ describe('ThemeModeToggle.vue', () => {
     expect(wrapper.classes()).toContain('el-theme-mode-toggle--mobile')
     expect(wrapper.classes()).toContain('is-compact')
     expect(wrapper.attributes('data-theme-mode-visibility')).toBe('mobile')
+    expect(
+      wrapper.element.matches('.el-radio-group.el-theme-mode-toggle'),
+    ).toBe(true)
   })
 
   test('emits and syncs selected theme mode', async () => {

@@ -1,13 +1,21 @@
 {
-  "generatedAt": "2026-06-03T13:21:38.554Z",
+  "generatedAt": "2026-06-10T03:14:34.976Z",
   "totals": {
     "filesScanned": 132,
-    "totalNodes": 1027,
+    "totalNodes": 1024,
     "totalIssues": 0,
+    "totalReviewFindings": 90,
     "totalPotentialSavings": 0,
+    "totalReviewPotentialSavings": 90,
     "deprecatedSyntaxCount": 0,
     "byRisk": {},
-    "byCategory": {}
+    "byCategory": {},
+    "byReviewCategory": {
+      "slot-passthrough-wrapper": 53,
+      "class-only-single-child-wrapper": 24,
+      "component-wrapper-around-component-root": 8,
+      "v-show-sibling-branches": 5
+    }
   },
   "files": [
     {
@@ -15,1188 +23,2221 @@
       "nodeCount": 3,
       "componentCount": 0,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 3,
+          "category": "slot-passthrough-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/alert/src/alert.vue",
       "nodeCount": 12,
       "componentCount": 5,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 13,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "span 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/autocomplete/src/autocomplete.vue",
       "nodeCount": 14,
       "componentCount": 5,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/avatar/src/avatar.vue",
       "nodeCount": 5,
       "componentCount": 2,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/backtop/src/backtop.vue",
       "nodeCount": 5,
       "componentCount": 3,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/badge/src/badge.vue",
       "nodeCount": 4,
       "componentCount": 1,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/breadcrumb/src/breadcrumb-item.vue",
       "nodeCount": 6,
       "componentCount": 2,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/breadcrumb/src/breadcrumb.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/button/src/button-group.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 2,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/button/src/button.vue",
       "nodeCount": 9,
       "componentCount": 5,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 33,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "span 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/calendar/src/calendar.vue",
       "nodeCount": 16,
       "componentCount": 6,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 3,
+      "manualReviewCount": 3,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 3,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 5,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 带 class 且只包裹 interpolation",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        },
+        {
+          "line": 6,
+          "category": "component-wrapper-around-component-root",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 <el-button-group component>",
+          "suggestion": "检查子组件 root 是否支持 class/attrs 透传，再评估移除外壳"
+        }
+      ]
     },
     {
       "file": "packages/components/calendar/src/date-table.vue",
       "nodeCount": 8,
       "componentCount": 0,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 26,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/card/src/card.vue",
       "nodeCount": 7,
       "componentCount": 0,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 3,
+      "manualReviewCount": 3,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 3,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 6,
+          "category": "slot-passthrough-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 9,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/carousel/src/carousel-item.vue",
       "nodeCount": 3,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/carousel/src/carousel.vue",
       "nodeCount": 15,
       "componentCount": 7,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/cascader-panel/src/index.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/cascader-panel/src/menu.vue",
       "nodeCount": 7,
       "componentCount": 4,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 24,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 带 class 且只包裹 interpolation",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        }
+      ]
     },
     {
       "file": "packages/components/cascader-panel/src/node.vue",
       "nodeCount": 11,
       "componentCount": 9,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/cascader/src/cascader.vue",
       "nodeCount": 21,
       "componentCount": 13,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 2,
+      "manualReviewCount": 2,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 94,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 带 class 且只包裹 <div>",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        },
+        {
+          "line": 142,
+          "category": "v-show-sibling-branches",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "template 下存在 2 个 v-show sibling branches",
+          "suggestion": "检查是否应改成 lazy v-if、render strategy 或按场景只挂载当前分支"
+        }
+      ]
     },
     {
       "file": "packages/components/check-tag/src/check-tag.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/checkbox/src/checkbox-button.vue",
       "nodeCount": 5,
       "componentCount": 0,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 33,
+          "category": "slot-passthrough-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "span 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/checkbox/src/checkbox-group.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/checkbox/src/checkbox.vue",
       "nodeCount": 7,
       "componentCount": 1,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 44,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "span 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/col/src/col.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/collapse-transition/src/collapse-transition.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/collapse/src/collapse-item.vue",
       "nodeCount": 9,
       "componentCount": 3,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 31,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/collapse/src/collapse.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 2,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/collection/src/collection-item.vue",
       "nodeCount": 1,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/collection/src/collection.vue",
       "nodeCount": 1,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/color-picker/src/color-picker.vue",
       "nodeCount": 21,
       "componentCount": 12,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 3,
+      "manualReviewCount": 3,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 30,
+          "category": "component-wrapper-around-component-root",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "span 只包裹 <el-input component>",
+          "suggestion": "检查子组件 root 是否支持 class/attrs 透传，再评估移除外壳"
+        },
+        {
+          "line": 76,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "span 带 class 且只包裹 <span>",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        },
+        {
+          "line": 77,
+          "category": "v-show-sibling-branches",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "span 下存在 2 个 v-show sibling branches",
+          "suggestion": "检查是否应改成 lazy v-if、render strategy 或按场景只挂载当前分支"
+        }
+      ]
     },
     {
       "file": "packages/components/container/src/aside.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/container/src/container.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/container/src/footer.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/container/src/header.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/container/src/main.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/countdown/src/countdown.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/descriptions/src/description.vue",
       "nodeCount": 10,
       "componentCount": 1,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 3,
+      "manualReviewCount": 3,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 7,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 10,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 15,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 带 class 且只包裹 <table>",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        }
+      ]
     },
     {
       "file": "packages/components/descriptions/src/descriptions-row.vue",
       "nodeCount": 8,
       "componentCount": 5,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/dialog/src/dialog-content.vue",
       "nodeCount": 11,
       "componentCount": 2,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/dialog/src/dialog.vue",
       "nodeCount": 10,
       "componentCount": 5,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/divider/src/divider.vue",
       "nodeCount": 3,
       "componentCount": 0,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 7,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/drawer/src/drawer.vue",
       "nodeCount": 17,
       "componentCount": 6,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 74,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/dropdown/src/dropdown-item-impl.vue",
       "nodeCount": 5,
       "componentCount": 2,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/dropdown/src/dropdown-item.vue",
       "nodeCount": 4,
       "componentCount": 3,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/dropdown/src/dropdown-menu.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/dropdown/src/dropdown.vue",
       "nodeCount": 14,
       "componentCount": 10,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/empty/src/empty.vue",
       "nodeCount": 9,
       "componentCount": 1,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 2,
+      "manualReviewCount": 2,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 9,
+          "category": "slot-passthrough-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 12,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/empty/src/img-empty.vue",
       "nodeCount": 11,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/focus-trap/src/focus-trap.vue",
       "nodeCount": 1,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/form/src/form-item.vue",
       "nodeCount": 9,
       "componentCount": 3,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 30,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 带 class 且只包裹 interpolation",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        }
+      ]
     },
     {
       "file": "packages/components/form/src/form.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/icon/src/icon.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/image-viewer/src/image-viewer.vue",
       "nodeCount": 26,
       "componentCount": 10,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 47,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 带 class 且只包裹 <img>",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        }
+      ]
     },
     {
       "file": "packages/components/image/src/image.vue",
       "nodeCount": 9,
       "componentCount": 1,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 2,
+      "manualReviewCount": 2,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 4,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 带 class 且只包裹 interpolation",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        },
+        {
+          "line": 18,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/input-number/src/input-number.vue",
       "nodeCount": 10,
       "componentCount": 7,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/input/src/input.vue",
       "nodeCount": 26,
       "componentCount": 10,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 4,
+      "manualReviewCount": 4,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 14,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 20,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "span 带 class 且只包裹 <span>",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        },
+        {
+          "line": 55,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "span 带 class 且只包裹 <span>",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        },
+        {
+          "line": 97,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/link/src/link.vue",
       "nodeCount": 6,
       "componentCount": 2,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 8,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "span 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/markdown-editor/src/markdown-editor.vue",
-      "nodeCount": 18,
+      "nodeCount": 17,
       "componentCount": 1,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 4,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 带 class 且只包裹 <button>",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        }
+      ]
     },
     {
       "file": "packages/components/markdown-renderer/src/markdown-renderer.vue",
       "nodeCount": 10,
       "componentCount": 0,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 24,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "span 带 class 且只包裹 node type 2",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        }
+      ]
     },
     {
       "file": "packages/components/menu/src/menu-collapse-transition.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/menu/src/menu-item-group.vue",
       "nodeCount": 5,
       "componentCount": 0,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 3,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/menu/src/menu-item.vue",
       "nodeCount": 7,
       "componentCount": 1,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 26,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/message-box/src/index.vue",
       "nodeCount": 26,
       "componentCount": 14,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 77,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/message/src/message.vue",
       "nodeCount": 10,
       "componentCount": 6,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/notification/src/notification.vue",
       "nodeCount": 12,
       "componentCount": 5,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 22,
+          "category": "slot-passthrough-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/page-header/src/page-header.vue",
       "nodeCount": 19,
       "componentCount": 3,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 5,
+      "manualReviewCount": 5,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 3,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 25,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 30,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 35,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 40,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/popconfirm/src/popconfirm.vue",
       "nodeCount": 9,
       "componentCount": 5,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/popover/src/popover.vue",
       "nodeCount": 4,
       "componentCount": 1,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/popper/src/arrow.vue",
       "nodeCount": 1,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/popper/src/content.vue",
       "nodeCount": 3,
       "componentCount": 1,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/popper/src/popper.vue",
       "nodeCount": 1,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/popper/src/trigger.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/progress/src/progress.vue",
       "nodeCount": 14,
       "componentCount": 2,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 3,
+      "manualReviewCount": 3,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 17,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 带 class 且只包裹 <div>",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        },
+        {
+          "line": 31,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 67,
+          "category": "slot-passthrough-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/public-shell/src/public-shell.vue",
       "nodeCount": 32,
       "componentCount": 3,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 127,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/radio/src/radio-button.vue",
       "nodeCount": 4,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/radio/src/radio-group.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/radio/src/radio.vue",
       "nodeCount": 6,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/rate/src/rate.vue",
       "nodeCount": 9,
       "componentCount": 6,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 33,
+          "category": "v-show-sibling-branches",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "template 下存在 2 个 v-show sibling branches",
+          "suggestion": "检查是否应改成 lazy v-if、render strategy 或按场景只挂载当前分支"
+        }
+      ]
     },
     {
       "file": "packages/components/responsive-collection/src/responsive-collection.vue",
       "nodeCount": 7,
       "componentCount": 0,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 2,
+      "manualReviewCount": 2,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 2,
+          "category": "v-show-sibling-branches",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 下存在 2 个 v-show sibling branches",
+          "suggestion": "检查是否应改成 lazy v-if、render strategy 或按场景只挂载当前分支"
+        },
+        {
+          "line": 3,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/result/src/result.vue",
       "nodeCount": 10,
       "componentCount": 1,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 4,
+      "manualReviewCount": 4,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 3,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 12,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 15,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 18,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/roving-focus-group/src/roving-focus-group-impl.vue",
       "nodeCount": 1,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/roving-focus-group/src/roving-focus-group.vue",
       "nodeCount": 3,
       "componentCount": 2,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/roving-focus-group/src/roving-focus-item.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/row/src/row.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/scrollbar/src/bar.vue",
       "nodeCount": 2,
       "componentCount": 2,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/scrollbar/src/scrollbar.vue",
       "nodeCount": 5,
       "componentCount": 2,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/scrollbar/src/thumb.vue",
       "nodeCount": 3,
       "componentCount": 1,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/select-v2/src/group-item.vue",
       "nodeCount": 3,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/select-v2/src/option-item.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/select-v2/src/select.vue",
       "nodeCount": 38,
       "componentCount": 13,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 4,
+      "manualReviewCount": 4,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 62,
+          "category": "component-wrapper-around-component-root",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 <el-tag component>",
+          "suggestion": "检查子组件 root 是否支持 class/attrs 透传，再评估移除外壳"
+        },
+        {
+          "line": 89,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 带 class 且只包裹 <div>",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        },
+        {
+          "line": 205,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 带 class 且只包裹 <input>",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        },
+        {
+          "line": 252,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "span 带 class 且只包裹 interpolation",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        }
+      ]
     },
     {
       "file": "packages/components/select/src/option-group.vue",
       "nodeCount": 5,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/select/src/option.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/select/src/select-dropdown.vue",
       "nodeCount": 6,
       "componentCount": 0,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 2,
+      "manualReviewCount": 2,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 6,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 10,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/select/src/select.vue",
-      "nodeCount": 38,
+      "nodeCount": 37,
       "componentCount": 17,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 2,
+      "manualReviewCount": 2,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 81,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 带 class 且只包裹 <div>",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        },
+        {
+          "line": 116,
+          "category": "component-wrapper-around-component-root",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "span 只包裹 <el-tag component>",
+          "suggestion": "检查子组件 root 是否支持 class/attrs 透传，再评估移除外壳"
+        }
+      ]
     },
     {
       "file": "packages/components/skeleton/src/skeleton-item.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 2,
+          "category": "component-wrapper-around-component-root",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 <picture-filled component>",
+          "suggestion": "检查子组件 root 是否支持 class/attrs 透传，再评估移除外壳"
+        }
+      ]
     },
     {
       "file": "packages/components/skeleton/src/skeleton.vue",
       "nodeCount": 5,
       "componentCount": 2,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/slider/src/button.vue",
       "nodeCount": 3,
       "componentCount": 1,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/slider/src/slider.vue",
       "nodeCount": 10,
       "componentCount": 4,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 64,
+          "category": "component-wrapper-around-component-root",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 <slider-marker component>",
+          "suggestion": "检查子组件 root 是否支持 class/attrs 透传，再评估移除外壳"
+        }
+      ]
     },
     {
       "file": "packages/components/statistic/src/statistic.vue",
       "nodeCount": 9,
       "componentCount": 0,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 3,
+      "manualReviewCount": 3,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 3,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 9,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 15,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/steps/src/item.vue",
       "nodeCount": 19,
       "componentCount": 6,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 5,
+      "manualReviewCount": 5,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 5,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 带 class 且只包裹 <i>",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        },
+        {
+          "line": 9,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 28,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 带 class 且只包裹 interpolation",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        },
+        {
+          "line": 36,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 40,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/steps/src/steps.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 2,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/switch/src/switch.vue",
       "nodeCount": 22,
       "componentCount": 12,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/table/src/filter-panel.vue",
       "nodeCount": 16,
       "componentCount": 7,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 17,
+          "category": "component-wrapper-around-component-root",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 <el-scrollbar component>",
+          "suggestion": "检查子组件 root 是否支持 class/attrs 透传，再评估移除外壳"
+        }
+      ]
     },
     {
       "file": "packages/components/table/src/table.vue",
       "nodeCount": 26,
       "componentCount": 9,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 117,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "span 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        }
+      ]
     },
     {
       "file": "packages/components/tabs/src/tab-bar.vue",
       "nodeCount": 1,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/tabs/src/tab-pane.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/tag/src/tag.vue",
       "nodeCount": 9,
       "componentCount": 5,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/teleport/src/teleport.vue",
       "nodeCount": 3,
       "componentCount": 1,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/text/src/text.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/theme-mode-toggle/src/theme-mode-toggle.vue",
-      "nodeCount": 3,
+      "nodeCount": 2,
       "componentCount": 2,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/time-select/src/time-select.vue",
       "nodeCount": 4,
       "componentCount": 4,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/timeline/src/timeline-item.vue",
       "nodeCount": 12,
       "componentCount": 2,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 5,
+      "manualReviewCount": 5,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 4,
+          "category": "component-wrapper-around-component-root",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 <el-icon component>",
+          "suggestion": "检查子组件 root 是否支持 class/attrs 透传，再评估移除外壳"
+        },
+        {
+          "line": 15,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 20,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 带 class 且只包裹 interpolation",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        },
+        {
+          "line": 27,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 31,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 带 class 且只包裹 interpolation",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        }
+      ]
     },
     {
       "file": "packages/components/tooltip-v2/src/arrow.vue",
       "nodeCount": 1,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/tooltip-v2/src/content.vue",
       "nodeCount": 6,
       "componentCount": 1,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/tooltip-v2/src/root.vue",
       "nodeCount": 1,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/tooltip-v2/src/tooltip.vue",
       "nodeCount": 11,
       "componentCount": 8,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/tooltip-v2/src/trigger.vue",
       "nodeCount": 4,
       "componentCount": 1,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/tooltip/src/content.vue",
       "nodeCount": 4,
       "componentCount": 3,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/tooltip/src/tooltip.vue",
       "nodeCount": 7,
       "componentCount": 4,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/tooltip/src/trigger.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/transfer/src/transfer-panel.vue",
       "nodeCount": 12,
       "componentCount": 5,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 1,
+      "manualReviewCount": 1,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 16,
+          "category": "v-show-sibling-branches",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 下存在 2 个 v-show sibling branches",
+          "suggestion": "检查是否应改成 lazy v-if、render strategy 或按场景只挂载当前分支"
+        }
+      ]
     },
     {
       "file": "packages/components/transfer/src/transfer.vue",
       "nodeCount": 12,
       "componentCount": 8,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/tree-v2/src/tree-node.vue",
       "nodeCount": 6,
       "componentCount": 4,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/tree-v2/src/tree.vue",
       "nodeCount": 5,
       "componentCount": 2,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 2,
+      "manualReviewCount": 2,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 34,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "div 带 class 且只包裹 <span>",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        },
+        {
+          "line": 35,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "span 带 class 且只包裹 interpolation",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        }
+      ]
     },
     {
       "file": "packages/components/tree/src/tree-node.vue",
       "nodeCount": 11,
       "componentCount": 8,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/tree/src/tree.vue",
       "nodeCount": 6,
       "componentCount": 1,
       "potentialSavings": 0,
-      "manualReviewCount": 0,
+      "reviewPotentialSavings": 2,
+      "manualReviewCount": 2,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": [
+        {
+          "line": 24,
+          "category": "slot-passthrough-wrapper",
+          "risk": "low",
+          "estimatedSavings": 1,
+          "summary": "div 只包裹 slot 内容",
+          "suggestion": "检查是否可用宿主 class、slot root class 或既有 slot 容器替代"
+        },
+        {
+          "line": 26,
+          "category": "class-only-single-child-wrapper",
+          "risk": "medium",
+          "estimatedSavings": 1,
+          "summary": "span 带 class 且只包裹 interpolation",
+          "suggestion": "检查 class 是否可上提到子节点，或改为更轻量的布局锚点"
+        }
+      ]
     },
     {
       "file": "packages/components/upload/src/upload-content.vue",
       "nodeCount": 5,
       "componentCount": 1,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/upload/src/upload-dragger.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/upload/src/upload-list.vue",
       "nodeCount": 27,
       "componentCount": 14,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/upload/src/upload.vue",
       "nodeCount": 13,
       "componentCount": 4,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/visual-hidden/src/visual-hidden.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     },
     {
       "file": "packages/components/watermark/src/watermark.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
+      "reviewPotentialSavings": 0,
       "manualReviewCount": 0,
       "deprecatedSyntax": [],
-      "issues": []
+      "issues": [],
+      "reviewFindings": []
     }
   ]
 }

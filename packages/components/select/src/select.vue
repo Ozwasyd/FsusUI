@@ -218,16 +218,7 @@
             @keydown.tab="visible = false"
           >
             <template v-if="$slots.prefix" #prefix>
-              <div
-                style="
-                  height: 100%;
-                  display: flex;
-                  justify-content: center;
-                  align-items: center;
-                "
-              >
-                <slot name="prefix" />
-              </div>
+              <slot name="prefix" />
             </template>
             <template #suffix>
               <el-icon

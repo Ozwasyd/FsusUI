@@ -59,7 +59,7 @@ interface SelectProps {
 const _mount = (
   template: string,
   data: SelectTestDataFactory = () => ({}),
-  otherObj: SelectTestExtraOptions = {}
+  otherObj: SelectTestExtraOptions = {},
 ) =>
   mount(
     {
@@ -83,20 +83,20 @@ const _mount = (
           namespace: 'el',
         },
       },
-    }
+    },
   )
 
 function getOptions(): HTMLElement[] {
   return Array.from(
     document.querySelectorAll<HTMLElement>(
-      'body > div:last-child .el-select-dropdown__item'
-    )
+      'body > div:last-child .el-select-dropdown__item',
+    ),
   )
 }
 
 const getSelectVm = (
   configs: SelectProps = {},
-  options?: SelectTestOption[]
+  options?: SelectTestOption[],
 ) => {
   ;[
     'multiple',
@@ -189,13 +189,13 @@ const getSelectVm = (
       remoteMethod: configs.remoteMethod,
       value: configs.multiple ? [] : '',
       size: configs.size || 'default',
-    })
+    }),
   )
 }
 
 const getGroupSelectVm = (
   configs: SelectProps = {},
-  options?: SelectTestOption[]
+  options?: SelectTestOption[],
 ) => {
   ;[
     'multiple',
@@ -325,7 +325,7 @@ const getGroupSelectVm = (
       remote: configs.remote,
       remoteMethod: configs.remoteMethod,
       value: configs.multiple ? [] : '',
-    })
+    }),
   )
 }
 
@@ -354,7 +354,7 @@ describe('Select', () => {
   test('options rendered correctly', () => {
     wrapper = getSelectVm()
     const options = wrapper.element.querySelectorAll(
-      '.el-select-dropdown__item'
+      '.el-select-dropdown__item',
     )
     const result = Array.prototype.every.call(options, (option, index) => {
       const text = option.querySelector('span').textContent
@@ -394,7 +394,7 @@ describe('Select', () => {
           },
         ],
         value: '选项2',
-      })
+      }),
     )
     await nextTick()
 
@@ -431,7 +431,7 @@ describe('Select', () => {
         value: {
           value: '选项2',
         },
-      })
+      }),
     )
     await nextTick()
 
@@ -462,7 +462,7 @@ describe('Select', () => {
           },
         ],
         value: 2,
-      })
+      }),
     )
     await nextTick()
 
@@ -495,11 +495,34 @@ describe('Select', () => {
         value: {
           id: 2,
         },
-      })
+      }),
     )
     await nextTick()
 
     expect(findInnerInput().value).toBe('双皮奶')
+  })
+
+  test('passes prefix slot directly to input prefix container', async () => {
+    wrapper = _mount(
+      `
+      <el-select v-model="value">
+        <template #prefix>
+          <span class="select-prefix">P</span>
+        </template>
+        <el-option label="One" value="one" />
+      </el-select>
+    `,
+      () => ({
+        value: '',
+      }),
+    )
+    await nextTick()
+
+    const prefixInner = wrapper.element.querySelector('.el-input__prefix-inner')
+    expect(prefixInner?.firstElementChild?.classList).toContain('select-prefix')
+    expect(
+      wrapper.element.querySelector('.el-input__prefix-inner > div[style]'),
+    ).toBeNull()
   })
 
   test('sync set value and options', async () => {
@@ -526,7 +549,7 @@ describe('Select', () => {
           },
         ],
         value: '选项2',
-      })
+      }),
     )
     const vm = wrapper.vm as any
     vm.options = [
@@ -585,7 +608,7 @@ describe('Select', () => {
             this.count++
           },
         },
-      }
+      },
     )
 
     await wrapper.find('.select-trigger').trigger('click')
@@ -721,7 +744,7 @@ describe('Select', () => {
             this.visible = val
           },
         },
-      }
+      },
     )
     const select = wrapper.findComponent({ name: 'ElSelect' })
     const vm = wrapper.vm as any
@@ -856,7 +879,7 @@ describe('Select', () => {
         filterable: true,
         defaultFirstOption: true,
       },
-      demoOptions
+      demoOptions,
     )
     const select = wrapper.findComponent({ name: 'ElSelect' })
     const selectVm = select.vm as any
@@ -906,7 +929,7 @@ describe('Select', () => {
           value: 'JavaScript',
           label: 'JavaScript',
         },
-      ]
+      ],
     )
     const select = wrapper.findComponent({ name: 'ElSelect' })
     const selectVm = select.vm as any
@@ -950,7 +973,7 @@ describe('Select', () => {
       () => ({
         options: [],
         value: '选项2',
-      })
+      }),
     )
 
     await nextTick()
@@ -1011,7 +1034,7 @@ describe('Select', () => {
           },
         ],
         selectedList: [],
-      })
+      }),
     )
     await wrapper.find('.select-trigger').trigger('click')
     const options = getOptions()
@@ -1032,7 +1055,7 @@ describe('Select', () => {
     for (const tagWrapper of tagWrappers) {
       const tagWrapperDom = tagWrapper.element as HTMLElement
       expect(Number.parseInt(tagWrapperDom.style.maxWidth) === 200 - 75).toBe(
-        true
+        true,
       )
     }
     mockInputWidth.mockRestore()
@@ -1072,7 +1095,7 @@ describe('Select', () => {
           },
         ],
         selectedList: [],
-      })
+      }),
     )
     await wrapper.find('.select-trigger').trigger('click')
     const options = getOptions()
@@ -1088,14 +1111,14 @@ describe('Select', () => {
     const tagWrappers = wrapper.findAll('.el-select__tags-text')
     const tagWrapperDom = tagWrappers[0].element as HTMLElement
     expect(Number.parseInt(tagWrapperDom.style.maxWidth) === 200 - 75).toBe(
-      true
+      true,
     )
     await clickOptionItem(options[1])
     await nextTick()
     await clickOptionItem(options[2])
     await nextTick()
     expect(Number.parseInt(tagWrapperDom.style.maxWidth) === 200 - 123).toBe(
-      true
+      true,
     )
     mockInputWidth.mockRestore()
   })
@@ -1132,7 +1155,7 @@ describe('Select', () => {
           },
         ],
         selectedList: [],
-      })
+      }),
     )
     await wrapper.find('.select-trigger').trigger('click')
     const options = getOptions()
@@ -1182,7 +1205,7 @@ describe('Select', () => {
           },
         ],
         selectedList: [],
-      })
+      }),
     )
     await wrapper.find('.select-trigger').trigger('click')
     const options = getOptions()
@@ -1243,7 +1266,7 @@ describe('Select', () => {
             // pass
           },
         },
-      }
+      },
     )
 
     const vm = wrapper.vm as any
@@ -1278,7 +1301,7 @@ describe('Select', () => {
       () => ({
         handleFocus,
         handleBlur,
-      })
+      }),
     )
     const select = wrapper.findComponent({ name: 'ElSelect' })
     const input = select.find('input')
@@ -1323,7 +1346,7 @@ describe('Select', () => {
         value: '选项1',
         handleFocus,
         handleBlur,
-      })
+      }),
     )
 
     const select = wrapper.findComponent({ name: 'ElSelect' })
@@ -1340,7 +1363,7 @@ describe('Select', () => {
     expect(handleBlur).not.toHaveBeenCalled()
 
     const options = getOptions()
-  await clickOptionItem(options[0])
+    await clickOptionItem(options[0])
     await nextTick()
     expect(vm.value).toBe('选项1')
     selectVm.inputHovering = true
@@ -1367,7 +1390,7 @@ describe('Select', () => {
       () => ({
         handleFocus,
         handleBlur,
-      })
+      }),
     )
     const select = wrapper.findComponent({ name: 'ElSelect' })
     const input = select.find('input')
@@ -1428,7 +1451,7 @@ describe('Select', () => {
         value: ['选项1', '选项2'],
         handleFocus,
         handleBlur,
-      })
+      }),
     )
 
     const select = wrapper.findComponent({ name: 'ElSelect' })
@@ -1476,7 +1499,7 @@ describe('Select', () => {
       () => ({
         value: '1',
         change: () => ++callCount,
-      })
+      }),
     )
 
     expect(callCount).toBe(0)
@@ -1496,11 +1519,11 @@ describe('Select', () => {
       </el-select>`,
       () => ({
         value: '1',
-      })
+      }),
     )
     await wrapper.find('.select-trigger').trigger('click')
     expect(
-      document.querySelector<HTMLElement>('.empty-slot')?.textContent
+      document.querySelector<HTMLElement>('.empty-slot')?.textContent,
     ).toBe('EmptySlot')
   })
 
@@ -1510,7 +1533,7 @@ describe('Select', () => {
       <el-select ref="select" v-model="value" filterable>
         <el-option label="test" value="test" />
       </el-select>`,
-      () => ({ value: 'test' })
+      () => ({ value: 'test' }),
     )
     const vm = wrapper.vm as any
     await wrapper.trigger('mouseenter')
@@ -1544,7 +1567,7 @@ describe('Select', () => {
           },
         ],
         value: undefined,
-      })
+      }),
     )
     const vm = wrapper.vm as any
     vm.value = null
@@ -1590,7 +1613,7 @@ describe('Select', () => {
           },
         ],
         value: 'test',
-      })
+      }),
     )
     const select = wrapper.findComponent({ name: 'ElSelect' })
     await select.trigger('mouseenter')
@@ -1598,7 +1621,7 @@ describe('Select', () => {
     await nextTick()
     expect(
       !!(document.querySelector('.el-select__popper') as HTMLElement).style
-        .display
+        .display,
     ).toBeFalsy()
     expect(wrapper.findAll('.el-select-dropdown__empty').length).toBe(0)
   })
@@ -1686,9 +1709,11 @@ describe('Select', () => {
         }
       },
       mounted() {
-        ;(this as SelectTestVm).list = (this as SelectTestVm).states.map((item: string) => {
-          return { value: `value:${item}`, label: `label:${item}` }
-        })
+        ;(this as SelectTestVm).list = (this as SelectTestVm).states.map(
+          (item: string) => {
+            return { value: `value:${item}`, label: `label:${item}` }
+          },
+        )
       },
       methods: {
         remoteMethod(this: SelectTestVm, query: string) {
@@ -1777,7 +1802,7 @@ describe('Select', () => {
           },
         ],
         value: '',
-      })
+      }),
     )
 
     const vm = wrapper.vm as any
@@ -1821,7 +1846,7 @@ describe('Select', () => {
           { name: 'Test 3', isDisabled: false },
           { name: 'Test 4', isDisabled: true },
         ],
-      })
+      }),
     )
     const vm = wrapper.vm as any
     await nextTick()
@@ -1852,13 +1877,13 @@ describe('Select', () => {
     expect(
       wrapper.findAll('.el-tag').filter((item) => {
         return !hasClass(item.element, 'in-tooltip')
-      }).length
+      }).length,
     ).toBe(2)
     await clickTagCloseButton(wrapper)
     expect(
       wrapper.findAll('.el-tag').filter((item) => {
         return !hasClass(item.element, 'in-tooltip')
-      }).length
+      }).length,
     ).toBe(2)
     expect(wrapper.findAll('.el-tag__close').length).toBe(0)
 
@@ -1869,14 +1894,17 @@ describe('Select', () => {
     await nextTick()
     expect(
       wrapper.findAll('.el-tag__close').filter((item) => {
-        return !hasClass(item.element.parentElement ?? item.element, 'in-tooltip')
-      }).length
+        return !hasClass(
+          item.element.parentElement ?? item.element,
+          'in-tooltip',
+        )
+      }).length,
     ).toBe(1)
     await clickTagCloseButton(wrapper)
     expect(
       wrapper.findAll('.el-tag').filter((item) => {
         return !hasClass(item.element, 'in-tooltip')
-      }).length
+      }).length,
     ).toBe(2)
     expect(wrapper.findAll('.el-tag__close').length).toBe(0)
   })
@@ -1906,7 +1934,7 @@ describe('Select', () => {
           },
         ],
         value: [],
-      })
+      }),
     )
 
     await wrapper.find('.select-trigger').trigger('click')
@@ -1936,7 +1964,7 @@ describe('Select', () => {
           { label: 'Test 3', value: 3 },
           { label: 'Test 4', value: 4 },
         ],
-      })
+      }),
     )
     const vm = wrapper.vm as any
     const selectVm = wrapper.findComponent({ name: 'ElSelect' }).vm as any
@@ -1959,7 +1987,7 @@ describe('Select', () => {
     </el-select>`,
       () => ({
         modelValue: ['1'],
-      })
+      }),
     )
     await nextTick()
 
@@ -2059,7 +2087,7 @@ describe('Select', () => {
         groups.filter((group) => {
           const vm = group.vm as any
           return vm.visible
-        }).length
+        }).length,
       ).toBe(1)
     })
   })
@@ -2086,7 +2114,7 @@ describe('Select', () => {
       await wrapper.trigger('mouseenter')
 
       const input = wrapper.find(
-        multiple ? '.el-select__input' : '.el-input__inner'
+        multiple ? '.el-select__input' : '.el-input__inner',
       )
       const inputEl = input.element as HTMLInputElement
       await input.trigger('click')
@@ -2144,7 +2172,7 @@ describe('Select', () => {
             { label: 'Test 3', value: 3 },
             { label: 'Test 4', value: 4 },
           ],
-        })
+        }),
       )
 
       await nextTick()
@@ -2173,7 +2201,7 @@ describe('Select', () => {
             { label: 'Test 3', value: 3 },
             { label: 'Test 4', value: 4 },
           ],
-        })
+        }),
       )
 
       await nextTick()
@@ -2202,7 +2230,7 @@ describe('Select', () => {
       () => ({
         modelValue,
         options,
-      })
+      }),
     )
     const select = wrapper.findComponent({ name: 'ElSelect' }).vm
     expect(select.selected[0].currentLabel).toBe(options[0].label)
@@ -2268,7 +2296,7 @@ describe('Select', () => {
         </el-form-item>`,
         () => ({
           modelValue: 1,
-        })
+        }),
       )
 
       await nextTick()
@@ -2288,7 +2316,7 @@ describe('Select', () => {
         </el-form-item>`,
         () => ({
           modelValue: 1,
-        })
+        }),
       )
 
       await nextTick()
@@ -2312,7 +2340,7 @@ describe('Select', () => {
         </el-form-item>`,
         () => ({
           modelValue: 1,
-        })
+        }),
       )
 
       await nextTick()
@@ -2437,7 +2465,7 @@ describe('Select', () => {
         () => ({
           value,
           options,
-        })
+        }),
       )
       await nextTick()
       const selectInput = wrapper.find('.el-select__input')
@@ -2473,7 +2501,7 @@ describe('Select', () => {
         <el-option label="label" value="1" />
         <el-option label="disabled" value="2" disabled />
       </el-select>`,
-      () => ({ value: '1' })
+      () => ({ value: '1' }),
     )
 
     const dropdown = wrapper.findComponent({ name: 'ElSelectDropdown' })
@@ -2481,7 +2509,7 @@ describe('Select', () => {
     const list = dropdown.find('.el-select-dropdown__list')
     const option = dropdown.find('.el-select-dropdown__item')
     const disabledOption = dropdown.find(
-      '.el-select-dropdown__item:nth-child(2)'
+      '.el-select-dropdown__item:nth-child(2)',
     )
 
     expect(input.attributes('role')).toBe('combobox')

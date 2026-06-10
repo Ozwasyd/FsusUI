@@ -1,24 +1,21 @@
 <template>
-  <div
+  <el-radio-group
     :class="toggleKls"
+    :model-value="selectedMode"
+    :size="size"
+    :label="label"
     v-bind="{ 'data-theme-mode-visibility': visibility }"
+    @update:model-value="handleModeChange"
   >
-    <el-radio-group
-      :model-value="selectedMode"
-      :size="size"
-      :label="label"
-      @update:model-value="handleModeChange"
+    <el-radio-button
+      v-for="option in options"
+      :key="option.mode"
+      :label="option.mode"
+      v-bind="{ 'data-theme-mode': option.mode }"
     >
-      <el-radio-button
-        v-for="option in options"
-        :key="option.mode"
-        :label="option.mode"
-        v-bind="{ 'data-theme-mode': option.mode }"
-      >
-        {{ compact ? option.shortLabel : option.label }}
-      </el-radio-button>
-    </el-radio-group>
-  </div>
+      {{ compact ? option.shortLabel : option.label }}
+    </el-radio-button>
+  </el-radio-group>
 </template>
 
 <script lang="ts" setup>
@@ -49,13 +46,13 @@ const getInitialMode = () => {
 
   return normalizeThemeMode(
     document.documentElement.dataset.themeMode,
-    normalizeThemeMode(props.defaultValue)
+    normalizeThemeMode(props.defaultValue),
   )
 }
 const localMode = ref<ThemeMode>(getInitialMode())
 
 const selectedMode = computed(() =>
-  normalizeThemeMode(props.modelValue ?? localMode.value)
+  normalizeThemeMode(props.modelValue ?? localMode.value),
 )
 const toggleKls = computed(() => [
   ns.b(),
@@ -77,7 +74,7 @@ watch(
   (mode) => {
     syncThemeMode(mode)
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 const handleModeChange = (value: string | number | boolean) => {

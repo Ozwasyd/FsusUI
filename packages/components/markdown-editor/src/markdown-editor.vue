@@ -53,20 +53,20 @@
         @keydown="handleKeydown"
       />
 
-      <div v-if="currentMode !== 'write'" :class="ns.e('preview')">
-        <el-markdown-renderer
-          :allow-html="allowHtml"
-          :base-url="previewBaseUrl"
-          :content="modelValue"
-          :csp-nonce="previewCspNonce"
-          :features="previewFeatures"
-          mode="editor"
-          :sanitize-html="sanitizeHtml"
-          @features-activated="emitRenderEvent('features-activated', $event)"
-          @render-complete="emitRenderEvent('render-complete', $event)"
-          @render-error="emitRenderEvent('render-error', $event)"
-        />
-      </div>
+      <el-markdown-renderer
+        v-if="currentMode !== 'write'"
+        :class="ns.e('preview')"
+        :allow-html="allowHtml"
+        :base-url="previewBaseUrl"
+        :content="modelValue"
+        :csp-nonce="previewCspNonce"
+        :features="previewFeatures"
+        mode="editor"
+        :sanitize-html="sanitizeHtml"
+        @features-activated="emitRenderEvent('features-activated', $event)"
+        @render-complete="emitRenderEvent('render-complete', $event)"
+        @render-error="emitRenderEvent('render-error', $event)"
+      />
     </div>
 
     <footer :class="ns.e('status')">

@@ -61,6 +61,9 @@ describe('MarkdownEditor', () => {
     })
 
     await wrapper.find('[data-stub-markdown-renderer]').trigger('click')
+    expect(wrapper.find('[data-stub-markdown-renderer]').classes()).toContain(
+      'el-markdown-editor__preview',
+    )
     await wrapper.findAll('.el-markdown-editor__action')[0].trigger('click')
     await wrapper.findAll('.el-markdown-editor__action')[1].trigger('click')
     await wrapper.findAll('.el-markdown-editor__action')[2].trigger('click')

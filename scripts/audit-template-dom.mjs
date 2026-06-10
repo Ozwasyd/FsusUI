@@ -106,10 +106,16 @@ for (const file of componentFiles.sort()) {
       (sum, issue) => sum + issue.estimatedSavings,
       0,
     ),
-    manualReviewCount: analysis.issues.filter((issue) => issue.manualReview)
-      .length,
+    reviewPotentialSavings: analysis.reviewFindings.reduce(
+      (sum, finding) => sum + finding.estimatedSavings,
+      0,
+    ),
+    manualReviewCount:
+      analysis.issues.filter((issue) => issue.manualReview).length +
+      analysis.reviewFindings.length,
     deprecatedSyntax: deprecatedFindings,
     issues: analysis.issues,
+    reviewFindings: analysis.reviewFindings,
   })
 }
 
@@ -129,9 +135,17 @@ console.log(
 
 function buildTotals(files) {
   const totalIssues = files.reduce((sum, item) => sum + item.issues.length, 0)
+  const totalReviewFindings = files.reduce(
+    (sum, item) => sum + item.reviewFindings.length,
+    0,
+  )
   const totalNodes = files.reduce((sum, item) => sum + item.nodeCount, 0)
   const totalSavings = files.reduce(
     (sum, item) => sum + item.potentialSavings,
+    0,
+  )
+  const totalReviewSavings = files.reduce(
+    (sum, item) => sum + item.reviewPotentialSavings,
     0,
   )
   const deprecatedSyntaxCount = files.reduce(
@@ -153,14 +167,24 @@ function buildTotals(files) {
       return acc
     }, {})
 
+  const byReviewCategory = files
+    .flatMap((item) => item.reviewFindings)
+    .reduce((acc, finding) => {
+      acc[finding.category] = (acc[finding.category] ?? 0) + 1
+      return acc
+    }, {})
+
   return {
     filesScanned: files.length,
     totalNodes,
     totalIssues,
+    totalReviewFindings,
     totalPotentialSavings: totalSavings,
+    totalReviewPotentialSavings: totalReviewSavings,
     deprecatedSyntaxCount,
     byRisk,
     byCategory,
+    byReviewCategory,
   }
 }
 
@@ -175,6 +199,16 @@ function buildMarkdown(files, totals) {
     })
     .slice(0, 25)
 
+  const topReviewFiles = [...files]
+    .filter((item) => item.reviewFindings.length > 0)
+    .sort((a, b) => {
+      if (b.reviewPotentialSavings !== a.reviewPotentialSavings) {
+        return b.reviewPotentialSavings - a.reviewPotentialSavings
+      }
+      return b.reviewFindings.length - a.reviewFindings.length
+    })
+    .slice(0, 25)
+
   const deprecatedHits = files
     .flatMap((item) =>
       item.deprecatedSyntax.map((finding) => ({
@@ -185,6 +219,11 @@ function buildMarkdown(files, totals) {
     .slice(0, 20)
 
   const categoryLines = Object.entries(totals.byCategory)
+    .sort((a, b) => b[1] - a[1])
+    .map(([category, count]) => `- ${category}: ${count}`)
+    .join('\n')
+
+  const reviewCategoryLines = Object.entries(totals.byReviewCategory)
     .sort((a, b) => b[1] - a[1])
     .map(([category, count]) => `- ${category}: ${count}`)
     .join('\n')
@@ -210,6 +249,22 @@ function buildMarkdown(files, totals) {
     })
     .join('\n')
 
+  const reviewFileLines = topReviewFiles
+    .map((item) => {
+      const topFindings = item.reviewFindings
+        .slice()
+        .sort((a, b) => severityRank(a.risk) - severityRank(b.risk))
+        .slice(0, 4)
+        .map(
+          (finding) =>
+            `L${finding.line} ${finding.category} [${finding.risk}] - ${finding.summary}`,
+        )
+        .join('；')
+
+      return `- \`${item.file}\`：review 候选 ${item.reviewFindings.length}，预估可审查 ${item.reviewPotentialSavings} 个节点。${topFindings}`
+    })
+    .join('\n')
+
   const deprecatedSection =
     deprecatedHits.length === 0
       ? '- 本轮未发现 `slot-scope`、`template slot=`、`inline-template`、`.native`、`.sync` 命中。'
@@ -230,6 +285,8 @@ Generated at: ${new Date().toISOString()}
 - Total element/component nodes: ${totals.totalNodes}
 - Total findings: ${totals.totalIssues}
 - Estimated removable nodes: ${totals.totalPotentialSavings}
+- Structural review findings: ${totals.totalReviewFindings}
+- Estimated reviewable nodes: ${totals.totalReviewPotentialSavings}
 - Deprecated syntax hits: ${totals.deprecatedSyntaxCount}
 
 ## Risk Breakdown
@@ -240,6 +297,10 @@ ${riskLines || '- none'}
 
 ${categoryLines || '- none'}
 
+## Structural Wrapper Review
+
+${reviewCategoryLines || '- none'}
+
 ## Deprecated Syntax
 
 ${deprecatedSection}
@@ -248,11 +309,16 @@ ${deprecatedSection}
 
 ${fileLines || '- none'}
 
+## Highest Review Yield Files
+
+${reviewFileLines || '- none'}
+
 ## Review Notes
 
 - high 风险候选通常带有 ref、事件、ARIA/role、键盘焦点、复杂指令，或承担明显的样式锚点。
 - medium 风险候选多为有 class/style 的结构包裹层，适合配合主题样式一起改。
 - low 风险候选一般是单子节点纯结构容器，可优先处理。
+- Structural Wrapper Review 是人工审查候选，不与 hard findings 混淆；CI 可以只对 hard findings fail，对 review findings warning。
 - 完整明细请查看同目录下的 \`runtime-template-audit.json\`。
 `
 }
@@ -261,6 +327,7 @@ function analyzeTemplateAst(ast, templateLineOffset) {
   let nodeCount = 0
   let componentCount = 0
   const issues = []
+  const reviewFindings = []
 
   const visit = (node, parent = null) => {
     if (!node) return
@@ -278,7 +345,14 @@ function analyzeTemplateAst(ast, templateLineOffset) {
         }
 
         maybeCollectWrapperIssue(node, parent, templateLineOffset, issues)
+        maybeCollectStructuralReview(
+          node,
+          parent,
+          templateLineOffset,
+          reviewFindings,
+        )
         maybeCollectVForIssue(node, templateLineOffset, issues)
+        maybeCollectVShowSiblingReview(node, templateLineOffset, reviewFindings)
 
         node.children.forEach((child) => visit(child, node))
         return
@@ -301,7 +375,7 @@ function analyzeTemplateAst(ast, templateLineOffset) {
 
   visit(ast)
 
-  return { nodeCount, componentCount, issues }
+  return { nodeCount, componentCount, issues, reviewFindings }
 }
 
 function maybeCollectWrapperIssue(node, parent, templateLineOffset, issues) {
@@ -368,6 +442,115 @@ function maybeCollectWrapperIssue(node, parent, templateLineOffset, issues) {
     summary,
     suggestion: buildSuggestion(category, node.tag, childName),
   })
+}
+
+function maybeCollectStructuralReview(
+  node,
+  parent,
+  templateLineOffset,
+  reviewFindings,
+) {
+  if (!wrapperTags.has(node.tag)) return
+
+  const meaningfulChildren = getMeaningfulChildren(node.children)
+  if (meaningfulChildren.length !== 1) return
+
+  const child = meaningfulChildren[0]
+  if (hasAdjacentMeaningfulText(node, parent, child)) return
+
+  const attrs = inspectNodeProps(node)
+  const reviewable =
+    !attrs.hasRef &&
+    !attrs.hasEvent &&
+    !attrs.hasAria &&
+    !attrs.hasRole &&
+    !attrs.hasTabindex &&
+    !attrs.hasNonStructuralDirective
+
+  if (!reviewable) return
+
+  const wrapsSlotLike =
+    child.type === NodeTypes.SLOT_OUTLET ||
+    (child.type === NodeTypes.ELEMENT && child.tag === 'slot')
+  const wrapsComponent =
+    child.type === NodeTypes.ELEMENT && child.tagType === ElementTypes.COMPONENT
+
+  let category = ''
+  let summary = ''
+  let suggestion = ''
+  let risk = 'medium'
+
+  if (attrs.hasVFor && wrapsComponent) {
+    category = 'v-for-item-shell-wrapper'
+    summary = `${node.tag} 在 v-for 中只包裹 ${describeChild(child)}`
+    suggestion = '检查是否可把 item class 上提到子组件 root，减少每项外壳'
+  } else if (wrapsSlotLike) {
+    category = 'slot-passthrough-wrapper'
+    summary = `${node.tag} 只包裹 slot 内容`
+    suggestion = '检查是否可用宿主 class、slot root class 或既有 slot 容器替代'
+    risk = attrs.hasStyle ? 'medium' : 'low'
+  } else if (wrapsComponent) {
+    category = 'component-wrapper-around-component-root'
+    summary = `${node.tag} 只包裹 ${describeChild(child)}`
+    suggestion = '检查子组件 root 是否支持 class/attrs 透传，再评估移除外壳'
+  } else if (attrs.hasClass && !attrs.hasStyle) {
+    category = 'class-only-single-child-wrapper'
+    summary = `${node.tag} 带 class 且只包裹 ${describeChild(child)}`
+    suggestion = '检查 class 是否可上提到子节点，或改为更轻量的布局锚点'
+  }
+
+  if (!category) return
+
+  pushReviewFinding(reviewFindings, {
+    line: templateLineOffset + node.loc.start.line,
+    category,
+    risk,
+    estimatedSavings: 1,
+    summary,
+    suggestion,
+  })
+}
+
+function maybeCollectVShowSiblingReview(
+  node,
+  templateLineOffset,
+  reviewFindings,
+) {
+  if (!Array.isArray(node.children) || node.children.length < 2) return
+
+  const vShowBranches = getMeaningfulChildren(node.children).filter((child) => {
+    if (child.type !== NodeTypes.ELEMENT) return false
+    return inspectNodeProps(child).hasVShow
+  })
+
+  if (vShowBranches.length < 2) return
+
+  const containsHeavyBranch = vShowBranches.some((branch) =>
+    containsSlotOrComponent(branch),
+  )
+
+  pushReviewFinding(reviewFindings, {
+    line: templateLineOffset + node.loc.start.line,
+    category: 'v-show-sibling-branches',
+    risk: containsHeavyBranch ? 'medium' : 'low',
+    estimatedSavings: vShowBranches.length - 1,
+    summary: `${node.tag} 下存在 ${vShowBranches.length} 个 v-show sibling branches`,
+    suggestion:
+      '检查是否应改成 lazy v-if、render strategy 或按场景只挂载当前分支',
+  })
+}
+
+function pushReviewFinding(reviewFindings, finding) {
+  const key = `${finding.line}:${finding.category}:${finding.summary}`
+  if (
+    reviewFindings.some(
+      (item) => `${item.line}:${item.category}:${item.summary}` === key,
+    )
+  ) {
+    return
+  }
+
+  reviewFindings.push(finding)
 }
 
 function hasAdjacentMeaningfulText(node, parent, child) {
@@ -448,6 +631,8 @@ function inspectNodeProps(node) {
   let hasStyle = false
   let hasClass = false
   let hasVFor = false
+  let hasVShow = false
+  let hasNonStructuralDirective = false
 
   for (const prop of node.props) {
     if (prop.type === NodeTypes.ATTRIBUTE) {
@@ -463,10 +648,16 @@ function inspectNodeProps(node) {
     hasDirective = true
     hasEvent ||= prop.name === 'on'
     hasVFor ||= prop.name === 'for'
+    hasVShow ||= prop.name === 'show'
     hasRef ||=
       prop.name === 'bind' &&
       prop.arg?.type === NodeTypes.SIMPLE_EXPRESSION &&
       prop.arg.content === 'ref'
+
+    const isStructuralBind =
+      prop.name === 'bind' &&
+      prop.arg?.type === NodeTypes.SIMPLE_EXPRESSION &&
+      ['class', 'style'].includes(prop.arg.content)
 
     if (
       prop.name === 'bind' &&
@@ -484,6 +675,12 @@ function inspectNodeProps(node) {
     if (!['if', 'else', 'else-if', 'show', 'for'].includes(prop.name)) {
       hasNonControlDirective = true
     }
+    if (
+      !['if', 'else', 'else-if', 'show', 'for'].includes(prop.name) &&
+      !isStructuralBind
+    ) {
+      hasNonStructuralDirective = true
+    }
   }
 
   return {
@@ -497,6 +694,8 @@ function inspectNodeProps(node) {
     hasStyle,
     hasClass,
     hasVFor,
+    hasVShow,
+    hasNonStructuralDirective,
   }
 }
 
@@ -534,6 +733,29 @@ function getMeaningfulChildren(children = []) {
     if (child.type === NodeTypes.TEXT) return child.content.trim().length > 0
     return true
   })
+}
+
+function containsSlotOrComponent(node) {
+  if (!node) return false
+  if (node.type === NodeTypes.SLOT_OUTLET) return true
+  if (node.type === NodeTypes.ELEMENT) {
+    if (node.tag === 'slot' || node.tagType === ElementTypes.COMPONENT) {
+      return true
+    }
+  }
+  if (node.type === NodeTypes.IF) {
+    return node.branches.some((branch) =>
+      branch.children.some((child) => containsSlotOrComponent(child)),
+    )
+  }
+  if (node.type === NodeTypes.FOR) {
+    return node.children.some((child) => containsSlotOrComponent(child))
+  }
+  if ('children' in node && Array.isArray(node.children)) {
+    return node.children.some((child) => containsSlotOrComponent(child))
+  }
+
+  return false
 }
 
 function describeChild(child) {
