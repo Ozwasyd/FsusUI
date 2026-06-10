@@ -75,6 +75,8 @@ const createList = ({
 
       const getItemStyleCache = useCache()
       let resetFrame = 0
+      let scrollFrame = 0
+      let pendingScrollElement: HTMLElement | null = null
       // refs
       // here windowRef and innerRef can be type of HTMLElement
       // or user defined component type, depends on the type passed
@@ -253,9 +255,8 @@ const createList = ({
         emit(SCROLL_EVT, scrollDir, scrollOffset, updateRequested)
       }
 
-      const scrollVertically = (e: Event) => {
-        const { clientHeight, scrollHeight, scrollTop } =
-          e.currentTarget as HTMLElement
+      const scrollVertically = (element: HTMLElement) => {
+        const { clientHeight, scrollHeight, scrollTop } = element
         const _states = unref(states)
         if (_states.scrollOffset === scrollTop) {
           return
@@ -281,9 +282,8 @@ const createList = ({
         )
       }
 
-      const scrollHorizontally = (e: Event) => {
-        const { clientWidth, scrollLeft, scrollWidth } =
-          e.currentTarget as HTMLElement
+      const scrollHorizontally = (element: HTMLElement) => {
+        const { clientWidth, scrollLeft, scrollWidth } = element
         const _states = unref(states)
 
         if (_states.scrollOffset === scrollLeft) {
@@ -331,9 +331,26 @@ const createList = ({
         )
       }
 
-      const onScroll = (e: Event) => {
-        unref(_isHorizontal) ? scrollHorizontally(e) : scrollVertically(e)
+      const flushScroll = () => {
+        scrollFrame = 0
+        const element = pendingScrollElement
+        pendingScrollElement = null
+        if (!element) return
+
+        unref(_isHorizontal)
+          ? scrollHorizontally(element)
+          : scrollVertically(element)
         emitEvents()
+      }
+
+      const onScroll = (e: Event) => {
+        pendingScrollElement = e.currentTarget as HTMLElement
+        if (scrollFrame) return
+        if (typeof requestAnimationFrame !== 'function') {
+          flushScroll()
+          return
+        }
+        scrollFrame = requestAnimationFrame(flushScroll)
       }
 
       const onScrollbarScroll = (distanceToGo: number, totalSteps: number) => {
@@ -561,6 +578,11 @@ const createList = ({
       })
 
       onBeforeUnmount(() => {
+        if (scrollFrame) {
+          cancelAnimationFrame(scrollFrame)
+          scrollFrame = 0
+        }
+        pendingScrollElement = null
         if (resetFrame) {
           cancelAnimationFrame(resetFrame)
           resetFrame = 0

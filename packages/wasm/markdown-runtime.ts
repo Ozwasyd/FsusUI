@@ -1363,8 +1363,18 @@ function readStructured<T>(
 }
 
 function parseStructuredText(raw: string): unknown {
-  let offset = 0
   const source = raw.trim()
+  if (!source) return null
+
+  try {
+    return JSON.parse(source)
+  } catch {
+    return parseStructuredTextFallback(source)
+  }
+}
+
+function parseStructuredTextFallback(source: string): unknown {
+  let offset = 0
   const skipWhitespace = () => {
     while (/\s/u.test(source[offset] ?? '')) offset += 1
   }

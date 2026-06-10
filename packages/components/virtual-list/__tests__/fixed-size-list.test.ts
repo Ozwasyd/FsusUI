@@ -197,7 +197,7 @@ describe('<fixed-size-list />', () => {
     expect(onItemRendered).toHaveBeenCalledTimes(1)
 
     makeScroll(windowRef, 'scrollTop', 100)
-    await nextTick()
+    await waitForScrollReset()
     // from index 3(item 4) + 4 visible items + 3 cache items = index 10
     // the total items rendered is 3 + 4 + 1 (index 3) inclusive
     // so the total number is 10
@@ -245,7 +245,7 @@ describe('<fixed-size-list />', () => {
 
     const { windowRef } = wrapper.vm.$refs.listRef as ListRef
     makeScroll(windowRef, 'scrollLeft', 100)
-    await nextTick()
+    await waitForScrollReset()
     expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(6)
     expect(wrapper.find(ITEM_SELECTOR).text()).toContain(3)
   })

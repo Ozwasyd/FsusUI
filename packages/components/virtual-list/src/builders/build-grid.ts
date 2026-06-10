@@ -117,6 +117,8 @@ const createGrid = ({
 
       const getItemStyleCache = useCache()
       let resetFrame = 0
+      let scrollFrame = 0
+      let pendingScrollElement: HTMLElement | null = null
 
       // computed
       const parsedHeight = computed(() =>
@@ -352,7 +354,12 @@ const createGrid = ({
         })
       }
 
-      const onScroll = (e: Event) => {
+      const flushScroll = () => {
+        scrollFrame = 0
+        const element = pendingScrollElement
+        pendingScrollElement = null
+        if (!element) return
+
         const {
           clientHeight,
           clientWidth,
@@ -360,7 +367,7 @@ const createGrid = ({
           scrollLeft,
           scrollTop,
           scrollWidth,
-        } = e.currentTarget as HTMLElement
+        } = element
 
         const _states = unref(states)
 
@@ -408,6 +415,16 @@ const createGrid = ({
 
         onUpdated()
         emitEvents()
+      }
+
+      const onScroll = (e: Event) => {
+        pendingScrollElement = e.currentTarget as HTMLElement
+        if (scrollFrame) return
+        if (typeof requestAnimationFrame !== 'function') {
+          flushScroll()
+          return
+        }
+        scrollFrame = requestAnimationFrame(flushScroll)
       }
 
       const onVerticalScroll = (distance: number, totalSteps: number) => {
@@ -716,6 +733,11 @@ const createGrid = ({
       })
 
       onBeforeUnmount(() => {
+        if (scrollFrame) {
+          cancelAnimationFrame(scrollFrame)
+          scrollFrame = 0
+        }
+        pendingScrollElement = null
         if (resetFrame) {
           cancelAnimationFrame(resetFrame)
           resetFrame = 0

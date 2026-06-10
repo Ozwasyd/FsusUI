@@ -148,6 +148,7 @@ const renderedContent = shallowRef(
 const chunkUnits = shallowRef<readonly MarkdownRenderChunk[]>([])
 const MIN_INITIAL_MARKDOWN_CHUNKS = 3
 const MAX_INITIAL_MARKDOWN_CHUNKS = 12
+const SINGLE_PASS_MARKDOWN_SOURCE_BYTES = 24 * 1024
 const renderPipelineConfig = useGlobalConfig('renderPipeline')
 const renderStrategy = shallowRef<'sync' | 'chunked-main' | 'chunked-worker'>(
   'sync',
@@ -412,9 +413,23 @@ const setChunkUnitTemplateRef = (
   setChunkUnitRef(key, element instanceof Element ? element : null)
 }
 
+const countMarkdownParagraphBreaks = (source: string) => {
+  let count = 1
+  for (let index = 0; index < source.length - 1; index += 1) {
+    if (
+      source.charCodeAt(index) === 10 &&
+      source.charCodeAt(index + 1) === 10
+    ) {
+      count += 1
+      index += 1
+    }
+  }
+  return count
+}
+
 const estimateMarkdownRender = (source: string) => ({
   htmlBytes: source.length * 2,
-  items: Math.max(1, source.split('\n\n').length),
+  items: Math.max(1, countMarkdownParagraphBreaks(source)),
   nodes: Math.max(1, Math.ceil(source.length / 180)),
 })
 
@@ -429,9 +444,19 @@ const createMarkdownRenderRequest = (
   allowMermaid: props.allowMermaid,
 })
 
+const hashMarkdownSource = (source: string) => {
+  let hash = 0xcbf29ce484222325n
+  for (let index = 0; index < source.length; index += 1) {
+    hash ^= BigInt(source.charCodeAt(index))
+    hash = BigInt.asUintN(64, hash * 0x100000001b3n)
+  }
+  return hash.toString(36)
+}
+
 const fingerprintMarkdownRenderRequest = (request: MarkdownRenderRequest) =>
   [
-    request.source,
+    hashMarkdownSource(request.source),
+    request.source.length,
     request.baseUrl ?? '',
     request.mode,
     request.allowHtml ? 'html' : 'no-html',
@@ -533,6 +558,22 @@ const renderMarkdownHtmlCached = async (request: MarkdownRenderRequest) => {
     cacheKey,
   )
   if (cached) return { ok: true as const, value: cached }
+  const cachedResult =
+    getMarkdownRendererRuntimeCache<MarkdownRuntimeRenderResult>(
+      'result',
+      cacheKey,
+    )
+  if (cachedResult) {
+    const htmlResult: MarkdownRuntimeHtmlResult = {
+      engine: cachedResult.engine,
+      html: cachedResult.html,
+      rendererVersion: cachedResult.rendererVersion,
+      timings: cachedResult.timings,
+    }
+    setMarkdownRendererRuntimeCache('result', cacheKey, cachedResult)
+    setMarkdownRendererRuntimeCache('html', cacheKey, htmlResult)
+    return { ok: true as const, value: htmlResult }
+  }
 
   const result = await renderMarkdownHtmlWithRuntime(request)
   if (!isFsusErr(result)) {
@@ -552,9 +593,22 @@ const renderMarkdownResultCached = async (request: MarkdownRenderRequest) => {
   const result = await renderMarkdownResultWithRuntime(request)
   if (!isFsusErr(result)) {
     setMarkdownRendererRuntimeCache('result', cacheKey, result.value)
+    setMarkdownRendererRuntimeCache('html', cacheKey, {
+      engine: result.value.engine,
+      html: result.value.html,
+      rendererVersion: result.value.rendererVersion,
+      timings: result.value.timings,
+    })
   }
   return result
 }
+
+const resolveMarkdownRenderExecutionMode = (
+  request: MarkdownRenderRequest,
+): 'fast-html-then-full' | 'single-pass' =>
+  request.source.length <= SINGLE_PASS_MARKDOWN_SOURCE_BYTES
+    ? 'single-pass'
+    : 'fast-html-then-full'
 
 const scheduleMeasurementWarmup = () => {
   measurementWarmupCancel?.()
@@ -676,6 +730,32 @@ const performRender = async () => {
       await activateRenderedFeatures(resolvedResult)
       emit('render-complete', resolvedResult)
       scheduleMeasurementWarmup()
+      return
+    }
+
+    if (resolveMarkdownRenderExecutionMode(request) === 'single-pass') {
+      const result = await renderMarkdownResultCached(request)
+
+      if (taskId !== currentTaskId) {
+        return
+      }
+
+      if (isFsusErr(result)) {
+        throw result.error
+      }
+
+      const resolvedResult = resolveMarkdownRenderResult(result.value)
+
+      await commitRenderedContent(resolvedResult.html, true)
+      await activateRenderedFeatures(resolvedResult)
+      emit('render-profile', {
+        engine: resolvedResult.engine,
+        phase: 'full-result',
+        rendererVersion: resolvedResult.rendererVersion,
+        timings: resolvedResult.timings,
+      })
+      emit('placeholders-ready', resolvedResult.placeholders, resolvedResult)
+      emit('render-complete', resolvedResult)
       return
     }
 

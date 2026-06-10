@@ -172,22 +172,20 @@ describe('MarkdownRenderer.vue', () => {
     expect(heading.text()).toBe('Title')
     expect(heading.attributes('data-markdown-heading')).toBe('title')
     expect(wrapper.find('[data-markdown-renderer="wasm"]').exists()).toBe(true)
-    expect(wrapper.emitted('render-profile')).toHaveLength(2)
+    expect(renderMarkdownHtml).not.toHaveBeenCalled()
+    expect(wrapper.emitted('render-profile')).toHaveLength(1)
     expect(wrapper.emitted('render-complete')).toHaveLength(1)
   })
 
   test('shows a loading state while the markdown runtime is rendering', async () => {
-    let resolveHtml:
-      | ((result: FsusResult<MarkdownRuntimeHtmlResult>) => void)
+    let resolveFull:
+      | ((result: FsusResult<MarkdownRuntimeRenderResult>) => void)
       | undefined
 
-    renderMarkdownHtml.mockReturnValue(
+    renderMarkdownResult.mockReturnValue(
       new Promise((resolve) => {
-        resolveHtml = resolve
+        resolveFull = resolve
       }),
-    )
-    renderMarkdownResult.mockResolvedValue(
-      fsusOk(makeResult('# Loading', '<h1>Loading</h1>')),
     )
 
     const wrapper = mount(MarkdownRenderer, {
@@ -200,7 +198,7 @@ describe('MarkdownRenderer.vue', () => {
     expect(wrapper.attributes('aria-busy')).toBe('true')
     expect(wrapper.find('[data-markdown-renderer-loading]').exists()).toBe(true)
 
-    resolveHtml?.(fsusOk(makeHtmlResult('<h1>Loading</h1>')))
+    resolveFull?.(fsusOk(makeResult('# Loading', '<h1>Loading</h1>')))
     await flushPromises()
     await vi.advanceTimersByTimeAsync(20)
     await flushPromises()
@@ -227,16 +225,7 @@ describe('MarkdownRenderer.vue', () => {
     mount(() => <MarkdownRenderer content="<script>alert(1)</script>" />)
     await flushRenderer()
 
-    expect(renderMarkdownHtml).toHaveBeenCalledWith(
-      expect.objectContaining({
-        source: '<script>alert(1)</script>',
-        allowHtml: false,
-        allowLatex: true,
-        allowMermaid: true,
-        mode: 'article',
-        baseUrl: null,
-      }),
-    )
+    expect(renderMarkdownHtml).not.toHaveBeenCalled()
     expect(renderMarkdownResult).toHaveBeenCalledWith(
       expect.objectContaining({
         source: '<script>alert(1)</script>',
@@ -574,6 +563,7 @@ describe('MarkdownRenderer.vue', () => {
         } as DOMRect
       })
 
+    const source = `anchor ${'x'.repeat(25_000)}`
     renderMarkdownHtml.mockResolvedValue(
       fsusOk(makeHtmlResult('<p data-anchor="stable">Anchor</p><p>Before</p>')),
     )
@@ -585,7 +575,7 @@ describe('MarkdownRenderer.vue', () => {
 
     const wrapper = mount(MarkdownRenderer, {
       attachTo: scroller,
-      props: { content: 'anchor' },
+      props: { content: source },
     })
 
     await vi.advanceTimersByTimeAsync(20)
@@ -595,7 +585,7 @@ describe('MarkdownRenderer.vue', () => {
     resolveFull?.(
       fsusOk(
         makeResult(
-          'anchor',
+          source,
           '<p data-anchor="stable">Anchor</p><p>After full result</p>',
         ),
       ),

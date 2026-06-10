@@ -166,11 +166,11 @@ describe('<fixed-size-grid />', () => {
       const gridRef = wrapper.vm.$refs.gridRef as GridRef
 
       makeScroll(unref(gridRef.windowRef), 'scrollTop', 100)
-      await nextTick()
+      await waitForScrollReset()
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(21)
 
       makeScroll(unref(gridRef.windowRef), 'scrollLeft', 100)
-      await nextTick()
+      await waitForScrollReset()
       // 5 (backward cache 1 + visible 2 + forward cache 2)
       // * 7 (backward cache 1 + visible 4 + forward cache 2)
       // 35

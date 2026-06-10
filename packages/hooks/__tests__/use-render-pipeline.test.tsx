@@ -351,6 +351,48 @@ describe('use-render-pipeline', () => {
     wrapper.unmount()
   })
 
+  it('maps render scheduler priority to native postTask priority', () => {
+    const postTasks: Array<{
+      callback: () => void
+      priority: string | undefined
+    }> = []
+    vi.stubGlobal('scheduler', {
+      postTask: vi.fn(
+        (callback: () => void, options?: { priority?: string }) => {
+          postTasks.push({ callback, priority: options?.priority })
+          return new Promise(() => undefined)
+        },
+      ),
+    })
+
+    const calls: string[] = []
+    let scheduler: ReturnType<typeof useFsusRenderScheduler> | undefined
+    const Probe = defineComponent({
+      setup() {
+        scheduler = useFsusRenderScheduler(ref({ frameMs: 100 }))
+        return () => h('div')
+      },
+    })
+
+    const wrapper = mount(Probe)
+    scheduler!.schedule(() => calls.push('background'), {
+      priority: 'background',
+    })
+    scheduler!.schedule(() => calls.push('visible'), {
+      priority: 'visible',
+    })
+
+    expect(postTasks.map((task) => task.priority)).toEqual([
+      'background',
+      'user-visible',
+    ])
+    postTasks[0]!.callback()
+    postTasks[1]!.callback()
+
+    expect(calls).toEqual(['visible', 'background'])
+    wrapper.unmount()
+  })
+
   it('registers component render policies separately from component code', () => {
     clearFsusRenderPipelineComponentPolicies()
     const config = resolveFsusRenderPipelineConfig()

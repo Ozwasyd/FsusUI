@@ -1025,12 +1025,23 @@ export const useFsusRenderScheduler = (
     visible: new Set(),
   }
   let cancelFlush: (() => void) | null = null
+  let scheduledFlushPriority: FsusRenderSchedulerPriority | null = null
 
   const priorities: FsusRenderSchedulerPriority[] = [
     'user-blocking',
     'visible',
     'background',
   ]
+  const priorityRank: Record<FsusRenderSchedulerPriority, number> = {
+    background: 0,
+    visible: 1,
+    'user-blocking': 2,
+  }
+  const postTaskPriorityMap: Record<FsusRenderSchedulerPriority, string> = {
+    background: 'background',
+    visible: 'user-visible',
+    'user-blocking': 'user-blocking',
+  }
 
   const hasPending = () =>
     priorities.some((priority) => queues[priority].size > 0)
@@ -1043,6 +1054,9 @@ export const useFsusRenderScheduler = (
     return null
   }
 
+  const getHighestPendingPriority = () =>
+    priorities.find((priority) => queues[priority].size > 0) ?? 'background'
+
   const removeEntry = (entry: SchedulerEntry) => {
     queues[entry.priority].delete(entry)
     entry.cleanup?.()
@@ -1051,6 +1065,7 @@ export const useFsusRenderScheduler = (
 
   const flush = () => {
     cancelFlush = null
+    scheduledFlushPriority = null
     const startedAt =
       typeof performance !== 'undefined' ? performance.now() : Date.now()
     const frameMs =
@@ -1072,7 +1087,18 @@ export const useFsusRenderScheduler = (
   }
 
   const requestFlush = () => {
-    if (cancelFlush) return
+    const flushPriority = getHighestPendingPriority()
+    if (cancelFlush) {
+      if (
+        scheduledFlushPriority &&
+        priorityRank[flushPriority] <= priorityRank[scheduledFlushPriority]
+      ) {
+        return
+      }
+      cancelFlush()
+      cancelFlush = null
+    }
+    scheduledFlushPriority = flushPriority
 
     const scheduler = (
       globalThis as {
@@ -1089,13 +1115,14 @@ export const useFsusRenderScheduler = (
       let cancelled = false
       cancelFlush = () => {
         cancelled = true
+        scheduledFlushPriority = null
       }
       void scheduler
         .postTask(
           () => {
             if (!cancelled) flush()
           },
-          { priority: 'user-blocking' },
+          { priority: postTaskPriorityMap[flushPriority] },
         )
         .catch(() => {
           if (!cancelled) flush()
@@ -1110,18 +1137,27 @@ export const useFsusRenderScheduler = (
       typeof requestIdleCallback === 'function'
     ) {
       const idle = requestIdleCallback(() => flush())
-      cancelFlush = () => cancelIdleCallback(idle)
+      cancelFlush = () => {
+        scheduledFlushPriority = null
+        cancelIdleCallback(idle)
+      }
       return
     }
 
     if (typeof requestAnimationFrame === 'function') {
       const frame = requestAnimationFrame(flush)
-      cancelFlush = () => cancelAnimationFrame(frame)
+      cancelFlush = () => {
+        scheduledFlushPriority = null
+        cancelAnimationFrame(frame)
+      }
       return
     }
 
     const timeout = setTimeout(flush, 0)
-    cancelFlush = () => clearTimeout(timeout)
+    cancelFlush = () => {
+      scheduledFlushPriority = null
+      clearTimeout(timeout)
+    }
   }
 
   const schedule = (
