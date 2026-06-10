@@ -19,6 +19,7 @@ import {
   epRoot,
   localeRoot,
   pkgRoot,
+  projRoot,
 } from '@element-plus/build-utils'
 import { version } from '../../../../packages/element-plus/version'
 import { ElementPlusAlias } from '../plugins/element-plus-alias'
@@ -32,11 +33,18 @@ import { target } from '../build-info'
 import type { Plugin } from 'rollup'
 
 const banner = `/*! ${PKG_BRAND_NAME} v${version} */\n`
-const ignoreRollupWarning = (warning: { code?: string; exporter?: string; id?: string; message?: string }) => {
+const tsconfig = path.resolve(projRoot, 'tsconfig.web.json')
+const ignoreRollupWarning = (warning: {
+  code?: string
+  exporter?: string
+  id?: string
+  message?: string
+}) => {
   const source = warning.exporter ?? warning.id ?? warning.message ?? ''
   return (
     (warning.code === 'UNRESOLVED_IMPORT' &&
-      (source.includes('fsevents') || source.includes('vue-sfc-transformer/mkdist'))) ||
+      (source.includes('fsevents') ||
+        source.includes('vue-sfc-transformer/mkdist'))) ||
     (warning.code === 'CIRCULAR_DEPENDENCY' &&
       (source.includes('mlly') || source.includes('semver/classes')))
   )
@@ -77,6 +85,7 @@ async function buildFullEntry(minify: boolean) {
       exclude: [],
       sourceMap: minify,
       target,
+      tsconfig,
       loaders: {
         '.vue': 'ts',
       },
@@ -92,7 +101,7 @@ async function buildFullEntry(minify: boolean) {
       minifyPlugin({
         target,
         sourceMap: true,
-      })
+      }),
     )
   }
 
@@ -112,7 +121,7 @@ async function buildFullEntry(minify: boolean) {
       file: path.resolve(
         epOutput,
         'dist',
-        formatBundleFilename('index.full', minify, 'js')
+        formatBundleFilename('index.full', minify, 'js'),
       ),
       inlineDynamicImports: true,
       exports: 'named',
@@ -128,7 +137,7 @@ async function buildFullEntry(minify: boolean) {
       file: path.resolve(
         epOutput,
         'dist',
-        formatBundleFilename('index.full', minify, 'mjs')
+        formatBundleFilename('index.full', minify, 'mjs'),
       ),
       inlineDynamicImports: true,
       sourcemap: minify,
@@ -158,6 +167,7 @@ async function buildFullLocale(minify: boolean) {
             minify,
             sourceMap: minify,
             target,
+            tsconfig,
           }),
         ],
       })
@@ -167,7 +177,7 @@ async function buildFullLocale(minify: boolean) {
           file: path.resolve(
             epOutput,
             'dist/locale',
-            formatBundleFilename(filename, minify, 'js')
+            formatBundleFilename(filename, minify, 'js'),
           ),
           exports: 'default',
           name: `${PKG_CAMELCASE_LOCAL_NAME}${name}`,
@@ -179,13 +189,13 @@ async function buildFullLocale(minify: boolean) {
           file: path.resolve(
             epOutput,
             'dist/locale',
-            formatBundleFilename(filename, minify, 'mjs')
+            formatBundleFilename(filename, minify, 'mjs'),
           ),
           sourcemap: minify,
           banner,
         },
       ])
-    })
+    }),
   )
 }
 
@@ -194,5 +204,5 @@ export const buildFull = (minify: boolean) => async () =>
 
 export const buildFullBundle = parallel(
   withTaskName('buildFullMinified', buildFull(true)),
-  withTaskName('buildFull', buildFull(false))
+  withTaskName('buildFull', buildFull(false)),
 )
