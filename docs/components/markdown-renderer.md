@@ -18,7 +18,7 @@
 
 ## Mermaid、KaTeX 与代码激活
 
-WASM 渲染器会保留 Mermaid、LaTeX/KaTeX 相关的 HTML、MathML、SVG 或 placeholder 信息。组件提交 DOM 后会调用 public `markdown-runtime` 的 activation 层，统一标记 Mermaid、LaTeX 和 `language-*` 代码块，并修正 heading/hash/external link。业务侧可以监听 `features-activated` 获取稳定 activation 结果；仍可监听 `placeholders-ready` 读取占位符和完整渲染结果。
+WASM 渲染器会保留 Mermaid、LaTeX/KaTeX 相关的 HTML、MathML、SVG 或 placeholder 信息。组件提交 DOM 后会调用 public `markdown-runtime` 的 activation 层，默认懒加载 Mermaid、KaTeX 与 Shiki，真实渲染 `.markdown-renderer__mermaid`、`.markdown-renderer__latex` 和 `language-*` 代码块，同时修正 heading/hash/external link。业务侧可以监听 `features-activated` 获取稳定 activation 结果；仍可监听 `placeholders-ready` 读取占位符和完整渲染结果。
 
 ```vue
 <template>
@@ -31,6 +31,25 @@ WASM 渲染器会保留 Mermaid、LaTeX/KaTeX 相关的 HTML、MathML、SVG 或 
   />
 </template>
 ```
+
+默认 adapter 会按 `data-theme-resolved`、Element Plus token 和 `csp-nonce` 设置 Mermaid themeVariables、KaTeX 错误色、Shiki light/dark theme，以及动态 `<style>` 的 nonce。失败时不会让整个 renderer 崩溃，组件会输出 `el-markdown-renderer__feature-error` 节点并在 `features-activated.errors` 中报告错误。
+
+`features` 用于关闭某类 activation；adapter prop 用于覆盖或禁用默认渲染器：
+
+```vue
+<template>
+  <!-- 完全关闭 Mermaid activation，不扫描也不标记 -->
+  <el-markdown-renderer :content="content" :features="{ mermaid: false }" />
+
+  <!-- 保留 Mermaid 节点标记，但不使用默认 Mermaid renderer -->
+  <el-markdown-renderer :content="content" :mermaid-adapter="null" />
+
+  <!-- 用业务 adapter 覆盖默认 Mermaid renderer -->
+  <el-markdown-renderer :content="content" :mermaid-adapter="renderMermaid" />
+</template>
+```
+
+同样的语义适用于 `latex-adapter` 和 `code-highlight-adapter`。直接使用 public runtime 时，也可以从 `@ozwasyd/element-plus/markdown-runtime` 复用 `defaultMermaidAdapter`、`defaultLatexAdapter` 与 `defaultCodeHighlightAdapter`。
 
 ## Raw HTML 安全边界
 
@@ -128,18 +147,21 @@ chunk 边界由 WASM 渲染流程产出，类型包括 `heading`、`paragraph`�
 
 ### Attributes
 
-| 属性名        | 说明                                    | 类型                                            | 默认值    |
-| ------------- | --------------------------------------- | ----------------------------------------------- | --------- |
-| content       | Markdown 源文本                         | `string`                                        | `''`      |
-| initial-html  | 初始 HTML，用于首帧占位                 | `string`                                        | `''`      |
-| allow-html    | 是否允许 Markdown 源码中的 raw HTML     | `boolean`                                       | `false`   |
-| sanitize-html | DOM 提交前是否清理不安全 HTML           | `boolean`                                       | `true`    |
-| allow-latex   | 是否启用 LaTeX/MathML 输出              | `boolean`                                       | `true`    |
-| allow-mermaid | 是否启用 Mermaid 输出                   | `boolean`                                       | `true`    |
-| mode          | 渲染模式元数据                          | `'article' \| 'about' \| 'preview' \| 'editor'` | `article` |
-| base-url      | 渲染元数据与 link activation 的基础 URL | `string \| null`                                | `null`    |
-| csp-nonce     | 写入 renderer 内动态 style 的 CSP nonce | `string \| null`                                | `null`    |
-| features      | DOM feature activation 开关             | `MarkdownFeatureActivationFeatureOptions`       | —         |
+| 属性名                 | 说明                                                                                     | 类型                                            | 默认值    |
+| ---------------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------- | --------- |
+| content                | Markdown 源文本                                                                          | `string`                                        | `''`      |
+| initial-html           | 初始 HTML，用于首帧占位                                                                  | `string`                                        | `''`      |
+| allow-html             | 是否允许 Markdown 源码中的 raw HTML                                                      | `boolean`                                       | `false`   |
+| sanitize-html          | DOM 提交前是否清理不安全 HTML                                                            | `boolean`                                       | `true`    |
+| allow-latex            | 是否启用 LaTeX/MathML 输出                                                               | `boolean`                                       | `true`    |
+| allow-mermaid          | 是否启用 Mermaid 输出                                                                    | `boolean`                                       | `true`    |
+| mode                   | 渲染模式元数据                                                                           | `'article' \| 'about' \| 'preview' \| 'editor'` | `article` |
+| base-url               | 渲染元数据与 link activation 的基础 URL                                                  | `string \| null`                                | `null`    |
+| csp-nonce              | 写入 renderer 内动态 style 的 CSP nonce                                                  | `string \| null`                                | `null`    |
+| features               | DOM feature activation 开关                                                              | `MarkdownFeatureActivationFeatureOptions`       | —         |
+| mermaid-adapter        | Mermaid DOM activation adapter；`undefined` 使用默认 adapter，`null` 只标记不渲染        | `MarkdownFeatureAdapter \| null`                | —         |
+| latex-adapter          | LaTeX/KaTeX DOM activation adapter；`undefined` 使用默认 adapter，`null` 只标记不渲染    | `MarkdownFeatureAdapter \| null`                | —         |
+| code-highlight-adapter | 代码高亮 DOM activation adapter；`undefined` 使用默认 Shiki adapter，`null` 只标记不渲染 | `MarkdownFeatureAdapter \| null`                | —         |
 
 ### Events
 

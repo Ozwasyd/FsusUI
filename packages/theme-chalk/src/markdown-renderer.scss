@@ -190,6 +190,37 @@
   overflow: auto;
 }
 
+.markdown-renderer .el-markdown-renderer__feature-error {
+  display: grid;
+  gap: var(--fsus-space-2, 8px);
+  max-inline-size: 100%;
+  margin-block: var(--fsus-markdown-embed-margin, 1rem);
+  padding: var(--fsus-space-3, 12px);
+  overflow: auto;
+  color: var(--el-color-danger);
+  background: color-mix(in srgb, var(--el-color-danger) 8%, var(--el-bg-color));
+  border: 1px solid
+    color-mix(in srgb, var(--el-color-danger) 34%, var(--el-border-color));
+  border-radius: var(--fsus-radius-card, 8px);
+}
+
+.markdown-renderer .el-markdown-renderer__feature-error-message {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.markdown-renderer .el-markdown-renderer__feature-error code {
+  display: block;
+  max-inline-size: 100%;
+  padding: var(--fsus-space-2, 8px);
+  overflow: auto;
+  color: var(--el-text-color-primary);
+  white-space: pre-wrap;
+  background: var(--el-fill-color-light);
+  border-radius: var(--fsus-radius-control, 6px);
+}
+
 .markdown-renderer .markdown-renderer__mermaid[data-mermaid-rendered='true'] {
   inline-size: fit-content;
   max-inline-size: min(100%, var(--fsus-markdown-diagram-max-width, 32rem));
@@ -212,6 +243,38 @@
 .markdown-renderer .markdown-renderer__latex > math,
 .markdown-renderer .markdown-renderer__latex > svg {
   max-inline-size: 100%;
+}
+
+.markdown-renderer .markdown-renderer__latex[data-latex-rendered='katex'] {
+  color: var(--el-text-color-primary);
+}
+
+.markdown-renderer pre[data-code-highlighted='shiki'],
+.markdown-renderer pre.shiki {
+  max-inline-size: 100%;
+  padding: var(--fsus-space-3, 12px);
+  overflow: auto;
+  background: var(--el-fill-color-light);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: var(--fsus-radius-card, 8px);
+}
+
+.markdown-renderer pre[data-code-highlighted='shiki'] code,
+.markdown-renderer pre.shiki code {
+  overflow-wrap: normal;
+  color: inherit;
+  word-break: normal;
+  background: transparent;
+}
+
+[data-theme-resolved='dark']
+  .markdown-renderer
+  pre[data-code-highlighted='shiki'],
+[data-theme-resolved='dark'] .markdown-renderer pre.shiki,
+.dark .markdown-renderer pre[data-code-highlighted='shiki'],
+.dark .markdown-renderer pre.shiki {
+  background: var(--el-bg-color-overlay);
+  border-color: var(--el-border-color);
 }
 
 @media (max-width: 44rem) {

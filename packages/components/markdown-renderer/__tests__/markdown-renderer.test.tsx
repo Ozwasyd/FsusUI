@@ -21,6 +21,18 @@ import type {
 } from '@element-plus/wasm'
 import type { FsusResult } from '@element-plus/utils'
 
+const markdownFeatureAdapterMocks = vi.hoisted(() => ({
+  defaultCodeHighlightAdapter: vi.fn(async (element: HTMLElement) => {
+    element.dataset.defaultCodeHighlightAdapter = 'true'
+  }),
+  defaultLatexAdapter: vi.fn(async (element: HTMLElement) => {
+    element.dataset.defaultLatexAdapter = 'true'
+  }),
+  defaultMermaidAdapter: vi.fn(async (element: HTMLElement) => {
+    element.dataset.defaultMermaidAdapter = 'true'
+  }),
+}))
+
 vi.mock('@element-plus/wasm', async () => {
   const actual =
     await vi.importActual<typeof import('@element-plus/wasm')>(
@@ -33,6 +45,10 @@ vi.mock('@element-plus/wasm', async () => {
   return {
     ...actual,
     activateMarkdownFeatures: runtime.activateMarkdownFeatures,
+    defaultCodeHighlightAdapter:
+      markdownFeatureAdapterMocks.defaultCodeHighlightAdapter,
+    defaultLatexAdapter: markdownFeatureAdapterMocks.defaultLatexAdapter,
+    defaultMermaidAdapter: markdownFeatureAdapterMocks.defaultMermaidAdapter,
     renderMarkdownChunksWithRuntime: vi.fn(),
     renderMarkdownHtmlWithRuntime: vi.fn(),
     renderMarkdownResultWithRuntime: vi.fn(),
@@ -121,6 +137,9 @@ describe('MarkdownRenderer.vue', () => {
     renderMarkdownChunks.mockReset()
     renderMarkdownHtml.mockReset()
     renderMarkdownResult.mockReset()
+    markdownFeatureAdapterMocks.defaultCodeHighlightAdapter.mockClear()
+    markdownFeatureAdapterMocks.defaultLatexAdapter.mockClear()
+    markdownFeatureAdapterMocks.defaultMermaidAdapter.mockClear()
     renderMarkdownHtml.mockImplementation(async (request) =>
       fsusOk(
         makeHtmlResult(
@@ -370,17 +389,128 @@ describe('MarkdownRenderer.vue', () => {
     ).toBe('mermaid')
     expect(
       wrapper
+        .find('.markdown-renderer__mermaid')
+        .attributes('data-default-mermaid-adapter'),
+    ).toBe('true')
+    expect(
+      wrapper
         .find('.markdown-renderer__latex')
         .attributes('data-markdown-feature-activated'),
     ).toBe('latex')
     expect(
+      wrapper
+        .find('.markdown-renderer__latex')
+        .attributes('data-default-latex-adapter'),
+    ).toBe('true')
+    expect(
       wrapper.find('code').attributes('data-markdown-feature-activated'),
     ).toBe('code-highlight')
+    expect(
+      wrapper.find('code').attributes('data-default-code-highlight-adapter'),
+    ).toBe('true')
+    expect(
+      markdownFeatureAdapterMocks.defaultMermaidAdapter,
+    ).toHaveBeenCalledTimes(1)
+    expect(
+      markdownFeatureAdapterMocks.defaultLatexAdapter,
+    ).toHaveBeenCalledTimes(1)
+    expect(
+      markdownFeatureAdapterMocks.defaultCodeHighlightAdapter,
+    ).toHaveBeenCalledTimes(1)
     expect(wrapper.emitted('features-activated')?.[0]?.[0]).toEqual(
       expect.objectContaining({
         errors: [],
       }),
     )
+  })
+
+  test('lets callers disable or override default markdown feature adapters', async () => {
+    const html = [
+      '<figure class="markdown-renderer__mermaid" data-mermaid-placeholder="true"></figure>',
+      '<span class="markdown-renderer__latex" data-latex-placeholder="true"></span>',
+      '<pre><code class="language-ts">const ok = true</code></pre>',
+    ].join('')
+    renderMarkdownHtml.mockResolvedValue(fsusOk(makeHtmlResult(html)))
+    renderMarkdownResult.mockResolvedValue(fsusOk(makeResult('adapters', html)))
+
+    const disabled = mount(MarkdownRenderer, {
+      props: {
+        codeHighlightAdapter: null,
+        content: 'adapters',
+        latexAdapter: null,
+        mermaidAdapter: null,
+        sanitizeHtml: false,
+      },
+    })
+    await flushRenderer()
+
+    expect(
+      markdownFeatureAdapterMocks.defaultMermaidAdapter,
+    ).not.toHaveBeenCalled()
+    expect(
+      markdownFeatureAdapterMocks.defaultLatexAdapter,
+    ).not.toHaveBeenCalled()
+    expect(
+      markdownFeatureAdapterMocks.defaultCodeHighlightAdapter,
+    ).not.toHaveBeenCalled()
+    expect(
+      disabled
+        .find('.markdown-renderer__mermaid')
+        .attributes('data-markdown-feature-activated'),
+    ).toBe('mermaid')
+
+    markdownFeatureAdapterMocks.defaultMermaidAdapter.mockClear()
+    const customMermaidAdapter = vi.fn(async (element: HTMLElement) => {
+      element.dataset.customMermaidAdapter = 'true'
+    })
+
+    const custom = mount(MarkdownRenderer, {
+      props: {
+        content: 'adapters',
+        mermaidAdapter: customMermaidAdapter,
+        sanitizeHtml: false,
+      },
+    })
+    await flushRenderer()
+
+    expect(customMermaidAdapter).toHaveBeenCalledTimes(1)
+    expect(
+      markdownFeatureAdapterMocks.defaultMermaidAdapter,
+    ).not.toHaveBeenCalled()
+    expect(
+      custom
+        .find('.markdown-renderer__mermaid')
+        .attributes('data-custom-mermaid-adapter'),
+    ).toBe('true')
+  })
+
+  test('skips markdown feature adapters when a feature is disabled', async () => {
+    const html =
+      '<figure class="markdown-renderer__mermaid" data-mermaid-placeholder="true"></figure>'
+    renderMarkdownHtml.mockResolvedValue(fsusOk(makeHtmlResult(html)))
+    renderMarkdownResult.mockResolvedValue(
+      fsusOk(makeResult('disabled feature', html)),
+    )
+
+    const wrapper = mount(MarkdownRenderer, {
+      props: {
+        content: 'disabled feature',
+        features: {
+          mermaid: false,
+        },
+        sanitizeHtml: false,
+      },
+    })
+    await flushRenderer()
+
+    expect(
+      markdownFeatureAdapterMocks.defaultMermaidAdapter,
+    ).not.toHaveBeenCalled()
+    expect(
+      wrapper
+        .find('.markdown-renderer__mermaid')
+        .attributes('data-markdown-feature-activated'),
+    ).toBeUndefined()
   })
 
   test('keeps the scroll anchor when the full result changes html', async () => {

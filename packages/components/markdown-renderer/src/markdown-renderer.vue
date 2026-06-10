@@ -79,6 +79,9 @@ import {
   MARKDOWN_RENDERER_SURFACE_CLASSES as markdownSurfaceClasses,
   activateMarkdownFeatures,
   buildMarkdownRenderResult,
+  defaultCodeHighlightAdapter,
+  defaultLatexAdapter,
+  defaultMermaidAdapter,
   escapeMarkdownHtml,
   normalizeMarkdownSource,
   renderMarkdownChunksWithRuntime,
@@ -585,6 +588,11 @@ const resolveMarkdownFeatureOptions = () => ({
   mermaid: props.features?.mermaid ?? props.allowMermaid,
 })
 
+const resolveMarkdownFeatureAdapter = <TAdapter,>(
+  adapter: TAdapter | null | undefined,
+  defaultAdapter: TAdapter,
+) => (adapter === undefined ? defaultAdapter : adapter)
+
 const activateRenderedFeatures = async (result: MarkdownRenderResult) => {
   await nextTick()
 
@@ -593,8 +601,20 @@ const activateRenderedFeatures = async (result: MarkdownRenderResult) => {
 
   const activation = await activateMarkdownFeatures({
     baseUrl: props.baseUrl,
+    codeHighlightAdapter: resolveMarkdownFeatureAdapter(
+      props.codeHighlightAdapter,
+      defaultCodeHighlightAdapter,
+    ),
     cspNonce: props.cspNonce,
     features: resolveMarkdownFeatureOptions(),
+    latexAdapter: resolveMarkdownFeatureAdapter(
+      props.latexAdapter,
+      defaultLatexAdapter,
+    ),
+    mermaidAdapter: resolveMarkdownFeatureAdapter(
+      props.mermaidAdapter,
+      defaultMermaidAdapter,
+    ),
     root,
   })
   emit('features-activated', activation, result)
@@ -733,6 +753,9 @@ watch(
     props.baseUrl,
     props.cspNonce,
     props.features,
+    props.mermaidAdapter,
+    props.latexAdapter,
+    props.codeHighlightAdapter,
   ],
   () => {
     if (debounceTimer) {

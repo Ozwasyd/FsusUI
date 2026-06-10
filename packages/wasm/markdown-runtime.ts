@@ -164,17 +164,28 @@ export interface MarkdownFeatureActivationResult {
   errors: readonly MarkdownFeatureActivationError[]
 }
 
+export type MarkdownFeatureActivationTheme = 'dark' | 'light'
+
+export interface MarkdownFeatureAdapterContext {
+  baseUrl?: string | null
+  cspNonce?: string | null
+  kind: MarkdownFeatureActivationKind
+  root: ParentNode
+  theme: MarkdownFeatureActivationTheme
+}
+
 export type MarkdownFeatureAdapter = (
   element: HTMLElement,
+  context?: MarkdownFeatureAdapterContext,
 ) => void | Promise<void>
 
 export interface MarkdownFeatureActivationOptions {
   baseUrl?: string | null
-  codeHighlightAdapter?: MarkdownFeatureAdapter
+  codeHighlightAdapter?: MarkdownFeatureAdapter | null
   cspNonce?: string | null
   features?: MarkdownFeatureActivationFeatureOptions
-  latexAdapter?: MarkdownFeatureAdapter
-  mermaidAdapter?: MarkdownFeatureAdapter
+  latexAdapter?: MarkdownFeatureAdapter | null
+  mermaidAdapter?: MarkdownFeatureAdapter | null
   root: ParentNode
 }
 
@@ -338,18 +349,657 @@ const activateCspNonce = (root: ParentNode, nonce?: string | null) => {
   return count
 }
 
+const isElementNode = (node: Node): node is Element =>
+  node.nodeType === Node.ELEMENT_NODE
+
+const selectMarkdownFeatureElements = (root: ParentNode, selector: string) => {
+  const elements: HTMLElement[] = []
+  const rootNode = root as Node
+
+  if (isElementNode(rootNode) && rootNode.matches(selector)) {
+    elements.push(rootNode as HTMLElement)
+  }
+
+  elements.push(...Array.from(root.querySelectorAll<HTMLElement>(selector)))
+  return Array.from(new Set(elements))
+}
+
+const getRootElement = (root: ParentNode) => {
+  if (isElementNode(root as Node)) return root as Element
+  if (root instanceof Document) return root.documentElement
+  return null
+}
+
+const resolveFeatureTheme = (
+  root: ParentNode,
+): MarkdownFeatureActivationTheme => {
+  const rootElement = getRootElement(root)
+  let current: Element | null = rootElement
+
+  while (current) {
+    const resolvedTheme =
+      current.getAttribute('data-theme-resolved') ??
+      current.getAttribute('data-theme')
+    if (resolvedTheme === 'dark' || resolvedTheme === 'light') {
+      return resolvedTheme
+    }
+    if (current.classList.contains('dark')) return 'dark'
+    current = current.parentElement
+  }
+
+  const documentElement =
+    root instanceof Document
+      ? root.documentElement
+      : rootElement?.ownerDocument?.documentElement
+  const documentTheme =
+    documentElement?.getAttribute('data-theme-resolved') ??
+    documentElement?.getAttribute('data-theme')
+  if (documentTheme === 'dark' || documentTheme === 'light') {
+    return documentTheme
+  }
+  if (documentElement?.classList.contains('dark')) return 'dark'
+
+  if (
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-color-scheme: dark)').matches
+  ) {
+    return 'dark'
+  }
+
+  return 'light'
+}
+
+const getComputedToken = (
+  element: Element | null,
+  token: string,
+  fallback: string,
+) => {
+  if (!element || typeof window === 'undefined') return fallback
+  const value = window.getComputedStyle(element).getPropertyValue(token).trim()
+  return value || fallback
+}
+
+const getFeatureStyleRoot = (element: HTMLElement, root: ParentNode) =>
+  getRootElement(root) ?? element.ownerDocument.documentElement
+
+const unsafeFeatureElementNames = new Set([
+  'base',
+  'embed',
+  'foreignobject',
+  'iframe',
+  'link',
+  'meta',
+  'object',
+  'script',
+])
+
+const featureUrlAttributeNames = new Set([
+  'action',
+  'formaction',
+  'href',
+  'poster',
+  'src',
+  'xlink:href',
+])
+
+const unsafeFeatureUrlProtocolRe = /^(?:javascript|vbscript):/i
+const featureDataUrlRe = /^data:/i
+const safeFeatureDataImageRe =
+  /^data:image\/(?:gif|jpeg|jpg|png|webp|svg\+xml);base64,/i
+
+const stripFeatureUrlControlChars = (value: string) =>
+  Array.from(value)
+    .filter((char) => {
+      const code = char.charCodeAt(0)
+      return code > 31 && code !== 127 && !/\s/.test(char)
+    })
+    .join('')
+
+const isUnsafeFeatureUrl = (value: string) => {
+  const normalized = stripFeatureUrlControlChars(value)
+  if (unsafeFeatureUrlProtocolRe.test(normalized)) return true
+  return (
+    featureDataUrlRe.test(normalized) && !safeFeatureDataImageRe.test(value)
+  )
+}
+
+const hasUnsafeFeatureStyle = (value: string) =>
+  /(?:expression\s*\(|url\s*\(\s*['"]?\s*(?:javascript|vbscript):)/i.test(value)
+
+const applyNonceToFeatureStyles = (
+  root: ParentNode | Node,
+  nonce?: string | null,
+) => {
+  if (!nonce) return
+
+  const styles: Element[] = []
+  const rootNode = root as Node
+  if (isElementNode(rootNode) && rootNode.tagName.toLowerCase() === 'style') {
+    styles.push(rootNode)
+  }
+  if ('querySelectorAll' in root) {
+    styles.push(...Array.from(root.querySelectorAll('style')))
+  }
+
+  styles.forEach((style) => {
+    if (!(style as HTMLStyleElement).nonce) {
+      ;(style as HTMLStyleElement).nonce = nonce
+    }
+  })
+}
+
+const sanitizeFeatureFragment = (
+  fragment: DocumentFragment,
+  nonce?: string | null,
+) => {
+  const elements = Array.from(fragment.querySelectorAll('*'))
+  for (const element of elements) {
+    const name = element.tagName.toLowerCase()
+
+    if (unsafeFeatureElementNames.has(name)) {
+      element.remove()
+      continue
+    }
+
+    for (const attribute of Array.from(element.attributes)) {
+      const attributeName = attribute.name.toLowerCase()
+      const value = attribute.value.trim()
+
+      if (attributeName.startsWith('on') || attributeName === 'srcdoc') {
+        element.removeAttribute(attribute.name)
+        continue
+      }
+
+      if (
+        featureUrlAttributeNames.has(attributeName) &&
+        isUnsafeFeatureUrl(value)
+      ) {
+        element.removeAttribute(attribute.name)
+        continue
+      }
+
+      if (attributeName === 'style' && hasUnsafeFeatureStyle(value)) {
+        element.removeAttribute(attribute.name)
+      }
+    }
+  }
+
+  applyNonceToFeatureStyles(fragment, nonce)
+  return fragment
+}
+
+const createSafeFeatureFragment = (
+  document: Document,
+  html: string,
+  nonce?: string | null,
+) => {
+  const template = document.createElement('template')
+  template.innerHTML = html
+  return sanitizeFeatureFragment(template.content, nonce)
+}
+
+const withStyleNonceBridge = async <T>(
+  document: Document,
+  nonce: string | null | undefined,
+  task: () => T | Promise<T>,
+): Promise<T> => {
+  const nodePrototype = document.defaultView?.Node?.prototype
+  if (!nonce || !nodePrototype) return task()
+
+  const originalAppendChild = nodePrototype.appendChild
+  const originalInsertBefore = nodePrototype.insertBefore
+  const originalReplaceChild = nodePrototype.replaceChild
+
+  nodePrototype.appendChild = function (this: Node, node: Node) {
+    applyNonceToFeatureStyles(node, nonce)
+    return originalAppendChild.call(this, node)
+  } as typeof nodePrototype.appendChild
+
+  nodePrototype.insertBefore = function (
+    this: Node,
+    node: Node,
+    child: Node | null,
+  ) {
+    applyNonceToFeatureStyles(node, nonce)
+    return originalInsertBefore.call(this, node, child)
+  } as typeof nodePrototype.insertBefore
+
+  nodePrototype.replaceChild = function (this: Node, node: Node, child: Node) {
+    applyNonceToFeatureStyles(node, nonce)
+    return originalReplaceChild.call(this, node, child)
+  } as typeof nodePrototype.replaceChild
+
+  try {
+    return await task()
+  } finally {
+    nodePrototype.appendChild = originalAppendChild
+    nodePrototype.insertBefore = originalInsertBefore
+    nodePrototype.replaceChild = originalReplaceChild
+  }
+}
+
+const formatFeatureErrorMessage = (
+  kind: MarkdownFeatureActivationKind,
+  error: unknown,
+) =>
+  error instanceof Error
+    ? error.message
+    : typeof error === 'string'
+      ? error
+      : `${kind}_activation_failed`
+
+const createFeatureErrorElement = (
+  document: Document,
+  kind: MarkdownFeatureActivationKind,
+  error: unknown,
+  source?: string,
+  inline = false,
+) => {
+  const element = document.createElement(inline ? 'span' : 'div')
+  element.className = 'el-markdown-renderer__feature-error'
+  element.setAttribute('role', 'note')
+  element.dataset.markdownFeatureError = kind
+
+  const message = document.createElement(inline ? 'span' : 'p')
+  message.className = 'el-markdown-renderer__feature-error-message'
+  message.textContent = formatFeatureErrorMessage(kind, error)
+  element.append(message)
+
+  if (source) {
+    const code = document.createElement('code')
+    code.textContent = source
+    element.append(code)
+  }
+
+  return element
+}
+
+const renderFeatureError = (
+  element: HTMLElement,
+  kind: MarkdownFeatureActivationKind,
+  error: unknown,
+  source?: string,
+) => {
+  const inline = element.tagName === 'SPAN' || element.tagName === 'CODE'
+  const errorElement = createFeatureErrorElement(
+    element.ownerDocument,
+    kind,
+    error,
+    source,
+    inline,
+  )
+  element.replaceChildren(errorElement)
+  element.dataset.markdownFeatureError = kind
+}
+
+const replaceWithFeatureError = (
+  element: HTMLElement,
+  kind: MarkdownFeatureActivationKind,
+  error: unknown,
+  source?: string,
+) => {
+  const inline = element.tagName === 'SPAN' || element.tagName === 'CODE'
+  const errorElement = createFeatureErrorElement(
+    element.ownerDocument,
+    kind,
+    error,
+    source,
+    inline,
+  )
+  element.replaceWith(errorElement)
+}
+
+const extractFeatureSource = (
+  element: HTMLElement,
+  dataNames: readonly string[],
+) => {
+  for (const name of dataNames) {
+    const value = element.dataset[name]
+    if (value) return value
+  }
+
+  for (const attribute of [
+    'data-markdown-source',
+    'data-source',
+    'data-source-code',
+  ]) {
+    const value = element.getAttribute(attribute)
+    if (value) return value
+  }
+
+  const code =
+    element.tagName === 'CODE'
+      ? element
+      : element.querySelector<HTMLElement>('code')
+  return code?.textContent?.replace(/\n+$/g, '') ?? ''
+}
+
+type MermaidRuntime = {
+  initialize?: (options: Record<string, unknown>) => void
+  render?: (
+    id: string,
+    source: string,
+  ) => Promise<{ svg: string }> | { svg: string } | string
+}
+
+type KatexRuntime = {
+  renderToString?: (source: string, options: Record<string, unknown>) => string
+}
+
+type ShikiRuntime = {
+  codeToHtml?: (
+    source: string,
+    options: Record<string, unknown>,
+  ) => string | Promise<string>
+}
+
+const resolveDefaultModule = <T>(module: T | { default?: T }) =>
+  'default' in (module as Record<string, unknown>) &&
+  (module as { default?: T }).default
+    ? (module as { default: T }).default
+    : (module as T)
+
+const loadMermaidRuntime = async () =>
+  resolveDefaultModule<MermaidRuntime>(
+    (await import('mermaid')) as unknown as
+      | MermaidRuntime
+      | { default?: MermaidRuntime },
+  )
+
+const loadKatexRuntime = async () =>
+  resolveDefaultModule<KatexRuntime>(
+    (await import('katex')) as unknown as
+      | KatexRuntime
+      | { default?: KatexRuntime },
+  )
+
+const loadShikiRuntime = async () =>
+  resolveDefaultModule<ShikiRuntime>(
+    (await import('shiki')) as unknown as
+      | ShikiRuntime
+      | { default?: ShikiRuntime },
+  )
+
+let markdownMermaidRenderId = 0
+
+const createMermaidThemeVariables = (
+  element: HTMLElement,
+  context: MarkdownFeatureAdapterContext,
+) => {
+  const styleRoot = getFeatureStyleRoot(element, context.root)
+  return {
+    background: getComputedToken(styleRoot, '--el-bg-color', '#ffffff'),
+    edgeLabelBackground: getComputedToken(
+      styleRoot,
+      '--el-bg-color-overlay',
+      '#ffffff',
+    ),
+    lineColor: getComputedToken(
+      styleRoot,
+      '--el-border-color-darker',
+      '#909399',
+    ),
+    mainBkg: getComputedToken(styleRoot, '--el-fill-color-light', '#f5f7fa'),
+    nodeBorder: getComputedToken(styleRoot, '--el-color-primary', '#409eff'),
+    primaryBorderColor: getComputedToken(
+      styleRoot,
+      '--el-color-primary',
+      '#409eff',
+    ),
+    primaryColor: getComputedToken(
+      styleRoot,
+      '--el-fill-color-light',
+      '#f5f7fa',
+    ),
+    primaryTextColor: getComputedToken(
+      styleRoot,
+      '--el-text-color-primary',
+      '#303133',
+    ),
+    secondaryColor: getComputedToken(
+      styleRoot,
+      '--el-fill-color-blank',
+      '#ffffff',
+    ),
+    tertiaryColor: getComputedToken(
+      styleRoot,
+      '--el-fill-color-lighter',
+      '#fafafa',
+    ),
+  }
+}
+
+export const defaultMermaidAdapter: MarkdownFeatureAdapter = async (
+  element,
+  context,
+) => {
+  if (
+    element.dataset.mermaidRendered === 'true' &&
+    !element.querySelector('code')
+  ) {
+    applyNonceToFeatureStyles(element, context?.cspNonce)
+    return
+  }
+
+  const source = extractFeatureSource(element, [
+    'mermaidSource',
+    'markdownSource',
+    'source',
+  ]).trim()
+  if (!source) return
+
+  try {
+    const mermaid = await loadMermaidRuntime()
+    if (typeof mermaid.render !== 'function') {
+      throw new Error('mermaid_render_unavailable')
+    }
+
+    mermaid.initialize?.({
+      securityLevel: 'strict',
+      startOnLoad: false,
+      theme: context?.theme === 'dark' ? 'dark' : 'default',
+      themeVariables: context
+        ? createMermaidThemeVariables(element, context)
+        : undefined,
+    })
+
+    const renderId = `fsus-markdown-mermaid-${++markdownMermaidRenderId}`
+    const rendered = await withStyleNonceBridge(
+      element.ownerDocument,
+      context?.cspNonce,
+      () => mermaid.render!(renderId, source),
+    )
+    const svg =
+      typeof rendered === 'string'
+        ? rendered
+        : (rendered as { svg: string }).svg
+    const fragment = createSafeFeatureFragment(
+      element.ownerDocument,
+      svg,
+      context?.cspNonce,
+    )
+
+    element.replaceChildren(fragment)
+    element.dataset.mermaidRendered = 'true'
+    element.dataset.markdownFeatureActivated = 'mermaid'
+    element.removeAttribute('data-mermaid-placeholder')
+  } catch (error) {
+    renderFeatureError(element, 'mermaid', error, source)
+    throw error
+  }
+}
+
+const isBlockLatexElement = (element: HTMLElement) =>
+  element.tagName === 'DIV' ||
+  element.tagName === 'FIGURE' ||
+  element.dataset.latexDisplay === 'block'
+
+export const defaultLatexAdapter: MarkdownFeatureAdapter = async (
+  element,
+  context,
+) => {
+  if (element.dataset.latexRendered && !element.querySelector('code')) {
+    applyNonceToFeatureStyles(element, context?.cspNonce)
+    return
+  }
+
+  const source = extractFeatureSource(element, [
+    'latexSource',
+    'markdownSource',
+    'source',
+  ]).trim()
+  if (!source) return
+
+  try {
+    const katex = await loadKatexRuntime()
+    if (typeof katex.renderToString !== 'function') {
+      throw new Error('katex_render_unavailable')
+    }
+
+    const styleRoot = context
+      ? getFeatureStyleRoot(element, context.root)
+      : element.ownerDocument.documentElement
+    const html = katex.renderToString(source, {
+      displayMode: isBlockLatexElement(element),
+      errorColor: getComputedToken(styleRoot, '--el-color-danger', '#f56c6c'),
+      throwOnError: false,
+      trust: false,
+    })
+    const fragment = createSafeFeatureFragment(
+      element.ownerDocument,
+      html,
+      context?.cspNonce,
+    )
+
+    element.replaceChildren(fragment)
+    element.dataset.latexRendered = 'katex'
+    element.dataset.markdownFeatureActivated = 'latex'
+    element.removeAttribute('data-latex-placeholder')
+  } catch (error) {
+    renderFeatureError(element, 'latex', error, source)
+    throw error
+  }
+}
+
+const languageAliases = new Map([
+  ['csharp', 'c#'],
+  ['cs', 'c#'],
+  ['javascript', 'js'],
+  ['typescript', 'ts'],
+  ['shell', 'bash'],
+  ['sh', 'bash'],
+])
+
+const normalizeCodeLanguage = (language: string | undefined) => {
+  if (!language) return 'text'
+  const normalized = language.trim().toLowerCase()
+  return languageAliases.get(normalized) ?? normalized ?? 'text'
+}
+
+const extractCodeLanguage = (element: HTMLElement) => {
+  for (const className of Array.from(element.classList)) {
+    const match = /^language-(.+)$/i.exec(className)
+    if (match?.[1]) return normalizeCodeLanguage(match[1])
+  }
+  return 'text'
+}
+
+const renderShikiHtml = async (
+  shiki: ShikiRuntime,
+  source: string,
+  language: string,
+  theme: string,
+) => {
+  if (typeof shiki.codeToHtml !== 'function') {
+    throw new Error('shiki_code_to_html_unavailable')
+  }
+
+  try {
+    return await shiki.codeToHtml(source, { lang: language, theme })
+  } catch (error) {
+    if (language === 'text') throw error
+    return shiki.codeToHtml(source, { lang: 'text', theme })
+  }
+}
+
+export const defaultCodeHighlightAdapter: MarkdownFeatureAdapter = async (
+  element,
+  context,
+) => {
+  const code =
+    element.tagName === 'CODE' ? element : element.querySelector('code')
+  if (!code) return
+
+  const pre = code.closest('pre') ?? code
+  if (pre instanceof HTMLElement && pre.dataset.codeHighlighted === 'shiki') {
+    applyNonceToFeatureStyles(pre, context?.cspNonce)
+    return
+  }
+
+  const source = code.textContent ?? ''
+  const language = extractCodeLanguage(code)
+  const theme = context?.theme === 'dark' ? 'github-dark' : 'github-light'
+
+  try {
+    const shiki = await loadShikiRuntime()
+    const html = await renderShikiHtml(shiki, source, language, theme)
+    const fragment = createSafeFeatureFragment(
+      element.ownerDocument,
+      html,
+      context?.cspNonce,
+    )
+    const highlightedPre = Array.from(fragment.childNodes).find(
+      (node): node is HTMLElement =>
+        isElementNode(node) && node.tagName === 'PRE',
+    )
+
+    if (pre instanceof HTMLElement) {
+      if (highlightedPre) {
+        highlightedPre.dataset.codeHighlighted = 'shiki'
+        highlightedPre.dataset.markdownFeatureActivated = 'code-highlight'
+        pre.replaceWith(highlightedPre)
+      } else {
+        pre.replaceChildren(fragment)
+        pre.dataset.codeHighlighted = 'shiki'
+        pre.dataset.markdownFeatureActivated = 'code-highlight'
+      }
+    } else {
+      element.replaceChildren(fragment)
+      element.dataset.codeHighlighted = 'shiki'
+      element.dataset.markdownFeatureActivated = 'code-highlight'
+    }
+  } catch (error) {
+    if (pre instanceof HTMLElement) {
+      replaceWithFeatureError(pre, 'code-highlight', error, source)
+    } else {
+      renderFeatureError(element, 'code-highlight', error, source)
+    }
+    throw error
+  }
+}
+
 const markElements = async (
   root: ParentNode,
   selector: string,
   kind: MarkdownFeatureActivationKind,
-  adapter: MarkdownFeatureAdapter | undefined,
+  adapter: MarkdownFeatureAdapter | null | undefined,
+  context: MarkdownFeatureAdapterContext,
 ) => {
-  const elements = Array.from(root.querySelectorAll<HTMLElement>(selector))
+  const elements = selectMarkdownFeatureElements(root, selector)
+  const errors: MarkdownFeatureActivationError[] = []
+  let count = 0
+
   for (const element of elements) {
-    if (adapter) await adapter(element)
-    element.dataset.markdownFeatureActivated = kind
+    try {
+      if (adapter) await adapter(element, context)
+      element.dataset.markdownFeatureActivated = kind
+      count += 1
+    } catch (error) {
+      errors.push(createActivationError(kind, error))
+    }
   }
-  return elements.length
+  return { count, errors }
 }
 
 export const activateMarkdownFeatures = async (
@@ -358,6 +1008,7 @@ export const activateMarkdownFeatures = async (
   const features = toMarkdownFeatureOptions(options.features)
   const activated: MarkdownFeatureActivationItem[] = []
   const errors: MarkdownFeatureActivationError[] = []
+  const theme = resolveFeatureTheme(options.root)
 
   if (features.headingSlug) {
     pushActivation(activated, 'heading', activateHeadingSlugs(options.root))
@@ -407,11 +1058,15 @@ export const activateMarkdownFeatures = async (
     }
 
     try {
-      pushActivation(
-        activated,
+      const result = await markElements(options.root, selector, kind, adapter, {
+        baseUrl: options.baseUrl,
+        cspNonce: options.cspNonce,
         kind,
-        await markElements(options.root, selector, kind, adapter),
-      )
+        root: options.root,
+        theme,
+      })
+      pushActivation(activated, kind, result.count)
+      errors.push(...result.errors)
     } catch (error) {
       errors.push(createActivationError(kind, error))
     }
