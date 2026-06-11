@@ -3,8 +3,14 @@ import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import FsuMotion, {
   FsuTransition,
+  createMotionRouteCleanup,
+  getGsap,
+  isScrollTriggerRegistered,
   motionPresets,
   motionTokens,
+  useGsapContext,
+  useScrollReveal,
+  useTimeline,
   vMotion,
 } from '..'
 
@@ -17,6 +23,10 @@ describe('motion primitives', () => {
   beforeEach(() => {
     vi.useFakeTimers()
     document.documentElement.dataset.fsusMotion = 'enabled'
+    Object.defineProperty(window, 'scrollTo', {
+      configurable: true,
+      value: vi.fn(),
+    })
   })
 
   afterEach(() => {
@@ -157,5 +167,101 @@ describe('motion primitives', () => {
 
     expect(wrapper.text()).toBe('ready')
     expect(wrapper.element.dataset.fsusMotionPreset).toBe('fade-in')
+  })
+
+  it('installs scroll reveal as a reduced-motion safe directive', () => {
+    document.documentElement.dataset.fsusMotion = 'reduced'
+    const Root = defineComponent({
+      template: `<section v-scroll-reveal="'fade-up'">ready</section>`,
+    })
+
+    const wrapper = mount(Root, {
+      global: {
+        plugins: [FsuMotion],
+      },
+    })
+    const el = wrapper.element as HTMLElement
+
+    expect(el.dataset.fsusScrollRevealPreset).toBe('fade-up')
+    expect(el.style.opacity).toBe('1')
+    expect(el.style.transform).toBe('translate3d(0, 0, 0)')
+  })
+
+  it('wraps gsap context creation and deterministic cleanup', () => {
+    const el = document.createElement('div')
+    document.body.append(el)
+    const context = useGsapContext(el)
+
+    context.create(() => {
+      getGsap().set(el, { opacity: 0.5 })
+    })
+
+    expect(context.contexts.size).toBe(1)
+    expect(el.style.opacity).toBe('0.5')
+
+    context.revert()
+
+    expect(context.contexts.size).toBe(0)
+    expect(el.style.opacity).toBe('')
+  })
+
+  it('builds preset-based gsap timelines without raw page-level gsap calls', () => {
+    const el = document.createElement('div')
+    const timeline = useTimeline()
+
+    timeline.add({ target: el, preset: 'fade-up', duration: 120 })
+
+    expect(timeline.timeline.getChildren()).toHaveLength(1)
+    expect(timeline.timeline.duration()).toBeCloseTo(0.12)
+
+    timeline.clear()
+    expect(timeline.timeline.getChildren()).toHaveLength(0)
+  })
+
+  it('reveals scroll content through a managed ScrollTrigger wrapper', () => {
+    const el = document.createElement('div')
+    document.body.append(el)
+    const reveal = useScrollReveal({ target: el, name: 'fade-up' })
+
+    const tween = reveal.reveal()
+
+    expect(isScrollTriggerRegistered()).toBe(true)
+    expect(
+      (tween?.vars.scrollTrigger as ScrollTrigger.StaticVars).trigger,
+    ).toBe(el)
+    expect(reveal.tweens.size).toBe(1)
+
+    reveal.kill()
+    expect(reveal.tweens.size).toBe(0)
+  })
+
+  it('finishes scroll reveal immediately when motion is reduced', () => {
+    document.documentElement.dataset.fsusMotion = 'reduced'
+    const el = document.createElement('div')
+    const reveal = useScrollReveal({ target: el, name: 'fade-up' })
+
+    const tween = reveal.reveal()
+
+    expect(tween).toBeUndefined()
+    expect(el.style.opacity).toBe('1')
+    expect(el.style.transform).toBe('translate3d(0, 0, 0)')
+  })
+
+  it('provides a route cleanup bucket for route leave hooks', () => {
+    const first = vi.fn()
+    const second = vi.fn()
+    const routeCleanup = createMotionRouteCleanup()
+    const removeFirst = routeCleanup.add(first)
+    routeCleanup.add(second)
+
+    expect(routeCleanup.size).toBe(2)
+    removeFirst()
+    expect(routeCleanup.size).toBe(1)
+
+    routeCleanup.cleanup()
+
+    expect(first).not.toHaveBeenCalled()
+    expect(second).toHaveBeenCalledTimes(1)
+    expect(routeCleanup.size).toBe(0)
   })
 })

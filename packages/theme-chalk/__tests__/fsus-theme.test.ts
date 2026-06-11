@@ -323,6 +323,19 @@ describe('Fsus theme visual baseline', () => {
     )
   })
 
+  test('keeps inline action buttons from wrapping into neighboring content', () => {
+    const css = compileThemeFile('button.scss')
+
+    expectCssRule(css, '.el-button.is-inline-action', [
+      'white-space: nowrap;',
+      'vertical-align: middle;',
+    ])
+    expectCssRule(css, '.el-button.is-inline-action > span', [
+      'overflow-wrap: normal;',
+      'white-space: nowrap;',
+    ])
+  })
+
   test('uses square table surfaces unless callers opt into another radius', () => {
     const tableCss = compileThemeFile('table.scss')
     const tableV2Css = compileThemeFile('table-v2.scss')
@@ -346,15 +359,35 @@ describe('Fsus theme visual baseline', () => {
     expectCssRule(themeCss, '.el-table__row', ['transform: none;'])
     expectCssRule(themeCss, '.el-table .el-button:hover', ['transform: none;'])
     expectCssRule(themeCss, '.el-table .el-tag:active', ['transform: none;'])
+    expectCssRule(themeCss, '.el-table .el-button', [
+      'flex-shrink: 0;',
+      'max-width: 100%;',
+      'overflow-wrap: normal;',
+      'white-space: nowrap;',
+    ])
+    expectCssRule(themeCss, '.el-table .el-button > span', [
+      'overflow-wrap: normal;',
+      'white-space: nowrap;',
+    ])
+    expectCssRule(themeCss, '.el-table .el-button.is-inline-action', [
+      'min-height: 32px;',
+      'height: 32px;',
+      'padding-block: 0;',
+      'padding-inline: 6px;',
+      'vertical-align: middle;',
+    ])
     expectCssRule(
       themeCss,
       '.el-table .el-table-fixed-column--right.el-table__cell',
-      ['background: var(--el-table-tr-bg-color);'],
+      ['background: var(--el-bg-color);', 'background-clip: padding-box;'],
     )
     expectCssRule(
       themeCss,
       '.el-table .el-table__row:hover > .el-table-fixed-column--right.el-table__cell',
-      ['background: var(--el-fill-color);'],
+      [
+        'background: var(--el-fill-color-light);',
+        'background-clip: padding-box;',
+      ],
     )
     expectCssRule(themeCss, '.el-table-v2__right', [
       'background: var(--el-bg-color);',

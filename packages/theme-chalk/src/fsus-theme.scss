@@ -144,6 +144,29 @@ html.dark {
   transform: none;
 }
 
+.#{$namespace}-table .#{$namespace}-button,
+.#{$namespace}-table-v2 .#{$namespace}-button {
+  flex-shrink: 0;
+  max-width: 100%;
+  overflow-wrap: normal;
+  white-space: nowrap;
+}
+
+.#{$namespace}-table .#{$namespace}-button > span,
+.#{$namespace}-table-v2 .#{$namespace}-button > span {
+  overflow-wrap: normal;
+  white-space: nowrap;
+}
+
+.#{$namespace}-table .#{$namespace}-button.is-inline-action,
+.#{$namespace}-table-v2 .#{$namespace}-button.is-inline-action {
+  min-height: 32px;
+  height: 32px;
+  padding-block: 0;
+  padding-inline: 6px;
+  vertical-align: middle;
+}
+
 .#{$namespace}-button {
   @include fsus-control(8px);
   background: transparent;
@@ -1862,7 +1885,8 @@ button.#{$namespace}-card:active {
   .#{$namespace}-table-fixed-column--left.#{$namespace}-table__cell,
 .#{$namespace}-table
   .#{$namespace}-table-fixed-column--right.#{$namespace}-table__cell {
-  background: var(--el-table-tr-bg-color);
+  background: var(--el-bg-color);
+  background-clip: padding-box;
 }
 
 .#{$namespace}-table
@@ -1877,7 +1901,8 @@ button.#{$namespace}-card:active {
 .#{$namespace}-table
   .hover-row
   > .#{$namespace}-table-fixed-column--right.#{$namespace}-table__cell {
-  background: var(--el-fill-color);
+  background: var(--el-fill-color-light);
+  background-clip: padding-box;
 }
 
 .#{$namespace}-table-v2__left,

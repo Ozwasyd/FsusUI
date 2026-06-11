@@ -285,13 +285,14 @@ $button-icon-span-gap: map.merge(
     min-height: 36px;
     height: auto;
     padding-inline: 4px;
-    white-space: normal;
-    vertical-align: baseline;
+    white-space: nowrap;
+    vertical-align: middle;
 
     > span {
       min-width: 0;
       text-align: inherit;
-      overflow-wrap: anywhere;
+      overflow-wrap: normal;
+      white-space: nowrap;
     }
 
     @include when(text) {

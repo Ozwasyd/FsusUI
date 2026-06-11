@@ -555,6 +555,9 @@ importers:
 
   packages/motion:
     dependencies:
+      gsap:
+        specifier: ^3.15.0
+        version: 3.15.0
       vue:
         specifier: ^3.5.0
         version: 3.5.32(typescript@6.0.2)
@@ -4911,6 +4914,9 @@ packages:
 
   grapheme-splitter@1.0.4:
     resolution: {integrity: sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==}
+
+  gsap@3.15.0:
+    resolution: {integrity: sha512-dMW4CWBTUK1AEEDeZc1g4xpPGIrSf9fJF960qbTZmN/QwZIWY5wgliS6JWl9/25fpTGJrMRtSjGtOmPnfjZB+A==}
 
   gulp-autoprefixer@8.0.0:
     resolution: {integrity: sha512-sVR++PIaXpa81p52dmmA/jt50bw0egmylK5mjagfgOJ8uLDGaF9tHyzvetkY9Uo0gBZUS5sVqN3kX/GlUKOyog==}
@@ -13049,6 +13055,8 @@ snapshots:
   graceful-fs@4.2.11: {}
 
   grapheme-splitter@1.0.4: {}
+
+  gsap@3.15.0: {}
 
   gulp-autoprefixer@8.0.0(gulp@5.0.1):
     dependencies:
