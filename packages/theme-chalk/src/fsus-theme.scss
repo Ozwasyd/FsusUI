@@ -182,6 +182,69 @@ html.dark {
   vertical-align: middle;
 }
 
+.fsus-action-row,
+.fsus-table-actions,
+[data-fsus-action-row],
+[data-fsus-table-actions],
+.#{$namespace}-table .cell:has(.#{$namespace}-button),
+.#{$namespace}-table-v2__cell:has(.#{$namespace}-button) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--fsus-space-2);
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  isolation: isolate;
+  transform: none;
+}
+
+.fsus-action-row > *,
+.fsus-table-actions > *,
+[data-fsus-action-row] > *,
+[data-fsus-table-actions] > *,
+.#{$namespace}-table .cell:has(.#{$namespace}-button) > *,
+.#{$namespace}-table-v2__cell:has(.#{$namespace}-button) > * {
+  flex: 0 0 auto;
+  transform: none;
+}
+
+.fsus-action-row .#{$namespace}-tag,
+.fsus-action-row .#{$namespace}-check-tag,
+.fsus-table-actions .#{$namespace}-tag,
+.fsus-table-actions .#{$namespace}-check-tag,
+[data-fsus-action-row] .#{$namespace}-tag,
+[data-fsus-action-row] .#{$namespace}-check-tag,
+[data-fsus-table-actions] .#{$namespace}-tag,
+[data-fsus-table-actions] .#{$namespace}-check-tag {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fsus-action-row .#{$namespace}-button:hover,
+.fsus-action-row .#{$namespace}-button:focus,
+.fsus-action-row .#{$namespace}-button:active,
+.fsus-action-row .#{$namespace}-tag:hover,
+.fsus-action-row .#{$namespace}-tag:active,
+.fsus-table-actions .#{$namespace}-button:hover,
+.fsus-table-actions .#{$namespace}-button:focus,
+.fsus-table-actions .#{$namespace}-button:active,
+.fsus-table-actions .#{$namespace}-tag:hover,
+.fsus-table-actions .#{$namespace}-tag:active,
+[data-fsus-action-row] .#{$namespace}-button:hover,
+[data-fsus-action-row] .#{$namespace}-button:focus,
+[data-fsus-action-row] .#{$namespace}-button:active,
+[data-fsus-action-row] .#{$namespace}-tag:hover,
+[data-fsus-action-row] .#{$namespace}-tag:active,
+[data-fsus-table-actions] .#{$namespace}-button:hover,
+[data-fsus-table-actions] .#{$namespace}-button:focus,
+[data-fsus-table-actions] .#{$namespace}-button:active,
+[data-fsus-table-actions] .#{$namespace}-tag:hover,
+[data-fsus-table-actions] .#{$namespace}-tag:active {
+  transform: none;
+}
+
 .#{$namespace}-button {
   @include fsus-control(8px);
   background: transparent;

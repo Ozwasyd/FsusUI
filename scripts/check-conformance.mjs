@@ -66,14 +66,25 @@ const checkTokens = () => {
     assert(hash.outputs?.[artifact], `token hash must include ${artifact}`)
     assert(exists(artifact), `${artifact} must exist`)
   }
+  const webTokenBridge = read(
+    'packages/theme-chalk/src/common/fsus-tokens.scss',
+  )
+  assertIncludes(
+    webTokenBridge,
+    "@use '../generated/tokens'",
+    'packages/theme-chalk/src/common/fsus-tokens.scss',
+  )
   console.log('conformance:tokens passed')
 }
 
 const checkContracts = () => {
   const file = 'spec/components/avalonia-first-subset.yaml'
   const contract = read(file)
+  const webMappingFile = 'docs/api/web-contract-mapping.md'
+  const webMapping = read(webMappingFile).toLowerCase()
   for (const component of requiredComponents) {
     assertIncludes(contract, `id: ${component}`, file)
+    assertIncludes(webMapping, component, webMappingFile)
   }
   for (const key of [
     'props:',
@@ -89,13 +100,20 @@ const checkContracts = () => {
 
 const checkInteractions = () => {
   const file = 'tests/conformance/interactions/basic-controls.yaml'
+  const webFile = 'tests/conformance/interactions/web-first-subset.yaml'
   const traces = read(file)
+  const webTraces = read(webFile)
   for (const component of interactionComponents) {
     assertIncludes(traces, `component: ${component}`, file)
   }
+  for (const component of ['button', 'icon-button', 'input']) {
+    assertIncludes(webTraces, `component: ${component}`, webFile)
+  }
   for (const step of ['pointerover', 'focus', 'keyboard', 'assert']) {
     assertIncludes(traces, step, file)
+    assertIncludes(webTraces, step, webFile)
   }
+  assertIncludes(webTraces, 'web-table-actions-motion-safe', webFile)
   console.log('conformance:interactions passed')
 }
 
@@ -142,6 +160,7 @@ const checkA11y = () => {
     'focus order',
     'disabled',
     'keyboard',
+    'Icon-only button',
   ]) {
     assertIncludes(content, term, file)
   }

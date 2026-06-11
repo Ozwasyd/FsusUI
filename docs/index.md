@@ -17,6 +17,7 @@ FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Mini
 | [Element Plus 接入指南](./element-plus-integration.md)       | 与 Element Plus 的差异点、包名约定、WASM 策略   |
 | [API 稳定性](./api-stability.md)                             | public preview 导出、稳定性等级、内部路径边界   |
 | [跨平台 API 边界](./api/cross-platform-api-boundary.md)      | Web/Avalonia/product integration 公私有边界     |
+| [Web 合同映射](./api/web-contract-mapping.md)                | Web/Vue API 与平台中立合同的对应关系            |
 | [Element Plus 兼容策略](./element-plus-compatibility.md)     | 兼容承诺、已知差异、支持与不支持的使用面        |
 | [从 Element Plus 迁移](./migration/from-element-plus.md)     | 包名、CSS、图标、运行时目标与迁移检查           |
 | [Element Plus 归属说明](./legal/element-plus-attribution.md) | 派生关系、许可、资产边界、包名说明              |

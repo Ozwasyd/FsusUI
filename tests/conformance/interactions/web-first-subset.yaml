@@ -1,0 +1,34 @@
+version: 1
+platform: web
+scenarios:
+  - id: web-button-motion-contract
+    component: button
+    contract: spec/components/avalonia-first-subset.yaml#button
+    steps:
+      - render: { component: ElButton, motion: scale-fade, text: Save }
+      - pointerover
+      - keyboard: Enter
+      - assert: { emitted: click, finalState: default }
+  - id: web-icon-button-accessible-name
+    component: icon-button
+    contract: spec/components/avalonia-first-subset.yaml#icon-button
+    steps:
+      - render: { component: ElButton, iconOnly: true, ariaLabel: Search }
+      - focus
+      - keyboard: Space
+      - assert: { accessibleName: Search }
+  - id: web-input-readonly-invalid
+    component: input
+    contract: spec/components/avalonia-first-subset.yaml#input
+    steps:
+      - render: { component: ElInput, readonly: true, invalid: true }
+      - focus
+      - assert: { readonly: true, invalid: true }
+  - id: web-table-actions-motion-safe
+    component: button
+    contract: spec/motion/README.md
+    steps:
+      - render:
+          { container: data-fsus-table-actions, children: [ElTag, ElButton] }
+      - pointerover
+      - assert: { transform: none, noOverlap: true }

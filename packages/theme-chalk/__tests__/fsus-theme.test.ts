@@ -426,6 +426,38 @@ describe('Fsus theme visual baseline', () => {
     )
   })
 
+  test('keeps dense action rows motion-safe and non-overlapping', () => {
+    const css = compileThemeFile('fsus-theme.scss')
+
+    expectCssRule(css, '.fsus-action-row', [
+      'display: inline-flex;',
+      'align-items: center;',
+      'justify-content: flex-end;',
+      'gap: var(--fsus-space-2);',
+      'overflow: hidden;',
+      'isolation: isolate;',
+      'transform: none;',
+    ])
+    expectCssRule(css, '[data-fsus-table-actions]', [
+      'display: inline-flex;',
+      'max-width: 100%;',
+      'overflow: hidden;',
+      'transform: none;',
+    ])
+    expectCssRule(css, '.fsus-action-row > *', [
+      'flex: 0 0 auto;',
+      'transform: none;',
+    ])
+    expectCssRule(css, '.fsus-action-row .el-tag', [
+      'max-width: 100%;',
+      'overflow: hidden;',
+      'text-overflow: ellipsis;',
+    ])
+    expectCssRule(css, '.fsus-action-row .el-button:hover', [
+      'transform: none;',
+    ])
+  })
+
   test('keeps card surfaces flat by default', () => {
     const css = compileThemeFile('card.scss')
 

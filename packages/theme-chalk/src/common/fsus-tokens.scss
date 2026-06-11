@@ -1,21 +1,36 @@
+@use '../generated/tokens' as generated;
+
 @mixin fsus-core-tokens {
-  --fsus-ink: #0f0f11;
-  --fsus-paper: #ffffff;
-  --fsus-page: #f7f7f8;
+  --fsus-color-action-primary: #{generated.$fsus-color-action-primary};
+  --fsus-color-action-primary-hover: #{generated.$fsus-color-action-primary-hover};
+  --fsus-color-text-primary: #{generated.$fsus-color-text-primary};
+  --fsus-color-text-muted: #{generated.$fsus-color-text-muted};
+  --fsus-color-surface-base: #{generated.$fsus-color-surface-base};
+  --fsus-color-surface-raised: #{generated.$fsus-color-surface-raised};
+  --fsus-color-border-subtle: #{generated.$fsus-color-border-subtle};
+  --fsus-color-focus-ring: #{generated.$fsus-color-focus-ring};
+  --fsus-color-status-danger: #{generated.$fsus-color-status-danger};
+  --fsus-icon-size-md: #{generated.$fsus-icon-size-md};
+  --fsus-icon-stroke-md: #{generated.$fsus-icon-stroke-md};
+  --fsus-icon-fill-default: #{generated.$fsus-icon-fill-default};
+
+  --fsus-ink: var(--fsus-color-text-primary);
+  --fsus-paper: var(--fsus-color-surface-base);
+  --fsus-page: var(--fsus-color-surface-raised);
   --fsus-surface-overlay: rgba(255, 255, 255, 0.85);
   --fsus-overlay-color: rgba(252, 252, 252, 0.5);
-  --fsus-scholarly-blue: #2a599c;
+  --fsus-scholarly-blue: var(--fsus-color-action-primary);
   --fsus-dot-gray: #a1a1aa;
-  --fsus-border: #e4e4e7;
+  --fsus-border: var(--fsus-color-border-subtle);
   --fsus-border-light: #ececf0;
   --fsus-border-lighter: #f1f1f3;
   --fsus-border-extra-light: #f7f7f8;
-  --fsus-text-regular: #5f5f68;
-  --fsus-text-placeholder: #7c7c86;
+  --fsus-text-regular: var(--fsus-color-text-muted);
+  --fsus-text-placeholder: var(--fsus-color-text-muted);
   --fsus-highlight: rgba(255, 255, 255, 0.8);
 
   --fsus-radius-control: 8px;
-  --fsus-radius-control-small: 6px;
+  --fsus-radius-control-small: #{generated.$fsus-radius-control-md};
   --fsus-radius-panel: 24px;
   --fsus-radius-floating: 24px;
   --fsus-radius-popover: 20px;
@@ -55,13 +70,13 @@
   --fsus-backdrop-blur-soft: 20px;
   --fsus-backdrop-blur-overlay: 16px;
   --fsus-backdrop-saturate: 120%;
-  --fsus-motion-standard: cubic-bezier(0.4, 0, 0.2, 1);
-  --fsus-motion-emphasized: cubic-bezier(0.2, 0, 0, 1);
-  --fsus-motion-control: 260ms;
-  --fsus-motion-control-fast: 160ms;
+  --fsus-motion-standard: #{generated.$fsus-motion-easing-standard};
+  --fsus-motion-emphasized: #{generated.$fsus-motion-easing-emphasized};
+  --fsus-motion-control: #{generated.$fsus-motion-duration-control};
+  --fsus-motion-control-fast: #{generated.$fsus-motion-duration-control-fast};
   --fsus-motion-slider-follow: 96ms;
   --fsus-motion-slider-release: 220ms;
-  --fsus-motion-panel: 420ms;
+  --fsus-motion-panel: #{generated.$fsus-motion-duration-panel};
   --fsus-motion-overlay: 300ms;
   --fsus-motion-blur: 0.35px;
   --fsus-motion-slider-blur: 0.28px;
@@ -104,7 +119,7 @@
   --el-text-color-regular: var(--fsus-text-regular);
   --el-text-color-secondary: var(--fsus-text-regular);
   --el-text-color-placeholder: var(--fsus-text-placeholder);
-  --el-a11y-focus-color: var(--fsus-scholarly-blue);
+  --el-a11y-focus-color: var(--fsus-color-focus-ring);
   --el-border-radius-base: var(--fsus-radius-control);
   --el-border-radius-small: var(--fsus-radius-control-small);
   --el-border-radius-round: var(--fsus-radius-pill);
