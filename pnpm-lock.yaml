@@ -426,6 +426,9 @@ importers:
       '@element-plus/icons-vue':
         specifier: workspace:*
         version: link:../icons-vue
+      '@element-plus/motion':
+        specifier: workspace:*
+        version: link:../motion
       '@floating-ui/dom':
         specifier: ^1.0.1
         version: 1.7.6
@@ -549,6 +552,12 @@ importers:
         version: 3.2.6(typescript@6.0.2)
 
   packages/locale: {}
+
+  packages/motion:
+    dependencies:
+      vue:
+        specifier: ^3.5.0
+        version: 3.5.32(typescript@6.0.2)
 
   packages/test-utils: {}
 

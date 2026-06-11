@@ -4,10 +4,12 @@ import { ElMessage } from '@element-plus/components/message'
 import { ElMessageBox } from '@element-plus/components/message-box'
 import { ElNotification } from '@element-plus/components/notification'
 import { ElPopoverDirective } from '@element-plus/components/popover'
+import { FsuMotion } from '@element-plus/motion'
 
 import type { Plugin } from 'vue'
 
 export default [
+  FsuMotion,
   ElInfiniteScroll,
   ElLoading,
   ElMessage,

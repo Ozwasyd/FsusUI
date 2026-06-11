@@ -1,0 +1,13 @@
+{
+  "name": "@element-plus/motion",
+  "version": "0.0.5",
+  "description": "FsusUI semantic motion primitives",
+  "license": "MIT",
+  "main": "index.ts",
+  "module": "index.ts",
+  "types": "index.d.ts",
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "sideEffects": false
+}

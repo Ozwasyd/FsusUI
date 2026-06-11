@@ -118,6 +118,10 @@ describe('motion-config', () => {
     expect(root.dataset.fsusMotion).toBe('enabled')
     expect(root.dataset.fsusMotionPreset).toBe('expressive')
     expect(root.style.getPropertyValue('--fsus-motion-panel')).toBe('520ms')
+    expect(root.style.getPropertyValue('--fsus-motion-distance-sm')).toBe(
+      '10px',
+    )
+    expect(root.style.getPropertyValue('--fsus-motion-stagger')).toBe('70ms')
     expect(root.style.getPropertyValue('--fsus-motion-scroll-settle')).toBe(
       '150ms',
     )

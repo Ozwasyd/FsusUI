@@ -18,6 +18,7 @@ FsusUI 提供 100+ 个 Vue 3 组件，涵盖基础、表单、数据展示、导
 | [Space 间距](./space.md)           | 为相邻元素提供统一间距                         |
 | [Layout 布局](./layout.md)         | 24 栅格响应式布局系统                          |
 | [Divider 分割线](./divider.md)     | 区隔内容的分割线                               |
+| [Motion 动效](./motion.md)         | 语义化动效 presets、指令和过渡组件             |
 
 ## 表单组件
 

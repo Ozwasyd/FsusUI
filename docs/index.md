@@ -69,6 +69,7 @@ FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Mini
 | 间距 Space                       | [components/space.md](./components/space.md)                         |
 | 布局 Layout                      | [components/layout.md](./components/layout.md)                       |
 | 分割线 Divider                   | [components/divider.md](./components/divider.md)                     |
+| 动效 Motion                      | [components/motion.md](./components/motion.md)                       |
 
 ### 表单组件
 

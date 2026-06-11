@@ -69,7 +69,11 @@
       <el-space :size="30">
         <el-badge :value="12"><el-button>Comments</el-button></el-badge>
         <el-badge :value="3" is-dot>
-          <el-button :icon="Share" type="primary" aria-label="Share item" />
+          <el-button
+            :icon="Share"
+            type="primary"
+            v-bind="{ 'aria-label': 'Share item' }"
+          />
         </el-badge>
       </el-space>
     </div>
@@ -112,9 +116,7 @@
         <el-descriptions-item label="Telephone">
           18100000000
         </el-descriptions-item>
-        <el-descriptions-item label="Place">
-          Suzhou
-        </el-descriptions-item>
+        <el-descriptions-item label="Place"> Suzhou </el-descriptions-item>
         <el-descriptions-item label="Remarks">
           <el-tag size="small">School</el-tag>
         </el-descriptions-item>
