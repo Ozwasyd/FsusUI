@@ -58,14 +58,18 @@
     </div>
     <div class="demo-block">
       <h3>Pagination</h3>
-      <el-pagination background layout="prev, pager, next, jumper, total" :total="1000" />
+      <el-pagination
+        background
+        layout="prev, pager, next, jumper, total"
+        :total="1000"
+      />
     </div>
     <div class="demo-block">
       <h3>Badge</h3>
       <el-space :size="30">
         <el-badge :value="12"><el-button>Comments</el-button></el-badge>
         <el-badge :value="3" is-dot>
-          <el-button :icon="Share" type="primary" />
+          <el-button :icon="Share" type="primary" aria-label="Share item" />
         </el-badge>
       </el-space>
     </div>
@@ -102,9 +106,15 @@
     <div class="demo-block">
       <h3>Descriptions & DescriptionsItem</h3>
       <el-descriptions title="User Info" border>
-        <el-descriptions-item label="Username">kooriookami</el-descriptions-item>
-        <el-descriptions-item label="Telephone">18100000000</el-descriptions-item>
-        <el-descriptions-item label="Place">Suzhou</el-descriptions-item>
+        <el-descriptions-item label="Username">
+          kooriookami
+        </el-descriptions-item>
+        <el-descriptions-item label="Telephone">
+          18100000000
+        </el-descriptions-item>
+        <el-descriptions-item label="Place">
+          Suzhou
+        </el-descriptions-item>
         <el-descriptions-item label="Remarks">
           <el-tag size="small">School</el-tag>
         </el-descriptions-item>
