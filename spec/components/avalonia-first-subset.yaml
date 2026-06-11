@@ -1,5 +1,6 @@
 version: 1
 status: preview
+releaseClassification: preview-minor
 scope: avalonia-first-subset
 controls:
   - id: button

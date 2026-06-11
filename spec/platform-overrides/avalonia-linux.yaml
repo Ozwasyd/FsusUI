@@ -1,0 +1,12 @@
+overrides:
+  - id: avalonia-linux-window-shadow-001
+    area: visual
+    component: dialog
+    platform: avalonia-linux
+    status: accepted
+    reason: Linux compositor and X11/Wayland window shadows differ from browser box-shadow rendering.
+    allowedDeviation: medium
+    testPolicy: visual-threshold
+    owner: fsusui-core
+    reviewAfter: 2026-09-01
+    linkedIssues: [18, 22, 24, 25]

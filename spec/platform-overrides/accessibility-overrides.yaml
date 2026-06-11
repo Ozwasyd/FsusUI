@@ -1,0 +1,12 @@
+overrides:
+  - id: accessibility-automation-name-001
+    area: accessibility
+    component: icon-button
+    platform: all
+    status: accepted
+    reason: Web ARIA names and Avalonia automation names use different platform APIs but must expose the same user-facing name.
+    allowedDeviation: none
+    testPolicy: accessibility-contract
+    owner: fsusui-core
+    reviewAfter: 2026-09-01
+    linkedIssues: [18, 23, 24, 25]

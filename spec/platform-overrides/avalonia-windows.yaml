@@ -1,0 +1,12 @@
+overrides:
+  - id: avalonia-windows-focus-ring-001
+    area: accessibility
+    component: focus-visible
+    platform: avalonia-windows
+    status: accepted
+    reason: Windows high-contrast and focus cues can override app brushes for accessibility.
+    allowedDeviation: low
+    testPolicy: accessibility-and-visual-threshold
+    owner: fsusui-core
+    reviewAfter: 2026-09-01
+    linkedIssues: [18, 24, 25]

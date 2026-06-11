@@ -1,0 +1,12 @@
+overrides:
+  - id: web-browser-font-baseline-001
+    area: typography
+    component: text
+    platform: web
+    status: accepted
+    reason: Browser font rendering and line box metrics differ from Skia text metrics.
+    allowedDeviation: medium
+    testPolicy: visual-threshold
+    owner: fsusui-core
+    reviewAfter: 2026-09-01
+    linkedIssues: [18, 24, 25]

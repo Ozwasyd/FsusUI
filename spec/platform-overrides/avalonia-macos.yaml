@@ -1,0 +1,12 @@
+overrides:
+  - id: avalonia-macos-text-smoothing-001
+    area: typography
+    component: text
+    platform: avalonia-macos
+    status: accepted
+    reason: macOS text smoothing differs from Linux, Windows, and browser rendering.
+    allowedDeviation: medium
+    testPolicy: visual-threshold
+    owner: fsusui-core
+    reviewAfter: 2026-09-01
+    linkedIssues: [18, 24, 25]

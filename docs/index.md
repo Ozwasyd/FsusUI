@@ -16,6 +16,7 @@ FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Mini
 | [图标系统](./icons.md)                                       | 图标导入、生成流程、SVG 审查和命名稳定性        |
 | [Element Plus 接入指南](./element-plus-integration.md)       | 与 Element Plus 的差异点、包名约定、WASM 策略   |
 | [API 稳定性](./api-stability.md)                             | public preview 导出、稳定性等级、内部路径边界   |
+| [跨平台 API 边界](./api/cross-platform-api-boundary.md)      | Web/Avalonia/product integration 公私有边界     |
 | [Element Plus 兼容策略](./element-plus-compatibility.md)     | 兼容承诺、已知差异、支持与不支持的使用面        |
 | [从 Element Plus 迁移](./migration/from-element-plus.md)     | 包名、CSS、图标、运行时目标与迁移检查           |
 | [Element Plus 归属说明](./legal/element-plus-attribution.md) | 派生关系、许可、资产边界、包名说明              |
@@ -25,6 +26,8 @@ FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Mini
 | [行为准则](../CODE_OF_CONDUCT.md)                            | public-preview 协作和安全披露行为约束           |
 | [工程维护交接](./engineering-handoff.md)                     | 环境基线、标准命令、CI 分工、常见问题排查       |
 | [发布治理](./release-governance.md)                          | npm 发布流程、Changesets 版本管理               |
+| [跨平台发布治理](./releases/cross-platform-governance.md)    | spec、npm、NuGet、token 与 contract 版本关系    |
+| [NuGet 发布策略](./releases/nuget-policy.md)                 | Avalonia NuGet metadata、preview 和 evidence    |
 | [npm 发布策略](./release/npm-registry-policy.md)             | npm registry、provenance、dist-tag 与包审计策略 |
 | [模板审计报告](./runtime-template-audit.md)                  | 模板 DOM 扫描结果（Wave 0 已全部完成）          |
 | [模板重构计划](./runtime-template-refactor-plan.md)          | 模板重构 Guardrails 与审计命令                  |

@@ -1,0 +1,12 @@
+overrides:
+  - id: avalonia-control-template-native-001
+    area: interaction
+    component: controls
+    platform: avalonia
+    status: accepted
+    reason: Avalonia controls use native template and automation behavior rather than Web DOM structure.
+    allowedDeviation: low
+    testPolicy: contract-and-accessibility
+    owner: fsusui-core
+    reviewAfter: 2026-09-01
+    linkedIssues: [18, 23, 24, 25]
