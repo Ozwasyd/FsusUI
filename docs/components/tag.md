@@ -2,6 +2,18 @@
 
 用于标记和选择。
 
+## Public Preview Notes
+
+| 字段                   | 说明                                                                       |
+| ---------------------- | -------------------------------------------------------------------------- |
+| purpose                | 标记状态、分类、筛选摘要或轻量对象标签。                                   |
+| basic usage            | 使用 `type`、`effect`、`size`、`closable` 和 `round` 表达不同标签状态。    |
+| props / events / slots | 本页 `Tag API` 和 `CheckTag API` 覆盖公开 props、events 和 slots。         |
+| accessibility          | 可关闭标签应让关闭按钮有明确上下文；可选中标签不能只依赖颜色表达选中状态。 |
+| theme token notes      | 跟随公开主色、文本色、边框色、圆角和 motion control token。                |
+| known limitations      | Tag 不是表单控件；需要提交值时应与 Checkbox、Select 或业务状态同步。       |
+| stability level        | Preview public component。                                                 |
+
 > 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
 
 ---
@@ -40,28 +52,28 @@
 
 ### Tag Attributes
 
-| 属性名 | 说明 | 类型 | 默认值 |
-|--------|------|------|--------|
-| type | 类型 | `'primary' \| 'success' \| 'info' \| 'warning' \| 'danger'` | `primary` |
-| closable | 是否可关闭 | `boolean` | `false` |
-| disable-transitions | 是否禁用动画 | `boolean` | `false` |
-| hit | 是否有高亮边框 | `boolean` | `false` |
-| color | 背景色 | `string` | — |
-| size | 尺寸 | `'large' \| 'default' \| 'small'` | — |
-| effect | 主题 | `'dark' \| 'light' \| 'plain'` | `light` |
-| round | 是否圆角 | `boolean` | `false` |
+| 属性名              | 说明           | 类型                                                        | 默认值    |
+| ------------------- | -------------- | ----------------------------------------------------------- | --------- |
+| type                | 类型           | `'primary' \| 'success' \| 'info' \| 'warning' \| 'danger'` | `primary` |
+| closable            | 是否可关闭     | `boolean`                                                   | `false`   |
+| disable-transitions | 是否禁用动画   | `boolean`                                                   | `false`   |
+| hit                 | 是否有高亮边框 | `boolean`                                                   | `false`   |
+| color               | 背景色         | `string`                                                    | —         |
+| size                | 尺寸           | `'large' \| 'default' \| 'small'`                           | —         |
+| effect              | 主题           | `'dark' \| 'light' \| 'plain'`                              | `light`   |
+| round               | 是否圆角       | `boolean`                                                   | `false`   |
 
 ### Tag Events
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|---------|
-| click | 点击标签时触发 | `(evt: MouseEvent) => void` |
-| close | 点击关闭按钮时触发 | `(evt: MouseEvent) => void` |
+| 事件名 | 说明               | 回调参数                    |
+| ------ | ------------------ | --------------------------- |
+| click  | 点击标签时触发     | `(evt: MouseEvent) => void` |
+| close  | 点击关闭按钮时触发 | `(evt: MouseEvent) => void` |
 
 ### Tag Slots
 
-| 插槽名 | 说明 |
-|--------|------|
+| 插槽名  | 说明       |
+| ------- | ---------- |
 | default | 自定义内容 |
 
 ---
@@ -70,20 +82,20 @@
 
 ### CheckTag Attributes
 
-| 属性名 | 说明 | 类型 | 默认值 |
-|--------|------|------|--------|
-| checked / v-model:checked | 是否选中 | `boolean` | `false` |
-| disabled | 是否禁用 | `boolean` | `false` |
-| type | 类型 | `'primary' \| 'success' \| 'info' \| 'warning' \| 'danger'` | `primary` |
+| 属性名                    | 说明     | 类型                                                        | 默认值    |
+| ------------------------- | -------- | ----------------------------------------------------------- | --------- |
+| checked / v-model:checked | 是否选中 | `boolean`                                                   | `false`   |
+| disabled                  | 是否禁用 | `boolean`                                                   | `false`   |
+| type                      | 类型     | `'primary' \| 'success' \| 'info' \| 'warning' \| 'danger'` | `primary` |
 
 ### CheckTag Events
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|---------|
+| 事件名 | 说明               | 回调参数                   |
+| ------ | ------------------ | -------------------------- |
 | change | 选中状态改变时触发 | `(value: boolean) => void` |
 
 ### CheckTag Slots
 
-| 插槽名 | 说明 |
-|--------|------|
+| 插槽名  | 说明       |
+| ------- | ---------- |
 | default | 自定义内容 |

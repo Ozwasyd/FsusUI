@@ -1,6 +1,6 @@
 # Icon 图标
 
-FsusUI 图标系统基于 `@element-plus/icons-vue`，提供一套 SVG 格式的图标集合。
+FsusUI 图标系统通过 `@ozwasyd/element-plus/icons-vue` 暴露 SVG 图标组件。导入、生成和命名稳定性策略见 [图标系统](../icons.md)。
 
 > 所有 SVG 图标全局强制继承 `stroke-linejoin="round"` 与 `stroke-linecap="round"`，呈现出如钢笔墨水洇开般的圆角边缘，符合 FsusUI「刚中有柔」的设计理念。
 
@@ -10,22 +10,22 @@ FsusUI 图标系统基于 `@element-plus/icons-vue`，提供一套 SVG 格式的
 
 ## 安装
 
-图标包已内置于 FsusUI monorepo（`packages/icons-vue`），无需额外安装。
+图标包已内置于 FsusUI 主包，通常无需额外安装。
 
 若在独立项目中使用：
 
 ```bash
-pnpm install @element-plus/icons-vue
+pnpm install @ozwasyd/element-plus
 ```
 
 ## 全量注册图标
 
 ```ts
 // main.ts
-import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import * as FsusIconsVue from '@ozwasyd/element-plus/icons-vue'
 
 const app = createApp(App)
-for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+for (const [key, component] of Object.entries(FsusIconsVue)) {
   app.component(key, component)
 }
 ```
@@ -48,7 +48,7 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 </template>
 
 <script setup lang="ts">
-import { Edit } from '@element-plus/icons-vue'
+import { Edit } from '@ozwasyd/element-plus/icons-vue'
 </script>
 ```
 
@@ -70,13 +70,13 @@ import { Edit } from '@element-plus/icons-vue'
 
 ### Attributes
 
-| 属性名 | 说明 | 类型 | 默认值 |
-|--------|------|------|--------|
-| color | SVG 图标的 fill 颜色 | `string` | 继承自父元素 color |
-| size | SVG 图标大小（宽高相等） | `number \| string` | 继承自父元素 font-size |
+| 属性名 | 说明                     | 类型               | 默认值                 |
+| ------ | ------------------------ | ------------------ | ---------------------- |
+| color  | SVG 图标的 fill 颜色     | `string`           | 继承自父元素 color     |
+| size   | SVG 图标大小（宽高相等） | `number \| string` | 继承自父元素 font-size |
 
 ### Slots
 
-| 插槽名 | 说明 |
-|--------|------|
+| 插槽名  | 说明          |
+| ------- | ------------- |
 | default | 图标 SVG 组件 |

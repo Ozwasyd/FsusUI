@@ -10,6 +10,8 @@ FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Mini
 | ---------------------------------------------------------- | ----------------------------------------------- |
 | [项目概览](./project-overview.md)                          | Monorepo 结构、工作区划分、主要入口             |
 | [设计规范](./design.md)                                    | 高智感极简主义设计语言、色彩、字体、组件规范    |
+| [Playground / Demo App](./playground.md)                   | demo app 启动、覆盖范围、视觉回归与公开样例规范 |
+| [图标系统](./icons.md)                                     | 图标导入、生成流程、SVG 审查和命名稳定性        |
 | [Element Plus 接入指南](./element-plus-integration.md)     | 与 Element Plus 的差异点、包名约定、WASM 策略   |
 | [API 稳定性](./api-stability.md)                           | public preview 导出、稳定性等级、内部路径边界   |
 | [Element Plus 兼容策略](./element-plus-compatibility.md)   | 兼容承诺、已知差异、支持与不支持的使用面        |
@@ -27,20 +29,21 @@ FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Mini
 
 ## 使用指南
 
-| 文档                                          | 说明                                                   |
-| --------------------------------------------- | ------------------------------------------------------ |
-| [安装](./guide/installation.md)               | 环境要求、通过 GitHub Packages 安装、配置 `.npmrc`     |
-| [快速开始](./guide/quickstart.md)             | 全量引入、按需引入、全局配置                           |
-| [主题定制](./guide/theming.md)                | CSS 变量覆盖、SCSS 变量、FsusUI 学术蓝配色规范         |
-| [主题 Token 稳定性](./theme/tokens.md)        | 公开主题变量、实验变量、内部变量边界                   |
-| [Motion Token 稳定性](./theme/motion.md)      | ConfigProvider motion、公开动效 token、低动效策略      |
-| [暗色模式](./guide/dark-mode.md)              | 接入 `themeMode`、跟随系统主题、自定义暗色变量         |
-| [国际化](./guide/i18n.md)                     | 多语言切换、Day.js 时区配置                            |
-| [自定义命名空间](./guide/namespace.md)        | 修改组件 CSS 类名前缀                                  |
-| [服务端渲染 (SSR)](./guide/ssr.md)            | SSR 水合错误处理、Teleport 注入                        |
-| [自定义默认值](./guide/custom-defaults.md)    | `setPropsDefaults` 用法与限制                          |
-| [Render Pipeline](./guide/render-pipeline.md) | 统一渲染预算、外部 adapter、Worker 与虚拟挂载          |
-| [Result Mode](./guide/result-mode.md)         | `FsusResult<T>`、错误码、可恢复失败迁移与 release gate |
+| 文档                                           | 说明                                                   |
+| ---------------------------------------------- | ------------------------------------------------------ |
+| [安装](./guide/installation.md)                | 环境要求、通过 GitHub Packages 安装、配置 `.npmrc`     |
+| [快速开始](./guide/quickstart.md)              | 全量引入、按需引入、全局配置                           |
+| [主题定制](./guide/theming.md)                 | CSS 变量覆盖、SCSS 变量、FsusUI 学术蓝配色规范         |
+| [主题 Customization](./theme/customization.md) | 颜色、圆角、间距、阴影、theme-chalk 与安全覆盖模式     |
+| [主题 Token 稳定性](./theme/tokens.md)         | 公开主题变量、实验变量、内部变量边界                   |
+| [Motion Token 稳定性](./theme/motion.md)       | ConfigProvider motion、公开动效 token、低动效策略      |
+| [暗色模式](./guide/dark-mode.md)               | 接入 `themeMode`、跟随系统主题、自定义暗色变量         |
+| [国际化](./guide/i18n.md)                      | 多语言切换、Day.js 时区配置                            |
+| [自定义命名空间](./guide/namespace.md)         | 修改组件 CSS 类名前缀                                  |
+| [服务端渲染 (SSR)](./guide/ssr.md)             | SSR 水合错误处理、Teleport 注入                        |
+| [自定义默认值](./guide/custom-defaults.md)     | `setPropsDefaults` 用法与限制                          |
+| [Render Pipeline](./guide/render-pipeline.md)  | 统一渲染预算、外部 adapter、Worker 与虚拟挂载          |
+| [Result Mode](./guide/result-mode.md)          | `FsusResult<T>`、错误码、可恢复失败迁移与 release gate |
 
 ---
 
@@ -106,6 +109,7 @@ FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Mini
 | 描述列表 Descriptions   | [components/descriptions.md](./components/descriptions.md)       |
 | 空状态 Empty            | [components/empty.md](./components/empty.md)                     |
 | 图片 Image              | [components/image.md](./components/image.md)                     |
+| 图片预览 ImageViewer    | [components/image-viewer.md](./components/image-viewer.md)       |
 | 无限滚动 InfiniteScroll | [components/infinite-scroll.md](./components/infinite-scroll.md) |
 | 统计数值 Statistic      | [components/statistic.md](./components/statistic.md)             |
 | 标签 Tag                | [components/tag.md](./components/tag.md)                         |

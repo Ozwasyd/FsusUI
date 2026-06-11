@@ -31,6 +31,18 @@ FsusUI semantic aliases on top.
 | `--el-box-shadow-light`     | Low elevation shadow.                                            |
 | `--fsus-backdrop-blur`      | FsusUI backdrop blur amount for supported overlay surfaces.      |
 
+### Spacing Tokens
+
+| Token            | Value  | Purpose                         |
+| ---------------- | ------ | ------------------------------- |
+| `--fsus-space-1` | `4px`  | Tight inline spacing.           |
+| `--fsus-space-2` | `8px`  | Compact control spacing.        |
+| `--fsus-space-3` | `12px` | Small group spacing.            |
+| `--fsus-space-4` | `16px` | Default section rhythm.         |
+| `--fsus-space-5` | `20px` | Medium panel rhythm.            |
+| `--fsus-space-6` | `24px` | Large panel rhythm.             |
+| `--fsus-space-8` | `32px` | Page and modal outer breathing. |
+
 These tokens are safe for application-level overrides when the value type stays
 compatible with CSS usage in the component styles.
 

@@ -4,6 +4,18 @@
 
 > 该组件不携带完整文章排版主题，但会在 DOM 提交后执行通用 feature activation：heading id、hash/external link 属性、CSP nonce、Mermaid/LaTeX 占位符和代码块高亮挂点都会由 FsusUI 统一归一。
 
+## Public Preview Notes
+
+| 字段                   | 说明                                                                                                                                                            |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| purpose                | 将可信或已清理的 Markdown 内容渲染为可激活的文章 DOM，并为长文档提供分块和虚拟挂载能力。                                                                        |
+| basic usage            | 传入 `content`，按需配置 `features`、`allow-html`、`sanitize-html`、adapter 和 Render Pipeline 预算。                                                           |
+| props / events / slots | 本页 `API` 覆盖公开 props、events 和 exposes；runtime 深层实现不属于组件 API。                                                                                  |
+| accessibility          | 业务侧需要为文章容器提供标题层级和阅读上下文；Mermaid、LaTeX、代码块等增强内容应保留文本回退或错误提示。                                                        |
+| theme token notes      | 组件默认无完整文章主题；可使用公开文本、背景、主色、代码块和 motion token 绑定业务排版。                                                                        |
+| known limitations      | Markdown runtime、WASM、feature activation 和 chunked rendering 在 public preview 期间均为 experimental；不可信 HTML 必须保持 `allow-html=false` 或在上游清理。 |
+| stability level        | Experimental component。                                                                                                                                        |
+
 ---
 
 ## 基础用法

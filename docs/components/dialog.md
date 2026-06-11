@@ -2,6 +2,18 @@
 
 在保留当前页面状态的情况下，告知用户并承载相关操作。
 
+## Public Preview Notes
+
+| 字段                   | 说明                                                                                          |
+| ---------------------- | --------------------------------------------------------------------------------------------- |
+| purpose                | 承载需要用户短期聚焦处理的确认、编辑、检查或说明任务。                                        |
+| basic usage            | 使用 `v-model` 控制显示，`title` 或 `header` slot 提供标题，`footer` slot 放置主次操作。      |
+| props / events / slots | 本页 `API` 覆盖公开 props、events、slots 和 exposes。                                         |
+| accessibility          | 必须提供可读标题；自定义 `header` 时保留 `titleId`；避免在 Dialog 内打开无必要的嵌套 Dialog。 |
+| theme token notes      | 跟随公开 surface、文本、边框、阴影、圆角、backdrop blur 和 panel/overlay motion token。       |
+| known limitations      | Teleport 内容不继承 SFC scoped 样式；嵌套 Dialog 必须显式处理 `append-to-body` 和焦点顺序。   |
+| stability level        | Preview public component。                                                                    |
+
 > 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
 
 ---
@@ -40,53 +52,53 @@
 
 ### Attributes
 
-| 属性名 | 说明 | 类型 | 默认值 |
-|--------|------|------|--------|
-| model-value / v-model | 是否显示对话框 | `boolean` | `false` |
-| title | 对话框标题 | `string` | `''` |
-| width | 宽度 | `string \| number` | `''` |
-| fullscreen | 是否全屏 | `boolean` | `false` |
-| top | 距离顶部的距离（margin-top） | `string` | `''` |
-| modal | 是否显示遮罩 | `boolean` | `true` |
-| append-to-body | 是否挂载到 body（嵌套时必须为 true） | `boolean` | `false` |
-| lock-scroll | 显示时是否禁止 body 滚动 | `boolean` | `true` |
-| open-delay | 打开延迟（ms） | `number` | `0` |
-| close-delay | 关闭延迟（ms） | `number` | `0` |
-| close-on-click-modal | 点击遮罩是否关闭 | `boolean` | `true` |
-| close-on-press-escape | 按 ESC 是否关闭 | `boolean` | `true` |
-| show-close | 是否显示关闭按钮 | `boolean` | `true` |
-| before-close | 关闭前的回调，调用 `done` 关闭对话框 | `(done: () => void) => void` | — |
-| draggable | 是否可拖拽 | `boolean` | `false` |
-| overflow | 拖拽时是否允许超出视口 | `boolean` | `false` |
-| center | 头部和底部是否居中 | `boolean` | `false` |
-| align-center | 对话框是否垂直水平居中 | `boolean` | `false` |
-| destroy-on-close | 关闭时是否销毁内容 | `boolean` | `false` |
-| z-index | 层级（同 CSS z-index） | `number` | — |
-| transition | 自定义动画（过渡名称或 Vue 过渡配置） | `string \| TransitionProps` | `dialog-fade` |
+| 属性名                | 说明                                  | 类型                         | 默认值        |
+| --------------------- | ------------------------------------- | ---------------------------- | ------------- |
+| model-value / v-model | 是否显示对话框                        | `boolean`                    | `false`       |
+| title                 | 对话框标题                            | `string`                     | `''`          |
+| width                 | 宽度                                  | `string \| number`           | `''`          |
+| fullscreen            | 是否全屏                              | `boolean`                    | `false`       |
+| top                   | 距离顶部的距离（margin-top）          | `string`                     | `''`          |
+| modal                 | 是否显示遮罩                          | `boolean`                    | `true`        |
+| append-to-body        | 是否挂载到 body（嵌套时必须为 true）  | `boolean`                    | `false`       |
+| lock-scroll           | 显示时是否禁止 body 滚动              | `boolean`                    | `true`        |
+| open-delay            | 打开延迟（ms）                        | `number`                     | `0`           |
+| close-delay           | 关闭延迟（ms）                        | `number`                     | `0`           |
+| close-on-click-modal  | 点击遮罩是否关闭                      | `boolean`                    | `true`        |
+| close-on-press-escape | 按 ESC 是否关闭                       | `boolean`                    | `true`        |
+| show-close            | 是否显示关闭按钮                      | `boolean`                    | `true`        |
+| before-close          | 关闭前的回调，调用 `done` 关闭对话框  | `(done: () => void) => void` | —             |
+| draggable             | 是否可拖拽                            | `boolean`                    | `false`       |
+| overflow              | 拖拽时是否允许超出视口                | `boolean`                    | `false`       |
+| center                | 头部和底部是否居中                    | `boolean`                    | `false`       |
+| align-center          | 对话框是否垂直水平居中                | `boolean`                    | `false`       |
+| destroy-on-close      | 关闭时是否销毁内容                    | `boolean`                    | `false`       |
+| z-index               | 层级（同 CSS z-index）                | `number`                     | —             |
+| transition            | 自定义动画（过渡名称或 Vue 过渡配置） | `string \| TransitionProps`  | `dialog-fade` |
 
 ### Slots
 
-| 插槽名 | 说明 |
-|--------|------|
-| default | 对话框主体内容 |
-| header | 自定义头部区域（可访问 `titleId`） |
-| footer | 对话框底部操作区 |
+| 插槽名  | 说明                               |
+| ------- | ---------------------------------- |
+| default | 对话框主体内容                     |
+| header  | 自定义头部区域（可访问 `titleId`） |
+| footer  | 对话框底部操作区                   |
 
 ### Events
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|---------|
-| open | 对话框打开时触发 | `() => void` |
+| 事件名 | 说明               | 回调参数     |
+| ------ | ------------------ | ------------ |
+| open   | 对话框打开时触发   | `() => void` |
 | opened | 打开动画结束时触发 | `() => void` |
-| close | 对话框关闭时触发 | `() => void` |
+| close  | 对话框关闭时触发   | `() => void` |
 | closed | 关闭动画结束时触发 | `() => void` |
 
 ### Exposes
 
-| 名称 | 说明 | 类型 |
-|------|------|------|
-| resetPosition | 重置拖拽位置 | `() => void` |
-| handleClose | 手动关闭对话框 | `() => void` |
+| 名称          | 说明           | 类型         |
+| ------------- | -------------- | ------------ |
+| resetPosition | 重置拖拽位置   | `() => void` |
+| handleClose   | 手动关闭对话框 | `() => void` |
 
 ---
 
