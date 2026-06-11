@@ -11,6 +11,7 @@ FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Mini
 | [项目概览](./project-overview.md)                            | Monorepo 结构、工作区划分、主要入口             |
 | [设计规范](./design.md)                                      | 高智感极简主义设计语言、色彩、字体、组件规范    |
 | [平台中立规范](../spec/README.md)                            | tokens、组件合同、UX 模式、a11y 与 motion 语义  |
+| [跨平台路线收口](./cross-platform-roadmap.md)                | Web/Vue 与 Avalonia/.NET 分层、issue 状态与边界 |
 | [Playground / Demo App](./playground.md)                     | demo app 启动、覆盖范围、视觉回归与公开样例规范 |
 | [图标系统](./icons.md)                                       | 图标导入、生成流程、SVG 审查和命名稳定性        |
 | [Element Plus 接入指南](./element-plus-integration.md)       | 与 Element Plus 的差异点、包名约定、WASM 策略   |
