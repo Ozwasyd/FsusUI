@@ -40,10 +40,33 @@ The workspace package names still include Element Plus naming for source
 compatibility. External consumers should use the `@ozwasyd/element-plus`
 package path.
 
+## Cross-Platform Registry
+
+The platform-neutral icon registry lives in `spec/icons/registry.yaml`.
+It defines stable semantic ids, source SVGs, Avalonia path data, tokenized
+size/stroke/fill names, aliases, and decorative-vs-semantic accessibility
+defaults.
+
+Generated registry outputs:
+
+- `packages/icons-vue/generated/icon-metadata.json`
+- `dotnet/FsusUI.Avalonia.Icons/Generated/FsusIcons.axaml`
+- `dotnet/FsusUI.Avalonia.Icons/Generated/FsusIconKeys.g.cs`
+
+Run:
+
+```bash
+pnpm run icons:generate
+pnpm run icons:check
+pnpm run icons:lint
+```
+
 ## Generation Workflow
 
 SVG source files live in `packages/icons-svg/*.svg`. Vue icon components are
-generated into `packages/icons-vue/src/components`.
+generated into `packages/icons-vue/src/components`; the Web generator reads the
+registry to add semantic aliases such as `ChevronRight` while preserving
+existing file-name exports.
 
 Use the root guard when you only need to ensure artifacts are fresh:
 

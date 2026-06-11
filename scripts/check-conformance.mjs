@@ -104,6 +104,7 @@ const checkVisual = () => {
     'tests/conformance/visual/thresholds.md',
     'tests/conformance/visual/avalonia-demo-baseline.md',
     'tests/conformance/visual/web-demo-baseline.md',
+    'tests/conformance/visual/icon-alignment.md',
   ]) {
     assert(exists(file), `${file} must exist`)
   }
@@ -115,6 +116,10 @@ const checkVisual = () => {
     'text baseline',
   ]) {
     assertIncludes(thresholds, term, 'tests/conformance/visual/thresholds.md')
+  }
+  const icons = read('tests/conformance/visual/icon-alignment.md')
+  for (const icon of ['search', 'settings', 'warning', 'chevron-right']) {
+    assertIncludes(icons, icon, 'tests/conformance/visual/icon-alignment.md')
   }
   console.log('conformance:visual passed')
 }

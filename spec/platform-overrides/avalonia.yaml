@@ -10,3 +10,14 @@ overrides:
     owner: fsusui-core
     reviewAfter: 2026-09-01
     linkedIssues: [18, 23, 24, 25]
+  - id: avalonia-icon-streamgeometry-001
+    area: visual
+    component: icon
+    platform: avalonia
+    status: accepted
+    reason: Avalonia renders registry path data as StreamGeometry resources while Web renders SVG components from source SVG files.
+    allowedDeviation: low
+    testPolicy: icon-alignment-threshold
+    owner: fsusui-core
+    reviewAfter: 2026-09-01
+    linkedIssues: [18, 24, 25, 26]

@@ -8,6 +8,7 @@ const __dirname = path.dirname(__filename)
 const packageRoot = path.resolve(__dirname, '..')
 const repoRoot = path.resolve(packageRoot, '..', '..')
 const iconsSvgRoot = path.join(repoRoot, 'packages', 'icons-svg')
+const iconRegistry = path.join(repoRoot, 'spec', 'icons', 'registry.yaml')
 const componentsRoot = path.join(packageRoot, 'src', 'components')
 const componentsIndex = path.join(packageRoot, 'src/components/index.ts')
 
@@ -26,6 +27,43 @@ function toPascalCase(name: string) {
     .filter(Boolean)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join('')
+}
+
+function parseScalar(value: string) {
+  const trimmed = value.trim()
+  if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+    return trimmed
+      .slice(1, -1)
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)
+  }
+  return trimmed.replace(/^['"]|['"]$/gu, '')
+}
+
+function readRegistryAliases(registry: string) {
+  const icons: Array<{ id: string; source?: string; aliases?: string[] }> = []
+  let current: { id: string; source?: string; aliases?: string[] } | undefined
+
+  for (const line of registry.split('\n')) {
+    const idMatch = line.match(/^[ ]{2}- id: (.+)$/u)
+    if (idMatch) {
+      current = { id: String(parseScalar(idMatch[1])) }
+      icons.push(current)
+      continue
+    }
+
+    const fieldMatch = line.match(/^[ ]{4}(source|aliases): (.+)$/u)
+    if (!fieldMatch || !current) continue
+    const [, field, value] = fieldMatch
+    if (field === 'aliases') {
+      current.aliases = parseScalar(value) as string[]
+    } else {
+      current.source = String(parseScalar(value))
+    }
+  }
+
+  return icons
 }
 
 function readAttributes(markup: string) {
@@ -93,7 +131,7 @@ await Promise.all(
   ),
 )
 
-const exports: string[] = []
+const exportTargets = new Map<string, string>()
 
 for (const file of svgFiles) {
   const name = file.replace(/\.svg$/u, '')
@@ -117,8 +155,39 @@ for (const file of svgFiles) {
     }),
     'utf8',
   )
-  exports.push(`export { default as ${componentName} } from './${name}.vue'`)
+  exportTargets.set(componentName, name)
 }
+
+const registryAliases = readRegistryAliases(
+  await readFile(iconRegistry, 'utf8'),
+)
+for (const icon of registryAliases) {
+  if (!icon.source) {
+    throw new Error(`Icon registry entry ${icon.id} is missing source`)
+  }
+
+  const sourceName = path.basename(icon.source).replace(/\.svg$/u, '')
+  if (!svgFiles.includes(`${sourceName}.svg`)) {
+    throw new Error(`Icon registry source ${icon.source} does not exist`)
+  }
+
+  for (const alias of [icon.id, ...(icon.aliases ?? [])]) {
+    const exportName = toPascalCase(alias)
+    const existing = exportTargets.get(exportName)
+    if (existing && existing !== sourceName) {
+      throw new Error(
+        `Icon registry alias ${exportName} conflicts with ${existing}.vue`,
+      )
+    }
+    exportTargets.set(exportName, sourceName)
+  }
+}
+
+const exports = Array.from(exportTargets.entries())
+  .map(([componentName, fileName]) => {
+    return `export { default as ${componentName} } from './${fileName}.vue'`
+  })
+  .sort((a, b) => a.localeCompare(b))
 
 await writeFile(
   componentsIndex,

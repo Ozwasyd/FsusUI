@@ -74,4 +74,21 @@ describe('icons-vue design alignment', () => {
       )
     }
   })
+
+  it('exports registry semantic aliases without duplicating component files', () => {
+    const index = readFileSync(path.join(componentsRoot, 'index.ts'), 'utf8')
+
+    expect(index).toContain(
+      "export { default as ChevronRight } from './arrow-right.vue'",
+    )
+    expect(index).toContain(
+      "export { default as Settings } from './setting.vue'",
+    )
+    expect(index).toContain(
+      "export { default as Magnifier } from './search.vue'",
+    )
+    expect(index).toContain(
+      "export { default as Next } from './arrow-right.vue'",
+    )
+  })
 })

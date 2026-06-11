@@ -1,0 +1,9 @@
+categories:
+  - id: action
+    description: Commands, tools, and direct operations.
+  - id: status
+    description: Feedback, validation, and state indicators.
+  - id: navigation
+    description: Movement, hierarchy, and route changes.
+  - id: object
+    description: Product objects, files, records, and resources.
