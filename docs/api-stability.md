@@ -1,0 +1,103 @@
+# Public API Stability
+
+FsusUI is in public preview. The repository still carries many Element Plus
+source paths and generated compatibility exports, so this policy defines which
+surfaces are public API and which surfaces are implementation detail.
+
+## Stability Levels
+
+| Level              | Meaning                                                                              | Change policy during public preview                                      |
+| ------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| Stable public API  | Documented, tested, and intended for broad external use.                             | Breaking changes require a major version or a documented migration path. |
+| Preview public API | Documented and intended for external use, but still allowed to change before 1.0 GA. | Breaking changes require release notes and migration guidance.           |
+| Experimental API   | Documented for early adopters only. Shape, defaults, and behavior may change.        | Breaking changes can happen in minor releases with explicit notes.       |
+| Internal API       | Not supported for external consumers, even if it is exported by package metadata.    | May change or disappear without notice.                                  |
+| Deprecated API     | Still present for compatibility, but scheduled for removal or replacement.           | Removal requires release notes and, where practical, an alternative.     |
+
+## Minimum Public Contract
+
+- A surface is public only when it is documented in this repository.
+- Undocumented package subpaths are internal, even if `package.json` contains a
+  broad export pattern.
+- `internal/*` workspace packages are build and maintenance utilities, not
+  runtime public API.
+- Gulp tasks, build scripts, generated metadata, fixture data, and test helpers
+  are internal.
+- WASM generated files, Emscripten glue code, worker implementations, and SIMD
+  tuning details are internal unless a specific wrapper is documented.
+- FsusBlog-specific adapters, examples, and migration helpers are product
+  integration references, not general-purpose FsusUI API.
+
+## Package Entry Points
+
+The published package name is currently `@ozwasyd/element-plus`.
+
+| Import path                                            | Level                          | Notes                                                                                                        |
+| ------------------------------------------------------ | ------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| `@ozwasyd/element-plus`                                | Preview public API             | Main Vue plugin, component exports, directives, hooks, constants, installer helpers, `version`, and `dayjs`. |
+| `@ozwasyd/element-plus/global`                         | Preview public API             | Type-only global component declarations.                                                                     |
+| `@ozwasyd/element-plus/es`                             | Preview public API             | ESM aggregate entry for bundlers that need an explicit module path.                                          |
+| `@ozwasyd/element-plus/lib`                            | Preview public API             | CommonJS aggregate entry for legacy build pipelines.                                                         |
+| `@ozwasyd/element-plus/icons-vue`                      | Preview public API             | Icon package bridge for consumers migrating from `@element-plus/icons-vue`.                                  |
+| `@ozwasyd/element-plus/theme`                          | Preview public API             | Theme mode helpers and documented theme contracts.                                                           |
+| `@ozwasyd/element-plus/result`                         | Preview public API             | `FsusResult<T>` helpers and documented result-mode utilities.                                                |
+| `@ozwasyd/element-plus/render-pipeline`                | Experimental API               | Render budget and adapter primitives. Use only when the integration has tests against this repository.       |
+| `@ozwasyd/element-plus/wasm`                           | Experimental API               | Public wrapper for accelerated paths. Generated internals remain unsupported.                                |
+| `@ozwasyd/element-plus/markdown-runtime`               | Experimental API               | Runtime primitives used by Markdown components.                                                              |
+| `@ozwasyd/element-plus/dist/index.css`                 | Preview public API             | Built full stylesheet for app consumers.                                                                     |
+| `@ozwasyd/element-plus/dist/public-shell-critical.css` | Preview public API             | Critical CSS for the public shell component.                                                                 |
+| `@ozwasyd/element-plus/theme-chalk/*`                  | Preview public API             | Built CSS and SCSS theme assets documented by the theme guides.                                              |
+| `@ozwasyd/element-plus/es/*`                           | Internal API unless documented | Component deep imports can work today, but only documented component paths are supported.                    |
+| `@ozwasyd/element-plus/lib/*`                          | Internal API unless documented | Same rule as `es/*` for CommonJS output.                                                                     |
+| `@ozwasyd/element-plus/*`                              | Internal API unless documented | Wildcard exports exist for compatibility and packaging mechanics. They are not a blanket stability promise.  |
+
+## Component Package Groups
+
+Public preview component APIs include the Vue component props, emits, slots, and
+exposed methods documented under `docs/components/`. Compatibility with Element
+Plus is best-effort unless the behavior has a local test or an explicit FsusUI
+doc page.
+
+- `components`: preview public when documented under `docs/components/`.
+- `directives`: preview public when exported from the main package and covered
+  by component or guide docs.
+- `hooks`: preview public only for hooks exported by the main package and used
+  in public guides.
+- `constants`: preview public only for documented constants.
+- `utils`: internal by default. Treat utility deep imports as unsupported.
+- `locale`: preview public for documented locale imports and ConfigProvider
+  usage.
+- `theme-chalk`: preview public for documented CSS and SCSS entry points.
+- `icons-vue`: preview public for exported icon components and package-level
+  imports.
+
+## Theme Token Stability
+
+Theme token stability is tracked separately in
+[`docs/theme/tokens.md`](./theme/tokens.md). Public preview tokens include the
+documented Element Plus-compatible CSS custom properties and the FsusUI semantic
+aliases listed there.
+
+Unlisted `--fsus-*` and component-private CSS variables are internal. They can
+change as component styling is normalized for the public preview.
+
+## Motion Token Stability
+
+Motion token stability is tracked in
+[`docs/theme/motion.md`](./theme/motion.md). The high-level timing tokens and
+ConfigProvider `motion` settings are preview public API. Low-level scroll,
+drag, trail, blur, and spring tokens are experimental unless they are promoted
+in that document.
+
+## Compatibility Claims
+
+Any compatibility claim against Element Plus must be backed by at least one of
+the following:
+
+- A local unit, visual, accessibility, or consumer-install test.
+- A component doc page that names the supported behavior.
+- A migration guide entry that names the expected difference.
+- A release evidence document that records the command and result.
+
+When none of those exists, the behavior should be described as best-effort or
+implementation detail.

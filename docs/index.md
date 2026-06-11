@@ -11,6 +11,9 @@ FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Mini
 | [项目概览](./project-overview.md)                          | Monorepo 结构、工作区划分、主要入口             |
 | [设计规范](./design.md)                                    | 高智感极简主义设计语言、色彩、字体、组件规范    |
 | [Element Plus 接入指南](./element-plus-integration.md)     | 与 Element Plus 的差异点、包名约定、WASM 策略   |
+| [API 稳定性](./api-stability.md)                           | public preview 导出、稳定性等级、内部路径边界   |
+| [Element Plus 兼容策略](./element-plus-compatibility.md)   | 兼容承诺、已知差异、支持与不支持的使用面        |
+| [从 Element Plus 迁移](./migration/from-element-plus.md)   | 包名、CSS、图标、运行时目标与迁移检查           |
 | [工程维护交接](./engineering-handoff.md)                   | 环境基线、标准命令、CI 分工、常见问题排查       |
 | [发布治理](./release-governance.md)                        | GitHub Packages 发布流程、Changesets 版本管理   |
 | [npm 发布策略](./release/npm-registry-policy.md)           | npm registry、provenance、dist-tag 与包审计策略 |
@@ -29,6 +32,8 @@ FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Mini
 | [安装](./guide/installation.md)               | 环境要求、通过 GitHub Packages 安装、配置 `.npmrc`     |
 | [快速开始](./guide/quickstart.md)             | 全量引入、按需引入、全局配置                           |
 | [主题定制](./guide/theming.md)                | CSS 变量覆盖、SCSS 变量、FsusUI 学术蓝配色规范         |
+| [主题 Token 稳定性](./theme/tokens.md)        | 公开主题变量、实验变量、内部变量边界                   |
+| [Motion Token 稳定性](./theme/motion.md)      | ConfigProvider motion、公开动效 token、低动效策略      |
 | [暗色模式](./guide/dark-mode.md)              | 接入 `themeMode`、跟随系统主题、自定义暗色变量         |
 | [国际化](./guide/i18n.md)                     | 多语言切换、Day.js 时区配置                            |
 | [自定义命名空间](./guide/namespace.md)        | 修改组件 CSS 类名前缀                                  |

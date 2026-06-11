@@ -56,3 +56,8 @@ pnpm build:wasm
 
 - 项目主文档：`docs/project-overview.md`
 - 与 Element Plus 不同点的接入指南：`docs/element-plus-integration.md`
+- Public API 稳定性：`docs/api-stability.md`
+- Element Plus 兼容策略：`docs/element-plus-compatibility.md`
+- 从 Element Plus 迁移：`docs/migration/from-element-plus.md`
+- 主题 token 稳定性：`docs/theme/tokens.md`
+- Motion token 稳定性：`docs/theme/motion.md`
