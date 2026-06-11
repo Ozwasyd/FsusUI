@@ -12,6 +12,14 @@ component contract version.
 - Avalonia package version: NuGet package metadata under `dotnet/`.
 - component contract version: component contract files under `spec/components/`.
 
+Web npm packages, Avalonia NuGet packages, and generated token/spec artifacts
+share the same platform-neutral contract but remain separate distribution
+channels. A Web-only npm patch must not silently redefine spec or token
+semantics; an Avalonia-only NuGet preview must point back to the same
+`spec/tokens`, `spec/components`, `spec/motion`, and `spec/icons` sources. When
+the shared contract changes, release notes must name the affected spec version,
+token schema version, npm package version, and NuGet package version.
+
 ## Release Classification
 
 Every cross-platform public contract change must be classified before release:

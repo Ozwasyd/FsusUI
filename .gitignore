@@ -43,6 +43,7 @@ packages/wasm/.cmake-check/
 packages/wasm/build/
 dotnet/**/bin/
 dotnet/**/obj/
+dotnet/artifacts/
 *.tsbuildinfo
 .vite/
 .turbo/
