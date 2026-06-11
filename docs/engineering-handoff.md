@@ -68,6 +68,18 @@ pnpm run check:markdown-extreme
 
 MarkdownRenderer 组件不携带完整文章排版主题，但会通过 public `markdown-runtime` 自动归一 heading id、hash/external link、CSP nonce、Mermaid/LaTeX 占位符和代码块高亮挂点；业务侧通过 `features-activated` 和 `placeholders-ready` 接入业务 glue。
 
+## Motion 系统收口状态
+
+Motion 系统的上游实现已经收口在 FsusUI：
+
+- 专用模块位于 [`packages/motion`](../packages/motion)，提供 `FsuTransition`、`v-motion`、`v-scroll-reveal`、tokens、presets、runtime、GSAP context、timeline、ScrollTrigger wrapper 和 route cleanup。
+- `ElConfigProvider.motion` 位于 [`packages/components/config-provider/src/motion.ts`](../packages/components/config-provider/src/motion.ts)，统一写入 `system / enabled / reduced / disabled` 状态、motion preset 和 CSS token。
+- 组件级 `motion` prop 约定位于 [`packages/components/motion.ts`](../packages/components/motion.ts)，已接入 Button、Card、Dialog、Drawer、Dropdown、Tooltip、Message、Notification、Collapse 和 Tabs。
+- GSAP 不作为业务侧直接依赖暴露；调用端通过 `useGsapContext`、`useTimeline`、`useScrollReveal`、`useMotionRouteCleanup` 和 `refreshScrollTriggers()` 完成生命周期清理与动态内容刷新。
+- 使用说明、preset gallery、低动效策略、性能规则、反模式和 FsusBlog 集成示例统一维护在 [`docs/components/motion.md`](./components/motion.md)。
+
+FsusBlog 侧的消费规则：页面只消费 FsusUI 导出的 component / directive / composable / preset，不在业务页面重复编写本地动画系统，不直接导入 `gsap` 或 `ScrollTrigger`；路由切换和动态 Markdown / 图片内容必须走 FsusUI 的 cleanup 与 refresh API。
+
 ## 3. 质量门分工
 
 ### 本地入口
