@@ -1,0 +1,27 @@
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml" />
+        <ResourceInclude Source="avares://FsusUI.Avalonia.Themes/Themes/FsusLight.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+
+      <x:String x:Key="FsusMotionModeSystem">system</x:String>
+      <x:String x:Key="FsusMotionModeEnabled">enabled</x:String>
+      <x:String x:Key="FsusMotionModeReduced">reduced</x:String>
+      <x:String x:Key="FsusMotionModeDisabled">disabled</x:String>
+      <x:String x:Key="FsusMotionDisabledDuration">1ms</x:String>
+      <x:String x:Key="FsusMotionReducedDuration">1ms</x:String>
+    </ResourceDictionary>
+  </Styles.Resources>
+
+  <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/Button.axaml" />
+  <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/Input.axaml" />
+  <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/Selection.axaml" />
+  <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/Card.axaml" />
+  <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/Dialog.axaml" />
+  <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/Tabs.axaml" />
+  <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/Menu.axaml" />
+</Styles>
