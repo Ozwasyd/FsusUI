@@ -1,8 +1,12 @@
 name: Bug report
 description: Report a runtime bug, regression, or packaging failure.
-title: "[Bug]: "
-labels: ["bug"]
+title: '[Bug]: '
+labels: ['bug']
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not report vulnerabilities in public issues. Follow SECURITY.md instead.
   - type: textarea
     id: summary
     attributes:

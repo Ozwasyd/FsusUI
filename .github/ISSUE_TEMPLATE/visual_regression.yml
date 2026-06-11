@@ -1,0 +1,57 @@
+name: Visual regression
+description: Report an unintended visual snapshot or UI rendering change.
+title: '[Visual Regression]: '
+labels: ['visual-regression']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not report vulnerabilities in public issues. Follow SECURITY.md instead.
+  - type: input
+    id: affected_surface
+    attributes:
+      label: Affected component or page
+      placeholder: ElSelect dropdown, demo Form section, PublicShell
+    validations:
+      required: true
+  - type: checkboxes
+    id: modes
+    attributes:
+      label: Affected modes
+      options:
+        - label: Light mode
+        - label: Dark mode
+        - label: Mobile viewport
+        - label: Reduced motion
+        - label: Desktop viewport
+  - type: textarea
+    id: before
+    attributes:
+      label: Before screenshot
+      description: Attach baseline screenshot or snapshot path.
+    validations:
+      required: true
+  - type: textarea
+    id: after
+    attributes:
+      label: After screenshot
+      description: Attach new screenshot or diff.
+    validations:
+      required: true
+  - type: dropdown
+    id: intentional
+    attributes:
+      label: Is the snapshot update intentional?
+      options:
+        - 'No'
+        - 'Yes'
+        - Unsure
+    validations:
+      required: true
+  - type: textarea
+    id: baseline
+    attributes:
+      label: Visual baseline changed
+      description: Name the Playwright spec, snapshot, component demo, or route.
+    validations:
+      required: true

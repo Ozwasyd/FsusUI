@@ -1,8 +1,12 @@
 name: Release issue
 description: Track a release-specific problem or packaging request.
-title: "[Release]: "
-labels: ["release"]
+title: '[Release]: '
+labels: ['release']
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not report vulnerabilities in public issues. Follow SECURITY.md instead.
   - type: textarea
     id: scope
     attributes:

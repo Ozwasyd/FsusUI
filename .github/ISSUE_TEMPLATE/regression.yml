@@ -1,8 +1,12 @@
 name: Regression
 description: Report behavior that used to work and now fails.
-title: "[Regression]: "
-labels: ["bug", "regression"]
+title: '[Regression]: '
+labels: ['bug', 'regression']
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not report vulnerabilities in public issues. Follow SECURITY.md instead.
   - type: textarea
     id: regression
     attributes:

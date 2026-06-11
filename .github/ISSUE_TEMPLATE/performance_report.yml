@@ -1,0 +1,56 @@
+name: Performance report
+description: Report slow rendering, interaction latency, memory, layout, paint, or WASM performance issues.
+title: '[Performance]: '
+labels: ['performance']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not report vulnerabilities in public issues. Follow SECURITY.md instead.
+  - type: input
+    id: workflow
+    attributes:
+      label: Component or workflow
+      placeholder: ElTable sort, MarkdownRenderer long article, Select remote search
+    validations:
+      required: true
+  - type: textarea
+    id: dataset
+    attributes:
+      label: Dataset size
+      description: Include row count, item count, document size, image count, or relevant fixture details.
+  - type: textarea
+    id: environment
+    attributes:
+      label: Browser and machine
+      description: Include browser, OS, CPU/RAM class, device, and power mode if relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: benchmark
+    attributes:
+      label: Benchmark or reproduction
+      description: Link a repo, test, trace, profile, or minimal steps.
+    validations:
+      required: true
+  - type: checkboxes
+    id: symptoms
+    attributes:
+      label: Symptom
+      options:
+        - label: CPU time
+        - label: Memory growth
+        - label: Layout cost
+        - label: Paint cost
+        - label: Interaction latency
+        - label: Bundle or install size
+  - type: textarea
+    id: wasm
+    attributes:
+      label: WASM path
+      description: Is a WASM code path involved? Include engine state or fallback evidence if known.
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Before and after evidence
+      description: Attach traces, screenshots, timings, or logs if available.

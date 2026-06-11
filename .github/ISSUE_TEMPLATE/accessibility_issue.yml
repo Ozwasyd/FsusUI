@@ -1,0 +1,46 @@
+name: Accessibility issue
+description: Report keyboard, screen reader, ARIA, focus, contrast, or motion accessibility issues.
+title: '[A11y]: '
+labels: ['accessibility']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not report vulnerabilities in public issues. Follow SECURITY.md instead.
+  - type: input
+    id: component
+    attributes:
+      label: Component or workflow
+      placeholder: ElDialog focus trap, ElButton icon-only state
+    validations:
+      required: true
+  - type: textarea
+    id: assistive_tech
+    attributes:
+      label: Assistive technology and browser
+      description: Include screen reader, browser, OS, and device if applicable.
+  - type: textarea
+    id: keyboard
+    attributes:
+      label: Keyboard behavior
+      description: What keyboard interaction fails or is missing?
+  - type: textarea
+    id: screen_reader
+    attributes:
+      label: Screen reader behavior
+      description: What is announced, skipped, or confusing?
+  - type: textarea
+    id: aria
+    attributes:
+      label: ARIA name, role, or value issue
+      description: Include expected and actual accessible name/role/value if known.
+  - type: textarea
+    id: focus
+    attributes:
+      label: Focus management issue
+      description: Note focus loss, trapping, restoration, or tab order problems.
+  - type: textarea
+    id: contrast_motion
+    attributes:
+      label: Contrast or reduced-motion issue
+      description: Include colors, screenshots, or motion sensitivity notes.

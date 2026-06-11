@@ -1,0 +1,55 @@
+name: Theme token request
+description: Request a public theme token or a change to token stability.
+title: '[Theme Token]: '
+labels: ['theme']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not report vulnerabilities in public issues. Follow SECURITY.md instead.
+  - type: input
+    id: token
+    attributes:
+      label: Token name or proposed token
+      placeholder: --fsus-space-4, --el-color-primary, --fsus-component-state
+    validations:
+      required: true
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use case
+      description: What problem does this token solve?
+    validations:
+      required: true
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      options:
+        - Global token
+        - Component-specific token
+        - Unsure
+    validations:
+      required: true
+  - type: textarea
+    id: dark_mode
+    attributes:
+      label: Dark mode behavior
+      description: How should this token behave in dark mode?
+    validations:
+      required: true
+  - type: textarea
+    id: motion
+    attributes:
+      label: Reduced-motion or motion-token impact
+      description: Note any timing, transition, or reduced-motion interaction.
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Element Plus variable compatibility
+      description: Is there an existing Element Plus variable this should map to or preserve?
+  - type: textarea
+    id: migration_risk
+    attributes:
+      label: Migration risk
+      description: Who would be affected if this token changes before stable release?

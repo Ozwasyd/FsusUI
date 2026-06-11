@@ -1,0 +1,60 @@
+name: Component bug
+description: Report a component runtime, API, compatibility, or packaging bug.
+title: '[Component Bug]: '
+labels: ['bug', 'component']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not report vulnerabilities in public issues. Follow SECURITY.md instead.
+  - type: input
+    id: component
+    attributes:
+      label: Component
+      description: Component name, package subpath, or service API.
+      placeholder: ElButton, ElSelect, ElTable, ElMessage
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: FsusUI package version
+      placeholder: '@ozwasyd/element-plus@1.5.0'
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include browser, OS, Vue version, Node/pnpm if relevant, and package manager.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Link a repo, StackBlitz, failing test, or paste the smallest code sample.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: element_plus_difference
+    attributes:
+      label: Element Plus comparison
+      description: Does Element Plus behave differently? Include version and evidence if checked.
+  - type: textarea
+    id: visual_modes
+    attributes:
+      label: Visual, dark-mode, or reduced-motion impact
+      description: Add screenshots and note light/dark/mobile/reduced-motion impact if relevant.
