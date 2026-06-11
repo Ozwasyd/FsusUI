@@ -5,13 +5,14 @@ import {
   isClient,
   mutable,
 } from '@element-plus/utils'
+import { componentMotionProps } from '@element-plus/components/motion'
 import type { AppContext, ExtractPropTypes, VNode } from 'vue'
 import type { Mutable } from '@element-plus/utils'
 import type MessageConstructor from './message.vue'
 
 export const messageTypes = ['success', 'info', 'warning', 'error'] as const
 
-export type messageType = typeof messageTypes[number]
+export type messageType = (typeof messageTypes)[number]
 
 export interface MessageConfigContext {
   max?: number
@@ -32,9 +33,11 @@ export const messageDefaults = mutable({
   grouping: false,
   repeatNum: 1,
   appendTo: isClient ? document.body : (undefined as never),
+  motion: undefined,
 } as const)
 
 export const messageProps = buildProps({
+  ...componentMotionProps,
   /**
    * @description custom class name for Message
    */
@@ -173,7 +176,7 @@ export type MessageFn = {
 }
 export type MessageTypedFn = (
   options?: MessageParamsWithType,
-  appContext?: null | AppContext
+  appContext?: null | AppContext,
 ) => MessageHandler
 
 export interface Message extends MessageFn {

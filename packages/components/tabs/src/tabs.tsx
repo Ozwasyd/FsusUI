@@ -18,6 +18,7 @@ import {
 import { EVENT_CODE, UPDATE_MODEL_EVENT } from '@element-plus/constants'
 import ElIcon from '@element-plus/components/icon'
 import { Plus } from '@element-plus/icons-vue'
+import { componentMotionProps } from '@element-plus/components/motion'
 import {
   useDeprecated,
   useNamespace,
@@ -34,6 +35,7 @@ import type { Awaitable } from '@element-plus/utils'
 export type TabPaneName = string | number
 
 export const tabsProps = buildProps({
+  ...componentMotionProps,
   type: {
     type: String,
     values: ['card', 'border-card', ''],
@@ -96,7 +98,7 @@ const Tabs = defineComponent({
 
     const nav$ = ref<TabNavInstance>()
     const currentName = ref<TabPaneName>(
-      props.modelValue ?? props.activeName ?? '0'
+      props.modelValue ?? props.activeName ?? '0',
     )
 
     const setCurrentName = async (value?: TabPaneName, trigger = false) => {
@@ -122,7 +124,7 @@ const Tabs = defineComponent({
     const handleTabClick = (
       tab: TabsPaneContext,
       tabName: TabPaneName,
-      event: Event
+      event: Event,
     ) => {
       if (tab.props.disabled) return
       setCurrentName(tabName, true)
@@ -150,17 +152,17 @@ const Tabs = defineComponent({
         ref: 'https://element-plus.org/en-US/component/tabs.html#attributes',
         type: 'Attribute',
       },
-      computed(() => !!props.activeName)
+      computed(() => !!props.activeName),
     )
 
     watch(
       () => props.activeName,
-      (modelValue) => setCurrentName(modelValue)
+      (modelValue) => setCurrentName(modelValue),
     )
 
     watch(
       () => props.modelValue,
-      (modelValue) => setCurrentName(modelValue)
+      (modelValue) => setCurrentName(modelValue),
     )
 
     watch(currentName, async () => {
@@ -223,6 +225,12 @@ const Tabs = defineComponent({
 
       return (
         <div
+          data-fsus-motion-preset={
+            typeof props.motion === 'string' ? props.motion : undefined
+          }
+          data-fsus-motion-disabled={
+            props.motion === false ? 'true' : undefined
+          }
           class={[
             ns.b(),
             ns.m(props.tabPosition),

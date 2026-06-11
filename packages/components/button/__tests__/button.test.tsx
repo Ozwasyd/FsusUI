@@ -87,6 +87,18 @@ describe('Button.vue', () => {
     expect(wrapper.classes()).toContain('is-text')
   })
 
+  it('applies component motion attrs', () => {
+    const wrapper = mount(() => <Button motion="scale-fade" />)
+
+    expect(wrapper.attributes('data-fsus-motion-preset')).toBe('scale-fade')
+  })
+
+  it('can disable component motion', () => {
+    const wrapper = mount(() => <Button motion={false} />)
+
+    expect(wrapper.attributes('data-fsus-motion-disabled')).toBe('true')
+  })
+
   test('render text', () => {
     const wrapper = mount(() => (
       <Button

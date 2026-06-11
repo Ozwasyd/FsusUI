@@ -1,6 +1,6 @@
 <template>
   <transition
-    :name="ns.b('fade')"
+    :name="messageTransitionName"
     @before-leave="onClose"
     @after-leave="$emit('destroy')"
   >
@@ -8,6 +8,7 @@
       v-show="visible"
       :id="id"
       ref="messageRef"
+      v-bind="componentMotionAttrs"
       :class="[
         ns.b(),
         { [ns.m(type)]: type && !icon },
@@ -44,12 +45,20 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from 'vue'
-import { useEventListener, useResizeObserver, useTimeoutFn } from '@element-plus/hooks/use-runtime'
+import {
+  useEventListener,
+  useResizeObserver,
+  useTimeoutFn,
+} from '@element-plus/hooks/use-runtime'
 import { TypeComponents, TypeComponentsMap } from '@element-plus/utils'
 import { EVENT_CODE } from '@element-plus/constants'
 import ElBadge from '@element-plus/components/badge'
 import { useGlobalComponentSettings } from '@element-plus/components/config-provider'
 import { ElIcon } from '@element-plus/components/icon'
+import {
+  resolveComponentTransitionName,
+  useComponentMotionAttrs,
+} from '@element-plus/components/motion'
 import { messageEmits, messageProps } from './message'
 import { getLastOffset, getOffsetOrSpace } from './instance'
 import type { BadgeProps } from '@element-plus/components/badge'
@@ -66,6 +75,16 @@ defineEmits(messageEmits)
 
 const { ns, zIndex } = useGlobalComponentSettings('message')
 const { currentZIndex, nextZIndex } = zIndex
+const componentMotionAttrs = useComponentMotionAttrs(
+  computed(() => props.motion),
+  'slide-up',
+)
+const messageTransitionName = computed(() =>
+  resolveComponentTransitionName(props.motion, ns.b('fade'), {
+    'slide-up': ns.b('fade'),
+    'fade-up': ns.b('fade'),
+  }),
+)
 
 const messageRef = ref<HTMLDivElement>()
 const visible = ref(false)
@@ -74,19 +93,19 @@ const height = ref(0)
 let stopTimer: (() => void) | undefined = undefined
 
 const badgeType = computed<BadgeProps['type']>(() =>
-  props.type ? (props.type === 'error' ? 'danger' : props.type) : 'info'
+  props.type ? (props.type === 'error' ? 'danger' : props.type) : 'info',
 )
 const typeClass = computed(() => {
   const type = props.type
   return { [ns.bm('icon', type)]: type && TypeComponentsMap[type] }
 })
 const iconComponent = computed(
-  () => props.icon || TypeComponentsMap[props.type] || ''
+  () => props.icon || TypeComponentsMap[props.type] || '',
 )
 
 const lastOffset = computed(() => getLastOffset(props.id))
 const offset = computed(
-  () => getOffsetOrSpace(props.id, props.offset) + lastOffset.value
+  () => getOffsetOrSpace(props.id, props.offset) + lastOffset.value,
 )
 const stackOffset = computed(() => offset.value - props.offset)
 const bottom = computed((): number => height.value + offset.value)
@@ -135,7 +154,7 @@ watch(
   () => {
     clearTimer()
     startTimer()
-  }
+  },
 )
 
 useEventListener(document, 'keydown', keydown)

@@ -4,7 +4,7 @@
     :disabled="appendTo !== 'body' ? false : !appendToBody"
   >
     <transition
-      name="dialog-fade"
+      :name="dialogTransitionName"
       @after-enter="afterEnter"
       @after-leave="afterLeave"
       @before-leave="beforeLeave"
@@ -40,7 +40,7 @@
             <el-dialog-content
               v-if="rendered"
               ref="dialogContentRef"
-              v-bind="$attrs"
+              v-bind="dialogContentAttrs"
               :custom-class="customClass"
               :close-icon="closeIcon"
               :draggable="draggable"
@@ -73,9 +73,13 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, provide, ref, useSlots } from 'vue'
+import { computed, provide, ref, toRef, useAttrs, useSlots } from 'vue'
 import { ElOverlay } from '@element-plus/components/overlay'
 import { useDeprecated, useNamespace, useSameTarget } from '@element-plus/hooks'
+import {
+  resolveComponentTransitionName,
+  useComponentMotionAttrs,
+} from '@element-plus/components/motion'
 import ElFocusTrap from '@element-plus/components/focus-trap'
 import ElDialogContent from './dialog-content.vue'
 import { dialogInjectionKey } from './constants'
@@ -90,6 +94,7 @@ defineOptions({
 const props = defineProps(dialogProps)
 defineEmits(dialogEmits)
 const slots = useSlots()
+const attrs = useAttrs()
 
 useDeprecated(
   {
@@ -99,7 +104,7 @@ useDeprecated(
     version: '3.0.0',
     ref: 'https://element-plus.org/en-US/component/dialog.html#slots',
   },
-  computed(() => !!slots.title)
+  computed(() => !!slots.title),
 )
 
 useDeprecated(
@@ -111,13 +116,26 @@ useDeprecated(
     ref: 'https://element-plus.org/en-US/component/dialog.html#attributes',
     type: 'Attribute',
   },
-  computed(() => !!props.customClass)
+  computed(() => !!props.customClass),
 )
 
 const ns = useNamespace('dialog')
 const dialogRef = ref<HTMLElement>()
 const headerRef = ref<HTMLElement>()
 const dialogContentRef = ref()
+const componentMotionAttrs = useComponentMotionAttrs(
+  toRef(props, 'motion'),
+  'scale-fade',
+)
+const dialogContentAttrs = computed(() => ({
+  ...attrs,
+  ...componentMotionAttrs.value,
+}))
+const dialogTransitionName = computed(() =>
+  resolveComponentTransitionName(props.motion, 'dialog-fade', {
+    'scale-fade': 'dialog-scale-fade',
+  }),
+)
 
 const {
   visible,

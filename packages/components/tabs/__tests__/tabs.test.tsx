@@ -22,6 +22,18 @@ const Comp = defineComponent({
 })
 
 describe('Tabs.vue', () => {
+  test('applies component motion attrs', async () => {
+    const wrapper = mount(() => <Tabs motion="route-fade" />)
+
+    expect(wrapper.attributes('data-fsus-motion-preset')).toBe('route-fade')
+  })
+
+  test('can disable tabs motion', async () => {
+    const wrapper = mount(() => <Tabs motion={false} />)
+
+    expect(wrapper.attributes('data-fsus-motion-disabled')).toBe('true')
+  })
+
   test('create', async () => {
     const wrapper = mount(() => (
       <Tabs>
@@ -200,7 +212,7 @@ describe('Tabs.vue', () => {
     const tabIndex = ref(3)
     const handleTabsEdit = (
       targetName: TabPaneName | undefined,
-      action: 'remove' | 'add'
+      action: 'remove' | 'add',
     ) => {
       if (action === 'add') {
         const newTabName = `${++tabIndex.value}`
@@ -454,7 +466,7 @@ describe('Tabs.vue', () => {
     expect(tabsWrapper.find('.el-tabs__nav-wrap').classes('is-left')).toBe(true)
     expect(tabsWrapper.find('.el-tabs__nav').classes('is-left')).toBe(true)
     expect(tabsWrapper.find('.el-tabs__active-bar').classes('is-left')).toBe(
-      true
+      true,
     )
     expect(tabsWrapper.find('.el-tabs__item').classes('is-left')).toBe(true)
   })
@@ -512,7 +524,7 @@ describe('Tabs.vue', () => {
 
     await nextTick()
     expect(tabsWrapper.find('.el-tabs__active-bar').attributes().style).toMatch(
-      'translateX(300px)'
+      'translateX(300px)',
     )
 
     tabPosition.value = 'left'
@@ -525,7 +537,7 @@ describe('Tabs.vue', () => {
 
     await nextTick()
     expect(tabsWrapper.find('.el-tabs__active-bar').attributes().style).toMatch(
-      'translateY(200px)'
+      'translateY(200px)',
     )
 
     mockOffsetLeft.mockRestore()
@@ -674,7 +686,7 @@ describe('Tabs.vue', () => {
       .spyOn(
         wrapper.find('#tab-99').element as HTMLElement,
         'offsetLeft',
-        'get'
+        'get',
       )
       .mockImplementation(() => 100)
     const mockComputedStyle = vi
@@ -685,7 +697,7 @@ describe('Tabs.vue', () => {
     await nextTick()
 
     expect(tabsWrapper.find('.el-tabs__active-bar').attributes().style).toMatch(
-      'translateX(100px)'
+      'translateX(100px)',
     )
 
     mockOffsetLeft.mockRestore()

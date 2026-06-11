@@ -1,5 +1,6 @@
 import { buildProps, definePropType, isBoolean } from '@element-plus/utils'
 import { UPDATE_MODEL_EVENT } from '@element-plus/constants'
+import { componentMotionProps } from '@element-plus/components/motion'
 import { dialogContentProps } from './dialog-content'
 
 import type { ExtractPropTypes } from 'vue'
@@ -8,6 +9,7 @@ type DoneFn = (cancel?: boolean) => void
 export type DialogBeforeCloseFn = (done: DoneFn) => void
 
 export const dialogProps = buildProps({
+  ...componentMotionProps,
   ...dialogContentProps,
   /**
    * @description whether to append Dialog itself to body. A nested Dialog should have this attribute set to `true`

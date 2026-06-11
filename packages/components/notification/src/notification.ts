@@ -1,4 +1,5 @@
 import { buildProps, definePropType, iconPropType } from '@element-plus/utils'
+import { componentMotionProps } from '@element-plus/components/motion'
 
 import type { ExtractPropTypes, VNode } from 'vue'
 import type Notification from './notification.vue'
@@ -11,6 +12,7 @@ export const notificationTypes = [
 ] as const
 
 export const notificationProps = buildProps({
+  ...componentMotionProps,
   /**
    * @description custom class name for Notification
    */
@@ -136,11 +138,11 @@ export type NotificationParamsTyped =
   | VNode
 
 export type NotifyFn = ((
-  options?: NotificationParams
+  options?: NotificationParams,
 ) => NotificationHandle) & { closeAll: () => void }
 
 export type NotifyTypedFn = (
-  options?: NotificationParamsTyped
+  options?: NotificationParamsTyped,
 ) => NotificationHandle
 
 export interface Notify extends NotifyFn {

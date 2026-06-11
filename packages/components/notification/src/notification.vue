@@ -1,12 +1,13 @@
 <template>
   <transition
-    :name="ns.b('fade')"
+    :name="notificationTransitionName"
     @before-leave="onClose"
     @after-leave="$emit('destroy')"
   >
     <div
       v-show="visible"
       :id="id"
+      v-bind="componentMotionAttrs"
       :class="[ns.b(), customClass, horizontalClass, typeClass]"
       :style="positionStyle"
       role="alert"
@@ -33,11 +34,7 @@
           :style="contentStyle"
           v-html="message"
         />
-        <div
-          v-else-if="message"
-          :class="ns.e('content')"
-          :style="contentStyle"
-        >
+        <div v-else-if="message" :class="ns.e('content')" :style="contentStyle">
           {{ message }}
         </div>
         <el-icon
@@ -58,6 +55,10 @@ import { CloseComponents, TypeComponentsMap } from '@element-plus/utils'
 import { EVENT_CODE } from '@element-plus/constants'
 import { ElIcon } from '@element-plus/components/icon'
 import { useGlobalComponentSettings } from '@element-plus/components/config-provider'
+import {
+  resolveComponentTransitionName,
+  useComponentMotionAttrs,
+} from '@element-plus/components/motion'
 import { notificationEmits, notificationProps } from './notification'
 import { getNotificationBaseOffset } from './instance'
 
@@ -72,6 +73,16 @@ defineEmits(notificationEmits)
 
 const { ns, zIndex } = useGlobalComponentSettings('notification')
 const { nextZIndex, currentZIndex } = zIndex
+const componentMotionAttrs = useComponentMotionAttrs(
+  computed(() => props.motion),
+  'slide-up',
+)
+const notificationTransitionName = computed(() =>
+  resolveComponentTransitionName(props.motion, ns.b('fade'), {
+    'slide-up': ns.b('fade'),
+    'fade-up': ns.b('fade'),
+  }),
+)
 
 const { Close } = CloseComponents
 
@@ -89,15 +100,15 @@ const iconComponent = computed(() => {
 })
 
 const horizontalClass = computed(() =>
-  props.position.endsWith('right') ? 'right' : 'left'
+  props.position.endsWith('right') ? 'right' : 'left',
 )
 
 const verticalProperty = computed(() =>
-  props.position.startsWith('top') ? 'top' : 'bottom'
+  props.position.startsWith('top') ? 'top' : 'bottom',
 )
 
 const baseOffset = computed(() =>
-  getNotificationBaseOffset(props.id, props.offset)
+  getNotificationBaseOffset(props.id, props.offset),
 )
 
 const stackOffset = computed(() => props.offset - baseOffset.value)
@@ -112,7 +123,7 @@ const positionStyle = computed<CSSProperties>(() => {
   }
 })
 const contentStyle = computed<CSSProperties | undefined>(() =>
-  props.title ? undefined : { margin: 0 }
+  props.title ? undefined : { margin: 0 },
 )
 const closeBtnEvents = {
   click: (event: MouseEvent) => {

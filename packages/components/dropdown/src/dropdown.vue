@@ -1,5 +1,8 @@
 <template>
-  <div :class="[ns.b(), ns.is('disabled', disabled)]">
+  <div
+    v-bind="componentMotionAttrs"
+    :class="[ns.b(), ns.is('disabled', disabled)]"
+  >
     <el-tooltip ref="popperRef" v-bind="tooltipBindings" v-on="tooltipEvents">
       <template #content>
         <el-scrollbar
@@ -70,6 +73,10 @@ import { addUnit, ensureArray } from '@element-plus/utils'
 import { ArrowDown } from '@element-plus/icons-vue'
 import { EVENT_CODE } from '@element-plus/constants'
 import { useId, useLocale, useNamespace } from '@element-plus/hooks'
+import {
+  resolveComponentTransitionName,
+  useComponentMotionAttrs,
+} from '@element-plus/components/motion'
 import { ElCollection as ElDropdownCollection, dropdownProps } from './dropdown'
 import { DROPDOWN_INJECTION_KEY } from './tokens'
 
@@ -121,6 +128,20 @@ export default defineComponent({
     }))
     const dropdownTriggerKls = computed(() => [ns.m(dropdownSize.value)])
     const trigger = computed(() => ensureArray(props.trigger))
+    const componentMotionAttrs = useComponentMotionAttrs(
+      toRef(props, 'motion'),
+      'fade-down',
+    )
+    const dropdownTransitionName = computed(() =>
+      resolveComponentTransitionName(
+        props.motion,
+        `${ns.namespace.value}-zoom-in-top`,
+        {
+          'fade-down': `${ns.namespace.value}-zoom-in-top`,
+          'scale-fade': `${ns.namespace.value}-zoom-in-top`,
+        },
+      ),
+    )
 
     const defaultTriggerId = useId().value
     const triggerId = computed<string>(() => {
@@ -144,7 +165,7 @@ export default defineComponent({
       virtualRef: virtualRef.value,
       virtualTriggering: props.splitButton,
       disabled: props.disabled,
-      transition: `${ns.namespace.value}-zoom-in-top`,
+      transition: dropdownTransitionName.value,
       teleported: props.teleported,
       pure: true,
       persistent: true,
@@ -267,6 +288,7 @@ export default defineComponent({
       wrapStyle,
       dropdownTriggerKls,
       dropdownSize,
+      componentMotionAttrs,
       triggerId,
       triggerKeys,
       tooltipBindings,

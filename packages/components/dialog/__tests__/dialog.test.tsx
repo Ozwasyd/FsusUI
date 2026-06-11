@@ -19,6 +19,32 @@ describe('Dialog.vue', () => {
     expect(wrapper.find('.el-dialog__body').text()).toEqual(AXIOM)
   })
 
+  test('applies dialog motion attrs to the dialog surface', async () => {
+    const wrapper = mount(
+      <Dialog modelValue={true} motion="scale-fade">
+        {AXIOM}
+      </Dialog>,
+    )
+
+    await nextTick()
+    expect(
+      wrapper.find('.el-dialog').attributes('data-fsus-motion-preset'),
+    ).toBe('scale-fade')
+  })
+
+  test('can disable dialog motion', async () => {
+    const wrapper = mount(
+      <Dialog modelValue={true} motion={false}>
+        {AXIOM}
+      </Dialog>,
+    )
+
+    await nextTick()
+    expect(
+      wrapper.find('.el-dialog').attributes('data-fsus-motion-disabled'),
+    ).toBe('true')
+  })
+
   test('dialog should have a title and header when it has been given', async () => {
     const HEADER = 'I am header'
     const wrapper = mount(
@@ -29,7 +55,7 @@ describe('Dialog.vue', () => {
         }}
       >
         {AXIOM}
-      </Dialog>
+      </Dialog>,
     )
 
     await nextTick()
@@ -38,7 +64,7 @@ describe('Dialog.vue', () => {
     mount(
       <Dialog modelValue={true} title={HEADER}>
         {AXIOM}
-      </Dialog>
+      </Dialog>,
     )
     await nextTick()
 
@@ -68,14 +94,14 @@ describe('Dialog.vue', () => {
         }}
       >
         {AXIOM}
-      </Dialog>
+      </Dialog>,
     )
 
     await nextTick()
     const headerButton = wrapper.find('button')
     expect(headerButton.attributes()['data-title-id']).toBeTruthy()
     expect(headerButton.attributes()['data-title-class']).toBe(
-      'el-dialog__title'
+      'el-dialog__title',
     )
     expect(wrapper.emitted().close).toBeFalsy()
     headerButton.trigger('click')
@@ -87,7 +113,7 @@ describe('Dialog.vue', () => {
     const wrapper = mount(
       <Dialog modelValue={true} v-slots={{ footer: () => AXIOM }}>
         {AXIOM}
-      </Dialog>
+      </Dialog>,
     )
 
     await nextTick()
@@ -99,12 +125,12 @@ describe('Dialog.vue', () => {
     const wrapper = mount(
       <Dialog modelValue={true} appendToBody={true}>
         {AXIOM}
-      </Dialog>
+      </Dialog>,
     )
 
     await nextTick()
     expect(
-      document.body.firstElementChild!.classList.contains('el-overlay')
+      document.body.firstElementChild!.classList.contains('el-overlay'),
     ).toBe(true)
     wrapper.unmount()
   })
@@ -120,7 +146,7 @@ describe('Dialog.vue', () => {
     const wrapper = mount(
       <Dialog modelValue={true} showClose={false}>
         {AXIOM}
-      </Dialog>
+      </Dialog>,
     )
 
     await nextTick()
@@ -140,7 +166,7 @@ describe('Dialog.vue', () => {
       const wrapper = mount(
         <Dialog modal={false} modelValue={true}>
           {AXIOM}
-        </Dialog>
+        </Dialog>,
       )
 
       await nextTick()
@@ -165,7 +191,7 @@ describe('Dialog.vue', () => {
       const wrapper = mount(
         <Dialog modelValue={true} beforeClose={beforeClose}>
           {AXIOM}
-        </Dialog>
+        </Dialog>,
       )
 
       await nextTick()
@@ -181,7 +207,7 @@ describe('Dialog.vue', () => {
       const wrapper = mount(
         <Dialog modelValue={true} beforeClose={beforeClose}>
           {AXIOM}
-        </Dialog>
+        </Dialog>,
       )
       await nextTick()
       await clickCloseButton(wrapper, '.el-dialog__headerbtn')
@@ -199,7 +225,7 @@ describe('Dialog.vue', () => {
           modelValue={false}
         >
           {AXIOM}
-        </Dialog>
+        </Dialog>,
       )
       vi.useFakeTimers()
 
@@ -224,7 +250,7 @@ describe('Dialog.vue', () => {
       const wrapper = mount(
         <Dialog modelValue={true} destroyOnClose={true}>
           {AXIOM}
-        </Dialog>
+        </Dialog>,
       )
       expect(wrapper.vm.visible).toBe(true)
       await nextTick()
@@ -254,7 +280,7 @@ describe('Dialog.vue', () => {
           onClosed={onClosed}
         >
           {AXIOM}
-        </Dialog>
+        </Dialog>,
       )
 
       expect(wrapper.vm.visible).toBe(true)
@@ -275,7 +301,7 @@ describe('Dialog.vue', () => {
       const wrapper = mount(
         <Dialog modelValue={true} closeIcon={markRaw(Delete)}>
           {AXIOM}
-        </Dialog>
+        </Dialog>,
       )
       await nextTick()
       await rAF()
@@ -289,7 +315,7 @@ describe('Dialog.vue', () => {
       const wrapper = mount(
         <Dialog modelValue={true} draggable={true}>
           {AXIOM}
-        </Dialog>
+        </Dialog>,
       )
 
       await nextTick()
@@ -305,7 +331,7 @@ describe('Dialog.vue', () => {
       const wrapper = mount(
         <Dialog modelValue={true} title={title}>
           {AXIOM}
-        </Dialog>
+        </Dialog>,
       )
       await nextTick()
       const dialog = wrapper.find('[role="dialog"]')
@@ -328,14 +354,14 @@ describe('Dialog.vue', () => {
           }}
         >
           {AXIOM}
-        </Dialog>
+        </Dialog>,
       )
       await nextTick()
       const dialog = wrapper.find('[role="dialog"]')
       const dialogTitle = wrapper.find('.el-dialog__title')
       expect(dialog.attributes()['aria-label']).toBeFalsy()
       expect(dialog.attributes()['aria-labelledby']).toBe(
-        dialogTitle.attributes().id
+        dialogTitle.attributes().id,
       )
     })
 
@@ -345,7 +371,7 @@ describe('Dialog.vue', () => {
       const dialog = wrapper.find('[role="dialog"]')
       const dialogBody = wrapper.find('.el-dialog__body')
       expect(dialog.attributes()['aria-describedby']).toBe(
-        dialogBody.attributes().id
+        dialogBody.attributes().id,
       )
     })
   })

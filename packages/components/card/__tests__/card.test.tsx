@@ -17,6 +17,18 @@ describe('Card.vue', () => {
     expect(wrapper.find('.is-never-shadow').exists()).toBe(true)
   })
 
+  test('applies default card motion attrs', () => {
+    const wrapper = mount(() => <Card>{AXIOM}</Card>)
+
+    expect(wrapper.attributes('data-fsus-motion-preset')).toBe('card-hover')
+  })
+
+  test('can disable card motion', () => {
+    const wrapper = mount(() => <Card motion={false}>{AXIOM}</Card>)
+
+    expect(wrapper.attributes('data-fsus-motion-disabled')).toBe('true')
+  })
+
   test('string header', () => {
     const header = 'I am header'
     const wrapper = mount(() => <Card header={header}>{AXIOM}</Card>)

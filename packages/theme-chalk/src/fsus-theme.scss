@@ -144,6 +144,21 @@ html.dark {
   transform: none;
 }
 
+[data-fsus-motion-disabled='true'],
+[data-fsus-motion-disabled='true'] * {
+  transition-duration: 1ms !important;
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+}
+
+[data-fsus-motion-disabled='true'],
+[data-fsus-motion-disabled='true']:hover,
+[data-fsus-motion-disabled='true']:focus,
+[data-fsus-motion-disabled='true']:active {
+  transform: none !important;
+  filter: none !important;
+}
+
 .#{$namespace}-table .#{$namespace}-button,
 .#{$namespace}-table-v2 .#{$namespace}-button {
   flex-shrink: 0;

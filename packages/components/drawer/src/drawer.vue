@@ -1,7 +1,7 @@
 <template>
   <teleport to="body" :disabled="!appendToBody">
     <transition
-      :name="ns.b('fade')"
+      :name="drawerTransitionName"
       @after-enter="afterEnter"
       @after-leave="afterLeave"
       @before-leave="beforeLeave"
@@ -26,7 +26,7 @@
             :aria-label="title || undefined"
             :aria-labelledby="!title ? titleId : undefined"
             :aria-describedby="bodyId"
-            v-bind="$attrs"
+            v-bind="drawerAttrs"
             :class="[ns.b(), direction, visible && 'open', customClass]"
             :style="
               isHorizontal ? 'width: ' + drawerSize : 'height: ' + drawerSize
@@ -82,7 +82,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue'
+import { computed, defineComponent, ref, toRef } from 'vue'
 import { Close } from '@element-plus/icons-vue'
 
 import { ElOverlay } from '@element-plus/components/overlay'
@@ -91,6 +91,10 @@ import { useDialog } from '@element-plus/components/dialog'
 import { addUnit } from '@element-plus/utils'
 import ElIcon from '@element-plus/components/icon'
 import { useDeprecated, useLocale, useNamespace } from '@element-plus/hooks'
+import {
+  resolveComponentTransitionName,
+  useComponentMotionAttrs,
+} from '@element-plus/components/motion'
 import { drawerEmits, drawerProps } from './drawer'
 
 export default defineComponent({
@@ -105,7 +109,7 @@ export default defineComponent({
   props: drawerProps,
   emits: drawerEmits,
 
-  setup(props, { slots }) {
+  setup(props, { attrs, slots }) {
     useDeprecated(
       {
         scope: 'el-drawer',
@@ -114,7 +118,7 @@ export default defineComponent({
         version: '3.0.0',
         ref: 'https://element-plus.org/en-US/component/drawer.html#slots',
       },
-      computed(() => !!slots.title)
+      computed(() => !!slots.title),
     )
     useDeprecated(
       {
@@ -125,7 +129,7 @@ export default defineComponent({
         ref: 'https://element-plus.org/en-US/component/drawer.html#attributes',
         type: 'Attribute',
       },
-      computed(() => !!props.customClass)
+      computed(() => !!props.customClass),
     )
 
     const drawerRef = ref<HTMLElement>()
@@ -134,9 +138,29 @@ export default defineComponent({
     const { t } = useLocale()
 
     const isHorizontal = computed(
-      () => props.direction === 'rtl' || props.direction === 'ltr'
+      () => props.direction === 'rtl' || props.direction === 'ltr',
     )
     const drawerSize = computed(() => addUnit(props.size))
+    const defaultMotionPreset = computed(() => {
+      if (props.direction === 'ltr') return 'slide-right'
+      if (props.direction === 'btt') return 'slide-up'
+      return 'slide-left'
+    })
+    const componentMotionAttrs = useComponentMotionAttrs(
+      toRef(props, 'motion'),
+      defaultMotionPreset,
+    )
+    const drawerAttrs = computed(() => ({
+      ...attrs,
+      ...componentMotionAttrs.value,
+    }))
+    const drawerTransitionName = computed(() =>
+      resolveComponentTransitionName(props.motion, ns.b('fade'), {
+        'slide-left': ns.b('fade'),
+        'slide-right': ns.b('fade'),
+        'slide-up': ns.b('fade'),
+      }),
+    )
 
     return {
       ...useDialog(props, drawerRef),
@@ -144,6 +168,9 @@ export default defineComponent({
       focusStartRef,
       isHorizontal,
       drawerSize,
+      drawerAttrs,
+      componentMotionAttrs,
+      drawerTransitionName,
       ns,
       t,
     }

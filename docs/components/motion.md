@@ -191,6 +191,38 @@ await nextTick()
 refreshScrollTriggers()
 ```
 
+## Component Motion Prop
+
+关键组件共享同一个 `motion` prop 约定：传 preset 名称启用语义动效，传 `false`
+关闭该组件的本地动效。全局 reduced / disabled motion 仍由 `ElConfigProvider`
+统一控制。
+
+```vue
+<template>
+  <el-button motion="scale-fade">保存</el-button>
+  <el-card motion="fade-up">评论审核</el-card>
+  <el-dialog v-model="open" motion="scale-fade">确认操作</el-dialog>
+  <el-drawer v-model="drawerOpen" motion="slide-right">筛选器</el-drawer>
+  <el-dropdown motion="fade-down">
+    <button>更多</button>
+    <template #dropdown>...</template>
+  </el-dropdown>
+  <el-tooltip motion="fade-scale" content="查看详情">
+    <button>?</button>
+  </el-tooltip>
+  <el-collapse motion="slide-up">...</el-collapse>
+  <el-tabs motion="route-fade">...</el-tabs>
+  <el-button :motion="false">无动效操作</el-button>
+</template>
+```
+
+Message 和 Notification 也接受 `motion`：
+
+```ts
+ElMessage({ message: '已保存', motion: 'slide-up' })
+ElNotification({ title: '完成', message: '同步结束', motion: false })
+```
+
 ## Presets
 
 第一批 preset 包括：

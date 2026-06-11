@@ -1,7 +1,9 @@
 import { buildProps, definePropType } from '@element-plus/utils'
+import { componentMotionProps } from '@element-plus/components/motion'
 import type { ExtractPropTypes, StyleValue } from 'vue'
 
 export const cardProps = buildProps({
+  ...componentMotionProps,
   /**
    * @description title of the card. Also accepts a DOM passed by `slot#header`
    */

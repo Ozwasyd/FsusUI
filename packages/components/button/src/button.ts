@@ -1,6 +1,7 @@
 import { useSizeProp } from '@element-plus/hooks'
 import { buildProps, definePropType, iconPropType } from '@element-plus/utils'
 import { Loading } from '@element-plus/icons-vue'
+import { componentMotionProps } from '@element-plus/components/motion'
 import type { Component, ExtractPropTypes } from 'vue'
 
 export const buttonTypes = [
@@ -20,6 +21,7 @@ export const buttonTypes = [
 export const buttonNativeTypes = ['button', 'submit', 'reset'] as const
 
 export const buttonProps = buildProps({
+  ...componentMotionProps,
   /**
    * @description button size
    */

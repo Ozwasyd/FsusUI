@@ -136,6 +136,26 @@
   }
 }
 
+.dialog-scale-fade-enter-active {
+  animation: modal-fade-in var(--fsus-motion-overlay, 300ms)
+    var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
+
+  .#{$namespace}-overlay-dialog {
+    animation: dialog-scale-fade-in var(--fsus-motion-panel, 420ms)
+      var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));
+  }
+}
+
+.dialog-scale-fade-leave-active {
+  animation: modal-fade-out var(--fsus-motion-overlay, 300ms)
+    var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
+
+  .#{$namespace}-overlay-dialog {
+    animation: dialog-scale-fade-out var(--fsus-motion-control, 260ms)
+      var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
+  }
+}
+
 @keyframes dialog-fade-in {
   0% {
     transform: translate3d(0, -20px, 0);
@@ -154,6 +174,30 @@
   }
   100% {
     transform: translate3d(0, -20px, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes dialog-scale-fade-in {
+  0% {
+    transform: translate3d(0, var(--fsus-motion-distance-sm, 8px), 0)
+      scale(var(--fsus-motion-intensity-standard, 0.96));
+    opacity: 0;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes dialog-scale-fade-out {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, var(--fsus-motion-distance-xs, 4px), 0)
+      scale(var(--fsus-motion-intensity-subtle, 0.98));
     opacity: 0;
   }
 }
@@ -179,8 +223,12 @@
 @media (prefers-reduced-motion: reduce) {
   .dialog-fade-enter-active,
   .dialog-fade-leave-active,
+  .dialog-scale-fade-enter-active,
+  .dialog-scale-fade-leave-active,
   .dialog-fade-enter-active .#{$namespace}-overlay-dialog,
-  .dialog-fade-leave-active .#{$namespace}-overlay-dialog {
+  .dialog-fade-leave-active .#{$namespace}-overlay-dialog,
+  .dialog-scale-fade-enter-active .#{$namespace}-overlay-dialog,
+  .dialog-scale-fade-leave-active .#{$namespace}-overlay-dialog {
     animation-duration: 1ms !important;
   }
 }

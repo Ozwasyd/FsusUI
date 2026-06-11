@@ -336,6 +336,33 @@ describe('Fsus theme visual baseline', () => {
     ])
   })
 
+  test('supports component-level motion disablement and dialog scale fade', () => {
+    const themeCss = compileThemeFile('fsus-theme.scss')
+    const dialogCss = compileThemeFile('dialog.scss')
+
+    expectCssRule(themeCss, '[data-fsus-motion-disabled=true]', [
+      'transition-duration: 1ms !important;',
+      'animation-duration: 1ms !important;',
+      'animation-iteration-count: 1 !important;',
+    ])
+    expectCssRule(themeCss, '[data-fsus-motion-disabled=true]:hover', [
+      'transform: none !important;',
+      'filter: none !important;',
+    ])
+    expectCssRule(dialogCss, '.dialog-scale-fade-enter-active', [
+      'animation: modal-fade-in var(--fsus-motion-overlay, 300ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));',
+    ])
+    expectCssRule(
+      dialogCss,
+      '.dialog-scale-fade-enter-active .el-overlay-dialog',
+      [
+        'animation: dialog-scale-fade-in var(--fsus-motion-panel, 420ms) var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));',
+      ],
+    )
+    expect(dialogCss).toContain('@keyframes dialog-scale-fade-in')
+    expect(dialogCss).toContain('@keyframes dialog-scale-fade-out')
+  })
+
   test('uses square table surfaces unless callers opt into another radius', () => {
     const tableCss = compileThemeFile('table.scss')
     const tableV2Css = compileThemeFile('table-v2.scss')

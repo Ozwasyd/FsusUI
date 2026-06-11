@@ -6,6 +6,7 @@ import {
   mutable,
 } from '@element-plus/utils'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
+import { componentMotionProps } from '@element-plus/components/motion'
 import type { ExtractPropTypes } from 'vue'
 import type { Arrayable } from '@element-plus/utils'
 
@@ -16,6 +17,7 @@ export const emitChangeFn = (value: CollapseModelValue) =>
   isNumber(value) || isString(value) || Array.isArray(value)
 
 export const collapseProps = buildProps({
+  ...componentMotionProps,
   accordion: Boolean,
   modelValue: {
     type: definePropType<CollapseModelValue>([Array, String, Number]),

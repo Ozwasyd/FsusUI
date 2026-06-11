@@ -33,7 +33,7 @@
       :show-after="showAfter"
       :strategy="strategy"
       :teleported="teleported"
-      :transition="transition"
+      :transition="contentTransition"
       :virtual-triggering="virtualTriggering"
       :z-index="zIndex"
       :append-to="appendTo"
@@ -64,8 +64,10 @@ import { isBoolean } from '@element-plus/utils'
 import {
   useDelayedToggle,
   useId,
+  useNamespace,
   usePopperContainer,
 } from '@element-plus/hooks'
+import { resolveComponentTransitionName } from '@element-plus/components/motion'
 import { TOOLTIP_INJECTION_KEY } from './constants'
 import { tooltipEmits, useTooltipModelToggle, useTooltipProps } from './tooltip'
 import ElTooltipTrigger from './trigger.vue'
@@ -82,6 +84,7 @@ const emit = defineEmits(tooltipEmits)
 usePopperContainer()
 
 const id = useId()
+const ns = useNamespace('tooltip')
 const popperRef = ref<PopperInstance>()
 // TODO any is temporary, replace with `TooltipContentInstance` later
 const contentRef = ref<any>()
@@ -109,12 +112,26 @@ const { onOpen, onClose } = useDelayedToggle({
 })
 
 const controlled = computed(
-  () => isBoolean(props.visible) && !hasUpdateHandler.value
+  () => isBoolean(props.visible) && !hasUpdateHandler.value,
 )
 
 const tooltipContentAttrs = computed(() => ({
   ariaLabel: props.ariaLabel,
+  'data-fsus-motion-preset':
+    typeof props.motion === 'string' ? props.motion : undefined,
+  'data-fsus-motion-disabled': props.motion === false ? 'true' : undefined,
 }))
+const contentTransition = computed(() =>
+  resolveComponentTransitionName(
+    props.motion,
+    props.transition || `${ns.namespace.value}-fade-in-linear`,
+    {
+      'fade-scale': `${ns.namespace.value}-zoom-in-top`,
+      'scale-fade': `${ns.namespace.value}-zoom-in-top`,
+      'fade-down': `${ns.namespace.value}-zoom-in-top`,
+    },
+  ),
+)
 
 provide(TOOLTIP_INJECTION_KEY, {
   controlled,
@@ -155,7 +172,7 @@ watch(
     if (disabled && open.value) {
       open.value = false
     }
-  }
+  },
 )
 
 const isFocusInsideContent = (event?: FocusEvent) => {

@@ -5,6 +5,7 @@ import {
   useTooltipContentProps,
   useTooltipTriggerProps,
 } from '@element-plus/components/tooltip'
+import { componentMotionProps } from '@element-plus/components/motion'
 
 import type { Options } from '@popperjs/core'
 import type { ButtonProps, ButtonType } from '@element-plus/components/button'
@@ -27,6 +28,7 @@ export interface IElDropdownInstance {
 }
 
 export const dropdownProps = buildProps({
+  ...componentMotionProps,
   trigger: useTooltipTriggerProps.trigger,
   effect: {
     ...useTooltipContentProps.effect,

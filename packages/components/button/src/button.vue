@@ -3,6 +3,10 @@
     :is="tag"
     ref="_ref"
     v-bind="_props"
+    :data-fsus-motion-preset="componentMotionAttrs['data-fsus-motion-preset']"
+    :data-fsus-motion-disabled="
+      componentMotionAttrs['data-fsus-motion-disabled']
+    "
     :class="[
       ns.b(),
       ns.m(_type),
@@ -40,8 +44,10 @@
 </template>
 
 <script lang="ts" setup>
+import { toRef } from 'vue'
 import { ElIcon } from '@element-plus/components/icon'
 import { useNamespace } from '@element-plus/hooks'
+import { useComponentMotionAttrs } from '@element-plus/components/motion'
 import { useButton } from './use-button'
 import { buttonEmits, buttonProps } from './button'
 import { useButtonCustomStyle } from './button-custom'
@@ -55,6 +61,7 @@ const emit = defineEmits(buttonEmits)
 
 const buttonStyle = useButtonCustomStyle(props)
 const ns = useNamespace('button')
+const componentMotionAttrs = useComponentMotionAttrs(toRef(props, 'motion'))
 const { _ref, _size, _type, _disabled, _props, shouldAddSpace, handleClick } =
   useButton(props, emit)
 
