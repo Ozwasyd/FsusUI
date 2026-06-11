@@ -1,0 +1,46 @@
+version: 1
+status: planned
+releaseClassification: preview-minor
+scope: avalonia-complex-components
+note: Basic Avalonia support does not imply complex component parity.
+components:
+  - id: data-table
+    publicName: FsusDataTable
+    phase: deferred
+    followUpIssue: Plan FsusDataTable virtualization, data model, and selection.
+  - id: virtual-list
+    publicName: FsusVirtualList
+    phase: deferred
+    followUpIssue: Plan FsusVirtualList fixed and variable height virtualization.
+  - id: log-viewer
+    publicName: FsusLogViewer
+    phase: deferred
+    followUpIssue: Plan FsusLogViewer append stream, retention, and search.
+  - id: terminal-panel
+    publicName: FsusTerminalPanel
+    phase: deferred
+    followUpIssue: Plan FsusTerminalPanel PTY boundary and input security.
+  - id: markdown-viewer
+    publicName: FsusMarkdownViewer
+    phase: deferred
+    followUpIssue: Plan FsusMarkdownViewer rendering, sanitization, and code blocks.
+  - id: markdown-editor
+    publicName: FsusMarkdownEditor
+    phase: deferred
+    followUpIssue: Plan FsusMarkdownEditor editing model and preview sync.
+  - id: file-manager
+    publicName: FsusFileManager
+    phase: deferred
+    followUpIssue: Plan FsusFileManager async directory and permission model.
+  - id: tree
+    publicName: FsusTree
+    phase: deferred
+    followUpIssue: Plan FsusTree hierarchy, keyboard, and lazy loading.
+  - id: tree-table
+    publicName: FsusTreeTable
+    phase: deferred
+    followUpIssue: Plan FsusTreeTable nested rows and column virtualization.
+  - id: code-block
+    publicName: FsusCodeBlock
+    phase: deferred
+    followUpIssue: Plan FsusCodeBlock highlighting, copy, and large snippets.

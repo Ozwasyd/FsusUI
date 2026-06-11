@@ -41,3 +41,8 @@ The initial cross-platform contract set is tracked in
 
 Implementation packages may expose platform-native APIs, but those APIs must
 map back to these public concepts.
+
+Complex Avalonia component planning is tracked separately in
+[`complex-components-roadmap.yaml`](./complex-components-roadmap.yaml). Those
+entries are deferred architecture targets, not part of the first basic control
+subset.

@@ -28,6 +28,12 @@ Authoritative boundaries:
   target private DOM selectors, generated WASM paths, or Avalonia template
   parts.
 
+Complex Avalonia components such as DataTable, VirtualList, LogViewer,
+TerminalPanel, MarkdownViewer, FileManager, Tree, TreeTable, and CodeBlock are
+tracked in
+[`docs/avalonia/complex-components-roadmap.md`](./avalonia/complex-components-roadmap.md).
+They are not included in the first basic Avalonia support scope.
+
 ## Closed Child Issues
 
 | Issue                       | Status | Repository Evidence                                                                                                     |
@@ -37,6 +43,7 @@ Authoritative boundaries:
 | #20 Token generator         | Closed | `spec/tokens/tokens.json`, `scripts/token-pipeline.mjs`, generated Web/Avalonia/docs/checksum artifacts, CI token gate  |
 | #21 Avalonia theme baseline | Closed | `dotnet/FsusUI.Avalonia.Themes`, generated token resource import, light/dark dictionaries, control baselines, smoke app |
 | #22 Avalonia demo shell     | Closed | `dotnet/FsusUI.Avalonia.Demo`, reference shell pages, light/dark/density/motion switching, startup smoke                |
+| #29 Complex component plan  | Closed | `docs/avalonia/complex-components-roadmap.md`, `spec/components/complex-components-roadmap.yaml`                        |
 
 ## Dependency Rules
 

@@ -32,6 +32,19 @@ const interactionComponents = [
   'menu',
 ]
 
+const complexComponents = [
+  'data-table',
+  'virtual-list',
+  'log-viewer',
+  'terminal-panel',
+  'markdown-viewer',
+  'markdown-editor',
+  'file-manager',
+  'tree',
+  'tree-table',
+  'code-block',
+]
+
 const read = (relativePath) =>
   fs.readFileSync(path.join(root, relativePath), 'utf8')
 
@@ -95,6 +108,23 @@ const checkContracts = () => {
   ]) {
     assertIncludes(contract, key, file)
   }
+  const complexSpecFile = 'spec/components/complex-components-roadmap.yaml'
+  const complexDocsFile = 'docs/avalonia/complex-components-roadmap.md'
+  const complexSpec = read(complexSpecFile)
+  const complexDocs = read(complexDocsFile).toLowerCase()
+  for (const component of complexComponents) {
+    assertIncludes(complexSpec, `id: ${component}`, complexSpecFile)
+    assertIncludes(
+      complexDocs,
+      component.replaceAll('-', '').toLowerCase(),
+      complexDocsFile,
+    )
+  }
+  assertIncludes(
+    complexDocs,
+    'does not imply parity',
+    'docs/avalonia/complex-components-roadmap.md',
+  )
   console.log('conformance:contracts passed')
 }
 
