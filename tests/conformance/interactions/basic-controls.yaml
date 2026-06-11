@@ -1,0 +1,46 @@
+version: 1
+scenarios:
+  - id: primary-button-click
+    component: button
+    steps:
+      - render: { variant: primary, text: Save }
+      - pointerover
+      - keyboard: Enter
+      - assert: { emitted: press, finalState: default }
+  - id: text-input-focus
+    component: input
+    steps:
+      - render: { placeholder: Search }
+      - focus
+      - keyboard: 'A'
+      - assert: { value: A, finalState: focus-visible }
+  - id: checkbox-toggle
+    component: checkbox
+    steps:
+      - render: { checked: false, text: Accept }
+      - focus
+      - keyboard: Space
+      - assert: { checked: true }
+  - id: dialog-keyboard-containment
+    component: dialog
+    steps:
+      - render: { modal: true, title: Confirm }
+      - focus
+      - keyboard: Tab
+      - keyboard: Escape
+      - assert: { finalState: closed }
+  - id: tabs-arrow-navigation
+    component: tabs
+    steps:
+      - render: { selectedKey: overview }
+      - focus
+      - keyboard: ArrowRight
+      - assert: { selectedKey: next }
+  - id: menu-item-activation
+    component: menu
+    steps:
+      - render: { selectedKey: dashboard }
+      - focus
+      - keyboard: ArrowDown
+      - keyboard: Enter
+      - assert: { emitted: select }
