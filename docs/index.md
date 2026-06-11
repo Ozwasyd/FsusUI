@@ -6,18 +6,19 @@ FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Mini
 
 ## 工程文档
 
-| 文档                                                       | 说明                                          |
-| ---------------------------------------------------------- | --------------------------------------------- |
-| [项目概览](./project-overview.md)                          | Monorepo 结构、工作区划分、主要入口           |
-| [设计规范](./design.md)                                    | 高智感极简主义设计语言、色彩、字体、组件规范  |
-| [Element Plus 接入指南](./element-plus-integration.md)     | 与 Element Plus 的差异点、包名约定、WASM 策略 |
-| [工程维护交接](./engineering-handoff.md)                   | 环境基线、标准命令、CI 分工、常见问题排查     |
-| [发布治理](./release-governance.md)                        | GitHub Packages 发布流程、Changesets 版本管理 |
-| [模板审计报告](./runtime-template-audit.md)                | 模板 DOM 扫描结果（Wave 0 已全部完成）        |
-| [模板重构计划](./runtime-template-refactor-plan.md)        | 模板重构 Guardrails 与审计命令                |
-| [UX 语义指南](./ux/dont-make-me-think-guidelines.md)       | Don’t Make Me Think 风格约束与检查器规则      |
-| [任务导向组件语义](./ux/task-oriented-components.md)       | 页面任务、危险操作、空状态、筛选摘要等契约    |
-| [FsusBlog 消费示例](./ux/fsusblog-consumption-examples.md) | 内容后台消费 UX 语义模式的组合示例            |
+| 文档                                                       | 说明                                            |
+| ---------------------------------------------------------- | ----------------------------------------------- |
+| [项目概览](./project-overview.md)                          | Monorepo 结构、工作区划分、主要入口             |
+| [设计规范](./design.md)                                    | 高智感极简主义设计语言、色彩、字体、组件规范    |
+| [Element Plus 接入指南](./element-plus-integration.md)     | 与 Element Plus 的差异点、包名约定、WASM 策略   |
+| [工程维护交接](./engineering-handoff.md)                   | 环境基线、标准命令、CI 分工、常见问题排查       |
+| [发布治理](./release-governance.md)                        | GitHub Packages 发布流程、Changesets 版本管理   |
+| [npm 发布策略](./release/npm-registry-policy.md)           | npm registry、provenance、dist-tag 与包审计策略 |
+| [模板审计报告](./runtime-template-audit.md)                | 模板 DOM 扫描结果（Wave 0 已全部完成）          |
+| [模板重构计划](./runtime-template-refactor-plan.md)        | 模板重构 Guardrails 与审计命令                  |
+| [UX 语义指南](./ux/dont-make-me-think-guidelines.md)       | Don’t Make Me Think 风格约束与检查器规则        |
+| [任务导向组件语义](./ux/task-oriented-components.md)       | 页面任务、危险操作、空状态、筛选摘要等契约      |
+| [FsusBlog 消费示例](./ux/fsusblog-consumption-examples.md) | 内容后台消费 UX 语义模式的组合示例              |
 
 ---
 

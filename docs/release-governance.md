@@ -6,7 +6,9 @@
 
 - 主发布目标：GitHub Packages
 - 发布对象：`dist/element-plus` 中准备好的主包工件
-- 不扩展到 npm registry
+- 当前不发布到 npm registry
+
+Public preview 的 npm registry 策略、包名策略、dist-tag 策略和 provenance 要求见 [npm Registry Publishing Policy](./release/npm-registry-policy.md)。在 #8 public-preview readiness gate 完成前，npm public publish 只能作为候选审计流程，不能实际发布。
 
 发布前必须先通过：
 
@@ -45,6 +47,7 @@ pnpm test:consumer-install
 4. `pnpm run build:github-package`
 5. `pnpm test:consumer-install`
 6. 检查 `dist/element-plus/package.json`
+7. 若准备 public-preview npm 发布，补充 `npm pack --dry-run` / `pnpm pack --dry-run` 记录，并更新 `release-evidence/npm-public-preview/`
 
 发布工件检查重点：
 
@@ -123,6 +126,7 @@ workspace 依赖归一化由 `scripts/prepare-github-package.mjs` 负责，当�
 - `test:visual`
 - quality workflow
 - Changesets 基础目录与模板
+- npm public-preview package audit evidence
 
 本轮未纳入的事项：
 

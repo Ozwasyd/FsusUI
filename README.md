@@ -10,21 +10,22 @@
 
 核心特性（以仓库现状为准）：
 
-| 维度 | 原 Element Plus | FsusUI |
-|------|----------------|--------|
-| JS 标准 | ES2018 | **ES2022**（`at()`、`Object.hasOwn()`、Top-level await 等） |
-| TypeScript | 4.7 | **6.0**（更严格推断、`moduleResolution: Bundler`） |
-| 最低兼容 | Chrome 64+ | **Chrome 106+**（ES2022 全支持） |
-| 重计算 | 纯 JS | **WASM SIMD**（C++23 / Emscripten，见 `packages/wasm/`） |
-| 构建工具 | Rollup 2 / esbuild 0.14 | **Rollup 4 / esbuild 0.28** |
-| 包管理器 | pnpm 7 | **pnpm 10** |
-| 运行时 | Node 16 | **Node 22** |
-| ESLint | 8（旧格式） | **10（Flat Config）** |
+| 维度       | 原 Element Plus         | FsusUI                                                      |
+| ---------- | ----------------------- | ----------------------------------------------------------- |
+| JS 标准    | ES2018                  | **ES2022**（`at()`、`Object.hasOwn()`、Top-level await 等） |
+| TypeScript | 4.7                     | **6.0**（更严格推断、`moduleResolution: Bundler`）          |
+| 最低兼容   | Chrome 64+              | **Chrome 106+**（ES2022 全支持）                            |
+| 重计算     | 纯 JS                   | **WASM SIMD**（C++23 / Emscripten，见 `packages/wasm/`）    |
+| 构建工具   | Rollup 2 / esbuild 0.14 | **Rollup 4 / esbuild 0.28**                                 |
+| 包管理器   | pnpm 7                  | **pnpm 10**                                                 |
+| 运行时     | Node 16                 | **Node 22**                                                 |
+| ESLint     | 8（旧格式）             | **10（Flat Config）**                                       |
 
 ## 与 Element Plus 的关系与命名现状
 
 - 这是一个以 Element Plus 包结构为主体的代码库分支/改造版本；具体行为以本仓库代码与构建产物为准。
 - 文档与描述会避免“完全兼容”等无法从仓库自动证明的强断言；若你在迁移中遇到不一致，应以实际构建与运行结果为准。
+- 当前对外安装名仍为 `@ozwasyd/element-plus`，发布目标仍为 GitHub Packages。公共 npm registry、provenance、dist-tag 和长期包名策略见 [`docs/release/npm-registry-policy.md`](./docs/release/npm-registry-policy.md)。
 
 ## 快速开始
 
