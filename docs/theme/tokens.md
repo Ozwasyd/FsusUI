@@ -46,6 +46,25 @@ FsusUI semantic aliases on top.
 These tokens are safe for application-level overrides when the value type stays
 compatible with CSS usage in the component styles.
 
+## Generated Cross-Platform Tokens
+
+The platform-neutral token source is
+[`spec/tokens/tokens.json`](../../spec/tokens/tokens.json). Run
+`pnpm run tokens:generate` after changing that source. The generator emits:
+
+- Web CSS variables, SCSS maps, and JSON metadata under
+  `packages/theme-chalk/src/generated/`
+- Avalonia resources under `dotnet/FsusUI.Avalonia.Themes/Generated/`
+- C# token constants under `dotnet/FsusUI.Avalonia/Generated/`
+- generated token documentation at
+  [`docs/theme/generated/tokens.md`](./generated/tokens.md)
+- checksums at `generated/tokens.hash.json`
+
+`pnpm run tokens:check` fails when any generated artifact is stale, and
+`pnpm run tokens:lint` validates naming, required platform mappings,
+references, aliases, and generated-file metadata. Web and Avalonia consumers
+must use the generated artifacts rather than manually mirroring token values.
+
 ```css
 :root {
   --el-color-primary: #2a599c;
