@@ -6,24 +6,29 @@ FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Mini
 
 ## 工程文档
 
-| 文档                                                       | 说明                                            |
-| ---------------------------------------------------------- | ----------------------------------------------- |
-| [项目概览](./project-overview.md)                          | Monorepo 结构、工作区划分、主要入口             |
-| [设计规范](./design.md)                                    | 高智感极简主义设计语言、色彩、字体、组件规范    |
-| [Playground / Demo App](./playground.md)                   | demo app 启动、覆盖范围、视觉回归与公开样例规范 |
-| [图标系统](./icons.md)                                     | 图标导入、生成流程、SVG 审查和命名稳定性        |
-| [Element Plus 接入指南](./element-plus-integration.md)     | 与 Element Plus 的差异点、包名约定、WASM 策略   |
-| [API 稳定性](./api-stability.md)                           | public preview 导出、稳定性等级、内部路径边界   |
-| [Element Plus 兼容策略](./element-plus-compatibility.md)   | 兼容承诺、已知差异、支持与不支持的使用面        |
-| [从 Element Plus 迁移](./migration/from-element-plus.md)   | 包名、CSS、图标、运行时目标与迁移检查           |
-| [工程维护交接](./engineering-handoff.md)                   | 环境基线、标准命令、CI 分工、常见问题排查       |
-| [发布治理](./release-governance.md)                        | GitHub Packages 发布流程、Changesets 版本管理   |
-| [npm 发布策略](./release/npm-registry-policy.md)           | npm registry、provenance、dist-tag 与包审计策略 |
-| [模板审计报告](./runtime-template-audit.md)                | 模板 DOM 扫描结果（Wave 0 已全部完成）          |
-| [模板重构计划](./runtime-template-refactor-plan.md)        | 模板重构 Guardrails 与审计命令                  |
-| [UX 语义指南](./ux/dont-make-me-think-guidelines.md)       | Don’t Make Me Think 风格约束与检查器规则        |
-| [任务导向组件语义](./ux/task-oriented-components.md)       | 页面任务、危险操作、空状态、筛选摘要等契约      |
-| [FsusBlog 消费示例](./ux/fsusblog-consumption-examples.md) | 内容后台消费 UX 语义模式的组合示例              |
+| 文档                                                         | 说明                                            |
+| ------------------------------------------------------------ | ----------------------------------------------- |
+| [项目概览](./project-overview.md)                            | Monorepo 结构、工作区划分、主要入口             |
+| [设计规范](./design.md)                                      | 高智感极简主义设计语言、色彩、字体、组件规范    |
+| [Playground / Demo App](./playground.md)                     | demo app 启动、覆盖范围、视觉回归与公开样例规范 |
+| [图标系统](./icons.md)                                       | 图标导入、生成流程、SVG 审查和命名稳定性        |
+| [Element Plus 接入指南](./element-plus-integration.md)       | 与 Element Plus 的差异点、包名约定、WASM 策略   |
+| [API 稳定性](./api-stability.md)                             | public preview 导出、稳定性等级、内部路径边界   |
+| [Element Plus 兼容策略](./element-plus-compatibility.md)     | 兼容承诺、已知差异、支持与不支持的使用面        |
+| [从 Element Plus 迁移](./migration/from-element-plus.md)     | 包名、CSS、图标、运行时目标与迁移检查           |
+| [Element Plus 归属说明](./legal/element-plus-attribution.md) | 派生关系、许可、资产边界、包名说明              |
+| [Public Preview 发布说明](./releases/public-preview.md)      | 预览状态、可用包、限制、验证证据                |
+| [贡献指南](../CONTRIBUTING.md)                               | 本地开发、changeset、视觉回归、发布验证流程     |
+| [安全策略](../SECURITY.md)                                   | 漏洞报告、支持版本、XSS/SVG/WASM/供应链范围     |
+| [行为准则](../CODE_OF_CONDUCT.md)                            | public-preview 协作和安全披露行为约束           |
+| [工程维护交接](./engineering-handoff.md)                     | 环境基线、标准命令、CI 分工、常见问题排查       |
+| [发布治理](./release-governance.md)                          | GitHub Packages 发布流程、Changesets 版本管理   |
+| [npm 发布策略](./release/npm-registry-policy.md)             | npm registry、provenance、dist-tag 与包审计策略 |
+| [模板审计报告](./runtime-template-audit.md)                  | 模板 DOM 扫描结果（Wave 0 已全部完成）          |
+| [模板重构计划](./runtime-template-refactor-plan.md)          | 模板重构 Guardrails 与审计命令                  |
+| [UX 语义指南](./ux/dont-make-me-think-guidelines.md)         | Don’t Make Me Think 风格约束与检查器规则        |
+| [任务导向组件语义](./ux/task-oriented-components.md)         | 页面任务、危险操作、空状态、筛选摘要等契约      |
+| [FsusBlog 消费示例](./ux/fsusblog-consumption-examples.md)   | 内容后台消费 UX 语义模式的组合示例              |
 
 ---
 

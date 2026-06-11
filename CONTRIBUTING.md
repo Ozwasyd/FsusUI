@@ -54,6 +54,82 @@ Component changes should name the affected component docs under
 `docs/theme/tokens.md`, `docs/theme/customization.md`, or
 `docs/theme/motion.md`.
 
+## Component Contribution Workflow
+
+- Start from the component source under `packages/components/<name>/`.
+- Update the matching docs page under `docs/components/`.
+- State whether props, events, slots, exposes, styling, or accessibility
+  behavior changed.
+- Add or update focused unit tests under the component package.
+- Run visual tests when the rendered DOM, style, layout, icon, focus, hover,
+  active, loading, disabled, or empty states change.
+- Do not rely on undocumented deep imports from `es/*`, `lib/*`, `packages/*`,
+  or `internal/*`.
+
+## Theme Token Contribution Workflow
+
+- Check [`docs/theme/tokens.md`](./docs/theme/tokens.md) before adding or
+  changing a public token.
+- Prefer Element Plus-compatible `--el-*` variables when they already express
+  the intended behavior.
+- Use `--fsus-*` aliases only when a semantic FsusUI layer is needed.
+- Document dark-mode behavior, reduced-motion impact, migration risk, and
+  whether the token is global or component-specific.
+- Update [`docs/theme/customization.md`](./docs/theme/customization.md) when
+  the safe override pattern changes.
+
+## Icon Generation Workflow
+
+SVG sources live in `packages/icons-svg`. Generated Vue components live in
+`packages/icons-vue/src/components`.
+
+Use:
+
+```bash
+pnpm run ensure:icons
+pnpm -C packages/icons-vue build:generate
+```
+
+Icon changes must satisfy the review rules in [`docs/icons.md`](./docs/icons.md)
+and must not include private logos, private screenshots, external image
+references, or customer artwork.
+
+## WASM Artifact Workflow
+
+WASM changes must keep JavaScript fallback behavior intact and must not publish
+debug-only artifacts or source maps by accident.
+
+Useful commands:
+
+```bash
+pnpm run ensure:wasm
+pnpm run build:wasm
+pnpm run check:markdown-wasm
+pnpm run check:markdown-wasm-runtime
+pnpm run perf:wasm
+```
+
+If a WASM change affects the public package, also run release packaging and
+consumer install checks.
+
+## Consumer Install And Release Verification
+
+Run the consumer install test when package exports, install behavior, generated
+artifacts, registry configuration, theme CSS imports, icons, or package
+contents change:
+
+```bash
+pnpm run test:consumer-install
+```
+
+Release verification commands:
+
+```bash
+pnpm run verify
+pnpm run verify:strict
+pnpm run verify:release
+```
+
 ## Changeset Workflow
 
 Use Changesets for public package release notes and version bumps.

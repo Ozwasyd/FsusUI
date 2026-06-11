@@ -1,0 +1,24 @@
+FsusUI
+Copyright (c) Ozwasyd.
+
+FsusUI is derived from the Element Plus project and preserves the upstream MIT
+license text and copyright notice:
+
+Copyright (c) 2020-PRESENT Element Plus
+
+FsusUI-specific changes, documentation, release evidence, demo wiring, theme
+tokens, motion tokens, build policy, package-preparation scripts, and
+repository governance files are maintained by Ozwasyd unless a file states
+otherwise.
+
+The source code and generated package artifacts are distributed under the MIT
+license in LICENSE. SVG icon sources under packages/icons-svg retain the same
+MIT license lineage documented by packages/icons-svg/LICENSE.
+
+Public demo screenshots and visual regression snapshots in tests/visual are
+synthetic fixtures for repository verification. They are not customer data,
+private product screenshots, or brand assets.
+
+Product-specific names such as FsusBlog appear only as integration context.
+FsusBlog adapters and examples are not a separate public API contract unless a
+public FsusUI document explicitly says so.
