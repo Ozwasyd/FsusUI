@@ -16,6 +16,7 @@ public partial class AppShellView : UserControl
     pages = new Dictionary<string, (string, Func<Control>)>
     {
       ["dashboard"] = ("App shell", () => new DashboardPage()),
+      ["components"] = ("Component subset", () => new ComponentSubsetPage()),
       ["settings"] = ("Settings page", () => new SettingsPage()),
       ["list"] = ("List page", () => new ListPage()),
       ["detail"] = ("Detail page", () => new DetailPage()),

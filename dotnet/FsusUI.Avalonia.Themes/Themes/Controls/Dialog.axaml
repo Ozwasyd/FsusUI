@@ -1,4 +1,6 @@
-<Styles xmlns="https://github.com/avaloniaui">
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls">
   <Style Selector="Window.fsus-dialog">
     <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
@@ -14,8 +16,15 @@
     <Setter Property="Padding" Value="20" />
   </Style>
 
+  <Style Selector="fsus|FsusDialog">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusSurfaceMd}" />
+    <Setter Property="Padding" Value="20" />
+  </Style>
+
   <Style Selector="Border.fsus-overlay">
     <Setter Property="Background" Value="#99000000" />
   </Style>
 </Styles>
-

@@ -1,0 +1,68 @@
+<UserControl
+  x:Class="FsusUI.Avalonia.Demo.Views.ComponentSubsetPage"
+  xmlns="https://github.com/avaloniaui"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <StackPanel Spacing="14">
+    <Border Classes="fsus-card">
+      <StackPanel Spacing="10">
+        <TextBlock FontSize="18" FontWeight="700" Text="Commands" />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <fsus:FsusButton Variant="Primary">Primary</fsus:FsusButton>
+          <fsus:FsusButton>Default</fsus:FsusButton>
+          <fsus:FsusButton IsLoading="True">Loading</fsus:FsusButton>
+          <fsus:FsusIconButton Variant="Text" Content="⌘" />
+        </StackPanel>
+      </StackPanel>
+    </Border>
+
+    <Border Classes="fsus-card">
+      <StackPanel Spacing="10">
+        <TextBlock FontSize="18" FontWeight="700" Text="Form controls" />
+        <fsus:FsusInput PlaceholderText="FsusInput" />
+        <fsus:FsusInput IsInvalid="True" Text="Invalid input state" />
+        <fsus:FsusTextarea Text="FsusTextarea validates multiline input and wrapping." />
+        <fsus:FsusCheckbox IsChecked="True">FsusCheckbox</fsus:FsusCheckbox>
+        <fsus:FsusRadio GroupName="subset" IsChecked="True">FsusRadio selected</fsus:FsusRadio>
+        <fsus:FsusSwitch IsChecked="True" Content="FsusSwitch" />
+      </StackPanel>
+    </Border>
+
+    <Border Classes="fsus-card">
+      <StackPanel Spacing="10">
+        <TextBlock FontSize="18" FontWeight="700" Text="Surfaces and feedback" />
+        <fsus:FsusCard IsSelected="True">
+          <TextBlock Text="FsusCard selected surface" />
+        </fsus:FsusCard>
+        <fsus:FsusDivider />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <fsus:FsusTag Content="FsusTag" />
+          <fsus:FsusBadge Content="12" />
+          <fsus:FsusAlert Variant="Danger" Content="FsusAlert danger state" />
+        </StackPanel>
+        <fsus:FsusDialog IsLoading="True">
+          <TextBlock Text="FsusDialog surface with loading state" />
+        </fsus:FsusDialog>
+      </StackPanel>
+    </Border>
+
+    <Border Classes="fsus-card">
+      <StackPanel Spacing="10">
+        <TextBlock FontSize="18" FontWeight="700" Text="Navigation" />
+        <fsus:FsusTabs>
+          <TabItem Header="Overview">
+            <TextBlock Margin="8" Text="FsusTabs overview panel" />
+          </TabItem>
+          <TabItem Header="Disabled" IsEnabled="False">
+            <TextBlock Margin="8" Text="Disabled panel" />
+          </TabItem>
+        </fsus:FsusTabs>
+        <fsus:FsusMenu>
+          <MenuItem Header="FsusMenu item" />
+          <MenuItem Header="Disabled item" IsEnabled="False" />
+        </fsus:FsusMenu>
+      </StackPanel>
+    </Border>
+  </StackPanel>
+</UserControl>
+

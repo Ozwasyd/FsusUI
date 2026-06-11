@@ -1,5 +1,7 @@
-<Styles xmlns="https://github.com/avaloniaui">
-  <Style Selector="Button">
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls">
+  <Style Selector="Button, fsus|FsusButton, fsus|FsusIconButton">
     <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
     <Setter Property="Padding" Value="14,6" />
     <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
@@ -10,33 +12,37 @@
     <Setter Property="Opacity" Value="1" />
   </Style>
 
-  <Style Selector="Button:pointerover">
+  <Style Selector="Button:pointerover, fsus|FsusButton:pointerover, fsus|FsusIconButton:pointerover">
     <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
   </Style>
 
-  <Style Selector="Button:pressed">
+  <Style Selector="Button:pressed, fsus|FsusButton:pressed, fsus|FsusIconButton:pressed">
     <Setter Property="Opacity" Value="0.9" />
   </Style>
 
-  <Style Selector="Button:disabled">
+  <Style Selector="Button:disabled, fsus|FsusButton:disabled, fsus|FsusIconButton:disabled">
     <Setter Property="Background" Value="{DynamicResource FsusThemeDisabledSurfaceBrush}" />
     <Setter Property="Opacity" Value="{DynamicResource FsusThemeDisabledOpacity}" />
   </Style>
 
-  <Style Selector="Button.fsus-primary">
+  <Style Selector="Button.fsus-primary, fsus|FsusButton.fsus-primary, fsus|FsusIconButton.fsus-primary">
     <Setter Property="Background" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
     <Setter Property="Foreground" Value="White" />
     <Setter Property="BorderBrush" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
   </Style>
 
-  <Style Selector="Button.fsus-danger">
+  <Style Selector="Button.fsus-danger, fsus|FsusButton.fsus-danger, fsus|FsusIconButton.fsus-danger">
     <Setter Property="Background" Value="{DynamicResource FsusThemeDangerBrush}" />
     <Setter Property="Foreground" Value="White" />
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeDangerBrush}" />
   </Style>
 
-  <Style Selector="Button.fsus-loading">
+  <Style Selector="Button.fsus-loading, fsus|FsusButton.fsus-loading, fsus|FsusIconButton.fsus-loading">
     <Setter Property="Background" Value="{DynamicResource FsusThemeLoadingBrush}" />
   </Style>
-</Styles>
 
+  <Style Selector="fsus|FsusIconButton">
+    <Setter Property="MinWidth" Value="{DynamicResource FsusDensityControlDefaultY}" />
+    <Setter Property="Padding" Value="6" />
+  </Style>
+</Styles>

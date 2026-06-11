@@ -1,21 +1,22 @@
-<Styles xmlns="https://github.com/avaloniaui">
-  <Style Selector="CheckBox, RadioButton, ToggleSwitch">
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls">
+  <Style Selector="CheckBox, RadioButton, ToggleSwitch, fsus|FsusCheckbox, fsus|FsusRadio, fsus|FsusSwitch">
     <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlCompactY}" />
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
     <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodyMdSize}" />
     <Setter Property="Margin" Value="0,2" />
   </Style>
 
-  <Style Selector="CheckBox:disabled, RadioButton:disabled, ToggleSwitch:disabled">
+  <Style Selector="CheckBox:disabled, RadioButton:disabled, ToggleSwitch:disabled, fsus|FsusCheckbox:disabled, fsus|FsusRadio:disabled, fsus|FsusSwitch:disabled">
     <Setter Property="Opacity" Value="{DynamicResource FsusThemeDisabledOpacity}" />
   </Style>
 
-  <Style Selector="CheckBox:checked, RadioButton:checked, ToggleSwitch:checked">
+  <Style Selector="CheckBox:checked, RadioButton:checked, ToggleSwitch:checked, fsus|FsusCheckbox:checked, fsus|FsusRadio:checked, fsus|FsusSwitch:checked">
     <Setter Property="Foreground" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
   </Style>
 
-  <Style Selector="CheckBox:focus, RadioButton:focus, ToggleSwitch:focus">
+  <Style Selector="CheckBox:focus, RadioButton:focus, ToggleSwitch:focus, fsus|FsusCheckbox:focus, fsus|FsusRadio:focus, fsus|FsusSwitch:focus">
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
   </Style>
 </Styles>
-

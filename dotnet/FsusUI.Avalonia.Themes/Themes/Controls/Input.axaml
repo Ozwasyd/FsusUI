@@ -1,5 +1,7 @@
-<Styles xmlns="https://github.com/avaloniaui">
-  <Style Selector="TextBox">
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls">
+  <Style Selector="TextBox, fsus|FsusInput, fsus|FsusTextarea">
     <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
     <Setter Property="Padding" Value="10,6" />
     <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
@@ -9,22 +11,21 @@
     <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodyMdSize}" />
   </Style>
 
-  <Style Selector="TextBox:focus">
+  <Style Selector="TextBox:focus, fsus|FsusInput:focus, fsus|FsusTextarea:focus">
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FsusThemeFocusThickness}" />
   </Style>
 
-  <Style Selector="TextBox:disabled">
+  <Style Selector="TextBox:disabled, fsus|FsusInput:disabled, fsus|FsusTextarea:disabled">
     <Setter Property="Background" Value="{DynamicResource FsusThemeDisabledSurfaceBrush}" />
     <Setter Property="Opacity" Value="{DynamicResource FsusThemeDisabledOpacity}" />
   </Style>
 
-  <Style Selector="TextBox:read-only">
+  <Style Selector="TextBox:read-only, fsus|FsusInput:read-only, fsus|FsusTextarea:read-only">
     <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
   </Style>
 
-  <Style Selector="TextBox.fsus-invalid">
+  <Style Selector="TextBox.fsus-invalid, fsus|FsusInput.fsus-invalid, fsus|FsusTextarea.fsus-invalid">
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeDangerBrush}" />
   </Style>
 </Styles>
-

@@ -73,6 +73,7 @@
             Foreground="{DynamicResource FsusThemeMutedTextBrush}"
             Text="Navigation" />
           <Button Click="Navigate" Tag="dashboard">Dashboard</Button>
+          <Button Click="Navigate" Tag="components">Component subset</Button>
           <Button Click="Navigate" Tag="settings">Settings page</Button>
           <Button Click="Navigate" Tag="list">List page</Button>
           <Button Click="Navigate" Tag="detail">Detail page</Button>
@@ -110,4 +111,3 @@
     </Grid>
   </Grid>
 </UserControl>
-

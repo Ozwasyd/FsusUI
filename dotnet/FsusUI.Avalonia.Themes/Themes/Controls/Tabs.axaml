@@ -1,5 +1,7 @@
-<Styles xmlns="https://github.com/avaloniaui">
-  <Style Selector="TabControl">
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls">
+  <Style Selector="TabControl, fsus|FsusTabs">
     <Setter Property="Background" Value="{DynamicResource FsusThemeBackgroundBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
     <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodyMdSize}" />
@@ -19,4 +21,3 @@
     <Setter Property="Opacity" Value="{DynamicResource FsusThemeDisabledOpacity}" />
   </Style>
 </Styles>
-

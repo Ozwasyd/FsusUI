@@ -1,0 +1,23 @@
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls">
+  <Style Selector="fsus|FsusTag, fsus|FsusBadge, fsus|FsusAlert">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="Padding" Value="8,4" />
+  </Style>
+
+  <Style Selector="fsus|FsusTag.fsus-primary, fsus|FsusBadge.fsus-primary, fsus|FsusAlert.fsus-primary">
+    <Setter Property="Background" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+    <Setter Property="Foreground" Value="White" />
+  </Style>
+
+  <Style Selector="fsus|FsusTag.fsus-danger, fsus|FsusBadge.fsus-danger, fsus|FsusAlert.fsus-danger">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeDangerBrush}" />
+    <Setter Property="Foreground" Value="White" />
+  </Style>
+
+  <Style Selector="fsus|FsusDivider">
+    <Setter Property="Margin" Value="0,8" />
+  </Style>
+</Styles>

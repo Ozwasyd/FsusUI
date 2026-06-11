@@ -1,0 +1,147 @@
+version: 1
+status: preview
+scope: avalonia-first-subset
+controls:
+  - id: button
+    publicName: FsusButton
+    props:
+      variant: [default, primary, success, warning, danger, text]
+      size: [sm, md, lg]
+      disabled: boolean
+      loading: boolean
+    states: [default, pointerover, pressed, focus-visible, disabled, loading]
+    events: [press]
+    keyboard: { Enter: activate, Space: activate }
+    accessibility: { role: command, name: required, disabledState: required }
+    tokens: [color, typography, space, radius, motion]
+  - id: icon-button
+    publicName: FsusIconButton
+    props:
+      variant: [default, primary, danger, text]
+      size: [sm, md, lg]
+      accessibleName: required
+      disabled: boolean
+      loading: boolean
+    states: [default, pointerover, pressed, focus-visible, disabled, loading]
+    events: [press]
+    keyboard: { Enter: activate, Space: activate }
+    accessibility: { role: command, name: required, iconOnlyLabel: required }
+    tokens: [icon, color, space, radius, motion]
+  - id: input
+    publicName: FsusInput
+    props:
+      value: string
+      placeholder: string
+      disabled: boolean
+      readonly: boolean
+      invalid: boolean
+      clearable: boolean
+    states: [default, hover, focus-visible, disabled, readonly, invalid]
+    events: [input, change, clear]
+    keyboard: { Tab: focus, Escape: clearWhenClearable }
+    accessibility: { role: text-input, name: required, invalidState: required }
+    tokens: [color, typography, border, radius, motion]
+  - id: textarea
+    publicName: FsusTextarea
+    props:
+      value: string
+      placeholder: string
+      disabled: boolean
+      readonly: boolean
+      invalid: boolean
+      rows: number
+    states: [default, hover, focus-visible, disabled, readonly, invalid]
+    events: [input, change]
+    keyboard: { Tab: focus, Enter: newline }
+    accessibility: { role: text-input-multiline, name: required }
+    tokens: [color, typography, border, radius, motion]
+  - id: checkbox
+    publicName: FsusCheckbox
+    props: { checked: boolean, indeterminate: boolean, disabled: boolean }
+    states: [unchecked, checked, indeterminate, focus-visible, disabled]
+    events: [toggle]
+    keyboard: { Space: toggle }
+    accessibility: { role: checkbox, checkedState: required }
+    tokens: [color, icon, motion]
+  - id: radio
+    publicName: FsusRadio
+    props: { checked: boolean, groupName: string, disabled: boolean }
+    states: [unchecked, checked, focus-visible, disabled]
+    events: [select]
+    keyboard: { Space: select, ArrowKeys: moveWithinGroup }
+    accessibility: { role: radio, checkedState: required }
+    tokens: [color, motion]
+  - id: switch
+    publicName: FsusSwitch
+    props: { checked: boolean, disabled: boolean, loading: boolean }
+    states: [off, on, focus-visible, disabled, loading]
+    events: [toggle]
+    keyboard: { Space: toggle }
+    accessibility: { role: switch, checkedState: required }
+    tokens: [color, radius, motion]
+  - id: card
+    publicName: FsusCard
+    props: { selected: boolean, disabled: boolean }
+    states: [static, hoverable, selected, disabled]
+    events: [press]
+    keyboard: { Enter: activateWhenInteractive }
+    accessibility: { role: group, name: optional }
+    tokens: [brush, border, radius, shadow, motion]
+  - id: divider
+    publicName: FsusDivider
+    props: { orientation: [horizontal, vertical] }
+    states: [horizontal, vertical]
+    events: []
+    keyboard: {}
+    accessibility: { role: separator }
+    tokens: [color, thickness, space]
+  - id: tag
+    publicName: FsusTag
+    props: { variant: [default, primary, success, warning, danger, info] }
+    states: [default, selected, disabled, removable]
+    events: [remove]
+    keyboard: { Backspace: removeWhenFocused }
+    accessibility: { role: status, name: required }
+    tokens: [color, typography, radius, space]
+  - id: badge
+    publicName: FsusBadge
+    props: { variant: [primary, success, warning, danger, info], value: string }
+    states: [neutral, info, success, warning, danger]
+    events: []
+    keyboard: {}
+    accessibility: { role: status, name: requiredWhenSemantic }
+    tokens: [color, typography, radius]
+  - id: alert
+    publicName: FsusAlert
+    props:
+      variant: [info, success, warning, danger]
+      dismissible: boolean
+    states: [info, success, warning, danger, dismissible]
+    events: [dismiss]
+    keyboard: { Escape: dismissWhenDismissible }
+    accessibility: { role: alert, name: required }
+    tokens: [color, typography, radius, icon, motion]
+  - id: dialog
+    publicName: FsusDialog
+    props: { modal: boolean, loading: boolean, dangerous: boolean }
+    states: [hidden, entering, open, leaving, loading]
+    events: [open, close, confirm, cancel]
+    keyboard: { Escape: closeWhenAllowed, Tab: trapWithinDialog }
+    accessibility: { role: dialog, name: required, modalState: required }
+    tokens: [brush, shadow, radius, z, motion]
+  - id: tabs
+    publicName: FsusTabs
+    props: { selectedKey: string, disabledItems: array }
+    states: [inactive, active, hover, focus-visible, disabled]
+    events: [select]
+    keyboard: { ArrowKeys: moveFocus, Home: firstTab, End: lastTab }
+    accessibility: { role: tablist, selectedState: required }
+    tokens: [color, typography, space, motion]
+  - id: menu
+    publicName: FsusMenu
+    props: { selectedKey: string, collapsed: boolean }
+    states: [collapsed, expanded, selected, hover, disabled]
+    events: [select]
+    keyboard: { ArrowKeys: moveFocus, Enter: activate, Escape: closeSubmenu }
+    accessibility: { role: menu, selectedState: required }
+    tokens: [color, typography, space, motion, icon]

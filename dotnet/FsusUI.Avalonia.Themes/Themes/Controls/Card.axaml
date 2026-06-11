@@ -1,5 +1,15 @@
-<Styles xmlns="https://github.com/avaloniaui">
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls">
   <Style Selector="Border.fsus-card">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusSurfaceMd}" />
+    <Setter Property="Padding" Value="16" />
+  </Style>
+
+  <Style Selector="fsus|FsusCard">
     <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
@@ -11,7 +21,15 @@
     <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
   </Style>
 
+  <Style Selector="fsus|FsusCard:pointerover">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
+  </Style>
+
   <Style Selector="Border.fsus-card.fsus-selected">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusCard.fsus-selected">
     <Setter Property="BorderBrush" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
   </Style>
 
@@ -21,4 +39,3 @@
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
   </Style>
 </Styles>
-
