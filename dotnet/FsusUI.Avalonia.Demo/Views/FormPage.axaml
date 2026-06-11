@@ -1,0 +1,20 @@
+<UserControl
+  x:Class="FsusUI.Avalonia.Demo.Views.FormPage"
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Border Classes="fsus-card">
+    <StackPanel Spacing="12">
+      <TextBlock FontSize="18" FontWeight="700" Text="Reference form" />
+      <TextBox PlaceholderText="Display name" Text="Avalonia theme baseline" />
+      <TextBox PlaceholderText="Description" Text="Validates TextBox, buttons, toggles, and form footer layout." />
+      <CheckBox IsChecked="True">Include generated token resources</CheckBox>
+      <RadioButton GroupName="Mode" IsChecked="True">System motion mode</RadioButton>
+      <RadioButton GroupName="Mode">Reduced motion mode</RadioButton>
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <Button Classes="fsus-primary">Submit</Button>
+        <Button>Reset</Button>
+      </StackPanel>
+    </StackPanel>
+  </Border>
+</UserControl>
+

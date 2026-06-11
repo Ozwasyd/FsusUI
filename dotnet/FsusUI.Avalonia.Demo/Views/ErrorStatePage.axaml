@@ -1,0 +1,43 @@
+<UserControl
+  x:Class="FsusUI.Avalonia.Demo.Views.ErrorStatePage"
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <StackPanel Spacing="14">
+    <Border Classes="fsus-card">
+      <StackPanel Spacing="10">
+        <TextBlock FontSize="18" FontWeight="700" Text="Recoverable error" />
+        <TextBlock TextWrapping="Wrap" Text="The token checksum could not be verified because the generated docs are stale." />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Button Classes="fsus-primary">Retry check</Button>
+          <Button>Open logs</Button>
+        </StackPanel>
+      </StackPanel>
+    </Border>
+
+    <Border Classes="fsus-card">
+      <StackPanel Spacing="10">
+        <TextBlock FontSize="18" FontWeight="700" Text="Permission denied" />
+        <TextBlock TextWrapping="Wrap" Text="Current user can inspect public theme resources but cannot publish NuGet packages." />
+      </StackPanel>
+    </Border>
+
+    <Border Classes="fsus-card">
+      <StackPanel Spacing="10">
+        <TextBlock FontSize="18" FontWeight="700" Text="Network disconnected" />
+        <TextBlock TextWrapping="Wrap" Text="Package restore is unavailable. Keep local UI state stable and expose a recovery action." />
+      </StackPanel>
+    </Border>
+
+    <Border Classes="fsus-card">
+      <StackPanel Spacing="10">
+        <TextBlock FontSize="18" FontWeight="700" Text="Destructive operation blocked" />
+        <TextBlock
+          Foreground="{DynamicResource FsusThemeDangerBrush}"
+          TextWrapping="Wrap"
+          Text="Deletion is disabled while generated artifacts are out of sync." />
+        <Button Classes="fsus-danger" HorizontalAlignment="Left">Review blocked action</Button>
+      </StackPanel>
+    </Border>
+  </StackPanel>
+</UserControl>
+

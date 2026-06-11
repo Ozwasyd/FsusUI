@@ -1,0 +1,25 @@
+<UserControl
+  x:Class="FsusUI.Avalonia.Demo.Views.EmptyStatePage"
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Border Classes="fsus-card" MinHeight="360">
+    <StackPanel
+      HorizontalAlignment="Center"
+      Spacing="14"
+      VerticalAlignment="Center"
+      Width="360">
+      <TextBlock
+        FontSize="20"
+        FontWeight="700"
+        HorizontalAlignment="Center"
+        Text="No records yet" />
+      <TextBlock
+        Foreground="{DynamicResource FsusThemeMutedTextBrush}"
+        Text="Use this state to validate empty content rhythm, centered action groups, and long copy wrapping."
+        TextAlignment="Center"
+        TextWrapping="Wrap" />
+      <Button Classes="fsus-primary" HorizontalAlignment="Center">Create reference item</Button>
+    </StackPanel>
+  </Border>
+</UserControl>
+

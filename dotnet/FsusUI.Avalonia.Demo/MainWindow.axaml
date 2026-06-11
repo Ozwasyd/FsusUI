@@ -1,0 +1,14 @@
+<Window
+  x:Class="FsusUI.Avalonia.Demo.MainWindow"
+  xmlns="https://github.com/avaloniaui"
+  xmlns:views="using:FsusUI.Avalonia.Demo.Views"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  Classes="fsus-dialog"
+  Height="760"
+  MinHeight="680"
+  MinWidth="1024"
+  Title="FsusUI Avalonia Demo"
+  Width="1180">
+  <views:AppShellView />
+</Window>
+

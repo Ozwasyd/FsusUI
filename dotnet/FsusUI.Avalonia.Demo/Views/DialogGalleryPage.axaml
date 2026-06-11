@@ -1,0 +1,55 @@
+<UserControl
+  x:Class="FsusUI.Avalonia.Demo.Views.DialogGalleryPage"
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="14" RowSpacing="14">
+    <Border Classes="fsus-card">
+      <StackPanel Spacing="10">
+        <TextBlock FontSize="18" FontWeight="700" Text="Confirm dialog" />
+        <TextBlock TextWrapping="Wrap" Text="Use for reversible actions that still need explicit user confirmation." />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Button Classes="fsus-primary">Confirm</Button>
+          <Button>Cancel</Button>
+        </StackPanel>
+      </StackPanel>
+    </Border>
+
+    <Border Grid.Column="1" Classes="fsus-card">
+      <StackPanel Spacing="10">
+        <TextBlock FontSize="18" FontWeight="700" Text="Destructive confirm" />
+        <TextBlock TextWrapping="Wrap" Text="Danger surface validates color, focus order, and blocked action copy." />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Button Classes="fsus-danger">Delete</Button>
+          <Button>Cancel</Button>
+        </StackPanel>
+      </StackPanel>
+    </Border>
+
+    <Border Grid.Row="1" Classes="fsus-card">
+      <StackPanel Spacing="10">
+        <TextBlock FontSize="18" FontWeight="700" Text="Form dialog" />
+        <TextBox PlaceholderText="Dialog title" Text="Create reference item" />
+        <TextBox PlaceholderText="Owner" Text="Design system" />
+        <Button Classes="fsus-primary" HorizontalAlignment="Left">Save</Button>
+      </StackPanel>
+    </Border>
+
+    <Border Grid.Row="1" Grid.Column="1" Classes="fsus-card">
+      <StackPanel Spacing="10">
+        <TextBlock FontSize="18" FontWeight="700" Text="Loading dialog" />
+        <Button Classes="fsus-loading">Syncing generated resources</Button>
+        <TextBlock Foreground="{DynamicResource FsusThemeMutedTextBrush}" Text="Loading state should keep label text readable." />
+      </StackPanel>
+    </Border>
+
+    <Border Grid.Row="2" Grid.ColumnSpan="2" Classes="fsus-card">
+      <StackPanel Spacing="10">
+        <TextBlock FontSize="18" FontWeight="700" Text="Long content dialog" />
+        <TextBlock
+          TextWrapping="Wrap"
+          Text="This long dialog content validates scroll pressure, text wrapping, and spacing under dense management workloads without introducing product-specific behavior. 这段中文用于验证长内容、换行和中英文混排在桌面端弹窗中的稳定性。" />
+      </StackPanel>
+    </Border>
+  </Grid>
+</UserControl>
+

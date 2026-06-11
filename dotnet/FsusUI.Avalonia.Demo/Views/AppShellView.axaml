@@ -1,0 +1,113 @@
+<UserControl
+  x:Class="FsusUI.Avalonia.Demo.Views.AppShellView"
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Grid
+    Background="{DynamicResource FsusThemeBackgroundBrush}"
+    ColumnDefinitions="260,*"
+    RowDefinitions="Auto,*">
+    <Border
+      Grid.ColumnSpan="2"
+      Background="{DynamicResource FsusThemeSurfaceBrush}"
+      BorderBrush="{DynamicResource FsusThemeBorderBrush}"
+      BorderThickness="0,0,0,1"
+      Padding="18,12">
+      <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
+        <StackPanel Spacing="2">
+          <TextBlock
+            FontSize="20"
+            FontWeight="700"
+            Foreground="{DynamicResource FsusThemeTextBrush}"
+            Text="FsusUI Avalonia Demo" />
+          <TextBlock
+            Foreground="{DynamicResource FsusThemeMutedTextBrush}"
+            Text="Platform-neutral validation shell" />
+        </StackPanel>
+
+        <StackPanel
+          Grid.Column="1"
+          Orientation="Horizontal"
+          Spacing="10"
+          VerticalAlignment="Center">
+          <ComboBox
+            x:Name="ThemeSelector"
+            MinWidth="112"
+            SelectedIndex="0"
+            SelectionChanged="ThemeChanged">
+            <ComboBoxItem Content="Light" />
+            <ComboBoxItem Content="Dark" />
+          </ComboBox>
+          <ComboBox
+            x:Name="DensitySelector"
+            MinWidth="112"
+            SelectedIndex="0"
+            SelectionChanged="DensityChanged">
+            <ComboBoxItem Content="Default" />
+            <ComboBoxItem Content="Compact" />
+            <ComboBoxItem Content="Spacious" />
+          </ComboBox>
+          <ComboBox
+            x:Name="MotionSelector"
+            MinWidth="116"
+            SelectedIndex="0"
+            SelectionChanged="MotionChanged">
+            <ComboBoxItem Content="System" />
+            <ComboBoxItem Content="Enabled" />
+            <ComboBoxItem Content="Reduced" />
+            <ComboBoxItem Content="Disabled" />
+          </ComboBox>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <Border
+      Grid.Row="1"
+      Background="{DynamicResource FsusThemeSurfaceBrush}"
+      BorderBrush="{DynamicResource FsusThemeBorderBrush}"
+      BorderThickness="0,0,1,0"
+      Padding="14">
+      <ScrollViewer>
+        <StackPanel Spacing="8">
+          <TextBlock
+            Margin="4,0,0,8"
+            Foreground="{DynamicResource FsusThemeMutedTextBrush}"
+            Text="Navigation" />
+          <Button Click="Navigate" Tag="dashboard">Dashboard</Button>
+          <Button Click="Navigate" Tag="settings">Settings page</Button>
+          <Button Click="Navigate" Tag="list">List page</Button>
+          <Button Click="Navigate" Tag="detail">Detail page</Button>
+          <Button Click="Navigate" Tag="form">Form page</Button>
+          <Button Click="Navigate" Tag="empty">Empty state</Button>
+          <Button Click="Navigate" Tag="error">Error state</Button>
+          <Button Click="Navigate" Tag="dialogs">Dialog gallery</Button>
+        </StackPanel>
+      </ScrollViewer>
+    </Border>
+
+    <Grid Grid.Column="1" Grid.Row="1" RowDefinitions="Auto,*">
+      <Border
+        Background="{DynamicResource FsusThemeSurfaceRaisedBrush}"
+        BorderBrush="{DynamicResource FsusThemeBorderBrush}"
+        BorderThickness="0,0,0,1"
+        Padding="18,12">
+        <StackPanel Spacing="2">
+          <TextBlock
+            x:Name="BreadcrumbText"
+            Foreground="{DynamicResource FsusThemeMutedTextBrush}"
+            Text="Demo / Dashboard" />
+          <TextBlock
+            x:Name="PageTitleText"
+            FontSize="24"
+            FontWeight="700"
+            Foreground="{DynamicResource FsusThemeTextBrush}"
+            Text="Dashboard" />
+        </StackPanel>
+      </Border>
+
+      <ScrollViewer Grid.Row="1">
+        <ContentControl x:Name="PageHost" Margin="18" />
+      </ScrollViewer>
+    </Grid>
+  </Grid>
+</UserControl>
+

@@ -1,0 +1,32 @@
+<UserControl
+  x:Class="FsusUI.Avalonia.Demo.Views.SettingsPage"
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <StackPanel Spacing="14">
+    <Border Classes="fsus-card">
+      <StackPanel Spacing="12">
+        <TextBlock FontSize="18" FontWeight="700" Text="Appearance" />
+        <CheckBox IsChecked="True">Follow platform theme when available</CheckBox>
+        <ToggleSwitch Content="Enable semantic motion" IsChecked="True" />
+        <ToggleSwitch Content="Compact navigation density" />
+      </StackPanel>
+    </Border>
+
+    <Border Classes="fsus-card">
+      <StackPanel Spacing="12">
+        <TextBlock FontSize="18" FontWeight="700" Text="Validation summary" />
+        <TextBox PlaceholderText="Workspace display name" Text="FsusUI Reference Workspace" />
+        <TextBox Classes="fsus-invalid" PlaceholderText="Token namespace" Text="fsus" />
+        <TextBlock
+          Foreground="{DynamicResource FsusThemeDangerBrush}"
+          Text="Example invalid state: namespace must remain platform-neutral." />
+      </StackPanel>
+    </Border>
+
+    <StackPanel Orientation="Horizontal" Spacing="8">
+      <Button Classes="fsus-primary">Save settings</Button>
+      <Button>Cancel</Button>
+    </StackPanel>
+  </StackPanel>
+</UserControl>
+

@@ -1,0 +1,50 @@
+<UserControl
+  x:Class="FsusUI.Avalonia.Demo.Views.DashboardPage"
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <StackPanel Spacing="16">
+    <TextBlock
+      Foreground="{DynamicResource FsusThemeMutedTextBrush}"
+      Text="Reference shell for validating layout, navigation, density, focus, theme, and motion behavior." />
+
+    <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="12">
+      <Border Classes="fsus-card">
+        <StackPanel Spacing="8">
+          <TextBlock FontWeight="700" Text="App shell" />
+          <TextBlock TextWrapping="Wrap" Text="Sidebar, topbar, breadcrumb, content surface, and responsive minimum size." />
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="1" Classes="fsus-card">
+        <StackPanel Spacing="8">
+          <TextBlock FontWeight="700" Text="Theme package" />
+          <TextBlock TextWrapping="Wrap" Text="Loaded from FsusUI.Avalonia.Themes with generated token resources." />
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="2" Classes="fsus-card">
+        <StackPanel Spacing="8">
+          <TextBlock FontWeight="700" Text="Static data" />
+          <TextBlock TextWrapping="Wrap" Text="Safe for public screenshots and visual regression baselines." />
+        </StackPanel>
+      </Border>
+      <Border Grid.Row="1" Classes="fsus-card">
+        <StackPanel Spacing="8">
+          <TextBlock FontWeight="700" Text="Long Chinese text" />
+          <TextBlock TextWrapping="Wrap" Text="用于验证中文字体渲染、换行、紧凑密度和高 DPI 下的控件可读性。" />
+        </StackPanel>
+      </Border>
+      <Border Grid.Row="1" Grid.Column="1" Classes="fsus-card">
+        <StackPanel Spacing="8">
+          <TextBlock FontWeight="700" Text="Long English text" />
+          <TextBlock TextWrapping="Wrap" Text="This sentence validates wrapping, truncation pressure, and predictable spacing in desktop management screens." />
+        </StackPanel>
+      </Border>
+      <Border Grid.Row="1" Grid.Column="2" Classes="fsus-card fsus-selected">
+        <StackPanel Spacing="8">
+          <TextBlock FontWeight="700" Text="Motion policy" />
+          <TextBlock TextWrapping="Wrap" Text="Mode selection is resource-driven and aligned with the Web motion system." />
+        </StackPanel>
+      </Border>
+    </Grid>
+  </StackPanel>
+</UserControl>
+

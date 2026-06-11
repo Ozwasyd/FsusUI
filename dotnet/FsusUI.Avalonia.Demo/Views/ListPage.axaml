@@ -1,0 +1,50 @@
+<UserControl
+  x:Class="FsusUI.Avalonia.Demo.Views.ListPage"
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <StackPanel Spacing="14">
+    <Border Classes="fsus-card">
+      <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+        <TextBox PlaceholderText="Search demo records" />
+        <Button Grid.Column="1">Filter placeholder</Button>
+        <Button Grid.Column="2" Classes="fsus-primary">Bulk action</Button>
+      </Grid>
+    </Border>
+
+    <Border Classes="fsus-card">
+      <StackPanel Spacing="0">
+        <Grid ColumnDefinitions="90,*,160,160" Margin="0,0,0,8">
+          <TextBlock FontWeight="700" Text="ID" />
+          <TextBlock Grid.Column="1" FontWeight="700" Text="Name" />
+          <TextBlock Grid.Column="2" FontWeight="700" Text="Status" />
+          <TextBlock Grid.Column="3" FontWeight="700" Text="Owner" />
+        </Grid>
+        <Border BorderBrush="{DynamicResource FsusThemeBorderBrush}" BorderThickness="0,1,0,0" />
+        <Grid ColumnDefinitions="90,*,160,160" Margin="0,12">
+          <TextBlock Text="AV-104" />
+          <TextBlock Grid.Column="1" Text="Cross-platform token review queue" />
+          <TextBlock Grid.Column="2" Foreground="{DynamicResource FsusColorActionPrimaryBrush}" Text="Ready" />
+          <TextBlock Grid.Column="3" Text="Design system" />
+        </Grid>
+        <Border BorderBrush="{DynamicResource FsusThemeBorderBrush}" BorderThickness="0,1,0,0" />
+        <Grid ColumnDefinitions="90,*,160,160" Margin="0,12">
+          <TextBlock Text="AV-205" />
+          <TextBlock
+            Grid.Column="1"
+            Text="很长的中文列表项用于验证截断、换行和高 DPI 字体渲染" />
+          <TextBlock Grid.Column="2" Text="Watching" />
+          <TextBlock Grid.Column="3" Text="QA" />
+        </Grid>
+        <Border BorderBrush="{DynamicResource FsusThemeBorderBrush}" BorderThickness="0,1,0,0" />
+        <Grid ColumnDefinitions="90,*,160,160" Margin="0,12">
+          <TextBlock Text="AV-318" />
+          <TextBlock
+            Grid.Column="1"
+            Text="Long English list item for predictable truncation and repeated action scanning" />
+          <TextBlock Grid.Column="2" Text="Blocked" />
+          <TextBlock Grid.Column="3" Text="Platform" />
+        </Grid>
+      </StackPanel>
+    </Border>
+  </StackPanel>
+</UserControl>

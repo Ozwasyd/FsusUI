@@ -1,0 +1,37 @@
+<UserControl
+  x:Class="FsusUI.Avalonia.Demo.Views.DetailPage"
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <StackPanel Spacing="14">
+    <Border Classes="fsus-card">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+        <StackPanel Spacing="4">
+          <TextBlock FontSize="20" FontWeight="700" Text="Token Generator Run" />
+          <TextBlock Foreground="{DynamicResource FsusThemeMutedTextBrush}" Text="ID AV-104 / last checked 2026-06-12 00:00:00" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+          <Button>Copy ID</Button>
+          <Button Classes="fsus-primary">Open artifact</Button>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
+      <Border Classes="fsus-card">
+        <StackPanel Spacing="8">
+          <TextBlock FontWeight="700" Text="Detail sections" />
+          <TextBlock TextWrapping="Wrap" Text="Generated Web CSS, SCSS, JSON, Avalonia XAML, C# constants, docs, and checksum artifacts are tracked from one source." />
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="1" Classes="fsus-card">
+        <StackPanel Spacing="8">
+          <TextBlock FontWeight="700" Text="Activity" />
+          <TextBlock Text="00:01 token source updated" />
+          <TextBlock Text="00:02 generated artifacts checked" />
+          <TextBlock Text="00:03 Avalonia theme build passed" />
+        </StackPanel>
+      </Border>
+    </Grid>
+  </StackPanel>
+</UserControl>
+
