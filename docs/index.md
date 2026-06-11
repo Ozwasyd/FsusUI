@@ -1,6 +1,6 @@
 # FsusUI 文档中心
 
-FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Minimalist），采用 pnpm monorepo 架构；当前对外 GitHub Packages 主包为 `@ozwasyd/element-plus`。
+FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Minimalist），采用 pnpm monorepo 架构；当前 npm public registry 主包为 `@ozwasyd/element-plus`。
 
 ---
 
@@ -22,7 +22,7 @@ FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Mini
 | [安全策略](../SECURITY.md)                                   | 漏洞报告、支持版本、XSS/SVG/WASM/供应链范围     |
 | [行为准则](../CODE_OF_CONDUCT.md)                            | public-preview 协作和安全披露行为约束           |
 | [工程维护交接](./engineering-handoff.md)                     | 环境基线、标准命令、CI 分工、常见问题排查       |
-| [发布治理](./release-governance.md)                          | GitHub Packages 发布流程、Changesets 版本管理   |
+| [发布治理](./release-governance.md)                          | npm 发布流程、Changesets 版本管理               |
 | [npm 发布策略](./release/npm-registry-policy.md)             | npm registry、provenance、dist-tag 与包审计策略 |
 | [模板审计报告](./runtime-template-audit.md)                  | 模板 DOM 扫描结果（Wave 0 已全部完成）          |
 | [模板重构计划](./runtime-template-refactor-plan.md)          | 模板重构 Guardrails 与审计命令                  |
@@ -36,7 +36,7 @@ FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Mini
 
 | 文档                                           | 说明                                                   |
 | ---------------------------------------------- | ------------------------------------------------------ |
-| [安装](./guide/installation.md)                | 环境要求、通过 GitHub Packages 安装、配置 `.npmrc`     |
+| [安装](./guide/installation.md)                | 环境要求、通过 npm public registry 安装                |
 | [快速开始](./guide/quickstart.md)              | 全量引入、按需引入、全局配置                           |
 | [主题定制](./guide/theming.md)                 | CSS 变量覆盖、SCSS 变量、FsusUI 学术蓝配色规范         |
 | [主题 Customization](./theme/customization.md) | 颜色、圆角、间距、阴影、theme-chalk 与安全覆盖模式     |

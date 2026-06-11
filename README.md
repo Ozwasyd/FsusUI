@@ -42,14 +42,9 @@ explicitly says so.
 
 ## Install
 
-Current public-preview distribution uses GitHub Packages.
-
-Configure `.npmrc`:
-
-```ini
-@ozwasyd:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
-```
+Current public-preview distribution uses the npm public registry:
+`https://registry.npmjs.org/`. The install package is
+`@ozwasyd/element-plus`.
 
 Install:
 
@@ -57,8 +52,8 @@ Install:
 pnpm install @ozwasyd/element-plus
 ```
 
-`GITHUB_TOKEN` needs `read:packages` permission for GitHub Packages installs.
-The public npm registry policy is documented in
+No package-specific `.npmrc` or GitHub package token is required. The npm
+registry policy is documented in
 [npm registry publishing policy](./docs/release/npm-registry-policy.md).
 
 ## Basic Vue Usage

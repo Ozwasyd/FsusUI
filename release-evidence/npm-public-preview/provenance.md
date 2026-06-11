@@ -5,29 +5,28 @@ Repository: `Ozwasyd/FsusUI`
 
 ## Current Status
 
-FsusUI is not approved for public npm publishing yet. The current package flow targets GitHub Packages, and public npm publication is gated by #8.
+FsusUI publishes public-preview packages through npm public registry with tag-triggered GitHub Actions publishing.
 
 ## Required Provenance Approach
 
 - Use npm trusted publishing through GitHub Actions OIDC when publishing public-preview packages.
-- Publish with provenance enabled, for example `npm publish --tag preview --provenance`.
+- Use Node `22.14.0+` and npm CLI `11.5.1+`.
+- Do not set `NODE_AUTH_TOKEN`; trusted publishing exchanges GitHub Actions OIDC for npm publish authorization.
+- Trusted publishing generates provenance automatically.
 - Require maintainer 2FA for npm account access.
-- Avoid long-lived npm tokens. If a token is temporarily required, scope it to the package and keep it in GitHub Actions secrets.
 - Never print npm token values, `.npmrc` contents, or auth headers in CI logs.
 
 ## Dist-Tag Evidence
 
-Public preview must publish to `preview` or `next`, never directly to `latest`.
-
 ```text
-latest  -> stable only
-next    -> preview / prerelease
-preview -> public-preview builds
-canary  -> commit-based test builds if enabled
+vX.Y.Z -> latest
+vX.Y.Z-preview.N -> preview
+vX.Y.Z-alpha.N / beta.N / rc.N / next.N -> next
 ```
+
+Other prerelease identifiers fail before publish.
 
 ## Open Before Publish
 
-- Create or update a GitHub Actions npm publish workflow using trusted publishing.
-- Confirm package name policy between `@ozwasyd/fsus-ui` and `@ozwasyd/element-plus`.
+- Confirm the npmjs.com trusted publisher entry uses owner `Ozwasyd`, repo `FsusUI`, workflow filename `publish-npm.yml`, and allowed action `npm publish`.
 - Attach package audit and consumer install evidence to the public-preview release notes.

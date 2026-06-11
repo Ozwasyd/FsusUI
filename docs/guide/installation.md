@@ -32,24 +32,11 @@ export default defineConfig({
 
 ---
 
-## 通过 GitHub Packages 安装
+## 通过 npm 安装
 
-FsusUI 发布在 **GitHub Packages**，不发布到 npm 公共仓库。安装前需要配置 GitHub Packages 认证。
+FsusUI public preview 发布在 npm public registry：`https://registry.npmjs.org/`。
 
-当前正式安装名为 `@ozwasyd/element-plus`。这个 scope 来自仓库所有者，和发布工件中的 `.npmrc` 保持一致。
-
-### 第一步：配置 .npmrc
-
-在项目根目录或用户目录 `~/.npmrc` 中添加：
-
-```ini
-@ozwasyd:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
-```
-
-> **说明**：`GITHUB_TOKEN` 需要具备 `read:packages` 权限。可在 GitHub 个人设置 → Developer settings → Personal access tokens 中生成。
-
-### 第二步：安装包
+当前正式安装名为 `@ozwasyd/element-plus`。安装不需要项目级 `.npmrc`、scope registry 配置或 GitHub package token。
 
 ```bash
 pnpm install @ozwasyd/element-plus

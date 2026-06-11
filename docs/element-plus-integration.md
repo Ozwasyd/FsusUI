@@ -4,7 +4,7 @@
 
 适用人群：
 
-- **业务项目接入/迁移**：从 Element Plus 切换到本仓库构建产物（或 GitHub package）时的注意事项
+- **业务项目接入/迁移**：从 Element Plus 切换到本仓库 npm 构建产物时的注意事项
 - **仓库内开发联调**：在本仓库里用 demo、源码 alias、源码态样式进行开发与调试
 
 相关入口：
@@ -21,7 +21,7 @@
 
 ### A2. 安装与入口（发布名 vs 源码名）
 
-当前对外 GitHub Packages 主包为 `@ozwasyd/element-plus`。仓库内部源码主入口仍位于 `packages/element-plus`，源码包名保持 `element-plus`，两者不要混用。
+当前对外 npm public registry 主包为 `@ozwasyd/element-plus`。仓库内部源码主入口仍位于 `packages/element-plus`，源码包名保持 `element-plus`，两者不要混用。
 
 - 业务项目整包安装入口：`@ozwasyd/element-plus`
 - 全局类型入口：`@ozwasyd/element-plus/global`

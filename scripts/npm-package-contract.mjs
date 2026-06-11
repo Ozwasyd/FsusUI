@@ -1,6 +1,7 @@
 import { execFileSync } from 'node:child_process'
 
-export const registryUrl = 'https://npm.pkg.github.com'
+export const registryUrl = 'https://registry.npmjs.org/'
+export const defaultPackageName = '@ozwasyd/element-plus'
 
 export function sanitizePackagePart(value) {
   const sanitized = value
@@ -96,34 +97,26 @@ export function resolveRepositoryContext(repoRoot) {
   return parseRepositoryFromRemote(remoteUrl)
 }
 
-export function resolvePackageName(owner, defaultBaseName) {
-  const configuredName = process.env.GITHUB_PACKAGE_NAME?.trim()
+export function resolvePackageName() {
+  const configuredName = process.env.NPM_PACKAGE_NAME?.trim()
   if (configuredName) {
     return configuredName
   }
 
-  const scope = sanitizePackagePart(process.env.GITHUB_PACKAGE_SCOPE || owner)
-  const packageBaseName = sanitizePackagePart(
-    process.env.GITHUB_PACKAGE_BASENAME || defaultBaseName,
-  )
-
-  return `@${scope}/${packageBaseName}`
+  return defaultPackageName
 }
 
 export function validateScopedPackageName(packageName) {
   if (!/^@[a-z0-9][a-z0-9-]*\/[a-z0-9][a-z0-9-]*$/.test(packageName)) {
     throw new Error(
-      `GitHub Packages requires a lowercase scoped package name, got: ${packageName}`,
+      `npm public publishing requires the configured lowercase scoped package name, got: ${packageName}`,
     )
   }
 }
 
-export function resolvePackageContract({ repoRoot, sourcePackageName }) {
+export function resolvePackageContract({ repoRoot }) {
   const repository = resolveRepositoryContext(repoRoot)
-  const packageName = resolvePackageName(
-    repository.owner,
-    getPackageBaseName(sourcePackageName),
-  )
+  const packageName = resolvePackageName()
 
   validateScopedPackageName(packageName)
 

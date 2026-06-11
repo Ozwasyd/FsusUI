@@ -48,15 +48,15 @@ The following surfaces are internal or unsupported for external consumers:
 
 ## Known Differences From Element Plus
 
-| Topic             | Difference                                                                                                  |
-| ----------------- | ----------------------------------------------------------------------------------------------------------- |
-| Browser support   | FsusUI targets ES2022 and does not claim Element Plus' older browser baseline.                              |
-| Package registry  | Public preview publishing starts from GitHub Packages. Public npm registry rules are documented separately. |
-| Theme defaults    | FsusUI uses an academic-blue visual direction and additional semantic tokens.                               |
-| Motion behavior   | Components can receive reduced or disabled motion settings through ConfigProvider.                          |
-| Markdown features | Markdown rendering, code highlighting, math, Mermaid, and related runtime helpers are FsusUI-specific.      |
-| Render budgets    | The render-pipeline API is specific to FsusUI public-shell and integration work.                            |
-| Result mode       | `FsusResult<T>` is a FsusUI contract for recoverable failures.                                              |
+| Topic             | Difference                                                                                                       |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Browser support   | FsusUI targets ES2022 and does not claim Element Plus' older browser baseline.                                   |
+| Package registry  | Public preview publishing uses the npm public registry. Dist-tag and provenance rules are documented separately. |
+| Theme defaults    | FsusUI uses an academic-blue visual direction and additional semantic tokens.                                    |
+| Motion behavior   | Components can receive reduced or disabled motion settings through ConfigProvider.                               |
+| Markdown features | Markdown rendering, code highlighting, math, Mermaid, and related runtime helpers are FsusUI-specific.           |
+| Render budgets    | The render-pipeline API is specific to FsusUI public-shell and integration work.                                 |
+| Result mode       | `FsusResult<T>` is a FsusUI contract for recoverable failures.                                                   |
 
 ## Testing Standard
 

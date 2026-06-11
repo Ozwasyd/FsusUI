@@ -9,10 +9,10 @@ import {
   registerFsusRenderPipelineAdapter,
   registerFsusRenderPipelineComponentPolicy,
   useFsusRenderPipelineRuntime,
-} from 'element-plus/render-pipeline'
+} from '@ozwasyd/element-plus/render-pipeline'
 ```
 
-如果使用当前 GitHub Packages 主包名，则导入路径为 `@ozwasyd/element-plus/render-pipeline`。
+发布包导入路径为 `@ozwasyd/element-plus/render-pipeline`。源码联调时仓库内部仍可通过 `element-plus/render-pipeline` alias 访问同一入口。
 
 ## 配置
 
@@ -55,7 +55,7 @@ import {
 import {
   registerFsusRenderPipelineAdapter,
   registerFsusRenderPipelineComponentPolicy,
-} from 'element-plus/render-pipeline'
+} from '@ozwasyd/element-plus/render-pipeline'
 
 const unregisterAdapter = registerFsusRenderPipelineAdapter({
   id: 'article-blocks',

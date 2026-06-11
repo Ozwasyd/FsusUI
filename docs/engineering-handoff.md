@@ -46,7 +46,7 @@ pnpm verify:release
 
 - `test:coverage`：成功生成 `coverage/`，包含 `lcov`
 - `test:visual`：Playwright 多项目截图与 smoke 通过，不重建基线
-- `verify:release`：`verify` 和 `build:github-package` 一并通过
+- `verify:release`：`verify`、`check:npm-dist-tag`、`build:npm-package` 和 `test:consumer-install` 一并通过
 
 ## WASM
 
@@ -80,7 +80,7 @@ MarkdownRenderer 组件不携带完整文章排版主题，但会通过 public `
 
 - `.github/workflows/quality.yml` 是统一质量入口
 - `.github/workflows/_quality.yml` 是可复用质量门定义
-- `publish-github-package.yml` 必须依赖质量门通过后再发布
+- `publish-npm.yml` 必须依赖质量门通过后再发布
 
 当前 CI job 分工：
 
@@ -103,7 +103,8 @@ MarkdownRenderer 组件不携带完整文章排版主题，但会通过 public `
 5. `pnpm build:demo`
 6. `pnpm test:coverage`
 7. `pnpm test:visual`
-8. `pnpm run build:github-package`
+8. `pnpm run check:npm-dist-tag`
+9. `pnpm run build:npm-package`
 
 高频问题与对应位置：
 
@@ -111,7 +112,7 @@ MarkdownRenderer 组件不携带完整文章排版主题，但会通过 public `
 - 覆盖率范围或门槛：看 [vitest.config.ts](/data/projects/FsusUI/vitest.config.ts:1)
 - 视觉回归失败：先看 [playwright.config.ts](/data/projects/FsusUI/playwright.config.ts:1) 和 [tests/visual/demo-app.spec.ts](/data/projects/FsusUI/tests/visual/demo-app.spec.ts:1)
 - demo 夹具问题：看 [packages/demo-app/src/VisualFixtures.vue](/data/projects/FsusUI/packages/demo-app/src/VisualFixtures.vue:1)
-- GitHub Package 准备问题：看 `scripts/prepare-github-package.mjs`
+- npm package 准备问题：看 `scripts/prepare-npm-package.mjs`
 - 根构建类型生成问题：看 `internal/build/src/tasks/types-definitions.ts`
 
 ## 5. Vitest、Coverage、Playwright 的关系
@@ -163,7 +164,8 @@ MarkdownRenderer 组件不携带完整文章排版主题，但会通过 public `
 pnpm install
 pnpm verify
 pnpm test:visual
-pnpm run build:github-package
+pnpm run build:npm-package
+pnpm test:consumer-install
 ```
 
-如果这三步都通过，说明当前仓库质量门、视觉基线和发布工件链路都处于可维护状态。
+如果这些步骤都通过，说明当前仓库质量门、视觉基线和发布工件链路都处于可维护状态。

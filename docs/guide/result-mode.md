@@ -5,10 +5,10 @@ FsusUI 使用 `FsusResult<T>` 表达可恢复失败。用户输入、WASM、Work
 推荐从专用入口导入：
 
 ```ts
-import { fsusOk, fsusErr, type FsusResult } from 'element-plus/result'
+import { fsusOk, fsusErr, type FsusResult } from '@ozwasyd/element-plus/result'
 ```
 
-如果使用当前 GitHub Packages 主包名，导入路径为 `@ozwasyd/element-plus/result`。
+源码联调时仓库内部仍可通过 `element-plus/result` alias 访问同一入口。
 
 ## 数据结构
 
@@ -72,12 +72,12 @@ submit()
 
 ## 迁移表
 
-| 旧写法 | 新写法 |
-| ------ | ------ |
-| `try { await validate() } catch (fields) { ... }` | `const result = await validate(); if (!result.ok) { ... }` |
-| `MessageBox.confirm(...).catch(...)` | `const result = await MessageBox.confirm(...); if (!result.ok) { ... }` |
+| 旧写法                                                              | 新写法                                                                             |
+| ------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `try { await validate() } catch (fields) { ... }`                   | `const result = await validate(); if (!result.ok) { ... }`                         |
+| `MessageBox.confirm(...).catch(...)`                                | `const result = await MessageBox.confirm(...); if (!result.ok) { ... }`            |
 | `const html = await renderMarkdownWithRuntime(...); if (!html) ...` | `const result = await renderMarkdownWithRuntime(...); if (result.ok) result.value` |
-| `worker.run(...).catch(...)` | `const result = await worker.run(...); if (!result.ok) ...` |
+| `worker.run(...).catch(...)`                                        | `const result = await worker.run(...); if (!result.ok) ...`                        |
 
 ## Release Gate
 

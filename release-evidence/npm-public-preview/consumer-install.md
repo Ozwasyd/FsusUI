@@ -28,11 +28,11 @@ Observed output:
 
 ```text
 dependencies:
-+ @ozwasyd/element-plus file:/tmp/fsusui-consumer-Y9lUbc/artifacts/ozwasyd-element-plus-1.5.0.tgz
++ @ozwasyd/element-plus file:/tmp/fsusui-consumer-sDChKO/artifacts/ozwasyd-element-plus-1.5.0.tgz
 
-vite v7.3.5 building client environment for production...
+vite v7.3.1 building client environment for production...
 ✓ 1911 modules transformed.
-✓ built in 11.77s
+✓ built in 12.97s
 Consumer JS chunk budget passed: largest=vendor-shikijs-langs-DEXqtc4K.js 476.08 KiB.
 Consumer install smoke passed for @ozwasyd/element-plus.
 ```

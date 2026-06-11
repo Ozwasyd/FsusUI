@@ -13,7 +13,7 @@ import { execFileSync, spawnSync } from 'node:child_process'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { resolvePackageContract } from './github-package-contract.mjs'
+import { resolvePackageContract } from './npm-package-contract.mjs'
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(scriptDir, '..')
@@ -40,7 +40,7 @@ const chunkBudgetBytes = 500 * 1024
 
 if (!existsSync(distPackagePath)) {
   throw new Error(
-    'Missing dist/element-plus/package.json. Run `pnpm run build:github-package` before `pnpm test:consumer-install`.',
+    'Missing dist/element-plus/package.json. Run `pnpm run build:npm-package` before `pnpm test:consumer-install`.',
   )
 }
 
@@ -149,7 +149,9 @@ const formatSize = (bytes) => `${(bytes / 1024).toFixed(2)} KiB`
 function assertConsumerChunkBudget(fixtureRoot) {
   const assetsRoot = path.join(fixtureRoot, 'dist', 'assets')
   const chunks = collectJsChunks(assetsRoot).sort((a, b) => b.size - a.size)
-  const oversizedChunks = chunks.filter((chunk) => chunk.size > chunkBudgetBytes)
+  const oversizedChunks = chunks.filter(
+    (chunk) => chunk.size > chunkBudgetBytes,
+  )
 
   if (oversizedChunks.length > 0) {
     const largestChunks = chunks

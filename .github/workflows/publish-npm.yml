@@ -1,0 +1,112 @@
+name: Publish npm Package
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+      - 'v*.*.*-*'
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: publish-npm-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  quality:
+    uses: ./.github/workflows/_quality.yml
+
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: quality
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Use npm 11.5.1+
+        run: |
+          npm install -g npm@^11.5.1
+          npm --version
+
+      - uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build npm package candidate
+        run: pnpm run build:npm-package
+
+      - name: Resolve package metadata
+        id: package
+        run: |
+          set -euo pipefail
+
+          tag_version="${GITHUB_REF_NAME#v}"
+          package_json="dist/element-plus/package.json"
+          name="$(node -p "require('./${package_json}').name")"
+          version="$(node -p "require('./${package_json}').version")"
+
+          if [ "${tag_version}" != "${version}" ]; then
+            echo "Tag version ${tag_version} does not match ${package_json} version ${version}." >&2
+            exit 1
+          fi
+
+          dist_tag="$(node ./scripts/resolve-npm-dist-tag.mjs "${version}")"
+
+          {
+            echo "name=${name}"
+            echo "version=${version}"
+            echo "dist_tag=${dist_tag}"
+          } >> "${GITHUB_OUTPUT}"
+
+          echo "Publishing ${name}@${version} with dist-tag ${dist_tag}."
+
+      - name: Check npm version availability
+        id: npm_view
+        run: |
+          set -euo pipefail
+          package_spec="${{ steps.package.outputs.name }}@${{ steps.package.outputs.version }}"
+
+          set +e
+          view_output="$(npm view "${package_spec}" version --registry=https://registry.npmjs.org/ 2>&1)"
+          view_status=$?
+          set -e
+
+          if [ "${view_status}" -eq 0 ]; then
+            echo "exists=true" >> "${GITHUB_OUTPUT}"
+            echo "${package_spec} already exists on npm as ${view_output}. Skipping publish."
+            exit 0
+          fi
+
+          if echo "${view_output}" | grep -Eq 'E404|404 Not Found'; then
+            echo "exists=false" >> "${GITHUB_OUTPUT}"
+            echo "${package_spec} does not exist on npm yet."
+            exit 0
+          fi
+
+          echo "${view_output}" >&2
+          exit "${view_status}"
+
+      - name: Publish to npm
+        if: steps.npm_view.outputs.exists != 'true'
+        working-directory: dist/element-plus
+        run: npm publish --access public --tag "${{ steps.package.outputs.dist_tag }}"
+
+      - name: Report skipped publish
+        if: steps.npm_view.outputs.exists == 'true'
+        run: |
+          echo "${{ steps.package.outputs.name }}@${{ steps.package.outputs.version }} already exists on npm. No publish was attempted."

@@ -33,12 +33,8 @@ Internal workspace packages under `internal/*` are not public API.
 
 ## Installation
 
-Current public-preview distribution is GitHub Packages:
-
-```ini
-@ozwasyd:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
-```
+Current public-preview distribution uses npm public registry:
+`https://registry.npmjs.org/`.
 
 ```bash
 pnpm install @ozwasyd/element-plus
@@ -55,7 +51,7 @@ import App from './App.vue'
 createApp(App).use(FsusUI).mount('#app')
 ```
 
-Public npm registry publishing policy is documented in
+The npm registry publishing policy is documented in
 [`docs/release/npm-registry-policy.md`](../release/npm-registry-policy.md).
 
 ## Known Limitations
@@ -87,5 +83,6 @@ and [`docs/migration/from-element-plus.md`](../migration/from-element-plus.md).
 | Consumer install test   | Recorded in `release-evidence/npm-public-preview/consumer-install.md`. |
 | Provenance policy       | Recorded in `release-evidence/npm-public-preview/provenance.md`.       |
 
-The first public preview must use a preview dist-tag and must not be promoted to
-`latest` until stable API criteria are separately approved.
+Version tags determine dist-tags: stable `X.Y.Z` releases publish to `latest`,
+`preview` prereleases publish to `preview`, and `alpha` / `beta` / `rc` /
+`next` prereleases publish to `next`.

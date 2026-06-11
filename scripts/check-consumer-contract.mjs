@@ -1,10 +1,7 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import {
-  registryUrl,
-  resolvePackageContract,
-} from './github-package-contract.mjs'
+import { registryUrl, resolvePackageContract } from './npm-package-contract.mjs'
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(scriptDir, '..')
@@ -35,12 +32,18 @@ const consumerDocs = [
   'docs/components/form.md',
 ]
 
+const legacyRegistryHost = ['npm.pkg', 'github.com'].join('.')
+const legacyScope = ['@', 'ozwasyd', ':registry='].join('')
+
 const forbiddenSnippets = [
   "'element-plus'",
   '"element-plus"',
   "'element-plus/",
   '"element-plus/',
-  '@element-plus:registry=https://npm.pkg.github.com',
+  legacyRegistryHost,
+  legacyScope,
+  `@element-plus:registry=https://${legacyRegistryHost}`,
+  'GITHUB_TOKEN',
   'pnpm install element-plus',
 ]
 
@@ -63,13 +66,7 @@ function expectEqual(actual, expected, label) {
 const requiredSnippets = new Map([
   ['README.md', [`\`${packageName}\``]],
   ['docs/index.md', [`\`${packageName}\``]],
-  [
-    'docs/guide/installation.md',
-    [
-      `@${packageName.slice(1).split('/')[0]}:registry=${registryUrl}`,
-      `pnpm install ${packageName}`,
-    ],
-  ],
+  ['docs/guide/installation.md', [registryUrl, `pnpm install ${packageName}`]],
   [
     'docs/guide/quickstart.md',
     [
@@ -151,7 +148,7 @@ const installationGuide = readFileSync(
 
 if (!installationGuide.includes(registryUrl)) {
   errors.push(
-    'docs/guide/installation.md must mention the GitHub Packages registry URL.',
+    'docs/guide/installation.md must mention the npm public registry URL.',
   )
 }
 
@@ -159,4 +156,4 @@ if (errors.length > 0) {
   throw new Error(`Consumer contract drift detected:\n- ${errors.join('\n- ')}`)
 }
 
-console.log(`Consumer contract matches ${packageName} and ${registryUrl}.`)
+console.log(`Consumer contract matches ${packageName} and npm public registry.`)

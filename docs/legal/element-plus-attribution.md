@@ -22,7 +22,7 @@ FsusUI-specific changes are maintained by Ozwasyd. This includes:
 - FsusUI public-preview documentation and release evidence.
 - Theme token, motion token, and visual-system changes.
 - WASM and Markdown runtime integration work.
-- GitHub Packages and public npm publishing policy.
+- npm public publishing policy.
 - Demo app wiring, visual regression coverage, and contribution workflow.
 
 Element Plus compatibility is best-effort unless covered by local tests or

@@ -45,7 +45,7 @@ packages:
   - internal/*
 ```
 
-### packages/*
+### packages/\*
 
 - `packages/element-plus`：对外主入口包（包名仍为 `element-plus`），聚合导出组件/指令/hooks/常量，并提供默认安装器。
 - `packages/components`：组件源码集合（按组件目录组织）。
@@ -59,7 +59,7 @@ packages:
 - `packages/wasm`：WASM 性能层（`@element-plus/wasm`），提供排序/过滤/颜色/精度/行高等计算能力。
 - `packages/demo-app`：Vite demo 应用，用于本地联调与展示。
 
-### internal/*
+### internal/\*
 
 - `internal/build`：构建工具链入口（根 `pnpm build` 调用此包）。
 - `internal/eslint-config`：ESLint Flat Config 封装（`@element-plus/eslint-config`）。
@@ -95,8 +95,8 @@ packages:
 根 `package.json` 里与发布相关的脚本包括：
 
 - `pnpm build`：执行构建工具链（`internal/build`）
-- `pnpm build:github-package`：构建后运行 `scripts/prepare-github-package.mjs` 组织发布目录
-- `pnpm publish:github-package`：在 `dist/element-plus` 下执行 `npm publish`
+- `pnpm build:npm-package`：构建后运行 `scripts/prepare-npm-package.mjs` 组织 npm public registry 发布目录
+- `pnpm check:npm-dist-tag`：校验 tag 版本到 npm dist-tag 的推断规则
 
 注意：仓库根包为 `private: true`，实际对外发布以 `packages/element-plus` 的构建产物为主。
 

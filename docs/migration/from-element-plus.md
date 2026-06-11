@@ -5,16 +5,14 @@ to FsusUI's current package, `@ozwasyd/element-plus`.
 
 ## Install
 
-FsusUI public preview packages are published through GitHub Packages. Configure
-the registry as described in
-[`docs/guide/installation.md`](../guide/installation.md), then install:
+FsusUI public preview packages are published through the npm public registry.
+Install the compatibility package directly:
 
 ```bash
 pnpm install @ozwasyd/element-plus
 ```
 
-Public npm registry policy, provenance, dist-tags, and promotion rules are
-tracked in
+Registry policy, provenance, dist-tags, and promotion rules are tracked in
 [`docs/release/npm-registry-policy.md`](../release/npm-registry-policy.md).
 
 ## Replace Runtime Imports

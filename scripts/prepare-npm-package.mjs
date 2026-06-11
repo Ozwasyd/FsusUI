@@ -8,10 +8,7 @@ import {
 } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import {
-  registryUrl,
-  resolvePackageContract,
-} from './github-package-contract.mjs'
+import { registryUrl, resolvePackageContract } from './npm-package-contract.mjs'
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(scriptDir, '..')
@@ -102,7 +99,7 @@ const secretScanExtensions = new Set([
 
 if (!existsSync(distPackagePath)) {
   throw new Error(
-    'Missing dist/element-plus/package.json. Run the build before preparing the GitHub Packages artifact.',
+    'Missing dist/element-plus/package.json. Run the build before preparing the npm package artifact.',
   )
 }
 
@@ -327,10 +324,9 @@ function assertNoSecretsOrRawSources(rootDir) {
     const stat = statSync(filePath)
 
     if (relativePath === '.npmrc') {
-      const npmrc = readFileSync(filePath, 'utf8')
-      if (secretContentPatterns.some((pattern) => pattern.test(npmrc))) {
-        violations.push(`${relativePath}: contains a publish token`)
-      }
+      violations.push(
+        `${relativePath}: npm registry config must not be published`,
+      )
       continue
     }
 
@@ -576,7 +572,7 @@ function assertNoWorkspaceProtocolsRemain(packageJson) {
 }
 
 const sourcePackageJson = JSON.parse(readFileSync(sourcePackagePath, 'utf8'))
-const { packageName, repository, repositoryGitUrl, repositoryWebUrl, scope } =
+const { packageName, repository, repositoryGitUrl, repositoryWebUrl } =
   resolvePackageContract({
     repoRoot,
     sourcePackageName: sourcePackageJson.name,
@@ -609,6 +605,7 @@ packageJson.bugs = {
   url: `${repositoryWebUrl}/issues`,
 }
 packageJson.publishConfig = {
+  access: 'public',
   registry: registryUrl,
 }
 
@@ -620,12 +617,14 @@ const rewrittenSelfReferences = rewritePublishedSelfReferences(
 )
 
 writeFileSync(distPackagePath, `${JSON.stringify(packageJson, null, 2)}\n`)
-writeFileSync(distNpmrcPath, `@${scope}:registry=${registryUrl}\n`)
+if (existsSync(distNpmrcPath)) {
+  unlinkSync(distNpmrcPath)
+}
 
 if (strict) {
   assertNoSecretsOrRawSources(distRoot)
 }
 
 console.log(
-  `Prepared ${packageJson.name}@${packageJson.version} for GitHub Packages from ${repository.owner}/${repository.repo} with ${rewrittenSelfReferences.replacementCount} self-reference rewrites across ${rewrittenSelfReferences.updatedFiles} files, ${rewrittenWorkerReferences} worker references rewritten, ${rewrittenWasmFallbackReferences} WASM fallback references rewritten, and ${prunedSourceMaps} source maps pruned.`,
+  `Prepared ${packageJson.name}@${packageJson.version} for npm public registry from ${repository.owner}/${repository.repo} with ${rewrittenSelfReferences.replacementCount} self-reference rewrites across ${rewrittenSelfReferences.updatedFiles} files, ${rewrittenWorkerReferences} worker references rewritten, ${rewrittenWasmFallbackReferences} WASM fallback references rewritten, and ${prunedSourceMaps} source maps pruned.`,
 )

@@ -13,7 +13,7 @@ in:
 
 The package audit records:
 
-- `pnpm run build:github-package`
+- `pnpm run build:npm-package`
 - `npm pack --dry-run --json`
 - `pnpm pack --dry-run`
 - token and private registry scans over the prepared package

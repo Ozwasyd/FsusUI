@@ -7,7 +7,7 @@ Candidate commit: this file's containing commit
 ## Commands
 
 ```bash
-pnpm run build:github-package
+pnpm run build:npm-package
 cd dist/element-plus
 npm pack --dry-run --json
 pnpm pack --dry-run
@@ -19,13 +19,15 @@ rg -n "workspace:|_authToken\s*=\s*(?!\$\{)|BEGIN [A-Z ]*PRIVATE KEY|github_pat_
 
 Passed for candidate package `@ozwasyd/element-plus@1.5.0`.
 
-`pnpm run build:github-package` prepared the GitHub Packages candidate and reported:
+`pnpm run build:npm-package` prepares the npm public registry candidate and writes `publishConfig.access = "public"` with `publishConfig.registry = "https://registry.npmjs.org/"`.
+
+Observed build output:
 
 ```text
-Prepared @ozwasyd/element-plus@1.5.0 for GitHub Packages from Ozwasyd/FsusUI with 87798 self-reference rewrites across 1711 files, 6 worker references rewritten, 9 WASM fallback references rewritten, and 3676 source maps pruned.
+Prepared @ozwasyd/element-plus@1.5.0 for npm public registry from Ozwasyd/FsusUI with 87798 self-reference rewrites across 1711 files, 6 worker references rewritten, 9 WASM fallback references rewritten, and 3676 source maps pruned.
 ```
 
-The prepared package manifest contains no `workspace:` dependencies. `dist/element-plus/.npmrc` exists for local GitHub Packages publish configuration, contains only `@ozwasyd:registry=https://npm.pkg.github.com`, and is not included in the npm pack manifest.
+The prepared package manifest contains no `workspace:` dependencies. The npm package candidate must not contain `.npmrc`, private registry configuration, source maps, or token-like content.
 
 ## Audit Checklist
 
@@ -33,7 +35,7 @@ The prepared package manifest contains no `workspace:` dependencies. `dist/eleme
 | ----------------------------------------------------------- | ------ | ----------------------------------------------------------------------------------------- |
 | No `.env` files                                             | Passed | npm pack manifest reports `.env: 0`                                                       |
 | No packed `.npmrc` files                                    | Passed | npm pack manifest reports `.npmrc: 0`                                                     |
-| No `.npmrc` tokens                                          | Passed | `dist/element-plus/.npmrc` contains only the GitHub Packages registry line                |
+| No `.npmrc` files                                           | Passed | `find dist/element-plus -name '.npmrc'` returned `0`                                      |
 | No private tokens                                           | Passed | refined token scan found no `_authToken`, private key, GitHub token, or npm token matches |
 | No `workspace:` dependencies                                | Passed | prepared `package.json` dependency scan returned `[]`                                     |
 | No private registry URL in package contents                 | Passed | refined registry scan found no packed private registry config                             |
@@ -51,11 +53,11 @@ The prepared package manifest contains no `workspace:` dependencies. `dist/eleme
   "name": "@ozwasyd/element-plus",
   "version": "1.5.0",
   "filename": "ozwasyd-element-plus-1.5.0.tgz",
-  "size": 7371138,
-  "unpackedSize": 90673679,
+  "size": 7371336,
+  "unpackedSize": 90676641,
   "entryCount": 6109,
-  "shasum": "81dba4120f72c287982fa7b09a0ece7243234270",
-  "integrity": "sha512-HB4sYG1RlvntGJqSHaAhKcJsyuGdPRCtaSPzsmiFoBDucezoGATfONA6f+UnsPN1MFm1YIHoJlJP/1PLXB0vfA==",
+  "shasum": "119b28e51bb74c952bae174682bf4e5b9c7e7dd2",
+  "integrity": "sha512-Ht1xLAYwKlf8zuUQ7hx+59v4iPvTBJJ5J3+riqQzYZb+vMCRd0Y9sk8bfgM6zrFBI+bNVK7z3KXeYkCURGJlgQ==",
   "bundled": []
 }
 ```
