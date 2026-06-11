@@ -10,7 +10,7 @@
 
 @include b(table) {
   position: relative;
-  border-radius: getCssVar('border-radius-base');
+  border-radius: getCssVar('table', 'border-radius');
   overflow: hidden;
   box-sizing: border-box;
   height: fit-content;
@@ -81,7 +81,7 @@
 
   @include e(expand-icon) {
     position: relative;
-  border-radius: getCssVar('border-radius-base');
+    border-radius: getCssVar('border-radius-base');
     cursor: pointer;
     color: getCssVar('text-color', 'regular');
     font-size: 12px;
@@ -326,7 +326,7 @@
         &.#{$namespace}-table-fixed-column--left,
         &.#{$namespace}-table-fixed-column--right {
           position: sticky !important;
-          background: inherit;
+          background: getCssVar('table-tr-bg-color');
           z-index: calc(getCssVar('table-index') + 1);
           &.is-last-column,
           &.is-first-column {
@@ -479,7 +479,7 @@
   @include e(body-wrapper) {
     overflow: hidden;
     position: relative;
-  border-radius: getCssVar('border-radius-base');
+    border-radius: getCssVar('table', 'border-radius');
     flex: 1;
     .#{$namespace}-scrollbar__bar {
       z-index: calc(getCssVar('table-index') + 2);
@@ -496,7 +496,7 @@
     cursor: pointer;
     overflow: initial;
     position: relative;
-  border-radius: getCssVar('border-radius-base');
+    border-radius: getCssVar('border-radius-base');
   }
 
   .sort-caret {

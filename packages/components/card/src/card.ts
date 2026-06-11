@@ -30,7 +30,7 @@ export const cardProps = buildProps({
   shadow: {
     type: String,
     values: ['always', 'hover', 'never'],
-    default: 'always',
+    default: 'never',
   },
 } as const)
 export type CardProps = ExtractPropTypes<typeof cardProps>

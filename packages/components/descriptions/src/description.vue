@@ -12,7 +12,7 @@
       </div>
     </div>
 
-    <div :class="ns.e('body')">
+    <div :class="[ns.e('body'), ns.is('bordered', border)]">
       <table :class="[ns.e('table'), ns.is('bordered', border)]">
         <tbody>
           <template v-for="(row, _index) in getRows()" :key="_index">
@@ -56,7 +56,7 @@ const filledNode = (
   node: DescriptionItemVNode,
   span: number,
   count: number,
-  isLast = false
+  isLast = false,
 ) => {
   if (!node.props) {
     node.props = {}
@@ -76,7 +76,7 @@ const getRows = () => {
 
   const children = flattedChildren(slots.default()).filter(
     (node): node is DescriptionItemVNode =>
-      (node as any)?.type?.name === 'ElDescriptionsItem'
+      (node as any)?.type?.name === 'ElDescriptionsItem',
   )
   const rows: DescriptionItemVNode[][] = []
   let temp: DescriptionItemVNode[] = []

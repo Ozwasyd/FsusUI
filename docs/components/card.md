@@ -28,20 +28,20 @@ Card 由 `header`、`body`、`footer` 三部分组成，后两者均可选，通
 
 ### Attributes
 
-| 属性名 | 说明 | 类型 | 默认值 |
-|--------|------|------|--------|
-| header | 卡片标题（也可通过 `#header` 插槽传入） | `string` | — |
-| footer | 卡片底部内容（也可通过 `#footer` 插槽传入） | `string` | — |
-| body-style | 卡片主体区域的 CSS 样式 | `CSSProperties` | — |
-| header-class | 卡片头部自定义 class | `string` | — |
-| body-class | 卡片主体自定义 class | `string` | — |
-| footer-class | 卡片底部自定义 class | `string` | — |
-| shadow | 阴影显示时机 | `'always' \| 'hover' \| 'never'` | `always` |
+| 属性名       | 说明                                        | 类型                             | 默认值  |
+| ------------ | ------------------------------------------- | -------------------------------- | ------- |
+| header       | 卡片标题（也可通过 `#header` 插槽传入）     | `string`                         | —       |
+| footer       | 卡片底部内容（也可通过 `#footer` 插槽传入） | `string`                         | —       |
+| body-style   | 卡片主体区域的 CSS 样式                     | `CSSProperties`                  | —       |
+| header-class | 卡片头部自定义 class                        | `string`                         | —       |
+| body-class   | 卡片主体自定义 class                        | `string`                         | —       |
+| footer-class | 卡片底部自定义 class                        | `string`                         | —       |
+| shadow       | 阴影显示时机                                | `'always' \| 'hover' \| 'never'` | `never` |
 
 ### Slots
 
-| 插槽名 | 说明 |
-|--------|------|
+| 插槽名  | 说明         |
+| ------- | ------------ |
 | default | 卡片主体内容 |
-| header | 卡片头部内容 |
-| footer | 卡片底部内容 |
+| header  | 卡片头部内容 |
+| footer  | 卡片底部内容 |

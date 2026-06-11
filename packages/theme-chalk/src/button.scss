@@ -34,12 +34,19 @@ $button-icon-span-gap: map.merge(
   text-align: center;
   box-sizing: border-box;
   outline: none;
-  transition: background-color getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
-    border-color getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
-    color getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
-    box-shadow getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
-    transform getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
-    opacity getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier');
+  transition:
+    background-color getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    border-color getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    color getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    box-shadow getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    transform getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    opacity getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier');
   font-weight: getCssVar('button', 'font-weight');
   user-select: none;
   vertical-align: middle;
@@ -71,6 +78,39 @@ $button-icon-span-gap: map.merge(
   > span {
     display: inline-flex;
     align-items: center;
+  }
+
+  @include e((loading, content)) {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+  }
+
+  @include e(loading) {
+    flex: 0 0 1em;
+    width: 1em;
+    height: 1em;
+    overflow: hidden;
+    line-height: 1;
+
+    > * {
+      flex: 0 0 1em;
+      width: 1em;
+      height: 1em;
+      max-width: 1em;
+      max-height: 1em;
+    }
+  }
+
+  @include e(content) {
+    text-align: inherit;
+  }
+
+  .#{$namespace}-button__loading + .#{$namespace}-button__content {
+    margin-left: map.get($button-icon-span-gap, 'default');
   }
 
   & + & {
@@ -331,6 +371,10 @@ $button-icon-span-gap: map.merge(
         & + span {
           margin-left: map.get($button-icon-span-gap, $size);
         }
+      }
+
+      .#{$namespace}-button__loading + .#{$namespace}-button__content {
+        margin-left: map.get($button-icon-span-gap, $size);
       }
 
       @include button-size(

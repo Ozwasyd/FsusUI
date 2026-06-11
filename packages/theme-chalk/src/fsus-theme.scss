@@ -105,6 +105,45 @@ html.dark {
       getCssVar('transition-function-ease-in-out-bezier');
 }
 
+.#{$namespace}-table__row,
+.#{$namespace}-table-v2__row,
+.#{$namespace}-table .#{$namespace}-tag,
+.#{$namespace}-table .#{$namespace}-check-tag,
+.#{$namespace}-table .#{$namespace}-button,
+.#{$namespace}-table-v2 .#{$namespace}-tag,
+.#{$namespace}-table-v2 .#{$namespace}-check-tag,
+.#{$namespace}-table-v2 .#{$namespace}-button {
+  transition:
+    background-color getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    border-color getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    box-shadow getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    color getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    opacity getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier');
+  transform: none;
+}
+
+.#{$namespace}-table .#{$namespace}-button:hover,
+.#{$namespace}-table .#{$namespace}-button:focus,
+.#{$namespace}-table .#{$namespace}-button:active,
+.#{$namespace}-table .#{$namespace}-tag:hover,
+.#{$namespace}-table .#{$namespace}-tag:active,
+.#{$namespace}-table .#{$namespace}-check-tag:hover,
+.#{$namespace}-table .#{$namespace}-check-tag:active,
+.#{$namespace}-table-v2 .#{$namespace}-button:hover,
+.#{$namespace}-table-v2 .#{$namespace}-button:focus,
+.#{$namespace}-table-v2 .#{$namespace}-button:active,
+.#{$namespace}-table-v2 .#{$namespace}-tag:hover,
+.#{$namespace}-table-v2 .#{$namespace}-tag:active,
+.#{$namespace}-table-v2 .#{$namespace}-check-tag:hover,
+.#{$namespace}-table-v2 .#{$namespace}-check-tag:active {
+  transform: none;
+}
+
 .#{$namespace}-button {
   @include fsus-control(8px);
   background: transparent;
@@ -479,16 +518,11 @@ html.dark .#{$namespace}-switch__action {
     var(--fsus-motion-trail);
 }
 
-.#{$namespace}-card,
 .#{$namespace}-alert,
-.#{$namespace}-descriptions,
 .#{$namespace}-calendar,
 .#{$namespace}-transfer-panel,
 .#{$namespace}-tree,
 .#{$namespace}-collapse,
-.#{$namespace}-table,
-.#{$namespace}-table-v2__root,
-.#{$namespace}-empty,
 .#{$namespace}-result,
 .#{$namespace}-menu:not(.#{$namespace}-menu--horizontal):not(
     .#{$namespace}-sub-menu .#{$namespace}-menu
@@ -496,8 +530,11 @@ html.dark .#{$namespace}-switch__action {
   @include fsus-panel(24px);
 }
 
-.#{$namespace}-descriptions {
-  padding: 14px 16px;
+.#{$namespace}-empty {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 // 嵌套子菜单容器重置 fsus-panel 样式，避免出现多层嵌套面板的视觉错位
@@ -674,9 +711,130 @@ html.dark .#{$namespace}-switch__action {
 .#{$namespace}-alert__title,
 .#{$namespace}-page-header__title,
 .#{$namespace}-descriptions__title,
-.#{$namespace}-empty__description,
 .#{$namespace}-breadcrumb__item:last-child .#{$namespace}-breadcrumb__inner {
   color: var(--el-text-color-primary);
+}
+
+.#{$namespace}-empty__bottom
+  .#{$namespace}-button:not(.#{$namespace}-button--primary):not(
+    .#{$namespace}-button--success
+  ):not(.#{$namespace}-button--warning):not(.#{$namespace}-button--danger):not(
+    .#{$namespace}-button--info
+  ) {
+  min-height: 36px;
+  padding-inline: 8px;
+  background: transparent;
+  border-color: transparent;
+  color: var(--el-text-color-primary);
+  box-shadow: none;
+  font-weight: 700;
+
+  &:hover,
+  &:focus {
+    background: transparent;
+    border-color: transparent;
+    color: var(--fsus-scholarly-blue);
+    transform: none;
+  }
+}
+
+.#{$namespace}-theme-mode-toggle {
+  .#{$namespace}-radio-group {
+    background: transparent;
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 8px;
+    padding: 2px;
+  }
+
+  .#{$namespace}-radio-button__inner {
+    min-height: 36px;
+    border-radius: 6px;
+  }
+
+  .#{$namespace}-radio-button.is-active .#{$namespace}-radio-button__inner {
+    background: var(--el-fill-color-light);
+    box-shadow: none !important;
+  }
+}
+
+.fsus-entry,
+.fsus-entry-control,
+[data-fsus-entry],
+[data-fsus-entry-control],
+.#{$namespace}-card.is-interactive,
+.#{$namespace}-card[role='button'],
+.#{$namespace}-card[role='link'],
+a.#{$namespace}-card,
+button.#{$namespace}-card {
+  position: relative;
+  box-sizing: border-box;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transform: translateZ(0);
+  transition:
+    background-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    border-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    box-shadow var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    transform var(--fsus-motion-control-fast) var(--fsus-motion-emphasized);
+  will-change: transform;
+}
+
+.fsus-entry:hover,
+.fsus-entry:focus-visible,
+.fsus-entry-control:hover,
+.fsus-entry-control:focus-visible,
+[data-fsus-entry]:hover,
+[data-fsus-entry]:focus-visible,
+[data-fsus-entry-control]:hover,
+[data-fsus-entry-control]:focus-visible,
+.#{$namespace}-card.is-interactive:hover,
+.#{$namespace}-card.is-interactive:focus-visible,
+.#{$namespace}-card[role='button']:hover,
+.#{$namespace}-card[role='button']:focus-visible,
+.#{$namespace}-card[role='link']:hover,
+.#{$namespace}-card[role='link']:focus-visible,
+a.#{$namespace}-card:hover,
+a.#{$namespace}-card:focus-visible,
+button.#{$namespace}-card:hover,
+button.#{$namespace}-card:focus-visible {
+  background: var(--el-bg-color);
+  border-color: var(--el-border-color-light);
+  box-shadow: 0 10px 28px rgba(15, 15, 17, 0.06);
+  transform: translate3d(0, -2px, 0);
+}
+
+.fsus-entry:active,
+.fsus-entry-control:active,
+[data-fsus-entry]:active,
+[data-fsus-entry-control]:active,
+.#{$namespace}-card.is-interactive:active,
+.#{$namespace}-card[role='button']:active,
+.#{$namespace}-card[role='link']:active,
+a.#{$namespace}-card:active,
+button.#{$namespace}-card:active {
+  background: var(--fsus-state-emphasis-bg);
+  border-color: var(--fsus-state-focus-border);
+  box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);
+  transform: translate3d(0, 1px, 0) scale(0.99);
+}
+
+.fsus-entry.is-active,
+.fsus-entry[aria-current='page'],
+.fsus-entry[aria-current='true'],
+.fsus-entry-control.is-active,
+.fsus-entry-control[aria-current='page'],
+.fsus-entry-control[aria-current='true'],
+[data-fsus-entry].is-active,
+[data-fsus-entry][aria-current='page'],
+[data-fsus-entry][aria-current='true'],
+[data-fsus-entry-control].is-active,
+[data-fsus-entry-control][aria-current='page'],
+[data-fsus-entry-control][aria-current='true'] {
+  background: var(--el-bg-color);
+  color: var(--el-text-color-primary);
+  box-shadow: inset 0 0 0 1px rgba(15, 15, 17, 0.04);
 }
 
 .#{$namespace}-tag,
@@ -1492,6 +1650,171 @@ html.dark .#{$namespace}-switch__action {
   font-weight: 700;
 }
 
+@keyframes fsus-tabs-indicator-in {
+  from {
+    opacity: 0;
+    transform: scaleX(0.36);
+  }
+
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+.#{$namespace}-tabs--card > .#{$namespace}-tabs__header,
+.#{$namespace}-tabs--border-card > .#{$namespace}-tabs__header {
+  height: auto;
+  border-bottom: 0;
+}
+
+.#{$namespace}-tabs--card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__nav-wrap,
+.#{$namespace}-tabs--border-card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__nav-wrap {
+  margin-bottom: 0;
+}
+
+.#{$namespace}-tabs--card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__nav,
+.#{$namespace}-tabs--border-card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__nav {
+  gap: 8px;
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.#{$namespace}-tabs--card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item,
+.#{$namespace}-tabs--border-card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item {
+  height: 36px;
+  margin: 0;
+  padding: 0 13px;
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: var(--fsus-radius-control-small);
+  background: transparent;
+  color: var(--el-text-color-regular);
+  box-shadow: none;
+  transform: translateZ(0);
+  transition:
+    background-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    border-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    box-shadow var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    transform var(--fsus-motion-control-fast) var(--fsus-motion-emphasized);
+  will-change: transform;
+}
+
+.#{$namespace}-tabs--card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item:first-child,
+.#{$namespace}-tabs--border-card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item:first-child {
+  margin-left: 0;
+  border-left: 1px solid var(--el-border-color-lighter);
+}
+
+.#{$namespace}-tabs--border-card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item
+  + .#{$namespace}-tabs__item {
+  margin-left: 0;
+}
+
+.#{$namespace}-tabs--card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item:not(.is-disabled):hover,
+.#{$namespace}-tabs--border-card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item:not(.is-disabled):hover {
+  background: var(--el-fill-color-lighter);
+  border-color: var(--el-border-color-light);
+  color: var(--el-text-color-primary);
+  box-shadow: 0 6px 14px rgba(15, 15, 17, 0.04);
+  transform: translate3d(0, -1px, 0);
+}
+
+.#{$namespace}-tabs--card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item.is-active,
+.#{$namespace}-tabs--border-card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item.is-active {
+  background: var(--fsus-state-selected-bg);
+  border-color: var(--el-border-color-light);
+  color: var(--el-text-color-primary);
+  box-shadow: inset 0 0 0 1px rgba(42, 89, 156, 0.08);
+  transform: translateZ(0);
+}
+
+.#{$namespace}-tabs--card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item:not(.is-disabled):active,
+.#{$namespace}-tabs--border-card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item:not(.is-disabled):active {
+  background: var(--fsus-state-emphasis-bg);
+  border-color: var(--fsus-state-focus-border);
+  color: var(--fsus-scholarly-blue);
+  box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);
+  transform: translate3d(0, 1px, 0) scale(0.985);
+}
+
+.#{$namespace}-tabs--card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item.is-top.is-active::after,
+.#{$namespace}-tabs--card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item.is-bottom.is-active::after,
+.#{$namespace}-tabs--border-card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item.is-top.is-active::after,
+.#{$namespace}-tabs--border-card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item.is-bottom.is-active::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  bottom: 5px;
+  left: 12px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--fsus-scholarly-blue);
+  transform-origin: center;
+  animation: fsus-tabs-indicator-in var(--fsus-motion-control-fast)
+    var(--fsus-motion-emphasized);
+}
+
+.#{$namespace}-tabs--card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item.is-disabled,
+.#{$namespace}-tabs--border-card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item.is-disabled {
+  background: transparent;
+  border-color: var(--el-border-color-extra-light);
+  color: var(--el-disabled-text-color);
+}
+
+.#{$namespace}-tabs--border-card {
+  border-color: var(--el-border-color-lighter);
+  border-radius: var(--fsus-radius-control);
+  box-shadow: none;
+}
+
+.#{$namespace}-tabs--border-card > .#{$namespace}-tabs__content {
+  padding: 18px;
+}
+
 .#{$namespace}-pagination {
   gap: 12px;
   flex-wrap: wrap;
@@ -1531,10 +1854,35 @@ html.dark .#{$namespace}-switch__action {
 .#{$namespace}-table,
 .#{$namespace}-table__inner-wrapper,
 .#{$namespace}-table__expanded-cell,
-.#{$namespace}-table-v2__main,
+.#{$namespace}-table-v2__main {
+  background: transparent;
+}
+
+.#{$namespace}-table
+  .#{$namespace}-table-fixed-column--left.#{$namespace}-table__cell,
+.#{$namespace}-table
+  .#{$namespace}-table-fixed-column--right.#{$namespace}-table__cell {
+  background: var(--el-table-tr-bg-color);
+}
+
+.#{$namespace}-table
+  .#{$namespace}-table__row:hover
+  > .#{$namespace}-table-fixed-column--left.#{$namespace}-table__cell,
+.#{$namespace}-table
+  .#{$namespace}-table__row:hover
+  > .#{$namespace}-table-fixed-column--right.#{$namespace}-table__cell,
+.#{$namespace}-table
+  .hover-row
+  > .#{$namespace}-table-fixed-column--left.#{$namespace}-table__cell,
+.#{$namespace}-table
+  .hover-row
+  > .#{$namespace}-table-fixed-column--right.#{$namespace}-table__cell {
+  background: var(--el-fill-color);
+}
+
 .#{$namespace}-table-v2__left,
 .#{$namespace}-table-v2__right {
-  background: transparent;
+  background: var(--el-bg-color);
 }
 
 // body-wrapper 自带 border-radius:8px + overflow:hidden 会把行截成小圆角，
@@ -1909,12 +2257,39 @@ html.dark .#{$namespace}-switch__action {
 
   .#{$namespace}-skeleton__item,
   .#{$namespace}-loading-spinner .circular,
+  .fsus-entry,
+  .fsus-entry-control,
+  [data-fsus-entry],
+  [data-fsus-entry-control],
+  .#{$namespace}-card.is-interactive,
+  .#{$namespace}-card[role='button'],
+  .#{$namespace}-card[role='link'],
+  .#{$namespace}-tabs__item,
+  .#{$namespace}-tabs__item::after,
   .#{$namespace}-slider__bar,
   .#{$namespace}-slider__button,
   .#{$namespace}-slider__button-wrapper {
     transition: none;
     animation-duration: 0.01ms;
     animation-iteration-count: 1;
+  }
+
+  .#{$namespace}-tabs__item {
+    transform: none !important;
+  }
+
+  .fsus-entry,
+  .fsus-entry-control,
+  [data-fsus-entry],
+  [data-fsus-entry-control],
+  .#{$namespace}-card.is-interactive,
+  .#{$namespace}-card[role='button'],
+  .#{$namespace}-card[role='link'] {
+    transform: none !important;
+  }
+
+  .#{$namespace}-tabs__item::after {
+    animation: none !important;
   }
 
   .#{$namespace}-slider__runway.is-dragging .#{$namespace}-slider__bar,

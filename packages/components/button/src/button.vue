@@ -20,19 +20,19 @@
     :style="buttonStyle"
     @click="handleClick"
   >
-    <template v-if="loading">
+    <span v-if="loading" :class="ns.e('loading')" aria-hidden="true">
       <slot v-if="$slots.loading" name="loading" />
       <el-icon v-else :class="ns.is('loading')">
         <component :is="loadingIcon" />
       </el-icon>
-    </template>
+    </span>
     <el-icon v-else-if="icon || $slots.icon">
       <component :is="icon" v-if="icon" />
       <slot v-else name="icon" />
     </el-icon>
     <span
       v-if="$slots.default"
-      :class="{ [ns.em('text', 'expand')]: shouldAddSpace }"
+      :class="[ns.e('content'), { [ns.em('text', 'expand')]: shouldAddSpace }]"
     >
       <slot />
     </span>

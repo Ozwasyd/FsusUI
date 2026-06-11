@@ -75,9 +75,14 @@ $descriptions-cell-font-size: map.merge(
   }
 
   @include e(body) {
+    box-sizing: border-box;
     background-color: getCssVar('fill-color', 'blank');
     border-radius: getCssVar('border-radius-base');
     overflow: hidden;
+
+    @include when(bordered) {
+      border: getCssVar('descriptions-table-border');
+    }
 
     .#{$namespace}-descriptions__table {
       border-collapse: separate;
@@ -109,12 +114,14 @@ $descriptions-cell-font-size: map.merge(
           border-right: getCssVar('descriptions-table-border');
           border-bottom: getCssVar('descriptions-table-border');
           padding: map.get($descriptions-bordered-cell-padding, 'default');
-          &:first-child {
-            border-left: getCssVar('descriptions-table-border');
-          }
         }
-        tr:first-child .#{$namespace}-descriptions__cell {
-          border-top: getCssVar('descriptions-table-border');
+
+        tr .#{$namespace}-descriptions__cell:last-child {
+          border-right: 0;
+        }
+
+        tr:last-child .#{$namespace}-descriptions__cell {
+          border-bottom: 0;
         }
       }
 

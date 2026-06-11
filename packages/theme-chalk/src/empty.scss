@@ -34,16 +34,23 @@
   }
 
   @include e(description) {
+    box-sizing: border-box;
+    width: 100%;
     margin-top: getCssVar('empty-description-margin-top');
+    margin-inline: auto;
     margin-bottom: 0;
-    max-width: getCssVar('empty-description-max-width', none);
+    max-width: getCssVar('empty-description-max-width');
+    padding-inline: getCssVar('empty-description-padding-inline');
     font-size: getCssVar('font-size', 'base');
     color: getCssVar('text-color', 'secondary');
-    line-height: 1.75;
+    font-weight: 400;
+    line-height: getCssVar('empty-description-line-height');
+    letter-spacing: 0;
     overflow-wrap: anywhere;
+    text-wrap: balance;
 
     @include m(narrow) {
-      @include set-css-var-value(('empty-description-max-width'), 18rem);
+      @include set-css-var-value(('empty-description-max-width'), 14rem);
     }
 
     @include m(wide) {

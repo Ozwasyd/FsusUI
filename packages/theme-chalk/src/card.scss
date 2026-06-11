@@ -10,23 +10,24 @@
   border-radius: getCssVar('card', 'border-radius');
   border: 1px solid getCssVar('card', 'border-color');
   background-color: getCssVar('card', 'bg-color');
-  backdrop-filter: getCssVar('bg-color', 'overlay-blur');
-  -webkit-backdrop-filter: getCssVar('bg-color', 'overlay-blur');
   overflow: hidden;
   color: getCssVar('text-color', 'primary');
-  transition: transform getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier'),
-    box-shadow getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier');
-  box-shadow: getCssVar('box-shadow', 'lighter');
+  transition:
+    transform getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    box-shadow getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier');
+  box-shadow: none;
 
   @include when(always-shadow) {
-    box-shadow: getCssVar('box-shadow', 'light');
+    box-shadow: getCssVar('box-shadow', 'lighter');
   }
 
   @include when(hover-shadow) {
     &:hover,
     &:focus {
-      box-shadow: getCssVar('box-shadow', 'light');
-      transform: translateY(-2px);
+      box-shadow: getCssVar('box-shadow', 'lighter');
+      transform: translateY(-1px);
     }
   }
 
@@ -55,11 +56,11 @@
   @include e(body) {
     padding: getCssVar('card', 'padding');
   }
-  
+
   @include e(footer) {
     padding: calc(#{getCssVar('card', 'padding')} - 2px)
       getCssVar('card', 'padding');
     border-top: 1px solid getCssVar('card', 'border-color');
-    box-sizing: border-box; 
+    box-sizing: border-box;
   }
 }

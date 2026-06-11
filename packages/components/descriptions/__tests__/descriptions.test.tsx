@@ -41,6 +41,9 @@ describe('Descriptions.vue', () => {
       </ElDescriptions>
     ))
 
+    expect(wrapper.find('.el-descriptions__body').classes()).toContain(
+      'is-bordered',
+    )
     expect(wrapper.find('table').classes()).toContain('is-bordered')
   })
 
@@ -54,10 +57,10 @@ describe('Descriptions.vue', () => {
     ))
 
     expect(wrapper.find('.el-descriptions__label').classes()).toContain(
-      'is-center'
+      'is-center',
     )
     expect(wrapper.find('.el-descriptions__content').classes()).toContain(
-      'is-right'
+      'is-right',
     )
   })
 
@@ -71,10 +74,10 @@ describe('Descriptions.vue', () => {
     ))
 
     expect(
-      wrapper.find('.el-descriptions__label').attributes('style')
+      wrapper.find('.el-descriptions__label').attributes('style'),
     ).toContain('width: 50px; min-width: 60px;')
     expect(
-      wrapper.find('.el-descriptions__content').attributes('style')
+      wrapper.find('.el-descriptions__content').attributes('style'),
     ).toContain('width: 50px; min-width: 60px;')
   })
 
@@ -91,10 +94,10 @@ describe('Descriptions.vue', () => {
     ))
 
     expect(wrapper.find('.el-descriptions__label').classes()).toContain(
-      'label-class-name'
+      'label-class-name',
     )
     expect(wrapper.find('.el-descriptions__content').classes()).toContain(
-      'class-name'
+      'class-name',
     )
   })
 
@@ -133,7 +136,7 @@ describe('Descriptions.vue', () => {
 
     expect(wrapper.find('tr').element.children.length).toEqual(10)
     expect(wrapper.findAll('tr')[0].element.children[0].innerHTML).toEqual(
-      wrapper.findAll('tr')[0].element.children[1].innerHTML
+      wrapper.findAll('tr')[0].element.children[1].innerHTML,
     )
 
     direction.value = 'vertical'
@@ -141,7 +144,7 @@ describe('Descriptions.vue', () => {
 
     expect(wrapper.find('tr').element.children.length).toEqual(5)
     expect(wrapper.findAll('tr')[0].element.children[0].innerHTML).toEqual(
-      wrapper.findAll('tr')[1].element.children[0].innerHTML
+      wrapper.findAll('tr')[1].element.children[0].innerHTML,
     )
   })
 
@@ -172,10 +175,10 @@ describe('Descriptions.vue', () => {
     ))
 
     expect(wrapper.findAll('td')[1].element.getAttribute('colSpan')).toEqual(
-      '2'
+      '2',
     )
     expect(wrapper.findAll('td')[3].element.getAttribute('colSpan')).toEqual(
-      '2'
+      '2',
     )
   })
 

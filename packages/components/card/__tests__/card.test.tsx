@@ -11,6 +11,12 @@ describe('Card.vue', () => {
     expect(wrapper.text()).toEqual(AXIOM)
   })
 
+  test('defaults to no shadow', () => {
+    const wrapper = mount(() => <Card>{AXIOM}</Card>)
+
+    expect(wrapper.find('.is-never-shadow').exists()).toBe(true)
+  })
+
   test('string header', () => {
     const header = 'I am header'
     const wrapper = mount(() => <Card header={header}>{AXIOM}</Card>)
@@ -47,7 +53,7 @@ describe('Card.vue', () => {
     const style = { 'font-size': '14px' }
     const wrapper = mount(() => <Card bodyStyle={style}>{AXIOM}</Card>)
     expect(wrapper.find('.el-card__body').attributes('style')).toBe(
-      'font-size: 14px;'
+      'font-size: 14px;',
     )
   })
 
@@ -55,7 +61,7 @@ describe('Card.vue', () => {
     const style = [{ 'font-size': '14px' }, { color: 'blue' }]
     const wrapper = mount(() => <Card bodyStyle={style}>{AXIOM}</Card>)
     expect(
-      wrapper.find('.el-card__body').attributes('style')?.replace(/[ ]/g, '')
+      wrapper.find('.el-card__body').attributes('style')?.replace(/[ ]/g, ''),
     ).toBe('font-size:14px;color:blue;')
   })
 

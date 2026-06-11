@@ -59,7 +59,7 @@
 
   @include e('root') {
     position: relative;
-    border-radius: getCssVar('border-radius-base');
+    border-radius: getCssVar('table', 'border-radius');
     overflow: hidden;
 
     // for showing the scrollbar when mouse is on the root table
@@ -162,7 +162,9 @@
     }
 
     @include e('sort-icon') {
-      transition: opacity, display getCssVar('transition-duration', '');
+      transition:
+        opacity,
+        display getCssVar('transition-duration', '');
       opacity: 0.6;
       display: none;
 

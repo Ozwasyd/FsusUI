@@ -91,8 +91,7 @@ $color-scholarly-blue-dark: #3b6fc2 !default;
   $colors: map.deep-merge(
     (
       $type: (
-        '#{$mode}-#{$number}':
-          color.mix(
+        '#{$mode}-#{$number}': color.mix(
             $mix-color,
             map.get($colors, $type, 'base'),
             math.percentage(math.div($number, 10))
@@ -542,7 +541,6 @@ $select-option: map.merge(
   $select-option
 );
 
-
 $select-group: () !default;
 $select-group: map.merge(
   (
@@ -897,9 +895,10 @@ $table: map.merge(
     'bg-color': getCssVar('fill-color', 'blank'),
     'tr-bg-color': getCssVar('bg-color'),
     'expanded-cell-bg-color': getCssVar('fill-color', 'blank'),
+    'border-radius': 0,
     'fixed-left-column': inset 10px 0 10px -10px rgb(0 0 0 / 15%),
     'fixed-right-column': inset -10px 0 10px -10px rgb(0 0 0 / 15%),
-    'index': getCssVar('index-normal')
+    'index': getCssVar('index-normal'),
   ),
   $table
 );
@@ -1383,8 +1382,7 @@ $link-text-color: () !default;
 $calendar: () !default;
 $calendar: map.merge(
   (
-    'border':
-      var(
+    'border': var(
         #{getCssVarName('table-border')},
         1px solid #{getCssVar('border-color-lighter')}
       ),
@@ -1435,10 +1433,13 @@ $avatar-size: map.merge(
 $empty: () !default;
 $empty: map.merge(
   (
-    'padding': 40px 0,
-    'image-width': 160px,
-    'description-margin-top': 20px,
-    'bottom-margin-top': 20px,
+    'padding': 32px 0,
+    'image-width': 112px,
+    'description-margin-top': 16px,
+    'description-max-width': 18rem,
+    'description-padding-inline': 12px,
+    'description-line-height': 1.7,
+    'bottom-margin-top': 18px,
     'border-color': getCssVar('border-color'),
     'fill-color-0': getCssVar('color-white'),
     'fill-color-1': #fcfcfd,
