@@ -848,6 +848,119 @@
         </el-scrollbar>
       </AuditCard>
 
+      <AuditCard name="ElSectionNav" :state="auditState">
+        <div class="audit-settings-primitives">
+          <ElSectionNav
+            ariaLabel="Settings audit sections"
+            :density="compact ? 'compact' : 'default'"
+          >
+            <a
+              class="el-section-nav__link is-current"
+              href="#audit-overview"
+              aria-current="location"
+              data-audit-focus
+              data-audit-target
+              data-audit-active
+            >
+              Overview
+            </a>
+            <a class="el-section-nav__link" href="#audit-resources">
+              Resources
+            </a>
+            <a
+              class="el-section-nav__link is-disabled"
+              aria-disabled="true"
+              tabindex="-1"
+            >
+              Disabled
+            </a>
+          </ElSectionNav>
+
+          <ElSettingsSection
+            title="Generic settings"
+            description="Reusable layout for copy supplied by the product."
+            title-tag="h3"
+            :density="compact ? 'compact' : 'default'"
+          >
+            <template #actions>
+              <el-button size="small">Update</el-button>
+            </template>
+
+            <ElSectionHeader
+              title="Standalone header"
+              description="Header primitive without an eyebrow."
+              title-tag="h4"
+              :density="compact ? 'compact' : 'default'"
+            />
+
+            <ElFormSection
+              title="Form group"
+              description="Labels and inputs remain owned by the form."
+              title-tag="h4"
+              :density="compact ? 'compact' : 'default'"
+            >
+              <label class="audit-settings-field">
+                Label
+                <input :value="activeText" />
+              </label>
+            </ElFormSection>
+
+            <ElResourceList :density="compact ? 'compact' : 'default'">
+              <ElResourceListItem
+                title="Resource Alpha"
+                description="Updated recently"
+                :density="compact ? 'compact' : 'default'"
+              >
+                <template #badge>
+                  <el-tag size="small" type="info">Ready</el-tag>
+                </template>
+                <ElMetadataRow :density="compact ? 'compact' : 'default'">
+                  <ElMetadataItem label="Created" value="2026-01-01" />
+                  <ElMetadataItem label="Fingerprint" monospace />
+                </ElMetadataRow>
+                <template #actions>
+                  <ElInlineActions ariaLabel="Resource actions">
+                    <el-button text size="small">Edit</el-button>
+                  </ElInlineActions>
+                </template>
+              </ElResourceListItem>
+              <ElResourceListItem title="Empty resource group">
+                <ElEmptyState
+                  size="inline"
+                  title="No resources"
+                  description="Add product-owned copy here."
+                />
+              </ElResourceListItem>
+            </ElResourceList>
+          </ElSettingsSection>
+
+          <ElDangerZone
+            title="Risk area"
+            description="Use explicit text in addition to color."
+            title-tag="h3"
+            :density="compact ? 'compact' : 'default'"
+          >
+            <ElRiskNotice title="Review" role="note">
+              Confirm consequences before continuing.
+            </ElRiskNotice>
+            <ElDestructiveActionPanel title="Destructive action">
+              <template #description>
+                Product copy explains the outcome and recovery path.
+              </template>
+              <template #actions>
+                <el-button type="danger" size="small">Continue</el-button>
+              </template>
+            </ElDestructiveActionPanel>
+            <ElTypedConfirmField
+              :model-value="active ? 'CONFIRM' : 'CONF'"
+              phrase="CONFIRM"
+              label="Confirmation phrase"
+              description="Type the exact phrase to continue."
+            />
+          </ElDangerZone>
+        </div>
+      </AuditCard>
+
       <AuditCard name="ElSelect" :state="auditState">
         <el-select
           :model-value="active ? 'two' : ''"
@@ -1149,7 +1262,22 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
 import * as Icons from '@element-plus/icons-vue'
-import { ElEmptyState } from '../../element-plus'
+import {
+  ElDangerZone,
+  ElDestructiveActionPanel,
+  ElEmptyState,
+  ElFormSection,
+  ElInlineActions,
+  ElMetadataItem,
+  ElMetadataRow,
+  ElResourceList,
+  ElResourceListItem,
+  ElRiskNotice,
+  ElSectionHeader,
+  ElSectionNav,
+  ElSettingsSection,
+  ElTypedConfirmField,
+} from '../../element-plus'
 import AuditCard from './AuditCard.vue'
 import {
   auditComponentNames,

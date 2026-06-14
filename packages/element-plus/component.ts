@@ -85,6 +85,21 @@ import {
   ElSelect,
 } from '@element-plus/components/select'
 import { ElSelectV2 } from '@element-plus/components/select-v2'
+import {
+  ElDangerZone,
+  ElDestructiveActionPanel,
+  ElFormSection,
+  ElInlineActions,
+  ElMetadataItem,
+  ElMetadataRow,
+  ElResourceList,
+  ElResourceListItem,
+  ElRiskNotice,
+  ElSectionHeader,
+  ElSectionNav,
+  ElSettingsSection,
+  ElTypedConfirmField,
+} from '@element-plus/components/settings-primitives'
 import { ElSkeleton, ElSkeletonItem } from '@element-plus/components/skeleton'
 import { ElSlider } from '@element-plus/components/slider'
 import { ElSpace } from '@element-plus/components/space'
@@ -189,6 +204,19 @@ export const allComponents = [
   ElOption,
   ElOptionGroup,
   ElSelectV2,
+  ElSectionHeader,
+  ElSectionNav,
+  ElSettingsSection,
+  ElFormSection,
+  ElResourceList,
+  ElResourceListItem,
+  ElMetadataRow,
+  ElMetadataItem,
+  ElInlineActions,
+  ElDangerZone,
+  ElDestructiveActionPanel,
+  ElRiskNotice,
+  ElTypedConfirmField,
   ElSkeleton,
   ElSkeletonItem,
   ElSlider,

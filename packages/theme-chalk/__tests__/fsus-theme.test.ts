@@ -493,6 +493,44 @@ describe('Fsus theme visual baseline', () => {
     ])
   })
 
+  test('keeps settings primitives flat, responsive, and risk-aware', () => {
+    const css = compileThemeFile('settings-primitives.scss')
+
+    expectCssRule(css, '.el-section-nav', [
+      'display: flex;',
+      'flex-wrap: wrap;',
+      'gap: 6px;',
+    ])
+    expectCssRule(css, '.el-settings-section', [
+      'display: grid;',
+      'border-top: 1px solid var(--el-border-color-lighter);',
+    ])
+    expectCssRule(css, '.el-section-header', [
+      'display: grid;',
+      'grid-template-columns: minmax(0, 1fr) auto;',
+    ])
+    expectCssRule(css, '.el-resource-list', [
+      'border: 1px solid var(--el-border-color-lighter);',
+      'border-radius: var(--fsus-radius-panel, 8px);',
+      'box-shadow: none;',
+    ])
+    expectCssRule(css, '.el-metadata-row', [
+      'display: flex;',
+      'flex-wrap: wrap;',
+    ])
+    expectCssRule(css, '.el-danger-zone', [
+      'display: grid;',
+      'border-top: 1px solid color-mix(in srgb, var(--el-color-danger) 38%, var(--el-border-color-lighter));',
+    ])
+    expectCssRule(css, '.el-typed-confirm-field__input:focus', [
+      'border-color: var(--el-color-primary);',
+    ])
+    expect(css).toContain('@media (max-width: 640px)')
+    expect(css).toContain('grid-template-columns: minmax(0, 1fr);')
+    expect(css).not.toMatch(/\.el-settings-section\s*\{[^}]*box-shadow:/s)
+    expect(css).not.toMatch(/gradient|backdrop-filter|blur\(/)
+  })
+
   test('keeps card surfaces flat by default', () => {
     const css = compileThemeFile('card.scss')
 
