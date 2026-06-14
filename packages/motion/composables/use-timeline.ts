@@ -5,13 +5,15 @@ import {
   resolveMotionTarget,
   sanitizeGsapVars,
 } from '../gsap/resolve'
+import { normalizeMotionRecipeOptions } from '../recipes'
 import { isMotionReducedOrDisabled } from '../runtime'
 import type { MotionTarget } from '../gsap/resolve'
-import type { MotionPresetName } from '../types'
+import type { MotionPresetName, MotionRecipeName } from '../types'
 
 export type MotionTimelineStep = {
   target: MotionTarget
   preset?: MotionPresetName
+  recipe?: MotionRecipeName
   duration?: string | number
   position?: gsap.Position
   from?: gsap.TweenVars
@@ -38,9 +40,12 @@ export const useTimeline = (options: UseTimelineOptions = {}) => {
     const target = resolveMotionTarget(step.target)
     if (!target) return controls
 
+    const recipeOptions = step.recipe
+      ? normalizeMotionRecipeOptions(step.recipe)
+      : undefined
     const preset = getGsapPresetVars(
-      step.preset || defaultTimelinePreset,
-      step.duration,
+      step.preset || recipeOptions?.name || defaultTimelinePreset,
+      step.duration ?? recipeOptions?.duration,
     )
     const fromVars = {
       ...sanitizeGsapVars(preset.from),

@@ -2,14 +2,28 @@ import { defineComponent, nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import FsuMotion, {
+  FsuMotionRecipe,
+  FsuScrollTimeline,
+  FsuSharedElement,
   FsuTransition,
   createMotionRouteCleanup,
+  defaultMotionBudget,
   getGsap,
+  getMotionRecipe,
   isScrollTriggerRegistered,
   motionPresets,
+  motionRecipes,
   motionTokens,
+  normalizeMotionRecipeOptions,
+  resolveMotionBudget,
+  runMotion,
+  runMotionRecipe,
+  setMotionBudget,
+  useFlipMotion,
   useGsapContext,
   useScrollReveal,
+  useScrollTimeline,
+  useSharedElementMotion,
   useTimeline,
   vMotion,
 } from '..'
@@ -30,6 +44,7 @@ describe('motion primitives', () => {
   })
 
   afterEach(() => {
+    setMotionBudget()
     vi.useRealTimers()
     delete document.documentElement.dataset.fsusMotion
     document.body.innerHTML = ''
@@ -37,6 +52,7 @@ describe('motion primitives', () => {
 
   it('centralizes the first-party token and preset contracts', () => {
     expect(motionTokens.duration.base).toBe('220ms')
+    expect(defaultMotionBudget.maxStaggerItems).toBe(20)
     expect(motionTokens.distance.md).toBe('16px')
     expect(Object.keys(motionPresets)).toEqual([
       'fade-in',
@@ -52,6 +68,53 @@ describe('motion primitives', () => {
       'route-fade',
       'card-hover',
     ])
+    expect(Object.keys(motionRecipes)).toEqual([
+      'content-enter',
+      'article-list-enter',
+      'island-enter',
+      'state-pending',
+      'state-settled',
+      'state-error',
+      'route-crossfade',
+      'reading-anchor-highlight',
+      'panel-enter',
+      'list-enter-small',
+      'card-interactive',
+      'page-enter',
+      'media-hover-subtle',
+    ])
+  })
+
+  it('maps motion recipes to preset-backed runtime options', async () => {
+    const el = document.createElement('div')
+    document.body.append(el)
+
+    runMotionRecipe(el, {
+      recipe: 'article-list-enter',
+      index: 50,
+      duration: 120,
+    })
+
+    await nextTick()
+    await flushMotionFrame()
+
+    expect(getMotionRecipe('state-error').preset).toBe('fade-in')
+    expect(normalizeMotionRecipeOptions('panel-enter').name).toBe('scale-fade')
+    expect(el.style.transition).toContain('120ms')
+    expect(el.style.transition).toContain('* 19')
+  })
+
+  it('falls back to terminal state when the motion node budget is exhausted', () => {
+    setMotionBudget({ maxAnimatedNodesPerViewport: 0 })
+    const el = document.createElement('div')
+    document.body.append(el)
+
+    runMotion(el, { name: 'fade-up' })
+
+    expect(resolveMotionBudget().maxAnimatedNodesPerViewport).toBe(0)
+    expect(el.style.transition).toBe('')
+    expect(el.style.opacity).toBe('1')
+    expect(el.style.transform).toBe('translate3d(0, 0, 0)')
   })
 
   it('runs v-motion with string syntax', async () => {
@@ -169,6 +232,39 @@ describe('motion primitives', () => {
     expect(wrapper.element.dataset.fsusMotionPreset).toBe('fade-in')
   })
 
+  it('installs recipe, scroll timeline, and shared-element components', async () => {
+    document.documentElement.dataset.fsusMotion = 'reduced'
+    const wrapper = mount(
+      () => (
+        <div>
+          <FsuMotionRecipe name="state-settled">saved</FsuMotionRecipe>
+          <FsuScrollTimeline
+            segments={[{ from: 0, to: 0.25, recipe: 'content-enter' }]}
+          >
+            timeline
+          </FsuScrollTimeline>
+          <FsuSharedElement id="article-cover-1">cover</FsuSharedElement>
+        </div>
+      ),
+      {
+        global: {
+          plugins: [FsuMotion],
+        },
+        attachTo: document.body,
+      },
+    )
+
+    await nextTick()
+
+    expect(wrapper.find('[data-fsus-motion-recipe="state-settled"]').exists())
+      .toBe(true)
+    expect(wrapper.find('[data-fsus-scroll-timeline="natural"]').exists()).toBe(
+      true,
+    )
+    expect(wrapper.find('[data-fsus-shared-element-id="article-cover-1"]')
+      .exists()).toBe(true)
+  })
+
   it('installs scroll reveal as a reduced-motion safe directive', () => {
     document.documentElement.dataset.fsusMotion = 'reduced'
     const Root = defineComponent({
@@ -210,9 +306,10 @@ describe('motion primitives', () => {
     const timeline = useTimeline()
 
     timeline.add({ target: el, preset: 'fade-up', duration: 120 })
+    timeline.add({ target: el, recipe: 'state-settled', position: '+=0' })
 
-    expect(timeline.timeline.getChildren()).toHaveLength(1)
-    expect(timeline.timeline.duration()).toBeCloseTo(0.12)
+    expect(timeline.timeline.getChildren()).toHaveLength(2)
+    expect(timeline.timeline.duration()).toBeGreaterThanOrEqual(0.12)
 
     timeline.clear()
     expect(timeline.timeline.getChildren()).toHaveLength(0)
@@ -233,6 +330,47 @@ describe('motion primitives', () => {
 
     reveal.kill()
     expect(reveal.tweens.size).toBe(0)
+  })
+
+  it('creates natural scroll timelines without scroll-jacking options', () => {
+    const el = document.createElement('div')
+    document.body.append(el)
+    const timeline = useScrollTimeline({
+      target: el,
+      segments: [{ from: 0, to: 0.5, recipe: 'content-enter' }],
+      scrollTrigger: { pin: true, snap: 1 },
+    })
+
+    const created = timeline.create()
+
+    expect(isScrollTriggerRegistered()).toBe(true)
+    expect(created?.scrollTrigger?.vars.pin).toBe(false)
+    expect(created?.scrollTrigger?.vars.snap).toBeUndefined()
+    expect(timeline.timelines.size).toBe(1)
+
+    timeline.kill()
+    expect(timeline.timelines.size).toBe(0)
+  })
+
+  it('exposes FLIP and shared-element helpers with terminal fallbacks', () => {
+    document.documentElement.dataset.fsusMotion = 'reduced'
+    const source = document.createElement('div')
+    const target = document.createElement('div')
+    document.body.append(source, target)
+
+    const flip = useFlipMotion()
+    const state = flip.capture(source)
+    const control = flip.play(target, state)
+    control.finish()
+
+    const shared = useSharedElementMotion()
+    const unregister = shared.register('article-cover-1', source)
+
+    expect(source.dataset.fsusSharedElementId).toBe('article-cover-1')
+    expect(shared.transition('article-cover-1', target)).toBeDefined()
+
+    unregister()
+    expect(source.dataset.fsusSharedElementId).toBeUndefined()
   })
 
   it('finishes scroll reveal immediately when motion is reduced', () => {

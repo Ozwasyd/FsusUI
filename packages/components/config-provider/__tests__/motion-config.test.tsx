@@ -111,12 +111,21 @@ describe('motion-config', () => {
   })
 
   it('syncs explicit motion preset tokens to the document root', () => {
-    syncMotionConfig({ mode: 'enabled', preset: 'expressive' })
+    syncMotionConfig({
+      mode: 'enabled',
+      preset: 'expressive',
+      budget: {
+        maxStaggerItems: 12,
+        maxAnimatedNodesPerViewport: 24,
+      },
+    })
 
     const root = document.documentElement
     expect(root.dataset.fsusMotionMode).toBe('enabled')
     expect(root.dataset.fsusMotion).toBe('enabled')
     expect(root.dataset.fsusMotionPreset).toBe('expressive')
+    expect(root.dataset.fsusMotionMaxStaggerItems).toBe('12')
+    expect(root.dataset.fsusMotionMaxAnimatedNodesPerViewport).toBe('24')
     expect(root.style.getPropertyValue('--fsus-motion-panel')).toBe('520ms')
     expect(root.style.getPropertyValue('--fsus-motion-distance-sm')).toBe(
       '10px',

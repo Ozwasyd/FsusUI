@@ -15,6 +15,24 @@ export const motionPresetNames = [
 
 export type MotionPresetName = (typeof motionPresetNames)[number]
 
+export const motionRecipeNames = [
+  'content-enter',
+  'article-list-enter',
+  'island-enter',
+  'state-pending',
+  'state-settled',
+  'state-error',
+  'route-crossfade',
+  'reading-anchor-highlight',
+  'panel-enter',
+  'list-enter-small',
+  'card-interactive',
+  'page-enter',
+  'media-hover-subtle',
+] as const
+
+export type MotionRecipeName = (typeof motionRecipeNames)[number]
+
 export type MotionTokenScale<T extends string> = Record<T, string>
 
 export type MotionTokens = {
@@ -47,6 +65,28 @@ export type MotionPresetDefinition = {
   leaveTo?: MotionStyleState
 }
 
+export type MotionBudgetConfig = {
+  maxStaggerItems: number
+  maxAnimatedNodesPerViewport: number
+  disableScrollEffectsBelowFps: number
+  disableBlurOnLowPower: boolean
+  disableParallaxOnTouch: boolean
+  preferCssWhenPossible: boolean
+  allowedProperties: readonly (keyof MotionStyleState)[]
+}
+
+export type MotionRecipeDefinition = {
+  name: MotionRecipeName
+  intent: string
+  preset: MotionPresetName
+  durationClass: 'instant' | 'fast' | 'base' | 'slow' | 'panel' | 'route'
+  allowedTargets: readonly string[]
+  reducedFallback: 'terminal' | 'opacity-only'
+  disabledFallback: 'terminal'
+  maxItemCount?: number
+  budget?: Partial<MotionBudgetConfig>
+}
+
 export type MotionOptions = {
   name?: MotionPresetName
   duration?: string | number
@@ -56,6 +96,7 @@ export type MotionOptions = {
   disabled?: boolean
   once?: boolean
   immediate?: boolean
+  budget?: Partial<MotionBudgetConfig>
 }
 
 export type MotionDirectiveValue =
@@ -81,4 +122,5 @@ export type MotionRuntimeControls = {
 export type MotionPluginConfig = {
   defaultPreset?: MotionPresetName
   disabled?: boolean
+  budget?: Partial<MotionBudgetConfig>
 }

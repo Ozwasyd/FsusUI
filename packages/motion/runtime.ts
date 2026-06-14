@@ -1,5 +1,13 @@
 import { getMotionPreset, resolveMotionPresetName } from './presets'
+import {
+  claimMotionBudgetNode,
+  clampStaggerIndex,
+  isMotionPropertyAllowed,
+  releaseMotionBudgetNode,
+  resolveMotionBudget,
+} from './budget'
 import type {
+  MotionBudgetConfig,
   MotionDirectiveValue,
   MotionPhase,
   MotionPresetDefinition,
@@ -67,7 +75,8 @@ const resolveDelay = (
   const directDelay = toTimeValue(options.delay, preset.delay || '0ms')
   if (options.name !== 'list-stagger') return directDelay
 
-  const index = options.index ?? 0
+  const budget = resolveMotionBudget(options.budget)
+  const index = clampStaggerIndex(options.index ?? 0, budget)
   if (index <= 0) return directDelay
 
   const stagger = preset.stagger || '0ms'
@@ -83,12 +92,13 @@ const transitionFor = (
   preset: MotionPresetDefinition,
   options: MotionRunOptions,
   state: MotionStyleState,
+  budget: MotionBudgetConfig,
 ) => {
   const duration = toTimeValue(options.duration, preset.duration)
   const delay = resolveDelay(preset, options)
   const easing = options.easing || preset.easing
   const properties = transitionProperties.filter(
-    (property) => property in state,
+    (property) => property in state && isMotionPropertyAllowed(property, budget),
   )
 
   return {
@@ -165,23 +175,29 @@ export const runMotion = (
   cancelMotion(el)
 
   const preset = getMotionPreset(options.name)
+  const budget = resolveMotionBudget(options.budget)
   const phase = options.phase || 'enter'
   const { from, to } = getMotionPhaseState(preset, phase)
   const {
     delay,
     duration,
     value: transition,
-  } = transitionFor(preset, options, to)
+  } = transitionFor(preset, options, to, budget)
 
   let finished = false
   let frame = 0
   let timeout: ReturnType<typeof setTimeout> | undefined
+  let claimedBudget = false
 
   const cleanup = () => {
     if (frame) window.cancelAnimationFrame(frame)
     if (timeout) clearTimeout(timeout)
     el.removeEventListener('transitionend', finish)
     el.style.willChange = ''
+    if (claimedBudget) {
+      releaseMotionBudgetNode()
+      claimedBudget = false
+    }
   }
 
   const finish = () => {
@@ -203,7 +219,11 @@ export const runMotion = (
 
   ;(el as MotionElement)[motionStateKey] = controls
 
-  if (isMotionReducedOrDisabled(options.disabled)) {
+  const shouldAnimate =
+    !isMotionReducedOrDisabled(options.disabled) && claimMotionBudgetNode(budget)
+  claimedBudget = shouldAnimate
+
+  if (!shouldAnimate) {
     el.style.transition = ''
     applyStyleState(el, to)
     finish()

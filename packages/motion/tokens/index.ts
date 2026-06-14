@@ -38,8 +38,10 @@ export const motionTokens: MotionTokens = {
 
 export const motionCssVars = {
   duration: {
+    instant: 'var(--fsus-motion-duration-instant, 1ms)',
     fast: 'var(--fsus-motion-control-fast, 140ms)',
     base: 'var(--fsus-motion-control, 220ms)',
+    slow: 'var(--fsus-motion-duration-slow, 320ms)',
     panel: 'var(--fsus-motion-panel, 420ms)',
     route: 'var(--fsus-motion-overlay, 260ms)',
   },

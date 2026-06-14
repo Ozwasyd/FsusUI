@@ -83,3 +83,8 @@ trail colors transparent.
 - Test complex interactions with `system`, `reduced`, and `disabled`.
 - Do not depend on low-level scroll, drag, spring, or trail tokens unless the
   integration owns compatibility testing.
+> **Motion note:** Motion now has a recipe layer above presets plus a runtime
+> budget. Prefer recipes such as `state-settled`, `route-crossfade`, and
+> `reading-anchor-highlight` for product code. Avoid blanket `fade-up` on
+> article bodies and avoid `list-stagger` for long lists; the default stagger
+> budget is 20 items.

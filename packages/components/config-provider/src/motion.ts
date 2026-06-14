@@ -4,9 +4,15 @@ export type MotionMode = (typeof motionModes)[number]
 export const motionPresets = ['standard', 'smooth', 'expressive'] as const
 export type MotionPreset = (typeof motionPresets)[number]
 
+export type MotionBudgetContract = {
+  maxStaggerItems?: number
+  maxAnimatedNodesPerViewport?: number
+}
+
 export type MotionConfigContract = {
   mode?: MotionMode
   preset?: MotionPreset
+  budget?: MotionBudgetContract
 }
 
 type ResolvedMotionMode = Exclude<MotionMode, 'system'>
@@ -16,6 +22,7 @@ type MotionTokenMap = Record<string, string>
 export const defaultMotionConfig: Required<MotionConfigContract> = {
   mode: 'system',
   preset: 'smooth',
+  budget: {},
 }
 
 const prefersReducedQuery = '(prefers-reduced-motion: reduce)'
@@ -288,6 +295,7 @@ export const normalizeMotionConfig = (
 ): Required<MotionConfigContract> => ({
   mode: normalizeMotionMode(config?.mode),
   preset: normalizeMotionPreset(config?.preset),
+  budget: config?.budget ?? {},
 })
 
 const resolveMotionMode = (mode: MotionMode): ResolvedMotionMode => {
@@ -319,6 +327,22 @@ const writeMotionDataset = (
   root.dataset.fsusMotionMode = config.mode
   root.dataset.fsusMotion = resolvedMode
   root.dataset.fsusMotionPreset = config.preset
+
+  if (config.budget.maxStaggerItems !== undefined) {
+    root.dataset.fsusMotionMaxStaggerItems = String(
+      config.budget.maxStaggerItems,
+    )
+  } else {
+    delete root.dataset.fsusMotionMaxStaggerItems
+  }
+
+  if (config.budget.maxAnimatedNodesPerViewport !== undefined) {
+    root.dataset.fsusMotionMaxAnimatedNodesPerViewport = String(
+      config.budget.maxAnimatedNodesPerViewport,
+    )
+  } else {
+    delete root.dataset.fsusMotionMaxAnimatedNodesPerViewport
+  }
 }
 
 export const clearMotionConfig = (root = getMotionRoot()) => {
@@ -328,6 +352,8 @@ export const clearMotionConfig = (root = getMotionRoot()) => {
   delete root.dataset.fsusMotion
   delete root.dataset.fsusMotionMode
   delete root.dataset.fsusMotionPreset
+  delete root.dataset.fsusMotionMaxStaggerItems
+  delete root.dataset.fsusMotionMaxAnimatedNodesPerViewport
 
   for (const token of motionTokenNames) {
     root.style.removeProperty(token)

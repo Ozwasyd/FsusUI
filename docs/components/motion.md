@@ -242,6 +242,98 @@ Preset gallery：
 | `route-fade`   | 路由内容切换                 | 主内容区、文章页切换                        |
 | `card-hover`   | 可点击卡片的轻量 hover/press | Entry card、管理入口、可交互 Dashboard tile |
 
+## Motion Recipe
+
+Recipe is the semantic layer above presets. Use a recipe when the business
+surface knows why it moves, and let FsusUI choose the preset, fallback, and
+budget.
+
+```ts
+import { motion, runMotionRecipe } from '@ozwasyd/element-plus'
+
+motion.recipe('state-settled')
+runMotionRecipe(el, { recipe: 'reading-anchor-highlight' })
+```
+
+```vue
+<template>
+  <FsuMotionRecipe name="article-list-enter" :index="index">
+    <ArticleCard />
+  </FsuMotionRecipe>
+</template>
+```
+
+Initial recipes:
+
+| Recipe                     | Intent                              | Default preset |
+| -------------------------- | ----------------------------------- | -------------- |
+| `content-enter`            | ordinary content enters quietly     | `fade-in`      |
+| `article-list-enter`       | short article list reveal           | `list-stagger` |
+| `island-enter`             | async island mount                  | `fade-up`      |
+| `state-pending`            | in-progress operation state         | `fade-in`      |
+| `state-settled`            | completed operation feedback        | `fade-in`      |
+| `state-error`              | failed operation feedback           | `fade-in`      |
+| `route-crossfade`          | route body switch                   | `route-fade`   |
+| `reading-anchor-highlight` | anchor jump feedback in long-form   | `fade-in`      |
+| `panel-enter`              | dialog, drawer, popover, menu enter | `scale-fade`   |
+| `list-enter-small`         | bounded small list enter            | `list-stagger` |
+| `card-interactive`         | clickable card hover/press          | `card-hover`   |
+
+Avoid `fade-up` on article bodies and long-form reading content. Avoid
+`list-stagger` for long lists; use it only for bounded groups, with the default
+20-item cap. Prefer route-level and overlay-level recipes for content-heavy
+pages. Content card hover displacement should stay at `0` or
+`translateY(-1px)`.
+
+## Scroll Timeline
+
+`useScrollTimeline()` and `FsuScrollTimeline` provide natural scroll-linked
+segments. They do not hide scrollbars, pin sections, snap the page, block
+wheel/touch events, or enable scroll-jacking.
+
+```ts
+useScrollTimeline({
+  target: sectionRef,
+  segments: [
+    { from: 0, to: 0.25, recipe: 'content-enter' },
+    { from: 0.25, to: 0.5, recipe: 'reading-anchor-highlight' },
+  ],
+  reducedFallback: 'terminal',
+})
+```
+
+Use scroll timelines for public-page spotlight reveals, short article lists,
+TOC or anchor feedback, and async island mount. Do not enable narrative scroll
+effects by default in admin screens or article bodies.
+
+## Shared Element And FLIP
+
+`useSharedElementMotion()`, `useFlipMotion()`, and `FsuSharedElement` cover the
+first shared-transition layer for routes such as article card to article page,
+thumbnail to lightbox, or list row to editor. The default implementation only
+animates `transform` and `opacity`, respects reduced/disabled motion, and falls
+back to terminal state when measurement fails.
+
+## Motion Budget
+
+The default budget is:
+
+```ts
+{
+  maxStaggerItems: 20,
+  maxAnimatedNodesPerViewport: 40,
+  disableScrollEffectsBelowFps: 45,
+  disableBlurOnLowPower: true,
+  disableParallaxOnTouch: true,
+  preferCssWhenPossible: true,
+}
+```
+
+`list-stagger` delay is capped at `maxStaggerItems`. When too many nodes are
+already animating, new motion falls back to the terminal state. Presets and
+recipes should animate only `transform`, `opacity`, and budget-controlled
+`filter`.
+
 ## Reduced Motion
 
 当 `ElConfigProvider` 的 `motion.mode` 为 `reduced` / `disabled`，或系统 `prefers-reduced-motion: reduce` 生效时，`v-motion` 和 `FsuTransition` 会跳过位移/缩放过程并直接落到最终状态。

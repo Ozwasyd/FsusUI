@@ -42,7 +42,11 @@ export const configProviderProps = buildProps({
     type: definePropType<MotionConfigContract>(Object),
     validator: (config: MotionConfigContract) =>
       (!config.mode || motionModes.includes(config.mode)) &&
-      (!config.preset || motionPresets.includes(config.preset)),
+      (!config.preset || motionPresets.includes(config.preset)) &&
+      (!config.budget?.maxStaggerItems ||
+        config.budget.maxStaggerItems > 0) &&
+      (!config.budget?.maxAnimatedNodesPerViewport ||
+        config.budget.maxAnimatedNodesPerViewport > 0),
   },
   /**
    * @description controls the shared render pipeline runtime budget.
