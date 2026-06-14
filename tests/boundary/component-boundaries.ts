@@ -152,6 +152,12 @@ export const publicComponentBoundaries: Record<
   collapse: entry([...simpleBoundaries, 'model-value', 'event'], {
     fixtureModes: ['states'],
   }),
+  'collection-primitives': entry(
+    [...simpleBoundaries, 'model-value', 'event', 'keyboard-focus'],
+    {
+      fixtureModes: ['states', 'data-boundaries', 'forms'],
+    },
+  ),
   collection: entry([
     'default-render',
     'props-state',

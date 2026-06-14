@@ -221,6 +221,38 @@ describe('Fsus theme visual baseline', () => {
     expect(css).not.toMatch(/\.el-empty-state\s*\{[^}]*box-shadow:/s)
   })
 
+  test('keeps collection primitives flat and responsive', () => {
+    const css = compileThemeFile('collection-primitives.scss')
+
+    expectCssRule(css, '.el-collection-toolbar', [
+      'display: grid;',
+      'grid-template-columns: minmax(14rem, 1fr) minmax(0, auto) auto;',
+      'gap: 12px;',
+      'padding: 0;',
+    ])
+    expectCssRule(css, '.el-filter-group', [
+      'margin: 0;',
+      'padding: 0;',
+      'border: 0;',
+    ])
+    expectCssRule(css, '.el-segmented-control', [
+      'display: inline-flex;',
+      'border: 1px solid var(--el-border-color-lighter);',
+      'background: transparent;',
+    ])
+    expectCssRule(css, '.el-collection-summary', [
+      'display: flex;',
+      'align-items: baseline;',
+      'justify-content: space-between;',
+    ])
+    expectCssRule(css, '.el-pagination-bar', [
+      'display: flex;',
+      'align-items: center;',
+      'justify-content: space-between;',
+    ])
+    expect(css).not.toMatch(/\.el-collection-toolbar\s*\{[^}]*box-shadow:/s)
+  })
+
   test('keeps bordered descriptions corners continuous', () => {
     const descriptionsCss = compileThemeFile('descriptions.scss')
     const fsusCss = compileThemeFile('fsus-theme.scss')

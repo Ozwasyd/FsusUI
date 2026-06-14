@@ -34,6 +34,7 @@ export const auditComponentNames = [
   'ElCollapseItem',
   'ElCollapseTransition',
   'ElColorPicker',
+  'ElCollectionToolbar',
   'ElConfigProvider',
   'ElContainer',
   'ElCountdown',

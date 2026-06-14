@@ -54,6 +54,35 @@
         </ElEmptyState>
       </div>
 
+      <div class="issue-primitives__collection-panel">
+        <ElCollectionToolbar ariaLabel="Collection controls">
+          <template #primary>
+            <el-input v-model="collectionQuery" placeholder="Search" />
+          </template>
+
+          <template #filters>
+            <ElFilterGroup label="State">
+              <ElSegmentedControl
+                v-model="collectionState"
+                :items="collectionStateItems"
+                ariaLabel="Filter state"
+              />
+            </ElFilterGroup>
+          </template>
+
+          <template #actions>
+            <el-button>Refresh</el-button>
+          </template>
+        </ElCollectionToolbar>
+
+        <ElCollectionSummary
+          title="Results"
+          :total="12"
+          :visible="rows.length"
+          state="Filtered"
+        />
+      </div>
+
       <ElResponsiveCollection
         :items="rows"
         row-key="id"
@@ -82,6 +111,13 @@
         </template>
       </ElResponsiveCollection>
 
+      <ElPaginationBar ariaLabel="Results pagination">
+        <template #summary>Page 1 of 6</template>
+        <template #pagination>
+          <el-pagination small layout="prev, pager, next" :total="12" />
+        </template>
+      </ElPaginationBar>
+
       <el-upload
         media-field
         media-aspect-ratio="1200 / 630"
@@ -104,10 +140,16 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import {
+  ElCollectionSummary,
+  ElCollectionToolbar,
   ElEmptyState,
+  ElFilterGroup,
+  ElPaginationBar,
   ElPublicShell,
   ElResponsiveCollection,
+  ElSegmentedControl,
   ElThemeModeToggle,
+  type SegmentedControlValue,
 } from '../../../element-plus'
 
 defineProps<{
@@ -115,6 +157,8 @@ defineProps<{
 }>()
 
 const searchQuery = ref('')
+const collectionQuery = ref('')
+const collectionState = ref<SegmentedControlValue>('all')
 const navItems = [
   { key: 'home', label: 'Home', href: '/' },
   { key: 'archive', label: 'Archive', href: '/archive' },
@@ -123,6 +167,11 @@ const navItems = [
 const rows = [
   { id: 1, title: 'Layout primitives', meta: '42 views' },
   { id: 2, title: 'Media upload field', meta: 'Draft' },
+]
+const collectionStateItems = [
+  { label: 'All', value: 'all' },
+  { label: 'Open', value: 'open' },
+  { label: 'Closed', value: 'closed' },
 ]
 
 const normalizeRow = (item: unknown) =>

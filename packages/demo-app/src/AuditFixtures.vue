@@ -303,6 +303,45 @@
         />
       </AuditCard>
 
+      <AuditCard name="ElCollectionToolbar" :state="auditState">
+        <ElCollectionToolbar ariaLabel="Collection controls" density="compact">
+          <template #primary>
+            <el-input
+              :model-value="activeText"
+              placeholder="Search"
+              data-audit-focus
+              data-audit-target
+            />
+          </template>
+          <template #filters>
+            <ElFilterGroup label="State" density="compact">
+              <ElSegmentedControl
+                :model-value="active ? 'open' : 'all'"
+                :items="collectionStateItems"
+                ariaLabel="Filter state"
+                density="compact"
+              />
+            </ElFilterGroup>
+          </template>
+          <template #actions>
+            <el-button data-audit-active data-audit-target>Refresh</el-button>
+          </template>
+        </ElCollectionToolbar>
+        <ElCollectionSummary
+          title="Results"
+          :total="12"
+          :visible="active ? 3 : 12"
+          :state="active ? 'Filtered' : ''"
+          density="compact"
+        />
+        <ElPaginationBar ariaLabel="Results pagination" density="compact">
+          <template #summary>Page 1 of 4</template>
+          <template #pagination>
+            <el-pagination small layout="prev, pager, next" :total="40" />
+          </template>
+        </ElPaginationBar>
+      </AuditCard>
+
       <AuditCard name="ElConfigProvider" :state="auditState">
         <el-config-provider :button="{ autoInsertSpace: false }">
           <el-button type="primary" data-audit-target>
@@ -1149,7 +1188,14 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
 import * as Icons from '@element-plus/icons-vue'
-import { ElEmptyState } from '../../element-plus'
+import {
+  ElCollectionSummary,
+  ElCollectionToolbar,
+  ElEmptyState,
+  ElFilterGroup,
+  ElPaginationBar,
+  ElSegmentedControl,
+} from '../../element-plus'
 import AuditCard from './AuditCard.vue'
 import {
   auditComponentNames,
@@ -1232,6 +1278,11 @@ const responsiveCollectionItems = computed(() => [
     state: 'Review',
   },
 ])
+const collectionStateItems = [
+  { label: 'All', value: 'all' },
+  { label: 'Open', value: 'open' },
+  { label: 'Closed', value: 'closed' },
+]
 const formatCollectionItem = (item: unknown) => {
   if (!item || typeof item !== 'object') return String(item)
 
