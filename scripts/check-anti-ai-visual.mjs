@@ -1,9 +1,24 @@
 #!/usr/bin/env node
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { readFileSync, readdirSync } from 'node:fs'
+import { join, relative, resolve } from 'node:path'
 
 const root = process.cwd()
 const violations = []
+const themeSourceRoot = 'packages/theme-chalk/src'
+const radiusBudgetPx = 12
+const pillRadiusPx = new Set([100, 999])
+const radiusLiteralPattern =
+  /\b(border(?:-(?:top|bottom)-(?:left|right))?-radius)\s*:\s*([0-9.]+)px\b/g
+const allowedRadiusLiterals = [
+  {
+    file: 'packages/theme-chalk/src/image-viewer.scss',
+    property: 'border-radius',
+    value: 22,
+    contextIncludes: '@include e(actions)',
+    reason:
+      'image viewer media chrome toolbar is an immersive control surface, not an ordinary card or panel',
+  },
+]
 
 const read = (file) => readFileSync(resolve(root, file), 'utf8')
 
@@ -13,6 +28,34 @@ const addViolation = (file, line, message) => {
 
 const lineNumberOf = (source, index) =>
   source.slice(0, Math.max(index, 0)).split('\n').length
+
+const scssFiles = (directory) => {
+  const absoluteDirectory = resolve(root, directory)
+  const files = []
+
+  for (const entry of readdirSync(absoluteDirectory, { withFileTypes: true })) {
+    const absoluteEntry = join(absoluteDirectory, entry.name)
+    if (entry.isDirectory()) {
+      files.push(...scssFiles(relative(root, absoluteEntry)))
+      continue
+    }
+    if (entry.isFile() && entry.name.endsWith('.scss')) {
+      files.push(relative(root, absoluteEntry).split('\\').join('/'))
+    }
+  }
+
+  return files
+}
+
+const isAllowedRadiusLiteral = (file, property, value, context) =>
+  allowedRadiusLiterals.some(
+    (entry) =>
+      entry.file === file &&
+      entry.property === property &&
+      entry.value === value &&
+      entry.reason.trim().length > 0 &&
+      context.includes(entry.contextIncludes),
+  )
 
 const assertIncludes = (file, source, expected, message) => {
   if (!source.includes(expected)) addViolation(file, 1, message)
@@ -86,7 +129,9 @@ const checkBackdropFilters = () => {
 
   for (const file of files) {
     const source = read(file)
-    for (const match of source.matchAll(/backdrop-filter:\s*blur\(([0-9.]+)px\)/g)) {
+    for (const match of source.matchAll(
+      /backdrop-filter:\s*blur\(([0-9.]+)px\)/g,
+    )) {
       const blur = Number(match[1])
       if (!Number.isFinite(blur) || blur <= 0) continue
 
@@ -100,6 +145,29 @@ const checkBackdropFilters = () => {
           'hardcoded backdrop blur must be opt-in or token-driven',
         )
       }
+    }
+  }
+}
+
+const checkScatteredRadiusLiterals = () => {
+  for (const file of scssFiles(themeSourceRoot)) {
+    const source = read(file)
+
+    for (const match of source.matchAll(radiusLiteralPattern)) {
+      const property = match[1]
+      const value = Number(match[2])
+      if (!Number.isFinite(value) || value <= radiusBudgetPx) continue
+      if (pillRadiusPx.has(value)) continue
+
+      const index = match.index ?? 0
+      const context = source.slice(Math.max(0, index - 400), index + 240)
+      if (isAllowedRadiusLiteral(file, property, value, context)) continue
+
+      addViolation(
+        file,
+        lineNumberOf(source, index),
+        `${property}: ${value}px exceeds ${radiusBudgetPx}px; reduce it or add an allowlist entry with a reason`,
+      )
     }
   }
 }
@@ -129,7 +197,10 @@ const checkMarkdownLoading = () => {
   const file = 'packages/theme-chalk/src/markdown-renderer.scss'
   const source = read(file)
   const loadingBlockStart = source.indexOf('.markdown-renderer__loading')
-  const loadingBlock = loadingBlockStart >= 0 ? source.slice(loadingBlockStart, loadingBlockStart + 2400) : ''
+  const loadingBlock =
+    loadingBlockStart >= 0
+      ? source.slice(loadingBlockStart, loadingBlockStart + 2400)
+      : ''
 
   if (loadingBlock.includes('linear-gradient')) {
     addViolation(
@@ -170,6 +241,7 @@ const checkMotionDocs = () => {
 
 try {
   checkCoreTokens()
+  checkScatteredRadiusLiterals()
   checkBackdropFilters()
   checkReadingSurface()
   checkMarkdownLoading()

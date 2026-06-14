@@ -43,7 +43,7 @@
       line-height: 36px;
       color: getCssVar('datepicker-text-color');
       margin: 0 auto;
-      border-radius: 18px;
+      border-radius: 12px;
       &:hover {
         color: getCssVar('datepicker-hover-text-color');
       }
@@ -67,13 +67,13 @@
     }
 
     &.start-date div {
-      border-top-left-radius: 24px;
-      border-bottom-left-radius: 24px;
+      border-top-left-radius: 12px;
+      border-bottom-left-radius: 12px;
     }
 
     &.end-date div {
-      border-top-right-radius: 24px;
-      border-bottom-right-radius: 24px;
+      border-top-right-radius: 12px;
+      border-bottom-right-radius: 12px;
     }
 
     &.current:not(.disabled) .cell {

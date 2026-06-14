@@ -31,7 +31,7 @@
       align-items: center;
       margin: 2px 0;
       padding-right: 0 !important;
-      border-radius: 14px;
+      border-radius: 12px;
       box-sizing: border-box;
       color: getCssVar('text-color', 'regular');
       overflow: hidden;
@@ -95,7 +95,8 @@
         box-shadow: none !important;
       }
 
-      &:hover, &.hover {
+      &:hover,
+      &.hover {
         background: transparent !important;
         outline: none !important;
         box-shadow: none !important;
@@ -103,7 +104,9 @@
       }
     }
 
-    .#{$namespace}-tree-node__content > .#{$namespace}-tree-node__expand-icon + .#{$namespace}-select-dropdown__item {
+    .#{$namespace}-tree-node__content
+      > .#{$namespace}-tree-node__expand-icon
+      + .#{$namespace}-select-dropdown__item {
       margin-left: -32px !important;
       padding-left: 44px !important;
     }
@@ -115,7 +118,9 @@
       box-shadow: none;
     }
 
-    .#{$namespace}-tree-node.is-current > .#{$namespace}-tree-node__content .#{$namespace}-select-dropdown__item {
+    .#{$namespace}-tree-node.is-current
+      > .#{$namespace}-tree-node__content
+      .#{$namespace}-select-dropdown__item {
       background: transparent !important;
       box-shadow: none !important;
       outline: none !important;
@@ -123,11 +128,16 @@
       font-weight: inherit;
     }
 
-    .#{$namespace}-tree-node.is-current > .#{$namespace}-tree-node__content .#{$namespace}-select-dropdown__item,
-    .#{$namespace}-tree-node__content:hover > .#{$namespace}-select-dropdown__item,
-    .#{$namespace}-tree-node:focus > .#{$namespace}-tree-node__content .#{$namespace}-select-dropdown__item {
+    .#{$namespace}-tree-node.is-current
+      > .#{$namespace}-tree-node__content
+      .#{$namespace}-select-dropdown__item,
+    .#{$namespace}-tree-node__content:hover
+      > .#{$namespace}-select-dropdown__item,
+    .#{$namespace}-tree-node:focus
+      > .#{$namespace}-tree-node__content
+      .#{$namespace}-select-dropdown__item {
       background: rgba(42, 89, 156, 0.08) !important;
-      border-radius: 14px !important;
+      border-radius: 12px !important;
     }
 
     .#{$namespace}-tree-node:focus > .#{$namespace}-tree-node__content {
