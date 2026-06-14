@@ -16,13 +16,13 @@
         }
         td:first-child .#{$namespace}-date-table-cell {
           margin-left: 5px;
-          border-top-left-radius: 15px;
-          border-bottom-left-radius: 15px;
+          border-top-left-radius: 12px;
+          border-bottom-left-radius: 12px;
         }
         td:last-child .#{$namespace}-date-table-cell {
           margin-right: 5px;
-          border-top-right-radius: 15px;
-          border-bottom-right-radius: 15px;
+          border-top-right-radius: 12px;
+          border-bottom-right-radius: 12px;
         }
       }
 
@@ -86,7 +86,10 @@
       color: getCssVar('datepicker-hover-text-color');
 
       .#{$namespace}-date-table-cell__text {
-        background-color: var(--fsus-state-hover-bg, #{getCssVar('fill-color')});
+        background-color: var(
+          --fsus-state-hover-bg,
+          #{getCssVar('fill-color')}
+        );
         color: getCssVar('text-color', 'primary');
       }
     }
@@ -122,14 +125,14 @@
 
     &.start-date .#{$namespace}-date-table-cell {
       margin-left: 5px;
-      border-top-left-radius: 15px;
-      border-bottom-left-radius: 15px;
+      border-top-left-radius: 12px;
+      border-bottom-left-radius: 12px;
     }
 
     &.end-date .#{$namespace}-date-table-cell {
       margin-right: 5px;
-      border-top-right-radius: 15px;
-      border-bottom-right-radius: 15px;
+      border-top-right-radius: 12px;
+      border-bottom-right-radius: 12px;
     }
 
     &.disabled .#{$namespace}-date-table-cell {
@@ -143,7 +146,7 @@
       margin-left: 5px;
       margin-right: 5px;
       background-color: getCssVar('datepicker-inrange-bg-color');
-      border-radius: 15px;
+      border-radius: 12px;
       &:hover {
         background-color: getCssVar('datepicker-inrange-hover-bg-color');
       }
@@ -152,7 +155,7 @@
     &.selected .#{$namespace}-date-table-cell__text {
       background-color: getCssVar('datepicker-active-color');
       color: $color-white;
-      border-radius: 15px;
+      border-radius: 12px;
     }
 
     &.week {

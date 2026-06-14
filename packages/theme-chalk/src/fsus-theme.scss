@@ -1209,7 +1209,7 @@ button.#{$namespace}-card:active {
   top: var(--fsus-space-4);
   width: var(--fsus-notification-max-width);
   padding: var(--fsus-space-3) var(--fsus-space-4);
-  border-radius: 18px;
+  border-radius: 12px;
 }
 
 .#{$namespace}-notification {
@@ -1296,7 +1296,7 @@ button.#{$namespace}-card:active {
   display: flex;
   align-items: center;
   line-height: normal;
-  border-radius: 14px; // Unified with 20px popper - 6px padding
+  border-radius: 12px; // Option rows stay inside the default panel radius budget.
   color: var(--el-text-color-regular);
   margin: 2px 0;
   padding: 0 16px;
@@ -1448,7 +1448,7 @@ button.#{$namespace}-card:active {
   min-width: 40px;
   min-height: 40px;
   line-height: 40px;
-  border-radius: 14px;
+  border-radius: 12px;
 }
 
 .#{$namespace}-date-table
@@ -2082,7 +2082,7 @@ button.#{$namespace}-card:active {
 .#{$namespace}-tree-node__content {
   min-height: 44px;
   padding-right: 10px;
-  border-radius: 14px;
+  border-radius: 12px;
   color: var(--el-text-color-regular);
 }
 
