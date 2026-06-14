@@ -74,9 +74,9 @@
     <div class="demo-block">
       <h3>Space</h3>
       <el-space :size="20">
-        <el-button>Item 1</el-button>
-        <el-button>Item 2</el-button>
-        <el-button>Item 3</el-button>
+        <el-button>保存草稿</el-button>
+        <el-button>发布文章</el-button>
+        <el-button>移入归档</el-button>
       </el-space>
     </div>
     <div class="demo-block">
@@ -120,10 +120,5 @@
 </template>
 
 <script setup lang="ts">
-import {
-  ArrowLeft,
-  ArrowRight,
-  Edit,
-  Search,
-} from '../demo-state'
+import { ArrowLeft, ArrowRight, Edit, Search } from '../demo-state'
 </script>

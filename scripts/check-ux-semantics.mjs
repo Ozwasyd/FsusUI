@@ -7,6 +7,7 @@ const violations = []
 
 const semanticExampleDir = 'examples/ux-semantics'
 const consumerScanDirs = ['packages/demo-app/src', semanticExampleDir]
+const demoAppDir = 'packages/demo-app/src'
 const genericActionLabels = new Set([
   '确定',
   '提交',
@@ -64,6 +65,21 @@ const requiredExampleFiles = [
   'message-center.vue',
   'dashboard-today.vue',
   'admin-navigation.vue',
+]
+
+const forbiddenDemoCopyPatterns = [
+  /\bItem\s+\d+\b/gu,
+  /\bOption\s+\d+\b/gu,
+  /\bOption\s+[A-B]\b/gu,
+  /\bTag\s+\d+\b/gu,
+  /\bAction\s+\d+\b/gu,
+  /\bStep\s+\d+\b/gu,
+  /\bItem\s+(?:alpha|beta)\b/giu,
+  /\bItem\s+(?:body|action)\b/giu,
+  /\bPlease input\b/gu,
+  /\bSome description\b/gu,
+  /\bitem three\b/giu,
+  /\bTips\b/gu,
 ]
 
 const addViolation = (file, line, message) => {
@@ -371,6 +387,19 @@ const checkSemanticPage = (file, source) => {
   checkEmptyStates(file, cleanSource)
 }
 
+const checkDemoCopyPlaceholders = (file, source) => {
+  const cleanSource = stripComments(source)
+  for (const pattern of forbiddenDemoCopyPatterns) {
+    for (const match of cleanSource.matchAll(pattern)) {
+      addViolation(
+        file,
+        lineNumberOf(cleanSource, match.index ?? 0),
+        `demo copy must use real task context instead of "${match[0]}"`,
+      )
+    }
+  }
+}
+
 for (const { file, terms } of requiredDocs) {
   if (!existsSync(resolve(root, file))) {
     addViolation(file, 1, 'required UX semantics document is missing')
@@ -399,6 +428,10 @@ for (const dir of consumerScanDirs) {
   for (const file of listFiles(dir, ['.vue'])) {
     checkIconOnlyButtons(file, stripComments(readText(file)))
   }
+}
+
+for (const file of listFiles(demoAppDir, ['.vue'])) {
+  checkDemoCopyPlaceholders(file, readText(file))
 }
 
 for (const file of listFiles(semanticExampleDir, ['.vue'])) {

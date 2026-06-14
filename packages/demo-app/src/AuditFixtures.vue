@@ -235,7 +235,7 @@
 
       <AuditCard name="ElCheckboxButton" :state="auditState">
         <el-checkbox-group :model-value="active ? ['A'] : []">
-          <el-checkbox-button label="A">Option A</el-checkbox-button>
+          <el-checkbox-button label="A">推送到首页</el-checkbox-button>
         </el-checkbox-group>
       </AuditCard>
 
@@ -273,7 +273,7 @@
       <AuditCard name="ElCollapseItem" :state="auditState">
         <el-collapse :model-value="active ? ['item'] : []">
           <el-collapse-item title="Collapse item" name="item">
-            Item body
+            发布前检查摘要
           </el-collapse-item>
         </el-collapse>
       </AuditCard>
@@ -383,8 +383,8 @@
 
       <AuditCard name="ElDescriptionsItem" :state="auditState">
         <el-descriptions :column="1" border>
-          <el-descriptions-item label="Item">
-            Description cell
+          <el-descriptions-item label="文章状态">
+            等待复核
           </el-descriptions-item>
         </el-descriptions>
       </AuditCard>
@@ -470,7 +470,9 @@
           </el-button>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item :divided="active">Item action</el-dropdown-item>
+              <el-dropdown-item :divided="active">
+                导出 Markdown
+              </el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -669,21 +671,21 @@
           <template #list>
             <ElConversationList ariaLabel="Generic item list">
               <ElConversationListItem
-                title="Item alpha"
-                preview="Long preview content that should stay contained"
+                title="关于评论权限的讨论"
+                preview="长摘要内容仍然需要留在列表列宽内"
                 meta="09:00"
                 selected
                 :unread-count="active ? 3 : 1"
               />
               <ElConversationListItem
-                title="Item beta"
-                preview="Secondary neutral preview"
+                title="下周封面图评审"
+                preview="第二条工作流摘要保持安全换行"
                 meta="10:30"
               />
             </ElConversationList>
           </template>
           <template #detail>
-            <ElThreadPanel title="Thread alpha">
+            <ElThreadPanel title="评论权限讨论">
               <template #status>
                 <el-tag size="small" type="info">
                   {{ active ? 'Active' : 'Ready' }}
@@ -824,29 +826,29 @@
 
       <AuditCard name="ElOption" :state="auditState">
         <el-select
-          :model-value="active ? 'two' : ''"
-          placeholder="Option"
+          :model-value="active ? 'private' : ''"
+          placeholder="选择发布范围"
           :teleported="false"
           data-audit-focus
           data-audit-target
           data-audit-active
         >
-          <el-option label="Option one" value="one" />
-          <el-option label="Option two" value="two" />
+          <el-option label="公开" value="public" />
+          <el-option label="仅自己可见" value="private" />
         </el-select>
       </AuditCard>
 
       <AuditCard name="ElOptionGroup" :state="auditState">
         <el-select
-          :model-value="active ? 'one' : ''"
-          placeholder="Grouped option"
+          :model-value="active ? 'homepage' : ''"
+          placeholder="选择推荐策略"
           :teleported="false"
           data-audit-focus
           data-audit-target
           data-audit-active
         >
-          <el-option-group label="Group">
-            <el-option label="Grouped option" value="one" />
+          <el-option-group label="内容分发">
+            <el-option label="推送到首页" value="homepage" />
           </el-option-group>
         </el-select>
       </AuditCard>
@@ -1177,9 +1179,9 @@
 
       <AuditCard name="ElSelectV2" :state="auditState">
         <el-select-v2
-          :model-value="active ? 'Option 2' : ''"
+          :model-value="active ? 'cover-review' : ''"
           :options="selectV2Options"
-          placeholder="Select V2"
+          placeholder="选择工作流"
           :teleported="false"
           data-audit-focus
           data-audit-target
@@ -1234,9 +1236,9 @@
 
       <AuditCard name="ElSteps" :state="auditState">
         <el-steps :active="active ? 2 : 1">
-          <el-step title="One" description="Start" />
-          <el-step title="Two" description="Middle" />
-          <el-step title="Three" description="End" />
+          <el-step title="撰写" description="整理正文" />
+          <el-step title="复核" description="检查权限" />
+          <el-step title="发布" description="同步公开页" />
         </el-steps>
       </AuditCard>
 
@@ -1643,20 +1645,51 @@ const cascaderOptions = computed(() => [
     ],
   },
 ])
-const selectV2Options = computed(() =>
-  Array.from({ length: props.boundary ? 24 : 6 }, (_, idx) => ({
-    value: `Option ${idx + 1}`,
-    label: props.boundary
-      ? `Option ${idx + 1} - ${boundaryText}`
-      : `Option ${idx + 1}`,
-  })),
-)
+const selectV2BaseOptions = [
+  ['draft-review', '草稿评审'],
+  ['cover-review', '封面图复核'],
+  ['publish-schedule', '发布排期'],
+  ['comment-permission', '评论权限'],
+  ['archive-policy', '归档策略'],
+  ['homepage-feature', '首页推荐'],
+] as const
+const selectV2Options = computed(() => {
+  if (!props.boundary) {
+    return selectV2BaseOptions.map(([value, label]) => ({ value, label }))
+  }
+
+  return Array.from({ length: 24 }, (_, idx) => {
+    const [value, label] = selectV2BaseOptions[idx % selectV2BaseOptions.length]
+    return {
+      value: idx === 1 ? 'cover-review' : `${value}-${idx + 1}`,
+      label: `${label} - ${boundaryText}`,
+    }
+  })
+})
+const transferLabels = [
+  '同步成员权限',
+  '发布前校对',
+  '更新封面图',
+  '复核评论设置',
+  '写入审计记录',
+  '刷新搜索索引',
+  '生成分享摘要',
+  '同步首页推荐',
+  '校验附件大小',
+  '通知协作者',
+  '归档过期草稿',
+  '检查外链状态',
+  '更新标签分组',
+  '预热公开缓存',
+  '记录发布说明',
+  '检查摘要长度',
+  '更新发布时间',
+  '生成回滚说明',
+]
 const transferData = computed(() =>
-  Array.from({ length: props.boundary ? 18 : 6 }, (_, idx) => ({
+  transferLabels.slice(0, props.boundary ? 18 : 6).map((label, idx) => ({
     key: idx + 1,
-    label: props.boundary
-      ? `Option ${idx + 1} - ${boundaryText}`
-      : `Option ${idx + 1}`,
+    label: props.boundary ? `${label} - ${boundaryText}` : label,
     disabled: idx === 4,
   })),
 )

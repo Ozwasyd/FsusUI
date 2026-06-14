@@ -7,10 +7,10 @@
         <el-menu-item index="1">Processing Center</el-menu-item>
         <el-sub-menu index="2">
           <template #title>Workspace</template>
-          <el-menu-item index="2-1">item one</el-menu-item>
-          <el-menu-item index="2-2">item two</el-menu-item>
-          <el-menu-item-group title="Group One">
-            <el-menu-item index="2-3">item three</el-menu-item>
+          <el-menu-item index="2-1">草稿箱</el-menu-item>
+          <el-menu-item index="2-2">发布队列</el-menu-item>
+          <el-menu-item-group title="内容工作区">
+            <el-menu-item index="2-3">权限设置</el-menu-item>
           </el-menu-item-group>
         </el-sub-menu>
       </el-menu>
@@ -45,9 +45,9 @@
         </el-button>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item>Action 1</el-dropdown-item>
-            <el-dropdown-item disabled>Action 2</el-dropdown-item>
-            <el-dropdown-item divided>Action 3</el-dropdown-item>
+            <el-dropdown-item>保存草稿</el-dropdown-item>
+            <el-dropdown-item disabled>预览发布</el-dropdown-item>
+            <el-dropdown-item divided>导出 Markdown</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -55,9 +55,9 @@
     <div class="demo-block">
       <h3>Steps & Step</h3>
       <el-steps :active="1">
-        <el-step title="Step 1" description="Some description" />
-        <el-step title="Step 2" description="Some description" />
-        <el-step title="Step 3" description="Some description" />
+        <el-step title="撰写" description="整理正文与封面" />
+        <el-step title="复核" description="检查摘要和权限" />
+        <el-step title="发布" description="同步到公开站点" />
       </el-steps>
     </div>
     <div class="demo-block demo-backtop-block">

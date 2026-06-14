@@ -4,14 +4,7 @@ import * as Icons from '@element-plus/icons-vue'
 
 import type { InjectionKey } from 'vue'
 
-export const {
-  Search,
-  ArrowLeft,
-  ArrowRight,
-  ArrowDown,
-  Edit,
-  Share,
-} = Icons
+export const { Search, ArrowLeft, ArrowRight, ArrowDown, Edit, Share } = Icons
 
 const readCssVar = (name: string, fallback: string) => {
   if (typeof window === 'undefined') return fallback
@@ -28,9 +21,20 @@ export const createDemoState = () => {
   const input = ref('')
   const inputNumber = ref<any>(1)
   const select = ref('')
-  const selectV2Options = Array.from({ length: 10 }).map((_, idx) => ({
-    value: `Option ${idx + 1}`,
-    label: `Option ${idx + 1}`,
+  const selectV2Options = [
+    '草稿评审',
+    '封面图复核',
+    '发布排期',
+    '评论权限',
+    '归档策略',
+    '首页推荐',
+    '搜索收录',
+    '成员协作',
+    '审计记录',
+    '站点通知',
+  ].map((label, idx) => ({
+    value: `workflow-${idx + 1}`,
+    label,
   }))
   const cascaderOptions = [
     {
@@ -48,9 +52,26 @@ export const createDemoState = () => {
   const rate = ref(3.5)
   const color = ref(readCssVar('--fsus-scholarly-blue', '#2a599c'))
   const transferValue = ref<any[]>([])
-  const transferData = Array.from({ length: 15 }).map((_, idx) => ({
+  const transferLabels = [
+    '同步成员权限',
+    '发布前校对',
+    '更新封面图',
+    '复核评论设置',
+    '写入审计记录',
+    '刷新搜索索引',
+    '生成分享摘要',
+    '同步首页推荐',
+    '校验附件大小',
+    '通知协作者',
+    '归档过期草稿',
+    '检查外链状态',
+    '更新标签分组',
+    '预热公开缓存',
+    '记录发布说明',
+  ]
+  const transferData = transferLabels.map((label, idx) => ({
     key: idx,
-    label: `Option ${idx}`,
+    label,
     disabled: idx % 4 === 0,
   }))
   const formModel = reactive({ name: '', region: '' })
@@ -83,9 +104,7 @@ export const createDemoState = () => {
         {
           value: 'level-1-1',
           label: 'Level two 1-1',
-          children: [
-            { value: 'level-1-1-1', label: 'Level three 1-1-1' },
-          ],
+          children: [{ value: 'level-1-1-1', label: 'Level three 1-1-1' }],
         },
       ],
     },
@@ -120,8 +139,7 @@ export const createDemoState = () => {
     cb([{ value: 'vue' }, { value: 'element' }])
   }
   const showMessage = () => ElMessage('This is a message.')
-  const showMessageBox = () =>
-    ElMessageBox.alert('This is a message', 'Title')
+  const showMessageBox = () => ElMessageBox.alert('This is a message', 'Title')
   const showNotification = () =>
     ElNotification({
       title: 'Notification',

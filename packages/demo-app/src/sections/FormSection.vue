@@ -5,12 +5,12 @@
       <h3>Radio & RadioButton</h3>
       <el-space direction="vertical" alignment="flex-start">
         <el-radio-group v-model="radio">
-          <el-radio label="1">Option 1</el-radio>
-          <el-radio label="2">Option 2</el-radio>
+          <el-radio label="1">公开</el-radio>
+          <el-radio label="2">仅自己可见</el-radio>
         </el-radio-group>
         <el-radio-group v-model="radio">
-          <el-radio-button label="1">Option 1</el-radio-button>
-          <el-radio-button label="2">Option 2</el-radio-button>
+          <el-radio-button label="1">公开</el-radio-button>
+          <el-radio-button label="2">仅自己可见</el-radio-button>
         </el-radio-group>
       </el-space>
     </div>
@@ -19,20 +19,24 @@
       <el-space direction="vertical" alignment="flex-start">
         <el-checkbox v-model="checkbox">Checkbox</el-checkbox>
         <el-checkbox-group v-model="checkboxGroup">
-          <el-checkbox label="A">Option A</el-checkbox>
-          <el-checkbox label="B">Option B</el-checkbox>
+          <el-checkbox label="A">推送到首页</el-checkbox>
+          <el-checkbox label="B">保持普通</el-checkbox>
         </el-checkbox-group>
         <el-checkbox-group v-model="checkboxGroup">
-          <el-checkbox-button label="A">Option A</el-checkbox-button>
-          <el-checkbox-button label="B">Option B</el-checkbox-button>
+          <el-checkbox-button label="A">推送到首页</el-checkbox-button>
+          <el-checkbox-button label="B">保持普通</el-checkbox-button>
         </el-checkbox-group>
       </el-space>
     </div>
     <div class="demo-block">
       <h3>Input</h3>
       <el-space direction="vertical" style="width: 100%">
-        <el-input v-model="input" placeholder="Please input" clearable />
-        <el-input v-model="input" type="textarea" placeholder="Textarea" />
+        <el-input v-model="input" placeholder="输入文章标题" clearable />
+        <el-input
+          v-model="input"
+          type="textarea"
+          placeholder="写下摘要或更新说明"
+        />
       </el-space>
     </div>
     <div class="demo-block">
@@ -41,10 +45,10 @@
     </div>
     <div class="demo-block">
       <h3>Select & Option & OptionGroup</h3>
-      <el-select v-model="select" placeholder="Select">
-        <el-option-group label="Group 1">
-          <el-option label="Option 1" value="1" />
-          <el-option label="Option 2" value="2" />
+      <el-select v-model="select" placeholder="选择可见范围">
+        <el-option-group label="发布范围">
+          <el-option label="公开" value="1" />
+          <el-option label="仅自己可见" value="2" />
         </el-option-group>
       </el-select>
     </div>
@@ -53,7 +57,7 @@
       <el-select-v2
         v-model="select"
         :options="selectV2Options"
-        placeholder="Select V2"
+        placeholder="选择工作流"
       />
     </div>
     <div class="demo-block">
@@ -65,7 +69,11 @@
     </div>
     <div class="demo-block">
       <h3>Switch</h3>
-      <el-switch v-model="switchValue" active-text="Open" inactive-text="Close" />
+      <el-switch
+        v-model="switchValue"
+        active-text="Open"
+        inactive-text="Close"
+      />
     </div>
     <div class="demo-block">
       <h3>Slider</h3>
@@ -102,7 +110,9 @@
       <el-upload action="#" multiple :limit="3">
         <el-button type="primary">Click to upload</el-button>
         <template #tip>
-          <div class="el-upload__tip">jpg/png files with a size less than 500kb</div>
+          <div class="el-upload__tip">
+            jpg/png files with a size less than 500kb
+          </div>
         </template>
       </el-upload>
     </div>

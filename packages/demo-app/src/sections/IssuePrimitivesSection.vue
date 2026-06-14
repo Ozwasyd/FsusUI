@@ -354,8 +354,8 @@
         <template #list>
           <ElConversationList ariaLabel="Generic conversation list">
             <ElConversationListItem
-              title="Item Alpha"
-              preview="Neutral preview text stays within the list column."
+              title="关于评论权限的讨论"
+              preview="长摘要内容仍然需要留在列表列宽内。"
               meta="09:00"
               :selected="selectedInboxItem === 'alpha'"
               :unread-count="2"
@@ -366,8 +366,8 @@
               </template>
             </ElConversationListItem>
             <ElConversationListItem
-              title="Item Beta"
-              preview="Secondary generic preview with safe wrapping behavior."
+              title="下周封面图评审"
+              preview="第二条工作流摘要保持安全换行。"
               meta="10:30"
               :selected="selectedInboxItem === 'beta'"
               @select="selectedInboxItem = 'beta'"
@@ -380,7 +380,7 @@
         </template>
 
         <template #detail>
-          <ElThreadPanel title="Thread Alpha">
+          <ElThreadPanel title="评论权限讨论">
             <template #back>
               <el-button text inline-action>Back</el-button>
             </template>

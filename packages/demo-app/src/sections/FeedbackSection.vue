@@ -13,21 +13,21 @@
     <div class="demo-block">
       <h3>Dialog / Drawer</h3>
       <el-space wrap>
-        <el-button @click="dialogVisible = true">Open Dialog</el-button>
-        <el-button @click="drawerVisible = true">Open Drawer</el-button>
-        <el-dialog v-model="dialogVisible" title="Tips" width="30%">
-          <span>This is a message</span>
+        <el-button @click="dialogVisible = true">打开发布确认</el-button>
+        <el-button @click="drawerVisible = true">查看审阅记录</el-button>
+        <el-dialog v-model="dialogVisible" title="确认发布" width="30%">
+          <span>发布后读者将看到最新版本。</span>
           <template #footer>
             <span class="dialog-footer">
-              <el-button @click="dialogVisible = false">Cancel</el-button>
+              <el-button @click="dialogVisible = false">继续编辑</el-button>
               <el-button type="primary" @click="dialogVisible = false">
-                Confirm
+                确认发布
               </el-button>
             </span>
           </template>
         </el-dialog>
-        <el-drawer v-model="drawerVisible" title="I am the title" direction="rtl">
-          <span>Hi, there!</span>
+        <el-drawer v-model="drawerVisible" title="审阅记录" direction="rtl">
+          <span>查看最近一次修改摘要。</span>
         </el-drawer>
       </el-space>
     </div>
@@ -78,7 +78,9 @@
     <div class="demo-block">
       <h3>Popper (Raw) & PopperArrow & PopperContent & PopperTrigger</h3>
       <el-popper>
-        <el-popper-trigger><el-button>Popper Trigger</el-button></el-popper-trigger>
+        <el-popper-trigger>
+          <el-button>Popper Trigger</el-button>
+        </el-popper-trigger>
         <el-popper-content :visible="true">
           <el-popper-arrow />Raw Popper Content
         </el-popper-content>

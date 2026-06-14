@@ -27,13 +27,13 @@
     <div class="demo-block">
       <h3>Tag / CheckTag</h3>
       <el-space wrap>
-        <el-tag>Tag 1</el-tag>
-        <el-tag type="success">Tag 2</el-tag>
-        <el-tag type="info">Tag 3</el-tag>
-        <el-tag type="warning">Tag 4</el-tag>
-        <el-tag type="danger">Tag 5</el-tag>
+        <el-tag>文章</el-tag>
+        <el-tag type="success">已发布</el-tag>
+        <el-tag type="info">技术笔记</el-tag>
+        <el-tag type="warning">待复核</el-tag>
+        <el-tag type="danger">高风险</el-tag>
         <el-check-tag :checked="checkTag" @change="checkTag = !checkTag">
-          Check Tag
+          已同步
         </el-check-tag>
       </el-space>
     </div>
@@ -69,11 +69,7 @@
       <el-space :size="30">
         <el-badge :value="12"><el-button>Comments</el-button></el-badge>
         <el-badge :value="3" is-dot>
-          <el-button
-            :icon="Share"
-            type="primary"
-            v-bind="{ 'aria-label': 'Share item' }"
-          />
+          <el-button :icon="Share" type="primary" aria-label="Share article" />
         </el-badge>
       </el-space>
     </div>
