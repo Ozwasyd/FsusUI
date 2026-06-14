@@ -4,13 +4,13 @@
       v-show="always || visible"
       ref="instance"
       :class="[ns.e('bar'), ns.is(bar.key)]"
-      @mousedown="clickTrackHandler"
+      @pointerdown="handleTrackPointerDown"
     >
       <div
         ref="thumb"
         :class="ns.e('thumb')"
         :style="thumbStyle"
-        @mousedown="clickThumbHandler"
+        @pointerdown="handleThumbPointerDown"
       />
     </div>
   </transition>
@@ -43,6 +43,8 @@ let cursorDown = false
 let cursorLeave = false
 let dragStartClient = 0
 let dragStartScroll = 0
+let activePointerId: number | undefined
+let pointerCaptureTarget: HTMLDivElement | undefined
 let originalOnSelectStart:
   | ((this: GlobalEventHandlers, ev: Event) => any)
   | null = isClient ? document.onselectstart : null
@@ -90,7 +92,7 @@ const isLongRangeScroll = () =>
   getScrollRange() / getTrackTravel() > LONG_RANGE_TRACK_DENSITY
 
 const resolveLongRangeDragOffset = (
-  event: MouseEvent,
+  event: PointerEvent,
   fallbackScrollOffset: number,
 ) => {
   if (!scrollbar.wrapElement || !isLongRangeScroll())
@@ -110,16 +112,44 @@ const resolveLongRangeDragOffset = (
   )
 }
 
-const clickThumbHandler = (e: MouseEvent) => {
+const isPrimaryPointer = (e: PointerEvent) =>
+  e.isPrimary !== false && !e.ctrlKey && ![1, 2].includes(e.button)
+
+const capturePointer = (target: HTMLDivElement, pointerId: number) => {
+  activePointerId = pointerId
+  pointerCaptureTarget = target
+  try {
+    target.setPointerCapture?.(pointerId)
+  } catch {
+    // Synthetic events and older browsers can reject capture; document
+    // listeners still keep the drag stable.
+  }
+}
+
+const releasePointer = () => {
+  if (activePointerId == null) return
+
+  try {
+    pointerCaptureTarget?.releasePointerCapture?.(activePointerId)
+  } catch {
+    // The pointer can already be released after pointercancel.
+  }
+
+  activePointerId = undefined
+  pointerCaptureTarget = undefined
+}
+
+const handleThumbPointerDown = (e: PointerEvent) => {
   // prevent click event of middle and right button
   e.stopPropagation()
-  if (e.ctrlKey || [1, 2].includes(e.button)) return
+  if (!isPrimaryPointer(e)) return
+
+  const el = e.currentTarget as HTMLDivElement | null
+  if (!el) return
 
   window.getSelection()?.removeAllRanges()
-  startDrag(e)
+  startDrag(e, el)
 
-  const el = e.currentTarget as HTMLDivElement
-  if (!el) return
   dragStartClient = e[bar.value.client]
   dragStartScroll = scrollbar.wrapElement?.[bar.value.scroll] || 0
   thumbState.value[bar.value.axis] =
@@ -127,8 +157,11 @@ const clickThumbHandler = (e: MouseEvent) => {
     (e[bar.value.client] - el.getBoundingClientRect()[bar.value.direction])
 }
 
-const clickTrackHandler = (e: MouseEvent) => {
+const handleTrackPointerDown = (e: PointerEvent) => {
+  if (!isPrimaryPointer(e)) return
   if (!thumb.value || !instance.value || !scrollbar.wrapElement) return
+
+  e.preventDefault()
 
   if (isLongRangeScroll()) {
     const thumbRect = thumb.value.getBoundingClientRect()
@@ -166,27 +199,35 @@ const clickTrackHandler = (e: MouseEvent) => {
 }
 
 const cleanupDocumentListeners = () => {
-  document.removeEventListener('mousemove', mouseMoveDocumentHandler)
-  document.removeEventListener('mouseup', mouseUpDocumentHandler)
+  document.removeEventListener('pointermove', pointerMoveDocumentHandler)
+  document.removeEventListener('pointerup', pointerUpDocumentHandler)
+  document.removeEventListener('pointercancel', pointerCancelDocumentHandler)
 }
 
-const startDrag = (e: MouseEvent) => {
+const startDrag = (e: PointerEvent, target: HTMLDivElement) => {
   e.stopImmediatePropagation()
+  e.preventDefault()
   cursorDown = true
+  capturePointer(target, e.pointerId)
   scrollbar.startThumbDrag()
   cleanupDocumentListeners()
-  document.addEventListener('mousemove', mouseMoveDocumentHandler)
-  document.addEventListener('mouseup', mouseUpDocumentHandler)
+  document.addEventListener('pointermove', pointerMoveDocumentHandler, {
+    passive: false,
+  })
+  document.addEventListener('pointerup', pointerUpDocumentHandler)
+  document.addEventListener('pointercancel', pointerCancelDocumentHandler)
   originalOnSelectStart = document.onselectstart
   document.onselectstart = () => false
 }
 
-const mouseMoveDocumentHandler = (e: MouseEvent) => {
+const pointerMoveDocumentHandler = (e: PointerEvent) => {
   if (!instance.value || !thumb.value) return
   if (cursorDown === false) return
+  if (activePointerId != null && e.pointerId !== activePointerId) return
+  e.preventDefault()
 
   const prevPage = thumbState.value[bar.value.axis]
-  if (!prevPage) return
+  if (prevPage == null) return
 
   const offset =
     (instance.value.getBoundingClientRect()[bar.value.direction] -
@@ -205,21 +246,32 @@ const mouseMoveDocumentHandler = (e: MouseEvent) => {
   )
 }
 
-const mouseUpDocumentHandler = () => {
+const finishDrag = () => {
   cursorDown = false
-  thumbState.value[bar.value.axis] = 0
+  thumbState.value[bar.value.axis] = undefined
   scrollbar.endThumbDrag()
+  releasePointer()
   cleanupDocumentListeners()
   restoreOnselectstart()
   if (cursorLeave) visible.value = false
 }
 
-const mouseMoveScrollbarHandler = () => {
+const pointerUpDocumentHandler = (e: PointerEvent) => {
+  if (activePointerId != null && e.pointerId !== activePointerId) return
+  finishDrag()
+}
+
+const pointerCancelDocumentHandler = (e: PointerEvent) => {
+  if (activePointerId != null && e.pointerId !== activePointerId) return
+  finishDrag()
+}
+
+const pointerMoveScrollbarHandler = () => {
   cursorLeave = false
   visible.value = !!props.size
 }
 
-const mouseLeaveScrollbarHandler = () => {
+const pointerLeaveScrollbarHandler = () => {
   cursorLeave = true
   visible.value = cursorDown
 }
@@ -239,12 +291,12 @@ const restoreOnselectstart = () => {
 
 useEventListener(
   toRef(scrollbar, 'scrollbarElement'),
-  'mousemove',
-  mouseMoveScrollbarHandler,
+  'pointermove',
+  pointerMoveScrollbarHandler,
 )
 useEventListener(
   toRef(scrollbar, 'scrollbarElement'),
-  'mouseleave',
-  mouseLeaveScrollbarHandler,
+  'pointerleave',
+  pointerLeaveScrollbarHandler,
 )
 </script>

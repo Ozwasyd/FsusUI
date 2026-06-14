@@ -167,6 +167,9 @@
 
   @include e(mobile-nav-wrap) {
     overflow-y: hidden;
+    touch-action: pan-x pan-y;
+    overscroll-behavior-x: contain;
+    overscroll-behavior-y: auto;
   }
 
   @include e(mobile-actions) {

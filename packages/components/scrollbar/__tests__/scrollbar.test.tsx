@@ -6,6 +6,61 @@ import defineGetter from '@element-plus/test-utils/define-getter'
 import { rAF } from '@element-plus/test-utils/tick'
 import Scrollbar from '../src/scrollbar.vue'
 
+const rect = (overrides: Partial<DOMRect> = {}) =>
+  ({
+    x: 0,
+    y: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    width: 0,
+    height: 0,
+    toJSON: () => ({}),
+    ...overrides,
+  }) as DOMRect
+
+const createPointerEvent = (
+  type: string,
+  init: PointerEventInit & { pointerType?: string } = {},
+) => {
+  const event =
+    typeof PointerEvent === 'function'
+      ? new PointerEvent(type, {
+          bubbles: true,
+          cancelable: true,
+          button: 0,
+          pointerId: 1,
+          pointerType: 'mouse',
+          isPrimary: true,
+          ...init,
+        })
+      : new MouseEvent(type, {
+          bubbles: true,
+          cancelable: true,
+          button: 0,
+          clientX: init.clientX,
+          clientY: init.clientY,
+        })
+
+  Object.defineProperties(event, {
+    pointerId: {
+      configurable: true,
+      value: init.pointerId ?? 1,
+    },
+    pointerType: {
+      configurable: true,
+      value: init.pointerType ?? 'mouse',
+    },
+    isPrimary: {
+      configurable: true,
+      value: init.isPrimary ?? true,
+    },
+  })
+
+  return event as PointerEvent
+}
+
 afterEach(() => {
   vi.restoreAllMocks()
 })
@@ -324,21 +379,188 @@ describe('ScrollBar', () => {
     ))
 
     await nextTick()
-    await wrapper.find('.el-scrollbar__thumb').trigger('mousedown', {
-      button: 0,
-      clientY: 10,
-    })
+    wrapper
+      .find('.el-scrollbar__thumb')
+      .element.dispatchEvent(createPointerEvent('pointerdown', { clientY: 10 }))
 
     wrapper.unmount()
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith(
-      'mousemove',
+      'pointermove',
       expect.any(Function),
     )
     expect(removeEventListenerSpy).toHaveBeenCalledWith(
-      'mouseup',
+      'pointerup',
       expect.any(Function),
     )
+    expect(removeEventListenerSpy).toHaveBeenCalledWith(
+      'pointercancel',
+      expect.any(Function),
+    )
+  })
+
+  test('should render opt-in overscroll containment class', () => {
+    const wrapper = mount(() => <Scrollbar overscroll="contain" />)
+
+    expect(wrapper.find('.el-scrollbar').classes()).toContain(
+      'el-scrollbar--contain-overscroll',
+    )
+  })
+
+  for (const pointerType of ['mouse', 'touch'] as const) {
+    test(`should drag vertical thumb with ${pointerType} pointer from a zero edge offset`, async () => {
+      const outerHeight = 204
+      const innerHeight = 1000
+      const wrapper = mount(() => (
+        <Scrollbar style={`height: ${outerHeight}px;`} always>
+          <div style={`height: ${innerHeight}px;`}></div>
+        </Scrollbar>
+      ))
+      const scrollDom = wrapper.find('.el-scrollbar__wrap')
+        .element as HTMLElement
+      const track = wrapper.find('.el-scrollbar__bar.is-vertical')
+        .element as HTMLDivElement
+      const thumb = wrapper.find(
+        '.el-scrollbar__bar.is-vertical .el-scrollbar__thumb',
+      ).element as HTMLDivElement
+
+      const offsetHeightRestore = defineGetter(
+        scrollDom,
+        'offsetHeight',
+        outerHeight,
+      )
+      const clientHeightRestore = defineGetter(
+        scrollDom,
+        'clientHeight',
+        outerHeight,
+      )
+      const scrollHeightRestore = defineGetter(
+        scrollDom,
+        'scrollHeight',
+        innerHeight,
+      )
+      const trackHeightRestore = defineGetter(track, 'offsetHeight', 196)
+      const thumbHeightRestore = defineGetter(thumb, 'offsetHeight', 40)
+      vi.spyOn(track, 'getBoundingClientRect').mockReturnValue(
+        rect({ top: 0, bottom: 196, height: 196 }),
+      )
+      vi.spyOn(thumb, 'getBoundingClientRect').mockReturnValue(
+        rect({ top: 0, bottom: 40, height: 40 }),
+      )
+      const setPointerCapture = vi.fn()
+      const releasePointerCapture = vi.fn()
+      Object.defineProperties(thumb, {
+        setPointerCapture: {
+          configurable: true,
+          value: setPointerCapture,
+        },
+        releasePointerCapture: {
+          configurable: true,
+          value: releasePointerCapture,
+        },
+      })
+
+      await makeScroll(scrollDom, 'scrollTop', 0)
+      thumb.dispatchEvent(
+        createPointerEvent('pointerdown', {
+          clientY: 40,
+          pointerId: 7,
+          pointerType,
+        }),
+      )
+      document.dispatchEvent(
+        createPointerEvent('pointermove', {
+          clientY: 84,
+          pointerId: 7,
+          pointerType,
+        }),
+      )
+
+      await rAF()
+
+      expect(scrollDom.scrollTop).toBeGreaterThan(0)
+      expect(wrapper.find('.el-scrollbar').classes()).toContain(
+        'is-thumb-dragging',
+      )
+
+      document.dispatchEvent(
+        createPointerEvent('pointerup', {
+          clientY: 84,
+          pointerId: 7,
+          pointerType,
+        }),
+      )
+      await rAF()
+
+      expect(wrapper.find('.el-scrollbar').classes()).not.toContain(
+        'is-thumb-dragging',
+      )
+      expect(setPointerCapture).toHaveBeenCalledWith(7)
+      expect(releasePointerCapture).toHaveBeenCalledWith(7)
+
+      offsetHeightRestore()
+      clientHeightRestore()
+      scrollHeightRestore()
+      trackHeightRestore()
+      thumbHeightRestore()
+    })
+  }
+
+  test('should cleanup pointer drag state on pointercancel', async () => {
+    const wrapper = mount(() => (
+      <Scrollbar style="height: 204px;" always>
+        <div style="height: 1000px;"></div>
+      </Scrollbar>
+    ))
+    const scrollDom = wrapper.find('.el-scrollbar__wrap').element as HTMLElement
+    const track = wrapper.find('.el-scrollbar__bar.is-vertical')
+      .element as HTMLDivElement
+    const thumb = wrapper.find(
+      '.el-scrollbar__bar.is-vertical .el-scrollbar__thumb',
+    ).element as HTMLDivElement
+
+    const offsetHeightRestore = defineGetter(scrollDom, 'offsetHeight', 204)
+    const clientHeightRestore = defineGetter(scrollDom, 'clientHeight', 204)
+    const scrollHeightRestore = defineGetter(scrollDom, 'scrollHeight', 1000)
+    const trackHeightRestore = defineGetter(track, 'offsetHeight', 196)
+    const thumbHeightRestore = defineGetter(thumb, 'offsetHeight', 40)
+    vi.spyOn(track, 'getBoundingClientRect').mockReturnValue(
+      rect({ top: 0, bottom: 196, height: 196 }),
+    )
+    vi.spyOn(thumb, 'getBoundingClientRect').mockReturnValue(
+      rect({ top: 0, bottom: 40, height: 40 }),
+    )
+
+    await makeScroll(scrollDom, 'scrollTop', 0)
+    thumb.dispatchEvent(
+      createPointerEvent('pointerdown', {
+        clientY: 20,
+        pointerId: 12,
+        pointerType: 'touch',
+      }),
+    )
+    expect(wrapper.find('.el-scrollbar').classes()).toContain(
+      'is-thumb-dragging',
+    )
+
+    document.dispatchEvent(
+      createPointerEvent('pointercancel', {
+        clientY: 20,
+        pointerId: 12,
+        pointerType: 'touch',
+      }),
+    )
+    await rAF()
+
+    expect(wrapper.find('.el-scrollbar').classes()).not.toContain(
+      'is-thumb-dragging',
+    )
+
+    offsetHeightRestore()
+    clientHeightRestore()
+    scrollHeightRestore()
+    trackHeightRestore()
+    thumbHeightRestore()
   })
 
   test('should not trigger motion classes for silent programmatic scroll', async () => {
