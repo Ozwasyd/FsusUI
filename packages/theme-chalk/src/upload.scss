@@ -179,7 +179,8 @@
   list-style: none;
   position: relative;
   @include e(item) {
-    transition: opacity 0.5s cubic-bezier(0.55, 0, 0.1, 1),
+    transition:
+      opacity 0.5s cubic-bezier(0.55, 0, 0.1, 1),
       transform 0.5s cubic-bezier(0.55, 0, 0.1, 1),
       background-color 0.5s cubic-bezier(0.55, 0, 0.1, 1);
     font-size: getCssVar('font-size', 'base');
@@ -629,7 +630,7 @@
       }
 
       &:hover {
-        transform: translateY(-13px);
+        transform: translateY(-1px);
 
         span {
           opacity: 1;

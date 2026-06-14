@@ -129,7 +129,10 @@ $slider-height: map.merge(
     user-select: none;
 
     &:hover,
-    &.hover,
+    &.hover {
+      transform: translateY(-1px);
+    }
+
     &.dragging {
       transform: scale(1.2);
     }

@@ -19,6 +19,9 @@ const allowedRadiusLiterals = [
       'image viewer media chrome toolbar is an immersive control surface, not an ordinary card or panel',
   },
 ]
+const hoverScaleMax = 1.1
+const hoverTranslateMaxPx = 1
+const hoverTransformAllowlist = []
 
 const read = (file) => readFileSync(resolve(root, file), 'utf8')
 
@@ -56,6 +59,95 @@ const isAllowedRadiusLiteral = (file, property, value, context) =>
       entry.reason.trim().length > 0 &&
       context.includes(entry.contextIncludes),
   )
+
+const findMatchingBrace = (source, openIndex) => {
+  let depth = 0
+  for (let index = openIndex; index < source.length; index += 1) {
+    const char = source[index]
+    if (char === '{') depth += 1
+    if (char === '}') {
+      depth -= 1
+      if (depth === 0) return index
+    }
+  }
+
+  return -1
+}
+
+const selectorHasHoverState = (selector) =>
+  selector.replaceAll(/:not\(\s*:hover\s*\)/g, '').includes(':hover')
+
+const hoverBlocks = (source) => {
+  const ranges = []
+
+  for (const hoverMatch of source.matchAll(/:hover/g)) {
+    const hoverIndex = hoverMatch.index ?? 0
+    const blockOpen = source.indexOf('{', hoverIndex)
+    if (blockOpen < 0) continue
+
+    const selectorStart =
+      Math.max(
+        source.lastIndexOf('{', hoverIndex),
+        source.lastIndexOf('}', hoverIndex),
+        source.lastIndexOf(';', hoverIndex),
+      ) + 1
+    const selector = source.slice(selectorStart, blockOpen).trim()
+    if (!selectorHasHoverState(selector)) continue
+
+    const blockClose = findMatchingBrace(source, blockOpen)
+    if (blockClose < 0) continue
+
+    ranges.push({ start: blockOpen + 1, end: blockClose, selector })
+  }
+
+  return ranges
+}
+
+const isAllowedHoverTransform = (file, selector, transform) =>
+  hoverTransformAllowlist.some(
+    (entry) =>
+      entry.file === file &&
+      entry.reason.trim().length > 0 &&
+      selector.includes(entry.selectorIncludes) &&
+      transform.includes(entry.transformIncludes),
+  )
+
+const numericArgs = (args) =>
+  args
+    .split(',')
+    .map((arg) => Number(/-?[0-9.]+/.exec(arg)?.[0]))
+    .filter((value) => Number.isFinite(value))
+
+const pxArgs = (args) =>
+  [...args.matchAll(/(-?[0-9.]+)px/g)].map((match) => Number(match[1]))
+
+const transformViolations = (transform) => {
+  const messages = []
+
+  for (const match of transform.matchAll(/\bscale(?:3d|X|Y)?\(([^)]*)\)/g)) {
+    const maxScale = Math.max(...numericArgs(match[1]))
+    if (Number.isFinite(maxScale) && maxScale >= hoverScaleMax) {
+      messages.push(
+        `hover scale must stay below ${hoverScaleMax}; found ${match[0]}`,
+      )
+    }
+  }
+
+  for (const match of transform.matchAll(
+    /\btranslate(?:3d|X|Y)?\(([^)]*)\)/g,
+  )) {
+    const maxOffset = Math.max(
+      ...pxArgs(match[1]).map((value) => Math.abs(value)),
+    )
+    if (Number.isFinite(maxOffset) && maxOffset > hoverTranslateMaxPx) {
+      messages.push(
+        `hover translation must stay within ${hoverTranslateMaxPx}px; found ${match[0]}`,
+      )
+    }
+  }
+
+  return messages
+}
 
 const assertIncludes = (file, source, expected, message) => {
   if (!source.includes(expected)) addViolation(file, 1, message)
@@ -172,6 +264,29 @@ const checkScatteredRadiusLiterals = () => {
   }
 }
 
+const checkHoverTransforms = () => {
+  for (const file of scssFiles(themeSourceRoot)) {
+    const source = read(file)
+    const reportedTransforms = new Set()
+
+    for (const block of hoverBlocks(source)) {
+      const blockSource = source.slice(block.start, block.end)
+      for (const match of blockSource.matchAll(/transform\s*:\s*([^;]+);/g)) {
+        const transform = match[1].replaceAll(/\s+/g, ' ').trim()
+        const index = block.start + (match.index ?? 0)
+        if (reportedTransforms.has(index)) continue
+        reportedTransforms.add(index)
+
+        if (isAllowedHoverTransform(file, block.selector, transform)) continue
+
+        for (const message of transformViolations(transform)) {
+          addViolation(file, lineNumberOf(source, index), message)
+        }
+      }
+    }
+  }
+}
+
 const checkReadingSurface = () => {
   const file = 'packages/theme-chalk/src/fsus-theme.scss'
   const source = read(file)
@@ -242,6 +357,7 @@ const checkMotionDocs = () => {
 try {
   checkCoreTokens()
   checkScatteredRadiusLiterals()
+  checkHoverTransforms()
   checkBackdropFilters()
   checkReadingSurface()
   checkMarkdownLoading()
