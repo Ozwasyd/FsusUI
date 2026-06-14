@@ -45,6 +45,11 @@ test('issue primitives render in the demo route', async ({
   await expect(page.locator('.el-empty-state--compact')).toBeVisible()
   await expect(page.locator('.el-empty-state--page')).toBeVisible()
   await expect(page.locator('.el-empty-state__illustration')).toHaveCount(1)
+  await expect(page.locator('.el-collection-toolbar')).toBeVisible()
+  await expect(page.locator('.el-filter-group')).toBeVisible()
+  await expect(page.locator('.el-segmented-control')).toBeVisible()
+  await expect(page.locator('.el-collection-summary')).toBeVisible()
+  await expect(page.locator('.el-pagination-bar')).toBeVisible()
   await expect(
     page.locator(
       isCompact

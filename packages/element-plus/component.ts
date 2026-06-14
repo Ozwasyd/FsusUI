@@ -24,6 +24,13 @@ import { ElCol } from '@element-plus/components/col'
 import { ElCollapse, ElCollapseItem } from '@element-plus/components/collapse'
 import { ElCollapseTransition } from '@element-plus/components/collapse-transition'
 import { ElColorPicker } from '@element-plus/components/color-picker'
+import {
+  ElCollectionSummary,
+  ElCollectionToolbar,
+  ElFilterGroup,
+  ElPaginationBar,
+  ElSegmentedControl,
+} from '@element-plus/components/collection-primitives'
 import { ElConfigProvider } from '@element-plus/components/config-provider'
 import {
   ElAside,
@@ -139,6 +146,8 @@ export const allComponents = [
   ElCollapseItem,
   ElCollapseTransition,
   ElColorPicker,
+  ElCollectionSummary,
+  ElCollectionToolbar,
   ElConfigProvider,
   ElContainer,
   ElAside,
@@ -156,6 +165,7 @@ export const allComponents = [
   ElDropdownMenu,
   ElEmpty,
   ElEmptyState,
+  ElFilterGroup,
   ElForm,
   ElFormItem,
   ElIcon,
@@ -171,6 +181,7 @@ export const allComponents = [
   ElMenuItemGroup,
   ElSubMenu,
   ElPageHeader,
+  ElPaginationBar,
   ElPagination,
   ElPopconfirm,
   ElPopover,
@@ -189,6 +200,7 @@ export const allComponents = [
   ElOption,
   ElOptionGroup,
   ElSelectV2,
+  ElSegmentedControl,
   ElSkeleton,
   ElSkeletonItem,
   ElSlider,
