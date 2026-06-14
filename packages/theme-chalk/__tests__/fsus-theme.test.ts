@@ -493,6 +493,33 @@ describe('Fsus theme visual baseline', () => {
     ])
   })
 
+  test('keeps metric primitives flat, readable, and chart-free', () => {
+    const css = compileThemeFile('metric-primitives.scss')
+
+    expectCssRule(css, '.el-metric-list', [
+      'display: grid;',
+      'box-shadow: none;',
+    ])
+    expectCssRule(css, '.el-metric-item__primary', [
+      'font-variant-numeric: tabular-nums;',
+      'letter-spacing: 0;',
+    ])
+    expectCssRule(css, '.el-distribution-bar-row__bar', [
+      'grid-column: 2/-1;',
+      'height: 6px;',
+    ])
+    expectCssRule(css, '.el-key-value-grid', [
+      'display: grid;',
+      'grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));',
+    ])
+    expectCssRule(css, '.el-diagnostics-item__detail-body', [
+      'font-family: var(--el-font-family-monospace, monospace);',
+      'overflow-wrap: anywhere;',
+    ])
+    expect(css).toContain('@media (max-width: 640px)')
+    expect(css).not.toMatch(/gradient|backdrop-filter|blur\(/)
+  })
+
   test('keeps card surfaces flat by default', () => {
     const css = compileThemeFile('card.scss')
 

@@ -45,6 +45,16 @@ test('issue primitives render in the demo route', async ({
   await expect(page.locator('.el-empty-state--compact')).toBeVisible()
   await expect(page.locator('.el-empty-state--page')).toBeVisible()
   await expect(page.locator('.el-empty-state__illustration')).toHaveCount(1)
+  await expect(page.locator('.el-metric-list')).toBeVisible()
+  await expect(page.locator('.el-metric-item')).toHaveCount(2)
+  await expect(page.locator('.el-kpi-group')).toBeVisible()
+  await expect(page.locator('.el-key-value-grid')).toBeVisible()
+  await expect(page.locator('.el-distribution-list')).toBeVisible()
+  await expect(page.locator('.el-distribution-bar-row')).toHaveCount(3)
+  await expect(page.locator('.el-status-summary')).toBeVisible()
+  await expect(page.locator('.el-diagnostics-list')).toBeVisible()
+  await expect(page.locator('.el-diagnostics-item')).toHaveCount(2)
+  await expect(page.locator('.el-copyable-detail')).toBeVisible()
   await expect(
     page.locator(
       isCompact
