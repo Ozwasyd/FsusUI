@@ -505,4 +505,44 @@ describe('Fsus theme visual baseline', () => {
       'transform: translateY(-1px);',
     ])
   })
+
+  test('keeps inbox primitives flat and scroll-owned', () => {
+    const css = compileThemeFile('inbox-primitives.scss')
+
+    expectCssRule(css, '.el-inbox-layout', [
+      'grid-template-columns: minmax(16rem, 0.38fr) minmax(0, 1fr);',
+      'min-height: 32rem;',
+      'overflow: hidden;',
+      'box-shadow: none;',
+    ])
+    expectCssRule(css, '.el-inbox-layout__list', [
+      'min-height: 0;',
+      'overflow: auto;',
+      'overscroll-behavior: contain;',
+    ])
+    expectCssRule(css, '.el-inbox-layout__detail', [
+      'min-height: 0;',
+      'overflow: auto;',
+      'overscroll-behavior: contain;',
+    ])
+    expectCssRule(css, '.el-thread-panel', [
+      'grid-template-rows: auto auto minmax(0, 1fr) auto;',
+      'min-height: 100%;',
+    ])
+    expectCssRule(css, '.el-thread-panel__messages', [
+      'min-height: 0;',
+      'overflow: auto;',
+      'overscroll-behavior: contain;',
+    ])
+    expectCssRule(css, '.el-message-bubble__body', [
+      'white-space: pre-wrap;',
+      'overflow-wrap: anywhere;',
+    ])
+    expect(css).toContain(
+      '.el-inbox-layout.el-inbox-layout--mobile-list .el-inbox-layout__detail',
+    )
+    expect(css).not.toMatch(
+      /\.el-(?:inbox-layout|split-pane|message-bubble)[^{]*\{[^}]*(?:linear-gradient|backdrop-filter|filter:\s*blur)/s,
+    )
+  })
 })

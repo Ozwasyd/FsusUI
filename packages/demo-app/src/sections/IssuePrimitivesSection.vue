@@ -93,6 +93,99 @@
           <span>Upload cover</span>
         </div>
       </el-upload>
+
+      <ElInboxLayout
+        class="issue-primitives__inbox-demo"
+        selected
+        mobile-pane="detail"
+        list-label="Generic item list"
+        detail-label="Generic thread detail"
+      >
+        <template #list>
+          <ElConversationList ariaLabel="Generic conversation list">
+            <ElConversationListItem
+              title="Item Alpha"
+              preview="Neutral preview text stays within the list column."
+              meta="09:00"
+              :selected="selectedInboxItem === 'alpha'"
+              :unread-count="2"
+              @select="selectedInboxItem = 'alpha'"
+            >
+              <template #badges>
+                <el-tag size="small" type="info">Ready</el-tag>
+              </template>
+            </ElConversationListItem>
+            <ElConversationListItem
+              title="Item Beta"
+              preview="Secondary generic preview with safe wrapping behavior."
+              meta="10:30"
+              :selected="selectedInboxItem === 'beta'"
+              @select="selectedInboxItem = 'beta'"
+            />
+            <ElInboxEmptyState
+              title="No more items"
+              description="Adjust filters or broaden the current view."
+            />
+          </ElConversationList>
+        </template>
+
+        <template #detail>
+          <ElThreadPanel title="Thread Alpha">
+            <template #back>
+              <el-button text inline-action>Back</el-button>
+            </template>
+            <template #status>
+              <el-tag size="small" type="info">Ready</el-tag>
+            </template>
+            <template #actions>
+              <el-button text type="primary" inline-action>Open</el-button>
+            </template>
+            <template #context>
+              <ElConversationContextBar>
+                <span>Kind: Generic</span>
+                <span>Source: Neutral</span>
+                <span>Mode: Slot-first</span>
+              </ElConversationContextBar>
+            </template>
+            <template #messages>
+              <ElMessageTimeline>
+                <ElMessageBubble author="A" meta="09:00">
+                  The message body preserves line breaks and wraps long text
+                  without product-specific sender labels.
+                </ElMessageBubble>
+                <ElMessageBubble variant="self" author="B" meta="09:10">
+                  Slot-first reply content remains generic.
+                </ElMessageBubble>
+                <ElMessageBubble variant="system">
+                  Generic state changed.
+                </ElMessageBubble>
+                <ElMessageBubble variant="muted">
+                  Muted note with neutral supporting copy.
+                </ElMessageBubble>
+              </ElMessageTimeline>
+            </template>
+            <template #composer>
+              <ElReplyComposerShell title="Reply">
+                <template #input>
+                  <el-input
+                    type="textarea"
+                    model-value=""
+                    label="Reply body"
+                    placeholder="Write a reply"
+                  />
+                </template>
+                <template #actions>
+                  <el-button type="primary">Send</el-button>
+                </template>
+              </ElReplyComposerShell>
+            </template>
+          </ElThreadPanel>
+          <ElEmptySelectionState
+            title="Select an item"
+            description="Choose an item from the list to view details."
+          />
+        </template>
+      </ElInboxLayout>
     </section>
 
     <template #footer>
@@ -104,10 +197,20 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import {
+  ElConversationContextBar,
+  ElConversationList,
+  ElConversationListItem,
   ElEmptyState,
+  ElEmptySelectionState,
+  ElInboxEmptyState,
+  ElInboxLayout,
+  ElMessageBubble,
+  ElMessageTimeline,
   ElPublicShell,
+  ElReplyComposerShell,
   ElResponsiveCollection,
   ElThemeModeToggle,
+  ElThreadPanel,
 } from '../../../element-plus'
 
 defineProps<{
@@ -115,6 +218,7 @@ defineProps<{
 }>()
 
 const searchQuery = ref('')
+const selectedInboxItem = ref('alpha')
 const navItems = [
   { key: 'home', label: 'Home', href: '/' },
   { key: 'archive', label: 'Archive', href: '/archive' },

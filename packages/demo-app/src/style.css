@@ -230,6 +230,10 @@ body {
   font-weight: 700;
 }
 
+.issue-primitives__inbox-demo {
+  min-height: 520px;
+}
+
 .issue-primitives__footer {
   font-weight: 700;
 }
@@ -844,6 +848,11 @@ body {
 
 .audit-markdown-editor-frame .el-markdown-editor {
   min-width: 18rem;
+}
+
+.audit-inbox-layout {
+  height: 360px;
+  min-height: 360px;
 }
 
 .audit-card[data-audit-component='ElPublicShell'] .el-public-shell {

@@ -194,6 +194,18 @@ export const publicComponentBoundaries: Record<
     fixtureModes: ['states'],
   }),
   'image-viewer': entry(overlayBoundaries, { fixtureModes: ['overlays'] }),
+  'inbox-primitives': entry(
+    [
+      ...dataBoundaries,
+      'event',
+      'keyboard-focus',
+      'empty-null-undefined',
+      'overflow-virtual',
+    ],
+    {
+      fixtureModes: ['states', 'data-boundaries'],
+    },
+  ),
   'infinite-scroll': entry(pluginBoundaries, {
     fixtureModes: ['data-boundaries'],
   }),

@@ -71,6 +71,20 @@ test('issue primitives render in the demo route', async ({
   expect(uploadBox?.width ?? 0).toBeGreaterThan(isCompact ? 250 : 600)
   expect(uploadBox?.height ?? 0).toBeGreaterThan(isCompact ? 120 : 260)
 
+  const inboxLayout = page.locator('.el-inbox-layout')
+  await expect(inboxLayout).toBeVisible()
+  await expect(inboxLayout.locator('.el-conversation-list')).toBeVisible()
+  await expect(inboxLayout.locator('.el-conversation-list-item')).toHaveCount(2)
+  await expect(inboxLayout.locator('.el-thread-panel')).toBeVisible()
+  await expect(inboxLayout.locator('.el-message-timeline')).toBeVisible()
+  await expect(inboxLayout.locator('.el-message-bubble')).toHaveCount(4)
+  await expect(
+    inboxLayout.locator('.el-conversation-context-bar'),
+  ).toBeVisible()
+  await expect(inboxLayout.locator('.el-reply-composer-shell')).toBeVisible()
+  await expect(inboxLayout.locator('.el-empty-selection-state')).toBeVisible()
+  await expect(inboxLayout.locator('.el-inbox-empty-state')).toBeVisible()
+
   const horizontalOverflow = await page.evaluate(() => {
     const root = document.documentElement
     return (

@@ -59,6 +59,7 @@ const visualAuditExclusions = new Set([
 ])
 
 const visualAuditNameOverrides: Record<string, string> = {
+  'inbox-primitives': 'ElInboxLayout',
   'visual-hidden': 'ElVisuallyHidden',
 }
 
@@ -135,9 +136,10 @@ describe('component boundary coverage registry', () => {
     for (const componentDir of rawHtmlBoundaryComponents) {
       const coverage = publicComponentBoundaries[componentDir]
 
-      expect(coverage.boundaries, `${componentDir} must cover safe text`).toContain(
-        'safe-text',
-      )
+      expect(
+        coverage.boundaries,
+        `${componentDir} must cover safe text`,
+      ).toContain('safe-text')
       expect(
         coverage.boundaries,
         `${componentDir} must cover SQL/XSS-like payload strings`,

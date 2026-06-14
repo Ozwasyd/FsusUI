@@ -535,6 +535,84 @@
         />
       </AuditCard>
 
+      <AuditCard name="ElInboxLayout" :state="auditState">
+        <ElInboxLayout
+          class="audit-inbox-layout"
+          selected
+          mobile-pane="detail"
+          list-label="Generic item list"
+          detail-label="Generic item detail"
+          :density="compact ? 'compact' : 'default'"
+        >
+          <template #list>
+            <ElConversationList ariaLabel="Generic item list">
+              <ElConversationListItem
+                title="Item alpha"
+                preview="Long preview content that should stay contained"
+                meta="09:00"
+                selected
+                :unread-count="active ? 3 : 1"
+              />
+              <ElConversationListItem
+                title="Item beta"
+                preview="Secondary neutral preview"
+                meta="10:30"
+              />
+            </ElConversationList>
+          </template>
+          <template #detail>
+            <ElThreadPanel title="Thread alpha">
+              <template #status>
+                <el-tag size="small" type="info">
+                  {{ active ? 'Active' : 'Ready' }}
+                </el-tag>
+              </template>
+              <template #context>
+                <ElConversationContextBar>
+                  <span>Kind: Generic</span>
+                  <span>Source: Neutral</span>
+                </ElConversationContextBar>
+              </template>
+              <template #messages>
+                <ElMessageTimeline>
+                  <ElMessageBubble author="A" meta="09:00">
+                    Neutral timeline content.
+                  </ElMessageBubble>
+                  <ElMessageBubble variant="self" author="B" meta="09:10">
+                    Reply content with enough length to test wrapping in a
+                    compact panel.
+                  </ElMessageBubble>
+                  <ElMessageBubble variant="system">
+                    Generic state changed.
+                  </ElMessageBubble>
+                </ElMessageTimeline>
+              </template>
+              <template #composer>
+                <ElReplyComposerShell title="Reply">
+                  <template #input>
+                    <el-input
+                      type="textarea"
+                      :model-value="activeText"
+                      label="Reply body"
+                    />
+                  </template>
+                  <template #actions>
+                    <el-button
+                      type="primary"
+                      data-audit-active
+                      data-audit-focus
+                      data-audit-target
+                    >
+                      Send
+                    </el-button>
+                  </template>
+                </ElReplyComposerShell>
+              </template>
+            </ElThreadPanel>
+          </template>
+        </ElInboxLayout>
+      </AuditCard>
+
       <AuditCard name="ElInput" :state="auditState">
         <el-input
           :model-value="activeText"
@@ -1149,7 +1227,17 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
 import * as Icons from '@element-plus/icons-vue'
-import { ElEmptyState } from '../../element-plus'
+import {
+  ElConversationContextBar,
+  ElConversationList,
+  ElConversationListItem,
+  ElEmptyState,
+  ElInboxLayout,
+  ElMessageBubble,
+  ElMessageTimeline,
+  ElReplyComposerShell,
+  ElThreadPanel,
+} from '../../element-plus'
 import AuditCard from './AuditCard.vue'
 import {
   auditComponentNames,
