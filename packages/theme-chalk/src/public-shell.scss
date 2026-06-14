@@ -12,8 +12,9 @@
   @include e(header) {
     width: 100%;
     border-bottom: 1px solid getCssVar('border-color-lighter');
-    background: color-mix(in srgb, #{getCssVar('bg-color')} 82%, transparent);
-    backdrop-filter: blur(12px) saturate(1.2);
+    background: color-mix(in srgb, #{getCssVar('bg-color')} 96%, transparent);
+    backdrop-filter: blur(var(--fsus-backdrop-blur-soft, 0px))
+      saturate(var(--fsus-backdrop-saturate, 100%));
     z-index: 50;
 
     @include when(sticky) {

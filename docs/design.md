@@ -277,3 +277,15 @@ FsusUI 使用低透明度阴影、轻量玻璃和细边框表达层级。材质�
 - Public token stability: `docs/theme/tokens.md`
 
 Any new visual rule should either map to an existing public token or introduce a token through `spec/tokens/tokens.json` before becoming part of this document.
+> **Material update:** Current defaults are paper/document-first, not
+> glass/SaaS-first. Backdrop blur tokens default to `0px`; glass material is
+> opt-in through `.is-glass` or `[data-fsus-material='glass']`. Ordinary
+> controls use `6px` radius, small controls use `4px`, and ordinary cards,
+> panels, dialogs, drawers, and popovers use `12px` or less by default. The
+> `24px` panel radius is available only for expressive opt-in surfaces through
+> `[data-fsus-surface='expressive']` or equivalent component context. Ordinary
+> panels are border-first and default to `--fsus-shadow-panel: none`.
+> `[data-fsus-surface='reading']` disables glass, motion trails, and glow so
+> FsusBlog article pages, MarkdownRenderer, TOC, article lists, and comments
+> keep a paper/document feel. MarkdownRenderer loading states use neutral
+> document placeholders by default, with no accent shimmer or pulse.

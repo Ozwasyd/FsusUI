@@ -115,3 +115,8 @@ surface. FsusUI-specific aliases such as `--fsus-scholarly-blue` and
 If an Element Plus variable exists and works for the same purpose, prefer the
 Element Plus variable. Add FsusUI aliases only when the product needs a semantic
 layer that can survive future visual changes.
+> **Material customization:** The default FsusUI material is
+> paper/document-first: no backdrop blur, lower surface radii, and border-first
+> panels. Opt into glass with `.is-glass` or `[data-fsus-material='glass']`;
+> use `[data-fsus-surface='reading']` for article and Markdown surfaces that
+> should suppress glow, blur, and trails.

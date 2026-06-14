@@ -111,3 +111,7 @@ FsusBlog and other product integrations can define product-level aliases such
 as `--blog-reading-surface` or `--blog-accent`. Keep those aliases in the
 product stylesheet and map them to FsusUI public-preview tokens rather than
 depending on component-private variables.
+> **Material default:** Backdrops default to `0px` blur. Use `.is-glass` or
+> `[data-fsus-material='glass']` when a surface intentionally needs glass
+> material. Reading surfaces can use `[data-fsus-surface='reading']` to disable
+> blur, glow, and motion trails.

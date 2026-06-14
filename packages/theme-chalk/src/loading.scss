@@ -20,8 +20,8 @@
   position: absolute;
   z-index: 2000;
   background-color: getCssVar('mask-color');
-  backdrop-filter: blur(var(--el-overlay-soft-backdrop-blur, 8px));
-  -webkit-backdrop-filter: blur(var(--el-overlay-soft-backdrop-blur, 8px));
+  backdrop-filter: blur(var(--el-overlay-soft-backdrop-blur, 0px));
+  -webkit-backdrop-filter: blur(var(--el-overlay-soft-backdrop-blur, 0px));
   margin: 0;
   top: 0;
   right: 0;

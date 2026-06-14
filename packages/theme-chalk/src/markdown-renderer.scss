@@ -19,7 +19,7 @@
   inline-size: 18px;
   block-size: 18px;
   border: 2px solid var(--el-border-color-light);
-  border-block-start-color: var(--fsus-color-accent, #2a599c);
+  border-block-start-color: var(--el-text-color-placeholder);
   border-radius: 50%;
   animation: markdown-renderer-spin 800ms linear infinite;
 }
@@ -34,17 +34,8 @@
   grid-column: 1 / -1;
   block-size: 10px;
   overflow: hidden;
-  background:
-    linear-gradient(
-      90deg,
-      transparent,
-      color-mix(in srgb, var(--fsus-color-accent, #2a599c) 14%, transparent),
-      transparent
-    ),
-    var(--el-fill-color-light);
-  background-size: 220% 100%;
-  border-radius: var(--fsus-radius-control, 8px);
-  animation: markdown-renderer-shimmer 1300ms ease-in-out infinite;
+  background: var(--el-fill-color-light);
+  border-radius: var(--fsus-radius-control, 6px);
 }
 
 .markdown-renderer__loading-line:nth-child(4) {
@@ -60,21 +51,7 @@
 }
 
 .markdown-renderer__loading-pulse {
-  position: sticky;
-  z-index: 1;
-  inset-block-end: var(--fsus-space-3, 12px);
-  inset-inline-start: calc(100% - 30px);
-  display: block;
-  inline-size: 18px;
-  block-size: 18px;
-  margin-block-start: -18px;
-  border-radius: 50%;
-  background: var(--fsus-color-accent, #2a599c);
-  box-shadow: 0 0 0 0
-    color-mix(in srgb, var(--fsus-color-accent, #2a599c) 32%, transparent);
-  opacity: 0.72;
-  pointer-events: none;
-  animation: markdown-renderer-pulse 1100ms ease-out infinite;
+  display: none;
 }
 
 @keyframes markdown-renderer-spin {
@@ -83,28 +60,8 @@
   }
 }
 
-@keyframes markdown-renderer-shimmer {
-  0% {
-    background-position: 180% 0;
-  }
-  100% {
-    background-position: -80% 0;
-  }
-}
-
-@keyframes markdown-renderer-pulse {
-  70% {
-    box-shadow: 0 0 0 9px transparent;
-  }
-  100% {
-    box-shadow: 0 0 0 0 transparent;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .markdown-renderer__loading-spinner,
-  .markdown-renderer__loading-line,
-  .markdown-renderer__loading-pulse {
+  .markdown-renderer__loading-spinner {
     animation: none;
   }
 }

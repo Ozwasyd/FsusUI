@@ -426,7 +426,7 @@ $color-picker-size: map.merge($common-component-size, $color-picker-size);
     padding: 6px;
     box-sizing: content-box;
     background-color: getCssVar('bg-color', 'overlay');
-    border-radius: var(--fsus-radius-panel, 24px);
+    border-radius: var(--fsus-radius-floating, 12px);
     box-shadow: map.get($dropdown, 'menu-box-shadow');
     &.#{$namespace}-popper {
       border: 1px solid getCssVar('border-color-lighter');

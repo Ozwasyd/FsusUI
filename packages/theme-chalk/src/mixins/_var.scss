@@ -37,7 +37,10 @@
 
 @mixin set-css-main-vars {
   @include set-css-var-value(('color', 'scholarly-blue'), $color-scholarly-blue);
-  @include set-css-var-value(('bg-color', 'overlay-blur'), blur(40px) saturate(120%));
+  @include set-css-var-value(
+    ('bg-color', 'overlay-blur'),
+    blur(var(--fsus-backdrop-blur, 0px)) saturate(var(--fsus-backdrop-saturate, 100%))
+  );
 }
 
 // set all css var for component by map

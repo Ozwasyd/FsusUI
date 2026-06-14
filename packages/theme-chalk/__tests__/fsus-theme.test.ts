@@ -267,8 +267,8 @@ describe('Fsus theme visual baseline', () => {
     ])
     expectCssRule(css, '.fsus-entry:hover', [
       'background: var(--el-bg-color);',
-      'box-shadow: 0 10px 28px rgba(15, 15, 17, 0.06);',
-      'transform: translate3d(0, -2px, 0);',
+      'box-shadow: none;',
+      'transform: translate3d(0, -1px, 0);',
     ])
     expectCssRule(css, '[data-fsus-entry-control]:active', [
       'background: var(--fsus-state-emphasis-bg);',

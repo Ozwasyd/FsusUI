@@ -6,18 +6,14 @@
   background: var(--el-bg-color);
   border: 1px solid var(--el-border-color);
   border-radius: $radius;
-  box-shadow:
-    inset 0 1px 0 var(--fsus-highlight, rgba(255, 255, 255, 0.1)),
-    var(--el-box-shadow-light);
+  box-shadow: var(--fsus-shadow-panel);
 }
 
 @mixin fsus-floating($radius: var(--fsus-radius-floating)) {
   background: var(--el-bg-color-overlay);
   border: 1px solid var(--el-border-color-light);
   border-radius: $radius;
-  box-shadow:
-    inset 0 1px 0 var(--fsus-highlight, rgba(255, 255, 255, 0.1)),
-    var(--el-box-shadow);
+  box-shadow: var(--fsus-shadow-floating);
   backdrop-filter: blur(var(--fsus-backdrop-blur));
   -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur));
 }
@@ -49,6 +45,48 @@
   --el-font-family:
     'Google Sans', 'Noto Sans SC', 'Noto Sans TC', 'Noto Sans JP',
     ui-sans-serif, system-ui, sans-serif;
+}
+
+.is-glass,
+[data-fsus-material='glass'] {
+  --fsus-backdrop-blur: 12px;
+  --fsus-backdrop-blur-soft: 6px;
+  --fsus-backdrop-blur-overlay: 8px;
+  --fsus-backdrop-saturate: 120%;
+  --fsus-surface-overlay: rgba(255, 255, 255, 0.86);
+}
+
+html.dark .is-glass,
+html.dark [data-fsus-material='glass'] {
+  --fsus-surface-overlay: rgba(18, 18, 20, 0.86);
+}
+
+.is-expressive-surface,
+[data-fsus-surface='expressive'] {
+  --fsus-radius-panel: var(--fsus-radius-panel-large, 24px);
+  --fsus-radius-floating: var(--fsus-radius-panel-large, 24px);
+  --fsus-radius-popover: 20px;
+}
+
+.fsus-reading-surface,
+[data-fsus-surface='reading'] {
+  --fsus-backdrop-blur: 0px;
+  --fsus-backdrop-blur-soft: 0px;
+  --fsus-backdrop-blur-overlay: 0px;
+  --fsus-interactive-motion-blur: 0px;
+  --fsus-interactive-motion-glow: 0px;
+  --fsus-interactive-motion-trail-opacity: 0;
+  --fsus-motion-trail: transparent;
+  --fsus-motion-slider-trail: transparent;
+}
+
+.fsus-reading-surface .#{$namespace}-scrollbar,
+[data-fsus-surface='reading'] .#{$namespace}-scrollbar,
+.fsus-reading-surface .#{$namespace}-vl__wrapper,
+[data-fsus-surface='reading'] .#{$namespace}-vl__wrapper {
+  --fsus-interactive-motion-edge-size: 0px;
+  --fsus-interactive-motion-thumb-spread: 0px;
+  --fsus-interactive-motion-trail-opacity: 0;
 }
 
 @mixin dark-mode-tokens {
@@ -628,7 +666,7 @@ html.dark .#{$namespace}-switch__action {
 .#{$namespace}-menu:not(.#{$namespace}-menu--horizontal):not(
     .#{$namespace}-sub-menu .#{$namespace}-menu
   ):not(.#{$namespace}-menu--popup-container) {
-  @include fsus-panel(24px);
+  @include fsus-panel;
 }
 
 .#{$namespace}-empty {
@@ -650,7 +688,7 @@ html.dark .#{$namespace}-switch__action {
 .#{$namespace}-page-header,
 .#{$namespace}-statistic,
 .#{$namespace}-countdown {
-  @include fsus-panel(18px);
+  @include fsus-panel;
 }
 
 .#{$namespace}-page-header,
@@ -902,8 +940,8 @@ button.#{$namespace}-card:hover,
 button.#{$namespace}-card:focus-visible {
   background: var(--el-bg-color);
   border-color: var(--el-border-color-light);
-  box-shadow: 0 10px 28px rgba(15, 15, 17, 0.06);
-  transform: translate3d(0, -2px, 0);
+  box-shadow: none;
+  transform: translate3d(0, -1px, 0);
 }
 
 .fsus-entry:active,
@@ -1028,9 +1066,7 @@ button.#{$namespace}-card:active {
   -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur));
   border: 1px solid var(--el-border-color-light);
   border-radius: var(--fsus-radius-popover);
-  box-shadow:
-    inset 0 1px 0 var(--fsus-highlight),
-    var(--el-box-shadow);
+  box-shadow: var(--fsus-shadow-panel-light);
 }
 
 .#{$namespace}-cascader__dropdown {
@@ -1039,9 +1075,7 @@ button.#{$namespace}-card:active {
   -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur));
   border: 1px solid var(--el-border-color-light);
   border-radius: var(--fsus-radius-popover);
-  box-shadow:
-    inset 0 1px 0 var(--fsus-highlight),
-    var(--el-box-shadow);
+  box-shadow: var(--fsus-shadow-panel-light);
   overflow: hidden;
 }
 
@@ -2314,8 +2348,8 @@ button.#{$namespace}-card:active {
 
 @media (max-width: 760px) {
   :root {
-    --fsus-backdrop-blur: 10px;
-    --fsus-backdrop-blur-soft: 6px;
+    --fsus-backdrop-blur: 0px;
+    --fsus-backdrop-blur-soft: 0px;
   }
 
   .#{$namespace}-message,
@@ -2445,7 +2479,7 @@ button.#{$namespace}-card:active {
 
 .#{$namespace}-color-picker__panel.#{$namespace}-popper {
   padding: 12px;
-  border-radius: 24px;
+  border-radius: var(--fsus-radius-floating);
 }
 
 .#{$namespace}-color-dropdown {

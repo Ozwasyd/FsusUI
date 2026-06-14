@@ -17,7 +17,7 @@
   --fsus-ink: var(--fsus-color-text-primary);
   --fsus-paper: var(--fsus-color-surface-base);
   --fsus-page: var(--fsus-color-surface-raised);
-  --fsus-surface-overlay: rgba(255, 255, 255, 0.85);
+  --fsus-surface-overlay: rgba(255, 255, 255, 0.98);
   --fsus-overlay-color: rgba(252, 252, 252, 0.5);
   --fsus-scholarly-blue: var(--fsus-color-action-primary);
   --fsus-dot-gray: #a1a1aa;
@@ -29,11 +29,12 @@
   --fsus-text-placeholder: var(--fsus-color-text-muted);
   --fsus-highlight: rgba(255, 255, 255, 0.8);
 
-  --fsus-radius-control: 8px;
-  --fsus-radius-control-small: #{generated.$fsus-radius-control-md};
-  --fsus-radius-panel: 24px;
-  --fsus-radius-floating: 24px;
-  --fsus-radius-popover: 20px;
+  --fsus-radius-control: 6px;
+  --fsus-radius-control-small: 4px;
+  --fsus-radius-panel: 12px;
+  --fsus-radius-panel-large: 24px;
+  --fsus-radius-floating: 12px;
+  --fsus-radius-popover: 10px;
   --fsus-radius-pill: 999px;
 
   --fsus-space-1: 4px;
@@ -66,10 +67,10 @@
   --fsus-demo-max-width: 1200px;
   --fsus-audit-max-width: 1440px;
 
-  --fsus-backdrop-blur: 40px;
-  --fsus-backdrop-blur-soft: 20px;
-  --fsus-backdrop-blur-overlay: 16px;
-  --fsus-backdrop-saturate: 120%;
+  --fsus-backdrop-blur: 0px;
+  --fsus-backdrop-blur-soft: 0px;
+  --fsus-backdrop-blur-overlay: 0px;
+  --fsus-backdrop-saturate: 100%;
   --fsus-motion-standard: #{generated.$fsus-motion-easing-standard};
   --fsus-motion-emphasized: #{generated.$fsus-motion-easing-emphasized};
   --fsus-motion-control: #{generated.$fsus-motion-duration-control};
@@ -100,11 +101,11 @@
   --fsus-state-emphasis-bg: rgba(42, 89, 156, 0.08);
   --fsus-state-focus-border: rgba(42, 89, 156, 0.28);
 
-  --fsus-shadow-panel: 0 32px 64px rgba(0, 0, 0, 0.08);
-  --fsus-shadow-panel-light: 0 14px 40px rgba(0, 0, 0, 0.08);
-  --fsus-shadow-panel-lighter: 0 8px 24px rgba(0, 0, 0, 0.06);
-  --fsus-shadow-panel-dark: 0 24px 64px rgba(0, 0, 0, 0.12);
-  --fsus-shadow-floating: 0 24px 60px rgba(15, 23, 42, 0.12);
+  --fsus-shadow-panel: none;
+  --fsus-shadow-panel-light: 0 8px 24px rgba(15, 23, 42, 0.05);
+  --fsus-shadow-panel-lighter: 0 2px 8px rgba(15, 23, 42, 0.04);
+  --fsus-shadow-panel-dark: 0 16px 40px rgba(15, 23, 42, 0.1);
+  --fsus-shadow-floating: 0 12px 32px rgba(15, 23, 42, 0.08);
 
   --el-color-primary: var(--fsus-ink);
   --el-bg-color: var(--fsus-paper);
@@ -144,7 +145,7 @@
   --fsus-ink: #f0f0f4;
   --fsus-paper: #121214;
   --fsus-page: #09090b;
-  --fsus-surface-overlay: rgba(18, 18, 20, 0.85);
+  --fsus-surface-overlay: rgba(18, 18, 20, 0.98);
   --fsus-overlay-color: rgba(18, 18, 20, 0.7);
   --fsus-scholarly-blue: #4b79cc;
   --fsus-dot-gray: #71717a;
@@ -155,11 +156,11 @@
   --fsus-text-regular: #a1a1aa;
   --fsus-text-placeholder: #71717a;
   --fsus-highlight: rgba(255, 255, 255, 0.05);
-  --fsus-shadow-panel: 0 32px 64px rgba(0, 0, 0, 0.4);
-  --fsus-shadow-panel-light: 0 14px 40px rgba(0, 0, 0, 0.4);
-  --fsus-shadow-panel-lighter: 0 8px 24px rgba(0, 0, 0, 0.3);
-  --fsus-shadow-panel-dark: 0 24px 64px rgba(0, 0, 0, 0.5);
-  --fsus-shadow-floating: 0 24px 60px rgba(0, 0, 0, 0.5);
+  --fsus-shadow-panel: none;
+  --fsus-shadow-panel-light: 0 8px 24px rgba(0, 0, 0, 0.28);
+  --fsus-shadow-panel-lighter: 0 2px 8px rgba(0, 0, 0, 0.24);
+  --fsus-shadow-panel-dark: 0 16px 40px rgba(0, 0, 0, 0.36);
+  --fsus-shadow-floating: 0 12px 32px rgba(0, 0, 0, 0.36);
   --fsus-motion-trail: rgba(75, 121, 204, 0.22);
   --fsus-motion-slider-trail: rgba(75, 121, 204, 0.28);
   --fsus-state-hover-bg: rgba(75, 121, 204, 0.12);

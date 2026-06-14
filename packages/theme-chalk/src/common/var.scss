@@ -231,9 +231,9 @@ $border-color-hover: getCssVar('text-color', 'disabled') !default;
 $border-radius: () !default;
 $border-radius: map.merge(
   (
-    'base': 8px,
-    'small': 6px,
-    'large': 24px,
+    'base': 6px,
+    'small': 4px,
+    'large': 12px,
     'round': 999px,
     'circle': 100%,
   ),
@@ -244,23 +244,10 @@ $border-radius: map.merge(
 $box-shadow: () !default;
 $box-shadow: map.merge(
   (
-    '': (
-      0px 32px 64px rgba(0, 0, 0, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.8),
-    ),
-    'light': (
-      0px 14px 40px rgba(0, 0, 0, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.8),
-    ),
-    'lighter': (
-      0px 8px 24px rgba(0, 0, 0, 0.06),
-      inset 0 1px 0 rgba(255, 255, 255, 0.8),
-    ),
-    'dark': (
-      0px 24px 64px rgba(0, 0, 0, 0.12),
-      0px 10px 24px rgba(0, 0, 0, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.8),
-    ),
+    '': none,
+    'light': 0px 8px 24px rgba(15, 23, 42, 0.05),
+    'lighter': 0px 2px 8px rgba(15, 23, 42, 0.04),
+    'dark': 0px 16px 40px rgba(15, 23, 42, 0.1),
   ),
   $box-shadow
 );
@@ -268,23 +255,10 @@ $box-shadow: map.merge(
 $box-shadow-dark: () !default;
 $box-shadow-dark: map.merge(
   (
-    '': (
-      0px 32px 64px rgba(0, 0, 0, 0.45),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    ),
-    'light': (
-      0px 14px 40px rgba(0, 0, 0, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    ),
-    'lighter': (
-      0px 8px 24px rgba(0, 0, 0, 0.35),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    ),
-    'dark': (
-      0px 24px 64px rgba(0, 0, 0, 0.55),
-      0px 10px 24px rgba(0, 0, 0, 0.45),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    ),
+    '': none,
+    'light': 0px 8px 24px rgba(0, 0, 0, 0.28),
+    'lighter': 0px 2px 8px rgba(0, 0, 0, 0.24),
+    'dark': 0px 16px 40px rgba(0, 0, 0, 0.36),
   ),
   $box-shadow-dark
 );
@@ -869,12 +843,12 @@ $dialog: map.merge(
     'width': 50%,
     'margin-top': 15vh,
     'bg-color': getCssVar('bg-color'),
-    'box-shadow': getCssVar('box-shadow'),
+    'box-shadow': getCssVar('box-shadow', 'dark'),
     'title-font-size': getCssVar('font-size-large'),
     'content-font-size': 14px,
     'font-line-height': getCssVar('font-line-height-primary'),
     'padding-primary': 24px,
-    'border-radius': 24px,
+    'border-radius': getCssVar('border-radius', 'large'),
   ),
   $dialog
 );
@@ -1139,7 +1113,7 @@ $card: () !default;
 $card: map.merge(
   (
     'border-color': getCssVar('border-color', 'light'),
-    'border-radius': 24px,
+    'border-radius': getCssVar('border-radius', 'large'),
     'padding': 20px,
     'bg-color': getCssVar('fill-color', 'blank'),
   ),
