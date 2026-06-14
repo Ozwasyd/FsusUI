@@ -186,6 +186,41 @@ describe('Fsus theme visual baseline', () => {
     ])
   })
 
+  test('keeps empty-state primitives flat and density-aware', () => {
+    const css = compileThemeFile('empty-state.scss')
+
+    expectCssRule(css, '.el-empty-state', [
+      'box-sizing: border-box;',
+      'display: flex;',
+      'width: 100%;',
+      'max-width: 100%;',
+      'flex-direction: column;',
+      'align-items: flex-start;',
+      'text-align: left;',
+      'letter-spacing: 0;',
+    ])
+    expectCssRule(css, '.el-empty-state--inline', [
+      '--el-empty-state-description-width: 28rem;',
+      '--el-empty-state-illustration-size: 24px;',
+      'padding: 8px 0;',
+    ])
+    expectCssRule(css, '.el-empty-state--compact', [
+      '--el-empty-state-description-width: 30rem;',
+      '--el-empty-state-illustration-size: 32px;',
+      'padding: 20px 0;',
+    ])
+    expectCssRule(css, '.el-empty-state--page', [
+      '--el-empty-state-title-size: 20px;',
+      '--el-empty-state-illustration-size: 64px;',
+      'align-items: center;',
+      'max-width: 36rem;',
+      'margin-inline: auto;',
+      'padding: 56px 16px;',
+      'text-align: center;',
+    ])
+    expect(css).not.toMatch(/\.el-empty-state\s*\{[^}]*box-shadow:/s)
+  })
+
   test('keeps bordered descriptions corners continuous', () => {
     const descriptionsCss = compileThemeFile('descriptions.scss')
     const fsusCss = compileThemeFile('fsus-theme.scss')

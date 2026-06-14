@@ -144,11 +144,9 @@
 
       <AuditCard name="ElBreadcrumbItem" :state="auditState">
         <el-breadcrumb separator="/">
-          <el-breadcrumb-item :to="{ path: '/' }"
-            >
-Current item
-</el-breadcrumb-item
-          >
+          <el-breadcrumb-item :to="{ path: '/' }">
+            Current item
+          </el-breadcrumb-item>
         </el-breadcrumb>
       </AuditCard>
 
@@ -249,11 +247,9 @@ Current item
       </AuditCard>
 
       <AuditCard name="ElCheckTag" :state="auditState">
-        <el-check-tag :checked="active" data-audit-target
-          >
-Check tag
-</el-check-tag
-        >
+        <el-check-tag :checked="active" data-audit-target>
+          Check tag
+        </el-check-tag>
       </AuditCard>
 
       <AuditCard name="ElCol" :state="auditState">
@@ -265,16 +261,12 @@ Check tag
 
       <AuditCard name="ElCollapse" :state="auditState">
         <el-collapse :model-value="active ? ['1', '2'] : ['1']">
-          <el-collapse-item title="Consistency" name="1"
-            >
-First panel
-</el-collapse-item
-          >
-          <el-collapse-item title="Interaction" name="2"
-            >
-Second panel
-</el-collapse-item
-          >
+          <el-collapse-item title="Consistency" name="1">
+            First panel
+          </el-collapse-item>
+          <el-collapse-item title="Interaction" name="2">
+            Second panel
+          </el-collapse-item>
         </el-collapse>
       </AuditCard>
 
@@ -352,11 +344,9 @@ Second panel
 
       <AuditCard name="ElDescriptionsItem" :state="auditState">
         <el-descriptions :column="1" border>
-          <el-descriptions-item label="Item"
-            >
-Description cell
-</el-descriptions-item
-          >
+          <el-descriptions-item label="Item">
+            Description cell
+          </el-descriptions-item>
         </el-descriptions>
       </AuditCard>
 
@@ -426,11 +416,9 @@ Description cell
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item>Action one</el-dropdown-item>
-              <el-dropdown-item :disabled="!active"
-                >
-Action two
-</el-dropdown-item
-              >
+              <el-dropdown-item :disabled="!active">
+                Action two
+              </el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -438,11 +426,9 @@ Action two
 
       <AuditCard name="ElDropdownItem" :state="auditState">
         <el-dropdown trigger="click" :show-timeout="0" :teleported="false">
-          <el-button data-audit-active data-audit-target
-            >
-Dropdown item
-</el-button
-          >
+          <el-button data-audit-active data-audit-target>
+            Dropdown item
+          </el-button>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item :divided="active">Item action</el-dropdown-item>
@@ -453,11 +439,9 @@ Dropdown item
 
       <AuditCard name="ElDropdownMenu" :state="auditState">
         <el-dropdown trigger="click" :show-timeout="0" :teleported="false">
-          <el-button data-audit-active data-audit-target
-            >
-Dropdown menu
-</el-button
-          >
+          <el-button data-audit-active data-audit-target>
+            Dropdown menu
+          </el-button>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item>Menu action</el-dropdown-item>
@@ -468,6 +452,24 @@ Dropdown menu
 
       <AuditCard name="ElEmpty" :state="auditState">
         <el-empty description="No records" />
+      </AuditCard>
+
+      <AuditCard name="ElEmptyState" :state="auditState">
+        <ElEmptyState
+          :size="active ? 'page' : 'compact'"
+          title="No records"
+          description="Adjust filters or create a new item."
+          :action-variant="active ? 'primary' : 'secondary'"
+        >
+          <el-button
+            :type="active ? 'primary' : undefined"
+            data-audit-focus
+            data-audit-target
+            data-audit-active
+          >
+            Create item
+          </el-button>
+        </ElEmptyState>
       </AuditCard>
 
       <AuditCard name="ElFooter" :state="auditState">
@@ -654,11 +656,9 @@ Dropdown menu
           <el-overlay v-if="active" :z-index="1">
             <div class="audit-overlay-panel">Overlay content</div>
           </el-overlay>
-          <el-button v-else data-audit-focus data-audit-target
-            >
-Overlay trigger
-</el-button
-          >
+          <el-button v-else data-audit-focus data-audit-target>
+            Overlay trigger
+          </el-button>
         </div>
       </AuditCard>
 
@@ -742,11 +742,9 @@ Overlay trigger
           <el-popper-trigger>
             <el-button>Arrow</el-button>
           </el-popper-trigger>
-          <el-popper-content :visible="true"
-            >
-<el-popper-arrow />Arrow content
-</el-popper-content
-          >
+          <el-popper-content :visible="true">
+            <el-popper-arrow />Arrow content
+          </el-popper-content>
         </el-popper>
       </AuditCard>
 
@@ -1055,11 +1053,9 @@ Overlay trigger
 
       <AuditCard name="ElTimelineItem" :state="auditState">
         <el-timeline>
-          <el-timeline-item timestamp="2026/05/20"
-            >
-Timeline item
-</el-timeline-item
-          >
+          <el-timeline-item timestamp="2026/05/20">
+            Timeline item
+          </el-timeline-item>
         </el-timeline>
       </AuditCard>
 
@@ -1153,6 +1149,7 @@ Timeline item
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
 import * as Icons from '@element-plus/icons-vue'
+import { ElEmptyState } from '../../element-plus'
 import AuditCard from './AuditCard.vue'
 import {
   auditComponentNames,
