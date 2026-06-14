@@ -50,6 +50,18 @@ test('issue primitives render in the demo route', async ({
   await expect(page.locator('.el-segmented-control')).toBeVisible()
   await expect(page.locator('.el-collection-summary')).toBeVisible()
   await expect(page.locator('.el-pagination-bar')).toBeVisible()
+  await expect(page.locator('.el-section-nav')).toBeVisible()
+  await expect(page.locator('.el-settings-section')).toHaveCount(2)
+  await expect(page.locator('.el-section-header')).toBeVisible()
+  await expect(page.locator('.el-form-section')).toBeVisible()
+  await expect(page.locator('.el-resource-list')).toBeVisible()
+  await expect(page.locator('.el-resource-list-item')).toHaveCount(2)
+  await expect(page.locator('.el-metadata-row')).toBeVisible()
+  await expect(page.locator('.el-inline-actions')).toBeVisible()
+  await expect(page.locator('.el-danger-zone')).toBeVisible()
+  await expect(page.locator('.el-destructive-action-panel')).toBeVisible()
+  await expect(page.locator('.el-risk-notice')).toBeVisible()
+  await expect(page.locator('.el-typed-confirm-field')).toBeVisible()
   await expect(
     page.locator(
       isCompact

@@ -294,6 +294,18 @@ export const publicComponentBoundaries: Record<
       fixtureModes: ['forms', 'data-boundaries'],
     },
   ),
+  'settings-primitives': entry(
+    [
+      ...formBoundaries,
+      ...dataBoundaries,
+      'safe-text',
+      'keyboard-focus',
+      'event',
+    ],
+    {
+      fixtureModes: ['forms', 'states', 'data-boundaries'],
+    },
+  ),
   skeleton: entry([...simpleBoundaries, 'loading-clearable'], {
     fixtureModes: ['states', 'data-boundaries'],
   }),

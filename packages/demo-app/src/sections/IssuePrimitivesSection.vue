@@ -83,6 +83,124 @@
         />
       </div>
 
+      <div class="issue-primitives__settings-demo">
+        <ElSectionNav
+          ariaLabel="Settings primitive sections"
+          :items="settingsNavItems"
+          :density="compact ? 'compact' : 'default'"
+        />
+
+        <div class="issue-primitives__settings-grid">
+          <ElSettingsSection
+            id="settings-overview"
+            title="Generic settings"
+            description="Reusable section structure with product-owned copy."
+            title-tag="h3"
+            :density="compact ? 'compact' : 'default'"
+          >
+            <template #actions>
+              <el-button size="small">Save</el-button>
+            </template>
+
+            <ElSectionHeader
+              title="Standalone header"
+              description="Use this when a page needs only the header primitive."
+              title-tag="h4"
+              :density="compact ? 'compact' : 'default'"
+            />
+
+            <ElFormSection
+              title="Form-compatible group"
+              description="The consuming form owns labels, validation, and submit."
+              title-tag="h4"
+              :density="compact ? 'compact' : 'default'"
+            >
+              <label class="issue-primitives__field">
+                Label
+                <input value="Neutral value" />
+              </label>
+            </ElFormSection>
+          </ElSettingsSection>
+
+          <ElSettingsSection
+            id="settings-resources"
+            title="Resource list"
+            description="Rows support metadata, badges, inline actions, and local empty states."
+            title-tag="h3"
+            :density="compact ? 'compact' : 'default'"
+          >
+            <ElResourceList :density="compact ? 'compact' : 'default'">
+              <ElResourceListItem
+                title="Resource Alpha"
+                description="Updated recently"
+                :density="compact ? 'compact' : 'default'"
+              >
+                <template #badge>
+                  <el-tag size="small" type="info">Ready</el-tag>
+                </template>
+
+                <ElMetadataRow :density="compact ? 'compact' : 'default'">
+                  <ElMetadataItem label="Created" value="2026-01-01" />
+                  <ElMetadataItem
+                    label="Fingerprint"
+                    value="A1B2-C3D4"
+                    monospace
+                  />
+                  <ElMetadataItem label="Optional" />
+                </ElMetadataRow>
+
+                <template #actions>
+                  <ElInlineActions ariaLabel="Resource actions">
+                    <el-button text size="small">Edit</el-button>
+                    <el-button text size="small">Disable</el-button>
+                  </ElInlineActions>
+                </template>
+              </ElResourceListItem>
+
+              <ElResourceListItem title="Empty resource group">
+                <ElEmptyState
+                  size="inline"
+                  title="No resources"
+                  description="Downstream apps supply the exact copy."
+                >
+                  <el-button text type="primary" inline-action>
+                    Add resource
+                  </el-button>
+                </ElEmptyState>
+              </ElResourceListItem>
+            </ElResourceList>
+          </ElSettingsSection>
+        </div>
+
+        <ElDangerZone
+          id="settings-risk"
+          title="Risk area"
+          description="Danger content uses explicit text in addition to color."
+          title-tag="h3"
+          :density="compact ? 'compact' : 'default'"
+        >
+          <ElRiskNotice title="Review" role="note">
+            Confirm the impact before continuing.
+          </ElRiskNotice>
+
+          <ElDestructiveActionPanel title="Destructive action">
+            <template #description>
+              Product copy explains outcome, recovery, and permissions.
+            </template>
+            <template #actions>
+              <el-button type="danger" size="small">Continue</el-button>
+            </template>
+          </ElDestructiveActionPanel>
+
+          <ElTypedConfirmField
+            v-model="confirmation"
+            phrase="CONFIRM"
+            label="Confirmation phrase"
+            description="Type the exact phrase to continue."
+          />
+        </ElDangerZone>
+      </div>
+
       <ElResponsiveCollection
         :items="rows"
         row-key="id"
@@ -145,10 +263,23 @@ import {
   ElEmptyState,
   ElFilterGroup,
   ElPaginationBar,
+  ElDangerZone,
+  ElDestructiveActionPanel,
+  ElFormSection,
+  ElInlineActions,
+  ElMetadataItem,
+  ElMetadataRow,
   ElPublicShell,
+  ElResourceList,
+  ElResourceListItem,
+  ElRiskNotice,
+  ElSectionHeader,
+  ElSectionNav,
+  ElSettingsSection,
   ElResponsiveCollection,
   ElSegmentedControl,
   ElThemeModeToggle,
+  ElTypedConfirmField,
   type SegmentedControlValue,
 } from '../../../element-plus'
 
@@ -159,10 +290,21 @@ defineProps<{
 const searchQuery = ref('')
 const collectionQuery = ref('')
 const collectionState = ref<SegmentedControlValue>('all')
+const confirmation = ref('CONF')
 const navItems = [
   { key: 'home', label: 'Home', href: '/' },
   { key: 'archive', label: 'Archive', href: '/archive' },
   { key: 'about', label: 'About', href: '/about' },
+]
+const settingsNavItems = [
+  {
+    key: 'overview',
+    label: 'Overview',
+    href: '#settings-overview',
+    current: true,
+  },
+  { key: 'resources', label: 'Resources', href: '#settings-resources' },
+  { key: 'risk', label: 'Risk', href: '#settings-risk' },
 ]
 const rows = [
   { id: 1, title: 'Layout primitives', meta: '42 views' },
