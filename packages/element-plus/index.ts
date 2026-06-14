@@ -7,12 +7,17 @@ export * from './make-installer'
 export * from './render-pipeline-policies'
 export * from './result'
 export {
+  FsuBottomActionBar,
+  FsuMobileDock,
   FsuMotion,
   FsuMotionRecipe,
+  FsuOverlayTransition,
   FsuRowStateMotion,
   FsuScrollTimeline,
+  FsuSheetTransition,
   FsuSharedElement,
   FsuTaskReceipt,
+  FsuToastReceipt,
   FsuTransition,
   cancelMotion,
   claimMotionBudgetNode,

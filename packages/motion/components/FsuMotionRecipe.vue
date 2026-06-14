@@ -4,6 +4,8 @@
     ref="root"
     :data-fsus-motion-recipe="resolved.recipe"
     :data-fsus-motion-preset="resolved.name"
+    :aria-live="ariaLive"
+    :role="role"
   >
     <slot />
   </component>
@@ -29,11 +31,15 @@ const props = withDefaults(
     disabled?: boolean
     once?: boolean
     immediate?: boolean
+    ariaLive?: 'polite' | 'assertive'
+    role?: string
   }>(),
   {
     name: 'content-enter',
     as: 'div',
     immediate: true,
+    ariaLive: undefined,
+    role: undefined,
   },
 )
 

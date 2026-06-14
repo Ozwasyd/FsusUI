@@ -524,6 +524,41 @@ const reveal = useScrollReveal({ name: 'media-develop', once: true })
 Code copy feedback should be attached to the copy button or toolbar with
 `copy-confirm` and an `aria-live` receipt, not by moving the entire code block.
 
+## Mobile And Overlay Motion
+
+Use FsusUI primitives for mobile docks, bottom action bars, sheets, overlays,
+dialogs, lightboxes, toast receipts, and banners. These primitives own motion,
+safe-area, focus restore, and reduced-motion behavior; apps provide labels and
+actions.
+
+```vue
+<template>
+  <FsuMobileDock label="Article actions">
+    <button>Like</button>
+    <button>Share</button>
+  </FsuMobileDock>
+
+  <FsuBottomActionBar label="Bulk edit actions">
+    <button>Cancel</button>
+    <button>Save</button>
+  </FsuBottomActionBar>
+
+  <FsuOverlayTransition>
+    <div v-if="open" role="dialog" aria-modal="true">
+      <FsuSheetTransition>
+        <aside v-if="open">Filters</aside>
+      </FsuSheetTransition>
+    </div>
+  </FsuOverlayTransition>
+
+  <FsuToastReceipt tone="success" message="Published" />
+</template>
+```
+
+Base dock and overlay components do not add default glass, blur, or large slide
+distances. `FsuMobileDock` respects `safe-area-inset-bottom` by default, while
+`FsuOverlayTransition` restores focus to the trigger after close.
+
 - Route leave 后，context、timeline 和 scroll reveal 的 cleanup 都被调用。
 - 组件 unmount 后没有残留 ScrollTrigger 或未 kill 的 timeline。
 - `motion={false}` 在 Button、Card、Dialog、Drawer、Dropdown、Tooltip、Message、

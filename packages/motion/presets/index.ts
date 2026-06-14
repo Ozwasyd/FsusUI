@@ -282,6 +282,18 @@ export const motionPresets: Record<MotionPresetName, MotionPresetDefinition> = {
       transform: `translate3d(0, ${motionCssVars.distance.md}, 0)`,
     },
   },
+  'overlay-settle': {
+    name: 'overlay-settle',
+    duration: motionCssVars.duration.route,
+    easing: motionCssVars.easing.standard,
+    surfaces: ['overlay-sheet-dialog-surface'],
+    forbiddenSurfaces: ['reading-surface', 'ordinary-content'],
+    from: { opacity: '0' },
+    to: { opacity: '1' },
+    reduced: opacityTerminal,
+    leaveFrom: { opacity: '1' },
+    leaveTo: { opacity: '0' },
+  },
   'dock-settle': {
     name: 'dock-settle',
     duration: motionCssVars.duration.base,

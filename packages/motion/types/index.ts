@@ -16,6 +16,7 @@ export const motionPresetNames = [
   'route-settle',
   'dialog-settle',
   'sheet-settle',
+  'overlay-settle',
   'dock-settle',
   'toast-receipt',
   'banner-receipt',

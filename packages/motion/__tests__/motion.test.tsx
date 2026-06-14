@@ -2,11 +2,16 @@ import { defineComponent, nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import FsuMotion, {
+  FsuBottomActionBar,
+  FsuMobileDock,
   FsuMotionRecipe,
+  FsuOverlayTransition,
   FsuRowStateMotion,
   FsuScrollTimeline,
+  FsuSheetTransition,
   FsuSharedElement,
   FsuTaskReceipt,
+  FsuToastReceipt,
   FsuTransition,
   createMotionRouteCleanup,
   defaultMotionBudget,
@@ -97,6 +102,7 @@ describe('motion primitives', () => {
       'route-settle',
       'dialog-settle',
       'sheet-settle',
+      'overlay-settle',
       'dock-settle',
       'toast-receipt',
       'banner-receipt',
@@ -331,6 +337,9 @@ describe('motion primitives', () => {
           <FsuMotionRecipe name="state-settled">saved</FsuMotionRecipe>
           <FsuTaskReceipt phase="success" message="Saved" />
           <FsuRowStateMotion state="busy" rowKey="row-1" message="Saving" />
+          <FsuMobileDock immediate={false}>dock</FsuMobileDock>
+          <FsuBottomActionBar immediate={false}>bar</FsuBottomActionBar>
+          <FsuToastReceipt immediate={false} message="Done" />
           <FsuScrollTimeline
             segments={[{ from: 0, to: 0.25, recipe: 'content-enter' }]}
           >
@@ -355,6 +364,11 @@ describe('motion primitives', () => {
       true,
     )
     expect(wrapper.find('[data-fsus-row-state="busy"]').exists()).toBe(true)
+    expect(wrapper.find('[data-fsus-mobile-dock="bottom"]').exists()).toBe(
+      true,
+    )
+    expect(wrapper.find('[data-fsus-bottom-action-bar]').exists()).toBe(true)
+    expect(wrapper.find('[data-fsus-toast-receipt]').exists()).toBe(true)
     expect(wrapper.find('[data-fsus-scroll-timeline="natural"]').exists()).toBe(
       true,
     )
@@ -551,5 +565,65 @@ describe('motion primitives', () => {
     expect(task.classes()).toContain('fsu-motion-summary-receipt')
     expect(row.attributes('aria-live')).toBe('assertive')
     expect(row.classes()).toContain('fsu-motion-row-error-lock')
+  })
+
+  it('renders mobile dock primitives without default glass and with safe-area', () => {
+    const wrapper = mount(() => (
+      <div>
+        <FsuMobileDock immediate={false}>actions</FsuMobileDock>
+        <FsuBottomActionBar immediate={false}>save</FsuBottomActionBar>
+        <FsuSheetTransition>
+          <div v-if={false}>sheet</div>
+        </FsuSheetTransition>
+      </div>
+    ))
+
+    const dock = wrapper.find('[data-fsus-mobile-dock="bottom"]')
+
+    expect(dock.attributes('data-fsus-motion-preset')).toBe('dock-settle')
+    expect(dock.attributes('style')).toContain('safe-area-inset-bottom')
+    expect(dock.attributes('style')).not.toContain('backdrop-filter')
+    expect(wrapper.find('[data-fsus-bottom-action-bar]').exists()).toBe(true)
+  })
+
+  it('restores focus after overlay close', async () => {
+    const trigger = document.createElement('button')
+    trigger.textContent = 'open'
+    document.body.append(trigger)
+    trigger.focus()
+
+    const visible = ref(false)
+    const wrapper = mount(
+      defineComponent({
+        setup() {
+          return () => (
+            <FsuOverlayTransition duration={1}>
+              {visible.value ? (
+                <div class="overlay" tabindex="-1">
+                  overlay
+                </div>
+              ) : null}
+            </FsuOverlayTransition>
+          )
+        },
+      }),
+      { attachTo: document.body },
+    )
+
+    visible.value = true
+    await nextTick()
+    vi.runAllTimers()
+    await nextTick()
+    const overlay = document.body.querySelector('.overlay') as HTMLElement
+    overlay.focus()
+
+    visible.value = false
+    await nextTick()
+    vi.runAllTimers()
+    await nextTick()
+
+    expect(document.activeElement).toBe(trigger)
+    wrapper.unmount()
+    trigger.remove()
   })
 })

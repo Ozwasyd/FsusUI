@@ -1,9 +1,14 @@
 import FsuTransition from './components/FsuTransition.vue'
 import FsuMotionRecipe from './components/FsuMotionRecipe.vue'
+import FsuMobileDock from './components/FsuMobileDock.vue'
+import FsuBottomActionBar from './components/FsuBottomActionBar.vue'
+import FsuOverlayTransition from './components/FsuOverlayTransition.vue'
 import FsuScrollTimeline from './components/FsuScrollTimeline.vue'
+import FsuSheetTransition from './components/FsuSheetTransition.vue'
 import FsuSharedElement from './components/FsuSharedElement.vue'
 import FsuTaskReceipt from './components/FsuTaskReceipt.vue'
 import FsuRowStateMotion from './components/FsuRowStateMotion.vue'
+import FsuToastReceipt from './components/FsuToastReceipt.vue'
 import { vMotion } from './directives/motion'
 import { vScrollReveal } from './directives/scroll-reveal'
 import { setMotionBudget } from './budget'
@@ -17,11 +22,16 @@ export const createMotionPlugin = (
     if (config.budget) setMotionBudget(config.budget)
     app.directive('motion', vMotion)
     app.directive('scroll-reveal', vScrollReveal)
+    app.component('FsuBottomActionBar', FsuBottomActionBar)
+    app.component('FsuMobileDock', FsuMobileDock)
     app.component('FsuMotionRecipe', FsuMotionRecipe)
+    app.component('FsuOverlayTransition', FsuOverlayTransition)
     app.component('FsuScrollTimeline', FsuScrollTimeline)
+    app.component('FsuSheetTransition', FsuSheetTransition)
     app.component('FsuSharedElement', FsuSharedElement)
     app.component('FsuTaskReceipt', FsuTaskReceipt)
     app.component('FsuRowStateMotion', FsuRowStateMotion)
+    app.component('FsuToastReceipt', FsuToastReceipt)
     app.component('FsuTransition', FsuTransition)
   },
 })
@@ -29,11 +39,16 @@ export const createMotionPlugin = (
 export const FsuMotion = createMotionPlugin()
 
 export {
+  FsuBottomActionBar,
+  FsuMobileDock,
   FsuMotionRecipe,
+  FsuOverlayTransition,
   FsuRowStateMotion,
   FsuScrollTimeline,
+  FsuSheetTransition,
   FsuSharedElement,
   FsuTaskReceipt,
+  FsuToastReceipt,
   FsuTransition,
   vMotion,
   vScrollReveal,
