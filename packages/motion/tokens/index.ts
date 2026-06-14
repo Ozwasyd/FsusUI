@@ -46,6 +46,7 @@ export const motionCssVars = {
     route: 'var(--fsus-motion-overlay, 260ms)',
   },
   easing: {
+    linear: 'var(--fsus-motion-linear, linear)',
     standard: 'var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1))',
     emphasized: 'var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1))',
     decelerate: 'cubic-bezier(0, 0, 0.2, 1)',

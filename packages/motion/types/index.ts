@@ -21,6 +21,16 @@ export const motionPresetNames = [
   'banner-receipt',
   'lightbox-focus',
   'index-list-settle',
+  'reading-title-settle',
+  'media-develop',
+  'media-focus',
+  'code-ready',
+  'grid-settle',
+  'quote-line',
+  'toc-anchor',
+  'anchor-mark',
+  'reading-progress-transform',
+  'copy-confirm',
 ] as const
 
 export type MotionPresetName = (typeof motionPresetNames)[number]

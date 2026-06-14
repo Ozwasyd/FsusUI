@@ -45,6 +45,8 @@ export {
   normalizeMotionOptions,
   normalizeMotionRecipeOptions,
   playFlipMotion,
+  readingMotionPolicy,
+  readingMotionPresetNames,
   refreshScrollTriggers,
   registerScrollTrigger,
   releaseMotionBudgetNode,

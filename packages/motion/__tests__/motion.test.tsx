@@ -22,6 +22,8 @@ import FsuMotion, {
   motionTokenAliases,
   motionTokens,
   normalizeMotionRecipeOptions,
+  readingMotionPolicy,
+  readingMotionPresetNames,
   resolveMotionPreference,
   resolveMotionScrollBehavior,
   resolveMotionBudget,
@@ -100,6 +102,16 @@ describe('motion primitives', () => {
       'banner-receipt',
       'lightbox-focus',
       'index-list-settle',
+      'reading-title-settle',
+      'media-develop',
+      'media-focus',
+      'code-ready',
+      'grid-settle',
+      'quote-line',
+      'toc-anchor',
+      'anchor-mark',
+      'reading-progress-transform',
+      'copy-confirm',
     ])
     expect(motionPresetAliases['scale-fade']).toBe('dialog-settle')
     expect(
@@ -119,6 +131,19 @@ describe('motion primitives', () => {
         'media-preview-surface',
       ),
     ).toBe(true)
+    expect(readingMotionPresetNames).toContain('code-ready')
+    expect(readingMotionPolicy).toMatchObject({
+      bodyTextAnimatedByDefault: false,
+      imageHoverScaleByDefault: false,
+      codeBlockMovesOnReady: false,
+    })
+    expect(
+      readingMotionPresetNames.every((name) =>
+        isMotionPresetAllowedOnSurface(name, 'reading-surface'),
+      ),
+    ).toBe(true)
+    expect(motionPresets['media-focus'].to.transform).toBeUndefined()
+    expect(motionPresets['code-ready'].to.transform).toBeUndefined()
     expect(Object.keys(motionRecipes)).toEqual([
       'content-enter',
       'article-list-enter',

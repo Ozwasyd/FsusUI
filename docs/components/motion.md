@@ -488,6 +488,42 @@ markers. The exported classes are line or lock markers:
 `fsu-motion-task-receipt`. For large bulk operations, update one
 `FsuTaskReceipt` summary instead of animating every affected row.
 
+## Reading And Technical Writing Presets
+
+Reading pages should not animate article body paragraphs by default. Use
+content-type presets only where a state becomes interactive or ready:
+
+| Preset                       | Use for                                      |
+| ---------------------------- | -------------------------------------------- |
+| `reading-title-settle`       | article title and metadata settle            |
+| `media-develop`              | image or diagram load reveal                 |
+| `media-focus`                | image affordance without default hover scale |
+| `code-ready`                 | code toolbar/copy-control readiness          |
+| `grid-settle`                | markdown table or compact grid readiness     |
+| `quote-line`                 | quote or aside accent line                   |
+| `toc-anchor`                 | active table-of-contents state               |
+| `anchor-mark`                | hash-target highlight                        |
+| `reading-progress-transform` | progress bar transform only                  |
+| `copy-confirm`               | accessible copy confirmation                 |
+
+```vue
+<template>
+  <h1 v-motion="'reading-title-settle'">{{ title }}</h1>
+  <img v-scroll-reveal="'media-develop'" :src="cover" alt="" />
+  <pre v-motion="'code-ready'"><code>{{ source }}</code></pre>
+  <a v-motion="'anchor-mark'" :href="hash">Section</a>
+</template>
+```
+
+```ts
+import { useScrollReveal } from '@ozwasyd/element-plus'
+
+const reveal = useScrollReveal({ name: 'media-develop', once: true })
+```
+
+Code copy feedback should be attached to the copy button or toolbar with
+`copy-confirm` and an `aria-live` receipt, not by moving the entire code block.
+
 - Route leave 后，context、timeline 和 scroll reveal 的 cleanup 都被调用。
 - 组件 unmount 后没有残留 ScrollTrigger 或未 kill 的 timeline。
 - `motion={false}` 在 Button、Card、Dialog、Drawer、Dropdown、Tooltip、Message、
