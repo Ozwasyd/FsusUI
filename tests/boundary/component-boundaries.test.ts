@@ -62,6 +62,7 @@ const visualAuditNameOverrides: Record<string, string> = {
   'collection-primitives': 'ElCollectionToolbar',
   'settings-primitives': 'ElSectionNav',
   'metric-primitives': 'ElMetricList',
+  'inbox-primitives': 'ElInboxLayout',
   'visual-hidden': 'ElVisuallyHidden',
 }
 

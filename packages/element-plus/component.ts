@@ -58,6 +58,19 @@ import { ElForm, ElFormItem } from '@element-plus/components/form'
 import { ElIcon } from '@element-plus/components/icon'
 import { ElImage } from '@element-plus/components/image'
 import { ElImageViewer } from '@element-plus/components/image-viewer'
+import {
+  ElConversationContextBar,
+  ElConversationList,
+  ElConversationListItem,
+  ElEmptySelectionState,
+  ElInboxEmptyState,
+  ElInboxLayout,
+  ElMessageBubble,
+  ElMessageTimeline,
+  ElReplyComposerShell,
+  ElSplitPane,
+  ElThreadPanel,
+} from '@element-plus/components/inbox-primitives'
 import { ElInput } from '@element-plus/components/input'
 import { ElInputNumber } from '@element-plus/components/input-number'
 import { ElLink } from '@element-plus/components/link'
@@ -199,6 +212,17 @@ export const allComponents = [
   ElIcon,
   ElImage,
   ElImageViewer,
+  ElConversationContextBar,
+  ElConversationList,
+  ElConversationListItem,
+  ElEmptySelectionState,
+  ElInboxEmptyState,
+  ElInboxLayout,
+  ElMessageBubble,
+  ElMessageTimeline,
+  ElReplyComposerShell,
+  ElSplitPane,
+  ElThreadPanel,
   ElInput,
   ElInputNumber,
   ElLink,

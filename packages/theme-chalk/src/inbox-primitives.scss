@@ -1,0 +1,497 @@
+@use 'mixins/mixins' as *;
+@use 'mixins/var' as *;
+
+@mixin inbox-pane-layout($block) {
+  @include b($block) {
+    display: grid;
+    grid-template-columns: minmax(16rem, 0.38fr) minmax(0, 1fr);
+    width: 100%;
+    min-width: 0;
+    min-height: 32rem;
+    border: 1px solid getCssVar('border-color-lighter');
+    border-radius: var(--fsus-radius-panel, 8px);
+    background: getCssVar('bg-color');
+    box-shadow: none;
+    overflow: hidden;
+    letter-spacing: 0;
+
+    @include m(compact) {
+      min-height: 26rem;
+      grid-template-columns: minmax(14rem, 0.36fr) minmax(0, 1fr);
+    }
+
+    @include e(list) {
+      min-width: 0;
+      min-height: 0;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    @include e(detail) {
+      min-width: 0;
+      min-height: 0;
+      border-left: 1px solid getCssVar('border-color-lighter');
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    @media (max-width: 760px) {
+      display: block;
+      min-height: 24rem;
+
+      @include e(list) {
+        min-height: 24rem;
+        border-right: 0;
+      }
+
+      @include e(detail) {
+        min-height: 24rem;
+        border-left: 0;
+      }
+
+      &.#{$namespace}-#{$block}--mobile-list {
+        .#{$namespace}-#{$block}__detail {
+          display: none;
+        }
+      }
+
+      &.#{$namespace}-#{$block}--mobile-detail {
+        .#{$namespace}-#{$block}__list {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+@include inbox-pane-layout(split-pane);
+@include inbox-pane-layout(inbox-layout);
+
+@include b(conversation-list) {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+
+  @include m(compact) {
+    .#{$namespace}-conversation-list-item__button {
+      padding: 10px 12px;
+    }
+  }
+
+  > .#{$namespace}-conversation-list-item
+    + .#{$namespace}-conversation-list-item {
+    border-top: 1px solid getCssVar('border-color-lighter');
+  }
+}
+
+@include b(conversation-list-item) {
+  min-width: 0;
+
+  @include e(button) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: start;
+    width: 100%;
+    min-width: 0;
+    min-height: 56px;
+    padding: 14px;
+    border: 0;
+    background: transparent;
+    color: getCssVar('text-color-primary');
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      background: getCssVar('fill-color-light');
+      outline: none;
+    }
+
+    &:focus-visible {
+      box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c);
+    }
+
+    &:disabled {
+      color: getCssVar('text-color-disabled');
+      cursor: not-allowed;
+    }
+  }
+
+  @include when(selected) {
+    .#{$namespace}-conversation-list-item__button {
+      background: var(
+        --fsus-state-selected-bg,
+        #{getCssVar('fill-color-light')}
+      );
+      color: getCssVar('text-color-primary');
+      box-shadow: inset 3px 0 0 var(--fsus-scholarly-blue, #2a599c);
+    }
+  }
+
+  @include e(main) {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  @include e(title) {
+    min-width: 0;
+    color: getCssVar('text-color-primary');
+    font-size: getCssVar('font-size-base');
+    font-weight: 750;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  @include e(preview) {
+    min-width: 0;
+    color: getCssVar('text-color-secondary');
+    font-size: getCssVar('font-size-small');
+    line-height: 1.45;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @include e(side) {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+    min-width: 0;
+    max-width: 12rem;
+  }
+
+  @include e(meta) {
+    max-width: 100%;
+    color: getCssVar('text-color-secondary');
+    font-size: getCssVar('font-size-extra-small');
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @include e(badges) {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  @include e(unread) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--fsus-scholarly-blue, #2a599c);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  @include m(compact) {
+    .#{$namespace}-conversation-list-item__button {
+      min-height: 48px;
+      padding: 10px 12px;
+    }
+  }
+}
+
+@include b(thread-panel) {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+  background: getCssVar('bg-color');
+
+  @include e(header) {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: start;
+    min-width: 0;
+    padding: 16px;
+    border-bottom: 1px solid getCssVar('border-color-lighter');
+  }
+
+  @include e(back) {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  @include e(heading) {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  @include e(title) {
+    margin: 0;
+    color: getCssVar('text-color-primary');
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  @include e(status) {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-width: 0;
+    color: getCssVar('text-color-secondary');
+    font-size: getCssVar('font-size-small');
+  }
+
+  @include e(actions) {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  @include e(context) {
+    min-width: 0;
+    border-bottom: 1px solid getCssVar('border-color-lighter');
+  }
+
+  @include e(messages) {
+    min-width: 0;
+    min-height: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  @include e(composer) {
+    min-width: 0;
+    border-top: 1px solid getCssVar('border-color-lighter');
+  }
+
+  @include m(compact) {
+    @include e(header) {
+      padding: 12px;
+    }
+  }
+}
+
+@include b(message-timeline) {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 16px;
+  align-content: start;
+
+  @include m(compact) {
+    gap: 8px;
+    padding: 12px;
+  }
+}
+
+@include b(message-bubble) {
+  display: grid;
+  gap: 5px;
+  justify-self: start;
+  width: fit-content;
+  max-width: min(42rem, 86%);
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid getCssVar('border-color-lighter');
+  border-radius: var(--fsus-radius-control, 8px);
+  background: getCssVar('fill-color-light');
+  color: getCssVar('text-color-primary');
+  box-shadow: none;
+
+  @include e(meta) {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-width: 0;
+    color: getCssVar('text-color-secondary');
+    font-size: getCssVar('font-size-extra-small');
+    line-height: 1.4;
+  }
+
+  @include e(author) {
+    color: getCssVar('text-color-regular');
+    font-weight: 750;
+  }
+
+  @include e(time) {
+    color: getCssVar('text-color-secondary');
+  }
+
+  @include e(body) {
+    min-width: 0;
+    font-size: getCssVar('font-size-small');
+    line-height: 1.65;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  @include m(self) {
+    justify-self: end;
+    border-color: color-mix(
+      in srgb,
+      var(--fsus-scholarly-blue, #2a599c) 28%,
+      getCssVar('border-color-lighter')
+    );
+    background: color-mix(
+      in srgb,
+      var(--fsus-scholarly-blue, #2a599c) 8%,
+      getCssVar('bg-color')
+    );
+  }
+
+  @include m(system) {
+    justify-self: center;
+    max-width: min(34rem, 92%);
+    background: transparent;
+    color: getCssVar('text-color-secondary');
+    text-align: center;
+  }
+
+  @include m(muted) {
+    background: transparent;
+    color: getCssVar('text-color-secondary');
+  }
+
+  @include m(compact) {
+    padding: 8px 10px;
+  }
+}
+
+@include b(conversation-context-bar) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  min-width: 0;
+  padding: 10px 16px;
+  background: getCssVar('fill-color-lighter');
+  color: getCssVar('text-color-secondary');
+  font-size: getCssVar('font-size-small');
+  line-height: 1.45;
+
+  > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  @include m(compact) {
+    gap: 6px 10px;
+    padding: 8px 12px;
+  }
+}
+
+@include b(reply-composer-shell) {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px 16px;
+  background: getCssVar('bg-color');
+
+  @include e(header) {
+    min-width: 0;
+  }
+
+  @include e(title) {
+    display: block;
+    color: getCssVar('text-color-primary');
+    font-size: getCssVar('font-size-small');
+    font-weight: 800;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+
+  @include e(input) {
+    min-width: 0;
+
+    > * {
+      max-width: 100%;
+    }
+  }
+
+  @include e(actions) {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  @include when(disabled) {
+    opacity: 0.64;
+  }
+
+  @include m(compact) {
+    gap: 8px;
+    padding: 12px;
+  }
+}
+
+@mixin inbox-empty-surface($block) {
+  @include b($block) {
+    display: grid;
+    justify-items: start;
+    gap: 6px;
+    min-width: 0;
+    padding: 18px 16px;
+    background: transparent;
+    color: getCssVar('text-color-primary');
+    text-align: left;
+
+    @include e(title) {
+      color: getCssVar('text-color-primary');
+      font-size: getCssVar('font-size-base');
+      font-weight: 800;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    @include e(description) {
+      max-width: 30rem;
+      margin: 0;
+      color: getCssVar('text-color-secondary');
+      font-size: getCssVar('font-size-small');
+      line-height: 1.65;
+      overflow-wrap: anywhere;
+    }
+
+    @include e(actions) {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    @include m(compact) {
+      padding: 12px;
+    }
+  }
+}
+
+@include inbox-empty-surface(empty-selection-state);
+@include inbox-empty-surface(inbox-empty-state);
+
+@media (prefers-reduced-motion: reduce) {
+  .#{$namespace}-conversation-list-item__button,
+  .#{$namespace}-reply-composer-shell,
+  .#{$namespace}-message-bubble {
+    transition: none;
+  }
+}

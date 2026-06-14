@@ -56,6 +56,7 @@ export const auditComponentNames = [
   'ElIcon',
   'ElImage',
   'ElImageViewer',
+  'ElInboxLayout',
   'ElInput',
   'ElInputNumber',
   'ElLink',
