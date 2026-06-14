@@ -511,6 +511,89 @@
         </ElEmptyState>
       </AuditCard>
 
+      <AuditCard name="ElMetricList" :state="auditState">
+        <div class="audit-metric-primitives">
+          <ElKpiGroup :density="compact ? 'compact' : 'default'">
+            <ElMetricList :density="compact ? 'compact' : 'default'">
+              <ElMetricItem
+                label="Metric Alpha"
+                primary="P75 22ms"
+                secondary="Avg 23ms"
+                meta="58 samples"
+                :density="compact ? 'compact' : 'default'"
+              />
+              <ElMetricItem
+                label="Metric Beta"
+                primary="99.4%"
+                secondary="Target 99%"
+                meta="12 checks"
+                :density="compact ? 'compact' : 'default'"
+              />
+            </ElMetricList>
+
+            <ElKeyValueGrid :density="compact ? 'compact' : 'default'">
+              <ElKeyValueItem label="State" value="Ready" tone="success" />
+              <ElKeyValueItem label="Queue" value="0 / 0" monospace />
+            </ElKeyValueGrid>
+          </ElKpiGroup>
+
+          <ElDistributionList :density="compact ? 'compact' : 'default'">
+            <ElDistributionBarRow
+              rank="1"
+              label="Segment Alpha"
+              value="245"
+              :ratio="1"
+              :density="compact ? 'compact' : 'default'"
+            />
+            <ElDistributionBarRow
+              rank="2"
+              label="Segment Beta"
+              value="106"
+              :ratio="0.43"
+              :density="compact ? 'compact' : 'default'"
+            />
+          </ElDistributionList>
+
+          <ElStatusSummary
+            label="Generic status"
+            status="Stable"
+            updated-at="2026-06-14 20:30"
+            tone="success"
+            :density="compact ? 'compact' : 'default'"
+          >
+            <template #detail>Product-owned detail copy.</template>
+            <template #actions>
+              <el-button size="small">Inspect</el-button>
+            </template>
+          </ElStatusSummary>
+
+          <ElDiagnosticsList :density="compact ? 'compact' : 'default'">
+            <ElDiagnosticsItem
+              title="diagnostic.event"
+              message="Recent event summary."
+              meta="warning - 17:48:11 - 3 times"
+              detail="diagnostic-node:runCheck:sample-0001"
+              tone="warning"
+              :density="compact ? 'compact' : 'default'"
+            >
+              <template #actions>
+                <ElCopyableDetail
+                  value="diagnostic-node:runCheck:sample-0001"
+                  label="Copy detail"
+                  inline
+                >
+                  <template #button>
+                    <span data-audit-focus data-audit-target data-audit-active>
+                      Copy
+                    </span>
+                  </template>
+                </ElCopyableDetail>
+              </template>
+            </ElDiagnosticsItem>
+          </ElDiagnosticsList>
+        </div>
+      </AuditCard>
+
       <AuditCard name="ElFooter" :state="auditState">
         <el-container class="audit-container">
           <el-main>Main</el-main>
@@ -1304,22 +1387,33 @@ import * as Icons from '@element-plus/icons-vue'
 import {
   ElCollectionSummary,
   ElCollectionToolbar,
+  ElCopyableDetail,
+  ElDangerZone,
+  ElDiagnosticsItem,
+  ElDiagnosticsList,
+  ElDestructiveActionPanel,
+  ElDistributionBarRow,
+  ElDistributionList,
   ElEmptyState,
   ElFilterGroup,
-  ElPaginationBar,
-  ElSegmentedControl,
-  ElDangerZone,
-  ElDestructiveActionPanel,
   ElFormSection,
   ElInlineActions,
+  ElKeyValueGrid,
+  ElKeyValueItem,
+  ElKpiGroup,
   ElMetadataItem,
   ElMetadataRow,
+  ElMetricItem,
+  ElMetricList,
+  ElPaginationBar,
   ElResourceList,
   ElResourceListItem,
   ElRiskNotice,
+  ElSegmentedControl,
   ElSectionHeader,
   ElSectionNav,
   ElSettingsSection,
+  ElStatusSummary,
   ElTypedConfirmField,
 } from '../../element-plus'
 import AuditCard from './AuditCard.vue'

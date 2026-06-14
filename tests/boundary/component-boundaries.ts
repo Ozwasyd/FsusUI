@@ -232,6 +232,18 @@ export const publicComponentBoundaries: Record<
   menu: entry([...simpleBoundaries, 'model-value', 'keyboard-focus', 'event'], {
     fixtureModes: ['overlays'],
   }),
+  'metric-primitives': entry(
+    [
+      ...dataBoundaries,
+      'event',
+      'keyboard-focus',
+      'safe-text',
+      'empty-null-undefined',
+    ],
+    {
+      fixtureModes: ['states', 'data-boundaries'],
+    },
+  ),
   message: entry([...pluginBoundaries, ...rawHtmlOptInBoundaries], {
     fixtureModes: ['overlays'],
   }),

@@ -228,6 +228,12 @@ body {
   color: var(--el-text-color-primary);
 }
 
+.issue-primitives__metrics-demo {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
 .issue-primitives__table {
   min-width: 48rem;
   border: 1px solid var(--el-border-color-lighter);

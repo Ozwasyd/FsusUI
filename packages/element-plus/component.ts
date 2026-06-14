@@ -61,6 +61,19 @@ import { ElImageViewer } from '@element-plus/components/image-viewer'
 import { ElInput } from '@element-plus/components/input'
 import { ElInputNumber } from '@element-plus/components/input-number'
 import { ElLink } from '@element-plus/components/link'
+import {
+  ElCopyableDetail,
+  ElDiagnosticsItem,
+  ElDiagnosticsList,
+  ElDistributionBarRow,
+  ElDistributionList,
+  ElKeyValueGrid,
+  ElKeyValueItem,
+  ElKpiGroup,
+  ElMetricItem,
+  ElMetricList,
+  ElStatusSummary,
+} from '@element-plus/components/metric-primitives'
 import { ElMarkdownEditor } from '@element-plus/components/markdown-editor'
 import { ElMarkdownRenderer } from '@element-plus/components/markdown-renderer'
 import {
@@ -189,6 +202,17 @@ export const allComponents = [
   ElInput,
   ElInputNumber,
   ElLink,
+  ElMetricList,
+  ElMetricItem,
+  ElDistributionList,
+  ElDistributionBarRow,
+  ElKpiGroup,
+  ElKeyValueGrid,
+  ElKeyValueItem,
+  ElStatusSummary,
+  ElDiagnosticsList,
+  ElDiagnosticsItem,
+  ElCopyableDetail,
   ElMarkdownEditor,
   ElMarkdownRenderer,
   ElMenu,

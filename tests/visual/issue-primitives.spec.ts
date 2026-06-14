@@ -62,6 +62,16 @@ test('issue primitives render in the demo route', async ({
   await expect(page.locator('.el-destructive-action-panel')).toBeVisible()
   await expect(page.locator('.el-risk-notice')).toBeVisible()
   await expect(page.locator('.el-typed-confirm-field')).toBeVisible()
+  await expect(page.locator('.el-metric-list')).toBeVisible()
+  await expect(page.locator('.el-metric-item')).toHaveCount(2)
+  await expect(page.locator('.el-kpi-group')).toBeVisible()
+  await expect(page.locator('.el-key-value-grid')).toBeVisible()
+  await expect(page.locator('.el-distribution-list')).toBeVisible()
+  await expect(page.locator('.el-distribution-bar-row')).toHaveCount(3)
+  await expect(page.locator('.el-status-summary')).toBeVisible()
+  await expect(page.locator('.el-diagnostics-list')).toBeVisible()
+  await expect(page.locator('.el-diagnostics-item')).toHaveCount(2)
+  await expect(page.locator('.el-copyable-detail')).toBeVisible()
   await expect(
     page.locator(
       isCompact

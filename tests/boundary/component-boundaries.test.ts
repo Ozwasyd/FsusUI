@@ -61,6 +61,7 @@ const visualAuditExclusions = new Set([
 const visualAuditNameOverrides: Record<string, string> = {
   'collection-primitives': 'ElCollectionToolbar',
   'settings-primitives': 'ElSectionNav',
+  'metric-primitives': 'ElMetricList',
   'visual-hidden': 'ElVisuallyHidden',
 }
 

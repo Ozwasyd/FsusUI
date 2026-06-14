@@ -201,6 +201,102 @@
         </ElDangerZone>
       </div>
 
+      <div class="issue-primitives__metrics-demo">
+        <ElKpiGroup :density="compact ? 'compact' : 'default'">
+          <ElMetricList :density="compact ? 'compact' : 'default'">
+            <ElMetricItem
+              label="Metric Alpha"
+              primary="P75 22ms"
+              :secondary="['Avg 23ms', 'Min 8ms']"
+              meta="58 samples"
+              :density="compact ? 'compact' : 'default'"
+            />
+            <ElMetricItem
+              label="Metric Beta"
+              primary="99.4%"
+              secondary="Target 99%"
+              meta="12 checks"
+              :density="compact ? 'compact' : 'default'"
+            />
+          </ElMetricList>
+
+          <ElKeyValueGrid :density="compact ? 'compact' : 'default'">
+            <ElKeyValueItem label="State" value="Ready" tone="success">
+              <template #badge>
+                <el-tag size="small" type="success">OK</el-tag>
+              </template>
+            </ElKeyValueItem>
+            <ElKeyValueItem label="Queue" value="0 / 0" monospace />
+            <ElKeyValueItem label="Optional" />
+          </ElKeyValueGrid>
+        </ElKpiGroup>
+
+        <ElDistributionList :density="compact ? 'compact' : 'default'">
+          <ElDistributionBarRow
+            rank="1"
+            label="Segment Alpha"
+            value="245"
+            :ratio="1"
+            :density="compact ? 'compact' : 'default'"
+          />
+          <ElDistributionBarRow
+            rank="2"
+            label="Segment Beta"
+            value="106"
+            :ratio="0.43"
+            :density="compact ? 'compact' : 'default'"
+          />
+          <ElDistributionBarRow
+            rank="3"
+            label="Segment Gamma"
+            value="31"
+            :ratio="0.13"
+            :density="compact ? 'compact' : 'default'"
+          />
+        </ElDistributionList>
+
+        <ElStatusSummary
+          label="Generic status"
+          status="Stable"
+          updated-at="2026-06-14 20:30"
+          tone="success"
+          :density="compact ? 'compact' : 'default'"
+        >
+          <template #detail>
+            Product-owned detail copy can describe the current state.
+          </template>
+          <template #actions>
+            <el-button text size="small">Inspect</el-button>
+          </template>
+        </ElStatusSummary>
+
+        <ElDiagnosticsList :density="compact ? 'compact' : 'default'">
+          <ElDiagnosticsItem
+            title="diagnostic.event"
+            message="Recent event summary supplied by the product."
+            meta="warning - 17:48:11 - 3 times"
+            detail="diagnostic-node:runCheck:sample-0001"
+            tone="warning"
+            :density="compact ? 'compact' : 'default'"
+          >
+            <template #actions>
+              <ElCopyableDetail
+                value="diagnostic-node:runCheck:sample-0001"
+                label="Copy detail"
+                inline
+              />
+            </template>
+          </ElDiagnosticsItem>
+          <ElDiagnosticsItem title="No diagnostic rows">
+            <ElEmptyState
+              size="inline"
+              title="No diagnostics"
+              description="Downstream apps supply operational copy."
+            />
+          </ElDiagnosticsItem>
+        </ElDiagnosticsList>
+      </div>
+
       <ElResponsiveCollection
         :items="rows"
         row-key="id"
@@ -260,15 +356,25 @@ import { ref } from 'vue'
 import {
   ElCollectionSummary,
   ElCollectionToolbar,
+  ElCopyableDetail,
+  ElDangerZone,
+  ElDiagnosticsItem,
+  ElDiagnosticsList,
+  ElDestructiveActionPanel,
+  ElDistributionBarRow,
+  ElDistributionList,
   ElEmptyState,
   ElFilterGroup,
-  ElPaginationBar,
-  ElDangerZone,
-  ElDestructiveActionPanel,
   ElFormSection,
   ElInlineActions,
+  ElKeyValueGrid,
+  ElKeyValueItem,
+  ElKpiGroup,
   ElMetadataItem,
   ElMetadataRow,
+  ElMetricItem,
+  ElMetricList,
+  ElPaginationBar,
   ElPublicShell,
   ElResourceList,
   ElResourceListItem,
@@ -278,6 +384,7 @@ import {
   ElSettingsSection,
   ElResponsiveCollection,
   ElSegmentedControl,
+  ElStatusSummary,
   ElThemeModeToggle,
   ElTypedConfirmField,
   type SegmentedControlValue,
