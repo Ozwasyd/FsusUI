@@ -3,8 +3,10 @@ import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import FsuMotion, {
   FsuMotionRecipe,
+  FsuRowStateMotion,
   FsuScrollTimeline,
   FsuSharedElement,
+  FsuTaskReceipt,
   FsuTransition,
   createMotionRouteCleanup,
   defaultMotionBudget,
@@ -29,9 +31,11 @@ import FsuMotion, {
   useFlipMotion,
   useGsapContext,
   useMotionPreference,
+  useRowStateMotion,
   useScrollReveal,
   useScrollTimeline,
   useSharedElementMotion,
+  useTaskFeedback,
   useTimeline,
   vMotion,
 } from '..'
@@ -300,6 +304,8 @@ describe('motion primitives', () => {
       () => (
         <div>
           <FsuMotionRecipe name="state-settled">saved</FsuMotionRecipe>
+          <FsuTaskReceipt phase="success" message="Saved" />
+          <FsuRowStateMotion state="busy" rowKey="row-1" message="Saving" />
           <FsuScrollTimeline
             segments={[{ from: 0, to: 0.25, recipe: 'content-enter' }]}
           >
@@ -320,6 +326,10 @@ describe('motion primitives', () => {
 
     expect(wrapper.find('[data-fsus-motion-recipe="state-settled"]').exists())
       .toBe(true)
+    expect(wrapper.find('[data-fsus-task-receipt="success"]').exists()).toBe(
+      true,
+    )
+    expect(wrapper.find('[data-fsus-row-state="busy"]').exists()).toBe(true)
     expect(wrapper.find('[data-fsus-scroll-timeline="natural"]').exists()).toBe(
       true,
     )
@@ -463,5 +473,58 @@ describe('motion primitives', () => {
     expect(first).not.toHaveBeenCalled()
     expect(second).toHaveBeenCalledTimes(1)
     expect(routeCleanup.size).toBe(0)
+  })
+
+  it('provides task feedback receipts with cancellable timers and aria output', () => {
+    const feedback = useTaskFeedback({ clearDelay: 50 })
+
+    feedback.pending('Saving')
+    expect(feedback.phase.value).toBe('pending')
+    expect(feedback.ariaLive.value).toBe('polite')
+    expect(feedback.motionClass.value).toBe('fsu-motion-task-receipt')
+
+    feedback.error('Failed')
+    expect(feedback.ariaLive.value).toBe('assertive')
+    expect(feedback.receiptProps.value['data-fsus-task-feedback']).toBe('error')
+
+    feedback.success('Saved')
+    vi.advanceTimersByTime(50)
+    expect(feedback.phase.value).toBe('idle')
+  })
+
+  it('provides row state motion without requiring full-row flashing', () => {
+    const rows = useRowStateMotion({ clearDelay: 40 })
+
+    rows.set('post-1', { phase: 'busy', message: 'Saving' })
+    rows.set('post-2', { phase: 'success', message: 'Saved' })
+
+    expect(rows.activeCount.value).toBe(2)
+    expect(rows.get('post-1').phase).toBe('busy')
+    expect(rows.getClass('post-1')).toBe('fsu-motion-row-busy-line')
+    expect(rows.getClass('post-2')).toBe('fsu-motion-row-confirm-line')
+
+    vi.advanceTimersByTime(40)
+    expect(rows.get('post-1').phase).toBe('busy')
+    expect(rows.get('post-2').phase).toBe('idle')
+
+    rows.clearAll()
+    expect(rows.activeCount.value).toBe(0)
+  })
+
+  it('renders task and row feedback components with built-in accessibility', () => {
+    const wrapper = mount(() => (
+      <div>
+        <FsuTaskReceipt phase="partial" summary message="3 of 5 saved" />
+        <FsuRowStateMotion state="error" rowKey="post-1" message="Failed" />
+      </div>
+    ))
+
+    const task = wrapper.find('[data-fsus-task-receipt="partial"]')
+    const row = wrapper.find('[data-fsus-row-state="error"]')
+
+    expect(task.attributes('aria-live')).toBe('polite')
+    expect(task.classes()).toContain('fsu-motion-summary-receipt')
+    expect(row.attributes('aria-live')).toBe('assertive')
+    expect(row.classes()).toContain('fsu-motion-row-error-lock')
   })
 })

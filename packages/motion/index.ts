@@ -2,6 +2,8 @@ import FsuTransition from './components/FsuTransition.vue'
 import FsuMotionRecipe from './components/FsuMotionRecipe.vue'
 import FsuScrollTimeline from './components/FsuScrollTimeline.vue'
 import FsuSharedElement from './components/FsuSharedElement.vue'
+import FsuTaskReceipt from './components/FsuTaskReceipt.vue'
+import FsuRowStateMotion from './components/FsuRowStateMotion.vue'
 import { vMotion } from './directives/motion'
 import { vScrollReveal } from './directives/scroll-reveal'
 import { setMotionBudget } from './budget'
@@ -18,6 +20,8 @@ export const createMotionPlugin = (
     app.component('FsuMotionRecipe', FsuMotionRecipe)
     app.component('FsuScrollTimeline', FsuScrollTimeline)
     app.component('FsuSharedElement', FsuSharedElement)
+    app.component('FsuTaskReceipt', FsuTaskReceipt)
+    app.component('FsuRowStateMotion', FsuRowStateMotion)
     app.component('FsuTransition', FsuTransition)
   },
 })
@@ -26,8 +30,10 @@ export const FsuMotion = createMotionPlugin()
 
 export {
   FsuMotionRecipe,
+  FsuRowStateMotion,
   FsuScrollTimeline,
   FsuSharedElement,
+  FsuTaskReceipt,
   FsuTransition,
   vMotion,
   vScrollReveal,
@@ -37,9 +43,11 @@ export * from './composables/use-gsap-context'
 export * from './composables/use-flip-motion'
 export * from './composables/use-motion-route-cleanup'
 export * from './composables/use-motion-preference'
+export * from './composables/use-row-state-motion'
 export * from './composables/use-scroll-reveal'
 export * from './composables/use-scroll-timeline'
 export * from './composables/use-shared-element-motion'
+export * from './composables/use-task-feedback'
 export * from './composables/use-timeline'
 export * from './directives/motion'
 export * from './directives/scroll-reveal'

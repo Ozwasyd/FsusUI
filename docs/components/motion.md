@@ -460,6 +460,34 @@ Older generic presets remain available for compatibility, but
 `motionPresetAliases` documents their migration target. New app code should map
 semantic product names to the settle presets instead of adding local keyframes.
 
+## Task And Row Feedback
+
+Use `useTaskFeedback()` for save, publish, sync, import, export, rollback, and
+audit flows. Apps provide business text; FsusUI owns phase classes, timers, and
+live-region behavior.
+
+```vue
+<script setup lang="ts">
+import { FsuTaskReceipt, useTaskFeedback } from '@ozwasyd/element-plus'
+
+const feedback = useTaskFeedback({ clearDelay: 2400 })
+</script>
+
+<template>
+  <FsuTaskReceipt
+    :phase="feedback.phase.value"
+    :message="feedback.message.value"
+  />
+</template>
+```
+
+Use `useRowStateMotion()` for row-level pending, confirm, partial, and error
+markers. The exported classes are line or lock markers:
+`fsu-motion-row-busy-line`, `fsu-motion-row-confirm-line`,
+`fsu-motion-row-error-lock`, `fsu-motion-summary-receipt`, and
+`fsu-motion-task-receipt`. For large bulk operations, update one
+`FsuTaskReceipt` summary instead of animating every affected row.
+
 - Route leave 后，context、timeline 和 scroll reveal 的 cleanup 都被调用。
 - 组件 unmount 后没有残留 ScrollTrigger 或未 kill 的 timeline。
 - `motion={false}` 在 Button、Card、Dialog、Drawer、Dropdown、Tooltip、Message、
