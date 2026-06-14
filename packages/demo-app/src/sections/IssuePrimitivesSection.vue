@@ -28,13 +28,31 @@
         </el-button>
       </header>
 
-      <el-empty
-        description="Long public boundary text wraps safely without a downstream description wrapper."
-        description-layout="wide"
-        :description-width="384"
-      >
-        <el-button type="primary">Retry</el-button>
-      </el-empty>
+      <div class="issue-primitives__empty-grid">
+        <ElEmptyState
+          title="No rows"
+          description="Adjust filters and try again."
+        >
+          <el-button text type="primary" inline-action>Clear filters</el-button>
+        </ElEmptyState>
+
+        <ElEmptyState
+          size="compact"
+          title="Nothing selected"
+          description="Select an item to view details."
+        >
+          <el-button>Browse items</el-button>
+        </ElEmptyState>
+
+        <ElEmptyState
+          size="page"
+          title="No results"
+          description="Try a broader search term."
+          action-variant="primary"
+        >
+          <el-button type="primary">Create item</el-button>
+        </ElEmptyState>
+      </div>
 
       <ElResponsiveCollection
         :items="rows"
@@ -86,6 +104,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import {
+  ElEmptyState,
   ElPublicShell,
   ElResponsiveCollection,
   ElThemeModeToggle,

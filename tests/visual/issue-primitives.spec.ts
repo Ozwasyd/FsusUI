@@ -26,7 +26,9 @@ test.afterEach(async ({ page }) => {
   expect(diagnostics.get(page) ?? []).toEqual([])
 })
 
-test('issue primitives render in the demo route', async ({ page }, testInfo) => {
+test('issue primitives render in the demo route', async ({
+  page,
+}, testInfo) => {
   const projectName = testInfo.project.name
   const isCompact = projectName.includes('mobile')
   const theme = projectName.includes('dark') ? 'dark' : 'light'
@@ -39,6 +41,10 @@ test('issue primitives render in the demo route', async ({ page }, testInfo) => 
 
   await expect(page.locator('.el-public-shell')).toBeVisible()
   await expect(page.locator('.issue-primitives')).toBeVisible()
+  await expect(page.locator('.el-empty-state--inline')).toBeVisible()
+  await expect(page.locator('.el-empty-state--compact')).toBeVisible()
+  await expect(page.locator('.el-empty-state--page')).toBeVisible()
+  await expect(page.locator('.el-empty-state__illustration')).toHaveCount(1)
   await expect(
     page.locator(
       isCompact
@@ -50,7 +56,9 @@ test('issue primitives render in the demo route', async ({ page }, testInfo) => 
   const collection = page.locator('.el-responsive-collection')
   await expect(collection).toBeVisible()
   if (isCompact) {
-    await expect(collection.locator('.el-responsive-collection__compact')).toBeVisible()
+    await expect(
+      collection.locator('.el-responsive-collection__compact'),
+    ).toBeVisible()
     await expect(collection.locator('.issue-primitives__card')).toHaveCount(2)
   } else {
     await expect(collection.locator('.issue-primitives__table')).toBeVisible()
@@ -65,7 +73,9 @@ test('issue primitives render in the demo route', async ({ page }, testInfo) => 
 
   const horizontalOverflow = await page.evaluate(() => {
     const root = document.documentElement
-    return Math.max(root.scrollWidth, document.body.scrollWidth) - root.clientWidth
+    return (
+      Math.max(root.scrollWidth, document.body.scrollWidth) - root.clientWidth
+    )
   })
   expect(horizontalOverflow).toBeLessThanOrEqual(1)
 })

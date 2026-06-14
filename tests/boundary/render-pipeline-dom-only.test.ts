@@ -48,7 +48,7 @@ describe('render pipeline pure DOM boundary', () => {
       const source = readFileSync(file, 'utf8')
       if (!renderPipelineDirectConsumerPattern.test(source)) continue
 
-      const repoPath = relative(process.cwd(), file)
+      const repoPath = relative(process.cwd(), file).replace(/\\/g, '/')
       expect(
         allowedRenderPipelineConsumers.some((pattern) =>
           pattern.test(repoPath),

@@ -47,6 +47,7 @@ export const auditComponentNames = [
   'ElDropdownItem',
   'ElDropdownMenu',
   'ElEmpty',
+  'ElEmptyState',
   'ElFooter',
   'ElForm',
   'ElFormItem',

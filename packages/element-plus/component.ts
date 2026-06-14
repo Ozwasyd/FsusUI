@@ -46,6 +46,7 @@ import {
   ElDropdownMenu,
 } from '@element-plus/components/dropdown'
 import { ElEmpty } from '@element-plus/components/empty'
+import { ElEmptyState } from '@element-plus/components/empty-state'
 import { ElForm, ElFormItem } from '@element-plus/components/form'
 import { ElIcon } from '@element-plus/components/icon'
 import { ElImage } from '@element-plus/components/image'
@@ -154,6 +155,7 @@ export const allComponents = [
   ElDropdownItem,
   ElDropdownMenu,
   ElEmpty,
+  ElEmptyState,
   ElForm,
   ElFormItem,
   ElIcon,

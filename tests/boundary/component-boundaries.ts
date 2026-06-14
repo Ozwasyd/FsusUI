@@ -179,6 +179,9 @@ export const publicComponentBoundaries: Record<
   empty: entry(simpleBoundaries, {
     fixtureModes: ['states', 'data-boundaries'],
   }),
+  'empty-state': entry([...simpleBoundaries, 'empty-null-undefined'], {
+    fixtureModes: ['states', 'data-boundaries'],
+  }),
   'focus-trap': entry([
     'default-render',
     'event',
