@@ -91,3 +91,7 @@ pnpm run check:markdown-wasm-runtime
 ```
 
 详见 [工程维护交接](../engineering-handoff.md#wasm)。
+> **Name note:** FsusUI is the recommended public-facing name. The package
+> `@ozwasyd/element-plus` is the current FsusUI public-preview compatibility
+> build based on Element Plus; Element Plus itself remains upstream provenance
+> and API-compatibility context.

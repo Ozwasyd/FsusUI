@@ -13,12 +13,12 @@
 ```ts
 // main.ts
 import { createApp } from 'vue'
-import ElementPlus from '@ozwasyd/element-plus'
+import FsusUI from '@ozwasyd/element-plus'
 import '@ozwasyd/element-plus/dist/index.css'
 import App from './App.vue'
 
 const app = createApp(App)
-app.use(ElementPlus)
+app.use(FsusUI)
 app.mount('#app')
 ```
 
@@ -107,17 +107,17 @@ export default defineConfig({
 ```ts
 // main.ts
 import { createApp } from 'vue'
-import ElementPlus from '@ozwasyd/element-plus'
+import FsusUI from '@ozwasyd/element-plus'
 import App from './App.vue'
 
 const app = createApp(App)
-app.use(ElementPlus, { size: 'small', zIndex: 3000 })
+app.use(FsusUI, { size: 'small', zIndex: 3000 })
 ```
 
 如果你希望主题稳定跟随系统或支持显式强制模式，直接在这里加上 `themeMode`：
 
 ```ts
-app.use(ElementPlus, {
+app.use(FsusUI, {
   size: 'small',
   zIndex: 3000,
   themeMode: 'system',
@@ -165,3 +165,6 @@ pnpm dev
 - [暗色模式](./dark-mode.md) — 接入 `themeMode`、跟随系统主题、处理 SSR 首帧
 - [国际化](./i18n.md) — 配置多语言支持
 - [组件文档](../components/overview.md) — 查阅各组件的完整 API
+> **Name note:** FsusUI is the recommended public-facing name. The current npm
+> public-preview package remains `@ozwasyd/element-plus`; it is the FsusUI
+> Element Plus compatibility build, not the upstream Element Plus package.

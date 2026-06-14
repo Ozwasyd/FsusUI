@@ -165,3 +165,8 @@ FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Mini
 | 组件                    | 文档                                                             |
 | ----------------------- | ---------------------------------------------------------------- |
 | 全局配置 ConfigProvider | [components/config-provider.md](./components/config-provider.md) |
+> **Name note:** FsusUI is the recommended public-facing name for this fork and
+> compatibility-focused Vue 3 component library based on Element Plus. Element
+> Plus is retained as upstream provenance, API-alignment, and package-naming
+> context. The current npm public-preview package is `@ozwasyd/element-plus`,
+> which maps to the FsusUI compatibility build rather than the upstream package.

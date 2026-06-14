@@ -1,9 +1,11 @@
 # FsusUI
 
-FsusUI is a public-preview Vue 3 component-library workspace derived from the
-Element Plus ecosystem. It provides a preview package, FsusUI theme and motion
-tokens, icon assets, WASM-capable runtime paths, Markdown components, and a demo
-app for evaluation.
+FsusUI is a fork and compatibility-focused Vue 3 component library based on
+Element Plus. FsusUI is the recommended public-facing name for documentation,
+examples, and adoption guidance; Element Plus remains the upstream provenance
+and compatibility context. The workspace provides a preview package, FsusUI
+theme and motion tokens, icon assets, WASM-capable runtime paths, Markdown
+components, and a demo app for evaluation.
 
 > FsusUI is currently in public preview. Documented components and theme tokens
 > are available for evaluation, but internal package paths, undocumented
@@ -44,7 +46,8 @@ explicitly says so.
 
 Current public-preview distribution uses the npm public registry:
 `https://registry.npmjs.org/`. The install package is
-`@ozwasyd/element-plus`.
+`@ozwasyd/element-plus`; that package name is the FsusUI public-preview
+compatibility build and should not be confused with upstream Element Plus.
 
 Install:
 
