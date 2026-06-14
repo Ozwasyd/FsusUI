@@ -51,10 +51,12 @@ export const motionCssVars = {
     decelerate: 'cubic-bezier(0, 0, 0.2, 1)',
   },
   distance: {
+    xs: 'var(--fsus-motion-distance-xs, 4px)',
     sm: 'var(--fsus-motion-distance-sm, 8px)',
     md: 'var(--fsus-motion-distance-md, 16px)',
   },
   stagger: {
+    tight: 'var(--fsus-motion-stagger-tight, 35ms)',
     base: 'var(--fsus-motion-stagger, 55ms)',
   },
 } as const

@@ -57,7 +57,7 @@ const resolveDelay = (
   options: MotionRunOptions,
 ) => {
   const directDelay = toTimeValue(options.delay, preset.delay || '0ms')
-  if (options.name !== 'list-stagger') return directDelay
+  if (!preset.stagger || options.index === undefined) return directDelay
 
   const budget = resolveMotionBudget(options.budget)
   const index = clampStaggerIndex(options.index ?? 0, budget)
@@ -172,6 +172,7 @@ export const runMotion = (
   let frame = 0
   let timeout: ReturnType<typeof setTimeout> | undefined
   let claimedBudget = false
+  let finalState = to
 
   const cleanup = () => {
     if (frame) window.cancelAnimationFrame(frame)
@@ -188,7 +189,7 @@ export const runMotion = (
     if (finished) return
     finished = true
     cleanup()
-    applyStyleState(el, to)
+    applyStyleState(el, finalState)
     options.onFinish?.()
   }
 
@@ -208,8 +209,9 @@ export const runMotion = (
   claimedBudget = shouldAnimate
 
   if (!shouldAnimate) {
+    finalState = preset.reduced
     el.style.transition = ''
-    applyStyleState(el, to)
+    applyStyleState(el, preset.reduced)
     finish()
     return controls
   }

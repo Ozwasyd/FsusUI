@@ -30,7 +30,7 @@ export const motionRecipes: Record<MotionRecipeName, MotionRecipeDefinition> = {
   'content-enter': {
     name: 'content-enter',
     intent: 'Introduce ordinary content without making the page feel staged.',
-    preset: 'fade-in',
+    preset: 'surface-settle',
     durationClass: 'base',
     allowedTargets: ['section', 'article-list', 'comment-list'],
     reducedFallback: terminalFallback,
@@ -39,7 +39,7 @@ export const motionRecipes: Record<MotionRecipeName, MotionRecipeDefinition> = {
   'article-list-enter': {
     name: 'article-list-enter',
     intent: 'Reveal a short article list while preserving reading flow.',
-    preset: 'list-stagger',
+    preset: 'index-list-settle',
     durationClass: 'base',
     allowedTargets: ['article-list'],
     reducedFallback: terminalFallback,
@@ -50,7 +50,7 @@ export const motionRecipes: Record<MotionRecipeName, MotionRecipeDefinition> = {
   'island-enter': {
     name: 'island-enter',
     intent: 'Mount dynamic or async islands with a small, delayed entrance.',
-    preset: 'fade-up',
+    preset: 'paper-settle',
     durationClass: 'base',
     allowedTargets: ['dynamic-island', 'async-region'],
     reducedFallback: terminalFallback,
@@ -59,7 +59,7 @@ export const motionRecipes: Record<MotionRecipeName, MotionRecipeDefinition> = {
   'state-pending': {
     name: 'state-pending',
     intent: 'Show an operation is in progress without moving layout.',
-    preset: 'fade-in',
+    preset: 'banner-receipt',
     durationClass: 'fast',
     allowedTargets: ['task-region', 'button', 'row'],
     reducedFallback: 'opacity-only',
@@ -68,7 +68,7 @@ export const motionRecipes: Record<MotionRecipeName, MotionRecipeDefinition> = {
   'state-settled': {
     name: 'state-settled',
     intent: 'Acknowledge a completed state change with a brief highlight.',
-    preset: 'fade-in',
+    preset: 'toast-receipt',
     durationClass: 'fast',
     allowedTargets: ['task-region', 'row', 'message'],
     reducedFallback: 'opacity-only',
@@ -77,7 +77,7 @@ export const motionRecipes: Record<MotionRecipeName, MotionRecipeDefinition> = {
   'state-error': {
     name: 'state-error',
     intent: 'Expose an error state with color and opacity, not shake motion.',
-    preset: 'fade-in',
+    preset: 'banner-receipt',
     durationClass: 'fast',
     allowedTargets: ['task-region', 'row', 'form-field'],
     reducedFallback: 'opacity-only',
@@ -86,7 +86,7 @@ export const motionRecipes: Record<MotionRecipeName, MotionRecipeDefinition> = {
   'route-crossfade': {
     name: 'route-crossfade',
     intent: 'Transition the main route body without directional travel.',
-    preset: 'route-fade',
+    preset: 'route-settle',
     durationClass: 'route',
     allowedTargets: ['route-view', 'page-main'],
     reducedFallback: terminalFallback,
@@ -95,7 +95,7 @@ export const motionRecipes: Record<MotionRecipeName, MotionRecipeDefinition> = {
   'reading-anchor-highlight': {
     name: 'reading-anchor-highlight',
     intent: 'Mark the target of a reading anchor jump once.',
-    preset: 'fade-in',
+    preset: 'surface-settle',
     durationClass: 'fast',
     allowedTargets: ['heading', 'toc-target', 'comment'],
     reducedFallback: 'opacity-only',
@@ -104,7 +104,7 @@ export const motionRecipes: Record<MotionRecipeName, MotionRecipeDefinition> = {
   'panel-enter': {
     name: 'panel-enter',
     intent: 'Open an overlay, drawer, or dialog panel.',
-    preset: 'scale-fade',
+    preset: 'dialog-settle',
     durationClass: 'panel',
     allowedTargets: ['dialog', 'drawer', 'popover', 'menu'],
     reducedFallback: terminalFallback,
@@ -113,7 +113,7 @@ export const motionRecipes: Record<MotionRecipeName, MotionRecipeDefinition> = {
   'list-enter-small': {
     name: 'list-enter-small',
     intent: 'Stagger a small bounded list.',
-    preset: 'list-stagger',
+    preset: 'index-list-settle',
     durationClass: 'base',
     allowedTargets: ['menu', 'short-list', 'navigation'],
     reducedFallback: terminalFallback,
@@ -133,7 +133,7 @@ export const motionRecipes: Record<MotionRecipeName, MotionRecipeDefinition> = {
   'page-enter': {
     name: 'page-enter',
     intent: 'Introduce a page body after navigation.',
-    preset: 'route-fade',
+    preset: 'route-settle',
     durationClass: 'route',
     allowedTargets: ['page-main', 'route-view'],
     reducedFallback: terminalFallback,

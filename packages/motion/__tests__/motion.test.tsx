@@ -11,8 +11,11 @@ import FsuMotion, {
   getGsap,
   getPrefersReducedMotion,
   getMotionRecipe,
+  getMotionPresetSurfaces,
+  isMotionPresetAllowedOnSurface,
   isScrollTriggerRegistered,
   motionPresets,
+  motionPresetAliases,
   motionRecipes,
   motionTokenAliases,
   motionTokens,
@@ -83,7 +86,35 @@ describe('motion primitives', () => {
       'list-stagger',
       'route-fade',
       'card-hover',
+      'surface-settle',
+      'paper-settle',
+      'route-settle',
+      'dialog-settle',
+      'sheet-settle',
+      'dock-settle',
+      'toast-receipt',
+      'banner-receipt',
+      'lightbox-focus',
+      'index-list-settle',
     ])
+    expect(motionPresetAliases['scale-fade']).toBe('dialog-settle')
+    expect(
+      Object.values(motionPresets).every(
+        (preset) => preset.reduced.opacity === '1',
+      ),
+    ).toBe(true)
+    expect(getMotionPresetSurfaces('surface-settle').allowed).toContain(
+      'reading-surface',
+    )
+    expect(
+      isMotionPresetAllowedOnSurface('scale-fade', 'ordinary-content'),
+    ).toBe(false)
+    expect(
+      isMotionPresetAllowedOnSurface(
+        'lightbox-focus',
+        'media-preview-surface',
+      ),
+    ).toBe(true)
     expect(Object.keys(motionRecipes)).toEqual([
       'content-enter',
       'article-list-enter',
@@ -127,8 +158,10 @@ describe('motion primitives', () => {
     await nextTick()
     await flushMotionFrame()
 
-    expect(getMotionRecipe('state-error').preset).toBe('fade-in')
-    expect(normalizeMotionRecipeOptions('panel-enter').name).toBe('scale-fade')
+    expect(getMotionRecipe('state-error').preset).toBe('banner-receipt')
+    expect(normalizeMotionRecipeOptions('panel-enter').name).toBe(
+      'dialog-settle',
+    )
     expect(el.style.transition).toContain('120ms')
     expect(el.style.transition).toContain('* 19')
   })
@@ -143,7 +176,7 @@ describe('motion primitives', () => {
     expect(resolveMotionBudget().maxAnimatedNodesPerViewport).toBe(0)
     expect(el.style.transition).toBe('')
     expect(el.style.opacity).toBe('1')
-    expect(el.style.transform).toBe('translate3d(0, 0, 0)')
+    expect(el.style.transform).toBe('')
   })
 
   it('runs v-motion with string syntax', async () => {
@@ -208,7 +241,7 @@ describe('motion primitives', () => {
 
     expect(el.style.transition).toBe('')
     expect(el.style.opacity).toBe('1')
-    expect(el.style.transform).toBe('scale(1)')
+    expect(el.style.transform).toBe('')
   })
 
   it('wraps Vue Transition with preset-based enter and leave hooks', async () => {

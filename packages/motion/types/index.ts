@@ -11,9 +11,33 @@ export const motionPresetNames = [
   'list-stagger',
   'route-fade',
   'card-hover',
+  'surface-settle',
+  'paper-settle',
+  'route-settle',
+  'dialog-settle',
+  'sheet-settle',
+  'dock-settle',
+  'toast-receipt',
+  'banner-receipt',
+  'lightbox-focus',
+  'index-list-settle',
 ] as const
 
 export type MotionPresetName = (typeof motionPresetNames)[number]
+
+export const motionSurfaceCategories = [
+  'ordinary-content',
+  'reading-surface',
+  'list-table-surface',
+  'admin-operation-surface',
+  'overlay-sheet-dialog-surface',
+  'mobile-dock-surface',
+  'toast-banner-surface',
+  'media-preview-surface',
+  'route-surface',
+] as const
+
+export type MotionSurfaceCategory = (typeof motionSurfaceCategories)[number]
 
 export const motionRecipeNames = [
   'content-enter',
@@ -59,8 +83,11 @@ export type MotionPresetDefinition = {
   easing: string
   delay?: string
   stagger?: string
+  surfaces: readonly MotionSurfaceCategory[]
+  forbiddenSurfaces?: readonly MotionSurfaceCategory[]
   from: MotionStyleState
   to: MotionStyleState
+  reduced: MotionStyleState
   leaveFrom?: MotionStyleState
   leaveTo?: MotionStyleState
 }
