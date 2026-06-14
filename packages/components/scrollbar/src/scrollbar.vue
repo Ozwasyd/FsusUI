@@ -43,7 +43,10 @@ import {
   ref,
   watch,
 } from 'vue'
-import { useEventListener, useResizeObserver } from '@element-plus/hooks/use-runtime'
+import {
+  useEventListener,
+  useResizeObserver,
+} from '@element-plus/hooks/use-runtime'
 import { addUnit, debugWarn, isNumber, isObject } from '@element-plus/utils'
 import {
   applyFsusInteractiveMotionVars,
@@ -118,6 +121,7 @@ const scrollbarKls = computed(() => [
   ns.is('scrolling-y', isScrollMotionY.value),
   isScrollMotionX.value ? ns.is(`scrolling-x-${xAxisScrollDir.value}`) : '',
   isScrollMotionY.value ? ns.is(`scrolling-y-${yAxisScrollDir.value}`) : '',
+  props.overscroll === 'contain' ? ns.m('contain-overscroll') : '',
 ])
 
 const scrollMotionClassNames = () => [

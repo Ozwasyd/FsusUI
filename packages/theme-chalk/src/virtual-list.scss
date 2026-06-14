@@ -131,11 +131,18 @@
 
 .#{$namespace}-vl__window {
   scrollbar-width: none;
-  overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
+  overscroll-behavior: auto;
 
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+.#{$namespace}-vl__wrapper.is-contain-overscroll .#{$namespace}-vl__window,
+.#{$namespace}-vl__wrapper[data-fsus-overscroll='contain']
+  .#{$namespace}-vl__window {
+  overscroll-behavior: contain;
 }
 
 .#{$namespace}-vl__inner {

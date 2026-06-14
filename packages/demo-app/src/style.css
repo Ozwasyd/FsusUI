@@ -427,7 +427,7 @@ body {
   border-radius: inherit;
   overflow-x: hidden;
   overflow-y: auto;
-  overscroll-behavior: contain;
+  overscroll-behavior: auto;
   overflow-anchor: none;
 }
 

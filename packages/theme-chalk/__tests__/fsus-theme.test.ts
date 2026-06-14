@@ -446,6 +446,42 @@ describe('Fsus theme visual baseline', () => {
     ])
   })
 
+  test('keeps scrollbar touch panning native with opt-in containment', () => {
+    const scrollbarCss = compileThemeFile('scrollbar.scss')
+    const publicShellCss = compileThemeFile('public-shell.scss')
+    const virtualListCss = compileThemeFile('virtual-list.scss')
+
+    expectCssRule(scrollbarCss, '.el-scrollbar__wrap', [
+      'touch-action: pan-x pan-y;',
+      'overscroll-behavior: auto;',
+    ])
+    expectCssRule(scrollbarCss, '.el-scrollbar--contain-overscroll', [
+      'overscroll-behavior: contain;',
+    ])
+    expectCssRule(scrollbarCss, '[data-fsus-overscroll=contain]', [
+      'overscroll-behavior: contain;',
+    ])
+    expectCssRule(scrollbarCss, '.el-scrollbar__bar', [
+      'touch-action: none;',
+      'user-select: none;',
+    ])
+    expectCssRule(scrollbarCss, '.el-scrollbar__thumb', ['touch-action: none;'])
+
+    expectCssRule(publicShellCss, '.el-public-shell__mobile-nav-wrap', [
+      'touch-action: pan-x pan-y;',
+      'overscroll-behavior-x: contain;',
+      'overscroll-behavior-y: auto;',
+    ])
+
+    expectCssRule(virtualListCss, '.el-vl__window', [
+      'touch-action: pan-x pan-y;',
+      'overscroll-behavior: auto;',
+    ])
+    expectCssRule(virtualListCss, '.el-vl__wrapper[data-fsus-overscroll', [
+      'overscroll-behavior: contain;',
+    ])
+  })
+
   test('prevents table interaction motion from overlapping fixed columns', () => {
     const themeCss = compileThemeFile('fsus-theme.scss')
     const tableCss = compileThemeFile('table.scss')

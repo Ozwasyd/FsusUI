@@ -93,6 +93,14 @@ export const scrollbarProps = buildProps({
     type: String,
     values: ['horizontal', 'vertical'],
   },
+  /**
+   * @description scroll chaining behavior. Use contain only for intentional scroll traps such as drawers or modals.
+   */
+  overscroll: {
+    type: String,
+    values: ['auto', 'contain'],
+    default: 'auto',
+  },
 } as const)
 export type ScrollbarProps = ExtractPropTypes<typeof scrollbarProps>
 
