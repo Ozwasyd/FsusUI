@@ -21,7 +21,7 @@
     "shiki": "^4.2.0"
   },
   "scripts": {
-    "build:wasm": "node ../../scripts/with-node-heap.mjs bash ./build.sh",
+    "build:wasm": "node ../../scripts/with-node-heap.mjs node ../../scripts/run-wasm-build.mjs",
     "build": "node ../../scripts/with-node-heap.mjs unbuild",
     "dev": "pnpm run stub",
     "stub": "node ../../scripts/with-node-heap.mjs unbuild --stub",
