@@ -559,6 +559,48 @@ Base dock and overlay components do not add default glass, blur, or large slide
 distances. `FsuMobileDock` respects `safe-area-inset-bottom` by default, while
 `FsuOverlayTransition` restores focus to the trigger after close.
 
+## Motion Governance And Adoption Checks
+
+Run the adoption check against a downstream semantic mapping file:
+
+```bash
+pnpm run check:motion-adoption
+pnpm exec tsx scripts/check-motion-adoption.ts path/to/app-motion-map.json
+```
+
+Allowed downstream pattern:
+
+```json
+{
+  "semantic": "article.media.load",
+  "preset": "media-develop",
+  "surface": "reading-surface",
+  "effect": "preset"
+}
+```
+
+Disallowed downstream patterns:
+
+- app-local `@keyframes` for product motion
+- app-local raw `gsap`, `ScrollTrigger`, or animation-engine imports
+- local wrappers that reimplement motion instead of calling FsusUI presets
+- scale defaults on ordinary content panels
+- translate reveals on reading body content
+- complex stagger for large ordinary lists
+- loading sweep as the default reading-page loading pattern
+
+Allowed exceptions must be explicit:
+
+- hover scale is only for `media-preview-surface` or lightbox-style previews
+- route transitions belong on `route-surface`, not individual rows or cards
+- loading sweep can be requested for non-reading operational surfaces, but the
+  reading default is `surface-settle`, `code-ready`, or a static receipt
+
+Request a new preset by documenting the surface category, state meaning,
+reduced-motion terminal state, forbidden surfaces, and a migration example.
+Apps should first add semantic mappings to FsusUI presets; if the mapping cannot
+express the interaction, open a preset request instead of adding local effects.
+
 - Route leave 后，context、timeline 和 scroll reveal 的 cleanup 都被调用。
 - 组件 unmount 后没有残留 ScrollTrigger 或未 kill 的 timeline。
 - `motion={false}` 在 Button、Card、Dialog、Drawer、Dropdown、Tooltip、Message、

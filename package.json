@@ -54,6 +54,7 @@
     "check:consumer-contract": "node ./scripts/with-node-heap.mjs node ./scripts/check-consumer-contract.mjs",
     "check:npm-dist-tag": "node ./scripts/with-node-heap.mjs node ./scripts/check-npm-dist-tag.mjs",
     "check:anti-ai-visual": "node ./scripts/with-node-heap.mjs node ./scripts/check-anti-ai-visual.mjs",
+    "check:motion-adoption": "node ./scripts/with-node-heap.mjs node ./scripts/check-motion-adoption.mjs packages/motion/__tests__/fixtures/fsusblog-motion-adoption.json",
     "check:ux-semantics": "node ./scripts/with-node-heap.mjs node ./scripts/check-ux-semantics.mjs",
     "tokens:generate": "node ./scripts/with-node-heap.mjs node ./scripts/token-pipeline.mjs generate",
     "tokens:check": "node ./scripts/with-node-heap.mjs node ./scripts/token-pipeline.mjs check",

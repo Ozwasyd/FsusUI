@@ -1,0 +1,38 @@
+{
+  "app": "FsusBlog",
+  "mappings": [
+    {
+      "semantic": "article.title.enter",
+      "preset": "reading-title-settle",
+      "surface": "reading-surface",
+      "interaction": "default",
+      "effect": "preset",
+      "source": "src/routes/article/ArticleHeader.vue"
+    },
+    {
+      "semantic": "article.media.load",
+      "preset": "media-develop",
+      "surface": "reading-surface",
+      "interaction": "default",
+      "effect": "preset",
+      "source": "src/routes/article/ArticleImage.vue"
+    },
+    {
+      "semantic": "admin.bulk.save",
+      "preset": "banner-receipt",
+      "surface": "admin-operation-surface",
+      "interaction": "default",
+      "effect": "local-wrapper",
+      "callsFsusPreset": true,
+      "source": "src/admin/motion/adminMotionMap.ts"
+    },
+    {
+      "semantic": "mobile.bottomActions",
+      "preset": "dock-settle",
+      "surface": "mobile-dock-surface",
+      "interaction": "default",
+      "effect": "preset",
+      "source": "src/mobile/BottomActions.vue"
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { defineComponent, nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -13,6 +14,7 @@ import FsuMotion, {
   FsuTaskReceipt,
   FsuToastReceipt,
   FsuTransition,
+  assertEveryPresetHasGovernanceMetadata,
   createMotionRouteCleanup,
   defaultMotionBudget,
   getGsap,
@@ -44,8 +46,11 @@ import FsuMotion, {
   useSharedElementMotion,
   useTaskFeedback,
   useTimeline,
+  validateMotionAdoptionMapping,
+  validateMotionPresetUsage,
   vMotion,
 } from '..'
+import type { MotionAdoptionEntry } from '../governance'
 
 const flushMotionFrame = async () => {
   vi.runOnlyPendingTimers()
@@ -625,5 +630,77 @@ describe('motion primitives', () => {
     expect(document.activeElement).toBe(trigger)
     wrapper.unmount()
     trigger.remove()
+  })
+
+  it('enforces effect-level motion governance and downstream adoption', () => {
+    expect(assertEveryPresetHasGovernanceMetadata()).toBe(true)
+
+    expect(
+      validateMotionPresetUsage({
+        preset: 'scale-fade',
+        surface: 'ordinary-content',
+        interaction: 'default',
+      }).map((item) => item.ruleId),
+    ).toContain('ordinary-content-no-scale')
+
+    expect(
+      validateMotionPresetUsage({
+        preset: 'fade-up',
+        surface: 'reading-surface',
+        interaction: 'default',
+      }).map((item) => item.ruleId),
+    ).toContain('reading-body-no-translate')
+
+    expect(
+      validateMotionPresetUsage({
+        preset: 'index-list-settle',
+        surface: 'list-table-surface',
+        itemCount: 80,
+      }).map((item) => item.ruleId),
+    ).toContain('ordinary-list-no-complex-stagger')
+
+    expect(
+      validateMotionPresetUsage({
+        preset: 'lightbox-focus',
+        surface: 'ordinary-content',
+        interaction: 'hover',
+      }).map((item) => item.ruleId),
+    ).toContain('hover-scale-requires-media-preview')
+
+    expect(
+      validateMotionPresetUsage({
+        preset: 'surface-settle',
+        surface: 'reading-surface',
+        interaction: 'loading',
+        effect: 'loading-sweep',
+      }).map((item) => item.ruleId),
+    ).toContain('reading-loading-no-sweep')
+
+    const fixture = JSON.parse(
+      readFileSync(
+        'packages/motion/__tests__/fixtures/fsusblog-motion-adoption.json',
+        'utf8',
+      ),
+    ) as { mappings: MotionAdoptionEntry[] }
+
+    expect(validateMotionAdoptionMapping(fixture.mappings)).toEqual([])
+    expect(
+      validateMotionAdoptionMapping([
+        {
+          semantic: 'article.body.reveal',
+          preset: 'fade-up',
+          surface: 'reading-surface',
+          interaction: 'default',
+          effect: 'raw-keyframes',
+          source: 'src/article.css',
+        },
+      ]).map((item) => item.ruleId),
+    ).toEqual(
+      expect.arrayContaining([
+        'app-local-keyframes',
+        'surface-disallowed',
+        'reading-body-no-translate',
+      ]),
+    )
   })
 })
