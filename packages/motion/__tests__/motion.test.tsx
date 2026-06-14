@@ -9,18 +9,23 @@ import FsuMotion, {
   createMotionRouteCleanup,
   defaultMotionBudget,
   getGsap,
+  getPrefersReducedMotion,
   getMotionRecipe,
   isScrollTriggerRegistered,
   motionPresets,
   motionRecipes,
+  motionTokenAliases,
   motionTokens,
   normalizeMotionRecipeOptions,
+  resolveMotionPreference,
+  resolveMotionScrollBehavior,
   resolveMotionBudget,
   runMotion,
   runMotionRecipe,
   setMotionBudget,
   useFlipMotion,
   useGsapContext,
+  useMotionPreference,
   useScrollReveal,
   useScrollTimeline,
   useSharedElementMotion,
@@ -52,6 +57,17 @@ describe('motion primitives', () => {
 
   it('centralizes the first-party token and preset contracts', () => {
     expect(motionTokens.duration.base).toBe('220ms')
+    expect(motionTokenAliases).toMatchObject({
+      fast: 'var(--fsus-motion-control-fast, 140ms)',
+      control: 'var(--fsus-motion-control, 220ms)',
+      panel: 'var(--fsus-motion-panel, 420ms)',
+      overlay: 'var(--fsus-motion-overlay, 260ms)',
+      route: 'var(--fsus-motion-overlay, 260ms)',
+      standardEase:
+        'var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1))',
+      emphasizedEase:
+        'var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1))',
+    })
     expect(defaultMotionBudget.maxStaggerItems).toBe(20)
     expect(motionTokens.distance.md).toBe('16px')
     expect(Object.keys(motionPresets)).toEqual([
@@ -83,6 +99,19 @@ describe('motion primitives', () => {
       'page-enter',
       'media-hover-subtle',
     ])
+  })
+
+  it('centralizes motion preference and scroll behavior resolution', () => {
+    document.documentElement.dataset.fsusMotion = 'reduced'
+
+    const preference = resolveMotionPreference()
+    const composable = useMotionPreference()
+
+    expect(getPrefersReducedMotion()).toBe(false)
+    expect(preference.mode).toBe('reduced')
+    expect(preference.reduced).toBe(true)
+    expect(composable.reduced.value).toBe(true)
+    expect(resolveMotionScrollBehavior('smooth')).toBe('auto')
   })
 
   it('maps motion recipes to preset-backed runtime options', async () => {

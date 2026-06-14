@@ -88,3 +88,29 @@ trail colors transparent.
 > `reading-anchor-highlight` for product code. Avoid blanket `fade-up` on
 > article bodies and avoid `list-stagger` for long lists; the default stagger
 > budget is 20 items.
+
+## App Boundary Helpers
+
+Use `motionTokenAliases` when an app needs semantic aliases such as
+`blog.motion.fast` or `admin.motion.panel`. The alias values stay tied to
+FsusUI public CSS variables:
+
+```ts
+import { motionTokenAliases } from '@ozwasyd/element-plus'
+
+export const blogMotion = {
+  fast: motionTokenAliases.fast,
+  panel: motionTokenAliases.panel,
+  route: motionTokenAliases.route,
+}
+```
+
+Use `useMotionPreference()`, `getPrefersReducedMotion()`, and
+`resolveMotionScrollBehavior()` instead of app-local media-query helpers.
+Reduced and disabled motion must collapse smooth scrolling, movement, scale,
+blur, and looping effects while preserving state meaning through text, opacity,
+color, border, or background.
+
+Business apps may map semantic names to FsusUI recipes or presets, but should
+not define raw keyframes, import raw animation engines, or duplicate reduced
+motion runtime behavior locally.

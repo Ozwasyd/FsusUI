@@ -1,4 +1,5 @@
 import { getMotionPreset, resolveMotionPresetName } from './presets'
+import { isMotionReduced } from './preference'
 import {
   claimMotionBudgetNode,
   clampStaggerIndex,
@@ -25,25 +26,8 @@ type MotionElement = HTMLElement & {
 
 const transitionProperties = ['opacity', 'transform', 'filter'] as const
 
-const readRootMotionMode = () =>
-  typeof document === 'undefined'
-    ? 'enabled'
-    : document.documentElement.dataset.fsusMotion
-
-const prefersReducedMotion = () =>
-  typeof window !== 'undefined' &&
-  typeof window.matchMedia === 'function' &&
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
 export const isMotionReducedOrDisabled = (disabled?: boolean) => {
-  if (disabled) return true
-
-  const rootMotionMode = readRootMotionMode()
-  return (
-    rootMotionMode === 'disabled' ||
-    rootMotionMode === 'reduced' ||
-    (!rootMotionMode && prefersReducedMotion())
-  )
+  return isMotionReduced(disabled)
 }
 
 const toTimeValue = (value: string | number | undefined, fallback: string) =>

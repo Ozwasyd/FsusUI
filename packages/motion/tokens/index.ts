@@ -58,3 +58,13 @@ export const motionCssVars = {
     base: 'var(--fsus-motion-stagger, 55ms)',
   },
 } as const
+
+export const motionTokenAliases = {
+  fast: motionCssVars.duration.fast,
+  control: motionCssVars.duration.base,
+  panel: motionCssVars.duration.panel,
+  overlay: motionCssVars.duration.route,
+  route: motionCssVars.duration.route,
+  standardEase: motionCssVars.easing.standard,
+  emphasizedEase: motionCssVars.easing.emphasized,
+} as const
