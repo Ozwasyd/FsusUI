@@ -831,6 +831,38 @@ describe('Fsus theme visual baseline', () => {
     expect(css).not.toContain('color: #fff;')
   })
 
+  test('keeps tree drag current and expand feedback tokenized', () => {
+    const css = compileThemeFile('tree.scss')
+
+    expectCssRule(css, '.el-tree__drop-indicator', [
+      'background-color: var(--fsus-tree-drop-indicator-color, var(--fsus-state-focus-border));',
+    ])
+    expectCssRule(
+      css,
+      '.el-tree-node.is-drop-inner > .el-tree-node__content .el-tree-node__label',
+      [
+        'background-color: var(--fsus-tree-drop-inner-bg, var(--fsus-state-emphasis-bg));',
+        'color: var(--fsus-tree-drop-inner-text, var(--fsus-ink));',
+      ],
+    )
+    expectCssRule(css, '.el-tree-node__expand-icon', [
+      'transition: transform var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+    ])
+    expectCssRule(
+      css,
+      '.el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content',
+      [
+        'background-color: var(--fsus-tree-current-bg, var(--fsus-state-selected-bg));',
+      ],
+    )
+    expect(css).not.toContain('color: #fff;')
+    expect(css).not.toContain('var(--el-color-primary)')
+    expect(css).not.toContain('var(--el-color-primary-light-9)')
+    expect(css).not.toContain(
+      'transition: transform var(--el-transition-duration) var(--el-transition-function-ease-in-out-bezier);',
+    )
+  })
+
   test('keeps calendar header controls border-first', () => {
     const css = compileThemeFile('calendar.scss')
 

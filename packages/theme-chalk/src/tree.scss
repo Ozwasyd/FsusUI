@@ -37,7 +37,10 @@
     left: 0;
     right: 0;
     height: 1px;
-    background-color: getCssVar('color-primary');
+    background-color: var(
+      --fsus-tree-drop-indicator-color,
+      var(--fsus-state-focus-border)
+    );
   }
 }
 
@@ -54,8 +57,11 @@
 
   @include when(drop-inner) {
     > .#{$namespace}-tree-node__content .#{$namespace}-tree-node__label {
-      background-color: getCssVar('color-primary');
-      color: #fff;
+      background-color: var(
+        --fsus-tree-drop-inner-bg,
+        var(--fsus-state-emphasis-bg)
+      );
+      color: var(--fsus-tree-drop-inner-text, var(--fsus-ink));
     }
   }
 
@@ -99,7 +105,8 @@
     font-size: 12px;
 
     transform: rotate(0deg);
-    transition: transform getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier');
+    transition: transform var(--fsus-motion-control-fast, 160ms)
+      var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
 
     &.expanded {
       transform: rotate(90deg);
@@ -134,5 +141,8 @@
 .#{$namespace}-tree--highlight-current
   .#{$namespace}-tree-node.is-current
   > .#{$namespace}-tree-node__content {
-  background-color: getCssVar('color-primary-light-9');
+  background-color: var(
+    --fsus-tree-current-bg,
+    var(--fsus-state-selected-bg)
+  );
 }

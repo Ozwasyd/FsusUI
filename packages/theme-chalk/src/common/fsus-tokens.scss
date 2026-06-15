@@ -127,6 +127,10 @@
   --fsus-progress-width-motion: var(--fsus-motion-control);
   --fsus-progress-animation-duration: 3s;
   --fsus-progress-animation-easing: linear;
+  --fsus-tree-drop-indicator-color: var(--fsus-state-focus-border);
+  --fsus-tree-drop-inner-bg: var(--fsus-state-emphasis-bg);
+  --fsus-tree-drop-inner-text: var(--fsus-ink);
+  --fsus-tree-current-bg: var(--fsus-state-selected-bg);
 
   --fsus-shadow-panel: none;
   --fsus-shadow-panel-light: 0 8px 24px rgba(15, 23, 42, 0.05);
