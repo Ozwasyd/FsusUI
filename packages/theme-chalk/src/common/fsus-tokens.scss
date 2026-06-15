@@ -121,6 +121,12 @@
   --fsus-carousel-indicator-active-bg: var(--fsus-color-surface-base);
   --fsus-carousel-indicator-active-border: var(--fsus-scholarly-blue);
   --fsus-step-finish-color: var(--fsus-scholarly-blue);
+  --fsus-progress-radius: var(--fsus-radius-pill);
+  --fsus-progress-bar-color: var(--fsus-scholarly-blue);
+  --fsus-progress-inner-text-color: var(--fsus-color-surface-base);
+  --fsus-progress-width-motion: var(--fsus-motion-control);
+  --fsus-progress-animation-duration: 3s;
+  --fsus-progress-animation-easing: linear;
 
   --fsus-shadow-panel: none;
   --fsus-shadow-panel-light: 0 8px 24px rgba(15, 23, 42, 0.05);

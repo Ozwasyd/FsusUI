@@ -75,6 +75,16 @@ trail colors transparent.
 </template>
 ```
 
+## Functional Continuous Motion
+
+Continuous component motion is reserved for states where motion communicates
+ongoing work. `ElProgress` uses this rule for `indeterminate` and
+`stripedFlow`; both are explicit opt-ins and use
+`--fsus-progress-animation-duration` plus
+`--fsus-progress-animation-easing` instead of raw animation shorthands.
+Reduced motion collapses these loops to a single `1ms` iteration while keeping
+the progress state visible through bar fill, text, and status color.
+
 ## Usage Rules
 
 - Prefer public timing and easing tokens over hard-coded values.

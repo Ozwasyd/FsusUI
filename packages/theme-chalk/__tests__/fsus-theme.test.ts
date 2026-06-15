@@ -791,6 +791,46 @@ describe('Fsus theme visual baseline', () => {
     expect(css).not.toContain('scale(0.8)')
   })
 
+  test('keeps progress radius motion and contrast tokenized', () => {
+    const css = compileThemeFile('progress.scss')
+
+    expectCssRule(css, '.el-progress-bar__outer', [
+      'border-radius: var(--fsus-progress-radius, var(--fsus-radius-pill));',
+    ])
+    expectCssRule(css, '.el-progress-bar__inner', [
+      'background-color: var(--fsus-progress-bar-color, var(--fsus-scholarly-blue));',
+      'border-radius: var(--fsus-progress-radius, var(--fsus-radius-pill));',
+      'transition: width var(--fsus-progress-width-motion, var(--fsus-motion-control, 260ms)) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+    ])
+    expectCssRule(css, '.el-progress-bar__inner--indeterminate', [
+      'animation: indeterminate var(--fsus-progress-animation-duration, 3s) var(--fsus-progress-animation-easing, linear) infinite;',
+    ])
+    expectCssRule(
+      css,
+      '.el-progress-bar__inner--striped.el-progress-bar__inner--striped-flow',
+      [
+        'animation: striped-flow var(--fsus-progress-animation-duration, 3s) var(--fsus-progress-animation-easing, linear) infinite;',
+      ],
+    )
+    expectCssRule(css, '.el-progress-bar__innerText', [
+      'color: var(--fsus-progress-inner-text-color, var(--fsus-color-surface-base));',
+    ])
+    expectCssRule(
+      css,
+      '.el-progress-bar__inner--indeterminate, .el-progress-bar__inner--striped-flow',
+      [
+        'animation-duration: 1ms !important;',
+        'animation-iteration-count: 1 !important;',
+      ],
+    )
+    expect(css).not.toContain('border-radius: 100px;')
+    expect(css).not.toContain('transition: width 0.6s ease;')
+    expect(css).not.toContain('animation: indeterminate 3s infinite;')
+    expect(css).not.toContain('animation: striped-flow 3s linear infinite;')
+    expect(css).not.toContain('var(--el-color-primary)')
+    expect(css).not.toContain('color: #fff;')
+  })
+
   test('keeps calendar header controls border-first', () => {
     const css = compileThemeFile('calendar.scss')
 

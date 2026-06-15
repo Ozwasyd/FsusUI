@@ -11,7 +11,17 @@ describe('Progress.vue', () => {
 
     expect(wrapper.find('.el-progress__text').text()).toBe('66%')
     expect(wrapper.find('.el-progress-bar__inner').attributes('style')).toBe(
-      'width: 66%; animation-duration: 3s;'
+      'width: 66%; animation-duration: var(--fsus-progress-animation-duration, 3s);'
+    )
+  })
+
+  test('animation duration keeps token fallback when customized', () => {
+    const wrapper = mount(() => <Progress percentage={66} duration={5} />)
+
+    expect(
+      wrapper.find('.el-progress-bar__inner').attributes('style')
+    ).toContain(
+      'animation-duration: var(--fsus-progress-animation-duration, 5s);'
     )
   })
 

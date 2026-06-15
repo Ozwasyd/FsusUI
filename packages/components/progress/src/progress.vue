@@ -110,7 +110,7 @@ const ns = useNamespace('progress')
 
 const barStyle = computed<CSSProperties>(() => ({
   width: `${props.percentage}%`,
-  animationDuration: `${props.duration}s`,
+  animationDuration: `var(--fsus-progress-animation-duration, ${props.duration}s)`,
   backgroundColor: getCurrentColor(props.percentage),
 }))
 

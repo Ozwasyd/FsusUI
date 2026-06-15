@@ -96,7 +96,7 @@
 
   @include e(outer) {
     height: 6px;
-    border-radius: 100px;
+    border-radius: var(--fsus-progress-radius, var(--fsus-radius-pill));
     background-color: getCssVar('border-color-lighter');
     overflow: hidden;
     position: relative;
@@ -107,18 +107,21 @@
     left: 0;
     top: 0;
     height: 100%;
-    background-color: getCssVar('color-primary');
+    background-color: var(--fsus-progress-bar-color, var(--fsus-scholarly-blue));
     text-align: right;
-    border-radius: 100px;
+    border-radius: var(--fsus-progress-radius, var(--fsus-radius-pill));
     line-height: 1;
     white-space: nowrap;
-    transition: width 0.6s ease;
+    transition: width
+      var(--fsus-progress-width-motion, var(--fsus-motion-control, 260ms))
+      var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
 
     @include utils-vertical-center;
 
     @include m(indeterminate) {
       transform: translateZ(0);
-      animation: indeterminate 3s infinite;
+      animation: indeterminate var(--fsus-progress-animation-duration, 3s)
+        var(--fsus-progress-animation-easing, linear) infinite;
     }
 
     @include m(striped) {
@@ -134,7 +137,8 @@
       );
       background-size: 1.25em 1.25em;
       &.#{$namespace}-progress-bar__inner--striped-flow {
-        animation: striped-flow 3s linear infinite;
+        animation: striped-flow var(--fsus-progress-animation-duration, 3s)
+          var(--fsus-progress-animation-easing, linear) infinite;
       }
     }
   }
@@ -142,7 +146,10 @@
   @include e(innerText) {
     display: inline-block;
     vertical-align: middle;
-    color: $color-white;
+    color: var(
+      --fsus-progress-inner-text-color,
+      var(--fsus-color-surface-base)
+    );
     font-size: 12px;
     margin: 0 5px;
   }
