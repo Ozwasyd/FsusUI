@@ -33,6 +33,13 @@ full quality 的 unit shard 由 `unit-artifacts` job 统一准备测试工件并
 和 `pnpm exec vitest run --shard=<n>/4`。这样 cache miss/generation 日志只集中在
 前置 job，shard 不再重复执行 icon/WASM 生成。
 
+full quality 的 `consumer-install` 复用 `build-package` 产出的
+`fsusui-npm-package-dist`，下载后先用 `sha256sum` 校验
+`fsusui-npm-package-dist.tgz`，再解包 `dist/element-plus` 并运行
+`pnpm run build:package-smoke` 与 `pnpm test:consumer-install`。`verify:release`
+仍按本地 release 顺序执行 `build:npm-package` 后再跑 consumer install，保留
+independent rebuild 语义，便于发布前排查可复现性问题。
+
 发布前必须先通过：
 
 ```bash

@@ -29,6 +29,7 @@ const installDependencyFields = [
   'peerDependencies',
   'optionalDependencies',
 ]
+const bundledWorkspaceDependencyNames = new Set(['@element-plus/motion'])
 const wasmRuntimeArtifacts = [
   'dist/ep_wasm.wasm',
   'es/wasm/ep_wasm.mjs',
@@ -550,6 +551,28 @@ function normalizeWorkspaceProtocols(packageJson, workspaceVersions) {
   }
 }
 
+function removeBundledWorkspaceDependencies(packageJson) {
+  let removed = 0
+
+  for (const field of installDependencyFields) {
+    const dependencies = packageJson[field]
+    if (!dependencies) continue
+
+    for (const dependencyName of bundledWorkspaceDependencyNames) {
+      if (Object.hasOwn(dependencies, dependencyName)) {
+        delete dependencies[dependencyName]
+        removed += 1
+      }
+    }
+
+    if (Object.keys(dependencies).length === 0) {
+      delete packageJson[field]
+    }
+  }
+
+  return removed
+}
+
 function assertNoWorkspaceProtocolsRemain(packageJson) {
   const remaining = []
 
@@ -567,6 +590,118 @@ function assertNoWorkspaceProtocolsRemain(packageJson) {
   if (remaining.length > 0) {
     throw new Error(
       `Workspace protocols remain in published manifest: ${remaining.join(', ')}`,
+    )
+  }
+}
+
+function toModuleSpecifier(relativePath) {
+  const normalized = relativePath.split(path.sep).join('/')
+  return normalized.startsWith('.') ? normalized : `./${normalized}`
+}
+
+function resolveBundledWorkspaceRuntimeSpecifier(rootDir, filePath, packageName) {
+  if (
+    filePath.endsWith('.d.ts') ||
+    filePath.endsWith('.d.mts') ||
+    filePath.endsWith('.d.cts')
+  ) {
+    return `${packageName}/es/motion`
+  }
+
+  const relativePath = path.relative(rootDir, filePath).split(path.sep).join('/')
+  const extension = path.extname(filePath)
+
+  if (relativePath.startsWith('es/') && extension === '.mjs') {
+    return toModuleSpecifier(
+      path.relative(path.dirname(filePath), path.join(rootDir, 'es', 'motion', 'index.mjs')),
+    )
+  }
+
+  if (
+    relativePath.startsWith('lib/') &&
+    (extension === '.js' || extension === '.cjs')
+  ) {
+    return toModuleSpecifier(
+      path.relative(path.dirname(filePath), path.join(rootDir, 'lib', 'motion', 'index.js')),
+    )
+  }
+
+  throw new Error(
+    `Unable to rewrite bundled workspace dependency reference in ${relativePath}.`,
+  )
+}
+
+function rewriteBundledWorkspaceDependencyReferences(rootDir, packageName) {
+  const candidates = collectSelfReferenceCandidates(rootDir)
+  let updatedFiles = 0
+  let replacementCount = 0
+
+  for (const filePath of candidates) {
+    if (!existsSync(filePath)) continue
+
+    const original = readFileSync(filePath, 'utf8')
+    let rewritten = original
+
+    for (const dependencyName of bundledWorkspaceDependencyNames) {
+      if (!rewritten.includes(dependencyName)) continue
+
+      const replacement = resolveBundledWorkspaceRuntimeSpecifier(
+        rootDir,
+        filePath,
+        packageName,
+      )
+      const pattern = new RegExp(
+        `(['"])${dependencyName.replace('/', '\\/')}\\1`,
+        'g',
+      )
+      rewritten = rewritten.replace(pattern, (_match, quote) => {
+        replacementCount += 1
+        return `${quote}${replacement}${quote}`
+      })
+    }
+
+    if (rewritten !== original) {
+      writeFileSync(filePath, rewritten)
+      updatedFiles += 1
+    }
+  }
+
+  return { updatedFiles, replacementCount }
+}
+
+function assertNoBundledWorkspaceDependencyReferences(packageJson, rootDir) {
+  const manifestLeaks = []
+
+  for (const field of installDependencyFields) {
+    const dependencies = packageJson[field]
+    if (!dependencies) continue
+
+    for (const dependencyName of bundledWorkspaceDependencyNames) {
+      if (Object.hasOwn(dependencies, dependencyName)) {
+        manifestLeaks.push(`${field}.${dependencyName}`)
+      }
+    }
+  }
+
+  if (manifestLeaks.length > 0) {
+    throw new Error(
+      `Bundled workspace dependencies must not remain in published manifest: ${manifestLeaks.join(', ')}`,
+    )
+  }
+
+  const contentLeaks = []
+  for (const filePath of collectSelfReferenceCandidates(rootDir)) {
+    const content = readFileSync(filePath, 'utf8')
+    for (const dependencyName of bundledWorkspaceDependencyNames) {
+      if (content.includes(dependencyName)) {
+        contentLeaks.push(path.relative(rootDir, filePath))
+      }
+    }
+  }
+
+  if (contentLeaks.length > 0) {
+    throw new Error(
+      `Bundled workspace dependency references remain in published files: ${contentLeaks.join(', ')}`,
     )
   }
 }
@@ -610,11 +745,16 @@ packageJson.publishConfig = {
 }
 
 normalizeWorkspaceProtocols(packageJson, workspaceVersions)
+const removedBundledWorkspaceDependencies =
+  removeBundledWorkspaceDependencies(packageJson)
 assertNoWorkspaceProtocolsRemain(packageJson)
 const rewrittenSelfReferences = rewritePublishedSelfReferences(
   distRoot,
   packageName,
 )
+const rewrittenBundledWorkspaceReferences =
+  rewriteBundledWorkspaceDependencyReferences(distRoot, packageName)
+assertNoBundledWorkspaceDependencyReferences(packageJson, distRoot)
 
 writeFileSync(distPackagePath, `${JSON.stringify(packageJson, null, 2)}\n`)
 if (existsSync(distNpmrcPath)) {
@@ -626,5 +766,5 @@ if (strict) {
 }
 
 console.log(
-  `Prepared ${packageJson.name}@${packageJson.version} for npm public registry from ${repository.owner}/${repository.repo} with ${rewrittenSelfReferences.replacementCount} self-reference rewrites across ${rewrittenSelfReferences.updatedFiles} files, ${rewrittenWorkerReferences} worker references rewritten, ${rewrittenWasmFallbackReferences} WASM fallback references rewritten, and ${prunedSourceMaps} source maps pruned.`,
+  `Prepared ${packageJson.name}@${packageJson.version} for npm public registry from ${repository.owner}/${repository.repo} with ${rewrittenSelfReferences.replacementCount} self-reference rewrites across ${rewrittenSelfReferences.updatedFiles} files, ${rewrittenBundledWorkspaceReferences.replacementCount} bundled workspace rewrites across ${rewrittenBundledWorkspaceReferences.updatedFiles} files, ${removedBundledWorkspaceDependencies} bundled workspace dependencies removed, ${rewrittenWorkerReferences} worker references rewritten, ${rewrittenWasmFallbackReferences} WASM fallback references rewritten, and ${prunedSourceMaps} source maps pruned.`,
 )

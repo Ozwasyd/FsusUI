@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { registryUrl, resolvePackageContract } from './npm-package-contract.mjs'
@@ -6,11 +6,33 @@ import { registryUrl, resolvePackageContract } from './npm-package-contract.mjs'
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const read = (relativePath) => readFileSync(path.join(root, relativePath), 'utf8')
 const readJson = (relativePath) => JSON.parse(read(relativePath))
+const publishedDistRoot = path.join(root, 'dist', 'element-plus')
 
 function assert(condition, message) {
   if (!condition) {
     throw new Error(message)
   }
+}
+
+function collectFiles(rootDir, currentDir = rootDir) {
+  const files = []
+
+  for (const entry of readdirSync(currentDir, { withFileTypes: true })) {
+    const absolutePath = path.join(currentDir, entry.name)
+    if (entry.isDirectory()) {
+      files.push(...collectFiles(rootDir, absolutePath))
+    } else {
+      files.push(absolutePath)
+    }
+  }
+
+  return files
+}
+
+function isPackageReferenceCandidate(filePath) {
+  return ['.d.ts', '.d.mts', '.d.cts', '.js', '.mjs', '.cjs'].some(
+    (extension) => filePath.endsWith(extension),
+  )
 }
 
 const rootPackage = readJson('package.json')
@@ -69,6 +91,24 @@ for (const task of [
   'copyWasmRuntimeAssets',
 ]) {
   assert(gulpfile.includes(task), `internal build gulpfile must keep ${task}`)
+}
+
+if (existsSync(path.join(publishedDistRoot, 'package.json'))) {
+  const distPackage = readJson('dist/element-plus/package.json')
+  assert(
+    !distPackage.dependencies?.['@element-plus/motion'],
+    'published package must not depend on unpublished @element-plus/motion',
+  )
+
+  const leakedFiles = collectFiles(publishedDistRoot)
+    .filter(isPackageReferenceCandidate)
+    .filter((filePath) => readFileSync(filePath, 'utf8').includes('@element-plus/motion'))
+    .map((filePath) => path.relative(publishedDistRoot, filePath))
+
+  assert(
+    leakedFiles.length === 0,
+    `published files must not reference unpublished @element-plus/motion: ${leakedFiles.join(', ')}`,
+  )
 }
 
 console.log(`Package build smoke passed for ${packageName}.`)

@@ -99,6 +99,8 @@ FsusBlog 侧的消费规则：页面只消费 FsusUI 导出的 component / direc
 - `pnpm run build:wasm` 保留显式 force regeneration 语义；需要强制重建所有测试工件时可使用 `FORCE_REBUILD=1 pnpm run prepare:test-artifacts`。
 - `_quality.yml` 的 `unit-artifacts` job 会先生成并上传 `unit-test-artifacts`，unit shard 只下载该工件、解包、执行 `pnpm run check:test-artifacts-ready`，再运行 `pnpm exec vitest run --shard=<n>/4`。
 - 本地复现 unit shard 时，先运行 `pnpm run prepare:test-artifacts`，再运行 `pnpm run check:test-artifacts-ready` 和目标 `vitest run --shard` 命令；不要在每个 shard 前重复生成 icon/WASM 工件。
+- `_quality.yml` 的 `build-package` job 会上传 `fsusui-npm-package-dist`，其中包含 `fsusui-npm-package-dist.tgz` 与 `sha256sum` 文件；`consumer-install` 只下载、校验、解包该工件并运行 `build:package-smoke` / `test:consumer-install`，不再重复执行 `build:npm-package`。
+- `verify:release` 仍保留 independent rebuild：本地发布验收会重新执行 `build:npm-package`，再运行 consumer install，避免发布路径只依赖 workflow artifact。
 
 ### CI 入口
 
