@@ -72,8 +72,9 @@
           <el-button
             :icon="Share"
             type="primary"
-            v-bind="{ 'aria-label': 'Share article' }"
-          />
+          >
+            <el-visually-hidden>Share article</el-visually-hidden>
+          </el-button>
         </el-badge>
       </el-space>
     </div>

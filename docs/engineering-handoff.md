@@ -212,3 +212,15 @@ the lane name, the `.tsbuildinfo` path, and a source hash prefix. `verify:full`
 still runs the full four-lane `typecheck` graph, while
 `pnpm run typecheck:no-cache` keeps a diagnostic and release fallback that
 bypasses the incremental typecheck cache entirely.
+
+## Path-aware demo build
+
+PR checks call `scripts/should-run-demo-build.mjs` after `verify:pr-fast`.
+The script classifies changed files into demo, component/runtime, theme,
+public API, and build-config filters. Matching changes run `pnpm run build:demo`;
+docs/metadata-only changes skip it. The workflow logs `demo-build-run` and
+`demo-build-reason` for handoff/debugging.
+
+Full verification remains unchanged for main, master, workflow-dispatch, and
+release paths: `verify:full` and the reusable `build-demo` quality job still
+run the complete demo build.

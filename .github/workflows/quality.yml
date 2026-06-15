@@ -64,6 +64,19 @@ jobs:
           echo "cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
           echo "cache-primary-key=${{ steps.typecheck-cache.outputs.cache-primary-key }}"
       - run: pnpm run verify:pr-fast
+      - name: Determine PR demo build path impact
+        id: demo-build-path
+        run: node ./scripts/with-node-heap.mjs node ./scripts/should-run-demo-build.mjs
+      - name: Log PR demo build path decision
+        run: |
+          echo "demo-build-run=${{ steps.demo-build-path.outputs.run }}"
+          echo "demo-build-reason=${{ steps.demo-build-path.outputs.reason }}"
+      - name: Run PR demo build
+        if: steps.demo-build-path.outputs.run == 'true'
+        run: pnpm run build:demo
+      - name: Skip PR demo build
+        if: steps.demo-build-path.outputs.run != 'true'
+        run: echo "Skipping demo build: ${{ steps.demo-build-path.outputs.reason }}"
 
   full:
     if: github.event_name != 'pull_request'

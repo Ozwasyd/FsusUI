@@ -17,7 +17,6 @@ function runEnsure(group) {
     const child = spawn(process.execPath, args, {
       cwd: root,
       stdio: 'inherit',
-      shell: process.platform === 'win32',
     })
 
     child.on('error', reject)
