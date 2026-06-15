@@ -65,6 +65,10 @@
               {{ authLabel }}
             </a>
           </div>
+
+          <div :class="ns.e('mobile-primary-actions')">
+            <slot name="mobile-primary-actions" />
+          </div>
         </div>
 
         <div :class="ns.e('mobile-toolbar')">

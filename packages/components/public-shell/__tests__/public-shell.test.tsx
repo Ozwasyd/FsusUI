@@ -60,4 +60,50 @@ describe('PublicShell.vue', () => {
     expect(event.defaultPrevented).toBe(true)
     expect(wrapper.emitted('search')?.[0]).toEqual(['layout'])
   })
+
+  test('renders mobile primary actions beside brand while preserving legacy mobile actions', () => {
+    const wrapper = mount(PublicShell, {
+      props: {
+        brand: 'Fsus',
+        navItems,
+        showSearch: false,
+      },
+      slots: {
+        'mobile-primary-actions': '<button data-test="mobile-primary">Search</button>',
+        'mobile-actions': '<button data-test="legacy-mobile">Legacy</button>',
+      },
+    })
+
+    const primaryRow = wrapper.find('.el-public-shell__primary-row')
+    const mobilePrimaryActions = primaryRow.find(
+      '.el-public-shell__mobile-primary-actions',
+    )
+    const mobileToolbar = wrapper.find('.el-public-shell__mobile-toolbar')
+
+    expect(mobilePrimaryActions.exists()).toBe(true)
+    expect(mobilePrimaryActions.find('[data-test="mobile-primary"]').exists()).toBe(
+      true,
+    )
+    expect(mobileToolbar.find('.el-public-shell__mobile-nav').exists()).toBe(true)
+    expect(mobileToolbar.find('.el-public-shell__mobile-actions').exists()).toBe(
+      true,
+    )
+    expect(mobileToolbar.find('[data-test="legacy-mobile"]').exists()).toBe(true)
+    expect(mobileToolbar.find('[data-test="mobile-primary"]').exists()).toBe(
+      false,
+    )
+
+    const primaryChildren = primaryRow.element.children
+    expect(primaryChildren[0]?.classList.contains('el-public-shell__brand-nav')).toBe(
+      true,
+    )
+    expect(primaryChildren[1]?.classList.contains('el-public-shell__actions')).toBe(
+      true,
+    )
+    expect(
+      primaryChildren[2]?.classList.contains(
+        'el-public-shell__mobile-primary-actions',
+      ),
+    ).toBe(true)
+  })
 })

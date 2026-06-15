@@ -701,6 +701,48 @@ describe('Fsus theme visual baseline', () => {
     ])
   })
 
+  test('separates public shell mobile primary actions from the mobile nav row', () => {
+    const publicShellCss = compileThemeFile('public-shell.scss')
+    const criticalCss = compileThemeFile('public-shell-critical.scss')
+
+    for (const css of [publicShellCss, criticalCss]) {
+      expectCssRule(css, '.el-public-shell__primary-row', [
+        'display: grid;',
+        'grid-template-columns: minmax(0, 1fr) auto;',
+        'align-items: center;',
+      ])
+      expectCssRule(css, '.el-public-shell__mobile-primary-actions', [
+        'display: none;',
+      ])
+      expectCssRule(css, '.el-public-shell__mobile-toolbar', [
+        'display: none;',
+        'margin-top: 18px;',
+      ])
+      expectCssRule(css, '.el-public-shell__mobile-actions', [
+        'display: flex;',
+      ])
+      expectCssRule(css, '.el-public-shell__mobile-nav-scrollbar', [
+        'width: 100%;',
+      ])
+      expectCssRule(
+        css,
+        '.el-public-shell__mobile-nav-scrollbar .el-public-shell__mobile-nav-wrap',
+        [
+          'overflow-y: hidden;',
+          'touch-action: pan-x pan-y;',
+          'overscroll-behavior-x: contain;',
+          'overscroll-behavior-y: auto;',
+        ],
+      )
+      expectCssRule(css, '.el-public-shell__desktop-nav', ['display: none;'])
+      expectCssRule(css, '.el-public-shell__actions', ['display: none;'])
+      expect(css).toContain('.el-public-shell__mobile-primary-actions')
+      expect(css).toContain('display: inline-flex;')
+      expect(css).toContain('.el-public-shell__mobile-toolbar')
+      expect(css).toContain('display: block;')
+    }
+  })
+
   test('prevents table interaction motion from overlapping fixed columns', () => {
     const themeCss = compileThemeFile('fsus-theme.scss')
     const tableCss = compileThemeFile('table.scss')

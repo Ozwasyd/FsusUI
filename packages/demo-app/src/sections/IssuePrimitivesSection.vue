@@ -16,7 +16,7 @@
       <ElThemeModeToggle visibility="desktop" compact />
     </template>
 
-    <template #mobile-actions>
+    <template #mobile-primary-actions>
       <ElThemeModeToggle visibility="mobile" compact />
     </template>
 
