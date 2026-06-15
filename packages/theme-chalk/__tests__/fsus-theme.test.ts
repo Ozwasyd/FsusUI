@@ -676,9 +676,17 @@ describe('Fsus theme visual baseline', () => {
   test('keeps rate hover within the control motion budget', () => {
     const css = compileThemeFile('rate.scss')
 
-    expectCssRule(css, '.el-rate .el-rate__icon.hover', [
-      'transform: translateY(-1px);',
+    expectCssRule(css, '.el-rate:focus-visible', [
+      'outline: none !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
     ])
+    expectCssRule(css, '.el-rate .el-rate__icon', [
+      'transition: transform var(--fsus-motion-control-fast) var(--fsus-motion-standard), color var(--fsus-motion-control-fast) var(--fsus-motion-standard);',
+    ])
+    expectCssRule(css, '.el-rate .el-rate__icon.hover', [
+      'transform: translateY(var(--fsus-rate-icon-hover-y, -1px));',
+    ])
+    expect(css).not.toContain('transition: var(--el-transition-duration);')
     expect(css).not.toContain('transform: scale(1.15);')
   })
 

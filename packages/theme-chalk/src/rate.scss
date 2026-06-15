@@ -36,6 +36,13 @@ $rate-size: map.merge(
     outline: none;
   }
 
+  &:focus-visible {
+    @include a11y-focus-ring(
+      2px,
+      var(--fsus-radius-control-small, var(--el-border-radius-small))
+    );
+  }
+
   @include e(item) {
     cursor: pointer;
     display: inline-block;
@@ -51,10 +58,12 @@ $rate-size: map.merge(
     display: inline-block;
     font-size: getCssVar('rate-icon-size');
     margin-right: getCssVar('rate-icon-margin');
-    transition: getCssVar('transition-duration');
+    transition:
+      transform var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+      color var(--fsus-motion-control-fast) var(--fsus-motion-standard);
 
     &.hover {
-      transform: translateY(-1px);
+      transform: translateY(var(--fsus-rate-icon-hover-y, -1px));
     }
 
     .path2 {
