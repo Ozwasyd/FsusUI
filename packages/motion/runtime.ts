@@ -8,7 +8,6 @@ import {
   resolveMotionBudget,
 } from './budget'
 import type {
-  MotionBudgetConfig,
   MotionDirectiveValue,
   MotionPhase,
   MotionPresetDefinition,
@@ -73,29 +72,6 @@ const resolveDelay = (
   return `calc(${stagger} * ${index})`
 }
 
-const transitionFor = (
-  preset: MotionPresetDefinition,
-  options: MotionRunOptions,
-  state: MotionStyleState,
-  budget: MotionBudgetConfig,
-) => {
-  const bundle = getMotionPresetBundle(preset.name)
-  const duration = toTimeValue(options.duration, bundle.duration)
-  const delay = resolveDelay(preset, bundle, options)
-  const easing = options.easing || bundle.easing
-  const properties = transitionProperties.filter(
-    (property) => property in state && isMotionPropertyAllowed(property, budget),
-  )
-
-  return {
-    delay,
-    duration,
-    value: properties
-      .map((property) => `${property} ${duration} ${easing} ${delay}`)
-      .join(', '),
-  }
-}
-
 const estimatedDuration = (duration: string, delay: string) => {
   const durationMs = numericTimeValue(duration) ?? 260
   const delayMs = numericTimeValue(delay) ?? 0
@@ -154,6 +130,103 @@ export const cancelMotion = (el: HTMLElement) => {
   delete motionEl[motionStateKey]
 }
 
+// Build WAAPI keyframes from the from/to MotionStyleState. Each animated
+// property is interpolated independently; if the from-state omits a
+// property present in the to-state, the to-value is used for both ends
+// (so the property is held constant). Conversely if the to-state omits
+// a property present in the from-state, the from-value is held.
+const buildKeyframes = (
+  properties: readonly (keyof MotionStyleState)[],
+  from: MotionStyleState,
+  to: MotionStyleState,
+): Keyframe[] => {
+  const fromFrame: Record<string, string> = {}
+  const toFrame: Record<string, string> = {}
+  for (const property of properties) {
+    const fromValue = from[property]
+    const toValue = to[property]
+    fromFrame[property] = (fromValue ?? toValue ?? '') as string
+    toFrame[property] = (toValue ?? fromValue ?? '') as string
+  }
+  return [fromFrame, toFrame]
+}
+
+// WAAPI primary path — uses the browser's animation engine.
+const runWaapiMotion = (
+  el: HTMLElement,
+  properties: readonly (keyof MotionStyleState)[],
+  keyframes: Keyframe[],
+  durationMs: number,
+  delayMs: number,
+  easing: string,
+  onFinish: () => void,
+  onCancel: () => void,
+): Animation | null => {
+  if (typeof el.animate !== 'function') return null
+  const animation = el.animate(keyframes, {
+    duration: durationMs,
+    delay: delayMs,
+    easing,
+    fill: 'forwards',
+  })
+  animation.onfinish = onFinish
+  animation.oncancel = onCancel
+  return animation
+}
+
+// Compatibility fallback for environments without WAAPI (jsdom, very old
+// browsers). Uses inline CSS transitions, which is the old self-written
+// path. Kept narrow on purpose: any code path that hits this is in a
+// test or legacy context, not the production runtime.
+const runTransitionFallback = (
+  el: HTMLElement,
+  properties: readonly (keyof MotionStyleState)[],
+  from: MotionStyleState,
+  to: MotionStyleState,
+  durationStr: string,
+  delayStr: string,
+  easing: string,
+  onFinish: () => void,
+  onCancel: () => void,
+): { cancel: () => void } => {
+  el.style.transition = 'none'
+  el.style.willChange = properties.join(', ')
+  applyStyleState(el, from)
+  void el.offsetWidth
+  let frame = nextFrame(() => {
+    if (finished) return
+    el.style.transition = properties
+      .map((property) => `${property} ${durationStr} ${easing} ${delayStr}`)
+      .join(', ')
+    applyStyleState(el, to)
+    const handleEnd = () => {
+      el.removeEventListener('transitionend', handleEnd)
+      onFinish()
+    }
+    el.addEventListener('transitionend', handleEnd, { once: true })
+    timeout = setTimeout(
+      handleEnd,
+      estimatedDuration(durationStr, delayStr) + 32,
+    )
+  })
+  let finished = false
+  let timeout: ReturnType<typeof setTimeout> | undefined
+  return {
+    cancel() {
+      if (finished) return
+      finished = true
+      if (frame) {
+        if (typeof window !== 'undefined') window.cancelAnimationFrame(frame)
+        frame = 0
+      }
+      if (timeout) clearTimeout(timeout)
+      el.style.transition = ''
+      el.style.willChange = ''
+      onCancel()
+    },
+  }
+}
+
 export const runMotion = (
   el: HTMLElement,
   options: MotionRunOptions,
@@ -161,37 +234,43 @@ export const runMotion = (
   cancelMotion(el)
 
   const preset = getMotionPreset(options.name)
-  const budget = resolveMotionBudget(options.budget)
+  const bundle = getMotionPresetBundle(preset.name)
   const phase = options.phase || 'enter'
   const { from, to } = getMotionPhaseState(preset, phase)
-  const {
-    delay,
-    duration,
-    value: transition,
-  } = transitionFor(preset, options, to, budget)
+  const durationStr = toTimeValue(options.duration, bundle.duration)
+  const delayStr = resolveDelay(preset, bundle, options)
+  const easing = options.easing || bundle.easing
+  const budget = resolveMotionBudget(options.budget)
+  const durationMs = numericTimeValue(durationStr) ?? 260
+  const delayMs = numericTimeValue(delayStr) ?? 0
 
   let finished = false
-  let frame = 0
-  let timeout: ReturnType<typeof setTimeout> | undefined
   let claimedBudget = false
   let finalState = to
+  let animation: Animation | null = null
+  let fallback: { cancel: () => void } | null = null
 
-  const cleanup = () => {
-    if (frame) window.cancelAnimationFrame(frame)
-    if (timeout) clearTimeout(timeout)
-    el.removeEventListener('transitionend', finish)
-    el.style.willChange = ''
+  const releaseBudget = () => {
     if (claimedBudget) {
       releaseMotionBudgetNode()
       claimedBudget = false
     }
   }
 
-  const finish = () => {
+  const commitAndFinish = () => {
     if (finished) return
     finished = true
-    cleanup()
+    if (animation) {
+      try {
+        animation.commitStyles()
+      } catch {
+        // commitStyles may throw if the animation was cancelled before
+        // any frame was produced. Fall back to applying the final state
+        // directly so the element ends up at its terminal visual.
+      }
+    }
     applyStyleState(el, finalState)
+    releaseBudget()
     options.onFinish?.()
   }
 
@@ -199,42 +278,83 @@ export const runMotion = (
     cancel() {
       if (finished) return
       finished = true
-      cleanup()
+      animation?.cancel()
+      fallback?.cancel()
+      releaseBudget()
     },
-    finish,
+    finish: commitAndFinish,
   }
 
   ;(el as MotionElement)[motionStateKey] = controls
 
-  const shouldAnimate =
-    !isMotionReducedOrDisabled(options.disabled) && claimMotionBudgetNode(budget)
-  claimedBudget = shouldAnimate
-
-  if (!shouldAnimate) {
+  // Reduced / disabled / budget exhausted — apply terminal state immediately.
+  if (
+    isMotionReducedOrDisabled(options.disabled) ||
+    !claimMotionBudgetNode(budget)
+  ) {
     finalState = preset.reduced
-    el.style.transition = ''
     applyStyleState(el, preset.reduced)
-    finish()
+    options.onFinish?.()
+    finished = true
+    return controls
+  }
+  claimedBudget = true
+
+  // Filter the animated properties by what's in the to-state and the budget.
+  const properties = transitionProperties.filter(
+    (property) =>
+      property in to && isMotionPropertyAllowed(property, budget),
+  ) as (keyof MotionStyleState)[]
+
+  // If the to-state is empty (or all properties blocked), commit terminal.
+  if (properties.length === 0) {
+    applyStyleState(el, to)
+    options.onFinish?.()
+    finished = true
     return controls
   }
 
-  el.style.transition = 'none'
-  el.style.willChange = transitionProperties
-    .filter((property) => property in to)
-    .join(', ')
-  applyStyleState(el, from)
+  const keyframes = buildKeyframes(properties, from, to)
 
-  // Force the browser to commit the initial state before enabling transitions.
-  void el.offsetWidth
+  // Primary: WAAPI. The browser's animation engine handles interpolation,
+  // easing, delay, and timing. We only need to commitStyles on finish so
+  // the final state persists on the element after the animation ends.
+  animation = runWaapiMotion(
+    el,
+    properties,
+    keyframes,
+    durationMs,
+    delayMs,
+    easing,
+    commitAndFinish,
+    () => {
+      if (!finished) {
+        finished = true
+        releaseBudget()
+      }
+    },
+  )
 
-  frame = nextFrame(() => {
-    if (finished) return
-
-    el.style.transition = transition
-    el.addEventListener('transitionend', finish, { once: true })
-    applyStyleState(el, to)
-    timeout = setTimeout(finish, estimatedDuration(duration, delay) + 32)
-  })
+  if (!animation) {
+    // Fallback for environments without WAAPI (jsdom, very old browsers).
+    // Uses inline CSS transitions — see runTransitionFallback.
+    fallback = runTransitionFallback(
+      el,
+      properties,
+      from,
+      to,
+      durationStr,
+      delayStr,
+      easing,
+      commitAndFinish,
+      () => {
+        if (!finished) {
+          finished = true
+          releaseBudget()
+        }
+      },
+    )
+  }
 
   return controls
 }
