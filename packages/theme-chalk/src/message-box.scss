@@ -19,7 +19,7 @@
   border-radius: getCssVar('messagebox-border-radius');
   border: 1px solid getCssVar('border-color-lighter');
   font-size: getCssVar('messagebox-font-size');
-  box-shadow: getCssVar('box-shadow-light');
+  box-shadow: var(--fsus-shadow-panel, none);
   text-align: left;
   overflow: hidden;
   backface-visibility: hidden;
@@ -186,29 +186,41 @@
 }
 
 .fade-in-linear-enter-active {
-  animation: modal-fade-in getCssVar('transition-duration');
+  animation: modal-fade-in var(--fsus-motion-overlay, 300ms)
+    var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
 
   .#{$namespace}-overlay-message-box {
-    animation: msgbox-fade-in getCssVar('transition-duration');
+    animation: msgbox-fade-in var(--fsus-motion-panel, 420ms)
+      var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));
   }
 }
 
 .fade-in-linear-leave-active {
-  animation: modal-fade-out getCssVar('transition-duration');
+  animation: modal-fade-out var(--fsus-motion-overlay, 300ms)
+    var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
 
   .#{$namespace}-overlay-message-box {
-    animation: msgbox-fade-in getCssVar('transition-duration') reverse;
+    animation: msgbox-fade-in var(--fsus-motion-panel, 420ms)
+      var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)) reverse;
   }
 }
 
 @keyframes modal-fade-in {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes modal-fade-out {
-  0% { opacity: 1; }
-  100% { opacity: 0; }
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 @keyframes msgbox-fade-in {

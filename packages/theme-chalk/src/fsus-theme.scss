@@ -1037,10 +1037,16 @@ button.#{$namespace}-card:active {
 }
 
 .#{$namespace}-dialog,
-.#{$namespace}-drawer,
-.#{$namespace}-message-box {
+.#{$namespace}-drawer {
   @include fsus-floating;
   border: none;
+}
+
+.#{$namespace}-message-box {
+  background: var(--el-bg-color-overlay);
+  border: 1px solid var(--el-border-color-light);
+  border-radius: var(--fsus-radius-floating);
+  box-shadow: var(--fsus-shadow-panel, none);
 }
 
 .#{$namespace}-message,
