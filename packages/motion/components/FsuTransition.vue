@@ -5,8 +5,9 @@
 </template>
 
 <script lang="ts" setup>
+import { resolveMotionPresetName } from '../presets'
 import { runMotion } from '../runtime'
-import type { MotionPresetName } from '../types'
+import type { MotionPresetInput } from '../types'
 
 defineOptions({
   name: 'FsuTransition',
@@ -14,7 +15,7 @@ defineOptions({
 
 const props = withDefaults(
   defineProps<{
-    name?: MotionPresetName
+    name?: MotionPresetInput
     duration?: string | number
     delay?: string | number
     easing?: string
@@ -29,7 +30,7 @@ const props = withDefaults(
 
 const onEnter = (el: Element, done: () => void) => {
   runMotion(el as HTMLElement, {
-    name: props.name,
+    name: resolveMotionPresetName(props.name),
     duration: props.duration,
     delay: props.delay,
     easing: props.easing,
@@ -41,7 +42,7 @@ const onEnter = (el: Element, done: () => void) => {
 
 const onLeave = (el: Element, done: () => void) => {
   runMotion(el as HTMLElement, {
-    name: props.name,
+    name: resolveMotionPresetName(props.name),
     duration: props.duration,
     delay: props.delay,
     easing: props.easing,

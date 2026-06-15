@@ -1,4 +1,5 @@
 import { cancelMotion, normalizeMotionOptions, runMotion } from '../runtime'
+import { resolveMotionPresetName } from '../presets'
 import type { Directive, DirectiveBinding } from 'vue'
 import type { MotionDirectiveValue, MotionRunOptions } from '../types'
 
@@ -16,12 +17,17 @@ const readStaggerIndex = (el: HTMLElement) => {
   return Array.from(parent.children).indexOf(el)
 }
 
+const isListStaggerValue = (value: MotionDirectiveValue) => {
+  if (typeof value === 'string') return value === 'list-stagger'
+  return typeof value === 'object' && value?.name === 'list-stagger'
+}
+
 const resolveDirectiveOptions = (
   el: HTMLElement,
   binding: DirectiveBinding<MotionDirectiveValue>,
 ): MotionRunOptions => {
   const options = normalizeMotionOptions(binding.value)
-  if (options.name !== 'list-stagger' || options.index !== undefined) {
+  if (!isListStaggerValue(binding.value) || options.index !== undefined) {
     return options
   }
 
@@ -39,7 +45,7 @@ const applyDirectiveMotion = (
 
   if (options.once && el.dataset.fsusMotionPlayed === 'true') return
 
-  el.dataset.fsusMotionPreset = options.name
+  el.dataset.fsusMotionPreset = resolveMotionPresetName(options.name)
   runMotion(el, {
     ...options,
     phase: 'enter',

@@ -1,7 +1,11 @@
 import { unref } from 'vue'
-import { getMotionPreset, getMotionPresetBundle } from '../presets'
+import {
+  getMotionPreset,
+  getMotionPresetBundle,
+  resolveMotionPresetName,
+} from '../presets'
 import type { Ref } from 'vue'
-import type { MotionPresetName, MotionStyleState } from '../types'
+import type { MotionPresetInput, MotionStyleState } from '../types'
 
 export type MotionTarget =
   | Element
@@ -34,9 +38,8 @@ export const millisecondsToSeconds = (value: string | number | undefined) => {
 export const toGsapScrubSeconds = (
   value: boolean | number | string | undefined,
 ): boolean | number => {
-  if (value === undefined || value === true || value === false) {
-    return value ?? true
-  }
+  if (value === undefined) return true
+  if (typeof value === 'boolean') return value
   if (typeof value === 'number') {
     return Number.isFinite(value) && value >= 0 ? value : true
   }
@@ -61,11 +64,12 @@ export const resolveGsapEase = (easing: string): string => {
 }
 
 export const getGsapPresetVars = (
-  name: MotionPresetName,
+  name: MotionPresetInput,
   duration?: string | number,
 ) => {
-  const preset = getMotionPreset(name)
-  const bundle = getMotionPresetBundle(name)
+  const presetName = resolveMotionPresetName(name)
+  const preset = getMotionPreset(presetName)
+  const bundle = getMotionPresetBundle(presetName)
   return {
     duration: millisecondsToSeconds(duration || bundle.duration),
     ease: resolveGsapEase(bundle.easing),

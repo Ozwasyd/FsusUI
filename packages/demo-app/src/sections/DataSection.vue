@@ -69,7 +69,11 @@
       <el-space :size="30">
         <el-badge :value="12"><el-button>Comments</el-button></el-badge>
         <el-badge :value="3" is-dot>
-          <el-button :icon="Share" type="primary" aria-label="Share article" />
+          <el-button
+            :icon="Share"
+            type="primary"
+            v-bind="{ 'aria-label': 'Share article' }"
+          />
         </el-badge>
       </el-space>
     </div>

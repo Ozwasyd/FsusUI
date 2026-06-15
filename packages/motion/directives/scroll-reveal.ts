@@ -1,4 +1,5 @@
 import { normalizeMotionOptions } from '../runtime'
+import { resolveMotionPresetName } from '../presets'
 import { useScrollReveal } from '../composables/use-scroll-reveal'
 import type { Directive, DirectiveBinding } from 'vue'
 import type { ScrollRevealOptions } from '../composables/use-scroll-reveal'
@@ -19,7 +20,7 @@ const applyScrollReveal = (
   el.__fsusScrollReveal?.kill()
 
   const options = resolveDirectiveOptions(binding)
-  el.dataset.fsusScrollRevealPreset = options.name
+  el.dataset.fsusScrollRevealPreset = resolveMotionPresetName(options.name)
 
   const controls = useScrollReveal({
     ...options,

@@ -2,8 +2,13 @@ import {
   getMotionPreset,
   isMotionPresetAllowedOnSurface,
   motionPresets,
+  resolveMotionPresetName,
 } from './presets'
-import type { MotionPresetName, MotionSurfaceCategory } from './types'
+import type {
+  MotionPresetInput,
+  MotionPresetName,
+  MotionSurfaceCategory,
+} from './types'
 
 export type MotionGovernanceSeverity = 'error' | 'warning'
 
@@ -29,7 +34,7 @@ export type MotionEffectKind =
   | 'local-wrapper'
 
 export type MotionPresetUsage = {
-  preset: MotionPresetName
+  preset: MotionPresetInput
   surface: MotionSurfaceCategory
   interaction?: MotionInteractionKind
   effect?: MotionEffectKind
@@ -77,12 +82,13 @@ export const validateMotionPresetUsage = (
   usage: MotionPresetUsage,
 ): MotionGovernanceFinding[] => {
   const findings: MotionGovernanceFinding[] = []
+  const preset = resolveMotionPresetName(usage.preset)
 
-  if (!isMotionPresetAllowedOnSurface(usage.preset, usage.surface)) {
+  if (!isMotionPresetAllowedOnSurface(preset, usage.surface)) {
     findings.push(
       finding(
         'surface-disallowed',
-        `${usage.preset} is not allowed on ${usage.surface}.`,
+        `${preset} is not allowed on ${usage.surface}.`,
         usage.source,
       ),
     )
@@ -91,7 +97,7 @@ export const validateMotionPresetUsage = (
   if (
     usage.surface === 'ordinary-content' &&
     usage.interaction !== 'hover' &&
-    usesScale(usage.preset)
+    usesScale(preset)
   ) {
     findings.push(
       finding(
@@ -105,7 +111,7 @@ export const validateMotionPresetUsage = (
   if (
     usage.surface === 'reading-surface' &&
     usage.interaction === 'default' &&
-    usesTranslate(usage.preset)
+    usesTranslate(preset)
   ) {
     findings.push(
       finding(
@@ -118,7 +124,7 @@ export const validateMotionPresetUsage = (
 
   if (
     usage.surface === 'list-table-surface' &&
-    hasStagger(usage.preset) &&
+    hasStagger(preset) &&
     (usage.itemCount ?? 0) > 20
   ) {
     findings.push(
@@ -132,7 +138,7 @@ export const validateMotionPresetUsage = (
 
   if (
     usage.interaction === 'hover' &&
-    usesScale(usage.preset) &&
+    usesScale(preset) &&
     usage.surface !== 'media-preview-surface'
   ) {
     findings.push(

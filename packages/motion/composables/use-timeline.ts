@@ -8,11 +8,15 @@ import {
 import { normalizeMotionRecipeOptions } from '../recipes'
 import { isMotionReducedOrDisabled } from '../runtime'
 import type { MotionTarget } from '../gsap/resolve'
-import type { MotionPresetName, MotionRecipeName } from '../types'
+import type {
+  MotionPresetInput,
+  MotionPresetName,
+  MotionRecipeName,
+} from '../types'
 
 export type MotionTimelineStep = {
   target: MotionTarget
-  preset?: MotionPresetName
+  preset?: MotionPresetInput
   recipe?: MotionRecipeName
   duration?: string | number
   position?: gsap.Position

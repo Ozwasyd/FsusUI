@@ -196,3 +196,19 @@ pnpm test:consumer-install
 ```
 
 如果这些步骤都通过，说明当前仓库质量门、视觉基线和发布工件链路都处于可维护状态。
+
+## Typecheck cache policy
+
+PR-fast uses `typecheck:affected`, which selects the affected TypeScript
+lanes and runs them through `scripts/run-typecheck.mjs`. The default
+`typecheck:*` lanes write `.tsbuildinfo` files under `.tmp/typecheck-cache`;
+GitHub Actions restores that typecheck cache with a key that includes
+`pnpm-lock.yaml`, `package.json`, `tsconfig*.json`, package sources, typings,
+internal TypeScript sources, and `scripts/run-typecheck.mjs`.
+
+Workflow logs print `typecheck-cache-hit`, `cache-hit`, and
+`cache-primary-key`. The wrapper also prints `cache hit` / `cache miss`,
+the lane name, the `.tsbuildinfo` path, and a source hash prefix. `verify:full`
+still runs the full four-lane `typecheck` graph, while
+`pnpm run typecheck:no-cache` keeps a diagnostic and release fallback that
+bypasses the incremental typecheck cache entirely.

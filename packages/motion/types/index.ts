@@ -1,3 +1,14 @@
+import type {
+  MotionPattern,
+  MotionTier,
+} from '../tokens'
+
+export type {
+  MotionPattern,
+  MotionTier,
+  MotionTokens,
+} from '../tokens'
+
 // Intent-based canonical motion preset vocabulary.
 // Replaces the previous 33-name enumeration that mixed generic effect names
 // (fade-in, scale-fade, slide-up, …) with intent names (surface-settle,
@@ -98,17 +109,10 @@ export const motionRecipeNames = [
 
 export type MotionRecipeName = (typeof motionRecipeNames)[number]
 
-export type MotionTokenScale<T extends string> = Record<T, string>
 
 // Pattern-tier bundle — see tokens/index.ts for the 4×2 matrix.
-export type MotionPattern = 'emphasized' | 'standard' | 'decel' | 'accel'
-export type MotionTier = 'short' | 'long'
 
 // Re-exported from tokens to keep a single canonical location.
-export type MotionTokens = {
-  patterns: Record<MotionPattern, Record<MotionTier, MotionTokenScale<string>>>
-  instant: string
-}
 
 export type MotionStyleState = {
   opacity?: string
@@ -155,7 +159,7 @@ export type MotionRecipeDefinition = {
 }
 
 export type MotionOptions = {
-  name?: MotionPresetName
+  name?: MotionPresetInput
   duration?: string | number
   delay?: string | number
   easing?: string
@@ -176,8 +180,8 @@ export type MotionDirectiveValue =
 
 export type MotionPhase = 'enter' | 'leave'
 
-export type MotionRunOptions = MotionOptions & {
-  name: MotionPresetName
+export type MotionRunOptions = Omit<MotionOptions, 'name'> & {
+  name: MotionPresetInput
   phase?: MotionPhase
   onFinish?: () => void
 }

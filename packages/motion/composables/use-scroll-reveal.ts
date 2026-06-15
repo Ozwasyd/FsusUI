@@ -12,11 +12,11 @@ import {
 } from '../gsap/resolve'
 import { isMotionReducedOrDisabled } from '../runtime'
 import type { MotionTarget } from '../gsap/resolve'
-import type { MotionPresetName } from '../types'
+import type { MotionPresetInput, MotionPresetName } from '../types'
 
 export type ScrollRevealOptions = {
   target?: MotionTarget
-  name?: MotionPresetName
+  name?: MotionPresetInput
   duration?: string | number
   disabled?: boolean
   once?: boolean

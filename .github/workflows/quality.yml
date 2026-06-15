@@ -50,6 +50,19 @@ jobs:
         run: |
           echo "icons-cache-hit=${{ steps.icons-cache.outputs.cache-hit }}"
           echo "wasm-cache-hit=${{ steps.wasm-cache.outputs.cache-hit }}"
+      - name: Restore TypeScript typecheck cache
+        id: typecheck-cache
+        uses: actions/cache@v4
+        with:
+          path: .tmp/typecheck-cache
+          key: ${{ runner.os }}-fsusui-typecheck-${{ hashFiles('pnpm-lock.yaml', 'package.json', 'tsconfig*.json', 'packages/**/*.ts', 'packages/**/*.tsx', 'packages/**/*.vue', 'packages/**/*.json', 'internal/**/*.ts', 'internal/**/*.json', 'typings/**/*.d.ts', 'scripts/run-typecheck.mjs') }}
+          restore-keys: |
+            ${{ runner.os }}-fsusui-typecheck-
+      - name: Log TypeScript typecheck cache status
+        run: |
+          echo "typecheck-cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
+          echo "cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
+          echo "cache-primary-key=${{ steps.typecheck-cache.outputs.cache-primary-key }}"
       - run: pnpm run verify:pr-fast
 
   full:

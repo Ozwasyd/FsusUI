@@ -173,3 +173,19 @@ workspace 依赖归一化由 `scripts/prepare-npm-package.mjs` 负责，当前�
 - 复杂 release train
 
 后续若扩展治理范围，应在不破坏当前发布顺序和质量门语义的前提下增量演进。
+
+## Typecheck cache policy
+
+PR-fast uses `typecheck:affected`, which selects the affected TypeScript
+lanes and runs them through `scripts/run-typecheck.mjs`. The default
+`typecheck:*` lanes write `.tsbuildinfo` files under `.tmp/typecheck-cache`;
+GitHub Actions restores that typecheck cache with a key that includes
+`pnpm-lock.yaml`, `package.json`, `tsconfig*.json`, package sources, typings,
+internal TypeScript sources, and `scripts/run-typecheck.mjs`.
+
+Workflow logs print `typecheck-cache-hit`, `cache-hit`, and
+`cache-primary-key`. The wrapper also prints `cache hit` / `cache miss`,
+the lane name, the `.tsbuildinfo` path, and a source hash prefix. `verify:full`
+still runs the full four-lane `typecheck` graph, while
+`pnpm run typecheck:no-cache` keeps a diagnostic and release fallback that
+bypasses the incremental typecheck cache entirely.
