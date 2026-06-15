@@ -1048,9 +1048,15 @@ button.#{$namespace}-card:active {
   @include fsus-floating(18px);
 }
 
+.#{$namespace}-popover.#{$namespace}-popper {
+  background: var(--el-bg-color-overlay);
+  border: 1px solid var(--el-border-color-light);
+  border-radius: var(--fsus-radius-popover);
+  box-shadow: var(--fsus-shadow-panel, none);
+}
+
 // 功能性下拉层：不透明白底，不使用 backdrop-filter，
 // 避免 blur 边缘虚化以及父容器滚动时因 GPU composite layer 重建导致的生硬跳动
-.#{$namespace}-popover.#{$namespace}-popper,
 .#{$namespace}-popper.is-light,
 .#{$namespace}-popper.is-dark,
 .#{$namespace}-popper.is-pure,

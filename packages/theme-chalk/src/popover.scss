@@ -7,8 +7,6 @@
 
   &.#{$namespace}-popper {
     background: getCssVar('popover-bg-color');
-    backdrop-filter: getCssVar('bg-color', 'overlay-blur');
-    -webkit-backdrop-filter: getCssVar('bg-color', 'overlay-blur');
     min-width: 150px;
     border-radius: getCssVar('popover-border-radius');
     border: 1px solid getCssVar('popover-border-color');
@@ -18,7 +16,7 @@
     line-height: 1.6;
     text-align: left;
     font-size: getCssVar('popover-font-size');
-    box-shadow: getCssVar('box-shadow', 'light');
+    box-shadow: var(--fsus-shadow-panel, none);
     word-break: break-word;
     box-sizing: border-box;
 
@@ -34,9 +32,13 @@
     }
 
     @include e(reference) {
-      &:focus:not(.focusing),
-      &:focus:hover {
+      &:focus:not(.focusing):not(:focus-visible),
+      &:focus:hover:not(:focus-visible) {
         outline-width: 0;
+      }
+
+      &:focus-visible {
+        @include a11y-focus-ring(2px, getCssVar('border-radius-base'));
       }
     }
 
@@ -57,8 +59,12 @@
     }
 
     &:focus:active,
-    &:focus {
+    &:focus:not(:focus-visible) {
       outline-width: 0;
+    }
+
+    &:focus-visible {
+      @include a11y-focus-ring(2px, getCssVar('popover-border-radius'));
     }
   }
 }
