@@ -5,6 +5,11 @@
       content="# Consumer Markdown&#10;&#10;This render path validates packaged WASM assets."
       mode="preview"
     />
+    <el-empty-state
+      title="EmptyState package export"
+      description="This validates the packed component and global types."
+      size="compact"
+    />
   </div>
 </template>
 

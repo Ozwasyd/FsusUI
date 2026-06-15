@@ -39,6 +39,8 @@ const rootPackage = readJson('package.json')
 const sourcePackage = readJson('packages/element-plus/package.json')
 const { packageName, repositoryGitUrl, repositoryWebUrl } =
   resolvePackageContract({ repoRoot: root })
+const componentBarrel = read('packages/components/index.ts')
+const emptyStateEntry = read('packages/components/empty-state/index.ts')
 
 assert(
   rootPackage.scripts?.build?.includes('pnpm run -C internal/build start'),
@@ -70,6 +72,19 @@ for (const exportPath of ['.', './global', './theme', './icons-vue', './wasm', '
   assert(sourcePackage.exports?.[exportPath], `source package exports must include ${exportPath}`)
 }
 
+assert(
+  componentBarrel.includes("export * from './empty-state'"),
+  'component source barrel must export EmptyState',
+)
+assert(
+  emptyStateEntry.includes('export const ElEmptyState'),
+  'EmptyState source entry must export ElEmptyState',
+)
+assert(
+  emptyStateEntry.includes('export type { EmptyStateInstance }'),
+  'EmptyState source entry must export EmptyStateInstance',
+)
+
 for (const artifact of [
   'packages/icons-vue/dist/index.js',
   'packages/icons-vue/dist/types/index.d.ts',
@@ -99,6 +114,28 @@ if (existsSync(path.join(publishedDistRoot, 'package.json'))) {
     !distPackage.dependencies?.['@element-plus/motion'],
     'published package must not depend on unpublished @element-plus/motion',
   )
+
+  const emptyStateDistChecks = [
+    ['dist/element-plus/es/index.d.ts', "export * from '@ozwasyd/element-plus/es/components'"],
+    ['dist/element-plus/lib/index.d.ts', "export * from '@ozwasyd/element-plus/es/components'"],
+    ['dist/element-plus/es/index.mjs', 'ElEmptyState'],
+    ['dist/element-plus/lib/index.js', 'ElEmptyState'],
+    ['dist/element-plus/es/components/index.d.ts', "export * from './empty-state'"],
+    ['dist/element-plus/lib/components/index.d.ts', "export * from './empty-state'"],
+    ['dist/element-plus/es/components/empty-state/index.d.ts', 'ElEmptyState'],
+    ['dist/element-plus/lib/components/empty-state/index.d.ts', 'ElEmptyState'],
+    ['dist/element-plus/es/components/empty-state/index.d.ts', 'EmptyStateInstance'],
+    ['dist/element-plus/lib/components/empty-state/index.d.ts', 'EmptyStateInstance'],
+  ]
+
+  for (const [relativePath, token] of emptyStateDistChecks) {
+    const absolutePath = path.join(root, relativePath)
+    assert(existsSync(absolutePath), `published package must include ${relativePath}`)
+    assert(
+      readFileSync(absolutePath, 'utf8').includes(token),
+      `published package ${relativePath} must expose ${token}`,
+    )
+  }
 
   const leakedFiles = collectFiles(publishedDistRoot)
     .filter(isPackageReferenceCandidate)

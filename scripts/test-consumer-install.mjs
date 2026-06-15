@@ -44,6 +44,17 @@ if (!existsSync(distPackagePath)) {
   )
 }
 
+function resolveExecutable(command) {
+  return command
+}
+
+function withCommandOptions(options) {
+  return {
+    shell: process.platform === 'win32',
+    ...options,
+  }
+}
+
 const sourcePackage = JSON.parse(readFileSync(sourcePackagePath, 'utf8'))
 const distPackage = JSON.parse(readFileSync(distPackagePath, 'utf8'))
 const { packageName, repositoryWebUrl } = resolvePackageContract({
@@ -70,16 +81,16 @@ if (distPackage.homepage !== repositoryWebUrl) {
 }
 
 function run(command, args, options) {
-  execFileSync(command, args, {
+  execFileSync(resolveExecutable(command), args, {
     stdio: 'inherit',
-    ...options,
+    ...withCommandOptions(options),
   })
 }
 
 function runAndCollect(command, args, options) {
-  const result = spawnSync(command, args, {
+  const result = spawnSync(resolveExecutable(command), args, {
     encoding: 'utf8',
-    ...options,
+    ...withCommandOptions(options),
   })
   const stdout = result.stdout ?? ''
   const stderr = result.stderr ?? ''
@@ -91,7 +102,7 @@ function runAndCollect(command, args, options) {
   }
   if (result.status !== 0) {
     throw new Error(
-      `${command} ${args.join(' ')} exited with code ${result.status ?? -1}`,
+      `${resolveExecutable(command)} ${args.join(' ')} exited with code ${result.status ?? -1}`,
     )
   }
 
@@ -197,12 +208,12 @@ try {
   writeFileSync(viteConfigPath, viteConfig)
 
   const packOutput = execFileSync(
-    'npm',
+    resolveExecutable('npm'),
     ['pack', '--silent', '--pack-destination', artifactsRoot],
-    {
+    withCommandOptions({
       cwd: distRoot,
       encoding: 'utf8',
-    },
+    }),
   )
 
   const tarballName = packOutput.trim().split(/\r?\n/u).at(-1)
