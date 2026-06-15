@@ -19,7 +19,12 @@
     </template>
 
     <template #mobile-primary-actions>
-      <ElThemeModeToggle visibility="mobile" compact />
+      <ElThemeModeToggle
+        visibility="mobile"
+        variant="menu-button"
+        label="外观模式"
+        :labels="themeModeLabels"
+      />
     </template>
 
     <section class="issue-primitives">
@@ -504,6 +509,14 @@ const collectionQuery = ref('')
 const collectionState = ref<SegmentedControlValue>('all')
 const confirmation = ref('CONF')
 const selectedInboxItem = ref('alpha')
+const themeModeLabels = {
+  light: '浅色',
+  dark: '深色',
+  system: '跟随系统',
+  lightShort: '浅',
+  darkShort: '深',
+  systemShort: '系统',
+}
 const navItems = [
   { key: 'home', label: 'Home', href: '/' },
   { key: 'archive', label: 'Archive', href: '/archive' },

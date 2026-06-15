@@ -392,6 +392,33 @@ describe('Fsus theme visual baseline', () => {
     )
   })
 
+  test('supports theme mode menu-button as restrained paper menu', () => {
+    const css = compileThemeFile('theme-mode-toggle.scss')
+
+    expectCssRule(css, '.el-theme-mode-toggle__menu-button', [
+      'min-height: 40px;',
+      'border: 1px solid var(--el-border-color-lighter);',
+      'border-radius: var(--el-border-radius-small);',
+    ])
+    expectCssRule(css, '.el-theme-mode-toggle__menu', [
+      'position: absolute;',
+      'min-width: 132px;',
+      'border: 1px solid var(--el-border-color-lighter);',
+      'border-radius: 8px;',
+      'background: var(--el-bg-color);',
+      'box-shadow: var(--el-box-shadow-light);',
+    ])
+    expectCssRule(css, '.el-theme-mode-toggle__menu-item', [
+      'min-height: 36px;',
+      'background: transparent;',
+      'text-align: left;',
+    ])
+    expectCssRule(css, '.el-theme-mode-toggle__menu-item[aria-checked=true]', [
+      'background: var(--el-fill-color-light);',
+      'color: var(--el-text-color-primary);',
+    ])
+  })
+
   test('animates generic entry surfaces without requiring app-specific CSS', () => {
     const css = compileThemeFile('fsus-theme.scss')
 
