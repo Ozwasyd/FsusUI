@@ -6,21 +6,32 @@
   @include set-component-css-var('backtop', $backtop);
 
   position: fixed;
+  appearance: none;
   background-color: getCssVar('backtop', 'bg-color');
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+  width: var(--fsus-floating-control-size, 40px);
+  height: var(--fsus-floating-control-size, 40px);
+  padding: 0;
+  border: 0;
+  border-radius: var(--fsus-floating-control-radius, var(--fsus-radius-pill));
   color: getCssVar('backtop', 'text-color');
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 20px;
-  box-shadow: getCssVar('box-shadow', 'lighter');
+  line-height: 1;
+  box-shadow: var(--fsus-floating-control-shadow, var(--fsus-shadow-floating));
   cursor: pointer;
-  z-index: 5;
+  z-index: var(--fsus-z-floating-control, 5);
 
   &:hover {
     background-color: getCssVar('backtop', 'hover-bg-color');
+  }
+
+  &:focus-visible {
+    @include a11y-focus-ring(
+      2px,
+      var(--fsus-floating-control-radius, var(--fsus-radius-pill))
+    );
   }
 
   @include e(icon) {

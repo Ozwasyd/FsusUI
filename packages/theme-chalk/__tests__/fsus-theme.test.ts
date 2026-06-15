@@ -690,6 +690,24 @@ describe('Fsus theme visual baseline', () => {
     expect(css).not.toContain('transform: scale(1.15);')
   })
 
+  test('keeps backtop aligned with floating focus tokens', () => {
+    const css = compileThemeFile('backtop.scss')
+
+    expectCssRule(css, '.el-backtop', [
+      'width: var(--fsus-floating-control-size, 40px);',
+      'height: var(--fsus-floating-control-size, 40px);',
+      'border-radius: var(--fsus-floating-control-radius, var(--fsus-radius-pill));',
+      'box-shadow: var(--fsus-floating-control-shadow, var(--fsus-shadow-floating));',
+      'z-index: var(--fsus-z-floating-control, 5);',
+    ])
+    expectCssRule(css, '.el-backtop:focus-visible', [
+      'outline: none !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+    ])
+    expect(css).not.toContain('border-radius: 50%;')
+    expect(css).not.toContain('box-shadow: var(--el-box-shadow-lighter);')
+  })
+
   test('keeps calendar header controls border-first', () => {
     const css = compileThemeFile('calendar.scss')
 

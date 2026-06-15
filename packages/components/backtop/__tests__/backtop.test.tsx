@@ -32,6 +32,8 @@ describe('Backtop.vue', () => {
     expect(wrapper.find('.el-backtop').attributes('style')).toBe(
       'right: 100px; bottom: 200px;'
     )
+    expect(wrapper.find('.el-backtop').element.tagName).toBe('BUTTON')
+    expect(wrapper.find('.el-backtop').attributes('type')).toBe('button')
     expect(wrapper.findComponent(CaretTop).exists()).toBe(true)
 
     await wrapper.trigger('click')

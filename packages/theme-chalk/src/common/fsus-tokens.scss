@@ -105,6 +105,10 @@
   --fsus-badge-emphasis-text: var(--fsus-color-surface-base);
   --fsus-card-elevated-shadow: var(--fsus-shadow-panel-lighter);
   --fsus-rate-icon-hover-y: -1px;
+  --fsus-floating-control-size: 40px;
+  --fsus-floating-control-radius: var(--fsus-radius-pill);
+  --fsus-floating-control-shadow: var(--fsus-shadow-floating);
+  --fsus-z-floating-control: 5;
 
   --fsus-shadow-panel: none;
   --fsus-shadow-panel-light: 0 8px 24px rgba(15, 23, 42, 0.05);
