@@ -75,20 +75,25 @@ describe('motion primitives', () => {
   })
 
   it('centralizes the first-party token and preset contracts', () => {
-    expect(motionTokens.duration.base).toBe('220ms')
+    expect(motionTokens.patterns.standard.long.duration).toBe('400ms')
+    expect(motionTokens.patterns.emphasized.short.easing).toBe(
+      'cubic-bezier(0.2, 0, 0, 1)',
+    )
+    expect(motionTokens.instant).toBe('1ms')
     expect(motionTokenAliases).toMatchObject({
-      fast: 'var(--fsus-motion-control-fast, 140ms)',
-      control: 'var(--fsus-motion-control, 220ms)',
-      panel: 'var(--fsus-motion-panel, 420ms)',
-      overlay: 'var(--fsus-motion-overlay, 260ms)',
-      route: 'var(--fsus-motion-overlay, 260ms)',
+      fast: 'var(--fsus-motion-standard-short, 250ms)',
+      control: 'var(--fsus-motion-standard-long, 400ms)',
+      panel: 'var(--fsus-motion-emphasized-long, 500ms)',
+      overlay: 'var(--fsus-motion-decel-long, 300ms)',
+      route: 'var(--fsus-motion-decel-long, 300ms)',
       standardEase:
         'var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1))',
       emphasizedEase:
         'var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1))',
     })
     expect(defaultMotionBudget.maxStaggerItems).toBe(20)
-    expect(motionTokens.distance.md).toBe('16px')
+    expect(motionTokens.patterns.standard.short.distance).toBe('8px')
+    expect(motionTokens.patterns.decel.long.distance).toBe('12px')
     expect(Object.keys(motionPresets)).toEqual([
       'surface-settle',
       'paper-settle',
@@ -250,7 +255,9 @@ describe('motion primitives', () => {
 
     expect(el.dataset.fsusMotionPreset).toBe('index-list-settle')
     expect(el.style.transition).toContain('120ms')
-    expect(el.style.transition).toContain('calc(var(--fsus-motion-stagger')
+    expect(el.style.transition).toContain(
+      'calc(var(--fsus-motion-standard-short-stagger, 25ms)',
+    )
   })
 
   it('finishes immediately when global motion is reduced', async () => {
@@ -296,7 +303,7 @@ describe('motion primitives', () => {
     const panel = document.body.querySelector('.panel') as HTMLElement
     expect(panel.style.transition).toContain('1ms')
     expect(panel.style.transform).toBe(
-      'translate3d(0, var(--fsus-motion-distance-xs, 4px), 0)',
+      'translate3d(0, var(--fsus-motion-emphasized-short-distance, 12px), 0)',
     )
 
     vi.runAllTimers()

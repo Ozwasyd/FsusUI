@@ -1,5 +1,5 @@
 import { unref } from 'vue'
-import { getMotionPreset } from '../presets'
+import { getMotionPreset, getMotionPresetBundle } from '../presets'
 import type { Ref } from 'vue'
 import type { MotionPresetName, MotionStyleState } from '../types'
 
@@ -38,9 +38,10 @@ export const getGsapPresetVars = (
   duration?: string | number,
 ) => {
   const preset = getMotionPreset(name)
+  const bundle = getMotionPresetBundle(name)
   return {
-    duration: millisecondsToSeconds(duration || preset.duration),
-    ease: resolveGsapEase(preset.easing),
+    duration: millisecondsToSeconds(duration || bundle.duration),
+    ease: resolveGsapEase(bundle.easing),
     from: preset.from as Record<string, string>,
     to: preset.to as Record<string, string>,
   }

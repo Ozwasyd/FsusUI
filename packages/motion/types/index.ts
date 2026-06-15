@@ -100,16 +100,14 @@ export type MotionRecipeName = (typeof motionRecipeNames)[number]
 
 export type MotionTokenScale<T extends string> = Record<T, string>
 
+// Pattern-tier bundle — see tokens/index.ts for the 4×2 matrix.
+export type MotionPattern = 'emphasized' | 'standard' | 'decel' | 'accel'
+export type MotionTier = 'short' | 'long'
+
+// Re-exported from tokens to keep a single canonical location.
 export type MotionTokens = {
-  duration: MotionTokenScale<
-    'instant' | 'fast' | 'base' | 'slow' | 'panel' | 'route'
-  >
-  easing: MotionTokenScale<
-    'linear' | 'standard' | 'emphasized' | 'decelerate' | 'accelerate'
-  >
-  distance: MotionTokenScale<'none' | 'xs' | 'sm' | 'md' | 'lg'>
-  stagger: MotionTokenScale<'none' | 'tight' | 'base' | 'loose'>
-  intensity: MotionTokenScale<'subtle' | 'standard' | 'expressive'>
+  patterns: Record<MotionPattern, Record<MotionTier, MotionTokenScale<string>>>
+  instant: string
 }
 
 export type MotionStyleState = {
@@ -120,8 +118,8 @@ export type MotionStyleState = {
 
 export type MotionPresetDefinition = {
   name: MotionPresetName
-  duration: string
-  easing: string
+  pattern: MotionPattern
+  tier: MotionTier
   delay?: string
   stagger?: string
   surfaces: readonly MotionSurfaceCategory[]
@@ -147,7 +145,8 @@ export type MotionRecipeDefinition = {
   name: MotionRecipeName
   intent: string
   preset: MotionPresetName
-  durationClass: 'instant' | 'fast' | 'base' | 'slow' | 'panel' | 'route'
+  pattern: MotionPattern
+  tier: MotionTier
   allowedTargets: readonly string[]
   reducedFallback: 'terminal' | 'opacity-only'
   disabledFallback: 'terminal'

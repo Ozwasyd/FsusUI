@@ -1,4 +1,4 @@
-import { getMotionPreset, resolveMotionPresetName } from './presets'
+import { getMotionPreset, getMotionPresetBundle, resolveMotionPresetName } from './presets'
 import { isMotionReduced } from './preference'
 import {
   claimMotionBudgetNode,
@@ -54,16 +54,17 @@ const applyStyleState = (el: HTMLElement, state: MotionStyleState) => {
 
 const resolveDelay = (
   preset: MotionPresetDefinition,
+  bundle: { stagger: string },
   options: MotionRunOptions,
 ) => {
   const directDelay = toTimeValue(options.delay, preset.delay || '0ms')
-  if (!preset.stagger || options.index === undefined) return directDelay
+  const stagger = preset.stagger ?? bundle.stagger
+  if (!stagger || options.index === undefined) return directDelay
 
   const budget = resolveMotionBudget(options.budget)
   const index = clampStaggerIndex(options.index ?? 0, budget)
   if (index <= 0) return directDelay
 
-  const stagger = preset.stagger || '0ms'
   const numericStagger = numericTimeValue(stagger)
   if (numericStagger !== undefined) {
     return `${numericStagger * index}ms`
@@ -78,9 +79,10 @@ const transitionFor = (
   state: MotionStyleState,
   budget: MotionBudgetConfig,
 ) => {
-  const duration = toTimeValue(options.duration, preset.duration)
-  const delay = resolveDelay(preset, options)
-  const easing = options.easing || preset.easing
+  const bundle = getMotionPresetBundle(preset.name)
+  const duration = toTimeValue(options.duration, bundle.duration)
+  const delay = resolveDelay(preset, bundle, options)
+  const easing = options.easing || bundle.easing
   const properties = transitionProperties.filter(
     (property) => property in state && isMotionPropertyAllowed(property, budget),
   )
