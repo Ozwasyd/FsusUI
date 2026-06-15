@@ -372,11 +372,11 @@ $checkbox: map.merge(
     'disabled-checked-input-fill': getCssVar('border-color-extra-light'),
     'disabled-checked-input-border-color': getCssVar('border-color'),
     'disabled-checked-icon-color': getCssVar('text-color-placeholder'),
-    'checked-text-color': getCssVar('color-primary'),
-    'checked-input-border-color': getCssVar('color-primary'),
-    'checked-bg-color': getCssVar('color-primary'),
+    'checked-text-color': getCssVar('color', 'scholarly-blue'),
+    'checked-input-border-color': getCssVar('color', 'scholarly-blue'),
+    'checked-bg-color': getCssVar('color', 'scholarly-blue'),
     'checked-icon-color': getCssVar('color', 'white'),
-    'input-border-color-hover': getCssVar('color-primary'),
+    'input-border-color-hover': getCssVar('color', 'scholarly-blue'),
   ),
   $checkbox
 );
@@ -384,9 +384,9 @@ $checkbox: map.merge(
 $checkbox-button: () !default;
 $checkbox-button: map.merge(
   (
-    'checked-bg-color': getCssVar('color-primary'),
+    'checked-bg-color': getCssVar('color', 'scholarly-blue'),
     'checked-text-color': getCssVar('color-white'),
-    'checked-border-color': getCssVar('color-primary'),
+    'checked-border-color': getCssVar('color', 'scholarly-blue'),
   ),
   $checkbox-button
 );
@@ -425,7 +425,7 @@ $radio: map.merge(
     'input-bg-color': getCssVar('fill-color', 'blank'),
     'input-border': getCssVar('border'),
     'input-border-color': getCssVar('border-color'),
-    'input-border-color-hover': getCssVar('color-primary'),
+    'input-border-color-hover': getCssVar('color', 'scholarly-blue'),
   ),
   $radio
 );
@@ -436,9 +436,9 @@ $radio-height: map.merge($common-component-size, $radio-height);
 $radio-button: () !default;
 $radio-button: map.merge(
   (
-    'checked-bg-color': getCssVar('color-primary'),
+    'checked-bg-color': getCssVar('color', 'scholarly-blue'),
     'checked-text-color': getCssVar('color-white'),
-    'checked-border-color': getCssVar('color-primary'),
+    'checked-border-color': getCssVar('color', 'scholarly-blue'),
     'disabled-checked-fill': getCssVar('border-color-extra-light'),
   ),
   $radio-button
@@ -460,9 +460,9 @@ $radio-disabled: map.merge(
 $radio-checked: () !default;
 $radio-checked: map.merge(
   (
-    'text-color': getCssVar('color-primary'),
-    'input-border-color': getCssVar('color-primary'),
-    'icon-color': getCssVar('color-primary'),
+    'text-color': getCssVar('color', 'scholarly-blue'),
+    'input-border-color': getCssVar('color', 'scholarly-blue'),
+    'icon-color': getCssVar('color', 'scholarly-blue'),
   ),
   $radio-checked
 );
@@ -633,7 +633,7 @@ $input: map.merge(
     'text-color': getCssVar('text-color-regular'),
     'border': getCssVar('border'),
     'hover-border': getCssVar('border-color-hover'),
-    'focus-border': getCssVar('color-primary'),
+    'focus-border': getCssVar('color-scholarly-blue'),
     'transparent-border': 0 0 0 1px transparent inset,
     'border-color': getCssVar('border-color'),
     'border-radius': getCssVar('border-radius-small'),
@@ -701,7 +701,7 @@ $cascader: () !default;
 $cascader: map.merge(
   (
     'menu-text-color': getCssVar('text-color-regular'),
-    'menu-selected-text-color': getCssVar('color-primary'),
+    'menu-selected-text-color': getCssVar('color', 'scholarly-blue'),
     'menu-fill': getCssVar('bg-color', 'overlay'),
     'menu-font-size': getCssVar('font-size-base'),
     'menu-radius': getCssVar('border-radius-small'),
@@ -829,7 +829,7 @@ $button-padding-horizontal: map.merge(
 $switch: () !default;
 $switch: map.merge(
   (
-    'on-color': getCssVar('color-primary'),
+    'on-color': getCssVar('color', 'scholarly-blue'),
     'off-color': getCssVar('border-color'),
   ),
   $switch

@@ -106,7 +106,7 @@ $switch-content-padding: map.merge(
     color: getCssVar('text-color', 'primary');
 
     @include when(active) {
-      color: getCssVar('color-primary');
+      color: getCssVar('color', 'scholarly-blue');
     }
 
     @include m(left) {

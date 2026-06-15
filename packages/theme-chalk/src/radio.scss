@@ -48,7 +48,7 @@ $radio-font-size: map.merge(
     box-sizing: border-box;
 
     &.is-checked {
-      border-color: getCssVar('color-primary');
+      border-color: getCssVar('color', 'scholarly-blue');
     }
 
     &.is-disabled {

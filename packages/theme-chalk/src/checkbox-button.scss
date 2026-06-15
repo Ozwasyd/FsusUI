@@ -48,7 +48,7 @@
     );
 
     &:hover {
-      color: getCssVar('color-primary');
+      color: getCssVar('color', 'scholarly-blue');
     }
 
     & [class*='#{$namespace}-icon-'] {
