@@ -194,8 +194,8 @@
     height: 20px;
     padding: 0 6px;
     border-radius: 999px;
-    background: var(--fsus-scholarly-blue, #2a599c);
-    color: #fff;
+    background: var(--fsus-badge-emphasis-bg, var(--fsus-scholarly-blue));
+    color: var(--fsus-badge-emphasis-text, var(--fsus-color-surface-base));
     font-size: 11px;
     font-weight: 800;
     line-height: 1;

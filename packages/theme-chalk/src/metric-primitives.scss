@@ -140,7 +140,7 @@
     display: block;
     height: 100%;
     border-radius: inherit;
-    background: getCssVar('color-primary');
+    background: var(--fsus-metric-accent, var(--fsus-scholarly-blue));
   }
 }
 

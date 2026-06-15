@@ -921,6 +921,10 @@ describe('Fsus theme visual baseline', () => {
       'flex-wrap: wrap;',
       'gap: 6px;',
     ])
+    expectCssRule(css, '.el-section-nav__link:focus-visible', [
+      'outline: none !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+    ])
     expectCssRule(css, '.el-settings-section', [
       'display: grid;',
       'border-top: 1px solid var(--el-border-color-lighter);',
@@ -947,6 +951,9 @@ describe('Fsus theme visual baseline', () => {
     ])
     expect(css).toContain('@media (max-width: 640px)')
     expect(css).toContain('grid-template-columns: minmax(0, 1fr);')
+    expect(css).not.toMatch(
+      /\.el-section-nav__link:hover,\s*\.el-section-nav__link:focus-visible\s*\{[^}]*outline: none;/s,
+    )
     expect(css).not.toMatch(/\.el-settings-section\s*\{[^}]*box-shadow:/s)
     expect(css).not.toMatch(/gradient|backdrop-filter|blur\(/)
   })
@@ -966,6 +973,9 @@ describe('Fsus theme visual baseline', () => {
       'grid-column: 2/-1;',
       'height: 6px;',
     ])
+    expectCssRule(css, '.el-distribution-bar-row__bar-fill', [
+      'background: var(--fsus-metric-accent, var(--fsus-scholarly-blue));',
+    ])
     expectCssRule(css, '.el-key-value-grid', [
       'display: grid;',
       'grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));',
@@ -975,6 +985,9 @@ describe('Fsus theme visual baseline', () => {
       'overflow-wrap: anywhere;',
     ])
     expect(css).toContain('@media (max-width: 640px)')
+    expect(css).not.toMatch(
+      /\.el-distribution-bar-row__bar-fill\s*\{[^}]*var\(--el-color-primary\)/s,
+    )
     expect(css).not.toMatch(/gradient|backdrop-filter|blur\(/)
   })
 
@@ -1023,8 +1036,15 @@ describe('Fsus theme visual baseline', () => {
       'white-space: pre-wrap;',
       'overflow-wrap: anywhere;',
     ])
+    expectCssRule(css, '.el-conversation-list-item__unread', [
+      'background: var(--fsus-badge-emphasis-bg, var(--fsus-scholarly-blue));',
+      'color: var(--fsus-badge-emphasis-text, var(--fsus-color-surface-base));',
+    ])
     expect(css).toContain(
       '.el-inbox-layout.el-inbox-layout--mobile-list .el-inbox-layout__detail',
+    )
+    expect(css).not.toMatch(
+      /\.el-conversation-list-item__unread\s*\{[^}]*color: #fff;/s,
     )
     expect(css).not.toMatch(
       /\.el-(?:inbox-layout|split-pane|message-bubble)[^{]*\{[^}]*(?:linear-gradient|backdrop-filter|filter:\s*blur)/s,

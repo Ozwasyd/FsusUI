@@ -30,12 +30,17 @@
       border-color getCssVar('transition-duration'),
       color getCssVar('transition-duration');
 
-    &:hover,
+    &:hover {
+      border-color: getCssVar('border-color-lighter');
+      background: getCssVar('fill-color', 'light');
+      color: getCssVar('text-color', 'primary');
+    }
+
     &:focus-visible {
       border-color: getCssVar('border-color-lighter');
       background: getCssVar('fill-color', 'light');
       color: getCssVar('text-color', 'primary');
-      outline: none;
+      @include a11y-focus-ring(2px, var(--fsus-radius-control-small, 6px));
     }
 
     @include when(current) {

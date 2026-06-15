@@ -100,6 +100,9 @@
   --fsus-state-selected-bg: rgba(42, 89, 156, 0.05);
   --fsus-state-emphasis-bg: rgba(42, 89, 156, 0.08);
   --fsus-state-focus-border: rgba(42, 89, 156, 0.28);
+  --fsus-metric-accent: var(--fsus-scholarly-blue);
+  --fsus-badge-emphasis-bg: var(--fsus-scholarly-blue);
+  --fsus-badge-emphasis-text: var(--fsus-color-surface-base);
 
   --fsus-shadow-panel: none;
   --fsus-shadow-panel-light: 0 8px 24px rgba(15, 23, 42, 0.05);
