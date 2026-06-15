@@ -84,9 +84,11 @@ FsusBlog 侧的消费规则：页面只消费 FsusUI 导出的 component / direc
 
 ### 本地入口
 
-- `verify` 是本地最小总入口，对齐 CI 的核心门槛
-- `verify` 不包含视觉回归；发布前仍需显式执行 `test:visual`
-- `verify:release` 用于发布前完整核验
+- `verify:pr-fast` 是 PR 默认快速门，用于小改动迭代；它覆盖 lint、按变更路径选择的 affected typecheck/unit、token/icon/design governance 和最小包构建 smoke。
+- `verify:full` 是完整本地质量门，等价于历史 `verify` 的覆盖面。
+- `verify` 保留为 `verify:full` 的安全别名，避免旧命令降低检查覆盖。
+- `verify:release` 用于发布前完整核验，在 `verify:full` 基础上增加 npm dist-tag、package build 和 consumer-install。
+- `verify:release` 不替代视觉/覆盖率证据；发布前仍需显式执行 `test:coverage` 与 `test:visual`。
 
 ### CI 入口
 
@@ -95,6 +97,9 @@ FsusBlog 侧的消费规则：页面只消费 FsusUI 导出的 component / direc
 - `publish-npm.yml` 必须依赖质量门通过后再发布
 
 当前 CI job 分工：
+
+- `quality.yml` 在 `pull_request` 默认运行 `verify:pr-fast`
+- `quality.yml` 在 `push` / `workflow_dispatch` 继续调用 `_quality.yml` full gate
 
 - `lint`
 - `typecheck`
@@ -108,15 +113,13 @@ FsusBlog 侧的消费规则：页面只消费 FsusUI 导出的 component / direc
 
 建议始终按下面顺序排查，避免同时处理多条链路：
 
-1. `pnpm lint`
-2. `pnpm typecheck`
-3. `pnpm test:run`
-4. `pnpm build`
-5. `pnpm build:demo`
-6. `pnpm test:coverage`
-7. `pnpm test:visual`
-8. `pnpm run check:npm-dist-tag`
-9. `pnpm run build:npm-package`
+1. `pnpm verify:pr-fast`
+2. `pnpm verify:full`
+3. `pnpm test:coverage`
+4. `pnpm test:visual`
+5. `pnpm verify:release`
+6. `pnpm run check:npm-dist-tag`
+7. `pnpm run build:npm-package`
 
 高频问题与对应位置：
 

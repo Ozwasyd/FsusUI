@@ -70,7 +70,7 @@ const requiredSnippets = new Map([
   [
     'docs/guide/quickstart.md',
     [
-      `import ElementPlus from '${packageName}'`,
+      `import FsusUI from '${packageName}'`,
       `import '${packageName}/dist/index.css'`,
       `"types": ["${packageName}/global"]`,
     ],

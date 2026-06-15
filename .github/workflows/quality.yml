@@ -6,7 +6,32 @@ on:
     branches:
       - main
       - master
+  workflow_dispatch:
 
 jobs:
-  quality:
+  pr-fast:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run verify:pr-fast
+
+  full:
+    if: github.event_name != 'pull_request'
     uses: ./.github/workflows/_quality.yml

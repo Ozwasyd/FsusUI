@@ -11,15 +11,20 @@
 
 Public preview 的 registry 策略、包名策略、dist-tag 策略和 provenance 要求见 [npm Registry Publishing Policy](./release/npm-registry-policy.md)。旧的包注册表自动发布流程已移入 `docs/archive/github-packages/`，仅作历史参考，不再自动发布，也不作为 npm 发布后的镜像。
 
+常用验证门分为三层：
+
+- `pnpm verify:pr-fast`：PR 默认快速门，覆盖 lint、按变更路径选择的 affected typecheck/unit、token/icon/design governance 和最小包构建 smoke，不包含 demo build、coverage、visual 或发布包安装。
+- `pnpm verify:full`：完整本地质量门，等价于历史 `pnpm verify` 行为，包含 `prepare:test-artifacts`、`_verify:parallel` 和 `build:demo`。
+- `pnpm verify:release`：发布候选门，在 `verify:full` 之上增加 npm dist-tag、npm package 和 consumer-install 检查。
+
+`pnpm verify` 保留为 `verify:full` 的安全别名，避免旧脚本降级覆盖面。
+
 发布前必须先通过：
 
 ```bash
-pnpm verify
+pnpm verify:release
 pnpm test:coverage
 pnpm test:visual
-pnpm run check:npm-dist-tag
-pnpm run build:npm-package
-pnpm test:consumer-install
 ```
 
 ## 2. Changesets 流程
@@ -43,14 +48,11 @@ pnpm test:consumer-install
 
 发布前按以下顺序检查：
 
-1. `pnpm verify`
+1. `pnpm verify:release`
 2. `pnpm test:coverage`
 3. `pnpm test:visual`
-4. `pnpm run check:npm-dist-tag`
-5. `pnpm run build:npm-package`
-6. `pnpm test:consumer-install`
-7. 检查 `dist/element-plus/package.json`
-8. 补充 `npm pack --dry-run` / `pnpm pack --dry-run` 记录，并更新 `release-evidence/npm-public-preview/`
+4. 检查 `dist/element-plus/package.json`
+5. 补充 `npm pack --dry-run` / `pnpm pack --dry-run` 记录，并更新 `release-evidence/npm-public-preview/`
 
 发布工件检查重点：
 
@@ -130,6 +132,8 @@ workspace 依赖归一化由 `scripts/prepare-npm-package.mjs` 负责，当前�
 本轮治理已固定这些工程接口：
 
 - `verify`
+- `verify:pr-fast`
+- `verify:full`
 - `check:consumer-contract`
 - `verify:release`
 - `test:coverage`

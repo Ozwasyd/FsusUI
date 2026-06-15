@@ -83,7 +83,7 @@ if (
 }
 
 const referenceBlock = popoverSource.match(
-  /@include e\(reference\)\s*\{(?<body>[\s\S]*?)\n    \}/u,
+  /@include e\(reference\)\s*\{(?<body>[\s\S]*?)\n {4}\}/u,
 )
 
 if (!referenceBlock?.groups?.body) {

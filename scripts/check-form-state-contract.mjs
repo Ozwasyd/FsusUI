@@ -71,7 +71,7 @@ for (const file of [
 
 const timeSelectSource = read('packages/theme-chalk/src/time-select.scss')
 const selectedBlock = timeSelectSource.match(
-  /\.time-select-item\.selected:not\(\.disabled\)\s*\{(?<body>[\s\S]*?)\n  \}/u,
+  /\.time-select-item\.selected:not\(\.disabled\)\s*\{(?<body>[\s\S]*?)\n {2}\}/u,
 )
 
 if (!selectedBlock?.groups?.body) {

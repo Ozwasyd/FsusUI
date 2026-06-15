@@ -37,6 +37,14 @@ const assertMappingStatus = (content, component, status) => {
   )
 }
 
+const assertTableRow = (content, cells, file) => {
+  const pattern = new RegExp(
+    `${cells.map((cell) => String.raw`\|\s*${escapeRegExp(cell)}\s*`).join('')}\\|`,
+    'u',
+  )
+  assert(pattern.test(content), `${file} must include table row ${cells.join(' | ')}`)
+}
+
 try {
   const source = JSON.parse(read('spec/tokens/tokens.json'))
   const tokens = new Map(source.tokens.map((token) => [token.name, token]))
@@ -94,15 +102,19 @@ try {
   )
 
   const design = read('docs/design.md')
+  for (const row of [
+    ['Small control', '`4px`'],
+    ['Control', '`6px`'],
+    ['Popover', '`10px`'],
+    ['Panel', '`12px`'],
+    ['Control radius', '`6px`'],
+    ['Small control radius', '`4px`'],
+    ['Backdrop blur', '`0px`'],
+    ['Panel shadow', '`none`'],
+  ]) {
+    assertTableRow(design, row, 'docs/design.md')
+  }
   for (const expected of [
-    '| Small control | `4px`',
-    '| Control       | `6px`',
-    '| Popover       | `10px`',
-    '| Panel         | `12px`',
-    '| Control radius         | `6px`',
-    '| Small control radius   | `4px`',
-    '| Backdrop blur          | `0px`',
-    '| Panel shadow           | `none`',
     'glass/SaaS-first',
     '--fsus-shadow-panel: none',
   ]) {
