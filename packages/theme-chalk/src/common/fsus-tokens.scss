@@ -131,6 +131,13 @@
   --fsus-tree-drop-inner-bg: var(--fsus-state-emphasis-bg);
   --fsus-tree-drop-inner-text: var(--fsus-ink);
   --fsus-tree-current-bg: var(--fsus-state-selected-bg);
+  --fsus-select-v2-focus-border: var(--fsus-state-focus-border);
+  --fsus-select-v2-tag-close-bg: var(--fsus-text-placeholder);
+  --fsus-select-v2-tag-close-icon: var(--fsus-color-surface-base);
+  --fsus-select-v2-tag-close-hover-bg: var(--fsus-text-regular);
+  --fsus-select-option-selected-bg: var(--fsus-state-selected-bg);
+  --fsus-select-option-selected-text: var(--fsus-scholarly-blue);
+  --fsus-select-option-hover-bg: var(--fsus-state-hover-bg);
 
   --fsus-shadow-panel: none;
   --fsus-shadow-panel-light: 0 8px 24px rgba(15, 23, 42, 0.05);

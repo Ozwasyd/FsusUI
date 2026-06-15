@@ -5,8 +5,17 @@
 @use 'common/var' as *;
 
 @include b(select-dropdown) {
+  @include set-component-css-var('select-dropdown', $select-dropdown);
+
+  --el-select-dropdown-border-radius: var(--fsus-radius-popover, 10px);
+  --el-select-dropdown-shadow: var(--fsus-shadow-panel, none);
+
   z-index: calc(#{getCssVar('index-top')} + 1);
-  border-radius: getCssVar('border-radius-small');
+  border-radius: var(--el-select-dropdown-border-radius);
+  background-color: getCssVar('select-dropdown', 'bg-color');
+  box-shadow: var(--el-select-dropdown-shadow);
+  border: getCssVar('select-dropdown', 'border');
+  overflow: hidden;
   box-sizing: border-box;
 
   .#{$namespace}-scrollbar.is-empty .#{$namespace}-select-dropdown__list {

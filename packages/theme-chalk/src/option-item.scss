@@ -29,28 +29,53 @@
     }
 
     @include when(selected) {
-      background-color: map.get($select-option, 'hover-background');
-      font-weight: 700;
+      background-color: var(
+        --fsus-select-option-selected-bg,
+        var(--fsus-state-selected-bg)
+      );
+      font-weight: 500;
 
       &:not(.is-multiple) {
-        color: map.get($select-option, 'selected-text-color');
+        color: var(
+          --fsus-select-option-selected-text,
+          var(--fsus-scholarly-blue)
+        );
       }
     }
 
     &.hover {
-      background-color: map.get($select-option, 'hover-background') !important;
+      background-color: var(
+        --fsus-select-option-hover-bg,
+        var(--fsus-state-hover-bg)
+      ) !important;
+    }
+
+    &.is-selected.hover {
+      background-color: var(
+        --fsus-select-option-selected-bg,
+        var(--fsus-state-selected-bg)
+      ) !important;
     }
 
     &:hover {
-      background-color: map.get($select-option, 'hover-background');
+      background-color: var(
+        --fsus-select-option-hover-bg,
+        var(--fsus-state-hover-bg)
+      );
     }
   }
 
   @include when(multiple) {
     .#{$namespace}-select-dropdown__option-item {
       &.is-selected {
-        color: map.get($select-option, 'selected-text-color');
-        background-color: map.get($select-dropdown, 'bg-color');
+        color: var(
+          --fsus-select-option-selected-text,
+          var(--fsus-scholarly-blue)
+        );
+        background-color: var(
+          --fsus-select-option-selected-bg,
+          var(--fsus-state-selected-bg)
+        );
 
         & .#{$namespace}-icon {
           position: absolute;

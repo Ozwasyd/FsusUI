@@ -863,6 +863,52 @@ describe('Fsus theme visual baseline', () => {
     )
   })
 
+  test('keeps select v2 focus dropdown and selected states tokenized', () => {
+    const selectCss = compileThemeFile('select-v2.scss')
+    const dropdownCss = compileThemeFile('select-dropdown-v2.scss')
+    const optionCss = compileThemeFile('option-item.scss')
+
+    expectCssRule(selectCss, '.el-select-v2__wrapper', [
+      'border-radius: var(--fsus-radius-control-small, var(--el-border-radius-small));',
+      'transition: border-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), box-shadow var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+    ])
+    expectCssRule(selectCss, '.el-select-v2__wrapper.is-focused', [
+      'border-color: var(--fsus-select-v2-focus-border, var(--fsus-state-focus-border));',
+      'outline: none !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+    ])
+    expectCssRule(
+      selectCss,
+      '.el-select-v2 .el-select-v2__selection .el-tag .el-icon-close',
+      [
+        'background-color: var(--fsus-select-v2-tag-close-bg, var(--fsus-text-placeholder));',
+        'color: var(--fsus-select-v2-tag-close-icon, var(--fsus-color-surface-base));',
+      ],
+    )
+    expectCssRule(dropdownCss, '.el-select-dropdown', [
+      '--el-select-dropdown-border-radius: var(--fsus-radius-popover, 10px);',
+      '--el-select-dropdown-shadow: var(--fsus-shadow-panel, none);',
+      'border-radius: var(--el-select-dropdown-border-radius);',
+      'box-shadow: var(--el-select-dropdown-shadow);',
+      'overflow: hidden;',
+    ])
+    expectCssRule(optionCss, '.el-select-dropdown__option-item.is-selected', [
+      'background-color: var(--fsus-select-option-selected-bg, var(--fsus-state-selected-bg));',
+      'font-weight: 500;',
+    ])
+    expectCssRule(
+      optionCss,
+      '.el-select-dropdown__option-item.is-selected:not(.is-multiple)',
+      [
+        'color: var(--fsus-select-option-selected-text, var(--fsus-scholarly-blue));',
+      ],
+    )
+    expect(optionCss).not.toContain('font-weight: 700;')
+    expect(selectCss).not.toContain('var(--el-color-primary)')
+    expect(selectCss).not.toContain('var(--el-color-white)')
+    expect(dropdownCss).not.toContain('border-radius: var(--el-border-radius-small);')
+  })
+
   test('keeps calendar header controls border-first', () => {
     const css = compileThemeFile('calendar.scss')
 

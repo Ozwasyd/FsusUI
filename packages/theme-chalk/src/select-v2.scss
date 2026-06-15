@@ -30,9 +30,16 @@ $input-inline-start: map.get($input-padding-horizontal, 'default') !default;
     cursor: pointer;
     padding: 1px 30px 1px 0;
     border: 1px solid getCssVar('border-color');
-    border-radius: getCssVar('border-radius-small');
+    border-radius: var(
+      --fsus-radius-control-small,
+      var(--el-border-radius-small)
+    );
     background-color: getCssVar('fill-color', 'blank');
-    transition: getCssVar('transition', 'duration');
+    transition:
+      border-color var(--fsus-motion-control-fast, 160ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+      box-shadow var(--fsus-motion-control-fast, 160ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
 
     &:hover {
       border-color: getCssVar('text-color', 'placeholder');
@@ -43,7 +50,14 @@ $input-inline-start: map.get($input-padding-horizontal, 'default') !default;
     }
 
     @include when(focused) {
-      border-color: getCssVar('color-primary');
+      border-color: var(
+        --fsus-select-v2-focus-border,
+        var(--fsus-state-focus-border)
+      );
+      @include a11y-focus-ring(
+        2px,
+        var(--fsus-radius-control-small, var(--el-border-radius-small))
+      );
     }
 
     @include when(hovering) {
@@ -322,12 +336,21 @@ $input-inline-start: map.get($input-padding-horizontal, 'default') !default;
     background-color: getCssVar('fill-color');
 
     .#{$namespace}-icon-close {
-      background-color: getCssVar('text-color', 'placeholder');
+      background-color: var(
+        --fsus-select-v2-tag-close-bg,
+        var(--fsus-text-placeholder)
+      );
       right: -7px;
-      color: getCssVar('color-white');
+      color: var(
+        --fsus-select-v2-tag-close-icon,
+        var(--fsus-color-surface-base)
+      );
 
       &:hover {
-        background-color: getCssVar('text-color', 'secondary');
+        background-color: var(
+          --fsus-select-v2-tag-close-hover-bg,
+          var(--fsus-text-regular)
+        );
       }
 
       &::before {
