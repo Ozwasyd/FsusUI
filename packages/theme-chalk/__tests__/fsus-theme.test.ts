@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { compile } from 'sass'
@@ -944,6 +945,67 @@ describe('Fsus theme visual baseline', () => {
     expect(css).not.toContain('var(--el-border-radius-base)')
     expect(css).not.toContain('var(--el-color-white)')
     expect(css).not.toContain('var(--el-color-black)')
+  })
+
+  test('keeps color picker interaction chrome tokenized while preserving color-space gradients', () => {
+    const css = compileThemeFile('color-picker.scss')
+    const docs = readFileSync(
+      path.resolve(dirname, '../../../docs/components/color-picker.md'),
+      'utf8',
+    )
+
+    expectCssRule(css, '.el-color-hue-slider__thumb', [
+      'background: var(--fsus-color-picker-thumb-bg, var(--fsus-color-surface-base));',
+      'border: 1px solid var(--fsus-color-picker-thumb-border, var(--fsus-border));',
+      'box-shadow: var(--fsus-color-picker-thumb-shadow, var(--fsus-shadow-panel-lighter));',
+      'will-change: left, top;',
+    ])
+    expectCssRule(css, '.el-color-svpanel__cursor > div', [
+      'background-color: var(--fsus-color-picker-thumb-bg, var(--fsus-color-surface-base));',
+      'border: 1px solid var(--fsus-color-picker-thumb-border, var(--fsus-border));',
+      'box-shadow: var(--fsus-color-picker-thumb-shadow, var(--fsus-shadow-panel-lighter));',
+    ])
+
+    for (const selector of [
+      '.el-color-hue-slider:active .el-color-hue-slider__thumb',
+      '.el-color-alpha-slider:active .el-color-alpha-slider__thumb',
+      '.el-color-svpanel:active .el-color-svpanel__cursor > div',
+      '.el-color-svpanel.is-dragging .el-color-svpanel__cursor > div',
+    ]) {
+      expectCssRule(css, selector, [
+        'box-shadow: 0 0 0 2px var(--fsus-color-picker-active-ring, var(--fsus-state-focus-border));',
+        'filter: none;',
+      ])
+    }
+
+    expectCssRule(css, '.el-color-predefine__color-selector.selected', [
+      'box-shadow: inset 0 0 0 2px var(--fsus-color-picker-selected-ring, var(--fsus-state-focus-border));',
+    ])
+    expectCssRule(css, '.el-color-picker.is-focused .el-color-picker__trigger', [
+      'border-color: var(--fsus-color-picker-focus-border, var(--fsus-state-focus-border));',
+    ])
+    expectCssRule(css, '.el-color-dropdown__value', [
+      'color: var(--fsus-color-picker-value-text, var(--fsus-ink));',
+    ])
+    expectCssRule(css, '.el-color-picker__icon', [
+      'color: var(--fsus-color-picker-icon-contrast, var(--fsus-color-surface-base));',
+    ])
+    expectCssRule(css, '.el-color-picker__mask', [
+      'background-color: var(--fsus-color-picker-mask-bg, var(--fsus-overlay-color));',
+    ])
+
+    expect(css).toContain(
+      'linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)',
+    )
+    expect(css).not.toContain('filter: blur(')
+    expect(css).not.toContain('--fsus-interactive-motion-glow')
+    expect(css).not.toContain('--fsus-motion-slider-trail')
+    expect(css).not.toMatch(
+      /\.el-color-predefine__color-selector\.selected\s*\{[^}]*var\(--el-color-primary\)/s,
+    )
+
+    expect(docs).toContain('color-space gradients')
+    expect(docs).toContain('ColorPicker chrome')
   })
 
   test('keeps calendar header controls border-first', () => {

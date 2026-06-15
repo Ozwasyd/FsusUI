@@ -22,6 +22,12 @@
 
 通过 `size` 设置尺寸。
 
+## 主题契约
+
+ColorPicker chrome（触发器、滑块 thumb、SV 光标、预设色选中态、遮罩与下拉面板）使用 Fsus surface、border、focus 与 shadow token。默认 active/dragging 反馈只保留静态 ring，不启用 blur 或 glow。
+
+Hue、SV 与 Alpha 面板里的 `color-space gradients` 是颜色模型本身的坐标背景，用来表达色相、饱和度、明度与透明度，不属于主题装饰色。调整主题 token 时应保留这些功能性渐变，并把外层交互 chrome 与它们分开处理。
+
 ---
 
 ## API

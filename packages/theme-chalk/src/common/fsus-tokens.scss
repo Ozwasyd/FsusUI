@@ -144,6 +144,21 @@
   --fsus-tooltip-v2-dark-bg: var(--fsus-ink);
   --fsus-tooltip-v2-dark-text: var(--fsus-color-surface-base);
   --fsus-tooltip-v2-dark-border: transparent;
+  --fsus-color-picker-thumb-bg: var(--fsus-color-surface-base);
+  --fsus-color-picker-thumb-border: var(--fsus-border);
+  --fsus-color-picker-thumb-shadow: var(--fsus-shadow-panel-lighter);
+  --fsus-color-picker-active-ring: var(--fsus-state-focus-border);
+  --fsus-color-picker-selected-ring: var(--fsus-state-focus-border);
+  --fsus-color-picker-trigger-border: var(--fsus-border);
+  --fsus-color-picker-hover-border: var(--fsus-state-focus-border);
+  --fsus-color-picker-focus-border: var(--fsus-state-focus-border);
+  --fsus-color-picker-swatch-border: var(--fsus-border);
+  --fsus-color-picker-value-text: var(--fsus-ink);
+  --fsus-color-picker-icon-contrast: var(--fsus-color-surface-base);
+  --fsus-color-picker-mask-bg: var(--fsus-overlay-color);
+  --fsus-color-picker-panel-bg: var(--fsus-surface-overlay);
+  --fsus-color-picker-panel-border: var(--fsus-border-lighter);
+  --fsus-color-picker-panel-shadow: var(--fsus-shadow-panel);
 
   --fsus-shadow-panel: none;
   --fsus-shadow-panel-light: 0 8px 24px rgba(15, 23, 42, 0.05);
