@@ -72,7 +72,7 @@
               ref="mobileSearchTriggerRef"
               type="button"
               :class="[ns.e('mobile-search-trigger'), ns.is('expanded', mobileSearchExpanded)]"
-              :aria-expanded="String(mobileSearchExpanded)"
+              :aria-expanded="mobileSearchExpanded"
               :aria-controls="mobileSearchRowId"
               :aria-label="mobileSearchButtonLabel"
               @click="toggleMobileSearch"
@@ -90,7 +90,7 @@
             :id="mobileSearchRowId"
             ref="mobileSearchRowRef"
             :class="[ns.e('mobile-search-row'), ns.is('expanded', mobileSearchExpanded)]"
-            :aria-hidden="String(!mobileSearchExpanded)"
+            :aria-hidden="!mobileSearchExpanded"
           >
             <slot name="mobile-search">
               <form
