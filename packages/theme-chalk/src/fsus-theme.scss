@@ -665,7 +665,7 @@ html.dark .#{$namespace}-switch__action {
 .#{$namespace}-result,
 .#{$namespace}-menu:not(.#{$namespace}-menu--horizontal):not(
     .#{$namespace}-sub-menu .#{$namespace}-menu
-  ):not(.#{$namespace}-menu--popup-container) {
+  ):not(.#{$namespace}-menu--popup-container):not(.#{$namespace}-menu--popup) {
   @include fsus-panel;
 }
 
@@ -1055,6 +1055,13 @@ button.#{$namespace}-card:active {
   box-shadow: var(--fsus-shadow-panel, none);
 }
 
+.#{$namespace}-menu--popup {
+  background: var(--el-bg-color-overlay);
+  border: 1px solid var(--el-border-color-light);
+  border-radius: var(--fsus-radius-popover);
+  box-shadow: var(--fsus-shadow-panel, none);
+}
+
 // 功能性下拉层：不透明白底，不使用 backdrop-filter，
 // 避免 blur 边缘虚化以及父容器滚动时因 GPU composite layer 重建导致的生硬跳动
 .#{$namespace}-popper.is-light,
@@ -1065,7 +1072,6 @@ button.#{$namespace}-card:active {
 .#{$namespace}-dropdown__popper,
 .#{$namespace}-autocomplete-suggestion,
 .#{$namespace}-color-picker__panel,
-.#{$namespace}-menu--popup,
 .#{$namespace}-tooltip-v2__content {
   background: var(--el-bg-color-overlay);
   backdrop-filter: blur(var(--fsus-backdrop-blur));
@@ -2750,11 +2756,11 @@ button.#{$namespace}-card:active {
   }
 
   .#{$namespace}-menu-item:not(.is-active):hover,
-  .#{$namespace}-menu-item:not(.is-active):focus,
+  .#{$namespace}-menu-item:not(.is-active):focus:not(:focus-visible),
   .#{$namespace}-sub-menu:not(.is-active)
     > .#{$namespace}-sub-menu__title:hover,
   .#{$namespace}-sub-menu:not(.is-active)
-    > .#{$namespace}-sub-menu__title:focus,
+    > .#{$namespace}-sub-menu__title:focus:not(:focus-visible),
   .#{$namespace}-tabs__item:not(.is-active):hover,
   .#{$namespace}-tabs__item:not(.is-active):focus,
   .#{$namespace}-pagination button:not(:disabled):hover,
