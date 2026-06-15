@@ -764,6 +764,33 @@ describe('Fsus theme visual baseline', () => {
     expect(css).not.toContain('background-color: #fff;')
   })
 
+  test('keeps steps state and motion tokenized', () => {
+    const css = compileThemeFile('step.scss')
+
+    expectCssRule(css, '.el-step__head.is-finish', [
+      'color: var(--fsus-step-finish-color, var(--fsus-scholarly-blue));',
+      'border-color: var(--fsus-step-finish-color, var(--fsus-scholarly-blue));',
+    ])
+    expectCssRule(css, '.el-step__title.is-finish', [
+      'color: var(--fsus-step-finish-color, var(--fsus-scholarly-blue));',
+    ])
+    expectCssRule(css, '.el-step__description.is-finish', [
+      'color: var(--fsus-step-finish-color, var(--fsus-scholarly-blue));',
+    ])
+    expectCssRule(css, '.el-step__icon', [
+      'transition: border-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), background-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+    ])
+    expectCssRule(css, '.el-step__line-inner', [
+      'transition: width var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), height var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), border-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+    ])
+    expectCssRule(css, '.el-step.is-simple .el-step__icon-inner.is-status', [
+      'transform: translateY(1px);',
+    ])
+    expect(css).not.toContain('var(--el-color-primary)')
+    expect(css).not.toContain('transition: 0.15s ease-out;')
+    expect(css).not.toContain('scale(0.8)')
+  })
+
   test('keeps calendar header controls border-first', () => {
     const css = compileThemeFile('calendar.scss')
 
