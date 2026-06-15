@@ -358,7 +358,7 @@
         &.#{$namespace}-table__fixed-right-patch {
           position: sticky !important;
           z-index: calc(getCssVar('table-index') + 1);
-          background: #fff;
+          background: getCssVar('table-tr-bg-color');
           right: 0;
         }
       }

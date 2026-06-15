@@ -635,6 +635,11 @@ describe('Fsus theme visual baseline', () => {
       '.el-table__header-wrapper tr td.el-table-fixed-column--right',
       ['background: var(--el-table-tr-bg-color);'],
     )
+    expectCssRule(
+      tableCss,
+      '.el-table__header-wrapper tr td.el-table__fixed-right-patch',
+      ['background: var(--el-table-tr-bg-color);'],
+    )
   })
 
   test('keeps dense action rows motion-safe and non-overlapping', () => {
