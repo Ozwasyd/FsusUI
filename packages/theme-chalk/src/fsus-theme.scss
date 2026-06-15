@@ -1049,9 +1049,15 @@ button.#{$namespace}-card:active {
   box-shadow: var(--fsus-shadow-panel, none);
 }
 
-.#{$namespace}-message,
 .#{$namespace}-notification {
   @include fsus-floating(18px);
+}
+
+.#{$namespace}-message {
+  background: var(--el-bg-color-overlay);
+  border: 1px solid var(--el-border-color-light);
+  border-radius: var(--fsus-radius-floating);
+  box-shadow: var(--fsus-shadow-floating);
 }
 
 .#{$namespace}-popover.#{$namespace}-popper {

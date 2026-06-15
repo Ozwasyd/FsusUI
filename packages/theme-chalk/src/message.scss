@@ -19,14 +19,12 @@
   top: 20px;
   transform: translate3d(-50%, var(--el-message-stack-y, 0px), 0);
   background-color: getCssVar('message', 'bg-color');
-  backdrop-filter: getCssVar('bg-color', 'overlay-blur');
-  -webkit-backdrop-filter: getCssVar('bg-color', 'overlay-blur');
-  box-shadow: getCssVar('box-shadow', 'light');
+  box-shadow: var(--fsus-shadow-floating);
   transition:
-    opacity getCssVar('transition-duration')
-      getCssVar('transition-function-fast-bezier'),
-    transform getCssVar('transition-duration')
-      getCssVar('transition-function-fast-bezier');
+    opacity var(--fsus-motion-control-fast, 160ms)
+      var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+    transform var(--fsus-motion-panel, 420ms)
+      var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));
   padding: getCssVar('message', 'padding');
   display: flex;
   align-items: center;
@@ -123,11 +121,7 @@
 .#{$namespace}-message-fade-enter-from,
 .#{$namespace}-message-fade-leave-to {
   opacity: 0;
-  transform: translate3d(
-    -50%,
-    calc(var(--el-message-stack-y, 0px) - 12px),
-    0
-  );
+  transform: translate3d(-50%, calc(var(--el-message-stack-y, 0px) - 12px), 0);
 }
 
 @media (prefers-reduced-motion: reduce) {
