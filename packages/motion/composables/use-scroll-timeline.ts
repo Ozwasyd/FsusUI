@@ -8,6 +8,7 @@ import {
   getGsapPresetVars,
   resolveMotionTarget,
   sanitizeGsapVars,
+  toGsapScrubSeconds,
 } from '../gsap/resolve'
 import { normalizeMotionRecipeOptions } from '../recipes'
 import { isMotionReducedOrDisabled } from '../runtime'
@@ -32,11 +33,17 @@ export type UseScrollTimelineOptions = {
   once?: boolean
   start?: string
   end?: string
-  scrub?: boolean | number
+  // Scrub smoothing: boolean for on/off, number/string for smoothing in
+  // seconds. Strings may carry an 'ms'/'s' suffix and are normalized via
+  // toGsapScrubSeconds.
+  scrub?: boolean | number | string
   scroller?: Element | Window | string
   markers?: boolean
   mode?: 'natural'
   reducedFallback?: 'terminal'
+  // Caller-supplied ScrollTrigger overrides. `pin` and `snap` are passed
+  // through to gsap verbatim when provided; the safe defaults (pin: false,
+  // snap: undefined) only apply when the caller omits them.
   scrollTrigger?: ScrollTrigger.StaticVars
 }
 
@@ -87,22 +94,28 @@ export const useScrollTimeline = (defaults: UseScrollTimelineOptions = {}) => {
 
     registerScrollTrigger()
 
-    const safeScrollTrigger = { ...options.scrollTrigger }
-    delete safeScrollTrigger.pin
-    delete safeScrollTrigger.snap
+    // Respect caller-supplied pin/snap. The safe defaults only kick in
+    // when the caller omits them; explicit values pass through.
+    const callerScrollTrigger = options.scrollTrigger ?? {}
+    const rest: ScrollTrigger.StaticVars = { ...callerScrollTrigger }
+    delete rest.pin
+    delete rest.snap
+    const pin = callerScrollTrigger.pin ?? false
+    const snap = callerScrollTrigger.snap
+
     const timeline = gsap.timeline({
       paused: false,
       scrollTrigger: {
         trigger,
         start: options.start || 'top 90%',
         end: options.end || 'bottom 10%',
-        scrub: options.scrub ?? true,
+        scrub: toGsapScrubSeconds(options.scrub ?? true),
         once: options.once,
         scroller: options.scroller,
         markers: options.markers,
-        ...safeScrollTrigger,
-        pin: false,
-        snap: undefined,
+        ...rest,
+        pin,
+        snap,
       },
     })
 

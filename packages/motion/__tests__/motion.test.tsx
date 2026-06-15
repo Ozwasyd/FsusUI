@@ -445,13 +445,33 @@ describe('motion primitives', () => {
     expect(reveal.tweens.size).toBe(0)
   })
 
-  it('creates natural scroll timelines without scroll-jacking options', () => {
+  it('respects caller-supplied ScrollTrigger pin and snap', () => {
     const el = document.createElement('div')
     document.body.append(el)
     const timeline = useScrollTimeline({
       target: el,
       segments: [{ from: 0, to: 0.5, recipe: 'content-enter' }],
       scrollTrigger: { pin: true, snap: 1 },
+    })
+
+    const created = timeline.create()
+
+    expect(isScrollTriggerRegistered()).toBe(true)
+    // Caller-supplied pin and snap pass through to gsap verbatim.
+    expect(created?.scrollTrigger?.vars.pin).toBe(true)
+    expect(created?.scrollTrigger?.vars.snap).toBe(1)
+    expect(timeline.timelines.size).toBe(1)
+
+    timeline.kill()
+    expect(timeline.timelines.size).toBe(0)
+  })
+
+  it('falls back to safe ScrollTrigger defaults when caller omits pin and snap', () => {
+    const el = document.createElement('div')
+    document.body.append(el)
+    const timeline = useScrollTimeline({
+      target: el,
+      segments: [{ from: 0, to: 0.5, recipe: 'content-enter' }],
     })
 
     const created = timeline.create()
