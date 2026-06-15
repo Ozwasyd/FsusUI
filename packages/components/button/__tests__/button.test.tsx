@@ -88,9 +88,11 @@ describe('Button.vue', () => {
   })
 
   it('applies component motion attrs', () => {
+    // `scale-fade` is a legacy alias that resolves to the intent-based
+    // `dialog-settle` via motionPresetAliases.
     const wrapper = mount(() => <Button motion="scale-fade" />)
 
-    expect(wrapper.attributes('data-fsus-motion-preset')).toBe('scale-fade')
+    expect(wrapper.attributes('data-fsus-motion-preset')).toBe('dialog-settle')
   })
 
   it('can disable component motion', () => {

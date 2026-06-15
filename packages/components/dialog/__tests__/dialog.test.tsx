@@ -20,6 +20,9 @@ describe('Dialog.vue', () => {
   })
 
   test('applies dialog motion attrs to the dialog surface', async () => {
+    // Legacy preset name `scale-fade` resolves to the intent-based
+    // equivalent `dialog-settle` via motionPresetAliases, so the
+    // data attribute reflects the resolved intent.
     const wrapper = mount(
       <Dialog modelValue={true} motion="scale-fade">
         {AXIOM}
@@ -29,7 +32,7 @@ describe('Dialog.vue', () => {
     await nextTick()
     expect(
       wrapper.find('.el-dialog').attributes('data-fsus-motion-preset'),
-    ).toBe('scale-fade')
+    ).toBe('dialog-settle')
   })
 
   test('can disable dialog motion', async () => {

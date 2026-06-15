@@ -18,9 +18,11 @@ describe('Card.vue', () => {
   })
 
   test('applies default card motion attrs', () => {
+    // The default `card-hover` is a legacy alias that resolves to the
+    // intent-based `paper-settle` via motionPresetAliases.
     const wrapper = mount(() => <Card>{AXIOM}</Card>)
 
-    expect(wrapper.attributes('data-fsus-motion-preset')).toBe('card-hover')
+    expect(wrapper.attributes('data-fsus-motion-preset')).toBe('paper-settle')
   })
 
   test('can disable card motion', () => {
