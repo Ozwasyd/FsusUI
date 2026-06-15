@@ -910,6 +910,36 @@ describe('Fsus theme visual baseline', () => {
     expect(dropdownCss).not.toContain('border-radius: var(--el-border-radius-small);')
   })
 
+  test('keeps autocomplete suggestion popper on the shared dropdown material', () => {
+    const css = compileThemeFile('autocomplete.scss')
+
+    expectCssRule(css, '.el-autocomplete__popper.el-popper', [
+      'background: var(--fsus-autocomplete-popper-bg, var(--fsus-surface-overlay));',
+      'border: 1px solid var(--fsus-autocomplete-popper-border, var(--fsus-border-lighter));',
+      'box-shadow: var(--fsus-autocomplete-popper-shadow, var(--fsus-shadow-panel, none));',
+    ])
+    expectCssRule(css, '.el-autocomplete-suggestion', [
+      'border-radius: var(--fsus-autocomplete-radius, var(--fsus-radius-popover, 10px));',
+      'background: var(--fsus-autocomplete-popper-bg, var(--fsus-surface-overlay));',
+      'overflow: hidden;',
+    ])
+    expectCssRule(css, '.el-autocomplete-suggestion__wrap', [
+      'padding: 8px 0;',
+    ])
+    expectCssRule(css, '.el-autocomplete-suggestion li:hover', [
+      'background-color: var(--fsus-autocomplete-option-hover-bg, var(--fsus-select-option-hover-bg, var(--fsus-state-hover-bg)));',
+    ])
+    expectCssRule(css, '.el-autocomplete-suggestion li.highlighted', [
+      'background-color: var(--fsus-autocomplete-option-hover-bg, var(--fsus-select-option-hover-bg, var(--fsus-state-hover-bg)));',
+    ])
+    expectCssRule(css, '.el-autocomplete-suggestion li.divider', [
+      'border-top: 1px solid var(--fsus-autocomplete-divider-border, var(--fsus-border-lighter));',
+    ])
+    expect(css).not.toContain('var(--el-box-shadow-light)')
+    expect(css).not.toContain('var(--el-color-black)')
+    expect(css).not.toContain('border-radius: var(--el-border-radius-base);')
+  })
+
   test('keeps tooltip v2 radius and surfaces tokenized', () => {
     const css = compileThemeFile('tooltip-v2.scss')
 
