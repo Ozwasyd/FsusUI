@@ -19,6 +19,15 @@ Public preview 的 registry 策略、包名策略、dist-tag 策略和 provenanc
 
 `pnpm verify` 保留为 `verify:full` 的安全别名，避免旧脚本降级覆盖面。
 
+`prepare:test-artifacts` 会先检查 icon 与 WASM 的 test artifact cache。
+GitHub Actions 使用 source-hash key 恢复 `packages/icons-vue/dist` 与
+`packages/wasm/dist`；日志中会输出 `icons-cache-hit`、`wasm-cache-hit`，
+本地 wrapper 还会输出 `cache hit` / `cache miss` 与 fingerprint source hash。
+cache hit 时会跳过对应 `ensure:icons` / `ensure:wasm`；cache miss 或
+restore-key 命中旧工件时会重新生成并写入 fingerprint。发布或手工重建仍使用
+`pnpm run build:wasm` 或 `FORCE_REBUILD=1 pnpm run prepare:test-artifacts`，
+不要把 release regeneration 改成只依赖 cache。
+
 发布前必须先通过：
 
 ```bash

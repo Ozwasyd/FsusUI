@@ -90,6 +90,14 @@ FsusBlog 侧的消费规则：页面只消费 FsusUI 导出的 component / direc
 - `verify:release` 用于发布前完整核验，在 `verify:full` 基础上增加 npm dist-tag、package build 和 consumer-install。
 - `verify:release` 不替代视觉/覆盖率证据；发布前仍需显式执行 `test:coverage` 与 `test:visual`。
 
+### Test artifact cache
+
+- `prepare:test-artifacts` 会按 source hash 检查 icon / WASM 生成工件，再决定是否调用 `ensure:icons` 与 `ensure:wasm`。
+- CI 使用 test artifact cache 恢复 `packages/icons-vue/dist` 与 `packages/wasm/dist`，cache key 覆盖相关源码、构建配置和生成脚本。
+- GitHub Actions 日志会输出 `icons-cache-hit` 与 `wasm-cache-hit`；本地 wrapper 会继续输出 `cache hit` / `cache miss`、source hash 和 miss reason。
+- cache hit 会跳过对应 ensure 脚本；cache miss、restore-key 命中过期工件或 fingerprint 不一致时会重新生成。
+- `pnpm run build:wasm` 保留显式 force regeneration 语义；需要强制重建所有测试工件时可使用 `FORCE_REBUILD=1 pnpm run prepare:test-artifacts`。
+
 ### CI 入口
 
 - `.github/workflows/quality.yml` 是统一质量入口

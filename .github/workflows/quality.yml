@@ -30,6 +30,26 @@ jobs:
           version: 5.0.4
           actions-cache-folder: emsdk-cache
       - run: pnpm install --frozen-lockfile
+      - name: Restore icons test artifact cache
+        id: icons-cache
+        uses: actions/cache@v4
+        with:
+          path: packages/icons-vue/dist
+          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('packages/icons-vue/package.json', 'packages/icons-vue/src/**', 'packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
+          restore-keys: |
+            ${{ runner.os }}-fsusui-test-artifacts-icons-
+      - name: Restore WASM test artifact cache
+        id: wasm-cache
+        uses: actions/cache@v4
+        with:
+          path: packages/wasm/dist
+          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('packages/wasm/package.json', 'packages/wasm/build.config.ts', 'packages/wasm/**/*.ts', 'packages/wasm/**/*.cpp', 'packages/wasm/**/*.hpp', 'packages/wasm/**/*.h', 'packages/wasm/**/CMakeLists.txt', 'packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
+          restore-keys: |
+            ${{ runner.os }}-fsusui-test-artifacts-wasm-
+      - name: Log test artifact cache status
+        run: |
+          echo "icons-cache-hit=${{ steps.icons-cache.outputs.cache-hit }}"
+          echo "wasm-cache-hit=${{ steps.wasm-cache.outputs.cache-hit }}"
       - run: pnpm run verify:pr-fast
 
   full:
