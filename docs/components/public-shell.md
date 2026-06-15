@@ -49,6 +49,9 @@ import '@ozwasyd/element-plus/dist/index.css'
 | search-placeholder  | 搜索占位文本           | `string`               | `Search`  |
 | search-aria-label   | 搜索 aria label        | `string`               | `Search`  |
 | show-search         | 是否渲染搜索控件       | `boolean`              | `true`    |
+| mobile-search-mode  | mobile 搜索形态        | `'inline' \| 'trigger' \| 'none'` | `inline` |
+| mobile-search-trigger-label | trigger 关闭前的按钮文本；为空时使用 `search-aria-label` | `string` | `''` |
+| mobile-search-cancel-label | trigger 展开后的关闭按钮文本 | `string` | `Cancel` |
 | spa-search          | 是否用事件接管搜索提交 | `boolean`              | `false`   |
 | sticky              | header 是否 sticky     | `boolean`              | `true`    |
 | max-width           | shell 最大宽度         | `string`               | `64rem`   |
@@ -65,7 +68,7 @@ import '@ozwasyd/element-plus/dist/index.css'
 | desktop-search         | desktop 搜索区域                                                     |
 | desktop-actions        | desktop 右侧工具区                                                   |
 | mobile-primary-actions | mobile 第一行高频工具区，位于品牌右侧，适合 search trigger / theme   |
-| mobile-search          | legacy mobile 搜索区域，保留兼容；新公共阅读页优先用 trigger 形态    |
+| mobile-search          | mobile 搜索内容；`inline` 时位于 nav 下方，`trigger` 时位于 primary row 下方 |
 | mobile-actions         | legacy mobile 次级工具区，保留兼容；渲染在 mobile nav 下方           |
 | footer                 | 页脚                                                                 |
 | footer-brand           | 页脚品牌                                                             |

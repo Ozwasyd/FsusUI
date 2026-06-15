@@ -743,6 +743,46 @@ describe('Fsus theme visual baseline', () => {
     }
   })
 
+  test('supports public shell trigger-based mobile search motion', () => {
+    const publicShellCss = compileThemeFile('public-shell.scss')
+    const criticalCss = compileThemeFile('public-shell-critical.scss')
+
+    for (const css of [publicShellCss, criticalCss]) {
+      expectCssRule(css, '.el-public-shell__mobile-search-trigger', [
+        'min-height: 40px;',
+        'border: 1px solid var(--el-border-color-lighter);',
+      ])
+      expectCssRule(css, '.el-public-shell__mobile-search-row', [
+        'display: none;',
+        'margin-top: 12px;',
+      ])
+      expectCssRule(css, '.el-public-shell__mobile-search-row.is-expanded', [
+        'display: block;',
+      ])
+      expectCssRule(
+        css,
+        '.el-public-shell-mobile-search-enter-active, .el-public-shell-mobile-search-leave-active',
+        [
+          'transition: opacity var(--el-transition-duration-fast), transform var(--el-transition-duration-fast);',
+        ],
+      )
+      expectCssRule(
+        css,
+        '.el-public-shell-mobile-search-enter-from, .el-public-shell-mobile-search-leave-to',
+        [
+          'opacity: 0;',
+          'transform: translateY(-4px);',
+        ],
+      )
+      expect(css).toContain('@media (prefers-reduced-motion: reduce)')
+      expectCssRule(
+        css,
+        '.el-public-shell-mobile-search-enter-active, .el-public-shell-mobile-search-leave-active',
+        ['transition: none;'],
+      )
+    }
+  })
+
   test('prevents table interaction motion from overlapping fixed columns', () => {
     const themeCss = compileThemeFile('fsus-theme.scss')
     const tableCss = compileThemeFile('table.scss')

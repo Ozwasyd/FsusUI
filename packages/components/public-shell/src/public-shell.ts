@@ -10,6 +10,8 @@ export interface PublicShellNavItem {
   href: string
 }
 
+export type PublicShellMobileSearchMode = 'inline' | 'trigger' | 'none'
+
 export const publicShellProps = buildProps({
   /**
    * @description public shell hydration marker
@@ -98,6 +100,28 @@ export const publicShellProps = buildProps({
   showSearch: {
     type: Boolean,
     default: true,
+  },
+  /**
+   * @description mobile search presentation
+   */
+  mobileSearchMode: {
+    type: definePropType<PublicShellMobileSearchMode>(String),
+    values: ['inline', 'trigger', 'none'],
+    default: 'inline',
+  },
+  /**
+   * @description mobile search trigger label
+   */
+  mobileSearchTriggerLabel: {
+    type: String,
+    default: '',
+  },
+  /**
+   * @description mobile search cancel label
+   */
+  mobileSearchCancelLabel: {
+    type: String,
+    default: 'Cancel',
   },
   /**
    * @description emit search without navigating the form

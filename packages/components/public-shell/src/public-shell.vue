@@ -67,9 +67,59 @@
           </div>
 
           <div :class="ns.e('mobile-primary-actions')">
+            <button
+              v-if="showMobileSearchTrigger"
+              ref="mobileSearchTriggerRef"
+              type="button"
+              :class="[ns.e('mobile-search-trigger'), ns.is('expanded', mobileSearchExpanded)]"
+              :aria-expanded="String(mobileSearchExpanded)"
+              :aria-controls="mobileSearchRowId"
+              :aria-label="mobileSearchButtonLabel"
+              @click="toggleMobileSearch"
+            >
+              {{ mobileSearchButtonLabel }}
+            </button>
             <slot name="mobile-primary-actions" />
           </div>
         </div>
+
+        <Transition name="el-public-shell-mobile-search">
+          <div
+            v-if="showMobileSearchTrigger"
+            v-show="mobileSearchExpanded"
+            :id="mobileSearchRowId"
+            ref="mobileSearchRowRef"
+            :class="[ns.e('mobile-search-row'), ns.is('expanded', mobileSearchExpanded)]"
+            :aria-hidden="String(!mobileSearchExpanded)"
+          >
+            <slot name="mobile-search">
+              <form
+                v-if="showSearch"
+                :class="[ns.e('search'), ns.em('search', 'trigger')]"
+                :action="searchAction"
+                method="get"
+                @submit="handleSearchSubmit"
+                @keydown.esc="handleMobileSearchEscape"
+              >
+                <el-input
+                  :model-value="searchValue"
+                  :placeholder="searchPlaceholder"
+                  :label="searchAriaLabel"
+                  clearable
+                  @focus="emit('search-focus')"
+                  @input="handleSearchInput"
+                  @keydown.enter="handleSearchEnter"
+                />
+                <input
+                  v-if="searchName"
+                  type="hidden"
+                  :name="searchName"
+                  :value="searchValue"
+                />
+              </form>
+            </slot>
+          </div>
+        </Transition>
 
         <div :class="ns.e('mobile-toolbar')">
           <el-scrollbar
@@ -91,31 +141,32 @@
           </el-scrollbar>
 
           <div :class="ns.e('mobile-actions')">
-            <slot name="mobile-search">
-              <form
-                v-if="showSearch"
-                :class="[ns.e('search'), ns.em('search', 'mobile')]"
-                :action="searchAction"
-                method="get"
-                @submit="handleSearchSubmit"
-              >
-                <el-input
-                  :model-value="searchValue"
-                  :placeholder="searchPlaceholder"
-                  :label="searchAriaLabel"
-                  clearable
-                  @focus="emit('search-focus')"
-                  @input="handleSearchInput"
-                  @keydown.enter="handleSearchEnter"
-                />
-                <input
-                  v-if="searchName"
-                  type="hidden"
-                  :name="searchName"
-                  :value="searchValue"
-                />
-              </form>
-            </slot>
+            <template v-if="showMobileInlineSearch">
+              <slot name="mobile-search">
+                <form
+                  :class="[ns.e('search'), ns.em('search', 'mobile')]"
+                  :action="searchAction"
+                  method="get"
+                  @submit="handleSearchSubmit"
+                >
+                  <el-input
+                    :model-value="searchValue"
+                    :placeholder="searchPlaceholder"
+                    :label="searchAriaLabel"
+                    clearable
+                    @focus="emit('search-focus')"
+                    @input="handleSearchInput"
+                    @keydown.enter="handleSearchEnter"
+                  />
+                  <input
+                    v-if="searchName"
+                    type="hidden"
+                    :name="searchName"
+                    :value="searchValue"
+                  />
+                </form>
+              </slot>
+            </template>
             <slot name="mobile-actions" />
           </div>
         </div>
@@ -137,11 +188,11 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { ElInput } from '@element-plus/components/input'
 import { ElScrollbar } from '@element-plus/components/scrollbar'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
-import { useNamespace } from '@element-plus/hooks'
+import { useId, useNamespace } from '@element-plus/hooks'
 import { publicShellEmits, publicShellProps } from './public-shell'
 
 import type { CSSProperties } from 'vue'
@@ -155,6 +206,12 @@ const emit = defineEmits(publicShellEmits)
 
 const ns = useNamespace('public-shell')
 const searchValue = ref(props.searchQuery)
+const mobileSearchRowId = useId().value
+const mobileSearchRowRef = ref<HTMLElement>()
+const mobileSearchTriggerRef = ref<HTMLButtonElement>()
+const mobileSearchExpanded = ref(
+  props.mobileSearchMode === 'trigger' && props.searchQuery.trim().length > 0,
+)
 
 watch(
   () => props.searchQuery,
@@ -168,6 +225,20 @@ const headerKls = computed(() => [
   ns.e('header'),
   ns.is('sticky', props.sticky),
 ])
+const showMobileSearchTrigger = computed(
+  () => props.showSearch && props.mobileSearchMode === 'trigger',
+)
+const showMobileInlineSearch = computed(
+  () => props.showSearch && props.mobileSearchMode === 'inline',
+)
+const mobileSearchTriggerText = computed(
+  () => props.mobileSearchTriggerLabel || props.searchAriaLabel,
+)
+const mobileSearchButtonLabel = computed(() =>
+  mobileSearchExpanded.value
+    ? props.mobileSearchCancelLabel
+    : mobileSearchTriggerText.value,
+)
 const shellStyle = computed<CSSProperties>(() => ({
   '--el-public-shell-mobile-nav-gap': props.mobileNavGap,
   '--el-public-shell-mobile-search-width': props.mobileSearchWidth,
@@ -187,6 +258,42 @@ const handleSearchInput = (value: string) => {
   emit(CHANGE_EVENT, value)
 }
 
+const focusMobileSearchInput = async () => {
+  await nextTick()
+  mobileSearchRowRef.value?.querySelector<HTMLInputElement>('input')?.focus()
+}
+
+const focusMobileSearchTrigger = async () => {
+  await nextTick()
+  mobileSearchTriggerRef.value?.focus()
+}
+
+const openMobileSearch = () => {
+  mobileSearchExpanded.value = true
+  void focusMobileSearchInput()
+}
+
+const closeMobileSearch = (restoreFocus = false) => {
+  mobileSearchExpanded.value = false
+  if (restoreFocus) {
+    void focusMobileSearchTrigger()
+  }
+}
+
+const toggleMobileSearch = () => {
+  if (mobileSearchExpanded.value) {
+    closeMobileSearch(true)
+    return
+  }
+
+  openMobileSearch()
+}
+
+const handleMobileSearchEscape = (event: KeyboardEvent) => {
+  event.preventDefault()
+  closeMobileSearch(true)
+}
+
 const submitSearch = (event: Event) => {
   if (!props.spaSearch) return
 
@@ -204,4 +311,13 @@ const handleSearchSubmit = (event: Event) => {
 const handleSearchEnter = (event: Event | KeyboardEvent) => {
   submitSearch(event)
 }
+
+watch(
+  () => props.mobileSearchMode,
+  (mode) => {
+    if (mode !== 'trigger') {
+      mobileSearchExpanded.value = false
+    }
+  },
+)
 </script>

@@ -106,4 +106,119 @@ describe('PublicShell.vue', () => {
       ),
     ).toBe(true)
   })
+
+  test('supports trigger-based mobile search without replacing desktop search', async () => {
+    const wrapper = mount(PublicShell, {
+      props: {
+        brand: 'Fsus',
+        navItems,
+        mobileSearchMode: 'trigger',
+        searchAriaLabel: 'Search site',
+        searchPlaceholder: 'Search articles',
+        spaSearch: true,
+      },
+    })
+
+    const desktopSearch = wrapper.find('.el-public-shell__search--desktop')
+    const legacyMobileSearch = wrapper.find('.el-public-shell__search--mobile')
+    const trigger = wrapper.find('.el-public-shell__mobile-search-trigger')
+    const searchRow = wrapper.find('.el-public-shell__mobile-search-row')
+
+    expect(desktopSearch.exists()).toBe(true)
+    expect(legacyMobileSearch.exists()).toBe(false)
+    expect(trigger.exists()).toBe(true)
+    expect(trigger.text()).toBe('Search site')
+    expect(trigger.attributes('aria-expanded')).toBe('false')
+    expect(trigger.attributes('aria-controls')).toBe(searchRow.attributes('id'))
+    expect(searchRow.exists()).toBe(true)
+    expect(searchRow.classes()).not.toContain('is-expanded')
+
+    await trigger.trigger('click')
+    await nextTick()
+
+    expect(trigger.text()).toBe('Cancel')
+    expect(trigger.attributes('aria-expanded')).toBe('true')
+    expect(searchRow.classes()).toContain('is-expanded')
+    expect(searchRow.find('input').attributes('placeholder')).toBe(
+      'Search articles',
+    )
+
+    const emptySubmit = new Event('submit', { cancelable: true })
+    searchRow.find('form').element.dispatchEvent(emptySubmit)
+    await nextTick()
+
+    expect(emptySubmit.defaultPrevented).toBe(true)
+    expect(wrapper.emitted('search')).toBeUndefined()
+
+    await searchRow.find('input').setValue('docs')
+    const submit = new Event('submit', { cancelable: true })
+    searchRow.find('form').element.dispatchEvent(submit)
+    await nextTick()
+
+    expect(submit.defaultPrevented).toBe(true)
+    expect(wrapper.emitted('search')?.[0]).toEqual(['docs'])
+  })
+
+  test('closes trigger mobile search with escape and cancel while preserving focus', async () => {
+    const wrapper = mount(PublicShell, {
+      attachTo: document.body,
+      props: {
+        brand: 'Fsus',
+        navItems,
+        mobileSearchMode: 'trigger',
+        searchQuery: 'initial',
+      },
+    })
+
+    const trigger = wrapper.find<HTMLButtonElement>(
+      '.el-public-shell__mobile-search-trigger',
+    )
+    const searchRow = wrapper.find('.el-public-shell__mobile-search-row')
+
+    expect(searchRow.classes()).toContain('is-expanded')
+
+    await searchRow.find('input').trigger('keydown', { key: 'Escape' })
+    await nextTick()
+
+    expect(searchRow.classes()).not.toContain('is-expanded')
+
+    await trigger.trigger('click')
+    await nextTick()
+    expect(searchRow.classes()).toContain('is-expanded')
+
+    await trigger.trigger('click')
+    await nextTick()
+
+    expect(searchRow.classes()).not.toContain('is-expanded')
+    expect(document.activeElement).toBe(trigger.element)
+  })
+
+  test('keeps inline and none mobile search modes available', () => {
+    const inlineWrapper = mount(PublicShell, {
+      props: {
+        brand: 'Fsus',
+        navItems,
+      },
+    })
+    const noneWrapper = mount(PublicShell, {
+      props: {
+        brand: 'Fsus',
+        navItems,
+        mobileSearchMode: 'none',
+      },
+    })
+
+    expect(inlineWrapper.find('.el-public-shell__search--mobile').exists()).toBe(
+      true,
+    )
+    expect(
+      inlineWrapper.find('.el-public-shell__mobile-search-trigger').exists(),
+    ).toBe(false)
+    expect(noneWrapper.find('.el-public-shell__search--mobile').exists()).toBe(
+      false,
+    )
+    expect(noneWrapper.find('.el-public-shell__mobile-search-trigger').exists()).toBe(
+      false,
+    )
+  })
 })
