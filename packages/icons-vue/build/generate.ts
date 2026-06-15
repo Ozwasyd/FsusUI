@@ -9,16 +9,26 @@ const packageRoot = path.resolve(__dirname, '..')
 const repoRoot = path.resolve(packageRoot, '..', '..')
 const iconsSvgRoot = path.join(repoRoot, 'packages', 'icons-svg')
 const iconRegistry = path.join(repoRoot, 'spec', 'icons', 'registry.yaml')
+const tokenSource = path.join(repoRoot, 'spec', 'tokens', 'tokens.json')
 const componentsRoot = path.join(packageRoot, 'src', 'components')
 const componentsIndex = path.join(packageRoot, 'src/components/index.ts')
 
-const requiredSvgPatterns = [
-  /stroke-linejoin="round"/u,
-  /stroke-linecap="round"/u,
-  /stroke-width="32"/u,
-  /stroke="currentColor"/u,
+const commonSvgPatterns = [
   /viewBox="0 0 1024 1024"/u,
   /fill="currentColor"/u,
+]
+
+const lineSvgStaticPatterns = [
+  /stroke-linejoin="round"/u,
+  /stroke-linecap="round"/u,
+  /stroke="currentColor"/u,
+]
+
+const solidForbiddenSvgPatterns = [
+  /stroke-linejoin=/u,
+  /stroke-linecap=/u,
+  /stroke-width=/u,
+  /stroke="currentColor"/u,
 ]
 
 function toPascalCase(name: string) {
@@ -64,6 +74,43 @@ function readRegistryAliases(registry: string) {
   }
 
   return icons
+}
+
+function parseTokenEntries(tokens: string) {
+  return JSON.parse(tokens) as { tokens: Array<{ name: string; value: string }> }
+}
+
+function tokenValue(
+  tokens: { tokens: Array<{ name: string; value: string }> },
+  name: string,
+) {
+  const token = tokens.tokens.find((entry) => entry.name === name)
+  if (!token) throw new Error(`Missing token ${name}`)
+  return token.value
+}
+
+function parsePx(value: string) {
+  const match = value.match(/^(\d+(?:\.\d+)?)px$/u)
+  if (!match) throw new Error(`Expected px token value, received ${value}`)
+  return Number(match[1])
+}
+
+function viewBoxWidth(source: string) {
+  const match = source.match(/viewBox="0 0 (?<width>\d+) \d+"/u)
+  if (!match?.groups?.width) throw new Error('Missing icon viewBox width')
+  return Number(match.groups.width)
+}
+
+function expectedSourceStrokeWidth(
+  source: string,
+  visualStrokePx: number,
+  renderedIconSizePx: number,
+) {
+  return visualStrokePx * viewBoxWidth(source) / renderedIconSizePx
+}
+
+function isSolidIcon(name: string) {
+  return /(?:^|-)filled$/u.test(name)
 }
 
 function readAttributes(markup: string) {
@@ -112,6 +159,9 @@ defineOptions({
 const svgFiles = (await readdir(iconsSvgRoot))
   .filter((file) => file.endsWith('.svg'))
   .sort((a, b) => a.localeCompare(b))
+const tokens = parseTokenEntries(await readFile(tokenSource, 'utf8'))
+const renderedIconSizePx = parsePx(tokenValue(tokens, 'icon.size.md'))
+const visualStrokePx = Number(tokenValue(tokens, 'icon.stroke.md'))
 const prettierOptions = (await resolveConfig(
   path.join(repoRoot, 'package.json'),
 )) ?? {
@@ -137,6 +187,21 @@ for (const file of svgFiles) {
   const name = file.replace(/\.svg$/u, '')
   const componentName = toPascalCase(name)
   const svg = (await readFile(path.join(iconsSvgRoot, file), 'utf8')).trim()
+  const lineSvgPatterns = [
+    ...lineSvgStaticPatterns,
+    new RegExp(
+      `stroke-width="${expectedSourceStrokeWidth(
+        svg,
+        visualStrokePx,
+        renderedIconSizePx,
+      )}"`,
+      'u',
+    ),
+  ]
+  const requiredSvgPatterns = [
+    ...commonSvgPatterns,
+    ...(isSolidIcon(name) ? [] : lineSvgPatterns),
+  ]
 
   const missing = requiredSvgPatterns.filter((pattern) => !pattern.test(svg))
   if (missing.length > 0) {
@@ -145,6 +210,18 @@ for (const file of svgFiles) {
         .map((pattern) => pattern.source)
         .join(', ')}`,
     )
+  }
+  if (isSolidIcon(name)) {
+    const inheritedStroke = solidForbiddenSvgPatterns.filter((pattern) =>
+      pattern.test(svg),
+    )
+    if (inheritedStroke.length > 0) {
+      throw new Error(
+        `Icon ${file} is a solid icon but inherits line attrs: ${inheritedStroke
+          .map((pattern) => pattern.source)
+          .join(', ')}`,
+      )
+    }
   }
 
   await writeFile(

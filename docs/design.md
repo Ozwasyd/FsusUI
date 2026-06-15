@@ -85,14 +85,14 @@ FsusUI 的色彩系统围绕 **Ink / Paper / Dot / Scholarly Blue** 展开。颜
 
 ### Radius
 
-| Surface       | Value   | Token                                              | Usage                                |
-| ------------- | ------- | -------------------------------------------------- | ------------------------------------ |
-| Small control | `4px`   | `--fsus-radius-control-small`                      | 小尺寸按钮、紧凑输入、标签内部结构   |
-| Control       | `6px`   | `--fsus-radius-control`, `--el-border-radius-base` | Button、Input、Select、Checkbox 外框 |
-| Popover       | `10px`  | `--fsus-radius-popover`                            | Tooltip、Popover、Dropdown 内层面板  |
-| Panel         | `12px`  | `--fsus-radius-panel`, `--el-dialog-border-radius` | Dialog、Drawer、Card、MessageBox     |
-| Expressive panel | `24px` | `--fsus-radius-panel-large`                       | 仅限 opt-in expressive surface       |
-| Pill          | `999px` | `--fsus-radius-pill`, `--el-border-radius-round`   | Badge、圆形图标按钮、胶囊标签        |
+| Surface          | Value   | Token                                              | Usage                                |
+| ---------------- | ------- | -------------------------------------------------- | ------------------------------------ |
+| Small control    | `4px`   | `--fsus-radius-control-small`                      | 小尺寸按钮、紧凑输入、标签内部结构   |
+| Control          | `6px`   | `--fsus-radius-control`, `--el-border-radius-base` | Button、Input、Select、Checkbox 外框 |
+| Popover          | `10px`  | `--fsus-radius-popover`                            | Tooltip、Popover、Dropdown 内层面板  |
+| Panel            | `12px`  | `--fsus-radius-panel`, `--el-dialog-border-radius` | Dialog、Drawer、Card、MessageBox     |
+| Expressive panel | `24px`  | `--fsus-radius-panel-large`                        | 仅限 opt-in expressive surface       |
+| Pill             | `999px` | `--fsus-radius-pill`, `--el-border-radius-round`   | Badge、圆形图标按钮、胶囊标签        |
 
 ### Density
 
@@ -119,11 +119,11 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 
 ### Shadow
 
-| Token                         | Value                                               | Usage                      |
-| ----------------------------- | --------------------------------------------------- | -------------------------- |
-| `--fsus-shadow-panel`         | `none`                              | 普通 Dialog、Card、Drawer 面板 |
-| `--fsus-shadow-panel-light`   | `0 8px 24px rgba(15, 23, 42, 0.05)` | Opt-in 低层级浮层              |
-| `--fsus-shadow-panel-lighter` | `0 2px 8px rgba(15, 23, 42, 0.04)`  | Opt-in 轻微浮起元素            |
+| Token                         | Value                                | Usage                          |
+| ----------------------------- | ------------------------------------ | ------------------------------ |
+| `--fsus-shadow-panel`         | `none`                               | 普通 Dialog、Card、Drawer 面板 |
+| `--fsus-shadow-panel-light`   | `0 8px 24px rgba(15, 23, 42, 0.05)`  | Opt-in 低层级浮层              |
+| `--fsus-shadow-panel-lighter` | `0 2px 8px rgba(15, 23, 42, 0.04)`   | Opt-in 轻微浮起元素            |
 | `--fsus-shadow-floating`      | `0 12px 32px rgba(15, 23, 42, 0.08)` | Notification、临时悬浮提示     |
 
 避免使用重黑投影、彩色光晕和无层级意义的外发光。
@@ -206,6 +206,8 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 ### Icons
 
 - 默认图标尺寸 `16px`，默认描边约 `1.75`。
+- 在 `viewBox="0 0 1024 1024"` 的源 SVG 中，线性图标描边由 token
+  推导为 `stroke-width="112"`，即 `112 / 1024 * 16 = 1.75px`。
 - 线性图标应统一 `stroke-linecap: round` 和 `stroke-linejoin: round`。
 - 实心图标保留原始轮廓，不强行描边化。
 - 图标按钮必须提供可访问名称，例如 `aria-label` 或可见文本。
@@ -256,19 +258,19 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 
 ### Surface and Interaction Tokens
 
-| Visual Concept         | Value                             | Runtime Token                                             | Notes                      |
-| ---------------------- | --------------------------------- | --------------------------------------------------------- | -------------------------- |
-| Control radius         | `6px`                             | `--fsus-radius-control`, `--el-border-radius-base`        | Button、Input、Select      |
-| Small control radius   | `4px`                             | `--fsus-radius-control-small`, `--el-border-radius-small` | 小尺寸控件                 |
-| Popover radius         | `10px`                            | `--fsus-radius-popover`, `--el-popover-border-radius`     | Popover、Tooltip、Dropdown |
-| Panel radius           | `12px`                            | `--fsus-radius-panel`, `--el-dialog-border-radius`        | Dialog、Drawer、Card       |
-| Expressive panel radius | `24px`                           | `--fsus-radius-panel-large`                               | Opt-in expressive surfaces |
-| Control height         | `44px`                            | `--fsus-control-height`                                   | 默认控件高度               |
-| Compact control height | `40px`                            | `--fsus-control-height-compact`                           | 紧凑控件高度               |
-| Focus ring             | `2px inset`                       | `--fsus-scholarly-blue` / `--el-a11y-focus-color`         | `focus-visible` only       |
-| Backdrop blur          | `0px`                             | `--fsus-backdrop-blur`                                    | Default paper material     |
-| Overlay blur           | `0px`                             | `--fsus-backdrop-blur-overlay`                            | Default overlay material   |
-| Panel shadow           | `none`                            | `--fsus-shadow-panel`, `--el-box-shadow`                  | Border-first panels        |
+| Visual Concept          | Value       | Runtime Token                                             | Notes                      |
+| ----------------------- | ----------- | --------------------------------------------------------- | -------------------------- |
+| Control radius          | `6px`       | `--fsus-radius-control`, `--el-border-radius-base`        | Button、Input、Select      |
+| Small control radius    | `4px`       | `--fsus-radius-control-small`, `--el-border-radius-small` | 小尺寸控件                 |
+| Popover radius          | `10px`      | `--fsus-radius-popover`, `--el-popover-border-radius`     | Popover、Tooltip、Dropdown |
+| Panel radius            | `12px`      | `--fsus-radius-panel`, `--el-dialog-border-radius`        | Dialog、Drawer、Card       |
+| Expressive panel radius | `24px`      | `--fsus-radius-panel-large`                               | Opt-in expressive surfaces |
+| Control height          | `44px`      | `--fsus-control-height`                                   | 默认控件高度               |
+| Compact control height  | `40px`      | `--fsus-control-height-compact`                           | 紧凑控件高度               |
+| Focus ring              | `2px inset` | `--fsus-scholarly-blue` / `--el-a11y-focus-color`         | `focus-visible` only       |
+| Backdrop blur           | `0px`       | `--fsus-backdrop-blur`                                    | Default paper material     |
+| Overlay blur            | `0px`       | `--fsus-backdrop-blur-overlay`                            | Default overlay material   |
+| Panel shadow            | `none`      | `--fsus-shadow-panel`, `--el-box-shadow`                  | Border-first panels        |
 
 ## 12. Source of Truth
 
@@ -278,6 +280,7 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 - Public token stability: `docs/theme/tokens.md`
 
 Any new visual rule should either map to an existing public token or introduce a token through `spec/tokens/tokens.json` before becoming part of this document.
+
 > **Material update:** Current defaults are paper/document-first, not
 > glass/SaaS-first. Backdrop blur tokens default to `0px`; glass material is
 > opt-in through `.is-glass` or `[data-fsus-material='glass']`. Ordinary

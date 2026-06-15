@@ -88,7 +88,11 @@ The generator enforces the FsusUI icon contract:
 - `fill="currentColor"`
 - `stroke-linejoin="round"`
 - `stroke-linecap="round"`
-- `stroke-width="32"`
+- `stroke-width="112"` for line icons, derived from
+  `icon.stroke.md` / `icon.size.md` with `1.75 * 1024 / 16`
+
+Solid `*-filled` icons keep `fill="currentColor"` and do not inherit line icon
+stroke attributes.
 
 ## SVG Review Expectations
 

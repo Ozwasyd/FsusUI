@@ -1,12 +1,5 @@
 <template>
-  <svg
-    stroke-linejoin="round"
-    stroke-linecap="round"
-    stroke-width="32"
-    stroke="currentColor"
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 1024 1024"
-  >
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
     <path
       fill="currentColor"
       d="M938.67 512.01c0-44.59-6.82-87.6-19.54-128H682.67a212.37 212.37 0 0 1 42.67 128c.06 38.71-10.45 76.7-30.42 109.87l-182.91 316.8c235.65-.01 426.66-191.02 426.66-426.67"

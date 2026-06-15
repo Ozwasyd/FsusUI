@@ -29,14 +29,53 @@ const commonSvgPatterns = [
   /fill="currentColor"/u,
 ]
 
-const lineSvgPatterns = [
+const tokenEntries = JSON.parse(
+  readFileSync(path.join(repoRoot, 'spec', 'tokens', 'tokens.json'), 'utf8'),
+) as { tokens: Array<{ name: string; value: string }> }
+
+const tokenValue = (name: string) => {
+  const token = tokenEntries.tokens.find((entry) => entry.name === name)
+  if (!token) throw new Error(`Missing token ${name}`)
+  return token.value
+}
+
+const parsePx = (value: string) => {
+  const match = value.match(/^(\d+(?:\.\d+)?)px$/u)
+  if (!match) throw new Error(`Expected px token value, received ${value}`)
+  return Number(match[1])
+}
+
+const renderedIconSizePx = parsePx(tokenValue('icon.size.md'))
+const visualStrokePx = Number(tokenValue('icon.stroke.md'))
+
+const viewBoxWidth = (source: string) => {
+  const match = source.match(/viewBox="0 0 (?<width>\d+) \d+"/u)
+  if (!match?.groups?.width) throw new Error('Missing icon viewBox width')
+  return Number(match.groups.width)
+}
+
+const sourceStrokeWidth = (source: string) => {
+  const match = source.match(/stroke-width="(?<width>\d+(?:\.\d+)?)"/u)
+  if (!match?.groups?.width) throw new Error('Missing icon stroke-width')
+  return Number(match.groups.width)
+}
+
+const expectedSourceStrokeWidth = (source: string) =>
+  visualStrokePx * viewBoxWidth(source) / renderedIconSizePx
+
+const lineSvgStaticPatterns = [
   /stroke-linejoin="round"/u,
   /stroke-linecap="round"/u,
-  /stroke-width="32"/u,
   /stroke="currentColor"/u,
 ]
 
 const solidSvgPatterns = [/fill="currentColor"/u]
+const solidForbiddenSvgPatterns = [
+  /stroke-linejoin=/u,
+  /stroke-linecap=/u,
+  /stroke-width=/u,
+  /stroke="currentColor"/u,
+]
 
 const isSolidIcon = (name: string) => /(?:^|-)filled$/u.test(name)
 
@@ -98,7 +137,7 @@ describe('icons-vue design alignment', () => {
 
       const contractPatterns = isSolidIcon(name)
         ? solidSvgPatterns
-        : lineSvgPatterns
+        : lineSvgStaticPatterns
       for (const pattern of contractPatterns) {
         expect(source, `${file} contract should match ${pattern}`).toMatch(
           pattern,
@@ -107,6 +146,35 @@ describe('icons-vue design alignment', () => {
           component,
           `${name}.vue contract should match ${pattern}`,
         ).toMatch(pattern)
+      }
+
+      if (!isSolidIcon(name)) {
+        const expectedStrokeWidth = expectedSourceStrokeWidth(source)
+        const expectedStrokePattern = new RegExp(
+          `stroke-width="${expectedStrokeWidth}"`,
+          'u',
+        )
+
+        expect(source, `${file} should derive stroke from icon tokens`).toMatch(
+          expectedStrokePattern,
+        )
+        expect(
+          component,
+          `${name}.vue should derive stroke from icon tokens`,
+        ).toMatch(expectedStrokePattern)
+        expect(
+          sourceStrokeWidth(source) * renderedIconSizePx / viewBoxWidth(source),
+        ).toBeCloseTo(visualStrokePx, 5)
+      } else {
+        for (const pattern of solidForbiddenSvgPatterns) {
+          expect(source, `${file} should not inherit ${pattern}`).not.toMatch(
+            pattern,
+          )
+          expect(
+            component,
+            `${name}.vue should not inherit ${pattern}`,
+          ).not.toMatch(pattern)
+        }
       }
 
       expect(component).toContain(`name: '${componentName}'`)
