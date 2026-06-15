@@ -102,8 +102,13 @@
     }
 
     &:hover {
-      border-color: getCssVar('color-primary');
-      color: getCssVar('color-primary');
+      border-color: getCssVar('color', 'scholarly-blue');
+      color: getCssVar('color', 'scholarly-blue');
+    }
+
+    &.is-focus-visible-picture-card,
+    &:focus-visible {
+      @include a11y-focus-ring(2px, 6px);
     }
   }
 
@@ -116,11 +121,16 @@
   }
 
   &:focus {
-    border-color: getCssVar('color-primary');
-    color: getCssVar('color-primary');
+    color: getCssVar('color', 'scholarly-blue');
 
     .#{$namespace}-upload-dragger {
-      border-color: getCssVar('color-primary');
+      border-color: getCssVar('color', 'scholarly-blue');
+    }
+  }
+
+  &.is-focus-visible-dragger {
+    .#{$namespace}-upload-dragger {
+      @include a11y-focus-ring(2px, var(--fsus-radius-panel-large, 24px));
     }
   }
 }
@@ -166,14 +176,14 @@
   }
 
   &:hover {
-    border-color: getCssVar('color-primary');
+    border-color: getCssVar('color', 'scholarly-blue');
   }
 
   @include when(dragover) {
     padding: calc(#{getCssVar('upload-dragger-padding-horizontal')} - 1px)
       calc(#{getCssVar('upload-dragger-padding-vertical')} - 1px);
-    background-color: getCssVar('color', 'primary', 'light-9');
-    border: 2px dashed getCssVar('color-primary');
+    background-color: var(--fsus-state-emphasis-bg);
+    border: 2px dashed getCssVar('color', 'scholarly-blue');
   }
 }
 
