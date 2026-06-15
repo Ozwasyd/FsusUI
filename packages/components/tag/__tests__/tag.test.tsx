@@ -75,4 +75,18 @@ describe('Tag.vue', () => {
     expect(el.className.includes('el-tag--default')).toEqual(false)
     expect(el.className.includes('el-tag--small')).toEqual(false)
   })
+
+  test('applies component motion attrs', () => {
+    const wrapper = mount(() => <Tag motion="scale-fade">{AXIOM}</Tag>)
+
+    expect(wrapper.attributes('data-fsus-motion-preset')).toBe(
+      'dialog-settle',
+    )
+  })
+
+  test('can disable component motion', () => {
+    const wrapper = mount(() => <Tag motion={false}>{AXIOM}</Tag>)
+
+    expect(wrapper.attributes('data-fsus-motion-disabled')).toBe('true')
+  })
 })

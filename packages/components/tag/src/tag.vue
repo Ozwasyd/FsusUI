@@ -1,6 +1,7 @@
 <template>
   <span
     v-if="disableTransitions"
+    v-bind="componentMotionAttrs"
     :class="containerKls"
     :style="{ backgroundColor: color }"
     @click="handleClick"
@@ -12,6 +13,7 @@
   </span>
   <transition v-else :name="`${ns.namespace.value}-zoom-in-center`" appear>
     <span
+      v-bind="componentMotionAttrs"
       :class="containerKls"
       :style="{ backgroundColor: color }"
       @click="handleClick"
@@ -25,11 +27,12 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, toRef } from 'vue'
 import ElIcon from '@element-plus/components/icon'
 import { Close } from '@element-plus/icons-vue'
 import { useNamespace } from '@element-plus/hooks'
 import { useFormSize } from '@element-plus/components/form'
+import { useComponentMotionAttrs } from '@element-plus/components/motion'
 
 import { tagEmits, tagProps } from './tag'
 
@@ -41,6 +44,7 @@ const emit = defineEmits(tagEmits)
 
 const tagSize = useFormSize()
 const ns = useNamespace('tag')
+const componentMotionAttrs = useComponentMotionAttrs(toRef(props, 'motion'))
 const containerKls = computed(() => {
   const { type, hit, effect, closable, round } = props
   return [

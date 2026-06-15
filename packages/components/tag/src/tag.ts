@@ -1,10 +1,12 @@
 import { buildProps } from '@element-plus/utils'
 import { componentSizes } from '@element-plus/constants'
+import { componentMotionProps } from '@element-plus/components/motion'
 import type Tag from './tag.vue'
 
 import type { ExtractPropTypes } from 'vue'
 
 export const tagProps = buildProps({
+  ...componentMotionProps,
   /**
    * @description type of Tag
    */
