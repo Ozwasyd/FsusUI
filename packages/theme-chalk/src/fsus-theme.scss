@@ -1077,11 +1077,9 @@ button.#{$namespace}-card:active {
 
 .#{$namespace}-cascader__dropdown {
   background: var(--el-bg-color-overlay);
-  backdrop-filter: blur(var(--fsus-backdrop-blur));
-  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur));
   border: 1px solid var(--el-border-color-light);
   border-radius: var(--fsus-radius-popover);
-  box-shadow: var(--fsus-shadow-panel-light);
+  box-shadow: var(--fsus-shadow-panel, none);
   overflow: hidden;
 }
 
