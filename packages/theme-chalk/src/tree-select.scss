@@ -141,9 +141,8 @@
     }
 
     .#{$namespace}-tree-node:focus > .#{$namespace}-tree-node__content {
-      outline: none !important;
       background: transparent !important;
-      box-shadow: none !important;
+      @include a11y-focus-ring(2px, 12px);
       color: var(--fsus-scholarly-blue);
     }
   }

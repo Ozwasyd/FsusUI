@@ -1,4 +1,5 @@
 @use 'var.scss';
+@use 'mixins/mixins' as *;
 @use 'common/transition.scss';
 @use 'icon.scss';
 
@@ -53,8 +54,7 @@
 
   &:focus-visible {
     top: 1rem;
-    outline: none;
-    box-shadow: inset 0 0 0 1px var(--fsus-scholarly-blue);
+    @include a11y-focus-ring(2px, 4px);
   }
 }
 

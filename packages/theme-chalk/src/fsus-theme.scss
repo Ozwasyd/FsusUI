@@ -527,7 +527,7 @@ html.dark {
 .#{$namespace}-checkbox-button.is-focus .#{$namespace}-checkbox-button__inner,
 .#{$namespace}-radio-button:focus-within .#{$namespace}-radio-button__inner {
   border-color: var(--fsus-scholarly-blue) !important;
-  box-shadow: inset 0 0 0 1px var(--fsus-scholarly-blue) !important;
+  box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;
   z-index: 2;
 }
 
@@ -2457,7 +2457,7 @@ button.#{$namespace}-card:active {
   &:hover,
   &.is-focus {
     border-color: var(--fsus-scholarly-blue);
-    box-shadow: inset 0 0 0 1px var(--fsus-scholarly-blue) !important;
+    box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;
   }
 }
 

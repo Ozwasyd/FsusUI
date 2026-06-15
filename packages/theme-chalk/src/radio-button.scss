@@ -105,10 +105,8 @@
       & + .#{$namespace}-radio-button__inner {
         border-left: getCssVar('border');
         border-color: var(--fsus-scholarly-blue);
-        outline: none;
-        box-shadow: inset 0 0 0 1px var(--fsus-scholarly-blue);
+        @include a11y-focus-ring(2px, getCssVar('border-radius-base'));
         z-index: 2;
-        border-radius: getCssVar('border-radius-base');
       }
     }
 
