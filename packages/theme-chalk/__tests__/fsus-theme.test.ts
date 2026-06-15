@@ -143,6 +143,45 @@ describe('Fsus theme visual baseline', () => {
     ])
   })
 
+  test('aligns public focus and active states with Scholarly Blue', () => {
+    const inputCss = compileThemeFile('input.scss')
+    const tabsCss = compileThemeFile('tabs.scss')
+    const themeCss = compileThemeFile('fsus-theme.scss')
+    const publicShellCss = compileThemeFile('public-shell.scss')
+
+    expectCssRule(inputCss, '.el-textarea__inner:focus-visible', [
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+    ])
+    expectCssRule(tabsCss, '.el-tabs__active-bar', [
+      'background-color: var(--fsus-scholarly-blue);',
+    ])
+    expectCssRule(tabsCss, '.el-tabs__item:focus-visible', [
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue);',
+    ])
+    expectCssRule(tabsCss, '.el-tabs__item.is-active', [
+      'color: var(--el-text-color-primary);',
+    ])
+    expectCssRule(themeCss, '.el-tabs__item.is-active', [
+      'color: var(--el-text-color-primary);',
+    ])
+    expectCssRule(publicShellCss, '.el-public-shell__nav-link', [
+      'border-bottom: 2px solid transparent;',
+      'padding-bottom: 2px;',
+    ])
+    expectCssRule(publicShellCss, '.el-public-shell__nav-link.is-active', [
+      'border-bottom-color: var(--fsus-scholarly-blue);',
+    ])
+    for (const selector of [
+      '.el-public-shell__brand:focus-visible',
+      '.el-public-shell__nav-link:focus-visible',
+      '.el-public-shell__action-link:focus-visible',
+    ]) {
+      expectCssRule(publicShellCss, selector, [
+        'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+      ])
+    }
+  })
+
   test('does not force empty states into panel cards', () => {
     const css = compileThemeFile('fsus-theme.scss')
 

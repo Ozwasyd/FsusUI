@@ -14,7 +14,7 @@
     bottom: 0;
     left: 0;
     height: 2px;
-    background-color: getCssVar('color-primary');
+    background-color: var(--fsus-scholarly-blue);
     z-index: 1;
     transition:
       width var(--fsus-motion-control, 260ms)
@@ -53,7 +53,7 @@
     }
 
     &:hover {
-      color: getCssVar('color-primary');
+      color: var(--fsus-scholarly-blue);
     }
   }
   @include e(nav-wrap) {
@@ -140,7 +140,7 @@
     }
 
     &:focus-visible {
-      box-shadow: inset 0 0 0 1px var(--fsus-scholarly-blue);
+      box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue);
       border-radius: getCssVar('border-radius', 'small');
     }
 
@@ -165,11 +165,11 @@
     }
 
     @include when(active) {
-      color: getCssVar('color-primary');
+      color: getCssVar('text-color', 'primary');
     }
 
     &:hover {
-      color: getCssVar('color-primary');
+      color: var(--fsus-scholarly-blue);
       cursor: pointer;
     }
 
@@ -281,14 +281,14 @@
       }
 
       &.is-active {
-        color: getCssVar('color-primary');
+        color: getCssVar('text-color', 'primary');
         background-color: getCssVar('bg-color', 'overlay');
         border-right-color: getCssVar('border-color');
         border-left-color: getCssVar('border-color');
       }
 
       &:not(.is-disabled):hover {
-        color: getCssVar('color-primary');
+        color: var(--fsus-scholarly-blue);
       }
 
       &.is-disabled {

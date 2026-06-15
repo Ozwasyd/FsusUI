@@ -1775,13 +1775,14 @@ button.#{$namespace}-card:active {
   color: var(--el-text-color-regular);
 }
 
-.#{$namespace}-tabs__item:hover,
-.#{$namespace}-tabs__item.is-active {
+.#{$namespace}-tabs__item:hover {
   background: var(--el-fill-color);
   color: var(--fsus-scholarly-blue);
 }
 
 .#{$namespace}-tabs__item.is-active {
+  background: var(--el-fill-color);
+  color: var(--el-text-color-primary);
   font-weight: 700;
 }
 

@@ -61,7 +61,7 @@
     }
 
     &:focus-visible {
-      @include a11y-focus-ring(1px, getCssVar('border-radius-small'));
+      @include a11y-focus-ring(2px, getCssVar('border-radius-small'));
     }
   }
 
@@ -76,6 +76,8 @@
     flex: 0 0 auto;
     border-radius: getCssVar('border-radius', 'small');
     color: getCssVar('text-color', 'secondary');
+    border-bottom: 2px solid transparent;
+    padding-bottom: 2px;
     font-size: 12px;
     font-weight: 700;
     line-height: 1.4;
@@ -93,10 +95,11 @@
 
     @include when(active) {
       color: getCssVar('text-color', 'primary');
+      border-bottom-color: var(--fsus-scholarly-blue);
     }
 
     &:focus-visible {
-      @include a11y-focus-ring(1px, getCssVar('border-radius-small'));
+      @include a11y-focus-ring(2px, getCssVar('border-radius-small'));
     }
   }
 
@@ -133,7 +136,7 @@
     }
 
     &:focus-visible {
-      @include a11y-focus-ring(1px, getCssVar('border-radius-small'));
+      @include a11y-focus-ring(2px, getCssVar('border-radius-small'));
     }
   }
 
