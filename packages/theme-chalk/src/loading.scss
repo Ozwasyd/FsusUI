@@ -59,23 +59,54 @@
   }
 
   .circular {
-    display: inline;
+    display: inline-block;
     height: getCssVar('loading-spinner-size');
     width: getCssVar('loading-spinner-size');
-    animation: loading-rotate 2s linear infinite;
+    border-radius: 999px;
+    background: getCssVar('fill-color', 'light');
+    box-shadow: inset 0 0 0 1px getCssVar('border-color-lighter');
+    animation: none;
   }
 
   .path {
-    animation: loading-dash 1.5s ease-in-out infinite;
-    stroke-dasharray: 90, 150;
+    animation: none;
+    stroke-dasharray: none;
     stroke-dashoffset: 0;
     stroke-width: 2;
-    stroke: getCssVar('color-primary');
+    stroke: getCssVar('border-color');
     stroke-linecap: round;
   }
 
+  @include when(animated) {
+    .circular {
+      background: transparent;
+      box-shadow: none;
+      animation: loading-rotate 2s linear infinite;
+    }
+
+    .path {
+      animation: loading-dash 1.5s ease-in-out infinite;
+      stroke-dasharray: 90, 150;
+      stroke: getCssVar('text-color', 'placeholder');
+    }
+  }
+
+  [data-fsus-loading-motion='spinner'] & {
+    .circular {
+      background: transparent;
+      box-shadow: none;
+      animation: loading-rotate 2s linear infinite;
+    }
+
+    .path {
+      animation: loading-dash 1.5s ease-in-out infinite;
+      stroke-dasharray: 90, 150;
+      stroke: getCssVar('text-color', 'placeholder');
+    }
+  }
+
   i {
-    color: getCssVar('color-primary');
+    color: getCssVar('text-color', 'placeholder');
   }
 }
 

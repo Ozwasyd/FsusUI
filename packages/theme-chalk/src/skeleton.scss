@@ -6,26 +6,6 @@
   @include set-component-css-var('skeleton', $skeleton);
 }
 
-@mixin skeleton-color() {
-  background: linear-gradient(
-    90deg,
-    getCssVar('skeleton-color') 25%,
-    getCssVar('skeleton-to-color') 37%,
-    getCssVar('skeleton-color') 63%
-  );
-  background-size: 400% 100%;
-  animation: #{$namespace}-skeleton-loading 1.4s ease infinite;
-}
-
-@keyframes #{$namespace}-skeleton-loading {
-  0% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0 50%;
-  }
-}
-
 @keyframes skeleton-zinc-pulse {
   0%, 100% { background-color: getCssVar('fill-color', 'lighter'); opacity: 1; }
   50% { background-color: getCssVar('border-color'); opacity: 0.6; }

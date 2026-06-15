@@ -457,6 +457,50 @@ describe('Fsus theme visual baseline', () => {
     )
   })
 
+  test('keeps default loading primitives neutral and non-looping', () => {
+    const loadingCss = compileThemeFile('loading.scss')
+    const spinnerCss = compileThemeFile('spinner.scss')
+    const skeletonCss = compileThemeFile('skeleton.scss')
+    const markdownCss = compileThemeFile('markdown-renderer.scss')
+    const themeCss = compileThemeFile('fsus-theme.scss')
+
+    expectCssRule(loadingCss, '.el-loading-spinner .circular', [
+      'background: var(--el-fill-color-light);',
+      'animation: none;',
+    ])
+    expectCssRule(loadingCss, '.el-loading-spinner .path', [
+      'animation: none;',
+      'stroke: var(--el-border-color);',
+    ])
+    expectCssRule(loadingCss, '.el-loading-spinner.is-animated .circular', [
+      'animation: loading-rotate 2s linear infinite;',
+    ])
+    expectCssRule(
+      loadingCss,
+      '[data-fsus-loading-motion=spinner] .el-loading-spinner .path',
+      ['animation: loading-dash 1.5s ease-in-out infinite;'],
+    )
+    expectCssRule(spinnerCss, '.el-spinner-inner', [
+      'background-color: var(--el-fill-color-light, #f4f4f5);',
+      'animation: none;',
+    ])
+    expect(skeletonCss).not.toContain('linear-gradient')
+    expect(skeletonCss).not.toContain('el-skeleton-loading')
+    expectCssRule(skeletonCss, '.el-skeleton.is-animated .el-skeleton__item', [
+      'animation: skeleton-zinc-pulse 1.5s ease-in-out infinite;',
+    ])
+    expectCssRule(markdownCss, '.markdown-renderer__loading-spinner', [
+      'background: var(--el-fill-color-light);',
+      'animation: none;',
+    ])
+    expect(markdownCss).not.toContain('markdown-renderer-spin')
+    expectCssRule(themeCss, '.el-loading-spinner .circular', [
+      'background: var(--el-fill-color-light);',
+      'animation: none;',
+    ])
+    expect(themeCss).not.toContain('punctuation-zinc-pulse 1.2s')
+  })
+
   test('keeps inline action buttons from wrapping into neighboring content', () => {
     const css = compileThemeFile('button.scss')
 

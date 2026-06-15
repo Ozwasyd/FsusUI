@@ -13,12 +13,11 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background-color: #f4f4f5;
-  animation: skeleton-zinc-pulse 1.5s ease-in-out infinite;
+  background-color: var(--el-fill-color-light, #f4f4f5);
+  box-shadow: inset 0 0 0 1px var(--el-border-color-lighter);
+  animation: none;
 
   & .path {
     display: none;
   }
 }
-
-// Keyframes removed as we use skeleton-zinc-pulse
