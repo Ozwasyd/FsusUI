@@ -106,7 +106,7 @@
   @include e(actions) {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 12px;
     min-width: max-content;
   }
 
@@ -174,7 +174,7 @@
     margin: 0;
 
     @include m(desktop) {
-      width: 9rem;
+      width: 11rem;
     }
 
     @include m(mobile) {
@@ -192,6 +192,7 @@
     font-size: 12px;
     font-weight: 700;
     text-decoration: none;
+    white-space: nowrap;
     outline: none;
 
     &:hover,

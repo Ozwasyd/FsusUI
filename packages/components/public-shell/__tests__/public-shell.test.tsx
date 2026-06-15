@@ -221,4 +221,36 @@ describe('PublicShell.vue', () => {
       false,
     )
   })
+
+  test('supports dense desktop utility group with long search copy and optional auth link', () => {
+    const navItems = [
+      { key: 'home', label: 'Home', href: '/' },
+      { key: 'archive', label: 'Archive', href: '/archive' },
+      { key: 'tags', label: 'Tags', href: '/tags' },
+      { key: 'projects', label: 'Projects', href: '/projects' },
+      { key: 'about', label: 'About', href: '/about' },
+    ]
+    const wrapper = mount(PublicShell, {
+      props: {
+        brand: "Fsu's Blog",
+        navItems,
+        searchPlaceholder: '搜索文章、标签或关键词',
+        searchAriaLabel: '搜索',
+      },
+      slots: {
+        'desktop-actions': '<button data-test="theme">Theme</button>',
+      },
+    })
+
+    const actions = wrapper.find('.el-public-shell__actions')
+    const search = actions.find('.el-public-shell__search--desktop')
+    const input = search.find('input')
+
+    expect(wrapper.findAll('.el-public-shell__desktop-nav a')).toHaveLength(5)
+    expect(search.exists()).toBe(true)
+    expect(input.attributes('placeholder')).toBe('搜索文章、标签或关键词')
+    expect(input.attributes('aria-label')).toBe('搜索')
+    expect(actions.find('[data-test="theme"]').exists()).toBe(true)
+    expect(actions.find('.el-public-shell__auth-link').exists()).toBe(false)
+  })
 })

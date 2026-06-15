@@ -810,6 +810,25 @@ describe('Fsus theme visual baseline', () => {
     }
   })
 
+  test('keeps public shell desktop utilities compact while giving search room', () => {
+    const publicShellCss = compileThemeFile('public-shell.scss')
+    const criticalCss = compileThemeFile('public-shell-critical.scss')
+
+    for (const css of [publicShellCss, criticalCss]) {
+      expectCssRule(css, '.el-public-shell__search--desktop', [
+        'width: 11rem;',
+      ])
+      expectCssRule(css, '.el-public-shell__actions', [
+        'gap: 12px;',
+        'min-width: max-content;',
+      ])
+    }
+
+    expectCssRule(publicShellCss, '.el-public-shell__action-link', [
+      'white-space: nowrap;',
+    ])
+  })
+
   test('prevents table interaction motion from overlapping fixed columns', () => {
     const themeCss = compileThemeFile('fsus-theme.scss')
     const tableCss = compileThemeFile('table.scss')
