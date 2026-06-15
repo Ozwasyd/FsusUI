@@ -24,14 +24,21 @@ const readSorted = (dir: string, extension: string) =>
     .filter((file) => file.endsWith(extension))
     .sort((a, b) => a.localeCompare(b))
 
-const requiredSvgPatterns = [
+const commonSvgPatterns = [
+  /viewBox="0 0 1024 1024"/u,
+  /fill="currentColor"/u,
+]
+
+const lineSvgPatterns = [
   /stroke-linejoin="round"/u,
   /stroke-linecap="round"/u,
   /stroke-width="32"/u,
   /stroke="currentColor"/u,
-  /viewBox="0 0 1024 1024"/u,
-  /fill="currentColor"/u,
 ]
+
+const solidSvgPatterns = [/fill="currentColor"/u]
+
+const isSolidIcon = (name: string) => /(?:^|-)filled$/u.test(name)
 
 describe('icons-vue design alignment', () => {
   it('mirrors every icons-svg source without stale component files', () => {
@@ -46,7 +53,28 @@ describe('icons-vue design alignment', () => {
     expect(svgNames).toHaveLength(293)
   })
 
-  it('keeps every source svg and generated vue icon on the FsusUI round-stroke contract', () => {
+  it('classifies line and solid source icon contracts separately', () => {
+    const svgNames = readSorted(iconsSvgRoot, '.svg').map((file) =>
+      file.replace(/\.svg$/u, ''),
+    )
+    const solidNames = svgNames.filter(isSolidIcon)
+    const lineNames = svgNames.filter((name) => !isSolidIcon(name))
+
+    expect(solidNames).toEqual(
+      expect.arrayContaining([
+        'bell-filled',
+        'circle-check-filled',
+        'chrome-filled',
+      ]),
+    )
+    expect(lineNames).toEqual(
+      expect.arrayContaining(['search', 'setting', 'warning']),
+    )
+    expect(solidNames).toHaveLength(28)
+    expect(lineNames.length + solidNames.length).toBe(svgNames.length)
+  })
+
+  it('keeps line icons on the FsusUI round-stroke contract and solid icons on fill contract', () => {
     const svgFiles = readSorted(iconsSvgRoot, '.svg')
     const index = readFileSync(path.join(componentsRoot, 'index.ts'), 'utf8')
 
@@ -59,13 +87,26 @@ describe('icons-vue design alignment', () => {
         'utf8',
       )
 
-      for (const pattern of requiredSvgPatterns) {
+      for (const pattern of commonSvgPatterns) {
         expect(source, `${file} source should match ${pattern}`).toMatch(
           pattern,
         )
         expect(component, `${name}.vue should match ${pattern}`).toMatch(
           pattern,
         )
+      }
+
+      const contractPatterns = isSolidIcon(name)
+        ? solidSvgPatterns
+        : lineSvgPatterns
+      for (const pattern of contractPatterns) {
+        expect(source, `${file} contract should match ${pattern}`).toMatch(
+          pattern,
+        )
+        expect(
+          component,
+          `${name}.vue contract should match ${pattern}`,
+        ).toMatch(pattern)
       }
 
       expect(component).toContain(`name: '${componentName}'`)
