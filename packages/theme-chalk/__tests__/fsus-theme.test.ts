@@ -995,13 +995,21 @@ describe('Fsus theme visual baseline', () => {
     const css = compileThemeFile('card.scss')
 
     expectCssRule(css, '.el-card', ['box-shadow: none;'])
+    expectCssRule(css, '.el-card:focus-visible', [
+      'outline: none !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+    ])
     expectCssRule(css, '.el-card.is-always-shadow', [
-      'box-shadow: var(--el-box-shadow-lighter);',
+      'box-shadow: var(--fsus-card-elevated-shadow, var(--fsus-shadow-panel-lighter));',
     ])
     expectCssRule(css, '.el-card.is-hover-shadow:hover', [
-      'box-shadow: var(--el-box-shadow-lighter);',
+      'box-shadow: var(--fsus-card-elevated-shadow, var(--fsus-shadow-panel-lighter));',
       'transform: translateY(-1px);',
     ])
+    expect(css).not.toContain('.el-card__header::before')
+    expect(css).not.toMatch(
+      /\.el-card\.is-hover-shadow:hover,\s*\.el-card\.is-hover-shadow:focus\s*\{/s,
+    )
   })
 
   test('keeps inbox primitives flat and scroll-owned', () => {

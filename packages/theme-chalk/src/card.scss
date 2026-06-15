@@ -19,14 +19,17 @@
       getCssVar('transition-function-ease-in-out-bezier');
   box-shadow: none;
 
+  &:focus-visible {
+    @include a11y-focus-ring(2px, getCssVar('card', 'border-radius'));
+  }
+
   @include when(always-shadow) {
-    box-shadow: getCssVar('box-shadow', 'lighter');
+    box-shadow: var(--fsus-card-elevated-shadow, var(--fsus-shadow-panel-lighter));
   }
 
   @include when(hover-shadow) {
-    &:hover,
-    &:focus {
-      box-shadow: getCssVar('box-shadow', 'lighter');
+    &:hover {
+      box-shadow: var(--fsus-card-elevated-shadow, var(--fsus-shadow-panel-lighter));
       transform: translateY(-1px);
     }
   }
@@ -38,19 +41,6 @@
     font-weight: 600;
     color: getCssVar('text-color', 'primary');
     position: relative;
-
-    // Dot motif for headers
-    &::before {
-      content: '';
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background-color: getCssVar('color-info');
-    }
   }
 
   @include e(body) {
