@@ -538,6 +538,15 @@ describe('Fsus theme visual baseline', () => {
     expect(dialogCss).toContain('@keyframes dialog-scale-fade-out')
   })
 
+  test('keeps rate hover within the control motion budget', () => {
+    const css = compileThemeFile('rate.scss')
+
+    expectCssRule(css, '.el-rate .el-rate__icon.hover', [
+      'transform: translateY(-1px);',
+    ])
+    expect(css).not.toContain('transform: scale(1.15);')
+  })
+
   test('uses square table surfaces unless callers opt into another radius', () => {
     const tableCss = compileThemeFile('table.scss')
     const tableV2Css = compileThemeFile('table-v2.scss')

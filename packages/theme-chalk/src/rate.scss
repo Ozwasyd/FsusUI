@@ -54,7 +54,7 @@ $rate-size: map.merge(
     transition: getCssVar('transition-duration');
 
     &.hover {
-      transform: scale(1.15);
+      transform: translateY(-1px);
     }
 
     .path2 {
