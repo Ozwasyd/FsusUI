@@ -16,8 +16,8 @@ FsusUI semantic aliases on top.
 
 | Token                       | Purpose                                                          |
 | --------------------------- | ---------------------------------------------------------------- |
-| `--el-color-primary`        | Primary action and emphasis color.                               |
-| `--fsus-scholarly-blue`     | FsusUI semantic primary alias used by docs and product examples. |
+| `--el-color-primary`        | Element Plus compatibility primary mapped to Ink by default.     |
+| `--fsus-scholarly-blue`     | Accent for links, active states, focus rings, and selection.     |
 | `--el-bg-color`             | Main surface background.                                         |
 | `--el-bg-color-page`        | Page background.                                                 |
 | `--el-text-color-primary`   | Primary text.                                                    |
@@ -27,9 +27,9 @@ FsusUI semantic aliases on top.
 | `--el-border-radius-base`   | Base radius token.                                               |
 | `--el-border-radius-large`  | Large radius token.                                              |
 | `--el-border-radius-round`  | Fully rounded token for circular controls.                       |
-| `--el-box-shadow`           | Default elevation shadow.                                        |
-| `--el-box-shadow-light`     | Low elevation shadow.                                            |
-| `--fsus-backdrop-blur`      | FsusUI backdrop blur amount for supported overlay surfaces.      |
+| `--el-box-shadow`           | Border-first panel shadow, defaulting to `none`.                 |
+| `--el-box-shadow-light`     | Opt-in low elevation shadow.                                     |
+| `--fsus-backdrop-blur`      | Opt-in backdrop blur amount, defaulting to `0px`.                |
 
 ### Spacing Tokens
 
@@ -67,10 +67,14 @@ must use the generated artifacts rather than manually mirroring token values.
 
 ```css
 :root {
-  --el-color-primary: #2a599c;
+  --el-color-primary: var(--fsus-ink);
   --fsus-scholarly-blue: #2a599c;
+  --fsus-radius-control: 6px;
+  --fsus-radius-control-small: 4px;
+  --fsus-radius-panel: 12px;
   --el-border-radius-base: 6px;
-  --fsus-backdrop-blur: 12px;
+  --fsus-backdrop-blur: 0px;
+  --fsus-shadow-panel: none;
 }
 ```
 

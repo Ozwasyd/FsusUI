@@ -87,10 +87,11 @@ FsusUI 的色彩系统围绕 **Ink / Paper / Dot / Scholarly Blue** 展开。颜
 
 | Surface       | Value   | Token                                              | Usage                                |
 | ------------- | ------- | -------------------------------------------------- | ------------------------------------ |
-| Small control | `6px`   | `--fsus-radius-control-small`                      | 小尺寸按钮、紧凑输入、标签内部结构   |
-| Control       | `8px`   | `--fsus-radius-control`, `--el-border-radius-base` | Button、Input、Select、Checkbox 外框 |
-| Popover       | `20px`  | `--fsus-radius-popover`                            | Tooltip、Popover、Dropdown 内层面板  |
-| Panel         | `24px`  | `--fsus-radius-panel`, `--el-dialog-border-radius` | Dialog、Drawer、Card、MessageBox     |
+| Small control | `4px`   | `--fsus-radius-control-small`                      | 小尺寸按钮、紧凑输入、标签内部结构   |
+| Control       | `6px`   | `--fsus-radius-control`, `--el-border-radius-base` | Button、Input、Select、Checkbox 外框 |
+| Popover       | `10px`  | `--fsus-radius-popover`                            | Tooltip、Popover、Dropdown 内层面板  |
+| Panel         | `12px`  | `--fsus-radius-panel`, `--el-dialog-border-radius` | Dialog、Drawer、Card、MessageBox     |
+| Expressive panel | `24px` | `--fsus-radius-panel-large`                       | 仅限 opt-in expressive surface       |
 | Pill          | `999px` | `--fsus-radius-pill`, `--el-border-radius-round`   | Badge、圆形图标按钮、胶囊标签        |
 
 ### Density
@@ -107,24 +108,23 @@ FsusUI 的色彩系统围绕 **Ink / Paper / Dot / Scholarly Blue** 展开。颜
 
 ## 6. Depth and Material
 
-FsusUI 使用低透明度阴影、轻量玻璃和细边框表达层级。材质效果必须能解释信息结构或交互状态。
+FsusUI 默认使用 paper/document material、细边框和稳定留白表达层级。玻璃、强阴影和装饰性动效必须是明确 opt-in，不能作为普通组件默认值。
 
 ### Overlay Material
 
-- 浮层背景使用 `--fsus-surface-overlay`，默认约 `rgba(255, 255, 255, 0.85)`。
-- 主浮层模糊使用 `--fsus-backdrop-blur: 40px`。
-- 次级浮层或轻量面板使用 `--fsus-backdrop-blur-soft: 20px`。
-- 遮罩层使用 `--fsus-backdrop-blur-overlay: 16px`。
-- 毛玻璃只用于 Dialog、Drawer、Dropdown、Popover、Notification 等悬浮层。静态页面区块、表格单元格和常规表单区域不使用毛玻璃。
+- 浮层背景使用 `--fsus-surface-overlay`，默认约 `rgba(255, 255, 255, 0.98)`。
+- 默认不使用背景模糊：`--fsus-backdrop-blur`、`--fsus-backdrop-blur-soft` 和 `--fsus-backdrop-blur-overlay` 均为 `0px`。
+- 毛玻璃是 opt-in material，仅通过 `.is-glass` 或 `[data-fsus-material='glass']` 用于有明确悬浮层语义的场景。
+- 阅读表面（`[data-fsus-surface='reading']`）必须保持 paper/document feel，不使用 blur、glow 或 motion trail。
 
 ### Shadow
 
 | Token                         | Value                                               | Usage                      |
 | ----------------------------- | --------------------------------------------------- | -------------------------- |
-| `--fsus-shadow-panel`         | `0 32px 64px rgba(0, 0, 0, 0.08)` + inner highlight | Dialog、Card、主要浮层     |
-| `--fsus-shadow-panel-light`   | `0 14px 40px rgba(0, 0, 0, 0.08)` + inner highlight | Dropdown、Popover          |
-| `--fsus-shadow-panel-lighter` | `0 8px 24px rgba(0, 0, 0, 0.06)` + inner highlight  | 低层级浮起元素             |
-| `--fsus-shadow-floating`      | `0 24px 60px rgba(15, 23, 42, 0.12)`                | Notification、临时悬浮提示 |
+| `--fsus-shadow-panel`         | `none`                              | 普通 Dialog、Card、Drawer 面板 |
+| `--fsus-shadow-panel-light`   | `0 8px 24px rgba(15, 23, 42, 0.05)` | Opt-in 低层级浮层              |
+| `--fsus-shadow-panel-lighter` | `0 2px 8px rgba(15, 23, 42, 0.04)`  | Opt-in 轻微浮起元素            |
+| `--fsus-shadow-floating`      | `0 12px 32px rgba(15, 23, 42, 0.08)` | Notification、临时悬浮提示     |
 
 避免使用重黑投影、彩色光晕和无层级意义的外发光。
 
@@ -163,7 +163,7 @@ FsusUI 使用低透明度阴影、轻量玻璃和细边框表达层级。材质�
 
 ### Form Controls
 
-- Input、Select、Textarea 默认圆角 `8px`，边框 `1px solid var(--el-border-color)`。
+- Input、Select、Textarea 默认圆角 `6px`，边框 `1px solid var(--el-border-color)`。
 - Input 默认高度 `44px`，大号 `48px`，小号 `40px`。
 - Input 水平 padding 默认 `12px`，大号 `16px`，小号 `8px`。
 - Focus Visible 使用 `2px` inset blue ring，禁用浏览器默认 outline。
@@ -173,19 +173,19 @@ FsusUI 使用低透明度阴影、轻量玻璃和细边框表达层级。材质�
 ### Dropdown, Select, Popover
 
 - Dropdown 面板默认 padding `8px 0`，最大高度 `274px`。
-- Popover 半径使用 `20px`；Select Dropdown 可使用大圆角以匹配浮层语言。
-- 阴影使用 `--el-box-shadow-light`，不要叠加额外外发光。
+- Popover 半径使用 `10px`；Select Dropdown 可使用 `12px` 以匹配浮层语言。
+- 阴影默认使用 `none`，仅在需要明确层级时 opt into `--el-box-shadow-light`，不要叠加额外外发光。
 - 选中项用 `Scholarly Blue` 或浅蓝背景表达，不使用高饱和整行色块。
 - 列表项需要稳定高度，Hover、Active、Disabled 三种状态必须可区分。
 
 ### Dialog and Drawer
 
 - Dialog 默认宽度 `50%`，默认顶部间距 `15vh`。
-- 面板圆角 `24px`，主 padding `24px`。
+- 面板圆角 `12px`，主 padding `24px`。
 - Header、Body、Footer 必须共享同一左右内边距，关闭按钮与标题基线保持明确关系。
 - 关闭按钮触控区域 `54px`，Focus Visible 使用圆形 `2px` ring。
-- Overlay 使用半透明 Paper 与 `16px` backdrop blur，不能变成沉重黑色遮罩。
-- Drawer 与 Dialog 使用同一层级语言：玻璃、24px 面板圆角、低透明度阴影。
+- Overlay 使用半透明 Paper，backdrop blur 默认 `0px`，不能变成沉重黑色遮罩。
+- Drawer 与 Dialog 使用同一层级语言：paper material、12px 面板圆角、边框优先。
 
 ### Table
 
@@ -258,16 +258,17 @@ FsusUI 使用低透明度阴影、轻量玻璃和细边框表达层级。材质�
 
 | Visual Concept         | Value                             | Runtime Token                                             | Notes                      |
 | ---------------------- | --------------------------------- | --------------------------------------------------------- | -------------------------- |
-| Control radius         | `8px`                             | `--fsus-radius-control`, `--el-border-radius-base`        | Button、Input、Select      |
-| Small control radius   | `6px`                             | `--fsus-radius-control-small`, `--el-border-radius-small` | 小尺寸控件                 |
-| Popover radius         | `20px`                            | `--fsus-radius-popover`, `--el-popover-border-radius`     | Popover、Tooltip、Dropdown |
-| Panel radius           | `24px`                            | `--fsus-radius-panel`, `--el-dialog-border-radius`        | Dialog、Drawer、Card       |
+| Control radius         | `6px`                             | `--fsus-radius-control`, `--el-border-radius-base`        | Button、Input、Select      |
+| Small control radius   | `4px`                             | `--fsus-radius-control-small`, `--el-border-radius-small` | 小尺寸控件                 |
+| Popover radius         | `10px`                            | `--fsus-radius-popover`, `--el-popover-border-radius`     | Popover、Tooltip、Dropdown |
+| Panel radius           | `12px`                            | `--fsus-radius-panel`, `--el-dialog-border-radius`        | Dialog、Drawer、Card       |
+| Expressive panel radius | `24px`                           | `--fsus-radius-panel-large`                               | Opt-in expressive surfaces |
 | Control height         | `44px`                            | `--fsus-control-height`                                   | 默认控件高度               |
 | Compact control height | `40px`                            | `--fsus-control-height-compact`                           | 紧凑控件高度               |
 | Focus ring             | `2px inset`                       | `--fsus-scholarly-blue` / `--el-a11y-focus-color`         | `focus-visible` only       |
-| Backdrop blur          | `40px`                            | `--fsus-backdrop-blur`                                    | 主浮层                     |
-| Overlay blur           | `16px`                            | `--fsus-backdrop-blur-overlay`                            | 遮罩层                     |
-| Panel shadow           | `0 32px 64px rgba(0, 0, 0, 0.08)` | `--fsus-shadow-panel`, `--el-box-shadow`                  | Light mode                 |
+| Backdrop blur          | `0px`                             | `--fsus-backdrop-blur`                                    | Default paper material     |
+| Overlay blur           | `0px`                             | `--fsus-backdrop-blur-overlay`                            | Default overlay material   |
+| Panel shadow           | `none`                            | `--fsus-shadow-panel`, `--el-box-shadow`                  | Border-first panels        |
 
 ## 12. Source of Truth
 

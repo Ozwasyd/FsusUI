@@ -14,11 +14,11 @@ public static class FsusTokens
 
     public const string ColorTextPrimaryName = "color.text.primary";
     public const string ColorTextPrimaryResourceKey = "FsusColorTextPrimary";
-    public const string ColorTextPrimaryValue = "#111827";
+    public const string ColorTextPrimaryValue = "#0F0F11";
 
     public const string ColorTextMutedName = "color.text.muted";
     public const string ColorTextMutedResourceKey = "FsusColorTextMuted";
-    public const string ColorTextMutedValue = "#6B7280";
+    public const string ColorTextMutedValue = "#71717A";
 
     public const string ColorSurfaceBaseName = "color.surface.base";
     public const string ColorSurfaceBaseResourceKey = "FsusColorSurfaceBase";
@@ -26,11 +26,11 @@ public static class FsusTokens
 
     public const string ColorSurfaceRaisedName = "color.surface.raised";
     public const string ColorSurfaceRaisedResourceKey = "FsusColorSurfaceRaised";
-    public const string ColorSurfaceRaisedValue = "#F8FAFC";
+    public const string ColorSurfaceRaisedValue = "#F7F7F8";
 
     public const string ColorBorderSubtleName = "color.border.subtle";
     public const string ColorBorderSubtleResourceKey = "FsusColorBorderSubtle";
-    public const string ColorBorderSubtleValue = "#D9DEE8";
+    public const string ColorBorderSubtleValue = "#E4E4E7";
 
     public const string ColorFocusRingName = "color.focus.ring";
     public const string ColorFocusRingResourceKey = "FsusColorFocusRing";
@@ -46,7 +46,7 @@ public static class FsusTokens
 
     public const string BrushSurfaceRaisedName = "brush.surface.raised";
     public const string BrushSurfaceRaisedResourceKey = "FsusBrushSurfaceRaised";
-    public const string BrushSurfaceRaisedValue = "#F8FAFC";
+    public const string BrushSurfaceRaisedValue = "#F7F7F8";
 
     public const string TypographyBodyMdSizeName = "typography.body.md.size";
     public const string TypographyBodyMdSizeResourceKey = "FsusTypographyBodyMdSize";
@@ -98,7 +98,7 @@ public static class FsusTokens
 
     public const string RadiusSurfaceMdName = "radius.surface.md";
     public const string RadiusSurfaceMdResourceKey = "FsusRadiusSurfaceMd";
-    public const string RadiusSurfaceMdValue = "8px";
+    public const string RadiusSurfaceMdValue = "12px";
 
     public const string BorderControlWidthName = "border.control.width";
     public const string BorderControlWidthResourceKey = "FsusBorderControlWidth";
@@ -106,7 +106,7 @@ public static class FsusTokens
 
     public const string ShadowOverlayMdName = "shadow.overlay.md";
     public const string ShadowOverlayMdResourceKey = "FsusShadowOverlayMd";
-    public const string ShadowOverlayMdValue = "0 18px 48px rgba(15, 23, 42, 0.14)";
+    public const string ShadowOverlayMdValue = "none";
 
     public const string OpacityDisabledContentName = "opacity.disabled.content";
     public const string OpacityDisabledContentResourceKey = "FsusOpacityDisabledContent";
@@ -154,11 +154,11 @@ public static class FsusTokens
 
     public const string DensityControlDefaultYName = "density.control.default.y";
     public const string DensityControlDefaultYResourceKey = "FsusDensityControlDefaultY";
-    public const string DensityControlDefaultYValue = "32px";
+    public const string DensityControlDefaultYValue = "44px";
 
     public const string DensityControlCompactYName = "density.control.compact.y";
     public const string DensityControlCompactYResourceKey = "FsusDensityControlCompactY";
-    public const string DensityControlCompactYValue = "28px";
+    public const string DensityControlCompactYValue = "40px";
 
     public const string IconSizeMdName = "icon.size.md";
     public const string IconSizeMdResourceKey = "FsusIconSizeMd";
