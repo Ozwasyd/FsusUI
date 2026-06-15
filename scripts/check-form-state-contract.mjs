@@ -60,11 +60,40 @@ for (const file of [
   'packages/theme-chalk/src/radio.scss',
   'packages/theme-chalk/src/radio-button.scss',
   'packages/theme-chalk/src/switch.scss',
+  'packages/theme-chalk/src/time-select.scss',
 ]) {
   const source = read(file)
 
   for (const match of source.matchAll(forbiddenPrimaryPattern)) {
     failures.push(`${file}:${lineNumberAt(source, match.index ?? 0)}`)
+  }
+}
+
+const timeSelectSource = read('packages/theme-chalk/src/time-select.scss')
+const selectedBlock = timeSelectSource.match(
+  /\.time-select-item\.selected:not\(\.disabled\)\s*\{(?<body>[\s\S]*?)\n  \}/u,
+)
+
+if (!selectedBlock?.groups?.body) {
+  failures.push('packages/theme-chalk/src/time-select.scss: missing selected state block')
+} else {
+  const body = selectedBlock.groups.body
+  if (!body.includes("color: getCssVar('color', 'scholarly-blue');")) {
+    failures.push(
+      'packages/theme-chalk/src/time-select.scss: selected state must use Scholarly Blue',
+    )
+  }
+
+  if (!body.includes('background-color: var(--fsus-state-selected-bg);')) {
+    failures.push(
+      'packages/theme-chalk/src/time-select.scss: selected state must use selected-state background',
+    )
+  }
+
+  if (/font-weight:\s*bold/u.test(body)) {
+    failures.push(
+      'packages/theme-chalk/src/time-select.scss: selected state must not rely on bold only',
+    )
   }
 }
 

@@ -31,7 +31,8 @@
   }
 
   .time-select-item.selected:not(.disabled) {
-    color: getCssVar('color-primary');
-    font-weight: bold;
+    color: getCssVar('color', 'scholarly-blue');
+    background-color: var(--fsus-state-selected-bg);
+    font-weight: 600;
   }
 }
