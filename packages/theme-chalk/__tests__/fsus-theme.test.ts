@@ -727,6 +727,43 @@ describe('Fsus theme visual baseline', () => {
     expect(css).not.toContain('var(--el-color-primary)')
   })
 
+  test('keeps carousel motion focus and contrast tokenized', () => {
+    const css = compileThemeFile('carousel.scss')
+
+    expectCssRule(css, '.el-carousel.is-dragging .el-carousel__item', [
+      'filter: var(--fsus-carousel-drag-filter, none);',
+      'will-change: transform;',
+    ])
+    expectCssRule(css, '.el-carousel__arrow', [
+      'color: var(--fsus-carousel-control-color, var(--fsus-color-surface-base));',
+      'transition: background-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), box-shadow var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+    ])
+    expectCssRule(css, '.el-carousel__arrow:focus-visible', [
+      'outline: none !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+    ])
+    expectCssRule(css, '.el-carousel__indicators--labels .el-carousel__button', [
+      'color: var(--fsus-carousel-label-color, var(--fsus-ink));',
+    ])
+    expectCssRule(css, '.el-carousel__button', [
+      'background-color: var(--fsus-carousel-indicator-bg, var(--fsus-color-surface-base));',
+      'transition: background-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), box-shadow var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), opacity var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+    ])
+    expectCssRule(css, '.el-carousel__button:focus-visible', [
+      'outline: none !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+    ])
+    expectCssRule(css, '.el-carousel__indicator.is-active button', [
+      'opacity: var(--fsus-carousel-indicator-active-opacity, 1);',
+      'background-color: var(--fsus-carousel-indicator-active-bg, var(--fsus-color-surface-base));',
+      'box-shadow: inset 0 0 0 1px var(--fsus-carousel-indicator-active-border, var(--fsus-scholarly-blue));',
+    ])
+    expect(css).not.toContain('filter: blur(')
+    expect(css).not.toContain('color: #fff;')
+    expect(css).not.toContain('color: #000;')
+    expect(css).not.toContain('background-color: #fff;')
+  })
+
   test('keeps calendar header controls border-first', () => {
     const css = compileThemeFile('calendar.scss')
 

@@ -24,10 +24,8 @@
     cursor: grabbing;
 
     .#{$namespace}-carousel__item {
-      filter: blur(
-        var(--fsus-interactive-motion-blur, var(--fsus-motion-blur, 0.35px))
-      );
-      will-change: transform, filter;
+      filter: var(--fsus-carousel-drag-filter, none);
+      will-change: transform;
     }
   }
 
@@ -48,10 +46,16 @@
     height: getCssVar('carousel', 'arrow-size');
     width: getCssVar('carousel', 'arrow-size');
     cursor: pointer;
-    transition: getCssVar('transition', 'duration');
+    transition:
+      background-color var(--fsus-motion-control-fast, 160ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+      color var(--fsus-motion-control-fast, 160ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+      box-shadow var(--fsus-motion-control-fast, 160ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
     border-radius: 50%;
     background-color: getCssVar('carousel', 'arrow-background');
-    color: $color-white;
+    color: var(--fsus-carousel-control-color, var(--fsus-color-surface-base));
     position: absolute;
     top: 50%;
     z-index: 10;
@@ -71,6 +75,10 @@
 
     &:hover {
       background-color: getCssVar('carousel', 'arrow-hover-background');
+    }
+
+    &:focus-visible {
+      @include a11y-focus-ring(2px, var(--fsus-radius-pill));
     }
 
     & i {
@@ -107,12 +115,15 @@
       transform: none;
 
       .#{$namespace}-carousel__indicator:hover button {
-        opacity: 0.64;
+        opacity: var(--fsus-carousel-indicator-hover-opacity, 0.72);
       }
 
       button {
-        background-color: getCssVar('carousel', 'indicator-out-color');
-        opacity: 0.24;
+        background-color: var(
+          --fsus-carousel-indicator-outside-bg,
+          var(--fsus-ink)
+        );
+        opacity: var(--fsus-carousel-indicator-outside-opacity, 0.24);
       }
     }
 
@@ -131,7 +142,7 @@
         width: auto;
         padding: 2px 18px;
         font-size: 12px;
-        color: $color-black;
+        color: var(--fsus-carousel-label-color, var(--fsus-ink));
       }
 
       .#{$namespace}-carousel__indicator {
@@ -145,7 +156,7 @@
     cursor: pointer;
 
     &:hover button {
-      opacity: 0.72;
+      opacity: var(--fsus-carousel-indicator-hover-opacity, 0.72);
     }
 
     @include m(horizontal) {
@@ -166,23 +177,45 @@
 
     @include when(active) {
       button {
-        opacity: 1;
+        opacity: var(--fsus-carousel-indicator-active-opacity, 1);
+        background-color: var(
+          --fsus-carousel-indicator-active-bg,
+          var(--fsus-color-surface-base)
+        );
+        box-shadow: inset 0 0 0 1px
+          var(
+            --fsus-carousel-indicator-active-border,
+            var(--fsus-scholarly-blue)
+          );
       }
     }
   }
 
   @include e(button) {
     display: block;
-    opacity: 0.48;
+    opacity: var(--fsus-carousel-indicator-opacity, 0.48);
     width: getCssVar('carousel-indicator-width');
     height: getCssVar('carousel-indicator-height');
-    background-color: $color-white;
+    background-color: var(
+      --fsus-carousel-indicator-bg,
+      var(--fsus-color-surface-base)
+    );
     border: none;
     outline: none;
     padding: 0;
     margin: 0;
     cursor: pointer;
-    transition: getCssVar('transition-duration');
+    transition:
+      background-color var(--fsus-motion-control-fast, 160ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+      box-shadow var(--fsus-motion-control-fast, 160ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+      opacity var(--fsus-motion-control-fast, 160ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+
+    &:focus-visible {
+      @include a11y-focus-ring(2px, var(--fsus-radius-pill));
+    }
   }
 }
 

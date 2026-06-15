@@ -109,6 +109,17 @@
   --fsus-floating-control-radius: var(--fsus-radius-pill);
   --fsus-floating-control-shadow: var(--fsus-shadow-floating);
   --fsus-z-floating-control: 5;
+  --fsus-carousel-drag-filter: none;
+  --fsus-carousel-control-color: var(--fsus-color-surface-base);
+  --fsus-carousel-label-color: var(--fsus-ink);
+  --fsus-carousel-indicator-bg: var(--fsus-color-surface-base);
+  --fsus-carousel-indicator-outside-bg: var(--fsus-ink);
+  --fsus-carousel-indicator-opacity: 0.48;
+  --fsus-carousel-indicator-hover-opacity: 0.72;
+  --fsus-carousel-indicator-outside-opacity: 0.24;
+  --fsus-carousel-indicator-active-opacity: 1;
+  --fsus-carousel-indicator-active-bg: var(--fsus-color-surface-base);
+  --fsus-carousel-indicator-active-border: var(--fsus-scholarly-blue);
 
   --fsus-shadow-panel: none;
   --fsus-shadow-panel-light: 0 8px 24px rgba(15, 23, 42, 0.05);
