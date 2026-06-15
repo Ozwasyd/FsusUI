@@ -708,6 +708,25 @@ describe('Fsus theme visual baseline', () => {
     expect(css).not.toContain('box-shadow: var(--el-box-shadow-lighter);')
   })
 
+  test('keeps collapse header focus and motion tokenized', () => {
+    const css = compileThemeFile('collapse.scss')
+
+    expectCssRule(css, '.el-collapse-item__header', [
+      'transition: border-bottom-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+    ])
+    expectCssRule(css, '.el-collapse-item__arrow', [
+      'transition: transform var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+    ])
+    expectCssRule(css, '.el-collapse-item__header:focus-visible', [
+      'outline: none !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+    ])
+    expect(css).not.toContain(
+      '.el-collapse-item__header.focusing:focus:not(:hover) {\n  color:',
+    )
+    expect(css).not.toContain('var(--el-color-primary)')
+  })
+
   test('keeps calendar header controls border-first', () => {
     const css = compileThemeFile('calendar.scss')
 

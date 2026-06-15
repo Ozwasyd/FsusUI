@@ -31,18 +31,21 @@
     border-bottom: 1px solid getCssVar('collapse-border-color');
     font-size: getCssVar('collapse-header-font-size');
     font-weight: 500;
-    transition: border-bottom-color getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier');
+    transition: border-bottom-color var(--fsus-motion-control-fast, 160ms)
+      var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
     outline: none;
     @include e(arrow) {
       margin: 0 8px 0 auto;
-      transition: transform getCssVar('transition-duration') getCssVar('transition-function-ease-in-out-bezier');
+      transition: transform var(--fsus-motion-control-fast, 160ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
       font-weight: 300;
       @include when(active) {
         transform: rotate(90deg);
       }
     }
-    &.focusing:focus:not(:hover) {
-      color: getCssVar('color-primary');
+    &.focusing:focus:not(:hover),
+    &:focus-visible {
+      @include a11y-focus-ring(2px, var(--fsus-radius-control-small, 6px));
     }
     @include when(active) {
       border-bottom-color: transparent;
