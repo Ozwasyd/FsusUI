@@ -606,10 +606,10 @@ $message: map.merge(
 $notification: () !default;
 $notification: map.merge(
   (
-    'width': 360px,
+    'width': var(--fsus-notification-max-width, min(480px, calc(100vw - 24px))),
     'padding': 20px 24px,
     'radius': getCssVar('border-radius', 'large'),
-    'shadow': getCssVar('box-shadow', 'dark'),
+    'shadow': var(--fsus-shadow-floating, 0 12px 32px rgba(15, 23, 42, 0.08)),
     'border-color': getCssVar('border-color-lighter'),
     'icon-size': 24px,
     'close-font-size': 18px,

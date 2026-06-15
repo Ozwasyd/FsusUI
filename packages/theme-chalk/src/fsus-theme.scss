@@ -1235,7 +1235,8 @@ button.#{$namespace}-card:active {
 }
 
 .#{$namespace}-notification {
-  width: var(--fsus-floating-max-width);
+  position: fixed;
+  width: var(--fsus-notification-max-width);
 }
 
 .#{$namespace}-loading-mask {
@@ -2358,9 +2359,12 @@ button.#{$namespace}-card:active {
     --fsus-backdrop-blur-soft: 0px;
   }
 
-  .#{$namespace}-message,
-  .#{$namespace}-notification {
+  .#{$namespace}-message {
     width: min(100vw - 16px, 420px);
+  }
+
+  .#{$namespace}-notification {
+    width: var(--fsus-notification-max-width);
   }
 
   .#{$namespace}-dialog:not(.is-fullscreen) {

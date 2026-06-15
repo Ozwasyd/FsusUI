@@ -28,11 +28,11 @@
   will-change: transform, opacity;
 
   &.right {
-    right: 16px;
+    right: var(--fsus-space-3, 12px);
   }
 
   &.left {
-    left: 16px;
+    left: var(--fsus-space-3, 12px);
   }
 
   @include e(group) {
@@ -97,7 +97,7 @@
 .#{$namespace}-notification-fade-enter-from {
   &.right {
     transform: translate3d(
-      calc(100% + 16px),
+      calc(100% + var(--fsus-space-3, 12px)),
       var(--el-notification-stack-y, 0px),
       0
     );
@@ -105,7 +105,7 @@
 
   &.left {
     transform: translate3d(
-      calc(-100% - 16px),
+      calc(-100% - var(--fsus-space-3, 12px)),
       var(--el-notification-stack-y, 0px),
       0
     );
@@ -117,7 +117,7 @@
 
   &.right {
     transform: translate3d(
-      calc(100% + 16px),
+      calc(100% + var(--fsus-space-3, 12px)),
       var(--el-notification-stack-y, 0px),
       0
     );
@@ -125,7 +125,7 @@
 
   &.left {
     transform: translate3d(
-      calc(-100% - 16px),
+      calc(-100% - var(--fsus-space-3, 12px)),
       var(--el-notification-stack-y, 0px),
       0
     );
