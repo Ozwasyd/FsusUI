@@ -7,6 +7,7 @@
           :key="command.key"
           type="button"
           :class="ns.e('command')"
+          :disabled="disabled"
           :title="command.title || command.label"
           @click="runCommand(command)"
         >
@@ -14,7 +15,12 @@
         </button>
       </div>
 
-      <div :class="ns.e('modes')" role="tablist" aria-label="Markdown mode">
+      <div
+        v-if="showModeSwitcher"
+        :class="ns.e('modes')"
+        role="tablist"
+        aria-label="Markdown mode"
+      >
         <button
           v-for="mode in modes"
           :key="mode"
@@ -22,20 +28,42 @@
           role="tab"
           :aria-selected="currentMode === mode"
           :class="[ns.e('mode'), ns.is('active', currentMode === mode)]"
+          :disabled="disabled"
           @click="setMode(mode)"
         >
           {{ mode }}
         </button>
       </div>
 
-      <div :class="ns.e('actions')">
-        <button type="button" :class="ns.e('action')" @click="emitUploadImage">
+      <div
+        v-if="showActions && (showImageAction || showSaveAction || showSubmitAction)"
+        :class="ns.e('actions')"
+      >
+        <button
+          v-if="showImageAction"
+          type="button"
+          :class="ns.e('action')"
+          :disabled="disabled"
+          @click="emitUploadImage"
+        >
           Image
         </button>
-        <button type="button" :class="ns.e('action')" @click="emitSave">
+        <button
+          v-if="showSaveAction"
+          type="button"
+          :class="ns.e('action')"
+          :disabled="disabled"
+          @click="emitSave"
+        >
           Save
         </button>
-        <button type="button" :class="ns.e('action')" @click="emitSubmit">
+        <button
+          v-if="showSubmitAction"
+          type="button"
+          :class="ns.e('action')"
+          :disabled="disabled"
+          @click="emitSubmit"
+        >
           Submit
         </button>
       </div>
@@ -44,8 +72,12 @@
     <div :class="ns.e('body')">
       <textarea
         v-show="currentMode !== 'preview'"
+        :id="textareaId"
         ref="textareaRef"
         :class="ns.e('textarea')"
+        :aria-disabled="disabled"
+        :disabled="disabled"
+        :name="textareaName"
         :placeholder="placeholder"
         :rows="minRows"
         :value="modelValue"
@@ -108,13 +140,13 @@ const props = defineProps(markdownEditorProps)
 const emit = defineEmits(markdownEditorEmits)
 const ns = useNamespace('markdown-editor')
 const modes: MarkdownEditorMode[] = ['write', 'split', 'preview']
-const currentMode = ref<MarkdownEditorMode>(props.defaultMode)
+const currentMode = ref<MarkdownEditorMode>(props.mode ?? props.defaultMode)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 
 watch(
-  () => props.defaultMode,
-  (mode) => {
-    currentMode.value = mode
+  [() => props.mode, () => props.defaultMode],
+  ([mode, defaultMode]) => {
+    currentMode.value = mode ?? defaultMode
   },
 )
 
@@ -130,6 +162,8 @@ const emitValue = (value: string) => {
 }
 
 const handleInput = (event: Event) => {
+  if (props.disabled) return
+
   const target = event.target
   if (target instanceof HTMLTextAreaElement) {
     emitValue(target.value)
@@ -152,6 +186,8 @@ const restoreSelection = async (selection: MarkdownEditorSelection) => {
 }
 
 const runCommand = (command: MarkdownEditorCommand) => {
+  if (props.disabled) return
+
   const result = applyMarkdownEditorCommand(
     props.modelValue,
     readSelection(),
@@ -165,19 +201,27 @@ const runCommand = (command: MarkdownEditorCommand) => {
 }
 
 const setMode = (mode: MarkdownEditorMode) => {
+  if (props.disabled) return
+
   currentMode.value = mode
   emit('mode-change', mode)
 }
 
 const emitSave = () => {
+  if (props.disabled) return
+
   emit('save', props.modelValue)
 }
 
 const emitSubmit = () => {
+  if (props.disabled) return
+
   emit('submit', props.modelValue)
 }
 
 const emitUploadImage = () => {
+  if (props.disabled) return
+
   emit('upload-image')
 }
 
@@ -197,6 +241,8 @@ const emitRenderEvent = (
 }
 
 const handleKeydown = (event: KeyboardEvent) => {
+  if (props.disabled) return
+
   const isMod = event.metaKey || event.ctrlKey
   if (!isMod) return
 
@@ -222,4 +268,24 @@ const handleKeydown = (event: KeyboardEvent) => {
     runCommand(command)
   }
 }
+
+const insertMarkdownAtCursor = (markdown: string) => {
+  if (props.disabled) return false
+
+  const selection = readSelection()
+  const start = Math.max(0, Math.min(props.modelValue.length, selection.start))
+  const end = Math.max(0, Math.min(props.modelValue.length, selection.end))
+  const value =
+    props.modelValue.slice(0, start) + markdown + props.modelValue.slice(end)
+  const cursor = start + markdown.length
+
+  emitValue(value)
+  void restoreSelection({ start: cursor, end: cursor })
+
+  return true
+}
+
+defineExpose({
+  insertMarkdownAtCursor,
+})
 </script>

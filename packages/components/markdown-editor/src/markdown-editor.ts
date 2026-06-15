@@ -173,9 +173,43 @@ export const markdownEditorProps = buildProps({
     values: ['write', 'split', 'preview'],
     default: 'write',
   },
+  mode: {
+    type: String as PropType<MarkdownEditorMode | undefined>,
+    values: ['write', 'split', 'preview'],
+    default: undefined,
+  },
   placeholder: {
     type: String,
     default: '',
+  },
+  textareaId: {
+    type: String,
+    default: undefined,
+  },
+  textareaName: {
+    type: String,
+    default: undefined,
+  },
+  disabled: Boolean,
+  showModeSwitcher: {
+    type: Boolean,
+    default: true,
+  },
+  showActions: {
+    type: Boolean,
+    default: true,
+  },
+  showImageAction: {
+    type: Boolean,
+    default: true,
+  },
+  showSaveAction: {
+    type: Boolean,
+    default: true,
+  },
+  showSubmitAction: {
+    type: Boolean,
+    default: true,
   },
   commands: {
     type: definePropType<readonly MarkdownEditorCommand[]>(Array),

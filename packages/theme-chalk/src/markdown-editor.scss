@@ -56,11 +56,15 @@
     padding: 7px 9px;
     cursor: pointer;
 
-    &:hover,
+    &:hover {
+      color: getCssVar('color', 'primary');
+      border-color: getCssVar('color', 'primary');
+    }
+
     &:focus-visible {
       color: getCssVar('color', 'primary');
       border-color: getCssVar('color', 'primary');
-      outline: none;
+      @include a11y-focus-ring(2px, getCssVar('border-radius', 'small'));
     }
   }
 
@@ -99,6 +103,10 @@
       ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
       'Courier New', monospace;
     line-height: 1.6;
+
+    &:focus-visible {
+      @include a11y-focus-ring(2px);
+    }
   }
 
   @include e(preview) {

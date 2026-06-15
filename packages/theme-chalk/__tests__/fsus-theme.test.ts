@@ -183,6 +183,21 @@ describe('Fsus theme visual baseline', () => {
     }
   })
 
+  test('aligns markdown editor focus states with the shared 2px contract', () => {
+    const css = compileThemeFile('markdown-editor.scss')
+
+    for (const selector of [
+      '.el-markdown-editor__command:focus-visible',
+      '.el-markdown-editor__mode:focus-visible',
+      '.el-markdown-editor__action:focus-visible',
+      '.el-markdown-editor__textarea:focus-visible',
+    ]) {
+      expectCssRule(css, selector, [
+        'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+      ])
+    }
+  })
+
   test('keeps closable card tabs hit areas stable', () => {
     const css = compileThemeFile('tabs.scss')
 

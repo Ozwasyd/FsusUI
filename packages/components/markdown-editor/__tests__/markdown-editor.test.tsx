@@ -75,4 +75,42 @@ describe('MarkdownEditor', () => {
     expect(wrapper.emitted('save')?.[0]).toEqual(['# Preview'])
     expect(wrapper.emitted('submit')?.[0]).toEqual(['# Preview'])
   })
+
+  it('supports controlled mode, action visibility, disabled state, and cursor insertion', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        disabled: true,
+        mode: 'preview',
+        modelValue: 'initial',
+        showActions: false,
+        showModeSwitcher: false,
+        textareaId: 'markdown-body',
+        textareaName: 'body',
+      },
+      global: {
+        stubs: {
+          ElMarkdownRenderer: {
+            template: '<div data-stub-markdown-renderer></div>',
+            props: ['content'],
+          },
+        },
+      },
+    })
+
+    expect(wrapper.find('.el-markdown-editor--preview').exists()).toBe(true)
+    expect(wrapper.find('.el-markdown-editor__actions').exists()).toBe(false)
+    expect(wrapper.find('.el-markdown-editor__modes').exists()).toBe(false)
+
+    await wrapper.setProps({ mode: 'write' })
+    const textarea = wrapper.find('textarea')
+    expect(textarea.attributes('id')).toBe('markdown-body')
+    expect(textarea.attributes('name')).toBe('body')
+    expect(textarea.attributes('disabled')).toBeDefined()
+    expect(wrapper.vm.insertMarkdownAtCursor(' ignored')).toBe(false)
+
+    await wrapper.setProps({ disabled: false })
+    ;(textarea.element as HTMLTextAreaElement).setSelectionRange(7, 7)
+    expect(wrapper.vm.insertMarkdownAtCursor(' text')).toBe(true)
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['initial text'])
+  })
 })
