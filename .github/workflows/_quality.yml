@@ -4,9 +4,9 @@ on:
   workflow_call:
 
 jobs:
-  contract:
+  static-quality:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -18,90 +18,24 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run check:consumer-contract
-      - run: pnpm run check:npm-dist-tag
-
-  lint:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-
-  tokens:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run tokens:check
-      - run: pnpm run tokens:lint
-
-  icons:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run icons:check
-      - run: pnpm run icons:lint
-
-  conformance:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run conformance
-
-  governance:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run governance:check
+      - name: Run contract checks
+        run: |
+          pnpm run check:consumer-contract
+          pnpm run check:npm-dist-tag
+      - name: Run lint
+        run: pnpm lint
+      - name: Run token checks
+        run: |
+          pnpm run tokens:check
+          pnpm run tokens:lint
+      - name: Run icon checks
+        run: |
+          pnpm run icons:check
+          pnpm run icons:lint
+      - name: Run conformance
+        run: pnpm run conformance
+      - name: Run governance
+        run: pnpm run governance:check
 
   dotnet:
     runs-on: ${{ matrix.os }}
@@ -335,7 +269,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     needs:
-      - contract
+      - static-quality
       - build-package
     steps:
       - uses: actions/checkout@v4

@@ -201,3 +201,11 @@ changes. It skips only docs/metadata-only changes, and the workflow prints
 Main, master, workflow-dispatch, release, and local full verification paths
 still keep the full `build:demo` gate through `verify:full` and the reusable
 `build-demo` quality job.
+
+## Short Quality Consolidation
+
+The reusable full quality workflow groups short quality checks in one
+`static-quality` job with shared setup/install. Contract, lint, token, icon,
+conformance, and governance checks remain separate named steps, so failure
+output still identifies the failing quality area while avoiding repeated
+checkout, Node setup, and dependency installation for each short check.

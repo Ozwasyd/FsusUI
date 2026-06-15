@@ -224,3 +224,10 @@ docs/metadata-only changes skip it. The workflow logs `demo-build-run` and
 Full verification remains unchanged for main, master, workflow-dispatch, and
 release paths: `verify:full` and the reusable `build-demo` quality job still
 run the complete demo build.
+
+## Short Quality Consolidation
+
+Reusable full quality uses a `static-quality` job for short quality checks with
+shared setup/install. The job keeps contract, lint, token, icon, conformance,
+and governance as separate named steps so failure output remains easy to map
+back to the failing quality area.
