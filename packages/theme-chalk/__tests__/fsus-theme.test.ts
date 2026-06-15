@@ -196,6 +196,23 @@ describe('Fsus theme visual baseline', () => {
         'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
       ])
     }
+
+    expectCssRule(css, '.el-markdown-editor__command:hover', [
+      'background: var(--fsus-state-hover-bg);',
+      'border-color: var(--fsus-state-focus-border);',
+      'color: var(--el-text-color-primary);',
+    ])
+    expectCssRule(css, '.el-markdown-editor__mode.is-active', [
+      'background: var(--fsus-state-selected-bg);',
+      'color: var(--el-text-color-primary);',
+      'box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);',
+    ])
+    expect(css).not.toMatch(
+      /\.el-markdown-editor__(?:command|mode|action)(?::hover|:focus-visible)[^{]*\{[^}]*var\(--el-color-primary\)/s,
+    )
+    expect(css).not.toMatch(
+      /\.el-markdown-editor__mode\.is-active\s*\{[^}]*(?:var\(--el-color-primary\)|var\(--el-color-white\))/s,
+    )
   })
 
   test('keeps closable card tabs hit areas stable', () => {
