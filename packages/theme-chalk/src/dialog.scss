@@ -151,7 +151,7 @@
     var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
 
   .#{$namespace}-overlay-dialog {
-    animation: dialog-scale-fade-out var(--fsus-motion-control, 260ms)
+    animation: dialog-scale-fade-out var(--fsus-motion-panel, 420ms)
       var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
   }
 }

@@ -56,8 +56,9 @@ $button-icon-span-gap: map.merge(
   border-color: getCssVar('button', 'border-color');
 
   &:hover {
-    background-color: inherit;
-    opacity: 0.85;
+    color: getCssVar('button', 'hover', 'text-color');
+    border-color: getCssVar('button', 'hover', 'border-color');
+    background-color: getCssVar('button', 'hover', 'bg-color');
   }
 
   &:focus {

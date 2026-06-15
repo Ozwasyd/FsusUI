@@ -42,7 +42,7 @@ $directions: rtl, ltr, ttb, btt;
     font-size: 1.5rem;
     font-weight: 700;
     color: getCssVar('text-color', 'primary');
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
   }
 
   @include e(footer) {
@@ -55,8 +55,11 @@ $directions: rtl, ltr, ttb, btt;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 44px;
-    min-height: 44px;
+    width: 54px;
+    height: 54px;
+    min-width: 54px;
+    min-height: 54px;
+    padding: 0;
     border: none;
     cursor: pointer;
     font-size: getCssVar('font-size-extra-large');

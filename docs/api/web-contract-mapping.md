@@ -8,7 +8,7 @@ which APIs are cross-platform FsusUI contracts.
 
 | Component   | Web API Surface                    | Contract Status | Notes                                                               |
 | ----------- | ---------------------------------- | --------------- | ------------------------------------------------------------------- |
-| button      | `ElButton`, `inlineAction`, motion | partial         | Contract matches behavior; #56 tracks variant-specific hover opacity and state detail. |
+| button      | `ElButton`, `inlineAction`, motion | matching        | Loading, disabled, keyboard activation, variant hover, and motion map to `button`. |
 | icon-button | `ElButton` with `icon`/`circle`    | matching        | Icon-only usage must provide `aria-label` or `aria-labelledby`.     |
 | input       | `ElInput`                          | matching        | Native input semantics remain the Web adapter.                      |
 | textarea    | `ElInput` textarea mode            | matching        | Maps to multiline text-input contract with 2px inset Scholarly Blue focus parity. |
@@ -20,11 +20,11 @@ which APIs are cross-platform FsusUI contracts.
 | tag         | `ElTag`, `ElCheckTag`              | matching        | Uppercase visual treatment is Web styling, not a contract field.    |
 | badge       | `ElBadge`                          | matching        | Count and status variants map to `badge`.                           |
 | alert       | `ElAlert`                          | matching        | Dismissible state and role map to `alert`.                          |
-| dialog      | `ElDialog`                         | partial         | Vue transition implementation is not public contract; #56 tracks panel leave duration and close target details. |
+| dialog      | `ElDialog`                         | matching        | Vue transition implementation is not public contract; panel leave duration follows the panel motion token. |
 | tabs        | `ElTabs`                           | matching        | Card/border-card visuals are Web adapter details; active/focus indicators use Scholarly Blue. |
 | menu        | `ElMenu`                           | matching        | DOM class names and submenu templates are not public contract.      |
-| dropdown    | `ElDropdown`, dropdown menu        | partial         | #56 tracks default `8px 0` menu padding and selectable state details. |
-| table       | `ElTable`, `ElTableV2`             | partial         | #56 tracks 16px horizontal cell padding and quiet row hover treatment. |
+| dropdown    | `ElDropdown`, dropdown menu        | matching        | Default menu padding is `8px 0`; selectable states stay quiet and token-driven. |
+| table       | `ElTable`, `ElTableV2`             | matching        | Table cells use 16px default horizontal padding and quiet row hover treatment. |
 | public-shell | `ElPublicShell`                   | matching        | Focus rings are 2px inset; active navigation uses a stable Scholarly Blue underline. |
 
 ## Token Migration

@@ -184,7 +184,7 @@
     white-space: normal;
     word-break: break-all;
     line-height: 23px;
-    padding: 0 12px;
+    padding: 0 16px;
 
     &.#{$namespace}-tooltip {
       white-space: nowrap;
@@ -633,8 +633,8 @@
 
   @include m(enable-row-hover) {
     .#{$namespace}-table__body tr:hover > td.#{$namespace}-table__cell {
-      background-color: getCssVar('bg-color', 'page');
-      color: getCssVar('color', 'scholarly-blue');
+      background-color: getCssVar('table-row-hover-bg-color');
+      color: getCssVar('table-text-color');
     }
   }
 

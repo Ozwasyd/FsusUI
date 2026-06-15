@@ -138,10 +138,15 @@ try {
   }
 
   const webMapping = read('docs/api/web-contract-mapping.md')
-  for (const component of ['button', 'dialog', 'dropdown', 'table']) {
-    assertMappingStatus(webMapping, component, 'partial')
-  }
-  for (const component of ['textarea', 'tabs', 'public-shell']) {
+  for (const component of [
+    'button',
+    'dialog',
+    'dropdown',
+    'table',
+    'textarea',
+    'tabs',
+    'public-shell',
+  ]) {
     assertMappingStatus(webMapping, component, 'matching')
   }
   assertIncludes(

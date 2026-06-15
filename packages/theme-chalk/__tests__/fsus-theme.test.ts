@@ -442,6 +442,40 @@ describe('Fsus theme visual baseline', () => {
     ])
   })
 
+  test('keeps high-frequency component states aligned with design details', () => {
+    const buttonCss = compileThemeFile('button.scss')
+    const drawerCss = compileThemeFile('drawer.scss')
+    const dropdownCss = compileThemeFile('dropdown.scss')
+    const tableCss = compileThemeFile('table.scss')
+
+    expect(buttonCss).not.toMatch(
+      /\.el-button:hover\s*\{[^}]*opacity:\s*0\.85;/s,
+    )
+    expectCssRule(buttonCss, '.el-button:hover', [
+      'color: var(--el-button-hover-text-color);',
+      'border-color: var(--el-button-hover-border-color);',
+      'background-color: var(--el-button-hover-bg-color);',
+    ])
+    expectCssRule(drawerCss, '.el-drawer__title', ['letter-spacing: 0;'])
+    expectCssRule(drawerCss, '.el-drawer__close-btn', [
+      'width: 54px;',
+      'height: 54px;',
+      'min-width: 54px;',
+      'min-height: 54px;',
+      'padding: 0;',
+    ])
+    expectCssRule(dropdownCss, '.el-dropdown-menu', ['padding: 8px 0;'])
+    expectCssRule(tableCss, '.el-table .cell', ['padding: 0 16px;'])
+    expectCssRule(
+      tableCss,
+      '.el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell',
+      [
+        'background-color: var(--el-table-row-hover-bg-color);',
+        'color: var(--el-table-text-color);',
+      ],
+    )
+  })
+
   test('supports component-level motion disablement and dialog scale fade', () => {
     const themeCss = compileThemeFile('fsus-theme.scss')
     const dialogCss = compileThemeFile('dialog.scss')
@@ -463,6 +497,13 @@ describe('Fsus theme visual baseline', () => {
       '.dialog-scale-fade-enter-active .el-overlay-dialog',
       [
         'animation: dialog-scale-fade-in var(--fsus-motion-panel, 420ms) var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));',
+      ],
+    )
+    expectCssRule(
+      dialogCss,
+      '.dialog-scale-fade-leave-active .el-overlay-dialog',
+      [
+        'animation: dialog-scale-fade-out var(--fsus-motion-panel, 420ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));',
       ],
     )
     expect(dialogCss).toContain('@keyframes dialog-scale-fade-in')
