@@ -167,8 +167,19 @@
       background-color: getCssVar('pagination-button-bg-color');
 
       &.is-active {
-        background-color: getCssVar('color-primary');
-        color: getCssVar('color-white');
+        background-color: var(
+          --fsus-pagination-active-bg,
+          var(--fsus-state-selected-bg)
+        );
+        color: var(
+          --fsus-pagination-active-text,
+          var(--fsus-scholarly-blue)
+        );
+        box-shadow: inset 0 0 0 1px
+          var(
+            --fsus-pagination-active-border,
+            var(--fsus-state-focus-border)
+          );
       }
 
       &:disabled,

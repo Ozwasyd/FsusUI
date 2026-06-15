@@ -940,6 +940,19 @@ describe('Fsus theme visual baseline', () => {
     expect(css).not.toContain('border-radius: var(--el-border-radius-base);')
   })
 
+  test('keeps pagination background active state on navigation tokens', () => {
+    const css = compileThemeFile('pagination.scss')
+
+    expectCssRule(css, '.el-pagination.is-background .el-pager li.is-active', [
+      'background-color: var(--fsus-pagination-active-bg, var(--fsus-state-selected-bg));',
+      'color: var(--fsus-pagination-active-text, var(--fsus-scholarly-blue));',
+      'box-shadow: inset 0 0 0 1px var(--fsus-pagination-active-border, var(--fsus-state-focus-border));',
+    ])
+    expect(css).not.toMatch(
+      /\.el-pagination\.is-background [^{]*\.is-active\s*\{[^}]*(?:var\(--el-color-primary\)|var\(--el-color-white\))/s,
+    )
+  })
+
   test('keeps tooltip v2 radius and surfaces tokenized', () => {
     const css = compileThemeFile('tooltip-v2.scss')
 
