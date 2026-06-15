@@ -33,13 +33,7 @@
       padding: 3px;
       border: 1px solid getCssVar('border-color-lighter');
       border-radius: var(--fsus-radius-control, 8px);
-      background:
-        linear-gradient(
-          180deg,
-          color-mix(in srgb, #{getCssVar('fill-color', 'blank')} 92%, transparent),
-          color-mix(in srgb, #{getCssVar('fill-color', 'light')} 90%, transparent)
-        );
-      box-shadow: inset 0 1px 0 var(--fsus-highlight, rgba(255, 255, 255, 0.72));
+      background: transparent;
     }
 
     .#{$namespace}-button-group > .#{$namespace}-button {

@@ -547,6 +547,17 @@ describe('Fsus theme visual baseline', () => {
     expect(css).not.toContain('transform: scale(1.15);')
   })
 
+  test('keeps calendar header controls border-first', () => {
+    const css = compileThemeFile('calendar.scss')
+
+    expectCssRule(css, '.el-calendar__button-group .el-button-group', [
+      'border: 1px solid var(--el-border-color-lighter);',
+      'background: transparent;',
+    ])
+    expect(css).not.toContain('linear-gradient')
+    expect(css).not.toContain('inset 0 1px 0')
+  })
+
   test('uses square table surfaces unless callers opt into another radius', () => {
     const tableCss = compileThemeFile('table.scss')
     const tableV2Css = compileThemeFile('table-v2.scss')
