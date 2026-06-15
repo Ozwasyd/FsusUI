@@ -16,7 +16,7 @@ $directions: rtl, ltr, ttb, btt;
   -webkit-backdrop-filter: getCssVar('bg-color', 'overlay-blur');
   display: flex;
   flex-direction: column;
-  box-shadow: getCssVar('box-shadow', 'dark');
+  box-shadow: var(--fsus-shadow-panel, none);
   overflow: hidden;
   transition: transform getCssVar('transition-duration')
     getCssVar('transition-function-fast-bezier');

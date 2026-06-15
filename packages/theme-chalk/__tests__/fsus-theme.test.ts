@@ -534,8 +534,40 @@ describe('Fsus theme visual baseline', () => {
         'animation: dialog-scale-fade-out var(--fsus-motion-panel, 420ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));',
       ],
     )
+    expectCssRule(dialogCss, '.dialog-fade-enter-active', [
+      'animation: modal-fade-in var(--fsus-motion-overlay, 300ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));',
+    ])
+    expectCssRule(dialogCss, '.dialog-fade-enter-active .el-overlay-dialog', [
+      'animation: dialog-fade-in var(--fsus-motion-panel, 420ms) var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));',
+    ])
+    expectCssRule(dialogCss, '.dialog-fade-leave-active .el-overlay-dialog', [
+      'animation: dialog-fade-out var(--fsus-motion-panel, 420ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));',
+    ])
     expect(dialogCss).toContain('@keyframes dialog-scale-fade-in')
     expect(dialogCss).toContain('@keyframes dialog-scale-fade-out')
+  })
+
+  test('keeps overlay panels border-first by default', () => {
+    const drawerCss = compileThemeFile('drawer.scss')
+    const selectDropdownCss = compileThemeFile('select-dropdown.scss')
+
+    expectCssRule(drawerCss, '.el-drawer', [
+      'box-shadow: var(--fsus-shadow-panel, none);',
+    ])
+    expect(selectDropdownCss).toContain(
+      '--el-select-dropdown-padding: 8px 0;',
+    )
+    expect(selectDropdownCss).toContain(
+      '--el-select-dropdown-shadow: var(--fsus-shadow-panel, none);',
+    )
+    expectCssRule(selectDropdownCss, '.el-select-dropdown', [
+      'box-shadow: var(--el-select-dropdown-shadow);',
+    ])
+    expect(drawerCss).not.toContain('box-shadow: var(--el-box-shadow-dark);')
+    expect(selectDropdownCss).not.toContain('--el-select-dropdown-padding: 6px 0;')
+    expect(selectDropdownCss).not.toContain(
+      '--el-select-dropdown-shadow: var(--el-box-shadow-light);',
+    )
   })
 
   test('keeps rate hover within the control motion budget', () => {

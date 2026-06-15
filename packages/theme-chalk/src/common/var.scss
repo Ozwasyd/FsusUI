@@ -529,10 +529,10 @@ $select-dropdown: () !default;
 $select-dropdown: map.merge(
   (
     'bg-color': getCssVar('bg-color', 'overlay'),
-    'shadow': getCssVar('box-shadow-light'),
+    'shadow': var(--fsus-shadow-panel, none),
     'empty-color': getCssVar('text-color-secondary'),
     'max-height': 274px,
-    'padding': 6px 0,
+    'padding': 8px 0,
     'empty-padding': 10px 0,
     'header-padding': 10px,
     'footer-padding': 10px,
@@ -969,7 +969,7 @@ $select-dropdown: map.merge(
     'empty-color': getCssVar('text-color-secondary'),
     'max-height': 274px,
     'border': 1px solid getCssVar('border-color-lighter'),
-    'shadow': getCssVar('box-shadow', 'light'),
+    'shadow': var(--fsus-shadow-panel, none),
     'border-radius': getCssVar('border-radius', 'large'),
   ),
   $select-dropdown
