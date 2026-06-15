@@ -5,9 +5,6 @@
   width: 44px;
   height: 44px;
   font-size: 24px;
-  color: #fff;
-  background-color: getCssVar('text-color', 'regular');
-  border-color: #fff;
 }
 
 @include b(image-viewer) {
@@ -26,11 +23,32 @@
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    opacity: 0;
+    opacity: var(--fsus-image-viewer-control-opacity, 0.88);
+    color: var(
+      --fsus-image-viewer-control-fg,
+      var(--fsus-color-surface-base)
+    );
+    background-color: var(
+      --fsus-image-viewer-control-bg,
+      rgba(15, 15, 17, 0.72)
+    );
+    border: 1px solid
+      var(--fsus-image-viewer-control-border, rgba(255, 255, 255, 0.64));
     cursor: pointer;
     box-sizing: border-box;
     user-select: none;
-    transition: opacity getCssVar('transition-duration');
+    transition:
+      opacity var(--fsus-motion-control-fast, 160ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+      background-color var(--fsus-motion-control-fast, 160ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+      box-shadow var(--fsus-motion-control-fast, 160ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+
+    &:focus-visible {
+      @include a11y-focus-ring(2px, var(--fsus-radius-pill));
+      opacity: var(--fsus-image-viewer-control-hover-opacity, 1);
+    }
 
     > svg {
       width: 1em;
@@ -41,7 +59,7 @@
   @include e(wrapper) {
     &:hover {
       .#{$namespace}-image-viewer__btn {
-        opacity: 0.8;
+        opacity: var(--fsus-image-viewer-control-hover-opacity, 1);
       }
     }
   }
@@ -71,19 +89,34 @@
     width: 282px;
     height: 44px;
     padding: 0 23px;
-    background-color: getCssVar('text-color', 'regular');
-    border-color: #fff;
+    background-color: var(
+      --fsus-image-viewer-control-bg,
+      rgba(15, 15, 17, 0.72)
+    );
+    border-color: var(
+      --fsus-image-viewer-control-border,
+      rgba(255, 255, 255, 0.64)
+    );
     border-radius: 22px;
     cursor: default;
     font-size: 23px;
-    color: #fff;
+    color: var(
+      --fsus-image-viewer-control-fg,
+      var(--fsus-color-surface-base)
+    );
     justify-content: space-around;
 
     @include e(action) {
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      border-radius: var(--fsus-radius-pill);
       cursor: pointer;
+
+      &:focus-visible {
+        @include a11y-focus-ring(2px, var(--fsus-radius-pill));
+        opacity: var(--fsus-image-viewer-control-hover-opacity, 1);
+      }
     }
   }
 
@@ -112,22 +145,38 @@
     height: 100%;
     top: 0;
     left: 0;
-    opacity: 0.5;
-    background: #000;
+    opacity: 1;
+    background: var(--fsus-image-viewer-overlay-bg, rgba(0, 0, 0, 0.72));
   }
 }
 
 .viewer-fade-enter-active {
-  animation: viewer-fade-in getCssVar('transition-duration');
+  animation: viewer-fade-in
+    var(--fsus-image-viewer-motion, var(--fsus-motion-overlay, 300ms))
+    var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
 }
 
 .viewer-fade-leave-active {
-  animation: viewer-fade-out getCssVar('transition-duration');
+  animation: viewer-fade-out
+    var(--fsus-image-viewer-motion, var(--fsus-motion-overlay, 300ms))
+    var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .viewer-fade-enter-active,
+  .viewer-fade-leave-active {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
 
 @keyframes viewer-fade-in {
   0% {
-    transform: translate3d(0, -20px, 0);
+    transform: translate3d(
+      0,
+      var(--fsus-image-viewer-enter-y, -12px),
+      0
+    );
     opacity: 0;
   }
   100% {
@@ -142,7 +191,11 @@
     opacity: 1;
   }
   100% {
-    transform: translate3d(0, -20px, 0);
+    transform: translate3d(
+      0,
+      var(--fsus-image-viewer-enter-y, -12px),
+      0
+    );
     opacity: 0;
   }
 }

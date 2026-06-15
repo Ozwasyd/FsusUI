@@ -10,36 +10,78 @@
         <div :class="ns.e('mask')" @click.self="hideOnClickModal && hide()" />
 
         <!-- CLOSE -->
-        <span :class="[ns.e('btn'), ns.e('close')]" @click="hide">
+        <span
+          :class="[ns.e('btn'), ns.e('close')]"
+          role="button"
+          tabindex="0"
+          v-on="closeEvents"
+        >
           <Close />
         </span>
 
         <!-- ARROW -->
         <template v-if="!isSingle">
-          <span :class="arrowPrevKls" @click="prev">
+          <span
+            :class="arrowPrevKls"
+            role="button"
+            :tabindex="!props.infinite && isFirst ? -1 : 0"
+            :aria-disabled="!props.infinite && isFirst ? 'true' : undefined"
+            v-on="prevEvents"
+          >
             <ArrowLeft />
           </span>
-          <span :class="arrowNextKls" @click="next">
+          <span
+            :class="arrowNextKls"
+            role="button"
+            :tabindex="!props.infinite && isLast ? -1 : 0"
+            :aria-disabled="!props.infinite && isLast ? 'true' : undefined"
+            v-on="nextEvents"
+          >
             <ArrowRight />
           </span>
         </template>
         <!-- ACTIONS -->
         <div :class="[ns.e('btn'), ns.e('actions')]">
-          <span :class="ns.e('action')" v-on="zoomOutEvents">
+          <span
+            :class="ns.e('action')"
+            role="button"
+            tabindex="0"
+            v-on="zoomOutEvents"
+          >
             <ZoomOut />
           </span>
-          <span :class="ns.e('action')" v-on="zoomInEvents">
+          <span
+            :class="ns.e('action')"
+            role="button"
+            tabindex="0"
+            v-on="zoomInEvents"
+          >
             <ZoomIn />
           </span>
           <i :class="ns.e('actions__divider')" />
-          <span :class="ns.e('action')" v-on="toggleModeEvents">
+          <span
+            :class="ns.e('action')"
+            role="button"
+            tabindex="0"
+            v-on="toggleModeEvents"
+          >
             <component :is="mode.icon" />
           </span>
           <i :class="ns.e('actions__divider')" />
-          <span :class="ns.e('action')" v-on="anticlockwiseEvents">
+          <span
+            :class="ns.e('action')"
+            role="button"
+            tabindex="0"
+            v-on="anticlockwiseEvents"
+          >
             <RefreshLeft />
           </span>
-          <span :class="ns.e('action')" v-on="clockwiseEvents">
+          <span
+            :class="ns.e('action')"
+            role="button"
+            tabindex="0"
+            v-on="clockwiseEvents"
+          >
             <RefreshRight />
           </span>
         </div>
@@ -312,11 +354,31 @@ function toggleMode() {
   reset()
 }
 
-const zoomOutEvents = { click: () => handleActions('zoomOut') }
-const zoomInEvents = { click: () => handleActions('zoomIn') }
-const toggleModeEvents = { click: toggleMode }
-const anticlockwiseEvents = { click: () => handleActions('anticlockwise') }
-const clockwiseEvents = { click: () => handleActions('clockwise') }
+function handleControlKeydown(e: KeyboardEvent, handler: () => void) {
+  if (e.code !== EVENT_CODE.enter && e.code !== EVENT_CODE.space) return
+
+  e.preventDefault()
+  e.stopPropagation()
+  handler()
+}
+
+function createControlEvents(handler: () => void) {
+  return {
+    click: handler,
+    keydown: (e: KeyboardEvent) => handleControlKeydown(e, handler),
+  }
+}
+
+const closeEvents = createControlEvents(hide)
+const prevEvents = createControlEvents(prev)
+const nextEvents = createControlEvents(next)
+const zoomOutEvents = createControlEvents(() => handleActions('zoomOut'))
+const zoomInEvents = createControlEvents(() => handleActions('zoomIn'))
+const toggleModeEvents = createControlEvents(toggleMode)
+const anticlockwiseEvents = createControlEvents(() =>
+  handleActions('anticlockwise')
+)
+const clockwiseEvents = createControlEvents(() => handleActions('clockwise'))
 
 function setActiveItem(index: number) {
   const len = props.urlList.length

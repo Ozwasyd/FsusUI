@@ -120,6 +120,14 @@
   --fsus-carousel-indicator-active-opacity: 1;
   --fsus-carousel-indicator-active-bg: var(--fsus-color-surface-base);
   --fsus-carousel-indicator-active-border: var(--fsus-scholarly-blue);
+  --fsus-image-viewer-overlay-bg: rgba(0, 0, 0, 0.72);
+  --fsus-image-viewer-control-fg: var(--fsus-color-surface-base);
+  --fsus-image-viewer-control-bg: rgba(15, 15, 17, 0.72);
+  --fsus-image-viewer-control-border: rgba(255, 255, 255, 0.64);
+  --fsus-image-viewer-control-opacity: 0.88;
+  --fsus-image-viewer-control-hover-opacity: 1;
+  --fsus-image-viewer-motion: var(--fsus-motion-overlay);
+  --fsus-image-viewer-enter-y: -12px;
   --fsus-step-finish-color: var(--fsus-scholarly-blue);
   --fsus-progress-radius: var(--fsus-radius-pill);
   --fsus-progress-bar-color: var(--fsus-scholarly-blue);

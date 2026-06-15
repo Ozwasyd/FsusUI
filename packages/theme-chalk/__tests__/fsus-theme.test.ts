@@ -1029,6 +1029,56 @@ describe('Fsus theme visual baseline', () => {
     expect(css).not.toContain('transition: var(--el-transition-duration-fast);')
   })
 
+  test('keeps image viewer overlay controls motion and focus tokenized', () => {
+    const css = compileThemeFile('image-viewer.scss')
+
+    expectCssRule(css, '.el-image-viewer__mask', [
+      'opacity: 1;',
+      'background: var(--fsus-image-viewer-overlay-bg, rgba(0, 0, 0, 0.72));',
+    ])
+    expectCssRule(css, '.el-image-viewer__btn', [
+      'opacity: var(--fsus-image-viewer-control-opacity, 0.88);',
+      'color: var(--fsus-image-viewer-control-fg, var(--fsus-color-surface-base));',
+      'background-color: var(--fsus-image-viewer-control-bg, rgba(15, 15, 17, 0.72));',
+      'border: 1px solid var(--fsus-image-viewer-control-border, rgba(255, 255, 255, 0.64));',
+      'transition: opacity var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), background-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), box-shadow var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+    ])
+    expectCssRule(css, '.el-image-viewer__wrapper:hover .el-image-viewer__btn', [
+      'opacity: var(--fsus-image-viewer-control-hover-opacity, 1);',
+    ])
+
+    for (const selector of [
+      '.el-image-viewer__btn:focus-visible',
+      '.el-image-viewer__action:focus-visible',
+    ]) {
+      expectCssRule(css, selector, [
+        'outline: none !important;',
+        'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+        'opacity: var(--fsus-image-viewer-control-hover-opacity, 1);',
+      ])
+    }
+
+    expectCssRule(css, '.viewer-fade-enter-active', [
+      'animation: viewer-fade-in var(--fsus-image-viewer-motion, var(--fsus-motion-overlay, 300ms)) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+    ])
+    expectCssRule(css, '.viewer-fade-leave-active', [
+      'animation: viewer-fade-out var(--fsus-image-viewer-motion, var(--fsus-motion-overlay, 300ms)) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+    ])
+    expect(css).toContain('@media (prefers-reduced-motion: reduce)')
+    expectCssRule(
+      css,
+      '.viewer-fade-enter-active, .viewer-fade-leave-active',
+      [
+        'animation-duration: 1ms !important;',
+        'animation-iteration-count: 1 !important;',
+      ],
+    )
+    expect(css).not.toContain('color: #fff;')
+    expect(css).not.toContain('border-color: #fff;')
+    expect(css).not.toContain('background: #000;')
+    expect(css).not.toContain('var(--el-transition-duration)')
+  })
+
   test('keeps calendar header controls border-first', () => {
     const css = compileThemeFile('calendar.scss')
 

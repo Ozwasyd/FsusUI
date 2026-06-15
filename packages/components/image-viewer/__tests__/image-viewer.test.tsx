@@ -1,6 +1,7 @@
 import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, test } from 'vitest'
+import { EVENT_CODE } from '@element-plus/constants'
 import { IMAGE_SUCCESS } from '@element-plus/test-utils/mock'
 import ImageViewer from '../src/image-viewer.vue'
 
@@ -132,6 +133,42 @@ describe('<image-viewer /> keyboard and pointer scope', () => {
     await viewer.trigger('wheel', { deltaY: -120 })
     await doubleWait()
     expect(vm.transform.scale).toBeGreaterThan(initialScale)
+    wrapper.unmount()
+  })
+
+  test('exposes viewer controls as keyboard focusable buttons', async () => {
+    const wrapper = mount(
+      <ImageViewer urlList={[IMAGE_SUCCESS, IMAGE_SUCCESS]} />
+    )
+
+    await doubleWait()
+    const close = wrapper.find('.el-image-viewer__close')
+    const prev = wrapper.find('.el-image-viewer__prev')
+    const next = wrapper.find('.el-image-viewer__next')
+    const actions = wrapper.findAll('.el-image-viewer__action')
+
+    for (const control of [close, prev, next, ...actions]) {
+      expect(control.attributes('role')).toBe('button')
+      expect(control.attributes('tabindex')).toBe('0')
+    }
+
+    await next.trigger('keydown', { code: EVENT_CODE.enter })
+    await doubleWait()
+    expect((wrapper.vm as any).activeIndex).toBe(1)
+
+    await prev.trigger('keydown', { code: EVENT_CODE.space })
+    await doubleWait()
+    expect((wrapper.vm as any).activeIndex).toBe(0)
+
+    ;(wrapper.vm as any).loading = false
+    const scaleBeforeZoom = (wrapper.vm as any).transform.scale
+    await actions[1].trigger('keydown', { code: EVENT_CODE.enter })
+    await doubleWait()
+    expect((wrapper.vm as any).transform.scale).toBeGreaterThan(scaleBeforeZoom)
+
+    await close.trigger('keydown', { code: EVENT_CODE.space })
+    await doubleWait()
+    expect(wrapper.emitted('close')).toEqual([[]])
     wrapper.unmount()
   })
 })
