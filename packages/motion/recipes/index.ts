@@ -124,7 +124,7 @@ export const motionRecipes: Record<MotionRecipeName, MotionRecipeDefinition> = {
   'card-interactive': {
     name: 'card-interactive',
     intent: 'Give a clickable card subtle hover or press feedback.',
-    preset: 'card-hover',
+    preset: 'paper-settle',
     durationClass: 'fast',
     allowedTargets: ['card', 'media-card', 'dashboard-entry'],
     reducedFallback: terminalFallback,
@@ -142,7 +142,7 @@ export const motionRecipes: Record<MotionRecipeName, MotionRecipeDefinition> = {
   'media-hover-subtle': {
     name: 'media-hover-subtle',
     intent: 'Provide a bounded media hover state without gloss.',
-    preset: 'card-hover',
+    preset: 'paper-settle',
     durationClass: 'fast',
     allowedTargets: ['image', 'media', 'thumbnail'],
     reducedFallback: terminalFallback,

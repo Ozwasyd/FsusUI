@@ -111,7 +111,7 @@ const nextFrame = (callback: () => void) => {
 
 export const normalizeMotionOptions = (
   value: MotionDirectiveValue,
-  fallback: MotionPresetName = 'fade-in',
+  fallback: MotionPresetName = 'surface-settle',
 ): MotionRunOptions => {
   if (typeof value === 'string') {
     const name = resolveMotionPresetName(value, fallback)

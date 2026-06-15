@@ -1,27 +1,27 @@
+// Intent-based canonical motion preset vocabulary.
+// Replaces the previous 33-name enumeration that mixed generic effect names
+// (fade-in, scale-fade, slide-up, …) with intent names (surface-settle,
+// dialog-settle, sheet-settle, …). Each entry is an *intent* — what the
+// component is doing — not a *mechanism* — how the visual is achieved.
 export const motionPresetNames = [
-  'fade-in',
-  'fade-up',
-  'fade-down',
-  'fade-left',
-  'fade-right',
-  'scale-fade',
-  'slide-left',
-  'slide-right',
-  'slide-up',
-  'list-stagger',
-  'route-fade',
-  'card-hover',
+  // Reading/text surfaces — quiet, opacity-led, no translate
   'surface-settle',
   'paper-settle',
+  // Routing / page-level — long duration, opacity-only
   'route-settle',
+  'overlay-settle',
+  // Overlay surfaces — dialog/drawer/sheet
   'dialog-settle',
   'sheet-settle',
-  'overlay-settle',
+  'lightbox-focus',
+  // Mobile dock
   'dock-settle',
+  // Receipt surfaces — toast / banner
   'toast-receipt',
   'banner-receipt',
-  'lightbox-focus',
+  // List surfaces — small stagger
   'index-list-settle',
+  // Reading body micro-effects
   'reading-title-settle',
   'media-develop',
   'media-focus',
@@ -35,6 +35,36 @@ export const motionPresetNames = [
 ] as const
 
 export type MotionPresetName = (typeof motionPresetNames)[number]
+
+// Legacy preset names retained as one-release compatibility shims.
+// Each entry resolves to an intent-based preset via `motionPresetAliases`.
+// Documented as deprecated; new code should use intent names directly.
+export const motionLegacyPresetNames = [
+  'fade-in',
+  'fade-up',
+  'fade-down',
+  'fade-left',
+  'fade-right',
+  'scale-fade',
+  'slide-up',
+  'slide-left',
+  'slide-right',
+  'list-stagger',
+  'route-fade',
+  'card-hover',
+] as const
+
+export type MotionLegacyPresetName = (typeof motionLegacyPresetNames)[number]
+
+// Acceptable input shape for motion preset lookups: intent names, legacy
+// aliases, or `false`/`undefined` (caller-side disabled).
+export type MotionPresetInput =
+  | MotionPresetName
+  | MotionLegacyPresetName
+  | string
+  | false
+  | null
+  | undefined
 
 export const motionSurfaceCategories = [
   'ordinary-content',
@@ -139,6 +169,7 @@ export type MotionOptions = {
 
 export type MotionDirectiveValue =
   | MotionPresetName
+  | MotionLegacyPresetName
   | MotionOptions
   | false
   | null

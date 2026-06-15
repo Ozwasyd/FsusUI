@@ -90,18 +90,6 @@ describe('motion primitives', () => {
     expect(defaultMotionBudget.maxStaggerItems).toBe(20)
     expect(motionTokens.distance.md).toBe('16px')
     expect(Object.keys(motionPresets)).toEqual([
-      'fade-in',
-      'fade-up',
-      'fade-down',
-      'fade-left',
-      'fade-right',
-      'scale-fade',
-      'slide-left',
-      'slide-right',
-      'slide-up',
-      'list-stagger',
-      'route-fade',
-      'card-hover',
       'surface-settle',
       'paper-settle',
       'route-settle',
@@ -232,7 +220,7 @@ describe('motion primitives', () => {
     await flushMotionFrame()
     const el = wrapper.element as HTMLElement
 
-    expect(el.dataset.fsusMotionPreset).toBe('fade-up')
+    expect(el.dataset.fsusMotionPreset).toBe('paper-settle')
     expect(el.style.transition).toContain('opacity')
     expect(el.style.transition).toContain('transform')
     expect(el.style.transform).toBe('translate3d(0, 0, 0)')
@@ -260,7 +248,7 @@ describe('motion primitives', () => {
     await flushMotionFrame()
     const el = wrapper.find('span').element as HTMLElement
 
-    expect(el.dataset.fsusMotionPreset).toBe('list-stagger')
+    expect(el.dataset.fsusMotionPreset).toBe('index-list-settle')
     expect(el.style.transition).toContain('120ms')
     expect(el.style.transition).toContain('calc(var(--fsus-motion-stagger')
   })
@@ -307,7 +295,9 @@ describe('motion primitives', () => {
 
     const panel = document.body.querySelector('.panel') as HTMLElement
     expect(panel.style.transition).toContain('1ms')
-    expect(panel.style.transform).toBe('scale(0.98)')
+    expect(panel.style.transform).toBe(
+      'translate3d(0, var(--fsus-motion-distance-xs, 4px), 0)',
+    )
 
     vi.runAllTimers()
     await nextTick()
@@ -331,7 +321,7 @@ describe('motion primitives', () => {
     })
 
     expect(wrapper.text()).toBe('ready')
-    expect(wrapper.element.dataset.fsusMotionPreset).toBe('fade-in')
+    expect(wrapper.element.dataset.fsusMotionPreset).toBe('surface-settle')
   })
 
   it('installs recipe, scroll timeline, and shared-element components', async () => {
@@ -394,7 +384,7 @@ describe('motion primitives', () => {
     })
     const el = wrapper.element as HTMLElement
 
-    expect(el.dataset.fsusScrollRevealPreset).toBe('fade-up')
+    expect(el.dataset.fsusScrollRevealPreset).toBe('paper-settle')
     expect(el.style.opacity).toBe('1')
     expect(el.style.transform).toBe('translate3d(0, 0, 0)')
   })
@@ -637,7 +627,7 @@ describe('motion primitives', () => {
 
     expect(
       validateMotionPresetUsage({
-        preset: 'scale-fade',
+        preset: 'lightbox-focus',
         surface: 'ordinary-content',
         interaction: 'default',
       }).map((item) => item.ruleId),

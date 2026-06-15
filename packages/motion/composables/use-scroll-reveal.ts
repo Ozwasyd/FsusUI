@@ -31,7 +31,7 @@ export type ScrollRevealOptions = {
 
 export type ScrollRevealRunOptions = Omit<ScrollRevealOptions, 'target'>
 
-const defaultScrollRevealPreset: MotionPresetName = 'fade-up'
+const defaultScrollRevealPreset: MotionPresetName = 'paper-settle'
 
 const applyReducedState = (
   target: ReturnType<typeof resolveMotionTarget>,

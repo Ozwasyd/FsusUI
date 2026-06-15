@@ -22,7 +22,7 @@ const props = withDefaults(
     appear?: boolean
   }>(),
   {
-    name: 'fade-in',
+    name: 'surface-settle',
     appear: false,
   },
 )

@@ -27,7 +27,7 @@ export type UseTimelineOptions = {
   timeline?: gsap.TimelineVars
 }
 
-const defaultTimelinePreset: MotionPresetName = 'fade-up'
+const defaultTimelinePreset: MotionPresetName = 'paper-settle'
 
 export const useTimeline = (options: UseTimelineOptions = {}) => {
   const gsap = getGsap()
