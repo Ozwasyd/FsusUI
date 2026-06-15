@@ -142,13 +142,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
 
-  unit:
+  unit-artifacts:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: ['1/4', '2/4', '3/4', '4/4']
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -185,6 +181,44 @@ jobs:
           echo "icons-cache-hit=${{ steps.icons-cache.outputs.cache-hit }}"
           echo "wasm-cache-hit=${{ steps.wasm-cache.outputs.cache-hit }}"
       - run: pnpm run prepare:test-artifacts
+      - name: Pack unit test artifacts
+        run: |
+          tar -czf unit-test-artifacts.tgz packages/icons-vue/dist packages/wasm/dist
+          sha256sum unit-test-artifacts.tgz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-artifacts
+          path: unit-test-artifacts.tgz
+          retention-days: 1
+
+  unit:
+    needs: unit-artifacts
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ['1/4', '2/4', '3/4', '4/4']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: unit-test-artifacts
+          path: .unit-artifacts
+      - name: Unpack unit test artifacts
+        run: |
+          sha256sum .unit-artifacts/unit-test-artifacts.tgz
+          tar -xzf .unit-artifacts/unit-test-artifacts.tgz
+      - run: pnpm run check:test-artifacts-ready
       - run: pnpm exec vitest run --shard=${{ matrix.shard }}
 
   coverage:

@@ -28,6 +28,11 @@ restore-key 命中旧工件时会重新生成并写入 fingerprint。发布或�
 `pnpm run build:wasm` 或 `FORCE_REBUILD=1 pnpm run prepare:test-artifacts`，
 不要把 release regeneration 改成只依赖 cache。
 
+full quality 的 unit shard 由 `unit-artifacts` job 统一准备测试工件并上传
+`unit-test-artifacts`，各 shard 下载后运行 `pnpm run check:test-artifacts-ready`
+和 `pnpm exec vitest run --shard=<n>/4`。这样 cache miss/generation 日志只集中在
+前置 job，shard 不再重复执行 icon/WASM 生成。
+
 发布前必须先通过：
 
 ```bash

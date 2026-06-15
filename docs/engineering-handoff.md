@@ -97,6 +97,8 @@ FsusBlog 侧的消费规则：页面只消费 FsusUI 导出的 component / direc
 - GitHub Actions 日志会输出 `icons-cache-hit` 与 `wasm-cache-hit`；本地 wrapper 会继续输出 `cache hit` / `cache miss`、source hash 和 miss reason。
 - cache hit 会跳过对应 ensure 脚本；cache miss、restore-key 命中过期工件或 fingerprint 不一致时会重新生成。
 - `pnpm run build:wasm` 保留显式 force regeneration 语义；需要强制重建所有测试工件时可使用 `FORCE_REBUILD=1 pnpm run prepare:test-artifacts`。
+- `_quality.yml` 的 `unit-artifacts` job 会先生成并上传 `unit-test-artifacts`，unit shard 只下载该工件、解包、执行 `pnpm run check:test-artifacts-ready`，再运行 `pnpm exec vitest run --shard=<n>/4`。
+- 本地复现 unit shard 时，先运行 `pnpm run prepare:test-artifacts`，再运行 `pnpm run check:test-artifacts-ready` 和目标 `vitest run --shard` 命令；不要在每个 shard 前重复生成 icon/WASM 工件。
 
 ### CI 入口
 
