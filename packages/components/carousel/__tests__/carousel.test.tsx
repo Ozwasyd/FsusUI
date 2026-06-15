@@ -141,6 +141,25 @@ describe('Carousel', () => {
     expect(wrapper.find('.el-carousel__button').text()).toBe('1')
   })
 
+  it('provides accessible names for icon-only controls', async () => {
+    wrapper = createComponent({
+      autoplay: false,
+      arrow: 'always',
+    })
+
+    await nextTick()
+
+    expect(
+      wrapper.find('.el-carousel__arrow--left').attributes('aria-label')
+    ).toBe('Previous slide')
+    expect(
+      wrapper.find('.el-carousel__arrow--right').attributes('aria-label')
+    ).toBe('Next slide')
+    expect(
+      wrapper.findAll('.el-carousel__button')[0].attributes('aria-label')
+    ).toBe('Go to slide 1')
+  })
+
   describe('manual control', () => {
     it('hover', async () => {
       wrapper = createComponent({

@@ -85,6 +85,11 @@ export default {
       deprecationWarning:
         '你使用了一些已被废弃的用法，请参考 el-pagination 的官方文档',
     },
+    carousel: {
+      prev: '上一张',
+      next: '下一张',
+      indicator: '切换到第 {index} 张',
+    },
     messagebox: {
       title: '提示',
       confirm: '确定',

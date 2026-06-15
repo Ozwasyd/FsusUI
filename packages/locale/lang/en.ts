@@ -109,6 +109,11 @@ export default {
       deprecationWarning:
         'Deprecated usages detected, please refer to the el-pagination documentation for more details',
     },
+    carousel: {
+      prev: 'Previous slide',
+      next: 'Next slide',
+      indicator: 'Go to slide {index}',
+    },
     dialog: {
       close: 'Close this dialog',
     },
