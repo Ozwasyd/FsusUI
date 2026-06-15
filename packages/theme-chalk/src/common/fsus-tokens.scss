@@ -149,6 +149,13 @@
   --fsus-pagination-active-bg: var(--fsus-state-selected-bg);
   --fsus-pagination-active-text: var(--fsus-scholarly-blue);
   --fsus-pagination-active-border: var(--fsus-state-focus-border);
+  --fsus-datepicker-panel-bg: var(--fsus-surface-overlay);
+  --fsus-datepicker-panel-radius: var(--el-popover-border-radius);
+  --fsus-datepicker-panel-shadow: var(--fsus-shadow-panel);
+  --fsus-datepicker-time-panel-shadow: var(--fsus-shadow-panel);
+  --fsus-datepicker-shortcut-active-bg: var(--fsus-state-selected-bg);
+  --fsus-datepicker-shortcut-active-text: var(--fsus-scholarly-blue);
+  --fsus-datepicker-action-radius: var(--fsus-radius-control);
   --fsus-select-v2-focus-border: var(--fsus-state-focus-border);
   --fsus-select-v2-tag-close-bg: var(--fsus-text-placeholder);
   --fsus-select-v2-tag-close-icon: var(--fsus-color-surface-base);

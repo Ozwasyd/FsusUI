@@ -953,6 +953,37 @@ describe('Fsus theme visual baseline', () => {
     )
   })
 
+  test('keeps date picker panel material and focus states tokenized', () => {
+    const css = compileThemeFile('date-picker/picker-panel.scss')
+
+    expectCssRule(css, '.el-picker-panel', [
+      'background: var(--fsus-datepicker-panel-bg, var(--fsus-surface-overlay));',
+      'border-radius: var(--fsus-datepicker-panel-radius, var(--el-popover-border-radius));',
+      'box-shadow: var(--fsus-datepicker-panel-shadow, var(--fsus-shadow-panel, none));',
+    ])
+    expectCssRule(css, '.el-picker-panel .el-time-panel', [
+      'background-color: var(--fsus-datepicker-panel-bg, var(--fsus-surface-overlay));',
+      'box-shadow: var(--fsus-datepicker-time-panel-shadow, var(--fsus-shadow-panel, none));',
+    ])
+    expectCssRule(css, '.el-picker-panel__shortcut.active', [
+      'background-color: var(--fsus-datepicker-shortcut-active-bg, var(--fsus-state-selected-bg));',
+      'color: var(--fsus-datepicker-shortcut-active-text, var(--fsus-scholarly-blue));',
+    ])
+    expectCssRule(css, '.el-picker-panel__shortcut:focus-visible', [
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+      'border-radius: var(--fsus-radius-control-small, 4px);',
+    ])
+    expectCssRule(css, '.el-picker-panel__icon-btn:focus-visible', [
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+      'border-radius: var(--fsus-radius-control-small, 4px);',
+    ])
+    expectCssRule(css, '.el-picker-panel__btn', [
+      'border-radius: var(--fsus-datepicker-action-radius, var(--fsus-radius-control));',
+    ])
+    expect(css).not.toContain('#e6f1fe')
+    expect(css).not.toContain('var(--el-box-shadow-light)')
+  })
+
   test('keeps tooltip v2 radius and surfaces tokenized', () => {
     const css = compileThemeFile('tooltip-v2.scss')
 

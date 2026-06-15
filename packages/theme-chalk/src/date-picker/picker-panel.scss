@@ -3,15 +3,28 @@
 
 @include b(picker-panel) {
   color: getCssVar('text-color', 'regular');
-  background: getCssVar('bg-color', 'overlay');
-  border-radius: getCssVar('border-radius-base');
+  background: var(--fsus-datepicker-panel-bg, var(--fsus-surface-overlay));
+  border-radius: var(
+    --fsus-datepicker-panel-radius,
+    var(--el-popover-border-radius)
+  );
+  box-shadow: var(
+    --fsus-datepicker-panel-shadow,
+    var(--fsus-shadow-panel, none)
+  );
   line-height: 30px;
 
   .#{$namespace}-time-panel {
     margin: 5px 0;
     border: solid 1px getCssVar('datepicker-border-color');
-    background-color: getCssVar('bg-color', 'overlay');
-    box-shadow: getCssVar('box-shadow-light');
+    background-color: var(
+      --fsus-datepicker-panel-bg,
+      var(--fsus-surface-overlay)
+    );
+    box-shadow: var(
+      --fsus-datepicker-time-panel-shadow,
+      var(--fsus-shadow-panel, none)
+    );
   }
 
   @include e((body, body-wrapper)) {
@@ -53,9 +66,19 @@
       color: getCssVar('datepicker-hover-text-color');
     }
 
+    &:focus-visible {
+      @include a11y-focus-ring(2px, var(--fsus-radius-control-small, 4px));
+    }
+
     &.active {
-      background-color: #e6f1fe;
-      color: getCssVar('datepicker-active-color');
+      background-color: var(
+        --fsus-datepicker-shortcut-active-bg,
+        var(--fsus-state-selected-bg)
+      );
+      color: var(
+        --fsus-datepicker-shortcut-active-text,
+        var(--fsus-scholarly-blue)
+      );
     }
   }
 
@@ -63,7 +86,10 @@
     border: 1px solid getCssVar('fill-color', 'darker');
     color: getCssVar('text-color', 'primary');
     line-height: 24px;
-    border-radius: 2px;
+    border-radius: var(
+      --fsus-datepicker-action-radius,
+      var(--fsus-radius-control)
+    );
     padding: 0 20px;
     cursor: pointer;
     background-color: transparent;
@@ -90,6 +116,7 @@
     }
     &:focus-visible {
       color: getCssVar('datepicker-hover-text-color');
+      @include a11y-focus-ring(2px, var(--fsus-radius-control-small, 4px));
     }
 
     @include when(disabled) {
