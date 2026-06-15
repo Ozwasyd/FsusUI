@@ -96,15 +96,21 @@ $tag-icon-span-gap: map.merge(
   height: map.get($tag-height, 'default');
   padding: 0 map.get($tag-padding, 'default') - $border-width;
 
-  font-size: 0.75rem;
+  font-size: var(--fsus-tag-font-size, var(--el-font-size-extra-small));
   line-height: 1;
   border-width: $tag-border-width;
   border-style: solid;
   border-radius: getCssVar('tag-border-radius');
   box-sizing: border-box;
   white-space: nowrap;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--fsus-tag-letter-spacing, 0);
+  text-transform: var(--fsus-tag-text-transform, none);
+
+  &.is-uppercase,
+  &[data-fsus-tag-uppercase='true'] {
+    letter-spacing: var(--fsus-tag-uppercase-letter-spacing, 0.05em);
+    text-transform: uppercase;
+  }
 
   @include set-css-var-value('icon-size', 14px);
 

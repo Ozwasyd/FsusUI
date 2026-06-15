@@ -138,6 +138,10 @@
   --fsus-slider-handle-hover-y: -1px;
   --fsus-slider-handle-active-y: 1px;
   --fsus-slider-handle-active-scale: 1.04;
+  --fsus-tag-font-size: var(--el-font-size-extra-small);
+  --fsus-tag-letter-spacing: 0;
+  --fsus-tag-text-transform: none;
+  --fsus-tag-uppercase-letter-spacing: 0.05em;
   --fsus-tree-drop-indicator-color: var(--fsus-state-focus-border);
   --fsus-tree-drop-inner-bg: var(--fsus-state-emphasis-bg);
   --fsus-tree-drop-inner-text: var(--fsus-ink);

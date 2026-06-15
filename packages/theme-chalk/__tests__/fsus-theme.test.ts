@@ -1109,6 +1109,35 @@ describe('Fsus theme visual baseline', () => {
     expect(css).not.toContain('var(--el-transition-duration)')
   })
 
+  test('keeps tag typography overrides opt-in for mixed-language labels', () => {
+    const css = compileThemeFile('tag.scss')
+    const docs = readFileSync(
+      path.resolve(dirname, '../../../docs/components/tag.md'),
+      'utf8',
+    )
+
+    expectCssRule(css, '.el-tag', [
+      'font-size: var(--fsus-tag-font-size, var(--el-font-size-extra-small));',
+      'letter-spacing: var(--fsus-tag-letter-spacing, 0);',
+      'text-transform: var(--fsus-tag-text-transform, none);',
+    ])
+    for (const selector of [
+      '.el-tag.is-uppercase',
+      '.el-tag[data-fsus-tag-uppercase=true]',
+    ]) {
+      expectCssRule(css, selector, [
+        'letter-spacing: var(--fsus-tag-uppercase-letter-spacing, 0.05em);',
+        'text-transform: uppercase;',
+      ])
+    }
+    expect(css).not.toMatch(/\.el-tag\s*\{[^}]*text-transform:\s*uppercase;/s)
+    expect(css).not.toMatch(/\.el-tag\s*\{[^}]*letter-spacing:\s*0\.05em;/s)
+    expect(docs).toContain('混合语言')
+    expect(docs).toContain('code-like')
+    expect(docs).toContain('状态 APIv2')
+    expect(docs).toContain('sha-1:AbC123')
+  })
+
   test('keeps calendar header controls border-first', () => {
     const css = compileThemeFile('calendar.scss')
 

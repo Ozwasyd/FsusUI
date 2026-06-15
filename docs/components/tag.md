@@ -22,6 +22,8 @@
 
 使用 `type` 属性定义标签类型，`color` 属性设置背景色。
 
+默认 Tag 会保留传入文本的大小写与字距，适合混合语言标签和 code-like 标签，例如 `状态 APIv2`、`zh-CN Ready`、`sha-1:AbC123`。需要全大写视觉时，让调用方显式添加 `.is-uppercase` 或 `data-fsus-tag-uppercase="true"`，不要依赖默认样式改写用户文本。
+
 ## 可移除标签
 
 设置 `closable` 为 `true`，标签右侧显示关闭图标，点击后触发 `close` 事件；设置 `disable-transitions` 禁用动画。
