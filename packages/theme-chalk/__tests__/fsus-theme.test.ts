@@ -1008,6 +1008,27 @@ describe('Fsus theme visual baseline', () => {
     expect(docs).toContain('ColorPicker chrome')
   })
 
+  test('keeps slider handle focus and active motion tokenized', () => {
+    const css = compileThemeFile('slider.scss')
+
+    expectCssRule(css, '.el-slider__button-wrapper:focus-visible', [
+      'outline: none !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+      'border-radius: var(--fsus-radius-pill);',
+    ])
+    expectCssRule(css, '.el-slider__button', [
+      'transition: transform var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), border-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), box-shadow var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), background-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+    ])
+    expectCssRule(css, '.el-slider__button:hover', [
+      'transform: translateY(var(--fsus-slider-handle-hover-y, -1px));',
+    ])
+    expectCssRule(css, '.el-slider__button.dragging', [
+      'transform: translateY(var(--fsus-slider-handle-active-y, 1px)) scale(var(--fsus-slider-handle-active-scale, 1.04));',
+    ])
+    expect(css).not.toContain('transform: scale(1.2);')
+    expect(css).not.toContain('transition: var(--el-transition-duration-fast);')
+  })
+
   test('keeps calendar header controls border-first', () => {
     const css = compileThemeFile('calendar.scss')
 

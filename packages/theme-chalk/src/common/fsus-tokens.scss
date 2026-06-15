@@ -127,6 +127,9 @@
   --fsus-progress-width-motion: var(--fsus-motion-control);
   --fsus-progress-animation-duration: 3s;
   --fsus-progress-animation-easing: linear;
+  --fsus-slider-handle-hover-y: -1px;
+  --fsus-slider-handle-active-y: 1px;
+  --fsus-slider-handle-active-scale: 1.04;
   --fsus-tree-drop-indicator-color: var(--fsus-state-focus-border);
   --fsus-tree-drop-inner-bg: var(--fsus-state-emphasis-bg);
   --fsus-tree-drop-inner-text: var(--fsus-ink);

@@ -106,6 +106,10 @@ $slider-height: map.merge(
     outline: none;
     @include utils-vertical-center;
 
+    &:focus-visible {
+      @include a11y-focus-ring(2px, var(--fsus-radius-pill));
+    }
+
     &:hover,
     &.hover {
       cursor: grab;
@@ -125,16 +129,25 @@ $slider-height: map.merge(
     background-color: getCssVar('color-white');
     border-radius: 50%;
     box-sizing: border-box;
-    transition: getCssVar('transition-duration-fast');
+    transition:
+      transform var(--fsus-motion-control-fast, 160ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+      border-color var(--fsus-motion-control-fast, 160ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+      box-shadow var(--fsus-motion-control-fast, 160ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+      background-color var(--fsus-motion-control-fast, 160ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
     user-select: none;
 
     &:hover,
     &.hover {
-      transform: translateY(-1px);
+      transform: translateY(var(--fsus-slider-handle-hover-y, -1px));
     }
 
     &.dragging {
-      transform: scale(1.2);
+      transform: translateY(var(--fsus-slider-handle-active-y, 1px))
+        scale(var(--fsus-slider-handle-active-scale, 1.04));
     }
 
     &:hover,
