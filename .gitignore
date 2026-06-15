@@ -2,6 +2,9 @@
 .idea/
 .vscode/settings.json
 
+# Claude Code agent docs (per-developer; not part of the project)
+/CLAUDE.md
+
 # Package manager and dependency state
 node_modules/
 .pnpm-store/
