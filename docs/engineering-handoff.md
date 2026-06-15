@@ -231,3 +231,16 @@ Reusable full quality uses a `static-quality` job for short quality checks with
 shared setup/install. The job keeps contract, lint, token, icon, conformance,
 and governance as separate named steps so failure output remains easy to map
 back to the failing quality area.
+
+## Coverage Sharding
+
+`pnpm test:coverage` now runs through `scripts/run-coverage.mjs`. The measured
+baseline on 2026-06-15 was 44.1s wall-clock after the wrapper path (the wrapper
+logged 42.4s and Vitest reported 39.79s across 180 test files and 1888 tests),
+so coverage sharding stays disabled by default.
+
+The sharding threshold is 180s and is configurable with
+`FSUSUI_COVERAGE_SHARD_THRESHOLD_SECONDS`. If a single coverage lane exceeds the
+threshold, set `FSUSUI_COVERAGE_SHARDS=<n>` to run sharded coverage. Shards emit
+blob reports, then the wrapper calls Vitest `--merge-reports`; reports are
+merged before coverage thresholds are evaluated.

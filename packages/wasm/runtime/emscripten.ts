@@ -62,8 +62,7 @@ function resolveNodeDirname(moduleUrl: string): string | null {
     return null
   }
 
-  const pathname = new URL('.', moduleUrl).pathname.replace(/\/+$/, '')
-  return decodeURIComponent(pathname)
+  return fileUrlToPath(new URL('.', moduleUrl).href).replace(/[\\/]+$/u, '')
 }
 
 function readNodeWasmBinary(wasmUrl: string): Uint8Array | undefined {
@@ -89,8 +88,52 @@ function readNodeWasmBinary(wasmUrl: string): Uint8Array | undefined {
 }
 
 function fileUrlToPath(fileUrl: string): string {
+  const nodeUrl = getNodeUrlModule()
+  if (typeof nodeUrl?.fileURLToPath === 'function') {
+    return nodeUrl.fileURLToPath(fileUrl)
+  }
+
   const url = new URL(fileUrl)
-  return decodeURIComponent(url.pathname)
+  return normalizeWindowsDrivePath(decodeURIComponent(url.pathname))
+}
+
+function pathToFileUrl(filePath: string): string {
+  const normalized = normalizeWindowsDrivePath(filePath)
+  const nodeUrl = getNodeUrlModule()
+  if (typeof nodeUrl?.pathToFileURL === 'function') {
+    return nodeUrl.pathToFileURL(normalized).href
+  }
+
+  const slashPath = normalized.replace(/\\/gu, '/')
+  return `file://${slashPath.startsWith('/') ? '' : '/'}${slashPath}`
+}
+
+function normalizeWindowsDrivePath(value: string): string {
+  return value.replace(/^\/([A-Za-z]:[\\/])/u, '$1')
+}
+
+function getNodeUrlModule():
+  | {
+      fileURLToPath?: (url: string | URL) => string
+      pathToFileURL?: (path: string) => URL
+    }
+  | undefined {
+  const nodeProcess = (
+    globalThis as {
+      process?: {
+        getBuiltinModule?: (
+          name: string,
+        ) =>
+          | {
+              fileURLToPath?: (url: string | URL) => string
+              pathToFileURL?: (path: string) => URL
+            }
+          | undefined
+      }
+    }
+  ).process
+
+  return nodeProcess?.getBuiltinModule?.('url')
 }
 
 async function resolveRuntimeUrl(url: string): Promise<string> {
@@ -119,7 +162,7 @@ async function resolveRuntimeUrl(url: string): Promise<string> {
     const fileName = url.split('/').filter(Boolean).pop()
     if (fileName) {
       const cwd = nodeProcess.cwd().replace(/\\/g, '/').replace(/\/+$/, '')
-      return `file://${cwd}/packages/wasm/dist/${fileName}`
+      return pathToFileUrl(`${cwd}/packages/wasm/dist/${fileName}`)
     }
   }
 
@@ -157,5 +200,5 @@ function resolveNodeLocalRuntimeUrl(url: string): string | null {
         ? `${cwd}${pathname}`
         : null
 
-  return filePath ? `file://${filePath}` : null
+  return filePath ? pathToFileUrl(filePath) : null
 }

@@ -209,3 +209,20 @@ The reusable full quality workflow groups short quality checks in one
 conformance, and governance checks remain separate named steps, so failure
 output still identifies the failing quality area while avoiding repeated
 checkout, Node setup, and dependency installation for each short check.
+
+## Coverage Sharding Evaluation
+
+The current local coverage baseline measured on 2026-06-15 is 44.1s wall-clock
+for `pnpm test:coverage` after the wrapper path (the wrapper logged 42.4s and
+Vitest reported 39.79s across 180 test files and 1888 tests). That is below
+the sharding trigger, so the default coverage lane remains a single run.
+
+Coverage sharding becomes mandatory when the single lane exceeds 180s. The
+threshold is controlled by `FSUSUI_COVERAGE_SHARD_THRESHOLD_SECONDS`, and the
+default `test:coverage` wrapper prints `duration-seconds` plus
+`shard-threshold-seconds` so CI logs show the decision point.
+
+If sharding is enabled with `FSUSUI_COVERAGE_SHARDS=<n>`, each shard writes a
+Vitest blob report and disables per-shard coverage percentage thresholds. The
+wrapper then runs Vitest `--merge-reports` so shard outputs are merged before
+coverage thresholds are checked.

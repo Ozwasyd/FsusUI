@@ -206,7 +206,10 @@ jobs:
         run: |
           echo "icons-cache-hit=${{ steps.icons-cache.outputs.cache-hit }}"
           echo "wasm-cache-hit=${{ steps.wasm-cache.outputs.cache-hit }}"
-      - run: pnpm test:coverage
+      - name: Run coverage
+        env:
+          FSUSUI_COVERAGE_SHARD_THRESHOLD_SECONDS: 180
+        run: pnpm test:coverage
       - uses: actions/upload-artifact@v4
         if: always()
         continue-on-error: true
