@@ -56,6 +56,7 @@
     "check:npm-dist-tag": "node ./scripts/with-node-heap.mjs node ./scripts/check-npm-dist-tag.mjs",
     "check:anti-ai-visual": "node ./scripts/with-node-heap.mjs node ./scripts/check-anti-ai-visual.mjs",
     "check:motion-adoption": "node ./scripts/with-node-heap.mjs node ./scripts/check-motion-adoption.mjs packages/motion/__tests__/fixtures/fsusblog-motion-adoption.json",
+    "governance:motion": "node ./scripts/with-node-heap.mjs node ./scripts/check-motion-governance.mjs",
     "check:ux-semantics": "node ./scripts/with-node-heap.mjs node ./scripts/check-ux-semantics.mjs",
     "check:design-source-drift": "node ./scripts/with-node-heap.mjs node ./scripts/check-design-source-drift.mjs",
     "check:focus-ring-contract": "node ./scripts/with-node-heap.mjs node ./scripts/check-focus-ring-contract.mjs",

@@ -1,5 +1,5 @@
 import { getMotionPreset, getMotionPresetBundle, resolveMotionPresetName } from './presets'
-import { isMotionReduced } from './preference'
+import { isMotionDisabled, isMotionReduced } from './preference'
 import {
   claimMotionBudgetNode,
   clampStaggerIndex,
@@ -25,8 +25,14 @@ type MotionElement = HTMLElement & {
 
 const transitionProperties = ['opacity', 'transform', 'filter'] as const
 
+// Combined check: motion is reduced if either the user prefers
+// reduced motion (or the root is set to 'reduced') OR a component
+// has been explicitly disabled. The two axes are tracked separately
+// by `isMotionReduced` and `isMotionDisabled`; this helper is for
+// call sites that want the union (the common case for runtime
+// branches that should not animate at all).
 export const isMotionReducedOrDisabled = (disabled?: boolean) => {
-  return isMotionReduced(disabled)
+  return isMotionDisabled(disabled) || isMotionReduced()
 }
 
 const toTimeValue = (value: string | number | undefined, fallback: string) =>

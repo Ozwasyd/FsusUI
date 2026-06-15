@@ -21,7 +21,9 @@ import FsuMotion, {
   getPrefersReducedMotion,
   getMotionRecipe,
   getMotionPresetSurfaces,
+  isMotionDisabled,
   isMotionPresetAllowedOnSurface,
+  isMotionReduced,
   isScrollTriggerRegistered,
   motionPresets,
   motionPresetAliases,
@@ -176,6 +178,36 @@ describe('motion primitives', () => {
     expect(preference.reduced).toBe(true)
     expect(composable.reduced.value).toBe(true)
     expect(resolveMotionScrollBehavior('smooth')).toBe('auto')
+  })
+
+  it('splits the disabled flag from the reduced-motion preference', () => {
+    // Default state (no root mode, no preference, no disabled flag) —
+    // both axes read as false.
+    expect(isMotionDisabled()).toBe(false)
+    expect(isMotionDisabled(true)).toBe(true)
+    expect(isMotionReduced()).toBe(false)
+    expect(resolveMotionPreference(false).disabled).toBe(false)
+    expect(resolveMotionPreference(false).reduced).toBe(false)
+
+    // Root mode 'disabled' flips the disabled axis but leaves the
+    // reduced axis at its current value (false here, since the
+    // reduced preference is also off).
+    document.documentElement.dataset.fsusMotion = 'disabled'
+    expect(isMotionDisabled()).toBe(true)
+    expect(isMotionReduced()).toBe(false)
+    expect(resolveMotionPreference().disabled).toBe(true)
+    expect(resolveMotionPreference().reduced).toBe(true)
+
+    // Root mode 'reduced' flips the reduced axis but does not imply
+    // disabled — components can still opt in to animation while the
+    // user is asking for reduced motion; runtime branches that need
+    // to know which axis caused the reduction can read each one
+    // independently.
+    document.documentElement.dataset.fsusMotion = 'reduced'
+    expect(isMotionDisabled()).toBe(false)
+    expect(isMotionReduced()).toBe(true)
+    expect(resolveMotionPreference().disabled).toBe(false)
+    expect(resolveMotionPreference().reduced).toBe(true)
   })
 
   it('maps motion recipes to preset-backed runtime options', async () => {
