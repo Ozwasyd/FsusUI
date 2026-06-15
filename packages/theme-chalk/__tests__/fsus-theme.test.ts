@@ -909,6 +909,43 @@ describe('Fsus theme visual baseline', () => {
     expect(dropdownCss).not.toContain('border-radius: var(--el-border-radius-small);')
   })
 
+  test('keeps tooltip v2 radius and surfaces tokenized', () => {
+    const css = compileThemeFile('tooltip-v2.scss')
+
+    expectCssRule(css, '.el-tooltip-v2__content', [
+      '--el-tooltip-v2-border-radius: var(--el-popover-border-radius);',
+      '--fsus-tooltip-v2-arrow-bg: var(--fsus-tooltip-v2-light-bg, var(--fsus-color-surface-base));',
+      '--fsus-tooltip-v2-arrow-border: var(--fsus-tooltip-v2-light-border, var(--fsus-border));',
+      'border-radius: var(--el-tooltip-v2-border-radius);',
+      'color: var(--fsus-tooltip-v2-light-text, var(--fsus-ink));',
+      'background-color: var(--fsus-tooltip-v2-light-bg, var(--fsus-color-surface-base));',
+      'border: 1px solid var(--fsus-tooltip-v2-light-border, var(--fsus-border));',
+    ])
+    expectCssRule(css, '.el-tooltip-v2__arrow', [
+      'color: var(--fsus-tooltip-v2-arrow-bg);',
+    ])
+    expectCssRule(
+      css,
+      '.el-tooltip-v2__content[data-side^=top] .el-tooltip-v2__arrow::before',
+      ['border-top-color: var(--fsus-tooltip-v2-arrow-bg);'],
+    )
+    expectCssRule(
+      css,
+      '.el-tooltip-v2__content[data-side^=top] .el-tooltip-v2__arrow::after',
+      ['border-top-color: var(--fsus-tooltip-v2-arrow-border);'],
+    )
+    expectCssRule(css, '.el-tooltip-v2__content.is-dark', [
+      '--fsus-tooltip-v2-arrow-bg: var(--fsus-tooltip-v2-dark-bg, var(--fsus-ink));',
+      '--fsus-tooltip-v2-arrow-border: var(--fsus-tooltip-v2-dark-border, transparent);',
+      'background-color: var(--fsus-tooltip-v2-dark-bg, var(--fsus-ink));',
+      'color: var(--fsus-tooltip-v2-dark-text, var(--fsus-color-surface-base));',
+      'border-color: var(--fsus-tooltip-v2-dark-border, transparent);',
+    ])
+    expect(css).not.toContain('var(--el-border-radius-base)')
+    expect(css).not.toContain('var(--el-color-white)')
+    expect(css).not.toContain('var(--el-color-black)')
+  })
+
   test('keeps calendar header controls border-first', () => {
     const css = compileThemeFile('calendar.scss')
 

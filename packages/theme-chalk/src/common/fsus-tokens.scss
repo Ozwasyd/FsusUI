@@ -138,6 +138,12 @@
   --fsus-select-option-selected-bg: var(--fsus-state-selected-bg);
   --fsus-select-option-selected-text: var(--fsus-scholarly-blue);
   --fsus-select-option-hover-bg: var(--fsus-state-hover-bg);
+  --fsus-tooltip-v2-light-bg: var(--fsus-color-surface-base);
+  --fsus-tooltip-v2-light-text: var(--fsus-ink);
+  --fsus-tooltip-v2-light-border: var(--fsus-border);
+  --fsus-tooltip-v2-dark-bg: var(--fsus-ink);
+  --fsus-tooltip-v2-dark-text: var(--fsus-color-surface-base);
+  --fsus-tooltip-v2-dark-border: transparent;
 
   --fsus-shadow-panel: none;
   --fsus-shadow-panel-light: 0 8px 24px rgba(15, 23, 42, 0.05);
