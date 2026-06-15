@@ -140,8 +140,7 @@
     }
 
     &:focus-visible {
-      box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue);
-      border-radius: getCssVar('border-radius', 'small');
+      @include a11y-focus-ring(2px, getCssVar('border-radius', 'small'));
     }
 
     & .is-icon-close {
@@ -201,33 +200,39 @@
       display: none;
     }
     > .#{$namespace}-tabs__header .#{$namespace}-tabs__item .is-icon-close {
+      flex: 0 0 14px;
       position: relative;
       font-size: 12px;
-      width: 0;
+      width: 14px;
       height: 14px;
+      opacity: 0;
       overflow: hidden;
+      pointer-events: none;
       right: -2px;
       transform-origin: 100% 50%;
+      transition: opacity getCssVar('transition-duration')
+          getCssVar('transition-function-ease-in-out-bezier'),
+        background-color getCssVar('transition-duration')
+          getCssVar('transition-function-ease-in-out-bezier'),
+        color getCssVar('transition-duration')
+          getCssVar('transition-function-ease-in-out-bezier');
     }
     > .#{$namespace}-tabs__header .#{$namespace}-tabs__item {
       border-bottom: 1px solid transparent;
       border-left: 1px solid getCssVar('border-color-light');
       transition: color getCssVar('transition-duration')
-          getCssVar('transition-function-ease-in-out-bezier'),
-        padding getCssVar('transition-duration')
-          getCssVar('transition-function-ease-in-out-bezier');
+        getCssVar('transition-function-ease-in-out-bezier');
 
       &:first-child {
         border-left: none;
       }
 
       &.is-closable {
-        &:hover {
-          padding-left: 13px;
-          padding-right: 13px;
-
+        &:hover,
+        &:focus-within {
           & .is-icon-close {
-            width: 14px;
+            opacity: 1;
+            pointer-events: auto;
           }
         }
       }
@@ -236,11 +241,9 @@
         border-bottom-color: getCssVar('bg-color');
 
         &.is-closable {
-          padding-left: 20px;
-          padding-right: 20px;
-
           .is-icon-close {
-            width: 14px;
+            opacity: 1;
+            pointer-events: auto;
           }
         }
       }
@@ -311,17 +314,10 @@
         .#{$namespace}-tabs__item:nth-child(2) {
           padding-left: 20px;
 
-          &:not(.is-active).is-closable:hover {
-            padding-left: 13px;
-          }
         }
 
         .#{$namespace}-tabs__item:last-child {
           padding-right: 20px;
-
-          &:not(.is-active).is-closable:hover {
-            padding-right: 13px;
-          }
         }
       }
     }

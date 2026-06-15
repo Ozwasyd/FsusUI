@@ -156,7 +156,8 @@ describe('Fsus theme visual baseline', () => {
       'background-color: var(--fsus-scholarly-blue);',
     ])
     expectCssRule(tabsCss, '.el-tabs__item:focus-visible', [
-      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue);',
+      'outline: none !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
     ])
     expectCssRule(tabsCss, '.el-tabs__item.is-active', [
       'color: var(--el-text-color-primary);',
@@ -180,6 +181,33 @@ describe('Fsus theme visual baseline', () => {
         'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
       ])
     }
+  })
+
+  test('keeps closable card tabs hit areas stable', () => {
+    const css = compileThemeFile('tabs.scss')
+
+    expectCssRule(
+      css,
+      '.el-tabs--card > .el-tabs__header .el-tabs__item .is-icon-close',
+      [
+        'flex: 0 0 14px;',
+        'width: 14px;',
+        'opacity: 0;',
+        'pointer-events: none;',
+      ],
+    )
+    expectCssRule(
+      css,
+      '.el-tabs--card > .el-tabs__header .el-tabs__item.is-closable:hover .is-icon-close',
+      ['opacity: 1;', 'pointer-events: auto;'],
+    )
+    expectCssRule(
+      css,
+      '.el-tabs--card > .el-tabs__header .el-tabs__item.is-active.is-closable .is-icon-close',
+      ['opacity: 1;', 'pointer-events: auto;'],
+    )
+    expect(css).not.toContain('padding-left: 13px;')
+    expect(css).not.toContain('padding-right: 13px;')
   })
 
   test('does not force empty states into panel cards', () => {
