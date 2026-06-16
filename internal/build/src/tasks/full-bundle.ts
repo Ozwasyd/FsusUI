@@ -30,6 +30,7 @@ import {
   writeBundles,
 } from '../utils'
 import { target } from '../build-info'
+import type { TaskFunction } from 'gulp'
 import type { Plugin } from 'rollup'
 
 const banner = `/*! ${PKG_BRAND_NAME} v${version} */\n`
@@ -199,10 +200,10 @@ async function buildFullLocale(minify: boolean) {
   )
 }
 
-export const buildFull = (minify: boolean) => async () =>
+export const buildFull = (minify: boolean): TaskFunction => async () =>
   Promise.all([buildFullEntry(minify), buildFullLocale(minify)])
 
-export const buildFullBundle = series(
+export const buildFullBundle: TaskFunction = series(
   withTaskName('buildFull', buildFull(false)),
   withTaskName('buildFullMinified', buildFull(true)),
 )

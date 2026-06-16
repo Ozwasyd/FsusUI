@@ -132,7 +132,7 @@ export const copyWasmRuntimeAssets = async () => {
   )
 }
 
-export default series(
+const buildPackage: TaskFunction = series(
   withTaskName('cleanPackageBuild', () => run('pnpm run clean:package-build')),
   withTaskName('createOutput', () => mkdir(epOutput, { recursive: true })),
 
@@ -156,5 +156,7 @@ export default series(
 
   parallel(copyTypesDefinitions, copyFiles, copyWasmRuntimeAssets),
 )
+
+export default buildPackage
 
 export * from './src'

@@ -8,6 +8,7 @@ import cleanCSS from 'gulp-clean-css'
 import rename from 'gulp-rename'
 import consola from 'consola'
 import { epOutput } from '@element-plus/build-utils'
+import type { TaskFunction } from 'gulp'
 
 const distFolder = path.resolve(__dirname, 'dist')
 const distBundle = path.resolve(epOutput, 'theme-chalk')
@@ -21,7 +22,7 @@ const themeEntryFiles = [
  * not use sass.sync().on('error', sass.logError) to throw exception
  * @returns
  */
-function buildThemeChalk() {
+const buildThemeChalk: TaskFunction = () => {
   const sass = gulpSass(dartSass)
   const noElPrefixFile = /(index|base|display)/
   return src(themeEntryFiles)
@@ -58,21 +59,19 @@ function buildThemeChalk() {
 /**
  * copy from packages/theme-chalk/dist to dist/element-plus/theme-chalk
  */
-export function copyThemeChalkBundle() {
-  return src(`${distFolder}/**`).pipe(dest(distBundle))
-}
+export const copyThemeChalkBundle: TaskFunction = () =>
+  src(`${distFolder}/**`).pipe(dest(distBundle))
 
 /**
  * copy source file to packages
  */
 
-export function copyThemeChalkSource() {
-  return src(path.resolve(__dirname, 'src/**')).pipe(
+export const copyThemeChalkSource: TaskFunction = () =>
+  src(path.resolve(__dirname, 'src/**')).pipe(
     dest(path.resolve(distBundle, 'src'))
   )
-}
 
-export const build = parallel(
+export const build: TaskFunction = parallel(
   copyThemeChalkSource,
   series(buildThemeChalk, copyThemeChalkBundle)
 )
