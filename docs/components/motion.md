@@ -52,6 +52,25 @@ Motion 提供 FsusUI 的语义化动效层。业务页面只选择 preset，不�
 </template>
 ```
 
+## SSR / AOT Hydration
+
+SSR and AOT pages already have their initial DOM before Vue owns the tree. Use
+`suppress-appear-during-hydration` with `appear` when the first hydrated frame
+must not replay entrance motion. Client-only views can omit the suppression prop
+to keep normal `appear` behavior.
+
+```vue
+<template>
+  <FsuTransition
+    name="mobile-bar"
+    appear
+    suppress-appear-during-hydration
+  >
+    <nav>...</nav>
+  </FsuTransition>
+</template>
+```
+
 ## 下拉面板
 
 ```vue

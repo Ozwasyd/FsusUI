@@ -344,6 +344,47 @@ describe('motion primitives', () => {
     wrapper.unmount()
   })
 
+  it('keeps normal appear motion for client-only transition consumers', async () => {
+    const wrapper = mount(
+      () => (
+        <FsuTransition name="scale-fade" duration={1} appear>
+          <div class="panel">panel</div>
+        </FsuTransition>
+      ),
+      { attachTo: document.body },
+    )
+
+    await nextTick()
+    await flushMotionFrame()
+
+    const panel = wrapper.find('.panel').element as HTMLElement
+    expect(panel.style.transition).toContain('1ms')
+    wrapper.unmount()
+  })
+
+  it('suppresses initial appear motion for hydration-sensitive consumers', async () => {
+    const wrapper = mount(
+      () => (
+        <FsuTransition
+          name="scale-fade"
+          duration={1}
+          appear
+          suppressAppearDuringHydration
+        >
+          <div class="panel">panel</div>
+        </FsuTransition>
+      ),
+      { attachTo: document.body },
+    )
+
+    await nextTick()
+    await flushMotionFrame()
+
+    const panel = wrapper.find('.panel').element as HTMLElement
+    expect(panel.style.transition).toBe('')
+    wrapper.unmount()
+  })
+
   it('installs the directive and transition component as a plugin', () => {
     const Root = defineComponent({
       template: `
