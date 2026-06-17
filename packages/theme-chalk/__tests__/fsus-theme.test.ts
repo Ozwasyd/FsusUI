@@ -1462,6 +1462,20 @@ describe('Fsus theme visual baseline', () => {
     ])
   })
 
+  test('renders public shell mobile auth as a stable primary action', () => {
+    const publicShellCss = compileThemeFile('public-shell.scss')
+    const criticalCss = compileThemeFile('public-shell-critical.scss')
+
+    for (const css of [publicShellCss, criticalCss]) {
+      expectCssRule(css, '.el-public-shell__auth-link--mobile', [
+        'display: inline-flex;',
+        'align-items: center;',
+        'min-height: 40px;',
+        'white-space: nowrap;',
+      ])
+    }
+  })
+
   test('prevents table interaction motion from overlapping fixed columns', () => {
     const themeCss = compileThemeFile('fsus-theme.scss')
     const tableCss = compileThemeFile('table.scss')

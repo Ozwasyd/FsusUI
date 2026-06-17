@@ -151,6 +151,59 @@ describe('PublicShell.vue', () => {
     ).toBe(true)
   })
 
+  test('renders default auth link in desktop and mobile primary actions', () => {
+    const wrapper = mount(PublicShell, {
+      props: {
+        brand: 'Fsus',
+        navItems,
+        authLabel: 'Sign in',
+        authHref: '/login',
+        mobileSearchMode: 'trigger',
+      },
+      slots: {
+        'mobile-primary-actions':
+          '<button data-test="theme-toggle">Theme</button>',
+      },
+    })
+
+    const desktopAuth = wrapper.find(
+      '.el-public-shell__actions .el-public-shell__auth-link',
+    )
+    const mobilePrimaryActions = wrapper.find(
+      '.el-public-shell__mobile-primary-actions',
+    )
+    const mobileAuth = mobilePrimaryActions.find('.el-public-shell__auth-link')
+
+    expect(wrapper.findAll('.el-public-shell__auth-link')).toHaveLength(2)
+    expect(desktopAuth.attributes('href')).toBe('/login')
+    expect(desktopAuth.text()).toBe('Sign in')
+    expect(mobileAuth.attributes('href')).toBe('/login')
+    expect(mobileAuth.text()).toBe('Sign in')
+    expect(mobileAuth.classes()).toContain('el-public-shell__auth-link--mobile')
+    expect(mobileAuth.attributes('data-public-nav')).toBe('auth')
+    expect(
+      mobilePrimaryActions
+        .find('.el-public-shell__mobile-search-trigger')
+        .exists(),
+    ).toBe(true)
+    expect(
+      mobilePrimaryActions.find('[data-test="theme-toggle"]').exists(),
+    ).toBe(true)
+  })
+
+  test('omits desktop and mobile auth links when auth props are incomplete', () => {
+    const wrapper = mount(PublicShell, {
+      props: {
+        brand: 'Fsus',
+        navItems,
+        authLabel: 'Sign in',
+        authHref: '',
+      },
+    })
+
+    expect(wrapper.find('.el-public-shell__auth-link').exists()).toBe(false)
+  })
+
   test('supports trigger-based mobile search without replacing desktop search', async () => {
     const wrapper = mount(PublicShell, {
       props: {

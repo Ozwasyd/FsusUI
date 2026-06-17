@@ -4,6 +4,8 @@
 
 `active-nav-motion="indicator"` 可为 desktop/mobile nav 启用组件自有的 active indicator。默认 `none` 保持原有静态 active 颜色和下划线；启用后 indicator 通过组件内部测量写入 CSS 变量，不要求业务侧使用 `:deep()` 覆盖内部 class，并在 `prefers-reduced-motion: reduce` 下取消移动过渡。
 
+当同时传入 `auth-label` 与 `auth-href` 时，`ElPublicShell` 会在 desktop actions 与 mobile primary actions 中各渲染一份默认账户入口，并保留 `data-public-nav="auth"`。如果业务完全自定义移动端账户入口，可将 `auth-label` 或 `auth-href` 置空并通过 slot 接管。
+
 ## Critical CSS
 
 SSR、AOT 或首帧需要稳定 shell 布局时，可以单独引入 critical artifact：

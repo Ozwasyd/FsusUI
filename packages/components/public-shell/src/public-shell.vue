@@ -67,7 +67,7 @@
             </slot>
             <slot name="desktop-actions" />
             <a
-              v-if="authLabel && authHref"
+              v-if="hasAuthLink"
               :href="authHref"
               :class="[ns.e('action-link'), ns.e('auth-link')]"
               v-bind="{ 'data-public-nav': 'auth' }"
@@ -93,6 +93,18 @@
               {{ mobileSearchButtonLabel }}
             </button>
             <slot name="mobile-primary-actions" />
+            <a
+              v-if="hasAuthLink"
+              :href="authHref"
+              :class="[
+                ns.e('action-link'),
+                ns.e('auth-link'),
+                ns.em('auth-link', 'mobile'),
+              ]"
+              v-bind="{ 'data-public-nav': 'auth' }"
+            >
+              {{ authLabel }}
+            </a>
           </div>
         </div>
 
@@ -259,6 +271,7 @@ const showMobileSearchTrigger = computed(
 const showMobileInlineSearch = computed(
   () => props.showSearch && props.mobileSearchMode === 'inline',
 )
+const hasAuthLink = computed(() => Boolean(props.authLabel && props.authHref))
 const mobileSearchTriggerText = computed(
   () => props.mobileSearchTriggerLabel || props.searchAriaLabel,
 )

@@ -91,9 +91,22 @@
     }
   }
 
+  @include e(auth-link) {
+    @include m(mobile) {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 0 12px;
+      box-sizing: border-box;
+      white-space: nowrap;
+    }
+  }
+
   &-mobile-search-enter-active,
   &-mobile-search-leave-active {
-    transition: opacity var(--#{$namespace}-transition-duration-fast),
+    transition:
+      opacity var(--#{$namespace}-transition-duration-fast),
       transform var(--#{$namespace}-transition-duration-fast);
   }
 
