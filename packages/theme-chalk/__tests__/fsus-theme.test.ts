@@ -442,6 +442,31 @@ describe('Fsus theme visual baseline', () => {
     )
   })
 
+  test('maps theme mode segmented tokens through resolved theme states', () => {
+    const css = compileThemeFile('theme-mode-toggle.scss')
+
+    expectCssRule(
+      css,
+      ':root[data-theme-resolved=light] .el-theme-mode-toggle--segmented',
+      [
+        '--el-theme-mode-toggle-bg: transparent;',
+        '--el-theme-mode-toggle-item-bg: transparent;',
+        '--el-theme-mode-toggle-item-hover-bg: var(--el-fill-color-light);',
+        '--el-theme-mode-toggle-active-bg: var(--el-fill-color-light);',
+      ],
+    )
+    expectCssRule(
+      css,
+      ':root[data-theme-resolved=dark] .el-theme-mode-toggle--segmented',
+      [
+        '--el-theme-mode-toggle-bg: color-mix(in srgb, var(--el-bg-color) 88%, transparent);',
+        '--el-theme-mode-toggle-item-bg: transparent;',
+        '--el-theme-mode-toggle-item-hover-bg: color-mix(in srgb, var(--fsus-scholarly-blue) 16%, transparent);',
+        '--el-theme-mode-toggle-active-bg: color-mix(in srgb, var(--fsus-scholarly-blue) 24%, var(--el-bg-color));',
+      ],
+    )
+  })
+
   test('supports theme mode menu-button as restrained paper menu', () => {
     const css = compileThemeFile('theme-mode-toggle.scss')
 

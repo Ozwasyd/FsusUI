@@ -98,6 +98,78 @@
     }
   }
 
+  @at-root :root[data-theme-resolved='light']
+      .#{$namespace}-theme-mode-toggle--segmented {
+    --#{$namespace}-theme-mode-toggle-bg: transparent;
+    --#{$namespace}-theme-mode-toggle-border-color: #{var(
+        --#{$namespace}-border-color-lighter
+      )};
+    --#{$namespace}-theme-mode-toggle-item-bg: transparent;
+    --#{$namespace}-theme-mode-toggle-item-border-color: transparent;
+    --#{$namespace}-theme-mode-toggle-item-color: #{var(
+        --#{$namespace}-text-color-regular
+      )};
+    --#{$namespace}-theme-mode-toggle-item-hover-bg: #{var(
+        --#{$namespace}-fill-color-light
+      )};
+    --#{$namespace}-theme-mode-toggle-item-hover-border-color: transparent;
+    --#{$namespace}-theme-mode-toggle-item-hover-color: #{var(
+        --#{$namespace}-text-color-primary
+      )};
+    --#{$namespace}-theme-mode-toggle-active-bg: #{var(
+        --#{$namespace}-fill-color-light
+      )};
+    --#{$namespace}-theme-mode-toggle-active-border-color: transparent;
+    --#{$namespace}-theme-mode-toggle-active-color: #{var(
+        --#{$namespace}-text-color-primary
+      )};
+  }
+
+  @at-root :root[data-theme-resolved='dark']
+      .#{$namespace}-theme-mode-toggle--segmented {
+    --#{$namespace}-theme-mode-toggle-bg: #{color-mix(
+        in srgb,
+        var(--#{$namespace}-bg-color) 88%,
+        transparent
+      )};
+    --#{$namespace}-theme-mode-toggle-border-color: #{color-mix(
+        in srgb,
+        var(--#{$namespace}-border-color-lighter) 72%,
+        transparent
+      )};
+    --#{$namespace}-theme-mode-toggle-item-bg: transparent;
+    --#{$namespace}-theme-mode-toggle-item-border-color: transparent;
+    --#{$namespace}-theme-mode-toggle-item-color: #{var(
+        --#{$namespace}-text-color-regular
+      )};
+    --#{$namespace}-theme-mode-toggle-item-hover-bg: #{color-mix(
+        in srgb,
+        var(--fsus-scholarly-blue) 16%,
+        transparent
+      )};
+    --#{$namespace}-theme-mode-toggle-item-hover-border-color: #{color-mix(
+        in srgb,
+        var(--fsus-scholarly-blue) 28%,
+        transparent
+      )};
+    --#{$namespace}-theme-mode-toggle-item-hover-color: #{var(
+        --#{$namespace}-text-color-primary
+      )};
+    --#{$namespace}-theme-mode-toggle-active-bg: #{color-mix(
+        in srgb,
+        var(--fsus-scholarly-blue) 24%,
+        var(--#{$namespace}-bg-color)
+      )};
+    --#{$namespace}-theme-mode-toggle-active-border-color: #{color-mix(
+        in srgb,
+        var(--fsus-scholarly-blue) 44%,
+        transparent
+      )};
+    --#{$namespace}-theme-mode-toggle-active-color: #{var(
+        --#{$namespace}-text-color-primary
+      )};
+  }
+
   @include e(menu-button) {
     min-height: 40px;
     border: 1px solid var(--#{$namespace}-border-color-lighter);
