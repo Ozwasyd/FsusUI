@@ -133,6 +133,7 @@ import {
   ElSettingsSection,
   ElTypedConfirmField,
 } from '@element-plus/components/settings-primitives'
+import { ElSiteHeader } from '@element-plus/components/site-header'
 import { ElSkeleton, ElSkeletonItem } from '@element-plus/components/skeleton'
 import { ElSlider } from '@element-plus/components/slider'
 import { ElSpace } from '@element-plus/components/space'
@@ -268,6 +269,7 @@ export const allComponents = [
   ElSectionNav,
   ElSettingsSection,
   ElFormSection,
+  ElSiteHeader,
   ElResourceList,
   ElResourceListItem,
   ElMetadataRow,

@@ -137,6 +137,7 @@ declare module '@vue/runtime-core' {
     ElSegmentedControl: (typeof import('element-plus'))['ElSegmentedControl']
     ElSettingsSection: (typeof import('element-plus'))['ElSettingsSection']
     FsusSettingsSection: (typeof import('element-plus'))['FsusSettingsSection']
+    ElSiteHeader: (typeof import('element-plus'))['ElSiteHeader']
     ElSlider: (typeof import('element-plus'))['ElSlider']
     ElSplitPane: (typeof import('element-plus'))['ElSplitPane']
     FsusSplitPane: (typeof import('element-plus'))['FsusSplitPane']

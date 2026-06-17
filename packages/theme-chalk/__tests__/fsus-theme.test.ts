@@ -1382,6 +1382,45 @@ describe('Fsus theme visual baseline', () => {
     }
   })
 
+  test('defines reusable site header chrome primitives', () => {
+    const css = compileThemeFile('site-header.scss')
+
+    expectCssRule(css, '.el-site-header', [
+      'width: 100%;',
+      'border-bottom: 1px solid var(--el-border-color-lighter);',
+      'background: color-mix(in srgb, var(--el-bg-color) 96%, transparent);',
+    ])
+    expectCssRule(css, '.el-site-header.is-sticky', [
+      'position: sticky;',
+      'top: 0;',
+      'z-index: 50;',
+    ])
+    expectCssRule(css, '.el-site-header__inner', [
+      'width: min(100%, var(--el-site-header-max-width, 64rem));',
+      'padding: 24px;',
+    ])
+    expectCssRule(css, '.el-site-header__primary-row', [
+      'display: grid;',
+      'grid-template-columns: minmax(0, 1fr) auto;',
+      'align-items: center;',
+    ])
+    expectCssRule(css, '.el-site-header__desktop-nav', ['display: flex;'])
+    expectCssRule(css, '.el-site-header__mobile-primary-actions', [
+      'display: none;',
+    ])
+    expectCssRule(
+      css,
+      '.el-site-header__brand :where(a, button):focus-visible',
+      [
+        'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+      ],
+    )
+    expectCssRule(css, '.el-site-header__desktop-nav', ['display: none;'])
+    expectCssRule(css, '.el-site-header__mobile-primary-actions', [
+      'display: inline-flex;',
+    ])
+  })
+
   test('supports public shell trigger-based mobile search motion', () => {
     const publicShellCss = compileThemeFile('public-shell.scss')
     const criticalCss = compileThemeFile('public-shell-critical.scss')

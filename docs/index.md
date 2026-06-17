@@ -69,6 +69,7 @@ FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Mini
 | 图标 Icon                        | [components/icon.md](./components/icon.md)                           |
 | 链接 Link                        | [components/link.md](./components/link.md)                           |
 | 文本 Text                        | [components/text.md](./components/text.md)                           |
+| 站点头部 SiteHeader              | [components/site-header.md](./components/site-header.md)             |
 | 公共页面外壳 PublicShell         | [components/public-shell.md](./components/public-shell.md)           |
 | Markdown 渲染器 MarkdownRenderer | [components/markdown-renderer.md](./components/markdown-renderer.md) |
 | Markdown 编辑器 MarkdownEditor   | [components/markdown-editor.md](./components/markdown-editor.md)     |
@@ -165,6 +166,7 @@ FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Mini
 | 组件                    | 文档                                                             |
 | ----------------------- | ---------------------------------------------------------------- |
 | 全局配置 ConfigProvider | [components/config-provider.md](./components/config-provider.md) |
+
 > **Name note:** FsusUI is the recommended public-facing name for this fork and
 > compatibility-focused Vue 3 component library based on Element Plus. Element
 > Plus is retained as upstream provenance, API-alignment, and package-naming
