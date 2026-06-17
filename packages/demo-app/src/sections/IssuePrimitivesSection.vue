@@ -35,6 +35,64 @@
         </el-button>
       </header>
 
+      <div class="issue-primitives__site-header-fixtures">
+        <ElSiteHeader
+          :sticky="false"
+          max-width="100%"
+          aria-label="Blog header fixture"
+        >
+          <template #brand>
+            <a href="#blog-header">Blog</a>
+          </template>
+          <template #desktop-nav>
+            <a href="#home">Home</a>
+            <a href="#archive">Archive</a>
+          </template>
+          <template #desktop-actions>
+            <ElThemeModeToggle visibility="desktop" compact />
+          </template>
+          <template #mobile-primary-actions>
+            <ElThemeModeToggle visibility="mobile" variant="menu-button" />
+          </template>
+        </ElSiteHeader>
+
+        <ElSiteHeader
+          :sticky="false"
+          max-width="100%"
+          aria-label="Auth header fixture"
+        >
+          <template #brand>
+            <a href="#auth-header">Auth</a>
+          </template>
+          <template #desktop-actions>
+            <a href="#register">Register</a>
+          </template>
+          <template #mobile-primary-actions>
+            <a href="#register-mobile">Register</a>
+          </template>
+        </ElSiteHeader>
+
+        <ElSiteHeader
+          :sticky="false"
+          max-width="100%"
+          aria-label="Workspace header fixture"
+        >
+          <template #brand>
+            <a href="#workspace-header">Workspace</a>
+          </template>
+          <template #desktop-actions>
+            <a href="#main-site">Main site</a>
+            <button type="button">Sign out</button>
+          </template>
+          <template #mobile-overflow-trigger>
+            <button type="button">Menu</button>
+          </template>
+          <template #mobile-secondary-actions>
+            <a href="#workspace-settings">Settings</a>
+          </template>
+        </ElSiteHeader>
+      </div>
+
       <div class="issue-primitives__empty-grid">
         <ElEmptyState
           title="No rows"
@@ -493,6 +551,7 @@ import {
   ElSettingsSection,
   ElResponsiveCollection,
   ElSegmentedControl,
+  ElSiteHeader,
   ElStatusSummary,
   ElThemeModeToggle,
   ElThreadPanel,

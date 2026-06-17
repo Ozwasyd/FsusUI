@@ -41,6 +41,12 @@ test('issue primitives render in the demo route', async ({
 
   await expect(page.locator('.el-public-shell')).toBeVisible()
   await expect(page.locator('.issue-primitives')).toBeVisible()
+  await expect(
+    page.locator('.issue-primitives__site-header-fixtures'),
+  ).toBeVisible()
+  await expect(
+    page.locator('.issue-primitives__site-header-fixtures .el-site-header'),
+  ).toHaveCount(3)
   await expect(page.locator('.el-empty-state--inline')).toBeVisible()
   await expect(page.locator('.el-empty-state--compact')).toBeVisible()
   await expect(page.locator('.el-empty-state--page')).toBeVisible()

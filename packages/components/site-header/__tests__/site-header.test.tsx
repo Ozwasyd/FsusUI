@@ -58,4 +58,61 @@ describe('SiteHeader.vue', () => {
     expect(wrapper.find('[data-test="brand"]').exists()).toBe(true)
     expect(wrapper.find('[data-test="action"]').exists()).toBe(true)
   })
+
+  test('covers blog, auth, and workspace header compositions', () => {
+    const cases = [
+      {
+        name: 'blog',
+        slots: {
+          brand: '<a href="/" data-test="blog-brand">Blog</a>',
+          'desktop-nav': '<a href="/archive" data-test="blog-nav">Archive</a>',
+          'desktop-actions': '<button data-test="blog-theme">Theme</button>',
+          'mobile-primary-actions':
+            '<button data-test="blog-mobile-theme">Theme</button>',
+        },
+      },
+      {
+        name: 'auth',
+        props: {
+          sticky: false,
+          ariaLabel: 'Auth header',
+        },
+        slots: {
+          brand: '<a href="/" data-test="auth-brand">Auth</a>',
+          'desktop-actions':
+            '<a href="/login" data-test="auth-action">Login</a>',
+          'mobile-primary-actions':
+            '<a href="/login" data-test="auth-mobile-action">Login</a>',
+        },
+      },
+      {
+        name: 'workspace',
+        slots: {
+          brand: '<a href="/" data-test="workspace-brand">Workspace</a>',
+          'desktop-actions':
+            '<a href="/" data-test="workspace-home">Main site</a>',
+          'mobile-overflow-trigger':
+            '<button data-test="workspace-menu">Menu</button>',
+          'mobile-secondary-actions':
+            '<a href="/settings" data-test="workspace-secondary">Settings</a>',
+        },
+      },
+    ]
+
+    for (const scenario of cases) {
+      const wrapper = mount(SiteHeader, {
+        props: scenario.props,
+        slots: scenario.slots,
+      })
+
+      expect(wrapper.classes()).toContain('el-site-header')
+      expect(
+        wrapper.find(`[data-test="${scenario.name}-brand"]`).exists(),
+      ).toBe(true)
+      expect(wrapper.find('.el-site-header__primary-row').exists()).toBe(true)
+      expect(
+        wrapper.find('.el-site-header__mobile-primary-actions').exists(),
+      ).toBe(true)
+    }
+  })
 })
