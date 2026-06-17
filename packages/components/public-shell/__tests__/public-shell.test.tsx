@@ -14,6 +14,10 @@ describe('PublicShell.vue', () => {
       <PublicShell brand="Fsus" navItems={navItems} activeNav="archive" />
     ))
 
+    expect(wrapper.findComponent({ name: 'ElSiteHeader' }).exists()).toBe(true)
+    expect(
+      wrapper.find('.el-site-header.el-public-shell__header').exists(),
+    ).toBe(true)
     expect(wrapper.find('.el-public-shell__desktop-nav').exists()).toBe(true)
     expect(wrapper.find('.el-public-shell__mobile-nav').exists()).toBe(true)
     expect(

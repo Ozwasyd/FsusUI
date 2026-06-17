@@ -4,110 +4,116 @@
     :style="shellStyle"
     v-bind="{ 'data-public-hydration-kind': hydrationKind || undefined }"
   >
-    <header :class="headerKls">
-      <div :class="ns.e('inner')">
-        <div :class="ns.e('primary-row')">
-          <div :class="ns.e('brand-nav')">
-            <a
-              :href="brandHref"
-              :class="ns.e('brand')"
-              v-bind="{ 'data-public-nav': 'home' }"
-            >
-              <slot name="brand">{{ brand }}</slot>
-            </a>
+    <el-site-header
+      :class="headerKls"
+      :sticky="sticky"
+      :max-width="maxWidth"
+      :inner-class="ns.e('inner')"
+      :primary-row-class="ns.e('primary-row')"
+      :brand-nav-class="ns.e('brand-nav')"
+      :desktop-actions-class="ns.e('actions')"
+      :mobile-primary-actions-class="ns.e('mobile-primary-actions')"
+      :mobile-secondary-actions-class="ns.e('mobile-toolbar')"
+    >
+      <template #brand>
+        <a
+          :href="brandHref"
+          :class="ns.e('brand')"
+          v-bind="{ 'data-public-nav': 'home' }"
+        >
+          <slot name="brand">{{ brand }}</slot>
+        </a>
+      </template>
 
-            <nav
-              ref="desktopNavRef"
-              :class="navKls('desktop-nav')"
-              aria-label="Primary navigation"
-            >
-              <a
-                v-for="item in navItems"
-                :key="item.key"
-                :href="item.href"
-                :class="navLinkKls(item.key)"
-                v-bind="{ 'data-public-nav': item.key }"
-              >
-                {{ item.label }}
-              </a>
-              <span
-                v-if="activeNavIndicatorEnabled"
-                :class="ns.e('active-nav-indicator')"
-                aria-hidden="true"
-                v-bind="{ 'data-active-nav': activeNavIndicatorKey }"
-              />
-            </nav>
-          </div>
-
-          <div :class="ns.e('actions')">
-            <slot name="desktop-search">
-              <form
-                v-if="showSearch"
-                :class="[ns.e('search'), ns.em('search', 'desktop')]"
-                :action="searchAction"
-                method="get"
-                @submit="handleSearchSubmit"
-              >
-                <el-input
-                  :model-value="searchValue"
-                  :placeholder="searchPlaceholder"
-                  :label="searchAriaLabel"
-                  clearable
-                  @focus="emit('search-focus')"
-                  @input="handleSearchInput"
-                  @keydown.enter="handleSearchEnter"
-                />
-                <input
-                  v-if="searchName"
-                  type="hidden"
-                  :name="searchName"
-                  :value="searchValue"
-                />
-              </form>
-            </slot>
-            <slot name="desktop-actions" />
-            <a
-              v-if="hasAuthLink"
-              :href="authHref"
-              :class="[ns.e('action-link'), ns.e('auth-link')]"
-              v-bind="{ 'data-public-nav': 'auth' }"
-            >
-              {{ authLabel }}
-            </a>
-          </div>
-
-          <div :class="ns.e('mobile-primary-actions')">
-            <button
-              v-if="showMobileSearchTrigger"
-              ref="mobileSearchTriggerRef"
-              type="button"
-              :class="[
-                ns.e('mobile-search-trigger'),
-                ns.is('expanded', mobileSearchExpanded),
-              ]"
-              :aria-expanded="mobileSearchExpanded"
-              :aria-controls="mobileSearchRowId"
-              :aria-label="mobileSearchButtonLabel"
-              @click="toggleMobileSearch"
-            >
-              {{ mobileSearchButtonLabel }}
-            </button>
-            <slot name="mobile-primary-actions" />
-            <a
-              v-if="hasAuthLink"
-              :href="authHref"
-              :class="[
-                ns.e('action-link'),
-                ns.e('auth-link'),
-                ns.em('auth-link', 'mobile'),
-              ]"
-              v-bind="{ 'data-public-nav': 'auth' }"
-            >
-              {{ authLabel }}
-            </a>
-          </div>
+      <template #desktop-nav>
+        <div ref="desktopNavRef" :class="navKls('desktop-nav')">
+          <a
+            v-for="item in navItems"
+            :key="item.key"
+            :href="item.href"
+            :class="navLinkKls(item.key)"
+            v-bind="{ 'data-public-nav': item.key }"
+          >
+            {{ item.label }}
+          </a>
+          <span
+            v-if="activeNavIndicatorEnabled"
+            :class="ns.e('active-nav-indicator')"
+            aria-hidden="true"
+            v-bind="{ 'data-active-nav': activeNavIndicatorKey }"
+          />
         </div>
+      </template>
 
+      <template #desktop-actions>
+        <slot name="desktop-search">
+          <form
+            v-if="showSearch"
+            :class="[ns.e('search'), ns.em('search', 'desktop')]"
+            :action="searchAction"
+            method="get"
+            @submit="handleSearchSubmit"
+          >
+            <el-input
+              :model-value="searchValue"
+              :placeholder="searchPlaceholder"
+              :label="searchAriaLabel"
+              clearable
+              @focus="emit('search-focus')"
+              @input="handleSearchInput"
+              @keydown.enter="handleSearchEnter"
+            />
+            <input
+              v-if="searchName"
+              type="hidden"
+              :name="searchName"
+              :value="searchValue"
+            />
+          </form>
+        </slot>
+        <slot name="desktop-actions" />
+        <a
+          v-if="hasAuthLink"
+          :href="authHref"
+          :class="[ns.e('action-link'), ns.e('auth-link')]"
+          v-bind="{ 'data-public-nav': 'auth' }"
+        >
+          {{ authLabel }}
+        </a>
+      </template>
+
+      <template #mobile-primary-actions>
+        <button
+          v-if="showMobileSearchTrigger"
+          ref="mobileSearchTriggerRef"
+          type="button"
+          :class="[
+            ns.e('mobile-search-trigger'),
+            ns.is('expanded', mobileSearchExpanded),
+          ]"
+          :aria-expanded="mobileSearchExpanded"
+          :aria-controls="mobileSearchRowId"
+          :aria-label="mobileSearchButtonLabel"
+          @click="toggleMobileSearch"
+        >
+          {{ mobileSearchButtonLabel }}
+        </button>
+        <slot name="mobile-primary-actions" />
+        <a
+          v-if="hasAuthLink"
+          :href="authHref"
+          :class="[
+            ns.e('action-link'),
+            ns.e('auth-link'),
+            ns.em('auth-link', 'mobile'),
+          ]"
+          v-bind="{ 'data-public-nav': 'auth' }"
+        >
+          {{ authLabel }}
+        </a>
+      </template>
+
+      <template #mobile-secondary-actions>
         <Transition name="el-public-shell-mobile-search">
           <div
             v-if="showMobileSearchTrigger"
@@ -149,67 +155,65 @@
           </div>
         </Transition>
 
-        <div :class="ns.e('mobile-toolbar')">
-          <el-scrollbar
-            :class="ns.e('mobile-nav-scrollbar')"
-            :wrap-class="ns.e('mobile-nav-wrap')"
-            :view-class="ns.e('mobile-nav-view')"
+        <el-scrollbar
+          :class="ns.e('mobile-nav-scrollbar')"
+          :wrap-class="ns.e('mobile-nav-wrap')"
+          :view-class="ns.e('mobile-nav-view')"
+        >
+          <nav
+            ref="mobileNavRef"
+            :class="navKls('mobile-nav')"
+            aria-label="Primary navigation"
           >
-            <nav
-              ref="mobileNavRef"
-              :class="navKls('mobile-nav')"
-              aria-label="Primary navigation"
+            <a
+              v-for="item in navItems"
+              :key="item.key"
+              :href="item.href"
+              :class="navLinkKls(item.key)"
+              v-bind="{ 'data-public-nav': item.key }"
             >
-              <a
-                v-for="item in navItems"
-                :key="item.key"
-                :href="item.href"
-                :class="navLinkKls(item.key)"
-                v-bind="{ 'data-public-nav': item.key }"
-              >
-                {{ item.label }}
-              </a>
-              <span
-                v-if="activeNavIndicatorEnabled"
-                :class="ns.e('active-nav-indicator')"
-                aria-hidden="true"
-                v-bind="{ 'data-active-nav': activeNavIndicatorKey }"
-              />
-            </nav>
-          </el-scrollbar>
+              {{ item.label }}
+            </a>
+            <span
+              v-if="activeNavIndicatorEnabled"
+              :class="ns.e('active-nav-indicator')"
+              aria-hidden="true"
+              v-bind="{ 'data-active-nav': activeNavIndicatorKey }"
+            />
+          </nav>
+        </el-scrollbar>
 
-          <div :class="ns.e('mobile-actions')">
-            <template v-if="showMobileInlineSearch">
-              <slot name="mobile-search">
-                <form
-                  :class="[ns.e('search'), ns.em('search', 'mobile')]"
-                  :action="searchAction"
-                  method="get"
-                  @submit="handleSearchSubmit"
-                >
-                  <el-input
-                    :model-value="searchValue"
-                    :placeholder="searchPlaceholder"
-                    :label="searchAriaLabel"
-                    clearable
-                    @focus="emit('search-focus')"
-                    @input="handleSearchInput"
-                    @keydown.enter="handleSearchEnter"
-                  />
-                  <input
-                    v-if="searchName"
-                    type="hidden"
-                    :name="searchName"
-                    :value="searchValue"
-                  />
-                </form>
-              </slot>
-            </template>
-            <slot name="mobile-actions" />
-          </div>
+        <div :class="ns.e('mobile-actions')">
+          <template v-if="showMobileInlineSearch">
+            <slot name="mobile-search">
+              <form
+                :class="[ns.e('search'), ns.em('search', 'mobile')]"
+                :action="searchAction"
+                method="get"
+                @submit="handleSearchSubmit"
+              >
+                <el-input
+                  :model-value="searchValue"
+                  :placeholder="searchPlaceholder"
+                  :label="searchAriaLabel"
+                  clearable
+                  @focus="emit('search-focus')"
+                  @input="handleSearchInput"
+                  @keydown.enter="handleSearchEnter"
+                />
+                <input
+                  v-if="searchName"
+                  type="hidden"
+                  :name="searchName"
+                  :value="searchValue"
+                />
+              </form>
+            </slot>
+          </template>
+          <slot name="mobile-actions" />
         </div>
-      </div>
-    </header>
+      </template>
+    </el-site-header>
 
     <main :class="ns.e('main')">
       <slot />
@@ -229,6 +233,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { ElInput } from '@element-plus/components/input'
 import { ElScrollbar } from '@element-plus/components/scrollbar'
+import { ElSiteHeader } from '@element-plus/components/site-header'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
 import { useId, useNamespace } from '@element-plus/hooks'
 import { publicShellEmits, publicShellProps } from './public-shell'
