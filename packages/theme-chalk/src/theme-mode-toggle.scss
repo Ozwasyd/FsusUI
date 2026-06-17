@@ -25,6 +25,79 @@
     }
   }
 
+  @include m(segmented) {
+    --#{$namespace}-theme-mode-toggle-bg: transparent;
+    --#{$namespace}-theme-mode-toggle-border-color: #{var(
+        --#{$namespace}-border-color-lighter
+      )};
+    --#{$namespace}-theme-mode-toggle-item-bg: transparent;
+    --#{$namespace}-theme-mode-toggle-item-border-color: transparent;
+    --#{$namespace}-theme-mode-toggle-item-color: #{var(
+        --#{$namespace}-text-color-regular
+      )};
+    --#{$namespace}-theme-mode-toggle-item-hover-bg: #{var(
+        --#{$namespace}-fill-color-light
+      )};
+    --#{$namespace}-theme-mode-toggle-item-hover-border-color: transparent;
+    --#{$namespace}-theme-mode-toggle-item-hover-color: #{var(
+        --#{$namespace}-text-color-primary
+      )};
+    --#{$namespace}-theme-mode-toggle-active-bg: #{var(
+        --#{$namespace}-fill-color-light
+      )};
+    --#{$namespace}-theme-mode-toggle-active-border-color: transparent;
+    --#{$namespace}-theme-mode-toggle-active-color: #{var(
+        --#{$namespace}-text-color-primary
+      )};
+
+    border: 1px solid var(--#{$namespace}-theme-mode-toggle-border-color);
+    border-radius: 8px;
+    padding: 2px;
+    background: var(--#{$namespace}-theme-mode-toggle-bg);
+    box-sizing: border-box;
+
+    .#{$namespace}-radio-button__inner {
+      min-height: 36px;
+      border-color: var(--#{$namespace}-theme-mode-toggle-item-border-color);
+      border-radius: 6px;
+      background: var(--#{$namespace}-theme-mode-toggle-item-bg);
+      color: var(--#{$namespace}-theme-mode-toggle-item-color);
+      box-shadow: none;
+      transition:
+        background-color var(--#{$namespace}-transition-duration-fast),
+        border-color var(--#{$namespace}-transition-duration-fast),
+        color var(--#{$namespace}-transition-duration-fast);
+    }
+
+    .#{$namespace}-radio-button__inner:hover {
+      border-color: var(
+        --#{$namespace}-theme-mode-toggle-item-hover-border-color
+      );
+      background: var(--#{$namespace}-theme-mode-toggle-item-hover-bg);
+      color: var(--#{$namespace}-theme-mode-toggle-item-hover-color);
+    }
+
+    .#{$namespace}-radio-button__original-radio:focus-visible
+      + .#{$namespace}-radio-button__inner {
+      @include a11y-focus-ring(2px, 6px);
+    }
+
+    .#{$namespace}-radio-button__original-radio:checked
+      + .#{$namespace}-radio-button__inner,
+    .#{$namespace}-radio-button.is-active .#{$namespace}-radio-button__inner {
+      border-color: var(--#{$namespace}-theme-mode-toggle-active-border-color);
+      background: var(--#{$namespace}-theme-mode-toggle-active-bg);
+      color: var(--#{$namespace}-theme-mode-toggle-active-color);
+      box-shadow: none !important;
+    }
+
+    .#{$namespace}-radio-button__original-radio:disabled
+      + .#{$namespace}-radio-button__inner {
+      cursor: not-allowed;
+      opacity: 0.62;
+    }
+  }
+
   @include e(menu-button) {
     min-height: 40px;
     border: 1px solid var(--#{$namespace}-border-color-lighter);
