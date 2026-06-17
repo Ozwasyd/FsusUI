@@ -467,6 +467,42 @@ describe('Fsus theme visual baseline', () => {
     )
   })
 
+  test('keeps theme mode segmented interaction states token-backed', () => {
+    const css = compileThemeFile('theme-mode-toggle.scss')
+
+    expectCssRule(
+      css,
+      '.el-theme-mode-toggle--segmented .el-radio-button__inner',
+      [
+        'background: var(--el-theme-mode-toggle-item-bg);',
+        'color: var(--el-theme-mode-toggle-item-color);',
+      ],
+    )
+    expectCssRule(
+      css,
+      '.el-theme-mode-toggle--segmented .el-radio-button__inner:hover',
+      [
+        'background: var(--el-theme-mode-toggle-item-hover-bg);',
+        'color: var(--el-theme-mode-toggle-item-hover-color);',
+      ],
+    )
+    expectCssRule(
+      css,
+      '.el-theme-mode-toggle--segmented .el-radio-button__original-radio:focus-visible + .el-radio-button__inner',
+      [
+        'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+      ],
+    )
+    expectCssRule(
+      css,
+      '.el-theme-mode-toggle--segmented .el-radio-button__original-radio:checked + .el-radio-button__inner, .el-theme-mode-toggle--segmented .el-radio-button.is-active .el-radio-button__inner',
+      [
+        'background: var(--el-theme-mode-toggle-active-bg);',
+        'color: var(--el-theme-mode-toggle-active-color);',
+      ],
+    )
+  })
+
   test('supports theme mode menu-button as restrained paper menu', () => {
     const css = compileThemeFile('theme-mode-toggle.scss')
 

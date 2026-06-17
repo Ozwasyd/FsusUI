@@ -1,12 +1,113 @@
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
-import { afterEach, describe, expect, test } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import ThemeModeToggle from '../src/theme-mode-toggle.vue'
 import { clearThemeMode } from '@element-plus/components/config-provider'
 
+type MatchMediaController = ReturnType<typeof createMatchMediaController>
+
+const createMatchMediaController = (initialMatches = false) => {
+  let matches = initialMatches
+  const listeners = new Set<(event: MediaQueryListEvent) => void>()
+  const listenerMap = new Map<
+    EventListenerOrEventListenerObject,
+    (event: MediaQueryListEvent) => void
+  >()
+
+  const mediaQueryList = {
+    media: '(prefers-color-scheme: dark)',
+    onchange: null,
+    get matches() {
+      return matches
+    },
+    addEventListener(
+      _type: string,
+      listener: EventListenerOrEventListenerObject | null,
+    ) {
+      if (!listener) return
+
+      const normalizedListener = (event: MediaQueryListEvent) => {
+        if (typeof listener === 'function') {
+          listener.call(mediaQueryList, event)
+          return
+        }
+
+        listener.handleEvent(event)
+      }
+
+      listenerMap.set(listener, normalizedListener)
+      listeners.add(normalizedListener)
+    },
+    removeEventListener(
+      _type: string,
+      listener: EventListenerOrEventListenerObject | null,
+    ) {
+      if (!listener) return
+
+      const normalizedListener = listenerMap.get(listener)
+      if (!normalizedListener) return
+
+      listeners.delete(normalizedListener)
+      listenerMap.delete(listener)
+    },
+    addListener(
+      callback: (this: MediaQueryList, ev: MediaQueryListEvent) => any,
+    ) {
+      this.addEventListener('change', callback as EventListener)
+    },
+    removeListener(
+      callback: (this: MediaQueryList, ev: MediaQueryListEvent) => any,
+    ) {
+      this.removeEventListener('change', callback as EventListener)
+    },
+    dispatchEvent() {
+      return true
+    },
+  } as unknown as MediaQueryList
+
+  const createEvent = () => {
+    const event = new Event('change') as MediaQueryListEvent
+    Object.defineProperty(event, 'matches', {
+      configurable: true,
+      value: matches,
+    })
+    Object.defineProperty(event, 'media', {
+      configurable: true,
+      value: mediaQueryList.media,
+    })
+    return event
+  }
+
+  return {
+    matchMedia: () => mediaQueryList,
+    setMatches(nextMatches: boolean) {
+      matches = nextMatches
+      const event = createEvent()
+      listeners.forEach((listener) => listener(event))
+    },
+  }
+}
+
 describe('ThemeModeToggle.vue', () => {
+  let originalMatchMedia: typeof window.matchMedia | undefined
+  let matchMediaController: MatchMediaController
+
+  beforeEach(() => {
+    originalMatchMedia = window.matchMedia
+    matchMediaController = createMatchMediaController(false)
+    window.matchMedia =
+      matchMediaController.matchMedia as typeof window.matchMedia
+    clearThemeMode()
+  })
+
   afterEach(() => {
     clearThemeMode()
+    if (originalMatchMedia) {
+      window.matchMedia = originalMatchMedia
+      return
+    }
+
+    delete (window as Partial<Window>).matchMedia
   })
 
   test('renders compact visibility classes', () => {
@@ -52,14 +153,55 @@ describe('ThemeModeToggle.vue', () => {
       },
     })
 
-    expect(wrapper.element.matches('.el-radio-group.el-theme-mode-toggle')).toBe(
-      true,
-    )
+    expect(
+      wrapper.element.matches('.el-radio-group.el-theme-mode-toggle'),
+    ).toBe(true)
     expect(wrapper.find('.el-theme-mode-toggle__menu-button').exists()).toBe(
       false,
     )
     expect(wrapper.text()).toContain('系统')
     expect(wrapper.text()).not.toContain('Sys')
+  })
+
+  test('syncs segmented variant through manual and system-resolved theme states', async () => {
+    const wrapper = mount(ThemeModeToggle, {
+      props: {
+        modelValue: 'light',
+      },
+    })
+
+    expect(document.documentElement.dataset.themeMode).toBe('light')
+    expect(document.documentElement.dataset.themeResolved).toBe('light')
+    expect(
+      wrapper.find<HTMLInputElement>('input[value="light"]').element.checked,
+    ).toBe(true)
+
+    await wrapper.setProps({ modelValue: 'dark' })
+    await nextTick()
+
+    expect(document.documentElement.dataset.themeMode).toBe('dark')
+    expect(document.documentElement.dataset.themeResolved).toBe('dark')
+    expect(
+      wrapper.find<HTMLInputElement>('input[value="dark"]').element.checked,
+    ).toBe(true)
+
+    await wrapper.setProps({ modelValue: 'system' })
+    await nextTick()
+
+    expect(document.documentElement.dataset.themeMode).toBe('system')
+    expect(document.documentElement.dataset.themeResolved).toBe('light')
+    expect(
+      wrapper.find<HTMLInputElement>('input[value="system"]').element.checked,
+    ).toBe(true)
+
+    matchMediaController.setMatches(true)
+    await nextTick()
+
+    expect(document.documentElement.dataset.themeMode).toBe('system')
+    expect(document.documentElement.dataset.themeResolved).toBe('dark')
+    expect(
+      wrapper.find<HTMLInputElement>('input[value="system"]').element.checked,
+    ).toBe(true)
   })
 
   test('renders menu-button variant with localized current mode and menu items', async () => {
@@ -139,7 +281,9 @@ describe('ThemeModeToggle.vue', () => {
 
     await items[0].trigger('keydown', { key: 'ArrowDown' })
     await nextTick()
-    items = wrapper.findAll<HTMLButtonElement>('.el-theme-mode-toggle__menu-item')
+    items = wrapper.findAll<HTMLButtonElement>(
+      '.el-theme-mode-toggle__menu-item',
+    )
     expect(document.activeElement).toBe(items[1].element)
 
     await items[1].trigger('keydown', { key: 'Enter' })
@@ -150,7 +294,9 @@ describe('ThemeModeToggle.vue', () => {
 
     await trigger.trigger('click')
     await nextTick()
-    items = wrapper.findAll<HTMLButtonElement>('.el-theme-mode-toggle__menu-item')
+    items = wrapper.findAll<HTMLButtonElement>(
+      '.el-theme-mode-toggle__menu-item',
+    )
     await items[0].trigger('keydown', { key: 'Escape' })
     await nextTick()
     expect(trigger.attributes('aria-expanded')).toBe('false')
@@ -158,7 +304,9 @@ describe('ThemeModeToggle.vue', () => {
 
     await trigger.trigger('click')
     await nextTick()
-    document.body.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }))
+    document.body.dispatchEvent(
+      new MouseEvent('pointerdown', { bubbles: true }),
+    )
     await nextTick()
     expect(trigger.attributes('aria-expanded')).toBe('false')
 
