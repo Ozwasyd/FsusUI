@@ -16,7 +16,11 @@
               <slot name="brand">{{ brand }}</slot>
             </a>
 
-            <nav :class="ns.e('desktop-nav')" aria-label="Primary navigation">
+            <nav
+              ref="desktopNavRef"
+              :class="navKls('desktop-nav')"
+              aria-label="Primary navigation"
+            >
               <a
                 v-for="item in navItems"
                 :key="item.key"
@@ -26,6 +30,12 @@
               >
                 {{ item.label }}
               </a>
+              <span
+                v-if="activeNavIndicatorEnabled"
+                :class="ns.e('active-nav-indicator')"
+                aria-hidden="true"
+                v-bind="{ 'data-active-nav': activeNavIndicatorKey }"
+              />
             </nav>
           </div>
 
@@ -71,7 +81,10 @@
               v-if="showMobileSearchTrigger"
               ref="mobileSearchTriggerRef"
               type="button"
-              :class="[ns.e('mobile-search-trigger'), ns.is('expanded', mobileSearchExpanded)]"
+              :class="[
+                ns.e('mobile-search-trigger'),
+                ns.is('expanded', mobileSearchExpanded),
+              ]"
               :aria-expanded="mobileSearchExpanded"
               :aria-controls="mobileSearchRowId"
               :aria-label="mobileSearchButtonLabel"
@@ -89,7 +102,10 @@
             v-show="mobileSearchExpanded"
             :id="mobileSearchRowId"
             ref="mobileSearchRowRef"
-            :class="[ns.e('mobile-search-row'), ns.is('expanded', mobileSearchExpanded)]"
+            :class="[
+              ns.e('mobile-search-row'),
+              ns.is('expanded', mobileSearchExpanded),
+            ]"
             :aria-hidden="!mobileSearchExpanded"
           >
             <slot name="mobile-search">
@@ -127,7 +143,11 @@
             :wrap-class="ns.e('mobile-nav-wrap')"
             :view-class="ns.e('mobile-nav-view')"
           >
-            <nav :class="ns.e('mobile-nav')" aria-label="Primary navigation">
+            <nav
+              ref="mobileNavRef"
+              :class="navKls('mobile-nav')"
+              aria-label="Primary navigation"
+            >
               <a
                 v-for="item in navItems"
                 :key="item.key"
@@ -137,6 +157,12 @@
               >
                 {{ item.label }}
               </a>
+              <span
+                v-if="activeNavIndicatorEnabled"
+                :class="ns.e('active-nav-indicator')"
+                aria-hidden="true"
+                v-bind="{ 'data-active-nav': activeNavIndicatorKey }"
+              />
             </nav>
           </el-scrollbar>
 
@@ -188,7 +214,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { ElInput } from '@element-plus/components/input'
 import { ElScrollbar } from '@element-plus/components/scrollbar'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
@@ -209,6 +235,8 @@ const searchValue = ref(props.searchQuery)
 const mobileSearchRowId = useId().value
 const mobileSearchRowRef = ref<HTMLElement>()
 const mobileSearchTriggerRef = ref<HTMLButtonElement>()
+const desktopNavRef = ref<HTMLElement>()
+const mobileNavRef = ref<HTMLElement>()
 const mobileSearchExpanded = ref(
   props.mobileSearchMode === 'trigger' && props.searchQuery.trim().length > 0,
 )
@@ -239,6 +267,13 @@ const mobileSearchButtonLabel = computed(() =>
     ? props.mobileSearchCancelLabel
     : mobileSearchTriggerText.value,
 )
+const activeNavIndicatorEnabled = computed(
+  () => props.activeNavMotion === 'indicator' && props.navItems.length > 0,
+)
+const activeNavIndicatorKey = computed(() => {
+  const activeItem = props.navItems.find((item) => item.key === props.activeNav)
+  return activeItem?.key ?? ''
+})
 const shellStyle = computed<CSSProperties>(() => ({
   '--el-public-shell-mobile-nav-gap': props.mobileNavGap,
   '--el-public-shell-mobile-search-width': props.mobileSearchWidth,
@@ -250,6 +285,73 @@ const navLinkKls = (key: string) => [
   ns.e('nav-link'),
   ns.is('active', key === props.activeNav),
 ]
+const navKls = (element: 'desktop-nav' | 'mobile-nav') => [
+  ns.e(element),
+  ns.is('indicator-motion', activeNavIndicatorEnabled.value),
+]
+
+const clearNavIndicator = (nav: HTMLElement) => {
+  nav.style.removeProperty('--el-public-shell-active-nav-indicator-x')
+  nav.style.removeProperty('--el-public-shell-active-nav-indicator-width')
+  nav.style.setProperty('--el-public-shell-active-nav-indicator-opacity', '0')
+}
+
+const syncNavIndicator = (nav: HTMLElement | undefined) => {
+  if (!nav) return
+
+  if (!activeNavIndicatorEnabled.value || !activeNavIndicatorKey.value) {
+    clearNavIndicator(nav)
+    return
+  }
+
+  const activeLink = Array.from(
+    nav.querySelectorAll<HTMLElement>(`.${ns.e('nav-link')}`),
+  ).find((link) => link.dataset.publicNav === activeNavIndicatorKey.value)
+
+  if (!activeLink) {
+    clearNavIndicator(nav)
+    return
+  }
+
+  const navRect = nav.getBoundingClientRect()
+  const linkRect = activeLink.getBoundingClientRect()
+  nav.style.setProperty(
+    '--el-public-shell-active-nav-indicator-x',
+    `${Math.max(0, linkRect.left - navRect.left + nav.scrollLeft)}px`,
+  )
+  nav.style.setProperty(
+    '--el-public-shell-active-nav-indicator-width',
+    `${Math.max(0, linkRect.width)}px`,
+  )
+  nav.style.setProperty('--el-public-shell-active-nav-indicator-opacity', '1')
+}
+
+const syncNavIndicators = async () => {
+  await nextTick()
+  syncNavIndicator(desktopNavRef.value)
+  syncNavIndicator(mobileNavRef.value)
+}
+
+const handleIndicatorResize = () => {
+  void syncNavIndicators()
+}
+
+watch(
+  () => [props.activeNav, props.activeNavMotion, props.navItems],
+  () => {
+    void syncNavIndicators()
+  },
+  { deep: true },
+)
+
+onMounted(() => {
+  void syncNavIndicators()
+  window.addEventListener('resize', handleIndicatorResize)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleIndicatorResize)
+})
 
 const handleSearchInput = (value: string) => {
   searchValue.value = value

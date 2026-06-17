@@ -658,9 +658,7 @@ describe('Fsus theme visual baseline', () => {
     expectCssRule(drawerCss, '.el-drawer', [
       'box-shadow: var(--fsus-shadow-panel, none);',
     ])
-    expect(selectDropdownCss).toContain(
-      '--el-select-dropdown-padding: 8px 0;',
-    )
+    expect(selectDropdownCss).toContain('--el-select-dropdown-padding: 8px 0;')
     expect(selectDropdownCss).toContain(
       '--el-select-dropdown-shadow: var(--fsus-shadow-panel, none);',
     )
@@ -668,7 +666,9 @@ describe('Fsus theme visual baseline', () => {
       'box-shadow: var(--el-select-dropdown-shadow);',
     ])
     expect(drawerCss).not.toContain('box-shadow: var(--el-box-shadow-dark);')
-    expect(selectDropdownCss).not.toContain('--el-select-dropdown-padding: 6px 0;')
+    expect(selectDropdownCss).not.toContain(
+      '--el-select-dropdown-padding: 6px 0;',
+    )
     expect(selectDropdownCss).not.toContain(
       '--el-select-dropdown-shadow: var(--el-box-shadow-light);',
     )
@@ -743,9 +743,11 @@ describe('Fsus theme visual baseline', () => {
       'outline: none !important;',
       'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
     ])
-    expectCssRule(css, '.el-carousel__indicators--labels .el-carousel__button', [
-      'color: var(--fsus-carousel-label-color, var(--fsus-ink));',
-    ])
+    expectCssRule(
+      css,
+      '.el-carousel__indicators--labels .el-carousel__button',
+      ['color: var(--fsus-carousel-label-color, var(--fsus-ink));'],
+    )
     expectCssRule(css, '.el-carousel__button', [
       'background-color: var(--fsus-carousel-indicator-bg, var(--fsus-color-surface-base));',
       'transition: background-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), box-shadow var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), opacity var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
@@ -907,7 +909,9 @@ describe('Fsus theme visual baseline', () => {
     expect(optionCss).not.toContain('font-weight: 700;')
     expect(selectCss).not.toContain('var(--el-color-primary)')
     expect(selectCss).not.toContain('var(--el-color-white)')
-    expect(dropdownCss).not.toContain('border-radius: var(--el-border-radius-small);')
+    expect(dropdownCss).not.toContain(
+      'border-radius: var(--el-border-radius-small);',
+    )
   })
 
   test('keeps autocomplete suggestion popper on the shared dropdown material', () => {
@@ -923,9 +927,7 @@ describe('Fsus theme visual baseline', () => {
       'background: var(--fsus-autocomplete-popper-bg, var(--fsus-surface-overlay));',
       'overflow: hidden;',
     ])
-    expectCssRule(css, '.el-autocomplete-suggestion__wrap', [
-      'padding: 8px 0;',
-    ])
+    expectCssRule(css, '.el-autocomplete-suggestion__wrap', ['padding: 8px 0;'])
     expectCssRule(css, '.el-autocomplete-suggestion li:hover', [
       'background-color: var(--fsus-autocomplete-option-hover-bg, var(--fsus-select-option-hover-bg, var(--fsus-state-hover-bg)));',
     ])
@@ -1055,9 +1057,13 @@ describe('Fsus theme visual baseline', () => {
     expectCssRule(css, '.el-color-predefine__color-selector.selected', [
       'box-shadow: inset 0 0 0 2px var(--fsus-color-picker-selected-ring, var(--fsus-state-focus-border));',
     ])
-    expectCssRule(css, '.el-color-picker.is-focused .el-color-picker__trigger', [
-      'border-color: var(--fsus-color-picker-focus-border, var(--fsus-state-focus-border));',
-    ])
+    expectCssRule(
+      css,
+      '.el-color-picker.is-focused .el-color-picker__trigger',
+      [
+        'border-color: var(--fsus-color-picker-focus-border, var(--fsus-state-focus-border));',
+      ],
+    )
     expectCssRule(css, '.el-color-dropdown__value', [
       'color: var(--fsus-color-picker-value-text, var(--fsus-ink));',
     ])
@@ -1117,9 +1123,11 @@ describe('Fsus theme visual baseline', () => {
       'border: 1px solid var(--fsus-image-viewer-control-border, rgba(255, 255, 255, 0.64));',
       'transition: opacity var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), background-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), box-shadow var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
     ])
-    expectCssRule(css, '.el-image-viewer__wrapper:hover .el-image-viewer__btn', [
-      'opacity: var(--fsus-image-viewer-control-hover-opacity, 1);',
-    ])
+    expectCssRule(
+      css,
+      '.el-image-viewer__wrapper:hover .el-image-viewer__btn',
+      ['opacity: var(--fsus-image-viewer-control-hover-opacity, 1);'],
+    )
 
     for (const selector of [
       '.el-image-viewer__btn:focus-visible',
@@ -1139,14 +1147,10 @@ describe('Fsus theme visual baseline', () => {
       'animation: viewer-fade-out var(--fsus-image-viewer-motion, var(--fsus-motion-overlay, 300ms)) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
     ])
     expect(css).toContain('@media (prefers-reduced-motion: reduce)')
-    expectCssRule(
-      css,
-      '.viewer-fade-enter-active, .viewer-fade-leave-active',
-      [
-        'animation-duration: 1ms !important;',
-        'animation-iteration-count: 1 !important;',
-      ],
-    )
+    expectCssRule(css, '.viewer-fade-enter-active, .viewer-fade-leave-active', [
+      'animation-duration: 1ms !important;',
+      'animation-iteration-count: 1 !important;',
+    ])
     expect(css).not.toContain('color: #fff;')
     expect(css).not.toContain('border-color: #fff;')
     expect(css).not.toContain('background: #000;')
@@ -1262,9 +1266,7 @@ describe('Fsus theme visual baseline', () => {
         'display: none;',
         'margin-top: 18px;',
       ])
-      expectCssRule(css, '.el-public-shell__mobile-actions', [
-        'display: flex;',
-      ])
+      expectCssRule(css, '.el-public-shell__mobile-actions', ['display: flex;'])
       expectCssRule(css, '.el-public-shell__mobile-nav-scrollbar', [
         'width: 100%;',
       ])
@@ -1313,10 +1315,7 @@ describe('Fsus theme visual baseline', () => {
       expectCssRule(
         css,
         '.el-public-shell-mobile-search-enter-from, .el-public-shell-mobile-search-leave-to',
-        [
-          'opacity: 0;',
-          'transform: translateY(-4px);',
-        ],
+        ['opacity: 0;', 'transform: translateY(-4px);'],
       )
       expect(css).toContain('@media (prefers-reduced-motion: reduce)')
       expectCssRule(
@@ -1327,14 +1326,38 @@ describe('Fsus theme visual baseline', () => {
     }
   })
 
+  test('supports opt-in public shell active nav indicator motion', () => {
+    const publicShellCss = compileThemeFile('public-shell.scss')
+
+    expectCssRule(
+      publicShellCss,
+      '.el-public-shell__desktop-nav.is-indicator-motion, .el-public-shell__mobile-nav.is-indicator-motion',
+      [
+        'position: relative;',
+        '--el-public-shell-active-nav-indicator-opacity: 0;',
+      ],
+    )
+    expectCssRule(publicShellCss, '.el-public-shell__active-nav-indicator', [
+      'position: absolute;',
+      'pointer-events: none;',
+      'transform: translate3d(var(--el-public-shell-active-nav-indicator-x, 0px), 0, 0);',
+      'opacity: var(--el-public-shell-active-nav-indicator-opacity, 0);',
+      'transition: transform var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), opacity var(--el-transition-duration-fast);',
+    ])
+    expectCssRule(publicShellCss, '.el-public-shell__nav-link.is-active', [
+      'border-bottom-color: var(--fsus-scholarly-blue);',
+    ])
+    expectCssRule(publicShellCss, '.el-public-shell__active-nav-indicator', [
+      'transition: none;',
+    ])
+  })
+
   test('keeps public shell desktop utilities compact while giving search room', () => {
     const publicShellCss = compileThemeFile('public-shell.scss')
     const criticalCss = compileThemeFile('public-shell-critical.scss')
 
     for (const css of [publicShellCss, criticalCss]) {
-      expectCssRule(css, '.el-public-shell__search--desktop', [
-        'width: 11rem;',
-      ])
+      expectCssRule(css, '.el-public-shell__search--desktop', ['width: 11rem;'])
       expectCssRule(css, '.el-public-shell__actions', [
         'gap: 12px;',
         'min-width: max-content;',

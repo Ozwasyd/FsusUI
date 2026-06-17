@@ -160,7 +160,8 @@
 
   &-mobile-search-enter-active,
   &-mobile-search-leave-active {
-    transition: opacity var(--#{$namespace}-transition-duration-fast),
+    transition:
+      opacity var(--#{$namespace}-transition-duration-fast),
       transform var(--#{$namespace}-transition-duration-fast);
   }
 
@@ -236,6 +237,40 @@
       word-break: keep-all;
       writing-mode: horizontal-tb;
     }
+  }
+
+  @include e((desktop-nav, mobile-nav)) {
+    @include when(indicator-motion) {
+      position: relative;
+      --#{$namespace}-public-shell-active-nav-indicator-opacity: 0;
+      --#{$namespace}-public-shell-active-nav-indicator-width: 0px;
+      --#{$namespace}-public-shell-active-nav-indicator-x: 0px;
+    }
+  }
+
+  @include e(active-nav-indicator) {
+    position: absolute;
+    inset-block-end: 0;
+    inset-inline-start: 0;
+    inline-size: var(
+      --#{$namespace}-public-shell-active-nav-indicator-width,
+      0px
+    );
+    block-size: 2px;
+    border-radius: 999px;
+    background: var(--fsus-scholarly-blue);
+    opacity: var(--#{$namespace}-public-shell-active-nav-indicator-opacity, 0);
+    pointer-events: none;
+    transform: translate3d(
+      var(--#{$namespace}-public-shell-active-nav-indicator-x, 0px),
+      0,
+      0
+    );
+    transition:
+      transform var(--fsus-motion-control-fast, 160ms)
+        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+      opacity var(--#{$namespace}-transition-duration-fast);
+    will-change: transform, opacity;
   }
 
   @include e(mobile-nav-wrap) {
@@ -317,6 +352,10 @@
     }
 
     @include e(nav-link) {
+      transition: none;
+    }
+
+    @include e(active-nav-indicator) {
       transition: none;
     }
 

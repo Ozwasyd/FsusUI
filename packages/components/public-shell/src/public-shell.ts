@@ -11,6 +11,7 @@ export interface PublicShellNavItem {
 }
 
 export type PublicShellMobileSearchMode = 'inline' | 'trigger' | 'none'
+export type PublicShellActiveNavMotion = 'none' | 'indicator'
 
 export const publicShellProps = buildProps({
   /**
@@ -44,6 +45,14 @@ export const publicShellProps = buildProps({
   activeNav: {
     type: String,
     default: '',
+  },
+  /**
+   * @description active navigation motion presentation
+   */
+  activeNavMotion: {
+    type: definePropType<PublicShellActiveNavMotion>(String),
+    values: ['none', 'indicator'],
+    default: 'none',
   },
   /**
    * @description auth/action link label

@@ -21,6 +21,45 @@ describe('PublicShell.vue', () => {
         .find('.el-public-shell__nav-link.is-active[data-public-nav="archive"]')
         .exists(),
     ).toBe(true)
+    expect(
+      wrapper.find('.el-public-shell__active-nav-indicator').exists(),
+    ).toBe(false)
+  })
+
+  test('renders opt-in semantic active nav indicator for desktop and mobile', async () => {
+    const wrapper = mount(PublicShell, {
+      props: {
+        brand: 'Fsus',
+        navItems,
+        activeNav: 'home',
+        activeNavMotion: 'indicator',
+      },
+    })
+
+    const indicators = wrapper.findAll('.el-public-shell__active-nav-indicator')
+    expect(indicators).toHaveLength(2)
+    expect(
+      wrapper
+        .find('.el-public-shell__desktop-nav.is-indicator-motion')
+        .exists(),
+    ).toBe(true)
+    expect(
+      wrapper.find('.el-public-shell__mobile-nav.is-indicator-motion').exists(),
+    ).toBe(true)
+    expect(
+      indicators.map((indicator) => indicator.attributes('aria-hidden')),
+    ).toEqual(['true', 'true'])
+    expect(
+      indicators.map((indicator) => indicator.attributes('data-active-nav')),
+    ).toEqual(['home', 'home'])
+
+    await wrapper.setProps({ activeNav: 'archive' })
+
+    expect(
+      wrapper
+        .findAll('.el-public-shell__active-nav-indicator')
+        .map((indicator) => indicator.attributes('data-active-nav')),
+    ).toEqual(['archive', 'archive'])
   })
 
   test('exposes layout invariants through public css variables', () => {
@@ -69,7 +108,8 @@ describe('PublicShell.vue', () => {
         showSearch: false,
       },
       slots: {
-        'mobile-primary-actions': '<button data-test="mobile-primary">Search</button>',
+        'mobile-primary-actions':
+          '<button data-test="mobile-primary">Search</button>',
         'mobile-actions': '<button data-test="legacy-mobile">Legacy</button>',
       },
     })
@@ -81,25 +121,29 @@ describe('PublicShell.vue', () => {
     const mobileToolbar = wrapper.find('.el-public-shell__mobile-toolbar')
 
     expect(mobilePrimaryActions.exists()).toBe(true)
-    expect(mobilePrimaryActions.find('[data-test="mobile-primary"]').exists()).toBe(
+    expect(
+      mobilePrimaryActions.find('[data-test="mobile-primary"]').exists(),
+    ).toBe(true)
+    expect(mobileToolbar.find('.el-public-shell__mobile-nav').exists()).toBe(
       true,
     )
-    expect(mobileToolbar.find('.el-public-shell__mobile-nav').exists()).toBe(true)
-    expect(mobileToolbar.find('.el-public-shell__mobile-actions').exists()).toBe(
+    expect(
+      mobileToolbar.find('.el-public-shell__mobile-actions').exists(),
+    ).toBe(true)
+    expect(mobileToolbar.find('[data-test="legacy-mobile"]').exists()).toBe(
       true,
     )
-    expect(mobileToolbar.find('[data-test="legacy-mobile"]').exists()).toBe(true)
     expect(mobileToolbar.find('[data-test="mobile-primary"]').exists()).toBe(
       false,
     )
 
     const primaryChildren = primaryRow.element.children
-    expect(primaryChildren[0]?.classList.contains('el-public-shell__brand-nav')).toBe(
-      true,
-    )
-    expect(primaryChildren[1]?.classList.contains('el-public-shell__actions')).toBe(
-      true,
-    )
+    expect(
+      primaryChildren[0]?.classList.contains('el-public-shell__brand-nav'),
+    ).toBe(true)
+    expect(
+      primaryChildren[1]?.classList.contains('el-public-shell__actions'),
+    ).toBe(true)
     expect(
       primaryChildren[2]?.classList.contains(
         'el-public-shell__mobile-primary-actions',
@@ -208,18 +252,18 @@ describe('PublicShell.vue', () => {
       },
     })
 
-    expect(inlineWrapper.find('.el-public-shell__search--mobile').exists()).toBe(
-      true,
-    )
+    expect(
+      inlineWrapper.find('.el-public-shell__search--mobile').exists(),
+    ).toBe(true)
     expect(
       inlineWrapper.find('.el-public-shell__mobile-search-trigger').exists(),
     ).toBe(false)
     expect(noneWrapper.find('.el-public-shell__search--mobile').exists()).toBe(
       false,
     )
-    expect(noneWrapper.find('.el-public-shell__mobile-search-trigger').exists()).toBe(
-      false,
-    )
+    expect(
+      noneWrapper.find('.el-public-shell__mobile-search-trigger').exists(),
+    ).toBe(false)
   })
 
   test('supports dense desktop utility group with long search copy and optional auth link', () => {
