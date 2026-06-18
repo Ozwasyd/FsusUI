@@ -20,6 +20,18 @@ FsusUI 2026 的设计语言定义为 **The Intellectual Minimalist（高智感�
 2. **Ivy / Editorial Restraint**: 借鉴学术出版物的克制和低调质感，优先表达内容与结构。
 3. **Firm Yet Soft**: 结构精确，控件边缘和交互反馈柔和。微圆角、细描边和低强度阴影降低机械感，但不削弱界面秩序。
 
+### Scope Boundary
+
+FsusUI defaults are calibrated for **task surfaces**: 管理后台、内容编辑、知识产品、工具型界面、阅读文档。组件级规范（spacing scale、控件高度、tabs、buttons）都假设读者在 **densely repeated rows, forms, and panels** 之间操作。
+
+FsusUI 不为下列场景提供完整规范：
+
+- 公开 marketing / landing pages（hero、CTA、slogan、公开阅读面）。
+- Mobile-first consumer navigation（bottom tab bar、bottom sheet、segment control 在 consumer 上下文里的视觉语言）。
+- Long-form editorial 排版（杂志风章节、多栏 grid、首字下沉）。
+
+在这些场景里使用 FsusUI 组件时，consumer 必须自己定义一份 **Public / Marketing Layout Rules**，把 FsusUI 的组件级规范适配到自己的页面上；不能直接把 desktop admin patterns 搬到 mobile landing。FsusBlog 这类项目需要在仓库里维护自己的公开页面规范，并在 commit 评审里区分 FsusUI 改动与 consumer layout 改动。
+
 ## 2. Brand Motif: Punctuation
 
 FsusUI 从 `Fsu's Blog.` 的句点中提取 **Punctuation Mark（标点）** 作为品牌识别元素。
@@ -117,6 +129,16 @@ FsusUI 的色彩系统围绕 **Ink / Paper / Dot / Scholarly Blue** 展开。颜
 - 表格大尺寸行内 padding：`14px 0`
 
 密度只用于表达任务场景，不表达视觉偏好。数据管理、日志、表格操作使用紧凑密度；表单录入和配置页使用默认密度；营销式展示页不应反向污染组件库默认密度。
+
+### Spacing On Mobile Editorial Surfaces
+
+`--fsus-space-*` 的 32px 上限是 **task surface** 的值，假设用户在表单、表格、面板之间连续操作。在 mobile editorial / reading surface（hero、章节开头、长文阅读、品牌主标语）上，纵向 breathing room 可以超出 32px token：
+
+- Mobile hero 上下 padding 通常落在 `48–80px`（`--fsus-space-8` 的 1.5× 到 2.5×）。
+- Mobile 章节首屏与正文之间通常 `32–48px`，由字号 + 字重承担重音，不靠留白装饰。
+- Mobile 长文段落间不需要额外 margin，沿用组件 typography 默认行高。
+
+这条例外**只**适用于 `[data-fsus-surface='reading']` 或明确标记为 editorial 的 mobile surface。Task surface（admin、editor、表格）必须仍然落在 `--fsus-space-*` token 之内。Consumer landing 页面在 commit 评审时需要明确标注哪一块属于 editorial surface、哪一块属于 task surface。
 
 ### Rationale
 
@@ -218,10 +240,28 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 
 ### Tabs and Navigation
 
-- Tabs header 默认高度 `40px`。
+- Tabs header 默认高度 `40px`（**desktop / task surface**，mobile 见下方）。
 - Active 状态使用 Ink 文本、Scholarly Blue 下划线或边框。
 - Hover 只改变文字或弱背景，不改变布局尺寸。
 - 导航项需要稳定 hit area，不因为图标、徽标或加载态导致宽高跳动。
+
+#### Mobile Navigation Patterns
+
+`40px` tab header 默认值只覆盖 **desktop / task surface**。Mobile 必须显式选一种 navigation 模式，不要把 desktop 的下划线 tab 直接搬到 mobile：
+
+| 模式 | 适用场景 | 触控高度 | Active 表达 |
+|------|---------|---------|------------|
+| **Bottom tab bar** | Consumer 公开 app、blog、knowledge product 的主导航（3–5 项） | `56–64px`（含 safe-area-inset-bottom） | Ink 图标 + Ink 文本 + Scholarly Blue 顶标或 icon fill |
+| **Segment control** | 单一页面内的视图切换（Tab/All/Following） | `36–40px` | Scholarly Blue 选中胶囊 + Ink 文本 |
+| **Horizontal scrollable tab strip** | 多于 4 个分类的次级导航 | `44px` 触控区 + scroll snap | Ink 文本 + Scholarly Blue 下划线（继承 desktop 规范） |
+
+不允许：
+
+- Mobile 顶部主导航继续用 `text-link + underline` 而把 action 按钮（搜索、登录、菜单）做成 bordered button，两种 affordance 在同一行并存。
+- Mobile tab 使用低于 `40px` 的命中区域。
+- Mobile bottom tab bar 项目多于 5 个；多于 5 项必须收纳到 "More"。
+
+Consumer 在公开 landing 上使用 FsusUI 时，必须在 Public Layout Rules 里指明 mobile 用哪种模式、为什么。
 
 ### Icons
 
@@ -310,6 +350,7 @@ Focus 状态使用 `2px` Scholarly Blue ring：
 - 不使用浏览器默认蓝色 outline 替代 FsusUI focus ring。
 - 不在组件库示例中堆叠宣传语。组件示例应展示真实状态和真实约束。
 - 不使用"高级""极致""智能"等不可验证形容词描述组件。
+- **不在同一导航行混用两种 affordance**：text-link tab（裸文字 + 下划线）和 bordered action button（带边框圆角按钮）不能并排出现在同一行 primary nav 里。两者必须统一为同一种视觉语言，或者用区域（顶部 / 底部 / 抽屉）明确分开。如果 consumer 必须并排，必须在 affordance 之间保持命中区域尺寸一致，并加 `aria-current` 区分语义。
 
 #### Don't — anti-examples
 
