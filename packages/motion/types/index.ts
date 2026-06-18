@@ -20,6 +20,7 @@ export const motionPresetNames = [
   'paper-settle',
   // Routing / page-level — long duration, opacity-only
   'route-settle',
+  'ownership-transfer-snapshot',
   'overlay-settle',
   // Overlay surfaces — dialog/drawer/sheet
   'dialog-settle',
@@ -87,6 +88,7 @@ export const motionSurfaceCategories = [
   'toast-banner-surface',
   'media-preview-surface',
   'route-surface',
+  'ownership-transfer-surface',
 ] as const
 
 export type MotionSurfaceCategory = (typeof motionSurfaceCategories)[number]

@@ -39,7 +39,7 @@
         <ElSiteHeader
           :sticky="false"
           max-width="100%"
-          aria-label="Blog header fixture"
+          ariaLabel="Blog header fixture"
         >
           <template #brand>
             <a href="#blog-header">Blog</a>
@@ -59,7 +59,7 @@
         <ElSiteHeader
           :sticky="false"
           max-width="100%"
-          aria-label="Auth header fixture"
+          ariaLabel="Auth header fixture"
         >
           <template #brand>
             <a href="#auth-header">Auth</a>
@@ -75,7 +75,7 @@
         <ElSiteHeader
           :sticky="false"
           max-width="100%"
-          aria-label="Workspace header fixture"
+          ariaLabel="Workspace header fixture"
         >
           <template #brand>
             <a href="#workspace-header">Workspace</a>

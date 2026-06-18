@@ -298,8 +298,8 @@ export const runMotion = (
     isMotionReducedOrDisabled(options.disabled) ||
     !claimMotionBudgetNode(budget)
   ) {
-    finalState = preset.reduced
-    applyStyleState(el, preset.reduced)
+    finalState = phase === 'leave' ? to : preset.reduced
+    applyStyleState(el, finalState)
     options.onFinish?.()
     finished = true
     return controls
@@ -363,4 +363,20 @@ export const runMotion = (
   }
 
   return controls
+}
+
+export type OwnershipTransferSnapshotMotionOptions = Omit<
+  MotionRunOptions,
+  'name'
+>
+
+export const runOwnershipTransferSnapshotMotion = (
+  el: HTMLElement,
+  options: OwnershipTransferSnapshotMotionOptions = {},
+): MotionRuntimeControls => {
+  el.dataset.fsusMotionPreset = 'ownership-transfer-snapshot'
+  return runMotion(el, {
+    ...options,
+    name: 'ownership-transfer-snapshot',
+  })
 }

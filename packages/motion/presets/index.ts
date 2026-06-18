@@ -90,6 +90,17 @@ export const motionPresets: Record<MotionPresetName, MotionPresetDefinition> = {
     leaveFrom: { opacity: '1' },
     leaveTo: { opacity: '0.96' },
   },
+  'ownership-transfer-snapshot': {
+    name: 'ownership-transfer-snapshot',
+    pattern: 'decel',
+    tier: 'long',
+    surfaces: ['ownership-transfer-surface', 'route-surface'],
+    from: { opacity: '0' },
+    to: { opacity: '1' },
+    reduced: opacityTerminal,
+    leaveFrom: { opacity: '1' },
+    leaveTo: { opacity: '0' },
+  },
   'dialog-settle': {
     name: 'dialog-settle',
     pattern: 'emphasized',

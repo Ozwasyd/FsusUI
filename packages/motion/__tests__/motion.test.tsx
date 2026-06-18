@@ -38,6 +38,7 @@ import FsuMotion, {
   resolveMotionBudget,
   runMotion,
   runMotionRecipe,
+  runOwnershipTransferSnapshotMotion,
   setMotionBudget,
   useFlipMotion,
   useGsapContext,
@@ -100,6 +101,7 @@ describe('motion primitives', () => {
       'surface-settle',
       'paper-settle',
       'route-settle',
+      'ownership-transfer-snapshot',
       'dialog-settle',
       'sheet-settle',
       'overlay-settle',
@@ -150,6 +152,12 @@ describe('motion primitives', () => {
     ).toBe(true)
     expect(motionPresets['media-focus'].to.transform).toBeUndefined()
     expect(motionPresets['code-ready'].to.transform).toBeUndefined()
+    expect(motionPresets['ownership-transfer-snapshot']).toMatchObject({
+      from: { opacity: '0' },
+      to: { opacity: '1' },
+      leaveFrom: { opacity: '1' },
+      leaveTo: { opacity: '0' },
+    })
     expect(Object.keys(motionRecipes)).toEqual([
       'content-enter',
       'article-list-enter',
@@ -383,6 +391,49 @@ describe('motion primitives', () => {
     const panel = wrapper.find('.panel').element as HTMLElement
     expect(panel.style.transition).toBe('')
     wrapper.unmount()
+  })
+
+  it('provides a deterministic ownership-transfer snapshot fade contract', async () => {
+    const enterEl = document.createElement('div')
+    const leaveEl = document.createElement('div')
+    document.body.append(enterEl, leaveEl)
+
+    runOwnershipTransferSnapshotMotion(enterEl, { duration: 120 })
+    runOwnershipTransferSnapshotMotion(leaveEl, {
+      duration: 120,
+      phase: 'leave',
+    })
+
+    await nextTick()
+    await flushMotionFrame()
+
+    expect(enterEl.dataset.fsusMotionPreset).toBe(
+      'ownership-transfer-snapshot',
+    )
+    expect(enterEl.style.transition).toContain('opacity 120ms')
+    expect(enterEl.style.transform).toBe('')
+    expect(leaveEl.dataset.fsusMotionPreset).toBe(
+      'ownership-transfer-snapshot',
+    )
+    expect(leaveEl.style.transition).toContain('opacity 120ms')
+    expect(leaveEl.style.transform).toBe('')
+  })
+
+  it('settles ownership-transfer snapshots immediately under reduced motion', () => {
+    document.documentElement.dataset.fsusMotion = 'reduced'
+    const el = document.createElement('div')
+    document.body.append(el)
+
+    const onFinish = vi.fn()
+    runOwnershipTransferSnapshotMotion(el, {
+      phase: 'leave',
+      onFinish,
+    })
+
+    expect(onFinish).toHaveBeenCalledTimes(1)
+    expect(el.style.transition).toBe('')
+    expect(el.style.opacity).toBe('0')
+    expect(el.style.transform).toBe('')
   })
 
   it('installs the directive and transition component as a plugin', () => {

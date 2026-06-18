@@ -71,6 +71,31 @@ to keep normal `appear` behavior.
 </template>
 ```
 
+For an ownership transfer where an existing SSR/AOT snapshot stays visible while
+the client runtime takes ownership, use the named snapshot preset or helper. The
+consumer owns the snapshot DOM and route intent; FsusUI only owns the transition
+semantics.
+
+```ts
+import { runOwnershipTransferSnapshotMotion } from 'element-plus'
+
+runOwnershipTransferSnapshotMotion(snapshotEl, {
+  phase: 'leave',
+  onFinish: () => snapshotEl.remove(),
+})
+```
+
+```vue
+<template>
+  <FsuTransition
+    name="ownership-transfer-snapshot"
+    suppress-appear-during-hydration
+  >
+    <div v-if="snapshotVisible" inert aria-hidden="true" />
+  </FsuTransition>
+</template>
+```
+
 ## 下拉面板
 
 ```vue
