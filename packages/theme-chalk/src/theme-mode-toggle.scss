@@ -57,7 +57,24 @@
     background: var(--#{$namespace}-theme-mode-toggle-bg);
 
     .#{$namespace}-radio-button__inner {
+      /* FsusUI's global fsus-theme.scss rule (line ~477) sets
+         `display: flex; align-items: center; justify-content: center;
+         min-height: 40px; padding: 0 16px` on .el-radio-button__inner.
+         For a multi-line label that flex rule works fine, but for a
+         single-character label like "L" the anonymous flex item is
+         aligned by its first-formatted-line baseline (CSS Flexbox §9.4
+         "Aligning Items in the Cross Axis"), which sits near the bottom
+         of the cap-height — so the glyph rides ~2px above optical center
+         inside the pill.
+
+         Locking the inner to display:inline-block with line-height equal
+         to min-height and padding-block:0 turns the text box itself into
+         a 36px-tall line box, and the glyph centers inside the line box
+         naturally — independent of any baseline alignment rules. */
+      display: inline-block;
       min-height: 36px;
+      line-height: 36px;
+      padding-block: 0;
       border-color: var(--#{$namespace}-theme-mode-toggle-item-border-color);
       border-radius: 6px;
       background: var(--#{$namespace}-theme-mode-toggle-item-bg);
