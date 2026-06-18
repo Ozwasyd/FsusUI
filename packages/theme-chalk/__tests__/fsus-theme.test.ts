@@ -413,13 +413,17 @@ describe('Fsus theme visual baseline', () => {
   test('defines theme mode segmented tokens in the component stylesheet', () => {
     const css = compileThemeFile('theme-mode-toggle.scss')
 
+    /* design.md §7: segment control = Scholarly Blue 选中胶囊 + Ink 文本.
+       The segmented variant is intentionally frameless — inactive items
+       render as plain text buttons and only the active pill supplies the
+       grouping affordance, so there is no outer container border, radius,
+       or inner padding on the segmented root. */
     expectCssRule(css, '.el-theme-mode-toggle--segmented', [
       '--el-theme-mode-toggle-bg: transparent;',
-      '--el-theme-mode-toggle-border-color: var(--el-border-color-lighter);',
       '--el-theme-mode-toggle-item-bg: transparent;',
+      '--el-theme-mode-toggle-item-border-color: transparent;',
       '--el-theme-mode-toggle-active-bg: var(--el-fill-color-light);',
       'background: var(--el-theme-mode-toggle-bg);',
-      'border: 1px solid var(--el-theme-mode-toggle-border-color);',
     ])
     expectCssRule(
       css,
@@ -445,6 +449,9 @@ describe('Fsus theme visual baseline', () => {
   test('maps theme mode segmented tokens through resolved theme states', () => {
     const css = compileThemeFile('theme-mode-toggle.scss')
 
+    /* Outer container is transparent in both themes now that the segmented
+       variant is frameless; hover and active keep their theme-specific
+       tints so the selected pill reads as Scholarly Blue in dark mode. */
     expectCssRule(
       css,
       ':root[data-theme-resolved=light] .el-theme-mode-toggle--segmented',
@@ -459,7 +466,7 @@ describe('Fsus theme visual baseline', () => {
       css,
       ':root[data-theme-resolved=dark] .el-theme-mode-toggle--segmented',
       [
-        '--el-theme-mode-toggle-bg: color-mix(in srgb, var(--el-bg-color) 88%, transparent);',
+        '--el-theme-mode-toggle-bg: transparent;',
         '--el-theme-mode-toggle-item-bg: transparent;',
         '--el-theme-mode-toggle-item-hover-bg: color-mix(in srgb, var(--fsus-scholarly-blue) 16%, transparent);',
         '--el-theme-mode-toggle-active-bg: color-mix(in srgb, var(--fsus-scholarly-blue) 24%, var(--el-bg-color));',
