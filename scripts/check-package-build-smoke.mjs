@@ -92,9 +92,32 @@ for (const artifact of [
   'packages/wasm/dist/ep_wasm.wasm',
   'packages/wasm/dist/markdown_basic.wasm',
   'packages/wasm/dist/markdown_simd.wasm',
+  // Theme-chalk artifacts. fsus-theme.scss is intentionally compiled
+  // as a standalone product override bundle so consumers can load it
+  // after the base element-plus CSS without relying on cascade luck.
+  'packages/theme-chalk/dist/index.css',
+  'packages/theme-chalk/dist/el-public-shell-critical.css',
+  'packages/theme-chalk/dist/el-fsus-theme.css',
 ]) {
   assert(existsSync(path.join(root, artifact)), `package smoke requires prepared artifact: ${artifact}`)
 }
+
+const themeIndexSource = read('packages/theme-chalk/src/index.scss')
+const fsusThemeCss = read('packages/theme-chalk/dist/el-fsus-theme.css')
+assert(
+  !themeIndexSource.includes("@use './fsus-theme.scss'")
+    && !themeIndexSource.includes('@use "./fsus-theme.scss"'),
+  'packages/theme-chalk/src/index.scss must not directly @use fsus-theme.scss',
+)
+assert(
+  fsusThemeCss.includes('--fsus-scholarly-blue'),
+  'dist/el-fsus-theme.css must carry fsus-theme product tokens',
+)
+assert(
+  fsusThemeCss.includes('.fsus-reading-surface')
+    && fsusThemeCss.includes('.is-expressive-surface'),
+  'dist/el-fsus-theme.css must carry fsus-theme product surface rules',
+)
 
 const gulpfile = read('internal/build/gulpfile.ts')
 for (const task of [
