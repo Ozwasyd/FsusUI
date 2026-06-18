@@ -1,6 +1,6 @@
 # FsusUI Design System: The Intellectual Minimalist
 
-> **Version:** 0.1 · **Status:** Stable · **Scope:** FsusUI component library defaults, documentation examples, and product integration · **Last updated:** 2026-06-15
+> **Version:** 0.1 · **Status:** Stable · **Scope:** FsusUI component library defaults, documentation examples, and product integration · **Last updated:** 2026-06-18
 >
 > 维护者：FsusUI core team。关联文档：[`docs/theme/tokens.md`](../theme/tokens.md)、[`docs/theme/motion.md`](../theme/motion.md)、[`docs/element-plus-integration.md`](../element-plus-integration.md)、[`docs/api-stability.md`](../api-stability.md)。术语约定见 [§13 Terminology](#13-terminology)。
 
@@ -447,6 +447,34 @@ body {
 ### Rationale
 
 §11 是 §4–§7 与实现代码之间的查表索引：每一行同时列出 FsusUI 语义 token（`--fsus-*`）与 Element Plus 兼容变量（`--el-*`），下游实现优先引用 `--fsus-*`，`--el-*` 作为迁移期 fallback。新视觉规则必须先在 [`spec/tokens/tokens.json`](../../spec/tokens/tokens.json) 注册 token，再写入此表，最后才进入本文档正文（见 [§12 Source of Truth](#12-source-of-truth)）。
+
+### Element Plus Compatibility Variables Consumed by Public Layouts
+
+Public / marketing surfaces ([§1 Scope Boundary](#scope-boundary)) 通常不会注册自己的 `--fsus-*` 派生 token；它们直接消费 Element Plus 的 `--el-*` 兼容变量来填充次级文本、弱边框、占位符等角色。下表是 consumer 可以**直接依赖**的稳定 `--el-*` 变量，定义为 Element Plus public API，不受 FsusUI token 注册流程约束。
+
+| Role                        | Stable Token                            | Use case in public layout                |
+| --------------------------- | --------------------------------------- | ---------------------------------------- |
+| Secondary text              | `--el-text-color-regular`               | 描述、正文、字段说明                     |
+| Tertiary text               | `--el-text-color-secondary`             | 元信息、计数、辅助标签                   |
+| Placeholder / muted text    | `--el-text-color-placeholder`           | 输入框占位符、未激活状态                 |
+| Disabled text               | `--el-disabled-text-color`              | 禁用按钮、不可点击链接                   |
+| Disabled background         | `--el-disabled-bg-color`                | 禁用控件填充                             |
+| Border (lighter)            | `--el-border-color-lighter`             | 分隔线、卡片弱描边                       |
+| Surface fill (light)        | `--el-fill-color-light`                 | 代码块背景、占位骨架                     |
+| Surface fill (blank)        | `--el-fill-color-blank`                 | 浮层表面、卡片正面                       |
+| Surface fill (default)      | `--el-fill-color`                       | 高亮背景、mark 标签                      |
+| Focus ring                  | `--el-a11y-focus-color`                 | 键盘焦点环                               |
+| Danger / Success / Warning  | `--el-color-danger`, `--el-color-success`, `--el-color-warning` 及 `-light-N` / `-dark-N` 变体 | 错误提示、成功反馈、警告徽标 |
+
+**Consumer 约束**：
+
+- Public layout 在 token 链中**不要**插入未注册的 `--fsus-text-*` / `--fsus-border-extra-light` 等中转别名；这些别名在 FsusUI 中不存在，会让 `var()` 链路无声 fallthrough，违反 §12 的"先注册再使用"原则。
+- 优先 `var(--el-text-color-regular, CanvasText)` 而不是 `var(--fsus-text-regular, var(--el-text-color-regular, CanvasText))`：前者只经过一层变量查找，后者要求浏览器先解析一个永远 `undefined` 的 `--fsus-text-regular`。
+- 当 public layout 需要**自己的**命名空间（避免污染 Element Plus 主题）时，前缀用 `--{consumer-name}-*`（如 FsusBlog 的 `--fsusblog-*`），不要伪造 `--fsus-*` 别名。
+
+### Material Attribute Contract
+
+§6 把毛玻璃定义为 opt-in material，启用条件是元素携带 `.is-glass` 或 `[data-fsus-material='glass']`。这条契约对所有 consumer 都成立——glass 不是"加几行 CSS"的实现细节，而是声明性的 material 选择。Review 时可以 grep `data-fsus-material` 来审计哪些地方启用了非 paper 材质。
 
 ## 12. Source of Truth
 
