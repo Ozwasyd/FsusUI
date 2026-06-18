@@ -12,10 +12,15 @@ import type { TaskFunction } from 'gulp'
 
 const distFolder = path.resolve(__dirname, 'dist')
 const distBundle = path.resolve(epOutput, 'theme-chalk')
-const themeEntryFiles = [
-  path.resolve(__dirname, 'src/*.scss'),
-  `!${path.resolve(__dirname, 'src/fsus-theme.scss')}`,
-]
+/* fsus-theme.scss is included here so it compiles to its own per-component
+   CSS bundle (dist/el-fsus-theme.css). Previously it was excluded and only
+   pulled in via @use from src/index.scss, which mixed product overrides
+   into the same dist/index.css bundle as the element-plus base styles.
+   That mixing made equal-specificity overrides depend on import order,
+   which produced silent cascade bugs (e.g. theme-mode-toggle segmented
+   rule losing to base .el-radio-button--small rule). The split is the
+   structural fix. */
+const themeEntryFiles = [path.resolve(__dirname, 'src/*.scss')]
 
 /**
  * compile theme-chalk scss & minify

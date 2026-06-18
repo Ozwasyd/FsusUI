@@ -73,8 +73,12 @@
          naturally — independent of any baseline alignment rules. */
       display: inline-block;
       min-height: 36px;
+      /* padding shorthand (not padding-block) so this beats
+         element-plus base `.el-radio-button--small .el-radio-button__inner
+         { padding: 8px 11px; }` which has identical specificity (0,2,0) and
+         would otherwise clobber the longhand later in the cascade. */
+      padding: 0 11px;
       line-height: 36px;
-      padding-block: 0;
       border-color: var(--#{$namespace}-theme-mode-toggle-item-border-color);
       border-radius: 6px;
       background: var(--#{$namespace}-theme-mode-toggle-item-bg);

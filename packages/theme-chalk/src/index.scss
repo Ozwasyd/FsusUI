@@ -115,5 +115,11 @@
 @use './option-group.scss';
 @use './option-item.scss';
 @use './statistic.scss';
-@use './fsus-theme.scss'; // v2.0-FORCE-RECOMPILE
+/* fsus-theme.scss is intentionally NOT @use'd here.
+   Product-level overrides now live in their own per-component CSS bundle
+   (dist/el-fsus-theme.css) emitted by the gulpfile per-file compile.
+   Consumers must @import dist/el-fsus-theme.css AFTER any base element-plus
+   CSS they want to override, otherwise equal-specificity base rules will
+   win by source order. See el-public-shell-critical.scss / FsusBlog
+   src/assets/public-shell-critical.css for the canonical ordering. */
 @use './motion.scss';
