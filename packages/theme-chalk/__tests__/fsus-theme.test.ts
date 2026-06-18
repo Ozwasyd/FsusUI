@@ -1433,6 +1433,7 @@ describe('Fsus theme visual baseline', () => {
       expectCssRule(css, '.el-public-shell__mobile-search-row', [
         'display: none;',
         'margin-top: 12px;',
+        'margin-bottom: 12px;',
       ])
       expectCssRule(css, '.el-public-shell__mobile-search-row.is-expanded', [
         'display: block;',
@@ -1496,9 +1497,15 @@ describe('Fsus theme visual baseline', () => {
       ])
     }
 
-    expectCssRule(publicShellCss, '.el-public-shell__action-link', [
-      'white-space: nowrap;',
-    ])
+    for (const css of [publicShellCss, criticalCss]) {
+      expectCssRule(css, '.el-public-shell__action-link', [
+        'color: var(--el-text-color-secondary);',
+        'font-size: 12px;',
+        'font-weight: 700;',
+        'text-decoration: none;',
+        'white-space: nowrap;',
+      ])
+    }
   })
 
   test('renders public shell mobile auth as a stable primary action', () => {
@@ -1510,6 +1517,8 @@ describe('Fsus theme visual baseline', () => {
         'display: inline-flex;',
         'align-items: center;',
         'min-height: 40px;',
+        'border: 1px solid var(--el-border-color-lighter);',
+        'background: var(--el-bg-color);',
         'white-space: nowrap;',
       ])
     }

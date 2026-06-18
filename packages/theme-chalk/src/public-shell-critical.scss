@@ -81,6 +81,7 @@
     display: none;
     min-width: 0;
     margin-top: 12px;
+    margin-bottom: 12px;
 
     @include when(expanded) {
       display: block;
@@ -91,13 +92,27 @@
     }
   }
 
+  @include e(action-link) {
+    border-radius: var(--#{$namespace}-border-radius-small);
+    color: var(--#{$namespace}-text-color-secondary);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    outline: none;
+  }
+
   @include e(auth-link) {
     @include m(mobile) {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       min-height: 40px;
+      border: 1px solid var(--#{$namespace}-border-color-lighter);
+      border-radius: var(--#{$namespace}-border-radius-small);
       padding: 0 12px;
+      background: var(--#{$namespace}-bg-color);
+      color: var(--#{$namespace}-text-color-primary);
       box-sizing: border-box;
       white-space: nowrap;
     }
