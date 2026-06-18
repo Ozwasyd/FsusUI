@@ -57,7 +57,21 @@
     background: var(--#{$namespace}-theme-mode-toggle-bg);
 
     .#{$namespace}-radio-button__inner {
+      /* Element Plus' default radio-button__inner keeps line-height: 1
+         and a default button padding-block of 10px (= 11px - 1px
+         border-width). When we additionally enforce min-height: 36px
+         the content box (10 + 14 + 10 = 34px) is shorter than min-height,
+         so the browser vertically stretches padding asymmetrically and
+         the single-line text rides too high. Locking line-height: 36px
+         here makes the content box exactly equal to min-height and keeps
+         the glyph optically centered. display: inline-flex + center
+         alignment is defense in depth in case a child adds a leading
+         inline element. */
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       min-height: 36px;
+      line-height: 36px;
       border-color: var(--#{$namespace}-theme-mode-toggle-item-border-color);
       border-radius: 6px;
       background: var(--#{$namespace}-theme-mode-toggle-item-bg);
