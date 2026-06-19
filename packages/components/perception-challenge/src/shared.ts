@@ -14,6 +14,8 @@ export const perceptionChallengeStates = [
   'ready',
   'error',
   'verifying',
+  'submitting',
+  'failed',
   'verified',
   'expired',
 ] as const
@@ -92,6 +94,11 @@ export type PerceptionChallengeVerifyResult = {
   proofToken?: string
   reason?: string
   retryAfterMs?: number
+}
+
+export type PerceptionChallengeExpiredPayload = {
+  challengeId?: string
+  reason: 'state' | 'proofExpired' | 'expiresAtUnixMs'
 }
 
 export type PerceptionChallengeClient = {
@@ -186,9 +193,17 @@ export const perceptionChallengeProps = buildProps({
     type: String,
     default: 'Retry',
   },
+  cancelLabel: {
+    type: String,
+    default: 'Cancel',
+  },
   loadingText: {
     type: String,
     default: 'Preparing challenge',
+  },
+  failedText: {
+    type: String,
+    default: 'Challenge verification failed',
   },
   expiredText: {
     type: String,
@@ -269,12 +284,15 @@ export const microInteractionChallengeProps = buildProps({
 export const perceptionChallengeEmits = {
   refresh: () => true,
   retry: () => true,
+  cancel: () => true,
   submit: (payload: PerceptionChallengeSubmitPayload) =>
     Boolean(payload && typeof payload.kind === 'string'),
   rendered: (payload: PerceptionChallengeRenderPayload | null) =>
     payload === null || typeof payload === 'object',
   verified: (value: PerceptionChallengeVerifyResult) =>
     Boolean(value && typeof value.verified === 'boolean'),
+  expired: (value: PerceptionChallengeExpiredPayload) =>
+    Boolean(value && typeof value.reason === 'string'),
   error: (value: string) => typeof value === 'string',
 }
 

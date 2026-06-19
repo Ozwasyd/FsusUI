@@ -280,6 +280,12 @@ export const publicComponentBoundaries: Record<
   pagination: entry([...formBoundaries, 'event'], {
     fixtureModes: ['data-boundaries'],
   }),
+  'perception-challenge': entry(
+    [...formBoundaries, 'loading-clearable', 'slot', 'unmount-cleanup'],
+    {
+      fixtureModes: ['forms', 'states'],
+    },
+  ),
   popconfirm: entry(overlayBoundaries, { fixtureModes: ['overlays'] }),
   popover: entry(overlayBoundaries, { fixtureModes: ['overlays'] }),
   popper: entry(overlayBoundaries, { fixtureModes: ['overlays'] }),
@@ -330,6 +336,9 @@ export const publicComponentBoundaries: Record<
       fixtureModes: ['forms', 'states', 'data-boundaries'],
     },
   ),
+  'site-header': entry([...simpleBoundaries, 'keyboard-focus'], {
+    fixtureModes: ['states'],
+  }),
   skeleton: entry([...simpleBoundaries, 'loading-clearable'], {
     fixtureModes: ['states', 'data-boundaries'],
   }),

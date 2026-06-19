@@ -597,6 +597,12 @@ body {
   gap: var(--fsus-space-4);
 }
 
+.audit-perception-stack {
+  display: grid;
+  gap: var(--fsus-space-3);
+  min-width: 0;
+}
+
 .audit-page.is-compact {
   padding: var(--fsus-mobile-page-padding);
 }

@@ -900,6 +900,21 @@
         />
       </AuditCard>
 
+      <AuditCard name="ElPerceptionChallenge" :state="auditState">
+        <div class="audit-perception-stack">
+          <ElPerceptionChallenge
+            v-for="challenge in perceptionChallenges"
+            :key="challenge.challengeId"
+            :challenge="challenge"
+            :state="active ? 'submitting' : 'ready'"
+            title="Challenge review"
+            eyebrow="Signal"
+            :disabled="auditState === 'interaction'"
+            data-audit-active
+          />
+        </div>
+      </AuditCard>
+
       <AuditCard name="ElPopconfirm" :state="auditState">
         <el-popconfirm title="Delete item?" :teleported="false">
           <template #reference>
@@ -1161,6 +1176,30 @@
             />
           </ElDangerZone>
         </div>
+      </AuditCard>
+
+      <AuditCard name="ElSiteHeader" :state="auditState">
+        <ElSiteHeader
+          :sticky="false"
+          max-width="100%"
+          ariaLabel="Audit site header"
+        >
+          <template #brand>
+            <a href="#audit-brand" data-audit-focus>FsusUI</a>
+          </template>
+          <template #desktop-nav>
+            <a href="#audit-docs">Docs</a>
+            <a href="#audit-components">Components</a>
+          </template>
+          <template #desktop-actions>
+            <el-button size="small" data-audit-target data-audit-active>
+              Action
+            </el-button>
+          </template>
+          <template #mobile-primary-actions>
+            <el-button size="small">Menu</el-button>
+          </template>
+        </ElSiteHeader>
       </AuditCard>
 
       <AuditCard name="ElSelect" :state="auditState">
@@ -1492,6 +1531,7 @@ import {
   ElMetricItem,
   ElMetricList,
   ElPaginationBar,
+  ElPerceptionChallenge,
   ElReplyComposerShell,
   ElResourceList,
   ElResourceListItem,
@@ -1500,6 +1540,7 @@ import {
   ElSectionHeader,
   ElSectionNav,
   ElSettingsSection,
+  ElSiteHeader,
   ElStatusSummary,
   ElThreadPanel,
   ElTypedConfirmField,
@@ -1584,6 +1625,42 @@ const responsiveCollectionItems = computed(() => [
   {
     name: props.boundary ? `Beta ${boundaryText}` : 'Beta',
     state: 'Review',
+  },
+])
+const perceptionChallenges = computed(() => [
+  {
+    challengeId: 'audit-perception-text-task',
+    kind: 'text-task' as const,
+    prompt: props.boundary ? boundaryText : 'Read the prompt and respond.',
+    description: active.value
+      ? 'Text answer is submitting.'
+      : 'Text task is ready for review.',
+  },
+  {
+    challengeId: 'audit-perception-localization',
+    kind: 'localization' as const,
+    prompt: props.boundary ? boundaryText : 'Select the marked region.',
+    description: active.value
+      ? 'Localization answer is submitting.'
+      : 'Localization task is ready for review.',
+    gridWidth: 120,
+    gridHeight: 64,
+    renderPayload: {
+      kind: 'image-url' as const,
+      src: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%2264%22 viewBox=%220 0 120 64%22%3E%3Crect width=%22120%22 height=%2264%22 fill=%22%23f4f4f5%22/%3E%3Ccircle cx=%2278%22 cy=%2232%22 r=%2210%22 fill=%22%232a599c%22/%3E%3C/svg%3E',
+      width: 120,
+      height: 64,
+      alt: 'Localization target',
+    },
+  },
+  {
+    challengeId: 'audit-perception-micro-interaction',
+    kind: 'micro-interaction' as const,
+    prompt: props.boundary ? boundaryText : 'Confirm the interaction.',
+    description: active.value
+      ? 'Micro-interaction answer is submitting.'
+      : 'Micro-interaction task is ready for review.',
+    microInteractionEnabled: true,
   },
 ])
 const collectionStateItems = [

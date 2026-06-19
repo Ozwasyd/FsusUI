@@ -101,6 +101,7 @@ FsusUI 提供 100+ 个 Vue 3 组件，涵盖基础、表单、数据展示、导
 | [Tooltip 文字提示](./tooltip.md)         | 常用于展示鼠标 hover 时的提示信息                  |
 | [Progress 进度条](./progress.md)         | 展示操作进度                                       |
 | [Result 结果](./result.md)               | 用于反馈一系列操作任务的处理结果                   |
+| [PerceptionChallenge 感知挑战](./perception-challenge.md) | perception v2 challenge host 与三类 task 渲染 |
 
 ## 配置
 

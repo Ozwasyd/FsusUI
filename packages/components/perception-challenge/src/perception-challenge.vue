@@ -5,13 +5,22 @@
         <p v-if="eyebrow" :class="ns.e('eyebrow')">{{ eyebrow }}</p>
         <h3 :class="ns.e('title')">{{ title }}</h3>
       </div>
-      <ElButton
-        v-bind="refreshButtonAttrs"
-        :disabled="isBusy || disabled"
-        @click="refreshChallenge"
-      >
-        {{ refreshLabel }}
-      </ElButton>
+      <div :class="ns.e('actions')">
+        <ElButton
+          v-if="isBusy"
+          v-bind="cancelButtonAttrs"
+          @click="cancelChallenge"
+        >
+          {{ cancelLabel }}
+        </ElButton>
+        <ElButton
+          v-bind="refreshButtonAttrs"
+          :disabled="isBusy || disabled"
+          @click="refreshChallenge"
+        >
+          {{ refreshLabel }}
+        </ElButton>
+      </div>
     </header>
 
     <div
@@ -110,7 +119,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useNamespace } from '@element-plus/hooks'
 import { ElButton } from '@element-plus/components/button'
 import FsusLocalizationChallenge from './localization-challenge.vue'
@@ -136,6 +145,9 @@ const internalChallenge = ref<PerceptionChallengeAssignment | null>(null)
 const internalRenderPayload = ref<PerceptionChallengeRenderPayload | null>(null)
 const internalState = ref<PerceptionChallengeState>('ready')
 const internalError = ref('')
+const nowMs = ref(0)
+const expiredEmitKey = ref('')
+let expiresAtTimer: ReturnType<typeof setTimeout> | undefined
 
 const activeChallenge = computed(
   () => props.challenge ?? internalChallenge.value,
@@ -148,15 +160,23 @@ const activeRenderPayload = computed(
     internalRenderPayload.value,
 )
 const activeState = computed(() => props.state ?? internalState.value)
-const visibleError = computed(() => props.error || internalError.value)
+const isFailed = computed(
+  () => activeState.value === 'error' || activeState.value === 'failed',
+)
+const visibleError = computed(() => {
+  if (props.error || internalError.value) return props.error || internalError.value
+  return isFailed.value ? props.failedText : ''
+})
 const isLoading = computed(() => activeState.value === 'loading')
-const isVerifying = computed(() => activeState.value === 'verifying')
+const isVerifying = computed(
+  () => activeState.value === 'verifying' || activeState.value === 'submitting',
+)
 const isBusy = computed(() => isLoading.value || isVerifying.value)
 const isExpired = computed(() => {
   if (props.proofExpired || activeState.value === 'expired') return true
 
   const expiresAtUnixMs = activeChallenge.value?.expiresAtUnixMs
-  return Number.isFinite(expiresAtUnixMs) && expiresAtUnixMs! <= props.now()
+  return Number.isFinite(expiresAtUnixMs) && expiresAtUnixMs! <= nowMs.value
 })
 const activeMicroInteractionEnabled = computed(
   () =>
@@ -178,6 +198,9 @@ const rootAttrs = {
 }
 const refreshButtonAttrs = {
   'data-test': 'perception-challenge-refresh',
+}
+const cancelButtonAttrs = {
+  'data-test': 'perception-challenge-cancel',
 }
 const loadingAttrs = {
   'data-test': 'perception-challenge-loading',
@@ -201,10 +224,31 @@ watch(
 )
 
 onMounted(() => {
+  nowMs.value = props.now()
+
   if (props.autoLoad) {
     void loadChallenge()
   }
 })
+
+onBeforeUnmount(() => {
+  clearExpirationTimer()
+})
+
+watch(
+  () => [
+    activeChallenge.value?.challengeId ?? '',
+    activeChallenge.value?.expiresAtUnixMs ?? 0,
+    activeState.value,
+    props.proofExpired,
+  ],
+  () => {
+    nowMs.value = props.now()
+    scheduleExpirationTimer()
+    emitExpiredIfNeeded()
+  },
+  { immediate: true },
+)
 
 async function refreshChallenge() {
   emit('refresh')
@@ -217,6 +261,14 @@ async function refreshChallenge() {
 async function retryChallenge() {
   emit('retry')
   await refreshChallenge()
+}
+
+function cancelChallenge() {
+  emit('cancel')
+
+  if (!props.state && isBusy.value) {
+    internalState.value = 'ready'
+  }
 }
 
 async function loadChallenge() {
@@ -261,7 +313,7 @@ async function handleSubmit(payload: PerceptionChallengeSubmitPayload) {
 
   if (!props.client?.verify || props.disabled) return
 
-  internalState.value = 'verifying'
+  internalState.value = 'submitting'
   internalError.value = ''
 
   try {
@@ -281,11 +333,59 @@ async function handleSubmit(payload: PerceptionChallengeSubmitPayload) {
 
 function setError(message: string) {
   internalError.value = message
-  internalState.value = 'error'
+  internalState.value = 'failed'
   emit('error', message)
 }
 
 function errorMessage(error: unknown, fallback: string) {
   return error instanceof Error && error.message ? error.message : fallback
+}
+
+function scheduleExpirationTimer() {
+  clearExpirationTimer()
+
+  const expiresAtUnixMs = activeChallenge.value?.expiresAtUnixMs
+  if (!Number.isFinite(expiresAtUnixMs)) return
+
+  const delay = Math.max(0, expiresAtUnixMs! - nowMs.value)
+  expiresAtTimer = setTimeout(() => {
+    nowMs.value = props.now()
+    emitExpiredIfNeeded()
+  }, delay)
+}
+
+function clearExpirationTimer() {
+  if (!expiresAtTimer) return
+
+  clearTimeout(expiresAtTimer)
+  expiresAtTimer = undefined
+}
+
+function emitExpiredIfNeeded() {
+  const reason = expiredReason()
+  if (!reason) return
+
+  const challengeId = activeChallenge.value?.challengeId
+  const expiresAtUnixMs = activeChallenge.value?.expiresAtUnixMs ?? ''
+  const key = `${challengeId ?? 'anonymous'}:${expiresAtUnixMs}`
+  if (expiredEmitKey.value === key) return
+
+  expiredEmitKey.value = key
+  emit('expired', {
+    challengeId,
+    reason,
+  })
+}
+
+function expiredReason() {
+  if (activeState.value === 'expired') return 'state'
+  if (props.proofExpired) return 'proofExpired'
+
+  const expiresAtUnixMs = activeChallenge.value?.expiresAtUnixMs
+  if (Number.isFinite(expiresAtUnixMs) && expiresAtUnixMs! <= nowMs.value) {
+    return 'expiresAtUnixMs'
+  }
+
+  return null
 }
 </script>

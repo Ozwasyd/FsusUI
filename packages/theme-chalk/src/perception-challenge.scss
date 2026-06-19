@@ -25,6 +25,14 @@
     min-width: 0;
   }
 
+  @include e(actions) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--fsus-space-2, 8px);
+    justify-content: end;
+    min-width: 0;
+  }
+
   @include e(heading) {
     display: grid;
     gap: var(--fsus-space-1, 4px);
@@ -254,6 +262,10 @@
 
     @include e(header) {
       display: grid;
+    }
+
+    @include e(actions) {
+      justify-content: start;
     }
   }
 

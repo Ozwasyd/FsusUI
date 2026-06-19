@@ -64,6 +64,117 @@ describe('perception challenge primitives', () => {
     ).toContain('Challenge proof expired')
   })
 
+  test('keeps v1 state aliases compatible with submitting and failed states', async () => {
+    const wrapper = mount(FsusPerceptionChallenge, {
+      props: {
+        kind: 'text-task',
+        state: 'submitting',
+      },
+    })
+
+    expect(wrapper.classes()).toContain('is-verifying')
+    expect(wrapper.attributes('aria-busy')).toBe('true')
+
+    await wrapper.setProps({
+      state: 'failed',
+      error: 'try_again',
+    })
+
+    expect(wrapper.classes()).toContain('is-error')
+    expect(wrapper.find('[role="alert"]').text()).toContain('try_again')
+  })
+
+  test('emits cancel from an accessible cancel action while busy', async () => {
+    const cancel = vi.fn()
+    const wrapper = mount(FsusPerceptionChallenge, {
+      props: {
+        kind: 'text-task',
+        state: 'submitting',
+        cancelLabel: 'Stop challenge',
+        onCancel: cancel,
+      },
+    })
+
+    const cancelButton = wrapper.find(
+      '[data-test="perception-challenge-cancel"]',
+    )
+
+    expect(cancelButton.exists()).toBe(true)
+    expect(cancelButton.text()).toBe('Stop challenge')
+
+    await cancelButton.trigger('click')
+
+    expect(cancel).toHaveBeenCalledTimes(1)
+  })
+
+  test('emits expired once when expiresAtUnixMs is already elapsed or becomes elapsed', async () => {
+    vi.useFakeTimers()
+    try {
+      vi.setSystemTime(1_000)
+      const expired = vi.fn()
+      const wrapper = mount(FsusPerceptionChallenge, {
+        props: {
+          challenge: {
+            challengeId: 'expiring-challenge',
+            kind: 'text-task',
+            expiresAtUnixMs: 1_050,
+          } satisfies PerceptionChallengeAssignment,
+          now: () => Date.now(),
+          onExpired: expired,
+        },
+      })
+
+      expect(expired).not.toHaveBeenCalled()
+
+      vi.advanceTimersByTime(50)
+      await nextTick()
+
+      expect(wrapper.classes()).toContain('is-expired')
+      expect(expired).toHaveBeenCalledTimes(1)
+      expect(expired).toHaveBeenCalledWith({
+        challengeId: 'expiring-challenge',
+        reason: 'expiresAtUnixMs',
+      })
+
+      await wrapper.setProps({
+        proofExpired: true,
+      })
+
+      expect(expired).toHaveBeenCalledTimes(1)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  test.each([
+    ['text-task', '.el-text-task-challenge'],
+    ['localization', '.el-localization-challenge'],
+    ['micro-interaction', '.el-micro-interaction-challenge'],
+  ] as const)('renders the %s task through the host', (kind, selector) => {
+    const wrapper = mount(FsusPerceptionChallenge, {
+      props: {
+        challenge: {
+          challengeId: `${kind}-challenge`,
+          kind,
+          prompt: `${kind} prompt`,
+          microInteractionEnabled: kind === 'micro-interaction',
+          renderPayload:
+            kind === 'localization'
+              ? {
+                  kind: 'image-url',
+                  src: 'data:image/png;base64,CCCC',
+                  width: 20,
+                  height: 10,
+                }
+              : null,
+        } satisfies PerceptionChallengeAssignment,
+      },
+    })
+
+    expect(wrapper.find(selector).exists()).toBe(true)
+    expect(wrapper.text()).toContain(`${kind} prompt`)
+  })
+
   test('loads an assignment through the optional client and renders through the worker renderer adapter', async () => {
     const assignment: PerceptionChallengeAssignment = {
       challengeId: 'challenge-1',
