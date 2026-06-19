@@ -97,6 +97,12 @@ import {
 } from '@element-plus/components/menu'
 import { ElPageHeader } from '@element-plus/components/page-header'
 import { ElPagination } from '@element-plus/components/pagination'
+import {
+  ElLocalizationChallenge,
+  ElMicroInteractionChallenge,
+  ElPerceptionChallenge,
+  ElTextTaskChallenge,
+} from '@element-plus/components/perception-challenge'
 import { ElPopconfirm } from '@element-plus/components/popconfirm'
 import { ElPopover } from '@element-plus/components/popover'
 import { ElPopper } from '@element-plus/components/popper'
@@ -247,6 +253,10 @@ export const allComponents = [
   ElPageHeader,
   ElPaginationBar,
   ElPagination,
+  ElLocalizationChallenge,
+  ElMicroInteractionChallenge,
+  ElPerceptionChallenge,
+  ElTextTaskChallenge,
   ElPopconfirm,
   ElPopover,
   ElPopper,

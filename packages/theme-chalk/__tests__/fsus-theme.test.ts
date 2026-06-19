@@ -1760,4 +1760,36 @@ describe('Fsus theme visual baseline', () => {
       /\.el-(?:inbox-layout|split-pane|message-bubble)[^{]*\{[^}]*(?:linear-gradient|backdrop-filter|filter:\s*blur)/s,
     )
   })
+
+  test('keeps perception challenge states task-focused and token aligned', () => {
+    const css = compileThemeFile('perception-challenge.scss')
+
+    expectCssRule(css, '.el-perception-challenge', [
+      'display: grid;',
+      'gap: var(--fsus-space-4, 16px);',
+      'border-radius: var(--fsus-radius-panel, 12px);',
+      'box-shadow: none;',
+    ])
+    expectCssRule(css, '.el-perception-challenge__status', [
+      'border-radius: var(--fsus-radius-control, 6px);',
+      'background: var(--el-fill-color-lighter);',
+    ])
+    expectCssRule(css, '.el-text-task-challenge__form', [
+      'grid-template-columns: minmax(0, 1fr) auto;',
+      'gap: var(--fsus-space-3, 12px);',
+    ])
+    expectCssRule(css, '.el-localization-challenge__target', [
+      'border-radius: var(--fsus-radius-control, 6px);',
+      'cursor: crosshair;',
+    ])
+    expectCssRule(css, '.el-localization-challenge__point', [
+      'box-shadow: 0 0 0 2px var(--fsus-scholarly-blue, #2a599c);',
+    ])
+    expectCssRule(css, '.el-micro-interaction-challenge__gate', [
+      'border-radius: var(--fsus-radius-control, 6px);',
+      'color: var(--el-text-color-secondary);',
+    ])
+    expect(css).toContain('@media (max-width: 640px)')
+    expect(css).not.toMatch(/linear-gradient|backdrop-filter|filter:\s*blur/)
+  })
 })

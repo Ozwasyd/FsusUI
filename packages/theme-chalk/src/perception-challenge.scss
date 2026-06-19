@@ -1,0 +1,265 @@
+@use 'mixins/mixins' as *;
+@use 'mixins/var' as *;
+
+@include b(perception-challenge) {
+  display: grid;
+  gap: var(--fsus-space-4, 16px);
+  min-width: 0;
+  padding: var(--fsus-space-4, 16px);
+  border: 1px solid getCssVar('border-color');
+  border-radius: var(--fsus-radius-panel, 12px);
+  background: getCssVar('bg-color');
+  box-shadow: none;
+  color: getCssVar('text-color-primary');
+  letter-spacing: 0;
+
+  @include when(disabled) {
+    color: getCssVar('text-color-secondary');
+  }
+
+  @include e(header) {
+    display: flex;
+    gap: var(--fsus-space-3, 12px);
+    align-items: start;
+    justify-content: space-between;
+    min-width: 0;
+  }
+
+  @include e(heading) {
+    display: grid;
+    gap: var(--fsus-space-1, 4px);
+    min-width: 0;
+  }
+
+  @include e(eyebrow) {
+    margin: 0;
+    color: getCssVar('text-color-secondary');
+    font-size: getCssVar('font-size-extra-small');
+    line-height: 1.4;
+  }
+
+  @include e(title) {
+    margin: 0;
+    color: getCssVar('text-color-primary');
+    font-size: 16px;
+    font-weight: 750;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  @include e(status) {
+    display: flex;
+    gap: var(--fsus-space-3, 12px);
+    align-items: center;
+    justify-content: space-between;
+    min-width: 0;
+    padding: var(--fsus-space-3, 12px);
+    border: 1px solid getCssVar('border-color-lighter');
+    border-radius: var(--fsus-radius-control, 6px);
+    background: var(--el-fill-color-lighter);
+    color: getCssVar('text-color-secondary');
+    font-size: getCssVar('font-size-small');
+    line-height: 1.5;
+  }
+}
+
+@include b(text-task-challenge) {
+  display: grid;
+  gap: var(--fsus-space-3, 12px);
+  min-width: 0;
+
+  @include e(copy) {
+    display: grid;
+    gap: var(--fsus-space-1, 4px);
+    min-width: 0;
+  }
+
+  @include e(prompt) {
+    margin: 0;
+    color: getCssVar('text-color-primary');
+    font-size: getCssVar('font-size-base');
+    font-weight: 650;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+
+  @include e(description) {
+    margin: 0;
+    color: getCssVar('text-color-secondary');
+    font-size: getCssVar('font-size-small');
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  @include e(form) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--fsus-space-3, 12px);
+    align-items: start;
+    min-width: 0;
+  }
+
+  @include e(error) {
+    margin: 0;
+    color: getCssVar('color-danger');
+    font-size: getCssVar('font-size-small');
+    line-height: 1.5;
+  }
+}
+
+@include b(localization-challenge) {
+  display: grid;
+  gap: var(--fsus-space-3, 12px);
+  min-width: 0;
+
+  @include e(copy) {
+    display: grid;
+    gap: var(--fsus-space-1, 4px);
+    min-width: 0;
+  }
+
+  @include e(prompt) {
+    margin: 0;
+    color: getCssVar('text-color-primary');
+    font-size: getCssVar('font-size-base');
+    font-weight: 650;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+
+  @include e(description) {
+    margin: 0;
+    color: getCssVar('text-color-secondary');
+    font-size: getCssVar('font-size-small');
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  @include e(target) {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-width: 0;
+    min-height: 160px;
+    border: 1px solid getCssVar('border-color');
+    border-radius: var(--fsus-radius-control, 6px);
+    background: getCssVar('fill-color-lighter');
+    cursor: crosshair;
+    overflow: hidden;
+    touch-action: manipulation;
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c);
+    }
+  }
+
+  @include e(image) {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    user-select: none;
+  }
+
+  @include e(canvas) {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+  }
+
+  @include e(placeholder) {
+    padding: var(--fsus-space-4, 16px);
+    color: getCssVar('text-color-secondary');
+    font-size: getCssVar('font-size-small');
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  @include e(point) {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: var(--fsus-radius-pill, 999px);
+    box-shadow: 0 0 0 2px var(--fsus-scholarly-blue, #2a599c);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+
+  @include e(error) {
+    margin: 0;
+    color: getCssVar('color-danger');
+    font-size: getCssVar('font-size-small');
+    line-height: 1.5;
+  }
+}
+
+@include b(micro-interaction-challenge) {
+  display: grid;
+  gap: var(--fsus-space-3, 12px);
+  min-width: 0;
+
+  @include e(gate) {
+    padding: var(--fsus-space-3, 12px);
+    border: 1px solid getCssVar('border-color-lighter');
+    border-radius: var(--fsus-radius-control, 6px);
+    background: getCssVar('fill-color-lighter');
+    color: var(--el-text-color-secondary);
+    font-size: getCssVar('font-size-small');
+    line-height: 1.5;
+  }
+
+  @include e(copy) {
+    display: grid;
+    gap: var(--fsus-space-1, 4px);
+    min-width: 0;
+  }
+
+  @include e(title) {
+    margin: 0;
+    color: getCssVar('text-color-primary');
+    font-size: getCssVar('font-size-base');
+    font-weight: 650;
+    line-height: 1.45;
+  }
+
+  @include e(prompt) {
+    margin: 0;
+    color: getCssVar('text-color-secondary');
+    font-size: getCssVar('font-size-small');
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  @include e(description) {
+    margin: 0;
+    color: getCssVar('text-color-secondary');
+    font-size: getCssVar('font-size-small');
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  @include e(error) {
+    margin: 0;
+    color: getCssVar('color-danger');
+    font-size: getCssVar('font-size-small');
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 640px) {
+  @include b(perception-challenge) {
+    padding: var(--fsus-space-3, 12px);
+
+    @include e(header) {
+      display: grid;
+    }
+  }
+
+  @include b(text-task-challenge) {
+    @include e(form) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+}
