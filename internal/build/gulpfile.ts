@@ -1,5 +1,12 @@
 import path from 'path'
-import { copyFile, mkdir, stat } from 'fs/promises'
+import {
+  copyFile,
+  mkdir,
+  readFile,
+  readdir,
+  stat,
+  writeFile,
+} from 'fs/promises'
 import { setTimeout as sleep } from 'timers/promises'
 import { copy } from 'fs-extra'
 import { parallel, series } from 'gulp'
@@ -36,9 +43,127 @@ const waitForPath = async (target: string) => {
   throw lastError
 }
 
+const bundledWorkspaceDependencyNames = ['@element-plus/motion']
+const packageReferenceExtensions = ['.d.ts', '.d.mts', '.d.cts', '.js', '.mjs', '.cjs']
+
+const copyElementPlusPackageManifest = async () => {
+  const packageJson = JSON.parse(await readFile(epPackage, 'utf8'))
+  delete packageJson.dependencies?.['@element-plus/motion']
+
+  await writeFile(
+    path.join(epOutput, 'package.json'),
+    `${JSON.stringify(packageJson, null, 2)}\n`,
+  )
+}
+
+const toModuleSpecifier = (relativePath: string) => {
+  const normalized = relativePath.split(path.sep).join('/')
+  return normalized.startsWith('.') ? normalized : `./${normalized}`
+}
+
+const collectPackageReferenceCandidates = async (
+  rootDir: string,
+  currentDir = rootDir,
+) => {
+  const files: string[] = []
+  const entries = await readdir(currentDir, { withFileTypes: true })
+
+  for (const entry of entries) {
+    const absolutePath = path.join(currentDir, entry.name)
+
+    if (entry.isDirectory()) {
+      files.push(...(await collectPackageReferenceCandidates(rootDir, absolutePath)))
+      continue
+    }
+
+    if (
+      packageReferenceExtensions.some((extension) =>
+        absolutePath.endsWith(extension),
+      )
+    ) {
+      files.push(absolutePath)
+    }
+  }
+
+  return files
+}
+
+const resolveBundledWorkspaceRuntimeSpecifier = (
+  rootDir: string,
+  filePath: string,
+) => {
+  if (
+    filePath.endsWith('.d.ts') ||
+    filePath.endsWith('.d.mts') ||
+    filePath.endsWith('.d.cts')
+  ) {
+    return 'element-plus/es/motion'
+  }
+
+  const relativePath = path.relative(rootDir, filePath).split(path.sep).join('/')
+  const extension = path.extname(filePath)
+
+  if (relativePath.startsWith('es/') && extension === '.mjs') {
+    return toModuleSpecifier(
+      path.relative(
+        path.dirname(filePath),
+        path.join(rootDir, 'es', 'motion', 'index.mjs'),
+      ),
+    )
+  }
+
+  if (
+    relativePath.startsWith('lib/') &&
+    (extension === '.js' || extension === '.cjs')
+  ) {
+    return toModuleSpecifier(
+      path.relative(
+        path.dirname(filePath),
+        path.join(rootDir, 'lib', 'motion', 'index.js'),
+      ),
+    )
+  }
+
+  return undefined
+}
+
+export const rewriteBuiltBundledWorkspaceDependencyReferences = async () => {
+  const candidates = await collectPackageReferenceCandidates(epOutput)
+
+  await Promise.all(
+    candidates.map(async (filePath) => {
+      let rewritten = await readFile(filePath, 'utf8')
+      let changed = false
+
+      for (const dependencyName of bundledWorkspaceDependencyNames) {
+        if (!rewritten.includes(dependencyName)) continue
+
+        const replacement = resolveBundledWorkspaceRuntimeSpecifier(
+          epOutput,
+          filePath,
+        )
+        if (!replacement) continue
+
+        const pattern = new RegExp(
+          `(['"])${dependencyName.replace('/', '\\/')}\\1`,
+          'g',
+        )
+        rewritten = rewritten.replace(pattern, (_match, quote) => {
+          changed = true
+          return `${quote}${replacement}${quote}`
+        })
+      }
+
+      if (changed) {
+        await writeFile(filePath, rewritten)
+      }
+    }),
+  )
+}
+
 export const copyFiles = () =>
   Promise.all([
-    copyFile(epPackage, path.join(epOutput, 'package.json')),
+    copyElementPlusPackageManifest(),
     copyFile(
       path.resolve(projRoot, 'README.md'),
       path.resolve(epOutput, 'README.md'),
@@ -65,10 +190,15 @@ export const copyFullStyle = async () => {
     epOutput,
     'theme-chalk/el-public-shell-critical.css',
   )
+  const fsusThemeSource = path.resolve(
+    epOutput,
+    'theme-chalk/el-fsus-theme.css',
+  )
 
   await Promise.all([
     waitForPath(fullStyleSource),
     waitForPath(criticalStyleSource),
+    waitForPath(fsusThemeSource),
   ])
   await mkdir(path.resolve(epOutput, 'dist'), { recursive: true })
   await copyFile(
@@ -78,6 +208,10 @@ export const copyFullStyle = async () => {
   await copyFile(
     criticalStyleSource,
     path.resolve(epOutput, 'dist/public-shell-critical.css'),
+  )
+  await copyFile(
+    fsusThemeSource,
+    path.resolve(epOutput, 'dist/el-fsus-theme.css'),
   )
 }
 
@@ -152,6 +286,10 @@ const buildPackage: TaskFunction = series(
       copyFullStyle,
     ),
     withTaskName('buildFullBundle', buildFullBundle),
+    withTaskName(
+      'rewriteBuiltBundledWorkspaceDependencyReferences',
+      rewriteBuiltBundledWorkspaceDependencyReferences,
+    ),
   ),
 
   parallel(copyTypesDefinitions, copyFiles, copyWasmRuntimeAssets),

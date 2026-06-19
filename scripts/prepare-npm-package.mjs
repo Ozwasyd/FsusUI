@@ -104,7 +104,19 @@ if (!existsSync(distPackagePath)) {
   )
 }
 
-function assertPublicInterfaceMatches(sourcePackageJson, distPackageJson) {
+function assertPublicInterfaceMatches(
+  sourcePackageJson,
+  distPackageJson,
+  workspaceVersions,
+) {
+  const normalizedSourcePackageJson = normalizePublicInterfacePackageJson(
+    sourcePackageJson,
+    workspaceVersions,
+  )
+  const normalizedDistPackageJson = normalizePublicInterfacePackageJson(
+    distPackageJson,
+    workspaceVersions,
+  )
   const publicInterfaceFields = [
     'main',
     'module',
@@ -123,8 +135,8 @@ function assertPublicInterfaceMatches(sourcePackageJson, distPackageJson) {
 
   const mismatchedFields = publicInterfaceFields.filter((field) => {
     return (
-      JSON.stringify(sourcePackageJson[field]) !==
-      JSON.stringify(distPackageJson[field])
+      JSON.stringify(normalizedSourcePackageJson[field]) !==
+      JSON.stringify(normalizedDistPackageJson[field])
     )
   })
 
@@ -573,6 +585,13 @@ function removeBundledWorkspaceDependencies(packageJson) {
   return removed
 }
 
+function normalizePublicInterfacePackageJson(packageJson, workspaceVersions) {
+  const normalized = JSON.parse(JSON.stringify(packageJson))
+  normalizeWorkspaceProtocols(normalized, workspaceVersions)
+  removeBundledWorkspaceDependencies(normalized)
+  return normalized
+}
+
 function assertNoWorkspaceProtocolsRemain(packageJson) {
   const remaining = []
 
@@ -719,7 +738,7 @@ let rewrittenWorkerReferences = 0
 let rewrittenWasmFallbackReferences = 0
 
 if (strict) {
-  assertPublicInterfaceMatches(sourcePackageJson, packageJson)
+  assertPublicInterfaceMatches(sourcePackageJson, packageJson, workspaceVersions)
   assertDistArtifactShape(distRoot)
   assertWasmRuntimeArtifacts(distRoot)
   stripSourceMappingUrlReferences(distRoot)

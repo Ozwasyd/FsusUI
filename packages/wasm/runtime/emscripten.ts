@@ -21,9 +21,7 @@ export async function loadEmscriptenModule<TModule>(
 ): Promise<TModule | null> {
   const resolvedModuleUrl = await resolveRuntimeUrl(moduleUrl)
   const resolvedWasmUrl = await resolveRuntimeUrl(wasmUrl)
-  const moduleRef = (await import(
-    /* @vite-ignore */ resolvedModuleUrl
-  )) as ModuleNamespace<TModule>
+  const moduleRef = await importRuntimeModule<TModule>(resolvedModuleUrl)
   const factory = (moduleRef.default ?? moduleRef[exportName]) as
     | EmscriptenModuleFactory<TModule>
     | undefined
@@ -55,6 +53,52 @@ export async function loadEmscriptenModule<TModule>(
       }
     }
   }
+}
+
+async function importRuntimeModule<TModule>(
+  moduleUrl: string,
+): Promise<ModuleNamespace<TModule>> {
+  if (moduleUrl.startsWith('file://')) {
+    try {
+      const nativeImport = new Function(
+        'specifier',
+        'return import(specifier)',
+      ) as (specifier: string) => Promise<unknown>
+      return (await nativeImport(moduleUrl)) as ModuleNamespace<TModule>
+    } catch (error) {
+      if (!isMissingDynamicImportCallback(error)) {
+        throw error
+      }
+
+      const moduleRef = requireNodeFileRuntimeModule(moduleUrl)
+      if (moduleRef) {
+        return moduleRef as ModuleNamespace<TModule>
+      }
+
+      throw error
+    }
+  }
+
+  return (await import(
+    /* @vite-ignore */ moduleUrl
+  )) as ModuleNamespace<TModule>
+}
+
+function isMissingDynamicImportCallback(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    error.message.includes('dynamic import callback was not specified')
+  )
+}
+
+function requireNodeFileRuntimeModule(moduleUrl: string): unknown {
+  const nodeModule = getNodeModuleModule()
+  if (typeof nodeModule?.createRequire !== 'function') {
+    return null
+  }
+
+  const modulePath = fileUrlToPath(moduleUrl)
+  return nodeModule.createRequire(modulePath)(modulePath)
 }
 
 function resolveNodeDirname(moduleUrl: string): string | null {
@@ -134,6 +178,28 @@ function getNodeUrlModule():
   ).process
 
   return nodeProcess?.getBuiltinModule?.('url')
+}
+
+function getNodeModuleModule():
+  | {
+      createRequire?: (filename: string) => (id: string) => unknown
+    }
+  | undefined {
+  const nodeProcess = (
+    globalThis as {
+      process?: {
+        getBuiltinModule?: (
+          name: string,
+        ) =>
+          | {
+              createRequire?: (filename: string) => (id: string) => unknown
+            }
+          | undefined
+      }
+    }
+  ).process
+
+  return nodeProcess?.getBuiltinModule?.('module')
 }
 
 async function resolveRuntimeUrl(url: string): Promise<string> {

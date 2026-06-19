@@ -120,6 +120,15 @@ assert(
 )
 
 const gulpfile = read('internal/build/gulpfile.ts')
+const elementPlusPackage = JSON.parse(read('packages/element-plus/package.json'))
+assert(
+  elementPlusPackage.exports?.['./dist/el-fsus-theme.css'] === './dist/el-fsus-theme.css',
+  'element-plus package exports must expose dist/el-fsus-theme.css for consumers',
+)
+assert(
+  gulpfile.includes('dist/el-fsus-theme.css'),
+  'internal build must copy el-fsus-theme.css to package dist',
+)
 for (const task of [
   'cleanPackageBuild',
   'buildModules',
@@ -133,14 +142,15 @@ for (const task of [
 
 if (existsSync(path.join(publishedDistRoot, 'package.json'))) {
   const distPackage = readJson('dist/element-plus/package.json')
+  const distPackageSelfReference = distPackage.name
   assert(
     !distPackage.dependencies?.['@element-plus/motion'],
     'published package must not depend on unpublished @element-plus/motion',
   )
 
   const emptyStateDistChecks = [
-    ['dist/element-plus/es/index.d.ts', "export * from '@ozwasyd/element-plus/es/components'"],
-    ['dist/element-plus/lib/index.d.ts', "export * from '@ozwasyd/element-plus/es/components'"],
+    ['dist/element-plus/es/index.d.ts', `export * from '${distPackageSelfReference}/es/components'`],
+    ['dist/element-plus/lib/index.d.ts', `export * from '${distPackageSelfReference}/es/components'`],
     ['dist/element-plus/es/index.mjs', 'ElEmptyState'],
     ['dist/element-plus/lib/index.js', 'ElEmptyState'],
     ['dist/element-plus/es/components/index.d.ts', "export * from './empty-state'"],

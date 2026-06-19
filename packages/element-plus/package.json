@@ -66,6 +66,7 @@
       "require": "./lib/markdown-runtime.js"
     },
     "./dist/public-shell-critical.css": "./dist/public-shell-critical.css",
+    "./dist/el-fsus-theme.css": "./dist/el-fsus-theme.css",
     "./es/*.mjs": {
       "types": "./es/*.d.ts",
       "import": "./es/*.mjs"
