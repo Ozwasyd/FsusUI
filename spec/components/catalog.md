@@ -1,7 +1,12 @@
-# Initial Component Catalog
+# Stable Component Contract Catalog
 
-This catalog defines the first public contract targets. It intentionally avoids
-DOM, Vue, XAML, and platform template details.
+The complete versioned source registry is
+[`contracts/v1/vue-public-contracts.json`](./contracts/v1/vue-public-contracts.json).
+It is generated from the Vue public API baseline and validated by
+`pnpm run conformance:contracts`.
+
+The table below keeps the original first controls as a human-readable summary.
+It intentionally avoids DOM, Vue, XAML, and platform template details.
 
 | ID            | Contract Summary                                       | Core States                                               | Required Token Groups                     |
 | ------------- | ------------------------------------------------------ | --------------------------------------------------------- | ----------------------------------------- |

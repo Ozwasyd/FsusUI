@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
+import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -91,22 +92,18 @@ const checkTokens = () => {
 }
 
 const checkContracts = () => {
-  const file = 'spec/components/avalonia-first-subset.yaml'
-  const contract = read(file)
+  execFileSync(
+    process.execPath,
+    ['scripts/component-contract-registry.mjs', '--check'],
+    {
+      cwd: root,
+      stdio: 'inherit',
+    },
+  )
   const webMappingFile = 'docs/api/web-contract-mapping.md'
   const webMapping = read(webMappingFile).toLowerCase()
   for (const component of requiredComponents) {
-    assertIncludes(contract, `id: ${component}`, file)
     assertIncludes(webMapping, component, webMappingFile)
-  }
-  for (const key of [
-    'props:',
-    'states:',
-    'keyboard:',
-    'accessibility:',
-    'tokens:',
-  ]) {
-    assertIncludes(contract, key, file)
   }
   const complexSpecFile = 'spec/components/complex-components-roadmap.yaml'
   const complexDocsFile = 'docs/avalonia/complex-components-roadmap.md'

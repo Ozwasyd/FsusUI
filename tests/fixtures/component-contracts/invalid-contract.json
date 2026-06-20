@@ -1,0 +1,28 @@
+{
+  "id": "component.invalid-fixture",
+  "releaseClassification": "preview",
+  "owner": "FsusUI Core",
+  "supportedPlatforms": {
+    "web": {
+      "status": "source"
+    }
+  },
+  "changeClassification": "unknown",
+  "platformClassification": "portable",
+  "source": {
+    "kind": "component",
+    "name": "ElInvalidFixture",
+    "module": "invalid-fixture"
+  },
+  "props": [],
+  "events": [],
+  "contentRegions": [],
+  "defaults": {},
+  "stateMachine": {},
+  "keyboardBehavior": {},
+  "pointerBehavior": {},
+  "accessibilityMapping": {},
+  "themeTokens": [],
+  "motionPolicy": {},
+  "performanceBudget": {}
+}

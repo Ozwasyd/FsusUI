@@ -103,9 +103,11 @@ const checkReleaseDocs = () => {
 }
 
 const checkContractReleaseClassification = () => {
-  const contract = read('spec/components/avalonia-first-subset.yaml')
+  const contract = read(
+    'spec/components/contracts/v1/vue-public-contracts.json',
+  )
   assert(
-    contract.includes('releaseClassification: preview-minor'),
+    contract.includes('"releaseClassification": "preview"'),
     'component contracts must include releaseClassification',
   )
   console.log('governance:contract-classification passed')

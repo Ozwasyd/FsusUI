@@ -1,0 +1,37 @@
+{
+  "id": "component.fixture-button",
+  "version": "1.0.0",
+  "releaseClassification": "preview",
+  "owner": "FsusUI Core",
+  "supportedPlatforms": {
+    "web": {
+      "status": "source"
+    },
+    "avalonia": {
+      "status": "required"
+    }
+  },
+  "changeClassification": "minor",
+  "platformClassification": "portable",
+  "source": {
+    "kind": "component",
+    "name": "ElFixtureButton",
+    "module": "fixture-button"
+  },
+  "props": [],
+  "events": [],
+  "contentRegions": [],
+  "defaults": {
+    "source": "fixture"
+  },
+  "stateMachine": {
+    "initial": "default",
+    "states": ["default"]
+  },
+  "keyboardBehavior": {},
+  "pointerBehavior": {},
+  "accessibilityMapping": {},
+  "themeTokens": [],
+  "motionPolicy": {},
+  "performanceBudget": {}
+}
