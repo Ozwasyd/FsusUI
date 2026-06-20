@@ -6,6 +6,23 @@ export * from '@element-plus/hooks'
 export * from './make-installer'
 export * from './render-pipeline-policies'
 export * from './result'
+export { ElEmptyState } from '@element-plus/components/empty-state'
+export { ElSiteHeader } from '@element-plus/components/site-header'
+export {
+  FsusPerceptionChallenge,
+  FsusTextTaskChallenge,
+} from '@element-plus/components/perception-challenge'
+export type {
+  PerceptionChallengeAssignment,
+  PerceptionChallengeClient,
+  PerceptionChallengeExpiredPayload,
+  PerceptionChallengeKind,
+  PerceptionChallengeRenderPayload,
+  PerceptionChallengeRenderer,
+  PerceptionChallengeState,
+  PerceptionChallengeSubmitPayload,
+  PerceptionChallengeVerifyResult,
+} from '@element-plus/components/perception-challenge'
 export {
   FsuBottomActionBar,
   FsuMobileDock,
