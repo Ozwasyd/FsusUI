@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "componentModules": {
+    "fixture-service": "platform-override",
+    "fixture-widget": "portable"
+  },
+  "directives": {
+    "ElFixtureDirective": "platform-override",
+    "vFixture": "platform-override"
+  },
+  "services": {
+    "ElFixtureService": "platform-override"
+  },
+  "plugins": {
+    "ElFixtureService": "platform-override"
+  },
+  "entryPoints": {
+    ".": "portable"
+  }
+}
