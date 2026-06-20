@@ -5,6 +5,9 @@ overrides:
     platform: all
     status: accepted
     reason: Web ARIA names and Avalonia automation names use different platform APIs but must expose the same user-facing name.
+    affectedContracts: [component.el-button, component.el-icon]
+    visualThreshold: none
+    behaviorExpectation: Accessible names, disabled states, and automation roles must match the public component contract.
     allowedDeviation: none
     testPolicy: accessibility-contract
     owner: fsusui-core

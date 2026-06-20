@@ -1,0 +1,55 @@
+overrides:
+  - id: fixture-missing-owner-001
+    area: visual
+    component: button
+    platform: avalonia
+    status: accepted
+    reason: Missing owner fixture.
+    reviewAfter: 2026-12-31
+    testPolicy: visual-threshold
+    affectedContracts: [component.el-button]
+    visualThreshold: low
+    behaviorExpectation: Behavior must match the component contract.
+    allowedDeviation: low
+    linkedIssues: [132]
+  - id: fixture-expired-001
+    area: visual
+    component: button
+    platform: avalonia
+    status: accepted
+    reason: Expired review date fixture.
+    owner: fsusui-core
+    reviewAfter: 2000-01-01
+    testPolicy: visual-threshold
+    affectedContracts: [component.el-button]
+    visualThreshold: low
+    behaviorExpectation: Behavior must match the component contract.
+    allowedDeviation: low
+    linkedIssues: [132]
+  - id: fixture-missing-test-policy-001
+    area: behavior
+    component: button
+    platform: avalonia
+    status: accepted
+    reason: Missing test policy fixture.
+    owner: fsusui-core
+    reviewAfter: 2026-12-31
+    affectedContracts: [component.el-button]
+    visualThreshold: none
+    behaviorExpectation: Behavior must match the component contract.
+    allowedDeviation: none
+    linkedIssues: [132]
+  - id: fixture-invalid-component-001
+    area: accessibility
+    component: missing
+    platform: avalonia
+    status: accepted
+    reason: Invalid affected component fixture.
+    owner: fsusui-core
+    reviewAfter: 2026-12-31
+    testPolicy: accessibility-contract
+    affectedContracts: [component.missing]
+    visualThreshold: none
+    behaviorExpectation: Behavior must match the component contract.
+    allowedDeviation: none
+    linkedIssues: [132]

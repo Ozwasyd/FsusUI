@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
+import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -37,6 +38,10 @@ const assert = (condition, message) => {
 }
 
 const checkRegistry = () => {
+  execFileSync(process.execPath, ['scripts/check-platform-overrides.mjs'], {
+    cwd: root,
+    stdio: 'inherit',
+  })
   for (const file of registryFiles) {
     assert(exists(file), `${file} must exist`)
     const content = read(file)

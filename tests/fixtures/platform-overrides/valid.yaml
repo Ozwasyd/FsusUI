@@ -1,0 +1,15 @@
+overrides:
+  - id: fixture-valid-001
+    area: visual
+    component: button
+    platform: avalonia
+    status: accepted
+    reason: Fixture documents a bounded rendering difference.
+    owner: fsusui-core
+    reviewAfter: 2026-12-31
+    testPolicy: visual-threshold
+    affectedContracts: [component.el-button]
+    visualThreshold: low
+    behaviorExpectation: Behavior must match the component contract.
+    allowedDeviation: low
+    linkedIssues: [132]

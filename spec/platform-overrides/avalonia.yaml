@@ -5,6 +5,10 @@ overrides:
     platform: avalonia
     status: accepted
     reason: Avalonia controls use native template and automation behavior rather than Web DOM structure.
+    affectedContracts:
+      [component.el-button, component.el-input, component.el-select]
+    visualThreshold: low
+    behaviorExpectation: Native templates may differ internally, but props, events, states, keyboard behavior, and accessibility mapping must match the registry contract.
     allowedDeviation: low
     testPolicy: contract-and-accessibility
     owner: fsusui-core
@@ -16,6 +20,9 @@ overrides:
     platform: avalonia
     status: accepted
     reason: Avalonia renders registry path data as StreamGeometry resources while Web renders SVG components from source SVG files.
+    affectedContracts: [component.el-icon]
+    visualThreshold: low
+    behaviorExpectation: Icon identity, sizing contract, current-color behavior, and accessible hiding behavior must match the public icon contract.
     allowedDeviation: low
     testPolicy: icon-alignment-threshold
     owner: fsusui-core

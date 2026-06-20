@@ -5,6 +5,9 @@ overrides:
     platform: avalonia-windows
     status: accepted
     reason: Windows high-contrast and focus cues can override app brushes for accessibility.
+    affectedContracts: [component.el-button, component.el-input]
+    visualThreshold: low
+    behaviorExpectation: Keyboard focus-visible state and accessibility state must remain equivalent to the public contracts.
     allowedDeviation: low
     testPolicy: accessibility-and-visual-threshold
     owner: fsusui-core

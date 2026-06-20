@@ -5,6 +5,9 @@ overrides:
     platform: avalonia-macos
     status: accepted
     reason: macOS text smoothing differs from Linux, Windows, and browser rendering.
+    affectedContracts: [component.el-text]
+    visualThreshold: medium
+    behaviorExpectation: Text content, wrapping behavior, and accessible name exposure must match the public text contract.
     allowedDeviation: medium
     testPolicy: visual-threshold
     owner: fsusui-core

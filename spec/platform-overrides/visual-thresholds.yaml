@@ -1,9 +1,13 @@
 thresholds:
   - id: visual-token-color-001
     area: visual
+    component: button
     platform: all
     status: accepted
     reason: Tokenized colors should remain tight across generated Web and Avalonia outputs.
+    affectedContracts: [component.el-button]
+    visualThreshold: low
+    behaviorExpectation: Color variance must not change state meaning, contrast intent, or token role semantics.
     allowedDeviation: low
     testPolicy: color-delta
     owner: fsusui-core
@@ -11,9 +15,13 @@ thresholds:
     linkedIssues: [18, 20, 24, 25]
   - id: visual-text-baseline-001
     area: visual
+    component: text
     platform: all
     status: accepted
     reason: Font rasterization and baseline metrics differ across browser engines and Skia.
+    affectedContracts: [component.el-text]
+    visualThreshold: medium
+    behaviorExpectation: Text content, line order, wrapping intent, and accessible name exposure must remain equivalent.
     allowedDeviation: medium
     testPolicy: text-baseline-threshold
     owner: fsusui-core

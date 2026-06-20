@@ -5,6 +5,9 @@ overrides:
     platform: avalonia-linux
     status: accepted
     reason: Linux compositor and X11/Wayland window shadows differ from browser box-shadow rendering.
+    affectedContracts: [component.el-dialog]
+    visualThreshold: medium
+    behaviorExpectation: Dialog modality, focus trap, dismissal, and announced name must match the public dialog contract.
     allowedDeviation: medium
     testPolicy: visual-threshold
     owner: fsusui-core

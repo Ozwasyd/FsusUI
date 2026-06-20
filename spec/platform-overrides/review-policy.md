@@ -8,9 +8,12 @@ Each override must define:
 - id
 - area
 - component or pattern
+- affected contract id
 - platform
 - status
 - reason
+- visual threshold
+- behavior expectation
 - allowed deviation
 - test policy
 - owner

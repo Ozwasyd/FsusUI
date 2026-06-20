@@ -195,6 +195,10 @@ const checkA11y = () => {
 }
 
 const checkPlatformOverrides = () => {
+  execFileSync(process.execPath, ['scripts/check-platform-overrides.mjs'], {
+    cwd: root,
+    stdio: 'inherit',
+  })
   for (const file of [
     'spec/platform-overrides/README.md',
     'tests/conformance/platform-overrides/metadata.md',

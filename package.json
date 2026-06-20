@@ -76,6 +76,7 @@
     "icons:lint": "node ./scripts/with-node-heap.mjs node ./scripts/icon-pipeline.mjs lint",
     "component-contracts:generate": "node ./scripts/with-node-heap.mjs node ./scripts/component-contract-registry.mjs",
     "component-contracts:check": "node ./scripts/with-node-heap.mjs node ./scripts/component-contract-registry.mjs --check",
+    "platform-overrides:check": "node ./scripts/with-node-heap.mjs node ./scripts/check-platform-overrides.mjs",
     "conformance:tokens": "node ./scripts/with-node-heap.mjs node ./scripts/check-conformance.mjs tokens",
     "conformance:contracts": "node ./scripts/with-node-heap.mjs node ./scripts/check-conformance.mjs contracts",
     "conformance:interactions": "node ./scripts/with-node-heap.mjs node ./scripts/check-conformance.mjs interactions",
