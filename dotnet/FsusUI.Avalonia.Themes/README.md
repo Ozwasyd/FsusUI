@@ -74,6 +74,14 @@ Motion resources are exposed through stable theme keys:
 Controls should consume these semantic resources instead of hard-coding local
 durations or easing values.
 
+`FsusMotionService` resolves stable Avalonia motion plans from the same token
+set. It provides presets for control feedback, panel enter/leave, overlay
+transitions, list item appearance, and action-row safe motion. `Reduced` mode
+keeps terminal visual state with no travel or scale; `Disabled` mode resolves
+immediately with `0ms` duration.
+
+See `docs/avalonia/motion-runtime.md` for the runtime API and governance gate.
+
 ## Runtime Resource Dictionaries
 
 Stable theme dictionaries are shipped for:

@@ -128,8 +128,11 @@ const checkContracts = () => {
 const checkInteractions = () => {
   const file = 'tests/conformance/interactions/basic-controls.yaml'
   const webFile = 'tests/conformance/interactions/web-first-subset.yaml'
+  const avaloniaMotionFile =
+    'tests/conformance/interactions/avalonia-motion.yaml'
   const traces = read(file)
   const webTraces = read(webFile)
+  const avaloniaMotionTraces = read(avaloniaMotionFile)
   for (const component of interactionComponents) {
     assertIncludes(traces, `component: ${component}`, file)
   }
@@ -141,6 +144,9 @@ const checkInteractions = () => {
     assertIncludes(webTraces, step, webFile)
   }
   assertIncludes(webTraces, 'web-table-actions-motion-safe', webFile)
+  for (const term of ['reduced', 'disabled', 'terminal', 'focusTarget']) {
+    assertIncludes(avaloniaMotionTraces, term, avaloniaMotionFile)
+  }
   console.log('conformance:interactions passed')
 }
 

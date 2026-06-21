@@ -33,6 +33,11 @@ Implementations may add more presets, but they must document intent, duration,
 distance, easing, reduced-motion fallback, and applicable component or pattern
 targets.
 
+Avalonia stable controls consume these semantics through
+`FsusMotionService`. The runtime maps platform presets to shared token-backed
+plans and collapses `reduced` / `disabled` modes to terminal visual state
+without layout travel.
+
 ## Recipe Layer
 
 Recipes describe business intent above preset mechanics. Implementations must
@@ -74,14 +79,14 @@ measurement fails.
 
 Default budget:
 
-| Field                         | Default |
-| ----------------------------- | ------- |
-| `maxStaggerItems`             | `20`    |
-| `maxAnimatedNodesPerViewport` | `40`    |
-| `disableScrollEffectsBelowFps`| `45`    |
-| `disableBlurOnLowPower`       | `true`  |
-| `disableParallaxOnTouch`      | `true`  |
-| `preferCssWhenPossible`       | `true`  |
+| Field                          | Default |
+| ------------------------------ | ------- |
+| `maxStaggerItems`              | `20`    |
+| `maxAnimatedNodesPerViewport`  | `40`    |
+| `disableScrollEffectsBelowFps` | `45`    |
+| `disableBlurOnLowPower`        | `true`  |
+| `disableParallaxOnTouch`       | `true`  |
+| `preferCssWhenPossible`        | `true`  |
 
 Presets and recipes should animate only `transform`, `opacity`, and
 budget-controlled `filter`.

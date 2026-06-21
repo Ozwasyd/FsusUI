@@ -1,0 +1,32 @@
+version: 1
+platform: avalonia
+scenarios:
+  - id: avalonia-motion-reduced-panel-terminal-state
+    component: dialog
+    contract: spec/motion/README.md
+    motionMode: reduced
+    steps:
+      - render: { preset: panel-enter, focusTarget: primary-action }
+      - assert:
+          { finalState: open, transform: terminal, focusTarget: primary-action }
+  - id: avalonia-motion-disabled-overlay-terminal-state
+    component: dialog
+    contract: spec/motion/README.md
+    motionMode: disabled
+    steps:
+      - render: { preset: overlay-transition, focusTarget: close-button }
+      - assert:
+          {
+            finalState: open,
+            duration: 0ms,
+            transform: terminal,
+            focusTarget: close-button,
+          }
+  - id: avalonia-motion-action-row-safe
+    component: button
+    contract: spec/motion/README.md
+    motionMode: enabled
+    steps:
+      - render: { preset: action-row-safe, container: data-table-actions }
+      - pointerover
+      - assert: { transform: terminal, noOverlap: true }
