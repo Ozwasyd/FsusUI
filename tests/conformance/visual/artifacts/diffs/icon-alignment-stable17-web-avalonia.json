@@ -1,0 +1,31 @@
+{
+  "id": "icon-alignment-stable17-web-avalonia",
+  "component": "icon",
+  "state": "enabled",
+  "mode": "crossPlatform",
+  "platform": "web->avalonia",
+  "token": "icon.size.md",
+  "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/icon-alignment-stable17.png",
+  "diffArtifact": "tests/conformance/visual/artifacts/diffs/icon-alignment-stable17-web-avalonia.json",
+  "deltas": {
+    "geometry": 0.5,
+    "colorDelta": 0.3316624790355407,
+    "radius": 0,
+    "spacing": 0.3000000000000007,
+    "textBaseline": 0.3999999999999986,
+    "screenshotDiffPercent": 0.009,
+    "perceptualDelta": 0.04
+  },
+  "thresholds": {
+    "geometry": 1.5,
+    "colorDelta": 1.4,
+    "radius": 0.75,
+    "spacing": 1,
+    "textBaseline": 1,
+    "screenshotDiffPercent": 0.015,
+    "perceptualDelta": 0.08
+  },
+  "allowedByOverride": [],
+  "passed": true,
+  "failures": []
+}

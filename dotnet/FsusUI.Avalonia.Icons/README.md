@@ -14,6 +14,9 @@
 Use `FsusIconKeys` for stable lookup instead of hard-coded resource keys.
 `docs/icons/generated/stable-icons.md` lists the matching Vue component and
 Avalonia resource key for every stable icon.
+`FsusUI.Avalonia.Controls.FsusIcon` can consume these resources through
+`IconKey` plus `Data="{StaticResource ...}"` without changing the generated
+source set.
 
 ## Semantics
 

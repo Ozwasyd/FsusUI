@@ -1,0 +1,67 @@
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls">
+  <Style Selector="fsus|FsusIcon">
+    <Setter Property="Width" Value="{DynamicResource FsusIconSizeMd}" />
+    <Setter Property="Height" Value="{DynamicResource FsusIconSizeMd}" />
+    <Setter Property="Fill" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="Stroke" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="StrokeThickness" Value="{DynamicResource FsusIconStrokeMd}" />
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+
+  <Style Selector="fsus|FsusIcon.fsus-disabled">
+    <Setter Property="Opacity" Value="{DynamicResource FsusThemeDisabledOpacity}" />
+  </Style>
+
+  <Style Selector="fsus|FsusText">
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="FontFamily" Value="{DynamicResource FsusTypographyFamilyBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodyMdSize}" />
+    <Setter Property="FontWeight" Value="{DynamicResource FsusTypographyBodyMdWeight}" />
+    <Setter Property="LineHeight" Value="{DynamicResource FsusTypographyBodyMdLineHeight}" />
+  </Style>
+
+  <Style Selector="fsus|FsusText.fsus-text-muted">
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusText.fsus-text-strong">
+    <Setter Property="FontWeight" Value="700" />
+  </Style>
+
+  <Style Selector="fsus|FsusText.fsus-text-title">
+    <Setter Property="FontSize" Value="{DynamicResource FsusTypographyHeadingLgSize}" />
+    <Setter Property="LineHeight" Value="{DynamicResource FsusTypographyHeadingLgLineHeight}" />
+    <Setter Property="FontWeight" Value="700" />
+  </Style>
+
+  <Style Selector="fsus|FsusText.fsus-text-monospace">
+    <Setter Property="FontFamily" Value="{DynamicResource FsusTypographyFamilyMonospace}" />
+  </Style>
+
+  <Style Selector="fsus|FsusText.fsus-text-truncated">
+    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    <Setter Property="TextWrapping" Value="NoWrap" />
+  </Style>
+
+  <Style Selector="fsus|FsusLink">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+    <Setter Property="FontFamily" Value="{DynamicResource FsusTypographyFamilyBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodyMdSize}" />
+    <Setter Property="FontWeight" Value="{DynamicResource FsusTypographyBodyMdWeight}" />
+    <Setter Property="Padding" Value="0,2" />
+    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlCompactY}" />
+  </Style>
+
+  <Style Selector="fsus|FsusLink:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource FsusColorActionPrimaryHoverBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusLink:disabled">
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+    <Setter Property="Opacity" Value="{DynamicResource FsusThemeDisabledOpacity}" />
+  </Style>
+</Styles>

@@ -3,7 +3,7 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "fixtureSource": {
     "path": "tests/conformance/visual/fixtures/visual-comparisons.json",
-    "sha256": "764f49d5ef20d841aded9d580a52f2d9c1571a00bce466e8f96ee1dc55e4f44f"
+    "sha256": "ccdf60d5104d62173c21357c9260eb8d740e3b6014dae017781500b48140afad"
   },
   "artifactRoot": "tests/conformance/visual/artifacts",
   "thresholds": {
@@ -355,6 +355,126 @@
         },
         "textBaseline": 19.2
       }
+    },
+    {
+      "id": "icon-alignment-stable17-web-avalonia",
+      "component": "icon",
+      "fixture": {
+        "page": "visual/icon",
+        "theme": "light",
+        "density": "default",
+        "variant": "search-warning-row",
+        "size": "md",
+        "state": "enabled",
+        "locale": "en-US",
+        "direction": "ltr",
+        "motionMode": "enabled"
+      },
+      "token": "icon.size.md",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/icon-alignment-stable17.png",
+        "geometry": {
+          "x": 24,
+          "y": 32,
+          "width": 128,
+          "height": 40
+        },
+        "color": {
+          "token": "icon.size.md",
+          "lab": [25, 1, -3]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 8
+        },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/icon-alignment-stable17.png",
+        "geometry": {
+          "x": 24.4,
+          "y": 32.3,
+          "width": 128.5,
+          "height": 40.4
+        },
+        "color": {
+          "token": "icon.size.md",
+          "lab": [25.3, 1.1, -3.1]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 0,
+          "gap": 8.3
+        },
+        "textBaseline": 24.4
+      }
+    },
+    {
+      "id": "text-link-baseline-stable17-web-avalonia",
+      "component": "text",
+      "fixture": {
+        "page": "visual/text-link",
+        "theme": "light",
+        "density": "default",
+        "variant": "body-link-monospace",
+        "size": "md",
+        "state": "enabled-truncated",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "typography.body.baseline",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/text-link-baseline-stable17.png",
+        "geometry": {
+          "x": 20,
+          "y": 24,
+          "width": 260,
+          "height": 48
+        },
+        "color": {
+          "token": "typography.body.color",
+          "lab": [23, 0, -2]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 2,
+          "gap": 10
+        },
+        "textBaseline": 26
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/text-link-baseline-stable17.png",
+        "geometry": {
+          "x": 20.5,
+          "y": 24.4,
+          "width": 260.6,
+          "height": 48.5
+        },
+        "color": {
+          "token": "typography.body.color",
+          "lab": [23.4, 0.1, -2.2]
+        },
+        "radius": 0,
+        "spacing": {
+          "paddingX": 0,
+          "paddingY": 2.2,
+          "gap": 10.4
+        },
+        "textBaseline": 26.6
+      }
     }
   ],
   "approvedComparisons": [
@@ -387,6 +507,18 @@
       "mode": "crossPlatform",
       "platform": "web->avalonia",
       "diffArtifact": "tests/conformance/visual/artifacts/diffs/text-baseline-registered-override.json"
+    },
+    {
+      "id": "icon-alignment-stable17-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/icon-alignment-stable17-web-avalonia.json"
+    },
+    {
+      "id": "text-link-baseline-stable17-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/text-link-baseline-stable17-web-avalonia.json"
     }
   ]
 }

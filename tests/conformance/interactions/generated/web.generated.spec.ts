@@ -140,6 +140,159 @@ const scenarios = [
     expectations: ['finalState', 'noOverlap'],
   },
   {
+    id: 'icon-only-action-accessible-name',
+    platform: 'shared',
+    component: 'icon-button',
+    source: 'tests/conformance/interactions/basic-controls.yaml',
+    contract: '',
+    motionMode: '',
+    shardKey: 3,
+    steps: [
+      {
+        type: 'render',
+        value: '{ icon: search, accessibleName: Search, variant: text }',
+      },
+      {
+        type: 'focus',
+        value: '',
+      },
+      {
+        type: 'keyboard',
+        value: 'Enter',
+      },
+      {
+        type: 'assert',
+        value:
+          '{ emitted: press, accessibleName: Search, finalState: default }',
+      },
+    ],
+    expectations: ['accessibleName', 'emitted', 'finalState'],
+  },
+  {
+    id: 'link-keyboard-activation',
+    platform: 'shared',
+    component: 'link',
+    source: 'tests/conformance/interactions/basic-controls.yaml',
+    contract: '',
+    motionMode: '',
+    shardKey: 2,
+    steps: [
+      {
+        type: 'render',
+        value: '{ text: Docs, href: https://fsus.dev/docs }',
+      },
+      {
+        type: 'focus',
+        value: '',
+      },
+      {
+        type: 'keyboard',
+        value: 'Enter',
+      },
+      {
+        type: 'assert',
+        value: '{ emitted: press, focusTarget: link }',
+      },
+    ],
+    expectations: ['emitted', 'focusTarget'],
+  },
+  {
+    id: 'disabled-link-blocks-activation',
+    platform: 'shared',
+    component: 'link',
+    source: 'tests/conformance/interactions/basic-controls.yaml',
+    contract: '',
+    motionMode: '',
+    shardKey: 3,
+    steps: [
+      {
+        type: 'render',
+        value: '{ text: Disabled docs, disabled: true }',
+      },
+      {
+        type: 'focus',
+        value: '',
+      },
+      {
+        type: 'keyboard',
+        value: 'Space',
+      },
+      {
+        type: 'assert',
+        value: '{ emitted: none, finalState: disabled }',
+      },
+    ],
+    expectations: ['emitted', 'finalState'],
+  },
+  {
+    id: 'icon-text-link-focus-order',
+    platform: 'shared',
+    component: 'link',
+    source: 'tests/conformance/interactions/basic-controls.yaml',
+    contract: '',
+    motionMode: '',
+    shardKey: 2,
+    steps: [
+      {
+        type: 'render',
+        value: '{ row: [iconButton, link], accessibleName: Open details }',
+      },
+      {
+        type: 'focus',
+        value: '',
+      },
+      {
+        type: 'keyboard',
+        value: 'Tab',
+      },
+      {
+        type: 'assert',
+        value: '{ focusTarget: link, finalState: focus-visible }',
+      },
+    ],
+    expectations: ['finalState', 'focusTarget'],
+  },
+  {
+    id: 'text-truncation-ellipsis',
+    platform: 'shared',
+    component: 'text',
+    source: 'tests/conformance/interactions/basic-controls.yaml',
+    contract: '',
+    motionMode: '',
+    shardKey: 0,
+    steps: [
+      {
+        type: 'render',
+        value: '{ text: Long operational label, truncated: true }',
+      },
+      {
+        type: 'assert',
+        value: '{ finalState: truncated, noOverlap: text-ellipsis }',
+      },
+    ],
+    expectations: ['finalState', 'noOverlap'],
+  },
+  {
+    id: 'text-variants-baseline',
+    platform: 'shared',
+    component: 'text',
+    source: 'tests/conformance/interactions/basic-controls.yaml',
+    contract: '',
+    motionMode: '',
+    shardKey: 1,
+    steps: [
+      {
+        type: 'render',
+        value: '{ variants: [body, muted, strong, title, monospace] }',
+      },
+      {
+        type: 'assert',
+        value: '{ finalState: variants, noOverlap: baseline-grid }',
+      },
+    ],
+    expectations: ['finalState', 'noOverlap'],
+  },
+  {
     id: 'text-input-focus',
     platform: 'shared',
     component: 'input',

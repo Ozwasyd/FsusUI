@@ -1,4 +1,5 @@
 using Avalonia.Automation;
+using Avalonia.Automation.Peers;
 using Avalonia.Media;
 using FsusUI.Avalonia.Controls;
 using System.Windows.Input;
@@ -221,7 +222,107 @@ public class FsusControlTests
       new FsusIconButton().ValidateAccessibility());
   }
 
+  [Fact]
+  public void IconSyncsKeySizeAndAutomationMetadata()
+  {
+    var icon = new FsusIcon
+    {
+      IconKey = "FsusIconSearch",
+      Size = FsusComponentSize.Lg,
+      AccessibleName = "Search",
+      IsDecorative = false,
+    };
+
+    Assert.Contains("fsus-icon", icon.Classes);
+    Assert.Contains("fsus-size-lg", icon.Classes);
+    Assert.Contains("fsus-semantic-icon", icon.Classes);
+    Assert.Equal("FsusIconSearch", icon.IconKey);
+    Assert.Equal("Search", AutomationProperties.GetName(icon));
+    Assert.Equal(AccessibilityView.Control, AutomationProperties.GetAccessibilityView(icon));
+    icon.ValidateAccessibility();
+
+    icon.AccessibleName = null;
+
+    Assert.Throws<InvalidOperationException>(() => icon.ValidateAccessibility());
+
+    icon.IsDecorative = true;
+
+    Assert.Equal(AccessibilityView.Raw, AutomationProperties.GetAccessibilityView(icon));
+    Assert.Contains("fsus-decorative-icon", icon.Classes);
+    icon.ValidateAccessibility();
+  }
+
+  [Fact]
+  public void TextSyncsVariantsTruncationAndAutomationMetadata()
+  {
+    var text = new FsusText
+    {
+      Text = "Archive completed",
+      Variant = FsusTextVariant.Monospace,
+      IsTruncated = true,
+      AccessibleName = "Archive status",
+    };
+
+    Assert.Contains("fsus-text-control", text.Classes);
+    Assert.Contains("fsus-text-monospace", text.Classes);
+    Assert.Contains("fsus-text-truncated", text.Classes);
+    Assert.Equal(TextTrimming.CharacterEllipsis, text.TextTrimming);
+    Assert.Equal(TextWrapping.NoWrap, text.TextWrapping);
+    Assert.Equal("Archive status", AutomationProperties.GetName(text));
+
+    text.Variant = FsusTextVariant.Strong;
+    text.IsTruncated = false;
+
+    Assert.Contains("fsus-text-strong", text.Classes);
+    Assert.DoesNotContain("fsus-text-monospace", text.Classes);
+    Assert.DoesNotContain("fsus-text-truncated", text.Classes);
+    Assert.Equal(0, text.MaxLines);
+    Assert.Equal(TextTrimming.None, text.TextTrimming);
+  }
+
+  [Fact]
+  public void LinkActivatesCommandAndRoutedEventWithAutomationMetadata()
+  {
+    var activated = 0;
+    var command = new CountingCommand();
+    var link = new ClickableLink
+    {
+      Content = "Read release notes",
+      AccessibleName = "Open release notes",
+      NavigateUri = new Uri("https://example.test/releases"),
+      Command = command,
+    };
+    link.Activated += (_, _) => activated++;
+
+    Assert.True(link.Focusable);
+    Assert.Contains("fsus-link-control", link.Classes);
+    Assert.Contains("fsus-link", link.Classes);
+    Assert.Contains("fsus-text-button", link.Classes);
+    Assert.Equal("Open release notes", AutomationProperties.GetName(link));
+    Assert.Equal(AccessibilityView.Control, AutomationProperties.GetAccessibilityView(link));
+    Assert.Equal(
+      AutomationControlType.Hyperlink,
+      AutomationProperties.GetControlTypeOverride(link));
+
+    link.InvokeClick();
+
+    Assert.Equal(1, command.ExecuteCount);
+    Assert.Equal(1, activated);
+
+    link.IsEnabled = false;
+    link.InvokeClick();
+
+    Assert.Equal(1, command.ExecuteCount);
+    Assert.Equal(1, activated);
+    Assert.Contains("fsus-disabled", link.Classes);
+  }
+
   private sealed class ClickableButton : FsusButton
+  {
+    public void InvokeClick() => OnClick();
+  }
+
+  private sealed class ClickableLink : FsusLink
   {
     public void InvokeClick() => OnClick();
   }

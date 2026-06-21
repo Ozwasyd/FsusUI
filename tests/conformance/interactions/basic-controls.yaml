@@ -35,6 +35,44 @@ scenarios:
           { variant: primary, group: [Previous, Next], disabledIndexes: [1] }
       - pointerover
       - assert: { finalState: grouped, noOverlap: shared-border-radius }
+  - id: icon-only-action-accessible-name
+    component: icon-button
+    steps:
+      - render: { icon: search, accessibleName: Search, variant: text }
+      - focus
+      - keyboard: Enter
+      - assert: { emitted: press, accessibleName: Search, finalState: default }
+  - id: link-keyboard-activation
+    component: link
+    steps:
+      - render: { text: Docs, href: https://fsus.dev/docs }
+      - focus
+      - keyboard: Enter
+      - assert: { emitted: press, focusTarget: link }
+  - id: disabled-link-blocks-activation
+    component: link
+    steps:
+      - render: { text: Disabled docs, disabled: true }
+      - focus
+      - keyboard: Space
+      - assert: { emitted: none, finalState: disabled }
+  - id: icon-text-link-focus-order
+    component: link
+    steps:
+      - render: { row: [iconButton, link], accessibleName: Open details }
+      - focus
+      - keyboard: Tab
+      - assert: { focusTarget: link, finalState: focus-visible }
+  - id: text-truncation-ellipsis
+    component: text
+    steps:
+      - render: { text: Long operational label, truncated: true }
+      - assert: { finalState: truncated, noOverlap: text-ellipsis }
+  - id: text-variants-baseline
+    component: text
+    steps:
+      - render: { variants: [body, muted, strong, title, monospace] }
+      - assert: { finalState: variants, noOverlap: baseline-grid }
   - id: text-input-focus
     component: input
     steps:

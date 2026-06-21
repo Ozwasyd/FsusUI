@@ -150,6 +150,27 @@
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/icon-button-search.json"
     },
     {
+      "id": "link-release-notes",
+      "component": "link",
+      "platform": "avalonia",
+      "control": "FsusLink",
+      "evidenceSource": "avalonia-headless",
+      "role": "link",
+      "accessibleName": "Open release notes",
+      "value": null,
+      "states": {
+        "disabled": false,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["Enter", "Space"],
+      "keyboardOperable": true,
+      "tabOrder": 8,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/link-release-notes.json"
+    },
+    {
       "id": "alert-live-region",
       "component": "live-region",
       "platform": "avalonia",
@@ -167,7 +188,7 @@
       },
       "keyboard": ["Escape"],
       "keyboardOperable": true,
-      "tabOrder": 8,
+      "tabOrder": 9,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/alert-live-region.json"
     }
   ],

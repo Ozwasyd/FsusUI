@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "tests/conformance/accessibility/contracts.json",
-      "sha256": "1a71f5bd36fe8d8b354d7d423d67afe57e54f35e97223392f3fd203b77b01e19"
+      "sha256": "695b80f19c7db20bf6c920ac5b273b4c9c5d9a87867cc6826016ef6da5b16c55"
     },
     {
       "path": "tests/conformance/accessibility/automation-snapshots.json",
-      "sha256": "4863ab6c46d0583047454177530f009e31febd168693eeeed3747a6caa8dbe26"
+      "sha256": "6c7bd50c3e93199dfe98c2ccf776808d05d0345c4929c470eb7e99a731b8f35c"
     }
   ],
   "requiredContractFields": [
@@ -23,9 +23,9 @@
     "keyboardNavigation"
   ],
   "summary": {
-    "controls": 8,
-    "snapshots": 8,
-    "passed": 8,
+    "controls": 9,
+    "snapshots": 9,
+    "passed": 9,
     "appiumReleaseGates": 2,
     "allowedByOverride": 0
   },
@@ -203,6 +203,28 @@
       "errors": []
     },
     {
+      "id": "link-release-notes",
+      "component": "link",
+      "platform": "avalonia",
+      "role": "link",
+      "accessibleName": "Open release notes",
+      "value": null,
+      "states": {
+        "disabled": false,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["Enter", "Space"],
+      "tabOrder": 8,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/link-release-notes.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
       "id": "alert-live-region",
       "component": "live-region",
       "platform": "avalonia",
@@ -217,7 +239,7 @@
         "invalid": null
       },
       "keyboard": ["Escape"],
-      "tabOrder": 8,
+      "tabOrder": 9,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/alert-live-region.json",
       "allowedByOverride": [],

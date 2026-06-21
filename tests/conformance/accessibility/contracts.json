@@ -111,6 +111,20 @@
       "keyboardNavigation": ["Enter", "Space"]
     },
     {
+      "id": "link",
+      "publicName": "FsusLink",
+      "role": "link",
+      "accessibleName": "required",
+      "value": "not-applicable",
+      "disabledState": "required",
+      "selectedState": "not-applicable",
+      "checkedState": "not-applicable",
+      "expandedState": "not-applicable",
+      "invalidState": "not-applicable",
+      "expectedStates": { "disabled": false },
+      "keyboardNavigation": ["Enter", "Space"]
+    },
+    {
       "id": "live-region",
       "publicName": "FsusAlert",
       "role": "alert",

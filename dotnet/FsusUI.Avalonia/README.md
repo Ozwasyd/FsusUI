@@ -19,6 +19,26 @@ until loading clears.
 deterministic first/middle/last membership classes, collapsed borders, and
 disabled-state propagation that restores each child to its prior enabled state.
 
+`FsusIconButton` is the icon-only action surface. It inherits command,
+disabled/loading, and routed `Activated` behavior from `FsusButton`, applies the
+icon-only placement classes, and requires `AccessibleName` unless
+`IsDecorativeIcon` is set.
+
+## Icon, Text, and Link Controls
+
+`FsusIcon` renders an Avalonia `Geometry` through the existing stable icon
+resources. Set `IconKey` to the generated resource key and optionally bind
+`Data` from `FsusUI.Avalonia.Icons`. Decorative icons default to raw automation
+view; semantic icons must set `AccessibleName` and `IsDecorative=false`.
+
+`FsusText` is the stable text primitive for body, muted, strong, title, and
+monospace variants. `IsTruncated` applies single-line ellipsis behavior without
+changing the row height contract.
+
+`FsusLink` is a command-capable text action with `NavigateUri`, inherited
+`Activated` routing, disabled-state blocking, and automation naming from either
+`AccessibleName` or string content.
+
 ## Overlay Host
 
 `FsusOverlayHost` provides the shared host for stable overlay surfaces. It

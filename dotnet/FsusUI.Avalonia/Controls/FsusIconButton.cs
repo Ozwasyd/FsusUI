@@ -11,6 +11,8 @@ public class FsusIconButton : FsusButton
   public FsusIconButton()
   {
     FsusComponentClasses.SetBaseClasses(this, "fsus-icon-button");
+    IconPlacement = FsusButtonIconPlacement.IconOnly;
+    IsCircle = true;
     SyncAccessibility();
   }
 

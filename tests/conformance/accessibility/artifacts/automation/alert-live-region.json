@@ -19,7 +19,7 @@
     },
     "keyboard": ["Escape"],
     "keyboardOperable": true,
-    "tabOrder": 8,
+    "tabOrder": 9,
     "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/alert-live-region.json"
   }
 }

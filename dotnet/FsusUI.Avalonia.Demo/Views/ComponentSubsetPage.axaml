@@ -21,8 +21,33 @@
           </fsus:FsusButtonGroup>
           <fsus:FsusIconButton
             AccessibleName="Open command palette"
-            Variant="Text"
-            Content="⌘" />
+            Variant="Text">
+            <fsus:FsusIcon
+              Data="{StaticResource FsusIconSearch}"
+              IconKey="FsusIconSearch" />
+          </fsus:FsusIconButton>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <fsus:FsusIcon
+            AccessibleName="Warning"
+            Data="{StaticResource FsusIconWarning}"
+            IconKey="FsusIconWarning"
+            IsDecorative="False" />
+          <fsus:FsusText Variant="Strong">Semantic icon with text baseline</fsus:FsusText>
+          <fsus:FsusLink
+            AccessibleName="Open Avalonia parity guide"
+            NavigateUri="https://fsus.dev/avalonia">
+            Avalonia parity guide
+          </fsus:FsusLink>
+        </StackPanel>
+        <fsus:FsusText
+          MaxWidth="260"
+          IsTruncated="True"
+          Text="FsusText truncates long operational labels without changing row height." />
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <fsus:FsusText Variant="Muted">Muted</fsus:FsusText>
+          <fsus:FsusText Variant="Monospace">code-variant</fsus:FsusText>
+          <fsus:FsusText Variant="Title">Title</fsus:FsusText>
         </StackPanel>
       </StackPanel>
     </Border>

@@ -13,6 +13,12 @@ public class InteractionConformanceTests
     yield return new object[] { "disabled-button-blocks-keyboard", "button", new[] { "render", "focus", "keyboard", "assert" }, new[] { "emitted", "finalState" } };
     yield return new object[] { "icon-button-trailing-spacing", "button", new[] { "render", "focus", "keyboard", "assert" }, new[] { "emitted", "noOverlap" } };
     yield return new object[] { "grouped-button-borders", "button", new[] { "render", "pointerover", "assert" }, new[] { "finalState", "noOverlap" } };
+    yield return new object[] { "icon-only-action-accessible-name", "icon-button", new[] { "render", "focus", "keyboard", "assert" }, new[] { "accessibleName", "emitted", "finalState" } };
+    yield return new object[] { "link-keyboard-activation", "link", new[] { "render", "focus", "keyboard", "assert" }, new[] { "emitted", "focusTarget" } };
+    yield return new object[] { "disabled-link-blocks-activation", "link", new[] { "render", "focus", "keyboard", "assert" }, new[] { "emitted", "finalState" } };
+    yield return new object[] { "icon-text-link-focus-order", "link", new[] { "render", "focus", "keyboard", "assert" }, new[] { "finalState", "focusTarget" } };
+    yield return new object[] { "text-truncation-ellipsis", "text", new[] { "render", "assert" }, new[] { "finalState", "noOverlap" } };
+    yield return new object[] { "text-variants-baseline", "text", new[] { "render", "assert" }, new[] { "finalState", "noOverlap" } };
     yield return new object[] { "text-input-focus", "input", new[] { "render", "focus", "keyboard", "assert" }, new[] { "finalState", "value" } };
     yield return new object[] { "checkbox-toggle", "checkbox", new[] { "render", "focus", "keyboard", "assert" }, new[] { "checked" } };
     yield return new object[] { "dialog-keyboard-containment", "dialog", new[] { "render", "focus", "keyboard", "keyboard", "assert" }, new[] { "finalState" } };

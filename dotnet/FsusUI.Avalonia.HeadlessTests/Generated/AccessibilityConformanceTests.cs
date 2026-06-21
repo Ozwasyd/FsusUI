@@ -15,7 +15,8 @@ public class AccessibilityConformanceTests
     yield return new object[] { "tabs-main", "tabs", "tablist", "Article sections", 3, 5 };
     yield return new object[] { "menu-main", "menu", "menu", "Main navigation", 3, 6 };
     yield return new object[] { "icon-button-search", "icon-button", "button", "Search", 2, 7 };
-    yield return new object[] { "alert-live-region", "live-region", "alert", "Upload complete", 1, 8 };
+    yield return new object[] { "link-release-notes", "link", "link", "Open release notes", 2, 8 };
+    yield return new object[] { "alert-live-region", "live-region", "alert", "Upload complete", 1, 9 };
   }
 
   [Theory]

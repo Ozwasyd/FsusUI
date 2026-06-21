@@ -50,6 +50,7 @@ Unknown enum values fall back to light, default density, and system motion.
 The package includes baseline styles for:
 
 - `Button`, `FsusButton`, `FsusIconButton`, and `FsusButtonGroup`
+- `FsusIcon`, `FsusText`, and `FsusLink`
 - `TextBox`
 - `CheckBox`
 - `RadioButton`
