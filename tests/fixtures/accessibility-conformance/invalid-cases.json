@@ -1,0 +1,58 @@
+{
+  "cases": [
+    {
+      "name": "missing accessible name",
+      "expectedError": "missing accessible name",
+      "mutation": {
+        "snapshotId": "button-primary",
+        "path": "accessibleName",
+        "value": ""
+      }
+    },
+    {
+      "name": "wrong role",
+      "expectedError": "wrong role",
+      "mutation": {
+        "snapshotId": "input-invalid",
+        "path": "role",
+        "value": "button"
+      }
+    },
+    {
+      "name": "wrong checked state",
+      "expectedError": "wrong state checked",
+      "mutation": {
+        "snapshotId": "checkbox-accept",
+        "path": "states.checked",
+        "value": false
+      }
+    },
+    {
+      "name": "broken tab order",
+      "expectedError": "broken tab order",
+      "mutation": {
+        "snapshotId": "dialog-confirm",
+        "path": "tabOrder",
+        "value": 2
+      }
+    },
+    {
+      "name": "non keyboard operable",
+      "expectedError": "non-keyboard-operable control",
+      "mutation": {
+        "snapshotId": "menu-main",
+        "path": "keyboardOperable",
+        "value": false
+      }
+    },
+    {
+      "name": "unregistered accessibility override",
+      "expectedError": "unregistered accessibility override",
+      "mutation": {
+        "snapshotId": "icon-button-search",
+        "path": "overrideId",
+        "value": "missing-a11y-override"
+      }
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "button-primary",
+    "component": "button",
+    "platform": "avalonia",
+    "control": "FsusButton",
+    "evidenceSource": "avalonia-headless",
+    "role": "button",
+    "accessibleName": "Save changes",
+    "value": null,
+    "states": {
+      "disabled": false,
+      "selected": null,
+      "checked": null,
+      "expanded": null,
+      "invalid": null
+    },
+    "keyboard": ["Enter", "Space"],
+    "keyboardOperable": true,
+    "tabOrder": 1,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/button-primary.json"
+  }
+}

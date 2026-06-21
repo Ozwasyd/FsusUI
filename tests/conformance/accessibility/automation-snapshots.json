@@ -1,0 +1,192 @@
+{
+  "schemaVersion": 1,
+  "snapshots": [
+    {
+      "id": "button-primary",
+      "component": "button",
+      "platform": "avalonia",
+      "control": "FsusButton",
+      "evidenceSource": "avalonia-headless",
+      "role": "button",
+      "accessibleName": "Save changes",
+      "value": null,
+      "states": {
+        "disabled": false,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["Enter", "Space"],
+      "keyboardOperable": true,
+      "tabOrder": 1,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/button-primary.json"
+    },
+    {
+      "id": "input-invalid",
+      "component": "input",
+      "platform": "avalonia",
+      "control": "FsusInput",
+      "evidenceSource": "avalonia-headless",
+      "role": "text-input",
+      "accessibleName": "Search articles",
+      "value": "draft",
+      "states": {
+        "disabled": false,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": true
+      },
+      "keyboard": ["Tab", "Escape"],
+      "keyboardOperable": true,
+      "tabOrder": 2,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/input-invalid.json"
+    },
+    {
+      "id": "checkbox-accept",
+      "component": "checkbox",
+      "platform": "avalonia",
+      "control": "FsusCheckbox",
+      "evidenceSource": "avalonia-headless",
+      "role": "checkbox",
+      "accessibleName": "Accept terms",
+      "value": null,
+      "states": {
+        "disabled": false,
+        "selected": null,
+        "checked": true,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["Space"],
+      "keyboardOperable": true,
+      "tabOrder": 3,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/checkbox-accept.json"
+    },
+    {
+      "id": "dialog-confirm",
+      "component": "dialog",
+      "platform": "avalonia",
+      "control": "FsusDialog",
+      "evidenceSource": "avalonia-headless",
+      "role": "dialog",
+      "accessibleName": "Confirm publish",
+      "value": null,
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["Tab", "Escape"],
+      "keyboardOperable": true,
+      "tabOrder": 4,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/dialog-confirm.json"
+    },
+    {
+      "id": "tabs-main",
+      "component": "tabs",
+      "platform": "avalonia",
+      "control": "FsusTabs",
+      "evidenceSource": "avalonia-headless",
+      "role": "tablist",
+      "accessibleName": "Article sections",
+      "value": null,
+      "states": {
+        "disabled": null,
+        "selected": true,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["ArrowRight", "Home", "End"],
+      "keyboardOperable": true,
+      "tabOrder": 5,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/tabs-main.json"
+    },
+    {
+      "id": "menu-main",
+      "component": "menu",
+      "platform": "avalonia",
+      "control": "FsusMenu",
+      "evidenceSource": "avalonia-headless",
+      "role": "menu",
+      "accessibleName": "Main navigation",
+      "value": null,
+      "states": {
+        "disabled": null,
+        "selected": true,
+        "checked": null,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["ArrowDown", "Enter", "Escape"],
+      "keyboardOperable": true,
+      "tabOrder": 6,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/menu-main.json"
+    },
+    {
+      "id": "icon-button-search",
+      "component": "icon-button",
+      "platform": "avalonia",
+      "control": "FsusIconButton",
+      "evidenceSource": "avalonia-headless",
+      "overrideId": "accessibility-automation-name-001",
+      "role": "button",
+      "accessibleName": "Search",
+      "value": null,
+      "states": {
+        "disabled": false,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["Enter", "Space"],
+      "keyboardOperable": true,
+      "tabOrder": 7,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/icon-button-search.json"
+    },
+    {
+      "id": "alert-live-region",
+      "component": "live-region",
+      "platform": "avalonia",
+      "control": "FsusAlert",
+      "evidenceSource": "avalonia-headless",
+      "role": "alert",
+      "accessibleName": "Upload complete",
+      "value": "Upload complete",
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["Escape"],
+      "keyboardOperable": true,
+      "tabOrder": 8,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/alert-live-region.json"
+    }
+  ],
+  "appiumReleaseGates": [
+    {
+      "id": "windows-real-window-accessibility",
+      "platform": "windows",
+      "runner": "appium",
+      "status": "configured",
+      "command": "pnpm run conformance:a11y -- --platform windows",
+      "artifact": "tests/conformance/accessibility/artifacts/appium/windows-release-gate.json"
+    },
+    {
+      "id": "macos-real-window-accessibility",
+      "platform": "macos",
+      "runner": "appium",
+      "status": "configured",
+      "command": "pnpm run conformance:a11y -- --platform macos",
+      "artifact": "tests/conformance/accessibility/artifacts/appium/macos-release-gate.json"
+    }
+  ]
+}

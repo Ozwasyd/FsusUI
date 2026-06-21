@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "menu-main",
+    "component": "menu",
+    "platform": "avalonia",
+    "control": "FsusMenu",
+    "evidenceSource": "avalonia-headless",
+    "role": "menu",
+    "accessibleName": "Main navigation",
+    "value": null,
+    "states": {
+      "disabled": null,
+      "selected": true,
+      "checked": null,
+      "expanded": true,
+      "invalid": null
+    },
+    "keyboard": ["ArrowDown", "Enter", "Escape"],
+    "keyboardOperable": true,
+    "tabOrder": 6,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/menu-main.json"
+  }
+}

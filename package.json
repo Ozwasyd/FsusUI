@@ -84,6 +84,8 @@
     "interactions:check": "node ./scripts/with-node-heap.mjs node ./scripts/interaction-conformance.mjs check",
     "visual:generate": "node ./scripts/with-node-heap.mjs node ./scripts/visual-conformance.mjs generate",
     "visual:check": "node ./scripts/with-node-heap.mjs node ./scripts/visual-conformance.mjs check",
+    "a11y:generate": "node ./scripts/with-node-heap.mjs node ./scripts/accessibility-conformance.mjs generate",
+    "a11y:check": "node ./scripts/with-node-heap.mjs node ./scripts/accessibility-conformance.mjs check",
     "conformance:interactions": "node ./scripts/with-node-heap.mjs node ./scripts/check-conformance.mjs interactions",
     "conformance:visual": "node ./scripts/with-node-heap.mjs node ./scripts/check-conformance.mjs visual",
     "conformance:a11y": "node ./scripts/with-node-heap.mjs node ./scripts/check-conformance.mjs a11y",

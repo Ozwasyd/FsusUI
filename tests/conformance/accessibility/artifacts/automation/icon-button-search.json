@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "icon-button-search",
+    "component": "icon-button",
+    "platform": "avalonia",
+    "control": "FsusIconButton",
+    "evidenceSource": "avalonia-headless",
+    "overrideId": "accessibility-automation-name-001",
+    "role": "button",
+    "accessibleName": "Search",
+    "value": null,
+    "states": {
+      "disabled": false,
+      "selected": null,
+      "checked": null,
+      "expanded": null,
+      "invalid": null
+    },
+    "keyboard": ["Enter", "Space"],
+    "keyboardOperable": true,
+    "tabOrder": 7,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/icon-button-search.json"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "gate": {
+    "id": "windows-real-window-accessibility",
+    "platform": "windows",
+    "runner": "appium",
+    "status": "configured",
+    "command": "pnpm run conformance:a11y -- --platform windows",
+    "artifact": "tests/conformance/accessibility/artifacts/appium/windows-release-gate.json"
+  },
+  "requiredForStableRelease": true
+}

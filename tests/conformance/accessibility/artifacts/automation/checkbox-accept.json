@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "checkbox-accept",
+    "component": "checkbox",
+    "platform": "avalonia",
+    "control": "FsusCheckbox",
+    "evidenceSource": "avalonia-headless",
+    "role": "checkbox",
+    "accessibleName": "Accept terms",
+    "value": null,
+    "states": {
+      "disabled": false,
+      "selected": null,
+      "checked": true,
+      "expanded": null,
+      "invalid": null
+    },
+    "keyboard": ["Space"],
+    "keyboardOperable": true,
+    "tabOrder": 3,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/checkbox-accept.json"
+  }
+}

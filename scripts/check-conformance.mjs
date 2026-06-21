@@ -217,6 +217,14 @@ const checkVisual = () => {
 }
 
 const checkA11y = () => {
+  execFileSync(
+    process.execPath,
+    ['scripts/accessibility-conformance.mjs', 'check'],
+    {
+      cwd: root,
+      stdio: 'inherit',
+    },
+  )
   const file = 'tests/conformance/accessibility/first-subset.md'
   const content = read(file)
   for (const component of [

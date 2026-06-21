@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "gate": {
+    "id": "macos-real-window-accessibility",
+    "platform": "macos",
+    "runner": "appium",
+    "status": "configured",
+    "command": "pnpm run conformance:a11y -- --platform macos",
+    "artifact": "tests/conformance/accessibility/artifacts/appium/macos-release-gate.json"
+  },
+  "requiredForStableRelease": true
+}

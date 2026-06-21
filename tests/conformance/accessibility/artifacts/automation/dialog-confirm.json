@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "dialog-confirm",
+    "component": "dialog",
+    "platform": "avalonia",
+    "control": "FsusDialog",
+    "evidenceSource": "avalonia-headless",
+    "role": "dialog",
+    "accessibleName": "Confirm publish",
+    "value": null,
+    "states": {
+      "disabled": null,
+      "selected": null,
+      "checked": null,
+      "expanded": true,
+      "invalid": null
+    },
+    "keyboard": ["Tab", "Escape"],
+    "keyboardOperable": true,
+    "tabOrder": 4,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/dialog-confirm.json"
+  }
+}

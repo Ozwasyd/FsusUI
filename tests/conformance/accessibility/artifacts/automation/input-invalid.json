@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "input-invalid",
+    "component": "input",
+    "platform": "avalonia",
+    "control": "FsusInput",
+    "evidenceSource": "avalonia-headless",
+    "role": "text-input",
+    "accessibleName": "Search articles",
+    "value": "draft",
+    "states": {
+      "disabled": false,
+      "selected": null,
+      "checked": null,
+      "expanded": null,
+      "invalid": true
+    },
+    "keyboard": ["Tab", "Escape"],
+    "keyboardOperable": true,
+    "tabOrder": 2,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/input-invalid.json"
+  }
+}
