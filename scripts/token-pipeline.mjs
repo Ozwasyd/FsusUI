@@ -73,6 +73,10 @@ const tokenSnapshotPath = path.join(
   root,
   'tests/fixtures/token-v2/output-snapshots.json',
 )
+const avaloniaTypeSnapshotPath = path.join(
+  root,
+  'tests/fixtures/token-v2/avalonia-type-snapshots.json',
+)
 
 const toPosix = (filePath) => filePath.split(path.sep).join('/')
 
@@ -332,6 +336,92 @@ const xmlEscape = (value) =>
 
 const cssEscape = (value) => String(value).replaceAll('\n', ' ')
 
+const csharpEscape = (value) =>
+  String(value).replaceAll('\\', '\\\\').replaceAll('"', '\\"')
+
+const numericValue = (value) => {
+  const number = Number(stripUnit(value))
+  if (!Number.isFinite(number)) {
+    throw new Error(`Cannot convert ${value} to an Avalonia numeric value`)
+  }
+  return String(number)
+}
+
+const csharpDoubleLiteral = (value) => `${numericValue(value)}d`
+
+const timeSpanText = (value) => {
+  const milliseconds = Number(String(value).replace(/ms$/, ''))
+  if (!Number.isFinite(milliseconds)) {
+    throw new Error(`Cannot convert ${value} to an Avalonia TimeSpan`)
+  }
+  const ticks = Math.round(milliseconds * 10_000)
+  const ticksPerSecond = 10_000_000
+  const ticksPerMinute = ticksPerSecond * 60
+  const ticksPerHour = ticksPerMinute * 60
+  const hours = Math.floor(ticks / ticksPerHour)
+  const minutes = Math.floor((ticks % ticksPerHour) / ticksPerMinute)
+  const seconds = Math.floor((ticks % ticksPerMinute) / ticksPerSecond)
+  const fraction = ticks % ticksPerSecond
+  const pad2 = (part) => String(part).padStart(2, '0')
+  return `${pad2(hours)}:${pad2(minutes)}:${pad2(seconds)}.${String(fraction).padStart(7, '0')}`
+}
+
+const parseEasing = (value) => {
+  const raw = String(value).trim()
+  if (raw === 'linear') return { type: 'linear' }
+  const match = /^cubic-bezier\(([^,]+),([^,]+),([^,]+),([^)]+)\)$/.exec(raw)
+  if (!match) {
+    throw new Error(`Unsupported Avalonia easing value ${value}`)
+  }
+  const points = match.slice(1).map((part) => {
+    const number = Number(part.trim())
+    if (!Number.isFinite(number)) {
+      throw new Error(`Unsupported Avalonia easing value ${value}`)
+    }
+    return String(number)
+  })
+  return {
+    type: 'spline',
+    x1: points[0],
+    y1: points[1],
+    x2: points[2],
+    y2: points[3],
+  }
+}
+
+const avaloniaResourceKindForToken = (token) => {
+  const category = token.name.split('.')[0]
+  const lowerName = token.name.toLowerCase()
+
+  if (token.type === 'color') return 'color'
+  if (token.type === 'brush') return 'brush'
+  if (token.type === 'duration') return 'timeSpan'
+  if (token.type === 'easing') return 'easing'
+  if (token.type === 'fontFamily') return 'fontFamily'
+  if (token.type === 'fontWeight') return 'fontWeight'
+  if (token.type === 'shadow') return 'boxShadows'
+  if (token.type === 'zIndex') return 'int'
+  if (token.type === 'radius' || lowerName.includes('radius'))
+    return 'cornerRadius'
+  if (
+    token.type === 'thickness' ||
+    category === 'space' ||
+    category === 'border' ||
+    lowerName.includes('padding') ||
+    lowerName.includes('margin')
+  ) {
+    return 'thickness'
+  }
+  if (
+    token.type === 'dimension' ||
+    token.type === 'number' ||
+    token.type === 'opacity'
+  ) {
+    return 'double'
+  }
+  return 'string'
+}
+
 const renderCss = (source, tokenMap) => {
   const lines = [
     `/* ${generatedHeader} */`,
@@ -438,39 +528,74 @@ const renderAvaloniaXaml = (source, tokenMap) => {
   for (const token of source.tokens) {
     const key = pascalName(token.name)
     const value = xmlEscape(resolveValue(token, tokenMap))
-    const category = token.name.split('.')[0]
+    const kind = avaloniaResourceKindForToken(token)
 
-    if (token.type === 'color') {
+    if (kind === 'color') {
       lines.push(`  <Color x:Key="${key}">${value}</Color>`)
       lines.push(`  <SolidColorBrush x:Key="${key}Brush" Color="${value}" />`)
       continue
     }
 
-    if (token.type === 'brush') {
+    if (kind === 'brush') {
       lines.push(`  <SolidColorBrush x:Key="${key}" Color="${value}" />`)
       continue
     }
 
-    if (category === 'radius') {
+    if (kind === 'cornerRadius') {
       lines.push(
         `  <CornerRadius x:Key="${key}">${stripUnit(value)}</CornerRadius>`,
       )
       continue
     }
 
-    if (category === 'space') {
+    if (kind === 'thickness') {
       lines.push(`  <Thickness x:Key="${key}">${stripUnit(value)}</Thickness>`)
       continue
     }
 
-    if (
-      token.type === 'dimension' ||
-      token.type === 'number' ||
-      token.type === 'opacity' ||
-      token.type === 'zIndex' ||
-      token.type === 'fontWeight'
-    ) {
+    if (kind === 'fontFamily') {
+      lines.push(`  <FontFamily x:Key="${key}">${value}</FontFamily>`)
+      continue
+    }
+
+    if (kind === 'fontWeight') {
+      lines.push(
+        `  <FontWeight x:Key="${key}">${numericValue(value)}</FontWeight>`,
+      )
+      continue
+    }
+
+    if (kind === 'timeSpan') {
+      lines.push(
+        `  <x:TimeSpan x:Key="${key}">${timeSpanText(value)}</x:TimeSpan>`,
+      )
+      continue
+    }
+
+    if (kind === 'easing') {
+      const easing = parseEasing(value)
+      if (easing.type === 'linear') {
+        lines.push(`  <LinearEasing x:Key="${key}" />`)
+      } else {
+        lines.push(
+          `  <SplineEasing x:Key="${key}" X1="${easing.x1}" Y1="${easing.y1}" X2="${easing.x2}" Y2="${easing.y2}" />`,
+        )
+      }
+      continue
+    }
+
+    if (kind === 'boxShadows') {
+      lines.push(`  <BoxShadows x:Key="${key}">${value}</BoxShadows>`)
+      continue
+    }
+
+    if (kind === 'double') {
       lines.push(`  <x:Double x:Key="${key}">${stripUnit(value)}</x:Double>`)
+      continue
+    }
+
+    if (kind === 'int') {
+      lines.push(`  <x:Int32 x:Key="${key}">${numericValue(value)}</x:Int32>`)
       continue
     }
 
@@ -481,23 +606,125 @@ const renderAvaloniaXaml = (source, tokenMap) => {
   return lines.join('\n')
 }
 
+const renderCsharpAccessorLines = (token, tokenMap) => {
+  const name = csharpName(token.name)
+  const value = resolveValue(token, tokenMap)
+  const kind = avaloniaResourceKindForToken(token)
+  const escapedValue = csharpEscape(value)
+
+  if (kind === 'color') {
+    return [
+      `    public const string ${name}BrushResourceKey = "${pascalName(token.name)}Brush";`,
+      `    public static Color ${name}Color => Color.Parse(${name}Value);`,
+      `    public static SolidColorBrush ${name}Brush => new(${name}Color);`,
+    ]
+  }
+
+  if (kind === 'brush') {
+    return [
+      `    public static SolidColorBrush ${name}Brush => new(Color.Parse(${name}Value));`,
+    ]
+  }
+
+  if (kind === 'thickness') {
+    return [
+      `    public static Thickness ${name}Thickness => new(${csharpDoubleLiteral(value)});`,
+    ]
+  }
+
+  if (kind === 'cornerRadius') {
+    return [
+      `    public static CornerRadius ${name}CornerRadius => new(${csharpDoubleLiteral(value)});`,
+    ]
+  }
+
+  if (kind === 'fontFamily') {
+    return [
+      `    public static FontFamily ${name}FontFamily => FontFamily.Parse(${name}Value);`,
+    ]
+  }
+
+  if (kind === 'fontWeight') {
+    return [
+      `    public static FontWeight ${name}FontWeight => (FontWeight)${numericValue(value)};`,
+    ]
+  }
+
+  if (kind === 'timeSpan') {
+    return [
+      `    public static TimeSpan ${name}TimeSpan => TimeSpan.FromMilliseconds(${csharpDoubleLiteral(value)});`,
+    ]
+  }
+
+  if (kind === 'easing') {
+    const easing = parseEasing(value)
+    if (easing.type === 'linear') {
+      return [`    public static IEasing ${name}Easing => new LinearEasing();`]
+    }
+    return [
+      `    public static IEasing ${name}Easing => new SplineEasing { X1 = ${easing.x1}d, Y1 = ${easing.y1}d, X2 = ${easing.x2}d, Y2 = ${easing.y2}d };`,
+    ]
+  }
+
+  if (kind === 'boxShadows') {
+    if (String(value).trim() === 'none') {
+      return [`    public static BoxShadows ${name}BoxShadows => default;`]
+    }
+    return [
+      `    public static BoxShadows ${name}BoxShadows => BoxShadows.Parse("${escapedValue}");`,
+    ]
+  }
+
+  if (kind === 'double') {
+    return [
+      `    public static double ${name}Double => ${csharpDoubleLiteral(value)};`,
+    ]
+  }
+
+  if (kind === 'int') {
+    return [`    public static int ${name}Int32 => ${numericValue(value)};`]
+  }
+
+  return []
+}
+
 const renderCsharp = (source, tokenMap) => {
   const lines = [
     '// <auto-generated />',
     `// ${generatedHeader}`,
+    'using System;',
+    'using Avalonia;',
+    'using Avalonia.Animation.Easings;',
+    'using Avalonia.Controls;',
+    'using Avalonia.Media;',
+    '',
     'namespace FsusUI.Avalonia;',
     '',
     'public static class FsusTokens',
     '{',
+    '    public static T GetResource<T>(IResourceHost host, string resourceKey)',
+    '    {',
+    '        ArgumentNullException.ThrowIfNull(host);',
+    '        ArgumentException.ThrowIfNullOrWhiteSpace(resourceKey);',
+    '',
+    '        if (host.TryGetResource(resourceKey, out var resource) && resource is T typed)',
+    '            return typed;',
+    '',
+    '        var actualType = resource?.GetType().FullName ?? "missing";',
+    '        throw new InvalidOperationException(',
+    '            $"Resource \'{resourceKey}\' was {actualType}, expected {typeof(T).FullName}.");',
+    '    }',
+    '',
   ]
 
   for (const token of source.tokens) {
     const name = csharpName(token.name)
     const resourceKey = pascalName(token.name)
-    const value = resolveValue(token, tokenMap).replaceAll('"', '\\"')
+    const value = csharpEscape(resolveValue(token, tokenMap))
     lines.push(`    public const string ${name}Name = "${token.name}";`)
     lines.push(`    public const string ${name}ResourceKey = "${resourceKey}";`)
     lines.push(`    public const string ${name}Value = "${value}";`)
+    lines.push(...renderCsharpAccessorLines(token, tokenMap))
     lines.push('')
   }
 
@@ -696,6 +923,68 @@ const lintOutputSnapshots = () => {
   }
 }
 
+const lintAvaloniaTypeSnapshots = (source) => {
+  const snapshots = JSON.parse(
+    fs.readFileSync(avaloniaTypeSnapshotPath, 'utf8'),
+  )
+  const tokenMap = getTokenMap(source.tokens)
+  const files = renderAll()
+  const generatedXaml = files[outputPaths.avaloniaXaml]
+  const generatedCsharp = files[outputPaths.csharp]
+  const sourceTokens = new Map(
+    source.tokens.map((token) => [token.name, token]),
+  )
+  const failures = []
+
+  if (!generatedCsharp.includes('public static T GetResource<T>(')) {
+    failures.push('C# output is missing the typed GetResource<T> helper')
+  }
+
+  for (const [snapshotName, snapshot] of Object.entries(snapshots)) {
+    const token = sourceTokens.get(snapshot.token)
+    if (!token) {
+      failures.push(
+        `${snapshotName} references missing token ${snapshot.token}`,
+      )
+      continue
+    }
+
+    const actualKind = avaloniaResourceKindForToken(token)
+    if (actualKind !== snapshot.kind) {
+      failures.push(
+        `${snapshot.token} expected Avalonia kind ${snapshot.kind} but resolved ${actualKind}`,
+      )
+    }
+
+    for (const expected of snapshot.xaml ?? []) {
+      if (!generatedXaml.includes(expected)) {
+        failures.push(`${snapshot.token} XAML snapshot is missing ${expected}`)
+      }
+    }
+    for (const expected of snapshot.csharp ?? []) {
+      if (!generatedCsharp.includes(expected)) {
+        failures.push(`${snapshot.token} C# snapshot is missing ${expected}`)
+      }
+    }
+
+    const key = pascalName(token.name)
+    if (
+      actualKind !== 'string' &&
+      generatedXaml.includes(`<x:String x:Key="${key}"`)
+    ) {
+      failures.push(`${snapshot.token} still emits a string-only XAML resource`)
+    }
+
+    resolveValue(token, tokenMap)
+  }
+
+  if (failures.length) {
+    throw new Error(
+      `Avalonia typed token snapshots failed:\n${failures.join('\n')}`,
+    )
+  }
+}
+
 const lintStableComponentHardcoding = () => {
   const scanRoots = [
     'dotnet/FsusUI.Avalonia/Controls',
@@ -737,6 +1026,7 @@ const lint = () => {
   lintGeneratedHeaders()
   lintTokenFixtures()
   lintOutputSnapshots()
+  lintAvaloniaTypeSnapshots(source)
   lintStableComponentHardcoding()
   console.log('Token source and generated artifact metadata are valid.')
 }

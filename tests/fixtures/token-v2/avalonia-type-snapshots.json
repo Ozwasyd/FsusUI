@@ -1,0 +1,84 @@
+{
+  "color": {
+    "token": "color.action.primary",
+    "kind": "color",
+    "xaml": [
+      "<Color x:Key=\"FsusColorActionPrimary\">#2A599C</Color>",
+      "<SolidColorBrush x:Key=\"FsusColorActionPrimaryBrush\" Color=\"#2A599C\" />"
+    ],
+    "csharp": [
+      "public static Color ColorActionPrimaryColor",
+      "public static SolidColorBrush ColorActionPrimaryBrush"
+    ]
+  },
+  "brush": {
+    "token": "brush.surface.base",
+    "kind": "brush",
+    "xaml": [
+      "<SolidColorBrush x:Key=\"FsusBrushSurfaceBase\" Color=\"#FFFFFF\" />"
+    ],
+    "csharp": ["public static SolidColorBrush BrushSurfaceBaseBrush"]
+  },
+  "thickness": {
+    "token": "thickness.border.default",
+    "kind": "thickness",
+    "xaml": ["<Thickness x:Key=\"FsusThicknessBorderDefault\">1</Thickness>"],
+    "csharp": ["public static Thickness ThicknessBorderDefaultThickness"]
+  },
+  "cornerRadius": {
+    "token": "radius.control.md",
+    "kind": "cornerRadius",
+    "xaml": ["<CornerRadius x:Key=\"FsusRadiusControlMd\">6</CornerRadius>"],
+    "csharp": ["public static CornerRadius RadiusControlMdCornerRadius"]
+  },
+  "fontFamily": {
+    "token": "typography.family.body",
+    "kind": "fontFamily",
+    "xaml": [
+      "<FontFamily x:Key=\"FsusTypographyFamilyBody\">Inter, ui-sans-serif, system-ui, sans-serif</FontFamily>"
+    ],
+    "csharp": ["public static FontFamily TypographyFamilyBodyFontFamily"]
+  },
+  "fontWeight": {
+    "token": "typography.body.md.weight",
+    "kind": "fontWeight",
+    "xaml": [
+      "<FontWeight x:Key=\"FsusTypographyBodyMdWeight\">400</FontWeight>"
+    ],
+    "csharp": ["public static FontWeight TypographyBodyMdWeightFontWeight"]
+  },
+  "timeSpan": {
+    "token": "motion.duration.control",
+    "kind": "timeSpan",
+    "xaml": [
+      "<x:TimeSpan x:Key=\"FsusMotionDurationControl\">00:00:00.2200000</x:TimeSpan>"
+    ],
+    "csharp": ["public static TimeSpan MotionDurationControlTimeSpan"]
+  },
+  "easing": {
+    "token": "motion.easing.standard",
+    "kind": "easing",
+    "xaml": [
+      "<SplineEasing x:Key=\"FsusMotionEasingStandard\" X1=\"0.4\" Y1=\"0\" X2=\"0.2\" Y2=\"1\" />"
+    ],
+    "csharp": ["public static IEasing MotionEasingStandardEasing"]
+  },
+  "boxShadows": {
+    "token": "shadow.overlay.md",
+    "kind": "boxShadows",
+    "xaml": ["<BoxShadows x:Key=\"FsusShadowOverlayMd\">none</BoxShadows>"],
+    "csharp": ["public static BoxShadows ShadowOverlayMdBoxShadows"]
+  },
+  "double": {
+    "token": "opacity.disabled.content",
+    "kind": "double",
+    "xaml": ["<x:Double x:Key=\"FsusOpacityDisabledContent\">0.46</x:Double>"],
+    "csharp": ["public static double OpacityDisabledContentDouble"]
+  },
+  "int": {
+    "token": "z.overlay.dialog",
+    "kind": "int",
+    "xaml": ["<x:Int32 x:Key=\"FsusZOverlayDialog\">2000</x:Int32>"],
+    "csharp": ["public static int ZOverlayDialogInt32"]
+  }
+}

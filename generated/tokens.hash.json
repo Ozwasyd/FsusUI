@@ -7,8 +7,8 @@
     "packages/theme-chalk/src/generated/tokens.css": "abaaba36050cb059f37ae892d305c677c126b43e77ff2be5e7d30770a700cb7b",
     "packages/theme-chalk/src/generated/tokens.scss": "5cb685da76f8c2c3db0adb05087c6b59811c57d0858cfb7e31d98a31685e8f0d",
     "packages/theme-chalk/src/generated/tokens.json": "00781c08ec9579464e66f79f375f08e4fe8a68f532ecdedc0e8133b4f6e42be8",
-    "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml": "e1b46a57c29332b482f8b9da77f2dc827559b6b441a9c4f95a35d7b3bedf7221",
-    "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs": "7cf07f4c6db2dba6fff7df65d8775bcb32707a3f6a368cc5341a984e67d66dd1",
+    "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml": "22769223716f6305cca0bfb8a5df7f842e78819da1c865f2506807ea7a859c30",
+    "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs": "6bdc2bfcd510a57bab0bc2cb6fa4a075f3471ec80a8d53a087a5df0f89e0b119",
     "docs/theme/generated/tokens.md": "f2e5a8820a6384593f5cf299d5b1f81bcd16e537b93886ab95f11c11197132f8"
   }
 }
