@@ -1,0 +1,32 @@
+version: 1
+platform: avalonia
+scenarios:
+  - id: avalonia-overlay-nested-modal-stack
+    component: dialog
+    contract: docs/avalonia/overlay-host.md
+    steps:
+      - render: { host: FsusOverlayHost, overlays: [dialog, popover] }
+      - assert: { zOrder: deterministic, modalStack: [dialog, popover] }
+  - id: avalonia-overlay-keyboard-focus-containment
+    component: dialog
+    contract: docs/avalonia/overlay-host.md
+    steps:
+      - render: { focusScope: [primary, cancel], restoreFocusTo: trigger }
+      - keyboard: Tab
+      - keyboard: Escape
+      - assert: { finalState: closed, restoredFocus: trigger }
+  - id: avalonia-overlay-pointer-cancellation
+    component: popover
+    contract: docs/avalonia/overlay-host.md
+    steps:
+      - render: { closeOnPointerOutside: true, closing: cancellable }
+      - pointer: outside
+      - assert: { finalState: open }
+      - pointer: outside
+      - assert: { finalState: closed }
+  - id: avalonia-overlay-boundary-placement
+    component: dropdown
+    contract: docs/avalonia/overlay-host.md
+    steps:
+      - render: { anchor: bottom-edge, viewport: constrained }
+      - assert: { placement: top-start, dpiAware: true }

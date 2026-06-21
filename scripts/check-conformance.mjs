@@ -130,9 +130,12 @@ const checkInteractions = () => {
   const webFile = 'tests/conformance/interactions/web-first-subset.yaml'
   const avaloniaMotionFile =
     'tests/conformance/interactions/avalonia-motion.yaml'
+  const avaloniaOverlayFile =
+    'tests/conformance/interactions/avalonia-overlay.yaml'
   const traces = read(file)
   const webTraces = read(webFile)
   const avaloniaMotionTraces = read(avaloniaMotionFile)
+  const avaloniaOverlayTraces = read(avaloniaOverlayFile)
   for (const component of interactionComponents) {
     assertIncludes(traces, `component: ${component}`, file)
   }
@@ -146,6 +149,14 @@ const checkInteractions = () => {
   assertIncludes(webTraces, 'web-table-actions-motion-safe', webFile)
   for (const term of ['reduced', 'disabled', 'terminal', 'focusTarget']) {
     assertIncludes(avaloniaMotionTraces, term, avaloniaMotionFile)
+  }
+  for (const term of [
+    'modalStack',
+    'restoredFocus',
+    'cancellable',
+    'dpiAware',
+  ]) {
+    assertIncludes(avaloniaOverlayTraces, term, avaloniaOverlayFile)
   }
   console.log('conformance:interactions passed')
 }
