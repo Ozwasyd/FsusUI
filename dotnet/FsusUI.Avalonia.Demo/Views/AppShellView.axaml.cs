@@ -1,13 +1,14 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Media;
-using Avalonia.Styling;
+using FsusUI.Avalonia.Themes;
 
 namespace FsusUI.Avalonia.Demo.Views;
 
 public partial class AppShellView : UserControl
 {
   private readonly Dictionary<string, (string Title, Func<Control> Factory)> pages;
+  private readonly FsusThemeManager themeManager = new();
+  private FsusThemeOptions themeOptions = FsusThemeOptions.Default;
 
   public AppShellView()
   {
@@ -27,6 +28,7 @@ public partial class AppShellView : UserControl
     };
 
     ShowPage("dashboard");
+    ApplyThemeOptions();
   }
 
   private void Navigate(object? sender, global::Avalonia.Interactivity.RoutedEventArgs args)
@@ -51,54 +53,70 @@ public partial class AppShellView : UserControl
 
   private void ThemeChanged(object? sender, SelectionChangedEventArgs args)
   {
-    var dark = ThemeSelector.SelectedIndex == 1;
-    Application.Current!.RequestedThemeVariant = dark ? ThemeVariant.Dark : ThemeVariant.Light;
-    SetBrush("FsusThemeBackgroundBrush", dark ? "#111827" : "#FFFFFF");
-    SetBrush("FsusThemeSurfaceBrush", dark ? "#171F2C" : "#FFFFFF");
-    SetBrush("FsusThemeSurfaceRaisedBrush", dark ? "#1F2937" : "#F8FAFC");
-    SetBrush("FsusThemeTextBrush", dark ? "#F8FAFC" : "#111827");
-    SetBrush("FsusThemeMutedTextBrush", dark ? "#B6C0CF" : "#6B7280");
-    SetBrush("FsusThemeBorderBrush", dark ? "#394657" : "#D9DEE8");
-    SetBrush("FsusThemeFocusBrush", dark ? "#7EA6DA" : "#2A599C");
-    SetBrush("FsusThemeDangerBrush", dark ? "#F97066" : "#D92D20");
-  }
-
-  private static void SetBrush(string key, string color)
-  {
-    Application.Current!.Resources[key] = new SolidColorBrush(Color.Parse(color));
+    themeOptions = ThemeSelector.SelectedIndex switch
+    {
+      0 => themeOptions with
+      {
+        FollowSystemTheme = true,
+        HighContrast = false,
+        Variant = FsusThemeVariant.Light,
+      },
+      2 => themeOptions with
+      {
+        FollowSystemTheme = false,
+        HighContrast = false,
+        Variant = FsusThemeVariant.Dark,
+      },
+      3 => themeOptions with
+      {
+        FollowSystemTheme = false,
+        HighContrast = true,
+        Variant = FsusThemeVariant.Light,
+      },
+      _ => themeOptions with
+      {
+        FollowSystemTheme = false,
+        HighContrast = false,
+        Variant = FsusThemeVariant.Light,
+      },
+    };
+    ApplyThemeOptions();
   }
 
   private void DensityChanged(object? sender, SelectionChangedEventArgs args)
   {
-    var defaultHeight = DensitySelector.SelectedIndex switch
+    themeOptions = themeOptions with
     {
-      1 => 28d,
-      2 => 38d,
-      _ => 32d,
+      Density = DensitySelector.SelectedIndex switch
+      {
+        1 => FsusDensity.Compact,
+        2 => FsusDensity.Spacious,
+        _ => FsusDensity.Default,
+      },
     };
-    var compactHeight = DensitySelector.SelectedIndex switch
-    {
-      1 => 24d,
-      2 => 34d,
-      _ => 28d,
-    };
-
-    Application.Current!.Resources["FsusDensityControlDefaultY"] = defaultHeight;
-    Application.Current.Resources["FsusDensityControlCompactY"] = compactHeight;
+    ApplyThemeOptions();
   }
 
   private void MotionChanged(object? sender, SelectionChangedEventArgs args)
   {
-    var mode = MotionSelector.SelectedIndex switch
+    themeOptions = themeOptions with
     {
-      1 => "enabled",
-      2 => "reduced",
-      3 => "disabled",
-      _ => "system",
+      MotionMode = MotionSelector.SelectedIndex switch
+      {
+        1 => FsusMotionMode.Enabled,
+        2 => FsusMotionMode.Reduced,
+        3 => FsusMotionMode.Disabled,
+        _ => FsusMotionMode.System,
+      },
     };
+    ApplyThemeOptions();
+  }
 
-    Application.Current!.Resources["FsusMotionModeCurrent"] = mode;
-    Application.Current.Resources["FsusMotionDurationEffective"] =
-      mode is "disabled" or "reduced" ? "1ms" : "220ms";
+  private void ApplyThemeOptions()
+  {
+    if (Application.Current is not null)
+    {
+      themeManager.Apply(Application.Current, themeOptions);
+    }
   }
 }

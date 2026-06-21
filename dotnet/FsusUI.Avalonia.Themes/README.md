@@ -14,6 +14,37 @@ resources on top.
 </Application.Styles>
 ```
 
+## Theme Manager
+
+Use `FsusThemeManager` for runtime changes instead of mutating demo or
+application resources directly:
+
+```csharp
+var manager = new FsusThemeManager();
+manager.Apply(
+  Application.Current!,
+  new FsusThemeOptions
+  {
+    Variant = FsusThemeVariant.Dark,
+    Density = FsusDensity.Compact,
+    MotionMode = FsusMotionMode.Reduced,
+    HighContrast = false,
+    FollowSystemTheme = false,
+  });
+```
+
+The manager applies resources in this order:
+
+1. light or dark palette
+2. high contrast overrides
+3. accent override
+4. density resources
+5. motion resources
+
+Unknown enum values fall back to light, default density, and system motion.
+`FollowSystemTheme` sets `Application.RequestedThemeVariant` to
+`ThemeVariant.Default` while keeping FsusUI resource fallbacks active.
+
 ## Scope
 
 The package includes baseline styles for:
@@ -34,15 +65,26 @@ FsusPanel business logic.
 
 ## Motion Modes
 
-Motion resources are exposed through theme keys:
+Motion resources are exposed through stable theme keys:
 
-- `FsusMotionModeSystem`
-- `FsusMotionModeEnabled`
-- `FsusMotionModeReduced`
-- `FsusMotionModeDisabled`
-- `FsusMotionDisabledDuration`
-- `FsusMotionReducedDuration`
+- `FsusMotionModeCurrent`
+- `FsusMotionDurationEffective`
+- `FsusMotionEasingEffective`
 
 Controls should consume these semantic resources instead of hard-coding local
 durations or easing values.
 
+## Runtime Resource Dictionaries
+
+Stable theme dictionaries are shipped for:
+
+- `FsusLight.axaml`
+- `FsusDark.axaml`
+- `FsusHighContrast.axaml`
+- `FsusDensityCompact.axaml`
+- `FsusDensityDefault.axaml`
+- `FsusDensitySpacious.axaml`
+- `FsusMotionSystem.axaml`
+- `FsusMotionEnabled.axaml`
+- `FsusMotionReduced.axaml`
+- `FsusMotionDisabled.axaml`

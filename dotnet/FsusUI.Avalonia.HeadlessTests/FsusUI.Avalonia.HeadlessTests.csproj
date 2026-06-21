@@ -11,6 +11,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FsusUI.Avalonia.Demo\FsusUI.Avalonia.Demo.csproj" />
+    <ProjectReference Include="..\FsusUI.Avalonia\FsusUI.Avalonia.csproj" />
+    <ProjectReference Include="..\FsusUI.Avalonia.Themes\FsusUI.Avalonia.Themes.csproj" />
   </ItemGroup>
 
   <ItemGroup>

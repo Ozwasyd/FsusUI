@@ -6,14 +6,9 @@
       <ResourceDictionary.MergedDictionaries>
         <ResourceInclude Source="avares://FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml" />
         <ResourceInclude Source="avares://FsusUI.Avalonia.Themes/Themes/FsusLight.axaml" />
+        <ResourceInclude Source="avares://FsusUI.Avalonia.Themes/Themes/FsusDensityDefault.axaml" />
+        <ResourceInclude Source="avares://FsusUI.Avalonia.Themes/Themes/FsusMotionSystem.axaml" />
       </ResourceDictionary.MergedDictionaries>
-
-      <x:String x:Key="FsusMotionModeSystem">system</x:String>
-      <x:String x:Key="FsusMotionModeEnabled">enabled</x:String>
-      <x:String x:Key="FsusMotionModeReduced">reduced</x:String>
-      <x:String x:Key="FsusMotionModeDisabled">disabled</x:String>
-      <x:String x:Key="FsusMotionDisabledDuration">1ms</x:String>
-      <x:String x:Key="FsusMotionReducedDuration">1ms</x:String>
     </ResourceDictionary>
   </Styles.Resources>
 

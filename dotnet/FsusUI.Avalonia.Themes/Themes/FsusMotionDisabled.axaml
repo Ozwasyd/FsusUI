@@ -1,0 +1,7 @@
+<ResourceDictionary
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:String x:Key="FsusMotionModeCurrent">disabled</x:String>
+  <x:TimeSpan x:Key="FsusMotionDurationEffective">00:00:00.0010000</x:TimeSpan>
+  <SplineEasing x:Key="FsusMotionEasingEffective" X1="0.4" Y1="0" X2="0.2" Y2="1" />
+</ResourceDictionary>
