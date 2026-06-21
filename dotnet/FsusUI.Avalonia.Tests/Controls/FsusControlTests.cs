@@ -1,6 +1,7 @@
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Media;
 using FsusUI.Avalonia.Controls;
 using System.Windows.Input;
@@ -344,6 +345,142 @@ public class FsusControlTests
   }
 
   [Fact]
+  public void CheckboxTogglesIndeterminateAndReportsAutomationState()
+  {
+    var changes = new List<bool?>();
+    var checkbox = new KeyboardCheckbox
+    {
+      AccessibleName = "Accept terms",
+      IsThreeState = true,
+      IsIndeterminate = true,
+      ItemValue = "terms",
+    };
+    checkbox.ValueChanged += (_, args) => changes.Add(args.NewValue);
+
+    Assert.True(checkbox.IsChecked is null);
+    Assert.Contains("fsus-indeterminate", checkbox.Classes);
+    Assert.Equal("Accept terms", AutomationProperties.GetName(checkbox));
+    Assert.Equal(
+      AutomationControlType.CheckBox,
+      AutomationProperties.GetControlTypeOverride(checkbox));
+    Assert.Equal("indeterminate", AutomationProperties.GetItemStatus(checkbox));
+    Assert.Equal("terms", checkbox.ItemValue);
+
+    checkbox.Press(Key.Space);
+
+    Assert.True(checkbox.IsChecked);
+    Assert.False(checkbox.IsIndeterminate);
+    Assert.Contains("fsus-checked", checkbox.Classes);
+    Assert.Equal("checked", AutomationProperties.GetItemStatus(checkbox));
+    Assert.Equal(new bool?[] { true }, changes);
+  }
+
+  [Fact]
+  public void CheckboxGroupMaintainsDeterministicValueAndDisabledItems()
+  {
+    var changes = new List<IReadOnlyList<object?>>();
+    var first = new KeyboardCheckbox { ItemValue = "alpha", Content = "Alpha" };
+    var second = new KeyboardCheckbox { ItemValue = "beta", Content = "Beta" };
+    var disabled = new KeyboardCheckbox
+    {
+      ItemValue = "gamma",
+      Content = "Gamma",
+      IsEnabled = false,
+    };
+    var group = new FsusCheckboxGroup();
+    group.SelectionChanged += (_, args) => changes.Add(args.NewValue);
+    group.Children.Add(first);
+    group.Children.Add(second);
+    group.Children.Add(disabled);
+
+    group.SetSelectedValues(["beta", "missing", "alpha"]);
+
+    Assert.Equal(new object?[] { "alpha", "beta" }, group.SelectedValues);
+    Assert.True(first.IsChecked);
+    Assert.True(second.IsChecked);
+    Assert.False(disabled.IsChecked);
+
+    first.Press(Key.Space);
+    disabled.Press(Key.Space);
+
+    Assert.Equal(new object?[] { "beta" }, group.SelectedValues);
+    Assert.False(first.IsChecked);
+    Assert.False(disabled.IsChecked);
+    Assert.Equal(new object?[] { "beta" }, changes.Last());
+  }
+
+  [Fact]
+  public void RadioGroupSupportsArrowNavigationAndValueBinding()
+  {
+    var changes = new List<object?>();
+    var first = new KeyboardRadio { ItemValue = "draft", Content = "Draft" };
+    var second = new KeyboardRadio { ItemValue = "review", Content = "Review" };
+    var third = new KeyboardRadio
+    {
+      ItemValue = "published",
+      Content = "Published",
+      IsEnabled = false,
+    };
+    var group = new FsusRadioGroup { SelectedValue = "draft" };
+    group.SelectionChanged += (_, args) => changes.Add(args.NewValue);
+    group.Children.Add(first);
+    group.Children.Add(second);
+    group.Children.Add(third);
+    group.RefreshGroupState();
+
+    Assert.True(first.IsChecked);
+    Assert.False(second.IsChecked);
+    Assert.Equal("draft", group.SelectedValue);
+
+    first.Press(Key.Right);
+
+    Assert.False(first.IsChecked);
+    Assert.True(second.IsChecked);
+    Assert.False(third.IsChecked);
+    Assert.Equal("review", group.SelectedValue);
+    Assert.Equal(new object?[] { "review" }, changes);
+    Assert.Equal(
+      AutomationControlType.RadioButton,
+      AutomationProperties.GetControlTypeOverride(second));
+    Assert.Equal("checked", AutomationProperties.GetItemStatus(second));
+  }
+
+  [Fact]
+  public void SwitchLoadingBlocksToggleAndRestoresEnabledState()
+  {
+    var changes = new List<bool>();
+    var fsusSwitch = new KeyboardSwitch
+    {
+      AccessibleName = "Email alerts",
+      IsChecked = false,
+      IsLoading = true,
+    };
+    fsusSwitch.ValueChanged += (_, args) => changes.Add(args.NewValue);
+
+    Assert.False(fsusSwitch.IsEnabled);
+    Assert.Contains("fsus-loading", fsusSwitch.Classes);
+    Assert.Equal("Email alerts", AutomationProperties.GetName(fsusSwitch));
+    Assert.Equal(
+      AutomationControlType.Button,
+      AutomationProperties.GetControlTypeOverride(fsusSwitch));
+    Assert.Equal("Switch", AutomationProperties.GetClassNameOverride(fsusSwitch));
+    Assert.Equal("loading", AutomationProperties.GetItemStatus(fsusSwitch));
+
+    fsusSwitch.Press(Key.Space);
+
+    Assert.False(fsusSwitch.IsChecked);
+    Assert.Empty(changes);
+
+    fsusSwitch.IsLoading = false;
+    fsusSwitch.Press(Key.Space);
+
+    Assert.True(fsusSwitch.IsChecked);
+    Assert.True(fsusSwitch.IsEnabled);
+    Assert.Equal("checked", AutomationProperties.GetItemStatus(fsusSwitch));
+    Assert.Equal(new[] { true }, changes);
+  }
+
+  [Fact]
   public void IconButtonRequiresAccessibleNameUnlessExplicitlyDecorative()
   {
     var named = new FsusIconButton { AccessibleName = "Open command palette" };
@@ -469,6 +606,21 @@ public class FsusControlTests
   private sealed class ClickableLink : FsusLink
   {
     public void InvokeClick() => OnClick();
+  }
+
+  private sealed class KeyboardCheckbox : FsusCheckbox
+  {
+    public void Press(Key key) => HandleKey(key);
+  }
+
+  private sealed class KeyboardRadio : FsusRadio
+  {
+    public void Press(Key key) => HandleKey(key);
+  }
+
+  private sealed class KeyboardSwitch : FsusSwitch
+  {
+    public void Press(Key key) => HandleKey(key);
   }
 
   private sealed class CountingCommand : ICommand

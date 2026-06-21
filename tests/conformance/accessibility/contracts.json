@@ -83,6 +83,34 @@
       "keyboardNavigation": ["Space"]
     },
     {
+      "id": "radio",
+      "publicName": "FsusRadio",
+      "role": "radio",
+      "accessibleName": "required",
+      "value": "not-applicable",
+      "disabledState": "required",
+      "selectedState": "not-applicable",
+      "checkedState": "required",
+      "expandedState": "not-applicable",
+      "invalidState": "not-applicable",
+      "expectedStates": { "disabled": false, "checked": true },
+      "keyboardNavigation": ["Space", "ArrowRight", "Home", "End"]
+    },
+    {
+      "id": "switch",
+      "publicName": "FsusSwitch",
+      "role": "button",
+      "accessibleName": "required",
+      "value": "not-applicable",
+      "disabledState": "required",
+      "selectedState": "not-applicable",
+      "checkedState": "required",
+      "expandedState": "not-applicable",
+      "invalidState": "not-applicable",
+      "expectedStates": { "disabled": false, "checked": true },
+      "keyboardNavigation": ["Space"]
+    },
+    {
       "id": "dialog",
       "publicName": "FsusDialog",
       "role": "dialog",

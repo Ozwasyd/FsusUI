@@ -75,9 +75,66 @@
           Minimum="0"
           Step="2"
           Value="4" />
-        <fsus:FsusCheckbox IsChecked="True">FsusCheckbox</fsus:FsusCheckbox>
-        <fsus:FsusRadio GroupName="subset" IsChecked="True">FsusRadio selected</fsus:FsusRadio>
-        <fsus:FsusSwitch IsChecked="True" Content="FsusSwitch" />
+        <fsus:FsusCheckbox
+          AccessibleName="Accept publishing terms"
+          IsChecked="True"
+          ItemValue="terms">
+          FsusCheckbox checked
+        </fsus:FsusCheckbox>
+        <fsus:FsusCheckbox
+          AccessibleName="Partial moderation scope"
+          IsIndeterminate="True"
+          IsThreeState="True"
+          ItemValue="partial">
+          FsusCheckbox indeterminate
+        </fsus:FsusCheckbox>
+        <fsus:FsusCheckboxGroup x:Name="DemoCheckboxGroup" Size="Sm">
+          <fsus:FsusCheckbox
+            AccessibleName="Daily digest"
+            ItemValue="daily">
+            Daily digest
+          </fsus:FsusCheckbox>
+          <fsus:FsusCheckbox
+            AccessibleName="Weekly digest"
+            ItemValue="weekly">
+            Weekly digest
+          </fsus:FsusCheckbox>
+          <fsus:FsusCheckbox
+            AccessibleName="Disabled digest"
+            IsEnabled="False"
+            ItemValue="disabled">
+            Disabled digest
+          </fsus:FsusCheckbox>
+        </fsus:FsusCheckboxGroup>
+        <fsus:FsusRadioGroup
+          x:Name="DemoRadioGroup"
+          SelectedValue="review"
+          Size="Sm">
+          <fsus:FsusRadio
+            AccessibleName="Draft status"
+            ItemValue="draft">
+            Draft
+          </fsus:FsusRadio>
+          <fsus:FsusRadio
+            AccessibleName="Review status"
+            ItemValue="review">
+            Review
+          </fsus:FsusRadio>
+          <fsus:FsusRadio
+            AccessibleName="Disabled status"
+            IsEnabled="False"
+            ItemValue="disabled">
+            Disabled
+          </fsus:FsusRadio>
+        </fsus:FsusRadioGroup>
+        <fsus:FsusSwitch
+          AccessibleName="Comment notifications"
+          IsChecked="True"
+          Content="FsusSwitch on" />
+        <fsus:FsusSwitch
+          AccessibleName="Loading notifications"
+          IsLoading="True"
+          Content="FsusSwitch loading" />
       </StackPanel>
     </Border>
 

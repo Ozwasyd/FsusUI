@@ -55,6 +55,28 @@ wrapping defaults.
 spin controls, text commit parsing, and clamping. Increment/decrement operations
 respect readonly and disabled states.
 
+## Selection Controls
+
+`FsusCheckbox` supports checked, unchecked, and indeterminate states through
+nullable `IsChecked`, `IsIndeterminate`, `IsThreeState`, `ItemValue`,
+`AccessibleName`, `IsLoading`, keyboard Space toggling, and `ValueChanged`.
+Automation metadata maps to checkbox semantics and reports checked,
+unchecked, or indeterminate item status.
+
+`FsusCheckboxGroup` owns `FsusCheckbox` children and exposes deterministic
+`SelectedValues` ordering based on child order. Disabled children cannot be
+toggled by keyboard or pointer interaction, and group disabled state restores
+each child to its prior enabled state.
+
+`FsusRadio` and `FsusRadioGroup` provide item-value selection with Space,
+Arrow, Home, and End keyboard navigation. `SelectedValue` updates exactly one
+enabled item and skips disabled or loading radios during roving navigation.
+
+`FsusSwitch` exposes boolean `IsChecked`, `AccessibleName`, `IsLoading`, Space
+toggling, and `ValueChanged`. Loading state blocks interaction, publishes
+automation item status, and restores the previous enabled state when loading
+clears.
+
 ## Overlay Host
 
 `FsusOverlayHost` provides the shared host for stable overlay surfaces. It

@@ -6,26 +6,26 @@ which APIs are cross-platform FsusUI contracts.
 
 ## Mapping Status
 
-| Component   | Web API Surface                    | Contract Status | Notes                                                               |
-| ----------- | ---------------------------------- | --------------- | ------------------------------------------------------------------- |
-| button      | `ElButton`, `inlineAction`, motion | matching        | Loading, disabled, keyboard activation, variant hover, and motion map to `button`. |
-| icon-button | `ElButton` with `icon`/`circle`    | matching        | Icon-only usage must provide `aria-label` or `aria-labelledby`.     |
-| input       | `ElInput`                          | matching        | Native input semantics remain the Web adapter.                      |
-| textarea    | `ElInput` textarea mode            | matching        | Maps to multiline text-input contract with 2px inset Scholarly Blue focus parity. |
-| checkbox    | `ElCheckbox`                       | matching        | Native checkbox and ARIA state are Web-specific adapters.           |
-| radio       | `ElRadio`/`ElRadioGroup`           | matching        | Arrow-key group behavior remains required.                          |
-| switch      | `ElSwitch`                         | matching        | Loading/disabled states map to the shared switch contract.          |
-| card        | `ElCard`, `.is-interactive`        | matching        | DOM structure is not public contract.                               |
-| divider     | `ElDivider`                        | matching        | Orientation maps to `divider`.                                      |
-| tag         | `ElTag`, `ElCheckTag`              | matching        | Uppercase visual treatment is Web styling, not a contract field.    |
-| badge       | `ElBadge`                          | matching        | Count and status variants map to `badge`.                           |
-| alert       | `ElAlert`                          | matching        | Dismissible state and role map to `alert`.                          |
-| dialog      | `ElDialog`                         | matching        | Vue transition implementation is not public contract; panel leave duration follows the panel motion token. |
-| tabs        | `ElTabs`                           | matching        | Card/border-card visuals are Web adapter details; active/focus indicators use Scholarly Blue. |
-| menu        | `ElMenu`                           | matching        | DOM class names and submenu templates are not public contract.      |
-| dropdown    | `ElDropdown`, dropdown menu        | matching        | Default menu padding is `8px 0`; selectable states stay quiet and token-driven. |
-| table       | `ElTable`, `ElTableV2`             | matching        | Table cells use 16px default horizontal padding and quiet row hover treatment. |
-| public-shell | `ElPublicShell`                   | matching        | Focus rings are 2px inset; active navigation uses a stable Scholarly Blue underline. |
+| Component    | Web API Surface                    | Contract Status | Notes                                                                                                                                   |
+| ------------ | ---------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| button       | `ElButton`, `inlineAction`, motion | matching        | Loading, disabled, keyboard activation, variant hover, and motion map to `button`.                                                      |
+| icon-button  | `ElButton` with `icon`/`circle`    | matching        | Icon-only usage must provide `aria-label` or `aria-labelledby`.                                                                         |
+| input        | `ElInput`                          | matching        | Native input semantics remain the Web adapter.                                                                                          |
+| textarea     | `ElInput` textarea mode            | matching        | Maps to multiline text-input contract with 2px inset Scholarly Blue focus parity.                                                       |
+| checkbox     | `ElCheckbox`                       | matching        | Native checkbox and ARIA state are adapter-specific; Avalonia uses `FsusCheckbox`/`FsusCheckboxGroup` item values, not Web DOM classes. |
+| radio        | `ElRadio`/`ElRadioGroup`           | matching        | Arrow-key group behavior remains required and maps to `FsusRadioGroup` value selection.                                                 |
+| switch       | `ElSwitch`                         | matching        | Loading/disabled states map to the shared switch contract; Avalonia exposes checked status through native toggle state metadata.        |
+| card         | `ElCard`, `.is-interactive`        | matching        | DOM structure is not public contract.                                                                                                   |
+| divider      | `ElDivider`                        | matching        | Orientation maps to `divider`.                                                                                                          |
+| tag          | `ElTag`, `ElCheckTag`              | matching        | Uppercase visual treatment is Web styling, not a contract field.                                                                        |
+| badge        | `ElBadge`                          | matching        | Count and status variants map to `badge`.                                                                                               |
+| alert        | `ElAlert`                          | matching        | Dismissible state and role map to `alert`.                                                                                              |
+| dialog       | `ElDialog`                         | matching        | Vue transition implementation is not public contract; panel leave duration follows the panel motion token.                              |
+| tabs         | `ElTabs`                           | matching        | Card/border-card visuals are Web adapter details; active/focus indicators use Scholarly Blue.                                           |
+| menu         | `ElMenu`                           | matching        | DOM class names and submenu templates are not public contract.                                                                          |
+| dropdown     | `ElDropdown`, dropdown menu        | matching        | Default menu padding is `8px 0`; selectable states stay quiet and token-driven.                                                         |
+| table        | `ElTable`, `ElTableV2`             | matching        | Table cells use 16px default horizontal padding and quiet row hover treatment.                                                          |
+| public-shell | `ElPublicShell`                    | matching        | Focus rings are 2px inset; active navigation uses a stable Scholarly Blue underline.                                                    |
 
 ## Token Migration
 

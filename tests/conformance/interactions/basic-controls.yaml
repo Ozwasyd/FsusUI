@@ -135,6 +135,54 @@ scenarios:
       - focus
       - keyboard: Space
       - assert: { checked: true }
+  - id: checkbox-indeterminate-toggle
+    component: checkbox
+    steps:
+      - render: { indeterminate: true, text: Partial scope }
+      - focus
+      - keyboard: Space
+      - assert: { checked: true, finalState: checked }
+  - id: checkbox-group-value-binding
+    component: checkbox
+    steps:
+      - render: { groupValue: [daily], items: [daily, weekly, disabled] }
+      - keyboard: Space
+      - assert: { emitted: toggle, value: [daily, weekly] }
+  - id: checkbox-disabled-item-blocks-toggle
+    component: checkbox
+    steps:
+      - render: { checked: false, text: Disabled, disabled: true }
+      - focus
+      - keyboard: Space
+      - assert: { emitted: none, checked: false, finalState: disabled }
+  - id: radio-group-arrow-navigation
+    component: radio
+    steps:
+      - render: { selectedKey: draft, items: [draft, review, disabled] }
+      - focus
+      - keyboard: ArrowRight
+      - assert: { selectedKey: review, emitted: select }
+  - id: radio-disabled-item-skips-arrow
+    component: radio
+    steps:
+      - render: { selectedKey: review, items: [draft, review, disabled] }
+      - focus
+      - keyboard: ArrowRight
+      - assert: { selectedKey: draft }
+  - id: switch-loading-blocks-toggle
+    component: switch
+    steps:
+      - render: { checked: false, loading: true, text: Alerts }
+      - focus
+      - keyboard: Space
+      - assert: { emitted: none, checked: false, finalState: loading }
+  - id: switch-focus-visible-toggle
+    component: switch
+    steps:
+      - render: { checked: false, text: Alerts }
+      - focus
+      - keyboard: Space
+      - assert: { checked: true, finalState: focus-visible }
   - id: dialog-keyboard-containment
     component: dialog
     steps:

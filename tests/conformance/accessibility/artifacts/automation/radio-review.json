@@ -2,24 +2,24 @@
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
   "snapshot": {
-    "id": "link-release-notes",
-    "component": "link",
+    "id": "radio-review",
+    "component": "radio",
     "platform": "avalonia",
-    "control": "FsusLink",
+    "control": "FsusRadio",
     "evidenceSource": "avalonia-headless",
-    "role": "link",
-    "accessibleName": "Open release notes",
+    "role": "radio",
+    "accessibleName": "Review status",
     "value": null,
     "states": {
       "disabled": false,
       "selected": null,
-      "checked": null,
+      "checked": true,
       "expanded": null,
       "invalid": null
     },
-    "keyboard": ["Enter", "Space"],
+    "keyboard": ["Space", "ArrowRight", "Home", "End"],
     "keyboardOperable": true,
-    "tabOrder": 12,
-    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/link-release-notes.json"
+    "tabOrder": 6,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/radio-review.json"
   }
 }

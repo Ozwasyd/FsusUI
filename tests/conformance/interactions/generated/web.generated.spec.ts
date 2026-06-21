@@ -541,6 +541,198 @@ const scenarios = [
     expectations: ['checked'],
   },
   {
+    id: 'checkbox-indeterminate-toggle',
+    platform: 'shared',
+    component: 'checkbox',
+    source: 'tests/conformance/interactions/basic-controls.yaml',
+    contract: '',
+    motionMode: '',
+    shardKey: 3,
+    steps: [
+      {
+        type: 'render',
+        value: '{ indeterminate: true, text: Partial scope }',
+      },
+      {
+        type: 'focus',
+        value: '',
+      },
+      {
+        type: 'keyboard',
+        value: 'Space',
+      },
+      {
+        type: 'assert',
+        value: '{ checked: true, finalState: checked }',
+      },
+    ],
+    expectations: ['checked', 'finalState'],
+  },
+  {
+    id: 'checkbox-group-value-binding',
+    platform: 'shared',
+    component: 'checkbox',
+    source: 'tests/conformance/interactions/basic-controls.yaml',
+    contract: '',
+    motionMode: '',
+    shardKey: 2,
+    steps: [
+      {
+        type: 'render',
+        value: '{ groupValue: [daily], items: [daily, weekly, disabled] }',
+      },
+      {
+        type: 'keyboard',
+        value: 'Space',
+      },
+      {
+        type: 'assert',
+        value: '{ emitted: toggle, value: [daily, weekly] }',
+      },
+    ],
+    expectations: ['emitted', 'value'],
+  },
+  {
+    id: 'checkbox-disabled-item-blocks-toggle',
+    platform: 'shared',
+    component: 'checkbox',
+    source: 'tests/conformance/interactions/basic-controls.yaml',
+    contract: '',
+    motionMode: '',
+    shardKey: 3,
+    steps: [
+      {
+        type: 'render',
+        value: '{ checked: false, text: Disabled, disabled: true }',
+      },
+      {
+        type: 'focus',
+        value: '',
+      },
+      {
+        type: 'keyboard',
+        value: 'Space',
+      },
+      {
+        type: 'assert',
+        value: '{ emitted: none, checked: false, finalState: disabled }',
+      },
+    ],
+    expectations: ['checked', 'emitted', 'finalState'],
+  },
+  {
+    id: 'radio-group-arrow-navigation',
+    platform: 'shared',
+    component: 'radio',
+    source: 'tests/conformance/interactions/basic-controls.yaml',
+    contract: '',
+    motionMode: '',
+    shardKey: 2,
+    steps: [
+      {
+        type: 'render',
+        value: '{ selectedKey: draft, items: [draft, review, disabled] }',
+      },
+      {
+        type: 'focus',
+        value: '',
+      },
+      {
+        type: 'keyboard',
+        value: 'ArrowRight',
+      },
+      {
+        type: 'assert',
+        value: '{ selectedKey: review, emitted: select }',
+      },
+    ],
+    expectations: ['emitted', 'selectedKey'],
+  },
+  {
+    id: 'radio-disabled-item-skips-arrow',
+    platform: 'shared',
+    component: 'radio',
+    source: 'tests/conformance/interactions/basic-controls.yaml',
+    contract: '',
+    motionMode: '',
+    shardKey: 2,
+    steps: [
+      {
+        type: 'render',
+        value: '{ selectedKey: review, items: [draft, review, disabled] }',
+      },
+      {
+        type: 'focus',
+        value: '',
+      },
+      {
+        type: 'keyboard',
+        value: 'ArrowRight',
+      },
+      {
+        type: 'assert',
+        value: '{ selectedKey: draft }',
+      },
+    ],
+    expectations: ['selectedKey'],
+  },
+  {
+    id: 'switch-loading-blocks-toggle',
+    platform: 'shared',
+    component: 'switch',
+    source: 'tests/conformance/interactions/basic-controls.yaml',
+    contract: '',
+    motionMode: '',
+    shardKey: 0,
+    steps: [
+      {
+        type: 'render',
+        value: '{ checked: false, loading: true, text: Alerts }',
+      },
+      {
+        type: 'focus',
+        value: '',
+      },
+      {
+        type: 'keyboard',
+        value: 'Space',
+      },
+      {
+        type: 'assert',
+        value: '{ emitted: none, checked: false, finalState: loading }',
+      },
+    ],
+    expectations: ['checked', 'emitted', 'finalState'],
+  },
+  {
+    id: 'switch-focus-visible-toggle',
+    platform: 'shared',
+    component: 'switch',
+    source: 'tests/conformance/interactions/basic-controls.yaml',
+    contract: '',
+    motionMode: '',
+    shardKey: 0,
+    steps: [
+      {
+        type: 'render',
+        value: '{ checked: false, text: Alerts }',
+      },
+      {
+        type: 'focus',
+        value: '',
+      },
+      {
+        type: 'keyboard',
+        value: 'Space',
+      },
+      {
+        type: 'assert',
+        value: '{ checked: true, finalState: focus-visible }',
+      },
+    ],
+    expectations: ['checked', 'finalState'],
+  },
+  {
     id: 'dialog-keyboard-containment',
     platform: 'shared',
     component: 'dialog',

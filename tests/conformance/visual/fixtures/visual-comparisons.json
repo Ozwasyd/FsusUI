@@ -443,6 +443,66 @@
       },
       "screenshotDiffPercent": 0.011,
       "perceptualDelta": 0.05
+    },
+    {
+      "id": "selection-controls-stable19-web-avalonia",
+      "component": "selection-controls",
+      "mode": "crossPlatform",
+      "token": "selection.controls.states",
+      "fixture": {
+        "page": "visual/selection-controls",
+        "theme": "light",
+        "density": "default",
+        "variant": "checkbox-radio-switch",
+        "size": "md",
+        "state": "checked-unchecked-indeterminate-disabled-loading",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "enabled"
+      },
+      "coverage": {
+        "controls": [
+          "FsusCheckbox",
+          "FsusCheckboxGroup",
+          "FsusRadio",
+          "FsusRadioGroup",
+          "FsusSwitch"
+        ],
+        "states": [
+          "checked",
+          "unchecked",
+          "indeterminate",
+          "disabled",
+          "loading",
+          "focus-visible"
+        ],
+        "densities": ["compact", "default", "spacious"]
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/selection-controls-stable19.png",
+        "geometry": { "x": 24, "y": 28, "width": 360, "height": 220 },
+        "color": { "token": "selection.controls.states", "lab": [52, 6, -22] },
+        "radius": 6,
+        "spacing": { "paddingX": 8, "paddingY": 4, "gap": 6 },
+        "textBaseline": 24.5
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/selection-controls-stable19.png",
+        "geometry": { "x": 24.6, "y": 28.5, "width": 360.7, "height": 220.6 },
+        "color": {
+          "token": "selection.controls.states",
+          "lab": [52.4, 6.2, -22.3]
+        },
+        "radius": 6.4,
+        "spacing": { "paddingX": 8.4, "paddingY": 4.3, "gap": 6.4 },
+        "textBaseline": 25
+      },
+      "screenshotDiffPercent": 0.012,
+      "perceptualDelta": 0.05
     }
   ]
 }

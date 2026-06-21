@@ -2,24 +2,24 @@
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
   "snapshot": {
-    "id": "link-release-notes",
-    "component": "link",
+    "id": "switch-alerts",
+    "component": "switch",
     "platform": "avalonia",
-    "control": "FsusLink",
+    "control": "FsusSwitch",
     "evidenceSource": "avalonia-headless",
-    "role": "link",
-    "accessibleName": "Open release notes",
+    "role": "button",
+    "accessibleName": "Comment notifications",
     "value": null,
     "states": {
       "disabled": false,
       "selected": null,
-      "checked": null,
+      "checked": true,
       "expanded": null,
       "invalid": null
     },
-    "keyboard": ["Enter", "Space"],
+    "keyboard": ["Space"],
     "keyboardOperable": true,
-    "tabOrder": 12,
-    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/link-release-notes.json"
+    "tabOrder": 7,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/switch-alerts.json"
   }
 }

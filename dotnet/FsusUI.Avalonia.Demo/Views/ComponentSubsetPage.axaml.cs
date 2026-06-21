@@ -7,6 +7,6 @@ public partial class ComponentSubsetPage : UserControl
   public ComponentSubsetPage()
   {
     InitializeComponent();
+    DemoCheckboxGroup.SetSelectedValues(["daily"]);
   }
 }
-

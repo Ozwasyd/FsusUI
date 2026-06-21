@@ -28,6 +28,13 @@ public class InteractionConformanceTests
     yield return new object[] { "input-number-step-and-clamp", "input-number", new[] { "render", "keyboard", "keyboard", "keyboard", "keyboard", "assert" }, new[] { "emitted", "finalState", "value" } };
     yield return new object[] { "input-number-min-clamp", "input-number", new[] { "render", "keyboard", "assert" }, new[] { "emitted", "finalState", "value" } };
     yield return new object[] { "checkbox-toggle", "checkbox", new[] { "render", "focus", "keyboard", "assert" }, new[] { "checked" } };
+    yield return new object[] { "checkbox-indeterminate-toggle", "checkbox", new[] { "render", "focus", "keyboard", "assert" }, new[] { "checked", "finalState" } };
+    yield return new object[] { "checkbox-group-value-binding", "checkbox", new[] { "render", "keyboard", "assert" }, new[] { "emitted", "value" } };
+    yield return new object[] { "checkbox-disabled-item-blocks-toggle", "checkbox", new[] { "render", "focus", "keyboard", "assert" }, new[] { "checked", "emitted", "finalState" } };
+    yield return new object[] { "radio-group-arrow-navigation", "radio", new[] { "render", "focus", "keyboard", "assert" }, new[] { "emitted", "selectedKey" } };
+    yield return new object[] { "radio-disabled-item-skips-arrow", "radio", new[] { "render", "focus", "keyboard", "assert" }, new[] { "selectedKey" } };
+    yield return new object[] { "switch-loading-blocks-toggle", "switch", new[] { "render", "focus", "keyboard", "assert" }, new[] { "checked", "emitted", "finalState" } };
+    yield return new object[] { "switch-focus-visible-toggle", "switch", new[] { "render", "focus", "keyboard", "assert" }, new[] { "checked", "finalState" } };
     yield return new object[] { "dialog-keyboard-containment", "dialog", new[] { "render", "focus", "keyboard", "keyboard", "assert" }, new[] { "finalState" } };
     yield return new object[] { "tabs-arrow-navigation", "tabs", new[] { "render", "focus", "keyboard", "assert" }, new[] { "selectedKey" } };
     yield return new object[] { "menu-item-activation", "menu", new[] { "render", "focus", "keyboard", "keyboard", "assert" }, new[] { "emitted" } };

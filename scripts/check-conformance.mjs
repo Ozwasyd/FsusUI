@@ -28,6 +28,8 @@ const interactionComponents = [
   'button',
   'input',
   'checkbox',
+  'radio',
+  'switch',
   'dialog',
   'tabs',
   'menu',

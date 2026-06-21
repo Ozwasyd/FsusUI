@@ -3,7 +3,7 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "fixtureSource": {
     "path": "tests/conformance/visual/fixtures/visual-comparisons.json",
-    "sha256": "5e0761b210b7da8501c3e5483ebe109a8494c0d7af83dc0de7aeac3035997c00"
+    "sha256": "45acf44c09dd9a7cc6e3b05a85cff128e6c0783591391cc5cfc5ff64517365c5"
   },
   "artifactRoot": "tests/conformance/visual/artifacts",
   "thresholds": {
@@ -595,6 +595,66 @@
         },
         "textBaseline": 22.3
       }
+    },
+    {
+      "id": "selection-controls-stable19-web-avalonia",
+      "component": "selection-controls",
+      "fixture": {
+        "page": "visual/selection-controls",
+        "theme": "light",
+        "density": "default",
+        "variant": "checkbox-radio-switch",
+        "size": "md",
+        "state": "checked-unchecked-indeterminate-disabled-loading",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "enabled"
+      },
+      "token": "selection.controls.states",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/selection-controls-stable19.png",
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 360,
+          "height": 220
+        },
+        "color": {
+          "token": "selection.controls.states",
+          "lab": [52, 6, -22]
+        },
+        "radius": 6,
+        "spacing": {
+          "paddingX": 8,
+          "paddingY": 4,
+          "gap": 6
+        },
+        "textBaseline": 24.5
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/selection-controls-stable19.png",
+        "geometry": {
+          "x": 24.6,
+          "y": 28.5,
+          "width": 360.7,
+          "height": 220.6
+        },
+        "color": {
+          "token": "selection.controls.states",
+          "lab": [52.4, 6.2, -22.3]
+        },
+        "radius": 6.4,
+        "spacing": {
+          "paddingX": 8.4,
+          "paddingY": 4.3,
+          "gap": 6.4
+        },
+        "textBaseline": 25
+      }
     }
   ],
   "approvedComparisons": [
@@ -651,6 +711,12 @@
       "mode": "crossPlatform",
       "platform": "web->avalonia",
       "diffArtifact": "tests/conformance/visual/artifacts/diffs/input-number-stable18-web-avalonia.json"
+    },
+    {
+      "id": "selection-controls-stable19-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/selection-controls-stable19-web-avalonia.json"
     }
   ]
 }

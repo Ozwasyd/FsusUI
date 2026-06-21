@@ -3,8 +3,8 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "artifactRoot": "tests/conformance/visual/artifacts",
   "summary": {
-    "total": 9,
-    "passed": 9,
+    "total": 10,
+    "passed": 10,
     "allowedByOverride": 1
   },
   "comparisons": [
@@ -279,6 +279,37 @@
         "spacing": 0.40000000000000036,
         "textBaseline": 0.5,
         "screenshotDiffPercent": 0.011,
+        "perceptualDelta": 0.05
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "selection-controls-stable19-web-avalonia",
+      "component": "selection-controls",
+      "state": "checked-unchecked-indeterminate-disabled-loading",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "selection.controls.states",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/selection-controls-stable19.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/selection-controls-stable19-web-avalonia.json",
+      "deltas": {
+        "geometry": 0.6999999999999886,
+        "colorDelta": 0.5385164807134498,
+        "radius": 0.40000000000000036,
+        "spacing": 0.40000000000000036,
+        "textBaseline": 0.5,
+        "screenshotDiffPercent": 0.012,
         "perceptualDelta": 0.05
       },
       "thresholds": {

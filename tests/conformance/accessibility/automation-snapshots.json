@@ -107,6 +107,48 @@
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/checkbox-accept.json"
     },
     {
+      "id": "radio-review",
+      "component": "radio",
+      "platform": "avalonia",
+      "control": "FsusRadio",
+      "evidenceSource": "avalonia-headless",
+      "role": "radio",
+      "accessibleName": "Review status",
+      "value": null,
+      "states": {
+        "disabled": false,
+        "selected": null,
+        "checked": true,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["Space", "ArrowRight", "Home", "End"],
+      "keyboardOperable": true,
+      "tabOrder": 6,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/radio-review.json"
+    },
+    {
+      "id": "switch-alerts",
+      "component": "switch",
+      "platform": "avalonia",
+      "control": "FsusSwitch",
+      "evidenceSource": "avalonia-headless",
+      "role": "button",
+      "accessibleName": "Comment notifications",
+      "value": null,
+      "states": {
+        "disabled": false,
+        "selected": null,
+        "checked": true,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["Space"],
+      "keyboardOperable": true,
+      "tabOrder": 7,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/switch-alerts.json"
+    },
+    {
       "id": "dialog-confirm",
       "component": "dialog",
       "platform": "avalonia",
@@ -124,7 +166,7 @@
       },
       "keyboard": ["Tab", "Escape"],
       "keyboardOperable": true,
-      "tabOrder": 6,
+      "tabOrder": 8,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/dialog-confirm.json"
     },
     {
@@ -145,7 +187,7 @@
       },
       "keyboard": ["ArrowRight", "Home", "End"],
       "keyboardOperable": true,
-      "tabOrder": 7,
+      "tabOrder": 9,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/tabs-main.json"
     },
     {
@@ -166,7 +208,7 @@
       },
       "keyboard": ["ArrowDown", "Enter", "Escape"],
       "keyboardOperable": true,
-      "tabOrder": 8,
+      "tabOrder": 10,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/menu-main.json"
     },
     {
@@ -188,7 +230,7 @@
       },
       "keyboard": ["Enter", "Space"],
       "keyboardOperable": true,
-      "tabOrder": 9,
+      "tabOrder": 11,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/icon-button-search.json"
     },
     {
@@ -209,7 +251,7 @@
       },
       "keyboard": ["Enter", "Space"],
       "keyboardOperable": true,
-      "tabOrder": 10,
+      "tabOrder": 12,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/link-release-notes.json"
     },
     {
@@ -230,7 +272,7 @@
       },
       "keyboard": ["Escape"],
       "keyboardOperable": true,
-      "tabOrder": 11,
+      "tabOrder": 13,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/alert-live-region.json"
     }
   ],

@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "tests/conformance/accessibility/contracts.json",
-      "sha256": "967e872232aa2534a5ac80aeded2bb7294254ae1ec9c764a0552b420bb8e6953"
+      "sha256": "7f12119051677635449a06d4dd8c07f2e2c713267e2c024b32c897769ccbf21f"
     },
     {
       "path": "tests/conformance/accessibility/automation-snapshots.json",
-      "sha256": "7630d6e50e4969098bd9e8868be34c66714b759fbd581c2b7c14d227d9c6a070"
+      "sha256": "755b2df7f38a7d86ba5ae3d1f6adf1e0fbab7f7016e538661bde2d5e8a0e6f37"
     }
   ],
   "requiredContractFields": [
@@ -23,9 +23,9 @@
     "keyboardNavigation"
   ],
   "summary": {
-    "controls": 11,
-    "snapshots": 11,
-    "passed": 11,
+    "controls": 13,
+    "snapshots": 13,
+    "passed": 13,
     "appiumReleaseGates": 2,
     "allowedByOverride": 0
   },
@@ -159,6 +159,50 @@
       "errors": []
     },
     {
+      "id": "radio-review",
+      "component": "radio",
+      "platform": "avalonia",
+      "role": "radio",
+      "accessibleName": "Review status",
+      "value": null,
+      "states": {
+        "disabled": false,
+        "selected": null,
+        "checked": true,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["Space", "ArrowRight", "Home", "End"],
+      "tabOrder": 6,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/radio-review.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "switch-alerts",
+      "component": "switch",
+      "platform": "avalonia",
+      "role": "button",
+      "accessibleName": "Comment notifications",
+      "value": null,
+      "states": {
+        "disabled": false,
+        "selected": null,
+        "checked": true,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["Space"],
+      "tabOrder": 7,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/switch-alerts.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
       "id": "dialog-confirm",
       "component": "dialog",
       "platform": "avalonia",
@@ -173,7 +217,7 @@
         "invalid": null
       },
       "keyboard": ["Tab", "Escape"],
-      "tabOrder": 6,
+      "tabOrder": 8,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/dialog-confirm.json",
       "allowedByOverride": [],
@@ -195,7 +239,7 @@
         "invalid": null
       },
       "keyboard": ["ArrowRight", "Home", "End"],
-      "tabOrder": 7,
+      "tabOrder": 9,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/tabs-main.json",
       "allowedByOverride": [],
@@ -217,7 +261,7 @@
         "invalid": null
       },
       "keyboard": ["ArrowDown", "Enter", "Escape"],
-      "tabOrder": 8,
+      "tabOrder": 10,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/menu-main.json",
       "allowedByOverride": [],
@@ -239,7 +283,7 @@
         "invalid": null
       },
       "keyboard": ["Enter", "Space"],
-      "tabOrder": 9,
+      "tabOrder": 11,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/icon-button-search.json",
       "allowedByOverride": [],
@@ -261,7 +305,7 @@
         "invalid": null
       },
       "keyboard": ["Enter", "Space"],
-      "tabOrder": 10,
+      "tabOrder": 12,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/link-release-notes.json",
       "allowedByOverride": [],
@@ -283,7 +327,7 @@
         "invalid": null
       },
       "keyboard": ["Escape"],
-      "tabOrder": 11,
+      "tabOrder": 13,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/alert-live-region.json",
       "allowedByOverride": [],

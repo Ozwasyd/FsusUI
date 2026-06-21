@@ -19,7 +19,7 @@
     },
     "keyboard": ["ArrowRight", "Home", "End"],
     "keyboardOperable": true,
-    "tabOrder": 7,
+    "tabOrder": 9,
     "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/tabs-main.json"
   }
 }
