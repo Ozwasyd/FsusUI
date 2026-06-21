@@ -1,3 +1,4 @@
+using Avalonia.Automation;
 using FsusUI.Avalonia.Controls;
 
 namespace FsusUI.Avalonia.Tests.Controls;
@@ -87,5 +88,28 @@ public class FsusControlTests
     Assert.True(new FsusCheckbox().Focusable);
     Assert.True(new FsusRadio().Focusable);
     Assert.True(new FsusSwitch().Focusable);
+  }
+
+  [Fact]
+  public void IconButtonRequiresAccessibleNameUnlessExplicitlyDecorative()
+  {
+    var named = new FsusIconButton { AccessibleName = "Open command palette" };
+
+    Assert.Equal("Open command palette", AutomationProperties.GetName(named));
+    Assert.Contains("fsus-semantic-icon", named.Classes);
+    named.ValidateAccessibility();
+    named.AccessibleName = null;
+    Assert.Equal(string.Empty, AutomationProperties.GetName(named));
+    Assert.DoesNotContain("fsus-semantic-icon", named.Classes);
+    Assert.Throws<InvalidOperationException>(() => named.ValidateAccessibility());
+
+    var decorative = new FsusIconButton { IsDecorativeIcon = true };
+
+    Assert.Equal(AccessibilityView.Raw, AutomationProperties.GetAccessibilityView(decorative));
+    Assert.Contains("fsus-decorative-icon", decorative.Classes);
+    decorative.ValidateAccessibility();
+
+    Assert.Throws<InvalidOperationException>(() =>
+      new FsusIconButton().ValidateAccessibility());
   }
 }

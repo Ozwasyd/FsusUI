@@ -18,5 +18,8 @@ Required representative checks:
 
 Web checks compare generated Vue exports and registry metadata. Avalonia checks
 compare generated `StreamGeometry` resources and `FsusIconKeys` constants.
+`icon-baselines.json` is generated from the registry and records the Vue
+component, Avalonia resource key, viewport, stroke metadata, token ids, and
+source path hash for each representative icon.
 Platform-specific differences must be registered under
 `spec/platform-overrides/`.

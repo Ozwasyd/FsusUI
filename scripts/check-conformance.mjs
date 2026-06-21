@@ -150,6 +150,7 @@ const checkVisual = () => {
     'tests/conformance/visual/avalonia-demo-baseline.md',
     'tests/conformance/visual/web-demo-baseline.md',
     'tests/conformance/visual/icon-alignment.md',
+    'tests/conformance/visual/icon-baselines.json',
   ]) {
     assert(exists(file), `${file} must exist`)
   }
@@ -163,8 +164,25 @@ const checkVisual = () => {
     assertIncludes(thresholds, term, 'tests/conformance/visual/thresholds.md')
   }
   const icons = read('tests/conformance/visual/icon-alignment.md')
+  const baseline = JSON.parse(
+    read('tests/conformance/visual/icon-baselines.json'),
+  )
+  assert(
+    baseline.viewport === '0 0 1024 1024',
+    'icon baseline viewport mismatch',
+  )
   for (const icon of ['search', 'settings', 'warning', 'chevron-right']) {
     assertIncludes(icons, icon, 'tests/conformance/visual/icon-alignment.md')
+    const baselineIcon = baseline.icons?.find((entry) => entry.id === icon)
+    assert(baselineIcon, `icon baseline must include ${icon}`)
+    assert(
+      baselineIcon.avaloniaResourceKey?.startsWith('FsusIcon'),
+      `${icon} must include an Avalonia resource key`,
+    )
+    assert(
+      baselineIcon.vueComponent,
+      `${icon} must include a Vue component mapping`,
+    )
   }
   console.log('conformance:visual passed')
 }

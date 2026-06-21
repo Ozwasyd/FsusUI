@@ -14,8 +14,13 @@ const outputPaths = {
   webMetadata: 'packages/icons-vue/generated/icon-metadata.json',
   avaloniaXaml: 'dotnet/FsusUI.Avalonia.Icons/Generated/FsusIcons.axaml',
   csharp: 'dotnet/FsusUI.Avalonia.Icons/Generated/FsusIconKeys.g.cs',
+  docs: 'docs/icons/generated/stable-icons.md',
+  visualBaseline: 'tests/conformance/visual/icon-baselines.json',
   hash: 'generated/icons.hash.json',
 }
+
+const fixturePath = 'tests/fixtures/icon-pipeline/invalid-cases.json'
+const expectedViewBox = '0 0 1024 1024'
 
 const sha256 = (content) =>
   crypto.createHash('sha256').update(content).digest('hex')
@@ -51,39 +56,66 @@ const readTokenNames = () => {
   return new Set((spec.tokens ?? []).map((token) => token.name))
 }
 
-const readRegistry = () => {
-  const content = fs.readFileSync(registryPath, 'utf8')
-  const icons = []
-  let current
+const normalizePathData = (value) => String(value).replace(/\s+/g, ' ').trim()
 
-  for (const line of content.split('\n')) {
-    const idMatch = line.match(/^[ ]{2}- id: (.+)$/)
-    if (idMatch) {
-      current = { id: parseScalar(idMatch[1]) }
-      icons.push(current)
-      continue
-    }
-
-    const fieldMatch = line.match(/^[ ]{4}([A-Za-z0-9]+): (.+)$/)
-    if (fieldMatch && current) {
-      current[fieldMatch[1]] = parseScalar(fieldMatch[2])
-    }
+const parseAttributes = (tag) => {
+  const attributes = {}
+  for (const match of tag.matchAll(
+    /\s([A-Za-z_:][-A-Za-z0-9_:.]*)="([^"]*)"/g,
+  )) {
+    attributes[match[1]] = match[2]
   }
-
-  validateIcons(icons)
-  return { content, icons }
+  return attributes
 }
 
-const validateIcons = (icons) => {
+const readSvgMetadata = (relativePath, files = undefined) => {
+  const content =
+    files?.[relativePath] ??
+    fs.readFileSync(path.join(root, relativePath), 'utf8')
+  const svgMatch = content.match(/<svg\b[^>]*>/)
+  if (!svgMatch) throw new Error(`${relativePath} must include an svg root`)
+
+  const paths = [...content.matchAll(/<path\b[^>]*>/g)].map((match) =>
+    parseAttributes(match[0]),
+  )
+  if (paths.length === 0) throw new Error(`${relativePath} must include a path`)
+
+  return {
+    ...parseAttributes(svgMatch[0]),
+    pathData: normalizePathData(paths.map((item) => item.d ?? '').join(' ')),
+    pathFill: paths.map((item) => item.fill ?? ''),
+  }
+}
+
+const sourceSlug = (source) => path.basename(source, path.extname(source))
+
+const readVueComponentName = (source, files = undefined) => {
+  const componentPath = `packages/icons-vue/src/components/${sourceSlug(source)}.vue`
+  const content =
+    files?.[componentPath] ??
+    fs.readFileSync(path.join(root, componentPath), 'utf8')
+  const nameMatch = content.match(/\bname:\s*['"]([^'"]+)['"]/)
+  if (!nameMatch)
+    throw new Error(`${componentPath} must define a component name`)
+  return { componentPath, name: nameMatch[1] }
+}
+
+const validateIconSet = (icons, tokenNames, options = {}) => {
   if (icons.length === 0) throw new Error('Icon registry must not be empty')
 
   const ids = new Set()
-  const tokenNames = readTokenNames()
-  for (const icon of icons) {
+  const files = options.files
+  const sourceExists = (relativePath) =>
+    files
+      ? Object.hasOwn(files, relativePath)
+      : fs.existsSync(path.join(root, relativePath))
+
+  return icons.map((icon) => {
     for (const field of [
       'id',
       'displayName',
       'category',
+      'source',
       'path',
       'defaultSize',
       'stroke',
@@ -106,10 +138,88 @@ const validateIcons = (icons) => {
     if (!tokenNames.has(icon.fill)) {
       throw new Error(`${icon.id} must use shared icon fill tokens`)
     }
-    if (!fs.existsSync(path.join(root, icon.source))) {
+    if (!sourceExists(icon.source)) {
       throw new Error(`${icon.id} source ${icon.source} does not exist`)
     }
+
+    const svg = readSvgMetadata(icon.source, files)
+    if (svg.viewBox !== expectedViewBox) {
+      throw new Error(`${icon.id} source viewBox must be ${expectedViewBox}`)
+    }
+    if (Number(svg['stroke-width']) !== 112) {
+      throw new Error(`${icon.id} source stroke-width must be 112`)
+    }
+    if (svg.stroke !== 'currentColor') {
+      throw new Error(`${icon.id} source stroke must use currentColor`)
+    }
+    if (svg['stroke-linecap'] !== 'round') {
+      throw new Error(`${icon.id} source stroke-linecap must be round`)
+    }
+    if (svg['stroke-linejoin'] !== 'round') {
+      throw new Error(`${icon.id} source stroke-linejoin must be round`)
+    }
+    if (!svg.pathFill.every((fill) => fill === 'currentColor')) {
+      throw new Error(`${icon.id} paths must use currentColor fill`)
+    }
+    if (normalizePathData(icon.path) !== svg.pathData) {
+      throw new Error(
+        `${icon.id} registry path must match source svg path data`,
+      )
+    }
+
+    const vue = readVueComponentName(icon.source, files)
+    const expectedComponentName = pascal(sourceSlug(icon.source))
+    if (vue.name !== expectedComponentName) {
+      throw new Error(
+        `${icon.id} Vue component name must be ${expectedComponentName}`,
+      )
+    }
+
+    return {
+      viewBox: svg.viewBox,
+      sourcePathHash: sha256(svg.pathData),
+      strokeWidth: Number(svg['stroke-width']),
+      strokeLineCap: svg['stroke-linecap'],
+      strokeLineJoin: svg['stroke-linejoin'],
+      vueComponent: vue.name,
+      vueComponentPath: vue.componentPath,
+      resourceKey: `FsusIcon${pascal(icon.id)}`,
+    }
+  })
+}
+
+const readRegistry = () => {
+  const content = fs.readFileSync(registryPath, 'utf8')
+  const icons = []
+  let current
+
+  for (const line of content.split('\n')) {
+    const idMatch = line.match(/^[ ]{2}- id: (.+)$/)
+    if (idMatch) {
+      current = { id: parseScalar(idMatch[1]) }
+      icons.push(current)
+      continue
+    }
+
+    const fieldMatch = line.match(/^[ ]{4}([A-Za-z0-9]+): (.+)$/)
+    if (fieldMatch && current) {
+      current[fieldMatch[1]] = parseScalar(fieldMatch[2])
+    }
   }
+
+  const metadata = validateIcons(icons)
+  return {
+    content,
+    icons: icons.map((icon, index) => ({
+      ...icon,
+      ...metadata[index],
+    })),
+  }
+}
+
+const validateIcons = (icons) => {
+  const tokenNames = readTokenNames()
+  return validateIconSet(icons, tokenNames)
 }
 
 const xmlEscape = (value) =>
@@ -118,6 +228,22 @@ const xmlEscape = (value) =>
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
+
+const compactSingleItemArrays = (json, property) =>
+  json.replace(
+    new RegExp(`\\n( {6}"${property}": )\\[\\n {8}("[^"\\n]+")\\n {6}\\]`, 'g'),
+    `\n$1[$2]`,
+  )
+
+const renderMarkdownTable = (headers, rows) => {
+  const widths = headers.map((header, index) =>
+    Math.max(header.length, ...rows.map((row) => row[index].length)),
+  )
+  const renderRow = (row) =>
+    `| ${row.map((cell, index) => cell.padEnd(widths[index])).join(' | ')} |`
+  const divider = `| ${widths.map((width) => '-'.repeat(width)).join(' | ')} |`
+  return [renderRow(headers), divider, ...rows.map(renderRow)]
+}
 
 const renderWebMetadata = (icons) => {
   const json = JSON.stringify(
@@ -130,10 +256,7 @@ const renderWebMetadata = (icons) => {
     2,
   )
 
-  return `${json.replace(
-    /\n( {6}"aliases": )\[\n {8}("[^"\n]+")\n {6}\]/g,
-    '\n$1[$2]',
-  )}\n`
+  return `${compactSingleItemArrays(json, 'aliases')}\n`
 }
 
 const renderAvaloniaXaml = (icons) => {
@@ -176,12 +299,85 @@ const renderCsharp = (icons) => {
   return lines.join('\n')
 }
 
+const renderStableIconDocs = (icons) => {
+  const rows = icons.map((icon) => [
+    `\`${icon.id}\``,
+    `\`${icon.vueComponent}\``,
+    `\`${icon.resourceKey}\``,
+    `\`${icon.defaultSize}\`, \`${icon.stroke}\`, \`${icon.fill}\``,
+    icon.decorativeByDefault ? 'decorative by default' : 'semantic by default',
+  ])
+  const lines = [
+    '# Stable Icon Inventory',
+    '',
+    generatedHeader,
+    '',
+    'All stable icons are validated against the same SVG source files used by the Vue icon components. Avalonia resources use the matching `StreamGeometry` data and C# keys listed here.',
+    '',
+    ...renderMarkdownTable(
+      ['Icon', 'Vue component', 'Avalonia key', 'Tokens', 'Accessibility'],
+      rows,
+    ),
+  ]
+
+  lines.push(
+    '',
+    'Icon-only controls must either expose a stable accessible name on the host control or explicitly mark the icon as decorative. Disabled, danger, muted, and current-color states inherit through the host foreground and the shared icon tokens above.',
+    '',
+  )
+  return lines.join('\n')
+}
+
+const renderIconBaseline = (icons) => {
+  const json = JSON.stringify(
+    {
+      generatedBy: 'scripts/icon-pipeline.mjs',
+      note: generatedHeader,
+      source: 'spec/icons/registry.yaml',
+      viewport: expectedViewBox,
+      tokens: {
+        size: 'icon.size.md',
+        stroke: 'icon.stroke.md',
+        fill: 'icon.fill.default',
+      },
+      stateBehavior: [
+        'current-color',
+        'disabled-inherits-host-foreground',
+        'danger-inherits-host-foreground',
+        'muted-inherits-host-foreground',
+      ],
+      icons: icons.map((icon) => ({
+        id: icon.id,
+        source: icon.source,
+        vueComponent: icon.vueComponent,
+        avaloniaResourceKey: icon.resourceKey,
+        sourcePathHash: icon.sourcePathHash,
+        viewBox: icon.viewBox,
+        strokeWidth: icon.strokeWidth,
+        strokeLineCap: icon.strokeLineCap,
+        strokeLineJoin: icon.strokeLineJoin,
+        defaultSize: icon.defaultSize,
+        stroke: icon.stroke,
+        fill: icon.fill,
+        decorativeByDefault: icon.decorativeByDefault,
+        aliases: icon.aliases ?? [],
+      })),
+    },
+    null,
+    2,
+  )
+
+  return `${compactSingleItemArrays(json, 'aliases')}\n`
+}
+
 const renderAll = () => {
   const { content, icons } = readRegistry()
   const files = {
     [outputPaths.webMetadata]: renderWebMetadata(icons),
     [outputPaths.avaloniaXaml]: renderAvaloniaXaml(icons),
     [outputPaths.csharp]: renderCsharp(icons),
+    [outputPaths.docs]: renderStableIconDocs(icons),
+    [outputPaths.visualBaseline]: renderIconBaseline(icons),
   }
 
   files[outputPaths.hash] = `${JSON.stringify(
@@ -240,7 +436,33 @@ const lint = () => {
       aliases.add(alias)
     }
   }
+  runInvalidFixtures()
   console.log('Icon registry is valid.')
+}
+
+const runInvalidFixtures = () => {
+  const absolutePath = path.join(root, fixturePath)
+  if (!fs.existsSync(absolutePath)) {
+    throw new Error(`${fixturePath} must exist`)
+  }
+
+  const fixtures = JSON.parse(fs.readFileSync(absolutePath, 'utf8'))
+  const tokenNames = readTokenNames()
+  for (const fixture of fixtures.cases ?? []) {
+    let message = ''
+    try {
+      validateIconSet(fixture.icons ?? [], tokenNames, {
+        files: fixture.files ?? {},
+      })
+    } catch (error) {
+      message = error instanceof Error ? error.message : String(error)
+    }
+    if (!message.includes(fixture.expectedError)) {
+      throw new Error(
+        `${fixture.name} fixture expected ${fixture.expectedError}, got ${message || 'success'}`,
+      )
+    }
+  }
 }
 
 const command = process.argv[2]

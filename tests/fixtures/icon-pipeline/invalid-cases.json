@@ -1,0 +1,145 @@
+{
+  "cases": [
+    {
+      "name": "missing-icon",
+      "expectedError": "source packages/icons-svg/missing.svg does not exist",
+      "icons": [
+        {
+          "id": "missing",
+          "displayName": "Missing",
+          "category": "action",
+          "source": "packages/icons-svg/missing.svg",
+          "path": "M0 0",
+          "defaultSize": "icon.size.md",
+          "stroke": "icon.stroke.md",
+          "fill": "icon.fill.default",
+          "mode": "stroke",
+          "decorativeByDefault": true
+        }
+      ],
+      "files": {}
+    },
+    {
+      "name": "duplicate-key",
+      "expectedError": "Duplicate icon id fixture",
+      "icons": [
+        {
+          "id": "fixture",
+          "displayName": "Fixture",
+          "category": "action",
+          "source": "packages/icons-svg/fixture.svg",
+          "path": "M0 0",
+          "defaultSize": "icon.size.md",
+          "stroke": "icon.stroke.md",
+          "fill": "icon.fill.default",
+          "mode": "stroke",
+          "decorativeByDefault": true
+        },
+        {
+          "id": "fixture",
+          "displayName": "Fixture",
+          "category": "action",
+          "source": "packages/icons-svg/fixture.svg",
+          "path": "M0 0",
+          "defaultSize": "icon.size.md",
+          "stroke": "icon.stroke.md",
+          "fill": "icon.fill.default",
+          "mode": "stroke",
+          "decorativeByDefault": true
+        }
+      ],
+      "files": {
+        "packages/icons-svg/fixture.svg": "<svg stroke-linejoin=\"round\" stroke-linecap=\"round\" stroke-width=\"112\" stroke=\"currentColor\" viewBox=\"0 0 1024 1024\"><path fill=\"currentColor\" d=\"M0 0\" /></svg>",
+        "packages/icons-vue/src/components/fixture.vue": "<script setup lang=\"ts\">defineOptions({ name: 'Fixture' })</script>"
+      }
+    },
+    {
+      "name": "invalid-viewBox",
+      "expectedError": "source viewBox must be 0 0 1024 1024",
+      "icons": [
+        {
+          "id": "fixture",
+          "displayName": "Fixture",
+          "category": "action",
+          "source": "packages/icons-svg/fixture.svg",
+          "path": "M0 0",
+          "defaultSize": "icon.size.md",
+          "stroke": "icon.stroke.md",
+          "fill": "icon.fill.default",
+          "mode": "stroke",
+          "decorativeByDefault": true
+        }
+      ],
+      "files": {
+        "packages/icons-svg/fixture.svg": "<svg stroke-linejoin=\"round\" stroke-linecap=\"round\" stroke-width=\"112\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path fill=\"currentColor\" d=\"M0 0\" /></svg>",
+        "packages/icons-vue/src/components/fixture.vue": "<script setup lang=\"ts\">defineOptions({ name: 'Fixture' })</script>"
+      }
+    },
+    {
+      "name": "invalid-stroke",
+      "expectedError": "source stroke-width must be 112",
+      "icons": [
+        {
+          "id": "fixture",
+          "displayName": "Fixture",
+          "category": "action",
+          "source": "packages/icons-svg/fixture.svg",
+          "path": "M0 0",
+          "defaultSize": "icon.size.md",
+          "stroke": "icon.stroke.md",
+          "fill": "icon.fill.default",
+          "mode": "stroke",
+          "decorativeByDefault": true
+        }
+      ],
+      "files": {
+        "packages/icons-svg/fixture.svg": "<svg stroke-linejoin=\"round\" stroke-linecap=\"round\" stroke-width=\"2\" stroke=\"currentColor\" viewBox=\"0 0 1024 1024\"><path fill=\"currentColor\" d=\"M0 0\" /></svg>",
+        "packages/icons-vue/src/components/fixture.vue": "<script setup lang=\"ts\">defineOptions({ name: 'Fixture' })</script>"
+      }
+    },
+    {
+      "name": "mismatched-naming",
+      "expectedError": "Vue component name must be Fixture",
+      "icons": [
+        {
+          "id": "fixture",
+          "displayName": "Fixture",
+          "category": "action",
+          "source": "packages/icons-svg/fixture.svg",
+          "path": "M0 0",
+          "defaultSize": "icon.size.md",
+          "stroke": "icon.stroke.md",
+          "fill": "icon.fill.default",
+          "mode": "stroke",
+          "decorativeByDefault": true
+        }
+      ],
+      "files": {
+        "packages/icons-svg/fixture.svg": "<svg stroke-linejoin=\"round\" stroke-linecap=\"round\" stroke-width=\"112\" stroke=\"currentColor\" viewBox=\"0 0 1024 1024\"><path fill=\"currentColor\" d=\"M0 0\" /></svg>",
+        "packages/icons-vue/src/components/fixture.vue": "<script setup lang=\"ts\">defineOptions({ name: 'WrongName' })</script>"
+      }
+    },
+    {
+      "name": "mismatched-path",
+      "expectedError": "registry path must match source svg path data",
+      "icons": [
+        {
+          "id": "fixture",
+          "displayName": "Fixture",
+          "category": "action",
+          "source": "packages/icons-svg/fixture.svg",
+          "path": "M0 1",
+          "defaultSize": "icon.size.md",
+          "stroke": "icon.stroke.md",
+          "fill": "icon.fill.default",
+          "mode": "stroke",
+          "decorativeByDefault": true
+        }
+      ],
+      "files": {
+        "packages/icons-svg/fixture.svg": "<svg stroke-linejoin=\"round\" stroke-linecap=\"round\" stroke-width=\"112\" stroke=\"currentColor\" viewBox=\"0 0 1024 1024\"><path fill=\"currentColor\" d=\"M0 0\" /></svg>",
+        "packages/icons-vue/src/components/fixture.vue": "<script setup lang=\"ts\">defineOptions({ name: 'Fixture' })</script>"
+      }
+    }
+  ]
+}

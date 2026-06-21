@@ -13,7 +13,7 @@ resource generation.
 | `displayName`         | human-readable name used by docs and generated metadata   |
 | `category`            | action, status, navigation, or object                     |
 | `source`              | source SVG path used by Web generation                    |
-| `path`                | platform-neutral path data used by Avalonia generation    |
+| `path`                | source SVG path data used by Avalonia generation          |
 | `defaultSize`         | token reference such as `icon.size.md`                    |
 | `stroke`              | token reference for stroke weight                         |
 | `fill`                | token reference or semantic fill token                    |
@@ -21,8 +21,13 @@ resource generation.
 | `decorativeByDefault` | whether the icon is hidden from assistive tech by default |
 | `aliases`             | stable compatibility or semantic alias ids                |
 
+The icon pipeline validates `path`, viewport, stroke, fill, and Vue component
+name against `source`. Registry entries drift when the source SVG or Vue
+component changes without regenerating Avalonia artifacts.
+
 Icons used as the only visible command label require an accessible name from
-the consuming component or pattern.
+the consuming component or pattern. Decorative icons must be explicitly marked
+decorative when they would otherwise be the only visible glyph.
 
 ## Generated Artifacts
 
@@ -34,6 +39,8 @@ are current.
 - Avalonia resources:
   `dotnet/FsusUI.Avalonia.Icons/Generated/FsusIcons.axaml`
 - C# lookup keys: `dotnet/FsusUI.Avalonia.Icons/Generated/FsusIconKeys.g.cs`
+- Stable inventory: `docs/icons/generated/stable-icons.md`
+- Visual baseline: `tests/conformance/visual/icon-baselines.json`
 
 Web Vue components remain generated from `packages/icons-svg`, but the Web
 generation step reads this registry to add semantic aliases such as

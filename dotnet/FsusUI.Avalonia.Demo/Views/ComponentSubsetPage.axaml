@@ -11,7 +11,10 @@
           <fsus:FsusButton Variant="Primary">Primary</fsus:FsusButton>
           <fsus:FsusButton>Default</fsus:FsusButton>
           <fsus:FsusButton IsLoading="True">Loading</fsus:FsusButton>
-          <fsus:FsusIconButton Variant="Text" Content="⌘" />
+          <fsus:FsusIconButton
+            AccessibleName="Open command palette"
+            Variant="Text"
+            Content="⌘" />
         </StackPanel>
       </StackPanel>
     </Border>
@@ -65,4 +68,3 @@
     </Border>
   </StackPanel>
 </UserControl>
-
