@@ -126,6 +126,14 @@ const checkContracts = () => {
 }
 
 const checkInteractions = () => {
+  execFileSync(
+    process.execPath,
+    ['scripts/interaction-conformance.mjs', 'check'],
+    {
+      cwd: root,
+      stdio: 'inherit',
+    },
+  )
   const file = 'tests/conformance/interactions/basic-controls.yaml'
   const webFile = 'tests/conformance/interactions/web-first-subset.yaml'
   const avaloniaMotionFile =

@@ -1,0 +1,84 @@
+{
+  "cases": [
+    {
+      "name": "missing assert step",
+      "expectedError": "must include at least one assert step",
+      "scenario": {
+        "id": "invalid-missing-assert",
+        "component": "button",
+        "steps": [
+          {
+            "type": "render",
+            "value": "{ text: Save }"
+          },
+          {
+            "type": "keyboard",
+            "value": "Enter"
+          }
+        ]
+      }
+    },
+    {
+      "name": "unsupported step",
+      "expectedError": "has unsupported step drag",
+      "scenario": {
+        "id": "invalid-unsupported-step",
+        "component": "menu",
+        "steps": [
+          {
+            "type": "render",
+            "value": "{ selectedKey: dashboard }"
+          },
+          {
+            "type": "drag",
+            "value": "item"
+          },
+          {
+            "type": "assert",
+            "value": "{ emitted: select }"
+          }
+        ]
+      }
+    },
+    {
+      "name": "missing expectation term",
+      "expectedError": "must include an expected event or state",
+      "scenario": {
+        "id": "invalid-missing-expectation",
+        "component": "input",
+        "steps": [
+          {
+            "type": "render",
+            "value": "{ placeholder: Search }"
+          },
+          {
+            "type": "assert",
+            "value": "{ unsupported: true }"
+          }
+        ]
+      }
+    },
+    {
+      "name": "keyboard without key",
+      "expectedError": "keyboard step must include a key",
+      "scenario": {
+        "id": "invalid-keyboard-empty",
+        "component": "tabs",
+        "steps": [
+          {
+            "type": "render",
+            "value": "{ selectedKey: overview }"
+          },
+          {
+            "type": "keyboard",
+            "value": ""
+          },
+          {
+            "type": "assert",
+            "value": "{ selectedKey: next }"
+          }
+        ]
+      }
+    }
+  ]
+}

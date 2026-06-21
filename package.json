@@ -80,6 +80,8 @@
     "typography:check": "node ./scripts/with-node-heap.mjs node ./scripts/check-typography-baseline.mjs",
     "conformance:tokens": "node ./scripts/with-node-heap.mjs node ./scripts/check-conformance.mjs tokens",
     "conformance:contracts": "node ./scripts/with-node-heap.mjs node ./scripts/check-conformance.mjs contracts",
+    "interactions:generate": "node ./scripts/with-node-heap.mjs node ./scripts/interaction-conformance.mjs generate",
+    "interactions:check": "node ./scripts/with-node-heap.mjs node ./scripts/interaction-conformance.mjs check",
     "conformance:interactions": "node ./scripts/with-node-heap.mjs node ./scripts/check-conformance.mjs interactions",
     "conformance:visual": "node ./scripts/with-node-heap.mjs node ./scripts/check-conformance.mjs visual",
     "conformance:a11y": "node ./scripts/with-node-heap.mjs node ./scripts/check-conformance.mjs a11y",
