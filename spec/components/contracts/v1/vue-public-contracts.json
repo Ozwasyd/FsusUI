@@ -5,9 +5,9 @@
   "owner": "FsusUI Core",
   "baseline": {
     "path": "spec/baselines/vue-current.json",
-    "hash": "c87f31e65823167a8b51c26cc33ff37aa4df8549a4d96971a41bb5a44312c769",
+    "hash": "c06e916b8db75edc480ce344b9fccef1a0a0de04e99af92d6cdc03522ba0c7a9",
     "packageVersion": "1.5.1",
-    "tokenHash": "f45e1472880bcd2e700c4758340f31e2d488fd896d8d247ddf30ac5361328ca1",
+    "tokenHash": "be2aa1d6735927c270d506cd6ad8434102e60215680537520b43459f47bde02b",
     "iconHash": "7358b0813aef61acef51069c49a97f8d18d89c2e674298f74ffff4642dbf1cf1"
   },
   "changeClassifications": [

@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "94d64b73219e6cb96e8aa8968355b730ea0dfccd",
+    "commitSha": "3484d3cb1c66285c208dd69ff4325e56ce5db7ce",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
-    "tokenHash": "f45e1472880bcd2e700c4758340f31e2d488fd896d8d247ddf30ac5361328ca1",
+    "tokenHash": "be2aa1d6735927c270d506cd6ad8434102e60215680537520b43459f47bde02b",
     "iconHash": "7358b0813aef61acef51069c49a97f8d18d89c2e674298f74ffff4642dbf1cf1"
   },
   "summary": {
@@ -14,7 +14,7 @@
     "directives": 3,
     "services": 4,
     "plugins": 7,
-    "cssVariables": 303,
+    "cssVariables": 316,
     "deprecatedApis": 20,
     "componentCountByClassification": {
       "portable": 120,
@@ -6551,6 +6551,46 @@
       "classification": "portable"
     },
     {
+      "name": "--fsus-component-button-padding-x",
+      "files": ["packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-button-radius",
+      "files": ["packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-dialog-min-height",
+      "files": ["packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-dialog-min-width",
+      "files": ["packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-dialog-padding",
+      "files": ["packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-overlay-scrim",
+      "files": ["packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-state-button-primary-background-default",
+      "files": ["packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-state-button-primary-background-hover",
+      "files": ["packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
       "name": "--fsus-control-height",
       "files": ["packages/theme-chalk/src/common/fsus-tokens.scss"],
       "classification": "portable"
@@ -7346,6 +7386,26 @@
       "classification": "portable"
     },
     {
+      "name": "--fsus-primitive-color-blue-600",
+      "files": ["packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-primitive-color-blue-700",
+      "files": ["packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-primitive-color-gray-950",
+      "files": ["packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-primitive-color-white",
+      "files": ["packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
       "name": "--fsus-progress-animation-duration",
       "files": [
         "packages/theme-chalk/src/common/fsus-tokens.scss",
@@ -7990,6 +8050,11 @@
     },
     {
       "name": "--fsus-typography-body-md-weight",
+      "files": ["packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-typography-family-body",
       "files": ["packages/theme-chalk/src/generated/tokens.css"],
       "classification": "portable"
     },

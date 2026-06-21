@@ -4,8 +4,8 @@
   <Style Selector="Window.fsus-dialog">
     <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
-    <Setter Property="MinWidth" Value="360" />
-    <Setter Property="MinHeight" Value="220" />
+    <Setter Property="MinWidth" Value="{DynamicResource FsusComponentDialogMinWidth}" />
+    <Setter Property="MinHeight" Value="{DynamicResource FsusComponentDialogMinHeight}" />
   </Style>
 
   <Style Selector="Border.fsus-dialog-surface">
@@ -13,7 +13,7 @@
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
     <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusSurfaceMd}" />
-    <Setter Property="Padding" Value="20" />
+    <Setter Property="Padding" Value="{DynamicResource FsusComponentDialogPadding}" />
   </Style>
 
   <Style Selector="fsus|FsusDialog">
@@ -21,10 +21,10 @@
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
     <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusSurfaceMd}" />
-    <Setter Property="Padding" Value="20" />
+    <Setter Property="Padding" Value="{DynamicResource FsusComponentDialogPadding}" />
   </Style>
 
   <Style Selector="Border.fsus-overlay">
-    <Setter Property="Background" Value="#99000000" />
+    <Setter Property="Background" Value="{DynamicResource FsusComponentOverlayScrimBrush}" />
   </Style>
 </Styles>

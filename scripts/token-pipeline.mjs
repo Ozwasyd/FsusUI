@@ -20,6 +20,7 @@ const outputPaths = {
 }
 
 const allowedCategories = new Set([
+  'primitive',
   'color',
   'brush',
   'typography',
@@ -33,6 +34,8 @@ const allowedCategories = new Set([
   'motion',
   'density',
   'icon',
+  'component',
+  'component-state',
 ])
 
 const allowedTypes = new Set([
@@ -41,15 +44,35 @@ const allowedTypes = new Set([
   'dimension',
   'duration',
   'easing',
+  'fontFamily',
   'fontWeight',
   'number',
+  'opacity',
+  'radius',
   'shadow',
   'string',
+  'thickness',
+  'zIndex',
 ])
 
 const requiredPlatforms = ['web', 'avalonia']
+const requiredTokenLayers = [
+  'primitive',
+  'semantic',
+  'component',
+  'component-state',
+]
+const requiredDimensions = {
+  theme: ['light', 'dark', 'high-contrast'],
+  density: ['compact', 'default', 'spacious'],
+  motion: ['full', 'reduced', 'disabled'],
+}
 const namePattern = /^[a-z][a-z0-9]*(?:[.-][a-z0-9]+)*$/
 const referencePattern = /\{([^}]+)\}/g
+const tokenSnapshotPath = path.join(
+  root,
+  'tests/fixtures/token-v2/output-snapshots.json',
+)
 
 const toPosix = (filePath) => filePath.split(path.sep).join('/')
 
@@ -68,31 +91,85 @@ const getTokenMap = (tokens) =>
   new Map(tokens.map((token) => [token.name, token]))
 
 const validateSource = (source) => {
-  if (source.version !== 1) {
-    throw new Error('spec/tokens/tokens.json must declare version 1')
+  if (source.version !== 2) {
+    throw new Error('spec/tokens/tokens.json must declare version 2')
   }
   if (!Array.isArray(source.tokens) || source.tokens.length === 0) {
     throw new Error(
       'spec/tokens/tokens.json must contain a non-empty tokens array',
     )
   }
+  validateTokenV2Metadata(source)
 
   const names = new Set()
+  const semanticMeanings = new Map()
   for (const token of source.tokens) {
-    validateToken(token, names)
+    validateToken(source, token, names)
+    const semanticMeaning = token.semanticMeaning
+    if (semanticMeaning) {
+      if (semanticMeanings.has(semanticMeaning)) {
+        throw new Error(
+          `${token.name} duplicates semantic meaning ${semanticMeaning} from ${semanticMeanings.get(
+            semanticMeaning,
+          )}`,
+        )
+      }
+      semanticMeanings.set(semanticMeaning, token.name)
+    }
     names.add(token.name)
   }
 
   for (const token of source.tokens) {
-    for (const reference of findReferences(token.value)) {
+    for (const reference of findTokenReferences(token)) {
       if (!names.has(reference)) {
         throw new Error(`${token.name} references missing token ${reference}`)
       }
     }
   }
+
+  const tokenMap = getTokenMap(source.tokens)
+  const usedLayers = new Set()
+  for (const token of source.tokens) {
+    usedLayers.add(layerForToken(source, token))
+    const resolved = resolveValue(token, tokenMap)
+    validateResolvedTokenValue(token, resolved)
+    for (const [modeName, modeValue] of Object.entries(
+      token.modeValues ?? {},
+    )) {
+      validateModeValue(token, modeName, modeValue)
+      validateResolvedTokenValue(
+        token,
+        resolveValue(token, tokenMap, new Set(), modeName),
+      )
+    }
+  }
+
+  for (const layer of requiredTokenLayers) {
+    if (!usedLayers.has(layer)) {
+      throw new Error(`Token v2 layer ${layer} has no registered tokens`)
+    }
+  }
 }
 
-const validateToken = (token, names) => {
+const validateTokenV2Metadata = (source) => {
+  for (const layer of requiredTokenLayers) {
+    if (
+      !Array.isArray(source.layers?.[layer]) ||
+      source.layers[layer].length === 0
+    ) {
+      throw new Error(`Token v2 layer ${layer} must declare match patterns`)
+    }
+  }
+  for (const [dimension, values] of Object.entries(requiredDimensions)) {
+    for (const value of values) {
+      if (!source.dimensions?.[dimension]?.includes(value)) {
+        throw new Error(`Token v2 dimension ${dimension} must include ${value}`)
+      }
+    }
+  }
+}
+
+const validateToken = (source, token, names) => {
   for (const field of ['name', 'type', 'value', 'description', 'platforms']) {
     if (token[field] === undefined || token[field] === '') {
       throw new Error(`Token is missing required field ${field}`)
@@ -116,6 +193,8 @@ const validateToken = (token, names) => {
     throw new Error(`Unsupported token type ${token.type} in ${token.name}`)
   }
 
+  layerForToken(source, token)
+
   if (!Array.isArray(token.platforms)) {
     throw new Error(`${token.name} platforms must be an array`)
   }
@@ -138,6 +217,71 @@ const validateToken = (token, names) => {
   }
 }
 
+const layerForToken = (source, token) => {
+  for (const [layer, patterns] of Object.entries(source.layers ?? {})) {
+    for (const pattern of patterns) {
+      if (
+        pattern.endsWith('*') &&
+        token.name.startsWith(pattern.slice(0, -1))
+      ) {
+        return layer
+      }
+      if (token.name === pattern) return layer
+    }
+  }
+  throw new Error(`${token.name} is not assigned to a Token v2 layer`)
+}
+
+const validateModeValue = (token, modeName, modeValue) => {
+  if (!modeValue || typeof modeValue !== 'object') {
+    throw new Error(
+      `${token.name} mode ${modeName} must declare value and fallback`,
+    )
+  }
+  if (modeValue.value === undefined || modeValue.fallback === undefined) {
+    throw new Error(`${token.name} mode ${modeName} is missing fallback token`)
+  }
+}
+
+const validateResolvedTokenValue = (token, value) => {
+  const raw = String(value)
+  const type = token.type
+  const fail = () => {
+    throw new Error(`${token.name} has invalid ${type} value ${raw}`)
+  }
+
+  if (type === 'color' && !/^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/.test(raw))
+    fail()
+  if (type === 'brush' && !/^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/.test(raw))
+    fail()
+  if (
+    ['dimension', 'radius', 'thickness'].includes(type) &&
+    !/^-?\d+(?:\.\d+)?(?:px|rem)$/.test(raw)
+  ) {
+    fail()
+  }
+  if (type === 'duration' && !/^\d+(?:\.\d+)?ms$/.test(raw)) fail()
+  if (type === 'easing' && !/^(?:linear|cubic-bezier\([^)]+\))$/.test(raw))
+    fail()
+  if (type === 'fontFamily' && raw.length < 2) fail()
+  if (type === 'fontWeight' && !/^\d{3}$/.test(raw)) fail()
+  if (type === 'opacity') {
+    const valueNumber = Number(raw)
+    if (!Number.isFinite(valueNumber) || valueNumber < 0 || valueNumber > 1)
+      fail()
+  }
+  if (type === 'zIndex' && !/^\d+$/.test(raw)) fail()
+  if (type === 'number' && Number.isNaN(Number(raw))) fail()
+}
+
+const findTokenReferences = (token) => [
+  ...findReferences(token.value),
+  ...Object.values(token.modeValues ?? {}).flatMap((modeValue) => [
+    ...findReferences(modeValue.value),
+    ...(modeValue.fallback ? [modeValue.fallback] : []),
+  ]),
+]
+
 const findReferences = (value) => {
   const references = []
   const raw = String(value)
@@ -147,19 +291,19 @@ const findReferences = (value) => {
   return references
 }
 
-const resolveValue = (token, tokenMap, seen = new Set()) => {
+const resolveValue = (token, tokenMap, seen = new Set(), modeName) => {
   if (seen.has(token.name)) {
     throw new Error(`Circular token reference involving ${token.name}`)
   }
 
   seen.add(token.name)
-  const raw = String(token.value)
+  const raw = String(token.modeValues?.[modeName]?.value ?? token.value)
   return raw.replace(referencePattern, (_, name) => {
     const referenced = tokenMap.get(name)
     if (!referenced) {
       throw new Error(`${token.name} references missing token ${name}`)
     }
-    return resolveValue(referenced, tokenMap, seen)
+    return resolveValue(referenced, tokenMap, new Set(seen), modeName)
   })
 }
 
@@ -189,7 +333,10 @@ const xmlEscape = (value) =>
 const cssEscape = (value) => String(value).replaceAll('\n', ' ')
 
 const renderCss = (source, tokenMap) => {
-  const lines = [`/* ${generatedHeader} */`, ':root {']
+  const lines = [
+    `/* ${generatedHeader} */`,
+    ':root, [data-fsus-theme="light"] {',
+  ]
   for (const token of source.tokens) {
     const value = cssEscape(resolveValue(token, tokenMap))
     lines.push(`  ${cssName(token.name)}: ${value};`)
@@ -198,6 +345,27 @@ const renderCss = (source, tokenMap) => {
     }
   }
   lines.push('}', '')
+  const modeSelectors = {
+    dark: '[data-fsus-theme="dark"]',
+    highContrast: '[data-fsus-theme="high-contrast"]',
+    densityCompact: '[data-fsus-density="compact"]',
+    densitySpacious: '[data-fsus-density="spacious"]',
+    motionReduced: '[data-fsus-motion="reduced"]',
+    motionDisabled: '[data-fsus-motion="disabled"]',
+  }
+  for (const [modeName, selector] of Object.entries(modeSelectors)) {
+    const modeTokens = source.tokens.filter(
+      (token) => token.modeValues?.[modeName],
+    )
+    if (modeTokens.length === 0) continue
+    lines.push(`${selector} {`)
+    for (const token of modeTokens) {
+      lines.push(
+        `  ${cssName(token.name)}: ${cssEscape(resolveValue(token, tokenMap, new Set(), modeName))};`,
+      )
+    }
+    lines.push('}', '')
+  }
   return lines.join('\n')
 }
 
@@ -230,10 +398,17 @@ const renderJson = (source, tokenMap) => {
       {
         type: token.type,
         value: resolveValue(token, tokenMap),
+        layer: layerForToken(source, token),
         css: cssName(token.name),
         avalonia: pascalName(token.name),
         description: token.description,
         aliases: token.aliases ?? [],
+        modeValues: Object.fromEntries(
+          Object.entries(token.modeValues ?? {}).map(([modeName]) => [
+            modeName,
+            resolveValue(token, tokenMap, new Set(), modeName),
+          ]),
+        ),
       },
     ]),
   )
@@ -243,6 +418,8 @@ const renderJson = (source, tokenMap) => {
       generatedBy: 'scripts/token-pipeline.mjs',
       note: generatedHeader,
       version: source.version,
+      layers: source.layers,
+      dimensions: source.dimensions,
       tokens,
     },
     null,
@@ -289,6 +466,8 @@ const renderAvaloniaXaml = (source, tokenMap) => {
     if (
       token.type === 'dimension' ||
       token.type === 'number' ||
+      token.type === 'opacity' ||
+      token.type === 'zIndex' ||
       token.type === 'fontWeight'
     ) {
       lines.push(`  <x:Double x:Key="${key}">${stripUnit(value)}</x:Double>`)
@@ -345,9 +524,10 @@ const renderDocs = (source, tokenMap) => {
 
   lines.push(
     renderMarkdownTable(
-      ['Token', 'Type', 'CSS Variable', 'Avalonia Resource', 'Value'],
+      ['Token', 'Layer', 'Type', 'CSS Variable', 'Avalonia Resource', 'Value'],
       source.tokens.map((token) => [
         `\`${token.name}\``,
+        layerForToken(source, token),
         token.type,
         `\`${cssName(token.name)}\``,
         `\`${pascalName(token.name)}\``,
@@ -453,10 +633,111 @@ const lintRegisteredAliases = (source) => {
   }
 }
 
+const lintTokenFixtures = () => {
+  const fixturePath = path.join(
+    root,
+    'tests/fixtures/token-v2/schema-cases.json',
+  )
+  const fixture = JSON.parse(fs.readFileSync(fixturePath, 'utf8'))
+  validateSource(fixture.valid)
+  for (const testCase of fixture.invalid) {
+    const source = JSON.parse(JSON.stringify(fixture.valid))
+    for (const mutation of testCase.mutations ?? []) {
+      if (mutation.path === 'remove-platform') {
+        const token = source.tokens.find((item) => item.name === mutation.token)
+        token.platforms = token.platforms.filter(
+          (platform) => platform !== mutation.platform,
+        )
+        continue
+      }
+      if (mutation.path === 'push-token') {
+        source.tokens.push(mutation.token)
+        continue
+      }
+      const token = source.tokens.find((item) => item.name === mutation.token)
+      if (!token)
+        throw new Error(`Unknown token fixture mutation ${mutation.token}`)
+      if (mutation.path === 'value') token.value = mutation.value
+      if (mutation.path === 'modeValues') token.modeValues = mutation.value
+      if (mutation.path === 'semanticMeaning') {
+        token.semanticMeaning = mutation.value
+      }
+    }
+    let failed = false
+    try {
+      validateSource(source)
+    } catch (error) {
+      failed = String(error instanceof Error ? error.message : error).includes(
+        testCase.errorIncludes,
+      )
+    }
+    if (!failed) {
+      throw new Error(
+        `Token v2 invalid fixture did not fail as expected: ${testCase.name}`,
+      )
+    }
+  }
+}
+
+const lintOutputSnapshots = () => {
+  const files = renderAll()
+  const snapshot = JSON.parse(fs.readFileSync(tokenSnapshotPath, 'utf8'))
+  for (const [key, relativePath] of Object.entries({
+    webCss: outputPaths.css,
+    webScss: outputPaths.scss,
+    json: outputPaths.json,
+    avaloniaXaml: outputPaths.avaloniaXaml,
+    csharp: outputPaths.csharp,
+  })) {
+    const actualHash = sha256(files[relativePath])
+    if (snapshot[key] !== actualHash) {
+      throw new Error(`Token output snapshot ${key} is stale`)
+    }
+  }
+}
+
+const lintStableComponentHardcoding = () => {
+  const scanRoots = [
+    'dotnet/FsusUI.Avalonia/Controls',
+    'dotnet/FsusUI.Avalonia.Themes/Themes/Controls',
+  ]
+  const banned = [
+    /#[0-9A-Fa-f]{6,8}/,
+    /\b(?:Padding|Margin|MinWidth|MinHeight|CornerRadius)="\d+(?:\.\d+)?"/,
+    /\b(?:Duration|Delay)="\d+(?:\.\d+)?ms"/,
+  ]
+  const failures = []
+  const walk = (directory) => {
+    if (!fs.existsSync(directory)) return
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      const fullPath = path.join(directory, entry.name)
+      if (entry.isDirectory()) {
+        walk(fullPath)
+        continue
+      }
+      if (!/\.(axaml|cs)$/.test(entry.name)) continue
+      const content = fs.readFileSync(fullPath, 'utf8')
+      for (const pattern of banned) {
+        if (pattern.test(content))
+          failures.push(`${rel(fullPath)} contains ${pattern}`)
+      }
+    }
+  }
+  for (const scanRoot of scanRoots) walk(path.join(root, scanRoot))
+  if (failures.length) {
+    throw new Error(
+      `Stable component token hardcoding detected:\n${failures.join('\n')}`,
+    )
+  }
+}
+
 const lint = () => {
   const source = readSource()
   lintRegisteredAliases(source)
   lintGeneratedHeaders()
+  lintTokenFixtures()
+  lintOutputSnapshots()
+  lintStableComponentHardcoding()
   console.log('Token source and generated artifact metadata are valid.')
 }
 

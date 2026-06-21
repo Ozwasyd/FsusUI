@@ -4,6 +4,22 @@ namespace FsusUI.Avalonia;
 
 public static class FsusTokens
 {
+    public const string PrimitiveColorBlue600Name = "primitive.color.blue.600";
+    public const string PrimitiveColorBlue600ResourceKey = "FsusPrimitiveColorBlue600";
+    public const string PrimitiveColorBlue600Value = "#2A599C";
+
+    public const string PrimitiveColorBlue700Name = "primitive.color.blue.700";
+    public const string PrimitiveColorBlue700ResourceKey = "FsusPrimitiveColorBlue700";
+    public const string PrimitiveColorBlue700Value = "#244E89";
+
+    public const string PrimitiveColorGray950Name = "primitive.color.gray.950";
+    public const string PrimitiveColorGray950ResourceKey = "FsusPrimitiveColorGray950";
+    public const string PrimitiveColorGray950Value = "#0F0F11";
+
+    public const string PrimitiveColorWhiteName = "primitive.color.white";
+    public const string PrimitiveColorWhiteResourceKey = "FsusPrimitiveColorWhite";
+    public const string PrimitiveColorWhiteValue = "#FFFFFF";
+
     public const string ColorActionPrimaryName = "color.action.primary";
     public const string ColorActionPrimaryResourceKey = "FsusColorActionPrimary";
     public const string ColorActionPrimaryValue = "#2A599C";
@@ -51,6 +67,10 @@ public static class FsusTokens
     public const string TypographyBodyMdSizeName = "typography.body.md.size";
     public const string TypographyBodyMdSizeResourceKey = "FsusTypographyBodyMdSize";
     public const string TypographyBodyMdSizeValue = "14px";
+
+    public const string TypographyFamilyBodyName = "typography.family.body";
+    public const string TypographyFamilyBodyResourceKey = "FsusTypographyFamilyBody";
+    public const string TypographyFamilyBodyValue = "Inter, ui-sans-serif, system-ui, sans-serif";
 
     public const string TypographyBodyMdLineHeightName = "typography.body.md.line-height";
     public const string TypographyBodyMdLineHeightResourceKey = "FsusTypographyBodyMdLineHeight";
@@ -171,5 +191,37 @@ public static class FsusTokens
     public const string IconFillDefaultName = "icon.fill.default";
     public const string IconFillDefaultResourceKey = "FsusIconFillDefault";
     public const string IconFillDefaultValue = "currentColor";
+
+    public const string ComponentButtonPaddingXName = "component.button.padding.x";
+    public const string ComponentButtonPaddingXResourceKey = "FsusComponentButtonPaddingX";
+    public const string ComponentButtonPaddingXValue = "12px";
+
+    public const string ComponentButtonRadiusName = "component.button.radius";
+    public const string ComponentButtonRadiusResourceKey = "FsusComponentButtonRadius";
+    public const string ComponentButtonRadiusValue = "6px";
+
+    public const string ComponentDialogMinWidthName = "component.dialog.min-width";
+    public const string ComponentDialogMinWidthResourceKey = "FsusComponentDialogMinWidth";
+    public const string ComponentDialogMinWidthValue = "360px";
+
+    public const string ComponentDialogMinHeightName = "component.dialog.min-height";
+    public const string ComponentDialogMinHeightResourceKey = "FsusComponentDialogMinHeight";
+    public const string ComponentDialogMinHeightValue = "220px";
+
+    public const string ComponentDialogPaddingName = "component.dialog.padding";
+    public const string ComponentDialogPaddingResourceKey = "FsusComponentDialogPadding";
+    public const string ComponentDialogPaddingValue = "20px";
+
+    public const string ComponentOverlayScrimName = "component.overlay.scrim";
+    public const string ComponentOverlayScrimResourceKey = "FsusComponentOverlayScrim";
+    public const string ComponentOverlayScrimValue = "#99000000";
+
+    public const string ComponentStateButtonPrimaryBackgroundDefaultName = "component-state.button.primary.background.default";
+    public const string ComponentStateButtonPrimaryBackgroundDefaultResourceKey = "FsusComponentStateButtonPrimaryBackgroundDefault";
+    public const string ComponentStateButtonPrimaryBackgroundDefaultValue = "#2A599C";
+
+    public const string ComponentStateButtonPrimaryBackgroundHoverName = "component-state.button.primary.background.hover";
+    public const string ComponentStateButtonPrimaryBackgroundHoverResourceKey = "FsusComponentStateButtonPrimaryBackgroundHover";
+    public const string ComponentStateButtonPrimaryBackgroundHoverValue = "#244E89";
 
 }

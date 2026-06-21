@@ -1,6 +1,8 @@
 # Token Schema
 
-Tokens use platform-neutral names and mechanical platform mappings.
+Tokens use platform-neutral names and mechanical platform mappings. Token v2
+adds source layers and mode dimensions so Web and Avalonia can be generated from
+one registry without hand-authored value drift.
 
 ```txt
 category.group.name.variant
@@ -14,6 +16,23 @@ radius.control.md
 space.3
 motion.control.fast
 ```
+
+## Source Layers
+
+| Layer             | Purpose                                            |
+| ----------------- | -------------------------------------------------- |
+| `primitive`       | Raw color and measurement decisions                |
+| `semantic`        | Product-neutral roles such as text, surface, z     |
+| `component`       | Component-level defaults such as padding/radius    |
+| `component-state` | State-specific component tokens such as hover fill |
+
+## Mode Dimensions
+
+| Dimension | Required Values            |
+| --------- | -------------------------- |
+| theme     | light, dark, high-contrast |
+| density   | compact, default, spacious |
+| motion    | full, reduced, disabled    |
 
 ## Required Categories
 
@@ -37,15 +56,16 @@ motion.control.fast
 
 Each token record includes:
 
-| Field         | Required | Description                                     |
-| ------------- | -------- | ----------------------------------------------- |
-| `name`        | yes      | platform-neutral dotted token name              |
-| `type`        | yes      | token type, such as `color`, `duration`, `size` |
-| `value`       | yes      | canonical source value                          |
-| `description` | yes      | intended usage                                  |
-| `platforms`   | yes      | supported outputs such as `web` and `avalonia`  |
-| `aliases`     | no       | public compatibility aliases                    |
-| `mode`        | no       | light, dark, compact, reduced, or disabled mode |
+| Field             | Required | Description                                     |
+| ----------------- | -------- | ----------------------------------------------- |
+| `name`            | yes      | platform-neutral dotted token name              |
+| `type`            | yes      | token type, such as `color`, `duration`, `size` |
+| `value`           | yes      | canonical source value                          |
+| `description`     | yes      | intended usage                                  |
+| `platforms`       | yes      | supported outputs such as `web` and `avalonia`  |
+| `aliases`         | no       | public compatibility aliases                    |
+| `modeValues`      | no       | mode-specific value plus fallback token         |
+| `semanticMeaning` | no       | unique semantic meaning guard for aliases       |
 
 ## Platform Mapping
 

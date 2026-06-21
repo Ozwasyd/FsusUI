@@ -1,0 +1,157 @@
+{
+  "valid": {
+    "version": 2,
+    "layers": {
+      "primitive": ["primitive.*"],
+      "semantic": ["color.*"],
+      "component": ["component.*"],
+      "component-state": ["component-state.*"]
+    },
+    "dimensions": {
+      "theme": ["light", "dark", "high-contrast"],
+      "density": ["compact", "default", "spacious"],
+      "motion": ["full", "reduced", "disabled"]
+    },
+    "tokens": [
+      {
+        "name": "primitive.color.blue.600",
+        "type": "color",
+        "value": "#2A599C",
+        "description": "Fixture primitive color.",
+        "platforms": ["web", "avalonia"]
+      },
+      {
+        "name": "color.action.primary",
+        "type": "color",
+        "value": "{primitive.color.blue.600}",
+        "description": "Fixture semantic color.",
+        "platforms": ["web", "avalonia"],
+        "semanticMeaning": "fixture primary accent",
+        "modeValues": {
+          "dark": {
+            "value": "#F8FAFC",
+            "fallback": "color.action.primary"
+          }
+        }
+      },
+      {
+        "name": "component.button.padding.x",
+        "type": "dimension",
+        "value": "12px",
+        "description": "Fixture component dimension.",
+        "platforms": ["web", "avalonia"]
+      },
+      {
+        "name": "component-state.button.primary.background.default",
+        "type": "brush",
+        "value": "{color.action.primary}",
+        "description": "Fixture component state brush.",
+        "platforms": ["web", "avalonia"]
+      }
+    ]
+  },
+  "invalid": [
+    {
+      "name": "invalid references",
+      "errorIncludes": "references missing token missing.token",
+      "mutations": [
+        {
+          "token": "color.action.primary",
+          "path": "value",
+          "value": "{missing.token}"
+        }
+      ]
+    },
+    {
+      "name": "cycles",
+      "errorIncludes": "Circular token reference",
+      "mutations": [
+        {
+          "path": "push-token",
+          "token": {
+            "name": "color.cycle.a",
+            "type": "color",
+            "value": "{color.cycle.b}",
+            "description": "Cycle fixture A.",
+            "platforms": ["web", "avalonia"]
+          }
+        },
+        {
+          "path": "push-token",
+          "token": {
+            "name": "color.cycle.b",
+            "type": "color",
+            "value": "{color.cycle.a}",
+            "description": "Cycle fixture B.",
+            "platforms": ["web", "avalonia"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "unsupported units",
+      "errorIncludes": "invalid dimension value 2pt",
+      "mutations": [
+        {
+          "token": "component.button.padding.x",
+          "path": "value",
+          "value": "2pt"
+        }
+      ]
+    },
+    {
+      "name": "missing platform declarations",
+      "errorIncludes": "must support avalonia",
+      "mutations": [
+        {
+          "token": "color.action.primary",
+          "path": "remove-platform",
+          "platform": "avalonia"
+        }
+      ]
+    },
+    {
+      "name": "missing fallback tokens",
+      "errorIncludes": "is missing fallback token",
+      "mutations": [
+        {
+          "token": "color.action.primary",
+          "path": "modeValues",
+          "value": {
+            "dark": {
+              "value": "#F8FAFC"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "type mismatch",
+      "errorIncludes": "invalid color value 12px",
+      "mutations": [
+        {
+          "token": "color.action.primary",
+          "path": "value",
+          "value": "12px"
+        }
+      ]
+    },
+    {
+      "name": "duplicate semantic meaning",
+      "errorIncludes": "duplicates semantic meaning",
+      "mutations": [
+        {
+          "path": "push-token",
+          "token": {
+            "name": "color.action.secondary",
+            "type": "color",
+            "value": "{primitive.color.blue.600}",
+            "description": "Duplicate semantic meaning fixture.",
+            "platforms": ["web", "avalonia"],
+            "semanticMeaning": "fixture primary accent"
+          }
+        }
+      ]
+    }
+  ]
+}
