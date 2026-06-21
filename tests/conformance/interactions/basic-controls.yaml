@@ -7,6 +7,34 @@ scenarios:
       - pointerover
       - keyboard: Enter
       - assert: { emitted: press, finalState: default }
+  - id: loading-button-blocks-activation
+    component: button
+    steps:
+      - render: { variant: primary, text: Saving, loading: true }
+      - pointerover
+      - keyboard: Enter
+      - assert: { emitted: none, finalState: loading }
+  - id: disabled-button-blocks-keyboard
+    component: button
+    steps:
+      - render: { variant: danger, text: Delete, disabled: true }
+      - focus
+      - keyboard: Space
+      - assert: { emitted: none, finalState: disabled }
+  - id: icon-button-trailing-spacing
+    component: button
+    steps:
+      - render: { variant: default, text: Next, iconPlacement: trailing }
+      - focus
+      - keyboard: Enter
+      - assert: { emitted: press, noOverlap: icon-label-gap }
+  - id: grouped-button-borders
+    component: button
+    steps:
+      - render:
+          { variant: primary, group: [Previous, Next], disabledIndexes: [1] }
+      - pointerover
+      - assert: { finalState: grouped, noOverlap: shared-border-radius }
   - id: text-input-focus
     component: input
     steps:

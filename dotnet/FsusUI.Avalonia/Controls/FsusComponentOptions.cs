@@ -40,6 +40,14 @@ internal static class FsusComponentClasses
     "fsus-size-lg",
   ];
 
+  private static readonly string[] IconPlacementClasses =
+  [
+    "fsus-icon-none",
+    "fsus-icon-leading",
+    "fsus-icon-trailing",
+    "fsus-icon-only",
+  ];
+
   public static void SetBaseClasses(Control control, string baseClass)
   {
     Ensure(control, "fsus-control", true);
@@ -66,6 +74,18 @@ internal static class FsusComponentClasses
     Ensure(control, SizeClasses[(int)size], true);
   }
 
+  public static void SyncIconPlacement(
+    Control control,
+    FsusButtonIconPlacement placement)
+  {
+    foreach (var className in IconPlacementClasses)
+    {
+      Ensure(control, className, false);
+    }
+
+    Ensure(control, IconPlacementClasses[(int)placement], true);
+  }
+
   public static void Ensure(Control control, string className, bool enabled)
   {
     if (enabled)
@@ -81,4 +101,3 @@ internal static class FsusComponentClasses
     }
   }
 }
-

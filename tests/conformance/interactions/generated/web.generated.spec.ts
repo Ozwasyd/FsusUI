@@ -31,6 +31,115 @@ const scenarios = [
     expectations: ['emitted', 'finalState'],
   },
   {
+    id: 'loading-button-blocks-activation',
+    platform: 'shared',
+    component: 'button',
+    source: 'tests/conformance/interactions/basic-controls.yaml',
+    contract: '',
+    motionMode: '',
+    shardKey: 1,
+    steps: [
+      {
+        type: 'render',
+        value: '{ variant: primary, text: Saving, loading: true }',
+      },
+      {
+        type: 'pointerover',
+        value: '',
+      },
+      {
+        type: 'keyboard',
+        value: 'Enter',
+      },
+      {
+        type: 'assert',
+        value: '{ emitted: none, finalState: loading }',
+      },
+    ],
+    expectations: ['emitted', 'finalState'],
+  },
+  {
+    id: 'disabled-button-blocks-keyboard',
+    platform: 'shared',
+    component: 'button',
+    source: 'tests/conformance/interactions/basic-controls.yaml',
+    contract: '',
+    motionMode: '',
+    shardKey: 3,
+    steps: [
+      {
+        type: 'render',
+        value: '{ variant: danger, text: Delete, disabled: true }',
+      },
+      {
+        type: 'focus',
+        value: '',
+      },
+      {
+        type: 'keyboard',
+        value: 'Space',
+      },
+      {
+        type: 'assert',
+        value: '{ emitted: none, finalState: disabled }',
+      },
+    ],
+    expectations: ['emitted', 'finalState'],
+  },
+  {
+    id: 'icon-button-trailing-spacing',
+    platform: 'shared',
+    component: 'button',
+    source: 'tests/conformance/interactions/basic-controls.yaml',
+    contract: '',
+    motionMode: '',
+    shardKey: 2,
+    steps: [
+      {
+        type: 'render',
+        value: '{ variant: default, text: Next, iconPlacement: trailing }',
+      },
+      {
+        type: 'focus',
+        value: '',
+      },
+      {
+        type: 'keyboard',
+        value: 'Enter',
+      },
+      {
+        type: 'assert',
+        value: '{ emitted: press, noOverlap: icon-label-gap }',
+      },
+    ],
+    expectations: ['emitted', 'noOverlap'],
+  },
+  {
+    id: 'grouped-button-borders',
+    platform: 'shared',
+    component: 'button',
+    source: 'tests/conformance/interactions/basic-controls.yaml',
+    contract: '',
+    motionMode: '',
+    shardKey: 0,
+    steps: [
+      {
+        type: 'render',
+        value:
+          '{ variant: primary, group: [Previous, Next], disabledIndexes: [1] }',
+      },
+      {
+        type: 'pointerover',
+        value: '',
+      },
+      {
+        type: 'assert',
+        value: '{ finalState: grouped, noOverlap: shared-border-radius }',
+      },
+    ],
+    expectations: ['finalState', 'noOverlap'],
+  },
+  {
     id: 'text-input-focus',
     platform: 'shared',
     component: 'input',

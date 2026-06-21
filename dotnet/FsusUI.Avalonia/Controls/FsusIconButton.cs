@@ -5,9 +5,6 @@ namespace FsusUI.Avalonia.Controls;
 
 public class FsusIconButton : FsusButton
 {
-  public static readonly StyledProperty<string?> AccessibleNameProperty =
-    AvaloniaProperty.Register<FsusIconButton, string?>(nameof(AccessibleName));
-
   public static readonly StyledProperty<bool> IsDecorativeIconProperty =
     AvaloniaProperty.Register<FsusIconButton, bool>(nameof(IsDecorativeIcon));
 
@@ -15,12 +12,6 @@ public class FsusIconButton : FsusButton
   {
     FsusComponentClasses.SetBaseClasses(this, "fsus-icon-button");
     SyncAccessibility();
-  }
-
-  public string? AccessibleName
-  {
-    get => GetValue(AccessibleNameProperty);
-    set => SetValue(AccessibleNameProperty, value);
   }
 
   public bool IsDecorativeIcon

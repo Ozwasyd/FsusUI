@@ -3,8 +3,8 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "artifactRoot": "tests/conformance/visual/artifacts",
   "summary": {
-    "total": 3,
-    "passed": 3,
+    "total": 5,
+    "passed": 5,
     "allowedByOverride": 1
   },
   "comparisons": [
@@ -56,6 +56,68 @@
         "textBaseline": 0.5999999999999979,
         "screenshotDiffPercent": 0.011,
         "perceptualDelta": 0.06
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "button-stable-variants-web-avalonia",
+      "component": "button",
+      "state": "enabled-loading-disabled",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "color.button.stable-variants",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/button-stable-variants.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/button-stable-variants-web-avalonia.json",
+      "deltas": {
+        "geometry": 0.8000000000000114,
+        "colorDelta": 0.5385164807134498,
+        "radius": 0.40000000000000036,
+        "spacing": 0.5,
+        "textBaseline": 0.6000000000000014,
+        "screenshotDiffPercent": 0.012,
+        "perceptualDelta": 0.05
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "button-group-borders-web-avalonia",
+      "component": "button-group",
+      "state": "enabled-disabled-mixed",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "border.button.group",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/button-group-borders.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/button-group-borders-web-avalonia.json",
+      "deltas": {
+        "geometry": 0.5999999999999943,
+        "colorDelta": 0.5385164807134475,
+        "radius": 0.40000000000000036,
+        "spacing": 0.40000000000000036,
+        "textBaseline": 0.3999999999999986,
+        "screenshotDiffPercent": 0.012,
+        "perceptualDelta": 0.05
       },
       "thresholds": {
         "geometry": 1.5,

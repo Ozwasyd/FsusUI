@@ -1,0 +1,31 @@
+{
+  "id": "button-stable-variants-web-avalonia",
+  "component": "button",
+  "state": "enabled-loading-disabled",
+  "mode": "crossPlatform",
+  "platform": "web->avalonia",
+  "token": "color.button.stable-variants",
+  "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/button-stable-variants.png",
+  "diffArtifact": "tests/conformance/visual/artifacts/diffs/button-stable-variants-web-avalonia.json",
+  "deltas": {
+    "geometry": 0.8000000000000114,
+    "colorDelta": 0.5385164807134498,
+    "radius": 0.40000000000000036,
+    "spacing": 0.5,
+    "textBaseline": 0.6000000000000014,
+    "screenshotDiffPercent": 0.012,
+    "perceptualDelta": 0.05
+  },
+  "thresholds": {
+    "geometry": 1.5,
+    "colorDelta": 1.4,
+    "radius": 0.75,
+    "spacing": 1,
+    "textBaseline": 1,
+    "screenshotDiffPercent": 0.015,
+    "perceptualDelta": 0.08
+  },
+  "allowedByOverride": [],
+  "passed": true,
+  "failures": []
+}

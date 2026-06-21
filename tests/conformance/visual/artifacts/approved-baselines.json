@@ -3,7 +3,7 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "fixtureSource": {
     "path": "tests/conformance/visual/fixtures/visual-comparisons.json",
-    "sha256": "8cde17736364e4438141ca126ed83fc06926cb34ecb29c7f644bb67cc0a494b1"
+    "sha256": "764f49d5ef20d841aded9d580a52f2d9c1571a00bce466e8f96ee1dc55e4f44f"
   },
   "artifactRoot": "tests/conformance/visual/artifacts",
   "thresholds": {
@@ -177,6 +177,126 @@
       }
     },
     {
+      "id": "button-stable-variants-web-avalonia",
+      "component": "button",
+      "fixture": {
+        "page": "visual/button",
+        "theme": "light",
+        "density": "default",
+        "variant": "stable-variants",
+        "size": "md",
+        "state": "enabled-loading-disabled",
+        "locale": "en-US",
+        "direction": "ltr",
+        "motionMode": "enabled"
+      },
+      "token": "color.button.stable-variants",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/button-stable-variants.png",
+        "geometry": {
+          "x": 24,
+          "y": 32,
+          "width": 360,
+          "height": 184
+        },
+        "color": {
+          "token": "color.button.stable-variants",
+          "lab": [50, 6, -20]
+        },
+        "radius": 6,
+        "spacing": {
+          "paddingX": 16,
+          "paddingY": 8,
+          "gap": 8
+        },
+        "textBaseline": 25.2
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/button-stable-variants.png",
+        "geometry": {
+          "x": 24.7,
+          "y": 32.5,
+          "width": 360.8,
+          "height": 184.4
+        },
+        "color": {
+          "token": "color.button.stable-variants",
+          "lab": [50.4, 6.2, -20.3]
+        },
+        "radius": 6.4,
+        "spacing": {
+          "paddingX": 16.5,
+          "paddingY": 8.4,
+          "gap": 8.5
+        },
+        "textBaseline": 25.8
+      }
+    },
+    {
+      "id": "button-group-borders-web-avalonia",
+      "component": "button-group",
+      "fixture": {
+        "page": "visual/button-group",
+        "theme": "dark",
+        "density": "compact",
+        "variant": "primary",
+        "size": "sm",
+        "state": "enabled-disabled-mixed",
+        "locale": "en-US",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "border.button.group",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/button-group-borders.png",
+        "geometry": {
+          "x": 20,
+          "y": 28,
+          "width": 178,
+          "height": 34
+        },
+        "color": {
+          "token": "border.button.group",
+          "lab": [48, 10, -37]
+        },
+        "radius": 5,
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 6,
+          "gap": 0
+        },
+        "textBaseline": 21.8
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/button-group-borders.png",
+        "geometry": {
+          "x": 20.5,
+          "y": 28.4,
+          "width": 178.6,
+          "height": 34.2
+        },
+        "color": {
+          "token": "border.button.group",
+          "lab": [48.4, 10.2, -37.3]
+        },
+        "radius": 5.4,
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 6.2,
+          "gap": 0
+        },
+        "textBaseline": 22.2
+      }
+    },
+    {
       "id": "text-baseline-registered-override",
       "component": "text",
       "fixture": {
@@ -249,6 +369,18 @@
       "mode": "crossPlatform",
       "platform": "web->avalonia",
       "diffArtifact": "tests/conformance/visual/artifacts/diffs/button-primary-web-avalonia.json"
+    },
+    {
+      "id": "button-stable-variants-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/button-stable-variants-web-avalonia.json"
+    },
+    {
+      "id": "button-group-borders-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/button-group-borders-web-avalonia.json"
     },
     {
       "id": "text-baseline-registered-override",

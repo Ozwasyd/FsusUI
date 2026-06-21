@@ -1,6 +1,7 @@
 <Styles
   xmlns="https://github.com/avaloniaui"
-  xmlns:fsus="using:FsusUI.Avalonia.Controls">
+  xmlns:fsus="using:FsusUI.Avalonia.Controls"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <Style Selector="Button, fsus|FsusButton, fsus|FsusIconButton">
     <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
     <Setter Property="Padding" Value="14,6" />
@@ -8,8 +9,29 @@
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusComponentButtonRadius}" />
     <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodyMdSize}" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="Opacity" Value="1" />
+  </Style>
+
+  <Style Selector="fsus|FsusButton, fsus|FsusIconButton">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ContentPresenter
+          x:Name="PART_ContentPresenter"
+          Padding="{TemplateBinding Padding}"
+          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+          Background="{TemplateBinding Background}"
+          BorderBrush="{TemplateBinding BorderBrush}"
+          BorderThickness="{TemplateBinding BorderThickness}"
+          Content="{TemplateBinding Content}"
+          ContentTemplate="{TemplateBinding ContentTemplate}"
+          CornerRadius="{TemplateBinding CornerRadius}" />
+      </ControlTemplate>
+    </Setter>
   </Style>
 
   <Style Selector="Button:pointerover, fsus|FsusButton:pointerover, fsus|FsusIconButton:pointerover">
@@ -31,6 +53,21 @@
     <Setter Property="BorderBrush" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
   </Style>
 
+  <Style Selector="Button.fsus-success, fsus|FsusButton.fsus-success, fsus|FsusIconButton.fsus-success">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+  </Style>
+
+  <Style Selector="Button.fsus-warning, fsus|FsusButton.fsus-warning, fsus|FsusIconButton.fsus-warning">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeFocusBrush}" />
+  </Style>
+
+  <Style Selector="Button.fsus-info, fsus|FsusButton.fsus-info, fsus|FsusIconButton.fsus-info">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+  </Style>
+
   <Style Selector="Button.fsus-danger, fsus|FsusButton.fsus-danger, fsus|FsusIconButton.fsus-danger">
     <Setter Property="Background" Value="{DynamicResource FsusThemeDangerBrush}" />
     <Setter Property="Foreground" Value="White" />
@@ -39,6 +76,69 @@
 
   <Style Selector="Button.fsus-loading, fsus|FsusButton.fsus-loading, fsus|FsusIconButton.fsus-loading">
     <Setter Property="Background" Value="{DynamicResource FsusThemeLoadingBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusButton.fsus-size-sm, fsus|FsusIconButton.fsus-size-sm">
+    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlCompactY}" />
+    <Setter Property="Padding" Value="10,4" />
+    <Setter Property="FontSize" Value="12" />
+  </Style>
+
+  <Style Selector="fsus|FsusButton.fsus-size-lg, fsus|FsusIconButton.fsus-size-lg">
+    <Setter Property="MinHeight" Value="44" />
+    <Setter Property="Padding" Value="18,8" />
+  </Style>
+
+  <Style Selector="fsus|FsusButton.fsus-plain, fsus|FsusIconButton.fsus-plain">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+
+  <Style Selector="fsus|FsusButton.fsus-text-button, fsus|FsusButton.fsus-link, fsus|FsusIconButton.fsus-text-button, fsus|FsusIconButton.fsus-link">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusButton.fsus-round, fsus|FsusIconButton.fsus-round">
+    <Setter Property="CornerRadius" Value="999" />
+  </Style>
+
+  <Style Selector="fsus|FsusButton.fsus-circle, fsus|FsusIconButton.fsus-circle">
+    <Setter Property="MinWidth" Value="{DynamicResource FsusDensityControlDefaultY}" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="CornerRadius" Value="999" />
+  </Style>
+
+  <Style Selector="fsus|FsusButton.fsus-inline-action">
+    <Setter Property="Padding" Value="6,2" />
+    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlCompactY}" />
+  </Style>
+
+  <Style Selector="fsus|FsusButton.fsus-grouped">
+    <Setter Property="CornerRadius" Value="0" />
+    <Setter Property="Margin" Value="-1,0,0,0" />
+  </Style>
+
+  <Style Selector="fsus|FsusButton.fsus-group-first">
+    <Setter Property="CornerRadius" Value="6,0,0,6" />
+    <Setter Property="Margin" Value="0" />
+  </Style>
+
+  <Style Selector="fsus|FsusButton.fsus-group-last">
+    <Setter Property="CornerRadius" Value="0,6,6,0" />
+  </Style>
+
+  <Style Selector="fsus|FsusButton.fsus-group-single">
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusComponentButtonRadius}" />
+    <Setter Property="Margin" Value="0" />
+  </Style>
+
+  <Style Selector="fsus|FsusButtonGroup">
+    <Setter Property="Spacing" Value="0" />
+  </Style>
+
+  <Style Selector="fsus|FsusButtonGroup.fsus-disabled">
+    <Setter Property="Opacity" Value="{DynamicResource FsusThemeDisabledOpacity}" />
   </Style>
 
   <Style Selector="fsus|FsusIconButton">

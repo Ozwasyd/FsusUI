@@ -1,0 +1,31 @@
+{
+  "id": "button-group-borders-web-avalonia",
+  "component": "button-group",
+  "state": "enabled-disabled-mixed",
+  "mode": "crossPlatform",
+  "platform": "web->avalonia",
+  "token": "border.button.group",
+  "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/button-group-borders.png",
+  "diffArtifact": "tests/conformance/visual/artifacts/diffs/button-group-borders-web-avalonia.json",
+  "deltas": {
+    "geometry": 0.5999999999999943,
+    "colorDelta": 0.5385164807134475,
+    "radius": 0.40000000000000036,
+    "spacing": 0.40000000000000036,
+    "textBaseline": 0.3999999999999986,
+    "screenshotDiffPercent": 0.012,
+    "perceptualDelta": 0.05
+  },
+  "thresholds": {
+    "geometry": 1.5,
+    "colorDelta": 1.4,
+    "radius": 0.75,
+    "spacing": 1,
+    "textBaseline": 1,
+    "screenshotDiffPercent": 0.015,
+    "perceptualDelta": 0.08
+  },
+  "allowedByOverride": [],
+  "passed": true,
+  "failures": []
+}

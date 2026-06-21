@@ -9,6 +9,10 @@ public class InteractionConformanceTests
   public static IEnumerable<object[]> Scenarios()
   {
     yield return new object[] { "primary-button-click", "button", new[] { "render", "pointerover", "keyboard", "assert" }, new[] { "emitted", "finalState" } };
+    yield return new object[] { "loading-button-blocks-activation", "button", new[] { "render", "pointerover", "keyboard", "assert" }, new[] { "emitted", "finalState" } };
+    yield return new object[] { "disabled-button-blocks-keyboard", "button", new[] { "render", "focus", "keyboard", "assert" }, new[] { "emitted", "finalState" } };
+    yield return new object[] { "icon-button-trailing-spacing", "button", new[] { "render", "focus", "keyboard", "assert" }, new[] { "emitted", "noOverlap" } };
+    yield return new object[] { "grouped-button-borders", "button", new[] { "render", "pointerover", "assert" }, new[] { "finalState", "noOverlap" } };
     yield return new object[] { "text-input-focus", "input", new[] { "render", "focus", "keyboard", "assert" }, new[] { "finalState", "value" } };
     yield return new object[] { "checkbox-toggle", "checkbox", new[] { "render", "focus", "keyboard", "assert" }, new[] { "checked" } };
     yield return new object[] { "dialog-keyboard-containment", "dialog", new[] { "render", "focus", "keyboard", "keyboard", "assert" }, new[] { "finalState" } };

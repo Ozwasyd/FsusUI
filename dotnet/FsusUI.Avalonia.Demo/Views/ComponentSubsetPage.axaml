@@ -8,9 +8,17 @@
       <StackPanel Spacing="10">
         <TextBlock FontSize="18" FontWeight="700" Text="Commands" />
         <StackPanel Orientation="Horizontal" Spacing="8">
-          <fsus:FsusButton Variant="Primary">Primary</fsus:FsusButton>
-          <fsus:FsusButton>Default</fsus:FsusButton>
+          <fsus:FsusButton
+            AccessibleName="Save primary action"
+            Variant="Primary">
+            Primary
+          </fsus:FsusButton>
+          <fsus:FsusButton IsPlain="True">Plain</fsus:FsusButton>
           <fsus:FsusButton IsLoading="True">Loading</fsus:FsusButton>
+          <fsus:FsusButtonGroup Variant="Primary" Size="Sm">
+            <fsus:FsusButton IconPlacement="Leading">Previous</fsus:FsusButton>
+            <fsus:FsusButton IconPlacement="Trailing">Next</fsus:FsusButton>
+          </fsus:FsusButtonGroup>
           <fsus:FsusIconButton
             AccessibleName="Open command palette"
             Variant="Text"
