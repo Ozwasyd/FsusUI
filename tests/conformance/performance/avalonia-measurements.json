@@ -96,6 +96,22 @@
         "mountUnmountCycles": 80
       },
       "artifact": "tests/conformance/performance/artifacts/measurements/menu-navigation-repeated-mount.json"
+    },
+    {
+      "id": "form-validation-repeated-mount",
+      "component": "form",
+      "scenario": "construct-layout-validate-reset-unmount",
+      "metrics": {
+        "constructionMs": 1.7,
+        "firstLayoutMs": 5.2,
+        "interactionLatencyMs": 6.4,
+        "frameTimeMs": 11,
+        "allocationsKb": 132,
+        "retainedControlCount": 12,
+        "disposalMs": 0.9,
+        "mountUnmountCycles": 80
+      },
+      "artifact": "tests/conformance/performance/artifacts/measurements/form-validation-repeated-mount.json"
     }
   ]
 }

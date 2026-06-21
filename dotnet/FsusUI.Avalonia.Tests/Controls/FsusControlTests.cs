@@ -481,6 +481,168 @@ public class FsusControlTests
   }
 
   [Fact]
+  public async Task FormValidatesRequiredFieldsAndMapsAutomationMetadata()
+  {
+    var input = new FsusInput { Text = string.Empty };
+    var item = new FsusFormItem
+    {
+      FieldName = "displayName",
+      Label = "Display name",
+      HelpText = "Shown publicly",
+      IsRequired = true,
+      Content = input,
+    };
+    var form = new FsusForm
+    {
+      LabelPosition = FsusFormLabelPosition.Top,
+      Size = FsusComponentSize.Sm,
+    };
+    form.Children.Add(item);
+
+    var result = await form.ValidateAsync();
+
+    Assert.False(result.IsValid);
+    Assert.Equal(new[] { "displayName" }, result.Errors.Select(error => error.FieldName));
+    Assert.Equal(FsusFormValidationState.Error, item.ValidationState);
+    Assert.Equal("Display name is required.", item.ErrorText);
+    Assert.True(input.IsInvalid);
+    Assert.Equal("Display name", AutomationProperties.GetName(input));
+    Assert.Contains("Shown publicly", AutomationProperties.GetHelpText(input));
+    Assert.Contains("fsus-label-top", item.Classes);
+    Assert.Single(form.Fields);
+
+    input.Text = "Ada";
+    result = await form.ValidateAsync();
+
+    Assert.True(result.IsValid);
+    Assert.Equal(FsusFormValidationState.Success, item.ValidationState);
+    Assert.False(input.IsInvalid);
+    Assert.Equal("valid", AutomationProperties.GetItemStatus(input));
+  }
+
+  [Fact]
+  public async Task FormSupportsAsyncValidationResetAndClearValidation()
+  {
+    var input = new FsusInput { Text = "taken" };
+    var item = new FsusFormItem
+    {
+      FieldName = "slug",
+      Label = "Profile slug",
+      Content = input,
+      AsyncValidator = field =>
+      {
+        var text = ((FsusInput)field.FieldControl!).Text;
+        return new ValueTask<string?>(Task.FromResult(
+          text == "taken" ? "Slug is already reserved." : null));
+      },
+    };
+    var form = new FsusForm();
+    form.Children.Add(item);
+
+    var result = await form.ValidateAsync();
+
+    Assert.False(result.IsValid);
+    Assert.Equal(FsusFormValidationState.Error, item.ValidationState);
+    Assert.Equal("Slug is already reserved.", item.ErrorText);
+
+    item.ClearValidation();
+
+    Assert.Equal(FsusFormValidationState.None, item.ValidationState);
+    Assert.Equal(string.Empty, item.ErrorText);
+    Assert.False(input.IsInvalid);
+
+    input.Text = "available";
+    result = await form.ValidateAsync();
+
+    Assert.True(result.IsValid);
+
+    input.Text = "changed";
+    form.ResetFields();
+
+    Assert.Equal("taken", input.Text);
+    Assert.Equal(FsusFormValidationState.None, item.ValidationState);
+  }
+
+  [Fact]
+  public void FormPropagatesDisabledAndSizeToSupportedControls()
+  {
+    var input = new FsusInput();
+    var checkbox = new FsusCheckbox();
+    var radio = new FsusRadio();
+    var fsusSwitch = new FsusSwitch();
+    var disabledInput = new FsusInput { IsEnabled = false };
+    var form = new FsusForm
+    {
+      IsEnabled = false,
+      Size = FsusComponentSize.Lg,
+    };
+    form.Children.Add(new FsusFormItem { FieldName = "title", Content = input });
+    form.Children.Add(new FsusFormItem { FieldName = "accept", Content = checkbox });
+    form.Children.Add(new FsusFormItem { FieldName = "mode", Content = radio });
+    form.Children.Add(new FsusFormItem { FieldName = "alerts", Content = fsusSwitch });
+    form.Children.Add(new FsusFormItem { FieldName = "locked", Content = disabledInput });
+
+    form.RefreshFormState();
+
+    Assert.All(new Control[] { input, checkbox, radio, fsusSwitch, disabledInput },
+      control => Assert.False(control.IsEnabled));
+    Assert.Equal(FsusComponentSize.Lg, input.Size);
+    Assert.Equal(FsusComponentSize.Lg, checkbox.Size);
+    Assert.Equal(FsusComponentSize.Lg, radio.Size);
+    Assert.Equal(FsusComponentSize.Lg, fsusSwitch.Size);
+
+    form.IsEnabled = true;
+    form.RefreshFormState();
+
+    Assert.True(input.IsEnabled);
+    Assert.True(checkbox.IsEnabled);
+    Assert.True(radio.IsEnabled);
+    Assert.True(fsusSwitch.IsEnabled);
+    Assert.False(disabledInput.IsEnabled);
+  }
+
+  [Fact]
+  public async Task FormRegistrationCleanupAndScrollToErrorAreDeterministic()
+  {
+    var first = new FsusFormItem
+    {
+      FieldName = "first",
+      Label = "First",
+      IsRequired = true,
+      Content = new FsusInput { Text = "ok" },
+    };
+    var second = new FsusFormItem
+    {
+      FieldName = "second",
+      Label = "Second",
+      IsRequired = true,
+      Content = new FsusInput { Text = string.Empty },
+    };
+    var nested = new StackPanel();
+    nested.Children.Add(first);
+    nested.Children.Add(second);
+    var form = new FsusForm { ScrollToError = true };
+    form.Children.Add(nested);
+    form.RefreshFormState();
+
+    Assert.Equal(new[] { "first", "second" }, form.Fields.Select(field => field.FieldName));
+
+    var result = await form.ValidateAsync();
+    var scrollTarget = form.ScrollToFirstError();
+
+    Assert.False(result.IsValid);
+    Assert.Same(second, scrollTarget);
+    Assert.Same(second, form.LastScrollTarget);
+    Assert.Contains("fsus-scroll-target", second.Classes);
+
+    nested.Children.Remove(second);
+    form.RefreshFormState();
+
+    Assert.Equal(new[] { "first" }, form.Fields.Select(field => field.FieldName));
+    Assert.Null(second.OwnerForm);
+  }
+
+  [Fact]
   public void IconButtonRequiresAccessibleNameUnlessExplicitlyDecorative()
   {
     var named = new FsusIconButton { AccessibleName = "Open command palette" };

@@ -35,6 +35,9 @@ public class InteractionConformanceTests
     yield return new object[] { "radio-disabled-item-skips-arrow", "radio", new[] { "render", "focus", "keyboard", "assert" }, new[] { "selectedKey" } };
     yield return new object[] { "switch-loading-blocks-toggle", "switch", new[] { "render", "focus", "keyboard", "assert" }, new[] { "checked", "emitted", "finalState" } };
     yield return new object[] { "switch-focus-visible-toggle", "switch", new[] { "render", "focus", "keyboard", "assert" }, new[] { "checked", "finalState" } };
+    yield return new object[] { "form-required-field-invalid", "form", new[] { "render", "focus", "keyboard", "assert" }, new[] { "accessibleName", "finalState", "invalid" } };
+    yield return new object[] { "form-async-reset-clear-validation", "form", new[] { "render", "keyboard", "assert", "keyboard", "assert" }, new[] { "emitted", "finalState", "invalid", "value" } };
+    yield return new object[] { "form-disabled-nested-focus-order", "form", new[] { "render", "focus", "keyboard", "assert" }, new[] { "emitted", "finalState", "focusTarget" } };
     yield return new object[] { "dialog-keyboard-containment", "dialog", new[] { "render", "focus", "keyboard", "keyboard", "assert" }, new[] { "finalState" } };
     yield return new object[] { "tabs-arrow-navigation", "tabs", new[] { "render", "focus", "keyboard", "assert" }, new[] { "selectedKey" } };
     yield return new object[] { "menu-item-activation", "menu", new[] { "render", "focus", "keyboard", "keyboard", "assert" }, new[] { "emitted" } };

@@ -19,7 +19,7 @@
     },
     "keyboard": ["ArrowDown", "Enter", "Escape"],
     "keyboardOperable": true,
-    "tabOrder": 10,
+    "tabOrder": 11,
     "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/menu-main.json"
   }
 }

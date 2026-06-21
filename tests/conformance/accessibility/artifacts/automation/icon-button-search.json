@@ -20,7 +20,7 @@
     },
     "keyboard": ["Enter", "Space"],
     "keyboardOperable": true,
-    "tabOrder": 11,
+    "tabOrder": 12,
     "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/icon-button-search.json"
   }
 }

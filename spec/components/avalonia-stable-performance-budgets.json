@@ -110,6 +110,20 @@
       }
     },
     {
+      "id": "form",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 2.4,
+        "firstLayoutMs": 7,
+        "interactionLatencyMs": 10,
+        "frameTimeMs": 16,
+        "allocationsKb": 160,
+        "retainedControlCount": 16,
+        "disposalMs": 1.5,
+        "mountUnmountCycles": 50
+      }
+    },
+    {
       "id": "card",
       "stability": "stable",
       "budgets": {

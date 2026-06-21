@@ -1,0 +1,119 @@
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Style Selector="fsus|FsusForm">
+    <Setter Property="Spacing" Value="12" />
+  </Style>
+
+  <Style Selector="fsus|FsusForm.fsus-disabled">
+    <Setter Property="Opacity" Value="{DynamicResource FsusThemeDisabledOpacity}" />
+  </Style>
+
+  <Style Selector="fsus|FsusFormItem">
+    <Setter Property="Margin" Value="0,0,0,2" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid
+          x:Name="PART_FormItemRoot"
+          ColumnDefinitions="140,*"
+          RowDefinitions="Auto,Auto,Auto">
+          <StackPanel
+            x:Name="PART_LabelHost"
+            Grid.Row="0"
+            Grid.Column="0"
+            Margin="0,7,12,0"
+            Orientation="Horizontal"
+            Spacing="3">
+            <TextBlock
+              x:Name="PART_RequiredMark"
+              Foreground="{DynamicResource FsusThemeDangerBrush}"
+              IsVisible="False"
+              Text="*" />
+            <TextBlock
+              x:Name="PART_Label"
+              FontFamily="{DynamicResource FsusTypographyFamilyBody}"
+              FontSize="{DynamicResource FsusTypographyBodyMdSize}"
+              Foreground="{DynamicResource FsusThemeTextBrush}"
+              Text="{TemplateBinding Label}"
+              TextTrimming="CharacterEllipsis"
+              TextWrapping="NoWrap" />
+          </StackPanel>
+          <ContentPresenter
+            x:Name="PART_Field"
+            Grid.Row="0"
+            Grid.Column="1"
+            Content="{TemplateBinding Content}" />
+          <StackPanel
+            x:Name="PART_Message"
+            Grid.Row="1"
+            Grid.Column="1"
+            Margin="0,4,0,0"
+            Spacing="2">
+            <TextBlock
+              x:Name="PART_Help"
+              FontFamily="{DynamicResource FsusTypographyFamilyBody}"
+              FontSize="12"
+              Foreground="{DynamicResource FsusThemeMutedTextBrush}"
+              Text="{TemplateBinding HelpText}"
+              TextWrapping="Wrap" />
+            <TextBlock
+              x:Name="PART_Error"
+              FontFamily="{DynamicResource FsusTypographyFamilyBody}"
+              FontSize="12"
+              Foreground="{DynamicResource FsusThemeDangerBrush}"
+              Text="{TemplateBinding ErrorText}"
+              TextWrapping="Wrap" />
+          </StackPanel>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusFormItem.fsus-required /template/ TextBlock#PART_RequiredMark">
+    <Setter Property="IsVisible" Value="True" />
+  </Style>
+
+  <Style Selector="fsus|FsusFormItem.fsus-label-left /template/ StackPanel#PART_LabelHost">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+  </Style>
+
+  <Style Selector="fsus|FsusFormItem.fsus-label-right /template/ StackPanel#PART_LabelHost">
+    <Setter Property="HorizontalAlignment" Value="Right" />
+  </Style>
+
+  <Style Selector="fsus|FsusFormItem.fsus-label-top /template/ StackPanel#PART_LabelHost">
+    <Setter Property="Grid.Row" Value="0" />
+    <Setter Property="Grid.Column" Value="0" />
+    <Setter Property="Grid.ColumnSpan" Value="2" />
+    <Setter Property="Margin" Value="0,0,0,6" />
+  </Style>
+
+  <Style Selector="fsus|FsusFormItem.fsus-label-top /template/ ContentPresenter#PART_Field">
+    <Setter Property="Grid.Row" Value="1" />
+    <Setter Property="Grid.Column" Value="0" />
+    <Setter Property="Grid.ColumnSpan" Value="2" />
+  </Style>
+
+  <Style Selector="fsus|FsusFormItem.fsus-label-top /template/ StackPanel#PART_Message">
+    <Setter Property="Grid.Row" Value="2" />
+    <Setter Property="Grid.Column" Value="0" />
+    <Setter Property="Grid.ColumnSpan" Value="2" />
+  </Style>
+
+  <Style Selector="fsus|FsusFormItem.fsus-error /template/ TextBlock#PART_Label">
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeDangerBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusFormItem.fsus-success /template/ TextBlock#PART_Label">
+    <Setter Property="Foreground" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusFormItem.fsus-validating /template/ TextBlock#PART_Label">
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeFocusBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusFormItem.fsus-scroll-target /template/ ContentPresenter#PART_Field">
+    <Setter Property="Opacity" Value="0.98" />
+  </Style>
+</Styles>

@@ -15,6 +15,7 @@ which APIs are cross-platform FsusUI contracts.
 | checkbox     | `ElCheckbox`                       | matching        | Native checkbox and ARIA state are adapter-specific; Avalonia uses `FsusCheckbox`/`FsusCheckboxGroup` item values, not Web DOM classes. |
 | radio        | `ElRadio`/`ElRadioGroup`           | matching        | Arrow-key group behavior remains required and maps to `FsusRadioGroup` value selection.                                                 |
 | switch       | `ElSwitch`                         | matching        | Loading/disabled states map to the shared switch contract; Avalonia exposes checked status through native toggle state metadata.        |
+| form         | `ElForm`, `ElFormItem`             | matching        | Field registration, validation, reset, clear-validation, labels, help/error text, and disabled/size propagation map to `FsusForm`.      |
 | card         | `ElCard`, `.is-interactive`        | matching        | DOM structure is not public contract.                                                                                                   |
 | divider      | `ElDivider`                        | matching        | Orientation maps to `divider`.                                                                                                          |
 | tag          | `ElTag`, `ElCheckTag`              | matching        | Uppercase visual treatment is Web styling, not a contract field.                                                                        |

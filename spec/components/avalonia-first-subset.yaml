@@ -80,6 +80,23 @@ controls:
     keyboard: { Space: toggle }
     accessibility: { role: switch, checkedState: required }
     tokens: [color, radius, motion]
+  - id: form
+    publicName: FsusForm
+    props:
+      labelPosition: [left, right, top]
+      size: [sm, md, lg]
+      disabled: boolean
+      scrollToError: boolean
+      validationState: [none, validating, success, error]
+    states: [default, disabled, required, validating, success, error]
+    events: [fieldValidated]
+    keyboard: { Tab: fieldFocusOrder, ShiftTab: reverseFieldFocusOrder }
+    accessibility:
+      role: group
+      labelAssociation: required
+      helpAssociation: required
+      invalidState: required
+    tokens: [color, typography, space, radius, motion]
   - id: card
     publicName: FsusCard
     props: { selected: boolean, disabled: boolean }

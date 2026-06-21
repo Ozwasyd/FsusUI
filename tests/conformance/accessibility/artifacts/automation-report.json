@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "tests/conformance/accessibility/contracts.json",
-      "sha256": "7f12119051677635449a06d4dd8c07f2e2c713267e2c024b32c897769ccbf21f"
+      "sha256": "0a97d5fe4f2f064b3b5916c0816e638c3ac3dd3b575c9514de3c8d12abd2f9b0"
     },
     {
       "path": "tests/conformance/accessibility/automation-snapshots.json",
-      "sha256": "755b2df7f38a7d86ba5ae3d1f6adf1e0fbab7f7016e538661bde2d5e8a0e6f37"
+      "sha256": "a25bd791488c0bac57b45a6adf67172ddc941987148e6c799c0f5966538f9d22"
     }
   ],
   "requiredContractFields": [
@@ -23,9 +23,9 @@
     "keyboardNavigation"
   ],
   "summary": {
-    "controls": 13,
-    "snapshots": 13,
-    "passed": 13,
+    "controls": 14,
+    "snapshots": 14,
+    "passed": 14,
     "appiumReleaseGates": 2,
     "allowedByOverride": 0
   },
@@ -203,6 +203,28 @@
       "errors": []
     },
     {
+      "id": "form-display-name",
+      "component": "form",
+      "platform": "avalonia",
+      "role": "group",
+      "accessibleName": "Display name",
+      "value": null,
+      "states": {
+        "disabled": false,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": true
+      },
+      "keyboard": ["Tab", "ShiftTab"],
+      "tabOrder": 8,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/form-display-name.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
       "id": "dialog-confirm",
       "component": "dialog",
       "platform": "avalonia",
@@ -217,7 +239,7 @@
         "invalid": null
       },
       "keyboard": ["Tab", "Escape"],
-      "tabOrder": 8,
+      "tabOrder": 9,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/dialog-confirm.json",
       "allowedByOverride": [],
@@ -239,7 +261,7 @@
         "invalid": null
       },
       "keyboard": ["ArrowRight", "Home", "End"],
-      "tabOrder": 9,
+      "tabOrder": 10,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/tabs-main.json",
       "allowedByOverride": [],
@@ -261,7 +283,7 @@
         "invalid": null
       },
       "keyboard": ["ArrowDown", "Enter", "Escape"],
-      "tabOrder": 10,
+      "tabOrder": 11,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/menu-main.json",
       "allowedByOverride": [],
@@ -283,7 +305,7 @@
         "invalid": null
       },
       "keyboard": ["Enter", "Space"],
-      "tabOrder": 11,
+      "tabOrder": 12,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/icon-button-search.json",
       "allowedByOverride": [],
@@ -305,7 +327,7 @@
         "invalid": null
       },
       "keyboard": ["Enter", "Space"],
-      "tabOrder": 12,
+      "tabOrder": 13,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/link-release-notes.json",
       "allowedByOverride": [],
@@ -327,7 +349,7 @@
         "invalid": null
       },
       "keyboard": ["Escape"],
-      "tabOrder": 13,
+      "tabOrder": 14,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/alert-live-region.json",
       "allowedByOverride": [],

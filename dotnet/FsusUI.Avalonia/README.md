@@ -77,6 +77,17 @@ toggling, and `ValueChanged`. Loading state blocks interaction, publishes
 automation item status, and restores the previous enabled state when loading
 clears.
 
+## Form Controls
+
+`FsusForm` orchestrates `FsusFormItem` registration, label placement, shared
+size/disabled state, required checks, sync and async validation adapters,
+field-level reset, validation clearing, and scroll-to-error focus targeting.
+
+`FsusFormItem` connects label, help text, and error text to the hosted field
+automation metadata. It maps validation state to item status and propagates
+invalid state to `FsusInput` while keeping field controls responsible for their
+own value contracts.
+
 ## Overlay Host
 
 `FsusOverlayHost` provides the shared host for stable overlay surfaces. It

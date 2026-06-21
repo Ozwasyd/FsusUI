@@ -19,7 +19,7 @@
     },
     "keyboard": ["Tab", "Escape"],
     "keyboardOperable": true,
-    "tabOrder": 8,
+    "tabOrder": 9,
     "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/dialog-confirm.json"
   }
 }

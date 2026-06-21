@@ -111,6 +111,20 @@
       "keyboardNavigation": ["Space"]
     },
     {
+      "id": "form",
+      "publicName": "FsusForm",
+      "role": "group",
+      "accessibleName": "required",
+      "value": "not-applicable",
+      "disabledState": "required",
+      "selectedState": "not-applicable",
+      "checkedState": "not-applicable",
+      "expandedState": "not-applicable",
+      "invalidState": "required",
+      "expectedStates": { "disabled": false, "invalid": true },
+      "keyboardNavigation": ["Tab", "ShiftTab"]
+    },
+    {
       "id": "dialog",
       "publicName": "FsusDialog",
       "role": "dialog",

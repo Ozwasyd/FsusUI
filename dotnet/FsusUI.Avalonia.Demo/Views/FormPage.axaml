@@ -1,15 +1,51 @@
 <UserControl
   x:Class="FsusUI.Avalonia.Demo.Views.FormPage"
   xmlns="https://github.com/avaloniaui"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <Border Classes="fsus-card">
     <StackPanel Spacing="12">
       <TextBlock FontSize="18" FontWeight="700" Text="Reference form" />
-      <TextBox PlaceholderText="Display name" Text="Avalonia theme baseline" />
-      <TextBox PlaceholderText="Description" Text="Validates TextBox, buttons, toggles, and form footer layout." />
-      <CheckBox IsChecked="True">Include generated token resources</CheckBox>
-      <RadioButton GroupName="Mode" IsChecked="True">System motion mode</RadioButton>
-      <RadioButton GroupName="Mode">Reduced motion mode</RadioButton>
+      <fsus:FsusForm LabelPosition="Top" Size="Md">
+        <fsus:FsusFormItem
+          FieldName="displayName"
+          HelpText="Shown in audit comments and release notes."
+          IsRequired="True"
+          Label="Display name"
+          ValidationState="Success">
+          <fsus:FsusInput Text="Avalonia theme baseline" />
+        </fsus:FsusFormItem>
+        <fsus:FsusFormItem
+          ErrorText="Description must stay under the configured limit."
+          FieldName="description"
+          Label="Description with a deliberately long label that must wrap cleanly"
+          ValidationState="Error">
+          <fsus:FsusTextarea Text="Validates input, selection controls, and form footer layout." />
+        </fsus:FsusFormItem>
+        <fsus:FsusFormItem
+          FieldName="locale"
+          HelpText="中文标签需要和英文标签保持相同基线。"
+          IsRequired="True"
+          Label="发布语言">
+          <fsus:FsusInput Text="简体中文" />
+        </fsus:FsusFormItem>
+      </fsus:FsusForm>
+      <fsus:FsusForm LabelPosition="Left" Size="Sm">
+        <fsus:FsusFormItem
+          FieldName="includeTokens"
+          Label="Include generated token resources">
+          <fsus:FsusCheckbox IsChecked="True">Include generated token resources</fsus:FsusCheckbox>
+        </fsus:FsusFormItem>
+        <fsus:FsusFormItem FieldName="motion" Label="Motion mode">
+          <fsus:FsusRadioGroup SelectedValue="system">
+            <fsus:FsusRadio ItemValue="system">System motion mode</fsus:FsusRadio>
+            <fsus:FsusRadio ItemValue="reduced">Reduced motion mode</fsus:FsusRadio>
+          </fsus:FsusRadioGroup>
+        </fsus:FsusFormItem>
+        <fsus:FsusFormItem FieldName="alerts" Label="Notify reviewers">
+          <fsus:FsusSwitch IsChecked="True">Notify reviewers</fsus:FsusSwitch>
+        </fsus:FsusFormItem>
+      </fsus:FsusForm>
       <StackPanel Orientation="Horizontal" Spacing="8">
         <Button Classes="fsus-primary">Submit</Button>
         <Button>Reset</Button>
@@ -17,4 +53,3 @@
     </StackPanel>
   </Border>
 </UserControl>
-

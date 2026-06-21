@@ -733,6 +733,98 @@ const scenarios = [
     expectations: ['checked', 'finalState'],
   },
   {
+    id: 'form-required-field-invalid',
+    platform: 'shared',
+    component: 'form',
+    source: 'tests/conformance/interactions/basic-controls.yaml',
+    contract: '',
+    motionMode: '',
+    shardKey: 2,
+    steps: [
+      {
+        type: 'render',
+        value:
+          "{\nfields: [{ name: displayName, required: true, value: '' }],\nlabelPosition: top,\n}",
+      },
+      {
+        type: 'focus',
+        value: '',
+      },
+      {
+        type: 'keyboard',
+        value: 'Tab',
+      },
+      {
+        type: 'assert',
+        value:
+          '{ invalid: true, accessibleName: Display name, finalState: error }',
+      },
+    ],
+    expectations: ['accessibleName', 'finalState', 'invalid'],
+  },
+  {
+    id: 'form-async-reset-clear-validation',
+    platform: 'shared',
+    component: 'form',
+    source: 'tests/conformance/interactions/basic-controls.yaml',
+    contract: '',
+    motionMode: '',
+    shardKey: 0,
+    steps: [
+      {
+        type: 'render',
+        value:
+          '{\nfields:\n[{ name: slug, value: taken, asyncValidation: reserved-slug }],\n}',
+      },
+      {
+        type: 'keyboard',
+        value: 'Enter',
+      },
+      {
+        type: 'assert',
+        value: '{ invalid: true, emitted: fieldValidated, finalState: error }',
+      },
+      {
+        type: 'keyboard',
+        value: 'Escape',
+      },
+      {
+        type: 'assert',
+        value: '{ value: taken, invalid: false, finalState: default }',
+      },
+    ],
+    expectations: ['emitted', 'finalState', 'invalid', 'value'],
+  },
+  {
+    id: 'form-disabled-nested-focus-order',
+    platform: 'shared',
+    component: 'form',
+    source: 'tests/conformance/interactions/basic-controls.yaml',
+    contract: '',
+    motionMode: '',
+    shardKey: 2,
+    steps: [
+      {
+        type: 'render',
+        value:
+          '{\ndisabled: true,\nnestedFields: [title, accept, mode, alerts],\ncontrols: [input, checkbox, radio, switch],\n}',
+      },
+      {
+        type: 'focus',
+        value: '',
+      },
+      {
+        type: 'keyboard',
+        value: 'Tab',
+      },
+      {
+        type: 'assert',
+        value: '{ emitted: none, finalState: disabled, focusTarget: form }',
+      },
+    ],
+    expectations: ['emitted', 'finalState', 'focusTarget'],
+  },
+  {
     id: 'dialog-keyboard-containment',
     platform: 'shared',
     component: 'dialog',

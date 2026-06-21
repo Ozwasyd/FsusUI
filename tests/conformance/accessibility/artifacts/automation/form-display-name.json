@@ -2,24 +2,24 @@
   "schemaVersion": 1,
   "generatedBy": "scripts/accessibility-conformance.mjs",
   "snapshot": {
-    "id": "link-release-notes",
-    "component": "link",
+    "id": "form-display-name",
+    "component": "form",
     "platform": "avalonia",
-    "control": "FsusLink",
+    "control": "FsusForm",
     "evidenceSource": "avalonia-headless",
-    "role": "link",
-    "accessibleName": "Open release notes",
+    "role": "group",
+    "accessibleName": "Display name",
     "value": null,
     "states": {
       "disabled": false,
       "selected": null,
       "checked": null,
       "expanded": null,
-      "invalid": null
+      "invalid": true
     },
-    "keyboard": ["Enter", "Space"],
+    "keyboard": ["Tab", "ShiftTab"],
     "keyboardOperable": true,
-    "tabOrder": 13,
-    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/link-release-notes.json"
+    "tabOrder": 8,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/form-display-name.json"
   }
 }

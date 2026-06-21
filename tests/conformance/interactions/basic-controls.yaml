@@ -183,6 +183,42 @@ scenarios:
       - focus
       - keyboard: Space
       - assert: { checked: true, finalState: focus-visible }
+  - id: form-required-field-invalid
+    component: form
+    steps:
+      - render:
+          {
+            fields: [{ name: displayName, required: true, value: '' }],
+            labelPosition: top,
+          }
+      - focus
+      - keyboard: Tab
+      - assert:
+          { invalid: true, accessibleName: Display name, finalState: error }
+  - id: form-async-reset-clear-validation
+    component: form
+    steps:
+      - render:
+          {
+            fields:
+              [{ name: slug, value: taken, asyncValidation: reserved-slug }],
+          }
+      - keyboard: Enter
+      - assert: { invalid: true, emitted: fieldValidated, finalState: error }
+      - keyboard: Escape
+      - assert: { value: taken, invalid: false, finalState: default }
+  - id: form-disabled-nested-focus-order
+    component: form
+    steps:
+      - render:
+          {
+            disabled: true,
+            nestedFields: [title, accept, mode, alerts],
+            controls: [input, checkbox, radio, switch],
+          }
+      - focus
+      - keyboard: Tab
+      - assert: { emitted: none, finalState: disabled, focusTarget: form }
   - id: dialog-keyboard-containment
     component: dialog
     steps:

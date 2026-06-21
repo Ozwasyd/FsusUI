@@ -15,12 +15,13 @@ public class AccessibilityConformanceTests
     yield return new object[] { "checkbox-accept", "checkbox", "checkbox", "Accept terms", 1, 5 };
     yield return new object[] { "radio-review", "radio", "radio", "Review status", 4, 6 };
     yield return new object[] { "switch-alerts", "switch", "button", "Comment notifications", 1, 7 };
-    yield return new object[] { "dialog-confirm", "dialog", "dialog", "Confirm publish", 2, 8 };
-    yield return new object[] { "tabs-main", "tabs", "tablist", "Article sections", 3, 9 };
-    yield return new object[] { "menu-main", "menu", "menu", "Main navigation", 3, 10 };
-    yield return new object[] { "icon-button-search", "icon-button", "button", "Search", 2, 11 };
-    yield return new object[] { "link-release-notes", "link", "link", "Open release notes", 2, 12 };
-    yield return new object[] { "alert-live-region", "live-region", "alert", "Upload complete", 1, 13 };
+    yield return new object[] { "form-display-name", "form", "group", "Display name", 2, 8 };
+    yield return new object[] { "dialog-confirm", "dialog", "dialog", "Confirm publish", 2, 9 };
+    yield return new object[] { "tabs-main", "tabs", "tablist", "Article sections", 3, 10 };
+    yield return new object[] { "menu-main", "menu", "menu", "Main navigation", 3, 11 };
+    yield return new object[] { "icon-button-search", "icon-button", "button", "Search", 2, 12 };
+    yield return new object[] { "link-release-notes", "link", "link", "Open release notes", 2, 13 };
+    yield return new object[] { "alert-live-region", "live-region", "alert", "Upload complete", 1, 14 };
   }
 
   [Theory]

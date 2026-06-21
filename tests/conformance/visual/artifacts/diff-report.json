@@ -3,8 +3,8 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "artifactRoot": "tests/conformance/visual/artifacts",
   "summary": {
-    "total": 10,
-    "passed": 10,
+    "total": 11,
+    "passed": 11,
     "allowedByOverride": 1
   },
   "comparisons": [
@@ -308,6 +308,37 @@
         "colorDelta": 0.5385164807134498,
         "radius": 0.40000000000000036,
         "spacing": 0.40000000000000036,
+        "textBaseline": 0.5,
+        "screenshotDiffPercent": 0.012,
+        "perceptualDelta": 0.05
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "form-stable20-web-avalonia",
+      "component": "form",
+      "state": "required-invalid-disabled-long-cjk",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "form.layout.validation",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/form-stable20.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/form-stable20-web-avalonia.json",
+      "deltas": {
+        "geometry": 0.6999999999999886,
+        "colorDelta": 0.41231056256176374,
+        "radius": 0.40000000000000036,
+        "spacing": 0.5,
         "textBaseline": 0.5,
         "screenshotDiffPercent": 0.012,
         "perceptualDelta": 0.05
