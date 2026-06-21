@@ -20,6 +20,13 @@ public class InteractionConformanceTests
     yield return new object[] { "text-truncation-ellipsis", "text", new[] { "render", "assert" }, new[] { "finalState", "noOverlap" } };
     yield return new object[] { "text-variants-baseline", "text", new[] { "render", "assert" }, new[] { "finalState", "noOverlap" } };
     yield return new object[] { "text-input-focus", "input", new[] { "render", "focus", "keyboard", "assert" }, new[] { "finalState", "value" } };
+    yield return new object[] { "input-clear-affordance", "input", new[] { "render", "pointer", "assert" }, new[] { "emitted", "finalState", "value" } };
+    yield return new object[] { "input-composition-commit", "input", new[] { "render", "keyboard", "keyboard", "assert" }, new[] { "emitted", "finalState", "value" } };
+    yield return new object[] { "input-readonly-blocks-clear", "input", new[] { "render", "pointer", "assert" }, new[] { "emitted", "readonly", "value" } };
+    yield return new object[] { "input-disabled-blocks-clear", "input", new[] { "render", "pointer", "assert" }, new[] { "emitted", "finalState", "value" } };
+    yield return new object[] { "textarea-multiline-entry", "textarea", new[] { "render", "focus", "keyboard", "keyboard", "assert" }, new[] { "finalState", "value" } };
+    yield return new object[] { "input-number-step-and-clamp", "input-number", new[] { "render", "keyboard", "keyboard", "keyboard", "keyboard", "assert" }, new[] { "emitted", "finalState", "value" } };
+    yield return new object[] { "input-number-min-clamp", "input-number", new[] { "render", "keyboard", "assert" }, new[] { "emitted", "finalState", "value" } };
     yield return new object[] { "checkbox-toggle", "checkbox", new[] { "render", "focus", "keyboard", "assert" }, new[] { "checked" } };
     yield return new object[] { "dialog-keyboard-containment", "dialog", new[] { "render", "focus", "keyboard", "keyboard", "assert" }, new[] { "finalState" } };
     yield return new object[] { "tabs-arrow-navigation", "tabs", new[] { "render", "focus", "keyboard", "assert" }, new[] { "selectedKey" } };

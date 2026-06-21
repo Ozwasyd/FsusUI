@@ -44,6 +44,48 @@
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/input-invalid.json"
     },
     {
+      "id": "textarea-comment",
+      "component": "textarea",
+      "platform": "avalonia",
+      "control": "FsusTextarea",
+      "evidenceSource": "avalonia-headless",
+      "role": "text-input",
+      "accessibleName": "Comment body",
+      "value": "First line\nSecond line",
+      "states": {
+        "disabled": false,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": false
+      },
+      "keyboard": ["Tab", "Enter", "Escape"],
+      "keyboardOperable": true,
+      "tabOrder": 3,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/textarea-comment.json"
+    },
+    {
+      "id": "input-number-quantity",
+      "component": "input-number",
+      "platform": "avalonia",
+      "control": "FsusInputNumber",
+      "evidenceSource": "avalonia-headless",
+      "role": "spinbutton",
+      "accessibleName": "Quantity",
+      "value": "4",
+      "states": {
+        "disabled": false,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": false
+      },
+      "keyboard": ["Tab", "ArrowUp", "ArrowDown"],
+      "keyboardOperable": true,
+      "tabOrder": 4,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/input-number-quantity.json"
+    },
+    {
       "id": "checkbox-accept",
       "component": "checkbox",
       "platform": "avalonia",
@@ -61,7 +103,7 @@
       },
       "keyboard": ["Space"],
       "keyboardOperable": true,
-      "tabOrder": 3,
+      "tabOrder": 5,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/checkbox-accept.json"
     },
     {
@@ -82,7 +124,7 @@
       },
       "keyboard": ["Tab", "Escape"],
       "keyboardOperable": true,
-      "tabOrder": 4,
+      "tabOrder": 6,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/dialog-confirm.json"
     },
     {
@@ -103,7 +145,7 @@
       },
       "keyboard": ["ArrowRight", "Home", "End"],
       "keyboardOperable": true,
-      "tabOrder": 5,
+      "tabOrder": 7,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/tabs-main.json"
     },
     {
@@ -124,7 +166,7 @@
       },
       "keyboard": ["ArrowDown", "Enter", "Escape"],
       "keyboardOperable": true,
-      "tabOrder": 6,
+      "tabOrder": 8,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/menu-main.json"
     },
     {
@@ -146,7 +188,7 @@
       },
       "keyboard": ["Enter", "Space"],
       "keyboardOperable": true,
-      "tabOrder": 7,
+      "tabOrder": 9,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/icon-button-search.json"
     },
     {
@@ -167,7 +209,7 @@
       },
       "keyboard": ["Enter", "Space"],
       "keyboardOperable": true,
-      "tabOrder": 8,
+      "tabOrder": 10,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/link-release-notes.json"
     },
     {
@@ -188,7 +230,7 @@
       },
       "keyboard": ["Escape"],
       "keyboardOperable": true,
-      "tabOrder": 9,
+      "tabOrder": 11,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/alert-live-region.json"
     }
   ],

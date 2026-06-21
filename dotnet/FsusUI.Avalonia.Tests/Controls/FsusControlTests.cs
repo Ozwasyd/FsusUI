@@ -1,5 +1,6 @@
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
+using Avalonia.Controls;
 using Avalonia.Media;
 using FsusUI.Avalonia.Controls;
 using System.Windows.Input;
@@ -153,13 +154,156 @@ public class FsusControlTests
   }
 
   [Fact]
+  public void InputRaisesValueAndClearEventsWithAutomationMetadata()
+  {
+    var changes = new List<string?>();
+    var validationStates = new List<bool>();
+    var cleared = 0;
+    var input = new FsusInput
+    {
+      AccessibleName = "Search articles",
+      PrefixContent = "Query",
+      SuffixContent = "⌘K",
+      IsClearable = true,
+      IsInvalid = true,
+      Text = "draft",
+    };
+    input.ValueChanged += (_, args) => changes.Add(args.NewValue);
+    input.ValidationStateChanged += (_, args) => validationStates.Add(args.IsInvalid);
+    input.Cleared += (_, _) => cleared++;
+
+    Assert.Contains("fsus-has-prefix", input.Classes);
+    Assert.Contains("fsus-has-suffix", input.Classes);
+    Assert.Contains("fsus-has-clear-affordance", input.Classes);
+    Assert.NotNull(input.InnerLeftContent);
+    var rightContent = Assert.IsType<StackPanel>(input.InnerRightContent);
+    Assert.Contains(rightContent.Children, child => child is Button);
+    Assert.Equal("Search articles", AutomationProperties.GetName(input));
+    Assert.Equal(
+      AutomationControlType.Edit,
+      AutomationProperties.GetControlTypeOverride(input));
+
+    input.ClearText();
+
+    Assert.Equal(string.Empty, input.Text);
+    Assert.Equal(1, cleared);
+    Assert.Equal(new string?[] { string.Empty }, changes);
+
+    input.IsInvalid = false;
+
+    Assert.Equal(new[] { false }, validationStates);
+  }
+
+  [Fact]
+  public void InputCompositionDefersValueChangedUntilCommit()
+  {
+    var changes = new List<string?>();
+    var input = new FsusInput();
+    input.ValueChanged += (_, args) => changes.Add(args.NewValue);
+
+    input.BeginImeComposition();
+    input.Text = "n";
+    input.UpdateImeComposition("ni");
+
+    Assert.Empty(changes);
+    Assert.True(input.IsComposing);
+    Assert.Contains("fsus-composing", input.Classes);
+
+    input.CommitImeComposition("你");
+
+    Assert.False(input.IsComposing);
+    Assert.Equal("你", input.Text);
+    Assert.Equal(new string?[] { "你" }, changes);
+  }
+
+  [Fact]
+  public void InputClearRespectsReadonlyAndDisabledStates()
+  {
+    var input = new FsusInput
+    {
+      IsClearable = true,
+      Text = "locked",
+      IsReadOnly = true,
+    };
+
+    input.ClearText();
+
+    Assert.Equal("locked", input.Text);
+    Assert.Contains("fsus-readonly", input.Classes);
+
+    input.IsReadOnly = false;
+    input.IsEnabled = false;
+    input.ClearText();
+
+    Assert.Equal("locked", input.Text);
+    Assert.Contains("fsus-disabled", input.Classes);
+  }
+
+  [Fact]
   public void TextareaUsesMultilineDefaults()
   {
-    var textarea = new FsusTextarea();
+    var cleared = 0;
+    var textarea = new FsusTextarea
+    {
+      AccessibleName = "Comment body",
+      IsClearable = true,
+      Text = "First line\nSecond line",
+    };
+    textarea.Cleared += (_, _) => cleared++;
 
     Assert.True(textarea.AcceptsReturn);
     Assert.True(textarea.MinLines >= 3);
+    Assert.Equal(TextWrapping.Wrap, textarea.TextWrapping);
     Assert.Contains("fsus-textarea", textarea.Classes);
+
+    textarea.ClearText();
+
+    Assert.Equal(string.Empty, textarea.Text);
+    Assert.Equal(1, cleared);
+  }
+
+  [Fact]
+  public void InputNumberClampsStepsAndSyncsTextAutomation()
+  {
+    var values = new List<decimal?>();
+    var input = new FsusInputNumber
+    {
+      AccessibleName = "Quantity",
+      Minimum = 0,
+      Maximum = 10,
+      Step = 2,
+      Value = 4,
+    };
+    input.ValueChanged += (_, args) => values.Add(args.NewValue);
+
+    Assert.Contains("fsus-input-number", input.Classes);
+    Assert.Contains("fsus-has-spin-controls", input.Classes);
+    var spinContent = Assert.IsType<StackPanel>(input.InnerRightContent);
+    Assert.Equal(2, spinContent.Children.OfType<Button>().Count());
+    Assert.Equal("Quantity", AutomationProperties.GetName(input));
+    Assert.Equal(
+      AutomationControlType.Spinner,
+      AutomationProperties.GetControlTypeOverride(input));
+    Assert.Equal("4", input.Text);
+
+    input.Increment();
+    input.Increment();
+    input.Increment();
+    input.Increment();
+
+    Assert.Equal(10, input.Value);
+    Assert.Equal("10", input.Text);
+
+    input.Decrement();
+
+    Assert.Equal(8, input.Value);
+    Assert.Equal(new decimal?[] { 6, 8, 10, 8 }, values);
+
+    input.Text = "-5";
+    input.CommitText();
+
+    Assert.Equal(0, input.Value);
+    Assert.Equal("0", input.Text);
   }
 
   [Fact]

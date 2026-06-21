@@ -39,6 +39,22 @@ changing the row height contract.
 `Activated` routing, disabled-state blocking, and automation naming from either
 `AccessibleName` or string content.
 
+## Input Controls
+
+`FsusInput` extends Avalonia `TextBox` with stable size, invalid, clearable,
+prefix/suffix content, automation name, `ValueChanged`, `Cleared`, and IME
+composition guards. `BeginImeComposition`, `UpdateImeComposition`, and
+`CommitImeComposition` keep partial composition text from emitting committed
+value changes.
+
+`FsusTextarea` uses the same value, clear, automation, prefix/suffix, readonly,
+disabled, and invalid semantics while enabling multiline return input and
+wrapping defaults.
+
+`FsusInputNumber` adds nullable decimal `Value`, `Minimum`, `Maximum`, `Step`,
+spin controls, text commit parsing, and clamping. Increment/decrement operations
+respect readonly and disabled states.
+
 ## Overlay Host
 
 `FsusOverlayHost` provides the shared host for stable overlay surfaces. It

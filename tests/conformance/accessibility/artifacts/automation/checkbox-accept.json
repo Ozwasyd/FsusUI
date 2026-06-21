@@ -19,7 +19,7 @@
     },
     "keyboard": ["Space"],
     "keyboardOperable": true,
-    "tabOrder": 3,
+    "tabOrder": 5,
     "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/checkbox-accept.json"
   }
 }

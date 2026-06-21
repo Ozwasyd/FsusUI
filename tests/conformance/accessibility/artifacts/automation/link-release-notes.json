@@ -19,7 +19,7 @@
     },
     "keyboard": ["Enter", "Space"],
     "keyboardOperable": true,
-    "tabOrder": 8,
+    "tabOrder": 10,
     "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/link-release-notes.json"
   }
 }

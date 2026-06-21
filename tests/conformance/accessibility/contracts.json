@@ -41,6 +41,34 @@
       "keyboardNavigation": ["Tab", "Escape"]
     },
     {
+      "id": "textarea",
+      "publicName": "FsusTextarea",
+      "role": "text-input",
+      "accessibleName": "required",
+      "value": "required",
+      "disabledState": "required",
+      "selectedState": "not-applicable",
+      "checkedState": "not-applicable",
+      "expandedState": "not-applicable",
+      "invalidState": "required",
+      "expectedStates": { "disabled": false, "invalid": false },
+      "keyboardNavigation": ["Tab", "Enter", "Escape"]
+    },
+    {
+      "id": "input-number",
+      "publicName": "FsusInputNumber",
+      "role": "spinbutton",
+      "accessibleName": "required",
+      "value": "required",
+      "disabledState": "required",
+      "selectedState": "not-applicable",
+      "checkedState": "not-applicable",
+      "expandedState": "not-applicable",
+      "invalidState": "required",
+      "expectedStates": { "disabled": false, "invalid": false },
+      "keyboardNavigation": ["Tab", "ArrowUp", "ArrowDown"]
+    },
+    {
       "id": "checkbox",
       "publicName": "FsusCheckbox",
       "role": "checkbox",

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "input-number-quantity",
+    "component": "input-number",
+    "platform": "avalonia",
+    "control": "FsusInputNumber",
+    "evidenceSource": "avalonia-headless",
+    "role": "spinbutton",
+    "accessibleName": "Quantity",
+    "value": "4",
+    "states": {
+      "disabled": false,
+      "selected": null,
+      "checked": null,
+      "expanded": null,
+      "invalid": false
+    },
+    "keyboard": ["Tab", "ArrowUp", "ArrowDown"],
+    "keyboardOperable": true,
+    "tabOrder": 4,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/input-number-quantity.json"
+  }
+}

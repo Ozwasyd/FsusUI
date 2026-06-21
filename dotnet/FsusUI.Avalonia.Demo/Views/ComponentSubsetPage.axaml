@@ -55,9 +55,26 @@
     <Border Classes="fsus-card">
       <StackPanel Spacing="10">
         <TextBlock FontSize="18" FontWeight="700" Text="Form controls" />
-        <fsus:FsusInput PlaceholderText="FsusInput" />
-        <fsus:FsusInput IsInvalid="True" Text="Invalid input state" />
-        <fsus:FsusTextarea Text="FsusTextarea validates multiline input and wrapping." />
+        <fsus:FsusInput
+          AccessibleName="Search articles"
+          IsClearable="True"
+          PlaceholderText="FsusInput"
+          PrefixContent="Search"
+          SuffixContent="⌘K" />
+        <fsus:FsusInput
+          AccessibleName="Invalid slug"
+          IsInvalid="True"
+          Text="Invalid input state" />
+        <fsus:FsusTextarea
+          AccessibleName="Comment body"
+          IsClearable="True"
+          Text="FsusTextarea validates multiline input and wrapping." />
+        <fsus:FsusInputNumber
+          AccessibleName="Quantity"
+          Maximum="10"
+          Minimum="0"
+          Step="2"
+          Value="4" />
         <fsus:FsusCheckbox IsChecked="True">FsusCheckbox</fsus:FsusCheckbox>
         <fsus:FsusRadio GroupName="subset" IsChecked="True">FsusRadio selected</fsus:FsusRadio>
         <fsus:FsusSwitch IsChecked="True" Content="FsusSwitch" />

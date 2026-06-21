@@ -5,7 +5,7 @@
   "sources": [
     {
       "path": "tests/conformance/interactions/basic-controls.yaml",
-      "sha256": "938fde647439711e6e24ffcaa6e2230512a6e33a35a25c3ef259ecde7796ceb4"
+      "sha256": "380faa4d99f61e5e7cc57f903453a41595f15c015566cb8dd19ba7a74543deac"
     },
     {
       "path": "tests/conformance/interactions/web-first-subset.yaml",
@@ -336,6 +336,198 @@
         }
       ],
       "expectations": ["finalState", "value"]
+    },
+    {
+      "id": "input-clear-affordance",
+      "platform": "shared",
+      "component": "input",
+      "source": "tests/conformance/interactions/basic-controls.yaml",
+      "contract": "",
+      "motionMode": "",
+      "shardKey": 1,
+      "steps": [
+        {
+          "type": "render",
+          "value": "{ value: draft, clearable: true, prefix: Search, suffix: ⌘K }"
+        },
+        {
+          "type": "pointer",
+          "value": "clear"
+        },
+        {
+          "type": "assert",
+          "value": "{ emitted: clear, value: '', finalState: default }"
+        }
+      ],
+      "expectations": ["emitted", "finalState", "value"]
+    },
+    {
+      "id": "input-composition-commit",
+      "platform": "shared",
+      "component": "input",
+      "source": "tests/conformance/interactions/basic-controls.yaml",
+      "contract": "",
+      "motionMode": "",
+      "shardKey": 3,
+      "steps": [
+        {
+          "type": "render",
+          "value": "{ value: '', ime: true }"
+        },
+        {
+          "type": "keyboard",
+          "value": "composition-n"
+        },
+        {
+          "type": "keyboard",
+          "value": "composition-commit"
+        },
+        {
+          "type": "assert",
+          "value": "{ emitted: change, value: 你, finalState: default }"
+        }
+      ],
+      "expectations": ["emitted", "finalState", "value"]
+    },
+    {
+      "id": "input-readonly-blocks-clear",
+      "platform": "shared",
+      "component": "input",
+      "source": "tests/conformance/interactions/basic-controls.yaml",
+      "contract": "",
+      "motionMode": "",
+      "shardKey": 1,
+      "steps": [
+        {
+          "type": "render",
+          "value": "{ value: locked, clearable: true, readonly: true }"
+        },
+        {
+          "type": "pointer",
+          "value": "clear"
+        },
+        {
+          "type": "assert",
+          "value": "{ emitted: none, readonly: true, value: locked }"
+        }
+      ],
+      "expectations": ["emitted", "readonly", "value"]
+    },
+    {
+      "id": "input-disabled-blocks-clear",
+      "platform": "shared",
+      "component": "input",
+      "source": "tests/conformance/interactions/basic-controls.yaml",
+      "contract": "",
+      "motionMode": "",
+      "shardKey": 1,
+      "steps": [
+        {
+          "type": "render",
+          "value": "{ value: locked, clearable: true, disabled: true }"
+        },
+        {
+          "type": "pointer",
+          "value": "clear"
+        },
+        {
+          "type": "assert",
+          "value": "{ emitted: none, finalState: disabled, value: locked }"
+        }
+      ],
+      "expectations": ["emitted", "finalState", "value"]
+    },
+    {
+      "id": "textarea-multiline-entry",
+      "platform": "shared",
+      "component": "textarea",
+      "source": "tests/conformance/interactions/basic-controls.yaml",
+      "contract": "",
+      "motionMode": "",
+      "shardKey": 0,
+      "steps": [
+        {
+          "type": "render",
+          "value": "{ value: First, multiline: true }"
+        },
+        {
+          "type": "focus",
+          "value": ""
+        },
+        {
+          "type": "keyboard",
+          "value": "Enter"
+        },
+        {
+          "type": "keyboard",
+          "value": "'Second'"
+        },
+        {
+          "type": "assert",
+          "value": "{ value: \"First\\nSecond\", finalState: focus-visible }"
+        }
+      ],
+      "expectations": ["finalState", "value"]
+    },
+    {
+      "id": "input-number-step-and-clamp",
+      "platform": "shared",
+      "component": "input-number",
+      "source": "tests/conformance/interactions/basic-controls.yaml",
+      "contract": "",
+      "motionMode": "",
+      "shardKey": 3,
+      "steps": [
+        {
+          "type": "render",
+          "value": "{ value: 4, min: 0, max: 10, step: 2 }"
+        },
+        {
+          "type": "keyboard",
+          "value": "ArrowUp"
+        },
+        {
+          "type": "keyboard",
+          "value": "ArrowUp"
+        },
+        {
+          "type": "keyboard",
+          "value": "ArrowUp"
+        },
+        {
+          "type": "keyboard",
+          "value": "ArrowUp"
+        },
+        {
+          "type": "assert",
+          "value": "{ value: 10, emitted: change, finalState: default }"
+        }
+      ],
+      "expectations": ["emitted", "finalState", "value"]
+    },
+    {
+      "id": "input-number-min-clamp",
+      "platform": "shared",
+      "component": "input-number",
+      "source": "tests/conformance/interactions/basic-controls.yaml",
+      "contract": "",
+      "motionMode": "",
+      "shardKey": 0,
+      "steps": [
+        {
+          "type": "render",
+          "value": "{ value: 1, min: 0, max: 10, step: 2 }"
+        },
+        {
+          "type": "keyboard",
+          "value": "ArrowDown"
+        },
+        {
+          "type": "assert",
+          "value": "{ value: 0, emitted: change, finalState: default }"
+        }
+      ],
+      "expectations": ["emitted", "finalState", "value"]
     },
     {
       "id": "checkbox-toggle",

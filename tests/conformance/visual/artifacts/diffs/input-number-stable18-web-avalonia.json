@@ -1,0 +1,31 @@
+{
+  "id": "input-number-stable18-web-avalonia",
+  "component": "input-number",
+  "state": "enabled-invalid-disabled",
+  "mode": "crossPlatform",
+  "platform": "web->avalonia",
+  "token": "input.number.spin",
+  "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/input-number-stable18.png",
+  "diffArtifact": "tests/conformance/visual/artifacts/diffs/input-number-stable18-web-avalonia.json",
+  "deltas": {
+    "geometry": 0.5,
+    "colorDelta": 0.48989794855663427,
+    "radius": 0.40000000000000036,
+    "spacing": 0.40000000000000036,
+    "textBaseline": 0.5,
+    "screenshotDiffPercent": 0.011,
+    "perceptualDelta": 0.05
+  },
+  "thresholds": {
+    "geometry": 1.5,
+    "colorDelta": 1.4,
+    "radius": 0.75,
+    "spacing": 1,
+    "textBaseline": 1,
+    "screenshotDiffPercent": 0.015,
+    "perceptualDelta": 0.08
+  },
+  "allowedByOverride": [],
+  "passed": true,
+  "failures": []
+}

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "textarea-comment",
+    "component": "textarea",
+    "platform": "avalonia",
+    "control": "FsusTextarea",
+    "evidenceSource": "avalonia-headless",
+    "role": "text-input",
+    "accessibleName": "Comment body",
+    "value": "First line\nSecond line",
+    "states": {
+      "disabled": false,
+      "selected": null,
+      "checked": null,
+      "expanded": null,
+      "invalid": false
+    },
+    "keyboard": ["Tab", "Enter", "Escape"],
+    "keyboardOperable": true,
+    "tabOrder": 3,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/textarea-comment.json"
+  }
+}

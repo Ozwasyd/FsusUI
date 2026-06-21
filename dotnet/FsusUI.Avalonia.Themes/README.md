@@ -51,7 +51,7 @@ The package includes baseline styles for:
 
 - `Button`, `FsusButton`, `FsusIconButton`, and `FsusButtonGroup`
 - `FsusIcon`, `FsusText`, and `FsusLink`
-- `TextBox`
+- `TextBox`, `FsusInput`, `FsusTextarea`, and `FsusInputNumber`
 - `CheckBox`
 - `RadioButton`
 - `ToggleSwitch`

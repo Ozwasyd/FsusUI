@@ -10,13 +10,15 @@ public class AccessibilityConformanceTests
   {
     yield return new object[] { "button-primary", "button", "button", "Save changes", 2, 1 };
     yield return new object[] { "input-invalid", "input", "text-input", "Search articles", 2, 2 };
-    yield return new object[] { "checkbox-accept", "checkbox", "checkbox", "Accept terms", 1, 3 };
-    yield return new object[] { "dialog-confirm", "dialog", "dialog", "Confirm publish", 2, 4 };
-    yield return new object[] { "tabs-main", "tabs", "tablist", "Article sections", 3, 5 };
-    yield return new object[] { "menu-main", "menu", "menu", "Main navigation", 3, 6 };
-    yield return new object[] { "icon-button-search", "icon-button", "button", "Search", 2, 7 };
-    yield return new object[] { "link-release-notes", "link", "link", "Open release notes", 2, 8 };
-    yield return new object[] { "alert-live-region", "live-region", "alert", "Upload complete", 1, 9 };
+    yield return new object[] { "textarea-comment", "textarea", "text-input", "Comment body", 3, 3 };
+    yield return new object[] { "input-number-quantity", "input-number", "spinbutton", "Quantity", 3, 4 };
+    yield return new object[] { "checkbox-accept", "checkbox", "checkbox", "Accept terms", 1, 5 };
+    yield return new object[] { "dialog-confirm", "dialog", "dialog", "Confirm publish", 2, 6 };
+    yield return new object[] { "tabs-main", "tabs", "tablist", "Article sections", 3, 7 };
+    yield return new object[] { "menu-main", "menu", "menu", "Main navigation", 3, 8 };
+    yield return new object[] { "icon-button-search", "icon-button", "button", "Search", 2, 9 };
+    yield return new object[] { "link-release-notes", "link", "link", "Open release notes", 2, 10 };
+    yield return new object[] { "alert-live-region", "live-region", "alert", "Upload complete", 1, 11 };
   }
 
   [Theory]

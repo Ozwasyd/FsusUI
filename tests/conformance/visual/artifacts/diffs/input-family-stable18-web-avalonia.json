@@ -1,0 +1,31 @@
+{
+  "id": "input-family-stable18-web-avalonia",
+  "component": "input",
+  "state": "enabled-invalid-readonly-disabled-clearable",
+  "mode": "crossPlatform",
+  "platform": "web->avalonia",
+  "token": "input.surface.states",
+  "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/input-family-stable18.png",
+  "diffArtifact": "tests/conformance/visual/artifacts/diffs/input-family-stable18-web-avalonia.json",
+  "deltas": {
+    "geometry": 0.6999999999999886,
+    "colorDelta": 0.45825756949558905,
+    "radius": 0.40000000000000036,
+    "spacing": 0.5,
+    "textBaseline": 0.6000000000000014,
+    "screenshotDiffPercent": 0.012,
+    "perceptualDelta": 0.05
+  },
+  "thresholds": {
+    "geometry": 1.5,
+    "colorDelta": 1.4,
+    "radius": 0.75,
+    "spacing": 1,
+    "textBaseline": 1,
+    "screenshotDiffPercent": 0.015,
+    "perceptualDelta": 0.08
+  },
+  "allowedByOverride": [],
+  "passed": true,
+  "failures": []
+}

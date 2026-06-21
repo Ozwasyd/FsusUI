@@ -80,6 +80,54 @@ scenarios:
       - focus
       - keyboard: 'A'
       - assert: { value: A, finalState: focus-visible }
+  - id: input-clear-affordance
+    component: input
+    steps:
+      - render: { value: draft, clearable: true, prefix: Search, suffix: ⌘K }
+      - pointer: clear
+      - assert: { emitted: clear, value: '', finalState: default }
+  - id: input-composition-commit
+    component: input
+    steps:
+      - render: { value: '', ime: true }
+      - keyboard: composition-n
+      - keyboard: composition-commit
+      - assert: { emitted: change, value: 你, finalState: default }
+  - id: input-readonly-blocks-clear
+    component: input
+    steps:
+      - render: { value: locked, clearable: true, readonly: true }
+      - pointer: clear
+      - assert: { emitted: none, readonly: true, value: locked }
+  - id: input-disabled-blocks-clear
+    component: input
+    steps:
+      - render: { value: locked, clearable: true, disabled: true }
+      - pointer: clear
+      - assert: { emitted: none, finalState: disabled, value: locked }
+  - id: textarea-multiline-entry
+    component: textarea
+    steps:
+      - render: { value: First, multiline: true }
+      - focus
+      - keyboard: Enter
+      - keyboard: 'Second'
+      - assert: { value: "First\nSecond", finalState: focus-visible }
+  - id: input-number-step-and-clamp
+    component: input-number
+    steps:
+      - render: { value: 4, min: 0, max: 10, step: 2 }
+      - keyboard: ArrowUp
+      - keyboard: ArrowUp
+      - keyboard: ArrowUp
+      - keyboard: ArrowUp
+      - assert: { value: 10, emitted: change, finalState: default }
+  - id: input-number-min-clamp
+    component: input-number
+    steps:
+      - render: { value: 1, min: 0, max: 10, step: 2 }
+      - keyboard: ArrowDown
+      - assert: { value: 0, emitted: change, finalState: default }
   - id: checkbox-toggle
     component: checkbox
     steps:

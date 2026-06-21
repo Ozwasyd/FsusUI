@@ -347,6 +347,102 @@
       },
       "screenshotDiffPercent": 0.011,
       "perceptualDelta": 0.05
+    },
+    {
+      "id": "input-family-stable18-web-avalonia",
+      "component": "input",
+      "mode": "crossPlatform",
+      "token": "input.surface.states",
+      "fixture": {
+        "page": "visual/input-family",
+        "theme": "light",
+        "density": "default",
+        "variant": "input-textarea-states",
+        "size": "md",
+        "state": "enabled-invalid-readonly-disabled-clearable",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "enabled"
+      },
+      "coverage": {
+        "states": [
+          "enabled",
+          "focus-visible",
+          "invalid",
+          "readonly",
+          "disabled",
+          "clearable",
+          "composition"
+        ],
+        "densities": ["compact", "default", "spacious"],
+        "controls": ["FsusInput", "FsusTextarea"]
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/input-family-stable18.png",
+        "geometry": { "x": 24, "y": 28, "width": 360, "height": 214 },
+        "color": { "token": "input.surface.states", "lab": [92, 0, -3] },
+        "radius": 6,
+        "spacing": { "paddingX": 10, "paddingY": 6, "gap": 10 },
+        "textBaseline": 24.5
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/input-family-stable18.png",
+        "geometry": { "x": 24.6, "y": 28.4, "width": 360.7, "height": 214.5 },
+        "color": { "token": "input.surface.states", "lab": [92.4, 0.1, -3.2] },
+        "radius": 6.4,
+        "spacing": { "paddingX": 10.4, "paddingY": 6.3, "gap": 10.5 },
+        "textBaseline": 25.1
+      },
+      "screenshotDiffPercent": 0.012,
+      "perceptualDelta": 0.05
+    },
+    {
+      "id": "input-number-stable18-web-avalonia",
+      "component": "input-number",
+      "mode": "crossPlatform",
+      "token": "input.number.spin",
+      "fixture": {
+        "page": "visual/input-number",
+        "theme": "dark",
+        "density": "compact",
+        "variant": "spin-min-max",
+        "size": "sm",
+        "state": "enabled-invalid-disabled",
+        "locale": "en-US",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "coverage": {
+        "states": ["enabled", "focus-visible", "invalid", "disabled"],
+        "constraints": ["min", "max", "step"],
+        "densities": ["compact", "default", "spacious"]
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/input-number-stable18.png",
+        "geometry": { "x": 20, "y": 28, "width": 168, "height": 34 },
+        "color": { "token": "input.number.spin", "lab": [49, 2, -14] },
+        "radius": 5,
+        "spacing": { "paddingX": 8, "paddingY": 4, "gap": 4 },
+        "textBaseline": 21.8
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/input-number-stable18.png",
+        "geometry": { "x": 20.4, "y": 28.3, "width": 168.5, "height": 34.3 },
+        "color": { "token": "input.number.spin", "lab": [49.4, 2.2, -14.2] },
+        "radius": 5.4,
+        "spacing": { "paddingX": 8.3, "paddingY": 4.2, "gap": 4.4 },
+        "textBaseline": 22.3
+      },
+      "screenshotDiffPercent": 0.011,
+      "perceptualDelta": 0.05
     }
   ]
 }

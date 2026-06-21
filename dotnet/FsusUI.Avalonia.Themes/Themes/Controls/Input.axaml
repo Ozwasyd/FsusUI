@@ -1,7 +1,7 @@
 <Styles
   xmlns="https://github.com/avaloniaui"
   xmlns:fsus="using:FsusUI.Avalonia.Controls">
-  <Style Selector="TextBox, fsus|FsusInput, fsus|FsusTextarea">
+  <Style Selector="TextBox, fsus|FsusInput, fsus|FsusTextarea, fsus|FsusInputNumber">
     <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
     <Setter Property="Padding" Value="10,6" />
     <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
@@ -9,23 +9,57 @@
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
     <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodyMdSize}" />
+    <Setter Property="FontFamily" Value="{DynamicResource FsusTypographyFamilyBody}" />
+    <Setter Property="LineHeight" Value="{DynamicResource FsusTypographyBodyMdLineHeight}" />
   </Style>
 
-  <Style Selector="TextBox:focus, fsus|FsusInput:focus, fsus|FsusTextarea:focus">
+  <Style Selector="TextBox:focus, fsus|FsusInput:focus, fsus|FsusTextarea:focus, fsus|FsusInputNumber:focus">
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FsusThemeFocusThickness}" />
   </Style>
 
-  <Style Selector="TextBox:disabled, fsus|FsusInput:disabled, fsus|FsusTextarea:disabled">
+  <Style Selector="TextBox:disabled, fsus|FsusInput:disabled, fsus|FsusTextarea:disabled, fsus|FsusInputNumber:disabled">
     <Setter Property="Background" Value="{DynamicResource FsusThemeDisabledSurfaceBrush}" />
     <Setter Property="Opacity" Value="{DynamicResource FsusThemeDisabledOpacity}" />
   </Style>
 
-  <Style Selector="TextBox:read-only, fsus|FsusInput:read-only, fsus|FsusTextarea:read-only">
+  <Style Selector="TextBox:read-only, fsus|FsusInput:read-only, fsus|FsusTextarea:read-only, fsus|FsusInputNumber:read-only">
     <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
   </Style>
 
-  <Style Selector="TextBox.fsus-invalid, fsus|FsusInput.fsus-invalid, fsus|FsusTextarea.fsus-invalid">
+  <Style Selector="TextBox.fsus-invalid, fsus|FsusInput.fsus-invalid, fsus|FsusTextarea.fsus-invalid, fsus|FsusInputNumber.fsus-invalid">
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeDangerBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusInput.fsus-size-sm, fsus|FsusTextarea.fsus-size-sm, fsus|FsusInputNumber.fsus-size-sm">
+    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlCompactY}" />
+    <Setter Property="Padding" Value="8,4" />
+    <Setter Property="FontSize" Value="12" />
+  </Style>
+
+  <Style Selector="fsus|FsusInput.fsus-size-lg, fsus|FsusTextarea.fsus-size-lg, fsus|FsusInputNumber.fsus-size-lg">
+    <Setter Property="MinHeight" Value="44" />
+    <Setter Property="Padding" Value="12,8" />
+  </Style>
+
+  <Style Selector="fsus|FsusInput.fsus-composing, fsus|FsusTextarea.fsus-composing, fsus|FsusInputNumber.fsus-composing">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusTextarea">
+    <Setter Property="MinHeight" Value="96" />
+  </Style>
+
+  <Style Selector="Button.fsus-input-clear, Button.fsus-input-number-spin">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlCompactY}" />
+    <Setter Property="Padding" Value="6,0" />
+    <Setter Property="FontSize" Value="12" />
+  </Style>
+
+  <Style Selector="Button.fsus-input-clear:pointerover, Button.fsus-input-number-spin:pointerover">
+    <Setter Property="Foreground" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
   </Style>
 </Styles>
