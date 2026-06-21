@@ -65,6 +65,16 @@
       "import": "./es/markdown-runtime.mjs",
       "require": "./lib/markdown-runtime.js"
     },
+    "./motion": {
+      "types": "./es/motion.d.ts",
+      "import": "./es/motion.mjs",
+      "require": "./lib/motion.js"
+    },
+    "./perception-challenge": {
+      "types": "./es/perception-challenge.d.ts",
+      "import": "./es/perception-challenge.mjs",
+      "require": "./lib/perception-challenge.js"
+    },
     "./dist/public-shell-critical.css": "./dist/public-shell-critical.css",
     "./dist/el-fsus-theme.css": "./dist/el-fsus-theme.css",
     "./es/*.mjs": {

@@ -1,34 +1,11 @@
-import installer from './defaults'
-export * from '@element-plus/components'
-export * from '@element-plus/constants'
-export * from '@element-plus/directives'
-export * from '@element-plus/hooks'
-export * from './make-installer'
-export * from './render-pipeline-policies'
-export * from './result'
-export { ElEmptyState } from '@element-plus/components/empty-state'
-export { ElSiteHeader } from '@element-plus/components/site-header'
-export {
-  ElLocalizationChallenge,
-  ElMicroInteractionChallenge,
-  ElPerceptionChallenge,
-  ElTextTaskChallenge,
-  FsusLocalizationChallenge,
-  FsusMicroInteractionChallenge,
-  FsusPerceptionChallenge,
-  FsusTextTaskChallenge,
-} from '@element-plus/components/perception-challenge'
-export type {
-  PerceptionChallengeAssignment,
-  PerceptionChallengeClient,
-  PerceptionChallengeExpiredPayload,
-  PerceptionChallengeKind,
-  PerceptionChallengeRenderPayload,
-  PerceptionChallengeRenderer,
-  PerceptionChallengeState,
-  PerceptionChallengeSubmitPayload,
-  PerceptionChallengeVerifyResult,
-} from '@element-plus/components/perception-challenge'
+// Stable subpath module: `@ozwasyd/element-plus/motion`
+//
+// Preview public API for downstream consumers that need the motion runtime
+// (plugin, directives, composables, runtime helpers, preset lookup, governance
+// validators) without depending on the deep `@element-plus/motion` package
+// path. Surface area mirrors the named exports documented in
+// `packages/element-plus/index.ts`; do not add internal-only exports here.
+
 export {
   FsuBottomActionBar,
   FsuMobileDock,
@@ -104,22 +81,23 @@ export {
   vMotion,
   vScrollReveal,
 } from '@element-plus/motion'
+
 export type {
   FlipMotionOptions,
   FlipMotionState,
   GsapContextCallback,
   GsapScope,
   MotionAdoptionEntry,
-  MotionDirectiveValue,
   MotionBudgetConfig,
+  MotionDirectiveValue,
   MotionEffectKind,
   MotionGovernanceFinding,
   MotionGovernanceSeverity,
   MotionInteractionKind,
+  MotionMode,
   MotionOptions,
   MotionPhase,
   MotionPluginConfig,
-  MotionMode,
   MotionPreferenceSnapshot,
   MotionPresetDefinition,
   MotionPresetName,
@@ -150,10 +128,3 @@ export type {
   UseTaskFeedbackOptions,
   UseTimelineOptions,
 } from '@element-plus/motion'
-
-export const install = installer.install
-export const version = installer.version
-export { groupedInstaller } from './defaults'
-export default installer
-
-export { default as dayjs } from 'dayjs'
