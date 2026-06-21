@@ -1,0 +1,56 @@
+{
+  "cases": [
+    {
+      "name": "construction budget exceeded",
+      "expectedError": "constructionMs exceeded",
+      "measurementMutation": {
+        "id": "button-repeated-mount",
+        "path": "metrics.constructionMs",
+        "value": 99
+      }
+    },
+    {
+      "name": "layout budget exceeded",
+      "expectedError": "firstLayoutMs exceeded",
+      "measurementMutation": {
+        "id": "input-invalid-repeated-mount",
+        "path": "metrics.firstLayoutMs",
+        "value": 99
+      }
+    },
+    {
+      "name": "allocation budget exceeded",
+      "expectedError": "allocationsKb exceeded",
+      "measurementMutation": {
+        "id": "dialog-overlay-repeated-mount",
+        "path": "metrics.allocationsKb",
+        "value": 999
+      }
+    },
+    {
+      "name": "retained control budget exceeded",
+      "expectedError": "retainedControlCount exceeded",
+      "measurementMutation": {
+        "id": "menu-navigation-repeated-mount",
+        "path": "metrics.retainedControlCount",
+        "value": 99
+      }
+    },
+    {
+      "name": "missing stable budget metric",
+      "expectedError": "menu budget missing retainedControlCount",
+      "budgetMutation": {
+        "id": "menu",
+        "path": "budgets.retainedControlCount",
+        "delete": true
+      }
+    },
+    {
+      "name": "complex component stable without numeric budgets",
+      "expectedError": "data-table complex component stable without numeric budgets",
+      "complexRoadmapMutation": {
+        "id": "data-table"
+      }
+    }
+  ]
+}

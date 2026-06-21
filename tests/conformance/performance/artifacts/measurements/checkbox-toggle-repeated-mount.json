@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/avalonia-performance-budget.mjs",
+  "measurement": {
+    "id": "checkbox-toggle-repeated-mount",
+    "component": "checkbox",
+    "scenario": "construct-layout-toggle-unmount",
+    "metrics": {
+      "constructionMs": 0.7,
+      "firstLayoutMs": 2,
+      "interactionLatencyMs": 3.1,
+      "frameTimeMs": 8,
+      "allocationsKb": 44,
+      "retainedControlCount": 3,
+      "disposalMs": 0.4,
+      "mountUnmountCycles": 80
+    },
+    "artifact": "tests/conformance/performance/artifacts/measurements/checkbox-toggle-repeated-mount.json"
+  }
+}

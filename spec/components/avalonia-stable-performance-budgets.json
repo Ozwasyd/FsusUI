@@ -1,0 +1,225 @@
+{
+  "schemaVersion": 1,
+  "unit": {
+    "constructionMs": "milliseconds",
+    "firstLayoutMs": "milliseconds",
+    "interactionLatencyMs": "milliseconds",
+    "frameTimeMs": "milliseconds",
+    "allocationsKb": "kilobytes",
+    "retainedControlCount": "control-count",
+    "disposalMs": "milliseconds",
+    "mountUnmountCycles": "minimum-cycle-count"
+  },
+  "components": [
+    {
+      "id": "button",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 1.5,
+        "firstLayoutMs": 4,
+        "interactionLatencyMs": 8,
+        "frameTimeMs": 16,
+        "allocationsKb": 96,
+        "retainedControlCount": 8,
+        "disposalMs": 1,
+        "mountUnmountCycles": 50
+      }
+    },
+    {
+      "id": "icon-button",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 1.5,
+        "firstLayoutMs": 4,
+        "interactionLatencyMs": 8,
+        "frameTimeMs": 16,
+        "allocationsKb": 96,
+        "retainedControlCount": 8,
+        "disposalMs": 1,
+        "mountUnmountCycles": 50
+      }
+    },
+    {
+      "id": "input",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 2,
+        "firstLayoutMs": 5,
+        "interactionLatencyMs": 9,
+        "frameTimeMs": 16,
+        "allocationsKb": 128,
+        "retainedControlCount": 10,
+        "disposalMs": 1.2,
+        "mountUnmountCycles": 50
+      }
+    },
+    {
+      "id": "textarea",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 2,
+        "firstLayoutMs": 5,
+        "interactionLatencyMs": 9,
+        "frameTimeMs": 16,
+        "allocationsKb": 128,
+        "retainedControlCount": 10,
+        "disposalMs": 1.2,
+        "mountUnmountCycles": 50
+      }
+    },
+    {
+      "id": "checkbox",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 1.4,
+        "firstLayoutMs": 4,
+        "interactionLatencyMs": 8,
+        "frameTimeMs": 16,
+        "allocationsKb": 88,
+        "retainedControlCount": 8,
+        "disposalMs": 1,
+        "mountUnmountCycles": 50
+      }
+    },
+    {
+      "id": "radio",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 1.4,
+        "firstLayoutMs": 4,
+        "interactionLatencyMs": 8,
+        "frameTimeMs": 16,
+        "allocationsKb": 88,
+        "retainedControlCount": 8,
+        "disposalMs": 1,
+        "mountUnmountCycles": 50
+      }
+    },
+    {
+      "id": "switch",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 1.6,
+        "firstLayoutMs": 4.5,
+        "interactionLatencyMs": 8,
+        "frameTimeMs": 16,
+        "allocationsKb": 96,
+        "retainedControlCount": 8,
+        "disposalMs": 1,
+        "mountUnmountCycles": 50
+      }
+    },
+    {
+      "id": "card",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 1.8,
+        "firstLayoutMs": 5,
+        "interactionLatencyMs": 9,
+        "frameTimeMs": 16,
+        "allocationsKb": 112,
+        "retainedControlCount": 10,
+        "disposalMs": 1.2,
+        "mountUnmountCycles": 50
+      }
+    },
+    {
+      "id": "divider",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 1,
+        "firstLayoutMs": 3,
+        "interactionLatencyMs": 6,
+        "frameTimeMs": 16,
+        "allocationsKb": 64,
+        "retainedControlCount": 4,
+        "disposalMs": 0.8,
+        "mountUnmountCycles": 50
+      }
+    },
+    {
+      "id": "tag",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 1.4,
+        "firstLayoutMs": 4,
+        "interactionLatencyMs": 8,
+        "frameTimeMs": 16,
+        "allocationsKb": 88,
+        "retainedControlCount": 8,
+        "disposalMs": 1,
+        "mountUnmountCycles": 50
+      }
+    },
+    {
+      "id": "badge",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 1.4,
+        "firstLayoutMs": 4,
+        "interactionLatencyMs": 8,
+        "frameTimeMs": 16,
+        "allocationsKb": 88,
+        "retainedControlCount": 8,
+        "disposalMs": 1,
+        "mountUnmountCycles": 50
+      }
+    },
+    {
+      "id": "alert",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 1.8,
+        "firstLayoutMs": 5,
+        "interactionLatencyMs": 9,
+        "frameTimeMs": 16,
+        "allocationsKb": 120,
+        "retainedControlCount": 10,
+        "disposalMs": 1.2,
+        "mountUnmountCycles": 50
+      }
+    },
+    {
+      "id": "dialog",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 2.5,
+        "firstLayoutMs": 7,
+        "interactionLatencyMs": 10,
+        "frameTimeMs": 16,
+        "allocationsKb": 160,
+        "retainedControlCount": 16,
+        "disposalMs": 1.5,
+        "mountUnmountCycles": 50
+      }
+    },
+    {
+      "id": "tabs",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 2.2,
+        "firstLayoutMs": 6,
+        "interactionLatencyMs": 10,
+        "frameTimeMs": 16,
+        "allocationsKb": 144,
+        "retainedControlCount": 14,
+        "disposalMs": 1.4,
+        "mountUnmountCycles": 50
+      }
+    },
+    {
+      "id": "menu",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 2.3,
+        "firstLayoutMs": 6,
+        "interactionLatencyMs": 10,
+        "frameTimeMs": 16,
+        "allocationsKb": 152,
+        "retainedControlCount": 14,
+        "disposalMs": 1.4,
+        "mountUnmountCycles": 50
+      }
+    }
+  ]
+}

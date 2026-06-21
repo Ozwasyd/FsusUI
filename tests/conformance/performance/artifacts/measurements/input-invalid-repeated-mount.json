@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/avalonia-performance-budget.mjs",
+  "measurement": {
+    "id": "input-invalid-repeated-mount",
+    "component": "input",
+    "scenario": "construct-layout-type-clear-unmount",
+    "metrics": {
+      "constructionMs": 1.1,
+      "firstLayoutMs": 3.1,
+      "interactionLatencyMs": 4.2,
+      "frameTimeMs": 9.2,
+      "allocationsKb": 72,
+      "retainedControlCount": 5,
+      "disposalMs": 0.5,
+      "mountUnmountCycles": 80
+    },
+    "artifact": "tests/conformance/performance/artifacts/measurements/input-invalid-repeated-mount.json"
+  }
+}

@@ -1,0 +1,249 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/avalonia-performance-budget.mjs",
+  "sources": [
+    {
+      "path": "spec/components/avalonia-stable-performance-budgets.json",
+      "sha256": "ba66df1b44213af81650dd3a214df466753195f96164dcb847ae955d1ca67b0b"
+    },
+    {
+      "path": "tests/conformance/performance/avalonia-measurements.json",
+      "sha256": "e40a8489403606f0f75f9ef1d975f9c395cc2e28ab8c03ba747b548dcc5c4e57"
+    },
+    {
+      "path": "tests/conformance/performance/data-size-fixtures.json",
+      "sha256": "388f2b418434ed5e44ffda6526b566f5f7dc98fe1068ff499d1d177da7365dc6"
+    }
+  ],
+  "summary": {
+    "budgetedComponents": 15,
+    "measurements": 6,
+    "passed": 6,
+    "dataSizeFixtures": 5
+  },
+  "dataSizeFixtures": [
+    {
+      "family": "list",
+      "component": "virtual-list",
+      "sizes": {
+        "items": [1000, 10000, 100000],
+        "visibleRows": 40
+      },
+      "budgetFocus": ["firstLayoutMs", "retainedControlCount"]
+    },
+    {
+      "family": "table",
+      "component": "data-table",
+      "sizes": {
+        "rows": [1000, 10000, 100000],
+        "columns": [8, 24, 80]
+      },
+      "budgetFocus": ["firstLayoutMs", "allocationsKb", "retainedControlCount"]
+    },
+    {
+      "family": "tree",
+      "component": "tree",
+      "sizes": {
+        "nodes": [1000, 10000],
+        "depth": [4, 12]
+      },
+      "budgetFocus": ["interactionLatencyMs", "retainedControlCount"]
+    },
+    {
+      "family": "markdown",
+      "component": "markdown-viewer",
+      "sizes": {
+        "blocks": [100, 1000],
+        "codeLines": [200, 5000]
+      },
+      "budgetFocus": ["constructionMs", "firstLayoutMs", "allocationsKb"]
+    },
+    {
+      "family": "upload",
+      "component": "upload",
+      "sizes": {
+        "files": [10, 100, 1000],
+        "concurrentTransfers": [2, 8]
+      },
+      "budgetFocus": ["interactionLatencyMs", "retainedControlCount"]
+    }
+  ],
+  "measurements": [
+    {
+      "id": "button-repeated-mount",
+      "component": "button",
+      "scenario": "construct-layout-activate-unmount",
+      "metrics": {
+        "constructionMs": 0.8,
+        "firstLayoutMs": 2.2,
+        "interactionLatencyMs": 3.6,
+        "frameTimeMs": 8.5,
+        "allocationsKb": 48,
+        "retainedControlCount": 3,
+        "disposalMs": 0.4,
+        "mountUnmountCycles": 80
+      },
+      "budgets": {
+        "constructionMs": 1.5,
+        "firstLayoutMs": 4,
+        "interactionLatencyMs": 8,
+        "frameTimeMs": 16,
+        "allocationsKb": 96,
+        "retainedControlCount": 8,
+        "disposalMs": 1,
+        "mountUnmountCycles": 50
+      },
+      "artifact": "tests/conformance/performance/artifacts/measurements/button-repeated-mount.json",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "input-invalid-repeated-mount",
+      "component": "input",
+      "scenario": "construct-layout-type-clear-unmount",
+      "metrics": {
+        "constructionMs": 1.1,
+        "firstLayoutMs": 3.1,
+        "interactionLatencyMs": 4.2,
+        "frameTimeMs": 9.2,
+        "allocationsKb": 72,
+        "retainedControlCount": 5,
+        "disposalMs": 0.5,
+        "mountUnmountCycles": 80
+      },
+      "budgets": {
+        "constructionMs": 2,
+        "firstLayoutMs": 5,
+        "interactionLatencyMs": 9,
+        "frameTimeMs": 16,
+        "allocationsKb": 128,
+        "retainedControlCount": 10,
+        "disposalMs": 1.2,
+        "mountUnmountCycles": 50
+      },
+      "artifact": "tests/conformance/performance/artifacts/measurements/input-invalid-repeated-mount.json",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "checkbox-toggle-repeated-mount",
+      "component": "checkbox",
+      "scenario": "construct-layout-toggle-unmount",
+      "metrics": {
+        "constructionMs": 0.7,
+        "firstLayoutMs": 2,
+        "interactionLatencyMs": 3.1,
+        "frameTimeMs": 8,
+        "allocationsKb": 44,
+        "retainedControlCount": 3,
+        "disposalMs": 0.4,
+        "mountUnmountCycles": 80
+      },
+      "budgets": {
+        "constructionMs": 1.4,
+        "firstLayoutMs": 4,
+        "interactionLatencyMs": 8,
+        "frameTimeMs": 16,
+        "allocationsKb": 88,
+        "retainedControlCount": 8,
+        "disposalMs": 1,
+        "mountUnmountCycles": 50
+      },
+      "artifact": "tests/conformance/performance/artifacts/measurements/checkbox-toggle-repeated-mount.json",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "dialog-overlay-repeated-mount",
+      "component": "dialog",
+      "scenario": "construct-layout-open-close-unmount",
+      "metrics": {
+        "constructionMs": 1.6,
+        "firstLayoutMs": 4.8,
+        "interactionLatencyMs": 6.4,
+        "frameTimeMs": 11,
+        "allocationsKb": 118,
+        "retainedControlCount": 9,
+        "disposalMs": 0.8,
+        "mountUnmountCycles": 80
+      },
+      "budgets": {
+        "constructionMs": 2.5,
+        "firstLayoutMs": 7,
+        "interactionLatencyMs": 10,
+        "frameTimeMs": 16,
+        "allocationsKb": 160,
+        "retainedControlCount": 16,
+        "disposalMs": 1.5,
+        "mountUnmountCycles": 50
+      },
+      "artifact": "tests/conformance/performance/artifacts/measurements/dialog-overlay-repeated-mount.json",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "tabs-navigation-repeated-mount",
+      "component": "tabs",
+      "scenario": "construct-layout-arrow-navigation-unmount",
+      "metrics": {
+        "constructionMs": 1.4,
+        "firstLayoutMs": 4.2,
+        "interactionLatencyMs": 5.2,
+        "frameTimeMs": 10,
+        "allocationsKb": 96,
+        "retainedControlCount": 8,
+        "disposalMs": 0.7,
+        "mountUnmountCycles": 80
+      },
+      "budgets": {
+        "constructionMs": 2.2,
+        "firstLayoutMs": 6,
+        "interactionLatencyMs": 10,
+        "frameTimeMs": 16,
+        "allocationsKb": 144,
+        "retainedControlCount": 14,
+        "disposalMs": 1.4,
+        "mountUnmountCycles": 50
+      },
+      "artifact": "tests/conformance/performance/artifacts/measurements/tabs-navigation-repeated-mount.json",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "menu-navigation-repeated-mount",
+      "component": "menu",
+      "scenario": "construct-layout-keyboard-select-unmount",
+      "metrics": {
+        "constructionMs": 1.5,
+        "firstLayoutMs": 4.5,
+        "interactionLatencyMs": 5.4,
+        "frameTimeMs": 10.2,
+        "allocationsKb": 104,
+        "retainedControlCount": 8,
+        "disposalMs": 0.7,
+        "mountUnmountCycles": 80
+      },
+      "budgets": {
+        "constructionMs": 2.3,
+        "firstLayoutMs": 6,
+        "interactionLatencyMs": 10,
+        "frameTimeMs": 16,
+        "allocationsKb": 152,
+        "retainedControlCount": 14,
+        "disposalMs": 1.4,
+        "mountUnmountCycles": 50
+      },
+      "artifact": "tests/conformance/performance/artifacts/measurements/menu-navigation-repeated-mount.json",
+      "passed": true,
+      "errors": []
+    }
+  ],
+  "measurementOutput": [
+    "tests/conformance/performance/artifacts/measurements/button-repeated-mount.json",
+    "tests/conformance/performance/artifacts/measurements/input-invalid-repeated-mount.json",
+    "tests/conformance/performance/artifacts/measurements/checkbox-toggle-repeated-mount.json",
+    "tests/conformance/performance/artifacts/measurements/dialog-overlay-repeated-mount.json",
+    "tests/conformance/performance/artifacts/measurements/tabs-navigation-repeated-mount.json",
+    "tests/conformance/performance/artifacts/measurements/menu-navigation-repeated-mount.json"
+  ]
+}

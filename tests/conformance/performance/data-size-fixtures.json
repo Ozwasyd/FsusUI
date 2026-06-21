@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "fixtures": [
+    {
+      "family": "list",
+      "component": "virtual-list",
+      "sizes": { "items": [1000, 10000, 100000], "visibleRows": 40 },
+      "budgetFocus": ["firstLayoutMs", "retainedControlCount"]
+    },
+    {
+      "family": "table",
+      "component": "data-table",
+      "sizes": { "rows": [1000, 10000, 100000], "columns": [8, 24, 80] },
+      "budgetFocus": ["firstLayoutMs", "allocationsKb", "retainedControlCount"]
+    },
+    {
+      "family": "tree",
+      "component": "tree",
+      "sizes": { "nodes": [1000, 10000], "depth": [4, 12] },
+      "budgetFocus": ["interactionLatencyMs", "retainedControlCount"]
+    },
+    {
+      "family": "markdown",
+      "component": "markdown-viewer",
+      "sizes": { "blocks": [100, 1000], "codeLines": [200, 5000] },
+      "budgetFocus": ["constructionMs", "firstLayoutMs", "allocationsKb"]
+    },
+    {
+      "family": "upload",
+      "component": "upload",
+      "sizes": { "files": [10, 100, 1000], "concurrentTransfers": [2, 8] },
+      "budgetFocus": ["interactionLatencyMs", "retainedControlCount"]
+    }
+  ]
+}

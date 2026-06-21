@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/avalonia-performance-budget.mjs",
+  "measurement": {
+    "id": "tabs-navigation-repeated-mount",
+    "component": "tabs",
+    "scenario": "construct-layout-arrow-navigation-unmount",
+    "metrics": {
+      "constructionMs": 1.4,
+      "firstLayoutMs": 4.2,
+      "interactionLatencyMs": 5.2,
+      "frameTimeMs": 10,
+      "allocationsKb": 96,
+      "retainedControlCount": 8,
+      "disposalMs": 0.7,
+      "mountUnmountCycles": 80
+    },
+    "artifact": "tests/conformance/performance/artifacts/measurements/tabs-navigation-repeated-mount.json"
+  }
+}

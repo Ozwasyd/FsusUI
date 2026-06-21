@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/avalonia-performance-budget.mjs",
+  "measurement": {
+    "id": "menu-navigation-repeated-mount",
+    "component": "menu",
+    "scenario": "construct-layout-keyboard-select-unmount",
+    "metrics": {
+      "constructionMs": 1.5,
+      "firstLayoutMs": 4.5,
+      "interactionLatencyMs": 5.4,
+      "frameTimeMs": 10.2,
+      "allocationsKb": 104,
+      "retainedControlCount": 8,
+      "disposalMs": 0.7,
+      "mountUnmountCycles": 80
+    },
+    "artifact": "tests/conformance/performance/artifacts/measurements/menu-navigation-repeated-mount.json"
+  }
+}

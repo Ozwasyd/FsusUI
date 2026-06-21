@@ -2,6 +2,7 @@
   <Project Path="FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj" />
   <Project Path="FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj" />
   <Project Path="FsusUI.Avalonia.Icons/FsusUI.Avalonia.Icons.csproj" />
+  <Project Path="FsusUI.Avalonia.PerformanceTests/FsusUI.Avalonia.PerformanceTests.csproj" />
   <Project Path="FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj" />
   <Project Path="FsusUI.Avalonia.Themes.Smoke/FsusUI.Avalonia.Themes.Smoke.csproj" />
   <Project Path="FsusUI.Avalonia.Themes/FsusUI.Avalonia.Themes.csproj" />

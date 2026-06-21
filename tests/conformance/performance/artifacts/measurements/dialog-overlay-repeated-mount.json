@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/avalonia-performance-budget.mjs",
+  "measurement": {
+    "id": "dialog-overlay-repeated-mount",
+    "component": "dialog",
+    "scenario": "construct-layout-open-close-unmount",
+    "metrics": {
+      "constructionMs": 1.6,
+      "firstLayoutMs": 4.8,
+      "interactionLatencyMs": 6.4,
+      "frameTimeMs": 11,
+      "allocationsKb": 118,
+      "retainedControlCount": 9,
+      "disposalMs": 0.8,
+      "mountUnmountCycles": 80
+    },
+    "artifact": "tests/conformance/performance/artifacts/measurements/dialog-overlay-repeated-mount.json"
+  }
+}

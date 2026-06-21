@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/avalonia-performance-budget.mjs",
+  "measurement": {
+    "id": "button-repeated-mount",
+    "component": "button",
+    "scenario": "construct-layout-activate-unmount",
+    "metrics": {
+      "constructionMs": 0.8,
+      "firstLayoutMs": 2.2,
+      "interactionLatencyMs": 3.6,
+      "frameTimeMs": 8.5,
+      "allocationsKb": 48,
+      "retainedControlCount": 3,
+      "disposalMs": 0.4,
+      "mountUnmountCycles": 80
+    },
+    "artifact": "tests/conformance/performance/artifacts/measurements/button-repeated-mount.json"
+  }
+}
