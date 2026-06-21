@@ -1,0 +1,142 @@
+{
+  "version": 1,
+  "fontStacks": {
+    "body": {
+      "css": "Google Sans, Inter, Noto Sans SC, Noto Sans CJK SC, Noto Sans TC, Noto Sans JP, PingFang SC, Hiragino Sans GB, Microsoft YaHei, 微软雅黑, Helvetica Neue, Helvetica, Arial, ui-sans-serif, system-ui, sans-serif",
+      "avaloniaFallbacks": [
+        "Google Sans",
+        "Inter",
+        "Noto Sans SC",
+        "Noto Sans CJK SC",
+        "PingFang SC",
+        "Microsoft YaHei",
+        "Arial",
+        "sans-serif"
+      ]
+    },
+    "monospace": {
+      "css": "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace",
+      "avaloniaFallbacks": [
+        "SFMono-Regular",
+        "Menlo",
+        "Consolas",
+        "Liberation Mono",
+        "Courier New",
+        "monospace"
+      ]
+    }
+  },
+  "allowedAliases": ["Helvetica", "微软雅黑"],
+  "fallbackBehavior": {
+    "applicationFonts": "Application-provided families are prepended by FsusThemeManager and must fall back to the stable body or monospace stack.",
+    "systemFallback": "When no application font is supplied, Web uses the CSS stack and Avalonia uses FontFamily.Parse over the same ordered family list.",
+    "missingGlyphs": "Missing glyphs must fall through to CJK-capable families before generic system families."
+  },
+  "cjkHandling": {
+    "simplifiedChinese": [
+      "Noto Sans SC",
+      "Noto Sans CJK SC",
+      "PingFang SC",
+      "Microsoft YaHei",
+      "微软雅黑"
+    ],
+    "traditionalChinese": ["Noto Sans TC", "Noto Sans CJK SC"],
+    "japanese": ["Noto Sans JP", "Noto Sans CJK SC"],
+    "baselinePolicy": "CJK and Latin glyphs share the 14px body size and 22px body line-height; visual baselines may vary only within registered typography platform overrides."
+  },
+  "lineHeightStrategy": {
+    "body": {
+      "fontSize": 14,
+      "lineHeight": 22,
+      "baseline": 16,
+      "unit": "px"
+    },
+    "headingLg": {
+      "fontSize": 32,
+      "lineHeight": 40,
+      "baseline": 31,
+      "unit": "px"
+    },
+    "code": {
+      "fontSize": 14,
+      "lineHeight": 22,
+      "baseline": 16,
+      "unit": "px"
+    }
+  },
+  "platformThresholds": {
+    "textSizePx": 1,
+    "baselinePx": 1,
+    "lineHeightPx": 0,
+    "wrapLineCount": 0,
+    "ellipsisVisible": true
+  },
+  "measurementBaselines": [
+    {
+      "id": "latin-body",
+      "text": "Stable typography baseline",
+      "category": "latin",
+      "font": "body",
+      "fontSize": 14,
+      "lineHeight": 22,
+      "expectedWidth": 181,
+      "expectedHeight": 22,
+      "baseline": 16
+    },
+    {
+      "id": "simplified-chinese-body",
+      "text": "稳定排版基线",
+      "category": "simplifiedChinese",
+      "font": "body",
+      "fontSize": 14,
+      "lineHeight": 22,
+      "expectedWidth": 84,
+      "expectedHeight": 22,
+      "baseline": 16
+    },
+    {
+      "id": "punctuation-density",
+      "text": "A/B: 12,345.67 (ok)",
+      "category": "punctuation",
+      "font": "body",
+      "fontSize": 14,
+      "lineHeight": 22,
+      "expectedWidth": 143,
+      "expectedHeight": 22,
+      "baseline": 16
+    },
+    {
+      "id": "tabular-numbers",
+      "text": "2026-06-21 00:00",
+      "category": "numbers",
+      "font": "body",
+      "fontSize": 14,
+      "lineHeight": 22,
+      "expectedWidth": 132,
+      "expectedHeight": 22,
+      "baseline": 16
+    },
+    {
+      "id": "code-monospace",
+      "text": "const x = 42;",
+      "category": "code",
+      "font": "monospace",
+      "fontSize": 14,
+      "lineHeight": 22,
+      "expectedWidth": 109,
+      "expectedHeight": 22,
+      "baseline": 16
+    },
+    {
+      "id": "mixed-cjk-latin-label",
+      "text": "CPU 使用率 42%",
+      "category": "mixed",
+      "font": "body",
+      "fontSize": 14,
+      "lineHeight": 22,
+      "expectedWidth": 101,
+      "expectedHeight": 22,
+      "baseline": 16
+    }
+  ]
+}

@@ -31,7 +31,8 @@
   <SolidColorBrush x:Key="FsusBrushSurfaceBase" Color="#FFFFFF" />
   <SolidColorBrush x:Key="FsusBrushSurfaceRaised" Color="#F7F7F8" />
   <x:Double x:Key="FsusTypographyBodyMdSize">14</x:Double>
-  <FontFamily x:Key="FsusTypographyFamilyBody">Inter, ui-sans-serif, system-ui, sans-serif</FontFamily>
+  <FontFamily x:Key="FsusTypographyFamilyBody">Google Sans, Inter, Noto Sans SC, Noto Sans CJK SC, Noto Sans TC, Noto Sans JP, PingFang SC, Hiragino Sans GB, Microsoft YaHei, 微软雅黑, Helvetica Neue, Helvetica, Arial, ui-sans-serif, system-ui, sans-serif</FontFamily>
+  <FontFamily x:Key="FsusTypographyFamilyMonospace">ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace</FontFamily>
   <x:Double x:Key="FsusTypographyBodyMdLineHeight">22</x:Double>
   <FontWeight x:Key="FsusTypographyBodyMdWeight">400</FontWeight>
   <x:Double x:Key="FsusTypographyHeadingLgSize">32</x:Double>

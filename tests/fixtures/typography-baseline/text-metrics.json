@@ -1,0 +1,53 @@
+{
+  "textSize": {
+    "cases": [
+      { "id": "latin-body", "width": 181, "height": 22 },
+      { "id": "simplified-chinese-body", "width": 84, "height": 22 },
+      { "id": "mixed-cjk-latin-label", "width": 101, "height": 22 }
+    ]
+  },
+  "baseline": {
+    "cases": [
+      { "id": "latin-body", "baseline": 16, "threshold": 1 },
+      { "id": "simplified-chinese-body", "baseline": 16, "threshold": 1 },
+      { "id": "code-monospace", "baseline": 16, "threshold": 1 }
+    ]
+  },
+  "lineHeight": {
+    "cases": [
+      { "id": "body-md", "fontSize": 14, "lineHeight": 22 },
+      { "id": "heading-lg", "fontSize": 32, "lineHeight": 40 },
+      { "id": "code-md", "fontSize": 14, "lineHeight": 22 }
+    ]
+  },
+  "wrapping": {
+    "cases": [
+      {
+        "id": "mixed-wrap-160",
+        "text": "CPU 使用率 42% is within the stable range",
+        "width": 160,
+        "expectedLines": 2
+      }
+    ]
+  },
+  "ellipsis": {
+    "cases": [
+      {
+        "id": "latin-ellipsis-120",
+        "text": "Stable typography baseline",
+        "width": 120,
+        "expectedText": "Stable typography…"
+      }
+    ]
+  },
+  "mixedLanguage": {
+    "cases": [
+      {
+        "id": "settings-label-cjk-latin",
+        "text": "通知 Inbox 24",
+        "font": "body",
+        "expectedHeight": 22
+      }
+    ]
+  }
+}

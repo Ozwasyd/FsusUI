@@ -131,8 +131,13 @@ public static class FsusTokens
 
     public const string TypographyFamilyBodyName = "typography.family.body";
     public const string TypographyFamilyBodyResourceKey = "FsusTypographyFamilyBody";
-    public const string TypographyFamilyBodyValue = "Inter, ui-sans-serif, system-ui, sans-serif";
+    public const string TypographyFamilyBodyValue = "Google Sans, Inter, Noto Sans SC, Noto Sans CJK SC, Noto Sans TC, Noto Sans JP, PingFang SC, Hiragino Sans GB, Microsoft YaHei, 微软雅黑, Helvetica Neue, Helvetica, Arial, ui-sans-serif, system-ui, sans-serif";
     public static FontFamily TypographyFamilyBodyFontFamily => FontFamily.Parse(TypographyFamilyBodyValue);
+
+    public const string TypographyFamilyMonospaceName = "typography.family.monospace";
+    public const string TypographyFamilyMonospaceResourceKey = "FsusTypographyFamilyMonospace";
+    public const string TypographyFamilyMonospaceValue = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace";
+    public static FontFamily TypographyFamilyMonospaceFontFamily => FontFamily.Parse(TypographyFamilyMonospaceValue);
 
     public const string TypographyBodyMdLineHeightName = "typography.body.md.line-height";
     public const string TypographyBodyMdLineHeightResourceKey = "FsusTypographyBodyMdLineHeight";

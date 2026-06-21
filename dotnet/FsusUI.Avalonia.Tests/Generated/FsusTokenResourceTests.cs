@@ -28,7 +28,7 @@ public class FsusTokenResourceTests
     Assert.Equal(Color.Parse("#FFFFFF"), brush.Color);
     Assert.Equal(new Thickness(1), thickness);
     Assert.Equal(new CornerRadius(6), cornerRadius);
-    Assert.Contains("Inter", fontFamily.Name);
+    Assert.Equal("Google Sans", fontFamily.Name);
     Assert.Equal((FontWeight)400, fontWeight);
     Assert.Equal(TimeSpan.FromMilliseconds(220), duration);
     Assert.Equal(0, shadow.Count);

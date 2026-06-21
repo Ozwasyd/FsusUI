@@ -90,6 +90,42 @@ public class FsusThemeManagerTests
     );
   }
 
+  [Fact]
+  public void ApplyPrependsApplicationFontsBeforeStableFallbacks()
+  {
+    var resources = new ResourceDictionary();
+    var manager = new FsusThemeManager();
+
+    manager.Apply(
+      resources,
+      new FsusThemeOptions
+      {
+        Typography = new FsusTypographyOptions
+        {
+          ApplicationFontFamilies = ["Acme App Sans"],
+          ApplicationMonospaceFontFamilies = ["Acme Mono"],
+        },
+      }
+    );
+
+    var body = Assert.IsType<FontFamily>(
+      resources[FsusTokens.TypographyFamilyBodyResourceKey]
+    );
+    var monospace = Assert.IsType<FontFamily>(
+      resources[FsusTokens.TypographyFamilyMonospaceResourceKey]
+    );
+    var bodyStack = Assert.IsType<string>(
+      resources[FsusThemeResourceKeys.BodyFontStack]
+    );
+    var monospaceStack = Assert.IsType<string>(
+      resources[FsusThemeResourceKeys.MonospaceFontStack]
+    );
+    Assert.StartsWith("Acme App Sans", body.Name);
+    Assert.Contains("Noto Sans SC", bodyStack);
+    Assert.StartsWith("Acme Mono", monospace.Name);
+    Assert.Contains("Consolas", monospaceStack);
+  }
+
   private static void AssertBrush(
     ResourceDictionary resources,
     string key,

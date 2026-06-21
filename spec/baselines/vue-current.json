@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "3484d3cb1c66285c208dd69ff4325e56ce5db7ce",
+    "commitSha": "38d02bb9f2b596196f06d430200a4203843968a7",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
-    "tokenHash": "be2aa1d6735927c270d506cd6ad8434102e60215680537520b43459f47bde02b",
+    "tokenHash": "0f8bbc25f76cd0a379dbf32d34933e57c629c3895eb71b4686a33be784dfda14",
     "iconHash": "7358b0813aef61acef51069c49a97f8d18d89c2e674298f74ffff4642dbf1cf1"
   },
   "summary": {
@@ -14,7 +14,7 @@
     "directives": 3,
     "services": 4,
     "plugins": 7,
-    "cssVariables": 316,
+    "cssVariables": 317,
     "deprecatedApis": 20,
     "componentCountByClassification": {
       "portable": 120,
@@ -8055,6 +8055,11 @@
     },
     {
       "name": "--fsus-typography-family-body",
+      "files": ["packages/theme-chalk/src/generated/tokens.css"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-typography-family-monospace",
       "files": ["packages/theme-chalk/src/generated/tokens.css"],
       "classification": "portable"
     },

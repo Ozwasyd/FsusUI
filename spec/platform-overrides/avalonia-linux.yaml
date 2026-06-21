@@ -13,3 +13,17 @@ overrides:
     owner: fsusui-core
     reviewAfter: 2026-09-01
     linkedIssues: [18, 22, 24, 25]
+  - id: avalonia-linux-font-rasterization-001
+    area: typography
+    component: text
+    platform: avalonia-linux
+    status: accepted
+    reason: Linux fontconfig selection and Skia rasterization can differ from browser fallback metrics for the same stable font stack.
+    affectedContracts: [component.el-text]
+    visualThreshold: medium
+    behaviorExpectation: Text content, wrapping intent, line count, ellipsis behavior, and accessible names must match the typography baseline.
+    allowedDeviation: medium
+    testPolicy: typography-baseline-threshold
+    owner: fsusui-core
+    reviewAfter: 2026-09-01
+    linkedIssues: [136]

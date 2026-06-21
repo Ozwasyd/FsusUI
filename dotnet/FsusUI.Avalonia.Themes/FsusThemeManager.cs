@@ -36,6 +36,17 @@ public sealed record FsusThemeOptions
   public FsusMotionMode MotionMode { get; init; } = FsusMotionMode.System;
   public Color? AccentOverride { get; init; }
   public bool FollowSystemTheme { get; init; }
+  public FsusTypographyOptions Typography { get; init; } =
+    FsusTypographyOptions.Default;
+}
+
+public sealed record FsusTypographyOptions
+{
+  public static FsusTypographyOptions Default { get; } = new();
+
+  public IReadOnlyList<string> ApplicationFontFamilies { get; init; } = [];
+  public IReadOnlyList<string> ApplicationMonospaceFontFamilies { get; init; } = [];
+  public bool UseSystemFallback { get; init; } = true;
 }
 
 public static class FsusThemeResourceKeys
@@ -57,6 +68,8 @@ public static class FsusThemeResourceKeys
   public const string MotionModeCurrent = "FsusMotionModeCurrent";
   public const string MotionDurationEffective = "FsusMotionDurationEffective";
   public const string MotionEasingEffective = "FsusMotionEasingEffective";
+  public const string BodyFontStack = "FsusTypographyBodyFontStack";
+  public const string MonospaceFontStack = "FsusTypographyMonospaceFontStack";
 }
 
 public sealed class FsusThemeManager
@@ -137,6 +150,7 @@ public sealed class FsusThemeManager
 
     ApplyPalette(resources, palette);
     ApplyAccent(resources, resolved.AccentOverride);
+    ApplyTypography(resources, resolved.Typography);
     ApplyDensity(resources, resolved.Density);
     ApplyMotion(resources, resolved.MotionMode);
 
@@ -204,6 +218,48 @@ public sealed class FsusThemeManager
 
     resources[FsusThemeResourceKeys.DensityControlDefaultY] = values.DefaultY;
     resources[FsusThemeResourceKeys.DensityControlCompactY] = values.CompactY;
+  }
+
+  private static void ApplyTypography(
+    IResourceDictionary resources,
+    FsusTypographyOptions options
+  )
+  {
+    var bodyStack = BuildFontStack(
+      options.ApplicationFontFamilies,
+      FsusTokens.TypographyFamilyBodyValue,
+      options.UseSystemFallback
+    );
+    var monospaceStack = BuildFontStack(
+      options.ApplicationMonospaceFontFamilies,
+      FsusTokens.TypographyFamilyMonospaceValue,
+      options.UseSystemFallback
+    );
+
+    resources[FsusThemeResourceKeys.BodyFontStack] = bodyStack;
+    resources[FsusThemeResourceKeys.MonospaceFontStack] = monospaceStack;
+    resources[FsusTokens.TypographyFamilyBodyResourceKey] =
+      FontFamily.Parse(bodyStack);
+    resources[FsusTokens.TypographyFamilyMonospaceResourceKey] =
+      FontFamily.Parse(monospaceStack);
+  }
+
+  private static string BuildFontStack(
+    IReadOnlyList<string> applicationFonts,
+    string stableStack,
+    bool useSystemFallback
+  )
+  {
+    var families = applicationFonts
+      .Where((family) => !string.IsNullOrWhiteSpace(family))
+      .Select((family) => family.Trim())
+      .ToList();
+    if (useSystemFallback)
+    {
+      families.Add(stableStack);
+    }
+
+    return families.Count == 0 ? stableStack : string.Join(", ", families);
   }
 
   private static void ApplyMotion(IResourceDictionary resources, FsusMotionMode motionMode)

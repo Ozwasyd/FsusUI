@@ -17,7 +17,8 @@
   --fsus-brush-surface-base: #FFFFFF;
   --fsus-brush-surface-raised: #F7F7F8;
   --fsus-typography-body-md-size: 14px;
-  --fsus-typography-family-body: Inter, ui-sans-serif, system-ui, sans-serif;
+  --fsus-typography-family-body: Google Sans, Inter, Noto Sans SC, Noto Sans CJK SC, Noto Sans TC, Noto Sans JP, PingFang SC, Hiragino Sans GB, Microsoft YaHei, 微软雅黑, Helvetica Neue, Helvetica, Arial, ui-sans-serif, system-ui, sans-serif;
+  --fsus-typography-family-monospace: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
   --fsus-typography-body-md-line-height: 22px;
   --fsus-typography-body-md-weight: 400;
   --fsus-typography-heading-lg-size: 32px;

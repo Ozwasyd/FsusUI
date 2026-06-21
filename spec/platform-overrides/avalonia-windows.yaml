@@ -13,3 +13,17 @@ overrides:
     owner: fsusui-core
     reviewAfter: 2026-09-01
     linkedIssues: [18, 24, 25]
+  - id: avalonia-windows-font-rasterization-001
+    area: typography
+    component: text
+    platform: avalonia-windows
+    status: accepted
+    reason: Windows DirectWrite font fallback and browser text rendering can produce small baseline and glyph-width differences.
+    affectedContracts: [component.el-text]
+    visualThreshold: medium
+    behaviorExpectation: Text content, wrapping intent, line count, ellipsis behavior, and accessible names must match the typography baseline.
+    allowedDeviation: medium
+    testPolicy: typography-baseline-threshold
+    owner: fsusui-core
+    reviewAfter: 2026-09-01
+    linkedIssues: [136]
