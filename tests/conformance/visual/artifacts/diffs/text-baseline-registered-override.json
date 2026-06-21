@@ -1,0 +1,38 @@
+{
+  "id": "text-baseline-registered-override",
+  "component": "text",
+  "state": "default",
+  "mode": "crossPlatform",
+  "platform": "web->avalonia",
+  "token": "typography.body.baseline",
+  "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/text-body-zh-rtl.png",
+  "diffArtifact": "tests/conformance/visual/artifacts/diffs/text-baseline-registered-override.json",
+  "deltas": {
+    "geometry": 0.5,
+    "colorDelta": 0.45825756949558283,
+    "radius": 0,
+    "spacing": 0,
+    "textBaseline": 1.1999999999999993,
+    "screenshotDiffPercent": 0.012,
+    "perceptualDelta": 0.05
+  },
+  "thresholds": {
+    "geometry": 1.5,
+    "colorDelta": 1.4,
+    "radius": 0.75,
+    "spacing": 1,
+    "textBaseline": 1,
+    "screenshotDiffPercent": 0.015,
+    "perceptualDelta": 0.08
+  },
+  "allowedByOverride": [
+    {
+      "metric": "textBaseline",
+      "delta": 1.1999999999999993,
+      "threshold": 1,
+      "overrideId": "visual-text-baseline-001"
+    }
+  ],
+  "passed": true,
+  "failures": []
+}

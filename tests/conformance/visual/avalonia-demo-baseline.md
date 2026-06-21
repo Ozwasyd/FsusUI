@@ -9,5 +9,6 @@ Baseline target:
 - densities: default, compact, spacious
 - motion modes: system, enabled, reduced, disabled
 
-The demo shell includes static public-safe data and is suitable for future
-headless Skia/X11 screenshots once the visual harness is added.
+The demo shell includes static public-safe data and is suitable for the
+Headless Skia / real-window capture records used by the visual conformance
+harness.

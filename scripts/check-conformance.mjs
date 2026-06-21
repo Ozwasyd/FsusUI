@@ -170,6 +170,10 @@ const checkInteractions = () => {
 }
 
 const checkVisual = () => {
+  execFileSync(process.execPath, ['scripts/visual-conformance.mjs', 'check'], {
+    cwd: root,
+    stdio: 'inherit',
+  })
   for (const file of [
     'tests/conformance/visual/thresholds.md',
     'tests/conformance/visual/avalonia-demo-baseline.md',

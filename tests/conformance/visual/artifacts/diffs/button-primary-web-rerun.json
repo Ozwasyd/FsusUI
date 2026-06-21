@@ -1,0 +1,31 @@
+{
+  "id": "button-primary-web-rerun",
+  "component": "button",
+  "state": "enabled",
+  "mode": "samePlatform",
+  "platform": "web->web",
+  "token": "color.brand.primary",
+  "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/web/button-primary-rerun.png",
+  "diffArtifact": "tests/conformance/visual/artifacts/diffs/button-primary-web-rerun.json",
+  "deltas": {
+    "geometry": 0.10000000000000142,
+    "colorDelta": 0.17320508075688917,
+    "radius": 0,
+    "spacing": 0,
+    "textBaseline": 0.05000000000000071,
+    "screenshotDiffPercent": 0.001,
+    "perceptualDelta": 0.01
+  },
+  "thresholds": {
+    "geometry": 0.25,
+    "colorDelta": 0.5,
+    "radius": 0.2,
+    "spacing": 0.25,
+    "textBaseline": 0.4,
+    "screenshotDiffPercent": 0.002,
+    "perceptualDelta": 0.02
+  },
+  "allowedByOverride": [],
+  "passed": true,
+  "failures": []
+}

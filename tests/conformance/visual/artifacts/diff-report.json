@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/visual-conformance.mjs",
+  "artifactRoot": "tests/conformance/visual/artifacts",
+  "summary": {
+    "total": 3,
+    "passed": 3,
+    "allowedByOverride": 1
+  },
+  "comparisons": [
+    {
+      "id": "button-primary-web-rerun",
+      "component": "button",
+      "state": "enabled",
+      "mode": "samePlatform",
+      "platform": "web->web",
+      "token": "color.brand.primary",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/web/button-primary-rerun.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/button-primary-web-rerun.json",
+      "deltas": {
+        "geometry": 0.10000000000000142,
+        "colorDelta": 0.17320508075688917,
+        "radius": 0,
+        "spacing": 0,
+        "textBaseline": 0.05000000000000071,
+        "screenshotDiffPercent": 0.001,
+        "perceptualDelta": 0.01
+      },
+      "thresholds": {
+        "geometry": 0.25,
+        "colorDelta": 0.5,
+        "radius": 0.2,
+        "spacing": 0.25,
+        "textBaseline": 0.4,
+        "screenshotDiffPercent": 0.002,
+        "perceptualDelta": 0.02
+      },
+      "allowedByOverride": [],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "button-primary-web-avalonia",
+      "component": "button",
+      "state": "hover",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "color.brand.primary",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/button-primary-dark-compact.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/button-primary-web-avalonia.json",
+      "deltas": {
+        "geometry": 0.8000000000000007,
+        "colorDelta": 0.5830951894845317,
+        "radius": 0.5,
+        "spacing": 0.5,
+        "textBaseline": 0.5999999999999979,
+        "screenshotDiffPercent": 0.011,
+        "perceptualDelta": 0.06
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "text-baseline-registered-override",
+      "component": "text",
+      "state": "default",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "typography.body.baseline",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/text-body-zh-rtl.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/text-baseline-registered-override.json",
+      "deltas": {
+        "geometry": 0.5,
+        "colorDelta": 0.45825756949558283,
+        "radius": 0,
+        "spacing": 0,
+        "textBaseline": 1.1999999999999993,
+        "screenshotDiffPercent": 0.012,
+        "perceptualDelta": 0.05
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [
+        {
+          "metric": "textBaseline",
+          "delta": 1.1999999999999993,
+          "threshold": 1,
+          "overrideId": "visual-text-baseline-001"
+        }
+      ],
+      "passed": true,
+      "failures": []
+    }
+  ]
+}

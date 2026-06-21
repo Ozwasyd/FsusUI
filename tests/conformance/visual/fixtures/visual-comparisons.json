@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "artifactRoot": "tests/conformance/visual/artifacts",
+  "thresholds": {
+    "samePlatform": {
+      "geometry": 0.25,
+      "colorDelta": 0.5,
+      "radius": 0.2,
+      "spacing": 0.25,
+      "textBaseline": 0.4,
+      "screenshotDiffPercent": 0.002,
+      "perceptualDelta": 0.02
+    },
+    "crossPlatform": {
+      "geometry": 1.5,
+      "colorDelta": 1.4,
+      "radius": 0.75,
+      "spacing": 1,
+      "textBaseline": 1,
+      "screenshotDiffPercent": 0.015,
+      "perceptualDelta": 0.08
+    },
+    "levels": {
+      "low": {
+        "geometry": 1,
+        "colorDelta": 1.2,
+        "radius": 0.5,
+        "spacing": 0.75,
+        "textBaseline": 0.8,
+        "screenshotDiffPercent": 0.01,
+        "perceptualDelta": 0.05
+      },
+      "medium": {
+        "geometry": 2,
+        "colorDelta": 2,
+        "radius": 1,
+        "spacing": 1.25,
+        "textBaseline": 1.5,
+        "screenshotDiffPercent": 0.02,
+        "perceptualDelta": 0.1
+      },
+      "high": {
+        "geometry": 3,
+        "colorDelta": 3,
+        "radius": 1.5,
+        "spacing": 2,
+        "textBaseline": 2,
+        "screenshotDiffPercent": 0.04,
+        "perceptualDelta": 0.16
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "id": "button-primary-web-rerun",
+      "component": "button",
+      "mode": "samePlatform",
+      "token": "color.brand.primary",
+      "fixture": {
+        "page": "visual/button",
+        "theme": "light",
+        "density": "default",
+        "variant": "primary",
+        "size": "md",
+        "state": "enabled",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "enabled"
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/button-primary-baseline.png",
+        "geometry": { "x": 24, "y": 32, "width": 96, "height": 40 },
+        "color": { "token": "color.brand.primary", "lab": [54.1, 12.2, -41.4] },
+        "radius": 6,
+        "spacing": { "paddingX": 16, "paddingY": 8, "gap": 8 },
+        "textBaseline": 25.2
+      },
+      "candidate": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/button-primary-rerun.png",
+        "geometry": { "x": 24, "y": 32.1, "width": 96, "height": 40 },
+        "color": { "token": "color.brand.primary", "lab": [54.2, 12.1, -41.3] },
+        "radius": 6,
+        "spacing": { "paddingX": 16, "paddingY": 8, "gap": 8 },
+        "textBaseline": 25.25
+      },
+      "screenshotDiffPercent": 0.001,
+      "perceptualDelta": 0.01
+    },
+    {
+      "id": "button-primary-web-avalonia",
+      "component": "button",
+      "mode": "crossPlatform",
+      "token": "color.brand.primary",
+      "fixture": {
+        "page": "visual/button",
+        "theme": "dark",
+        "density": "compact",
+        "variant": "primary",
+        "size": "sm",
+        "state": "hover",
+        "locale": "en-US",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/button-primary-dark-compact.png",
+        "geometry": { "x": 20, "y": 28, "width": 84, "height": 34 },
+        "color": { "token": "color.brand.primary", "lab": [49.6, 11.7, -38.9] },
+        "radius": 5,
+        "spacing": { "paddingX": 12, "paddingY": 6, "gap": 6 },
+        "textBaseline": 21.8
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/button-primary-dark-compact.png",
+        "geometry": { "x": 20.8, "y": 28.5, "width": 84.4, "height": 34.2 },
+        "color": { "token": "color.brand.primary", "lab": [50, 12, -39.2] },
+        "radius": 5.5,
+        "spacing": { "paddingX": 12.5, "paddingY": 6.5, "gap": 6 },
+        "textBaseline": 22.4
+      },
+      "screenshotDiffPercent": 0.011,
+      "perceptualDelta": 0.06
+    },
+    {
+      "id": "text-baseline-registered-override",
+      "component": "text",
+      "mode": "crossPlatform",
+      "token": "typography.body.baseline",
+      "overrideId": "visual-text-baseline-001",
+      "fixture": {
+        "page": "visual/text",
+        "theme": "light",
+        "density": "spacious",
+        "variant": "body",
+        "size": "md",
+        "state": "default",
+        "locale": "zh-CN",
+        "direction": "rtl",
+        "motionMode": "disabled"
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/text-body-zh-rtl.png",
+        "geometry": { "x": 16, "y": 18, "width": 220, "height": 28 },
+        "color": { "token": "typography.body.color", "lab": [23, 0, -2] },
+        "radius": 0,
+        "spacing": { "paddingX": 0, "paddingY": 0, "gap": 0 },
+        "textBaseline": 18
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/text-body-zh-rtl.png",
+        "geometry": { "x": 16.5, "y": 18.4, "width": 220.5, "height": 28.5 },
+        "color": { "token": "typography.body.color", "lab": [23.4, 0.1, -2.2] },
+        "radius": 0,
+        "spacing": { "paddingX": 0, "paddingY": 0, "gap": 0 },
+        "textBaseline": 19.2
+      },
+      "screenshotDiffPercent": 0.012,
+      "perceptualDelta": 0.05
+    }
+  ]
+}

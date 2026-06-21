@@ -1,0 +1,31 @@
+{
+  "id": "button-primary-web-avalonia",
+  "component": "button",
+  "state": "hover",
+  "mode": "crossPlatform",
+  "platform": "web->avalonia",
+  "token": "color.brand.primary",
+  "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/button-primary-dark-compact.png",
+  "diffArtifact": "tests/conformance/visual/artifacts/diffs/button-primary-web-avalonia.json",
+  "deltas": {
+    "geometry": 0.8000000000000007,
+    "colorDelta": 0.5830951894845317,
+    "radius": 0.5,
+    "spacing": 0.5,
+    "textBaseline": 0.5999999999999979,
+    "screenshotDiffPercent": 0.011,
+    "perceptualDelta": 0.06
+  },
+  "thresholds": {
+    "geometry": 1.5,
+    "colorDelta": 1.4,
+    "radius": 0.75,
+    "spacing": 1,
+    "textBaseline": 1,
+    "screenshotDiffPercent": 0.015,
+    "perceptualDelta": 0.08
+  },
+  "allowedByOverride": [],
+  "passed": true,
+  "failures": []
+}
