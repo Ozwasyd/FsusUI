@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "groups": {
+    "pr-fast": ["verify:pr-fast"],
+    "main": ["verify:full", "dotnet:verify", "governance:check"],
+    "nightly": ["verify:nightly"],
+    "release": ["verify:release", "verify:stable"]
+  },
+  "requiredOperatingSystems": [
+    "ubuntu-latest",
+    "windows-latest",
+    "macos-latest"
+  ],
+  "requiredJobs": [
+    "static-quality",
+    "dotnet",
+    "typecheck",
+    "unit",
+    "coverage",
+    "build-package",
+    "consumer-install",
+    "build-demo",
+    "visual",
+    "stable-readiness",
+    "nightly-readiness",
+    "release-readiness"
+  ],
+  "requiredArtifactNames": [
+    "avalonia-stable-evidence",
+    "avalonia-nightly-evidence",
+    "avalonia-release-evidence",
+    "unit-test-artifacts",
+    "fsusui-npm-package-dist",
+    "dotnet-build-output",
+    "avalonia-screenshots",
+    "avalonia-generated-artifacts"
+  ],
+  "requiredEvidenceTerms": [
+    "contract version",
+    "token version",
+    "npm version",
+    "NuGet version",
+    "platform overrides",
+    "known limitations",
+    "cache and sharding policy"
+  ]
+}

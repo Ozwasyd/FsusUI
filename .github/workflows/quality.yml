@@ -6,7 +6,19 @@ on:
     branches:
       - main
       - master
+  schedule:
+    - cron: '23 3 * * *'
   workflow_dispatch:
+    inputs:
+      group:
+        description: Quality group to run
+        default: main
+        required: false
+        type: choice
+        options:
+          - main
+          - nightly
+          - release
 
 jobs:
   pr-fast:
@@ -76,8 +88,23 @@ jobs:
         run: pnpm run build:demo
       - name: Skip PR demo build
         if: steps.demo-build-path.outputs.run != 'true'
-        run: echo "Skipping demo build: ${{ steps.demo-build-path.outputs.reason }}"
+        run: |
+          echo "Skipping demo build: ${{ steps.demo-build-path.outputs.reason }}"
 
-  full:
-    if: github.event_name != 'pull_request'
+  main:
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.group == 'main')
     uses: ./.github/workflows/_quality.yml
+    with:
+      group: main
+
+  nightly:
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.group == 'nightly')
+    uses: ./.github/workflows/_quality.yml
+    with:
+      group: nightly
+
+  release:
+    if: github.event_name == 'workflow_dispatch' && inputs.group == 'release'
+    uses: ./.github/workflows/_quality.yml
+    with:
+      group: release

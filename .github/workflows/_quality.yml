@@ -2,6 +2,12 @@ name: Reusable Quality Gates
 
 on:
   workflow_call:
+    inputs:
+      group:
+        description: Quality group to run.
+        required: false
+        type: string
+        default: main
 
 jobs:
   static-quality:
@@ -43,7 +49,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -57,8 +63,26 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: dotnet/global.json
+      - name: Restore .NET build output cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.nuget/packages
+            dotnet/**/obj
+          key: ${{ runner.os }}-fsusui-dotnet-${{ hashFiles('dotnet/**/*.csproj', 'dotnet/**/*.props', 'dotnet/**/*.slnx', 'dotnet/global.json') }}
+          restore-keys: |
+            ${{ runner.os }}-fsusui-dotnet-
       - run: pnpm install --frozen-lockfile
       - run: pnpm run dotnet:verify
+      - name: Run selected real-window readiness checks
+        run: pnpm run a11y:check
+      - uses: actions/upload-artifact@v4
+        if: always()
+        continue-on-error: true
+        with:
+          name: dotnet-build-output-${{ matrix.os }}
+          path: dotnet/**/bin/Release
+          retention-days: 3
 
   typecheck:
     runs-on: ubuntu-latest
@@ -386,7 +410,132 @@ jobs:
         if: failure()
         continue-on-error: true
         with:
-          name: playwright-report-${{ matrix.project }}
+          name: avalonia-screenshots-${{ matrix.project }}
           path: |
             playwright-report
             test-results
+
+  stable-readiness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs:
+      - static-quality
+      - dotnet
+      - typecheck
+      - unit
+      - coverage
+      - build-package
+      - consumer-install
+      - build-demo
+      - visual
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: dotnet/global.json
+      - run: pnpm install --frozen-lockfile
+      - name: Run stable readiness gate
+        run: pnpm run verify:stable
+      - name: Pack stable evidence
+        run: |
+          tar -czf avalonia-stable-evidence.tgz docs/releases spec/components tests/conformance
+          sha256sum avalonia-stable-evidence.tgz | tee avalonia-stable-evidence.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: avalonia-stable-evidence
+          path: |
+            avalonia-stable-evidence.tgz
+            avalonia-stable-evidence.sha256
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        with:
+          name: avalonia-generated-artifacts
+          path: |
+            generated
+            tests/conformance/**/artifacts
+            docs/releases
+          retention-days: 7
+
+  nightly-readiness:
+    if: inputs.group == 'nightly'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs:
+      - stable-readiness
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: dotnet/global.json
+      - run: pnpm install --frozen-lockfile
+      - name: Run nightly readiness gate
+        run: pnpm run verify:nightly
+      - name: Pack nightly evidence
+        if: always()
+        run: |
+          mkdir -p .stable-evidence
+          printf "group=nightly\n" > .stable-evidence/group.txt
+          tar -czf avalonia-nightly-evidence.tgz docs/releases spec/ci .stable-evidence
+          sha256sum avalonia-nightly-evidence.tgz | tee avalonia-nightly-evidence.sha256
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: avalonia-nightly-evidence
+          path: |
+            avalonia-nightly-evidence.tgz
+            avalonia-nightly-evidence.sha256
+          retention-days: 7
+
+  release-readiness:
+    if: inputs.group == 'release'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs:
+      - stable-readiness
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: dotnet/global.json
+      - run: pnpm install --frozen-lockfile
+      - name: Run release readiness gate
+        run: pnpm run verify:release
+      - name: Pack release evidence
+        if: always()
+        run: |
+          mkdir -p .stable-evidence
+          printf "group=release\n" > .stable-evidence/group.txt
+          tar -czf avalonia-release-evidence.tgz docs/releases spec/ci .stable-evidence
+          sha256sum avalonia-release-evidence.tgz | tee avalonia-release-evidence.sha256
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: avalonia-release-evidence
+          path: |
+            avalonia-release-evidence.tgz
+            avalonia-release-evidence.sha256
+          retention-days: 7

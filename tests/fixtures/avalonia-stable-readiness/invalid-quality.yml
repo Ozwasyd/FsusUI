@@ -1,0 +1,10 @@
+name: Invalid Quality
+
+on:
+  pull_request:
+
+jobs:
+  static-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - run: pnpm run verify:full

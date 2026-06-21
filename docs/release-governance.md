@@ -15,9 +15,16 @@ Public preview 的 registry 策略、包名策略、dist-tag 策略和 provenanc
 
 - `pnpm verify:pr-fast`：PR 默认快速门，覆盖 lint、按变更路径选择的 affected typecheck/unit、token/icon/design governance 和最小包构建 smoke，不包含 demo build、coverage、visual 或发布包安装。
 - `pnpm verify:full`：完整本地质量门，等价于历史 `pnpm verify` 行为，包含 `prepare:test-artifacts`、`_verify:parallel` 和 `build:demo`。
-- `pnpm verify:release`：发布候选门，在 `verify:full` 之上增加 npm dist-tag、npm package 和 consumer-install 检查。
+- `pnpm verify:stable`：Avalonia stable 门，聚合 token/icon、interaction、visual、a11y、performance、conformance、governance 与 .NET 验证。
+- `pnpm verify:nightly`：nightly 门，在 full gate 之外复跑 coverage、visual、.NET 与 performance 预算。
+- `pnpm verify:release`：发布候选门，在 `verify:full` 和 `verify:stable` 之上增加 npm dist-tag、npm package 和 consumer-install 检查。
 
 `pnpm verify` 保留为 `verify:full` 的安全别名，避免旧脚本降级覆盖面。
+
+GitHub Actions 的 `quality.yml` 将非 PR 路径拆成 main、nightly、release
+三个 group：push 进入 `group: main`，定时任务进入 `group: nightly`，手工
+workflow dispatch 可选择 main、nightly 或 release。最终发布仍只由发布 workflow
+处理，quality release group 只产出发布前证据，不执行 publish。
 
 `prepare:test-artifacts` 会先检查 icon 与 WASM 的 test artifact cache。
 GitHub Actions 使用 source-hash key 恢复 `packages/icons-vue/dist` 与

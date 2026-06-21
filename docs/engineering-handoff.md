@@ -111,7 +111,9 @@ FsusBlog 侧的消费规则：页面只消费 FsusUI 导出的 component / direc
 当前 CI job 分工：
 
 - `quality.yml` 在 `pull_request` 默认运行 `verify:pr-fast`
-- `quality.yml` 在 `push` / `workflow_dispatch` 继续调用 `_quality.yml` full gate
+- `quality.yml` 在 `push` 调用 `_quality.yml` 的 `group: main`
+- `quality.yml` 在定时任务或手工选择 nightly 时调用 `_quality.yml` 的 `group: nightly`
+- `quality.yml` 在手工选择 release 时调用 `_quality.yml` 的 `group: release`
 
 - `lint`
 - `typecheck`
