@@ -26,35 +26,48 @@
   }
 
   @include m(segmented) {
-    /* The segmented variant is intentionally frameless per design.md §7
-       ("Segment control … Scholarly Blue 选中胶囊 + Ink 文本").
-       Inactive items render as plain text buttons — the active pill alone
-       supplies the grouping affordance, so the outer container border,
-       radius, and inner padding are removed to keep the toggle visually
-       lightweight (see fsus-theme.test "keeps theme mode toggle controls
-       visually lightweight"). */
-    --#{$namespace}-theme-mode-toggle-bg: transparent;
+    /* design.md §8: mobile/task segment controls need a stable hit area
+       and a Scholarly Blue selected capsule. The group surface stays quiet,
+       but it cannot be transparent on white headers because the active item
+       then reads as a detached white tile. */
+    --#{$namespace}-theme-mode-toggle-bg: #{var(
+        --#{$namespace}-fill-color-extra-light
+      )};
     --#{$namespace}-theme-mode-toggle-item-bg: transparent;
     --#{$namespace}-theme-mode-toggle-item-border-color: transparent;
     --#{$namespace}-theme-mode-toggle-item-color: #{var(
         --#{$namespace}-text-color-regular
       )};
-    --#{$namespace}-theme-mode-toggle-item-hover-bg: #{var(
-        --#{$namespace}-fill-color-light
+    --#{$namespace}-theme-mode-toggle-item-hover-bg: #{color-mix(
+        in srgb,
+        var(--fsus-scholarly-blue) 8%,
+        transparent
       )};
     --#{$namespace}-theme-mode-toggle-item-hover-border-color: transparent;
     --#{$namespace}-theme-mode-toggle-item-hover-color: #{var(
         --#{$namespace}-text-color-primary
       )};
-    --#{$namespace}-theme-mode-toggle-active-bg: #{var(
-        --#{$namespace}-fill-color-light
+    --#{$namespace}-theme-mode-toggle-active-bg: #{color-mix(
+        in srgb,
+        var(--fsus-scholarly-blue) 14%,
+        var(--#{$namespace}-bg-color)
       )};
     --#{$namespace}-theme-mode-toggle-active-border-color: transparent;
     --#{$namespace}-theme-mode-toggle-active-color: #{var(
         --#{$namespace}-text-color-primary
       )};
+    --#{$namespace}-theme-mode-toggle-active-ring: #{color-mix(
+        in srgb,
+        var(--fsus-scholarly-blue) 24%,
+        transparent
+      )};
 
+    gap: 2px;
+    min-height: 40px;
+    padding: 2px;
+    border-radius: 8px;
     background: var(--#{$namespace}-theme-mode-toggle-bg);
+    overflow: hidden;
 
     .#{$namespace}-radio-button__inner {
       /* Keep the segmented text pills deterministic, then use padding
@@ -72,10 +85,16 @@
       background: var(--#{$namespace}-theme-mode-toggle-item-bg);
       color: var(--#{$namespace}-theme-mode-toggle-item-color);
       box-shadow: none;
+      overflow: hidden;
       transition:
         background-color var(--#{$namespace}-transition-duration-fast),
         border-color var(--#{$namespace}-transition-duration-fast),
         color var(--#{$namespace}-transition-duration-fast);
+    }
+
+    .#{$namespace}-radio-button:first-child .#{$namespace}-radio-button__inner,
+    .#{$namespace}-radio-button:last-child .#{$namespace}-radio-button__inner {
+      border-radius: 6px;
     }
 
     .#{$namespace}-radio-button__inner:hover {
@@ -88,7 +107,16 @@
 
     .#{$namespace}-radio-button__original-radio:focus-visible
       + .#{$namespace}-radio-button__inner {
-      @include a11y-focus-ring(2px, 6px);
+      box-shadow:
+        inset 0 0 0 1px var(--#{$namespace}-theme-mode-toggle-active-ring) !important;
+      border-radius: 6px;
+    }
+
+    .#{$namespace}-radio-button:focus-within .#{$namespace}-radio-button__inner {
+      border-color: var(--#{$namespace}-theme-mode-toggle-active-border-color) !important;
+      border-radius: 6px;
+      box-shadow:
+        inset 0 0 0 1px var(--#{$namespace}-theme-mode-toggle-active-ring) !important;
     }
 
     .#{$namespace}-radio-button__original-radio:checked
@@ -97,7 +125,8 @@
       border-color: var(--#{$namespace}-theme-mode-toggle-active-border-color);
       background: var(--#{$namespace}-theme-mode-toggle-active-bg);
       color: var(--#{$namespace}-theme-mode-toggle-active-color);
-      box-shadow: none !important;
+      box-shadow:
+        inset 0 0 0 1px var(--#{$namespace}-theme-mode-toggle-active-ring) !important;
     }
 
     .#{$namespace}-radio-button__original-radio:disabled
@@ -109,31 +138,46 @@
 
   @at-root :root[data-theme-resolved='light']
       .#{$namespace}-theme-mode-toggle--segmented {
-    --#{$namespace}-theme-mode-toggle-bg: transparent;
+    --#{$namespace}-theme-mode-toggle-bg: #{var(
+        --#{$namespace}-fill-color-extra-light
+      )};
     --#{$namespace}-theme-mode-toggle-item-bg: transparent;
     --#{$namespace}-theme-mode-toggle-item-border-color: transparent;
     --#{$namespace}-theme-mode-toggle-item-color: #{var(
         --#{$namespace}-text-color-regular
       )};
-    --#{$namespace}-theme-mode-toggle-item-hover-bg: #{var(
-        --#{$namespace}-fill-color-light
+    --#{$namespace}-theme-mode-toggle-item-hover-bg: #{color-mix(
+        in srgb,
+        var(--fsus-scholarly-blue) 8%,
+        transparent
       )};
     --#{$namespace}-theme-mode-toggle-item-hover-border-color: transparent;
     --#{$namespace}-theme-mode-toggle-item-hover-color: #{var(
         --#{$namespace}-text-color-primary
       )};
-    --#{$namespace}-theme-mode-toggle-active-bg: #{var(
-        --#{$namespace}-fill-color-light
+    --#{$namespace}-theme-mode-toggle-active-bg: #{color-mix(
+        in srgb,
+        var(--fsus-scholarly-blue) 14%,
+        var(--#{$namespace}-bg-color)
       )};
     --#{$namespace}-theme-mode-toggle-active-border-color: transparent;
     --#{$namespace}-theme-mode-toggle-active-color: #{var(
         --#{$namespace}-text-color-primary
       )};
+    --#{$namespace}-theme-mode-toggle-active-ring: #{color-mix(
+        in srgb,
+        var(--fsus-scholarly-blue) 24%,
+        transparent
+      )};
   }
 
   @at-root :root[data-theme-resolved='dark']
       .#{$namespace}-theme-mode-toggle--segmented {
-    --#{$namespace}-theme-mode-toggle-bg: transparent;
+    --#{$namespace}-theme-mode-toggle-bg: #{color-mix(
+        in srgb,
+        var(--#{$namespace}-fill-color-light) 76%,
+        transparent
+      )};
     --#{$namespace}-theme-mode-toggle-item-bg: transparent;
     --#{$namespace}-theme-mode-toggle-item-border-color: transparent;
     --#{$namespace}-theme-mode-toggle-item-color: #{var(
@@ -156,6 +200,11 @@
     --#{$namespace}-theme-mode-toggle-active-border-color: transparent;
     --#{$namespace}-theme-mode-toggle-active-color: #{var(
         --#{$namespace}-text-color-primary
+      )};
+    --#{$namespace}-theme-mode-toggle-active-ring: #{color-mix(
+        in srgb,
+        var(--fsus-scholarly-blue) 34%,
+        transparent
       )};
   }
 

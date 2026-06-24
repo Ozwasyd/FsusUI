@@ -2,6 +2,7 @@
   <Transition
     :appear="effectiveAppear"
     :css="false"
+    :mode="mode"
     @enter="onEnter"
     @leave="onLeave"
   >
@@ -10,7 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, type TransitionProps } from 'vue'
 import { resolveMotionPresetName } from '../presets'
 import { runMotion } from '../runtime'
 import type { MotionPresetInput } from '../types'
@@ -27,6 +28,7 @@ const props = withDefaults(
     easing?: string
     disabled?: boolean
     appear?: boolean
+    mode?: TransitionProps['mode']
     suppressAppearDuringHydration?: boolean
   }>(),
   {

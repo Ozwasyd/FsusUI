@@ -82,13 +82,13 @@ export const motionPresets: Record<MotionPresetName, MotionPresetDefinition> = {
   'route-settle': {
     name: 'route-settle',
     pattern: 'decel',
-    tier: 'long',
+    tier: 'short',
     surfaces: ['route-surface', 'reading-surface'],
-    from: { opacity: '0.96' },
+    from: { opacity: '0.78' },
     to: { opacity: '1' },
     reduced: opacityTerminal,
     leaveFrom: { opacity: '1' },
-    leaveTo: { opacity: '0.96' },
+    leaveTo: { opacity: '0.78' },
   },
   'ownership-transfer-snapshot': {
     name: 'ownership-transfer-snapshot',

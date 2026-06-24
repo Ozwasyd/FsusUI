@@ -160,18 +160,18 @@ $switch-content-padding: map.merge(
     background: getCssVar('switch-off-color');
     cursor: pointer;
     transition:
-      border-color getCssVar('transition-duration')
-        getCssVar('transition-function-ease-in-out-bezier'),
-      background-color getCssVar('transition-duration')
-        getCssVar('transition-function-ease-in-out-bezier');
+      border-color var(--fsus-motion-control-fast, #{getCssVar('transition-duration-fast')})
+        var(--fsus-motion-standard, #{getCssVar('transition-function-standard')}),
+      background-color var(--fsus-motion-control-fast, #{getCssVar('transition-duration-fast')})
+        var(--fsus-motion-standard, #{getCssVar('transition-function-standard')});
 
     .#{$namespace}-switch__inner {
       width: 100%;
       transition:
-        padding getCssVar('transition-duration')
-          getCssVar('transition-function-ease-in-out-bezier'),
-        color getCssVar('transition-duration')
-          getCssVar('transition-function-ease-in-out-bezier');
+        padding var(--fsus-motion-control-fast, #{getCssVar('transition-duration-fast')})
+          var(--fsus-motion-standard, #{getCssVar('transition-function-standard')}),
+        color var(--fsus-motion-control-fast, #{getCssVar('transition-duration-fast')})
+          var(--fsus-motion-standard, #{getCssVar('transition-function-standard')});
       height: map.get($switch-button-size, 'default');
       display: flex;
       justify-content: center;
@@ -191,22 +191,25 @@ $switch-content-padding: map.merge(
 
     .#{$namespace}-switch__action {
       position: absolute;
-      left: 1px;
+      left: calc(var(--fsus-switch-action-inset, 2px) - 1px);
+      box-sizing: border-box;
       border-radius: getCssVar('border-radius-circle');
       transition:
-        left getCssVar('transition-duration')
-          getCssVar('transition-function-ease-in-out-bezier'),
-        transform var(--fsus-motion-control, 260ms)
-          var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1)),
-        filter var(--fsus-motion-control-fast, 160ms)
-          var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
-        box-shadow var(--fsus-motion-control-fast, 160ms)
-          var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
-        color getCssVar('transition-duration')
-          getCssVar('transition-function-ease-in-out-bezier'),
-        background-color getCssVar('transition-duration')
-          getCssVar('transition-function-ease-in-out-bezier');
-      will-change: transform, filter;
+        left var(
+            --fsus-switch-motion-thumb,
+            var(--fsus-motion-control-fast, #{getCssVar('transition-duration-fast')})
+          )
+          var(
+            --fsus-switch-ease-thumb,
+            var(--fsus-motion-standard, #{getCssVar('transition-function-standard')})
+          ),
+        box-shadow var(--fsus-motion-control-fast, #{getCssVar('transition-duration-fast')})
+          var(--fsus-motion-standard, #{getCssVar('transition-function-standard')}),
+        color var(--fsus-motion-control-fast, #{getCssVar('transition-duration-fast')})
+          var(--fsus-motion-standard, #{getCssVar('transition-function-standard')}),
+        background-color var(--fsus-motion-control-fast, #{getCssVar('transition-duration-fast')})
+          var(--fsus-motion-standard, #{getCssVar('transition-function-standard')});
+      will-change: left;
       width: map.get($switch-button-size, 'default');
       height: map.get($switch-button-size, 'default');
       background-color: getCssVar('color-white');
@@ -226,7 +229,10 @@ $switch-content-padding: map.merge(
       background-color: getCssVar('switch-on-color');
 
       .#{$namespace}-switch__action {
-        left: calc(100% - #{map.get($switch-button-size, 'default') + 1px});
+        left: calc(
+          100% - #{map.get($switch-button-size, 'default')} -
+            var(--fsus-switch-action-inset, 2px) - 1px
+        );
         color: getCssVar('switch-on-color');
       }
 

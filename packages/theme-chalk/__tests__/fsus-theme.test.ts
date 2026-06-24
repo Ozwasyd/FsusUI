@@ -395,35 +395,126 @@ describe('Fsus theme visual baseline', () => {
     const css = compileThemeFile('fsus-theme.scss')
 
     expectCssRule(css, '.el-theme-mode-toggle .el-radio-group', [
-      'background: transparent;',
+      'background: var(--el-theme-mode-toggle-bg, var(--el-fill-color-extra-light));',
       'border: 1px solid var(--el-border-color-lighter);',
       'border-radius: 8px;',
       'padding: 2px;',
+      'overflow: hidden;',
     ])
+    expectCssRule(css, '.el-theme-mode-toggle .el-radio-button__inner', [
+      'border-radius: 6px;',
+      'overflow: hidden;',
+    ])
+    expectCssRule(
+      css,
+      '.el-theme-mode-toggle .el-radio-button:focus-within .el-radio-button__inner',
+      [
+        'border-color: var(--el-theme-mode-toggle-active-border-color, transparent) !important;',
+        'border-radius: 6px;',
+        'box-shadow: inset 0 0 0 1px var(--el-theme-mode-toggle-active-ring, color-mix(in srgb, var(--fsus-scholarly-blue) 24%, transparent)) !important;',
+      ],
+    )
     expectCssRule(
       css,
       '.el-theme-mode-toggle .el-radio-button.is-active .el-radio-button__inner',
       [
-        'background: var(--el-fill-color-light);',
-        'box-shadow: none !important;',
+        'background: var(--el-theme-mode-toggle-active-bg, color-mix(in srgb, var(--fsus-scholarly-blue) 14%, var(--el-bg-color)));',
+        'box-shadow: inset 0 0 0 1px var(--el-theme-mode-toggle-active-ring, color-mix(in srgb, var(--fsus-scholarly-blue) 24%, transparent)) !important;',
       ],
     )
+  })
+
+  test('keeps switch thumb material aligned with FsusUI surfaces', () => {
+    const css = compileThemeFile('fsus-theme.scss')
+    const switchCss = compileThemeFile('switch.scss')
+
+    expectCssRule(css, '.el-switch', [
+      '--fsus-switch-action-inset: 2px;',
+      '--fsus-switch-motion-thumb: 220ms;',
+      '--fsus-switch-ease-thumb: cubic-bezier(0.22, 1, 0.36, 1);',
+      '--fsus-switch-off-bg: color-mix( in srgb, var(--fsus-ink) 7%, var(--fsus-color-surface-raised) 93% );',
+      '--fsus-switch-off-border: color-mix( in srgb, var(--fsus-ink) 10%, var(--fsus-color-surface-raised) 90% );',
+      '--fsus-switch-action-bg: var(--fsus-color-surface-raised);',
+      '--fsus-switch-action-border: color-mix( in srgb, var(--fsus-border-light) 86%, var(--fsus-ink) 14% );',
+      '--fsus-switch-action-shadow: 0 1px 2px rgba(15, 15, 17, 0.08);',
+    ])
+    expectCssRule(css, '.el-switch__action', [
+      'left: calc(var(--fsus-switch-action-inset) - 1px) !important;',
+      'box-sizing: border-box;',
+      'background-color: var(--fsus-switch-action-bg);',
+      'box-shadow: var(--fsus-switch-action-shadow);',
+      'border: 1px solid var(--fsus-switch-action-border);',
+    ])
+    expectCssRule(css, 'html.dark .el-switch__action', [
+      '--fsus-switch-action-bg: color-mix( in srgb, var(--fsus-color-surface-base) 82%, white 18% );',
+      '--fsus-switch-action-border: color-mix( in srgb, var(--fsus-border-light) 56%, white 44% );',
+      '--fsus-switch-action-shadow: 0 1px 2px rgba(0, 0, 0, 0.28);',
+    ])
+    expectCssRule(
+      css,
+      '.el-switch.is-checked .el-switch__core .el-switch__action',
+      [
+        '--fsus-switch-checked-action-bg: var(--el-color-white);',
+        '--fsus-switch-action-border: color-mix( in srgb, var(--fsus-scholarly-blue) 18%, var(--el-color-white) 82% );',
+        '--fsus-switch-action-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fsus-scholarly-blue) 10%, transparent), 0 1px 2px rgba(15, 15, 17, 0.16);',
+        'background-color: var(--fsus-switch-checked-action-bg);',
+        'left: calc(var(--fsus-switch-core-width) - var(--fsus-switch-action-size) - var(--fsus-switch-action-inset) - 1px) !important;',
+        'transform: none;',
+      ],
+    )
+    expectCssRule(css, '.el-switch__core', [
+      'background: var(--fsus-switch-off-bg);',
+      'border-color: var(--fsus-switch-off-border);',
+      'box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fsus-ink) 4%, transparent);',
+      'background-color var(--fsus-motion-control-fast) var(--fsus-motion-standard)',
+      'border-color var(--fsus-motion-control-fast) var(--fsus-motion-standard)',
+      'box-shadow var(--fsus-motion-control-fast) var(--fsus-motion-standard)',
+    ])
+    expectCssRule(css, '.el-switch__action', [
+      'left var(--fsus-switch-motion-thumb) var(--fsus-switch-ease-thumb)',
+      'will-change: left;',
+    ])
+    expectCssRule(css, '.el-switch.is-checked .el-switch__core', ['box-shadow: none;'])
+    expectCssRule(css, '.el-switch.is-sliding .el-switch__action, .el-switch:active .el-switch__action', [
+      'filter: blur(0);',
+      'box-shadow: var(--fsus-switch-action-shadow);',
+    ])
+    expectCssRule(switchCss, '.el-switch__core', [
+      'border-color var(--fsus-motion-control-fast, var(--el-transition-duration-fast))',
+      'background-color var(--fsus-motion-control-fast, var(--el-transition-duration-fast))',
+    ])
+    expectCssRule(switchCss, '.el-switch__core .el-switch__action', [
+      'left: calc(var(--fsus-switch-action-inset, 2px) - 1px);',
+      'box-sizing: border-box;',
+      'left var(--fsus-switch-motion-thumb, var(--fsus-motion-control-fast, var(--el-transition-duration-fast)))',
+      'will-change: left;',
+    ])
+    expectCssRule(switchCss, '.el-switch.is-checked .el-switch__core .el-switch__action', [
+      'left: calc(100% - 16px - var(--fsus-switch-action-inset, 2px) - 1px);',
+    ])
+    expect(css).not.toContain('transform var(--fsus-motion-control) var(--fsus-motion-emphasized)')
+    expect(switchCss).not.toContain('var(--fsus-motion-control, 260ms)')
+    expect(switchCss).not.toContain('calc(100% - 17px)')
   })
 
   test('defines theme mode segmented tokens in the component stylesheet', () => {
     const css = compileThemeFile('theme-mode-toggle.scss')
 
-    /* design.md §7: segment control = Scholarly Blue 选中胶囊 + Ink 文本.
-       The segmented variant is intentionally frameless — inactive items
-       render as plain text buttons and only the active pill supplies the
-       grouping affordance, so there is no outer container border, radius,
-       or inner padding on the segmented root. */
+    /* design.md §8: segment controls use stable hit areas and restrained
+       selection material. The group surface stays quiet, but not transparent
+       on white headers, so active items do not read as detached tiles. */
     expectCssRule(css, '.el-theme-mode-toggle--segmented', [
-      '--el-theme-mode-toggle-bg: transparent;',
+      '--el-theme-mode-toggle-bg: var(--el-fill-color-extra-light);',
       '--el-theme-mode-toggle-item-bg: transparent;',
       '--el-theme-mode-toggle-item-border-color: transparent;',
-      '--el-theme-mode-toggle-active-bg: var(--el-fill-color-light);',
+      '--el-theme-mode-toggle-active-bg: color-mix(in srgb, var(--fsus-scholarly-blue) 14%, var(--el-bg-color));',
+      '--el-theme-mode-toggle-active-ring: color-mix(in srgb, var(--fsus-scholarly-blue) 24%, transparent);',
+      'gap: 2px;',
+      'min-height: 40px;',
+      'padding: 2px;',
+      'border-radius: 8px;',
       'background: var(--el-theme-mode-toggle-bg);',
+      'overflow: hidden;',
     ])
     expectCssRule(
       css,
@@ -431,7 +522,9 @@ describe('Fsus theme visual baseline', () => {
       [
         'background: var(--el-theme-mode-toggle-item-bg);',
         'border-color: var(--el-theme-mode-toggle-item-border-color);',
+        'border-radius: 6px;',
         'color: var(--el-theme-mode-toggle-item-color);',
+        'overflow: hidden;',
       ],
     )
     expectCssRule(
@@ -441,7 +534,7 @@ describe('Fsus theme visual baseline', () => {
         'background: var(--el-theme-mode-toggle-active-bg);',
         'border-color: var(--el-theme-mode-toggle-active-border-color);',
         'color: var(--el-theme-mode-toggle-active-color);',
-        'box-shadow: none !important;',
+        'box-shadow: inset 0 0 0 1px var(--el-theme-mode-toggle-active-ring) !important;',
       ],
     )
   })
@@ -449,27 +542,29 @@ describe('Fsus theme visual baseline', () => {
   test('maps theme mode segmented tokens through resolved theme states', () => {
     const css = compileThemeFile('theme-mode-toggle.scss')
 
-    /* Outer container is transparent in both themes now that the segmented
-       variant is frameless; hover and active keep their theme-specific
-       tints so the selected pill reads as Scholarly Blue in dark mode. */
+    /* The group surface is visible in both themes; hover and active keep
+       their theme-specific tints so the selected pill reads as Scholarly
+       Blue without leaking a square radio-button edge. */
     expectCssRule(
       css,
       ':root[data-theme-resolved=light] .el-theme-mode-toggle--segmented',
       [
-        '--el-theme-mode-toggle-bg: transparent;',
+        '--el-theme-mode-toggle-bg: var(--el-fill-color-extra-light);',
         '--el-theme-mode-toggle-item-bg: transparent;',
-        '--el-theme-mode-toggle-item-hover-bg: var(--el-fill-color-light);',
-        '--el-theme-mode-toggle-active-bg: var(--el-fill-color-light);',
+        '--el-theme-mode-toggle-item-hover-bg: color-mix(in srgb, var(--fsus-scholarly-blue) 8%, transparent);',
+        '--el-theme-mode-toggle-active-bg: color-mix(in srgb, var(--fsus-scholarly-blue) 14%, var(--el-bg-color));',
+        '--el-theme-mode-toggle-active-ring: color-mix(in srgb, var(--fsus-scholarly-blue) 24%, transparent);',
       ],
     )
     expectCssRule(
       css,
       ':root[data-theme-resolved=dark] .el-theme-mode-toggle--segmented',
       [
-        '--el-theme-mode-toggle-bg: transparent;',
+        '--el-theme-mode-toggle-bg: color-mix(in srgb, var(--el-fill-color-light) 76%, transparent);',
         '--el-theme-mode-toggle-item-bg: transparent;',
         '--el-theme-mode-toggle-item-hover-bg: color-mix(in srgb, var(--fsus-scholarly-blue) 16%, transparent);',
         '--el-theme-mode-toggle-active-bg: color-mix(in srgb, var(--fsus-scholarly-blue) 24%, var(--el-bg-color));',
+        '--el-theme-mode-toggle-active-ring: color-mix(in srgb, var(--fsus-scholarly-blue) 34%, transparent);',
       ],
     )
   })
@@ -497,7 +592,17 @@ describe('Fsus theme visual baseline', () => {
       css,
       '.el-theme-mode-toggle--segmented .el-radio-button__original-radio:focus-visible + .el-radio-button__inner',
       [
-        'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+        'box-shadow: inset 0 0 0 1px var(--el-theme-mode-toggle-active-ring) !important;',
+        'border-radius: 6px;',
+      ],
+    )
+    expectCssRule(
+      css,
+      '.el-theme-mode-toggle--segmented .el-radio-button:focus-within .el-radio-button__inner',
+      [
+        'border-color: var(--el-theme-mode-toggle-active-border-color) !important;',
+        'border-radius: 6px;',
+        'box-shadow: inset 0 0 0 1px var(--el-theme-mode-toggle-active-ring) !important;',
       ],
     )
     expectCssRule(
@@ -506,6 +611,7 @@ describe('Fsus theme visual baseline', () => {
       [
         'background: var(--el-theme-mode-toggle-active-bg);',
         'color: var(--el-theme-mode-toggle-active-color);',
+        'box-shadow: inset 0 0 0 1px var(--el-theme-mode-toggle-active-ring) !important;',
       ],
     )
   })

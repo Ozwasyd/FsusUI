@@ -352,6 +352,34 @@ describe('motion primitives', () => {
     wrapper.unmount()
   })
 
+  it('forwards Vue Transition mode for route-level choreography', () => {
+    let observedMode: unknown
+    const TransitionProbe = defineComponent({
+      props: {
+        mode: String,
+      },
+      setup(props, { slots }) {
+        observedMode = props.mode
+        return () => slots.default?.()
+      },
+    })
+
+    const wrapper = mount(() => (
+      <FsuTransition name="route-settle" mode="out-in">
+        <div class="panel">panel</div>
+      </FsuTransition>
+    ), {
+      global: {
+        stubs: {
+          Transition: TransitionProbe,
+        },
+      },
+    })
+
+    expect(observedMode).toBe('out-in')
+    wrapper.unmount()
+  })
+
   it('keeps normal appear motion for client-only transition consumers', async () => {
     const wrapper = mount(
       () => (

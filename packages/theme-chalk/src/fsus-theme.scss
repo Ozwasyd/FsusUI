@@ -592,6 +592,26 @@ html.dark {
 .#{$namespace}-switch {
   --fsus-switch-core-width: 40px;
   --fsus-switch-action-size: 16px;
+  --fsus-switch-action-inset: 2px;
+  --fsus-switch-motion-thumb: 220ms;
+  --fsus-switch-ease-thumb: cubic-bezier(0.22, 1, 0.36, 1);
+  --fsus-switch-off-bg: color-mix(
+    in srgb,
+    var(--fsus-ink) 7%,
+    var(--fsus-color-surface-raised) 93%
+  );
+  --fsus-switch-off-border: color-mix(
+    in srgb,
+    var(--fsus-ink) 10%,
+    var(--fsus-color-surface-raised) 90%
+  );
+  --fsus-switch-action-bg: var(--fsus-color-surface-raised);
+  --fsus-switch-action-border: color-mix(
+    in srgb,
+    var(--fsus-border-light) 86%,
+    var(--fsus-ink) 14%
+  );
+  --fsus-switch-action-shadow: 0 1px 2px rgba(15, 15, 17, 0.08);
 }
 
 .#{$namespace}-switch--large {
@@ -605,56 +625,76 @@ html.dark {
 }
 
 .#{$namespace}-switch__core {
-  background: var(--el-fill-color);
-  border-color: var(--el-fill-color);
-  box-shadow: none;
+  background: var(--fsus-switch-off-bg);
+  border-color: var(--fsus-switch-off-border);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fsus-ink) 4%, transparent);
   transition:
-    background-color var(--fsus-motion-control) var(--fsus-motion-standard),
-    border-color var(--fsus-motion-control) var(--fsus-motion-standard),
-    box-shadow var(--fsus-motion-control) var(--fsus-motion-standard);
+    background-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    border-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    box-shadow var(--fsus-motion-control-fast) var(--fsus-motion-standard);
 }
 
 .#{$namespace}-switch__action {
-  left: 1px !important;
+  left: calc(var(--fsus-switch-action-inset) - 1px) !important;
+  box-sizing: border-box;
   filter: blur(0);
-  transform: translate3d(0, 0, 0);
+  transform: none;
   transition:
-    transform var(--fsus-motion-control) var(--fsus-motion-emphasized),
-    filter var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    left var(--fsus-switch-motion-thumb) var(--fsus-switch-ease-thumb),
     box-shadow var(--fsus-motion-control-fast) var(--fsus-motion-standard),
     background-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
     border-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
     color var(--fsus-motion-control-fast) var(--fsus-motion-standard);
-  will-change: transform, filter;
-  box-shadow: none;
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  will-change: left;
+  background-color: var(--fsus-switch-action-bg);
+  box-shadow: var(--fsus-switch-action-shadow);
+  border: 1px solid var(--fsus-switch-action-border);
 }
 
 html.dark .#{$namespace}-switch__action {
-  border-color: rgba(255, 255, 255, 0.1);
+  --fsus-switch-action-bg: color-mix(
+    in srgb,
+    var(--fsus-color-surface-base) 82%,
+    white 18%
+  );
+  --fsus-switch-action-border: color-mix(
+    in srgb,
+    var(--fsus-border-light) 56%,
+    white 44%
+  );
+  --fsus-switch-action-shadow: 0 1px 2px rgba(0, 0, 0, 0.28);
 }
 
 .#{$namespace}-switch.is-checked .#{$namespace}-switch__core {
   background: var(--fsus-scholarly-blue);
   border-color: var(--fsus-scholarly-blue);
+  box-shadow: none;
 }
 
 .#{$namespace}-switch.is-checked
   .#{$namespace}-switch__core
   .#{$namespace}-switch__action {
-  left: 1px !important;
-  transform: translate3d(
-    calc(var(--fsus-switch-core-width) - var(--fsus-switch-action-size) - 2px),
-    0,
-    0
+  --fsus-switch-checked-action-bg: var(--el-color-white);
+  --fsus-switch-action-border: color-mix(
+    in srgb,
+    var(--fsus-scholarly-blue) 18%,
+    var(--el-color-white) 82%
   );
+  --fsus-switch-action-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--fsus-scholarly-blue) 10%, transparent),
+    0 1px 2px rgba(15, 15, 17, 0.16);
+  background-color: var(--fsus-switch-checked-action-bg);
+  left: calc(
+    var(--fsus-switch-core-width) - var(--fsus-switch-action-size) -
+      var(--fsus-switch-action-inset) - 1px
+  ) !important;
+  transform: none;
 }
 
 .#{$namespace}-switch.is-sliding .#{$namespace}-switch__action,
 .#{$namespace}-switch:active .#{$namespace}-switch__action {
-  filter: blur(var(--fsus-interactive-motion-blur, var(--fsus-motion-blur)));
-  box-shadow: 0 0 var(--fsus-interactive-motion-glow, 14px)
-    var(--fsus-motion-trail);
+  filter: blur(0);
+  box-shadow: var(--fsus-switch-action-shadow);
 }
 
 .#{$namespace}-alert,
@@ -879,20 +919,49 @@ html.dark .#{$namespace}-switch__action {
 
 .#{$namespace}-theme-mode-toggle {
   .#{$namespace}-radio-group {
-    background: transparent;
+    background: var(
+      --#{$namespace}-theme-mode-toggle-bg,
+      var(--#{$namespace}-fill-color-extra-light)
+    );
     border: 1px solid var(--el-border-color-lighter);
     border-radius: 8px;
     padding: 2px;
+    overflow: hidden;
   }
 
   .#{$namespace}-radio-button__inner {
     min-height: 36px;
     border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .#{$namespace}-radio-button:first-child .#{$namespace}-radio-button__inner,
+  .#{$namespace}-radio-button:last-child .#{$namespace}-radio-button__inner {
+    border-radius: 6px;
+  }
+
+  .#{$namespace}-radio-button:focus-within .#{$namespace}-radio-button__inner {
+    border-color: var(--#{$namespace}-theme-mode-toggle-active-border-color, transparent) !important;
+    border-radius: 6px;
+    box-shadow:
+      inset 0 0 0 1px
+        var(
+          --#{$namespace}-theme-mode-toggle-active-ring,
+          color-mix(in srgb, var(--fsus-scholarly-blue) 24%, transparent)
+        ) !important;
   }
 
   .#{$namespace}-radio-button.is-active .#{$namespace}-radio-button__inner {
-    background: var(--el-fill-color-light);
-    box-shadow: none !important;
+    background: var(
+      --#{$namespace}-theme-mode-toggle-active-bg,
+      color-mix(in srgb, var(--fsus-scholarly-blue) 14%, var(--el-bg-color))
+    );
+    box-shadow:
+      inset 0 0 0 1px
+        var(
+          --#{$namespace}-theme-mode-toggle-active-ring,
+          color-mix(in srgb, var(--fsus-scholarly-blue) 24%, transparent)
+        ) !important;
   }
 }
 
@@ -1228,6 +1297,7 @@ button.#{$namespace}-card:active {
 }
 
 .#{$namespace}-message {
+  position: fixed;
   top: var(--fsus-space-4);
   width: var(--fsus-notification-max-width);
   padding: var(--fsus-space-3) var(--fsus-space-4);
