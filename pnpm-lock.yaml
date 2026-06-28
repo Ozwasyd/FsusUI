@@ -87,6 +87,9 @@ importers:
       '@element-plus/icons-svg':
         specifier: workspace:*
         version: link:packages/icons-svg
+      '@eslint/js':
+        specifier: ^10.0.1
+        version: 10.0.1(eslint@10.2.0(jiti@2.6.1))
       '@playwright/test':
         specifier: ^1.59.1
         version: 1.59.1

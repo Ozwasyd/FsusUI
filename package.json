@@ -177,6 +177,7 @@
     "@element-plus/build-utils": "workspace:^0.0.1",
     "@element-plus/eslint-config": "workspace:*",
     "@element-plus/icons-svg": "workspace:*",
+    "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.59.1",
     "@pnpm/find-workspace-packages": "^4.0.16",
     "@pnpm/logger": "^4.0.0",
