@@ -533,9 +533,12 @@ html.dark {
 
 .#{$namespace}-checkbox.is-bordered,
 .#{$namespace}-radio.is-bordered,
-.#{$namespace}-check-tag,
-.#{$namespace}-tag {
+.#{$namespace}-check-tag {
   @include fsus-control(8px);
+  box-shadow: none;
+}
+
+.#{$namespace}-tag {
   box-shadow: none;
 }
 
@@ -1049,12 +1052,12 @@ button.#{$namespace}-card:active {
 .#{$namespace}-check-tag {
   color: var(--el-text-color-regular);
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
   background: rgba(161, 161, 170, 0.06);
   border-color: var(--el-border-color-light);
-  border-radius: 8px !important;
+  border-radius: var(--fsus-radius-control-small, 4px) !important;
 }
 
 .#{$namespace}-tag:hover,

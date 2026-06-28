@@ -93,14 +93,15 @@ $tag-icon-span-gap: map.merge(
   justify-content: center;
   align-items: center;
   vertical-align: middle;
-  height: map.get($tag-height, 'default');
-  padding: 0 map.get($tag-padding, 'default') - $border-width;
+  height: var(--fsus-tag-height, 22px);
+  padding: 0 var(--fsus-tag-padding-x, 7px);
 
   font-size: var(--fsus-tag-font-size, var(--el-font-size-extra-small));
+  font-weight: var(--fsus-tag-font-weight, 650);
   line-height: 1;
   border-width: $tag-border-width;
   border-style: solid;
-  border-radius: getCssVar('tag-border-radius');
+  border-radius: var(--fsus-radius-control-small, #{getCssVar('tag-border-radius')});
   box-sizing: border-box;
   white-space: nowrap;
   letter-spacing: var(--fsus-tag-letter-spacing, 0);
@@ -143,6 +144,24 @@ $tag-icon-span-gap: map.merge(
   @include m(plain) {
     @include genTheme(false, 'light-5', '');
     @include css-var-from-global(('tag', 'bg-color'), ('fill-color', 'blank'));
+  }
+
+  &.#{$namespace}-tag--light {
+    background-color: color-mix(
+      in srgb,
+      getCssVar('tag-text-color') 2%,
+      getCssVar('fill-color', 'blank')
+    );
+    border-color: color-mix(
+      in srgb,
+      getCssVar('tag-text-color') 7%,
+      getCssVar('border-color-lighter')
+    );
+    color: color-mix(
+      in srgb,
+      getCssVar('tag-text-color') 34%,
+      getCssVar('text-color', 'regular')
+    );
   }
 
   &.is-closable {

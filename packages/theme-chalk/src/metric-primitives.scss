@@ -147,43 +147,76 @@
 @include b(key-value-grid) {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 10px;
+  gap: 0;
   min-width: 0;
   margin: 0;
+  border: 1px solid getCssVar('border-color-lighter');
+  border-radius: var(--fsus-radius-control, 6px);
+  background: getCssVar('bg-color');
+  overflow: hidden;
+
+  &.#{$namespace}-key-value-grid {
+    gap: 0;
+  }
 
   @include m(compact) {
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 8px;
+    gap: 0;
   }
 }
 
 @include b(key-value-item) {
   display: grid;
-  gap: 4px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 3px;
+  align-items: start;
   min-width: 0;
-  padding: 10px 12px;
-  border: 1px solid getCssVar('border-color-lighter');
-  border-radius: var(--fsus-radius-panel, 8px);
-  background: getCssVar('fill-color', 'blank');
+  min-height: 48px;
+  padding: 9px 12px;
+  border-right: 1px solid getCssVar('border-color-lighter');
+  border-bottom: 1px solid getCssVar('border-color-lighter');
+  background: transparent;
+  --fsus-key-value-dot-color: var(--fsus-dot-gray, #{getCssVar('text-color', 'placeholder')});
 
   @include e(label) {
-    color: getCssVar('text-color', 'placeholder');
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    min-width: 0;
+    color: getCssVar('text-color', 'secondary');
     font-size: 12px;
+    font-weight: 700;
     line-height: 1.45;
+    overflow-wrap: anywhere;
+
+    &::before {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--fsus-key-value-dot-color);
+      content: '';
+      flex: 0 0 auto;
+      opacity: 0.42;
+    }
   }
 
   @include e(value) {
-    display: flex;
-    flex-wrap: wrap;
+    display: inline-flex;
+    flex-wrap: nowrap;
     gap: 6px;
+    align-items: baseline;
     min-width: 0;
     margin: 0;
     color: getCssVar('text-color', 'primary');
-    font-size: 14px;
+    font-size: 13px;
     font-variant-numeric: tabular-nums;
-    font-weight: 800;
-    line-height: 1.4;
+    font-weight: 750;
+    line-height: 1.45;
     overflow-wrap: anywhere;
+
+    > * {
+      min-width: 0;
+    }
   }
 
   @include e(badge) {
@@ -197,27 +230,19 @@
   }
 
   @include m(success) {
-    border-color: color-mix(
-      in srgb,
-      getCssVar('color-success') 30%,
-      getCssVar('border-color-lighter')
-    );
+    --fsus-key-value-dot-color: #{getCssVar('color-success')};
   }
 
   @include m(warning) {
-    border-color: color-mix(
-      in srgb,
-      getCssVar('color-warning') 34%,
-      getCssVar('border-color-lighter')
-    );
+    --fsus-key-value-dot-color: #{getCssVar('color-warning')};
   }
 
   @include m(danger) {
-    border-color: color-mix(
-      in srgb,
-      getCssVar('color-danger') 34%,
-      getCssVar('border-color-lighter')
-    );
+    --fsus-key-value-dot-color: #{getCssVar('color-danger')};
+  }
+
+  @include m(info) {
+    --fsus-key-value-dot-color: var(--fsus-scholarly-blue, #{getCssVar('color-primary')});
   }
 }
 

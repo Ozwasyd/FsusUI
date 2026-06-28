@@ -2,6 +2,7 @@ import { withInstall } from '@element-plus/utils'
 
 import CollectionSummary from './src/collection-summary.vue'
 import CollectionToolbar from './src/collection-toolbar.vue'
+import DataList from './src/data-list.vue'
 import FilterGroup from './src/filter-group.vue'
 import PaginationBar from './src/pagination-bar.vue'
 import SegmentedControl from './src/segmented-control.vue'
@@ -19,6 +20,11 @@ export const ElCollectionToolbar = withInstall(CollectionToolbar, {
   ),
 })
 export const FsusCollectionToolbar = ElCollectionToolbar.FsusCollectionToolbar
+
+export const ElDataList = withInstall(DataList, {
+  FsusDataList: createAlias(DataList, 'FsusDataList'),
+})
+export const FsusDataList = ElDataList.FsusDataList
 
 export const ElFilterGroup = withInstall(FilterGroup, {
   FsusFilterGroup: createAlias(FilterGroup, 'FsusFilterGroup'),
@@ -44,6 +50,7 @@ export const ElPaginationBar = withInstall(PaginationBar, {
 export const FsusPaginationBar = ElPaginationBar.FsusPaginationBar
 
 export * from './src/collection-toolbar'
+export * from './src/data-list'
 export * from './src/filter-group'
 export * from './src/segmented-control'
 export * from './src/collection-summary'

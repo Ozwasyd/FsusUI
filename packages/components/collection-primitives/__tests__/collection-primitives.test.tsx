@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, test } from 'vitest'
 import CollectionToolbar from '../src/collection-toolbar.vue'
+import DataList from '../src/data-list.vue'
 import FilterGroup from '../src/filter-group.vue'
 import SegmentedControl from '../src/segmented-control.vue'
 import CollectionSummary from '../src/collection-summary.vue'
@@ -47,6 +48,50 @@ describe('collection primitives', () => {
     expect(wrapper.element.tagName).toBe('FIELDSET')
     expect(wrapper.find('.el-filter-group__label').text()).toBe('State')
     expect(wrapper.find('select').exists()).toBe(true)
+  })
+
+  test('renders data list rows with active and loading state', async () => {
+    const wrapper = mount(DataList, {
+      props: {
+        rows: [
+          { id: 'ca', name: 'Canada', scope: 'Independent', action: 'Open' },
+          {
+            id: 'us',
+            name: 'United States',
+            scope: 'Independent',
+            action: 'Open',
+          },
+        ],
+        columns: [
+          { key: 'name', label: 'Region', grid: 'minmax(0, 1fr)' },
+          { key: 'scope', label: 'Scope', grid: 'minmax(0, 1fr)' },
+          {
+            key: 'action',
+            label: 'Action',
+            grid: 'minmax(4rem, auto)',
+            align: 'end',
+          },
+        ],
+        activeKey: 'ca',
+        loadingKey: 'us',
+        ariaLabel: 'Regions',
+        href: (row: Record<string, unknown>) => `#${row.id}`,
+      },
+    })
+
+    expect(wrapper.classes()).toContain('el-data-list--default')
+    expect(wrapper.attributes('role')).toBe('list')
+    expect(wrapper.attributes('aria-label')).toBe('Regions')
+    expect(wrapper.find('.el-data-list__head').text()).toContain('Region')
+    expect(wrapper.findAll('.el-data-list__row')).toHaveLength(2)
+    expect(wrapper.find('.el-data-list__row').classes()).toContain('is-active')
+    expect(wrapper.findAll('.el-data-list__row')[1]?.classes()).toContain(
+      'is-loading',
+    )
+
+    await wrapper.find('.el-data-list__row').trigger('click')
+    expect(wrapper.emitted('row-click')?.[0]?.[1]).toBe('ca')
+    expect(wrapper.emitted('change')?.[0]?.[1]).toBe('ca')
   })
 
   test('emits segmented control changes from click and keyboard', async () => {

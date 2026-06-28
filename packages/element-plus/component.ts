@@ -27,6 +27,7 @@ import { ElColorPicker } from '@element-plus/components/color-picker'
 import {
   ElCollectionSummary,
   ElCollectionToolbar,
+  ElDataList,
   ElFilterGroup,
   ElPaginationBar,
   ElSegmentedControl,
@@ -196,6 +197,7 @@ export const allComponents = [
   ElColorPicker,
   ElCollectionSummary,
   ElCollectionToolbar,
+  ElDataList,
   ElConfigProvider,
   ElContainer,
   ElAside,

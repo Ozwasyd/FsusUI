@@ -139,6 +139,111 @@
   }
 }
 
+@include b(data-list) {
+  --el-data-list-columns: minmax(0, 1fr);
+
+  display: grid;
+  grid-template-columns: var(--el-data-list-columns);
+  width: 100%;
+  min-width: 0;
+  color: getCssVar('text-color-primary');
+  border-top: 1px solid getCssVar('border-color-lighter');
+
+  @include e(head) {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: var(--el-data-list-columns);
+    min-width: 0;
+    min-height: 44px;
+    align-items: center;
+    color: getCssVar('text-color-secondary');
+    font-size: getCssVar('font-size-extra-small');
+    font-weight: 650;
+    line-height: 1.3;
+    border-bottom: 1px solid getCssVar('border-color-lighter');
+  }
+
+  @include e(row) {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: var(--el-data-list-columns);
+    min-width: 0;
+    min-height: 56px;
+    align-items: center;
+    padding: 0;
+    border: 0;
+    border-bottom: 1px solid getCssVar('border-color-lighter');
+    background: transparent;
+    color: getCssVar('text-color-primary');
+    font: inherit;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      background-color getCssVar('transition-duration-fast'),
+      color getCssVar('transition-duration-fast');
+
+    &:hover {
+      background: getCssVar('fill-color-light');
+    }
+
+    &:focus-visible {
+      position: relative;
+      z-index: 1;
+      outline: 2px solid getCssVar('color-primary-light-5');
+      outline-offset: -2px;
+    }
+
+    @include when(active) {
+      background: getCssVar('fill-color-light');
+    }
+
+    @include when(loading) {
+      pointer-events: none;
+      opacity: 0.62;
+    }
+  }
+
+  @include e(cell) {
+    min-width: 0;
+    padding: 0 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: getCssVar('font-size-small');
+    font-weight: 650;
+    line-height: 1.3;
+
+    @include m(center) {
+      text-align: center;
+    }
+
+    @include m(end) {
+      text-align: right;
+    }
+  }
+
+  @include e(empty) {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+
+  @include m(compact) {
+    @include e(head) {
+      min-height: 40px;
+    }
+
+    @include e(row) {
+      min-height: 52px;
+    }
+
+    @include e(cell) {
+      padding-inline: 14px;
+      font-size: getCssVar('font-size-extra-small');
+    }
+  }
+}
+
 @include b(collection-summary) {
   display: flex;
   min-width: 0;
