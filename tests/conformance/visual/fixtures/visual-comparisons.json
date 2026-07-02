@@ -907,6 +907,72 @@
       },
       "screenshotDiffPercent": 0.012,
       "perceptualDelta": 0.05
+    },
+    {
+      "id": "service-helper-stable26-web-avalonia",
+      "component": "service-helper",
+      "mode": "crossPlatform",
+      "token": "service.helper.surface",
+      "fixture": {
+        "page": "visual/service-helper",
+        "theme": "light",
+        "density": "default",
+        "variant": "message-notification-loading-affix-backtop",
+        "size": "md",
+        "state": "grouped-closed-loading-affixed-visible-keyboard",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "coverage": {
+        "controls": [
+          "FsusMessageToast",
+          "FsusNotification",
+          "FsusLoadingOverlay",
+          "FsusAffix",
+          "FsusBacktop"
+        ],
+        "states": [
+          "message-grouped",
+          "notification-placement",
+          "manual-close",
+          "loading-scope",
+          "affix-threshold",
+          "backtop-visible",
+          "keyboard-activate"
+        ],
+        "themes": ["light", "dark", "high-contrast"],
+        "densities": ["compact", "default", "spacious"],
+        "motionModes": ["system", "enabled", "reduced", "disabled"]
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/service-helper-stable26.png",
+        "geometry": { "x": 24, "y": 28, "width": 540, "height": 360 },
+        "color": {
+          "token": "service.helper.surface",
+          "lab": [50, 5, -15]
+        },
+        "radius": 12,
+        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/service-helper-stable26.png",
+        "geometry": { "x": 24.8, "y": 28.7, "width": 540.9, "height": 360.8 },
+        "color": {
+          "token": "service.helper.surface",
+          "lab": [50.4, 5.2, -15.3]
+        },
+        "radius": 12.5,
+        "spacing": { "paddingX": 12.5, "paddingY": 8.4, "gap": 12.5 },
+        "textBaseline": 24.8
+      },
+      "screenshotDiffPercent": 0.012,
+      "perceptualDelta": 0.05
     }
   ]
 }

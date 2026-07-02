@@ -15,6 +15,7 @@ public class PerformanceBudgetTests
     yield return new object[] { "tabs-navigation-repeated-mount", "tabs", 1.4, 2.2, 4.2, 6, 96, 144, 8, 14, 80, 50 };
     yield return new object[] { "menu-navigation-repeated-mount", "menu", 1.5, 2.3, 4.5, 6, 104, 152, 8, 14, 80, 50 };
     yield return new object[] { "form-validation-repeated-mount", "form", 1.7, 2.4, 5.2, 7, 132, 160, 12, 16, 80, 50 };
+    yield return new object[] { "service-helper-stable26-repeated-show-close", "service-helper", 1.8, 2.6, 5.4, 7, 136, 168, 10, 16, 80, 50 };
   }
 
   [Theory]

@@ -26,4 +26,5 @@
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/Menu.axaml" />
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/Navigation.axaml" />
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/AnchoredOverlay.axaml" />
+  <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/Services.axaml" />
 </Styles>

@@ -234,6 +234,20 @@
         "disposalMs": 1.4,
         "mountUnmountCycles": 50
       }
+    },
+    {
+      "id": "service-helper",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 2.6,
+        "firstLayoutMs": 7,
+        "interactionLatencyMs": 10,
+        "frameTimeMs": 16,
+        "allocationsKb": 168,
+        "retainedControlCount": 16,
+        "disposalMs": 1.5,
+        "mountUnmountCycles": 50
+      }
     }
   ]
 }

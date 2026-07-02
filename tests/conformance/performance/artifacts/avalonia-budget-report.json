@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "spec/components/avalonia-stable-performance-budgets.json",
-      "sha256": "63e1b489f5eac4ab91a5dd69b6bf5445d8d9b64e7d270378f011f37f9181548c"
+      "sha256": "3651aeb116567e0520ebd64c38263c2d29131dfbbd0218087e7b735f9c0a46fc"
     },
     {
       "path": "tests/conformance/performance/avalonia-measurements.json",
-      "sha256": "95b90e9eedad5d64617441097eb11e0f066a03500324958842c15e5243b4693f"
+      "sha256": "fc94b8e8768bb9b4f9d2a9c1eb5e7be48c61c910c2333b0e4f68587ad216cd95"
     },
     {
       "path": "tests/conformance/performance/data-size-fixtures.json",
@@ -16,9 +16,9 @@
     }
   ],
   "summary": {
-    "budgetedComponents": 16,
-    "measurements": 7,
-    "passed": 7,
+    "budgetedComponents": 17,
+    "measurements": 8,
+    "passed": 8,
     "dataSizeFixtures": 5
   },
   "dataSizeFixtures": [
@@ -264,6 +264,34 @@
       "artifact": "tests/conformance/performance/artifacts/measurements/form-validation-repeated-mount.json",
       "passed": true,
       "errors": []
+    },
+    {
+      "id": "service-helper-stable26-repeated-show-close",
+      "component": "service-helper",
+      "scenario": "construct-show-group-close-dispose",
+      "metrics": {
+        "constructionMs": 1.8,
+        "firstLayoutMs": 5.4,
+        "interactionLatencyMs": 6.5,
+        "frameTimeMs": 11,
+        "allocationsKb": 136,
+        "retainedControlCount": 10,
+        "disposalMs": 0.9,
+        "mountUnmountCycles": 80
+      },
+      "budgets": {
+        "constructionMs": 2.6,
+        "firstLayoutMs": 7,
+        "interactionLatencyMs": 10,
+        "frameTimeMs": 16,
+        "allocationsKb": 168,
+        "retainedControlCount": 16,
+        "disposalMs": 1.5,
+        "mountUnmountCycles": 50
+      },
+      "artifact": "tests/conformance/performance/artifacts/measurements/service-helper-stable26-repeated-show-close.json",
+      "passed": true,
+      "errors": []
     }
   ],
   "measurementOutput": [
@@ -273,6 +301,7 @@
     "tests/conformance/performance/artifacts/measurements/dialog-overlay-repeated-mount.json",
     "tests/conformance/performance/artifacts/measurements/tabs-navigation-repeated-mount.json",
     "tests/conformance/performance/artifacts/measurements/menu-navigation-repeated-mount.json",
-    "tests/conformance/performance/artifacts/measurements/form-validation-repeated-mount.json"
+    "tests/conformance/performance/artifacts/measurements/form-validation-repeated-mount.json",
+    "tests/conformance/performance/artifacts/measurements/service-helper-stable26-repeated-show-close.json"
   ]
 }

@@ -112,6 +112,22 @@
         "mountUnmountCycles": 80
       },
       "artifact": "tests/conformance/performance/artifacts/measurements/form-validation-repeated-mount.json"
+    },
+    {
+      "id": "service-helper-stable26-repeated-show-close",
+      "component": "service-helper",
+      "scenario": "construct-show-group-close-dispose",
+      "metrics": {
+        "constructionMs": 1.8,
+        "firstLayoutMs": 5.4,
+        "interactionLatencyMs": 6.5,
+        "frameTimeMs": 11,
+        "allocationsKb": 136,
+        "retainedControlCount": 10,
+        "disposalMs": 0.9,
+        "mountUnmountCycles": 80
+      },
+      "artifact": "tests/conformance/performance/artifacts/measurements/service-helper-stable26-repeated-show-close.json"
     }
   ]
 }
