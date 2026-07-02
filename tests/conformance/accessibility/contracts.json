@@ -501,6 +501,20 @@
       "invalidState": "not-applicable",
       "expectedStates": {},
       "keyboardNavigation": ["ArrowDown", "ArrowUp", "Tab"]
+    },
+    {
+      "id": "perception-challenge",
+      "publicName": "FsusPerceptionChallenge",
+      "role": "group",
+      "accessibleName": "required",
+      "value": "required",
+      "disabledState": "required",
+      "selectedState": "not-applicable",
+      "checkedState": "not-applicable",
+      "expandedState": "not-applicable",
+      "invalidState": "not-applicable",
+      "expectedStates": { "disabled": false },
+      "keyboardNavigation": ["Enter", "Space", "Escape"]
     }
   ]
 }

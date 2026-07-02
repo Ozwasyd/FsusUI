@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "tests/conformance/accessibility/contracts.json",
-      "sha256": "e3f74287a0368023fd22a2d98544c171375eea912ee5204a4436a4937556668f"
+      "sha256": "ce54d98224e71c4673d9123adcc87e31e5bcdc56ab22756d02c97c3c8cd584f3"
     },
     {
       "path": "tests/conformance/accessibility/automation-snapshots.json",
-      "sha256": "28af7ed8924890518a8c82d933577e728bedc38a0d38f0c819875ae2e4b4b318"
+      "sha256": "235ed4621868d55eae98b52925597a51bbd81c651e2b60dcab1aab49a93f7214"
     }
   ],
   "requiredContractFields": [
@@ -23,9 +23,9 @@
     "keyboardNavigation"
   ],
   "summary": {
-    "controls": 35,
-    "snapshots": 38,
-    "passed": 38,
+    "controls": 36,
+    "snapshots": 39,
+    "passed": 39,
     "appiumReleaseGates": 2,
     "allowedByOverride": 0
   },
@@ -880,6 +880,28 @@
       "tabOrder": 38,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/inbox-primitives-stable39.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "perception-challenge-stable40",
+      "component": "perception-challenge",
+      "platform": "avalonia",
+      "role": "group",
+      "accessibleName": "Challenge",
+      "value": "loading failure retry disabled localized keyboard-only flows",
+      "states": {
+        "disabled": false,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["Enter", "Space", "Escape"],
+      "tabOrder": 39,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/perception-challenge-stable40.json",
       "allowedByOverride": [],
       "passed": true,
       "errors": []

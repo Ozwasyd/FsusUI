@@ -799,6 +799,27 @@
       "keyboardOperable": true,
       "tabOrder": 38,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/inbox-primitives-stable39.json"
+    },
+    {
+      "id": "perception-challenge-stable40",
+      "component": "perception-challenge",
+      "platform": "avalonia",
+      "control": "FsusPerceptionChallenge",
+      "evidenceSource": "avalonia-headless",
+      "role": "group",
+      "accessibleName": "Challenge",
+      "value": "loading failure retry disabled localized keyboard-only flows",
+      "states": {
+        "disabled": false,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["Enter", "Space", "Escape"],
+      "keyboardOperable": true,
+      "tabOrder": 39,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/perception-challenge-stable40.json"
     }
   ],
   "appiumReleaseGates": [

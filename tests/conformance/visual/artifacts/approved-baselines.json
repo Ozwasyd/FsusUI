@@ -3,7 +3,7 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "fixtureSource": {
     "path": "tests/conformance/visual/fixtures/visual-comparisons.json",
-    "sha256": "bd85d8f13f1c7f166ef535b12ece57a4aad8ccc01619cecb612275d12ecaad29"
+    "sha256": "1328188d719091aa7061f95fdd285623dbb3b09944fd1b8355f8763c0427ba2c"
   },
   "artifactRoot": "tests/conformance/visual/artifacts",
   "thresholds": {
@@ -2275,6 +2275,66 @@
         },
         "textBaseline": 24.7
       }
+    },
+    {
+      "id": "perception-challenge-stable40-web-avalonia",
+      "component": "perception-challenge",
+      "fixture": {
+        "page": "visual/perception-challenge",
+        "theme": "light",
+        "density": "default",
+        "variant": "text-localization-micro-interaction",
+        "size": "lg",
+        "state": "success-failure-retry-loading-disabled-localized-keyboard-long-prompt",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "perception.challenge.surface",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/perception-challenge-stable40.png",
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 760,
+          "height": 420
+        },
+        "color": {
+          "token": "perception.challenge.surface",
+          "lab": [56, 2, -10]
+        },
+        "radius": 8,
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 12
+        },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/perception-challenge-stable40.png",
+        "geometry": {
+          "x": 24.8,
+          "y": 28.8,
+          "width": 760.8,
+          "height": 420.8
+        },
+        "color": {
+          "token": "perception.challenge.surface",
+          "lab": [56.3, 2.1, -10.2]
+        },
+        "radius": 8.4,
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 12.4
+        },
+        "textBaseline": 24.7
+      }
     }
   ],
   "approvedComparisons": [
@@ -2499,6 +2559,12 @@
       "mode": "crossPlatform",
       "platform": "web->avalonia",
       "diffArtifact": "tests/conformance/visual/artifacts/diffs/inbox-primitives-stable39-web-avalonia.json"
+    },
+    {
+      "id": "perception-challenge-stable40-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/perception-challenge-stable40-web-avalonia.json"
     }
   ]
 }

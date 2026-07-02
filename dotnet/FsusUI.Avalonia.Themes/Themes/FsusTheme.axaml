@@ -40,4 +40,5 @@
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/TextEditor.axaml" />
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/PublicShell.axaml" />
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/ProductPrimitives.axaml" />
+  <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/PerceptionChallenge.axaml" />
 </Styles>

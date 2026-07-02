@@ -2030,6 +2030,58 @@
       },
       "screenshotDiffPercent": 0.012,
       "perceptualDelta": 0.05
+    },
+    {
+      "id": "perception-challenge-stable40-web-avalonia",
+      "component": "perception-challenge",
+      "mode": "crossPlatform",
+      "token": "perception.challenge.surface",
+      "fixture": {
+        "page": "visual/perception-challenge",
+        "theme": "light",
+        "density": "default",
+        "variant": "text-localization-micro-interaction",
+        "size": "lg",
+        "state": "success-failure-retry-loading-disabled-localized-keyboard-long-prompt",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "coverage": {
+        "controls": ["FsusPerceptionChallenge", "FsusTextTaskChallenge", "FsusLocalizationChallenge", "FsusMicroInteractionChallenge"],
+        "states": ["success", "failure", "retry", "loading", "disabled", "localized", "keyboard-only", "long-prompt"],
+        "themes": ["light", "dark", "high-contrast"],
+        "densities": ["compact", "default", "spacious"],
+        "motionModes": ["system", "enabled", "reduced", "disabled"]
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/perception-challenge-stable40.png",
+        "geometry": { "x": 24, "y": 28, "width": 760, "height": 420 },
+        "color": {
+          "token": "perception.challenge.surface",
+          "lab": [56, 2, -10]
+        },
+        "radius": 8,
+        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/perception-challenge-stable40.png",
+        "geometry": { "x": 24.8, "y": 28.8, "width": 760.8, "height": 420.8 },
+        "color": {
+          "token": "perception.challenge.surface",
+          "lab": [56.3, 2.1, -10.2]
+        },
+        "radius": 8.4,
+        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 12.4 },
+        "textBaseline": 24.7
+      },
+      "screenshotDiffPercent": 0.012,
+      "perceptualDelta": 0.05
     }
   ]
 }
