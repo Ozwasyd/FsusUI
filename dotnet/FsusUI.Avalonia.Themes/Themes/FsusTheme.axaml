@@ -31,4 +31,5 @@
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/DateTime.axaml" />
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/ValuePickers.axaml" />
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/UploadTransfer.axaml" />
+  <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/DataDisplay.axaml" />
 </Styles>

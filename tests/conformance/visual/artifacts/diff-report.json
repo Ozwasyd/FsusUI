@@ -3,8 +3,8 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "artifactRoot": "tests/conformance/visual/artifacts",
   "summary": {
-    "total": 25,
-    "passed": 25,
+    "total": 27,
+    "passed": 27,
     "allowedByOverride": 2
   },
   "comparisons": [
@@ -775,6 +775,68 @@
       "token": "upload.transfer.surface",
       "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/upload-transfer-stable30.png",
       "diffArtifact": "tests/conformance/visual/artifacts/diffs/upload-transfer-stable30-web-avalonia.json",
+      "deltas": {
+        "geometry": 0.8000000000000114,
+        "colorDelta": 0.3741657386773915,
+        "radius": 0.40000000000000036,
+        "spacing": 0.40000000000000036,
+        "textBaseline": 0.6999999999999993,
+        "screenshotDiffPercent": 0.012,
+        "perceptualDelta": 0.05
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "data-display-stable31-web-avalonia",
+      "component": "data-display",
+      "state": "paged-bordered-alternate-formatted-countdown",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "data.display.surface",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/data-display-stable31.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/data-display-stable31-web-avalonia.json",
+      "deltas": {
+        "geometry": 0.8000000000000114,
+        "colorDelta": 0.3741657386773915,
+        "radius": 0.40000000000000036,
+        "spacing": 0.40000000000000036,
+        "textBaseline": 0.6999999999999993,
+        "screenshotDiffPercent": 0.012,
+        "perceptualDelta": 0.05
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "data-display-stable31-compact-web-avalonia",
+      "component": "data-display",
+      "state": "responsive-single-column-timing-safe",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "data.display.surface",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/data-display-stable31-compact.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/data-display-stable31-compact-web-avalonia.json",
       "deltas": {
         "geometry": 0.8000000000000114,
         "colorDelta": 0.3741657386773915,
