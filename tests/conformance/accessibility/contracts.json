@@ -291,6 +291,20 @@
       "invalidState": "not-applicable",
       "expectedStates": {},
       "keyboardNavigation": ["Escape"]
+    },
+    {
+      "id": "media-decorative",
+      "publicName": "FsusImageViewer",
+      "role": "image",
+      "accessibleName": "required",
+      "value": "required",
+      "disabledState": "not-applicable",
+      "selectedState": "not-applicable",
+      "checkedState": "not-applicable",
+      "expandedState": "required",
+      "invalidState": "not-applicable",
+      "expectedStates": { "expanded": true },
+      "keyboardNavigation": ["ArrowLeft", "ArrowRight", "Escape"]
     }
   ]
 }

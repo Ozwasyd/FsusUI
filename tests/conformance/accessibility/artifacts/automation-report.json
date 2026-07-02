@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "tests/conformance/accessibility/contracts.json",
-      "sha256": "837f5870b92b69e3668e03e50171eb9bab7c737f2cb60b9ebe5633725f0a1b2e"
+      "sha256": "44ccb309a52231695342a947803c5585e8cc920b06ff31f3a15028efe3cd1744"
     },
     {
       "path": "tests/conformance/accessibility/automation-snapshots.json",
-      "sha256": "68d1e066fa714f58839a921f52659e4a67ac068c117a0244983d761672fb3725"
+      "sha256": "bba395443f50c7e89feb55e8163bb89f9c76b6ac062fb37c1a79c5e70bb8bbd7"
     }
   ],
   "requiredContractFields": [
@@ -23,9 +23,9 @@
     "keyboardNavigation"
   ],
   "summary": {
-    "controls": 20,
-    "snapshots": 23,
-    "passed": 23,
+    "controls": 21,
+    "snapshots": 24,
+    "passed": 24,
     "appiumReleaseGates": 2,
     "allowedByOverride": 0
   },
@@ -550,6 +550,28 @@
       "tabOrder": 23,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/dropdown-stable25.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "media-decorative-stable32",
+      "component": "media-decorative",
+      "platform": "avalonia",
+      "role": "image",
+      "accessibleName": "Gallery",
+      "value": "image 1 of 3",
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["ArrowLeft", "ArrowRight", "Escape"],
+      "tabOrder": 24,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/media-decorative-stable32.json",
       "allowedByOverride": [],
       "passed": true,
       "errors": []

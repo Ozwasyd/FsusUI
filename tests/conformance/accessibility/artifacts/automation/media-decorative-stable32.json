@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "media-decorative-stable32",
+    "component": "media-decorative",
+    "platform": "avalonia",
+    "control": "FsusImageViewer",
+    "evidenceSource": "avalonia-headless",
+    "role": "image",
+    "accessibleName": "Gallery",
+    "value": "image 1 of 3",
+    "states": {
+      "disabled": null,
+      "selected": null,
+      "checked": null,
+      "expanded": true,
+      "invalid": null
+    },
+    "keyboard": ["ArrowLeft", "ArrowRight", "Escape"],
+    "keyboardOperable": true,
+    "tabOrder": 24,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/media-decorative-stable32.json"
+  }
+}

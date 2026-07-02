@@ -9,6 +9,7 @@
   <SolidColorBrush x:Key="FsusThemeValuePickerTrackBrush" Color="#243043" />
   <SolidColorBrush x:Key="FsusThemeUploadSurfaceBrush" Color="#1B2433" />
   <SolidColorBrush x:Key="FsusThemeDataDisplaySurfaceBrush" Color="#1B2433" />
+  <SolidColorBrush x:Key="FsusThemeMediaSurfaceBrush" Color="#1B2433" />
   <SolidColorBrush x:Key="FsusThemeTextBrush" Color="#F8FAFC" />
   <SolidColorBrush x:Key="FsusThemeMutedTextBrush" Color="#B6C0CF" />
   <SolidColorBrush x:Key="FsusThemeBorderBrush" Color="#394657" />
