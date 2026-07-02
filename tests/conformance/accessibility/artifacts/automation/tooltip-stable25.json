@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "tooltip-stable25",
+    "component": "tooltip",
+    "platform": "avalonia",
+    "control": "FsusTooltip",
+    "evidenceSource": "avalonia-headless",
+    "role": "tooltip",
+    "accessibleName": "Publish help",
+    "value": null,
+    "states": {
+      "disabled": null,
+      "selected": null,
+      "checked": null,
+      "expanded": true,
+      "invalid": null
+    },
+    "keyboard": ["Escape"],
+    "keyboardOperable": true,
+    "tabOrder": 20,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/tooltip-stable25.json"
+  }
+}

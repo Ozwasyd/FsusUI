@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "tests/conformance/accessibility/contracts.json",
-      "sha256": "13dc5f16d96cefa56b0ccc272cd2396676d2a02c65a167cd30081f459826eda3"
+      "sha256": "837f5870b92b69e3668e03e50171eb9bab7c737f2cb60b9ebe5633725f0a1b2e"
     },
     {
       "path": "tests/conformance/accessibility/automation-snapshots.json",
-      "sha256": "0b284f813a8c91a8099a8304258cab596968836fae0c2e322b3e4aea7719f6cd"
+      "sha256": "68d1e066fa714f58839a921f52659e4a67ac068c117a0244983d761672fb3725"
     }
   ],
   "requiredContractFields": [
@@ -23,9 +23,9 @@
     "keyboardNavigation"
   ],
   "summary": {
-    "controls": 16,
-    "snapshots": 19,
-    "passed": 19,
+    "controls": 20,
+    "snapshots": 23,
+    "passed": 23,
     "appiumReleaseGates": 2,
     "allowedByOverride": 0
   },
@@ -462,6 +462,94 @@
       "tabOrder": 19,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/message-box-stable24.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "tooltip-stable25",
+      "component": "tooltip",
+      "platform": "avalonia",
+      "role": "tooltip",
+      "accessibleName": "Publish help",
+      "value": null,
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["Escape"],
+      "tabOrder": 20,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/tooltip-stable25.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "popover-stable25",
+      "component": "popover",
+      "platform": "avalonia",
+      "role": "dialog",
+      "accessibleName": "Publish settings",
+      "value": null,
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["Escape"],
+      "tabOrder": 21,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/popover-stable25.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "popconfirm-stable25",
+      "component": "popconfirm",
+      "platform": "avalonia",
+      "role": "dialog",
+      "accessibleName": "Delete article?",
+      "value": null,
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["Escape"],
+      "tabOrder": 22,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/popconfirm-stable25.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "dropdown-stable25",
+      "component": "dropdown",
+      "platform": "avalonia",
+      "role": "menu",
+      "accessibleName": "More actions",
+      "value": null,
+      "states": {
+        "disabled": null,
+        "selected": true,
+        "checked": null,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["ArrowDown", "Enter", "Escape"],
+      "tabOrder": 23,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/dropdown-stable25.json",
       "allowedByOverride": [],
       "passed": true,
       "errors": []

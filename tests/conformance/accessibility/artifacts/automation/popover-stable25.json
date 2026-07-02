@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "popover-stable25",
+    "component": "popover",
+    "platform": "avalonia",
+    "control": "FsusPopover",
+    "evidenceSource": "avalonia-headless",
+    "role": "dialog",
+    "accessibleName": "Publish settings",
+    "value": null,
+    "states": {
+      "disabled": null,
+      "selected": null,
+      "checked": null,
+      "expanded": true,
+      "invalid": null
+    },
+    "keyboard": ["Escape"],
+    "keyboardOperable": true,
+    "tabOrder": 21,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/popover-stable25.json"
+  }
+}

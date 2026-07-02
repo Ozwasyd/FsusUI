@@ -828,6 +828,85 @@
       },
       "screenshotDiffPercent": 0.012,
       "perceptualDelta": 0.05
+    },
+    {
+      "id": "anchored-overlay-stable25-web-avalonia",
+      "component": "anchored-overlay",
+      "mode": "crossPlatform",
+      "token": "overlay.anchored.surface",
+      "fixture": {
+        "page": "visual/anchored-overlay",
+        "theme": "high-contrast",
+        "density": "spacious",
+        "variant": "tooltip-popover-popconfirm-dropdown",
+        "size": "md",
+        "state": "hover-focus-click-selected-disabled-confirmed-flipped",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "disabled"
+      },
+      "coverage": {
+        "controls": [
+          "FsusTooltip",
+          "FsusPopover",
+          "FsusPopconfirm",
+          "FsusDropdown",
+          "FsusDropdownMenu",
+          "FsusDropdownItem",
+          "FsusOverlayHost"
+        ],
+        "placements": [
+          "top-start",
+          "top-end",
+          "right-start",
+          "right-end",
+          "bottom-start",
+          "bottom-end",
+          "left-start",
+          "left-end"
+        ],
+        "states": [
+          "hover-trigger",
+          "focus-trigger",
+          "click-trigger",
+          "keyboard-open",
+          "disabled-item",
+          "selected-item",
+          "confirmed",
+          "boundary-flipped"
+        ],
+        "themes": ["light", "dark", "high-contrast"],
+        "densities": ["compact", "default", "spacious"],
+        "motionModes": ["system", "enabled", "reduced", "disabled"]
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/anchored-overlay-stable25.png",
+        "geometry": { "x": 24, "y": 28, "width": 560, "height": 380 },
+        "color": {
+          "token": "overlay.anchored.surface",
+          "lab": [46, 5, -17]
+        },
+        "radius": 12,
+        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 8 },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/anchored-overlay-stable25.png",
+        "geometry": { "x": 24.8, "y": 28.7, "width": 560.9, "height": 380.8 },
+        "color": {
+          "token": "overlay.anchored.surface",
+          "lab": [46.4, 5.2, -17.3]
+        },
+        "radius": 12.5,
+        "spacing": { "paddingX": 12.5, "paddingY": 8.4, "gap": 8.5 },
+        "textBaseline": 24.8
+      },
+      "screenshotDiffPercent": 0.012,
+      "perceptualDelta": 0.05
     }
   ]
 }

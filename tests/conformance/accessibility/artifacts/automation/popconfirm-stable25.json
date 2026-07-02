@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "popconfirm-stable25",
+    "component": "popconfirm",
+    "platform": "avalonia",
+    "control": "FsusPopconfirm",
+    "evidenceSource": "avalonia-headless",
+    "role": "dialog",
+    "accessibleName": "Delete article?",
+    "value": null,
+    "states": {
+      "disabled": null,
+      "selected": null,
+      "checked": null,
+      "expanded": true,
+      "invalid": null
+    },
+    "keyboard": ["Escape"],
+    "keyboardOperable": true,
+    "tabOrder": 22,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/popconfirm-stable25.json"
+  }
+}

@@ -400,6 +400,90 @@
       "keyboardOperable": true,
       "tabOrder": 19,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/message-box-stable24.json"
+    },
+    {
+      "id": "tooltip-stable25",
+      "component": "tooltip",
+      "platform": "avalonia",
+      "control": "FsusTooltip",
+      "evidenceSource": "avalonia-headless",
+      "role": "tooltip",
+      "accessibleName": "Publish help",
+      "value": null,
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["Escape"],
+      "keyboardOperable": true,
+      "tabOrder": 20,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/tooltip-stable25.json"
+    },
+    {
+      "id": "popover-stable25",
+      "component": "popover",
+      "platform": "avalonia",
+      "control": "FsusPopover",
+      "evidenceSource": "avalonia-headless",
+      "role": "dialog",
+      "accessibleName": "Publish settings",
+      "value": null,
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["Escape"],
+      "keyboardOperable": true,
+      "tabOrder": 21,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/popover-stable25.json"
+    },
+    {
+      "id": "popconfirm-stable25",
+      "component": "popconfirm",
+      "platform": "avalonia",
+      "control": "FsusPopconfirm",
+      "evidenceSource": "avalonia-headless",
+      "role": "dialog",
+      "accessibleName": "Delete article?",
+      "value": null,
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["Escape"],
+      "keyboardOperable": true,
+      "tabOrder": 22,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/popconfirm-stable25.json"
+    },
+    {
+      "id": "dropdown-stable25",
+      "component": "dropdown",
+      "platform": "avalonia",
+      "control": "FsusDropdown",
+      "evidenceSource": "avalonia-headless",
+      "role": "menu",
+      "accessibleName": "More actions",
+      "value": null,
+      "states": {
+        "disabled": null,
+        "selected": true,
+        "checked": null,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["ArrowDown", "Enter", "Escape"],
+      "keyboardOperable": true,
+      "tabOrder": 23,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/dropdown-stable25.json"
     }
   ],
   "appiumReleaseGates": [

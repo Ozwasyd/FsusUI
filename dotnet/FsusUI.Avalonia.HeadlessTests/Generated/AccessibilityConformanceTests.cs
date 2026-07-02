@@ -27,6 +27,10 @@ public class AccessibilityConformanceTests
     yield return new object[] { "dialog-stable24", "dialog", "dialog", "Delete article", 2, 17 };
     yield return new object[] { "drawer-stable24", "drawer", "dialog", "Filters", 2, 18 };
     yield return new object[] { "message-box-stable24", "message-box", "dialog", "Delete permanently?", 2, 19 };
+    yield return new object[] { "tooltip-stable25", "tooltip", "tooltip", "Publish help", 1, 20 };
+    yield return new object[] { "popover-stable25", "popover", "dialog", "Publish settings", 1, 21 };
+    yield return new object[] { "popconfirm-stable25", "popconfirm", "dialog", "Delete article?", 1, 22 };
+    yield return new object[] { "dropdown-stable25", "dropdown", "menu", "More actions", 3, 23 };
   }
 
   [Theory]

@@ -1,0 +1,31 @@
+{
+  "id": "anchored-overlay-stable25-web-avalonia",
+  "component": "anchored-overlay",
+  "state": "hover-focus-click-selected-disabled-confirmed-flipped",
+  "mode": "crossPlatform",
+  "platform": "web->avalonia",
+  "token": "overlay.anchored.surface",
+  "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/anchored-overlay-stable25.png",
+  "diffArtifact": "tests/conformance/visual/artifacts/diffs/anchored-overlay-stable25-web-avalonia.json",
+  "deltas": {
+    "geometry": 0.8999999999999773,
+    "colorDelta": 0.5385164807134498,
+    "radius": 0.5,
+    "spacing": 0.5,
+    "textBaseline": 0.8000000000000007,
+    "screenshotDiffPercent": 0.012,
+    "perceptualDelta": 0.05
+  },
+  "thresholds": {
+    "geometry": 1.5,
+    "colorDelta": 1.4,
+    "radius": 0.75,
+    "spacing": 1,
+    "textBaseline": 1,
+    "screenshotDiffPercent": 0.015,
+    "perceptualDelta": 0.08
+  },
+  "allowedByOverride": [],
+  "passed": true,
+  "failures": []
+}

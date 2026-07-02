@@ -1,0 +1,73 @@
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls">
+  <Style Selector="Border.fsus-anchored-overlay">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusSurfaceMd}" />
+    <Setter Property="BoxShadow" Value="{DynamicResource FsusShadowOverlayMd}" />
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
+  </Style>
+
+  <Style Selector="fsus|FsusTooltip, fsus|FsusPopover, fsus|FsusPopconfirm, fsus|FsusDropdown">
+    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusSurfaceMd}" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition
+          Property="Opacity"
+          Duration="{DynamicResource FsusMotionDurationEffective}"
+          Easing="{DynamicResource FsusMotionEasingEffective}" />
+      </Transitions>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusTooltip">
+    <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodySmSize}" />
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusPopover, fsus|FsusPopconfirm">
+    <Setter Property="MinWidth" Value="{DynamicResource FsusComponentDialogMinWidth}" />
+  </Style>
+
+  <Style Selector="fsus|FsusPopconfirm.fsus-dangerous">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeDangerBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropdown, fsus|FsusDropdownMenu">
+    <Setter Property="MinWidth" Value="{DynamicResource FsusComponentDialogMinWidth}" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropdownMenu">
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace1}" />
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusSurfaceMd}" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropdownItem">
+    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropdownItem.fsus-focused">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropdownItem.fsus-selected">
+    <Setter Property="Foreground" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropdownItem.fsus-disabled">
+    <Setter Property="Opacity" Value="{DynamicResource FsusThemeDisabledOpacity}" />
+  </Style>
+</Styles>

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "dropdown-stable25",
+    "component": "dropdown",
+    "platform": "avalonia",
+    "control": "FsusDropdown",
+    "evidenceSource": "avalonia-headless",
+    "role": "menu",
+    "accessibleName": "More actions",
+    "value": null,
+    "states": {
+      "disabled": null,
+      "selected": true,
+      "checked": null,
+      "expanded": true,
+      "invalid": null
+    },
+    "keyboard": ["ArrowDown", "Enter", "Escape"],
+    "keyboardOperable": true,
+    "tabOrder": 23,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/dropdown-stable25.json"
+  }
+}

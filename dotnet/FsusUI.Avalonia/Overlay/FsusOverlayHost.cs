@@ -10,6 +10,10 @@ public enum FsusOverlayPlacement
   BottomEnd,
   TopStart,
   TopEnd,
+  LeftStart,
+  LeftEnd,
+  RightStart,
+  RightEnd,
 }
 
 public enum FsusOverlayCloseReason
@@ -276,26 +280,48 @@ public sealed class FsusOverlayHost : Panel
     var size = options.OverlaySize;
     var viewport = options.ViewportBounds;
     var anchor = options.AnchorBounds;
-    var x = placement is FsusOverlayPlacement.BottomEnd or FsusOverlayPlacement.TopEnd
-      ? anchor.Right - size.Width
-      : anchor.Left;
-    var y = placement is FsusOverlayPlacement.TopStart or FsusOverlayPlacement.TopEnd
-      ? anchor.Top - size.Height
-      : anchor.Bottom;
+    var (x, y) = ResolveOrigin(placement, anchor, size);
 
-    if (y + size.Height > viewport.Bottom && anchor.Top - size.Height >= viewport.Top)
+    if (
+      IsBottomPlacement(placement) &&
+      y + size.Height > viewport.Bottom &&
+      anchor.Top - size.Height >= viewport.Top)
     {
       placement = placement is FsusOverlayPlacement.BottomEnd
         ? FsusOverlayPlacement.TopEnd
         : FsusOverlayPlacement.TopStart;
       y = anchor.Top - size.Height;
     }
-    else if (y < viewport.Top && anchor.Bottom + size.Height <= viewport.Bottom)
+    else if (
+      IsTopPlacement(placement) &&
+      y < viewport.Top &&
+      anchor.Bottom + size.Height <= viewport.Bottom)
     {
       placement = placement is FsusOverlayPlacement.TopEnd
         ? FsusOverlayPlacement.BottomEnd
         : FsusOverlayPlacement.BottomStart;
       y = anchor.Bottom;
+    }
+
+    if (
+      IsRightPlacement(placement) &&
+      x + size.Width > viewport.Right &&
+      anchor.Left - size.Width >= viewport.Left)
+    {
+      placement = placement is FsusOverlayPlacement.RightEnd
+        ? FsusOverlayPlacement.LeftEnd
+        : FsusOverlayPlacement.LeftStart;
+      x = anchor.Left - size.Width;
+    }
+    else if (
+      IsLeftPlacement(placement) &&
+      x < viewport.Left &&
+      anchor.Right + size.Width <= viewport.Right)
+    {
+      placement = placement is FsusOverlayPlacement.LeftEnd
+        ? FsusOverlayPlacement.RightEnd
+        : FsusOverlayPlacement.RightStart;
+      x = anchor.Right;
     }
 
     if (x + size.Width > viewport.Right)
@@ -309,6 +335,34 @@ public sealed class FsusOverlayHost : Panel
 
     return (new Rect(x, y, size.Width, size.Height), placement);
   }
+
+  private static (double X, double Y) ResolveOrigin(
+    FsusOverlayPlacement placement,
+    Rect anchor,
+    Size size) =>
+    placement switch
+    {
+      FsusOverlayPlacement.TopEnd => (anchor.Right - size.Width, anchor.Top - size.Height),
+      FsusOverlayPlacement.BottomEnd => (anchor.Right - size.Width, anchor.Bottom),
+      FsusOverlayPlacement.LeftStart => (anchor.Left - size.Width, anchor.Top),
+      FsusOverlayPlacement.LeftEnd => (anchor.Left - size.Width, anchor.Bottom - size.Height),
+      FsusOverlayPlacement.RightStart => (anchor.Right, anchor.Top),
+      FsusOverlayPlacement.RightEnd => (anchor.Right, anchor.Bottom - size.Height),
+      FsusOverlayPlacement.TopStart => (anchor.Left, anchor.Top - size.Height),
+      _ => (anchor.Left, anchor.Bottom),
+    };
+
+  private static bool IsTopPlacement(FsusOverlayPlacement placement) =>
+    placement is FsusOverlayPlacement.TopStart or FsusOverlayPlacement.TopEnd;
+
+  private static bool IsBottomPlacement(FsusOverlayPlacement placement) =>
+    placement is FsusOverlayPlacement.BottomStart or FsusOverlayPlacement.BottomEnd;
+
+  private static bool IsLeftPlacement(FsusOverlayPlacement placement) =>
+    placement is FsusOverlayPlacement.LeftStart or FsusOverlayPlacement.LeftEnd;
+
+  private static bool IsRightPlacement(FsusOverlayPlacement placement) =>
+    placement is FsusOverlayPlacement.RightStart or FsusOverlayPlacement.RightEnd;
 }
 
 public sealed class FsusOverlayHostService
