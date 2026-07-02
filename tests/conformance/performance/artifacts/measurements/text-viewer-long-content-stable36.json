@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/avalonia-performance-budget.mjs",
+  "measurement": {
+    "id": "text-viewer-long-content-stable36",
+    "component": "text-viewer",
+    "scenario": "construct-render-scroll-cancel-structured-text-10k",
+    "metrics": {
+      "constructionMs": 2.2,
+      "firstLayoutMs": 5.8,
+      "interactionLatencyMs": 6.9,
+      "frameTimeMs": 11.4,
+      "allocationsKb": 144,
+      "retainedControlCount": 104,
+      "disposalMs": 1.1,
+      "mountUnmountCycles": 80
+    },
+    "artifact": "tests/conformance/performance/artifacts/measurements/text-viewer-long-content-stable36.json"
+  }
+}

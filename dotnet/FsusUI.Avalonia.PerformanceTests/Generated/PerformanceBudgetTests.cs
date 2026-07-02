@@ -23,6 +23,7 @@ public class PerformanceBudgetTests
     yield return new object[] { "table-v2-two-axis-stable34", "table-v2", 3.8, 4.6, 8.2, 9.5, 244, 288, 1320, 1536, 80, 50 };
     yield return new object[] { "tree-lazy-virtualized-stable35", "tree", 3.2, 4, 7.8, 9, 196, 240, 48, 64, 80, 50 };
     yield return new object[] { "tree-table-virtualized-stable35", "tree-table", 3.9, 4.8, 8.5, 10, 260, 320, 640, 768, 80, 50 };
+    yield return new object[] { "text-viewer-long-content-stable36", "text-viewer", 2.2, 3, 5.8, 7, 144, 180, 104, 128, 80, 50 };
   }
 
   [Theory]

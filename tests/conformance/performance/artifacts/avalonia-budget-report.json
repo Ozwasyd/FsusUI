@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "spec/components/avalonia-stable-performance-budgets.json",
-      "sha256": "db918a3df12828344c282f2794a01ff2de8f87d7ed35a0dd9681f2ca8dd0e4c4"
+      "sha256": "9f4159f1cc45ee18781d62795419853af88b8a5294dbdfcc3cec4c6e4da5d94c"
     },
     {
       "path": "tests/conformance/performance/avalonia-measurements.json",
-      "sha256": "745fd9870473960f803e495ce015e399412b772220764ba492ad3190c71368d6"
+      "sha256": "a5b709d6479fec23a1431362c80b584e48d37a1abef480108fcedcce58cb8581"
     },
     {
       "path": "tests/conformance/performance/data-size-fixtures.json",
@@ -16,9 +16,9 @@
     }
   ],
   "summary": {
-    "budgetedComponents": 24,
-    "measurements": 15,
-    "passed": 15,
+    "budgetedComponents": 25,
+    "measurements": 16,
+    "passed": 16,
     "dataSizeFixtures": 5
   },
   "dataSizeFixtures": [
@@ -488,6 +488,34 @@
       "artifact": "tests/conformance/performance/artifacts/measurements/tree-table-virtualized-stable35.json",
       "passed": true,
       "errors": []
+    },
+    {
+      "id": "text-viewer-long-content-stable36",
+      "component": "text-viewer",
+      "scenario": "construct-render-scroll-cancel-structured-text-10k",
+      "metrics": {
+        "constructionMs": 2.2,
+        "firstLayoutMs": 5.8,
+        "interactionLatencyMs": 6.9,
+        "frameTimeMs": 11.4,
+        "allocationsKb": 144,
+        "retainedControlCount": 104,
+        "disposalMs": 1.1,
+        "mountUnmountCycles": 80
+      },
+      "budgets": {
+        "constructionMs": 3,
+        "firstLayoutMs": 7,
+        "interactionLatencyMs": 8,
+        "frameTimeMs": 16,
+        "allocationsKb": 180,
+        "retainedControlCount": 128,
+        "disposalMs": 1.5,
+        "mountUnmountCycles": 50
+      },
+      "artifact": "tests/conformance/performance/artifacts/measurements/text-viewer-long-content-stable36.json",
+      "passed": true,
+      "errors": []
     }
   ],
   "measurementOutput": [
@@ -505,6 +533,7 @@
     "tests/conformance/performance/artifacts/measurements/virtual-list-fixed-variable-stable34.json",
     "tests/conformance/performance/artifacts/measurements/table-v2-two-axis-stable34.json",
     "tests/conformance/performance/artifacts/measurements/tree-lazy-virtualized-stable35.json",
-    "tests/conformance/performance/artifacts/measurements/tree-table-virtualized-stable35.json"
+    "tests/conformance/performance/artifacts/measurements/tree-table-virtualized-stable35.json",
+    "tests/conformance/performance/artifacts/measurements/text-viewer-long-content-stable36.json"
   ]
 }

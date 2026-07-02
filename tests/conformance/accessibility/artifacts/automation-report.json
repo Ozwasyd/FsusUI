@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "tests/conformance/accessibility/contracts.json",
-      "sha256": "69f3c61a5a26505ec1a0982e5d253160fc48ca598f2a31737160fdc7dbecb217"
+      "sha256": "5e5ef473c7d971d5cb51858b0786786510e8d56ad4471514c7fea97956c621dc"
     },
     {
       "path": "tests/conformance/accessibility/automation-snapshots.json",
-      "sha256": "088985eca47946404e316b06ff49b97dd2495a4203aebb13b8047caf3eaeb53f"
+      "sha256": "87c963db86a58ec04ae809303a5c6a2a9f40827e028fba7cbef42839cd6707a5"
     }
   ],
   "requiredContractFields": [
@@ -23,9 +23,9 @@
     "keyboardNavigation"
   ],
   "summary": {
-    "controls": 26,
-    "snapshots": 29,
-    "passed": 29,
+    "controls": 27,
+    "snapshots": 30,
+    "passed": 30,
     "appiumReleaseGates": 2,
     "allowedByOverride": 0
   },
@@ -682,6 +682,28 @@
       "tabOrder": 29,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/tree-table-stable35.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "text-viewer-stable36",
+      "component": "text-viewer",
+      "platform": "avalonia",
+      "role": "document",
+      "accessibleName": "Release notes",
+      "value": "4 structured blocks, mixed language, focus 2 of 4",
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["ArrowDown", "ArrowUp"],
+      "tabOrder": 30,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/text-viewer-stable36.json",
       "allowedByOverride": [],
       "passed": true,
       "errors": []

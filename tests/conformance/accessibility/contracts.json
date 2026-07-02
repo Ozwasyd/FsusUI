@@ -375,6 +375,20 @@
       "invalidState": "not-applicable",
       "expectedStates": { "selected": true, "expanded": true },
       "keyboardNavigation": ["ArrowDown", "ArrowRight", "Space"]
+    },
+    {
+      "id": "text-viewer",
+      "publicName": "FsusTextViewer",
+      "role": "document",
+      "accessibleName": "required",
+      "value": "required",
+      "disabledState": "not-applicable",
+      "selectedState": "not-applicable",
+      "checkedState": "not-applicable",
+      "expandedState": "not-applicable",
+      "invalidState": "not-applicable",
+      "expectedStates": {},
+      "keyboardNavigation": ["ArrowDown", "ArrowUp"]
     }
   ]
 }

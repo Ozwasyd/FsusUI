@@ -610,6 +610,27 @@
       "keyboardOperable": true,
       "tabOrder": 29,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/tree-table-stable35.json"
+    },
+    {
+      "id": "text-viewer-stable36",
+      "component": "text-viewer",
+      "platform": "avalonia",
+      "control": "FsusTextViewer",
+      "evidenceSource": "avalonia-headless",
+      "role": "document",
+      "accessibleName": "Release notes",
+      "value": "4 structured blocks, mixed language, focus 2 of 4",
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["ArrowDown", "ArrowUp"],
+      "keyboardOperable": true,
+      "tabOrder": 30,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/text-viewer-stable36.json"
     }
   ],
   "appiumReleaseGates": [

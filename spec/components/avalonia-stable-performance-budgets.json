@@ -346,6 +346,20 @@
         "disposalMs": 2.4,
         "mountUnmountCycles": 50
       }
+    },
+    {
+      "id": "text-viewer",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 3,
+        "firstLayoutMs": 7,
+        "interactionLatencyMs": 8,
+        "frameTimeMs": 16,
+        "allocationsKb": 180,
+        "retainedControlCount": 128,
+        "disposalMs": 1.5,
+        "mountUnmountCycles": 50
+      }
     }
   ]
 }

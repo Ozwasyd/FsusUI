@@ -1718,6 +1718,58 @@
       },
       "screenshotDiffPercent": 0.012,
       "perceptualDelta": 0.05
+    },
+    {
+      "id": "text-viewer-stable36-web-avalonia",
+      "component": "text-viewer",
+      "mode": "crossPlatform",
+      "token": "text.viewer.surface",
+      "fixture": {
+        "page": "visual/text-viewer",
+        "theme": "light",
+        "density": "default",
+        "variant": "structured-mixed-language-long-content",
+        "size": "lg",
+        "state": "heading-paragraph-list-code-keyboard-virtualized-cancelable",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "coverage": {
+        "controls": ["FsusTextViewer"],
+        "states": ["structured-blocks", "mixed-language", "keyboard-focus", "virtualized", "canceled-render"],
+        "themes": ["light", "dark", "high-contrast"],
+        "densities": ["compact", "default", "spacious"],
+        "motionModes": ["system", "enabled", "reduced", "disabled"]
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/text-viewer-stable36.png",
+        "geometry": { "x": 24, "y": 28, "width": 700, "height": 440 },
+        "color": {
+          "token": "text.viewer.surface",
+          "lab": [56, 2, -10]
+        },
+        "radius": 8,
+        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 10 },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/text-viewer-stable36.png",
+        "geometry": { "x": 24.8, "y": 28.8, "width": 700.8, "height": 440.8 },
+        "color": {
+          "token": "text.viewer.surface",
+          "lab": [56.3, 2.1, -10.2]
+        },
+        "radius": 8.4,
+        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 10.4 },
+        "textBaseline": 24.7
+      },
+      "screenshotDiffPercent": 0.012,
+      "perceptualDelta": 0.05
     }
   ]
 }
