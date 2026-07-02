@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/avalonia-performance-budget.mjs",
+  "measurement": {
+    "id": "data-table-virtualized-grid-stable33",
+    "component": "data-table",
+    "scenario": "construct-sort-select-scroll-virtualized-grid-100k",
+    "metrics": {
+      "constructionMs": 3.2,
+      "firstLayoutMs": 7.4,
+      "interactionLatencyMs": 8.6,
+      "frameTimeMs": 12.2,
+      "allocationsKb": 212,
+      "retainedControlCount": 640,
+      "disposalMs": 1.4,
+      "mountUnmountCycles": 80
+    },
+    "artifact": "tests/conformance/performance/artifacts/measurements/data-table-virtualized-grid-stable33.json"
+  }
+}

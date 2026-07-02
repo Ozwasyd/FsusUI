@@ -3,7 +3,7 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "fixtureSource": {
     "path": "tests/conformance/visual/fixtures/visual-comparisons.json",
-    "sha256": "789bbd0c1846c8a97afc17e847620752b06f76fc51ac9857ac8dbd3dda624684"
+    "sha256": "3d0a05c5c7a9c26530c5c5d9f04657a0c9210c5ebe2f44ec0d52c0021d84ed29"
   },
   "artifactRoot": "tests/conformance/visual/artifacts",
   "thresholds": {
@@ -1735,6 +1735,66 @@
         },
         "textBaseline": 24.7
       }
+    },
+    {
+      "id": "data-table-stable33-web-avalonia",
+      "component": "data-table",
+      "fixture": {
+        "page": "visual/data-table",
+        "theme": "light",
+        "density": "default",
+        "variant": "sortable-selectable-virtualized-grid",
+        "size": "lg",
+        "state": "sorted-selected-fixed-columns-loading-empty-error",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "data.table.surface",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/data-table-stable33.png",
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 760,
+          "height": 460
+        },
+        "color": {
+          "token": "data.table.surface",
+          "lab": [56, 2, -10]
+        },
+        "radius": 8,
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 10
+        },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/data-table-stable33.png",
+        "geometry": {
+          "x": 24.8,
+          "y": 28.8,
+          "width": 760.8,
+          "height": 460.8
+        },
+        "color": {
+          "token": "data.table.surface",
+          "lab": [56.3, 2.1, -10.2]
+        },
+        "radius": 8.4,
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 10.4
+        },
+        "textBaseline": 24.7
+      }
     }
   ],
   "approvedComparisons": [
@@ -1905,6 +1965,12 @@
       "mode": "crossPlatform",
       "platform": "web->avalonia",
       "diffArtifact": "tests/conformance/visual/artifacts/diffs/media-decorative-stable32-web-avalonia.json"
+    },
+    {
+      "id": "data-table-stable33-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/data-table-stable33-web-avalonia.json"
     }
   ]
 }

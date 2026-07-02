@@ -33,4 +33,5 @@
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/UploadTransfer.axaml" />
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/DataDisplay.axaml" />
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/Media.axaml" />
+  <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/DataTable.axaml" />
 </Styles>

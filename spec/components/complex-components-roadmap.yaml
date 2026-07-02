@@ -6,8 +6,8 @@ note: Basic Avalonia support does not imply complex component parity.
 components:
   - id: data-table
     publicName: FsusDataTable
-    phase: deferred
-    followUpIssue: Plan FsusDataTable virtualization, data model, and selection.
+    phase: stable
+    followUpIssue: Implemented in Avalonia Stable 33 with virtualization, data model, and selection budgets.
   - id: virtual-list
     publicName: FsusVirtualList
     phase: deferred

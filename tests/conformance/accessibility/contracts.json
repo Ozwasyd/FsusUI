@@ -305,6 +305,20 @@
       "invalidState": "not-applicable",
       "expectedStates": { "expanded": true },
       "keyboardNavigation": ["ArrowLeft", "ArrowRight", "Escape"]
+    },
+    {
+      "id": "data-table",
+      "publicName": "FsusDataTable",
+      "role": "grid",
+      "accessibleName": "required",
+      "value": "required",
+      "disabledState": "not-applicable",
+      "selectedState": "required",
+      "checkedState": "not-applicable",
+      "expandedState": "required",
+      "invalidState": "not-applicable",
+      "expectedStates": { "selected": true, "expanded": true },
+      "keyboardNavigation": ["ArrowRight", "ArrowDown", "Space", "Enter"]
     }
   ]
 }

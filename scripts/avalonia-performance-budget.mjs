@@ -89,6 +89,23 @@ const parseComplexRoadmap = (content = read(complexRoadmapPath)) => {
   return entries
 }
 
+const setComplexRoadmapPhase = (content, id, phase) => {
+  const lines = content.split('\n')
+  let inEntry = false
+  for (let index = 0; index < lines.length; index++) {
+    const start = lines[index].match(/^  - id:\s*(.+)$/)
+    if (start) {
+      inEntry = start[1].trim() === id
+      continue
+    }
+    if (inEntry && /^    phase:\s*/.test(lines[index])) {
+      lines[index] = `    phase: ${phase}`
+      return lines.join('\n')
+    }
+  }
+  throw new Error(`missing complex roadmap entry ${id}`)
+}
+
 const validateBudgets = (budgetData, complexRoadmapContent) => {
   const errors = []
   const firstSubsetIds = parseFirstSubsetIds()
@@ -244,9 +261,10 @@ const applyInvalidMutation = (
     }
   }
   if (testCase.complexRoadmapMutation) {
-    complexRoadmapContent = complexRoadmapContent.replace(
-      `  - id: ${testCase.complexRoadmapMutation.id}\n    publicName: FsusDataTable\n    phase: deferred`,
-      `  - id: ${testCase.complexRoadmapMutation.id}\n    publicName: FsusDataTable\n    phase: stable`,
+    complexRoadmapContent = setComplexRoadmapPhase(
+      complexRoadmapContent,
+      testCase.complexRoadmapMutation.id,
+      'stable',
     )
   }
   return {

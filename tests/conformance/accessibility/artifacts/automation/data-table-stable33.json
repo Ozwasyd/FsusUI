@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "data-table-stable33",
+    "component": "data-table",
+    "platform": "avalonia",
+    "control": "FsusDataTable",
+    "evidenceSource": "avalonia-headless",
+    "role": "grid",
+    "accessibleName": "Release table",
+    "value": "2 rows, 3 columns, score sorted descending, row 1 column 2",
+    "states": {
+      "disabled": null,
+      "selected": true,
+      "checked": null,
+      "expanded": true,
+      "invalid": null
+    },
+    "keyboard": ["ArrowRight", "ArrowDown", "Space", "Enter"],
+    "keyboardOperable": true,
+    "tabOrder": 25,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/data-table-stable33.json"
+  }
+}

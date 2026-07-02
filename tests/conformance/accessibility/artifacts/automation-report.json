@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "tests/conformance/accessibility/contracts.json",
-      "sha256": "44ccb309a52231695342a947803c5585e8cc920b06ff31f3a15028efe3cd1744"
+      "sha256": "730fe3634496b591f8ebb3a9ce35c88fa2c4e1e474e051b2227b1e6ebf7b7cd1"
     },
     {
       "path": "tests/conformance/accessibility/automation-snapshots.json",
-      "sha256": "bba395443f50c7e89feb55e8163bb89f9c76b6ac062fb37c1a79c5e70bb8bbd7"
+      "sha256": "0f8ee2c53e8c24747a2a782088e6644af31f9fc0cbdc1537ecf7503801c1e749"
     }
   ],
   "requiredContractFields": [
@@ -23,9 +23,9 @@
     "keyboardNavigation"
   ],
   "summary": {
-    "controls": 21,
-    "snapshots": 24,
-    "passed": 24,
+    "controls": 22,
+    "snapshots": 25,
+    "passed": 25,
     "appiumReleaseGates": 2,
     "allowedByOverride": 0
   },
@@ -572,6 +572,28 @@
       "tabOrder": 24,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/media-decorative-stable32.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "data-table-stable33",
+      "component": "data-table",
+      "platform": "avalonia",
+      "role": "grid",
+      "accessibleName": "Release table",
+      "value": "2 rows, 3 columns, score sorted descending, row 1 column 2",
+      "states": {
+        "disabled": null,
+        "selected": true,
+        "checked": null,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["ArrowRight", "ArrowDown", "Space", "Enter"],
+      "tabOrder": 25,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/data-table-stable33.json",
       "allowedByOverride": [],
       "passed": true,
       "errors": []

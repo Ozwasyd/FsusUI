@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "spec/components/avalonia-stable-performance-budgets.json",
-      "sha256": "0b6ee86bbb5af9f3de68021a8284d11c24e08575608726a6a63e64d9517a45c1"
+      "sha256": "af8d83a116e83a9e00ebaa38dc2b34acd312d21bb181cc0ed1c0853213d7e4b9"
     },
     {
       "path": "tests/conformance/performance/avalonia-measurements.json",
-      "sha256": "498ec9e343ac464932fe3278b6e8138e97b29a52dc809c7cb676323ad30d3b7c"
+      "sha256": "d042ca1a2f4743ec1b3c17f06d01bb2d4fdef15e9a93aff7caafa74cdb02024b"
     },
     {
       "path": "tests/conformance/performance/data-size-fixtures.json",
@@ -16,9 +16,9 @@
     }
   ],
   "summary": {
-    "budgetedComponents": 19,
-    "measurements": 10,
-    "passed": 10,
+    "budgetedComponents": 20,
+    "measurements": 11,
+    "passed": 11,
     "dataSizeFixtures": 5
   },
   "dataSizeFixtures": [
@@ -348,6 +348,34 @@
       "artifact": "tests/conformance/performance/artifacts/measurements/upload-transfer-large-list-stable30.json",
       "passed": true,
       "errors": []
+    },
+    {
+      "id": "data-table-virtualized-grid-stable33",
+      "component": "data-table",
+      "scenario": "construct-sort-select-scroll-virtualized-grid-100k",
+      "metrics": {
+        "constructionMs": 3.2,
+        "firstLayoutMs": 7.4,
+        "interactionLatencyMs": 8.6,
+        "frameTimeMs": 12.2,
+        "allocationsKb": 212,
+        "retainedControlCount": 640,
+        "disposalMs": 1.4,
+        "mountUnmountCycles": 80
+      },
+      "budgets": {
+        "constructionMs": 4.4,
+        "firstLayoutMs": 9,
+        "interactionLatencyMs": 12,
+        "frameTimeMs": 16,
+        "allocationsKb": 256,
+        "retainedControlCount": 720,
+        "disposalMs": 2,
+        "mountUnmountCycles": 50
+      },
+      "artifact": "tests/conformance/performance/artifacts/measurements/data-table-virtualized-grid-stable33.json",
+      "passed": true,
+      "errors": []
     }
   ],
   "measurementOutput": [
@@ -360,6 +388,7 @@
     "tests/conformance/performance/artifacts/measurements/form-validation-repeated-mount.json",
     "tests/conformance/performance/artifacts/measurements/service-helper-stable26-repeated-show-close.json",
     "tests/conformance/performance/artifacts/measurements/picker-virtualized-list-stable27.json",
-    "tests/conformance/performance/artifacts/measurements/upload-transfer-large-list-stable30.json"
+    "tests/conformance/performance/artifacts/measurements/upload-transfer-large-list-stable30.json",
+    "tests/conformance/performance/artifacts/measurements/data-table-virtualized-grid-stable33.json"
   ]
 }

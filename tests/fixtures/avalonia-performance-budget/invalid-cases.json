@@ -47,9 +47,9 @@
     },
     {
       "name": "complex component stable without numeric budgets",
-      "expectedError": "data-table complex component stable without numeric budgets",
+      "expectedError": "virtual-list complex component stable without numeric budgets",
       "complexRoadmapMutation": {
-        "id": "data-table"
+        "id": "virtual-list"
       }
     }
   ]
