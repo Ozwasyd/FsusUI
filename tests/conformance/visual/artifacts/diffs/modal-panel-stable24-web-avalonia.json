@@ -1,0 +1,31 @@
+{
+  "id": "modal-panel-stable24-web-avalonia",
+  "component": "modal-panel",
+  "state": "modal-dangerous-loading-nested-guarded",
+  "mode": "crossPlatform",
+  "platform": "web->avalonia",
+  "token": "overlay.dialog.surface",
+  "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/modal-panel-stable24.png",
+  "diffArtifact": "tests/conformance/visual/artifacts/diffs/modal-panel-stable24-web-avalonia.json",
+  "deltas": {
+    "geometry": 0.8999999999999773,
+    "colorDelta": 0.5385164807134498,
+    "radius": 0.5,
+    "spacing": 0.5,
+    "textBaseline": 0.8000000000000007,
+    "screenshotDiffPercent": 0.012,
+    "perceptualDelta": 0.05
+  },
+  "thresholds": {
+    "geometry": 1.5,
+    "colorDelta": 1.4,
+    "radius": 0.75,
+    "spacing": 1,
+    "textBaseline": 1,
+    "screenshotDiffPercent": 0.015,
+    "perceptualDelta": 0.08
+  },
+  "allowedByOverride": [],
+  "passed": true,
+  "failures": []
+}

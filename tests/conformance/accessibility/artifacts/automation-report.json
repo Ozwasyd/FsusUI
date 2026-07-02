@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "tests/conformance/accessibility/contracts.json",
-      "sha256": "0a97d5fe4f2f064b3b5916c0816e638c3ac3dd3b575c9514de3c8d12abd2f9b0"
+      "sha256": "13dc5f16d96cefa56b0ccc272cd2396676d2a02c65a167cd30081f459826eda3"
     },
     {
       "path": "tests/conformance/accessibility/automation-snapshots.json",
-      "sha256": "555650d2641bcb5b1a26e25868dbe15a5bfeb6a5519685b76e765f29b0da6304"
+      "sha256": "0b284f813a8c91a8099a8304258cab596968836fae0c2e322b3e4aea7719f6cd"
     }
   ],
   "requiredContractFields": [
@@ -23,9 +23,9 @@
     "keyboardNavigation"
   ],
   "summary": {
-    "controls": 14,
-    "snapshots": 16,
-    "passed": 16,
+    "controls": 16,
+    "snapshots": 19,
+    "passed": 19,
     "appiumReleaseGates": 2,
     "allowedByOverride": 0
   },
@@ -396,6 +396,72 @@
       "tabOrder": 16,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/menu-stable23.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "dialog-stable24",
+      "component": "dialog",
+      "platform": "avalonia",
+      "role": "dialog",
+      "accessibleName": "Delete article",
+      "value": null,
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["Tab", "Escape"],
+      "tabOrder": 17,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/dialog-stable24.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "drawer-stable24",
+      "component": "drawer",
+      "platform": "avalonia",
+      "role": "dialog",
+      "accessibleName": "Filters",
+      "value": null,
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["Tab", "Escape"],
+      "tabOrder": 18,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/drawer-stable24.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "message-box-stable24",
+      "component": "message-box",
+      "platform": "avalonia",
+      "role": "dialog",
+      "accessibleName": "Delete permanently?",
+      "value": null,
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["Tab", "Escape"],
+      "tabOrder": 19,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/message-box-stable24.json",
       "allowedByOverride": [],
       "passed": true,
       "errors": []

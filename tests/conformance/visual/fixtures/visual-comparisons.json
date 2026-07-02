@@ -767,6 +767,67 @@
       },
       "screenshotDiffPercent": 0.012,
       "perceptualDelta": 0.05
+    },
+    {
+      "id": "modal-panel-stable24-web-avalonia",
+      "component": "modal-panel",
+      "mode": "crossPlatform",
+      "token": "overlay.dialog.surface",
+      "fixture": {
+        "page": "visual/modal-panel",
+        "theme": "dark",
+        "density": "compact",
+        "variant": "dialog-drawer-message-box",
+        "size": "md",
+        "state": "modal-dangerous-loading-nested-guarded",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "coverage": {
+        "controls": ["FsusDialog", "FsusDrawer", "FsusMessageBox", "FsusOverlayHost"],
+        "states": [
+          "open",
+          "loading",
+          "dangerous",
+          "blocked-close",
+          "nested-dialog",
+          "focus-restored",
+          "keyboard-close",
+          "message-box-confirm-cancel"
+        ],
+        "themes": ["light", "dark", "high-contrast"],
+        "densities": ["compact", "default", "spacious"],
+        "motionModes": ["system", "enabled", "reduced", "disabled"]
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/modal-panel-stable24.png",
+        "geometry": { "x": 24, "y": 28, "width": 520, "height": 420 },
+        "color": {
+          "token": "overlay.dialog.surface",
+          "lab": [42, 4, -14]
+        },
+        "radius": 12,
+        "spacing": { "paddingX": 20, "paddingY": 20, "gap": 12 },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/modal-panel-stable24.png",
+        "geometry": { "x": 24.8, "y": 28.7, "width": 520.9, "height": 420.8 },
+        "color": {
+          "token": "overlay.dialog.surface",
+          "lab": [42.4, 4.2, -14.3]
+        },
+        "radius": 12.5,
+        "spacing": { "paddingX": 20.5, "paddingY": 20.4, "gap": 12.5 },
+        "textBaseline": 24.8
+      },
+      "screenshotDiffPercent": 0.012,
+      "perceptualDelta": 0.05
     }
   ]
 }

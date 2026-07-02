@@ -337,6 +337,69 @@
       "keyboardOperable": true,
       "tabOrder": 16,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/menu-stable23.json"
+    },
+    {
+      "id": "dialog-stable24",
+      "component": "dialog",
+      "platform": "avalonia",
+      "control": "FsusDialog",
+      "evidenceSource": "avalonia-headless",
+      "role": "dialog",
+      "accessibleName": "Delete article",
+      "value": null,
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["Tab", "Escape"],
+      "keyboardOperable": true,
+      "tabOrder": 17,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/dialog-stable24.json"
+    },
+    {
+      "id": "drawer-stable24",
+      "component": "drawer",
+      "platform": "avalonia",
+      "control": "FsusDrawer",
+      "evidenceSource": "avalonia-headless",
+      "role": "dialog",
+      "accessibleName": "Filters",
+      "value": null,
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["Tab", "Escape"],
+      "keyboardOperable": true,
+      "tabOrder": 18,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/drawer-stable24.json"
+    },
+    {
+      "id": "message-box-stable24",
+      "component": "message-box",
+      "platform": "avalonia",
+      "control": "FsusMessageBox",
+      "evidenceSource": "avalonia-headless",
+      "role": "dialog",
+      "accessibleName": "Delete permanently?",
+      "value": null,
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["Tab", "Escape"],
+      "keyboardOperable": true,
+      "tabOrder": 19,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/message-box-stable24.json"
     }
   ],
   "appiumReleaseGates": [

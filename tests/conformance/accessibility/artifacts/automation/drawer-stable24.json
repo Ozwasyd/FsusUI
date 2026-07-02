@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "drawer-stable24",
+    "component": "drawer",
+    "platform": "avalonia",
+    "control": "FsusDrawer",
+    "evidenceSource": "avalonia-headless",
+    "role": "dialog",
+    "accessibleName": "Filters",
+    "value": null,
+    "states": {
+      "disabled": null,
+      "selected": null,
+      "checked": null,
+      "expanded": true,
+      "invalid": null
+    },
+    "keyboard": ["Tab", "Escape"],
+    "keyboardOperable": true,
+    "tabOrder": 18,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/drawer-stable24.json"
+  }
+}

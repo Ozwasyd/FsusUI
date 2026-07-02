@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "message-box-stable24",
+    "component": "message-box",
+    "platform": "avalonia",
+    "control": "FsusMessageBox",
+    "evidenceSource": "avalonia-headless",
+    "role": "dialog",
+    "accessibleName": "Delete permanently?",
+    "value": null,
+    "states": {
+      "disabled": null,
+      "selected": null,
+      "checked": null,
+      "expanded": true,
+      "invalid": null
+    },
+    "keyboard": ["Tab", "Escape"],
+    "keyboardOperable": true,
+    "tabOrder": 19,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/message-box-stable24.json"
+  }
+}

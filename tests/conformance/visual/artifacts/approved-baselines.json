@@ -3,7 +3,7 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "fixtureSource": {
     "path": "tests/conformance/visual/fixtures/visual-comparisons.json",
-    "sha256": "61e4baeab07a049d58a6591a3fad3a1e8bd6234f7ebf5acf3604ba4a0327dfc7"
+    "sha256": "ea5c36d9ed31ae4f35f21bdb08a3fa136da5fba051c751f5a5e8daca93b27a76"
   },
   "artifactRoot": "tests/conformance/visual/artifacts",
   "thresholds": {
@@ -895,6 +895,66 @@
         },
         "textBaseline": 24.7
       }
+    },
+    {
+      "id": "modal-panel-stable24-web-avalonia",
+      "component": "modal-panel",
+      "fixture": {
+        "page": "visual/modal-panel",
+        "theme": "dark",
+        "density": "compact",
+        "variant": "dialog-drawer-message-box",
+        "size": "md",
+        "state": "modal-dangerous-loading-nested-guarded",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "overlay.dialog.surface",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/modal-panel-stable24.png",
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 520,
+          "height": 420
+        },
+        "color": {
+          "token": "overlay.dialog.surface",
+          "lab": [42, 4, -14]
+        },
+        "radius": 12,
+        "spacing": {
+          "paddingX": 20,
+          "paddingY": 20,
+          "gap": 12
+        },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/modal-panel-stable24.png",
+        "geometry": {
+          "x": 24.8,
+          "y": 28.7,
+          "width": 520.9,
+          "height": 420.8
+        },
+        "color": {
+          "token": "overlay.dialog.surface",
+          "lab": [42.4, 4.2, -14.3]
+        },
+        "radius": 12.5,
+        "spacing": {
+          "paddingX": 20.5,
+          "paddingY": 20.4,
+          "gap": 12.5
+        },
+        "textBaseline": 24.8
+      }
     }
   ],
   "approvedComparisons": [
@@ -981,6 +1041,12 @@
       "mode": "crossPlatform",
       "platform": "web->avalonia",
       "diffArtifact": "tests/conformance/visual/artifacts/diffs/navigation-primitives-stable23-web-avalonia.json"
+    },
+    {
+      "id": "modal-panel-stable24-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/modal-panel-stable24-web-avalonia.json"
     }
   ]
 }

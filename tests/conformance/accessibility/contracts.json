@@ -139,6 +139,34 @@
       "keyboardNavigation": ["Tab", "Escape"]
     },
     {
+      "id": "drawer",
+      "publicName": "FsusDrawer",
+      "role": "dialog",
+      "accessibleName": "required",
+      "value": "not-applicable",
+      "disabledState": "not-applicable",
+      "selectedState": "not-applicable",
+      "checkedState": "not-applicable",
+      "expandedState": "required",
+      "invalidState": "not-applicable",
+      "expectedStates": { "expanded": true },
+      "keyboardNavigation": ["Tab", "Escape"]
+    },
+    {
+      "id": "message-box",
+      "publicName": "FsusMessageBox",
+      "role": "dialog",
+      "accessibleName": "required",
+      "value": "not-applicable",
+      "disabledState": "not-applicable",
+      "selectedState": "not-applicable",
+      "checkedState": "not-applicable",
+      "expandedState": "required",
+      "invalidState": "not-applicable",
+      "expectedStates": { "expanded": true },
+      "keyboardNavigation": ["Tab", "Escape"]
+    },
+    {
       "id": "tabs",
       "publicName": "FsusTabs",
       "role": "tablist",

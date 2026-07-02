@@ -82,4 +82,47 @@
     <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
   </Style>
+
+  <Style Selector="Border.fsus-modal-scrim">
+    <Setter Property="Background" Value="{DynamicResource FsusComponentOverlayScrimBrush}" />
+    <Setter Property="Panel.ZIndex" Value="{DynamicResource FsusZOverlayDialog}" />
+  </Style>
+
+  <Style Selector="fsus|FsusDialog, fsus|FsusDrawer, fsus|FsusMessageBox">
+    <Setter Property="MinWidth" Value="{DynamicResource FsusComponentDialogMinWidth}" />
+    <Setter Property="MinHeight" Value="{DynamicResource FsusComponentDialogMinHeight}" />
+    <Setter Property="Padding" Value="{DynamicResource FsusComponentDialogPadding}" />
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusSurfaceMd}" />
+    <Setter Property="Panel.ZIndex" Value="{DynamicResource FsusZOverlayDialog}" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition
+          Property="Opacity"
+          Duration="{DynamicResource FsusMotionDurationEffective}"
+          Easing="{DynamicResource FsusMotionEasingEffective}" />
+      </Transitions>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusDialog.fsus-dangerous, fsus|FsusDrawer.fsus-dangerous, fsus|FsusMessageBox.fsus-dangerous">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeDangerBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusDialog.fsus-loading, fsus|FsusDrawer.fsus-loading, fsus|FsusMessageBox.fsus-loading">
+    <Setter Property="Opacity" Value="{DynamicResource FsusOpacityDisabledContent}" />
+  </Style>
+
+  <Style Selector="fsus|FsusDrawer.fsus-drawer-left, fsus|FsusDrawer.fsus-drawer-right">
+    <Setter Property="MinWidth" Value="{DynamicResource FsusComponentDialogMinWidth}" />
+    <Setter Property="MinHeight" Value="720" />
+  </Style>
+
+  <Style Selector="fsus|FsusMessageBox">
+    <Setter Property="MinWidth" Value="{DynamicResource FsusComponentDialogMinWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusSurfaceMd}" />
+  </Style>
 </Styles>

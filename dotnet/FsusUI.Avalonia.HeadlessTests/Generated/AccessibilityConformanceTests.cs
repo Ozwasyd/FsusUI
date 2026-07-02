@@ -24,6 +24,9 @@ public class AccessibilityConformanceTests
     yield return new object[] { "alert-live-region", "live-region", "alert", "Upload complete", 1, 14 };
     yield return new object[] { "tabs-stable23", "tabs", "tablist", "Stable navigation tabs", 3, 15 };
     yield return new object[] { "menu-stable23", "menu", "menu", "Stable navigation menu", 3, 16 };
+    yield return new object[] { "dialog-stable24", "dialog", "dialog", "Delete article", 2, 17 };
+    yield return new object[] { "drawer-stable24", "drawer", "dialog", "Filters", 2, 18 };
+    yield return new object[] { "message-box-stable24", "message-box", "dialog", "Delete permanently?", 2, 19 };
   }
 
   [Theory]

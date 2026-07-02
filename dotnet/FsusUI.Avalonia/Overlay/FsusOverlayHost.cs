@@ -31,6 +31,12 @@ public sealed record FsusOverlayCloseRequest(
   FsusOverlayCloseReason Reason,
   CancellationToken CancellationToken);
 
+public interface IFsusOverlayLifecycle
+{
+  void OnOverlayOpened(FsusOverlayEntry entry);
+  void OnOverlayClosed(FsusOverlayCloseReason reason);
+}
+
 public sealed record FsusOverlayOptions
 {
   public bool IsModal { get; init; } = true;
@@ -145,6 +151,10 @@ public sealed class FsusOverlayHost : Panel
 
     entries.Add(entry);
     Children.Add(content);
+    if (content is IFsusOverlayLifecycle lifecycle)
+    {
+      lifecycle.OnOverlayOpened(entry);
+    }
     return entry;
   }
 
@@ -154,11 +164,24 @@ public sealed class FsusOverlayHost : Panel
   {
     ArgumentNullException.ThrowIfNull(dialog);
 
-    var resolvedOptions = (options ?? new FsusOverlayOptions()) with
-    {
-      IsModal = dialog.IsModal,
-    };
+    var resolvedOptions = dialog.CreateOverlayOptions(options);
     return Open(dialog, resolvedOptions);
+  }
+
+  public FsusOverlayEntry OpenDrawer(
+    FsusDrawer drawer,
+    FsusOverlayOptions? options = null)
+  {
+    ArgumentNullException.ThrowIfNull(drawer);
+    return Open(drawer, drawer.CreateOverlayOptions(options));
+  }
+
+  public FsusOverlayEntry OpenMessageBox(
+    FsusMessageBox messageBox,
+    FsusOverlayOptions? options = null)
+  {
+    ArgumentNullException.ThrowIfNull(messageBox);
+    return Open(messageBox, messageBox.CreateOverlayOptions(options));
   }
 
   public ValueTask<bool> CloseTopAsync(
@@ -200,6 +223,10 @@ public sealed class FsusOverlayHost : Panel
     entries.Remove(entry);
     Children.Remove(entry.Content);
     entry.MarkClosed();
+    if (entry.Content is IFsusOverlayLifecycle lifecycle)
+    {
+      lifecycle.OnOverlayClosed(reason);
+    }
     RestoreFocus(entry);
     return true;
   }
