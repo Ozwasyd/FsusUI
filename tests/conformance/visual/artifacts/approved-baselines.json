@@ -3,7 +3,7 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "fixtureSource": {
     "path": "tests/conformance/visual/fixtures/visual-comparisons.json",
-    "sha256": "158a1c1d758b9f15fbbda7c6356a29c9527b7477c1725bd3a304492006e1579d"
+    "sha256": "1d45ef2538dcc73d9d0df2b7ce35f0ded96c3b64ed7a1117fe3f5b2b8b73f206"
   },
   "artifactRoot": "tests/conformance/visual/artifacts",
   "thresholds": {
@@ -1315,6 +1315,186 @@
         },
         "textBaseline": 22.7
       }
+    },
+    {
+      "id": "value-picker-stable29-light-default-web-avalonia",
+      "component": "value-picker",
+      "fixture": {
+        "page": "visual/value-picker",
+        "theme": "light",
+        "density": "default",
+        "variant": "slider-rate-color-picker",
+        "size": "md",
+        "state": "marks-half-rating-alpha-presets",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "system"
+      },
+      "token": "value.picker.track",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/value-picker-stable29-light-default.png",
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 520,
+          "height": 300
+        },
+        "color": {
+          "token": "value.picker.track",
+          "lab": [58, 2, -12]
+        },
+        "radius": 8,
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 12
+        },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/value-picker-stable29-light-default.png",
+        "geometry": {
+          "x": 24.7,
+          "y": 28.7,
+          "width": 520.8,
+          "height": 300.8
+        },
+        "color": {
+          "token": "value.picker.track",
+          "lab": [58.3, 2.1, -12.2]
+        },
+        "radius": 8.4,
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 12.4
+        },
+        "textBaseline": 24.7
+      }
+    },
+    {
+      "id": "value-picker-stable29-dark-spacious-web-avalonia",
+      "component": "value-picker",
+      "fixture": {
+        "page": "visual/value-picker",
+        "theme": "dark",
+        "density": "spacious",
+        "variant": "slider-rate-color-picker",
+        "size": "lg",
+        "state": "disabled-clearable-alpha",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "system"
+      },
+      "token": "value.picker.track",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/value-picker-stable29-dark-spacious.png",
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 560,
+          "height": 330
+        },
+        "color": {
+          "token": "value.picker.track",
+          "lab": [29, 2, -11]
+        },
+        "radius": 8,
+        "spacing": {
+          "paddingX": 14,
+          "paddingY": 10,
+          "gap": 14
+        },
+        "textBaseline": 26
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/value-picker-stable29-dark-spacious.png",
+        "geometry": {
+          "x": 24.8,
+          "y": 28.8,
+          "width": 560.8,
+          "height": 330.8
+        },
+        "color": {
+          "token": "value.picker.track",
+          "lab": [29.3, 2.1, -11.2]
+        },
+        "radius": 8.4,
+        "spacing": {
+          "paddingX": 14.4,
+          "paddingY": 10.3,
+          "gap": 14.4
+        },
+        "textBaseline": 26.7
+      }
+    },
+    {
+      "id": "value-picker-stable29-high-contrast-compact-web-avalonia",
+      "component": "value-picker",
+      "fixture": {
+        "page": "visual/value-picker",
+        "theme": "high-contrast",
+        "density": "compact",
+        "variant": "slider-rate-color-picker",
+        "size": "sm",
+        "state": "keyboard-only-focused",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "value.picker.track",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/value-picker-stable29-high-contrast-compact.png",
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 500,
+          "height": 280
+        },
+        "color": {
+          "token": "value.picker.track",
+          "lab": [18, 0, -6]
+        },
+        "radius": 8,
+        "spacing": {
+          "paddingX": 10,
+          "paddingY": 6,
+          "gap": 8
+        },
+        "textBaseline": 22
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/value-picker-stable29-high-contrast-compact.png",
+        "geometry": {
+          "x": 24.8,
+          "y": 28.7,
+          "width": 500.8,
+          "height": 280.8
+        },
+        "color": {
+          "token": "value.picker.track",
+          "lab": [18.2, 0.1, -6.1]
+        },
+        "radius": 8.4,
+        "spacing": {
+          "paddingX": 10.4,
+          "paddingY": 6.3,
+          "gap": 8.4
+        },
+        "textBaseline": 22.7
+      }
     }
   ],
   "approvedComparisons": [
@@ -1443,6 +1623,24 @@
       "mode": "crossPlatform",
       "platform": "web->avalonia",
       "diffArtifact": "tests/conformance/visual/artifacts/diffs/date-time-picker-stable28-compact-web-avalonia.json"
+    },
+    {
+      "id": "value-picker-stable29-light-default-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/value-picker-stable29-light-default-web-avalonia.json"
+    },
+    {
+      "id": "value-picker-stable29-dark-spacious-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/value-picker-stable29-dark-spacious-web-avalonia.json"
+    },
+    {
+      "id": "value-picker-stable29-high-contrast-compact-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/value-picker-stable29-high-contrast-compact-web-avalonia.json"
     }
   ]
 }

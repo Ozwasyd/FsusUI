@@ -3,8 +3,8 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "artifactRoot": "tests/conformance/visual/artifacts",
   "summary": {
-    "total": 21,
-    "passed": 21,
+    "total": 24,
+    "passed": 24,
     "allowedByOverride": 2
   },
   "comparisons": [
@@ -654,6 +654,99 @@
       "deltas": {
         "geometry": 0.8000000000000114,
         "colorDelta": 0.41231056256176374,
+        "radius": 0.40000000000000036,
+        "spacing": 0.40000000000000036,
+        "textBaseline": 0.6999999999999993,
+        "screenshotDiffPercent": 0.012,
+        "perceptualDelta": 0.05
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "value-picker-stable29-light-default-web-avalonia",
+      "component": "value-picker",
+      "state": "marks-half-rating-alpha-presets",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "value.picker.track",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/value-picker-stable29-light-default.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/value-picker-stable29-light-default-web-avalonia.json",
+      "deltas": {
+        "geometry": 0.8000000000000114,
+        "colorDelta": 0.3741657386773915,
+        "radius": 0.40000000000000036,
+        "spacing": 0.40000000000000036,
+        "textBaseline": 0.6999999999999993,
+        "screenshotDiffPercent": 0.012,
+        "perceptualDelta": 0.05
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "value-picker-stable29-dark-spacious-web-avalonia",
+      "component": "value-picker",
+      "state": "disabled-clearable-alpha",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "value.picker.track",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/value-picker-stable29-dark-spacious.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/value-picker-stable29-dark-spacious-web-avalonia.json",
+      "deltas": {
+        "geometry": 0.8000000000000114,
+        "colorDelta": 0.3741657386773944,
+        "radius": 0.40000000000000036,
+        "spacing": 0.40000000000000036,
+        "textBaseline": 0.6999999999999993,
+        "screenshotDiffPercent": 0.012,
+        "perceptualDelta": 0.05
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "value-picker-stable29-high-contrast-compact-web-avalonia",
+      "component": "value-picker",
+      "state": "keyboard-only-focused",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "value.picker.track",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/value-picker-stable29-high-contrast-compact.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/value-picker-stable29-high-contrast-compact-web-avalonia.json",
+      "deltas": {
+        "geometry": 0.8000000000000114,
+        "colorDelta": 0.2449489742783171,
         "radius": 0.40000000000000036,
         "spacing": 0.40000000000000036,
         "textBaseline": 0.6999999999999993,

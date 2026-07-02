@@ -1,0 +1,50 @@
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls">
+  <Style Selector="fsus|FsusSlider, fsus|FsusRate, fsus|FsusColorPicker">
+    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusControlMd}" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition
+          Property="Opacity"
+          Duration="{DynamicResource FsusMotionDurationEffective}"
+          Easing="{DynamicResource FsusMotionEasingEffective}" />
+      </Transitions>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusSlider">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeValuePickerTrackBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusSlider.fsus-has-marks">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusRate.fsus-selected">
+    <Setter Property="Foreground" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusRate.fsus-half">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusColorPicker.fsus-alpha">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeValuePickerTrackBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusColorPicker.fsus-empty">
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusSlider.fsus-disabled, fsus|FsusRate.fsus-disabled, fsus|FsusColorPicker.fsus-disabled">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeDisabledSurfaceBrush}" />
+    <Setter Property="Opacity" Value="{DynamicResource FsusThemeDisabledOpacity}" />
+  </Style>
+</Styles>
