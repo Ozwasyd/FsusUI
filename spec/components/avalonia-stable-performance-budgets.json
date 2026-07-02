@@ -248,6 +248,20 @@
         "disposalMs": 1.5,
         "mountUnmountCycles": 50
       }
+    },
+    {
+      "id": "picker-virtualized-list",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 3,
+        "firstLayoutMs": 7.5,
+        "interactionLatencyMs": 10,
+        "frameTimeMs": 16,
+        "allocationsKb": 176,
+        "retainedControlCount": 32,
+        "disposalMs": 1.5,
+        "mountUnmountCycles": 50
+      }
     }
   ]
 }

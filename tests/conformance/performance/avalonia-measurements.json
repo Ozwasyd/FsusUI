@@ -128,6 +128,22 @@
         "mountUnmountCycles": 80
       },
       "artifact": "tests/conformance/performance/artifacts/measurements/service-helper-stable26-repeated-show-close.json"
+    },
+    {
+      "id": "picker-virtualized-list-stable27",
+      "component": "picker-virtualized-list",
+      "scenario": "construct-filter-keyboard-select-virtualized-list",
+      "metrics": {
+        "constructionMs": 2.1,
+        "firstLayoutMs": 5.8,
+        "interactionLatencyMs": 6.7,
+        "frameTimeMs": 11.4,
+        "allocationsKb": 148,
+        "retainedControlCount": 28,
+        "disposalMs": 0.9,
+        "mountUnmountCycles": 80
+      },
+      "artifact": "tests/conformance/performance/artifacts/measurements/picker-virtualized-list-stable27.json"
     }
   ]
 }

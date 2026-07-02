@@ -973,6 +973,75 @@
       },
       "screenshotDiffPercent": 0.012,
       "perceptualDelta": 0.05
+    },
+    {
+      "id": "picker-stable27-web-avalonia",
+      "component": "picker",
+      "mode": "crossPlatform",
+      "token": "picker.surface",
+      "fixture": {
+        "page": "visual/picker",
+        "theme": "light",
+        "density": "default",
+        "variant": "select-v2-autocomplete-cascader",
+        "size": "md",
+        "state": "filtered-multiple-remote-virtualized-cascader-selected",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "system"
+      },
+      "coverage": {
+        "controls": [
+          "FsusSelect",
+          "FsusSelectV2",
+          "FsusOption",
+          "FsusOptionGroup",
+          "FsusAutocomplete",
+          "FsusCascader",
+          "FsusCascaderPanel"
+        ],
+        "states": [
+          "single-selection",
+          "multiple-tags",
+          "filtering",
+          "remote-loading",
+          "disabled-option",
+          "grouped-options",
+          "virtualized-list",
+          "cascader-path"
+        ],
+        "themes": ["light", "dark", "high-contrast"],
+        "densities": ["compact", "default", "spacious"],
+        "motionModes": ["system", "enabled", "reduced", "disabled"]
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/picker-stable27.png",
+        "geometry": { "x": 24, "y": 28, "width": 620, "height": 420 },
+        "color": {
+          "token": "picker.surface",
+          "lab": [54, 4, -13]
+        },
+        "radius": 8,
+        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 10 },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/picker-stable27.png",
+        "geometry": { "x": 24.7, "y": 28.8, "width": 620.8, "height": 420.8 },
+        "color": {
+          "token": "picker.surface",
+          "lab": [54.4, 4.2, -13.2]
+        },
+        "radius": 8.4,
+        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 10.4 },
+        "textBaseline": 24.7
+      },
+      "screenshotDiffPercent": 0.012,
+      "perceptualDelta": 0.05
     }
   ]
 }

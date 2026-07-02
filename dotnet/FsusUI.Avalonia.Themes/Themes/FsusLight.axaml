@@ -4,6 +4,7 @@
   <SolidColorBrush x:Key="FsusThemeBackgroundBrush" Color="#FFFFFF" />
   <SolidColorBrush x:Key="FsusThemeSurfaceBrush" Color="#FFFFFF" />
   <SolidColorBrush x:Key="FsusThemeSurfaceRaisedBrush" Color="#F8FAFC" />
+  <SolidColorBrush x:Key="FsusThemePickerSurfaceBrush" Color="#FFFFFF" />
   <SolidColorBrush x:Key="FsusThemeTextBrush" Color="#111827" />
   <SolidColorBrush x:Key="FsusThemeMutedTextBrush" Color="#6B7280" />
   <SolidColorBrush x:Key="FsusThemeBorderBrush" Color="#D9DEE8" />
@@ -14,4 +15,3 @@
   <x:Double x:Key="FsusThemeDisabledOpacity">0.46</x:Double>
   <x:Double x:Key="FsusThemeFocusThickness">2</x:Double>
 </ResourceDictionary>
-

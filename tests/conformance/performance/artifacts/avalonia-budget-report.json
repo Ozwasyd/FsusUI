@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "spec/components/avalonia-stable-performance-budgets.json",
-      "sha256": "3651aeb116567e0520ebd64c38263c2d29131dfbbd0218087e7b735f9c0a46fc"
+      "sha256": "0f6a7561cebfa04509e7ddf851bfe35b58b5edf1dbde39d356e86e5b43581a77"
     },
     {
       "path": "tests/conformance/performance/avalonia-measurements.json",
-      "sha256": "fc94b8e8768bb9b4f9d2a9c1eb5e7be48c61c910c2333b0e4f68587ad216cd95"
+      "sha256": "8ad58f0324d56612d03987879f6b0c02a4f0335351399db26fc5152382c625b5"
     },
     {
       "path": "tests/conformance/performance/data-size-fixtures.json",
@@ -16,9 +16,9 @@
     }
   ],
   "summary": {
-    "budgetedComponents": 17,
-    "measurements": 8,
-    "passed": 8,
+    "budgetedComponents": 18,
+    "measurements": 9,
+    "passed": 9,
     "dataSizeFixtures": 5
   },
   "dataSizeFixtures": [
@@ -292,6 +292,34 @@
       "artifact": "tests/conformance/performance/artifacts/measurements/service-helper-stable26-repeated-show-close.json",
       "passed": true,
       "errors": []
+    },
+    {
+      "id": "picker-virtualized-list-stable27",
+      "component": "picker-virtualized-list",
+      "scenario": "construct-filter-keyboard-select-virtualized-list",
+      "metrics": {
+        "constructionMs": 2.1,
+        "firstLayoutMs": 5.8,
+        "interactionLatencyMs": 6.7,
+        "frameTimeMs": 11.4,
+        "allocationsKb": 148,
+        "retainedControlCount": 28,
+        "disposalMs": 0.9,
+        "mountUnmountCycles": 80
+      },
+      "budgets": {
+        "constructionMs": 3,
+        "firstLayoutMs": 7.5,
+        "interactionLatencyMs": 10,
+        "frameTimeMs": 16,
+        "allocationsKb": 176,
+        "retainedControlCount": 32,
+        "disposalMs": 1.5,
+        "mountUnmountCycles": 50
+      },
+      "artifact": "tests/conformance/performance/artifacts/measurements/picker-virtualized-list-stable27.json",
+      "passed": true,
+      "errors": []
     }
   ],
   "measurementOutput": [
@@ -302,6 +330,7 @@
     "tests/conformance/performance/artifacts/measurements/tabs-navigation-repeated-mount.json",
     "tests/conformance/performance/artifacts/measurements/menu-navigation-repeated-mount.json",
     "tests/conformance/performance/artifacts/measurements/form-validation-repeated-mount.json",
-    "tests/conformance/performance/artifacts/measurements/service-helper-stable26-repeated-show-close.json"
+    "tests/conformance/performance/artifacts/measurements/service-helper-stable26-repeated-show-close.json",
+    "tests/conformance/performance/artifacts/measurements/picker-virtualized-list-stable27.json"
   ]
 }
