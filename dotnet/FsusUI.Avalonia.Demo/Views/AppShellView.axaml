@@ -83,6 +83,7 @@
           <Button Click="Navigate" Tag="empty">Empty state</Button>
           <Button Click="Navigate" Tag="error">Error state</Button>
           <Button Click="Navigate" Tag="dialogs">Dialog gallery</Button>
+          <Button Click="Navigate" Tag="stable/button">Stable gallery</Button>
         </StackPanel>
       </ScrollViewer>
     </Border>

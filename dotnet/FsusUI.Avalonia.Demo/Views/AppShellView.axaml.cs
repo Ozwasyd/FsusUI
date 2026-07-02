@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using FsusUI.Avalonia.Demo.Gallery;
 using FsusUI.Avalonia.Themes;
 
 namespace FsusUI.Avalonia.Demo.Views;
@@ -26,6 +27,11 @@ public partial class AppShellView : UserControl
       ["error"] = ("Error state", () => new ErrorStatePage()),
       ["dialogs"] = ("Dialog gallery", () => new DialogGalleryPage()),
     };
+
+    foreach (var route in FsusAvaloniaGalleryRegistry.StableRoutes)
+    {
+      pages[route.Route.TrimStart('/')] = (route.Title, route.CreatePage);
+    }
 
     ShowPage("dashboard");
     ApplyThemeOptions();
