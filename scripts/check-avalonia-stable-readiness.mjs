@@ -20,6 +20,59 @@ const validateReleaseEvidence = (content, spec, label) => {
   }
 }
 
+const validateStableEvidenceSections = (content, spec, label) => {
+  const normalized = content.toLowerCase()
+  for (const section of spec.requiredStableEvidenceSections) {
+    assertIncludes(normalized, section.toLowerCase(), label)
+  }
+}
+
+const validateStableChecklistCoverage = (content, spec, label) => {
+  const normalized = content.toLowerCase()
+  for (const issueNumber of spec.requiredStableIssueNumbers) {
+    const issueToken = `#${issueNumber}`
+    assertIncludes(content, issueToken, label)
+    const issueLine = content
+      .split('\n')
+      .find((line) => line.includes(issueToken))
+      ?.toLowerCase()
+    if (!issueLine || !/(closed|not required)/u.test(issueLine)) {
+      throw new Error(`${label} must mark ${issueToken} closed or not required`)
+    }
+  }
+
+  for (const family of spec.requiredStableComponentFamilies) {
+    assertIncludes(normalized, `\`${family}\``, label)
+    const familyLine = content
+      .split('\n')
+      .find((line) => line.includes(`\`${family}\``))
+      ?.toLowerCase()
+    if (!familyLine || !familyLine.includes('release-evidence/avalonia-stable/')) {
+      throw new Error(`${label} missing evidence link for ${family}`)
+    }
+  }
+}
+
+const validateStableEvidenceBundle = (spec) => {
+  const evidenceRoot = 'release-evidence/avalonia-stable'
+  for (const file of spec.requiredStableEvidenceFiles) {
+    const relativePath = `${evidenceRoot}/${file}`
+    if (!fs.existsSync(path.join(root, relativePath))) {
+      throw new Error(`${relativePath} missing`)
+    }
+  }
+
+  const bundle = spec.requiredStableEvidenceFiles
+    .map((file) => read(`${evidenceRoot}/${file}`))
+    .join('\n')
+  validateStableEvidenceSections(bundle, spec, 'avalonia stable RC evidence')
+  validateStableChecklistCoverage(
+    read(`${evidenceRoot}/stable-readiness-checklist.md`),
+    spec,
+    'avalonia stable checklist',
+  )
+}
+
 const workflowJob = (content, name) => {
   const match = content.match(
     new RegExp(
@@ -100,6 +153,44 @@ const runFixtureChecks = (spec) => {
       `invalid workflow fixture did not fail on avalonia-stable-evidence: ${workflowMessage || 'success'}`,
     )
   }
+
+  const invalidStableEvidence = read(
+    'tests/fixtures/avalonia-stable-readiness/invalid-stable-evidence.md',
+  )
+  let stableEvidenceMessage = ''
+  try {
+    validateStableEvidenceSections(
+      invalidStableEvidence,
+      spec,
+      'invalid stable evidence',
+    )
+  } catch (error) {
+    stableEvidenceMessage = error instanceof Error ? error.message : String(error)
+  }
+  if (!stableEvidenceMessage.includes('consumer install results')) {
+    throw new Error(
+      `invalid stable evidence fixture did not fail on consumer install results: ${stableEvidenceMessage || 'success'}`,
+    )
+  }
+
+  const invalidChecklist = read(
+    'tests/fixtures/avalonia-stable-readiness/invalid-checklist.md',
+  )
+  let checklistMessage = ''
+  try {
+    validateStableChecklistCoverage(
+      invalidChecklist,
+      spec,
+      'invalid stable checklist',
+    )
+  } catch (error) {
+    checklistMessage = error instanceof Error ? error.message : String(error)
+  }
+  if (!checklistMessage.includes('#130')) {
+    throw new Error(
+      `invalid checklist fixture did not fail on #130: ${checklistMessage || 'success'}`,
+    )
+  }
 }
 
 try {
@@ -133,6 +224,7 @@ try {
     spec,
     'avalonia stable release evidence',
   )
+  validateStableEvidenceBundle(spec)
   console.log('Avalonia stable readiness check passed.')
 } catch (error) {
   console.error(error instanceof Error ? error.message : error)
