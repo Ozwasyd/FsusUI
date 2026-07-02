@@ -652,6 +652,90 @@
       "keyboardOperable": true,
       "tabOrder": 31,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/text-editor-stable37.json"
+    },
+    {
+      "id": "public-shell-stable38",
+      "component": "public-shell",
+      "platform": "avalonia",
+      "control": "FsusPublicShell",
+      "evidenceSource": "avalonia-headless",
+      "role": "group",
+      "accessibleName": "Fsus public shell",
+      "value": "desktop and mobile navigation, active archive, indicator motion",
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["ArrowRight", "ArrowLeft", "Home", "End"],
+      "keyboardOperable": true,
+      "tabOrder": 32,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/public-shell-stable38.json"
+    },
+    {
+      "id": "site-header-stable38",
+      "component": "site-header",
+      "platform": "avalonia",
+      "control": "FsusSiteHeader",
+      "evidenceSource": "avalonia-headless",
+      "role": "group",
+      "accessibleName": "Site header",
+      "value": "brand, desktop nav, desktop actions, mobile primary actions, mobile secondary actions",
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["Tab"],
+      "keyboardOperable": true,
+      "tabOrder": 33,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/site-header-stable38.json"
+    },
+    {
+      "id": "theme-mode-toggle-stable38",
+      "component": "theme-mode-toggle",
+      "platform": "avalonia",
+      "control": "FsusThemeModeToggle",
+      "evidenceSource": "avalonia-headless",
+      "role": "group",
+      "accessibleName": "Theme mode",
+      "value": "manager-backed light dark system selection",
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["ArrowRight", "ArrowLeft"],
+      "keyboardOperable": true,
+      "tabOrder": 34,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/theme-mode-toggle-stable38.json"
+    },
+    {
+      "id": "responsive-collection-stable38",
+      "component": "responsive-collection",
+      "platform": "avalonia",
+      "control": "FsusResponsiveCollection",
+      "evidenceSource": "avalonia-headless",
+      "role": "list",
+      "accessibleName": "Article list",
+      "value": "desktop and compact branches, stable item keys, focus second",
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["ArrowDown", "ArrowUp", "Home", "End"],
+      "keyboardOperable": true,
+      "tabOrder": 35,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/responsive-collection-stable38.json"
     }
   ],
   "appiumReleaseGates": [

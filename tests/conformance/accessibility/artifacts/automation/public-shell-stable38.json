@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "public-shell-stable38",
+    "component": "public-shell",
+    "platform": "avalonia",
+    "control": "FsusPublicShell",
+    "evidenceSource": "avalonia-headless",
+    "role": "group",
+    "accessibleName": "Fsus public shell",
+    "value": "desktop and mobile navigation, active archive, indicator motion",
+    "states": {
+      "disabled": null,
+      "selected": null,
+      "checked": null,
+      "expanded": null,
+      "invalid": null
+    },
+    "keyboard": ["ArrowRight", "ArrowLeft", "Home", "End"],
+    "keyboardOperable": true,
+    "tabOrder": 32,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/public-shell-stable38.json"
+  }
+}

@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "tests/conformance/accessibility/contracts.json",
-      "sha256": "112b56ca1246b37abb7dceed7ed89cf82c9f04016463ecd8c111d129f895afda"
+      "sha256": "90cc50c135bf8e6a5916733f0f32d8bdc1e52218cf027aaf310ec99b57c0343f"
     },
     {
       "path": "tests/conformance/accessibility/automation-snapshots.json",
-      "sha256": "3f922994090fbb9781bf9a4aac64cb3eb355f5b8f49298da2d1a8b6805383ce1"
+      "sha256": "c25b9cb625115fe68672844df94623f8c1b3e1aa6e3c4a0869d587aac0dcd80b"
     }
   ],
   "requiredContractFields": [
@@ -23,9 +23,9 @@
     "keyboardNavigation"
   ],
   "summary": {
-    "controls": 28,
-    "snapshots": 31,
-    "passed": 31,
+    "controls": 32,
+    "snapshots": 35,
+    "passed": 35,
     "appiumReleaseGates": 2,
     "allowedByOverride": 0
   },
@@ -726,6 +726,94 @@
       "tabOrder": 31,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/text-editor-stable37.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "public-shell-stable38",
+      "component": "public-shell",
+      "platform": "avalonia",
+      "role": "group",
+      "accessibleName": "Fsus public shell",
+      "value": "desktop and mobile navigation, active archive, indicator motion",
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["ArrowRight", "ArrowLeft", "Home", "End"],
+      "tabOrder": 32,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/public-shell-stable38.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "site-header-stable38",
+      "component": "site-header",
+      "platform": "avalonia",
+      "role": "group",
+      "accessibleName": "Site header",
+      "value": "brand, desktop nav, desktop actions, mobile primary actions, mobile secondary actions",
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["Tab"],
+      "tabOrder": 33,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/site-header-stable38.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "theme-mode-toggle-stable38",
+      "component": "theme-mode-toggle",
+      "platform": "avalonia",
+      "role": "group",
+      "accessibleName": "Theme mode",
+      "value": "manager-backed light dark system selection",
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["ArrowRight", "ArrowLeft"],
+      "tabOrder": 34,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/theme-mode-toggle-stable38.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "responsive-collection-stable38",
+      "component": "responsive-collection",
+      "platform": "avalonia",
+      "role": "list",
+      "accessibleName": "Article list",
+      "value": "desktop and compact branches, stable item keys, focus second",
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["ArrowDown", "ArrowUp", "Home", "End"],
+      "tabOrder": 35,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/responsive-collection-stable38.json",
       "allowedByOverride": [],
       "passed": true,
       "errors": []

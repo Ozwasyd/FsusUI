@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "site-header-stable38",
+    "component": "site-header",
+    "platform": "avalonia",
+    "control": "FsusSiteHeader",
+    "evidenceSource": "avalonia-headless",
+    "role": "group",
+    "accessibleName": "Site header",
+    "value": "brand, desktop nav, desktop actions, mobile primary actions, mobile secondary actions",
+    "states": {
+      "disabled": null,
+      "selected": null,
+      "checked": null,
+      "expanded": null,
+      "invalid": null
+    },
+    "keyboard": ["Tab"],
+    "keyboardOperable": true,
+    "tabOrder": 33,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/site-header-stable38.json"
+  }
+}

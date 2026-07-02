@@ -39,6 +39,10 @@ public class AccessibilityConformanceTests
     yield return new object[] { "tree-table-stable35", "tree-table", "grid", "Tree table", 3, 29 };
     yield return new object[] { "text-viewer-stable36", "text-viewer", "document", "Release notes", 2, 30 };
     yield return new object[] { "text-editor-stable37", "text-editor", "textbox", "Article editor", 4, 31 };
+    yield return new object[] { "public-shell-stable38", "public-shell", "group", "Fsus public shell", 4, 32 };
+    yield return new object[] { "site-header-stable38", "site-header", "group", "Site header", 1, 33 };
+    yield return new object[] { "theme-mode-toggle-stable38", "theme-mode-toggle", "group", "Theme mode", 2, 34 };
+    yield return new object[] { "responsive-collection-stable38", "responsive-collection", "list", "Article list", 4, 35 };
   }
 
   [Theory]

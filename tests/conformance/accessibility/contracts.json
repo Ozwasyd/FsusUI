@@ -403,6 +403,62 @@
       "invalidState": "not-applicable",
       "expectedStates": { "disabled": false, "selected": true },
       "keyboardNavigation": ["ArrowLeft", "ArrowRight", "Control+Z", "Control+Y"]
+    },
+    {
+      "id": "public-shell",
+      "publicName": "FsusPublicShell",
+      "role": "group",
+      "accessibleName": "required",
+      "value": "required",
+      "disabledState": "not-applicable",
+      "selectedState": "not-applicable",
+      "checkedState": "not-applicable",
+      "expandedState": "not-applicable",
+      "invalidState": "not-applicable",
+      "expectedStates": {},
+      "keyboardNavigation": ["ArrowRight", "ArrowLeft", "Home", "End"]
+    },
+    {
+      "id": "site-header",
+      "publicName": "FsusSiteHeader",
+      "role": "group",
+      "accessibleName": "required",
+      "value": "required",
+      "disabledState": "not-applicable",
+      "selectedState": "not-applicable",
+      "checkedState": "not-applicable",
+      "expandedState": "not-applicable",
+      "invalidState": "not-applicable",
+      "expectedStates": {},
+      "keyboardNavigation": ["Tab"]
+    },
+    {
+      "id": "theme-mode-toggle",
+      "publicName": "FsusThemeModeToggle",
+      "role": "group",
+      "accessibleName": "required",
+      "value": "required",
+      "disabledState": "not-applicable",
+      "selectedState": "not-applicable",
+      "checkedState": "not-applicable",
+      "expandedState": "not-applicable",
+      "invalidState": "not-applicable",
+      "expectedStates": {},
+      "keyboardNavigation": ["ArrowRight", "ArrowLeft"]
+    },
+    {
+      "id": "responsive-collection",
+      "publicName": "FsusResponsiveCollection",
+      "role": "list",
+      "accessibleName": "required",
+      "value": "required",
+      "disabledState": "not-applicable",
+      "selectedState": "not-applicable",
+      "checkedState": "not-applicable",
+      "expandedState": "not-applicable",
+      "invalidState": "not-applicable",
+      "expectedStates": {},
+      "keyboardNavigation": ["ArrowDown", "ArrowUp", "Home", "End"]
     }
   ]
 }

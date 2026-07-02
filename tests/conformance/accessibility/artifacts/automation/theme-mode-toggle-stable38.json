@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "theme-mode-toggle-stable38",
+    "component": "theme-mode-toggle",
+    "platform": "avalonia",
+    "control": "FsusThemeModeToggle",
+    "evidenceSource": "avalonia-headless",
+    "role": "group",
+    "accessibleName": "Theme mode",
+    "value": "manager-backed light dark system selection",
+    "states": {
+      "disabled": null,
+      "selected": null,
+      "checked": null,
+      "expanded": null,
+      "invalid": null
+    },
+    "keyboard": ["ArrowRight", "ArrowLeft"],
+    "keyboardOperable": true,
+    "tabOrder": 34,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/theme-mode-toggle-stable38.json"
+  }
+}

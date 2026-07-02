@@ -1822,6 +1822,58 @@
       },
       "screenshotDiffPercent": 0.012,
       "perceptualDelta": 0.05
+    },
+    {
+      "id": "public-shell-stable38-web-avalonia",
+      "component": "public-shell",
+      "mode": "crossPlatform",
+      "token": "public.shell.surface",
+      "fixture": {
+        "page": "visual/public-shell",
+        "theme": "light",
+        "density": "default",
+        "variant": "blog-header-responsive-collection-theme-toggle",
+        "size": "lg",
+        "state": "desktop-mobile-active-nav-localized-labels-manager-theme-toggle",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "coverage": {
+        "controls": ["FsusPublicShell", "FsusSiteHeader", "FsusThemeModeToggle", "FsusResponsiveCollection"],
+        "states": ["desktop-header", "mobile-header", "active-navigation", "theme-mode", "responsive-collection", "long-localized-labels"],
+        "themes": ["light", "dark", "high-contrast"],
+        "densities": ["compact", "default", "spacious"],
+        "motionModes": ["system", "enabled", "reduced", "disabled"]
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/public-shell-stable38.png",
+        "geometry": { "x": 0, "y": 0, "width": 960, "height": 640 },
+        "color": {
+          "token": "public.shell.surface",
+          "lab": [56, 2, -10]
+        },
+        "radius": 0,
+        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 16 },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/public-shell-stable38.png",
+        "geometry": { "x": 0.8, "y": 0.8, "width": 960.8, "height": 640.8 },
+        "color": {
+          "token": "public.shell.surface",
+          "lab": [56.3, 2.1, -10.2]
+        },
+        "radius": 0.4,
+        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 16.4 },
+        "textBaseline": 24.7
+      },
+      "screenshotDiffPercent": 0.012,
+      "perceptualDelta": 0.05
     }
   ]
 }

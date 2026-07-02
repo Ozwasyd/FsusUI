@@ -15,6 +15,7 @@
   <SolidColorBrush x:Key="FsusThemeTreeSurfaceBrush" Color="#FFFFFF" />
   <SolidColorBrush x:Key="FsusThemeTextViewerSurfaceBrush" Color="#FFFFFF" />
   <SolidColorBrush x:Key="FsusThemeTextEditorSurfaceBrush" Color="#FFFFFF" />
+  <SolidColorBrush x:Key="FsusThemePublicShellSurfaceBrush" Color="#FFFFFF" />
   <SolidColorBrush x:Key="FsusThemeTextBrush" Color="#111827" />
   <SolidColorBrush x:Key="FsusThemeMutedTextBrush" Color="#6B7280" />
   <SolidColorBrush x:Key="FsusThemeBorderBrush" Color="#D9DEE8" />

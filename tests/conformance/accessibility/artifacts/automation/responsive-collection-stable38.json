@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "responsive-collection-stable38",
+    "component": "responsive-collection",
+    "platform": "avalonia",
+    "control": "FsusResponsiveCollection",
+    "evidenceSource": "avalonia-headless",
+    "role": "list",
+    "accessibleName": "Article list",
+    "value": "desktop and compact branches, stable item keys, focus second",
+    "states": {
+      "disabled": null,
+      "selected": null,
+      "checked": null,
+      "expanded": null,
+      "invalid": null
+    },
+    "keyboard": ["ArrowDown", "ArrowUp", "Home", "End"],
+    "keyboardOperable": true,
+    "tabOrder": 35,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/responsive-collection-stable38.json"
+  }
+}
