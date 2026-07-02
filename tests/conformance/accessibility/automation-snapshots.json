@@ -526,6 +526,48 @@
       "keyboardOperable": true,
       "tabOrder": 25,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/data-table-stable33.json"
+    },
+    {
+      "id": "virtualization-stable34",
+      "component": "virtual-list",
+      "platform": "avalonia",
+      "control": "FsusVirtualList",
+      "evidenceSource": "avalonia-headless",
+      "role": "list",
+      "accessibleName": "Activity stream",
+      "value": "100000 items, fixed and variable size, focus retained during recycle",
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["ArrowDown", "ArrowUp"],
+      "keyboardOperable": true,
+      "tabOrder": 26,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/virtualization-stable34.json"
+    },
+    {
+      "id": "table-v2-stable34",
+      "component": "table-v2",
+      "platform": "avalonia",
+      "control": "FsusTableV2",
+      "evidenceSource": "avalonia-headless",
+      "role": "grid",
+      "accessibleName": "Large table",
+      "value": "100000 rows, 80 columns, row 99951 column 71",
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["ArrowRight", "ArrowDown"],
+      "keyboardOperable": true,
+      "tabOrder": 27,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/table-v2-stable34.json"
     }
   ],
   "appiumReleaseGates": [

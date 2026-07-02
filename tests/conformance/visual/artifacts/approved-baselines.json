@@ -3,7 +3,7 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "fixtureSource": {
     "path": "tests/conformance/visual/fixtures/visual-comparisons.json",
-    "sha256": "3d0a05c5c7a9c26530c5c5d9f04657a0c9210c5ebe2f44ec0d52c0021d84ed29"
+    "sha256": "61f9bb1ba65141ae466502fa307d0988c0732cc06d877e699680d6e8663e26de"
   },
   "artifactRoot": "tests/conformance/visual/artifacts",
   "thresholds": {
@@ -1795,6 +1795,66 @@
         },
         "textBaseline": 24.7
       }
+    },
+    {
+      "id": "virtualization-stable34-web-avalonia",
+      "component": "virtualization",
+      "fixture": {
+        "page": "visual/virtualization",
+        "theme": "light",
+        "density": "default",
+        "variant": "virtual-list-auto-resizer-table-v2",
+        "size": "lg",
+        "state": "fixed-variable-anchor-recycle-async-cancel-two-axis",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "virtualization.surface",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/virtualization-stable34.png",
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 780,
+          "height": 460
+        },
+        "color": {
+          "token": "virtualization.surface",
+          "lab": [56, 2, -10]
+        },
+        "radius": 8,
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 10
+        },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/virtualization-stable34.png",
+        "geometry": {
+          "x": 24.8,
+          "y": 28.8,
+          "width": 780.8,
+          "height": 460.8
+        },
+        "color": {
+          "token": "virtualization.surface",
+          "lab": [56.3, 2.1, -10.2]
+        },
+        "radius": 8.4,
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 10.4
+        },
+        "textBaseline": 24.7
+      }
     }
   ],
   "approvedComparisons": [
@@ -1971,6 +2031,12 @@
       "mode": "crossPlatform",
       "platform": "web->avalonia",
       "diffArtifact": "tests/conformance/visual/artifacts/diffs/data-table-stable33-web-avalonia.json"
+    },
+    {
+      "id": "virtualization-stable34-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/virtualization-stable34-web-avalonia.json"
     }
   ]
 }

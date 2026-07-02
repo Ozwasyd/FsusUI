@@ -1,0 +1,15 @@
+overrides:
+  - id: scroll-anchoring-avalonia-presenter
+    area: behavior
+    component: virtual-list
+    platform: avalonia
+    status: accepted
+    reason: Avalonia ScrollPresenter corrects realized content offsets after measure passes, while browser scroll anchoring is DOM-driven.
+    affectedContracts: [component.el-virtual-list, component.el-table-v2]
+    visualThreshold: low
+    behaviorExpectation: Anchor item identity, focused item position, scroll-to-index, and realized container budgets must remain stable across data changes.
+    allowedDeviation: low
+    testPolicy: virtualization-anchor-and-budget-contract
+    owner: fsusui-core
+    reviewAfter: 2026-10-01
+    linkedIssues: [163]

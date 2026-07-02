@@ -47,9 +47,9 @@
     },
     {
       "name": "complex component stable without numeric budgets",
-      "expectedError": "virtual-list complex component stable without numeric budgets",
+      "expectedError": "log-viewer complex component stable without numeric budgets",
       "complexRoadmapMutation": {
-        "id": "virtual-list"
+        "id": "log-viewer"
       }
     }
   ]

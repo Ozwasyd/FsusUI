@@ -10,8 +10,12 @@ components:
     followUpIssue: Implemented in Avalonia Stable 33 with virtualization, data model, and selection budgets.
   - id: virtual-list
     publicName: FsusVirtualList
-    phase: deferred
-    followUpIssue: Plan FsusVirtualList fixed and variable height virtualization.
+    phase: stable
+    followUpIssue: Implemented in Avalonia Stable 34 with fixed and variable height virtualization.
+  - id: table-v2
+    publicName: FsusTableV2
+    phase: stable
+    followUpIssue: Implemented in Avalonia Stable 34 with two-dimensional virtualization.
   - id: log-viewer
     publicName: FsusLogViewer
     phase: deferred

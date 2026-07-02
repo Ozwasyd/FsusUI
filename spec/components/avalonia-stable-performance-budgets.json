@@ -290,6 +290,34 @@
         "disposalMs": 2,
         "mountUnmountCycles": 50
       }
+    },
+    {
+      "id": "virtual-list",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 3.6,
+        "firstLayoutMs": 8,
+        "interactionLatencyMs": 9,
+        "frameTimeMs": 16,
+        "allocationsKb": 192,
+        "retainedControlCount": 64,
+        "disposalMs": 1.6,
+        "mountUnmountCycles": 50
+      }
+    },
+    {
+      "id": "table-v2",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 4.6,
+        "firstLayoutMs": 9.5,
+        "interactionLatencyMs": 12,
+        "frameTimeMs": 16,
+        "allocationsKb": 288,
+        "retainedControlCount": 1536,
+        "disposalMs": 2.2,
+        "mountUnmountCycles": 50
+      }
     }
   ]
 }

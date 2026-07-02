@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "tests/conformance/accessibility/contracts.json",
-      "sha256": "730fe3634496b591f8ebb3a9ce35c88fa2c4e1e474e051b2227b1e6ebf7b7cd1"
+      "sha256": "34dcf44113227479f7e743dd0a56f9b47ab6e3134bb219e757fe57c598345475"
     },
     {
       "path": "tests/conformance/accessibility/automation-snapshots.json",
-      "sha256": "0f8ee2c53e8c24747a2a782088e6644af31f9fc0cbdc1537ecf7503801c1e749"
+      "sha256": "2379f63b0a42e0db22ebabe7619f22a7c83dee98338fc91f5fb93b0cd7ba06b1"
     }
   ],
   "requiredContractFields": [
@@ -23,9 +23,9 @@
     "keyboardNavigation"
   ],
   "summary": {
-    "controls": 22,
-    "snapshots": 25,
-    "passed": 25,
+    "controls": 24,
+    "snapshots": 27,
+    "passed": 27,
     "appiumReleaseGates": 2,
     "allowedByOverride": 0
   },
@@ -594,6 +594,50 @@
       "tabOrder": 25,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/data-table-stable33.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "virtualization-stable34",
+      "component": "virtual-list",
+      "platform": "avalonia",
+      "role": "list",
+      "accessibleName": "Activity stream",
+      "value": "100000 items, fixed and variable size, focus retained during recycle",
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["ArrowDown", "ArrowUp"],
+      "tabOrder": 26,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/virtualization-stable34.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "table-v2-stable34",
+      "component": "table-v2",
+      "platform": "avalonia",
+      "role": "grid",
+      "accessibleName": "Large table",
+      "value": "100000 rows, 80 columns, row 99951 column 71",
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["ArrowRight", "ArrowDown"],
+      "tabOrder": 27,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/table-v2-stable34.json",
       "allowedByOverride": [],
       "passed": true,
       "errors": []

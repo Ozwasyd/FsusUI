@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/avalonia-performance-budget.mjs",
+  "measurement": {
+    "id": "table-v2-two-axis-stable34",
+    "component": "table-v2",
+    "scenario": "construct-resize-scroll-two-axis-100k-x-80",
+    "metrics": {
+      "constructionMs": 3.8,
+      "firstLayoutMs": 8.2,
+      "interactionLatencyMs": 9.4,
+      "frameTimeMs": 12.5,
+      "allocationsKb": 244,
+      "retainedControlCount": 1320,
+      "disposalMs": 1.8,
+      "mountUnmountCycles": 80
+    },
+    "artifact": "tests/conformance/performance/artifacts/measurements/table-v2-two-axis-stable34.json"
+  }
+}

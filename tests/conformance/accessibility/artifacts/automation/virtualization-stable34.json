@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "virtualization-stable34",
+    "component": "virtual-list",
+    "platform": "avalonia",
+    "control": "FsusVirtualList",
+    "evidenceSource": "avalonia-headless",
+    "role": "list",
+    "accessibleName": "Activity stream",
+    "value": "100000 items, fixed and variable size, focus retained during recycle",
+    "states": {
+      "disabled": null,
+      "selected": null,
+      "checked": null,
+      "expanded": null,
+      "invalid": null
+    },
+    "keyboard": ["ArrowDown", "ArrowUp"],
+    "keyboardOperable": true,
+    "tabOrder": 26,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/virtualization-stable34.json"
+  }
+}

@@ -319,6 +319,34 @@
       "invalidState": "not-applicable",
       "expectedStates": { "selected": true, "expanded": true },
       "keyboardNavigation": ["ArrowRight", "ArrowDown", "Space", "Enter"]
+    },
+    {
+      "id": "virtual-list",
+      "publicName": "FsusVirtualList",
+      "role": "list",
+      "accessibleName": "required",
+      "value": "required",
+      "disabledState": "not-applicable",
+      "selectedState": "not-applicable",
+      "checkedState": "not-applicable",
+      "expandedState": "not-applicable",
+      "invalidState": "not-applicable",
+      "expectedStates": {},
+      "keyboardNavigation": ["ArrowDown", "ArrowUp"]
+    },
+    {
+      "id": "table-v2",
+      "publicName": "FsusTableV2",
+      "role": "grid",
+      "accessibleName": "required",
+      "value": "required",
+      "disabledState": "not-applicable",
+      "selectedState": "not-applicable",
+      "checkedState": "not-applicable",
+      "expandedState": "not-applicable",
+      "invalidState": "not-applicable",
+      "expectedStates": {},
+      "keyboardNavigation": ["ArrowRight", "ArrowDown"]
     }
   ]
 }

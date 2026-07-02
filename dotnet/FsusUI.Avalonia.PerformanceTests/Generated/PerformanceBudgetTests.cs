@@ -19,6 +19,8 @@ public class PerformanceBudgetTests
     yield return new object[] { "picker-virtualized-list-stable27", "picker-virtualized-list", 2.1, 3, 5.8, 7.5, 148, 176, 28, 32, 80, 50 };
     yield return new object[] { "upload-transfer-large-list-stable30", "upload-transfer", 2.5, 3.4, 6.1, 8, 164, 196, 58, 80, 80, 50 };
     yield return new object[] { "data-table-virtualized-grid-stable33", "data-table", 3.2, 4.4, 7.4, 9, 212, 256, 640, 720, 80, 50 };
+    yield return new object[] { "virtual-list-fixed-variable-stable34", "virtual-list", 2.8, 3.6, 6.9, 8, 156, 192, 48, 64, 80, 50 };
+    yield return new object[] { "table-v2-two-axis-stable34", "table-v2", 3.8, 4.6, 8.2, 9.5, 244, 288, 1320, 1536, 80, 50 };
   }
 
   [Theory]

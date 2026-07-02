@@ -1,0 +1,41 @@
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls">
+  <Style Selector="fsus|FsusVirtualList, fsus|FsusAutoResizer, fsus|FsusTableV2">
+    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
+    <Setter Property="Background" Value="{DynamicResource FsusThemeVirtualizationSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusSurfaceMd}" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition
+          Property="Opacity"
+          Duration="{DynamicResource FsusMotionDurationEffective}"
+          Easing="{DynamicResource FsusMotionEasingEffective}" />
+      </Transitions>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusVirtualList.fsus-loading">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeLoadingBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusVirtualList.fsus-error">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeDangerBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusVirtualList.fsus-empty">
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusVirtualList.fsus-virtualized, fsus|FsusTableV2.fsus-virtualized">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusVirtualList.fsus-variable-size">
+    <Setter Property="Opacity" Value="0.98" />
+  </Style>
+</Styles>

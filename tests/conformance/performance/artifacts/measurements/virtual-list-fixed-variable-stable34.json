@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/avalonia-performance-budget.mjs",
+  "measurement": {
+    "id": "virtual-list-fixed-variable-stable34",
+    "component": "virtual-list",
+    "scenario": "construct-measure-anchor-scroll-recycle-100k",
+    "metrics": {
+      "constructionMs": 2.8,
+      "firstLayoutMs": 6.9,
+      "interactionLatencyMs": 7.5,
+      "frameTimeMs": 11.8,
+      "allocationsKb": 156,
+      "retainedControlCount": 48,
+      "disposalMs": 1.2,
+      "mountUnmountCycles": 80
+    },
+    "artifact": "tests/conformance/performance/artifacts/measurements/virtual-list-fixed-variable-stable34.json"
+  }
+}

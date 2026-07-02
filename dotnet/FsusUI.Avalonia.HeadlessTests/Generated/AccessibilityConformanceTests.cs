@@ -33,6 +33,8 @@ public class AccessibilityConformanceTests
     yield return new object[] { "dropdown-stable25", "dropdown", "menu", "More actions", 3, 23 };
     yield return new object[] { "media-decorative-stable32", "media-decorative", "image", "Gallery", 3, 24 };
     yield return new object[] { "data-table-stable33", "data-table", "grid", "Release table", 4, 25 };
+    yield return new object[] { "virtualization-stable34", "virtual-list", "list", "Activity stream", 2, 26 };
+    yield return new object[] { "table-v2-stable34", "table-v2", "grid", "Large table", 2, 27 };
   }
 
   [Theory]

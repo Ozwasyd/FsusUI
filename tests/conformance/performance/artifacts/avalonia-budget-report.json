@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "spec/components/avalonia-stable-performance-budgets.json",
-      "sha256": "af8d83a116e83a9e00ebaa38dc2b34acd312d21bb181cc0ed1c0853213d7e4b9"
+      "sha256": "d55fc19fbaacd2f2ab81019618b41619cd179fe6545b65a76b4f58a27e99af3d"
     },
     {
       "path": "tests/conformance/performance/avalonia-measurements.json",
-      "sha256": "d042ca1a2f4743ec1b3c17f06d01bb2d4fdef15e9a93aff7caafa74cdb02024b"
+      "sha256": "345968d8772f0a57251b4d17efa8d1c3b95ecb2745a759c7193174a66875e853"
     },
     {
       "path": "tests/conformance/performance/data-size-fixtures.json",
@@ -16,9 +16,9 @@
     }
   ],
   "summary": {
-    "budgetedComponents": 20,
-    "measurements": 11,
-    "passed": 11,
+    "budgetedComponents": 22,
+    "measurements": 13,
+    "passed": 13,
     "dataSizeFixtures": 5
   },
   "dataSizeFixtures": [
@@ -376,6 +376,62 @@
       "artifact": "tests/conformance/performance/artifacts/measurements/data-table-virtualized-grid-stable33.json",
       "passed": true,
       "errors": []
+    },
+    {
+      "id": "virtual-list-fixed-variable-stable34",
+      "component": "virtual-list",
+      "scenario": "construct-measure-anchor-scroll-recycle-100k",
+      "metrics": {
+        "constructionMs": 2.8,
+        "firstLayoutMs": 6.9,
+        "interactionLatencyMs": 7.5,
+        "frameTimeMs": 11.8,
+        "allocationsKb": 156,
+        "retainedControlCount": 48,
+        "disposalMs": 1.2,
+        "mountUnmountCycles": 80
+      },
+      "budgets": {
+        "constructionMs": 3.6,
+        "firstLayoutMs": 8,
+        "interactionLatencyMs": 9,
+        "frameTimeMs": 16,
+        "allocationsKb": 192,
+        "retainedControlCount": 64,
+        "disposalMs": 1.6,
+        "mountUnmountCycles": 50
+      },
+      "artifact": "tests/conformance/performance/artifacts/measurements/virtual-list-fixed-variable-stable34.json",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "table-v2-two-axis-stable34",
+      "component": "table-v2",
+      "scenario": "construct-resize-scroll-two-axis-100k-x-80",
+      "metrics": {
+        "constructionMs": 3.8,
+        "firstLayoutMs": 8.2,
+        "interactionLatencyMs": 9.4,
+        "frameTimeMs": 12.5,
+        "allocationsKb": 244,
+        "retainedControlCount": 1320,
+        "disposalMs": 1.8,
+        "mountUnmountCycles": 80
+      },
+      "budgets": {
+        "constructionMs": 4.6,
+        "firstLayoutMs": 9.5,
+        "interactionLatencyMs": 12,
+        "frameTimeMs": 16,
+        "allocationsKb": 288,
+        "retainedControlCount": 1536,
+        "disposalMs": 2.2,
+        "mountUnmountCycles": 50
+      },
+      "artifact": "tests/conformance/performance/artifacts/measurements/table-v2-two-axis-stable34.json",
+      "passed": true,
+      "errors": []
     }
   ],
   "measurementOutput": [
@@ -389,6 +445,8 @@
     "tests/conformance/performance/artifacts/measurements/service-helper-stable26-repeated-show-close.json",
     "tests/conformance/performance/artifacts/measurements/picker-virtualized-list-stable27.json",
     "tests/conformance/performance/artifacts/measurements/upload-transfer-large-list-stable30.json",
-    "tests/conformance/performance/artifacts/measurements/data-table-virtualized-grid-stable33.json"
+    "tests/conformance/performance/artifacts/measurements/data-table-virtualized-grid-stable33.json",
+    "tests/conformance/performance/artifacts/measurements/virtual-list-fixed-variable-stable34.json",
+    "tests/conformance/performance/artifacts/measurements/table-v2-two-axis-stable34.json"
   ]
 }
