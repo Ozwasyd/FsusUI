@@ -28,3 +28,18 @@ overrides:
     owner: fsusui-core
     reviewAfter: 2026-09-01
     linkedIssues: [18, 24, 25, 26]
+  - id: avalonia-layout-panel-measure-001
+    area: visual
+    component: layout-primitives
+    platform: avalonia
+    status: accepted
+    reason: Avalonia panels measure and arrange content differently from Web flex and grid engines, especially for text baselines and scrollbar chrome.
+    affectedContracts:
+      [component.el-space, component.el-row, component.el-col, component.el-scrollbar]
+    visualThreshold: medium
+    behaviorExpectation: Gap tokens, responsive span intent, region order, keyboard scroll behavior, and accessible hidden labels must remain equivalent.
+    allowedDeviation: medium
+    testPolicy: layout-geometry-threshold
+    owner: fsusui-core
+    reviewAfter: 2026-09-01
+    linkedIssues: [151]

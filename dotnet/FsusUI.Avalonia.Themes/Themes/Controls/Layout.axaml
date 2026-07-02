@@ -1,0 +1,93 @@
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Style Selector="fsus|FsusSpace, fsus|FsusRow, fsus|FsusContainer">
+    <Setter Property="Margin" Value="{DynamicResource FsusSpace3}" />
+  </Style>
+
+  <Style Selector="fsus|FsusSpace.fsus-gap-xs, fsus|FsusRow.fsus-gap-xs, fsus|FsusContainer.fsus-gap-xs">
+    <Setter Property="Margin" Value="{DynamicResource FsusSpace1}" />
+  </Style>
+
+  <Style Selector="fsus|FsusSpace.fsus-gap-sm, fsus|FsusRow.fsus-gap-sm, fsus|FsusContainer.fsus-gap-sm">
+    <Setter Property="Margin" Value="{DynamicResource FsusSpace2}" />
+  </Style>
+
+  <Style Selector="fsus|FsusSpace.fsus-gap-lg, fsus|FsusRow.fsus-gap-lg, fsus|FsusContainer.fsus-gap-lg">
+    <Setter Property="Margin" Value="{DynamicResource FsusSpace4}" />
+  </Style>
+
+  <Style Selector="fsus|FsusCol">
+    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlCompactY}" />
+  </Style>
+
+  <Style Selector="fsus|FsusContainer">
+    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
+  </Style>
+
+  <Style Selector="fsus|FsusHeader, fsus|FsusAside, fsus|FsusMain, fsus|FsusFooter">
+    <Setter Property="Padding" Value="{DynamicResource FsusComponentDialogPadding}" />
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusSurfaceMd}" />
+    <Setter Property="FontFamily" Value="{DynamicResource FsusTypographyFamilyBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodyMdSize}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ContentPresenter
+          Padding="{TemplateBinding Padding}"
+          Background="{TemplateBinding Background}"
+          BorderBrush="{TemplateBinding BorderBrush}"
+          BorderThickness="{TemplateBinding BorderThickness}"
+          Content="{TemplateBinding Content}"
+          ContentTemplate="{TemplateBinding ContentTemplate}"
+          CornerRadius="{TemplateBinding CornerRadius}" />
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusAside">
+    <Setter Property="MinWidth" Value="{DynamicResource FsusDensityControlDefaultY}" />
+  </Style>
+
+  <Style Selector="fsus|FsusScrollbar">
+    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusControlMd}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border
+          MinHeight="{TemplateBinding MinHeight}"
+          Padding="{TemplateBinding Padding}"
+          Background="{TemplateBinding Background}"
+          BorderBrush="{TemplateBinding BorderBrush}"
+          BorderThickness="{TemplateBinding BorderThickness}"
+          CornerRadius="{TemplateBinding CornerRadius}">
+          <ContentPresenter
+            Content="{TemplateBinding Content}"
+            ContentTemplate="{TemplateBinding ContentTemplate}" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusScrollbar:focus">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusThemeFocusThickness}" />
+  </Style>
+
+  <Style Selector="fsus|FsusVisualHidden">
+    <Setter Property="Width" Value="1" />
+    <Setter Property="Height" Value="1" />
+    <Setter Property="MinWidth" Value="1" />
+    <Setter Property="MinHeight" Value="1" />
+    <Setter Property="Opacity" Value="0" />
+  </Style>
+</Styles>

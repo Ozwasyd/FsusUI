@@ -625,6 +625,75 @@
       },
       "screenshotDiffPercent": 0.012,
       "perceptualDelta": 0.05
+    },
+    {
+      "id": "layout-primitives-stable22-web-avalonia",
+      "component": "layout-primitives",
+      "mode": "crossPlatform",
+      "token": "layout.primitives.geometry",
+      "overrideId": "avalonia-layout-panel-measure-001",
+      "fixture": {
+        "page": "visual/layout-primitives",
+        "theme": "dark",
+        "density": "compact",
+        "variant": "space-row-col-container-scrollbar-visual-hidden",
+        "size": "md",
+        "state": "wrapping-nested-responsive-scroll-hidden-label",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "coverage": {
+        "controls": [
+          "FsusSpace",
+          "FsusRow",
+          "FsusCol",
+          "FsusContainer",
+          "FsusHeader",
+          "FsusAside",
+          "FsusMain",
+          "FsusFooter",
+          "FsusScrollbar",
+          "FsusVisualHidden"
+        ],
+        "states": [
+          "wrapping",
+          "nested-containers",
+          "responsive-breakpoints",
+          "long-content",
+          "keyboard-scroll",
+          "pointer-scroll",
+          "screen-reader-only-label"
+        ],
+        "themes": ["light", "dark", "high-contrast"],
+        "densities": ["compact", "default", "spacious"],
+        "motionModes": ["system", "enabled", "reduced", "disabled"]
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/layout-primitives-stable22.png",
+        "geometry": { "x": 20, "y": 28, "width": 480, "height": 360 },
+        "color": { "token": "layout.primitives.geometry", "lab": [48, 4, -16] },
+        "radius": 12,
+        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/layout-primitives-stable22.png",
+        "geometry": { "x": 20.8, "y": 28.7, "width": 480.9, "height": 360.8 },
+        "color": {
+          "token": "layout.primitives.geometry",
+          "lab": [48.4, 4.2, -16.3]
+        },
+        "radius": 12.5,
+        "spacing": { "paddingX": 12.5, "paddingY": 8.4, "gap": 12.5 },
+        "textBaseline": 25.2
+      },
+      "screenshotDiffPercent": 0.012,
+      "perceptualDelta": 0.05
     }
   ]
 }

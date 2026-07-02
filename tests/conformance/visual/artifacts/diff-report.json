@@ -3,9 +3,9 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "artifactRoot": "tests/conformance/visual/artifacts",
   "summary": {
-    "total": 12,
-    "passed": 12,
-    "allowedByOverride": 1
+    "total": 13,
+    "passed": 13,
+    "allowedByOverride": 2
   },
   "comparisons": [
     {
@@ -384,6 +384,44 @@
         "perceptualDelta": 0.08
       },
       "allowedByOverride": [],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "layout-primitives-stable22-web-avalonia",
+      "component": "layout-primitives",
+      "state": "wrapping-nested-responsive-scroll-hidden-label",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "layout.primitives.geometry",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/layout-primitives-stable22.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/layout-primitives-stable22-web-avalonia.json",
+      "deltas": {
+        "geometry": 0.8999999999999773,
+        "colorDelta": 0.5385164807134498,
+        "radius": 0.5,
+        "spacing": 0.5,
+        "textBaseline": 1.1999999999999993,
+        "screenshotDiffPercent": 0.012,
+        "perceptualDelta": 0.05
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [
+        {
+          "metric": "textBaseline",
+          "delta": 1.1999999999999993,
+          "threshold": 1,
+          "overrideId": "avalonia-layout-panel-measure-001"
+        }
+      ],
       "passed": true,
       "failures": []
     }
