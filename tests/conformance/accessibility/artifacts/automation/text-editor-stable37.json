@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "text-editor-stable37",
+    "component": "text-editor",
+    "platform": "avalonia",
+    "control": "FsusTextEditor",
+    "evidenceSource": "avalonia-headless",
+    "role": "textbox",
+    "accessibleName": "Article editor",
+    "value": "30 chars, selection 30-30, preview synced, undo redo available",
+    "states": {
+      "disabled": false,
+      "selected": true,
+      "checked": null,
+      "expanded": null,
+      "invalid": null
+    },
+    "keyboard": ["ArrowLeft", "ArrowRight", "Control+Z", "Control+Y"],
+    "keyboardOperable": true,
+    "tabOrder": 31,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/text-editor-stable37.json"
+  }
+}

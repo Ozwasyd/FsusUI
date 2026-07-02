@@ -389,6 +389,20 @@
       "invalidState": "not-applicable",
       "expectedStates": {},
       "keyboardNavigation": ["ArrowDown", "ArrowUp"]
+    },
+    {
+      "id": "text-editor",
+      "publicName": "FsusTextEditor",
+      "role": "textbox",
+      "accessibleName": "required",
+      "value": "required",
+      "disabledState": "required",
+      "selectedState": "required",
+      "checkedState": "not-applicable",
+      "expandedState": "not-applicable",
+      "invalidState": "not-applicable",
+      "expectedStates": { "disabled": false, "selected": true },
+      "keyboardNavigation": ["ArrowLeft", "ArrowRight", "Control+Z", "Control+Y"]
     }
   ]
 }

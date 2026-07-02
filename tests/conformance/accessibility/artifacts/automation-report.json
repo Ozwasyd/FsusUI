@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "tests/conformance/accessibility/contracts.json",
-      "sha256": "5e5ef473c7d971d5cb51858b0786786510e8d56ad4471514c7fea97956c621dc"
+      "sha256": "112b56ca1246b37abb7dceed7ed89cf82c9f04016463ecd8c111d129f895afda"
     },
     {
       "path": "tests/conformance/accessibility/automation-snapshots.json",
-      "sha256": "87c963db86a58ec04ae809303a5c6a2a9f40827e028fba7cbef42839cd6707a5"
+      "sha256": "3f922994090fbb9781bf9a4aac64cb3eb355f5b8f49298da2d1a8b6805383ce1"
     }
   ],
   "requiredContractFields": [
@@ -23,9 +23,9 @@
     "keyboardNavigation"
   ],
   "summary": {
-    "controls": 27,
-    "snapshots": 30,
-    "passed": 30,
+    "controls": 28,
+    "snapshots": 31,
+    "passed": 31,
     "appiumReleaseGates": 2,
     "allowedByOverride": 0
   },
@@ -704,6 +704,28 @@
       "tabOrder": 30,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/text-viewer-stable36.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "text-editor-stable37",
+      "component": "text-editor",
+      "platform": "avalonia",
+      "role": "textbox",
+      "accessibleName": "Article editor",
+      "value": "30 chars, selection 30-30, preview synced, undo redo available",
+      "states": {
+        "disabled": false,
+        "selected": true,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["ArrowLeft", "ArrowRight", "Control+Z", "Control+Y"],
+      "tabOrder": 31,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/text-editor-stable37.json",
       "allowedByOverride": [],
       "passed": true,
       "errors": []

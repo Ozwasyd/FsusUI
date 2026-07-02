@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "spec/components/avalonia-stable-performance-budgets.json",
-      "sha256": "9f4159f1cc45ee18781d62795419853af88b8a5294dbdfcc3cec4c6e4da5d94c"
+      "sha256": "f625cb7be28deab8a73834fa5e7a30ffde5a40046c6aaa091fd6ba34720ef239"
     },
     {
       "path": "tests/conformance/performance/avalonia-measurements.json",
-      "sha256": "a5b709d6479fec23a1431362c80b584e48d37a1abef480108fcedcce58cb8581"
+      "sha256": "6b45da298b80eee510d3d2b848cb87e676d79861518fd5530b2ec5ade62326f4"
     },
     {
       "path": "tests/conformance/performance/data-size-fixtures.json",
@@ -16,9 +16,9 @@
     }
   ],
   "summary": {
-    "budgetedComponents": 25,
-    "measurements": 16,
-    "passed": 16,
+    "budgetedComponents": 26,
+    "measurements": 17,
+    "passed": 17,
     "dataSizeFixtures": 5
   },
   "dataSizeFixtures": [
@@ -516,6 +516,38 @@
       "artifact": "tests/conformance/performance/artifacts/measurements/text-viewer-long-content-stable36.json",
       "passed": true,
       "errors": []
+    },
+    {
+      "id": "text-editor-large-document-stable37",
+      "component": "text-editor",
+      "scenario": "type-compose-paste-undo-redo-preview-sync-10k",
+      "metrics": {
+        "constructionMs": 2.8,
+        "firstLayoutMs": 6.6,
+        "interactionLatencyMs": 8.2,
+        "frameTimeMs": 12.4,
+        "allocationsKb": 176,
+        "retainedControlCount": 132,
+        "disposalMs": 1.3,
+        "mountUnmountCycles": 80,
+        "documentChars": 1000000,
+        "undoStackEntries": 128
+      },
+      "budgets": {
+        "constructionMs": 3.8,
+        "firstLayoutMs": 8.5,
+        "interactionLatencyMs": 10,
+        "frameTimeMs": 16,
+        "allocationsKb": 224,
+        "retainedControlCount": 160,
+        "disposalMs": 1.8,
+        "mountUnmountCycles": 50,
+        "documentChars": 1000000,
+        "undoStackEntries": 128
+      },
+      "artifact": "tests/conformance/performance/artifacts/measurements/text-editor-large-document-stable37.json",
+      "passed": true,
+      "errors": []
     }
   ],
   "measurementOutput": [
@@ -534,6 +566,7 @@
     "tests/conformance/performance/artifacts/measurements/table-v2-two-axis-stable34.json",
     "tests/conformance/performance/artifacts/measurements/tree-lazy-virtualized-stable35.json",
     "tests/conformance/performance/artifacts/measurements/tree-table-virtualized-stable35.json",
-    "tests/conformance/performance/artifacts/measurements/text-viewer-long-content-stable36.json"
+    "tests/conformance/performance/artifacts/measurements/text-viewer-long-content-stable36.json",
+    "tests/conformance/performance/artifacts/measurements/text-editor-large-document-stable37.json"
   ]
 }

@@ -360,6 +360,22 @@
         "disposalMs": 1.5,
         "mountUnmountCycles": 50
       }
+    },
+    {
+      "id": "text-editor",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 3.8,
+        "firstLayoutMs": 8.5,
+        "interactionLatencyMs": 10,
+        "frameTimeMs": 16,
+        "allocationsKb": 224,
+        "retainedControlCount": 160,
+        "disposalMs": 1.8,
+        "mountUnmountCycles": 50,
+        "documentChars": 1000000,
+        "undoStackEntries": 128
+      }
     }
   ]
 }

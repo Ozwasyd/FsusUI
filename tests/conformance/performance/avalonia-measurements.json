@@ -256,6 +256,24 @@
         "mountUnmountCycles": 80
       },
       "artifact": "tests/conformance/performance/artifacts/measurements/text-viewer-long-content-stable36.json"
+    },
+    {
+      "id": "text-editor-large-document-stable37",
+      "component": "text-editor",
+      "scenario": "type-compose-paste-undo-redo-preview-sync-10k",
+      "metrics": {
+        "constructionMs": 2.8,
+        "firstLayoutMs": 6.6,
+        "interactionLatencyMs": 8.2,
+        "frameTimeMs": 12.4,
+        "allocationsKb": 176,
+        "retainedControlCount": 132,
+        "disposalMs": 1.3,
+        "mountUnmountCycles": 80,
+        "documentChars": 1000000,
+        "undoStackEntries": 128
+      },
+      "artifact": "tests/conformance/performance/artifacts/measurements/text-editor-large-document-stable37.json"
     }
   ]
 }

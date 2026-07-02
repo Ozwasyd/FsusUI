@@ -38,6 +38,7 @@ public class AccessibilityConformanceTests
     yield return new object[] { "tree-stable35", "tree", "tree", "Release tree", 4, 28 };
     yield return new object[] { "tree-table-stable35", "tree-table", "grid", "Tree table", 3, 29 };
     yield return new object[] { "text-viewer-stable36", "text-viewer", "document", "Release notes", 2, 30 };
+    yield return new object[] { "text-editor-stable37", "text-editor", "textbox", "Article editor", 4, 31 };
   }
 
   [Theory]

@@ -24,6 +24,7 @@ public class PerformanceBudgetTests
     yield return new object[] { "tree-lazy-virtualized-stable35", "tree", 3.2, 4, 7.8, 9, 196, 240, 48, 64, 80, 50 };
     yield return new object[] { "tree-table-virtualized-stable35", "tree-table", 3.9, 4.8, 8.5, 10, 260, 320, 640, 768, 80, 50 };
     yield return new object[] { "text-viewer-long-content-stable36", "text-viewer", 2.2, 3, 5.8, 7, 144, 180, 104, 128, 80, 50 };
+    yield return new object[] { "text-editor-large-document-stable37", "text-editor", 2.8, 3.8, 6.6, 8.5, 176, 224, 132, 160, 80, 50 };
   }
 
   [Theory]

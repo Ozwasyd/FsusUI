@@ -1,0 +1,42 @@
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls">
+  <Style Selector="fsus|FsusTextEditor">
+    <Setter Property="MinHeight" Value="192" />
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
+    <Setter Property="Background" Value="{DynamicResource FsusThemeTextEditorSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusSurfaceMd}" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition
+          Property="Opacity"
+          Duration="{DynamicResource FsusMotionDurationEffective}"
+          Easing="{DynamicResource FsusMotionEasingEffective}" />
+      </Transitions>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusTextEditor.fsus-split-preview">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusTextEditor.fsus-preview-pending">
+    <Setter Property="Opacity" Value="0.94" />
+  </Style>
+
+  <Style Selector="fsus|FsusTextEditor.fsus-composing">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusTextEditor.fsus-readonly">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusTextEditor.fsus-disabled">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeDisabledSurfaceBrush}" />
+    <Setter Property="Opacity" Value="{DynamicResource FsusThemeDisabledOpacity}" />
+  </Style>
+</Styles>
