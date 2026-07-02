@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "tabs-stable23",
+    "component": "tabs",
+    "platform": "avalonia",
+    "control": "FsusTabs",
+    "evidenceSource": "avalonia-headless",
+    "role": "tablist",
+    "accessibleName": "Stable navigation tabs",
+    "value": null,
+    "states": {
+      "disabled": null,
+      "selected": true,
+      "checked": null,
+      "expanded": null,
+      "invalid": null
+    },
+    "keyboard": ["ArrowRight", "Home", "End"],
+    "keyboardOperable": true,
+    "tabOrder": 15,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/tabs-stable23.json"
+  }
+}

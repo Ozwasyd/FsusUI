@@ -694,6 +694,79 @@
       },
       "screenshotDiffPercent": 0.012,
       "perceptualDelta": 0.05
+    },
+    {
+      "id": "navigation-primitives-stable23-web-avalonia",
+      "component": "navigation-primitives",
+      "mode": "crossPlatform",
+      "token": "navigation.active.indicator",
+      "fixture": {
+        "page": "visual/navigation-primitives",
+        "theme": "light",
+        "density": "default",
+        "variant": "tabs-menu-breadcrumb-header-steps",
+        "size": "md",
+        "state": "selected-disabled-collapsed-nested-current-error",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "enabled"
+      },
+      "coverage": {
+        "controls": [
+          "FsusTabs",
+          "FsusTabPane",
+          "FsusMenu",
+          "FsusMenuItem",
+          "FsusSubMenu",
+          "FsusMenuItemGroup",
+          "FsusBreadcrumb",
+          "FsusBreadcrumbItem",
+          "FsusPageHeader",
+          "FsusSteps",
+          "FsusStep"
+        ],
+        "states": [
+          "selected-tabs",
+          "disabled-tab",
+          "nested-menu",
+          "collapsed-menu",
+          "current-breadcrumb",
+          "page-header-back",
+          "step-process",
+          "step-error"
+        ],
+        "themes": ["light", "dark", "high-contrast"],
+        "densities": ["compact", "default", "spacious"],
+        "motionModes": ["system", "enabled", "reduced", "disabled"]
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/navigation-primitives-stable23.png",
+        "geometry": { "x": 24, "y": 28, "width": 520, "height": 360 },
+        "color": {
+          "token": "navigation.active.indicator",
+          "lab": [49, 6, -18]
+        },
+        "radius": 6,
+        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/navigation-primitives-stable23.png",
+        "geometry": { "x": 24.7, "y": 28.6, "width": 520.8, "height": 360.7 },
+        "color": {
+          "token": "navigation.active.indicator",
+          "lab": [49.4, 6.2, -18.3]
+        },
+        "radius": 6.4,
+        "spacing": { "paddingX": 12.5, "paddingY": 8.4, "gap": 12.5 },
+        "textBaseline": 24.7
+      },
+      "screenshotDiffPercent": 0.012,
+      "perceptualDelta": 0.05
     }
   ]
 }

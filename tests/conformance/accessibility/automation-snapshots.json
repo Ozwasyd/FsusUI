@@ -295,6 +295,48 @@
       "keyboardOperable": true,
       "tabOrder": 14,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/alert-live-region.json"
+    },
+    {
+      "id": "tabs-stable23",
+      "component": "tabs",
+      "platform": "avalonia",
+      "control": "FsusTabs",
+      "evidenceSource": "avalonia-headless",
+      "role": "tablist",
+      "accessibleName": "Stable navigation tabs",
+      "value": null,
+      "states": {
+        "disabled": null,
+        "selected": true,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["ArrowRight", "Home", "End"],
+      "keyboardOperable": true,
+      "tabOrder": 15,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/tabs-stable23.json"
+    },
+    {
+      "id": "menu-stable23",
+      "component": "menu",
+      "platform": "avalonia",
+      "control": "FsusMenu",
+      "evidenceSource": "avalonia-headless",
+      "role": "menu",
+      "accessibleName": "Stable navigation menu",
+      "value": null,
+      "states": {
+        "disabled": null,
+        "selected": true,
+        "checked": null,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["ArrowDown", "Enter", "Escape"],
+      "keyboardOperable": true,
+      "tabOrder": 16,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/menu-stable23.json"
     }
   ],
   "appiumReleaseGates": [

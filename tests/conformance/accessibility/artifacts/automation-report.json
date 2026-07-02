@@ -8,7 +8,7 @@
     },
     {
       "path": "tests/conformance/accessibility/automation-snapshots.json",
-      "sha256": "a25bd791488c0bac57b45a6adf67172ddc941987148e6c799c0f5966538f9d22"
+      "sha256": "555650d2641bcb5b1a26e25868dbe15a5bfeb6a5519685b76e765f29b0da6304"
     }
   ],
   "requiredContractFields": [
@@ -24,8 +24,8 @@
   ],
   "summary": {
     "controls": 14,
-    "snapshots": 14,
-    "passed": 14,
+    "snapshots": 16,
+    "passed": 16,
     "appiumReleaseGates": 2,
     "allowedByOverride": 0
   },
@@ -352,6 +352,50 @@
       "tabOrder": 14,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/alert-live-region.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "tabs-stable23",
+      "component": "tabs",
+      "platform": "avalonia",
+      "role": "tablist",
+      "accessibleName": "Stable navigation tabs",
+      "value": null,
+      "states": {
+        "disabled": null,
+        "selected": true,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["ArrowRight", "Home", "End"],
+      "tabOrder": 15,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/tabs-stable23.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "menu-stable23",
+      "component": "menu",
+      "platform": "avalonia",
+      "role": "menu",
+      "accessibleName": "Stable navigation menu",
+      "value": null,
+      "states": {
+        "disabled": null,
+        "selected": true,
+        "checked": null,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["ArrowDown", "Enter", "Escape"],
+      "tabOrder": 16,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/menu-stable23.json",
       "allowedByOverride": [],
       "passed": true,
       "errors": []

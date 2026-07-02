@@ -3,8 +3,8 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "artifactRoot": "tests/conformance/visual/artifacts",
   "summary": {
-    "total": 13,
-    "passed": 13,
+    "total": 14,
+    "passed": 14,
     "allowedByOverride": 2
   },
   "comparisons": [
@@ -422,6 +422,37 @@
           "overrideId": "avalonia-layout-panel-measure-001"
         }
       ],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "navigation-primitives-stable23-web-avalonia",
+      "component": "navigation-primitives",
+      "state": "selected-disabled-collapsed-nested-current-error",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "navigation.active.indicator",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/navigation-primitives-stable23.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/navigation-primitives-stable23-web-avalonia.json",
+      "deltas": {
+        "geometry": 0.7999999999999545,
+        "colorDelta": 0.5385164807134498,
+        "radius": 0.40000000000000036,
+        "spacing": 0.5,
+        "textBaseline": 0.6999999999999993,
+        "screenshotDiffPercent": 0.012,
+        "perceptualDelta": 0.05
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [],
       "passed": true,
       "failures": []
     }

@@ -3,7 +3,7 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "fixtureSource": {
     "path": "tests/conformance/visual/fixtures/visual-comparisons.json",
-    "sha256": "621f80dca798b708af829d051096106d3de49935fbdb70e1facc2e18e57e71c8"
+    "sha256": "61e4baeab07a049d58a6591a3fad3a1e8bd6234f7ebf5acf3604ba4a0327dfc7"
   },
   "artifactRoot": "tests/conformance/visual/artifacts",
   "thresholds": {
@@ -835,6 +835,66 @@
         },
         "textBaseline": 25.2
       }
+    },
+    {
+      "id": "navigation-primitives-stable23-web-avalonia",
+      "component": "navigation-primitives",
+      "fixture": {
+        "page": "visual/navigation-primitives",
+        "theme": "light",
+        "density": "default",
+        "variant": "tabs-menu-breadcrumb-header-steps",
+        "size": "md",
+        "state": "selected-disabled-collapsed-nested-current-error",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "enabled"
+      },
+      "token": "navigation.active.indicator",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/navigation-primitives-stable23.png",
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 520,
+          "height": 360
+        },
+        "color": {
+          "token": "navigation.active.indicator",
+          "lab": [49, 6, -18]
+        },
+        "radius": 6,
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 12
+        },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/navigation-primitives-stable23.png",
+        "geometry": {
+          "x": 24.7,
+          "y": 28.6,
+          "width": 520.8,
+          "height": 360.7
+        },
+        "color": {
+          "token": "navigation.active.indicator",
+          "lab": [49.4, 6.2, -18.3]
+        },
+        "radius": 6.4,
+        "spacing": {
+          "paddingX": 12.5,
+          "paddingY": 8.4,
+          "gap": 12.5
+        },
+        "textBaseline": 24.7
+      }
     }
   ],
   "approvedComparisons": [
@@ -915,6 +975,12 @@
       "mode": "crossPlatform",
       "platform": "web->avalonia",
       "diffArtifact": "tests/conformance/visual/artifacts/diffs/layout-primitives-stable22-web-avalonia.json"
+    },
+    {
+      "id": "navigation-primitives-stable23-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/navigation-primitives-stable23-web-avalonia.json"
     }
   ]
 }

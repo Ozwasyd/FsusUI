@@ -7,17 +7,28 @@
     <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodyMdSize}" />
   </Style>
 
-  <Style Selector="TabItem">
+  <Style Selector="TabItem, fsus|FsusTabPane">
     <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
-    <Setter Property="Padding" Value="12,6" />
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0,0,0,2" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition
+          Property="Opacity"
+          Duration="{DynamicResource FsusMotionDurationEffective}"
+          Easing="{DynamicResource FsusMotionEasingEffective}" />
+      </Transitions>
+    </Setter>
   </Style>
 
-  <Style Selector="TabItem:selected">
+  <Style Selector="TabItem:selected, fsus|FsusTabPane.fsus-selected">
     <Setter Property="Foreground" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
   </Style>
 
-  <Style Selector="TabItem:disabled">
+  <Style Selector="TabItem:disabled, fsus|FsusTabPane.fsus-disabled">
     <Setter Property="Opacity" Value="{DynamicResource FsusThemeDisabledOpacity}" />
   </Style>
 </Styles>
