@@ -1,0 +1,31 @@
+{
+  "id": "date-time-picker-stable28-panel-web-avalonia",
+  "component": "date-time",
+  "state": "date-shortcut-time-range-clearable",
+  "mode": "crossPlatform",
+  "platform": "web->avalonia",
+  "token": "date.time.surface",
+  "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/date-time-picker-stable28-panel.png",
+  "diffArtifact": "tests/conformance/visual/artifacts/diffs/date-time-picker-stable28-panel-web-avalonia.json",
+  "deltas": {
+    "geometry": 0.8000000000000114,
+    "colorDelta": 0.41231056256176374,
+    "radius": 0.40000000000000036,
+    "spacing": 0.40000000000000036,
+    "textBaseline": 0.8000000000000007,
+    "screenshotDiffPercent": 0.012,
+    "perceptualDelta": 0.05
+  },
+  "thresholds": {
+    "geometry": 1.5,
+    "colorDelta": 1.4,
+    "radius": 0.75,
+    "spacing": 1,
+    "textBaseline": 1,
+    "screenshotDiffPercent": 0.015,
+    "perceptualDelta": 0.08
+  },
+  "allowedByOverride": [],
+  "passed": true,
+  "failures": []
+}

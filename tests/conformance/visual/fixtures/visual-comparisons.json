@@ -1042,6 +1042,162 @@
       },
       "screenshotDiffPercent": 0.012,
       "perceptualDelta": 0.05
+    },
+    {
+      "id": "date-time-calendar-stable28-grid-web-avalonia",
+      "component": "date-time",
+      "mode": "crossPlatform",
+      "token": "date.time.surface",
+      "fixture": {
+        "page": "visual/date-time/calendar",
+        "theme": "light",
+        "density": "default",
+        "variant": "calendar-grid",
+        "size": "md",
+        "state": "selected-range-disabled-keyboard",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "system"
+      },
+      "coverage": {
+        "controls": ["FsusCalendar"],
+        "states": ["date-selection", "range-selection", "disabled-date", "keyboard-navigation", "locale-format"],
+        "themes": ["light", "dark", "high-contrast"],
+        "densities": ["compact", "default", "spacious"],
+        "motionModes": ["system", "enabled", "reduced", "disabled"]
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/date-time-calendar-stable28-grid.png",
+        "geometry": { "x": 24, "y": 28, "width": 360, "height": 320 },
+        "color": {
+          "token": "date.time.surface",
+          "lab": [55, 3, -11]
+        },
+        "radius": 8,
+        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 8 },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/date-time-calendar-stable28-grid.png",
+        "geometry": { "x": 24.7, "y": 28.8, "width": 360.8, "height": 320.7 },
+        "color": {
+          "token": "date.time.surface",
+          "lab": [55.3, 3.1, -11.2]
+        },
+        "radius": 8.4,
+        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 8.4 },
+        "textBaseline": 24.7
+      },
+      "screenshotDiffPercent": 0.012,
+      "perceptualDelta": 0.05
+    },
+    {
+      "id": "date-time-picker-stable28-panel-web-avalonia",
+      "component": "date-time",
+      "mode": "crossPlatform",
+      "token": "date.time.surface",
+      "fixture": {
+        "page": "visual/date-time/picker-panel",
+        "theme": "light",
+        "density": "default",
+        "variant": "date-time-picker-panel",
+        "size": "md",
+        "state": "date-shortcut-time-range-clearable",
+        "locale": "en-US",
+        "direction": "ltr",
+        "motionMode": "system"
+      },
+      "coverage": {
+        "controls": ["FsusDatePicker", "FsusTimePicker", "FsusTimeSelect", "FsusCalendar"],
+        "states": ["display-text", "value-binding", "clearable", "shortcuts", "disabled-time", "time-range"],
+        "themes": ["light", "dark", "high-contrast"],
+        "densities": ["compact", "default", "spacious"],
+        "motionModes": ["system", "enabled", "reduced", "disabled"]
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/date-time-picker-stable28-panel.png",
+        "geometry": { "x": 24, "y": 28, "width": 520, "height": 360 },
+        "color": {
+          "token": "date.time.surface",
+          "lab": [55, 3, -11]
+        },
+        "radius": 8,
+        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 10 },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/date-time-picker-stable28-panel.png",
+        "geometry": { "x": 24.8, "y": 28.7, "width": 520.8, "height": 360.8 },
+        "color": {
+          "token": "date.time.surface",
+          "lab": [55.3, 3.2, -11.2]
+        },
+        "radius": 8.4,
+        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 10.4 },
+        "textBaseline": 24.8
+      },
+      "screenshotDiffPercent": 0.012,
+      "perceptualDelta": 0.05
+    },
+    {
+      "id": "date-time-picker-stable28-compact-web-avalonia",
+      "component": "date-time",
+      "mode": "crossPlatform",
+      "token": "date.time.surface",
+      "fixture": {
+        "page": "visual/date-time/compact",
+        "theme": "light",
+        "density": "compact",
+        "variant": "date-time-compact-density",
+        "size": "sm",
+        "state": "compact-calendar-time-select",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "coverage": {
+        "controls": ["FsusDatePicker", "FsusTimePicker", "FsusTimeSelect", "FsusCalendar"],
+        "states": ["compact-density", "reduced-motion", "selected-date", "selected-time"],
+        "themes": ["light", "dark", "high-contrast"],
+        "densities": ["compact", "default", "spacious"],
+        "motionModes": ["system", "enabled", "reduced", "disabled"]
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/date-time-picker-stable28-compact.png",
+        "geometry": { "x": 24, "y": 28, "width": 480, "height": 300 },
+        "color": {
+          "token": "date.time.surface",
+          "lab": [55, 3, -11]
+        },
+        "radius": 8,
+        "spacing": { "paddingX": 10, "paddingY": 6, "gap": 8 },
+        "textBaseline": 22
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/date-time-picker-stable28-compact.png",
+        "geometry": { "x": 24.7, "y": 28.7, "width": 480.8, "height": 300.7 },
+        "color": {
+          "token": "date.time.surface",
+          "lab": [55.3, 3.2, -11.2]
+        },
+        "radius": 8.4,
+        "spacing": { "paddingX": 10.4, "paddingY": 6.3, "gap": 8.4 },
+        "textBaseline": 22.7
+      },
+      "screenshotDiffPercent": 0.012,
+      "perceptualDelta": 0.05
     }
   ]
 }

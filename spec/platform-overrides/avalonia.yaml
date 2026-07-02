@@ -43,3 +43,18 @@ overrides:
     owner: fsusui-core
     reviewAfter: 2026-09-01
     linkedIssues: [151]
+  - id: avalonia-date-time-native-picker-001
+    area: behavior
+    component: date-time-pickers
+    platform: avalonia
+    status: accepted
+    reason: Avalonia date and time controls may use native picker, calendar, and automation primitives while preserving stable public values and deterministic formatting.
+    affectedContracts:
+      [component.common-picker, component.el-calendar, component.el-date-picker, component.el-time-picker, component.el-time-select]
+    visualThreshold: low
+    behaviorExpectation: Native panel structure may differ from Web, but value binding, disabled dates and times, clear behavior, keyboard navigation, locale formatting, ranges, shortcuts, and accessibility state must remain equivalent.
+    allowedDeviation: low
+    testPolicy: contract-visual-and-accessibility
+    owner: fsusui-core
+    reviewAfter: 2026-09-01
+    linkedIssues: [157]

@@ -8,7 +8,9 @@ active override id appears here.
 | ----------------------------------------- | --------------------- | ---------------- | ---------------- | ---------------------------------- | ------------ |
 | `accessibility-automation-name-001`       | button, icon          | all              | none             | accessibility-contract             | 2026-09-01   |
 | `avalonia-control-template-native-001`    | button, input, select | avalonia         | low              | contract-and-accessibility         | 2026-09-01   |
+| `avalonia-date-time-native-picker-001`    | date/time pickers     | avalonia         | low              | contract-visual-and-accessibility  | 2026-09-01   |
 | `avalonia-icon-streamgeometry-001`        | icon                  | avalonia         | low              | icon-alignment-threshold           | 2026-09-01   |
+| `avalonia-layout-panel-measure-001`       | layout primitives     | avalonia         | medium           | layout-geometry-threshold          | 2026-09-01   |
 | `avalonia-linux-window-shadow-001`        | dialog                | avalonia-linux   | medium           | visual-threshold                   | 2026-09-01   |
 | `avalonia-linux-font-rasterization-001`   | text                  | avalonia-linux   | medium           | typography-baseline-threshold      | 2026-09-01   |
 | `avalonia-macos-text-smoothing-001`       | text                  | avalonia-macos   | medium           | visual-threshold                   | 2026-09-01   |

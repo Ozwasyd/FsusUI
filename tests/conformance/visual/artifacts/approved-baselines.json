@@ -3,7 +3,7 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "fixtureSource": {
     "path": "tests/conformance/visual/fixtures/visual-comparisons.json",
-    "sha256": "93e979cdc8040a76a9ab8a4c071694af3a01d1e2f55e1715a88392eb51a0c6ca"
+    "sha256": "158a1c1d758b9f15fbbda7c6356a29c9527b7477c1725bd3a304492006e1579d"
   },
   "artifactRoot": "tests/conformance/visual/artifacts",
   "thresholds": {
@@ -1135,6 +1135,186 @@
         },
         "textBaseline": 24.7
       }
+    },
+    {
+      "id": "date-time-calendar-stable28-grid-web-avalonia",
+      "component": "date-time",
+      "fixture": {
+        "page": "visual/date-time/calendar",
+        "theme": "light",
+        "density": "default",
+        "variant": "calendar-grid",
+        "size": "md",
+        "state": "selected-range-disabled-keyboard",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "system"
+      },
+      "token": "date.time.surface",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/date-time-calendar-stable28-grid.png",
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 360,
+          "height": 320
+        },
+        "color": {
+          "token": "date.time.surface",
+          "lab": [55, 3, -11]
+        },
+        "radius": 8,
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 8
+        },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/date-time-calendar-stable28-grid.png",
+        "geometry": {
+          "x": 24.7,
+          "y": 28.8,
+          "width": 360.8,
+          "height": 320.7
+        },
+        "color": {
+          "token": "date.time.surface",
+          "lab": [55.3, 3.1, -11.2]
+        },
+        "radius": 8.4,
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 8.4
+        },
+        "textBaseline": 24.7
+      }
+    },
+    {
+      "id": "date-time-picker-stable28-panel-web-avalonia",
+      "component": "date-time",
+      "fixture": {
+        "page": "visual/date-time/picker-panel",
+        "theme": "light",
+        "density": "default",
+        "variant": "date-time-picker-panel",
+        "size": "md",
+        "state": "date-shortcut-time-range-clearable",
+        "locale": "en-US",
+        "direction": "ltr",
+        "motionMode": "system"
+      },
+      "token": "date.time.surface",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/date-time-picker-stable28-panel.png",
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 520,
+          "height": 360
+        },
+        "color": {
+          "token": "date.time.surface",
+          "lab": [55, 3, -11]
+        },
+        "radius": 8,
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 10
+        },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/date-time-picker-stable28-panel.png",
+        "geometry": {
+          "x": 24.8,
+          "y": 28.7,
+          "width": 520.8,
+          "height": 360.8
+        },
+        "color": {
+          "token": "date.time.surface",
+          "lab": [55.3, 3.2, -11.2]
+        },
+        "radius": 8.4,
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 10.4
+        },
+        "textBaseline": 24.8
+      }
+    },
+    {
+      "id": "date-time-picker-stable28-compact-web-avalonia",
+      "component": "date-time",
+      "fixture": {
+        "page": "visual/date-time/compact",
+        "theme": "light",
+        "density": "compact",
+        "variant": "date-time-compact-density",
+        "size": "sm",
+        "state": "compact-calendar-time-select",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "date.time.surface",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/date-time-picker-stable28-compact.png",
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 480,
+          "height": 300
+        },
+        "color": {
+          "token": "date.time.surface",
+          "lab": [55, 3, -11]
+        },
+        "radius": 8,
+        "spacing": {
+          "paddingX": 10,
+          "paddingY": 6,
+          "gap": 8
+        },
+        "textBaseline": 22
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/date-time-picker-stable28-compact.png",
+        "geometry": {
+          "x": 24.7,
+          "y": 28.7,
+          "width": 480.8,
+          "height": 300.7
+        },
+        "color": {
+          "token": "date.time.surface",
+          "lab": [55.3, 3.2, -11.2]
+        },
+        "radius": 8.4,
+        "spacing": {
+          "paddingX": 10.4,
+          "paddingY": 6.3,
+          "gap": 8.4
+        },
+        "textBaseline": 22.7
+      }
     }
   ],
   "approvedComparisons": [
@@ -1245,6 +1425,24 @@
       "mode": "crossPlatform",
       "platform": "web->avalonia",
       "diffArtifact": "tests/conformance/visual/artifacts/diffs/picker-stable27-web-avalonia.json"
+    },
+    {
+      "id": "date-time-calendar-stable28-grid-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/date-time-calendar-stable28-grid-web-avalonia.json"
+    },
+    {
+      "id": "date-time-picker-stable28-panel-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/date-time-picker-stable28-panel-web-avalonia.json"
+    },
+    {
+      "id": "date-time-picker-stable28-compact-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/date-time-picker-stable28-compact-web-avalonia.json"
     }
   ]
 }
