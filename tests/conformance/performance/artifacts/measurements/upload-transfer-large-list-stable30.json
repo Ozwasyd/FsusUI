@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/avalonia-performance-budget.mjs",
+  "measurement": {
+    "id": "upload-transfer-large-list-stable30",
+    "component": "upload-transfer",
+    "scenario": "construct-filter-move-virtualized-transfer-list",
+    "metrics": {
+      "constructionMs": 2.5,
+      "firstLayoutMs": 6.1,
+      "interactionLatencyMs": 7.4,
+      "frameTimeMs": 11.8,
+      "allocationsKb": 164,
+      "retainedControlCount": 58,
+      "disposalMs": 1.1,
+      "mountUnmountCycles": 80
+    },
+    "artifact": "tests/conformance/performance/artifacts/measurements/upload-transfer-large-list-stable30.json"
+  }
+}

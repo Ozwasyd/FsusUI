@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "spec/components/avalonia-stable-performance-budgets.json",
-      "sha256": "0f6a7561cebfa04509e7ddf851bfe35b58b5edf1dbde39d356e86e5b43581a77"
+      "sha256": "0b6ee86bbb5af9f3de68021a8284d11c24e08575608726a6a63e64d9517a45c1"
     },
     {
       "path": "tests/conformance/performance/avalonia-measurements.json",
-      "sha256": "8ad58f0324d56612d03987879f6b0c02a4f0335351399db26fc5152382c625b5"
+      "sha256": "498ec9e343ac464932fe3278b6e8138e97b29a52dc809c7cb676323ad30d3b7c"
     },
     {
       "path": "tests/conformance/performance/data-size-fixtures.json",
@@ -16,9 +16,9 @@
     }
   ],
   "summary": {
-    "budgetedComponents": 18,
-    "measurements": 9,
-    "passed": 9,
+    "budgetedComponents": 19,
+    "measurements": 10,
+    "passed": 10,
     "dataSizeFixtures": 5
   },
   "dataSizeFixtures": [
@@ -320,6 +320,34 @@
       "artifact": "tests/conformance/performance/artifacts/measurements/picker-virtualized-list-stable27.json",
       "passed": true,
       "errors": []
+    },
+    {
+      "id": "upload-transfer-large-list-stable30",
+      "component": "upload-transfer",
+      "scenario": "construct-filter-move-virtualized-transfer-list",
+      "metrics": {
+        "constructionMs": 2.5,
+        "firstLayoutMs": 6.1,
+        "interactionLatencyMs": 7.4,
+        "frameTimeMs": 11.8,
+        "allocationsKb": 164,
+        "retainedControlCount": 58,
+        "disposalMs": 1.1,
+        "mountUnmountCycles": 80
+      },
+      "budgets": {
+        "constructionMs": 3.4,
+        "firstLayoutMs": 8,
+        "interactionLatencyMs": 11,
+        "frameTimeMs": 16,
+        "allocationsKb": 196,
+        "retainedControlCount": 80,
+        "disposalMs": 1.8,
+        "mountUnmountCycles": 50
+      },
+      "artifact": "tests/conformance/performance/artifacts/measurements/upload-transfer-large-list-stable30.json",
+      "passed": true,
+      "errors": []
     }
   ],
   "measurementOutput": [
@@ -331,6 +359,7 @@
     "tests/conformance/performance/artifacts/measurements/menu-navigation-repeated-mount.json",
     "tests/conformance/performance/artifacts/measurements/form-validation-repeated-mount.json",
     "tests/conformance/performance/artifacts/measurements/service-helper-stable26-repeated-show-close.json",
-    "tests/conformance/performance/artifacts/measurements/picker-virtualized-list-stable27.json"
+    "tests/conformance/performance/artifacts/measurements/picker-virtualized-list-stable27.json",
+    "tests/conformance/performance/artifacts/measurements/upload-transfer-large-list-stable30.json"
   ]
 }

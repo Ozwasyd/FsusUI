@@ -262,6 +262,20 @@
         "disposalMs": 1.5,
         "mountUnmountCycles": 50
       }
+    },
+    {
+      "id": "upload-transfer",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 3.4,
+        "firstLayoutMs": 8,
+        "interactionLatencyMs": 11,
+        "frameTimeMs": 16,
+        "allocationsKb": 196,
+        "retainedControlCount": 80,
+        "disposalMs": 1.8,
+        "mountUnmountCycles": 50
+      }
     }
   ]
 }

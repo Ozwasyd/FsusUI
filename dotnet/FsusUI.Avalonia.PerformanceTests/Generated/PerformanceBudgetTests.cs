@@ -17,6 +17,7 @@ public class PerformanceBudgetTests
     yield return new object[] { "form-validation-repeated-mount", "form", 1.7, 2.4, 5.2, 7, 132, 160, 12, 16, 80, 50 };
     yield return new object[] { "service-helper-stable26-repeated-show-close", "service-helper", 1.8, 2.6, 5.4, 7, 136, 168, 10, 16, 80, 50 };
     yield return new object[] { "picker-virtualized-list-stable27", "picker-virtualized-list", 2.1, 3, 5.8, 7.5, 148, 176, 28, 32, 80, 50 };
+    yield return new object[] { "upload-transfer-large-list-stable30", "upload-transfer", 2.5, 3.4, 6.1, 8, 164, 196, 58, 80, 80, 50 };
   }
 
   [Theory]
