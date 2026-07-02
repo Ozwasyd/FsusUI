@@ -1,0 +1,7 @@
+{
+  "packageId": "FsusUI.Avalonia.Icons",
+  "baselineVersion": "1.0.0",
+  "publicSymbols": [
+    "FsusIconKeys"
+  ]
+}

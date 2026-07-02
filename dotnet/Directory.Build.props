@@ -11,9 +11,13 @@
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>fsusui;avalonia;components;design-system;cross-platform</PackageTags>
-    <PackageReleaseNotes>Preview package candidate. See release-evidence/avalonia-preview for build, test, package, and platform evidence.</PackageReleaseNotes>
+    <PackageReleaseNotes>Stable Avalonia package candidate. Public API baselines, package metadata, symbol packages, dependency review, package content audit, and packed consumer verification guard stable NuGet readiness.</PackageReleaseNotes>
     <Deterministic>true</Deterministic>
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <DebugType>portable</DebugType>
     <PackageReadmeFile Condition="Exists('README.md')">README.md</PackageReadmeFile>
   </PropertyGroup>
 

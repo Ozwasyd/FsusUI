@@ -1,0 +1,8 @@
+{
+  "packageId": "FsusUI.Avalonia",
+  "baselineVersion": "1.0.0",
+  "publicSymbols": [
+    "FsusButton",
+    "FsusDefinitelyMissingStableApi"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "packageId": "FsusUI.Avalonia.Themes",
+  "baselineVersion": "1.0.0",
+  "publicSymbols": [
+    "FsusDensity",
+    "FsusMotionMode",
+    "FsusMotionModeChangedEventArgs",
+    "FsusMotionPhase",
+    "FsusMotionPlan",
+    "FsusMotionPreset",
+    "FsusMotionRequest",
+    "FsusMotionService",
+    "FsusMotionVisualState",
+    "FsusResolvedMotionMode",
+    "FsusThemeManager",
+    "FsusThemeMode",
+    "FsusThemeModeChangedEventArgs",
+    "FsusThemeModeToggle",
+    "FsusThemeModeToggleLabels",
+    "FsusThemeModeToggleVariant",
+    "FsusThemeModeToggleVisibility",
+    "FsusThemeOptions",
+    "FsusThemeResourceKeys",
+    "FsusThemeVariant",
+    "FsusTypographyOptions"
+  ]
+}
