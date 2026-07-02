@@ -43,7 +43,7 @@ public class FsusVirtualizationPrimitiveTests
 
     Assert.Equal(2, list.RetainedMeasurementCount);
     Assert.Equal(40, list.GetResolvedSize(499));
-    Assert.True(list.RealizedItems.Any(item => item.Index == 499));
+    Assert.Contains(list.RealizedItems, item => item.Index == 499);
   }
 
   [Fact]

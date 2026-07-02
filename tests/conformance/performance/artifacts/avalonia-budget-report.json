@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "spec/components/avalonia-stable-performance-budgets.json",
-      "sha256": "d55fc19fbaacd2f2ab81019618b41619cd179fe6545b65a76b4f58a27e99af3d"
+      "sha256": "db918a3df12828344c282f2794a01ff2de8f87d7ed35a0dd9681f2ca8dd0e4c4"
     },
     {
       "path": "tests/conformance/performance/avalonia-measurements.json",
-      "sha256": "345968d8772f0a57251b4d17efa8d1c3b95ecb2745a759c7193174a66875e853"
+      "sha256": "745fd9870473960f803e495ce015e399412b772220764ba492ad3190c71368d6"
     },
     {
       "path": "tests/conformance/performance/data-size-fixtures.json",
@@ -16,9 +16,9 @@
     }
   ],
   "summary": {
-    "budgetedComponents": 22,
-    "measurements": 13,
-    "passed": 13,
+    "budgetedComponents": 24,
+    "measurements": 15,
+    "passed": 15,
     "dataSizeFixtures": 5
   },
   "dataSizeFixtures": [
@@ -432,6 +432,62 @@
       "artifact": "tests/conformance/performance/artifacts/measurements/table-v2-two-axis-stable34.json",
       "passed": true,
       "errors": []
+    },
+    {
+      "id": "tree-lazy-virtualized-stable35",
+      "component": "tree",
+      "scenario": "construct-expand-filter-lazy-cancel-virtualized-tree-10k",
+      "metrics": {
+        "constructionMs": 3.2,
+        "firstLayoutMs": 7.8,
+        "interactionLatencyMs": 8.9,
+        "frameTimeMs": 12.6,
+        "allocationsKb": 196,
+        "retainedControlCount": 48,
+        "disposalMs": 1.5,
+        "mountUnmountCycles": 80
+      },
+      "budgets": {
+        "constructionMs": 4,
+        "firstLayoutMs": 9,
+        "interactionLatencyMs": 12,
+        "frameTimeMs": 16,
+        "allocationsKb": 240,
+        "retainedControlCount": 64,
+        "disposalMs": 2,
+        "mountUnmountCycles": 50
+      },
+      "artifact": "tests/conformance/performance/artifacts/measurements/tree-lazy-virtualized-stable35.json",
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "tree-table-virtualized-stable35",
+      "component": "tree-table",
+      "scenario": "construct-expand-scroll-tree-grid-10k-x-24",
+      "metrics": {
+        "constructionMs": 3.9,
+        "firstLayoutMs": 8.5,
+        "interactionLatencyMs": 9.8,
+        "frameTimeMs": 13,
+        "allocationsKb": 260,
+        "retainedControlCount": 640,
+        "disposalMs": 1.9,
+        "mountUnmountCycles": 80
+      },
+      "budgets": {
+        "constructionMs": 4.8,
+        "firstLayoutMs": 10,
+        "interactionLatencyMs": 13,
+        "frameTimeMs": 16,
+        "allocationsKb": 320,
+        "retainedControlCount": 768,
+        "disposalMs": 2.4,
+        "mountUnmountCycles": 50
+      },
+      "artifact": "tests/conformance/performance/artifacts/measurements/tree-table-virtualized-stable35.json",
+      "passed": true,
+      "errors": []
     }
   ],
   "measurementOutput": [
@@ -447,6 +503,8 @@
     "tests/conformance/performance/artifacts/measurements/upload-transfer-large-list-stable30.json",
     "tests/conformance/performance/artifacts/measurements/data-table-virtualized-grid-stable33.json",
     "tests/conformance/performance/artifacts/measurements/virtual-list-fixed-variable-stable34.json",
-    "tests/conformance/performance/artifacts/measurements/table-v2-two-axis-stable34.json"
+    "tests/conformance/performance/artifacts/measurements/table-v2-two-axis-stable34.json",
+    "tests/conformance/performance/artifacts/measurements/tree-lazy-virtualized-stable35.json",
+    "tests/conformance/performance/artifacts/measurements/tree-table-virtualized-stable35.json"
   ]
 }

@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "tests/conformance/accessibility/contracts.json",
-      "sha256": "34dcf44113227479f7e743dd0a56f9b47ab6e3134bb219e757fe57c598345475"
+      "sha256": "69f3c61a5a26505ec1a0982e5d253160fc48ca598f2a31737160fdc7dbecb217"
     },
     {
       "path": "tests/conformance/accessibility/automation-snapshots.json",
-      "sha256": "2379f63b0a42e0db22ebabe7619f22a7c83dee98338fc91f5fb93b0cd7ba06b1"
+      "sha256": "088985eca47946404e316b06ff49b97dd2495a4203aebb13b8047caf3eaeb53f"
     }
   ],
   "requiredContractFields": [
@@ -23,9 +23,9 @@
     "keyboardNavigation"
   ],
   "summary": {
-    "controls": 24,
-    "snapshots": 27,
-    "passed": 27,
+    "controls": 26,
+    "snapshots": 29,
+    "passed": 29,
     "appiumReleaseGates": 2,
     "allowedByOverride": 0
   },
@@ -638,6 +638,50 @@
       "tabOrder": 27,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/table-v2-stable34.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "tree-stable35",
+      "component": "tree",
+      "platform": "avalonia",
+      "role": "tree",
+      "accessibleName": "Release tree",
+      "value": "4 nodes, level 2 child selected checked expanded",
+      "states": {
+        "disabled": null,
+        "selected": true,
+        "checked": true,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["ArrowDown", "ArrowRight", "ArrowLeft", "Space"],
+      "tabOrder": 28,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/tree-stable35.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "tree-table-stable35",
+      "component": "tree-table",
+      "platform": "avalonia",
+      "role": "grid",
+      "accessibleName": "Tree table",
+      "value": "36 tree rows, 4 columns, row level and expanded state exposed",
+      "states": {
+        "disabled": null,
+        "selected": true,
+        "checked": null,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["ArrowDown", "ArrowRight", "Space"],
+      "tabOrder": 29,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/tree-table-stable35.json",
       "allowedByOverride": [],
       "passed": true,
       "errors": []

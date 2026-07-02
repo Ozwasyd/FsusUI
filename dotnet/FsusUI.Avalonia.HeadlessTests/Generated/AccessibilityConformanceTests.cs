@@ -35,6 +35,8 @@ public class AccessibilityConformanceTests
     yield return new object[] { "data-table-stable33", "data-table", "grid", "Release table", 4, 25 };
     yield return new object[] { "virtualization-stable34", "virtual-list", "list", "Activity stream", 2, 26 };
     yield return new object[] { "table-v2-stable34", "table-v2", "grid", "Large table", 2, 27 };
+    yield return new object[] { "tree-stable35", "tree", "tree", "Release tree", 4, 28 };
+    yield return new object[] { "tree-table-stable35", "tree-table", "grid", "Tree table", 3, 29 };
   }
 
   [Theory]

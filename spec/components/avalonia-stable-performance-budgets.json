@@ -318,6 +318,34 @@
         "disposalMs": 2.2,
         "mountUnmountCycles": 50
       }
+    },
+    {
+      "id": "tree",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 4,
+        "firstLayoutMs": 9,
+        "interactionLatencyMs": 12,
+        "frameTimeMs": 16,
+        "allocationsKb": 240,
+        "retainedControlCount": 64,
+        "disposalMs": 2,
+        "mountUnmountCycles": 50
+      }
+    },
+    {
+      "id": "tree-table",
+      "stability": "stable",
+      "budgets": {
+        "constructionMs": 4.8,
+        "firstLayoutMs": 10,
+        "interactionLatencyMs": 13,
+        "frameTimeMs": 16,
+        "allocationsKb": 320,
+        "retainedControlCount": 768,
+        "disposalMs": 2.4,
+        "mountUnmountCycles": 50
+      }
     }
   ]
 }

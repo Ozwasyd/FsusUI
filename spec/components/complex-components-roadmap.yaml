@@ -38,12 +38,12 @@ components:
     followUpIssue: Plan FsusFileManager async directory and permission model.
   - id: tree
     publicName: FsusTree
-    phase: deferred
-    followUpIssue: Plan FsusTree hierarchy, keyboard, and lazy loading.
+    phase: stable
+    followUpIssue: Implemented in Avalonia Stable 35 with lazy loading and virtualized tree rows.
   - id: tree-table
     publicName: FsusTreeTable
-    phase: deferred
-    followUpIssue: Plan FsusTreeTable nested rows and column virtualization.
+    phase: stable
+    followUpIssue: Implemented in Avalonia Stable 35 with tree-grid row and column virtualization.
   - id: code-block
     publicName: FsusCodeBlock
     phase: deferred

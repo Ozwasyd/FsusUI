@@ -208,6 +208,38 @@
         "mountUnmountCycles": 80
       },
       "artifact": "tests/conformance/performance/artifacts/measurements/table-v2-two-axis-stable34.json"
+    },
+    {
+      "id": "tree-lazy-virtualized-stable35",
+      "component": "tree",
+      "scenario": "construct-expand-filter-lazy-cancel-virtualized-tree-10k",
+      "metrics": {
+        "constructionMs": 3.2,
+        "firstLayoutMs": 7.8,
+        "interactionLatencyMs": 8.9,
+        "frameTimeMs": 12.6,
+        "allocationsKb": 196,
+        "retainedControlCount": 48,
+        "disposalMs": 1.5,
+        "mountUnmountCycles": 80
+      },
+      "artifact": "tests/conformance/performance/artifacts/measurements/tree-lazy-virtualized-stable35.json"
+    },
+    {
+      "id": "tree-table-virtualized-stable35",
+      "component": "tree-table",
+      "scenario": "construct-expand-scroll-tree-grid-10k-x-24",
+      "metrics": {
+        "constructionMs": 3.9,
+        "firstLayoutMs": 8.5,
+        "interactionLatencyMs": 9.8,
+        "frameTimeMs": 13,
+        "allocationsKb": 260,
+        "retainedControlCount": 640,
+        "disposalMs": 1.9,
+        "mountUnmountCycles": 80
+      },
+      "artifact": "tests/conformance/performance/artifacts/measurements/tree-table-virtualized-stable35.json"
     }
   ]
 }

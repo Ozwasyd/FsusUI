@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "tree-table-stable35",
+    "component": "tree-table",
+    "platform": "avalonia",
+    "control": "FsusTreeTable",
+    "evidenceSource": "avalonia-headless",
+    "role": "grid",
+    "accessibleName": "Tree table",
+    "value": "36 tree rows, 4 columns, row level and expanded state exposed",
+    "states": {
+      "disabled": null,
+      "selected": true,
+      "checked": null,
+      "expanded": true,
+      "invalid": null
+    },
+    "keyboard": ["ArrowDown", "ArrowRight", "Space"],
+    "keyboardOperable": true,
+    "tabOrder": 29,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/tree-table-stable35.json"
+  }
+}

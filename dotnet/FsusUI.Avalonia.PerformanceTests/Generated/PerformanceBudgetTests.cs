@@ -21,6 +21,8 @@ public class PerformanceBudgetTests
     yield return new object[] { "data-table-virtualized-grid-stable33", "data-table", 3.2, 4.4, 7.4, 9, 212, 256, 640, 720, 80, 50 };
     yield return new object[] { "virtual-list-fixed-variable-stable34", "virtual-list", 2.8, 3.6, 6.9, 8, 156, 192, 48, 64, 80, 50 };
     yield return new object[] { "table-v2-two-axis-stable34", "table-v2", 3.8, 4.6, 8.2, 9.5, 244, 288, 1320, 1536, 80, 50 };
+    yield return new object[] { "tree-lazy-virtualized-stable35", "tree", 3.2, 4, 7.8, 9, 196, 240, 48, 64, 80, 50 };
+    yield return new object[] { "tree-table-virtualized-stable35", "tree-table", 3.9, 4.8, 8.5, 10, 260, 320, 640, 768, 80, 50 };
   }
 
   [Theory]

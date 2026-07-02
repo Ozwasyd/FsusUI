@@ -3,7 +3,7 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "fixtureSource": {
     "path": "tests/conformance/visual/fixtures/visual-comparisons.json",
-    "sha256": "61f9bb1ba65141ae466502fa307d0988c0732cc06d877e699680d6e8663e26de"
+    "sha256": "daf7497c57ac65bb071ba0b1c8b757a4fae6f97eb8d4ad2ddcb29ac6e67c6b12"
   },
   "artifactRoot": "tests/conformance/visual/artifacts",
   "thresholds": {
@@ -1855,6 +1855,66 @@
         },
         "textBaseline": 24.7
       }
+    },
+    {
+      "id": "tree-stable35-web-avalonia",
+      "component": "tree",
+      "fixture": {
+        "page": "visual/tree",
+        "theme": "light",
+        "density": "default",
+        "variant": "tree-v2-tree-select-tree-table",
+        "size": "lg",
+        "state": "expanded-selected-checked-lazy-filtered-virtualized-overlay-tree-table",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "tree.surface",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/tree-stable35.png",
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 780,
+          "height": 480
+        },
+        "color": {
+          "token": "tree.surface",
+          "lab": [56, 2, -10]
+        },
+        "radius": 8,
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 10
+        },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/tree-stable35.png",
+        "geometry": {
+          "x": 24.8,
+          "y": 28.8,
+          "width": 780.8,
+          "height": 480.8
+        },
+        "color": {
+          "token": "tree.surface",
+          "lab": [56.3, 2.1, -10.2]
+        },
+        "radius": 8.4,
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 10.4
+        },
+        "textBaseline": 24.7
+      }
     }
   ],
   "approvedComparisons": [
@@ -2037,6 +2097,12 @@
       "mode": "crossPlatform",
       "platform": "web->avalonia",
       "diffArtifact": "tests/conformance/visual/artifacts/diffs/virtualization-stable34-web-avalonia.json"
+    },
+    {
+      "id": "tree-stable35-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/tree-stable35-web-avalonia.json"
     }
   ]
 }

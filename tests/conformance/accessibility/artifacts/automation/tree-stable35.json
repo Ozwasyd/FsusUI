@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "tree-stable35",
+    "component": "tree",
+    "platform": "avalonia",
+    "control": "FsusTree",
+    "evidenceSource": "avalonia-headless",
+    "role": "tree",
+    "accessibleName": "Release tree",
+    "value": "4 nodes, level 2 child selected checked expanded",
+    "states": {
+      "disabled": null,
+      "selected": true,
+      "checked": true,
+      "expanded": true,
+      "invalid": null
+    },
+    "keyboard": ["ArrowDown", "ArrowRight", "ArrowLeft", "Space"],
+    "keyboardOperable": true,
+    "tabOrder": 28,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/tree-stable35.json"
+  }
+}

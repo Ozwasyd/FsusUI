@@ -1666,6 +1666,58 @@
       },
       "screenshotDiffPercent": 0.012,
       "perceptualDelta": 0.05
+    },
+    {
+      "id": "tree-stable35-web-avalonia",
+      "component": "tree",
+      "mode": "crossPlatform",
+      "token": "tree.surface",
+      "fixture": {
+        "page": "visual/tree",
+        "theme": "light",
+        "density": "default",
+        "variant": "tree-v2-tree-select-tree-table",
+        "size": "lg",
+        "state": "expanded-selected-checked-lazy-filtered-virtualized-overlay-tree-table",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "coverage": {
+        "controls": ["FsusTree", "FsusTreeV2", "FsusTreeSelect", "FsusTreeTable"],
+        "states": ["expanded", "selected", "checked", "lazy-loaded", "filtered", "virtualized", "overlay-open", "tree-table"],
+        "themes": ["light", "dark", "high-contrast"],
+        "densities": ["compact", "default", "spacious"],
+        "motionModes": ["system", "enabled", "reduced", "disabled"]
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/tree-stable35.png",
+        "geometry": { "x": 24, "y": 28, "width": 780, "height": 480 },
+        "color": {
+          "token": "tree.surface",
+          "lab": [56, 2, -10]
+        },
+        "radius": 8,
+        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 10 },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/tree-stable35.png",
+        "geometry": { "x": 24.8, "y": 28.8, "width": 780.8, "height": 480.8 },
+        "color": {
+          "token": "tree.surface",
+          "lab": [56.3, 2.1, -10.2]
+        },
+        "radius": 8.4,
+        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 10.4 },
+        "textBaseline": 24.7
+      },
+      "screenshotDiffPercent": 0.012,
+      "perceptualDelta": 0.05
     }
   ]
 }

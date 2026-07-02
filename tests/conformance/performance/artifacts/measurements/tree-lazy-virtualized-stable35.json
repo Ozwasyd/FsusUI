@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/avalonia-performance-budget.mjs",
+  "measurement": {
+    "id": "tree-lazy-virtualized-stable35",
+    "component": "tree",
+    "scenario": "construct-expand-filter-lazy-cancel-virtualized-tree-10k",
+    "metrics": {
+      "constructionMs": 3.2,
+      "firstLayoutMs": 7.8,
+      "interactionLatencyMs": 8.9,
+      "frameTimeMs": 12.6,
+      "allocationsKb": 196,
+      "retainedControlCount": 48,
+      "disposalMs": 1.5,
+      "mountUnmountCycles": 80
+    },
+    "artifact": "tests/conformance/performance/artifacts/measurements/tree-lazy-virtualized-stable35.json"
+  }
+}

@@ -568,6 +568,48 @@
       "keyboardOperable": true,
       "tabOrder": 27,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/table-v2-stable34.json"
+    },
+    {
+      "id": "tree-stable35",
+      "component": "tree",
+      "platform": "avalonia",
+      "control": "FsusTree",
+      "evidenceSource": "avalonia-headless",
+      "role": "tree",
+      "accessibleName": "Release tree",
+      "value": "4 nodes, level 2 child selected checked expanded",
+      "states": {
+        "disabled": null,
+        "selected": true,
+        "checked": true,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["ArrowDown", "ArrowRight", "ArrowLeft", "Space"],
+      "keyboardOperable": true,
+      "tabOrder": 28,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/tree-stable35.json"
+    },
+    {
+      "id": "tree-table-stable35",
+      "component": "tree-table",
+      "platform": "avalonia",
+      "control": "FsusTreeTable",
+      "evidenceSource": "avalonia-headless",
+      "role": "grid",
+      "accessibleName": "Tree table",
+      "value": "36 tree rows, 4 columns, row level and expanded state exposed",
+      "states": {
+        "disabled": null,
+        "selected": true,
+        "checked": null,
+        "expanded": true,
+        "invalid": null
+      },
+      "keyboard": ["ArrowDown", "ArrowRight", "Space"],
+      "keyboardOperable": true,
+      "tabOrder": 29,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/tree-table-stable35.json"
     }
   ],
   "appiumReleaseGates": [

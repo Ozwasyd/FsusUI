@@ -35,4 +35,5 @@
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/Media.axaml" />
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/DataTable.axaml" />
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/Virtualization.axaml" />
+  <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/Tree.axaml" />
 </Styles>

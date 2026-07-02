@@ -3,8 +3,8 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "artifactRoot": "tests/conformance/visual/artifacts",
   "summary": {
-    "total": 30,
-    "passed": 30,
+    "total": 31,
+    "passed": 31,
     "allowedByOverride": 2
   },
   "comparisons": [
@@ -930,6 +930,37 @@
       "token": "virtualization.surface",
       "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/virtualization-stable34.png",
       "diffArtifact": "tests/conformance/visual/artifacts/diffs/virtualization-stable34-web-avalonia.json",
+      "deltas": {
+        "geometry": 0.8000000000000114,
+        "colorDelta": 0.3741657386773915,
+        "radius": 0.40000000000000036,
+        "spacing": 0.40000000000000036,
+        "textBaseline": 0.6999999999999993,
+        "screenshotDiffPercent": 0.012,
+        "perceptualDelta": 0.05
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "tree-stable35-web-avalonia",
+      "component": "tree",
+      "state": "expanded-selected-checked-lazy-filtered-virtualized-overlay-tree-table",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "tree.surface",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/tree-stable35.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/tree-stable35-web-avalonia.json",
       "deltas": {
         "geometry": 0.8000000000000114,
         "colorDelta": 0.3741657386773915,
