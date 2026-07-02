@@ -1,0 +1,36 @@
+# Text viewer
+
+Component ID: `text-viewer`
+
+## Avalonia API
+
+Use `FsusTextViewer`, `FsusTextContentBlock`, `FsusTextBlockKind`, and text
+viewer budget records for large read-only content.
+
+## Vue Contract Mapping
+
+Vue markdown or article viewer concepts map to a sanitized block model,
+heading levels, copied text, search highlights, and render budgets.
+
+## Supported Platform Differences
+
+Text measurement, wrapping, and baseline thresholds follow
+`docs/avalonia/platform-differences.md`.
+
+## Theme Tokens
+
+Text viewer uses text, muted text, surface, border, focus, density, and motion
+resources.
+
+## Minimal Avalonia Example
+
+```csharp
+using FsusUI.Avalonia.Controls;
+
+var viewer = new FsusTextViewer { AccessibleName = "Release notes" };
+viewer.Blocks.Add(new FsusTextContentBlock(FsusTextBlockKind.Heading, "Changes", 1));
+```
+
+## Known Limitations
+
+Parsing untrusted markdown is not included; pass sanitized blocks.

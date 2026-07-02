@@ -103,6 +103,7 @@
     "check:package-artifact-reuse": "node ./scripts/with-node-heap.mjs node ./scripts/check-package-artifact-reuse-policy.mjs",
     "check:avalonia-motion-contract": "node ./scripts/with-node-heap.mjs node ./scripts/check-avalonia-motion-contract.mjs",
     "check:avalonia-stable-readiness": "node ./scripts/with-node-heap.mjs node ./scripts/check-avalonia-stable-readiness.mjs",
+    "check:avalonia-docs": "node ./scripts/with-node-heap.mjs node ./scripts/check-avalonia-docs.mjs",
     "avalonia:performance:generate": "node ./scripts/with-node-heap.mjs node ./scripts/avalonia-performance-budget.mjs generate",
     "avalonia:performance:check": "node ./scripts/with-node-heap.mjs node ./scripts/avalonia-performance-budget.mjs check",
     "avalonia:performance": "node ./scripts/with-node-heap.mjs node ./scripts/avalonia-performance-budget.mjs check",

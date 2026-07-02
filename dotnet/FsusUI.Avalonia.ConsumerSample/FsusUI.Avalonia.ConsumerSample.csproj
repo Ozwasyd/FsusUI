@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FsusUI.Avalonia\FsusUI.Avalonia.csproj" />
+    <ProjectReference Include="..\FsusUI.Avalonia.Themes\FsusUI.Avalonia.Themes.csproj" />
+    <ProjectReference Include="..\FsusUI.Avalonia.Icons\FsusUI.Avalonia.Icons.csproj" />
+  </ItemGroup>
+</Project>

@@ -5,6 +5,9 @@ It consumes generated resources from `Generated/FsusTokens.axaml` and layers
 hand-authored light/dark, density, focus, disabled, loading, overlay, and motion
 resources on top.
 
+For adoption setup, package references, and clean sample verification, see
+[`docs/avalonia/installation.md`](../../docs/avalonia/installation.md).
+
 ## Import
 
 ```xml

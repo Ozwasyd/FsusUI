@@ -3,6 +3,9 @@
 `FsusUI.Avalonia.Icons` provides Avalonia icon resources generated from
 `spec/icons/registry.yaml`.
 
+For adoption setup, package references, and clean sample verification, see
+[`docs/avalonia/installation.md`](../../docs/avalonia/installation.md).
+
 ## Import
 
 ```xml
