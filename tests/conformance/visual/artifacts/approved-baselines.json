@@ -3,7 +3,7 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "fixtureSource": {
     "path": "tests/conformance/visual/fixtures/visual-comparisons.json",
-    "sha256": "1328188d719091aa7061f95fdd285623dbb3b09944fd1b8355f8763c0427ba2c"
+    "sha256": "32bb4126c584065d193ad72bfa067ec09af04e70da63f300ed7306dfec07f185"
   },
   "artifactRoot": "tests/conformance/visual/artifacts",
   "thresholds": {
@@ -2335,6 +2335,66 @@
         },
         "textBaseline": 24.7
       }
+    },
+    {
+      "id": "locale-formatting-stable41-web-avalonia",
+      "component": "locale-formatting",
+      "fixture": {
+        "page": "visual/locale-formatting",
+        "theme": "light",
+        "density": "compact",
+        "variant": "long-localized-labels-compact-density",
+        "size": "lg",
+        "state": "english-simplified-chinese-fallback-date-number-direction",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "token": "locale.formatting.surface",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/locale-formatting-stable41.png",
+        "geometry": {
+          "x": 24,
+          "y": 28,
+          "width": 780,
+          "height": 360
+        },
+        "color": {
+          "token": "locale.formatting.surface",
+          "lab": [56, 2, -10]
+        },
+        "radius": 8,
+        "spacing": {
+          "paddingX": 12,
+          "paddingY": 8,
+          "gap": 10
+        },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/locale-formatting-stable41.png",
+        "geometry": {
+          "x": 24.8,
+          "y": 28.8,
+          "width": 780.8,
+          "height": 360.8
+        },
+        "color": {
+          "token": "locale.formatting.surface",
+          "lab": [56.3, 2.1, -10.2]
+        },
+        "radius": 8.4,
+        "spacing": {
+          "paddingX": 12.4,
+          "paddingY": 8.3,
+          "gap": 10.4
+        },
+        "textBaseline": 24.7
+      }
     }
   ],
   "approvedComparisons": [
@@ -2565,6 +2625,12 @@
       "mode": "crossPlatform",
       "platform": "web->avalonia",
       "diffArtifact": "tests/conformance/visual/artifacts/diffs/perception-challenge-stable40-web-avalonia.json"
+    },
+    {
+      "id": "locale-formatting-stable41-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/locale-formatting-stable41-web-avalonia.json"
     }
   ]
 }

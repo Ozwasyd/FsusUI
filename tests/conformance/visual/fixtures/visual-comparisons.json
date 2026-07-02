@@ -2082,6 +2082,58 @@
       },
       "screenshotDiffPercent": 0.012,
       "perceptualDelta": 0.05
+    },
+    {
+      "id": "locale-formatting-stable41-web-avalonia",
+      "component": "locale-formatting",
+      "mode": "crossPlatform",
+      "token": "locale.formatting.surface",
+      "fixture": {
+        "page": "visual/locale-formatting",
+        "theme": "light",
+        "density": "compact",
+        "variant": "long-localized-labels-compact-density",
+        "size": "lg",
+        "state": "english-simplified-chinese-fallback-date-number-direction",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "coverage": {
+        "controls": ["FsusAvaloniaLocaleProvider", "FsusLocalizedText"],
+        "states": ["english", "simplified-chinese", "missing-key-fallback", "date-format", "number-format", "layout-direction", "long-labels"],
+        "themes": ["light", "dark", "high-contrast"],
+        "densities": ["compact", "default", "spacious"],
+        "motionModes": ["system", "enabled", "reduced", "disabled"]
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/locale-formatting-stable41.png",
+        "geometry": { "x": 24, "y": 28, "width": 780, "height": 360 },
+        "color": {
+          "token": "locale.formatting.surface",
+          "lab": [56, 2, -10]
+        },
+        "radius": 8,
+        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 10 },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/locale-formatting-stable41.png",
+        "geometry": { "x": 24.8, "y": 28.8, "width": 780.8, "height": 360.8 },
+        "color": {
+          "token": "locale.formatting.surface",
+          "lab": [56.3, 2.1, -10.2]
+        },
+        "radius": 8.4,
+        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 10.4 },
+        "textBaseline": 24.7
+      },
+      "screenshotDiffPercent": 0.012,
+      "perceptualDelta": 0.05
     }
   ]
 }
