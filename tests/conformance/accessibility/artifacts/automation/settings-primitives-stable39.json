@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "settings-primitives-stable39",
+    "component": "settings-primitives",
+    "platform": "avalonia",
+    "control": "FsusSettingsSection",
+    "evidenceSource": "avalonia-headless",
+    "role": "group",
+    "accessibleName": "Workspace settings",
+    "value": "loading dense mobile settings section, nav, danger zone, typed confirm",
+    "states": {
+      "disabled": null,
+      "selected": null,
+      "checked": null,
+      "expanded": null,
+      "invalid": null
+    },
+    "keyboard": ["ArrowDown", "ArrowUp", "Tab"],
+    "keyboardOperable": true,
+    "tabOrder": 36,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/settings-primitives-stable39.json"
+  }
+}

@@ -736,6 +736,69 @@
       "keyboardOperable": true,
       "tabOrder": 35,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/responsive-collection-stable38.json"
+    },
+    {
+      "id": "settings-primitives-stable39",
+      "component": "settings-primitives",
+      "platform": "avalonia",
+      "control": "FsusSettingsSection",
+      "evidenceSource": "avalonia-headless",
+      "role": "group",
+      "accessibleName": "Workspace settings",
+      "value": "loading dense mobile settings section, nav, danger zone, typed confirm",
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["ArrowDown", "ArrowUp", "Tab"],
+      "keyboardOperable": true,
+      "tabOrder": 36,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/settings-primitives-stable39.json"
+    },
+    {
+      "id": "metric-primitives-stable39",
+      "component": "metric-primitives",
+      "platform": "avalonia",
+      "control": "FsusMetricList",
+      "evidenceSource": "avalonia-headless",
+      "role": "list",
+      "accessibleName": "Metric list",
+      "value": "error dense metric list, distribution bars, diagnostics, copyable detail",
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["ArrowDown", "ArrowUp", "Control+C"],
+      "keyboardOperable": true,
+      "tabOrder": 37,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/metric-primitives-stable39.json"
+    },
+    {
+      "id": "inbox-primitives-stable39",
+      "component": "inbox-primitives",
+      "platform": "avalonia",
+      "control": "FsusInboxLayout",
+      "evidenceSource": "avalonia-headless",
+      "role": "group",
+      "accessibleName": "Inbox",
+      "value": "mobile split pane, conversation list, thread timeline, disabled composer, empty state",
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["ArrowDown", "ArrowUp", "Tab"],
+      "keyboardOperable": true,
+      "tabOrder": 38,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/inbox-primitives-stable39.json"
     }
   ],
   "appiumReleaseGates": [

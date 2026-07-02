@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "tests/conformance/accessibility/contracts.json",
-      "sha256": "90cc50c135bf8e6a5916733f0f32d8bdc1e52218cf027aaf310ec99b57c0343f"
+      "sha256": "e3f74287a0368023fd22a2d98544c171375eea912ee5204a4436a4937556668f"
     },
     {
       "path": "tests/conformance/accessibility/automation-snapshots.json",
-      "sha256": "c25b9cb625115fe68672844df94623f8c1b3e1aa6e3c4a0869d587aac0dcd80b"
+      "sha256": "28af7ed8924890518a8c82d933577e728bedc38a0d38f0c819875ae2e4b4b318"
     }
   ],
   "requiredContractFields": [
@@ -23,9 +23,9 @@
     "keyboardNavigation"
   ],
   "summary": {
-    "controls": 32,
-    "snapshots": 35,
-    "passed": 35,
+    "controls": 35,
+    "snapshots": 38,
+    "passed": 38,
     "appiumReleaseGates": 2,
     "allowedByOverride": 0
   },
@@ -814,6 +814,72 @@
       "tabOrder": 35,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/responsive-collection-stable38.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "settings-primitives-stable39",
+      "component": "settings-primitives",
+      "platform": "avalonia",
+      "role": "group",
+      "accessibleName": "Workspace settings",
+      "value": "loading dense mobile settings section, nav, danger zone, typed confirm",
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["ArrowDown", "ArrowUp", "Tab"],
+      "tabOrder": 36,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/settings-primitives-stable39.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "metric-primitives-stable39",
+      "component": "metric-primitives",
+      "platform": "avalonia",
+      "role": "list",
+      "accessibleName": "Metric list",
+      "value": "error dense metric list, distribution bars, diagnostics, copyable detail",
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["ArrowDown", "ArrowUp", "Control+C"],
+      "tabOrder": 37,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/metric-primitives-stable39.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "inbox-primitives-stable39",
+      "component": "inbox-primitives",
+      "platform": "avalonia",
+      "role": "group",
+      "accessibleName": "Inbox",
+      "value": "mobile split pane, conversation list, thread timeline, disabled composer, empty state",
+      "states": {
+        "disabled": null,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": null
+      },
+      "keyboard": ["ArrowDown", "ArrowUp", "Tab"],
+      "tabOrder": 38,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/inbox-primitives-stable39.json",
       "allowedByOverride": [],
       "passed": true,
       "errors": []

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "metric-primitives-stable39",
+    "component": "metric-primitives",
+    "platform": "avalonia",
+    "control": "FsusMetricList",
+    "evidenceSource": "avalonia-headless",
+    "role": "list",
+    "accessibleName": "Metric list",
+    "value": "error dense metric list, distribution bars, diagnostics, copyable detail",
+    "states": {
+      "disabled": null,
+      "selected": null,
+      "checked": null,
+      "expanded": null,
+      "invalid": null
+    },
+    "keyboard": ["ArrowDown", "ArrowUp", "Control+C"],
+    "keyboardOperable": true,
+    "tabOrder": 37,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/metric-primitives-stable39.json"
+  }
+}

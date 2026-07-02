@@ -39,4 +39,5 @@
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/TextViewer.axaml" />
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/TextEditor.axaml" />
   <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/PublicShell.axaml" />
+  <StyleInclude Source="avares://FsusUI.Avalonia.Themes/Themes/Controls/ProductPrimitives.axaml" />
 </Styles>

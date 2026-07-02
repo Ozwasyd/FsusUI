@@ -1,0 +1,54 @@
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls">
+  <Style Selector="fsus|FsusSettingsSection, fsus|FsusMetricList, fsus|FsusInboxLayout">
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace3}" />
+    <Setter Property="Background" Value="{DynamicResource FsusThemeProductPrimitiveSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusSurfaceMd}" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition
+          Property="Opacity"
+          Duration="{DynamicResource FsusMotionDurationEffective}"
+          Easing="{DynamicResource FsusMotionEasingEffective}" />
+      </Transitions>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusSettingsSection.fsus-dense, fsus|FsusMetricList.fsus-dense, fsus|FsusInboxLayout.fsus-dense">
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
+  </Style>
+
+  <Style Selector="fsus|FsusSettingsSection.fsus-error, fsus|FsusMetricList.fsus-error, fsus|FsusInboxLayout.fsus-error">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeDangerBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusSettingsSectionNav, fsus|FsusDiagnosticsList, fsus|FsusConversationList">
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusDangerZone, fsus|FsusDestructiveActionPanel, fsus|FsusRiskNotice">
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeDangerBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusSurfaceMd}" />
+  </Style>
+
+  <Style Selector="fsus|FsusDistributionList, fsus|FsusKpiGroup, fsus|FsusKeyValueGrid, fsus|FsusStatusSummary, fsus|FsusCopyableDetail">
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusThreadPanel, fsus|FsusMessageTimeline, fsus|FsusReplyComposerShell, fsus|FsusInboxEmptyState">
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+  </Style>
+</Styles>

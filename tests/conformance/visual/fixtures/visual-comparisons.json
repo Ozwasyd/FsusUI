@@ -1874,6 +1874,162 @@
       },
       "screenshotDiffPercent": 0.012,
       "perceptualDelta": 0.05
+    },
+    {
+      "id": "settings-primitives-stable39-web-avalonia",
+      "component": "settings-primitives",
+      "mode": "crossPlatform",
+      "token": "product.primitive.surface",
+      "fixture": {
+        "page": "visual/settings-primitives",
+        "theme": "light",
+        "density": "compact",
+        "variant": "section-nav-danger-confirm",
+        "size": "lg",
+        "state": "empty-loading-error-dense-mobile-keyboard-long-text",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "coverage": {
+        "controls": ["FsusSettingsSection", "FsusSettingsSectionNav", "FsusDangerZone", "FsusTypedConfirmField"],
+        "states": ["empty", "loading", "error", "dense", "mobile", "keyboard", "long-text"],
+        "themes": ["light", "dark", "high-contrast"],
+        "densities": ["compact", "default", "spacious"],
+        "motionModes": ["system", "enabled", "reduced", "disabled"]
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/settings-primitives-stable39.png",
+        "geometry": { "x": 24, "y": 28, "width": 860, "height": 520 },
+        "color": {
+          "token": "product.primitive.surface",
+          "lab": [56, 2, -10]
+        },
+        "radius": 8,
+        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/settings-primitives-stable39.png",
+        "geometry": { "x": 24.8, "y": 28.8, "width": 860.8, "height": 520.8 },
+        "color": {
+          "token": "product.primitive.surface",
+          "lab": [56.3, 2.1, -10.2]
+        },
+        "radius": 8.4,
+        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 12.4 },
+        "textBaseline": 24.7
+      },
+      "screenshotDiffPercent": 0.012,
+      "perceptualDelta": 0.05
+    },
+    {
+      "id": "metric-primitives-stable39-web-avalonia",
+      "component": "metric-primitives",
+      "mode": "crossPlatform",
+      "token": "product.primitive.surface",
+      "fixture": {
+        "page": "visual/metric-primitives",
+        "theme": "dark",
+        "density": "default",
+        "variant": "metric-distribution-kpi-diagnostics-copy",
+        "size": "lg",
+        "state": "empty-loading-error-dense-mobile-keyboard-long-text",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "coverage": {
+        "controls": ["FsusMetricList", "FsusDistributionList", "FsusKpiGroup", "FsusDiagnosticsList", "FsusCopyableDetail"],
+        "states": ["empty", "loading", "error", "dense", "mobile", "keyboard", "long-text"],
+        "themes": ["light", "dark", "high-contrast"],
+        "densities": ["compact", "default", "spacious"],
+        "motionModes": ["system", "enabled", "reduced", "disabled"]
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/metric-primitives-stable39.png",
+        "geometry": { "x": 24, "y": 28, "width": 860, "height": 520 },
+        "color": {
+          "token": "product.primitive.surface",
+          "lab": [42, 0, -8]
+        },
+        "radius": 8,
+        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/metric-primitives-stable39.png",
+        "geometry": { "x": 24.8, "y": 28.8, "width": 860.8, "height": 520.8 },
+        "color": {
+          "token": "product.primitive.surface",
+          "lab": [42.3, 0.1, -8.2]
+        },
+        "radius": 8.4,
+        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 12.4 },
+        "textBaseline": 24.7
+      },
+      "screenshotDiffPercent": 0.012,
+      "perceptualDelta": 0.05
+    },
+    {
+      "id": "inbox-primitives-stable39-web-avalonia",
+      "component": "inbox-primitives",
+      "mode": "crossPlatform",
+      "token": "product.primitive.surface",
+      "fixture": {
+        "page": "visual/inbox-primitives",
+        "theme": "light",
+        "density": "spacious",
+        "variant": "layout-split-thread-composer-empty",
+        "size": "lg",
+        "state": "empty-loading-error-dense-mobile-keyboard-long-text",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "reduced"
+      },
+      "coverage": {
+        "controls": ["FsusInboxLayout", "FsusConversationList", "FsusThreadPanel", "FsusMessageTimeline", "FsusReplyComposerShell"],
+        "states": ["empty", "loading", "error", "dense", "mobile", "keyboard", "long-text"],
+        "themes": ["light", "dark", "high-contrast"],
+        "densities": ["compact", "default", "spacious"],
+        "motionModes": ["system", "enabled", "reduced", "disabled"]
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/inbox-primitives-stable39.png",
+        "geometry": { "x": 24, "y": 28, "width": 900, "height": 560 },
+        "color": {
+          "token": "product.primitive.surface",
+          "lab": [56, 2, -10]
+        },
+        "radius": 8,
+        "spacing": { "paddingX": 12, "paddingY": 8, "gap": 12 },
+        "textBaseline": 24
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/inbox-primitives-stable39.png",
+        "geometry": { "x": 24.8, "y": 28.8, "width": 900.8, "height": 560.8 },
+        "color": {
+          "token": "product.primitive.surface",
+          "lab": [56.3, 2.1, -10.2]
+        },
+        "radius": 8.4,
+        "spacing": { "paddingX": 12.4, "paddingY": 8.3, "gap": 12.4 },
+        "textBaseline": 24.7
+      },
+      "screenshotDiffPercent": 0.012,
+      "perceptualDelta": 0.05
     }
   ]
 }

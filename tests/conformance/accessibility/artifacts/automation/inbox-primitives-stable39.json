@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "inbox-primitives-stable39",
+    "component": "inbox-primitives",
+    "platform": "avalonia",
+    "control": "FsusInboxLayout",
+    "evidenceSource": "avalonia-headless",
+    "role": "group",
+    "accessibleName": "Inbox",
+    "value": "mobile split pane, conversation list, thread timeline, disabled composer, empty state",
+    "states": {
+      "disabled": null,
+      "selected": null,
+      "checked": null,
+      "expanded": null,
+      "invalid": null
+    },
+    "keyboard": ["ArrowDown", "ArrowUp", "Tab"],
+    "keyboardOperable": true,
+    "tabOrder": 38,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/inbox-primitives-stable39.json"
+  }
+}

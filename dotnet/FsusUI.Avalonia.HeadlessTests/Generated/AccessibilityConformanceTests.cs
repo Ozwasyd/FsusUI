@@ -43,6 +43,9 @@ public class AccessibilityConformanceTests
     yield return new object[] { "site-header-stable38", "site-header", "group", "Site header", 1, 33 };
     yield return new object[] { "theme-mode-toggle-stable38", "theme-mode-toggle", "group", "Theme mode", 2, 34 };
     yield return new object[] { "responsive-collection-stable38", "responsive-collection", "list", "Article list", 4, 35 };
+    yield return new object[] { "settings-primitives-stable39", "settings-primitives", "group", "Workspace settings", 3, 36 };
+    yield return new object[] { "metric-primitives-stable39", "metric-primitives", "list", "Metric list", 3, 37 };
+    yield return new object[] { "inbox-primitives-stable39", "inbox-primitives", "group", "Inbox", 3, 38 };
   }
 
   [Theory]

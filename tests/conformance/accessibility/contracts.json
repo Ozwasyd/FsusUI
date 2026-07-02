@@ -459,6 +459,48 @@
       "invalidState": "not-applicable",
       "expectedStates": {},
       "keyboardNavigation": ["ArrowDown", "ArrowUp", "Home", "End"]
+    },
+    {
+      "id": "settings-primitives",
+      "publicName": "FsusSettingsPrimitives",
+      "role": "group",
+      "accessibleName": "required",
+      "value": "required",
+      "disabledState": "not-applicable",
+      "selectedState": "not-applicable",
+      "checkedState": "not-applicable",
+      "expandedState": "not-applicable",
+      "invalidState": "not-applicable",
+      "expectedStates": {},
+      "keyboardNavigation": ["ArrowDown", "ArrowUp", "Tab"]
+    },
+    {
+      "id": "metric-primitives",
+      "publicName": "FsusMetricPrimitives",
+      "role": "list",
+      "accessibleName": "required",
+      "value": "required",
+      "disabledState": "not-applicable",
+      "selectedState": "not-applicable",
+      "checkedState": "not-applicable",
+      "expandedState": "not-applicable",
+      "invalidState": "not-applicable",
+      "expectedStates": {},
+      "keyboardNavigation": ["ArrowDown", "ArrowUp", "Control+C"]
+    },
+    {
+      "id": "inbox-primitives",
+      "publicName": "FsusInboxPrimitives",
+      "role": "group",
+      "accessibleName": "required",
+      "value": "required",
+      "disabledState": "not-applicable",
+      "selectedState": "not-applicable",
+      "checkedState": "not-applicable",
+      "expandedState": "not-applicable",
+      "invalidState": "not-applicable",
+      "expectedStates": {},
+      "keyboardNavigation": ["ArrowDown", "ArrowUp", "Tab"]
     }
   ]
 }
