@@ -558,6 +558,73 @@
       },
       "screenshotDiffPercent": 0.012,
       "perceptualDelta": 0.05
+    },
+    {
+      "id": "display-primitives-stable21-web-avalonia",
+      "component": "display-primitives",
+      "mode": "crossPlatform",
+      "token": "display.primitives.states",
+      "fixture": {
+        "page": "visual/display-primitives",
+        "theme": "high-contrast",
+        "density": "spacious",
+        "variant": "card-tag-alert-progress-empty-result",
+        "size": "md",
+        "state": "selected-removable-dismissible-progress-reduced-empty-result",
+        "locale": "zh-CN",
+        "direction": "ltr",
+        "motionMode": "disabled"
+      },
+      "coverage": {
+        "controls": [
+          "FsusCard",
+          "FsusDivider",
+          "FsusTag",
+          "FsusBadge",
+          "FsusAlert",
+          "FsusProgress",
+          "FsusSkeleton",
+          "FsusEmpty",
+          "FsusResult"
+        ],
+        "states": [
+          "selected-card",
+          "removable-tag",
+          "dismissible-alert",
+          "progress-values",
+          "skeleton-reduced-motion",
+          "empty-action",
+          "result-variants"
+        ],
+        "themes": ["light", "dark", "high-contrast"],
+        "densities": ["compact", "default", "spacious"],
+        "motionModes": ["system", "enabled", "reduced", "disabled"]
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/display-primitives-stable21.png",
+        "geometry": { "x": 24, "y": 28, "width": 460, "height": 390 },
+        "color": { "token": "display.primitives.states", "lab": [54, 5, -18] },
+        "radius": 12,
+        "spacing": { "paddingX": 20, "paddingY": 20, "gap": 12 },
+        "textBaseline": 25
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/display-primitives-stable21.png",
+        "geometry": { "x": 24.7, "y": 28.6, "width": 460.8, "height": 390.7 },
+        "color": {
+          "token": "display.primitives.states",
+          "lab": [54.4, 5.2, -18.3]
+        },
+        "radius": 12.5,
+        "spacing": { "paddingX": 20.5, "paddingY": 20.4, "gap": 12.5 },
+        "textBaseline": 25.7
+      },
+      "screenshotDiffPercent": 0.012,
+      "perceptualDelta": 0.05
     }
   ]
 }

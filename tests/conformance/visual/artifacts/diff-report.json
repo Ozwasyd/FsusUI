@@ -3,8 +3,8 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "artifactRoot": "tests/conformance/visual/artifacts",
   "summary": {
-    "total": 11,
-    "passed": 11,
+    "total": 12,
+    "passed": 12,
     "allowedByOverride": 1
   },
   "comparisons": [
@@ -340,6 +340,37 @@
         "radius": 0.40000000000000036,
         "spacing": 0.5,
         "textBaseline": 0.5,
+        "screenshotDiffPercent": 0.012,
+        "perceptualDelta": 0.05
+      },
+      "thresholds": {
+        "geometry": 1.5,
+        "colorDelta": 1.4,
+        "radius": 0.75,
+        "spacing": 1,
+        "textBaseline": 1,
+        "screenshotDiffPercent": 0.015,
+        "perceptualDelta": 0.08
+      },
+      "allowedByOverride": [],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "display-primitives-stable21-web-avalonia",
+      "component": "display-primitives",
+      "state": "selected-removable-dismissible-progress-reduced-empty-result",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "display.primitives.states",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/display-primitives-stable21.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/display-primitives-stable21-web-avalonia.json",
+      "deltas": {
+        "geometry": 0.8000000000000114,
+        "colorDelta": 0.5385164807134498,
+        "radius": 0.5,
+        "spacing": 0.5,
+        "textBaseline": 0.6999999999999993,
         "screenshotDiffPercent": 0.012,
         "perceptualDelta": 0.05
       },

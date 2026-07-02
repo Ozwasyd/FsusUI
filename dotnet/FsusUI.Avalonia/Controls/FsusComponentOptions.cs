@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using System.Globalization;
 
 namespace FsusUI.Avalonia.Controls;
 
@@ -56,12 +57,13 @@ internal static class FsusComponentClasses
 
   public static void SyncVariant(Control control, FsusComponentVariant variant)
   {
+    var normalized = NormalizeVariant(variant);
     foreach (var className in VariantClasses)
     {
       Ensure(control, className, false);
     }
 
-    Ensure(control, VariantClasses[(int)variant], true);
+    Ensure(control, VariantClasses[(int)normalized], true);
   }
 
   public static void SyncSize(Control control, FsusComponentSize size)
@@ -100,4 +102,27 @@ internal static class FsusComponentClasses
       control.Classes.Remove(className);
     }
   }
+
+  public static string VariantName(FsusComponentVariant variant) =>
+    NormalizeVariant(variant).ToString().ToLower(CultureInfo.InvariantCulture);
+
+  public static string ResolveName(string? title, object? fallback)
+  {
+    if (!string.IsNullOrWhiteSpace(title))
+    {
+      return title!;
+    }
+
+    return fallback switch
+    {
+      null => string.Empty,
+      string text => text,
+      _ => fallback.ToString() ?? string.Empty,
+    };
+  }
+
+  private static FsusComponentVariant NormalizeVariant(FsusComponentVariant variant) =>
+    Enum.IsDefined(typeof(FsusComponentVariant), variant)
+      ? variant
+      : FsusComponentVariant.Default;
 }
