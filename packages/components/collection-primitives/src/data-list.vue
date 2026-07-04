@@ -69,7 +69,13 @@ const props = defineProps(dataListProps)
 const emit = defineEmits(dataListEmits)
 const ns = useNamespace('data-list')
 
-const listKls = computed(() => [ns.b(), ns.m(props.density)])
+const isInteractiveList = computed(() => props.interactive || Boolean(props.href))
+const listKls = computed(() => [
+  ns.b(),
+  ns.m(props.density),
+  ns.m(props.variant),
+  ns.is('interactive', isInteractiveList.value),
+])
 const listAttrs = computed(() => ({
   role: 'list',
   'aria-label': props.ariaLabel || undefined,

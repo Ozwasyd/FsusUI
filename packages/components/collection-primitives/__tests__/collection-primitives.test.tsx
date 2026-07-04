@@ -94,6 +94,24 @@ describe('collection primitives', () => {
     expect(wrapper.emitted('change')?.[0]?.[1]).toBe('ca')
   })
 
+  test('renders data list summary rows without interactive affordance', () => {
+    const wrapper = mount(DataList, {
+      props: {
+        rows: [{ id: 'rule', summary: 'Manual review before publish' }],
+        columns: [{ key: 'summary', label: 'Summary' }],
+        rowKey: 'id',
+        showHeader: false,
+        interactive: false,
+        variant: 'summary',
+      },
+    })
+
+    expect(wrapper.classes()).toContain('el-data-list--summary')
+    expect(wrapper.classes()).not.toContain('is-interactive')
+    expect(wrapper.find('.el-data-list__head').exists()).toBe(false)
+    expect(wrapper.find('.el-data-list__row').element.tagName).toBe('DIV')
+  })
+
   test('emits segmented control changes from click and keyboard', async () => {
     const wrapper = mount(SegmentedControl, {
       props: {

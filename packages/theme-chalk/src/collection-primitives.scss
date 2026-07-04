@@ -178,21 +178,10 @@
     font: inherit;
     text-align: left;
     text-decoration: none;
-    cursor: pointer;
+    cursor: default;
     transition:
       background-color getCssVar('transition-duration-fast'),
       color getCssVar('transition-duration-fast');
-
-    &:hover {
-      background: getCssVar('fill-color-light');
-    }
-
-    &:focus-visible {
-      position: relative;
-      z-index: 1;
-      outline: 2px solid getCssVar('color-primary-light-5');
-      outline-offset: -2px;
-    }
 
     @include when(active) {
       background: getCssVar('fill-color-light');
@@ -240,6 +229,40 @@
     @include e(cell) {
       padding-inline: 14px;
       font-size: getCssVar('font-size-extra-small');
+    }
+  }
+
+  @include when(interactive) {
+    @include e(row) {
+      cursor: pointer;
+
+      &:hover {
+        background: getCssVar('fill-color-light');
+      }
+
+      &:focus-visible {
+        position: relative;
+        z-index: 1;
+        outline: 2px solid getCssVar('color-primary-light-5');
+        outline-offset: -2px;
+      }
+    }
+  }
+
+  @include m(summary) {
+    border-top: 0;
+
+    @include e(row) {
+      min-height: 72px;
+      align-items: stretch;
+    }
+
+    @include e(cell) {
+      display: block;
+      min-width: 0;
+      padding: 16px 20px;
+      overflow: visible;
+      white-space: normal;
     }
   }
 }

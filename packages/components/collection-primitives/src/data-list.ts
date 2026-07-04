@@ -6,6 +6,7 @@ import type { ExtractPropTypes } from 'vue'
 import type DataList from './data-list.vue'
 
 export type DataListRowKey = string | number
+export const dataListVariants = ['default', 'summary'] as const
 
 export type DataListColumn = {
   key: string
@@ -81,6 +82,14 @@ export const dataListProps = buildProps({
   density: {
     type: String,
     values: collectionDensities,
+    default: 'default',
+  },
+  /**
+   * @description visual presentation variant
+   */
+  variant: {
+    type: String,
+    values: dataListVariants,
     default: 'default',
   },
   /**
