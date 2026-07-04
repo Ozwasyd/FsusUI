@@ -6,7 +6,9 @@
 /CLAUDE.md
 
 # Package manager and dependency state
+node_modules
 node_modules/
+.pnpm-store
 .pnpm-store/
 pnpm-debug.log*
 npm-debug.log*
@@ -18,6 +20,7 @@ yarn-error.log*
 Thumbs.db
 
 # Bundles, reports, and generated visual evidence
+/dist
 /dist/
 /coverage/
 /playwright-report/
@@ -25,9 +28,11 @@ Thumbs.db
 /blob-report/
 /screenshots/
 .husky/_/
+packages/*/dist
 packages/demo-app/dist/
 packages/icons-vue/dist/
 packages/wasm/dist/
+internal/*/dist
 internal/*/dist/
 tests/fixtures/**/dist/
 tests/fixtures/**/node_modules/
@@ -44,8 +49,12 @@ cmake_install.cmake
 .cmake/
 packages/wasm/.cmake-check/
 packages/wasm/build/
+dotnet/**/bin
 dotnet/**/bin/
+dotnet/**/obj
 dotnet/**/obj/
+dotnet/**/TestResults
+dotnet/**/TestResults/
 dotnet/artifacts/
 *.tsbuildinfo
 .vite/
