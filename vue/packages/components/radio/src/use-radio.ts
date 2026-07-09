@@ -30,7 +30,9 @@ export const useRadio = (
       } else {
         emit && emit(UPDATE_MODEL_EVENT, val)
       }
-      radioRef.value!.checked = val === actualValue.value
+      if (radioRef.value) {
+        radioRef.value.checked = val === actualValue.value
+      }
     },
   })
 

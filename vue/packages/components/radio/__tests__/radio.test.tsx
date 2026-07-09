@@ -6,6 +6,7 @@ import { ElFormItem } from '@element-plus/components/form'
 import Radio from '../src/radio.vue'
 import RadioGroup from '../src/radio-group.vue'
 import RadioButton from '../src/radio-button.vue'
+import { useRadio } from '../src/use-radio'
 
 import type { RadioProps } from '../src/radio'
 
@@ -80,6 +81,20 @@ describe('Radio', () => {
     await setRadioValue(split)
     expect(split.classes()).toContain('is-checked')
     expect(radio.value).toBe('split')
+  })
+
+  test('model update before native input ref is available does not throw', () => {
+    let modelValue!: ReturnType<typeof useRadio>['modelValue']
+    mount({
+      setup() {
+        modelValue = useRadio({ label: 'a', modelValue: '' }).modelValue
+        return () => null
+      },
+    })
+
+    expect(() => {
+      modelValue.value = 'a'
+    }).not.toThrow()
   })
 })
 
