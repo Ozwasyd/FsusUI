@@ -162,7 +162,7 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 | `--fsus-shadow-panel`         | `none`                               | 普通 Dialog、Card、Drawer 面板 |
 | `--fsus-shadow-panel-light`   | `0 8px 24px rgba(15, 23, 42, 0.05)`  | Opt-in 低层级浮层              |
 | `--fsus-shadow-panel-lighter` | `0 2px 8px rgba(15, 23, 42, 0.04)`   | Opt-in 轻微浮起元素            |
-| `--fsus-shadow-floating`      | `0 12px 32px rgba(15, 23, 42, 0.08)` | Notification、临时悬浮提示     |
+| `--fsus-shadow-floating`      | `0 12px 32px rgba(15, 23, 42, 0.08)` | Notification、Popover 等高层级浮层 |
 
 避免使用重黑投影、彩色光晕和无层级意义的外发光。
 
@@ -478,8 +478,8 @@ Public / marketing surfaces ([§1 Scope Boundary](#scope-boundary)) 通常不会
 
 ## 12. Source of Truth
 
-- Theme token implementation: [`packages/theme-chalk/src/common/fsus-tokens.scss`](../../packages/theme-chalk/src/common/fsus-tokens.scss)
-- Element Plus compatibility variables: [`packages/theme-chalk/src/common/var.scss`](../../packages/theme-chalk/src/common/var.scss)
+- Theme token implementation: [`vue/packages/theme-chalk/src/common/fsus-tokens.scss`](../../vue/packages/theme-chalk/src/common/fsus-tokens.scss)
+- Element Plus compatibility variables: [`vue/packages/theme-chalk/src/common/var.scss`](../../vue/packages/theme-chalk/src/common/var.scss)
 - Platform-neutral token source: [`spec/tokens/tokens.json`](../../spec/tokens/tokens.json)
 - Public token stability: [`docs/theme/tokens.md`](../theme/tokens.md)
 - Public motion tokens: [`docs/theme/motion.md`](../theme/motion.md)

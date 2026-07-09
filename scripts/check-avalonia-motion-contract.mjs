@@ -16,18 +16,39 @@ const allowedFiles = new Set([
   'dotnet/FsusUI.Avalonia.Themes/Themes/FsusMotionSystem.axaml',
 ])
 
-const forbiddenPatterns = [
-  { pattern: /Duration\s*="/u, message: 'XAML duration' },
-  { pattern: /\bDoubleTransition\b/u, message: 'local transition' },
-  { pattern: /\bTransitions\b/u, message: 'local transition collection' },
-  { pattern: /\bSplineEasing\b/u, message: 'local easing' },
-  { pattern: /\bCubicEase\b/u, message: 'local easing' },
-  { pattern: /\bQuadraticEase\b/u, message: 'local easing' },
-  { pattern: /\bRenderTransform\b/u, message: 'local transform animation' },
-  { pattern: /\bTranslateTransform\b/u, message: 'local transform animation' },
-  { pattern: /\bScaleTransform\b/u, message: 'local transform animation' },
-  { pattern: /TimeSpan\.FromMilliseconds\(/u, message: 'local duration' },
-]
+const xamlMotionDuration =
+  /Duration\s*="\{DynamicResource FsusMotionDurationEffective\}"/u
+const xamlMotionEasing =
+  /Easing\s*="\{DynamicResource FsusMotionEasingEffective\}"/u
+
+const checkLine = (relativePath, content, line) => {
+  const usesMotionTransitionResources =
+    xamlMotionDuration.test(content) && xamlMotionEasing.test(content)
+
+  if (/Duration\s*="/u.test(line) && !xamlMotionDuration.test(line)) {
+    return `${relativePath}: XAML duration must use FsusMotionService`
+  }
+  if (/\bDoubleTransition\b/u.test(line) && !usesMotionTransitionResources) {
+    return `${relativePath}: local transition must use FsusMotionService`
+  }
+  if (/\bTransitions\b/u.test(line) && !usesMotionTransitionResources) {
+    return `${relativePath}: local transition collection must use FsusMotionService`
+  }
+  if (/\b(?:SplineEasing|CubicEase|QuadraticEase)\b/u.test(line)) {
+    return `${relativePath}: local easing must use FsusMotionService`
+  }
+  if (/\b(?:RenderTransform|TranslateTransform|ScaleTransform)\b/u.test(line)) {
+    return `${relativePath}: local transform animation must use FsusMotionService`
+  }
+  if (
+    /TimeSpan\.FromMilliseconds\(/u.test(line) &&
+    !/\bPreviewDebounce\b/u.test(line)
+  ) {
+    return `${relativePath}: local duration must use FsusMotionService`
+  }
+
+  return null
+}
 
 const toPosix = (value) => value.split(path.sep).join('/')
 
@@ -51,12 +72,9 @@ for (const scanRoot of scanRoots) {
     const relativePath = toPosix(path.relative(root, file))
     if (allowedFiles.has(relativePath)) continue
     const content = fs.readFileSync(file, 'utf8')
-    for (const rule of forbiddenPatterns) {
-      if (rule.pattern.test(content)) {
-        failures.push(
-          `${relativePath}: ${rule.message} must use FsusMotionService`,
-        )
-      }
+    for (const line of content.split(/\r?\n/u)) {
+      const failure = checkLine(relativePath, content, line)
+      if (failure) failures.push(failure)
     }
   }
 }

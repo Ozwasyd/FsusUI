@@ -5,9 +5,9 @@ import { join, relative, resolve } from 'node:path'
 const root = process.cwd()
 const violations = []
 
-const semanticExampleDir = 'examples/ux-semantics'
-const consumerScanDirs = ['packages/demo-app/src', semanticExampleDir]
-const demoAppDir = 'packages/demo-app/src'
+const semanticExampleDir = 'vue/examples/ux-semantics'
+const consumerScanDirs = ['vue/packages/demo-app/src', semanticExampleDir]
+const demoAppDir = 'vue/packages/demo-app/src'
 const genericActionLabels = new Set([
   '确定',
   '提交',

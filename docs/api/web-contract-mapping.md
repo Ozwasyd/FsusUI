@@ -31,8 +31,8 @@ which APIs are cross-platform FsusUI contracts.
 ## Token Migration
 
 Web theme code consumes generated tokens from
-`packages/theme-chalk/src/generated/tokens.scss` through
-`packages/theme-chalk/src/common/fsus-tokens.scss`. Existing preview CSS
+`vue/packages/theme-chalk/src/generated/tokens.scss` through
+`vue/packages/theme-chalk/src/common/fsus-tokens.scss`. Existing preview CSS
 variables such as `--fsus-scholarly-blue`, `--fsus-motion-control`, and
 Element Plus-compatible `--el-*` aliases remain available as compatibility
 aliases.

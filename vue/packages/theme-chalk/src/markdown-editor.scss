@@ -1,0 +1,441 @@
+@use 'mixins/mixins' as *;
+@use 'common/var' as *;
+
+@include b(markdown-editor) {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid getCssVar('border-color');
+  border-radius: getCssVar('border-radius', 'base');
+  background: getCssVar('bg-color');
+
+  @include e(toolbar) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 8px;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid getCssVar('border-color-lighter');
+    background: getCssVar('fill-color', 'lighter');
+  }
+
+  @include e(commands) {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  @include e(modes) {
+    display: inline-flex;
+    overflow: hidden;
+    border: 1px solid getCssVar('border-color');
+    border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
+  }
+
+  @include e(actions) {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+  }
+
+  @include e((command, command-more)) {
+    min-inline-size: 2rem;
+    white-space: nowrap;
+  }
+
+  @include e(command-more) {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex: 0 0 auto;
+    min-height: 2.25rem;
+
+    @include when(expanded) {
+      background: var(--fsus-state-selected-bg);
+      border-color: var(--fsus-state-focus-border);
+      color: getCssVar('text-color', 'primary');
+    }
+  }
+
+  @include e(command-more-count) {
+    display: inline-grid;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    place-items: center;
+    border-radius: 999px;
+    background: getCssVar('fill-color', 'light');
+    color: getCssVar('text-color', 'secondary');
+    font-size: 11px;
+    line-height: 1;
+  }
+
+  @include e(command-tray) {
+    display: flex;
+    grid-column: 1 / -1;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-width: 0;
+    padding: 10px;
+    border: 1px solid getCssVar('border-color-lighter');
+    border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
+    background: getCssVar('bg-color');
+    box-shadow: var(--fsus-shadow-subtle, 0 10px 24px rgb(0 0 0 / 8%));
+    animation: markdown-editor-command-tray-in 160ms ease-out;
+  }
+
+  @include e((command, command-more, mode, action)) {
+    display: inline-flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid getCssVar('border-color');
+    border-radius: var(--fsus-radius-control-small, var(--el-border-radius-small));
+    background: getCssVar('fill-color', 'blank');
+    color: getCssVar('text-color', 'regular');
+    font: inherit;
+    font-size: 12px;
+    line-height: 1.2;
+    padding: 7px 9px;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--fsus-state-hover-bg);
+      border-color: var(--fsus-state-focus-border);
+      color: getCssVar('text-color', 'primary');
+    }
+
+    &:focus-visible {
+      background: var(--fsus-state-hover-bg);
+      border-color: var(--fsus-state-focus-border);
+      color: getCssVar('text-color', 'primary');
+      @include a11y-focus-ring(
+        2px,
+        var(--fsus-radius-control-small, var(--el-border-radius-small))
+      );
+    }
+  }
+
+  @include e(mode) {
+    border: 0;
+    border-radius: var(--fsus-radius-control-small, var(--el-border-radius-small));
+
+    @include when(active) {
+      background: var(--fsus-state-selected-bg);
+      color: getCssVar('text-color', 'primary');
+      box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);
+
+      &:focus-visible {
+        @include a11y-focus-ring(
+          2px,
+          var(--fsus-radius-control-small, var(--el-border-radius-small))
+        );
+      }
+    }
+  }
+
+  @include m(interaction-touch) {
+    @include e(toolbar) {
+      gap: 10px;
+      padding: 10px;
+    }
+
+    @include e(commands) {
+      gap: 8px;
+    }
+
+    @include e(actions) {
+      gap: 8px;
+    }
+
+    @include e((command, command-more, mode, action)) {
+      min-height: 44px;
+      padding: 0 14px;
+      font-size: 14px;
+    }
+
+    @include e(command-more-count) {
+      min-width: 1.375rem;
+      height: 1.375rem;
+      font-size: 12px;
+    }
+  }
+
+  @include m(interaction-keyboard) {
+    @include e((command, command-more, mode, action)) {
+      min-height: 2.25rem;
+    }
+  }
+
+  @include e(body) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  @include m(split) {
+    @include e(body) {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+
+  @include e(textarea) {
+    min-width: 0;
+    resize: vertical;
+    border: 0;
+    outline: none;
+    padding: 16px;
+    background: getCssVar('bg-color');
+    color: getCssVar('text-color', 'primary');
+    font: inherit;
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+      'Courier New', monospace;
+    line-height: 1.6;
+
+    &:focus-visible {
+      @include a11y-focus-ring(2px);
+    }
+  }
+
+  @include e(preview) {
+    min-width: 0;
+    overflow: auto;
+    border-left: 1px solid getCssVar('border-color-lighter');
+    padding: 16px;
+  }
+
+  @include m(preview) {
+    @include e(preview) {
+      border-left: 0;
+    }
+  }
+
+  @include e(status) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 0;
+    padding: 8px 12px;
+    border-top: 1px solid getCssVar('border-color-lighter');
+    color: getCssVar('text-color', 'secondary');
+    font-size: 12px;
+    line-height: 1.6;
+
+    > * {
+      min-width: 0;
+    }
+  }
+
+  @include m(profile-prose) {
+    border-color: getCssVar('border-color-lighter');
+    border-radius: var(--fsus-radius-panel, var(--el-border-radius-base));
+    background: getCssVar('bg-color');
+
+    @include e(toolbar) {
+      gap: 10px;
+      padding: 10px 12px;
+      background: getCssVar('bg-color');
+    }
+
+    @include e(command-tray) {
+      padding: 12px;
+      background: getCssVar('fill-color', 'blank');
+    }
+
+    @include e(body) {
+      background: getCssVar('fill-color', 'blank');
+    }
+
+    @include e(textarea) {
+      justify-self: center;
+      width: min(100%, 74ch);
+      min-height: clamp(
+        30rem,
+        calc(var(--el-markdown-editor-visual-viewport-height, 100vh) - 18rem),
+        68rem
+      );
+      padding: clamp(1.35rem, 3vw, 2.75rem)
+        clamp(1.1rem, 4vw, 3rem);
+      resize: vertical;
+      background: getCssVar('fill-color', 'blank');
+      font-family:
+        getCssVar('font-family'),
+        -apple-system,
+        BlinkMacSystemFont,
+        'Segoe UI',
+        sans-serif;
+      font-size: 18px;
+      line-height: 1.84;
+      letter-spacing: 0;
+      caret-color: var(--fsus-state-focus-border);
+      transition:
+        background-color getCssVar('transition-duration-fast') ease,
+        box-shadow getCssVar('transition-duration-fast') ease;
+
+      &::placeholder {
+        color: getCssVar('text-color', 'placeholder');
+      }
+
+      &:focus-visible {
+        outline: none;
+        background: getCssVar('bg-color');
+        box-shadow:
+          inset 0 0 0 1px var(--fsus-state-focus-border),
+          0 12px 36px rgb(0 0 0 / 4%);
+      }
+    }
+
+    @include e(preview) {
+      padding: clamp(1.25rem, 3vw, 2.5rem);
+      line-height: 1.78;
+    }
+
+    @include e(status) {
+      gap: 8px 14px;
+      background: getCssVar('bg-color');
+    }
+  }
+
+  @include m(mobile-compact) {
+    @include e(mode) {
+      &--split {
+        display: none;
+      }
+    }
+  }
+
+  @media (max-width: 48rem) {
+    @include e(toolbar) {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+    }
+
+    @include e((command, command-more, mode, action)) {
+      min-inline-size: 44px;
+      min-height: 44px;
+      padding: 0 14px;
+      font-size: 14px;
+    }
+
+    @include e(actions) {
+      justify-self: end;
+      gap: 8px;
+    }
+
+    @include e(commands) {
+      grid-column: 1 / -1;
+      gap: 8px;
+    }
+
+    @include e(command-tray) {
+      grid-column: 1 / -1;
+    }
+
+    @include e(modes) {
+      justify-self: start;
+    }
+
+    @include m(mobile-auto) {
+      @include e(mode) {
+        &--split {
+          display: none;
+        }
+      }
+    }
+
+    @include m(split) {
+      @include e(body) {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @include e(preview) {
+      border-left: 0;
+      border-top: 1px solid getCssVar('border-color-lighter');
+    }
+
+    @include e(textarea) {
+      min-height: 20rem;
+      padding: 14px;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+
+    @include m(profile-prose) {
+      @include e(toolbar) {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+      }
+
+      @include e(textarea) {
+        width: 100%;
+        min-height: clamp(
+          24rem,
+          calc(var(--el-markdown-editor-visual-viewport-height, 100vh) - 15rem),
+          52rem
+        );
+        padding: 1.25rem 1rem 1.75rem;
+        font-size: 17px;
+        line-height: 1.78;
+      }
+    }
+
+    @include e(status) {
+      justify-content: flex-start;
+    }
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    @include m(interaction-auto) {
+      @include e(toolbar) {
+        gap: 10px;
+        padding: 10px;
+      }
+
+      @include e(commands) {
+        gap: 8px;
+      }
+
+      @include e(actions) {
+        gap: 8px;
+      }
+
+      @include e((command, command-more, mode, action)) {
+        min-height: 44px;
+        padding: 0 14px;
+        font-size: 14px;
+      }
+
+      @include e(mode) {
+        &--split {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+@keyframes markdown-editor-command-tray-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

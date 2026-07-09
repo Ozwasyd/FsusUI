@@ -1,3 +1,9 @@
 packages:
-  - packages/*
-  - internal/*
+  - vue/packages/*
+  - vue/internal/*
+
+peerDependencyRules:
+  ignoreMissing:
+    - vite
+    - react
+    - react-dom

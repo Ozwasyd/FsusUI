@@ -4,7 +4,7 @@
 
 ## FsusUI WASM 加速
 
-当列表条目数量 **≥ 2000** 时，FsusUI 自动启用基于 WASM 的行高预估算法（位于 `packages/wasm/`），大幅减少初始布局计算时间。低于阈值时自动降级为纯 JavaScript 实现，无需任何手动配置。
+当列表条目数量 **≥ 2000** 时，FsusUI 自动启用基于 WASM 的行高预估算法（位于 `vue/packages/wasm/`），大幅减少初始布局计算时间。低于阈值时自动降级为纯 JavaScript 实现，无需任何手动配置。
 
 > **注意**：如需从源码重新编译 WASM 模块，需要 Emscripten 5.0.4。
 

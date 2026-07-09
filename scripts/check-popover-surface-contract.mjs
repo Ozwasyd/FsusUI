@@ -52,7 +52,7 @@ const topLevelBlocks = (source) => {
 }
 
 const failures = []
-const popoverFile = 'packages/theme-chalk/src/popover.scss'
+const popoverFile = 'vue/packages/theme-chalk/src/popover.scss'
 const popoverSource = read(popoverFile)
 
 for (const match of popoverSource.matchAll(
@@ -108,7 +108,7 @@ if (!referenceBlock?.groups?.body) {
   }
 }
 
-const themeFile = 'packages/theme-chalk/src/fsus-theme.scss'
+const themeFile = 'vue/packages/theme-chalk/src/fsus-theme.scss'
 const themeSource = read(themeFile)
 
 for (const block of topLevelBlocks(themeSource)) {

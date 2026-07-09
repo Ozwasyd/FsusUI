@@ -49,8 +49,8 @@ for (const fragment of [
   'pnpm run prepare:test-artifacts',
   'actions/upload-artifact@v4',
   'name: unit-test-artifacts',
-  'packages/icons-vue/dist',
-  'packages/wasm/dist',
+  'vue/packages/icons-vue/dist',
+  'vue/packages/wasm/dist',
   'icons-cache-hit',
   'wasm-cache-hit',
 ]) {

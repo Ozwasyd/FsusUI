@@ -74,5 +74,5 @@ private-asset-path-strict-scan-exit=1
 Exit `1` means no matches.
 
 An additional broader scan found `file://` strings only in
-`packages/wasm/runtime/emscripten.ts`, where they are runtime URL handling
+`vue/packages/wasm/runtime/emscripten.ts`, where they are runtime URL handling
 logic for local WASM files, not hard-coded local machine paths.

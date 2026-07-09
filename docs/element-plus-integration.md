@@ -15,13 +15,13 @@
 
 ### A1. 环境与兼容性边界（必须先确认）
 
-- 本仓库构建目标为 `es2022`（见 `internal/build/src/build-info.ts`），意味着你的运行环境至少需要具备 ES2022 支持能力。
+- 本仓库构建目标为 `es2022`（见 `vue/internal/build/src/build-info.ts`），意味着你的运行环境至少需要具备 ES2022 支持能力。
 - 若你的目标浏览器/运行环境低于 ES2022（例如需要兼容更老浏览器），需要在业务侧自行做更强的转译与 polyfill 策略；本仓库不承诺提供向下兼容输出。
 - 根 `package.json` 对开发环境要求：`node >= 22`、`pnpm >= 10`（用于构建与仓库内联调，不等同于业务运行时要求）。
 
 ### A2. 安装与入口（发布名 vs 源码名）
 
-当前对外 npm public registry 主包为 `@ozwasyd/element-plus`。仓库内部源码主入口仍位于 `packages/element-plus`，源码包名保持 `element-plus`，两者不要混用。
+当前对外 npm public registry 主包为 `@ozwasyd/element-plus`。仓库内部源码主入口仍位于 `vue/packages/element-plus`，源码包名保持 `element-plus`，两者不要混用。
 
 - 业务项目整包安装入口：`@ozwasyd/element-plus`
 - 全局类型入口：`@ozwasyd/element-plus/global`
@@ -82,21 +82,21 @@ html[data-theme-resolved='dark'] {
 
 `@element-plus/wasm` 是“可选性能层”，仓库代码中已有两处组件侧接入点：
 
-- `packages/components/table/src/composables/use-wasm-sort.ts`
+- `vue/packages/components/table/src/composables/use-wasm-sort.ts`
   - 当行数 `>= 5000` 且列值满足条件时尝试走 WASM 排序，否则降级到 JS
-- `packages/components/virtual-list/src/hooks/use-wasm-row-height.ts`
+- `vue/packages/components/virtual-list/src/hooks/use-wasm-row-height.ts`
   - 当 items `>= 2000` 时尝试走 WASM 批量预估，否则返回 `null` 由调用方降级
 
 业务接入时的现实约束：
 
-- WASM 构建产物位于 `packages/wasm/dist/`，并通过 `@element-plus/wasm` 对外导出；你需要确保你的打包器/部署链路能正确处理 `.wasm` 资源与其加载方式。
+- WASM 构建产物位于 `vue/packages/wasm/dist/`，并通过 `@element-plus/wasm` 对外导出；你需要确保你的打包器/部署链路能正确处理 `.wasm` 资源与其加载方式。
 - 不要假设“零配置必然可用”：是否需要额外的静态资源拷贝、跨域/COOP/COEP 配置、或 bundler 的 wasm 插件支持，取决于你的构建与部署环境。
 
 ### A5. 与 Element Plus 的“可见差异清单”（只列可证实项）
 
 这些差异点大多**不影响**你在业务侧以“发布包”方式使用组件 API，但会影响仓库内联调与构建策略：
 
-- **额外能力**：`packages/element-plus/index.ts` 额外转导出 `dayjs`（`export { default as dayjs } from 'dayjs'`）。
+- **额外能力**：`vue/packages/element-plus/index.ts` 额外转导出 `dayjs`（`export { default as dayjs } from 'dayjs'`）。
 - **图标源码归属**：`@element-plus/icons-svg` 在本仓库内作为原始 SVG 真源维护，`@element-plus/icons-vue` 由其生成并供组件代码直接引用；当前目标是源码内收与联调一致，不代表视觉体系已分叉。
 - **可选性能层**：新增 `@element-plus/wasm`，并在仓库 demo 构建中被拆到独立 chunk（`fsus-wasm`）。
 
@@ -106,24 +106,24 @@ html[data-theme-resolved='dark'] {
 
 ```bash
 pnpm install
-pnpm -C packages/demo-app dev
+pnpm -C vue/packages/demo-app dev
 ```
 
-- dev server：`5173`（见 `packages/demo-app/vite.config.ts`）
+- dev server：`5173`（见 `vue/packages/demo-app/vite.config.ts`）
 - preview：`4173`
 
 ### B2. 源码联调（Vite alias / 排除预构建）
 
-`packages/demo-app/vite.config.ts` 通过 alias 将依赖指向工作区源码：
+`vue/packages/demo-app/vite.config.ts` 通过 alias 将依赖指向工作区源码：
 
-- `element-plus` -> `packages/element-plus/index.ts`
-- `@element-plus/components` / `constants` / `directives` / `hooks` / `locale` / `utils` / `wasm` -> 对应 `packages/*`
+- `element-plus` -> `vue/packages/element-plus/index.ts`
+- `@element-plus/components` / `constants` / `directives` / `hooks` / `locale` / `utils` / `wasm` -> 对应 `vue/packages/*`
 
 同时 `optimizeDeps.exclude` 排除这些包，目的是让它们保持源码态联调，而不是被 Vite 当作普通三方依赖进行预构建。
 
 ### B3. 样式联调（仅仓库内）
 
-demo 入口 `packages/demo-app/src/main.ts` 使用源码态样式入口：
+demo 入口 `vue/packages/demo-app/src/main.ts` 使用源码态样式入口：
 
 - `@element-plus/theme-chalk/src/index.scss`
 
@@ -131,11 +131,11 @@ demo 入口 `packages/demo-app/src/main.ts` 使用源码态样式入口：
 
 ### B4. WASM 构建与调试
 
-WASM 构建脚本为 `packages/wasm/build.sh`，仓库根命令为：
+WASM 构建脚本为 `vue/packages/wasm/build.sh`，仓库根命令为：
 
 ```bash
 pnpm build:wasm
 ```
 
 - 构建依赖 Emscripten 工具链（`emsdk`）已安装并激活；脚本会在必要时尝试从环境中定位/激活。
-- demo 构建会把 WASM 相关模块拆分为 `fsus-wasm` chunk（见 `packages/demo-app/vite.config.ts`）。
+- demo 构建会把 WASM 相关模块拆分为 `fsus-wasm` chunk（见 `vue/packages/demo-app/vite.config.ts`）。

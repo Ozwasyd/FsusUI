@@ -33,8 +33,8 @@ Icon-only buttons must provide an accessible name:
 | Package or path                   | Audience                                  | Stability                  |
 | --------------------------------- | ----------------------------------------- | -------------------------- |
 | `@ozwasyd/element-plus/icons-vue` | External consumers                        | Preview public API         |
-| `packages/icons-svg`              | Repository maintainers                    | Internal source of truth   |
-| `packages/icons-vue`              | Repository maintainers and build pipeline | Internal workspace package |
+| `vue/packages/icons-svg`              | Repository maintainers                    | Internal source of truth   |
+| `vue/packages/icons-vue`              | Repository maintainers and build pipeline | Internal workspace package |
 
 The workspace package names still include Element Plus naming for source
 compatibility. External consumers should use the `@ozwasyd/element-plus`
@@ -49,7 +49,7 @@ defaults.
 
 Generated registry outputs:
 
-- `packages/icons-vue/generated/icon-metadata.json`
+- `vue/packages/icons-vue/generated/icon-metadata.json`
 - `dotnet/FsusUI.Avalonia.Icons/Generated/FsusIcons.axaml`
 - `dotnet/FsusUI.Avalonia.Icons/Generated/FsusIconKeys.g.cs`
 
@@ -63,8 +63,8 @@ pnpm run icons:lint
 
 ## Generation Workflow
 
-SVG source files live in `packages/icons-svg/*.svg`. Vue icon components are
-generated into `packages/icons-vue/src/components`; the Web generator reads the
+SVG source files live in `vue/packages/icons-svg/*.svg`. Vue icon components are
+generated into `vue/packages/icons-vue/src/components`; the Web generator reads the
 registry to add semantic aliases such as `ChevronRight` while preserving
 existing file-name exports.
 
@@ -77,7 +77,7 @@ pnpm run ensure:icons
 Use the icon package generator when adding or reviewing SVG changes:
 
 ```bash
-pnpm -C packages/icons-vue build:generate
+pnpm -C vue/packages/icons-vue build:generate
 ```
 
 The generator enforces the FsusUI icon contract:
@@ -96,7 +96,7 @@ stroke attributes.
 
 ## SVG Review Expectations
 
-- Keep icon names stable and kebab-case in `packages/icons-svg`.
+- Keep icon names stable and kebab-case in `vue/packages/icons-svg`.
 - Review the rendered Vue component, not only the raw SVG path.
 - Do not include private logos, customer artwork, tracking pixels, or external
   image references.

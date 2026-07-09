@@ -27,8 +27,8 @@ const incremental = process.argv.includes('--incremental')
 const sourcePatterns = pathArgs.length
   ? pathArgs
   : incremental
-    ? ['packages/components/**/src/*.vue']
-    : ['packages/components/**/src/*.vue']
+    ? ['vue/packages/components/**/src/*.vue']
+    : ['vue/packages/components/**/src/*.vue']
 
 const componentFiles = await fg(sourcePatterns, {
   cwd: rootDir,

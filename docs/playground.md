@@ -1,20 +1,20 @@
 # Playground And Demo App
 
-The current public playground is the Vite demo app in `packages/demo-app`. It
+The current public playground is the Vite demo app in `vue/packages/demo-app`. It
 remains a development app, but its examples must be safe for public-preview
 evaluation.
 
 ## Run The Demo
 
 ```bash
-pnpm -C packages/demo-app dev
+pnpm -C vue/packages/demo-app dev
 ```
 
 The dev server uses port `5173` by default. Previewing a built demo uses:
 
 ```bash
-pnpm -C packages/demo-app build
-pnpm -C packages/demo-app preview
+pnpm -C vue/packages/demo-app build
+pnpm -C vue/packages/demo-app preview
 ```
 
 The root build helper is:
@@ -29,18 +29,18 @@ The default gallery is split into sections:
 
 | Section          | File                                                        |
 | ---------------- | ----------------------------------------------------------- |
-| Basic            | `packages/demo-app/src/sections/BasicSection.vue`           |
-| Form             | `packages/demo-app/src/sections/FormSection.vue`            |
-| Data             | `packages/demo-app/src/sections/DataSection.vue`            |
-| Navigation       | `packages/demo-app/src/sections/NavigationSection.vue`      |
-| Feedback         | `packages/demo-app/src/sections/FeedbackSection.vue`        |
-| Others           | `packages/demo-app/src/sections/OthersSection.vue`          |
-| Icons            | `packages/demo-app/src/sections/IconsSection.vue`           |
-| Markdown stress  | `packages/demo-app/src/sections/MarkdownStressSection.vue`  |
-| Issue primitives | `packages/demo-app/src/sections/IssuePrimitivesSection.vue` |
+| Basic            | `vue/packages/demo-app/src/sections/BasicSection.vue`           |
+| Form             | `vue/packages/demo-app/src/sections/FormSection.vue`            |
+| Data             | `vue/packages/demo-app/src/sections/DataSection.vue`            |
+| Navigation       | `vue/packages/demo-app/src/sections/NavigationSection.vue`      |
+| Feedback         | `vue/packages/demo-app/src/sections/FeedbackSection.vue`        |
+| Others           | `vue/packages/demo-app/src/sections/OthersSection.vue`          |
+| Icons            | `vue/packages/demo-app/src/sections/IconsSection.vue`           |
+| Markdown stress  | `vue/packages/demo-app/src/sections/MarkdownStressSection.vue`  |
+| Issue primitives | `vue/packages/demo-app/src/sections/IssuePrimitivesSection.vue` |
 
 The demo also has UI audit routes and metadata in
-`packages/demo-app/src/ui-audit-manifest.ts`.
+`vue/packages/demo-app/src/ui-audit-manifest.ts`.
 
 ## Add A Demo
 
@@ -53,14 +53,14 @@ The demo also has UI audit routes and metadata in
 
 ## Visual Regression Relationship
 
-Visual snapshots under `tests/visual/demo-app.spec.ts-snapshots/` are generated
+Visual snapshots under `vue/tests/visual/demo-app.spec.ts-snapshots/` are generated
 from the demo app. The main command is:
 
 ```bash
 pnpm run test:visual
 ```
 
-Focused Playwright specs live under `tests/visual/`, including demo smoke,
+Focused Playwright specs live under `vue/tests/visual/`, including demo smoke,
 interactive audit, UI audit, scroll motion, and issue primitive coverage.
 
 When a demo change intentionally changes screenshots, update the relevant

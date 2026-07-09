@@ -17,7 +17,7 @@
   "icons": [
     {
       "id": "search",
-      "source": "packages/icons-svg/search.svg",
+      "source": "vue/packages/icons-svg/search.svg",
       "vueComponent": "Search",
       "avaloniaResourceKey": "FsusIconSearch",
       "sourcePathHash": "98da11164694978a1f3d9243c2e2968d8a2ded1cea1e80b5b1a31a950c9aa400",
@@ -33,7 +33,7 @@
     },
     {
       "id": "settings",
-      "source": "packages/icons-svg/setting.svg",
+      "source": "vue/packages/icons-svg/setting.svg",
       "vueComponent": "Setting",
       "avaloniaResourceKey": "FsusIconSettings",
       "sourcePathHash": "241f83ba738431311b3cff39d1b41cf4de9b575ee06e4c3b580836a2df4e48cf",
@@ -49,7 +49,7 @@
     },
     {
       "id": "warning",
-      "source": "packages/icons-svg/warning.svg",
+      "source": "vue/packages/icons-svg/warning.svg",
       "vueComponent": "Warning",
       "avaloniaResourceKey": "FsusIconWarning",
       "sourcePathHash": "54e34f8bcd9750d9cf2b9bbfa7521f58812c12f339ecdf697f267467fbf1933c",
@@ -65,7 +65,7 @@
     },
     {
       "id": "chevron-right",
-      "source": "packages/icons-svg/arrow-right.svg",
+      "source": "vue/packages/icons-svg/arrow-right.svg",
       "vueComponent": "ArrowRight",
       "avaloniaResourceKey": "FsusIconChevronRight",
       "sourcePathHash": "3db3c29382f10903654eb12109936e262a5e2a7be40afac3ec891a1fc4ef9423",

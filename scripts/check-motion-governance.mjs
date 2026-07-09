@@ -24,7 +24,7 @@ const steps = [
       './scripts/with-node-heap.mjs',
       'vitest',
       'run',
-      'packages/motion',
+      'vue/packages/motion',
     ],
   },
   {
@@ -34,7 +34,7 @@ const steps = [
       './scripts/with-node-heap.mjs',
       'node',
       './scripts/check-motion-adoption.mjs',
-      'packages/motion/__tests__/fixtures/fsusblog-motion-adoption.json',
+      'vue/packages/motion/__tests__/fixtures/fsusblog-motion-adoption.json',
     ],
   },
 ]

@@ -6,43 +6,43 @@ const mode = process.argv[2]
 const pathGroups = {
   node: [
     /^scripts\//,
-    /^internal\//,
-    /^packages\/wasm\/build\.config\.ts$/,
-    /^packages\/theme-chalk\/[^/]+$/,
-    /^packages\/element-plus\/version\.ts$/,
-    /^packages\/element-plus\/package\.json$/,
-    /^tsconfig\.node\.json$/,
+    /^vue\/internal\//,
+    /^vue\/packages\/wasm\/build\.config\.ts$/,
+    /^vue\/packages\/theme-chalk\/[^/]+$/,
+    /^vue\/packages\/element-plus\/version\.ts$/,
+    /^vue\/packages\/element-plus\/package\.json$/,
+    /^vue\/tsconfig\.node\.json$/,
     /^package\.json$/,
     /^pnpm-lock\.yaml$/,
   ],
   web: [
-    /^packages\/components\//,
-    /^packages\/hooks\//,
-    /^packages\/directives\//,
-    /^packages\/utils\//,
-    /^packages\/element-plus\//,
-    /^packages\/theme-chalk\//,
-    /^packages\/locale\//,
-    /^packages\/constants\//,
-    /^packages\/test-utils\//,
-    /^packages\/wasm\//,
-    /^typings\//,
-    /^tests\//,
-    /^playwright\./,
+    /^vue\/packages\/components\//,
+    /^vue\/packages\/hooks\//,
+    /^vue\/packages\/directives\//,
+    /^vue\/packages\/utils\//,
+    /^vue\/packages\/element-plus\//,
+    /^vue\/packages\/theme-chalk\//,
+    /^vue\/packages\/locale\//,
+    /^vue\/packages\/constants\//,
+    /^vue\/packages\/test-utils\//,
+    /^vue\/packages\/wasm\//,
+    /^vue\/typings\//,
+    /^vue\/tests\//,
+    /^vue\/playwright\./,
     /^vite\.config\./,
-    /^vitest\.config\./,
-    /^tsconfig\.(web|vite-config|vitest|base)\.json$/,
+    /^vue\/vitest\.config\./,
+    /^vue\/tsconfig\.(web|vite-config|vitest|base)\.json$/,
   ],
   unit: [
-    /^packages\/components\//,
-    /^packages\/hooks\//,
-    /^packages\/directives\//,
-    /^packages\/utils\//,
-    /^packages\/theme-chalk\//,
-    /^packages\/wasm\//,
-    /^tests\/boundary\//,
-    /^vitest\.config\./,
-    /^tsconfig\.vitest\.json$/,
+    /^vue\/packages\/components\//,
+    /^vue\/packages\/hooks\//,
+    /^vue\/packages\/directives\//,
+    /^vue\/packages\/utils\//,
+    /^vue\/packages\/theme-chalk\//,
+    /^vue\/packages\/wasm\//,
+    /^vue\/tests\/boundary\//,
+    /^vue\/vitest\.config\./,
+    /^vue\/tsconfig\.vitest\.json$/,
   ],
 }
 
@@ -116,7 +116,7 @@ function typecheckScripts(files) {
   if (files.some((file) => matchesAny(file, pathGroups.web))) {
     scripts.push('typecheck:web', 'typecheck:vitest')
   }
-  if (files.some((file) => /^vite\.config\.|^tsconfig\.vite-config\.json$/.test(file))) {
+  if (files.some((file) => /^vite\.config\.|^vue\/tsconfig\.vite-config\.json$/.test(file))) {
     scripts.push('typecheck:vite-config')
   }
   return [...new Set(scripts)]
@@ -124,22 +124,22 @@ function typecheckScripts(files) {
 
 function unitArgs(files) {
   const targets = []
-  if (files.some((file) => /^packages\/components\//.test(file))) targets.push('packages/components')
-  if (files.some((file) => /^packages\/hooks\//.test(file))) targets.push('packages/hooks')
-  if (files.some((file) => /^packages\/directives\//.test(file))) targets.push('packages/directives')
-  if (files.some((file) => /^packages\/utils\//.test(file))) targets.push('packages/utils')
-  if (files.some((file) => /^packages\/theme-chalk\//.test(file))) targets.push('packages/theme-chalk')
-  if (files.some((file) => /^packages\/wasm\//.test(file))) targets.push('packages/wasm')
-  if (files.some((file) => /^tests\/boundary\//.test(file))) targets.push('tests/boundary')
-  if (files.some((file) => /^vitest\.config\.|^tsconfig\.vitest\.json$/.test(file))) {
-    return ['packages/components', 'packages/hooks', 'packages/directives', 'packages/utils', 'tests/boundary']
+  if (files.some((file) => /^vue\/packages\/components\//.test(file))) targets.push('vue/packages/components')
+  if (files.some((file) => /^vue\/packages\/hooks\//.test(file))) targets.push('vue/packages/hooks')
+  if (files.some((file) => /^vue\/packages\/directives\//.test(file))) targets.push('vue/packages/directives')
+  if (files.some((file) => /^vue\/packages\/utils\//.test(file))) targets.push('vue/packages/utils')
+  if (files.some((file) => /^vue\/packages\/theme-chalk\//.test(file))) targets.push('vue/packages/theme-chalk')
+  if (files.some((file) => /^vue\/packages\/wasm\//.test(file))) targets.push('vue/packages/wasm')
+  if (files.some((file) => /^vue\/tests\/boundary\//.test(file))) targets.push('vue/tests/boundary')
+  if (files.some((file) => /^vue\/vitest\.config\.|^vue\/tsconfig\.vitest\.json$/.test(file))) {
+    return ['vue/packages/components', 'vue/packages/hooks', 'vue/packages/directives', 'vue/packages/utils', 'vue/tests/boundary']
   }
   return [...new Set(targets)]
 }
 
 function runVitest(targets) {
   console.log(`[affected:${mode}] run vitest ${targets.join(' ')}`)
-  const result = spawnSync('pnpm', ['exec', 'vitest', 'run', ...targets], {
+  const result = spawnSync('pnpm', ['exec', 'vitest', 'run', '--config', 'vue/vitest.config.ts', ...targets], {
     stdio: 'inherit',
     shell: process.platform === 'win32',
   })

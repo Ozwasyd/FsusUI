@@ -19,7 +19,7 @@ Avalonia keys are in `dotnet/FsusUI.Avalonia.Icons/Generated/FsusIconKeys.g.cs`.
 ## npm version
 
 The Web compatibility package version is `@ozwasyd/element-plus@1.5.1` from
-`packages/element-plus/package.json`.
+`vue/packages/element-plus/package.json`.
 
 ## NuGet version
 

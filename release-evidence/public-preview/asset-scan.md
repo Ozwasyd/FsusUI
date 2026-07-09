@@ -23,18 +23,18 @@ total=337
 bitmaps=44
 svgs=293
 bitmap_dirs:
-     44 tests/visual/demo-app.spec.ts-snapshots
+     44 vue/tests/visual/demo-app.spec.ts-snapshots
 svg_dirs:
-    293 packages/icons-svg
+    293 vue/packages/icons-svg
 private-asset-path-strict-scan-exit=1
 ```
 
 Tracked bitmap files are visual regression snapshots from the demo app. They
 use synthetic component states and do not contain private user data.
 
-Tracked SVG files are FsusUI icon source assets under `packages/icons-svg`.
+Tracked SVG files are FsusUI icon source assets under `vue/packages/icons-svg`.
 They are covered by the MIT license lineage documented in `NOTICE` and
-`packages/icons-svg/LICENSE`.
+`vue/packages/icons-svg/LICENSE`.
 
 No private GitHub image attachment URLs, public user-image attachment URLs,
 Linux home-directory paths, or Windows user-directory paths were found in the

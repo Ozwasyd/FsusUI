@@ -61,7 +61,7 @@ const selectorItems = (selector) =>
     .filter(Boolean)
 
 const failures = []
-const notificationFile = 'packages/theme-chalk/src/notification.scss'
+const notificationFile = 'vue/packages/theme-chalk/src/notification.scss'
 const source = read(notificationFile)
 const sourceWithoutComments = withoutLineComments(source)
 
@@ -87,7 +87,7 @@ for (const expected of [
   }
 }
 
-const varFile = 'packages/theme-chalk/src/common/var.scss'
+const varFile = 'vue/packages/theme-chalk/src/common/var.scss'
 const varSource = read(varFile)
 
 if (varSource.includes("'width': 360px")) {
@@ -110,7 +110,7 @@ if (!/'shadow':\s*var\(\s*--fsus-shadow-floating/u.test(varSource)) {
   )
 }
 
-const themeFile = 'packages/theme-chalk/src/fsus-theme.scss'
+const themeFile = 'vue/packages/theme-chalk/src/fsus-theme.scss'
 const themeSource = read(themeFile)
 const normalizedThemeSource = withoutLineComments(themeSource).replace(
   /#\{[^}]+\}/gu,

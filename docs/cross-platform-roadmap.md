@@ -38,7 +38,7 @@ They are not included in the first basic Avalonia support scope.
 
 | Issue                       | Status | Repository Evidence                                                                                                     |
 | --------------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------- |
-| #16 Motion system           | Closed | `packages/motion`, component `motion` props, GSAP wrappers, `docs/components/motion.md`                                 |
+| #16 Motion system           | Closed | `vue/packages/motion`, component `motion` props, GSAP wrappers, `docs/components/motion.md`                                 |
 | #19 Platform-neutral spec   | Closed | `spec/README.md`, `spec/architecture.md`, token/component/pattern/a11y/motion/icon docs                                 |
 | #20 Token generator         | Closed | `spec/tokens/tokens.json`, `scripts/token-pipeline.mjs`, generated Web/Avalonia/docs/checksum artifacts, CI token gate  |
 | #21 Avalonia theme baseline | Closed | `dotnet/FsusUI.Avalonia.Themes`, generated token resource import, light/dark dictionaries, control baselines, smoke app |

@@ -48,18 +48,18 @@ assert(
   workflows.includes('actions/cache@v4'),
   'quality workflows must restore/save generated artifact caches',
 )
-for (const path of ['packages/icons-vue/dist', 'packages/wasm/dist']) {
+for (const path of ['vue/packages/icons-vue/dist', 'vue/packages/wasm/dist']) {
   assert(workflows.includes(path), `artifact cache paths must include ${path}`)
 }
 for (const fragment of [
   'fsusui-test-artifacts-icons-',
   'fsusui-test-artifacts-wasm-',
-  'packages/icons-vue/src/**',
-  'packages/icons-vue/build/**',
+  'vue/packages/icons-vue/src/**',
+  'vue/packages/icons-vue/build/**',
   'scripts/ensure-icons-artifacts.mjs',
-  'packages/wasm/**/*.ts',
-  'packages/wasm/**/*.cpp',
-  'packages/wasm/**/CMakeLists.txt',
+  'vue/packages/wasm/**/*.ts',
+  'vue/packages/wasm/**/*.cpp',
+  'vue/packages/wasm/**/CMakeLists.txt',
   'scripts/ensure-wasm-artifacts.mjs',
   'scripts/run-wasm-build.mjs',
 ]) {

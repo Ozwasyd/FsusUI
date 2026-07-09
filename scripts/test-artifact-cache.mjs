@@ -12,27 +12,27 @@ const posixPath = (value) => value.replaceAll('\\', '/')
 const resolveArtifact = (file) => resolve(root, file)
 
 const iconArtifactFiles = [
-  'packages/icons-vue/dist/index.js',
-  'packages/icons-vue/dist/index.cjs',
-  'packages/icons-vue/dist/global.js',
-  'packages/icons-vue/dist/types/index.d.ts',
+  'vue/packages/icons-vue/dist/index.js',
+  'vue/packages/icons-vue/dist/index.cjs',
+  'vue/packages/icons-vue/dist/global.js',
+  'vue/packages/icons-vue/dist/types/index.d.ts',
 ]
 
 const wasmBundleArtifacts = [
-  'packages/wasm/dist/index.mjs',
-  'packages/wasm/dist/index.cjs',
-  'packages/wasm/dist/index.d.ts',
-  'packages/wasm/dist/index.d.mts',
-  'packages/wasm/dist/index.d.cts',
+  'vue/packages/wasm/dist/index.mjs',
+  'vue/packages/wasm/dist/index.cjs',
+  'vue/packages/wasm/dist/index.d.ts',
+  'vue/packages/wasm/dist/index.d.mts',
+  'vue/packages/wasm/dist/index.d.cts',
 ]
 
 const wasmNativeArtifacts = [
-  'packages/wasm/dist/ep_wasm.mjs',
-  'packages/wasm/dist/ep_wasm.wasm',
-  'packages/wasm/dist/markdown_basic.js',
-  'packages/wasm/dist/markdown_basic.wasm',
-  'packages/wasm/dist/markdown_simd.js',
-  'packages/wasm/dist/markdown_simd.wasm',
+  'vue/packages/wasm/dist/ep_wasm.mjs',
+  'vue/packages/wasm/dist/ep_wasm.wasm',
+  'vue/packages/wasm/dist/markdown_basic.js',
+  'vue/packages/wasm/dist/markdown_basic.wasm',
+  'vue/packages/wasm/dist/markdown_simd.js',
+  'vue/packages/wasm/dist/markdown_simd.wasm',
 ]
 
 export const artifactGroups = {
@@ -41,16 +41,16 @@ export const artifactGroups = {
     label: 'icons-vue',
     scriptName: 'ensure:icons',
     scriptPath: 'scripts/ensure-icons-artifacts.mjs',
-    artifactsPath: 'packages/icons-vue/dist',
+    artifactsPath: 'vue/packages/icons-vue/dist',
     fingerprints: [
       {
         id: 'icons',
-        fingerprintPath: 'packages/icons-vue/dist/.artifact-fingerprint',
+        fingerprintPath: 'vue/packages/icons-vue/dist/.artifact-fingerprint',
         artifactFiles: iconArtifactFiles,
         inputPatterns: [
-          'packages/icons-vue/package.json',
-          'packages/icons-vue/src/**/*',
-          'packages/icons-vue/build/**/*',
+          'vue/packages/icons-vue/package.json',
+          'vue/packages/icons-vue/src/**/*',
+          'vue/packages/icons-vue/build/**/*',
           'scripts/ensure-icons-artifacts.mjs',
           'scripts/prepare-test-artifacts.mjs',
           'scripts/test-artifact-cache.mjs',
@@ -63,19 +63,19 @@ export const artifactGroups = {
     label: 'wasm',
     scriptName: 'ensure:wasm',
     scriptPath: 'scripts/ensure-wasm-artifacts.mjs',
-    artifactsPath: 'packages/wasm/dist',
+    artifactsPath: 'vue/packages/wasm/dist',
     fingerprints: [
       {
         id: 'bundle',
-        fingerprintPath: 'packages/wasm/dist/.artifact-fingerprint',
+        fingerprintPath: 'vue/packages/wasm/dist/.artifact-fingerprint',
         artifactFiles: wasmBundleArtifacts,
         inputPatterns: [
-          'packages/wasm/package.json',
-          'packages/wasm/build.config.ts',
-          'packages/wasm/index.ts',
-          'packages/wasm/markdown.ts',
-          'packages/wasm/markdown-runtime.ts',
-          'packages/wasm/runtime/**/*.ts',
+          'vue/packages/wasm/package.json',
+          'vue/packages/wasm/build.config.ts',
+          'vue/packages/wasm/index.ts',
+          'vue/packages/wasm/markdown.ts',
+          'vue/packages/wasm/markdown-runtime.ts',
+          'vue/packages/wasm/runtime/**/*.ts',
           'scripts/ensure-wasm-artifacts.mjs',
           'scripts/prepare-test-artifacts.mjs',
           'scripts/test-artifact-cache.mjs',
@@ -83,15 +83,15 @@ export const artifactGroups = {
       },
       {
         id: 'native',
-        fingerprintPath: 'packages/wasm/dist/.native-artifact-fingerprint',
+        fingerprintPath: 'vue/packages/wasm/dist/.native-artifact-fingerprint',
         artifactFiles: wasmNativeArtifacts,
         inputPatterns: [
-          'packages/wasm/build.sh',
-          'packages/wasm/CMakeLists.txt',
-          'packages/wasm/markdown/CMakeLists.txt',
-          'packages/wasm/markdown/include/**/*',
-          'packages/wasm/markdown/src/**/*',
-          'packages/wasm/src/**/*',
+          'vue/packages/wasm/build.sh',
+          'vue/packages/wasm/CMakeLists.txt',
+          'vue/packages/wasm/markdown/CMakeLists.txt',
+          'vue/packages/wasm/markdown/include/**/*',
+          'vue/packages/wasm/markdown/src/**/*',
+          'vue/packages/wasm/src/**/*',
           'scripts/ensure-wasm-artifacts.mjs',
           'scripts/run-wasm-build.mjs',
           'scripts/prepare-test-artifacts.mjs',
@@ -121,9 +121,9 @@ export async function expandInputPatterns(patterns) {
     dot: true,
     ignore: [
       '**/node_modules/**',
-      'packages/icons-vue/dist/**',
-      'packages/wasm/build/**',
-      'packages/wasm/dist/**',
+      'vue/packages/icons-vue/dist/**',
+      'vue/packages/wasm/build/**',
+      'vue/packages/wasm/dist/**',
     ],
     onlyFiles: true,
     unique: true,

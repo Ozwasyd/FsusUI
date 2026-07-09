@@ -491,7 +491,7 @@ Prefer the semantic settle presets for new product work:
 | ------------------- | ----------------------------------------- | ------------------------------------------ |
 | `surface-settle`    | ordinary content, reading, list/table     | none; this is the quiet default            |
 | `paper-settle`      | ordinary panels and admin operation cards | reading body content                       |
-| `route-settle`      | route and reading page changes, using a short fade-through with no directional travel | local card or row state feedback           |
+| `route-settle`      | route and reading page changes, using a short soft-focus fade-through | local card or row state feedback           |
 | `dialog-settle`     | dialog, popover, menu, centered overlay   | ordinary content panels and reading bodies |
 | `sheet-settle`      | drawer, bottom sheet, mobile sheet        | article body and ordinary content panels   |
 | `dock-settle`       | mobile dock and bottom action bar         | article body and ordinary content panels   |
@@ -581,6 +581,16 @@ actions.
     <button>Like</button>
     <button>Share</button>
   </FsuMobileDock>
+
+  <FsuBottomTabBar
+    label="Primary navigation"
+    :items="[
+      { key: 'home', label: 'Home', href: '/' },
+      { key: 'archive', label: 'Archive', href: '/archive' },
+      { key: 'about', label: 'About', href: '/about' }
+    ]"
+    active-key="archive"
+  />
 
   <FsuBottomActionBar label="Bulk edit actions">
     <button>Cancel</button>

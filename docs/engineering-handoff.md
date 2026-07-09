@@ -31,7 +31,7 @@ pnpm verify
 - `typecheck`：零 TypeScript warning、零 error
 - `test:run`：全量 Vitest 通过
 - `build`：根构建通过，且类型生成链路无 `TS5103`
-- `build:demo`：`packages/demo-app` 生产构建成功
+- `build:demo`：`vue/packages/demo-app` 生产构建成功
 - `verify`：上述主链路按既定顺序串行通过
 
 ### 覆盖率与视觉回归
@@ -50,7 +50,7 @@ pnpm verify:release
 
 ## WASM
 
-本仓库的 WASM 包位于 `packages/wasm`，当前构建会生成：
+本仓库的 WASM 包位于 `vue/packages/wasm`，当前构建会生成：
 
 - `ep_wasm.mjs/.wasm`：表格排序、虚拟列表行高等通用加速能力。
 - `markdown_basic.js/.wasm`：Markdown raw HTML 渲染器的标量 fallback。
@@ -72,9 +72,9 @@ MarkdownRenderer 组件不携带完整文章排版主题，但会通过 public `
 
 Motion 系统的上游实现已经收口在 FsusUI：
 
-- 专用模块位于 [`packages/motion`](../packages/motion)，提供 `FsuTransition`、`v-motion`、`v-scroll-reveal`、tokens、presets、runtime、GSAP context、timeline、ScrollTrigger wrapper 和 route cleanup。
-- `ElConfigProvider.motion` 位于 [`packages/components/config-provider/src/motion.ts`](../packages/components/config-provider/src/motion.ts)，统一写入 `system / enabled / reduced / disabled` 状态、motion preset 和 CSS token。
-- 组件级 `motion` prop 约定位于 [`packages/components/motion.ts`](../packages/components/motion.ts)，已接入 Button、Card、Dialog、Drawer、Dropdown、Tooltip、Message、Notification、Collapse 和 Tabs。
+- 专用模块位于 [`vue/packages/motion`](../vue/packages/motion)，提供 `FsuTransition`、`v-motion`、`v-scroll-reveal`、tokens、presets、runtime、GSAP context、timeline、ScrollTrigger wrapper 和 route cleanup。
+- `ElConfigProvider.motion` 位于 [`vue/packages/components/config-provider/src/motion.ts`](../vue/packages/components/config-provider/src/motion.ts)，统一写入 `system / enabled / reduced / disabled` 状态、motion preset 和 CSS token。
+- 组件级 `motion` prop 约定位于 [`vue/packages/components/motion.ts`](../vue/packages/components/motion.ts)，已接入 Button、Card、Dialog、Drawer、Dropdown、Tooltip、Message、Notification、Collapse 和 Tabs。
 - GSAP 不作为业务侧直接依赖暴露；调用端通过 `useGsapContext`、`useTimeline`、`useScrollReveal`、`useMotionRouteCleanup` 和 `refreshScrollTriggers()` 完成生命周期清理与动态内容刷新。
 - 使用说明、preset gallery、低动效策略、性能规则、反模式和 FsusBlog 集成示例统一维护在 [`docs/components/motion.md`](./components/motion.md)。
 
@@ -93,11 +93,11 @@ FsusBlog 侧的消费规则：页面只消费 FsusUI 导出的 component / direc
 ### Test artifact cache
 
 - `prepare:test-artifacts` 会按 source hash 检查 icon / WASM 生成工件，再决定是否调用 `ensure:icons` 与 `ensure:wasm`。
-- CI 使用 test artifact cache 恢复 `packages/icons-vue/dist` 与 `packages/wasm/dist`，cache key 覆盖相关源码、构建配置和生成脚本。
+- CI 使用 test artifact cache 恢复 `vue/packages/icons-vue/dist` 与 `vue/packages/wasm/dist`，cache key 覆盖相关源码、构建配置和生成脚本。
 - GitHub Actions 日志会输出 `icons-cache-hit` 与 `wasm-cache-hit`；本地 wrapper 会继续输出 `cache hit` / `cache miss`、source hash 和 miss reason。
 - cache hit 会跳过对应 ensure 脚本；cache miss、restore-key 命中过期工件或 fingerprint 不一致时会重新生成。
 - `pnpm run build:wasm` 保留显式 force regeneration 语义；需要强制重建所有测试工件时可使用 `FORCE_REBUILD=1 pnpm run prepare:test-artifacts`。
-- `_quality.yml` 的 `unit-artifacts` job 会先生成并上传 `unit-test-artifacts`，unit shard 只下载该工件、解包、执行 `pnpm run check:test-artifacts-ready`，再运行 `pnpm exec vitest run --shard=<n>/4`。
+- `_quality.yml` 的 `unit-artifacts` job 会先生成并上传 `unit-test-artifacts`，unit shard 只下载该工件、解包、执行 `pnpm run check:test-artifacts-ready`，再运行 `pnpm exec vitest run --config vue/vitest.config.ts --shard=<n>/4`。
 - 本地复现 unit shard 时，先运行 `pnpm run prepare:test-artifacts`，再运行 `pnpm run check:test-artifacts-ready` 和目标 `vitest run --shard` 命令；不要在每个 shard 前重复生成 icon/WASM 工件。
 - `_quality.yml` 的 `build-package` job 会上传 `fsusui-npm-package-dist`，其中包含 `fsusui-npm-package-dist.tgz` 与 `sha256sum` 文件；`consumer-install` 只下载、校验、解包该工件并运行 `build:package-smoke` / `test:consumer-install`，不再重复执行 `build:npm-package`。
 - `verify:release` 仍保留 independent rebuild：本地发布验收会重新执行 `build:npm-package`，再运行 consumer install，避免发布路径只依赖 workflow artifact。
@@ -138,11 +138,11 @@ FsusBlog 侧的消费规则：页面只消费 FsusUI 导出的 component / direc
 高频问题与对应位置：
 
 - Vitest 环境噪声：看 [vitest.setup.ts](/data/projects/FsusUI/vitest.setup.ts:1)
-- 覆盖率范围或门槛：看 [vitest.config.ts](/data/projects/FsusUI/vitest.config.ts:1)
-- 视觉回归失败：先看 [playwright.config.ts](/data/projects/FsusUI/playwright.config.ts:1) 和 [tests/visual/demo-app.spec.ts](/data/projects/FsusUI/tests/visual/demo-app.spec.ts:1)
-- demo 夹具问题：看 [packages/demo-app/src/VisualFixtures.vue](/data/projects/FsusUI/packages/demo-app/src/VisualFixtures.vue:1)
+- 覆盖率范围或门槛：看 [vue/vitest.config.ts](/data/projects/FsusUI/vue/vitest.config.ts:1)
+- 视觉回归失败：先看 [vue/playwright.config.ts](/data/projects/FsusUI/vue/playwright.config.ts:1) 和 [vue/tests/visual/demo-app.spec.ts](/data/projects/FsusUI/vue/tests/visual/demo-app.spec.ts:1)
+- demo 夹具问题：看 [vue/packages/demo-app/src/VisualFixtures.vue](/data/projects/FsusUI/vue/packages/demo-app/src/VisualFixtures.vue:1)
 - npm package 准备问题：看 `scripts/prepare-npm-package.mjs`
-- 根构建类型生成问题：看 `internal/build/src/tasks/types-definitions.ts`
+- 根构建类型生成问题：看 `vue/internal/build/src/tasks/types-definitions.ts`
 
 ## 5. Vitest、Coverage、Playwright 的关系
 
@@ -159,9 +159,9 @@ FsusBlog 侧的消费规则：页面只消费 FsusUI 导出的 component / direc
 
 ## 6. Visual Fixtures 维护规则
 
-- 稳定夹具入口在 [packages/demo-app/src/VisualFixtures.vue](/data/projects/FsusUI/packages/demo-app/src/VisualFixtures.vue:1)
-- Playwright 用例入口在 [tests/visual/demo-app.spec.ts](/data/projects/FsusUI/tests/visual/demo-app.spec.ts:1)
-- 视觉模式通过 `/?visual=<group>&theme=<light|dark>&compact=<0|1>` 切换，由 [packages/demo-app/src/main.ts](/data/projects/FsusUI/packages/demo-app/src/main.ts:1) 挂载
+- 稳定夹具入口在 [vue/packages/demo-app/src/VisualFixtures.vue](/data/projects/FsusUI/vue/packages/demo-app/src/VisualFixtures.vue:1)
+- Playwright 用例入口在 [vue/tests/visual/demo-app.spec.ts](/data/projects/FsusUI/vue/tests/visual/demo-app.spec.ts:1)
+- 视觉模式通过 `/?visual=<group>&theme=<light|dark>&compact=<0|1>` 切换，由 [vue/packages/demo-app/src/main.ts](/data/projects/FsusUI/vue/packages/demo-app/src/main.ts:1) 挂载
 
 新增视觉用例时遵守这些规则：
 
@@ -176,8 +176,8 @@ FsusBlog 侧的消费规则：页面只消费 FsusUI 导出的 component / direc
 - 根目录一次性迁移脚本属于明确排除项，不纳入质量门
 - 长期维护脚本仍纳入质量门，包括：
   - `scripts/**`
-  - `packages/icons-vue/build/**`
-  - `playwright.config.ts`
+  - `vue/packages/icons-vue/build/**`
+  - `vue/playwright.config.ts`
   - CI 工作流相关长期资产
 
 后续新增脚本时，先判断它是：
@@ -205,7 +205,7 @@ PR-fast uses `typecheck:affected`, which selects the affected TypeScript
 lanes and runs them through `scripts/run-typecheck.mjs`. The default
 `typecheck:*` lanes write `.tsbuildinfo` files under `.tmp/typecheck-cache`;
 GitHub Actions restores that typecheck cache with a key that includes
-`pnpm-lock.yaml`, `package.json`, `tsconfig*.json`, package sources, typings,
+`pnpm-lock.yaml`, `package.json`, `vue/tsconfig*.json`, package sources, typings,
 internal TypeScript sources, and `scripts/run-typecheck.mjs`.
 
 Workflow logs print `typecheck-cache-hit`, `cache-hit`, and

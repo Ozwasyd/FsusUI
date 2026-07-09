@@ -1,0 +1,373 @@
+@use 'sass:list';
+@use 'mixins/mixins' as *;
+@use 'mixins/config' as *;
+
+// Motion phase classes for FsusUI components.
+//
+// Vue's `<Transition>` adds six classes to its child by default: one
+// `*-from`, one `*-active`, and one `*-to` for both `enter` and
+// `leave` phases. The legacy Element Plus styles in
+// `common/transition.scss` collapsed many of these into a single rule
+// per selector (e.g. `.el-zoom-in-top-enter-active,
+// .el-zoom-in-top-leave-active { transition: ... }`). The collapsed form
+// is concise but blurs the contract: a rule that only wants the
+// enter-active duration must be written next to a leave-active rule
+// that often has a different shape.
+//
+// This file de-collapses the phase classes — each phase state gets its
+// own rule — and provides a `motionPhaseClassNames` helper that emits
+// the full set of six names for a given base. New component CSS should
+// prefer the helper over hand-written selectors.
+
+// Emit the six Vue Transition phase class names for `name`. The
+// `data-fsus-motion-phase` attribute is also added by `runMotion` so
+// styles can target the active phase without relying on the legacy
+// `enter-from` / `enter-active` / `enter-to` selectors.
+@function motionPhaseClassNames($name) {
+  @return (
+    $name + '-enter-from',
+    $name + '-enter-active',
+    $name + '-enter-to',
+    $name + '-leave-from',
+    $name + '-leave-active',
+    $name + '-leave-to',
+  );
+}
+
+// Convenience: generate the four class selectors that the runtime
+// actually drives — `enter-from`, `enter-active`, `leave-from`,
+// `leave-active`. Use this when the to-state equals the from-state on
+// exit and you only need to declare the active phase.
+@function motionActivePhaseClassNames($name) {
+  @return (
+    $name + '-enter-from',
+    $name + '-enter-active',
+    $name + '-leave-from',
+    $name + '-leave-active',
+  );
+}
+
+// De-collapsed phase classes for the Fsu* motion components. The
+// runtime sets `data-fsus-motion-preset` on the element and writes the
+// enter/leave state to its `style` attribute, so the only CSS concerns
+// are (a) the `transition` duration/easing on the active phase, and
+// (b) the `will-change` hint. Both are inherited from the FsusUI
+// motion token scale — no per-component override needed.
+
+.#{$namespace}-fade-in-linear-enter-active {
+  transition: getCssVar('transition-fade', 'linear');
+}
+
+.#{$namespace}-fade-in-linear-enter-from,
+.#{$namespace}-fade-in-linear-leave-to {
+  opacity: 0;
+}
+
+.#{$namespace}-fade-in-linear-leave-active {
+  transition: getCssVar('transition-fade', 'linear');
+}
+
+.#{$namespace}-fade-in-linear-leave-from,
+.#{$namespace}-fade-in-linear-enter-to {
+  opacity: 1;
+}
+
+.#{$namespace}-fade-in-enter-active {
+  transition: opacity getCssVar('transition-duration')
+    getCssVar('transition-function-fast-bezier');
+}
+
+.#{$namespace}-fade-in-leave-active {
+  transition: opacity getCssVar('transition-duration')
+    getCssVar('transition-function-fast-bezier');
+}
+
+.#{$namespace}-fade-in-enter-from,
+.#{$namespace}-fade-in-leave-to {
+  opacity: 0;
+}
+
+.#{$namespace}-fade-in-leave-from,
+.#{$namespace}-fade-in-enter-to {
+  opacity: 1;
+}
+
+.#{$namespace}-zoom-in-center-enter-active {
+  transition:
+    opacity getCssVar('transition-duration')
+      getCssVar('transition-function-fast-bezier'),
+    transform getCssVar('transition-duration')
+      getCssVar('transition-function-fast-bezier');
+}
+
+.#{$namespace}-zoom-in-center-leave-active {
+  transition:
+    opacity getCssVar('transition-duration')
+      getCssVar('transition-function-fast-bezier'),
+    transform getCssVar('transition-duration')
+      getCssVar('transition-function-fast-bezier');
+}
+
+.#{$namespace}-zoom-in-center-enter-from,
+.#{$namespace}-zoom-in-center-leave-to {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.#{$namespace}-zoom-in-center-leave-from,
+.#{$namespace}-zoom-in-center-enter-to {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.#{$namespace}-zoom-in-top-enter-active {
+  transition:
+    opacity 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform-origin: top left;
+  will-change: opacity, transform;
+}
+
+.#{$namespace}-zoom-in-top-leave-active {
+  transition:
+    opacity 120ms ease-in,
+    transform 120ms ease-in;
+  transform-origin: top left;
+  will-change: opacity, transform;
+}
+
+.#{$namespace}-zoom-in-top-enter-from {
+  opacity: 0;
+  transform: translate3d(0, 6px, 0) scale(0.98);
+}
+
+.#{$namespace}-zoom-in-top-enter-to {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.#{$namespace}-zoom-in-top-leave-from {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.#{$namespace}-zoom-in-top-leave-to {
+  opacity: 0;
+  transform: translate3d(0, 4px, 0) scale(0.985);
+}
+
+.#{$namespace}-zoom-in-bottom-enter-active {
+  transition: getCssVar('transition-md-fade');
+  transform-origin: center bottom;
+  will-change: opacity, transform;
+}
+
+.#{$namespace}-zoom-in-bottom-leave-active {
+  transition: getCssVar('transition-md-fade');
+  transform-origin: center bottom;
+  will-change: opacity, transform;
+}
+
+.#{$namespace}-zoom-in-bottom-enter-from,
+.#{$namespace}-zoom-in-bottom-leave-to {
+  opacity: 0;
+  transform: scaleY(0);
+}
+
+.#{$namespace}-zoom-in-bottom-leave-from,
+.#{$namespace}-zoom-in-bottom-enter-to {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+.#{$namespace}-zoom-in-left-enter-active {
+  transition: getCssVar('transition-md-fade');
+  transform-origin: top left;
+  will-change: opacity, transform;
+}
+
+.#{$namespace}-zoom-in-left-leave-active {
+  transition: getCssVar('transition-md-fade');
+  transform-origin: top left;
+  will-change: opacity, transform;
+}
+
+.#{$namespace}-zoom-in-left-enter-from,
+.#{$namespace}-zoom-in-left-leave-to {
+  opacity: 0;
+  transform: scale(0.45, 0.45);
+}
+
+.#{$namespace}-zoom-in-left-leave-from,
+.#{$namespace}-zoom-in-left-enter-to {
+  opacity: 1;
+  transform: scale(1, 1);
+}
+
+.#{$namespace}-list-enter-active {
+  transition:
+    opacity getCssVar('transition-duration')
+      getCssVar('transition-function-fast-bezier'),
+    transform getCssVar('transition-duration')
+      getCssVar('transition-function-fast-bezier');
+}
+
+.#{$namespace}-list-leave-active {
+  transition:
+    opacity getCssVar('transition-duration')
+      getCssVar('transition-function-fast-bezier'),
+    transform getCssVar('transition-duration')
+      getCssVar('transition-function-fast-bezier');
+  position: absolute !important;
+}
+
+.#{$namespace}-list-enter-from,
+.#{$namespace}-list-leave-to {
+  opacity: 0;
+  transform: translateY(-30px);
+}
+
+.#{$namespace}-list-leave-from,
+.#{$namespace}-list-enter-to {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.#{$namespace}-opacity-transition {
+  transition: opacity getCssVar('transition-duration')
+    getCssVar('transition-function-ease-in-out-bezier');
+}
+
+// Fsu* motion components read their state from data-fsus-motion-* and
+// are not driven by CSS classes, but consumer CSS that targets phase
+// classes (e.g. `.fsu-transition-*-active`) still benefits from the
+// de-collapsed layout. Emit the active-phase classes for each Fsu*
+// transition name so that custom transitions follow the same shape.
+
+$fsu-transitions: (
+  'fsu-transition',
+  'fsu-sheet-transition',
+  'fsu-overlay-transition',
+);
+
+@each $base in $fsu-transitions {
+  $phases: motionActivePhaseClassNames($base);
+  .#{list.nth($phases, 1)},
+  .#{list.nth($phases, 2)},
+  .#{list.nth($phases, 3)},
+  .#{list.nth($phases, 4)} {
+    transition: opacity getCssVar('transition-duration')
+      getCssVar('transition-function-fast-bezier');
+  }
+}
+
+.fsu-mobile-dock {
+  box-sizing: border-box;
+}
+
+.fsu-mobile-dock[data-fsus-mobile-dock='bottom'] {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: var(--fsus-z-mobile-dock, 40);
+}
+
+.fsu-bottom-tab-bar {
+  display: flex;
+  align-items: stretch;
+  inline-size: 100%;
+  min-block-size: var(--fsus-bottom-tab-height, 56px);
+  background: var(
+    --fsus-bottom-tab-bg,
+    var(--fsus-color-surface-base, var(--fsus-paper, #fff))
+  );
+  border-block-start: 1px solid
+    var(--fsus-bottom-tab-border, var(--fsus-border, #e4e4e7));
+}
+
+.fsu-bottom-tab-bar__item {
+  position: relative;
+  flex: 1 1 0;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--fsus-bottom-tab-height, 56px);
+  min-inline-size: 0;
+  padding: var(--fsus-space-1, 4px) var(--fsus-space-2, 8px);
+  color: var(--fsus-bottom-tab-color, var(--fsus-text-regular, #5f5f68));
+  font-size: var(--fsus-bottom-tab-font-size, 13px);
+  font-weight: 600;
+  line-height: 1.15;
+  text-align: center;
+  text-decoration: none;
+  outline: none;
+  transition:
+    color var(--fsus-motion-control-fast, 160ms)
+      var(--fsus-motion-standard, ease),
+    background-color var(--fsus-motion-control-fast, 160ms)
+      var(--fsus-motion-standard, ease);
+}
+
+.fsu-bottom-tab-bar__item:hover,
+.fsu-bottom-tab-bar__item:focus-visible {
+  color: var(--fsus-bottom-tab-hover-color, var(--fsus-ink, #0f0f11));
+  background: var(--fsus-bottom-tab-hover-bg, var(--fsus-state-hover-bg));
+}
+
+.fsu-bottom-tab-bar__item:focus-visible {
+  box-shadow: inset 0 0 0 2px
+    var(--fsus-bottom-tab-focus-ring, var(--fsus-color-focus-ring));
+}
+
+.fsu-bottom-tab-bar__item.is-active {
+  color: var(--fsus-bottom-tab-active-color, var(--fsus-ink, #0f0f11));
+  font-weight: 700;
+}
+
+.fsu-bottom-tab-bar__indicator {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 50%;
+  inline-size: var(--fsus-bottom-tab-indicator-width, 32px);
+  block-size: var(--fsus-bottom-tab-indicator-height, 2px);
+  border-radius: var(--fsus-radius-pill, 999px);
+  background: transparent;
+  transform: translateX(-50%);
+  transition: background-color var(--fsus-motion-control-fast, 160ms)
+    var(--fsus-motion-standard, ease);
+}
+
+.fsu-bottom-tab-bar__item.is-active .fsu-bottom-tab-bar__indicator {
+  background: var(--fsus-bottom-tab-indicator, var(--fsus-scholarly-blue));
+}
+
+.fsu-bottom-tab-bar__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--fsus-bottom-tab-icon-size, 16px);
+}
+
+.fsu-bottom-tab-bar__icon:empty {
+  display: none;
+}
+
+.fsu-bottom-tab-bar__label {
+  overflow: hidden;
+  max-inline-size: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html.dark .fsu-bottom-tab-bar,
+html[data-theme-resolved='dark'] .fsu-bottom-tab-bar {
+  background: var(
+    --fsus-bottom-tab-bg,
+    var(--fsus-color-surface-base, var(--fsus-paper, #0f0f11))
+  );
+  border-block-start-color: var(
+    --fsus-bottom-tab-border,
+    var(--fsus-border, #27272a)
+  );
+}

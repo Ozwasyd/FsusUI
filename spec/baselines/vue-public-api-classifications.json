@@ -128,6 +128,8 @@
     "./lib/*.js": "portable",
     "./lib/*": "portable",
     "./markdown-runtime": "native-adapter",
+    "./motion": "portable",
+    "./perception-challenge": "native-adapter",
     "./render-pipeline": "portable",
     "./result": "portable",
     "./theme": "portable",

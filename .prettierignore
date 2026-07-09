@@ -3,6 +3,16 @@
 CMakeFiles
 .cmake
 .husky/_/
+vue/packages/*/dist
+vue/packages/demo-app/dist
+vue/packages/icons-vue/dist
+vue/packages/wasm/dist
+vue/internal/*/dist
+vue/tests/fixtures/**/dist
+vue/tests/fixtures/**/node_modules
+vue/tests/fixtures/**/.pnpm-store
+vue/packages/wasm/build
+vue/packages/wasm/.cmake-check
 packages/demo-app/dist
 packages/icons-vue/dist
 packages/wasm/dist
@@ -10,6 +20,10 @@ internal/*/dist
 tests/fixtures/**/dist
 tests/fixtures/**/node_modules
 tests/fixtures/**/.pnpm-store
+tests/fixtures/**/bin
+tests/fixtures/**/obj
+vue/tests/fixtures/**/bin
+vue/tests/fixtures/**/obj
 packages/wasm/build
 packages/wasm/.cmake-check
 node_modules
@@ -32,6 +46,8 @@ secrets
 *.pack
 tests/fixtures/**/.npmrc
 tests/fixtures/**/.npmrc.*
+vue/tests/fixtures/**/.npmrc
+vue/tests/fixtures/**/.npmrc.*
 .vite
 .turbo
 .cache

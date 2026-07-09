@@ -61,7 +61,7 @@ const selectorItems = (selector) =>
     .filter(Boolean)
 
 const failures = []
-const messageFile = 'packages/theme-chalk/src/message.scss'
+const messageFile = 'vue/packages/theme-chalk/src/message.scss'
 const source = read(messageFile)
 const sourceWithoutComments = withoutLineComments(source)
 
@@ -82,9 +82,27 @@ if (source.includes("box-shadow: getCssVar('box-shadow', 'light')")) {
   )
 }
 
-if (!source.includes('box-shadow: var(--fsus-shadow-floating);')) {
+if (source.includes('var(--fsus-shadow-floating)')) {
   failures.push(
-    `${messageFile}: Message must use the floating shadow token by default`,
+    `${messageFile}: Message must stay lighter than Notification and not use --fsus-shadow-floating`,
+  )
+}
+
+if (!source.includes("box-shadow: getCssVar('message', 'shadow');")) {
+  failures.push(
+    `${messageFile}: Message must use the component shadow token by default`,
+  )
+}
+
+if (!source.includes('max-width: min(420px, calc(100% - 32px));')) {
+  failures.push(
+    `${messageFile}: Message must keep a compact toast max-width`,
+  )
+}
+
+if (sourceWithoutComments.includes('&::before')) {
+  failures.push(
+    `${messageFile}: Message must not add decorative pseudo markers`,
   )
 }
 
@@ -105,9 +123,22 @@ for (const expected of [
   }
 }
 
-const themeFile = 'packages/theme-chalk/src/fsus-theme.scss'
+const themeFile = 'vue/packages/theme-chalk/src/fsus-theme.scss'
 const themeSource = read(themeFile)
-let hasMessageSurface = false
+const themeWithoutComments = withoutLineComments(themeSource)
+let hasMessageToastSurface = false
+
+if (themeWithoutComments.includes('.#{$namespace}-message__content')) {
+  failures.push(
+    `${themeFile}: Message content typography must stay owned by message.scss`,
+  )
+}
+
+if (themeWithoutComments.includes('.#{$namespace}-message--')) {
+  failures.push(
+    `${themeFile}: Message status variants must stay owned by message.scss`,
+  )
+}
 
 for (const block of topLevelBlocks(themeSource)) {
   if (!selectorItems(block.selector).includes('.NS-message')) continue
@@ -124,18 +155,61 @@ for (const block of topLevelBlocks(themeSource)) {
     )
   }
 
+  if (block.body.includes('var(--fsus-shadow-floating)')) {
+    failures.push(
+      `${themeFile}:${block.startLine} Message must not inherit Notification-level shadow`,
+    )
+  }
+
+  if (block.body.includes('var(--fsus-radius-floating)')) {
+    failures.push(
+      `${themeFile}:${block.startLine} Message must use compact toast radius, not floating radius`,
+    )
+  }
+
+  if (block.body.includes('var(--fsus-notification-max-width)')) {
+    failures.push(
+      `${themeFile}:${block.startLine} Message must not reuse Notification max-width`,
+    )
+  }
+
+  if (block.body.includes('padding: var(--fsus-space-3) var(--fsus-space-4);')) {
+    failures.push(
+      `${themeFile}:${block.startLine} Message theme overrides must not replace component padding`,
+    )
+  }
+
+  if (block.body.includes('border-radius: 12px;')) {
+    failures.push(
+      `${themeFile}:${block.startLine} Message theme overrides must not hard-code panel radius`,
+    )
+  }
+
+  if (block.body.includes('&::before')) {
+    failures.push(
+      `${themeFile}:${block.startLine} Message theme overrides must not add decorative pseudo markers`,
+    )
+  }
+
   if (
-    block.body.includes('background: var(--el-bg-color-overlay);') &&
-    block.body.includes('border: 1px solid var(--el-border-color-light);') &&
-    block.body.includes('box-shadow: var(--fsus-shadow-floating);')
+    block.body.includes('background: var(--fsus-message-bg, var(--el-bg-color));') &&
+    block.body.includes(
+      'border: 1px solid var(--fsus-message-border, var(--el-border-color-lighter));',
+    ) &&
+    block.body.includes(
+      'border-radius: var(--fsus-message-radius, var(--el-message-border-radius));',
+    ) &&
+    block.body.includes(
+      'box-shadow: var(--fsus-message-shadow, 0 8px 20px rgba(15, 23, 42, 0.06));',
+    )
   ) {
-    hasMessageSurface = true
+    hasMessageToastSurface = true
   }
 }
 
-if (!hasMessageSurface) {
+if (!hasMessageToastSurface) {
   failures.push(
-    `${themeFile}: Message needs an explicit non-blurred floating surface override`,
+    `${themeFile}: Message needs an explicit compact toast surface override`,
   )
 }
 

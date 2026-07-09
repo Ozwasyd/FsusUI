@@ -55,7 +55,7 @@ const extractBlock = (source, selector) => {
 }
 
 const failures = []
-const varFile = 'packages/theme-chalk/src/common/var.scss'
+const varFile = 'vue/packages/theme-chalk/src/common/var.scss'
 const varSource = read(varFile)
 const cascaderMap = extractMap(varSource, 'cascader')
 
@@ -90,7 +90,7 @@ for (const forbidden of [
   }
 }
 
-const themeFile = 'packages/theme-chalk/src/fsus-theme.scss'
+const themeFile = 'vue/packages/theme-chalk/src/fsus-theme.scss'
 const themeSource = read(themeFile)
 const dropdownBlock = extractBlock(
   themeSource,

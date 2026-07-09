@@ -118,7 +118,41 @@ const checkContractReleaseClassification = () => {
   console.log('governance:contract-classification passed')
 }
 
+const checkWorkspaceLayout = () => {
+  for (const oldRootEntry of ['packages', 'internal', 'typings', 'global.d.ts']) {
+    assert(
+      !exists(oldRootEntry),
+      `${oldRootEntry} must live under vue/; root compatibility shells are not allowed`,
+    )
+  }
+
+  for (const requiredVueEntry of [
+    'vue/packages/element-plus/index.ts',
+    'vue/packages/icons-vue/src/index.ts',
+    'vue/internal/build/package.json',
+    'vue/typings/components.d.ts',
+    'vue/global.d.ts',
+  ]) {
+    assert(exists(requiredVueEntry), `${requiredVueEntry} must exist`)
+  }
+
+  const workspace = read('pnpm-workspace.yaml')
+  assert(
+    workspace.includes('vue/packages/*') &&
+      workspace.includes('vue/internal/*'),
+    'pnpm-workspace.yaml must point at vue/packages/* and vue/internal/*',
+  )
+  assert(
+    !workspace.includes('\n  - packages/*') &&
+      !workspace.includes('\n  - internal/*'),
+    'pnpm-workspace.yaml must not keep root packages/internal workspaces',
+  )
+
+  console.log('governance:workspace-layout passed')
+}
+
 try {
+  checkWorkspaceLayout()
   checkRegistry()
   checkReleaseDocs()
   checkContractReleaseClassification()

@@ -10,7 +10,7 @@
 | basic usage            | 调用 `ElMessage('...')`、`ElMessage.success('...')` 或对象参数创建消息。                          |
 | props / events / slots | 本页 `API` 覆盖公开 options 和 instance methods。                                                 |
 | accessibility          | 不要把唯一错误说明放在自动消失消息中；关键错误应同时出现在页面内可回读区域。                      |
-| theme token notes      | 跟随公开 surface、文本、状态色、圆角、阴影和 overlay motion token。                               |
+| theme token notes      | 跟随轻量 toast surface、文本、状态色、紧凑圆角、弱阴影和 overlay motion token。                   |
 | known limitations      | 服务 API 依赖浏览器 DOM；`dangerouslyUseHTMLString` 只允许可信内容，grouping 只合并相同 message。 |
 | stability level        | Preview public service。                                                                          |
 

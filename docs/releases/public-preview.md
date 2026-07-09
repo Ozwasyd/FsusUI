@@ -29,7 +29,7 @@ classified in [`docs/api-stability.md`](../api-stability.md),
 | `@ozwasyd/element-plus/wasm`             | Experimental path      | Public WASM wrapper; generated internals are unsupported. |
 | `@ozwasyd/element-plus/markdown-runtime` | Experimental path      | Runtime helpers for Markdown components.                  |
 
-Internal workspace packages under `internal/*` are not public API.
+Internal workspace packages under `vue/internal/*` are not public API.
 
 ## Installation
 
@@ -61,7 +61,7 @@ The npm registry publishing policy is documented in
 - Minimum runtime target differs from Element Plus; FsusUI expects ES2022 and
   Vue 3.5+.
 - Undocumented `es/*`, `lib/*`, wildcard paths, build internals, generated
-  WASM files, and `internal/*` packages are unsupported.
+  WASM files, and `vue/internal/*` packages are unsupported.
 - Markdown rendering, WASM acceleration, and render pipeline APIs are
   experimental during public preview.
 - Visual regression coverage exists for demo/audit states, but full a11y matrix

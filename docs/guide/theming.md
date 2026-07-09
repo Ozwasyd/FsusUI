@@ -66,7 +66,7 @@ el.style.setProperty('--el-color-primary', '#2A599C')
 
 SCSS 变量在**构建阶段**生效，适合需要深度定制的场景。
 
-SCSS 变量文件路径：`packages/theme-chalk/src/common/var.scss`
+SCSS 变量文件路径：`vue/packages/theme-chalk/src/common/var.scss`
 
 ### 步骤 1：创建自定义变量文件
 

@@ -5,7 +5,7 @@ import { resolve } from 'node:path'
 import { URL } from 'node:url'
 
 const root = process.cwd()
-const wasmBinaryPath = resolve(root, 'packages/wasm/dist/ep_wasm.wasm')
+const wasmBinaryPath = resolve(root, 'vue/packages/wasm/dist/ep_wasm.wasm')
 const originalFetch = globalThis.fetch
 
 const getRequestUrl = (input) => {
@@ -73,7 +73,7 @@ globalThis.fetch = async (input, init) => {
 }
 
 try {
-  const wasm = await import('../packages/wasm/dist/index.mjs')
+  const wasm = await import('../vue/packages/wasm/dist/index.mjs')
   unwrapResult('ensureWasmReady', await wasm.ensureWasmReady())
 
   const numericData = Array.from(

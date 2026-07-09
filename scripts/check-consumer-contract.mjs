@@ -7,6 +7,7 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(scriptDir, '..')
 const sourcePackagePath = path.join(
   repoRoot,
+  'vue',
   'packages',
   'element-plus',
   'package.json',
@@ -102,22 +103,22 @@ const requiredSnippets = new Map([
 expectEqual(
   sourcePackage.peerDependencies?.vue,
   rootPackage.peerDependencies?.vue,
-  'packages/element-plus peerDependencies.vue',
+  'vue/packages/element-plus peerDependencies.vue',
 )
 expectEqual(
   sourcePackage.homepage,
   repositoryWebUrl,
-  'packages/element-plus homepage',
+  'vue/packages/element-plus homepage',
 )
 expectEqual(
   sourcePackage.bugs?.url,
   `${repositoryWebUrl}/issues`,
-  'packages/element-plus bugs.url',
+  'vue/packages/element-plus bugs.url',
 )
 expectEqual(
   sourcePackage.repository?.url,
   `git+${repositoryGitUrl}`,
-  'packages/element-plus repository.url',
+  'vue/packages/element-plus repository.url',
 )
 
 for (const relativePath of consumerDocs) {

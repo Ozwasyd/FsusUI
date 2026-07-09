@@ -13,7 +13,7 @@ Copyright (c) 2020-PRESENT Element Plus
 ```
 
 The root [`LICENSE`](../../LICENSE), root [`NOTICE`](../../NOTICE), and
-`packages/icons-svg/LICENSE` document this license lineage.
+`vue/packages/icons-svg/LICENSE` document this license lineage.
 
 ## FsusUI Ownership Boundary
 

@@ -80,7 +80,7 @@ const topLevelBlocks = (source) => {
 }
 
 const failures = []
-const menuFile = 'packages/theme-chalk/src/menu.scss'
+const menuFile = 'vue/packages/theme-chalk/src/menu.scss'
 const menuSource = read(menuFile)
 const popupBlock = extractBlockAfter(menuSource, '@include m(popup)')
 
@@ -139,7 +139,7 @@ if (!menuItemMixin) {
   }
 }
 
-const themeFile = 'packages/theme-chalk/src/fsus-theme.scss'
+const themeFile = 'vue/packages/theme-chalk/src/fsus-theme.scss'
 const themeSource = read(themeFile)
 let hasMenuPopupSurface = false
 

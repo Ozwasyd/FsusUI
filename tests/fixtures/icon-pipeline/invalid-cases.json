@@ -2,13 +2,13 @@
   "cases": [
     {
       "name": "missing-icon",
-      "expectedError": "source packages/icons-svg/missing.svg does not exist",
+      "expectedError": "source vue/packages/icons-svg/missing.svg does not exist",
       "icons": [
         {
           "id": "missing",
           "displayName": "Missing",
           "category": "action",
-          "source": "packages/icons-svg/missing.svg",
+          "source": "vue/packages/icons-svg/missing.svg",
           "path": "M0 0",
           "defaultSize": "icon.size.md",
           "stroke": "icon.stroke.md",
@@ -27,7 +27,7 @@
           "id": "fixture",
           "displayName": "Fixture",
           "category": "action",
-          "source": "packages/icons-svg/fixture.svg",
+          "source": "vue/packages/icons-svg/fixture.svg",
           "path": "M0 0",
           "defaultSize": "icon.size.md",
           "stroke": "icon.stroke.md",
@@ -39,7 +39,7 @@
           "id": "fixture",
           "displayName": "Fixture",
           "category": "action",
-          "source": "packages/icons-svg/fixture.svg",
+          "source": "vue/packages/icons-svg/fixture.svg",
           "path": "M0 0",
           "defaultSize": "icon.size.md",
           "stroke": "icon.stroke.md",
@@ -49,8 +49,8 @@
         }
       ],
       "files": {
-        "packages/icons-svg/fixture.svg": "<svg stroke-linejoin=\"round\" stroke-linecap=\"round\" stroke-width=\"112\" stroke=\"currentColor\" viewBox=\"0 0 1024 1024\"><path fill=\"currentColor\" d=\"M0 0\" /></svg>",
-        "packages/icons-vue/src/components/fixture.vue": "<script setup lang=\"ts\">defineOptions({ name: 'Fixture' })</script>"
+        "vue/packages/icons-svg/fixture.svg": "<svg stroke-linejoin=\"round\" stroke-linecap=\"round\" stroke-width=\"112\" stroke=\"currentColor\" viewBox=\"0 0 1024 1024\"><path fill=\"currentColor\" d=\"M0 0\" /></svg>",
+        "vue/packages/icons-vue/src/components/fixture.vue": "<script setup lang=\"ts\">defineOptions({ name: 'Fixture' })</script>"
       }
     },
     {
@@ -61,7 +61,7 @@
           "id": "fixture",
           "displayName": "Fixture",
           "category": "action",
-          "source": "packages/icons-svg/fixture.svg",
+          "source": "vue/packages/icons-svg/fixture.svg",
           "path": "M0 0",
           "defaultSize": "icon.size.md",
           "stroke": "icon.stroke.md",
@@ -71,8 +71,8 @@
         }
       ],
       "files": {
-        "packages/icons-svg/fixture.svg": "<svg stroke-linejoin=\"round\" stroke-linecap=\"round\" stroke-width=\"112\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path fill=\"currentColor\" d=\"M0 0\" /></svg>",
-        "packages/icons-vue/src/components/fixture.vue": "<script setup lang=\"ts\">defineOptions({ name: 'Fixture' })</script>"
+        "vue/packages/icons-svg/fixture.svg": "<svg stroke-linejoin=\"round\" stroke-linecap=\"round\" stroke-width=\"112\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path fill=\"currentColor\" d=\"M0 0\" /></svg>",
+        "vue/packages/icons-vue/src/components/fixture.vue": "<script setup lang=\"ts\">defineOptions({ name: 'Fixture' })</script>"
       }
     },
     {
@@ -83,7 +83,7 @@
           "id": "fixture",
           "displayName": "Fixture",
           "category": "action",
-          "source": "packages/icons-svg/fixture.svg",
+          "source": "vue/packages/icons-svg/fixture.svg",
           "path": "M0 0",
           "defaultSize": "icon.size.md",
           "stroke": "icon.stroke.md",
@@ -93,8 +93,8 @@
         }
       ],
       "files": {
-        "packages/icons-svg/fixture.svg": "<svg stroke-linejoin=\"round\" stroke-linecap=\"round\" stroke-width=\"2\" stroke=\"currentColor\" viewBox=\"0 0 1024 1024\"><path fill=\"currentColor\" d=\"M0 0\" /></svg>",
-        "packages/icons-vue/src/components/fixture.vue": "<script setup lang=\"ts\">defineOptions({ name: 'Fixture' })</script>"
+        "vue/packages/icons-svg/fixture.svg": "<svg stroke-linejoin=\"round\" stroke-linecap=\"round\" stroke-width=\"2\" stroke=\"currentColor\" viewBox=\"0 0 1024 1024\"><path fill=\"currentColor\" d=\"M0 0\" /></svg>",
+        "vue/packages/icons-vue/src/components/fixture.vue": "<script setup lang=\"ts\">defineOptions({ name: 'Fixture' })</script>"
       }
     },
     {
@@ -105,7 +105,7 @@
           "id": "fixture",
           "displayName": "Fixture",
           "category": "action",
-          "source": "packages/icons-svg/fixture.svg",
+          "source": "vue/packages/icons-svg/fixture.svg",
           "path": "M0 0",
           "defaultSize": "icon.size.md",
           "stroke": "icon.stroke.md",
@@ -115,8 +115,8 @@
         }
       ],
       "files": {
-        "packages/icons-svg/fixture.svg": "<svg stroke-linejoin=\"round\" stroke-linecap=\"round\" stroke-width=\"112\" stroke=\"currentColor\" viewBox=\"0 0 1024 1024\"><path fill=\"currentColor\" d=\"M0 0\" /></svg>",
-        "packages/icons-vue/src/components/fixture.vue": "<script setup lang=\"ts\">defineOptions({ name: 'WrongName' })</script>"
+        "vue/packages/icons-svg/fixture.svg": "<svg stroke-linejoin=\"round\" stroke-linecap=\"round\" stroke-width=\"112\" stroke=\"currentColor\" viewBox=\"0 0 1024 1024\"><path fill=\"currentColor\" d=\"M0 0\" /></svg>",
+        "vue/packages/icons-vue/src/components/fixture.vue": "<script setup lang=\"ts\">defineOptions({ name: 'WrongName' })</script>"
       }
     },
     {
@@ -127,7 +127,7 @@
           "id": "fixture",
           "displayName": "Fixture",
           "category": "action",
-          "source": "packages/icons-svg/fixture.svg",
+          "source": "vue/packages/icons-svg/fixture.svg",
           "path": "M0 1",
           "defaultSize": "icon.size.md",
           "stroke": "icon.stroke.md",
@@ -137,8 +137,8 @@
         }
       ],
       "files": {
-        "packages/icons-svg/fixture.svg": "<svg stroke-linejoin=\"round\" stroke-linecap=\"round\" stroke-width=\"112\" stroke=\"currentColor\" viewBox=\"0 0 1024 1024\"><path fill=\"currentColor\" d=\"M0 0\" /></svg>",
-        "packages/icons-vue/src/components/fixture.vue": "<script setup lang=\"ts\">defineOptions({ name: 'Fixture' })</script>"
+        "vue/packages/icons-svg/fixture.svg": "<svg stroke-linejoin=\"round\" stroke-linecap=\"round\" stroke-width=\"112\" stroke=\"currentColor\" viewBox=\"0 0 1024 1024\"><path fill=\"currentColor\" d=\"M0 0\" /></svg>",
+        "vue/packages/icons-vue/src/components/fixture.vue": "<script setup lang=\"ts\">defineOptions({ name: 'Fixture' })</script>"
       }
     }
   ]

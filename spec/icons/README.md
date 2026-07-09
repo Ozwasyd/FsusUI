@@ -35,13 +35,13 @@ Run `pnpm run icons:generate` after changing the registry. CI uses
 `pnpm run icons:check` and `pnpm run icons:lint` to ensure generated artifacts
 are current.
 
-- Web metadata: `packages/icons-vue/generated/icon-metadata.json`
+- Web metadata: `vue/packages/icons-vue/generated/icon-metadata.json`
 - Avalonia resources:
   `dotnet/FsusUI.Avalonia.Icons/Generated/FsusIcons.axaml`
 - C# lookup keys: `dotnet/FsusUI.Avalonia.Icons/Generated/FsusIconKeys.g.cs`
 - Stable inventory: `docs/icons/generated/stable-icons.md`
 - Visual baseline: `tests/conformance/visual/icon-baselines.json`
 
-Web Vue components remain generated from `packages/icons-svg`, but the Web
+Web Vue components remain generated from `vue/packages/icons-svg`, but the Web
 generation step reads this registry to add semantic aliases such as
 `ChevronRight` and to catch missing source SVG mappings.

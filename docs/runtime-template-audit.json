@@ -19,7 +19,7 @@
   },
   "files": [
     {
-      "file": "packages/components/affix/src/affix.vue",
+      "file": "vue/packages/components/affix/src/affix.vue",
       "nodeCount": 3,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -39,7 +39,7 @@
       ]
     },
     {
-      "file": "packages/components/alert/src/alert.vue",
+      "file": "vue/packages/components/alert/src/alert.vue",
       "nodeCount": 12,
       "componentCount": 5,
       "potentialSavings": 0,
@@ -59,7 +59,7 @@
       ]
     },
     {
-      "file": "packages/components/autocomplete/src/autocomplete.vue",
+      "file": "vue/packages/components/autocomplete/src/autocomplete.vue",
       "nodeCount": 14,
       "componentCount": 5,
       "potentialSavings": 0,
@@ -70,7 +70,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/avatar/src/avatar.vue",
+      "file": "vue/packages/components/avatar/src/avatar.vue",
       "nodeCount": 5,
       "componentCount": 2,
       "potentialSavings": 0,
@@ -81,7 +81,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/backtop/src/backtop.vue",
+      "file": "vue/packages/components/backtop/src/backtop.vue",
       "nodeCount": 5,
       "componentCount": 3,
       "potentialSavings": 0,
@@ -92,7 +92,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/badge/src/badge.vue",
+      "file": "vue/packages/components/badge/src/badge.vue",
       "nodeCount": 4,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -103,7 +103,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/breadcrumb/src/breadcrumb-item.vue",
+      "file": "vue/packages/components/breadcrumb/src/breadcrumb-item.vue",
       "nodeCount": 6,
       "componentCount": 2,
       "potentialSavings": 0,
@@ -114,7 +114,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/breadcrumb/src/breadcrumb.vue",
+      "file": "vue/packages/components/breadcrumb/src/breadcrumb.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -125,7 +125,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/button/src/button-group.vue",
+      "file": "vue/packages/components/button/src/button-group.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -145,7 +145,7 @@
       ]
     },
     {
-      "file": "packages/components/button/src/button.vue",
+      "file": "vue/packages/components/button/src/button.vue",
       "nodeCount": 9,
       "componentCount": 5,
       "potentialSavings": 0,
@@ -165,7 +165,7 @@
       ]
     },
     {
-      "file": "packages/components/calendar/src/calendar.vue",
+      "file": "vue/packages/components/calendar/src/calendar.vue",
       "nodeCount": 16,
       "componentCount": 6,
       "potentialSavings": 0,
@@ -201,7 +201,7 @@
       ]
     },
     {
-      "file": "packages/components/calendar/src/date-table.vue",
+      "file": "vue/packages/components/calendar/src/date-table.vue",
       "nodeCount": 8,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -221,7 +221,7 @@
       ]
     },
     {
-      "file": "packages/components/card/src/card.vue",
+      "file": "vue/packages/components/card/src/card.vue",
       "nodeCount": 7,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -257,7 +257,7 @@
       ]
     },
     {
-      "file": "packages/components/carousel/src/carousel-item.vue",
+      "file": "vue/packages/components/carousel/src/carousel-item.vue",
       "nodeCount": 3,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -268,7 +268,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/carousel/src/carousel.vue",
+      "file": "vue/packages/components/carousel/src/carousel.vue",
       "nodeCount": 15,
       "componentCount": 7,
       "potentialSavings": 0,
@@ -279,7 +279,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/cascader-panel/src/index.vue",
+      "file": "vue/packages/components/cascader-panel/src/index.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -290,7 +290,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/cascader-panel/src/menu.vue",
+      "file": "vue/packages/components/cascader-panel/src/menu.vue",
       "nodeCount": 7,
       "componentCount": 4,
       "potentialSavings": 0,
@@ -310,7 +310,7 @@
       ]
     },
     {
-      "file": "packages/components/cascader-panel/src/node.vue",
+      "file": "vue/packages/components/cascader-panel/src/node.vue",
       "nodeCount": 11,
       "componentCount": 9,
       "potentialSavings": 0,
@@ -321,7 +321,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/cascader/src/cascader.vue",
+      "file": "vue/packages/components/cascader/src/cascader.vue",
       "nodeCount": 21,
       "componentCount": 13,
       "potentialSavings": 0,
@@ -349,7 +349,7 @@
       ]
     },
     {
-      "file": "packages/components/check-tag/src/check-tag.vue",
+      "file": "vue/packages/components/check-tag/src/check-tag.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -360,7 +360,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/checkbox/src/checkbox-button.vue",
+      "file": "vue/packages/components/checkbox/src/checkbox-button.vue",
       "nodeCount": 5,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -380,7 +380,7 @@
       ]
     },
     {
-      "file": "packages/components/checkbox/src/checkbox-group.vue",
+      "file": "vue/packages/components/checkbox/src/checkbox-group.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -391,7 +391,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/checkbox/src/checkbox.vue",
+      "file": "vue/packages/components/checkbox/src/checkbox.vue",
       "nodeCount": 7,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -411,7 +411,7 @@
       ]
     },
     {
-      "file": "packages/components/col/src/col.vue",
+      "file": "vue/packages/components/col/src/col.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -422,7 +422,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/collapse-transition/src/collapse-transition.vue",
+      "file": "vue/packages/components/collapse-transition/src/collapse-transition.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -433,7 +433,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/collapse/src/collapse-item.vue",
+      "file": "vue/packages/components/collapse/src/collapse-item.vue",
       "nodeCount": 9,
       "componentCount": 3,
       "potentialSavings": 0,
@@ -453,7 +453,7 @@
       ]
     },
     {
-      "file": "packages/components/collapse/src/collapse.vue",
+      "file": "vue/packages/components/collapse/src/collapse.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -473,7 +473,7 @@
       ]
     },
     {
-      "file": "packages/components/collection/src/collection-item.vue",
+      "file": "vue/packages/components/collection/src/collection-item.vue",
       "nodeCount": 1,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -484,7 +484,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/collection/src/collection.vue",
+      "file": "vue/packages/components/collection/src/collection.vue",
       "nodeCount": 1,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -495,7 +495,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/color-picker/src/color-picker.vue",
+      "file": "vue/packages/components/color-picker/src/color-picker.vue",
       "nodeCount": 21,
       "componentCount": 12,
       "potentialSavings": 0,
@@ -531,7 +531,7 @@
       ]
     },
     {
-      "file": "packages/components/container/src/aside.vue",
+      "file": "vue/packages/components/container/src/aside.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -542,7 +542,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/container/src/container.vue",
+      "file": "vue/packages/components/container/src/container.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -553,7 +553,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/container/src/footer.vue",
+      "file": "vue/packages/components/container/src/footer.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -564,7 +564,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/container/src/header.vue",
+      "file": "vue/packages/components/container/src/header.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -575,7 +575,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/container/src/main.vue",
+      "file": "vue/packages/components/container/src/main.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -586,7 +586,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/countdown/src/countdown.vue",
+      "file": "vue/packages/components/countdown/src/countdown.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -597,7 +597,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/descriptions/src/description.vue",
+      "file": "vue/packages/components/descriptions/src/description.vue",
       "nodeCount": 10,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -633,7 +633,7 @@
       ]
     },
     {
-      "file": "packages/components/descriptions/src/descriptions-row.vue",
+      "file": "vue/packages/components/descriptions/src/descriptions-row.vue",
       "nodeCount": 8,
       "componentCount": 5,
       "potentialSavings": 0,
@@ -644,7 +644,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/dialog/src/dialog-content.vue",
+      "file": "vue/packages/components/dialog/src/dialog-content.vue",
       "nodeCount": 11,
       "componentCount": 2,
       "potentialSavings": 0,
@@ -655,7 +655,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/dialog/src/dialog.vue",
+      "file": "vue/packages/components/dialog/src/dialog.vue",
       "nodeCount": 10,
       "componentCount": 5,
       "potentialSavings": 0,
@@ -666,7 +666,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/divider/src/divider.vue",
+      "file": "vue/packages/components/divider/src/divider.vue",
       "nodeCount": 3,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -686,7 +686,7 @@
       ]
     },
     {
-      "file": "packages/components/drawer/src/drawer.vue",
+      "file": "vue/packages/components/drawer/src/drawer.vue",
       "nodeCount": 17,
       "componentCount": 6,
       "potentialSavings": 0,
@@ -706,7 +706,7 @@
       ]
     },
     {
-      "file": "packages/components/dropdown/src/dropdown-item-impl.vue",
+      "file": "vue/packages/components/dropdown/src/dropdown-item-impl.vue",
       "nodeCount": 5,
       "componentCount": 2,
       "potentialSavings": 0,
@@ -717,7 +717,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/dropdown/src/dropdown-item.vue",
+      "file": "vue/packages/components/dropdown/src/dropdown-item.vue",
       "nodeCount": 4,
       "componentCount": 3,
       "potentialSavings": 0,
@@ -728,7 +728,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/dropdown/src/dropdown-menu.vue",
+      "file": "vue/packages/components/dropdown/src/dropdown-menu.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -739,7 +739,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/dropdown/src/dropdown.vue",
+      "file": "vue/packages/components/dropdown/src/dropdown.vue",
       "nodeCount": 14,
       "componentCount": 10,
       "potentialSavings": 0,
@@ -750,7 +750,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/empty/src/empty.vue",
+      "file": "vue/packages/components/empty/src/empty.vue",
       "nodeCount": 9,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -778,7 +778,7 @@
       ]
     },
     {
-      "file": "packages/components/empty/src/img-empty.vue",
+      "file": "vue/packages/components/empty/src/img-empty.vue",
       "nodeCount": 11,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -789,7 +789,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/focus-trap/src/focus-trap.vue",
+      "file": "vue/packages/components/focus-trap/src/focus-trap.vue",
       "nodeCount": 1,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -800,7 +800,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/form/src/form-item.vue",
+      "file": "vue/packages/components/form/src/form-item.vue",
       "nodeCount": 9,
       "componentCount": 3,
       "potentialSavings": 0,
@@ -820,7 +820,7 @@
       ]
     },
     {
-      "file": "packages/components/form/src/form.vue",
+      "file": "vue/packages/components/form/src/form.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -831,7 +831,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/icon/src/icon.vue",
+      "file": "vue/packages/components/icon/src/icon.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -842,7 +842,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/image-viewer/src/image-viewer.vue",
+      "file": "vue/packages/components/image-viewer/src/image-viewer.vue",
       "nodeCount": 26,
       "componentCount": 10,
       "potentialSavings": 0,
@@ -862,7 +862,7 @@
       ]
     },
     {
-      "file": "packages/components/image/src/image.vue",
+      "file": "vue/packages/components/image/src/image.vue",
       "nodeCount": 9,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -890,7 +890,7 @@
       ]
     },
     {
-      "file": "packages/components/input-number/src/input-number.vue",
+      "file": "vue/packages/components/input-number/src/input-number.vue",
       "nodeCount": 10,
       "componentCount": 7,
       "potentialSavings": 0,
@@ -901,7 +901,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/input/src/input.vue",
+      "file": "vue/packages/components/input/src/input.vue",
       "nodeCount": 26,
       "componentCount": 10,
       "potentialSavings": 0,
@@ -945,7 +945,7 @@
       ]
     },
     {
-      "file": "packages/components/link/src/link.vue",
+      "file": "vue/packages/components/link/src/link.vue",
       "nodeCount": 6,
       "componentCount": 2,
       "potentialSavings": 0,
@@ -965,7 +965,7 @@
       ]
     },
     {
-      "file": "packages/components/markdown-editor/src/markdown-editor.vue",
+      "file": "vue/packages/components/markdown-editor/src/markdown-editor.vue",
       "nodeCount": 17,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -985,7 +985,7 @@
       ]
     },
     {
-      "file": "packages/components/markdown-renderer/src/markdown-renderer.vue",
+      "file": "vue/packages/components/markdown-renderer/src/markdown-renderer.vue",
       "nodeCount": 10,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -1005,7 +1005,7 @@
       ]
     },
     {
-      "file": "packages/components/menu/src/menu-collapse-transition.vue",
+      "file": "vue/packages/components/menu/src/menu-collapse-transition.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -1016,7 +1016,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/menu/src/menu-item-group.vue",
+      "file": "vue/packages/components/menu/src/menu-item-group.vue",
       "nodeCount": 5,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -1036,7 +1036,7 @@
       ]
     },
     {
-      "file": "packages/components/menu/src/menu-item.vue",
+      "file": "vue/packages/components/menu/src/menu-item.vue",
       "nodeCount": 7,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -1056,7 +1056,7 @@
       ]
     },
     {
-      "file": "packages/components/message-box/src/index.vue",
+      "file": "vue/packages/components/message-box/src/index.vue",
       "nodeCount": 26,
       "componentCount": 14,
       "potentialSavings": 0,
@@ -1076,7 +1076,7 @@
       ]
     },
     {
-      "file": "packages/components/message/src/message.vue",
+      "file": "vue/packages/components/message/src/message.vue",
       "nodeCount": 10,
       "componentCount": 6,
       "potentialSavings": 0,
@@ -1087,7 +1087,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/notification/src/notification.vue",
+      "file": "vue/packages/components/notification/src/notification.vue",
       "nodeCount": 12,
       "componentCount": 5,
       "potentialSavings": 0,
@@ -1107,7 +1107,7 @@
       ]
     },
     {
-      "file": "packages/components/page-header/src/page-header.vue",
+      "file": "vue/packages/components/page-header/src/page-header.vue",
       "nodeCount": 19,
       "componentCount": 3,
       "potentialSavings": 0,
@@ -1159,7 +1159,7 @@
       ]
     },
     {
-      "file": "packages/components/popconfirm/src/popconfirm.vue",
+      "file": "vue/packages/components/popconfirm/src/popconfirm.vue",
       "nodeCount": 9,
       "componentCount": 5,
       "potentialSavings": 0,
@@ -1170,7 +1170,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/popover/src/popover.vue",
+      "file": "vue/packages/components/popover/src/popover.vue",
       "nodeCount": 4,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -1181,7 +1181,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/popper/src/arrow.vue",
+      "file": "vue/packages/components/popper/src/arrow.vue",
       "nodeCount": 1,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -1192,7 +1192,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/popper/src/content.vue",
+      "file": "vue/packages/components/popper/src/content.vue",
       "nodeCount": 3,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -1203,7 +1203,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/popper/src/popper.vue",
+      "file": "vue/packages/components/popper/src/popper.vue",
       "nodeCount": 1,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -1214,7 +1214,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/popper/src/trigger.vue",
+      "file": "vue/packages/components/popper/src/trigger.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -1225,7 +1225,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/progress/src/progress.vue",
+      "file": "vue/packages/components/progress/src/progress.vue",
       "nodeCount": 14,
       "componentCount": 2,
       "potentialSavings": 0,
@@ -1261,7 +1261,7 @@
       ]
     },
     {
-      "file": "packages/components/public-shell/src/public-shell.vue",
+      "file": "vue/packages/components/public-shell/src/public-shell.vue",
       "nodeCount": 32,
       "componentCount": 3,
       "potentialSavings": 0,
@@ -1281,7 +1281,7 @@
       ]
     },
     {
-      "file": "packages/components/radio/src/radio-button.vue",
+      "file": "vue/packages/components/radio/src/radio-button.vue",
       "nodeCount": 4,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -1292,7 +1292,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/radio/src/radio-group.vue",
+      "file": "vue/packages/components/radio/src/radio-group.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -1303,7 +1303,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/radio/src/radio.vue",
+      "file": "vue/packages/components/radio/src/radio.vue",
       "nodeCount": 6,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -1314,7 +1314,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/rate/src/rate.vue",
+      "file": "vue/packages/components/rate/src/rate.vue",
       "nodeCount": 9,
       "componentCount": 6,
       "potentialSavings": 0,
@@ -1334,7 +1334,7 @@
       ]
     },
     {
-      "file": "packages/components/responsive-collection/src/responsive-collection.vue",
+      "file": "vue/packages/components/responsive-collection/src/responsive-collection.vue",
       "nodeCount": 7,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -1362,7 +1362,7 @@
       ]
     },
     {
-      "file": "packages/components/result/src/result.vue",
+      "file": "vue/packages/components/result/src/result.vue",
       "nodeCount": 10,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -1406,7 +1406,7 @@
       ]
     },
     {
-      "file": "packages/components/roving-focus-group/src/roving-focus-group-impl.vue",
+      "file": "vue/packages/components/roving-focus-group/src/roving-focus-group-impl.vue",
       "nodeCount": 1,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -1417,7 +1417,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/roving-focus-group/src/roving-focus-group.vue",
+      "file": "vue/packages/components/roving-focus-group/src/roving-focus-group.vue",
       "nodeCount": 3,
       "componentCount": 2,
       "potentialSavings": 0,
@@ -1428,7 +1428,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/roving-focus-group/src/roving-focus-item.vue",
+      "file": "vue/packages/components/roving-focus-group/src/roving-focus-item.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -1439,7 +1439,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/row/src/row.vue",
+      "file": "vue/packages/components/row/src/row.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -1450,7 +1450,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/scrollbar/src/bar.vue",
+      "file": "vue/packages/components/scrollbar/src/bar.vue",
       "nodeCount": 2,
       "componentCount": 2,
       "potentialSavings": 0,
@@ -1461,7 +1461,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/scrollbar/src/scrollbar.vue",
+      "file": "vue/packages/components/scrollbar/src/scrollbar.vue",
       "nodeCount": 5,
       "componentCount": 2,
       "potentialSavings": 0,
@@ -1472,7 +1472,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/scrollbar/src/thumb.vue",
+      "file": "vue/packages/components/scrollbar/src/thumb.vue",
       "nodeCount": 3,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -1483,7 +1483,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/select-v2/src/group-item.vue",
+      "file": "vue/packages/components/select-v2/src/group-item.vue",
       "nodeCount": 3,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -1494,7 +1494,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/select-v2/src/option-item.vue",
+      "file": "vue/packages/components/select-v2/src/option-item.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -1505,7 +1505,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/select-v2/src/select.vue",
+      "file": "vue/packages/components/select-v2/src/select.vue",
       "nodeCount": 38,
       "componentCount": 13,
       "potentialSavings": 0,
@@ -1549,7 +1549,7 @@
       ]
     },
     {
-      "file": "packages/components/select/src/option-group.vue",
+      "file": "vue/packages/components/select/src/option-group.vue",
       "nodeCount": 5,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -1560,7 +1560,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/select/src/option.vue",
+      "file": "vue/packages/components/select/src/option.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -1571,7 +1571,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/select/src/select-dropdown.vue",
+      "file": "vue/packages/components/select/src/select-dropdown.vue",
       "nodeCount": 6,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -1599,7 +1599,7 @@
       ]
     },
     {
-      "file": "packages/components/select/src/select.vue",
+      "file": "vue/packages/components/select/src/select.vue",
       "nodeCount": 37,
       "componentCount": 17,
       "potentialSavings": 0,
@@ -1627,7 +1627,7 @@
       ]
     },
     {
-      "file": "packages/components/skeleton/src/skeleton-item.vue",
+      "file": "vue/packages/components/skeleton/src/skeleton-item.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -1647,7 +1647,7 @@
       ]
     },
     {
-      "file": "packages/components/skeleton/src/skeleton.vue",
+      "file": "vue/packages/components/skeleton/src/skeleton.vue",
       "nodeCount": 5,
       "componentCount": 2,
       "potentialSavings": 0,
@@ -1658,7 +1658,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/slider/src/button.vue",
+      "file": "vue/packages/components/slider/src/button.vue",
       "nodeCount": 3,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -1669,7 +1669,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/slider/src/slider.vue",
+      "file": "vue/packages/components/slider/src/slider.vue",
       "nodeCount": 10,
       "componentCount": 4,
       "potentialSavings": 0,
@@ -1689,7 +1689,7 @@
       ]
     },
     {
-      "file": "packages/components/statistic/src/statistic.vue",
+      "file": "vue/packages/components/statistic/src/statistic.vue",
       "nodeCount": 9,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -1725,7 +1725,7 @@
       ]
     },
     {
-      "file": "packages/components/steps/src/item.vue",
+      "file": "vue/packages/components/steps/src/item.vue",
       "nodeCount": 19,
       "componentCount": 6,
       "potentialSavings": 0,
@@ -1777,7 +1777,7 @@
       ]
     },
     {
-      "file": "packages/components/steps/src/steps.vue",
+      "file": "vue/packages/components/steps/src/steps.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -1797,7 +1797,7 @@
       ]
     },
     {
-      "file": "packages/components/switch/src/switch.vue",
+      "file": "vue/packages/components/switch/src/switch.vue",
       "nodeCount": 22,
       "componentCount": 12,
       "potentialSavings": 0,
@@ -1808,7 +1808,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/table/src/filter-panel.vue",
+      "file": "vue/packages/components/table/src/filter-panel.vue",
       "nodeCount": 16,
       "componentCount": 7,
       "potentialSavings": 0,
@@ -1828,7 +1828,7 @@
       ]
     },
     {
-      "file": "packages/components/table/src/table.vue",
+      "file": "vue/packages/components/table/src/table.vue",
       "nodeCount": 26,
       "componentCount": 9,
       "potentialSavings": 0,
@@ -1848,7 +1848,7 @@
       ]
     },
     {
-      "file": "packages/components/tabs/src/tab-bar.vue",
+      "file": "vue/packages/components/tabs/src/tab-bar.vue",
       "nodeCount": 1,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -1859,7 +1859,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/tabs/src/tab-pane.vue",
+      "file": "vue/packages/components/tabs/src/tab-pane.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -1870,7 +1870,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/tag/src/tag.vue",
+      "file": "vue/packages/components/tag/src/tag.vue",
       "nodeCount": 9,
       "componentCount": 5,
       "potentialSavings": 0,
@@ -1881,7 +1881,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/teleport/src/teleport.vue",
+      "file": "vue/packages/components/teleport/src/teleport.vue",
       "nodeCount": 3,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -1892,7 +1892,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/text/src/text.vue",
+      "file": "vue/packages/components/text/src/text.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -1903,7 +1903,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/theme-mode-toggle/src/theme-mode-toggle.vue",
+      "file": "vue/packages/components/theme-mode-toggle/src/theme-mode-toggle.vue",
       "nodeCount": 2,
       "componentCount": 2,
       "potentialSavings": 0,
@@ -1914,7 +1914,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/time-select/src/time-select.vue",
+      "file": "vue/packages/components/time-select/src/time-select.vue",
       "nodeCount": 4,
       "componentCount": 4,
       "potentialSavings": 0,
@@ -1925,7 +1925,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/timeline/src/timeline-item.vue",
+      "file": "vue/packages/components/timeline/src/timeline-item.vue",
       "nodeCount": 12,
       "componentCount": 2,
       "potentialSavings": 0,
@@ -1977,7 +1977,7 @@
       ]
     },
     {
-      "file": "packages/components/tooltip-v2/src/arrow.vue",
+      "file": "vue/packages/components/tooltip-v2/src/arrow.vue",
       "nodeCount": 1,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -1988,7 +1988,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/tooltip-v2/src/content.vue",
+      "file": "vue/packages/components/tooltip-v2/src/content.vue",
       "nodeCount": 6,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -1999,7 +1999,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/tooltip-v2/src/root.vue",
+      "file": "vue/packages/components/tooltip-v2/src/root.vue",
       "nodeCount": 1,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -2010,7 +2010,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/tooltip-v2/src/tooltip.vue",
+      "file": "vue/packages/components/tooltip-v2/src/tooltip.vue",
       "nodeCount": 11,
       "componentCount": 8,
       "potentialSavings": 0,
@@ -2021,7 +2021,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/tooltip-v2/src/trigger.vue",
+      "file": "vue/packages/components/tooltip-v2/src/trigger.vue",
       "nodeCount": 4,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -2032,7 +2032,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/tooltip/src/content.vue",
+      "file": "vue/packages/components/tooltip/src/content.vue",
       "nodeCount": 4,
       "componentCount": 3,
       "potentialSavings": 0,
@@ -2043,7 +2043,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/tooltip/src/tooltip.vue",
+      "file": "vue/packages/components/tooltip/src/tooltip.vue",
       "nodeCount": 7,
       "componentCount": 4,
       "potentialSavings": 0,
@@ -2054,7 +2054,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/tooltip/src/trigger.vue",
+      "file": "vue/packages/components/tooltip/src/trigger.vue",
       "nodeCount": 2,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -2065,7 +2065,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/transfer/src/transfer-panel.vue",
+      "file": "vue/packages/components/transfer/src/transfer-panel.vue",
       "nodeCount": 12,
       "componentCount": 5,
       "potentialSavings": 0,
@@ -2085,7 +2085,7 @@
       ]
     },
     {
-      "file": "packages/components/transfer/src/transfer.vue",
+      "file": "vue/packages/components/transfer/src/transfer.vue",
       "nodeCount": 12,
       "componentCount": 8,
       "potentialSavings": 0,
@@ -2096,7 +2096,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/tree-v2/src/tree-node.vue",
+      "file": "vue/packages/components/tree-v2/src/tree-node.vue",
       "nodeCount": 6,
       "componentCount": 4,
       "potentialSavings": 0,
@@ -2107,7 +2107,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/tree-v2/src/tree.vue",
+      "file": "vue/packages/components/tree-v2/src/tree.vue",
       "nodeCount": 5,
       "componentCount": 2,
       "potentialSavings": 0,
@@ -2135,7 +2135,7 @@
       ]
     },
     {
-      "file": "packages/components/tree/src/tree-node.vue",
+      "file": "vue/packages/components/tree/src/tree-node.vue",
       "nodeCount": 11,
       "componentCount": 8,
       "potentialSavings": 0,
@@ -2146,7 +2146,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/tree/src/tree.vue",
+      "file": "vue/packages/components/tree/src/tree.vue",
       "nodeCount": 6,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -2174,7 +2174,7 @@
       ]
     },
     {
-      "file": "packages/components/upload/src/upload-content.vue",
+      "file": "vue/packages/components/upload/src/upload-content.vue",
       "nodeCount": 5,
       "componentCount": 1,
       "potentialSavings": 0,
@@ -2185,7 +2185,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/upload/src/upload-dragger.vue",
+      "file": "vue/packages/components/upload/src/upload-dragger.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -2196,7 +2196,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/upload/src/upload-list.vue",
+      "file": "vue/packages/components/upload/src/upload-list.vue",
       "nodeCount": 27,
       "componentCount": 14,
       "potentialSavings": 0,
@@ -2207,7 +2207,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/upload/src/upload.vue",
+      "file": "vue/packages/components/upload/src/upload.vue",
       "nodeCount": 13,
       "componentCount": 4,
       "potentialSavings": 0,
@@ -2218,7 +2218,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/visual-hidden/src/visual-hidden.vue",
+      "file": "vue/packages/components/visual-hidden/src/visual-hidden.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,
@@ -2229,7 +2229,7 @@
       "reviewFindings": []
     },
     {
-      "file": "packages/components/watermark/src/watermark.vue",
+      "file": "vue/packages/components/watermark/src/watermark.vue",
       "nodeCount": 2,
       "componentCount": 0,
       "potentialSavings": 0,

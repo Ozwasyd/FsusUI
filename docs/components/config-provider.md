@@ -1,6 +1,6 @@
 # ConfigProvider 全局配置
 
-`ElConfigProvider` 用于在应用根部提供 FsusUI 的全局上下文。当前仓库已实现的配置面以 `packages/components/config-provider/src/config-provider-props.ts` 为准。
+`ElConfigProvider` 用于在应用根部提供 FsusUI 的全局上下文。当前仓库已实现的配置面以 `vue/packages/components/config-provider/src/config-provider-props.ts` 为准。
 
 > 运行示例：`pnpm dev` 后访问 demo-app，可直接看到全局尺寸、主题模式等配置的联动效果。
 

@@ -110,7 +110,7 @@ if (nativeStaleReasons.length > 0) {
       } source-hash=${status.sourceHash.slice(
         0,
         16,
-      )}; building packages/wasm native artifacts...`,
+      )}; building vue/packages/wasm native artifacts...`,
       ...nativeStaleReasons.map((reason) => `  - ${reason}`),
     ].join('\n'),
   )
@@ -140,11 +140,11 @@ if (bundleStaleReasons.length > 0) {
       } source-hash=${status.sourceHash.slice(
         0,
         16,
-      )}; building packages/wasm bundle artifacts...`,
+      )}; building vue/packages/wasm bundle artifacts...`,
       ...bundleStaleReasons.map((reason) => `  - ${reason}`),
     ].join('\n'),
   )
-  await run('pnpm', ['run', '-C', 'packages/wasm', 'build'])
+  await run('pnpm', ['run', '-C', 'vue/packages/wasm', 'build'])
   await writeFingerprint(bundle.fingerprintPath, bundle.currentFingerprint)
   rebuiltBundleArtifacts = true
 }
@@ -155,9 +155,9 @@ if (shouldWriteNativeFingerprint && !dryRun) {
 
 console.info(
   rebuiltBundleArtifacts
-    ? '[ensure-wasm] packages/wasm/dist artifacts are ready.'
+    ? '[ensure-wasm] vue/packages/wasm/dist artifacts are ready.'
     : `[ensure-wasm] cache-hit source-hash=${status.sourceHash.slice(
         0,
         16,
-      )}; reusing packages/wasm/dist artifacts.`,
+      )}; reusing vue/packages/wasm/dist artifacts.`,
 )

@@ -55,7 +55,7 @@ const topLevelBlocks = (source) => {
 }
 
 const failures = []
-const messageBoxFile = 'packages/theme-chalk/src/message-box.scss'
+const messageBoxFile = 'vue/packages/theme-chalk/src/message-box.scss'
 const source = read(messageBoxFile)
 
 if (!source.includes('box-shadow: var(--fsus-shadow-panel, none);')) {
@@ -95,7 +95,7 @@ for (const expected of [
   }
 }
 
-const themeFile = 'packages/theme-chalk/src/fsus-theme.scss'
+const themeFile = 'vue/packages/theme-chalk/src/fsus-theme.scss'
 const themeSource = read(themeFile)
 let hasMessageBoxPanel = false
 

@@ -22,7 +22,7 @@ Policy:
 
 - `@ozwasyd/fsus-ui` is the preferred long-term product package name.
 - `@ozwasyd/element-plus` may remain as a compatibility package only when a compatibility contract and migration path are documented.
-- Internal workspace packages under `internal/*` are never public packages.
+- Internal workspace packages under `vue/internal/*` are never public packages.
 - Packages that still contain `workspace:` dependency protocol are not publishable.
 - README install instructions must name the active package and registry.
 
@@ -40,7 +40,7 @@ Registry:
 https://registry.npmjs.org/
 ```
 
-The npm registry is the canonical registry for public OSS consumption. The legacy package-registry automation is archived under `docs/archive/github-packages/` and is not used as a mirror.
+The npm registry is the canonical registry for public OSS consumption. The legacy package-registry automation is archived under `docs/archive/github-vue/packages/` and is not used as a mirror.
 
 ## Trusted Publishing and Provenance
 

@@ -10,34 +10,34 @@ importers:
     dependencies:
       '@element-plus/components':
         specifier: workspace:*
-        version: link:packages/components
+        version: link:vue/packages/components
       '@element-plus/constants':
         specifier: workspace:*
-        version: link:packages/constants
+        version: link:vue/packages/constants
       '@element-plus/directives':
         specifier: workspace:*
-        version: link:packages/directives
+        version: link:vue/packages/directives
       '@element-plus/hooks':
         specifier: workspace:*
-        version: link:packages/hooks
+        version: link:vue/packages/hooks
       '@element-plus/icons-vue':
         specifier: workspace:*
-        version: link:packages/icons-vue
+        version: link:vue/packages/icons-vue
       '@element-plus/locale':
         specifier: workspace:*
-        version: link:packages/locale
+        version: link:vue/packages/locale
       '@element-plus/test-utils':
         specifier: workspace:*
-        version: link:packages/test-utils
+        version: link:vue/packages/test-utils
       '@element-plus/theme-chalk':
         specifier: workspace:*
-        version: link:packages/theme-chalk
+        version: link:vue/packages/theme-chalk
       '@element-plus/utils':
         specifier: workspace:*
-        version: link:packages/utils
+        version: link:vue/packages/utils
       '@element-plus/wasm':
         specifier: workspace:*
-        version: link:packages/wasm
+        version: link:vue/packages/wasm
       '@floating-ui/dom':
         specifier: ^1.7.6
         version: 1.7.6
@@ -80,16 +80,16 @@ importers:
         version: 3.6.1
       '@element-plus/build':
         specifier: workspace:^0.0.1
-        version: link:internal/build
+        version: link:vue/internal/build
       '@element-plus/build-utils':
         specifier: workspace:^0.0.1
-        version: link:internal/build-utils
+        version: link:vue/internal/build-utils
       '@element-plus/eslint-config':
         specifier: workspace:*
-        version: link:internal/eslint-config
+        version: link:vue/internal/eslint-config
       '@element-plus/icons-svg':
         specifier: workspace:*
-        version: link:packages/icons-svg
+        version: link:vue/packages/icons-svg
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.2.0(jiti@2.6.1))
@@ -229,7 +229,7 @@ importers:
         specifier: ^3.2.6
         version: 3.2.6(typescript@6.0.2)
 
-  internal/build:
+  vue/internal/build:
     dependencies:
       '@element-plus/build-constants':
         specifier: workspace:^0.0.1
@@ -305,13 +305,13 @@ importers:
         specifier: ^3.5.32
         version: 3.5.32(typescript@6.0.2)
 
-  internal/build-constants:
+  vue/internal/build-constants:
     devDependencies:
       unbuild:
         specifier: ^3.6.1
         version: 3.6.1(sass@1.99.0)(typescript@6.0.2)(vue-tsc@3.2.6(typescript@6.0.2))(vue@3.5.32(typescript@6.0.2))
 
-  internal/build-utils:
+  vue/internal/build-utils:
     dependencies:
       '@pnpm/find-workspace-packages':
         specifier: ^4.0.16
@@ -327,7 +327,7 @@ importers:
         specifier: ^3.6.1
         version: 3.6.1(sass@1.99.0)(typescript@6.0.2)(vue-tsc@3.2.6(typescript@6.0.2))(vue@3.5.32(typescript@6.0.2))
 
-  internal/eslint-config:
+  vue/internal/eslint-config:
     dependencies:
       '@eslint/js':
         specifier: ^10.0.1
@@ -352,7 +352,7 @@ importers:
         specifier: ^10.2.0
         version: 10.2.0(jiti@2.6.1)
 
-  internal/metadata:
+  vue/internal/metadata:
     devDependencies:
       '@element-plus/build':
         specifier: workspace:^0.0.1
@@ -388,15 +388,18 @@ importers:
         specifier: ^3.6.0
         version: 3.14.0
 
-  packages/components:
+  vue/packages/components:
     dependencies:
+      '@element-plus/motion':
+        specifier: workspace:*
+        version: link:../motion
       vue:
         specifier: ^3.2.0
         version: 3.5.32(typescript@6.0.2)
 
-  packages/constants: {}
+  vue/packages/constants: {}
 
-  packages/demo-app:
+  vue/packages/demo-app:
     dependencies:
       '@element-plus/icons-vue':
         specifier: workspace:*
@@ -439,13 +442,13 @@ importers:
         specifier: ^3.2.6
         version: 3.2.6(typescript@6.0.2)
 
-  packages/directives:
+  vue/packages/directives:
     dependencies:
       vue:
         specifier: ^3.2.0
         version: 3.5.32(typescript@6.0.2)
 
-  packages/element-plus:
+  vue/packages/element-plus:
     dependencies:
       '@ctrl/tinycolor':
         specifier: ^3.4.1
@@ -521,7 +524,7 @@ importers:
         specifier: ^4.0.16
         version: 4.6.4(vue@3.5.32(typescript@6.0.2))
 
-  packages/hooks:
+  vue/packages/hooks:
     dependencies:
       motion-dom:
         specifier: ^12.40.0
@@ -530,13 +533,13 @@ importers:
         specifier: ^3.2.0
         version: 3.5.32(typescript@6.0.2)
 
-  packages/icons-svg:
+  vue/packages/icons-svg:
     devDependencies:
       svgo:
         specifier: ^4.0.0
         version: 4.0.1
 
-  packages/icons-vue:
+  vue/packages/icons-vue:
     devDependencies:
       '@element-plus/icons-svg':
         specifier: workspace:*
@@ -581,9 +584,9 @@ importers:
         specifier: ^3.2.6
         version: 3.2.6(typescript@6.0.2)
 
-  packages/locale: {}
+  vue/packages/locale: {}
 
-  packages/motion:
+  vue/packages/motion:
     dependencies:
       gsap:
         specifier: ^3.15.0
@@ -592,9 +595,9 @@ importers:
         specifier: ^3.5.0
         version: 3.5.32(typescript@6.0.2)
 
-  packages/test-utils: {}
+  vue/packages/test-utils: {}
 
-  packages/theme-chalk:
+  vue/packages/theme-chalk:
     devDependencies:
       '@element-plus/build':
         specifier: workspace:*
@@ -633,13 +636,13 @@ importers:
         specifier: ^5.1.0
         version: 5.1.0
 
-  packages/utils:
+  vue/packages/utils:
     dependencies:
       vue:
         specifier: ^3.2.0
         version: 3.5.32(typescript@6.0.2)
 
-  packages/wasm:
+  vue/packages/wasm:
     dependencies:
       '@element-plus/utils':
         specifier: workspace:*

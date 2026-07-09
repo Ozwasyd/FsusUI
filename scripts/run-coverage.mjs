@@ -70,7 +70,7 @@ function assertSingleLaneThreshold(durationSeconds, thresholdSeconds) {
 
 function runSingleLane(thresholdSeconds) {
   const startedAt = Date.now()
-  runPnpm(['exec', 'vitest', 'run', '--coverage', ...extraVitestArgs])
+  runPnpm(['exec', 'vitest', 'run', '--config', 'vue/vitest.config.ts', '--coverage', ...extraVitestArgs])
   const durationSeconds = elapsedSeconds(startedAt)
   logDuration(durationSeconds, thresholdSeconds, 'single')
   assertSingleLaneThreshold(durationSeconds, thresholdSeconds)

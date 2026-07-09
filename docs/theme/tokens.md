@@ -53,7 +53,7 @@ The platform-neutral token source is
 `pnpm run tokens:generate` after changing that source. The generator emits:
 
 - Web CSS variables, SCSS maps, and JSON metadata under
-  `packages/theme-chalk/src/generated/`
+  `vue/packages/theme-chalk/src/generated/`
 - Avalonia resources under `dotnet/FsusUI.Avalonia.Themes/Generated/`
 - C# token constants under `dotnet/FsusUI.Avalonia/Generated/`
 - generated token documentation at

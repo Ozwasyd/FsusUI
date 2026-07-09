@@ -31,7 +31,7 @@ const extractMap = (source, mapName) => {
 
 const forbiddenPrimaryPattern = /getCssVar\('color-primary'\)/g
 const failures = []
-const varSource = read('packages/theme-chalk/src/common/var.scss')
+const varSource = read('vue/packages/theme-chalk/src/common/var.scss')
 
 for (const mapName of [
   'checkbox',
@@ -47,7 +47,7 @@ for (const mapName of [
 
   for (const match of block.source.matchAll(forbiddenPrimaryPattern)) {
     failures.push(
-      `packages/theme-chalk/src/common/var.scss:${
+      `vue/packages/theme-chalk/src/common/var.scss:${
         block.startLine + lineNumberAt(block.source, match.index ?? 0) - 1
       } ($${mapName})`,
     )
@@ -55,12 +55,12 @@ for (const mapName of [
 }
 
 for (const file of [
-  'packages/theme-chalk/src/checkbox.scss',
-  'packages/theme-chalk/src/checkbox-button.scss',
-  'packages/theme-chalk/src/radio.scss',
-  'packages/theme-chalk/src/radio-button.scss',
-  'packages/theme-chalk/src/switch.scss',
-  'packages/theme-chalk/src/time-select.scss',
+  'vue/packages/theme-chalk/src/checkbox.scss',
+  'vue/packages/theme-chalk/src/checkbox-button.scss',
+  'vue/packages/theme-chalk/src/radio.scss',
+  'vue/packages/theme-chalk/src/radio-button.scss',
+  'vue/packages/theme-chalk/src/switch.scss',
+  'vue/packages/theme-chalk/src/time-select.scss',
 ]) {
   const source = read(file)
 
@@ -69,30 +69,30 @@ for (const file of [
   }
 }
 
-const timeSelectSource = read('packages/theme-chalk/src/time-select.scss')
+const timeSelectSource = read('vue/packages/theme-chalk/src/time-select.scss')
 const selectedBlock = timeSelectSource.match(
   /\.time-select-item\.selected:not\(\.disabled\)\s*\{(?<body>[\s\S]*?)\n {2}\}/u,
 )
 
 if (!selectedBlock?.groups?.body) {
-  failures.push('packages/theme-chalk/src/time-select.scss: missing selected state block')
+  failures.push('vue/packages/theme-chalk/src/time-select.scss: missing selected state block')
 } else {
   const body = selectedBlock.groups.body
   if (!body.includes("color: getCssVar('color', 'scholarly-blue');")) {
     failures.push(
-      'packages/theme-chalk/src/time-select.scss: selected state must use Scholarly Blue',
+      'vue/packages/theme-chalk/src/time-select.scss: selected state must use Scholarly Blue',
     )
   }
 
   if (!body.includes('background-color: var(--fsus-state-selected-bg);')) {
     failures.push(
-      'packages/theme-chalk/src/time-select.scss: selected state must use selected-state background',
+      'vue/packages/theme-chalk/src/time-select.scss: selected state must use selected-state background',
     )
   }
 
   if (/font-weight:\s*bold/u.test(body)) {
     failures.push(
-      'packages/theme-chalk/src/time-select.scss: selected state must not rely on bold only',
+      'vue/packages/theme-chalk/src/time-select.scss: selected state must not rely on bold only',
     )
   }
 }

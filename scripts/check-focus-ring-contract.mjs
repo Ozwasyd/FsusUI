@@ -4,7 +4,7 @@ import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const themeSourceRoot = 'packages/theme-chalk/src'
+const themeSourceRoot = 'vue/packages/theme-chalk/src'
 
 const weakFocusRingPattern =
   /(?:box-shadow:\s*inset 0 0 0 1px var\(--fsus-scholarly-blue\b|@include\s+a11y-focus-ring\(\s*1px\b)/

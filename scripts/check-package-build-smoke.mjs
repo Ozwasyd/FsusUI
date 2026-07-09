@@ -36,14 +36,14 @@ function isPackageReferenceCandidate(filePath) {
 }
 
 const rootPackage = readJson('package.json')
-const sourcePackage = readJson('packages/element-plus/package.json')
+const sourcePackage = readJson('vue/packages/element-plus/package.json')
 const { packageName, repositoryGitUrl, repositoryWebUrl } =
   resolvePackageContract({ repoRoot: root })
-const componentBarrel = read('packages/components/index.ts')
-const emptyStateEntry = read('packages/components/empty-state/index.ts')
+const componentBarrel = read('vue/packages/components/index.ts')
+const emptyStateEntry = read('vue/packages/components/empty-state/index.ts')
 
 assert(
-  rootPackage.scripts?.build?.includes('pnpm run -C internal/build start'),
+  rootPackage.scripts?.build?.includes('pnpm run -C vue/internal/build start'),
   'root build script must call the internal package build entrypoint',
 )
 assert(
@@ -86,28 +86,28 @@ assert(
 )
 
 for (const artifact of [
-  'packages/icons-vue/dist/index.js',
-  'packages/icons-vue/dist/types/index.d.ts',
-  'packages/wasm/dist/index.mjs',
-  'packages/wasm/dist/ep_wasm.wasm',
-  'packages/wasm/dist/markdown_basic.wasm',
-  'packages/wasm/dist/markdown_simd.wasm',
+  'vue/packages/icons-vue/dist/index.js',
+  'vue/packages/icons-vue/dist/types/index.d.ts',
+  'vue/packages/wasm/dist/index.mjs',
+  'vue/packages/wasm/dist/ep_wasm.wasm',
+  'vue/packages/wasm/dist/markdown_basic.wasm',
+  'vue/packages/wasm/dist/markdown_simd.wasm',
   // Theme-chalk artifacts. fsus-theme.scss is intentionally compiled
   // as a standalone product override bundle so consumers can load it
   // after the base element-plus CSS without relying on cascade luck.
-  'packages/theme-chalk/dist/index.css',
-  'packages/theme-chalk/dist/el-public-shell-critical.css',
-  'packages/theme-chalk/dist/el-fsus-theme.css',
+  'vue/packages/theme-chalk/dist/index.css',
+  'vue/packages/theme-chalk/dist/el-public-shell-critical.css',
+  'vue/packages/theme-chalk/dist/el-fsus-theme.css',
 ]) {
   assert(existsSync(path.join(root, artifact)), `package smoke requires prepared artifact: ${artifact}`)
 }
 
-const themeIndexSource = read('packages/theme-chalk/src/index.scss')
-const fsusThemeCss = read('packages/theme-chalk/dist/el-fsus-theme.css')
+const themeIndexSource = read('vue/packages/theme-chalk/src/index.scss')
+const fsusThemeCss = read('vue/packages/theme-chalk/dist/el-fsus-theme.css')
 assert(
   !themeIndexSource.includes("@use './fsus-theme.scss'")
     && !themeIndexSource.includes('@use "./fsus-theme.scss"'),
-  'packages/theme-chalk/src/index.scss must not directly @use fsus-theme.scss',
+  'vue/packages/theme-chalk/src/index.scss must not directly @use fsus-theme.scss',
 )
 assert(
   fsusThemeCss.includes('--fsus-scholarly-blue'),
@@ -119,8 +119,8 @@ assert(
   'dist/el-fsus-theme.css must carry fsus-theme product surface rules',
 )
 
-const gulpfile = read('internal/build/gulpfile.ts')
-const elementPlusPackage = JSON.parse(read('packages/element-plus/package.json'))
+const gulpfile = read('vue/internal/build/gulpfile.ts')
+const elementPlusPackage = JSON.parse(read('vue/packages/element-plus/package.json'))
 assert(
   elementPlusPackage.exports?.['./dist/el-fsus-theme.css'] === './dist/el-fsus-theme.css',
   'element-plus package exports must expose dist/el-fsus-theme.css for consumers',

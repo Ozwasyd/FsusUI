@@ -1,0 +1,130 @@
+@use 'mixins/mixins' as *;
+@use 'mixins/var' as *;
+@use 'common/var' as *;
+
+@include b(message) {
+  @include set-component-css-var('message', $message);
+}
+
+@include b(message) {
+  width: fit-content;
+  max-width: min(420px, calc(100% - 32px));
+  min-height: 40px;
+  box-sizing: border-box;
+  border-radius: getCssVar('message', 'border-radius');
+  border-width: getCssVar('border-width');
+  border-style: getCssVar('border-style');
+  border-color: getCssVar('message', 'border-color');
+  position: fixed;
+  left: 50%;
+  top: 20px;
+  transform: translate3d(-50%, var(--el-message-stack-y, 0px), 0);
+  background-color: getCssVar('message', 'bg-color');
+  box-shadow: getCssVar('message', 'shadow');
+  transition:
+    opacity var(--fsus-motion-control-fast, 160ms)
+      var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+    transform var(--fsus-motion-panel, 420ms)
+      var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));
+  padding: getCssVar('message', 'padding');
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  will-change: transform, opacity;
+
+  @include when(closable) {
+    .#{$namespace}-message__content {
+      padding-right: 36px;
+    }
+  }
+
+  p {
+    margin: 0;
+  }
+
+  @each $type in (success, info, warning, error) {
+    @include m($type) {
+      @include css-var-from-global(
+        ('message', 'bg-color'),
+        ('color', $type, 'light-9')
+      );
+      @include css-var-from-global(
+        ('message', 'border-color'),
+        ('color', $type, 'light-8')
+      );
+      @include css-var-from-global(('message', 'text-color'), ('color', $type));
+
+      .#{$namespace}-message__content {
+        color: getCssVar('message', 'text-color');
+        overflow-wrap: anywhere;
+      }
+    }
+
+    & .#{$namespace}-message-icon--#{$type} {
+      color: getCssVar('message', 'text-color');
+    }
+  }
+
+  @include e(icon) {
+    margin-right: 0;
+    flex: 0 0 auto;
+  }
+
+  .#{$namespace}-message__badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+  }
+
+  @include e(content) {
+    padding: 0;
+    color: getCssVar('message', 'text-color');
+    font-size: getCssVar('font-size', 'base');
+    font-weight: 500;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+
+    &:focus {
+      outline-width: 0;
+    }
+  }
+
+  & .#{$namespace}-message__closeBtn {
+    @include icon-button(36px, 999px);
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    color: getCssVar('message', 'close-icon-color');
+    font-size: getCssVar('message', 'close-size');
+
+    &:focus {
+      outline-width: 0;
+    }
+
+    &:focus-visible {
+      @include a11y-focus-ring(2px, 999px);
+    }
+
+    &:hover {
+      color: getCssVar('message', 'close-hover-color');
+    }
+  }
+}
+
+.#{$namespace}-message-fade-enter-from,
+.#{$namespace}-message-fade-leave-to {
+  opacity: 0;
+  transform: translate3d(-50%, calc(var(--el-message-stack-y, 0px) - 12px), 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .#{$namespace}-message {
+    transition-duration: 1ms !important;
+  }
+
+  .#{$namespace}-message-fade-enter-from,
+  .#{$namespace}-message-fade-leave-to {
+    transform: translate3d(-50%, var(--el-message-stack-y, 0px), 0);
+  }
+}

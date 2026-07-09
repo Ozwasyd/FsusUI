@@ -9,7 +9,7 @@
 - 当前包名：`@ozwasyd/element-plus`
 - 发布触发：推送 `vX.Y.Z` 或 `vX.Y.Z-*` tag
 
-Public preview 的 registry 策略、包名策略、dist-tag 策略和 provenance 要求见 [npm Registry Publishing Policy](./release/npm-registry-policy.md)。旧的包注册表自动发布流程已移入 `docs/archive/github-packages/`，仅作历史参考，不再自动发布，也不作为 npm 发布后的镜像。
+Public preview 的 registry 策略、包名策略、dist-tag 策略和 provenance 要求见 [npm Registry Publishing Policy](./release/npm-registry-policy.md)。旧的包注册表自动发布流程已移入 `docs/archive/github-vue/packages/`，仅作历史参考，不再自动发布，也不作为 npm 发布后的镜像。
 
 常用验证门分为三层：
 
@@ -27,8 +27,8 @@ workflow dispatch 可选择 main、nightly 或 release。最终发布仍只由�
 处理，quality release group 只产出发布前证据，不执行 publish。
 
 `prepare:test-artifacts` 会先检查 icon 与 WASM 的 test artifact cache。
-GitHub Actions 使用 source-hash key 恢复 `packages/icons-vue/dist` 与
-`packages/wasm/dist`；日志中会输出 `icons-cache-hit`、`wasm-cache-hit`，
+GitHub Actions 使用 source-hash key 恢复 `vue/packages/icons-vue/dist` 与
+`vue/packages/wasm/dist`；日志中会输出 `icons-cache-hit`、`wasm-cache-hit`，
 本地 wrapper 还会输出 `cache hit` / `cache miss` 与 fingerprint source hash。
 cache hit 时会跳过对应 `ensure:icons` / `ensure:wasm`；cache miss 或
 restore-key 命中旧工件时会重新生成并写入 fingerprint。发布或手工重建仍使用
@@ -37,7 +37,7 @@ restore-key 命中旧工件时会重新生成并写入 fingerprint。发布或�
 
 full quality 的 unit shard 由 `unit-artifacts` job 统一准备测试工件并上传
 `unit-test-artifacts`，各 shard 下载后运行 `pnpm run check:test-artifacts-ready`
-和 `pnpm exec vitest run --shard=<n>/4`。这样 cache miss/generation 日志只集中在
+和 `pnpm exec vitest run --config vue/vitest.config.ts --shard=<n>/4`。这样 cache miss/generation 日志只集中在
 前置 job，shard 不再重复执行 icon/WASM 生成。
 
 full quality 的 `consumer-install` 复用 `build-package` 产出的
@@ -187,7 +187,7 @@ PR-fast uses `typecheck:affected`, which selects the affected TypeScript
 lanes and runs them through `scripts/run-typecheck.mjs`. The default
 `typecheck:*` lanes write `.tsbuildinfo` files under `.tmp/typecheck-cache`;
 GitHub Actions restores that typecheck cache with a key that includes
-`pnpm-lock.yaml`, `package.json`, `tsconfig*.json`, package sources, typings,
+`pnpm-lock.yaml`, `package.json`, `vue/tsconfig*.json`, package sources, typings,
 internal TypeScript sources, and `scripts/run-typecheck.mjs`.
 
 Workflow logs print `typecheck-cache-hit`, `cache-hit`, and

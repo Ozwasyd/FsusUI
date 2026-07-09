@@ -8,10 +8,10 @@ const root = process.cwd()
 const cacheDir = path.join(root, '.tmp/typecheck-cache')
 
 const lanes = new Map([
-  ['web', { tool: 'vue-tsc', project: 'tsconfig.web.json', noCacheArgs: ['--composite', 'false'] }],
-  ['node', { tool: 'tsc', project: 'tsconfig.node.json', noCacheArgs: [] }],
-  ['vite-config', { tool: 'vue-tsc', project: 'tsconfig.vite-config.json', noCacheArgs: ['--composite', 'false'] }],
-  ['vitest', { tool: 'vue-tsc', project: 'tsconfig.vitest.json', noCacheArgs: ['--composite', 'false'] }],
+  ['web', { tool: 'vue-tsc', project: 'vue/tsconfig.web.json', noCacheArgs: ['--composite', 'false'] }],
+  ['node', { tool: 'tsc', project: 'vue/tsconfig.node.json', noCacheArgs: [] }],
+  ['vite-config', { tool: 'vue-tsc', project: 'vue/tsconfig.vite-config.json', noCacheArgs: ['--composite', 'false'] }],
+  ['vitest', { tool: 'vue-tsc', project: 'vue/tsconfig.vitest.json', noCacheArgs: ['--composite', 'false'] }],
 ])
 
 function usage() {
@@ -31,7 +31,9 @@ function sourceFiles() {
   const tracked = git(['ls-files'])
   return tracked
     .split(/\r?\n/u)
-    .filter((file) => /^(package\.json|pnpm-lock\.yaml|tsconfig[^/]*\.json|typings\/.*\.d\.ts|packages\/.*\.(ts|tsx|vue|json)|internal\/.*\.(ts|json)|scripts\/run-typecheck\.mjs)$/u.test(file))
+    .filter((file) =>
+      /^(package\.json|pnpm-lock\.yaml|vue\/tsconfig[^/]*\.json|vue\/typings\/.*\.d\.ts|vue\/packages\/.*\.(ts|tsx|vue|json)|vue\/internal\/.*\.(ts|json)|scripts\/run-typecheck\.mjs)$/u.test(file),
+    )
     .sort()
 }
 

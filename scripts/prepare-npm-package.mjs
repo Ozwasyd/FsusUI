@@ -17,11 +17,12 @@ const distPackagePath = path.join(distRoot, 'package.json')
 const distNpmrcPath = path.join(distRoot, '.npmrc')
 const sourcePackagePath = path.join(
   repoRoot,
+  'vue',
   'packages',
   'element-plus',
   'package.json',
 )
-const workspaceRoots = ['packages', 'internal']
+const workspaceRoots = ['vue/packages', 'vue/internal']
 const collectOnly = process.argv.includes('--collect')
 const strict = process.argv.includes('--strict') || !collectOnly
 const installDependencyFields = [

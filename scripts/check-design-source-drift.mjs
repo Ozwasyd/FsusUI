@@ -167,7 +167,7 @@ try {
     'docs/api/web-contract-mapping.md',
   )
 
-  const runtimeTokens = read('packages/theme-chalk/src/common/fsus-tokens.scss')
+  const runtimeTokens = read('vue/packages/theme-chalk/src/common/fsus-tokens.scss')
   for (const expected of [
     '--el-color-primary: var(--fsus-ink);',
     '--fsus-radius-control: 6px;',
@@ -180,20 +180,20 @@ try {
     assertIncludes(
       runtimeTokens,
       expected,
-      'packages/theme-chalk/src/common/fsus-tokens.scss',
+      'vue/packages/theme-chalk/src/common/fsus-tokens.scss',
     )
   }
 
-  const generatedCss = read('packages/theme-chalk/src/generated/tokens.css')
+  const generatedCss = read('vue/packages/theme-chalk/src/generated/tokens.css')
   assertIncludes(
     generatedCss,
     '--fsus-scholarly-blue: var(--fsus-color-action-primary);',
-    'packages/theme-chalk/src/generated/tokens.css',
+    'vue/packages/theme-chalk/src/generated/tokens.css',
   )
   assertNotIncludes(
     generatedCss,
     '--el-color-primary: var(--fsus-color-action-primary);',
-    'packages/theme-chalk/src/generated/tokens.css',
+    'vue/packages/theme-chalk/src/generated/tokens.css',
   )
 
   console.log('design-source-drift check passed')

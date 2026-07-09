@@ -3,7 +3,7 @@
 ## Summary
 
 - 审计入口：`pnpm audit:templates`
-- 审计范围：`packages/components/**/src/*.vue` 中包含 `<template>` 的运行时 SFC，共 127 个文件
+- 审计范围：`vue/packages/components/**/src/*.vue` 中包含 `<template>` 的运行时 SFC，共 127 个文件
 - 当前结论：仓库内没有成规模的废弃模板语法，本轮模板审计与 DOM 减量已完成收口
 - 当前审计结果：971 个 element/component 节点，0 个可行动项，预估可继续减少节点数为 0
 
@@ -30,4 +30,4 @@
 - 不修改公开 API，只收缩内部 DOM
 - 默认不删除承担 `ref`、事件边界、ARIA/role、`tabindex`、复杂指令的容器
 - `display: contents` 继续视为例外手段，只在纯布局节点且样式/语义确认安全时使用
-- 本轮最终状态已经通过 `pnpm audit:templates`、受影响组件测试、`pnpm typecheck` 和 `pnpm -C packages/demo-app build` 收口
+- 本轮最终状态已经通过 `pnpm audit:templates`、受影响组件测试、`pnpm typecheck` 和 `pnpm -C vue/packages/demo-app build` 收口

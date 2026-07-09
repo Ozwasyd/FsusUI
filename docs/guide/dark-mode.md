@@ -15,7 +15,7 @@ import ElementPlus from '@ozwasyd/element-plus'
 import '@ozwasyd/element-plus/dist/index.css'
 ```
 
-内置规则位于 `packages/theme-chalk/src/fsus-theme.scss`：
+内置规则位于 `vue/packages/theme-chalk/src/fsus-theme.scss`：
 
 - `html.dark`：强制暗色
 - `html.light`：强制亮色

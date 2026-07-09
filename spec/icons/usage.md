@@ -22,7 +22,7 @@ Icon-only buttons:
 
 Generated outputs:
 
-- Web metadata: `packages/icons-vue/generated/icon-metadata.json`
+- Web metadata: `vue/packages/icons-vue/generated/icon-metadata.json`
 - Avalonia resources: `dotnet/FsusUI.Avalonia.Icons/Generated/FsusIcons.axaml`
 - C# keys: `dotnet/FsusUI.Avalonia.Icons/Generated/FsusIconKeys.g.cs`
 - Stable inventory: `docs/icons/generated/stable-icons.md`

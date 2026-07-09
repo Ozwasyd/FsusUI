@@ -93,12 +93,12 @@ const setComplexRoadmapPhase = (content, id, phase) => {
   const lines = content.split('\n')
   let inEntry = false
   for (let index = 0; index < lines.length; index++) {
-    const start = lines[index].match(/^  - id:\s*(.+)$/)
+    const start = lines[index].match(/^ {2}- id:\s*(.+)$/)
     if (start) {
       inEntry = start[1].trim() === id
       continue
     }
-    if (inEntry && /^    phase:\s*/.test(lines[index])) {
+    if (inEntry && /^ {4}phase:\s*/.test(lines[index])) {
       lines[index] = `    phase: ${phase}`
       return lines.join('\n')
     }

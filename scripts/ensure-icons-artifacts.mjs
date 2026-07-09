@@ -18,7 +18,7 @@ if (!force && status.fresh) {
     `[ensure-icons] cache-hit source-hash=${status.sourceHash.slice(
       0,
       16,
-    )}; reusing packages/icons-vue/dist artifacts.`,
+    )}; reusing vue/packages/icons-vue/dist artifacts.`,
   )
   process.exit(0)
 }
@@ -47,7 +47,7 @@ console.log(
   ].join('\n'),
 )
 
-const build = spawnSync('pnpm', ['run', '-C', 'packages/icons-vue', 'build'], {
+const build = spawnSync('pnpm', ['run', '-C', 'vue/packages/icons-vue', 'build'], {
   cwd: root,
   stdio: 'inherit',
   shell: process.platform === 'win32',

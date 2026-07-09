@@ -4,7 +4,7 @@ import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const file = 'packages/theme-chalk/src/upload.scss'
+const file = 'vue/packages/theme-chalk/src/upload.scss'
 const source = fs.readFileSync(path.join(root, file), 'utf8')
 
 const assertIncludes = (needle, message, failures) => {

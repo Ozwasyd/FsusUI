@@ -112,7 +112,7 @@ const validateSnapshots = () => {
 
 const validateGeneratedOutputs = () => {
   const baseline = readJson('spec/typography/baseline.json')
-  const generatedCss = read('packages/theme-chalk/src/generated/tokens.css')
+  const generatedCss = read('vue/packages/theme-chalk/src/generated/tokens.css')
   const generatedXaml = read(
     'dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml',
   )
@@ -123,12 +123,12 @@ const validateGeneratedOutputs = () => {
   assertIncludes(
     generatedCss,
     `--fsus-typography-family-body: ${baseline.fontStacks.body.css};`,
-    'packages/theme-chalk/src/generated/tokens.css',
+    'vue/packages/theme-chalk/src/generated/tokens.css',
   )
   assertIncludes(
     generatedCss,
     `--fsus-typography-family-monospace: ${baseline.fontStacks.monospace.css};`,
-    'packages/theme-chalk/src/generated/tokens.css',
+    'vue/packages/theme-chalk/src/generated/tokens.css',
   )
   assertIncludes(
     generatedXaml,
@@ -155,11 +155,11 @@ const scanStableFontFamilies = () => {
     ...(baseline.allowedAliases ?? []),
   ])
   const files = [
-    'packages/theme-chalk/src/common/var.scss',
-    'packages/theme-chalk/src/fsus-theme.scss',
-    'packages/theme-chalk/src/markdown-editor.scss',
-    'packages/theme-chalk/src/settings-primitives.scss',
-    'packages/wasm/markdown/src/markdown_mermaid.cpp',
+    'vue/packages/theme-chalk/src/common/var.scss',
+    'vue/packages/theme-chalk/src/fsus-theme.scss',
+    'vue/packages/theme-chalk/src/markdown-editor.scss',
+    'vue/packages/theme-chalk/src/settings-primitives.scss',
+    'vue/packages/wasm/markdown/src/markdown_mermaid.cpp',
     'dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml',
     'dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs',
   ]

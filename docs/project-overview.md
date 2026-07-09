@@ -29,11 +29,11 @@ FsusUI 是一个基于 Element Plus 包结构维护的 Vue 3 组件库工作区�
 
 - Vue：根 `peerDependencies` 要求 `vue ^3.5.0`
 - TypeScript：`^6.0.2`
-- 构建：仓库根 `pnpm build` 走 `internal/build` 的 gulp + Rollup 4 + esbuild 0.28 体系
-- 构建 target：`es2022`（见 `internal/build/src/build-info.ts`）
+- 构建：仓库根 `pnpm build` 走 `vue/internal/build` 的 gulp + Rollup 4 + esbuild 0.28 体系
+- 构建 target：`es2022`（见 `vue/internal/build/src/build-info.ts`）
 - 测试：Vitest（`jsdom` 环境）
 - 规范：ESLint 10（Flat Config）+ Prettier 3
-- Demo：Vite（`packages/demo-app`，端口 `5173/4173`）
+- Demo：Vite（`vue/packages/demo-app`，端口 `5173/4173`）
 
 ## 3. Monorepo 结构与工作区说明
 
@@ -41,34 +41,34 @@ FsusUI 是一个基于 Element Plus 包结构维护的 Vue 3 组件库工作区�
 
 ```yaml
 packages:
-  - packages/*
-  - internal/*
+  - vue/packages/*
+  - vue/internal/*
 ```
 
-### packages/\*
+### vue/packages/\*
 
-- `packages/element-plus`：对外主入口包（包名仍为 `element-plus`），聚合导出组件/指令/hooks/常量，并提供默认安装器。
-- `packages/components`：组件源码集合（按组件目录组织）。
-- `packages/theme-chalk`：样式主题包（`@element-plus/theme-chalk`），包含 SCSS 源码与构建脚本。
-- `packages/locale`：国际化资源（语言包集合）。
-- `packages/directives`：指令集合。
-- `packages/hooks`：组合式能力集合。
-- `packages/utils`：内部工具方法集合（私有）。
-- `packages/constants`：常量与共享定义（私有）。
-- `packages/test-utils`：测试工具（私有）。
-- `packages/wasm`：WASM 性能层（`@element-plus/wasm`），提供排序/过滤/颜色/精度/行高等计算能力。
-- `packages/demo-app`：Vite demo 应用，用于本地联调与展示。
+- `vue/packages/element-plus`：对外主入口包（包名仍为 `element-plus`），聚合导出组件/指令/hooks/常量，并提供默认安装器。
+- `vue/packages/components`：组件源码集合（按组件目录组织）。
+- `vue/packages/theme-chalk`：样式主题包（`@element-plus/theme-chalk`），包含 SCSS 源码与构建脚本。
+- `vue/packages/locale`：国际化资源（语言包集合）。
+- `vue/packages/directives`：指令集合。
+- `vue/packages/hooks`：组合式能力集合。
+- `vue/packages/utils`：内部工具方法集合（私有）。
+- `vue/packages/constants`：常量与共享定义（私有）。
+- `vue/packages/test-utils`：测试工具（私有）。
+- `vue/packages/wasm`：WASM 性能层（`@element-plus/wasm`），提供排序/过滤/颜色/精度/行高等计算能力。
+- `vue/packages/demo-app`：Vite demo 应用，用于本地联调与展示。
 
-### internal/\*
+### vue/internal/\*
 
-- `internal/build`：构建工具链入口（根 `pnpm build` 调用此包）。
-- `internal/eslint-config`：ESLint Flat Config 封装（`@element-plus/eslint-config`）。
-- `internal/metadata`：元信息生成工具（组件清单等）。
-- `internal/build-utils` / `internal/build-constants`：构建期工具与常量。
+- `vue/internal/build`：构建工具链入口（根 `pnpm build` 调用此包）。
+- `vue/internal/eslint-config`：ESLint Flat Config 封装（`@element-plus/eslint-config`）。
+- `vue/internal/metadata`：元信息生成工具（组件清单等）。
+- `vue/internal/build-utils` / `vue/internal/build-constants`：构建期工具与常量。
 
 ## 4. 核心包关系（从入口看）
 
-对外主入口位于 `packages/element-plus/index.ts`：
+对外主入口位于 `vue/packages/element-plus/index.ts`：
 
 - 默认导出：`defaults.ts` 组合出的安装器实例（含 `install` 与 `version`）
 - 聚合导出：`@element-plus/components` / `@element-plus/constants` / `@element-plus/directives` / `@element-plus/hooks`
@@ -83,7 +83,7 @@ packages:
 
 ### 5.1 对外包与导出
 
-`packages/element-plus/package.json` 定义了对外导出形态：
+`vue/packages/element-plus/package.json` 定义了对外导出形态：
 
 - ESM：`es/index.mjs`（类型定义对应 `es/index.d.ts`）
 - CJS：`lib/index.js`（类型定义对应 `lib/index.d.ts`）
@@ -94,11 +94,11 @@ packages:
 
 根 `package.json` 里与发布相关的脚本包括：
 
-- `pnpm build`：执行构建工具链（`internal/build`）
+- `pnpm build`：执行构建工具链（`vue/internal/build`）
 - `pnpm build:npm-package`：构建后运行 `scripts/prepare-npm-package.mjs` 组织 npm public registry 发布目录
 - `pnpm check:npm-dist-tag`：校验 tag 版本到 npm dist-tag 的推断规则
 
-注意：仓库根包为 `private: true`，实际对外发布以 `packages/element-plus` 的构建产物为主。
+注意：仓库根包为 `private: true`，实际对外发布以 `vue/packages/element-plus` 的构建产物为主。
 
 ## 6. 开发态运行方式与 Demo 应用
 
@@ -106,24 +106,24 @@ packages:
 
 ```bash
 pnpm install
-pnpm -C packages/demo-app dev
+pnpm -C vue/packages/demo-app dev
 ```
 
 demo 默认端口：
 
 - dev server：`5173`
-- preview：`4173`（`pnpm -C packages/demo-app preview`）
+- preview：`4173`（`pnpm -C vue/packages/demo-app preview`）
 
 ### 6.2 demo 的“源码联调”特性
 
-`packages/demo-app/vite.config.ts` 对工作区包做了 alias，开发态直接指向源码而非消费构建产物，例如：
+`vue/packages/demo-app/vite.config.ts` 对工作区包做了 alias，开发态直接指向源码而非消费构建产物，例如：
 
-- `element-plus` -> `packages/element-plus/index.ts`
-- `@element-plus/*` -> 对应 `packages/*`
+- `element-plus` -> `vue/packages/element-plus/index.ts`
+- `@element-plus/*` -> 对应 `vue/packages/*`
 
 同时 `optimizeDeps.exclude` 显式排除了 `element-plus` 及多个 `@element-plus/*` 工作区包，避免被当成三方依赖预构建，从而保持源码联调体验。
 
-demo 入口 `packages/demo-app/src/main.ts` 还直接引入了源码态样式：
+demo 入口 `vue/packages/demo-app/src/main.ts` 还直接引入了源码态样式：
 
 - `@element-plus/theme-chalk/src/index.scss`
 
@@ -151,35 +151,35 @@ pnpm format
 
 根 `pnpm typecheck` 使用 `vue-tsc` / `tsc` 对不同 tsconfig 分组检查：
 
-- web：`tsconfig.web.json`
-- node：`tsconfig.node.json`
-- vite 配置：`tsconfig.vite-config.json`
-- vitest：`tsconfig.vitest.json`
+- web：`vue/tsconfig.web.json`
+- node：`vue/tsconfig.node.json`
+- vite 配置：`vue/tsconfig.vite-config.json`
+- vitest：`vue/tsconfig.vitest.json`
 
 ### 7.3 ESLint
 
-仓库使用 ESLint Flat Config（入口 `eslint.config.mjs`），并提供 `internal/eslint-config` 包封装配置依赖。
+仓库使用 ESLint Flat Config（入口 `vue/eslint.config.mjs`），并提供 `vue/internal/eslint-config` 包封装配置依赖。
 
 ## 8. 样式体系（theme-chalk）
 
-样式包为 `@element-plus/theme-chalk`（`packages/theme-chalk`）：
+样式包为 `@element-plus/theme-chalk`（`vue/packages/theme-chalk`）：
 
 - 既支持源码态 SCSS（如 demo 的 `@element-plus/theme-chalk/src/index.scss`），也可构建产出 CSS（包入口 `index.css`）。
-- 构建脚本位于 `packages/theme-chalk/package.json`：`pnpm -C packages/theme-chalk build`（通过 gulp 执行）。
+- 构建脚本位于 `vue/packages/theme-chalk/package.json`：`pnpm -C vue/packages/theme-chalk build`（通过 gulp 执行）。
 
 ## 9. 国际化（locale）
 
-国际化资源位于 `packages/locale/lang`，包含多语言文件（如 `zh-cn.ts`、`en.ts` 等）。
+国际化资源位于 `vue/packages/locale/lang`，包含多语言文件（如 `zh-cn.ts`、`en.ts` 等）。
 
 ## 10. WASM 模块与当前接入点
 
 ### 10.1 包位置与职责
 
-WASM 包为 `@element-plus/wasm`（`packages/wasm`），描述为 “WebAssembly acceleration layer for FsusUI (C++23 / Emscripten)”。
+WASM 包为 `@element-plus/wasm`（`vue/packages/wasm`），描述为 “WebAssembly acceleration layer for FsusUI (C++23 / Emscripten)”。
 
-- 底层实现：`packages/wasm/src/ep_wasm.cpp`（C++23）
-- 构建脚本：`packages/wasm/build.sh`（Emscripten）
-- TS 封装：`packages/wasm/index.ts`（Promise-based 单例封装，同时提供若干 sync/async API）
+- 底层实现：`vue/packages/wasm/src/ep_wasm.cpp`（C++23）
+- 构建脚本：`vue/packages/wasm/build.sh`（Emscripten）
+- TS 封装：`vue/packages/wasm/index.ts`（Promise-based 单例封装，同时提供若干 sync/async API）
 
 构建 WASM：
 
@@ -193,9 +193,9 @@ pnpm build:wasm
 
 目前代码中有两个明确接入点（均为“满足阈值才启用，不满足则降级”策略）：
 
-- `packages/components/table/src/composables/use-wasm-sort.ts`
+- `vue/packages/components/table/src/composables/use-wasm-sort.ts`
   - 表格列排序：行数 `>= 5000` 且列值满足条件（全数字或 ASCII 字符串）时尝试走 WASM
-- `packages/components/virtual-list/src/hooks/use-wasm-row-height.ts`
+- `vue/packages/components/virtual-list/src/hooks/use-wasm-row-height.ts`
   - 虚拟列表行高预估：items 数量 `>= 2000` 时尝试走 WASM 批量预估
 
 ## 11. 与标准 Element Plus 工作方式的可见差异
@@ -216,82 +216,82 @@ pnpm build:wasm
 
 ### 工作区与包结构
 
-- 仓库是 `pnpm` monorepo；工作区由 `pnpm-workspace.yaml` 定义，覆盖 `packages/*` 与 `internal/*`。
-- `packages/*` 下工作区包（11 个）：
-  - `packages/components`
-  - `packages/constants`
-  - `packages/demo-app`
-  - `packages/directives`
-  - `packages/element-plus`
-  - `packages/hooks`
-  - `packages/locale`
-  - `packages/test-utils`
-  - `packages/theme-chalk`
-  - `packages/utils`
-  - `packages/wasm`
-- `internal/*` 下内部工具包（5 个）：
-  - `internal/build`
-  - `internal/build-constants`
-  - `internal/build-utils`
-  - `internal/eslint-config`
-  - `internal/metadata`
+- 仓库是 `pnpm` monorepo；工作区由 `pnpm-workspace.yaml` 定义，覆盖 `vue/packages/*` 与 `vue/internal/*`。
+- `vue/packages/*` 下工作区包（11 个）：
+  - `vue/packages/components`
+  - `vue/packages/constants`
+  - `vue/packages/demo-app`
+  - `vue/packages/directives`
+  - `vue/packages/element-plus`
+  - `vue/packages/hooks`
+  - `vue/packages/locale`
+  - `vue/packages/test-utils`
+  - `vue/packages/theme-chalk`
+  - `vue/packages/utils`
+  - `vue/packages/wasm`
+- `vue/internal/*` 下内部工具包（5 个）：
+  - `vue/internal/build`
+  - `vue/internal/build-constants`
+  - `vue/internal/build-utils`
+  - `vue/internal/eslint-config`
+  - `vue/internal/metadata`
 
 ### 发布入口与安装器（element-plus）
 
-- 对外主入口包位于 `packages/element-plus`，包名为 `element-plus`，版本为 `0.0.0-dev.2`。
-- `packages/element-plus/index.ts` 聚合导出：
+- 对外主入口包位于 `vue/packages/element-plus`，包名为 `element-plus`，版本为 `0.0.0-dev.2`。
+- `vue/packages/element-plus/index.ts` 聚合导出：
   - `@element-plus/components` / `@element-plus/constants` / `@element-plus/directives` / `@element-plus/hooks`
   - `make-installer`
   - 并额外转导出 `dayjs`
-- 默认安装器来自 `packages/element-plus/defaults.ts`，由 `component.ts` 与 `plugin.ts` 两组项拼装。
-- `packages/element-plus/make-installer.ts` 的安装逻辑包含：
+- 默认安装器来自 `vue/packages/element-plus/defaults.ts`，由 `component.ts` 与 `plugin.ts` 两组项拼装。
+- `vue/packages/element-plus/make-installer.ts` 的安装逻辑包含：
   - 使用 `INSTALLED_KEY` 防止重复安装
   - 对传入组件逐个执行 `app.use`
   - 传入选项时调用 `provideGlobalConfig`
 
 截至当前快照（数量统计）：
 
-- `packages/element-plus/component.ts` 注册了 99 个可安装组件/子组件插件项。
-- `packages/element-plus/plugin.ts` 注册了 6 个插件项：
+- `vue/packages/element-plus/component.ts` 注册了 99 个可安装组件/子组件插件项。
+- `vue/packages/element-plus/plugin.ts` 注册了 6 个插件项：
   - `ElInfiniteScroll` / `ElLoading` / `ElMessage` / `ElMessageBox` / `ElNotification` / `ElPopoverDirective`
-- `packages/components/index.ts` 聚合导出了 78 个模块入口。
+- `vue/packages/components/index.ts` 聚合导出了 78 个模块入口。
 
 ### 组件与样式（theme-chalk）
 
-- `packages/components` 下共有 112 个一级组件目录。
-- 样式主题包为 `@element-plus/theme-chalk`（`packages/theme-chalk`）。
-- 根包 `packages/element-plus/package.json` 的 `sideEffects` 显式保留：
+- `vue/packages/components` 下共有 112 个一级组件目录。
+- 样式主题包为 `@element-plus/theme-chalk`（`vue/packages/theme-chalk`）。
+- 根包 `vue/packages/element-plus/package.json` 的 `sideEffects` 显式保留：
   - `dist/*`
   - `theme-chalk/**/*.css`
   - `theme-chalk/src/**/*.scss`
   - 以及组件样式入口（`es/components/*/style/*`、`lib/components/*/style/*`）
 
-### Demo（packages/demo-app）
+### Demo（vue/packages/demo-app）
 
-- `packages/demo-app` 是 Vite 应用：
+- `vue/packages/demo-app` 是 Vite 应用：
   - dev：`5173`，preview：`4173`
-- `packages/demo-app/src/main.ts` 通过 `createApp(App).use(ElementPlus).mount('#app')` 挂载整包，并引入 `@element-plus/theme-chalk/src/index.scss`（源码态联调入口）。
-- `packages/demo-app/vite.config.ts`：
+- `vue/packages/demo-app/src/main.ts` 通过 `createApp(App).use(ElementPlus).mount('#app')` 挂载整包，并引入 `@element-plus/theme-chalk/src/index.scss`（源码态联调入口）。
+- `vue/packages/demo-app/vite.config.ts`：
   - 通过 alias 直接指向工作区源码
-  - 将 `packages/wasm` / `@element-plus/wasm` 拆分到 `fsus-wasm` chunk
+  - 将 `vue/packages/wasm` / `@element-plus/wasm` 拆分到 `fsus-wasm` chunk
   - `optimizeDeps.exclude` 排除 `element-plus` 及多个 `@element-plus/*` 工作区包以保持源码联调
 
 ### 测试、类型检查与规范
 
-- 测试：Vitest（`jsdom`），并启用 `pretendToBeVisual: true`（见 `vitest.config.ts`）。
-- 覆盖率 provider 为 `v8`，并排除 `packages/wasm/**` 等路径。
-- 截至当前快照，`packages/**/__tests__/**` 下共有 144 个测试文件。
-- ESLint 使用 Flat Config（入口 `eslint.config.mjs`），核心依赖包括 `typescript-eslint`、`eslint-plugin-vue`、`eslint-plugin-unicorn`、`vue-eslint-parser` 等。
+- 测试：Vitest（`jsdom`），并启用 `pretendToBeVisual: true`（见 `vue/vitest.config.ts`）。
+- 覆盖率 provider 为 `v8`，并排除 `vue/packages/wasm/**` 等路径。
+- 截至当前快照，`vue/packages/**/__tests__/**` 下共有 144 个测试文件。
+- ESLint 使用 Flat Config（入口 `vue/eslint.config.mjs`），核心依赖包括 `typescript-eslint`、`eslint-plugin-vue`、`eslint-plugin-unicorn`、`vue-eslint-parser` 等。
 
 ### 国际化（locale）
 
-- 截至当前快照，`packages/locale/lang` 下共有 58 个语言文件。
+- 截至当前快照，`vue/packages/locale/lang` 下共有 58 个语言文件。
 
 ### WASM（@element-plus/wasm）
 
-- `packages/wasm` 描述为 “WebAssembly acceleration layer for FsusUI (C++23 / Emscripten)”。
-- `packages/wasm/index.ts` 将 WASM 封装成 Promise 单例，并提供（示例）能力：
+- `vue/packages/wasm` 描述为 “WebAssembly acceleration layer for FsusUI (C++23 / Emscripten)”。
+- `vue/packages/wasm/index.ts` 将 WASM 封装成 Promise 单例，并提供（示例）能力：
   - 数字/字符串排序、关键词过滤、颜色转换、精度处理、行高预估、预热与版本读取
 - 组件侧明确接入点与阈值：
-  - 表格排序：`packages/components/table/src/composables/use-wasm-sort.ts`（`>= 5000`）
-  - 虚拟列表行高：`packages/components/virtual-list/src/hooks/use-wasm-row-height.ts`（`>= 2000`）
+  - 表格排序：`vue/packages/components/table/src/composables/use-wasm-sort.ts`（`>= 5000`）
+  - 虚拟列表行高：`vue/packages/components/virtual-list/src/hooks/use-wasm-row-height.ts`（`>= 2000`）

@@ -4,14 +4,14 @@ import { join, relative, resolve } from 'node:path'
 
 const root = process.cwd()
 const violations = []
-const themeSourceRoot = 'packages/theme-chalk/src'
+const themeSourceRoot = 'vue/packages/theme-chalk/src'
 const radiusBudgetPx = 12
 const pillRadiusPx = new Set([100, 999])
 const radiusLiteralPattern =
   /\b(border(?:-(?:top|bottom)-(?:left|right))?-radius)\s*:\s*([0-9.]+)px\b/g
 const allowedRadiusLiterals = [
   {
-    file: 'packages/theme-chalk/src/image-viewer.scss',
+    file: 'vue/packages/theme-chalk/src/image-viewer.scss',
     property: 'border-radius',
     value: 22,
     contextIncludes: '@include e(actions)',
@@ -170,7 +170,7 @@ const assertTokenMax = (file, source, token, max) => {
 }
 
 const checkCoreTokens = () => {
-  const file = 'packages/theme-chalk/src/common/fsus-tokens.scss'
+  const file = 'vue/packages/theme-chalk/src/common/fsus-tokens.scss'
   const source = read(file)
 
   for (const token of [
@@ -208,15 +208,15 @@ const checkCoreTokens = () => {
 
 const checkBackdropFilters = () => {
   const files = [
-    'packages/theme-chalk/src/dialog.scss',
-    'packages/theme-chalk/src/drawer.scss',
-    'packages/theme-chalk/src/loading.scss',
-    'packages/theme-chalk/src/message.scss',
-    'packages/theme-chalk/src/overlay.scss',
-    'packages/theme-chalk/src/popover.scss',
-    'packages/theme-chalk/src/public-shell.scss',
-    'packages/theme-chalk/src/select-dropdown.scss',
-    'packages/theme-chalk/src/fsus-theme.scss',
+    'vue/packages/theme-chalk/src/dialog.scss',
+    'vue/packages/theme-chalk/src/drawer.scss',
+    'vue/packages/theme-chalk/src/loading.scss',
+    'vue/packages/theme-chalk/src/message.scss',
+    'vue/packages/theme-chalk/src/overlay.scss',
+    'vue/packages/theme-chalk/src/popover.scss',
+    'vue/packages/theme-chalk/src/public-shell.scss',
+    'vue/packages/theme-chalk/src/select-dropdown.scss',
+    'vue/packages/theme-chalk/src/fsus-theme.scss',
   ]
 
   for (const file of files) {
@@ -288,7 +288,7 @@ const checkHoverTransforms = () => {
 }
 
 const checkReadingSurface = () => {
-  const file = 'packages/theme-chalk/src/fsus-theme.scss'
+  const file = 'vue/packages/theme-chalk/src/fsus-theme.scss'
   const source = read(file)
 
   for (const expected of [
@@ -309,7 +309,7 @@ const checkReadingSurface = () => {
 }
 
 const checkMarkdownLoading = () => {
-  const file = 'packages/theme-chalk/src/markdown-renderer.scss'
+  const file = 'vue/packages/theme-chalk/src/markdown-renderer.scss'
   const source = read(file)
   const loadingBlockStart = source.indexOf('.markdown-renderer__loading')
   const loadingBlock =

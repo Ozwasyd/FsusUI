@@ -74,10 +74,10 @@ assert(
 for (const fragment of [
   'pnpm-lock.yaml',
   'package.json',
-  'tsconfig*.json',
-  'packages/**/*.ts',
-  'packages/**/*.vue',
-  'typings/**/*.d.ts',
+  'vue/tsconfig*.json',
+  'vue/packages/**/*.ts',
+  'vue/packages/**/*.vue',
+  'vue/typings/**/*.d.ts',
   'scripts/run-typecheck.mjs',
 ]) {
   assert(workflows.includes(fragment), `typecheck cache key must include ${fragment}`)

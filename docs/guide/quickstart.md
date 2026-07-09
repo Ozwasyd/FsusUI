@@ -24,7 +24,7 @@ app.mount('#app')
 
 ### Volar 类型提示支持
 
-使用 Volar 时，在 `tsconfig.json` 的 `compilerOptions.types` 中添加全局组件类型定义：
+使用 Volar 时，在 `vue/tsconfig.json` 的 `compilerOptions.types` 中添加全局组件类型定义：
 
 ```json
 {

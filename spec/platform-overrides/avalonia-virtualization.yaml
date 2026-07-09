@@ -5,7 +5,8 @@ overrides:
     platform: avalonia
     status: accepted
     reason: Avalonia ScrollPresenter corrects realized content offsets after measure passes, while browser scroll anchoring is DOM-driven.
-    affectedContracts: [component.el-virtual-list, component.el-table-v2]
+    affectedContracts:
+      [component.dynamic-size-list, component.fixed-size-list, component.el-table-v2]
     visualThreshold: low
     behaviorExpectation: Anchor item identity, focused item position, scroll-to-index, and realized container budgets must remain stable across data changes.
     allowedDeviation: low

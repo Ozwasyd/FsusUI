@@ -103,7 +103,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .tmp/typecheck-cache
-          key: ${{ runner.os }}-fsusui-typecheck-${{ hashFiles('pnpm-lock.yaml', 'package.json', 'tsconfig*.json', 'packages/**/*.ts', 'packages/**/*.tsx', 'packages/**/*.vue', 'packages/**/*.json', 'internal/**/*.ts', 'internal/**/*.json', 'typings/**/*.d.ts', 'scripts/run-typecheck.mjs') }}
+          key: ${{ runner.os }}-fsusui-typecheck-${{ hashFiles('pnpm-lock.yaml', 'package.json', 'vue/tsconfig*.json', 'vue/packages/**/*.ts', 'vue/packages/**/*.tsx', 'vue/packages/**/*.vue', 'vue/packages/**/*.json', 'vue/internal/**/*.ts', 'vue/internal/**/*.json', 'vue/typings/**/*.d.ts', 'scripts/run-typecheck.mjs') }}
           restore-keys: |
             ${{ runner.os }}-fsusui-typecheck-
       - name: Log TypeScript typecheck cache status
@@ -135,16 +135,16 @@ jobs:
         id: icons-cache
         uses: actions/cache@v4
         with:
-          path: packages/icons-vue/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('packages/icons-vue/package.json', 'packages/icons-vue/src/**', 'packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
+          path: vue/packages/icons-vue/dist
+          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('vue/packages/icons-vue/package.json', 'vue/packages/icons-vue/src/**', 'vue/packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
           restore-keys: |
             ${{ runner.os }}-fsusui-test-artifacts-icons-
       - name: Restore WASM test artifact cache
         id: wasm-cache
         uses: actions/cache@v4
         with:
-          path: packages/wasm/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('packages/wasm/package.json', 'packages/wasm/build.config.ts', 'packages/wasm/**/*.ts', 'packages/wasm/**/*.cpp', 'packages/wasm/**/*.hpp', 'packages/wasm/**/*.h', 'packages/wasm/**/CMakeLists.txt', 'packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
+          path: vue/packages/wasm/dist
+          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
           restore-keys: |
             ${{ runner.os }}-fsusui-test-artifacts-wasm-
       - name: Log test artifact cache status
@@ -154,7 +154,7 @@ jobs:
       - run: pnpm run prepare:test-artifacts
       - name: Pack unit test artifacts
         run: |
-          tar -czf unit-test-artifacts.tgz packages/icons-vue/dist packages/wasm/dist
+          tar -czf unit-test-artifacts.tgz vue/packages/icons-vue/dist vue/packages/wasm/dist
           sha256sum unit-test-artifacts.tgz
       - uses: actions/upload-artifact@v4
         with:
@@ -190,7 +190,7 @@ jobs:
           sha256sum .unit-artifacts/unit-test-artifacts.tgz
           tar -xzf .unit-artifacts/unit-test-artifacts.tgz
       - run: pnpm run check:test-artifacts-ready
-      - run: pnpm exec vitest run --shard=${{ matrix.shard }}
+      - run: pnpm exec vitest run --config vue/vitest.config.ts --shard=${{ matrix.shard }}
 
   coverage:
     runs-on: ubuntu-latest
@@ -214,16 +214,16 @@ jobs:
         id: icons-cache
         uses: actions/cache@v4
         with:
-          path: packages/icons-vue/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('packages/icons-vue/package.json', 'packages/icons-vue/src/**', 'packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
+          path: vue/packages/icons-vue/dist
+          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('vue/packages/icons-vue/package.json', 'vue/packages/icons-vue/src/**', 'vue/packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
           restore-keys: |
             ${{ runner.os }}-fsusui-test-artifacts-icons-
       - name: Restore WASM test artifact cache
         id: wasm-cache
         uses: actions/cache@v4
         with:
-          path: packages/wasm/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('packages/wasm/package.json', 'packages/wasm/build.config.ts', 'packages/wasm/**/*.ts', 'packages/wasm/**/*.cpp', 'packages/wasm/**/*.hpp', 'packages/wasm/**/*.h', 'packages/wasm/**/CMakeLists.txt', 'packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
+          path: vue/packages/wasm/dist
+          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
           restore-keys: |
             ${{ runner.os }}-fsusui-test-artifacts-wasm-
       - name: Log test artifact cache status
@@ -263,16 +263,16 @@ jobs:
         id: icons-cache
         uses: actions/cache@v4
         with:
-          path: packages/icons-vue/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('packages/icons-vue/package.json', 'packages/icons-vue/src/**', 'packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
+          path: vue/packages/icons-vue/dist
+          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('vue/packages/icons-vue/package.json', 'vue/packages/icons-vue/src/**', 'vue/packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
           restore-keys: |
             ${{ runner.os }}-fsusui-test-artifacts-icons-
       - name: Restore WASM test artifact cache
         id: wasm-cache
         uses: actions/cache@v4
         with:
-          path: packages/wasm/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('packages/wasm/package.json', 'packages/wasm/build.config.ts', 'packages/wasm/**/*.ts', 'packages/wasm/**/*.cpp', 'packages/wasm/**/*.hpp', 'packages/wasm/**/*.h', 'packages/wasm/**/CMakeLists.txt', 'packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
+          path: vue/packages/wasm/dist
+          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
           restore-keys: |
             ${{ runner.os }}-fsusui-test-artifacts-wasm-
       - name: Log test artifact cache status
@@ -344,16 +344,16 @@ jobs:
         id: icons-cache
         uses: actions/cache@v4
         with:
-          path: packages/icons-vue/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('packages/icons-vue/package.json', 'packages/icons-vue/src/**', 'packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
+          path: vue/packages/icons-vue/dist
+          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('vue/packages/icons-vue/package.json', 'vue/packages/icons-vue/src/**', 'vue/packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
           restore-keys: |
             ${{ runner.os }}-fsusui-test-artifacts-icons-
       - name: Restore WASM test artifact cache
         id: wasm-cache
         uses: actions/cache@v4
         with:
-          path: packages/wasm/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('packages/wasm/package.json', 'packages/wasm/build.config.ts', 'packages/wasm/**/*.ts', 'packages/wasm/**/*.cpp', 'packages/wasm/**/*.hpp', 'packages/wasm/**/*.h', 'packages/wasm/**/CMakeLists.txt', 'packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
+          path: vue/packages/wasm/dist
+          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
           restore-keys: |
             ${{ runner.os }}-fsusui-test-artifacts-wasm-
       - name: Log test artifact cache status
@@ -388,16 +388,16 @@ jobs:
         id: icons-cache
         uses: actions/cache@v4
         with:
-          path: packages/icons-vue/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('packages/icons-vue/package.json', 'packages/icons-vue/src/**', 'packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
+          path: vue/packages/icons-vue/dist
+          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('vue/packages/icons-vue/package.json', 'vue/packages/icons-vue/src/**', 'vue/packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
           restore-keys: |
             ${{ runner.os }}-fsusui-test-artifacts-icons-
       - name: Restore WASM test artifact cache
         id: wasm-cache
         uses: actions/cache@v4
         with:
-          path: packages/wasm/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('packages/wasm/package.json', 'packages/wasm/build.config.ts', 'packages/wasm/**/*.ts', 'packages/wasm/**/*.cpp', 'packages/wasm/**/*.hpp', 'packages/wasm/**/*.h', 'packages/wasm/**/CMakeLists.txt', 'packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
+          path: vue/packages/wasm/dist
+          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
           restore-keys: |
             ${{ runner.os }}-fsusui-test-artifacts-wasm-
       - name: Log test artifact cache status

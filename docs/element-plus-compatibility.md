@@ -37,8 +37,8 @@ documented imports:
 
 The following surfaces are internal or unsupported for external consumers:
 
-- `internal/*` workspace packages.
-- Undocumented `packages/*` source imports.
+- `vue/internal/*` workspace packages.
+- Undocumented `vue/packages/*` source imports.
 - Deep imports from `es/*`, `lib/*`, or wildcard package paths unless a doc page
   names the import.
 - Build scripts, gulp tasks, generated metadata, and package fixture data.

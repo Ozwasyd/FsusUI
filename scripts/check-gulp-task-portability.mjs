@@ -1,9 +1,9 @@
 import { readFileSync } from 'node:fs'
 
 const taskFiles = [
-  'internal/build/gulpfile.ts',
-  'internal/build/src/tasks/full-bundle.ts',
-  'packages/theme-chalk/gulpfile.ts',
+  'vue/internal/build/gulpfile.ts',
+  'vue/internal/build/src/tasks/full-bundle.ts',
+  'vue/packages/theme-chalk/gulpfile.ts',
 ]
 
 let failures = 0

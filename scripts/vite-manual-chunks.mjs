@@ -101,7 +101,7 @@ const resolveElementPlusSupportChunk = (id) => {
   const supportPattern =
     '(constants|directives|hooks|locale|utils|render-pipeline)'
 
-  const workspaceSupport = id.match(new RegExp(`/packages/${supportPattern}/`))
+  const workspaceSupport = id.match(new RegExp(`/vue/packages/${supportPattern}/`))
   if (workspaceSupport) {
     return `ep-${sanitizeChunkName(workspaceSupport[1])}`
   }
@@ -129,7 +129,7 @@ export const resolveFsusViteManualChunk = (moduleId) => {
   const id = normalizeModuleId(moduleId)
 
   if (
-    id.includes('/packages/wasm/')
+    id.includes('/vue/packages/wasm/')
     || id.includes('/node_modules/@element-plus/wasm/')
     || id.includes('/node_modules/@ozwasyd/element-plus/es/wasm/')
     || id.includes('/ep_wasm')
@@ -140,7 +140,7 @@ export const resolveFsusViteManualChunk = (moduleId) => {
   }
 
   if (
-    id.includes('/packages/components/markdown-renderer/')
+    id.includes('/vue/packages/components/markdown-renderer/')
     || id.includes('/node_modules/@element-plus/components/markdown-renderer/')
     || id.includes('/node_modules/@ozwasyd/element-plus/es/components/markdown-renderer/')
     || id.includes('markdown-renderer.worker')
@@ -149,7 +149,7 @@ export const resolveFsusViteManualChunk = (moduleId) => {
   }
 
   if (
-    id.includes('/packages/icons-vue/')
+    id.includes('/vue/packages/icons-vue/')
     || id.includes('/node_modules/@element-plus/icons-vue/')
     || id.includes('/node_modules/@ozwasyd/element-plus/es/icons-vue/')
   ) {

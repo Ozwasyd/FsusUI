@@ -5,18 +5,18 @@ import { relative, resolve } from 'node:path'
 const root = process.cwd()
 
 const checkedFiles = [
-  'packages/wasm/index.ts',
-  'packages/wasm/markdown-runtime.ts',
-  'packages/hooks/use-render-pipeline/index.ts',
-  'packages/components/form/src/form.vue',
-  'packages/components/form/src/form-item.vue',
-  'packages/components/message-box/src/messageBox.ts',
-  'packages/components/upload/src/upload-content.vue',
+  'vue/packages/wasm/index.ts',
+  'vue/packages/wasm/markdown-runtime.ts',
+  'vue/packages/hooks/use-render-pipeline/index.ts',
+  'vue/packages/components/form/src/form.vue',
+  'vue/packages/components/form/src/form-item.vue',
+  'vue/packages/components/message-box/src/messageBox.ts',
+  'vue/packages/components/upload/src/upload-content.vue',
 ]
 
 const generatedDeclarationChecks = [
   {
-    file: 'packages/wasm/dist/index.d.ts',
+    file: 'vue/packages/wasm/dist/index.d.ts',
     signatures: [
       'initMarkdownRuntime(): Promise<FsusResult<MarkdownRuntimeKind>>',
       'renderMarkdownHtmlWithRuntime(request: MarkdownRenderRequest | string): Promise<FsusResult<MarkdownRuntimeHtmlResult>>',
@@ -31,7 +31,7 @@ const generatedDeclarationChecks = [
 
 const invariantThrowAllowlist = new Map([
   [
-    'packages/wasm/index.ts',
+    'vue/packages/wasm/index.ts',
     [
       '@element-plus/wasm is not ready',
       '@element-plus/wasm internal buffer helpers are unavailable',
@@ -39,7 +39,7 @@ const invariantThrowAllowlist = new Map([
     ],
   ],
   [
-    'packages/hooks/use-render-pipeline/index.ts',
+    'vue/packages/hooks/use-render-pipeline/index.ts',
     ['fsus_render_pipeline_adapter_id_required'],
   ],
 ])
@@ -78,7 +78,7 @@ for (const file of checkedFiles) {
     }
   }
 
-  if (normalized === 'packages/wasm/markdown-runtime.ts') {
+  if (normalized === 'vue/packages/wasm/markdown-runtime.ts') {
     const publicResultFunctions = [
       'initMarkdownRuntime',
       'renderMarkdownHtmlWithRuntime',

@@ -19,7 +19,7 @@ surfaces are public API and which surfaces are implementation detail.
 - A surface is public only when it is documented in this repository.
 - Undocumented package subpaths are internal, even if `package.json` contains a
   broad export pattern.
-- `internal/*` workspace packages are build and maintenance utilities, not
+- `vue/internal/*` workspace packages are build and maintenance utilities, not
   runtime public API.
 - Gulp tasks, build scripts, generated metadata, fixture data, and test helpers
   are internal.

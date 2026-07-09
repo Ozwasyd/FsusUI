@@ -34,7 +34,7 @@ const [bash] = getBashCandidates()
 
 if (!bash) {
   console.error(
-    'Unable to find bash for packages/wasm/build.sh. Set WASM_BASH to a bash executable.',
+    'Unable to find bash for vue/packages/wasm/build.sh. Set WASM_BASH to a bash executable.',
   )
   process.exit(1)
 }

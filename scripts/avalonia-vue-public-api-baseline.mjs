@@ -284,7 +284,7 @@ const parseSlotTags = (vueSource) => {
 }
 
 const parseDeprecatedApis = (root) => {
-  const files = walkFiles(path.join(root, 'packages/components'), (file) =>
+  const files = walkFiles(path.join(root, 'vue/packages/components'), (file) =>
     /\.(ts|vue)$/.test(file),
   )
   const deprecated = []
@@ -314,7 +314,7 @@ const parseDeprecatedApis = (root) => {
 }
 
 const parseComponentIndexModules = (root) => {
-  const file = path.join(root, 'packages/components/index.ts')
+  const file = path.join(root, 'vue/packages/components/index.ts')
   const content = exists(file) ? read(file) : ''
   return uniqueSorted(
     [...content.matchAll(/export\s+\*\s+from\s+['"]\.\/([^'"]+)['"]/g)].map(
@@ -324,7 +324,7 @@ const parseComponentIndexModules = (root) => {
 }
 
 const parsePublicExports = (root, moduleName) => {
-  const file = path.join(root, 'packages/components', moduleName, 'index.ts')
+  const file = path.join(root, 'vue/packages/components', moduleName, 'index.ts')
   if (!exists(file)) return []
   const content = read(file)
   const exports = []
@@ -349,7 +349,7 @@ const parsePublicExports = (root, moduleName) => {
 }
 
 const parseComponentImports = (root) => {
-  const file = path.join(root, 'packages/element-plus/component.ts')
+  const file = path.join(root, 'vue/packages/element-plus/component.ts')
   if (!exists(file)) return { imports: new Map(), installed: [] }
   const content = read(file)
   const imports = new Map()
@@ -384,7 +384,7 @@ const parseComponentImports = (root) => {
 }
 
 const parsePluginImports = (root) => {
-  const file = path.join(root, 'packages/element-plus/plugin.ts')
+  const file = path.join(root, 'vue/packages/element-plus/plugin.ts')
   if (!exists(file)) return []
   const content = read(file)
   const plugins = []
@@ -402,7 +402,7 @@ const parsePluginImports = (root) => {
 }
 
 const parseEntryPoints = (root, classifications) => {
-  const packageFile = path.join(root, 'packages/element-plus/package.json')
+  const packageFile = path.join(root, 'vue/packages/element-plus/package.json')
   if (!exists(packageFile)) return []
   const packageJson = parseJson(packageFile)
   return Object.keys(packageJson.exports || {})
@@ -418,7 +418,7 @@ const parseEntryPoints = (root, classifications) => {
 }
 
 const parseCssVariables = (root) => {
-  const files = walkFiles(path.join(root, 'packages/theme-chalk/src'), (file) =>
+  const files = walkFiles(path.join(root, 'vue/packages/theme-chalk/src'), (file) =>
     /\.(scss|css)$/.test(file),
   )
   const variables = new Map()
@@ -463,7 +463,7 @@ const loadClassifications = (root) => {
 }
 
 const loadModuleSources = (root, moduleName) => {
-  const moduleRoot = path.join(root, 'packages/components', moduleName)
+  const moduleRoot = path.join(root, 'vue/packages/components', moduleName)
   const files = walkFiles(moduleRoot, (file) => /\.(ts|vue)$/.test(file))
   return files.map((file) => ({
     file,
@@ -606,7 +606,7 @@ const parseServicesAndDirectives = (
       )
       services.push({
         name: serviceName,
-        module: plugin?.source ?? 'packages/element-plus/plugin.ts',
+        module: plugin?.source ?? 'vue/packages/element-plus/plugin.ts',
         classification: requiredClassification(
           classifications.services,
           serviceName,
@@ -624,7 +624,7 @@ const parseServicesAndDirectives = (
 const buildArtifacts = (root, options = {}) => {
   const classifications = loadClassifications(root)
   const packageJson = parseJson(
-    path.join(root, 'packages/element-plus/package.json'),
+    path.join(root, 'vue/packages/element-plus/package.json'),
   )
   const componentModules = parseComponentIndexModules(root)
   const componentImportInfo = parseComponentImports(root)
@@ -676,14 +676,14 @@ const buildArtifacts = (root, options = {}) => {
 
   const tokenFiles = [
     'spec/tokens/tokens.json',
-    'packages/theme-chalk/src/generated/tokens.json',
-    'packages/theme-chalk/src/generated/tokens.css',
-    'packages/theme-chalk/src/generated/tokens.scss',
+    'vue/packages/theme-chalk/src/generated/tokens.json',
+    'vue/packages/theme-chalk/src/generated/tokens.css',
+    'vue/packages/theme-chalk/src/generated/tokens.scss',
   ]
   const iconFiles = [
     'spec/icons/registry.yaml',
     'spec/icons/categories.yaml',
-    'packages/icons-vue/generated/icon-metadata.json',
+    'vue/packages/icons-vue/generated/icon-metadata.json',
   ]
 
   const componentCountByClassification = {}

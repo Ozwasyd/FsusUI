@@ -19,6 +19,7 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(scriptDir, '..')
 const templateRoot = path.join(
   repoRoot,
+  'vue',
   'tests',
   'consumer-install',
   'template',
@@ -27,6 +28,7 @@ const distRoot = path.join(repoRoot, 'dist', 'element-plus')
 const distPackagePath = path.join(distRoot, 'package.json')
 const sourcePackagePath = path.join(
   repoRoot,
+  'vue',
   'packages',
   'element-plus',
   'package.json',
