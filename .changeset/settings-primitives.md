@@ -1,5 +1,5 @@
 ---
-'@ozwasyd/element-plus': minor
+'element-plus': minor
 ---
 
 Add generic settings primitives for section navigation, standalone section

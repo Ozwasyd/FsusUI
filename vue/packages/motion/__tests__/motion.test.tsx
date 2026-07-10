@@ -884,7 +884,7 @@ describe('motion primitives', () => {
 
     const fixture = JSON.parse(
       readFileSync(
-        'packages/motion/__tests__/fixtures/fsusblog-motion-adoption.json',
+        'vue/packages/motion/__tests__/fixtures/fsusblog-motion-adoption.json',
         'utf8',
       ),
     ) as { mappings: MotionAdoptionEntry[] }

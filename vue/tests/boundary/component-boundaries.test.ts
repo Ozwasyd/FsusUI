@@ -185,10 +185,11 @@ describe('component boundary coverage registry', () => {
   })
 
   it('keeps demo-app runtime imports behind the demo contract', async () => {
-    const demoFiles = await fg('packages/demo-app/src/**/*.{ts,vue}', {
+    const demoFiles = await fg('vue/packages/demo-app/src/**/*.{ts,vue}', {
       cwd: process.cwd(),
       absolute: true,
     })
+    expect(demoFiles.length).toBeGreaterThan(0)
     const forbiddenDeepImport =
       /from ['"]\.\.\/\.\.\/components\/(?!.*style\/css)/
 

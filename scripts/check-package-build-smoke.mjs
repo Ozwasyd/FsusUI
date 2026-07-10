@@ -68,7 +68,16 @@ assert(
   'source package publish registry must be npm public registry when present',
 )
 
-for (const exportPath of ['.', './global', './theme', './icons-vue', './wasm', './markdown-runtime']) {
+for (const exportPath of [
+  '.',
+  './global',
+  './theme',
+  './icons-vue',
+  './wasm',
+  './markdown-runtime',
+  './motion',
+  './perception-challenge',
+]) {
   assert(sourcePackage.exports?.[exportPath], `source package exports must include ${exportPath}`)
 }
 
@@ -83,6 +92,10 @@ assert(
 assert(
   emptyStateEntry.includes('export type { EmptyStateInstance }'),
   'EmptyState source entry must export EmptyStateInstance',
+)
+assert(
+  componentBarrel.includes("export * from './collection-primitives'"),
+  'component source barrel must export collection primitives',
 )
 
 for (const artifact of [
@@ -144,6 +157,16 @@ if (existsSync(path.join(publishedDistRoot, 'package.json'))) {
   const distPackage = readJson('dist/element-plus/package.json')
   const distPackageSelfReference = distPackage.name
   assert(
+    distPackage.version === sourcePackage.version,
+    `published package version ${distPackage.version} must match source package version ${sourcePackage.version}`,
+  )
+  for (const exportPath of ['./motion', './perception-challenge']) {
+    assert(
+      distPackage.exports?.[exportPath],
+      `published package exports must include ${exportPath}`,
+    )
+  }
+  assert(
     !distPackage.dependencies?.['@element-plus/motion'],
     'published package must not depend on unpublished @element-plus/motion',
   )
@@ -162,6 +185,30 @@ if (existsSync(path.join(publishedDistRoot, 'package.json'))) {
   ]
 
   for (const [relativePath, token] of emptyStateDistChecks) {
+    const absolutePath = path.join(root, relativePath)
+    assert(existsSync(absolutePath), `published package must include ${relativePath}`)
+    assert(
+      readFileSync(absolutePath, 'utf8').includes(token),
+      `published package ${relativePath} must expose ${token}`,
+    )
+  }
+
+  const fsusBlogConsumerChecks = [
+    ['dist/element-plus/es/motion.mjs', 'FsuTransition'],
+    ['dist/element-plus/es/motion.d.ts', 'MotionPresetName'],
+    ['dist/element-plus/lib/motion.js', 'FsuTransition'],
+    ['dist/element-plus/lib/motion.d.ts', 'MotionPresetName'],
+    ['dist/element-plus/es/perception-challenge.mjs', 'FsusPerceptionChallenge'],
+    ['dist/element-plus/es/perception-challenge.d.ts', 'PerceptionChallengeClient'],
+    ['dist/element-plus/lib/perception-challenge.js', 'FsusPerceptionChallenge'],
+    ['dist/element-plus/lib/perception-challenge.d.ts', 'PerceptionChallengeClient'],
+    ['dist/element-plus/es/components/collection-primitives/index.d.ts', 'FsusDataList'],
+    ['dist/element-plus/es/components/collection-primitives/index.d.ts', 'DataListColumn'],
+    ['dist/element-plus/lib/components/collection-primitives/index.d.ts', 'FsusDataList'],
+    ['dist/element-plus/lib/components/collection-primitives/index.d.ts', 'DataListColumn'],
+  ]
+
+  for (const [relativePath, token] of fsusBlogConsumerChecks) {
     const absolutePath = path.join(root, relativePath)
     assert(existsSync(absolutePath), `published package must include ${relativePath}`)
     assert(

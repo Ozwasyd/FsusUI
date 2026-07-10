@@ -1,5 +1,5 @@
 ---
-'@ozwasyd/element-plus': patch
+'element-plus': patch
 ---
 
-Export EmptyState, SiteHeader, and perception challenge components and types from the package root.
+Export EmptyState, SiteHeader, DataList, motion, and perception challenge components and types through the published root and stable subpaths used by FsusBlog.

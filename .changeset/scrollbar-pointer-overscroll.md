@@ -1,5 +1,5 @@
 ---
-'@ozwasyd/element-plus': patch
+'element-plus': patch
 ---
 
 Migrate scrollbar thumb dragging to pointer events and make scroll containment
