@@ -1,7 +1,13 @@
 <template>
   <div :class="ns.b()">
     <div :class="ns.e('image')" :style="imageStyle">
-      <img v-if="image" :src="image" @dragstart.prevent />
+      <img
+        v-if="image"
+        :src="image"
+        alt=""
+        aria-hidden="true"
+        @dragstart.prevent
+      />
       <slot v-else name="image">
         <img-empty />
       </slot>

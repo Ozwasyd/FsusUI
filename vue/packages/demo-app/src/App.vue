@@ -75,6 +75,7 @@ import { initMarkdownRuntime } from '@element-plus/wasm'
 import { createDemoState, provideDemoState } from './demo-state'
 import BasicSection from './sections/BasicSection.vue'
 import DataSection from './sections/DataSection.vue'
+import EmptyIllustrationSection from './sections/EmptyIllustrationSection.vue'
 import FeedbackSection from './sections/FeedbackSection.vue'
 import FoundationBoundarySection from './sections/FoundationBoundarySection.vue'
 import FormSection from './sections/FormSection.vue'
@@ -144,6 +145,10 @@ const routeSections = new Map<string, DemoSection | { component: object }>([
     { component: markRaw(MarkdownStressSection) },
   ],
   ['foundation-boundary', { component: markRaw(FoundationBoundarySection) }],
+  [
+    'empty-illustration',
+    { component: markRaw(EmptyIllustrationSection) },
+  ],
   [
     'public-shell-nav-mode',
     { component: markRaw(PublicShellNavModeSection) },

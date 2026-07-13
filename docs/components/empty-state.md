@@ -4,7 +4,9 @@
 It is also exported as `FsusEmptyState` for Fsus application code.
 
 Use it when a table body, list, drawer, panel, or page has no data. Keep
-`ElEmpty` for legacy illustration-heavy placeholders.
+`ElEmpty` for compatibility surfaces that specifically need its image URL,
+image sizing, or image slot API. Its default mark is now a quiet monochrome
+document structure rather than an illustration-led placeholder.
 
 ## Sizes
 
@@ -64,6 +66,9 @@ The `illustration` prop defaults to `auto`.
 - Pass `:illustration="false"` to suppress the mark.
 - Pass a custom `#illustration` slot only when the image is decorative or has
   nearby text that explains the state.
+- Prefer no illustration when the surrounding heading and description already
+  make the empty state clear. Always state the reason and the next useful step
+  before adding visual decoration.
 
 ```vue
 <FsusEmptyState size="page" title="No archived items" :illustration="false" />

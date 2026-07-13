@@ -14,7 +14,12 @@ describe('Empty.vue', () => {
 
   test('should render image props', () => {
     const wrapper = mount(() => <Empty image={AXIOM} />)
-    expect(wrapper.find('.el-empty__image img').exists()).toBe(true)
+    const image = wrapper.find('.el-empty__image img')
+
+    expect(image.exists()).toBe(true)
+    expect(image.attributes('src')).toBe(AXIOM)
+    expect(image.attributes('alt')).toBe('')
+    expect(image.attributes('aria-hidden')).toBe('true')
   })
 
   test('should render imageSize props', async () => {
@@ -74,12 +79,20 @@ describe('Empty.vue', () => {
 })
 
 describe('Empty.vue svg visual regressions', () => {
-  test('default illustration keeps rounded stroke caps and joins', () => {
+  test('default illustration is a quiet decorative document structure', () => {
     const wrapper = mount(() => <Empty />)
     const svg = wrapper.find('.el-empty__image svg')
 
     expect(svg.exists()).toBe(true)
+    expect(svg.attributes('aria-hidden')).toBe('true')
+    expect(svg.attributes('focusable')).toBe('false')
+    expect(svg.attributes('fill')).toBe('none')
+    expect(svg.attributes('stroke')).toBe('currentColor')
     expect(svg.attributes('stroke-linejoin')).toBe('round')
     expect(svg.attributes('stroke-linecap')).toBe('round')
+    expect(svg.findAll('path')).toHaveLength(4)
+    expect(svg.findAll('circle')).toHaveLength(0)
+    expect(svg.findAll('linearGradient')).toHaveLength(0)
+    expect(svg.html()).not.toMatch(/orbit|node|glow|animation|color-primary/i)
   })
 })
