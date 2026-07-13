@@ -42,6 +42,23 @@ describe('use-motion', () => {
     vi.restoreAllMocks()
   })
 
+  it('uses the quiet standard runtime when no root override is present', () => {
+    const runtime = getFsusMotionRuntime()
+
+    expect(runtime.preset).toBe('standard')
+    expect(runtime.controlFastMs).toBe(140)
+    expect(runtime.controlMs).toBe(220)
+    expect(runtime.dragBlurPx).toBe(0)
+    expect(runtime.dragScaleDelta).toBe(0)
+    expect(runtime.dragTrailOpacity).toBe(0)
+    expect(runtime.scrollTrailOpacity).toBe(0)
+    expect(runtime.spring).toEqual({
+      damping: 28,
+      mass: 0.9,
+      stiffness: 260,
+    })
+  })
+
   it('reads root motion tokens into a normalized runtime', () => {
     const root = document.documentElement
     root.dataset.fsusMotion = 'enabled'

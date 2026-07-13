@@ -24,6 +24,8 @@ const steps = [
       './scripts/with-node-heap.mjs',
       'vitest',
       'run',
+      '--config',
+      'vue/vitest.config.ts',
       'vue/packages/motion',
     ],
   },

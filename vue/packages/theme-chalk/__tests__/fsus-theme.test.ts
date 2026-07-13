@@ -149,6 +149,17 @@ describe('Fsus theme visual baseline', () => {
         'scale(1.08);',
       ],
     )
+    expectCssRule(css, '.fsus-reading-surface', [
+      '--fsus-interactive-motion-blur: 0px;',
+      '--fsus-interactive-motion-glow: 0px;',
+      '--fsus-interactive-motion-offset-y: 0px;',
+      '--fsus-interactive-motion-strength: 0;',
+      '--fsus-interactive-motion-trail-opacity: 0;',
+      '--fsus-motion-scroll-max-offset: 0px;',
+      '--fsus-motion-drag-max-offset: 0px;',
+      '--fsus-motion-drag-scale: 0;',
+      '--fsus-motion-trail: transparent;',
+    ])
   })
 
   test('keeps border-card tabs on the same quiet baseline', () => {
@@ -924,24 +935,24 @@ describe('Fsus theme visual baseline', () => {
       dialogCss,
       '.dialog-scale-fade-enter-active .el-overlay-dialog',
       [
-        'animation: dialog-scale-fade-in var(--fsus-motion-panel, 420ms) var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));',
+        'animation: dialog-scale-fade-in var(--fsus-motion-panel, 360ms) var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));',
       ],
     )
     expectCssRule(
       dialogCss,
       '.dialog-scale-fade-leave-active .el-overlay-dialog',
       [
-        'animation: dialog-scale-fade-out var(--fsus-motion-panel, 420ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));',
+        'animation: dialog-scale-fade-out var(--fsus-motion-panel, 360ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));',
       ],
     )
     expectCssRule(dialogCss, '.dialog-fade-enter-active', [
       'animation: modal-fade-in var(--fsus-motion-overlay, 300ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));',
     ])
     expectCssRule(dialogCss, '.dialog-fade-enter-active .el-overlay-dialog', [
-      'animation: dialog-fade-in var(--fsus-motion-panel, 420ms) var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));',
+      'animation: dialog-fade-in var(--fsus-motion-panel, 360ms) var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));',
     ])
     expectCssRule(dialogCss, '.dialog-fade-leave-active .el-overlay-dialog', [
-      'animation: dialog-fade-out var(--fsus-motion-panel, 420ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));',
+      'animation: dialog-fade-out var(--fsus-motion-panel, 360ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));',
     ])
     expect(dialogCss).toContain('@keyframes dialog-scale-fade-in')
     expect(dialogCss).toContain('@keyframes dialog-scale-fade-out')
@@ -1099,7 +1110,7 @@ describe('Fsus theme visual baseline', () => {
     expectCssRule(css, '.el-progress-bar__inner', [
       'background-color: var(--fsus-progress-bar-color, var(--fsus-scholarly-blue));',
       'border-radius: var(--fsus-progress-radius, var(--fsus-radius-pill));',
-      'transition: width var(--fsus-progress-width-motion, var(--fsus-motion-control, 260ms)) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+      'transition: width var(--fsus-progress-width-motion, var(--fsus-motion-control, 220ms)) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
     ])
     expectCssRule(css, '.el-progress-bar__inner--indeterminate', [
       'animation: indeterminate var(--fsus-progress-animation-duration, 3s) var(--fsus-progress-animation-easing, linear) infinite;',

@@ -113,7 +113,7 @@
     line-height: 1;
     white-space: nowrap;
     transition: width
-      var(--fsus-progress-width-motion, var(--fsus-motion-control, 260ms))
+      var(--fsus-progress-width-motion, var(--fsus-motion-control, 220ms))
       var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
 
     @include utils-vertical-center;

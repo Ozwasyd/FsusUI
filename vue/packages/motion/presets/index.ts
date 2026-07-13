@@ -1,8 +1,5 @@
 import { motionCssVars, motionTokens } from '../tokens'
-import {
-  motionLegacyPresetNames,
-  motionPresetNames,
-} from '../types'
+import { motionLegacyPresetNames, motionPresetNames } from '../types'
 import type {
   MotionLegacyPresetName,
   MotionPresetDefinition,
@@ -14,8 +11,8 @@ import type {
 const none = 'translate3d(0, 0, 0)'
 const terminal: MotionStyleState = {
   opacity: '1',
-  transform: '',
-  filter: '',
+  transform: 'none',
+  filter: 'none',
 }
 const opacityTerminal: MotionStyleState = { opacity: '1' }
 const quietSurfaces = [
@@ -24,7 +21,10 @@ const quietSurfaces = [
   'list-table-surface',
 ] as const
 const overlaySurfaces = ['overlay-sheet-dialog-surface'] as const
-const receiptSurfaces = ['toast-banner-surface', 'admin-operation-surface'] as const
+const receiptSurfaces = [
+  'toast-banner-surface',
+  'admin-operation-surface',
+] as const
 
 // Legacy 33-name vocabulary is collapsed to 21 intent-based effects.
 // Each legacy name points to the intent preset that best matches its
@@ -84,11 +84,11 @@ export const motionPresets: Record<MotionPresetName, MotionPresetDefinition> = {
     pattern: 'decel',
     tier: 'short',
     surfaces: ['route-surface', 'reading-surface'],
-    from: { opacity: '0.72', filter: 'blur(2px) saturate(0.96)' },
-    to: { opacity: '1', filter: '' },
-    reduced: { opacity: '1', filter: '' },
-    leaveFrom: { opacity: '1', filter: '' },
-    leaveTo: { opacity: '0.72', filter: 'blur(1px) saturate(0.98)' },
+    from: { opacity: '0.72', filter: 'none' },
+    to: { opacity: '1', filter: 'none' },
+    reduced: terminal,
+    leaveFrom: { opacity: '1', filter: 'none' },
+    leaveTo: { opacity: '0.72', filter: 'none' },
   },
   'ownership-transfer-snapshot': {
     name: 'ownership-transfer-snapshot',
@@ -239,11 +239,11 @@ export const motionPresets: Record<MotionPresetName, MotionPresetDefinition> = {
     pattern: 'standard',
     tier: 'long',
     surfaces: ['reading-surface', 'media-preview-surface'],
-    from: { opacity: '0', filter: 'saturate(0.92)' },
-    to: { opacity: '1', filter: '' },
+    from: { opacity: '0', filter: 'none' },
+    to: { opacity: '1', filter: 'none' },
     reduced: terminal,
-    leaveFrom: { opacity: '1', filter: '' },
-    leaveTo: { opacity: '0', filter: 'saturate(0.92)' },
+    leaveFrom: { opacity: '1', filter: 'none' },
+    leaveTo: { opacity: '0', filter: 'none' },
   },
   'media-focus': {
     name: 'media-focus',

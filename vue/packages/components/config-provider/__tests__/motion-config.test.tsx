@@ -2,7 +2,12 @@ import { nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import ConfigProvider from '../src/config-provider'
-import { clearMotionConfig, syncMotionConfig } from '../src/motion'
+import {
+  clearMotionConfig,
+  defaultMotionConfig,
+  normalizeMotionConfig,
+  syncMotionConfig,
+} from '../src/motion'
 
 type MatchMediaController = ReturnType<typeof createMatchMediaController>
 
@@ -108,6 +113,39 @@ describe('motion-config', () => {
     }
 
     delete (window as Partial<Window>).matchMedia
+  })
+
+  it('defaults to the quiet standard runtime budget', () => {
+    syncMotionConfig()
+
+    const root = document.documentElement
+    expect(defaultMotionConfig.preset).toBe('standard')
+    expect(normalizeMotionConfig().preset).toBe('standard')
+    expect(root.dataset.fsusMotionPreset).toBe('standard')
+    expect(root.style.getPropertyValue('--fsus-motion-control')).toBe('220ms')
+    expect(root.style.getPropertyValue('--fsus-motion-panel')).toBe('360ms')
+    expect(root.style.getPropertyValue('--fsus-motion-blur')).toBe('0px')
+    expect(root.style.getPropertyValue('--fsus-motion-drag-blur')).toBe('0px')
+    expect(root.style.getPropertyValue('--fsus-motion-trail')).toBe(
+      'transparent',
+    )
+    expect(root.style.getPropertyValue('--fsus-motion-slider-trail')).toBe(
+      'transparent',
+    )
+    expect(
+      root.style.getPropertyValue('--fsus-motion-scroll-trail-opacity'),
+    ).toBe('0')
+    expect(root.style.getPropertyValue('--fsus-motion-drag-scale')).toBe('0')
+  })
+
+  it('keeps smooth and expressive available only through explicit selection', () => {
+    for (const preset of ['smooth', 'expressive'] as const) {
+      syncMotionConfig({ mode: 'enabled', preset })
+      expect(document.documentElement.dataset.fsusMotionPreset).toBe(preset)
+    }
+
+    syncMotionConfig({ preset: 'unknown' as never })
+    expect(document.documentElement.dataset.fsusMotionPreset).toBe('standard')
   })
 
   it('syncs explicit motion preset tokens to the document root', () => {

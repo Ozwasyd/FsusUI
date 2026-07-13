@@ -94,7 +94,20 @@ html.dark [data-fsus-material='glass'] {
   --fsus-backdrop-blur-overlay: 0px;
   --fsus-interactive-motion-blur: 0px;
   --fsus-interactive-motion-glow: 0px;
+  --fsus-interactive-motion-offset-x: 0px;
+  --fsus-interactive-motion-offset-y: 0px;
+  --fsus-interactive-motion-strength: 0;
   --fsus-interactive-motion-trail-opacity: 0;
+  --fsus-motion-blur: 0px;
+  --fsus-motion-slider-blur: 0px;
+  --fsus-motion-scroll-blur: 0px;
+  --fsus-motion-drag-blur: 0px;
+  --fsus-motion-scroll-offset: 0px;
+  --fsus-motion-scroll-max-offset: 0px;
+  --fsus-motion-scroll-trail-opacity: 0;
+  --fsus-motion-drag-max-offset: 0px;
+  --fsus-motion-drag-scale: 0;
+  --fsus-motion-drag-trail-opacity: 0;
   --fsus-motion-trail: transparent;
   --fsus-motion-slider-trail: transparent;
 }

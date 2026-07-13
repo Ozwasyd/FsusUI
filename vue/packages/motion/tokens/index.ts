@@ -26,14 +26,14 @@ export const motionTokens: MotionTokens = {
     // M3 emphasized: high-attention entry/exit, larger distance, longer stagger
     emphasized: {
       short: {
-        duration: '400ms',
+        duration: '320ms',
         easing: 'cubic-bezier(0.2, 0, 0, 1)',
         distance: '12px',
         stagger: '30ms',
         intensity: '0.96',
       },
       long: {
-        duration: '500ms',
+        duration: '360ms',
         easing: 'cubic-bezier(0.2, 0, 0, 1)',
         distance: '16px',
         stagger: '40ms',
@@ -43,14 +43,14 @@ export const motionTokens: MotionTokens = {
     // M3 standard: ordinary content settle, moderate distance and stagger
     standard: {
       short: {
-        duration: '250ms',
+        duration: '220ms',
         easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
         distance: '8px',
         stagger: '25ms',
         intensity: '0.97',
       },
       long: {
-        duration: '400ms',
+        duration: '360ms',
         easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
         distance: '12px',
         stagger: '35ms',
@@ -60,7 +60,7 @@ export const motionTokens: MotionTokens = {
     // M3 decel: outgoing, ends slowly so the eye lands on the result
     decel: {
       short: {
-        duration: '200ms',
+        duration: '180ms',
         easing: 'cubic-bezier(0, 0, 0.2, 1)',
         distance: '8px',
         stagger: '20ms',
@@ -84,7 +84,7 @@ export const motionTokens: MotionTokens = {
         intensity: '0.98',
       },
       long: {
-        duration: '250ms',
+        duration: '220ms',
         easing: 'cubic-bezier(0.4, 0, 1, 1)',
         distance: '8px',
         stagger: '25ms',
@@ -100,14 +100,14 @@ export const motionCssVars = {
   patterns: {
     emphasized: {
       short: {
-        duration: 'var(--fsus-motion-emphasized-short, 400ms)',
+        duration: 'var(--fsus-motion-emphasized-short, 320ms)',
         easing: 'var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1))',
         distance: 'var(--fsus-motion-emphasized-short-distance, 12px)',
         stagger: 'var(--fsus-motion-emphasized-short-stagger, 30ms)',
         intensity: 'var(--fsus-motion-emphasized-short-intensity, 0.96)',
       },
       long: {
-        duration: 'var(--fsus-motion-emphasized-long, 500ms)',
+        duration: 'var(--fsus-motion-emphasized-long, 360ms)',
         easing: 'var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1))',
         distance: 'var(--fsus-motion-emphasized-long-distance, 16px)',
         stagger: 'var(--fsus-motion-emphasized-long-stagger, 40ms)',
@@ -116,14 +116,14 @@ export const motionCssVars = {
     },
     standard: {
       short: {
-        duration: 'var(--fsus-motion-standard-short, 250ms)',
+        duration: 'var(--fsus-motion-standard-short, 220ms)',
         easing: 'var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1))',
         distance: 'var(--fsus-motion-standard-short-distance, 8px)',
         stagger: 'var(--fsus-motion-standard-short-stagger, 25ms)',
         intensity: 'var(--fsus-motion-standard-short-intensity, 0.97)',
       },
       long: {
-        duration: 'var(--fsus-motion-standard-long, 400ms)',
+        duration: 'var(--fsus-motion-standard-long, 360ms)',
         easing: 'var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1))',
         distance: 'var(--fsus-motion-standard-long-distance, 12px)',
         stagger: 'var(--fsus-motion-standard-long-stagger, 35ms)',
@@ -132,7 +132,7 @@ export const motionCssVars = {
     },
     decel: {
       short: {
-        duration: 'var(--fsus-motion-decel-short, 200ms)',
+        duration: 'var(--fsus-motion-decel-short, 180ms)',
         easing: 'var(--fsus-motion-decel, cubic-bezier(0, 0, 0.2, 1))',
         distance: 'var(--fsus-motion-decel-short-distance, 8px)',
         stagger: 'var(--fsus-motion-decel-short-stagger, 20ms)',
@@ -155,7 +155,7 @@ export const motionCssVars = {
         intensity: 'var(--fsus-motion-accel-short-intensity, 0.98)',
       },
       long: {
-        duration: 'var(--fsus-motion-accel-long, 250ms)',
+        duration: 'var(--fsus-motion-accel-long, 220ms)',
         easing: 'var(--fsus-motion-accel, cubic-bezier(0.4, 0, 1, 1))',
         distance: 'var(--fsus-motion-accel-long-distance, 8px)',
         stagger: 'var(--fsus-motion-accel-long-stagger, 25ms)',
@@ -169,11 +169,11 @@ export const motionCssVars = {
 // Backward-compat aliases for the previous 5-axis labels so external code
 // that referenced `motionTokenAliases.fast` etc. continues to work.
 export const motionTokenAliases = {
-  fast: motionCssVars.patterns.standard.short.duration,
-  control: motionCssVars.patterns.standard.long.duration,
-  panel: motionCssVars.patterns.emphasized.long.duration,
-  overlay: motionCssVars.patterns.decel.long.duration,
-  route: motionCssVars.patterns.decel.long.duration,
+  fast: 'var(--fsus-motion-control-fast, 140ms)',
+  control: 'var(--fsus-motion-control, 220ms)',
+  panel: 'var(--fsus-motion-panel, 360ms)',
+  overlay: 'var(--fsus-motion-overlay, 260ms)',
+  route: 'var(--fsus-motion-duration-route, 240ms)',
   standardEase: motionCssVars.patterns.standard.short.easing,
   emphasizedEase: motionCssVars.patterns.emphasized.short.easing,
   decelEase: motionCssVars.patterns.decel.short.easing,

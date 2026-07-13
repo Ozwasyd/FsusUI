@@ -79,19 +79,20 @@ describe('motion primitives', () => {
   })
 
   it('centralizes the first-party token and preset contracts', () => {
-    expect(motionTokens.patterns.standard.long.duration).toBe('400ms')
+    expect(motionTokens.patterns.standard.short.duration).toBe('220ms')
+    expect(motionTokens.patterns.standard.long.duration).toBe('360ms')
+    expect(motionTokens.patterns.emphasized.long.duration).toBe('360ms')
     expect(motionTokens.patterns.emphasized.short.easing).toBe(
       'cubic-bezier(0.2, 0, 0, 1)',
     )
     expect(motionTokens.instant).toBe('1ms')
     expect(motionTokenAliases).toMatchObject({
-      fast: 'var(--fsus-motion-standard-short, 250ms)',
-      control: 'var(--fsus-motion-standard-long, 400ms)',
-      panel: 'var(--fsus-motion-emphasized-long, 500ms)',
-      overlay: 'var(--fsus-motion-decel-long, 300ms)',
-      route: 'var(--fsus-motion-decel-long, 300ms)',
-      standardEase:
-        'var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1))',
+      fast: 'var(--fsus-motion-control-fast, 140ms)',
+      control: 'var(--fsus-motion-control, 220ms)',
+      panel: 'var(--fsus-motion-panel, 360ms)',
+      overlay: 'var(--fsus-motion-overlay, 260ms)',
+      route: 'var(--fsus-motion-duration-route, 240ms)',
+      standardEase: 'var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1))',
       emphasizedEase:
         'var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1))',
     })
@@ -135,10 +136,7 @@ describe('motion primitives', () => {
       isMotionPresetAllowedOnSurface('scale-fade', 'ordinary-content'),
     ).toBe(false)
     expect(
-      isMotionPresetAllowedOnSurface(
-        'lightbox-focus',
-        'media-preview-surface',
-      ),
+      isMotionPresetAllowedOnSurface('lightbox-focus', 'media-preview-surface'),
     ).toBe(true)
     expect(readingMotionPresetNames).toContain('code-ready')
     expect(readingMotionPolicy).toMatchObject({
@@ -160,11 +158,11 @@ describe('motion primitives', () => {
       leaveTo: { opacity: '0' },
     })
     expect(motionPresets['route-settle']).toMatchObject({
-      from: { opacity: '0.72', filter: 'blur(2px) saturate(0.96)' },
-      to: { opacity: '1', filter: '' },
-      reduced: { opacity: '1', filter: '' },
-      leaveFrom: { opacity: '1', filter: '' },
-      leaveTo: { opacity: '0.72', filter: 'blur(1px) saturate(0.98)' },
+      from: { opacity: '0.72', filter: 'none' },
+      to: { opacity: '1', filter: 'none' },
+      reduced: { opacity: '1', transform: 'none', filter: 'none' },
+      leaveFrom: { opacity: '1', filter: 'none' },
+      leaveTo: { opacity: '0.72', filter: 'none' },
     })
     expect(Object.keys(motionRecipes)).toEqual([
       'content-enter',
@@ -257,7 +255,8 @@ describe('motion primitives', () => {
     expect(resolveMotionBudget().maxAnimatedNodesPerViewport).toBe(0)
     expect(el.style.transition).toBe('')
     expect(el.style.opacity).toBe('1')
-    expect(el.style.transform).toBe('')
+    expect(el.style.transform).toBe('none')
+    expect(el.style.filter).toBe('none')
   })
 
   it('runs v-motion with string syntax', async () => {
@@ -324,7 +323,140 @@ describe('motion primitives', () => {
 
     expect(el.style.transition).toBe('')
     expect(el.style.opacity).toBe('1')
-    expect(el.style.transform).toBe('')
+    expect(el.style.transform).toBe('none')
+    expect(el.style.filter).toBe('none')
+  })
+
+  it('resolves route, panel, list, and reading-anchor runtime budgets', async () => {
+    const cases = [
+      {
+        name: 'route-settle',
+        surface: 'reading-surface',
+        duration: '180ms',
+        maxDuration: 360,
+      },
+      {
+        name: 'dialog-settle',
+        surface: 'overlay-sheet-dialog-surface',
+        duration: '320ms',
+        maxDuration: 360,
+      },
+      {
+        name: 'sheet-settle',
+        surface: 'overlay-sheet-dialog-surface',
+        duration: '360ms',
+        maxDuration: 360,
+      },
+      {
+        name: 'index-list-settle',
+        surface: 'list-table-surface',
+        duration: '220ms',
+        maxDuration: 220,
+      },
+      {
+        name: 'surface-settle',
+        surface: 'reading-surface',
+        duration: '220ms',
+        maxDuration: 220,
+      },
+    ] as const
+
+    for (const testCase of cases) {
+      const host = document.createElement('section')
+      if (testCase.surface === 'reading-surface') {
+        host.dataset.fsusSurface = 'reading'
+      }
+      const el = document.createElement('div')
+      host.append(el)
+      document.body.append(host)
+
+      runMotion(el, {
+        name: testCase.name,
+        surface: testCase.surface,
+      })
+      await nextTick()
+      await flushMotionFrame()
+
+      const resolvedDuration = Number(testCase.duration.replace('ms', ''))
+      expect(resolvedDuration).toBeLessThanOrEqual(testCase.maxDuration)
+      expect(el.style.transition).toContain(testCase.duration)
+      if (testCase.surface === 'reading-surface') {
+        expect(el.style.filter).toBe('none')
+        expect(el.style.getPropertyValue('--fsus-motion-blur')).toBe('0px')
+        expect(el.style.getPropertyValue('--fsus-motion-trail')).toBe(
+          'transparent',
+        )
+        expect(
+          el.style.getPropertyValue('--fsus-interactive-motion-offset-y'),
+        ).toBe('0px')
+        expect(
+          el.style.getPropertyValue('--fsus-interactive-motion-strength'),
+        ).toBe('0')
+        expect(el.style.transform).not.toContain('translate')
+      }
+    }
+  })
+
+  it('lands reduced and disabled motion without layout displacement', () => {
+    for (const mode of ['reduced', 'disabled']) {
+      document.documentElement.dataset.fsusMotion = mode
+      for (const name of [
+        'route-settle',
+        'dialog-settle',
+        'sheet-settle',
+        'index-list-settle',
+        'surface-settle',
+      ] as const) {
+        const el = document.createElement('div')
+        document.body.append(el)
+        const readLayout = () => {
+          const { height, width, x, y } = el.getBoundingClientRect()
+          return { height, width, x, y }
+        }
+        const before = readLayout()
+        const onFinish = vi.fn()
+
+        runMotion(el, { name, onFinish })
+
+        expect(onFinish).toHaveBeenCalledTimes(1)
+        expect(el.style.transition).toBe('')
+        expect(el.style.transform).toBe('none')
+        expect(el.style.filter).toBe('none')
+        expect(readLayout()).toEqual(before)
+      }
+    }
+  })
+
+  it('forces every reading-surface preset to filter none at runtime', async () => {
+    const host = document.createElement('article')
+    host.dataset.fsusSurface = 'reading'
+    document.body.append(host)
+
+    for (const preset of Object.values(motionPresets).filter((definition) =>
+      definition.surfaces.includes('reading-surface'),
+    )) {
+      const el = document.createElement('div')
+      host.append(el)
+      const controls = runMotion(el, {
+        name: preset.name,
+        surface: 'reading-surface',
+        duration: 1,
+      })
+      await nextTick()
+      await flushMotionFrame()
+      controls.finish()
+
+      expect(el.style.filter, preset.name).toBe('none')
+      expect(el.style.transform, preset.name).not.toContain('translate')
+      expect(
+        el.style.getPropertyValue('--fsus-interactive-motion-glow'),
+        preset.name,
+      ).toBe('0px')
+      expect(
+        el.style.getPropertyValue('--fsus-motion-drag-trail-opacity'),
+        preset.name,
+      ).toBe('0')
+    }
   })
 
   it('wraps Vue Transition with preset-based enter and leave hooks', async () => {
@@ -372,17 +504,20 @@ describe('motion primitives', () => {
       },
     })
 
-    const wrapper = mount(() => (
-      <FsuTransition name="route-settle" mode="out-in">
-        <div class="panel">panel</div>
-      </FsuTransition>
-    ), {
-      global: {
-        stubs: {
-          Transition: TransitionProbe,
+    const wrapper = mount(
+      () => (
+        <FsuTransition name="route-settle" mode="out-in">
+          <div class="panel">panel</div>
+        </FsuTransition>
+      ),
+      {
+        global: {
+          stubs: {
+            Transition: TransitionProbe,
+          },
         },
       },
-    })
+    )
 
     expect(observedMode).toBe('out-in')
     wrapper.unmount()
@@ -443,14 +578,10 @@ describe('motion primitives', () => {
     await nextTick()
     await flushMotionFrame()
 
-    expect(enterEl.dataset.fsusMotionPreset).toBe(
-      'ownership-transfer-snapshot',
-    )
+    expect(enterEl.dataset.fsusMotionPreset).toBe('ownership-transfer-snapshot')
     expect(enterEl.style.transition).toContain('opacity 120ms')
     expect(enterEl.style.transform).toBe('')
-    expect(leaveEl.dataset.fsusMotionPreset).toBe(
-      'ownership-transfer-snapshot',
-    )
+    expect(leaveEl.dataset.fsusMotionPreset).toBe('ownership-transfer-snapshot')
     expect(leaveEl.style.transition).toContain('opacity 120ms')
     expect(leaveEl.style.transform).toBe('')
   })
@@ -469,7 +600,8 @@ describe('motion primitives', () => {
     expect(onFinish).toHaveBeenCalledTimes(1)
     expect(el.style.transition).toBe('')
     expect(el.style.opacity).toBe('0')
-    expect(el.style.transform).toBe('')
+    expect(el.style.transform).toBe('none')
+    expect(el.style.filter).toBe('none')
   })
 
   it('installs the directive and transition component as a plugin', () => {
@@ -520,22 +652,22 @@ describe('motion primitives', () => {
 
     await nextTick()
 
-    expect(wrapper.find('[data-fsus-motion-recipe="state-settled"]').exists())
-      .toBe(true)
+    expect(
+      wrapper.find('[data-fsus-motion-recipe="state-settled"]').exists(),
+    ).toBe(true)
     expect(wrapper.find('[data-fsus-task-receipt="success"]').exists()).toBe(
       true,
     )
     expect(wrapper.find('[data-fsus-row-state="busy"]').exists()).toBe(true)
-    expect(wrapper.find('[data-fsus-mobile-dock="bottom"]').exists()).toBe(
-      true,
-    )
+    expect(wrapper.find('[data-fsus-mobile-dock="bottom"]').exists()).toBe(true)
     expect(wrapper.find('[data-fsus-bottom-action-bar]').exists()).toBe(true)
     expect(wrapper.find('[data-fsus-toast-receipt]').exists()).toBe(true)
     expect(wrapper.find('[data-fsus-scroll-timeline="natural"]').exists()).toBe(
       true,
     )
-    expect(wrapper.find('[data-fsus-shared-element-id="article-cover-1"]')
-      .exists()).toBe(true)
+    expect(
+      wrapper.find('[data-fsus-shared-element-id="article-cover-1"]').exists(),
+    ).toBe(true)
   })
 
   it('installs scroll reveal as a reduced-motion safe directive', () => {

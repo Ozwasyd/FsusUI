@@ -55,25 +55,25 @@ type MotionValueLike<T extends string | number> = MotionValue<T>
 type SpringOverrides = Partial<FsusMotionRuntime['spring']>
 
 const defaultRuntime: FsusMotionRuntime = {
-  controlFastMs: 160,
-  controlMs: 260,
-  dragBlurPx: 0.28,
-  dragMaxOffsetPx: 4,
-  dragScaleDelta: 0.08,
-  dragTrailOpacity: 0.46,
+  controlFastMs: 140,
+  controlMs: 220,
+  dragBlurPx: 0,
+  dragMaxOffsetPx: 3,
+  dragScaleDelta: 0,
+  dragTrailOpacity: 0,
   disabled: false,
   enabled: true,
   mode: 'enabled',
-  preset: 'smooth',
-  scrollMaxOffsetPx: 4,
+  preset: 'standard',
+  scrollMaxOffsetPx: 3,
   reduced: false,
-  scrollIdleMs: 130,
-  scrollSettleMs: 120,
-  scrollTrailOpacity: 0.46,
+  scrollIdleMs: 110,
+  scrollSettleMs: 100,
+  scrollTrailOpacity: 0,
   spring: {
-    damping: 30,
-    mass: 0.82,
-    stiffness: 300,
+    damping: 28,
+    mass: 0.9,
+    stiffness: 260,
   },
 }
 
@@ -116,12 +116,12 @@ export const normalizeFsusWheelDelta = (
 }
 
 const presetSpring: Record<FsusMotionPreset, FsusMotionRuntime['spring']> = {
-  standard: {
-    damping: 28,
-    mass: 0.9,
-    stiffness: 260,
+  standard: defaultRuntime.spring,
+  smooth: {
+    damping: 30,
+    mass: 0.82,
+    stiffness: 300,
   },
-  smooth: defaultRuntime.spring,
   expressive: {
     damping: 24,
     mass: 0.72,
@@ -165,7 +165,8 @@ export const getFsusMotionRuntime = (): FsusMotionRuntime => {
       ? 'reduced'
       : 'enabled')
   const preset =
-    (root.dataset.fsusMotionPreset as FsusMotionPreset | undefined) ?? 'smooth'
+    (root.dataset.fsusMotionPreset as FsusMotionPreset | undefined) ??
+    'standard'
   const enabled = mode === 'enabled'
   const spring = presetSpring[preset] ?? defaultRuntime.spring
 

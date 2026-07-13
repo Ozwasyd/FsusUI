@@ -1,4 +1,8 @@
-import { getMotionPreset, getMotionPresetBundle, resolveMotionPresetName } from './presets'
+import {
+  getMotionPreset,
+  getMotionPresetBundle,
+  resolveMotionPresetName,
+} from './presets'
 import { isMotionDisabled, isMotionReduced } from './preference'
 import {
   claimMotionBudgetNode,
@@ -15,6 +19,7 @@ import type {
   MotionRunOptions,
   MotionRuntimeControls,
   MotionStyleState,
+  MotionSurfaceCategory,
 } from './types'
 
 const motionStateKey = Symbol('fsusMotionState')
@@ -24,6 +29,28 @@ type MotionElement = HTMLElement & {
 }
 
 const transitionProperties = ['opacity', 'transform', 'filter'] as const
+const readingSurfaceSelector =
+  ".fsus-reading-surface, [data-fsus-surface='reading']"
+const readingSurfaceMotionTokens = {
+  '--fsus-interactive-motion-blur': '0px',
+  '--fsus-interactive-motion-glow': '0px',
+  '--fsus-interactive-motion-offset-x': '0px',
+  '--fsus-interactive-motion-offset-y': '0px',
+  '--fsus-interactive-motion-strength': '0',
+  '--fsus-interactive-motion-trail-opacity': '0',
+  '--fsus-motion-blur': '0px',
+  '--fsus-motion-slider-blur': '0px',
+  '--fsus-motion-scroll-blur': '0px',
+  '--fsus-motion-scroll-offset': '0px',
+  '--fsus-motion-scroll-max-offset': '0px',
+  '--fsus-motion-drag-blur': '0px',
+  '--fsus-motion-drag-max-offset': '0px',
+  '--fsus-motion-drag-scale': '0',
+  '--fsus-motion-scroll-trail-opacity': '0',
+  '--fsus-motion-drag-trail-opacity': '0',
+  '--fsus-motion-trail': 'transparent',
+  '--fsus-motion-slider-trail': 'transparent',
+} as const
 
 // Combined check: motion is reduced if either the user prefers
 // reduced motion (or the root is set to 'reduced') OR a component
@@ -116,19 +143,57 @@ export const normalizeMotionOptions = (
 export const getMotionPhaseState = (
   preset: MotionPresetDefinition,
   phase: MotionPhase,
+  surface?: MotionSurfaceCategory,
 ) => {
-  if (phase === 'leave') {
-    return {
-      from: preset.leaveFrom || preset.to,
-      to: preset.leaveTo || preset.from,
-    }
-  }
+  const states =
+    phase === 'leave'
+      ? {
+          from: preset.leaveFrom || preset.to,
+          to: preset.leaveTo || preset.from,
+        }
+      : {
+          from: preset.from,
+          to: preset.to,
+        }
 
+  if (surface !== 'reading-surface') return states
+
+  const sanitize = (state: MotionStyleState): MotionStyleState => ({
+    ...state,
+    filter: 'none',
+    ...(state.transform?.includes('translate') ? { transform: 'none' } : {}),
+  })
   return {
-    from: preset.from,
-    to: preset.to,
+    from: sanitize(states.from),
+    to: sanitize(states.to),
   }
 }
+
+const resolveMotionSurface = (
+  el: HTMLElement,
+  explicit?: MotionSurfaceCategory,
+): MotionSurfaceCategory | undefined =>
+  explicit ??
+  (el.closest(readingSurfaceSelector) ? 'reading-surface' : undefined)
+
+const applyReadingSurfaceGuard = (el: HTMLElement) => {
+  for (const [token, value] of Object.entries(readingSurfaceMotionTokens)) {
+    el.style.setProperty(token, value)
+  }
+}
+
+const reducedTerminalState = (
+  preset: MotionPresetDefinition,
+  phase: MotionPhase,
+  phaseTarget: MotionStyleState,
+): MotionStyleState => ({
+  opacity:
+    phase === 'leave'
+      ? (phaseTarget.opacity ?? '0')
+      : (preset.reduced.opacity ?? phaseTarget.opacity ?? '1'),
+  transform: 'none',
+  filter: 'none',
+})
 
 export const cancelMotion = (el: HTMLElement) => {
   const motionEl = el as MotionElement
@@ -242,7 +307,8 @@ export const runMotion = (
   const preset = getMotionPreset(options.name)
   const bundle = getMotionPresetBundle(preset.name)
   const phase = options.phase || 'enter'
-  const { from, to } = getMotionPhaseState(preset, phase)
+  const surface = resolveMotionSurface(el, options.surface)
+  const { from, to } = getMotionPhaseState(preset, phase, surface)
   const durationStr = toTimeValue(options.duration, bundle.duration)
   const delayStr = resolveDelay(preset, bundle, options)
   const easing = options.easing || bundle.easing
@@ -255,6 +321,8 @@ export const runMotion = (
   let finalState = to
   let animation: Animation | null = null
   let fallback: { cancel: () => void } | null = null
+
+  if (surface === 'reading-surface') applyReadingSurfaceGuard(el)
 
   const releaseBudget = () => {
     if (claimedBudget) {
@@ -298,7 +366,7 @@ export const runMotion = (
     isMotionReducedOrDisabled(options.disabled) ||
     !claimMotionBudgetNode(budget)
   ) {
-    finalState = phase === 'leave' ? to : preset.reduced
+    finalState = reducedTerminalState(preset, phase, to)
     applyStyleState(el, finalState)
     options.onFinish?.()
     finished = true
@@ -308,8 +376,7 @@ export const runMotion = (
 
   // Filter the animated properties by what's in the to-state and the budget.
   const properties = transitionProperties.filter(
-    (property) =>
-      property in to && isMotionPropertyAllowed(property, budget),
+    (property) => property in to && isMotionPropertyAllowed(property, budget),
   ) as (keyof MotionStyleState)[]
 
   // If the to-state is empty (or all properties blocked), commit terminal.

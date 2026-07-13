@@ -162,6 +162,7 @@ export type MotionRecipeDefinition = {
 
 export type MotionOptions = {
   name?: MotionPresetInput
+  surface?: MotionSurfaceCategory
   duration?: string | number
   delay?: string | number
   easing?: string

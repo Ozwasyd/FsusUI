@@ -57,11 +57,25 @@ const transforms = (preset: MotionPresetName) => {
   ].filter(Boolean)
 }
 
+const filters = (preset: MotionPresetName) => {
+  const definition = getMotionPreset(preset)
+  return [
+    definition.from.filter,
+    definition.to.filter,
+    definition.leaveFrom?.filter,
+    definition.leaveTo?.filter,
+    definition.reduced.filter,
+  ].filter(Boolean)
+}
+
 const usesScale = (preset: MotionPresetName) =>
   transforms(preset).some((value) => value?.includes('scale'))
 
 const usesTranslate = (preset: MotionPresetName) =>
   transforms(preset).some((value) => value?.includes('translate'))
+
+const usesVisualFilter = (preset: MotionPresetName) =>
+  filters(preset).some((value) => value !== 'none')
 
 const hasStagger = (preset: MotionPresetName) =>
   getMotionPreset(preset).stagger !== undefined
@@ -117,6 +131,16 @@ export const validateMotionPresetUsage = (
       finding(
         'reading-body-no-translate',
         'Reading body content must not use translate reveal by default.',
+        usage.source,
+      ),
+    )
+  }
+
+  if (usage.surface === 'reading-surface' && usesVisualFilter(preset)) {
+    findings.push(
+      finding(
+        'reading-surface-no-filter',
+        'Reading surfaces must resolve every preset with filter: none.',
         usage.source,
       ),
     )
@@ -204,5 +228,9 @@ export const validateMotionAdoptionMapping = (
 
 export const assertEveryPresetHasGovernanceMetadata = () =>
   Object.values(motionPresets).every(
-    (preset) => preset.surfaces.length > 0 && preset.reduced.opacity === '1',
+    (preset) =>
+      preset.surfaces.length > 0 &&
+      preset.reduced.opacity === '1' &&
+      (!preset.surfaces.includes('reading-surface') ||
+        (!usesTranslate(preset.name) && !usesVisualFilter(preset.name))),
   )

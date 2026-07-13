@@ -487,18 +487,18 @@ onBeforeRouteLeave(routeMotion.cleanup)
 
 Prefer the semantic settle presets for new product work:
 
-| Preset              | Intended surfaces                         | Forbidden defaults                         |
-| ------------------- | ----------------------------------------- | ------------------------------------------ |
-| `surface-settle`    | ordinary content, reading, list/table     | none; this is the quiet default            |
-| `paper-settle`      | ordinary panels and admin operation cards | reading body content                       |
-| `route-settle`      | route and reading page changes, using a short soft-focus fade-through | local card or row state feedback           |
-| `dialog-settle`     | dialog, popover, menu, centered overlay   | ordinary content panels and reading bodies |
-| `sheet-settle`      | drawer, bottom sheet, mobile sheet        | article body and ordinary content panels   |
-| `dock-settle`       | mobile dock and bottom action bar         | article body and ordinary content panels   |
-| `toast-receipt`     | toast and task completion receipts        | route transitions                          |
-| `banner-receipt`    | banner, inline status, operation summary  | route transitions                          |
-| `lightbox-focus`    | image preview and lightbox focus          | ordinary content panels                    |
-| `index-list-settle` | bounded index, table, navigation lists    | reading body paragraphs                    |
+| Preset              | Intended surfaces                                               | Forbidden defaults                         |
+| ------------------- | --------------------------------------------------------------- | ------------------------------------------ |
+| `surface-settle`    | ordinary content, reading, list/table                           | none; this is the quiet default            |
+| `paper-settle`      | ordinary panels and admin operation cards                       | reading body content                       |
+| `route-settle`      | route and reading page changes, using a quiet opacity crossfade | local card or row state feedback           |
+| `dialog-settle`     | dialog, popover, menu, centered overlay                         | ordinary content panels and reading bodies |
+| `sheet-settle`      | drawer, bottom sheet, mobile sheet                              | article body and ordinary content panels   |
+| `dock-settle`       | mobile dock and bottom action bar                               | article body and ordinary content panels   |
+| `toast-receipt`     | toast and task completion receipts                              | route transitions                          |
+| `banner-receipt`    | banner, inline status, operation summary                        | route transitions                          |
+| `lightbox-focus`    | image preview and lightbox focus                                | ordinary content panels                    |
+| `index-list-settle` | bounded index, table, navigation lists                          | reading body paragraphs                    |
 
 Older generic presets remain available for compatibility, but
 `motionPresetAliases` documents their migration target. New app code should map
@@ -535,6 +535,12 @@ markers. The exported classes are line or lock markers:
 ## Reading And Technical Writing Presets
 
 Reading pages should not animate article body paragraphs by default. Use
+`.fsus-reading-surface` or `data-fsus-surface="reading"` on the owning surface;
+all allowed presets then resolve to `filter: none`, zero glow/trail, and no
+translate-based paragraph reveal. `route-settle` and anchor feedback remain
+opacity-only. Reduced and disabled modes land immediately at the undisplaced
+terminal state.
+
 content-type presets only where a state becomes interactive or ready:
 
 | Preset                       | Use for                                      |

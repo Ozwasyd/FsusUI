@@ -8,7 +8,7 @@ tokens listed below.
 
 ```vue
 <template>
-  <el-config-provider :motion="{ mode: 'system', preset: 'smooth' }">
+  <el-config-provider :motion="{ mode: 'system', preset: 'standard' }">
     <AppShell />
   </el-config-provider>
 </template>
@@ -16,6 +16,10 @@ tokens listed below.
 
 Supported modes are `system`, `enabled`, `reduced`, and `disabled`. Supported
 presets are `standard`, `smooth`, and `expressive`.
+
+`standard` is the implicit default. It caps control motion at `220ms` and panel
+motion at `360ms`, with no blur, glow, or trail. `smooth` and `expressive` are
+available only when an application selects them explicitly.
 
 ## Preview Public Tokens
 
@@ -57,7 +61,18 @@ Use them only in product integrations that can tolerate minor-release changes.
 
 `mode: 'system'` follows `prefers-reduced-motion: reduce`. Reduced and disabled
 motion collapse public durations to `1ms`, remove blur and offsets, and make
-trail colors transparent.
+trail colors transparent. Runtime helpers land directly in the terminal state
+with `transform: none` and `filter: none`, so disabling motion does not retain a
+displaced frame or cause a layout jump.
+
+## Reading Surface Contract
+
+Mark long-form content with `.fsus-reading-surface` or
+`data-fsus-surface="reading"`. The runtime resolves every allowed preset on
+that surface with `filter: none`, transparent trails, zero glow, and no
+translate-based paragraph reveal. Route changes and anchor feedback remain
+opacity-only. This guard applies to final inline runtime styles as well as CSS
+tokens.
 
 ```vue
 <template>
@@ -93,11 +108,11 @@ the progress state visible through bar fill, text, and status color.
 - Test complex interactions with `system`, `reduced`, and `disabled`.
 - Do not depend on low-level scroll, drag, spring, or trail tokens unless the
   integration owns compatibility testing.
-> **Motion note:** Motion now has a recipe layer above presets plus a runtime
-> budget. Prefer recipes such as `state-settled`, `route-crossfade`, and
-> `reading-anchor-highlight` for product code. Avoid blanket `fade-up` on
-> article bodies and avoid `list-stagger` for long lists; the default stagger
-> budget is 20 items.
+  > **Motion note:** Motion now has a recipe layer above presets plus a runtime
+  > budget. Prefer recipes such as `state-settled`, `route-crossfade`, and
+  > `reading-anchor-highlight` for product code. Avoid blanket `fade-up` on
+  > article bodies and avoid `list-stagger` for long lists; the default stagger
+  > budget is 20 items.
 
 ## App Boundary Helpers
 
