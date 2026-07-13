@@ -55,6 +55,7 @@
         v-if="routeSection"
         :key="props.mode"
         :compact="props.compact"
+        :nav-mode="props.navMode"
       />
     </Transition>
   </div>
@@ -82,6 +83,7 @@ import IssuePrimitivesSection from './sections/IssuePrimitivesSection.vue'
 import MarkdownStressSection from './sections/MarkdownStressSection.vue'
 import NavigationSection from './sections/NavigationSection.vue'
 import OthersSection from './sections/OthersSection.vue'
+import PublicShellNavModeSection from './sections/PublicShellNavModeSection.vue'
 
 import type { ComponentPublicInstance } from 'vue'
 
@@ -96,11 +98,13 @@ const props = withDefaults(
   defineProps<{
     compact?: boolean
     mode?: string
+    navMode?: string
     theme?: string
   }>(),
   {
     compact: false,
     mode: '',
+    navMode: 'menu',
     theme: 'system',
   },
 )
@@ -140,6 +144,10 @@ const routeSections = new Map<string, DemoSection | { component: object }>([
     { component: markRaw(MarkdownStressSection) },
   ],
   ['foundation-boundary', { component: markRaw(FoundationBoundarySection) }],
+  [
+    'public-shell-nav-mode',
+    { component: markRaw(PublicShellNavModeSection) },
+  ],
 ])
 
 const isDefaultGallery = computed(() => !props.mode)

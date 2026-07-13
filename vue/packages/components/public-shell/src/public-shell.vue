@@ -100,6 +100,7 @@
           <summary
             ref="mobileNavMenuTriggerRef"
             :class="ns.e('mobile-nav-menu-trigger')"
+            role="button"
             :aria-expanded="mobileNavMenuExpanded"
             v-bind="{ 'data-mobile-nav-menu-trigger': '' }"
           >

@@ -125,3 +125,11 @@ toolbar 为 `is-collapsed`，不会留下空白次级行。
 
 该变更应进入下一个带迁移说明的组件库版本；发布前 consumer 可以通过本地
 workspace alias 验证源码，但不得假定未发布 npm 包已经包含新 prop。
+
+## Verification Contract
+
+组件测试锁定四种策略的 DOM/active state，并确认 desktop nav 在策略切换时保持
+不变。`public-shell-mobile-nav.spec.ts` 为 `menu | inline | bottom | none` 保存独立
+mobile snapshot，同时验证原生 summary 键盘顺序、navigation landmark、
+`aria-current="page"`、BottomTabBar fixed/safe-area/content padding，以及 `none`
+模式不会留下重复导航 landmark。

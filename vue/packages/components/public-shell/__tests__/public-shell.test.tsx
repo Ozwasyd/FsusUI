@@ -29,6 +29,9 @@ describe('PublicShell.vue', () => {
       wrapper.find('[data-mobile-nav-menu-trigger]').attributes('aria-expanded'),
     ).toBe('false')
     expect(
+      wrapper.find('[data-mobile-nav-menu-trigger]').attributes('role'),
+    ).toBe('button')
+    expect(
       wrapper
         .find('.el-public-shell__nav-link.is-active[data-public-nav="archive"]')
         .exists(),
@@ -201,6 +204,7 @@ describe('PublicShell.vue', () => {
           inline: wrapper.find('.el-public-shell__mobile-nav--inline').exists(),
           bottom: wrapper.find('[data-fsus-bottom-tab-bar]').exists(),
           bottomSafeAreaClass: wrapper.classes().includes('is-mobile-nav-bottom'),
+          desktopItems: wrapper.findAll('.el-public-shell__desktop-nav a').length,
           activeCurrent: active.exists() ? active.attributes('aria-current') : null,
         }
         wrapper.unmount()
@@ -215,6 +219,7 @@ describe('PublicShell.vue', () => {
           "bottom": false,
           "bottomSafeAreaClass": false,
           "dataMode": "menu",
+          "desktopItems": 2,
           "inline": false,
           "menu": true,
           "mode": "menu",
@@ -224,6 +229,7 @@ describe('PublicShell.vue', () => {
           "bottom": false,
           "bottomSafeAreaClass": false,
           "dataMode": "inline",
+          "desktopItems": 2,
           "inline": true,
           "menu": false,
           "mode": "inline",
@@ -233,6 +239,7 @@ describe('PublicShell.vue', () => {
           "bottom": true,
           "bottomSafeAreaClass": true,
           "dataMode": "bottom",
+          "desktopItems": 2,
           "inline": false,
           "menu": false,
           "mode": "bottom",
@@ -242,6 +249,7 @@ describe('PublicShell.vue', () => {
           "bottom": false,
           "bottomSafeAreaClass": false,
           "dataMode": "none",
+          "desktopItems": 2,
           "inline": false,
           "menu": false,
           "mode": "none",
