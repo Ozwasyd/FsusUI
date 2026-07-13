@@ -41,7 +41,7 @@ const sections: VisualSection[] = [
     await page.waitForTimeout(500)
   }},
   { name: 'feedback', testId: 'section-feedback', action: async (page) => {
-    await page.getByText('Open Dialog').click()
+    await page.getByTestId('open-publish-dialog').click()
     await page.waitForTimeout(500)
   }},
   { name: 'others', testId: 'section-others' },

@@ -13,7 +13,9 @@
     <div class="demo-block">
       <h3>Dialog / Drawer</h3>
       <el-space wrap>
-        <el-button @click="dialogVisible = true">打开发布确认</el-button>
+        <el-button data-testid="open-publish-dialog" @click="dialogVisible = true">
+          打开发布确认
+        </el-button>
         <el-button @click="drawerVisible = true">查看审阅记录</el-button>
         <el-dialog v-model="dialogVisible" title="确认发布" width="30%">
           <span>发布后读者将看到最新版本。</span>
