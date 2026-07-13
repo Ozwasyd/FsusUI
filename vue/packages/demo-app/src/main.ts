@@ -6,7 +6,7 @@ import '@fontsource/noto-sans-sc/500.css'
 import { createApp } from 'vue'
 import { createDemoContract, resolveDemoRoot } from './demo-contract'
 import './style.css'
-import '@element-plus/theme-chalk/src/index.scss'
+import '@element-plus/theme-chalk/src/fsus.scss'
 
 const searchParams = new URLSearchParams(window.location.search)
 const { component, props, themeMode } = await resolveDemoRoot(searchParams)

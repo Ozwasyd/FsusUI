@@ -44,7 +44,14 @@ const waitForPath = async (target: string) => {
 }
 
 const bundledWorkspaceDependencyNames = ['@element-plus/motion']
-const packageReferenceExtensions = ['.d.ts', '.d.mts', '.d.cts', '.js', '.mjs', '.cjs']
+const packageReferenceExtensions = [
+  '.d.ts',
+  '.d.mts',
+  '.d.cts',
+  '.js',
+  '.mjs',
+  '.cjs',
+]
 
 const copyElementPlusPackageManifest = async () => {
   const packageJson = JSON.parse(await readFile(epPackage, 'utf8'))
@@ -72,7 +79,9 @@ const collectPackageReferenceCandidates = async (
     const absolutePath = path.join(currentDir, entry.name)
 
     if (entry.isDirectory()) {
-      files.push(...(await collectPackageReferenceCandidates(rootDir, absolutePath)))
+      files.push(
+        ...(await collectPackageReferenceCandidates(rootDir, absolutePath)),
+      )
       continue
     }
 
@@ -100,7 +109,10 @@ const resolveBundledWorkspaceRuntimeSpecifier = (
     return 'element-plus/es/motion'
   }
 
-  const relativePath = path.relative(rootDir, filePath).split(path.sep).join('/')
+  const relativePath = path
+    .relative(rootDir, filePath)
+    .split(path.sep)
+    .join('/')
   const extension = path.extname(filePath)
 
   if (relativePath.startsWith('es/') && extension === '.mjs') {
@@ -186,6 +198,7 @@ export const copyTypesDefinitions: TaskFunction = (done) => {
 
 export const copyFullStyle = async () => {
   const fullStyleSource = path.resolve(epOutput, 'theme-chalk/index.css')
+  const fsusStyleSource = path.resolve(epOutput, 'theme-chalk/el-fsus.css')
   const criticalStyleSource = path.resolve(
     epOutput,
     'theme-chalk/el-public-shell-critical.css',
@@ -197,14 +210,13 @@ export const copyFullStyle = async () => {
 
   await Promise.all([
     waitForPath(fullStyleSource),
+    waitForPath(fsusStyleSource),
     waitForPath(criticalStyleSource),
     waitForPath(fsusThemeSource),
   ])
   await mkdir(path.resolve(epOutput, 'dist'), { recursive: true })
-  await copyFile(
-    fullStyleSource,
-    path.resolve(epOutput, 'dist/index.css'),
-  )
+  await copyFile(fullStyleSource, path.resolve(epOutput, 'dist/index.css'))
+  await copyFile(fsusStyleSource, path.resolve(epOutput, 'dist/fsus.css'))
   await copyFile(
     criticalStyleSource,
     path.resolve(epOutput, 'dist/public-shell-critical.css'),

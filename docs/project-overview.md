@@ -87,7 +87,7 @@ packages:
 
 - ESM：`es/index.mjs`（类型定义对应 `es/index.d.ts`）
 - CJS：`lib/index.js`（类型定义对应 `lib/index.d.ts`）
-- 样式入口字段：`style: dist/index.css`
+- 样式入口字段：`style: dist/fsus.css`
 - sideEffects：显式保留 `dist/*`、`theme-chalk/**/*.css`、`theme-chalk/src/**/*.scss` 以及组件样式入口，避免被 tree-shaking 误删
 
 ### 5.2 构建产物与发布脚本
@@ -125,7 +125,7 @@ demo 默认端口：
 
 demo 入口 `vue/packages/demo-app/src/main.ts` 还直接引入了源码态样式：
 
-- `@element-plus/theme-chalk/src/index.scss`
+- `@element-plus/theme-chalk/src/fsus.scss`
 
 ## 7. 构建、测试、类型检查与规范
 
@@ -164,7 +164,7 @@ pnpm format
 
 样式包为 `@element-plus/theme-chalk`（`vue/packages/theme-chalk`）：
 
-- 既支持源码态 SCSS（如 demo 的 `@element-plus/theme-chalk/src/index.scss`），也可构建产出 CSS（包入口 `index.css`）。
+- 既支持源码态完整 SCSS（如 demo 的 `@element-plus/theme-chalk/src/fsus.scss`），也可构建产出完整 CSS（主包入口 `dist/fsus.css`）。`index.scss` / `dist/index.css` 仅保留为基础兼容层。
 - 构建脚本位于 `vue/packages/theme-chalk/package.json`：`pnpm -C vue/packages/theme-chalk build`（通过 gulp 执行）。
 
 ## 9. 国际化（locale）
@@ -270,7 +270,7 @@ pnpm build:wasm
 
 - `vue/packages/demo-app` 是 Vite 应用：
   - dev：`5173`，preview：`4173`
-- `vue/packages/demo-app/src/main.ts` 通过 `createApp(App).use(ElementPlus).mount('#app')` 挂载整包，并引入 `@element-plus/theme-chalk/src/index.scss`（源码态联调入口）。
+- `vue/packages/demo-app/src/main.ts` 通过 `createApp(App).use(ElementPlus).mount('#app')` 挂载整包，并引入 `@element-plus/theme-chalk/src/fsus.scss`（与发布包 `dist/fsus.css` 对应的源码态完整入口）。
 - `vue/packages/demo-app/vite.config.ts`：
   - 通过 alias 直接指向工作区源码
   - 将 `vue/packages/wasm` / `@element-plus/wasm` 拆分到 `fsus-wasm` chunk

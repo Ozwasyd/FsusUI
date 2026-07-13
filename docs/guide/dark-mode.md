@@ -12,7 +12,7 @@ FsusUI 当前主题入口 `@ozwasyd/element-plus/theme-chalk` 已内置明暗双
 
 ```ts
 import ElementPlus from '@ozwasyd/element-plus'
-import '@ozwasyd/element-plus/dist/index.css'
+import '@ozwasyd/element-plus/dist/fsus.css'
 ```
 
 内置规则位于 `vue/packages/theme-chalk/src/fsus-theme.scss`：
@@ -34,7 +34,7 @@ import '@ozwasyd/element-plus/dist/index.css'
 ```ts
 import { createApp } from 'vue'
 import ElementPlus from '@ozwasyd/element-plus'
-import '@ozwasyd/element-plus/dist/index.css'
+import '@ozwasyd/element-plus/dist/fsus.css'
 import App from './App.vue'
 
 const app = createApp(App)
@@ -118,7 +118,7 @@ html[data-theme-resolved='dark'] {
 入口只需要继续引入主主题样式：
 
 ```ts
-import '@ozwasyd/element-plus/dist/index.css'
+import '@ozwasyd/element-plus/dist/fsus.css'
 import './styles/dark.css'
 ```
 

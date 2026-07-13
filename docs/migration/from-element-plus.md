@@ -28,7 +28,7 @@ FsusUI:
 
 ```ts
 import FsusUI from '@ozwasyd/element-plus'
-import '@ozwasyd/element-plus/dist/index.css'
+import '@ozwasyd/element-plus/dist/fsus.css'
 ```
 
 Vue setup:
@@ -37,7 +37,7 @@ Vue setup:
 import { createApp } from 'vue'
 import App from './App.vue'
 import FsusUI from '@ozwasyd/element-plus'
-import '@ozwasyd/element-plus/dist/index.css'
+import '@ozwasyd/element-plus/dist/fsus.css'
 
 createApp(App).use(FsusUI).mount('#app')
 ```
@@ -61,8 +61,16 @@ import { Search } from '@ozwasyd/element-plus/icons-vue'
 Use the built CSS entry for application installs:
 
 ```ts
-import '@ozwasyd/element-plus/dist/index.css'
+import '@ozwasyd/element-plus/dist/fsus.css'
 ```
+
+`dist/fsus.css` is the single complete production entry. It emits the base
+compatibility styles first and the FsusUI token/override layer second. The
+lower-level `dist/index.css` entry remains available for Element Plus-compatible
+base styling, and `dist/el-fsus-theme.css` remains available to migrate an
+existing base import. Do not combine either lower-level entry with `fsus.css`;
+the complete entry already contains both layers. Sass consumers can use
+`theme-chalk/src/fsus.scss`, whose `@use` graph emits each layer once.
 
 SCSS source imports under `theme-chalk` are preview public only when referenced
 by the theme docs. Prefer CSS custom properties for app-level customization.
@@ -94,8 +102,8 @@ on Element Plus until the runtime baseline is updated.
 Before switching production traffic:
 
 - Replace package and icon imports.
-- Replace `element-plus/dist/index.css` with
-  `@ozwasyd/element-plus/dist/index.css`.
+- Replace `element-plus/dist/index.css` with the complete
+  `@ozwasyd/element-plus/dist/fsus.css` entry.
 - Remove direct imports from Element Plus `es/*` or `lib/*` internals unless a
   FsusUI doc page names the equivalent public import.
 - Run your application unit tests and smoke tests against the packaged artifact.

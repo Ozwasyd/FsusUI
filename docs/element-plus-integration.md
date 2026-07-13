@@ -32,11 +32,11 @@
 
 业务侧优先按“发布产物”方式引入样式（而不是照搬仓库联调用的源码态 SCSS）：
 
-- 推荐：`@ozwasyd/element-plus/dist/index.css`（主包内的发布样式入口）
+- 推荐：`@ozwasyd/element-plus/dist/fsus.css`（主包内唯一完整的 FsusUI 发布样式入口）
 
 不推荐在业务项目中直接引入：
 
-- `@ozwasyd/element-plus/theme-chalk/src/index.scss`
+- `@ozwasyd/element-plus/theme-chalk/src/fsus.scss`
 
 原因：这是仓库联调友好的源码态入口，业务侧是否具备一致的 SCSS 构建、变量/路径解析与副作用配置不确定。
 
@@ -125,7 +125,7 @@ pnpm -C vue/packages/demo-app dev
 
 demo 入口 `vue/packages/demo-app/src/main.ts` 使用源码态样式入口：
 
-- `@element-plus/theme-chalk/src/index.scss`
+- `@element-plus/theme-chalk/src/fsus.scss`
 
 这对仓库内开发是便利的，但不代表业务项目应该照搬。
 

@@ -14,7 +14,7 @@
 // main.ts
 import { createApp } from 'vue'
 import FsusUI from '@ozwasyd/element-plus'
-import '@ozwasyd/element-plus/dist/index.css'
+import '@ozwasyd/element-plus/dist/fsus.css'
 import App from './App.vue'
 
 const app = createApp(App)
@@ -165,6 +165,6 @@ pnpm dev
 - [暗色模式](./dark-mode.md) — 接入 `themeMode`、跟随系统主题、处理 SSR 首帧
 - [国际化](./i18n.md) — 配置多语言支持
 - [组件文档](../components/overview.md) — 查阅各组件的完整 API
-> **Name note:** FsusUI is the recommended public-facing name. The current npm
-> public-preview package remains `@ozwasyd/element-plus`; it is the FsusUI
-> Element Plus compatibility build, not the upstream Element Plus package.
+  > **Name note:** FsusUI is the recommended public-facing name. The current npm
+  > public-preview package remains `@ozwasyd/element-plus`; it is the FsusUI
+  > Element Plus compatibility build, not the upstream Element Plus package.

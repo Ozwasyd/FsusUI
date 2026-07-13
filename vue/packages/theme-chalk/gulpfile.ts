@@ -12,7 +12,12 @@ import type { TaskFunction } from 'gulp'
 
 const distFolder = path.resolve(__dirname, 'dist')
 const distBundle = path.resolve(epOutput, 'theme-chalk')
-/* fsus-theme.scss is included here so it compiles to its own per-component
+/* fsus.scss is the complete product entry. fsus-theme.scss remains available
+   as a lower-level override bundle, while index.scss remains the Element Plus
+   compatibility layer. Keeping all three artifacts makes migration explicit
+   without making consumers assemble the default theme themselves.
+
+   fsus-theme.scss is included here so it compiles to its own per-component
    CSS bundle (dist/el-fsus-theme.css). Previously it was excluded and only
    pulled in via @use from src/index.scss, which mixed product overrides
    into the same dist/index.css bundle as the element-plus base styles.
@@ -39,24 +44,24 @@ const buildThemeChalk: TaskFunction = () => {
           'color-functions',
           'import',
         ],
-      })
+      }),
     )
     .pipe(autoprefixer({ cascade: false }))
     .pipe(
       cleanCSS({}, (details) => {
         consola.success(
           `${chalk.cyan(details.name)}: ${chalk.yellow(
-            details.stats.originalSize / 1000
-          )} KB -> ${chalk.green(details.stats.minifiedSize / 1000)} KB`
+            details.stats.originalSize / 1000,
+          )} KB -> ${chalk.green(details.stats.minifiedSize / 1000)} KB`,
         )
-      })
+      }),
     )
     .pipe(
       rename((path) => {
         if (!noElPrefixFile.test(path.basename)) {
           path.basename = `el-${path.basename}`
         }
-      })
+      }),
     )
     .pipe(dest(distFolder))
 }
@@ -73,12 +78,12 @@ export const copyThemeChalkBundle: TaskFunction = () =>
 
 export const copyThemeChalkSource: TaskFunction = () =>
   src(path.resolve(__dirname, 'src/**')).pipe(
-    dest(path.resolve(distBundle, 'src'))
+    dest(path.resolve(distBundle, 'src')),
   )
 
 export const build: TaskFunction = parallel(
   copyThemeChalkSource,
-  series(buildThemeChalk, copyThemeChalkBundle)
+  series(buildThemeChalk, copyThemeChalkBundle),
 )
 
 export default build

@@ -72,7 +72,7 @@ const requiredSnippets = new Map([
     'docs/guide/quickstart.md',
     [
       `import FsusUI from '${packageName}'`,
-      `import '${packageName}/dist/index.css'`,
+      `import '${packageName}/dist/fsus.css'`,
       `"types": ["${packageName}/global"]`,
     ],
   ],
@@ -92,7 +92,7 @@ const requiredSnippets = new Map([
   ],
   [
     'docs/element-plus-integration.md',
-    [`\`${packageName}\``, `\`${packageName}/dist/index.css\``],
+    [`\`${packageName}\``, `\`${packageName}/dist/fsus.css\``],
   ],
   [
     'docs/components/layout.md',

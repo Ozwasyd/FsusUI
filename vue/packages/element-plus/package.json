@@ -76,6 +76,7 @@
       "require": "./lib/perception-challenge.js"
     },
     "./dist/public-shell-critical.css": "./dist/public-shell-critical.css",
+    "./dist/fsus.css": "./dist/fsus.css",
     "./dist/el-fsus-theme.css": "./dist/el-fsus-theme.css",
     "./es/*.mjs": {
       "types": "./es/*.d.ts",
@@ -110,7 +111,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "style": "dist/index.css",
+  "style": "dist/fsus.css",
   "sideEffects": [
     "dist/*",
     "theme-chalk/**/*.css",

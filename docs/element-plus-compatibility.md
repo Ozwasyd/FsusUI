@@ -27,7 +27,8 @@ documented imports:
 
 - Components documented under [`docs/components/`](./components/).
 - The main package import from `@ozwasyd/element-plus`.
-- Built stylesheet imports such as `@ozwasyd/element-plus/dist/index.css`.
+- The complete built stylesheet import `@ozwasyd/element-plus/dist/fsus.css`.
+- The lower-level `@ozwasyd/element-plus/dist/index.css` compatibility layer.
 - Documented theme assets under `theme-chalk`.
 - Locale usage through documented ConfigProvider and locale import flows.
 - Icon imports through `@ozwasyd/element-plus/icons-vue`.

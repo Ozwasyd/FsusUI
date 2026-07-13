@@ -16,7 +16,7 @@ import {
   FsusPerceptionChallenge,
   type PerceptionChallengeKind,
 } from '__FSUS_PACKAGE_NAME__/perception-challenge'
-import '__FSUS_PACKAGE_NAME__/dist/index.css'
+import '__FSUS_PACKAGE_NAME__/dist/fsus.css'
 import App from './App.vue'
 
 const app = createApp(App)
@@ -48,8 +48,8 @@ const fsusBlogPackageContract = {
 }
 
 if (
-  fsusBlogPackageContract.collectionComponentName !== 'FsusDataList'
-  || fsusBlogPackageContract.perceptionComponentName !== 'FsusPerceptionChallenge'
+  fsusBlogPackageContract.collectionComponentName !== 'FsusDataList' ||
+  fsusBlogPackageContract.perceptionComponentName !== 'FsusPerceptionChallenge'
 ) {
   throw new Error('Packed package FsusBlog export surface drifted.')
 }

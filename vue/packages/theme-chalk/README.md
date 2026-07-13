@@ -1,8 +1,8 @@
 # element-theme-chalk
 
-FsusUI ships a single default component theme through `theme-chalk`.
-Importing `index.scss` or `index.css` applies the full FSUS design tokens and component styles by default.
-There is no separate dark bundle or alternate theme entry.
+FsusUI ships one complete default production theme through `fsus.scss` / `fsus.css`.
+It loads the Element Plus-compatible component layer first and the FsusUI product
+tokens and overrides second. Light and dark modes are both included.
 
 ## Installation
 
@@ -15,13 +15,13 @@ npm i element-plus
 Use Sass import
 
 ```css
-@use 'element-plus/lib/theme-chalk/index.scss';
+@use 'element-plus/lib/theme-chalk/fsus.scss';
 ```
 
 Or Use vite/webpack
 
 ```javascript
-import 'element-plus/lib/theme-chalk/index.css'
+import 'element-plus/lib/theme-chalk/fsus.css'
 ```
 
 Or
@@ -29,7 +29,7 @@ Or
 ```html
 <link
   rel="stylesheet"
-  href="https://unpkg.com/element-plus/lib/theme-chalk/index.css"
+  href="https://unpkg.com/element-plus/lib/theme-chalk/fsus.css"
 />
 ```
 
@@ -42,4 +42,7 @@ import 'element-plus/lib/theme-chalk/select.css'
 // ...
 ```
 
-All on-demand component styles share the same default FSUS theme baseline.
+`index.scss` / `index.css` remain compatibility-only base entries. Existing
+applications that already load that base may append `fsus-theme.css` while
+migrating, but new applications should load only `fsus.css`; combining the
+complete entry with either lower-level entry duplicates the base layer.

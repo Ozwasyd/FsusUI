@@ -1,0 +1,6 @@
+// Complete FsusUI production theme.
+// Keep the base compatibility layer first and product overrides last so the
+// cascade is deterministic. Sass `@use` also guarantees each layer is emitted
+// at most once within a compilation.
+@use './index.scss';
+@use './fsus-theme.scss';

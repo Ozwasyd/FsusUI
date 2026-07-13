@@ -64,7 +64,7 @@ registry policy is documented in
 ```ts
 import { createApp } from 'vue'
 import FsusUI from '@ozwasyd/element-plus'
-import '@ozwasyd/element-plus/dist/index.css'
+import '@ozwasyd/element-plus/dist/fsus.css'
 import App from './App.vue'
 
 createApp(App).use(FsusUI).mount('#app')
