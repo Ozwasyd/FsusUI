@@ -22,6 +22,18 @@ const allowedRadiusLiterals = [
 const hoverScaleMax = 1.1
 const hoverTranslateMaxPx = 1
 const hoverTransformAllowlist = []
+const geometryCategories = new Set([
+  'control',
+  'navigation',
+  'panel',
+  'expressive',
+  'pill',
+])
+const pillGeometryContexts = [
+  '-transfer__button',
+  '-pagination button',
+  '-pager li',
+]
 
 const read = (file) => readFileSync(resolve(root, file), 'utf8')
 
@@ -74,6 +86,21 @@ const findMatchingBrace = (source, openIndex) => {
   return -1
 }
 
+const selectorBeforeBlock = (source, blockOpen) => {
+  const selectorStart =
+    Math.max(
+      source.lastIndexOf('{', blockOpen - 1),
+      source.lastIndexOf('}', blockOpen - 1),
+      source.lastIndexOf(';', blockOpen - 1),
+    ) + 1
+  return source.slice(selectorStart, blockOpen).replaceAll(/\s+/g, ' ').trim()
+}
+
+const selectorAt = (source, index) => {
+  const blockOpen = source.lastIndexOf('{', index)
+  return blockOpen < 0 ? '' : selectorBeforeBlock(source, blockOpen)
+}
+
 const selectorHasHoverState = (selector) =>
   selector.replaceAll(/:not\(\s*:hover\s*\)/g, '').includes(':hover')
 
@@ -85,13 +112,7 @@ const hoverBlocks = (source) => {
     const blockOpen = source.indexOf('{', hoverIndex)
     if (blockOpen < 0) continue
 
-    const selectorStart =
-      Math.max(
-        source.lastIndexOf('{', hoverIndex),
-        source.lastIndexOf('}', hoverIndex),
-        source.lastIndexOf(';', hoverIndex),
-      ) + 1
-    const selector = source.slice(selectorStart, blockOpen).trim()
+    const selector = selectorBeforeBlock(source, blockOpen)
     if (!selectorHasHoverState(selector)) continue
 
     const blockClose = findMatchingBrace(source, blockOpen)
@@ -186,11 +207,12 @@ const checkCoreTokens = () => {
     )
   }
 
-  assertTokenMax(file, source, '--fsus-radius-control', 8)
-  assertTokenMax(file, source, '--fsus-radius-control-small', 6)
-  assertTokenMax(file, source, '--fsus-radius-panel', 16)
-  assertTokenMax(file, source, '--fsus-radius-floating', 16)
-  assertTokenMax(file, source, '--fsus-radius-popover', 16)
+  assertTokenMax(file, source, '--fsus-radius-control', 6)
+  assertTokenMax(file, source, '--fsus-radius-control-small', 4)
+  assertTokenMax(file, source, '--fsus-radius-navigation', 6)
+  assertTokenMax(file, source, '--fsus-radius-panel', 12)
+  assertTokenMax(file, source, '--fsus-radius-floating', 12)
+  assertTokenMax(file, source, '--fsus-radius-popover', 10)
 
   assertIncludes(
     file,
@@ -204,6 +226,117 @@ const checkCoreTokens = () => {
     '--fsus-shadow-floating: 0 12px 32px rgba(15, 23, 42, 0.08);',
     'floating shadow must stay below the large SaaS-card baseline',
   )
+}
+
+const checkGeometryMixinSemantics = () => {
+  const file = 'vue/packages/theme-chalk/src/fsus-theme.scss'
+  const source = read(file)
+  const includePattern =
+    /@include\s+fsus-(control|panel|floating|geometry)(?:\(([^;]*)\))?\s*;/g
+
+  for (const match of source.matchAll(includePattern)) {
+    const index = match.index ?? 0
+    const mixin = match[1]
+    const argument = (match[2] ?? (mixin === 'geometry' ? '' : 'panel')).trim()
+    const selector = selectorAt(source, index)
+
+    if (argument.startsWith('$')) continue
+    if (!geometryCategories.has(argument)) {
+      addViolation(
+        file,
+        lineNumberOf(source, index),
+        `fsus-${mixin} must use a semantic geometry category; found ${argument || 'no category'}`,
+      )
+      continue
+    }
+
+    if (
+      argument === 'expressive' &&
+      !selector.includes('.is-expressive-surface') &&
+      !selector.includes("[data-fsus-surface='expressive']")
+    ) {
+      addViolation(
+        file,
+        lineNumberOf(source, index),
+        'expressive geometry requires an explicit expressive surface selector',
+      )
+    }
+
+    if (
+      argument === 'pill' &&
+      !pillGeometryContexts.some((context) => selector.includes(context))
+    ) {
+      addViolation(
+        file,
+        lineNumberOf(source, index),
+        `pill geometry is limited to documented pill/circular controls; selector was ${selector}`,
+      )
+    }
+
+    if (
+      mixin === 'control' &&
+      argument === 'panel' &&
+      !selector.includes('-upload')
+    ) {
+      addViolation(
+        file,
+        lineNumberOf(source, index),
+        'panel geometry on a control requires an upload panel context',
+      )
+    }
+  }
+}
+
+const checkDefaultInteractionEffects = () => {
+  const file = 'vue/packages/theme-chalk/src/fsus-theme.scss'
+  const source = read(file)
+
+  for (const match of source.matchAll(/:active/g)) {
+    const index = match.index ?? 0
+    const blockOpen = source.indexOf('{', index)
+    if (blockOpen < 0) continue
+    const selector = selectorBeforeBlock(source, blockOpen)
+    const blockClose = findMatchingBrace(source, blockOpen)
+    if (blockClose < 0 || !selector.includes(':active')) continue
+    const body = source.slice(blockOpen + 1, blockClose)
+
+    if (/\bscale(?:3d|X|Y)?\(/u.test(body)) {
+      addViolation(
+        file,
+        lineNumberOf(source, index),
+        `default active state must not scale; selector was ${selector}`,
+      )
+    }
+    if (
+      body.includes('var(--fsus-motion-trail)') ||
+      body.includes('var(--fsus-motion-slider-trail)') ||
+      body.includes('var(--fsus-interactive-motion-glow') ||
+      /filter:\s*blur\((?!0(?:px)?\))/u.test(body)
+    ) {
+      addViolation(
+        file,
+        lineNumberOf(source, index),
+        `default active state must not use glow, trail, or blur; selector was ${selector}`,
+      )
+    }
+  }
+
+  for (const match of source.matchAll(
+    /var\(--fsus-(?:motion-trail|motion-slider-trail|interactive-motion-glow)/g,
+  )) {
+    const index = match.index ?? 0
+    const context = source.slice(Math.max(0, index - 900), index + 120)
+    if (
+      !context.includes('.is-expressive-surface') &&
+      !context.includes("[data-fsus-surface='expressive']")
+    ) {
+      addViolation(
+        file,
+        lineNumberOf(source, index),
+        'glow and trail effects require explicit expressive surface context',
+      )
+    }
+  }
 }
 
 const checkBackdropFilters = () => {
@@ -356,8 +489,10 @@ const checkMotionDocs = () => {
 
 try {
   checkCoreTokens()
+  checkGeometryMixinSemantics()
   checkScatteredRadiusLiterals()
   checkHoverTransforms()
+  checkDefaultInteractionEffects()
   checkBackdropFilters()
   checkReadingSurface()
   checkMarkdownLoading()

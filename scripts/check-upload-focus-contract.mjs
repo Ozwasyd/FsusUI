@@ -24,7 +24,7 @@ assertIncludes(
   failures,
 )
 assertIncludes(
-  '@include a11y-focus-ring(2px, var(--fsus-radius-panel-large, 24px));',
+  '@include a11y-focus-ring(2px, var(--fsus-radius-panel, 12px));',
   'upload dragger focus must use the shared 2px inset ring',
   failures,
 )

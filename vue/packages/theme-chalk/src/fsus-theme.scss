@@ -2,26 +2,42 @@
 @use 'common/var' as *;
 @use 'common/fsus-tokens' as *;
 
-@mixin fsus-panel($radius: var(--fsus-radius-panel)) {
+@mixin fsus-geometry($category) {
+  @if $category == control {
+    border-radius: var(--fsus-radius-control);
+  } @else if $category == navigation {
+    border-radius: var(--fsus-radius-navigation);
+  } @else if $category == panel {
+    border-radius: var(--fsus-radius-panel);
+  } @else if $category == expressive {
+    border-radius: var(--fsus-radius-panel-large);
+  } @else if $category == pill {
+    border-radius: var(--fsus-radius-pill);
+  } @else {
+    @error 'Unknown FsusUI geometry category: #{$category}';
+  }
+}
+
+@mixin fsus-panel($geometry: panel) {
   background: var(--el-bg-color);
   border: 1px solid var(--el-border-color);
-  border-radius: $radius;
+  @include fsus-geometry($geometry);
   box-shadow: var(--fsus-shadow-panel);
 }
 
-@mixin fsus-floating($radius: var(--fsus-radius-floating)) {
+@mixin fsus-floating($geometry: panel) {
   background: var(--el-bg-color-overlay);
   border: 1px solid var(--el-border-color-light);
-  border-radius: $radius;
+  @include fsus-geometry($geometry);
   box-shadow: var(--fsus-shadow-floating);
   backdrop-filter: blur(var(--fsus-backdrop-blur));
   -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur));
 }
 
-@mixin fsus-control($radius: var(--fsus-radius-control)) {
+@mixin fsus-control($geometry: control) {
   background: var(--el-fill-color-lighter);
   border: 1px solid var(--el-border-color);
-  border-radius: $radius;
+  @include fsus-geometry($geometry);
   color: var(--el-text-color-primary);
   transition:
     background-color getCssVar('transition-duration')
@@ -66,6 +82,9 @@ html.dark [data-fsus-material='glass'] {
   --fsus-radius-panel: var(--fsus-radius-panel-large, 24px);
   --fsus-radius-floating: var(--fsus-radius-panel-large, 24px);
   --fsus-radius-popover: 20px;
+  --fsus-interactive-motion-trail-opacity: 0.42;
+  --fsus-motion-trail: rgba(42, 89, 156, 0.16);
+  --fsus-motion-slider-trail: rgba(42, 89, 156, 0.2);
 }
 
 .fsus-reading-surface,
@@ -284,7 +303,7 @@ html.dark {
 }
 
 .#{$namespace}-button {
-  @include fsus-control(8px);
+  @include fsus-control(control);
   background: transparent;
   color: var(--el-text-color-primary);
   min-height: 44px;
@@ -307,7 +326,7 @@ html.dark {
   }
 
   &:focus-visible {
-    @include a11y-focus-ring($radius: 8px);
+    @include a11y-focus-ring($radius: var(--fsus-radius-control));
   }
 
   &.is-disabled,
@@ -384,7 +403,7 @@ html.dark {
 .#{$namespace}-input-group__append,
 .#{$namespace}-input-group__prepend,
 .#{$namespace}-color-picker__trigger {
-  @include fsus-control(8px);
+  @include fsus-control(control);
   box-shadow: none !important;
 }
 
@@ -431,7 +450,7 @@ html.dark {
 }
 
 .#{$namespace}-input-number {
-  @include fsus-control(8px);
+  @include fsus-control(control);
   overflow: hidden;
   padding: 0;
   display: inline-flex;
@@ -476,7 +495,7 @@ html.dark {
 
 .#{$namespace}-checkbox-button__inner,
 .#{$namespace}-radio-button__inner {
-  @include fsus-control(8px);
+  @include fsus-control(control);
   box-shadow: none !important; // override element plus default border logic
   background: transparent;
   border-color: transparent;
@@ -566,7 +585,7 @@ html.dark {
 .#{$namespace}-checkbox.is-bordered,
 .#{$namespace}-radio.is-bordered,
 .#{$namespace}-check-tag {
-  @include fsus-control(8px);
+  @include fsus-control(control);
   box-shadow: none;
 }
 
@@ -1053,7 +1072,7 @@ button.#{$namespace}-card:active {
   background: var(--fsus-state-emphasis-bg);
   border-color: var(--fsus-state-focus-border);
   box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);
-  transform: translate3d(0, 1px, 0) scale(0.99);
+  transform: translate3d(0, 1px, 0);
 }
 
 .fsus-entry.is-active,
@@ -1106,7 +1125,7 @@ button.#{$namespace}-card:active {
 }
 
 .#{$namespace}-transfer__button {
-  @include fsus-control(999px);
+  @include fsus-control(pill);
   width: 40px;
   height: 40px;
   padding: 0;
@@ -1135,8 +1154,8 @@ button.#{$namespace}-card:active {
 
 .#{$namespace}-dialog,
 .#{$namespace}-drawer {
-  @include fsus-floating;
-  border: none;
+  @include fsus-panel(panel);
+  background: var(--el-bg-color-overlay);
 }
 
 .#{$namespace}-message-box {
@@ -1147,7 +1166,8 @@ button.#{$namespace}-card:active {
 }
 
 .#{$namespace}-notification {
-  @include fsus-floating(18px);
+  @include fsus-panel(panel);
+  background: var(--el-bg-color-overlay);
 }
 
 .#{$namespace}-message {
@@ -1871,7 +1891,7 @@ button.#{$namespace}-card:active {
 .#{$namespace}-tabs__item {
   height: 44px;
   padding: 0 14px;
-  border-radius: 999px;
+  @include fsus-geometry(navigation);
   color: var(--el-text-color-regular);
 }
 
@@ -1881,21 +1901,9 @@ button.#{$namespace}-card:active {
 }
 
 .#{$namespace}-tabs__item.is-active {
-  background: var(--el-fill-color);
+  background: transparent;
   color: var(--el-text-color-primary);
   font-weight: 700;
-}
-
-@keyframes fsus-tabs-indicator-in {
-  from {
-    opacity: 0;
-    transform: scaleX(0.36);
-  }
-
-  to {
-    opacity: 1;
-    transform: scaleX(1);
-  }
 }
 
 .#{$namespace}-tabs--card > .#{$namespace}-tabs__header,
@@ -1975,7 +1983,7 @@ button.#{$namespace}-card:active {
   background: var(--el-fill-color-lighter);
   border-color: var(--el-border-color-light);
   color: var(--el-text-color-primary);
-  box-shadow: 0 6px 14px rgba(15, 15, 17, 0.04);
+  box-shadow: none;
   transform: translate3d(0, -1px, 0);
 }
 
@@ -2002,32 +2010,7 @@ button.#{$namespace}-card:active {
   border-color: var(--fsus-state-focus-border);
   color: var(--fsus-scholarly-blue);
   box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);
-  transform: translate3d(0, 1px, 0) scale(0.985);
-}
-
-.#{$namespace}-tabs--card
-  > .#{$namespace}-tabs__header
-  .#{$namespace}-tabs__item.is-top.is-active::after,
-.#{$namespace}-tabs--card
-  > .#{$namespace}-tabs__header
-  .#{$namespace}-tabs__item.is-bottom.is-active::after,
-.#{$namespace}-tabs--border-card
-  > .#{$namespace}-tabs__header
-  .#{$namespace}-tabs__item.is-top.is-active::after,
-.#{$namespace}-tabs--border-card
-  > .#{$namespace}-tabs__header
-  .#{$namespace}-tabs__item.is-bottom.is-active::after {
-  content: '';
-  position: absolute;
-  right: 12px;
-  bottom: 5px;
-  left: 12px;
-  height: 2px;
-  border-radius: 2px;
-  background: var(--fsus-scholarly-blue);
-  transform-origin: center;
-  animation: fsus-tabs-indicator-in var(--fsus-motion-control-fast)
-    var(--fsus-motion-emphasized);
+  transform: translate3d(0, 1px, 0);
 }
 
 .#{$namespace}-tabs--card
@@ -2063,7 +2046,7 @@ button.#{$namespace}-card:active {
 
 .#{$namespace}-pagination button,
 .#{$namespace}-pager li {
-  @include fsus-control(999px);
+  @include fsus-control(pill);
   min-width: 44px;
   height: 44px;
   box-shadow: none;
@@ -2206,7 +2189,7 @@ button.#{$namespace}-card:active {
 }
 
 .#{$namespace}-upload-dragger {
-  @include fsus-control(24px);
+  @include fsus-control(panel);
   min-height: 180px;
   border-style: dashed;
   padding: 28px 20px;
@@ -2220,7 +2203,7 @@ button.#{$namespace}-card:active {
 }
 
 .#{$namespace}-upload-list__item {
-  @include fsus-control(14px);
+  @include fsus-control(panel);
   padding: 10px 12px;
 
   &:hover {
@@ -2265,29 +2248,34 @@ button.#{$namespace}-card:active {
   transform: translateZ(0);
 
   &::after {
-    content: '';
-    position: absolute;
-    inset: -5px -10px;
-    pointer-events: none;
-    border-radius: inherit;
-    opacity: 0;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      color-mix(in srgb, var(--fsus-scholarly-blue) 34%, transparent) 72%,
-      color-mix(in srgb, var(--fsus-scholarly-blue) 58%, transparent) 100%
-    );
-    filter: blur(5px);
-    transform: translate3d(
-      var(--fsus-interactive-motion-offset-x, 0px),
-      var(--fsus-interactive-motion-offset-y, 0px),
-      0
-    );
-    transition:
-      opacity var(--fsus-motion-control-fast) var(--fsus-motion-standard),
-      transform var(--fsus-interactive-motion-settle, 120ms)
-        var(--fsus-motion-standard);
+    content: none;
   }
+}
+
+.is-expressive-surface .#{$namespace}-slider__bar::after,
+[data-fsus-surface='expressive'] .#{$namespace}-slider__bar::after {
+  content: '';
+  position: absolute;
+  inset: -5px -10px;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--fsus-scholarly-blue) 34%, transparent) 72%,
+    color-mix(in srgb, var(--fsus-scholarly-blue) 58%, transparent) 100%
+  );
+  filter: blur(5px);
+  transform: translate3d(
+    var(--fsus-interactive-motion-offset-x, 0px),
+    var(--fsus-interactive-motion-offset-y, 0px),
+    0
+  );
+  transition:
+    opacity var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    transform var(--fsus-interactive-motion-settle, 120ms)
+      var(--fsus-motion-standard);
 }
 
 .#{$namespace}-slider__button-wrapper {
@@ -2320,19 +2308,13 @@ button.#{$namespace}-card:active {
 }
 
 .#{$namespace}-slider__button.dragging {
-  filter: blur(
-    var(--fsus-interactive-motion-blur, var(--fsus-motion-slider-blur))
-  );
-  box-shadow:
-    0 0 var(--fsus-interactive-motion-glow, 18px)
-      var(--fsus-motion-slider-trail),
-    0 3px 10px rgba(0, 0, 0, 0.12);
+  filter: none;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
   transform: translate3d(
-      var(--fsus-interactive-motion-offset-x, 0px),
-      var(--fsus-interactive-motion-offset-y, 0px),
-      0
-    )
-    scale(var(--fsus-interactive-motion-scale, 1.08));
+    var(--fsus-interactive-motion-offset-x, 0px),
+    var(--fsus-interactive-motion-offset-y, 0px),
+    0
+  );
 }
 
 .#{$namespace}-slider__button-wrapper.dragging {
@@ -2340,14 +2322,39 @@ button.#{$namespace}-card:active {
 }
 
 .#{$namespace}-slider__runway.is-dragging .#{$namespace}-slider__bar {
-  filter: blur(
-    var(--fsus-interactive-motion-blur, var(--fsus-motion-slider-blur))
-  );
-  box-shadow: 0 0 var(--fsus-interactive-motion-glow, 14px)
-    var(--fsus-motion-slider-trail);
+  filter: none;
+  box-shadow: none;
   transition:
     filter var(--fsus-motion-control-fast) var(--fsus-motion-standard),
     box-shadow var(--fsus-motion-control-fast) var(--fsus-motion-standard);
+
+  &::after {
+    opacity: 0;
+  }
+}
+
+.is-expressive-surface .#{$namespace}-slider__button.dragging,
+[data-fsus-surface='expressive'] .#{$namespace}-slider__button.dragging {
+  filter: blur(var(--fsus-motion-slider-blur));
+  box-shadow:
+    0 0 18px var(--fsus-motion-slider-trail),
+    0 3px 10px rgba(0, 0, 0, 0.12);
+  transform: translate3d(
+      var(--fsus-interactive-motion-offset-x, 0px),
+      var(--fsus-interactive-motion-offset-y, 0px),
+      0
+    )
+    scale(1.08);
+}
+
+.is-expressive-surface
+  .#{$namespace}-slider__runway.is-dragging
+  .#{$namespace}-slider__bar,
+[data-fsus-surface='expressive']
+  .#{$namespace}-slider__runway.is-dragging
+  .#{$namespace}-slider__bar {
+  filter: blur(var(--fsus-motion-slider-blur));
+  box-shadow: 0 0 14px var(--fsus-motion-slider-trail);
 
   &::after {
     opacity: var(--fsus-interactive-motion-trail-opacity, 0.42);
@@ -2805,17 +2812,15 @@ button.#{$namespace}-card:active {
     background: var(--fsus-state-hover-bg);
     border-color: var(--fsus-state-focus-border);
     color: var(--fsus-scholarly-blue);
-    box-shadow:
-      inset 0 0 0 1px var(--fsus-state-focus-border),
-      0 0 12px var(--fsus-motion-trail) !important;
-    transform: translate3d(0, 1px, 0) scale(0.985);
+    box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border) !important;
+    transform: translate3d(0, 1px, 0);
   }
 
   .#{$namespace}-button--primary:not(.is-disabled):active {
     background: var(--fsus-scholarly-blue);
     border-color: var(--fsus-scholarly-blue);
     color: #ffffff;
-    box-shadow: 0 0 14px var(--fsus-motion-trail) !important;
+    box-shadow: none !important;
   }
 
   .#{$namespace}-select-dropdown__item:not(.selected):hover,
@@ -2922,7 +2927,7 @@ button.#{$namespace}-card:active {
     border-color: var(--fsus-state-focus-border);
     color: var(--fsus-scholarly-blue);
     box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);
-    transform: translate3d(0, 1px, 0) scale(0.985);
+    transform: translate3d(0, 1px, 0);
   }
 
   .#{$namespace}-checkbox__inner:hover,
@@ -2948,9 +2953,7 @@ button.#{$namespace}-card:active {
   .#{$namespace}-upload-dragger:active {
     background: var(--fsus-state-hover-bg);
     border-color: var(--fsus-state-focus-border);
-    box-shadow:
-      inset 0 0 0 1px var(--fsus-state-focus-border),
-      0 0 14px var(--fsus-motion-trail) !important;
+    box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border) !important;
     transform: translate3d(0, 1px, 0);
   }
 
@@ -2961,10 +2964,8 @@ button.#{$namespace}-card:active {
 
   .#{$namespace}-color-picker__trigger:active {
     border-color: var(--fsus-state-focus-border);
-    box-shadow:
-      inset 0 0 0 1px var(--fsus-state-focus-border),
-      0 0 12px var(--fsus-motion-trail) !important;
-    transform: translate3d(0, 1px, 0) scale(0.985);
+    box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border) !important;
+    transform: translate3d(0, 1px, 0);
   }
 
   .#{$namespace}-link:hover {
@@ -2984,8 +2985,8 @@ button.#{$namespace}-card:active {
   .#{$namespace}-backtop:active {
     background: var(--fsus-scholarly-blue);
     color: var(--el-bg-color);
-    box-shadow: 0 0 14px var(--fsus-motion-trail);
-    transform: translate3d(0, 1px, 0) scale(0.96);
+    box-shadow: none;
+    transform: translate3d(0, 1px, 0);
   }
 
   .#{$namespace}-image-viewer__btn:hover {

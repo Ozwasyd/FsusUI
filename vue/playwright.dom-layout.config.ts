@@ -66,7 +66,7 @@ export default defineConfig({
   ],
   webServer: {
     command:
-      `pnpm run build:demo && pnpm -C vue/packages/demo-app exec vite preview --host 127.0.0.1 --port ${domLayoutPort} --strictPort`,
+      `pnpm -C .. run build:demo && pnpm -C packages/demo-app exec vite preview --host 127.0.0.1 --port ${domLayoutPort} --strictPort`,
     url: domLayoutBaseUrl,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

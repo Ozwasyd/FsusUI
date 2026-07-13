@@ -58,7 +58,13 @@ describe('Fsus theme visual baseline', () => {
   test('renders card tabs as quiet segmented navigation', () => {
     const css = compileThemeFile('fsus-theme.scss')
 
-    expect(css).toContain('@keyframes fsus-tabs-indicator-in')
+    expect(css).not.toContain('@keyframes fsus-tabs-indicator-in')
+    expectCssRule(css, '.el-tabs__item', [
+      'border-radius: var(--fsus-radius-navigation);',
+    ])
+    expectCssRule(css, '.el-tabs__item.is-active', [
+      'background: transparent;',
+    ])
     expectCssRule(css, '.el-tabs--card > .el-tabs__header', [
       'height: auto;',
       'border-bottom: 0;',
@@ -82,7 +88,7 @@ describe('Fsus theme visual baseline', () => {
       css,
       '.el-tabs--card > .el-tabs__header .el-tabs__item:not(.is-disabled):hover',
       [
-        'box-shadow: 0 6px 14px rgba(15, 15, 17, 0.04);',
+        'box-shadow: none;',
         'transform: translate3d(0, -1px, 0);',
       ],
     )
@@ -94,7 +100,7 @@ describe('Fsus theme visual baseline', () => {
         'border-color: var(--fsus-state-focus-border);',
         'color: var(--fsus-scholarly-blue);',
         'box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);',
-        'transform: translate3d(0, 1px, 0) scale(0.985);',
+        'transform: translate3d(0, 1px, 0);',
       ],
     )
     expectCssRule(
@@ -107,15 +113,40 @@ describe('Fsus theme visual baseline', () => {
         'transform: translateZ(0);',
       ],
     )
+    expect(css).not.toMatch(
+      /\.el-tabs--(?:border-)?card[^{}]*\.el-tabs__item[^{}]*\.is-active::after/s,
+    )
+  })
+
+  test('uses semantic geometry budgets and border-first default panels', () => {
+    const css = compileThemeFile('fsus-theme.scss')
+
+    for (const selector of ['.el-button', '.el-input__wrapper']) {
+      expectCssRule(css, selector, [
+        'border-radius: var(--fsus-radius-control);',
+      ])
+    }
+    for (const selector of ['.el-dialog', '.el-drawer', '.el-notification']) {
+      expectCssRule(css, selector, [
+        'border: 1px solid var(--el-border-color);',
+        'border-radius: var(--fsus-radius-panel);',
+        'box-shadow: var(--fsus-shadow-panel);',
+      ])
+    }
+    expectCssRule(css, '.el-upload-dragger', [
+      'border-radius: var(--fsus-radius-panel);',
+    ])
+    expectCssRule(css, '.el-slider__button.dragging', [
+      'filter: none;',
+      'box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);',
+    ])
     expectCssRule(
       css,
-      '.el-tabs--card > .el-tabs__header .el-tabs__item.is-top.is-active::after',
+      '.is-expressive-surface .el-slider__button.dragging',
       [
-        'bottom: 5px;',
-        'height: 2px;',
-        'background: var(--fsus-scholarly-blue);',
-        'transform-origin: center;',
-        'animation: fsus-tabs-indicator-in var(--fsus-motion-control-fast) var(--fsus-motion-emphasized);',
+        'filter: blur(var(--fsus-motion-slider-blur));',
+        'box-shadow: 0 0 18px var(--fsus-motion-slider-trail), 0 3px 10px rgba(0, 0, 0, 0.12);',
+        'scale(1.08);',
       ],
     )
   })
@@ -733,7 +764,7 @@ describe('Fsus theme visual baseline', () => {
       'background: var(--fsus-state-emphasis-bg);',
       'border-color: var(--fsus-state-focus-border);',
       'box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);',
-      'transform: translate3d(0, 1px, 0) scale(0.99);',
+      'transform: translate3d(0, 1px, 0);',
     ])
     expectCssRule(css, '.fsus-entry[aria-current=page]', [
       'background: var(--el-bg-color);',

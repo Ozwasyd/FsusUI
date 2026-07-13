@@ -29,6 +29,9 @@ export default defineConfig({
   },
   use: {
     baseURL: previewBaseUrl,
+    launchOptions: process.env.FSUS_PLAYWRIGHT_EXECUTABLE_PATH
+      ? { executablePath: process.env.FSUS_PLAYWRIGHT_EXECUTABLE_PATH }
+      : undefined,
     locale: 'zh-CN',
     timezoneId: 'Asia/Shanghai',
     colorScheme: 'light',
@@ -70,7 +73,7 @@ export default defineConfig({
   ],
   webServer: {
     command:
-      `pnpm run prepare:test-artifacts && pnpm -C vue/packages/demo-app build && pnpm -C vue/packages/demo-app preview --host 127.0.0.1 --port ${previewPort} --strictPort`,
+      `pnpm -C .. run prepare:test-artifacts && pnpm -C packages/demo-app build && pnpm -C packages/demo-app preview --host 127.0.0.1 --port ${previewPort} --strictPort`,
     url: previewBaseUrl,
     reuseExistingServer: !process.env.CI,
     timeout: 240_000,

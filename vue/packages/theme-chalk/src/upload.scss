@@ -130,7 +130,7 @@
 
   &.is-focus-visible-dragger {
     .#{$namespace}-upload-dragger {
-      @include a11y-focus-ring(2px, var(--fsus-radius-panel-large, 24px));
+      @include a11y-focus-ring(2px, var(--fsus-radius-panel, 12px));
     }
   }
 }

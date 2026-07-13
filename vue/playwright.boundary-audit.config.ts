@@ -78,7 +78,7 @@ export default defineConfig({
   ],
   webServer: {
     command:
-      `pnpm run ensure:wasm && pnpm -C vue/packages/demo-app exec vite --host 127.0.0.1 --port ${boundaryAuditPort} --strictPort`,
+      `pnpm -C .. run ensure:wasm && pnpm -C packages/demo-app exec vite --host 127.0.0.1 --port ${boundaryAuditPort} --strictPort`,
     url: boundaryAuditBaseUrl,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

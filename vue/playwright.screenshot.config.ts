@@ -24,7 +24,7 @@ export default defineConfig({
     viewport: { width: 1440, height: 1600 },
   },
   webServer: {
-    command: `pnpm run ensure:wasm && pnpm -C vue/packages/demo-app exec vite --host 127.0.0.1 --port ${screenshotPort} --strictPort`,
+    command: `pnpm -C .. run ensure:wasm && pnpm -C packages/demo-app exec vite --host 127.0.0.1 --port ${screenshotPort} --strictPort`,
     url: screenshotBaseUrl,
     reuseExistingServer: true,
     timeout: 120_000,

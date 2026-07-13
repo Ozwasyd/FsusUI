@@ -113,10 +113,13 @@ FsusUI 的色彩系统围绕 **Ink / Paper / Dot / Scholarly Blue** 展开。颜
 | ---------------- | ------- | -------------------------------------------------- | ------------------------------------ |
 | Small control    | `4px`   | `--fsus-radius-control-small`                      | 小尺寸按钮、紧凑输入、标签内部结构   |
 | Control          | `6px`   | `--fsus-radius-control`, `--el-border-radius-base` | Button、Input、Select、Checkbox 外框 |
+| Navigation       | `6px`   | `--fsus-radius-navigation`                        | Tabs、Menu 等选中与导航表面          |
 | Popover          | `10px`  | `--fsus-radius-popover`                            | Tooltip、Popover、Dropdown 内层面板  |
 | Panel            | `12px`  | `--fsus-radius-panel`, `--el-dialog-border-radius` | Dialog、Drawer、Card、MessageBox     |
 | Expressive panel | `24px`  | `--fsus-radius-panel-large`                        | 仅限 opt-in expressive surface       |
 | Pill             | `999px` | `--fsus-radius-pill`, `--el-border-radius-round`   | Badge、圆形图标按钮、胶囊标签        |
+
+主题 Sass 只通过 `control`、`navigation`、`panel`、`expressive` 四类几何预算分配默认半径；`pill` 仅用于真实胶囊或圆形控件。`expressive` 必须位于 `.is-expressive-surface` 或 `[data-fsus-surface='expressive']` 显式语义上下文中，不能作为普通 Notification、Upload、Dialog 或 Drawer 的默认外观。
 
 ### Density
 

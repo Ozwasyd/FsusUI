@@ -14,8 +14,32 @@ type VisualVariant = {
 }
 
 const diagnostics = new WeakMap<Page, string[]>()
+const requestedComponentNames = new Set(
+  (process.env.FSUS_UI_AUDIT_COMPONENTS ?? '')
+    .split(',')
+    .map((name) => name.trim())
+    .filter(Boolean),
+)
+const selectedAuditComponents =
+  requestedComponentNames.size === 0
+    ? auditComponents
+    : auditComponents.filter((component) =>
+        requestedComponentNames.has(component.name),
+      )
+if (
+  requestedComponentNames.size > 0 &&
+  selectedAuditComponents.length !== requestedComponentNames.size
+) {
+  const selectedNames = new Set(
+    selectedAuditComponents.map((component) => component.name),
+  )
+  const unknownNames = [...requestedComponentNames].filter(
+    (name) => !selectedNames.has(name),
+  )
+  throw new Error(`Unknown UI audit components: ${unknownNames.join(', ')}`)
+}
 const expectedScreenshotsPerProject =
-  auditComponents.length * auditStateNames.length
+  selectedAuditComponents.length * auditStateNames.length
 
 const stabilizePage = async (page: Page) => {
   await page.addStyleTag({
@@ -77,7 +101,7 @@ const screenshotPath = (
 const countProjectScreenshots = (projectName: string) => {
   let count = 0
 
-  for (const component of auditComponents) {
+  for (const component of selectedAuditComponents) {
     for (const state of auditStateNames) {
       if (fs.existsSync(screenshotPath(component.name, projectName, state))) {
         count += 1
@@ -107,10 +131,10 @@ test('captures the registered component state matrix', async ({ page }, testInfo
     await stabilizePage(page)
 
     await expect(page.locator('[data-audit-component]')).toHaveCount(
-      auditComponents.length
+      auditComponents.length,
     )
 
-    for (const component of auditComponents) {
+    for (const component of selectedAuditComponents) {
       const componentCard = page.locator(component.locator)
       await expect(componentCard).toBeVisible()
 

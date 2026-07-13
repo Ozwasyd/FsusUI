@@ -117,7 +117,7 @@ const normalizedThemeSource = withoutLineComments(themeSource).replace(
   'NS',
 )
 let hasNotificationSafeWidth = false
-let hasNotificationFloatingMaterial = false
+let hasNotificationPanelMaterial = false
 let hasNotificationFixedPosition = false
 
 if (
@@ -151,10 +151,11 @@ for (const block of topLevelBlocks(themeSource)) {
   }
 
   if (
-    block.body.includes('@include fsus-floating') ||
-    block.body.includes('box-shadow: var(--fsus-shadow-floating')
+    block.body.includes('@include fsus-panel(panel)') ||
+    (block.body.includes('border: 1px solid') &&
+      block.body.includes('box-shadow: var(--fsus-shadow-panel'))
   ) {
-    hasNotificationFloatingMaterial = true
+    hasNotificationPanelMaterial = true
   }
 }
 
@@ -164,9 +165,9 @@ if (!hasNotificationSafeWidth) {
   )
 }
 
-if (!hasNotificationFloatingMaterial) {
+if (!hasNotificationPanelMaterial) {
   failures.push(
-    `${themeFile}: Notification needs floating material shadow coverage`,
+    `${themeFile}: Notification needs border-first panel material coverage`,
   )
 }
 
