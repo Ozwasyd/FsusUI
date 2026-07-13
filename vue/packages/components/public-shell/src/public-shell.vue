@@ -8,7 +8,7 @@
     }"
   >
     <el-site-header
-      data-public-shell-header
+      v-bind="{ 'data-public-shell-header': '' }"
       :class="headerKls"
       :sticky="sticky"
       :max-width="maxWidth"
