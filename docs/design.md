@@ -280,8 +280,17 @@ Consumer 在公开 landing 上使用 FsusUI 时，必须在 Public Layout Rules 
   推导为 `stroke-width="112"`，即 `112 / 1024 * 16 = 1.75px`。
 - 线性图标统一 `stroke-linecap: round` 和 `stroke-linejoin: round`。
 - 实心图标保留原始轮廓，不强行描边化。
+- 基础样式不得修改裸 `svg`；生成图标在 SVG 源内携带描边契约，自定义线性图标可在
+  `ElIcon` 上显式使用 `variant="linear"`。
 - 图标按钮必须提供可访问名称，例如 `aria-label` 或可见文本。
 - 图标只用于识别动作或状态，不用于填充空白。
+
+### Foundation And Prose Boundary
+
+`reset.css` 只负责跨浏览器 normalization，不为原生 `h1`、`h2`、`ul` 或
+第三方内容注入品牌排版。负字距、标题圆点和编辑型列表 marker 仅在显式
+`.fsus-prose` 作用域内启用。Markdown、KaTeX、Mermaid、图表、Logo 和原生表单
+默认保持自己的 stroke、fill、字距、marker 与语义。
 
 ## 9. Documentation and Example Tone
 

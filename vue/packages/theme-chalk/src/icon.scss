@@ -42,4 +42,11 @@
     height: 1em;
     width: 1em;
   }
+
+  &.is-linear > svg,
+  &.is-linear > svg * {
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    paint-order: stroke fill;
+  }
 }

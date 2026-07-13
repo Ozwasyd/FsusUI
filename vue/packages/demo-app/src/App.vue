@@ -75,6 +75,7 @@ import { createDemoState, provideDemoState } from './demo-state'
 import BasicSection from './sections/BasicSection.vue'
 import DataSection from './sections/DataSection.vue'
 import FeedbackSection from './sections/FeedbackSection.vue'
+import FoundationBoundarySection from './sections/FoundationBoundarySection.vue'
 import FormSection from './sections/FormSection.vue'
 import IconsSection from './sections/IconsSection.vue'
 import IssuePrimitivesSection from './sections/IssuePrimitivesSection.vue'
@@ -138,6 +139,7 @@ const routeSections = new Map<string, DemoSection | { component: object }>([
     'markdown-stress',
     { component: markRaw(MarkdownStressSection) },
   ],
+  ['foundation-boundary', { component: markRaw(FoundationBoundarySection) }],
 ])
 
 const isDefaultGallery = computed(() => !props.mode)

@@ -1,0 +1,123 @@
+@use 'common/var' as *;
+
+.fsus-prose {
+  color: getCssVar('text-color', 'primary');
+  font-family:
+    'Google Sans', 'Helvetica Neue', Helvetica, 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+  font-size: getCssVar('font-size', 'base');
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+
+  a {
+    color: getCssVar('color', 'primary');
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+      color: getCssVar('color-primary', 'light-3');
+    }
+
+    &:active {
+      color: getCssVar('color-primary', 'dark-2');
+    }
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: getCssVar('text-color', 'primary');
+    font-weight: 700;
+    line-height: 1.2;
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  h1 {
+    margin-bottom: 2rem;
+    font-size: calc(getCssVar('font-size', 'extra-large') + 16px);
+    letter-spacing: -0.06em;
+
+    &::after {
+      margin-left: 4px;
+      color: getCssVar('color-info');
+      content: '.';
+    }
+  }
+
+  h2 {
+    margin-bottom: 1.5rem;
+    font-size: calc(getCssVar('font-size', 'extra-large') + 8px);
+    letter-spacing: -0.04em;
+  }
+
+  h3 {
+    font-size: calc(getCssVar('font-size', 'base') + 4px);
+  }
+
+  ul {
+    padding-left: 1.5rem;
+    list-style: none;
+
+    li {
+      position: relative;
+
+      &::before {
+        position: absolute;
+        top: 0.6em;
+        left: -1.2rem;
+        width: 4px;
+        height: 4px;
+        background-color: getCssVar('color-info');
+        border-radius: 50%;
+        content: '';
+      }
+    }
+  }
+
+  h4,
+  h5,
+  h6,
+  p {
+    font-size: inherit;
+  }
+
+  p {
+    line-height: 1.8;
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  sup,
+  sub {
+    font-size: calc(getCssVar('font-size', 'base') - 1px);
+  }
+
+  small {
+    font-size: calc(getCssVar('font-size', 'base') - 2px);
+  }
+
+  hr {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border: 0;
+    border-top: 1px solid getCssVar('border-color', 'lighter');
+  }
+}

@@ -57,10 +57,3 @@
     @include a11y-focus-ring(2px, 4px);
   }
 }
-
-svg {
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.2px;
-  paint-order: stroke fill;
-}

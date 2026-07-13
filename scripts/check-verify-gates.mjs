@@ -50,6 +50,12 @@ assert(
   'build:package-smoke must use the lightweight package smoke checker',
 )
 assert(
+  scripts['check:foundation-style-boundary']?.includes(
+    'scripts/check-foundation-style-boundary.mjs',
+  ),
+  'package.json must expose the foundation style boundary checker',
+)
+assert(
   !scripts['typecheck:affected']?.includes('pnpm run typecheck'),
   'typecheck:affected must not call full typecheck',
 )
@@ -65,6 +71,13 @@ assert(
     scripts['_verify:pr-fast:parallel']?.includes('icons:check') &&
     scripts['_verify:pr-fast:parallel']?.includes('build:package-smoke'),
   'PR-fast group must cover lint, affected typecheck/unit, tokens, icons, and package smoke',
+)
+assert(
+  scripts['_verify:pr-fast:parallel']?.includes(
+    'check:foundation-style-boundary',
+  ) &&
+    scripts['_verify:parallel']?.includes('check:foundation-style-boundary'),
+  'PR-fast and full verification must enforce the foundation style boundary',
 )
 assert(
   qualityWorkflow.includes('pnpm run verify:pr-fast') &&

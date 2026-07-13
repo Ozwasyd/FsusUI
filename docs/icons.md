@@ -22,6 +22,20 @@ or inline alignment:
 </template>
 ```
 
+FsusUI never applies stroke or fill rules to a bare `svg`. Generated line icons
+carry their stroke contract in the SVG source. For a consumer-owned line icon,
+opt into the scoped cap/join recipe on the `ElIcon` container; solid and
+third-party icons should omit the attribute.
+
+```vue
+<el-icon variant="linear">
+  <CustomLineIcon />
+</el-icon>
+```
+
+`variant="inherit"` is the default and leaves a slotted SVG's paint geometry
+untouched.
+
 Icon-only buttons must provide an accessible name:
 
 ```vue

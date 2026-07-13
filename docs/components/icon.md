@@ -2,7 +2,9 @@
 
 FsusUI 图标系统通过 `@ozwasyd/element-plus/icons-vue` 暴露 SVG 图标组件。导入、生成和命名稳定性策略见 [图标系统](../icons.md)。
 
-> 所有 SVG 图标全局强制继承 `stroke-linejoin="round"` 与 `stroke-linecap="round"`，呈现出如钢笔墨水洇开般的圆角边缘，符合 FsusUI「刚中有柔」的设计理念。
+生成的 FsusUI 线性图标在 SVG 源中携带 `stroke-linejoin="round"`、
+`stroke-linecap="round"` 与 token 化描边宽度。基础样式不会修改裸 `svg`；自定义
+线性图标需要通过 `<el-icon variant="linear">` 显式启用 scoped cap/join recipe。
 
 > 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看所有可用图标。
 
@@ -74,6 +76,7 @@ import { Edit } from '@ozwasyd/element-plus/icons-vue'
 | ------ | ------------------------ | ------------------ | ---------------------- |
 | color  | SVG 图标的 fill 颜色     | `string`           | 继承自父元素 color     |
 | size   | SVG 图标大小（宽高相等） | `number \| string` | 继承自父元素 font-size |
+| variant | SVG paint geometry scope | `'inherit' \| 'linear'` | `'inherit'` |
 
 ### Slots
 
