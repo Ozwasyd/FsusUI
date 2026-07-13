@@ -1568,7 +1568,11 @@ describe('Fsus theme visual baseline', () => {
         'align-items: center;',
       ])
       expectCssRule(css, '.el-public-shell__mobile-primary-actions', [
+        'position: relative;',
         'display: none;',
+      ])
+      expectCssRule(css, '.el-public-shell__mobile-nav-menu', [
+        'position: static;',
       ])
       expectCssRule(css, '.el-public-shell__mobile-toolbar', [
         'display: none;',
@@ -1584,11 +1588,22 @@ describe('Fsus theme visual baseline', () => {
       expectCssRule(css, '.el-public-shell__mobile-nav-menu-panel', [
         'position: absolute;',
         'display: grid;',
-        'min-width: min(18rem, 100vw - 32px);',
+        'width: min(14rem, 100vw - 24px);',
+        'grid-template-columns: minmax(0, 1fr);',
+        'gap: 0;',
       ])
       expectCssRule(css, '.el-public-shell__mobile-nav-link', [
-        'min-height: 44px;',
+        'width: 100%;',
+        'min-height: 40px;',
+        'justify-content: flex-start;',
+        'text-align: start;',
       ])
+      expectCssRule(css, '.el-public-shell__mobile-nav-menu-actions', [
+        'margin-top: 4px;',
+        'padding-top: 6px;',
+        'border-top: 1px solid var(--el-border-color-lighter);',
+      ])
+      expect(css).toContain('.el-public-shell__mobile-nav-menu-trigger::marker')
       expectCssRule(css, '.el-public-shell.is-mobile-nav-bottom', [
         'padding-bottom: calc(var(--fsus-bottom-tab-height, 56px) + env(safe-area-inset-bottom));',
       ])

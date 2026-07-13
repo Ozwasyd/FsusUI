@@ -270,6 +270,12 @@ describe('PublicShell.vue', () => {
     await details.trigger('toggle')
     expect(trigger.attributes('aria-expanded')).toBe('true')
     expect(details.find('[data-test="menu-actions"]').exists()).toBe(true)
+    expect(
+      details
+        .find('.el-public-shell__mobile-nav-menu-actions')
+        .find('[data-test="menu-actions"]')
+        .exists(),
+    ).toBe(true)
 
     await details.trigger('keydown', { key: 'Escape' })
     await nextTick()

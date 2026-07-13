@@ -117,7 +117,12 @@
             >
               {{ item.label }}
             </a>
-            <slot name="mobile-menu-actions" />
+            <div
+              v-if="$slots['mobile-menu-actions']"
+              :class="ns.e('mobile-nav-menu-actions')"
+            >
+              <slot name="mobile-menu-actions" />
+            </div>
           </nav>
         </details>
         <a
