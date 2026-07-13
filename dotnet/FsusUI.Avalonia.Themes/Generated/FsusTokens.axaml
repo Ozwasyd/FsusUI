@@ -35,6 +35,8 @@
   <FontFamily x:Key="FsusTypographyFamilyMonospace">ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace</FontFamily>
   <x:Double x:Key="FsusTypographyBodyMdLineHeight">22</x:Double>
   <FontWeight x:Key="FsusTypographyBodyMdWeight">400</FontWeight>
+  <FontWeight x:Key="FsusTypographyWeightMedium">500</FontWeight>
+  <FontWeight x:Key="FsusTypographyWeightBold">700</FontWeight>
   <x:Double x:Key="FsusTypographyHeadingLgSize">32</x:Double>
   <x:Double x:Key="FsusTypographyHeadingLgLineHeight">40</x:Double>
   <Thickness x:Key="FsusSpace1">4</Thickness>
@@ -63,13 +65,13 @@
   <x:Double x:Key="FsusIconSizeMd">16</x:Double>
   <x:Double x:Key="FsusIconStrokeMd">1.75</x:Double>
   <x:String x:Key="FsusIconFillDefault">currentColor</x:String>
-  <Thickness x:Key="FsusComponentButtonPaddingX">12</Thickness>
+  <Thickness x:Key="FsusComponentButtonPaddingX">16</Thickness>
   <CornerRadius x:Key="FsusComponentButtonRadius">6</CornerRadius>
   <x:Double x:Key="FsusComponentDialogMinWidth">360</x:Double>
   <x:Double x:Key="FsusComponentDialogMinHeight">220</x:Double>
-  <Thickness x:Key="FsusComponentDialogPadding">20</Thickness>
+  <Thickness x:Key="FsusComponentDialogPadding">24</Thickness>
   <Color x:Key="FsusComponentOverlayScrim">#99000000</Color>
   <SolidColorBrush x:Key="FsusComponentOverlayScrimBrush" Color="#99000000" />
-  <SolidColorBrush x:Key="FsusComponentStateButtonPrimaryBackgroundDefault" Color="#2A599C" />
-  <SolidColorBrush x:Key="FsusComponentStateButtonPrimaryBackgroundHover" Color="#244E89" />
+  <SolidColorBrush x:Key="FsusComponentStateButtonPrimaryBackgroundDefault" Color="#0F0F11" />
+  <SolidColorBrush x:Key="FsusComponentStateButtonPrimaryBackgroundHover" Color="#2A599C" />
 </ResourceDictionary>

@@ -21,6 +21,7 @@ const requiredSnapshotMetrics = [
   'wrapping',
   'ellipsis',
   'mixedLanguage',
+  'visualRegression',
 ]
 
 const read = (relativePath) =>
@@ -63,6 +64,7 @@ const validateBaseline = () => {
     'lineHeightStrategy',
     'measurementBaselines',
     'platformThresholds',
+    'fontWeights',
   ]) {
     assert(baseline[section], `${file} missing ${section}`)
   }
@@ -87,6 +89,26 @@ const validateBaseline = () => {
     'typography.family.monospace must match spec/typography/baseline.json',
   )
 
+  const stableWeights = baseline.fontWeights.stable
+  assert(
+    Array.isArray(stableWeights) && stableWeights.join(',') === '400,500,700',
+    `${file} fontWeights.stable must declare 400, 500, and 700`,
+  )
+  for (const [family, weights] of Object.entries(
+    baseline.fontWeights.bundledFamilies ?? {},
+  )) {
+    assert(
+      stableWeights.every((weight) => weights.includes(weight)),
+      `${file} bundled family ${family} must provide every stable weight`,
+    )
+  }
+  assert(
+    loadTokenValue('typography.body.md.weight') === String(stableWeights[0]) &&
+      loadTokenValue('typography.weight.medium') === String(stableWeights[1]) &&
+      loadTokenValue('typography.weight.bold') === String(stableWeights[2]),
+    'typography weight tokens must match the declared stable font weights',
+  )
+
   const caseIds = new Set(
     baseline.measurementBaselines.map((testCase) => testCase.id),
   )
@@ -107,6 +129,25 @@ const validateSnapshots = () => {
         snapshots[metric].cases.length > 0,
       `${file} ${metric} must contain cases`,
     )
+  }
+
+  const baseline = readJson('spec/typography/baseline.json')
+  const visualCases = snapshots.visualRegression.cases
+  for (const language of ['latin', 'cjk']) {
+    for (const theme of ['light', 'dark']) {
+      for (const weight of baseline.fontWeights.stable) {
+        assert(
+          visualCases.some(
+            (testCase) =>
+              testCase.language === language &&
+              testCase.theme === theme &&
+              testCase.weight === weight &&
+              testCase.fontSynthesis === 'none',
+          ),
+          `${file} missing ${language}/${theme}/${weight} real-weight visual fixture`,
+        )
+      }
+    }
   }
 }
 
@@ -192,11 +233,70 @@ const scanStableFontFamilies = () => {
   }
 }
 
+const walkFiles = (directory, extension, files = []) => {
+  for (const entry of fs.readdirSync(path.join(root, directory), {
+    withFileTypes: true,
+  })) {
+    const relativePath = path.join(directory, entry.name)
+    if (entry.isDirectory()) {
+      walkFiles(relativePath, extension, files)
+    } else if (entry.name.endsWith(extension)) {
+      files.push(relativePath)
+    }
+  }
+  return files
+}
+
+const scanStableFontWeights = () => {
+  const baseline = readJson('spec/typography/baseline.json')
+  const allowed = new Set(baseline.fontWeights.stable.map(String))
+  const files = [
+    ...walkFiles('vue/packages/theme-chalk/src', '.scss'),
+    'vue/packages/demo-app/src/style.css',
+  ]
+  const failures = []
+
+  for (const file of files) {
+    const content = read(file)
+    for (const match of content.matchAll(/font-weight\s*:\s*(\d{3})\s*;/g)) {
+      if (!allowed.has(match[1])) {
+        failures.push(`${file} uses unavailable font weight ${match[1]}`)
+      }
+    }
+  }
+
+  const demoEntry = read('vue/packages/demo-app/src/main.ts')
+  for (const [family, weights] of Object.entries(
+    baseline.fontWeights.bundledFamilies,
+  )) {
+    const slug = family.toLowerCase().replaceAll(' ', '-')
+    for (const weight of weights) {
+      assertIncludes(
+        demoEntry,
+        `@fontsource/${slug}/${weight}.css`,
+        'vue/packages/demo-app/src/main.ts',
+      )
+    }
+  }
+  assertIncludes(
+    read('vue/packages/demo-app/src/style.css'),
+    'font-synthesis: none;',
+    'vue/packages/demo-app/src/style.css',
+  )
+
+  if (failures.length) {
+    throw new Error(
+      `Typography font-weight check failed:\n${failures.join('\n')}`,
+    )
+  }
+}
+
 try {
   validateBaseline()
   validateSnapshots()
   validateGeneratedOutputs()
   scanStableFontFamilies()
+  scanStableFontWeights()
   console.log('typography baseline check passed')
 } catch (error) {
   console.error(error instanceof Error ? error.message : error)

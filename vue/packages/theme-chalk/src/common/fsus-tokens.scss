@@ -13,6 +13,10 @@
   --fsus-icon-size-md: #{generated.$fsus-icon-size-md};
   --fsus-icon-stroke-md: #{generated.$fsus-icon-stroke-md};
   --fsus-icon-fill-default: #{generated.$fsus-icon-fill-default};
+  --fsus-component-button-padding-x: #{generated.$fsus-component-button-padding-x};
+  --fsus-component-dialog-padding: #{generated.$fsus-component-dialog-padding};
+  --fsus-component-state-button-primary-background-default: #{generated.$fsus-component-state-button-primary-background-default};
+  --fsus-component-state-button-primary-background-hover: #{generated.$fsus-component-state-button-primary-background-hover};
 
   --fsus-ink: var(--fsus-color-text-primary);
   --fsus-paper: var(--fsus-color-surface-base);

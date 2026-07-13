@@ -1,7 +1,7 @@
 <ResourceDictionary
   xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-  <SolidColorBrush x:Key="FsusThemeBackgroundBrush" Color="#111827" />
+  <SolidColorBrush x:Key="FsusThemeBackgroundBrush" Color="#121214" />
   <SolidColorBrush x:Key="FsusThemeSurfaceBrush" Color="#171F2C" />
   <SolidColorBrush x:Key="FsusThemeSurfaceRaisedBrush" Color="#1F2937" />
   <SolidColorBrush x:Key="FsusThemePickerSurfaceBrush" Color="#1B2433" />
@@ -18,7 +18,7 @@
   <SolidColorBrush x:Key="FsusThemePublicShellSurfaceBrush" Color="#1B2433" />
   <SolidColorBrush x:Key="FsusThemeProductPrimitiveSurfaceBrush" Color="#1B2433" />
   <SolidColorBrush x:Key="FsusThemePerceptionChallengeSurfaceBrush" Color="#1B2433" />
-  <SolidColorBrush x:Key="FsusThemeTextBrush" Color="#F8FAFC" />
+  <SolidColorBrush x:Key="FsusThemeTextBrush" Color="#F0F0F4" />
   <SolidColorBrush x:Key="FsusThemeMutedTextBrush" Color="#B6C0CF" />
   <SolidColorBrush x:Key="FsusThemeBorderBrush" Color="#394657" />
   <SolidColorBrush x:Key="FsusThemeFocusBrush" Color="#7EA6DA" />

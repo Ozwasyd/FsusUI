@@ -4,7 +4,7 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <Style Selector="Button, fsus|FsusButton, fsus|FsusIconButton">
     <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
-    <Setter Property="Padding" Value="14,6" />
+    <Setter Property="Padding" Value="16,6" />
     <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
@@ -48,9 +48,14 @@
   </Style>
 
   <Style Selector="Button.fsus-primary, fsus|FsusButton.fsus-primary, fsus|FsusIconButton.fsus-primary">
-    <Setter Property="Background" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
-    <Setter Property="Foreground" Value="White" />
-    <Setter Property="BorderBrush" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+    <Setter Property="Background" Value="{DynamicResource FsusComponentStateButtonPrimaryBackgroundDefault}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeBackgroundBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusComponentStateButtonPrimaryBackgroundDefault}" />
+  </Style>
+
+  <Style Selector="Button.fsus-primary:pointerover, fsus|FsusButton.fsus-primary:pointerover, fsus|FsusIconButton.fsus-primary:pointerover">
+    <Setter Property="Background" Value="{DynamicResource FsusComponentStateButtonPrimaryBackgroundHover}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusComponentStateButtonPrimaryBackgroundHover}" />
   </Style>
 
   <Style Selector="Button.fsus-success, fsus|FsusButton.fsus-success, fsus|FsusIconButton.fsus-success">

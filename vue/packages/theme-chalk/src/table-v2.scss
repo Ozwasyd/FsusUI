@@ -148,7 +148,7 @@
       overflow: hidden;
       background-color: getCssVar('table-header', 'bg-color');
       color: getCssVar('table-header', 'text-color');
-      font-weight: 600;
+      font-weight: 500;
 
       @include when(sortable) {
         cursor: pointer;

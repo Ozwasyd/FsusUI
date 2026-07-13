@@ -133,7 +133,7 @@
     color: getCssVar('text-color', 'primary');
 
     th {
-      font-weight: 600;
+      font-weight: 500;
       background-color: getCssVar('bg-color', 'page') !important;
       border-bottom: 1px solid getCssVar('border-color', 'dark') !important;
     }

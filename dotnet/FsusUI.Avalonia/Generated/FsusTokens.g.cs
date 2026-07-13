@@ -149,6 +149,16 @@ public static class FsusTokens
     public const string TypographyBodyMdWeightValue = "400";
     public static FontWeight TypographyBodyMdWeightFontWeight => (FontWeight)400;
 
+    public const string TypographyWeightMediumName = "typography.weight.medium";
+    public const string TypographyWeightMediumResourceKey = "FsusTypographyWeightMedium";
+    public const string TypographyWeightMediumValue = "500";
+    public static FontWeight TypographyWeightMediumFontWeight => (FontWeight)500;
+
+    public const string TypographyWeightBoldName = "typography.weight.bold";
+    public const string TypographyWeightBoldResourceKey = "FsusTypographyWeightBold";
+    public const string TypographyWeightBoldValue = "700";
+    public static FontWeight TypographyWeightBoldFontWeight => (FontWeight)700;
+
     public const string TypographyHeadingLgSizeName = "typography.heading.lg.size";
     public const string TypographyHeadingLgSizeResourceKey = "FsusTypographyHeadingLgSize";
     public const string TypographyHeadingLgSizeValue = "32px";
@@ -290,8 +300,8 @@ public static class FsusTokens
 
     public const string ComponentButtonPaddingXName = "component.button.padding.x";
     public const string ComponentButtonPaddingXResourceKey = "FsusComponentButtonPaddingX";
-    public const string ComponentButtonPaddingXValue = "12px";
-    public static Thickness ComponentButtonPaddingXThickness => new(12d);
+    public const string ComponentButtonPaddingXValue = "16px";
+    public static Thickness ComponentButtonPaddingXThickness => new(16d);
 
     public const string ComponentButtonRadiusName = "component.button.radius";
     public const string ComponentButtonRadiusResourceKey = "FsusComponentButtonRadius";
@@ -310,8 +320,8 @@ public static class FsusTokens
 
     public const string ComponentDialogPaddingName = "component.dialog.padding";
     public const string ComponentDialogPaddingResourceKey = "FsusComponentDialogPadding";
-    public const string ComponentDialogPaddingValue = "20px";
-    public static Thickness ComponentDialogPaddingThickness => new(20d);
+    public const string ComponentDialogPaddingValue = "24px";
+    public static Thickness ComponentDialogPaddingThickness => new(24d);
 
     public const string ComponentOverlayScrimName = "component.overlay.scrim";
     public const string ComponentOverlayScrimResourceKey = "FsusComponentOverlayScrim";
@@ -322,12 +332,12 @@ public static class FsusTokens
 
     public const string ComponentStateButtonPrimaryBackgroundDefaultName = "component-state.button.primary.background.default";
     public const string ComponentStateButtonPrimaryBackgroundDefaultResourceKey = "FsusComponentStateButtonPrimaryBackgroundDefault";
-    public const string ComponentStateButtonPrimaryBackgroundDefaultValue = "#2A599C";
+    public const string ComponentStateButtonPrimaryBackgroundDefaultValue = "#0F0F11";
     public static SolidColorBrush ComponentStateButtonPrimaryBackgroundDefaultBrush => new(Color.Parse(ComponentStateButtonPrimaryBackgroundDefaultValue));
 
     public const string ComponentStateButtonPrimaryBackgroundHoverName = "component-state.button.primary.background.hover";
     public const string ComponentStateButtonPrimaryBackgroundHoverResourceKey = "FsusComponentStateButtonPrimaryBackgroundHover";
-    public const string ComponentStateButtonPrimaryBackgroundHoverValue = "#244E89";
+    public const string ComponentStateButtonPrimaryBackgroundHoverValue = "#2A599C";
     public static SolidColorBrush ComponentStateButtonPrimaryBackgroundHoverBrush => new(Color.Parse(ComponentStateButtonPrimaryBackgroundHoverValue));
 
 }

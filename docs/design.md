@@ -52,6 +52,9 @@ FsusUI 从 `Fsu's Blog.` 的句点中提取 **Punctuation Mark（标点）** 作
 - Latin and numbers: `Google Sans`
 - CJK: `Noto Sans CJK` / `Noto Sans SC`
 - Fallback: `PingFang SC`, `Microsoft YaHei`, `Helvetica Neue`, `Arial`, `sans-serif`
+- 稳定组件只使用真实提供的 `400`、`500`、`700` 字重；Demo 同时加载
+  Google Sans 与 Noto Sans SC 的这三个静态字重，并禁用缺失粗体合成。若未来采用
+  variable font，必须先登记其 family、axis 范围和加载产物。
 
 ### Layout Rules
 
@@ -485,15 +488,15 @@ Public / marketing surfaces ([§1 Scope Boundary](#scope-boundary)) 通常不会
 
 ## 12. Source of Truth
 
-- Theme token implementation: [`vue/packages/theme-chalk/src/common/fsus-tokens.scss`](../../vue/packages/theme-chalk/src/common/fsus-tokens.scss)
-- Element Plus compatibility variables: [`vue/packages/theme-chalk/src/common/var.scss`](../../vue/packages/theme-chalk/src/common/var.scss)
-- Platform-neutral token source: [`spec/tokens/tokens.json`](../../spec/tokens/tokens.json)
-- Public token stability: [`docs/theme/tokens.md`](../theme/tokens.md)
-- Public motion tokens: [`docs/theme/motion.md`](../theme/motion.md)
-- Element Plus 差异说明: [`docs/element-plus-integration.md`](../element-plus-integration.md)
-- 公共 API 边界: [`docs/api-stability.md`](../api-stability.md)
+优先级从高到低固定如下，低优先级文件不得反向覆盖高优先级值：
 
-新规则必须先在 [`spec/tokens/tokens.json`](../../spec/tokens/tokens.json) 中映射到现有 public token，或新增一个 token，再写进本文件。
+1. Platform-neutral canonical source: [`spec/tokens/tokens.json`](../spec/tokens/tokens.json)。
+2. Human-readable contract: 本文与 [`docs/theme/tokens.md`](./theme/tokens.md)，必须由一致性检查证明与 canonical source 对齐。
+3. Generated Web/Avalonia outputs：`vue/packages/theme-chalk/src/generated/`、`dotnet/**/Generated/` 与 generated token docs；禁止手工编辑。
+4. Platform overrides: [`spec/platform-overrides/`](../spec/platform-overrides/)，仅可登记无法消除的平台差异，且必须包含 reason、owner、test policy 和 `reviewAfter`。
+5. Compatibility adapters: `vue/packages/theme-chalk/src/common/fsus-tokens.scss` 与 `common/var.scss`，只能引用 canonical token 或登记过的 override。
+
+新规则必须先在 [`spec/tokens/tokens.json`](../spec/tokens/tokens.json) 中映射到现有 public token，或新增一个 token，再写进本文件。
 
 ## 13. Terminology
 

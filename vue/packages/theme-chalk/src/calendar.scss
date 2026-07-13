@@ -21,7 +21,7 @@
     color: getCssVar('text-color');
     align-self: center;
     min-width: 0;
-    font-weight: 600;
+    font-weight: 500;
   }
 
   @include e(button-group) {
@@ -47,7 +47,7 @@
       background: transparent;
       color: getCssVar('text-color', 'regular');
       box-shadow: none;
-      font-weight: 600;
+      font-weight: 500;
       transition:
         background-color var(--fsus-calendar-cell-duration, 180ms)
           var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),

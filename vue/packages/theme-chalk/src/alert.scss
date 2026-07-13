@@ -96,7 +96,7 @@
   @include e(title) {
     font-size: getCssVar('alert', 'title-font-size');
     line-height: 20px;
-    font-weight: 600;
+    font-weight: 500;
     color: getCssVar('text-color', 'primary');
 
     @include when(bold) {

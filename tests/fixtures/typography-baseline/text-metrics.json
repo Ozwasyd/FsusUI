@@ -49,5 +49,93 @@
         "expectedHeight": 22
       }
     ]
+  },
+  "visualRegression": {
+    "cases": [
+      {
+        "id": "latin-light-400",
+        "language": "latin",
+        "theme": "light",
+        "weight": 400,
+        "fontSynthesis": "none"
+      },
+      {
+        "id": "latin-light-500",
+        "language": "latin",
+        "theme": "light",
+        "weight": 500,
+        "fontSynthesis": "none"
+      },
+      {
+        "id": "latin-light-700",
+        "language": "latin",
+        "theme": "light",
+        "weight": 700,
+        "fontSynthesis": "none"
+      },
+      {
+        "id": "latin-dark-400",
+        "language": "latin",
+        "theme": "dark",
+        "weight": 400,
+        "fontSynthesis": "none"
+      },
+      {
+        "id": "latin-dark-500",
+        "language": "latin",
+        "theme": "dark",
+        "weight": 500,
+        "fontSynthesis": "none"
+      },
+      {
+        "id": "latin-dark-700",
+        "language": "latin",
+        "theme": "dark",
+        "weight": 700,
+        "fontSynthesis": "none"
+      },
+      {
+        "id": "cjk-light-400",
+        "language": "cjk",
+        "theme": "light",
+        "weight": 400,
+        "fontSynthesis": "none"
+      },
+      {
+        "id": "cjk-light-500",
+        "language": "cjk",
+        "theme": "light",
+        "weight": 500,
+        "fontSynthesis": "none"
+      },
+      {
+        "id": "cjk-light-700",
+        "language": "cjk",
+        "theme": "light",
+        "weight": 700,
+        "fontSynthesis": "none"
+      },
+      {
+        "id": "cjk-dark-400",
+        "language": "cjk",
+        "theme": "dark",
+        "weight": 400,
+        "fontSynthesis": "none"
+      },
+      {
+        "id": "cjk-dark-500",
+        "language": "cjk",
+        "theme": "dark",
+        "weight": 500,
+        "fontSynthesis": "none"
+      },
+      {
+        "id": "cjk-dark-700",
+        "language": "cjk",
+        "theme": "dark",
+        "weight": 700,
+        "fontSynthesis": "none"
+      }
+    ]
   }
 }

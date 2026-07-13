@@ -21,6 +21,8 @@
   --fsus-typography-family-monospace: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
   --fsus-typography-body-md-line-height: 22px;
   --fsus-typography-body-md-weight: 400;
+  --fsus-typography-weight-medium: 500;
+  --fsus-typography-weight-bold: 700;
   --fsus-typography-heading-lg-size: 32px;
   --fsus-typography-heading-lg-line-height: 40px;
   --fsus-space-1: 4px;
@@ -54,24 +56,32 @@
   --fsus-icon-size-md: 16px;
   --fsus-icon-stroke-md: 1.75;
   --fsus-icon-fill-default: currentColor;
-  --fsus-component-button-padding-x: 12px;
+  --fsus-component-button-padding-x: 16px;
   --fsus-component-button-radius: 6px;
   --fsus-component-dialog-min-width: 360px;
   --fsus-component-dialog-min-height: 220px;
-  --fsus-component-dialog-padding: 20px;
+  --fsus-component-dialog-padding: 24px;
   --fsus-component-overlay-scrim: #99000000;
-  --fsus-component-state-button-primary-background-default: #2A599C;
-  --fsus-component-state-button-primary-background-hover: #244E89;
+  --fsus-component-state-button-primary-background-default: #0F0F11;
+  --fsus-component-state-button-primary-background-hover: #2A599C;
 }
 
 [data-fsus-theme="dark"] {
-  --fsus-color-text-primary: #F8FAFC;
-  --fsus-color-surface-base: #111827;
+  --fsus-color-action-primary: #4B79CC;
+  --fsus-color-action-primary-hover: #6F93D7;
+  --fsus-color-text-primary: #F0F0F4;
+  --fsus-color-surface-base: #121214;
+  --fsus-component-state-button-primary-background-default: #F0F0F4;
+  --fsus-component-state-button-primary-background-hover: #4B79CC;
 }
 
 [data-fsus-theme="high-contrast"] {
+  --fsus-color-action-primary: #FFFF00;
+  --fsus-color-action-primary-hover: #FFFF00;
   --fsus-color-text-primary: #FFFFFF;
   --fsus-color-surface-base: #000000;
+  --fsus-component-state-button-primary-background-default: #FFFFFF;
+  --fsus-component-state-button-primary-background-hover: #FFFF00;
 }
 
 [data-fsus-density="compact"] {

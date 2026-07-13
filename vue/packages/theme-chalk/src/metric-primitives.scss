@@ -46,7 +46,7 @@
     color: getCssVar('text-color', 'primary');
     font-size: 17px;
     font-variant-numeric: tabular-nums;
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1.3;
     letter-spacing: 0;
     overflow-wrap: anywhere;
@@ -210,7 +210,7 @@
     color: getCssVar('text-color', 'primary');
     font-size: 13px;
     font-variant-numeric: tabular-nums;
-    font-weight: 750;
+    font-weight: 700;
     line-height: 1.45;
     overflow-wrap: anywhere;
 
@@ -272,7 +272,7 @@
   @include e(label) {
     color: getCssVar('text-color', 'primary');
     font-size: 14px;
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1.4;
     overflow-wrap: anywhere;
   }
@@ -367,7 +367,7 @@
   @include e(title) {
     color: getCssVar('text-color', 'primary');
     font-size: 13px;
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1.45;
     overflow-wrap: anywhere;
   }

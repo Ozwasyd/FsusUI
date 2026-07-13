@@ -42,7 +42,10 @@ const assertTableRow = (content, cells, file) => {
     `${cells.map((cell) => String.raw`\|\s*${escapeRegExp(cell)}\s*`).join('')}\\|`,
     'u',
   )
-  assert(pattern.test(content), `${file} must include table row ${cells.join(' | ')}`)
+  assert(
+    pattern.test(content),
+    `${file} must include table row ${cells.join(' | ')}`,
+  )
 }
 
 try {
@@ -56,6 +59,11 @@ try {
 
   const actionPrimary = token('color.action.primary')
   assertEquals(actionPrimary.value, '#2A599C', 'Scholarly Blue token drift')
+  assertEquals(
+    actionPrimary.modeValues?.dark?.value,
+    '#4B79CC',
+    'Dark Scholarly Blue token drift',
+  )
   assert(
     !actionPrimary.aliases?.includes('--el-color-primary'),
     'color.action.primary must not alias --el-color-primary',
@@ -65,6 +73,16 @@ try {
     'color.action.primary must alias --fsus-scholarly-blue',
   )
   assertEquals(token('color.text.primary').value, '#0F0F11', 'Ink token drift')
+  assertEquals(
+    token('color.text.primary').modeValues?.dark?.value,
+    '#F0F0F4',
+    'Dark Ink token drift',
+  )
+  assertEquals(
+    token('color.surface.base').modeValues?.dark?.value,
+    '#121214',
+    'Dark Paper token drift',
+  )
   assertEquals(
     token('color.surface.raised').value,
     '#F7F7F8',
@@ -100,6 +118,26 @@ try {
     '40px',
     'Compact control density token drift',
   )
+  assertEquals(
+    token('component.button.padding.x').value,
+    '{space.4}',
+    'Button padding token drift',
+  )
+  assertEquals(
+    token('component.dialog.padding').value,
+    '24px',
+    'Dialog padding token drift',
+  )
+  assertEquals(
+    token('component-state.button.primary.background.default').value,
+    '{color.text.primary}',
+    'Primary Button must use Ink',
+  )
+  assertEquals(
+    token('component-state.button.primary.background.hover').value,
+    '{color.action.primary}',
+    'Primary Button hover must use Scholarly Blue',
+  )
 
   const design = read('docs/design.md')
   for (const row of [
@@ -117,6 +155,8 @@ try {
   for (const expected of [
     'glass/SaaS-first',
     '--fsus-shadow-panel: none',
+    'Platform-neutral canonical source',
+    '`400`、`500`、`700`',
   ]) {
     assertIncludes(design, expected, 'docs/design.md')
   }
@@ -167,7 +207,9 @@ try {
     'docs/api/web-contract-mapping.md',
   )
 
-  const runtimeTokens = read('vue/packages/theme-chalk/src/common/fsus-tokens.scss')
+  const runtimeTokens = read(
+    'vue/packages/theme-chalk/src/common/fsus-tokens.scss',
+  )
   for (const expected of [
     '--el-color-primary: var(--fsus-ink);',
     '--fsus-radius-control: 6px;',
@@ -176,6 +218,8 @@ try {
     '--fsus-radius-popover: 10px;',
     '--fsus-backdrop-blur: 0px;',
     '--fsus-shadow-panel: none;',
+    '--fsus-component-button-padding-x: #{generated.$fsus-component-button-padding-x};',
+    '--fsus-component-dialog-padding: #{generated.$fsus-component-dialog-padding};',
   ]) {
     assertIncludes(
       runtimeTokens,
@@ -195,6 +239,70 @@ try {
     '--el-color-primary: var(--fsus-color-action-primary);',
     'vue/packages/theme-chalk/src/generated/tokens.css',
   )
+  for (const expected of [
+    '--fsus-component-button-padding-x: 16px;',
+    '--fsus-component-dialog-padding: 24px;',
+    '--fsus-component-state-button-primary-background-default: #0F0F11;',
+    '--fsus-color-surface-base: #121214;',
+    '--fsus-component-state-button-primary-background-default: #F0F0F4;',
+  ]) {
+    assertIncludes(
+      generatedCss,
+      expected,
+      'vue/packages/theme-chalk/src/generated/tokens.css',
+    )
+  }
+
+  const webTheme = read('vue/packages/theme-chalk/src/fsus-theme.scss')
+  for (const expected of [
+    'padding: 0 var(--fsus-component-button-padding-x);',
+    'background: var(--fsus-component-state-button-primary-background-default);',
+    'background: var(--fsus-component-state-button-primary-background-hover);',
+  ]) {
+    assertIncludes(
+      webTheme,
+      expected,
+      'vue/packages/theme-chalk/src/fsus-theme.scss',
+    )
+  }
+
+  const avaloniaTokens = read(
+    'dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml',
+  )
+  for (const expected of [
+    '<Thickness x:Key="FsusComponentButtonPaddingX">16</Thickness>',
+    '<Thickness x:Key="FsusComponentDialogPadding">24</Thickness>',
+    '<SolidColorBrush x:Key="FsusComponentStateButtonPrimaryBackgroundDefault" Color="#0F0F11" />',
+  ]) {
+    assertIncludes(
+      avaloniaTokens,
+      expected,
+      'dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml',
+    )
+  }
+
+  const avaloniaDark = read(
+    'dotnet/FsusUI.Avalonia.Themes/Themes/FsusDark.axaml',
+  )
+  assertIncludes(
+    avaloniaDark,
+    'x:Key="FsusThemeBackgroundBrush" Color="#121214"',
+    'dotnet/FsusUI.Avalonia.Themes/Themes/FsusDark.axaml',
+  )
+  const avaloniaButton = read(
+    'dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Button.axaml',
+  )
+  for (const expected of [
+    'Property="Padding" Value="16,6"',
+    'FsusComponentStateButtonPrimaryBackgroundDefault',
+    'FsusComponentStateButtonPrimaryBackgroundHover',
+  ]) {
+    assertIncludes(
+      avaloniaButton,
+      expected,
+      'dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Button.axaml',
+    )
+  }
 
   console.log('design-source-drift check passed')
 } catch (error) {

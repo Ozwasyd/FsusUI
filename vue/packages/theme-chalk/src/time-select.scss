@@ -33,6 +33,6 @@
   .time-select-item.selected:not(.disabled) {
     color: getCssVar('color', 'scholarly-blue');
     background-color: var(--fsus-state-selected-bg);
-    font-weight: 600;
+    font-weight: 500;
   }
 }

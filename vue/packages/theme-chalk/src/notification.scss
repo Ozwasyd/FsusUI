@@ -41,7 +41,7 @@
   }
 
   @include e(title) {
-    font-weight: 600;
+    font-weight: 500;
     font-size: getCssVar('notification-title-font-size');
     line-height: getCssVar('notification-icon-size');
     color: getCssVar('notification-title-color');

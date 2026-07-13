@@ -2,6 +2,33 @@
   --demo-app-version: '2.0-REWRITE';
   font-family: var(--el-font-family, sans-serif);
   color-scheme: light dark;
+  font-synthesis: none;
+}
+
+.demo-typography-fixture {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--fsus-space-3, 12px);
+}
+
+.demo-typography-fixture > span {
+  padding: var(--fsus-space-3, 12px);
+  border: 1px solid var(--el-border-color);
+  border-radius: var(--fsus-radius-control);
+  background: var(--el-bg-color);
+  line-height: 22px;
+}
+
+.demo-font-weight-400 {
+  font-weight: 400;
+}
+
+.demo-font-weight-500 {
+  font-weight: 500;
+}
+
+.demo-font-weight-700 {
+  font-weight: 700;
 }
 
 body {
@@ -587,7 +614,7 @@ body {
   margin: 0;
   color: var(--el-text-color-regular);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .audit-grid {

@@ -81,3 +81,15 @@ Mappings are generated mechanically:
 
 Compatibility aliases such as `--el-color-primary` are allowed only when they
 point back to platform-neutral source tokens.
+
+## Source Precedence
+
+1. `spec/tokens/tokens.json` is the canonical platform-neutral source.
+2. `docs/design.md` and `docs/theme/tokens.md` are checked human-readable contracts.
+3. Web CSS/SCSS/JSON, Avalonia XAML/C#, generated docs, and hashes are generated artifacts.
+4. `spec/platform-overrides/*.yaml` may record only unavoidable differences and must include reason, owner, test policy, and review date.
+5. Platform adapters and compatibility aliases consume the preceding layers; they never redefine them.
+
+Typography availability is canonical in `spec/typography/baseline.json`.
+Stable component styles may use only its `fontWeights.stable` values unless a
+declared variable font supplies the requested axis.

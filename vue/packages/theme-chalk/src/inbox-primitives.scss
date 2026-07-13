@@ -144,7 +144,7 @@
     min-width: 0;
     color: getCssVar('text-color-primary');
     font-size: getCssVar('font-size-base');
-    font-weight: 750;
+    font-weight: 700;
     line-height: 1.35;
     overflow-wrap: anywhere;
   }
@@ -197,7 +197,7 @@
     background: var(--fsus-badge-emphasis-bg, var(--fsus-scholarly-blue));
     color: var(--fsus-badge-emphasis-text, var(--fsus-color-surface-base));
     font-size: 11px;
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1;
   }
 
@@ -242,7 +242,7 @@
     margin: 0;
     color: getCssVar('text-color-primary');
     font-size: 18px;
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1.35;
     overflow-wrap: anywhere;
   }
@@ -329,7 +329,7 @@
 
   @include e(author) {
     color: getCssVar('text-color-regular');
-    font-weight: 750;
+    font-weight: 700;
   }
 
   @include e(time) {
@@ -413,7 +413,7 @@
     display: block;
     color: getCssVar('text-color-primary');
     font-size: getCssVar('font-size-small');
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1.4;
     overflow-wrap: anywhere;
   }
@@ -458,7 +458,7 @@
     @include e(title) {
       color: getCssVar('text-color-primary');
       font-size: getCssVar('font-size-base');
-      font-weight: 800;
+      font-weight: 700;
       line-height: 1.35;
       overflow-wrap: anywhere;
     }

@@ -65,6 +65,17 @@ The platform-neutral token source is
 references, aliases, and generated-file metadata. Web and Avalonia consumers
 must use the generated artifacts rather than manually mirroring token values.
 
+The precedence is canonical spec → checked design documentation → generated
+Web/Avalonia output → registered platform override → compatibility adapter.
+Generated files never become a source of truth. Every platform difference must
+be recorded under `spec/platform-overrides/` with a reason, owner, test policy,
+and review date.
+
+Stable typography uses only the bundled `400`, `500`, and `700` faces declared
+in `spec/typography/baseline.json`. The demo loads those exact weights for both
+Google Sans and Noto Sans SC; stable component CSS may not request an
+undeclared weight or rely on browser synthesis.
+
 ```css
 :root {
   --el-color-primary: var(--fsus-ink);

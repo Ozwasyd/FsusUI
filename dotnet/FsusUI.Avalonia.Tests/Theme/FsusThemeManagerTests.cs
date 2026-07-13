@@ -12,6 +12,8 @@ public class FsusThemeManagerTests
   public void ApplyUsesHighContrastThenAccentDensityAndMotionOverrides()
   {
     var resources = new ResourceDictionary();
+    resources[FsusTokens.ComponentStateButtonPrimaryBackgroundDefaultResourceKey] =
+      FsusTokens.ComponentStateButtonPrimaryBackgroundDefaultBrush;
     var manager = new FsusThemeManager();
 
     var resolved = manager.Apply(
@@ -32,6 +34,16 @@ public class FsusThemeManagerTests
     Assert.Equal(FsusMotionMode.Disabled, resolved.MotionMode);
     AssertBrush(resources, FsusThemeResourceKeys.BackgroundBrush, "#000000");
     AssertBrush(resources, FsusThemeResourceKeys.FocusBrush, "#FF00AA");
+    AssertBrush(
+      resources,
+      FsusTokens.ComponentStateButtonPrimaryBackgroundDefaultResourceKey,
+      "#FFFFFF"
+    );
+    AssertBrush(
+      resources,
+      FsusTokens.ComponentStateButtonPrimaryBackgroundHoverResourceKey,
+      "#FF00AA"
+    );
     Assert.Equal(40d, resources[FsusThemeResourceKeys.DensityControlDefaultY]);
     Assert.Equal(
       TimeSpan.FromMilliseconds(1),

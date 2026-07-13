@@ -80,7 +80,7 @@
     color: getCssVar('text-color', 'primary');
 
     &.confirm {
-      font-weight: 800;
+      font-weight: 700;
       color: var(
         #{getCssVarName('timepicker-active-color')},
         #{getCssVar('color-primary')}

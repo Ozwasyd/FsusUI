@@ -27,6 +27,15 @@
     }
   },
   "allowedAliases": ["Helvetica", "微软雅黑"],
+  "fontWeights": {
+    "policy": "Stable components may use only weights backed by every bundled primary Latin and Simplified Chinese family. Browser synthesis is disabled for the demo regression fixture.",
+    "stable": [400, 500, 700],
+    "bundledFamilies": {
+      "Google Sans": [400, 500, 700],
+      "Noto Sans SC": [400, 500, 700]
+    },
+    "variableFonts": []
+  },
   "fallbackBehavior": {
     "applicationFonts": "Application-provided families are prepended by FsusThemeManager and must fall back to the stable body or monospace stack.",
     "systemFallback": "When no application font is supplied, Web uses the CSS stack and Avalonia uses FontFamily.Parse over the same ordered family list.",

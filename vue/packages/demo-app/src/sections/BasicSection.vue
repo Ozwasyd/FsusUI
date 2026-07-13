@@ -42,6 +42,14 @@
         <el-text truncated style="width: 100px">Truncated text content</el-text>
       </el-space>
     </div>
+    <div class="demo-block" data-testid="typography-real-weight-fixture">
+      <h3>Real font weights · 真实字重</h3>
+      <div class="demo-typography-fixture">
+        <span class="demo-font-weight-400">Latin 400 · 中文正文</span>
+        <span class="demo-font-weight-500">Latin 500 · 中文强调</span>
+        <span class="demo-font-weight-700">Latin 700 · 中文标题</span>
+      </div>
+    </div>
     <div class="demo-block">
       <h3>Icon</h3>
       <el-space>

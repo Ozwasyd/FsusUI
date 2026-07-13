@@ -307,9 +307,9 @@ html.dark {
   background: transparent;
   color: var(--el-text-color-primary);
   min-height: 44px;
-  padding: 0 16px;
+  padding: 0 var(--fsus-component-button-padding-x);
   box-shadow: none;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.01em;
 
   &:hover,
@@ -340,14 +340,14 @@ html.dark {
 }
 
 .#{$namespace}-button--primary {
-  background: var(--el-color-primary);
-  border-color: var(--el-color-primary);
+  background: var(--fsus-component-state-button-primary-background-default);
+  border-color: var(--fsus-component-state-button-primary-background-default);
   color: var(--el-bg-color);
 
   &:hover,
   &:focus {
-    background: var(--fsus-scholarly-blue);
-    border-color: var(--fsus-scholarly-blue);
+    background: var(--fsus-component-state-button-primary-background-hover);
+    border-color: var(--fsus-component-state-button-primary-background-hover);
     color: #ffffff;
   }
 }
@@ -823,7 +823,7 @@ html.dark .#{$namespace}-switch__action {
 
 .#{$namespace}-alert__title,
 .#{$namespace}-notification__title {
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .#{$namespace}-alert__description,
@@ -916,7 +916,7 @@ html.dark .#{$namespace}-switch__action {
 .#{$namespace}-collapse-item__header {
   min-height: 52px;
   color: var(--el-text-color-primary);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .#{$namespace}-collapse-item__content,
@@ -1096,7 +1096,7 @@ button.#{$namespace}-card:active {
 .#{$namespace}-check-tag {
   color: var(--el-text-color-regular);
   font-size: 11px;
-  font-weight: 650;
+  font-weight: 700;
   letter-spacing: 0;
   text-transform: none;
   background: rgba(161, 161, 170, 0.06);
@@ -1806,7 +1806,7 @@ button.#{$namespace}-card:active {
   padding: 0 12px;
   border-radius: var(--el-border-radius-base);
   color: var(--el-text-color-regular);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .#{$namespace}-time-panel__btn:hover {

@@ -83,6 +83,7 @@ public sealed class FsusThemeManager
       "#6B7280",
       "#D9DEE8",
       "#2A599C",
+      "#2A599C",
       "#D92D20",
       "#F1F5F9",
       "#E8EEF7",
@@ -91,13 +92,14 @@ public sealed class FsusThemeManager
 
   private static readonly ThemePalette DarkPalette =
     new(
-      "#111827",
+      "#121214",
       "#171F2C",
       "#1F2937",
-      "#F8FAFC",
+      "#F0F0F4",
       "#B6C0CF",
       "#394657",
       "#7EA6DA",
+      "#4B79CC",
       "#F97066",
       "#202A38",
       "#243043",
@@ -112,6 +114,7 @@ public sealed class FsusThemeManager
       "#FFFFFF",
       "#FDE68A",
       "#FFFFFF",
+      "#FFFF00",
       "#FFFF00",
       "#FF6B6B",
       "#1F2937",
@@ -183,6 +186,14 @@ public sealed class FsusThemeManager
     SetBrush(resources, FsusThemeResourceKeys.MutedTextBrush, palette.MutedText);
     SetBrush(resources, FsusThemeResourceKeys.BorderBrush, palette.Border);
     SetBrush(resources, FsusThemeResourceKeys.FocusBrush, palette.Focus);
+    SetBrush(
+      resources,
+      FsusTokens.ComponentStateButtonPrimaryBackgroundDefaultResourceKey,
+      palette.Text);
+    SetBrush(
+      resources,
+      FsusTokens.ComponentStateButtonPrimaryBackgroundHoverResourceKey,
+      palette.PrimaryHover);
     SetBrush(resources, FsusThemeResourceKeys.DangerBrush, palette.Danger);
     SetBrush(
       resources,
@@ -204,7 +215,7 @@ public sealed class FsusThemeManager
     resources[FsusThemeResourceKeys.FocusBrush] = brush;
     resources[FsusTokens.ColorActionPrimaryBrushResourceKey] = brush;
     resources[FsusTokens.ColorFocusRingBrushResourceKey] = brush;
-    resources[FsusTokens.ComponentStateButtonPrimaryBackgroundDefaultResourceKey] = brush;
+    resources[FsusTokens.ComponentStateButtonPrimaryBackgroundHoverResourceKey] = brush;
   }
 
   private static void ApplyDensity(IResourceDictionary resources, FsusDensity density)
@@ -292,6 +303,7 @@ public sealed class FsusThemeManager
     string MutedText,
     string Border,
     string Focus,
+    string PrimaryHover,
     string Danger,
     string DisabledSurface,
     string Loading,

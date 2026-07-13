@@ -82,7 +82,17 @@ public class FsusPublicShellPrimitiveTests
     Assert.Equal(FsusThemeMode.Dark, toggle.CurrentMode);
     Assert.Equal(FsusThemeVariant.Dark, manager.CurrentOptions.Variant);
     Assert.False(manager.CurrentOptions.FollowSystemTheme);
-    AssertBrush(resources, FsusThemeResourceKeys.BackgroundBrush, "#111827");
+    AssertBrush(resources, FsusThemeResourceKeys.BackgroundBrush, "#121214");
+    AssertBrush(
+      resources,
+      FsusTokens.ComponentStateButtonPrimaryBackgroundDefaultResourceKey,
+      "#F0F0F4"
+    );
+    AssertBrush(
+      resources,
+      FsusTokens.ComponentStateButtonPrimaryBackgroundHoverResourceKey,
+      "#4B79CC"
+    );
     Assert.Equal(["浅", "深", "系统"], toggle.VisibleLabels);
     Assert.Equal([FsusThemeMode.Dark], changes);
     Assert.Equal(AutomationControlType.Group, AutomationProperties.GetControlTypeOverride(toggle));
