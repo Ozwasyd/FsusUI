@@ -2,9 +2,13 @@
   <div
     :class="shellKls"
     :style="shellStyle"
-    v-bind="{ 'data-public-hydration-kind': hydrationKind || undefined }"
+    v-bind="{
+      'data-public-hydration-kind': hydrationKind || undefined,
+      'data-mobile-nav-mode': mobileNavMode,
+    }"
   >
     <el-site-header
+      data-public-shell-header
       :class="headerKls"
       :sticky="sticky"
       :max-width="maxWidth"
@@ -13,7 +17,7 @@
       :brand-nav-class="ns.e('brand-nav')"
       :desktop-actions-class="ns.e('actions')"
       :mobile-primary-actions-class="ns.e('mobile-primary-actions')"
-      :mobile-secondary-actions-class="ns.e('mobile-toolbar')"
+      :mobile-secondary-actions-class="mobileToolbarKls"
     >
       <template #brand>
         <a
@@ -32,6 +36,7 @@
             :key="item.key"
             :href="item.href"
             :class="navLinkKls(item.key)"
+            :aria-current="item.key === activeNav ? 'page' : undefined"
             v-bind="{ 'data-public-nav': item.key }"
           >
             {{ item.label }}
@@ -85,10 +90,40 @@
       </template>
 
       <template #mobile-primary-actions>
-        <button
+        <details
+          v-if="showMobileMenu"
+          ref="mobileNavMenuRef"
+          :class="ns.e('mobile-nav-menu')"
+          @toggle="handleMobileNavMenuToggle"
+          @keydown.esc="handleMobileNavMenuEscape"
+        >
+          <summary
+            ref="mobileNavMenuTriggerRef"
+            :class="ns.e('mobile-nav-menu-trigger')"
+            :aria-expanded="mobileNavMenuExpanded"
+            v-bind="{ 'data-mobile-nav-menu-trigger': '' }"
+          >
+            {{ mobileNavMenuLabel }}
+          </summary>
+          <nav :class="ns.e('mobile-nav-menu-panel')" :aria-label="mobileNavLabel">
+            <a
+              v-for="item in navItems"
+              :key="item.key"
+              :href="item.href"
+              :class="mobileNavLinkKls(item.key)"
+              :aria-current="item.key === activeNav ? 'page' : undefined"
+              v-bind="{ 'data-public-nav': item.key }"
+              @click="closeMobileNavMenu"
+            >
+              {{ item.label }}
+            </a>
+            <slot name="mobile-menu-actions" />
+          </nav>
+        </details>
+        <a
           v-if="showMobileSearchTrigger"
           ref="mobileSearchTriggerRef"
-          type="button"
+          :href="searchAction"
           :class="[
             ns.e('mobile-search-trigger'),
             ns.is('expanded', mobileSearchExpanded),
@@ -96,10 +131,10 @@
           :aria-expanded="mobileSearchExpanded"
           :aria-controls="mobileSearchRowId"
           :aria-label="mobileSearchButtonLabel"
-          @click="toggleMobileSearch"
+          @click="handleMobileSearchTrigger"
         >
           {{ mobileSearchButtonLabel }}
-        </button>
+        </a>
         <slot name="mobile-primary-actions" />
         <a
           v-if="hasAuthLink"
@@ -116,6 +151,22 @@
       </template>
 
       <template #mobile-secondary-actions>
+        <nav
+          v-if="showMobileInlineNav"
+          :class="[ns.e('mobile-nav'), ns.em('mobile-nav', 'inline')]"
+          :aria-label="mobileNavLabel"
+        >
+          <a
+            v-for="item in navItems"
+            :key="item.key"
+            :href="item.href"
+            :class="mobileNavLinkKls(item.key)"
+            :aria-current="item.key === activeNav ? 'page' : undefined"
+            v-bind="{ 'data-public-nav': item.key }"
+          >
+            {{ item.label }}
+          </a>
+        </nav>
         <Transition name="el-public-shell-mobile-search">
           <div
             v-if="showMobileSearchTrigger"
@@ -194,11 +245,11 @@
     </el-site-header>
 
     <FsuBottomTabBar
-      v-if="navItems.length > 0"
+      v-if="showMobileBottomNav"
       :class="ns.e('bottom-tab')"
       :items="navItems"
       :active-key="activeNav"
-      label="Primary navigation"
+      :label="mobileNavLabel"
     />
 
     <main :class="ns.e('main')">
@@ -216,7 +267,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useSlots, watch } from 'vue'
 import { ElInput } from '@element-plus/components/input'
 import { ElSiteHeader } from '@element-plus/components/site-header'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
@@ -232,13 +283,17 @@ defineOptions({
 
 const props = defineProps(publicShellProps)
 const emit = defineEmits(publicShellEmits)
+const slots = useSlots()
 
 const ns = useNamespace('public-shell')
 const searchValue = ref(props.searchQuery)
 const mobileSearchRowId = useId().value
 const mobileSearchRowRef = ref<HTMLElement>()
-const mobileSearchTriggerRef = ref<HTMLButtonElement>()
+const mobileSearchTriggerRef = ref<HTMLAnchorElement>()
 const desktopNavRef = ref<HTMLElement>()
+const mobileNavMenuRef = ref<HTMLDetailsElement>()
+const mobileNavMenuTriggerRef = ref<HTMLElement>()
+const mobileNavMenuExpanded = ref(false)
 const mobileSearchExpanded = ref(
   props.mobileSearchMode === 'trigger' && props.searchQuery.trim().length > 0,
 )
@@ -247,10 +302,17 @@ watch(
   () => props.searchQuery,
   (value) => {
     searchValue.value = value
+    if (props.mobileSearchMode === 'trigger' && value.trim().length > 0) {
+      mobileSearchExpanded.value = true
+    }
   },
 )
 
-const shellKls = computed(() => [ns.b(), ns.is('sticky', props.sticky)])
+const shellKls = computed(() => [
+  ns.b(),
+  ns.is('sticky', props.sticky),
+  ns.is(`mobile-nav-${props.mobileNavMode}`),
+])
 const headerKls = computed(() => [
   ns.e('header'),
   ns.is('sticky', props.sticky),
@@ -260,6 +322,26 @@ const showMobileSearchTrigger = computed(
 )
 const showMobileInlineSearch = computed(
   () => props.showSearch && props.mobileSearchMode === 'inline',
+)
+const hasMobileNavItems = computed(() => props.navItems.length > 0)
+const showMobileInlineNav = computed(
+  () => hasMobileNavItems.value && props.mobileNavMode === 'inline',
+)
+const mobileToolbarKls = computed(() => [
+  ns.e('mobile-toolbar'),
+  ns.is(
+    'collapsed',
+    showMobileSearchTrigger.value
+      && !mobileSearchExpanded.value
+      && !showMobileInlineNav.value
+      && !slots['mobile-actions'],
+  ),
+])
+const showMobileMenu = computed(
+  () => hasMobileNavItems.value && props.mobileNavMode === 'menu',
+)
+const showMobileBottomNav = computed(
+  () => hasMobileNavItems.value && props.mobileNavMode === 'bottom',
 )
 const hasAuthLink = computed(() => Boolean(props.authLabel && props.authHref))
 const mobileSearchTriggerText = computed(
@@ -286,6 +368,10 @@ const shellStyle = computed<CSSProperties>(() => ({
 
 const navLinkKls = (key: string) => [
   ns.e('nav-link'),
+  ns.is('active', key === props.activeNav),
+]
+const mobileNavLinkKls = (key: string) => [
+  ns.e('mobile-nav-link'),
   ns.is('active', key === props.activeNav),
 ]
 const navKls = (element: 'desktop-nav') => [
@@ -393,9 +479,42 @@ const toggleMobileSearch = () => {
   openMobileSearch()
 }
 
+const isModifiedClick = (event: MouseEvent) =>
+  event.defaultPrevented
+  || event.button !== 0
+  || event.metaKey
+  || event.ctrlKey
+  || event.shiftKey
+  || event.altKey
+
+const handleMobileSearchTrigger = (event: MouseEvent) => {
+  if (isModifiedClick(event)) return
+  event.preventDefault()
+  toggleMobileSearch()
+}
+
 const handleMobileSearchEscape = (event: KeyboardEvent) => {
   event.preventDefault()
   closeMobileSearch(true)
+}
+
+const handleMobileNavMenuToggle = (event: Event) => {
+  mobileNavMenuExpanded.value = (event.currentTarget as HTMLDetailsElement).open
+}
+
+const closeMobileNavMenu = () => {
+  if (mobileNavMenuRef.value) {
+    mobileNavMenuRef.value.open = false
+  }
+  mobileNavMenuExpanded.value = false
+}
+
+const handleMobileNavMenuEscape = (event: KeyboardEvent) => {
+  if (!mobileNavMenuExpanded.value) return
+  event.preventDefault()
+  event.stopPropagation()
+  closeMobileNavMenu()
+  void nextTick(() => mobileNavMenuTriggerRef.value?.focus())
 }
 
 const submitSearch = (event: Event) => {
@@ -422,6 +541,13 @@ watch(
     if (mode !== 'trigger') {
       mobileSearchExpanded.value = false
     }
+  },
+)
+
+watch(
+  () => props.mobileNavMode,
+  (mode) => {
+    if (mode !== 'menu') closeMobileNavMenu()
   },
 )
 </script>

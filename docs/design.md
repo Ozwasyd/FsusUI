@@ -1,6 +1,6 @@
 # FsusUI Design System: The Intellectual Minimalist
 
-> **Version:** 0.1 · **Status:** Stable · **Scope:** FsusUI component library defaults, documentation examples, and product integration · **Last updated:** 2026-06-18
+> **Version:** 0.1 · **Status:** Stable · **Scope:** FsusUI component library defaults, documentation examples, and product integration · **Last updated:** 2026-07-11
 >
 > 维护者：FsusUI core team。关联文档：[`docs/theme/tokens.md`](../theme/tokens.md)、[`docs/theme/motion.md`](../theme/motion.md)、[`docs/element-plus-integration.md`](../element-plus-integration.md)、[`docs/api-stability.md`](../api-stability.md)。术语约定见 [§13 Terminology](#13-terminology)。
 
@@ -251,7 +251,9 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 
 | 模式 | 适用场景 | 触控高度 | Active 表达 |
 |------|---------|---------|------------|
-| **Bottom tab bar** | Consumer 公开 app、blog、knowledge product 的主导航（3–5 项） | `56–64px`（含 safe-area-inset-bottom） | Ink 图标 + Ink 文本 + Scholarly Blue 顶标或 icon fill |
+| **Header menu** | 编辑型站点、文档站、文章站的主导航 | `40–44px` trigger，菜单项至少 `44px` | 当前链接使用 Ink 文本与 `aria-current="page"` |
+| **Header inline** | 项目很少、需要持续可见的移动主导航 | `44px` | Ink 文本；当前项加粗或使用 Scholarly Blue 标记 |
+| **Bottom tab bar** | 明确采用 app-like navigation 的 consumer 主导航（3–5 项） | `56–64px`（含 safe-area-inset-bottom） | Ink 图标 + Ink 文本 + Scholarly Blue 顶标或 icon fill |
 | **Segment control** | 单一页面内的视图切换（Tab/All/Following） | `36–40px` | Scholarly Blue 选中胶囊 + Ink 文本 |
 | **Horizontal scrollable tab strip** | 多于 4 个分类的次级导航 | `44px` 触控区 + scroll snap | Ink 文本 + Scholarly Blue 下划线（继承 desktop 规范） |
 
@@ -260,8 +262,10 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 - Mobile 顶部主导航继续用 `text-link + underline` 而把 action 按钮（搜索、登录、菜单）做成 bordered button，两种 affordance 在同一行并存。
 - Mobile tab 使用低于 `40px` 的命中区域。
 - Mobile bottom tab bar 项目多于 5 个；多于 5 项必须收纳到 "More"。
+- 仅因存在导航项就隐式输出 fixed BottomTabBar；`ElPublicShell` 必须通过 `mobile-nav-mode="bottom"` 显式 opt-in，默认使用原生 header menu。
+- 同一页面同时输出全局 BottomTabBar 与正文 reading dock；consumer 装配层必须选择其中一个。
 
-Consumer 在公开 landing 上使用 FsusUI 时，必须在 Public Layout Rules 里指明 mobile 用哪种模式、为什么。
+Consumer 在公开 landing 上使用 FsusUI 时，必须在 Public Layout Rules 里指明 `inline | menu | bottom | none` 中的哪种模式、为什么，并记录 safe-area 与迁移策略。
 
 ### Icons
 

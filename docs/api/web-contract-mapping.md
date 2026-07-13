@@ -26,7 +26,7 @@ which APIs are cross-platform FsusUI contracts.
 | menu         | `ElMenu`                           | matching        | DOM class names and submenu templates are not public contract.                                                                          |
 | dropdown     | `ElDropdown`, dropdown menu        | matching        | Default menu padding is `8px 0`; selectable states stay quiet and token-driven.                                                         |
 | table        | `ElTable`, `ElTableV2`             | matching        | Table cells use 16px default horizontal padding and quiet row hover treatment.                                                          |
-| public-shell | `ElPublicShell`                    | matching        | Focus rings are 2px inset; active navigation uses a stable Scholarly Blue underline.                                                    |
+| public-shell | `ElPublicShell`                    | matching        | Mobile navigation is explicit (`inline | menu | bottom | none`); `menu` is default, fixed bottom tabs are opt-in, active links expose `aria-current`, the menu has a consumer utility slot, and trigger search retains a native `search-action` link fallback. |
 
 ## Token Migration
 

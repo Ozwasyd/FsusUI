@@ -11,6 +11,7 @@ export interface PublicShellNavItem {
 }
 
 export type PublicShellMobileSearchMode = 'inline' | 'trigger' | 'none'
+export type PublicShellMobileNavMode = 'inline' | 'menu' | 'bottom' | 'none'
 export type PublicShellActiveNavMotion = 'none' | 'indicator'
 
 export const publicShellProps = buildProps({
@@ -38,6 +39,28 @@ export const publicShellProps = buildProps({
   navItems: {
     type: definePropType<PublicShellNavItem[]>(Array),
     default: () => [],
+  },
+  /**
+   * @description explicit mobile navigation presentation; fixed bottom tabs are opt-in
+   */
+  mobileNavMode: {
+    type: definePropType<PublicShellMobileNavMode>(String),
+    values: ['inline', 'menu', 'bottom', 'none'],
+    default: 'menu',
+  },
+  /**
+   * @description accessible label for mobile navigation landmarks
+   */
+  mobileNavLabel: {
+    type: String,
+    default: 'Primary navigation',
+  },
+  /**
+   * @description visible label for the mobile navigation menu trigger
+   */
+  mobileNavMenuLabel: {
+    type: String,
+    default: 'Menu',
   },
   /**
    * @description active public navigation key

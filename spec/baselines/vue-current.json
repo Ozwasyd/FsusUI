@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "ceef4070d3f61e031da5d5d48cf0d061ccd6c841",
+    "commitSha": "5de942a96fc293d756985b023f400debf8bdbab5",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "c9fcadfed3dee0ce45d451b915e5dc952ac703c488e2defe984093e4cd809290",
@@ -3085,6 +3085,9 @@
         "hydrationKind",
         "maxWidth",
         "mobileNavGap",
+        "mobileNavLabel",
+        "mobileNavMenuLabel",
+        "mobileNavMode",
         "mobileSearchCancelLabel",
         "mobileSearchMode",
         "mobileSearchTriggerLabel",
@@ -3134,6 +3137,10 @@
         },
         {
           "name": "mobile-actions",
+          "scoped": false
+        },
+        {
+          "name": "mobile-menu-actions",
           "scoped": false
         },
         {
@@ -7807,6 +7814,8 @@
         "vue/packages/theme-chalk/src/autocomplete.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
+        "vue/packages/theme-chalk/src/public-shell-critical.scss",
+        "vue/packages/theme-chalk/src/public-shell.scss",
         "vue/packages/theme-chalk/src/select-dropdown-v2.scss"
       ],
       "classification": "portable"
@@ -7975,7 +7984,8 @@
       "name": "--fsus-shadow-panel-light",
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
-        "vue/packages/theme-chalk/src/fsus-theme.scss"
+        "vue/packages/theme-chalk/src/fsus-theme.scss",
+        "vue/packages/theme-chalk/src/public-shell.scss"
       ],
       "classification": "portable"
     },

@@ -1557,7 +1557,7 @@ describe('Fsus theme visual baseline', () => {
     ])
   })
 
-  test('separates public shell mobile primary actions from the bottom tab bar', () => {
+  test('keeps public shell mobile navigation explicit and bottom spacing opt-in', () => {
     const publicShellCss = compileThemeFile('public-shell.scss')
     const criticalCss = compileThemeFile('public-shell-critical.scss')
 
@@ -1576,7 +1576,25 @@ describe('Fsus theme visual baseline', () => {
       ])
       expectCssRule(css, '.el-public-shell__mobile-actions', ['display: flex;'])
       expectCssRule(css, '.el-public-shell__bottom-tab', ['display: none;'])
-      expect(css).toContain('var(--fsus-bottom-tab-height, 56px)')
+      expectCssRule(css, '.el-public-shell__mobile-nav-menu-trigger', [
+        'display: inline-flex;',
+        'min-height: 40px;',
+        'list-style: none;',
+      ])
+      expectCssRule(css, '.el-public-shell__mobile-nav-menu-panel', [
+        'position: absolute;',
+        'display: grid;',
+        'min-width: min(18rem, 100vw - 32px);',
+      ])
+      expectCssRule(css, '.el-public-shell__mobile-nav-link', [
+        'min-height: 44px;',
+      ])
+      expectCssRule(css, '.el-public-shell.is-mobile-nav-bottom', [
+        'padding-bottom: calc(var(--fsus-bottom-tab-height, 56px) + env(safe-area-inset-bottom));',
+      ])
+      expectCssRule(css, '.el-public-shell__footer', [
+        'padding-bottom: max(40px, 24px + env(safe-area-inset-bottom));',
+      ])
       expectCssRule(css, '.el-public-shell__desktop-nav', ['display: none;'])
       expectCssRule(css, '.el-public-shell__actions', ['display: none;'])
       expect(css).toContain('.el-public-shell__mobile-primary-actions')
@@ -1585,6 +1603,9 @@ describe('Fsus theme visual baseline', () => {
       expect(css).toContain('display: block;')
       expect(css).toContain('.el-public-shell__bottom-tab')
       expect(css).toContain('display: flex;')
+      expectCssRule(css, '.el-public-shell__mobile-nav--inline', [
+        'display: flex;',
+      ])
     }
   })
 

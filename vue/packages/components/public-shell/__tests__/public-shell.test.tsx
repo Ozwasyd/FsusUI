@@ -9,7 +9,7 @@ const navItems = [
 ]
 
 describe('PublicShell.vue', () => {
-  test('renders SSR-stable desktop navigation and mobile bottom tabs', () => {
+  test('renders SSR-stable desktop navigation and the default native mobile menu', () => {
     const wrapper = mount(() => (
       <PublicShell brand="Fsus" navItems={navItems} activeNav="archive" />
     ))
@@ -20,7 +20,14 @@ describe('PublicShell.vue', () => {
     ).toBe(true)
     expect(wrapper.find('.el-public-shell__desktop-nav').exists()).toBe(true)
     expect(wrapper.find('.el-public-shell__mobile-nav').exists()).toBe(false)
-    expect(wrapper.find('[data-fsus-bottom-tab-bar]').exists()).toBe(true)
+    expect(wrapper.find('[data-fsus-bottom-tab-bar]').exists()).toBe(false)
+    expect(wrapper.find('[data-public-shell-header]').exists()).toBe(true)
+    expect(wrapper.find('.el-public-shell__mobile-nav-menu').exists()).toBe(
+      true,
+    )
+    expect(
+      wrapper.find('[data-mobile-nav-menu-trigger]').attributes('aria-expanded'),
+    ).toBe('false')
     expect(
       wrapper
         .find('.el-public-shell__nav-link.is-active[data-public-nav="archive"]')
@@ -28,7 +35,7 @@ describe('PublicShell.vue', () => {
     ).toBe(true)
     expect(
       wrapper
-        .find('[data-fsus-bottom-tab-item="archive"].is-active')
+        .find('.el-public-shell__mobile-nav-link.is-active[data-public-nav="archive"]')
         .attributes('aria-current'),
     ).toBe('page')
     expect(
@@ -43,6 +50,7 @@ describe('PublicShell.vue', () => {
         navItems,
         activeNav: 'home',
         activeNavMotion: 'indicator',
+        mobileNavMode: 'bottom',
       },
     })
 
@@ -123,6 +131,7 @@ describe('PublicShell.vue', () => {
         brand: 'Fsus',
         navItems,
         showSearch: false,
+        mobileNavMode: 'bottom',
       },
       slots: {
         'mobile-primary-actions':
@@ -170,6 +179,107 @@ describe('PublicShell.vue', () => {
     ).toBe(true)
   })
 
+  test('renders every explicit mobile navigation strategy with stable semantic snapshots', () => {
+    const snapshot = (['menu', 'inline', 'bottom', 'none'] as const).map(
+      (mode) => {
+        const wrapper = mount(PublicShell, {
+          props: {
+            brand: 'Fsus',
+            navItems,
+            activeNav: 'archive',
+            mobileNavMode: mode,
+            mobileNavLabel: 'Primary sections',
+          },
+        })
+        const active = wrapper.find(
+          '.el-public-shell__mobile-nav-link[aria-current="page"][data-public-nav="archive"], [aria-current="page"][data-fsus-bottom-tab-item="archive"]',
+        )
+        const result = {
+          mode,
+          dataMode: wrapper.attributes('data-mobile-nav-mode'),
+          menu: wrapper.find('.el-public-shell__mobile-nav-menu').exists(),
+          inline: wrapper.find('.el-public-shell__mobile-nav--inline').exists(),
+          bottom: wrapper.find('[data-fsus-bottom-tab-bar]').exists(),
+          bottomSafeAreaClass: wrapper.classes().includes('is-mobile-nav-bottom'),
+          activeCurrent: active.exists() ? active.attributes('aria-current') : null,
+        }
+        wrapper.unmount()
+        return result
+      },
+    )
+
+    expect(snapshot).toMatchInlineSnapshot(`
+      [
+        {
+          "activeCurrent": "page",
+          "bottom": false,
+          "bottomSafeAreaClass": false,
+          "dataMode": "menu",
+          "inline": false,
+          "menu": true,
+          "mode": "menu",
+        },
+        {
+          "activeCurrent": "page",
+          "bottom": false,
+          "bottomSafeAreaClass": false,
+          "dataMode": "inline",
+          "inline": true,
+          "menu": false,
+          "mode": "inline",
+        },
+        {
+          "activeCurrent": "page",
+          "bottom": true,
+          "bottomSafeAreaClass": true,
+          "dataMode": "bottom",
+          "inline": false,
+          "menu": false,
+          "mode": "bottom",
+        },
+        {
+          "activeCurrent": null,
+          "bottom": false,
+          "bottomSafeAreaClass": false,
+          "dataMode": "none",
+          "inline": false,
+          "menu": false,
+          "mode": "none",
+        },
+      ]
+    `)
+  })
+
+  test('closes the native mobile menu with escape and restores summary focus', async () => {
+    const wrapper = mount(PublicShell, {
+      attachTo: document.body,
+      props: {
+        brand: 'Fsus',
+        navItems,
+        activeNav: 'home',
+        mobileNavMode: 'menu',
+      },
+      slots: {
+        'mobile-menu-actions': '<div data-test="menu-actions">Theme and account</div>',
+      },
+    })
+    const details = wrapper.find<HTMLDetailsElement>('.el-public-shell__mobile-nav-menu')
+    const trigger = wrapper.find<HTMLElement>('[data-mobile-nav-menu-trigger]')
+
+    details.element.open = true
+    await details.trigger('toggle')
+    expect(trigger.attributes('aria-expanded')).toBe('true')
+    expect(details.find('[data-test="menu-actions"]').exists()).toBe(true)
+
+    await details.trigger('keydown', { key: 'Escape' })
+    await nextTick()
+
+    expect(details.element.open).toBe(false)
+    expect(trigger.attributes('aria-expanded')).toBe('false')
+    expect(document.activeElement).toBe(trigger.element)
+    wrapper.unmount()
+  })
+
   test('renders default auth link in desktop and mobile primary actions', () => {
     const wrapper = mount(PublicShell, {
       props: {
@@ -178,6 +288,7 @@ describe('PublicShell.vue', () => {
         authLabel: 'Sign in',
         authHref: '/login',
         mobileSearchMode: 'trigger',
+        searchAction: '/search',
       },
       slots: {
         'mobile-primary-actions':
@@ -239,14 +350,22 @@ describe('PublicShell.vue', () => {
     const legacyMobileSearch = wrapper.find('.el-public-shell__search--mobile')
     const trigger = wrapper.find('.el-public-shell__mobile-search-trigger')
     const searchRow = wrapper.find('.el-public-shell__mobile-search-row')
+    const mobileToolbar = wrapper.find('.el-public-shell__mobile-toolbar')
 
     expect(desktopSearch.exists()).toBe(true)
     expect(legacyMobileSearch.exists()).toBe(false)
     expect(trigger.exists()).toBe(true)
+    expect(trigger.element.tagName).toBe('A')
+    expect(trigger.attributes('href')).toBe('/search')
     expect(trigger.text()).toBe('Search site')
     expect(trigger.attributes('aria-expanded')).toBe('false')
     expect(trigger.attributes('aria-controls')).toBe(searchRow.attributes('id'))
     expect(searchRow.exists()).toBe(true)
+    expect(searchRow.classes()).not.toContain('is-expanded')
+    expect(mobileToolbar.classes()).toContain('is-collapsed')
+
+    await trigger.trigger('click', { ctrlKey: true })
+    await nextTick()
     expect(searchRow.classes()).not.toContain('is-expanded')
 
     await trigger.trigger('click')
@@ -255,6 +374,7 @@ describe('PublicShell.vue', () => {
     expect(trigger.text()).toBe('Cancel')
     expect(trigger.attributes('aria-expanded')).toBe('true')
     expect(searchRow.classes()).toContain('is-expanded')
+    expect(mobileToolbar.classes()).not.toContain('is-collapsed')
     expect(searchRow.find('input').attributes('placeholder')).toBe(
       'Search articles',
     )
@@ -286,7 +406,7 @@ describe('PublicShell.vue', () => {
       },
     })
 
-    const trigger = wrapper.find<HTMLButtonElement>(
+    const trigger = wrapper.find<HTMLAnchorElement>(
       '.el-public-shell__mobile-search-trigger',
     )
     const searchRow = wrapper.find('.el-public-shell__mobile-search-row')
