@@ -149,7 +149,7 @@ public class FsusUploadTransferPrimitiveTests
       "tests",
       "conformance",
       "performance",
-      "avalonia-measurements.json"));
+      "avalonia-budget-fixtures.json"));
     Assert.Contains("upload-transfer-large-list-stable30", performanceMeasurements);
 
     var performanceBudgets = File.ReadAllText(Path.Combine(

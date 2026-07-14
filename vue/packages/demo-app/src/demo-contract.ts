@@ -62,7 +62,9 @@ export const resolveDemoLocale = (
     const baseLanguage = normalized.split('-')[0]
     const baseMatch = demoLocales.find((locale) => {
       const localeName = normalizeLanguageTag(locale.name)
-      return localeName === baseLanguage || localeName.startsWith(`${baseLanguage}-`)
+      return (
+        localeName === baseLanguage || localeName.startsWith(`${baseLanguage}-`)
+      )
     })
 
     if (baseMatch) return baseMatch
@@ -112,6 +114,21 @@ export const resolveDemoRoot = async (
   searchParams: URLSearchParams,
 ): Promise<DemoRootOptions> => {
   const themeMode = normalizeThemeMode(searchParams.get('theme'), 'system')
+  const performanceScenario = searchParams.get('performance')
+
+  if (performanceScenario) {
+    const { default: PerformanceFixture } =
+      await import('./PerformanceFixture.vue')
+    return {
+      component: PerformanceFixture,
+      themeMode,
+      props: {
+        scenario: performanceScenario,
+        size: Number(searchParams.get('size') || 1_000_000),
+        motion: searchParams.get('motion') || 'enabled',
+      },
+    }
+  }
   const auditMode = searchParams.get('audit')
 
   if (auditMode === 'ui-states' || auditMode === 'ui-boundaries') {

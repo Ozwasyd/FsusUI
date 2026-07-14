@@ -197,7 +197,7 @@ public class FsusServiceHelperPrimitiveTests
       "tests",
       "conformance",
       "performance",
-      "avalonia-measurements.json"));
+      "avalonia-budget-fixtures.json"));
     Assert.Contains("service-helper-stable26-repeated-show-close", performanceMeasurements);
 
     var performanceBudgets = File.ReadAllText(Path.Combine(

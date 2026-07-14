@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "description": "Absolute limits only catch runaway measurements; same-runner relative comparison is the regression gate.",
+  "relativeRegressionLimit": 0.15,
+  "web": {
+    "maxP95InputToNextFrameMs": 1000,
+    "maxDroppedFrameRate": 1,
+    "maxLongTaskMs": 5000,
+    "maxDomNodes": 25000
+  },
+  "avalonia": {
+    "maxP95FrameMs": 2000,
+    "maxPeakAllocatedBytesPerSample": 268435456,
+    "maxRetainedVisuals": 25000
+  }
+}

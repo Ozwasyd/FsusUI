@@ -1,5 +1,6 @@
 {
   "schemaVersion": 1,
+  "kind": "static-fixture-budget-validation",
   "generatedBy": "scripts/avalonia-performance-budget.mjs",
   "sources": [
     {
@@ -7,8 +8,8 @@
       "sha256": "f625cb7be28deab8a73834fa5e7a30ffde5a40046c6aaa091fd6ba34720ef239"
     },
     {
-      "path": "tests/conformance/performance/avalonia-measurements.json",
-      "sha256": "6b45da298b80eee510d3d2b848cb87e676d79861518fd5530b2ec5ade62326f4"
+      "path": "tests/conformance/performance/avalonia-budget-fixtures.json",
+      "sha256": "b71def43c98ffd2496f99c2a534b215e13ae3ed801df1bd27c32fddf90f43fcc"
     },
     {
       "path": "tests/conformance/performance/data-size-fixtures.json",

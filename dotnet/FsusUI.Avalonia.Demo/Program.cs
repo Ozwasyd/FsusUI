@@ -7,6 +7,13 @@ public static class Program
   [STAThread]
   public static void Main(string[] args)
   {
+    if (args.Contains("--render-performance", StringComparer.OrdinalIgnoreCase))
+    {
+      RenderPerformanceRunner.Configure(args);
+      BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+      return;
+    }
+
     if (args.Contains("--smoke", StringComparer.OrdinalIgnoreCase))
     {
       _ = BuildAvaloniaApp();

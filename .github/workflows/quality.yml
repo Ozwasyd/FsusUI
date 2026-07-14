@@ -91,6 +91,62 @@ jobs:
         run: |
           echo "Skipping demo build: ${{ steps.demo-build-path.outputs.reason }}"
 
+  pr-real-render-performance:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout current change
+        uses: actions/checkout@v4
+        with:
+          path: current
+      - name: Checkout base revision
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: baseline
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: current/dotnet/global.json
+      - name: Install current dependencies
+        working-directory: current
+        run: pnpm install --frozen-lockfile
+      - name: Install Chromium and desktop display dependencies
+        working-directory: current
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Install and measure same-runner baseline
+        id: baseline
+        working-directory: baseline
+        run: |
+          if test -f scripts/run-render-performance.mjs; then
+            pnpm install --frozen-lockfile
+            pnpm perf:render -- --profile quick --output ../performance-baseline
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Measure current quick matrix
+        working-directory: current
+        run: pnpm perf:render -- --profile quick --output ../performance-current
+      - name: Compare against base revision on the same runner
+        if: steps.baseline.outputs.available == 'true'
+        working-directory: current
+        run: pnpm perf:render:compare -- ../performance-baseline ../performance-current 0.15
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pr-real-render-performance
+          path: |
+            performance-baseline
+            performance-current
+          retention-days: 14
+
   main:
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.group == 'main')
     uses: ./.github/workflows/_quality.yml

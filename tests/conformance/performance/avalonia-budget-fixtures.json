@@ -1,5 +1,6 @@
 {
   "schemaVersion": 1,
+  "kind": "static-budget-fixtures",
   "measurements": [
     {
       "id": "button-repeated-mount",

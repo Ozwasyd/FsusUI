@@ -220,7 +220,7 @@ public class FsusDataTablePrimitiveTests
       "tests",
       "conformance",
       "performance",
-      "avalonia-measurements.json"));
+      "avalonia-budget-fixtures.json"));
     Assert.Contains("data-table-virtualized-grid-stable33", measurements);
   }
 

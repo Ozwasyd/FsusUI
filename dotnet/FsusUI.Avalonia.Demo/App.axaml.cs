@@ -15,10 +15,11 @@ public partial class App : Application
   {
     if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
     {
-      desktop.MainWindow = new MainWindow();
+      desktop.MainWindow = RenderPerformanceRunner.IsConfigured
+        ? RenderPerformanceRunner.CreateWindow(desktop)
+        : new MainWindow();
     }
 
     base.OnFrameworkInitializationCompleted();
   }
 }
-

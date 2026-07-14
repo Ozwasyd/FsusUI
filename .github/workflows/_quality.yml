@@ -10,6 +10,33 @@ on:
         default: main
 
 jobs:
+  real-render-performance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: dotnet/global.json
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Run real-render matrix
+        run: pnpm perf:render -- --profile ${{ inputs.group == 'main' && 'quick' || 'full' }} --output .tmp/performance/current
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: real-render-performance-${{ inputs.group }}
+          path: .tmp/performance/current
+          retention-days: 30
+
   static-quality:
     runs-on: ubuntu-latest
     timeout-minutes: 30

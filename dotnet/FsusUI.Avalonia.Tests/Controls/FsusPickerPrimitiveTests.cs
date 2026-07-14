@@ -236,7 +236,7 @@ public class FsusPickerPrimitiveTests
       "tests",
       "conformance",
       "performance",
-      "avalonia-measurements.json"));
+      "avalonia-budget-fixtures.json"));
     Assert.Contains("picker-virtualized-list-stable27", performanceMeasurements);
 
     var performanceBudgets = File.ReadAllText(Path.Combine(
