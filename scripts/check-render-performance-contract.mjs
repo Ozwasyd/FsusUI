@@ -30,6 +30,7 @@ for (const token of [
   'scenarioDefinitions.flatMap',
   'Tracing.start',
   'workerProbe',
+  'workerPoolBurstProbe',
   'wasmProbe',
 ]) {
   if (!web.includes(token)) failures.push(`web runner missing ${token}`)

@@ -236,6 +236,7 @@ try {
     const frameWork = []
     const heapSamples = []
     const worker = []
+    const workerPoolBursts = []
     const wasm = []
     for (let index = 0; index < samples; index++) {
       const sample = await page.evaluate(async (iteration) => {
@@ -257,6 +258,13 @@ try {
           index,
         ),
       )
+      if (scenario.startsWith('markdown') || scenario === 'select-v2') {
+        workerPoolBursts.push(
+          await page.evaluate(() =>
+            window.__FSUSUI_PERFORMANCE_FIXTURE__.workerPoolBurstProbe(),
+          ),
+        )
+      }
       if (scenario.startsWith('markdown')) {
         wasm.push(
           await page.evaluate(() =>
@@ -307,6 +315,7 @@ try {
       frameIntervals: pageMetrics.frameIntervals,
       longTasks: pageMetrics.longTasks,
       worker,
+      workerPoolBursts,
       wasm,
       trace: {
         styleMs: sumTrace(
@@ -359,6 +368,22 @@ try {
         computeMs: stats(worker.map((entry) => entry.computeMs)),
         transferMs: stats(worker.map((entry) => entry.transferMs)),
       },
+      workerPoolBurst: workerPoolBursts.length
+        ? {
+            latestCompletions: workerPoolBursts.map(
+              (entry) => entry.latestCompletions,
+            ),
+            legacyInputMs: stats(
+              workerPoolBursts.map((entry) => entry.legacyInputMs),
+            ),
+            maxQueueDepth: Math.max(
+              ...workerPoolBursts.map((entry) => entry.maxQueueDepth),
+            ),
+            poolInputMs: stats(
+              workerPoolBursts.map((entry) => entry.poolInputMs),
+            ),
+          }
+        : null,
       wasm: wasm.length
         ? {
             coldStartupMs: wasm[0].initial?.startupMs ?? navigationMs,

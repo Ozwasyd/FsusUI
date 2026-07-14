@@ -100,6 +100,8 @@ executor 是真正的有界 Worker pool：默认根据 `navigator.hardwareConcur
 
 `structuredCloneLimitBytes` 默认 8 MiB。超过预算的非 transferable 请求会在创建 Worker 前以 `FsusResult.ok = false` 拒绝；ArrayBuffer/TypedArray 应通过 `transfer` 传递，已转移 buffer 不计入 clone 预算。单 Worker crash/timeout 只终止该 slot 上的任务，其他 Worker 不受影响；显式 `retryOnCrash` 最多在健康替代 Worker 上重试一次。Worker fallback 到主线程前会等待 idle/frame 边界，避免在繁忙主线程立即同步执行同一重任务。
 
+真实浏览器 runner 对 Markdown 连续编辑和 Select 连续输入执行 12-generation burst，并同时测量旧单 Worker FIFO 与 shared pool。产物中的 `workerPoolBurst.maxQueueDepth`、`latestCompletions`、`legacyInputMs.p95` 和 `poolInputMs.p95` 用于确认队列有界、只提交最新 generation，并比较输入响应。
+
 组件内部只调用统一 runtime：
 
 ```ts

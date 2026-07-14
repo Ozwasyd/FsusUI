@@ -112,6 +112,7 @@ import {
   FixedSizeList,
 } from '@element-plus/components/virtual-list'
 import {
+  createFsusWorkerExecutor,
   FsusVirtualSizeIndex,
   useFsusRenderScheduler,
 } from '@element-plus/hooks'
@@ -216,6 +217,12 @@ const markdown = computed(() => {
 
 type PerformanceFixtureApi = {
   act: (iteration: number) => Promise<void>
+  workerPoolBurstProbe: () => Promise<{
+    latestCompletions: number
+    legacyInputMs: number
+    maxQueueDepth: number
+    poolInputMs: number
+  }>
   workerProbe: (iteration: number) => Promise<{
     queueWaitMs: number
     computeMs: number
@@ -233,6 +240,80 @@ type PerformanceFixtureApi = {
       engine: string
     } | null
   }>
+}
+
+const createBurstWorker = () => {
+  const source = `
+    self.onmessage = ({ data }) => {
+      if (data.type === 'cancel') return
+      const started = performance.now()
+      let checksum = data.request.seed >>> 0
+      for (let index = 0; index < data.request.iterations; index += 1) {
+        checksum = (checksum * 33 + index) >>> 0
+      }
+      const completed = performance.now()
+      self.postMessage({
+        id: data.id,
+        result: checksum,
+        status: 'complete',
+        timings: { computeDurationMs: completed - started },
+      })
+    }
+  `
+  const workerUrl = URL.createObjectURL(new Blob([source]))
+  const worker = new Worker(workerUrl)
+  URL.revokeObjectURL(workerUrl)
+  return worker
+}
+
+const workerPoolBurstProbe = async () => {
+  const burst = 12
+  const iterations = props.scenario.startsWith('markdown') ? 1_500_000 : 500_000
+  const legacyWorker = createBurstWorker()
+  const legacyStarted = performance.now()
+  const legacyInputMs = await new Promise<number>((resolve) => {
+    legacyWorker.onmessage = ({ data }) => {
+      if (data.id === burst) resolve(performance.now() - legacyStarted)
+    }
+    for (let index = 1; index <= burst; index += 1) {
+      legacyWorker.postMessage({
+        id: index,
+        request: { iterations, seed: index },
+        type: 'run',
+      })
+    }
+  })
+  legacyWorker.terminate()
+
+  let latestCompletions = 0
+  let maxQueueDepth = 0
+  const executor = createFsusWorkerExecutor<
+    { iterations: number; seed: number },
+    number
+  >(createBurstWorker, {
+    maxQueue: burst,
+    maxWorkers: 4,
+    onEvent: (event) => {
+      maxQueueDepth = Math.max(maxQueueDepth, event.queueDepth ?? 0)
+      if (event.type === 'request-resolve') latestCompletions += 1
+    },
+  })
+  const poolStarted = performance.now()
+  const requests = Array.from({ length: burst }, (_, index) =>
+    executor.run(
+      { iterations, seed: index + 1 },
+      {
+        generation: index + 1,
+        key: `continuous-${props.scenario}`,
+        lane: 'latency',
+      },
+    ),
+  )
+  await Promise.all(requests)
+  const poolInputMs = performance.now() - poolStarted
+  executor.dispose()
+
+  return { latestCompletions, legacyInputMs, maxQueueDepth, poolInputMs }
 }
 
 declare global {
@@ -414,7 +495,12 @@ const wasmProbe = async () => {
 }
 
 onMounted(async () => {
-  window.__FSUSUI_PERFORMANCE_FIXTURE__ = { act, workerProbe, wasmProbe }
+  window.__FSUSUI_PERFORMANCE_FIXTURE__ = {
+    act,
+    workerPoolBurstProbe,
+    workerProbe,
+    wasmProbe,
+  }
   await nextTick()
   if (!props.scenario.startsWith('markdown')) ready.value = 'true'
 })
