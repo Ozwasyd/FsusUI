@@ -37,6 +37,7 @@ export interface MarkdownRenderRequest {
   allowHtml?: boolean
   allowLatex?: boolean
   allowMermaid?: boolean
+  contentVersion?: number | string | null
 }
 
 export interface MarkdownRenderPlaceholder {

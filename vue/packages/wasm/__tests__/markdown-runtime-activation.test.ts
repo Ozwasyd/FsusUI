@@ -11,6 +11,8 @@ const featureModuleMocks = vi.hoisted(() => ({
   mermaidInitialize: vi.fn(),
   mermaidRender: vi.fn(),
   shikiCodeToHtml: vi.fn(),
+  shikiLoadLanguage: vi.fn(async () => undefined),
+  shikiLoadTheme: vi.fn(async () => undefined),
 }))
 
 vi.mock('katex', () => ({
@@ -23,6 +25,8 @@ vi.mock('katex', () => ({
 vi.mock('shiki/core', () => ({
   createHighlighterCore: vi.fn(async () => ({
     codeToHtml: featureModuleMocks.shikiCodeToHtml,
+    loadLanguage: featureModuleMocks.shikiLoadLanguage,
+    loadTheme: featureModuleMocks.shikiLoadTheme,
   })),
 }))
 
@@ -69,6 +73,8 @@ describe('markdown feature activation runtime', () => {
     featureModuleMocks.mermaidInitialize.mockReset()
     featureModuleMocks.mermaidRender.mockReset()
     featureModuleMocks.shikiCodeToHtml.mockReset()
+    featureModuleMocks.shikiLoadLanguage.mockClear()
+    featureModuleMocks.shikiLoadTheme.mockClear()
 
     featureModuleMocks.mermaidRender.mockResolvedValue({
       svg: [
@@ -195,6 +201,14 @@ describe('markdown feature activation runtime', () => {
         theme: 'github-dark',
       }),
     )
+    expect(featureModuleMocks.shikiLoadLanguage).toHaveBeenCalledTimes(1)
+    expect(featureModuleMocks.shikiLoadLanguage).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'typescript' }),
+    )
+    expect(featureModuleMocks.shikiLoadTheme).toHaveBeenCalledTimes(1)
+    expect(featureModuleMocks.shikiLoadTheme).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'github-dark' }),
+    )
 
     expect(
       root.querySelector('[data-mermaid-rendered="true"] svg'),
@@ -243,5 +257,50 @@ describe('markdown feature activation runtime', () => {
     expect(
       root.querySelector('.el-markdown-renderer__feature-error'),
     ).toBeTruthy()
+  })
+
+  it('limits concurrent feature work and stops scheduling after cancellation', async () => {
+    const root = document.createElement('article')
+    root.innerHTML = Array.from(
+      { length: 8 },
+      (_, index) => `<pre><code class="language-ts">item-${index}</code></pre>`,
+    ).join('')
+    const controller = new AbortController()
+    const releases: Array<() => void> = []
+    let active = 0
+    let maxActive = 0
+    const started: string[] = []
+    const codeHighlightAdapter = vi.fn(async (element: HTMLElement) => {
+      started.push(element.textContent ?? '')
+      active += 1
+      maxActive = Math.max(maxActive, active)
+      await new Promise<void>((resolve) => releases.push(resolve))
+      active -= 1
+    })
+
+    const activation = activateMarkdownFeatures({
+      codeHighlightAdapter,
+      concurrency: 2,
+      features: {
+        cspNonce: false,
+        externalLink: false,
+        hashLink: false,
+        headingSlug: false,
+        latex: false,
+        mermaid: false,
+      },
+      root,
+      signal: controller.signal,
+    })
+
+    await vi.waitFor(() => expect(started).toHaveLength(2))
+    controller.abort()
+    releases.splice(0).forEach((release) => release())
+    const result = await activation
+
+    expect(maxActive).toBe(2)
+    expect(started).toEqual(['item-0', 'item-1'])
+    expect(result.activated).toEqual([])
+    expect(root.querySelector('[data-markdown-feature-activated]')).toBeNull()
   })
 })

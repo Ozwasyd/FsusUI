@@ -1,5 +1,7 @@
 import { flushPromises, mount } from '@vue/test-utils'
+import { computed } from 'vue'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+import { configProviderContextKey } from '@element-plus/components/config-provider'
 import MarkdownRenderer from '../src/markdown-renderer.vue'
 import {
   buildMarkdownRenderResult,
@@ -126,8 +128,24 @@ const makeChunkResult = (
 })
 
 const flushRenderer = async () => {
-  await vi.advanceTimersByTimeAsync(20)
+  await vi.advanceTimersByTimeAsync(250)
   await flushPromises()
+  await vi.advanceTimersByTimeAsync(250)
+  await flushPromises()
+}
+
+const forcedChunkedPipeline = {
+  global: {
+    provide: {
+      [configProviderContextKey as symbol]: computed(() => ({
+        renderPipeline: {
+          budget: { measureBatch: 2 },
+          mode: 'enabled',
+          worker: 'disabled',
+        },
+      })),
+    },
+  },
 }
 
 describe('MarkdownRenderer.vue', () => {
@@ -536,7 +554,7 @@ describe('MarkdownRenderer.vue', () => {
 
         if (this.getAttribute('data-anchor') === 'stable') {
           anchorReads += 1
-          const top = anchorReads <= 2 ? 24 : 84
+          const top = anchorReads === 1 ? 24 : 84
           return {
             bottom: top + 20,
             height: 20,
@@ -563,10 +581,7 @@ describe('MarkdownRenderer.vue', () => {
         } as DOMRect
       })
 
-    const source = `anchor ${'x'.repeat(25_000)}`
-    renderMarkdownHtml.mockResolvedValue(
-      fsusOk(makeHtmlResult('<p data-anchor="stable">Anchor</p><p>Before</p>')),
-    )
+    const source = 'anchor update'
     renderMarkdownResult.mockReturnValue(
       new Promise((resolve) => {
         resolveFull = resolve
@@ -575,11 +590,12 @@ describe('MarkdownRenderer.vue', () => {
 
     const wrapper = mount(MarkdownRenderer, {
       attachTo: scroller,
-      props: { content: source },
+      props: {
+        content: source,
+        initialHtml: '<p data-anchor="stable">Anchor</p><p>Before</p>',
+      },
     })
 
-    await vi.advanceTimersByTimeAsync(20)
-    await flushPromises()
     expect(wrapper.html()).toContain('Before')
 
     resolveFull?.(
@@ -596,6 +612,9 @@ describe('MarkdownRenderer.vue', () => {
 
     expect(wrapper.html()).toContain('After full result')
     expect(scroller.scrollTop).toBe(380)
+    expect(anchorReads).toBe(2)
+    expect(renderMarkdownHtml).not.toHaveBeenCalled()
+    expect(renderMarkdownResult).toHaveBeenCalledTimes(1)
 
     wrapper.unmount()
     rectSpy.mockRestore()
@@ -603,14 +622,17 @@ describe('MarkdownRenderer.vue', () => {
   })
 
   test('uses chunked virtual rendering for large markdown content', async () => {
-    const source = `${'# Large\n\n'}${'Paragraph\n\n'.repeat(700)}`
+    const source = `${'# Large\n\n'}${'Paragraph\n\n'.repeat(1_600)}`
     const result = makeChunkResult(source, '<h1>Chunked</h1><p>Chunk body</p>')
     renderMarkdownChunks.mockResolvedValue(fsusOk(result))
 
     const wrapper = mount(MarkdownRenderer, {
+      ...forcedChunkedPipeline,
       props: { content: source },
     })
     await flushRenderer()
+
+    expect(wrapper.emitted('render-error')).toBeUndefined()
 
     expect(renderMarkdownChunks).toHaveBeenCalledWith(
       expect.objectContaining({ source }),
@@ -636,7 +658,7 @@ describe('MarkdownRenderer.vue', () => {
   })
 
   test('sanitizes chunked markdown units and emitted chunk results', async () => {
-    const source = `${'# Unsafe large\n\n'}${'Paragraph\n\n'.repeat(700)}`
+    const source = `${'# Unsafe large\n\n'}${'Paragraph\n\n'.repeat(1_600)}`
     const result = makeChunkResult(source, '<h1>Chunked</h1>', {
       chunks: [
         {
@@ -652,6 +674,7 @@ describe('MarkdownRenderer.vue', () => {
     renderMarkdownChunks.mockResolvedValue(fsusOk(result))
 
     const wrapper = mount(MarkdownRenderer, {
+      ...forcedChunkedPipeline,
       props: { content: source, allowHtml: true },
     })
     await flushRenderer()
@@ -670,18 +693,60 @@ describe('MarkdownRenderer.vue', () => {
     )
   })
 
+  test('commits the first readable chunks before staging the remaining document', async () => {
+    const source = `${'# Staged large\n\n'}${'Paragraph\n\n'.repeat(1_600)}`
+    const chunks = Array.from({ length: 70 }, (_, index) => ({
+      estimatedSize: 48,
+      html: index === 0 ? '<h1>Staged</h1>' : `<p>Chunk ${index}</p>`,
+      htmlEndOffset: (index + 1) * 16,
+      htmlStartOffset: index * 16,
+      key: `md-${index}-${index * 16}`,
+      kind: index === 0 ? ('heading' as const) : ('paragraph' as const),
+    }))
+    const result = makeChunkResult(
+      source,
+      chunks.map((item) => item.html).join(''),
+      {
+        chunks,
+      },
+    )
+    renderMarkdownChunks.mockResolvedValue(fsusOk(result))
+
+    const wrapper = mount(MarkdownRenderer, {
+      ...forcedChunkedPipeline,
+      props: { content: source },
+    })
+    for (
+      let frame = 0;
+      frame < 20 && !wrapper.find('h1').exists();
+      frame += 1
+    ) {
+      await vi.advanceTimersByTimeAsync(16)
+      await flushPromises()
+    }
+
+    expect(wrapper.find('h1').text()).toBe('Staged')
+    expect(wrapper.emitted('render-complete')).toBeUndefined()
+
+    await vi.advanceTimersByTimeAsync(1_000)
+    await flushPromises()
+    expect(wrapper.emitted('render-complete')?.[0]?.[0]).toEqual(result)
+  })
+
   test('reuses cached chunk results for matching markdown fingerprints', async () => {
-    const source = `${'# Cached large\n\n'}${'Cached paragraph\n\n'.repeat(700)}`
+    const source = `${'# Cached large\n\n'}${'Cached paragraph\n\n'.repeat(1_600)}`
     const result = makeChunkResult(source, '<h1>Cached</h1><p>Chunk body</p>')
     renderMarkdownChunks.mockResolvedValue(fsusOk(result))
 
     const first = mount(MarkdownRenderer, {
+      ...forcedChunkedPipeline,
       props: { content: source },
     })
     await flushRenderer()
     first.unmount()
 
     const second = mount(MarkdownRenderer, {
+      ...forcedChunkedPipeline,
       props: { content: source },
     })
     await flushRenderer()
@@ -713,6 +778,31 @@ describe('MarkdownRenderer.vue', () => {
         'oversized',
       ),
     ).toBeNull()
+  })
+
+  test('keeps one canonical chunk payload when weaker cache views are written', () => {
+    const html = `<h1>Canonical</h1>${'<p>Body</p>'.repeat(100)}`
+    const result = makeChunkResult('canonical source', html)
+
+    setMarkdownRendererRuntimeCache('chunks', 'canonical', result)
+    setMarkdownRendererRuntimeCache(
+      'html',
+      'canonical',
+      makeHtmlResult('<p>weaker duplicate</p>'.repeat(100)),
+    )
+
+    expect(
+      getMarkdownRendererRuntimeCache<MarkdownRuntimeChunkResult>(
+        'chunks',
+        'canonical',
+      ),
+    ).toBe(result)
+    expect(
+      getMarkdownRendererRuntimeCache<MarkdownRuntimeHtmlResult>(
+        'html',
+        'canonical',
+      )?.html,
+    ).toBe(html)
   })
 
   test('uses a safe fallback and emits render-error when runtime fails', async () => {

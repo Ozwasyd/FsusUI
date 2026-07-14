@@ -20,7 +20,7 @@
 
 ## 基础用法
 
-传入 `content` 后，组件会异步调用 `@element-plus/wasm` 中的 Markdown runtime。小文档保持 HTML fast path；大文档会按全局 Render Pipeline 预算切为 block chunks，只挂载当前 viewport 附近内容，避免长 Markdown 一次性把主线程 DOM/layout/paint 打满。
+传入 `content` 后，组件会异步调用 `@element-plus/wasm` 中的 Markdown runtime。每个 generation 只执行一次完整解析，不再先走 HTML-only、随后对同一内容重复完整解析。大文档会按全局 Render Pipeline 预算切为 block chunks，先提交首个可读 section，再按 frame budget 补齐其余描述符，并只挂载当前 viewport 附近内容，避免长 Markdown 一次性把主线程 DOM/layout/paint 打满。
 
 ```vue
 <template>
@@ -44,7 +44,7 @@ WASM 渲染器会保留 Mermaid、LaTeX/KaTeX 相关的 HTML、MathML、SVG 或 
 </template>
 ```
 
-默认 adapter 会按 `data-theme-resolved`、Element Plus token 和 `csp-nonce` 设置 Mermaid themeVariables、KaTeX 错误色、Shiki light/dark theme，以及动态 `<style>` 的 nonce。失败时不会让整个 renderer 崩溃，组件会输出 `el-markdown-renderer__feature-error` 节点并在 `features-activated.errors` 中报告错误。
+默认 adapter 会按 `data-theme-resolved`、Element Plus token 和 `csp-nonce` 设置 Mermaid themeVariables、KaTeX 错误色、Shiki light/dark theme，以及动态 `<style>` 的 nonce。Mermaid、KaTeX 与 Shiki 只在对应 chunk 接近 viewport 时激活；Shiki 只加载实际遇到的 grammar 和当前 theme。多个 renderer 的 activation 使用有界并发，不共享一把全局 Promise 锁。失败时不会让整个 renderer 崩溃，组件会输出 `el-markdown-renderer__feature-error` 节点并在 `features-activated.errors` 中报告错误。
 
 `features` 用于关闭某类 activation；adapter prop 用于覆盖或禁用默认渲染器：
 
@@ -65,7 +65,7 @@ WASM 渲染器会保留 Mermaid、LaTeX/KaTeX 相关的 HTML、MathML、SVG 或 
 
 ## Raw HTML 安全边界
 
-`allow-html` 默认关闭。默认情况下，Markdown 源码中的 HTML 会被转义，避免把不可信内容直接注入页面。组件提交到 DOM 前还会默认执行一层 HTML sanitize，覆盖 `initial-html`、HTML fast path、完整结果和 chunked 结果。
+`allow-html` 默认关闭。默认情况下，Markdown 源码中的 HTML 会被转义，避免把不可信内容直接注入页面。组件提交到 DOM 前还会默认执行一层 HTML sanitize，覆盖 `initial-html`、完整结果和 chunked 结果。
 
 只有在调用方确认内容可信时才应开启 `allow-html`。如业务已经在上游完成可信 HTML 过滤，并且需要保留完整 HTML 能力，可以显式设置 `:sanitize-html="false"` 关闭组件层 sanitize。
 
@@ -150,10 +150,13 @@ chunk 边界由 WASM 渲染流程产出，类型包括 `heading`、`paragraph`�
 - 每个 renderer 的 virtual window 只创建一个共享 `ResizeObserver`；element 关联使用弱引用，测量结果按帧和 `measureBatch` 批量提交，历史高度缓存有明确上限。
 - 同批次中只累计锚点之前的高度差，并最多补偿一次 `scrollTop`；连续插入、删除或重排时优先按稳定 chunk key 恢复锚点，避免跳回前文。
 - SSR 或无 `ResizeObserver` 环境不创建观察器，首次挂载仍以确定性的 `offsetHeight` 回填估算值。
+- Mermaid、KaTeX 与 Shiki activation 由带预加载边界的 `IntersectionObserver` 驱动；不支持该 API 时保持兼容，立即激活当前已挂载 chunk。
+- 新 `content` generation 会同时取消解析、结果传输、分帧提交、activation 与过期 cache write；Worker 解析中的同步 WASM 任务会通过终止其 parser worker 实际停止，而不是只丢弃最终结果。
+- renderer cache 每个 fingerprint 只保留一份最强 canonical payload；chunk result 可派生 result/HTML 视图，不同时保存 chunks、HTML 与 result 三份副本。
 
 阈值与预算通过 `ElConfigProvider` 的 `render-pipeline` 配置统一控制；MarkdownRenderer 不新增专属开关。
 
-大文档优先走 Render Pipeline adapter 的 shared Worker pool。Worker 只负责 Markdown 分块与 metadata 预计算，主线程仍负责虚拟挂载、测量和锚点保持；每个 renderer 使用独立 key/generation，连续编辑会向 Worker 发送 cancel，旧 generation 在解析阶段结束后不得提交结果。单 Worker 超时或崩溃只影响对应 slot，其他 renderer 任务继续运行；Worker 不可用时会等待主线程 idle/frame 预算后降级到 `chunked-main`，组件不会持有自己的私有 executor。
+大文档优先走 Render Pipeline adapter 的 shared Worker pool。每个 pool slot 使用轻量 broker worker 管理可终止的 parser worker；Worker 负责 Markdown 分块、metadata 预计算和增量完整 fingerprint，主线程仍负责虚拟挂载、测量和锚点保持。每个 renderer 使用独立 key/generation，连续编辑会向 Worker 发送 cancel，并终止正在执行同步 WASM 的 parser worker，旧 generation 不得继续传输、提交或写缓存。单 Worker 超时或崩溃只影响对应 slot，其他 renderer 任务继续运行；Worker 不可用时会等待主线程 idle/frame 预算后降级到 `chunked-main`，组件不会持有自己的私有 executor。
 
 ---
 
@@ -164,6 +167,7 @@ chunk 边界由 WASM 渲染流程产出，类型包括 `heading`、`paragraph`�
 | 属性名                 | 说明                                                                                     | 类型                                            | 默认值    |
 | ---------------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------- | --------- |
 | content                | Markdown 源文本                                                                          | `string`                                        | `''`      |
+| content-version        | 可选稳定内容版本；大文档提供后可跳过主线程完整哈希，并参与 generation/cache fingerprint  | `string \| number \| null`                      | `null`    |
 | initial-html           | 初始 HTML，用于首帧占位                                                                  | `string`                                        | `''`      |
 | allow-html             | 是否允许 Markdown 源码中的 raw HTML                                                      | `boolean`                                       | `false`   |
 | sanitize-html          | DOM 提交前是否清理不安全 HTML                                                            | `boolean`                                       | `true`    |

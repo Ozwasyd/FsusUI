@@ -121,6 +121,7 @@ import {
 import {
   createFsusWorkerExecutor,
   FsusVirtualSizeIndex,
+  getFsusRenderPipelineDiagnosticsSnapshot,
   useFsusRenderScheduler,
 } from '@element-plus/hooks'
 import { createWasmSortController } from '@element-plus/components/table/src/composables/use-wasm-sort'
@@ -248,6 +249,12 @@ type PerformanceFixtureApi = {
     workerEndToEndMs: number
     workerSubmitBlockMs: number
   } | null>
+  markdownPhaseProbe: () => {
+    activationMs: number
+    commitMs: number
+    parseMs: number
+    transferMs: number
+  } | null
   wasmProbe: () => Promise<{
     startupMs: number
     computeMs: number
@@ -547,10 +554,33 @@ const wasmProbe = async () => {
   }
 }
 
+const markdownPhaseProbe = () => {
+  if (!props.scenario.startsWith('markdown')) return null
+  const diagnostics = getFsusRenderPipelineDiagnosticsSnapshot().filter(
+    (event) => event.adapterId === 'markdown-renderer',
+  )
+  const latestStage = (stage: string) =>
+    diagnostics.findLast(
+      (event) => event.stage === stage && typeof event.durationMs === 'number',
+    )?.durationMs ?? 0
+  const renderer = document.querySelector<HTMLElement>(
+    '[data-markdown-renderer="wasm"]',
+  )
+  return {
+    activationMs: Number(renderer?.dataset.fsusMarkdownActivationMs ?? '0'),
+    commitMs:
+      Number(renderer?.dataset.fsusMarkdownCommitMs ?? '0') ||
+      latestStage('vue-commit'),
+    parseMs: initialWasmProfile?.endToEndMs ?? latestStage('worker-compute'),
+    transferMs: latestStage('worker-transfer'),
+  }
+}
+
 onMounted(async () => {
   window.__FSUSUI_PERFORMANCE_FIXTURE__ = {
     act,
     dataPipelineProbe,
+    markdownPhaseProbe,
     workerPoolBurstProbe,
     workerProbe,
     wasmProbe,

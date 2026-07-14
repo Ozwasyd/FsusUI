@@ -242,6 +242,7 @@ try {
     const worker = []
     const workerPoolBursts = []
     const wasm = []
+    const markdownPhases = []
     const dataPipeline = []
     for (let index = 0; index < samples; index++) {
       const sample = await page.evaluate(async (iteration) => {
@@ -274,6 +275,11 @@ try {
         wasm.push(
           await page.evaluate(() =>
             window.__FSUSUI_PERFORMANCE_FIXTURE__.wasmProbe(),
+          ),
+        )
+        markdownPhases.push(
+          await page.evaluate(() =>
+            window.__FSUSUI_PERFORMANCE_FIXTURE__.markdownPhaseProbe(),
           ),
         )
       }
@@ -329,6 +335,7 @@ try {
       worker,
       workerPoolBursts,
       wasm,
+      markdownPhases,
       dataPipeline,
       trace: {
         styleMs: sumTrace(
@@ -405,6 +412,17 @@ try {
             hotStartupMs: stats(wasm.map((entry) => entry.startupMs)),
             hotEndToEndMs: stats(wasm.map((entry) => entry.endToEndMs)),
             engine: wasm[0].initial?.engine ?? wasm.at(-1).engine,
+          }
+        : null,
+      markdownPhases: markdownPhases.length
+        ? {
+            activationMs: stats(
+              markdownPhases.map((entry) => entry.activationMs),
+            ),
+            commitMs: stats(markdownPhases.map((entry) => entry.commitMs)),
+            parseMs: stats(markdownPhases.map((entry) => entry.parseMs)),
+            transferMs: stats(markdownPhases.map((entry) => entry.transferMs)),
+            paintMs: raw.trace.paintMs,
           }
         : null,
       dataPipeline: dataPipeline.length

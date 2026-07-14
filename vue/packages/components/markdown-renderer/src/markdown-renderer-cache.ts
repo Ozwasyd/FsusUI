@@ -12,16 +12,12 @@ export type MarkdownRendererRuntimeCacheValue =
   | MarkdownRuntimeHtmlResult
   | MarkdownRuntimeRenderResult
 
-type MarkdownRendererRuntimeCacheEntry<TValue> = {
+type MarkdownRendererRuntimeCacheEntry = {
   bytes: number
+  kind: MarkdownRendererRuntimeCacheKind
   key: string
-  value: TValue
+  value: MarkdownRendererRuntimeCacheValue
 }
-
-type MarkdownRendererRuntimeCacheStore = Record<
-  MarkdownRendererRuntimeCacheKind,
-  Map<string, MarkdownRendererRuntimeCacheEntry<unknown>>
->
 
 const MARKDOWN_CACHE_MAX_ENTRIES = 8
 const MARKDOWN_CACHE_MAX_TOTAL_BYTES = 12 * 1024 * 1024
@@ -33,11 +29,7 @@ const getMarkdownRuntimeCaches = () => {
     __fsusMarkdownRendererRuntimeCaches?: MarkdownRendererRuntimeCacheStore
   }
   if (!globalObject.__fsusMarkdownRendererRuntimeCaches) {
-    globalObject.__fsusMarkdownRendererRuntimeCaches = {
-      chunks: new Map(),
-      html: new Map(),
-      result: new Map(),
-    }
+    globalObject.__fsusMarkdownRendererRuntimeCaches = new Map()
   }
   return globalObject.__fsusMarkdownRendererRuntimeCaches
 }
@@ -51,12 +43,15 @@ const estimateMarkdownCacheBytes = (value: unknown) => {
   const htmlBytes = result.html?.length ?? 0
   const chunkBytes =
     result.chunks?.reduce((sum, chunk) => sum + chunk.html.length, 0) ?? 0
-  return Math.max(htmlBytes, chunkBytes)
+  return htmlBytes + chunkBytes
 }
 
-const pruneMarkdownCache = (
-  cache: Map<string, MarkdownRendererRuntimeCacheEntry<unknown>>,
-) => {
+type MarkdownRendererRuntimeCacheStore = Map<
+  string,
+  MarkdownRendererRuntimeCacheEntry
+>
+
+const pruneMarkdownCache = (cache: MarkdownRendererRuntimeCacheStore) => {
   while (cache.size > MARKDOWN_CACHE_MAX_ENTRIES) {
     const oldestKey = cache.keys().next().value
     if (!oldestKey) break
@@ -80,14 +75,25 @@ export const getMarkdownRendererRuntimeCache = <TValue>(
   kind: MarkdownRendererRuntimeCacheKind,
   key: string,
 ) => {
-  const cache = getMarkdownRuntimeCaches()[kind]
-  const entry = cache.get(key) as
-    | MarkdownRendererRuntimeCacheEntry<TValue>
-    | undefined
+  const cache = getMarkdownRuntimeCaches()
+  const entry = cache.get(key)
   if (!entry) return null
+  if (kind === 'chunks' && entry.kind !== 'chunks') return null
+  if (kind === 'result' && entry.kind === 'html') return null
   cache.delete(key)
   cache.set(key, entry)
-  return entry.value
+  if (kind === 'html' && entry.kind !== 'html') {
+    const result = entry.value as
+      | MarkdownRuntimeChunkResult
+      | MarkdownRuntimeRenderResult
+    return {
+      engine: result.engine,
+      html: result.html,
+      rendererVersion: result.rendererVersion,
+      timings: result.timings,
+    } as TValue
+  }
+  return entry.value as TValue
 }
 
 export const setMarkdownRendererRuntimeCache = <TValue>(
@@ -99,19 +105,20 @@ export const setMarkdownRendererRuntimeCache = <TValue>(
   if (bytes <= 0 || bytes > MARKDOWN_CACHE_MAX_ENTRY_BYTES) return
   if (kind !== 'chunks' && bytes < MARKDOWN_CACHE_MIN_INLINE_BYTES) return
 
-  const cache = getMarkdownRuntimeCaches()[kind]
+  const cache = getMarkdownRuntimeCaches()
+  const previous = cache.get(key)
+  const rank = { chunks: 3, html: 1, result: 2 } as const
+  if (previous && rank[previous.kind] > rank[kind]) return
   cache.delete(key)
   cache.set(key, {
     bytes,
+    kind,
     key,
-    value,
+    value: value as MarkdownRendererRuntimeCacheValue,
   })
   pruneMarkdownCache(cache)
 }
 
 export const clearMarkdownRendererRuntimeCache = () => {
-  const caches = getMarkdownRuntimeCaches()
-  caches.chunks.clear()
-  caches.html.clear()
-  caches.result.clear()
+  getMarkdownRuntimeCaches().clear()
 }

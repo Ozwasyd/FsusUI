@@ -1,6 +1,5 @@
 import { loadEmscriptenModule } from './runtime/emscripten'
 import { resolveMarkdownAsset, type MarkdownAssetKind } from './runtime/assets'
-import { createSerializedExecutor } from './runtime/serialized'
 import { decodeUtf8, encodeUtf8 } from './runtime/utf8'
 import {
   MARKDOWN_RENDERER_VERSION,
@@ -171,6 +170,7 @@ export interface MarkdownFeatureAdapterContext {
   cspNonce?: string | null
   kind: MarkdownFeatureActivationKind
   root: ParentNode
+  signal?: AbortSignal
   theme: MarkdownFeatureActivationTheme
 }
 
@@ -182,11 +182,13 @@ export type MarkdownFeatureAdapter = (
 export interface MarkdownFeatureActivationOptions {
   baseUrl?: string | null
   codeHighlightAdapter?: MarkdownFeatureAdapter | null
+  concurrency?: number
   cspNonce?: string | null
   features?: MarkdownFeatureActivationFeatureOptions
   latexAdapter?: MarkdownFeatureAdapter | null
   mermaidAdapter?: MarkdownFeatureAdapter | null
   root: ParentNode
+  signal?: AbortSignal
 }
 
 const defaultMarkdownFeatureOptions: Required<MarkdownFeatureActivationFeatureOptions> =
@@ -539,6 +541,8 @@ const createSafeFeatureFragment = (
   return sanitizeFeatureFragment(template.content, nonce)
 }
 
+const nonceBridgeQueues = new WeakMap<Document, Promise<void>>()
+
 const withStyleNonceBridge = async <T>(
   document: Document,
   nonce: string | null | undefined,
@@ -546,6 +550,14 @@ const withStyleNonceBridge = async <T>(
 ): Promise<T> => {
   const nodePrototype = document.defaultView?.Node?.prototype
   if (!nonce || !nodePrototype) return task()
+
+  const previous = nonceBridgeQueues.get(document) ?? Promise.resolve()
+  let release!: () => void
+  const current = new Promise<void>((resolve) => {
+    release = resolve
+  })
+  nonceBridgeQueues.set(document, current)
+  await previous
 
   const originalAppendChild = nodePrototype.appendChild
   const originalInsertBefore = nodePrototype.insertBefore
@@ -576,6 +588,10 @@ const withStyleNonceBridge = async <T>(
     nodePrototype.appendChild = originalAppendChild
     nodePrototype.insertBefore = originalInsertBefore
     nodePrototype.replaceChild = originalReplaceChild
+    release()
+    if (nonceBridgeQueues.get(document) === current) {
+      nonceBridgeQueues.delete(document)
+    }
   }
 }
 
@@ -683,9 +699,6 @@ type MermaidRuntime = {
   ) => Promise<{ svg: string }> | { svg: string } | string
 }
 
-const mermaidRuntimeUrl =
-  'https://cdn.jsdelivr.net/npm/mermaid@10.9.6/dist/mermaid.esm.min.mjs'
-
 type GlobalMermaidRuntime = typeof globalThis & {
   mermaid?: MermaidRuntime | { default?: MermaidRuntime }
 }
@@ -704,6 +717,16 @@ type ShikiRuntime = {
     source: string,
     options: ShikiRenderOptions,
   ) => string | Promise<string>
+  ensureLoaded?: (language: string, theme: string) => Promise<void>
+}
+
+type ShikiHighlighter = {
+  codeToHtml: (
+    source: string,
+    options: ShikiRenderOptions,
+  ) => string | Promise<string>
+  loadLanguage?: (...languages: unknown[]) => Promise<void>
+  loadTheme?: (...themes: unknown[]) => Promise<void>
 }
 
 type ShikiCoreModule = {
@@ -711,12 +734,7 @@ type ShikiCoreModule = {
     engine: unknown
     langs: unknown[]
     themes: unknown[]
-  }) => Promise<{
-    codeToHtml: (
-      source: string,
-      options: ShikiRenderOptions,
-    ) => string | Promise<string>
-  }>
+  }) => Promise<ShikiHighlighter>
   default?: ShikiCoreModule
 }
 
@@ -739,11 +757,10 @@ const loadMermaidRuntime = async () => {
     return resolveDefaultModule<MermaidRuntime>(globalMermaid)
   }
 
-  mermaidRuntimePromise ??= import(/* @vite-ignore */ mermaidRuntimeUrl).then(
-    (module) =>
-      resolveDefaultModule<MermaidRuntime>(
-        module as unknown as MermaidRuntime | { default?: MermaidRuntime },
-      ),
+  mermaidRuntimePromise ??= import('mermaid').then((module) =>
+    resolveDefaultModule<MermaidRuntime>(
+      module as unknown as MermaidRuntime | { default?: MermaidRuntime },
+    ),
   )
 
   return mermaidRuntimePromise
@@ -756,28 +773,23 @@ const loadKatexRuntime = async () =>
       | { default?: KatexRuntime },
   )
 
+const shikiLanguageLoaders: Record<string, () => Promise<unknown>> = {
+  bash: () => import('shiki/dist/langs/bash.mjs'),
+  'c#': () => import('shiki/dist/langs/csharp.mjs'),
+  js: () => import('shiki/dist/langs/javascript.mjs'),
+  ts: () => import('shiki/dist/langs/typescript.mjs'),
+}
+const shikiThemeLoaders: Record<string, () => Promise<unknown>> = {
+  'github-dark': () => import('shiki/dist/themes/github-dark.mjs'),
+  'github-light': () => import('shiki/dist/themes/github-light.mjs'),
+}
 let shikiRuntimePromise: Promise<ShikiRuntime> | null = null
 
 const loadShikiRuntime = async () => {
   shikiRuntimePromise ??= (async () => {
-    const [
-      coreModule,
-      engineModule,
-      javascript,
-      typescript,
-      bash,
-      csharp,
-      githubLight,
-      githubDark,
-    ] = await Promise.all([
+    const [coreModule, engineModule] = await Promise.all([
       import('shiki/core'),
       import('shiki/engine/javascript'),
-      import('shiki/dist/langs/javascript.mjs'),
-      import('shiki/dist/langs/typescript.mjs'),
-      import('shiki/dist/langs/bash.mjs'),
-      import('shiki/dist/langs/csharp.mjs'),
-      import('shiki/dist/themes/github-light.mjs'),
-      import('shiki/dist/themes/github-dark.mjs'),
     ])
     const { createHighlighterCore } = resolveDefaultModule<ShikiCoreModule>(
       coreModule as ShikiCoreModule,
@@ -791,17 +803,63 @@ const loadShikiRuntime = async () => {
     }
     const highlighter = await createHighlighterCore({
       engine: createJavaScriptRegexEngine(),
-      langs: [
-        javascript.default,
-        typescript.default,
-        bash.default,
-        csharp.default,
-      ].flat(),
-      themes: [githubLight.default, githubDark.default],
+      langs: [],
+      themes: [],
     })
+    const loadedLanguages = new Set<string>()
+    const loadedThemes = new Set<string>()
+    const pendingLanguages = new Map<string, Promise<void>>()
+    const pendingThemes = new Map<string, Promise<void>>()
+    const loadOne = async (
+      key: string,
+      loaders: Record<string, () => Promise<unknown>>,
+      loaded: Set<string>,
+      pending: Map<string, Promise<void>>,
+      apply: ((...values: unknown[]) => Promise<void>) | undefined,
+    ) => {
+      if (loaded.has(key) || !apply) return
+      const loader = loaders[key]
+      if (!loader) return
+      let promise = pending.get(key)
+      if (!promise) {
+        promise = loader()
+          .then((module) => {
+            const value = (module as { default?: unknown }).default ?? module
+            return apply(...(Array.isArray(value) ? value : [value]))
+          })
+          .then(() => {
+            loaded.add(key)
+            pending.delete(key)
+          })
+          .catch((error) => {
+            pending.delete(key)
+            throw error
+          })
+        pending.set(key, promise)
+      }
+      await promise
+    }
 
     return {
       codeToHtml: (source, options) => highlighter.codeToHtml(source, options),
+      ensureLoaded: async (language, theme) => {
+        await Promise.all([
+          loadOne(
+            language,
+            shikiLanguageLoaders,
+            loadedLanguages,
+            pendingLanguages,
+            highlighter.loadLanguage?.bind(highlighter),
+          ),
+          loadOne(
+            theme,
+            shikiThemeLoaders,
+            loadedThemes,
+            pendingThemes,
+            highlighter.loadTheme?.bind(highlighter),
+          ),
+        ])
+      },
     }
   })()
 
@@ -878,6 +936,7 @@ export const defaultMermaidAdapter: MarkdownFeatureAdapter = async (
 
   try {
     const mermaid = await loadMermaidRuntime()
+    if (context?.signal?.aborted) return
     if (typeof mermaid.render !== 'function') {
       throw createMarkdownRuntimeError('infra', 'mermaid_render_unavailable')
     }
@@ -897,6 +956,7 @@ export const defaultMermaidAdapter: MarkdownFeatureAdapter = async (
       context?.cspNonce,
       () => mermaid.render!(renderId, source),
     )
+    if (context?.signal?.aborted) return
     const svg =
       typeof rendered === 'string'
         ? rendered
@@ -940,6 +1000,7 @@ export const defaultLatexAdapter: MarkdownFeatureAdapter = async (
 
   try {
     const katex = await loadKatexRuntime()
+    if (context?.signal?.aborted) return
     if (typeof katex.renderToString !== 'function') {
       throw createMarkdownRuntimeError('infra', 'katex_render_unavailable')
     }
@@ -953,6 +1014,7 @@ export const defaultLatexAdapter: MarkdownFeatureAdapter = async (
       throwOnError: false,
       trust: false,
     })
+    if (context?.signal?.aborted) return
     const fragment = createSafeFeatureFragment(
       element.ownerDocument,
       html,
@@ -1030,7 +1092,10 @@ export const defaultCodeHighlightAdapter: MarkdownFeatureAdapter = async (
 
   try {
     const shiki = await loadShikiRuntime()
+    await shiki.ensureLoaded?.(language, theme)
+    if (context?.signal?.aborted) return
     const html = await renderShikiHtml(shiki, source, language, theme)
+    if (context?.signal?.aborted) return
     const fragment = createSafeFeatureFragment(
       element.ownerDocument,
       html,
@@ -1072,20 +1137,35 @@ const markElements = async (
   kind: MarkdownFeatureActivationKind,
   adapter: MarkdownFeatureAdapter | null | undefined,
   context: MarkdownFeatureAdapterContext,
+  concurrency: number,
+  signal?: AbortSignal,
 ) => {
   const elements = selectMarkdownFeatureElements(root, selector)
   const errors: MarkdownFeatureActivationError[] = []
   let count = 0
 
-  for (const element of elements) {
-    try {
-      if (adapter) await adapter(element, context)
-      element.dataset.markdownFeatureActivated = kind
-      count += 1
-    } catch (error) {
-      errors.push(createActivationError(kind, error))
+  let nextIndex = 0
+  const activateNext = async () => {
+    while (nextIndex < elements.length) {
+      if (signal?.aborted) return
+      const element = elements[nextIndex++]
+      if (!element) continue
+      try {
+        if (adapter) await adapter(element, context)
+        if (signal?.aborted) return
+        element.dataset.markdownFeatureActivated = kind
+        count += 1
+      } catch (error) {
+        errors.push(createActivationError(kind, error))
+      }
     }
   }
+  await Promise.all(
+    Array.from(
+      { length: Math.min(elements.length, Math.max(1, concurrency)) },
+      () => activateNext(),
+    ),
+  )
   return { count, errors }
 }
 
@@ -1096,6 +1176,9 @@ export const activateMarkdownFeatures = async (
   const activated: MarkdownFeatureActivationItem[] = []
   const errors: MarkdownFeatureActivationError[] = []
   const theme = resolveFeatureTheme(options.root)
+  const concurrency = Math.max(1, Math.min(4, options.concurrency ?? 3))
+
+  if (options.signal?.aborted) return { activated, errors }
 
   if (features.headingSlug) {
     pushActivation(activated, 'heading', activateHeadingSlugs(options.root))
@@ -1136,6 +1219,7 @@ export const activateMarkdownFeatures = async (
       options.codeHighlightAdapter,
     ],
   ] as const) {
+    if (options.signal?.aborted) break
     if (
       (kind === 'mermaid' && !features.mermaid) ||
       (kind === 'latex' && !features.latex) ||
@@ -1145,13 +1229,22 @@ export const activateMarkdownFeatures = async (
     }
 
     try {
-      const result = await markElements(options.root, selector, kind, adapter, {
-        baseUrl: options.baseUrl,
-        cspNonce: options.cspNonce,
+      const result = await markElements(
+        options.root,
+        selector,
         kind,
-        root: options.root,
-        theme,
-      })
+        adapter,
+        {
+          baseUrl: options.baseUrl,
+          cspNonce: options.cspNonce,
+          kind,
+          root: options.root,
+          signal: options.signal,
+          theme,
+        },
+        concurrency,
+        options.signal,
+      )
       pushActivation(activated, kind, result.count)
       errors.push(...result.errors)
     } catch (error) {
@@ -1207,7 +1300,6 @@ let runtimePromise: Promise<{
   engine: MarkdownRuntimeKind
 }> | null = null
 let runtimeEngine: MarkdownRuntimeKind = 'UNKNOWN'
-const withMarkdownRuntimeLock = createSerializedExecutor()
 
 function supportsSimdMarkdown(): boolean {
   try {
@@ -1670,187 +1762,171 @@ async function renderMarkdownPayloadWithRuntime(
   request: MarkdownRenderRequest | string,
   payloadMode: MarkdownPayloadMode,
 ): Promise<MarkdownRuntimePayloadResult | null> {
-  return await withMarkdownRuntimeLock(async () => {
-    const startedAt = now()
-    const timings = createTimings()
-    const payload = typeof request === 'string' ? { source: request } : request
-    const source = normalizeMarkdownSource(payload.source)
+  const startedAt = now()
+  const timings = createTimings()
+  const payload = typeof request === 'string' ? { source: request } : request
+  const source = normalizeMarkdownSource(payload.source)
 
-    const initStartedAt = now()
-    const { module, engine } = await initMarkdownRuntimeModule()
-    timings.initMs = now() - initStartedAt
+  const initStartedAt = now()
+  const { module, engine } = await initMarkdownRuntimeModule()
+  timings.initMs = now() - initStartedAt
 
-    if (!module) {
-      return null
-    }
+  if (!module) {
+    return null
+  }
 
-    const alloc = module._markdown_alloc_buffer
-    const free = module._markdown_free_buffer
-    const render = module._markdown_render_profile ?? module._markdown_render
-    const getHtmlPtr = module._markdown_get_last_html_ptr
-    const getHtmlLen = module._markdown_get_last_html_len
-    const getErrorPtr = module._markdown_get_last_error_ptr
-    const getErrorLen = module._markdown_get_last_error_len
-    const getErrorCode = module._markdown_get_last_error_code
-    const getFeaturesPtr = module._markdown_get_last_features_ptr
-    const getFeaturesLen = module._markdown_get_last_features_len
-    const getPlaceholdersPtr = module._markdown_get_last_placeholders_ptr
-    const getPlaceholdersLen = module._markdown_get_last_placeholders_len
-    const getChunksPtr = module._markdown_get_last_chunks_ptr
-    const getChunksLen = module._markdown_get_last_chunks_len
-    const getRendererVersionPtr = module._markdown_get_last_renderer_version_ptr
-    const getRendererVersionLen = module._markdown_get_last_renderer_version_len
-    const getMetadataPtr = module._markdown_get_last_metadata_ptr
-    const getMetadataLen = module._markdown_get_last_metadata_len
+  const alloc = module._markdown_alloc_buffer
+  const free = module._markdown_free_buffer
+  const render = module._markdown_render_profile ?? module._markdown_render
+  const getHtmlPtr = module._markdown_get_last_html_ptr
+  const getHtmlLen = module._markdown_get_last_html_len
+  const getErrorPtr = module._markdown_get_last_error_ptr
+  const getErrorLen = module._markdown_get_last_error_len
+  const getErrorCode = module._markdown_get_last_error_code
+  const getFeaturesPtr = module._markdown_get_last_features_ptr
+  const getFeaturesLen = module._markdown_get_last_features_len
+  const getPlaceholdersPtr = module._markdown_get_last_placeholders_ptr
+  const getPlaceholdersLen = module._markdown_get_last_placeholders_len
+  const getChunksPtr = module._markdown_get_last_chunks_ptr
+  const getChunksLen = module._markdown_get_last_chunks_len
+  const getRendererVersionPtr = module._markdown_get_last_renderer_version_ptr
+  const getRendererVersionLen = module._markdown_get_last_renderer_version_len
+  const getMetadataPtr = module._markdown_get_last_metadata_ptr
+  const getMetadataLen = module._markdown_get_last_metadata_len
 
-    if (
-      !alloc ||
-      !free ||
-      !render ||
-      !getHtmlPtr ||
-      !getHtmlLen ||
-      !getErrorPtr ||
-      !getErrorLen ||
-      !getErrorCode ||
-      !getFeaturesPtr ||
-      !getFeaturesLen ||
-      !getPlaceholdersPtr ||
-      !getPlaceholdersLen ||
-      !getChunksPtr ||
-      !getChunksLen ||
-      !getRendererVersionPtr ||
-      !getRendererVersionLen ||
-      !getMetadataPtr ||
-      !getMetadataLen
-    ) {
-      return null
-    }
+  if (
+    !alloc ||
+    !free ||
+    !render ||
+    !getHtmlPtr ||
+    !getHtmlLen ||
+    !getErrorPtr ||
+    !getErrorLen ||
+    !getErrorCode ||
+    !getFeaturesPtr ||
+    !getFeaturesLen ||
+    !getPlaceholdersPtr ||
+    !getPlaceholdersLen ||
+    !getChunksPtr ||
+    !getChunksLen ||
+    !getRendererVersionPtr ||
+    !getRendererVersionLen ||
+    !getMetadataPtr ||
+    !getMetadataLen
+  ) {
+    return null
+  }
 
-    const encodeStartedAt = now()
-    const bytes = encodeUtf8(source)
-    const ptr = alloc(bytes.byteLength)
-    if (ptr <= 0) {
-      return null
-    }
+  const encodeStartedAt = now()
+  const bytes = encodeUtf8(source)
+  const ptr = alloc(bytes.byteLength)
+  if (ptr <= 0) {
+    return null
+  }
 
-    try {
-      module.HEAPU8.set(bytes, ptr)
-      timings.encodeMs = now() - encodeStartedAt
+  try {
+    module.HEAPU8.set(bytes, ptr)
+    timings.encodeMs = now() - encodeStartedAt
 
-      const renderStartedAt = now()
-      const ok =
-        render === module._markdown_render_profile
-          ? module._markdown_render_profile(
-              ptr,
-              bytes.byteLength,
-              payload.allowHtml ? 1 : 0,
-              payload.allowLatex === false ? 0 : 1,
-              payload.allowMermaid === false ? 0 : 1,
-              payloadModeToWasmMode(payloadMode),
-            )
-          : module._markdown_render?.(
-              ptr,
-              bytes.byteLength,
-              payload.allowHtml ? 1 : 0,
-              payload.allowLatex === false ? 0 : 1,
-              payload.allowMermaid === false ? 0 : 1,
-            )
-      timings.wasmRenderMs = now() - renderStartedAt
-
-      const memory = resolveModuleMemory(module)
-      if (!memory) {
-        return null
-      }
-      if (ok !== 1) {
-        const error = readCString(memory, getErrorPtr(), getErrorLen())
-        if (error) {
-          throw createMarkdownRuntimeError(
-            mapMarkdownErrorCode(getErrorCode(), error),
-            `markdown_wasm_render_failed:${error}`,
+    const renderStartedAt = now()
+    const ok =
+      render === module._markdown_render_profile
+        ? module._markdown_render_profile(
+            ptr,
+            bytes.byteLength,
+            payload.allowHtml ? 1 : 0,
+            payload.allowLatex === false ? 0 : 1,
+            payload.allowMermaid === false ? 0 : 1,
+            payloadModeToWasmMode(payloadMode),
           )
-        }
-        return null
-      }
+        : module._markdown_render?.(
+            ptr,
+            bytes.byteLength,
+            payload.allowHtml ? 1 : 0,
+            payload.allowLatex === false ? 0 : 1,
+            payload.allowMermaid === false ? 0 : 1,
+          )
+    timings.wasmRenderMs = now() - renderStartedAt
 
-      const htmlStartedAt = now()
-      const html = readCString(memory, getHtmlPtr(), getHtmlLen())
-      timings.readHtmlMs = now() - htmlStartedAt
-
-      const metadataStartedAt = now()
-      const rendererVersion =
-        readCString(memory, getRendererVersionPtr(), getRendererVersionLen()) ||
-        MARKDOWN_RENDERER_VERSION
-      timings.readMetadataMs = now() - metadataStartedAt
-
-      if (payloadMode === 'html-only') {
-        return {
-          html,
-          engine,
-          rendererVersion,
-          timings: finalizeTimings(timings, startedAt),
-        }
-      }
-
-      const featuresStartedAt = now()
-      const features = readStructured<MarkdownRenderResult['features']>(
-        memory,
-        getFeaturesPtr(),
-        getFeaturesLen(),
-        [],
-      )
-      timings.readFeaturesMs = now() - featuresStartedAt
-
-      const metadataReadStartedAt = now()
-      const metadata = readStructured<MarkdownRenderMetadata>(
-        memory,
-        getMetadataPtr(),
-        getMetadataLen(),
-        buildDefaultMetadata(payload, source, features, 0, rendererVersion),
-      )
-      timings.readMetadataMs += now() - metadataReadStartedAt
-
-      if (payloadMode === 'summary') {
-        return {
-          html,
-          engine,
-          features,
-          metadata,
-          rendererVersion,
-          timings: finalizeTimings(timings, startedAt),
-        }
-      }
-
-      const placeholdersStartedAt = now()
-      const placeholders = readStructured<MarkdownRenderPlaceholder[]>(
-        memory,
-        getPlaceholdersPtr(),
-        getPlaceholdersLen(),
-        [],
-      )
-      timings.readPlaceholdersMs = now() - placeholdersStartedAt
-
-      if (payloadMode === 'chunks') {
-        const chunks = readStructured<MarkdownRenderChunk[]>(
-          memory,
-          getChunksPtr(),
-          getChunksLen(),
-          [],
+    const memory = resolveModuleMemory(module)
+    if (!memory) {
+      return null
+    }
+    if (ok !== 1) {
+      const error = readCString(memory, getErrorPtr(), getErrorLen())
+      if (error) {
+        throw createMarkdownRuntimeError(
+          mapMarkdownErrorCode(getErrorCode(), error),
+          `markdown_wasm_render_failed:${error}`,
         )
-        return {
-          ...buildMarkdownRenderResult({
-            html,
-            source,
-            features,
-            placeholders,
-            rendererVersion,
-            metadata,
-          }),
-          chunks,
-          engine,
-          timings: finalizeTimings(timings, startedAt),
-        }
       }
+      return null
+    }
 
+    const htmlStartedAt = now()
+    const html = readCString(memory, getHtmlPtr(), getHtmlLen())
+    timings.readHtmlMs = now() - htmlStartedAt
+
+    const metadataStartedAt = now()
+    const rendererVersion =
+      readCString(memory, getRendererVersionPtr(), getRendererVersionLen()) ||
+      MARKDOWN_RENDERER_VERSION
+    timings.readMetadataMs = now() - metadataStartedAt
+
+    if (payloadMode === 'html-only') {
+      return {
+        html,
+        engine,
+        rendererVersion,
+        timings: finalizeTimings(timings, startedAt),
+      }
+    }
+
+    const featuresStartedAt = now()
+    const features = readStructured<MarkdownRenderResult['features']>(
+      memory,
+      getFeaturesPtr(),
+      getFeaturesLen(),
+      [],
+    )
+    timings.readFeaturesMs = now() - featuresStartedAt
+
+    const metadataReadStartedAt = now()
+    const metadata = readStructured<MarkdownRenderMetadata>(
+      memory,
+      getMetadataPtr(),
+      getMetadataLen(),
+      buildDefaultMetadata(payload, source, features, 0, rendererVersion),
+    )
+    timings.readMetadataMs += now() - metadataReadStartedAt
+
+    if (payloadMode === 'summary') {
+      return {
+        html,
+        engine,
+        features,
+        metadata,
+        rendererVersion,
+        timings: finalizeTimings(timings, startedAt),
+      }
+    }
+
+    const placeholdersStartedAt = now()
+    const placeholders = readStructured<MarkdownRenderPlaceholder[]>(
+      memory,
+      getPlaceholdersPtr(),
+      getPlaceholdersLen(),
+      [],
+    )
+    timings.readPlaceholdersMs = now() - placeholdersStartedAt
+
+    if (payloadMode === 'chunks') {
+      const chunks = readStructured<MarkdownRenderChunk[]>(
+        memory,
+        getChunksPtr(),
+        getChunksLen(),
+        [],
+      )
       return {
         ...buildMarkdownRenderResult({
           html,
@@ -1860,13 +1936,27 @@ async function renderMarkdownPayloadWithRuntime(
           rendererVersion,
           metadata,
         }),
+        chunks,
         engine,
         timings: finalizeTimings(timings, startedAt),
       }
-    } finally {
-      free(ptr)
     }
-  })
+
+    return {
+      ...buildMarkdownRenderResult({
+        html,
+        source,
+        features,
+        placeholders,
+        rendererVersion,
+        metadata,
+      }),
+      engine,
+      timings: finalizeTimings(timings, startedAt),
+    }
+  } finally {
+    free(ptr)
+  }
 }
 
 export async function renderMarkdownHtmlWithRuntime(

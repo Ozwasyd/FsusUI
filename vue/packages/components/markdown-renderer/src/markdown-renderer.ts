@@ -12,6 +12,10 @@ export const markdownRendererProps = buildProps({
     type: String,
     default: '',
   },
+  contentVersion: {
+    type: [String, Number] as PropType<string | number | null>,
+    default: null,
+  },
   initialHtml: {
     type: String,
     default: '',

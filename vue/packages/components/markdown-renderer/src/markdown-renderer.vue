@@ -85,7 +85,6 @@ import {
   escapeMarkdownHtml,
   normalizeMarkdownSource,
   renderMarkdownChunksWithRuntime,
-  renderMarkdownHtmlWithRuntime,
   renderMarkdownResultWithRuntime,
 } from '@element-plus/wasm'
 import { isFsusErr, toFsusError } from '@element-plus/utils'
@@ -97,7 +96,6 @@ import {
 import {
   sanitizeMarkdownChunk,
   sanitizeMarkdownHtml,
-  sanitizeMarkdownHtmlResult,
   sanitizeMarkdownRenderResult,
 } from './markdown-sanitize'
 
@@ -109,7 +107,6 @@ import type {
   MarkdownRenderRequest,
   MarkdownFeatureActivationResult,
   MarkdownRuntimeChunkResult,
-  MarkdownRuntimeHtmlResult,
   MarkdownRuntimeProfile,
   MarkdownRuntimeRenderResult,
 } from '@element-plus/wasm'
@@ -148,7 +145,6 @@ const renderedContent = shallowRef(
 const chunkUnits = shallowRef<readonly MarkdownRenderChunk[]>([])
 const MIN_INITIAL_MARKDOWN_CHUNKS = 3
 const MAX_INITIAL_MARKDOWN_CHUNKS = 12
-const SINGLE_PASS_MARKDOWN_SOURCE_BYTES = 24 * 1024
 const renderPipelineConfig = useGlobalConfig('renderPipeline')
 const renderStrategy = shallowRef<'sync' | 'chunked-main' | 'chunked-worker'>(
   'sync',
@@ -213,6 +209,13 @@ const getChunkUnitAttrs = (
 let currentTaskId = 0
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 let measurementWarmupCancel: (() => void) | null = null
+let activationController: AbortController | null = null
+let activationObserver: IntersectionObserver | null = null
+let activeChunkResult: MarkdownRuntimeChunkResult | null = null
+let activationDurationMs = 0
+let commitDurationMs = 0
+const activatedChunkKeys = new Set<string>()
+const chunkActivationElements = new Map<string, HTMLElement>()
 
 type RenderAnchor = {
   htmlEndOffset?: number
@@ -251,6 +254,17 @@ const afterFrame = () =>
 
     requestAnimationFrame(() => resolve())
   })
+
+const readPerformanceNow = () =>
+  typeof performance === 'undefined' ? Date.now() : performance.now()
+
+const recordCommitDuration = (startedAt: number) => {
+  commitDurationMs += readPerformanceNow() - startedAt
+  rootEl.value?.setAttribute(
+    'data-fsus-markdown-commit-ms',
+    commitDurationMs.toFixed(3),
+  )
+}
 
 const findScrollContainer = (element: HTMLElement | null) => {
   let current = element?.parentElement ?? null
@@ -308,20 +322,24 @@ const captureRenderAnchor = (): RenderAnchor | null => {
   if (scrollContainer.scrollTop <= 0) return null
 
   const containerRect = scrollContainer.getBoundingClientRect()
-  const candidates = Array.from(
-    root.querySelectorAll<HTMLElement>(anchorCandidateSelector),
+  const pointCandidate = root.ownerDocument.elementFromPoint?.(
+    Math.max(containerRect.left, 0) + 1,
+    Math.max(containerRect.top, 0) + 1,
   )
-
-  const anchor =
-    candidates.find((candidate) => {
-      const rect = candidate.getBoundingClientRect()
-      return (
-        rect.bottom >= containerRect.top && rect.top <= containerRect.top + 32
+  const pointAnchor =
+    pointCandidate instanceof HTMLElement
+      ? pointCandidate.closest<HTMLElement>(anchorCandidateSelector)
+      : null
+  const visibleUnit = virtualWindow.visibleItems.value[0]
+  const unitAnchor = visibleUnit
+    ? root.querySelector<HTMLElement>(
+        `.markdown-renderer__virtual-unit[data-fsus-render-unit-key="${escapeCssAttributeValue(visibleUnit.key)}"]`,
       )
-    }) ??
-    candidates.find(
-      (candidate) => candidate.getBoundingClientRect().top >= containerRect.top,
-    )
+    : null
+  const anchor =
+    (pointAnchor && root.contains(pointAnchor) ? pointAnchor : null) ??
+    unitAnchor ??
+    root.querySelector<HTMLElement>(anchorCandidateSelector)
 
   if (!anchor) return null
 
@@ -380,11 +398,13 @@ const restoreRenderAnchor = async (anchor: RenderAnchor | null) => {
 const commitRenderedContent = async (html: string, preserveAnchor = false) => {
   if (renderedContent.value === html) return false
 
+  const startedAt = readPerformanceNow()
   const anchor = preserveAnchor ? captureRenderAnchor() : null
   chunkUnits.value = []
   renderStrategy.value = 'sync'
   renderedContent.value = html
   await restoreRenderAnchor(anchor)
+  recordCommitDuration(startedAt)
   return true
 }
 
@@ -404,6 +424,14 @@ const virtualWindow = useFsusVirtualWindow<MarkdownRenderChunk>({
 
 const setChunkUnitRef = (key: string, element: Element | null) => {
   virtualWindow.setUnitRef(key, element)
+  const previous = chunkActivationElements.get(key)
+  if (previous && previous !== element) {
+    activationObserver?.unobserve(previous)
+    chunkActivationElements.delete(key)
+  }
+  if (!(element instanceof HTMLElement)) return
+  chunkActivationElements.set(key, element)
+  observeChunkForActivation(key, element)
 }
 
 const setChunkUnitTemplateRef = (
@@ -442,20 +470,32 @@ const createMarkdownRenderRequest = (
   allowHtml: props.allowHtml,
   allowLatex: props.allowLatex,
   allowMermaid: props.allowMermaid,
+  contentVersion: props.contentVersion,
 })
 
-const hashMarkdownSource = (source: string) => {
-  let hash = 0xcbf29ce484222325n
-  for (let index = 0; index < source.length; index += 1) {
-    hash ^= BigInt(source.charCodeAt(index))
-    hash = BigInt.asUintN(64, hash * 0x100000001b3n)
+const sampleMarkdownSource = (source: string) => {
+  let hash = 0x811c9dc5
+  const sampleSize = 64
+  const starts = [
+    0,
+    Math.max(0, Math.floor(source.length / 2) - sampleSize / 2),
+    Math.max(0, source.length - sampleSize),
+  ]
+  for (const start of starts) {
+    const end = Math.min(source.length, start + sampleSize)
+    for (let index = start; index < end; index += 1) {
+      hash ^= source.charCodeAt(index)
+      hash = Math.imul(hash, 0x01000193)
+    }
   }
-  return hash.toString(36)
+  return (hash >>> 0).toString(36)
 }
 
 const fingerprintMarkdownRenderRequest = (request: MarkdownRenderRequest) =>
   [
-    hashMarkdownSource(request.source),
+    request.contentVersion === null || request.contentVersion === undefined
+      ? `sample:${sampleMarkdownSource(request.source)}`
+      : `version:${String(request.contentVersion)}`,
     request.source.length,
     request.baseUrl ?? '',
     request.mode,
@@ -463,9 +503,6 @@ const fingerprintMarkdownRenderRequest = (request: MarkdownRenderRequest) =>
     request.allowLatex ? 'latex' : 'no-latex',
     request.allowMermaid ? 'mermaid' : 'no-mermaid',
   ].join('\u0000')
-
-const resolveMarkdownHtmlResult = (result: MarkdownRuntimeHtmlResult) =>
-  props.sanitizeHtml ? sanitizeMarkdownHtmlResult(result) : result
 
 const resolveMarkdownRenderResult = <
   TResult extends MarkdownRuntimeChunkResult | MarkdownRuntimeRenderResult,
@@ -551,38 +588,10 @@ const renderScheduler = useFsusRenderScheduler(
   computed(() => resolvedRenderPipelineConfig.value.budget),
 )
 
-const renderMarkdownHtmlCached = async (request: MarkdownRenderRequest) => {
-  const cacheKey = fingerprintMarkdownRenderRequest(request)
-  const cached = getMarkdownRendererRuntimeCache<MarkdownRuntimeHtmlResult>(
-    'html',
-    cacheKey,
-  )
-  if (cached) return { ok: true as const, value: cached }
-  const cachedResult =
-    getMarkdownRendererRuntimeCache<MarkdownRuntimeRenderResult>(
-      'result',
-      cacheKey,
-    )
-  if (cachedResult) {
-    const htmlResult: MarkdownRuntimeHtmlResult = {
-      engine: cachedResult.engine,
-      html: cachedResult.html,
-      rendererVersion: cachedResult.rendererVersion,
-      timings: cachedResult.timings,
-    }
-    setMarkdownRendererRuntimeCache('result', cacheKey, cachedResult)
-    setMarkdownRendererRuntimeCache('html', cacheKey, htmlResult)
-    return { ok: true as const, value: htmlResult }
-  }
-
-  const result = await renderMarkdownHtmlWithRuntime(request)
-  if (!isFsusErr(result)) {
-    setMarkdownRendererRuntimeCache('html', cacheKey, result.value)
-  }
-  return result
-}
-
-const renderMarkdownResultCached = async (request: MarkdownRenderRequest) => {
+const renderMarkdownResultCached = async (
+  request: MarkdownRenderRequest,
+  generation: number,
+) => {
   const cacheKey = fingerprintMarkdownRenderRequest(request)
   const cached = getMarkdownRendererRuntimeCache<MarkdownRuntimeRenderResult>(
     'result',
@@ -591,24 +600,11 @@ const renderMarkdownResultCached = async (request: MarkdownRenderRequest) => {
   if (cached) return { ok: true as const, value: cached }
 
   const result = await renderMarkdownResultWithRuntime(request)
-  if (!isFsusErr(result)) {
+  if (!isFsusErr(result) && generation === currentTaskId) {
     setMarkdownRendererRuntimeCache('result', cacheKey, result.value)
-    setMarkdownRendererRuntimeCache('html', cacheKey, {
-      engine: result.value.engine,
-      html: result.value.html,
-      rendererVersion: result.value.rendererVersion,
-      timings: result.value.timings,
-    })
   }
   return result
 }
-
-const resolveMarkdownRenderExecutionMode = (
-  request: MarkdownRenderRequest,
-): 'fast-html-then-full' | 'single-pass' =>
-  request.source.length <= SINGLE_PASS_MARKDOWN_SOURCE_BYTES
-    ? 'single-pass'
-    : 'fast-html-then-full'
 
 const scheduleMeasurementWarmup = () => {
   measurementWarmupCancel?.()
@@ -647,18 +643,35 @@ const resolveMarkdownFeatureAdapter = <TAdapter,>(
   defaultAdapter: TAdapter,
 ) => (adapter === undefined ? defaultAdapter : adapter)
 
-const activateRenderedFeatures = async (result: MarkdownRenderResult) => {
+const resetFeatureActivation = () => {
+  activationController?.abort()
+  activationController = new AbortController()
+  activationObserver?.disconnect()
+  activationObserver = null
+  activeChunkResult = null
+  activationDurationMs = 0
+  rootEl.value?.removeAttribute('data-fsus-markdown-activation-ms')
+  activatedChunkKeys.clear()
+  chunkActivationElements.clear()
+}
+
+const activateRenderedFeatures = async (
+  result: MarkdownRenderResult,
+  activationRoot: ParentNode | null = rootEl.value,
+  signal: AbortSignal | undefined = activationController?.signal,
+) => {
   await nextTick()
 
-  const root = rootEl.value
-  if (!root) return
+  if (!activationRoot || signal?.aborted) return
 
+  const activationStartedAt = readPerformanceNow()
   const activation = await activateMarkdownFeatures({
     baseUrl: props.baseUrl,
     codeHighlightAdapter: resolveMarkdownFeatureAdapter(
       props.codeHighlightAdapter,
       defaultCodeHighlightAdapter,
     ),
+    concurrency: 3,
     cspNonce: props.cspNonce,
     features: resolveMarkdownFeatureOptions(),
     latexAdapter: resolveMarkdownFeatureAdapter(
@@ -669,13 +682,74 @@ const activateRenderedFeatures = async (result: MarkdownRenderResult) => {
       props.mermaidAdapter,
       defaultMermaidAdapter,
     ),
-    root,
+    root: activationRoot,
+    signal,
   })
+  if (signal?.aborted) return
+  activationDurationMs += readPerformanceNow() - activationStartedAt
+  rootEl.value?.setAttribute(
+    'data-fsus-markdown-activation-ms',
+    activationDurationMs.toFixed(3),
+  )
   emit('features-activated', activation, result)
+}
+
+async function activateChunkFeatures(
+  key: string,
+  element: HTMLElement,
+  taskId: number,
+) {
+  if (
+    taskId !== currentTaskId ||
+    activatedChunkKeys.has(key) ||
+    !activeChunkResult ||
+    activationController?.signal.aborted
+  ) {
+    return
+  }
+  activatedChunkKeys.add(key)
+  await activateRenderedFeatures(
+    activeChunkResult,
+    element,
+    activationController?.signal,
+  )
+}
+
+function observeChunkForActivation(key: string, element: HTMLElement) {
+  const taskId = currentTaskId
+  if (typeof IntersectionObserver === 'undefined') {
+    void activateChunkFeatures(key, element, taskId)
+    return
+  }
+  if (!activationObserver) {
+    const viewport = findScrollContainer(rootEl.value)
+    const observerRoot =
+      viewport === document.documentElement || viewport === document.body
+        ? null
+        : viewport
+    activationObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting || !(entry.target instanceof HTMLElement)) {
+            continue
+          }
+          const unitKey = entry.target.dataset.fsusRenderUnitKey
+          if (!unitKey) continue
+          activationObserver?.unobserve(entry.target)
+          void activateChunkFeatures(unitKey, entry.target, currentTaskId)
+        }
+      },
+      { root: observerRoot, rootMargin: '384px 0px' },
+    )
+  }
+  activationObserver.observe(element)
 }
 
 const performRender = async () => {
   const taskId = ++currentTaskId
+  resetFeatureActivation()
+  commitDurationMs = 0
+  rootEl.value?.removeAttribute('data-fsus-markdown-commit-ms')
   const source = normalizeMarkdownSource(props.content)
   const request = createMarkdownRenderRequest(source)
   isRendering.value = source.length > 0
@@ -711,9 +785,26 @@ const performRender = async () => {
       const resolvedUnits = props.sanitizeHtml
         ? document.units.map(sanitizeMarkdownChunk)
         : document.units
+      const firstSectionHeadingIndex = resolvedUnits.findIndex(
+        (unit, index) => index > 0 && unit.kind === 'heading',
+      )
+      const initialCount = Math.min(
+        resolvedUnits.length,
+        firstSectionHeadingIndex < 0
+          ? MIN_INITIAL_MARKDOWN_CHUNKS
+          : Math.min(
+              MAX_INITIAL_MARKDOWN_CHUNKS,
+              Math.max(
+                MIN_INITIAL_MARKDOWN_CHUNKS,
+                firstSectionHeadingIndex + 1,
+              ),
+            ),
+      )
 
+      const commitStartedAt = readPerformanceNow()
       renderedContent.value = ''
-      chunkUnits.value = resolvedUnits
+      activeChunkResult = resolvedResult
+      chunkUnits.value = resolvedUnits.slice(0, initialCount)
       renderStrategy.value =
         renderPipelineRuntime.renderedStrategy.value === 'chunked-worker'
           ? 'chunked-worker'
@@ -727,59 +818,22 @@ const performRender = async () => {
       emit('placeholders-ready', resolvedResult.placeholders, resolvedResult)
       await nextTick()
       virtualWindow.readViewport()
-      await activateRenderedFeatures(resolvedResult)
+      await afterFrame()
+      if (initialCount < resolvedUnits.length) {
+        if (taskId !== currentTaskId) return
+        await afterFrame()
+        if (taskId !== currentTaskId) return
+        chunkUnits.value = resolvedUnits
+        await nextTick()
+        virtualWindow.readViewport()
+      }
+      recordCommitDuration(commitStartedAt)
       emit('render-complete', resolvedResult)
       scheduleMeasurementWarmup()
       return
     }
 
-    if (resolveMarkdownRenderExecutionMode(request) === 'single-pass') {
-      const result = await renderMarkdownResultCached(request)
-
-      if (taskId !== currentTaskId) {
-        return
-      }
-
-      if (isFsusErr(result)) {
-        throw result.error
-      }
-
-      const resolvedResult = resolveMarkdownRenderResult(result.value)
-
-      await commitRenderedContent(resolvedResult.html, true)
-      await activateRenderedFeatures(resolvedResult)
-      emit('render-profile', {
-        engine: resolvedResult.engine,
-        phase: 'full-result',
-        rendererVersion: resolvedResult.rendererVersion,
-        timings: resolvedResult.timings,
-      })
-      emit('placeholders-ready', resolvedResult.placeholders, resolvedResult)
-      emit('render-complete', resolvedResult)
-      return
-    }
-
-    const htmlResult = await renderMarkdownHtmlCached(request)
-
-    if (taskId !== currentTaskId) {
-      return
-    }
-
-    if (isFsusErr(htmlResult)) {
-      throw htmlResult.error
-    }
-
-    const resolvedHtmlResult = resolveMarkdownHtmlResult(htmlResult.value)
-
-    await commitRenderedContent(resolvedHtmlResult.html)
-    emit('render-profile', {
-      engine: resolvedHtmlResult.engine,
-      phase: 'html-only',
-      rendererVersion: resolvedHtmlResult.rendererVersion,
-      timings: resolvedHtmlResult.timings,
-    })
-
-    const result = await renderMarkdownResultCached(request)
+    const result = await renderMarkdownResultCached(request, taskId)
 
     if (taskId !== currentTaskId) {
       return
@@ -825,6 +879,7 @@ const performRender = async () => {
 watch(
   () => [
     props.content,
+    props.contentVersion,
     props.allowHtml,
     props.sanitizeHtml,
     props.allowLatex,
@@ -855,6 +910,13 @@ onBeforeUnmount(() => {
   }
   measurementWarmupCancel?.()
   measurementWarmupCancel = null
+  activationController?.abort()
+  activationController = null
+  activationObserver?.disconnect()
+  activationObserver = null
+  activeChunkResult = null
+  activatedChunkKeys.clear()
+  chunkActivationElements.clear()
   currentTaskId += 1
   isRendering.value = false
 })

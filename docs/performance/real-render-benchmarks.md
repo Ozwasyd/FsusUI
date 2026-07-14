@@ -40,7 +40,13 @@ The full browser matrix is the Cartesian product of every scenario below with 60
 - paired `render-pipeline-monolithic` and `render-pipeline-cooperative` CPU work, measuring the input response of an indivisible callback against the real continuation scheduler;
 - 60 Hz and 120 Hz targets, DPR 1 and 2, and enabled/reduced/disabled motion modes.
 
-The runner records frame work and intervals, dropped-frame rate, Long Tasks, input-to-next-frame latency, style/layout/paint/composite trace durations, DOM nodes, Chromium layers and estimated layer area, JS heap, Worker queue/compute/transfer time, and WASM startup/compute/end-to-end time. The `data-pipeline-table` result additionally reports p50/p95/p99 for the legacy synchronous sort block, Worker submission block and Worker/WASM end-to-end completion. This distinguishes main-thread responsiveness from total completion time. Refresh targets are analysis budgets; they do not claim that a virtual CI display physically refreshes at 120 Hz.
+The runner records frame work and intervals, dropped-frame rate, Long Tasks, input-to-next-frame latency, style/layout/paint/composite trace durations, DOM nodes, Chromium layers and estimated layer area, JS heap, Worker queue/compute/transfer time, and WASM startup/compute/end-to-end time. Markdown results additionally expose `markdownPhases.parseMs`, `transferMs`, `commitMs`, `activationMs`, and the matching Chromium `paintMs`, so the 24 KiB, 256 KiB and 1 MiB path can be compared phase by phase instead of treating one end-to-end number as a diagnosis. The `data-pipeline-table` result additionally reports p50/p95/p99 for the legacy synchronous sort block, Worker submission block and Worker/WASM end-to-end completion. This distinguishes main-thread responsiveness from total completion time. Refresh targets are analysis budgets; they do not claim that a virtual CI display physically refreshes at 120 Hz.
+
+To collect only the three Markdown sizes while preserving cold/hot scenario semantics:
+
+```bash
+pnpm perf:render:web -- --profile full --scenario markdown- --warmups 3 --samples 12 --output .tmp/performance/markdown-renderer
+```
 
 To reproduce the real 100K Table data-path measurement without unrelated scenarios:
 
