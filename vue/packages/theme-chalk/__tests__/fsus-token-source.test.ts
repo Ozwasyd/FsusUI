@@ -16,6 +16,27 @@ const generatedTokenSource = readFileSync(
   path.resolve(dirname, '../src/generated/tokens.scss'),
   'utf8',
 )
+const generatedCssSource = readFileSync(
+  path.resolve(dirname, '../src/generated/tokens.css'),
+  'utf8',
+)
+const generatedJson = JSON.parse(
+  readFileSync(path.resolve(dirname, '../src/generated/tokens.json'), 'utf8'),
+)
+const generatedAvaloniaSource = readFileSync(
+  path.resolve(
+    dirname,
+    '../../../../dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml',
+  ),
+  'utf8',
+)
+const generatedCsharpSource = readFileSync(
+  path.resolve(
+    dirname,
+    '../../../../dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs',
+  ),
+  'utf8',
+)
 const inputSource = readFileSync(
   path.resolve(dirname, '../src/input.scss'),
   'utf8',
@@ -67,5 +88,41 @@ describe('Fsus token source contracts', () => {
     )
     expect(tokenSource).toContain('--fsus-scholarly-blue: #4b79cc;')
     expect(tokenSource).toContain('--fsus-accent-hover: #6f93d7;')
+  })
+
+  test('exposes quiet, decorative, and raised semantics from generated mode values', () => {
+    expect(tokenSource).toContain(
+      '--fsus-color-text-quiet: #{generated.$fsus-color-text-quiet};',
+    )
+    expect(tokenSource).toContain(
+      '--fsus-color-text-decorative: #{generated.$fsus-color-text-decorative};',
+    )
+    expect(tokenSource).toContain(
+      '--fsus-dot-gray: var(--fsus-color-text-decorative);',
+    )
+    expect(tokenSource).toContain(
+      '--fsus-color-surface-raised: #{generated.$fsus-color-surface-raised-dark};',
+    )
+    expect(generatedTokenSource).toContain(
+      '$fsus-color-text-quiet-dark: #A1A1AA;',
+    )
+    expect(generatedTokenSource).toContain(
+      '$fsus-color-text-decorative-dark: #71717A;',
+    )
+    expect(generatedTokenSource).toContain(
+      '$fsus-color-surface-raised-dark: #1A1A1E;',
+    )
+    expect(generatedCssSource).toContain('[data-fsus-theme="high-contrast"] {')
+    expect(generatedCssSource).toContain('--fsus-color-text-quiet: #FFFFFF;')
+    expect(generatedJson.tokens['color.text.decorative'].modeValues).toEqual({
+      dark: '#71717A',
+      highContrast: '#FFFFFF',
+    })
+    expect(generatedAvaloniaSource).toContain(
+      '<Color x:Key="FsusColorTextQuietDark">#A1A1AA</Color>',
+    )
+    expect(generatedCsharpSource).toContain(
+      'public const string ColorSurfaceRaisedDarkValue = "#1A1A1E";',
+    )
   })
 })

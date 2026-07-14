@@ -2,6 +2,8 @@
 :root, [data-fsus-theme="light"] {
   --fsus-primitive-color-blue-600: #2A599C;
   --fsus-primitive-color-blue-700: #244E89;
+  --fsus-primitive-color-gray-400: #A1A1AA;
+  --fsus-primitive-color-gray-500: #71717A;
   --fsus-primitive-color-gray-950: #0F0F11;
   --fsus-primitive-color-white: #FFFFFF;
   --fsus-color-action-primary: #2A599C;
@@ -9,6 +11,9 @@
   --fsus-color-action-primary-hover: #244E89;
   --fsus-color-text-primary: #0F0F11;
   --fsus-color-text-muted: #71717A;
+  --fsus-color-text-quiet: #A1A1AA;
+  --fsus-color-text-decorative: #A1A1AA;
+  --fsus-dot-gray: var(--fsus-color-text-decorative);
   --fsus-color-surface-base: #FFFFFF;
   --fsus-color-surface-raised: #F7F7F8;
   --fsus-color-border-subtle: #E4E4E7;
@@ -70,7 +75,12 @@
   --fsus-color-action-primary: #4B79CC;
   --fsus-color-action-primary-hover: #6F93D7;
   --fsus-color-text-primary: #F0F0F4;
+  --fsus-color-text-quiet: #A1A1AA;
+  --fsus-color-text-decorative: #71717A;
   --fsus-color-surface-base: #121214;
+  --fsus-color-surface-raised: #1A1A1E;
+  --fsus-color-border-subtle: #27272A;
+  --fsus-color-focus-ring: #4B79CC;
   --fsus-component-state-button-primary-background-default: #F0F0F4;
   --fsus-component-state-button-primary-background-hover: #4B79CC;
 }
@@ -79,7 +89,12 @@
   --fsus-color-action-primary: #FFFF00;
   --fsus-color-action-primary-hover: #FFFF00;
   --fsus-color-text-primary: #FFFFFF;
+  --fsus-color-text-quiet: #FFFFFF;
+  --fsus-color-text-decorative: #FFFFFF;
   --fsus-color-surface-base: #000000;
+  --fsus-color-surface-raised: #000000;
+  --fsus-color-border-subtle: #FFFFFF;
+  --fsus-color-focus-ring: #FFFF00;
   --fsus-component-state-button-primary-background-default: #FFFFFF;
   --fsus-component-state-button-primary-background-hover: #FFFF00;
 }

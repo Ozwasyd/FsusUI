@@ -14,22 +14,26 @@ FsusUI semantic aliases on top.
 
 ## Preview Public Tokens
 
-| Token                       | Purpose                                                          |
-| --------------------------- | ---------------------------------------------------------------- |
-| `--el-color-primary`        | Element Plus compatibility primary mapped to Ink by default.     |
-| `--fsus-scholarly-blue`     | Accent for links, active states, focus rings, and selection.     |
-| `--el-bg-color`             | Main surface background.                                         |
-| `--el-bg-color-page`        | Page background.                                                 |
-| `--el-text-color-primary`   | Primary text.                                                    |
-| `--el-text-color-secondary` | Secondary text.                                                  |
-| `--el-border-color`         | Default border color.                                            |
-| `--el-border-radius-small`  | Small radius token.                                              |
-| `--el-border-radius-base`   | Base radius token.                                               |
-| `--el-border-radius-large`  | Large radius token.                                              |
-| `--el-border-radius-round`  | Fully rounded token for circular controls.                       |
-| `--el-box-shadow`           | Border-first panel shadow, defaulting to `none`.                 |
-| `--el-box-shadow-light`     | Opt-in low elevation shadow.                                     |
-| `--fsus-backdrop-blur`      | Opt-in backdrop blur amount, defaulting to `0px`.                |
+| Token                          | Purpose                                                                               |
+| ------------------------------ | ------------------------------------------------------------------------------------- |
+| `--el-color-primary`           | Element Plus compatibility primary mapped to Ink by default.                          |
+| `--fsus-scholarly-blue`        | Accent for links, active states, focus rings, and selection.                          |
+| `--el-bg-color`                | Main surface background.                                                              |
+| `--el-bg-color-page`           | Page background.                                                                      |
+| `--el-text-color-primary`      | Primary text.                                                                         |
+| `--el-text-color-secondary`    | Secondary text.                                                                       |
+| `--fsus-color-text-quiet`      | Readable low-emphasis informational text; remains `#A1A1AA` in light and dark modes.  |
+| `--fsus-color-text-decorative` | Non-essential ornamental marks; switches from `#A1A1AA` to `#71717A` in dark mode.    |
+| `--fsus-color-surface-raised`  | Raised and inline-code surfaces; switches from `#F7F7F8` to `#1A1A1E` in dark mode.   |
+| `--fsus-dot-gray`              | Compatibility alias for `--fsus-color-text-decorative`; also feeds `--el-color-info`. |
+| `--el-border-color`            | Default border color.                                                                 |
+| `--el-border-radius-small`     | Small radius token.                                                                   |
+| `--el-border-radius-base`      | Base radius token.                                                                    |
+| `--el-border-radius-large`     | Large radius token.                                                                   |
+| `--el-border-radius-round`     | Fully rounded token for circular controls.                                            |
+| `--el-box-shadow`              | Border-first panel shadow, defaulting to `none`.                                      |
+| `--el-box-shadow-light`        | Opt-in low elevation shadow.                                                          |
+| `--fsus-backdrop-blur`         | Opt-in backdrop blur amount, defaulting to `0px`.                                     |
 
 ### Spacing Tokens
 
@@ -126,6 +130,7 @@ FsusBlog and other product integrations can define product-level aliases such
 as `--blog-reading-surface` or `--blog-accent`. Keep those aliases in the
 product stylesheet and map them to FsusUI public-preview tokens rather than
 depending on component-private variables.
+
 > **Material default:** Backdrops default to `0px` blur. Use `.is-glass` or
 > `[data-fsus-material='glass']` when a surface intentionally needs glass
 > material. Reading surfaces can use `[data-fsus-surface='reading']` to disable

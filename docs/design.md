@@ -74,14 +74,15 @@ FsusUI 的色彩系统围绕 **Ink / Paper / Dot / Scholarly Blue** 展开。颜
 
 ### Core Palette
 
-| Concept        | Light                 | Dark      | Runtime Token                           | Usage                                     |
-| -------------- | --------------------- | --------- | --------------------------------------- | ----------------------------------------- |
-| Ink            | `#0F0F11`             | `#F0F0F4` | `--fsus-ink`, `--el-text-color-primary` | 主要文本、品牌字标、Primary Button 默认色 |
-| Paper          | `#FFFFFF` / `#FCFCFC` | `#121214` | `--fsus-paper`, `--el-bg-color`         | 控件和浮层表面                            |
-| Page           | `#F7F7F8`             | `#09090B` | `--fsus-page`, `--el-bg-color-page`     | 页面背景                                  |
-| Dot Gray       | `#A1A1AA` / `#8E8E93` | `#71717A` | `--fsus-dot-gray`, `--el-color-info`    | 次级文本、弱边框、禁用态                  |
-| Border         | `#E4E4E7`             | `#27272A` | `--fsus-border`, `--el-border-color`    | 默认边框和分隔线                          |
-| Scholarly Blue | `#2A599C`             | `#4B79CC` | `--fsus-scholarly-blue`                 | 链接、激活态、Focus Ring、交互 Hover      |
+| Concept         | Light                 | Dark      | Runtime Token                                                        | Usage                                     |
+| --------------- | --------------------- | --------- | -------------------------------------------------------------------- | ----------------------------------------- |
+| Ink             | `#0F0F11`             | `#F0F0F4` | `--fsus-ink`, `--el-text-color-primary`                              | 主要文本、品牌字标、Primary Button 默认色 |
+| Paper           | `#FFFFFF` / `#FCFCFC` | `#121214` | `--fsus-paper`, `--el-bg-color`                                      | 控件和浮层表面                            |
+| Page            | `#F7F7F8`             | `#09090B` | `--fsus-page`, `--el-bg-color-page`                                  | 页面背景                                  |
+| Quiet Text      | `#A1A1AA`             | `#A1A1AA` | `--fsus-color-text-quiet`                                            | 必须可读的低强调说明文字                  |
+| Decorative Gray | `#A1A1AA`             | `#71717A` | `--fsus-color-text-decorative`, `--fsus-dot-gray`, `--el-color-info` | 非必要装饰、句点与视觉分隔                |
+| Border          | `#E4E4E7`             | `#27272A` | `--fsus-border`, `--el-border-color`                                 | 默认边框和分隔线                          |
+| Scholarly Blue  | `#2A599C`             | `#4B79CC` | `--fsus-scholarly-blue`                                              | 链接、激活态、Focus Ring、交互 Hover      |
 
 ### Accent Rules
 
@@ -116,7 +117,7 @@ FsusUI 的色彩系统围绕 **Ink / Paper / Dot / Scholarly Blue** 展开。颜
 | ---------------- | ------- | -------------------------------------------------- | ------------------------------------ |
 | Small control    | `4px`   | `--fsus-radius-control-small`                      | 小尺寸按钮、紧凑输入、标签内部结构   |
 | Control          | `6px`   | `--fsus-radius-control`, `--el-border-radius-base` | Button、Input、Select、Checkbox 外框 |
-| Navigation       | `6px`   | `--fsus-radius-navigation`                        | Tabs、Menu 等选中与导航表面          |
+| Navigation       | `6px`   | `--fsus-radius-navigation`                         | Tabs、Menu 等选中与导航表面          |
 | Popover          | `10px`  | `--fsus-radius-popover`                            | Tooltip、Popover、Dropdown 内层面板  |
 | Panel            | `12px`  | `--fsus-radius-panel`, `--el-dialog-border-radius` | Dialog、Drawer、Card、MessageBox     |
 | Expressive panel | `24px`  | `--fsus-radius-panel-large`                        | 仅限 opt-in expressive surface       |
@@ -163,11 +164,11 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 
 ### Shadow
 
-| Token                         | Value                                | Usage                          |
-| ----------------------------- | ------------------------------------ | ------------------------------ |
-| `--fsus-shadow-panel`         | `none`                               | 普通 Dialog、Card、Drawer 面板 |
-| `--fsus-shadow-panel-light`   | `0 8px 24px rgba(15, 23, 42, 0.05)`  | Opt-in 低层级浮层              |
-| `--fsus-shadow-panel-lighter` | `0 2px 8px rgba(15, 23, 42, 0.04)`   | Opt-in 轻微浮起元素            |
+| Token                         | Value                                | Usage                              |
+| ----------------------------- | ------------------------------------ | ---------------------------------- |
+| `--fsus-shadow-panel`         | `none`                               | 普通 Dialog、Card、Drawer 面板     |
+| `--fsus-shadow-panel-light`   | `0 8px 24px rgba(15, 23, 42, 0.05)`  | Opt-in 低层级浮层                  |
+| `--fsus-shadow-panel-lighter` | `0 2px 8px rgba(15, 23, 42, 0.04)`   | Opt-in 轻微浮起元素                |
 | `--fsus-shadow-floating`      | `0 12px 32px rgba(15, 23, 42, 0.08)` | Notification、Popover 等高层级浮层 |
 
 避免使用重黑投影、彩色光晕和无层级意义的外发光。
@@ -255,13 +256,13 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 
 `40px` tab header 默认值只覆盖 **desktop / task surface**。Mobile 必须显式选一种 navigation 模式，不要把 desktop 的下划线 tab 直接搬到 mobile：
 
-| 模式 | 适用场景 | 触控高度 | Active 表达 |
-|------|---------|---------|------------|
-| **Header menu** | 编辑型站点、文档站、文章站的主导航 | `40–44px` trigger，菜单项至少 `44px` | 当前链接使用 Ink 文本与 `aria-current="page"` |
-| **Header inline** | 项目很少、需要持续可见的移动主导航 | `44px` | Ink 文本；当前项加粗或使用 Scholarly Blue 标记 |
-| **Bottom tab bar** | 明确采用 app-like navigation 的 consumer 主导航（3–5 项） | `56–64px`（含 safe-area-inset-bottom） | Ink 图标 + Ink 文本 + Scholarly Blue 顶标或 icon fill |
-| **Segment control** | 单一页面内的视图切换（Tab/All/Following） | `36–40px` | Scholarly Blue 选中胶囊 + Ink 文本 |
-| **Horizontal scrollable tab strip** | 多于 4 个分类的次级导航 | `44px` 触控区 + scroll snap | Ink 文本 + Scholarly Blue 下划线（继承 desktop 规范） |
+| 模式                                | 适用场景                                                  | 触控高度                               | Active 表达                                           |
+| ----------------------------------- | --------------------------------------------------------- | -------------------------------------- | ----------------------------------------------------- |
+| **Header menu**                     | 编辑型站点、文档站、文章站的主导航                        | `40–44px` trigger，菜单项至少 `44px`   | 当前链接使用 Ink 文本与 `aria-current="page"`         |
+| **Header inline**                   | 项目很少、需要持续可见的移动主导航                        | `44px`                                 | Ink 文本；当前项加粗或使用 Scholarly Blue 标记        |
+| **Bottom tab bar**                  | 明确采用 app-like navigation 的 consumer 主导航（3–5 项） | `56–64px`（含 safe-area-inset-bottom） | Ink 图标 + Ink 文本 + Scholarly Blue 顶标或 icon fill |
+| **Segment control**                 | 单一页面内的视图切换（Tab/All/Following）                 | `36–40px`                              | Scholarly Blue 选中胶囊 + Ink 文本                    |
+| **Horizontal scrollable tab strip** | 多于 4 个分类的次级导航                                   | `44px` 触控区 + scroll snap            | Ink 文本 + Scholarly Blue 下划线（继承 desktop 规范） |
 
 不允许：
 
@@ -342,7 +343,7 @@ Consumer 在公开 landing 上使用 FsusUI 时，必须在 Public Layout Rules 
   height: 38px;
   padding-inline: 14px;
   border-radius: 999px;
-  background: linear-gradient(135deg, #2A599C, #4B79CC);
+  background: linear-gradient(135deg, #2a599c, #4b79cc);
 }
 ```
 
@@ -357,7 +358,7 @@ Focus 状态使用 `2px` Scholarly Blue ring：
 
 /* ❌ 浏览器默认蓝色 outline */
 :focus {
-  outline: 2px solid #4B79CC;
+  outline: 2px solid #4b79cc;
 }
 ```
 
@@ -437,14 +438,16 @@ body {
 
 ### Core Color Tokens
 
-| Visual Concept | Light                 | Runtime Token                           | Dark      |
-| -------------- | --------------------- | --------------------------------------- | --------- |
-| Ink            | `#0F0F11`             | `--fsus-ink`, `--el-text-color-primary` | `#F0F0F4` |
-| Paper          | `#FFFFFF` / `#FCFCFC` | `--fsus-paper`, `--el-bg-color`         | `#121214` |
-| Page           | `#F7F7F8`             | `--fsus-page`, `--el-bg-color-page`     | `#09090B` |
-| Scholarly Blue | `#2A599C`             | `--fsus-scholarly-blue`                 | `#4B79CC` |
-| Dot Gray       | `#A1A1AA` / `#8E8E93` | `--fsus-dot-gray`, `--el-color-info`    | `#71717A` |
-| Border         | `#E4E4E7`             | `--fsus-border`, `--el-border-color`    | `#27272A` |
+| Visual Concept  | Light                 | Runtime Token                                                        | Dark      |
+| --------------- | --------------------- | -------------------------------------------------------------------- | --------- |
+| Ink             | `#0F0F11`             | `--fsus-ink`, `--el-text-color-primary`                              | `#F0F0F4` |
+| Paper           | `#FFFFFF` / `#FCFCFC` | `--fsus-paper`, `--el-bg-color`                                      | `#121214` |
+| Page            | `#F7F7F8`             | `--fsus-page`, `--el-bg-color-page`                                  | `#09090B` |
+| Scholarly Blue  | `#2A599C`             | `--fsus-scholarly-blue`                                              | `#4B79CC` |
+| Quiet Text      | `#A1A1AA`             | `--fsus-color-text-quiet`                                            | `#A1A1AA` |
+| Decorative Gray | `#A1A1AA`             | `--fsus-color-text-decorative`, `--fsus-dot-gray`, `--el-color-info` | `#71717A` |
+| Raised Surface  | `#F7F7F8`             | `--fsus-color-surface-raised`                                        | `#1A1A1E` |
+| Border          | `#E4E4E7`             | `--fsus-border`, `--el-border-color`                                 | `#27272A` |
 
 ### Surface and Interaction Tokens
 
@@ -455,7 +458,7 @@ body {
 | Popover radius          | `10px`      | `--fsus-radius-popover`, `--el-popover-border-radius`     | Popover、Tooltip、Dropdown |
 | Panel radius            | `12px`      | `--fsus-radius-panel`, `--el-dialog-border-radius`        | Dialog、Drawer、Card       |
 | Expressive panel radius | `24px`      | `--fsus-radius-panel-large`                               | Opt-in expressive surfaces |
-| Pill radius             | `999px`     | `--fsus-radius-pill`, `--el-border-radius-round`          | Badge、Tag、圆形图标按钮    |
+| Pill radius             | `999px`     | `--fsus-radius-pill`, `--el-border-radius-round`          | Badge、Tag、圆形图标按钮   |
 | Control height          | `44px`      | `--fsus-control-height`                                   | 默认控件高度               |
 | Compact control height  | `40px`      | `--fsus-control-height-compact`                           | 紧凑控件高度               |
 | Focus ring              | `2px inset` | `--fsus-scholarly-blue` / `--el-a11y-focus-color`         | `focus-visible` only       |
@@ -471,19 +474,19 @@ body {
 
 Public / marketing surfaces ([§1 Scope Boundary](#scope-boundary)) 通常不会注册自己的 `--fsus-*` 派生 token；它们直接消费 Element Plus 的 `--el-*` 兼容变量来填充次级文本、弱边框、占位符等角色。下表是 consumer 可以**直接依赖**的稳定 `--el-*` 变量，定义为 Element Plus public API，不受 FsusUI token 注册流程约束。
 
-| Role                        | Stable Token                            | Use case in public layout                |
-| --------------------------- | --------------------------------------- | ---------------------------------------- |
-| Secondary text              | `--el-text-color-regular`               | 描述、正文、字段说明                     |
-| Tertiary text               | `--el-text-color-secondary`             | 元信息、计数、辅助标签                   |
-| Placeholder / muted text    | `--el-text-color-placeholder`           | 输入框占位符、未激活状态                 |
-| Disabled text               | `--el-disabled-text-color`              | 禁用按钮、不可点击链接                   |
-| Disabled background         | `--el-disabled-bg-color`                | 禁用控件填充                             |
-| Border (lighter)            | `--el-border-color-lighter`             | 分隔线、卡片弱描边                       |
-| Surface fill (light)        | `--el-fill-color-light`                 | 代码块背景、占位骨架                     |
-| Surface fill (blank)        | `--el-fill-color-blank`                 | 浮层表面、卡片正面                       |
-| Surface fill (default)      | `--el-fill-color`                       | 高亮背景、mark 标签                      |
-| Focus ring                  | `--el-a11y-focus-color`                 | 键盘焦点环                               |
-| Danger / Success / Warning  | `--el-color-danger`, `--el-color-success`, `--el-color-warning` 及 `-light-N` / `-dark-N` 变体 | 错误提示、成功反馈、警告徽标 |
+| Role                       | Stable Token                                                                                   | Use case in public layout    |
+| -------------------------- | ---------------------------------------------------------------------------------------------- | ---------------------------- |
+| Secondary text             | `--el-text-color-regular`                                                                      | 描述、正文、字段说明         |
+| Tertiary text              | `--el-text-color-secondary`                                                                    | 元信息、计数、辅助标签       |
+| Placeholder / muted text   | `--el-text-color-placeholder`                                                                  | 输入框占位符、未激活状态     |
+| Disabled text              | `--el-disabled-text-color`                                                                     | 禁用按钮、不可点击链接       |
+| Disabled background        | `--el-disabled-bg-color`                                                                       | 禁用控件填充                 |
+| Border (lighter)           | `--el-border-color-lighter`                                                                    | 分隔线、卡片弱描边           |
+| Surface fill (light)       | `--el-fill-color-light`                                                                        | 代码块背景、占位骨架         |
+| Surface fill (blank)       | `--el-fill-color-blank`                                                                        | 浮层表面、卡片正面           |
+| Surface fill (default)     | `--el-fill-color`                                                                              | 高亮背景、mark 标签          |
+| Focus ring                 | `--el-a11y-focus-color`                                                                        | 键盘焦点环                   |
+| Danger / Success / Warning | `--el-color-danger`, `--el-color-success`, `--el-color-warning` 及 `-light-N` / `-dark-N` 变体 | 错误提示、成功反馈、警告徽标 |
 
 **Consumer 约束**：
 
@@ -521,22 +524,23 @@ Public / marketing surfaces ([§1 Scope Boundary](#scope-boundary)) 通常不会
 
 ### 13.3 设计语言词汇
 
-| 英文 | 中文 | 含义 |
-| --- | --- | --- |
-| Ink | 主墨色 | 主要文本与品牌字标 |
-| Paper | 纸面色 | 控件与浮层表面 |
-| Page | 页面底 | 页面背景 |
-| Dot Gray | 句点灰 | 次级文本、弱边框、禁用态 |
-| Scholarly Blue | 学术蓝 | 仅用于功能性反馈：链接、选中、焦点、Hover |
-| Border-first | 边框优先 | 边框先于阴影定义表面层级 |
-| Paper material | 纸面材质 | 实色表面，不使用模糊或光晕 |
-| Glass material | 玻璃材质 | opt-in 浮层材质，通过 `.is-glass` 或 `[data-fsus-material='glass']` 启用 |
-| Opt-in expressive surface | opt-in 表达面 | `[data-fsus-surface='expressive']`，启用 `24px` 圆角 |
-| Reading surface | 阅读面 | `[data-fsus-surface='reading']`，禁用玻璃、motion trail、glow |
-| Firm Yet Soft | 精确而柔和 | 结构精确，控件边缘柔和 |
-| Ivy / Editorial Restraint | 学术编辑克制 | 学术出版物的克制与耐看质感 |
-| Swiss Graphic Design | 瑞士平面设计 | 左对齐、明确网格、清晰层级 |
-| Punctuation | 标点 | 品牌母题：句点作为列表符号、标题锚点、加载记号 |
+| 英文                      | 中文          | 含义                                                                     |
+| ------------------------- | ------------- | ------------------------------------------------------------------------ |
+| Ink                       | 主墨色        | 主要文本与品牌字标                                                       |
+| Paper                     | 纸面色        | 控件与浮层表面                                                           |
+| Page                      | 页面底        | 页面背景                                                                 |
+| Quiet Text                | 安静文本      | 必须保持可读的低强调说明文字                                             |
+| Decorative Gray           | 装饰灰        | 句点、视觉分隔等非必要装饰；兼容别名为 `--fsus-dot-gray`                 |
+| Scholarly Blue            | 学术蓝        | 仅用于功能性反馈：链接、选中、焦点、Hover                                |
+| Border-first              | 边框优先      | 边框先于阴影定义表面层级                                                 |
+| Paper material            | 纸面材质      | 实色表面，不使用模糊或光晕                                               |
+| Glass material            | 玻璃材质      | opt-in 浮层材质，通过 `.is-glass` 或 `[data-fsus-material='glass']` 启用 |
+| Opt-in expressive surface | opt-in 表达面 | `[data-fsus-surface='expressive']`，启用 `24px` 圆角                     |
+| Reading surface           | 阅读面        | `[data-fsus-surface='reading']`，禁用玻璃、motion trail、glow            |
+| Firm Yet Soft             | 精确而柔和    | 结构精确，控件边缘柔和                                                   |
+| Ivy / Editorial Restraint | 学术编辑克制  | 学术出版物的克制与耐看质感                                               |
+| Swiss Graphic Design      | 瑞士平面设计  | 左对齐、明确网格、清晰层级                                               |
+| Punctuation               | 标点          | 品牌母题：句点作为列表符号、标题锚点、加载记号                           |
 
 ### 13.4 Token、CSS 类名、ARIA
 

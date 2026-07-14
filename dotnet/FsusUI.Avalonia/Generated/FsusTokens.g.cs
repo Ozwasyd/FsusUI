@@ -37,6 +37,20 @@ public static class FsusTokens
     public static Color PrimitiveColorBlue700Color => Color.Parse(PrimitiveColorBlue700Value);
     public static SolidColorBrush PrimitiveColorBlue700Brush => new(PrimitiveColorBlue700Color);
 
+    public const string PrimitiveColorGray400Name = "primitive.color.gray.400";
+    public const string PrimitiveColorGray400ResourceKey = "FsusPrimitiveColorGray400";
+    public const string PrimitiveColorGray400Value = "#A1A1AA";
+    public const string PrimitiveColorGray400BrushResourceKey = "FsusPrimitiveColorGray400Brush";
+    public static Color PrimitiveColorGray400Color => Color.Parse(PrimitiveColorGray400Value);
+    public static SolidColorBrush PrimitiveColorGray400Brush => new(PrimitiveColorGray400Color);
+
+    public const string PrimitiveColorGray500Name = "primitive.color.gray.500";
+    public const string PrimitiveColorGray500ResourceKey = "FsusPrimitiveColorGray500";
+    public const string PrimitiveColorGray500Value = "#71717A";
+    public const string PrimitiveColorGray500BrushResourceKey = "FsusPrimitiveColorGray500Brush";
+    public static Color PrimitiveColorGray500Color => Color.Parse(PrimitiveColorGray500Value);
+    public static SolidColorBrush PrimitiveColorGray500Brush => new(PrimitiveColorGray500Color);
+
     public const string PrimitiveColorGray950Name = "primitive.color.gray.950";
     public const string PrimitiveColorGray950ResourceKey = "FsusPrimitiveColorGray950";
     public const string PrimitiveColorGray950Value = "#0F0F11";
@@ -54,6 +68,10 @@ public static class FsusTokens
     public const string ColorActionPrimaryName = "color.action.primary";
     public const string ColorActionPrimaryResourceKey = "FsusColorActionPrimary";
     public const string ColorActionPrimaryValue = "#2A599C";
+    public const string ColorActionPrimaryDarkResourceKey = "FsusColorActionPrimaryDark";
+    public const string ColorActionPrimaryDarkValue = "#4B79CC";
+    public const string ColorActionPrimaryHighContrastResourceKey = "FsusColorActionPrimaryHighContrast";
+    public const string ColorActionPrimaryHighContrastValue = "#FFFF00";
     public const string ColorActionPrimaryBrushResourceKey = "FsusColorActionPrimaryBrush";
     public static Color ColorActionPrimaryColor => Color.Parse(ColorActionPrimaryValue);
     public static SolidColorBrush ColorActionPrimaryBrush => new(ColorActionPrimaryColor);
@@ -61,6 +79,10 @@ public static class FsusTokens
     public const string ColorActionPrimaryHoverName = "color.action.primary.hover";
     public const string ColorActionPrimaryHoverResourceKey = "FsusColorActionPrimaryHover";
     public const string ColorActionPrimaryHoverValue = "#244E89";
+    public const string ColorActionPrimaryHoverDarkResourceKey = "FsusColorActionPrimaryHoverDark";
+    public const string ColorActionPrimaryHoverDarkValue = "#6F93D7";
+    public const string ColorActionPrimaryHoverHighContrastResourceKey = "FsusColorActionPrimaryHoverHighContrast";
+    public const string ColorActionPrimaryHoverHighContrastValue = "#FFFF00";
     public const string ColorActionPrimaryHoverBrushResourceKey = "FsusColorActionPrimaryHoverBrush";
     public static Color ColorActionPrimaryHoverColor => Color.Parse(ColorActionPrimaryHoverValue);
     public static SolidColorBrush ColorActionPrimaryHoverBrush => new(ColorActionPrimaryHoverColor);
@@ -68,6 +90,10 @@ public static class FsusTokens
     public const string ColorTextPrimaryName = "color.text.primary";
     public const string ColorTextPrimaryResourceKey = "FsusColorTextPrimary";
     public const string ColorTextPrimaryValue = "#0F0F11";
+    public const string ColorTextPrimaryDarkResourceKey = "FsusColorTextPrimaryDark";
+    public const string ColorTextPrimaryDarkValue = "#F0F0F4";
+    public const string ColorTextPrimaryHighContrastResourceKey = "FsusColorTextPrimaryHighContrast";
+    public const string ColorTextPrimaryHighContrastValue = "#FFFFFF";
     public const string ColorTextPrimaryBrushResourceKey = "FsusColorTextPrimaryBrush";
     public static Color ColorTextPrimaryColor => Color.Parse(ColorTextPrimaryValue);
     public static SolidColorBrush ColorTextPrimaryBrush => new(ColorTextPrimaryColor);
@@ -79,9 +105,35 @@ public static class FsusTokens
     public static Color ColorTextMutedColor => Color.Parse(ColorTextMutedValue);
     public static SolidColorBrush ColorTextMutedBrush => new(ColorTextMutedColor);
 
+    public const string ColorTextQuietName = "color.text.quiet";
+    public const string ColorTextQuietResourceKey = "FsusColorTextQuiet";
+    public const string ColorTextQuietValue = "#A1A1AA";
+    public const string ColorTextQuietDarkResourceKey = "FsusColorTextQuietDark";
+    public const string ColorTextQuietDarkValue = "#A1A1AA";
+    public const string ColorTextQuietHighContrastResourceKey = "FsusColorTextQuietHighContrast";
+    public const string ColorTextQuietHighContrastValue = "#FFFFFF";
+    public const string ColorTextQuietBrushResourceKey = "FsusColorTextQuietBrush";
+    public static Color ColorTextQuietColor => Color.Parse(ColorTextQuietValue);
+    public static SolidColorBrush ColorTextQuietBrush => new(ColorTextQuietColor);
+
+    public const string ColorTextDecorativeName = "color.text.decorative";
+    public const string ColorTextDecorativeResourceKey = "FsusColorTextDecorative";
+    public const string ColorTextDecorativeValue = "#A1A1AA";
+    public const string ColorTextDecorativeDarkResourceKey = "FsusColorTextDecorativeDark";
+    public const string ColorTextDecorativeDarkValue = "#71717A";
+    public const string ColorTextDecorativeHighContrastResourceKey = "FsusColorTextDecorativeHighContrast";
+    public const string ColorTextDecorativeHighContrastValue = "#FFFFFF";
+    public const string ColorTextDecorativeBrushResourceKey = "FsusColorTextDecorativeBrush";
+    public static Color ColorTextDecorativeColor => Color.Parse(ColorTextDecorativeValue);
+    public static SolidColorBrush ColorTextDecorativeBrush => new(ColorTextDecorativeColor);
+
     public const string ColorSurfaceBaseName = "color.surface.base";
     public const string ColorSurfaceBaseResourceKey = "FsusColorSurfaceBase";
     public const string ColorSurfaceBaseValue = "#FFFFFF";
+    public const string ColorSurfaceBaseDarkResourceKey = "FsusColorSurfaceBaseDark";
+    public const string ColorSurfaceBaseDarkValue = "#121214";
+    public const string ColorSurfaceBaseHighContrastResourceKey = "FsusColorSurfaceBaseHighContrast";
+    public const string ColorSurfaceBaseHighContrastValue = "#000000";
     public const string ColorSurfaceBaseBrushResourceKey = "FsusColorSurfaceBaseBrush";
     public static Color ColorSurfaceBaseColor => Color.Parse(ColorSurfaceBaseValue);
     public static SolidColorBrush ColorSurfaceBaseBrush => new(ColorSurfaceBaseColor);
@@ -89,6 +141,10 @@ public static class FsusTokens
     public const string ColorSurfaceRaisedName = "color.surface.raised";
     public const string ColorSurfaceRaisedResourceKey = "FsusColorSurfaceRaised";
     public const string ColorSurfaceRaisedValue = "#F7F7F8";
+    public const string ColorSurfaceRaisedDarkResourceKey = "FsusColorSurfaceRaisedDark";
+    public const string ColorSurfaceRaisedDarkValue = "#1A1A1E";
+    public const string ColorSurfaceRaisedHighContrastResourceKey = "FsusColorSurfaceRaisedHighContrast";
+    public const string ColorSurfaceRaisedHighContrastValue = "#000000";
     public const string ColorSurfaceRaisedBrushResourceKey = "FsusColorSurfaceRaisedBrush";
     public static Color ColorSurfaceRaisedColor => Color.Parse(ColorSurfaceRaisedValue);
     public static SolidColorBrush ColorSurfaceRaisedBrush => new(ColorSurfaceRaisedColor);
@@ -96,6 +152,10 @@ public static class FsusTokens
     public const string ColorBorderSubtleName = "color.border.subtle";
     public const string ColorBorderSubtleResourceKey = "FsusColorBorderSubtle";
     public const string ColorBorderSubtleValue = "#E4E4E7";
+    public const string ColorBorderSubtleDarkResourceKey = "FsusColorBorderSubtleDark";
+    public const string ColorBorderSubtleDarkValue = "#27272A";
+    public const string ColorBorderSubtleHighContrastResourceKey = "FsusColorBorderSubtleHighContrast";
+    public const string ColorBorderSubtleHighContrastValue = "#FFFFFF";
     public const string ColorBorderSubtleBrushResourceKey = "FsusColorBorderSubtleBrush";
     public static Color ColorBorderSubtleColor => Color.Parse(ColorBorderSubtleValue);
     public static SolidColorBrush ColorBorderSubtleBrush => new(ColorBorderSubtleColor);
@@ -103,6 +163,10 @@ public static class FsusTokens
     public const string ColorFocusRingName = "color.focus.ring";
     public const string ColorFocusRingResourceKey = "FsusColorFocusRing";
     public const string ColorFocusRingValue = "#2A599C";
+    public const string ColorFocusRingDarkResourceKey = "FsusColorFocusRingDark";
+    public const string ColorFocusRingDarkValue = "#4B79CC";
+    public const string ColorFocusRingHighContrastResourceKey = "FsusColorFocusRingHighContrast";
+    public const string ColorFocusRingHighContrastValue = "#FFFF00";
     public const string ColorFocusRingBrushResourceKey = "FsusColorFocusRingBrush";
     public static Color ColorFocusRingColor => Color.Parse(ColorFocusRingValue);
     public static SolidColorBrush ColorFocusRingBrush => new(ColorFocusRingColor);
@@ -237,6 +301,10 @@ public static class FsusTokens
     public const string MotionDurationControlName = "motion.duration.control";
     public const string MotionDurationControlResourceKey = "FsusMotionDurationControl";
     public const string MotionDurationControlValue = "220ms";
+    public const string MotionDurationControlMotionReducedResourceKey = "FsusMotionDurationControlMotionReduced";
+    public const string MotionDurationControlMotionReducedValue = "1ms";
+    public const string MotionDurationControlMotionDisabledResourceKey = "FsusMotionDurationControlMotionDisabled";
+    public const string MotionDurationControlMotionDisabledValue = "1ms";
     public static TimeSpan MotionDurationControlTimeSpan => TimeSpan.FromMilliseconds(220d);
 
     public const string MotionDurationPanelName = "motion.duration.panel";
@@ -277,6 +345,10 @@ public static class FsusTokens
     public const string DensityControlDefaultYName = "density.control.default.y";
     public const string DensityControlDefaultYResourceKey = "FsusDensityControlDefaultY";
     public const string DensityControlDefaultYValue = "44px";
+    public const string DensityControlDefaultYDensityCompactResourceKey = "FsusDensityControlDefaultYDensityCompact";
+    public const string DensityControlDefaultYDensityCompactValue = "40px";
+    public const string DensityControlDefaultYDensitySpaciousResourceKey = "FsusDensityControlDefaultYDensitySpacious";
+    public const string DensityControlDefaultYDensitySpaciousValue = "48px";
     public static double DensityControlDefaultYDouble => 44d;
 
     public const string DensityControlCompactYName = "density.control.compact.y";
@@ -333,11 +405,19 @@ public static class FsusTokens
     public const string ComponentStateButtonPrimaryBackgroundDefaultName = "component-state.button.primary.background.default";
     public const string ComponentStateButtonPrimaryBackgroundDefaultResourceKey = "FsusComponentStateButtonPrimaryBackgroundDefault";
     public const string ComponentStateButtonPrimaryBackgroundDefaultValue = "#0F0F11";
+    public const string ComponentStateButtonPrimaryBackgroundDefaultDarkResourceKey = "FsusComponentStateButtonPrimaryBackgroundDefaultDark";
+    public const string ComponentStateButtonPrimaryBackgroundDefaultDarkValue = "#F0F0F4";
+    public const string ComponentStateButtonPrimaryBackgroundDefaultHighContrastResourceKey = "FsusComponentStateButtonPrimaryBackgroundDefaultHighContrast";
+    public const string ComponentStateButtonPrimaryBackgroundDefaultHighContrastValue = "#FFFFFF";
     public static SolidColorBrush ComponentStateButtonPrimaryBackgroundDefaultBrush => new(Color.Parse(ComponentStateButtonPrimaryBackgroundDefaultValue));
 
     public const string ComponentStateButtonPrimaryBackgroundHoverName = "component-state.button.primary.background.hover";
     public const string ComponentStateButtonPrimaryBackgroundHoverResourceKey = "FsusComponentStateButtonPrimaryBackgroundHover";
     public const string ComponentStateButtonPrimaryBackgroundHoverValue = "#2A599C";
+    public const string ComponentStateButtonPrimaryBackgroundHoverDarkResourceKey = "FsusComponentStateButtonPrimaryBackgroundHoverDark";
+    public const string ComponentStateButtonPrimaryBackgroundHoverDarkValue = "#4B79CC";
+    public const string ComponentStateButtonPrimaryBackgroundHoverHighContrastResourceKey = "FsusComponentStateButtonPrimaryBackgroundHoverHighContrast";
+    public const string ComponentStateButtonPrimaryBackgroundHoverHighContrastValue = "#FFFF00";
     public static SolidColorBrush ComponentStateButtonPrimaryBackgroundHoverBrush => new(Color.Parse(ComponentStateButtonPrimaryBackgroundHoverValue));
 
 }

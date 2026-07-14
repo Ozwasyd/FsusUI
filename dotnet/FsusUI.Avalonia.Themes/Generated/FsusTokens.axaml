@@ -6,26 +6,70 @@
   <SolidColorBrush x:Key="FsusPrimitiveColorBlue600Brush" Color="#2A599C" />
   <Color x:Key="FsusPrimitiveColorBlue700">#244E89</Color>
   <SolidColorBrush x:Key="FsusPrimitiveColorBlue700Brush" Color="#244E89" />
+  <Color x:Key="FsusPrimitiveColorGray400">#A1A1AA</Color>
+  <SolidColorBrush x:Key="FsusPrimitiveColorGray400Brush" Color="#A1A1AA" />
+  <Color x:Key="FsusPrimitiveColorGray500">#71717A</Color>
+  <SolidColorBrush x:Key="FsusPrimitiveColorGray500Brush" Color="#71717A" />
   <Color x:Key="FsusPrimitiveColorGray950">#0F0F11</Color>
   <SolidColorBrush x:Key="FsusPrimitiveColorGray950Brush" Color="#0F0F11" />
   <Color x:Key="FsusPrimitiveColorWhite">#FFFFFF</Color>
   <SolidColorBrush x:Key="FsusPrimitiveColorWhiteBrush" Color="#FFFFFF" />
   <Color x:Key="FsusColorActionPrimary">#2A599C</Color>
   <SolidColorBrush x:Key="FsusColorActionPrimaryBrush" Color="#2A599C" />
+  <Color x:Key="FsusColorActionPrimaryDark">#4B79CC</Color>
+  <SolidColorBrush x:Key="FsusColorActionPrimaryDarkBrush" Color="#4B79CC" />
+  <Color x:Key="FsusColorActionPrimaryHighContrast">#FFFF00</Color>
+  <SolidColorBrush x:Key="FsusColorActionPrimaryHighContrastBrush" Color="#FFFF00" />
   <Color x:Key="FsusColorActionPrimaryHover">#244E89</Color>
   <SolidColorBrush x:Key="FsusColorActionPrimaryHoverBrush" Color="#244E89" />
+  <Color x:Key="FsusColorActionPrimaryHoverDark">#6F93D7</Color>
+  <SolidColorBrush x:Key="FsusColorActionPrimaryHoverDarkBrush" Color="#6F93D7" />
+  <Color x:Key="FsusColorActionPrimaryHoverHighContrast">#FFFF00</Color>
+  <SolidColorBrush x:Key="FsusColorActionPrimaryHoverHighContrastBrush" Color="#FFFF00" />
   <Color x:Key="FsusColorTextPrimary">#0F0F11</Color>
   <SolidColorBrush x:Key="FsusColorTextPrimaryBrush" Color="#0F0F11" />
+  <Color x:Key="FsusColorTextPrimaryDark">#F0F0F4</Color>
+  <SolidColorBrush x:Key="FsusColorTextPrimaryDarkBrush" Color="#F0F0F4" />
+  <Color x:Key="FsusColorTextPrimaryHighContrast">#FFFFFF</Color>
+  <SolidColorBrush x:Key="FsusColorTextPrimaryHighContrastBrush" Color="#FFFFFF" />
   <Color x:Key="FsusColorTextMuted">#71717A</Color>
   <SolidColorBrush x:Key="FsusColorTextMutedBrush" Color="#71717A" />
+  <Color x:Key="FsusColorTextQuiet">#A1A1AA</Color>
+  <SolidColorBrush x:Key="FsusColorTextQuietBrush" Color="#A1A1AA" />
+  <Color x:Key="FsusColorTextQuietDark">#A1A1AA</Color>
+  <SolidColorBrush x:Key="FsusColorTextQuietDarkBrush" Color="#A1A1AA" />
+  <Color x:Key="FsusColorTextQuietHighContrast">#FFFFFF</Color>
+  <SolidColorBrush x:Key="FsusColorTextQuietHighContrastBrush" Color="#FFFFFF" />
+  <Color x:Key="FsusColorTextDecorative">#A1A1AA</Color>
+  <SolidColorBrush x:Key="FsusColorTextDecorativeBrush" Color="#A1A1AA" />
+  <Color x:Key="FsusColorTextDecorativeDark">#71717A</Color>
+  <SolidColorBrush x:Key="FsusColorTextDecorativeDarkBrush" Color="#71717A" />
+  <Color x:Key="FsusColorTextDecorativeHighContrast">#FFFFFF</Color>
+  <SolidColorBrush x:Key="FsusColorTextDecorativeHighContrastBrush" Color="#FFFFFF" />
   <Color x:Key="FsusColorSurfaceBase">#FFFFFF</Color>
   <SolidColorBrush x:Key="FsusColorSurfaceBaseBrush" Color="#FFFFFF" />
+  <Color x:Key="FsusColorSurfaceBaseDark">#121214</Color>
+  <SolidColorBrush x:Key="FsusColorSurfaceBaseDarkBrush" Color="#121214" />
+  <Color x:Key="FsusColorSurfaceBaseHighContrast">#000000</Color>
+  <SolidColorBrush x:Key="FsusColorSurfaceBaseHighContrastBrush" Color="#000000" />
   <Color x:Key="FsusColorSurfaceRaised">#F7F7F8</Color>
   <SolidColorBrush x:Key="FsusColorSurfaceRaisedBrush" Color="#F7F7F8" />
+  <Color x:Key="FsusColorSurfaceRaisedDark">#1A1A1E</Color>
+  <SolidColorBrush x:Key="FsusColorSurfaceRaisedDarkBrush" Color="#1A1A1E" />
+  <Color x:Key="FsusColorSurfaceRaisedHighContrast">#000000</Color>
+  <SolidColorBrush x:Key="FsusColorSurfaceRaisedHighContrastBrush" Color="#000000" />
   <Color x:Key="FsusColorBorderSubtle">#E4E4E7</Color>
   <SolidColorBrush x:Key="FsusColorBorderSubtleBrush" Color="#E4E4E7" />
+  <Color x:Key="FsusColorBorderSubtleDark">#27272A</Color>
+  <SolidColorBrush x:Key="FsusColorBorderSubtleDarkBrush" Color="#27272A" />
+  <Color x:Key="FsusColorBorderSubtleHighContrast">#FFFFFF</Color>
+  <SolidColorBrush x:Key="FsusColorBorderSubtleHighContrastBrush" Color="#FFFFFF" />
   <Color x:Key="FsusColorFocusRing">#2A599C</Color>
   <SolidColorBrush x:Key="FsusColorFocusRingBrush" Color="#2A599C" />
+  <Color x:Key="FsusColorFocusRingDark">#4B79CC</Color>
+  <SolidColorBrush x:Key="FsusColorFocusRingDarkBrush" Color="#4B79CC" />
+  <Color x:Key="FsusColorFocusRingHighContrast">#FFFF00</Color>
+  <SolidColorBrush x:Key="FsusColorFocusRingHighContrastBrush" Color="#FFFF00" />
   <Color x:Key="FsusColorStatusDanger">#D92D20</Color>
   <SolidColorBrush x:Key="FsusColorStatusDangerBrush" Color="#D92D20" />
   <SolidColorBrush x:Key="FsusBrushSurfaceBase" Color="#FFFFFF" />

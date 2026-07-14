@@ -325,6 +325,9 @@ const csharpName = (name) =>
     .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
     .join('')
 
+const modeSuffix = (modeName) =>
+  modeName.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
+
 const stripUnit = (value) => String(value).replace(/px$/, '').replace(/ms$/, '')
 
 const xmlEscape = (value) =>
@@ -471,6 +474,11 @@ const renderScss = (source, tokenMap) => {
     lines.push(
       `$fsus-${token.name.replace(/[.]/g, '-')}: ${resolveValue(token, tokenMap)};`,
     )
+    for (const modeName of Object.keys(token.modeValues ?? {})) {
+      lines.push(
+        `$fsus-${token.name.replace(/[.]/g, '-')}-${modeSuffix(modeName)}: ${resolveValue(token, tokenMap, new Set(), modeName)};`,
+      )
+    }
   }
 
   lines.push('', '$fsus-tokens: (')
@@ -539,6 +547,16 @@ const renderAvaloniaXaml = (source, tokenMap) => {
     if (kind === 'color') {
       lines.push(`  <Color x:Key="${key}">${value}</Color>`)
       lines.push(`  <SolidColorBrush x:Key="${key}Brush" Color="${value}" />`)
+      for (const modeName of Object.keys(token.modeValues ?? {})) {
+        const modeKey = `${key}${csharpName(modeName)}`
+        const modeValue = xmlEscape(
+          resolveValue(token, tokenMap, new Set(), modeName),
+        )
+        lines.push(`  <Color x:Key="${modeKey}">${modeValue}</Color>`)
+        lines.push(
+          `  <SolidColorBrush x:Key="${modeKey}Brush" Color="${modeValue}" />`,
+        )
+      }
       continue
     }
 
@@ -730,6 +748,18 @@ const renderCsharp = (source, tokenMap) => {
     lines.push(`    public const string ${name}Name = "${token.name}";`)
     lines.push(`    public const string ${name}ResourceKey = "${resourceKey}";`)
     lines.push(`    public const string ${name}Value = "${value}";`)
+    for (const modeName of Object.keys(token.modeValues ?? {})) {
+      const suffix = csharpName(modeName)
+      const modeValue = csharpEscape(
+        resolveValue(token, tokenMap, new Set(), modeName),
+      )
+      lines.push(
+        `    public const string ${name}${suffix}ResourceKey = "${resourceKey}${suffix}";`,
+      )
+      lines.push(
+        `    public const string ${name}${suffix}Value = "${modeValue}";`,
+      )
+    }
     lines.push(...renderCsharpAccessorLines(token, tokenMap))
     lines.push('')
   }
@@ -757,7 +787,15 @@ const renderDocs = (source, tokenMap) => {
 
   lines.push(
     renderMarkdownTable(
-      ['Token', 'Layer', 'Type', 'CSS Variable', 'Avalonia Resource', 'Value'],
+      [
+        'Token',
+        'Layer',
+        'Type',
+        'CSS Variable',
+        'Avalonia Resource',
+        'Value',
+        'Mode Values',
+      ],
       source.tokens.map((token) => [
         `\`${token.name}\``,
         layerForToken(source, token),
@@ -765,6 +803,14 @@ const renderDocs = (source, tokenMap) => {
         `\`${cssName(token.name)}\``,
         `\`${pascalName(token.name)}\``,
         `\`${resolveValue(token, tokenMap)}\``,
+        Object.keys(token.modeValues ?? {}).length === 0
+          ? '—'
+          : Object.keys(token.modeValues)
+              .map(
+                (modeName) =>
+                  `\`${modeName}: ${resolveValue(token, tokenMap, new Set(), modeName)}\``,
+              )
+              .join('<br>'),
       ]),
     ),
   )

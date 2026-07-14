@@ -5,6 +5,8 @@
   --fsus-color-action-primary-hover: #{generated.$fsus-color-action-primary-hover};
   --fsus-color-text-primary: #{generated.$fsus-color-text-primary};
   --fsus-color-text-muted: #{generated.$fsus-color-text-muted};
+  --fsus-color-text-quiet: #{generated.$fsus-color-text-quiet};
+  --fsus-color-text-decorative: #{generated.$fsus-color-text-decorative};
   --fsus-color-surface-base: #{generated.$fsus-color-surface-base};
   --fsus-color-surface-raised: #{generated.$fsus-color-surface-raised};
   --fsus-color-border-subtle: #{generated.$fsus-color-border-subtle};
@@ -26,7 +28,7 @@
   --fsus-scholarly-blue: var(--fsus-color-action-primary);
   --fsus-accent: var(--fsus-scholarly-blue);
   --fsus-accent-hover: var(--fsus-color-action-primary-hover);
-  --fsus-dot-gray: #a1a1aa;
+  --fsus-dot-gray: var(--fsus-color-text-decorative);
   --fsus-border: var(--fsus-color-border-subtle);
   --fsus-border-light: #ececf0;
   --fsus-border-lighter: #f1f1f3;
@@ -241,6 +243,11 @@
 }
 
 @mixin fsus-dark-tokens {
+  --fsus-color-text-quiet: #{generated.$fsus-color-text-quiet-dark};
+  --fsus-color-text-decorative: #{generated.$fsus-color-text-decorative-dark};
+  --fsus-color-surface-raised: #{generated.$fsus-color-surface-raised-dark};
+  --fsus-color-border-subtle: #{generated.$fsus-color-border-subtle-dark};
+  --fsus-color-focus-ring: #{generated.$fsus-color-focus-ring-dark};
   --fsus-ink: #f0f0f4;
   --fsus-paper: #121214;
   --fsus-page: #09090b;
@@ -249,7 +256,7 @@
   --fsus-scholarly-blue: #4b79cc;
   --fsus-accent: var(--fsus-scholarly-blue);
   --fsus-accent-hover: #6f93d7;
-  --fsus-dot-gray: #71717a;
+  --fsus-dot-gray: var(--fsus-color-text-decorative);
   --fsus-border: #27272a;
   --fsus-border-light: #3f3f46;
   --fsus-border-lighter: #303036;
