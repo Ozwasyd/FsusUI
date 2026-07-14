@@ -16,7 +16,7 @@
 
 ## WASM 加速
 
-FsusUI 的大数据路径先提取最小 primitive 列数据，在 Worker 中通过持久 WASM buffer 返回稳定 `Uint32Array` 行索引。重复值按原始 index 稳定排序，完整 row object 不进入 Worker；只有公共数组边界才 materialize。策略会记录初始化、复制、计算、映射和提交耗时，并动态选择 Worker/WASM 或可让出主线程的分块 JS，不使用固定 5K 阈值。
+FsusUI 的大数据路径先提取最小 primitive 列数据，在 Worker 中通过持久 WASM buffer 返回稳定 `Uint32Array` 行索引。重复值按原始 index 稳定排序，完整 row object 不进入 Worker；只有最新 generation 返回后才在公共数组边界 materialize。新的排序会取消仍在执行的旧任务，旧结果或组件卸载后的结果不会写回 Table；卸载同时释放 Worker/WASM session。策略会记录初始化、复制、计算、映射和提交耗时，并动态选择 Worker/WASM 或可让出主线程的分块 JS，不使用固定 5K 阈值。
 
 WASM memory growth 后旧 TypedArray view 会失效，因此实现只持久化 pointer/capacity，每次操作重新读取当前 heap view。组件/pool 释放时同时释放 input/output/index buffer。locale-aware、CJK、mixed values、`sort-method` 和 `sort-by` 保持 JS 语义，不会使用 ASCII 字节序冒充 locale 排序。
 

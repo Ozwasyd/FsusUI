@@ -97,6 +97,25 @@ describe('data pipeline worker client', () => {
     client.dispose()
   })
 
+  it('cancels the previous sort generation even when the dataset key changes', async () => {
+    vi.stubGlobal('Worker', FakeDataWorker)
+    const client = createFsusDataPipelineClient('sort-generation-test')
+    const first = client.sortNumbers(
+      'score-v1',
+      Float64Array.from([2, 1]),
+      true,
+    )
+    const second = client.sortAscii('name-v2', ['beta', 'alpha'], true)
+
+    const [firstResult, secondResult] = await Promise.all([first, second])
+    expect(firstResult).toBeNull()
+    expect(secondResult).toMatchObject({ ok: true })
+    expect(
+      FakeDataWorker.instances.flatMap((worker) => worker.messages),
+    ).toContainEqual(expect.objectContaining({ type: 'cancel' }))
+    client.dispose()
+  })
+
   it('adapts end-to-end decisions from observed initialization and commit cost', () => {
     const strategy = new FsusDataPipelineStrategy()
     expect(strategy.choose(100_000, true)).toBe('worker-wasm')

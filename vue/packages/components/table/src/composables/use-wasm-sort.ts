@@ -110,8 +110,8 @@ export function trySortIndicesWithWasmSync<T extends AnyRow>(
   return null
 }
 
-/** Compatibility boundary for the current Table store. #190 can consume the
- * index view directly and remove this final materialization. */
+/** Compatibility helper for synchronous callers. The public Table store uses
+ * createWasmSortController and materializes only after the latest async result. */
 export function trySortWithWasmSync<T extends AnyRow>(
   rows: T[],
   sortProp: string,
@@ -124,6 +124,7 @@ export function trySortWithWasmSync<T extends AnyRow>(
 const stableJsIndices = async (
   values: readonly (number | string)[],
   ascending: boolean,
+  isStale: () => boolean,
 ) => {
   let width = 1
   let source = Uint32Array.from(values, (_, index) => index)
@@ -159,6 +160,7 @@ const stableJsIndices = async (
       }
       if (now() - sliceStarted > 6) {
         await yieldToMain()
+        if (isStale()) return null
         sliceStarted = now()
       }
     }
@@ -170,6 +172,10 @@ const stableJsIndices = async (
 
 export const createWasmSortController = (componentId: string) => {
   const client = createFsusDataPipelineClient(`table-${componentId}`)
+  let disposed = false
+  let generation = 0
+  let activeDatasetId: string | null = null
+  let activeDatasetKey: string | null = null
   const datasets = new Map<
     string,
     {
@@ -178,7 +184,15 @@ export const createWasmSortController = (componentId: string) => {
     }
   >()
   return {
+    cancel: () => {
+      if (disposed) return
+      generation += 1
+      client.cancelSort()
+    },
     dispose: () => {
+      if (disposed) return
+      disposed = true
+      generation += 1
       datasets.clear()
       client.dispose()
     },
@@ -192,8 +206,17 @@ export const createWasmSortController = (componentId: string) => {
         path?: 'auto' | 'js' | 'worker-wasm'
       } = {},
     ): Promise<FsusRowIndexView<T> | null> {
-      if (!sortProp) return null
+      if (!sortProp || disposed) return null
+      const currentGeneration = ++generation
+      const isStale = () => disposed || currentGeneration !== generation
       const datasetKey = `${sortProp}:${options.datasetVersion ?? '0'}`
+      const datasetId = `${componentId}:${datasetKey}`
+      if (activeDatasetKey && activeDatasetKey !== datasetKey) {
+        datasets.delete(activeDatasetKey)
+        if (activeDatasetId) void client.release(activeDatasetId)
+      }
+      activeDatasetKey = datasetKey
+      activeDatasetId = datasetId
       const cached = datasets.get(datasetKey)
       let classified = cached?.rows === rows ? cached.classified : null
       if (!classified || options.changedStart !== undefined) {
@@ -210,7 +233,6 @@ export const createWasmSortController = (componentId: string) => {
             canUseDataPipelineWorker(),
           ) === 'worker-wasm')
       if (workerPath) {
-        const datasetId = `${componentId}:${sortProp}:${options.datasetVersion ?? '0'}`
         const result =
           classified.kind === 'number'
             ? await client.sortNumbers(
@@ -220,6 +242,7 @@ export const createWasmSortController = (componentId: string) => {
                 options.changedStart,
               )
             : await client.sortAscii(datasetId, classified.strings, ascending)
+        if (isStale()) return null
         if (result?.ok && result.value.indices) {
           fsusDataPipelineStrategy.record({
             commitMs: 0,
@@ -237,7 +260,8 @@ export const createWasmSortController = (componentId: string) => {
         classified.kind === 'number'
           ? Array.from(classified.numbers)
           : classified.strings
-      const indices = await stableJsIndices(values, ascending)
+      const indices = await stableJsIndices(values, ascending, isStale)
+      if (!indices || isStale()) return null
       const totalMs = now() - started
       fsusDataPipelineStrategy.record({
         commitMs: 0,
@@ -269,11 +293,13 @@ export function shouldUseWasm<T>(
   rows: T[],
   column: TableColumnCtx<T> | null,
 ): boolean {
+  const workerAvailable = canUseDataPipelineWorker()
   return Boolean(
     column &&
     !column.sortMethod &&
     !column.sortBy &&
-    fsusDataPipelineStrategy.choose(rows.length, canUseDataPipelineWorker()) ===
-      'worker-wasm',
+    (fsusDataPipelineStrategy.shouldChunkJs(rows.length) ||
+      fsusDataPipelineStrategy.choose(rows.length, workerAvailable) ===
+        'worker-wasm'),
   )
 }

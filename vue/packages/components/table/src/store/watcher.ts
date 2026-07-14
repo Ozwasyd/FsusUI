@@ -1,5 +1,12 @@
 // @ts-nocheck
-import { getCurrentInstance, ref, toRefs, unref, watch } from 'vue'
+import {
+  getCurrentInstance,
+  onBeforeUnmount,
+  ref,
+  toRefs,
+  unref,
+  watch,
+} from 'vue'
 import { hasOwn } from '@element-plus/utils'
 import {
   getColumnById,
@@ -10,10 +17,8 @@ import {
   toggleRowStatus,
 } from '../util'
 import {
-  ensureWasmSortReady,
-  isWasmSortReady,
+  createWasmSortController,
   shouldUseWasm,
-  trySortWithWasmSync,
 } from '../composables/use-wasm-sort'
 import useExpand from './expand'
 import useCurrent from './current'
@@ -28,23 +33,10 @@ import type { StoreFilter } from '.'
  * WASM-first sorting for eligible large primitive datasets.
  * Non-eligible paths such as custom sort callbacks stay on the JS primary path.
  */
-const sortData = (data, states, requestWasmReady?: () => void) => {
+const sortData = (data, states) => {
   const sortingColumn = states.sortingColumn
   if (!sortingColumn || typeof sortingColumn.sortable === 'string') {
     return data
-  }
-
-  if (shouldUseWasm(data, sortingColumn)) {
-    const ascending = states.sortOrder !== 'descending'
-    if (!isWasmSortReady()) {
-      requestWasmReady?.()
-      return data
-    }
-
-    const wasmSortedData = trySortWithWasmSync(data, states.sortProp, ascending)
-    if (wasmSortedData) {
-      return wasmSortedData
-    }
   }
 
   return orderBy(
@@ -95,8 +87,9 @@ function useWatcher<T>() {
   const selectable: Ref<(row: T, index: number) => boolean> = ref(null)
   const filters: Ref<StoreFilter> = ref({})
   const filteredData = ref(null)
-  const wasmSortError = ref<unknown>(null)
-  let wasmSortReadyPromise: Promise<void> | null = null
+  const wasmSortController = createWasmSortController(String(instance.uid))
+  let sortGeneration = 0
+  let disposed = false
   const sortingColumn = ref(null)
   const sortProp = ref(null)
   const sortOrder = ref(null)
@@ -411,30 +404,39 @@ function useWatcher<T>() {
   }
 
   const execSort = () => {
-    if (wasmSortError.value) {
-      throw wasmSortError.value
-    }
-
-    data.value = sortData(filteredData.value, {
+    const source = filteredData.value
+    const states = {
       sortingColumn: sortingColumn.value,
       sortProp: sortProp.value,
       sortOrder: sortOrder.value,
-    }, requestWasmSortReady)
-  }
+    }
+    const generation = ++sortGeneration
+    if (!shouldUseWasm(source, states.sortingColumn)) {
+      wasmSortController.cancel()
+      data.value = sortData(source, states)
+      return
+    }
 
-  const requestWasmSortReady = () => {
-    if (wasmSortReadyPromise) return
-    wasmSortReadyPromise = ensureWasmSortReady()
-      .then(() => {
-        wasmSortReadyPromise = null
-        execSort()
+    const ascending = states.sortOrder !== 'descending'
+    void wasmSortController
+      .sort(source, states.sortProp, ascending)
+      .then((view) => {
+        if (disposed || generation !== sortGeneration) return
+        data.value = view ? view.materialize() : sortData(source, states)
         scheduleLayout(false)
       })
-      .catch((error) => {
-        wasmSortReadyPromise = null
-        wasmSortError.value = error
+      .catch(() => {
+        if (disposed || generation !== sortGeneration) return
+        data.value = sortData(source, states)
+        scheduleLayout(false)
       })
   }
+
+  onBeforeUnmount(() => {
+    disposed = true
+    sortGeneration += 1
+    wasmSortController.dispose()
+  })
 
   // 根据 filters 与 sort 去过滤 data
   const execQuery = (ignore = undefined) => {

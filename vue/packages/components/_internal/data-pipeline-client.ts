@@ -67,6 +67,12 @@ export const createFsusDataPipelineClient = (componentId: string) => {
   const generations = new Map<string, number>()
   let disposed = false
 
+  const cancelLatest = (key: string) => {
+    controllers.get(key)?.abort()
+    controllers.delete(key)
+    generations.set(key, (generations.get(key) ?? 0) + 1)
+  }
+
   const runLatest = async (
     key: string,
     request: DataRequest,
@@ -100,6 +106,7 @@ export const createFsusDataPipelineClient = (componentId: string) => {
         { datasetId, labels, type: 'build-filter', version },
         { lane: 'throughput' },
       ),
+    cancelSort: () => cancelLatest('sort'),
     dispose: () => {
       if (disposed) return
       disposed = true
@@ -121,7 +128,7 @@ export const createFsusDataPipelineClient = (componentId: string) => {
       ),
     sortAscii: (datasetId: string, labels: string[], ascending: boolean) =>
       runLatest(
-        `sort:${datasetId}`,
+        'sort',
         { ascending, datasetId, labels, type: 'sort-ascii' },
         { lane: 'throughput' },
       ),
@@ -132,7 +139,7 @@ export const createFsusDataPipelineClient = (componentId: string) => {
       changedStart?: number,
     ) =>
       runLatest(
-        `sort:${datasetId}`,
+        'sort',
         { ascending, changedStart, datasetId, type: 'sort-number', values },
         { lane: 'throughput', transfer: [values.buffer] },
       ),
