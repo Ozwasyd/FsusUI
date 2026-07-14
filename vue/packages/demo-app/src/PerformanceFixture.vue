@@ -76,6 +76,13 @@
     />
 
     <output
+      v-else-if="scenario === 'data-pipeline-table'"
+      class="performance-pipeline-result"
+      v-bind="{ 'data-performance-pipeline': 'true' }"
+      >{{ pipelineRevision }}</output
+    >
+
+    <output
       v-else-if="scenario.startsWith('virtual-window-index-')"
       class="performance-pipeline-result"
       v-bind="{ 'data-performance-pipeline': 'true' }"
@@ -116,6 +123,7 @@ import {
   FsusVirtualSizeIndex,
   useFsusRenderScheduler,
 } from '@element-plus/hooks'
+import { createWasmSortController } from '@element-plus/components/table/src/composables/use-wasm-sort'
 
 import type { MarkdownRuntimeProfile } from '@element-plus/wasm'
 import type { FsusScheduledWork } from '@element-plus/hooks'
@@ -132,6 +140,7 @@ const selection = ref<unknown[]>([])
 const tableFilter = ref('')
 const tableRevision = ref(0)
 const pipelineRevision = ref(0)
+const tablePipeline = createWasmSortController('performance-fixture')
 const renderScheduler = useFsusRenderScheduler()
 const virtualList = ref<{ scrollTo: (offset: number) => void } | null>(null)
 const virtualGrid = ref<{
@@ -199,6 +208,12 @@ const tableRows = computed(() =>
     score: (index * 48_271) % 104_729,
   })),
 )
+const dataPipelineRows = computed(() =>
+  Array.from({ length: boundedSize.value }, (_, index) => ({
+    id: index,
+    score: (index * 48_271) % 104_729,
+  })),
+)
 const displayedTableRows = computed(() => {
   const source = tableFilter.value
     ? tableRows.value.filter((row) => row.id % 7 === 0)
@@ -228,6 +243,11 @@ type PerformanceFixtureApi = {
     computeMs: number
     transferMs: number
   }>
+  dataPipelineProbe: () => Promise<{
+    legacyBlockMs: number
+    workerEndToEndMs: number
+    workerSubmitBlockMs: number
+  } | null>
   wasmProbe: () => Promise<{
     startupMs: number
     computeMs: number
@@ -350,6 +370,15 @@ const act = async (iteration: number) => {
       tableRevision.value += 1
       table.value?.clearSort()
     }
+  } else if (props.scenario === 'data-pipeline-table') {
+    const view = await tablePipeline.sort(
+      dataPipelineRows.value,
+      'score',
+      iteration % 2 === 0,
+      { datasetVersion: 'stable-100k' },
+    )
+    pipelineRevision.value =
+      (view?.at(0)?.id ?? 0) + (view?.at(-1)?.id ?? 0) + iteration
   } else if (props.scenario === 'virtual-window-index-legacy') {
     const changedIndex = (iteration * 7919) % measurementSizes.length
     measurementSizes[changedIndex] = 32 + (iteration % 9) * 5
@@ -418,6 +447,30 @@ const act = async (iteration: number) => {
     })
   }
   await nextTick()
+}
+
+const dataPipelineProbe = async () => {
+  if (props.scenario !== 'data-pipeline-table') return null
+  const rows = dataPipelineRows.value
+  const legacyStarted = performance.now()
+  Uint32Array.from(rows, (_, index) => index).sort((left, right) => {
+    const compared = rows[left]!.score - rows[right]!.score
+    return compared || left - right
+  })
+  const legacyBlockMs = performance.now() - legacyStarted
+
+  const workerStarted = performance.now()
+  const pending = tablePipeline.sort(rows, 'score', true, {
+    datasetVersion: 'stable-100k',
+    path: 'worker-wasm',
+  })
+  const workerSubmitBlockMs = performance.now() - workerStarted
+  await pending
+  return {
+    legacyBlockMs,
+    workerEndToEndMs: performance.now() - workerStarted,
+    workerSubmitBlockMs,
+  }
 }
 
 const workerProbe = async (iteration: number) => {
@@ -497,6 +550,7 @@ const wasmProbe = async () => {
 onMounted(async () => {
   window.__FSUSUI_PERFORMANCE_FIXTURE__ = {
     act,
+    dataPipelineProbe,
     workerPoolBurstProbe,
     workerProbe,
     wasmProbe,
@@ -506,6 +560,7 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
+  tablePipeline.dispose()
   delete window.__FSUSUI_PERFORMANCE_FIXTURE__
 })
 </script>

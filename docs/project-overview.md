@@ -191,10 +191,12 @@ pnpm build:wasm
 
 ### 10.2 已落地的组件侧接入
 
-目前代码中有两个明确接入点（均为“满足阈值才启用，不满足则降级”策略）：
+目前代码中的大数据路径按端到端实测动态选择，不以固定行数作为性能结论：
 
 - `vue/packages/components/table/src/composables/use-wasm-sort.ts`
-  - 表格列排序：行数 `>= 5000` 且列值满足条件（全数字或 ASCII 字符串）时尝试走 WASM
+  - 表格列排序：number / ASCII string 返回稳定 `Uint32Array` 行索引；Worker/WASM 持久 buffer 与分块 JS fallback 均保持原始重复值顺序
+- `vue/packages/components/select-v2/src/useSelect.ts`
+  - SelectV2：过滤索引只依赖 options / label getter / case 模式；连续输入复用候选集合并通过 generation/cancel 丢弃旧结果
 - `vue/packages/components/virtual-list/src/hooks/use-wasm-row-height.ts`
   - 虚拟列表行高预估：items 数量 `>= 2000` 时尝试走 WASM 批量预估
 

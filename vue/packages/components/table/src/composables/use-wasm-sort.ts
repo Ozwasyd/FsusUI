@@ -1,120 +1,256 @@
-/**
- * useWasmSort — WASM 加速的表格列排序
- *
- * 策略：
- *   - 行数 >= WASM_THRESHOLD（默认 5000）且列值全为数字或全为字符串时，
- *     走 WASM SIMD 排序（比 JS Array.sort 快 2-4x）。
- *   - 小数据、混合类型、非 ASCII 字符串与用户自定义排序保持 JS primary path。
- *
- * 与 Element Plus 公共合约无关，仅内部使用。
- */
 import {
+  createAsciiFilterIndex,
   ensureWasmReady,
   isWasmReady,
-  sortNumbersSync,
-  sortStringsSync,
+  sortAsciiIndicesSync,
+  sortNumberIndicesSync,
   warmupWasm,
 } from '@element-plus/wasm'
 import { get } from 'lodash-es'
+
+import {
+  canUseDataPipelineWorker,
+  createFsusDataPipelineClient,
+} from '../../../_internal/data-pipeline-client'
+import { fsusDataPipelineStrategy } from '../../../_internal/data-pipeline-strategy'
+
 import type { TableColumnCtx } from '../table-column/defaults'
-
-/** 启用 WASM 加速的最小行数阈值 */
-const WASM_THRESHOLD = 5_000
-
-const isAsciiOnly = (value: string) => {
-  for (let index = 0; index < value.length; index++) {
-    if (value.charCodeAt(index) > 0x7f) {
-      return false
-    }
-  }
-
-  return true
-}
 
 type AnyRow = Record<string, unknown>
 
-function isAllNumbers(values: unknown[]): values is number[] {
-  return values.every((v) => typeof v === 'number' && !isNaN(v as number))
+const isAsciiOnly = (value: string) => {
+  for (let index = 0; index < value.length; index++) {
+    if (value.charCodeAt(index) > 0x7f) return false
+  }
+  return true
 }
 
-function isAllStrings(values: unknown[]): values is string[] {
-  return values.every((v) => typeof v === 'string')
-}
+const now = () =>
+  typeof performance !== 'undefined' ? performance.now() : Date.now()
 
-function isAllAsciiStrings(values: unknown[]): values is string[] {
-  return isAllStrings(values) && values.every((value) => isAsciiOnly(value))
-}
+const yieldToMain = () =>
+  new Promise<void>((resolve) => {
+    const scheduler = globalThis.scheduler as
+      | { yield?: () => Promise<void> }
+      | undefined
+    if (scheduler?.yield) void scheduler.yield().then(resolve)
+    else setTimeout(resolve, 0)
+  })
 
-function groupRowsByValue<T>(
-  rows: T[],
-  getBucketKey: (row: T) => string | number,
-) {
-  const bucketMap = new Map<string | number, T[]>()
+export class FsusRowIndexView<T> implements Iterable<T> {
+  constructor(
+    private readonly rows: readonly T[],
+    readonly indices: Uint32Array,
+  ) {}
 
-  for (const row of rows) {
-    const key = getBucketKey(row)
-    const bucket = bucketMap.get(key)
-
-    if (bucket) {
-      bucket.push(row)
-      continue
-    }
-
-    bucketMap.set(key, [row])
+  get length() {
+    return this.indices.length
   }
 
-  return bucketMap
+  at(index: number) {
+    const sourceIndex = this.indices.at(index)
+    return sourceIndex === undefined ? undefined : this.rows[sourceIndex]
+  }
+
+  materialize() {
+    return Array.from(this.indices, (index) => this.rows[index]!)
+  }
+
+  *[Symbol.iterator]() {
+    for (const index of this.indices) yield this.rows[index]!
+  }
 }
 
-/**
- * 尝试用 WASM 加速排序。
- * 返回排序后的数组，若不满足 WASM 条件则返回 null（调用方走 JS primary path）。
- */
+const classifyValues = <T extends AnyRow>(
+  rows: readonly T[],
+  sortProp: string,
+) => {
+  const numbers = new Float64Array(rows.length)
+  const strings: string[] = []
+  let kind: 'number' | 'ascii' | 'unsupported' | null = null
+  for (let index = 0; index < rows.length; index++) {
+    const value = get(rows[index], sortProp)
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      if (kind === 'ascii') return { kind: 'unsupported' as const }
+      kind = 'number'
+      numbers[index] = value
+      continue
+    }
+    if (typeof value === 'string' && isAsciiOnly(value)) {
+      if (kind === 'number') return { kind: 'unsupported' as const }
+      kind = 'ascii'
+      strings.push(value)
+      continue
+    }
+    return { kind: 'unsupported' as const }
+  }
+  return kind === 'number'
+    ? { kind, numbers }
+    : kind === 'ascii'
+      ? { kind, strings }
+      : { kind: 'unsupported' as const }
+}
+
+export function trySortIndicesWithWasmSync<T extends AnyRow>(
+  rows: readonly T[],
+  sortProp: string,
+  ascending: boolean,
+): Uint32Array | null {
+  if (!sortProp || !isWasmReady()) return null
+  const values = classifyValues(rows, sortProp)
+  if (values.kind === 'number') {
+    return sortNumberIndicesSync(values.numbers, ascending)
+  }
+  if (values.kind === 'ascii') {
+    return sortAsciiIndicesSync(
+      createAsciiFilterIndex(values.strings),
+      ascending,
+    )
+  }
+  return null
+}
+
+/** Compatibility boundary for the current Table store. #190 can consume the
+ * index view directly and remove this final materialization. */
 export function trySortWithWasmSync<T extends AnyRow>(
-  array: T[],
+  rows: T[],
   sortProp: string,
   ascending: boolean,
 ): T[] | null {
-  if (array.length < WASM_THRESHOLD) return null
-  if (!sortProp) return null
+  const indices = trySortIndicesWithWasmSync(rows, sortProp, ascending)
+  return indices ? new FsusRowIndexView(rows, indices).materialize() : null
+}
 
-  const values: unknown[] = array.map((row) => get(row, sortProp))
-
-  if (isAllNumbers(values)) {
-    const sortedVals = sortNumbersSync(values, ascending)
-
-    // 重建原行顺序（稳定排序：相同值时保留原顺序）
-    const indexMap = groupRowsByValue(
-      array,
-      (row) => get(row, sortProp) as number,
-    )
-    const usedMap = new Map<number, number>()
-    return sortedVals.map((v) => {
-      const bucket = indexMap.get(v)!
-      const used = usedMap.get(v) ?? 0
-      usedMap.set(v, used + 1)
-      return bucket[used]!
-    })
+const stableJsIndices = async (
+  values: readonly (number | string)[],
+  ascending: boolean,
+) => {
+  let width = 1
+  let source = Uint32Array.from(values, (_, index) => index)
+  let target = new Uint32Array(source.length)
+  let sliceStarted = now()
+  const compare = (left: number, right: number) => {
+    const compared =
+      typeof values[left] === 'number'
+        ? (values[left] as number) - (values[right] as number)
+        : (values[left] as string) < (values[right] as string)
+          ? -1
+          : (values[left] as string) > (values[right] as string)
+            ? 1
+            : 0
+    return compared === 0 ? left - right : ascending ? compared : -compared
   }
-
-  if (isAllAsciiStrings(values)) {
-    // 与数字同理：WASM 排序字符串键，再映射回原行
-    const sorted = sortStringsSync(values, ascending, 'zh-CN')
-
-    const indexMap = groupRowsByValue(
-      array,
-      (row) => get(row, sortProp) as string,
-    )
-    const usedMap = new Map<string, number>()
-    return sorted.map((v) => {
-      const bucket = indexMap.get(v)!
-      const used = usedMap.get(v) ?? 0
-      usedMap.set(v, used + 1)
-      return bucket[used]!
-    })
+  while (width < source.length) {
+    for (let start = 0; start < source.length; start += width * 2) {
+      const middle = Math.min(start + width, source.length)
+      const end = Math.min(start + width * 2, source.length)
+      let left = start
+      let right = middle
+      let output = start
+      while (left < middle || right < end) {
+        if (
+          right >= end ||
+          (left < middle && compare(source[left]!, source[right]!) <= 0)
+        ) {
+          target[output++] = source[left++]!
+        } else {
+          target[output++] = source[right++]!
+        }
+      }
+      if (now() - sliceStarted > 6) {
+        await yieldToMain()
+        sliceStarted = now()
+      }
+    }
+    ;[source, target] = [target, source]
+    width *= 2
   }
+  return source
+}
 
-  return null // 混合类型或对象值：JS primary path
+export const createWasmSortController = (componentId: string) => {
+  const client = createFsusDataPipelineClient(`table-${componentId}`)
+  const datasets = new Map<
+    string,
+    {
+      classified: ReturnType<typeof classifyValues>
+      rows: readonly AnyRow[]
+    }
+  >()
+  return {
+    dispose: () => {
+      datasets.clear()
+      client.dispose()
+    },
+    async sort<T extends AnyRow>(
+      rows: readonly T[],
+      sortProp: string,
+      ascending: boolean,
+      options: {
+        changedStart?: number
+        datasetVersion?: string | number
+        path?: 'auto' | 'js' | 'worker-wasm'
+      } = {},
+    ): Promise<FsusRowIndexView<T> | null> {
+      if (!sortProp) return null
+      const datasetKey = `${sortProp}:${options.datasetVersion ?? '0'}`
+      const cached = datasets.get(datasetKey)
+      let classified = cached?.rows === rows ? cached.classified : null
+      if (!classified || options.changedStart !== undefined) {
+        classified = classifyValues(rows, sortProp)
+        datasets.set(datasetKey, { classified, rows })
+      }
+      if (classified.kind === 'unsupported') return null
+      const started = now()
+      const workerPath =
+        options.path === 'worker-wasm' ||
+        (options.path !== 'js' &&
+          fsusDataPipelineStrategy.choose(
+            rows.length,
+            canUseDataPipelineWorker(),
+          ) === 'worker-wasm')
+      if (workerPath) {
+        const datasetId = `${componentId}:${sortProp}:${options.datasetVersion ?? '0'}`
+        const result =
+          classified.kind === 'number'
+            ? await client.sortNumbers(
+                datasetId,
+                classified.numbers.slice(),
+                ascending,
+                options.changedStart,
+              )
+            : await client.sortAscii(datasetId, classified.strings, ascending)
+        if (result?.ok && result.value.indices) {
+          fsusDataPipelineStrategy.record({
+            commitMs: 0,
+            computeMs: now() - started,
+            copyMs: 0,
+            count: rows.length,
+            initializeMs: 0,
+            path: 'worker-wasm',
+            totalMs: now() - started,
+          })
+          return new FsusRowIndexView(rows, result.value.indices)
+        }
+      }
+      const values =
+        classified.kind === 'number'
+          ? Array.from(classified.numbers)
+          : classified.strings
+      const indices = await stableJsIndices(values, ascending)
+      const totalMs = now() - started
+      fsusDataPipelineStrategy.record({
+        commitMs: 0,
+        computeMs: totalMs,
+        copyMs: 0,
+        count: rows.length,
+        initializeMs: 0,
+        path: 'js',
+        totalMs,
+      })
+      return new FsusRowIndexView(rows, indices)
+    },
+  }
 }
 
 export function warmupWasmSort(): void {
@@ -129,18 +265,15 @@ export function isWasmSortReady(): boolean {
   return isWasmReady()
 }
 
-/**
- * 是否应该尝试 WASM 加速。
- * 供外部检测，避免 async 开销不值当的小数据集。
- */
 export function shouldUseWasm<T>(
-  array: T[],
+  rows: T[],
   column: TableColumnCtx<T> | null,
 ): boolean {
-  return (
-    array.length >= WASM_THRESHOLD &&
-    !!column &&
-    !column.sortMethod && // 自定义 sortMethod 不走 WASM
-    !column.sortBy // 自定义 sortBy 不走 WASM
+  return Boolean(
+    column &&
+    !column.sortMethod &&
+    !column.sortBy &&
+    fsusDataPipelineStrategy.choose(rows.length, canUseDataPipelineWorker()) ===
+      'worker-wasm',
   )
 }

@@ -4,19 +4,21 @@
 
 ## Public Preview Notes
 
-| 字段                   | 说明                                                                                         |
-| ---------------------- | -------------------------------------------------------------------------------------------- |
-| purpose                | 展示结构化数据，支持排序、筛选、选择、展开、树形数据和自定义列模板。                         |
-| basic usage            | 通过 `data` 传入数组，用 `el-table-column` 声明列；大数据场景优先评估 TableV2 或虚拟列表。   |
-| props / events / slots | 本页 `Table API` 和 `Table-column API` 覆盖公开 props、events、slots 和 exposes。            |
-| accessibility          | 为业务表格提供明确上下文标题；选择列、展开列和自定义单元格内容应保留键盘可达控件与可读文本。 |
-| theme token notes      | 跟随公开背景、边框、文本、主色、阴影和 motion control token；WASM 加速不改变视觉 token。     |
-| known limitations      | WASM 排序只覆盖本地大行数排序路径；服务端排序、分页、筛选和复杂单元格性能预算由调用方负责。  |
-| stability level        | Preview public component；WASM 加速路径属于 Experimental behavior。                          |
+| 字段                   | 说明                                                                                                                                   |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| purpose                | 展示结构化数据，支持排序、筛选、选择、展开、树形数据和自定义列模板。                                                                   |
+| basic usage            | 通过 `data` 传入数组，用 `el-table-column` 声明列；大数据场景优先评估 TableV2 或虚拟列表。                                             |
+| props / events / slots | 本页 `Table API` 和 `Table-column API` 覆盖公开 props、events、slots 和 exposes。                                                      |
+| accessibility          | 为业务表格提供明确上下文标题；选择列、展开列和自定义单元格内容应保留键盘可达控件与可读文本。                                           |
+| theme token notes      | 跟随公开背景、边框、文本、主色、阴影和 motion control token；WASM 加速不改变视觉 token。                                               |
+| known limitations      | 索引加速只覆盖本地 number / ASCII string 排序；locale-aware、CJK、mixed、自定义 comparator、服务端排序和分页继续使用语义正确的原路径。 |
+| stability level        | Preview public component；WASM 加速路径属于 Experimental behavior。                                                                    |
 
 ## WASM 加速
 
-当表格行数 **≥ 5000** 时，FsusUI 自动启用基于 WASM 的原生排序，性能可提升 5–10 倍。低于阈值时自动退回到纯 JavaScript 排序。
+FsusUI 的大数据路径先提取最小 primitive 列数据，在 Worker 中通过持久 WASM buffer 返回稳定 `Uint32Array` 行索引。重复值按原始 index 稳定排序，完整 row object 不进入 Worker；只有公共数组边界才 materialize。策略会记录初始化、复制、计算、映射和提交耗时，并动态选择 Worker/WASM 或可让出主线程的分块 JS，不使用固定 5K 阈值。
+
+WASM memory growth 后旧 TypedArray view 会失效，因此实现只持久化 pointer/capacity，每次操作重新读取当前 heap view。组件/pool 释放时同时释放 input/output/index buffer。locale-aware、CJK、mixed values、`sort-method` 和 `sort-by` 保持 JS 语义，不会使用 ASCII 字节序冒充 locale 排序。
 
 > **注意**：开启 WASM 加速无需任何额外配置；如需从源码重新编译 WASM 模块，需要 Emscripten 5.0.4。
 
@@ -48,7 +50,7 @@
 
 在列上设置 `sortable` 开启排序。可通过 `sort-method` / `sort-by` 自定义排序逻辑。后端排序时设置 `sortable="custom"`，监听 `sort-change` 事件自行请求接口。
 
-> **行数 ≥ 5000 时会自动使用 WASM 加速排序。**
+> 是否启用 Worker/WASM 由当前设备和该会话的端到端历史决定；行数本身不是固定开关。
 
 ## 筛选
 

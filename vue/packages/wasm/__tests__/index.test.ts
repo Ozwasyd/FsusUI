@@ -8,6 +8,7 @@ import { fsusOk } from '@element-plus/utils'
 import {
   clampAndRound,
   createAsciiFilterIndex,
+  createWasmDataSession,
   ensureWasmReady,
   estimateRowHeights,
   filterAsciiIndices,
@@ -21,6 +22,8 @@ import {
   roundToPrecision,
   sortNumbers,
   sortNumbersSync,
+  sortAsciiIndices,
+  sortNumberIndices,
   sortStrings,
   sortStringsSync,
   warmupWasm,
@@ -88,6 +91,60 @@ describe('@element-plus/wasm', () => {
       fsusOk([-1, 1, 3, 3]),
     )
     expect(sortNumbersSync([3, 1, 3, -1], false)).toEqual([3, 3, 1, -1])
+  })
+
+  it('returns stable row indices for duplicate number and ASCII values', async () => {
+    await expect(
+      sortNumberIndices(Float64Array.from([7, 2, 7, 2]), true),
+    ).resolves.toEqual(fsusOk(Uint32Array.from([1, 3, 0, 2])))
+    const ascii = createAsciiFilterIndex(['beta', 'alpha', 'beta', 'alpha'])
+    await expect(sortAsciiIndices(ascii, false)).resolves.toEqual(
+      fsusOk(Uint32Array.from([0, 2, 1, 3])),
+    )
+  })
+
+  it('reuses persistent buffers and survives memory growth without stale views', async () => {
+    const sessionResult = await createWasmDataSession()
+    expect(sessionResult.ok).toBe(true)
+    if (!sessionResult.ok) return
+    const session = sessionResult.value
+    const large = Float64Array.from(
+      { length: 600_000 },
+      (_, index) => 600_000 - index,
+    )
+    const first = session.sortNumberIndices(large, true)
+    expect(first[0]).toBe(599_999)
+    const firstStats = session.stats()
+    const second = session.sortNumberIndices(Float64Array.from([3, 1, 2]), true)
+    expect(second).toEqual(Uint32Array.from([1, 2, 0]))
+    const secondStats = session.stats()
+    expect(secondStats.allocationCount).toBe(firstStats.allocationCount)
+    expect(secondStats.reusedAllocationCount).toBeGreaterThan(
+      firstStats.reusedAllocationCount,
+    )
+    expect(secondStats.memoryGeneration).toBeGreaterThanOrEqual(1)
+
+    const ascii = createAsciiFilterIndex(['alpha', 'alphabet', 'beta'])
+    session.setAsciiIndex(ascii)
+    const candidates = session.filterLoadedAsciiIndices('alpha', false)
+    const filterStats = session.stats()
+    expect(
+      session.filterLoadedAsciiIndices('alphabet', false, candidates),
+    ).toEqual(Uint32Array.from([1]))
+    const candidateStats = session.stats()
+    expect(candidateStats.allocationCount).toBe(filterStats.allocationCount + 1)
+    expect(
+      session.filterLoadedAsciiIndices(
+        'alphabet',
+        false,
+        Uint32Array.from([1]),
+      ),
+    ).toEqual(Uint32Array.from([1]))
+    expect(session.stats().allocationCount).toBe(candidateStats.allocationCount)
+    session.dispose()
+    expect(() =>
+      session.sortNumberIndices(Float64Array.from([1]), true),
+    ).toThrow(/disposed/u)
   })
 
   it('keeps string sort results stable while ignoring locale compatibility parameter', async () => {

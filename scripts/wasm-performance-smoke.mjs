@@ -84,13 +84,29 @@ try {
     [...numericData].sort((a, b) => a - b),
   )
   const wasmNumberSort = await measure('wasm number sort', () =>
-    wasm.sortNumbers(numericData, true).then((result) =>
-      unwrapResult('sortNumbers', result),
-    ),
+    wasm
+      .sortNumbers(numericData, true)
+      .then((result) => unwrapResult('sortNumbers', result)),
   )
   assertArrayEqual('number sort', wasmNumberSort.value, jsNumberSort.value)
+  const jsNumberIndices = await measure('js stable number indices', () =>
+    Uint32Array.from(numericData, (_, index) => index).sort((left, right) => {
+      const compared = numericData[left] - numericData[right]
+      return compared || left - right
+    }),
+  )
+  const wasmNumberIndices = await measure('wasm stable number indices', () =>
+    wasm
+      .sortNumberIndices(Float64Array.from(numericData), true)
+      .then((result) => unwrapResult('sortNumberIndices', result)),
+  )
+  assertArrayEqual(
+    'stable number indices',
+    wasmNumberIndices.value,
+    jsNumberIndices.value,
+  )
 
-  const filterData = Array.from({ length: 50_000 }, (_, index) =>
+  const filterData = Array.from({ length: 100_000 }, (_, index) =>
     index % 4_097 === 0 ? `needle option ${index}` : `option ${index}`,
   )
   const filterKeyword = 'needle'
@@ -105,11 +121,28 @@ try {
     return matched
   })
   const wasmFilter = await measure('wasm ascii filter', () =>
-    wasm.filterAsciiIndices(asciiFilterIndex, filterKeyword, false).then(
-      (result) => unwrapResult('filterAsciiIndices', result),
-    ),
+    wasm
+      .filterAsciiIndices(asciiFilterIndex, filterKeyword, false)
+      .then((result) => unwrapResult('filterAsciiIndices', result)),
   )
   assertArrayEqual('string filter', wasmFilter.value, jsFilter.value)
+  const session = unwrapResult(
+    'createWasmDataSession',
+    await wasm.createWasmDataSession(),
+  )
+  session.setAsciiIndex(asciiFilterIndex)
+  const sessionColdFilter = await measure('persistent filter cold', () =>
+    session.filterLoadedAsciiIndices(filterKeyword, false),
+  )
+  const sessionHotFilter = await measure('persistent filter hot', () =>
+    session.filterLoadedAsciiIndices(
+      'needle option 8',
+      false,
+      sessionColdFilter.value,
+    ),
+  )
+  const sessionStats = session.stats()
+  session.dispose()
 
   const textLengths = Array.from(
     { length: 100_000 },
@@ -126,22 +159,26 @@ try {
     )
   })
   const wasmHeights = await measure('wasm row heights', () =>
-    wasm.estimateRowHeights(
-      textLengths,
-      rowWidth,
-      charWidth,
-      lineHeight,
-      padding,
-    ).then((result) =>
-      unwrapResult('estimateRowHeights', result),
-    ),
+    wasm
+      .estimateRowHeights(textLengths, rowWidth, charWidth, lineHeight, padding)
+      .then((result) => unwrapResult('estimateRowHeights', result)),
   )
   assertArrayEqual('row heights', wasmHeights.value, jsHeights.value)
 
   const rows = [
     ['case', 'js', 'wasm'],
     ['number sort', formatMs(jsNumberSort.ms), formatMs(wasmNumberSort.ms)],
+    [
+      'stable number indices',
+      formatMs(jsNumberIndices.ms),
+      formatMs(wasmNumberIndices.ms),
+    ],
     ['ascii filter', formatMs(jsFilter.ms), formatMs(wasmFilter.ms)],
+    [
+      `persistent filter (${sessionStats.reusedAllocationCount} reuse)`,
+      formatMs(sessionColdFilter.ms),
+      formatMs(sessionHotFilter.ms),
+    ],
     ['row heights', formatMs(jsHeights.ms), formatMs(wasmHeights.ms)],
   ]
 

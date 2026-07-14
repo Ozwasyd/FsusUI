@@ -40,6 +40,9 @@ const definitions = [
   ['select-v2', 10_000],
   ['select-v2', 100_000],
   ['table', 1_000],
+  ['data-pipeline-table', 5_000],
+  ['data-pipeline-table', 10_000],
+  ['data-pipeline-table', 100_000],
   ['render-pipeline-monolithic', 2_000_000],
   ['render-pipeline-cooperative', 2_000_000],
   ['virtual-window-index-legacy', 100_000],
@@ -68,10 +71,11 @@ const quickDefinitions = [
   definitions[10],
   definitions[13],
   definitions[14],
-  definitions[15],
-  definitions[16],
   definitions[17],
   definitions[18],
+  definitions[19],
+  definitions[20],
+  definitions[21],
 ]
 const dimensions = profile === 'full' ? fullDimensions : quickDimensions
 const scenarioDefinitions = (
@@ -238,6 +242,7 @@ try {
     const worker = []
     const workerPoolBursts = []
     const wasm = []
+    const dataPipeline = []
     for (let index = 0; index < samples; index++) {
       const sample = await page.evaluate(async (iteration) => {
         const started = performance.now()
@@ -269,6 +274,13 @@ try {
         wasm.push(
           await page.evaluate(() =>
             window.__FSUSUI_PERFORMANCE_FIXTURE__.wasmProbe(),
+          ),
+        )
+      }
+      if (scenario === 'data-pipeline-table') {
+        dataPipeline.push(
+          await page.evaluate(() =>
+            window.__FSUSUI_PERFORMANCE_FIXTURE__.dataPipelineProbe(),
           ),
         )
       }
@@ -317,6 +329,7 @@ try {
       worker,
       workerPoolBursts,
       wasm,
+      dataPipeline,
       trace: {
         styleMs: sumTrace(
           traceEvents,
@@ -392,6 +405,19 @@ try {
             hotStartupMs: stats(wasm.map((entry) => entry.startupMs)),
             hotEndToEndMs: stats(wasm.map((entry) => entry.endToEndMs)),
             engine: wasm[0].initial?.engine ?? wasm.at(-1).engine,
+          }
+        : null,
+      dataPipeline: dataPipeline.length
+        ? {
+            legacyBlockMs: stats(
+              dataPipeline.map((entry) => entry.legacyBlockMs),
+            ),
+            workerEndToEndMs: stats(
+              dataPipeline.map((entry) => entry.workerEndToEndMs),
+            ),
+            workerSubmitBlockMs: stats(
+              dataPipeline.map((entry) => entry.workerSubmitBlockMs),
+            ),
           }
         : null,
     })

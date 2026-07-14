@@ -1,22 +1,29 @@
 // @ts-nocheck
-import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  reactive,
+  ref,
+  watch,
+} from 'vue'
 import { isArray, isFunction, isObject } from '@vue/shared'
 import { get, isEqual, isNil, debounce as lodashDebounce } from 'lodash-unified'
 import { useResizeObserver } from '@element-plus/hooks/use-runtime'
 import { useLocale, useNamespace } from '@element-plus/hooks'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
 import {
-  createAsciiFilterIndex,
-  ensureWasmReady,
-  filterAsciiIndicesSync,
-  isWasmReady,
-} from '@element-plus/wasm'
-import {
   ValidateComponentsMap,
   debugWarn,
   escapeStringRegexp,
 } from '@element-plus/utils'
 import { useFormItem, useFormSize } from '@element-plus/components/form'
+import {
+  canUseDataPipelineWorker,
+  createFsusDataPipelineClient,
+} from '@element-plus/components/_internal/data-pipeline-client'
+import { fsusDataPipelineStrategy } from '@element-plus/components/_internal/data-pipeline-strategy'
 
 import { ArrowUp } from '@element-plus/icons-vue'
 import { useAllowCreate } from './useAllowCreate'
@@ -30,13 +37,12 @@ import type { ISelectProps } from './token'
 
 const DEFAULT_INPUT_PLACEHOLDER = ''
 const MINIMUM_INPUT_WIDTH = 11
+let selectPipelineId = 0
 const TAG_BASE_WIDTH = {
   larget: 51,
   default: 42,
   small: 33,
 }
-const WASM_FILTER_THRESHOLD = 2_000
-
 const isAsciiOnly = (value: string) => {
   for (let index = 0; index < value.length; index++) {
     if (value.charCodeAt(index) > 0x7f) {
@@ -93,26 +99,18 @@ const useSelect = (props: ISelectProps, emit) => {
   const selectRef = ref(null)
   const selectionRef = ref(null) // tags ref
   const calculatorRef = ref<HTMLElement>(null)
-  const wasmFilterVersion = ref(0)
-  const wasmFilterError = ref<unknown>(null)
-  let wasmFilterReadyPromise: Promise<void> | null = null
-
-  const requestWasmFilterReady = () => {
-    if (wasmFilterReadyPromise) return
-    wasmFilterReadyPromise = ensureWasmReady()
-      .then((result) => {
-        wasmFilterReadyPromise = null
-        if (!result.ok) {
-          wasmFilterError.value = result.error
-          return
-        }
-        wasmFilterVersion.value++
-      })
-      .catch((error) => {
-        wasmFilterReadyPromise = null
-        wasmFilterError.value = error
-      })
-  }
+  const filterPipeline = createFsusDataPipelineClient(
+    `select-${++selectPipelineId}`,
+  )
+  const filterDatasetId = 'options'
+  const filterIndexVersion = ref(0)
+  const asyncFilterResult = ref<{
+    indexes: Uint32Array
+    query: string
+    version: number
+  } | null>(null)
+  let filterBuildPromise: Promise<unknown> | null = null
+  let filterGeneration = 0
 
   // the controller of the expanded popup
   const expanded = ref(false)
@@ -248,9 +246,9 @@ const useSelect = (props: ISelectProps, emit) => {
   )
 
   const filterOptionsWithQuery = (options: OptionType[], query: string) => {
+    const regexp = query ? new RegExp(escapeStringRegexp(query), 'i') : null
     const isValidOption = (option: Option): boolean => {
-      const regexp = new RegExp(escapeStringRegexp(query), 'i')
-      return query ? regexp.test(getLabel(option) || '') : true
+      return regexp ? regexp.test(getLabel(option) || '') : true
     }
 
     return options.reduce((all, item) => {
@@ -278,32 +276,113 @@ const useSelect = (props: ISelectProps, emit) => {
     }, [] as OptionType[])
   }
 
-  const shouldUseWasmFilter = computed(() => {
+  const hasOnlyAsciiFilterLabels = computed(() =>
+    filterGroups.value.labels.every((label) => isAsciiOnly(label)),
+  )
+  const canBuildWorkerFilterIndex = computed(() => {
     return (
       props.filterable &&
       !props.remote &&
       !isFunction(props.filterMethod) &&
-      states.inputValue.length > 0 &&
-      filterGroups.value.labels.length >= WASM_FILTER_THRESHOLD
+      hasOnlyAsciiFilterLabels.value &&
+      canUseDataPipelineWorker()
     )
   })
+  const unfilteredOptions = computed(() =>
+    filterOptionsWithQuery(filterSourceOptions.value, ''),
+  )
 
-  const isAsciiFilterQuery = computed(() => isAsciiOnly(states.inputValue))
-  const hasOnlyAsciiFilterLabels = computed(() =>
-    filterGroups.value.labels.every((label) => isAsciiOnly(label)),
-  )
-  const canUseWasmFilter = computed(() => {
-    return (
-      shouldUseWasmFilter.value &&
-      isAsciiFilterQuery.value &&
-      hasOnlyAsciiFilterLabels.value
-    )
-  })
-  const wasmFilterIndex = computed(() =>
-    canUseWasmFilter.value
-      ? createAsciiFilterIndex(filterGroups.value.labels)
-      : null,
-  )
+  const chunkFilterIndexes = async (
+    labels: readonly string[],
+    query: string,
+    generation: number,
+  ) => {
+    const regexp = new RegExp(escapeStringRegexp(query), 'i')
+    const indexes: number[] = []
+    let sliceStarted = performance.now()
+    for (let index = 0; index < labels.length; index++) {
+      if (generation !== filterGeneration) return null
+      if (regexp.test(labels[index])) indexes.push(index)
+      if (performance.now() - sliceStarted > 6) {
+        await new Promise<void>((resolve) => setTimeout(resolve, 0))
+        sliceStarted = performance.now()
+      }
+    }
+    return Uint32Array.from(indexes)
+  }
+
+  const commitFilterIndexes = (
+    indexes: Uint32Array,
+    query: string,
+    version: number,
+    generation: number,
+  ) => {
+    if (
+      generation !== filterGeneration ||
+      version !== filterIndexVersion.value ||
+      query !== states.inputValue
+    ) {
+      return
+    }
+    asyncFilterResult.value = { indexes, query, version }
+  }
+
+  const scheduleAsyncFilter = async () => {
+    const query = states.inputValue
+    const version = filterIndexVersion.value
+    const labels = filterGroups.value.labels
+    const generation = ++filterGeneration
+    asyncFilterResult.value = null
+    if (!query) return
+
+    const started = performance.now()
+    const useWorker =
+      canBuildWorkerFilterIndex.value &&
+      isAsciiOnly(query) &&
+      fsusDataPipelineStrategy.choose(labels.length, true) === 'worker-wasm'
+
+    if (useWorker) {
+      void (async () => {
+        await filterBuildPromise
+        if (generation !== filterGeneration) return
+        const result = await filterPipeline.filter(
+          filterDatasetId,
+          version,
+          query,
+        )
+        if (result?.ok && result.value.indices) {
+          commitFilterIndexes(result.value.indices, query, version, generation)
+          const totalMs = performance.now() - started
+          fsusDataPipelineStrategy.record({
+            commitMs: 0,
+            computeMs: totalMs,
+            copyMs: 0,
+            count: labels.length,
+            initializeMs: 0,
+            path: 'worker-wasm',
+            totalMs,
+          })
+        }
+      })()
+    }
+
+    if (useWorker || fsusDataPipelineStrategy.shouldChunkJs(labels.length)) {
+      const chunkStarted = performance.now()
+      const indexes = await chunkFilterIndexes(labels, query, generation)
+      if (!indexes) return
+      commitFilterIndexes(indexes, query, version, generation)
+      const totalMs = performance.now() - chunkStarted
+      fsusDataPipelineStrategy.record({
+        commitMs: 0,
+        computeMs: totalMs,
+        copyMs: 0,
+        count: labels.length,
+        initializeMs: 0,
+        path: 'js',
+        totalMs,
+      })
+    }
+  }
 
   // filteredOptions includes flatten the data into one dimensional array.
   const emptyText = computed(() => {
@@ -328,28 +407,31 @@ const useSelect = (props: ISelectProps, emit) => {
       return []
     }
 
-    if (canUseWasmFilter.value) {
-      void wasmFilterVersion.value
-      if (wasmFilterError.value) {
-        throw wasmFilterError.value
-      }
-
-      if (!isWasmReady()) {
-        requestWasmFilterReady()
-        return []
-      }
-
-      const matchedIndexes = filterAsciiIndicesSync(
-        wasmFilterIndex.value!,
-        states.inputValue,
-        false,
-      )
-
+    const asyncResult = asyncFilterResult.value
+    if (
+      asyncResult?.query === states.inputValue &&
+      asyncResult.version === filterIndexVersion.value
+    ) {
       return buildFilteredOptions(
         filterGroups.value.groups,
-        new Set(matchedIndexes),
+        new Set(asyncResult.indexes),
       )
     }
+
+    const shouldWaitForAsync =
+      states.inputValue.length > 0 &&
+      !props.remote &&
+      !isFunction(props.filterMethod) &&
+      (fsusDataPipelineStrategy.shouldChunkJs(
+        filterGroups.value.labels.length,
+      ) ||
+        (canBuildWorkerFilterIndex.value &&
+          isAsciiOnly(states.inputValue) &&
+          fsusDataPipelineStrategy.choose(
+            filterGroups.value.labels.length,
+            true,
+          ) === 'worker-wasm'))
+    if (shouldWaitForAsync) return unfilteredOptions.value
 
     return filterOptionsWithQuery(filterSourceOptions.value, states.inputValue)
   })
@@ -939,14 +1021,24 @@ const useSelect = (props: ISelectProps, emit) => {
   )
 
   watch(
-    canUseWasmFilter,
-    (useWasm) => {
-      if (useWasm) {
-        requestWasmFilterReady()
-      }
+    filterGroups,
+    (groups) => {
+      const version = ++filterIndexVersion.value
+      asyncFilterResult.value = null
+      filterBuildPromise = canBuildWorkerFilterIndex.value
+        ? filterPipeline.buildFilterIndex(filterDatasetId, version, [
+            ...groups.labels,
+          ])
+        : null
+      void scheduleAsyncFilter()
     },
-    {
-      immediate: true,
+    { immediate: true },
+  )
+
+  watch(
+    () => states.inputValue,
+    () => {
+      void scheduleAsyncFilter()
     },
   )
 
@@ -966,6 +1058,11 @@ const useSelect = (props: ISelectProps, emit) => {
 
   onMounted(() => {
     initStates()
+  })
+  onBeforeUnmount(() => {
+    filterGeneration += 1
+    void filterPipeline.release(filterDatasetId)
+    filterPipeline.dispose()
   })
   useResizeObserver(selectRef, handleResize)
 

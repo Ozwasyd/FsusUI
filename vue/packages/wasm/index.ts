@@ -36,6 +36,20 @@ interface EpWasmInternalModule {
   _malloc(size: number): number
   _free(ptr: number): void
   _sort_numbers_buffer(ptr: number, len: number, ascending: number): void
+  _sort_number_indices_buffer(
+    valuesPtr: number,
+    indicesPtr: number,
+    len: number,
+    ascending: number,
+  ): void
+  _sort_ascii_indices_buffer(
+    labelsPtr: number,
+    offsetsPtr: number,
+    lengthsPtr: number,
+    indicesPtr: number,
+    count: number,
+    ascending: number,
+  ): void
   _estimate_row_heights_buffer(
     textLengthsPtr: number,
     len: number,
@@ -55,8 +69,20 @@ interface EpWasmInternalModule {
     caseSensitive: number,
     outPtr: number,
   ): number
+  _filter_ascii_candidate_indices_buffer(
+    labelsPtr: number,
+    offsetsPtr: number,
+    lengthsPtr: number,
+    candidatesPtr: number,
+    candidateCount: number,
+    keywordPtr: number,
+    keywordLength: number,
+    caseSensitive: number,
+    outPtr: number,
+  ): number
   HEAPU8: Uint8Array
   HEAP32: Int32Array
+  HEAPU32: Uint32Array
   HEAPF64: Float64Array
 }
 
@@ -164,10 +190,14 @@ function getInternalModule(module: EpWasmModule): LoadedEpWasmModule {
     typeof module._malloc !== 'function' ||
     typeof module._free !== 'function' ||
     typeof module._sort_numbers_buffer !== 'function' ||
+    typeof module._sort_number_indices_buffer !== 'function' ||
+    typeof module._sort_ascii_indices_buffer !== 'function' ||
     typeof module._estimate_row_heights_buffer !== 'function' ||
     typeof module._filter_ascii_indices_buffer !== 'function' ||
+    typeof module._filter_ascii_candidate_indices_buffer !== 'function' ||
     !(module.HEAPU8 instanceof Uint8Array) ||
     !(module.HEAP32 instanceof Int32Array) ||
+    !(module.HEAPU32 instanceof Uint32Array) ||
     !(module.HEAPF64 instanceof Float64Array)
   ) {
     throw new Error(
@@ -296,6 +326,265 @@ const encodeAsciiKeyword = (keyword: string) => {
   return bytes
 }
 
+type PersistentBuffer = { capacity: number; ptr: number }
+
+export type WasmDataSessionStats = {
+  allocatedBytes: number
+  allocationCount: number
+  memoryGeneration: number
+  reusedAllocationCount: number
+}
+
+export type WasmAsciiIndexUpdate = {
+  byteStart: number
+  labelStart: number
+}
+
+/**
+ * Worker-lifetime WASM buffers. Pointers remain stable while capacity is
+ * sufficient; heap views are always re-read after `_malloc`, because
+ * ALLOW_MEMORY_GROWTH replaces the backing ArrayBuffer.
+ */
+export class WasmDataSession {
+  private readonly buffers = new Map<string, PersistentBuffer>()
+  private heapBuffer: ArrayBuffer
+  private allocationCount = 0
+  private memoryGeneration = 0
+  private reusedAllocationCount = 0
+  private disposed = false
+  private asciiCount = 0
+
+  constructor(private readonly module: LoadedEpWasmModule) {
+    this.heapBuffer = module.HEAPU8.buffer as ArrayBuffer
+  }
+
+  private assertActive() {
+    if (this.disposed) throw new Error('@element-plus/wasm session disposed.')
+  }
+
+  private refreshHeapGeneration() {
+    const next = this.module.HEAPU8.buffer as ArrayBuffer
+    if (next !== this.heapBuffer) {
+      this.heapBuffer = next
+      this.memoryGeneration += 1
+    }
+  }
+
+  private ensureBuffer(name: string, byteLength: number) {
+    this.assertActive()
+    const required = Math.max(1, byteLength)
+    const current = this.buffers.get(name)
+    if (current && current.capacity >= required) {
+      this.reusedAllocationCount += 1
+      this.refreshHeapGeneration()
+      return current.ptr
+    }
+    if (current) this.module._free(current.ptr)
+    let capacity = 64
+    while (capacity < required) capacity *= 2
+    const ptr = this.module._malloc(capacity)
+    this.allocationCount += 1
+    this.buffers.set(name, { capacity, ptr })
+    this.refreshHeapGeneration()
+    return ptr
+  }
+
+  setNumbers(values: Float64Array, changedStart = 0) {
+    const ptr = this.ensureBuffer('numbers', values.byteLength)
+    const start = Math.max(0, Math.min(values.length, changedStart))
+    this.module.HEAPF64.set(
+      values.subarray(start),
+      ptr / Float64Array.BYTES_PER_ELEMENT + start,
+    )
+    return ptr
+  }
+
+  setAsciiIndex(index: WasmAsciiFilterIndex, update?: WasmAsciiIndexUpdate) {
+    const labelsPtr = this.ensureBuffer('labels', index.bytes.byteLength)
+    const offsetsPtr = this.ensureBuffer('offsets', index.offsets.byteLength)
+    const lengthsPtr = this.ensureBuffer('lengths', index.lengths.byteLength)
+    const byteStart = Math.max(
+      0,
+      Math.min(index.bytes.length, update?.byteStart ?? 0),
+    )
+    const labelStart = Math.max(
+      0,
+      Math.min(index.lengths.length, update?.labelStart ?? 0),
+    )
+    this.module.HEAPU8.set(
+      index.bytes.subarray(byteStart),
+      labelsPtr + byteStart,
+    )
+    this.module.HEAP32.set(
+      index.offsets.subarray(labelStart),
+      offsetsPtr / Int32Array.BYTES_PER_ELEMENT + labelStart,
+    )
+    this.module.HEAP32.set(
+      index.lengths.subarray(labelStart),
+      lengthsPtr / Int32Array.BYTES_PER_ELEMENT + labelStart,
+    )
+    this.asciiCount = index.lengths.length
+    return { labelsPtr, lengthsPtr, offsetsPtr }
+  }
+
+  private loadedAsciiPointers() {
+    this.assertActive()
+    const labelsPtr = this.buffers.get('labels')?.ptr
+    const offsetsPtr = this.buffers.get('offsets')?.ptr
+    const lengthsPtr = this.buffers.get('lengths')?.ptr
+    if (
+      labelsPtr === undefined ||
+      offsetsPtr === undefined ||
+      lengthsPtr === undefined
+    ) {
+      throw new Error('@element-plus/wasm ASCII index is not loaded.')
+    }
+    this.refreshHeapGeneration()
+    return { labelsPtr, lengthsPtr, offsetsPtr }
+  }
+
+  sortNumberIndices(values: Float64Array, ascending = true, changedStart = 0) {
+    if (values.length === 0) return new Uint32Array()
+    const valuesPtr = this.setNumbers(values, changedStart)
+    const outPtr = this.ensureBuffer(
+      'indices-output',
+      values.length * Uint32Array.BYTES_PER_ELEMENT,
+    )
+    this.module._sort_number_indices_buffer(
+      valuesPtr,
+      outPtr,
+      values.length,
+      ascending ? 1 : 0,
+    )
+    return this.module.HEAPU32.slice(
+      outPtr / Uint32Array.BYTES_PER_ELEMENT,
+      outPtr / Uint32Array.BYTES_PER_ELEMENT + values.length,
+    )
+  }
+
+  sortAsciiIndices(index: WasmAsciiFilterIndex, ascending = true) {
+    if (index.lengths.length === 0) return new Uint32Array()
+    this.setAsciiIndex(index)
+    return this.sortLoadedAsciiIndices(ascending)
+  }
+
+  sortLoadedAsciiIndices(ascending = true) {
+    if (this.asciiCount === 0) return new Uint32Array()
+    const { labelsPtr, offsetsPtr, lengthsPtr } = this.loadedAsciiPointers()
+    const outPtr = this.ensureBuffer(
+      'indices-output',
+      this.asciiCount * Uint32Array.BYTES_PER_ELEMENT,
+    )
+    this.module._sort_ascii_indices_buffer(
+      labelsPtr,
+      offsetsPtr,
+      lengthsPtr,
+      outPtr,
+      this.asciiCount,
+      ascending ? 1 : 0,
+    )
+    return this.module.HEAPU32.slice(
+      outPtr / Uint32Array.BYTES_PER_ELEMENT,
+      outPtr / Uint32Array.BYTES_PER_ELEMENT + this.asciiCount,
+    )
+  }
+
+  filterAsciiIndices(
+    index: WasmAsciiFilterIndex,
+    keyword: string,
+    caseSensitive = false,
+    candidates?: Uint32Array,
+  ) {
+    if (index.lengths.length === 0) return new Uint32Array()
+    this.setAsciiIndex(index)
+    return this.filterLoadedAsciiIndices(keyword, caseSensitive, candidates)
+  }
+
+  filterLoadedAsciiIndices(
+    keyword: string,
+    caseSensitive = false,
+    candidates?: Uint32Array,
+  ) {
+    if (this.asciiCount === 0) return new Uint32Array()
+    const { labelsPtr, offsetsPtr, lengthsPtr } = this.loadedAsciiPointers()
+    const keywordBytes = encodeAsciiKeyword(keyword)
+    const keywordPtr = this.ensureBuffer('keyword', keywordBytes.byteLength)
+    this.module.HEAPU8.set(keywordBytes, keywordPtr)
+    const outPtr = this.ensureBuffer(
+      'indices-output',
+      this.asciiCount * Uint32Array.BYTES_PER_ELEMENT,
+    )
+    let matchedCount: number
+    if (candidates) {
+      const candidatesPtr = this.ensureBuffer(
+        'indices-candidates',
+        candidates.byteLength,
+      )
+      this.module.HEAPU32.set(
+        candidates,
+        candidatesPtr / Uint32Array.BYTES_PER_ELEMENT,
+      )
+      matchedCount = this.module._filter_ascii_candidate_indices_buffer(
+        labelsPtr,
+        offsetsPtr,
+        lengthsPtr,
+        candidatesPtr,
+        candidates.length,
+        keywordPtr,
+        keywordBytes.length,
+        caseSensitive ? 1 : 0,
+        outPtr,
+      )
+    } else {
+      matchedCount = this.module._filter_ascii_indices_buffer(
+        labelsPtr,
+        offsetsPtr,
+        lengthsPtr,
+        this.asciiCount,
+        keywordPtr,
+        keywordBytes.length,
+        caseSensitive ? 1 : 0,
+        outPtr,
+      )
+    }
+    return this.module.HEAPU32.slice(
+      outPtr / Uint32Array.BYTES_PER_ELEMENT,
+      outPtr / Uint32Array.BYTES_PER_ELEMENT + matchedCount,
+    )
+  }
+
+  stats(): WasmDataSessionStats {
+    return {
+      allocatedBytes: [...this.buffers.values()].reduce(
+        (sum, buffer) => sum + buffer.capacity,
+        0,
+      ),
+      allocationCount: this.allocationCount,
+      memoryGeneration: this.memoryGeneration,
+      reusedAllocationCount: this.reusedAllocationCount,
+    }
+  }
+
+  dispose() {
+    if (this.disposed) return
+    this.disposed = true
+    for (const buffer of this.buffers.values()) this.module._free(buffer.ptr)
+    this.buffers.clear()
+  }
+}
+
+export async function createWasmDataSession(): Promise<
+  FsusResult<WasmDataSession>
+> {
+  return await wasmTryAsync(async () => {
+    return new WasmDataSession(getInternalModule(await getModule()))
+  }, '@element-plus/wasm createWasmDataSession failed.')
+}
+
+export function createWasmDataSessionSync(): WasmDataSession {
+  return new WasmDataSession(getInternalModule(getRequiredModule()))
+}
+
 function filterAsciiIndicesWithModule(
   module: EpWasmModule,
   index: WasmAsciiFilterIndex,
@@ -394,6 +683,32 @@ export function sortNumbersSync(data: number[], ascending = true): number[] {
   return sortNumbersWithModule(getRequiredModule(), data, ascending)
 }
 
+export async function sortNumberIndices(
+  data: Float64Array,
+  ascending = true,
+): Promise<FsusResult<Uint32Array>> {
+  return await wasmTryAsync(async () => {
+    const session = new WasmDataSession(getInternalModule(await getModule()))
+    try {
+      return session.sortNumberIndices(data, ascending)
+    } finally {
+      session.dispose()
+    }
+  }, '@element-plus/wasm sortNumberIndices failed.')
+}
+
+export function sortNumberIndicesSync(
+  data: Float64Array,
+  ascending = true,
+): Uint32Array {
+  const session = createWasmDataSessionSync()
+  try {
+    return session.sortNumberIndices(data, ascending)
+  } finally {
+    session.dispose()
+  }
+}
+
 /**
  * 对字符串数组排序，支持区域感知（locale）。
  * 注意：当前 WASM 实现为字节序排序，locale 参数保留给未来 ICU 集成。
@@ -422,6 +737,32 @@ export function sortStringsSync(
   void locale
   m.sortStrings(copy as unknown as string[], ascending)
   return copy
+}
+
+export async function sortAsciiIndices(
+  index: WasmAsciiFilterIndex,
+  ascending = true,
+): Promise<FsusResult<Uint32Array>> {
+  return await wasmTryAsync(async () => {
+    const session = new WasmDataSession(getInternalModule(await getModule()))
+    try {
+      return session.sortAsciiIndices(index, ascending)
+    } finally {
+      session.dispose()
+    }
+  }, '@element-plus/wasm sortAsciiIndices failed.')
+}
+
+export function sortAsciiIndicesSync(
+  index: WasmAsciiFilterIndex,
+  ascending = true,
+): Uint32Array {
+  const session = createWasmDataSessionSync()
+  try {
+    return session.sortAsciiIndices(index, ascending)
+  } finally {
+    session.dispose()
+  }
 }
 
 // ─────────────────────────────────

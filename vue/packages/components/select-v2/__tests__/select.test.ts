@@ -16,6 +16,56 @@ import Select from '../src/select.vue'
 
 const NOOP: (...args: any[]) => void = () => {}
 
+const { buildFilterIndex, disposeFilterPipeline, filterWithPipeline } =
+  vi.hoisted(() => {
+    let labels: string[] = []
+    let version = 0
+    return {
+      buildFilterIndex: vi.fn(
+        async (
+          _datasetId: string,
+          nextVersion: number,
+          nextLabels: string[],
+        ) => {
+          labels = nextLabels
+          version = nextVersion
+          return { ok: true, value: { kind: 'built', version } }
+        },
+      ),
+      disposeFilterPipeline: vi.fn(),
+      filterWithPipeline: vi.fn(
+        async (
+          _datasetId: string,
+          requestedVersion: number,
+          query: string,
+        ) => ({
+          ok: true,
+          value: {
+            indices: Uint32Array.from(
+              labels.flatMap((label, index) =>
+                label.toLowerCase().includes(query.toLowerCase())
+                  ? [index]
+                  : [],
+              ),
+            ),
+            kind: 'indices',
+            version: requestedVersion,
+          },
+        }),
+      ),
+    }
+  })
+
+vi.mock('@element-plus/components/_internal/data-pipeline-client', () => ({
+  canUseDataPipelineWorker: () => true,
+  createFsusDataPipelineClient: () => ({
+    buildFilterIndex,
+    dispose: disposeFilterPipeline,
+    filter: filterWithPipeline,
+    release: vi.fn(),
+  }),
+}))
+
 const {
   createAsciiFilterIndex,
   ensureWasmReady,
@@ -1831,10 +1881,10 @@ describe('Select', () => {
     expect(selectVm.filteredOptions.length).toBe(3)
   })
 
-  it('filterable supports large datasets with required wasm parity', async () => {
-    const options = Array.from({ length: 2_200 }, (_, index) => ({
+  it('filterable supports 100K datasets through the indexed worker path', async () => {
+    const options = Array.from({ length: 100_000 }, (_, index) => ({
       value: `${index + 1}`,
-      label: index === 2_111 ? 'Wasm Match' : `option ${index + 1}`,
+      label: index === 92_111 ? 'Wasm Match' : `option ${index + 1}`,
     }))
 
     const wrapper = createSelect({
@@ -1856,11 +1906,54 @@ describe('Select', () => {
     const input = wrapper.find('input')
     input.element.value = 'match'
     await input.trigger('input')
-    await nextTick()
+    await vi.waitFor(() => expect(selectVm.filteredOptions).toHaveLength(1))
 
-    expect(filterIndicesSync).toHaveBeenCalled()
-    expect(selectVm.filteredOptions).toHaveLength(1)
+    expect(filterWithPipeline).toHaveBeenCalled()
     expect(selectVm.filteredOptions[0].label).toBe('Wasm Match')
+  })
+
+  it('keeps continuous typing, deletion and option replacement on the latest index version', async () => {
+    const options = Array.from({ length: 10_000 }, (_, index) => ({
+      value: `${index}`,
+      label:
+        index === 1_234
+          ? 'Target Alpha'
+          : index === 8_765
+            ? 'Target Beta'
+            : `option ${index}`,
+    }))
+    const wrapper = createSelect({
+      data: () => ({ filterable: true, options }),
+    })
+    const selectVm = wrapper.findComponent(Select).vm as any
+    const input = wrapper.find('input')
+
+    input.element.value = 'target a'
+    await input.trigger('input')
+    input.element.value = 'target beta'
+    await input.trigger('input')
+    await vi.waitFor(() => expect(selectVm.filteredOptions).toHaveLength(1))
+    expect(selectVm.filteredOptions[0].label).toBe('Target Beta')
+
+    input.element.value = 'target'
+    await input.trigger('input')
+    await vi.waitFor(() => expect(selectVm.filteredOptions).toHaveLength(2))
+
+    const buildCount = buildFilterIndex.mock.calls.length
+    ;(wrapper.vm as any).options = Array.from(
+      { length: 5_000 },
+      (_, index) => ({
+        value: `replacement-${index}`,
+        label: index === 4_321 ? 'Replacement Target' : `fresh ${index}`,
+      }),
+    )
+    await vi.waitFor(() =>
+      expect(buildFilterIndex.mock.calls.length).toBeGreaterThan(buildCount),
+    )
+    input.element.value = 'replacement'
+    await input.trigger('input')
+    await vi.waitFor(() => expect(selectVm.filteredOptions).toHaveLength(1))
+    expect(selectVm.filteredOptions[0].label).toBe('Replacement Target')
   })
 
   it('should close the dropdown when tab or esc is pressed inside the list', async () => {
@@ -1914,11 +2007,14 @@ describe('Select', () => {
     ).toBe('No matched options')
   })
 
-  it('should suspend default filtering on cold start and use wasm after readiness', async () => {
-    setWasmReady(false)
-    const options = Array.from({ length: 2_200 }, (_, index) => ({
+  it('keeps non-empty JS results while the worker/WASM path is unavailable', async () => {
+    filterWithPipeline.mockResolvedValueOnce({
+      error: { code: 'infra', message: 'worker unavailable' },
+      ok: false,
+    } as never)
+    const options = Array.from({ length: 10_000 }, (_, index) => ({
       value: `${index + 1}`,
-      label: index === 1_765 ? 'Wasm Match' : `option ${index + 1}`,
+      label: index === 8_765 ? 'Wasm Match' : `option ${index + 1}`,
     }))
 
     const wrapper = createSelect({
@@ -1936,25 +2032,15 @@ describe('Select', () => {
     await input.trigger('input')
     await nextTick()
 
-    expect(ensureWasmReady).toHaveBeenCalled()
-    expect(filterIndicesSync).not.toHaveBeenCalled()
-    expect(selectVm.filteredOptions).toHaveLength(0)
-
-    vi.clearAllMocks()
-    setWasmReady(true)
-    await nextTick()
-    await nextTick()
-    expect(filterIndicesSync).toHaveBeenCalled()
-    expect(selectVm.filteredOptions).toHaveLength(1)
+    expect(selectVm.filteredOptions.length).toBeGreaterThan(0)
+    await vi.waitFor(() => expect(selectVm.filteredOptions).toHaveLength(1))
     expect(selectVm.filteredOptions[0].label).toBe('Wasm Match')
 
-    vi.clearAllMocks()
     input.element.value = 'option 12'
     await input.trigger('input')
-    await nextTick()
-
-    expect(filterIndicesSync).toHaveBeenCalled()
-    expect(ensureWasmReady).not.toHaveBeenCalled()
+    await vi.waitFor(() =>
+      expect(selectVm.filteredOptions.length).toBeGreaterThan(0),
+    )
   })
 
   it('should keep non-ascii filtering on the JS path', async () => {

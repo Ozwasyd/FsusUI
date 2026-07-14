@@ -97,6 +97,46 @@ void sortNumbersBuffer(std::span<double> data, bool ascending)
   std::sort(data.begin(), data.end(), std::greater<>{});
 }
 
+void sortNumberIndicesBuffer(std::span<const double> values,
+                             std::span<std::uint32_t> indices,
+                             bool ascending)
+{
+  for (std::size_t index = 0; index < values.size(); ++index)
+    indices[index] = static_cast<std::uint32_t>(index);
+
+  std::stable_sort(indices.begin(), indices.end(), [&](auto left, auto right) {
+    if (values[left] == values[right])
+      return left < right;
+    return ascending ? values[left] < values[right]
+                     : values[left] > values[right];
+  });
+}
+
+int compareAsciiLabels(const unsigned char* labels,
+                       const std::int32_t* offsets,
+                       const std::int32_t* lengths,
+                       std::uint32_t left,
+                       std::uint32_t right)
+{
+  const auto leftLength = lengths[left];
+  const auto rightLength = lengths[right];
+  const auto commonLength = std::min(leftLength, rightLength);
+  const auto* leftValue = labels + offsets[left];
+  const auto* rightValue = labels + offsets[right];
+  for (std::int32_t index = 0; index < commonLength; ++index)
+  {
+    if (leftValue[index] < rightValue[index])
+      return -1;
+    if (leftValue[index] > rightValue[index])
+      return 1;
+  }
+  if (leftLength < rightLength)
+    return -1;
+  if (leftLength > rightLength)
+    return 1;
+  return 0;
+}
+
 void estimateRowHeightsBuffer(std::span<const std::int32_t> textLengths,
                               double rowWidth,
                               double charWidth,
@@ -139,6 +179,34 @@ EMSCRIPTEN_KEEPALIVE void sort_numbers_buffer(double* data,
   sortNumbersBuffer({data, len}, ascending != 0);
 }
 
+EMSCRIPTEN_KEEPALIVE void sort_number_indices_buffer(
+  const double* values,
+  std::uint32_t* indices,
+  std::size_t len,
+  int ascending)
+{
+  sortNumberIndicesBuffer({values, len}, {indices, len}, ascending != 0);
+}
+
+EMSCRIPTEN_KEEPALIVE void sort_ascii_indices_buffer(
+  const unsigned char* labels,
+  const std::int32_t* offsets,
+  const std::int32_t* lengths,
+  std::uint32_t* indices,
+  std::size_t count,
+  int ascending)
+{
+  for (std::size_t index = 0; index < count; ++index)
+    indices[index] = static_cast<std::uint32_t>(index);
+
+  std::stable_sort(indices, indices + count, [&](auto left, auto right) {
+    const auto compared =
+      compareAsciiLabels(labels, offsets, lengths, left, right);
+    return compared == 0 ? left < right
+                         : (ascending != 0 ? compared < 0 : compared > 0);
+  });
+}
+
 EMSCRIPTEN_KEEPALIVE void estimate_row_heights_buffer(
   const std::int32_t* lengths,
   std::size_t len,
@@ -178,6 +246,33 @@ EMSCRIPTEN_KEEPALIVE std::int32_t filter_ascii_indices_buffer(
     }
   }
 
+  return matchedCount;
+}
+
+EMSCRIPTEN_KEEPALIVE std::int32_t filter_ascii_candidate_indices_buffer(
+  const unsigned char* labels,
+  const std::int32_t* offsets,
+  const std::int32_t* lengths,
+  const std::uint32_t* candidates,
+  std::int32_t candidateCount,
+  const unsigned char* keyword,
+  std::int32_t keywordLength,
+  int caseSensitive,
+  std::uint32_t* out)
+{
+  std::int32_t matchedCount = 0;
+  for (std::int32_t position = 0; position < candidateCount; ++position)
+  {
+    const auto index = candidates[position];
+    if (containsAsciiKeyword(labels + offsets[index],
+                             lengths[index],
+                             keyword,
+                             keywordLength,
+                             caseSensitive != 0))
+    {
+      out[matchedCount++] = index;
+    }
+  }
   return matchedCount;
 }
 }

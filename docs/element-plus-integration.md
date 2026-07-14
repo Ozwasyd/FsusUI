@@ -83,7 +83,9 @@ html[data-theme-resolved='dark'] {
 `@element-plus/wasm` 是“可选性能层”，仓库代码中已有两处组件侧接入点：
 
 - `vue/packages/components/table/src/composables/use-wasm-sort.ts`
-  - 当行数 `>= 5000` 且列值满足条件时尝试走 WASM 排序，否则降级到 JS
+  - number / ASCII string 本地排序返回稳定行索引；动态策略根据初始化、复制、计算、映射和提交的端到端历史选择 Worker/WASM 或分块 JS，不再使用固定行数阈值
+- `vue/packages/components/select-v2/src/useSelect.ts`
+  - options / label / case 模式变化时才重建持久过滤索引；query 只提交 generation 查询，WASM 冷启动或 Worker 不可用时保留并异步更新 JS 结果
 - `vue/packages/components/virtual-list/src/hooks/use-wasm-row-height.ts`
   - 当 items `>= 2000` 时尝试走 WASM 批量预估，否则返回 `null` 由调用方降级
 

@@ -25,6 +25,7 @@ for (const token of [
   "['markdown-hot', 1024 * 1024]",
   "['select-v2', 100_000]",
   "['table', 1_000]",
+  "['data-pipeline-table', 100_000]",
   '[60, 120].flatMap',
   "['enabled', 'reduced', 'disabled']",
   'scenarioDefinitions.flatMap',
@@ -32,6 +33,7 @@ for (const token of [
   'workerProbe',
   'workerPoolBurstProbe',
   'wasmProbe',
+  'dataPipelineProbe',
 ]) {
   if (!web.includes(token)) failures.push(`web runner missing ${token}`)
 }

@@ -78,7 +78,8 @@ pnpm test:run
 
 FsusUI 内置 WASM 加速模块，在特定场景下自动启用，无需额外配置：
 
-- **Table 排序**：当表格行数 ≥ 5000 时，自动启用 WASM 加速排序，低于阈值时使用纯 JS。
+- **Table 排序**：number / ASCII string 数据可通过 Worker/WASM 返回稳定行索引；运行时依据真实端到端历史动态选择加速或分块 JS 路径，不按固定行数切换。
+- **SelectV2 过滤**：选项变化时建立一次持久索引，连续 query 使用 generation/cancel 和 transferable 索引结果；WASM 未就绪时继续显示 JS 过滤结果。
 - **VirtualList 行高预估**：当列表项 ≥ 2000 时，自动启用 WASM 动态行高预估，低于阈值时自动降级。
 - **MarkdownRenderer**：内置 raw HTML Markdown 渲染器，产物包含 `markdown_basic.js/.wasm` 与 `markdown_simd.js/.wasm`，组件本身不包含 Markdown 样式。
 
@@ -91,6 +92,7 @@ pnpm run check:markdown-wasm-runtime
 ```
 
 详见 [工程维护交接](../engineering-handoff.md#wasm)。
+
 > **Name note:** FsusUI is the recommended public-facing name. The package
 > `@ozwasyd/element-plus` is the current FsusUI public-preview compatibility
 > build based on Element Plus; Element Plus itself remains upstream provenance
