@@ -273,10 +273,14 @@ describe('PublicShell.vue', () => {
     })
     const details = wrapper.find<HTMLDetailsElement>('.el-public-shell__mobile-nav-menu')
     const trigger = wrapper.find<HTMLElement>('[data-mobile-nav-menu-trigger]')
+    const panel = wrapper.find<HTMLElement>('.el-public-shell__mobile-nav-menu-panel')
+
+    expect(panel.attributes('style')).toContain('display: none')
 
     details.element.open = true
     await details.trigger('toggle')
     expect(trigger.attributes('aria-expanded')).toBe('true')
+    expect(panel.attributes('style') ?? '').not.toContain('display: none')
     expect(details.find('[data-test="menu-actions"]').exists()).toBe(true)
     expect(
       details
@@ -290,6 +294,7 @@ describe('PublicShell.vue', () => {
 
     expect(details.element.open).toBe(false)
     expect(trigger.attributes('aria-expanded')).toBe('false')
+    expect(panel.attributes('style')).toContain('display: none')
     expect(document.activeElement).toBe(trigger.element)
     wrapper.unmount()
   })

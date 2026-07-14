@@ -106,7 +106,11 @@
           >
             {{ mobileNavMenuLabel }}
           </summary>
-          <nav :class="ns.e('mobile-nav-menu-panel')" :aria-label="mobileNavLabel">
+          <nav
+            v-show="mobileNavMenuExpanded"
+            :class="ns.e('mobile-nav-menu-panel')"
+            :aria-label="mobileNavLabel"
+          >
             <a
               v-for="item in navItems"
               :key="item.key"

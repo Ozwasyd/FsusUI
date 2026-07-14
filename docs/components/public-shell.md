@@ -119,6 +119,8 @@ toolbar 为 `is-collapsed`，不会留下空白次级行。
 - 需要保留旧行为：显式添加 `mobile-nav-mode="bottom"`。
 - 需要编辑型移动导航：采用默认 `menu`，并按 consumer 文案传入
   `mobile-nav-label` 与 `mobile-nav-menu-label`。
+- `menu` 关闭时，菜单面板及其中的操作会退出布局与可达控件集合；打开
+  `<details>` 后才显示。这保证窄视口和高缩放下不会由关闭态内容产生越界。
 - 已有自定义移动导航：使用 `mobile-nav-mode="none"`，避免两个全局导航并存。
 - 使用 `bottom` 的 consumer 应检查 safe-area、主内容底部留白、active key，
   并确认页面没有 reading dock。
