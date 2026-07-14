@@ -41,6 +41,9 @@ const inputSource = readFileSync(
   path.resolve(dirname, '../src/input.scss'),
   'utf8',
 )
+const darkTokenMixin = tokenSource.match(
+  /@mixin fsus-dark-tokens \{([\s\S]*?)\n\}/,
+)?.[1]
 
 describe('Fsus token source contracts', () => {
   test('keeps input counters on the field surface instead of blank fill patches', () => {
@@ -86,8 +89,31 @@ describe('Fsus token source contracts', () => {
     expect(tokenSource).toContain(
       '--fsus-accent-border: var(--fsus-state-focus-border);',
     )
-    expect(tokenSource).toContain('--fsus-scholarly-blue: #4b79cc;')
-    expect(tokenSource).toContain('--fsus-accent-hover: #6f93d7;')
+    expect(darkTokenMixin).toContain(
+      '--fsus-scholarly-blue: var(--fsus-color-action-primary);',
+    )
+    expect(darkTokenMixin).toContain(
+      '--fsus-accent-hover: var(--fsus-color-action-primary-hover);',
+    )
+  })
+
+  test('maps every public dark foundation token from generated mode values', () => {
+    for (const declaration of [
+      '--fsus-color-action-primary: #{generated.$fsus-color-action-primary-dark};',
+      '--fsus-color-action-primary-hover: #{generated.$fsus-color-action-primary-hover-dark};',
+      '--fsus-color-text-primary: #{generated.$fsus-color-text-primary-dark};',
+      '--fsus-color-surface-base: #{generated.$fsus-color-surface-base-dark};',
+      '--fsus-component-state-button-primary-background-default: #{generated.$fsus-component-state-button-primary-background-default-dark};',
+      '--fsus-component-state-button-primary-background-hover: #{generated.$fsus-component-state-button-primary-background-hover-dark};',
+    ]) {
+      expect(darkTokenMixin).toContain(declaration)
+    }
+    expect(darkTokenMixin).toContain(
+      '--fsus-ink: var(--fsus-color-text-primary);',
+    )
+    expect(darkTokenMixin).toContain(
+      '--fsus-paper: var(--fsus-color-surface-base);',
+    )
   })
 
   test('exposes quiet, decorative, and raised semantics from generated mode values', () => {

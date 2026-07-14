@@ -243,19 +243,25 @@
 }
 
 @mixin fsus-dark-tokens {
+  --fsus-color-action-primary: #{generated.$fsus-color-action-primary-dark};
+  --fsus-color-action-primary-hover: #{generated.$fsus-color-action-primary-hover-dark};
+  --fsus-color-text-primary: #{generated.$fsus-color-text-primary-dark};
   --fsus-color-text-quiet: #{generated.$fsus-color-text-quiet-dark};
   --fsus-color-text-decorative: #{generated.$fsus-color-text-decorative-dark};
+  --fsus-color-surface-base: #{generated.$fsus-color-surface-base-dark};
   --fsus-color-surface-raised: #{generated.$fsus-color-surface-raised-dark};
   --fsus-color-border-subtle: #{generated.$fsus-color-border-subtle-dark};
   --fsus-color-focus-ring: #{generated.$fsus-color-focus-ring-dark};
-  --fsus-ink: #f0f0f4;
-  --fsus-paper: #121214;
+  --fsus-component-state-button-primary-background-default: #{generated.$fsus-component-state-button-primary-background-default-dark};
+  --fsus-component-state-button-primary-background-hover: #{generated.$fsus-component-state-button-primary-background-hover-dark};
+  --fsus-ink: var(--fsus-color-text-primary);
+  --fsus-paper: var(--fsus-color-surface-base);
   --fsus-page: #09090b;
   --fsus-surface-overlay: rgba(18, 18, 20, 0.98);
   --fsus-overlay-color: rgba(18, 18, 20, 0.7);
-  --fsus-scholarly-blue: #4b79cc;
+  --fsus-scholarly-blue: var(--fsus-color-action-primary);
   --fsus-accent: var(--fsus-scholarly-blue);
-  --fsus-accent-hover: #6f93d7;
+  --fsus-accent-hover: var(--fsus-color-action-primary-hover);
   --fsus-dot-gray: var(--fsus-color-text-decorative);
   --fsus-border: #27272a;
   --fsus-border-light: #3f3f46;

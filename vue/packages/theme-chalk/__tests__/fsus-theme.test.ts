@@ -55,6 +55,23 @@ const expectCssRule = (
 }
 
 describe('Fsus theme visual baseline', () => {
+  test('emits canonical public foundation tokens in dark product CSS', () => {
+    const css = compileThemeFile('fsus-theme.scss')
+
+    expectCssRule(css, 'html.dark', [
+      '--fsus-color-action-primary: #4B79CC;',
+      '--fsus-color-action-primary-hover: #6F93D7;',
+      '--fsus-color-text-primary: #F0F0F4;',
+      '--fsus-color-text-quiet: #A1A1AA;',
+      '--fsus-color-surface-base: #121214;',
+      '--fsus-color-surface-raised: #1A1A1E;',
+      '--fsus-component-state-button-primary-background-default: #F0F0F4;',
+      '--fsus-component-state-button-primary-background-hover: #4B79CC;',
+      '--fsus-ink: var(--fsus-color-text-primary);',
+      '--fsus-paper: var(--fsus-color-surface-base);',
+    ])
+  })
+
   test('renders card tabs as quiet segmented navigation', () => {
     const css = compileThemeFile('fsus-theme.scss')
 

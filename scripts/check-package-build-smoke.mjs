@@ -171,6 +171,7 @@ const themeIndexSource = read('vue/packages/theme-chalk/src/index.scss')
 const completeThemeSource = read('vue/packages/theme-chalk/src/fsus.scss')
 const completeThemeCss = read('vue/packages/theme-chalk/dist/el-fsus.css')
 const fsusThemeCss = read('vue/packages/theme-chalk/dist/el-fsus-theme.css')
+const normalizedFsusThemeCss = fsusThemeCss.toLowerCase()
 assert(
   !themeIndexSource.includes("@use './fsus-theme.scss'") &&
     !themeIndexSource.includes('@use "./fsus-theme.scss"'),
@@ -190,6 +191,19 @@ assert(
   fsusThemeCss.includes('--fsus-scholarly-blue'),
   'dist/el-fsus-theme.css must carry fsus-theme product tokens',
 )
+for (const token of [
+  '--fsus-color-action-primary:#4b79cc',
+  '--fsus-color-action-primary-hover:#6f93d7',
+  '--fsus-color-text-primary:#f0f0f4',
+  '--fsus-color-surface-base:#121214',
+  '--fsus-component-state-button-primary-background-default:#f0f0f4',
+  '--fsus-component-state-button-primary-background-hover:#4b79cc',
+]) {
+  assert(
+    normalizedFsusThemeCss.includes(token),
+    `dist/el-fsus-theme.css must carry the dark public token ${token}`,
+  )
+}
 assert(
   fsusThemeCss.includes('.fsus-reading-surface') &&
     fsusThemeCss.includes('.is-expressive-surface'),
