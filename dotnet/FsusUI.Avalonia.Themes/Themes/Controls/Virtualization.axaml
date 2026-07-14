@@ -38,4 +38,17 @@
   <Style Selector="fsus|FsusVirtualList.fsus-variable-size">
     <Setter Property="Opacity" Value="0.98" />
   </Style>
+
+  <Style Selector="fsus|FsusVirtualListItemContainer, fsus|FsusTableV2CellContainer">
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
+
+  <Style Selector="fsus|FsusVirtualListItemContainer:focus-visible, fsus|FsusTableV2CellContainer:focus-visible">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusThicknessFocusMd}" />
+  </Style>
 </Styles>

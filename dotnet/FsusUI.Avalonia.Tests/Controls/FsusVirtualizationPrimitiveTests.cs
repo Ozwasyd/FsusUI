@@ -29,12 +29,25 @@ public class FsusVirtualizationPrimitiveTests
     Assert.Equal(0, list.RealizedItems[0].Index);
     Assert.Equal("item-0", list.RealizedItems[0].Key);
     Assert.True(list.RealizedContainerCount <= list.VirtualizationBudget.RealizedContainers);
+    Assert.Equal(list.RealizedContainerCount, list.RealizedVisualCount);
+    Assert.Equal(12, list.VisualHost.Children.Count);
+    Assert.All(list.RealizedContainers, container =>
+    {
+      Assert.True(container.ContainerId > 0);
+      Assert.True(container.Index >= 0);
+      Assert.NotNull(container.Content);
+      var peer = ControlAutomationPeer.CreatePeerForElement(container);
+      Assert.NotNull(peer);
+      Assert.Equal(AutomationControlType.ListItem, peer.GetAutomationControlType());
+    });
+    var initialContainerIds = list.RealizedContainers.Select(container => container.ContainerId).Order().ToArray();
 
     list.ScrollToIndex(500);
 
     Assert.Equal(498, list.RealizedItems[0].Index);
     Assert.Equal("item-498", list.RealizedItems[0].Key);
     Assert.True(list.RecycledContainerCount > 0);
+    Assert.Equal(initialContainerIds, list.RealizedContainers.Select(container => container.ContainerId).Order().ToArray());
 
     list.SizeMode = FsusVirtualSizeMode.Variable;
     list.SetMeasuredSize(498, 48);
@@ -44,6 +57,63 @@ public class FsusVirtualizationPrimitiveTests
     Assert.Equal(2, list.RetainedMeasurementCount);
     Assert.Equal(40, list.GetResolvedSize(499));
     Assert.Contains(list.RealizedItems, item => item.Index == 499);
+  }
+
+  [Fact]
+  public void VariableListUsesLogarithmicIndexMaintainsAnchorAndBoundsCachesAndPool()
+  {
+    var list = new FsusVirtualList
+    {
+      ItemCount = 100_000,
+      FixedItemSize = 32,
+      ViewportSize = 320,
+      Overscan = 2,
+      SizeMode = FsusVirtualSizeMode.Variable,
+      ContainerPoolLimit = 2,
+      VirtualizationBudget = new FsusVirtualListBudget(64, 4, 8, 512),
+    };
+    list.RefreshWindow();
+    list.ScrollToIndex(50_000);
+    var offsetBeforeMeasurement = list.ScrollOffset;
+
+    list.SetMeasuredSize(10, 64);
+
+    Assert.Equal(offsetBeforeMeasurement + 32, list.ScrollOffset);
+    Assert.InRange(list.LastIndexLookupSteps, 1, 18);
+    Assert.InRange(list.LastOffsetLookupSteps, 1, 18);
+    for (var index = 0; index < 12; index++)
+    {
+      list.SetMeasuredSize(index, 40 + index);
+    }
+    Assert.Equal(4, list.RetainedMeasurementCount);
+
+    list.ItemCount = 1;
+    list.ScrollToIndex(0);
+    Assert.InRange(list.ContainerPoolCount, 0, 2);
+    Assert.True(list.DiscardedContainerCount > 0);
+  }
+
+  [Fact]
+  public async Task VirtualListBoundsLoadedWindowAndDoesNotRepeatAutomationWrites()
+  {
+    var list = new FsusVirtualList
+    {
+      AccessibleName = "Bounded async stream",
+      ItemCount = 10_000,
+      LoadedWindowLimit = 8,
+      SourceProvider = (window, _) => ValueTask.FromResult<IReadOnlyList<FsusVirtualListItem>>(
+        Enumerable.Range(window.StartIndex, 64)
+          .Select(index => new FsusVirtualListItem(index, $"item-{index}", $"Item {index}"))
+          .ToArray()),
+    };
+    list.RefreshWindow();
+    var automationUpdates = list.AutomationUpdateCount;
+    list.RefreshWindow();
+
+    Assert.Equal(automationUpdates, list.AutomationUpdateCount);
+    Assert.True(await list.LoadWindowAsync());
+    Assert.Equal(8, list.LoadedItems.Count);
+    Assert.Equal(list.RealizedContainerCount, list.VisualHost.Children.Count);
   }
 
   [Fact]
@@ -147,6 +217,18 @@ public class FsusVirtualizationPrimitiveTests
     Assert.True(table.RealizedRowCount <= table.VirtualizationBudget.RealizedRows);
     Assert.True(table.RealizedColumnCount <= table.VirtualizationBudget.RealizedColumns);
     Assert.True(table.RealizedCellCount <= table.VirtualizationBudget.RealizedCells);
+    Assert.Equal(table.RealizedCellCount, table.RealizedVisualCount);
+    Assert.True(table.RealizedCellCount < table.RowCount * table.ColumnCount);
+    Assert.All(table.RealizedCells, cell =>
+    {
+      Assert.True(cell.RowIndex >= 0);
+      Assert.True(cell.ColumnIndex >= 0);
+      Assert.NotNull(cell.Content);
+      var peer = ControlAutomationPeer.CreatePeerForElement(cell);
+      Assert.NotNull(peer);
+      Assert.Equal(AutomationControlType.DataItem, peer.GetAutomationControlType());
+    });
+    var initialCellIds = table.RealizedCells.Select(cell => cell.ContainerId).Order().ToArray();
 
     table.ScrollToCell(99_950, 70);
 
@@ -154,7 +236,56 @@ public class FsusVirtualizationPrimitiveTests
     Assert.Equal(68, table.RealizedColumnStartIndex);
     Assert.Equal("row 99951 of 100000, column 71 of 80", table.FocusedCellStatus);
     Assert.True(table.RecycledCellCount > 0);
+    Assert.Equal(initialCellIds, table.RealizedCells.Select(cell => cell.ContainerId).Order().ToArray());
     Assert.Equal(AutomationControlType.DataGrid, AutomationProperties.GetControlTypeOverride(table));
+  }
+
+  [Fact]
+  public async Task TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults()
+  {
+    var table = new KeyboardTableV2
+    {
+      RowCount = 100_000,
+      ColumnCount = 80,
+      RowHeight = 32,
+      ColumnWidth = 120,
+      Overscan = 2,
+      FrozenRowCount = 1,
+      FrozenColumnCount = 1,
+      LoadedRowIndexLimit = 4,
+    };
+    table.AttachResizer(new FsusAutoResizer { Viewport = new Size(960, 480) });
+    table.RefreshLayout();
+    table.ScrollToCell(50_000, 40);
+
+    Assert.Contains(table.RealizedCells, cell => cell.RowIndex == 0);
+    Assert.Contains(table.RealizedCells, cell => cell.ColumnIndex == 0);
+    Assert.Contains(table.RealizedCells, cell => cell.RowIndex == 50_000 && cell.ColumnIndex == 40);
+    Assert.True(await table.PressAsync(Key.Right));
+    Assert.Equal(41, table.FocusedColumnIndex);
+
+    var firstCompletion = new TaskCompletionSource<IReadOnlyList<int>>();
+    var firstCanceled = false;
+    var first = table.UpdateRowIndexAsync(token =>
+    {
+      token.Register(() =>
+      {
+        firstCanceled = true;
+        firstCompletion.TrySetCanceled(token);
+      });
+      return new ValueTask<IReadOnlyList<int>>(firstCompletion.Task);
+    });
+    var second = await table.UpdateRowIndexAsync(_ =>
+      ValueTask.FromResult<IReadOnlyList<int>>([9, 8, 7, 6, 5, 4]));
+
+    Assert.False(await first);
+    Assert.True(second);
+    Assert.True(firstCanceled);
+    Assert.True(table.LastBackgroundCanceled);
+    Assert.Equal([9, 8, 7, 6], table.LoadedRowIndex);
+    var automationUpdates = table.AutomationUpdateCount;
+    table.RefreshLayout();
+    Assert.Equal(automationUpdates, table.AutomationUpdateCount);
   }
 
   [Fact]
@@ -166,6 +297,8 @@ public class FsusVirtualizationPrimitiveTests
       "fsus|FsusVirtualList",
       "fsus|FsusAutoResizer",
       "fsus|FsusTableV2",
+      "fsus|FsusVirtualListItemContainer",
+      "fsus|FsusTableV2CellContainer",
     })
     {
       Assert.Contains(selector, virtualization);
@@ -212,6 +345,11 @@ public class FsusVirtualizationPrimitiveTests
   }
 
   private sealed class KeyboardVirtualList : FsusVirtualList
+  {
+    public ValueTask<bool> PressAsync(Key key) => HandleKeyAsync(key);
+  }
+
+  private sealed class KeyboardTableV2 : FsusTableV2
   {
     public ValueTask<bool> PressAsync(Key key) => HandleKeyAsync(key);
   }

@@ -26,6 +26,25 @@ public static class Program
 
   public static AppBuilder BuildAvaloniaApp()
   {
-    return AppBuilder.Configure<App>().UsePlatformDetect();
+    var builder = AppBuilder.Configure<App>().UsePlatformDetect();
+    if (RenderPerformanceRunner.IsConfigured &&
+        RenderPerformanceRunner.UseSoftwareRendering &&
+        OperatingSystem.IsLinux())
+    {
+      builder.With(new X11PlatformOptions
+      {
+        RenderingMode = [X11RenderingMode.Software],
+      });
+    }
+    else if (RenderPerformanceRunner.IsConfigured &&
+             RenderPerformanceRunner.UseGpuRendering &&
+             OperatingSystem.IsLinux())
+    {
+      builder.With(new X11PlatformOptions
+      {
+        RenderingMode = [X11RenderingMode.Glx, X11RenderingMode.Egl, X11RenderingMode.Vulkan],
+      });
+    }
+    return builder;
   }
 }

@@ -18,7 +18,14 @@ const baseline = valueOf('--baseline', '')
 const webOnly = args.includes('--web-only')
 const avaloniaOnly = args.includes('--avalonia-only')
 const forwarded = ['--profile', profile]
-for (const name of ['--warmups', '--samples', '--regression-limit']) {
+for (const name of [
+  '--warmups',
+  '--samples',
+  '--long-scroll-iterations',
+  '--backend',
+  '--scenario',
+  '--regression-limit',
+]) {
   const value = valueOf(name, '')
   if (value) forwarded.push(name, value)
 }

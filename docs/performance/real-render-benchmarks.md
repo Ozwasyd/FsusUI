@@ -56,6 +56,28 @@ The desktop runner opens a fixed 1180×760 window with fixed font, DPI and theme
 
 The artifact records the resolved renderer type and native window handle descriptor. A result with an unresolved renderer/backend is invalid evidence and must not be described as a desktop measurement.
 
+Virtualization scenarios additionally record actual realized and pooled
+container counts, retained measurements, loaded source windows and visual-tree
+size for every sample. After each scenario is unmounted, the runner compares the
+window's retained visual count with its pre-mount baseline. A separate long
+scroll phase reports the Gen2 collection delta without forcing a collection
+inside that phase.
+
+To collect distinct default/GPU-selected and forced software-renderer evidence
+on Linux, run the same profile and sample count twice:
+
+```bash
+pnpm perf:render -- --avalonia-only --backend gpu --profile full --output .tmp/performance/avalonia-gpu
+pnpm perf:render -- --avalonia-only --backend software --profile full --output .tmp/performance/avalonia-software
+```
+
+On Linux, `gpu` allows only GLX/EGL/Vulkan and fails instead of falling back to
+software. `Environment.RequestedBackend` records the request and
+`Environment.RenderingBackend` records the renderer actually created. Do not
+label `auto` as GPU unless `Environment.PlatformGraphicsBackend` confirms it.
+Use `--scenario virtual-list` or `--scenario table-v2` to repeat one family
+without running unrelated controls.
+
 ## CI regression policy
 
 Pull requests run the quick representative matrix. When the base revision contains the runner, CI measures both the base SHA and the proposed SHA sequentially on the same GitHub runner, then rejects a p95 regression above 15%. This avoids comparing unrelated hardware. The first commit that introduces the runner has no prior executable baseline and therefore only produces current evidence; subsequent changes receive relative gating.

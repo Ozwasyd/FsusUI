@@ -2,7 +2,9 @@ using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
 using Avalonia.Controls;
+using Avalonia.Controls.Templates;
 using Avalonia.Input;
+using Avalonia.Threading;
 using System.Globalization;
 
 namespace FsusUI.Avalonia.Controls;
@@ -75,17 +77,45 @@ public delegate ValueTask<IReadOnlyList<FsusVirtualListItem>> FsusVirtualListSou
 public class FsusVirtualList : ContentControl
 {
   private readonly Dictionary<int, double> measurementCache = [];
+  private readonly Queue<int> measurementOrder = [];
   private readonly List<FsusRealizedVirtualItem> realizedItems = [];
   private readonly List<FsusVirtualListItem> loadedItems = [];
+  private readonly Dictionary<int, FsusVirtualListItem> loadedItemsByIndex = [];
+  private readonly Dictionary<int, FsusVirtualListItemContainer> realizedContainers = [];
+  private readonly Queue<FsusVirtualListItemContainer> containerPool = [];
+  private readonly FsusVariableSizeIndex variableSizeIndex = new();
+  private readonly Canvas itemHost = new();
+  private readonly ScrollViewer scrollViewer = new();
   private CancellationTokenSource? loadCancellation;
   private int loadVersion;
+  private int nextContainerId;
   private double scrollOffset;
   private FsusVirtualListState state = FsusVirtualListState.Ready;
+  private string? lastAutomationName;
+  private string? lastAutomationStatus;
+  private string? lastStateName;
+  private bool isApplyingScroll;
 
   public FsusVirtualList()
   {
     FsusComponentClasses.SetBaseClasses(this, "fsus-virtual-list");
     Focusable = true;
+    scrollViewer.Content = itemHost;
+    scrollViewer.ScrollChanged += (_, _) =>
+    {
+      if (isApplyingScroll)
+      {
+        return;
+      }
+
+      scrollOffset = Math.Max(0d, scrollViewer.Offset.Y);
+      if (scrollViewer.Viewport.Height > 0)
+      {
+        ViewportSize = scrollViewer.Viewport.Height;
+      }
+      RefreshWindow(updateScrollViewer: false);
+    };
+    Content = scrollViewer;
     SyncState();
   }
 
@@ -97,6 +127,8 @@ public class FsusVirtualList : ContentControl
   public int FocusedIndex { get; private set; }
   public FsusVirtualSizeMode SizeMode { get; set; } = FsusVirtualSizeMode.Fixed;
   public Func<int, string>? ItemKeyProvider { get; set; }
+  public Func<int, object?>? ItemProvider { get; set; }
+  public IDataTemplate? ItemTemplate { get; set; }
   public FsusVirtualListSourceProvider? SourceProvider { get; set; }
   public FsusVirtualListBudget VirtualizationBudget { get; set; } = new(
     RealizedContainers: 64,
@@ -109,6 +141,8 @@ public class FsusVirtualList : ContentControl
   public string? ErrorMessage { get; set; }
   public string AnchorKey { get; private set; } = string.Empty;
   public bool LastLoadCanceled { get; private set; }
+  public int ContainerPoolLimit { get; set; } = 64;
+  public int LoadedWindowLimit { get; set; } = 256;
 
   public FsusVirtualListState State
   {
@@ -126,12 +160,22 @@ public class FsusVirtualList : ContentControl
     private set => scrollOffset = Math.Max(0d, value);
   }
 
-  public bool IsVirtualized => ItemCount > RealizedItems.Count;
-  public int RealizedContainerCount => realizedItems.Count;
+  public bool IsVirtualized => ItemCount > realizedItems.Count;
+  public int RealizedContainerCount => realizedContainers.Count;
+  public int RealizedVisualCount => itemHost.Children.Count;
   public int RecycledContainerCount { get; private set; }
+  public int CreatedContainerCount { get; private set; }
+  public int DiscardedContainerCount { get; private set; }
+  public int ContainerPoolCount => containerPool.Count;
   public int RetainedMeasurementCount => measurementCache.Count;
-  public IReadOnlyList<FsusRealizedVirtualItem> RealizedItems => realizedItems.AsReadOnly();
-  public IReadOnlyList<FsusVirtualListItem> LoadedItems => loadedItems.AsReadOnly();
+  public int LastIndexLookupSteps { get; private set; }
+  public int LastOffsetLookupSteps { get; private set; }
+  public int AutomationUpdateCount { get; private set; }
+  public Canvas VisualHost => itemHost;
+  public ScrollViewer ScrollHost => scrollViewer;
+  public IReadOnlyList<FsusRealizedVirtualItem> RealizedItems => realizedItems;
+  public IReadOnlyList<FsusVirtualListItem> LoadedItems => loadedItems;
+  public IReadOnlyCollection<FsusVirtualListItemContainer> RealizedContainers => realizedContainers.Values;
   public string DisplayText =>
     State switch
     {
@@ -141,34 +185,81 @@ public class FsusVirtualList : ContentControl
       _ => string.Empty,
     };
 
-  public void RefreshWindow()
-  {
-    var previousCount = realizedItems.Count;
-    var previousStart = realizedItems.FirstOrDefault()?.Index ?? 0;
-    realizedItems.Clear();
+  public void RefreshWindow() => RefreshWindow(updateScrollViewer: true);
 
+  private void RefreshWindow(bool updateScrollViewer)
+  {
     if (ItemCount <= 0)
     {
+      RecycleAllContainers();
+      realizedItems.Clear();
+      itemHost.Height = 0;
       SyncState();
       return;
     }
 
+    EnsureVariableIndex();
     var visibleCount = ResolveVisibleCount();
     var anchorIndex = ResolveIndexFromOffset(ScrollOffset);
     var startIndex = Math.Clamp(anchorIndex - Overscan, 0, Math.Max(0, ItemCount - visibleCount));
-    for (var index = startIndex; index < Math.Min(ItemCount, startIndex + visibleCount); index++)
+    var endIndex = Math.Min(ItemCount, startIndex + visibleCount);
+    var desired = new HashSet<int>();
+    for (var index = startIndex; index < endIndex; index++)
     {
-      realizedItems.Add(new FsusRealizedVirtualItem(
-        index,
-        ResolveKey(index),
-        ResolveOffset(index),
-        GetResolvedSize(index),
-        index - startIndex));
+      desired.Add(index);
     }
 
-    if (previousCount > 0 && previousStart != startIndex)
+    var staleContainers = realizedContainers
+      .Where(pair => !desired.Contains(pair.Key))
+      .ToArray();
+    var missingIndices = desired
+      .Where(index => !realizedContainers.ContainsKey(index))
+      .ToArray();
+    var reboundCount = Math.Min(staleContainers.Length, missingIndices.Length);
+    for (var position = 0; position < reboundCount; position++)
     {
-      RecycledContainerCount += Math.Min(previousCount, realizedItems.Count);
+      var stale = staleContainers[position];
+      realizedContainers.Remove(stale.Key);
+      realizedContainers[missingIndices[position]] = stale.Value;
+      RecycledContainerCount++;
+    }
+    for (var position = reboundCount; position < staleContainers.Length; position++)
+    {
+      var stale = staleContainers[position];
+      realizedContainers.Remove(stale.Key);
+      itemHost.Children.Remove(stale.Value);
+      RecycleContainer(stale.Value);
+    }
+    for (var position = reboundCount; position < missingIndices.Length; position++)
+    {
+      var container = AcquireContainer();
+      realizedContainers[missingIndices[position]] = container;
+      itemHost.Children.Add(container);
+    }
+
+    realizedItems.Clear();
+    for (var index = startIndex; index < endIndex; index++)
+    {
+      var item = ResolveItem(index);
+      var size = GetResolvedSize(index);
+      var offset = ResolveOffset(index);
+      var container = realizedContainers[index];
+      container.Bind(item, ItemTemplate, size);
+      Canvas.SetTop(container, offset);
+      Canvas.SetLeft(container, 0d);
+      realizedItems.Add(new FsusRealizedVirtualItem(
+        index,
+        item.Key,
+        offset,
+        size,
+        container.ContainerId));
+    }
+
+    itemHost.Height = ResolveTotalSize();
+    itemHost.MinWidth = Math.Max(1d, Bounds.Width);
+    if (updateScrollViewer)
+    {
+      ApplyScrollOffset();
     }
 
     SyncState();
@@ -179,6 +270,16 @@ public class FsusVirtualList : ContentControl
     FocusedIndex = Math.Clamp(index, 0, Math.Max(0, ItemCount - 1));
     ScrollOffset = ResolveOffset(FocusedIndex);
     RefreshWindow();
+    if (realizedContainers.TryGetValue(FocusedIndex, out var container))
+    {
+      container.Focus();
+    }
+  }
+
+  public void ScrollToOffset(double offset)
+  {
+    ScrollOffset = Math.Min(Math.Max(0d, offset), Math.Max(0d, ResolveTotalSize() - ViewportSize));
+    RefreshWindow();
   }
 
   public void SetMeasuredSize(int index, double size)
@@ -188,7 +289,26 @@ public class FsusVirtualList : ContentControl
       return;
     }
 
-    measurementCache[index] = Math.Max(1d, size);
+    EnsureVariableIndex();
+    var nextSize = Math.Max(1d, size);
+    var previousSize = GetResolvedSize(index);
+    var anchorIndex = ResolveIndexFromOffset(ScrollOffset);
+    if (!measurementCache.ContainsKey(index))
+    {
+      measurementOrder.Enqueue(index);
+    }
+    measurementCache[index] = nextSize;
+    variableSizeIndex.Update(index, previousSize, nextSize);
+    if (index < anchorIndex)
+    {
+      ScrollOffset += nextSize - previousSize;
+    }
+
+    TrimMeasurementCache();
+    if (realizedContainers.ContainsKey(index))
+    {
+      RefreshWindow();
+    }
   }
 
   public double GetResolvedSize(int index) =>
@@ -211,6 +331,38 @@ public class FsusVirtualList : ContentControl
   {
     AnchorKey = anchor.Key;
     ScrollOffset = anchor.Offset + Math.Max(0, insertedCount) * Math.Max(1d, insertedSize);
+    RefreshWindow();
+  }
+
+  public void NotifyItemsInserted(int index, int insertedCount)
+  {
+    if (insertedCount <= 0)
+    {
+      return;
+    }
+
+    var anchor = CaptureAnchor();
+    var shifted = measurementCache
+      .Select(pair => new KeyValuePair<int, double>(
+        pair.Key >= index ? pair.Key + insertedCount : pair.Key,
+        pair.Value))
+      .Where(pair => pair.Key < ItemCount + insertedCount)
+      .ToArray();
+    measurementCache.Clear();
+    measurementOrder.Clear();
+    foreach (var (measuredIndex, measuredSize) in shifted)
+    {
+      measurementCache[measuredIndex] = measuredSize;
+      measurementOrder.Enqueue(measuredIndex);
+    }
+
+    ItemCount += insertedCount;
+    variableSizeIndex.Ensure(ItemCount, FixedItemSize, measurementCache);
+    if (index <= anchor.Index)
+    {
+      FocusedIndex = Math.Min(ItemCount - 1, anchor.Index + insertedCount);
+      ScrollOffset = anchor.Offset + insertedCount * Math.Max(1d, FixedItemSize);
+    }
     RefreshWindow();
   }
 
@@ -244,9 +396,19 @@ public class FsusVirtualList : ContentControl
         return false;
       }
 
-      loadedItems.Clear();
-      loadedItems.AddRange(items);
-      State = FsusVirtualListState.Ready;
+      var boundedItems = items.Take(Math.Max(1, LoadedWindowLimit)).ToArray();
+      await CommitOnUiThreadAsync(() =>
+      {
+        loadedItems.Clear();
+        loadedItems.AddRange(boundedItems);
+        loadedItemsByIndex.Clear();
+        foreach (var item in boundedItems)
+        {
+          loadedItemsByIndex[item.Index] = item;
+        }
+        State = FsusVirtualListState.Ready;
+        RefreshWindow();
+      });
       return true;
     }
     catch (OperationCanceledException)
@@ -303,17 +465,10 @@ public class FsusVirtualList : ContentControl
       return Math.Clamp((int)Math.Floor(offset / Math.Max(1d, FixedItemSize)), 0, Math.Max(0, ItemCount - 1));
     }
 
-    var cursor = 0d;
-    for (var index = 0; index < ItemCount; index++)
-    {
-      cursor += GetResolvedSize(index);
-      if (cursor > offset)
-      {
-        return index;
-      }
-    }
-
-    return Math.Max(0, ItemCount - 1);
+    EnsureVariableIndex();
+    var index = variableSizeIndex.FindIndex(offset);
+    LastIndexLookupSteps = variableSizeIndex.LastLookupSteps;
+    return index;
   }
 
   private double ResolveOffset(int index)
@@ -323,34 +478,139 @@ public class FsusVirtualList : ContentControl
       return Math.Max(0, index) * Math.Max(1d, FixedItemSize);
     }
 
-    var offset = 0d;
-    for (var current = 0; current < Math.Clamp(index, 0, Math.Max(0, ItemCount)); current++)
-    {
-      offset += GetResolvedSize(current);
-    }
-
+    EnsureVariableIndex();
+    var offset = variableSizeIndex.PrefixSize(index);
+    LastOffsetLookupSteps = variableSizeIndex.LastLookupSteps;
     return offset;
   }
 
   private string ResolveKey(int index) =>
     ItemKeyProvider?.Invoke(index) ?? index.ToString(CultureInfo.InvariantCulture);
 
+  private FsusVirtualListItem ResolveItem(int index) =>
+    loadedItemsByIndex.TryGetValue(index, out var loaded)
+      ? loaded
+      : new FsusVirtualListItem(index, ResolveKey(index), ItemProvider?.Invoke(index) ?? $"Item {index + 1}");
+
+  private FsusVirtualListItemContainer AcquireContainer()
+  {
+    if (containerPool.TryDequeue(out var recycled))
+    {
+      RecycledContainerCount++;
+      return recycled;
+    }
+
+    CreatedContainerCount++;
+    return new FsusVirtualListItemContainer(++nextContainerId);
+  }
+
+  private void RecycleContainer(FsusVirtualListItemContainer container)
+  {
+    container.Recycle();
+    if (containerPool.Count < Math.Max(0, ContainerPoolLimit))
+    {
+      containerPool.Enqueue(container);
+    }
+    else
+    {
+      DiscardedContainerCount++;
+    }
+  }
+
+  private void RecycleAllContainers()
+  {
+    foreach (var container in realizedContainers.Values)
+    {
+      itemHost.Children.Remove(container);
+      RecycleContainer(container);
+    }
+    realizedContainers.Clear();
+  }
+
+  private void EnsureVariableIndex() =>
+    variableSizeIndex.Ensure(ItemCount, FixedItemSize, measurementCache);
+
+  private double ResolveTotalSize()
+  {
+    if (SizeMode == FsusVirtualSizeMode.Fixed)
+    {
+      return Math.Max(0, ItemCount) * Math.Max(1d, FixedItemSize);
+    }
+
+    EnsureVariableIndex();
+    return variableSizeIndex.TotalSize;
+  }
+
+  private void TrimMeasurementCache()
+  {
+    var limit = Math.Max(0, VirtualizationBudget.RetainedMeasurements);
+    while (measurementCache.Count > limit && measurementOrder.TryDequeue(out var index))
+    {
+      if (measurementCache.Remove(index, out var size))
+      {
+        variableSizeIndex.Update(index, size, FixedItemSize);
+      }
+    }
+  }
+
+  private void ApplyScrollOffset()
+  {
+    isApplyingScroll = true;
+    try
+    {
+      scrollViewer.Offset = new Vector(scrollViewer.Offset.X, ScrollOffset);
+    }
+    finally
+    {
+      isApplyingScroll = false;
+    }
+  }
+
+  private static async Task CommitOnUiThreadAsync(Action action)
+  {
+    if (Dispatcher.UIThread.CheckAccess())
+    {
+      action();
+      return;
+    }
+
+    await Dispatcher.UIThread.InvokeAsync(action);
+  }
+
   private void SyncState()
   {
     var stateName = EffectiveStateName();
-    foreach (var className in new[] { "fsus-ready", "fsus-empty", "fsus-loading", "fsus-error" })
+    if (!string.Equals(lastStateName, stateName, StringComparison.Ordinal))
     {
-      FsusComponentClasses.Ensure(this, className, false);
+      foreach (var className in new[] { "fsus-ready", "fsus-empty", "fsus-loading", "fsus-error" })
+      {
+        FsusComponentClasses.Ensure(this, className, false);
+      }
+      FsusComponentClasses.Ensure(this, $"fsus-{stateName}", true);
+      lastStateName = stateName;
     }
 
-    FsusComponentClasses.Ensure(this, $"fsus-{stateName}", true);
     FsusComponentClasses.Ensure(this, "fsus-virtualized", IsVirtualized);
     FsusComponentClasses.Ensure(this, "fsus-variable-size", SizeMode == FsusVirtualSizeMode.Variable);
-    AutomationProperties.SetName(this, FsusComponentClasses.ResolveName(AccessibleName, ItemCount));
-    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.List);
-    AutomationProperties.SetItemStatus(
-      this,
-      $"{stateName}, {ItemCount.ToString(CultureInfo.InvariantCulture)} items, focus {(FocusedIndex + 1).ToString(CultureInfo.InvariantCulture)} of {Math.Max(1, ItemCount).ToString(CultureInfo.InvariantCulture)}");
+    var automationName = FsusComponentClasses.ResolveName(AccessibleName, ItemCount);
+    if (!string.Equals(lastAutomationName, automationName, StringComparison.Ordinal))
+    {
+      AutomationProperties.SetName(this, automationName);
+      lastAutomationName = automationName;
+      AutomationUpdateCount++;
+    }
+    if (AutomationProperties.GetControlTypeOverride(this) != AutomationControlType.List)
+    {
+      AutomationProperties.SetControlTypeOverride(this, AutomationControlType.List);
+      AutomationUpdateCount++;
+    }
+    var automationStatus = $"{stateName}, {ItemCount.ToString(CultureInfo.InvariantCulture)} items, focus {(FocusedIndex + 1).ToString(CultureInfo.InvariantCulture)} of {Math.Max(1, ItemCount).ToString(CultureInfo.InvariantCulture)}";
+    if (!string.Equals(lastAutomationStatus, automationStatus, StringComparison.Ordinal))
+    {
+      AutomationProperties.SetItemStatus(this, automationStatus);
+      lastAutomationStatus = automationStatus;
+      AutomationUpdateCount++;
+    }
   }
 
   private string EffectiveStateName() =>
@@ -398,16 +658,44 @@ public class FsusAutoResizer : ContentControl
 
 public class FsusTableV2 : ContentControl
 {
+  private readonly Dictionary<(int Row, int Column), FsusTableV2CellContainer> realizedCells = [];
+  private readonly Queue<FsusTableV2CellContainer> cellPool = [];
+  private readonly Canvas cellHost = new();
+  private readonly ScrollViewer scrollViewer = new();
+  private readonly List<int> loadedRowIndex = [];
   private Size viewport = new(960, 480);
   private int realizedRowStartIndex;
   private int realizedColumnStartIndex;
   private int realizedRowCount;
   private int realizedColumnCount;
+  private int nextContainerId;
+  private CancellationTokenSource? backgroundCancellation;
+  private int backgroundVersion;
+  private bool isApplyingScroll;
+  private string? lastAutomationName;
+  private string? lastAutomationStatus;
 
   public FsusTableV2()
   {
     FsusComponentClasses.SetBaseClasses(this, "fsus-table-v2");
     Focusable = true;
+    scrollViewer.Content = cellHost;
+    scrollViewer.ScrollChanged += (_, _) =>
+    {
+      if (isApplyingScroll)
+      {
+        return;
+      }
+
+      if (scrollViewer.Viewport.Width > 0 && scrollViewer.Viewport.Height > 0)
+      {
+        viewport = scrollViewer.Viewport;
+      }
+      realizedRowStartIndex = ResolveStart(scrollViewer.Offset.Y, RowHeight, RowCount, realizedRowCount);
+      realizedColumnStartIndex = ResolveStart(scrollViewer.Offset.X, ColumnWidth, ColumnCount, realizedColumnCount);
+      RefreshLayout(updateScrollViewer: false);
+    };
+    Content = scrollViewer;
     SyncState();
   }
 
@@ -417,6 +705,12 @@ public class FsusTableV2 : ContentControl
   public double RowHeight { get; set; } = 32d;
   public double ColumnWidth { get; set; } = 120d;
   public int Overscan { get; set; } = 2;
+  public int FrozenRowCount { get; set; }
+  public int FrozenColumnCount { get; set; }
+  public int ContainerPoolLimit { get; set; } = 1536;
+  public int LoadedRowIndexLimit { get; set; } = 4096;
+  public Func<int, int, object?>? CellProvider { get; set; }
+  public IDataTemplate? CellTemplate { get; set; }
   public int FocusedRowIndex { get; private set; }
   public int FocusedColumnIndex { get; private set; }
   public FsusTableV2Budget VirtualizationBudget { get; set; } = new(
@@ -432,8 +726,19 @@ public class FsusTableV2 : ContentControl
   public int RealizedColumnStartIndex => realizedColumnStartIndex;
   public int RealizedRowCount => realizedRowCount;
   public int RealizedColumnCount => realizedColumnCount;
-  public int RealizedCellCount => realizedRowCount * realizedColumnCount;
+  public int RealizedCellCount => realizedCells.Count;
+  public int RealizedVisualCount => cellHost.Children.Count;
   public int RecycledCellCount { get; private set; }
+  public int CreatedCellCount { get; private set; }
+  public int DiscardedCellCount { get; private set; }
+  public int CellPoolCount => cellPool.Count;
+  public int AutomationUpdateCount { get; private set; }
+  public bool LastBackgroundCanceled { get; private set; }
+  public int BackgroundVersion => backgroundVersion;
+  public Canvas VisualHost => cellHost;
+  public ScrollViewer ScrollHost => scrollViewer;
+  public IReadOnlyCollection<FsusTableV2CellContainer> RealizedCells => realizedCells.Values;
+  public IReadOnlyList<int> LoadedRowIndex => loadedRowIndex;
   public string FocusedCellStatus =>
     $"row {(FocusedRowIndex + 1).ToString(CultureInfo.InvariantCulture)} of {RowCount.ToString(CultureInfo.InvariantCulture)}, column {(FocusedColumnIndex + 1).ToString(CultureInfo.InvariantCulture)} of {ColumnCount.ToString(CultureInfo.InvariantCulture)}";
 
@@ -443,13 +748,14 @@ public class FsusTableV2 : ContentControl
     viewport = resizer.Viewport.Width <= 0 || resizer.Viewport.Height <= 0
       ? viewport
       : resizer.Viewport;
+    scrollViewer.Width = viewport.Width;
+    scrollViewer.Height = viewport.Height;
   }
 
-  public void RefreshLayout()
+  public void RefreshLayout() => RefreshLayout(updateScrollViewer: true);
+
+  private void RefreshLayout(bool updateScrollViewer)
   {
-    var oldCellCount = RealizedCellCount;
-    var oldRowStart = realizedRowStartIndex;
-    var oldColumnStart = realizedColumnStartIndex;
     realizedRowCount = Math.Min(
       RowCount,
       Math.Max(1, (int)Math.Ceiling(viewport.Height / Math.Max(1d, RowHeight)) + Math.Max(0, Overscan)));
@@ -457,28 +763,148 @@ public class FsusTableV2 : ContentControl
       ColumnCount,
       Math.Max(1, (int)Math.Ceiling(viewport.Width / Math.Max(1d, ColumnWidth)) + Math.Max(0, Overscan)));
     ClampStarts();
-    if (oldCellCount > 0 && (oldRowStart != realizedRowStartIndex || oldColumnStart != realizedColumnStartIndex))
+    var rows = ResolveAxisIndices(realizedRowStartIndex, realizedRowCount, RowCount, FrozenRowCount);
+    var columns = ResolveAxisIndices(realizedColumnStartIndex, realizedColumnCount, ColumnCount, FrozenColumnCount);
+    var desired = new HashSet<(int Row, int Column)>();
+    foreach (var row in rows)
     {
-      RecycledCellCount += Math.Min(oldCellCount, RealizedCellCount);
+      foreach (var column in columns)
+      {
+        desired.Add((row, column));
+      }
     }
 
+    var staleCells = realizedCells
+      .Where(pair => !desired.Contains(pair.Key))
+      .ToArray();
+    var missingCells = desired
+      .Where(key => !realizedCells.ContainsKey(key))
+      .ToArray();
+    var reboundCount = Math.Min(staleCells.Length, missingCells.Length);
+    for (var position = 0; position < reboundCount; position++)
+    {
+      var stale = staleCells[position];
+      realizedCells.Remove(stale.Key);
+      realizedCells[missingCells[position]] = stale.Value;
+      RecycledCellCount++;
+    }
+    for (var position = reboundCount; position < staleCells.Length; position++)
+    {
+      var stale = staleCells[position];
+      realizedCells.Remove(stale.Key);
+      cellHost.Children.Remove(stale.Value);
+      RecycleCell(stale.Value);
+    }
+    for (var position = reboundCount; position < missingCells.Length; position++)
+    {
+      var container = AcquireCell();
+      realizedCells[missingCells[position]] = container;
+      cellHost.Children.Add(container);
+    }
+
+    foreach (var key in desired)
+    {
+      var container = realizedCells[key];
+      var sourceRow = ResolveSourceRow(key.Row);
+      var content = CellProvider?.Invoke(sourceRow, key.Column) ?? $"R{sourceRow + 1} C{key.Column + 1}";
+      container.Bind(key.Row, key.Column, content, CellTemplate, ColumnWidth, RowHeight);
+      Canvas.SetLeft(container, key.Column * Math.Max(1d, ColumnWidth));
+      Canvas.SetTop(container, key.Row * Math.Max(1d, RowHeight));
+    }
+
+    cellHost.Width = Math.Max(0, ColumnCount) * Math.Max(1d, ColumnWidth);
+    cellHost.Height = Math.Max(0, RowCount) * Math.Max(1d, RowHeight);
+    if (updateScrollViewer)
+    {
+      ApplyScrollOffset();
+    }
     SyncState();
   }
 
   public void ScrollToCell(int rowIndex, int columnIndex)
   {
-    var oldCellCount = RealizedCellCount;
-    var oldRowStart = realizedRowStartIndex;
-    var oldColumnStart = realizedColumnStartIndex;
     FocusedRowIndex = Math.Clamp(rowIndex, 0, Math.Max(0, RowCount - 1));
     FocusedColumnIndex = Math.Clamp(columnIndex, 0, Math.Max(0, ColumnCount - 1));
     realizedRowStartIndex = Math.Clamp(FocusedRowIndex - Math.Max(0, Overscan), 0, Math.Max(0, RowCount - Math.Max(1, realizedRowCount)));
     realizedColumnStartIndex = Math.Clamp(FocusedColumnIndex - Math.Max(0, Overscan), 0, Math.Max(0, ColumnCount - Math.Max(1, realizedColumnCount)));
     RefreshLayout();
-    if (oldCellCount > 0 && (oldRowStart != realizedRowStartIndex || oldColumnStart != realizedColumnStartIndex))
+    if (realizedCells.TryGetValue((FocusedRowIndex, FocusedColumnIndex), out var container))
     {
-      RecycledCellCount += Math.Min(oldCellCount, RealizedCellCount);
+      container.Focus();
     }
+  }
+
+  public async ValueTask<bool> UpdateRowIndexAsync(
+    Func<CancellationToken, ValueTask<IReadOnlyList<int>>> provider)
+  {
+    ArgumentNullException.ThrowIfNull(provider);
+    if (backgroundCancellation is not null)
+    {
+      LastBackgroundCanceled = true;
+      backgroundCancellation.Cancel();
+    }
+
+    using var cancellation = new CancellationTokenSource();
+    backgroundCancellation = cancellation;
+    var version = ++backgroundVersion;
+    try
+    {
+      var result = await provider(cancellation.Token);
+      if (cancellation.IsCancellationRequested || version != backgroundVersion)
+      {
+        return false;
+      }
+
+      var bounded = result.Take(Math.Max(1, LoadedRowIndexLimit)).ToArray();
+      await CommitOnUiThreadAsync(() =>
+      {
+        if (version != backgroundVersion)
+        {
+          return;
+        }
+        loadedRowIndex.Clear();
+        loadedRowIndex.AddRange(bounded);
+        RefreshLayout();
+      });
+      return true;
+    }
+    catch (OperationCanceledException)
+    {
+      return false;
+    }
+    finally
+    {
+      if (ReferenceEquals(backgroundCancellation, cancellation))
+      {
+        backgroundCancellation = null;
+      }
+    }
+  }
+
+  protected ValueTask<bool> HandleKeyAsync(Key key)
+  {
+    var row = FocusedRowIndex;
+    var column = FocusedColumnIndex;
+    switch (key)
+    {
+      case Key.Down:
+        row++;
+        break;
+      case Key.Up:
+        row--;
+        break;
+      case Key.Right:
+        column++;
+        break;
+      case Key.Left:
+        column--;
+        break;
+      default:
+        return ValueTask.FromResult(false);
+    }
+
+    ScrollToCell(row, column);
+    return ValueTask.FromResult(true);
   }
 
   public FsusTableV2BudgetResult EvaluateBudget() =>
@@ -490,13 +916,101 @@ public class FsusTableV2 : ContentControl
     realizedColumnStartIndex = Math.Clamp(realizedColumnStartIndex, 0, Math.Max(0, ColumnCount - Math.Max(1, realizedColumnCount)));
   }
 
+  private static int ResolveStart(double offset, double size, int count, int realizedCount) =>
+    Math.Clamp(
+      (int)Math.Floor(Math.Max(0d, offset) / Math.Max(1d, size)),
+      0,
+      Math.Max(0, count - Math.Max(1, realizedCount)));
+
+  private static int[] ResolveAxisIndices(int start, int count, int total, int frozen)
+  {
+    var indices = new HashSet<int>();
+    for (var index = 0; index < Math.Min(total, Math.Max(0, frozen)); index++)
+    {
+      indices.Add(index);
+    }
+    for (var index = start; index < Math.Min(total, start + count); index++)
+    {
+      indices.Add(index);
+    }
+    return indices.Order().ToArray();
+  }
+
+  private int ResolveSourceRow(int row) =>
+    row >= 0 && row < loadedRowIndex.Count ? loadedRowIndex[row] : row;
+
+  private FsusTableV2CellContainer AcquireCell()
+  {
+    if (cellPool.TryDequeue(out var cell))
+    {
+      RecycledCellCount++;
+      return cell;
+    }
+
+    CreatedCellCount++;
+    return new FsusTableV2CellContainer(++nextContainerId);
+  }
+
+  private void RecycleCell(FsusTableV2CellContainer cell)
+  {
+    cell.Recycle();
+    if (cellPool.Count < Math.Max(0, ContainerPoolLimit))
+    {
+      cellPool.Enqueue(cell);
+    }
+    else
+    {
+      DiscardedCellCount++;
+    }
+  }
+
+  private void ApplyScrollOffset()
+  {
+    isApplyingScroll = true;
+    try
+    {
+      scrollViewer.Offset = new Vector(
+        realizedColumnStartIndex * Math.Max(1d, ColumnWidth),
+        realizedRowStartIndex * Math.Max(1d, RowHeight));
+    }
+    finally
+    {
+      isApplyingScroll = false;
+    }
+  }
+
+  private static async Task CommitOnUiThreadAsync(Action action)
+  {
+    if (Dispatcher.UIThread.CheckAccess())
+    {
+      action();
+      return;
+    }
+
+    await Dispatcher.UIThread.InvokeAsync(action);
+  }
+
   private void SyncState()
   {
     FsusComponentClasses.Ensure(this, "fsus-virtualized", IsVirtualized);
-    AutomationProperties.SetName(this, FsusComponentClasses.ResolveName(AccessibleName, RowCount));
-    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.DataGrid);
-    AutomationProperties.SetItemStatus(
-      this,
-      $"{RowCount.ToString(CultureInfo.InvariantCulture)} rows, {ColumnCount.ToString(CultureInfo.InvariantCulture)} columns, {RealizedCellCount.ToString(CultureInfo.InvariantCulture)} realized cells");
+    var automationName = FsusComponentClasses.ResolveName(AccessibleName, RowCount);
+    if (!string.Equals(lastAutomationName, automationName, StringComparison.Ordinal))
+    {
+      AutomationProperties.SetName(this, automationName);
+      lastAutomationName = automationName;
+      AutomationUpdateCount++;
+    }
+    if (AutomationProperties.GetControlTypeOverride(this) != AutomationControlType.DataGrid)
+    {
+      AutomationProperties.SetControlTypeOverride(this, AutomationControlType.DataGrid);
+      AutomationUpdateCount++;
+    }
+    var automationStatus = $"{RowCount.ToString(CultureInfo.InvariantCulture)} rows, {ColumnCount.ToString(CultureInfo.InvariantCulture)} columns, {RealizedCellCount.ToString(CultureInfo.InvariantCulture)} realized cells";
+    if (!string.Equals(lastAutomationStatus, automationStatus, StringComparison.Ordinal))
+    {
+      AutomationProperties.SetItemStatus(this, automationStatus);
+      lastAutomationStatus = automationStatus;
+      AutomationUpdateCount++;
+    }
   }
 }
