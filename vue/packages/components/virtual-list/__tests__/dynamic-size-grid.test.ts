@@ -21,7 +21,7 @@ const ITEM_KLS = 'item'
 const ITEM_SELECTOR = `.${ITEM_KLS}`
 const columnWidths = Array.from({ length: 100 }).map((_, i) => 25 + i)
 const waitForScrollReset = async () => {
-  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+  await new Promise<void>((resolve) => setTimeout(resolve, 130))
   await nextTick()
 }
 

@@ -14,7 +14,7 @@ import { DynamicSizeList } from '..'
 import type { ListExposes } from '../src/types'
 type ListRef = ListExposes
 const waitForScrollReset = async () => {
-  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+  await new Promise<void>((resolve) => setTimeout(resolve, 130))
   await nextTick()
 }
 

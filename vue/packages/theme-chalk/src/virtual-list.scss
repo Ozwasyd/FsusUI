@@ -78,33 +78,15 @@
       transform: translate3d(0, 0, 0);
     }
 
-    &.is-scrolling .#{$namespace}-vl__inner > * {
+    &.is-fast-scrolling::before,
+    &.is-fast-scrolling::after {
+      opacity: 0;
+    }
+
+    &.is-fast-scrolling .#{$namespace}-vl__inner > * {
       filter: none;
-      transform: translate3d(
-        var(--fsus-interactive-motion-offset-x, 0px),
-        var(--fsus-interactive-motion-offset-y, 0px),
-        0
-      );
-    }
-
-    &[data-fsus-render-hardware='cpu-threaded'].is-scrolling
-      .#{$namespace}-vl__inner
-      > * {
-      transform: none;
-      will-change: auto;
-    }
-
-    &[data-fsus-compositor='disabled'].is-scrolling
-      .#{$namespace}-vl__inner
-      > * {
-      transform: none;
-      will-change: auto;
-    }
-
-    &[data-fsus-compositor='enabled'].is-scrolling
-      .#{$namespace}-vl__inner
-      > * {
-      will-change: transform;
+      box-shadow: none;
+      transition: none;
     }
 
     &[data-fsus-content-visibility='enabled'] .#{$namespace}-vl__inner > * {
@@ -112,14 +94,19 @@
       contain-intrinsic-size: auto var(--fsus-render-unit-intrinsic-size, 48px);
     }
 
-    &.is-scrolling .#{$namespace}-virtual-scrollbar,
+    &.is-fast-scrolling .#{$namespace}-virtual-scrollbar,
     .#{$namespace}-virtual-scrollbar.is-scrolling {
       filter: none;
     }
 
-    &.is-scrolling .#{$namespace}-scrollbar__thumb,
+    &.is-fast-scrolling .#{$namespace}-scrollbar__thumb,
     .#{$namespace}-virtual-scrollbar.is-scrolling
       .#{$namespace}-scrollbar__thumb {
+      box-shadow: 0 0 0 1px
+        color-mix(in srgb, var(--fsus-scholarly-blue) 18%, transparent);
+    }
+
+    &.is-scrolling:not(.is-fast-scrolling) .#{$namespace}-scrollbar__thumb {
       box-shadow:
         0 0 0 1px
           color-mix(in srgb, var(--fsus-scholarly-blue) 18%, transparent),
@@ -150,12 +137,6 @@
 
   > * {
     filter: none;
-    transform: translate3d(0, 0, 0);
-    transition:
-      filter 1ms linear,
-      transform var(--fsus-interactive-motion-settle, 120ms)
-        var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));
-    will-change: auto;
   }
 }
 

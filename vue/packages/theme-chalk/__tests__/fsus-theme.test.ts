@@ -62,9 +62,7 @@ describe('Fsus theme visual baseline', () => {
     expectCssRule(css, '.el-tabs__item', [
       'border-radius: var(--fsus-radius-navigation);',
     ])
-    expectCssRule(css, '.el-tabs__item.is-active', [
-      'background: transparent;',
-    ])
+    expectCssRule(css, '.el-tabs__item.is-active', ['background: transparent;'])
     expectCssRule(css, '.el-tabs--card > .el-tabs__header', [
       'height: auto;',
       'border-bottom: 0;',
@@ -87,10 +85,7 @@ describe('Fsus theme visual baseline', () => {
     expectCssRule(
       css,
       '.el-tabs--card > .el-tabs__header .el-tabs__item:not(.is-disabled):hover',
-      [
-        'box-shadow: none;',
-        'transform: translate3d(0, -1px, 0);',
-      ],
+      ['box-shadow: none;', 'transform: translate3d(0, -1px, 0);'],
     )
     expectCssRule(
       css,
@@ -140,15 +135,11 @@ describe('Fsus theme visual baseline', () => {
       'filter: none;',
       'box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);',
     ])
-    expectCssRule(
-      css,
-      '.is-expressive-surface .el-slider__button.dragging',
-      [
-        'filter: blur(var(--fsus-motion-slider-blur));',
-        'box-shadow: 0 0 18px var(--fsus-motion-slider-trail), 0 3px 10px rgba(0, 0, 0, 0.12);',
-        'scale(1.08);',
-      ],
-    )
+    expectCssRule(css, '.is-expressive-surface .el-slider__button.dragging', [
+      'filter: blur(var(--fsus-motion-slider-blur));',
+      'box-shadow: 0 0 18px var(--fsus-motion-slider-trail), 0 3px 10px rgba(0, 0, 0, 0.12);',
+      'scale(1.08);',
+    ])
     expectCssRule(css, '.fsus-reading-surface', [
       '--fsus-interactive-motion-blur: 0px;',
       '--fsus-interactive-motion-glow: 0px;',
@@ -1362,8 +1353,12 @@ describe('Fsus theme visual baseline', () => {
     expect(messageCss).not.toContain('var(--fsus-shadow-floating)')
     expect(messageCss).not.toContain('var(--fsus-radius-floating)')
     expect(themeCss).not.toContain('.el-message::before')
-    expect(themeCss).not.toMatch(/\.el-message__content\s*\{[^}]*font-weight:\s*600/s)
-    expect(themeCss).not.toMatch(/\.el-message__content\s*\{[^}]*line-height:\s*1\.55/s)
+    expect(themeCss).not.toMatch(
+      /\.el-message__content\s*\{[^}]*font-weight:\s*600/s,
+    )
+    expect(themeCss).not.toMatch(
+      /\.el-message__content\s*\{[^}]*line-height:\s*1\.55/s,
+    )
     expect(themeCss).not.toMatch(
       /\.el-message\s*\{[^}]*width:\s*var\(--fsus-notification-max-width\)/s,
     )
@@ -1596,6 +1591,19 @@ describe('Fsus theme visual baseline', () => {
     ])
     expectCssRule(virtualListCss, '.el-vl__wrapper[data-fsus-overscroll', [
       'overscroll-behavior: contain;',
+    ])
+  })
+
+  test('keeps virtual items off individual compositor layers while scrolling', () => {
+    const css = compileThemeFile('virtual-list.scss')
+    const itemRule = css.match(/\.el-vl__inner > \*\s*\{([^}]*)\}/)?.[1] ?? ''
+
+    expect(itemRule).not.toContain('translate3d')
+    expect(itemRule).not.toContain('will-change')
+    expectCssRule(css, '.el-vl__wrapper.is-fast-scrolling .el-vl__inner > *', [
+      'filter: none;',
+      'box-shadow: none;',
+      'transition: none;',
     ])
   })
 

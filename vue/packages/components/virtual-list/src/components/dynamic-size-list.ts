@@ -30,7 +30,7 @@ const DEFAULT_WASM_TEXT_KEYS = ['label', 'text', 'title', 'name', 'content']
 
 const resolveWasmTextKey = (items: unknown[]) => {
   const record = items.find(
-    (item) => item && typeof item === 'object' && !Array.isArray(item)
+    (item) => item && typeof item === 'object' && !Array.isArray(item),
   ) as Record<string, unknown> | undefined
 
   if (!record) {
@@ -68,24 +68,20 @@ const getItemStyleCacheGetter = (instance: Instance) => {
 
 const resetItemStyleCache = (instance: Instance) => {
   const getItemStyleCache = getItemStyleCacheGetter(instance)
-  const itemStyleCache = getItemStyleCache?.(false, false, false)
-
-  if (!itemStyleCache) {
-    return
-  }
-
-  Object.keys(itemStyleCache).forEach((key) => {
-    delete itemStyleCache[key]
-  })
+  getItemStyleCache?.clear?.()
 }
 
 const hydrateCacheWithEstimatedHeights = async (
   props: Props,
   instance: Instance,
   cache: ListCache,
-  remainingRetries = 2
+  remainingRetries = 2,
 ) => {
-  if (isHorizontal(props.layout) || !Array.isArray(props.data) || props.data.length === 0) {
+  if (
+    isHorizontal(props.layout) ||
+    !Array.isArray(props.data) ||
+    props.data.length === 0
+  ) {
     return
   }
 
@@ -102,7 +98,7 @@ const hydrateCacheWithEstimatedHeights = async (
           props,
           instance,
           cache,
-          remainingRetries - 1
+          remainingRetries - 1,
         )
       })
     }
@@ -114,7 +110,7 @@ const hydrateCacheWithEstimatedHeights = async (
     textKey,
     {
       rowWidth,
-    }
+    },
   )
 
   if (!estimatedHeights?.length) {
@@ -146,7 +142,7 @@ const hydrateCacheWithEstimatedHeights = async (
 const getItemFromCache = (
   props: Props,
   index: number,
-  listCache: ListCache
+  listCache: ListCache,
 ): ListItem => {
   const { itemSize } = props
   const { items, lastVisitedIndex } = listCache
@@ -196,7 +192,7 @@ const bs = (
   listCache: ListCache,
   low: number,
   high: number,
-  offset: number
+  offset: number,
 ) => {
   while (low <= high) {
     const mid = low + Math.floor((high - low) / 2)
@@ -224,7 +220,7 @@ const es = (
   props: Props,
   listCache: ListCache,
   index: number,
-  offset: number
+  offset: number,
 ) => {
   const { total } = props
   let exponent = 1
@@ -242,13 +238,13 @@ const es = (
     listCache,
     Math.floor(index / 2),
     Math.min(index, total - 1),
-    offset
+    offset,
   )
 }
 
 const getEstimatedTotalSize = (
   { total }: Props,
-  { items, estimatedItemSize, lastVisitedIndex }: ListCache
+  { items, estimatedItemSize, lastVisitedIndex }: ListCache,
 ) => {
   let totalSizeOfMeasuredItems = 0
 
@@ -285,7 +281,7 @@ const DynamicSizeList = createList({
 
     const maxOffset = Math.max(
       0,
-      Math.min(estimatedTotalSize - size, item.offset)
+      Math.min(estimatedTotalSize - size, item.offset),
     )
     const minOffset = Math.max(0, item.offset - size + item.size)
 
@@ -362,9 +358,11 @@ const DynamicSizeList = createList({
     }
 
     nextTick(() => {
-      void hydrateCacheWithEstimatedHeights(props, instance, cache).catch(() => {
-        throwError(SCOPE, 'WASM row-height priming failed.')
-      })
+      void hydrateCacheWithEstimatedHeights(props, instance, cache).catch(
+        () => {
+          throwError(SCOPE, 'WASM row-height priming failed.')
+        },
+      )
     })
 
     return cache
@@ -379,7 +377,7 @@ const DynamicSizeList = createList({
           SCOPE,
           `
           itemSize is required as function, but the given value was ${typeof itemSize}
-        `
+        `,
         )
       }
     }

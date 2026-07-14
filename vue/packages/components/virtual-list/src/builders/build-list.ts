@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
   computed,
   defineComponent,
@@ -22,7 +21,7 @@ import {
   useNamespace,
 } from '@element-plus/hooks'
 import { useGlobalConfig } from '@element-plus/components/config-provider'
-import { useCache } from '../hooks/use-cache'
+import { resolveVirtualLayerBudget, useCache } from '../hooks/use-cache'
 import useWheel from '../hooks/use-wheel'
 import Scrollbar from '../components/scrollbar'
 import { getRTLOffsetType, getScrollDir, isHorizontal } from '../utils'
@@ -56,7 +55,6 @@ const createList = ({
   getStartIndexForOffset,
   getStopIndexForStartIndex,
   initCache,
-  clearCache,
   validateProps,
 }: ListConstructorProps<VirtualizedListProps>) => {
   return defineComponent({
@@ -74,7 +72,7 @@ const createList = ({
       const dynamicSizeCache = ref(initCache(props, instance))
 
       const getItemStyleCache = useCache()
-      let resetFrame = 0
+      let resetTimer: ReturnType<typeof setTimeout> | undefined
       let scrollFrame = 0
       let pendingScrollElement: HTMLElement | null = null
       // refs
@@ -170,13 +168,32 @@ const createList = ({
       const renderPipelineHardwareAttrs = computed(() => {
         const [start, end] = itemsToRender.value
         const renderedCount = end >= start ? end - start + 1 : 0
-        return resolveFsusRenderPipelineUnitAttrs({
-          baseAttrs: baseRenderPipelineHardwareAttrs.value,
-          disableContentVisibilityOnOverflow: true,
-          layerBudget:
+        const dpr = typeof window === 'undefined' ? 1 : window.devicePixelRatio
+        const crossSize = Number(
+          unref(_isHorizontal) ? props.height : props.width,
+        )
+        const unitArea =
+          estimatedItemPixelSize.value *
+          (Number.isFinite(crossSize) && crossSize > 0
+            ? crossSize
+            : estimatedItemPixelSize.value)
+        const layerBudget = resolveVirtualLayerBudget({
+          configuredBudget:
             resolvedRenderPipelineConfig.value.acceleration.layerBudget,
-          renderedCount,
+          devicePixelRatio: dpr,
+          unitArea,
         })
+        return {
+          ...resolveFsusRenderPipelineUnitAttrs({
+            baseAttrs: baseRenderPipelineHardwareAttrs.value,
+            disableContentVisibilityOnOverflow: true,
+            layerBudget,
+            renderedCount,
+          }),
+          'data-fsus-render-layer-pixels': String(
+            Math.round(unitArea * renderedCount * Math.max(1, dpr) ** 2),
+          ),
+        }
       })
 
       const estimatedTotalSize = computed(() =>
@@ -266,19 +283,17 @@ const createList = ({
           0,
           Math.min(scrollTop, scrollHeight - clientHeight),
         )
+        const delta = scrollOffset - _states.scrollOffset
 
-        states.value = {
-          ..._states,
-          isScrolling: true,
-          scrollDir: getScrollDir(_states.scrollOffset, scrollOffset),
-          scrollOffset,
-          updateRequested: false,
-        }
+        _states.isScrolling = true
+        _states.scrollDir = getScrollDir(_states.scrollOffset, scrollOffset)
+        _states.scrollOffset = scrollOffset
+        _states.updateRequested = false
 
         scheduleResetIsScrolling()
         triggerScrollMotion(
-          _isHorizontal.value ? scrollOffset - _states.scrollOffset : 0,
-          _isHorizontal.value ? 0 : scrollOffset - _states.scrollOffset,
+          _isHorizontal.value ? delta : 0,
+          _isHorizontal.value ? 0 : delta,
         )
       }
 
@@ -315,19 +330,17 @@ const createList = ({
           0,
           Math.min(scrollOffset, scrollWidth - clientWidth),
         )
+        const delta = scrollOffset - _states.scrollOffset
 
-        states.value = {
-          ..._states,
-          isScrolling: true,
-          scrollDir: getScrollDir(_states.scrollOffset, scrollOffset),
-          scrollOffset,
-          updateRequested: false,
-        }
+        _states.isScrolling = true
+        _states.scrollDir = getScrollDir(_states.scrollOffset, scrollOffset)
+        _states.scrollOffset = scrollOffset
+        _states.updateRequested = false
 
         scheduleResetIsScrolling()
         triggerScrollMotion(
-          _isHorizontal.value ? scrollOffset - _states.scrollOffset : 0,
-          _isHorizontal.value ? 0 : scrollOffset - _states.scrollOffset,
+          _isHorizontal.value ? delta : 0,
+          _isHorizontal.value ? 0 : delta,
         )
       }
 
@@ -354,6 +367,7 @@ const createList = ({
       }
 
       const onScrollbarScroll = (distanceToGo: number, totalSteps: number) => {
+        if (!Number.isFinite(totalSteps) || totalSteps <= 0) return
         const offset =
           ((estimatedTotalSize.value - (clientSize.value as number)) /
             totalSteps) *
@@ -372,9 +386,9 @@ const createList = ({
           isScrollbarDragging: true,
           isScrolling: true,
         }
-        if (resetFrame) {
-          cancelAnimationFrame(resetFrame)
-          resetFrame = 0
+        if (resetTimer) {
+          clearTimeout(resetTimer)
+          resetTimer = undefined
         }
       }
 
@@ -395,13 +409,10 @@ const createList = ({
           return
         }
 
-        states.value = {
-          ...unref(states),
-          isScrolling: true,
-          scrollOffset: offset,
-          scrollDir: getScrollDir(previousOffset, offset),
-          updateRequested: true,
-        }
+        states.value.isScrolling = true
+        states.value.scrollOffset = offset
+        states.value.scrollDir = getScrollDir(previousOffset, offset)
+        states.value.updateRequested = true
 
         scheduleResetIsScrolling()
         triggerScrollMotion(
@@ -432,9 +443,9 @@ const createList = ({
         const { direction, itemSize, layout } = props
 
         const itemStyleCache = getItemStyleCache.value(
-          clearCache && itemSize,
-          clearCache && layout,
-          clearCache && direction,
+          itemSize,
+          layout,
+          direction,
         )
 
         let style: CSSProperties
@@ -465,15 +476,19 @@ const createList = ({
       let scrollMotionTimer: ReturnType<typeof setTimeout> | undefined
       let scrollMotionFrame = 0
       let lastScrollMotionAt = 0
+      let lastScrollMotionClass = ''
 
       const scheduleResetIsScrolling = () => {
-        if (resetFrame) return
-        resetFrame = requestAnimationFrame(resetIsScrolling)
+        if (resetTimer) clearTimeout(resetTimer)
+        resetTimer = setTimeout(resetIsScrolling, 120)
       }
 
       const syncScrollMotionClasses = (active: boolean) => {
         const wrapper = wrapperRef.value
         if (!wrapper) return
+        const nextClass = active ? states.value.scrollDir : ''
+        if (nextClass === lastScrollMotionClass) return
+        lastScrollMotionClass = nextClass
 
         wrapper.classList.remove(
           ns.is('scrolling'),
@@ -545,9 +560,12 @@ const createList = ({
       }
 
       const resetIsScrolling = () => {
-        resetFrame = 0
+        resetTimer = undefined
         states.value.isScrolling = false
-        getItemStyleCache.value(-1, null, null)
+      }
+      const onScrollEnd = () => {
+        if (resetTimer) clearTimeout(resetTimer)
+        resetIsScrolling()
       }
 
       const resetScrollTop = () => {
@@ -559,6 +577,7 @@ const createList = ({
 
       const resetAfterIndex = (index: number, forceUpdate = true) => {
         dynamicSizeCache.value?.clearCacheAfterIndex?.(index, forceUpdate)
+        getItemStyleCache.value.clear()
       }
 
       // life cycles
@@ -583,11 +602,12 @@ const createList = ({
           scrollFrame = 0
         }
         pendingScrollElement = null
-        if (resetFrame) {
-          cancelAnimationFrame(resetFrame)
-          resetFrame = 0
+        if (resetTimer) {
+          clearTimeout(resetTimer)
+          resetTimer = undefined
         }
         clearScrollMotionSchedule()
+        lastScrollMotionClass = ''
       })
 
       onUpdated(() => {
@@ -643,6 +663,7 @@ const createList = ({
         renderPipelineStrategy,
         getItemStyle,
         onScroll,
+        onScrollEnd,
         onScrollbarScroll,
         onScrollbarStartMove,
         onScrollbarStopMove,
@@ -682,6 +703,7 @@ const createList = ({
         layout,
         total,
         onScroll,
+        onScrollEnd,
         onScrollbarScroll,
         onScrollbarStartMove,
         onScrollbarStopMove,
@@ -740,9 +762,10 @@ const createList = ({
         onStartMove: onScrollbarStartMove,
         onStopMove: onScrollbarStopMove,
         onScroll: onScrollbarScroll,
-        ratio: (clientSize * 100) / this.estimatedTotalSize,
+        ratio: (clientSize * 100) / Math.max(1, this.estimatedTotalSize),
         scrollFrom:
-          states.scrollOffset / (this.estimatedTotalSize - clientSize),
+          states.scrollOffset /
+          Math.max(1, this.estimatedTotalSize - clientSize),
         total,
       })
 
@@ -753,6 +776,7 @@ const createList = ({
           ...renderPipelineHardwareAttrs,
           style: windowStyle,
           onScroll,
+          onScrollend: onScrollEnd,
           onWheel,
           ref: 'windowRef',
           key: 0,
@@ -768,6 +792,7 @@ const createList = ({
             ns.e('wrapper'),
             states.scrollbarAlwaysOn ? 'always-on' : '',
             ns.is('scrolling', states.isScrollMotion),
+            ns.is('fast-scrolling', states.isScrolling),
             ns.is('vertical', layout !== HORIZONTAL),
             ns.is('horizontal', layout === HORIZONTAL),
             states.isScrollMotion ? ns.is(`scrolling-${states.scrollDir}`) : '',

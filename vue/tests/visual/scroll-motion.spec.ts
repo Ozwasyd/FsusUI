@@ -110,14 +110,7 @@ test('scroll containers expose unified motion without text blur while scrolling'
     }
   })
 
-  if (
-    treeMotion.hardware === 'cpu-threaded' ||
-    treeMotion.compositor === 'disabled'
-  ) {
-    expect(treeMotion.itemTransform).toBe('none')
-  } else {
-    expect(treeMotion.itemTransform).not.toBe('none')
-  }
+  expect(treeMotion.itemTransform).toBe('none')
   expect(blurRadius(treeMotion.itemFilter)).toBeLessThanOrEqual(0.05)
   expect(blurRadius(treeMotion.thumbFilter)).toBeLessThanOrEqual(0.05)
   expect(treeMotion.thumbShadow).not.toBe('none')

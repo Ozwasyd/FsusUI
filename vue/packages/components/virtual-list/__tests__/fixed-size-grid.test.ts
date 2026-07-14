@@ -7,6 +7,7 @@ import setupMock from '../setup-mock'
 import {
   CENTERED_ALIGNMENT,
   END_ALIGNMENT,
+  RTL,
   SMART_ALIGNMENT,
   START_ALIGNMENT,
 } from '../src/defaults'
@@ -21,7 +22,7 @@ const WINDOW_KLS = 'window'
 const ITEM_KLS = 'item'
 const ITEM_SELECTOR = `.${ITEM_KLS}`
 const waitForScrollReset = async () => {
-  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+  await new Promise<void>((resolve) => setTimeout(resolve, 130))
   await nextTick()
 }
 const mount = makeMount(
@@ -155,6 +156,18 @@ describe('<fixed-size-grid />', () => {
       await nextTick()
       expect(wrapper.findAll(ITEM_SELECTOR)).toHaveLength(0)
     })
+  })
+
+  it('keeps RTL cell positioning compatible in the dual-axis grid', async () => {
+    const wrapper = mount({ props: { direction: RTL } })
+    await nextTick()
+    expect(
+      (wrapper.find(ITEM_SELECTOR).element as HTMLElement).style.right,
+    ).toBe('0px')
+    const gridRef = wrapper.vm.$refs.gridRef as GridRef
+    gridRef.scrollTo({ scrollLeft: 100, scrollTop: 100 })
+    await waitForScrollReset()
+    expect(wrapper.findAll(ITEM_SELECTOR).length).toBeGreaterThan(0)
   })
 
   describe('scroll testing', () => {

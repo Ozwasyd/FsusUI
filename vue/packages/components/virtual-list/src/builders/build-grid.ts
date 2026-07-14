@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
   computed,
   defineComponent,
@@ -29,7 +28,7 @@ import {
 import { useGlobalConfig } from '@element-plus/components/config-provider'
 import Scrollbar from '../components/scrollbar'
 import { useGridWheel } from '../hooks/use-grid-wheel'
-import { useCache } from '../hooks/use-cache'
+import { resolveVirtualLayerBudget, useCache } from '../hooks/use-cache'
 import { virtualizedGridProps } from '../props'
 import { getRTLOffsetType, getScrollDir, isRTL } from '../utils'
 import {
@@ -64,7 +63,6 @@ const SCROLL_MOTION_IDLE_MS = 320
 
 const createGrid = ({
   name,
-  clearCache,
   getColumnPosition,
   getColumnStartIndexForOffset,
   getColumnStopIndexForStartIndex,
@@ -116,7 +114,7 @@ const createGrid = ({
       })
 
       const getItemStyleCache = useCache()
-      let resetFrame = 0
+      let resetTimer: ReturnType<typeof setTimeout> | undefined
       let scrollFrame = 0
       let pendingScrollElement: HTMLElement | null = null
 
@@ -264,13 +262,32 @@ const createGrid = ({
         const renderedColumnCount =
           columnEnd >= columnStart ? columnEnd - columnStart + 1 : 0
         const renderedRowCount = rowEnd >= rowStart ? rowEnd - rowStart + 1 : 0
-        return resolveFsusRenderPipelineUnitAttrs({
-          baseAttrs: baseRenderPipelineHardwareAttrs.value,
-          disableContentVisibilityOnOverflow: true,
-          layerBudget:
+        const dpr = typeof window === 'undefined' ? 1 : window.devicePixelRatio
+        const columnWidth = isNumber(props.columnWidth)
+          ? props.columnWidth
+          : DEFAULT_DYNAMIC_LIST_ITEM_SIZE
+        const rowHeight = isNumber(props.rowHeight)
+          ? props.rowHeight
+          : DEFAULT_DYNAMIC_LIST_ITEM_SIZE
+        const unitArea = columnWidth * rowHeight
+        const renderedCount = renderedColumnCount * renderedRowCount
+        const layerBudget = resolveVirtualLayerBudget({
+          configuredBudget:
             resolvedRenderPipelineConfig.value.acceleration.layerBudget,
-          renderedCount: renderedColumnCount * renderedRowCount,
+          devicePixelRatio: dpr,
+          unitArea,
         })
+        return {
+          ...resolveFsusRenderPipelineUnitAttrs({
+            baseAttrs: baseRenderPipelineHardwareAttrs.value,
+            disableContentVisibilityOnOverflow: true,
+            layerBudget,
+            renderedCount,
+          }),
+          'data-fsus-render-layer-pixels': String(
+            Math.round(unitArea * renderedCount * Math.max(1, dpr) ** 2),
+          ),
+        }
       })
 
       const estimatedTotalHeight = computed(() =>
@@ -400,15 +417,12 @@ const createGrid = ({
         const deltaX = _scrollLeft - _states.scrollLeft
         const deltaY = nextScrollTop - _states.scrollTop
 
-        states.value = {
-          ..._states,
-          isScrolling: true,
-          scrollLeft: _scrollLeft,
-          scrollTop: nextScrollTop,
-          updateRequested: true,
-          xAxisScrollDir: getScrollDir(_states.scrollLeft, _scrollLeft),
-          yAxisScrollDir: getScrollDir(_states.scrollTop, nextScrollTop),
-        }
+        _states.isScrolling = true
+        _states.xAxisScrollDir = getScrollDir(_states.scrollLeft, _scrollLeft)
+        _states.yAxisScrollDir = getScrollDir(_states.scrollTop, nextScrollTop)
+        _states.scrollLeft = _scrollLeft
+        _states.scrollTop = nextScrollTop
+        _states.updateRequested = true
 
         scheduleResetIsScrolling()
         triggerScrollMotion(isScrollingX, isScrollingY, deltaX, deltaY)
@@ -428,6 +442,7 @@ const createGrid = ({
       }
 
       const onVerticalScroll = (distance: number, totalSteps: number) => {
+        if (!Number.isFinite(totalSteps) || totalSteps <= 0) return
         const height = unref(parsedHeight)
         const offset =
           ((estimatedTotalHeight.value - height) / totalSteps) * distance
@@ -437,6 +452,7 @@ const createGrid = ({
       }
 
       const onHorizontalScroll = (distance: number, totalSteps: number) => {
+        if (!Number.isFinite(totalSteps) || totalSteps <= 0) return
         const width = unref(parsedWidth)
         const offset =
           ((estimatedTotalWidth.value - width) / totalSteps) * distance
@@ -497,15 +513,12 @@ const createGrid = ({
         const deltaX = scrollLeft - _states.scrollLeft
         const deltaY = scrollTop - _states.scrollTop
 
-        states.value = {
-          ..._states,
-          isScrolling: true,
-          xAxisScrollDir: getScrollDir(_states.scrollLeft, scrollLeft),
-          yAxisScrollDir: getScrollDir(_states.scrollTop, scrollTop),
-          scrollLeft,
-          scrollTop,
-          updateRequested: true,
-        }
+        _states.isScrolling = true
+        _states.xAxisScrollDir = getScrollDir(_states.scrollLeft, scrollLeft)
+        _states.yAxisScrollDir = getScrollDir(_states.scrollTop, scrollTop)
+        _states.scrollLeft = scrollLeft
+        _states.scrollTop = scrollTop
+        _states.updateRequested = true
 
         scheduleResetIsScrolling()
         triggerScrollMotion(isScrollingX, isScrollingY, deltaX, deltaY)
@@ -535,7 +548,7 @@ const createGrid = ({
             alignment,
             _states.scrollLeft,
             _cache,
-            estimatedWidth > props.width! ? scrollBarWidth : 0,
+            estimatedWidth > (Number(props.width) || 0) ? scrollBarWidth : 0,
           ),
           scrollTop: getRowOffset(
             props,
@@ -543,7 +556,7 @@ const createGrid = ({
             alignment,
             _states.scrollTop,
             _cache,
-            estimatedHeight > props.height! ? scrollBarWidth : 0,
+            estimatedHeight > (Number(props.height) || 0) ? scrollBarWidth : 0,
           ),
         })
       }
@@ -554,9 +567,9 @@ const createGrid = ({
       ): CSSProperties => {
         const { columnWidth, direction, rowHeight } = props
         const itemStyleCache = getItemStyleCache.value(
-          clearCache && columnWidth,
-          clearCache && rowHeight,
-          clearCache && direction,
+          columnWidth,
+          rowHeight,
+          direction,
         )
         // since there was no need to introduce an nested array into cache object
         // we use row,column to construct the key for indexing the map.
@@ -589,15 +602,21 @@ const createGrid = ({
       let scrollMotionTimer: ReturnType<typeof setTimeout> | undefined
       let scrollMotionFrame = 0
       let lastScrollMotionAt = 0
+      let lastScrollMotionClass = ''
 
       const scheduleResetIsScrolling = () => {
-        if (resetFrame) return
-        resetFrame = requestAnimationFrame(resetIsScrolling)
+        if (resetTimer) clearTimeout(resetTimer)
+        resetTimer = setTimeout(resetIsScrolling, 120)
       }
 
       const syncScrollMotionClasses = (active: boolean) => {
         const wrapper = wrapperRef.value
         if (!wrapper) return
+        const nextClass = active
+          ? `${states.value.isScrollMotionX}:${states.value.xAxisScrollDir}:${states.value.isScrollMotionY}:${states.value.yAxisScrollDir}`
+          : ''
+        if (nextClass === lastScrollMotionClass) return
+        lastScrollMotionClass = nextClass
 
         wrapper.classList.remove(
           ns.is('scrolling'),
@@ -689,9 +708,12 @@ const createGrid = ({
       }
 
       const resetIsScrolling = () => {
-        resetFrame = 0
+        resetTimer = undefined
         states.value.isScrolling = false
-        getItemStyleCache.value(-1, null, null)
+      }
+      const onScrollEnd = () => {
+        if (resetTimer) clearTimeout(resetTimer)
+        resetIsScrolling()
       }
 
       const onScrollbarStartMove = () => {
@@ -700,9 +722,9 @@ const createGrid = ({
           isScrollbarDragging: true,
           isScrolling: true,
         }
-        if (resetFrame) {
-          cancelAnimationFrame(resetFrame)
-          resetFrame = 0
+        if (resetTimer) {
+          clearTimeout(resetTimer)
+          resetTimer = undefined
         }
       }
 
@@ -738,11 +760,12 @@ const createGrid = ({
           scrollFrame = 0
         }
         pendingScrollElement = null
-        if (resetFrame) {
-          cancelAnimationFrame(resetFrame)
-          resetFrame = 0
+        if (resetTimer) {
+          clearTimeout(resetTimer)
+          resetTimer = undefined
         }
         clearScrollMotionSchedule()
+        lastScrollMotionClass = ''
       })
 
       const onUpdated = () => {
@@ -920,6 +943,7 @@ const createGrid = ({
             class: [
               ns.e('wrapper'),
               ns.is('scrolling', isScrollMotionX || isScrollMotionY),
+              ns.is('fast-scrolling', states.value.isScrolling),
               ns.is('scrolling-x', isScrollMotionX),
               ns.is('scrolling-y', isScrollMotionY),
               isScrollMotionX ? ns.is(`scrolling-x-${xAxisScrollDir}`) : '',
@@ -943,6 +967,7 @@ const createGrid = ({
                 ...renderPipelineHardwareAttrs.value,
                 style: unref(windowStyle),
                 onScroll,
+                onScrollend: onScrollEnd,
                 onWheel,
                 ref: windowRef,
               },

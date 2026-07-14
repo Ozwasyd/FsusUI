@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { computed, defineComponent, nextTick, provide } from 'vue'
+import { computed, defineComponent, nextTick, provide, unref } from 'vue'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import makeMount from '@element-plus/test-utils/make-mount'
 import makeScroll from '@element-plus/test-utils/make-scroll'
@@ -25,7 +25,7 @@ const WINDOW_SELECTOR = `.${WINDOW_KLS}`
 const ITEM_KLS = 'item'
 const ITEM_SELECTOR = `.${ITEM_KLS}`
 const waitForScrollReset = async () => {
-  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+  await new Promise<void>((resolve) => setTimeout(resolve, 130))
   await nextTick()
 }
 const mount = makeMount(
@@ -294,6 +294,35 @@ describe('<fixed-size-list />', () => {
   })
 
   describe('scrollTo', () => {
+    it('keeps scrolling active until the trailing idle window', async () => {
+      const wrapper = mount()
+      await nextTick()
+      const listRef = wrapper.vm.$refs.listRef as ListExposes & {
+        states: { isScrolling: boolean }
+      }
+      listRef.scrollTo(100)
+      expect(listRef.states.isScrolling).toBe(true)
+      await new Promise((resolve) => setTimeout(resolve, 70))
+      listRef.scrollTo(200)
+      await new Promise((resolve) => setTimeout(resolve, 70))
+      expect(listRef.states.isScrolling).toBe(true)
+      await new Promise((resolve) => setTimeout(resolve, 60))
+      expect(listRef.states.isScrolling).toBe(false)
+    })
+
+    it('ends scrolling immediately when the platform emits scrollend', async () => {
+      const wrapper = mount()
+      await nextTick()
+      const listRef = wrapper.vm.$refs.listRef as ListExposes & {
+        states: { isScrolling: boolean }
+      }
+      listRef.scrollTo(100)
+      expect(listRef.states.isScrolling).toBe(true)
+      unref(listRef.windowRef).dispatchEvent(new Event('scrollend'))
+      await nextTick()
+      expect(listRef.states.isScrolling).toBe(false)
+    })
+
     it('should correctly scroll vertically', async () => {
       const wrapper = mount()
 

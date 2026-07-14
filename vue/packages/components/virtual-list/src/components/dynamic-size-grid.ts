@@ -348,7 +348,7 @@ const DynamicSizeGrid = createGrid({
         )
       }
 
-      instance.exposed?.getItemStyleCache.value(-1, null, null)
+      instance.exposed?.getItemStyleCache.value.clear()
 
       if (forceUpdate) instance.proxy?.$forceUpdate()
     }
