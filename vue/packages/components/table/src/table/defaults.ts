@@ -89,8 +89,11 @@ type CellStyle<T> =
       columnIndex: number
     }) => CSSProperties)
 type Layout = 'fixed' | 'auto'
+export type TableDataChangeStrategy = 'identity' | 'version' | 'manual' | 'deep'
 interface TableProps<T> {
   data: T[]
+  dataChangeStrategy?: TableDataChangeStrategy
+  dataVersion?: string | number
   size?: ComponentSize
   width?: string | number
   height?: string | number
@@ -185,6 +188,15 @@ export default {
     type: Array as PropType<DefaultRow[]>,
     default: () => [],
   },
+  dataChangeStrategy: {
+    type: String as PropType<TableDataChangeStrategy>,
+    default: 'deep',
+    validator: (value: string) =>
+      ['identity', 'version', 'manual', 'deep'].includes(value),
+  },
+  dataVersion: [String, Number] as PropType<
+    TableProps<DefaultRow>['dataVersion']
+  >,
   size: useSizeProp,
   width: [String, Number],
   height: [String, Number],

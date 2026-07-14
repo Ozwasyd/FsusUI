@@ -9,8 +9,12 @@ import {
   watch,
   watchEffect,
 } from 'vue'
-import { useEventListener, useResizeObserver } from '@element-plus/hooks/use-runtime'
+import {
+  useEventListener,
+  useResizeObserver,
+} from '@element-plus/hooks/use-runtime'
 import { useFormSize } from '@element-plus/components/form'
+import { debugWarn } from '@element-plus/utils'
 
 import type { Table, TableProps } from './defaults'
 import type { Store } from '../store'
@@ -120,16 +124,58 @@ function useStyle<T>(
       immediate: true,
     },
   )
-  watch(
-    () => props.data,
-    (data) => {
-      table.store.commit('setData', data)
-    },
-    {
+  let stopDataWatch: (() => void) | null = null
+  let warnedLargeDeepData = false
+  const largeDataDiagnosticSize = () => {
+    const cores =
+      typeof navigator === 'undefined' ? 2 : navigator.hardwareConcurrency || 2
+    const memory =
+      typeof navigator === 'undefined'
+        ? 4
+        : ((navigator as Navigator & { deviceMemory?: number }).deviceMemory ??
+          4)
+    return Math.max(1_000, Math.round(cores * memory * 500))
+  }
+  const commitData = (reason: string) => {
+    table.store.commit('setData', props.data, {
+      reason,
+      strategy: props.dataChangeStrategy,
+    })
+    if (
+      !warnedLargeDeepData &&
+      props.dataChangeStrategy === 'deep' &&
+      (props.data?.length ?? 0) >= largeDataDiagnosticSize() &&
+      process.env.NODE_ENV !== 'production'
+    ) {
+      warnedLargeDeepData = true
+      debugWarn(
+        'ElTable',
+        `deep data tracking is active for ${props.data.length} rows on this device. Prefer data-change-strategy="identity" or an explicit data-version.`,
+      )
+    }
+  }
+  const installDataWatch = () => {
+    stopDataWatch?.()
+    const strategy = props.dataChangeStrategy
+    if (strategy === 'manual') {
+      commitData('data-manual-init')
+      stopDataWatch = null
+      return
+    }
+    const source =
+      strategy === 'version' ? () => props.dataVersion : () => props.data
+    stopDataWatch = watch(source, () => commitData(`data-${strategy}`), {
+      deep: strategy === 'deep',
       immediate: true,
-      deep: true,
-    },
-  )
+    })
+  }
+  watch(() => props.dataChangeStrategy, installDataWatch, { immediate: true })
+  const refreshData = () => commitData('data-manual')
+
+  onBeforeUnmount(() => {
+    stopDataWatch?.()
+    stopDataWatch = null
+  })
   watchEffect(() => {
     if (props.expandRowKeys) {
       store.setExpandRowKeysAdapter(props.expandRowKeys)
@@ -212,6 +258,7 @@ function useStyle<T>(
     await nextTick()
     store.updateColumns()
     bindEvents()
+    store.recordLayoutReason('container-resize')
     scheduleLayoutFrame()
 
     const el: HTMLElement = table.vnode.el as HTMLElement
@@ -350,7 +397,7 @@ function useStyle<T>(
         height,
         headerHeight: (props.showHeader && tableHeader?.offsetHeight) || 0,
       }
-      doLayout()
+      store.scheduleLayout(false, true, 'container-resize')
     }
   }
   const tableSize = useFormSize()
@@ -465,6 +512,7 @@ function useStyle<T>(
     scrollbarViewStyle,
     tableInnerStyle,
     scrollbarStyle,
+    refreshData,
   }
 }
 

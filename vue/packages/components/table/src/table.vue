@@ -221,7 +221,7 @@ export default defineComponent({
     'expand-change',
   ],
   setup(props) {
-    type Row = typeof props.data[number]
+    type Row = (typeof props.data)[number]
     const { t } = useLocale()
     const ns = useNamespace('table')
     const table = getCurrentInstance() as Table<Row>
@@ -271,6 +271,7 @@ export default defineComponent({
       scrollbarViewStyle,
       tableInnerStyle,
       scrollbarStyle,
+      refreshData,
     } = useStyle<Row>(props, layout, store, table)
 
     const { scrollBarRef, scrollTo, setScrollLeft, setScrollTop } =
@@ -287,7 +288,7 @@ export default defineComponent({
       debouncedUpdateLayout,
     }
     const computedSumText = computed(
-      () => props.sumText || t('el.table.sumText')
+      () => props.sumText || t('el.table.sumText'),
     )
 
     const computedEmptyText = computed(() => {
@@ -338,6 +339,8 @@ export default defineComponent({
       scrollTo,
       setScrollLeft,
       setScrollTop,
+      refresh: refreshData,
+      getLayoutDiagnostics: store.getLayoutDiagnostics,
     }
   },
 })

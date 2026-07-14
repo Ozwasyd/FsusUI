@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { inject } from 'vue'
+import { inject, toRaw } from 'vue'
 import { useNamespace } from '@element-plus/hooks'
 import {
   ensurePosition,
@@ -27,9 +27,11 @@ function useStyles<T>(props: Partial<TableBodyProps<T>>) {
 
   const getRowClass = (row: T, rowIndex: number) => {
     const classes = [ns.e('row')]
+    const currentRow = props.store.states.currentRow.value
     if (
       parent?.props.highlightCurrentRow &&
-      row === props.store.states.currentRow.value
+      currentRow &&
+      toRaw(row) === toRaw(currentRow)
     ) {
       classes.push('current-row')
     }
@@ -45,7 +47,7 @@ function useStyles<T>(props: Partial<TableBodyProps<T>>) {
         rowClassName.call(null, {
           row,
           rowIndex,
-        })
+        }),
       )
     }
     return classes
@@ -55,7 +57,7 @@ function useStyles<T>(props: Partial<TableBodyProps<T>>) {
     rowIndex: number,
     columnIndex: number,
     row: T,
-    column: TableColumnCtx<T>
+    column: TableColumnCtx<T>,
   ) => {
     const cellStyle = parent?.props.cellStyle
     let cellStyles = cellStyle ?? {}
@@ -70,7 +72,7 @@ function useStyles<T>(props: Partial<TableBodyProps<T>>) {
     const fixedStyle = getFixedColumnOffset(
       columnIndex,
       props?.fixed,
-      props.store
+      props.store,
     )
     ensurePosition(fixedStyle, 'left')
     ensurePosition(fixedStyle, 'right')
@@ -82,7 +84,7 @@ function useStyles<T>(props: Partial<TableBodyProps<T>>) {
     columnIndex: number,
     row: T,
     column: TableColumnCtx<T>,
-    offset: number
+    offset: number,
   ) => {
     const fixedClasses = getFixedColumnsClass(
       ns.b(),
@@ -90,7 +92,7 @@ function useStyles<T>(props: Partial<TableBodyProps<T>>) {
       props?.fixed,
       props.store,
       undefined,
-      offset
+      offset,
     )
     const classes = [column.id, column.align, column.className, ...fixedClasses]
     const cellClassName = parent?.props.cellClassName
@@ -103,7 +105,7 @@ function useStyles<T>(props: Partial<TableBodyProps<T>>) {
           columnIndex,
           row,
           column,
-        })
+        }),
       )
     }
     classes.push(ns.e('cell'))
@@ -113,7 +115,7 @@ function useStyles<T>(props: Partial<TableBodyProps<T>>) {
     row: T,
     column: TableColumnCtx<T>,
     rowIndex: number,
-    columnIndex: number
+    columnIndex: number,
   ) => {
     let rowspan = 1
     let colspan = 1
@@ -138,7 +140,7 @@ function useStyles<T>(props: Partial<TableBodyProps<T>>) {
   const getColspanRealWidth = (
     columns: TableColumnCtx<T>[],
     colspan: number,
-    index: number
+    index: number,
   ): number => {
     if (colspan < 1) {
       return columns[index].realWidth
@@ -147,7 +149,7 @@ function useStyles<T>(props: Partial<TableBodyProps<T>>) {
       .map(({ realWidth, width }) => realWidth || width)
       .slice(index, index + colspan)
     return Number(
-      widthArr.reduce((acc, width) => Number(acc) + Number(width), -1)
+      widthArr.reduce((acc, width) => Number(acc) + Number(width), -1),
     )
   }
 

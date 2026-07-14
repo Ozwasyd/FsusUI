@@ -26,4 +26,9 @@ export type {
   Sort,
   Filter,
   TableColumnCtx,
+  TableDataChangeStrategy,
 } from './src/table/defaults'
+export type {
+  TableLayoutDiagnostics,
+  TableLayoutReason,
+} from './src/store/watcher'

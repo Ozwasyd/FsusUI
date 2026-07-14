@@ -1,21 +1,12 @@
-// @ts-nocheck
 import {
   getCurrentInstance,
   onBeforeUnmount,
   ref,
+  shallowRef,
   toRefs,
   unref,
-  watch,
 } from 'vue'
-import { hasOwn } from '@element-plus/utils'
-import {
-  getColumnById,
-  getColumnByKey,
-  getKeysMap,
-  getRowIdentity,
-  orderBy,
-  toggleRowStatus,
-} from '../util'
+import { getColumnById, getColumnByKey, getRowIdentity, orderBy } from '../util'
 import {
   createWasmSortController,
   shouldUseWasm,
@@ -24,16 +15,41 @@ import useExpand from './expand'
 import useCurrent from './current'
 import useTree from './tree'
 
-import type { Ref } from 'vue'
+import type { Ref, ShallowRef } from 'vue'
 import type { TableColumnCtx } from '../table-column/defaults'
-import type { Table, TableRefs } from '../table/defaults'
+import type { Table, TableProps, TableRefs } from '../table/defaults'
 import type { StoreFilter } from '.'
+
+export type TableLayoutReason =
+  | 'columns'
+  | 'container-resize'
+  | 'data-deep'
+  | 'data-identity'
+  | 'data-manual'
+  | 'data-manual-init'
+  | 'data-version'
+  | 'filter'
+  | 'sort'
+  | 'unknown'
+
+export type TableLayoutDiagnostics = {
+  flushCount: number
+  lastFlushedAt: number
+  lastReasons: TableLayoutReason[]
+  pendingReasons: TableLayoutReason[]
+}
+
+type TableSortState<T> = {
+  sortingColumn: TableColumnCtx<T> | null
+  sortOrder: 'ascending' | 'descending' | null
+  sortProp: string | null
+}
 
 /**
  * WASM-first sorting for eligible large primitive datasets.
  * Non-eligible paths such as custom sort callbacks stay on the JS primary path.
  */
-const sortData = (data, states) => {
+const sortData = <T>(data: T[], states: TableSortState<T>): T[] => {
   const sortingColumn = states.sortingColumn
   if (!sortingColumn || typeof sortingColumn.sortable === 'string') {
     return data
@@ -41,15 +57,15 @@ const sortData = (data, states) => {
 
   return orderBy(
     data,
-    states.sortProp,
-    states.sortOrder,
+    states.sortProp ?? '',
+    states.sortOrder ?? 1,
     sortingColumn.sortMethod,
-    sortingColumn.sortBy,
+    sortingColumn.sortBy as never,
   )
 }
 
-const doFlattenColumns = (columns) => {
-  const result = []
+const doFlattenColumns = <T>(columns: TableColumnCtx<T>[]) => {
+  const result: TableColumnCtx<T>[] = []
   columns.forEach((column) => {
     if (column.children && column.children.length > 0) {
       // eslint-disable-next-line prefer-spread
@@ -64,9 +80,9 @@ const doFlattenColumns = (columns) => {
 function useWatcher<T>() {
   const instance = getCurrentInstance() as Table<T>
   const { size: tableSize } = toRefs(instance.proxy?.$props as any)
-  const rowKey: Ref<string> = ref(null)
-  const data: Ref<T[]> = ref([])
-  const _data: Ref<T[]> = ref([])
+  const rowKey: Ref<TableProps<T>['rowKey'] | null> = ref(null)
+  const data: ShallowRef<T[]> = shallowRef([])
+  const _data: ShallowRef<T[]> = shallowRef([])
   const isComplex = ref(false)
   const _columns: Ref<TableColumnCtx<T>[]> = ref([])
   const originColumns: Ref<TableColumnCtx<T>[]> = ref([])
@@ -81,23 +97,32 @@ function useWatcher<T>() {
   const fixedLeafColumnsLength = ref(0)
   const rightFixedLeafColumnsLength = ref(0)
   const isAllSelected = ref(false)
-  const selection: Ref<T[]> = ref([])
+  const selection: ShallowRef<T[]> = shallowRef([])
   const reserveSelection = ref(false)
   const selectOnIndeterminate = ref(false)
-  const selectable: Ref<(row: T, index: number) => boolean> = ref(null)
+  const selectable: Ref<((row: T, index: number) => boolean) | null> = ref(null)
   const filters: Ref<StoreFilter> = ref({})
-  const filteredData = ref(null)
+  const filteredData: ShallowRef<T[]> = shallowRef([])
+  const filteredRowIndices: ShallowRef<Uint32Array | null> = shallowRef(null)
+  const sortedRowIndices: ShallowRef<Uint32Array | null> = shallowRef(null)
   const wasmSortController = createWasmSortController(String(instance.uid))
   let sortGeneration = 0
   let disposed = false
-  const sortingColumn = ref(null)
-  const sortProp = ref(null)
-  const sortOrder = ref(null)
-  const hoverRow = ref(null)
-
-  watch(data, () => instance.state && scheduleLayout(false), {
-    deep: true,
+  const sortingColumn: Ref<TableColumnCtx<T> | null> = ref(null)
+  const sortProp: Ref<string | null> = ref(null)
+  const sortOrder: Ref<'ascending' | 'descending' | null> = ref(null)
+  const hoverRow: Ref<T | null> = ref(null)
+  const selectedRows = new Map<unknown, T>()
+  const pendingLayoutReasons = new Set<TableLayoutReason>()
+  const layoutDiagnostics = shallowRef<TableLayoutDiagnostics>({
+    flushCount: 0,
+    lastFlushedAt: 0,
+    lastReasons: [],
+    pendingReasons: [],
   })
+  let layoutFlushPending = false
+  let pendingColumnUpdate = false
+  let pendingImmediateLayout = false
 
   // 检查 rowKey 是否存在
   const assertRowKey = () => {
@@ -134,10 +159,11 @@ function useWatcher<T>() {
     }
 
     const notFixedColumns = _columns.value.filter((column) => !column.fixed)
-    originColumns.value = []
-      .concat(fixedColumns.value)
-      .concat(notFixedColumns)
-      .concat(rightFixedColumns.value)
+    originColumns.value = [
+      ...fixedColumns.value,
+      ...notFixedColumns,
+      ...rightFixedColumns.value,
+    ]
     const leafColumns = doFlattenColumns(notFixedColumns)
     const fixedLeafColumns = doFlattenColumns(fixedColumns.value)
     const rightFixedLeafColumns = doFlattenColumns(rightFixedColumns.value)
@@ -146,63 +172,114 @@ function useWatcher<T>() {
     fixedLeafColumnsLength.value = fixedLeafColumns.length
     rightFixedLeafColumnsLength.value = rightFixedLeafColumns.length
 
-    columns.value = []
-      .concat(fixedLeafColumns)
-      .concat(leafColumns)
-      .concat(rightFixedLeafColumns)
+    columns.value = [
+      ...fixedLeafColumns,
+      ...leafColumns,
+      ...rightFixedLeafColumns,
+    ]
     isComplex.value =
       fixedColumns.value.length > 0 || rightFixedColumns.value.length > 0
   }
 
   // 更新 DOM
-  const scheduleLayout = (needUpdateColumns?: boolean, immediate = false) => {
-    if (needUpdateColumns) {
-      updateColumns()
-    }
-    if (immediate) {
-      instance.state.doLayout()
-    } else {
-      instance.state.debouncedUpdateLayout()
+  const recordLayoutReason = (reason: TableLayoutReason = 'unknown') => {
+    pendingLayoutReasons.add(reason)
+    layoutDiagnostics.value = {
+      ...layoutDiagnostics.value,
+      pendingReasons: [...pendingLayoutReasons],
     }
   }
 
-  // 选择
-  const isSelected = (row) => {
-    return selection.value.includes(row)
+  const flushLayout = () => {
+    layoutFlushPending = false
+    if (disposed || !instance.state) return
+    const reasons = [...pendingLayoutReasons]
+    pendingLayoutReasons.clear()
+    if (pendingColumnUpdate) updateColumns()
+    pendingColumnUpdate = false
+    const immediate = pendingImmediateLayout
+    pendingImmediateLayout = false
+    layoutDiagnostics.value = {
+      flushCount: layoutDiagnostics.value.flushCount + 1,
+      lastFlushedAt:
+        typeof performance === 'undefined' ? Date.now() : performance.now(),
+      lastReasons: reasons,
+      pendingReasons: [],
+    }
+    if (immediate) instance.state.doLayout()
+    else instance.state.debouncedUpdateLayout()
   }
+
+  const scheduleLayout = (
+    needUpdateColumns = false,
+    immediate = false,
+    reason: TableLayoutReason = 'unknown',
+  ) => {
+    recordLayoutReason(reason)
+    pendingColumnUpdate ||= needUpdateColumns
+    pendingImmediateLayout ||= immediate
+    if (layoutFlushPending) return
+    layoutFlushPending = true
+    queueMicrotask(flushLayout)
+  }
+
+  // 选择：内部使用稳定 key Map，只有事件/API 边界才 materialize 数组。
+  const selectionKey = (row: T) =>
+    rowKey.value ? getRowIdentity(row, rowKey.value) : row
+
+  const syncSelectionSnapshot = () => {
+    selection.value = [...selectedRows.values()]
+    return selection.value
+  }
+
+  const rebuildSelectionIndex = () => {
+    const rows = selection.value
+    selectedRows.clear()
+    rows.forEach((row) => selectedRows.set(selectionKey(row), row))
+  }
+
+  const setRowSelected = (row: T, selected?: boolean) => {
+    const current = selectedRows.has(selectionKey(row))
+    const next = selected === undefined ? !current : selected
+    let changed = false
+    const visit = (item: T) => {
+      const key = selectionKey(item)
+      const included = selectedRows.has(key)
+      if (included !== next) {
+        if (next) selectedRows.set(key, item)
+        else selectedRows.delete(key)
+        changed = true
+      }
+      const children = (item as T & { children?: T[] }).children
+      children?.forEach(visit)
+    }
+    visit(row)
+    return changed
+  }
+
+  const isSelected = (row: T) => selectedRows.has(selectionKey(row))
 
   const clearSelection = () => {
     isAllSelected.value = false
-    const oldSelection = selection.value
-    if (oldSelection.length) {
-      selection.value = []
+    if (selectedRows.size) {
+      selectedRows.clear()
+      syncSelectionSnapshot()
       instance.emit('selection-change', [])
     }
   }
 
   const cleanSelection = () => {
-    let deleted
-    if (rowKey.value) {
-      deleted = []
-      const selectedMap = getKeysMap(selection.value, rowKey.value)
-      const dataMap = getKeysMap(data.value, rowKey.value)
-      for (const key in selectedMap) {
-        if (hasOwn(selectedMap, key) && !dataMap[key]) {
-          deleted.push(selectedMap[key].row)
-        }
+    const available = new Set<unknown>(data.value.map(selectionKey))
+    let changed = false
+    for (const key of selectedRows.keys()) {
+      if (!available.has(key)) {
+        selectedRows.delete(key)
+        changed = true
       }
-    } else {
-      const dataSet = new Set(data.value)
-      deleted = selection.value.filter((item) => !dataSet.has(item))
     }
-    if (deleted.length) {
-      const deletedSet = new Set(deleted)
-      const newSelection = selection.value.filter(
-        (item) => !deletedSet.has(item),
-      )
-      selection.value = newSelection
-      instance.emit('selection-change', newSelection.slice())
-    }
+    if (!changed) return
+    const snapshot = syncSelectionSnapshot()
+    instance.emit('selection-change', snapshot.slice())
   }
 
   const getSelectionRows = () => {
@@ -214,9 +291,9 @@ function useWatcher<T>() {
     selected = undefined,
     emitChange = true,
   ) => {
-    const changed = toggleRowStatus(selection.value, row, selected)
+    const changed = setRowSelected(row, selected)
     if (changed) {
-      const newSelection = (selection.value || []).slice()
+      const newSelection = syncSelectionSnapshot().slice()
       // 调用 API 修改选中值，不触发 select 事件
       if (emitChange) {
         instance.emit('select', newSelection, row)
@@ -230,51 +307,48 @@ function useWatcher<T>() {
     // depending on the value of selectOnIndeterminate
     const value = selectOnIndeterminate.value
       ? !isAllSelected.value
-      : !(isAllSelected.value || selection.value.length)
+      : !(isAllSelected.value || selectedRows.size)
     isAllSelected.value = value
 
     let selectionChanged = false
     let childrenCount = 0
-    const rowKey = instance?.store?.states?.rowKey.value
+    const selectionRowKey = rowKey.value
     const childrenCountCache = new Map<string, number>()
     data.value.forEach((row, index) => {
       const rowIndex = index + childrenCount
       if (selectable.value) {
         if (
           selectable.value.call(null, row, rowIndex) &&
-          toggleRowStatus(selection.value, row, value)
+          setRowSelected(row, value)
         ) {
           selectionChanged = true
         }
       } else {
-        if (toggleRowStatus(selection.value, row, value)) {
+        if (setRowSelected(row, value)) {
           selectionChanged = true
         }
       }
-      childrenCount += getChildrenCount(
-        getRowIdentity(row, rowKey),
-        childrenCountCache,
-      )
+      if (selectionRowKey) {
+        childrenCount += getChildrenCount(
+          getRowIdentity(row, selectionRowKey),
+          childrenCountCache,
+        )
+      }
     })
 
     if (selectionChanged) {
-      instance.emit(
-        'selection-change',
-        selection.value ? selection.value.slice() : [],
-      )
+      syncSelectionSnapshot()
+      instance.emit('selection-change', selection.value.slice())
     }
-    instance.emit('select-all', selection.value)
+    instance.emit('select-all', selection.value.slice())
   }
 
   const updateSelectionByRowKey = () => {
-    const selectedMap = getKeysMap(selection.value, rowKey.value)
     data.value.forEach((row) => {
-      const rowId = getRowIdentity(row, rowKey.value)
-      const rowInfo = selectedMap[rowId]
-      if (rowInfo) {
-        selection.value[rowInfo.index] = row
-      }
+      const rowId = selectionKey(row)
+      if (selectedRows.has(rowId)) selectedRows.set(rowId, row)
     })
+    syncSelectionSnapshot()
   }
 
   const updateAllSelected = () => {
@@ -284,24 +358,10 @@ function useWatcher<T>() {
       return
     }
 
-    let selectedMap
-    let selectionSet
-    if (rowKey.value) {
-      selectedMap = getKeysMap(selection.value, rowKey.value)
-    } else {
-      selectionSet = new Set(selection.value)
-    }
-    const isSelected = function (row) {
-      if (selectedMap) {
-        return !!selectedMap[getRowIdentity(row, rowKey.value)]
-      } else {
-        return selectionSet.has(row)
-      }
-    }
     let isAllSelected_ = true
     let selectedCount = 0
     let childrenCount = 0
-    const keyProp = instance?.store?.states?.rowKey.value
+    const keyProp = rowKey.value
     const childrenCountCache = new Map<string, number>()
     for (let i = 0, j = (data.value || []).length; i < j; i++) {
       const rowIndex = i + childrenCount
@@ -316,10 +376,12 @@ function useWatcher<T>() {
       } else {
         selectedCount++
       }
-      childrenCount += getChildrenCount(
-        getRowIdentity(item, keyProp),
-        childrenCountCache,
-      )
+      if (keyProp) {
+        childrenCount += getChildrenCount(
+          getRowIdentity(item, keyProp),
+          childrenCountCache,
+        )
+      }
     }
 
     if (selectedCount === 0) isAllSelected_ = false
@@ -344,7 +406,7 @@ function useWatcher<T>() {
     const children = treeData.value[rowKey]?.children
     if (children) {
       count += children.length
-      children.forEach((childKey) => {
+      children.forEach((childKey: string) => {
         count += getChildrenCount(childKey, cache)
       })
     }
@@ -353,11 +415,14 @@ function useWatcher<T>() {
   }
 
   // 过滤与排序
-  const updateFilters = (columns, values) => {
+  const updateFilters = (
+    columns: TableColumnCtx<T> | TableColumnCtx<T>[],
+    values: string[],
+  ) => {
     if (!Array.isArray(columns)) {
       columns = [columns]
     }
-    const filters_ = {}
+    const filters_: StoreFilter = {}
     columns.forEach((col) => {
       filters.value[col.id] = values
       filters_[col.columnKey || col.id] = values
@@ -365,9 +430,13 @@ function useWatcher<T>() {
     return filters_
   }
 
-  const updateSort = (column, prop, order) => {
+  const updateSort = (
+    column: TableColumnCtx<T> | null,
+    prop: string | null,
+    order: 'ascending' | 'descending' | null,
+  ) => {
     if (sortingColumn.value && sortingColumn.value !== column) {
-      sortingColumn.value.order = null
+      sortingColumn.value.order = ''
     }
     sortingColumn.value = column
     sortProp.value = prop
@@ -385,25 +454,42 @@ function useWatcher<T>() {
           },
           columnId,
         )
-        return column && column.filterMethod ? { column, values } : null
+        return typeof column?.filterMethod === 'function'
+          ? { column, values }
+          : null
       })
-      .filter(Boolean)
+      .filter(
+        (item): item is { column: TableColumnCtx<T>; values: string[] } =>
+          item !== null,
+      )
 
     if (activeFilters.length === 0) {
+      filteredRowIndices.value = null
       filteredData.value = unref(_data)
       return
     }
 
-    filteredData.value = unref(_data).filter((row) =>
-      activeFilters.every(({ column, values }) =>
-        values.some((value) =>
-          column.filterMethod.call(null, value, row, column),
-        ),
-      ),
+    const source = unref(_data)
+    const matches: number[] = []
+    source.forEach((row, index) => {
+      if (
+        activeFilters.every(({ column, values }) =>
+          values.some((value) =>
+            column.filterMethod.call(null, value, row, column),
+          ),
+        )
+      ) {
+        matches.push(index)
+      }
+    })
+    filteredRowIndices.value = Uint32Array.from(matches)
+    filteredData.value = Array.from(
+      filteredRowIndices.value,
+      (index) => source[index],
     )
   }
 
-  const execSort = () => {
+  const execSort = (layoutReason: TableLayoutReason = 'sort') => {
     const source = filteredData.value
     const states = {
       sortingColumn: sortingColumn.value,
@@ -414,21 +500,38 @@ function useWatcher<T>() {
     if (!shouldUseWasm(source, states.sortingColumn)) {
       wasmSortController.cancel()
       data.value = sortData(source, states)
+      sortedRowIndices.value =
+        states.sortingColumn === null ? filteredRowIndices.value : null
+      scheduleLayout(false, false, layoutReason)
       return
     }
 
     const ascending = states.sortOrder !== 'descending'
+    const filteredIndices = filteredRowIndices.value
     void wasmSortController
-      .sort(source, states.sortProp, ascending)
+      .sort(
+        source as unknown as Record<string, unknown>[],
+        states.sortProp ?? '',
+        ascending,
+      )
       .then((view) => {
         if (disposed || generation !== sortGeneration) return
-        data.value = view ? view.materialize() : sortData(source, states)
-        scheduleLayout(false)
+        if (view) {
+          data.value = view.materialize() as unknown as T[]
+          sortedRowIndices.value = filteredIndices
+            ? Uint32Array.from(view.indices, (index) => filteredIndices[index]!)
+            : view.indices
+        } else {
+          data.value = sortData(source, states)
+          sortedRowIndices.value = null
+        }
+        scheduleLayout(false, false, layoutReason)
       })
       .catch(() => {
         if (disposed || generation !== sortGeneration) return
         data.value = sortData(source, states)
-        scheduleLayout(false)
+        sortedRowIndices.value = null
+        scheduleLayout(false, false, layoutReason)
       })
   }
 
@@ -439,14 +542,17 @@ function useWatcher<T>() {
   })
 
   // 根据 filters 与 sort 去过滤 data
-  const execQuery = (ignore = undefined) => {
+  const execQuery = (
+    ignore: { filter?: boolean } | undefined = undefined,
+    layoutReason: TableLayoutReason = ignore?.filter ? 'sort' : 'filter',
+  ) => {
     if (!(ignore && ignore.filter)) {
       execFilter()
     }
-    execSort()
+    execSort(layoutReason)
   }
 
-  const clearFilter = (columnKeys) => {
+  const clearFilter = (columnKeys?: string | string[]) => {
     const { tableHeaderRef } = instance.refs as TableRefs
     if (!tableHeaderRef) return
     const panels = Object.assign({}, tableHeaderRef.filterPanels)
@@ -514,16 +620,32 @@ function useWatcher<T>() {
     data,
     rowKey,
   })
+  type TreeWatcher = {
+    updateTreeExpandKeys: (value: string[]) => void
+    toggleTreeExpansion: (row: T, expanded?: boolean) => void
+    updateTreeData: (
+      ifChangeExpandRowKeys?: boolean,
+      ifExpandAll?: boolean,
+    ) => void
+    loadOrToggle: (row: T) => void
+    states: {
+      expandRowKeys: Ref<string[]>
+      treeData: Ref<Record<string, { children?: string[] }>>
+      hasTreeData: Ref<boolean>
+      indent: Ref<number>
+      lazy: Ref<boolean>
+      lazyTreeNodeMap: Ref<Record<string, T[]>>
+      lazyColumnIdentifier: Ref<string>
+      childrenColumnName: Ref<string>
+    }
+  }
   const {
     updateTreeExpandKeys,
     toggleTreeExpansion,
     updateTreeData,
     loadOrToggle,
     states: treeStates,
-  } = useTree({
-    data,
-    rowKey,
-  })
+  } = useTree({ data, rowKey }) as unknown as TreeWatcher
   const {
     updateCurrentRowData,
     updateCurrentRow,
@@ -554,6 +676,12 @@ function useWatcher<T>() {
     assertRowKey,
     updateColumns,
     scheduleLayout,
+    recordLayoutReason,
+    getLayoutDiagnostics: () => ({
+      ...layoutDiagnostics.value,
+      lastReasons: [...layoutDiagnostics.value.lastReasons],
+      pendingReasons: [...layoutDiagnostics.value.pendingReasons],
+    }),
     isSelected,
     clearSelection,
     cleanSelection,
@@ -562,6 +690,7 @@ function useWatcher<T>() {
     _toggleAllSelection,
     toggleAllSelection: null,
     updateSelectionByRowKey,
+    rebuildSelectionIndex,
     updateAllSelected,
     updateFilters,
     updateCurrentRow,
@@ -605,6 +734,9 @@ function useWatcher<T>() {
       selectable,
       filters,
       filteredData,
+      filteredRowIndices,
+      sortedRowIndices,
+      layoutDiagnostics,
       sortingColumn,
       sortProp,
       sortOrder,

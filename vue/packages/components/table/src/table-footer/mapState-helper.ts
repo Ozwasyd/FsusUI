@@ -3,7 +3,10 @@ import { TABLE_INJECTION_KEY } from '../tokens'
 
 function useMapState() {
   const table = inject(TABLE_INJECTION_KEY)
-  const store = table?.store
+  if (!table) {
+    throw new Error('[ElTableFooter] missing table context')
+  }
+  const store = table.store
   const leftFixedLeafCount = computed(() => {
     return store.states.fixedLeafColumnsLength.value
   })

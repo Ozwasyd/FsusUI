@@ -1,20 +1,22 @@
 // @ts-nocheck
-import { getCurrentInstance, nextTick, unref } from 'vue'
+import { getCurrentInstance, nextTick, toRaw, triggerRef, unref } from 'vue'
 import { useNamespace } from '@element-plus/hooks'
 import useWatcher from './watcher'
 
 import type { Ref } from 'vue'
 import type { TableColumnCtx } from '../table-column/defaults'
-import type { Filter, Sort, Table } from '../table/defaults'
+import type { Filter, Sort, Table, TableProps } from '../table/defaults'
+import type { TableDataChangeStrategy } from '../table/defaults'
+import type { TableLayoutReason } from './watcher'
 
 interface WatcherPropsData<T> {
   data: Ref<T[]>
-  rowKey: Ref<string>
+  rowKey: Ref<TableProps<T>['rowKey'] | null>
 }
 
 function replaceColumn<T>(
   array: TableColumnCtx<T>[],
-  column: TableColumnCtx<T>
+  column: TableColumnCtx<T>,
 ) {
   return array.map((item) => {
     if (item.id === column.id) {
@@ -42,17 +44,29 @@ function useStore<T>() {
   const ns = useNamespace('table')
   type StoreStates = typeof watcher.states
   const mutations = {
-    setData(states: StoreStates, data: T[]) {
-      const dataInstanceChanged = unref(states._data) !== data
-      states.data.value = data
-      states._data.value = data
-      instance.store.execQuery()
+    setData(
+      states: StoreStates,
+      data: T[],
+      options: {
+        reason?: TableLayoutReason
+        strategy?: TableDataChangeStrategy
+      } = {},
+    ) {
+      const nextData = options.strategy === 'deep' ? data : toRaw(data)
+      const dataInstanceChanged = unref(states._data) !== nextData
+      states.data.value = nextData
+      states._data.value = nextData
+      if (!dataInstanceChanged) {
+        triggerRef(states.data)
+        triggerRef(states._data)
+      }
+      instance.store.execQuery(undefined, options.reason ?? 'unknown')
       // 数据变化，更新部分数据。
       // 没有使用 computed，而是手动更新部分数据 https://github.com/vuejs/vue/issues/6660#issuecomment-331417140
       instance.store.updateCurrentRowData()
       instance.store.updateExpandRows()
       instance.store.updateTreeData(
-        instance.store.states.defaultExpandAll.value
+        instance.store.states.defaultExpandAll.value,
       )
       if (unref(states.reserveSelection)) {
         instance.store.assertRowKey()
@@ -66,7 +80,7 @@ function useStore<T>() {
       }
       instance.store.updateAllSelected()
       if (instance.$ready) {
-        instance.store.scheduleLayout()
+        instance.store.scheduleLayout(false, false, options.reason ?? 'unknown')
       }
     },
 
@@ -74,7 +88,7 @@ function useStore<T>() {
       states: StoreStates,
       column: TableColumnCtx<T>,
       parent: TableColumnCtx<T>,
-      updateColumnOrder: () => void
+      updateColumnOrder: () => void,
     ) {
       const array = unref(states._columns)
       let newColumns = []
@@ -97,7 +111,7 @@ function useStore<T>() {
       }
       if (instance.$ready) {
         instance.store.updateColumns() // hack for dynamics insert column
-        instance.store.scheduleLayout()
+        instance.store.scheduleLayout(false, false, 'columns')
       }
     },
 
@@ -116,13 +130,13 @@ function useStore<T>() {
       states: StoreStates,
       column: TableColumnCtx<T>,
       parent: TableColumnCtx<T>,
-      updateColumnOrder: () => void
+      updateColumnOrder: () => void,
     ) {
       const array = unref(states._columns) || []
       if (parent) {
         parent.children.splice(
           parent.children.findIndex((item) => item.id === column.id),
-          1
+          1,
         )
         // fix #10699, delete parent.children immediately will trigger again
         nextTick(() => {
@@ -144,7 +158,7 @@ function useStore<T>() {
 
       if (instance.$ready) {
         instance.store.updateColumns() // hack for dynamics remove column
-        instance.store.scheduleLayout()
+        instance.store.scheduleLayout(false, false, 'columns')
       }
     },
 
@@ -152,7 +166,7 @@ function useStore<T>() {
       const { prop, order, init } = options
       if (prop) {
         const column = unref(states.columns).find(
-          (column) => column.property === prop
+          (column) => column.property === prop,
         )
         if (column) {
           column.order = order

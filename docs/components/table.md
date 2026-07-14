@@ -24,6 +24,31 @@ WASM memory growth 后旧 TypedArray view 会失效，因此实现只持久化 p
 
 > 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
 
+## 大数据变更策略
+
+`data-change-strategy` 明确 Table 何时接收消费者的数据变化：
+
+| 策略       | 刷新条件                      | 适用场景                                    |
+| ---------- | ----------------------------- | ------------------------------------------- |
+| `identity` | `data` 数组 identity 改变     | 推荐的大数据默认写法；更新后替换数组        |
+| `version`  | `data-version` 改变           | 数据容器稳定、由 store/reducer 提交显式版本 |
+| `manual`   | 调用 Table 实例的 `refresh()` | 批处理、外部缓存或事务式提交                |
+| `deep`     | 数组或任意嵌套行字段改变      | 兼容旧行为；仍是当前默认值                  |
+
+`deep` 保持为默认值是为了避免现有应用在升级后静默停止刷新；新建的大数据页面应显式选择 `identity`。`identity`、`version` 和 `manual` 使用 shallow/raw 边界，不订阅全部行对象。纯内容提交不会重算列结构，同一 microtask 内的重复提交只形成一次 layout batch。
+
+```vue
+<el-table
+  ref="table"
+  :data="rows"
+  data-change-strategy="version"
+  :data-version="rowsVersion"
+  row-key="id"
+/>
+```
+
+排序和筛选内部保存 `Uint32Array` row index view；selection 使用 `row-key` Map。`selection-change`、`getSelectionRows()` 等公共边界仍返回行对象数组。`getLayoutDiagnostics()` 返回最近一次 layout 的 `lastReasons`、待处理 reason 和 flush 次数，可区分 `data-*`、`sort`、`filter`、`columns` 与 `container-resize`。
+
 ---
 
 ## 基础用法
@@ -89,6 +114,8 @@ WASM memory growth 后旧 TypedArray view 会失效，因此实现只持久化 p
 | 属性名                | 说明                                         | 类型                                                                                 | 默认值                                                                       |
 | --------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
 | data                  | 表格数据                                     | `any[]`                                                                              | `[]`                                                                         |
+| data-change-strategy  | 数据变化提交策略                             | `'identity' \| 'version' \| 'manual' \| 'deep'`                                      | `deep`                                                                       |
+| data-version          | `version` 策略的显式版本                     | `string \| number`                                                                   | —                                                                            |
 | height                | 表格高度（数字为 px，字符串赋给 CSS height） | `string \| number`                                                                   | —                                                                            |
 | max-height            | 最大高度                                     | `string \| number`                                                                   | —                                                                            |
 | stripe                | 是否有斑马纹                                 | `boolean`                                                                            | `false`                                                                      |
@@ -145,21 +172,23 @@ WASM memory growth 后旧 TypedArray view 会失效，因此实现只持久化 p
 
 ### Table Exposes
 
-| 名称               | 说明                 | 类型                                          |
-| ------------------ | -------------------- | --------------------------------------------- |
-| clearSelection     | 清空选中状态（多选） | `() => void`                                  |
-| getSelectionRows   | 获取当前选中行       | `() => any[]`                                 |
-| toggleRowSelection | 切换某行选中状态     | `(row, selected?, ignoreSelectable?) => void` |
-| toggleAllSelection | 切换全选/全不选      | `() => void`                                  |
-| toggleRowExpansion | 切换某行展开状态     | `(row, expanded?) => void`                    |
-| setCurrentRow      | 设置当前行（单选）   | `(row) => void`                               |
-| clearSort          | 清除排序             | `() => void`                                  |
-| clearFilter        | 清除筛选             | `(columnKeys?) => void`                       |
-| doLayout           | 刷新布局             | `() => void`                                  |
-| sort               | 手动排序             | `(prop, order) => void`                       |
-| scrollTo           | 滚动到指定位置       | `(options, yCoord?) => void`                  |
-| setScrollTop       | 设置垂直滚动位置     | `(top?) => void`                              |
-| setScrollLeft      | 设置水平滚动位置     | `(left?) => void`                             |
+| 名称                 | 说明                           | 类型                                          |
+| -------------------- | ------------------------------ | --------------------------------------------- |
+| clearSelection       | 清空选中状态（多选）           | `() => void`                                  |
+| getSelectionRows     | 获取当前选中行                 | `() => any[]`                                 |
+| toggleRowSelection   | 切换某行选中状态               | `(row, selected?, ignoreSelectable?) => void` |
+| toggleAllSelection   | 切换全选/全不选                | `() => void`                                  |
+| toggleRowExpansion   | 切换某行展开状态               | `(row, expanded?) => void`                    |
+| setCurrentRow        | 设置当前行（单选）             | `(row) => void`                               |
+| clearSort            | 清除排序                       | `() => void`                                  |
+| clearFilter          | 清除筛选                       | `(columnKeys?) => void`                       |
+| doLayout             | 刷新布局                       | `() => void`                                  |
+| sort                 | 手动排序                       | `(prop, order) => void`                       |
+| scrollTo             | 滚动到指定位置                 | `(options, yCoord?) => void`                  |
+| setScrollTop         | 设置垂直滚动位置               | `(top?) => void`                              |
+| setScrollLeft        | 设置水平滚动位置               | `(left?) => void`                             |
+| refresh              | 提交 `manual` 策略的数据更新   | `() => void`                                  |
+| getLayoutDiagnostics | 获取最近 layout 合并原因与次数 | `() => TableLayoutDiagnostics`                |
 
 ---
 

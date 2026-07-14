@@ -52,6 +52,14 @@ On the #189 development machine (8 visible logical cores, Chromium 149), the aud
 
 The native 100K smoke additionally compares semantic results, not only timings: stable number indices matched JS exactly (105.33 ms JS / 31.61 ms WASM in the recorded run), and a narrowed hot query reused persistent buffers (9.13 ms cold / 1.60 ms hot). Re-run `pnpm perf:wasm` on the target machine instead of treating these values as universal thresholds.
 
+Table data-change dependency tracking has a separate reproducible 100K benchmark so it does not share or perturb the Markdown/browser fixtures:
+
+```bash
+node scripts/table-data-change-performance.mjs --size 100000 --samples 7 --output .tmp/performance/table-data-change.json
+```
+
+It uses real Vue `watch`/`ref`/`shallowRef` boundaries with synchronous commits and compares a nested mutation under `deep` against prebuilt identity replacement and an explicit version commit. On the #190 development machine (8 visible logical cores, Node 24.16), the recorded 100K run measured deep setup at 3511.1 ms and update p95 at 3561.8 ms; identity update p95 was 0.227 ms and version update p95 was 0.136 ms. The script validates semantic callback counts and requires both explicit paths to reduce same-process p95 by at least 50%; the local values are evidence, not portable budgets.
+
 The scheduler pair can be reproduced without rerunning the rest of the matrix:
 
 ```bash

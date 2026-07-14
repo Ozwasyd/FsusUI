@@ -17,7 +17,7 @@ function useEvent<T>(props: TableHeaderProps<T>, emit) {
   let layoutFrame = 0
   const scheduleLayoutAfterResize = () => {
     if (typeof requestAnimationFrame !== 'function') {
-      props.store.scheduleLayout(false, true)
+      props.store.scheduleLayout(false, true, 'columns')
       return
     }
 
@@ -26,7 +26,7 @@ function useEvent<T>(props: TableHeaderProps<T>, emit) {
     }
     layoutFrame = requestAnimationFrame(() => {
       layoutFrame = 0
-      props.store.scheduleLayout(false, true)
+      props.store.scheduleLayout(false, true, 'columns')
     })
   }
 

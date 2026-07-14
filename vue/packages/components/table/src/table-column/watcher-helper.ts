@@ -14,7 +14,7 @@ function getAllAliases(props, aliases) {
 }
 function useWatcher<T>(
   owner: ComputedRef<any>,
-  props_: Partial<TableColumnCtx<T>>
+  props_: Partial<TableColumnCtx<T>>,
 ) {
   const instance = getCurrentInstance() as TableColumn<T>
   const registerComplexWatchers = () => {
@@ -40,8 +40,12 @@ function useWatcher<T>(
             instance.columnConfig.value[columnKey as any] = value
             instance.columnConfig.value[key] = value
             const updateColumns = columnKey === 'fixed'
-            owner.value.store.scheduleLayout(updateColumns)
-          }
+            owner.value.store.scheduleLayout(
+              updateColumns,
+              false,
+              updateColumns ? 'columns' : 'unknown',
+            )
+          },
         )
       }
     })
@@ -72,7 +76,7 @@ function useWatcher<T>(
           () => props_[columnKey],
           (newVal) => {
             instance.columnConfig.value[key] = newVal
-          }
+          },
         )
       }
     })

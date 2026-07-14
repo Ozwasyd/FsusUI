@@ -45,7 +45,7 @@ function proxyTableProps<T>(store: Store<T>, props: TableProps<T>) {
       () => getArrKeysValue(props, key),
       (value) => {
         handleValue(value, key, store)
-      }
+      },
     )
   })
 }
@@ -58,6 +58,7 @@ function handleValue<T>(value, propsKey: string, store: Store<T>) {
     newVal = newVal || InitialStateMap[propsKey].default
   }
   store.states[storeKey].value = newVal
+  if (storeKey === 'rowKey') store.rebuildSelectionIndex()
 }
 
 function getArrKeysValue<T>(props: TableProps<T>, keys: string) {
