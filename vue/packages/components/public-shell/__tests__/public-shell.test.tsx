@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
-import { nextTick } from 'vue'
+import { h, nextTick } from 'vue'
+import { renderToString } from '@vue/server-renderer'
 import { describe, expect, test, vi } from 'vitest'
 import PublicShell from '../src/public-shell.vue'
 
@@ -9,6 +10,23 @@ const navItems = [
 ]
 
 describe('PublicShell.vue', () => {
+  test('keeps the native menu panel available before hydration for no-JavaScript details', async () => {
+    const html = await renderToString(
+      h(PublicShell, {
+        brand: 'Fsus',
+        navItems,
+        mobileNavMode: 'menu',
+      }),
+    )
+
+    expect(html).toContain('<details')
+    expect(html).toContain('el-public-shell__mobile-nav-menu-panel')
+    expect(html).not.toMatch(
+      /mobile-nav-menu-panel[^>]*style="[^"]*display:\s*none/u,
+    )
+    expect(html).not.toMatch(/mobile-nav-menu-panel[^>]*aria-hidden/u)
+  })
+
   test('renders SSR-stable desktop navigation and the default native mobile menu', () => {
     const wrapper = mount(() => (
       <PublicShell brand="Fsus" navItems={navItems} activeNav="archive" />
@@ -268,17 +286,22 @@ describe('PublicShell.vue', () => {
         mobileNavMode: 'menu',
       },
       slots: {
-        'mobile-menu-actions': '<div data-test="menu-actions">Theme and account</div>',
+        'mobile-menu-actions':
+          '<div data-test="menu-actions">Theme and account</div>',
       },
     })
-    const details = wrapper.find<HTMLDetailsElement>('.el-public-shell__mobile-nav-menu')
+    const details = wrapper.find<HTMLDetailsElement>(
+      '.el-public-shell__mobile-nav-menu',
+    )
     const trigger = wrapper.find<HTMLElement>('[data-mobile-nav-menu-trigger]')
-    const panel = wrapper.find<HTMLElement>('.el-public-shell__mobile-nav-menu-panel')
+    const panel = wrapper.find<HTMLElement>(
+      '.el-public-shell__mobile-nav-menu-panel',
+    )
 
+    await nextTick()
     expect(panel.attributes('style')).toContain('display: none')
 
-    details.element.open = true
-    await details.trigger('toggle')
+    await trigger.trigger('click', { button: 0 })
     expect(trigger.attributes('aria-expanded')).toBe('true')
     expect(panel.attributes('style') ?? '').not.toContain('display: none')
     expect(details.find('[data-test="menu-actions"]').exists()).toBe(true)
@@ -290,13 +313,139 @@ describe('PublicShell.vue', () => {
     ).toBe(true)
 
     await details.trigger('keydown', { key: 'Escape' })
-    await nextTick()
 
-    expect(details.element.open).toBe(false)
+    expect(details.element.open).toBe(true)
+    expect(details.classes()).toContain('is-closing')
+    expect(trigger.attributes('aria-expanded')).toBe('false')
+    expect(panel.attributes('aria-hidden')).toBe('true')
+    expect(panel.attributes()).toHaveProperty('inert')
+
+    await vi.waitFor(() => expect(details.element.open).toBe(false))
+
     expect(trigger.attributes('aria-expanded')).toBe('false')
     expect(panel.attributes('style')).toContain('display: none')
     expect(document.activeElement).toBe(trigger.element)
     wrapper.unmount()
+  })
+
+  test('keeps details open through leave and safely reverses a rapid close', async () => {
+    const wrapper = mount(PublicShell, {
+      props: {
+        brand: 'Fsus',
+        navItems,
+        mobileNavMode: 'menu',
+      },
+    })
+    const details = wrapper.find<HTMLDetailsElement>(
+      '.el-public-shell__mobile-nav-menu',
+    )
+    const trigger = wrapper.find<HTMLElement>('[data-mobile-nav-menu-trigger]')
+    const panel = wrapper.find<HTMLElement>(
+      '.el-public-shell__mobile-nav-menu-panel',
+    )
+
+    await nextTick()
+    await trigger.trigger('click', { button: 0 })
+    await trigger.trigger('click', { button: 0 })
+
+    expect(details.element.open).toBe(true)
+    expect(details.classes()).toContain('is-closing')
+    expect(trigger.attributes('aria-expanded')).toBe('false')
+
+    await trigger.trigger('click', { button: 0 })
+    await nextTick()
+
+    expect(details.element.open).toBe(true)
+    expect(details.classes()).not.toContain('is-closing')
+    expect(trigger.attributes('aria-expanded')).toBe('true')
+    expect(panel.attributes('aria-hidden')).toBeUndefined()
+    expect(panel.attributes('style') ?? '').not.toContain('display: none')
+  })
+
+  test('runs and completes the mobile menu enter lifecycle', async () => {
+    const wrapper = mount(PublicShell, {
+      props: {
+        brand: 'Fsus',
+        navItems,
+        mobileNavMode: 'menu',
+      },
+    })
+    const trigger = wrapper.find<HTMLElement>('[data-mobile-nav-menu-trigger]')
+    const panel = wrapper.find<HTMLElement>(
+      '.el-public-shell__mobile-nav-menu-panel',
+    )
+
+    await nextTick()
+    await trigger.trigger('click', { button: 0 })
+
+    expect(panel.classes()).toContain(
+      'el-public-shell-mobile-nav-menu-enter-active',
+    )
+    expect(panel.classes()).toContain(
+      'el-public-shell-mobile-nav-menu-enter-from',
+    )
+    await vi.waitFor(() => {
+      expect(panel.classes()).not.toContain(
+        'el-public-shell-mobile-nav-menu-enter-active',
+      )
+    })
+    expect(trigger.attributes('aria-expanded')).toBe('true')
+  })
+
+  test('closes the mobile menu through the shared navigation-link path', async () => {
+    const wrapper = mount(PublicShell, {
+      props: {
+        brand: 'Fsus',
+        navItems,
+        mobileNavMode: 'menu',
+      },
+    })
+    const details = wrapper.find<HTMLDetailsElement>(
+      '.el-public-shell__mobile-nav-menu',
+    )
+    const trigger = wrapper.find<HTMLElement>('[data-mobile-nav-menu-trigger]')
+
+    await nextTick()
+    await trigger.trigger('click', { button: 0 })
+    const link = wrapper.find<HTMLElement>('.el-public-shell__mobile-nav-link')
+    link.element.addEventListener('click', (event) => event.preventDefault(), {
+      once: true,
+    })
+    await link.trigger('click')
+
+    expect(details.element.open).toBe(true)
+    expect(details.classes()).toContain('is-closing')
+    expect(trigger.attributes('aria-expanded')).toBe('false')
+    await vi.waitFor(() => expect(details.element.open).toBe(false))
+  })
+
+  test('resets controlled menu state when switching to another mobile navigation mode', async () => {
+    const wrapper = mount(PublicShell, {
+      props: {
+        brand: 'Fsus',
+        navItems,
+        mobileNavMode: 'menu',
+      },
+    })
+    const trigger = wrapper.find<HTMLElement>('[data-mobile-nav-menu-trigger]')
+
+    await nextTick()
+    await trigger.trigger('click', { button: 0 })
+    expect(trigger.attributes('aria-expanded')).toBe('true')
+
+    await wrapper.setProps({ mobileNavMode: 'inline' })
+    expect(wrapper.find('.el-public-shell__mobile-nav-menu').exists()).toBe(false)
+    expect(wrapper.find('.el-public-shell__mobile-nav--inline').exists()).toBe(true)
+
+    await wrapper.setProps({ mobileNavMode: 'menu' })
+    const reopenedTrigger = wrapper.find<HTMLElement>('[data-mobile-nav-menu-trigger]')
+    await nextTick()
+    expect(reopenedTrigger.attributes('aria-expanded')).toBe('false')
+    expect(
+      wrapper
+        .find('.el-public-shell__mobile-nav-menu-panel')
+        .attributes('style'),
+    ).toContain('display: none')
   })
 
   test('renders default auth link in desktop and mobile primary actions', () => {

@@ -4,6 +4,8 @@
 
 `active-nav-motion="indicator"` 可为 desktop nav 启用组件自有的 active indicator。默认 `none` 保持原有静态 active 颜色和下划线；启用后 indicator 通过组件内部测量写入 CSS 变量，不要求业务侧使用 `:deep()` 覆盖内部 class，并在 `prefers-reduced-motion: reduce` 下取消移动过渡。移动端由 `mobile-nav-mode` 显式选择形态；只有 `bottom` 使用 `FsuBottomTabBar` 的固定底部 active indicator。
 
+`mobile-nav-mode="menu"` 保留原生 `<details>/<summary>` 的无 JavaScript 展开能力，并由组件内置可中断的 enter/leave motion。关闭时会先让面板完成轻量的 opacity/vertical transition，再清除 `open`；Escape 会在关闭完成后恢复 summary 焦点。`prefers-reduced-motion: reduce` 下状态立即完成且不产生位移。Consumer 不应通过 `:deep(.el-public-shell__*)` 覆写这些内部状态或复制 motion preset。
+
 需要测量 sticky header 的 consumer 使用稳定的 `[data-public-shell-header]` hook；
 不得把 `.el-public-shell__header` 等内部 BEM class 当成应用运行时 API。
 

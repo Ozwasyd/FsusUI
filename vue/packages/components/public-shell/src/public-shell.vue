@@ -93,7 +93,10 @@
         <details
           v-if="showMobileMenu"
           ref="mobileNavMenuRef"
-          :class="ns.e('mobile-nav-menu')"
+          :class="[
+            ns.e('mobile-nav-menu'),
+            ns.is('closing', mobileNavMenuClosing),
+          ]"
           @toggle="handleMobileNavMenuToggle"
           @keydown.esc="handleMobileNavMenuEscape"
         >
@@ -103,32 +106,40 @@
             role="button"
             :aria-expanded="mobileNavMenuExpanded"
             v-bind="{ 'data-mobile-nav-menu-trigger': '' }"
+            @click="handleMobileNavMenuTrigger"
           >
             {{ mobileNavMenuLabel }}
           </summary>
-          <nav
-            v-show="mobileNavMenuExpanded"
-            :class="ns.e('mobile-nav-menu-panel')"
-            :aria-label="mobileNavLabel"
+          <Transition
+            name="el-public-shell-mobile-nav-menu"
+            @after-leave="finishMobileNavMenuClose"
           >
-            <a
-              v-for="item in navItems"
-              :key="item.key"
-              :href="item.href"
-              :class="mobileNavLinkKls(item.key)"
-              :aria-current="item.key === activeNav ? 'page' : undefined"
-              v-bind="{ 'data-public-nav': item.key }"
-              @click="closeMobileNavMenu"
+            <nav
+              v-show="!mobileNavMenuHydrated || mobileNavMenuVisible"
+              :class="ns.e('mobile-nav-menu-panel')"
+              :aria-label="mobileNavLabel"
+              :aria-hidden="mobileNavMenuClosing ? 'true' : undefined"
+              :inert="mobileNavMenuClosing || undefined"
             >
-              {{ item.label }}
-            </a>
-            <div
-              v-if="$slots['mobile-menu-actions']"
-              :class="ns.e('mobile-nav-menu-actions')"
-            >
-              <slot name="mobile-menu-actions" />
-            </div>
-          </nav>
+              <a
+                v-for="item in navItems"
+                :key="item.key"
+                :href="item.href"
+                :class="mobileNavLinkKls(item.key)"
+                :aria-current="item.key === activeNav ? 'page' : undefined"
+                v-bind="{ 'data-public-nav': item.key }"
+                @click="closeMobileNavMenu()"
+              >
+                {{ item.label }}
+              </a>
+              <div
+                v-if="$slots['mobile-menu-actions']"
+                :class="ns.e('mobile-nav-menu-actions')"
+              >
+                <slot name="mobile-menu-actions" />
+              </div>
+            </nav>
+          </Transition>
         </details>
         <a
           v-if="showMobileSearchTrigger"
@@ -277,7 +288,16 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, useSlots, watch } from 'vue'
+import {
+  computed,
+  nextTick,
+  onBeforeMount,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  useSlots,
+  watch,
+} from 'vue'
 import { ElInput } from '@element-plus/components/input'
 import { ElSiteHeader } from '@element-plus/components/site-header'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
@@ -304,6 +324,10 @@ const desktopNavRef = ref<HTMLElement>()
 const mobileNavMenuRef = ref<HTMLDetailsElement>()
 const mobileNavMenuTriggerRef = ref<HTMLElement>()
 const mobileNavMenuExpanded = ref(false)
+const mobileNavMenuVisible = ref(false)
+const mobileNavMenuHydrated = ref(false)
+const mobileNavMenuClosing = ref(false)
+let restoreMobileNavMenuFocus = false
 const mobileSearchExpanded = ref(
   props.mobileSearchMode === 'trigger' && props.searchQuery.trim().length > 0,
 )
@@ -442,7 +466,15 @@ watch(
   { deep: true },
 )
 
+onBeforeMount(() => {
+  mobileNavMenuHydrated.value = true
+})
+
 onMounted(() => {
+  if (mobileNavMenuRef.value?.open) {
+    mobileNavMenuExpanded.value = true
+    mobileNavMenuVisible.value = true
+  }
   void syncNavIndicators()
   window.addEventListener('resize', handleIndicatorResize)
 })
@@ -509,22 +541,71 @@ const handleMobileSearchEscape = (event: KeyboardEvent) => {
 }
 
 const handleMobileNavMenuToggle = (event: Event) => {
-  mobileNavMenuExpanded.value = (event.currentTarget as HTMLDetailsElement).open
+  const open = (event.currentTarget as HTMLDetailsElement).open
+  if (open) {
+    if (!mobileNavMenuClosing.value) {
+      mobileNavMenuExpanded.value = true
+      mobileNavMenuVisible.value = true
+    }
+    return
+  }
+
+  mobileNavMenuExpanded.value = false
+  mobileNavMenuVisible.value = false
+  mobileNavMenuClosing.value = false
 }
 
-const closeMobileNavMenu = () => {
-  if (mobileNavMenuRef.value) {
-    mobileNavMenuRef.value.open = false
-  }
+const openMobileNavMenu = () => {
+  const details = mobileNavMenuRef.value
+  if (!details) return
+  restoreMobileNavMenuFocus = false
+  details.open = true
+  mobileNavMenuClosing.value = false
+  mobileNavMenuExpanded.value = true
+  mobileNavMenuVisible.value = true
+}
+
+const closeMobileNavMenu = (restoreFocus = false) => {
+  if (!mobileNavMenuRef.value?.open && !mobileNavMenuVisible.value) return
+  restoreMobileNavMenuFocus ||= restoreFocus
   mobileNavMenuExpanded.value = false
+  mobileNavMenuClosing.value = true
+  mobileNavMenuVisible.value = false
+}
+
+const finishMobileNavMenuClose = () => {
+  if (mobileNavMenuVisible.value) return
+  if (mobileNavMenuRef.value) mobileNavMenuRef.value.open = false
+  mobileNavMenuClosing.value = false
+  if (restoreMobileNavMenuFocus) {
+    restoreMobileNavMenuFocus = false
+    void nextTick(() => mobileNavMenuTriggerRef.value?.focus())
+  }
+}
+
+const resetMobileNavMenu = () => {
+  if (mobileNavMenuRef.value) mobileNavMenuRef.value.open = false
+  restoreMobileNavMenuFocus = false
+  mobileNavMenuExpanded.value = false
+  mobileNavMenuVisible.value = false
+  mobileNavMenuClosing.value = false
+}
+
+const handleMobileNavMenuTrigger = (event: MouseEvent) => {
+  if (isModifiedClick(event)) return
+  event.preventDefault()
+  if (mobileNavMenuExpanded.value || mobileNavMenuVisible.value) {
+    closeMobileNavMenu()
+  } else {
+    openMobileNavMenu()
+  }
 }
 
 const handleMobileNavMenuEscape = (event: KeyboardEvent) => {
-  if (!mobileNavMenuExpanded.value) return
+  if (!mobileNavMenuExpanded.value && !mobileNavMenuVisible.value) return
   event.preventDefault()
   event.stopPropagation()
-  closeMobileNavMenu()
-  void nextTick(() => mobileNavMenuTriggerRef.value?.focus())
+  closeMobileNavMenu(true)
 }
 
 const submitSearch = (event: Event) => {
@@ -557,7 +638,7 @@ watch(
 watch(
   () => props.mobileNavMode,
   (mode) => {
-    if (mode !== 'menu') closeMobileNavMenu()
+    if (mode !== 'menu') resetMobileNavMenu()
   },
 )
 </script>

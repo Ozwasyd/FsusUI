@@ -1743,6 +1743,42 @@ describe('Fsus theme visual baseline', () => {
     }
   })
 
+  test('keeps public shell mobile menu motion synchronized in critical and full css', () => {
+    const publicShellCss = compileThemeFile('public-shell.scss')
+    const criticalCss = compileThemeFile('public-shell-critical.scss')
+
+    for (const css of [publicShellCss, criticalCss]) {
+      expectCssRule(
+        css,
+        '.el-public-shell-mobile-nav-menu-enter-active, .el-public-shell-mobile-nav-menu-leave-active',
+        [
+          'transition: opacity var(--el-transition-duration-fast) var(--el-transition-function-ease-in-out-bezier), transform var(--el-transition-duration-fast) var(--el-transition-function-ease-in-out-bezier);',
+        ],
+      )
+      expectCssRule(
+        css,
+        '.el-public-shell-mobile-nav-menu-enter-from, .el-public-shell-mobile-nav-menu-leave-to',
+        ['opacity: 0;', 'transform: translateY(-4px);'],
+      )
+      expectCssRule(
+        css,
+        '.el-public-shell__mobile-nav-menu.is-closing .el-public-shell__mobile-nav-menu-panel',
+        ['pointer-events: none;'],
+      )
+      expect(css).toContain('@media (prefers-reduced-motion: reduce)')
+      expectCssRule(
+        css,
+        '.el-public-shell-mobile-nav-menu-enter-active, .el-public-shell-mobile-nav-menu-leave-active',
+        ['transition: none;'],
+      )
+      expectCssRule(
+        css,
+        '.el-public-shell-mobile-nav-menu-enter-from, .el-public-shell-mobile-nav-menu-leave-to',
+        ['transform: none;'],
+      )
+    }
+  })
+
   test('supports opt-in public shell active nav indicator motion', () => {
     const publicShellCss = compileThemeFile('public-shell.scss')
 
