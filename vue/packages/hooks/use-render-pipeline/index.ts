@@ -61,6 +61,46 @@ export type FsusRenderSchedulerPriority =
   | 'user-blocking'
   | 'visible'
   | 'background'
+export type FsusRenderMotionMode = 'enabled' | 'reduced' | 'disabled'
+export type FsusRenderComputeProfile = 'low' | 'normal' | 'high'
+export type FsusRenderMemoryProfile = 'low' | 'normal' | 'high'
+export type FsusRenderPipelineStage =
+  | 'queue-wait'
+  | 'worker-compute'
+  | 'worker-transfer'
+  | 'prepare'
+  | 'vue-commit'
+  | 'style-layout'
+  | 'next-paint'
+  | 'total'
+
+export type FsusRenderRefreshProfile = {
+  framePeriodMs: number
+  hz: number
+  mainThreadBudgetMs: number
+  rafDriftMs: number
+  sampleCount: number
+}
+
+export type FsusRenderCapabilityProfile = {
+  compositorCapability: boolean
+  computeCalibration: {
+    mainOpsPerMs: number
+    workerConcurrency: number
+  }
+  computeProfile: FsusRenderComputeProfile
+  contentVisibilityCapability: boolean
+  lowPower: boolean
+  memoryProfile: FsusRenderMemoryProfile
+  motionMode: FsusRenderMotionMode
+  refreshProfile: FsusRenderRefreshProfile
+  version: string
+  visibility: 'visible' | 'hidden'
+}
+
+export type FsusScheduledWork =
+  | { done: true }
+  | { done: false; continuation: () => FsusScheduledWork }
 
 export type FsusRenderPipelineEstimate = {
   htmlBytes?: number
@@ -87,6 +127,7 @@ export type FsusRenderPipelineConfig = {
     itemCount?: number
   }
   budget?: {
+    dynamicFrameMs?: boolean
     frameMs?: number
     overscanPx?: number
     measureBatch?: number
@@ -111,6 +152,7 @@ export type FsusResolvedRenderPipelineConfig = {
     itemCount: number
   }
   budget: {
+    dynamicFrameMs: boolean
     frameMs: number
     overscanPx: number
     measureBatch: number
@@ -139,11 +181,13 @@ export type FsusWorkerExecutorEventType =
   | 'request-timeout'
 
 export type FsusWorkerExecutorEvent = {
+  computeDurationMs?: number
   durationMs?: number
   error?: FsusErrorDetail
   id?: number
   name: string
   pendingCount: number
+  transferDurationMs?: number
   type: FsusWorkerExecutorEventType
 }
 
@@ -176,6 +220,8 @@ export type FsusRenderPipelineDiagnosticEvent = {
   error?: FsusErrorDetail
   fallbackReason?: string
   phase?: string
+  stage?: FsusRenderPipelineStage
+  stageStats?: FsusRenderStageStats
   pendingCount?: number
   queueDepth?: number
   strategy: FsusRenderPipelineStrategy
@@ -184,6 +230,7 @@ export type FsusRenderPipelineDiagnosticEvent = {
     | 'render-start'
     | 'render-complete'
     | 'render-error'
+    | 'stage-sample'
     | 'strategy-cache'
     | 'worker-fallback'
     | FsusWorkerExecutorEventType
@@ -213,11 +260,20 @@ export type FsusRenderPipelineAdaptiveSignals = {
   queueDepth?: number
   rafDriftMs?: number
   renderDurationMs?: number
+  stages?: Partial<Record<FsusRenderPipelineStage, FsusRenderStageStats>>
 }
 
 export type FsusRenderSchedulerTaskOptions = {
+  key?: string
   priority?: FsusRenderSchedulerPriority
   signal?: AbortSignal
+}
+
+export type FsusRenderStageStats = {
+  ewmaMs: number
+  p50Ms: number
+  p95Ms: number
+  sampleCount: number
 }
 
 export type FsusRenderPipelineAdapter<TSource, TUnit> = {
@@ -289,6 +345,7 @@ export type FsusRenderPipelineRuntimeState<TSource, TUnit> =
   FsusRenderPipelineState<TUnit> & {
     adapter: ComputedRef<FsusRenderPipelineAdapter<TSource, TUnit> | null>
     canUseWorker: ComputedRef<boolean>
+    capabilityProfile: ComputedRef<FsusRenderCapabilityProfile>
     compositor: ComputedRef<boolean>
     config: ComputedRef<FsusResolvedRenderPipelineConfig>
     contentVisibility: ComputedRef<boolean>
@@ -311,7 +368,8 @@ const defaultRenderPipelineConfig: FsusResolvedRenderPipelineConfig = {
     itemCount: 500,
   },
   budget: {
-    frameMs: 8,
+    dynamicFrameMs: true,
+    frameMs: 7.5,
     overscanPx: 800,
     measureBatch: 32,
   },
@@ -331,7 +389,8 @@ const cpuThreadedRenderPipelineDefaults: FsusResolvedRenderPipelineConfig = {
     itemCount: 250,
   },
   budget: {
-    frameMs: 4,
+    dynamicFrameMs: true,
+    frameMs: 7.5,
     overscanPx: 480,
     measureBatch: 16,
   },
@@ -392,6 +451,8 @@ export const resolveFsusRenderPipelineConfig = (
       ),
     },
     budget: {
+      dynamicFrameMs:
+        config?.budget?.dynamicFrameMs ?? config?.budget?.frameMs === undefined,
       frameMs: positive(config?.budget?.frameMs, defaults.budget.frameMs),
       overscanPx: positive(
         config?.budget?.overscanPx,
@@ -428,6 +489,98 @@ const clampNumber = (value: number, min: number, max: number) =>
 
 const roundBudgetNumber = (value: number) => Math.round(value * 100) / 100
 
+const percentile = (sorted: readonly number[], ratio: number) =>
+  sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * ratio))] ?? 0
+
+export const estimateFsusRenderRefreshProfile = (
+  deltas: readonly number[],
+): FsusRenderRefreshProfile => {
+  const samples = deltas
+    .filter((value) => Number.isFinite(value) && value >= 4 && value <= 40)
+    .sort((left, right) => left - right)
+  const trim = samples.length >= 10 ? Math.floor(samples.length * 0.1) : 0
+  const trimmed = samples.slice(trim, samples.length - trim || undefined)
+  const median = percentile(samples, 0.5) || 1000 / 60
+  const mean = trimmed.length
+    ? trimmed.reduce((sum, value) => sum + value, 0) / trimmed.length
+    : median
+  const framePeriodMs = roundBudgetNumber((median + mean) / 2)
+  const idealPeriod = 1000 / Math.max(1, Math.round(1000 / framePeriodMs))
+  return {
+    framePeriodMs,
+    hz: Math.round(1000 / framePeriodMs),
+    mainThreadBudgetMs: roundBudgetNumber(
+      clampNumber(framePeriodMs * 0.45, 2, 7.5),
+    ),
+    rafDriftMs: roundBudgetNumber(
+      samples.reduce((sum, value) => sum + Math.abs(value - idealPeriod), 0) /
+        Math.max(1, samples.length),
+    ),
+    sampleCount: samples.length,
+  }
+}
+
+export const createFsusRafRefreshSampler = ({
+  onSample,
+  requestFrame = (callback: FrameRequestCallback) =>
+    requestAnimationFrame(callback),
+  cancelFrame = (handle: number) => cancelAnimationFrame(handle),
+  sampleSize = 24,
+}: {
+  onSample: (profile: FsusRenderRefreshProfile) => void
+  requestFrame?: (callback: FrameRequestCallback) => number
+  cancelFrame?: (handle: number) => void
+  sampleSize?: number
+}) => {
+  const deltas: number[] = []
+  let previous: number | null = null
+  let handle = 0
+  let stopped = false
+  const sample = (timestamp: number) => {
+    if (stopped) return
+    if (previous !== null) deltas.push(timestamp - previous)
+    previous = timestamp
+    if (deltas.length >= Math.max(4, sampleSize)) {
+      onSample(estimateFsusRenderRefreshProfile(deltas))
+      deltas.splice(0, Math.max(1, Math.floor(deltas.length / 2)))
+    }
+    handle = requestFrame(sample)
+  }
+  handle = requestFrame(sample)
+  return () => {
+    stopped = true
+    cancelFrame(handle)
+  }
+}
+
+export const createFsusRenderStageHistory = (limit = 32, alpha = 0.25) => {
+  const samples = new Map<FsusRenderPipelineStage, number[]>()
+  const ewma = new Map<FsusRenderPipelineStage, number>()
+  const record = (stage: FsusRenderPipelineStage, durationMs: number) => {
+    if (!Number.isFinite(durationMs) || durationMs < 0) return
+    const values = samples.get(stage) ?? []
+    values.push(durationMs)
+    if (values.length > limit) values.shift()
+    samples.set(stage, values)
+    ewma.set(
+      stage,
+      ewma.has(stage)
+        ? ewma.get(stage)! * (1 - alpha) + durationMs * alpha
+        : durationMs,
+    )
+  }
+  const snapshot = (stage: FsusRenderPipelineStage): FsusRenderStageStats => {
+    const values = [...(samples.get(stage) ?? [])].sort((a, b) => a - b)
+    return {
+      ewmaMs: roundBudgetNumber(ewma.get(stage) ?? 0),
+      p50Ms: roundBudgetNumber(percentile(values, 0.5)),
+      p95Ms: roundBudgetNumber(percentile(values, 0.95)),
+      sampleCount: values.length,
+    }
+  }
+  return { record, snapshot }
+}
+
 export const resolveFsusAdaptiveRenderPipelineConfig = (
   config: FsusResolvedRenderPipelineConfig,
   hardwareProfile: FsusRenderHardwareProfile,
@@ -438,11 +591,17 @@ export const resolveFsusAdaptiveRenderPipelineConfig = (
   const hasRuntimeSignals =
     signals.queueDepth !== undefined ||
     signals.rafDriftMs !== undefined ||
-    signals.renderDurationMs !== undefined
+    signals.renderDurationMs !== undefined ||
+    signals.stages !== undefined
   if (!hasRuntimeSignals) return config
 
   const frameMs = Math.max(1, config.budget.frameMs)
-  const renderDurationMs = signals.renderDurationMs ?? 0
+  const renderDurationMs = Math.max(
+    signals.renderDurationMs ?? 0,
+    signals.stages?.prepare?.p95Ms ?? 0,
+    signals.stages?.['vue-commit']?.p95Ms ?? 0,
+    signals.stages?.['style-layout']?.p95Ms ?? 0,
+  )
   const rafDriftMs = signals.rafDriftMs ?? 0
   const queueDepth = signals.queueDepth ?? 0
   let factor = hardwareProfile === 'cpu-threaded' ? 0.75 : 1
@@ -471,6 +630,7 @@ export const resolveFsusAdaptiveRenderPipelineConfig = (
   return {
     ...config,
     budget: {
+      dynamicFrameMs: config.budget.dynamicFrameMs,
       frameMs: Math.max(1, roundBudgetNumber(config.budget.frameMs * clamped)),
       measureBatch: Math.max(
         1,
@@ -591,6 +751,22 @@ const isReducedMotionPreferred = () =>
   typeof window.matchMedia === 'function' &&
   window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
+let renderPipelineLowPower = false
+let calibratedMainOpsPerMs: number | null = null
+
+export const calibrateFsusMainThreadThroughput = () => {
+  if (calibratedMainOpsPerMs !== null) return calibratedMainOpsPerMs
+  const operations = 50_000
+  const startedAt = readRenderPipelineNow()
+  let checksum = 0
+  for (let index = 0; index < operations; index++) {
+    checksum = (checksum * 33 + index) >>> 0
+  }
+  const elapsedMs = Math.max(0.1, readRenderPipelineNow() - startedAt)
+  calibratedMainOpsPerMs = Math.round((operations + (checksum & 1)) / elapsedMs)
+  return calibratedMainOpsPerMs
+}
+
 const resolveAutoHardwareProfile = (): FsusRenderHardwareProfile => {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     return 'cpu-threaded'
@@ -606,11 +782,66 @@ const resolveAutoHardwareProfile = (): FsusRenderHardwareProfile => {
     return 'cpu-threaded'
   }
 
-  if (isReducedMotionPreferred()) {
-    return 'cpu-threaded'
-  }
-
   return 'gpu-compositor'
+}
+
+export const resolveFsusRenderCapabilityProfile = (
+  refreshProfile: FsusRenderRefreshProfile = estimateFsusRenderRefreshProfile(
+    Array.from({ length: 12 }, () => 1000 / 60),
+  ),
+  overrides: { lowPower?: boolean; mainOpsPerMs?: number } = {},
+): FsusRenderCapabilityProfile => {
+  const concurrency =
+    typeof navigator !== 'undefined' ? navigator.hardwareConcurrency || 0 : 0
+  const memory =
+    typeof navigator !== 'undefined'
+      ? (navigator as Navigator & { deviceMemory?: number }).deviceMemory
+      : undefined
+  const mainOpsPerMs =
+    overrides.mainOpsPerMs ?? calibrateFsusMainThreadThroughput()
+  const computeProfile: FsusRenderComputeProfile =
+    mainOpsPerMs < 25_000 ? 'low' : mainOpsPerMs >= 100_000 ? 'high' : 'normal'
+  const memoryProfile: FsusRenderMemoryProfile =
+    memory !== undefined && memory <= 2
+      ? 'low'
+      : memory !== undefined && memory >= 8
+        ? 'high'
+        : 'normal'
+  const visibility =
+    typeof document !== 'undefined' && document.visibilityState === 'hidden'
+      ? 'hidden'
+      : 'visible'
+  const motionMode: FsusRenderMotionMode = isReducedMotionPreferred()
+    ? 'reduced'
+    : 'enabled'
+  const compositorCapability = supportsCompositorTransforms()
+  const contentVisibilityCapability = supportsContentVisibility()
+  return {
+    compositorCapability,
+    computeCalibration: {
+      mainOpsPerMs,
+      workerConcurrency: Math.max(
+        1,
+        Math.min(4, Math.floor(concurrency / 2) || 1),
+      ),
+    },
+    computeProfile,
+    contentVisibilityCapability,
+    lowPower: overrides.lowPower ?? renderPipelineLowPower,
+    memoryProfile,
+    motionMode,
+    refreshProfile,
+    version: [
+      computeProfile,
+      memoryProfile,
+      compositorCapability ? 'compositor' : 'no-compositor',
+      contentVisibilityCapability ? 'cv' : 'no-cv',
+      refreshProfile.hz,
+      visibility,
+      (overrides.lowPower ?? renderPipelineLowPower) ? 'low-power' : 'power-ok',
+    ].join(':'),
+    visibility,
+  }
 }
 
 export const resolveFsusRenderPipelineHardwareProfile = (
@@ -624,22 +855,23 @@ export const resolveFsusRenderPipelineHardwareProfile = (
 
 export const resolveFsusRenderPipelineCompositorEnabled = (
   config: FsusResolvedRenderPipelineConfig,
-  hardwareProfile: FsusRenderHardwareProfile,
+  _hardwareProfile: FsusRenderHardwareProfile,
 ) => {
   const mode = config.acceleration.compositor
   if (mode === 'enabled') return true
   if (mode === 'disabled') return false
-  return hardwareProfile === 'gpu-compositor' && supportsCompositorTransforms()
+  if (config.acceleration.mode === 'cpu') return false
+  return supportsCompositorTransforms()
 }
 
 export const resolveFsusRenderPipelineContentVisibilityEnabled = (
   config: FsusResolvedRenderPipelineConfig,
-  hardwareProfile: FsusRenderHardwareProfile,
+  _hardwareProfile: FsusRenderHardwareProfile,
 ) => {
   const mode = config.acceleration.contentVisibility
   if (mode === 'enabled') return supportsContentVisibility()
   if (mode === 'disabled') return false
-  return hardwareProfile === 'gpu-compositor' && supportsContentVisibility()
+  return supportsContentVisibility()
 }
 
 export const resolveFsusRenderPipelineHardwareAttrs = ({
@@ -700,14 +932,88 @@ export const resolveFsusRenderPipelineUnitAttrs = ({
 export const useFsusRenderPipelineHardwareProfile = (
   config?: MaybeRef<FsusRenderPipelineConfig | null | undefined>,
 ) => {
-  const baseConfig = computed(() =>
-    resolveFsusRenderPipelineConfig(unref(config)),
+  const refreshProfile = shallowRef(
+    estimateFsusRenderRefreshProfile(
+      Array.from({ length: 12 }, () => 1000 / 60),
+    ),
   )
+  const visibilityVersion = ref(0)
+  const lowPower = ref(renderPipelineLowPower)
+  let stopSampler: (() => void) | null = null
+  const startSampler = () => {
+    stopSampler?.()
+    if (typeof requestAnimationFrame !== 'function') return
+    stopSampler = createFsusRafRefreshSampler({
+      onSample: (sample) => {
+        refreshProfile.value = sample
+      },
+    })
+  }
+  const onVisibilityChange = () => {
+    visibilityVersion.value += 1
+    startSampler()
+  }
+  onMounted(() => {
+    startSampler()
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', onVisibilityChange)
+    }
+    if (typeof navigator !== 'undefined') {
+      const getBattery = (
+        navigator as Navigator & {
+          getBattery?: () => Promise<{ charging: boolean; level: number }>
+        }
+      ).getBattery
+      if (typeof getBattery === 'function') {
+        void getBattery
+          .call(navigator)
+          .then((battery) => {
+            renderPipelineLowPower = !battery.charging && battery.level <= 0.2
+            lowPower.value = renderPipelineLowPower
+          })
+          .catch(() => undefined)
+      }
+    }
+  })
+  onBeforeUnmount(() => {
+    stopSampler?.()
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
+  })
+  const capabilityProfile = computed(() => {
+    visibilityVersion.value
+    return resolveFsusRenderCapabilityProfile(refreshProfile.value, {
+      lowPower: lowPower.value,
+    })
+  })
+  const baseConfig = computed(() => {
+    const input = unref(config)
+    const resolved = resolveFsusRenderPipelineConfig(input)
+    return input?.budget?.dynamicFrameMs === false ||
+      (input?.budget?.frameMs !== undefined &&
+        input?.budget?.dynamicFrameMs !== true)
+      ? resolved
+      : {
+          ...resolved,
+          budget: {
+            ...resolved.budget,
+            frameMs:
+              capabilityProfile.value.visibility === 'hidden' ||
+              capabilityProfile.value.lowPower
+                ? Math.min(
+                    2,
+                    capabilityProfile.value.refreshProfile.mainThreadBudgetMs,
+                  )
+                : capabilityProfile.value.refreshProfile.mainThreadBudgetMs,
+          },
+        }
+  })
   const profile = computed(() =>
     resolveFsusRenderPipelineHardwareProfile(baseConfig.value),
   )
   const resolvedConfig = computed(() =>
-    resolveFsusRenderPipelineConfig(unref(config), profile.value),
+    resolveFsusRenderPipelineConfig(baseConfig.value, profile.value),
   )
   const compositor = computed(() =>
     resolveFsusRenderPipelineCompositorEnabled(
@@ -732,10 +1038,12 @@ export const useFsusRenderPipelineHardwareProfile = (
 
   return {
     attrs,
+    capabilityProfile,
     compositor,
     config: resolvedConfig,
     contentVisibility,
     profile,
+    refreshProfile,
   }
 }
 
@@ -797,14 +1105,79 @@ const strategyResolvers = new Set<FsusRenderPipelineStrategyResolverEntry>()
 let strategyResolverOrder = 0
 let strategyResolverVersion = 0
 
-type FsusRenderPipelineStrategyCacheEntry = {
+export type FsusRenderPipelineStrategyCacheEntry = {
   durationMs?: number
+  durationEwmaMs?: number
+  expiresAt: number
+  profileVersion?: string
+  sampleCount: number
   strategy: FsusRenderPipelineStrategy
   updatedAt: number
 }
 
 const STRATEGY_CACHE_LIMIT = 128
-const strategyCache = new Map<string, FsusRenderPipelineStrategyCacheEntry>()
+const STRATEGY_CACHE_TTL_MS = 60_000
+export const createFsusRenderPipelineStrategyCache = ({
+  limit = STRATEGY_CACHE_LIMIT,
+  now: readNow = readRenderPipelineNow,
+  ttlMs = STRATEGY_CACHE_TTL_MS,
+}: {
+  limit?: number
+  now?: () => number
+  ttlMs?: number
+} = {}) => {
+  const entries = new Map<string, FsusRenderPipelineStrategyCacheEntry>()
+  const get = (cacheKey: string, profileVersion?: string) => {
+    if (!cacheKey) return undefined
+    const entry = entries.get(cacheKey)
+    if (
+      !entry ||
+      entry.expiresAt <= readNow() ||
+      (profileVersion !== undefined && entry.profileVersion !== profileVersion)
+    ) {
+      entries.delete(cacheKey)
+      return undefined
+    }
+    return entry
+  }
+  const set = (
+    cacheKey: string,
+    entry: Pick<
+      FsusRenderPipelineStrategyCacheEntry,
+      'durationMs' | 'strategy'
+    > & { profileVersion?: string; ttlMs?: number },
+  ) => {
+    if (!cacheKey) return
+    const previous = entries.get(cacheKey)
+    const durationEwmaMs =
+      entry.durationMs === undefined
+        ? previous?.durationEwmaMs
+        : previous?.durationEwmaMs === undefined
+          ? entry.durationMs
+          : previous.durationEwmaMs * 0.75 + entry.durationMs * 0.25
+    const updatedAt = readNow()
+    entries.delete(cacheKey)
+    entries.set(cacheKey, {
+      ...entry,
+      durationEwmaMs,
+      expiresAt: updatedAt + positive(entry.ttlMs, ttlMs),
+      sampleCount: (previous?.sampleCount ?? 0) + 1,
+      updatedAt,
+    })
+    if (entries.size > limit) {
+      const firstKey = entries.keys().next().value
+      if (firstKey) entries.delete(firstKey)
+    }
+  }
+  const invalidateProfile = (profileVersion: string) => {
+    for (const [key, entry] of entries) {
+      if (entry.profileVersion !== profileVersion) entries.delete(key)
+    }
+  }
+  return { clear: () => entries.clear(), get, invalidateProfile, set }
+}
+
+const strategyCache = createFsusRenderPipelineStrategyCache()
 
 const stringifyRenderPipelineConfigSignature = (
   config: FsusResolvedRenderPipelineConfig,
@@ -817,6 +1190,7 @@ const stringifyRenderPipelineConfigSignature = (
     config.thresholds.htmlBytes,
     config.thresholds.estimatedNodes,
     config.thresholds.itemCount,
+    config.budget.dynamicFrameMs ? 'dynamic-frame' : 'fixed-frame',
     config.budget.frameMs,
     config.budget.overscanPx,
     config.budget.measureBatch,
@@ -860,24 +1234,27 @@ const createStrategyCacheKey = <TSource, TUnit>({
   ].join('\u0000')
 }
 
-const getCachedStrategy = (cacheKey: string) =>
-  cacheKey ? strategyCache.get(cacheKey) : undefined
+const getCachedStrategy = (cacheKey: string, profileVersion?: string) => {
+  return strategyCache.get(cacheKey, profileVersion)
+}
 
 const setCachedStrategy = (
   cacheKey: string,
-  entry: Omit<FsusRenderPipelineStrategyCacheEntry, 'updatedAt'>,
+  entry: Pick<
+    FsusRenderPipelineStrategyCacheEntry,
+    'durationMs' | 'strategy'
+  > & {
+    profileVersion?: string
+    ttlMs?: number
+  },
 ) => {
-  if (!cacheKey) return
-  strategyCache.delete(cacheKey)
-  strategyCache.set(cacheKey, {
-    ...entry,
-    updatedAt: readRenderPipelineNow(),
-  })
-  if (strategyCache.size > STRATEGY_CACHE_LIMIT) {
-    const firstKey = strategyCache.keys().next().value
-    if (firstKey) strategyCache.delete(firstKey)
-  }
+  strategyCache.set(cacheKey, entry)
 }
+
+export const clearFsusRenderPipelineStrategyCache = strategyCache.clear
+
+export const inspectFsusRenderPipelineStrategyCache = (cacheKey: string) =>
+  strategyCache.get(cacheKey)
 
 export const registerFsusRenderPipelineStrategyResolver = (
   resolver: FsusRenderPipelineStrategyResolver,
@@ -1015,8 +1392,9 @@ export const useFsusRenderScheduler = (
 ) => {
   type SchedulerEntry = {
     cleanup: (() => void) | null
+    key?: string
     priority: FsusRenderSchedulerPriority
-    task: () => void
+    task: () => void | FsusScheduledWork
   }
 
   const queues: Record<FsusRenderSchedulerPriority, Set<SchedulerEntry>> = {
@@ -1026,6 +1404,7 @@ export const useFsusRenderScheduler = (
   }
   let cancelFlush: (() => void) | null = null
   let scheduledFlushPriority: FsusRenderSchedulerPriority | null = null
+  const keyedEntries = new Map<string, SchedulerEntry>()
 
   const priorities: FsusRenderSchedulerPriority[] = [
     'user-blocking',
@@ -1059,6 +1438,9 @@ export const useFsusRenderScheduler = (
 
   const removeEntry = (entry: SchedulerEntry) => {
     queues[entry.priority].delete(entry)
+    if (entry.key && keyedEntries.get(entry.key) === entry) {
+      keyedEntries.delete(entry.key)
+    }
     entry.cleanup?.()
     entry.cleanup = null
   }
@@ -1070,15 +1452,37 @@ export const useFsusRenderScheduler = (
       typeof performance !== 'undefined' ? performance.now() : Date.now()
     const frameMs =
       unref(budget)?.frameMs ?? defaultRenderPipelineConfig.budget.frameMs
+    const effectiveFrameMs =
+      typeof document !== 'undefined' && document.visibilityState === 'hidden'
+        ? Math.min(2, frameMs)
+        : renderPipelineLowPower
+          ? Math.min(3, frameMs)
+          : frameMs
 
     let entry = getNextEntry()
+    let ranBackgroundChunk = false
     while (entry) {
-      removeEntry(entry)
-      entry.task()
+      queues[entry.priority].delete(entry)
+      const result = entry.task()
+      const continuation =
+        result && typeof result === 'object' && result.done === false
+          ? result.continuation
+          : null
+      if (continuation) {
+        entry.task = continuation
+        queues[entry.priority].add(entry)
+      } else {
+        removeEntry(entry)
+      }
+
+      if (entry.priority === 'background') ranBackgroundChunk = true
 
       const now =
         typeof performance !== 'undefined' ? performance.now() : Date.now()
-      if (hasPending() && now - startedAt >= frameMs) {
+      if (
+        hasPending() &&
+        (now - startedAt >= effectiveFrameMs || ranBackgroundChunk)
+      ) {
         requestFlush()
         return
       }
@@ -1105,27 +1509,30 @@ export const useFsusRenderScheduler = (
         scheduler?: {
           postTask?: (
             callback: () => void,
-            options?: { priority?: string },
+            options?: { priority?: string; signal?: AbortSignal },
           ) => Promise<unknown>
         }
       }
     ).scheduler
 
     if (typeof scheduler?.postTask === 'function') {
-      let cancelled = false
+      const flushController = new AbortController()
       cancelFlush = () => {
-        cancelled = true
+        flushController.abort()
         scheduledFlushPriority = null
       }
       void scheduler
         .postTask(
           () => {
-            if (!cancelled) flush()
+            if (!flushController.signal.aborted) flush()
           },
-          { priority: postTaskPriorityMap[flushPriority] },
+          {
+            priority: postTaskPriorityMap[flushPriority],
+            signal: flushController.signal,
+          },
         )
         .catch(() => {
-          if (!cancelled) flush()
+          if (!flushController.signal.aborted) flush()
         })
       return
     }
@@ -1161,7 +1568,7 @@ export const useFsusRenderScheduler = (
   }
 
   const schedule = (
-    task: () => void,
+    task: () => void | FsusScheduledWork,
     options: FsusRenderSchedulerTaskOptions = {},
   ) => {
     const priority = options.priority ?? 'visible'
@@ -1169,6 +1576,7 @@ export const useFsusRenderScheduler = (
 
     const entry: SchedulerEntry = {
       cleanup: null,
+      key: options.key,
       priority,
       task,
     }
@@ -1179,6 +1587,11 @@ export const useFsusRenderScheduler = (
       entry.cleanup = () => options.signal?.removeEventListener('abort', cancel)
     }
 
+    if (entry.key) {
+      const previous = keyedEntries.get(entry.key)
+      if (previous) removeEntry(previous)
+      keyedEntries.set(entry.key, entry)
+    }
     queues[priority].add(entry)
     requestFlush()
     return cancel
@@ -1326,6 +1739,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     }) => void,
     type: FsusWorkerExecutorEventType,
     error?: FsusErrorDetail,
+    timings?: { computeDurationMs?: number },
   ) => {
     const task = pending.get(id)
     if (!task) return
@@ -1340,10 +1754,16 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
 
     try {
       action(task)
+      const durationMs = now() - task.startedAt
       emit(type, {
-        durationMs: now() - task.startedAt,
+        computeDurationMs: timings?.computeDurationMs,
+        durationMs,
         error,
         id,
+        transferDurationMs:
+          timings?.computeDurationMs === undefined
+            ? undefined
+            : Math.max(0, durationMs - timings.computeDurationMs),
       })
     } finally {
       task.release()
@@ -1380,6 +1800,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
           error?: unknown
           id: number
           result?: TResponse
+          timings?: { computeDurationMs?: number }
         }
         if (payload.error) {
           const error = normalizeWorkerError(
@@ -1397,6 +1818,8 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
             payload.id,
             (task) => task.resolve(fsusOk(payload.result as TResponse)),
             'request-resolve',
+            undefined,
+            payload.timings,
           )
         }
       }
@@ -1927,6 +2350,28 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   let workerExecutorShared = false
   let workerExecutorSharedCleanup: (() => void) | null = null
   const adaptiveSignals = shallowRef<FsusRenderPipelineAdaptiveSignals>({})
+  const stageHistory = createFsusRenderStageHistory()
+
+  const recordStage = (
+    stage: FsusRenderPipelineStage,
+    durationMs: number,
+    strategy: FsusRenderPipelineStrategy,
+  ) => {
+    stageHistory.record(stage, durationMs)
+    const stageStats = stageHistory.snapshot(stage)
+    adaptiveSignals.value = {
+      ...adaptiveSignals.value,
+      stages: { ...adaptiveSignals.value.stages, [stage]: stageStats },
+    }
+    recordDiagnostic({
+      durationMs,
+      phase: stage,
+      stage,
+      stageStats,
+      strategy,
+      type: 'stage-sample',
+    })
+  }
 
   const recordDiagnostic = (event: FsusRenderPipelineDiagnosticEvent) => {
     const nextEvent = {
@@ -1949,6 +2394,18 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
 
   const hardwareRuntime = useFsusRenderPipelineHardwareProfile(
     computed(() => unref(options.config)),
+  )
+  const capabilityProfile = hardwareRuntime.capabilityProfile
+  watch(
+    capabilityProfile,
+    (profile) => {
+      strategyCache.invalidateProfile(profile.version)
+      adaptiveSignals.value = {
+        ...adaptiveSignals.value,
+        rafDriftMs: profile.refreshProfile.rafDriftMs,
+      }
+    },
+    { immediate: true },
   )
   const config = computed(() =>
     resolveFsusAdaptiveRenderPipelineConfig(
@@ -2038,7 +2495,10 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   )
 
   const strategy = computed<FsusRenderPipelineStrategy>(() => {
-    const cached = getCachedStrategy(strategyCacheKey.value)
+    const cached = getCachedStrategy(
+      strategyCacheKey.value,
+      capabilityProfile.value.version,
+    )
     if (cached) return cached.strategy
     if (policy.value) return policy.value.strategy
     return chooseFsusRenderPipelineStrategy(
@@ -2083,6 +2543,22 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       adaptiveSignals.value = {
         ...adaptiveSignals.value,
         queueDepth: event.pendingCount,
+      }
+      if (event.type === 'request-resolve') {
+        if (event.computeDurationMs !== undefined) {
+          recordStage(
+            'worker-compute',
+            event.computeDurationMs,
+            renderedStrategy.value,
+          )
+        }
+        if (event.transferDurationMs !== undefined) {
+          recordStage(
+            'worker-transfer',
+            event.transferDurationMs,
+            renderedStrategy.value,
+          )
+        }
       }
     }
     const executorOptions: FsusWorkerExecutorOptions = {
@@ -2189,8 +2665,12 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     const activeAdapter = adapter.value
     const activeStrategy = strategy.value
     const activeStrategyCacheKey = strategyCacheKey.value
-    const activeStrategyCacheEntry = getCachedStrategy(activeStrategyCacheKey)
+    const activeStrategyCacheEntry = getCachedStrategy(
+      activeStrategyCacheKey,
+      capabilityProfile.value.version,
+    )
     const startedAt = now()
+    const queuedAt = startedAt
 
     loading.value = true
     error.value = null
@@ -2205,6 +2685,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       strategy: activeStrategy,
       type: 'render-start',
     })
+    recordStage('queue-wait', Math.max(0, now() - queuedAt), activeStrategy)
 
     if (!activeAdapter) {
       const missingAdapterError = createFsusError(
@@ -2223,12 +2704,14 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       return
     }
 
+    const prepareStartedAt = now()
     const nextDocument = await prepareDocument(
       activeAdapter,
       input,
       activeStrategy,
       controller.signal,
     )
+    recordStage('prepare', now() - prepareStartedAt, renderedStrategy.value)
 
     if (currentTaskId !== taskId || controller.signal.aborted) {
       loading.value = false
@@ -2236,10 +2719,36 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     }
 
     if (isFsusOk(nextDocument)) {
-      const durationMs = now() - startedAt
+      const commitStartedAt = now()
       documentRef.value = nextDocument.value
+      await nextTick()
+      if (currentTaskId !== taskId || controller.signal.aborted) return
+      recordStage('vue-commit', now() - commitStartedAt, renderedStrategy.value)
+      const layoutStartedAt = now()
+      await new Promise<void>((resolve) => {
+        if (typeof requestAnimationFrame === 'function') {
+          requestAnimationFrame(() => resolve())
+        } else resolve()
+      })
+      if (currentTaskId !== taskId || controller.signal.aborted) return
+      recordStage(
+        'style-layout',
+        now() - layoutStartedAt,
+        renderedStrategy.value,
+      )
+      const paintStartedAt = now()
+      await new Promise<void>((resolve) => {
+        if (typeof requestAnimationFrame === 'function') {
+          requestAnimationFrame(() => resolve())
+        } else resolve()
+      })
+      if (currentTaskId !== taskId || controller.signal.aborted) return
+      recordStage('next-paint', now() - paintStartedAt, renderedStrategy.value)
+      const durationMs = now() - startedAt
+      recordStage('total', durationMs, renderedStrategy.value)
       setCachedStrategy(activeStrategyCacheKey, {
         durationMs,
+        profileVersion: capabilityProfile.value.version,
         strategy: renderedStrategy.value,
       })
       adaptiveSignals.value = {
@@ -2285,6 +2794,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   return {
     adapter,
     canUseWorker,
+    capabilityProfile,
     compositor,
     config,
     contentVisibility,

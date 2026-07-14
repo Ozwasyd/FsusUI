@@ -27,9 +27,18 @@ describe('render-pipeline-config', () => {
     expect(config.acceleration.contentVisibility).toBe('enabled')
     expect(config.acceleration.layerBudget).toBe(24)
     expect(config.budget.frameMs).toBe(4)
+    expect(config.budget.dynamicFrameMs).toBe(false)
     expect(config.budget.overscanPx).toBe(800)
     expect(config.thresholds.htmlBytes).toBe(64_000)
     expect(config.thresholds.itemCount).toBe(500)
+  })
+
+  it('marks omitted frame budgets for runtime refresh calibration', () => {
+    const config = normalizeRenderPipelineConfig({
+      budget: { overscanPx: 900 },
+    })
+    expect(config.budget.dynamicFrameMs).toBe(true)
+    expect(config.budget.frameMs).toBe(7.5)
   })
 
   it('provides render pipeline config through ConfigProvider', () => {

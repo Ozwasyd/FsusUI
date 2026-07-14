@@ -97,7 +97,7 @@ const themeMode = ref<'light' | 'dark' | 'system'>('system')
     mode: 'auto',
     worker: 'auto',
     thresholds: { htmlBytes: 128_000, estimatedNodes: 1500, itemCount: 500 },
-    budget: { frameMs: 8, overscanPx: 800, measureBatch: 32 },
+    budget: { overscanPx: 800, measureBatch: 32 },
     acceleration: {
       mode: 'auto',
       compositor: 'auto',
@@ -117,7 +117,7 @@ const themeMode = ref<'light' | 'dark' | 'system'>('system')
 | thresholds.htmlBytes           | 超过后进入分块预算判断                                                      | `128000` |
 | thresholds.estimatedNodes      | 超过后进入分块预算判断                                                      | `1500`   |
 | thresholds.itemCount           | 超过后进入分块预算判断                                                      | `500`    |
-| budget.frameMs                 | 单帧主线程提交预算                                                          | `8`      |
+| budget.frameMs                 | 单帧主线程提交预算；省略时按实际 rAF 刷新周期动态校准                       | dynamic  |
 | budget.overscanPx              | 虚拟窗口上下预渲染距离                                                      | `800`    |
 | budget.measureBatch            | 单帧测量提交数量                                                            | `32`     |
 | acceleration.mode              | `'auto' \| 'gpu' \| 'cpu'`，控制硬件画像                                    | `auto`   |

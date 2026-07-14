@@ -8,10 +8,14 @@ import {
   clearFsusRenderPipelineDiagnostics,
   clearFsusRenderPipelineStrategyResolvers,
   createFsusWorkerExecutor,
+  createFsusRafRefreshSampler,
+  createFsusRenderStageHistory,
+  createFsusRenderPipelineStrategyCache,
   createFsusRenderPipelineDiagnosticsBuffer,
   getFsusRenderPipelineDiagnosticsSnapshot,
   getFsusRenderPipelineAdapter,
   getFsusRenderPipelineComponentPolicy,
+  estimateFsusRenderRefreshProfile,
   registerFsusRenderPipelineDiagnosticSink,
   registerFsusRenderPipelineAdapter,
   registerFsusRenderPipelineComponentPolicy,
@@ -21,6 +25,7 @@ import {
   resolveFsusRenderPipelineComponentPolicy,
   resolveFsusRenderPipelineCache,
   resolveFsusRenderPipelineConfig,
+  resolveFsusRenderCapabilityProfile,
   resolveFsusRenderPipelineContentVisibilityEnabled,
   resolveFsusRenderPipelineHardwareProfile,
   resolveFsusRenderPipelineHardwareAttrs,
@@ -60,10 +65,14 @@ class TestWorker {
     this.terminated = true
   }
 
-  resolve(result: unknown, postIndex = this.posts.length - 1) {
+  resolve(
+    result: unknown,
+    postIndex = this.posts.length - 1,
+    timings?: { computeDurationMs?: number },
+  ) {
     const post = this.posts[postIndex]
     if (!post) throw new Error('test_worker_post_missing')
-    this.onmessage?.({ data: { id: post.id, result } } as MessageEvent)
+    this.onmessage?.({ data: { id: post.id, result, timings } } as MessageEvent)
   }
 
   reject(error: unknown, postIndex = this.posts.length - 1) {
@@ -123,7 +132,8 @@ describe('use-render-pipeline', () => {
       acceleration: { mode: 'cpu' },
     })
     expect(cpuConfig.acceleration.mode).toBe('cpu')
-    expect(cpuConfig.budget.frameMs).toBe(4)
+    expect(cpuConfig.budget.dynamicFrameMs).toBe(true)
+    expect(cpuConfig.budget.frameMs).toBe(7.5)
     expect(cpuConfig.budget.overscanPx).toBe(480)
     expect(cpuConfig.thresholds.htmlBytes).toBe(64_000)
     expect(resolveFsusRenderPipelineHardwareProfile(cpuConfig)).toBe(
@@ -152,6 +162,7 @@ describe('use-render-pipeline', () => {
       adaptive: 'enabled',
       budget: { frameMs: 8, measureBatch: 32, overscanPx: 800 },
     })
+    expect(config.budget.dynamicFrameMs).toBe(false)
 
     const degraded = resolveFsusAdaptiveRenderPipelineConfig(
       config,
@@ -224,6 +235,133 @@ describe('use-render-pipeline', () => {
       'data-fsus-render-hardware': 'cpu-threaded',
     })
     wrapper.unmount()
+  })
+
+  it('enables content visibility independently from the cpu profile', () => {
+    vi.stubGlobal('CSS', {
+      supports: vi.fn((property: string) => property === 'content-visibility'),
+    })
+    const config = resolveFsusRenderPipelineConfig({
+      acceleration: { mode: 'cpu' },
+    })
+    expect(
+      resolveFsusRenderPipelineContentVisibilityEnabled(config, 'cpu-threaded'),
+    ).toBe(true)
+    expect(
+      resolveFsusRenderPipelineCompositorEnabled(config, 'cpu-threaded'),
+    ).toBe(false)
+  })
+
+  it('derives distinct budgets for 60/90/120/144 Hz samples', () => {
+    const profile = (hz: number) =>
+      estimateFsusRenderRefreshProfile(
+        Array.from({ length: 24 }, () => 1000 / hz),
+      )
+
+    expect([60, 90, 120, 144].map((hz) => profile(hz).hz)).toEqual([
+      60, 90, 120, 144,
+    ])
+    expect(
+      new Set([60, 90, 120, 144].map((hz) => profile(hz).mainThreadBudgetMs))
+        .size,
+    ).toBe(4)
+    expect(profile(120).mainThreadBudgetMs).toBeLessThan(4)
+    expect(profile(144).mainThreadBudgetMs).toBeLessThan(
+      profile(120).mainThreadBudgetMs,
+    )
+  })
+
+  it('samples real rAF drift and keeps motion separate from capabilities', () => {
+    const callbacks: FrameRequestCallback[] = []
+    const samples: ReturnType<typeof estimateFsusRenderRefreshProfile>[] = []
+    const stop = createFsusRafRefreshSampler({
+      cancelFrame: vi.fn(),
+      onSample: (sample) => samples.push(sample),
+      requestFrame: (callback) => {
+        callbacks.push(callback)
+        return callbacks.length
+      },
+      sampleSize: 4,
+    })
+    for (const timestamp of [0, 8.33, 16.9, 25.05, 33.4]) {
+      callbacks.shift()?.(timestamp)
+    }
+    expect(samples[0]).toMatchObject({ hz: 120, sampleCount: 4 })
+    expect(samples[0]!.rafDriftMs).toBeGreaterThan(0)
+    stop()
+
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: true })),
+    )
+    vi.spyOn(navigator, 'hardwareConcurrency', 'get').mockReturnValue(8)
+    vi.stubGlobal('CSS', { supports: vi.fn(() => true) })
+    const profile = resolveFsusRenderCapabilityProfile(samples[0], {
+      mainOpsPerMs: 200_000,
+    })
+    expect(profile.motionMode).toBe('reduced')
+    expect(profile.computeProfile).toBe('high')
+    expect(profile.computeCalibration).toMatchObject({
+      mainOpsPerMs: 200_000,
+      workerConcurrency: 4,
+    })
+    expect(profile.compositorCapability).toBe(true)
+    expect(profile.contentVisibilityCapability).toBe(true)
+    expect(
+      resolveFsusRenderPipelineHardwareProfile({
+        acceleration: { mode: 'auto' },
+      }),
+    ).toBe('gpu-compositor')
+  })
+
+  it('maintains sliding stage statistics instead of one total sample', () => {
+    const history = createFsusRenderStageHistory(3, 0.5)
+    history.record('prepare', 2)
+    history.record('prepare', 4)
+    history.record('prepare', 100)
+    history.record('prepare', 6)
+    const stats = history.snapshot('prepare')
+    expect(stats.sampleCount).toBe(3)
+    expect(stats.p50Ms).toBe(6)
+    expect(stats.ewmaMs).toBeGreaterThan(6)
+    expect(history.snapshot('vue-commit').sampleCount).toBe(0)
+  })
+
+  it('expires, recalibrates and invalidates strategy cache by profile', () => {
+    let clock = 100
+    const cache = createFsusRenderPipelineStrategyCache({
+      now: () => clock,
+      ttlMs: 50,
+    })
+    cache.set('article', {
+      durationMs: 10,
+      profileVersion: '60hz:visible',
+      strategy: 'chunked-main',
+    })
+    cache.set('article', {
+      durationMs: 30,
+      profileVersion: '60hz:visible',
+      strategy: 'chunked-main',
+    })
+    expect(cache.get('article', '60hz:visible')).toMatchObject({
+      durationEwmaMs: 15,
+      sampleCount: 2,
+    })
+    expect(cache.get('article', '120hz:visible')).toBeUndefined()
+
+    cache.set('article', {
+      durationMs: 5,
+      profileVersion: '120hz:visible',
+      strategy: 'sync',
+    })
+    cache.invalidateProfile('120hz:hidden')
+    expect(cache.get('article')).toBeUndefined()
+    cache.set('article', {
+      profileVersion: '120hz:hidden',
+      strategy: 'sync',
+    })
+    clock = 151
+    expect(cache.get('article')).toBeUndefined()
   })
 
   it('derives per-unit DOM performance attrs from the shared layer budget', () => {
@@ -315,7 +453,7 @@ describe('use-render-pipeline', () => {
     unregisterLow()
   })
 
-  it('schedules render tasks by priority and supports cancellation', async () => {
+  it('schedules 60 Hz render work by priority and supports cancellation', async () => {
     const frames: FrameRequestCallback[] = []
     vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
       frames.push(callback)
@@ -327,7 +465,13 @@ describe('use-render-pipeline', () => {
     let scheduler: ReturnType<typeof useFsusRenderScheduler> | undefined
     const Probe = defineComponent({
       setup() {
-        scheduler = useFsusRenderScheduler(ref({ frameMs: 100 }))
+        scheduler = useFsusRenderScheduler(
+          ref({
+            frameMs: estimateFsusRenderRefreshProfile(
+              Array.from({ length: 12 }, () => 1000 / 60),
+            ).mainThreadBudgetMs,
+          }),
+        )
         return () => h('div')
       },
     })
@@ -390,6 +534,96 @@ describe('use-render-pipeline', () => {
     postTasks[1]!.callback()
 
     expect(calls).toEqual(['visible', 'background'])
+    wrapper.unmount()
+  })
+
+  it('yields 120 Hz cooperative continuations and lets input preempt them', async () => {
+    const frames: FrameRequestCallback[] = []
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      frames.push(callback)
+      return frames.length
+    })
+    vi.stubGlobal('cancelAnimationFrame', vi.fn())
+    const calls: string[] = []
+    let scheduler: ReturnType<typeof useFsusRenderScheduler> | undefined
+    const Probe = defineComponent({
+      setup() {
+        scheduler = useFsusRenderScheduler(
+          ref({
+            frameMs: estimateFsusRenderRefreshProfile(
+              Array.from({ length: 12 }, () => 1000 / 120),
+            ).mainThreadBudgetMs,
+          }),
+        )
+        return () => h('div')
+      },
+    })
+    const wrapper = mount(Probe)
+    const chunk3 = () => {
+      calls.push('background-3')
+      return { done: true as const }
+    }
+    const chunk2 = () => {
+      calls.push('background-2')
+      return { done: false as const, continuation: chunk3 }
+    }
+    scheduler!.schedule(
+      () => {
+        calls.push('background-1')
+        return { done: false, continuation: chunk2 }
+      },
+      { key: 'index', priority: 'background' },
+    )
+    frames.shift()?.(0)
+    scheduler!.schedule(() => calls.push('input'), {
+      priority: 'user-blocking',
+    })
+    frames.shift()?.(8.33)
+    frames.shift()?.(16.66)
+    frames.shift()?.(24.99)
+    await nextTick()
+    expect(calls).toEqual([
+      'background-1',
+      'input',
+      'background-2',
+      'background-3',
+    ])
+    wrapper.unmount()
+  })
+
+  it('coalesces keyed work and aborts queued continuations uniformly', () => {
+    const frames: FrameRequestCallback[] = []
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      frames.push(callback)
+      return frames.length
+    })
+    vi.stubGlobal('cancelAnimationFrame', vi.fn())
+    const calls: string[] = []
+    const abort = new AbortController()
+    let scheduler: ReturnType<typeof useFsusRenderScheduler> | undefined
+    const Probe = defineComponent({
+      setup() {
+        scheduler = useFsusRenderScheduler(ref({ frameMs: 7.5 }))
+        return () => h('div')
+      },
+    })
+    const wrapper = mount(Probe)
+    scheduler!.schedule(() => calls.push('stale'), { key: 'render' })
+    scheduler!.schedule(() => calls.push('latest'), { key: 'render' })
+    scheduler!.schedule(
+      () => ({
+        done: false,
+        continuation: () => {
+          calls.push('aborted-continuation')
+          return { done: true }
+        },
+      }),
+      { priority: 'background', signal: abort.signal },
+    )
+    frames.shift()?.(0)
+    abort.abort()
+    frames.shift()?.(16.67)
+    expect(calls).toEqual(['latest'])
     wrapper.unmount()
   })
 
@@ -509,6 +743,22 @@ describe('use-render-pipeline', () => {
       type: 'render-start',
     })
     expect(buffer.snapshot()).toHaveLength(2)
+    expect(
+      new Set(
+        pipeline!.diagnostics.value
+          .filter((event) => event.type === 'stage-sample')
+          .map((event) => event.stage),
+      ),
+    ).toEqual(
+      new Set([
+        'queue-wait',
+        'prepare',
+        'vue-commit',
+        'style-layout',
+        'next-paint',
+        'total',
+      ]),
+    )
     expect(
       getFsusRenderPipelineDiagnosticsSnapshot().some(
         (event) => event.adapterId === 'diagnostic-runtime',
@@ -699,6 +949,39 @@ describe('use-render-pipeline', () => {
     wrapper.unmount()
   })
 
+  it('does not commit a pending render after component unmount', async () => {
+    let resolvePrepare: ((value: { units: string[] }) => void) | undefined
+    let pipeline:
+      | ReturnType<typeof useFsusRenderPipelineRuntime<string, string>>
+      | undefined
+    const Probe = defineComponent({
+      setup() {
+        pipeline = useFsusRenderPipelineRuntime({
+          adapter: {
+            id: 'unmount-guard',
+            estimate: () => ({ items: 800 }),
+            estimateSize: () => 20,
+            fingerprint: (value: string) => value,
+            keyOf: (unit: string) => unit,
+            prepare: () =>
+              new Promise((resolve) => {
+                resolvePrepare = resolve
+              }),
+          },
+          config: { mode: 'enabled' },
+          source: 'pending',
+        })
+        return () => h('div')
+      },
+    })
+    const wrapper = mount(Probe)
+    const render = pipeline!.render()
+    wrapper.unmount()
+    resolvePrepare?.({ units: ['late'] })
+    await render
+    expect(pipeline!.document.value).toBeNull()
+  })
+
   it('manages worker requests with lifecycle guards and idle termination', async () => {
     vi.useFakeTimers()
     const events: string[] = []
@@ -816,13 +1099,22 @@ describe('use-render-pipeline', () => {
     const wrapper = mount(Probe)
     const render = pipeline!.render()
     const worker = TestWorker.instances[0]
-    worker.resolve({ metadata: { source: 'worker' }, units: ['worker:source'] })
+    worker.resolve(
+      { metadata: { source: 'worker' }, units: ['worker:source'] },
+      undefined,
+      { computeDurationMs: 0.25 },
+    )
     await render
 
     expect(pipeline!.strategy.value).toBe('chunked-worker')
     expect(pipeline!.renderedStrategy.value).toBe('chunked-worker')
     expect(pipeline!.document.value?.units).toEqual(['worker:source'])
     expect(prepare).not.toHaveBeenCalled()
+    expect(
+      pipeline!.diagnostics.value
+        .filter((event) => event.type === 'stage-sample')
+        .map((event) => event.stage),
+    ).toEqual(expect.arrayContaining(['worker-compute', 'worker-transfer']))
     wrapper.unmount()
   })
 

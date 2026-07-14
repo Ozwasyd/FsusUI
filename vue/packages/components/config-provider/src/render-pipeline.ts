@@ -36,6 +36,7 @@ export type RenderPipelineThresholds = {
 }
 
 export type RenderPipelineBudget = {
+  dynamicFrameMs?: boolean
   frameMs?: number
   overscanPx?: number
   measureBatch?: number
@@ -76,7 +77,8 @@ export const defaultRenderPipelineConfig: ResolvedRenderPipelineConfig = {
     itemCount: 500,
   },
   budget: {
-    frameMs: 8,
+    dynamicFrameMs: true,
+    frameMs: 7.5,
     overscanPx: 800,
     measureBatch: 32,
   },
@@ -141,6 +143,8 @@ export const normalizeRenderPipelineConfig = (
     ),
   },
   budget: {
+    dynamicFrameMs:
+      config?.budget?.dynamicFrameMs ?? config?.budget?.frameMs === undefined,
     frameMs: normalizePositiveNumber(
       config?.budget?.frameMs,
       defaultRenderPipelineConfig.budget.frameMs,

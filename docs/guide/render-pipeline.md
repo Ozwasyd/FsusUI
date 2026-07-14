@@ -25,7 +25,7 @@ import {
     adaptive: 'auto',
     worker: 'auto',
     thresholds: { htmlBytes: 128_000, estimatedNodes: 1500, itemCount: 500 },
-    budget: { frameMs: 8, overscanPx: 800, measureBatch: 32 },
+    budget: { overscanPx: 800, measureBatch: 32 },
     acceleration: {
       mode: 'auto',
       compositor: 'auto',
@@ -39,13 +39,13 @@ import {
 ```
 
 - `mode: 'auto'` 按阈值启用；`enabled` 强制进入预算判断；`disabled` 关闭分块策略。
-- `adaptive: 'auto'` 会在运行时根据硬件画像、渲染耗时、Worker 队列和帧预算自动收紧或放宽 `budget`；`disabled` 完全使用静态预算。
+- `adaptive: 'auto'` 会根据多帧 rAF delta 的中位数与截尾均值估算真实刷新周期，在 60/90/120/144 Hz 下派生不同主线程预算；显式 `budget.frameMs` 仍按旧配置语义覆盖自动值。
 - `worker: 'auto'` 在 Worker 可用且 adapter 支持时启用；SSR 或 Worker 不可用时自动退回主线程路径。
 - `thresholds` 只决定是否进入分块预算，不会把不可分块组件强行虚拟化。
 - `budget` 控制主线程单帧提交、虚拟窗口 overscan 和测量批大小。
-- `acceleration.mode: 'auto'` 会按 DOM 合成层能力、软件渲染信号、CPU 核数和 reduced-motion 选择 `gpu-compositor` 或 `cpu-threaded`；`gpu` / `cpu` 可手动强制。
-- `acceleration.compositor` 控制 `translate3d`、临时 `will-change` 和 Popper GPU compute styles；`contentVisibility` 控制虚拟 chunk 的 `content-visibility: auto`。这里的 GPU 指浏览器 DOM compositor，不包含 WebGPU/Canvas 重写。
-- `cpu-threaded` 会使用更紧的默认阈值和预算，并在可用时优先走 Worker 分块；显式 `worker: 'disabled'` 仍然会被遵守。
+- 内部能力画像分别维护 `motionMode`、compositor、`content-visibility`、主线程校准吞吐/Worker 并发能力、memory 和 refresh profile；compute 等级来自运行时吞吐校准而不是只读 `hardwareConcurrency`，reduced-motion 只控制动效，不再降低 compute/compositor 等级。
+- `acceleration.compositor` 控制 `translate3d`、临时 `will-change` 和 Popper GPU compute styles；`contentVisibility` 只按浏览器能力与显式配置启用，不依赖 CPU/GPU 画像。这里的 GPU 指浏览器 DOM compositor，不包含 WebGPU/Canvas 重写。
+- 页面隐藏、低电量、刷新周期发生变化或运行时能力画像变化时会收紧后台预算、重新采样并使旧策略缓存失效；策略样本使用 EWMA，缓存 60 秒过期，避免一次偶发慢请求永久影响同一 fingerprint。
 
 ## 外部 Adapter
 
@@ -92,7 +92,7 @@ const unregisterPolicy = registerFsusRenderPipelineComponentPolicy({
 })
 ```
 
-Worker 消息协议由统一 executor 托管：请求形状为 `{ id, request }`，响应形状为 `{ id, result }` 或 `{ id, error }`。`result` 应返回与 `prepare()` 一致的 `{ units, html?, metadata? }` 文档对象。runtime 默认在组件实例内复用 Worker；`pool: 'shared'` 会按 `poolKey` 在多个 runtime 之间共享 executor。请求超时、AbortSignal、Worker error 和 dispose 都会以 `FsusResult` 的 `ok: false` 返回，并在 Worker 不可用或失败时回退到 `chunked-main`。
+Worker 消息协议由统一 executor 托管：请求形状为 `{ id, request }`，响应形状为 `{ id, result, timings?: { computeDurationMs } }` 或 `{ id, error }`。提供 Worker 内部 compute timing 后，主线程会把总往返减去 compute 得到 transfer/clone 阶段；没有 timing 时不会伪造阶段值。`result` 应返回与 `prepare()` 一致的 `{ units, html?, metadata? }` 文档对象。runtime 默认在组件实例内复用 Worker；`pool: 'shared'` 会按 `poolKey` 在多个 runtime 之间共享 executor。请求超时、AbortSignal、Worker error 和 dispose 都会以 `FsusResult` 的 `ok: false` 返回，并在 Worker 不可用或失败时回退到 `chunked-main`。
 
 组件内部只调用统一 runtime：
 
@@ -115,11 +115,16 @@ Stable:
 Advanced:
 
 - `registerFsusRenderPipelineStrategyResolver()` 可热拔插策略，支持 `priority`；注销函数执行后恢复默认预算策略。
-- `useFsusRenderScheduler()` 支持 `user-blocking`、`visible`、`background` 三档优先级；支持 AbortSignal 和返回 cancel 函数。
+- `useFsusRenderScheduler()` 支持 `user-blocking`、`visible`、`background` 三档优先级、同 key coalescing、AbortSignal 和返回 cancel 函数。长任务返回 `{ done: false, continuation }` 后每个 chunk 都会重新进入预算队列；background 每帧最多执行一个 chunk，高优先级可以在 continuation 之前抢占。浏览器 `scheduler.postTask` 路径使用同一个 AbortSignal 取消模型。
 - `useFsusVirtualWindow()` 可用于自定义虚拟挂载，但调用方必须保证稳定 key、估算高度和滚动容器。内部使用 prefix offset index、二分 range 查找和批量测量，避免滚动时反复全量扫描。
 - `createFsusWorkerExecutor()` 可用于高级 adapter 的托管 Worker 请求：支持共享实例、idle terminate、request timeout、AbortSignal 清理、失败批量 `FsusResult` 返回和 telemetry 事件。
 - `resolveFsusRenderPipelineUnitAttrs()` 统一派生 DOM 性能 attrs，调用方只透传 `data-fsus-*`，不在组件内复制 layer/content-visibility 策略。
 - `createFsusRenderPipelineDiagnosticsBuffer()`、`registerFsusRenderPipelineDiagnosticSink()` 和 `getFsusRenderPipelineDiagnosticsSnapshot()` 可用于开发期观测。诊断事件记录策略、阶段、预算、队列、cache hit/miss 和 fallback 原因，不记录完整源文或 HTML。
+- runtime 分别记录 queue wait、Worker compute、Worker transfer、prepare/sanitize、Vue commit、style/layout、next paint 和 total；每阶段保留 EWMA、p50、p95 与样本数，策略反馈不会只读取一次 total latency。
+
+## 真实浏览器验证
+
+`pnpm perf:render:web --profile quick` 的 #184 runner 包含 `render-pipeline-monolithic` 与 `render-pipeline-cooperative` 对照场景。两者在真实 Chromium 中执行相同 CPU 工作量，runner 记录 input-to-next-frame、long task、掉帧、layout/paint、heap 和 layer；前者模拟不可让出的旧 callback，后者通过真实 scheduler continuation 执行。需要回归对比时传入 `--baseline <summary.json>`，而不是使用内部函数计时替代页面测量。
 
 Internal:
 

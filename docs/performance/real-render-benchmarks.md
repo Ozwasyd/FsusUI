@@ -30,16 +30,25 @@ Warm-ups are discarded. Every reported timing has p50, p95 and p99. Raw samples 
 
 ## Web matrix and metrics
 
-The full browser matrix is the Cartesian product of every scenario below with 60/120 Hz, DPR 1/2 and enabled/reduced/disabled motion (180 browser cases). It covers:
+The full browser matrix is the Cartesian product of every scenario below with 60/120 Hz, DPR 1/2 and enabled/reduced/disabled motion (204 browser cases). It covers:
 
 - `VirtualList` at 1K, 10K and 100K rows in fixed- and variable-height modes;
 - `TableV2`/virtual grid with two-axis scrolling and 10K/100K rows;
 - `MarkdownRenderer` at 24 KiB, 256 KiB and 1 MiB, including cold and hot WASM paths;
 - `SelectV2` filtering at 2K, 10K and 100K options;
 - `Table` sorting, selection and data-view updates;
+- paired `render-pipeline-monolithic` and `render-pipeline-cooperative` CPU work, measuring the input response of an indivisible callback against the real continuation scheduler;
 - 60 Hz and 120 Hz targets, DPR 1 and 2, and enabled/reduced/disabled motion modes.
 
 The runner records frame work and intervals, dropped-frame rate, Long Tasks, input-to-next-frame latency, style/layout/paint/composite trace durations, DOM nodes, Chromium layers and estimated layer area, JS heap, Worker queue/compute/transfer time, and WASM startup/compute/end-to-end time. Refresh targets are analysis budgets; they do not claim that a virtual CI display physically refreshes at 120 Hz.
+
+The scheduler pair can be reproduced without rerunning the rest of the matrix:
+
+```bash
+pnpm perf:render:web -- --profile quick --scenario render-pipeline- --warmups 1 --samples 7 --output .tmp/performance/render-pipeline
+```
+
+Both variants run with the same browser dimension and CPU workload. On the #185 development machine, the paired run recorded input-to-next-frame p95 of 16.4 ms for the monolithic callback and 13.9 ms for cooperative scheduling; measured action work p95 fell from 15.9 ms to 1.2 ms. These local values are evidence for this implementation only, not portable performance budgets; the raw artifact remains untracked under `.tmp`.
 
 ## Avalonia matrix and metrics
 

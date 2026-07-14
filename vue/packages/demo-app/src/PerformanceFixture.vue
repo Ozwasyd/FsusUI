@@ -75,6 +75,13 @@
       class="performance-input-target"
     />
 
+    <output
+      v-else-if="scenario.startsWith('render-pipeline-')"
+      class="performance-pipeline-result"
+      v-bind="{ 'data-performance-pipeline': 'true' }"
+      >{{ pipelineRevision }}</output
+    >
+
     <el-table
       v-else
       ref="table"
@@ -97,8 +104,10 @@ import {
   DynamicSizeList,
   FixedSizeList,
 } from '@element-plus/components/virtual-list'
+import { useFsusRenderScheduler } from '@element-plus/hooks'
 
 import type { MarkdownRuntimeProfile } from '@element-plus/wasm'
+import type { FsusScheduledWork } from '@element-plus/hooks'
 
 const props = defineProps<{
   scenario: string
@@ -111,6 +120,8 @@ const selected = ref('')
 const selection = ref<unknown[]>([])
 const tableFilter = ref('')
 const tableRevision = ref(0)
+const pipelineRevision = ref(0)
+const renderScheduler = useFsusRenderScheduler()
 const virtualList = ref<{ scrollTo: (offset: number) => void } | null>(null)
 const virtualGrid = ref<{
   scrollTo: (position: { scrollLeft: number; scrollTop: number }) => void
@@ -237,6 +248,43 @@ const act = async (iteration: number) => {
       tableRevision.value += 1
       table.value?.clearSort()
     }
+  } else if (props.scenario === 'render-pipeline-monolithic') {
+    const target = props.size
+    let checksum = iteration
+    for (let index = 0; index < target; index++) {
+      checksum = (checksum * 33 + index) >>> 0
+    }
+    pipelineRevision.value = checksum
+  } else if (props.scenario === 'render-pipeline-cooperative') {
+    const chunkSize = 20_000
+    const target = props.size
+    let cursor = 0
+    let checksum = iteration
+    const chunk = (): FsusScheduledWork => {
+      const limit = Math.min(target, cursor + chunkSize)
+      while (cursor < limit) {
+        checksum = (checksum * 33 + cursor) >>> 0
+        cursor += 1
+      }
+      if (cursor >= target) {
+        pipelineRevision.value = checksum
+        return { done: true }
+      }
+      return { done: false, continuation: chunk }
+    }
+    renderScheduler.schedule(chunk, {
+      key: 'performance-pipeline-background',
+      priority: 'background',
+    })
+    await new Promise<void>((resolve) => {
+      renderScheduler.schedule(
+        () => {
+          pipelineRevision.value = iteration
+          resolve()
+        },
+        { priority: 'user-blocking' },
+      )
+    })
   } else {
     const target = document.querySelector<HTMLElement>(
       '.performance-scroll-target',

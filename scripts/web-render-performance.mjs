@@ -15,6 +15,7 @@ const valueOf = (name, fallback) => {
 }
 const has = (name) => argv.includes(name)
 const profile = valueOf('--profile', 'quick')
+const scenarioFilter = valueOf('--scenario', '')
 const output = path.resolve(root, valueOf('--output', '.tmp/performance/web'))
 const baselinePath = valueOf('--baseline', '')
 const port = Number(valueOf('--port', '5188'))
@@ -39,6 +40,8 @@ const definitions = [
   ['select-v2', 10_000],
   ['select-v2', 100_000],
   ['table', 1_000],
+  ['render-pipeline-monolithic', 2_000_000],
+  ['render-pipeline-cooperative', 2_000_000],
 ]
 
 const quickDimensions = [
@@ -63,11 +66,19 @@ const quickDefinitions = [
   definitions[10],
   definitions[13],
   definitions[14],
+  definitions[15],
+  definitions[16],
 ]
 const dimensions = profile === 'full' ? fullDimensions : quickDimensions
-const scenarioDefinitions = profile === 'full' ? definitions : quickDefinitions
-const matrix =
-  profile === 'full'
+const scenarioDefinitions = (
+  profile === 'full' ? definitions : quickDefinitions
+).filter(([scenario]) => !scenarioFilter || scenario.startsWith(scenarioFilter))
+const matrix = scenarioFilter
+  ? scenarioDefinitions.map((definition) => [
+      ...definition,
+      ...quickDimensions[0],
+    ])
+  : profile === 'full'
     ? scenarioDefinitions.flatMap((definition) =>
         dimensions.map((dimension) => [...definition, ...dimension]),
       )
