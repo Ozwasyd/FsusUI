@@ -10,6 +10,7 @@ import {
   resolveFsusRenderPipelineConfig,
   resolveFsusRenderPipelineUnitAttrs,
   resolveFsusRenderPipelineHardwareProfile,
+  resolveFsusWorkerPoolSize,
   useFsusRenderPipelineHardwareProfile,
   useFsusRenderPipelineRuntime,
   useFsusRenderScheduler,
@@ -35,6 +36,8 @@ import type {
   FsusRenderPipelineWorkerPoolMode,
   FsusRenderPipelineUnitAttrsOptions,
   FsusWorkerExecutorEvent,
+  FsusWorkerRunOptions,
+  FsusWorkerTaskLane,
   RenderPipelineConfigContract,
 } from '../../packages/element-plus/render-pipeline'
 
@@ -64,6 +67,12 @@ describe('render pipeline public api', () => {
       name: 'public-api-worker',
       pendingCount: 0,
       type: 'worker-created',
+    }
+    const workerLane: FsusWorkerTaskLane = 'latency'
+    const workerRunOptions: FsusWorkerRunOptions = {
+      generation: 2,
+      key: 'public-query',
+      lane: workerLane,
     }
     const diagnostic: FsusRenderPipelineDiagnosticEvent = {
       strategy,
@@ -123,6 +132,10 @@ describe('render pipeline public api', () => {
     expect(workerPool).toBe('runtime')
     expect(typeof workerOptions.createWorker).toBe('function')
     expect(workerEvent.type).toBe('worker-created')
+    expect(workerRunOptions.lane).toBe('latency')
+    expect(
+      resolveFsusWorkerPoolSize({ hardwareConcurrency: 8, reservedCores: 2 }),
+    ).toBe(4)
     expect(diagnostic.strategy).toBe('chunked-main')
   })
 

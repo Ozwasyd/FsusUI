@@ -50,6 +50,7 @@ export {
   resolveFsusRenderPipelineHardwareAttrs,
   resolveFsusRenderPipelineHardwareProfile,
   resolveFsusRenderPipelineUnitAttrs,
+  resolveFsusWorkerPoolSize,
   shouldUseFsusRenderPipeline,
   useFsusRenderPipeline,
   useFsusRenderPipelineHardwareProfile,
@@ -100,4 +101,10 @@ export type {
   FsusWorkerExecutorEvent,
   FsusWorkerExecutorEventType,
   FsusWorkerExecutorOptions,
+  FsusWorkerCancelMessage,
+  FsusWorkerPoolSizingInput,
+  FsusWorkerResponse,
+  FsusWorkerRunMessage,
+  FsusWorkerRunOptions,
+  FsusWorkerTaskLane,
 } from '@element-plus/hooks'

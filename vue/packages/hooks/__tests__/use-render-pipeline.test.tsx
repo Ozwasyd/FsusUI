@@ -20,6 +20,7 @@ import {
   registerFsusRenderPipelineAdapter,
   registerFsusRenderPipelineComponentPolicy,
   registerFsusRenderPipelineStrategyResolver,
+  resolveFsusWorkerPoolSize,
   resolveFsusAdaptiveRenderPipelineConfig,
   resolveFsusRenderPipelineCompositorEnabled,
   resolveFsusRenderPipelineComponentPolicy,
@@ -38,8 +39,12 @@ import {
 } from '../use-render-pipeline'
 
 type TestWorkerPayload = {
+  generation?: number
   id: number
-  request: unknown
+  key?: string
+  lane?: string
+  request?: unknown
+  type?: 'cancel' | 'run'
 }
 
 class TestWorker {
@@ -48,17 +53,19 @@ class TestWorker {
   onerror: ((event: ErrorEvent) => void) | null = null
   onmessage: ((event: MessageEvent) => void) | null = null
   posts: TestWorkerPayload[] = []
+  transfers: Transferable[][] = []
   terminated = false
 
   constructor() {
     TestWorker.instances.push(this)
   }
 
-  postMessage(message: TestWorkerPayload) {
+  postMessage(message: TestWorkerPayload, transfer: Transferable[] = []) {
     if (this.terminated) {
       throw new Error('test_worker_terminated')
     }
     this.posts.push(message)
+    this.transfers.push(transfer)
   }
 
   terminate() {
@@ -997,7 +1004,16 @@ describe('use-render-pipeline', () => {
 
     const render = executor.run('first')
     const worker = TestWorker.instances[0]
-    expect(worker.posts).toEqual([{ id: 1, request: 'first' }])
+    expect(worker.posts).toEqual([
+      {
+        generation: 0,
+        id: 1,
+        key: undefined,
+        lane: 'throughput',
+        request: 'first',
+        type: 'run',
+      },
+    ])
 
     worker.resolve('done')
     await expect(render).resolves.toEqual({ ok: true, value: 'done' })
@@ -1012,6 +1028,283 @@ describe('use-render-pipeline', () => {
 
     vi.advanceTimersByTime(20)
     expect(worker.terminated).toBe(true)
+  })
+
+  it('sizes pools from cores and memory while reserving render capacity', () => {
+    expect(
+      resolveFsusWorkerPoolSize({
+        deviceMemoryGb: 16,
+        hardwareConcurrency: 16,
+      }),
+    ).toBe(4)
+    expect(
+      resolveFsusWorkerPoolSize({
+        deviceMemoryGb: 2,
+        hardwareConcurrency: 16,
+      }),
+    ).toBe(1)
+    expect(
+      resolveFsusWorkerPoolSize({
+        hardwareConcurrency: 4,
+        maxWorkers: 4,
+        reservedCores: 2,
+      }),
+    ).toBe(2)
+  })
+
+  it('schedules latency lanes first without starving throughput or background', async () => {
+    const executor = createFsusWorkerExecutor<string, string>(
+      () => new TestWorker() as unknown as Worker,
+      {
+        laneQueueLimits: { background: 4, latency: 8, throughput: 4 },
+        maxQueue: 16,
+        maxWorkers: 1,
+      },
+    )
+    const blocker = executor.run('blocker', { lane: 'throughput' })
+    const background = executor.run('background', { lane: 'background' })
+    const throughput = executor.run('throughput', { lane: 'throughput' })
+    const latency = Array.from({ length: 5 }, (_, index) =>
+      executor.run(`latency-${index}`, { lane: 'latency' }),
+    )
+    const worker = TestWorker.instances[0]!
+
+    for (let index = 0; index < 8; index += 1) {
+      const postIndex = worker.posts.length - 1
+      const request = String(worker.posts[postIndex]?.request)
+      worker.resolve(request, postIndex)
+      await Promise.resolve()
+    }
+
+    await Promise.all([blocker, background, throughput, ...latency])
+    expect(
+      worker.posts
+        .filter((post) => post.type === 'run')
+        .map((post) => post.request),
+    ).toEqual([
+      'blocker',
+      'latency-0',
+      'latency-1',
+      'latency-2',
+      'latency-3',
+      'throughput',
+      'background',
+      'latency-4',
+    ])
+    executor.dispose()
+  })
+
+  it('cancels stale generations in the worker protocol', async () => {
+    const events: string[] = []
+    const executor = createFsusWorkerExecutor<string, string>(
+      () => new TestWorker() as unknown as Worker,
+      {
+        maxWorkers: 1,
+        onEvent: (event) => events.push(event.type),
+      },
+    )
+    const stale = executor.run('stale', {
+      generation: 1,
+      key: 'query',
+      lane: 'latency',
+    })
+    const latest = executor.run('latest', {
+      generation: 2,
+      key: 'query',
+      lane: 'latency',
+    })
+    const worker = TestWorker.instances[0]!
+
+    expect(worker.posts.map((post) => post.type)).toEqual(['run', 'cancel'])
+    await expect(stale).resolves.toMatchObject({
+      error: { code: 'aborted' },
+      ok: false,
+    })
+    worker.resolve('ignored-stale-result', 0)
+    await Promise.resolve()
+    expect(worker.posts.map((post) => post.type)).toEqual([
+      'run',
+      'cancel',
+      'run',
+    ])
+    worker.resolve('latest-result', 2)
+    await expect(latest).resolves.toEqual({
+      ok: true,
+      value: 'latest-result',
+    })
+    expect(events).toContain('request-cancel')
+    executor.dispose()
+  })
+
+  it('coalesces continuous input to one queued latest generation', async () => {
+    const executor = createFsusWorkerExecutor<string, string>(
+      () => new TestWorker() as unknown as Worker,
+      { maxQueue: 4, maxWorkers: 1 },
+    )
+    const requests = Array.from({ length: 12 }, (_, index) =>
+      executor.run(`query-${index}`, {
+        generation: index + 1,
+        key: 'continuous-query',
+        lane: 'latency',
+      }),
+    )
+    const worker = TestWorker.instances[0]!
+
+    expect(executor.getPendingCount()).toBe(1)
+    expect(executor.getQueueDepth()).toBe(1)
+    expect(worker.posts.filter((post) => post.type === 'run')).toHaveLength(1)
+
+    worker.resolve('ignored-stale-result', 0)
+    await Promise.resolve()
+    expect(worker.posts.filter((post) => post.type === 'run')).toHaveLength(2)
+    expect(worker.posts.at(-1)).toMatchObject({
+      generation: 12,
+      request: 'query-11',
+      type: 'run',
+    })
+    worker.resolve('latest-result', worker.posts.length - 1)
+
+    const results = await Promise.all(requests)
+    expect(results.slice(0, -1).every((result) => result.ok === false)).toBe(
+      true,
+    )
+    expect(results.at(-1)).toEqual({ ok: true, value: 'latest-result' })
+    executor.dispose()
+  })
+
+  it('propagates AbortSignal as a cancel message', async () => {
+    const executor = createFsusWorkerExecutor<string, string>(
+      () => new TestWorker() as unknown as Worker,
+      { maxWorkers: 1 },
+    )
+    const controller = new AbortController()
+    const result = executor.run('abort-me', {
+      generation: 4,
+      key: 'editor',
+      signal: controller.signal,
+    })
+    const worker = TestWorker.instances[0]!
+    controller.abort()
+
+    await expect(result).resolves.toMatchObject({
+      error: { code: 'aborted' },
+      ok: false,
+    })
+    expect(worker.posts.at(-1)).toMatchObject({
+      generation: 4,
+      key: 'editor',
+      type: 'cancel',
+    })
+    executor.dispose()
+  })
+
+  it('enforces clone and queue budgets with drop diagnostics', async () => {
+    const events: Array<{ cloneBytes?: number; type: string }> = []
+    const cloneExecutor = createFsusWorkerExecutor<string, string>(
+      () => new TestWorker() as unknown as Worker,
+      {
+        onEvent: (event) => events.push(event),
+        structuredCloneLimitBytes: 16,
+      },
+    )
+    await expect(
+      cloneExecutor.run('payload exceeding budget'),
+    ).resolves.toMatchObject({
+      error: { code: 'protocol', message: 'fsus_worker_clone_budget_exceeded' },
+      ok: false,
+    })
+    expect(cloneExecutor.getWorkerCount()).toBe(0)
+    expect(events.at(-1)).toMatchObject({ type: 'request-drop' })
+    expect(events.at(-1)?.cloneBytes).toBeGreaterThan(16)
+
+    const queueExecutor = createFsusWorkerExecutor<string, string>(
+      () => new TestWorker() as unknown as Worker,
+      {
+        laneQueueLimits: { background: 1 },
+        maxQueue: 1,
+        maxWorkers: 1,
+      },
+    )
+    const active = queueExecutor.run('active')
+    const queued = queueExecutor.run('queued', { lane: 'background' })
+    const dropped = queueExecutor.run('dropped', { lane: 'background' })
+    await expect(dropped).resolves.toMatchObject({
+      error: { message: 'fsus_worker_lane_queue_full' },
+      ok: false,
+    })
+    const worker = TestWorker.instances.at(-1)!
+    worker.resolve('active')
+    await active
+    worker.resolve('queued', worker.posts.length - 1)
+    await queued
+    queueExecutor.dispose()
+  })
+
+  it('passes transferable buffers without counting them as cloned payload', async () => {
+    class TransferWorker extends TestWorker {
+      override postMessage(
+        message: TestWorkerPayload,
+        transfer: Transferable[] = [],
+      ) {
+        const cloned = structuredClone(message, { transfer })
+        super.postMessage(cloned, transfer)
+      }
+    }
+    const executor = createFsusWorkerExecutor<Uint8Array, number>(
+      () => new TransferWorker() as unknown as Worker,
+      { maxWorkers: 1, structuredCloneLimitBytes: 8 },
+    )
+    const buffer = new ArrayBuffer(1024)
+    const request = new Uint8Array(buffer)
+    const result = executor.run(request, { transfer: [buffer] })
+    const worker = TestWorker.instances.at(-1)!
+
+    expect(buffer.byteLength).toBe(0)
+    expect(worker.transfers[0]).toHaveLength(1)
+    worker.resolve(1024)
+    await expect(result).resolves.toEqual({ ok: true, value: 1024 })
+    executor.dispose()
+  })
+
+  it('defers background work while the main thread reports pending input', async () => {
+    vi.useFakeTimers()
+    let busy = true
+    const executor = createFsusWorkerExecutor<string, string>(
+      () => new TestWorker() as unknown as Worker,
+      {
+        backgroundDeferMs: 10,
+        isMainThreadBusy: () => busy,
+        maxWorkers: 1,
+      },
+    )
+    const result = executor.run('background', { lane: 'background' })
+    const worker = TestWorker.instances[0]!
+    expect(worker.posts).toHaveLength(0)
+
+    busy = false
+    vi.advanceTimersByTime(10)
+    expect(worker.posts).toHaveLength(1)
+    worker.resolve('done')
+    await expect(result).resolves.toEqual({ ok: true, value: 'done' })
+    executor.dispose()
+  })
+
+  it('retries an opted-in task on a replacement worker after a crash', async () => {
+    const events: string[] = []
+    const executor = createFsusWorkerExecutor<string, string>(
+      () => new TestWorker() as unknown as Worker,
+      { maxWorkers: 1, onEvent: (event) => events.push(event.type) },
+    )
+    const result = executor.run('retry', { retryOnCrash: true })
+    TestWorker.instances[0]!.fail(new Error('first worker crashed'))
+
+    expect(TestWorker.instances).toHaveLength(2)
+    TestWorker.instances[1]!.resolve('recovered')
+    await expect(result).resolves.toEqual({ ok: true, value: 'recovered' })
+    expect(events).toEqual(
+      expect.arrayContaining(['worker-crash', 'request-retry']),
+    )
+    executor.dispose()
   })
 
   it('cleans up aborted and timed out worker requests', async () => {
@@ -1040,27 +1333,27 @@ describe('use-render-pipeline', () => {
     expect(worker.terminated).toBe(true)
   })
 
-  it('resolves all pending requests with errors when the worker fails', async () => {
+  it('isolates a worker crash from tasks running on healthy pool workers', async () => {
     const executor = createFsusWorkerExecutor<string, string>(
       () => new TestWorker() as unknown as Worker,
-      { requestTimeoutMs: 1_000 },
+      { maxWorkers: 2, requestTimeoutMs: 1_000 },
     )
     const first = executor.run('first')
     const second = executor.run('second')
-    const worker = TestWorker.instances[0]
+    const [failedWorker, healthyWorker] = TestWorker.instances
 
-    worker.fail(new Error('worker exploded'))
+    failedWorker!.fail(new Error('worker exploded'))
 
     await expect(first).resolves.toMatchObject({
       error: { code: 'infra', message: 'worker exploded' },
       ok: false,
     })
-    await expect(second).resolves.toMatchObject({
-      error: { code: 'infra', message: 'worker exploded' },
-      ok: false,
-    })
+    healthyWorker!.resolve('healthy')
+    await expect(second).resolves.toEqual({ ok: true, value: 'healthy' })
     expect(executor.getPendingCount()).toBe(0)
-    expect(worker.terminated).toBe(true)
+    expect(failedWorker!.terminated).toBe(true)
+    expect(healthyWorker!.terminated).toBe(false)
+    executor.dispose()
   })
 
   it('uses adapter worker configuration through the unified runtime', async () => {
@@ -1130,6 +1423,7 @@ describe('use-render-pipeline', () => {
       prepare: async (value: string) => ({ units: [`main:${value}`] }),
       worker: {
         createWorker: () => new TestWorker() as unknown as Worker,
+        maxWorkers: 2,
         pool: 'shared' as const,
         poolKey: 'shared-worker-test',
         requestTimeoutMs: 1_000,
@@ -1163,19 +1457,22 @@ describe('use-render-pipeline', () => {
     const wrapper = mount(Probe)
     const firstRender = first!.render()
     const secondRender = second!.render()
-    const worker = TestWorker.instances[0]
+    const [firstWorker, secondWorker] = TestWorker.instances
 
-    expect(TestWorker.instances).toHaveLength(1)
-    expect(worker.posts).toHaveLength(2)
+    expect(TestWorker.instances).toHaveLength(2)
+    expect(firstWorker!.posts).toHaveLength(1)
+    expect(secondWorker!.posts).toHaveLength(1)
 
-    worker.resolve({ units: ['worker:first'] }, 0)
-    worker.resolve({ units: ['worker:second'] }, 1)
+    firstWorker!.resolve({ units: ['worker:first'] }, 0)
+    secondWorker!.resolve({ units: ['worker:second'] }, 0)
     await firstRender
     await secondRender
 
     expect(first!.document.value?.units).toEqual(['worker:first'])
     expect(second!.document.value?.units).toEqual(['worker:second'])
     wrapper.unmount()
+    expect(firstWorker!.terminated).toBe(true)
+    expect(secondWorker!.terminated).toBe(true)
   })
 
   it('falls back to chunked-main when adapter worker rendering fails', async () => {
@@ -1221,7 +1518,18 @@ describe('use-render-pipeline', () => {
     const wrapper = mount(Probe)
     const render = pipeline!.render()
     const worker = TestWorker.instances[0]
+    const idleCallbacks: IdleRequestCallback[] = []
+    vi.stubGlobal('requestIdleCallback', (callback: IdleRequestCallback) => {
+      idleCallbacks.push(callback)
+      return idleCallbacks.length
+    })
     worker.reject({ message: 'worker failed', name: 'WorkerError' })
+    await Promise.resolve()
+    expect(prepare).not.toHaveBeenCalled()
+    idleCallbacks.at(-1)?.({
+      didTimeout: false,
+      timeRemaining: () => 8,
+    })
     await render
 
     expect(prepare).toHaveBeenCalledWith(

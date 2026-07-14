@@ -153,7 +153,7 @@ chunk 边界由 WASM 渲染流程产出，类型包括 `heading`、`paragraph`�
 
 阈值与预算通过 `ElConfigProvider` 的 `render-pipeline` 配置统一控制；MarkdownRenderer 不新增专属开关。
 
-大文档优先走 Render Pipeline adapter 的托管 Worker。Worker 只负责 Markdown 分块与 metadata 预计算，主线程仍负责虚拟挂载、测量和锚点保持；Worker 超时、崩溃、Abort 或不可用时会自动降级到 `chunked-main`，组件不会持有自己的私有 worker executor。
+大文档优先走 Render Pipeline adapter 的 shared Worker pool。Worker 只负责 Markdown 分块与 metadata 预计算，主线程仍负责虚拟挂载、测量和锚点保持；每个 renderer 使用独立 key/generation，连续编辑会向 Worker 发送 cancel，旧 generation 在解析阶段结束后不得提交结果。单 Worker 超时或崩溃只影响对应 slot，其他 renderer 任务继续运行；Worker 不可用时会等待主线程 idle/frame 预算后降级到 `chunked-main`，组件不会持有自己的私有 executor。
 
 ---
 

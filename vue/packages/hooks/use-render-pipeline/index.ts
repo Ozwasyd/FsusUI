@@ -17,7 +17,6 @@ import {
   getFsusRenderPipelineComponentPolicy,
   isFsusErr,
   isFsusOk,
-  toFsusError,
   type FsusRenderPipelineComponentPolicy,
   type FsusErrorDetail,
   type FsusResult,
@@ -26,8 +25,30 @@ import {
 import type { ComputedRef, MaybeRef, Ref } from 'vue'
 
 import { FsusVirtualSizeIndex } from './virtual-window-index'
+import {
+  createFsusWorkerExecutor,
+  type FsusWorkerExecutorEvent,
+  type FsusWorkerExecutorEventType,
+  type FsusWorkerExecutorOptions,
+  type FsusWorkerTaskLane,
+} from './worker-pool'
 
 export { FsusVirtualSizeIndex } from './virtual-window-index'
+export {
+  createFsusWorkerExecutor,
+  resolveFsusWorkerPoolSize,
+} from './worker-pool'
+export type {
+  FsusWorkerCancelMessage,
+  FsusWorkerExecutorEvent,
+  FsusWorkerExecutorEventType,
+  FsusWorkerExecutorOptions,
+  FsusWorkerPoolSizingInput,
+  FsusWorkerResponse,
+  FsusWorkerRunMessage,
+  FsusWorkerRunOptions,
+  FsusWorkerTaskLane,
+} from './worker-pool'
 
 export {
   clearFsusRenderPipelineComponentPolicies,
@@ -171,37 +192,6 @@ export type FsusRenderPipelineDocument<TUnit> = {
 
 export type FsusRenderDocument<TUnit> = FsusRenderPipelineDocument<TUnit>
 
-export type FsusWorkerExecutorEventType =
-  | 'worker-created'
-  | 'worker-reused'
-  | 'worker-disposed'
-  | 'worker-idle-terminate'
-  | 'worker-error'
-  | 'request-start'
-  | 'request-resolve'
-  | 'request-reject'
-  | 'request-abort'
-  | 'request-timeout'
-
-export type FsusWorkerExecutorEvent = {
-  computeDurationMs?: number
-  durationMs?: number
-  error?: FsusErrorDetail
-  id?: number
-  name: string
-  pendingCount: number
-  transferDurationMs?: number
-  type: FsusWorkerExecutorEventType
-}
-
-export type FsusWorkerExecutorOptions = {
-  idleTerminateMs?: number
-  name?: string
-  onEvent?: (event: FsusWorkerExecutorEvent) => void
-  requestTimeoutMs?: number
-  serializeError?: (error: unknown) => unknown
-}
-
 export type FsusRenderPipelineWorkerPoolMode = 'runtime' | 'shared'
 
 export type FsusRenderPipelineWorkerOptions = FsusWorkerExecutorOptions & {
@@ -219,16 +209,24 @@ export type FsusRenderPipelineDiagnosticEvent = {
     overscanPx: number
   }
   cache?: 'hit' | 'miss' | 'bypass'
+  cloneBytes?: number
   durationMs?: number
   error?: FsusErrorDetail
   fallbackReason?: string
+  generation?: number
+  key?: string
+  lane?: FsusWorkerTaskLane
   phase?: string
   stage?: FsusRenderPipelineStage
   stageStats?: FsusRenderStageStats
   pendingCount?: number
   queueDepth?: number
+  queueWaitDurationMs?: number
+  retryCount?: number
   strategy: FsusRenderPipelineStrategy
   timestamp?: number
+  workerCount?: number
+  workerId?: number
   type:
     | 'render-start'
     | 'render-complete'
@@ -1631,343 +1629,10 @@ export const useFsusRenderScheduler = (
   }
 }
 
-const DEFAULT_WORKER_IDLE_TERMINATE_MS = 30_000
-const DEFAULT_WORKER_REQUEST_TIMEOUT_MS = 60_000
-
 const now = () =>
   typeof performance !== 'undefined' && typeof performance.now === 'function'
     ? performance.now()
     : Date.now()
-
-const positiveNumber = (value: unknown, fallback: number) =>
-  typeof value === 'number' && Number.isFinite(value) && value > 0
-    ? value
-    : fallback
-
-const createAbortErrorDetail = (message: string) =>
-  createFsusError('aborted', message)
-
-const normalizeWorkerError = (
-  error: unknown,
-  serializeError?: (error: unknown) => unknown,
-) => {
-  const serialized = serializeError ? serializeError(error) : error
-  if (
-    serialized &&
-    typeof serialized === 'object' &&
-    'code' in serialized &&
-    'message' in serialized
-  ) {
-    return toFsusError(serialized, 'fsus_worker_error', 'infra')
-  }
-  if (serialized instanceof Error) {
-    return toFsusError(serialized, 'fsus_worker_error', 'infra')
-  }
-
-  if (serialized && typeof serialized === 'object') {
-    const payload = serialized as { message?: unknown; name?: unknown }
-    return createFsusError('infra', 'fsus_worker_error', {
-      cause: payload,
-      details:
-        typeof payload.message === 'string' ? payload.message : undefined,
-    })
-  }
-
-  return createFsusError(
-    'infra',
-    typeof serialized === 'string' ? serialized : 'fsus_worker_error',
-    { cause: serialized },
-  )
-}
-
-export const createFsusWorkerExecutor = <TRequest, TResponse>(
-  createWorker: () => Worker,
-  options: FsusWorkerExecutorOptions = {},
-) => {
-  let worker: Worker | null = null
-  let taskId = 0
-  let retainCount = 0
-  let idleTerminateTimer: ReturnType<typeof setTimeout> | null = null
-  const pending = new Map<
-    number,
-    {
-      abortCleanup: (() => void) | null
-      release: () => void
-      resolve: (value: FsusResult<TResponse>) => void
-      startedAt: number
-      timeoutId: ReturnType<typeof setTimeout> | null
-    }
-  >()
-
-  const name = options.name ?? 'fsus-worker'
-  const idleTerminateMs = positiveNumber(
-    options.idleTerminateMs,
-    DEFAULT_WORKER_IDLE_TERMINATE_MS,
-  )
-  const requestTimeoutMs = positiveNumber(
-    options.requestTimeoutMs,
-    DEFAULT_WORKER_REQUEST_TIMEOUT_MS,
-  )
-
-  const emit = (
-    type: FsusWorkerExecutorEventType,
-    event: Partial<
-      Omit<FsusWorkerExecutorEvent, 'name' | 'pendingCount' | 'type'>
-    > = {},
-  ) => {
-    options.onEvent?.({
-      name,
-      pendingCount: pending.size,
-      type,
-      ...event,
-    })
-  }
-
-  const clearIdleTerminateTimer = () => {
-    if (!idleTerminateTimer) return
-    clearTimeout(idleTerminateTimer)
-    idleTerminateTimer = null
-  }
-
-  const scheduleIdleTerminate = () => {
-    if (retainCount > 0 || pending.size > 0) return
-    clearIdleTerminateTimer()
-    idleTerminateTimer = setTimeout(() => {
-      if (retainCount === 0 && pending.size === 0 && worker) {
-        emit('worker-idle-terminate')
-        worker.terminate()
-        worker = null
-      }
-      idleTerminateTimer = null
-    }, idleTerminateMs)
-  }
-
-  const releaseRetain = () => {
-    retainCount = Math.max(0, retainCount - 1)
-    scheduleIdleTerminate()
-  }
-
-  const settlePendingRequest = (
-    id: number,
-    action: (task: {
-      resolve: (value: FsusResult<TResponse>) => void
-      startedAt: number
-    }) => void,
-    type: FsusWorkerExecutorEventType,
-    error?: FsusErrorDetail,
-    timings?: { computeDurationMs?: number },
-  ) => {
-    const task = pending.get(id)
-    if (!task) return
-
-    pending.delete(id)
-    if (task.timeoutId) {
-      clearTimeout(task.timeoutId)
-      task.timeoutId = null
-    }
-    task.abortCleanup?.()
-    task.abortCleanup = null
-
-    try {
-      action(task)
-      const durationMs = now() - task.startedAt
-      emit(type, {
-        computeDurationMs: timings?.computeDurationMs,
-        durationMs,
-        error,
-        id,
-        transferDurationMs:
-          timings?.computeDurationMs === undefined
-            ? undefined
-            : Math.max(0, durationMs - timings.computeDurationMs),
-      })
-    } finally {
-      task.release()
-    }
-  }
-
-  const destroyWorker = (
-    reason: unknown = createFsusError('infra', 'fsus_worker_disposed'),
-    type: FsusWorkerExecutorEventType = 'worker-disposed',
-  ) => {
-    const error = toFsusError(reason, 'fsus_worker_disposed', 'infra')
-    clearIdleTerminateTimer()
-    worker?.terminate()
-    worker = null
-    emit(type, { error })
-
-    for (const id of Array.from(pending.keys())) {
-      settlePendingRequest(
-        id,
-        (task) => task.resolve(fsusErr(error)),
-        'request-reject',
-        error,
-      )
-    }
-  }
-
-  const ensureWorker = () => {
-    if (!worker) {
-      clearIdleTerminateTimer()
-      worker = createWorker()
-      emit('worker-created')
-      worker.onmessage = (event: MessageEvent) => {
-        const payload = event.data as {
-          error?: unknown
-          id: number
-          result?: TResponse
-          timings?: { computeDurationMs?: number }
-        }
-        if (payload.error) {
-          const error = normalizeWorkerError(
-            payload.error,
-            options.serializeError,
-          )
-          settlePendingRequest(
-            payload.id,
-            (task) => task.resolve(fsusErr(error)),
-            'request-reject',
-            error,
-          )
-        } else {
-          settlePendingRequest(
-            payload.id,
-            (task) => task.resolve(fsusOk(payload.result as TResponse)),
-            'request-resolve',
-            undefined,
-            payload.timings,
-          )
-        }
-      }
-      worker.onerror = (event) => {
-        event.preventDefault?.()
-        const error = normalizeWorkerError(
-          (event as ErrorEvent).error ??
-            (event as ErrorEvent).message ??
-            'fsus_worker_error',
-          options.serializeError,
-        )
-        destroyWorker(error, 'worker-error')
-      }
-    } else {
-      clearIdleTerminateTimer()
-      emit('worker-reused')
-    }
-    return worker
-  }
-
-  const retain = () => {
-    retainCount += 1
-    clearIdleTerminateTimer()
-
-    try {
-      ensureWorker()
-    } catch (error) {
-      releaseRetain()
-      throw error
-    }
-
-    let released = false
-    return () => {
-      if (released) return
-      released = true
-      releaseRetain()
-    }
-  }
-
-  const dispose = () => {
-    destroyWorker(
-      createFsusError('infra', 'fsus_worker_disposed'),
-      'worker-disposed',
-    )
-  }
-
-  const run = (request: TRequest, signal?: AbortSignal) => {
-    if (signal?.aborted) {
-      return Promise.resolve(
-        fsusErr<TResponse>(
-          createAbortErrorDetail('fsus_worker_request_aborted'),
-        ),
-      )
-    }
-
-    const id = ++taskId
-    let release: (() => void) | null = null
-    let activeWorker: Worker
-
-    try {
-      release = retain()
-      activeWorker = worker ?? ensureWorker()
-    } catch (error) {
-      return Promise.resolve(
-        fsusErr<TResponse>(
-          toFsusError(error, 'fsus_worker_create_failed', 'infra'),
-        ),
-      )
-    }
-
-    return new Promise<FsusResult<TResponse>>((resolve) => {
-      const abort = () => {
-        const error = createAbortErrorDetail('fsus_worker_request_aborted')
-        settlePendingRequest(
-          id,
-          (task) => task.resolve(fsusErr(error)),
-          'request-abort',
-          error,
-        )
-      }
-
-      const timeoutId = setTimeout(() => {
-        const error = createFsusError('timeout', 'fsus_worker_request_timeout')
-        settlePendingRequest(
-          id,
-          (task) => task.resolve(fsusErr(error)),
-          'request-timeout',
-          error,
-        )
-        destroyWorker(error, 'worker-error')
-      }, requestTimeoutMs)
-
-      let abortCleanup: (() => void) | null = null
-      if (signal) {
-        signal.addEventListener('abort', abort, { once: true })
-        abortCleanup = () => signal.removeEventListener('abort', abort)
-      }
-
-      pending.set(id, {
-        abortCleanup,
-        release: release ?? (() => {}),
-        resolve,
-        startedAt: now(),
-        timeoutId,
-      })
-      emit('request-start', { id })
-
-      try {
-        activeWorker.postMessage({ id, request })
-      } catch (error) {
-        const detail = toFsusError(
-          error,
-          'fsus_worker_post_message_failed',
-          'infra',
-        )
-        settlePendingRequest(
-          id,
-          (task) => task.resolve(fsusErr(detail)),
-          'request-reject',
-          detail,
-        )
-      }
-    })
-  }
-
-  return {
-    dispose,
-    getPendingCount: () => pending.size,
-    retain,
-    run,
-  }
-}
 
 type AnyFsusWorkerExecutor = ReturnType<
   typeof createFsusWorkerExecutor<unknown, unknown>
@@ -1994,6 +1659,17 @@ const getSharedWorkerExecutor = <TRequest, TResponse>({
   let entry = sharedWorkerExecutors.get(poolKey)
   if (!entry) {
     const listeners = new Set<(event: FsusWorkerExecutorEvent) => void>()
+    const disposeIfUnused = () => {
+      const activeEntry = sharedWorkerExecutors.get(poolKey)
+      if (
+        activeEntry &&
+        activeEntry.listeners.size === 0 &&
+        activeEntry.executor.getPendingCount() === 0
+      ) {
+        sharedWorkerExecutors.delete(poolKey)
+        activeEntry.executor.dispose()
+      }
+    }
     entry = {
       executor: createFsusWorkerExecutor<unknown, unknown>(createWorker, {
         ...options,
@@ -2003,6 +1679,7 @@ const getSharedWorkerExecutor = <TRequest, TResponse>({
           for (const activeListener of Array.from(listeners)) {
             activeListener(event)
           }
+          if (listeners.size === 0) queueMicrotask(disposeIfUnused)
         },
       }),
       listeners,
@@ -2014,6 +1691,13 @@ const getSharedWorkerExecutor = <TRequest, TResponse>({
   return {
     cleanup: () => {
       entry?.listeners.delete(listener)
+      if (
+        entry?.listeners.size === 0 &&
+        entry.executor.getPendingCount() === 0
+      ) {
+        sharedWorkerExecutors.delete(poolKey)
+        entry.executor.dispose()
+      }
     },
     executor: entry.executor as ReturnType<
       typeof createFsusWorkerExecutor<TRequest, TResponse>
@@ -2520,6 +2204,8 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   }
 }
 
+let renderPipelineRuntimeId = 0
+
 export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   options: FsusRenderPipelineRuntimeOptions<TSource, TUnit>,
 ): FsusRenderPipelineRuntimeState<TSource, TUnit> => {
@@ -2531,6 +2217,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   const loading = ref(false)
   const renderedStrategy = shallowRef<FsusRenderPipelineStrategy>('sync')
   let taskId = 0
+  const workerTaskKey = `render-runtime-${++renderPipelineRuntimeId}`
   let controller: AbortController | null = null
   let workerExecutor: ReturnType<
     typeof createFsusWorkerExecutor<
@@ -2726,12 +2413,20 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     workerExecutorAdapter = activeAdapter
     const workerEventListener = (event: FsusWorkerExecutorEvent) => {
       recordDiagnostic({
+        cloneBytes: event.cloneBytes,
         durationMs: event.durationMs,
         error: event.error,
+        generation: event.generation,
+        key: event.key,
+        lane: event.lane,
         pendingCount: event.pendingCount,
-        queueDepth: event.pendingCount,
+        queueDepth: event.queueDepth ?? event.pendingCount,
+        queueWaitDurationMs: event.queueWaitDurationMs,
+        retryCount: event.retryCount,
         strategy: renderedStrategy.value,
         type: event.type,
+        workerCount: event.workerCount,
+        workerId: event.workerId,
       })
       adaptiveSignals.value = {
         ...adaptiveSignals.value,
@@ -2755,10 +2450,17 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       }
     }
     const executorOptions: FsusWorkerExecutorOptions = {
+      backgroundDeferMs: workerOptions.backgroundDeferMs,
       idleTerminateMs: workerOptions.idleTerminateMs,
+      isMainThreadBusy: workerOptions.isMainThreadBusy,
+      laneQueueLimits: workerOptions.laneQueueLimits,
+      maxQueue: workerOptions.maxQueue,
+      maxWorkers: workerOptions.maxWorkers,
       name: workerOptions.name ?? activeAdapter.id,
       requestTimeoutMs: workerOptions.requestTimeoutMs,
+      reservedCores: workerOptions.reservedCores,
       serializeError: workerOptions.serializeError,
+      structuredCloneLimitBytes: workerOptions.structuredCloneLimitBytes,
     }
 
     if (workerOptions.pool === 'shared') {
@@ -2796,17 +2498,46 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     return workerExecutor
   }
 
+  const waitForWorkerFallbackBudget = (signal: AbortSignal) =>
+    new Promise<void>((resolve) => {
+      if (signal.aborted) {
+        resolve()
+        return
+      }
+      let settled = false
+      const complete = () => {
+        if (settled) return
+        settled = true
+        signal.removeEventListener('abort', complete)
+        resolve()
+      }
+      signal.addEventListener('abort', complete, { once: true })
+      if (typeof requestIdleCallback === 'function') {
+        requestIdleCallback(complete, { timeout: 50 })
+      } else if (typeof requestAnimationFrame === 'function') {
+        requestAnimationFrame(() => setTimeout(complete, 0))
+      } else {
+        setTimeout(complete, 0)
+      }
+    })
+
   const prepareDocument = async (
     activeAdapter: FsusRenderPipelineAdapter<TSource, TUnit>,
     input: TSource,
     activeStrategy: FsusRenderPipelineStrategy,
     signal: AbortSignal,
+    generation: number,
   ): Promise<FsusResult<FsusRenderPipelineDocument<TUnit>>> => {
     if (activeStrategy === 'chunked-worker') {
       const executor = getWorkerExecutor(activeAdapter)
 
       if (executor) {
-        const workerDocument = await executor.run(input, signal)
+        const workerDocument = await executor.run(input, {
+          generation,
+          key: `${workerTaskKey}:${activeAdapter.id}`,
+          lane: 'throughput',
+          signal,
+        })
         if (workerDocument.ok && workerDocument.value) {
           renderedStrategy.value = 'chunked-worker'
           return fsusOk(workerDocument.value)
@@ -2826,6 +2557,8 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
             strategy: 'chunked-worker',
             type: 'worker-fallback',
           })
+          await waitForWorkerFallbackBudget(signal)
+          if (signal.aborted) return fsusErr(workerError)
           const fallbackDocument = await fsusTryAsync(
             () => activeAdapter.prepare(input, signal, 'chunked-main'),
             'fsus_render_pipeline_prepare_failed',
@@ -2903,6 +2636,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       input,
       activeStrategy,
       controller.signal,
+      currentTaskId,
     )
     recordStage('prepare', now() - prepareStartedAt, renderedStrategy.value)
 

@@ -92,7 +92,13 @@ const unregisterPolicy = registerFsusRenderPipelineComponentPolicy({
 })
 ```
 
-Worker 消息协议由统一 executor 托管：请求形状为 `{ id, request }`，响应形状为 `{ id, result, timings?: { computeDurationMs } }` 或 `{ id, error }`。提供 Worker 内部 compute timing 后，主线程会把总往返减去 compute 得到 transfer/clone 阶段；没有 timing 时不会伪造阶段值。`result` 应返回与 `prepare()` 一致的 `{ units, html?, metadata? }` 文档对象。runtime 默认在组件实例内复用 Worker；`pool: 'shared'` 会按 `poolKey` 在多个 runtime 之间共享 executor。请求超时、AbortSignal、Worker error 和 dispose 都会以 `FsusResult` 的 `ok: false` 返回，并在 Worker 不可用或失败时回退到 `chunked-main`。
+Worker 消息协议由统一 executor 托管。run 请求为 `{ type: 'run', id, generation, key?, lane, request }`，取消为 `{ type: 'cancel', id, generation, key? }`；响应为 `{ id, status?: 'complete', result, timings? }`、`{ id, status: 'aborted' }` 或 `{ id, error }`。旧 adapter 继续调用 `run(request, signal)` 即可；需要调度能力时可传入 `{ signal, lane, key, generation, transfer }`。
+
+executor 是真正的有界 Worker pool：默认根据 `navigator.hardwareConcurrency - reservedCores` 和 `deviceMemory` 校准，并限制在 1–4 个 Worker，至少为主线程/渲染保留一个核心。`maxWorkers`、`reservedCores` 可覆盖上限，但仍受安全范围约束。`pool: 'shared'` 按 `poolKey` 在 runtime 间复用整个 pool；最后一个 listener 释放且无 pending 后，registry 条目和 Worker 会一起销毁。
+
+任务分为 `latency`、`throughput`、`background` 三条 lane。latency 优先；当 background 等待时，每轮最多先执行四项 latency 和两项 throughput，再强制让出一个 slot，避免任一 lane 饥饿。background 在 `isInputPending()` 或自定义 `isMainThreadBusy()` 为 true 时延后。每条 lane 和总队列均有硬上限，同 key 的新 generation 会取消旧任务；队列满时只允许高优先级任务抢占更低优先级 queued task。事件会区分 queue、start、resolve、cancel、drop、retry、timeout、crash，并记录 queue wait、compute、transfer、clone bytes、worker/queue 数量。
+
+`structuredCloneLimitBytes` 默认 8 MiB。超过预算的非 transferable 请求会在创建 Worker 前以 `FsusResult.ok = false` 拒绝；ArrayBuffer/TypedArray 应通过 `transfer` 传递，已转移 buffer 不计入 clone 预算。单 Worker crash/timeout 只终止该 slot 上的任务，其他 Worker 不受影响；显式 `retryOnCrash` 最多在健康替代 Worker 上重试一次。Worker fallback 到主线程前会等待 idle/frame 边界，避免在繁忙主线程立即同步执行同一重任务。
 
 组件内部只调用统一 runtime：
 
@@ -119,7 +125,7 @@ Advanced:
 - `useFsusVirtualWindow()` 可用于自定义虚拟挂载，但调用方必须保证稳定且唯一的 key、估算高度和滚动容器。固定高度调用方传入 `itemSize` 后只使用算术索引，不创建尺寸 Map 或 `ResizeObserver`；可变高度路径使用增量前缀和索引，单项高度更新、index → offset 与 offset → index 为 O(log N)，total size 为 O(1)，可见范围只创建窗口内 item 对象。
 - 可变高度窗口共享一个 `ResizeObserver`，通过 element → key 弱引用收集变化，并按 `measureBatch` 在一帧内提交一次锚点修正。`measurementCacheLimit` 默认限制历史测量为 2048 项；当前已挂载窗口可以临时占用额外槽位，卸载后立即回到上限。无 `ResizeObserver` 时仍读取 ref 元素的 `offsetHeight`，SSR 不创建观察器。
 - units 尾部追加与删除使用增量索引；插入或重排允许重建前缀索引，但稳定 key 的测量缓存继续复用。重复 key 会立即抛出确定性错误。可通过 `onDiagnostic` 观察 `index-rebuild`、`measurement-batch`、`measurement-cache` 和 `scroll-correction`，诊断不包含业务内容。
-- `createFsusWorkerExecutor()` 可用于高级 adapter 的托管 Worker 请求：支持共享实例、idle terminate、request timeout、AbortSignal 清理、失败批量 `FsusResult` 返回和 telemetry 事件。
+- `createFsusWorkerExecutor()` 可用于高级 adapter 的托管 Worker 请求：支持动态 pool、三 lane、防饥饿、generation/cancel、队列与 clone 背压、transferable、slot 级 crash/timeout 隔离、idle/hidden 清理和结构化 telemetry。
 - `resolveFsusRenderPipelineUnitAttrs()` 统一派生 DOM 性能 attrs，调用方只透传 `data-fsus-*`，不在组件内复制 layer/content-visibility 策略。
 - `createFsusRenderPipelineDiagnosticsBuffer()`、`registerFsusRenderPipelineDiagnosticSink()` 和 `getFsusRenderPipelineDiagnosticsSnapshot()` 可用于开发期观测。诊断事件记录策略、阶段、预算、队列、cache hit/miss 和 fallback 原因，不记录完整源文或 HTML。
 - runtime 分别记录 queue wait、Worker compute、Worker transfer、prepare/sanitize、Vue commit、style/layout、next paint 和 total；每阶段保留 EWMA、p50、p95 与样本数，策略反馈不会只读取一次 total latency。
