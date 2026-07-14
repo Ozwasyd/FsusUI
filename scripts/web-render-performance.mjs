@@ -42,6 +42,8 @@ const definitions = [
   ['table', 1_000],
   ['render-pipeline-monolithic', 2_000_000],
   ['render-pipeline-cooperative', 2_000_000],
+  ['virtual-window-index-legacy', 100_000],
+  ['virtual-window-index-incremental', 100_000],
 ]
 
 const quickDimensions = [
@@ -68,6 +70,8 @@ const quickDefinitions = [
   definitions[14],
   definitions[15],
   definitions[16],
+  definitions[17],
+  definitions[18],
 ]
 const dimensions = profile === 'full' ? fullDimensions : quickDimensions
 const scenarioDefinitions = (

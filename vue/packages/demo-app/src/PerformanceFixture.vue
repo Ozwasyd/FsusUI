@@ -76,6 +76,13 @@
     />
 
     <output
+      v-else-if="scenario.startsWith('virtual-window-index-')"
+      class="performance-pipeline-result"
+      v-bind="{ 'data-performance-pipeline': 'true' }"
+      >{{ pipelineRevision }}</output
+    >
+
+    <output
       v-else-if="scenario.startsWith('render-pipeline-')"
       class="performance-pipeline-result"
       v-bind="{ 'data-performance-pipeline': 'true' }"
@@ -104,7 +111,10 @@ import {
   DynamicSizeList,
   FixedSizeList,
 } from '@element-plus/components/virtual-list'
-import { useFsusRenderScheduler } from '@element-plus/hooks'
+import {
+  FsusVirtualSizeIndex,
+  useFsusRenderScheduler,
+} from '@element-plus/hooks'
 
 import type { MarkdownRuntimeProfile } from '@element-plus/wasm'
 import type { FsusScheduledWork } from '@element-plus/hooks'
@@ -133,6 +143,17 @@ const table = ref<{
 } | null>(null)
 
 const boundedSize = computed(() => Math.max(1, Math.min(props.size, 100_000)))
+const measurementSizes = Array.from(
+  {
+    length: props.scenario.startsWith('virtual-window-index-')
+      ? boundedSize.value
+      : 0,
+  },
+  (_, index) => 28 + (index % 7) * 7,
+)
+const incrementalSizeIndex = props.scenario.endsWith('-incremental')
+  ? new FsusVirtualSizeIndex(measurementSizes)
+  : null
 const items = computed(() =>
   Array.from({ length: boundedSize.value }, (_, index) => ({
     id: index,
@@ -248,6 +269,28 @@ const act = async (iteration: number) => {
       tableRevision.value += 1
       table.value?.clearSort()
     }
+  } else if (props.scenario === 'virtual-window-index-legacy') {
+    const changedIndex = (iteration * 7919) % measurementSizes.length
+    measurementSizes[changedIndex] = 32 + (iteration % 9) * 5
+    let offset = 0
+    const metadata = measurementSizes.map((size, index) => {
+      const item = { index, offset, size }
+      offset += size
+      return item
+    })
+    const probe = metadata[(iteration * 1543) % metadata.length]
+    pipelineRevision.value = Math.round((probe?.offset ?? 0) + offset)
+  } else if (props.scenario === 'virtual-window-index-incremental') {
+    const changedIndex = (iteration * 7919) % measurementSizes.length
+    const nextSize = 32 + (iteration % 9) * 5
+    measurementSizes[changedIndex] = nextSize
+    incrementalSizeIndex?.update(changedIndex, nextSize)
+    const probeIndex = (iteration * 1543) % measurementSizes.length
+    const probeOffset = incrementalSizeIndex?.prefixSize(probeIndex) ?? 0
+    incrementalSizeIndex?.findFirstEndGreater(probeOffset)
+    pipelineRevision.value = Math.round(
+      probeOffset + (incrementalSizeIndex?.total ?? 0),
+    )
   } else if (props.scenario === 'render-pipeline-monolithic') {
     const target = props.size
     let checksum = iteration

@@ -116,7 +116,9 @@ Advanced:
 
 - `registerFsusRenderPipelineStrategyResolver()` 可热拔插策略，支持 `priority`；注销函数执行后恢复默认预算策略。
 - `useFsusRenderScheduler()` 支持 `user-blocking`、`visible`、`background` 三档优先级、同 key coalescing、AbortSignal 和返回 cancel 函数。长任务返回 `{ done: false, continuation }` 后每个 chunk 都会重新进入预算队列；background 每帧最多执行一个 chunk，高优先级可以在 continuation 之前抢占。浏览器 `scheduler.postTask` 路径使用同一个 AbortSignal 取消模型。
-- `useFsusVirtualWindow()` 可用于自定义虚拟挂载，但调用方必须保证稳定 key、估算高度和滚动容器。内部使用 prefix offset index、二分 range 查找和批量测量，避免滚动时反复全量扫描。
+- `useFsusVirtualWindow()` 可用于自定义虚拟挂载，但调用方必须保证稳定且唯一的 key、估算高度和滚动容器。固定高度调用方传入 `itemSize` 后只使用算术索引，不创建尺寸 Map 或 `ResizeObserver`；可变高度路径使用增量前缀和索引，单项高度更新、index → offset 与 offset → index 为 O(log N)，total size 为 O(1)，可见范围只创建窗口内 item 对象。
+- 可变高度窗口共享一个 `ResizeObserver`，通过 element → key 弱引用收集变化，并按 `measureBatch` 在一帧内提交一次锚点修正。`measurementCacheLimit` 默认限制历史测量为 2048 项；当前已挂载窗口可以临时占用额外槽位，卸载后立即回到上限。无 `ResizeObserver` 时仍读取 ref 元素的 `offsetHeight`，SSR 不创建观察器。
+- units 尾部追加与删除使用增量索引；插入或重排允许重建前缀索引，但稳定 key 的测量缓存继续复用。重复 key 会立即抛出确定性错误。可通过 `onDiagnostic` 观察 `index-rebuild`、`measurement-batch`、`measurement-cache` 和 `scroll-correction`，诊断不包含业务内容。
 - `createFsusWorkerExecutor()` 可用于高级 adapter 的托管 Worker 请求：支持共享实例、idle terminate、request timeout、AbortSignal 清理、失败批量 `FsusResult` 返回和 telemetry 事件。
 - `resolveFsusRenderPipelineUnitAttrs()` 统一派生 DOM 性能 attrs，调用方只透传 `data-fsus-*`，不在组件内复制 layer/content-visibility 策略。
 - `createFsusRenderPipelineDiagnosticsBuffer()`、`registerFsusRenderPipelineDiagnosticSink()` 和 `getFsusRenderPipelineDiagnosticsSnapshot()` 可用于开发期观测。诊断事件记录策略、阶段、预算、队列、cache hit/miss 和 fallback 原因，不记录完整源文或 HTML。
@@ -125,6 +127,8 @@ Advanced:
 ## 真实浏览器验证
 
 `pnpm perf:render:web --profile quick` 的 #184 runner 包含 `render-pipeline-monolithic` 与 `render-pipeline-cooperative` 对照场景。两者在真实 Chromium 中执行相同 CPU 工作量，runner 记录 input-to-next-frame、long task、掉帧、layout/paint、heap 和 layer；前者模拟不可让出的旧 callback，后者通过真实 scheduler continuation 执行。需要回归对比时传入 `--baseline <summary.json>`，而不是使用内部函数计时替代页面测量。
+
+#187 增加 `virtual-window-index-legacy` 与 `virtual-window-index-incremental` 两个 100K 同输入场景。2026-07-14 在本机 system Chrome、60 Hz、DPR 1、2 次 warmup + 12 次样本下，单项测量更新的 frame work p95 从 `19.2 ms` 降至 `0.7 ms`，input-to-next-frame p95 从 `19.7 ms` 降至 `16.8 ms`；frame interval p95 均为刷新率下限附近的 `16.8 ms`。原始结果保存在未跟踪目录 `.tmp/performance/issue-187-index-legacy/` 与 `.tmp/performance/issue-187-index-incremental/`。锚点稳定性另由批次修正和 Markdown 连续滚动测试验证，不能由算法计时替代。
 
 Internal:
 

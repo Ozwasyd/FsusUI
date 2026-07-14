@@ -146,8 +146,10 @@ chunk 边界由 WASM 渲染流程产出，类型包括 `heading`、`paragraph`�
 
 - 根节点带 `data-fsus-render-strategy="chunked-worker"`、`chunked-main` 或 `sync`。
 - 可见 chunk 带 `data-fsus-render-unit`、chunk key、kind 和 HTML offset。
-- 上下 spacer 保持总高度，ResizeObserver 按帧批处理测量结果。
-- 上方 chunk 高度变化时按锚点补偿 scrollTop，避免滚动中跳回前文。
+- 上下 spacer 由增量高度索引计算：单个 chunk 测量更新、offset/index 查询均为 O(log N)，total size 查询为 O(1)，可见窗口变化不会重建全量 metadata 数组。
+- 每个 renderer 的 virtual window 只创建一个共享 `ResizeObserver`；element 关联使用弱引用，测量结果按帧和 `measureBatch` 批量提交，历史高度缓存有明确上限。
+- 同批次中只累计锚点之前的高度差，并最多补偿一次 `scrollTop`；连续插入、删除或重排时优先按稳定 chunk key 恢复锚点，避免跳回前文。
+- SSR 或无 `ResizeObserver` 环境不创建观察器，首次挂载仍以确定性的 `offsetHeight` 回填估算值。
 
 阈值与预算通过 `ElConfigProvider` 的 `render-pipeline` 配置统一控制；MarkdownRenderer 不新增专属开关。
 
