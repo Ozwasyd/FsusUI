@@ -61,11 +61,7 @@ to keep normal `appear` behavior.
 
 ```vue
 <template>
-  <FsuTransition
-    name="mobile-bar"
-    appear
-    suppress-appear-during-hydration
-  >
+  <FsuTransition name="mobile-bar" appear suppress-appear-during-hydration>
     <nav>...</nav>
   </FsuTransition>
 </template>
@@ -504,6 +500,12 @@ Older generic presets remain available for compatibility, but
 `motionPresetAliases` documents their migration target. New app code should map
 semantic product names to the settle presets instead of adding local keyframes.
 
+In browsers with Web Animations API support, the runtime keeps terminal states
+as retained `fill: forwards` effects. It does not call `commitStyles()` or write
+terminal values through `HTMLElement.style`, so consumers can enforce
+`style-src-attr 'none'` without weakening CSP. The inline-transition fallback
+is reserved for environments without WAAPI, such as legacy DOM test runtimes.
+
 ## Task And Row Feedback
 
 Use `useTaskFeedback()` for save, publish, sync, import, export, rollback, and
@@ -593,7 +595,7 @@ actions.
     :items="[
       { key: 'home', label: 'Home', href: '/' },
       { key: 'archive', label: 'Archive', href: '/archive' },
-      { key: 'about', label: 'About', href: '/about' }
+      { key: 'about', label: 'About', href: '/about' },
     ]"
     active-key="archive"
   />

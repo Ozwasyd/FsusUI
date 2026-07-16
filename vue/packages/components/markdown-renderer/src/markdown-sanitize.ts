@@ -4,6 +4,7 @@ import type {
   MarkdownRuntimeHtmlResult,
   MarkdownRuntimeRenderResult,
 } from '@element-plus/wasm'
+import type { MarkdownTrustedHtmlFactory } from './markdown-renderer'
 
 const unsafeElementNames = new Set([
   'base',
@@ -49,9 +50,14 @@ const isUnsafeUrlValue = (value: string) => {
   return dataUrlRe.test(normalized) && !safeDataImageRe.test(normalized)
 }
 
-const sanitizeHtmlWithDom = (html: string) => {
+const sanitizeHtmlWithDom = (
+  html: string,
+  trustedHtmlFactory?: MarkdownTrustedHtmlFactory,
+) => {
+  const preSanitizedHtml = sanitizeHtmlWithoutDom(html)
   const template = document.createElement('template')
-  template.innerHTML = html
+  template.innerHTML = (trustedHtmlFactory?.(preSanitizedHtml)
+    ?? preSanitizedHtml) as string
 
   for (const element of Array.from(template.content.querySelectorAll('*'))) {
     const name = element.tagName.toLowerCase()
@@ -100,7 +106,7 @@ const sanitizeHtmlWithoutDom = (html: string) =>
     .replace(/\s+on[\w:-]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '')
     .replace(/\s+srcdoc\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, '')
     .replace(
-      /\s+(href|src|poster|action|formaction|xlink:href)\s*=\s*(["']?)\s*((?:java|vb)script|data):[^"'\s>]*/gi,
+      /\s+(href|src|poster|action|formaction|xlink:href)\s*=\s*(?:"\s*(?:(?:java|vb)script|data):[^"]*"|'\s*(?:(?:java|vb)script|data):[^']*'|(?:(?:java|vb)script|data):[^\s>]*)/gi,
       '',
     )
     .replace(
@@ -108,25 +114,30 @@ const sanitizeHtmlWithoutDom = (html: string) =>
       '',
     )
 
-export const sanitizeMarkdownHtml = (html: string) => {
+export const sanitizeMarkdownHtml = (
+  html: string,
+  trustedHtmlFactory?: MarkdownTrustedHtmlFactory,
+) => {
   if (!html) return html
 
   return typeof document === 'undefined'
     ? sanitizeHtmlWithoutDom(html)
-    : sanitizeHtmlWithDom(html)
+    : sanitizeHtmlWithDom(html, trustedHtmlFactory)
 }
 
 export const sanitizeMarkdownChunk = (
   chunk: MarkdownRenderChunk,
+  trustedHtmlFactory?: MarkdownTrustedHtmlFactory,
 ): MarkdownRenderChunk => {
-  const html = sanitizeMarkdownHtml(chunk.html)
+  const html = sanitizeMarkdownHtml(chunk.html, trustedHtmlFactory)
   return html === chunk.html ? chunk : { ...chunk, html }
 }
 
 export const sanitizeMarkdownHtmlResult = (
   result: MarkdownRuntimeHtmlResult,
+  trustedHtmlFactory?: MarkdownTrustedHtmlFactory,
 ): MarkdownRuntimeHtmlResult => {
-  const html = sanitizeMarkdownHtml(result.html)
+  const html = sanitizeMarkdownHtml(result.html, trustedHtmlFactory)
   return html === result.html ? result : { ...result, html }
 }
 
@@ -134,11 +145,14 @@ export const sanitizeMarkdownRenderResult = <
   TResult extends MarkdownRuntimeChunkResult | MarkdownRuntimeRenderResult,
 >(
   result: TResult,
+  trustedHtmlFactory?: MarkdownTrustedHtmlFactory,
 ): TResult => {
-  const html = sanitizeMarkdownHtml(result.html)
+  const html = sanitizeMarkdownHtml(result.html, trustedHtmlFactory)
   const hasChunks = 'chunks' in result
   const chunks = hasChunks
-    ? (result as MarkdownRuntimeChunkResult).chunks.map(sanitizeMarkdownChunk)
+    ? (result as MarkdownRuntimeChunkResult).chunks.map((chunk) =>
+        sanitizeMarkdownChunk(chunk, trustedHtmlFactory),
+      )
     : undefined
   const chunksChanged =
     chunks &&

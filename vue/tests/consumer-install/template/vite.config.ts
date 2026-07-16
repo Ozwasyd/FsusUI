@@ -5,10 +5,12 @@ import { createFsusViteManualChunks } from '../../../scripts/vite-manual-chunks.
 export default defineConfig({
   plugins: [vue()],
   build: {
-    chunkSizeWarningLimit: 500,
+    chunkSizeWarningLimit: Number.POSITIVE_INFINITY,
+    manifest: true,
     rollupOptions: {
       output: {
-        manualChunks: createFsusViteManualChunks(),
+        manualChunks: createFsusViteManualChunks({ profile: 'consumer' }),
+        onlyExplicitManualChunks: true,
       },
     },
   },

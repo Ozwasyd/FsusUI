@@ -534,7 +534,7 @@ const wasmProbe = async () => {
   const started = performance.now()
   const runtime = await import('@element-plus/wasm')
   const readiness = await runtime.ensureWasmReady()
-  if (!readiness.ok) throw new Error(readiness.error.message)
+  if (readiness.ok === false) throw new Error(readiness.error.message)
   const initialized = performance.now()
   const result = await runtime.renderMarkdownResultWithRuntime({
     source: markdown.value,
@@ -543,7 +543,7 @@ const wasmProbe = async () => {
     allowMermaid: true,
     mode: 'article',
   })
-  if (!result.ok) throw new Error(result.error.message)
+  if (result.ok === false) throw new Error(result.error.message)
   const completed = performance.now()
   return {
     startupMs: initialized - started,
@@ -559,10 +559,15 @@ const markdownPhaseProbe = () => {
   const diagnostics = getFsusRenderPipelineDiagnosticsSnapshot().filter(
     (event) => event.adapterId === 'markdown-renderer',
   )
-  const latestStage = (stage: string) =>
-    diagnostics.findLast(
-      (event) => event.stage === stage && typeof event.durationMs === 'number',
-    )?.durationMs ?? 0
+  const latestStage = (stage: string) => {
+    for (let index = diagnostics.length - 1; index >= 0; index -= 1) {
+      const event = diagnostics[index]
+      if (event.stage === stage && typeof event.durationMs === 'number') {
+        return event.durationMs
+      }
+    }
+    return 0
+  }
   const renderer = document.querySelector<HTMLElement>(
     '[data-markdown-renderer="wasm"]',
   )

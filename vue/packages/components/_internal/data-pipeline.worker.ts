@@ -76,7 +76,7 @@ const sessionFor = async (datasetId: string) => {
   const existing = sessions.get(datasetId)
   if (existing) return existing
   const result = await createWasmDataSession()
-  if (!result.ok) throw result.error
+  if (result.ok === false) throw result.error
   sessions.set(datasetId, result.value)
   return result.value
 }

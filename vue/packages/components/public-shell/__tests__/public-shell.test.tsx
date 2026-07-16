@@ -44,7 +44,9 @@ describe('PublicShell.vue', () => {
       true,
     )
     expect(
-      wrapper.find('[data-mobile-nav-menu-trigger]').attributes('aria-expanded'),
+      wrapper
+        .find('[data-mobile-nav-menu-trigger]')
+        .attributes('aria-expanded'),
     ).toBe('false')
     expect(
       wrapper.find('[data-mobile-nav-menu-trigger]').attributes('role'),
@@ -56,7 +58,9 @@ describe('PublicShell.vue', () => {
     ).toBe(true)
     expect(
       wrapper
-        .find('.el-public-shell__mobile-nav-link.is-active[data-public-nav="archive"]')
+        .find(
+          '.el-public-shell__mobile-nav-link.is-active[data-public-nav="archive"]',
+        )
         .attributes('aria-current'),
     ).toBe('page')
     expect(
@@ -124,6 +128,49 @@ describe('PublicShell.vue', () => {
     expect(style).toContain('--el-public-shell-nav-gap: 2.5rem')
     expect(style).toContain('--el-public-shell-mobile-nav-gap: 1rem')
     expect(style).toContain('--el-public-shell-mobile-search-width: 8rem')
+  })
+
+  test('removes inline layout styles and motion writes in CSP-safe mode', async () => {
+    const wrapper = mount(PublicShell, {
+      props: {
+        brand: 'Fsus',
+        navItems,
+        activeNav: 'archive',
+        activeNavMotion: 'indicator',
+        cspSafe: true,
+        mobileSearchMode: 'trigger',
+      },
+    })
+
+    await nextTick()
+    expect(wrapper.attributes('style')).toBeUndefined()
+    expect(wrapper.find('.el-site-header').attributes('style')).toBeUndefined()
+    expect(
+      wrapper.find('.el-public-shell__active-nav-indicator').exists(),
+    ).toBe(false)
+    expect(
+      wrapper.findAll('[style]').map((node) => ({
+        class: node.attributes('class'),
+        style: node.attributes('style'),
+      })),
+    ).toEqual([])
+    expect(
+      wrapper.find('.el-public-shell__mobile-nav-menu-panel').classes(),
+    ).toContain('is-csp-hidden')
+    expect(
+      wrapper.find('.el-public-shell__mobile-search-row').classes(),
+    ).toContain('is-csp-hidden')
+
+    const html = await renderToString(
+      h(PublicShell, {
+        brand: 'Fsus',
+        navItems,
+        activeNav: 'archive',
+        cspSafe: true,
+        mobileSearchMode: 'trigger',
+      }),
+    )
+    expect(html).not.toMatch(/\sstyle=/u)
   })
 
   test('emits spa search without native navigation', async () => {
@@ -221,9 +268,14 @@ describe('PublicShell.vue', () => {
           menu: wrapper.find('.el-public-shell__mobile-nav-menu').exists(),
           inline: wrapper.find('.el-public-shell__mobile-nav--inline').exists(),
           bottom: wrapper.find('[data-fsus-bottom-tab-bar]').exists(),
-          bottomSafeAreaClass: wrapper.classes().includes('is-mobile-nav-bottom'),
-          desktopItems: wrapper.findAll('.el-public-shell__desktop-nav a').length,
-          activeCurrent: active.exists() ? active.attributes('aria-current') : null,
+          bottomSafeAreaClass: wrapper
+            .classes()
+            .includes('is-mobile-nav-bottom'),
+          desktopItems: wrapper.findAll('.el-public-shell__desktop-nav a')
+            .length,
+          activeCurrent: active.exists()
+            ? active.attributes('aria-current')
+            : null,
         }
         wrapper.unmount()
         return result
@@ -434,11 +486,17 @@ describe('PublicShell.vue', () => {
     expect(trigger.attributes('aria-expanded')).toBe('true')
 
     await wrapper.setProps({ mobileNavMode: 'inline' })
-    expect(wrapper.find('.el-public-shell__mobile-nav-menu').exists()).toBe(false)
-    expect(wrapper.find('.el-public-shell__mobile-nav--inline').exists()).toBe(true)
+    expect(wrapper.find('.el-public-shell__mobile-nav-menu').exists()).toBe(
+      false,
+    )
+    expect(wrapper.find('.el-public-shell__mobile-nav--inline').exists()).toBe(
+      true,
+    )
 
     await wrapper.setProps({ mobileNavMode: 'menu' })
-    const reopenedTrigger = wrapper.find<HTMLElement>('[data-mobile-nav-menu-trigger]')
+    const reopenedTrigger = wrapper.find<HTMLElement>(
+      '[data-mobile-nav-menu-trigger]',
+    )
     await nextTick()
     expect(reopenedTrigger.attributes('aria-expanded')).toBe('false')
     expect(
@@ -532,6 +590,13 @@ describe('PublicShell.vue', () => {
     expect(searchRow.classes()).not.toContain('is-expanded')
     expect(mobileToolbar.classes()).toContain('is-collapsed')
 
+    trigger.element.addEventListener(
+      'click',
+      (event) => event.preventDefault(),
+      {
+        once: true,
+      },
+    )
     await trigger.trigger('click', { ctrlKey: true })
     await nextTick()
     expect(searchRow.classes()).not.toContain('is-expanded')

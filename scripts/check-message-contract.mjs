@@ -95,9 +95,7 @@ if (!source.includes("box-shadow: getCssVar('message', 'shadow');")) {
 }
 
 if (!source.includes('max-width: min(420px, calc(100% - 32px));')) {
-  failures.push(
-    `${messageFile}: Message must keep a compact toast max-width`,
-  )
+  failures.push(`${messageFile}: Message must keep a compact toast max-width`)
 }
 
 if (sourceWithoutComments.includes('&::before')) {
@@ -114,7 +112,7 @@ if (source.includes("getCssVar('transition-duration')")) {
 
 for (const expected of [
   'opacity var(--fsus-motion-control-fast, 160ms)',
-  'transform var(--fsus-motion-panel, 420ms)',
+  'transform var(--fsus-motion-panel, 360ms)',
   'var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1))',
   'var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1))',
 ]) {
@@ -173,7 +171,9 @@ for (const block of topLevelBlocks(themeSource)) {
     )
   }
 
-  if (block.body.includes('padding: var(--fsus-space-3) var(--fsus-space-4);')) {
+  if (
+    block.body.includes('padding: var(--fsus-space-3) var(--fsus-space-4);')
+  ) {
     failures.push(
       `${themeFile}:${block.startLine} Message theme overrides must not replace component padding`,
     )
@@ -192,7 +192,9 @@ for (const block of topLevelBlocks(themeSource)) {
   }
 
   if (
-    block.body.includes('background: var(--fsus-message-bg, var(--el-bg-color));') &&
+    block.body.includes(
+      'background: var(--fsus-message-bg, var(--el-bg-color));',
+    ) &&
     block.body.includes(
       'border: 1px solid var(--fsus-message-border, var(--el-border-color-lighter));',
     ) &&

@@ -9,6 +9,11 @@ const reusableQualityWorkflow = readFileSync(
 )
 const releaseGovernance = readFileSync('docs/release-governance.md', 'utf8')
 const engineeringHandoff = readFileSync('docs/engineering-handoff.md', 'utf8')
+const demoViteConfig = readFileSync(
+  'vue/packages/demo-app/vite.config.ts',
+  'utf8',
+)
+const manualChunkPolicy = readFileSync('scripts/vite-manual-chunks.mjs', 'utf8')
 
 function assert(condition, message) {
   if (!condition) {
@@ -30,7 +35,17 @@ assert(
   scripts['governance:check']?.includes('check:demo-build-path'),
   'governance:check must include the demo build path policy guard',
 )
-assert(existsSync(decisionScriptPath), 'demo build path decision script is missing')
+assert(
+  existsSync(decisionScriptPath),
+  'demo build path decision script is missing',
+)
+
+assert(
+  demoViteConfig.includes('chunkSizeWarningLimit: Number.POSITIVE_INFINITY') &&
+    demoViteConfig.includes('onlyExplicitManualChunks: true') &&
+    !manualChunkPolicy.includes('FSUS_DEMO_CHUNK_SIZE_WARNING_LIMIT_KB'),
+  'demo build must avoid a guessed aggregate chunk limit and keep explicit chunk ownership',
+)
 
 const decisionScript = existsSync(decisionScriptPath)
   ? readFileSync(decisionScriptPath, 'utf8')
@@ -77,8 +92,8 @@ assert(
   'verify:release must keep the full demo build through verify:full',
 )
 assert(
-  reusableQualityWorkflow.includes('build-demo')
-    && reusableQualityWorkflow.includes('pnpm run build:demo'),
+  reusableQualityWorkflow.includes('build-demo') &&
+    reusableQualityWorkflow.includes('pnpm run build:demo'),
   'non-PR reusable quality workflow must keep the build-demo job',
 )
 

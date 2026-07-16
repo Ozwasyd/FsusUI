@@ -118,6 +118,7 @@
     ".": "portable",
     "./*": "portable",
     "./dist/el-fsus-theme.css": "portable",
+    "./dist/fsus.css": "portable",
     "./dist/public-shell-critical.css": "platform-override",
     "./es": "portable",
     "./es/*.mjs": "portable",

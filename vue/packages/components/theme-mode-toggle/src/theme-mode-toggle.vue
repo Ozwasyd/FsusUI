@@ -39,10 +39,13 @@
     </button>
 
     <div
-      v-show="menuOpen"
+      v-if="cspSafe || menuOpen"
       :id="menuId"
       ref="menuRef"
-      :class="ns.e('menu')"
+      :class="[
+        ns.e('menu'),
+        ns.is('csp-hidden', cspSafe && !menuOpen),
+      ]"
       role="menu"
       :aria-label="label"
     >

@@ -9,6 +9,17 @@
   background: getCssVar('bg-color', 'page');
   color: getCssVar('text-color', 'primary');
 
+  .is-csp-hidden {
+    display: none !important;
+  }
+
+  @include e(search-input) {
+    --#{$namespace}-input-height: var(
+      --#{$namespace}-public-shell-control-height,
+      40px
+    );
+  }
+
   @include e(header) {
     width: 100%;
     border-bottom: 1px solid getCssVar('border-color-lighter');

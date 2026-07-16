@@ -59,6 +59,14 @@ describe('SiteHeader.vue', () => {
     expect(wrapper.find('[data-test="action"]').exists()).toBe(true)
   })
 
+  test('omits inline layout variables in CSP-safe mode', () => {
+    const wrapper = mount(SiteHeader, {
+      props: { cspSafe: true, maxWidth: '72rem' },
+    })
+
+    expect(wrapper.attributes('style')).toBeUndefined()
+  })
+
   test('covers blog, auth, and workspace header compositions', () => {
     const cases = [
       {

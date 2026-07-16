@@ -79,7 +79,7 @@ if (source.includes("getCssVar('transition-duration')")) {
 for (const expected of [
   'animation: modal-fade-in var(--fsus-motion-overlay, 300ms)',
   'animation: modal-fade-out var(--fsus-motion-overlay, 300ms)',
-  'animation: msgbox-fade-in var(--fsus-motion-panel, 420ms)',
+  'animation: msgbox-fade-in var(--fsus-motion-panel, 360ms)',
 ]) {
   if (!source.includes(expected)) {
     failures.push(`${messageBoxFile}: Missing ${expected}`)

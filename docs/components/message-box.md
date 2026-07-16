@@ -56,6 +56,10 @@ if (result.ok) {
 
 Promise 返回值是稳定的 `FsusResult<MessageBoxData>`。业务侧需要复用判断逻辑时，从 `@ozwasyd/element-plus/result` 导入 `isFsusResult`、`isTruthyFsusOk` 或 `getFsusErrorMessage`，不要判断私有返回 shape。`center` 等 option 默认值会在组件首次渲染前完成归一化。
 
+进入和退出动效使用 `--fsus-motion-panel`（默认 `360ms`），遮罩使用
+`--fsus-motion-overlay`；业务主题可覆盖 token，但不要为 MessageBox 写入独立的
+硬编码时长。
+
 ---
 
 ## API

@@ -141,6 +141,13 @@ describe('@element-plus/wasm', () => {
       ),
     ).toEqual(Uint32Array.from([1]))
     expect(session.stats().allocationCount).toBe(candidateStats.allocationCount)
+    const internalBuffers = (
+      session as unknown as { buffers: Map<string, unknown> }
+    ).buffers
+    internalBuffers.delete('labels')
+    expect(() => session.filterLoadedAsciiIndices('alpha', false)).toThrow(
+      /ASCII index is not loaded/u,
+    )
     session.dispose()
     expect(() =>
       session.sortNumberIndices(Float64Array.from([1]), true),

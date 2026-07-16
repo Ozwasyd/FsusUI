@@ -38,7 +38,7 @@ const expectedHtmlSinks: Record<string, ExpectedSink> = {
   'vue/packages/components/markdown-renderer/src/markdown-sanitize.ts': {
     contract: 'local template parsing only; sanitized output is returned',
     evidence: [
-      /template\.innerHTML = html/,
+      /template\.innerHTML = [\s\S]{0,160}preSanitizedHtml/,
       /sanitizeHtmlWithoutDom/,
       /unsafeElementNames/,
       /isUnsafeUrlValue/,

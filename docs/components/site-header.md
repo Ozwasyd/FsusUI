@@ -37,6 +37,7 @@
 | nav-aria-label | desktop nav label     | `string`  | `Primary navigation` |
 | sticky         | header 是否 sticky    | `boolean` | `true`               |
 | max-width      | header 内容最大宽度   | `string`  | `64rem`              |
+| csp-safe       | 禁止 inline max-width 变量并使用静态默认 token | `boolean` | `false` |
 
 ## Slots
 

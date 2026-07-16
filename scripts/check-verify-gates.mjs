@@ -33,6 +33,19 @@ assert(
   scripts['verify:pr-fast']?.includes('_verify:pr-fast:parallel'),
   'verify:pr-fast must use the explicit PR-fast parallel group',
 )
+for (const script of [
+  '_verify:pr-fast:parallel',
+  '_verify:parallel',
+  '_test:unit:parallel',
+  '_test:visual:parallel',
+  'typecheck',
+  'typecheck:no-cache',
+]) {
+  assert(
+    scripts[script]?.includes('run-p --continue-on-error'),
+    `${script} must collect every parallel failure before exiting`,
+  )
+}
 assert(
   scripts['typecheck:affected']?.includes(
     'scripts/run-affected-gate.mjs typecheck',
@@ -75,8 +88,7 @@ assert(
 assert(
   scripts['_verify:pr-fast:parallel']?.includes(
     'check:foundation-style-boundary',
-  ) &&
-    scripts['_verify:parallel']?.includes('check:foundation-style-boundary'),
+  ) && scripts['_verify:parallel']?.includes('check:foundation-style-boundary'),
   'PR-fast and full verification must enforce the foundation style boundary',
 )
 assert(
@@ -95,7 +107,8 @@ assert(
 assert(
   releaseGovernance.includes('verify:pr-fast') &&
     releaseGovernance.includes('verify:full') &&
-    releaseGovernance.includes('verify:release'),
+    releaseGovernance.includes('verify:release') &&
+    releaseGovernance.includes('--continue-on-error'),
   'release governance docs must explain verify gate selection',
 )
 assert(

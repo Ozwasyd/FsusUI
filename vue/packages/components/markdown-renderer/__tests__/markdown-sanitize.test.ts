@@ -38,4 +38,18 @@ describe('markdown html sanitizer', () => {
     expect(html).not.toContain('onerror')
     expect(html).not.toContain('javascript:')
   })
+
+  it('passes only conservatively sanitized markup into a TrustedHTML factory', () => {
+    const trustedHtmlFactory = vi.fn((html: string) => html)
+
+    const html = sanitizeMarkdownHtml(
+      '<script>alert(1)</script><p onclick="alert(2)">safe</p>',
+      trustedHtmlFactory,
+    )
+
+    expect(trustedHtmlFactory).toHaveBeenCalledOnce()
+    expect(trustedHtmlFactory.mock.calls[0]?.[0]).not.toContain('<script')
+    expect(trustedHtmlFactory.mock.calls[0]?.[0]).not.toContain('onclick')
+    expect(html).toContain('<p>safe</p>')
+  })
 })

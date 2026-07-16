@@ -556,7 +556,8 @@ export const createFsusRafRefreshSampler = ({
     previous = timestamp
     if (deltas.length >= Math.max(4, sampleSize)) {
       onSample(estimateFsusRenderRefreshProfile(deltas))
-      deltas.splice(0, Math.max(1, Math.floor(deltas.length / 2)))
+      stopped = true
+      return
     }
     handle = requestFrame(sample)
   }

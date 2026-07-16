@@ -13,7 +13,10 @@
     <div class="demo-block">
       <h3>Dialog / Drawer</h3>
       <el-space wrap>
-        <el-button data-testid="open-publish-dialog" @click="dialogVisible = true">
+        <el-button
+          v-bind="{ 'data-testid': 'open-publish-dialog' }"
+          @click="dialogVisible = true"
+        >
           打开发布确认
         </el-button>
         <el-button @click="drawerVisible = true">查看审阅记录</el-button>

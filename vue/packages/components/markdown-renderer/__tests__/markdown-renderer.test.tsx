@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { configProviderContextKey } from '@element-plus/components/config-provider'
 import MarkdownRenderer from '../src/markdown-renderer.vue'
+import { resolveMarkdownWorkerScriptUrl } from '../src/markdown-renderer'
 import {
   buildMarkdownRenderResult,
   renderMarkdownChunksWithRuntime,
@@ -171,6 +172,21 @@ describe('MarkdownRenderer.vue', () => {
     clearMarkdownRendererRuntimeCache()
     vi.runOnlyPendingTimers()
     vi.useRealTimers()
+  })
+
+  test('uses the host TrustedScriptURL factory for the markdown worker URL', () => {
+    const moduleUrl = new URL(
+      'https://blog.example/assets/markdown-renderer.worker-Abc_123.js',
+    )
+    const trustedUrl = { kind: 'TrustedScriptURL', value: moduleUrl.href }
+    const trustedScriptUrlFactory = vi.fn(() => trustedUrl)
+
+    expect(
+      resolveMarkdownWorkerScriptUrl(moduleUrl, trustedScriptUrlFactory),
+    ).toBe(trustedUrl)
+    expect(trustedScriptUrlFactory).toHaveBeenCalledOnce()
+    expect(trustedScriptUrlFactory).toHaveBeenCalledWith(moduleUrl)
+    expect(resolveMarkdownWorkerScriptUrl(moduleUrl)).toBe(moduleUrl)
   })
 
   test('renders raw html from the wasm markdown runtime', async () => {

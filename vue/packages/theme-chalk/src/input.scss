@@ -151,6 +151,10 @@
   vertical-align: middle;
   @include scroll-bar;
 
+  @include when(hidden) {
+    display: none;
+  }
+
   & .#{$namespace}-input__clear,
   & .#{$namespace}-input__password {
     color: getCssVar('input-icon-color');

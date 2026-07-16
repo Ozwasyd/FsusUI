@@ -1,17 +1,14 @@
 <template>
   <div
     :class="shellKls"
-    :style="shellStyle"
-    v-bind="{
-      'data-public-hydration-kind': hydrationKind || undefined,
-      'data-mobile-nav-mode': mobileNavMode,
-    }"
+    v-bind="shellAttrs"
   >
     <el-site-header
       v-bind="{ 'data-public-shell-header': '' }"
       :class="headerKls"
       :sticky="sticky"
       :max-width="maxWidth"
+      :csp-safe="cspSafe"
       :inner-class="ns.e('inner')"
       :primary-row-class="ns.e('primary-row')"
       :brand-nav-class="ns.e('brand-nav')"
@@ -64,7 +61,8 @@
               :placeholder="searchPlaceholder"
               :label="searchAriaLabel"
               size="small"
-              style="--el-input-height: var(--el-public-shell-control-height, 40px)"
+              :class="ns.e('search-input')"
+              :csp-safe="cspSafe"
               clearable
               @focus="emit('search-focus')"
               @input="handleSearchInput"
@@ -115,6 +113,35 @@
             @after-leave="finishMobileNavMenuClose"
           >
             <nav
+              v-if="cspSafe"
+              :class="[
+                ns.e('mobile-nav-menu-panel'),
+                ns.is('csp-hidden', mobileNavMenuHydrated && !mobileNavMenuVisible),
+              ]"
+              :aria-label="mobileNavLabel"
+              :aria-hidden="mobileNavMenuClosing ? 'true' : undefined"
+              :inert="mobileNavMenuClosing || undefined"
+            >
+              <a
+                v-for="item in navItems"
+                :key="item.key"
+                :href="item.href"
+                :class="mobileNavLinkKls(item.key)"
+                :aria-current="item.key === activeNav ? 'page' : undefined"
+                v-bind="{ 'data-public-nav': item.key }"
+                @click="closeMobileNavMenu()"
+              >
+                {{ item.label }}
+              </a>
+              <div
+                v-if="$slots['mobile-menu-actions']"
+                :class="ns.e('mobile-nav-menu-actions')"
+              >
+                <slot name="mobile-menu-actions" />
+              </div>
+            </nav>
+            <nav
+              v-else
               v-show="!mobileNavMenuHydrated || mobileNavMenuVisible"
               :class="ns.e('mobile-nav-menu-panel')"
               :aria-label="mobileNavLabel"
@@ -190,7 +217,48 @@
         </nav>
         <Transition name="el-public-shell-mobile-search">
           <div
-            v-if="showMobileSearchTrigger"
+            v-if="cspSafe && showMobileSearchTrigger"
+            :id="mobileSearchRowId"
+            ref="mobileSearchRowRef"
+            :class="[
+              ns.e('mobile-search-row'),
+              ns.is('expanded', mobileSearchExpanded),
+              ns.is('csp-hidden', !mobileSearchExpanded),
+            ]"
+            :aria-hidden="!mobileSearchExpanded"
+          >
+            <slot name="mobile-search">
+              <form
+                v-if="showSearch"
+                :class="[ns.e('search'), ns.em('search', 'trigger')]"
+                :action="searchAction"
+                method="get"
+                @submit="handleSearchSubmit"
+                @keydown.esc="handleMobileSearchEscape"
+              >
+                <el-input
+                  :model-value="searchValue"
+                  :placeholder="searchPlaceholder"
+                  :label="searchAriaLabel"
+                  size="small"
+                  :class="ns.e('search-input')"
+                  :csp-safe="cspSafe"
+                  clearable
+                  @focus="emit('search-focus')"
+                  @input="handleSearchInput"
+                  @keydown.enter="handleSearchEnter"
+                />
+                <input
+                  v-if="searchName"
+                  type="hidden"
+                  :name="searchName"
+                  :value="searchValue"
+                />
+              </form>
+            </slot>
+          </div>
+          <div
+            v-else-if="showMobileSearchTrigger"
             v-show="mobileSearchExpanded"
             :id="mobileSearchRowId"
             ref="mobileSearchRowRef"
@@ -214,7 +282,7 @@
                   :placeholder="searchPlaceholder"
                   :label="searchAriaLabel"
                   size="small"
-                  style="--el-input-height: var(--el-public-shell-control-height, 40px)"
+                  :class="ns.e('search-input')"
                   clearable
                   @focus="emit('search-focus')"
                   @input="handleSearchInput"
@@ -245,7 +313,8 @@
                   :placeholder="searchPlaceholder"
                   :label="searchAriaLabel"
                   size="small"
-                  style="--el-input-height: var(--el-public-shell-control-height, 40px)"
+                  :class="ns.e('search-input')"
+                  :csp-safe="cspSafe"
                   clearable
                   @focus="emit('search-focus')"
                   @input="handleSearchInput"
@@ -302,7 +371,7 @@ import { ElInput } from '@element-plus/components/input'
 import { ElSiteHeader } from '@element-plus/components/site-header'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
 import { useId, useNamespace } from '@element-plus/hooks'
-import { FsuBottomTabBar } from '@element-plus/motion'
+import FsuBottomTabBar from '../../../motion/components/FsuBottomTabBar.vue'
 import { publicShellEmits, publicShellProps } from './public-shell'
 
 import type { CSSProperties } from 'vue'
@@ -387,7 +456,9 @@ const mobileSearchButtonLabel = computed(() =>
     : mobileSearchTriggerText.value,
 )
 const activeNavIndicatorEnabled = computed(
-  () => props.activeNavMotion === 'indicator' && props.navItems.length > 0,
+  () => !props.cspSafe
+    && props.activeNavMotion === 'indicator'
+    && props.navItems.length > 0,
 )
 const activeNavIndicatorKey = computed(() => {
   const activeItem = props.navItems.find((item) => item.key === props.activeNav)
@@ -398,6 +469,11 @@ const shellStyle = computed<CSSProperties>(() => ({
   '--el-public-shell-mobile-search-width': props.mobileSearchWidth,
   '--el-public-shell-max-width': props.maxWidth,
   '--el-public-shell-nav-gap': props.navGap,
+}))
+const shellAttrs = computed(() => ({
+  'data-public-hydration-kind': props.hydrationKind || undefined,
+  'data-mobile-nav-mode': props.mobileNavMode,
+  ...(props.cspSafe ? {} : { style: shellStyle.value }),
 }))
 
 const navLinkKls = (key: string) => [
@@ -421,6 +497,10 @@ const clearNavIndicator = (nav: HTMLElement) => {
 
 const syncNavIndicator = (nav: HTMLElement | undefined) => {
   if (!nav) return
+  if (props.cspSafe) {
+    nav.removeAttribute('style')
+    return
+  }
 
   if (!activeNavIndicatorEnabled.value || !activeNavIndicatorKey.value) {
     clearNavIndicator(nav)
@@ -571,6 +651,9 @@ const closeMobileNavMenu = (restoreFocus = false) => {
   mobileNavMenuExpanded.value = false
   mobileNavMenuClosing.value = true
   mobileNavMenuVisible.value = false
+  if (props.cspSafe) {
+    void nextTick(finishMobileNavMenuClose)
+  }
 }
 
 const finishMobileNavMenuClose = () => {

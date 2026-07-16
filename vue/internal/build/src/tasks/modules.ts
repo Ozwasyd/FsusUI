@@ -9,21 +9,15 @@ import commonjs from '@rollup/plugin-commonjs'
 import esbuild from 'rollup-plugin-esbuild'
 import glob from 'fast-glob'
 import { epRoot, excludeFiles, pkgRoot } from '@element-plus/build-utils'
-import { generateExternal, writeBundles } from '../utils'
+import {
+  generateExternal,
+  shouldIgnoreRollupWarning,
+  writeBundles,
+} from '../utils'
 import { ElementPlusAlias } from '../plugins/element-plus-alias'
 import { buildConfigEntries, target } from '../build-info'
 
 import type { OutputOptions } from 'rollup'
-
-const ignoreRollupWarning = (warning: { code?: string; exporter?: string; id?: string; message?: string }) => {
-  const source = warning.exporter ?? warning.id ?? warning.message ?? ''
-  return (
-    (warning.code === 'UNRESOLVED_IMPORT' &&
-      (source.includes('fsevents') || source.includes('vue-sfc-transformer/mkdist'))) ||
-    (warning.code === 'CIRCULAR_DEPENDENCY' &&
-      (source.includes('mlly') || source.includes('semver/classes')))
-  )
-}
 
 export const buildModules = async () => {
   const externalPackage = await generateExternal({ full: false })
@@ -38,7 +32,7 @@ export const buildModules = async () => {
       cwd: pkgRoot,
       absolute: true,
       onlyFiles: true,
-    })
+    }),
   )
   const vueMacrosPlugins = await VueMacros({
     setupComponent: false,
@@ -53,7 +47,7 @@ export const buildModules = async () => {
   const bundle = await rollup({
     input,
     onwarn(warning, warn) {
-      if (ignoreRollupWarning(warning)) return
+      if (shouldIgnoreRollupWarning(warning)) return
       warn(warning)
     },
     plugins: [
@@ -93,6 +87,6 @@ export const buildModules = async () => {
         sourcemap: true,
         entryFileNames: `[name].${config.ext}`,
       }
-    })
+    }),
   )
 }

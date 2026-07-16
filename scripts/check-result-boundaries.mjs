@@ -35,12 +35,17 @@ const invariantThrowAllowlist = new Map([
     [
       '@element-plus/wasm is not ready',
       '@element-plus/wasm internal buffer helpers are unavailable',
+      '@element-plus/wasm session disposed',
+      '@element-plus/wasm ASCII index is not loaded',
       'contains non-ASCII data',
     ],
   ],
   [
     'vue/packages/hooks/use-render-pipeline/index.ts',
-    ['fsus_render_pipeline_adapter_id_required'],
+    [
+      'fsus_render_pipeline_adapter_id_required',
+      'useFsusVirtualWindow requires unique keys',
+    ],
   ],
 ])
 

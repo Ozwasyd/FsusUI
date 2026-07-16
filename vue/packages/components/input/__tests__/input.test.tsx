@@ -1,5 +1,6 @@
-import { nextTick, ref } from 'vue'
+import { h, nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
+import { renderToString } from '@vue/server-renderer'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import defineGetter from '@element-plus/test-utils/define-getter'
 import { ElFormItem as FormItem } from '@element-plus/components/form'
@@ -12,6 +13,57 @@ import type { InputAutoSize, InputInstance, InputProps } from '../src/input'
 describe('Input.vue', () => {
   afterEach(() => {
     vi.restoreAllMocks()
+  })
+
+  test('omits native style attributes from CSP-safe SSR', async () => {
+    const html = await renderToString(
+      h(Input, {
+        cspSafe: true,
+        inputStyle: { width: '12rem' },
+        modelValue: 'query',
+        style: 'width: 20rem',
+      }),
+    )
+
+    expect(html).not.toMatch(/\sstyle=/u)
+  })
+
+  test('does not measure textarea height with inline styles in CSP-safe mode', async () => {
+    const setAttribute = vi.spyOn(HTMLTextAreaElement.prototype, 'setAttribute')
+    const wrapper = mount(_Input, {
+      props: {
+        autosize: { minRows: 2, maxRows: 4 },
+        cspSafe: true,
+        modelValue: 'strict CSP content',
+        type: 'textarea',
+      },
+    })
+
+    await nextTick()
+    ;(wrapper.vm as unknown as InputInstance).resizeTextarea()
+
+    expect(setAttribute).not.toHaveBeenCalledWith('style', expect.any(String))
+    expect(wrapper.find('textarea').attributes('style')).toBeUndefined()
+  })
+
+  test('preserves a native aria-label when the label prop is unset', () => {
+    const wrapper = mount(Input, {
+      attrs: { 'aria-label': 'Search moderation comments' },
+    })
+
+    expect(wrapper.find('input').attributes('aria-label')).toBe(
+      'Search moderation comments',
+    )
+  })
+
+  test('keeps hidden inputs in the form tree without inline display styles', () => {
+    const wrapper = mount(Input, {
+      props: { type: 'hidden', modelValue: 'token' },
+    })
+
+    expect(wrapper.classes()).toContain('is-hidden')
+    expect(wrapper.find('input[type="hidden"]').exists()).toBe(true)
+    expect(wrapper.attributes('style')).toBeUndefined()
   })
 
   test('create', async () => {
@@ -177,7 +229,7 @@ describe('Input.vue', () => {
     await nextTick()
 
     expect(vm.$el.querySelector('textarea').value).toMatchInlineSnapshot(
-      `"123"`
+      `"123"`,
     )
     type.value = 'password'
     await nextTick()
@@ -310,8 +362,9 @@ describe('Input.vue', () => {
         type: 'textarea',
       } as any
       const wrapper = mount({
-        setup: () => () =>
-          <Input ref="textarea" v-model={text.value} {...textareaProps} />,
+        setup: () => () => (
+          <Input ref="textarea" v-model={text.value} {...textareaProps} />
+        ),
       })
       const refTextarea = wrapper.vm.$refs.textarea as InputInstance
 

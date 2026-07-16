@@ -38,6 +38,10 @@ export const siteHeaderProps = buildProps({
     default: '64rem',
   },
   /**
+   * @description avoid inline style attributes for strict style-src-attr CSP consumers
+   */
+  cspSafe: Boolean,
+  /**
    * @description extra class for the inner width container
    */
   innerClass: {

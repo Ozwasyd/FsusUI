@@ -7,10 +7,11 @@ import { createFsusViteManualChunks } from '../../../scripts/vite-manual-chunks.
 export default defineConfig({
   plugins: [vue(), vueJsx()],
   build: {
-    chunkSizeWarningLimit: 500,
+    chunkSizeWarningLimit: Number.POSITIVE_INFINITY,
     rollupOptions: {
       output: {
         manualChunks: createFsusViteManualChunks(),
+        onlyExplicitManualChunks: true,
       },
     },
   },
@@ -42,34 +43,34 @@ export default defineConfig({
   resolve: {
     alias: {
       'element-plus': fileURLToPath(
-        new URL('../element-plus/index.ts', import.meta.url)
+        new URL('../element-plus/index.ts', import.meta.url),
       ),
       '@element-plus/components': fileURLToPath(
-        new URL('../components', import.meta.url)
+        new URL('../components', import.meta.url),
       ),
       '@element-plus/constants': fileURLToPath(
-        new URL('../constants', import.meta.url)
+        new URL('../constants', import.meta.url),
       ),
       '@element-plus/directives': fileURLToPath(
-        new URL('../directives', import.meta.url)
+        new URL('../directives', import.meta.url),
       ),
       '@element-plus/hooks': fileURLToPath(
-        new URL('../hooks', import.meta.url)
+        new URL('../hooks', import.meta.url),
       ),
       '@element-plus/locale': fileURLToPath(
-        new URL('../locale', import.meta.url)
+        new URL('../locale', import.meta.url),
       ),
       '@element-plus/utils': fileURLToPath(
-        new URL('../utils', import.meta.url)
+        new URL('../utils', import.meta.url),
       ),
       '@element-plus/icons-vue': fileURLToPath(
-        new URL('../icons-vue/src/index.ts', import.meta.url)
+        new URL('../icons-vue/src/index.ts', import.meta.url),
       ),
       '@element-plus/theme-chalk/src': fileURLToPath(
-        new URL('../theme-chalk/src', import.meta.url)
+        new URL('../theme-chalk/src', import.meta.url),
       ),
       '@element-plus/wasm': fileURLToPath(
-        new URL('../wasm/index.ts', import.meta.url)
+        new URL('../wasm/index.ts', import.meta.url),
       ),
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },

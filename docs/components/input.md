@@ -91,6 +91,7 @@
 | tabindex              | 输入框 tabindex                                               | `string \| number`                                                                        | —        |
 | validate-event        | 是否触发表单校验                                              | `boolean`                                                                                 | `true`   |
 | input-style           | 输入框或 textarea 的 style                                    | `string \| CSSProperties \| CSSProperties[]`                                              | `{}`     |
+| csp-safe              | 禁止 container/input/textarea/count 的 inline style 绑定；autosize 与自定义 input-style 由 consumer 的静态样式接管 | `boolean` | `false` |
 | count-graphemes       | 自定义字符计数函数（设置后 `maxlength`/`minlength` 不再生效） | `(value: string) => number`                                                               | —        |
 
 ### Events

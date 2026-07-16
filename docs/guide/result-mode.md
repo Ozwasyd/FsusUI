@@ -62,6 +62,11 @@ submit()
 - 非法内部状态。
 - 同步 API 在未满足调用前置条件时失败。
 
+当前显式登记的同步 invariant 包括：`WasmDataSession` 在 `dispose()` 后
+继续使用、在 `setAsciiIndex()` 前读取 ASCII 索引，以及
+`useFsusVirtualWindow` 收到重复 key。这些状态表示调用方违反生命周期或
+身份唯一性契约，不属于可重试的 WASM/Worker 运行时失败。
+
 可恢复失败必须返回 Result：
 
 - 校验失败。

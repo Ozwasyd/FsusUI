@@ -1,9 +1,7 @@
 <template>
   <div
-    v-show="type !== 'hidden'"
-    v-bind="containerAttrs"
+    v-bind="containerBindingAttrs"
     :class="containerKls"
-    :style="containerStyle"
     :role="containerRole"
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
@@ -30,15 +28,14 @@
           :id="inputId"
           ref="input"
           :class="nsInput.e('inner')"
-          v-bind="attrs"
+          v-bind="inputBindingAttrs"
           :type="showPassword ? (passwordVisible ? 'text' : 'password') : type"
           :disabled="inputDisabled"
           :readonly="readonly"
           :autocomplete="autocomplete"
           :tabindex="tabindex"
-          :aria-label="label"
+          :aria-label="nativeAriaLabel"
           :placeholder="placeholder"
-          :style="inputStyle"
           :form="props.form"
           :autofocus="props.autofocus"
           @compositionstart="handleCompositionStart"
@@ -105,13 +102,12 @@
         :id="inputId"
         ref="textarea"
         :class="nsTextarea.e('inner')"
-        v-bind="attrs"
+        v-bind="textareaBindingAttrs"
         :tabindex="tabindex"
         :disabled="inputDisabled"
         :readonly="readonly"
         :autocomplete="autocomplete"
-        :style="textareaStyle"
-        :aria-label="label"
+        :aria-label="nativeAriaLabel"
         :placeholder="placeholder"
         :form="props.form"
         :autofocus="props.autofocus"
@@ -126,7 +122,7 @@
       />
       <span
         v-if="isWordLimitVisible"
-        :style="countStyle"
+        v-bind="cspSafe ? {} : { style: countStyle }"
         :class="nsInput.e('count')"
       >
         {{ textLength }} / {{ attrs.maxlength }}
@@ -207,6 +203,7 @@ const containerKls = computed(() => [
   props.type === 'textarea' ? nsTextarea.b() : nsInput.b(),
   nsInput.m(inputSize.value),
   nsInput.is('disabled', inputDisabled.value),
+  nsInput.is('hidden', props.type === 'hidden'),
   nsInput.is('exceed', inputExceed.value),
   {
     [nsInput.b('group')]: slots.prepend || slots.append,
@@ -279,6 +276,21 @@ const textareaStyle = computed<StyleValue>(() => [
   textareaCalcStyle.value,
   { resize: props.resize },
 ])
+const containerBindingAttrs = computed(() => ({
+  ...containerAttrs.value,
+  ...(props.cspSafe ? {} : { style: containerStyle.value }),
+}))
+const inputBindingAttrs = computed(() => ({
+  ...attrs.value,
+  ...(props.cspSafe ? {} : { style: props.inputStyle }),
+}))
+const textareaBindingAttrs = computed(() => ({
+  ...attrs.value,
+  ...(props.cspSafe ? {} : { style: textareaStyle.value }),
+}))
+const nativeAriaLabel = computed(() => (
+  props.label || (rawAttrs['aria-label'] as string | undefined)
+))
 const nativeInputValue = computed(() =>
   isNil(props.modelValue) ? '' : String(props.modelValue)
 )
@@ -341,6 +353,7 @@ const resizeTextarea = () => {
   const { type, autosize } = props
 
   if (!isClient || type !== 'textarea' || !textarea.value) return
+  if (props.cspSafe) return
 
   if (autosize) {
     const textareaAutosize = isObject(autosize)

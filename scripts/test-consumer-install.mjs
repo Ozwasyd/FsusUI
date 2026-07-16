@@ -3,16 +3,15 @@ import {
   existsSync,
   mkdtempSync,
   mkdirSync,
-  readdirSync,
   readFileSync,
   rmSync,
-  statSync,
   writeFileSync,
 } from 'node:fs'
 import { execFileSync, spawnSync } from 'node:child_process'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import { brotliCompressSync, constants, gzipSync } from 'node:zlib'
 import { resolvePackageContract } from './npm-package-contract.mjs'
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url))
@@ -38,7 +37,14 @@ const viteChunkHelperPath = path.join(
   'scripts',
   'vite-manual-chunks.mjs',
 )
-const chunkBudgetBytes = 500 * 1024
+const performanceBaseline = JSON.parse(
+  readFileSync(
+    path.join(repoRoot, 'scripts', 'consumer-performance-baseline.json'),
+    'utf8',
+  ),
+)
+const keepConsumerFixture = process.env.FSUS_KEEP_CONSUMER_FIXTURE === '1'
+const checkpointFixturePath = process.env.FSUS_CONSUMER_FIXTURE_PATH
 
 if (!existsSync(distPackagePath)) {
   throw new Error(
@@ -51,9 +57,16 @@ function resolveExecutable(command) {
 }
 
 function withCommandOptions(options) {
+  const { env, ...commandOptions } = options ?? {}
   return {
     shell: process.platform === 'win32',
-    ...options,
+    ...commandOptions,
+    env: {
+      ...process.env,
+      CI: '1',
+      NO_UPDATE_NOTIFIER: '1',
+      ...env,
+    },
   }
 }
 
@@ -135,106 +148,245 @@ function assertNoConsumerBuildWarnings(output) {
   }
 }
 
-function collectJsChunks(root, current = root, chunks = []) {
-  if (!existsSync(current)) return chunks
-
-  for (const entry of readdirSync(current)) {
-    const filePath = path.join(current, entry)
-    const stats = statSync(filePath)
-    if (stats.isDirectory()) {
-      collectJsChunks(root, filePath, chunks)
-      continue
-    }
-
-    if (/\.(?:js|mjs)$/u.test(entry)) {
-      chunks.push({
-        path: path.relative(root, filePath),
-        size: stats.size,
-      })
-    }
-  }
-
-  return chunks
-}
-
 const formatSize = (bytes) => `${(bytes / 1024).toFixed(2)} KiB`
 
-function assertConsumerChunkBudget(fixtureRoot) {
-  const assetsRoot = path.join(fixtureRoot, 'dist', 'assets')
-  const chunks = collectJsChunks(assetsRoot).sort((a, b) => b.size - a.size)
-  const oversizedChunks = chunks.filter(
-    (chunk) => chunk.size > chunkBudgetBytes,
-  )
+function collectManifestClosure(manifest, entryKey) {
+  const visited = new Set()
+  const visit = (key) => {
+    if (visited.has(key)) return
+    visited.add(key)
+    for (const dependency of manifest[key]?.imports ?? []) visit(dependency)
+  }
+  visit(entryKey)
+  return visited
+}
 
-  if (oversizedChunks.length > 0) {
-    const largestChunks = chunks
-      .slice(0, 10)
-      .map((chunk) => `${chunk.path} ${formatSize(chunk.size)}`)
-      .join('\n')
-
-    throw new Error(
-      `Consumer Vite build exceeded the ${formatSize(chunkBudgetBytes)} JS chunk budget:\n${largestChunks}`,
-    )
+function measureManifestClosure(
+  fixtureRoot,
+  manifest,
+  keys,
+  { excludeFiles = new Set(), measurementCache = new Map() } = {},
+) {
+  const relativeFiles = new Set()
+  for (const key of keys) {
+    const entry = manifest[key]
+    if (!entry) continue
+    if (entry.file) relativeFiles.add(entry.file)
+    for (const cssFile of entry.css ?? []) relativeFiles.add(cssFile)
   }
 
-  const largestChunk = chunks[0]
-  if (largestChunk) {
-    console.log(
-      `Consumer JS chunk budget passed: largest=${largestChunk.path} ${formatSize(largestChunk.size)}.`,
-    )
+  const files = [...relativeFiles]
+    .filter((relativePath) => !excludeFiles.has(relativePath))
+    .map((relativePath) => {
+      const cached = measurementCache.get(relativePath)
+      if (cached) return cached
+      const contents = readFileSync(
+        path.join(fixtureRoot, 'dist', relativePath),
+      )
+      const measurement = {
+        brotli: brotliCompressSync(contents, {
+          params: {
+            [constants.BROTLI_PARAM_QUALITY]: 11,
+          },
+        }).byteLength,
+        gzip: gzipSync(contents, { level: 9 }).byteLength,
+        path: relativePath,
+        raw: contents.byteLength,
+      }
+      measurementCache.set(relativePath, measurement)
+      return measurement
+    })
+    .sort((a, b) => b.brotli - a.brotli)
+
+  return {
+    brotli: files.reduce((total, file) => total + file.brotli, 0),
+    files,
+    gzip: files.reduce((total, file) => total + file.gzip, 0),
+    raw: files.reduce((total, file) => total + file.raw, 0),
   }
 }
 
-const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'fsusui-consumer-'))
-const fixtureRoot = path.join(tempRoot, 'fixture')
-const artifactsRoot = path.join(tempRoot, 'artifacts')
+function reportConsumerPerformanceGraph(fixtureRoot) {
+  const manifestPath = path.join(fixtureRoot, 'dist', '.vite', 'manifest.json')
+  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
+  const entryKey = Object.keys(manifest).find((key) => manifest[key]?.isEntry)
+  if (!entryKey) throw new Error('Consumer Vite manifest has no entry chunk.')
+
+  const measurementCache = new Map()
+  const initialKeys = collectManifestClosure(manifest, entryKey)
+  const initial = measureManifestClosure(fixtureRoot, manifest, initialKeys, {
+    measurementCache,
+  })
+  const initialFiles = new Set(initial.files.map((file) => file.path))
+  const dynamic = Object.entries(manifest)
+    .filter(([, entry]) => entry?.isDynamicEntry)
+    .map(([key]) => key)
+    .map((key) => ({
+      key,
+      ...measureManifestClosure(
+        fixtureRoot,
+        manifest,
+        collectManifestClosure(manifest, key),
+        { excludeFiles: initialFiles, measurementCache },
+      ),
+    }))
+    .sort((a, b) => b.brotli - a.brotli)
+
+  console.log(
+    `Consumer initial graph: raw=${formatSize(initial.raw)}, gzip=${formatSize(initial.gzip)}, brotli=${formatSize(initial.brotli)}, files=${initial.files.length}.`,
+  )
+  for (const file of initial.files.slice(0, 12)) {
+    console.log(
+      `Consumer initial file ${file.path}: raw=${formatSize(file.raw)}, gzip=${formatSize(file.gzip)}, brotli=${formatSize(file.brotli)}.`,
+    )
+  }
+  for (const group of dynamic.slice(0, 12)) {
+    console.log(
+      `Consumer dynamic graph ${group.key}: raw=${formatSize(group.raw)}, gzip=${formatSize(group.gzip)}, brotli=${formatSize(group.brotli)}, files=${group.files.length}.`,
+    )
+  }
+
+  return { dynamic, entryKey, initial, initialKeys, manifest }
+}
+
+function assertRatchet(label, actual, baseline) {
+  for (const encoding of ['raw', 'gzip', 'brotli']) {
+    if (actual[encoding] > baseline[encoding]) {
+      throw new Error(
+        `${label} ${encoding} regressed: actual=${formatSize(actual[encoding])}, measured-baseline=${formatSize(baseline[encoding])}.`,
+      )
+    }
+  }
+}
+
+function assertConsumerPerformanceGraph(graph) {
+  const forbiddenStartupFragments = [
+    'cytoscape',
+    'fsus-markdown',
+    'fsus-wasm',
+    'katex',
+    'mermaid',
+    'shiki',
+  ]
+  const eagerFeatureFiles = graph.initial.files.filter((file) =>
+    forbiddenStartupFragments.some((fragment) => file.path.includes(fragment)),
+  )
+  if (eagerFeatureFiles.length > 0) {
+    throw new Error(
+      `Consumer startup graph eagerly loaded optional feature files:\n${eagerFeatureFiles.map((file) => file.path).join('\n')}`,
+    )
+  }
+
+  assertRatchet(
+    'Consumer startup graph',
+    graph.initial,
+    performanceBaseline.startup,
+  )
+
+  const markdownHydration = graph.dynamic.find((group) =>
+    group.key.includes('/components/markdown-renderer/index.mjs'),
+  )
+  if (!markdownHydration) {
+    throw new Error('Consumer graph lost the lazy Markdown hydration entry.')
+  }
+  assertRatchet(
+    'Consumer Markdown hydration graph',
+    markdownHydration,
+    performanceBaseline.markdownHydration,
+  )
+
+  console.log(
+    `Consumer performance ratchets passed (${performanceBaseline.provenance}).`,
+  )
+}
+
+const tempRoot = checkpointFixturePath
+  ? null
+  : mkdtempSync(path.join(os.tmpdir(), 'fsusui-consumer-'))
+const fixtureRoot = checkpointFixturePath
+  ? path.resolve(checkpointFixturePath)
+  : path.join(tempRoot, 'fixture')
+const artifactsRoot = tempRoot ? path.join(tempRoot, 'artifacts') : null
 
 try {
-  cpSync(templateRoot, fixtureRoot, { recursive: true })
-  mkdirSync(artifactsRoot, { recursive: true })
+  if (!checkpointFixturePath) {
+    cpSync(templateRoot, fixtureRoot, { recursive: true })
+    mkdirSync(artifactsRoot, { recursive: true })
 
-  for (const relativePath of ['src/main.ts', 'tsconfig.json']) {
-    const filePath = path.join(fixtureRoot, relativePath)
-    const content = readFileSync(filePath, 'utf8').replaceAll(
-      '__FSUS_PACKAGE_NAME__',
-      packageName,
+    for (const relativePath of ['src/main.ts', 'tsconfig.json']) {
+      const filePath = path.join(fixtureRoot, relativePath)
+      const content = readFileSync(filePath, 'utf8').replaceAll(
+        '__FSUS_PACKAGE_NAME__',
+        packageName,
+      )
+      writeFileSync(filePath, content)
+    }
+
+    const viteConfigPath = path.join(fixtureRoot, 'vite.config.ts')
+    const viteConfig = readFileSync(viteConfigPath, 'utf8').replaceAll(
+      '../../../scripts/vite-manual-chunks.mjs',
+      pathToFileURL(viteChunkHelperPath).href,
     )
-    writeFileSync(filePath, content)
+    writeFileSync(viteConfigPath, viteConfig)
+
+    const packOutput = execFileSync(
+      resolveExecutable('npm'),
+      ['pack', '--silent', '--pack-destination', artifactsRoot],
+      withCommandOptions({
+        cwd: distRoot,
+        encoding: 'utf8',
+      }),
+    )
+
+    const tarballName = packOutput.trim().split(/\r?\n/u).at(-1)
+    if (!tarballName) {
+      throw new Error('npm pack did not return a tarball filename.')
+    }
+
+    const tarballPath = path.join(artifactsRoot, tarballName)
+
+    run('pnpm', ['install', '--no-frozen-lockfile'], { cwd: fixtureRoot })
+    run('pnpm', ['add', tarballPath], { cwd: fixtureRoot })
+  } else {
+    if (!existsSync(path.join(fixtureRoot, 'node_modules'))) {
+      throw new Error(
+        `Consumer checkpoint has no installed dependencies: ${fixtureRoot}`,
+      )
+    }
+    console.log(`Consumer verification resumed from ${fixtureRoot}.`)
   }
-
-  const viteConfigPath = path.join(fixtureRoot, 'vite.config.ts')
-  const viteConfig = readFileSync(viteConfigPath, 'utf8').replaceAll(
-    '../../../scripts/vite-manual-chunks.mjs',
-    pathToFileURL(viteChunkHelperPath).href,
+  run(
+    'node',
+    [
+      '--input-type=module',
+      '--eval',
+      [
+        `const root = await import('${packageName}')`,
+        `const motion = await import('${packageName}/motion')`,
+        `const perception = await import('${packageName}/perception-challenge')`,
+        `if (root.FsusDataList?.name !== 'FsusDataList') throw new Error('FsusDataList runtime export drifted')`,
+        `if (motion.FsuTransition?.name !== 'FsuTransition') throw new Error('FsuTransition runtime export drifted')`,
+        `if (perception.FsusPerceptionChallenge?.name !== 'FsusPerceptionChallenge') throw new Error('FsusPerceptionChallenge runtime export drifted')`,
+        `console.log('Consumer runtime export contract passed.')`,
+      ].join(';'),
+    ],
+    { cwd: fixtureRoot },
   )
-  writeFileSync(viteConfigPath, viteConfig)
-
-  const packOutput = execFileSync(
-    resolveExecutable('npm'),
-    ['pack', '--silent', '--pack-destination', artifactsRoot],
-    withCommandOptions({
-      cwd: distRoot,
-      encoding: 'utf8',
-    }),
-  )
-
-  const tarballName = packOutput.trim().split(/\r?\n/u).at(-1)
-  if (!tarballName) {
-    throw new Error('npm pack did not return a tarball filename.')
-  }
-
-  const tarballPath = path.join(artifactsRoot, tarballName)
-
-  run('pnpm', ['install', '--no-frozen-lockfile'], { cwd: fixtureRoot })
-  run('pnpm', ['add', tarballPath], { cwd: fixtureRoot })
   run('pnpm', ['exec', 'vue-tsc', '--noEmit'], { cwd: fixtureRoot })
   const viteOutput = runAndCollect('pnpm', ['exec', 'vite', 'build'], {
     cwd: fixtureRoot,
   })
+  const performanceGraph = reportConsumerPerformanceGraph(fixtureRoot)
   assertNoConsumerBuildWarnings(viteOutput)
-  assertConsumerChunkBudget(fixtureRoot)
+  assertConsumerPerformanceGraph(performanceGraph)
 
   console.log(`Consumer install smoke passed for ${packageName}.`)
 } finally {
-  rmSync(tempRoot, { force: true, recursive: true })
+  if (checkpointFixturePath) {
+    console.log(`Consumer checkpoint preserved at ${fixtureRoot}.`)
+  } else if (keepConsumerFixture) {
+    console.log(`Consumer fixture retained at ${fixtureRoot}.`)
+  } else {
+    rmSync(tempRoot, { force: true, recursive: true })
+  }
 }

@@ -295,6 +295,7 @@ describe('use-render-pipeline', () => {
     }
     expect(samples[0]).toMatchObject({ hz: 120, sampleCount: 4 })
     expect(samples[0]!.rafDriftMs).toBeGreaterThan(0)
+    expect(callbacks).toHaveLength(0)
     stop()
 
     vi.stubGlobal(
@@ -484,15 +485,30 @@ describe('use-render-pipeline', () => {
     })
 
     const wrapper = mount(Probe)
-    scheduler!.schedule(() => calls.push('background'), {
-      priority: 'background',
-    })
-    const cancelVisible = scheduler!.schedule(() => calls.push('visible'), {
-      priority: 'visible',
-    })
-    scheduler!.schedule(() => calls.push('user-blocking'), {
-      priority: 'user-blocking',
-    })
+    scheduler!.schedule(
+      () => {
+        calls.push('background')
+      },
+      {
+        priority: 'background',
+      },
+    )
+    const cancelVisible = scheduler!.schedule(
+      () => {
+        calls.push('visible')
+      },
+      {
+        priority: 'visible',
+      },
+    )
+    scheduler!.schedule(
+      () => {
+        calls.push('user-blocking')
+      },
+      {
+        priority: 'user-blocking',
+      },
+    )
     cancelVisible()
 
     frames.shift()?.(0)
@@ -526,12 +542,22 @@ describe('use-render-pipeline', () => {
     })
 
     const wrapper = mount(Probe)
-    scheduler!.schedule(() => calls.push('background'), {
-      priority: 'background',
-    })
-    scheduler!.schedule(() => calls.push('visible'), {
-      priority: 'visible',
-    })
+    scheduler!.schedule(
+      () => {
+        calls.push('background')
+      },
+      {
+        priority: 'background',
+      },
+    )
+    scheduler!.schedule(
+      () => {
+        calls.push('visible')
+      },
+      {
+        priority: 'visible',
+      },
+    )
 
     expect(postTasks.map((task) => task.priority)).toEqual([
       'background',
@@ -582,9 +608,14 @@ describe('use-render-pipeline', () => {
       { key: 'index', priority: 'background' },
     )
     frames.shift()?.(0)
-    scheduler!.schedule(() => calls.push('input'), {
-      priority: 'user-blocking',
-    })
+    scheduler!.schedule(
+      () => {
+        calls.push('input')
+      },
+      {
+        priority: 'user-blocking',
+      },
+    )
     frames.shift()?.(8.33)
     frames.shift()?.(16.66)
     frames.shift()?.(24.99)
@@ -615,8 +646,18 @@ describe('use-render-pipeline', () => {
       },
     })
     const wrapper = mount(Probe)
-    scheduler!.schedule(() => calls.push('stale'), { key: 'render' })
-    scheduler!.schedule(() => calls.push('latest'), { key: 'render' })
+    scheduler!.schedule(
+      () => {
+        calls.push('stale')
+      },
+      { key: 'render' },
+    )
+    scheduler!.schedule(
+      () => {
+        calls.push('latest')
+      },
+      { key: 'render' },
+    )
     scheduler!.schedule(
       () => ({
         done: false,

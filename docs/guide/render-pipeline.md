@@ -39,13 +39,13 @@ import {
 ```
 
 - `mode: 'auto'` 按阈值启用；`enabled` 强制进入预算判断；`disabled` 关闭分块策略。
-- `adaptive: 'auto'` 会根据多帧 rAF delta 的中位数与截尾均值估算真实刷新周期，在 60/90/120/144 Hz 下派生不同主线程预算；显式 `budget.frameMs` 仍按旧配置语义覆盖自动值。
+- `adaptive: 'auto'` 会在挂载时采集一个有界的多帧 rAF 窗口，根据 delta 的中位数与截尾均值估算真实刷新周期，在 60/90/120/144 Hz 下派生不同主线程预算；页面 visibility 变化时重新采样，不会为每个组件永久保留 RAF 循环。显式 `budget.frameMs` 仍按旧配置语义覆盖自动值。
 - `worker: 'auto'` 在 Worker 可用且 adapter 支持时启用；SSR 或 Worker 不可用时自动退回主线程路径。
 - `thresholds` 只决定是否进入分块预算，不会把不可分块组件强行虚拟化。
 - `budget` 控制主线程单帧提交、虚拟窗口 overscan 和测量批大小。
 - 内部能力画像分别维护 `motionMode`、compositor、`content-visibility`、主线程校准吞吐/Worker 并发能力、memory 和 refresh profile；compute 等级来自运行时吞吐校准而不是只读 `hardwareConcurrency`，reduced-motion 只控制动效，不再降低 compute/compositor 等级。
 - `acceleration.compositor` 控制 `translate3d`、临时 `will-change` 和 Popper GPU compute styles；`contentVisibility` 只按浏览器能力与显式配置启用，不依赖 CPU/GPU 画像。这里的 GPU 指浏览器 DOM compositor，不包含 WebGPU/Canvas 重写。
-- 页面隐藏、低电量、刷新周期发生变化或运行时能力画像变化时会收紧后台预算、重新采样并使旧策略缓存失效；策略样本使用 EWMA，缓存 60 秒过期，避免一次偶发慢请求永久影响同一 fingerprint。
+- 页面隐藏/重新可见、低电量或运行时能力画像变化时会收紧后台预算、重新采样并使旧策略缓存失效；策略样本使用 EWMA，缓存 60 秒过期，避免一次偶发慢请求永久影响同一 fingerprint。
 
 ## 外部 Adapter
 

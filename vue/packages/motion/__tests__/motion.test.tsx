@@ -259,6 +259,68 @@ describe('motion primitives', () => {
     expect(el.style.filter).toBe('none')
   })
 
+  it('retains WAAPI terminal state without materializing inline styles', () => {
+    const el = document.createElement('div')
+    document.body.append(el)
+    const cancel = vi.fn()
+    const finish = vi.fn()
+    const animation = {
+      cancel,
+      finish,
+      oncancel: null,
+      onfinish: null,
+      playState: 'running',
+    } as unknown as Animation
+    const animate = vi.fn(() => animation)
+    Object.defineProperty(el, 'animate', {
+      configurable: true,
+      value: animate,
+    })
+
+    const controls = runMotion(el, { name: 'fade-up' })
+    ;(animation as Animation & { playState: AnimationPlayState }).playState =
+      'finished'
+    animation.onfinish?.(new Event('finish') as AnimationPlaybackEvent)
+
+    expect(animate).toHaveBeenCalledTimes(1)
+    expect(el.getAttribute('style')).toBeNull()
+    expect(finish).not.toHaveBeenCalled()
+
+    controls.cancel()
+    expect(cancel).toHaveBeenCalledTimes(1)
+  })
+
+  it('uses a zero-duration WAAPI fill for reduced terminal state', () => {
+    document.documentElement.dataset.fsusMotion = 'reduced'
+    const el = document.createElement('div')
+    document.body.append(el)
+    const finish = vi.fn()
+    const animation = {
+      cancel: vi.fn(),
+      finish,
+      oncancel: null,
+      onfinish: null,
+      playState: 'finished',
+    } as unknown as Animation
+    const animate = vi.fn(() => animation)
+    Object.defineProperty(el, 'animate', {
+      configurable: true,
+      value: animate,
+    })
+
+    runMotion(el, { name: 'fade-up' })
+
+    expect(animate).toHaveBeenCalledWith(
+      [
+        { opacity: '1', transform: 'none', filter: 'none' },
+        { opacity: '1', transform: 'none', filter: 'none' },
+      ],
+      { duration: 0, fill: 'forwards' },
+    )
+    expect(finish).toHaveBeenCalledTimes(1)
+    expect(el.getAttribute('style')).toBeNull()
+  })
+
   it('runs v-motion with string syntax', async () => {
     const wrapper = mount(() => <div v-motion={'fade-up'}>content</div>, {
       global: {

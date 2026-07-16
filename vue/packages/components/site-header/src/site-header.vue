@@ -1,5 +1,9 @@
 <template>
-  <header :class="headerKls" :style="headerStyle" :aria-label="ariaLabel">
+  <header
+    :class="headerKls"
+    :aria-label="ariaLabel"
+    v-bind="cspSafe ? {} : { style: headerStyle }"
+  >
     <div :class="[ns.e('inner'), innerClass]">
       <div :class="[ns.e('primary-row'), primaryRowClass]">
         <div :class="[ns.e('brand-nav'), brandNavClass]">

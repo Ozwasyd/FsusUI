@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
-import { nextTick } from 'vue'
+import { h, nextTick } from 'vue'
+import { renderToString } from '@vue/server-renderer'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import ThemeModeToggle from '../src/theme-mode-toggle.vue'
 import { clearThemeMode } from '@element-plus/components/config-provider'
@@ -311,5 +312,25 @@ describe('ThemeModeToggle.vue', () => {
     expect(trigger.attributes('aria-expanded')).toBe('false')
 
     wrapper.unmount()
+  })
+
+  test('uses a class instead of v-show inline style in CSP-safe mode', async () => {
+    const wrapper = mount(ThemeModeToggle, {
+      props: { variant: 'menu-button', cspSafe: true },
+    })
+    const trigger = wrapper.find<HTMLButtonElement>('.el-theme-mode-toggle__menu-button')
+    const menu = wrapper.find('.el-theme-mode-toggle__menu')
+
+    expect(menu.classes()).toContain('is-csp-hidden')
+    expect(menu.attributes('style')).toBeUndefined()
+    await trigger.trigger('click')
+    await nextTick()
+    expect(menu.classes()).not.toContain('is-csp-hidden')
+    expect(menu.attributes('style')).toBeUndefined()
+
+    const html = await renderToString(
+      h(ThemeModeToggle, { variant: 'menu-button', cspSafe: true }),
+    )
+    expect(html).not.toMatch(/\sstyle=/u)
   })
 })

@@ -194,6 +194,10 @@ export const publicShellProps = buildProps({
     type: String,
     default: '7rem',
   },
+  /**
+   * @description avoid inline style attributes and fall back to static layout tokens under strict CSP
+   */
+  cspSafe: Boolean,
 } as const)
 
 export const publicShellEmits = {

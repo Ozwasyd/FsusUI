@@ -5,9 +5,9 @@
   "owner": "FsusUI Core",
   "baseline": {
     "path": "spec/baselines/vue-current.json",
-    "hash": "aaed44e4ee7599b024dd195a4199503b8a6aa1a5ce53eb4be6f3dae99abab108",
+    "hash": "08e4906e3c48af1bee874bda663ef90b8b990d9e73b68e7dd0b6150b0b82b4a7",
     "packageVersion": "1.5.1",
-    "tokenHash": "c9fcadfed3dee0ce45d451b915e5dc952ac703c488e2defe984093e4cd809290",
+    "tokenHash": "e527f5c8e52809857180b5712ae2ea0897fcb3cf1fe503fe231aa9546baa4ea6",
     "iconHash": "d61254b1b1ff9addaf45293153df217b0c0d01ec69ec602081c44a01008b78de"
   },
   "changeClassifications": [
@@ -7384,6 +7384,12 @@
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
+        },
+        {
+          "name": "variant",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
         }
       ],
       "events": [],
@@ -8075,6 +8081,12 @@
         },
         {
           "name": "containerRole",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "cspSafe",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -9598,6 +9610,12 @@
           "required": false
         },
         {
+          "name": "contentVersion",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "cspNonce",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -9635,6 +9653,18 @@
         },
         {
           "name": "sanitizeHtml",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "trustedHtmlFactory",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "trustedScriptUrlFactory",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -12871,6 +12901,12 @@
           "required": false
         },
         {
+          "name": "cspSafe",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "hydrationKind",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -12884,6 +12920,24 @@
         },
         {
           "name": "mobileNavGap",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "mobileNavLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "mobileNavMenuLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "mobileNavMode",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -13028,6 +13082,11 @@
         },
         {
           "name": "mobile-actions",
+          "scoped": false,
+          "required": false
+        },
+        {
+          "name": "mobile-menu-actions",
           "scoped": false,
           "required": false
         },
@@ -15371,6 +15430,12 @@
         },
         {
           "name": "brandNavClass",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "cspSafe",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -18094,6 +18159,12 @@
       "props": [
         {
           "name": "compact",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "cspSafe",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false

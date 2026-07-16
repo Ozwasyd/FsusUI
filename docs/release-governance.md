@@ -21,6 +21,30 @@ Public preview 的 registry 策略、包名策略、dist-tag 策略和 provenanc
 
 `pnpm verify` 保留为 `verify:full` 的安全别名，避免旧脚本降级覆盖面。
 
+所有并行质量组都通过 `run-p --continue-on-error` 收集完整失败集；单项失败不会
+提前终止仍在运行的 typecheck、unit、visual 或 release sibling。命令最终仍以
+非零状态退出，因此该策略只改善诊断完整性，不放宽任何 gate。
+
+Rollup 构建只静默已核验的第三方包内部循环：`mlly`、`semver`、
+`d3-interpolate`、`d3-selection` 和 `d3-transition`。过滤器会逐个解析循环参与
+文件的精确 `node_modules` 包名；只要包含本仓库文件、未知包或其他 warning code，
+就继续原样输出。`check:rollup-warning-policy` 防止规则退化成宽泛字符串过滤。
+
+`FsusUI.Avalonia.Tests` 内的控件测试共享 Avalonia 进程级 UI Dispatcher，因此该
+测试程序集禁用 test-collection 并行，避免跨线程 `InvokeAsync` 在无消息泵线程上
+等待。`dotnet test` 仍会并行执行 Avalonia、Headless 和 Performance 测试程序集；
+只有这个无法安全并行的共享 Dispatcher 边界保持串行。
+
+Demo 会加载完整 Markdown/Mermaid 压力样例，因此不再用 Vite 无路径语义的单文件
+warning 数字冒充响应性能预算。consumer smoke 根据 manifest 分开计算首屏静态闭包
+与 Markdown 冷水合闭包：首屏禁止提前引入 Markdown、WASM、Mermaid、Shiki、KaTeX
+或 Cytoscape，并以 `scripts/consumer-performance-baseline.json` 中的实测 raw/gzip/
+brotli 结果执行只减不增的棘轮。Demo 仍使用显式 chunk ownership；所有非尺寸类
+构建 warning 继续原样输出并由现有零 warning gate 拦截。
+诊断中可用 `FSUS_CONSUMER_FIXTURE_PATH` 指向一次完整安装后保留的 fixture，断点重跑
+运行时导出、类型检查、Vite 构建和性能棘轮；release gate 不设置该变量，始终从冷
+安装验证真实消费链路。
+
 GitHub Actions 的 `quality.yml` 将非 PR 路径拆成 main、nightly、release
 三个 group：push 进入 `group: main`，定时任务进入 `group: nightly`，手工
 workflow dispatch 可选择 main、nightly 或 release。最终发布仍只由发布 workflow
@@ -90,7 +114,27 @@ pnpm test:visual
 - `publishConfig.access` 为 `public`
 - `publishConfig.registry` 指向 `https://registry.npmjs.org/`
 - 不包含 `.npmrc`、secrets、source maps 或私有 registry URL
+- 所有 worker URL 必须改写到包内已生成的 ESM runtime；不得残留 `.worker.ts`，也不得指向不存在的相对路径
 - consumer fixture 可以从 tarball 安装并通过 `vue-tsc` / `vite build`
+
+consumer 性能采样使用按需组件导入与 `profile: 'consumer'` 分包策略，避免完整
+`app.use` 安装面把未使用组件强制变成空 chunk 或混入首屏。完整插件安装能力由包
+接口、类型和 pack smoke 独立校验；性能预算只对真实可达的首屏及动态依赖闭包计算
+raw、gzip 与 Brotli 体积。
+
+同理，性能采样只加载 `base.css`、实际组件 CSS 与
+`public-shell-critical.css`。完整 `dist/fsus.css` / `el-fsus-theme.css` 的内容、hash
+和可安装性仍由 package smoke 校验；DataList、Motion、Perception 的 runtime export
+也由独立 Node contract smoke 校验，不再人为塞进按需消费首屏。
+
+Markdown 首屏采样必须提供与 `content` 同源的 `initialHtml`，模拟 SSR、AOT shell
+或可信缓存立即首显；WASM 仍在后台完成正式解析并替换内容。这样首个可见文本不依赖
+WASM 下载，同时 consumer smoke 仍会真实请求并验证打包后的 WASM runtime。
+
+性能 fixture 还会在首次 idle 之前使用同源静态 HTML，之后才异步加载
+`ElMarkdownRenderer` 并 hydration。该边界用于证明 Markdown runtime、worker 与 WASM
+不会和首屏 Vue/CSS 争抢同一个启动任务；完整 runtime export 仍由独立 contract smoke
+覆盖。
 
 workspace 依赖归一化由 `scripts/prepare-npm-package.mjs` 负责，当前要求它处理：
 

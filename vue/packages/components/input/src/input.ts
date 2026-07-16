@@ -167,6 +167,10 @@ export const inputProps = buildProps({
     default: () => mutable({} as const),
   },
   /**
+   * @description omit inline style bindings for strict style-src-attr CSP consumers
+   */
+  cspSafe: Boolean,
+  /**
    * @description native input autofocus
    */
   autofocus: {

@@ -69,6 +69,8 @@ WASM 渲染器会保留 Mermaid、LaTeX/KaTeX 相关的 HTML、MathML、SVG 或 
 
 只有在调用方确认内容可信时才应开启 `allow-html`。如业务已经在上游完成可信 HTML 过滤，并且需要保留完整 HTML 能力，可以显式设置 `:sanitize-html="false"` 关闭组件层 sanitize。
 
+启用 `require-trusted-types-for 'script'` 的宿主应传入 `trusted-html-factory` 与 `trusted-script-url-factory`。组件会先执行保守字符串清理，再把结果交给 HTML factory 生成宿主 policy 的 `TrustedHTML`，随后继续执行 DOM 级清理；worker factory 只接收构建生成的 Markdown worker `URL`。FsusUI 不创建或公开宿主的 Trusted Types policy。
+
 ## Fsus 显式段落组
 
 Fsus Markdown 保留原生 Markdown 的双换行段落规则，同时增加一个显式段落组语法，用于表达“这是一段连续讲解，但中间包含代码块、表格、列表或引用”等块级内容。
@@ -171,6 +173,8 @@ chunk 边界由 WASM 渲染流程产出，类型包括 `heading`、`paragraph`�
 | initial-html           | 初始 HTML，用于首帧占位                                                                  | `string`                                        | `''`      |
 | allow-html             | 是否允许 Markdown 源码中的 raw HTML                                                      | `boolean`                                       | `false`   |
 | sanitize-html          | DOM 提交前是否清理不安全 HTML                                                            | `boolean`                                       | `true`    |
+| trusted-html-factory   | 将保守清理后的 HTML 转为宿主 policy 的 `TrustedHTML`；严格 Trusted Types 页面使用       | `(html: string) => unknown`                     | —         |
+| trusted-script-url-factory | 将 Markdown worker URL 转为宿主 policy 的 `TrustedScriptURL`                         | `(url: URL) => unknown`                         | —         |
 | allow-latex            | 是否启用 LaTeX/MathML 输出                                                               | `boolean`                                       | `true`    |
 | allow-mermaid          | 是否启用 Mermaid 输出                                                                    | `boolean`                                       | `true`    |
 | mode                   | 渲染模式元数据                                                                           | `'article' \| 'about' \| 'preview' \| 'editor'` | `article` |

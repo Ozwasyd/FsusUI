@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "policy": "no-growth-ratchet",
+  "provenance": "2026-07-16 consumer Vite manifest after a cold package install; browser cross-check used slow 4G and 4x CPU throttling",
+  "startup": {
+    "raw": 149237,
+    "gzip": 47490,
+    "brotli": 42574
+  },
+  "markdownHydration": {
+    "raw": 82281,
+    "gzip": 29602,
+    "brotli": 26817
+  }
+}

@@ -87,9 +87,25 @@ assert(
   'demo and visual fixtures must use the complete FsusUI source theme entry',
 )
 assert(
-  consumerFixtureEntry.includes('__FSUS_PACKAGE_NAME__/dist/fsus.css') &&
-    !consumerFixtureEntry.includes('__FSUS_PACKAGE_NAME__/dist/index.css'),
-  'packaged consumer fixture must use the complete dist/fsus.css entry',
+  consumerFixtureEntry.includes(
+    '__FSUS_PACKAGE_NAME__/dist/public-shell-critical.css',
+  ) &&
+    consumerFixtureEntry.includes(
+      '__FSUS_PACKAGE_NAME__/theme-chalk/el-markdown-renderer.css',
+    ) &&
+    !consumerFixtureEntry.includes('__FSUS_PACKAGE_NAME__/dist/fsus.css'),
+  'performance consumer fixture must use critical and component CSS without complete product theme bundles',
+)
+const consumerFixtureViteConfig = read(
+  'vue/tests/consumer-install/template/vite.config.ts',
+)
+assert(
+  consumerFixtureViteConfig.includes("profile: 'consumer'") &&
+    consumerFixtureViteConfig.includes('onlyExplicitManualChunks: true') &&
+    consumerFixtureViteConfig.includes(
+      'chunkSizeWarningLimit: Number.POSITIVE_INFINITY',
+    ),
+  'packaged consumer fixture must use explicit tree-shaken chunks and the path-aware performance ratchet',
 )
 assert(
   sourcePackage.homepage === repositoryWebUrl,
@@ -405,6 +421,27 @@ if (existsSync(path.join(publishedDistRoot, 'package.json'))) {
   assert(
     leakedFiles.length === 0,
     `published files must not reference unpublished @element-plus/motion: ${leakedFiles.join(', ')}`,
+  )
+
+  const workerReferencePattern =
+    /(['"])([^'"]*(?:data-pipeline\.worker|markdown-renderer\.worker|markdown-parser\.worker)\.(?:ts|js|mjs))\1/g
+  const workerReferenceViolations = []
+  for (const filePath of collectFiles(publishedDistRoot).filter(
+    isPackageReferenceCandidate,
+  )) {
+    const relativePath = path.relative(publishedDistRoot, filePath)
+    const content = readFileSync(filePath, 'utf8')
+    for (const match of content.matchAll(workerReferencePattern)) {
+      const workerSpecifier = match[2]
+      const workerPath = path.resolve(path.dirname(filePath), workerSpecifier)
+      if (workerSpecifier.endsWith('.ts') || !existsSync(workerPath)) {
+        workerReferenceViolations.push(`${relativePath} -> ${workerSpecifier}`)
+      }
+    }
+  }
+  assert(
+    workerReferenceViolations.length === 0,
+    `published worker references must resolve to built runtime artifacts: ${workerReferenceViolations.join(', ')}`,
   )
 }
 

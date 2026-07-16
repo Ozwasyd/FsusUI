@@ -76,6 +76,10 @@ export const themeModeToggleProps = buildProps({
     type: String,
     default: 'Theme mode',
   },
+  /**
+   * @description hide the closed menu with a class instead of an inline style attribute
+   */
+  cspSafe: Boolean,
 } as const)
 
 export const themeModeToggleEmits = {

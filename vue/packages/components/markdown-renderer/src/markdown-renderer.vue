@@ -88,7 +88,10 @@ import {
   renderMarkdownResultWithRuntime,
 } from '@element-plus/wasm'
 import { isFsusErr, toFsusError } from '@element-plus/utils'
-import { markdownRendererProps } from './markdown-renderer'
+import {
+  markdownRendererProps,
+  resolveMarkdownWorkerScriptUrl,
+} from './markdown-renderer'
 import {
   getMarkdownRendererRuntimeCache,
   setMarkdownRendererRuntimeCache,
@@ -138,7 +141,9 @@ const rootAttrs = {
   'data-markdown-renderer': 'wasm',
 }
 const resolveMarkdownHtml = (html: string) =>
-  props.sanitizeHtml ? sanitizeMarkdownHtml(html) : html
+  props.sanitizeHtml
+    ? sanitizeMarkdownHtml(html, props.trustedHtmlFactory)
+    : html
 const renderedContent = shallowRef(
   props.initialHtml.trim() ? resolveMarkdownHtml(props.initialHtml) : '',
 )
@@ -508,15 +513,23 @@ const resolveMarkdownRenderResult = <
   TResult extends MarkdownRuntimeChunkResult | MarkdownRuntimeRenderResult,
 >(
   result: TResult,
-) => (props.sanitizeHtml ? sanitizeMarkdownRenderResult(result) : result)
+) => props.sanitizeHtml
+  ? sanitizeMarkdownRenderResult(result, props.trustedHtmlFactory)
+  : result
 
 const canUseMarkdownWorker = () =>
   typeof Worker !== 'undefined' && typeof URL !== 'undefined'
 
-const createMarkdownRendererWorker = () =>
-  new Worker(new URL('./markdown-renderer.worker.ts', import.meta.url), {
+const createMarkdownRendererWorker = () => {
+  const moduleUrl = new URL('./markdown-renderer.worker.ts', import.meta.url)
+  const trustedModuleUrl = resolveMarkdownWorkerScriptUrl(
+    moduleUrl,
+    props.trustedScriptUrlFactory,
+  )
+  return new Worker(trustedModuleUrl as string | URL, {
     type: 'module',
   })
+}
 
 const markdownRenderPipelineAdapter: FsusRenderPipelineAdapter<
   MarkdownRenderRequest,
@@ -783,7 +796,9 @@ const performRender = async () => {
 
       const resolvedResult = resolveMarkdownRenderResult(result)
       const resolvedUnits = props.sanitizeHtml
-        ? document.units.map(sanitizeMarkdownChunk)
+        ? document.units.map((unit) =>
+            sanitizeMarkdownChunk(unit, props.trustedHtmlFactory),
+          )
         : document.units
       const firstSectionHeadingIndex = resolvedUnits.findIndex(
         (unit, index) => index > 0 && unit.kind === 'heading',

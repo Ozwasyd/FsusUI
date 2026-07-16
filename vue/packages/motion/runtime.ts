@@ -245,6 +245,24 @@ const runWaapiMotion = (
   return animation
 }
 
+// Keep a terminal visual state in the browser animation layer. Unlike
+// Animation.commitStyles() or HTMLElement.style writes, this does not create
+// a style attribute and therefore remains compatible with style-src-attr
+// 'none'. The owning controls cancel the retained fill effect before the next
+// motion starts or when the element is unmounted.
+const holdWaapiTerminalState = (
+  el: HTMLElement,
+  state: MotionStyleState,
+): Animation | null => {
+  if (typeof el.animate !== 'function') return null
+  const animation = el.animate([state, state], {
+    duration: 0,
+    fill: 'forwards',
+  })
+  animation.finish()
+  return animation
+}
+
 // Compatibility fallback for environments without WAAPI (jsdom, very old
 // browsers). Uses inline CSS transitions, which is the old self-written
 // path. Kept narrow on purpose: any code path that hits this is in a
@@ -336,25 +354,27 @@ export const runMotion = (
     finished = true
     if (animation) {
       try {
-        animation.commitStyles()
+        // Advancing the retained WAAPI effect is CSP-safe; commitStyles()
+        // would materialize an inline style attribute in WebKit.
+        if (animation.playState !== 'finished') animation.finish()
       } catch {
-        // commitStyles may throw if the animation was cancelled before
-        // any frame was produced. Fall back to applying the final state
-        // directly so the element ends up at its terminal visual.
+        // A cancelled animation may reject finish(). Its lifecycle is still
+        // complete, so release the budget and notify the caller below.
       }
+    } else {
+      applyStyleState(el, finalState)
     }
-    applyStyleState(el, finalState)
     releaseBudget()
     options.onFinish?.()
   }
 
   const controls: MotionRuntimeControls = {
     cancel() {
-      if (finished) return
+      const wasFinished = finished
       finished = true
       animation?.cancel()
       fallback?.cancel()
-      releaseBudget()
+      if (!wasFinished) releaseBudget()
     },
     finish: commitAndFinish,
   }
@@ -367,7 +387,8 @@ export const runMotion = (
     !claimMotionBudgetNode(budget)
   ) {
     finalState = reducedTerminalState(preset, phase, to)
-    applyStyleState(el, finalState)
+    animation = holdWaapiTerminalState(el, finalState)
+    if (!animation) applyStyleState(el, finalState)
     options.onFinish?.()
     finished = true
     return controls
@@ -381,7 +402,9 @@ export const runMotion = (
 
   // If the to-state is empty (or all properties blocked), commit terminal.
   if (properties.length === 0) {
-    applyStyleState(el, to)
+    animation = holdWaapiTerminalState(el, to)
+    if (!animation) applyStyleState(el, to)
+    releaseBudget()
     options.onFinish?.()
     finished = true
     return controls

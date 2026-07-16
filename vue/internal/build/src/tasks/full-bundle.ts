@@ -26,6 +26,7 @@ import { ElementPlusAlias } from '../plugins/element-plus-alias'
 import {
   formatBundleFilename,
   generateExternal,
+  shouldIgnoreRollupWarning,
   withTaskName,
   writeBundles,
 } from '../utils'
@@ -35,21 +36,6 @@ import type { Plugin } from 'rollup'
 
 const banner = `/*! ${PKG_BRAND_NAME} v${version} */\n`
 const tsconfig = path.resolve(projRoot, 'vue/tsconfig.web.json')
-const ignoreRollupWarning = (warning: {
-  code?: string
-  exporter?: string
-  id?: string
-  message?: string
-}) => {
-  const source = warning.exporter ?? warning.id ?? warning.message ?? ''
-  return (
-    (warning.code === 'UNRESOLVED_IMPORT' &&
-      (source.includes('fsevents') ||
-        source.includes('vue-sfc-transformer/mkdist'))) ||
-    (warning.code === 'CIRCULAR_DEPENDENCY' &&
-      (source.includes('mlly') || source.includes('semver/classes')))
-  )
-}
 
 async function buildFullEntry(minify: boolean) {
   const externalPackage = await generateExternal({ full: true })
@@ -109,7 +95,7 @@ async function buildFullEntry(minify: boolean) {
   const bundle = await rollup({
     input: path.resolve(epRoot, 'index.ts'),
     onwarn(warning, warn) {
-      if (ignoreRollupWarning(warning)) return
+      if (shouldIgnoreRollupWarning(warning)) return
       warn(warning)
     },
     plugins,
@@ -160,7 +146,7 @@ async function buildFullLocale(minify: boolean) {
       const bundle = await rollup({
         input: file,
         onwarn(warning, warn) {
-          if (ignoreRollupWarning(warning)) return
+          if (shouldIgnoreRollupWarning(warning)) return
           warn(warning)
         },
         plugins: [
@@ -200,8 +186,10 @@ async function buildFullLocale(minify: boolean) {
   )
 }
 
-export const buildFull = (minify: boolean): TaskFunction => async () =>
-  Promise.all([buildFullEntry(minify), buildFullLocale(minify)])
+export const buildFull =
+  (minify: boolean): TaskFunction =>
+  async () =>
+    Promise.all([buildFullEntry(minify), buildFullLocale(minify)])
 
 export const buildFullBundle: TaskFunction = series(
   withTaskName('buildFull', buildFull(false)),

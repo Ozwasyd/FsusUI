@@ -245,24 +245,86 @@ function rewriteWorkerRuntimeReferences(rootDir) {
   const candidates = collectPublishFiles(rootDir).filter((filePath) => {
     return ['.js', '.mjs', '.cjs'].includes(path.extname(filePath))
   })
+  const workerRuntimePaths = new Map([
+    [
+      'data-pipeline.worker',
+      'es/components/_internal/data-pipeline.worker.mjs',
+    ],
+    [
+      'markdown-renderer.worker',
+      'es/components/markdown-renderer/src/markdown-renderer.worker.mjs',
+    ],
+    [
+      'markdown-parser.worker',
+      'es/components/markdown-renderer/src/markdown-parser.worker.mjs',
+    ],
+  ])
+  const workerReferencePattern =
+    /(['"])(?:[^'"]*\/)?(data-pipeline\.worker|markdown-renderer\.worker|markdown-parser\.worker)\.(?:ts|js|mjs)\1/g
   let rewritten = 0
 
   for (const filePath of candidates) {
-    const extension = path.extname(filePath)
-    const workerExtension = extension === '.mjs' ? '.mjs' : '.js'
     const original = readFileSync(filePath, 'utf8')
     const next = original.replace(
-      /(\.\/markdown-renderer\.worker)\.ts/g,
-      `$1${workerExtension}`,
+      workerReferencePattern,
+      (_match, quote, workerName) => {
+        const targetPath = workerRuntimePaths.get(workerName)
+        if (!targetPath) return _match
+
+        const relativePath = path
+          .relative(path.dirname(filePath), path.join(rootDir, targetPath))
+          .split(path.sep)
+          .join('/')
+        const specifier = relativePath.startsWith('.')
+          ? relativePath
+          : `./${relativePath}`
+        rewritten += 1
+        return `${quote}${specifier}${quote}`
+      },
     )
 
     if (next !== original) {
       writeFileSync(filePath, next)
-      rewritten += 1
     }
   }
 
   return rewritten
+}
+
+function assertViteSafeWorkerRuntime(rootDir) {
+  const violations = []
+  const workerReferencePattern =
+    /(['"])([^'"]*(?:data-pipeline\.worker|markdown-renderer\.worker|markdown-parser\.worker)\.(?:ts|js|mjs))\1/g
+
+  for (const filePath of collectPublishFiles(rootDir)) {
+    if (!['.js', '.mjs', '.cjs'].includes(path.extname(filePath))) continue
+
+    const relativePath = path.relative(rootDir, filePath)
+    const content = readFileSync(filePath, 'utf8')
+
+    for (const match of content.matchAll(workerReferencePattern)) {
+      const workerSpecifier = match[2]
+      if (workerSpecifier.endsWith('.ts')) {
+        violations.push(
+          `${relativePath}: contains raw worker source reference ${workerSpecifier}`,
+        )
+        continue
+      }
+
+      const workerPath = path.resolve(path.dirname(filePath), workerSpecifier)
+      if (!existsSync(workerPath)) {
+        violations.push(
+          `${relativePath}: worker runtime target does not exist: ${workerSpecifier}`,
+        )
+      }
+    }
+  }
+
+  if (violations.length > 0) {
+    throw new Error(
+      `Worker runtime is not Vite-safe for consumers:\n${violations.join('\n')}`,
+    )
+  }
 }
 
 function rewriteEmscriptenWasmFallbackReferences(rootDir) {
@@ -619,7 +681,11 @@ function toModuleSpecifier(relativePath) {
   return normalized.startsWith('.') ? normalized : `./${normalized}`
 }
 
-function resolveBundledWorkspaceRuntimeSpecifier(rootDir, filePath, packageName) {
+function resolveBundledWorkspaceRuntimeSpecifier(
+  rootDir,
+  filePath,
+  packageName,
+) {
   if (
     filePath.endsWith('.d.ts') ||
     filePath.endsWith('.d.mts') ||
@@ -628,12 +694,18 @@ function resolveBundledWorkspaceRuntimeSpecifier(rootDir, filePath, packageName)
     return `${packageName}/es/motion`
   }
 
-  const relativePath = path.relative(rootDir, filePath).split(path.sep).join('/')
+  const relativePath = path
+    .relative(rootDir, filePath)
+    .split(path.sep)
+    .join('/')
   const extension = path.extname(filePath)
 
   if (relativePath.startsWith('es/') && extension === '.mjs') {
     return toModuleSpecifier(
-      path.relative(path.dirname(filePath), path.join(rootDir, 'es', 'motion', 'index.mjs')),
+      path.relative(
+        path.dirname(filePath),
+        path.join(rootDir, 'es', 'motion', 'index.mjs'),
+      ),
     )
   }
 
@@ -642,7 +714,10 @@ function resolveBundledWorkspaceRuntimeSpecifier(rootDir, filePath, packageName)
     (extension === '.js' || extension === '.cjs')
   ) {
     return toModuleSpecifier(
-      path.relative(path.dirname(filePath), path.join(rootDir, 'lib', 'motion', 'index.js')),
+      path.relative(
+        path.dirname(filePath),
+        path.join(rootDir, 'lib', 'motion', 'index.js'),
+      ),
     )
   }
 
@@ -739,7 +814,11 @@ let rewrittenWorkerReferences = 0
 let rewrittenWasmFallbackReferences = 0
 
 if (strict) {
-  assertPublicInterfaceMatches(sourcePackageJson, packageJson, workspaceVersions)
+  assertPublicInterfaceMatches(
+    sourcePackageJson,
+    packageJson,
+    workspaceVersions,
+  )
   assertDistArtifactShape(distRoot)
   assertWasmRuntimeArtifacts(distRoot)
   stripSourceMappingUrlReferences(distRoot)
@@ -747,6 +826,7 @@ if (strict) {
   rewrittenWorkerReferences = rewriteWorkerRuntimeReferences(distRoot)
   rewrittenWasmFallbackReferences =
     rewriteEmscriptenWasmFallbackReferences(distRoot)
+  assertViteSafeWorkerRuntime(distRoot)
   assertViteSafeWasmRuntime(distRoot)
 }
 

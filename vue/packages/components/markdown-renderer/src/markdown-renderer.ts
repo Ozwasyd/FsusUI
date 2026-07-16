@@ -7,6 +7,14 @@ import type {
   MarkdownRenderMode,
 } from '@element-plus/wasm'
 
+export type MarkdownTrustedHtmlFactory = (sanitizedHtml: string) => unknown
+export type MarkdownTrustedScriptUrlFactory = (moduleUrl: URL) => unknown
+
+export const resolveMarkdownWorkerScriptUrl = (
+  moduleUrl: URL,
+  trustedScriptUrlFactory?: MarkdownTrustedScriptUrlFactory,
+) => trustedScriptUrlFactory?.(moduleUrl) ?? moduleUrl
+
 export const markdownRendererProps = buildProps({
   content: {
     type: String,
@@ -27,6 +35,14 @@ export const markdownRendererProps = buildProps({
   sanitizeHtml: {
     type: Boolean,
     default: true,
+  },
+  trustedHtmlFactory: {
+    type: Function as PropType<MarkdownTrustedHtmlFactory>,
+    default: undefined,
+  },
+  trustedScriptUrlFactory: {
+    type: Function as PropType<MarkdownTrustedScriptUrlFactory>,
+    default: undefined,
   },
   allowLatex: {
     type: Boolean,
