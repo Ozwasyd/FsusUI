@@ -150,6 +150,10 @@
   @include e(mobile-nav-menu) {
     position: static;
     flex: 0 0 auto;
+
+    &:not([open]) > .#{$namespace}-public-shell__mobile-nav-menu-panel {
+      display: none;
+    }
   }
 
   @include e(mobile-nav-menu-trigger) {

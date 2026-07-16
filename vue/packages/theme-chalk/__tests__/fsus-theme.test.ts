@@ -1641,6 +1641,11 @@ describe('Fsus theme visual baseline', () => {
       expectCssRule(css, '.el-public-shell__mobile-nav-menu', [
         'position: static;',
       ])
+      expectCssRule(
+        css,
+        '.el-public-shell__mobile-nav-menu:not([open]) > .el-public-shell__mobile-nav-menu-panel',
+        ['display: none;'],
+      )
       expectCssRule(css, '.el-public-shell__mobile-toolbar', [
         'display: none;',
         'margin-top: 18px;',
