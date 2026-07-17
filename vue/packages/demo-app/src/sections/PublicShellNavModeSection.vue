@@ -9,6 +9,7 @@
     :nav-items="navItems"
     :show-search="false"
     :sticky="false"
+    :csp-safe="cspSafe"
   >
     <article
       class="public-shell-nav-fixture"
@@ -41,9 +42,11 @@ import type { PublicShellMobileNavMode } from '../../../element-plus'
 
 const props = withDefaults(
   defineProps<{
+    cspSafe?: boolean
     navMode?: string
   }>(),
   {
+    cspSafe: false,
     navMode: 'menu',
   },
 )

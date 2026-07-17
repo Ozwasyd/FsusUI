@@ -153,6 +153,7 @@ export const resolveDemoRoot = async (
       mode: searchParams.get('visual') || '',
       theme: themeMode,
       compact: searchParams.get('compact') === '1',
+      cspSafe: searchParams.get('cspSafe') === '1',
       navMode: searchParams.get('navMode') || 'menu',
     },
   }

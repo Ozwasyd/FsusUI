@@ -155,11 +155,51 @@ describe('PublicShell.vue', () => {
       })),
     ).toEqual([])
     expect(
-      wrapper.find('.el-public-shell__mobile-nav-menu-panel').classes(),
-    ).toContain('is-csp-hidden')
-    expect(
       wrapper.find('.el-public-shell__mobile-search-row').classes(),
     ).toContain('is-csp-hidden')
+
+    const details = wrapper.find<HTMLDetailsElement>(
+      '.el-public-shell__mobile-nav-menu',
+    )
+    const trigger = wrapper.find<HTMLElement>('[data-mobile-nav-menu-trigger]')
+    await vi.waitFor(() => {
+      expect(
+        wrapper.find('.el-public-shell__mobile-nav-menu-panel').exists(),
+      ).toBe(false)
+    })
+
+    await trigger.trigger('click', { button: 0 })
+    const openPanel = wrapper.find<HTMLElement>(
+      '.el-public-shell__mobile-nav-menu-panel',
+    )
+    expect(details.element.open).toBe(true)
+    expect(trigger.attributes('aria-expanded')).toBe('true')
+    expect(openPanel.classes()).toContain(
+      'el-public-shell-mobile-nav-menu-enter-active',
+    )
+    expect(openPanel.attributes('style')).toBeUndefined()
+
+    await vi.waitFor(() => {
+      expect(openPanel.classes()).not.toContain(
+        'el-public-shell-mobile-nav-menu-enter-active',
+      )
+    })
+    await trigger.trigger('click', { button: 0 })
+    expect(details.element.open).toBe(true)
+    expect(details.classes()).toContain('is-closing')
+    expect(trigger.attributes('aria-expanded')).toBe('false')
+    expect(openPanel.attributes('aria-hidden')).toBe('true')
+    expect(openPanel.attributes()).toHaveProperty('inert')
+    expect(openPanel.classes()).toContain(
+      'el-public-shell-mobile-nav-menu-leave-active',
+    )
+    expect(openPanel.attributes('style')).toBeUndefined()
+
+    await vi.waitFor(() => expect(details.element.open).toBe(false))
+    expect(
+      wrapper.find('.el-public-shell__mobile-nav-menu-panel').exists(),
+    ).toBe(false)
+    expect(wrapper.findAll('[style]')).toHaveLength(0)
 
     const html = await renderToString(
       h(PublicShell, {
@@ -171,6 +211,8 @@ describe('PublicShell.vue', () => {
       }),
     )
     expect(html).not.toMatch(/\sstyle=/u)
+    expect(html).toContain('el-public-shell__mobile-nav-menu-panel')
+    wrapper.unmount()
   })
 
   test('emits spa search without native navigation', async () => {

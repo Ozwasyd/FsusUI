@@ -56,6 +56,7 @@
         :key="props.mode"
         :compact="props.compact"
         :nav-mode="props.navMode"
+        :csp-safe="props.cspSafe"
       />
     </Transition>
   </div>
@@ -98,12 +99,14 @@ type DemoSection = {
 const props = withDefaults(
   defineProps<{
     compact?: boolean
+    cspSafe?: boolean
     mode?: string
     navMode?: string
     theme?: string
   }>(),
   {
     compact: false,
+    cspSafe: false,
     mode: '',
     navMode: 'menu',
     theme: 'system',

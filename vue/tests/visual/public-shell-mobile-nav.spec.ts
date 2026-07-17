@@ -21,6 +21,14 @@ const openMode = async (page: Page, mode?: (typeof modes)[number]) => {
   await expect(page.getByTestId('public-shell-nav-fixture')).toBeVisible()
 }
 
+const openCspSafeMenu = async (page: Page) => {
+  await page.goto(
+    '/?visual=public-shell-nav-mode&compact=1&navMode=menu&cspSafe=1',
+    { waitUntil: 'domcontentloaded' },
+  )
+  await expect(page.getByTestId('public-shell-nav-fixture')).toBeVisible()
+}
+
 test.beforeEach(async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile-light')
   diagnostics.set(page, attachPageDiagnostics(page))
@@ -76,6 +84,62 @@ test('keeps menu focus order and navigation semantics native', async ({
   await expect(nav.getByRole('link', { name: 'Home' })).toBeFocused()
   await page.keyboard.press('Escape')
   await expect(trigger).toBeFocused()
+})
+
+test('keeps CSP-safe menu open through its class-driven leave lifecycle', async ({
+  page,
+}) => {
+  await openCspSafeMenu(page)
+  const shell = page.locator('.el-public-shell')
+  const menu = page.locator('.el-public-shell__mobile-nav-menu')
+  const trigger = page.getByRole('button', { name: 'Sections' })
+  const panel = page.getByRole('navigation', { name: 'Primary sections' })
+
+  await expect(trigger).toHaveAttribute('aria-expanded', 'false')
+  await expect(menu).not.toHaveAttribute('open', '')
+  await expect(panel).toHaveCount(0)
+  await expect(shell.locator('[style]')).toHaveCount(0)
+
+  await trigger.click()
+  await expect(trigger).toHaveAttribute('aria-expanded', 'true')
+  await expect(menu).toHaveAttribute('open', '')
+  await expect(panel).toBeVisible()
+  await expect(panel).not.toHaveAttribute('style', /.+/u)
+  await expect(panel).not.toHaveClass(/\benter-active\b/u)
+
+  const closingState = await trigger.evaluate(async (element) => {
+    ;(element as HTMLElement).click()
+    await Promise.resolve()
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+    const details = element.closest('details')
+    const nav = details?.querySelector<HTMLElement>(
+      '.el-public-shell__mobile-nav-menu-panel',
+    )
+    return {
+      detailsOpen: details?.open ?? false,
+      expanded: element.getAttribute('aria-expanded'),
+      closing: details?.classList.contains('is-closing') ?? false,
+      inert: nav?.hasAttribute('inert') ?? false,
+      ariaHidden: nav?.getAttribute('aria-hidden'),
+      leaveActive:
+        nav?.classList.contains(
+          'el-public-shell-mobile-nav-menu-leave-active',
+        ) ?? false,
+      inlineStyle: nav?.getAttribute('style'),
+    }
+  })
+
+  expect(closingState).toEqual({
+    detailsOpen: true,
+    expanded: 'false',
+    closing: true,
+    inert: true,
+    ariaHidden: 'true',
+    leaveActive: true,
+    inlineStyle: null,
+  })
+  await expect(menu).not.toHaveAttribute('open', '')
+  await expect(panel).toHaveCount(0)
 })
 
 test('exposes inline, bottom, and none modes without duplicate landmarks', async ({

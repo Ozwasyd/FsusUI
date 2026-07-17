@@ -113,11 +113,8 @@
             @after-leave="finishMobileNavMenuClose"
           >
             <nav
-              v-if="cspSafe"
-              :class="[
-                ns.e('mobile-nav-menu-panel'),
-                ns.is('csp-hidden', mobileNavMenuHydrated && !mobileNavMenuVisible),
-              ]"
+              v-if="cspSafe && (!mobileNavMenuCspReady || mobileNavMenuVisible)"
+              :class="ns.e('mobile-nav-menu-panel')"
               :aria-label="mobileNavLabel"
               :aria-hidden="mobileNavMenuClosing ? 'true' : undefined"
               :inert="mobileNavMenuClosing || undefined"
@@ -141,7 +138,7 @@
               </div>
             </nav>
             <nav
-              v-else
+              v-else-if="!cspSafe"
               v-show="!mobileNavMenuHydrated || mobileNavMenuVisible"
               :class="ns.e('mobile-nav-menu-panel')"
               :aria-label="mobileNavLabel"
@@ -395,6 +392,7 @@ const mobileNavMenuTriggerRef = ref<HTMLElement>()
 const mobileNavMenuExpanded = ref(false)
 const mobileNavMenuVisible = ref(false)
 const mobileNavMenuHydrated = ref(false)
+const mobileNavMenuCspReady = ref(false)
 const mobileNavMenuClosing = ref(false)
 let restoreMobileNavMenuFocus = false
 const mobileSearchExpanded = ref(
@@ -555,6 +553,7 @@ onMounted(() => {
     mobileNavMenuExpanded.value = true
     mobileNavMenuVisible.value = true
   }
+  mobileNavMenuCspReady.value = true
   void syncNavIndicators()
   window.addEventListener('resize', handleIndicatorResize)
 })
@@ -650,10 +649,14 @@ const closeMobileNavMenu = (restoreFocus = false) => {
   restoreMobileNavMenuFocus ||= restoreFocus
   mobileNavMenuExpanded.value = false
   mobileNavMenuClosing.value = true
-  mobileNavMenuVisible.value = false
-  if (props.cspSafe) {
-    void nextTick(finishMobileNavMenuClose)
+  if (!props.cspSafe) {
+    mobileNavMenuVisible.value = false
+    return
   }
+  void nextTick(() => {
+    if (!mobileNavMenuClosing.value || mobileNavMenuExpanded.value) return
+    mobileNavMenuVisible.value = false
+  })
 }
 
 const finishMobileNavMenuClose = () => {
