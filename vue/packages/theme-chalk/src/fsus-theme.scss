@@ -2265,32 +2265,6 @@ button.#{$namespace}-card:active {
   }
 }
 
-.is-expressive-surface .#{$namespace}-slider__bar::after,
-[data-fsus-surface='expressive'] .#{$namespace}-slider__bar::after {
-  content: '';
-  position: absolute;
-  inset: -5px -10px;
-  pointer-events: none;
-  border-radius: inherit;
-  opacity: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    color-mix(in srgb, var(--fsus-scholarly-blue) 34%, transparent) 72%,
-    color-mix(in srgb, var(--fsus-scholarly-blue) 58%, transparent) 100%
-  );
-  filter: blur(5px);
-  transform: translate3d(
-    var(--fsus-interactive-motion-offset-x, 0px),
-    var(--fsus-interactive-motion-offset-y, 0px),
-    0
-  );
-  transition:
-    opacity var(--fsus-motion-control-fast) var(--fsus-motion-standard),
-    transform var(--fsus-interactive-motion-settle, 120ms)
-      var(--fsus-motion-standard);
-}
-
 .#{$namespace}-slider__button-wrapper {
   transform: translateZ(0);
   transition: transform var(--fsus-motion-slider-release)

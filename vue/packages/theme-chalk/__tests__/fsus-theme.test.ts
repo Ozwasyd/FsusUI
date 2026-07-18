@@ -187,6 +187,15 @@ describe('Fsus theme visual baseline', () => {
     )
   })
 
+  test('keeps expressive slider progress free of decorative glow', () => {
+    const css = compileThemeFile('fsus-theme.scss')
+
+    expectCssRule(css, '.el-slider__bar::after', ['content: none;'])
+    expect(css).not.toMatch(
+      /(?:\.is-expressive-surface|\[data-fsus-surface=(?:["']?expressive["']?)\])\s+\.el-slider__bar::after\s*(?:,|\{)/,
+    )
+  })
+
   test('keeps border-card tabs on the same quiet baseline', () => {
     const css = compileThemeFile('fsus-theme.scss')
 
