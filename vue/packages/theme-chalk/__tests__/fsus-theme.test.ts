@@ -170,6 +170,23 @@ describe('Fsus theme visual baseline', () => {
     ])
   })
 
+  test('keeps image viewer controls on the default paper material', () => {
+    const css = compileThemeFile('fsus-theme.scss')
+
+    for (const selector of [
+      '.el-image-viewer__btn',
+      '.el-image-viewer__actions',
+    ]) {
+      expectCssRule(css, selector, [
+        'background: rgba(255, 255, 255, 0.12);',
+        'border: 1px solid rgba(255, 255, 255, 0.18);',
+      ])
+    }
+    expect(css).not.toMatch(
+      /\.el-image-viewer__(?:btn|actions)\s*\{[^}]*(?:-webkit-)?backdrop-filter:/s,
+    )
+  })
+
   test('keeps border-card tabs on the same quiet baseline', () => {
     const css = compileThemeFile('fsus-theme.scss')
 
