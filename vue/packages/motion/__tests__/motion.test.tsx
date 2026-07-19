@@ -991,6 +991,59 @@ describe('motion primitives', () => {
     expect(links[1].find('.fsu-bottom-tab-bar__indicator').exists()).toBe(true)
   })
 
+  it('collects bottom tab overflow into a native More sheet', async () => {
+    const items = [
+      { key: 'home', label: 'Home', href: '/' },
+      { key: 'archive', label: 'Archive', href: '/archive' },
+      { key: 'topics', label: 'Topics', href: '/topics' },
+      { key: 'notes', label: 'Notes', href: '/notes' },
+      { key: 'about', label: 'About', href: '/about' },
+      { key: 'settings', label: 'Settings', href: '/settings' },
+    ]
+    const wrapper = mount(FsuBottomTabBar, {
+      props: {
+        items,
+        activeKey: 'settings',
+        moreLabel: 'More',
+        immediate: false,
+      },
+    })
+
+    const dock = wrapper.find('[data-fsus-bottom-tab-bar]')
+    const directItems = Array.from(
+      (dock.element as HTMLElement).children,
+    ).filter((element) => element.matches('[data-fsus-bottom-tab-item]'))
+    const moreMenu = wrapper.find<HTMLDetailsElement>(
+      '[data-fsus-bottom-tab-more-menu]',
+    )
+    const moreTrigger = wrapper.find('[data-fsus-bottom-tab-more]')
+
+    expect(directItems).toHaveLength(4)
+    expect(moreTrigger.text()).toContain('More')
+    expect(moreTrigger.classes()).toContain('is-active')
+    expect(moreMenu.element.open).toBe(false)
+
+    await moreTrigger.trigger('click')
+
+    expect(moreMenu.element.open).toBe(true)
+    expect(
+      wrapper.findAll('[data-fsus-bottom-tab-more-panel] a').map((item) => ({
+        key: item.attributes('data-fsus-bottom-tab-item'),
+        label: item.text(),
+      })),
+    ).toEqual([
+      { key: 'about', label: 'About' },
+      { key: 'settings', label: 'Settings' },
+    ])
+
+    await wrapper
+      .find('[data-fsus-bottom-tab-item="settings"]')
+      .trigger('click')
+
+    expect(moreMenu.element.open).toBe(false)
+    expect(wrapper.emitted('navigate')?.[0]?.[0]).toEqual(items[5])
+  })
+
   it('restores focus after overlay close', async () => {
     const trigger = document.createElement('button')
     trigger.textContent = 'open'

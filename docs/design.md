@@ -271,7 +271,7 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 - Mobile tab 使用低于 `40px` 的命中区域。
 - Mobile bottom tab bar 项目多于 5 个；多于 5 项必须收纳到 "More"。
 - 仅因存在导航项就隐式输出 fixed BottomTabBar；`ElPublicShell` 必须通过 `mobile-nav-mode="bottom"` 显式 opt-in，默认使用原生 header menu。
-- 同一页面同时输出全局 BottomTabBar 与正文 reading dock；consumer 装配层必须选择其中一个。
+- 同一页面同时输出全局 BottomTabBar 与正文 reading dock；`ElPublicShell` 不强制阻断外部 reading dock，但 `mobileNavMode` 契约声明二者互斥，consumer 装配层必须选择其中一个并在 dev 构建中对共存状态发出警告。
 
 Consumer 在公开 landing 上使用 FsusUI 时，必须在 Public Layout Rules 里指明 `inline | menu | bottom | none` 中的哪种模式、为什么，并记录 safe-area 与迁移策略。
 

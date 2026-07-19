@@ -206,6 +206,7 @@ describe('MarkdownRenderer.vue', () => {
     expect(heading.text()).toBe('Title')
     expect(heading.attributes('data-markdown-heading')).toBe('title')
     expect(wrapper.find('[data-markdown-renderer="wasm"]').exists()).toBe(true)
+    expect(wrapper.attributes('data-fsus-surface')).toBe('reading')
     expect(renderMarkdownHtml).not.toHaveBeenCalled()
     expect(wrapper.emitted('render-profile')).toHaveLength(1)
     expect(wrapper.emitted('render-complete')).toHaveLength(1)

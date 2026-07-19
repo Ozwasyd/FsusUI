@@ -41,7 +41,7 @@ export const publicShellProps = buildProps({
     default: () => [],
   },
   /**
-   * @description explicit mobile navigation presentation; fixed bottom tabs are opt-in
+   * @description explicit mobile navigation presentation; fixed bottom tabs are opt-in and must not coexist with a page-level reading dock
    */
   mobileNavMode: {
     type: definePropType<PublicShellMobileNavMode>(String),

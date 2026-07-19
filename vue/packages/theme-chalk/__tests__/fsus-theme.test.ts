@@ -1745,6 +1745,8 @@ describe('Fsus theme visual baseline', () => {
       expectCssRule(css, '.el-public-shell__mobile-nav-menu-trigger', [
         'display: inline-flex;',
         'min-height: 40px;',
+        'border: 1px solid var(--el-border-color-lighter);',
+        'background: var(--el-bg-color);',
         'list-style: none;',
       ])
       expectCssRule(css, '.el-public-shell__mobile-nav-menu-panel', [
@@ -1756,10 +1758,24 @@ describe('Fsus theme visual baseline', () => {
       ])
       expectCssRule(css, '.el-public-shell__mobile-nav-link', [
         'width: 100%;',
-        'min-height: 40px;',
+        'min-height: 44px;',
         'justify-content: flex-start;',
         'text-align: start;',
       ])
+      expectCssRule(
+        css,
+        '.fsu-bottom-tab-bar__overflow.el-public-shell__mobile-nav-menu',
+        ['position: relative;', 'flex: 1 1 0;', 'min-inline-size: 0;'],
+      )
+      expectCssRule(
+        css,
+        '.fsu-bottom-tab-bar__overflow-panel.el-public-shell__mobile-nav-menu-panel',
+        [
+          'inset-block-start: auto;',
+          'inset-block-end: calc(100% + 6px);',
+          'inset-inline-end: 0;',
+        ],
+      )
       expectCssRule(css, '.el-public-shell__mobile-nav-menu-actions', [
         'margin-top: 4px;',
         'padding-top: 6px;',

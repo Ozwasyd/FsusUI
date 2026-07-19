@@ -139,6 +139,7 @@ const emit = defineEmits<{
 const rootEl = ref<HTMLElement | null>(null)
 const rootAttrs = {
   'data-markdown-renderer': 'wasm',
+  'data-fsus-surface': 'reading',
 }
 const resolveMarkdownHtml = (html: string) =>
   props.sanitizeHtml
