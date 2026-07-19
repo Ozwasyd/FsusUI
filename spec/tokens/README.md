@@ -94,10 +94,13 @@ Typography availability is canonical in `spec/typography/baseline.json`.
 Stable component styles may use only its `fontWeights.stable` values unless a
 declared variable font supplies the requested axis.
 
-## Web Radius Fallbacks
+## Web Radius Usage
 
 Literal fallbacks for `var(--fsus-radius-*, <fallback>)` in
 `vue/packages/theme-chalk/src` must use the canonical radius scale:
 `4px`, `6px`, `10px`, `12px`, `24px`, or `999px`. Token-to-token and SCSS
 fallback expressions remain valid because their resolved value is governed by
-the token pipeline. `pnpm tokens:lint` enforces this rule.
+the token pipeline. The obsolete naked declaration `border-radius: 8px` is
+also rejected: component surfaces must select the matching
+`--fsus-radius-*` role instead of recreating the removed intermediate radius.
+Comments are excluded from this check. `pnpm tokens:lint` enforces both rules.

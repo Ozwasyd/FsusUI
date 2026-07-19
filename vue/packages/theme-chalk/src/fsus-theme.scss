@@ -984,7 +984,7 @@ html.dark .#{$namespace}-switch__action {
       var(--#{$namespace}-fill-color-extra-light)
     );
     border: 1px solid var(--el-border-color-lighter);
-    border-radius: 8px;
+    border-radius: var(--fsus-radius-control, 6px);
     padding: 2px;
     overflow: hidden;
   }

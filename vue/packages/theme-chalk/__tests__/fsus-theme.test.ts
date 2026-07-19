@@ -589,7 +589,7 @@ describe('Fsus theme visual baseline', () => {
     expectCssRule(css, '.el-theme-mode-toggle .el-radio-group', [
       'background: var(--el-theme-mode-toggle-bg, var(--el-fill-color-extra-light));',
       'border: 1px solid var(--el-border-color-lighter);',
-      'border-radius: 8px;',
+      'border-radius: var(--fsus-radius-control, 6px);',
       'padding: 2px;',
       'overflow: hidden;',
     ])

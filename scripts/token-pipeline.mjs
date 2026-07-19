@@ -1072,17 +1072,54 @@ const lintStableComponentHardcoding = () => {
   }
 }
 
-const lintWebRadiusFallbacks = () => {
-  const scanRoot = path.join(root, 'vue/packages/theme-chalk/src')
-  const allowedFallbacks = new Set([
-    '4px',
-    '6px',
-    '10px',
-    '12px',
-    '24px',
-    '999px',
-  ])
+const allowedWebRadiusFallbacks = new Set([
+  '4px',
+  '6px',
+  '10px',
+  '12px',
+  '24px',
+  '999px',
+])
+
+const stripStyleComments = (content) =>
+  content
+    .replace(/\/\*[\s\S]*?\*\//gu, (comment) => comment.replace(/[^\n]/gu, ' '))
+    .replace(/^[\t ]*\/\/.*$/gmu, (comment) => ' '.repeat(comment.length))
+
+export const findWebRadiusScaleViolations = (content, file = '<source>') => {
+  const source = stripStyleComments(content)
   const literalValuePattern = /^-?(?:\d+(?:\.\d+)?|\.\d+)(?:[a-z]+|%)?$/i
+  const failures = []
+  const fallbackPattern = /var\(\s*(--fsus-radius-[\w-]+)\s*,\s*([^,)]+)\)/gu
+
+  for (const match of source.matchAll(fallbackPattern)) {
+    const fallback = match[2].trim()
+    if (
+      literalValuePattern.test(fallback) &&
+      !allowedWebRadiusFallbacks.has(fallback)
+    ) {
+      const line = source.slice(0, match.index).split('\n').length
+      failures.push(
+        `${file}:${line} ${match[1]} uses off-scale fallback ${fallback}`,
+      )
+    }
+  }
+
+  const obsoleteBareRadiusPattern =
+    /(?:^|[;{\n])[\t ]*border-radius\s*:\s*(8px)\s*(?:!important\s*)?;/gmu
+  for (const match of source.matchAll(obsoleteBareRadiusPattern)) {
+    const declarationIndex = match.index + match[0].indexOf('border-radius')
+    const line = source.slice(0, declarationIndex).split('\n').length
+    failures.push(
+      `${file}:${line} uses obsolete bare radius ${match[1]}; use a canonical --fsus-radius-* token`,
+    )
+  }
+
+  return failures
+}
+
+const lintWebRadiusUsage = () => {
+  const scanRoot = path.join(root, 'vue/packages/theme-chalk/src')
   const failures = []
   const walk = (directory) => {
     for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
@@ -1094,27 +1131,14 @@ const lintWebRadiusFallbacks = () => {
       if (!/\.(?:css|scss)$/.test(entry.name)) continue
 
       const content = fs.readFileSync(fullPath, 'utf8')
-      const fallbackPattern =
-        /var\(\s*(--fsus-radius-[\w-]+)\s*,\s*([^,)]+)\)/gu
-      for (const match of content.matchAll(fallbackPattern)) {
-        const fallback = match[2].trim()
-        if (
-          literalValuePattern.test(fallback) &&
-          !allowedFallbacks.has(fallback)
-        ) {
-          const line = content.slice(0, match.index).split('\n').length
-          failures.push(
-            `${rel(fullPath)}:${line} ${match[1]} uses off-scale fallback ${fallback}`,
-          )
-        }
-      }
+      failures.push(...findWebRadiusScaleViolations(content, rel(fullPath)))
     }
   }
 
   walk(scanRoot)
   if (failures.length) {
     throw new Error(
-      `Web radius fallback scale violations detected:\n${failures.join('\n')}`,
+      `Web radius scale violations detected:\n${failures.join('\n')}`,
     )
   }
 }
@@ -1127,25 +1151,31 @@ const lint = () => {
   lintOutputSnapshots()
   lintAvaloniaTypeSnapshots(source)
   lintStableComponentHardcoding()
-  lintWebRadiusFallbacks()
+  lintWebRadiusUsage()
   console.log('Token source and generated artifact metadata are valid.')
 }
 
-const command = process.argv[2]
+const isDirectExecution =
+  process.argv[1] !== undefined &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
 
-try {
-  if (command === 'generate') {
-    writeFiles(renderAll())
-  } else if (command === 'check') {
-    checkFiles(renderAll())
-  } else if (command === 'lint') {
-    lint()
-  } else {
-    throw new Error(
-      'Usage: node scripts/token-pipeline.mjs <generate|check|lint>',
-    )
+if (isDirectExecution) {
+  const command = process.argv[2]
+
+  try {
+    if (command === 'generate') {
+      writeFiles(renderAll())
+    } else if (command === 'check') {
+      checkFiles(renderAll())
+    } else if (command === 'lint') {
+      lint()
+    } else {
+      throw new Error(
+        'Usage: node scripts/token-pipeline.mjs <generate|check|lint>',
+      )
+    }
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : error)
+    process.exitCode = 1
   }
-} catch (error) {
-  console.error(error instanceof Error ? error.message : error)
-  process.exitCode = 1
 }
