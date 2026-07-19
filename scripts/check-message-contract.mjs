@@ -111,7 +111,7 @@ if (source.includes("getCssVar('transition-duration')")) {
 }
 
 for (const expected of [
-  'opacity var(--fsus-motion-control-fast, 160ms)',
+  'opacity var(--fsus-motion-control-fast, 140ms)',
   'transform var(--fsus-motion-panel, 360ms)',
   'var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1))',
   'var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1))',

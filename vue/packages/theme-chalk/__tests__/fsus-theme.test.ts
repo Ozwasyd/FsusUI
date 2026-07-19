@@ -324,6 +324,7 @@ describe('Fsus theme visual baseline', () => {
     ])
     expectCssRule(tabsCss, '.el-tabs__active-bar', [
       'background-color: var(--fsus-scholarly-blue);',
+      'transition: width var(--fsus-motion-control, 220ms) var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1)), transform var(--fsus-motion-control, 220ms) var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));',
     ])
     expectCssRule(tabsCss, '.el-tabs__item:focus-visible', [
       'outline: none !important;',
@@ -1309,10 +1310,10 @@ describe('Fsus theme visual baseline', () => {
     const css = compileThemeFile('collapse.scss')
 
     expectCssRule(css, '.el-collapse-item__header', [
-      'transition: border-bottom-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+      'transition: border-bottom-color var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));',
     ])
     expectCssRule(css, '.el-collapse-item__arrow', [
-      'transition: transform var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+      'transition: transform var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));',
     ])
     expectCssRule(css, '.el-collapse-item__header:focus-visible', [
       'outline: none !important;',
@@ -1333,7 +1334,7 @@ describe('Fsus theme visual baseline', () => {
     ])
     expectCssRule(css, '.el-carousel__arrow', [
       'color: var(--fsus-carousel-control-color, var(--fsus-color-surface-base));',
-      'transition: background-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), box-shadow var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+      'transition: background-color var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)), color var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)), box-shadow var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));',
     ])
     expectCssRule(css, '.el-carousel__arrow:focus-visible', [
       'outline: none !important;',
@@ -1346,7 +1347,7 @@ describe('Fsus theme visual baseline', () => {
     )
     expectCssRule(css, '.el-carousel__button', [
       'background-color: var(--fsus-carousel-indicator-bg, var(--fsus-color-surface-base));',
-      'transition: background-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), box-shadow var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), opacity var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+      'transition: background-color var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)), box-shadow var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)), opacity var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));',
     ])
     expectCssRule(css, '.el-carousel__button:focus-visible', [
       'outline: none !important;',
@@ -1377,10 +1378,10 @@ describe('Fsus theme visual baseline', () => {
       'color: var(--fsus-step-finish-color, var(--fsus-scholarly-blue));',
     ])
     expectCssRule(css, '.el-step__icon', [
-      'transition: border-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), background-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+      'transition: border-color var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)), color var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)), background-color var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));',
     ])
     expectCssRule(css, '.el-step__line-inner', [
-      'transition: width var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), height var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), border-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+      'transition: width var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)), height var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)), border-color var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));',
     ])
     expectCssRule(css, '.el-step.is-simple .el-step__icon-inner.is-status', [
       'transform: translateY(1px);',
@@ -1399,7 +1400,7 @@ describe('Fsus theme visual baseline', () => {
     expectCssRule(css, '.el-progress-bar__inner', [
       'background-color: var(--fsus-progress-bar-color, var(--fsus-scholarly-blue));',
       'border-radius: var(--fsus-progress-radius, var(--fsus-radius-pill));',
-      'transition: width var(--fsus-progress-width-motion, var(--fsus-motion-control, 220ms)) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+      'transition: width var(--fsus-progress-width-motion, var(--fsus-motion-control, 220ms)) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));',
     ])
     expectCssRule(css, '.el-progress-bar__inner--indeterminate', [
       'animation: indeterminate var(--fsus-progress-animation-duration, 3s) var(--fsus-progress-animation-easing, linear) infinite;',
@@ -1445,7 +1446,7 @@ describe('Fsus theme visual baseline', () => {
       ],
     )
     expectCssRule(css, '.el-tree-node__expand-icon', [
-      'transition: transform var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+      'transition: transform var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));',
     ])
     expectCssRule(
       css,
@@ -1469,7 +1470,7 @@ describe('Fsus theme visual baseline', () => {
 
     expectCssRule(selectCss, '.el-select-v2__wrapper', [
       'border-radius: var(--fsus-radius-control, var(--el-border-radius-base));',
-      'transition: border-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), box-shadow var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+      'transition: border-color var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)), box-shadow var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));',
     ])
     expectCssRule(selectCss, '.el-select-v2__wrapper.is-focused', [
       'border-color: var(--fsus-select-v2-focus-border, var(--fsus-state-focus-border));',
@@ -1740,7 +1741,7 @@ describe('Fsus theme visual baseline', () => {
       'border-radius: var(--fsus-radius-pill);',
     ])
     expectCssRule(css, '.el-slider__button', [
-      'transition: transform var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), border-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), box-shadow var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), background-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+      'transition: transform var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)), border-color var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)), box-shadow var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)), background-color var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));',
     ])
     expectCssRule(css, '.el-slider__button:hover', [
       'transform: translateY(var(--fsus-slider-handle-hover-y, -1px));',
@@ -1764,7 +1765,7 @@ describe('Fsus theme visual baseline', () => {
       'color: var(--fsus-image-viewer-control-fg, var(--fsus-color-surface-base));',
       'background-color: var(--fsus-image-viewer-control-bg, rgba(15, 15, 17, 0.72));',
       'border: 1px solid var(--fsus-image-viewer-control-border, rgba(255, 255, 255, 0.64));',
-      'transition: opacity var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), background-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), box-shadow var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+      'transition: opacity var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)), background-color var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)), box-shadow var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));',
     ])
     expectCssRule(
       css,
@@ -1784,10 +1785,10 @@ describe('Fsus theme visual baseline', () => {
     }
 
     expectCssRule(css, '.viewer-fade-enter-active', [
-      'animation: viewer-fade-in var(--fsus-image-viewer-motion, var(--fsus-motion-overlay, 300ms)) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+      'animation: viewer-fade-in var(--fsus-image-viewer-motion, var(--fsus-motion-overlay, 300ms)) var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));',
     ])
     expectCssRule(css, '.viewer-fade-leave-active', [
-      'animation: viewer-fade-out var(--fsus-image-viewer-motion, var(--fsus-motion-overlay, 300ms)) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
+      'animation: viewer-fade-out var(--fsus-image-viewer-motion, var(--fsus-motion-overlay, 300ms)) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));',
     ])
     expect(css).toContain('@media (prefers-reduced-motion: reduce)')
     expectCssRule(css, '.viewer-fade-enter-active, .viewer-fade-leave-active', [
@@ -2151,7 +2152,7 @@ describe('Fsus theme visual baseline', () => {
       'pointer-events: none;',
       'transform: translate3d(var(--el-public-shell-active-nav-indicator-x, 0px), 0, 0);',
       'opacity: var(--el-public-shell-active-nav-indicator-opacity, 0);',
-      'transition: transform var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), opacity var(--el-transition-duration-fast);',
+      'transition: transform var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)), opacity var(--el-transition-duration-fast);',
     ])
     expectCssRule(publicShellCss, '.el-public-shell__nav-link.is-active', [
       'border-bottom-color: var(--fsus-scholarly-blue);',

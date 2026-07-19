@@ -627,7 +627,8 @@
 
   @include m(enable-row-transition) {
     .#{$namespace}-table__body td.#{$namespace}-table__cell {
-      transition: background-color 0.25s ease;
+      transition: background-color var(--fsus-motion-control, 220ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
     }
   }
 

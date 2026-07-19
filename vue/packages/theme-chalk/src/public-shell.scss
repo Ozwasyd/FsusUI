@@ -420,8 +420,8 @@
       0
     );
     transition:
-      transform var(--fsus-motion-control-fast, 160ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+      transform var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
       opacity var(--#{$namespace}-transition-duration-fast);
     will-change: transform, opacity;
   }

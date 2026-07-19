@@ -69,6 +69,8 @@
   --fsus-motion-control: var(--fsus-motion-duration-control);
   --fsus-motion-duration-panel: 360ms;
   --fsus-motion-panel: var(--fsus-motion-duration-panel);
+  --fsus-motion-duration-overlay: 300ms;
+  --fsus-motion-overlay: var(--fsus-motion-duration-overlay);
   --fsus-motion-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --fsus-motion-standard: var(--fsus-motion-easing-standard);
   --fsus-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
@@ -135,9 +137,15 @@
 }
 
 [data-fsus-motion="reduced"] {
+  --fsus-motion-duration-control-fast: 1ms;
   --fsus-motion-duration-control: 1ms;
+  --fsus-motion-duration-panel: 1ms;
+  --fsus-motion-duration-overlay: 1ms;
 }
 
 [data-fsus-motion="disabled"] {
+  --fsus-motion-duration-control-fast: 1ms;
   --fsus-motion-duration-control: 1ms;
+  --fsus-motion-duration-panel: 1ms;
+  --fsus-motion-duration-overlay: 1ms;
 }

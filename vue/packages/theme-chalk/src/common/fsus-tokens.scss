@@ -111,7 +111,7 @@
   --fsus-motion-slider-follow: 96ms;
   --fsus-motion-slider-release: 220ms;
   --fsus-motion-panel: #{generated.$fsus-motion-duration-panel};
-  --fsus-motion-overlay: 300ms;
+  --fsus-motion-overlay: #{generated.$fsus-motion-duration-overlay};
   --fsus-motion-distance-sm: var(--fsus-motion-distance-small);
   --fsus-motion-distance-md: var(--fsus-motion-distance-medium);
   --fsus-motion-distance-lg: var(--fsus-motion-distance-large);

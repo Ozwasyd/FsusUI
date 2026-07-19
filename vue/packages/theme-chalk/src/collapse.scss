@@ -31,13 +31,13 @@
     border-bottom: 1px solid getCssVar('collapse-border-color');
     font-size: getCssVar('collapse-header-font-size');
     font-weight: 500;
-    transition: border-bottom-color var(--fsus-motion-control-fast, 160ms)
-      var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+    transition: border-bottom-color var(--fsus-motion-control-fast, 140ms)
+      var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
     outline: none;
     @include e(arrow) {
       margin: 0 8px 0 auto;
-      transition: transform var(--fsus-motion-control-fast, 160ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+      transition: transform var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
       font-weight: 400;
       @include when(active) {
         transform: rotate(90deg);

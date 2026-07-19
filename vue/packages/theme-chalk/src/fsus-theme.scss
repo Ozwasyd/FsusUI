@@ -1629,23 +1629,27 @@ button.#{$namespace}-card:active {
 }
 
 .#{$namespace}-date-picker-view-next {
-  animation: #{$namespace}-date-picker-view-next 380ms
-    cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: #{$namespace}-date-picker-view-next
+    var(--fsus-motion-panel, 360ms)
+    var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1)) both;
 }
 
 .#{$namespace}-date-picker-view-prev {
-  animation: #{$namespace}-date-picker-view-prev 380ms
-    cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: #{$namespace}-date-picker-view-prev
+    var(--fsus-motion-panel, 360ms)
+    var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1)) both;
 }
 
 .#{$namespace}-date-picker-view-drill-in {
-  animation: #{$namespace}-date-picker-view-drill-in 320ms
-    cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: #{$namespace}-date-picker-view-drill-in
+    var(--fsus-motion-panel, 360ms)
+    var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1)) both;
 }
 
 .#{$namespace}-date-picker-view-drill-out {
-  animation: #{$namespace}-date-picker-view-drill-out 320ms
-    cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: #{$namespace}-date-picker-view-drill-out
+    var(--fsus-motion-panel, 360ms)
+    var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1)) both;
 }
 
 @keyframes #{$namespace}-date-picker-view-next {

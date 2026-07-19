@@ -58,8 +58,10 @@
 
 .#{$namespace}-zoom-in-top-enter-active {
   transition:
-    opacity 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    opacity var(--fsus-motion-overlay, 300ms)
+      var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1)),
+    transform var(--fsus-motion-overlay, 300ms)
+      var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));
 }
 
 .#{$namespace}-zoom-in-top-leave-active {

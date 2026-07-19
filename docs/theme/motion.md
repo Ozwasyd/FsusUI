@@ -30,7 +30,7 @@ available only when an application selects them explicitly.
 | `--fsus-motion-control-fast` | `140ms`                        | Fast control feedback.                              |
 | `--fsus-motion-control`      | `220ms`                        | Default control feedback.                           |
 | `--fsus-motion-panel`        | `360ms`                        | Panel and larger surface transitions.               |
-| `--fsus-motion-overlay`      | `260ms`                        | Overlay enter and leave transitions.                |
+| `--fsus-motion-overlay`      | `300ms`                        | Overlay enter and leave transitions.                |
 
 The same theme layer also owns the View Transition snapshot tokens:
 

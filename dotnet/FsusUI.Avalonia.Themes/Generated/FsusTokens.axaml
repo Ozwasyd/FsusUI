@@ -128,6 +128,7 @@
   <x:TimeSpan x:Key="FsusMotionDurationControlFast">00:00:00.1400000</x:TimeSpan>
   <x:TimeSpan x:Key="FsusMotionDurationControl">00:00:00.2200000</x:TimeSpan>
   <x:TimeSpan x:Key="FsusMotionDurationPanel">00:00:00.3600000</x:TimeSpan>
+  <x:TimeSpan x:Key="FsusMotionDurationOverlay">00:00:00.3000000</x:TimeSpan>
   <SplineEasing x:Key="FsusMotionEasingStandard" X1="0.4" Y1="0" X2="0.2" Y2="1" />
   <SplineEasing x:Key="FsusMotionEasingEmphasized" X1="0.2" Y1="0" X2="0" Y2="1" />
   <x:Double x:Key="FsusMotionDistanceSmall">8</x:Double>

@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "790171e2bbbd43db70bcc15391e32bbaf53bc42a",
+    "commitSha": "f258eea13d0a50bddefeb53238105d6993d73b2e",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
-    "tokenHash": "92122c4799786d89451d48d8dddd15d89467fd81bbca8f151791dc32de39cf09",
+    "tokenHash": "cd4c6903c083f0366ce6d773b314556a6e85247c8e28a12c877c2d2b7e3bdd00",
     "iconHash": "d61254b1b1ff9addaf45293153df217b0c0d01ec69ec602081c44a01008b78de"
   },
   "summary": {
@@ -14,7 +14,7 @@
     "directives": 3,
     "services": 4,
     "plugins": 7,
-    "cssVariables": 390,
+    "cssVariables": 391,
     "deprecatedApis": 20,
     "componentCountByClassification": {
       "portable": 122,
@@ -7462,6 +7462,8 @@
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/progress.scss",
+        "vue/packages/theme-chalk/src/tab-pane.scss",
+        "vue/packages/theme-chalk/src/table.scss",
         "vue/packages/theme-chalk/src/tabs.scss"
       ],
       "classification": "portable"
@@ -7469,7 +7471,6 @@
     {
       "name": "--fsus-motion-control-fast",
       "files": [
-        "vue/packages/theme-chalk/src/base.scss",
         "vue/packages/theme-chalk/src/carousel-item.scss",
         "vue/packages/theme-chalk/src/carousel.scss",
         "vue/packages/theme-chalk/src/collapse.scss",
@@ -7607,6 +7608,14 @@
       "classification": "portable"
     },
     {
+      "name": "--fsus-motion-duration-overlay",
+      "files": [
+        "vue/packages/theme-chalk/src/generated/tokens.css",
+        "vue/packages/theme-chalk/src/generated/tokens.scss"
+      ],
+      "classification": "portable"
+    },
+    {
       "name": "--fsus-motion-duration-panel",
       "files": [
         "vue/packages/theme-chalk/src/generated/tokens.css",
@@ -7645,9 +7654,13 @@
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/image-viewer.scss",
         "vue/packages/theme-chalk/src/message-box.scss",
         "vue/packages/theme-chalk/src/message.scss",
+        "vue/packages/theme-chalk/src/motion.scss",
         "vue/packages/theme-chalk/src/scrollbar.scss",
+        "vue/packages/theme-chalk/src/tab-pane.scss",
+        "vue/packages/theme-chalk/src/tabs.scss",
         "vue/packages/theme-chalk/src/virtual-list.scss"
       ],
       "classification": "portable"
@@ -7675,19 +7688,23 @@
       "files": [
         "vue/packages/theme-chalk/src/base.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
+        "vue/packages/theme-chalk/src/common/transition.scss",
         "vue/packages/theme-chalk/src/dialog.scss",
+        "vue/packages/theme-chalk/src/generated/tokens.css",
+        "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/image-viewer.scss",
-        "vue/packages/theme-chalk/src/message-box.scss"
+        "vue/packages/theme-chalk/src/message-box.scss",
+        "vue/packages/theme-chalk/src/motion.scss"
       ],
       "classification": "portable"
     },
     {
       "name": "--fsus-motion-panel",
       "files": [
-        "vue/packages/theme-chalk/src/base.scss",
         "vue/packages/theme-chalk/src/carousel-item.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/dialog.scss",
+        "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/message-box.scss",
@@ -7816,6 +7833,7 @@
         "vue/packages/theme-chalk/src/collapse.scss",
         "vue/packages/theme-chalk/src/color-picker.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
+        "vue/packages/theme-chalk/src/date-picker/date-table.scss",
         "vue/packages/theme-chalk/src/dialog.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
@@ -7832,6 +7850,8 @@
         "vue/packages/theme-chalk/src/slider.scss",
         "vue/packages/theme-chalk/src/step.scss",
         "vue/packages/theme-chalk/src/switch.scss",
+        "vue/packages/theme-chalk/src/table.scss",
+        "vue/packages/theme-chalk/src/tabs.scss",
         "vue/packages/theme-chalk/src/tree.scss",
         "vue/packages/theme-chalk/src/virtual-list.scss"
       ],

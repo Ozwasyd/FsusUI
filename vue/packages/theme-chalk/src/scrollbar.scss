@@ -38,7 +38,7 @@
     opacity: 0;
     mix-blend-mode: multiply;
     transition:
-      height var(--fsus-motion-control-fast, 160ms)
+      height var(--fsus-motion-control-fast, 140ms)
         var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
       opacity 80ms var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
       transform var(--fsus-interactive-motion-settle, 120ms)
@@ -121,7 +121,7 @@
     );
     transition:
       getCssVar('transition-duration') background-color,
-      transform var(--fsus-motion-control-fast, 160ms)
+      transform var(--fsus-motion-control-fast, 140ms)
         var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1)),
       box-shadow 90ms var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
     opacity: var(
@@ -139,7 +139,7 @@
       opacity: 0;
       transition:
         opacity 80ms var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
-        box-shadow var(--fsus-motion-control-fast, 160ms)
+        box-shadow var(--fsus-motion-control-fast, 140ms)
           var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
     }
 

@@ -38,12 +38,12 @@
     box-sizing: border-box;
     user-select: none;
     transition:
-      opacity var(--fsus-motion-control-fast, 160ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
-      background-color var(--fsus-motion-control-fast, 160ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
-      box-shadow var(--fsus-motion-control-fast, 160ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+      opacity var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+      background-color var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+      box-shadow var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
 
     &:focus-visible {
       @include a11y-focus-ring(2px, var(--fsus-radius-pill));
@@ -153,13 +153,13 @@
 .viewer-fade-enter-active {
   animation: viewer-fade-in
     var(--fsus-image-viewer-motion, var(--fsus-motion-overlay, 300ms))
-    var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+    var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));
 }
 
 .viewer-fade-leave-active {
   animation: viewer-fade-out
     var(--fsus-image-viewer-motion, var(--fsus-motion-overlay, 300ms))
-    var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+    var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
 }
 
 @media (prefers-reduced-motion: reduce) {

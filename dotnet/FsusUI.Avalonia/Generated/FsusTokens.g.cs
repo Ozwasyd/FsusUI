@@ -405,6 +405,10 @@ public static class FsusTokens
     public const string MotionDurationControlFastName = "motion.duration.control.fast";
     public const string MotionDurationControlFastResourceKey = "FsusMotionDurationControlFast";
     public const string MotionDurationControlFastValue = "140ms";
+    public const string MotionDurationControlFastMotionReducedResourceKey = "FsusMotionDurationControlFastMotionReduced";
+    public const string MotionDurationControlFastMotionReducedValue = "1ms";
+    public const string MotionDurationControlFastMotionDisabledResourceKey = "FsusMotionDurationControlFastMotionDisabled";
+    public const string MotionDurationControlFastMotionDisabledValue = "1ms";
     public static TimeSpan MotionDurationControlFastTimeSpan => TimeSpan.FromMilliseconds(140d);
 
     public const string MotionDurationControlName = "motion.duration.control";
@@ -419,7 +423,20 @@ public static class FsusTokens
     public const string MotionDurationPanelName = "motion.duration.panel";
     public const string MotionDurationPanelResourceKey = "FsusMotionDurationPanel";
     public const string MotionDurationPanelValue = "360ms";
+    public const string MotionDurationPanelMotionReducedResourceKey = "FsusMotionDurationPanelMotionReduced";
+    public const string MotionDurationPanelMotionReducedValue = "1ms";
+    public const string MotionDurationPanelMotionDisabledResourceKey = "FsusMotionDurationPanelMotionDisabled";
+    public const string MotionDurationPanelMotionDisabledValue = "1ms";
     public static TimeSpan MotionDurationPanelTimeSpan => TimeSpan.FromMilliseconds(360d);
+
+    public const string MotionDurationOverlayName = "motion.duration.overlay";
+    public const string MotionDurationOverlayResourceKey = "FsusMotionDurationOverlay";
+    public const string MotionDurationOverlayValue = "300ms";
+    public const string MotionDurationOverlayMotionReducedResourceKey = "FsusMotionDurationOverlayMotionReduced";
+    public const string MotionDurationOverlayMotionReducedValue = "1ms";
+    public const string MotionDurationOverlayMotionDisabledResourceKey = "FsusMotionDurationOverlayMotionDisabled";
+    public const string MotionDurationOverlayMotionDisabledValue = "1ms";
+    public static TimeSpan MotionDurationOverlayTimeSpan => TimeSpan.FromMilliseconds(300d);
 
     public const string MotionEasingStandardName = "motion.easing.standard";
     public const string MotionEasingStandardResourceKey = "FsusMotionEasingStandard";

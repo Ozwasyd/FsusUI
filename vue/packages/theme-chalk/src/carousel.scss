@@ -47,12 +47,12 @@
     width: getCssVar('carousel', 'arrow-size');
     cursor: pointer;
     transition:
-      background-color var(--fsus-motion-control-fast, 160ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
-      color var(--fsus-motion-control-fast, 160ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
-      box-shadow var(--fsus-motion-control-fast, 160ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+      background-color var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+      color var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+      box-shadow var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
     border-radius: 50%;
     background-color: getCssVar('carousel', 'arrow-background');
     color: var(--fsus-carousel-control-color, var(--fsus-color-surface-base));
@@ -206,12 +206,12 @@
     margin: 0;
     cursor: pointer;
     transition:
-      background-color var(--fsus-motion-control-fast, 160ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
-      box-shadow var(--fsus-motion-control-fast, 160ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
-      opacity var(--fsus-motion-control-fast, 160ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+      background-color var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+      box-shadow var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+      opacity var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
 
     &:focus-visible {
       @include a11y-focus-ring(2px, var(--fsus-radius-pill));

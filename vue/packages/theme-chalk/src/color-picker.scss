@@ -173,7 +173,7 @@ $color-picker-size: map.merge($common-component-size, $color-picker-size);
         var(--fsus-color-picker-thumb-border, var(--fsus-border));
       border-radius: 50%;
       transform: translate(-3px, -3px);
-      transition: box-shadow var(--fsus-motion-control-fast, 160ms)
+      transition: box-shadow var(--fsus-motion-control-fast, 140ms)
         var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
     }
   }

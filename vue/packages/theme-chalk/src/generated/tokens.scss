@@ -79,10 +79,17 @@ $fsus-shadow-floating-dark: 0 12px 32px rgba(0, 0, 0, 0.36);
 $fsus-opacity-disabled-content: 0.46;
 $fsus-z-overlay-dialog: 2000;
 $fsus-motion-duration-control-fast: 140ms;
+$fsus-motion-duration-control-fast-motion-reduced: 1ms;
+$fsus-motion-duration-control-fast-motion-disabled: 1ms;
 $fsus-motion-duration-control: 220ms;
 $fsus-motion-duration-control-motion-reduced: 1ms;
 $fsus-motion-duration-control-motion-disabled: 1ms;
 $fsus-motion-duration-panel: 360ms;
+$fsus-motion-duration-panel-motion-reduced: 1ms;
+$fsus-motion-duration-panel-motion-disabled: 1ms;
+$fsus-motion-duration-overlay: 300ms;
+$fsus-motion-duration-overlay-motion-reduced: 1ms;
+$fsus-motion-duration-overlay-motion-disabled: 1ms;
 $fsus-motion-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
 $fsus-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
 $fsus-motion-distance-small: 8px;
@@ -168,6 +175,7 @@ $fsus-tokens: (
   'motion.duration.control.fast': 140ms,
   'motion.duration.control': 220ms,
   'motion.duration.panel': 360ms,
+  'motion.duration.overlay': 300ms,
   'motion.easing.standard': cubic-bezier(0.4, 0, 0.2, 1),
   'motion.easing.emphasized': cubic-bezier(0.2, 0, 0, 1),
   'motion.distance.small': 8px,
@@ -203,6 +211,7 @@ $fsus-token-aliases: (
   '--fsus-motion-control-fast': '--fsus-motion-duration-control-fast',
   '--fsus-motion-control': '--fsus-motion-duration-control',
   '--fsus-motion-panel': '--fsus-motion-duration-panel',
+  '--fsus-motion-overlay': '--fsus-motion-duration-overlay',
   '--fsus-motion-standard': '--fsus-motion-easing-standard',
   '--fsus-motion-emphasized': '--fsus-motion-easing-emphasized',
   '--fsus-motion-distance-sm': '--fsus-motion-distance-small',

@@ -130,14 +130,14 @@ $slider-height: map.merge(
     border-radius: 50%;
     box-sizing: border-box;
     transition:
-      transform var(--fsus-motion-control-fast, 160ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
-      border-color var(--fsus-motion-control-fast, 160ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
-      box-shadow var(--fsus-motion-control-fast, 160ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
-      background-color var(--fsus-motion-control-fast, 160ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+      transform var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+      border-color var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+      box-shadow var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+      background-color var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
     user-select: none;
 
     &:hover,

@@ -50,13 +50,13 @@
       font-weight: 500;
       transition:
         background-color var(--fsus-calendar-cell-duration, 180ms)
-          var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+          var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
         color var(--fsus-calendar-cell-duration, 180ms)
-          var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+          var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
         box-shadow var(--fsus-calendar-cell-duration, 180ms)
-          var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+          var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
         transform var(--fsus-calendar-cell-duration, 180ms)
-          var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+          var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
 
       &:hover,
       &:focus-visible {
@@ -97,19 +97,19 @@
     @include when(motion-forward) {
       animation: #{$namespace}-calendar-motion-forward
         var(--fsus-calendar-view-duration, 360ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
     }
 
     @include when(motion-backward) {
       animation: #{$namespace}-calendar-motion-backward
         var(--fsus-calendar-view-duration, 360ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
     }
 
     @include when(motion-neutral) {
       animation: #{$namespace}-calendar-motion-neutral
         var(--fsus-calendar-view-duration, 360ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
     }
   }
 }
@@ -173,11 +173,11 @@
     vertical-align: top;
     transition:
       background-color var(--fsus-calendar-cell-duration, 180ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
       color var(--fsus-calendar-cell-duration, 180ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
       box-shadow var(--fsus-calendar-cell-duration, 180ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
 
     @include when(selected) {
       background-color: getCssVar('calendar', 'selected-bg-color');
@@ -207,11 +207,11 @@
     border-radius: var(--fsus-radius-control, 6px);
     transition:
       background-color var(--fsus-calendar-cell-duration, 180ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
       box-shadow var(--fsus-calendar-cell-duration, 180ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
       transform var(--fsus-calendar-cell-duration, 180ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
 
     &:hover {
       cursor: pointer;

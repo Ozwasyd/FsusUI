@@ -33,10 +33,10 @@ $input-inline-start: map.get($input-padding-horizontal, 'default') !default;
     border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
     background-color: getCssVar('fill-color', 'blank');
     transition:
-      border-color var(--fsus-motion-control-fast, 160ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),
-      box-shadow var(--fsus-motion-control-fast, 160ms)
-        var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));
+      border-color var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+      box-shadow var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
 
     &:hover {
       border-color: getCssVar('text-color', 'placeholder');

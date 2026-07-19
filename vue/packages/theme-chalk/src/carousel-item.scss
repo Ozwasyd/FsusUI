@@ -23,7 +23,7 @@
       transition:
         transform var(--fsus-motion-panel, 360ms)
           var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1)),
-        filter var(--fsus-motion-control-fast, 160ms)
+        filter var(--fsus-motion-control-fast, 140ms)
           var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
       will-change: transform, filter;
     }
@@ -33,7 +33,7 @@
       transition:
         transform var(--fsus-motion-panel, 360ms)
           var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1)),
-        filter var(--fsus-motion-control-fast, 160ms)
+        filter var(--fsus-motion-control-fast, 140ms)
           var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
 
       &.is-in-stage {

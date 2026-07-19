@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, test } from 'vitest'
@@ -45,11 +45,59 @@ const buttonSource = readFileSync(
   path.resolve(dirname, '../src/button.scss'),
   'utf8',
 )
+const baseSource = readFileSync(
+  path.resolve(dirname, '../src/base.scss'),
+  'utf8',
+)
+const motionDocs = readFileSync(
+  path.resolve(dirname, '../../../../docs/theme/motion.md'),
+  'utf8',
+)
+const readScssSources = (directory: string): string[] =>
+  readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const entryPath = path.join(directory, entry.name)
+
+    if (entry.isDirectory()) return readScssSources(entryPath)
+    if (entry.name.endsWith('.scss')) return [readFileSync(entryPath, 'utf8')]
+
+    return []
+  })
+const themeScssSource = readScssSources(path.resolve(dirname, '../src')).join(
+  '\n',
+)
 const darkTokenMixin = tokenSource.match(
   /@mixin fsus-dark-tokens \{([\s\S]*?)\n\}/,
 )?.[1]
 
 describe('Fsus token source contracts', () => {
+  test('keeps public motion tiers and fallbacks on the canonical contract', () => {
+    expect(sassVarSource).toMatch(
+      /\$transition-duration:[\s\S]*?'': 0\.22s,[\s\S]*?'fast': 0\.14s,[\s\S]*?'slow': 0\.36s,/,
+    )
+    expect(tokenSource).toContain(
+      '--fsus-motion-overlay: #{generated.$fsus-motion-duration-overlay};',
+    )
+    expect(motionDocs).toContain('| `--fsus-motion-overlay`      | `300ms`')
+
+    for (const [name, value, alias] of [
+      ['motion.duration.control.fast', '140ms', '--fsus-motion-control-fast'],
+      ['motion.duration.control', '220ms', '--fsus-motion-control'],
+      ['motion.duration.overlay', '300ms', '--fsus-motion-overlay'],
+      ['motion.duration.panel', '360ms', '--fsus-motion-panel'],
+    ]) {
+      expect(generatedJson.tokens[name]).toMatchObject({
+        value,
+        aliases: [alias],
+        modeValues: { motionReduced: '1ms', motionDisabled: '1ms' },
+      })
+    }
+
+    expect(baseSource).not.toContain('--fsus-motion-control-fast: 1ms;')
+    expect(baseSource).not.toContain('--fsus-motion-panel: 1ms;')
+    expect(themeScssSource).not.toContain('fsus-motion-control-fast, 160ms')
+    expect(themeScssSource).not.toContain('cubic-bezier(0.2, 0.8, 0.2, 1)')
+  })
+
   test('keeps input counters on the field surface instead of blank fill patches', () => {
     expect(
       inputSource.match(
