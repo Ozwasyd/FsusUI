@@ -55,6 +55,18 @@ $form-item-label-top-margin-bottom: map.merge(
   $form-item-label-top-margin-bottom
 );
 
+@mixin form-invalid-idle-ring($important: false) {
+  @if $important {
+    box-shadow: 0 0 0 1px getCssVar('color-danger') inset !important;
+  } @else {
+    box-shadow: 0 0 0 1px getCssVar('color-danger') inset;
+  }
+}
+
+@mixin form-invalid-focus-visible-ring {
+  box-shadow: 0 0 0 2px getCssVar('color-danger') inset !important;
+}
+
 @include b(form) {
   @include set-component-css-var('form', $form);
 
@@ -218,6 +230,7 @@ $form-item-label-top-margin-bottom: map.merge(
     .#{$namespace}-select-v2__wrapper {
       &.is-focused {
         border-color: transparent;
+        @include form-invalid-idle-ring(true);
       }
     }
 
@@ -225,40 +238,47 @@ $form-item-label-top-margin-bottom: map.merge(
     .#{$namespace}-textarea__inner {
       &,
       &:focus {
-        box-shadow: 0 0 0 1px getCssVar('color-danger') inset;
+        @include form-invalid-idle-ring;
       }
     }
 
     .#{$namespace}-input__wrapper {
-      box-shadow: 0 0 0 1px getCssVar('color-danger') inset;
+      @include form-invalid-idle-ring;
       &:hover {
-        box-shadow: 0 0 0 1px getCssVar('color-danger') inset;
+        @include form-invalid-idle-ring;
       }
       &.is-focus {
-        box-shadow: 0 0 0 1px getCssVar('color-danger') inset !important;
+        @include form-invalid-idle-ring(true);
       }
     }
 
     .#{$namespace}-select {
-       &:hover{
-         box-shadow: 0 0 0 1px transparent;
-       }
+      &:hover {
+        box-shadow: 0 0 0 1px transparent;
+      }
 
-      .#{$namespace}-input{
+      .#{$namespace}-input {
         .#{$namespace}-input__wrapper {
-          &:hover{
-            box-shadow: 0 0 0 1px getCssVar('color-danger') inset;
+          &:hover {
+            @include form-invalid-idle-ring;
           }
         }
 
         &.is-focus {
           .#{$namespace}-input__wrapper {
-            box-shadow: 0 0 0 1px getCssVar('color-danger') inset !important;
+            @include form-invalid-idle-ring(true);
           }
         }
       }
     }
 
+    .#{$namespace}-textarea__inner:focus-visible,
+    .#{$namespace}-select-v2__wrapper:has(input:focus-visible),
+    .#{$namespace}-input__wrapper:has(
+      .#{$namespace}-input__inner:focus-visible
+    ) {
+      @include form-invalid-focus-visible-ring;
+    }
 
     .#{$namespace}-input-group__append,
     .#{$namespace}-input-group__prepend {

@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
+import { compile } from 'sass'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -32,6 +33,14 @@ const extractMap = (source, mapName) => {
 const forbiddenPrimaryPattern = /getCssVar\('color-primary'\)/g
 const failures = []
 const varSource = read('vue/packages/theme-chalk/src/common/var.scss')
+const formSource = read('vue/packages/theme-chalk/src/form.scss')
+const formCss = compile(
+  path.join(root, 'vue/packages/theme-chalk/src/form.scss'),
+  {
+    loadPaths: [path.join(root, 'vue/packages/theme-chalk/src')],
+    style: 'expanded',
+  },
+).css
 
 for (const mapName of [
   'checkbox',
@@ -75,7 +84,9 @@ const selectedBlock = timeSelectSource.match(
 )
 
 if (!selectedBlock?.groups?.body) {
-  failures.push('vue/packages/theme-chalk/src/time-select.scss: missing selected state block')
+  failures.push(
+    'vue/packages/theme-chalk/src/time-select.scss: missing selected state block',
+  )
 } else {
   const body = selectedBlock.groups.body
   if (!body.includes("color: getCssVar('color', 'scholarly-blue');")) {
@@ -95,6 +106,40 @@ if (!selectedBlock?.groups?.body) {
       'vue/packages/theme-chalk/src/time-select.scss: selected state must not rely on bold only',
     )
   }
+}
+
+if (!formSource.includes('@mixin form-invalid-focus-visible-ring')) {
+  failures.push(
+    'vue/packages/theme-chalk/src/form.scss: missing semantic invalid focus-visible ring mixin',
+  )
+}
+
+for (const selector of [
+  '.el-form-item.is-error .el-textarea__inner:focus-visible',
+  '.el-form-item.is-error .el-select-v2__wrapper:has(input:focus-visible)',
+  '.el-form-item.is-error .el-input__wrapper:has(.el-input__inner:focus-visible)',
+]) {
+  const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&')
+  const rulePattern = new RegExp(
+    `${escapedSelector}[^{}]*\\{[^{}]*box-shadow:\\s*0 0 0 2px var\\(--el-color-danger\\) inset !important;`,
+    'u',
+  )
+
+  if (!rulePattern.test(formCss)) {
+    failures.push(
+      `vue/packages/theme-chalk/src/form.scss: ${selector} must use a 2px inset danger ring`,
+    )
+  }
+}
+
+if (
+  /focus-visible[^{}]*\{[^{}]*box-shadow:\s*0 0 0 1px var\(--el-color-danger\) inset/gu.test(
+    formCss,
+  )
+) {
+  failures.push(
+    'vue/packages/theme-chalk/src/form.scss: invalid focus-visible must not regress to the idle 1px danger ring',
+  )
 }
 
 if (failures.length > 0) {

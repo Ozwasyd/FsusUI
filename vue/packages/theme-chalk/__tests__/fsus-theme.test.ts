@@ -280,6 +280,24 @@ describe('Fsus theme visual baseline', () => {
     }
   })
 
+  test('keeps invalid idle and keyboard focus rings visually distinct', () => {
+    const css = compileThemeFile('form.scss')
+
+    expectCssRule(css, '.el-form-item.is-error .el-input__wrapper', [
+      'box-shadow: 0 0 0 1px var(--el-color-danger) inset;',
+    ])
+
+    for (const selector of [
+      '.el-form-item.is-error .el-textarea__inner:focus-visible',
+      '.el-form-item.is-error .el-select-v2__wrapper:has(input:focus-visible)',
+      '.el-form-item.is-error .el-input__wrapper:has(.el-input__inner:focus-visible)',
+    ]) {
+      expectCssRule(css, selector, [
+        'box-shadow: 0 0 0 2px var(--el-color-danger) inset !important;',
+      ])
+    }
+  })
+
   test('keeps input counters on the input surface', () => {
     const css = compileThemeFile('input.scss')
 

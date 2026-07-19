@@ -452,20 +452,22 @@ body {
 
 ### Surface and Interaction Tokens
 
-| Visual Concept          | Value       | Runtime Token                                             | Notes                      |
-| ----------------------- | ----------- | --------------------------------------------------------- | -------------------------- |
-| Control radius          | `6px`       | `--fsus-radius-control`, `--el-border-radius-base`        | Button、Input、Select      |
-| Small control radius    | `4px`       | `--fsus-radius-control-small`, `--el-border-radius-small` | 小尺寸控件                 |
-| Popover radius          | `10px`      | `--fsus-radius-popover`, `--el-popover-border-radius`     | Popover、Tooltip、Dropdown |
-| Panel radius            | `12px`      | `--fsus-radius-panel`, `--el-dialog-border-radius`        | Dialog、Drawer、Card       |
-| Expressive panel radius | `24px`      | `--fsus-radius-panel-large`                               | Opt-in expressive surfaces |
-| Pill radius             | `999px`     | `--fsus-radius-pill`, `--el-border-radius-round`          | Badge、Tag、圆形图标按钮   |
-| Control height          | `44px`      | `--fsus-control-height`                                   | 默认控件高度               |
-| Compact control height  | `40px`      | `--fsus-control-height-compact`                           | 紧凑控件高度               |
-| Focus ring              | `2px inset` | `--fsus-scholarly-blue` / `--el-a11y-focus-color`         | `focus-visible` only       |
-| Backdrop blur           | `0px`       | `--fsus-backdrop-blur`                                    | Default paper material     |
-| Overlay blur            | `0px`       | `--fsus-backdrop-blur-overlay`                            | Default overlay material   |
-| Panel shadow            | `none`      | `--fsus-shadow-panel`, `--el-box-shadow`                  | Border-first panels        |
+| Visual Concept          | Value       | Runtime Token                                             | Notes                       |
+| ----------------------- | ----------- | --------------------------------------------------------- | --------------------------- |
+| Control radius          | `6px`       | `--fsus-radius-control`, `--el-border-radius-base`        | Button、Input、Select       |
+| Small control radius    | `4px`       | `--fsus-radius-control-small`, `--el-border-radius-small` | 小尺寸控件                  |
+| Popover radius          | `10px`      | `--fsus-radius-popover`, `--el-popover-border-radius`     | Popover、Tooltip、Dropdown  |
+| Panel radius            | `12px`      | `--fsus-radius-panel`, `--el-dialog-border-radius`        | Dialog、Drawer、Card        |
+| Expressive panel radius | `24px`      | `--fsus-radius-panel-large`                               | Opt-in expressive surfaces  |
+| Pill radius             | `999px`     | `--fsus-radius-pill`, `--el-border-radius-round`          | Badge、Tag、圆形图标按钮    |
+| Control height          | `44px`      | `--fsus-control-height`                                   | 默认控件高度                |
+| Compact control height  | `40px`      | `--fsus-control-height-compact`                           | 紧凑控件高度                |
+| Focus ring              | `2px inset` | `--fsus-scholarly-blue` / `--el-a11y-focus-color`         | `focus-visible` only        |
+| Invalid idle ring       | `1px inset` | `--el-color-danger`                                       | invalid, not keyboard focus |
+| Invalid focus ring      | `2px inset` | `--el-color-danger`                                       | invalid + `focus-visible`   |
+| Backdrop blur           | `0px`       | `--fsus-backdrop-blur`                                    | Default paper material      |
+| Overlay blur            | `0px`       | `--fsus-backdrop-blur-overlay`                            | Default overlay material    |
+| Panel shadow            | `none`      | `--fsus-shadow-panel`, `--el-box-shadow`                  | Border-first panels         |
 
 ### Rationale
 
