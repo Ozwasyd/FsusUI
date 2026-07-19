@@ -61,7 +61,7 @@ FsusUI 从 `Fsu's Blog.` 的句点中提取 **Punctuation Mark（标点）** 作
 - 正文和主要信息默认左对齐，使用 ragged right，不做两端对齐。
 - 大段文本禁止居中。居中只用于结构明确的小组件，例如空状态、结果页或确认弹窗的标题区。
 - 层级通过字号、字重、行高和留白建立，不通过颜色堆叠建立。
-- 默认正文为 `14px`，小型说明为 `12px` 或 `13px`，标题按组件语境使用 `16px`、`18px`、`20px` 或页面级更大字号。
+- 默认正文与可读说明为 `14px`；`12px` 仅用于资源 metadata、caption 等辅助信息。通用 settings/task primitives 固定使用 `12 / 14 / 16px` 小字号阶梯，标题按其他组件语境使用 `16px`、`18px`、`20px` 或页面级更大字号。
 - 不使用负字距。大标题也应保持自然字距。
 - Dialog、Drawer、MessageBox、Notification 和 Popover 等浮层标题保持字体的自然字距，主题层不得压缩 CJK 或混排标题的字间距。
 

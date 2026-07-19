@@ -291,12 +291,39 @@ const scanStableFontWeights = () => {
   }
 }
 
+const validateSettingsTypographyLadder = () => {
+  const file = 'vue/packages/theme-chalk/src/settings-primitives.scss'
+  const source = read(file).replace(/\/\*[\s\S]*?\*\//g, '')
+  const allowedSizes = new Set(['12', '14', '16'])
+  const failures = []
+
+  for (const match of source.matchAll(/font-size\s*:\s*(\d+)px\s*;/g)) {
+    if (!allowedSizes.has(match[1])) {
+      failures.push(`${file} uses non-ladder font size ${match[1]}px`)
+    }
+  }
+
+  assert(
+    source.includes('font-size: 12px;') &&
+      source.includes('font-size: 14px;') &&
+      source.includes('font-size: 16px;'),
+    `${file} must expose the complete 12/14/16px ladder`,
+  )
+
+  if (failures.length) {
+    throw new Error(
+      `Settings typography ladder check failed:\n${failures.join('\n')}`,
+    )
+  }
+}
+
 try {
   validateBaseline()
   validateSnapshots()
   validateGeneratedOutputs()
   scanStableFontFamilies()
   scanStableFontWeights()
+  validateSettingsTypographyLadder()
   console.log('typography baseline check passed')
 } catch (error) {
   console.error(error instanceof Error ? error.message : error)

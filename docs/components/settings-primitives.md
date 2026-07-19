@@ -8,6 +8,24 @@ Do not create product-specific profile/account templates in FsusUI. Do not
 hard-code username, password, MFA, passkey, session, device, or deletion
 semantics in these primitives.
 
+## Typography roles
+
+Settings primitives use one `12 / 14 / 16px` ladder and only the loaded
+`400 / 500 / 700` weights. Compact density changes spacing, not text roles.
+
+| Role                                         | Size / weight / line-height  | Components                                                                      |
+| -------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------- |
+| Section title                                | `16px / 700 / 1.35`          | `FsusSettingsSection`, `FsusFormSection`, `FsusSectionHeader`, `FsusDangerZone` |
+| Readable navigation or supporting copy       | `14px / 400–700 / 1.35–1.65` | `FsusSectionNav`, section descriptions, typed-confirm labels                    |
+| Resource title                               | `14px / 700 / 1.4`           | `FsusResourceListItem`                                                          |
+| Resource metadata and compact auxiliary copy | `12px / 400 / 1.45–1.6`      | resource metadata, risk notices, destructive-action descriptions                |
+
+The `13px → 14px` migration is an intentional readability harmonization.
+Section navigation and descriptions may wrap slightly earlier or occupy more
+vertical space; that is the expected change. Section structure, action order,
+control sizes, compact/default density behavior, and mobile stacking stay
+unchanged. Resource metadata remains `12px`, and section titles remain `16px`.
+
 ## Section Navigation
 
 ```vue

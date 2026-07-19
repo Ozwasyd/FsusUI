@@ -2363,6 +2363,10 @@ describe('Fsus theme visual baseline', () => {
       'outline: none !important;',
       'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
     ])
+    expectCssRule(css, '.el-section-nav__link', [
+      'font-size: 14px;',
+      'font-weight: 700;',
+    ])
     expectCssRule(css, '.el-settings-section', [
       'display: grid;',
       'border-top: 1px solid var(--el-border-color-lighter);',
@@ -2371,11 +2375,24 @@ describe('Fsus theme visual baseline', () => {
       'display: grid;',
       'grid-template-columns: minmax(0, 1fr) auto;',
     ])
+    expectCssRule(css, '.el-settings-section__title', [
+      'font-size: 16px;',
+      'font-weight: 700;',
+    ])
+    expectCssRule(css, '.el-settings-section__description', [
+      'font-size: 14px;',
+    ])
+    expectCssRule(css, '.el-section-header__description', ['font-size: 14px;'])
     expectCssRule(css, '.el-resource-list', [
       'border: 1px solid var(--el-border-color-lighter);',
       'border-radius: var(--fsus-radius-panel, 12px);',
       'box-shadow: none;',
     ])
+    expectCssRule(css, '.el-resource-list-item__title', [
+      'font-size: 14px;',
+      'font-weight: 700;',
+    ])
+    expectCssRule(css, '.el-resource-list-item__meta', ['font-size: 12px;'])
     expectCssRule(css, '.el-metadata-row', [
       'display: flex;',
       'flex-wrap: wrap;',
@@ -2393,6 +2410,8 @@ describe('Fsus theme visual baseline', () => {
       /\.el-section-nav__link:hover,\s*\.el-section-nav__link:focus-visible\s*\{[^}]*outline: none;/s,
     )
     expect(css).not.toMatch(/\.el-settings-section\s*\{[^}]*box-shadow:/s)
+    expect(css).not.toContain('font-size: 13px;')
+    expect(css).not.toContain('font-size: 15px;')
     expect(css).not.toMatch(/gradient|backdrop-filter|blur\(/)
   })
 

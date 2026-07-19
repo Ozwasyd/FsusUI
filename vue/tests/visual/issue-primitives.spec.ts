@@ -47,7 +47,10 @@ test('issue primitives render in the demo route', async ({
   await expect(
     page.locator('.issue-primitives__site-header-fixtures .el-site-header'),
   ).toHaveCount(3)
-  await expect(page.locator('.el-empty-state--inline')).toBeVisible()
+  const inlineEmptyStates = page.locator('.el-empty-state--inline')
+  await expect(inlineEmptyStates).toHaveCount(2)
+  await expect(inlineEmptyStates.first()).toBeVisible()
+  await expect(inlineEmptyStates.last()).toBeVisible()
   await expect(page.locator('.el-empty-state--compact')).toBeVisible()
   await expect(page.locator('.el-empty-state--page')).toBeVisible()
   await expect(page.locator('.el-empty-state__illustration')).toHaveCount(1)
@@ -68,6 +71,69 @@ test('issue primitives render in the demo route', async ({
   await expect(page.locator('.el-destructive-action-panel')).toBeVisible()
   await expect(page.locator('.el-risk-notice')).toBeVisible()
   await expect(page.locator('.el-typed-confirm-field')).toBeVisible()
+
+  const settingsDemo = page.locator('.issue-primitives__settings-demo')
+  const legacyTypography = await page.addStyleTag({
+    content: `
+      .el-section-nav__link,
+      .el-settings-section__description,
+      .el-form-section__description,
+      .el-section-header__description,
+      .el-danger-zone__description,
+      .el-typed-confirm-field__label {
+        font-size: 13px !important;
+      }
+      .el-danger-zone__title {
+        font-size: 15px !important;
+      }
+    `,
+  })
+  const viewport = isCompact ? 'mobile' : 'desktop'
+  await testInfo.attach(`settings-typography-before-${theme}-${viewport}`, {
+    body: await settingsDemo.screenshot({ animations: 'disabled' }),
+    contentType: 'image/png',
+  })
+  await legacyTypography.evaluate((style) => style.remove())
+
+  await expect(page.locator('.el-section-nav__link').first()).toHaveCSS(
+    'font-size',
+    '14px',
+  )
+  await expect(
+    page.locator('.el-settings-section__description').first(),
+  ).toHaveCSS('font-size', '14px')
+  await expect(page.locator('.el-section-header__description')).toHaveCSS(
+    'font-size',
+    '14px',
+  )
+  await expect(page.locator('.el-settings-section__title').first()).toHaveCSS(
+    'font-size',
+    '16px',
+  )
+  await expect(page.locator('.el-resource-list-item__title').first()).toHaveCSS(
+    'font-size',
+    '14px',
+  )
+  await expect(page.locator('.el-resource-list-item__meta').first()).toHaveCSS(
+    'font-size',
+    '12px',
+  )
+  await expect(page.locator('.el-danger-zone__title')).toHaveCSS(
+    'font-size',
+    '16px',
+  )
+  await expect(page.locator('.el-typed-confirm-field__label')).toHaveCSS(
+    'font-size',
+    '14px',
+  )
+  await expect(page.locator('.el-section-nav')).toHaveClass(
+    new RegExp(`el-section-nav--${isCompact ? 'compact' : 'default'}`),
+  )
+  await testInfo.attach(`settings-typography-after-${theme}-${viewport}`, {
+    body: await settingsDemo.screenshot({ animations: 'disabled' }),
+    contentType: 'image/png',
+  })
+
   await expect(page.locator('.el-metric-list')).toBeVisible()
   await expect(page.locator('.el-metric-item')).toHaveCount(2)
   await expect(page.locator('.el-kpi-group')).toBeVisible()
@@ -78,13 +144,14 @@ test('issue primitives render in the demo route', async ({
   await expect(page.locator('.el-diagnostics-list')).toBeVisible()
   await expect(page.locator('.el-diagnostics-item')).toHaveCount(2)
   await expect(page.locator('.el-copyable-detail')).toBeVisible()
-  await expect(
-    page.locator(
-      isCompact
-        ? '.el-theme-mode-toggle--mobile'
-        : '.el-theme-mode-toggle--desktop',
-    ),
-  ).toBeVisible()
+  const themeModeToggles = page.locator(
+    isCompact
+      ? '.el-theme-mode-toggle--mobile'
+      : '.el-theme-mode-toggle--desktop',
+  )
+  await expect(themeModeToggles).toHaveCount(2)
+  await expect(themeModeToggles.first()).toBeVisible()
+  await expect(themeModeToggles.last()).toBeVisible()
 
   const collection = page.locator('.el-responsive-collection')
   await expect(collection).toBeVisible()
@@ -106,7 +173,11 @@ test('issue primitives render in the demo route', async ({
 
   const inboxLayout = page.locator('.el-inbox-layout')
   await expect(inboxLayout).toBeVisible()
-  await expect(inboxLayout.locator('.el-conversation-list')).toBeVisible()
+  if (isCompact) {
+    await expect(inboxLayout.locator('.el-conversation-list')).toBeHidden()
+  } else {
+    await expect(inboxLayout.locator('.el-conversation-list')).toBeVisible()
+  }
   await expect(inboxLayout.locator('.el-conversation-list-item')).toHaveCount(2)
   await expect(inboxLayout.locator('.el-thread-panel')).toBeVisible()
   await expect(inboxLayout.locator('.el-message-timeline')).toBeVisible()
@@ -116,7 +187,11 @@ test('issue primitives render in the demo route', async ({
   ).toBeVisible()
   await expect(inboxLayout.locator('.el-reply-composer-shell')).toBeVisible()
   await expect(inboxLayout.locator('.el-empty-selection-state')).toBeVisible()
-  await expect(inboxLayout.locator('.el-inbox-empty-state')).toBeVisible()
+  if (isCompact) {
+    await expect(inboxLayout.locator('.el-inbox-empty-state')).toBeHidden()
+  } else {
+    await expect(inboxLayout.locator('.el-inbox-empty-state')).toBeVisible()
+  }
 
   const horizontalOverflow = await page.evaluate(() => {
     const root = document.documentElement
