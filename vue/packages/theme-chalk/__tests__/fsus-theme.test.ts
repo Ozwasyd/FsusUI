@@ -1808,10 +1808,14 @@ describe('Fsus theme visual baseline', () => {
     )
 
     expectCssRule(css, '.el-tag', [
+      'height: var(--fsus-tag-height, 24px);',
       'font-size: var(--fsus-tag-font-size, var(--el-font-size-extra-small));',
+      'font-weight: var(--fsus-tag-font-weight, 500);',
       'letter-spacing: var(--fsus-tag-letter-spacing, 0);',
       'text-transform: var(--fsus-tag-text-transform, none);',
     ])
+    expectCssRule(css, '.el-tag--large', ['height: 32px;'])
+    expectCssRule(css, '.el-tag--small', ['height: 20px;'])
     for (const selector of [
       '.el-tag.is-uppercase',
       '.el-tag[data-fsus-tag-uppercase=true]',
@@ -1823,6 +1827,8 @@ describe('Fsus theme visual baseline', () => {
     }
     expect(css).not.toMatch(/\.el-tag\s*\{[^}]*text-transform:\s*uppercase;/s)
     expect(css).not.toMatch(/\.el-tag\s*\{[^}]*letter-spacing:\s*0\.05em;/s)
+    expect(css).not.toContain('var(--fsus-tag-height, 22px)')
+    expect(css).not.toContain('var(--fsus-tag-font-weight, 650)')
     expect(docs).toContain('混合语言')
     expect(docs).toContain('code-like')
     expect(docs).toContain('状态 APIv2')

@@ -135,6 +135,7 @@ Quiet Text 为可读文本角色，不得等于 Decorative Gray；Decorative Gra
 - 默认控件高度：`44px`
 - 大号控件高度：`48px`
 - 紧凑控件高度：`40px`
+- Tag 高度 large/default/small = `32/24/20px`，对应 `--fsus-tag-height-{large,default,small}`。
 - 图标按钮触控目标：`40px`
 - 表格默认行内 padding：`12px 0`
 - 表格紧凑行内 padding：`10px 0`
