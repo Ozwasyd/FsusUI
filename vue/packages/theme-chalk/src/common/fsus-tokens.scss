@@ -79,7 +79,16 @@
   --fsus-space-8: 32px;
   --fsus-control-height: 44px;
   --fsus-control-height-compact: 40px;
-  --fsus-icon-target: 40px;
+  --fsus-select-option-height: #{generated.$fsus-density-select-option-y};
+  --fsus-control-height-action: #{generated.$fsus-density-control-action-y};
+  --fsus-menu-item-height: #{generated.$fsus-density-menu-item-y};
+  --fsus-menu-horizontal-height: #{generated.$fsus-density-menu-horizontal-y};
+  --fsus-icon-target: #{generated.$fsus-density-icon-target};
+  --fsus-icon-target-small: #{generated.$fsus-density-icon-target-small};
+  --fsus-tag-height-large: #{generated.$fsus-component-tag-height-large};
+  --fsus-tag-height-default: #{generated.$fsus-component-tag-height-default};
+  --fsus-tag-height-small: #{generated.$fsus-component-tag-height-small};
+  --fsus-cascader-suggestion-max-height: #{generated.$fsus-component-cascader-suggestion-max-height};
   --fsus-mobile-page-padding: 16px;
   --fsus-desktop-page-padding: 24px;
   --fsus-floating-viewport-gap: 24px;

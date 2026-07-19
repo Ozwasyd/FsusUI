@@ -157,7 +157,7 @@
   }
 
   @include e(suggestion-list) {
-    max-height: 204px;
+    max-height: var(--fsus-cascader-suggestion-max-height);
     margin: 0;
     padding: 6px 0;
     font-size: getCssVar('font-size', 'base');
@@ -170,7 +170,7 @@
     justify-content: space-between;
     align-items: center;
     column-gap: 10px;
-    height: 34px;
+    height: var(--fsus-select-option-height);
     padding: 0 15px;
     text-align: left;
     outline: none;

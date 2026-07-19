@@ -102,6 +102,16 @@ $fsus-density-control-default-y: 44px;
 $fsus-density-control-default-y-density-compact: 40px;
 $fsus-density-control-default-y-density-spacious: 48px;
 $fsus-density-control-compact-y: 40px;
+$fsus-density-select-option-y: 34px;
+$fsus-density-control-action-y: 36px;
+$fsus-density-menu-item-y: 56px;
+$fsus-density-menu-horizontal-y: 60px;
+$fsus-density-icon-target: 40px;
+$fsus-density-icon-target-small: 32px;
+$fsus-component-tag-height-large: 32px;
+$fsus-component-tag-height-default: 24px;
+$fsus-component-tag-height-small: 20px;
+$fsus-component-cascader-suggestion-max-height: 204px;
 $fsus-icon-size-md: 16px;
 $fsus-icon-stroke-md: 1.75;
 $fsus-icon-fill-default: currentColor;
@@ -186,6 +196,16 @@ $fsus-tokens: (
   'motion.intensity.subtle': 0.98,
   'density.control.default.y': 44px,
   'density.control.compact.y': 40px,
+  'density.select.option.y': 34px,
+  'density.control.action.y': 36px,
+  'density.menu.item.y': 56px,
+  'density.menu.horizontal.y': 60px,
+  'density.icon.target': 40px,
+  'density.icon.target.small': 32px,
+  'component.tag.height.large': 32px,
+  'component.tag.height.default': 24px,
+  'component.tag.height.small': 20px,
+  'component.cascader.suggestion.max-height': 204px,
   'icon.size.md': 16px,
   'icon.stroke.md': 1.75,
   'icon.fill.default': currentColor,
@@ -217,4 +237,14 @@ $fsus-token-aliases: (
   '--fsus-motion-distance-sm': '--fsus-motion-distance-small',
   '--fsus-motion-distance-md': '--fsus-motion-distance-medium',
   '--fsus-motion-distance-lg': '--fsus-motion-distance-large',
+  '--fsus-select-option-height': '--fsus-density-select-option-y',
+  '--fsus-control-height-action': '--fsus-density-control-action-y',
+  '--fsus-menu-item-height': '--fsus-density-menu-item-y',
+  '--fsus-menu-horizontal-height': '--fsus-density-menu-horizontal-y',
+  '--fsus-icon-target': '--fsus-density-icon-target',
+  '--fsus-icon-target-small': '--fsus-density-icon-target-small',
+  '--fsus-tag-height-large': '--fsus-component-tag-height-large',
+  '--fsus-tag-height-default': '--fsus-component-tag-height-default',
+  '--fsus-tag-height-small': '--fsus-component-tag-height-small',
+  '--fsus-cascader-suggestion-max-height': '--fsus-component-cascader-suggestion-max-height',
 );

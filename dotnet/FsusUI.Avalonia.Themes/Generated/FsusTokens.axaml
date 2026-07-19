@@ -139,6 +139,16 @@
   <x:Double x:Key="FsusMotionIntensitySubtle">0.98</x:Double>
   <x:Double x:Key="FsusDensityControlDefaultY">44</x:Double>
   <x:Double x:Key="FsusDensityControlCompactY">40</x:Double>
+  <x:Double x:Key="FsusDensitySelectOptionY">34</x:Double>
+  <x:Double x:Key="FsusDensityControlActionY">36</x:Double>
+  <x:Double x:Key="FsusDensityMenuItemY">56</x:Double>
+  <x:Double x:Key="FsusDensityMenuHorizontalY">60</x:Double>
+  <x:Double x:Key="FsusDensityIconTarget">40</x:Double>
+  <x:Double x:Key="FsusDensityIconTargetSmall">32</x:Double>
+  <x:Double x:Key="FsusComponentTagHeightLarge">32</x:Double>
+  <x:Double x:Key="FsusComponentTagHeightDefault">24</x:Double>
+  <x:Double x:Key="FsusComponentTagHeightSmall">20</x:Double>
+  <x:Double x:Key="FsusComponentCascaderSuggestionMaxHeight">204</x:Double>
   <x:Double x:Key="FsusIconSizeMd">16</x:Double>
   <x:Double x:Key="FsusIconStrokeMd">1.75</x:Double>
   <x:String x:Key="FsusIconFillDefault">currentColor</x:String>

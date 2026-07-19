@@ -1809,14 +1809,18 @@ describe('Fsus theme visual baseline', () => {
     )
 
     expectCssRule(css, '.el-tag', [
-      'height: var(--fsus-tag-height, 24px);',
+      'height: var(--fsus-tag-height, var(--fsus-tag-height-default));',
       'font-size: var(--fsus-tag-font-size, var(--el-font-size-extra-small));',
       'font-weight: var(--fsus-tag-font-weight, 500);',
       'letter-spacing: var(--fsus-tag-letter-spacing, 0);',
       'text-transform: var(--fsus-tag-text-transform, none);',
     ])
-    expectCssRule(css, '.el-tag--large', ['height: 32px;'])
-    expectCssRule(css, '.el-tag--small', ['height: 20px;'])
+    expectCssRule(css, '.el-tag--large', [
+      'height: var(--fsus-tag-height-large);',
+    ])
+    expectCssRule(css, '.el-tag--small', [
+      'height: var(--fsus-tag-height-small);',
+    ])
     for (const selector of [
       '.el-tag.is-uppercase',
       '.el-tag[data-fsus-tag-uppercase=true]',
@@ -1834,6 +1838,44 @@ describe('Fsus theme visual baseline', () => {
     expect(docs).toContain('code-like')
     expect(docs).toContain('状态 APIv2')
     expect(docs).toContain('sha-1:AbC123')
+  })
+
+  test('keeps component control heights on the canonical density ladder', () => {
+    const buttonCss = compileThemeFile('button.scss')
+    const cascaderCss = compileThemeFile('cascader.scss')
+    const menuCss = compileThemeFile('menu.scss')
+    const optionCss = compileThemeFile('option.scss')
+    const paginationCss = compileThemeFile('pagination.scss')
+    const tabsCss = compileThemeFile('tabs.scss')
+
+    expectCssRule(buttonCss, '.el-button.is-inline-action', [
+      'min-height: var(--fsus-control-height-action);',
+    ])
+    expectCssRule(cascaderCss, '.el-cascader__suggestion-list', [
+      'max-height: var(--fsus-cascader-suggestion-max-height);',
+    ])
+    expectCssRule(cascaderCss, '.el-cascader__suggestion-item', [
+      'height: var(--fsus-select-option-height);',
+    ])
+    expectCssRule(menuCss, ':root', [
+      '--el-menu-item-height: var(--fsus-menu-item-height);',
+      '--el-menu-horizontal-height: var(--fsus-menu-horizontal-height);',
+      '--el-menu-horizontal-sub-item-height: calc(var(--fsus-menu-horizontal-height) - 24px);',
+    ])
+    expectCssRule(optionCss, '.el-select-dropdown__item', [
+      'height: var(--fsus-select-option-height);',
+      'line-height: var(--fsus-select-option-height);',
+    ])
+    expectCssRule(paginationCss, '.el-pagination', [
+      '--el-pagination-button-width-small: var(--fsus-control-height-compact);',
+      '--el-pagination-button-height-small: var(--fsus-control-height-compact);',
+    ])
+    expectCssRule(tabsCss, '.el-tabs__new-tab', [
+      'width: var(--fsus-control-height-action);',
+      'height: var(--fsus-control-height-action);',
+      'margin: 2px 0 2px 10px;',
+      'line-height: var(--fsus-control-height-action);',
+    ])
   })
 
   test('keeps calendar header controls border-first', () => {

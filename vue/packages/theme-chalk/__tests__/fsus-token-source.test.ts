@@ -283,4 +283,95 @@ describe('Fsus token source contracts', () => {
       aliases: ['--fsus-motion-distance-md'],
     })
   })
+
+  test('registers the control-height ladder across generated targets', () => {
+    const expectedTokens = [
+      [
+        'density.select.option.y',
+        '34px',
+        '--fsus-select-option-height',
+        'density-select-option-y',
+      ],
+      [
+        'density.control.action.y',
+        '36px',
+        '--fsus-control-height-action',
+        'density-control-action-y',
+      ],
+      [
+        'density.menu.item.y',
+        '56px',
+        '--fsus-menu-item-height',
+        'density-menu-item-y',
+      ],
+      [
+        'density.menu.horizontal.y',
+        '60px',
+        '--fsus-menu-horizontal-height',
+        'density-menu-horizontal-y',
+      ],
+      [
+        'density.icon.target',
+        '40px',
+        '--fsus-icon-target',
+        'density-icon-target',
+      ],
+      [
+        'density.icon.target.small',
+        '32px',
+        '--fsus-icon-target-small',
+        'density-icon-target-small',
+      ],
+      [
+        'component.tag.height.large',
+        '32px',
+        '--fsus-tag-height-large',
+        'component-tag-height-large',
+      ],
+      [
+        'component.tag.height.default',
+        '24px',
+        '--fsus-tag-height-default',
+        'component-tag-height-default',
+      ],
+      [
+        'component.tag.height.small',
+        '20px',
+        '--fsus-tag-height-small',
+        'component-tag-height-small',
+      ],
+      [
+        'component.cascader.suggestion.max-height',
+        '204px',
+        '--fsus-cascader-suggestion-max-height',
+        'component-cascader-suggestion-max-height',
+      ],
+    ]
+
+    for (const [name, value, alias, sassName] of expectedTokens) {
+      expect(generatedJson.tokens[name]).toMatchObject({
+        value,
+        aliases: [alias],
+      })
+      expect(tokenSource).toContain(`${alias}: #{generated.$fsus-${sassName}};`)
+    }
+
+    for (const resource of [
+      '<x:Double x:Key="FsusDensitySelectOptionY">34</x:Double>',
+      '<x:Double x:Key="FsusDensityMenuHorizontalY">60</x:Double>',
+      '<x:Double x:Key="FsusComponentTagHeightDefault">24</x:Double>',
+      '<x:Double x:Key="FsusComponentCascaderSuggestionMaxHeight">204</x:Double>',
+    ]) {
+      expect(generatedAvaloniaSource).toContain(resource)
+    }
+    expect(generatedCsharpSource).toContain(
+      'public const string DensityControlActionYValue = "36px";',
+    )
+    expect(generatedCsharpSource).toContain(
+      'public static double DensityControlActionYDouble => 36d;',
+    )
+    expect(generatedCsharpSource).toContain(
+      'public static double DensityIconTargetSmallDouble => 32d;',
+    )
+  })
 })

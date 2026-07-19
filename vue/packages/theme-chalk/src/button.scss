@@ -283,7 +283,7 @@ $button-icon-span-gap: map.merge(
   }
 
   @include when(inline-action) {
-    min-height: 36px;
+    min-height: var(--fsus-control-height-action);
     height: auto;
     padding-inline: 4px;
     white-space: nowrap;
@@ -301,7 +301,7 @@ $button-icon-span-gap: map.merge(
     }
 
     @include when(link) {
-      min-height: 36px;
+      min-height: var(--fsus-control-height-action);
       padding-inline: 4px;
     }
   }

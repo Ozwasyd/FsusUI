@@ -93,7 +93,7 @@ $tag-icon-span-gap: map.merge(
   justify-content: center;
   align-items: center;
   vertical-align: middle;
-  height: var(--fsus-tag-height, 24px);
+  height: var(--fsus-tag-height, var(--fsus-tag-height-default));
   padding: 0 var(--fsus-tag-padding-x, 7px);
 
   font-size: var(--fsus-tag-font-size, var(--el-font-size-extra-small));

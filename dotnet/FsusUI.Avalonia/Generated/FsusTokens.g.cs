@@ -492,6 +492,56 @@ public static class FsusTokens
     public const string DensityControlCompactYValue = "40px";
     public static double DensityControlCompactYDouble => 40d;
 
+    public const string DensitySelectOptionYName = "density.select.option.y";
+    public const string DensitySelectOptionYResourceKey = "FsusDensitySelectOptionY";
+    public const string DensitySelectOptionYValue = "34px";
+    public static double DensitySelectOptionYDouble => 34d;
+
+    public const string DensityControlActionYName = "density.control.action.y";
+    public const string DensityControlActionYResourceKey = "FsusDensityControlActionY";
+    public const string DensityControlActionYValue = "36px";
+    public static double DensityControlActionYDouble => 36d;
+
+    public const string DensityMenuItemYName = "density.menu.item.y";
+    public const string DensityMenuItemYResourceKey = "FsusDensityMenuItemY";
+    public const string DensityMenuItemYValue = "56px";
+    public static double DensityMenuItemYDouble => 56d;
+
+    public const string DensityMenuHorizontalYName = "density.menu.horizontal.y";
+    public const string DensityMenuHorizontalYResourceKey = "FsusDensityMenuHorizontalY";
+    public const string DensityMenuHorizontalYValue = "60px";
+    public static double DensityMenuHorizontalYDouble => 60d;
+
+    public const string DensityIconTargetName = "density.icon.target";
+    public const string DensityIconTargetResourceKey = "FsusDensityIconTarget";
+    public const string DensityIconTargetValue = "40px";
+    public static double DensityIconTargetDouble => 40d;
+
+    public const string DensityIconTargetSmallName = "density.icon.target.small";
+    public const string DensityIconTargetSmallResourceKey = "FsusDensityIconTargetSmall";
+    public const string DensityIconTargetSmallValue = "32px";
+    public static double DensityIconTargetSmallDouble => 32d;
+
+    public const string ComponentTagHeightLargeName = "component.tag.height.large";
+    public const string ComponentTagHeightLargeResourceKey = "FsusComponentTagHeightLarge";
+    public const string ComponentTagHeightLargeValue = "32px";
+    public static double ComponentTagHeightLargeDouble => 32d;
+
+    public const string ComponentTagHeightDefaultName = "component.tag.height.default";
+    public const string ComponentTagHeightDefaultResourceKey = "FsusComponentTagHeightDefault";
+    public const string ComponentTagHeightDefaultValue = "24px";
+    public static double ComponentTagHeightDefaultDouble => 24d;
+
+    public const string ComponentTagHeightSmallName = "component.tag.height.small";
+    public const string ComponentTagHeightSmallResourceKey = "FsusComponentTagHeightSmall";
+    public const string ComponentTagHeightSmallValue = "20px";
+    public static double ComponentTagHeightSmallDouble => 20d;
+
+    public const string ComponentCascaderSuggestionMaxHeightName = "component.cascader.suggestion.max-height";
+    public const string ComponentCascaderSuggestionMaxHeightResourceKey = "FsusComponentCascaderSuggestionMaxHeight";
+    public const string ComponentCascaderSuggestionMaxHeightValue = "204px";
+    public static double ComponentCascaderSuggestionMaxHeightDouble => 204d;
+
     public const string IconSizeMdName = "icon.size.md";
     public const string IconSizeMdResourceKey = "FsusIconSizeMd";
     public const string IconSizeMdValue = "16px";

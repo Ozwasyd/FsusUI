@@ -135,11 +135,19 @@ Quiet Text 为可读文本角色，不得等于 Decorative Gray；Decorative Gra
 - 默认控件高度：`44px`
 - 大号控件高度：`48px`
 - 紧凑控件高度：`40px`
-- Tag 高度 large/default/small = `32/24/20px`，对应 `--fsus-tag-height-{large,default,small}`。
-- 图标按钮触控目标：`40px`
+- 图标按钮触控目标：≥ `40px`；默认使用 `--fsus-icon-target`，紧凑 close affordance 使用 `--fsus-icon-target-small`（`32px`）。
 - 表格默认行内 padding：`12px 0`
 - 表格紧凑行内 padding：`10px 0`
 - 表格大尺寸行内 padding：`14px 0`
+
+| Component role                   | Height       | Token                                             |
+| -------------------------------- | ------------ | ------------------------------------------------- |
+| Select / Dropdown / Cascader row | `34px`       | `--fsus-select-option-height`                     |
+| Inline-table action / add-tab    | `36px`       | `--fsus-control-height-action`                    |
+| Menu vertical item               | `56px`       | `--fsus-menu-item-height`                         |
+| Menu horizontal                  | `60px`       | `--fsus-menu-horizontal-height`                   |
+| Tag（large/default/small）       | `32/24/20px` | `--fsus-tag-height-{large,default,small}`         |
+| Icon target（default/small）     | `40/32px`    | `--fsus-icon-target` / `--fsus-icon-target-small` |
 
 密度只用于表达任务场景，不表达视觉偏好。数据管理、日志、表格操作使用紧凑密度；表单录入和配置页使用默认密度；营销式展示页不应反向污染组件库默认密度。
 
