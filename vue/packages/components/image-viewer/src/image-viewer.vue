@@ -6,6 +6,7 @@
         :tabindex="-1"
         :class="ns.e('wrapper')"
         :style="{ zIndex: computedZIndex }"
+        v-bind="{ 'data-fsus-material': 'glass' }"
       >
         <div :class="ns.e('mask')" @click.self="hideOnClickModal && hide()" />
 

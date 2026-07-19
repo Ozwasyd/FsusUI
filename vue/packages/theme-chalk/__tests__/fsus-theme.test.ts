@@ -195,8 +195,8 @@ describe('Fsus theme visual baseline', () => {
       '--el-dialog-padding-primary: 24px;',
     ])
     expectCssRule(dialogCss, '.el-dialog', [
-      'backdrop-filter: var(--fsus-backdrop-blur-overlay, 0px);',
-      '-webkit-backdrop-filter: var(--fsus-backdrop-blur-overlay, 0px);',
+      'backdrop-filter: blur(var(--fsus-backdrop-blur-overlay, 0px)) saturate(var(--fsus-backdrop-saturate, 100%));',
+      '-webkit-backdrop-filter: blur(var(--fsus-backdrop-blur-overlay, 0px)) saturate(var(--fsus-backdrop-saturate, 100%));',
       'box-shadow: var(--el-dialog-box-shadow);',
     ])
     for (const selector of [
@@ -213,8 +213,8 @@ describe('Fsus theme visual baseline', () => {
       '--el-drawer-padding-primary: var(--fsus-space-6);',
     ])
     expectCssRule(drawerCss, '.el-drawer', [
-      'backdrop-filter: var(--fsus-backdrop-blur-overlay, 0px);',
-      '-webkit-backdrop-filter: var(--fsus-backdrop-blur-overlay, 0px);',
+      'backdrop-filter: blur(var(--fsus-backdrop-blur-overlay, 0px)) saturate(var(--fsus-backdrop-saturate, 100%));',
+      '-webkit-backdrop-filter: blur(var(--fsus-backdrop-blur-overlay, 0px)) saturate(var(--fsus-backdrop-saturate, 100%));',
       'box-shadow: var(--fsus-shadow-panel, none);',
     ])
     for (const selector of [
@@ -228,8 +228,8 @@ describe('Fsus theme visual baseline', () => {
     }
 
     expectCssRule(selectDropdownCss, '.el-select-dropdown', [
-      'backdrop-filter: var(--fsus-backdrop-blur-overlay, 0px);',
-      '-webkit-backdrop-filter: var(--fsus-backdrop-blur-overlay, 0px);',
+      'backdrop-filter: blur(var(--fsus-backdrop-blur-overlay, 0px)) saturate(var(--fsus-backdrop-saturate, 100%));',
+      '-webkit-backdrop-filter: blur(var(--fsus-backdrop-blur-overlay, 0px)) saturate(var(--fsus-backdrop-saturate, 100%));',
     ])
     for (const css of [dialogCss, drawerCss, selectDropdownCss]) {
       expect(css).not.toContain('--el-bg-color-overlay-blur')
@@ -255,6 +255,30 @@ describe('Fsus theme visual baseline', () => {
     ])
     expect(css).not.toMatch(
       /\.el-image-viewer__(?:btn|actions)\s*\{[^}]*(?:-webkit-)?backdrop-filter:/s,
+    )
+  })
+
+  test('keeps loading paper-only and scopes glass to the image viewer mask', () => {
+    const themeCss = compileThemeFile('fsus-theme.scss')
+    const loadingCss = compileThemeFile('loading.scss')
+    const imageViewerCss = compileThemeFile('image-viewer.scss')
+
+    for (const css of [themeCss, loadingCss]) {
+      expectCssRule(css, '.el-loading-mask', [
+        'backdrop-filter: blur(0px) saturate(100%);',
+        '-webkit-backdrop-filter: blur(0px) saturate(100%);',
+      ])
+    }
+
+    for (const css of [themeCss, imageViewerCss]) {
+      expectCssRule(css, '.el-image-viewer__mask', [
+        'backdrop-filter: blur(var(--fsus-backdrop-blur-overlay, 0px)) saturate(var(--fsus-backdrop-saturate, 100%));',
+        '-webkit-backdrop-filter: blur(var(--fsus-backdrop-blur-overlay, 0px)) saturate(var(--fsus-backdrop-saturate, 100%));',
+      ])
+    }
+
+    expect(themeCss).not.toMatch(
+      /--fsus-backdrop-blur(?:-soft|-overlay)?,\s*(?:12|24)px/,
     )
   })
 

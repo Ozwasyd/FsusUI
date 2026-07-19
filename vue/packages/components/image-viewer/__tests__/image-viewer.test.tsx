@@ -17,6 +17,7 @@ describe('<image-viewer />', () => {
     await doubleWait()
     const viewer = wrapper.find('.el-image-viewer__wrapper')
     expect(viewer.exists()).toBe(true)
+    expect(viewer.attributes('data-fsus-material')).toBe('glass')
     await wrapper.find('.el-image-viewer__close').trigger('click')
     expect(wrapper.emitted('close')).toEqual([[]])
     wrapper.unmount()

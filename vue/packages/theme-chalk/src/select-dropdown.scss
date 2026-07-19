@@ -29,8 +29,10 @@ $checked-icon: "data:image/svg+xml;utf8,%3Csvg class='icon' width='200' height='
   z-index: calc(#{getCssVar('index-top')} + 1);
   border-radius: getCssVar('select-dropdown', 'border-radius');
   background-color: getCssVar('select-dropdown', 'bg-color');
-  backdrop-filter: var(--fsus-backdrop-blur-overlay, 0px);
-  -webkit-backdrop-filter: var(--fsus-backdrop-blur-overlay, 0px);
+  backdrop-filter: blur(var(--fsus-backdrop-blur-overlay, 0px))
+    saturate(var(--fsus-backdrop-saturate, 100%));
+  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur-overlay, 0px))
+    saturate(var(--fsus-backdrop-saturate, 100%));
   box-shadow: getCssVar('select-dropdown', 'shadow');
   border: getCssVar('select-dropdown', 'border');
   overflow: hidden;

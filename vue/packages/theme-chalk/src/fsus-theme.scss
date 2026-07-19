@@ -30,8 +30,10 @@
   border: 1px solid var(--el-border-color-light);
   @include fsus-geometry($geometry);
   box-shadow: var(--fsus-shadow-floating);
-  backdrop-filter: blur(var(--fsus-backdrop-blur));
-  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur));
+  backdrop-filter: blur(var(--fsus-backdrop-blur, 0px))
+    saturate(var(--fsus-backdrop-saturate, 100%));
+  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur, 0px))
+    saturate(var(--fsus-backdrop-saturate, 100%));
 }
 
 @mixin fsus-control($geometry: control) {
@@ -1158,10 +1160,12 @@ button.#{$namespace}-card:active {
   border: 2px solid var(--el-bg-color);
 }
 
-// 模态层：毛玻璃效果由全局 token 控制，避免各浮层重复裸写。
+// 模态层默认是 paper scrim；只有显式 glass material 作用域会提供非零 token。
 .#{$namespace}-overlay {
-  backdrop-filter: blur(var(--fsus-backdrop-blur-overlay));
-  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur-overlay));
+  backdrop-filter: blur(var(--fsus-backdrop-blur-overlay, 0px))
+    saturate(var(--fsus-backdrop-saturate, 100%));
+  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur-overlay, 0px))
+    saturate(var(--fsus-backdrop-saturate, 100%));
   background-color: var(--fsus-component-overlay-scrim) !important;
 }
 
@@ -1216,8 +1220,10 @@ button.#{$namespace}-card:active {
 .#{$namespace}-color-picker__panel,
 .#{$namespace}-tooltip-v2__content {
   background: var(--el-bg-color-overlay);
-  backdrop-filter: blur(var(--fsus-backdrop-blur));
-  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur));
+  backdrop-filter: blur(var(--fsus-backdrop-blur, 0px))
+    saturate(var(--fsus-backdrop-saturate, 100%));
+  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur, 0px))
+    saturate(var(--fsus-backdrop-saturate, 100%));
   border: 1px solid var(--el-border-color-light);
   border-radius: var(--fsus-radius-popover);
   box-shadow: var(--fsus-shadow-panel-light);
@@ -1366,9 +1372,12 @@ button.#{$namespace}-card:active {
 }
 
 .#{$namespace}-loading-mask {
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(var(--fsus-backdrop-blur-soft, 12px));
-  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur-soft, 12px));
+  background: var(
+    --fsus-surface-overlay,
+    var(--el-mask-color, rgba(255, 255, 255, 0.98))
+  );
+  backdrop-filter: blur(0px) saturate(100%);
+  -webkit-backdrop-filter: blur(0px) saturate(100%);
 }
 
 .#{$namespace}-loading-spinner {
@@ -2652,14 +2661,14 @@ button.#{$namespace}-card:active {
 }
 
 // ─── ImageViewer ────────────────────────────────────────────────────────────
-// 遮罩：深色系毛玻璃（纯黑纱 → 深暖黑 + backdrop-filter）
+// 遮罩：仅在 ImageViewer 自身声明 glass material 时启用模糊。
 .#{$namespace}-image-viewer__mask {
   opacity: 1;
   background: rgba(5, 5, 5, 0.78);
-  backdrop-filter: blur(var(--fsus-backdrop-blur, 24px))
-    saturate(var(--fsus-backdrop-saturate, 120%));
-  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur, 24px))
-    saturate(var(--fsus-backdrop-saturate, 120%));
+  backdrop-filter: blur(var(--fsus-backdrop-blur-overlay, 0px))
+    saturate(var(--fsus-backdrop-saturate, 100%));
+  -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur-overlay, 0px))
+    saturate(var(--fsus-backdrop-saturate, 100%));
 }
 
 // 操作按钮（close / prev / next）：fsus-floating 风格，去除硬编码深灰背景与白边

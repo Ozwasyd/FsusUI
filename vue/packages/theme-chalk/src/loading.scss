@@ -19,9 +19,12 @@
 @include b(loading-mask) {
   position: absolute;
   z-index: 2000;
-  background-color: getCssVar('mask-color');
-  backdrop-filter: blur(var(--el-overlay-soft-backdrop-blur, 0px));
-  -webkit-backdrop-filter: blur(var(--el-overlay-soft-backdrop-blur, 0px));
+  background-color: var(
+    --fsus-surface-overlay,
+    var(--el-mask-color, rgba(255, 255, 255, 0.98))
+  );
+  backdrop-filter: blur(0px) saturate(100%);
+  -webkit-backdrop-filter: blur(0px) saturate(100%);
   margin: 0;
   top: 0;
   right: 0;

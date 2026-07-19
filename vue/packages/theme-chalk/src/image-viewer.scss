@@ -147,6 +147,10 @@
     left: 0;
     opacity: 1;
     background: var(--fsus-image-viewer-overlay-bg, rgba(0, 0, 0, 0.72));
+    backdrop-filter: blur(var(--fsus-backdrop-blur-overlay, 0px))
+      saturate(var(--fsus-backdrop-saturate, 100%));
+    -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur-overlay, 0px))
+      saturate(var(--fsus-backdrop-saturate, 100%));
   }
 }
 

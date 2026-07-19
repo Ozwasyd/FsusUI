@@ -175,6 +175,8 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 - Overlay surface 与 mask/scrim 是不同角色：浮层纸面使用 `--fsus-surface-overlay`，遮罩统一使用 `--fsus-component-overlay-scrim`，不得互相代替。
 - 默认不使用背景模糊：`--fsus-backdrop-blur`、`--fsus-backdrop-blur-soft` 和 `--fsus-backdrop-blur-overlay` 均为 `0px`。
 - 毛玻璃是 opt-in material，仅通过 `.is-glass` 或 `[data-fsus-material='glass']` 用于有明确悬浮层语义的场景。
+- Loading mask 是 paper overlay：Light / Dark 均固定为 `blur(0px) saturate(100%)`，不继承 glass material，默认 spinner 也不使用 shimmer 或 pulse。
+- ImageViewer dark mask 是唯一公开的 glass mask 例外：wrapper 由组件自身声明 `[data-fsus-material='glass']`，mask 只消费该作用域内的 overlay blur；缺少 token 时必须回落到 `blur(0px) saturate(100%)`。
 - 阅读表面（`[data-fsus-surface='reading']`）必须保持 paper/document feel，不使用 blur、glow 或 motion trail。
 
 ### Shadow
