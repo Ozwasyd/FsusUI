@@ -636,7 +636,7 @@
 
       span {
         opacity: 0;
-        transition: opacity 0.15s linear;
+        transition: opacity var(--fsus-motion-control-fast, 140ms) linear;
       }
 
       &:not(:first-child) {

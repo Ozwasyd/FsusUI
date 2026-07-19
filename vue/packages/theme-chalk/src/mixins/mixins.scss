@@ -38,7 +38,7 @@ $E: null;
     }
 
     &-thumb {
-      border-radius: 5px;
+      border-radius: var(--fsus-radius-pill, 999px);
       width: 6px;
       background: $scrollbar-thumb-background;
     }
@@ -59,7 +59,10 @@ $E: null;
 }
 
 // A11y
-@mixin a11y-focus-ring($offset: 1px, $radius: 0px) {
+@mixin a11y-focus-ring(
+  $offset: var(--fsus-focus-ring-width, 2px),
+  $radius: 0px
+) {
   outline: none !important;
   box-shadow: inset 0 0 0 #{$offset}
     var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;

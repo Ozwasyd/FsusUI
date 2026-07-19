@@ -200,7 +200,8 @@ $slider-height: map.merge(
     .#{$namespace}-slider__bar {
       width: getCssVar('slider-height');
       height: auto;
-      border-radius: 0 0 3px 3px;
+      border-radius: 0 0 getCssVar('slider-border-radius')
+        getCssVar('slider-border-radius');
     }
     .#{$namespace}-slider__button-wrapper {
       top: auto;

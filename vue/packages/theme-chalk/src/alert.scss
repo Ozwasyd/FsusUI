@@ -118,7 +118,7 @@
     position: absolute;
     top: 12px;
     right: 12px;
-    transition: opacity 0.2s;
+    transition: opacity var(--fsus-motion-control, 220ms);
 
     &:hover {
       opacity: 1;

@@ -69,6 +69,7 @@
   --fsus-radius-floating: #{generated.$fsus-radius-surface-md};
   --fsus-radius-popover: #{generated.$fsus-radius-surface-sm};
   --fsus-radius-pill: #{generated.$fsus-radius-pill};
+  --fsus-focus-ring-width: #{generated.$fsus-thickness-focus-md};
 
   --fsus-space-1: #{generated.$fsus-space-1};
   --fsus-space-2: #{generated.$fsus-space-2};
@@ -130,7 +131,7 @@
   --fsus-motion-scroll-blur: 0px;
   --fsus-motion-scroll-offset: 2px;
   --fsus-motion-scroll-max-offset: 4px;
-  --fsus-motion-scroll-settle: 120ms;
+  --fsus-motion-scroll-settle: #{generated.$fsus-motion-duration-control-fast};
   --fsus-motion-scroll-trail-opacity: 0;
   --fsus-motion-drag-max-offset: 4px;
   --fsus-motion-drag-blur: 0px;

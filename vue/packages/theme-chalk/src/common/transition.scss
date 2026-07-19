@@ -66,8 +66,8 @@
 
 .#{$namespace}-zoom-in-top-leave-active {
   transition:
-    opacity 120ms ease-in,
-    transform 120ms ease-in;
+    opacity var(--fsus-motion-control-fast, 140ms) ease-in,
+    transform var(--fsus-motion-control-fast, 140ms) ease-in;
 }
 
 .#{$namespace}-zoom-in-top-enter-from {

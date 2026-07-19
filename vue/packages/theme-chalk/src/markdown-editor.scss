@@ -88,7 +88,8 @@
     border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
     background: getCssVar('bg-color');
     box-shadow: var(--fsus-shadow-subtle, 0 10px 24px rgb(0 0 0 / 8%));
-    animation: markdown-editor-command-tray-in 160ms ease-out;
+    animation: markdown-editor-command-tray-in
+      var(--fsus-motion-control-fast, 140ms) ease-out;
   }
 
   @include e((command, command-more, mode, action)) {

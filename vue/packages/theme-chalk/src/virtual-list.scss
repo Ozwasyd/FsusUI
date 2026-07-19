@@ -17,7 +17,10 @@
     --fsus-interactive-motion-scale: 1;
     --fsus-interactive-motion-trail-opacity: 0;
     --fsus-interactive-motion-edge-size: 32px;
-    --fsus-interactive-motion-settle: var(--fsus-motion-scroll-settle, 120ms);
+    --fsus-interactive-motion-settle: var(
+      --fsus-motion-scroll-settle,
+      var(--fsus-motion-control-fast, 140ms)
+    );
 
     position: relative;
     overflow: hidden;
@@ -45,8 +48,13 @@
       pointer-events: none;
       opacity: 0;
       transition:
-        opacity 90ms var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
-        transform var(--fsus-interactive-motion-settle, 120ms)
+        opacity var(--fsus-motion-control-fast, 140ms)
+          var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+        transform
+          var(
+            --fsus-interactive-motion-settle,
+            var(--fsus-motion-control-fast, 140ms)
+          )
           var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));
     }
 

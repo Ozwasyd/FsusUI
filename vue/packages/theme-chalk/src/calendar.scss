@@ -49,13 +49,17 @@
       box-shadow: none;
       font-weight: 500;
       transition:
-        background-color var(--fsus-calendar-cell-duration, 180ms)
+        background-color
+          var(--fsus-calendar-cell-duration, var(--fsus-motion-control, 220ms))
           var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
-        color var(--fsus-calendar-cell-duration, 180ms)
+        color
+          var(--fsus-calendar-cell-duration, var(--fsus-motion-control, 220ms))
           var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
-        box-shadow var(--fsus-calendar-cell-duration, 180ms)
+        box-shadow
+          var(--fsus-calendar-cell-duration, var(--fsus-motion-control, 220ms))
           var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
-        transform var(--fsus-calendar-cell-duration, 180ms)
+        transform
+          var(--fsus-calendar-cell-duration, var(--fsus-motion-control, 220ms))
           var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
 
       &:hover,
@@ -172,11 +176,14 @@
     border-right: getCssVar('calendar', 'border');
     vertical-align: top;
     transition:
-      background-color var(--fsus-calendar-cell-duration, 180ms)
+      background-color
+        var(--fsus-calendar-cell-duration, var(--fsus-motion-control, 220ms))
         var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
-      color var(--fsus-calendar-cell-duration, 180ms)
+      color
+        var(--fsus-calendar-cell-duration, var(--fsus-motion-control, 220ms))
         var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
-      box-shadow var(--fsus-calendar-cell-duration, 180ms)
+      box-shadow
+        var(--fsus-calendar-cell-duration, var(--fsus-motion-control, 220ms))
         var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
 
     @include when(selected) {
@@ -206,11 +213,14 @@
     height: getCssVar('calendar', 'cell-width');
     border-radius: var(--fsus-radius-control, 6px);
     transition:
-      background-color var(--fsus-calendar-cell-duration, 180ms)
+      background-color
+        var(--fsus-calendar-cell-duration, var(--fsus-motion-control, 220ms))
         var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
-      box-shadow var(--fsus-calendar-cell-duration, 180ms)
+      box-shadow
+        var(--fsus-calendar-cell-duration, var(--fsus-motion-control, 220ms))
         var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
-      transform var(--fsus-calendar-cell-duration, 180ms)
+      transform
+        var(--fsus-calendar-cell-duration, var(--fsus-motion-control, 220ms))
         var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
 
     &:hover {

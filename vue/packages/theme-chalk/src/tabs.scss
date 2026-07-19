@@ -38,9 +38,10 @@
     font-size: 12px;
     color: getCssVar('text-color', 'primary');
     cursor: pointer;
-    transition: border-color 0.15s,
-      color 0.15s,
-      background-color 0.15s;
+    transition:
+      border-color var(--fsus-motion-control-fast, 140ms),
+      color var(--fsus-motion-control-fast, 140ms),
+      background-color var(--fsus-motion-control-fast, 140ms);
 
     .is-icon-plus {
       height: inherit;

@@ -240,7 +240,7 @@ $checkbox-bordered-input-width: map.merge(
       top: 1px;
       transform: rotate(45deg) scaleY(0);
       width: 3px;
-      transition: transform 0.15s ease-in 0.05s;
+      transition: transform var(--fsus-motion-control-fast, 140ms) ease-in;
       transform-origin: center;
     }
   }

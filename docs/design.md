@@ -129,6 +129,7 @@ Quiet Text 为可读文本角色，不得等于 Decorative Gray；Decorative Gra
 | Pill             | `999px` | `--fsus-radius-pill`, `--el-border-radius-round`   | Badge、圆形图标按钮、胶囊标签        |
 
 主题 Sass 只通过 `control`、`navigation`、`panel`、`expressive` 四类几何预算分配默认半径；`pill` 仅用于真实胶囊或圆形控件。`expressive` 必须位于 `.is-expressive-surface` 或 `[data-fsus-surface='expressive']` 显式语义上下文中，不能作为普通 Notification、Upload、Dialog 或 Drawer 的默认外观。
+普通组件不得直接声明标度外的 `border-radius` 字面值；内部几何必须复用上表 token，不通过 `2px`、`3px` 或 `5px` 创建局部档位。
 
 ### Density
 
@@ -214,6 +215,7 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 - 控件 Hover 位移不超过 `translateY(-1px)`。
 - 面板进入位移在 `8px` 到 `20px` 之间。
 - 禁止弹跳、过冲和循环装饰动画。
+- 普通组件状态的 duration fallback 只能使用 `140 / 220 / 300 / 360ms` 四档 public token；不得在组件 SCSS 中创建 `90 / 120 / 160 / 180 / 240 / 250 / 280 / 320 / 400 / 500ms` 中间档位。显式 opt-in 的连续功能动画依照独立 component token，不属于普通状态 transition。
 - 必须支持 `prefers-reduced-motion: reduce`，将非必要动画降至 `1ms` 或移除 transform。
 
 ### Rationale

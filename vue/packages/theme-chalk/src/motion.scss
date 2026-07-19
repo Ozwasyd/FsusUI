@@ -3,7 +3,10 @@
 @use 'mixins/config' as *;
 
 :root {
-  --fsus-view-transition-duration: var(--fsus-motion-duration-route, 240ms);
+  --fsus-view-transition-duration: var(
+    --fsus-motion-duration-route,
+    var(--fsus-motion-overlay, 300ms)
+  );
   --fsus-view-transition-shared-duration: var(--fsus-motion-panel, 360ms);
   --fsus-view-transition-easing: var(
     --fsus-motion-decel,
@@ -186,8 +189,8 @@
 
 .#{$namespace}-zoom-in-top-leave-active {
   transition:
-    opacity 120ms ease-in,
-    transform 120ms ease-in;
+    opacity var(--fsus-motion-control-fast, 140ms) ease-in,
+    transform var(--fsus-motion-control-fast, 140ms) ease-in;
   transform-origin: top left;
   will-change: opacity, transform;
 }

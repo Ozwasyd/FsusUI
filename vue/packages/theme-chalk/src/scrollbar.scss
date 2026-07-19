@@ -18,7 +18,10 @@
   --fsus-interactive-motion-trail-opacity: 0;
   --fsus-interactive-motion-edge-size: 32px;
   --fsus-interactive-motion-thumb-spread: 0px;
-  --fsus-interactive-motion-settle: var(--fsus-motion-scroll-settle, 120ms);
+  --fsus-interactive-motion-settle: var(
+    --fsus-motion-scroll-settle,
+    var(--fsus-motion-control-fast, 140ms)
+  );
   --fsus-scrollbar-track-edge-gap: var(--fsus-space-2, 8px);
   --fsus-scrollbar-track-cross-gap: var(--fsus-space-1, 4px);
 
@@ -41,7 +44,11 @@
       height var(--fsus-motion-control-fast, 140ms)
         var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
       opacity 80ms var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
-      transform var(--fsus-interactive-motion-settle, 120ms)
+      transform
+        var(
+          --fsus-interactive-motion-settle,
+          var(--fsus-motion-control-fast, 140ms)
+        )
         var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));
   }
 
@@ -123,7 +130,8 @@
       getCssVar('transition-duration') background-color,
       transform var(--fsus-motion-control-fast, 140ms)
         var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1)),
-      box-shadow 90ms var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
+      box-shadow var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
     opacity: var(
       #{getCssVarName('scrollbar-opacity')},
       map.get($scrollbar, 'opacity')
@@ -206,7 +214,11 @@
       transform: translate3d(0, 0, 0);
       transition:
         filter 1ms linear,
-        transform var(--fsus-interactive-motion-settle, 120ms)
+        transform
+          var(
+            --fsus-interactive-motion-settle,
+            var(--fsus-motion-control-fast, 140ms)
+          )
           var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1));
       will-change: transform;
     }
@@ -274,7 +286,7 @@
   }
 
   &-leave-active {
-    transition: opacity 120ms ease-out;
+    transition: opacity var(--fsus-motion-control-fast, 140ms) ease-out;
   }
 
   &-enter-from,

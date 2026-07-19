@@ -27,7 +27,7 @@
   }
 
   @include e(body) {
-    border-radius: 2px;
+    border-radius: var(--fsus-radius-control, 6px);
     border: 1px solid getCssVar('datepicker-border-color');
   }
 }

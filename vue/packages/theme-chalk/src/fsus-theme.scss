@@ -431,12 +431,26 @@ html.dark {
 .#{$namespace}-color-picker__trigger {
   min-height: 44px;
 
-  &:hover,
+  &:hover {
+    background: var(--el-bg-color);
+    border-color: var(--fsus-scholarly-blue);
+  }
+
   &.is-focus,
   &:focus-within {
     background: var(--el-bg-color);
     border-color: var(--fsus-scholarly-blue);
-    box-shadow: inset 0 0 0 1.5px var(--fsus-scholarly-blue) !important;
+    box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px)
+      var(--fsus-scholarly-blue) !important;
+  }
+}
+
+.#{$namespace}-select:not(.is-disabled) .#{$namespace}-input__wrapper {
+  &.is-focus,
+  &:focus-within {
+    border-color: var(--fsus-scholarly-blue);
+    box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px)
+      var(--fsus-scholarly-blue) !important;
   }
 }
 
@@ -448,7 +462,11 @@ html.dark {
   &:focus {
     background: var(--el-bg-color);
     border-color: var(--fsus-scholarly-blue);
-    box-shadow: inset 0 0 0 1.5px var(--fsus-scholarly-blue) !important;
+  }
+
+  &:focus-visible {
+    box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px)
+      var(--fsus-scholarly-blue) !important;
   }
 }
 
@@ -490,8 +508,8 @@ html.dark {
     align-items: center;
     justify-content: center;
     transition:
-      background-color 0.2s,
-      color 0.2s;
+      background-color var(--fsus-motion-control, 220ms),
+      color var(--fsus-motion-control, 220ms);
 
     &:hover {
       background: var(--el-fill-color);
@@ -1910,7 +1928,7 @@ button.#{$namespace}-card:active {
 .#{$namespace}-tabs__active-bar {
   background-color: var(--fsus-scholarly-blue);
   height: 2px;
-  border-radius: 2px;
+  border-radius: var(--fsus-radius-pill, 999px);
 }
 
 .#{$namespace}-tabs__item {
@@ -2644,7 +2662,7 @@ button.#{$namespace}-card:active {
 
 .#{$namespace}-link {
   font-weight: 500;
-  transition: color 0.2s;
+  transition: color var(--fsus-motion-control, 220ms);
 
   &:hover {
     color: var(--fsus-scholarly-blue);

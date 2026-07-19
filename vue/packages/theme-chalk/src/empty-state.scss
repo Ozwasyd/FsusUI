@@ -37,7 +37,7 @@
     height: 88%;
     box-sizing: border-box;
     border: 1px solid var(--el-empty-state-illustration-border);
-    border-radius: 2px;
+    border-radius: var(--fsus-radius-control-small, 4px);
     background: transparent;
 
     &::before {
