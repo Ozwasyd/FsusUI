@@ -270,7 +270,7 @@
 
 .#{$namespace}-scrollbar-fade {
   &-enter-active {
-    transition: opacity 340ms ease-out;
+    transition: opacity var(--fsus-motion-panel, 360ms) ease-out;
   }
 
   &-leave-active {
@@ -280,5 +280,12 @@
   &-enter-from,
   &-leave-active {
     opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .#{$namespace}-scrollbar-fade-enter-active,
+  .#{$namespace}-scrollbar-fade-leave-active {
+    transition-duration: 1ms !important;
   }
 }

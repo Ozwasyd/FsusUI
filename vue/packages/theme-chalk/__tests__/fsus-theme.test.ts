@@ -1637,6 +1637,21 @@ describe('Fsus theme visual baseline', () => {
     ])
   })
 
+  test('keeps scrollbar fade motion tokenized and reduced-motion safe', () => {
+    const scrollbarCss = compileThemeFile('scrollbar.scss')
+
+    expectCssRule(scrollbarCss, '.el-scrollbar-fade-enter-active', [
+      'transition: opacity var(--fsus-motion-panel, 360ms) ease-out;',
+    ])
+    expect(scrollbarCss).not.toContain('340ms')
+    expect(scrollbarCss).toContain('@media (prefers-reduced-motion: reduce)')
+    expectCssRule(
+      scrollbarCss,
+      '.el-scrollbar-fade-enter-active, .el-scrollbar-fade-leave-active',
+      ['transition-duration: 1ms !important;'],
+    )
+  })
+
   test('keeps virtual items off individual compositor layers while scrolling', () => {
     const css = compileThemeFile('virtual-list.scss')
     const itemRule = css.match(/\.el-vl__inner > \*\s*\{([^}]*)\}/)?.[1] ?? ''
