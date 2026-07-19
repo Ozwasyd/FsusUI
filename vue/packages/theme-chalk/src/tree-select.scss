@@ -8,8 +8,13 @@
 
 @include b(tree-select) {
   @include e(popper) {
+    --el-tree-select-row-height: 44px;
+    --el-tree-select-row-radius: var(--fsus-radius-navigation, 6px);
+    --el-tree-select-row-expand-size: 32px;
+    --el-tree-select-row-content-padding: 12px;
+
     &.#{$namespace}-popper {
-      background: getCssVar('bg-color') !important;
+      background: getCssVar('bg-color');
       border: 1px solid getCssVar('border-color-light');
       box-shadow:
         inset 0 1px 0 var(--fsus-highlight),
@@ -22,64 +27,84 @@
       padding: 6px;
     }
 
-    // TreeSelect uses the tree row itself as the single interaction surface.
+    // The Tree node content is TreeSelect's internal row primitive. It owns
+    // indentation (from Tree's inline padding), controls, content and states.
     .#{$namespace}-tree-node__content {
-      height: 44px !important; // 统一 44px
-      min-height: 44px;
-      background: transparent !important;
-      display: flex;
+      display: grid;
+      grid-template-columns:
+        var(--el-tree-select-row-expand-size) auto auto
+        minmax(0, 1fr);
       align-items: center;
+      height: var(--el-tree-select-row-height);
+      min-height: var(--el-tree-select-row-height);
       margin: 2px 0;
-      padding-right: 0 !important;
-      border-radius: 12px;
+      padding-right: var(--el-tree-select-row-content-padding);
+      border-radius: var(--el-tree-select-row-radius);
       box-sizing: border-box;
+      background: transparent;
       color: getCssVar('text-color', 'regular');
       overflow: hidden;
 
       &:hover {
-        background: transparent !important;
-        box-shadow: none !important;
+        background: var(--fsus-state-hover-bg);
         color: var(--fsus-scholarly-blue);
+      }
+
+      > .#{$namespace}-tree-node__expand-icon {
+        grid-column: 1;
+      }
+
+      > .#{$namespace}-checkbox {
+        grid-column: 2;
+        margin-right: 0;
+      }
+
+      > .#{$namespace}-tree-node__loading-icon {
+        grid-column: 3;
+        margin-right: 0;
+      }
+
+      > .#{$namespace}-select-dropdown__item {
+        grid-column: 4;
       }
     }
 
     .#{$namespace}-tree-node__expand-icon {
-      flex: 0 0 32px;
-      width: 32px;
-      height: 100%;
+      width: var(--el-tree-select-row-expand-size);
+      height: var(--el-tree-select-row-height);
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 0 !important;
-      margin: 0 !important;
-      position: relative;
-      z-index: 1;
-      opacity: 0 !important;
+      color: getCssVar('tree-expand-icon-color');
+      opacity: 1;
     }
 
+    // Select's option remains the semantic content/click target, while the
+    // TreeSelect row is the only owner of geometry and visual state.
     .#{$namespace}-select-dropdown__item {
-      flex: 1;
       min-width: 0;
-      height: 100% !important;
-      padding: 0 12px !important;
-      margin: 0 !important;
-      border-radius: 0 !important;
+      width: auto;
+      height: auto;
+      min-height: 0;
+      padding: 0 0 0 var(--el-tree-select-row-content-padding);
+      margin: 0;
+      border-radius: 0;
       display: flex;
       align-items: center;
-      background: transparent !important;
-      box-shadow: none !important;
-      color: inherit !important;
+      background: transparent;
+      box-shadow: none;
+      color: inherit;
       font-weight: inherit;
-      outline: none !important;
-      position: relative;
-      z-index: 0;
-      overflow: hidden !important;
+      outline: none;
+      overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
 
       span {
-        position: relative;
-        z-index: 1;
+        min-width: 0;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -87,63 +112,30 @@
 
       &::before,
       &::after {
-        content: none !important;
-        display: none !important;
-        width: 0 !important;
-        height: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
+        content: none;
       }
 
       &:hover,
-      &.hover {
-        background: transparent !important;
-        outline: none !important;
-        box-shadow: none !important;
-        color: inherit !important;
+      &.hover,
+      &.selected {
+        background: transparent;
+        box-shadow: none;
+        color: inherit;
+        font-weight: inherit;
+        outline: none;
       }
     }
 
-    .#{$namespace}-tree-node__content
-      > .#{$namespace}-tree-node__expand-icon
-      + .#{$namespace}-select-dropdown__item {
-      margin-left: -32px !important;
-      padding-left: 44px !important;
-    }
-
-    .#{$namespace}-tree-node.is-current > .#{$namespace}-tree-node__content {
-      background: transparent !important;
-      color: var(--fsus-scholarly-blue) !important;
-      font-weight: 700;
-      box-shadow: none;
-    }
-
-    .#{$namespace}-tree-node.is-current
-      > .#{$namespace}-tree-node__content
-      .#{$namespace}-select-dropdown__item {
-      background: transparent !important;
-      box-shadow: none !important;
-      outline: none !important;
-      color: inherit !important;
+    .#{$namespace}-tree
+      .#{$namespace}-tree-node.is-current
+      > .#{$namespace}-tree-node__content {
+      background: var(--fsus-state-selected-bg);
+      color: var(--fsus-scholarly-blue);
       font-weight: inherit;
     }
 
-    .#{$namespace}-tree-node.is-current
-      > .#{$namespace}-tree-node__content
-      .#{$namespace}-select-dropdown__item,
-    .#{$namespace}-tree-node__content:hover
-      > .#{$namespace}-select-dropdown__item,
-    .#{$namespace}-tree-node:focus
-      > .#{$namespace}-tree-node__content
-      .#{$namespace}-select-dropdown__item {
-      background: rgba(42, 89, 156, 0.08) !important;
-      border-radius: 12px !important;
-    }
-
-    .#{$namespace}-tree-node:focus > .#{$namespace}-tree-node__content {
-      background: transparent !important;
-      @include a11y-focus-ring(2px, 12px);
-      color: var(--fsus-scholarly-blue);
+    .#{$namespace}-tree-node:focus-visible > .#{$namespace}-tree-node__content {
+      @include a11y-focus-ring(2px, var(--el-tree-select-row-radius));
     }
   }
 }
