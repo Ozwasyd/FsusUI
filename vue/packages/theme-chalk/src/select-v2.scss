@@ -30,10 +30,7 @@ $input-inline-start: map.get($input-padding-horizontal, 'default') !default;
     cursor: pointer;
     padding: 1px 30px 1px 0;
     border: 1px solid getCssVar('border-color');
-    border-radius: var(
-      --fsus-radius-control-small,
-      var(--el-border-radius-small)
-    );
+    border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
     background-color: getCssVar('fill-color', 'blank');
     transition:
       border-color var(--fsus-motion-control-fast, 160ms)
@@ -56,7 +53,7 @@ $input-inline-start: map.get($input-padding-horizontal, 'default') !default;
       );
       @include a11y-focus-ring(
         2px,
-        var(--fsus-radius-control-small, var(--el-border-radius-small))
+        var(--fsus-radius-control, var(--el-border-radius-base))
       );
     }
 

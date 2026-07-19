@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "96c6969ef06d9856f9b0ada92625bbfaa80ec496",
+    "commitSha": "1e1b9558a66134767e4173e0695a247343dff915",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "92122c4799786d89451d48d8dddd15d89467fd81bbca8f151791dc32de39cf09",
@@ -5835,7 +5835,9 @@
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
-        "vue/packages/theme-chalk/src/markdown-editor.scss"
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
+        "vue/packages/theme-chalk/src/menu.scss",
+        "vue/packages/theme-chalk/src/select-v2.scss"
       ],
       "classification": "portable"
     },
@@ -5850,8 +5852,7 @@
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/markdown-editor.scss",
-        "vue/packages/theme-chalk/src/rate.scss",
-        "vue/packages/theme-chalk/src/select-v2.scss"
+        "vue/packages/theme-chalk/src/rate.scss"
       ],
       "classification": "portable"
     },
@@ -6142,7 +6143,9 @@
       "name": "--el-popover-border-radius",
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
-        "vue/packages/theme-chalk/src/date-picker/picker-panel.scss"
+        "vue/packages/theme-chalk/src/date-picker/picker-panel.scss",
+        "vue/packages/theme-chalk/src/dropdown-menu.scss",
+        "vue/packages/theme-chalk/src/dropdown.scss"
       ],
       "classification": "portable"
     },
@@ -8004,6 +8007,7 @@
         "vue/packages/theme-chalk/src/markdown-renderer.scss",
         "vue/packages/theme-chalk/src/metric-primitives.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss",
+        "vue/packages/theme-chalk/src/select-v2.scss",
         "vue/packages/theme-chalk/src/theme-mode-toggle.scss"
       ],
       "classification": "portable"
@@ -8023,7 +8027,6 @@
         "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/metric-primitives.scss",
         "vue/packages/theme-chalk/src/rate.scss",
-        "vue/packages/theme-chalk/src/select-v2.scss",
         "vue/packages/theme-chalk/src/settings-primitives.scss",
         "vue/packages/theme-chalk/src/tag.scss"
       ],
@@ -8044,6 +8047,7 @@
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
+        "vue/packages/theme-chalk/src/menu.scss",
         "vue/packages/theme-chalk/src/tree-select.scss"
       ],
       "classification": "portable"
@@ -8091,6 +8095,9 @@
       "files": [
         "vue/packages/theme-chalk/src/autocomplete.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
+        "vue/packages/theme-chalk/src/common/var.scss",
+        "vue/packages/theme-chalk/src/dropdown-menu.scss",
+        "vue/packages/theme-chalk/src/dropdown.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/select-dropdown-v2.scss"
       ],

@@ -1041,6 +1041,72 @@ describe('Fsus theme visual baseline', () => {
     )
   })
 
+  test('maps control popup and badge radii to the canonical ladder', () => {
+    const inputCss = compileThemeFile('input.scss')
+    const selectV2Css = compileThemeFile('select-v2.scss')
+    const menuCss = compileThemeFile('menu.scss')
+    const dropdownMenuCss = compileThemeFile('dropdown-menu.scss')
+    const dropdownCss = compileThemeFile('dropdown.scss')
+    const popoverCss = compileThemeFile('popover.scss')
+    const popperCss = compileThemeFile('popper.scss')
+    const badgeCss = compileThemeFile('badge.scss')
+
+    expectCssRule(inputCss, '.el-textarea', [
+      '--el-input-border-radius: var(--el-border-radius-base);',
+    ])
+    expectCssRule(inputCss, '.el-input__wrapper', [
+      'border-radius: var(--el-input-border-radius, var(--el-border-radius-base));',
+    ])
+    expectCssRule(selectV2Css, '.el-select-v2__wrapper', [
+      'border-radius: var(--fsus-radius-control, var(--el-border-radius-base));',
+    ])
+    expectCssRule(selectV2Css, '.el-select-v2__wrapper.is-focused', [
+      'border-radius: var(--fsus-radius-control, var(--el-border-radius-base));',
+    ])
+    expectCssRule(menuCss, '.el-menu-item', [
+      'border-radius: var(--fsus-radius-navigation, var(--el-border-radius-base));',
+    ])
+    expectCssRule(menuCss, '.el-menu-item:focus-visible', [
+      'border-radius: var(--fsus-radius-navigation, var(--el-border-radius-base));',
+    ])
+    for (const css of [dropdownMenuCss, dropdownCss]) {
+      expectCssRule(css, '.el-dropdown-menu', [
+        'border-radius: var(--fsus-radius-popover, var(--el-popover-border-radius));',
+      ])
+    }
+    expectCssRule(popoverCss, '.el-popover', [
+      '--el-popover-border-radius: var(--el-popover-border-radius, var(--fsus-radius-popover));',
+    ])
+    expectCssRule(popoverCss, '.el-popover.el-popper', [
+      'border-radius: var(--el-popover-border-radius);',
+    ])
+    expectCssRule(popperCss, '.el-popper', [
+      '--el-popper-border-radius: var(--el-popover-border-radius);',
+    ])
+    expectCssRule(popperCss, '.el-popper', [
+      'border-radius: var(--el-popper-border-radius);',
+    ])
+    expectCssRule(badgeCss, '.el-badge', [
+      '--el-badge-radius: var(--el-border-radius-round);',
+    ])
+    expectCssRule(badgeCss, '.el-badge__content', [
+      'border-radius: var(--el-badge-radius);',
+    ])
+    expectCssRule(badgeCss, '.el-badge__content.is-dot', [
+      'border-radius: 50%;',
+    ])
+
+    for (const css of [
+      inputCss,
+      selectV2Css,
+      menuCss,
+      dropdownCss,
+      popoverCss,
+    ]) {
+      expect(css).not.toContain('border-radius: 8px;')
+    }
+  })
+
   test('supports component-level motion disablement and dialog scale fade', () => {
     const themeCss = compileThemeFile('fsus-theme.scss')
     const dialogCss = compileThemeFile('dialog.scss')
@@ -1313,7 +1379,7 @@ describe('Fsus theme visual baseline', () => {
     const optionCss = compileThemeFile('option-item.scss')
 
     expectCssRule(selectCss, '.el-select-v2__wrapper', [
-      'border-radius: var(--fsus-radius-control-small, var(--el-border-radius-small));',
+      'border-radius: var(--fsus-radius-control, var(--el-border-radius-base));',
       'transition: border-color var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)), box-shadow var(--fsus-motion-control-fast, 160ms) var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1));',
     ])
     expectCssRule(selectCss, '.el-select-v2__wrapper.is-focused', [

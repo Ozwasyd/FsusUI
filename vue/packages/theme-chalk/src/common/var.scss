@@ -647,7 +647,7 @@ $input: map.merge(
     'focus-border': getCssVar('color-scholarly-blue'),
     'transparent-border': 0 0 0 1px transparent inset,
     'border-color': getCssVar('border-color'),
-    'border-radius': getCssVar('border-radius-small'),
+    'border-radius': getCssVar('border-radius', 'base'),
     'bg-color': getCssVar('fill-color', 'blank'),
     'icon-color': getCssVar('text-color-placeholder'),
     'placeholder-color': getCssVar('text-color-placeholder'),
@@ -965,7 +965,10 @@ $popover: map.merge(
     'padding-large': 24px 32px,
     'title-font-size': 18px,
     'title-text-color': getCssVar('text-color-primary'),
-    'border-radius': getCssVar('border-radius', 'large'),
+    'border-radius': var(
+        #{getCssVarName('popover-border-radius')},
+        var(--fsus-radius-popover)
+      ),
   ),
   $popover
 );
@@ -991,7 +994,7 @@ $select-dropdown: map.merge(
 $popper: () !default;
 $popper: map.merge(
   (
-    'border-radius': var(#{getCssVarName('popover-border-radius')}, 4px),
+    'border-radius': var(#{getCssVarName('popover-border-radius')}),
   ),
   $popper
 );
@@ -1111,7 +1114,7 @@ $badge: () !default;
 $badge: map.merge(
   (
     'bg-color': getCssVar('color-danger'),
-    'radius': 10px,
+    'radius': getCssVar('border-radius', 'round'),
     'font-size': 12px,
     'padding': 6px,
     'size': 18px,

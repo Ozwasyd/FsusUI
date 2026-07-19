@@ -153,7 +153,7 @@ $dropdown-menu-padding-vertical: map.merge(
   margin: 0;
   background-color: getCssVar('bg-color', 'overlay');
   border: none;
-  border-radius: getCssVar('border-radius-base');
+  border-radius: var(--fsus-radius-popover, var(--el-popover-border-radius));
   overflow: hidden;
   box-shadow: none;
   list-style: none;

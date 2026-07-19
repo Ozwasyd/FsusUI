@@ -1,0 +1,5 @@
+@use 'mixins/mixins' as *;
+
+@include b(dropdown-menu) {
+  border-radius: var(--fsus-radius-popover, var(--el-popover-border-radius));
+}
