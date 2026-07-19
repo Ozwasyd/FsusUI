@@ -128,10 +128,10 @@ $text-color: () !default;
 $text-color: map.merge(
   (
     'primary': #0f0f11,
-    'regular': #5f5f68,
-    'secondary': #8e8e93,
-    'placeholder': #a1a1aa,
-    'disabled': #a1a1aa,
+    'regular': var(--fsus-color-text-quiet),
+    'secondary': var(--fsus-color-text-muted),
+    'placeholder': var(--fsus-color-text-muted),
+    'disabled': var(--fsus-color-text-muted),
   ),
   $text-color
 );
@@ -139,9 +139,9 @@ $text-color: map.merge(
 $text-color-dark: () !default;
 $text-color-dark: map.merge(
   (
-    'primary': #fcfcfc,
-    'regular': #a1a1aa,
-    'secondary': #71717a,
+    'primary': #f0f0f4,
+    'regular': var(--fsus-color-text-quiet),
+    'secondary': var(--fsus-color-text-muted),
     'placeholder': #52525b,
     'disabled': #3f3f46,
   ),

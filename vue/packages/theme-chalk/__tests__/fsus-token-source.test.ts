@@ -160,6 +160,7 @@ describe('Fsus token source contracts', () => {
     expect(tokenSource).toContain(
       '--fsus-color-surface-raised: #{generated.$fsus-color-surface-raised-dark};',
     )
+    expect(generatedTokenSource).toContain('$fsus-color-text-quiet: #71717A;')
     expect(generatedTokenSource).toContain(
       '$fsus-color-text-quiet-dark: #A1A1AA;',
     )
@@ -175,6 +176,20 @@ describe('Fsus token source contracts', () => {
       dark: '#71717A',
       highContrast: '#FFFFFF',
     })
+    expect(generatedJson.tokens['color.text.quiet']).toMatchObject({
+      type: 'color',
+      value: '#71717A',
+      modeValues: {
+        dark: '#A1A1AA',
+        highContrast: '#FFFFFF',
+      },
+    })
+    expect(sassVarSource).toMatch(
+      /\$text-color:[\s\S]*?'regular': var\(--fsus-color-text-quiet\),[\s\S]*?'secondary': var\(--fsus-color-text-muted\),[\s\S]*?'placeholder': var\(--fsus-color-text-muted\),[\s\S]*?'disabled': var\(--fsus-color-text-muted\),/,
+    )
+    expect(sassVarSource).toMatch(
+      /\$text-color-dark:[\s\S]*?'primary': #f0f0f4,[\s\S]*?'regular': var\(--fsus-color-text-quiet\),[\s\S]*?'secondary': var\(--fsus-color-text-muted\),/,
+    )
     expect(generatedAvaloniaSource).toContain(
       '<Color x:Key="FsusColorTextQuietDark">#A1A1AA</Color>',
     )

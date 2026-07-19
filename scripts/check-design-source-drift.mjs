@@ -24,6 +24,50 @@ const assertNotIncludes = (content, expected, file) => {
   assert(!content.includes(expected), `${file} must not include ${expected}`)
 }
 
+const resolveTokenValue = (
+  candidate,
+  tokens,
+  mode = 'light',
+  seen = new Set(),
+) => {
+  assert(
+    !seen.has(candidate.name),
+    `Circular token reference at ${candidate.name}`,
+  )
+  seen.add(candidate.name)
+  const rawValue =
+    mode === 'light'
+      ? candidate.value
+      : (candidate.modeValues?.[mode]?.value ?? candidate.value)
+  const reference = /^\{([^}]+)\}$/.exec(rawValue)?.[1]
+  if (!reference) return rawValue
+  const referencedToken = tokens.get(reference)
+  assert(
+    referencedToken,
+    `${candidate.name} references missing token ${reference}`,
+  )
+  return resolveTokenValue(referencedToken, tokens, mode, seen)
+}
+
+const relativeLuminance = (hex) => {
+  const channels = hex
+    .slice(1)
+    .match(/.{2}/g)
+    .map((channel) => Number.parseInt(channel, 16) / 255)
+    .map((channel) =>
+      channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4,
+    )
+  return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2]
+}
+
+const contrastRatio = (foreground, background) => {
+  const foregroundLuminance = relativeLuminance(foreground)
+  const backgroundLuminance = relativeLuminance(background)
+  const lighter = Math.max(foregroundLuminance, backgroundLuminance)
+  const darker = Math.min(foregroundLuminance, backgroundLuminance)
+  return (lighter + 0.05) / (darker + 0.05)
+}
+
 const escapeRegExp = (value) =>
   value.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)
 
@@ -77,6 +121,26 @@ try {
     token('color.text.primary').modeValues?.dark?.value,
     '#F0F0F4',
     'Dark Ink token drift',
+  )
+  const quietTextLight = resolveTokenValue(token('color.text.quiet'), tokens)
+  const decorativeGrayLight = resolveTokenValue(
+    token('color.text.decorative'),
+    tokens,
+  )
+  const paperLight = resolveTokenValue(token('color.surface.base'), tokens)
+  assertEquals(quietTextLight, '#71717A', 'Quiet Text light token drift')
+  assert(
+    quietTextLight !== decorativeGrayLight,
+    'Quiet Text light must not equal Decorative Gray light',
+  )
+  assert(
+    contrastRatio(quietTextLight, paperLight) >= 4.5,
+    'Quiet Text light must meet WCAG AA on Paper',
+  )
+  assertEquals(
+    resolveTokenValue(token('color.text.quiet'), tokens, 'dark'),
+    '#A1A1AA',
+    'Dark Quiet Text token drift',
   )
   assertEquals(
     token('color.surface.base').modeValues?.dark?.value,
@@ -152,11 +216,28 @@ try {
   ]) {
     assertTableRow(design, row, 'docs/design.md')
   }
+  assertTableRow(
+    design,
+    [
+      'Quiet Text',
+      '`#71717A`',
+      '`#A1A1AA`',
+      '`--fsus-color-text-quiet`',
+      '必须可读的低强调说明文字',
+    ],
+    'docs/design.md',
+  )
+  assertTableRow(
+    design,
+    ['Quiet Text', '`#71717A`', '`--fsus-color-text-quiet`', '`#A1A1AA`'],
+    'docs/design.md',
+  )
   for (const expected of [
     'glass/SaaS-first',
     '--fsus-shadow-panel: none',
     'Platform-neutral canonical source',
     '`400`、`500`、`700`',
+    'Quiet Text 为可读文本角色，不得等于 Decorative Gray',
   ]) {
     assertIncludes(design, expected, 'docs/design.md')
   }

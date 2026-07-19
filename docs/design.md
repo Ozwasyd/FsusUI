@@ -80,7 +80,7 @@ FsusUI 的色彩系统围绕 **Ink / Paper / Dot / Scholarly Blue** 展开。颜
 | Ink             | `#0F0F11`             | `#F0F0F4` | `--fsus-ink`, `--el-text-color-primary`                              | 主要文本、品牌字标、Primary Button 默认色 |
 | Paper           | `#FFFFFF` / `#FCFCFC` | `#121214` | `--fsus-paper`, `--el-bg-color`                                      | 控件和浮层表面                            |
 | Page            | `#F7F7F8`             | `#09090B` | `--fsus-page`, `--el-bg-color-page`                                  | 页面背景                                  |
-| Quiet Text      | `#A1A1AA`             | `#A1A1AA` | `--fsus-color-text-quiet`                                            | 必须可读的低强调说明文字                  |
+| Quiet Text      | `#71717A`             | `#A1A1AA` | `--fsus-color-text-quiet`                                            | 必须可读的低强调说明文字                  |
 | Decorative Gray | `#A1A1AA`             | `#71717A` | `--fsus-color-text-decorative`, `--fsus-dot-gray`, `--el-color-info` | 非必要装饰、句点与视觉分隔                |
 | Border          | `#E4E4E7`             | `#27272A` | `--fsus-border`, `--el-border-color`                                 | 默认边框和分隔线                          |
 | Scholarly Blue  | `#2A599C`             | `#4B79CC` | `--fsus-scholarly-blue`                                              | 链接、激活态、Focus Ring、交互 Hover      |
@@ -95,6 +95,8 @@ FsusUI 的色彩系统围绕 **Ink / Paper / Dot / Scholarly Blue** 展开。颜
 ### Rationale
 
 `Scholarly Blue` 选用 `#2A599C` 而非 Element Plus 默认 `#409EFF`，因为后者在长时间阅读的表格、Markdown 编辑器、邮件会话视图里饱和度过高，会与正文抢焦点。暗色下提亮到 `#4B79CC` 是为了在 `--fsus-page: #09090B` 背景上保证 ≥ 4.5:1 的对比度（WCAG AA 正文标准）。`Ink / Paper / Dot / Scholarly Blue` 四个角色互不重叠，确保任何一个组件的视觉差异都能被映射到一个语义角色，而不是临时拼色。
+
+Quiet Text 为可读文本角色，不得等于 Decorative Gray；Decorative Gray 固定为 `#A1A1AA`（light）/ `#71717A`（dark），不用于承载信息的文本。
 
 ## 5. Space, Radius, and Density
 
@@ -445,7 +447,7 @@ body {
 | Paper           | `#FFFFFF` / `#FCFCFC` | `--fsus-paper`, `--el-bg-color`                                      | `#121214` |
 | Page            | `#F7F7F8`             | `--fsus-page`, `--el-bg-color-page`                                  | `#09090B` |
 | Scholarly Blue  | `#2A599C`             | `--fsus-scholarly-blue`                                              | `#4B79CC` |
-| Quiet Text      | `#A1A1AA`             | `--fsus-color-text-quiet`                                            | `#A1A1AA` |
+| Quiet Text      | `#71717A`             | `--fsus-color-text-quiet`                                            | `#A1A1AA` |
 | Decorative Gray | `#A1A1AA`             | `--fsus-color-text-decorative`, `--fsus-dot-gray`, `--el-color-info` | `#71717A` |
 | Raised Surface  | `#F7F7F8`             | `--fsus-color-surface-raised`                                        | `#1A1A1E` |
 | Border          | `#E4E4E7`             | `--fsus-border`, `--el-border-color`                                 | `#27272A` |

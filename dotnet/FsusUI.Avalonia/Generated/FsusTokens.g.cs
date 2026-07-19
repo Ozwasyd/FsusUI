@@ -107,7 +107,7 @@ public static class FsusTokens
 
     public const string ColorTextQuietName = "color.text.quiet";
     public const string ColorTextQuietResourceKey = "FsusColorTextQuiet";
-    public const string ColorTextQuietValue = "#A1A1AA";
+    public const string ColorTextQuietValue = "#71717A";
     public const string ColorTextQuietDarkResourceKey = "FsusColorTextQuietDark";
     public const string ColorTextQuietDarkValue = "#A1A1AA";
     public const string ColorTextQuietHighContrastResourceKey = "FsusColorTextQuietHighContrast";

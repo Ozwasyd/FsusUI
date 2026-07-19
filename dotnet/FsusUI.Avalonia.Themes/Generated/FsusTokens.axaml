@@ -34,8 +34,8 @@
   <SolidColorBrush x:Key="FsusColorTextPrimaryHighContrastBrush" Color="#FFFFFF" />
   <Color x:Key="FsusColorTextMuted">#71717A</Color>
   <SolidColorBrush x:Key="FsusColorTextMutedBrush" Color="#71717A" />
-  <Color x:Key="FsusColorTextQuiet">#A1A1AA</Color>
-  <SolidColorBrush x:Key="FsusColorTextQuietBrush" Color="#A1A1AA" />
+  <Color x:Key="FsusColorTextQuiet">#71717A</Color>
+  <SolidColorBrush x:Key="FsusColorTextQuietBrush" Color="#71717A" />
   <Color x:Key="FsusColorTextQuietDark">#A1A1AA</Color>
   <SolidColorBrush x:Key="FsusColorTextQuietDarkBrush" Color="#A1A1AA" />
   <Color x:Key="FsusColorTextQuietHighContrast">#FFFFFF</Color>
