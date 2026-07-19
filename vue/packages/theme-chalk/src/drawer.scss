@@ -12,8 +12,8 @@ $directions: rtl, ltr, ttb, btt;
   position: absolute;
   box-sizing: border-box;
   background-color: getCssVar('drawer', 'bg-color');
-  backdrop-filter: getCssVar('bg-color', 'overlay-blur');
-  -webkit-backdrop-filter: getCssVar('bg-color', 'overlay-blur');
+  backdrop-filter: var(--fsus-backdrop-blur-overlay, 0px);
+  -webkit-backdrop-filter: var(--fsus-backdrop-blur-overlay, 0px);
   display: flex;
   flex-direction: column;
   box-shadow: var(--fsus-shadow-panel, none);
@@ -27,7 +27,7 @@ $directions: rtl, ltr, ttb, btt;
     color: getCssVar('text-color', 'primary');
     display: flex;
     margin-bottom: 0;
-    padding: getCssVar('drawer-padding-primary');
+    padding: var(--fsus-space-4) getCssVar('drawer-padding-primary');
     position: relative;
 
     & > :first-child {
@@ -46,8 +46,7 @@ $directions: rtl, ltr, ttb, btt;
   }
 
   @include e(footer) {
-    padding: getCssVar('drawer-padding-primary');
-    padding-top: 10px;
+    padding: var(--fsus-space-4) getCssVar('drawer-padding-primary');
     text-align: right;
   }
 
@@ -81,7 +80,7 @@ $directions: rtl, ltr, ttb, btt;
 
   &__body {
     flex: 1;
-    padding: getCssVar('drawer-padding-primary');
+    padding: var(--fsus-space-4) getCssVar('drawer-padding-primary');
     overflow: auto;
     & > * {
       box-sizing: border-box;
@@ -127,7 +126,8 @@ $directions: rtl, ltr, ttb, btt;
 
     @each $direction in $directions {
       .#{$direction} {
-        transition: transform getCssVar('transition-duration')
+        transition: transform
+          getCssVar('transition-duration')
           getCssVar('transition-function-fast-bezier');
       }
     }

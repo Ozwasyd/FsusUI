@@ -234,10 +234,10 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 
 - Dialog 默认宽度 `50%`，默认顶部间距 `15vh`。
 - 面板圆角 `12px`，主 padding `24px`（均见 [§5](#5-space-radius-and-density)）。
-- Header、Body、Footer 共享同一左右内边距，关闭按钮与标题基线保持明确关系。
+- Header、Body、Footer 共享 `24px` 左右内边距和 `16px` 上下内边距，关闭按钮与标题基线保持明确关系。
 - 关闭按钮触控区域 `54px`，Focus Visible 使用圆形 `2px` ring。
 - Overlay 使用半透明 Paper，backdrop blur 默认 `0px`，不变成沉重黑色遮罩。
-- Drawer 与 Dialog 使用同一层级语言：paper material、`12px` 面板圆角、边框优先。
+- Drawer 与 Dialog 使用同一层级语言：paper material、`12px` 面板圆角、`24px` 主 padding、边框优先；默认使用 `--fsus-shadow-panel: none`，不以重阴影制造层级。
 
 ### Table
 

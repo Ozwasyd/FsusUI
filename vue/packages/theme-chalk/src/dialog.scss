@@ -12,8 +12,8 @@
   position: relative;
   margin: var(#{getCssVarName('dialog-margin-top')}, 15vh) auto 50px;
   background: getCssVar('bg-color', 'overlay');
-  backdrop-filter: getCssVar('bg-color', 'overlay-blur');
-  -webkit-backdrop-filter: getCssVar('bg-color', 'overlay-blur');
+  backdrop-filter: var(--fsus-backdrop-blur-overlay, 0px);
+  -webkit-backdrop-filter: var(--fsus-backdrop-blur-overlay, 0px);
   border-radius: getCssVar('dialog', 'border-radius');
   box-shadow: getCssVar('dialog', 'box-shadow');
   box-sizing: border-box;
@@ -54,8 +54,7 @@
   }
 
   @include e(header) {
-    padding: getCssVar('dialog', 'padding-primary');
-    padding-bottom: 10px;
+    padding: var(--fsus-space-4) getCssVar('dialog', 'padding-primary');
     margin-right: 16px;
   }
 
@@ -99,15 +98,13 @@
   }
 
   @include e(body) {
-    padding: calc(#{getCssVar('dialog-padding-primary')} + 10px)
-      getCssVar('dialog-padding-primary');
+    padding: var(--fsus-space-4) getCssVar('dialog-padding-primary');
     color: getCssVar('text-color', 'regular');
     font-size: getCssVar('dialog-content-font-size');
   }
 
   @include e(footer) {
-    padding: getCssVar('dialog-padding-primary');
-    padding-top: 10px;
+    padding: var(--fsus-space-4) getCssVar('dialog-padding-primary');
     text-align: right;
     box-sizing: border-box;
   }

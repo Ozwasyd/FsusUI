@@ -185,6 +185,57 @@ describe('Fsus theme visual baseline', () => {
     ])
   })
 
+  test('keeps dialog drawer and select overlays on the shared paper contract', () => {
+    const dialogCss = compileThemeFile('dialog.scss')
+    const drawerCss = compileThemeFile('drawer.scss')
+    const selectDropdownCss = compileThemeFile('select-dropdown.scss')
+
+    expectCssRule(dialogCss, '.el-dialog', [
+      '--el-dialog-box-shadow: var(--fsus-shadow-panel, none);',
+      '--el-dialog-padding-primary: 24px;',
+    ])
+    expectCssRule(dialogCss, '.el-dialog', [
+      'backdrop-filter: var(--fsus-backdrop-blur-overlay, 0px);',
+      '-webkit-backdrop-filter: var(--fsus-backdrop-blur-overlay, 0px);',
+      'box-shadow: var(--el-dialog-box-shadow);',
+    ])
+    for (const selector of [
+      '.el-dialog__header',
+      '.el-dialog__body',
+      '.el-dialog__footer',
+    ]) {
+      expectCssRule(dialogCss, selector, [
+        'padding: var(--fsus-space-4) var(--el-dialog-padding-primary);',
+      ])
+    }
+
+    expectCssRule(drawerCss, '.el-drawer', [
+      '--el-drawer-padding-primary: var(--fsus-space-6);',
+    ])
+    expectCssRule(drawerCss, '.el-drawer', [
+      'backdrop-filter: var(--fsus-backdrop-blur-overlay, 0px);',
+      '-webkit-backdrop-filter: var(--fsus-backdrop-blur-overlay, 0px);',
+      'box-shadow: var(--fsus-shadow-panel, none);',
+    ])
+    for (const selector of [
+      '.el-drawer__header',
+      '.el-drawer__body',
+      '.el-drawer__footer',
+    ]) {
+      expectCssRule(drawerCss, selector, [
+        'padding: var(--fsus-space-4) var(--el-drawer-padding-primary);',
+      ])
+    }
+
+    expectCssRule(selectDropdownCss, '.el-select-dropdown', [
+      'backdrop-filter: var(--fsus-backdrop-blur-overlay, 0px);',
+      '-webkit-backdrop-filter: var(--fsus-backdrop-blur-overlay, 0px);',
+    ])
+    for (const css of [dialogCss, drawerCss, selectDropdownCss]) {
+      expect(css).not.toContain('--el-bg-color-overlay-blur')
+    }
+  })
+
   test('keeps image viewer controls on the default paper material', () => {
     const css = compileThemeFile('fsus-theme.scss')
     const imageViewerCss = compileThemeFile('image-viewer.scss')

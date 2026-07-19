@@ -845,7 +845,7 @@ $dialog: map.merge(
     'width': 50%,
     'margin-top': 15vh,
     'bg-color': getCssVar('bg-color'),
-    'box-shadow': getCssVar('box-shadow', 'dark'),
+    'box-shadow': var(--fsus-shadow-panel, none),
     'title-font-size': getCssVar('font-size-large'),
     'content-font-size': 14px,
     'font-line-height': getCssVar('font-line-height-primary'),
@@ -1090,7 +1090,7 @@ $drawer: () !default;
 $drawer: map.merge(
   (
     'bg-color': getCssVar('bg-color', 'overlay'),
-    'padding-primary': 32px,
+    'padding-primary': var(--fsus-space-6),
     'border-radius': getCssVar('border-radius', 'large'),
   ),
   $drawer
