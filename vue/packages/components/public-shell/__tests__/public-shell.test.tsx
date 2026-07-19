@@ -602,6 +602,187 @@ describe('PublicShell.vue', () => {
     expect(wrapper.find('.el-public-shell__auth-link').exists()).toBe(false)
   })
 
+  test('keeps inline desktop search compatible and exposes an explicit none mode', () => {
+    const inlineWrapper = mount(PublicShell, {
+      props: {
+        brand: 'Fsus',
+        navItems,
+        searchPlaceholder: 'Search articles',
+      },
+    })
+    const noneWrapper = mount(PublicShell, {
+      props: {
+        brand: 'Fsus',
+        navItems,
+        desktopSearchMode: 'none',
+      },
+    })
+
+    expect(inlineWrapper.attributes('data-desktop-search-mode')).toBe('inline')
+    expect(
+      inlineWrapper.find('.el-public-shell__search--desktop').exists(),
+    ).toBe(true)
+    expect(
+      inlineWrapper.find('.el-public-shell__desktop-search-trigger').exists(),
+    ).toBe(false)
+    expect(noneWrapper.attributes('data-desktop-search-mode')).toBe('none')
+    expect(noneWrapper.find('.el-public-shell__search--desktop').exists()).toBe(
+      false,
+    )
+    expect(
+      noneWrapper.find('.el-public-shell__desktop-search-trigger').exists(),
+    ).toBe(false)
+  })
+
+  test('renders a native desktop trigger and preserves modified navigation', async () => {
+    const wrapper = mount(PublicShell, {
+      attachTo: document.body,
+      props: {
+        brand: 'Fsus',
+        navItems,
+        desktopSearchMode: 'trigger',
+        desktopSearchTriggerLabel: 'Search archive',
+        searchAction: '/search',
+        searchAriaLabel: 'Search site',
+        searchPlaceholder: 'Search articles',
+        spaSearch: true,
+      },
+    })
+    const trigger = wrapper.find<HTMLAnchorElement>(
+      '.el-public-shell__desktop-search-trigger',
+    )
+    const panel = wrapper.find<HTMLElement>(
+      '.el-public-shell__desktop-search-panel',
+    )
+
+    expect(trigger.element.tagName).toBe('A')
+    expect(trigger.attributes('href')).toBe('/search')
+    expect(trigger.text()).toBe('Search archive')
+    expect(trigger.attributes('aria-label')).toBe('Search archive')
+    expect(trigger.attributes('aria-expanded')).toBe('false')
+    expect(trigger.attributes('aria-controls')).toBe(panel.attributes('id'))
+    expect(panel.attributes('aria-hidden')).toBe('true')
+    expect(panel.attributes()).toHaveProperty('inert')
+
+    trigger.element.addEventListener(
+      'click',
+      (event) => event.preventDefault(),
+      {
+        once: true,
+      },
+    )
+    await trigger.trigger('click', { ctrlKey: true })
+    expect(trigger.attributes('aria-expanded')).toBe('false')
+
+    await trigger.trigger('click', { button: 0 })
+    await nextTick()
+
+    expect(trigger.attributes('aria-expanded')).toBe('true')
+    expect(panel.classes()).toContain('is-expanded')
+    expect(panel.attributes('aria-hidden')).toBe('false')
+    expect(panel.attributes()).not.toHaveProperty('inert')
+    expect(panel.find('input').attributes('placeholder')).toBe(
+      'Search articles',
+    )
+    expect(document.activeElement).toBe(panel.find('input').element)
+
+    await panel.find('input').setValue('layout')
+    expect(wrapper.emitted('update:searchQuery')?.at(-1)).toEqual(['layout'])
+    const submit = new Event('submit', { cancelable: true })
+    panel.find('form').element.dispatchEvent(submit)
+    await nextTick()
+    expect(submit.defaultPrevented).toBe(true)
+    expect(wrapper.emitted('search')?.at(-1)).toEqual(['layout'])
+
+    await panel.find('input').trigger('keydown', { key: 'Escape' })
+    await nextTick()
+    expect(trigger.attributes('aria-expanded')).toBe('false')
+    expect(document.activeElement).toBe(trigger.element)
+    wrapper.unmount()
+  })
+
+  test('syncs controlled desktop queries and closes on outside pointer without stealing focus', async () => {
+    const outside = document.createElement('button')
+    outside.type = 'button'
+    outside.textContent = 'Outside action'
+    document.body.append(outside)
+    const wrapper = mount(PublicShell, {
+      attachTo: document.body,
+      props: {
+        brand: 'Fsus',
+        navItems,
+        desktopSearchMode: 'trigger',
+        searchQuery: '',
+      },
+    })
+    const trigger = wrapper.find<HTMLAnchorElement>(
+      '.el-public-shell__desktop-search-trigger',
+    )
+
+    await wrapper.setProps({ searchQuery: 'controlled' })
+    await nextTick()
+    const panel = wrapper.find('.el-public-shell__desktop-search-panel')
+    expect(trigger.attributes('aria-expanded')).toBe('true')
+    expect((panel.find('input').element as HTMLInputElement).value).toBe(
+      'controlled',
+    )
+
+    outside.dispatchEvent(new Event('pointerdown', { bubbles: true }))
+    outside.focus()
+    await nextTick()
+    expect(trigger.attributes('aria-expanded')).toBe('false')
+    expect(document.activeElement).toBe(outside)
+
+    await wrapper.setProps({ desktopSearchMode: 'inline' })
+    expect(
+      wrapper.find('.el-public-shell__desktop-search-trigger').exists(),
+    ).toBe(false)
+    expect(wrapper.find('.el-public-shell__search--desktop').exists()).toBe(
+      true,
+    )
+    wrapper.unmount()
+    outside.remove()
+  })
+
+  test('keeps desktop trigger CSP-safe and server-rendered as a native fallback link', async () => {
+    const html = await renderToString(
+      h(PublicShell, {
+        brand: 'Fsus',
+        navItems,
+        cspSafe: true,
+        desktopSearchMode: 'trigger',
+        desktopSearchTriggerLabel: 'Search archive',
+        searchAction: '/search',
+      }),
+    )
+
+    expect(html).toContain('el-public-shell__desktop-search-trigger')
+    expect(html).toContain('href="/search"')
+    expect(html).not.toMatch(/\sstyle=/u)
+
+    const wrapper = mount(PublicShell, {
+      props: {
+        brand: 'Fsus',
+        navItems,
+        cspSafe: true,
+        desktopSearchMode: 'trigger',
+      },
+    })
+    const trigger = wrapper.find('.el-public-shell__desktop-search-trigger')
+    const panel = wrapper.find('.el-public-shell__desktop-search-panel')
+
+    expect(panel.classes()).toContain('is-csp-hidden')
+    expect(panel.attributes()).toHaveProperty('inert')
+    expect(wrapper.findAll('[style]')).toHaveLength(0)
+
+    await trigger.trigger('click', { button: 0 })
+    await nextTick()
+    expect(panel.classes()).not.toContain('is-csp-hidden')
+    expect(panel.classes()).toContain('is-expanded')
+    expect(panel.attributes()).not.toHaveProperty('inert')
+    expect(wrapper.findAll('[style]')).toHaveLength(0)
+  })
+
   test('supports trigger-based mobile search without replacing desktop search', async () => {
     const wrapper = mount(PublicShell, {
       props: {

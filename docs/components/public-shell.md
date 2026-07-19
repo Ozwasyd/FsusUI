@@ -13,6 +13,12 @@
 
 当同时传入 `auth-label` 与 `auth-href` 时，`ElPublicShell` 会在 desktop actions 与 mobile primary actions 中各渲染一份默认账户入口，并保留 `data-public-nav="auth"`。如果业务完全自定义移动端账户入口，可将 `auth-label` 或 `auth-href` 置空并通过 slot 接管。
 
+Desktop search 由 `desktop-search-mode` 显式选择。默认 `inline` 保留已有常驻
+input；`trigger` 输出指向 `search-action` 的原生链接，并由组件拥有相邻 panel、
+焦点转移、Escape 恢复、外部 pointer 关闭与 reduced-motion；`none` 不输出默认
+desktop search。Mobile search 继续由 `mobile-search-mode` 独立选择，两者不会互相
+打开或关闭。
+
 ## Critical CSS
 
 SSR、AOT 或首帧需要稳定 shell 布局时，可以单独引入 critical artifact：
@@ -48,34 +54,36 @@ import '@ozwasyd/element-plus/dist/fsus.css'
 
 ## API
 
-| 属性名                      | 说明                                                     | 类型                                       | 默认值               |
-| --------------------------- | -------------------------------------------------------- | ------------------------------------------ | -------------------- |
-| brand                       | 品牌文本                                                 | `string`                                   | `''`                 |
-| brand-href                  | 品牌链接                                                 | `string`                                   | `/`                  |
-| nav-items                   | 导航项                                                   | `PublicShellNavItem[]`                     | `[]`                 |
-| mobile-nav-mode             | mobile 导航形态                                          | `'inline' \| 'menu' \| 'bottom' \| 'none'` | `menu`               |
-| mobile-nav-label            | mobile navigation landmark 名称                          | `string`                                   | `Primary navigation` |
-| mobile-nav-menu-label       | `menu` 模式的 summary 文本                               | `string`                                   | `Menu`               |
-| active-nav                  | 当前导航 key                                             | `string`                                   | `''`                 |
-| active-nav-motion           | active nav 运动形态                                      | `'none' \| 'indicator'`                    | `none`               |
-| auth-label                  | 账户入口文本                                             | `string`                                   | `''`                 |
-| auth-href                   | 账户入口链接                                             | `string`                                   | `''`                 |
-| search-action               | 搜索表单 action                                          | `string`                                   | `/search`            |
-| search-name                 | 搜索字段名                                               | `string`                                   | `q`                  |
-| search-query                | 搜索值                                                   | `string`                                   | `''`                 |
-| search-placeholder          | 搜索占位文本                                             | `string`                                   | `Search`             |
-| search-aria-label           | 搜索 aria label                                          | `string`                                   | `Search`             |
-| show-search                 | 是否渲染搜索控件                                         | `boolean`                                  | `true`               |
-| mobile-search-mode          | mobile 搜索形态                                          | `'inline' \| 'trigger' \| 'none'`          | `inline`             |
-| mobile-search-trigger-label | trigger 关闭前的按钮文本；为空时使用 `search-aria-label` | `string`                                   | `''`                 |
-| mobile-search-cancel-label  | trigger 展开后的关闭按钮文本                             | `string`                                   | `Cancel`             |
-| spa-search                  | 是否用事件接管搜索提交                                   | `boolean`                                  | `false`              |
-| sticky                      | header 是否 sticky                                       | `boolean`                                  | `true`               |
-| max-width                   | shell 最大宽度                                           | `string`                                   | `64rem`              |
-| nav-gap                     | desktop brand/nav gap                                    | `string`                                   | `2rem`               |
-| mobile-nav-gap              | `inline` mobile nav 项目间距                             | `string`                                   | `1.5rem`             |
-| mobile-search-width         | mobile search width                                      | `string`                                   | `7rem`               |
-| csp-safe                    | 禁止 inline style，使用静态 token 与 class motion fallback | `boolean`                                  | `false`              |
+| 属性名                       | 说明                                                       | 类型                                       | 默认值               |
+| ---------------------------- | ---------------------------------------------------------- | ------------------------------------------ | -------------------- |
+| brand                        | 品牌文本                                                   | `string`                                   | `''`                 |
+| brand-href                   | 品牌链接                                                   | `string`                                   | `/`                  |
+| nav-items                    | 导航项                                                     | `PublicShellNavItem[]`                     | `[]`                 |
+| mobile-nav-mode              | mobile 导航形态                                            | `'inline' \| 'menu' \| 'bottom' \| 'none'` | `menu`               |
+| mobile-nav-label             | mobile navigation landmark 名称                            | `string`                                   | `Primary navigation` |
+| mobile-nav-menu-label        | `menu` 模式的 summary 文本                                 | `string`                                   | `Menu`               |
+| active-nav                   | 当前导航 key                                               | `string`                                   | `''`                 |
+| active-nav-motion            | active nav 运动形态                                        | `'none' \| 'indicator'`                    | `none`               |
+| auth-label                   | 账户入口文本                                               | `string`                                   | `''`                 |
+| auth-href                    | 账户入口链接                                               | `string`                                   | `''`                 |
+| search-action                | 搜索表单 action                                            | `string`                                   | `/search`            |
+| search-name                  | 搜索字段名                                                 | `string`                                   | `q`                  |
+| search-query                 | 搜索值                                                     | `string`                                   | `''`                 |
+| search-placeholder           | 搜索占位文本                                               | `string`                                   | `Search`             |
+| search-aria-label            | 搜索 aria label                                            | `string`                                   | `Search`             |
+| show-search                  | 是否渲染搜索控件                                           | `boolean`                                  | `true`               |
+| desktop-search-mode          | desktop 搜索形态                                           | `'inline' \| 'trigger' \| 'none'`          | `inline`             |
+| desktop-search-trigger-label | desktop trigger 文本；为空时使用 `search-aria-label`       | `string`                                   | `''`                 |
+| mobile-search-mode           | mobile 搜索形态                                            | `'inline' \| 'trigger' \| 'none'`          | `inline`             |
+| mobile-search-trigger-label  | trigger 关闭前的按钮文本；为空时使用 `search-aria-label`   | `string`                                   | `''`                 |
+| mobile-search-cancel-label   | trigger 展开后的关闭按钮文本                               | `string`                                   | `Cancel`             |
+| spa-search                   | 是否用事件接管搜索提交                                     | `boolean`                                  | `false`              |
+| sticky                       | header 是否 sticky                                         | `boolean`                                  | `true`               |
+| max-width                    | shell 最大宽度                                             | `string`                                   | `64rem`              |
+| nav-gap                      | desktop brand/nav gap                                      | `string`                                   | `2rem`               |
+| mobile-nav-gap               | `inline` mobile nav 项目间距                               | `string`                                   | `1.5rem`             |
+| mobile-search-width          | mobile search width                                        | `string`                                   | `7rem`               |
+| csp-safe                     | 禁止 inline style，使用静态 token 与 class motion fallback | `boolean`                                  | `false`              |
 
 ## Slots
 
@@ -91,6 +99,31 @@ import '@ozwasyd/element-plus/dist/fsus.css'
 | mobile-actions         | legacy mobile 次级工具区，保留兼容                                             |
 | footer                 | 页脚                                                                           |
 | footer-brand           | 页脚品牌                                                                       |
+
+## Desktop search 策略
+
+| 模式      | 输出                                 | 适用场景                         |
+| --------- | ------------------------------------ | -------------------------------- |
+| `inline`  | header actions 中持续显示 input      | 兼容现有 consumer；默认          |
+| `trigger` | 原生搜索链接 + 相邻 disclosure panel | 低噪声公共阅读 shell             |
+| `none`    | 不输出默认 desktop search            | 页面无需搜索或 consumer 完全接管 |
+
+`desktop-search-mode="trigger"` 的链接在无 JavaScript、修饰键点击或新窗口
+激活时仍导航到 `search-action`。普通主按钮激活会阻止本次导航，展开 panel 并把
+焦点移到 input；Escape 关闭后焦点返回 trigger。点击 disclosure 外部只关闭 panel，
+不劫持 pointer 目标的焦点。`aria-expanded` 和 `aria-controls` 始终反映当前状态。
+
+`search-query`、`update:search-query`、`search` 与 `spa-search` 在 inline/trigger
+之间共享同一契约。非空 controlled query 会展开 trigger panel，保证已有查询可见。
+严格 CSP consumer 使用 `csp-safe` 时，关闭态通过 class 与 `inert` 管理，不写入
+inline style。Trigger 的 panel placement、padding、border、radius、shadow 和
+transition 都属于组件内部实现；consumer 不应依赖 `.el-public-shell__search*` 等
+BEM selector。
+
+`desktop-search` slot 继续作为完全自定义兼容入口；一旦提供该 slot，consumer
+自行拥有其 markup/state，`desktop-search-mode` 只控制默认内容。新迁移应优先使用
+`trigger`，而不是复制 disclosure 状态机。组件没有单独的 desktop cancel label：
+trigger 文本保持稳定，展开/折叠语义由 `aria-expanded` 明确表达。
 
 ## Mobile navigation 策略
 
@@ -118,6 +151,13 @@ toolbar 为 `is-collapsed`，不会留下空白次级行。
 
 ## 从旧默认行为迁移
 
+Desktop 现有 consumer 无需修改，`desktop-search-mode` 默认仍为 `inline`。迁移
+自定义低噪声 trigger 时，删除 consumer 的 open/close state、document pointer
+listener、Escape/focus restoration、panel markup、transition class 及对内部 BEM
+selector 的 CSS，只保留 search route/name/query/label 和 SPA submit 语义。可见变化
+应限定为常驻 input 变为低噪声 trigger，以及组件自有 panel 的一致布局与 motion；
+不得借此调整 brand、navigation、auth、header height、footer 或结果页。
+
 旧版本只要 `nav-items` 非空就会隐式渲染固定 BottomTabBar。现在默认改为
 `menu`，这是有意的视觉行为变更：公共文章站不再被默认塑造成 app shell。
 
@@ -135,8 +175,11 @@ workspace alias 验证源码，但不得假定未发布 npm 包已经包含新 p
 
 ## Verification Contract
 
-组件测试锁定四种策略的 DOM/active state，并确认 desktop nav 在策略切换时保持
-不变。`public-shell-mobile-nav.spec.ts` 为 `menu | inline | bottom | none` 保存独立
+组件测试锁定 desktop `inline | trigger | none` 的 native fallback、modified click、
+controlled query、CSP-safe、outside pointer、Escape 与焦点恢复；同时锁定四种 mobile
+navigation 策略的 DOM/active state，并确认 desktop nav 在策略切换时保持不变。
+`public-shell-desktop-search.spec.ts` 覆盖 desktop Light/Dark 的 inline/trigger/none
+以及 trigger open/closed；`public-shell-mobile-nav.spec.ts` 为 `menu | inline | bottom | none` 保存独立
 mobile snapshot，同时验证原生 summary 键盘顺序、navigation landmark、
 `aria-current="page"`、BottomTabBar fixed/safe-area/content padding，以及 `none`
 模式不会留下重复导航 landmark。

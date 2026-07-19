@@ -163,6 +163,7 @@ export const resolveDemoRoot = async (
       compact: searchParams.get('compact') === '1',
       cspSafe: searchParams.get('cspSafe') === '1',
       navMode: searchParams.get('navMode') || 'menu',
+      searchMode: searchParams.get('searchMode') || 'inline',
     },
   }
 }

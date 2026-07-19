@@ -57,6 +57,7 @@
         :key="props.mode"
         :compact="props.compact"
         :nav-mode="props.navMode"
+        :search-mode="props.searchMode"
         :csp-safe="props.cspSafe"
       />
     </Transition>
@@ -87,6 +88,7 @@ import MarkdownStressSection from './sections/MarkdownStressSection.vue'
 import NavigationSection from './sections/NavigationSection.vue'
 import OthersSection from './sections/OthersSection.vue'
 import PublicShellNavModeSection from './sections/PublicShellNavModeSection.vue'
+import PublicShellSearchModeSection from './sections/PublicShellSearchModeSection.vue'
 import ViewTransitionSection from './sections/ViewTransitionSection.vue'
 
 import type { ComponentPublicInstance } from 'vue'
@@ -104,6 +106,7 @@ const props = withDefaults(
     cspSafe?: boolean
     mode?: string
     navMode?: string
+    searchMode?: string
     theme?: string
   }>(),
   {
@@ -111,6 +114,7 @@ const props = withDefaults(
     cspSafe: false,
     mode: '',
     navMode: 'menu',
+    searchMode: 'inline',
     theme: 'system',
   },
 )
@@ -157,6 +161,10 @@ const routeSections = new Map<string, DemoSection | { component: object }>([
   [
     'public-shell-nav-mode',
     { component: markRaw(PublicShellNavModeSection) },
+  ],
+  [
+    'public-shell-search-mode',
+    { component: markRaw(PublicShellSearchModeSection) },
   ],
   ['view-transitions', { component: markRaw(ViewTransitionSection) }],
 ])

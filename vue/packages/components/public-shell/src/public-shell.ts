@@ -10,6 +10,7 @@ export interface PublicShellNavItem {
   href: string
 }
 
+export type PublicShellDesktopSearchMode = 'inline' | 'trigger' | 'none'
 export type PublicShellMobileSearchMode = 'inline' | 'trigger' | 'none'
 export type PublicShellMobileNavMode = 'inline' | 'menu' | 'bottom' | 'none'
 export type PublicShellActiveNavMotion = 'none' | 'indicator'
@@ -132,6 +133,21 @@ export const publicShellProps = buildProps({
   showSearch: {
     type: Boolean,
     default: true,
+  },
+  /**
+   * @description desktop search presentation
+   */
+  desktopSearchMode: {
+    type: definePropType<PublicShellDesktopSearchMode>(String),
+    values: ['inline', 'trigger', 'none'],
+    default: 'inline',
+  },
+  /**
+   * @description desktop trigger label; falls back to searchAriaLabel
+   */
+  desktopSearchTriggerLabel: {
+    type: String,
+    default: '',
   },
   /**
    * @description mobile search presentation

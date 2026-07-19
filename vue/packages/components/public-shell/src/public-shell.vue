@@ -1,8 +1,5 @@
 <template>
-  <div
-    :class="shellKls"
-    v-bind="shellAttrs"
-  >
+  <div :class="shellKls" v-bind="shellAttrs">
     <el-site-header
       v-bind="{ 'data-public-shell-header': '' }"
       :class="headerKls"
@@ -50,7 +47,7 @@
       <template #desktop-actions>
         <slot name="desktop-search">
           <form
-            v-if="showSearch"
+            v-if="showDesktopInlineSearch"
             :class="[ns.e('search'), ns.em('search', 'desktop')]"
             :action="searchAction"
             method="get"
@@ -75,6 +72,105 @@
               :value="searchValue"
             />
           </form>
+          <div
+            v-else-if="showDesktopSearchTrigger"
+            ref="desktopSearchDisclosureRef"
+            :class="ns.e('desktop-search-disclosure')"
+          >
+            <a
+              ref="desktopSearchTriggerRef"
+              :href="searchAction"
+              :class="[
+                ns.e('desktop-search-trigger'),
+                ns.is('expanded', desktopSearchExpanded),
+              ]"
+              :aria-expanded="desktopSearchExpanded"
+              :aria-controls="desktopSearchPanelId"
+              :aria-label="desktopSearchTriggerText"
+              @click="handleDesktopSearchTrigger"
+            >
+              {{ desktopSearchTriggerText }}
+            </a>
+            <Transition name="el-public-shell-desktop-search">
+              <div
+                v-if="cspSafe"
+                :id="desktopSearchPanelId"
+                ref="desktopSearchPanelRef"
+                :class="[
+                  ns.e('desktop-search-panel'),
+                  ns.is('expanded', desktopSearchExpanded),
+                  ns.is('csp-hidden', !desktopSearchExpanded),
+                ]"
+                :aria-hidden="!desktopSearchExpanded"
+                :inert="!desktopSearchExpanded || undefined"
+              >
+                <form
+                  :class="[ns.e('search'), ns.em('search', 'desktop-trigger')]"
+                  :action="searchAction"
+                  method="get"
+                  @submit="handleSearchSubmit"
+                  @keydown.esc="handleDesktopSearchEscape"
+                >
+                  <el-input
+                    :model-value="searchValue"
+                    :placeholder="searchPlaceholder"
+                    :label="searchAriaLabel"
+                    size="small"
+                    :class="ns.e('search-input')"
+                    :csp-safe="cspSafe"
+                    clearable
+                    @focus="emit('search-focus')"
+                    @input="handleSearchInput"
+                    @keydown.enter="handleSearchEnter"
+                  />
+                  <input
+                    v-if="searchName"
+                    type="hidden"
+                    :name="searchName"
+                    :value="searchValue"
+                  />
+                </form>
+              </div>
+              <div
+                v-else
+                v-show="desktopSearchExpanded"
+                :id="desktopSearchPanelId"
+                ref="desktopSearchPanelRef"
+                :class="[
+                  ns.e('desktop-search-panel'),
+                  ns.is('expanded', desktopSearchExpanded),
+                ]"
+                :aria-hidden="!desktopSearchExpanded"
+                :inert="!desktopSearchExpanded || undefined"
+              >
+                <form
+                  :class="[ns.e('search'), ns.em('search', 'desktop-trigger')]"
+                  :action="searchAction"
+                  method="get"
+                  @submit="handleSearchSubmit"
+                  @keydown.esc="handleDesktopSearchEscape"
+                >
+                  <el-input
+                    :model-value="searchValue"
+                    :placeholder="searchPlaceholder"
+                    :label="searchAriaLabel"
+                    size="small"
+                    :class="ns.e('search-input')"
+                    clearable
+                    @focus="emit('search-focus')"
+                    @input="handleSearchInput"
+                    @keydown.enter="handleSearchEnter"
+                  />
+                  <input
+                    v-if="searchName"
+                    type="hidden"
+                    :name="searchName"
+                    :value="searchValue"
+                  />
+                </form>
+              </div>
+            </Transition>
+          </div>
         </slot>
         <slot name="desktop-actions" />
         <a
@@ -383,6 +479,10 @@ const slots = useSlots()
 
 const ns = useNamespace('public-shell')
 const searchValue = ref(props.searchQuery)
+const desktopSearchPanelId = useId().value
+const desktopSearchDisclosureRef = ref<HTMLElement>()
+const desktopSearchPanelRef = ref<HTMLElement>()
+const desktopSearchTriggerRef = ref<HTMLAnchorElement>()
 const mobileSearchRowId = useId().value
 const mobileSearchRowRef = ref<HTMLElement>()
 const mobileSearchTriggerRef = ref<HTMLAnchorElement>()
@@ -395,6 +495,9 @@ const mobileNavMenuHydrated = ref(false)
 const mobileNavMenuCspReady = ref(false)
 const mobileNavMenuClosing = ref(false)
 let restoreMobileNavMenuFocus = false
+const desktopSearchExpanded = ref(
+  props.desktopSearchMode === 'trigger' && props.searchQuery.trim().length > 0,
+)
 const mobileSearchExpanded = ref(
   props.mobileSearchMode === 'trigger' && props.searchQuery.trim().length > 0,
 )
@@ -403,6 +506,9 @@ watch(
   () => props.searchQuery,
   (value) => {
     searchValue.value = value
+    if (props.desktopSearchMode === 'trigger' && value.trim().length > 0) {
+      desktopSearchExpanded.value = true
+    }
     if (props.mobileSearchMode === 'trigger' && value.trim().length > 0) {
       mobileSearchExpanded.value = true
     }
@@ -418,6 +524,12 @@ const headerKls = computed(() => [
   ns.e('header'),
   ns.is('sticky', props.sticky),
 ])
+const showDesktopSearchTrigger = computed(
+  () => props.showSearch && props.desktopSearchMode === 'trigger',
+)
+const showDesktopInlineSearch = computed(
+  () => props.showSearch && props.desktopSearchMode === 'inline',
+)
 const showMobileSearchTrigger = computed(
   () => props.showSearch && props.mobileSearchMode === 'trigger',
 )
@@ -432,10 +544,10 @@ const mobileToolbarKls = computed(() => [
   ns.e('mobile-toolbar'),
   ns.is(
     'collapsed',
-    showMobileSearchTrigger.value
-      && !mobileSearchExpanded.value
-      && !showMobileInlineNav.value
-      && !slots['mobile-actions'],
+    showMobileSearchTrigger.value &&
+      !mobileSearchExpanded.value &&
+      !showMobileInlineNav.value &&
+      !slots['mobile-actions'],
   ),
 ])
 const showMobileMenu = computed(
@@ -448,15 +560,19 @@ const hasAuthLink = computed(() => Boolean(props.authLabel && props.authHref))
 const mobileSearchTriggerText = computed(
   () => props.mobileSearchTriggerLabel || props.searchAriaLabel,
 )
+const desktopSearchTriggerText = computed(
+  () => props.desktopSearchTriggerLabel || props.searchAriaLabel,
+)
 const mobileSearchButtonLabel = computed(() =>
   mobileSearchExpanded.value
     ? props.mobileSearchCancelLabel
     : mobileSearchTriggerText.value,
 )
 const activeNavIndicatorEnabled = computed(
-  () => !props.cspSafe
-    && props.activeNavMotion === 'indicator'
-    && props.navItems.length > 0,
+  () =>
+    !props.cspSafe &&
+    props.activeNavMotion === 'indicator' &&
+    props.navItems.length > 0,
 )
 const activeNavIndicatorKey = computed(() => {
   const activeItem = props.navItems.find((item) => item.key === props.activeNav)
@@ -470,6 +586,7 @@ const shellStyle = computed<CSSProperties>(() => ({
 }))
 const shellAttrs = computed(() => ({
   'data-public-hydration-kind': props.hydrationKind || undefined,
+  'data-desktop-search-mode': props.desktopSearchMode,
   'data-mobile-nav-mode': props.mobileNavMode,
   ...(props.cspSafe ? {} : { style: shellStyle.value }),
 }))
@@ -556,10 +673,12 @@ onMounted(() => {
   mobileNavMenuCspReady.value = true
   void syncNavIndicators()
   window.addEventListener('resize', handleIndicatorResize)
+  document.addEventListener('pointerdown', handleDesktopSearchOutsidePointer)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', handleIndicatorResize)
+  document.removeEventListener('pointerdown', handleDesktopSearchOutsidePointer)
 })
 
 const handleSearchInput = (value: string) => {
@@ -567,6 +686,28 @@ const handleSearchInput = (value: string) => {
   emit(UPDATE_MODEL_EVENT, value)
   emit('update:searchQuery', value)
   emit(CHANGE_EVENT, value)
+}
+
+const focusDesktopSearchInput = async () => {
+  await nextTick()
+  desktopSearchPanelRef.value
+    ?.querySelector<HTMLInputElement>('input:not([type="hidden"])')
+    ?.focus()
+}
+
+const focusDesktopSearchTrigger = async () => {
+  await nextTick()
+  desktopSearchTriggerRef.value?.focus()
+}
+
+const openDesktopSearch = () => {
+  desktopSearchExpanded.value = true
+  void focusDesktopSearchInput()
+}
+
+const closeDesktopSearch = (restoreFocus = false) => {
+  desktopSearchExpanded.value = false
+  if (restoreFocus) void focusDesktopSearchTrigger()
 }
 
 const focusMobileSearchInput = async () => {
@@ -601,12 +742,36 @@ const toggleMobileSearch = () => {
 }
 
 const isModifiedClick = (event: MouseEvent) =>
-  event.defaultPrevented
-  || event.button !== 0
-  || event.metaKey
-  || event.ctrlKey
-  || event.shiftKey
-  || event.altKey
+  event.defaultPrevented ||
+  event.button !== 0 ||
+  event.metaKey ||
+  event.ctrlKey ||
+  event.shiftKey ||
+  event.altKey
+
+const handleDesktopSearchTrigger = (event: MouseEvent) => {
+  if (isModifiedClick(event)) return
+  event.preventDefault()
+  if (desktopSearchExpanded.value) {
+    closeDesktopSearch(true)
+  } else {
+    openDesktopSearch()
+  }
+}
+
+const handleDesktopSearchEscape = (event: KeyboardEvent) => {
+  event.preventDefault()
+  event.stopPropagation()
+  closeDesktopSearch(true)
+}
+
+function handleDesktopSearchOutsidePointer(event: PointerEvent) {
+  if (!desktopSearchExpanded.value) return
+  const target = event.target
+  if (!(target instanceof Node)) return
+  if (desktopSearchDisclosureRef.value?.contains(target)) return
+  closeDesktopSearch()
+}
 
 const handleMobileSearchTrigger = (event: MouseEvent) => {
   if (isModifiedClick(event)) return
@@ -711,6 +876,21 @@ const handleSearchSubmit = (event: Event) => {
 const handleSearchEnter = (event: Event | KeyboardEvent) => {
   submitSearch(event)
 }
+
+watch(
+  () => props.desktopSearchMode,
+  (mode) => {
+    desktopSearchExpanded.value =
+      mode === 'trigger' && searchValue.value.trim().length > 0
+  },
+)
+
+watch(
+  () => props.showSearch,
+  (showSearch) => {
+    if (!showSearch) desktopSearchExpanded.value = false
+  },
+)
 
 watch(
   () => props.mobileSearchMode,

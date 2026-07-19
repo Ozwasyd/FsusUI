@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "91741626baa37e55a39aeb1d8381040badd963d5",
+    "commitSha": "9c2a6a9f28fa1604314bd41b47cf8e3f2fc80432",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
@@ -3091,6 +3091,8 @@
         "brand",
         "brandHref",
         "cspSafe",
+        "desktopSearchMode",
+        "desktopSearchTriggerLabel",
         "hydrationKind",
         "maxWidth",
         "mobileNavGap",
@@ -8478,6 +8480,8 @@
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/public-shell-critical.scss",
+        "vue/packages/theme-chalk/src/public-shell.scss",
         "vue/packages/theme-chalk/src/select-dropdown-v2.scss"
       ],
       "classification": "portable"
@@ -8645,6 +8649,8 @@
         "vue/packages/theme-chalk/src/date-picker/picker.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
+        "vue/packages/theme-chalk/src/public-shell-critical.scss",
+        "vue/packages/theme-chalk/src/public-shell.scss",
         "vue/packages/theme-chalk/src/tree-select.scss"
       ],
       "classification": "portable"

@@ -5,7 +5,7 @@
   "owner": "FsusUI Core",
   "baseline": {
     "path": "spec/baselines/vue-current.json",
-    "hash": "631724d1d12c2fcf9bf24a5a15307838de44655518e87b8d8cd83f6372d01e84",
+    "hash": "e4ea3f3943b7b2ace049c6e1df57514f61083a245739415ce02d3c86fdbf1486",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
     "iconHash": "d61254b1b1ff9addaf45293153df217b0c0d01ec69ec602081c44a01008b78de"
@@ -12902,6 +12902,18 @@
         },
         {
           "name": "cspSafe",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "desktopSearchMode",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "desktopSearchTriggerLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false

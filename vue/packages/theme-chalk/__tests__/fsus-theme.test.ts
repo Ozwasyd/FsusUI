@@ -404,6 +404,7 @@ describe('Fsus theme visual baseline', () => {
       '.el-public-shell__brand:focus-visible',
       '.el-public-shell__nav-link:focus-visible',
       '.el-public-shell__action-link:focus-visible',
+      '.el-public-shell__desktop-search-trigger:focus-visible',
     ]) {
       expectCssRule(publicShellCss, selector, [
         'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
@@ -2194,6 +2195,59 @@ describe('Fsus theme visual baseline', () => {
       expectCssRule(
         css,
         '.el-public-shell-mobile-search-enter-active, .el-public-shell-mobile-search-leave-active',
+        ['transition: none;'],
+      )
+    }
+  })
+
+  test('supports low-noise desktop search disclosure in critical and full css', () => {
+    const publicShellCss = compileThemeFile('public-shell.scss')
+    const criticalCss = compileThemeFile('public-shell-critical.scss')
+
+    for (const css of [publicShellCss, criticalCss]) {
+      expectCssRule(css, '.el-public-shell__actions', [
+        'min-height: calc(var(--el-public-shell-control-height, 40px) + 8px);',
+      ])
+      expectCssRule(css, '.el-public-shell__desktop-search-disclosure', [
+        'position: relative;',
+        'flex: 0 0 auto;',
+      ])
+      expectCssRule(css, '.el-public-shell__desktop-search-trigger', [
+        'display: inline-flex;',
+        'min-height: calc(var(--el-public-shell-control-height, 40px) + 8px);',
+        'border: 1px solid transparent;',
+        'background: transparent;',
+        'font-size: 12px;',
+        'font-weight: 700;',
+      ])
+      expectCssRule(css, '.el-public-shell__desktop-search-panel', [
+        'position: absolute;',
+        'inset-block-start: calc(100% + 8px);',
+        'inset-inline-end: 0;',
+        'width: min(20rem, 100vw - 48px);',
+        'padding: 12px;',
+        'border: 1px solid var(--el-border-color-lighter);',
+        'border-radius: var(--fsus-radius-popover, 10px);',
+        'box-shadow: var(--fsus-shadow-floating, none);',
+      ])
+      expectCssRule(css, '.el-public-shell__search--desktop-trigger', [
+        'width: 100%;',
+      ])
+      expectCssRule(
+        css,
+        '.el-public-shell-desktop-search-enter-active, .el-public-shell-desktop-search-leave-active',
+        [
+          'transition: opacity var(--el-transition-duration-fast) var(--el-transition-function-ease-in-out-bezier), transform var(--el-transition-duration-fast) var(--el-transition-function-ease-in-out-bezier);',
+        ],
+      )
+      expectCssRule(
+        css,
+        '.el-public-shell-desktop-search-enter-from, .el-public-shell-desktop-search-leave-to',
+        ['opacity: 0;', 'transform: translateY(-4px);'],
+      )
+      expectCssRule(
+        css,
+        '.el-public-shell-desktop-search-enter-active, .el-public-shell-desktop-search-leave-active',
         ['transition: none;'],
       )
     }
