@@ -201,9 +201,7 @@ for (const block of topLevelBlocks(themeSource)) {
     block.body.includes(
       'border-radius: var(--fsus-message-radius, var(--el-message-border-radius));',
     ) &&
-    block.body.includes(
-      'box-shadow: var(--fsus-message-shadow, 0 8px 20px rgba(15, 23, 42, 0.06));',
-    )
+    block.body.includes('box-shadow: var(--fsus-shadow-panel-light);')
   ) {
     hasMessageToastSurface = true
   }

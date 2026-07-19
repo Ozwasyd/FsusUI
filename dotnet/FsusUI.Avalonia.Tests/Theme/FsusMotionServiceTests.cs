@@ -61,12 +61,12 @@ public class FsusMotionServiceTests
     var panel = service.Resolve(FsusMotionPreset.PanelEnter);
     Assert.Equal(FsusTokens.MotionDurationPanelName, panel.DurationToken);
     Assert.Equal(FsusTokens.MotionEasingEmphasizedName, panel.EasingToken);
-    Assert.Equal(FsusMotionTransform.TranslateY(FsusTokens.MotionDistanceMdDouble), panel.From.Transform);
+    Assert.Equal(FsusMotionTransform.TranslateY(FsusTokens.MotionDistanceMediumDouble), panel.From.Transform);
 
     var listItem = service.Resolve(
       new FsusMotionRequest(FsusMotionPreset.ListItemAppearance) { Index = 50 });
     Assert.Equal(FsusTokens.MotionStaggerDefaultTimeSpan * 19, listItem.Delay);
-    Assert.Equal(FsusMotionTransform.TranslateY(FsusTokens.MotionDistanceSmDouble), listItem.From.Transform);
+    Assert.Equal(FsusMotionTransform.TranslateY(FsusTokens.MotionDistanceSmallDouble), listItem.From.Transform);
 
     var actionRow = service.Resolve(FsusMotionPreset.ActionRowSafe);
     Assert.Equal(FsusMotionTransform.Terminal, actionRow.From.Transform);

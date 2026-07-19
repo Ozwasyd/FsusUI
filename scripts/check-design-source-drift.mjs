@@ -101,6 +101,18 @@ try {
     return result
   }
 
+  assertEquals(
+    JSON.stringify(source.dimensions.theme),
+    JSON.stringify(['light', 'dark']),
+    'Canonical theme dimension drift',
+  )
+  for (const candidate of source.tokens) {
+    assert(
+      !Object.hasOwn(candidate.modeValues ?? {}, 'highContrast'),
+      `${candidate.name} must not define a third high-contrast canonical mode`,
+    )
+  }
+
   const actionPrimary = token('color.action.primary')
   assertEquals(actionPrimary.value, '#2A599C', 'Scholarly Blue token drift')
   assertEquals(
@@ -156,6 +168,65 @@ try {
     token('color.border.subtle').value,
     '#E4E4E7',
     'Border token drift',
+  )
+  for (const [name, light, dark, alias] of [
+    ['color.border.light', '#ECECF0', '#3F3F46', '--fsus-border-light'],
+    ['color.border.lighter', '#F1F1F3', '#303036', '--fsus-border-lighter'],
+    [
+      'color.border.extra.light',
+      '#F7F7F8',
+      '#1D1D20',
+      '--fsus-border-extra-light',
+    ],
+  ]) {
+    const borderToken = token(name)
+    assertEquals(borderToken.value, light, `${name} light value drift`)
+    assertEquals(
+      borderToken.modeValues?.dark?.value,
+      dark,
+      `${name} dark value drift`,
+    )
+    assert(
+      borderToken.aliases?.includes(alias),
+      `${name} must register ${alias}`,
+    )
+  }
+  assertEquals(
+    token('color.surface.overlay').value,
+    '#FFFFFFFA',
+    'Overlay surface token drift',
+  )
+  assertEquals(
+    token('color.surface.overlay').modeValues?.dark?.value,
+    '#121214FA',
+    'Dark overlay surface token drift',
+  )
+  assertEquals(
+    token('shadow.panel.light').value,
+    '0 8px 24px rgba(15, 23, 42, 0.05)',
+    'Light panel shadow token drift',
+  )
+  for (const [name, value, alias] of [
+    ['motion.distance.small', '8px', '--fsus-motion-distance-sm'],
+    ['motion.distance.medium', '14px', '--fsus-motion-distance-md'],
+    ['motion.distance.large', '20px', '--fsus-motion-distance-lg'],
+  ]) {
+    const motionToken = token(name)
+    assertEquals(motionToken.value, value, `${name} drift`)
+    assert(
+      motionToken.aliases?.includes(alias),
+      `${name} must register ${alias}`,
+    )
+  }
+  assertEquals(
+    token('motion.intensity.standard').value,
+    '0.96',
+    'Standard motion intensity drift',
+  )
+  assertEquals(
+    token('motion.intensity.subtle').value,
+    '0.98',
+    'Subtle motion intensity drift',
   )
   assertEquals(
     token('radius.control.md').value,
@@ -238,6 +309,9 @@ try {
     'Platform-neutral canonical source',
     '`400`、`500`、`700`',
     'Quiet Text 为可读文本角色，不得等于 Decorative Gray',
+    'ColorPicker 的 `--fsus-color-picker-*` 是组件内部命名 alias',
+    'Canonical theme 维度仅包含 light/dark',
+    '不生成第三套 Web theme preset',
   ]) {
     assertIncludes(design, expected, 'docs/design.md')
   }
@@ -258,9 +332,11 @@ try {
     '--fsus-radius-control: 6px;',
     '--fsus-radius-panel: 12px;',
     '--fsus-backdrop-blur: 0px;',
-    '--fsus-shadow-panel: none;',
+    '--fsus-shadow-panel: var(--fsus-shadow-overlay-md);',
     'Element Plus interaction primary mapped to Scholarly Blue.',
     'Accent for links, active states, focus rings, and selection.',
+    'fallbacks must reference registered canonical surface, border, and shadow',
+    'generates only the canonical `light` and `dark` Web theme presets',
   ]) {
     assertIncludes(themeDocs, expected, 'docs/theme/tokens.md')
   }
@@ -304,9 +380,17 @@ try {
     '--fsus-radius-panel: 12px;',
     '--fsus-radius-popover: 10px;',
     '--fsus-backdrop-blur: 0px;',
-    '--fsus-shadow-panel: none;',
+    '--fsus-shadow-panel: var(--fsus-shadow-overlay-md);',
     '--fsus-component-button-padding-x: #{generated.$fsus-component-button-padding-x};',
     '--fsus-component-dialog-padding: #{generated.$fsus-component-dialog-padding};',
+    '--fsus-border-light: var(--fsus-color-border-light);',
+    '--fsus-border-lighter: var(--fsus-color-border-lighter);',
+    '--fsus-border-extra-light: var(--fsus-color-border-extra-light);',
+    '--fsus-surface-overlay: var(--fsus-color-surface-overlay);',
+    '--fsus-shadow-panel-light: #{generated.$fsus-shadow-panel-light};',
+    '--fsus-motion-distance-sm: var(--fsus-motion-distance-small);',
+    '--fsus-motion-intensity-standard: #{generated.$fsus-motion-intensity-standard};',
+    '--fsus-component-overlay-scrim: #{generated.$fsus-component-overlay-scrim};',
   ]) {
     assertIncludes(
       runtimeTokens,
@@ -324,6 +408,11 @@ try {
   assertNotIncludes(
     generatedCss,
     '--el-color-primary: var(--fsus-color-action-primary);',
+    'vue/packages/theme-chalk/src/generated/tokens.css',
+  )
+  assertNotIncludes(
+    generatedCss,
+    '[data-fsus-theme="high-contrast"]',
     'vue/packages/theme-chalk/src/generated/tokens.css',
   )
   for (const expected of [
@@ -345,11 +434,30 @@ try {
     'padding: 0 var(--fsus-component-button-padding-x);',
     'background: var(--fsus-component-state-button-primary-background-default);',
     'background: var(--fsus-component-state-button-primary-background-hover);',
+    'background-color: var(--fsus-component-overlay-scrim) !important;',
+    'box-shadow: var(--fsus-shadow-panel-light);',
   ]) {
     assertIncludes(
       webTheme,
       expected,
       'vue/packages/theme-chalk/src/fsus-theme.scss',
+    )
+  }
+
+  const sassVariables = read('vue/packages/theme-chalk/src/common/var.scss')
+  for (const expected of [
+    "'light': var(--fsus-border-light)",
+    "'lighter': var(--fsus-border-lighter)",
+    "'extra-light': var(--fsus-border-extra-light)",
+    "'overlay': var(--fsus-surface-overlay)",
+    "'light': var(--fsus-shadow-panel-light)",
+    "'': var(--fsus-component-overlay-scrim)",
+    "'shadow': var(--fsus-shadow-panel-light)",
+  ]) {
+    assertIncludes(
+      sassVariables,
+      expected,
+      'vue/packages/theme-chalk/src/common/var.scss',
     )
   }
 

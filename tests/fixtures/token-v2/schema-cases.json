@@ -8,7 +8,7 @@
       "component-state": ["component-state.*"]
     },
     "dimensions": {
-      "theme": ["light", "dark", "high-contrast"],
+      "theme": ["light", "dark"],
       "density": ["compact", "default", "spacious"],
       "motion": ["full", "reduced", "disabled"]
     },

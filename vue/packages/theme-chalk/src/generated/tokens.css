@@ -16,7 +16,23 @@
   --fsus-dot-gray: var(--fsus-color-text-decorative);
   --fsus-color-surface-base: #FFFFFF;
   --fsus-color-surface-raised: #F7F7F8;
+  --fsus-color-surface-page: #F7F7F8;
+  --fsus-page: var(--fsus-color-surface-page);
+  --fsus-color-surface-overlay: #FFFFFFFA;
+  --fsus-surface-overlay: var(--fsus-color-surface-overlay);
+  --fsus-color-fill-base: #F4F4F5;
+  --fsus-color-fill-light: #FAFAFA;
+  --fsus-color-fill-lighter: #FCFCFC;
+  --fsus-color-fill-extra-light: #FFFFFF;
+  --fsus-color-fill-dark: #ECECF0;
+  --fsus-color-fill-darker: #E4E4E7;
   --fsus-color-border-subtle: #E4E4E7;
+  --fsus-color-border-light: #ECECF0;
+  --fsus-border-light: var(--fsus-color-border-light);
+  --fsus-color-border-lighter: #F1F1F3;
+  --fsus-border-lighter: var(--fsus-color-border-lighter);
+  --fsus-color-border-extra-light: #F7F7F8;
+  --fsus-border-extra-light: var(--fsus-color-border-extra-light);
   --fsus-color-focus-ring: #2A599C;
   --fsus-color-status-danger: #D92D20;
   --fsus-brush-surface-base: #FFFFFF;
@@ -40,6 +56,11 @@
   --fsus-radius-surface-md: 12px;
   --fsus-border-control-width: 1px;
   --fsus-shadow-overlay-md: none;
+  --fsus-shadow-panel: var(--fsus-shadow-overlay-md);
+  --fsus-shadow-panel-light: 0 8px 24px rgba(15, 23, 42, 0.05);
+  --fsus-shadow-panel-lighter: 0 2px 8px rgba(15, 23, 42, 0.04);
+  --fsus-shadow-panel-dark: 0 16px 40px rgba(15, 23, 42, 0.1);
+  --fsus-shadow-floating: 0 12px 32px rgba(15, 23, 42, 0.08);
   --fsus-opacity-disabled-content: 0.46;
   --fsus-z-overlay-dialog: 2000;
   --fsus-motion-duration-control-fast: 140ms;
@@ -52,10 +73,15 @@
   --fsus-motion-standard: var(--fsus-motion-easing-standard);
   --fsus-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
   --fsus-motion-emphasized: var(--fsus-motion-easing-emphasized);
-  --fsus-motion-distance-sm: 10px;
-  --fsus-motion-distance-md: 20px;
+  --fsus-motion-distance-small: 8px;
+  --fsus-motion-distance-sm: var(--fsus-motion-distance-small);
+  --fsus-motion-distance-medium: 14px;
+  --fsus-motion-distance-md: var(--fsus-motion-distance-medium);
+  --fsus-motion-distance-large: 20px;
+  --fsus-motion-distance-lg: var(--fsus-motion-distance-large);
   --fsus-motion-stagger-default: 70ms;
-  --fsus-motion-intensity-standard: 0.95;
+  --fsus-motion-intensity-standard: 0.96;
+  --fsus-motion-intensity-subtle: 0.98;
   --fsus-density-control-default-y: 44px;
   --fsus-density-control-compact-y: 40px;
   --fsus-icon-size-md: 16px;
@@ -79,24 +105,25 @@
   --fsus-color-text-decorative: #71717A;
   --fsus-color-surface-base: #121214;
   --fsus-color-surface-raised: #1A1A1E;
+  --fsus-color-surface-page: #09090B;
+  --fsus-color-surface-overlay: #121214FA;
+  --fsus-color-fill-base: #1A1A1E;
+  --fsus-color-fill-light: #27272A;
+  --fsus-color-fill-lighter: #3F3F46;
+  --fsus-color-fill-extra-light: #52525B;
+  --fsus-color-fill-dark: #0F0F11;
+  --fsus-color-fill-darker: #09090B;
   --fsus-color-border-subtle: #27272A;
+  --fsus-color-border-light: #3F3F46;
+  --fsus-color-border-lighter: #303036;
+  --fsus-color-border-extra-light: #1D1D20;
   --fsus-color-focus-ring: #4B79CC;
+  --fsus-shadow-panel-light: 0 8px 24px rgba(0, 0, 0, 0.28);
+  --fsus-shadow-panel-lighter: 0 2px 8px rgba(0, 0, 0, 0.24);
+  --fsus-shadow-panel-dark: 0 16px 40px rgba(0, 0, 0, 0.36);
+  --fsus-shadow-floating: 0 12px 32px rgba(0, 0, 0, 0.36);
   --fsus-component-state-button-primary-background-default: #F0F0F4;
   --fsus-component-state-button-primary-background-hover: #4B79CC;
-}
-
-[data-fsus-theme="high-contrast"] {
-  --fsus-color-action-primary: #FFFF00;
-  --fsus-color-action-primary-hover: #FFFF00;
-  --fsus-color-text-primary: #FFFFFF;
-  --fsus-color-text-quiet: #FFFFFF;
-  --fsus-color-text-decorative: #FFFFFF;
-  --fsus-color-surface-base: #000000;
-  --fsus-color-surface-raised: #000000;
-  --fsus-color-border-subtle: #FFFFFF;
-  --fsus-color-focus-ring: #FFFF00;
-  --fsus-component-state-button-primary-background-default: #FFFFFF;
-  --fsus-component-state-button-primary-background-hover: #FFFF00;
 }
 
 [data-fsus-density="compact"] {

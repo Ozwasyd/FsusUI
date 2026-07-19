@@ -1162,7 +1162,7 @@ button.#{$namespace}-card:active {
 .#{$namespace}-overlay {
   backdrop-filter: blur(var(--fsus-backdrop-blur-overlay));
   -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur-overlay));
-  background-color: var(--fsus-overlay-color) !important;
+  background-color: var(--fsus-component-overlay-scrim) !important;
 }
 
 .#{$namespace}-dialog,
@@ -1187,7 +1187,7 @@ button.#{$namespace}-card:active {
   background: var(--fsus-message-bg, var(--el-bg-color));
   border: 1px solid var(--fsus-message-border, var(--el-border-color-lighter));
   border-radius: var(--fsus-message-radius, var(--el-message-border-radius));
-  box-shadow: var(--fsus-message-shadow, 0 8px 20px rgba(15, 23, 42, 0.06));
+  box-shadow: var(--fsus-shadow-panel-light);
 }
 
 .#{$namespace}-popover.#{$namespace}-popper {

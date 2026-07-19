@@ -63,7 +63,7 @@ const requiredTokenLayers = [
   'component-state',
 ]
 const requiredDimensions = {
-  theme: ['light', 'dark', 'high-contrast'],
+  theme: ['light', 'dark'],
   density: ['compact', 'default', 'spacious'],
   motion: ['full', 'reduced', 'disabled'],
 }
@@ -446,7 +446,6 @@ const renderCss = (source, tokenMap) => {
   lines.push('}', '')
   const modeSelectors = {
     dark: '[data-fsus-theme="dark"]',
-    highContrast: '[data-fsus-theme="high-contrast"]',
     densityCompact: '[data-fsus-density="compact"]',
     densitySpacious: '[data-fsus-density="spacious"]',
     motionReduced: '[data-fsus-motion="reduced"]',

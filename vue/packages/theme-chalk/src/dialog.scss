@@ -199,7 +199,7 @@
     opacity: 1;
   }
   100% {
-    transform: translate3d(0, var(--fsus-motion-distance-xs, 4px), 0)
+    transform: translate3d(0, var(--fsus-motion-distance-sm, 8px), 0)
       scale(var(--fsus-motion-intensity-subtle, 0.98));
     opacity: 0;
   }

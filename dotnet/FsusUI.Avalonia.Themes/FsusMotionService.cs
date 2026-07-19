@@ -224,10 +224,10 @@ public sealed class FsusMotionService
         FsusTokens.MotionEasingEmphasizedName,
         new FsusMotionVisualState(
           0d,
-          FsusMotionTransform.TranslateY(FsusTokens.MotionDistanceMdDouble)),
+          FsusMotionTransform.TranslateY(FsusTokens.MotionDistanceMediumDouble)),
         new FsusMotionVisualState(
           0d,
-          FsusMotionTransform.TranslateY(FsusTokens.MotionDistanceMdDouble)),
+          FsusMotionTransform.TranslateY(FsusTokens.MotionDistanceMediumDouble)),
         true),
       FsusMotionPreset.OverlayTransition => new PresetContract(
         FsusTokens.MotionDurationPanelTimeSpan,
@@ -236,7 +236,7 @@ public sealed class FsusMotionService
         FsusTokens.MotionEasingEmphasizedName,
         new FsusMotionVisualState(
           0d,
-          FsusMotionTransform.TranslateY(FsusTokens.MotionDistanceSmDouble)),
+          FsusMotionTransform.TranslateY(FsusTokens.MotionDistanceSmallDouble)),
         new FsusMotionVisualState(0d, FsusMotionTransform.Terminal),
         true),
       FsusMotionPreset.ListItemAppearance => new PresetContract(
@@ -246,10 +246,10 @@ public sealed class FsusMotionService
         FsusTokens.MotionEasingStandardName,
         new FsusMotionVisualState(
           0d,
-          FsusMotionTransform.TranslateY(FsusTokens.MotionDistanceSmDouble)),
+          FsusMotionTransform.TranslateY(FsusTokens.MotionDistanceSmallDouble)),
         new FsusMotionVisualState(
           0d,
-          FsusMotionTransform.TranslateY(FsusTokens.MotionDistanceSmDouble)),
+          FsusMotionTransform.TranslateY(FsusTokens.MotionDistanceSmallDouble)),
         true),
       FsusMotionPreset.ActionRowSafe => new PresetContract(
         FsusTokens.MotionDurationControlFastTimeSpan,

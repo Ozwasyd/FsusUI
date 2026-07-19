@@ -161,6 +161,7 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 ### Overlay Material
 
 - 浮层背景使用 `--fsus-surface-overlay`，默认约 `rgba(255, 255, 255, 0.98)`。
+- Overlay surface 与 mask/scrim 是不同角色：浮层纸面使用 `--fsus-surface-overlay`，遮罩统一使用 `--fsus-component-overlay-scrim`，不得互相代替。
 - 默认不使用背景模糊：`--fsus-backdrop-blur`、`--fsus-backdrop-blur-soft` 和 `--fsus-backdrop-blur-overlay` 均为 `0px`。
 - 毛玻璃是 opt-in material，仅通过 `.is-glass` 或 `[data-fsus-material='glass']` 用于有明确悬浮层语义的场景。
 - 阅读表面（`[data-fsus-surface='reading']`）必须保持 paper/document feel，不使用 blur、glow 或 motion trail。
@@ -172,6 +173,7 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 | `--fsus-shadow-panel`         | `none`                               | 普通 Dialog、Card、Drawer 面板     |
 | `--fsus-shadow-panel-light`   | `0 8px 24px rgba(15, 23, 42, 0.05)`  | Opt-in 低层级浮层                  |
 | `--fsus-shadow-panel-lighter` | `0 2px 8px rgba(15, 23, 42, 0.04)`   | Opt-in 轻微浮起元素                |
+| `--fsus-shadow-panel-dark`    | `0 16px 40px rgba(15, 23, 42, 0.1)`  | Opt-in 强层级浮层                  |
 | `--fsus-shadow-floating`      | `0 12px 32px rgba(15, 23, 42, 0.08)` | Notification、Popover 等高层级浮层 |
 
 避免使用重黑投影、彩色光晕和无层级意义的外发光。
@@ -180,14 +182,19 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 
 动效用于解释状态变化，不用于制造视觉存在感。控件反馈不超过 `220ms`，浮层不超过 `360ms`。
 
-| Token                        | Value                          | Usage                                 |
-| ---------------------------- | ------------------------------ | ------------------------------------- |
-| `--fsus-motion-control-fast` | `140ms`                        | Checkbox、Radio、Switch 的即时反馈    |
-| `--fsus-motion-control`      | `220ms`                        | Button、Input、Tag、Tab 等控件状态    |
-| `--fsus-motion-overlay`      | `300ms`                        | 遮罩淡入淡出                          |
-| `--fsus-motion-panel`        | `360ms`                        | Dialog、Drawer、Dropdown 的进入与离开 |
-| `--fsus-motion-standard`     | `cubic-bezier(0.4, 0, 0.2, 1)` | 默认缓动                              |
-| `--fsus-motion-emphasized`   | `cubic-bezier(0.2, 0, 0, 1)`   | 浮层进入、重点内容揭示                |
+| Token                              | Value                          | Usage                                 |
+| ---------------------------------- | ------------------------------ | ------------------------------------- |
+| `--fsus-motion-control-fast`       | `140ms`                        | Checkbox、Radio、Switch 的即时反馈    |
+| `--fsus-motion-control`            | `220ms`                        | Button、Input、Tag、Tab 等控件状态    |
+| `--fsus-motion-overlay`            | `300ms`                        | 遮罩淡入淡出                          |
+| `--fsus-motion-panel`              | `360ms`                        | Dialog、Drawer、Dropdown 的进入与离开 |
+| `--fsus-motion-distance-sm`        | `8px`                          | 小幅内容进入与离开                    |
+| `--fsus-motion-distance-md`        | `14px`                         | 中等面板位移                          |
+| `--fsus-motion-distance-lg`        | `20px`                         | 大面板位移上限                        |
+| `--fsus-motion-intensity-standard` | `0.96`                         | 标准缩放入场强度                      |
+| `--fsus-motion-intensity-subtle`   | `0.98`                         | 轻微缩放离场强度                      |
+| `--fsus-motion-standard`           | `cubic-bezier(0.4, 0, 0.2, 1)` | 默认缓动                              |
+| `--fsus-motion-emphasized`         | `cubic-bezier(0.2, 0, 0, 1)`   | 浮层进入、重点内容揭示                |
 
 规则：
 
@@ -441,35 +448,37 @@ body {
 
 ### Core Color Tokens
 
-| Visual Concept  | Light                 | Runtime Token                                                        | Dark      |
-| --------------- | --------------------- | -------------------------------------------------------------------- | --------- |
-| Ink             | `#0F0F11`             | `--fsus-ink`, `--el-text-color-primary`                              | `#F0F0F4` |
-| Paper           | `#FFFFFF` / `#FCFCFC` | `--fsus-paper`, `--el-bg-color`                                      | `#121214` |
-| Page            | `#F7F7F8`             | `--fsus-page`, `--el-bg-color-page`                                  | `#09090B` |
-| Scholarly Blue  | `#2A599C`             | `--fsus-scholarly-blue`                                              | `#4B79CC` |
-| Quiet Text      | `#71717A`             | `--fsus-color-text-quiet`                                            | `#A1A1AA` |
-| Decorative Gray | `#A1A1AA`             | `--fsus-color-text-decorative`, `--fsus-dot-gray`, `--el-color-info` | `#71717A` |
-| Raised Surface  | `#F7F7F8`             | `--fsus-color-surface-raised`                                        | `#1A1A1E` |
-| Border          | `#E4E4E7`             | `--fsus-border`, `--el-border-color`                                 | `#27272A` |
+| Visual Concept  | Light                    | Runtime Token                                                        | Dark                  |
+| --------------- | ------------------------ | -------------------------------------------------------------------- | --------------------- |
+| Ink             | `#0F0F11`                | `--fsus-ink`, `--el-text-color-primary`                              | `#F0F0F4`             |
+| Paper           | `#FFFFFF` / `#FCFCFC`    | `--fsus-paper`, `--el-bg-color`                                      | `#121214`             |
+| Page            | `#F7F7F8`                | `--fsus-page`, `--el-bg-color-page`                                  | `#09090B`             |
+| Overlay Surface | `rgba(255,255,255,0.98)` | `--fsus-surface-overlay`, `--el-bg-color-overlay`                    | `rgba(18,18,20,0.98)` |
+| Scholarly Blue  | `#2A599C`                | `--fsus-scholarly-blue`                                              | `#4B79CC`             |
+| Quiet Text      | `#71717A`                | `--fsus-color-text-quiet`                                            | `#A1A1AA`             |
+| Decorative Gray | `#A1A1AA`                | `--fsus-color-text-decorative`, `--fsus-dot-gray`, `--el-color-info` | `#71717A`             |
+| Raised Surface  | `#F7F7F8`                | `--fsus-color-surface-raised`                                        | `#1A1A1E`             |
+| Border          | `#E4E4E7`                | `--fsus-border`, `--el-border-color`                                 | `#27272A`             |
 
 ### Surface and Interaction Tokens
 
-| Visual Concept          | Value       | Runtime Token                                             | Notes                       |
-| ----------------------- | ----------- | --------------------------------------------------------- | --------------------------- |
-| Control radius          | `6px`       | `--fsus-radius-control`, `--el-border-radius-base`        | Button、Input、Select       |
-| Small control radius    | `4px`       | `--fsus-radius-control-small`, `--el-border-radius-small` | 小尺寸控件                  |
-| Popover radius          | `10px`      | `--fsus-radius-popover`, `--el-popover-border-radius`     | Popover、Tooltip、Dropdown  |
-| Panel radius            | `12px`      | `--fsus-radius-panel`, `--el-dialog-border-radius`        | Dialog、Drawer、Card        |
-| Expressive panel radius | `24px`      | `--fsus-radius-panel-large`                               | Opt-in expressive surfaces  |
-| Pill radius             | `999px`     | `--fsus-radius-pill`, `--el-border-radius-round`          | Badge、Tag、圆形图标按钮    |
-| Control height          | `44px`      | `--fsus-control-height`                                   | 默认控件高度                |
-| Compact control height  | `40px`      | `--fsus-control-height-compact`                           | 紧凑控件高度                |
-| Focus ring              | `2px inset` | `--fsus-scholarly-blue` / `--el-a11y-focus-color`         | `focus-visible` only        |
-| Invalid idle ring       | `1px inset` | `--el-color-danger`                                       | invalid, not keyboard focus |
-| Invalid focus ring      | `2px inset` | `--el-color-danger`                                       | invalid + `focus-visible`   |
-| Backdrop blur           | `0px`       | `--fsus-backdrop-blur`                                    | Default paper material      |
-| Overlay blur            | `0px`       | `--fsus-backdrop-blur-overlay`                            | Default overlay material    |
-| Panel shadow            | `none`      | `--fsus-shadow-panel`, `--el-box-shadow`                  | Border-first panels         |
+| Visual Concept          | Value       | Runtime Token                                                               | Notes                             |
+| ----------------------- | ----------- | --------------------------------------------------------------------------- | --------------------------------- |
+| Control radius          | `6px`       | `--fsus-radius-control`, `--el-border-radius-base`                          | Button、Input、Select             |
+| Small control radius    | `4px`       | `--fsus-radius-control-small`, `--el-border-radius-small`                   | 小尺寸控件                        |
+| Popover radius          | `10px`      | `--fsus-radius-popover`, `--el-popover-border-radius`                       | Popover、Tooltip、Dropdown        |
+| Panel radius            | `12px`      | `--fsus-radius-panel`, `--el-dialog-border-radius`                          | Dialog、Drawer、Card              |
+| Expressive panel radius | `24px`      | `--fsus-radius-panel-large`                                                 | Opt-in expressive surfaces        |
+| Pill radius             | `999px`     | `--fsus-radius-pill`, `--el-border-radius-round`                            | Badge、Tag、圆形图标按钮          |
+| Control height          | `44px`      | `--fsus-control-height`                                                     | 默认控件高度                      |
+| Compact control height  | `40px`      | `--fsus-control-height-compact`                                             | 紧凑控件高度                      |
+| Focus ring              | `2px inset` | `--fsus-scholarly-blue` / `--el-a11y-focus-color`                           | `focus-visible` only              |
+| Invalid idle ring       | `1px inset` | `--el-color-danger`                                                         | invalid, not keyboard focus       |
+| Invalid focus ring      | `2px inset` | `--el-color-danger`                                                         | invalid + `focus-visible`         |
+| Backdrop blur           | `0px`       | `--fsus-backdrop-blur`                                                      | Default paper material            |
+| Overlay blur            | `0px`       | `--fsus-backdrop-blur-overlay`                                              | Default overlay material          |
+| Panel shadow            | `none`      | `--fsus-shadow-panel`, `--el-box-shadow`                                    | Border-first panels               |
+| Border sub-steps        | canonical   | `--fsus-border-light`, `--fsus-border-lighter`, `--fsus-border-extra-light` | Element Plus weak-border mappings |
 
 ### Rationale
 
@@ -493,9 +502,12 @@ Public / marketing surfaces ([§1 Scope Boundary](#scope-boundary)) 通常不会
 | Focus ring                 | `--el-a11y-focus-color`                                                                        | 键盘焦点环                   |
 | Danger / Success / Warning | `--el-color-danger`, `--el-color-success`, `--el-color-warning` 及 `-light-N` / `-dark-N` 变体 | 错误提示、成功反馈、警告徽标 |
 
+ColorPicker 的 `--fsus-color-picker-*` 是组件内部命名 alias；它们只引用 canonical surface、border、focus 与 shadow token，不是新的视觉真值，也不承诺为 consumer public API。
+
 **Consumer 约束**：
 
-- Public layout 在 token 链中**不要**插入未注册的 `--fsus-text-*` / `--fsus-border-extra-light` 等中转别名；这些别名在 FsusUI 中不存在，会让 `var()` 链路无声 fallthrough，违反 §12 的"先注册再使用"原则。
+- `--fsus-border-light`、`--fsus-border-lighter`、`--fsus-border-extra-light` 是已登记的 canonical 映射源，分别供稳定的 `--el-border-color-*` 兼容变量消费；不要删除或重指这条链。
+- Public layout 不应插入未注册的 `--fsus-text-*` 中转别名；这会让 `var()` 链路无声 fallthrough，违反 §12 的"先注册再使用"原则。
 - 优先 `var(--el-text-color-regular, CanvasText)` 而不是 `var(--fsus-text-regular, var(--el-text-color-regular, CanvasText))`：前者只经过一层变量查找，后者要求浏览器先解析一个永远 `undefined` 的 `--fsus-text-regular`。
 - 当 public layout 需要**自己的**命名空间（避免污染 Element Plus 主题）时，前缀用 `--{consumer-name}-*`（如 FsusBlog 的 `--fsusblog-*`），不要伪造 `--fsus-*` 别名。
 
@@ -514,6 +526,8 @@ Public / marketing surfaces ([§1 Scope Boundary](#scope-boundary)) 通常不会
 5. Compatibility adapters: `vue/packages/theme-chalk/src/common/fsus-tokens.scss` 与 `common/var.scss`，只能引用 canonical token 或登记过的 override。
 
 新规则必须先在 [`spec/tokens/tokens.json`](../spec/tokens/tokens.json) 中映射到现有 public token，或新增一个 token，再写进本文件。
+
+Canonical theme 维度仅包含 light/dark。操作系统 high-contrast 行为由 [`spec/platform-overrides/`](../spec/platform-overrides/) 单独登记、验证和定期复核，不生成第三套 Web theme preset。
 
 ## 13. Terminology
 

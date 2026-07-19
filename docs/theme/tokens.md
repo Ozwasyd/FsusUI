@@ -14,28 +14,38 @@ FsusUI semantic aliases on top.
 
 ## Preview Public Tokens
 
-| Token                          | Purpose                                                                               |
-| ------------------------------ | ------------------------------------------------------------------------------------- |
-| `--el-color-primary`           | Element Plus interaction primary mapped to Scholarly Blue.                            |
-| `--fsus-scholarly-blue`        | Accent for links, active states, focus rings, and selection.                          |
-| `--fsus-button-primary-bg`     | Primary button background mapped to Ink independently from the interaction primary.   |
-| `--fsus-button-primary-text`   | Primary button text mapped to Paper for light/dark contrast.                          |
-| `--el-bg-color`                | Main surface background.                                                              |
-| `--el-bg-color-page`           | Page background.                                                                      |
-| `--el-text-color-primary`      | Primary text.                                                                         |
-| `--el-text-color-secondary`    | Secondary text.                                                                       |
-| `--fsus-color-text-quiet`      | Readable low-emphasis informational text; remains `#A1A1AA` in light and dark modes.  |
-| `--fsus-color-text-decorative` | Non-essential ornamental marks; switches from `#A1A1AA` to `#71717A` in dark mode.    |
-| `--fsus-color-surface-raised`  | Raised and inline-code surfaces; switches from `#F7F7F8` to `#1A1A1E` in dark mode.   |
-| `--fsus-dot-gray`              | Compatibility alias for `--fsus-color-text-decorative`; also feeds `--el-color-info`. |
-| `--el-border-color`            | Default border color.                                                                 |
-| `--el-border-radius-small`     | Small radius token.                                                                   |
-| `--el-border-radius-base`      | Base radius token.                                                                    |
-| `--el-border-radius-large`     | Large radius token.                                                                   |
-| `--el-border-radius-round`     | Fully rounded token for circular controls.                                            |
-| `--el-box-shadow`              | Border-first panel shadow, defaulting to `none`.                                      |
-| `--el-box-shadow-light`        | Opt-in low elevation shadow.                                                          |
-| `--fsus-backdrop-blur`         | Opt-in backdrop blur amount, defaulting to `0px`.                                     |
+| Token                              | Purpose                                                                               |
+| ---------------------------------- | ------------------------------------------------------------------------------------- |
+| `--el-color-primary`               | Element Plus interaction primary mapped to Scholarly Blue.                            |
+| `--fsus-scholarly-blue`            | Accent for links, active states, focus rings, and selection.                          |
+| `--fsus-button-primary-bg`         | Primary button background mapped to Ink independently from the interaction primary.   |
+| `--fsus-button-primary-text`       | Primary button text mapped to Paper for light/dark contrast.                          |
+| `--el-bg-color`                    | Main surface background.                                                              |
+| `--el-bg-color-page`               | Page background.                                                                      |
+| `--el-text-color-primary`          | Primary text.                                                                         |
+| `--el-text-color-secondary`        | Secondary text.                                                                       |
+| `--fsus-color-text-quiet`          | Readable low-emphasis text; `#71717A` in light mode and `#A1A1AA` in dark mode.       |
+| `--fsus-color-text-decorative`     | Non-essential ornamental marks; switches from `#A1A1AA` to `#71717A` in dark mode.    |
+| `--fsus-color-surface-raised`      | Raised and inline-code surfaces; switches from `#F7F7F8` to `#1A1A1E` in dark mode.   |
+| `--fsus-dot-gray`                  | Compatibility alias for `--fsus-color-text-decorative`; also feeds `--el-color-info`. |
+| `--el-border-color`                | Default border color.                                                                 |
+| `--fsus-border-light`              | Light border step mapped to the canonical `color.border.light` token.                 |
+| `--fsus-border-lighter`            | Lighter border step mapped to the canonical `color.border.lighter` token.             |
+| `--fsus-border-extra-light`        | Extra-light border step mapped to the canonical `color.border.extra.light` token.     |
+| `--fsus-surface-overlay`           | Opaque overlay content surface; distinct from the backdrop scrim.                     |
+| `--el-border-radius-small`         | Small radius token.                                                                   |
+| `--el-border-radius-base`          | Base radius token.                                                                    |
+| `--el-border-radius-large`         | Large radius token.                                                                   |
+| `--el-border-radius-round`         | Fully rounded token for circular controls.                                            |
+| `--el-box-shadow`                  | Border-first panel shadow, defaulting to `none`.                                      |
+| `--el-box-shadow-light`            | Opt-in low elevation shadow.                                                          |
+| `--fsus-shadow-panel-light`        | Canonical low-elevation panel and compact-message shadow.                             |
+| `--fsus-motion-distance-sm`        | Small motion distance alias (`8px`).                                                  |
+| `--fsus-motion-distance-md`        | Medium motion distance alias (`14px`).                                                |
+| `--fsus-motion-distance-lg`        | Large motion distance alias (`20px`).                                                 |
+| `--fsus-motion-intensity-standard` | Standard motion intensity (`0.96`).                                                   |
+| `--fsus-motion-intensity-subtle`   | Subtle motion intensity (`0.98`).                                                     |
+| `--fsus-backdrop-blur`             | Opt-in backdrop blur amount, defaulting to `0px`.                                     |
 
 ### Spacing Tokens
 
@@ -93,7 +103,7 @@ undeclared weight or rely on browser synthesis.
   --fsus-radius-panel: 12px;
   --el-border-radius-base: 6px;
   --fsus-backdrop-blur: 0px;
-  --fsus-shadow-panel: none;
+  --fsus-shadow-panel: var(--fsus-shadow-overlay-md);
 }
 ```
 
@@ -120,6 +130,16 @@ The following are internal unless another guide explicitly documents them:
 - Unlisted `--fsus-*` tokens.
 - Generated theme metadata.
 - Selector structure inside component styles.
+
+ColorPicker chrome aliases such as `--fsus-color-picker-thumb-bg`,
+`--fsus-color-picker-thumb-border`, and `--fsus-color-picker-thumb-shadow` are
+intentionally internal. They remain available to component styles, but their
+fallbacks must reference registered canonical surface, border, and shadow
+tokens rather than introducing a second value source.
+
+FsusUI generates only the canonical `light` and `dark` Web theme presets.
+Operating-system high-contrast support remains a platform accessibility
+override and must not become a third canonical token mode.
 
 ## Element Plus Variable Compatibility
 

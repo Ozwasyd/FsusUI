@@ -30,7 +30,7 @@ motion.control.fast
 
 | Dimension | Required Values            |
 | --------- | -------------------------- |
-| theme     | light, dark, high-contrast |
+| theme     | light, dark                |
 | density   | compact, default, spacious |
 | motion    | full, reduced, disabled    |
 
@@ -81,6 +81,10 @@ Mappings are generated mechanically:
 
 Compatibility aliases such as `--el-color-primary` are allowed only when they
 point back to platform-neutral source tokens.
+
+High-contrast behavior is not a canonical theme dimension. Operating-system
+accessibility behavior is registered as a reviewed platform override under
+`spec/platform-overrides/` instead of being emitted as a third Web theme preset.
 
 ## Source Precedence
 

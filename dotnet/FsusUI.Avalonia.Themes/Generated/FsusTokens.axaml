@@ -18,58 +18,84 @@
   <SolidColorBrush x:Key="FsusColorActionPrimaryBrush" Color="#2A599C" />
   <Color x:Key="FsusColorActionPrimaryDark">#4B79CC</Color>
   <SolidColorBrush x:Key="FsusColorActionPrimaryDarkBrush" Color="#4B79CC" />
-  <Color x:Key="FsusColorActionPrimaryHighContrast">#FFFF00</Color>
-  <SolidColorBrush x:Key="FsusColorActionPrimaryHighContrastBrush" Color="#FFFF00" />
   <Color x:Key="FsusColorActionPrimaryHover">#244E89</Color>
   <SolidColorBrush x:Key="FsusColorActionPrimaryHoverBrush" Color="#244E89" />
   <Color x:Key="FsusColorActionPrimaryHoverDark">#6F93D7</Color>
   <SolidColorBrush x:Key="FsusColorActionPrimaryHoverDarkBrush" Color="#6F93D7" />
-  <Color x:Key="FsusColorActionPrimaryHoverHighContrast">#FFFF00</Color>
-  <SolidColorBrush x:Key="FsusColorActionPrimaryHoverHighContrastBrush" Color="#FFFF00" />
   <Color x:Key="FsusColorTextPrimary">#0F0F11</Color>
   <SolidColorBrush x:Key="FsusColorTextPrimaryBrush" Color="#0F0F11" />
   <Color x:Key="FsusColorTextPrimaryDark">#F0F0F4</Color>
   <SolidColorBrush x:Key="FsusColorTextPrimaryDarkBrush" Color="#F0F0F4" />
-  <Color x:Key="FsusColorTextPrimaryHighContrast">#FFFFFF</Color>
-  <SolidColorBrush x:Key="FsusColorTextPrimaryHighContrastBrush" Color="#FFFFFF" />
   <Color x:Key="FsusColorTextMuted">#71717A</Color>
   <SolidColorBrush x:Key="FsusColorTextMutedBrush" Color="#71717A" />
   <Color x:Key="FsusColorTextQuiet">#71717A</Color>
   <SolidColorBrush x:Key="FsusColorTextQuietBrush" Color="#71717A" />
   <Color x:Key="FsusColorTextQuietDark">#A1A1AA</Color>
   <SolidColorBrush x:Key="FsusColorTextQuietDarkBrush" Color="#A1A1AA" />
-  <Color x:Key="FsusColorTextQuietHighContrast">#FFFFFF</Color>
-  <SolidColorBrush x:Key="FsusColorTextQuietHighContrastBrush" Color="#FFFFFF" />
   <Color x:Key="FsusColorTextDecorative">#A1A1AA</Color>
   <SolidColorBrush x:Key="FsusColorTextDecorativeBrush" Color="#A1A1AA" />
   <Color x:Key="FsusColorTextDecorativeDark">#71717A</Color>
   <SolidColorBrush x:Key="FsusColorTextDecorativeDarkBrush" Color="#71717A" />
-  <Color x:Key="FsusColorTextDecorativeHighContrast">#FFFFFF</Color>
-  <SolidColorBrush x:Key="FsusColorTextDecorativeHighContrastBrush" Color="#FFFFFF" />
   <Color x:Key="FsusColorSurfaceBase">#FFFFFF</Color>
   <SolidColorBrush x:Key="FsusColorSurfaceBaseBrush" Color="#FFFFFF" />
   <Color x:Key="FsusColorSurfaceBaseDark">#121214</Color>
   <SolidColorBrush x:Key="FsusColorSurfaceBaseDarkBrush" Color="#121214" />
-  <Color x:Key="FsusColorSurfaceBaseHighContrast">#000000</Color>
-  <SolidColorBrush x:Key="FsusColorSurfaceBaseHighContrastBrush" Color="#000000" />
   <Color x:Key="FsusColorSurfaceRaised">#F7F7F8</Color>
   <SolidColorBrush x:Key="FsusColorSurfaceRaisedBrush" Color="#F7F7F8" />
   <Color x:Key="FsusColorSurfaceRaisedDark">#1A1A1E</Color>
   <SolidColorBrush x:Key="FsusColorSurfaceRaisedDarkBrush" Color="#1A1A1E" />
-  <Color x:Key="FsusColorSurfaceRaisedHighContrast">#000000</Color>
-  <SolidColorBrush x:Key="FsusColorSurfaceRaisedHighContrastBrush" Color="#000000" />
+  <Color x:Key="FsusColorSurfacePage">#F7F7F8</Color>
+  <SolidColorBrush x:Key="FsusColorSurfacePageBrush" Color="#F7F7F8" />
+  <Color x:Key="FsusColorSurfacePageDark">#09090B</Color>
+  <SolidColorBrush x:Key="FsusColorSurfacePageDarkBrush" Color="#09090B" />
+  <Color x:Key="FsusColorSurfaceOverlay">#FFFFFFFA</Color>
+  <SolidColorBrush x:Key="FsusColorSurfaceOverlayBrush" Color="#FFFFFFFA" />
+  <Color x:Key="FsusColorSurfaceOverlayDark">#121214FA</Color>
+  <SolidColorBrush x:Key="FsusColorSurfaceOverlayDarkBrush" Color="#121214FA" />
+  <Color x:Key="FsusColorFillBase">#F4F4F5</Color>
+  <SolidColorBrush x:Key="FsusColorFillBaseBrush" Color="#F4F4F5" />
+  <Color x:Key="FsusColorFillBaseDark">#1A1A1E</Color>
+  <SolidColorBrush x:Key="FsusColorFillBaseDarkBrush" Color="#1A1A1E" />
+  <Color x:Key="FsusColorFillLight">#FAFAFA</Color>
+  <SolidColorBrush x:Key="FsusColorFillLightBrush" Color="#FAFAFA" />
+  <Color x:Key="FsusColorFillLightDark">#27272A</Color>
+  <SolidColorBrush x:Key="FsusColorFillLightDarkBrush" Color="#27272A" />
+  <Color x:Key="FsusColorFillLighter">#FCFCFC</Color>
+  <SolidColorBrush x:Key="FsusColorFillLighterBrush" Color="#FCFCFC" />
+  <Color x:Key="FsusColorFillLighterDark">#3F3F46</Color>
+  <SolidColorBrush x:Key="FsusColorFillLighterDarkBrush" Color="#3F3F46" />
+  <Color x:Key="FsusColorFillExtraLight">#FFFFFF</Color>
+  <SolidColorBrush x:Key="FsusColorFillExtraLightBrush" Color="#FFFFFF" />
+  <Color x:Key="FsusColorFillExtraLightDark">#52525B</Color>
+  <SolidColorBrush x:Key="FsusColorFillExtraLightDarkBrush" Color="#52525B" />
+  <Color x:Key="FsusColorFillDark">#ECECF0</Color>
+  <SolidColorBrush x:Key="FsusColorFillDarkBrush" Color="#ECECF0" />
+  <Color x:Key="FsusColorFillDarkDark">#0F0F11</Color>
+  <SolidColorBrush x:Key="FsusColorFillDarkDarkBrush" Color="#0F0F11" />
+  <Color x:Key="FsusColorFillDarker">#E4E4E7</Color>
+  <SolidColorBrush x:Key="FsusColorFillDarkerBrush" Color="#E4E4E7" />
+  <Color x:Key="FsusColorFillDarkerDark">#09090B</Color>
+  <SolidColorBrush x:Key="FsusColorFillDarkerDarkBrush" Color="#09090B" />
   <Color x:Key="FsusColorBorderSubtle">#E4E4E7</Color>
   <SolidColorBrush x:Key="FsusColorBorderSubtleBrush" Color="#E4E4E7" />
   <Color x:Key="FsusColorBorderSubtleDark">#27272A</Color>
   <SolidColorBrush x:Key="FsusColorBorderSubtleDarkBrush" Color="#27272A" />
-  <Color x:Key="FsusColorBorderSubtleHighContrast">#FFFFFF</Color>
-  <SolidColorBrush x:Key="FsusColorBorderSubtleHighContrastBrush" Color="#FFFFFF" />
+  <Color x:Key="FsusColorBorderLight">#ECECF0</Color>
+  <SolidColorBrush x:Key="FsusColorBorderLightBrush" Color="#ECECF0" />
+  <Color x:Key="FsusColorBorderLightDark">#3F3F46</Color>
+  <SolidColorBrush x:Key="FsusColorBorderLightDarkBrush" Color="#3F3F46" />
+  <Color x:Key="FsusColorBorderLighter">#F1F1F3</Color>
+  <SolidColorBrush x:Key="FsusColorBorderLighterBrush" Color="#F1F1F3" />
+  <Color x:Key="FsusColorBorderLighterDark">#303036</Color>
+  <SolidColorBrush x:Key="FsusColorBorderLighterDarkBrush" Color="#303036" />
+  <Color x:Key="FsusColorBorderExtraLight">#F7F7F8</Color>
+  <SolidColorBrush x:Key="FsusColorBorderExtraLightBrush" Color="#F7F7F8" />
+  <Color x:Key="FsusColorBorderExtraLightDark">#1D1D20</Color>
+  <SolidColorBrush x:Key="FsusColorBorderExtraLightDarkBrush" Color="#1D1D20" />
   <Color x:Key="FsusColorFocusRing">#2A599C</Color>
   <SolidColorBrush x:Key="FsusColorFocusRingBrush" Color="#2A599C" />
   <Color x:Key="FsusColorFocusRingDark">#4B79CC</Color>
   <SolidColorBrush x:Key="FsusColorFocusRingDarkBrush" Color="#4B79CC" />
-  <Color x:Key="FsusColorFocusRingHighContrast">#FFFF00</Color>
-  <SolidColorBrush x:Key="FsusColorFocusRingHighContrastBrush" Color="#FFFF00" />
   <Color x:Key="FsusColorStatusDanger">#D92D20</Color>
   <SolidColorBrush x:Key="FsusColorStatusDangerBrush" Color="#D92D20" />
   <SolidColorBrush x:Key="FsusBrushSurfaceBase" Color="#FFFFFF" />
@@ -93,6 +119,10 @@
   <CornerRadius x:Key="FsusRadiusSurfaceMd">12</CornerRadius>
   <Thickness x:Key="FsusBorderControlWidth">1</Thickness>
   <BoxShadows x:Key="FsusShadowOverlayMd">none</BoxShadows>
+  <BoxShadows x:Key="FsusShadowPanelLight">0 8px 24px rgba(15, 23, 42, 0.05)</BoxShadows>
+  <BoxShadows x:Key="FsusShadowPanelLighter">0 2px 8px rgba(15, 23, 42, 0.04)</BoxShadows>
+  <BoxShadows x:Key="FsusShadowPanelDark">0 16px 40px rgba(15, 23, 42, 0.1)</BoxShadows>
+  <BoxShadows x:Key="FsusShadowFloating">0 12px 32px rgba(15, 23, 42, 0.08)</BoxShadows>
   <x:Double x:Key="FsusOpacityDisabledContent">0.46</x:Double>
   <x:Int32 x:Key="FsusZOverlayDialog">2000</x:Int32>
   <x:TimeSpan x:Key="FsusMotionDurationControlFast">00:00:00.1400000</x:TimeSpan>
@@ -100,10 +130,12 @@
   <x:TimeSpan x:Key="FsusMotionDurationPanel">00:00:00.3600000</x:TimeSpan>
   <SplineEasing x:Key="FsusMotionEasingStandard" X1="0.4" Y1="0" X2="0.2" Y2="1" />
   <SplineEasing x:Key="FsusMotionEasingEmphasized" X1="0.2" Y1="0" X2="0" Y2="1" />
-  <x:Double x:Key="FsusMotionDistanceSm">10</x:Double>
-  <x:Double x:Key="FsusMotionDistanceMd">20</x:Double>
+  <x:Double x:Key="FsusMotionDistanceSmall">8</x:Double>
+  <x:Double x:Key="FsusMotionDistanceMedium">14</x:Double>
+  <x:Double x:Key="FsusMotionDistanceLarge">20</x:Double>
   <x:TimeSpan x:Key="FsusMotionStaggerDefault">00:00:00.0700000</x:TimeSpan>
-  <x:Double x:Key="FsusMotionIntensityStandard">0.95</x:Double>
+  <x:Double x:Key="FsusMotionIntensityStandard">0.96</x:Double>
+  <x:Double x:Key="FsusMotionIntensitySubtle">0.98</x:Double>
   <x:Double x:Key="FsusDensityControlDefaultY">44</x:Double>
   <x:Double x:Key="FsusDensityControlCompactY">40</x:Double>
   <x:Double x:Key="FsusIconSizeMd">16</x:Double>

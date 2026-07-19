@@ -7,32 +7,45 @@ $fsus-primitive-color-gray-950: #0F0F11;
 $fsus-primitive-color-white: #FFFFFF;
 $fsus-color-action-primary: #2A599C;
 $fsus-color-action-primary-dark: #4B79CC;
-$fsus-color-action-primary-high-contrast: #FFFF00;
 $fsus-color-action-primary-hover: #244E89;
 $fsus-color-action-primary-hover-dark: #6F93D7;
-$fsus-color-action-primary-hover-high-contrast: #FFFF00;
 $fsus-color-text-primary: #0F0F11;
 $fsus-color-text-primary-dark: #F0F0F4;
-$fsus-color-text-primary-high-contrast: #FFFFFF;
 $fsus-color-text-muted: #71717A;
 $fsus-color-text-quiet: #71717A;
 $fsus-color-text-quiet-dark: #A1A1AA;
-$fsus-color-text-quiet-high-contrast: #FFFFFF;
 $fsus-color-text-decorative: #A1A1AA;
 $fsus-color-text-decorative-dark: #71717A;
-$fsus-color-text-decorative-high-contrast: #FFFFFF;
 $fsus-color-surface-base: #FFFFFF;
 $fsus-color-surface-base-dark: #121214;
-$fsus-color-surface-base-high-contrast: #000000;
 $fsus-color-surface-raised: #F7F7F8;
 $fsus-color-surface-raised-dark: #1A1A1E;
-$fsus-color-surface-raised-high-contrast: #000000;
+$fsus-color-surface-page: #F7F7F8;
+$fsus-color-surface-page-dark: #09090B;
+$fsus-color-surface-overlay: #FFFFFFFA;
+$fsus-color-surface-overlay-dark: #121214FA;
+$fsus-color-fill-base: #F4F4F5;
+$fsus-color-fill-base-dark: #1A1A1E;
+$fsus-color-fill-light: #FAFAFA;
+$fsus-color-fill-light-dark: #27272A;
+$fsus-color-fill-lighter: #FCFCFC;
+$fsus-color-fill-lighter-dark: #3F3F46;
+$fsus-color-fill-extra-light: #FFFFFF;
+$fsus-color-fill-extra-light-dark: #52525B;
+$fsus-color-fill-dark: #ECECF0;
+$fsus-color-fill-dark-dark: #0F0F11;
+$fsus-color-fill-darker: #E4E4E7;
+$fsus-color-fill-darker-dark: #09090B;
 $fsus-color-border-subtle: #E4E4E7;
 $fsus-color-border-subtle-dark: #27272A;
-$fsus-color-border-subtle-high-contrast: #FFFFFF;
+$fsus-color-border-light: #ECECF0;
+$fsus-color-border-light-dark: #3F3F46;
+$fsus-color-border-lighter: #F1F1F3;
+$fsus-color-border-lighter-dark: #303036;
+$fsus-color-border-extra-light: #F7F7F8;
+$fsus-color-border-extra-light-dark: #1D1D20;
 $fsus-color-focus-ring: #2A599C;
 $fsus-color-focus-ring-dark: #4B79CC;
-$fsus-color-focus-ring-high-contrast: #FFFF00;
 $fsus-color-status-danger: #D92D20;
 $fsus-brush-surface-base: #FFFFFF;
 $fsus-brush-surface-raised: #F7F7F8;
@@ -55,6 +68,14 @@ $fsus-radius-control-md: 6px;
 $fsus-radius-surface-md: 12px;
 $fsus-border-control-width: 1px;
 $fsus-shadow-overlay-md: none;
+$fsus-shadow-panel-light: 0 8px 24px rgba(15, 23, 42, 0.05);
+$fsus-shadow-panel-light-dark: 0 8px 24px rgba(0, 0, 0, 0.28);
+$fsus-shadow-panel-lighter: 0 2px 8px rgba(15, 23, 42, 0.04);
+$fsus-shadow-panel-lighter-dark: 0 2px 8px rgba(0, 0, 0, 0.24);
+$fsus-shadow-panel-dark: 0 16px 40px rgba(15, 23, 42, 0.1);
+$fsus-shadow-panel-dark-dark: 0 16px 40px rgba(0, 0, 0, 0.36);
+$fsus-shadow-floating: 0 12px 32px rgba(15, 23, 42, 0.08);
+$fsus-shadow-floating-dark: 0 12px 32px rgba(0, 0, 0, 0.36);
 $fsus-opacity-disabled-content: 0.46;
 $fsus-z-overlay-dialog: 2000;
 $fsus-motion-duration-control-fast: 140ms;
@@ -64,10 +85,12 @@ $fsus-motion-duration-control-motion-disabled: 1ms;
 $fsus-motion-duration-panel: 360ms;
 $fsus-motion-easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
 $fsus-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
-$fsus-motion-distance-sm: 10px;
-$fsus-motion-distance-md: 20px;
+$fsus-motion-distance-small: 8px;
+$fsus-motion-distance-medium: 14px;
+$fsus-motion-distance-large: 20px;
 $fsus-motion-stagger-default: 70ms;
-$fsus-motion-intensity-standard: 0.95;
+$fsus-motion-intensity-standard: 0.96;
+$fsus-motion-intensity-subtle: 0.98;
 $fsus-density-control-default-y: 44px;
 $fsus-density-control-default-y-density-compact: 40px;
 $fsus-density-control-default-y-density-spacious: 48px;
@@ -83,10 +106,8 @@ $fsus-component-dialog-padding: 24px;
 $fsus-component-overlay-scrim: #99000000;
 $fsus-component-state-button-primary-background-default: #0F0F11;
 $fsus-component-state-button-primary-background-default-dark: #F0F0F4;
-$fsus-component-state-button-primary-background-default-high-contrast: #FFFFFF;
 $fsus-component-state-button-primary-background-hover: #2A599C;
 $fsus-component-state-button-primary-background-hover-dark: #4B79CC;
-$fsus-component-state-button-primary-background-hover-high-contrast: #FFFF00;
 
 $fsus-tokens: (
   'primitive.color.blue.600': #2A599C,
@@ -103,7 +124,18 @@ $fsus-tokens: (
   'color.text.decorative': #A1A1AA,
   'color.surface.base': #FFFFFF,
   'color.surface.raised': #F7F7F8,
+  'color.surface.page': #F7F7F8,
+  'color.surface.overlay': #FFFFFFFA,
+  'color.fill.base': #F4F4F5,
+  'color.fill.light': #FAFAFA,
+  'color.fill.lighter': #FCFCFC,
+  'color.fill.extra.light': #FFFFFF,
+  'color.fill.dark': #ECECF0,
+  'color.fill.darker': #E4E4E7,
   'color.border.subtle': #E4E4E7,
+  'color.border.light': #ECECF0,
+  'color.border.lighter': #F1F1F3,
+  'color.border.extra.light': #F7F7F8,
   'color.focus.ring': #2A599C,
   'color.status.danger': #D92D20,
   'brush.surface.base': #FFFFFF,
@@ -127,6 +159,10 @@ $fsus-tokens: (
   'radius.surface.md': 12px,
   'border.control.width': 1px,
   'shadow.overlay.md': none,
+  'shadow.panel.light': 0 8px 24px rgba(15, 23, 42, 0.05),
+  'shadow.panel.lighter': 0 2px 8px rgba(15, 23, 42, 0.04),
+  'shadow.panel.dark': 0 16px 40px rgba(15, 23, 42, 0.1),
+  'shadow.floating': 0 12px 32px rgba(15, 23, 42, 0.08),
   'opacity.disabled.content': 0.46,
   'z.overlay.dialog': 2000,
   'motion.duration.control.fast': 140ms,
@@ -134,10 +170,12 @@ $fsus-tokens: (
   'motion.duration.panel': 360ms,
   'motion.easing.standard': cubic-bezier(0.4, 0, 0.2, 1),
   'motion.easing.emphasized': cubic-bezier(0.2, 0, 0, 1),
-  'motion.distance.sm': 10px,
-  'motion.distance.md': 20px,
+  'motion.distance.small': 8px,
+  'motion.distance.medium': 14px,
+  'motion.distance.large': 20px,
   'motion.stagger.default': 70ms,
-  'motion.intensity.standard': 0.95,
+  'motion.intensity.standard': 0.96,
+  'motion.intensity.subtle': 0.98,
   'density.control.default.y': 44px,
   'density.control.compact.y': 40px,
   'icon.size.md': 16px,
@@ -156,9 +194,18 @@ $fsus-tokens: (
 $fsus-token-aliases: (
   '--fsus-scholarly-blue': '--fsus-color-action-primary',
   '--fsus-dot-gray': '--fsus-color-text-decorative',
+  '--fsus-page': '--fsus-color-surface-page',
+  '--fsus-surface-overlay': '--fsus-color-surface-overlay',
+  '--fsus-border-light': '--fsus-color-border-light',
+  '--fsus-border-lighter': '--fsus-color-border-lighter',
+  '--fsus-border-extra-light': '--fsus-color-border-extra-light',
+  '--fsus-shadow-panel': '--fsus-shadow-overlay-md',
   '--fsus-motion-control-fast': '--fsus-motion-duration-control-fast',
   '--fsus-motion-control': '--fsus-motion-duration-control',
   '--fsus-motion-panel': '--fsus-motion-duration-panel',
   '--fsus-motion-standard': '--fsus-motion-easing-standard',
   '--fsus-motion-emphasized': '--fsus-motion-easing-emphasized',
+  '--fsus-motion-distance-sm': '--fsus-motion-distance-small',
+  '--fsus-motion-distance-md': '--fsus-motion-distance-medium',
+  '--fsus-motion-distance-lg': '--fsus-motion-distance-large',
 );

@@ -193,6 +193,10 @@ const assertTokenMax = (file, source, token, max) => {
 const checkCoreTokens = () => {
   const file = 'vue/packages/theme-chalk/src/common/fsus-tokens.scss'
   const source = read(file)
+  const canonicalSource = JSON.parse(read('spec/tokens/tokens.json'))
+  const canonicalTokens = new Map(
+    canonicalSource.tokens.map((token) => [token.name, token]),
+  )
 
   for (const token of [
     '--fsus-backdrop-blur',
@@ -217,15 +221,32 @@ const checkCoreTokens = () => {
   assertIncludes(
     file,
     source,
-    '--fsus-shadow-panel: none;',
+    '--fsus-shadow-panel: var(--fsus-shadow-overlay-md);',
     'ordinary panel surfaces must be border-first by default',
   )
   assertIncludes(
     file,
     source,
-    '--fsus-shadow-floating: 0 12px 32px rgba(15, 23, 42, 0.08);',
+    '--fsus-shadow-floating: #{generated.$fsus-shadow-floating};',
     'floating shadow must stay below the large SaaS-card baseline',
   )
+  if (canonicalTokens.get('shadow.overlay.md')?.value !== 'none') {
+    addViolation(
+      'spec/tokens/tokens.json',
+      1,
+      'ordinary panel canonical shadow must remain none',
+    )
+  }
+  if (
+    canonicalTokens.get('shadow.floating')?.value !==
+    '0 12px 32px rgba(15, 23, 42, 0.08)'
+  ) {
+    addViolation(
+      'spec/tokens/tokens.json',
+      1,
+      'floating canonical shadow must stay below the large SaaS-card baseline',
+    )
+  }
 }
 
 const checkGeometryMixinSemantics = () => {

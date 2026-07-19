@@ -1082,6 +1082,14 @@ describe('Fsus theme visual baseline', () => {
     ])
     expect(dialogCss).toContain('@keyframes dialog-scale-fade-in')
     expect(dialogCss).toContain('@keyframes dialog-scale-fade-out')
+    expect(dialogCss).toContain('var(--fsus-motion-distance-sm, 8px)')
+    expect(dialogCss).toContain(
+      'scale(var(--fsus-motion-intensity-standard, 0.96))',
+    )
+    expect(dialogCss).toContain(
+      'scale(var(--fsus-motion-intensity-subtle, 0.98))',
+    )
+    expect(dialogCss).not.toContain('--fsus-motion-distance-xs')
   })
 
   test('keeps overlay panels border-first by default', () => {
@@ -1475,7 +1483,7 @@ describe('Fsus theme visual baseline', () => {
       'background: var(--fsus-message-bg, var(--el-bg-color));',
       'border: 1px solid var(--fsus-message-border, var(--el-border-color-lighter));',
       'border-radius: var(--fsus-message-radius, var(--el-message-border-radius));',
-      'box-shadow: var(--fsus-message-shadow, 0 8px 20px rgba(15, 23, 42, 0.06));',
+      'box-shadow: var(--fsus-shadow-panel-light);',
     ])
     expectCssRule(themeCss, '.el-message', [
       'position: fixed;',

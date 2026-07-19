@@ -147,7 +147,7 @@ describe('Fsus token source contracts', () => {
     )
   })
 
-  test('exposes quiet, decorative, and raised semantics from generated mode values', () => {
+  test('exposes quiet, decorative, and raised semantics from the two canonical modes', () => {
     expect(tokenSource).toContain(
       '--fsus-color-text-quiet: #{generated.$fsus-color-text-quiet};',
     )
@@ -170,18 +170,17 @@ describe('Fsus token source contracts', () => {
     expect(generatedTokenSource).toContain(
       '$fsus-color-surface-raised-dark: #1A1A1E;',
     )
-    expect(generatedCssSource).toContain('[data-fsus-theme="high-contrast"] {')
-    expect(generatedCssSource).toContain('--fsus-color-text-quiet: #FFFFFF;')
+    expect(generatedCssSource).not.toContain(
+      '[data-fsus-theme="high-contrast"]',
+    )
     expect(generatedJson.tokens['color.text.decorative'].modeValues).toEqual({
       dark: '#71717A',
-      highContrast: '#FFFFFF',
     })
     expect(generatedJson.tokens['color.text.quiet']).toMatchObject({
       type: 'color',
       value: '#71717A',
       modeValues: {
         dark: '#A1A1AA',
-        highContrast: '#FFFFFF',
       },
     })
     expect(sassVarSource).toMatch(
@@ -196,5 +195,44 @@ describe('Fsus token source contracts', () => {
     expect(generatedCsharpSource).toContain(
       'public const string ColorSurfaceRaisedDarkValue = "#1A1A1E";',
     )
+  })
+
+  test('registers adapter aliases before component and Sass map use', () => {
+    for (const declaration of [
+      '--fsus-border-light: var(--fsus-color-border-light);',
+      '--fsus-border-lighter: var(--fsus-color-border-lighter);',
+      '--fsus-border-extra-light: var(--fsus-color-border-extra-light);',
+      '--fsus-surface-overlay: var(--fsus-color-surface-overlay);',
+      '--fsus-shadow-panel-light: #{generated.$fsus-shadow-panel-light};',
+      '--fsus-motion-distance-sm: var(--fsus-motion-distance-small);',
+      '--fsus-motion-distance-md: var(--fsus-motion-distance-medium);',
+      '--fsus-motion-distance-lg: var(--fsus-motion-distance-large);',
+      '--fsus-motion-intensity-standard: #{generated.$fsus-motion-intensity-standard};',
+      '--fsus-motion-intensity-subtle: #{generated.$fsus-motion-intensity-subtle};',
+      '--fsus-color-picker-thumb-bg: var(--fsus-color-surface-base);',
+      '--fsus-color-picker-thumb-border: var(--fsus-border);',
+      '--fsus-color-picker-thumb-shadow: var(--fsus-shadow-panel-lighter);',
+    ]) {
+      expect(tokenSource).toContain(declaration)
+    }
+
+    expect(sassVarSource).toMatch(
+      /\$border-color:[\s\S]*?'light': var\(--fsus-border-light\),[\s\S]*?'lighter': var\(--fsus-border-lighter\),[\s\S]*?'extra-light': var\(--fsus-border-extra-light\),/,
+    )
+    expect(sassVarSource).toMatch(
+      /\$bg-color:[\s\S]*?'page': var\(--fsus-page\),[\s\S]*?'overlay': var\(--fsus-surface-overlay\),/,
+    )
+    expect(sassVarSource).toMatch(
+      /\$message:[\s\S]*?'shadow': var\(--fsus-shadow-panel-light\),/,
+    )
+    expect(generatedJson.tokens['color.border.light']).toMatchObject({
+      value: '#ECECF0',
+      aliases: ['--fsus-border-light'],
+      modeValues: { dark: '#3F3F46' },
+    })
+    expect(generatedJson.tokens['motion.distance.medium']).toMatchObject({
+      value: '14px',
+      aliases: ['--fsus-motion-distance-md'],
+    })
   })
 })
