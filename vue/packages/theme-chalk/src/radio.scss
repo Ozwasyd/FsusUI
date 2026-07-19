@@ -188,13 +188,6 @@ $radio-font-size: map.merge(
     }
   }
 
-  &:focus:not(:focus-visible):not(.is-focus):not(:active):not(.is-disabled) {
-    /*获得焦点时 样式提醒*/
-    .#{$namespace}-radio__inner {
-      @include a11y-focus-ring(2px, getCssVar('radio-input-border-radius'));
-    }
-  }
-
   @include e(label) {
     font-size: getCssVar('radio-font-size');
     padding-left: 8px;
