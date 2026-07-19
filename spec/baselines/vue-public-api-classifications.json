@@ -78,6 +78,7 @@
     "table-v2": "native-adapter",
     "tabs": "native-adapter",
     "tag": "portable",
+    "task-page-header": "portable",
     "text": "portable",
     "theme-mode-toggle": "platform-override",
     "time-picker": "native-adapter",

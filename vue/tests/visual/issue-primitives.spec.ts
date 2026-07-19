@@ -32,6 +32,7 @@ test('issue primitives render in the demo route', async ({
   const projectName = testInfo.project.name
   const isCompact = projectName.includes('mobile')
   const theme = projectName.includes('dark') ? 'dark' : 'light'
+  const viewport = isCompact ? 'mobile' : 'desktop'
   const compactParam = isCompact ? '&compact=1' : ''
 
   await page.goto(`/?visual=issue-primitives&theme=${theme}${compactParam}`, {
@@ -47,6 +48,61 @@ test('issue primitives render in the demo route', async ({
   await expect(
     page.locator('.issue-primitives__site-header-fixtures .el-site-header'),
   ).toHaveCount(3)
+  const taskPageHeaderDemo = page.locator(
+    '.issue-primitives__task-page-header-demo',
+  )
+  await expect(taskPageHeaderDemo).toBeVisible()
+  await expect(
+    taskPageHeaderDemo.locator(
+      '.issue-primitives__task-page-header-comparison',
+    ),
+  ).toHaveCount(5)
+  const taskPageHeaders = taskPageHeaderDemo.locator('.el-task-page-header')
+  await expect(taskPageHeaders).toHaveCount(5)
+  await expect(taskPageHeaders.first()).toHaveClass(
+    new RegExp(`el-task-page-header--${isCompact ? 'compact' : 'default'}`),
+  )
+  await expect(
+    taskPageHeaders.first().locator('.el-task-page-header__title'),
+  ).toHaveCSS('font-size', '24px')
+  await expect(
+    taskPageHeaders.first().locator('.el-task-page-header__description'),
+  ).toHaveCSS('font-size', '14px')
+  await expect(
+    taskPageHeaders.last().locator('.el-task-page-header__description'),
+  ).toHaveCount(0)
+  const firstTaskPageHeaderAction = taskPageHeaders
+    .first()
+    .locator('.el-task-page-header__actions button')
+  await expect(firstTaskPageHeaderAction).toBeVisible()
+  await firstTaskPageHeaderAction.focus()
+  await expect(firstTaskPageHeaderAction).toBeFocused()
+  const taskHeaderSourceOrder = await taskPageHeaders
+    .first()
+    .evaluate((node) =>
+      Array.from(node.children).map((child) => child.className),
+    )
+  expect(taskHeaderSourceOrder).toEqual([
+    'el-task-page-header__heading',
+    'el-task-page-header__actions',
+  ])
+  if (isCompact) {
+    const headingBox = await taskPageHeaders
+      .first()
+      .locator('.el-task-page-header__heading')
+      .boundingBox()
+    const actionsBox = await taskPageHeaders
+      .first()
+      .locator('.el-task-page-header__actions')
+      .boundingBox()
+    expect(actionsBox?.y ?? 0).toBeGreaterThan(
+      (headingBox?.y ?? 0) + (headingBox?.height ?? 0) - 1,
+    )
+  }
+  await testInfo.attach(`task-page-header-${theme}-${viewport}`, {
+    body: await taskPageHeaderDemo.screenshot({ animations: 'disabled' }),
+    contentType: 'image/png',
+  })
   const inlineEmptyStates = page.locator('.el-empty-state--inline')
   await expect(inlineEmptyStates).toHaveCount(2)
   await expect(inlineEmptyStates.first()).toBeVisible()
@@ -88,7 +144,6 @@ test('issue primitives render in the demo route', async ({
       }
     `,
   })
-  const viewport = isCompact ? 'mobile' : 'desktop'
   await testInfo.attach(`settings-typography-before-${theme}-${viewport}`, {
     body: await settingsDemo.screenshot({ animations: 'disabled' }),
     contentType: 'image/png',

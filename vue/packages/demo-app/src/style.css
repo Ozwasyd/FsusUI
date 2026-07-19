@@ -232,6 +232,92 @@ body {
   font-size: 24px;
 }
 
+.issue-primitives__task-page-header-demo {
+  display: grid;
+  gap: var(--fsus-space-4, 16px);
+  min-width: 0;
+}
+
+.issue-primitives__task-page-header-demo > h3 {
+  margin: 0;
+  color: var(--el-text-color-primary);
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.issue-primitives__task-page-header-comparisons {
+  display: grid;
+  gap: var(--fsus-space-5, 20px);
+  min-width: 0;
+}
+
+.issue-primitives__task-page-header-comparison {
+  display: grid;
+  gap: var(--fsus-space-2, 8px);
+  min-width: 0;
+}
+
+.issue-primitives__task-page-header-context,
+.issue-primitives__task-page-header-variant {
+  margin: 0;
+  color: var(--el-text-color-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.issue-primitives__task-page-header-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--fsus-space-4, 16px);
+  min-width: 0;
+}
+
+.issue-primitives__task-page-header-surface {
+  display: grid;
+  gap: var(--fsus-space-3, 12px);
+  min-width: 0;
+  padding: var(--fsus-space-4, 16px);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: var(--fsus-radius-panel, 12px);
+  background: var(--el-bg-color);
+}
+
+.issue-primitives__legacy-page-header {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.issue-primitives__legacy-page-header-eyebrow {
+  color: var(--el-text-color-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.issue-primitives__legacy-page-header h4 {
+  margin: 0;
+  color: var(--el-text-color-primary);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.issue-primitives__legacy-page-header p {
+  margin: 0;
+  color: var(--el-text-color-secondary);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.issue-primitives__legacy-page-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--fsus-space-2, 8px);
+  margin-top: 2px;
+}
+
 .issue-primitives__settings-demo {
   display: grid;
   gap: 20px;
@@ -313,6 +399,10 @@ body {
 }
 
 @media (max-width: 760px) {
+  .issue-primitives__task-page-header-pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .issue-primitives__settings-grid {
     grid-template-columns: minmax(0, 1fr);
   }

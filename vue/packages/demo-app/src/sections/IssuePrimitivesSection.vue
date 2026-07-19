@@ -38,6 +38,64 @@
         </el-button>
       </header>
 
+      <section
+        class="issue-primitives__task-page-header-demo"
+        aria-labelledby="task-page-header-fixtures-title"
+      >
+        <h3 id="task-page-header-fixtures-title">
+          Task page header comparisons
+        </h3>
+        <div class="issue-primitives__task-page-header-comparisons">
+          <article
+            v-for="fixture in taskPageHeaderFixtures"
+            :key="fixture.key"
+            class="issue-primitives__task-page-header-comparison"
+          >
+            <p class="issue-primitives__task-page-header-context">
+              {{ fixture.context }}
+            </p>
+            <div class="issue-primitives__task-page-header-pair">
+              <div class="issue-primitives__task-page-header-surface">
+                <span class="issue-primitives__task-page-header-variant">
+                  Before
+                </span>
+                <header class="issue-primitives__legacy-page-header">
+                  <span class="issue-primitives__legacy-page-header-eyebrow">
+                    {{ fixture.context }} workspace
+                  </span>
+                  <h4>{{ fixture.title }}</h4>
+                  <p v-if="fixture.description">
+                    {{ fixture.description }}
+                  </p>
+                  <div
+                    v-if="fixture.action"
+                    class="issue-primitives__legacy-page-header-actions"
+                  >
+                    <el-button size="small">{{ fixture.action }}</el-button>
+                  </div>
+                </header>
+              </div>
+
+              <div class="issue-primitives__task-page-header-surface">
+                <span class="issue-primitives__task-page-header-variant">
+                  After
+                </span>
+                <ElTaskPageHeader
+                  :title="fixture.title"
+                  :description="fixture.description"
+                  title-tag="h4"
+                  :density="compact ? 'compact' : 'default'"
+                >
+                  <template v-if="fixture.action" #actions>
+                    <el-button size="small">{{ fixture.action }}</el-button>
+                  </template>
+                </ElTaskPageHeader>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
       <div class="issue-primitives__site-header-fixtures">
         <ElSiteHeader
           :sticky="false"
@@ -556,6 +614,7 @@ import {
   ElSegmentedControl,
   ElSiteHeader,
   ElStatusSummary,
+  ElTaskPageHeader,
   ElThemeModeToggle,
   ElThreadPanel,
   ElTypedConfirmField,
@@ -593,6 +652,43 @@ const settingsNavItems = [
   },
   { key: 'resources', label: 'Resources', href: '#settings-resources' },
   { key: 'risk', label: 'Risk', href: '#settings-risk' },
+]
+const taskPageHeaderFixtures = [
+  {
+    key: 'account',
+    context: 'Account',
+    title: 'Profile and security',
+    description: 'Manage profile details and sign-in preferences.',
+    action: 'Edit profile',
+  },
+  {
+    key: 'dashboard',
+    context: 'Dashboard',
+    title: 'Operations overview',
+    description: 'Review the latest health and delivery signals.',
+    action: 'Refresh',
+  },
+  {
+    key: 'collection',
+    context: 'Collection',
+    title: 'Article collection',
+    description: 'Filter, review, and export the current result set.',
+    action: 'Create item',
+  },
+  {
+    key: 'form',
+    context: 'Form',
+    title: 'Edit resource',
+    description: 'Update the fields required by this workflow.',
+    action: 'Save',
+  },
+  {
+    key: 'settings',
+    context: 'Settings',
+    title: 'Notification preferences',
+    description: '',
+    action: '',
+  },
 ]
 const rows = [
   { id: 1, title: 'Layout primitives', meta: '42 views' },

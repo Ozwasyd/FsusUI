@@ -1,0 +1,76 @@
+@use 'mixins/mixins' as *;
+@use 'mixins/var' as *;
+
+@include b(task-page-header) {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--fsus-space-6, 24px);
+  align-items: start;
+  min-width: 0;
+  max-width: 100%;
+  color: getCssVar('text-color', 'primary');
+  text-align: left;
+
+  @include m(compact) {
+    gap: var(--fsus-space-4, 16px);
+
+    @include e(heading) {
+      gap: var(--fsus-space-1, 4px);
+    }
+  }
+
+  @include e(heading) {
+    display: grid;
+    gap: var(--fsus-space-2, 8px);
+    min-width: 0;
+  }
+
+  @include e(title) {
+    max-width: 100%;
+    margin: 0;
+    color: getCssVar('text-color', 'primary');
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0;
+    overflow-wrap: anywhere;
+  }
+
+  @include e(description) {
+    max-width: 58rem;
+    margin: 0;
+    color: getCssVar('text-color', 'secondary');
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+  }
+
+  @include e(actions) {
+    display: inline-flex;
+    max-width: 100%;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--fsus-space-2, 8px);
+    min-width: 0;
+
+    > * {
+      flex: 0 1 auto;
+      min-width: 0;
+    }
+  }
+}
+
+@media (max-width: 760px) {
+  @include b(task-page-header) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--fsus-space-4, 16px);
+
+    @include e(actions) {
+      width: 100%;
+      justify-content: flex-start;
+    }
+  }
+}

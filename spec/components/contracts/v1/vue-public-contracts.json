@@ -5,9 +5,9 @@
   "owner": "FsusUI Core",
   "baseline": {
     "path": "spec/baselines/vue-current.json",
-    "hash": "08e4906e3c48af1bee874bda663ef90b8b990d9e73b68e7dd0b6150b0b82b4a7",
+    "hash": "631724d1d12c2fcf9bf24a5a15307838de44655518e87b8d8cd83f6372d01e84",
     "packageVersion": "1.5.1",
-    "tokenHash": "e527f5c8e52809857180b5712ae2ea0897fcb3cf1fe503fe231aa9546baa4ea6",
+    "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
     "iconHash": "d61254b1b1ff9addaf45293153df217b0c0d01ec69ec602081c44a01008b78de"
   },
   "changeClassifications": [
@@ -17929,6 +17929,111 @@
       }
     },
     {
+      "id": "component.el-task-page-header",
+      "version": "1.0.0",
+      "releaseClassification": "preview",
+      "owner": "FsusUI Core",
+      "supportedPlatforms": {
+        "web": {
+          "status": "source",
+          "package": "@ozwasyd/element-plus"
+        },
+        "avalonia": {
+          "status": "required",
+          "package": "FsusUI.Avalonia"
+        }
+      },
+      "changeClassification": "minor",
+      "platformClassification": "portable",
+      "source": {
+        "kind": "component",
+        "name": "ElTaskPageHeader",
+        "module": "task-page-header",
+        "baseline": "spec/baselines/vue-current.json"
+      },
+      "props": [
+        {
+          "name": "density",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "description",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "title",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "titleTag",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        }
+      ],
+      "events": [],
+      "contentRegions": [
+        {
+          "name": "actions",
+          "scoped": false,
+          "required": false
+        },
+        {
+          "name": "description",
+          "scoped": false,
+          "required": false
+        },
+        {
+          "name": "title",
+          "scoped": false,
+          "required": false
+        }
+      ],
+      "defaults": {
+        "source": "vue-baseline",
+        "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
+      },
+      "stateMachine": {
+        "initial": "default",
+        "states": ["default", "hover", "focus-visible", "active", "disabled"],
+        "transitions": {
+          "default->focus-visible": "keyboard focus enters the control",
+          "default->disabled": "disabled or unavailable state is applied"
+        },
+        "platformNotes": "Avalonia state names must remain contract-compatible with Web."
+      },
+      "keyboardBehavior": {
+        "focus": "platform-native focus entry must expose the same public focus state",
+        "activation": "keyboard activation follows the component accessibility role",
+        "escape": "dismiss only when the component contract exposes a dismissible surface"
+      },
+      "pointerBehavior": {
+        "primary": "pointer/tap activation maps to the same public event as Web click or selection",
+        "hover": "hover-only affordances must have keyboard and touch alternatives"
+      },
+      "accessibilityMapping": {
+        "role": "derived from public component semantics",
+        "name": "required when the component is interactive or status-bearing",
+        "automation": "Avalonia AutomationProperties must expose equivalent role, name, state, and value."
+      },
+      "themeTokens": ["color", "typography", "space", "radius", "motion"],
+      "motionPolicy": {
+        "source": "spec/motion/README.md",
+        "reducedMotion": "must honor user reduced-motion preference"
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
+    },
+    {
       "id": "component.el-text",
       "version": "1.0.0",
       "releaseClassification": "preview",
@@ -25068,6 +25173,111 @@
         },
         {
           "name": "updated",
+          "scoped": false,
+          "required": false
+        }
+      ],
+      "defaults": {
+        "source": "vue-baseline",
+        "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
+      },
+      "stateMachine": {
+        "initial": "default",
+        "states": ["default", "hover", "focus-visible", "active", "disabled"],
+        "transitions": {
+          "default->focus-visible": "keyboard focus enters the control",
+          "default->disabled": "disabled or unavailable state is applied"
+        },
+        "platformNotes": "Avalonia state names must remain contract-compatible with Web."
+      },
+      "keyboardBehavior": {
+        "focus": "platform-native focus entry must expose the same public focus state",
+        "activation": "keyboard activation follows the component accessibility role",
+        "escape": "dismiss only when the component contract exposes a dismissible surface"
+      },
+      "pointerBehavior": {
+        "primary": "pointer/tap activation maps to the same public event as Web click or selection",
+        "hover": "hover-only affordances must have keyboard and touch alternatives"
+      },
+      "accessibilityMapping": {
+        "role": "derived from public component semantics",
+        "name": "required when the component is interactive or status-bearing",
+        "automation": "Avalonia AutomationProperties must expose equivalent role, name, state, and value."
+      },
+      "themeTokens": ["color", "typography", "space", "radius", "motion"],
+      "motionPolicy": {
+        "source": "spec/motion/README.md",
+        "reducedMotion": "must honor user reduced-motion preference"
+      },
+      "performanceBudget": {
+        "renderMs": 8,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
+    },
+    {
+      "id": "component.fsus-task-page-header",
+      "version": "1.0.0",
+      "releaseClassification": "preview",
+      "owner": "FsusUI Core",
+      "supportedPlatforms": {
+        "web": {
+          "status": "source",
+          "package": "@ozwasyd/element-plus"
+        },
+        "avalonia": {
+          "status": "required",
+          "package": "FsusUI.Avalonia"
+        }
+      },
+      "changeClassification": "minor",
+      "platformClassification": "portable",
+      "source": {
+        "kind": "component",
+        "name": "FsusTaskPageHeader",
+        "module": "task-page-header",
+        "baseline": "spec/baselines/vue-current.json"
+      },
+      "props": [
+        {
+          "name": "density",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "description",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "title",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "titleTag",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        }
+      ],
+      "events": [],
+      "contentRegions": [
+        {
+          "name": "actions",
+          "scoped": false,
+          "required": false
+        },
+        {
+          "name": "description",
+          "scoped": false,
+          "required": false
+        },
+        {
+          "name": "title",
           "scoped": false,
           "required": false
         }

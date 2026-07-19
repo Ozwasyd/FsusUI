@@ -224,6 +224,20 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 
 ## 8. Component Implementation Rules
 
+### Task Page Header
+
+- Task surfaces use `FsusTaskPageHeader` for the top-level page-heading role:
+  `24px / 700 / 1.2` title plus an optional readable `14px` description.
+- The title stays at `24px` on wide and narrow screens; density changes spacing,
+  not typography. Actions follow the heading in DOM/source order and stack below
+  it on mobile.
+- The primitive is left aligned and flat. It does not own eyebrow, marketing
+  copy, decorative icons, breadcrumbs, back navigation, card material, gradient,
+  glow, or shadow.
+- `ElPageHeader` remains the navigation-oriented primitive for back, breadcrumb,
+  icon, divider, content, and extra regions. Do not use it as a generic task-page
+  heading.
+
 ### Button
 
 - 默认高度 `44px`，大号 `48px`，小号 `40px`。

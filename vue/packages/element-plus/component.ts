@@ -152,6 +152,7 @@ import { ElTable, ElTableColumn } from '@element-plus/components/table'
 import { ElAutoResizer, ElTableV2 } from '@element-plus/components/table-v2'
 import { ElTabPane, ElTabs } from '@element-plus/components/tabs'
 import { ElTag } from '@element-plus/components/tag'
+import { ElTaskPageHeader } from '@element-plus/components/task-page-header'
 import { ElText } from '@element-plus/components/text'
 import { ElThemeModeToggle } from '@element-plus/components/theme-mode-toggle'
 import { ElTimePicker } from '@element-plus/components/time-picker'
@@ -306,6 +307,7 @@ export const allComponents = [
   ElTabs,
   ElTabPane,
   ElTag,
+  ElTaskPageHeader,
   ElText,
   ElThemeModeToggle,
   ElTimePicker,

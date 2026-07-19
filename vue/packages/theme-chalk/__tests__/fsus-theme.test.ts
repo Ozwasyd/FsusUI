@@ -55,6 +55,39 @@ const expectCssRule = (
 }
 
 describe('Fsus theme visual baseline', () => {
+  test('keeps task page headings flat, readable, and stable across densities', () => {
+    const css = compileThemeFile('task-page-header.scss')
+
+    expectCssRule(css, '.el-task-page-header', [
+      'grid-template-columns: minmax(0, 1fr) auto;',
+      'gap: var(--fsus-space-6, 24px);',
+      'text-align: left;',
+    ])
+    expectCssRule(css, '.el-task-page-header__title', [
+      'font-size: 24px;',
+      'font-weight: 700;',
+      'line-height: 1.2;',
+      'letter-spacing: 0;',
+    ])
+    expectCssRule(css, '.el-task-page-header__description', [
+      'font-size: 14px;',
+      'font-weight: 400;',
+      'line-height: 1.65;',
+    ])
+    expectCssRule(css, '.el-task-page-header--compact', [
+      'gap: var(--fsus-space-4, 16px);',
+    ])
+    expectCssRule(css, '.el-task-page-header__actions', [
+      'justify-content: flex-end;',
+      'gap: var(--fsus-space-2, 8px);',
+    ])
+    expectCssRule(css, '.el-task-page-header', [
+      'grid-template-columns: minmax(0, 1fr);',
+      'gap: var(--fsus-space-4, 16px);',
+    ])
+    expect(css).not.toMatch(/(?:background|border|box-shadow):/)
+  })
+
   test('keeps overlay titles at their natural letter spacing', () => {
     const css = compileThemeFile('fsus-theme.scss')
 
