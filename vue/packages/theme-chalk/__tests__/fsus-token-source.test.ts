@@ -374,4 +374,50 @@ describe('Fsus token source contracts', () => {
       'public static double DensityIconTargetSmallDouble => 32d;',
     )
   })
+
+  test('traces stable scales, materials, and states to generated values', () => {
+    for (const [name, alias, sassName] of [
+      ['radius.control.sm', '--fsus-radius-control-small', 'radius-control-sm'],
+      ['radius.surface.sm', '--fsus-radius-popover', 'radius-surface-sm'],
+      ['radius.surface.lg', '--fsus-radius-panel-large', 'radius-surface-lg'],
+      [
+        'density.control.spacious.y',
+        '--fsus-control-height-spacious',
+        'density-control-spacious-y',
+      ],
+      [
+        'component.material.overlay.blur',
+        '--fsus-backdrop-blur-overlay',
+        'component-material-overlay-blur',
+      ],
+      [
+        'component-state.surface.focus.border',
+        '--fsus-state-focus-border',
+        'component-state-surface-focus-border',
+      ],
+    ]) {
+      expect(generatedJson.tokens[name].aliases).toContain(alias)
+      expect(tokenSource).toContain(`${alias}: #{generated.$fsus-${sassName}};`)
+      expect(generatedJson.tokens[name].traceability).toMatchObject({
+        canonicalName: name,
+        status: 'active',
+        migrationStatus: 'none',
+      })
+    }
+
+    for (const [name, alias, sassName] of [
+      ['space.5', '--fsus-space-5', 'space-5'],
+      ['radius.pill', '--fsus-radius-pill', 'radius-pill'],
+    ]) {
+      expect(generatedJson.tokens[name].css).toBe(alias)
+      expect(tokenSource).toContain(`${alias}: #{generated.$fsus-${sassName}};`)
+    }
+
+    expect(darkTokenMixin).toContain(
+      '--fsus-state-hover-bg: #{generated.$fsus-component-state-surface-hover-background-dark};',
+    )
+    expect(darkTokenMixin).toContain(
+      '--fsus-state-focus-border: #{generated.$fsus-component-state-surface-focus-border-dark};',
+    )
+  })
 })

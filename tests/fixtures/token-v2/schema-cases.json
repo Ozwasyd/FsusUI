@@ -3,7 +3,7 @@
     "version": 2,
     "layers": {
       "primitive": ["primitive.*"],
-      "semantic": ["color.*"],
+      "semantic": ["color.*", "motion.*"],
       "component": ["component.*"],
       "component-state": ["component-state.*"]
     },
@@ -11,6 +11,34 @@
       "theme": ["light", "dark"],
       "density": ["compact", "default", "spacious"],
       "motion": ["full", "reduced", "disabled"]
+    },
+    "traceability": {
+      "owners": {
+        "primitive": "Fixture design owner",
+        "semantic": "Fixture design owner",
+        "component": "Fixture component owner",
+        "component-state": "Fixture component owner"
+      },
+      "usageSurfaces": {
+        "primitive": "fixture foundation",
+        "semantic": "fixture shared surface",
+        "component": "fixture component",
+        "component-state": "fixture component state"
+      },
+      "consumerAccess": {
+        "primitive": false,
+        "semantic": true,
+        "component": false,
+        "component-state": false
+      },
+      "generatedOutputs": ["fixture/generated/tokens.json"],
+      "documentation": {
+        "public": "fixture/public.md",
+        "internal": "fixture/internal.md"
+      },
+      "fixture": "tests/fixtures/token-v2/schema-cases.json",
+      "status": "active",
+      "migrationStatus": "none"
     },
     "tokens": [
       {
@@ -35,6 +63,23 @@
         }
       },
       {
+        "name": "motion.duration.control",
+        "type": "duration",
+        "value": "220ms",
+        "description": "Fixture motion duration with reduced-motion coverage.",
+        "platforms": ["web", "avalonia"],
+        "modeValues": {
+          "motionReduced": {
+            "value": "1ms",
+            "fallback": "motion.duration.control"
+          },
+          "motionDisabled": {
+            "value": "1ms",
+            "fallback": "motion.duration.control"
+          }
+        }
+      },
+      {
         "name": "component.button.padding.x",
         "type": "dimension",
         "value": "12px",
@@ -51,6 +96,15 @@
     ]
   },
   "invalid": [
+    {
+      "name": "missing traceability metadata",
+      "errorIncludes": "traceability metadata is required",
+      "mutations": [
+        {
+          "path": "remove-traceability"
+        }
+      ]
+    },
     {
       "name": "invalid references",
       "errorIncludes": "references missing token missing.token",

@@ -540,6 +540,19 @@ ColorPicker 的 `--fsus-color-picker-*` 是组件内部命名 alias；它们只�
 
 新规则必须先在 [`spec/tokens/tokens.json`](../spec/tokens/tokens.json) 中映射到现有 public token，或新增一个 token，再写进本文件。
 
+可验证链固定为 `spec/tokens/tokens.json` → generated Web/Avalonia output →
+`common/fsus-tokens.scss` runtime adapter → 本文档 → consumer。生成 JSON 与
+[`docs/theme/generated/tokens.md`](./theme/generated/tokens.md) 会为每个 token
+展开 canonical name、runtime aliases、light/dark、usage surface、owner、
+consumer-use flag、output、doc、fixture、status 与 migration status；
+`consumerUse: true` 为 public，`false` 为 internal。canonical fixture 为
+`tests/fixtures/token-v2/schema-cases.json`，`pnpm tokens:lint` 同时阻止 adapter
+为稳定的 color/radius/spacing/material/motion/state token 增加未登记字面值。
+
+Consumer 自有视觉命名不进入 FsusUI registry。FsusBlog 必须使用
+`--fsusblog-*` 并映射到 public `--fsus-*` / `--el-*`，不得伪造新的
+`--fsus-*` 设计真值。
+
 Canonical theme 维度仅包含 light/dark。操作系统 high-contrast 行为由 [`spec/platform-overrides/`](../spec/platform-overrides/) 单独登记、验证和定期复核，不生成第三套 Web theme preset。
 
 ## 13. Terminology

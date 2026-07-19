@@ -101,6 +101,11 @@
   <SolidColorBrush x:Key="FsusBrushSurfaceBase" Color="#FFFFFF" />
   <SolidColorBrush x:Key="FsusBrushSurfaceRaised" Color="#F7F7F8" />
   <x:Double x:Key="FsusTypographyBodyMdSize">14</x:Double>
+  <x:Double x:Key="FsusTypographyCaptionSmSize">12</x:Double>
+  <x:Double x:Key="FsusTypographyCaptionMdSize">13</x:Double>
+  <x:Double x:Key="FsusTypographyBodyLgSize">16</x:Double>
+  <x:Double x:Key="FsusTypographyHeadingSmSize">18</x:Double>
+  <x:Double x:Key="FsusTypographyHeadingMdSize">20</x:Double>
   <FontFamily x:Key="FsusTypographyFamilyBody">Google Sans, Inter, Noto Sans SC, Noto Sans CJK SC, Noto Sans TC, Noto Sans JP, PingFang SC, Hiragino Sans GB, Microsoft YaHei, 微软雅黑, Helvetica Neue, Helvetica, Arial, ui-sans-serif, system-ui, sans-serif</FontFamily>
   <FontFamily x:Key="FsusTypographyFamilyMonospace">ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace</FontFamily>
   <x:Double x:Key="FsusTypographyBodyMdLineHeight">22</x:Double>
@@ -113,10 +118,17 @@
   <Thickness x:Key="FsusSpace2">8</Thickness>
   <Thickness x:Key="FsusSpace3">12</Thickness>
   <Thickness x:Key="FsusSpace4">16</Thickness>
+  <Thickness x:Key="FsusSpace5">20</Thickness>
+  <Thickness x:Key="FsusSpace6">24</Thickness>
+  <Thickness x:Key="FsusSpace8">32</Thickness>
   <Thickness x:Key="FsusThicknessBorderDefault">1</Thickness>
   <Thickness x:Key="FsusThicknessFocusMd">2</Thickness>
+  <CornerRadius x:Key="FsusRadiusControlSm">4</CornerRadius>
   <CornerRadius x:Key="FsusRadiusControlMd">6</CornerRadius>
+  <CornerRadius x:Key="FsusRadiusSurfaceSm">10</CornerRadius>
   <CornerRadius x:Key="FsusRadiusSurfaceMd">12</CornerRadius>
+  <CornerRadius x:Key="FsusRadiusSurfaceLg">24</CornerRadius>
+  <CornerRadius x:Key="FsusRadiusPill">999</CornerRadius>
   <Thickness x:Key="FsusBorderControlWidth">1</Thickness>
   <BoxShadows x:Key="FsusShadowOverlayMd">none</BoxShadows>
   <BoxShadows x:Key="FsusShadowPanelLight">0 8px 24px rgba(15, 23, 42, 0.05)</BoxShadows>
@@ -139,6 +151,7 @@
   <x:Double x:Key="FsusMotionIntensitySubtle">0.98</x:Double>
   <x:Double x:Key="FsusDensityControlDefaultY">44</x:Double>
   <x:Double x:Key="FsusDensityControlCompactY">40</x:Double>
+  <x:Double x:Key="FsusDensityControlSpaciousY">48</x:Double>
   <x:Double x:Key="FsusDensitySelectOptionY">34</x:Double>
   <x:Double x:Key="FsusDensityControlActionY">36</x:Double>
   <x:Double x:Key="FsusDensityMenuItemY">56</x:Double>
@@ -159,6 +172,28 @@
   <Thickness x:Key="FsusComponentDialogPadding">24</Thickness>
   <Color x:Key="FsusComponentOverlayScrim">#99000000</Color>
   <SolidColorBrush x:Key="FsusComponentOverlayScrimBrush" Color="#99000000" />
+  <x:Double x:Key="FsusComponentMaterialPaperBlur">0</x:Double>
+  <x:Double x:Key="FsusComponentMaterialPaperBlurSoft">0</x:Double>
+  <x:Double x:Key="FsusComponentMaterialOverlayBlur">0</x:Double>
+  <x:String x:Key="FsusComponentMaterialPaperSaturate">100%</x:String>
+  <Color x:Key="FsusComponentStateSurfaceHoverBackground">#2A599C0E</Color>
+  <SolidColorBrush x:Key="FsusComponentStateSurfaceHoverBackgroundBrush" Color="#2A599C0E" />
+  <Color x:Key="FsusComponentStateSurfaceHoverBackgroundDark">#4B79CC1F</Color>
+  <SolidColorBrush x:Key="FsusComponentStateSurfaceHoverBackgroundDarkBrush" Color="#4B79CC1F" />
+  <Color x:Key="FsusComponentStateSurfaceSelectedBackground">#2A599C0D</Color>
+  <SolidColorBrush x:Key="FsusComponentStateSurfaceSelectedBackgroundBrush" Color="#2A599C0D" />
+  <Color x:Key="FsusComponentStateSurfaceSelectedBackgroundDark">#4B79CC1A</Color>
+  <SolidColorBrush x:Key="FsusComponentStateSurfaceSelectedBackgroundDarkBrush" Color="#4B79CC1A" />
+  <Color x:Key="FsusComponentStateSurfaceEmphasisBackground">#2A599C14</Color>
+  <SolidColorBrush x:Key="FsusComponentStateSurfaceEmphasisBackgroundBrush" Color="#2A599C14" />
+  <Color x:Key="FsusComponentStateSurfaceEmphasisBackgroundDark">#4B79CC29</Color>
+  <SolidColorBrush x:Key="FsusComponentStateSurfaceEmphasisBackgroundDarkBrush" Color="#4B79CC29" />
+  <Color x:Key="FsusComponentStateSurfaceFocusBorder">#2A599C47</Color>
+  <SolidColorBrush x:Key="FsusComponentStateSurfaceFocusBorderBrush" Color="#2A599C47" />
+  <Color x:Key="FsusComponentStateSurfaceFocusBorderDark">#4B79CC5C</Color>
+  <SolidColorBrush x:Key="FsusComponentStateSurfaceFocusBorderDarkBrush" Color="#4B79CC5C" />
+  <Color x:Key="FsusComponentStateSurfaceInvalidBorder">#D92D20</Color>
+  <SolidColorBrush x:Key="FsusComponentStateSurfaceInvalidBorderBrush" Color="#D92D20" />
   <SolidColorBrush x:Key="FsusComponentStateButtonPrimaryBackgroundDefault" Color="#0F0F11" />
   <SolidColorBrush x:Key="FsusComponentStateButtonPrimaryBackgroundHover" Color="#2A599C" />
 </ResourceDictionary>

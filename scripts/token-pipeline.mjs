@@ -171,6 +171,44 @@ const validateTokenV2Metadata = (source) => {
       }
     }
   }
+
+  const traceability = source.traceability
+  if (!traceability || typeof traceability !== 'object') {
+    throw new Error('Token v2 traceability metadata is required')
+  }
+  for (const layer of requiredTokenLayers) {
+    if (!traceability.owners?.[layer]) {
+      throw new Error(`Token v2 traceability owner is required for ${layer}`)
+    }
+    if (!traceability.usageSurfaces?.[layer]) {
+      throw new Error(
+        `Token v2 traceability usage surface is required for ${layer}`,
+      )
+    }
+    if (typeof traceability.consumerAccess?.[layer] !== 'boolean') {
+      throw new Error(
+        `Token v2 traceability consumer access is required for ${layer}`,
+      )
+    }
+  }
+  if (
+    !Array.isArray(traceability.generatedOutputs) ||
+    traceability.generatedOutputs.length === 0
+  ) {
+    throw new Error('Token v2 traceability generated outputs are required')
+  }
+  for (const field of ['fixture', 'status', 'migrationStatus']) {
+    if (!traceability[field]) {
+      throw new Error(`Token v2 traceability ${field} is required`)
+    }
+  }
+  for (const audience of ['public', 'internal']) {
+    if (!traceability.documentation?.[audience]) {
+      throw new Error(
+        `Token v2 traceability ${audience} documentation is required`,
+      )
+    }
+  }
 }
 
 const validateToken = (source, token, names) => {
@@ -216,6 +254,11 @@ const validateToken = (source, token, names) => {
     for (const alias of token.aliases) {
       if (!alias.startsWith('--')) {
         throw new Error(`${token.name} alias ${alias} must be a CSS variable`)
+      }
+      if (alias === cssName(token.name)) {
+        throw new Error(
+          `${token.name} alias ${alias} duplicates its canonical CSS variable`,
+        )
       }
     }
   }
@@ -312,6 +355,36 @@ const resolveValue = (token, tokenMap, seen = new Set(), modeName) => {
 }
 
 const cssName = (name) => `--fsus-${name.replace(/[.]/g, '-')}`
+
+const traceForToken = (source, token, tokenMap) => {
+  const layer = layerForToken(source, token)
+  const consumerUse =
+    token.consumerUse ??
+    (source.traceability.consumerAccess[layer] ||
+      (token.aliases ?? []).length > 0)
+  const documentation = consumerUse
+    ? source.traceability.documentation.public
+    : source.traceability.documentation.internal
+
+  return {
+    canonicalName: token.name,
+    runtimeAliases: [cssName(token.name), ...(token.aliases ?? [])],
+    values: {
+      light: resolveValue(token, tokenMap),
+      dark: resolveValue(token, tokenMap, new Set(), 'dark'),
+    },
+    usageSurface:
+      token.usageSurface ?? source.traceability.usageSurfaces[layer],
+    owner: token.owner ?? source.traceability.owners[layer],
+    consumerUse,
+    generatedOutputs: source.traceability.generatedOutputs,
+    documentation,
+    fixture: source.traceability.fixture,
+    status: token.status ?? source.traceability.status,
+    migrationStatus:
+      token.migrationStatus ?? source.traceability.migrationStatus,
+  }
+}
 
 const pascalName = (name) =>
   `Fsus${name
@@ -512,6 +585,7 @@ const renderJson = (source, tokenMap) => {
             resolveValue(token, tokenMap, new Set(), modeName),
           ]),
         ),
+        traceability: traceForToken(source, token, tokenMap),
       },
     ]),
   )
@@ -523,6 +597,7 @@ const renderJson = (source, tokenMap) => {
       version: source.version,
       layers: source.layers,
       dimensions: source.dimensions,
+      traceability: source.traceability,
       tokens,
     },
     null,
@@ -793,7 +868,11 @@ const renderDocs = (source, tokenMap) => {
         'CSS Variable',
         'Avalonia Resource',
         'Value',
-        'Mode Values',
+        'Light / Dark',
+        'Runtime Aliases',
+        'Owner',
+        'Consumer',
+        'Status',
       ],
       source.tokens.map((token) => [
         `\`${token.name}\``,
@@ -802,14 +881,15 @@ const renderDocs = (source, tokenMap) => {
         `\`${cssName(token.name)}\``,
         `\`${pascalName(token.name)}\``,
         `\`${resolveValue(token, tokenMap)}\``,
-        Object.keys(token.modeValues ?? {}).length === 0
-          ? '—'
-          : Object.keys(token.modeValues)
-              .map(
-                (modeName) =>
-                  `\`${modeName}: ${resolveValue(token, tokenMap, new Set(), modeName)}\``,
-              )
-              .join('<br>'),
+        `\`${traceForToken(source, token, tokenMap).values.light}\` / \`${traceForToken(source, token, tokenMap).values.dark}\``,
+        traceForToken(source, token, tokenMap)
+          .runtimeAliases.map((alias) => `\`${alias}\``)
+          .join('<br>'),
+        traceForToken(source, token, tokenMap).owner,
+        traceForToken(source, token, tokenMap).consumerUse
+          ? 'public'
+          : 'internal',
+        `${traceForToken(source, token, tokenMap).status}; migration: ${traceForToken(source, token, tokenMap).migrationStatus}`,
       ]),
     ),
   )
@@ -817,6 +897,7 @@ const renderDocs = (source, tokenMap) => {
   lines.push(
     '',
     'Compatibility aliases are emitted only when they point back to platform-neutral source tokens.',
+    `Every row is covered by fixture \`${source.traceability.fixture}\`; public rows are documented in \`${source.traceability.documentation.public}\` and internal rows remain documented here.`,
     '',
   )
   return lines.join('\n')
@@ -921,6 +1002,10 @@ const lintTokenFixtures = () => {
   for (const testCase of fixture.invalid) {
     const source = JSON.parse(JSON.stringify(fixture.valid))
     for (const mutation of testCase.mutations ?? []) {
+      if (mutation.path === 'remove-traceability') {
+        delete source.traceability
+        continue
+      }
       if (mutation.path === 'remove-platform') {
         const token = source.tokens.find((item) => item.name === mutation.token)
         token.platforms = token.platforms.filter(
@@ -1142,6 +1227,72 @@ const lintWebRadiusUsage = () => {
   }
 }
 
+const governedAdapterTokenPattern =
+  /^--fsus-(?:color-|radius-|space-|backdrop-|shadow-|state-|motion-)/u
+const governedControlHeightPattern =
+  /^--fsus-control-height(?:-compact|-spacious)?$/u
+const legacyPrivateMotionLiterals = new Set([
+  '--fsus-motion-slider-follow',
+  '--fsus-motion-slider-release',
+  '--fsus-motion-blur',
+  '--fsus-motion-slider-blur',
+  '--fsus-motion-scroll-blur',
+  '--fsus-motion-scroll-offset',
+  '--fsus-motion-scroll-max-offset',
+  '--fsus-motion-scroll-settle',
+  '--fsus-motion-scroll-trail-opacity',
+  '--fsus-motion-drag-max-offset',
+  '--fsus-motion-drag-blur',
+  '--fsus-motion-drag-scale',
+  '--fsus-motion-drag-trail-opacity',
+  '--fsus-motion-trail',
+  '--fsus-motion-slider-trail',
+  '--fsus-motion-spring-stiffness',
+  '--fsus-motion-spring-damping',
+  '--fsus-motion-spring-mass',
+  '--fsus-motion-scroll-idle',
+])
+
+export const findStableAdapterLiteralViolations = (
+  content,
+  file = '<source>',
+) => {
+  const source = stripStyleComments(content)
+  const failures = []
+  const declarationPattern = /(--fsus-[\w-]+)\s*:\s*([^;]+);/gu
+
+  for (const match of source.matchAll(declarationPattern)) {
+    const name = match[1]
+    const value = match[2].trim()
+    if (
+      !governedAdapterTokenPattern.test(name) &&
+      !governedControlHeightPattern.test(name)
+    ) {
+      continue
+    }
+    if (legacyPrivateMotionLiterals.has(name)) continue
+    if (value.startsWith('var(') || value.startsWith('#{generated.')) continue
+
+    const line = source.slice(0, match.index).split('\n').length
+    failures.push(
+      `${file}:${line} ${name} must reference a generated canonical token, got ${value}`,
+    )
+  }
+
+  return failures
+}
+
+const lintStableAdapterVisualTruth = () => {
+  const relativePath = 'vue/packages/theme-chalk/src/common/fsus-tokens.scss'
+  const content = fs.readFileSync(path.join(root, relativePath), 'utf8')
+  const failures = findStableAdapterLiteralViolations(content, relativePath)
+  if (failures.length) {
+    throw new Error(
+      `Stable adapter visual truth detected:\n${failures.join('\n')}`,
+    )
+  }
+}
+
 const lint = () => {
   const source = readSource()
   lintRegisteredAliases(source)
@@ -1151,6 +1302,7 @@ const lint = () => {
   lintAvaloniaTypeSnapshots(source)
   lintStableComponentHardcoding()
   lintWebRadiusUsage()
+  lintStableAdapterVisualTruth()
   console.log('Token source and generated artifact metadata are valid.')
 }
 

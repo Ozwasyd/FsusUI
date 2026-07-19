@@ -274,6 +274,31 @@ public static class FsusTokens
     public const string TypographyBodyMdSizeValue = "14px";
     public static double TypographyBodyMdSizeDouble => 14d;
 
+    public const string TypographyCaptionSmSizeName = "typography.caption.sm.size";
+    public const string TypographyCaptionSmSizeResourceKey = "FsusTypographyCaptionSmSize";
+    public const string TypographyCaptionSmSizeValue = "12px";
+    public static double TypographyCaptionSmSizeDouble => 12d;
+
+    public const string TypographyCaptionMdSizeName = "typography.caption.md.size";
+    public const string TypographyCaptionMdSizeResourceKey = "FsusTypographyCaptionMdSize";
+    public const string TypographyCaptionMdSizeValue = "13px";
+    public static double TypographyCaptionMdSizeDouble => 13d;
+
+    public const string TypographyBodyLgSizeName = "typography.body.lg.size";
+    public const string TypographyBodyLgSizeResourceKey = "FsusTypographyBodyLgSize";
+    public const string TypographyBodyLgSizeValue = "16px";
+    public static double TypographyBodyLgSizeDouble => 16d;
+
+    public const string TypographyHeadingSmSizeName = "typography.heading.sm.size";
+    public const string TypographyHeadingSmSizeResourceKey = "FsusTypographyHeadingSmSize";
+    public const string TypographyHeadingSmSizeValue = "18px";
+    public static double TypographyHeadingSmSizeDouble => 18d;
+
+    public const string TypographyHeadingMdSizeName = "typography.heading.md.size";
+    public const string TypographyHeadingMdSizeResourceKey = "FsusTypographyHeadingMdSize";
+    public const string TypographyHeadingMdSizeValue = "20px";
+    public static double TypographyHeadingMdSizeDouble => 20d;
+
     public const string TypographyFamilyBodyName = "typography.family.body";
     public const string TypographyFamilyBodyResourceKey = "FsusTypographyFamilyBody";
     public const string TypographyFamilyBodyValue = "Google Sans, Inter, Noto Sans SC, Noto Sans CJK SC, Noto Sans TC, Noto Sans JP, PingFang SC, Hiragino Sans GB, Microsoft YaHei, 微软雅黑, Helvetica Neue, Helvetica, Arial, ui-sans-serif, system-ui, sans-serif";
@@ -334,6 +359,21 @@ public static class FsusTokens
     public const string Space4Value = "16px";
     public static Thickness Space4Thickness => new(16d);
 
+    public const string Space5Name = "space.5";
+    public const string Space5ResourceKey = "FsusSpace5";
+    public const string Space5Value = "20px";
+    public static Thickness Space5Thickness => new(20d);
+
+    public const string Space6Name = "space.6";
+    public const string Space6ResourceKey = "FsusSpace6";
+    public const string Space6Value = "24px";
+    public static Thickness Space6Thickness => new(24d);
+
+    public const string Space8Name = "space.8";
+    public const string Space8ResourceKey = "FsusSpace8";
+    public const string Space8Value = "32px";
+    public static Thickness Space8Thickness => new(32d);
+
     public const string ThicknessBorderDefaultName = "thickness.border.default";
     public const string ThicknessBorderDefaultResourceKey = "FsusThicknessBorderDefault";
     public const string ThicknessBorderDefaultValue = "1px";
@@ -344,15 +384,35 @@ public static class FsusTokens
     public const string ThicknessFocusMdValue = "2px";
     public static Thickness ThicknessFocusMdThickness => new(2d);
 
+    public const string RadiusControlSmName = "radius.control.sm";
+    public const string RadiusControlSmResourceKey = "FsusRadiusControlSm";
+    public const string RadiusControlSmValue = "4px";
+    public static CornerRadius RadiusControlSmCornerRadius => new(4d);
+
     public const string RadiusControlMdName = "radius.control.md";
     public const string RadiusControlMdResourceKey = "FsusRadiusControlMd";
     public const string RadiusControlMdValue = "6px";
     public static CornerRadius RadiusControlMdCornerRadius => new(6d);
 
+    public const string RadiusSurfaceSmName = "radius.surface.sm";
+    public const string RadiusSurfaceSmResourceKey = "FsusRadiusSurfaceSm";
+    public const string RadiusSurfaceSmValue = "10px";
+    public static CornerRadius RadiusSurfaceSmCornerRadius => new(10d);
+
     public const string RadiusSurfaceMdName = "radius.surface.md";
     public const string RadiusSurfaceMdResourceKey = "FsusRadiusSurfaceMd";
     public const string RadiusSurfaceMdValue = "12px";
     public static CornerRadius RadiusSurfaceMdCornerRadius => new(12d);
+
+    public const string RadiusSurfaceLgName = "radius.surface.lg";
+    public const string RadiusSurfaceLgResourceKey = "FsusRadiusSurfaceLg";
+    public const string RadiusSurfaceLgValue = "24px";
+    public static CornerRadius RadiusSurfaceLgCornerRadius => new(24d);
+
+    public const string RadiusPillName = "radius.pill";
+    public const string RadiusPillResourceKey = "FsusRadiusPill";
+    public const string RadiusPillValue = "999px";
+    public static CornerRadius RadiusPillCornerRadius => new(999d);
 
     public const string BorderControlWidthName = "border.control.width";
     public const string BorderControlWidthResourceKey = "FsusBorderControlWidth";
@@ -492,6 +552,11 @@ public static class FsusTokens
     public const string DensityControlCompactYValue = "40px";
     public static double DensityControlCompactYDouble => 40d;
 
+    public const string DensityControlSpaciousYName = "density.control.spacious.y";
+    public const string DensityControlSpaciousYResourceKey = "FsusDensityControlSpaciousY";
+    public const string DensityControlSpaciousYValue = "48px";
+    public static double DensityControlSpaciousYDouble => 48d;
+
     public const string DensitySelectOptionYName = "density.select.option.y";
     public const string DensitySelectOptionYResourceKey = "FsusDensitySelectOptionY";
     public const string DensitySelectOptionYValue = "34px";
@@ -587,6 +652,68 @@ public static class FsusTokens
     public const string ComponentOverlayScrimBrushResourceKey = "FsusComponentOverlayScrimBrush";
     public static Color ComponentOverlayScrimColor => Color.Parse(ComponentOverlayScrimValue);
     public static SolidColorBrush ComponentOverlayScrimBrush => new(ComponentOverlayScrimColor);
+
+    public const string ComponentMaterialPaperBlurName = "component.material.paper.blur";
+    public const string ComponentMaterialPaperBlurResourceKey = "FsusComponentMaterialPaperBlur";
+    public const string ComponentMaterialPaperBlurValue = "0px";
+    public static double ComponentMaterialPaperBlurDouble => 0d;
+
+    public const string ComponentMaterialPaperBlurSoftName = "component.material.paper.blur.soft";
+    public const string ComponentMaterialPaperBlurSoftResourceKey = "FsusComponentMaterialPaperBlurSoft";
+    public const string ComponentMaterialPaperBlurSoftValue = "0px";
+    public static double ComponentMaterialPaperBlurSoftDouble => 0d;
+
+    public const string ComponentMaterialOverlayBlurName = "component.material.overlay.blur";
+    public const string ComponentMaterialOverlayBlurResourceKey = "FsusComponentMaterialOverlayBlur";
+    public const string ComponentMaterialOverlayBlurValue = "0px";
+    public static double ComponentMaterialOverlayBlurDouble => 0d;
+
+    public const string ComponentMaterialPaperSaturateName = "component.material.paper.saturate";
+    public const string ComponentMaterialPaperSaturateResourceKey = "FsusComponentMaterialPaperSaturate";
+    public const string ComponentMaterialPaperSaturateValue = "100%";
+
+    public const string ComponentStateSurfaceHoverBackgroundName = "component-state.surface.hover.background";
+    public const string ComponentStateSurfaceHoverBackgroundResourceKey = "FsusComponentStateSurfaceHoverBackground";
+    public const string ComponentStateSurfaceHoverBackgroundValue = "#2A599C0E";
+    public const string ComponentStateSurfaceHoverBackgroundDarkResourceKey = "FsusComponentStateSurfaceHoverBackgroundDark";
+    public const string ComponentStateSurfaceHoverBackgroundDarkValue = "#4B79CC1F";
+    public const string ComponentStateSurfaceHoverBackgroundBrushResourceKey = "FsusComponentStateSurfaceHoverBackgroundBrush";
+    public static Color ComponentStateSurfaceHoverBackgroundColor => Color.Parse(ComponentStateSurfaceHoverBackgroundValue);
+    public static SolidColorBrush ComponentStateSurfaceHoverBackgroundBrush => new(ComponentStateSurfaceHoverBackgroundColor);
+
+    public const string ComponentStateSurfaceSelectedBackgroundName = "component-state.surface.selected.background";
+    public const string ComponentStateSurfaceSelectedBackgroundResourceKey = "FsusComponentStateSurfaceSelectedBackground";
+    public const string ComponentStateSurfaceSelectedBackgroundValue = "#2A599C0D";
+    public const string ComponentStateSurfaceSelectedBackgroundDarkResourceKey = "FsusComponentStateSurfaceSelectedBackgroundDark";
+    public const string ComponentStateSurfaceSelectedBackgroundDarkValue = "#4B79CC1A";
+    public const string ComponentStateSurfaceSelectedBackgroundBrushResourceKey = "FsusComponentStateSurfaceSelectedBackgroundBrush";
+    public static Color ComponentStateSurfaceSelectedBackgroundColor => Color.Parse(ComponentStateSurfaceSelectedBackgroundValue);
+    public static SolidColorBrush ComponentStateSurfaceSelectedBackgroundBrush => new(ComponentStateSurfaceSelectedBackgroundColor);
+
+    public const string ComponentStateSurfaceEmphasisBackgroundName = "component-state.surface.emphasis.background";
+    public const string ComponentStateSurfaceEmphasisBackgroundResourceKey = "FsusComponentStateSurfaceEmphasisBackground";
+    public const string ComponentStateSurfaceEmphasisBackgroundValue = "#2A599C14";
+    public const string ComponentStateSurfaceEmphasisBackgroundDarkResourceKey = "FsusComponentStateSurfaceEmphasisBackgroundDark";
+    public const string ComponentStateSurfaceEmphasisBackgroundDarkValue = "#4B79CC29";
+    public const string ComponentStateSurfaceEmphasisBackgroundBrushResourceKey = "FsusComponentStateSurfaceEmphasisBackgroundBrush";
+    public static Color ComponentStateSurfaceEmphasisBackgroundColor => Color.Parse(ComponentStateSurfaceEmphasisBackgroundValue);
+    public static SolidColorBrush ComponentStateSurfaceEmphasisBackgroundBrush => new(ComponentStateSurfaceEmphasisBackgroundColor);
+
+    public const string ComponentStateSurfaceFocusBorderName = "component-state.surface.focus.border";
+    public const string ComponentStateSurfaceFocusBorderResourceKey = "FsusComponentStateSurfaceFocusBorder";
+    public const string ComponentStateSurfaceFocusBorderValue = "#2A599C47";
+    public const string ComponentStateSurfaceFocusBorderDarkResourceKey = "FsusComponentStateSurfaceFocusBorderDark";
+    public const string ComponentStateSurfaceFocusBorderDarkValue = "#4B79CC5C";
+    public const string ComponentStateSurfaceFocusBorderBrushResourceKey = "FsusComponentStateSurfaceFocusBorderBrush";
+    public static Color ComponentStateSurfaceFocusBorderColor => Color.Parse(ComponentStateSurfaceFocusBorderValue);
+    public static SolidColorBrush ComponentStateSurfaceFocusBorderBrush => new(ComponentStateSurfaceFocusBorderColor);
+
+    public const string ComponentStateSurfaceInvalidBorderName = "component-state.surface.invalid.border";
+    public const string ComponentStateSurfaceInvalidBorderResourceKey = "FsusComponentStateSurfaceInvalidBorder";
+    public const string ComponentStateSurfaceInvalidBorderValue = "#D92D20";
+    public const string ComponentStateSurfaceInvalidBorderBrushResourceKey = "FsusComponentStateSurfaceInvalidBorderBrush";
+    public static Color ComponentStateSurfaceInvalidBorderColor => Color.Parse(ComponentStateSurfaceInvalidBorderValue);
+    public static SolidColorBrush ComponentStateSurfaceInvalidBorderBrush => new(ComponentStateSurfaceInvalidBorderColor);
 
     public const string ComponentStateButtonPrimaryBackgroundDefaultName = "component-state.button.primary.background.default";
     public const string ComponentStateButtonPrimaryBackgroundDefaultResourceKey = "FsusComponentStateButtonPrimaryBackgroundDefault";

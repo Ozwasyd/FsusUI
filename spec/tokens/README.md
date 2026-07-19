@@ -67,6 +67,19 @@ Each token record includes:
 | `modeValues`      | no       | mode-specific value plus fallback token         |
 | `semanticMeaning` | no       | unique semantic meaning guard for aliases       |
 
+Traceability defaults live once in the root `traceability` registry. The
+generator expands them onto every token record so generated JSON and docs expose
+the canonical name, every runtime alias, resolved light/dark values, usage
+surface, owner, consumer-use flag, generated outputs, documentation, fixture,
+status, and migration status. A token may override `owner`, `usageSurface`,
+`consumerUse`, `status`, or `migrationStatus` only when its lifecycle differs
+from the layer default.
+
+Aliases make a token consumer-usable even when its layer is internal by
+default. Consumer-owned aliases remain outside this registry: FsusBlog, for
+example, defines `--fsusblog-*` in its own stylesheet and maps those names to
+public `--fsus-*` or `--el-*` tokens.
+
 ## Platform Mapping
 
 Mappings are generated mechanically:
@@ -108,3 +121,8 @@ the token pipeline. The obsolete naked declaration `border-radius: 8px` is
 also rejected: component surfaces must select the matching
 `--fsus-radius-*` role instead of recreating the removed intermediate radius.
 Comments are excluded from this check. `pnpm tokens:lint` enforces both rules.
+
+The same lint command rejects literal visual truth for stable spacing, radius,
+control-height, material, and interaction-state declarations in
+`common/fsus-tokens.scss`. Register or reuse a canonical token, regenerate, and
+reference the generated SCSS variable instead.

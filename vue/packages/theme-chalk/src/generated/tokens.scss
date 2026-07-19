@@ -50,6 +50,11 @@ $fsus-color-status-danger: #D92D20;
 $fsus-brush-surface-base: #FFFFFF;
 $fsus-brush-surface-raised: #F7F7F8;
 $fsus-typography-body-md-size: 14px;
+$fsus-typography-caption-sm-size: 12px;
+$fsus-typography-caption-md-size: 13px;
+$fsus-typography-body-lg-size: 16px;
+$fsus-typography-heading-sm-size: 18px;
+$fsus-typography-heading-md-size: 20px;
 $fsus-typography-family-body: Google Sans, Inter, Noto Sans SC, Noto Sans CJK SC, Noto Sans TC, Noto Sans JP, PingFang SC, Hiragino Sans GB, Microsoft YaHei, 微软雅黑, Helvetica Neue, Helvetica, Arial, ui-sans-serif, system-ui, sans-serif;
 $fsus-typography-family-monospace: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
 $fsus-typography-body-md-line-height: 22px;
@@ -62,10 +67,17 @@ $fsus-space-1: 4px;
 $fsus-space-2: 8px;
 $fsus-space-3: 12px;
 $fsus-space-4: 16px;
+$fsus-space-5: 20px;
+$fsus-space-6: 24px;
+$fsus-space-8: 32px;
 $fsus-thickness-border-default: 1px;
 $fsus-thickness-focus-md: 2px;
+$fsus-radius-control-sm: 4px;
 $fsus-radius-control-md: 6px;
+$fsus-radius-surface-sm: 10px;
 $fsus-radius-surface-md: 12px;
+$fsus-radius-surface-lg: 24px;
+$fsus-radius-pill: 999px;
 $fsus-border-control-width: 1px;
 $fsus-shadow-overlay-md: none;
 $fsus-shadow-panel-light: 0 8px 24px rgba(15, 23, 42, 0.05);
@@ -102,6 +114,7 @@ $fsus-density-control-default-y: 44px;
 $fsus-density-control-default-y-density-compact: 40px;
 $fsus-density-control-default-y-density-spacious: 48px;
 $fsus-density-control-compact-y: 40px;
+$fsus-density-control-spacious-y: 48px;
 $fsus-density-select-option-y: 34px;
 $fsus-density-control-action-y: 36px;
 $fsus-density-menu-item-y: 56px;
@@ -121,6 +134,19 @@ $fsus-component-dialog-min-width: 360px;
 $fsus-component-dialog-min-height: 220px;
 $fsus-component-dialog-padding: 24px;
 $fsus-component-overlay-scrim: #99000000;
+$fsus-component-material-paper-blur: 0px;
+$fsus-component-material-paper-blur-soft: 0px;
+$fsus-component-material-overlay-blur: 0px;
+$fsus-component-material-paper-saturate: 100%;
+$fsus-component-state-surface-hover-background: #2A599C0E;
+$fsus-component-state-surface-hover-background-dark: #4B79CC1F;
+$fsus-component-state-surface-selected-background: #2A599C0D;
+$fsus-component-state-surface-selected-background-dark: #4B79CC1A;
+$fsus-component-state-surface-emphasis-background: #2A599C14;
+$fsus-component-state-surface-emphasis-background-dark: #4B79CC29;
+$fsus-component-state-surface-focus-border: #2A599C47;
+$fsus-component-state-surface-focus-border-dark: #4B79CC5C;
+$fsus-component-state-surface-invalid-border: #D92D20;
 $fsus-component-state-button-primary-background-default: #0F0F11;
 $fsus-component-state-button-primary-background-default-dark: #F0F0F4;
 $fsus-component-state-button-primary-background-hover: #2A599C;
@@ -158,6 +184,11 @@ $fsus-tokens: (
   'brush.surface.base': #FFFFFF,
   'brush.surface.raised': #F7F7F8,
   'typography.body.md.size': 14px,
+  'typography.caption.sm.size': 12px,
+  'typography.caption.md.size': 13px,
+  'typography.body.lg.size': 16px,
+  'typography.heading.sm.size': 18px,
+  'typography.heading.md.size': 20px,
   'typography.family.body': (Google Sans, Inter, Noto Sans SC, Noto Sans CJK SC, Noto Sans TC, Noto Sans JP, PingFang SC, Hiragino Sans GB, Microsoft YaHei, 微软雅黑, Helvetica Neue, Helvetica, Arial, ui-sans-serif, system-ui, sans-serif),
   'typography.family.monospace': (ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace),
   'typography.body.md.line-height': 22px,
@@ -170,10 +201,17 @@ $fsus-tokens: (
   'space.2': 8px,
   'space.3': 12px,
   'space.4': 16px,
+  'space.5': 20px,
+  'space.6': 24px,
+  'space.8': 32px,
   'thickness.border.default': 1px,
   'thickness.focus.md': 2px,
+  'radius.control.sm': 4px,
   'radius.control.md': 6px,
+  'radius.surface.sm': 10px,
   'radius.surface.md': 12px,
+  'radius.surface.lg': 24px,
+  'radius.pill': 999px,
   'border.control.width': 1px,
   'shadow.overlay.md': none,
   'shadow.panel.light': 0 8px 24px rgba(15, 23, 42, 0.05),
@@ -196,6 +234,7 @@ $fsus-tokens: (
   'motion.intensity.subtle': 0.98,
   'density.control.default.y': 44px,
   'density.control.compact.y': 40px,
+  'density.control.spacious.y': 48px,
   'density.select.option.y': 34px,
   'density.control.action.y': 36px,
   'density.menu.item.y': 56px,
@@ -215,6 +254,15 @@ $fsus-tokens: (
   'component.dialog.min-height': 220px,
   'component.dialog.padding': 24px,
   'component.overlay.scrim': #99000000,
+  'component.material.paper.blur': 0px,
+  'component.material.paper.blur.soft': 0px,
+  'component.material.overlay.blur': 0px,
+  'component.material.paper.saturate': 100%,
+  'component-state.surface.hover.background': #2A599C0E,
+  'component-state.surface.selected.background': #2A599C0D,
+  'component-state.surface.emphasis.background': #2A599C14,
+  'component-state.surface.focus.border': #2A599C47,
+  'component-state.surface.invalid.border': #D92D20,
   'component-state.button.primary.background.default': #0F0F11,
   'component-state.button.primary.background.hover': #2A599C,
 );
@@ -227,6 +275,15 @@ $fsus-token-aliases: (
   '--fsus-border-light': '--fsus-color-border-light',
   '--fsus-border-lighter': '--fsus-color-border-lighter',
   '--fsus-border-extra-light': '--fsus-color-border-extra-light',
+  '--fsus-border-width': '--fsus-thickness-border-default',
+  '--fsus-focus-ring-width': '--fsus-thickness-focus-md',
+  '--fsus-radius-control-small': '--fsus-radius-control-sm',
+  '--fsus-radius-control': '--fsus-radius-control-md',
+  '--fsus-radius-navigation': '--fsus-radius-control-md',
+  '--fsus-radius-popover': '--fsus-radius-surface-sm',
+  '--fsus-radius-panel': '--fsus-radius-surface-md',
+  '--fsus-radius-floating': '--fsus-radius-surface-md',
+  '--fsus-radius-panel-large': '--fsus-radius-surface-lg',
   '--fsus-shadow-panel': '--fsus-shadow-overlay-md',
   '--fsus-motion-control-fast': '--fsus-motion-duration-control-fast',
   '--fsus-motion-control': '--fsus-motion-duration-control',
@@ -237,6 +294,9 @@ $fsus-token-aliases: (
   '--fsus-motion-distance-sm': '--fsus-motion-distance-small',
   '--fsus-motion-distance-md': '--fsus-motion-distance-medium',
   '--fsus-motion-distance-lg': '--fsus-motion-distance-large',
+  '--fsus-control-height': '--fsus-density-control-default-y',
+  '--fsus-control-height-compact': '--fsus-density-control-compact-y',
+  '--fsus-control-height-spacious': '--fsus-density-control-spacious-y',
   '--fsus-select-option-height': '--fsus-density-select-option-y',
   '--fsus-control-height-action': '--fsus-density-control-action-y',
   '--fsus-menu-item-height': '--fsus-density-menu-item-y',
@@ -247,4 +307,13 @@ $fsus-token-aliases: (
   '--fsus-tag-height-default': '--fsus-component-tag-height-default',
   '--fsus-tag-height-small': '--fsus-component-tag-height-small',
   '--fsus-cascader-suggestion-max-height': '--fsus-component-cascader-suggestion-max-height',
+  '--fsus-backdrop-blur': '--fsus-component-material-paper-blur',
+  '--fsus-backdrop-blur-soft': '--fsus-component-material-paper-blur-soft',
+  '--fsus-backdrop-blur-overlay': '--fsus-component-material-overlay-blur',
+  '--fsus-backdrop-saturate': '--fsus-component-material-paper-saturate',
+  '--fsus-state-hover-bg': '--fsus-component-state-surface-hover-background',
+  '--fsus-state-selected-bg': '--fsus-component-state-surface-selected-background',
+  '--fsus-state-emphasis-bg': '--fsus-component-state-surface-emphasis-background',
+  '--fsus-state-focus-border': '--fsus-component-state-surface-focus-border',
+  '--fsus-state-invalid-border': '--fsus-component-state-surface-invalid-border',
 );

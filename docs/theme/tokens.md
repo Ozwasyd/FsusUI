@@ -46,6 +46,14 @@ FsusUI semantic aliases on top.
 | `--fsus-motion-intensity-standard` | Standard motion intensity (`0.96`).                                                   |
 | `--fsus-motion-intensity-subtle`   | Subtle motion intensity (`0.98`).                                                     |
 | `--fsus-backdrop-blur`             | Opt-in backdrop blur amount, defaulting to `0px`.                                     |
+| `--fsus-backdrop-blur-soft`        | Soft paper backdrop blur, defaulting to `0px`.                                        |
+| `--fsus-backdrop-blur-overlay`     | Overlay paper backdrop blur, defaulting to `0px`.                                     |
+| `--fsus-backdrop-saturate`         | Paper/overlay backdrop saturation, defaulting to `100%`.                              |
+| `--fsus-state-hover-bg`            | Registered hover background with light/dark values.                                   |
+| `--fsus-state-selected-bg`         | Registered selected background with light/dark values.                                |
+| `--fsus-state-emphasis-bg`         | Registered emphasized background with light/dark values.                              |
+| `--fsus-state-focus-border`        | Registered focus border with light/dark values.                                       |
+| `--fsus-state-invalid-border`      | Registered invalid border mapped to the danger semantic.                              |
 
 ### Spacing Tokens
 
@@ -61,6 +69,11 @@ FsusUI semantic aliases on top.
 
 These tokens are safe for application-level overrides when the value type stays
 compatible with CSS usage in the component styles.
+
+The public control-height ladder is `--fsus-control-height-compact` (`40px`),
+`--fsus-control-height` (`44px`), and `--fsus-control-height-spacious` (`48px`).
+The public radius ladder is `4 / 6 / 10 / 12 / 24 / 999px`, exposed through the
+role aliases documented in `docs/design.md`.
 
 ## Generated Cross-Platform Tokens
 
@@ -80,6 +93,14 @@ The platform-neutral token source is
 `pnpm run tokens:lint` validates naming, required platform mappings,
 references, aliases, and generated-file metadata. Web and Avalonia consumers
 must use the generated artifacts rather than manually mirroring token values.
+
+Every entry in generated JSON and generated token docs includes the complete
+traceability record: canonical name, runtime aliases, light/dark values, usage
+surface, owner, consumer-use flag, output list, documentation, fixture, active
+or deprecated status, and migration status. `consumerUse: true` is public;
+`false` is internal. The canonical schema fixture exercises the same metadata,
+and `pnpm run tokens:lint` rejects missing traceability plus literal stable
+visual values in `common/fsus-tokens.scss`.
 
 The precedence is canonical spec → checked design documentation → generated
 Web/Avalonia output → registered platform override → compatibility adapter.
@@ -101,6 +122,12 @@ undeclared weight or rely on browser synthesis.
   --fsus-radius-control: 6px;
   --fsus-radius-control-small: 4px;
   --fsus-radius-panel: 12px;
+  --fsus-radius-popover: 10px;
+  --fsus-radius-panel-large: 24px;
+  --fsus-radius-pill: 999px;
+  --fsus-control-height-compact: 40px;
+  --fsus-control-height: 44px;
+  --fsus-control-height-spacious: 48px;
   --el-border-radius-base: 6px;
   --fsus-backdrop-blur: 0px;
   --fsus-shadow-panel: var(--fsus-shadow-overlay-md);
@@ -151,7 +178,7 @@ before they are used in external apps.
 ## FsusBlog Semantic Aliases
 
 FsusBlog and other product integrations can define product-level aliases such
-as `--blog-reading-surface` or `--blog-accent`. Keep those aliases in the
+as `--fsusblog-reading-surface` or `--fsusblog-accent`. Keep those aliases in the
 product stylesheet and map them to FsusUI public-preview tokens rather than
 depending on component-private variables.
 

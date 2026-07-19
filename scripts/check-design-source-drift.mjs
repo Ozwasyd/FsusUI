@@ -253,6 +253,53 @@ try {
     '40px',
     'Compact control density token drift',
   )
+  for (const [name, value, alias] of [
+    ['radius.control.sm', '4px', '--fsus-radius-control-small'],
+    ['radius.control.md', '6px', '--fsus-radius-control'],
+    ['radius.surface.sm', '10px', '--fsus-radius-popover'],
+    ['radius.surface.md', '12px', '--fsus-radius-panel'],
+    ['radius.surface.lg', '24px', '--fsus-radius-panel-large'],
+    ['density.control.spacious.y', '48px', '--fsus-control-height-spacious'],
+    ['component.material.overlay.blur', '0px', '--fsus-backdrop-blur-overlay'],
+    [
+      'component-state.surface.focus.border',
+      '#2A599C47',
+      '--fsus-state-focus-border',
+    ],
+    [
+      'component-state.surface.invalid.border',
+      '{color.status.danger}',
+      '--fsus-state-invalid-border',
+    ],
+  ]) {
+    const candidate = token(name)
+    assertEquals(candidate.value, value, `${name} drift`)
+    assert(candidate.aliases?.includes(alias), `${name} must register ${alias}`)
+  }
+  for (const [name, value] of [
+    ['space.1', '4px'],
+    ['space.2', '8px'],
+    ['space.3', '12px'],
+    ['space.4', '16px'],
+    ['space.5', '20px'],
+    ['space.6', '24px'],
+    ['space.8', '32px'],
+    ['radius.pill', '999px'],
+  ]) {
+    assertEquals(token(name).value, value, `${name} drift`)
+  }
+  for (const layer of [
+    'primitive',
+    'semantic',
+    'component',
+    'component-state',
+  ]) {
+    assert(source.traceability.owners?.[layer], `Missing ${layer} token owner`)
+    assert(
+      source.traceability.usageSurfaces?.[layer],
+      `Missing ${layer} usage surface`,
+    )
+  }
   assertEquals(
     token('component.button.padding.x').value,
     '{space.4}',
@@ -319,6 +366,8 @@ try {
     'ColorPicker 的 `--fsus-color-picker-*` 是组件内部命名 alias',
     'Canonical theme 维度仅包含 light/dark',
     '不生成第三套 Web theme preset',
+    'canonical name、runtime aliases、light/dark、usage surface、owner',
+    '`--fsusblog-*`',
   ]) {
     assertIncludes(design, expected, 'docs/design.md')
   }
@@ -344,6 +393,9 @@ try {
     'Accent for links, active states, focus rings, and selection.',
     'fallbacks must reference registered canonical surface, border, and shadow',
     'generates only the canonical `light` and `dark` Web theme presets',
+    'traceability record: canonical name',
+    '`--fsus-control-height-spacious` (`48px`)',
+    '`--fsusblog-reading-surface`',
   ]) {
     assertIncludes(themeDocs, expected, 'docs/theme/tokens.md')
   }
@@ -382,11 +434,14 @@ try {
     '--el-color-primary: var(--fsus-scholarly-blue);',
     '--fsus-button-primary-bg: var(--fsus-ink);',
     '--fsus-button-primary-text: var(--fsus-paper);',
-    '--fsus-radius-control: 6px;',
-    '--fsus-radius-control-small: 4px;',
-    '--fsus-radius-panel: 12px;',
-    '--fsus-radius-popover: 10px;',
-    '--fsus-backdrop-blur: 0px;',
+    '--fsus-radius-control: #{generated.$fsus-radius-control-md};',
+    '--fsus-radius-control-small: #{generated.$fsus-radius-control-sm};',
+    '--fsus-radius-panel: #{generated.$fsus-radius-surface-md};',
+    '--fsus-radius-popover: #{generated.$fsus-radius-surface-sm};',
+    '--fsus-backdrop-blur: #{generated.$fsus-component-material-paper-blur};',
+    '--fsus-control-height-spacious: #{generated.$fsus-density-control-spacious-y};',
+    '--fsus-state-focus-border: #{generated.$fsus-component-state-surface-focus-border};',
+    '--fsus-state-invalid-border: #{generated.$fsus-component-state-surface-invalid-border};',
     '--fsus-shadow-panel: var(--fsus-shadow-overlay-md);',
     '--fsus-component-button-padding-x: #{generated.$fsus-component-button-padding-x};',
     '--fsus-component-dialog-padding: #{generated.$fsus-component-dialog-padding};',
