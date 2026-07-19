@@ -1072,6 +1072,53 @@ const lintStableComponentHardcoding = () => {
   }
 }
 
+const lintWebRadiusFallbacks = () => {
+  const scanRoot = path.join(root, 'vue/packages/theme-chalk/src')
+  const allowedFallbacks = new Set([
+    '4px',
+    '6px',
+    '10px',
+    '12px',
+    '24px',
+    '999px',
+  ])
+  const literalValuePattern = /^-?(?:\d+(?:\.\d+)?|\.\d+)(?:[a-z]+|%)?$/i
+  const failures = []
+  const walk = (directory) => {
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      const fullPath = path.join(directory, entry.name)
+      if (entry.isDirectory()) {
+        walk(fullPath)
+        continue
+      }
+      if (!/\.(?:css|scss)$/.test(entry.name)) continue
+
+      const content = fs.readFileSync(fullPath, 'utf8')
+      const fallbackPattern =
+        /var\(\s*(--fsus-radius-[\w-]+)\s*,\s*([^,)]+)\)/gu
+      for (const match of content.matchAll(fallbackPattern)) {
+        const fallback = match[2].trim()
+        if (
+          literalValuePattern.test(fallback) &&
+          !allowedFallbacks.has(fallback)
+        ) {
+          const line = content.slice(0, match.index).split('\n').length
+          failures.push(
+            `${rel(fullPath)}:${line} ${match[1]} uses off-scale fallback ${fallback}`,
+          )
+        }
+      }
+    }
+  }
+
+  walk(scanRoot)
+  if (failures.length) {
+    throw new Error(
+      `Web radius fallback scale violations detected:\n${failures.join('\n')}`,
+    )
+  }
+}
+
 const lint = () => {
   const source = readSource()
   lintRegisteredAliases(source)
@@ -1080,6 +1127,7 @@ const lint = () => {
   lintOutputSnapshots()
   lintAvaloniaTypeSnapshots(source)
   lintStableComponentHardcoding()
+  lintWebRadiusFallbacks()
   console.log('Token source and generated artifact metadata are valid.')
 }
 

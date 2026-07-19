@@ -2425,7 +2425,7 @@ button.#{$namespace}-card:active {
 }
 
 .#{$namespace}-skeleton__item {
-  border-radius: 8px;
+  border-radius: var(--fsus-radius-control-small, 4px);
   transition:
     opacity 0.28s ease,
     background-color 0.28s ease;
@@ -2557,7 +2557,7 @@ button.#{$namespace}-card:active {
   > .#{$namespace}-button
   + .#{$namespace}-button {
   margin-left: 0;
-  border-radius: calc(var(--fsus-radius-control, 8px) - 2px) !important;
+  border-radius: calc(var(--fsus-radius-control, 6px) - 2px) !important;
 }
 
 .#{$namespace}-color-picker__trigger {
@@ -2566,7 +2566,7 @@ button.#{$namespace}-card:active {
   padding: 4px;
   box-sizing: border-box;
   border: 1px solid var(--el-border-color);
-  border-radius: 8px;
+  border-radius: var(--fsus-radius-control, 6px);
 
   &:hover,
   &.is-focus {

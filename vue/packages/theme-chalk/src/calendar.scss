@@ -32,7 +32,7 @@
       gap: 2px;
       padding: 3px;
       border: 1px solid getCssVar('border-color-lighter');
-      border-radius: var(--fsus-radius-control, 8px);
+      border-radius: var(--fsus-radius-control, 6px);
       background: transparent;
     }
 
@@ -43,7 +43,7 @@
       margin: 0;
       padding: 0 13px;
       border: 0;
-      border-radius: calc(var(--fsus-radius-control, 8px) - 2px) !important;
+      border-radius: calc(var(--fsus-radius-control, 6px) - 2px) !important;
       background: transparent;
       color: getCssVar('text-color', 'regular');
       box-shadow: none;
@@ -204,7 +204,7 @@
     box-sizing: border-box;
     padding: 8px;
     height: getCssVar('calendar', 'cell-width');
-    border-radius: var(--fsus-radius-control, 8px);
+    border-radius: var(--fsus-radius-control, 6px);
     transition:
       background-color var(--fsus-calendar-cell-duration, 180ms)
         var(--fsus-motion-standard, cubic-bezier(0.2, 0.8, 0.2, 1)),

@@ -171,7 +171,7 @@
   background: color-mix(in srgb, var(--el-color-danger) 8%, var(--el-bg-color));
   border: 1px solid
     color-mix(in srgb, var(--el-color-danger) 34%, var(--el-border-color));
-  border-radius: var(--fsus-radius-card, 8px);
+  border-radius: var(--fsus-radius-card, 12px);
 }
 
 .markdown-renderer .el-markdown-renderer__feature-error-message {
@@ -226,7 +226,7 @@
   overflow: auto;
   background: var(--el-fill-color-light);
   border: 1px solid var(--el-border-color-lighter);
-  border-radius: var(--fsus-radius-card, 8px);
+  border-radius: var(--fsus-radius-card, 12px);
 }
 
 .markdown-renderer pre[data-code-highlighted='shiki'] code,

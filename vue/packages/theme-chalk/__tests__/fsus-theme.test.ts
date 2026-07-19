@@ -172,6 +172,7 @@ describe('Fsus theme visual baseline', () => {
 
   test('keeps image viewer controls on the default paper material', () => {
     const css = compileThemeFile('fsus-theme.scss')
+    const imageViewerCss = compileThemeFile('image-viewer.scss')
 
     for (const selector of [
       '.el-image-viewer__btn',
@@ -182,6 +183,10 @@ describe('Fsus theme visual baseline', () => {
         'border: 1px solid rgba(255, 255, 255, 0.18);',
       ])
     }
+    expectCssRule(imageViewerCss, '.el-image-viewer__actions', [
+      'padding: 0 24px;',
+      'border-radius: 999px;',
+    ])
     expect(css).not.toMatch(
       /\.el-image-viewer__(?:btn|actions)\s*\{[^}]*(?:-webkit-)?backdrop-filter:/s,
     )
@@ -647,7 +652,7 @@ describe('Fsus theme visual baseline', () => {
       'gap: 2px;',
       'min-height: 40px;',
       'padding: 2px;',
-      'border-radius: 8px;',
+      'border-radius: var(--fsus-radius-control, 6px);',
       'background: var(--el-theme-mode-toggle-bg);',
       'overflow: hidden;',
     ])
@@ -763,7 +768,7 @@ describe('Fsus theme visual baseline', () => {
       'position: absolute;',
       'min-width: 132px;',
       'border: 1px solid var(--el-border-color-lighter);',
-      'border-radius: 8px;',
+      'border-radius: var(--fsus-radius-control, 6px);',
       'background: var(--el-bg-color);',
       'box-shadow: var(--el-box-shadow-light);',
     ])
@@ -889,6 +894,9 @@ describe('Fsus theme visual baseline', () => {
     expect(skeletonCss).not.toContain('el-skeleton-loading')
     expectCssRule(skeletonCss, '.el-skeleton.is-animated .el-skeleton__item', [
       'animation: skeleton-zinc-pulse 1.5s ease-in-out infinite;',
+    ])
+    expectCssRule(themeCss, '.el-skeleton__item', [
+      'border-radius: var(--fsus-radius-control-small, 4px);',
     ])
     expectCssRule(markdownCss, '.markdown-renderer__loading-spinner', [
       'background: var(--el-fill-color-light);',
@@ -1579,8 +1587,16 @@ describe('Fsus theme visual baseline', () => {
 
     expectCssRule(css, '.el-calendar__button-group .el-button-group', [
       'border: 1px solid var(--el-border-color-lighter);',
+      'border-radius: var(--fsus-radius-control, 6px);',
       'background: transparent;',
     ])
+    expectCssRule(
+      css,
+      '.el-calendar__button-group .el-button-group > .el-button',
+      [
+        'border-radius: calc(var(--fsus-radius-control, 6px) - 2px) !important;',
+      ],
+    )
     expect(css).not.toContain('linear-gradient')
     expect(css).not.toContain('inset 0 1px 0')
   })
@@ -2021,7 +2037,7 @@ describe('Fsus theme visual baseline', () => {
     ])
     expectCssRule(css, '.el-resource-list', [
       'border: 1px solid var(--el-border-color-lighter);',
-      'border-radius: var(--fsus-radius-panel, 8px);',
+      'border-radius: var(--fsus-radius-panel, 12px);',
       'box-shadow: none;',
     ])
     expectCssRule(css, '.el-metadata-row', [

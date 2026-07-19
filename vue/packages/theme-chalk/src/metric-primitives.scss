@@ -5,7 +5,7 @@
   display: grid;
   min-width: 0;
   border: 1px solid getCssVar('border-color-lighter');
-  border-radius: var(--fsus-radius-panel, 8px);
+  border-radius: var(--fsus-radius-panel, 12px);
   background: getCssVar('bg-color');
   box-shadow: none;
   overflow: hidden;
@@ -254,7 +254,7 @@
   min-width: 0;
   padding: 12px;
   border: 1px solid getCssVar('border-color-lighter');
-  border-radius: var(--fsus-radius-panel, 8px);
+  border-radius: var(--fsus-radius-panel, 12px);
   background: getCssVar('bg-color');
 
   @include m(compact) {
@@ -343,7 +343,7 @@
   min-width: 0;
   padding: 12px;
   border: 1px solid getCssVar('border-color-lighter');
-  border-radius: var(--fsus-radius-panel, 8px);
+  border-radius: var(--fsus-radius-panel, 12px);
   background: getCssVar('bg-color');
 
   @include m(compact) {

@@ -88,7 +88,7 @@
     transform: translateX(-50%);
     width: 282px;
     height: 44px;
-    padding: 0 23px;
+    padding: 0 24px;
     background-color: var(
       --fsus-image-viewer-control-bg,
       rgba(15, 15, 17, 0.72)
@@ -97,7 +97,7 @@
       --fsus-image-viewer-control-border,
       rgba(255, 255, 255, 0.64)
     );
-    border-radius: 22px;
+    border-radius: 999px;
     cursor: default;
     font-size: 23px;
     color: var(

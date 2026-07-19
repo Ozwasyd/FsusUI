@@ -93,3 +93,11 @@ point back to platform-neutral source tokens.
 Typography availability is canonical in `spec/typography/baseline.json`.
 Stable component styles may use only its `fontWeights.stable` values unless a
 declared variable font supplies the requested axis.
+
+## Web Radius Fallbacks
+
+Literal fallbacks for `var(--fsus-radius-*, <fallback>)` in
+`vue/packages/theme-chalk/src` must use the canonical radius scale:
+`4px`, `6px`, `10px`, `12px`, `24px`, or `999px`. Token-to-token and SCSS
+fallback expressions remain valid because their resolved value is governed by
+the token pipeline. `pnpm tokens:lint` enforces this rule.
