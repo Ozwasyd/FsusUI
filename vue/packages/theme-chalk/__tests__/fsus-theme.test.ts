@@ -55,6 +55,21 @@ const expectCssRule = (
 }
 
 describe('Fsus theme visual baseline', () => {
+  test('keeps overlay titles at their natural letter spacing', () => {
+    const css = compileThemeFile('fsus-theme.scss')
+
+    for (const selector of [
+      '.el-dialog__title',
+      '.el-drawer__title',
+      '.el-message-box__title',
+      '.el-notification__title',
+      '.el-popover__title',
+    ]) {
+      expectCssRule(css, selector, ['color: var(--el-text-color-primary);'])
+    }
+    expect(css).not.toMatch(/letter-spacing:\s*-/)
+  })
+
   test('emits canonical public foundation tokens in dark product CSS', () => {
     const css = compileThemeFile('fsus-theme.scss')
 
