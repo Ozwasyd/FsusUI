@@ -458,7 +458,7 @@
 
       .#{$namespace}-tabs__item.is-left.is-active {
         border: 1px solid getCssVar('border-color-light');
-        border-right-color: #fff;
+        border-right-color: getCssVar('bg-color');
         border-left: none;
         border-bottom: none;
 
@@ -493,8 +493,8 @@
 
         &.is-active {
           border-color: transparent;
-          border-top-color: rgb(209, 219, 229);
-          border-bottom-color: rgb(209, 219, 229);
+          border-top-color: getCssVar('border-color', 'light');
+          border-bottom-color: getCssVar('border-color', 'light');
         }
       }
     }
@@ -536,7 +536,7 @@
 
       .#{$namespace}-tabs__item.is-right.is-active {
         border: 1px solid getCssVar('border-color-light');
-        border-left-color: #fff;
+        border-left-color: getCssVar('bg-color');
         border-right: none;
         border-bottom: none;
 
@@ -566,8 +566,8 @@
 
         &.is-active {
           border-color: transparent;
-          border-top-color: rgb(209, 219, 229);
-          border-bottom-color: rgb(209, 219, 229);
+          border-top-color: getCssVar('border-color', 'light');
+          border-bottom-color: getCssVar('border-color', 'light');
         }
       }
     }

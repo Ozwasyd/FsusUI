@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "69094e995772f518d4c42485b2ed93394e73035a",
+    "commitSha": "790171e2bbbd43db70bcc15391e32bbaf53bc42a",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "92122c4799786d89451d48d8dddd15d89467fd81bbca8f151791dc32de39cf09",
@@ -5750,7 +5750,10 @@
   "cssVariables": [
     {
       "name": "--el-a11y-focus-color",
-      "files": ["vue/packages/theme-chalk/src/common/fsus-tokens.scss"],
+      "files": [
+        "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
+        "vue/packages/theme-chalk/src/mixins/mixins.scss"
+      ],
       "classification": "portable"
     },
     {

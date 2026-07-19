@@ -269,6 +269,7 @@ describe('Fsus theme visual baseline', () => {
 
   test('keeps border-card tabs on the same quiet baseline', () => {
     const css = compileThemeFile('fsus-theme.scss')
+    const tabsCss = compileThemeFile('tabs.scss')
 
     expectCssRule(css, '.el-tabs--border-card > .el-tabs__header', [
       'height: auto;',
@@ -289,6 +290,27 @@ describe('Fsus theme visual baseline', () => {
       'border-radius: var(--fsus-radius-control);',
       'box-shadow: none;',
     ])
+    expectCssRule(
+      tabsCss,
+      '.el-tabs--left.el-tabs--card .el-tabs__item.is-left.is-active',
+      ['border-right-color: var(--el-bg-color);'],
+    )
+    expectCssRule(
+      tabsCss,
+      '.el-tabs--right.el-tabs--card .el-tabs__item.is-right.is-active',
+      ['border-left-color: var(--el-bg-color);'],
+    )
+    for (const selector of [
+      '.el-tabs--left.el-tabs--border-card .el-tabs__item.is-left.is-active',
+      '.el-tabs--right.el-tabs--border-card .el-tabs__item.is-right.is-active',
+    ]) {
+      expectCssRule(tabsCss, selector, [
+        'border-top-color: var(--el-border-color-light);',
+        'border-bottom-color: var(--el-border-color-light);',
+      ])
+    }
+    expect(tabsCss).not.toContain('rgb(209, 219, 229)')
+    expect(tabsCss).not.toMatch(/border-(?:left|right)-color:\s*#fff;/)
   })
 
   test('aligns public focus and active states with Scholarly Blue', () => {
@@ -298,14 +320,14 @@ describe('Fsus theme visual baseline', () => {
     const publicShellCss = compileThemeFile('public-shell.scss')
 
     expectCssRule(inputCss, '.el-textarea__inner:focus-visible', [
-      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
     ])
     expectCssRule(tabsCss, '.el-tabs__active-bar', [
       'background-color: var(--fsus-scholarly-blue);',
     ])
     expectCssRule(tabsCss, '.el-tabs__item:focus-visible', [
       'outline: none !important;',
-      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
     ])
     expectCssRule(tabsCss, '.el-tabs__item.is-active', [
       'color: var(--el-text-color-primary);',
@@ -326,7 +348,7 @@ describe('Fsus theme visual baseline', () => {
       '.el-public-shell__action-link:focus-visible',
     ]) {
       expectCssRule(publicShellCss, selector, [
-        'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+        'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
       ])
     }
   })
@@ -386,7 +408,7 @@ describe('Fsus theme visual baseline', () => {
       '.el-markdown-editor__textarea:focus-visible',
     ]) {
       expectCssRule(css, selector, [
-        'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+        'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
       ])
     }
 
@@ -1245,9 +1267,14 @@ describe('Fsus theme visual baseline', () => {
   test('keeps rate hover within the control motion budget', () => {
     const css = compileThemeFile('rate.scss')
 
+    expectCssRule(css, '.el-rate', [
+      '--el-rate-fill-color: var(--el-color-warning);',
+      '--el-rate-void-color: var(--el-border-color-darker);',
+      '--el-rate-disabled-void-color: var(--el-fill-color);',
+    ])
     expectCssRule(css, '.el-rate:focus-visible', [
       'outline: none !important;',
-      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
     ])
     expectCssRule(css, '.el-rate .el-rate__icon', [
       'transition: transform var(--fsus-motion-control-fast) var(--fsus-motion-standard), color var(--fsus-motion-control-fast) var(--fsus-motion-standard);',
@@ -1257,6 +1284,7 @@ describe('Fsus theme visual baseline', () => {
     ])
     expect(css).not.toContain('transition: var(--el-transition-duration);')
     expect(css).not.toContain('transform: scale(1.15);')
+    expect(css).not.toContain('#f7ba2a')
   })
 
   test('keeps backtop aligned with floating focus tokens', () => {
@@ -1271,7 +1299,7 @@ describe('Fsus theme visual baseline', () => {
     ])
     expectCssRule(css, '.el-backtop:focus-visible', [
       'outline: none !important;',
-      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
     ])
     expect(css).not.toContain('border-radius: 50%;')
     expect(css).not.toContain('box-shadow: var(--el-box-shadow-lighter);')
@@ -1288,7 +1316,7 @@ describe('Fsus theme visual baseline', () => {
     ])
     expectCssRule(css, '.el-collapse-item__header:focus-visible', [
       'outline: none !important;',
-      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
     ])
     expect(css).not.toContain(
       '.el-collapse-item__header.focusing:focus:not(:hover) {\n  color:',
@@ -1309,7 +1337,7 @@ describe('Fsus theme visual baseline', () => {
     ])
     expectCssRule(css, '.el-carousel__arrow:focus-visible', [
       'outline: none !important;',
-      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
     ])
     expectCssRule(
       css,
@@ -1322,7 +1350,7 @@ describe('Fsus theme visual baseline', () => {
     ])
     expectCssRule(css, '.el-carousel__button:focus-visible', [
       'outline: none !important;',
-      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
     ])
     expectCssRule(css, '.el-carousel__indicator.is-active button', [
       'opacity: var(--fsus-carousel-indicator-active-opacity, 1);',
@@ -1446,7 +1474,7 @@ describe('Fsus theme visual baseline', () => {
     expectCssRule(selectCss, '.el-select-v2__wrapper.is-focused', [
       'border-color: var(--fsus-select-v2-focus-border, var(--fsus-state-focus-border));',
       'outline: none !important;',
-      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
     ])
     expectCssRule(
       selectCss,
@@ -1540,11 +1568,11 @@ describe('Fsus theme visual baseline', () => {
       'color: var(--fsus-datepicker-shortcut-active-text, var(--fsus-scholarly-blue));',
     ])
     expectCssRule(css, '.el-picker-panel__shortcut:focus-visible', [
-      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
       'border-radius: var(--fsus-radius-control-small, 4px);',
     ])
     expectCssRule(css, '.el-picker-panel__icon-btn:focus-visible', [
-      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
       'border-radius: var(--fsus-radius-control-small, 4px);',
     ])
     expectCssRule(css, '.el-picker-panel__btn', [
@@ -1708,7 +1736,7 @@ describe('Fsus theme visual baseline', () => {
 
     expectCssRule(css, '.el-slider__button-wrapper:focus-visible', [
       'outline: none !important;',
-      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
       'border-radius: var(--fsus-radius-pill);',
     ])
     expectCssRule(css, '.el-slider__button', [
@@ -1750,7 +1778,7 @@ describe('Fsus theme visual baseline', () => {
     ]) {
       expectCssRule(css, selector, [
         'outline: none !important;',
-        'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+        'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
         'opacity: var(--fsus-image-viewer-control-hover-opacity, 1);',
       ])
     }
@@ -2018,7 +2046,7 @@ describe('Fsus theme visual baseline', () => {
       css,
       '.el-site-header__brand :where(a, button):focus-visible',
       [
-        'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+        'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
       ],
     )
     expectCssRule(css, '.el-site-header__desktop-nav', ['display: none;'])
@@ -2260,7 +2288,7 @@ describe('Fsus theme visual baseline', () => {
     ])
     expectCssRule(css, '.el-section-nav__link:focus-visible', [
       'outline: none !important;',
-      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
     ])
     expectCssRule(css, '.el-settings-section', [
       'display: grid;',
@@ -2334,7 +2362,7 @@ describe('Fsus theme visual baseline', () => {
     expectCssRule(css, '.el-card', ['box-shadow: none;'])
     expectCssRule(css, '.el-card:focus-visible', [
       'outline: none !important;',
-      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
     ])
     expectCssRule(css, '.el-card.is-always-shadow', [
       'box-shadow: var(--fsus-card-elevated-shadow, var(--fsus-shadow-panel-lighter));',

@@ -61,7 +61,8 @@ $E: null;
 // A11y
 @mixin a11y-focus-ring($offset: 1px, $radius: 0px) {
   outline: none !important;
-  box-shadow: inset 0 0 0 #{$offset} var(--fsus-scholarly-blue, #2a599c) !important;
+  box-shadow: inset 0 0 0 #{$offset}
+    var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;
   @if $radius != 0px and $radius != 0 {
     border-radius: #{$radius};
   }

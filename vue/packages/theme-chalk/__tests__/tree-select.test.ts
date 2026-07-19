@@ -64,7 +64,7 @@ describe('TreeSelect row contract', () => {
       '.el-tree-select__popper .el-tree-node:focus-visible > .el-tree-node__content',
     )
     expect(focus).toContain(
-      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
     )
     expect(focus).not.toContain('background:')
 
