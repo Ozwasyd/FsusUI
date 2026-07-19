@@ -6,13 +6,15 @@
       <el-card class="box-card">
         <template #header>
           <div class="card-header">
-            <span>Card name</span>
-            <el-button class="button" text>Operation button</el-button>
+            <span>最近编辑</span>
+            <el-button class="button" text>查看历史</el-button>
           </div>
         </template>
-        <div v-for="item in 4" :key="item" class="text item">
-          {{ `List item ${item}` }}
-        </div>
+        <div class="text item">草稿 · 发布于 3 分钟前</div>
+        <div class="text item">如何设置同步成员权限</div>
+        <div class="text item">发布前检查文章可见范围</div>
+        <div class="text item">为文章添加封面与摘要</div>
+        <div class="text item">定时发布前的校对清单</div>
       </el-card>
     </div>
     <div class="demo-block">
@@ -26,11 +28,14 @@
     <div class="demo-block">
       <h3>Collapse & CollapseItem</h3>
       <el-collapse v-model="activeCollapse">
-        <el-collapse-item title="Consistency" name="1">
-          <div>Consistent with real life</div>
+        <el-collapse-item title="内容规则" name="1">
+          <div>标题与摘要保持一致</div>
         </el-collapse-item>
-        <el-collapse-item title="Feedback" name="2">
-          <div>Real-time control</div>
+        <el-collapse-item title="权限范围" name="2">
+          <div>仅向所选成员开放</div>
+        </el-collapse-item>
+        <el-collapse-item title="发布流水" name="3">
+          <div>记录每次发布与回退</div>
         </el-collapse-item>
       </el-collapse>
     </div>

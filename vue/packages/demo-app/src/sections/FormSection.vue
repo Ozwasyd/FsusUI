@@ -63,7 +63,7 @@
     <div class="demo-block">
       <h3>Cascader & CascaderPanel</h3>
       <el-space wrap>
-        <el-cascader :options="cascaderOptions" placeholder="Cascader" />
+        <el-cascader :options="cascaderOptions" placeholder="选择分类" />
         <el-cascader-panel :options="cascaderOptions" />
       </el-space>
     </div>
@@ -82,36 +82,36 @@
     <div class="demo-block">
       <h3>TimePicker / TimeSelect</h3>
       <el-space wrap>
-        <el-time-picker v-model="time" placeholder="Pick time" />
+        <el-time-picker v-model="time" placeholder="选择发布时间" />
         <el-time-select
           v-model="timeSelect"
           start="08:30"
           step="00:15"
           end="18:30"
-          placeholder="Select time"
+          placeholder="选择推送时段"
         />
       </el-space>
     </div>
     <div class="demo-block">
       <h3>DatePicker</h3>
       <el-space direction="vertical">
-        <el-date-picker v-model="date" type="date" placeholder="Pick a day" />
+        <el-date-picker v-model="date" type="date" placeholder="选择日期" />
         <el-date-picker
           v-model="dateRange"
           type="daterange"
-          range-separator="To"
-          start-placeholder="Start date"
-          end-placeholder="End date"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
         />
       </el-space>
     </div>
     <div class="demo-block">
       <h3>Upload</h3>
       <el-upload action="#" multiple :limit="3">
-        <el-button type="primary">Click to upload</el-button>
+        <el-button type="primary">上传封面</el-button>
         <template #tip>
           <div class="el-upload__tip">
-            jpg/png files with a size less than 500kb
+            支持 jpg/png，单个文件 ≤ 500KB
           </div>
         </template>
       </el-upload>
@@ -134,18 +134,18 @@
     <div class="demo-block">
       <h3>Form & FormItem</h3>
       <el-form :model="formModel" label-width="120px">
-        <el-form-item label="Activity name">
+        <el-form-item label="文章标题">
           <el-input v-model="formModel.name" />
         </el-form-item>
-        <el-form-item label="Activity zone">
+        <el-form-item label="可见范围">
           <div data-testid="activity-zone-select-wrapper">
             <el-select
               v-model="formModel.region"
-              placeholder="please select your zone"
+              placeholder="选择可见范围"
               :teleported="false"
             >
-              <el-option label="Zone one" value="shanghai" />
-              <el-option label="Zone two" value="beijing" />
+              <el-option label="公开" value="shanghai" />
+              <el-option label="仅自己可见" value="beijing" />
             </el-select>
           </div>
         </el-form-item>

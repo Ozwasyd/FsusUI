@@ -1,6 +1,6 @@
 # FsusUI 文档中心
 
-FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Minimalist），采用 pnpm monorepo 架构；当前 npm public registry 主包为 `@ozwasyd/element-plus`。
+FsusUI 是基于 Vue 3 的组件库（pnpm monorepo；public preview 主包为 `@ozwasyd/element-plus`）；默认视觉语言为 The Intellectual Minimalist（详见设计规范 `docs/design.md`）。
 
 ---
 
@@ -9,7 +9,7 @@ FsusUI 是基于 Vue 3 的高智感极简主义组件库（The Intellectual Mini
 | 文档                                                              | 说明                                                         |
 | ----------------------------------------------------------------- | ------------------------------------------------------------ |
 | [项目概览](./project-overview.md)                                 | Monorepo 结构、工作区划分、主要入口                          |
-| [设计规范](./design.md)                                           | 高智感极简主义设计语言、色彩、字体、组件规范                 |
+| [设计规范](./design.md)                                           | 设计语言：The Intellectual Minimalist（色彩、字体、spacing token 详见 `docs/design.md`） |
 | [平台中立规范](../spec/README.md)                                 | tokens、组件合同、UX 模式、a11y 与 motion 语义               |
 | [跨平台路线收口](./cross-platform-roadmap.md)                     | Web/Vue 与 Avalonia/.NET 分层、issue 状态与边界              |
 | [Avalonia 复杂组件规划](./avalonia/complex-components-roadmap.md) | DataTable、VirtualList、Terminal、FileManager 等复杂组件路线 |

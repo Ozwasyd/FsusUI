@@ -4,9 +4,9 @@
     <div class="demo-block">
       <h3>Table & TableColumn</h3>
       <el-table :data="tableData" border style="width: 100%">
-        <el-table-column prop="date" label="Date" width="180" />
-        <el-table-column prop="name" label="Name" width="180" />
-        <el-table-column prop="address" label="Address" />
+        <el-table-column prop="date" label="发布日期" width="180" />
+        <el-table-column prop="name" label="标题" width="180" />
+        <el-table-column prop="address" label="可见范围" />
       </el-table>
     </div>
     <div class="demo-block">
@@ -106,23 +106,23 @@
     </div>
     <div class="demo-block">
       <h3>Empty</h3>
-      <el-empty description="No Data" />
+      <el-empty description="暂无文章" />
     </div>
     <div class="demo-block">
       <h3>Descriptions & DescriptionsItem</h3>
-      <el-descriptions title="User Info" border>
-        <el-descriptions-item label="Username">
-          kooriookami
+      <el-descriptions title="用户资料" border>
+        <el-descriptions-item label="笔名">
+          青砚
         </el-descriptions-item>
-        <el-descriptions-item label="Telephone">
+        <el-descriptions-item label="联系电话">
           18100000000
         </el-descriptions-item>
-        <el-descriptions-item label="Place"> Suzhou </el-descriptions-item>
-        <el-descriptions-item label="Remarks">
-          <el-tag size="small">School</el-tag>
+        <el-descriptions-item label="所在地"> 苏州 </el-descriptions-item>
+        <el-descriptions-item label="标签">
+          <el-tag size="small">写作</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="Address">
-          No.1188, Wuzhong Avenue, Wuzhong District, Suzhou, Jiangsu Province
+        <el-descriptions-item label="地址">
+          江苏省苏州市吴中区吴中大道 1188 号
         </el-descriptions-item>
       </el-descriptions>
     </div>
@@ -130,20 +130,22 @@
       <h3>Result</h3>
       <el-result
         icon="success"
-        title="Success Tip"
-        sub-title="Please follow the instructions"
+        title="已发布"
+        sub-title="读者将看到最新版本"
       >
-        <template #extra><el-button type="primary">Back</el-button></template>
+        <template #extra>
+          <el-button type="primary">返回文章列表</el-button>
+        </template>
       </el-result>
     </div>
     <div class="demo-block">
       <h3>Statistic / Countdown</h3>
       <el-row>
         <el-col :span="12">
-          <el-statistic title="Daily active users" :value="268500" />
+          <el-statistic title="今日活跃读者" :value="268500" />
         </el-col>
         <el-col :span="12">
-          <el-countdown title="Countdown" :value="countdownValue" />
+          <el-countdown title="距定时发布" :value="countdownValue" />
         </el-col>
       </el-row>
     </div>
@@ -151,10 +153,10 @@
       <h3>Timeline & TimelineItem</h3>
       <el-timeline>
         <el-timeline-item timestamp="2018/4/12" placement="top">
-          Update Github template
+          更新封面图
         </el-timeline-item>
         <el-timeline-item timestamp="2018/4/3" placement="top">
-          Custom icon
+          校对摘要
         </el-timeline-item>
       </el-timeline>
     </div>

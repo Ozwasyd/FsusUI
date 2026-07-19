@@ -4,10 +4,10 @@
     <div class="demo-block">
       <h3>Alert</h3>
       <el-space direction="vertical" style="width: 100%">
-        <el-alert title="success alert" type="success" show-icon />
-        <el-alert title="info alert" type="info" show-icon />
-        <el-alert title="warning alert" type="warning" show-icon />
-        <el-alert title="error alert" type="error" show-icon />
+        <el-alert title="草稿已保存" type="success" show-icon />
+        <el-alert title="权限更新已生效" type="info" show-icon />
+        <el-alert title="标题不能为空" type="warning" show-icon />
+        <el-alert title="删除后不可恢复" type="error" show-icon />
       </el-space>
     </div>
     <div class="demo-block">
@@ -39,7 +39,7 @@
     <div class="demo-block">
       <h3>Tooltip / TooltipV2 / Popover / Popconfirm</h3>
       <el-space wrap>
-        <el-tooltip content="Top Center prompts info" placement="top">
+        <el-tooltip content="权限同步已开始" placement="top">
           <el-button>Tooltip</el-button>
         </el-tooltip>
         <el-tooltip-v2 placement="bottom">
@@ -48,13 +48,13 @@
         </el-tooltip-v2>
         <el-popover
           placement="top"
-          title="Title"
+          title="同步成员权限"
           :width="200"
-          content="this is content, this is content, this is content"
+          content="将向所选成员推送更新"
         >
           <template #reference><el-button>Popover</el-button></template>
         </el-popover>
-        <el-popconfirm title="Are you sure to delete this?">
+        <el-popconfirm title="确定移入归档？">
           <template #reference><el-button>Popconfirm</el-button></template>
         </el-popconfirm>
       </el-space>

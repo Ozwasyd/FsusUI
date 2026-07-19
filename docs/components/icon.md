@@ -42,7 +42,7 @@ for (const [key, component] of Object.entries(FsusIconsVue)) {
 
 ```vue
 <template>
-  <el-icon :size="20" color="#2A599C">
+  <el-icon :size="20" color="var(--fsus-scholarly-blue)">
     <Edit />
   </el-icon>
   <!-- 也可直接使用 SVG 图标，不继承父级属性 -->

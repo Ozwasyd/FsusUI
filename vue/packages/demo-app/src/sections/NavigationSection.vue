@@ -4,7 +4,7 @@
     <div class="demo-block">
       <h3>Menu & MenuItem & SubMenu & MenuItemGroup</h3>
       <el-menu mode="horizontal" default-active="1">
-        <el-menu-item index="1">Processing Center</el-menu-item>
+        <el-menu-item index="1">内容中心</el-menu-item>
         <el-sub-menu index="2">
           <template #title>Workspace</template>
           <el-menu-item index="2-1">草稿箱</el-menu-item>
@@ -18,24 +18,24 @@
     <div class="demo-block">
       <h3>Tabs & TabPane</h3>
       <el-tabs v-model="activeTab">
-        <el-tab-pane label="User" name="first">User Content</el-tab-pane>
-        <el-tab-pane label="Config" name="second">Config Content</el-tab-pane>
-        <el-tab-pane label="Role" name="third">Role Content</el-tab-pane>
+        <el-tab-pane label="草稿" name="first">继续编辑未发布文章</el-tab-pane>
+        <el-tab-pane label="已发布" name="second">管理读者可见版本</el-tab-pane>
+        <el-tab-pane label="归档" name="third">查看已归档文章</el-tab-pane>
       </el-tabs>
     </div>
     <div class="demo-block">
       <h3>Breadcrumb & BreadcrumbItem</h3>
       <el-breadcrumb separator="/">
-        <el-breadcrumb-item :to="{ path: '/' }">homepage</el-breadcrumb-item>
+        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
         <el-breadcrumb-item>
-          <a href="/">promotion management</a>
+          <a href="/">内容管理</a>
         </el-breadcrumb-item>
-        <el-breadcrumb-item>promotion list</el-breadcrumb-item>
+        <el-breadcrumb-item>文章列表</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
     <div class="demo-block">
       <h3>PageHeader</h3>
-      <el-page-header content="Detail" @back="goBack" />
+      <el-page-header content="文章详情" @back="goBack" />
     </div>
     <div class="demo-block dropdown-trigger-proxy">
       <h3>Dropdown & DropdownMenu & DropdownItem</h3>
