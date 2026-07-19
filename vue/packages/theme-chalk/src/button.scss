@@ -346,6 +346,22 @@ $button-icon-span-gap: map.merge(
       @include button-variant($type);
 
       @if $type == 'primary' {
+        @include set-css-var-value(
+          ('button', 'text-color'),
+          var(--fsus-button-primary-text)
+        );
+        @include set-css-var-value(
+          ('button', 'bg-color'),
+          var(--fsus-button-primary-bg)
+        );
+        @include set-css-var-value(
+          ('button', 'border-color'),
+          var(--fsus-button-primary-bg)
+        );
+        color: getCssVar('button', 'text-color');
+        background-color: getCssVar('button', 'bg-color');
+        border-color: getCssVar('button', 'border-color');
+
         &:hover,
         &:focus {
           background-color: getCssVar('color', 'scholarly-blue');

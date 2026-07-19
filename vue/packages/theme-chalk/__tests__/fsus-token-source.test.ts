@@ -41,6 +41,10 @@ const inputSource = readFileSync(
   path.resolve(dirname, '../src/input.scss'),
   'utf8',
 )
+const buttonSource = readFileSync(
+  path.resolve(dirname, '../src/button.scss'),
+  'utf8',
+)
 const darkTokenMixin = tokenSource.match(
   /@mixin fsus-dark-tokens \{([\s\S]*?)\n\}/,
 )?.[1]
@@ -95,6 +99,33 @@ describe('Fsus token source contracts', () => {
     expect(darkTokenMixin).toContain(
       '--fsus-accent-hover: var(--fsus-color-action-primary-hover);',
     )
+  })
+
+  test('separates the compatibility interaction color from primary button ink', () => {
+    expect(sassVarSource).toMatch(
+      /\$colors:[\s\S]*?'primary': \(\s*'base': #2a599c,/,
+    )
+    expect(sassVarSource).toMatch(
+      /\$colors-dark:[\s\S]*?'primary': \(\s*'base': #4b79cc,/,
+    )
+    expect(tokenSource).toContain(
+      '--el-color-primary: var(--fsus-scholarly-blue);',
+    )
+    expect(tokenSource).not.toContain('--el-color-primary: var(--fsus-ink);')
+    expect(tokenSource).toContain('--fsus-button-primary-bg: var(--fsus-ink);')
+    expect(tokenSource).toContain(
+      '--fsus-button-primary-text: var(--fsus-paper);',
+    )
+    expect(buttonSource).toContain(
+      "('button', 'bg-color'),\n          var(--fsus-button-primary-bg)",
+    )
+    expect(buttonSource).toContain(
+      "('button', 'text-color'),\n          var(--fsus-button-primary-text)",
+    )
+    expect(buttonSource).toContain(
+      "background-color: getCssVar('button', 'bg-color');",
+    )
+    expect(buttonSource).toContain("color: getCssVar('button', 'text-color');")
   })
 
   test('maps every public dark foundation token from generated mode values', () => {

@@ -16,8 +16,10 @@ FsusUI semantic aliases on top.
 
 | Token                          | Purpose                                                                               |
 | ------------------------------ | ------------------------------------------------------------------------------------- |
-| `--el-color-primary`           | Element Plus compatibility primary mapped to Ink by default.                          |
+| `--el-color-primary`           | Element Plus interaction primary mapped to Scholarly Blue.                            |
 | `--fsus-scholarly-blue`        | Accent for links, active states, focus rings, and selection.                          |
+| `--fsus-button-primary-bg`     | Primary button background mapped to Ink independently from the interaction primary.   |
+| `--fsus-button-primary-text`   | Primary button text mapped to Paper for light/dark contrast.                          |
 | `--el-bg-color`                | Main surface background.                                                              |
 | `--el-bg-color-page`           | Page background.                                                                      |
 | `--el-text-color-primary`      | Primary text.                                                                         |
@@ -82,8 +84,10 @@ undeclared weight or rely on browser synthesis.
 
 ```css
 :root {
-  --el-color-primary: var(--fsus-ink);
+  --el-color-primary: var(--fsus-scholarly-blue);
   --fsus-scholarly-blue: #2a599c;
+  --fsus-button-primary-bg: var(--fsus-ink);
+  --fsus-button-primary-text: var(--fsus-paper);
   --fsus-radius-control: 6px;
   --fsus-radius-control-small: 4px;
   --fsus-radius-panel: 12px;

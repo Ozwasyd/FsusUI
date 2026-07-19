@@ -4,15 +4,15 @@
 
 ## Public Preview Notes
 
-| 字段                   | 说明                                                                                                                       |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| purpose                | 触发页面内明确动作，适用于表单提交、工具栏操作、危险操作确认和链接式次要操作。                                             |
-| basic usage            | 使用 `type`、`disabled`、`loading`、`icon`、`link`、`text` 等属性组合按钮状态；示例见下方基础用法。                        |
-| props / events / slots | 本页 `Button API` 与 `ButtonGroup API` 覆盖公开 props、slots 和 exposes；按钮点击仍使用原生 `click` 事件。                 |
-| accessibility          | 图标-only 按钮必须提供 `aria-label`、`aria-labelledby` 或 `title`；危险操作应使用清晰文案，不能只依赖颜色表达风险。        |
-| theme token notes      | 主要跟随 `--el-color-primary`、文本色、边框色、圆角和 motion control token；自定义颜色优先使用 `color` prop 或公开 token。 |
-| known limitations      | `type="text"` 已废弃；`tag` 切换为非 button 元素时，调用方需要补齐键盘语义与禁用语义。                                     |
-| stability level        | Preview public component。                                                                                                 |
+| 字段                   | 说明                                                                                                                                                                 |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| purpose                | 触发页面内明确动作，适用于表单提交、工具栏操作、危险操作确认和链接式次要操作。                                                                                       |
+| basic usage            | 使用 `type`、`disabled`、`loading`、`icon`、`link`、`text` 等属性组合按钮状态；示例见下方基础用法。                                                                  |
+| props / events / slots | 本页 `Button API` 与 `ButtonGroup API` 覆盖公开 props、slots 和 exposes；按钮点击仍使用原生 `click` 事件。                                                           |
+| accessibility          | 图标-only 按钮必须提供 `aria-label`、`aria-labelledby` 或 `title`；危险操作应使用清晰文案，不能只依赖颜色表达风险。                                                  |
+| theme token notes      | Primary 底色/文字跟随 `--fsus-button-primary-bg` / `--fsus-button-primary-text`；通用交互色跟随 `--el-color-primary`；自定义颜色优先使用 `color` prop 或公开 token。 |
+| known limitations      | `type="text"` 已废弃；`tag` 切换为非 button 元素时，调用方需要补齐键盘语义与禁用语义。                                                                               |
+| stability level        | Preview public component。                                                                                                                                           |
 
 > 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
 

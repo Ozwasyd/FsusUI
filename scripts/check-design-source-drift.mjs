@@ -171,18 +171,22 @@ try {
 
   const themeDocs = read('docs/theme/tokens.md')
   for (const expected of [
-    '--el-color-primary: var(--fsus-ink);',
+    '--el-color-primary: var(--fsus-scholarly-blue);',
+    '--fsus-button-primary-bg: var(--fsus-ink);',
+    '--fsus-button-primary-text: var(--fsus-paper);',
     '--fsus-radius-control: 6px;',
     '--fsus-radius-panel: 12px;',
     '--fsus-backdrop-blur: 0px;',
     '--fsus-shadow-panel: none;',
-    'Element Plus compatibility primary mapped to Ink by default.',
+    'Element Plus interaction primary mapped to Scholarly Blue.',
     'Accent for links, active states, focus rings, and selection.',
   ]) {
     assertIncludes(themeDocs, expected, 'docs/theme/tokens.md')
   }
   for (const stale of [
     '--el-color-primary: #2a599c;',
+    '--el-color-primary: var(--fsus-ink);',
+    'Element Plus compatibility primary mapped to Ink by default.',
     '--fsus-backdrop-blur: 12px;',
     'Primary action and emphasis color.',
   ]) {
@@ -211,7 +215,9 @@ try {
     'vue/packages/theme-chalk/src/common/fsus-tokens.scss',
   )
   for (const expected of [
-    '--el-color-primary: var(--fsus-ink);',
+    '--el-color-primary: var(--fsus-scholarly-blue);',
+    '--fsus-button-primary-bg: var(--fsus-ink);',
+    '--fsus-button-primary-text: var(--fsus-paper);',
     '--fsus-radius-control: 6px;',
     '--fsus-radius-control-small: 4px;',
     '--fsus-radius-panel: 12px;',

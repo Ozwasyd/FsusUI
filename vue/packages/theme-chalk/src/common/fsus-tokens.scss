@@ -22,6 +22,8 @@
 
   --fsus-ink: var(--fsus-color-text-primary);
   --fsus-paper: var(--fsus-color-surface-base);
+  --fsus-button-primary-bg: var(--fsus-ink);
+  --fsus-button-primary-text: var(--fsus-paper);
   --fsus-page: var(--fsus-color-surface-raised);
   --fsus-surface-overlay: rgba(255, 255, 255, 0.98);
   --fsus-overlay-color: rgba(252, 252, 252, 0.5);
@@ -208,7 +210,7 @@
   --fsus-shadow-panel-dark: 0 16px 40px rgba(15, 23, 42, 0.1);
   --fsus-shadow-floating: 0 12px 32px rgba(15, 23, 42, 0.08);
 
-  --el-color-primary: var(--fsus-ink);
+  --el-color-primary: var(--fsus-scholarly-blue);
   --el-bg-color: var(--fsus-paper);
   --el-bg-color-page: var(--fsus-page);
   --el-bg-color-overlay: var(--fsus-surface-overlay);
@@ -284,7 +286,7 @@
   --fsus-accent-subtle: var(--fsus-state-hover-bg);
   --fsus-accent-border: var(--fsus-state-focus-border);
 
-  --el-color-primary: var(--fsus-ink);
+  --el-color-primary: var(--fsus-scholarly-blue);
   --el-bg-color: var(--fsus-paper);
   --el-bg-color-page: var(--fsus-page);
   --el-bg-color-overlay: var(--fsus-surface-overlay);
