@@ -32,6 +32,16 @@ available only when an application selects them explicitly.
 | `--fsus-motion-panel`        | `360ms`                        | Panel and larger surface transitions.               |
 | `--fsus-motion-overlay`      | `260ms`                        | Overlay enter and leave transitions.                |
 
+The same theme layer also owns the View Transition snapshot tokens:
+
+| Token                                    | Standard value | Purpose                           |
+| ---------------------------------------- | -------------- | --------------------------------- |
+| `--fsus-view-transition-duration`        | `240ms`        | Root snapshot crossfade duration. |
+| `--fsus-view-transition-shared-duration` | `360ms`        | Bounded shared snapshot duration. |
+| `--fsus-view-transition-easing`          | decelerating   | Root snapshot easing.             |
+| `--fsus-view-transition-shared-easing`   | standard       | Shared snapshot easing.           |
+| `--fsus-view-transition-z-index`         | `2147483000`   | Isolated browser snapshot layer.  |
+
 Use these tokens for app-level transitions that should follow FsusUI motion
 settings.
 
@@ -64,6 +74,13 @@ motion collapse public durations to `1ms`, remove blur and offsets, and make
 trail colors transparent. Runtime helpers land directly in the terminal state
 with `transform: none` and `filter: none`, so disabling motion does not retain a
 displaced frame or cause a layout jump.
+
+The same contract governs same-document View Transition pseudo-elements.
+`theme-chalk` owns root and shared snapshot durations, easing, normal blend
+mode, isolation, and z-index. Reduced/disabled modes and the system media query
+collapse pseudo-element animation to `1ms`; product styles do not need global
+`::view-transition-*` overrides. Temporary shared names are runtime-owned and
+must not be persisted in markup, URLs, storage, or application logs.
 
 ## Reading Surface Contract
 

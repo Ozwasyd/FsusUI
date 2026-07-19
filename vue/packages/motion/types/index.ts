@@ -156,6 +156,7 @@ export type MotionRecipeDefinition = {
   allowedTargets: readonly string[]
   reducedFallback: 'terminal' | 'opacity-only'
   disabledFallback: 'terminal'
+  viewTransitionBackend?: 'preferred' | 'never'
   maxItemCount?: number
   budget?: Partial<MotionBudgetConfig>
 }

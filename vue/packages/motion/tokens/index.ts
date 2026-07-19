@@ -166,6 +166,15 @@ export const motionCssVars = {
   instant: 'var(--fsus-motion-duration-instant, 1ms)',
 } as const
 
+export const viewTransitionTokens = {
+  duration: motionCssVars.patterns.decel.long.duration,
+  sharedDuration: motionCssVars.patterns.standard.long.duration,
+  easing: motionCssVars.patterns.decel.long.easing,
+  sharedEasing: motionCssVars.patterns.standard.long.easing,
+  isolation: 'isolate',
+  zIndex: 'var(--fsus-view-transition-z-index, 2147483000)',
+} as const
+
 // Backward-compat aliases for the previous 5-axis labels so external code
 // that referenced `motionTokenAliases.fast` etc. continues to work.
 export const motionTokenAliases = {

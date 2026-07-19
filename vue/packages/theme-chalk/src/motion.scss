@@ -2,6 +2,60 @@
 @use 'mixins/mixins' as *;
 @use 'mixins/config' as *;
 
+:root {
+  --fsus-view-transition-duration: var(--fsus-motion-duration-route, 240ms);
+  --fsus-view-transition-shared-duration: var(--fsus-motion-panel, 360ms);
+  --fsus-view-transition-easing: var(
+    --fsus-motion-decel,
+    cubic-bezier(0, 0, 0.2, 1)
+  );
+  --fsus-view-transition-shared-easing: var(
+    --fsus-motion-standard,
+    cubic-bezier(0.4, 0, 0.2, 1)
+  );
+  --fsus-view-transition-z-index: 2147483000;
+}
+
+::view-transition {
+  pointer-events: none;
+  z-index: var(--fsus-view-transition-z-index);
+}
+
+::view-transition-group(root) {
+  isolation: isolate;
+  animation-duration: var(--fsus-view-transition-duration);
+  animation-timing-function: var(--fsus-view-transition-easing);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--fsus-view-transition-duration);
+  animation-timing-function: var(--fsus-view-transition-easing);
+  mix-blend-mode: normal;
+}
+
+::view-transition-group(*) {
+  animation-duration: var(--fsus-view-transition-shared-duration);
+  animation-timing-function: var(--fsus-view-transition-shared-easing);
+}
+
+:root[data-fsus-motion='reduced']::view-transition-group(*),
+:root[data-fsus-motion='disabled']::view-transition-group(*),
+:root[data-fsus-motion='reduced']::view-transition-old(*),
+:root[data-fsus-motion='reduced']::view-transition-new(*),
+:root[data-fsus-motion='disabled']::view-transition-old(*),
+:root[data-fsus-motion='disabled']::view-transition-new(*) {
+  animation-duration: 1ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 1ms;
+  }
+}
+
 // Motion phase classes for FsusUI components.
 //
 // Vue's `<Transition>` adds six classes to its child by default: one
@@ -30,7 +84,7 @@
     $name + '-enter-to',
     $name + '-leave-from',
     $name + '-leave-active',
-    $name + '-leave-to',
+    $name + '-leave-to'
   );
 }
 
@@ -43,7 +97,7 @@
     $name + '-enter-from',
     $name + '-enter-active',
     $name + '-leave-from',
-    $name + '-leave-active',
+    $name + '-leave-active'
   );
 }
 
@@ -247,7 +301,7 @@
 $fsu-transitions: (
   'fsu-transition',
   'fsu-sheet-transition',
-  'fsu-overlay-transition',
+  'fsu-overlay-transition'
 );
 
 @each $base in $fsu-transitions {
@@ -256,7 +310,8 @@ $fsu-transitions: (
   .#{list.nth($phases, 2)},
   .#{list.nth($phases, 3)},
   .#{list.nth($phases, 4)} {
-    transition: opacity getCssVar('transition-duration')
+    transition: opacity
+      getCssVar('transition-duration')
       getCssVar('transition-function-fast-bezier');
   }
 }

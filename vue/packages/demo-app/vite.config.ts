@@ -18,6 +18,7 @@ export default defineConfig({
   optimizeDeps: {
     exclude: [
       'element-plus',
+      'element-plus/motion',
       '@element-plus/components',
       '@element-plus/constants',
       '@element-plus/directives',
@@ -26,9 +27,12 @@ export default defineConfig({
       '@element-plus/utils',
       '@element-plus/icons-vue',
       '@element-plus/wasm',
+      '@element-plus/motion',
     ],
     include: [
       'escape-html',
+      'gsap',
+      'gsap/ScrollTrigger',
       'dayjs/plugin/advancedFormat.js',
       'dayjs/plugin/customParseFormat.js',
       'dayjs/plugin/dayOfYear.js',
@@ -42,8 +46,14 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      'element-plus/motion': fileURLToPath(
+        new URL('../element-plus/motion.ts', import.meta.url),
+      ),
       'element-plus': fileURLToPath(
         new URL('../element-plus/index.ts', import.meta.url),
+      ),
+      '@element-plus/motion': fileURLToPath(
+        new URL('../motion/index.ts', import.meta.url),
       ),
       '@element-plus/components': fileURLToPath(
         new URL('../components', import.meta.url),

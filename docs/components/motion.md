@@ -354,6 +354,82 @@ thumbnail to lightbox, or list row to editor. The default implementation only
 animates `transform` and `opacity`, respects reduced/disabled motion, and falls
 back to terminal state when measurement fails.
 
+## Same-document View Transitions
+
+`runViewTransition()` is the stable, tree-shakeable progressive-enhancement
+boundary exported by both `@ozwasyd/element-plus` and
+`@ozwasyd/element-plus/motion`. Capability detection happens for every call;
+importing the module never reads `window` or `document`.
+
+```ts
+import { runViewTransition } from '@ozwasyd/element-plus/motion'
+
+const result = runViewTransition(() => commitRouteOrState(), {
+  name: 'route-crossfade',
+  signal: navigationSignal,
+})
+
+await result.updateDone // business update completion, not animation success
+```
+
+The result always has `mode`, `ready`, `updateDone`, `finished`, and `skip()`.
+When the Web API is absent, throws synchronously, motion is reduced/disabled,
+or the signal is already aborted, FsusUI calls the update once and returns the
+same settled result shape in `fallback` mode. An update rejection remains
+visible through `updateDone`; `finished` always settles so animation cleanup
+cannot block business error handling. A new run skips the previous snapshot
+transition. Aborting, hiding, unmounting, or route cleanup may call `skip()`;
+none of those paths replay the update.
+
+`state-settled` and `route-crossfade` recipes prefer the native backend when it
+is usable:
+
+```ts
+runMotionRecipeUpdate(() => replaceLargeRegion(), 'state-settled')
+runMotionRecipeUpdate(() => commitRoute(), 'route-crossfade')
+```
+
+Only one primary backend runs for an intent. Native snapshots and the existing
+GSAP/CSS/FLIP runtime are never started together. Other recipes retain their
+current terminal or runtime behavior.
+
+For bounded shared elements, keep the existing identity API and move the DOM
+update inside `run()`:
+
+```ts
+const shared = useSharedElementMotion({ backend: 'auto' })
+shared.register(articleId, cardElement)
+shared.run(articleId, () => mountArticleHero())
+```
+
+FsusUI normalizes the identity, rejects duplicate live owners, temporarily
+sets `view-transition-name`, and restores the prior inline value after native
+completion, skip, failure, or scope disposal. If native snapshots are not
+usable, `run()` executes the update and then uses the existing FLIP path.
+`backend: 'flip'` is available for deterministic consumer testing; consumers
+should otherwise keep the default `auto` policy.
+
+Hydration does not start a transition. The consumer decides when SSR/AOT
+hydration is ready and only then calls the adapter. The server and client DOM
+shape stays identical, ownership-transfer snapshots keep their current rules,
+and no blocking script or CSP exception is required.
+
+The demo is available at `?visual=view-transitions`. It covers ordinary state
+replacement, route simulation, theme mode, shared element, unsupported API,
+and hydration-safe guidance. FsusUI owns Web Platform compatibility, snapshot
+style, interruption, cleanup, reduced motion, and backend choice. Applications
+own route/data commits, business identity, loading/error/empty states, focus,
+scroll, and the point at which hydration is ready. Do not scatter direct
+`document.startViewTransition()` calls through an application.
+
+Local browser verification uses `pnpm test:view-transitions`: Chromium,
+Firefox, and WebKit run the same terminal-DOM, focus, scroll, ARIA, reduced,
+disabled, capability-loss, interruption, and cleanup assertions. Chromium also
+runs controlled CPU rates `1x`, `4x`, and `6x`; these are repeatable emulation
+profiles, not claims about physical mobile devices. Failure artifacts retain
+trace and screenshots. Real Android/iOS/GPU evidence is optional unless
+a release makes a platform-specific performance claim.
+
 ## Motion Budget
 
 The default budget is:

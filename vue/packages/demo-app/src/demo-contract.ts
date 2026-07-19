@@ -114,6 +114,14 @@ export const resolveDemoRoot = async (
   searchParams: URLSearchParams,
 ): Promise<DemoRootOptions> => {
   const themeMode = normalizeThemeMode(searchParams.get('theme'), 'system')
+  const visualMode = searchParams.get('visual') || ''
+
+  if (visualMode === 'view-transitions') {
+    const { default: ViewTransitionSection } =
+      await import('./sections/ViewTransitionSection.vue')
+    return { component: ViewTransitionSection, themeMode }
+  }
+
   const performanceScenario = searchParams.get('performance')
 
   if (performanceScenario) {
@@ -150,7 +158,7 @@ export const resolveDemoRoot = async (
     component: App,
     themeMode,
     props: {
-      mode: searchParams.get('visual') || '',
+      mode: visualMode,
       theme: themeMode,
       compact: searchParams.get('compact') === '1',
       cspSafe: searchParams.get('cspSafe') === '1',

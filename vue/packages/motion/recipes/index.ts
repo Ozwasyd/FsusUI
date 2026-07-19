@@ -1,6 +1,7 @@
 import { motionCssVars } from '../tokens'
 import { motionRecipeNames } from '../types'
 import { runMotion } from '../runtime'
+import { runViewTransition } from '../view-transition'
 import type {
   MotionBudgetConfig,
   MotionOptions,
@@ -10,6 +11,10 @@ import type {
   MotionRunOptions,
   MotionRuntimeControls,
 } from '../types'
+import type {
+  ViewTransitionRunOptions,
+  ViewTransitionRunResult,
+} from '../view-transition'
 
 export type MotionRecipeOptions = Omit<MotionOptions, 'name'> & {
   name?: MotionRecipeName
@@ -78,6 +83,7 @@ export const motionRecipes: Record<MotionRecipeName, MotionRecipeDefinition> = {
     allowedTargets: ['task-region', 'row', 'message'],
     reducedFallback: 'opacity-only',
     disabledFallback: terminalFallback,
+    viewTransitionBackend: 'preferred',
   },
   'state-error': {
     name: 'state-error',
@@ -98,6 +104,7 @@ export const motionRecipes: Record<MotionRecipeName, MotionRecipeDefinition> = {
     allowedTargets: ['route-view', 'page-main'],
     reducedFallback: terminalFallback,
     disabledFallback: terminalFallback,
+    viewTransitionBackend: 'preferred',
   },
   'reading-anchor-highlight': {
     name: 'reading-anchor-highlight',
@@ -225,6 +232,23 @@ export const runMotionRecipe = (
   el: HTMLElement,
   value: MotionRecipeValue,
 ): MotionRuntimeControls => runMotion(el, normalizeMotionRecipeOptions(value))
+
+export const runMotionRecipeUpdate = (
+  update: () => void | Promise<void>,
+  value: MotionRecipeValue,
+  options: ViewTransitionRunOptions = {},
+): ViewTransitionRunResult => {
+  const normalized = normalizeMotionRecipeOptions(value)
+  const recipe = getMotionRecipe(normalized.recipe)
+  return runViewTransition(update, {
+    ...options,
+    disabled:
+      options.disabled ??
+      normalized.disabled ??
+      recipe.viewTransitionBackend !== 'preferred',
+    name: options.name ?? recipe.name,
+  })
+}
 
 export const motion = {
   recipe: getMotionRecipe,

@@ -87,6 +87,8 @@ export {
   resolveMotionTarget,
   runMotion,
   runMotionRecipe,
+  runMotionRecipeUpdate,
+  runViewTransition,
   sanitizeGsapVars,
   setMotionBudget,
   assertEveryPresetHasGovernanceMetadata,
@@ -102,6 +104,7 @@ export {
   useSharedElementMotion,
   useTaskFeedback,
   useTimeline,
+  useViewTransition,
   vMotion,
   vScrollReveal,
 } from '@element-plus/motion'
@@ -151,6 +154,11 @@ export type {
   UseScrollTimelineOptions,
   UseTaskFeedbackOptions,
   UseTimelineOptions,
+  SharedElementMotionOptions,
+  SharedElementRunOptions,
+  ViewTransitionMode,
+  ViewTransitionRunOptions,
+  ViewTransitionRunResult,
 } from '@element-plus/motion'
 
 export const install = installer.install

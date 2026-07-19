@@ -86,6 +86,7 @@ import MarkdownStressSection from './sections/MarkdownStressSection.vue'
 import NavigationSection from './sections/NavigationSection.vue'
 import OthersSection from './sections/OthersSection.vue'
 import PublicShellNavModeSection from './sections/PublicShellNavModeSection.vue'
+import ViewTransitionSection from './sections/ViewTransitionSection.vue'
 
 import type { ComponentPublicInstance } from 'vue'
 
@@ -156,6 +157,7 @@ const routeSections = new Map<string, DemoSection | { component: object }>([
     'public-shell-nav-mode',
     { component: markRaw(PublicShellNavModeSection) },
   ],
+  ['view-transitions', { component: markRaw(ViewTransitionSection) }],
 ])
 
 const isDefaultGallery = computed(() => !props.mode)
