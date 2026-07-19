@@ -9,19 +9,20 @@
   display: inline-block;
   font-size: getCssVar('font-size', 'base');
   line-height: getCssVar('font-size', 'base');
-  padding: 7px 15px;
+  padding: var(--fsus-space-1) var(--fsus-space-4);
   transition: getCssVar('transition', 'all');
   font-weight: bold;
 
   &:hover {
-    background-color: getCssVar('color', 'info', 'light-7');
+    background-color: var(--fsus-state-hover-bg);
+    color: var(--fsus-scholarly-blue);
   }
 
   @include when(checked) {
-    background-color: getCssVar('color', 'primary', 'light-8');
-    color: getCssVar('color', 'primary');
+    background-color: var(--fsus-state-selected-bg);
+    color: var(--fsus-scholarly-blue);
     &:hover {
-      background-color: getCssVar('color', 'primary', 'light-7');
+      background-color: var(--fsus-state-emphasis-bg);
     }
   }
 }

@@ -39,8 +39,8 @@
     }
 
     @include when(active) {
-      background-color: getCssVar('color-primary');
-      color: $color-white;
+      background-color: var(--fsus-state-selected-bg);
+      color: var(--fsus-scholarly-blue);
     }
   }
 

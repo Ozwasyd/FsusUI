@@ -874,7 +874,7 @@ $table: map.merge(
     'text-color': getCssVar('text-color-regular'),
     'header-text-color': getCssVar('text-color-regular'),
     'row-hover-bg-color': getCssVar('fill-color', 'light'),
-    'current-row-bg-color': getCssVar('color-primary-light-9'),
+    'current-row-bg-color': var(--fsus-state-selected-bg),
     'header-bg-color': getCssVar('fill-color', 'light'),
     'fixed-box-shadow': getCssVar('box-shadow', 'light'),
     'bg-color': getCssVar('fill-color', 'blank'),
@@ -1090,8 +1090,8 @@ $dropdown: () !default;
 $dropdown: map.merge(
   (
     'menu-box-shadow': getCssVar('box-shadow-light'),
-    'menuItem-hover-fill': getCssVar('color-primary-light-9'),
-    'menuItem-hover-color': getCssVar('color-primary'),
+    'menuItem-hover-fill': var(--fsus-state-hover-bg),
+    'menuItem-hover-color': var(--fsus-scholarly-blue),
     'menu-index': 10,
   ),
   $dropdown
@@ -1159,15 +1159,15 @@ $menu: map.merge(
   (
     'active-color': getCssVar('color-primary'),
     'text-color': getCssVar('text-color-primary'),
-    'hover-text-color': getCssVar('color-primary'),
+    'hover-text-color': var(--fsus-scholarly-blue),
     'bg-color': getCssVar('fill-color', 'blank'),
-    'hover-bg-color': getCssVar('color-primary-light-9'),
+    'hover-bg-color': var(--fsus-state-hover-bg),
     'item-height': 56px,
     'sub-item-height': calc(#{getCssVar('menu-item-height')} - 6px),
     'horizontal-height': 60px,
     'horizontal-sub-item-height': 36px,
     'item-font-size': getCssVar('font-size-base'),
-    'item-hover-fill': getCssVar('color-primary-light-9'),
+    'item-hover-fill': var(--fsus-state-hover-bg),
     'border-color': getCssVar('border-color'),
     'base-level-padding': 20px,
     'level-padding': 20px,

@@ -309,6 +309,7 @@ try {
     'Platform-neutral canonical source',
     '`400`、`500`、`700`',
     'Quiet Text 为可读文本角色，不得等于 Decorative Gray',
+    '选中/勾选语义一律使用 `Scholarly Blue`',
     'ColorPicker 的 `--fsus-color-picker-*` 是组件内部命名 alias',
     'Canonical theme 维度仅包含 light/dark',
     '不生成第三套 Web theme preset',

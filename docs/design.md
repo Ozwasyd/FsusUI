@@ -88,6 +88,7 @@ FsusUI 的色彩系统围绕 **Ink / Paper / Dot / Scholarly Blue** 展开。颜
 ### Accent Rules
 
 - `Scholarly Blue` 只用于功能性反馈：链接、选中、焦点、键盘导航、少量 Hover 状态。
+- 选中/勾选语义一律使用 `Scholarly Blue`；Ink tint（`--el-color-primary-light-9`）只可用于中性 Hover 或结构填充，不表达 selection。
 - 不用蓝色做大面积背景、渐变、氛围光或品牌装饰。
 - 成功、警告、危险色只在语义场景中出现，例如表单错误、删除确认、状态标签。
 - 同一组件内同时出现主按钮、链接和选中态时，蓝色优先给焦点或选中态，避免所有元素一起高亮。

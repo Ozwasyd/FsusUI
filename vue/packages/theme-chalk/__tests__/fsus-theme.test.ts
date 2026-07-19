@@ -1041,6 +1041,67 @@ describe('Fsus theme visual baseline', () => {
     )
   })
 
+  test('uses Scholarly Blue state tokens for selection and checked feedback', () => {
+    const tableColumnCss = compileThemeFile('table-column.scss')
+    const checkTagCss = compileThemeFile('check-tag.scss')
+    const tableCss = compileThemeFile('table.scss')
+    const dropdownCss = compileThemeFile('dropdown.scss')
+    const menuCss = compileThemeFile('menu.scss')
+
+    expectCssRule(tableColumnCss, '.el-table-filter__list-item:hover', [
+      'background-color: var(--fsus-state-hover-bg);',
+      'color: var(--fsus-scholarly-blue);',
+    ])
+    expectCssRule(tableColumnCss, '.el-table-filter__list-item.is-active', [
+      'background-color: var(--fsus-state-selected-bg);',
+      'color: var(--fsus-scholarly-blue);',
+    ])
+    expectCssRule(checkTagCss, '.el-check-tag', [
+      'background-color: var(--el-color-info-light-9);',
+      'color: var(--el-color-info);',
+      'padding: var(--fsus-space-1) var(--fsus-space-4);',
+    ])
+    expectCssRule(checkTagCss, '.el-check-tag:hover', [
+      'background-color: var(--fsus-state-hover-bg);',
+      'color: var(--fsus-scholarly-blue);',
+    ])
+    expectCssRule(checkTagCss, '.el-check-tag.is-checked', [
+      'background-color: var(--fsus-state-selected-bg);',
+      'color: var(--fsus-scholarly-blue);',
+    ])
+    expectCssRule(checkTagCss, '.el-check-tag.is-checked:hover', [
+      'background-color: var(--fsus-state-emphasis-bg);',
+    ])
+    expectCssRule(tableCss, '.el-table', [
+      '--el-table-current-row-bg-color: var(--fsus-state-selected-bg);',
+    ])
+    expectCssRule(
+      tableCss,
+      '.el-table__body tr.current-row > td.el-table__cell',
+      ['background-color: var(--el-table-current-row-bg-color);'],
+    )
+    expectCssRule(dropdownCss, '.el-dropdown', [
+      '--el-dropdown-menuItem-hover-fill: var(--fsus-state-hover-bg);',
+      '--el-dropdown-menuItem-hover-color: var(--fsus-scholarly-blue);',
+    ])
+    expectCssRule(
+      dropdownCss,
+      '.el-dropdown-menu__item:not(.is-disabled):focus',
+      [
+        'background-color: var(--el-dropdown-menuItem-hover-fill);',
+        'color: var(--el-dropdown-menuItem-hover-color);',
+      ],
+    )
+    expectCssRule(menuCss, ':root', [
+      '--el-menu-hover-text-color: var(--fsus-scholarly-blue);',
+      '--el-menu-hover-bg-color: var(--fsus-state-hover-bg);',
+      '--el-menu-item-hover-fill: var(--fsus-state-hover-bg);',
+    ])
+    expectCssRule(menuCss, '.el-menu-item:hover', [
+      'background-color: var(--el-menu-hover-bg-color);',
+    ])
+  })
+
   test('maps control popup and badge radii to the canonical ladder', () => {
     const inputCss = compileThemeFile('input.scss')
     const selectV2Css = compileThemeFile('select-v2.scss')

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "1e1b9558a66134767e4173e0695a247343dff915",
+    "commitSha": "69094e995772f518d4c42485b2ed93394e73035a",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "92122c4799786d89451d48d8dddd15d89467fd81bbca8f151791dc32de39cf09",
@@ -8129,8 +8129,10 @@
       "files": [
         "vue/packages/theme-chalk/src/calendar.scss",
         "vue/packages/theme-chalk/src/carousel.scss",
+        "vue/packages/theme-chalk/src/check-tag.scss",
         "vue/packages/theme-chalk/src/checkbox-button.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
+        "vue/packages/theme-chalk/src/common/var.scss",
         "vue/packages/theme-chalk/src/date-picker/picker-panel.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
@@ -8150,6 +8152,7 @@
         "vue/packages/theme-chalk/src/radio.scss",
         "vue/packages/theme-chalk/src/scrollbar.scss",
         "vue/packages/theme-chalk/src/step.scss",
+        "vue/packages/theme-chalk/src/table-column.scss",
         "vue/packages/theme-chalk/src/tabs.scss",
         "vue/packages/theme-chalk/src/theme-mode-toggle.scss",
         "vue/packages/theme-chalk/src/tree-select.scss",
@@ -8328,6 +8331,7 @@
     {
       "name": "--fsus-space-1",
       "files": [
+        "vue/packages/theme-chalk/src/check-tag.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/motion.scss",
@@ -8365,6 +8369,7 @@
     {
       "name": "--fsus-space-4",
       "files": [
+        "vue/packages/theme-chalk/src/check-tag.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/dialog.scss",
         "vue/packages/theme-chalk/src/drawer.scss",
@@ -8397,6 +8402,7 @@
     {
       "name": "--fsus-state-emphasis-bg",
       "files": [
+        "vue/packages/theme-chalk/src/check-tag.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/tree.scss",
@@ -8421,7 +8427,9 @@
       "name": "--fsus-state-hover-bg",
       "files": [
         "vue/packages/theme-chalk/src/autocomplete.scss",
+        "vue/packages/theme-chalk/src/check-tag.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
+        "vue/packages/theme-chalk/src/common/var.scss",
         "vue/packages/theme-chalk/src/date-picker/date-table.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/markdown-editor.scss",
@@ -8434,13 +8442,16 @@
     {
       "name": "--fsus-state-selected-bg",
       "files": [
+        "vue/packages/theme-chalk/src/check-tag.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
+        "vue/packages/theme-chalk/src/common/var.scss",
         "vue/packages/theme-chalk/src/date-picker/picker-panel.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/inbox-primitives.scss",
         "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/option-item.scss",
         "vue/packages/theme-chalk/src/pagination.scss",
+        "vue/packages/theme-chalk/src/table-column.scss",
         "vue/packages/theme-chalk/src/time-select.scss",
         "vue/packages/theme-chalk/src/tree-select.scss",
         "vue/packages/theme-chalk/src/tree.scss"
