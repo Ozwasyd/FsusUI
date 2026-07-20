@@ -1,0 +1,8 @@
+{
+  "availableParallelism": 16,
+  "cpuCount": 32,
+  "totalMemoryBytes": 34359738368,
+  "cgroupV1CpuQuota": "400000",
+  "cgroupV1CpuPeriod": "100000",
+  "cgroupV1MemoryLimit": "3221225472"
+}

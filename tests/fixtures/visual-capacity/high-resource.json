@@ -1,0 +1,7 @@
+{
+  "availableParallelism": 24,
+  "cpuCount": 32,
+  "totalMemoryBytes": 68719476736,
+  "cgroupV2CpuMax": "max 100000",
+  "cgroupV2MemoryMax": "max"
+}

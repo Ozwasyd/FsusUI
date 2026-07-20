@@ -1,0 +1,5 @@
+{
+  "availableParallelism": 8,
+  "cpuCount": 32,
+  "totalMemoryBytes": 17179869184
+}
