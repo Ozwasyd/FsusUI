@@ -157,3 +157,14 @@
     }
   }
 }
+
+// Public consumer modifier for segmented controls that need a full touch target
+// while retaining the typography and horizontal padding of their chosen size.
+.fsus-radio-group--touch {
+  .#{$namespace}-radio-button__inner {
+    display: inline-flex;
+    min-height: var(--fsus-control-height, 44px);
+    align-items: center;
+    justify-content: center;
+  }
+}

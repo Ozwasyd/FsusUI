@@ -55,6 +55,17 @@ const expectCssRule = (
 }
 
 describe('Fsus theme visual baseline', () => {
+  test('exposes a public touch-target modifier for radio button groups', () => {
+    const css = compileThemeFile('radio-button.scss')
+
+    expectCssRule(css, '.fsus-radio-group--touch .el-radio-button__inner', [
+      'display: inline-flex;',
+      'min-height: var(--fsus-control-height, 44px);',
+      'align-items: center;',
+      'justify-content: center;',
+    ])
+  })
+
   test('keeps task page headings flat, readable, and stable across densities', () => {
     const css = compileThemeFile('task-page-header.scss')
 
