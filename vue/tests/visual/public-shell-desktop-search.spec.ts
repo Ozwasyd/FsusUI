@@ -130,6 +130,21 @@ test('opens, submits, escapes, and closes outside without stealing focus', async
   await expect(panel).toBeVisible()
   const input = panel.getByRole('textbox', { name: 'Search Field Notes' })
   await expect(input).toBeFocused()
+  const overlayContract = await panel.evaluate((element) => {
+    const style = getComputedStyle(element)
+    const probe = document.createElement('div')
+    probe.style.background = 'var(--fsus-surface-overlay)'
+    element.append(probe)
+    const expectedBackgroundColor = getComputedStyle(probe).backgroundColor
+    probe.remove()
+    return {
+      backgroundColor: style.backgroundColor,
+      expectedBackgroundColor,
+    }
+  })
+  expect(overlayContract.backgroundColor).toBe(
+    overlayContract.expectedBackgroundColor,
+  )
   const transitionDuration = await panel.evaluate((element) =>
     Number.parseFloat(getComputedStyle(element).transitionDuration),
   )
@@ -148,6 +163,14 @@ test('opens, submits, escapes, and closes outside without stealing focus', async
       contentType: 'image/png',
     },
   )
+
+  await panel.evaluate((element) => {
+    ;(element as HTMLElement).style.setProperty(
+      '--fsus-surface-overlay',
+      'rgb(12, 34, 56)',
+    )
+  })
+  await expect(panel).toHaveCSS('background-color', 'rgb(12, 34, 56)')
 
   await input.press('Escape')
   await expect(trigger).toHaveAttribute('aria-expanded', 'false')

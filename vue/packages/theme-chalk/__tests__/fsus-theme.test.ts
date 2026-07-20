@@ -2260,6 +2260,7 @@ describe('Fsus theme visual baseline', () => {
         'padding: 12px;',
         'border: 1px solid var(--el-border-color-lighter);',
         'border-radius: var(--fsus-radius-popover, 10px);',
+        'background: var(--fsus-surface-overlay, var(--el-bg-color));',
         'box-shadow: var(--fsus-shadow-floating, none);',
       ])
       expectCssRule(css, '.el-public-shell__search--desktop-trigger', [

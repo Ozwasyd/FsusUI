@@ -216,7 +216,7 @@
     padding: 12px;
     border: 1px solid var(--#{$namespace}-border-color-lighter);
     border-radius: var(--fsus-radius-popover, 10px);
-    background: var(--#{$namespace}-bg-color);
+    background: var(--fsus-surface-overlay, var(--#{$namespace}-bg-color));
     box-shadow: var(--fsus-shadow-floating, none);
     box-sizing: border-box;
   }

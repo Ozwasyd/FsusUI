@@ -192,7 +192,7 @@
     padding: 12px;
     border: 1px solid getCssVar('border-color-lighter');
     border-radius: var(--fsus-radius-popover, 10px);
-    background: getCssVar('bg-color');
+    background: var(--fsus-surface-overlay, #{getCssVar('bg-color')});
     box-shadow: var(--fsus-shadow-floating, none);
     box-sizing: border-box;
   }
