@@ -404,6 +404,7 @@ try {
         `if (root.FsusDataList?.name !== 'FsusDataList') throw new Error('FsusDataList runtime export drifted')`,
         `if (motion.FsuTransition?.name !== 'FsuTransition') throw new Error('FsuTransition runtime export drifted')`,
         `if (perception.FsusPerceptionChallenge?.name !== 'FsusPerceptionChallenge') throw new Error('FsusPerceptionChallenge runtime export drifted')`,
+        `if (perception.FsusPerceptionCharacterChallenge?.name !== 'FsusPerceptionCharacterChallenge') throw new Error('FsusPerceptionCharacterChallenge runtime export drifted')`,
         `console.log('Consumer runtime export contract passed.')`,
       ].join(';'),
     ],

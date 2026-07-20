@@ -11,7 +11,11 @@ import {
 } from '__FSUS_PACKAGE_NAME__/es/components/empty-state/index.mjs'
 import { installThemeModeTestHelper } from '__FSUS_PACKAGE_NAME__/es/components/config-provider/src/theme-mode.mjs'
 import type { MotionPresetName } from '__FSUS_PACKAGE_NAME__/motion'
-import type { PerceptionChallengeKind } from '__FSUS_PACKAGE_NAME__/perception-challenge'
+import type {
+  CharacterChallengeProps,
+  PerceptionCharacterMedia,
+  PerceptionChallengeKind,
+} from '__FSUS_PACKAGE_NAME__/perception-challenge'
 import '__FSUS_PACKAGE_NAME__/theme-chalk/base.css'
 import '__FSUS_PACKAGE_NAME__/theme-chalk/el-button.css'
 import '__FSUS_PACKAGE_NAME__/theme-chalk/el-empty-state.css'
@@ -75,6 +79,20 @@ const fsusBlogPackageContract = {
   columns: [{ key: 'title', label: 'Title' }] satisfies DataListColumn[],
   motionPreset: 'surface-settle' satisfies MotionPresetName,
   perceptionKind: 'text-task' satisfies PerceptionChallengeKind,
+  characterKind: 'character' satisfies PerceptionChallengeKind,
+  characterMedia: {
+    raster: {
+      kind: 'image-url',
+      src: 'data:image/png;base64,AAAA',
+      width: 1,
+      height: 1,
+    },
+  } satisfies PerceptionCharacterMedia,
+  characterProps: {
+    challengeId: 'consumer-owned-character',
+    media: null,
+    state: 'ready',
+  } satisfies Partial<CharacterChallengeProps>,
   row: { title: 'Packed collection row' } satisfies DataListRow,
   rowKey: 'packed-row' satisfies DataListRowKey,
 }

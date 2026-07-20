@@ -3,6 +3,7 @@ import { buildProps, definePropType } from '@element-plus/utils'
 import type { ExtractPropTypes } from 'vue'
 
 export const perceptionChallengeKinds = [
+  'character',
   'text-task',
   'localization',
   'micro-interaction',
@@ -17,7 +18,11 @@ export const perceptionChallengeStates = [
   'submitting',
   'failed',
   'verified',
+  'retryable',
+  'reissue',
+  'unavailable',
   'expired',
+  'disabled',
 ] as const
 
 export type PerceptionChallengeKind = (typeof perceptionChallengeKinds)[number]
@@ -52,6 +57,18 @@ export type PerceptionChallengeRenderPayload =
       alt?: string
     }
 
+export type PerceptionCharacterAudioMedia = {
+  src: string
+  type?: string
+}
+
+export type PerceptionCharacterMode = 'raster' | 'audio'
+
+export type PerceptionCharacterMedia = {
+  raster?: PerceptionChallengeRenderPayload | null
+  audio?: PerceptionCharacterAudioMedia | null
+}
+
 export type PerceptionChallengeAssignment = {
   challengeId?: string
   kind: PerceptionChallengeKind
@@ -61,12 +78,19 @@ export type PerceptionChallengeAssignment = {
   gridHeight?: number
   expiresAtUnixMs?: number
   renderPayload?: PerceptionChallengeRenderPayload | null
+  characterMedia?: PerceptionCharacterMedia | null
   microInteractionEnabled?: boolean
   meta?: Record<string, unknown>
 }
 
 export type PerceptionTextTaskSubmitPayload = {
   kind: 'text-task'
+  value: string
+  challengeId?: string
+}
+
+export type PerceptionCharacterSubmitPayload = {
+  kind: 'character'
   value: string
   challengeId?: string
 }
@@ -85,6 +109,7 @@ export type PerceptionMicroInteractionSubmitPayload = {
 }
 
 export type PerceptionChallengeSubmitPayload =
+  | PerceptionCharacterSubmitPayload
   | PerceptionTextTaskSubmitPayload
   | PerceptionLocalizationSubmitPayload
   | PerceptionMicroInteractionSubmitPayload
@@ -157,6 +182,10 @@ export const perceptionChallengeProps = buildProps({
     type: definePropType<PerceptionChallengeRenderPayload | null>(Object),
     default: null,
   },
+  characterMedia: {
+    type: definePropType<PerceptionCharacterMedia | null>(Object),
+    default: null,
+  },
   kind: {
     type: String,
     values: perceptionChallengeKinds,
@@ -192,6 +221,18 @@ export const perceptionChallengeProps = buildProps({
   retryLabel: {
     type: String,
     default: 'Retry',
+  },
+  reissueLabel: {
+    type: String,
+    default: 'Get another challenge',
+  },
+  alternativeLabel: {
+    type: String,
+    default: 'Use audio instead',
+  },
+  rasterLabel: {
+    type: String,
+    default: 'Use image instead',
   },
   cancelLabel: {
     type: String,
@@ -233,6 +274,91 @@ export const textTaskChallengeProps = buildProps({
   submitLabel: {
     type: String,
     default: 'Submit',
+  },
+} as const)
+
+export const characterChallengeProps = buildProps({
+  ...perceptionChallengeCommonProps,
+  challengeId: {
+    type: String,
+    default: '',
+  },
+  state: {
+    type: String,
+    values: perceptionChallengeStates,
+    default: 'ready',
+  },
+  media: {
+    type: definePropType<PerceptionCharacterMedia | null>(Object),
+    default: null,
+  },
+  modelValue: {
+    type: String,
+    default: '',
+  },
+  inputLabel: {
+    type: String,
+    default: 'Character response',
+  },
+  placeholder: {
+    type: String,
+    default: '',
+  },
+  mediaAlt: {
+    type: String,
+    default: 'Character recognition challenge',
+  },
+  submitLabel: {
+    type: String,
+    default: 'Submit response',
+  },
+  refreshLabel: {
+    type: String,
+    default: 'Refresh challenge',
+  },
+  alternativeLabel: {
+    type: String,
+    default: 'Use audio instead',
+  },
+  rasterLabel: {
+    type: String,
+    default: 'Use image instead',
+  },
+  retryLabel: {
+    type: String,
+    default: 'Retry response',
+  },
+  reissueLabel: {
+    type: String,
+    default: 'Get another challenge',
+  },
+  loadingText: {
+    type: String,
+    default: 'Preparing challenge',
+  },
+  verifyingText: {
+    type: String,
+    default: 'Checking response',
+  },
+  retryableText: {
+    type: String,
+    default: 'The response was not accepted',
+  },
+  reissueText: {
+    type: String,
+    default: 'A new challenge is required',
+  },
+  unavailableText: {
+    type: String,
+    default: 'Character challenge is unavailable',
+  },
+  expiredText: {
+    type: String,
+    default: 'Character challenge expired',
+  },
+  disabledText: {
+    type: String,
+    default: 'Character challenge is disabled',
   },
 } as const)
 
@@ -284,6 +410,9 @@ export const microInteractionChallengeProps = buildProps({
 export const perceptionChallengeEmits = {
   refresh: () => true,
   retry: () => true,
+  reissue: () => true,
+  alternative: (mode: 'raster' | 'audio') =>
+    mode === 'raster' || mode === 'audio',
   cancel: () => true,
   submit: (payload: PerceptionChallengeSubmitPayload) =>
     Boolean(payload && typeof payload.kind === 'string'),
@@ -300,6 +429,17 @@ export const textTaskChallengeEmits = {
   'update:modelValue': (value: string) => typeof value === 'string',
   submit: (payload: PerceptionTextTaskSubmitPayload) =>
     payload.kind === 'text-task' && typeof payload.value === 'string',
+}
+
+export const characterChallengeEmits = {
+  'update:modelValue': (value: string) => typeof value === 'string',
+  submit: (payload: PerceptionCharacterSubmitPayload) =>
+    payload.kind === 'character' && typeof payload.value === 'string',
+  refresh: () => true,
+  alternative: (mode: PerceptionCharacterMode) =>
+    mode === 'raster' || mode === 'audio',
+  retry: () => true,
+  reissue: () => true,
 }
 
 export const localizationChallengeEmits = {
@@ -323,6 +463,9 @@ export type PerceptionChallengeProps = ExtractPropTypes<
 >
 export type TextTaskChallengeProps = ExtractPropTypes<
   typeof textTaskChallengeProps
+>
+export type CharacterChallengeProps = ExtractPropTypes<
+  typeof characterChallengeProps
 >
 export type LocalizationChallengeProps = ExtractPropTypes<
   typeof localizationChallengeProps

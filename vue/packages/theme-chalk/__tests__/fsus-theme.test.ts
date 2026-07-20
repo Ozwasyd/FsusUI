@@ -2729,6 +2729,21 @@ describe('Fsus theme visual baseline', () => {
       'grid-template-columns: minmax(0, 1fr) auto;',
       'gap: var(--fsus-space-3, 12px);',
     ])
+    expectCssRule(css, '.el-perception-character-challenge__media', [
+      'padding: var(--fsus-space-3);',
+      'border: var(--fsus-border-width) solid var(--el-border-color);',
+      'border-radius: var(--fsus-radius-control);',
+      'box-shadow: none;',
+    ])
+    expectCssRule(css, '.el-perception-character-challenge__image', [
+      'animation: none;',
+      'filter: none;',
+      'transform: none;',
+    ])
+    expectCssRule(css, '.el-perception-character-challenge__input', [
+      'min-height: var(--fsus-control-height-compact);',
+      'border-radius: var(--fsus-radius-control);',
+    ])
     expectCssRule(css, '.el-localization-challenge__target', [
       'border-radius: var(--fsus-radius-control, 6px);',
       'cursor: crosshair;',

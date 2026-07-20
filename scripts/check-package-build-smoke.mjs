@@ -374,12 +374,28 @@ if (existsSync(path.join(publishedDistRoot, 'package.json'))) {
       'PerceptionChallengeClient',
     ],
     [
+      'dist/element-plus/es/perception-challenge.mjs',
+      'FsusPerceptionCharacterChallenge',
+    ],
+    [
+      'dist/element-plus/es/perception-challenge.d.ts',
+      'PerceptionCharacterChallengeInstance',
+    ],
+    [
       'dist/element-plus/lib/perception-challenge.js',
       'FsusPerceptionChallenge',
     ],
     [
       'dist/element-plus/lib/perception-challenge.d.ts',
       'PerceptionChallengeClient',
+    ],
+    [
+      'dist/element-plus/lib/perception-challenge.js',
+      'FsusPerceptionCharacterChallenge',
+    ],
+    [
+      'dist/element-plus/lib/perception-challenge.d.ts',
+      'PerceptionCharacterChallengeInstance',
     ],
     [
       'dist/element-plus/es/components/collection-primitives/index.d.ts',

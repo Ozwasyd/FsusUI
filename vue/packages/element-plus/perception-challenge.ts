@@ -8,17 +8,25 @@
 
 export {
   ElPerceptionChallenge,
+  ElPerceptionCharacterChallenge,
   ElTextTaskChallenge,
   ElLocalizationChallenge,
   ElMicroInteractionChallenge,
   FsusPerceptionChallenge,
+  FsusPerceptionCharacterChallenge,
   FsusTextTaskChallenge,
   FsusLocalizationChallenge,
   FsusMicroInteractionChallenge,
 } from '@element-plus/components/perception-challenge'
 
 export type {
+  CharacterChallengeProps,
   PerceptionChallengeAssignment,
+  PerceptionCharacterAudioMedia,
+  PerceptionCharacterMedia,
+  PerceptionCharacterMode,
+  PerceptionCharacterSubmitPayload,
+  PerceptionCharacterChallengeInstance,
   PerceptionChallengeClient,
   PerceptionChallengeExpiredPayload,
   PerceptionChallengeKind,

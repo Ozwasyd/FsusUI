@@ -2,6 +2,7 @@ import { withInstall } from '@element-plus/utils'
 
 import LocalizationChallenge from './src/localization-challenge.vue'
 import MicroInteractionChallenge from './src/micro-interaction-challenge.vue'
+import PerceptionCharacterChallenge from './src/character-challenge.vue'
 import PerceptionChallenge from './src/perception-challenge.vue'
 import TextTaskChallenge from './src/text-task-challenge.vue'
 
@@ -22,6 +23,18 @@ export const ElPerceptionChallenge = withInstall(PerceptionChallenge, {
 })
 export const FsusPerceptionChallenge =
   ElPerceptionChallenge.FsusPerceptionChallenge
+
+export const ElPerceptionCharacterChallenge = withInstall(
+  PerceptionCharacterChallenge,
+  {
+    FsusPerceptionCharacterChallenge: withFsusAlias(
+      PerceptionCharacterChallenge,
+      'FsusPerceptionCharacterChallenge',
+    ),
+  },
+)
+export const FsusPerceptionCharacterChallenge =
+  ElPerceptionCharacterChallenge.FsusPerceptionCharacterChallenge
 
 export const ElTextTaskChallenge = withInstall(TextTaskChallenge, {
   FsusTextTaskChallenge: withFsusAlias(

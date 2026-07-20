@@ -101,6 +101,7 @@ import { ElPagination } from '@element-plus/components/pagination'
 import {
   ElLocalizationChallenge,
   ElMicroInteractionChallenge,
+  ElPerceptionCharacterChallenge,
   ElPerceptionChallenge,
   ElTextTaskChallenge,
 } from '@element-plus/components/perception-challenge'
@@ -258,6 +259,7 @@ export const allComponents = [
   ElPagination,
   ElLocalizationChallenge,
   ElMicroInteractionChallenge,
+  ElPerceptionCharacterChallenge,
   ElPerceptionChallenge,
   ElTextTaskChallenge,
   ElPopconfirm,

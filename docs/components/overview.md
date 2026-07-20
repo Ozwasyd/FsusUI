@@ -87,21 +87,21 @@ FsusUI 提供 100+ 个 Vue 3 组件，涵盖基础、表单、数据展示、导
 
 ## 反馈
 
-| 组件                                     | 说明                                               |
-| ---------------------------------------- | -------------------------------------------------- |
-| [Alert 警告](./alert.md)                 | 用于页面中展示重要的提示信息                       |
-| [Dialog 对话框](./dialog.md)             | 在保留当前页面状态的情况下，告知用户并承载相关操作 |
-| [Drawer 抽屉](./drawer.md)               | 从边缘滑入的浮层面板                               |
-| [Loading 加载](./loading.md)             | 加载数据时显示动效                                 |
-| [Message 消息提示](./message.md)         | 常用于主动操作后的反馈提示                         |
-| [MessageBox 消息弹框](./message-box.md)  | 模拟系统的消息提示框而实现的一套模态对话框组件     |
-| [Notification 通知](./notification.md)   | 悬浮出现在页面角落，显示全局的通知提醒消息         |
-| [Popover 气泡卡片](./popover.md)         | 弹出气泡式的卡片浮层                               |
-| [Popconfirm 气泡确认框](./popconfirm.md) | 点击元素弹出气泡式的确认框                         |
-| [Tooltip 文字提示](./tooltip.md)         | 常用于展示鼠标 hover 时的提示信息                  |
-| [Progress 进度条](./progress.md)         | 展示操作进度                                       |
-| [Result 结果](./result.md)               | 用于反馈一系列操作任务的处理结果                   |
-| [PerceptionChallenge 感知挑战](./perception-challenge.md) | perception v2 challenge host 与三类 task 渲染 |
+| 组件                                                      | 说明                                                                                           |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| [Alert 警告](./alert.md)                                  | 用于页面中展示重要的提示信息                                                                   |
+| [Dialog 对话框](./dialog.md)                              | 在保留当前页面状态的情况下，告知用户并承载相关操作                                             |
+| [Drawer 抽屉](./drawer.md)                                | 从边缘滑入的浮层面板                                                                           |
+| [Loading 加载](./loading.md)                              | 加载数据时显示动效                                                                             |
+| [Message 消息提示](./message.md)                          | 常用于主动操作后的反馈提示                                                                     |
+| [MessageBox 消息弹框](./message-box.md)                   | 模拟系统的消息提示框而实现的一套模态对话框组件                                                 |
+| [Notification 通知](./notification.md)                    | 悬浮出现在页面角落，显示全局的通知提醒消息                                                     |
+| [Popover 气泡卡片](./popover.md)                          | 弹出气泡式的卡片浮层                                                                           |
+| [Popconfirm 气泡确认框](./popconfirm.md)                  | 点击元素弹出气泡式的确认框                                                                     |
+| [Tooltip 文字提示](./tooltip.md)                          | 常用于展示鼠标 hover 时的提示信息                                                              |
+| [Progress 进度条](./progress.md)                          | 展示操作进度                                                                                   |
+| [Result 结果](./result.md)                                | 用于反馈一系列操作任务的处理结果                                                               |
+| [PerceptionChallenge 感知挑战](./perception-challenge.md) | protocol-neutral challenge host 与 character、text、localization、micro-interaction primitives |
 
 ## 配置
 

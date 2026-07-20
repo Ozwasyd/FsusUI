@@ -5,7 +5,7 @@
   "owner": "FsusUI Core",
   "baseline": {
     "path": "spec/baselines/vue-current.json",
-    "hash": "a24c7d0e35638ae0a5844b382e9a04a8158b8af0bc78a475c06b08b9c7077b8b",
+    "hash": "58112485c63ebf00e4353fd03368541be87b2d76458fd80a68fdf8590a53ec28",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
     "iconHash": "d61254b1b1ff9addaf45293153df217b0c0d01ec69ec602081c44a01008b78de"
@@ -11860,6 +11860,12 @@
       },
       "props": [
         {
+          "name": "alternativeLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "autoLoad",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -11873,6 +11879,12 @@
         },
         {
           "name": "challenge",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "characterMedia",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -11944,7 +11956,19 @@
           "required": false
         },
         {
+          "name": "rasterLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "refreshLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "reissueLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -11988,6 +12012,10 @@
       ],
       "events": [
         {
+          "name": "alternative",
+          "payload": "vue-source"
+        },
+        {
           "name": "cancel",
           "payload": "vue-source"
         },
@@ -12001,6 +12029,10 @@
         },
         {
           "name": "refresh",
+          "payload": "vue-source"
+        },
+        {
+          "name": "reissue",
           "payload": "vue-source"
         },
         {
@@ -12022,6 +12054,16 @@
       ],
       "contentRegions": [
         {
+          "name": "character-audio",
+          "scoped": true,
+          "required": false
+        },
+        {
+          "name": "character-raster",
+          "scoped": true,
+          "required": false
+        },
+        {
           "name": "localization-render",
           "scoped": true,
           "required": false
@@ -12033,6 +12075,233 @@
         },
         {
           "name": "text-task",
+          "scoped": true,
+          "required": false
+        }
+      ],
+      "defaults": {
+        "source": "vue-baseline",
+        "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
+      },
+      "stateMachine": {
+        "initial": "default",
+        "states": ["default", "hover", "focus-visible", "active", "disabled"],
+        "transitions": {
+          "default->focus-visible": "keyboard focus enters the control",
+          "default->disabled": "disabled or unavailable state is applied"
+        },
+        "platformNotes": "Avalonia may use native control primitives while preserving public state names."
+      },
+      "keyboardBehavior": {
+        "focus": "platform-native focus entry must expose the same public focus state",
+        "activation": "keyboard activation follows the component accessibility role",
+        "escape": "dismiss only when the component contract exposes a dismissible surface"
+      },
+      "pointerBehavior": {
+        "primary": "pointer/tap activation maps to the same public event as Web click or selection",
+        "hover": "hover-only affordances must have keyboard and touch alternatives"
+      },
+      "accessibilityMapping": {
+        "role": "derived from public component semantics",
+        "name": "required when the component is interactive or status-bearing",
+        "automation": "Avalonia AutomationProperties must expose equivalent role, name, state, and value."
+      },
+      "themeTokens": ["color", "typography", "space", "radius", "motion"],
+      "motionPolicy": {
+        "source": "spec/motion/README.md",
+        "reducedMotion": "must honor user reduced-motion preference"
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
+    },
+    {
+      "id": "component.el-perception-character-challenge",
+      "version": "1.0.0",
+      "releaseClassification": "preview",
+      "owner": "FsusUI Core",
+      "supportedPlatforms": {
+        "web": {
+          "status": "source",
+          "package": "@ozwasyd/element-plus"
+        },
+        "avalonia": {
+          "status": "native-adapter",
+          "package": "FsusUI.Avalonia"
+        }
+      },
+      "changeClassification": "minor",
+      "platformClassification": "native-adapter",
+      "source": {
+        "kind": "component",
+        "name": "ElPerceptionCharacterChallenge",
+        "module": "perception-challenge",
+        "baseline": "spec/baselines/vue-current.json"
+      },
+      "props": [
+        {
+          "name": "...perceptionChallengeCommonProps",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "alternativeLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "challengeId",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "disabledText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "expiredText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "inputLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "loadingText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "media",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "mediaAlt",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "modelValue",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "placeholder",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "rasterLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "refreshLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "reissueLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "reissueText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "retryLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "retryableText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "state",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "submitLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "unavailableText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "verifyingText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        }
+      ],
+      "events": [
+        {
+          "name": "alternative",
+          "payload": "vue-source"
+        },
+        {
+          "name": "refresh",
+          "payload": "vue-source"
+        },
+        {
+          "name": "reissue",
+          "payload": "vue-source"
+        },
+        {
+          "name": "retry",
+          "payload": "vue-source"
+        },
+        {
+          "name": "submit",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
+          "payload": "vue-source"
+        }
+      ],
+      "contentRegions": [
+        {
+          "name": "audio",
+          "scoped": true,
+          "required": false
+        },
+        {
+          "name": "raster",
           "scoped": true,
           "required": false
         }
@@ -23945,6 +24214,12 @@
       },
       "props": [
         {
+          "name": "alternativeLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "autoLoad",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -23958,6 +24233,12 @@
         },
         {
           "name": "challenge",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "characterMedia",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -24029,7 +24310,19 @@
           "required": false
         },
         {
+          "name": "rasterLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "refreshLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "reissueLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -24073,6 +24366,10 @@
       ],
       "events": [
         {
+          "name": "alternative",
+          "payload": "vue-source"
+        },
+        {
           "name": "cancel",
           "payload": "vue-source"
         },
@@ -24086,6 +24383,10 @@
         },
         {
           "name": "refresh",
+          "payload": "vue-source"
+        },
+        {
+          "name": "reissue",
           "payload": "vue-source"
         },
         {
@@ -24107,6 +24408,16 @@
       ],
       "contentRegions": [
         {
+          "name": "character-audio",
+          "scoped": true,
+          "required": false
+        },
+        {
+          "name": "character-raster",
+          "scoped": true,
+          "required": false
+        },
+        {
           "name": "localization-render",
           "scoped": true,
           "required": false
@@ -24118,6 +24429,233 @@
         },
         {
           "name": "text-task",
+          "scoped": true,
+          "required": false
+        }
+      ],
+      "defaults": {
+        "source": "vue-baseline",
+        "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
+      },
+      "stateMachine": {
+        "initial": "default",
+        "states": ["default", "hover", "focus-visible", "active", "disabled"],
+        "transitions": {
+          "default->focus-visible": "keyboard focus enters the control",
+          "default->disabled": "disabled or unavailable state is applied"
+        },
+        "platformNotes": "Avalonia may use native control primitives while preserving public state names."
+      },
+      "keyboardBehavior": {
+        "focus": "platform-native focus entry must expose the same public focus state",
+        "activation": "keyboard activation follows the component accessibility role",
+        "escape": "dismiss only when the component contract exposes a dismissible surface"
+      },
+      "pointerBehavior": {
+        "primary": "pointer/tap activation maps to the same public event as Web click or selection",
+        "hover": "hover-only affordances must have keyboard and touch alternatives"
+      },
+      "accessibilityMapping": {
+        "role": "derived from public component semantics",
+        "name": "required when the component is interactive or status-bearing",
+        "automation": "Avalonia AutomationProperties must expose equivalent role, name, state, and value."
+      },
+      "themeTokens": ["color", "typography", "space", "radius", "motion"],
+      "motionPolicy": {
+        "source": "spec/motion/README.md",
+        "reducedMotion": "must honor user reduced-motion preference"
+      },
+      "performanceBudget": {
+        "renderMs": 16,
+        "interactionMs": 50,
+        "memory": "no retained unbounded per-item state without virtualization budget"
+      }
+    },
+    {
+      "id": "component.fsus-perception-character-challenge",
+      "version": "1.0.0",
+      "releaseClassification": "preview",
+      "owner": "FsusUI Core",
+      "supportedPlatforms": {
+        "web": {
+          "status": "source",
+          "package": "@ozwasyd/element-plus"
+        },
+        "avalonia": {
+          "status": "native-adapter",
+          "package": "FsusUI.Avalonia"
+        }
+      },
+      "changeClassification": "minor",
+      "platformClassification": "native-adapter",
+      "source": {
+        "kind": "component",
+        "name": "FsusPerceptionCharacterChallenge",
+        "module": "perception-challenge",
+        "baseline": "spec/baselines/vue-current.json"
+      },
+      "props": [
+        {
+          "name": "...perceptionChallengeCommonProps",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "alternativeLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "challengeId",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "disabledText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "expiredText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "inputLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "loadingText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "media",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "mediaAlt",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "modelValue",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "placeholder",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "rasterLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "refreshLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "reissueLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "reissueText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "retryLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "retryableText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "state",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "submitLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "unavailableText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "verifyingText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        }
+      ],
+      "events": [
+        {
+          "name": "alternative",
+          "payload": "vue-source"
+        },
+        {
+          "name": "refresh",
+          "payload": "vue-source"
+        },
+        {
+          "name": "reissue",
+          "payload": "vue-source"
+        },
+        {
+          "name": "retry",
+          "payload": "vue-source"
+        },
+        {
+          "name": "submit",
+          "payload": "vue-source"
+        },
+        {
+          "name": "update:modelValue",
+          "payload": "vue-source"
+        }
+      ],
+      "contentRegions": [
+        {
+          "name": "audio",
+          "scoped": true,
+          "required": false
+        },
+        {
+          "name": "raster",
           "scoped": true,
           "required": false
         }

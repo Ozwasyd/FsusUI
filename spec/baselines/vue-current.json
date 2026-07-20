@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "d77a42cd1bb065a293c830c6c0b15b21a603d626",
+    "commitSha": "2b5ce39a0992c56e3c57c8fc325aadc59e593d4f",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
@@ -9,8 +9,8 @@
   },
   "summary": {
     "componentModules": 93,
-    "components": 224,
-    "installableComponents": 152,
+    "components": 226,
+    "installableComponents": 153,
     "directives": 3,
     "services": 4,
     "plugins": 7,
@@ -18,7 +18,7 @@
     "deprecatedApis": 20,
     "componentCountByClassification": {
       "portable": 124,
-      "native-adapter": 71,
+      "native-adapter": 73,
       "platform-override": 21,
       "web-only": 8
     }
@@ -394,6 +394,10 @@
     },
     {
       "name": "ElPerceptionChallenge",
+      "module": "perception-challenge"
+    },
+    {
+      "name": "ElPerceptionCharacterChallenge",
       "module": "perception-challenge"
     },
     {
@@ -2849,9 +2853,11 @@
       "module": "perception-challenge",
       "classification": "native-adapter",
       "props": [
+        "alternativeLabel",
         "autoLoad",
         "cancelLabel",
         "challenge",
+        "characterMedia",
         "client",
         "disabled",
         "error",
@@ -2863,7 +2869,9 @@
         "microInteractionEnabled",
         "now",
         "proofExpired",
+        "rasterLabel",
         "refreshLabel",
+        "reissueLabel",
         "renderPayload",
         "renderer",
         "retryLabel",
@@ -2872,16 +2880,26 @@
         "title"
       ],
       "emits": [
+        "alternative",
         "cancel",
         "error",
         "expired",
         "refresh",
+        "reissue",
         "rendered",
         "retry",
         "submit",
         "verified"
       ],
       "slots": [
+        {
+          "name": "character-audio",
+          "scoped": true
+        },
+        {
+          "name": "character-raster",
+          "scoped": true
+        },
         {
           "name": "localization-render",
           "scoped": true
@@ -2892,6 +2910,52 @@
         },
         {
           "name": "text-task",
+          "scoped": true
+        }
+      ]
+    },
+    {
+      "name": "ElPerceptionCharacterChallenge",
+      "module": "perception-challenge",
+      "classification": "native-adapter",
+      "props": [
+        "...perceptionChallengeCommonProps",
+        "alternativeLabel",
+        "challengeId",
+        "disabledText",
+        "expiredText",
+        "inputLabel",
+        "loadingText",
+        "media",
+        "mediaAlt",
+        "modelValue",
+        "placeholder",
+        "rasterLabel",
+        "refreshLabel",
+        "reissueLabel",
+        "reissueText",
+        "retryLabel",
+        "retryableText",
+        "state",
+        "submitLabel",
+        "unavailableText",
+        "verifyingText"
+      ],
+      "emits": [
+        "alternative",
+        "refresh",
+        "reissue",
+        "retry",
+        "submit",
+        "update:modelValue"
+      ],
+      "slots": [
+        {
+          "name": "audio",
+          "scoped": true
+        },
+        {
+          "name": "raster",
           "scoped": true
         }
       ]
@@ -5192,9 +5256,11 @@
       "module": "perception-challenge",
       "classification": "native-adapter",
       "props": [
+        "alternativeLabel",
         "autoLoad",
         "cancelLabel",
         "challenge",
+        "characterMedia",
         "client",
         "disabled",
         "error",
@@ -5206,7 +5272,9 @@
         "microInteractionEnabled",
         "now",
         "proofExpired",
+        "rasterLabel",
         "refreshLabel",
+        "reissueLabel",
         "renderPayload",
         "renderer",
         "retryLabel",
@@ -5215,16 +5283,26 @@
         "title"
       ],
       "emits": [
+        "alternative",
         "cancel",
         "error",
         "expired",
         "refresh",
+        "reissue",
         "rendered",
         "retry",
         "submit",
         "verified"
       ],
       "slots": [
+        {
+          "name": "character-audio",
+          "scoped": true
+        },
+        {
+          "name": "character-raster",
+          "scoped": true
+        },
         {
           "name": "localization-render",
           "scoped": true
@@ -5235,6 +5313,52 @@
         },
         {
           "name": "text-task",
+          "scoped": true
+        }
+      ]
+    },
+    {
+      "name": "FsusPerceptionCharacterChallenge",
+      "module": "perception-challenge",
+      "classification": "native-adapter",
+      "props": [
+        "...perceptionChallengeCommonProps",
+        "alternativeLabel",
+        "challengeId",
+        "disabledText",
+        "expiredText",
+        "inputLabel",
+        "loadingText",
+        "media",
+        "mediaAlt",
+        "modelValue",
+        "placeholder",
+        "rasterLabel",
+        "refreshLabel",
+        "reissueLabel",
+        "reissueText",
+        "retryLabel",
+        "retryableText",
+        "state",
+        "submitLabel",
+        "unavailableText",
+        "verifyingText"
+      ],
+      "emits": [
+        "alternative",
+        "refresh",
+        "reissue",
+        "retry",
+        "submit",
+        "update:modelValue"
+      ],
+      "slots": [
+        {
+          "name": "audio",
+          "scoped": true
+        },
+        {
+          "name": "raster",
           "scoped": true
         }
       ]
@@ -6476,7 +6600,8 @@
       "name": "--fsus-border-width",
       "files": [
         "vue/packages/theme-chalk/src/generated/tokens.css",
-        "vue/packages/theme-chalk/src/generated/tokens.scss"
+        "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/perception-challenge.scss"
       ],
       "classification": "portable"
     },
@@ -7035,7 +7160,8 @@
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/common/var.scss",
-        "vue/packages/theme-chalk/src/generated/tokens.css"
+        "vue/packages/theme-chalk/src/generated/tokens.css",
+        "vue/packages/theme-chalk/src/perception-challenge.scss"
       ],
       "classification": "portable"
     },
@@ -7209,6 +7335,7 @@
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/perception-challenge.scss",
         "vue/packages/theme-chalk/src/radio-button.scss"
       ],
       "classification": "portable"
@@ -7230,7 +7357,8 @@
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/common/var.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
-        "vue/packages/theme-chalk/src/generated/tokens.scss"
+        "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/perception-challenge.scss"
       ],
       "classification": "portable"
     },
@@ -7239,7 +7367,8 @@
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
-        "vue/packages/theme-chalk/src/generated/tokens.scss"
+        "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/perception-challenge.scss"
       ],
       "classification": "portable"
     },
@@ -7469,7 +7598,8 @@
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
-        "vue/packages/theme-chalk/src/mixins/mixins.scss"
+        "vue/packages/theme-chalk/src/mixins/mixins.scss",
+        "vue/packages/theme-chalk/src/perception-challenge.scss"
       ],
       "classification": "portable"
     },

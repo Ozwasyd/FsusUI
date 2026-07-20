@@ -71,6 +71,160 @@
   }
 }
 
+@include b(perception-character-challenge) {
+  display: grid;
+  gap: var(--fsus-space-3);
+  min-width: 0;
+  color: getCssVar('text-color-primary');
+  font-size: getCssVar('font-size-base');
+  line-height: getCssVar('font-line-height-primary');
+
+  @include e(copy) {
+    display: grid;
+    gap: var(--fsus-space-1);
+    min-width: 0;
+  }
+
+  @include e(prompt) {
+    margin: 0;
+    color: getCssVar('text-color-primary');
+    font-size: getCssVar('font-size-medium');
+    font-weight: getCssVar('font-weight-primary');
+    line-height: getCssVar('font-line-height-primary');
+    overflow-wrap: anywhere;
+  }
+
+  @include e(description) {
+    margin: 0;
+    color: var(--fsus-color-text-quiet);
+    font-size: getCssVar('font-size-base');
+    line-height: getCssVar('font-line-height-primary');
+    overflow-wrap: anywhere;
+  }
+
+  @include e(status) {
+    min-width: 0;
+    color: var(--fsus-color-text-quiet);
+    font-size: getCssVar('font-size-small');
+    line-height: getCssVar('font-line-height-primary');
+
+    &:empty {
+      display: none;
+    }
+  }
+
+  @include e(error) {
+    margin: 0;
+    color: getCssVar('color-danger');
+  }
+
+  @include e(media) {
+    display: grid;
+    place-items: center;
+    min-width: 0;
+    min-height: var(--fsus-control-height-spacious);
+    padding: var(--fsus-space-3);
+    border: var(--fsus-border-width) solid getCssVar('border-color');
+    border-radius: var(--fsus-radius-control);
+    background: getCssVar('bg-color');
+    box-shadow: none;
+    overflow: auto;
+  }
+
+  @include e(image) {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    animation: none;
+    filter: none;
+    transform: none;
+    user-select: none;
+  }
+
+  @include e(canvas) {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    animation: none;
+    filter: none;
+    transform: none;
+  }
+
+  @include e(audio) {
+    display: block;
+    width: 100%;
+    min-height: var(--fsus-control-height-compact);
+    color-scheme: light dark;
+  }
+
+  @include e(media-actions) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--fsus-space-2);
+    align-items: center;
+  }
+
+  @include e(form) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--fsus-space-2) var(--fsus-space-3);
+    align-items: end;
+    min-width: 0;
+  }
+
+  @include e(label) {
+    grid-column: 1 / -1;
+    color: getCssVar('text-color-primary');
+    font-size: getCssVar('font-size-base');
+    font-weight: getCssVar('font-weight-primary');
+    line-height: getCssVar('font-line-height-primary');
+  }
+
+  @include e(input) {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: var(--fsus-control-height-compact);
+    padding-inline: var(--fsus-space-3);
+    border: var(--fsus-border-width) solid getCssVar('border-color');
+    border-radius: var(--fsus-radius-control);
+    background: getCssVar('fill-color-blank');
+    box-shadow: none;
+    color: getCssVar('text-color-primary');
+    font: inherit;
+
+    &:focus-visible {
+      outline: var(--fsus-focus-ring-width) solid var(--fsus-scholarly-blue);
+      outline-offset: var(--fsus-focus-ring-width);
+    }
+
+    &:disabled {
+      background: getCssVar('disabled-bg-color');
+      color: getCssVar('disabled-text-color');
+      cursor: not-allowed;
+    }
+  }
+
+  @include e(state-actions) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--fsus-space-2);
+  }
+
+  @include when(invalid) {
+    @include e(form) {
+      .el-perception-character-challenge__input {
+        box-shadow: 0 0 0 var(--fsus-border-width) getCssVar('color-danger')
+          inset;
+      }
+    }
+  }
+
+  @include when(disabled) {
+    color: getCssVar('disabled-text-color');
+  }
+}
+
 @include b(text-task-challenge) {
   display: grid;
   gap: var(--fsus-space-3, 12px);
@@ -272,6 +426,40 @@
   @include b(text-task-challenge) {
     @include e(form) {
       grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @include b(perception-character-challenge) {
+    @include e(audio) {
+      min-height: var(--fsus-control-height);
+    }
+
+    @include e(form) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    @include e(input) {
+      min-height: var(--fsus-control-height);
+    }
+
+    @include e(label) {
+      grid-column: auto;
+    }
+  }
+}
+
+@media (forced-colors: active) {
+  @include b(perception-character-challenge) {
+    @include e(media) {
+      border-color: CanvasText;
+    }
+
+    @include when(invalid) {
+      @include e(form) {
+        .el-perception-character-challenge__input {
+          outline: var(--fsus-border-width) solid Mark;
+        }
+      }
     }
   }
 }

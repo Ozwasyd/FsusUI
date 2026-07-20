@@ -11,15 +11,23 @@ export { ElSiteHeader } from '@element-plus/components/site-header'
 export {
   ElLocalizationChallenge,
   ElMicroInteractionChallenge,
+  ElPerceptionCharacterChallenge,
   ElPerceptionChallenge,
   ElTextTaskChallenge,
   FsusLocalizationChallenge,
   FsusMicroInteractionChallenge,
+  FsusPerceptionCharacterChallenge,
   FsusPerceptionChallenge,
   FsusTextTaskChallenge,
 } from '@element-plus/components/perception-challenge'
 export type {
+  CharacterChallengeProps,
   PerceptionChallengeAssignment,
+  PerceptionCharacterAudioMedia,
+  PerceptionCharacterMedia,
+  PerceptionCharacterMode,
+  PerceptionCharacterSubmitPayload,
+  PerceptionCharacterChallengeInstance,
   PerceptionChallengeClient,
   PerceptionChallengeExpiredPayload,
   PerceptionChallengeKind,

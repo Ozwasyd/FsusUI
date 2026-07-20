@@ -24,7 +24,7 @@
     </header>
 
     <div
-      v-if="isLoading"
+      v-if="isLoading && activeKind !== 'character'"
       :class="ns.e('status')"
       v-bind="loadingAttrs"
       role="status"
@@ -32,7 +32,11 @@
       {{ loadingText }}
     </div>
 
-    <div v-else-if="visibleError" :class="ns.e('status')" role="alert">
+    <div
+      v-else-if="visibleError && activeKind !== 'character'"
+      :class="ns.e('status')"
+      role="alert"
+    >
       <span>{{ visibleError }}</span>
       <ElButton
         v-if="retryable"
@@ -46,7 +50,7 @@
     </div>
 
     <div
-      v-else-if="isExpired"
+      v-else-if="isExpired && activeKind !== 'character'"
       :class="ns.e('status')"
       v-bind="expiredAttrs"
       role="status"
@@ -61,6 +65,42 @@
         {{ retryLabel }}
       </ElButton>
     </div>
+
+    <FsusPerceptionCharacterChallenge
+      v-else-if="activeKind === 'character'"
+      :challenge-id="activeChallenge?.challengeId"
+      :prompt="activeChallenge?.prompt"
+      :description="activeChallenge?.description"
+      :media="activeCharacterMedia"
+      :state="activeCharacterState"
+      :disabled="disabled"
+      :error="visibleError"
+      :refresh-label="refreshLabel"
+      :retry-label="retryLabel"
+      :reissue-label="reissueLabel"
+      :alternative-label="alternativeLabel"
+      :raster-label="rasterLabel"
+      @refresh="refreshChallenge"
+      @retry="retryChallenge"
+      @reissue="reissueChallenge"
+      @alternative="emit('alternative', $event)"
+      @submit="handleSubmit"
+    >
+      <template v-if="$slots['character-raster']" #raster="slotProps">
+        <slot
+          name="character-raster"
+          :challenge="activeChallenge"
+          v-bind="slotProps"
+        />
+      </template>
+      <template v-if="$slots['character-audio']" #audio="slotProps">
+        <slot
+          name="character-audio"
+          :challenge="activeChallenge"
+          v-bind="slotProps"
+        />
+      </template>
+    </FsusPerceptionCharacterChallenge>
 
     <FsusTextTaskChallenge
       v-else-if="activeKind === 'text-task'"
@@ -124,6 +164,7 @@ import { useNamespace } from '@element-plus/hooks'
 import { ElButton } from '@element-plus/components/button'
 import FsusLocalizationChallenge from './localization-challenge.vue'
 import FsusMicroInteractionChallenge from './micro-interaction-challenge.vue'
+import FsusPerceptionCharacterChallenge from './character-challenge.vue'
 import FsusTextTaskChallenge from './text-task-challenge.vue'
 import { perceptionChallengeEmits, perceptionChallengeProps } from './shared'
 
@@ -159,12 +200,24 @@ const activeRenderPayload = computed(
     activeChallenge.value?.renderPayload ??
     internalRenderPayload.value,
 )
+const activeCharacterMedia = computed(
+  () =>
+    props.characterMedia ??
+    activeChallenge.value?.characterMedia ??
+    (activeRenderPayload.value
+      ? { raster: activeRenderPayload.value, audio: null }
+      : null),
+)
 const activeState = computed(() => props.state ?? internalState.value)
 const isFailed = computed(
-  () => activeState.value === 'error' || activeState.value === 'failed',
+  () =>
+    activeState.value === 'error' ||
+    activeState.value === 'failed' ||
+    activeState.value === 'retryable',
 )
 const visibleError = computed(() => {
-  if (props.error || internalError.value) return props.error || internalError.value
+  if (props.error || internalError.value)
+    return props.error || internalError.value
   return isFailed.value ? props.failedText : ''
 })
 const isLoading = computed(() => activeState.value === 'loading')
@@ -177,6 +230,18 @@ const isExpired = computed(() => {
 
   const expiresAtUnixMs = activeChallenge.value?.expiresAtUnixMs
   return Number.isFinite(expiresAtUnixMs) && expiresAtUnixMs! <= nowMs.value
+})
+const activeCharacterState = computed<PerceptionChallengeState>(() => {
+  if (props.disabled) return 'disabled'
+  if (isExpired.value) return 'expired'
+  if (activeState.value === 'submitting') return 'verifying'
+  if (activeState.value === 'error' || activeState.value === 'failed') {
+    return 'retryable'
+  }
+  if (activeState.value === 'idle' || activeState.value === 'verified') {
+    return 'ready'
+  }
+  return activeState.value
 })
 const activeMicroInteractionEnabled = computed(
   () =>
@@ -261,6 +326,13 @@ async function refreshChallenge() {
 async function retryChallenge() {
   emit('retry')
   await refreshChallenge()
+}
+
+async function reissueChallenge() {
+  emit('reissue')
+
+  if (!props.client?.refresh || props.disabled || isBusy.value) return
+  await loadChallenge()
 }
 
 function cancelChallenge() {
