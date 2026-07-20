@@ -2048,6 +2048,30 @@ describe('Fsus theme visual baseline', () => {
     ])
   })
 
+  test('keeps scrollbar motion shadows in the compiled scrolling states', () => {
+    const scrollbarCss = compileThemeFile('scrollbar.scss')
+    const virtualListCss = compileThemeFile('virtual-list.scss')
+
+    expectCssRule(
+      scrollbarCss,
+      '.el-scrollbar.is-scrolling .el-scrollbar__thumb',
+      [
+        'box-shadow:',
+        'color-mix(in srgb, var(--fsus-scholarly-blue) 28%, transparent)',
+        'var(--fsus-interactive-motion-glow, 18px)',
+      ],
+    )
+    expectCssRule(
+      virtualListCss,
+      '.el-vl__wrapper.is-scrolling:not(.is-fast-scrolling) .el-scrollbar__thumb',
+      [
+        'box-shadow:',
+        'color-mix(in srgb, var(--fsus-scholarly-blue) 18%, transparent)',
+        'var(--fsus-interactive-motion-glow, 18px)',
+      ],
+    )
+  })
+
   test('keeps public shell mobile navigation explicit and bottom spacing opt-in', () => {
     const publicShellCss = compileThemeFile('public-shell.scss')
     const criticalCss = compileThemeFile('public-shell-critical.scss')

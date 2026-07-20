@@ -277,6 +277,10 @@ export const publicComponentBoundaries: Record<
   'page-header': entry([...simpleBoundaries, 'event'], {
     fixtureModes: ['states'],
   }),
+  'task-page-header': entry(
+    [...simpleBoundaries, 'empty-null-undefined', 'keyboard-focus'],
+    { fixtureModes: ['states'] },
+  ),
   pagination: entry([...formBoundaries, 'event'], {
     fixtureModes: ['data-boundaries'],
   }),

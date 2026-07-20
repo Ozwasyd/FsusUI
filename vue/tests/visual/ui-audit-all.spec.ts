@@ -87,7 +87,7 @@ const buildAuditUrl = (state: string, projectName: string) => {
 const screenshotPath = (
   componentName: string,
   projectName: string,
-  stateName: string
+  stateName: string,
 ) =>
   path.join(
     process.cwd(),
@@ -95,7 +95,7 @@ const screenshotPath = (
     'ui-audit',
     componentName,
     projectName,
-    `${stateName}.png`
+    `${stateName}.png`,
   )
 
 const countProjectScreenshots = (projectName: string) => {
@@ -121,7 +121,9 @@ test.afterEach(async ({ page }) => {
   expect(diagnostics.get(page) ?? []).toEqual([])
 })
 
-test('captures the registered component state matrix', async ({ page }, testInfo) => {
+test('captures the registered component state matrix', async ({
+  page,
+}, testInfo) => {
   test.setTimeout(360_000)
 
   for (const state of auditStateNames) {
@@ -148,7 +150,10 @@ test('captures the registered component state matrix', async ({ page }, testInfo
       }
 
       if (state === 'interaction') {
-        const interactionTarget = page.locator(component.interactionLocator).first()
+        const interactionTarget = page
+          .locator(component.interactionLocator)
+          .filter({ visible: true })
+          .first()
         if (await interactionTarget.count()) {
           await interactionTarget.hover({ force: true, timeout: 1000 })
         } else {
@@ -159,7 +164,9 @@ test('captures the registered component state matrix', async ({ page }, testInfo
       if (state === 'active') {
         const activeTarget = page.locator(component.activeLocator).first()
         if (await activeTarget.count()) {
-          await activeTarget.click({ force: true, timeout: 1500 }).catch(() => undefined)
+          await activeTarget
+            .click({ force: true, timeout: 1500 })
+            .catch(() => undefined)
           await page.waitForTimeout(80)
         }
       }
@@ -167,7 +174,7 @@ test('captures the registered component state matrix', async ({ page }, testInfo
       const targetPath = screenshotPath(
         component.name,
         testInfo.project.name,
-        state
+        state,
       )
       fs.mkdirSync(path.dirname(targetPath), { recursive: true })
       await componentCard.screenshot({ path: targetPath })
@@ -176,6 +183,6 @@ test('captures the registered component state matrix', async ({ page }, testInfo
   }
 
   expect(countProjectScreenshots(testInfo.project.name)).toBe(
-    expectedScreenshotsPerProject
+    expectedScreenshotsPerProject,
   )
 })

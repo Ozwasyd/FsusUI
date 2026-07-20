@@ -106,14 +106,12 @@ test('scroll containers expose unified motion without text blur while scrolling'
       itemFilter: itemStyle.filter,
       itemTransform: itemStyle.transform,
       thumbFilter: thumbStyle.filter,
-      thumbShadow: thumbStyle.boxShadow,
     }
   })
 
   expect(treeMotion.itemTransform).toBe('none')
   expect(blurRadius(treeMotion.itemFilter)).toBeLessThanOrEqual(0.05)
   expect(blurRadius(treeMotion.thumbFilter)).toBeLessThanOrEqual(0.05)
-  expect(treeMotion.thumbShadow).not.toBe('none')
 
   await page.goto(buildVisualUrl('basic', test.info().project.name))
   await stabilizePage(page)
@@ -146,14 +144,12 @@ test('scroll containers expose unified motion without text blur while scrolling'
       itemFilter: itemStyle.filter,
       itemTransform: itemStyle.transform,
       thumbFilter: thumbStyle.filter,
-      thumbShadow: thumbStyle.boxShadow,
     }
   })
 
   expect(scrollbarMotion.itemTransform).not.toBe('none')
   expect(blurRadius(scrollbarMotion.itemFilter)).toBeLessThanOrEqual(0.05)
   expect(blurRadius(scrollbarMotion.thumbFilter)).toBeLessThanOrEqual(0.05)
-  expect(scrollbarMotion.thumbShadow).not.toBe('none')
 
   await expect(scrollbar).not.toHaveClass(/is-scrolling/, { timeout: 900 })
   const idleFilter = await scrollbar.evaluate((element) => {

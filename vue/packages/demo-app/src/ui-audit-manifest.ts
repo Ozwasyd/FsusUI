@@ -71,6 +71,7 @@ export const auditComponentNames = [
   'ElOptionGroup',
   'ElOverlay',
   'ElPageHeader',
+  'ElTaskPageHeader',
   'ElPublicShell',
   'ElPagination',
   'ElPerceptionChallenge',

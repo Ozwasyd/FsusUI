@@ -9,6 +9,7 @@ test.beforeEach(async ({ page }) => {
   await page.goto('/?visual=foundation-boundary', {
     waitUntil: 'domcontentloaded',
   })
+  await expect(page.getByTestId('foundation-boundary-fixture')).toBeVisible()
 })
 
 test.afterEach(async ({ page }) => {

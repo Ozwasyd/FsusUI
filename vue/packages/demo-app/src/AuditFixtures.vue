@@ -868,6 +868,20 @@
         <el-page-header content="Detail" title="Back" />
       </AuditCard>
 
+      <AuditCard name="ElTaskPageHeader" :state="auditState">
+        <ElTaskPageHeader
+          title="Review release evidence"
+          description="Confirm the final production checks before publishing."
+          :density="active ? 'compact' : 'default'"
+        >
+          <template #actions>
+            <el-button data-audit-focus data-audit-target>
+              Open evidence
+            </el-button>
+          </template>
+        </ElTaskPageHeader>
+      </AuditCard>
+
       <AuditCard name="ElPublicShell" :state="auditState">
         <el-public-shell
           brand="Fsus"
@@ -1542,6 +1556,7 @@ import {
   ElSettingsSection,
   ElSiteHeader,
   ElStatusSummary,
+  ElTaskPageHeader,
   ElThreadPanel,
   ElTypedConfirmField,
 } from '../../element-plus'
