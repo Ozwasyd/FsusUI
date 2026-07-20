@@ -100,44 +100,93 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: current
+          fetch-depth: 0
       - name: Checkout base revision
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.base.sha }}
           path: baseline
+      - name: Plan PR real-render impact before heavy setup
+        id: render-impact
+        working-directory: current
+        run: >-
+          node scripts/render-performance-impact-plan.mjs
+          --base ${{ github.event.pull_request.base.sha }}
+          --output ../performance-impact-plan.json
+      - name: Log PR real-render impact
+        run: |
+          echo "run=${{ steps.render-impact.outputs.run }}"
+          echo "scope=${{ steps.render-impact.outputs.scope }}"
+          echo "plan-digest=${{ steps.render-impact.outputs.digest }}"
+          echo "reason=${{ steps.render-impact.outputs.reason }}"
       - uses: pnpm/action-setup@v4
+        if: steps.render-impact.outputs.run == 'true'
         with:
           version: 10.33.0
       - uses: actions/setup-node@v4
+        if: steps.render-impact.outputs.run == 'true'
         with:
           node-version: 22
+          cache: pnpm
+          cache-dependency-path: |
+            current/pnpm-lock.yaml
+            baseline/pnpm-lock.yaml
       - uses: actions/setup-dotnet@v4
+        if: >-
+          steps.render-impact.outputs.run == 'true' &&
+          steps.render-impact.outputs.scope != 'web-only'
         with:
           global-json-file: current/dotnet/global.json
+      - name: Check baseline runner contract
+        id: baseline-contract
+        if: steps.render-impact.outputs.run == 'true'
+        run: >-
+          node current/scripts/check-render-performance-baseline.mjs
+          --directory baseline
+          --plan performance-impact-plan.json
+          --output performance-baseline/baseline-status.json
       - name: Install current dependencies
+        if: steps.render-impact.outputs.run == 'true'
         working-directory: current
         run: pnpm install --frozen-lockfile
-      - name: Install Chromium and desktop display dependencies
+      - name: Install Chromium and web display dependencies once
+        if: >-
+          steps.render-impact.outputs.run == 'true' &&
+          steps.render-impact.outputs.scope != 'avalonia-only'
         working-directory: current
         run: pnpm exec playwright install --with-deps chromium
-      - name: Install and measure same-runner baseline
-        id: baseline
-        working-directory: baseline
+      - name: Install Avalonia-only display dependency
+        if: steps.render-impact.outputs.scope == 'avalonia-only'
         run: |
-          if test -f scripts/run-render-performance.mjs; then
-            pnpm install --frozen-lockfile
-            pnpm perf:render -- --profile quick --output ../performance-baseline
-            echo "available=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "available=false" >> "$GITHUB_OUTPUT"
-          fi
+          sudo apt-get update
+          sudo apt-get install --yes xvfb
+      - name: Install baseline dependencies
+        if: steps.baseline-contract.outputs.available == 'true'
+        working-directory: baseline
+        run: pnpm install --frozen-lockfile
+      - name: Measure same-runner baseline first
+        if: steps.baseline-contract.outputs.available == 'true'
+        working-directory: baseline
+        run: >-
+          pnpm perf:render --
+          --impact-plan ../performance-impact-plan.json
+          --profile quick
+          --output ../performance-baseline
       - name: Measure current quick matrix
+        if: steps.render-impact.outputs.run == 'true'
         working-directory: current
-        run: pnpm perf:render -- --profile quick --output ../performance-current
+        run: >-
+          pnpm perf:render --
+          --impact-plan ../performance-impact-plan.json
+          --profile quick
+          --output ../performance-current
       - name: Compare against base revision on the same runner
-        if: steps.baseline.outputs.available == 'true'
+        if: steps.baseline-contract.outputs.available == 'true'
         working-directory: current
         run: pnpm perf:render:compare -- ../performance-baseline ../performance-current 0.15
+      - name: Skip unaffected PR real-render measurement
+        if: steps.render-impact.outputs.run != 'true'
+        run: echo "Skipping real-render measurement; ownership plan is skip-safe."
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -145,6 +194,7 @@ jobs:
           path: |
             performance-baseline
             performance-current
+            performance-impact-plan.json
           retention-days: 14
 
   main:

@@ -3,16 +3,29 @@ import path from 'node:path'
 
 const root = path.resolve(import.meta.dirname, '..')
 const read = (file) => readFile(path.join(root, file), 'utf8')
-const [web, avalonia, docs, packageJson, quality, reusable, staticBudget] =
-  await Promise.all([
-    read('scripts/web-render-performance.mjs'),
-    read('dotnet/FsusUI.Avalonia.Demo/RenderPerformanceRunner.cs'),
-    read('docs/performance/real-render-benchmarks.md'),
-    read('package.json'),
-    read('.github/workflows/quality.yml'),
-    read('.github/workflows/_quality.yml'),
-    read('scripts/avalonia-performance-budget.mjs'),
-  ])
+const [
+  web,
+  avalonia,
+  docs,
+  packageJson,
+  quality,
+  reusable,
+  staticBudget,
+  impactPlanner,
+  ownership,
+  impactFixtures,
+] = await Promise.all([
+  read('scripts/web-render-performance.mjs'),
+  read('dotnet/FsusUI.Avalonia.Demo/RenderPerformanceRunner.cs'),
+  read('docs/performance/real-render-benchmarks.md'),
+  read('package.json'),
+  read('.github/workflows/quality.yml'),
+  read('.github/workflows/_quality.yml'),
+  read('scripts/avalonia-performance-budget.mjs'),
+  read('scripts/render-performance-impact-plan.mjs'),
+  read('spec/ci/pr-render-performance-ownership.json'),
+  read('tests/fixtures/render-performance-impact-plan/cases.json'),
+])
 
 const failures = []
 for (const token of [
@@ -68,6 +81,42 @@ if (!quality.includes('pr-real-render-performance'))
   failures.push('PR quick matrix missing')
 if (!quality.includes('performance-baseline'))
   failures.push('same-runner PR baseline missing')
+for (const token of [
+  'Plan PR real-render impact before heavy setup',
+  'cache-dependency-path',
+  'performance-impact-plan.json',
+  'Measure same-runner baseline first',
+  'Measure current quick matrix',
+]) {
+  if (!quality.includes(token))
+    failures.push(`PR impact workflow missing ${token}`)
+}
+if (
+  quality.indexOf('Plan PR real-render impact before heavy setup') >
+  quality.indexOf('Install current dependencies')
+)
+  failures.push('PR impact plan must precede dependency installation')
+if (
+  quality.indexOf('Measure same-runner baseline first') >
+  quality.indexOf('Measure current quick matrix')
+)
+  failures.push('PR measurements must remain sequential baseline then current')
+for (const token of [
+  'Git base is unavailable; selecting both full quick sets.',
+  'GITHUB_OUTPUT',
+  'planDigest',
+]) {
+  if (!impactPlanner.includes(token))
+    failures.push(`impact planner missing ${token}`)
+}
+for (const scope of ['web-only', 'avalonia-only', 'both', 'skip']) {
+  if (!ownership.includes(`"scope": "${scope}"`))
+    failures.push(`ownership registry missing ${scope}`)
+  if (!impactFixtures.includes(`"scope": "${scope}"`))
+    failures.push(`impact fixtures missing ${scope}`)
+}
+if (!impactFixtures.includes('unknown becomes both'))
+  failures.push('impact fixtures missing unknown safe fallback')
 if (!reusable.includes("inputs.group == 'main' && 'quick' || 'full'"))
   failures.push('nightly/release full matrix missing')
 if (!staticBudget.includes('static-fixture-budget-validation'))
@@ -77,4 +126,5 @@ if (failures.length)
   throw new Error(
     `Real-render performance contract failed:\n${failures.join('\n')}`,
   )
+await import('./test-render-performance-impact-plan.mjs')
 console.info('Real-render performance contract passed.')

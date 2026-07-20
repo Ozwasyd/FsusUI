@@ -1,0 +1,32 @@
+[
+  {
+    "name": "web-only targeted markdown",
+    "files": ["vue/packages/wasm/markdown-runtime.ts"],
+    "scope": "web-only",
+    "webScenario": "markdown-"
+  },
+  {
+    "name": "avalonia-only targeted virtualization",
+    "files": ["dotnet/FsusUI.Avalonia/Controls/FsusVirtualizationControls.cs"],
+    "scope": "avalonia-only",
+    "avaloniaScenario": "virtual-"
+  },
+  {
+    "name": "both platforms",
+    "files": [
+      "vue/packages/components/select-v2/src/useSelect.ts",
+      "dotnet/FsusUI.Avalonia/Controls/Input/FsusInput.cs"
+    ],
+    "scope": "both"
+  },
+  {
+    "name": "skip-safe documentation",
+    "files": ["docs/guide/getting-started.md"],
+    "scope": "skip"
+  },
+  {
+    "name": "unknown becomes both",
+    "files": ["toolchain/new-global-runtime.config"],
+    "scope": "both"
+  }
+]

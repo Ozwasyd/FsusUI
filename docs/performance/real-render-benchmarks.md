@@ -104,7 +104,47 @@ without running unrelated controls.
 
 ## CI regression policy
 
-Pull requests run the quick representative matrix. When the base revision contains the runner, CI measures both the base SHA and the proposed SHA sequentially on the same GitHub runner, then rejects a p95 regression above 15%. This avoids comparing unrelated hardware. The first commit that introduces the runner has no prior executable baseline and therefore only produces current evidence; subsequent changes receive relative gating.
+Pull requests first run the dependency-free ownership planner, before installing
+packages, Chromium or desktop display dependencies:
+
+```bash
+pnpm perf:impact:plan --base <ref> --dry-run
+```
+
+The maintained registry at
+`spec/ci/pr-render-performance-ownership.json` classifies changed paths as
+`skip`, `web-only`, `avalonia-only` or `both`. Narrow component ownership can
+also select one quick scenario family. Rules are ordered from specific to
+general and the first matching rule owns a path. Multiple families, shared runtime/build
+paths and unknown files deliberately expand to the complete affected quick set;
+an unavailable Git base expands to both complete quick sets without blocking an
+ordinary local verify.
+
+The resolved changed-file list, platform/scenario selection, quick dimensions,
+sample profile and mandatory `baseline` then `current` order form an immutable
+SHA-256 plan digest. Both result directories contain the same
+`impact-plan.json`; comparison fails before inspecting timings if those digests
+differ. A base runner that cannot consume this plan is reported as
+`baseline-unavailable` or `contract-changed`, and its incomparable numbers are
+not used.
+
+When the base revision is compatible, CI measures the base SHA and proposed SHA
+sequentially on the same GitHub runner, then rejects a p95 regression above 15%.
+Both checkouts have independent `node_modules` and process/server lifetimes, but
+their installs share the runner's pnpm store cache. Chromium is installed once.
+This preserves isolation without comparing unrelated hardware or concurrent
+CPU, GC, renderer and I/O noise.
+
+The complete local paired workflow is:
+
+```bash
+pnpm perf:render:pr --base <ref>
+```
+
+It creates an isolated temporary base worktree, validates runner compatibility,
+installs through the shared pnpm store, resolves Chromium once, runs baseline
+before current, and removes only that temporary worktree. No remote performance
+database or fixed wall-clock threshold is involved.
 
 `main` runs the quick matrix. Nightly and release workflow groups run the full matrix. All jobs upload raw samples, environment metadata and summaries. Absolute limits in `tests/performance/render-performance-policy.json` only catch obvious loss of control; they are not used to claim cross-machine performance parity.
 

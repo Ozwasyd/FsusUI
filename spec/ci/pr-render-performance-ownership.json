@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 1,
+  "rules": [
+    {
+      "id": "performance-contract",
+      "patterns": [
+        ".github/workflows/quality.yml",
+        ".github/workflows/_quality.yml",
+        "docs/performance/**",
+        "scripts/*render-performance*.mjs",
+        "scripts/avalonia-performance-budget.mjs",
+        "tests/performance/**",
+        "spec/ci/pr-render-performance-ownership.json"
+      ],
+      "scope": "both"
+    },
+    {
+      "id": "shared-build-runtime",
+      "patterns": [
+        "package.json",
+        "pnpm-lock.yaml",
+        "pnpm-workspace.yaml",
+        "vue/internal/**",
+        "vue/packages/hooks/use-render-pipeline/**",
+        "vue/packages/components/_internal/**"
+      ],
+      "scope": "both"
+    },
+    {
+      "id": "web-virtualization",
+      "patterns": [
+        "vue/packages/components/virtual-list/**",
+        "vue/packages/components/table-v2/**",
+        "vue/packages/components/tree-v2/**"
+      ],
+      "scope": "web-only",
+      "webScenario": "virtual-"
+    },
+    {
+      "id": "web-markdown",
+      "patterns": [
+        "vue/packages/components/markdown-renderer/**",
+        "vue/packages/wasm/**",
+        "vue/tests/wasm/**"
+      ],
+      "scope": "web-only",
+      "webScenario": "markdown-"
+    },
+    {
+      "id": "web-select-v2",
+      "patterns": ["vue/packages/components/select-v2/**"],
+      "scope": "web-only",
+      "webScenario": "select-v2"
+    },
+    {
+      "id": "web-table-tree",
+      "patterns": [
+        "vue/packages/components/table/**",
+        "vue/packages/components/tree/**",
+        "vue/packages/components/tree-select/**"
+      ],
+      "scope": "web-only"
+    },
+    {
+      "id": "web-theme-motion",
+      "patterns": [
+        "vue/packages/theme-chalk/**",
+        "vue/packages/motion/**",
+        "spec/motion/**",
+        "spec/tokens/**"
+      ],
+      "scope": "web-only"
+    },
+    {
+      "id": "web-fixture-and-build",
+      "patterns": [
+        "vue/packages/demo-app/src/PerformanceFixture.vue",
+        "vue/packages/demo-app/src/demo-contract.ts",
+        "vue/packages/demo-app/vite.config.*",
+        "vue/vite.config.*"
+      ],
+      "scope": "web-only"
+    },
+    {
+      "id": "type-only",
+      "patterns": ["vue/typings/**", "**/*.d.ts"],
+      "scope": "skip"
+    },
+    {
+      "id": "static-governance-and-tests",
+      "patterns": [
+        "scripts/check-*.mjs",
+        "scripts/*conformance.mjs",
+        "tests/conformance/**",
+        "tests/fixtures/**",
+        "vue/**/__tests__/**",
+        "vue/tests/**",
+        "spec/accessibility/**",
+        "spec/baselines/**",
+        "spec/platform-overrides/**"
+      ],
+      "scope": "skip"
+    },
+    {
+      "id": "web-component-runtime",
+      "patterns": [
+        "vue/packages/components/**",
+        "vue/packages/hooks/**",
+        "vue/packages/directives/**",
+        "vue/packages/utils/**",
+        "vue/packages/element-plus/**",
+        "vue/packages/demo-app/**"
+      ],
+      "scope": "web-only"
+    },
+    {
+      "id": "avalonia-virtualization",
+      "patterns": [
+        "dotnet/FsusUI.Avalonia/Controls/VirtualList/**",
+        "dotnet/FsusUI.Avalonia/Controls/VirtualGrid/**",
+        "dotnet/FsusUI.Avalonia/Controls/FsusVirtualization*.cs"
+      ],
+      "scope": "avalonia-only",
+      "avaloniaScenario": "virtual-"
+    },
+    {
+      "id": "avalonia-table-tree",
+      "patterns": [
+        "dotnet/FsusUI.Avalonia/Controls/DataTable/**",
+        "dotnet/FsusUI.Avalonia/Controls/TableV2/**",
+        "dotnet/FsusUI.Avalonia/Controls/Tree/**",
+        "dotnet/FsusUI.Avalonia/Controls/FsusDataTableControls.cs",
+        "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs"
+      ],
+      "scope": "avalonia-only"
+    },
+    {
+      "id": "avalonia-input",
+      "patterns": [
+        "dotnet/FsusUI.Avalonia/Controls/Input/**",
+        "dotnet/FsusUI.Avalonia/Controls/FsusInput.cs",
+        "dotnet/FsusUI.Avalonia/Controls/FsusTextarea.cs"
+      ],
+      "scope": "avalonia-only",
+      "avaloniaScenario": "input-"
+    },
+    {
+      "id": "avalonia-runtime",
+      "patterns": [
+        "dotnet/FsusUI.Avalonia/**",
+        "dotnet/FsusUI.Avalonia.Themes/**",
+        "dotnet/FsusUI.Avalonia.Demo/**",
+        "dotnet/**/*.csproj",
+        "dotnet/**/*.props",
+        "dotnet/**/*.targets",
+        "dotnet/global.json"
+      ],
+      "scope": "avalonia-only"
+    },
+    {
+      "id": "non-performance-docs",
+      "patterns": ["**/*.md", ".github/ISSUE_TEMPLATE/**", ".changeset/**"],
+      "scope": "skip"
+    },
+    {
+      "id": "repository-metadata",
+      "patterns": [
+        ".editorconfig",
+        ".gitattributes",
+        ".gitignore",
+        ".npmignore",
+        ".prettierignore",
+        ".prettierrc"
+      ],
+      "scope": "skip"
+    }
+  ]
+}
