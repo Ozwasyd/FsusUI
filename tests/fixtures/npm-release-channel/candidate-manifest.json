@@ -1,0 +1,10 @@
+{
+  "package": {
+    "name": "@ozwasyd/element-plus",
+    "version": "1.5.1",
+    "distTag": "latest"
+  },
+  "metadata": {
+    "registry": "https://registry.npmjs.org/"
+  }
+}

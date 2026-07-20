@@ -182,12 +182,22 @@ workspace 依赖归一化由 `scripts/prepare-npm-package.mjs` 负责，当前�
 
 发布工作流还包含这些保护：
 
+- 轻量 plan job 按 `registry + package + resolved dist-tag` 生成 canonical 锁键；
+  quality 可以并行，但相同 package/channel 的 publish 临界区必须串行
 - 读取最终工件内的包名与版本
-- 校验 tag 版本与 package version 完全一致
+- 校验 tag、plan、candidate manifest 的 registry/package/version/dist-tag 完全一致
 - 使用 `scripts/resolve-npm-dist-tag.mjs` 推断 dist-tag
-- 先查询目标版本是否已存在
-- 已存在则跳过发布，避免重复发布同版本
+- 进入锁等待前以及获得锁后分别查询 channel 状态并执行 monotonicity check；查询失败
+  必须阻止发布
+- 仅当同版本已经存在且正是当前 dist-tag 时幂等跳过；已存在但 tag 不一致时失败，
+  不得在自动路径隐式移动 dist-tag
 - 使用 npm Trusted Publishing/OIDC，不设置长期 npm token
+
+显式回退或修复错误 dist-tag 只能手工触发 `recover-npm-dist-tag.yml`。该 workflow
+要求填写目标版本、请求时看到的当前版本和原因，在 `npm-recovery` environment 审批后
+使用同一 package/channel 锁；锁内重新读取状态并校验 expected-current，避免审批期间的
+状态变化被覆盖。恢复凭据只存放为该 environment 的 `NPM_RECOVERY_TOKEN`，不进入正常
+自动发布路径。
 
 ## 5. 发布后核验
 

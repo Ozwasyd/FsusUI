@@ -70,6 +70,44 @@ Other prerelease channels fail before publish. The checked implementation is `sc
 pnpm run check:npm-dist-tag
 ```
 
+### Channel lock and monotonicity
+
+Automatic publishing locks the shared registry resource, not the triggering ref:
+
+```text
+registry + package name + resolved dist-tag
+```
+
+`publish-npm.yml` resolves that resource in a lightweight plan job. The quality
+jobs may run concurrently, but the publish job uses the resulting
+`publish-npm-registry.npmjs.org-ozwasyd-element-plus-<channel>` key with
+`cancel-in-progress: false`. `latest`, `preview`, and `next` are therefore
+independent locks while every release targeting the same channel is serialized.
+
+The workflow validates package, version, registry, and dist-tag against the
+immutable candidate manifest. It queries the channel and runs the monotonicity
+gate once before waiting for the lock and again after obtaining the lock. npm
+query failures fail closed. A candidate may publish only when it is newer and
+not already present; an exact published/tagged match is an idempotent skip.
+Older candidates and already-published versions whose expected dist-tag points
+elsewhere fail the automatic path.
+
+The local, registry-free policy commands are:
+
+```bash
+pnpm release:channel:resolve <version>
+pnpm release:channel:check --candidate <version> --current <version> --candidate-exists false
+pnpm release:concurrency:plan --package <name> --version <version>
+pnpm test:release-channel
+pnpm check:npm-release-workflow
+```
+
+An intentional dist-tag move uses only `recover-npm-dist-tag.yml`. It requires a
+target version, the expected current value, and an auditable reason, runs in the
+protected `npm-recovery` environment, and takes the same package/channel lock.
+The environment owns `NPM_RECOVERY_TOKEN`; the normal trusted-publishing path
+does not receive that credential.
+
 ## Package Content Audit
 
 Before publish, run and record:

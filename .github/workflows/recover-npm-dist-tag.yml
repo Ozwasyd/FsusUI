@@ -1,0 +1,104 @@
+name: Recover npm Dist-Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_version:
+        description: Existing npm version that should own its canonical dist-tag.
+        required: true
+        type: string
+      expected_current:
+        description: Current dist-tag version observed before requesting recovery.
+        required: true
+        type: string
+      reason:
+        description: Auditable reason for the manual recovery.
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      package: ${{ steps.plan.outputs.package }}
+      version: ${{ steps.plan.outputs.version }}
+      dist-tag: ${{ steps.plan.outputs.dist_tag }}
+      concurrency-group: ${{ steps.plan.outputs.concurrency_group }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+      - id: plan
+        name: Resolve recovery resource
+        env:
+          TARGET_VERSION: ${{ inputs.target_version }}
+        run: |
+          pnpm release:concurrency:plan \
+            --package @ozwasyd/element-plus \
+            --version "${TARGET_VERSION}" \
+            --github-output
+
+  recover:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: npm-recovery
+    concurrency:
+      group: ${{ needs.plan.outputs.concurrency-group }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          registry-url: https://registry.npmjs.org/
+      - name: Read locked npm channel state
+        id: npm_state
+        run: |
+          node scripts/npm-channel-state.mjs \
+            --package '${{ needs.plan.outputs.package }}' \
+            --candidate '${{ needs.plan.outputs.version }}' \
+            --channel '${{ needs.plan.outputs.dist-tag }}' \
+            --github-output
+      - name: Authorize explicit recovery
+        id: recovery
+        env:
+          EXPECTED_CURRENT: ${{ inputs.expected_current }}
+          RECOVERY_REASON: ${{ inputs.reason }}
+        run: |
+          pnpm release:channel:check \
+            --candidate '${{ needs.plan.outputs.version }}' \
+            --current '${{ steps.npm_state.outputs.current }}' \
+            --candidate-exists '${{ steps.npm_state.outputs.candidate_exists }}' \
+            --mode recovery \
+            --expected-current "${EXPECTED_CURRENT}" \
+            --reason "${RECOVERY_REASON}" \
+            --github-output
+      - name: Move dist-tag to recovery target
+        if: steps.recovery.outputs.action == 'recover'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_RECOVERY_TOKEN }}
+        run: |
+          npm dist-tag add \
+            '${{ needs.plan.outputs.package }}@${{ needs.plan.outputs.version }}' \
+            '${{ needs.plan.outputs.dist-tag }}' \
+            --registry=https://registry.npmjs.org/
+      - name: Verify recovered dist-tag
+        if: steps.recovery.outputs.action == 'recover'
+        run: |
+          actual="$(npm view '${{ needs.plan.outputs.package }}' 'dist-tags.${{ needs.plan.outputs.dist-tag }}' --json --registry=https://registry.npmjs.org/ | node -pe 'JSON.parse(require("node:fs").readFileSync(0, "utf8"))')"
+          test "${actual}" = '${{ needs.plan.outputs.version }}'
+      - name: Report idempotent recovery
+        if: steps.recovery.outputs.action == 'skip'
+        run: echo 'The requested target already owns the dist-tag; no registry mutation was made.'

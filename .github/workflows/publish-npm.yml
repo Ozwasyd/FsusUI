@@ -10,106 +10,134 @@ permissions:
   contents: read
   id-token: write
 
-concurrency:
-  group: publish-npm-${{ github.ref }}
-  cancel-in-progress: false
-
 jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      registry: ${{ steps.plan.outputs.registry }}
+      package: ${{ steps.plan.outputs.package }}
+      version: ${{ steps.plan.outputs.version }}
+      dist-tag: ${{ steps.plan.outputs.dist_tag }}
+      concurrency-group: ${{ steps.plan.outputs.concurrency_group }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+      - name: Resolve canonical release resource
+        id: plan
+        run: |
+          pnpm release:concurrency:plan \
+            --package @ozwasyd/element-plus \
+            --version "${GITHUB_REF_NAME#v}" \
+            --github-output
+
   quality:
     uses: ./.github/workflows/_quality.yml
     with:
       group: release
 
-  publish:
+  preflight:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    needs: quality
+    timeout-minutes: 10
+    needs: [quality, plan]
     steps:
       - uses: actions/checkout@v4
-
       - uses: pnpm/action-setup@v4
         with:
           version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+      - uses: actions/download-artifact@v4
+        with:
+          name: fsusui-npm-candidate
+          path: .npm-candidate
+      - name: Verify candidate and release plan before lock
+        run: |
+          pnpm run package:candidate:verify -- --tarball .npm-candidate/fsusui-npm-candidate.tgz --tag-version "${GITHUB_REF_NAME}"
+          digest="$(node -p "require('./.npm-candidate/fsusui-npm-candidate.manifest.json').artifact.sha256")"
+          test "${digest}" = "${{ needs.quality.outputs.npm-candidate-digest }}"
+          candidate_group="$(pnpm --silent release:concurrency:plan \
+            --package '${{ needs.plan.outputs.package }}' \
+            --version '${{ needs.plan.outputs.version }}' \
+            --candidate-manifest .npm-candidate/fsusui-npm-candidate.manifest.json)"
+          test "${candidate_group}" = "${{ needs.plan.outputs.concurrency-group }}"
+      - name: Read npm channel state before lock
+        id: npm_state
+        run: |
+          node scripts/npm-channel-state.mjs \
+            --package '${{ needs.plan.outputs.package }}' \
+            --candidate '${{ needs.plan.outputs.version }}' \
+            --channel '${{ needs.plan.outputs.dist-tag }}' \
+            --github-output
+      - name: Check channel monotonicity before lock
+        run: |
+          pnpm release:channel:check \
+            --candidate '${{ needs.plan.outputs.version }}' \
+            --current '${{ steps.npm_state.outputs.current }}' \
+            --candidate-exists '${{ steps.npm_state.outputs.candidate_exists }}'
 
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [quality, plan, preflight]
+    concurrency:
+      group: ${{ needs.plan.outputs.concurrency-group }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
       - uses: actions/setup-node@v4
         with:
           node-version: 22.14.0
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-
       - name: Use npm 11.5.1+
         run: |
           npm install -g npm@^11.5.1
           npm --version
-
       - uses: actions/download-artifact@v4
         with:
           name: fsusui-npm-candidate
           path: .npm-candidate
-
-      - name: Verify tested npm candidate
+      - name: Verify locked candidate identity
         run: |
           pnpm run package:candidate:verify -- --tarball .npm-candidate/fsusui-npm-candidate.tgz --tag-version "${GITHUB_REF_NAME}"
           digest="$(node -p "require('./.npm-candidate/fsusui-npm-candidate.manifest.json').artifact.sha256")"
           test "${digest}" = "${{ needs.quality.outputs.npm-candidate-digest }}"
-
-      - name: Resolve package metadata
-        id: package
+          candidate_group="$(pnpm --silent release:concurrency:plan \
+            --package '${{ needs.plan.outputs.package }}' \
+            --version '${{ needs.plan.outputs.version }}' \
+            --candidate-manifest .npm-candidate/fsusui-npm-candidate.manifest.json)"
+          test "${candidate_group}" = "${{ needs.plan.outputs.concurrency-group }}"
+      - name: Read npm channel state after lock
+        id: npm_state
         run: |
-          set -euo pipefail
-
-          tag_version="${GITHUB_REF_NAME#v}"
-          manifest_json=".npm-candidate/fsusui-npm-candidate.manifest.json"
-          name="$(node -p "require('./${manifest_json}').package.name")"
-          version="$(node -p "require('./${manifest_json}').package.version")"
-
-          if [ "${tag_version}" != "${version}" ]; then
-            echo "Tag version ${tag_version} does not match candidate version ${version}." >&2
-            exit 1
-          fi
-
-          dist_tag="$(node ./scripts/resolve-npm-dist-tag.mjs "${version}")"
-
-          {
-            echo "name=${name}"
-            echo "version=${version}"
-            echo "dist_tag=${dist_tag}"
-          } >> "${GITHUB_OUTPUT}"
-
-          echo "Publishing ${name}@${version} with dist-tag ${dist_tag}."
-
-      - name: Check npm version availability
-        id: npm_view
+          node scripts/npm-channel-state.mjs \
+            --package '${{ needs.plan.outputs.package }}' \
+            --candidate '${{ needs.plan.outputs.version }}' \
+            --channel '${{ needs.plan.outputs.dist-tag }}' \
+            --github-output
+      - name: Check channel monotonicity after lock
+        id: monotonicity
         run: |
-          set -euo pipefail
-          package_spec="${{ steps.package.outputs.name }}@${{ steps.package.outputs.version }}"
-
-          set +e
-          view_output="$(npm view "${package_spec}" version --registry=https://registry.npmjs.org/ 2>&1)"
-          view_status=$?
-          set -e
-
-          if [ "${view_status}" -eq 0 ]; then
-            echo "exists=true" >> "${GITHUB_OUTPUT}"
-            echo "${package_spec} already exists on npm as ${view_output}. Skipping publish."
-            exit 0
-          fi
-
-          if echo "${view_output}" | grep -Eq 'E404|404 Not Found'; then
-            echo "exists=false" >> "${GITHUB_OUTPUT}"
-            echo "${package_spec} does not exist on npm yet."
-            exit 0
-          fi
-
-          echo "${view_output}" >&2
-          exit "${view_status}"
-
+          pnpm release:channel:check \
+            --candidate '${{ needs.plan.outputs.version }}' \
+            --current '${{ steps.npm_state.outputs.current }}' \
+            --candidate-exists '${{ steps.npm_state.outputs.candidate_exists }}' \
+            --github-output
       - name: Publish to npm
-        if: steps.npm_view.outputs.exists != 'true'
-        run: npm publish ./.npm-candidate/fsusui-npm-candidate.tgz --access public --tag "${{ steps.package.outputs.dist_tag }}"
-
+        if: steps.monotonicity.outputs.action == 'publish'
+        run: npm publish ./.npm-candidate/fsusui-npm-candidate.tgz --access public --tag '${{ needs.plan.outputs.dist-tag }}'
       - name: Report skipped publish
-        if: steps.npm_view.outputs.exists == 'true'
+        if: steps.monotonicity.outputs.action == 'skip'
         run: |
-          echo "${{ steps.package.outputs.name }}@${{ steps.package.outputs.version }} already exists on npm. No publish was attempted."
+          echo "${{ needs.plan.outputs.package }}@${{ needs.plan.outputs.version }} already owns ${{ needs.plan.outputs.dist-tag }}. No publish was attempted."
           echo "Verified candidate digest: ${{ needs.quality.outputs.npm-candidate-digest }}"
