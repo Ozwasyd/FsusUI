@@ -9,6 +9,7 @@ import { URL } from 'node:url'
 import {
   createAffectedSelection,
   createSmokeSelection,
+  createVisualCaptureTestTitle,
   loadVisualProfileRegistry,
   resolveAffectedFiles,
   selectAffectedVisualTargets,
@@ -41,6 +42,24 @@ const capacityPlan = createVisualCapacityPlan({
 test('registry assigns every component package exactly one visual owner', () => {
   assert.doesNotThrow(() =>
     validateVisualProfileRegistry(registry, repositoryRoot),
+  )
+})
+
+test('registry rejects a smoke grep that selects no canonical capture test', () => {
+  assert.equal(createVisualCaptureTestTitle('basic'), 'capture basic')
+  assert.throws(
+    () =>
+      validateVisualProfileRegistry(
+        {
+          ...registry,
+          smoke: {
+            ...registry.smoke,
+            grep: 'capture basic in (light|dark) mode',
+          },
+        },
+        repositoryRoot,
+      ),
+    /smoke grep does not select "capture basic"/u,
   )
 })
 
@@ -87,7 +106,7 @@ test('affected explicit files are browser-free and need no Git or network', () =
   })
   assert.equal(selection.profile, 'affected')
   assert.deepEqual(selection.auditComponents, ['ElButton'])
-  assert.match(selection.grep, /capture \(basic\)/u)
+  assert.match(selection.grep, /capture \(basic\)\$/u)
   assert.match(selection.grep, /ui audit/u)
 })
 
@@ -171,7 +190,8 @@ test('smoke is representative and capped to one shared-plan worker', () => {
   assert.equal(plan.length, 1)
   assert.deepEqual(plan[0].selectedProjects, ['desktop-light', 'mobile-dark'])
   assert.equal(plan[0].workers, 1)
-  assert.match(plan[0].argv.join(' '), /capture basic in/u)
+  assert.ok(plan[0].argv.includes('vue/tests/visual/capture-all.spec.ts'))
+  assert.match(plan[0].argv.join(' '), /capture basic\$/u)
 })
 
 test('smoke passes its one-worker capacity plan to Playwright', async () => {

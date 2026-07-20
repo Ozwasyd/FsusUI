@@ -2,8 +2,7 @@
   <div
     class="audit-page"
     :class="{ 'is-compact': compact, 'is-boundary': boundary }"
-    data-audit-ready="true"
-    :data-audit-state="auditState"
+    v-bind="auditRootDataAttributes"
   >
     <header class="audit-page__header">
       <h1>{{ auditTitle }}</h1>
@@ -1595,6 +1594,13 @@ const auditTitle = computed(() =>
 )
 const auditState = computed<UiAuditState>(() =>
   auditStateNames.includes(props.state) ? props.state : 'focus',
+)
+const auditRootDataAttributes = computed(
+  () =>
+    ({
+      'data-audit-ready': 'true',
+      'data-audit-state': auditState.value,
+    }) satisfies Record<`data-${string}`, string>,
 )
 const active = computed(() => auditState.value === 'active')
 const activeText = computed(() => {

@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-/* global queueMicrotask */
 import { readFileSync } from 'node:fs'
 import { EventEmitter } from 'node:events'
 import {
@@ -310,7 +309,9 @@ const smokePlan = createVisualPlan(
 assert(
   smokePlan.length === 1 &&
     smokePlan[0].workers === 1 &&
-    smokePlan[0].selectedProjects.join(',') === 'desktop-light,mobile-dark',
+    smokePlan[0].selectedProjects.join(',') === 'desktop-light,mobile-dark' &&
+    smokePlan[0].argv.includes('vue/tests/visual/capture-all.spec.ts') &&
+    smokePlan[0].argv.includes('capture basic$'),
   'smoke must stay a one-worker representative desktop/light and compact/dark plan',
 )
 const affectedFallback = createAffectedSelection({
@@ -387,8 +388,9 @@ assert(
 )
 assert(
   auditSpec.includes('createVisualAuditPathNamespace') &&
-    auditFixture.includes('data-audit-ready="true"') &&
-    auditFixture.includes(':data-audit-state="auditState"'),
+    auditFixture.includes('v-bind="auditRootDataAttributes"') &&
+    auditFixture.includes("'data-audit-ready': 'true'") &&
+    auditFixture.includes("'data-audit-state': auditState.value"),
   'UI audit fixture and screenshot namespace must bind suite/project/state/component readiness',
 )
 assert(

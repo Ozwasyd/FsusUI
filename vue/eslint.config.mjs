@@ -31,6 +31,7 @@ export default [
       'CHANGELOG.en-US.md',
       'docs/components.d.ts',
       'coverage/**',
+      '.tmp/**',
       'play/**',
       'ssr-testing/cases/*',
       'docs/.vitepress/i18n/*',

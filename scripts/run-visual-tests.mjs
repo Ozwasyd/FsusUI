@@ -136,11 +136,7 @@ export function createVisualPlan(
     ...selectedProjects.map((name) => `--project=${name}`),
   ]
   if (selection?.specs?.length) {
-    previewArgs.push(
-      ...selection.specs.map((spec) =>
-        spec.replace(/^vue\/tests\/visual\//u, ''),
-      ),
-    )
+    previewArgs.push(...selection.specs)
   }
   if (selection?.grep) previewArgs.push('--grep', selection.grep)
   if (shard) previewArgs.push(`--shard=${shard}`)

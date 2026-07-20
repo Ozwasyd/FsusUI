@@ -3,7 +3,7 @@
   "smoke": {
     "projects": ["desktop-light", "mobile-dark"],
     "specs": ["vue/tests/visual/capture-all.spec.ts"],
-    "grep": "capture basic in (light|dark) mode"
+    "grep": "capture basic$"
   },
   "commonContractSpecs": [
     "vue/tests/visual/foundation-style-boundary.spec.ts",

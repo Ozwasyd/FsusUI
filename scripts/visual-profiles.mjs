@@ -10,6 +10,8 @@ const normalizePath = (value) =>
   value.replaceAll('\\', '/').replace(/^\.\//u, '')
 const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&')
 
+export const createVisualCaptureTestTitle = (section) => `capture ${section}`
+
 export function loadVisualProfileRegistry(
   repositoryRoot = process.cwd(),
   registryPath = DEFAULT_VISUAL_PROFILE_REGISTRY,
@@ -42,6 +44,19 @@ export function validateVisualProfileRegistry(registry, repositoryRoot) {
     if (!Array.isArray(registry[field]) || registry[field].length === 0) {
       throw new Error(`visual profile registry ${field} must be non-empty`)
     }
+  }
+  let smokePattern
+  try {
+    smokePattern = new RegExp(registry.smoke?.grep, 'u')
+  } catch (error) {
+    throw new Error('visual profile registry smoke grep is invalid', {
+      cause: error,
+    })
+  }
+  if (!smokePattern.test(createVisualCaptureTestTitle('basic'))) {
+    throw new Error(
+      `visual profile registry smoke grep does not select ${JSON.stringify(createVisualCaptureTestTitle('basic'))}`,
+    )
   }
 
   const registered = registeredComponentPackages(registry)
@@ -393,7 +408,7 @@ export function createAffectedSelection({
     .join('|')
   const grepParts = []
   if (sectionPattern) {
-    grepParts.push(`capture (${sectionPattern}) in (light|dark) mode`)
+    grepParts.push(`capture (${sectionPattern})$`)
   }
   if (targets.specs.includes('vue/tests/visual/ui-audit-all.spec.ts')) {
     grepParts.push('ui audit')

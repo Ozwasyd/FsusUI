@@ -4,6 +4,7 @@ import {
   buildVisualUrl,
   resolveVisualVariant,
 } from '../../../scripts/visual-variant.mjs'
+import { createVisualCaptureTestTitle } from '../../../scripts/visual-profiles.mjs'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
 
 type VisualSection = {
@@ -63,29 +64,32 @@ const sections: VisualSection[] = [
 ]
 
 for (const section of sections) {
-  test(`capture ${section.name}`, async ({ page }, testInfo) => {
-    const variant = resolveVisualVariant(testInfo.project.name)
-    await page.goto(buildVisualUrl(section.name, testInfo.project.name), {
-      waitUntil: 'domcontentloaded',
-    })
-    await stabilizePage(page)
+  test(
+    createVisualCaptureTestTitle(section.name),
+    async ({ page }, testInfo) => {
+      const variant = resolveVisualVariant(testInfo.project.name)
+      await page.goto(buildVisualUrl(section.name, testInfo.project.name), {
+        waitUntil: 'domcontentloaded',
+      })
+      await stabilizePage(page)
 
-    const locator = page.locator(`[data-testid="${section.testId}"]`)
-    await expect(locator).toBeVisible()
+      const locator = page.locator(`[data-testid="${section.testId}"]`)
+      await expect(locator).toBeVisible()
 
-    if (section.action) {
-      await section.action(page)
-    }
+      if (section.action) {
+        await section.action(page)
+      }
 
-    await page.screenshot({
-      path: testInfo.outputPath(
-        'screenshots',
-        'capture-all',
-        testInfo.project.name,
-        section.name,
-        `${variant.theme}-full-page.png`,
-      ),
-      fullPage: true,
-    })
-  })
+      await page.screenshot({
+        path: testInfo.outputPath(
+          'screenshots',
+          'capture-all',
+          testInfo.project.name,
+          section.name,
+          `${variant.theme}-full-page.png`,
+        ),
+        fullPage: true,
+      })
+    },
+  )
 }
