@@ -1,10 +1,11 @@
 import { expect, test } from '@playwright/test'
 import type { Locator, Page, TestInfo } from '@playwright/test'
+import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
 
 test.setTimeout(120_000)
 
 const openFixture = async (page: Page, visual: string, theme: string) => {
-  await page.goto(`/?visual=${visual}&theme=light`, {
+  await page.goto(buildVisualUrl(visual, 'desktop-light'), {
     waitUntil: 'domcontentloaded',
   })
   await page.locator('[data-testid^="section-"]').waitFor()
@@ -48,18 +49,10 @@ const attachScreenshot = async (
   })
 }
 
-const skipNonCanonicalProject = (projectName: string) => {
-  test.skip(
-    projectName !== 'desktop-light',
-    'The desktop-light project toggles and captures both explicit themes.',
-  )
-}
-
 for (const theme of ['light', 'dark'] as const) {
   test(`form focus rings follow the public scale in ${theme}`, async ({
     page,
   }, testInfo) => {
-    skipNonCanonicalProject(testInfo.project.name)
     await page.emulateMedia({ reducedMotion: 'no-preference' })
     await openFixture(page, 'form', theme)
 
@@ -103,7 +96,6 @@ for (const theme of ['light', 'dark'] as const) {
   test(`tab focus ring follows the public scale in ${theme}`, async ({
     page,
   }, testInfo) => {
-    skipNonCanonicalProject(testInfo.project.name)
     await page.emulateMedia({ reducedMotion: 'no-preference' })
     await openFixture(page, 'navigation', theme)
 
@@ -116,7 +108,6 @@ for (const theme of ['light', 'dark'] as const) {
   test(`overlay focus rings and reduced motion follow the public scale in ${theme}`, async ({
     page,
   }, testInfo) => {
-    skipNonCanonicalProject(testInfo.project.name)
     await page.emulateMedia({ reducedMotion: 'no-preference' })
     await openFixture(page, 'feedback', theme)
 

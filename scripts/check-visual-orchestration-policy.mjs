@@ -93,6 +93,12 @@ assert(
   'governance:check must include the visual orchestration policy guard',
 )
 assert(
+  scripts['check:visual-variant-ownership']?.includes(
+    'scripts/check-visual-variant-policy.mjs',
+  ) && scripts['governance:check']?.includes('check:visual-variant-ownership'),
+  'governance:check must enforce visual variant ownership before browser launch',
+)
+assert(
   scripts['visual:capacity']?.includes('visual-capacity.mjs --dry-run'),
   'package.json must expose the browser-free visual capacity dry-run',
 )

@@ -1,16 +1,15 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
+import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
 
 const variants = ['default', 'inline', 'compact', 'page'] as const
 const diagnostics = new WeakMap<Page, string[]>()
 
 test.beforeEach(async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name.includes('mobile'))
   diagnostics.set(page, attachPageDiagnostics(page))
 
-  const theme = testInfo.project.name.includes('dark') ? 'dark' : 'light'
-  await page.goto(`/?visual=empty-illustration&theme=${theme}`, {
+  await page.goto(buildVisualUrl('empty-illustration', testInfo.project.name), {
     waitUntil: 'domcontentloaded',
   })
   await page.addStyleTag({
@@ -24,21 +23,21 @@ test.beforeEach(async ({ page }, testInfo) => {
   await expect(page.getByTestId('empty-illustration-fixture')).toBeVisible()
 })
 
-test.afterEach(async ({ page }, testInfo) => {
-  if (!testInfo.project.name.includes('mobile')) {
-    expect(diagnostics.get(page) ?? []).toEqual([])
-  }
+test.afterEach(async ({ page }) => {
+  expect(diagnostics.get(page) ?? []).toEqual([])
 })
 
 for (const variant of variants) {
   test(`${variant} empty state visual`, async ({ page }) => {
-    await expect(page.locator(`[data-empty-variant="${variant}"]`)).toHaveScreenshot(
-      `empty-${variant}.png`,
-    )
+    await expect(
+      page.locator(`[data-empty-variant="${variant}"]`),
+    ).toHaveScreenshot(`empty-${variant}.png`)
   })
 }
 
-test('keeps illustrations quiet, decorative, and size-aware', async ({ page }) => {
+test('keeps illustrations quiet, decorative, and size-aware', async ({
+  page,
+}) => {
   const defaultState = page.locator('[data-empty-variant="default"]')
   const defaultSvg = defaultState.locator('.el-empty__image svg')
 
@@ -52,7 +51,9 @@ test('keeps illustrations quiet, decorative, and size-aware', async ({ page }) =
     page.locator('[data-empty-variant="inline"] .el-empty-state__illustration'),
   ).toHaveCount(0)
   await expect(
-    page.locator('[data-empty-variant="compact"] .el-empty-state__illustration'),
+    page.locator(
+      '[data-empty-variant="compact"] .el-empty-state__illustration',
+    ),
   ).toHaveCount(0)
   await expect(
     page.locator('[data-empty-variant="page"] .el-empty-state__illustration'),

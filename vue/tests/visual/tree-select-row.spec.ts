@@ -1,14 +1,12 @@
 import { expect, test } from '@playwright/test'
+import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
 
 test('TreeSelect renders one coherent navigation row', async ({
   page,
 }, testInfo) => {
-  test.skip(
-    testInfo.project.name.startsWith('mobile'),
-    'Hover state is desktop-only',
-  )
-  await page.setViewportSize({ width: 1280, height: 900 })
-  await page.goto('/?theme=light', { waitUntil: 'domcontentloaded' })
+  await page.goto(buildVisualUrl('form', testInfo.project.name), {
+    waitUntil: 'domcontentloaded',
+  })
 
   const treeSelect = page.locator('[data-testid="unique-tree-select"]')
   await treeSelect.scrollIntoViewIfNeeded()

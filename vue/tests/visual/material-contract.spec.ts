@@ -1,8 +1,9 @@
 import { expect, test } from '@playwright/test'
 import type { Locator, Page, TestInfo } from '@playwright/test'
-
-const themeFor = (projectName: string) =>
-  projectName.includes('dark') ? 'dark' : 'light'
+import {
+  buildVisualUrl,
+  resolveVisualVariant,
+} from '../../../scripts/visual-variant.mjs'
 
 const computedMaterial = (locator: Locator) =>
   locator.evaluate((element) => {
@@ -74,9 +75,9 @@ const attachScreenshot = async (
 }
 
 test('paper overlays keep blur disabled', async ({ page }, testInfo) => {
-  const theme = themeFor(testInfo.project.name)
+  const { theme } = resolveVisualVariant(testInfo.project.name)
   await page.emulateMedia({ reducedMotion: 'no-preference' })
-  await page.goto(`/?visual=feedback&theme=${theme}`, {
+  await page.goto(buildVisualUrl('feedback', testInfo.project.name), {
     waitUntil: 'domcontentloaded',
   })
 
@@ -107,9 +108,9 @@ test('paper overlays keep blur disabled', async ({ page }, testInfo) => {
 test('image viewer owns the only public glass mask', async ({
   page,
 }, testInfo) => {
-  const theme = themeFor(testInfo.project.name)
+  const { theme } = resolveVisualVariant(testInfo.project.name)
   await page.emulateMedia({ reducedMotion: 'no-preference' })
-  await page.goto(`/?visual=others&theme=${theme}`, {
+  await page.goto(buildVisualUrl('others', testInfo.project.name), {
     waitUntil: 'domcontentloaded',
   })
   await page.getByRole('button', { name: 'Direct Viewer' }).click()
@@ -135,8 +136,8 @@ test('image viewer owns the only public glass mask', async ({
 test('site and public headers keep glass opt-in', async ({
   page,
 }, testInfo) => {
-  const theme = themeFor(testInfo.project.name)
-  await page.goto(`/?visual=issue-primitives&theme=${theme}`, {
+  const { theme } = resolveVisualVariant(testInfo.project.name)
+  await page.goto(buildVisualUrl('issue-primitives', testInfo.project.name), {
     waitUntil: 'domcontentloaded',
   })
   const siteHeader = page
@@ -145,9 +146,12 @@ test('site and public headers keep glass opt-in', async ({
   await expect(siteHeader).toBeVisible()
   await verifyPaperAndGlassHeader(siteHeader)
 
-  await page.goto(`/?visual=public-shell-search-mode&theme=${theme}`, {
-    waitUntil: 'domcontentloaded',
-  })
+  await page.goto(
+    buildVisualUrl('public-shell-search-mode', testInfo.project.name),
+    {
+      waitUntil: 'domcontentloaded',
+    },
+  )
   const publicHeader = page.locator('[data-public-shell-header]')
   await expect(publicHeader).toBeVisible()
   await verifyPaperAndGlassHeader(publicHeader)

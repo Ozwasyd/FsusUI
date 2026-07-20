@@ -1,15 +1,24 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
+import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
 
 const modes = ['menu', 'inline', 'bottom', 'none'] as const
 const diagnostics = new WeakMap<Page, string[]>()
 
-const openMode = async (page: Page, mode?: (typeof modes)[number]) => {
-  const query = mode ? `&navMode=${mode}` : ''
-  await page.goto(`/?visual=public-shell-nav-mode&compact=1${query}`, {
-    waitUntil: 'domcontentloaded',
-  })
+const openMode = async (
+  page: Page,
+  projectName: string,
+  mode?: (typeof modes)[number],
+) => {
+  await page.goto(
+    buildVisualUrl('public-shell-nav-mode', projectName, {
+      navMode: mode,
+    }),
+    {
+      waitUntil: 'domcontentloaded',
+    },
+  )
   await page.addStyleTag({
     content: `
       *, *::before, *::after {
@@ -21,28 +30,28 @@ const openMode = async (page: Page, mode?: (typeof modes)[number]) => {
   await expect(page.getByTestId('public-shell-nav-fixture')).toBeVisible()
 }
 
-const openCspSafeMenu = async (page: Page) => {
+const openCspSafeMenu = async (page: Page, projectName: string) => {
   await page.goto(
-    '/?visual=public-shell-nav-mode&compact=1&navMode=menu&cspSafe=1',
+    buildVisualUrl('public-shell-nav-mode', projectName, {
+      navMode: 'menu',
+      cspSafe: 1,
+    }),
     { waitUntil: 'domcontentloaded' },
   )
   await expect(page.getByTestId('public-shell-nav-fixture')).toBeVisible()
 }
 
-test.beforeEach(async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'mobile-light')
+test.beforeEach(async ({ page }) => {
   diagnostics.set(page, attachPageDiagnostics(page))
 })
 
-test.afterEach(async ({ page }, testInfo) => {
-  if (testInfo.project.name === 'mobile-light') {
-    expect(diagnostics.get(page) ?? []).toEqual([])
-  }
+test.afterEach(async ({ page }) => {
+  expect(diagnostics.get(page) ?? []).toEqual([])
 })
 
 for (const mode of modes) {
-  test(`mobile ${mode} strategy snapshot`, async ({ page }) => {
-    await openMode(page, mode)
+  test(`mobile ${mode} strategy snapshot`, async ({ page }, testInfo) => {
+    await openMode(page, testInfo.project.name, mode)
 
     await expect(page).toHaveScreenshot(`public-shell-mobile-${mode}.png`, {
       fullPage: true,
@@ -52,8 +61,8 @@ for (const mode of modes) {
 
 test('defaults to the native header menu without a bottom dock', async ({
   page,
-}) => {
-  await openMode(page)
+}, testInfo) => {
+  await openMode(page, testInfo.project.name)
 
   await expect(page.locator('.el-public-shell')).toHaveAttribute(
     'data-mobile-nav-mode',
@@ -65,8 +74,8 @@ test('defaults to the native header menu without a bottom dock', async ({
 
 test('keeps menu focus order and navigation semantics native', async ({
   page,
-}) => {
-  await openMode(page, 'menu')
+}, testInfo) => {
+  await openMode(page, testInfo.project.name, 'menu')
   const trigger = page.getByRole('button', { name: 'Sections' })
 
   await trigger.focus()
@@ -86,12 +95,11 @@ test('keeps menu focus order and navigation semantics native', async ({
   await expect(trigger).toBeFocused()
 })
 
-test('uses one 44px bordered affordance language at 375px', async ({
+test('uses one 44px bordered affordance language in the mobile project', async ({
   page,
 }, testInfo) => {
-  await page.setViewportSize({ width: 375, height: 1000 })
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await openMode(page, 'menu')
+  await openMode(page, testInfo.project.name, 'menu')
 
   const header = page.locator('[data-public-shell-header]')
   const menuTrigger = page.getByRole('button', { name: 'Sections' })
@@ -114,10 +122,18 @@ test('uses one 44px bordered affordance language at 375px', async ({
     await page.keyboard.press('Tab')
   }
   await expect(searchTrigger).toBeFocused()
-  await expect(searchTrigger).toHaveCSS(
-    'box-shadow',
-    /rgb\(42, 89, 156\) 0px 0px 0px 2px inset/u,
-  )
+  const focusRing = await searchTrigger.evaluate((element) => {
+    const probe = document.createElement('span')
+    probe.style.color = 'var(--fsus-color-focus-ring)'
+    element.append(probe)
+    const color = getComputedStyle(probe).color
+    probe.remove()
+    return {
+      color,
+      shadow: getComputedStyle(element).boxShadow,
+    }
+  })
+  expect(focusRing.shadow).toContain(`${focusRing.color} 0px 0px 0px 2px inset`)
   const rowHeights = await Promise.all(
     [menuTrigger, searchTrigger].map((control) =>
       control.evaluate((element) => element.getBoundingClientRect().height),
@@ -131,16 +147,19 @@ test('uses one 44px bordered affordance language at 375px', async ({
   )
   expect(overflow).toBeLessThanOrEqual(1)
 
-  await testInfo.attach('public-shell-mobile-bordered-375', {
-    body: await header.screenshot({ animations: 'disabled' }),
-    contentType: 'image/png',
-  })
+  await testInfo.attach(
+    `public-shell-mobile-bordered-${testInfo.project.name}`,
+    {
+      body: await header.screenshot({ animations: 'disabled' }),
+      contentType: 'image/png',
+    },
+  )
 })
 
 test('keeps CSP-safe menu open through its class-driven leave lifecycle', async ({
   page,
-}) => {
-  await openCspSafeMenu(page)
+}, testInfo) => {
+  await openCspSafeMenu(page, testInfo.project.name)
   const shell = page.locator('.el-public-shell')
   const menu = page.locator('.el-public-shell__mobile-nav-menu')
   const trigger = page.getByRole('button', { name: 'Sections' })
@@ -195,8 +214,8 @@ test('keeps CSP-safe menu open through its class-driven leave lifecycle', async 
 
 test('exposes inline, bottom, and none modes without duplicate landmarks', async ({
   page,
-}) => {
-  await openMode(page, 'inline')
+}, testInfo) => {
+  await openMode(page, testInfo.project.name, 'inline')
   let nav = page.getByRole('navigation', { name: 'Primary sections' })
   await expect(nav).toHaveCount(1)
   await expect(nav.getByRole('link', { name: 'Archive' })).toHaveAttribute(
@@ -204,7 +223,7 @@ test('exposes inline, bottom, and none modes without duplicate landmarks', async
     'page',
   )
 
-  await openMode(page, 'bottom')
+  await openMode(page, testInfo.project.name, 'bottom')
   nav = page.getByRole('navigation', { name: 'Primary sections' })
   await expect(nav).toHaveCount(1)
   await expect(nav.getByRole('link', { name: 'Archive' })).toHaveAttribute(
@@ -248,7 +267,7 @@ test('exposes inline, bottom, and none modes without duplicate landmarks', async
     dockBounds!.y + 1,
   )
 
-  await openMode(page, 'none')
+  await openMode(page, testInfo.project.name, 'none')
   await expect(
     page.getByRole('navigation', { name: 'Primary sections' }),
   ).toHaveCount(0)

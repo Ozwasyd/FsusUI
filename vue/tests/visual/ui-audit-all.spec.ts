@@ -1,7 +1,6 @@
 import { expect, test } from '@playwright/test'
 import * as fs from 'fs'
-import * as path from 'path'
-import type { Page } from '@playwright/test'
+import type { Page, TestInfo } from '@playwright/test'
 import {
   auditComponents,
   auditStateNames,
@@ -12,11 +11,7 @@ import {
   partitionVisualAuditComponents,
 } from '../../../scripts/visual-audit-buckets.mjs'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
-
-type VisualVariant = {
-  compact: boolean
-  theme: 'dark' | 'light'
-}
+import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
 
 const diagnostics = new WeakMap<Page, string[]>()
 const requestedComponentNames = new Set(
@@ -114,57 +109,40 @@ const stabilizePage = async (page: Page) => {
   })
 }
 
-const getVisualVariant = (projectName: string): VisualVariant => {
-  switch (projectName) {
-    case 'desktop-dark':
-      return { theme: 'dark', compact: false }
-    case 'mobile-dark':
-      return { theme: 'dark', compact: true }
-    case 'mobile-light':
-      return { theme: 'light', compact: true }
-    default:
-      return { theme: 'light', compact: false }
-  }
-}
-
 const buildAuditUrl = (state: string, projectName: string) => {
-  const variant = getVisualVariant(projectName)
-  const params = new URLSearchParams({
+  return buildVisualUrl('ui-states', projectName, {
     audit: 'ui-states',
     state,
-    theme: variant.theme,
   })
-
-  if (variant.compact) params.set('compact', '1')
-
-  return `/?${params.toString()}`
 }
 
 const screenshotPath = (
+  testInfo: TestInfo,
   componentName: string,
-  projectName: string,
   stateName: string,
 ) =>
-  path.join(
-    process.cwd(),
+  testInfo.outputPath(
     'screenshots',
+    'ui-audit',
+    testInfo.project.name,
+    componentName,
     `${createVisualAuditPathNamespace({
       componentName,
-      projectName,
+      projectName: testInfo.project.name,
       stateName,
       suiteName: 'ui-audit',
     })}.png`,
   )
 
 const countBucketScreenshots = (
+  testInfo: TestInfo,
   componentNames: readonly string[],
-  projectName: string,
   stateName: string,
 ) => {
   let count = 0
 
   for (const componentName of componentNames) {
-    if (fs.existsSync(screenshotPath(componentName, projectName, stateName))) {
+    if (fs.existsSync(screenshotPath(testInfo, componentName, stateName))) {
       count += 1
     }
   }
@@ -252,23 +230,14 @@ test.describe('ui audit buckets', () => {
             }
           }
 
-          const targetPath = screenshotPath(
-            component.name,
-            testInfo.project.name,
-            state,
-          )
-          fs.mkdirSync(path.dirname(targetPath), { recursive: true })
+          const targetPath = screenshotPath(testInfo, component.name, state)
           await componentCard.screenshot({ path: targetPath })
           await page.keyboard.press('Escape').catch(() => undefined)
         }
 
-        expect(
-          countBucketScreenshots(
-            bucket.components,
-            testInfo.project.name,
-            state,
-          ),
-        ).toBe(bucket.components.length)
+        expect(countBucketScreenshots(testInfo, bucket.components, state)).toBe(
+          bucket.components.length,
+        )
       })
     }
   }

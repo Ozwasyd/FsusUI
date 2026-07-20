@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test'
+import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
 
 test('CJK and Latin use real bundled weights in light and dark modes', async ({
   page,
 }, testInfo) => {
-  const theme = testInfo.project.name.includes('dark') ? 'dark' : 'light'
-  await page.goto(`/?visual=basic&theme=${theme}`)
+  await page.goto(buildVisualUrl('basic', testInfo.project.name))
   const fixture = page.getByTestId('typography-real-weight-fixture')
 
   await expect(fixture).toBeVisible()

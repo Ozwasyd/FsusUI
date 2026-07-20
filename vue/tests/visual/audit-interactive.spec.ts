@@ -1,4 +1,8 @@
 import { test, expect } from '@playwright/test'
+import {
+  buildVisualUrl,
+  resolveVisualVariant,
+} from '../../../scripts/visual-variant.mjs'
 
 test.describe('FsusUI Visual Alignment Audit', () => {
   test.beforeEach(async ({ page }) => {
@@ -7,67 +11,99 @@ test.describe('FsusUI Visual Alignment Audit', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' })
   })
 
-  for (const theme of ['light', 'dark']) {
-    test(`Verify Button States - ${theme}`, async ({ page }) => {
-      await page.goto(`/?visual=basic&theme=${theme}`, {
-        waitUntil: 'networkidle',
-      })
-      const btn = page
-        .locator(
-          '.demo-block:has-text("Button & ButtonGroup") .el-button--primary',
-        )
-        .first()
+  test('Verify Button States', async ({ page }, testInfo) => {
+    const variant = resolveVisualVariant(testInfo.project.name)
+    await page.goto(buildVisualUrl('basic', testInfo.project.name), {
+      waitUntil: 'networkidle',
+    })
+    const btn = page
+      .locator(
+        '.demo-block:has-text("Button & ButtonGroup") .el-button--primary',
+      )
+      .first()
 
-      // Capture Normal State
-      await btn.screenshot({
-        path: `screenshots/audit-button-normal-${theme}.png`,
-      })
-
-      // Capture Hover State (Should turn Scholarly Blue)
-      await btn.hover()
-      await page.waitForTimeout(300) // Wait for transition
-      await btn.screenshot({
-        path: `screenshots/audit-button-hover-${theme}.png`,
-      })
+    // Capture Normal State
+    await btn.screenshot({
+      path: testInfo.outputPath(
+        'screenshots',
+        'audit-interactive',
+        testInfo.project.name,
+        'button',
+        `${variant.theme}-normal.png`,
+      ),
     })
 
-    test(`Verify Input Focus - ${theme}`, async ({ page }) => {
-      await page.goto(`/?visual=form&theme=${theme}`, {
-        waitUntil: 'networkidle',
-      })
-      const input = page.locator('.el-input__inner').first()
-
-      // Capture Focus State (Should have 1px inset Scholarly Blue ring)
-      await input.focus()
-      await page.waitForTimeout(300)
-      await input.screenshot({
-        path: `screenshots/audit-input-focus-${theme}.png`,
-      })
+    // Capture Hover State (Should turn Scholarly Blue)
+    await btn.hover()
+    await page.waitForTimeout(300) // Wait for transition
+    await btn.screenshot({
+      path: testInfo.outputPath(
+        'screenshots',
+        'audit-interactive',
+        testInfo.project.name,
+        'button',
+        `${variant.theme}-hover.png`,
+      ),
     })
+  })
 
-    test(`Verify Dialog Blur - ${theme}`, async ({ page }) => {
-      await page.goto(`/?visual=feedback&theme=${theme}`, {
-        waitUntil: 'networkidle',
-      })
-      await page.getByTestId('open-publish-dialog').click()
-      await expect(page.locator('.el-dialog')).toBeVisible()
-
-      // Capture full page to see overlay blur
-      await page.screenshot({
-        path: `screenshots/audit-dialog-blur-${theme}.png`,
-        fullPage: false,
-      })
+  test('Verify Input Focus', async ({ page }, testInfo) => {
+    const variant = resolveVisualVariant(testInfo.project.name)
+    await page.goto(buildVisualUrl('form', testInfo.project.name), {
+      waitUntil: 'networkidle',
     })
+    const input = page.locator('.el-input__inner').first()
 
-    test(`Verify Icon Stroke Rounding - ${theme}`, async ({ page }) => {
-      await page.goto(`/?visual=icons&theme=${theme}`, {
-        waitUntil: 'networkidle',
-      })
-      const icon = page.locator('.icon-item').first()
-      // High resolution crop of an icon
-      await icon.screenshot({
-        path: `screenshots/audit-icon-detail-${theme}.png`,
-      })
+    // Capture Focus State (Should have 1px inset Scholarly Blue ring)
+    await input.focus()
+    await page.waitForTimeout(300)
+    await input.screenshot({
+      path: testInfo.outputPath(
+        'screenshots',
+        'audit-interactive',
+        testInfo.project.name,
+        'input',
+        `${variant.theme}-focus.png`,
+      ),
     })
-  }
+  })
+
+  test('Verify Dialog Blur', async ({ page }, testInfo) => {
+    const variant = resolveVisualVariant(testInfo.project.name)
+    await page.goto(buildVisualUrl('feedback', testInfo.project.name), {
+      waitUntil: 'networkidle',
+    })
+    await page.getByTestId('open-publish-dialog').click()
+    await expect(page.locator('.el-dialog')).toBeVisible()
+
+    // Capture full page to see overlay blur
+    await page.screenshot({
+      path: testInfo.outputPath(
+        'screenshots',
+        'audit-interactive',
+        testInfo.project.name,
+        'dialog',
+        `${variant.theme}-open.png`,
+      ),
+      fullPage: false,
+    })
+  })
+
+  test('Verify Icon Stroke Rounding', async ({ page }, testInfo) => {
+    const variant = resolveVisualVariant(testInfo.project.name)
+    await page.goto(buildVisualUrl('icons', testInfo.project.name), {
+      waitUntil: 'networkidle',
+    })
+    const icon = page.locator('.icon-item').first()
+    // High resolution crop of an icon
+    await icon.screenshot({
+      path: testInfo.outputPath(
+        'screenshots',
+        'audit-interactive',
+        testInfo.project.name,
+        'icon',
+        `${variant.theme}-detail.png`,
+      ),
+    })
+  })
 })

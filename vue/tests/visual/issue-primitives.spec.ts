@@ -1,6 +1,10 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
+import {
+  buildVisualUrl,
+  resolveVisualVariant,
+} from '../../../scripts/visual-variant.mjs'
 
 const diagnostics = new WeakMap<Page, string[]>()
 
@@ -29,13 +33,13 @@ test.afterEach(async ({ page }) => {
 test('issue primitives render in the demo route', async ({
   page,
 }, testInfo) => {
-  const projectName = testInfo.project.name
-  const isCompact = projectName.includes('mobile')
-  const theme = projectName.includes('dark') ? 'dark' : 'light'
-  const viewport = isCompact ? 'mobile' : 'desktop'
-  const compactParam = isCompact ? '&compact=1' : ''
+  const {
+    compact: isCompact,
+    theme,
+    viewportClass: viewport,
+  } = resolveVisualVariant(testInfo.project.name)
 
-  await page.goto(`/?visual=issue-primitives&theme=${theme}${compactParam}`, {
+  await page.goto(buildVisualUrl('issue-primitives', testInfo.project.name), {
     waitUntil: 'domcontentloaded',
   })
   await stabilizePage(page)

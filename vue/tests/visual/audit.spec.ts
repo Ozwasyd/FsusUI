@@ -1,10 +1,7 @@
 import { expect, test } from '@playwright/test'
+import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
 
 test('audit component styles', async ({ page }, testInfo) => {
-  test.skip(
-    testInfo.project.name.startsWith('mobile'),
-    'Tree hover audit is desktop-only',
-  )
   test.setTimeout(60_000)
 
   const components = [
@@ -27,7 +24,7 @@ test('audit component styles', async ({ page }, testInfo) => {
   console.log('\n--- GLOBAL RADIUS AUDIT REPORT ---')
   for (const comp of components) {
     try {
-      await page.goto(`/?visual=${comp.route}&theme=light`)
+      await page.goto(buildVisualUrl(comp.route, testInfo.project.name))
       await page.waitForSelector('.demo-app-container')
       const radius = await page.$eval(
         comp.selector,
@@ -40,7 +37,7 @@ test('audit component styles', async ({ page }, testInfo) => {
   }
 
   // 特殊审计：TreeSelect
-  await page.goto('/?visual=form&theme=light')
+  await page.goto(buildVisualUrl('form', testInfo.project.name))
   await page.waitForSelector('.demo-app-container')
   console.log('\n--- INTERACTION AUDIT: TREESELECT ---')
   const treeSelect = page.locator('[data-testid="unique-tree-select"]')

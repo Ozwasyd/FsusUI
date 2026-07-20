@@ -1,36 +1,13 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
+import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
 
 const diagnostics = new WeakMap<Page, string[]>()
 const transparentPng = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=',
   'base64',
 )
-
-const getVisualVariant = (projectName: string) => {
-  switch (projectName) {
-    case 'mobile-light':
-      return { theme: 'light', compact: true }
-    case 'desktop-dark':
-      return { theme: 'dark', compact: false }
-    case 'mobile-dark':
-      return { theme: 'dark', compact: true }
-    default:
-      return { theme: 'light', compact: false }
-  }
-}
-
-const buildVisualUrl = (mode: string, projectName: string) => {
-  const { theme, compact } = getVisualVariant(projectName)
-  const params = new URLSearchParams()
-
-  params.set('visual', mode)
-  params.set('theme', theme)
-  if (compact) params.set('compact', '1')
-
-  return `/?${params.toString()}`
-}
 
 const stabilizePage = async (page: Page) => {
   await page.addStyleTag({

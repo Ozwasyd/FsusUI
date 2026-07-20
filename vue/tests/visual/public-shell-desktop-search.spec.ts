@@ -1,18 +1,22 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
+import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
 
 const modes = ['inline', 'trigger', 'none'] as const
 const diagnostics = new WeakMap<Page, string[]>()
 
 const openMode = async (
   page: Page,
+  projectName: string,
   mode: (typeof modes)[number],
   cspSafe = false,
 ) => {
-  const cspQuery = cspSafe ? '&cspSafe=1' : ''
   await page.goto(
-    `/?visual=public-shell-search-mode&searchMode=${mode}${cspQuery}`,
+    buildVisualUrl('public-shell-search-mode', projectName, {
+      searchMode: mode,
+      cspSafe: cspSafe ? 1 : undefined,
+    }),
     { waitUntil: 'domcontentloaded' },
   )
   await expect(page.getByTestId('public-shell-search-fixture')).toBeVisible()
@@ -45,22 +49,19 @@ const shellGeometry = async (page: Page) =>
     }
   })
 
-test.beforeEach(async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name.startsWith('mobile'))
+test.beforeEach(async ({ page }) => {
   diagnostics.set(page, attachPageDiagnostics(page))
 })
 
-test.afterEach(async ({ page }, testInfo) => {
-  if (!testInfo.project.name.startsWith('mobile')) {
-    expect(diagnostics.get(page) ?? []).toEqual([])
-  }
+test.afterEach(async ({ page }) => {
+  expect(diagnostics.get(page) ?? []).toEqual([])
 })
 
 test('renders inline, trigger, and none without shifting shell geometry', async ({
   page,
 }, testInfo) => {
   const geometries = []
-  await openMode(page, 'inline')
+  await openMode(page, testInfo.project.name, 'inline')
 
   for (const mode of modes) {
     if (mode !== 'inline') {
@@ -107,11 +108,10 @@ test('renders inline, trigger, and none without shifting shell geometry', async 
   }
 })
 
-test('aligns 30px brand and 18px navigation text at 1280px', async ({
+test('aligns 30px brand and 18px navigation text in the desktop project', async ({
   page,
 }, testInfo) => {
-  await page.setViewportSize({ width: 1280, height: 900 })
-  await openMode(page, 'inline')
+  await openMode(page, testInfo.project.name, 'inline')
 
   const header = page.locator('[data-public-shell-header]')
   const brand = header.locator('.el-public-shell__brand')
@@ -138,7 +138,7 @@ test('aligns 30px brand and 18px navigation text at 1280px', async ({
   )
   expect(Math.abs(textBaselines[0] - textBaselines[1])).toBeLessThanOrEqual(1)
 
-  await testInfo.attach(`public-shell-baseline-1280-${testInfo.project.name}`, {
+  await testInfo.attach(`public-shell-baseline-${testInfo.project.name}`, {
     body: await header.screenshot({ animations: 'disabled' }),
     contentType: 'image/png',
   })
@@ -148,7 +148,7 @@ test('straddles the header border with a stable 2px active indicator', async ({
   page,
 }, testInfo) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' })
-  await openMode(page, 'inline')
+  await openMode(page, testInfo.project.name, 'inline')
 
   const header = page.locator('[data-public-shell-header]')
   const nav = header.locator('.el-public-shell__desktop-nav')
@@ -227,7 +227,7 @@ test('opens, submits, escapes, and closes outside without stealing focus', async
   page,
 }, testInfo) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await openMode(page, 'trigger')
+  await openMode(page, testInfo.project.name, 'trigger')
 
   const header = page.locator('[data-public-shell-header]')
   const trigger = page.getByRole('link', { name: 'Search archive' })
@@ -311,8 +311,7 @@ test('opens, submits, escapes, and closes outside without stealing focus', async
 test('keeps trigger disclosure free of inline styles in CSP-safe mode', async ({
   page,
 }, testInfo) => {
-  test.skip(testInfo.project.name !== 'desktop-light')
-  await openMode(page, 'trigger', true)
+  await openMode(page, testInfo.project.name, 'trigger', true)
 
   const shell = page.locator('.el-public-shell')
   const trigger = page.getByRole('link', { name: 'Search archive' })

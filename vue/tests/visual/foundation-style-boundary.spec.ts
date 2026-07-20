@@ -1,14 +1,18 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
+import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
 
 const diagnostics = new WeakMap<Page, string[]>()
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page }, testInfo) => {
   diagnostics.set(page, attachPageDiagnostics(page))
-  await page.goto('/?visual=foundation-boundary', {
-    waitUntil: 'domcontentloaded',
-  })
+  await page.goto(
+    buildVisualUrl('foundation-boundary', testInfo.project.name),
+    {
+      waitUntil: 'domcontentloaded',
+    },
+  )
   await expect(page.getByTestId('foundation-boundary-fixture')).toBeVisible()
 })
 
