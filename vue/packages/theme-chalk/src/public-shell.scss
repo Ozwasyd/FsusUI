@@ -219,12 +219,16 @@
   }
 
   @include e(mobile-search-trigger) {
-    min-height: 40px;
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
     border: 1px solid getCssVar('border-color-lighter');
-    border-radius: getCssVar('border-radius', 'small');
+    border-radius: var(--fsus-radius-control, 6px);
     padding: 0 12px;
     background: getCssVar('bg-color');
-    color: getCssVar('text-color', 'primary');
+    color: getCssVar('text-color', 'secondary');
     font: inherit;
     font-size: 12px;
     font-weight: 700;
@@ -234,16 +238,18 @@
     outline: none;
     transition:
       border-color getCssVar('transition-duration-fast'),
+      background-color getCssVar('transition-duration-fast'),
       color getCssVar('transition-duration-fast');
 
     &:hover,
     &:focus-visible {
       border-color: var(--fsus-scholarly-blue);
-      color: var(--fsus-scholarly-blue);
+      background: getCssVar('fill-color', 'light');
+      color: getCssVar('text-color', 'primary');
     }
 
     &:focus-visible {
-      @include a11y-focus-ring(2px, getCssVar('border-radius-small'));
+      @include a11y-focus-ring(2px, var(--fsus-radius-control, 6px));
     }
   }
 
@@ -258,11 +264,12 @@
 
   @include e(mobile-nav-menu-trigger) {
     display: inline-flex;
-    min-height: 40px;
+    min-height: 44px;
     align-items: center;
     justify-content: center;
+    box-sizing: border-box;
     border: 1px solid getCssVar('border-color-lighter');
-    border-radius: getCssVar('border-radius', 'small');
+    border-radius: var(--fsus-radius-control, 6px);
     padding: 0 8px;
     background: getCssVar('bg-color');
     color: getCssVar('text-color', 'secondary');
@@ -273,6 +280,10 @@
     white-space: nowrap;
     cursor: pointer;
     outline: none;
+    transition:
+      border-color getCssVar('transition-duration-fast'),
+      background-color getCssVar('transition-duration-fast'),
+      color getCssVar('transition-duration-fast');
 
     &::-webkit-details-marker {
       display: none;
@@ -285,11 +296,13 @@
     &:hover,
     &:focus-visible,
     [open] > & {
+      border-color: var(--fsus-scholarly-blue);
+      background: getCssVar('fill-color', 'light');
       color: getCssVar('text-color', 'primary');
     }
 
     &:focus-visible {
-      @include a11y-focus-ring(2px, getCssVar('border-radius-small'));
+      @include a11y-focus-ring(2px, var(--fsus-radius-control, 6px));
     }
   }
 
@@ -353,8 +366,9 @@
     align-items: center;
     justify-content: flex-start;
     box-sizing: border-box;
-    border-radius: getCssVar('border-radius', 'small');
-    padding-inline: 10px;
+    border: 1px solid getCssVar('border-color-lighter');
+    border-radius: var(--fsus-radius-control, 6px);
+    padding-inline: 12px;
     color: getCssVar('text-color', 'secondary');
     font-size: 13px;
     font-weight: 500;
@@ -363,21 +377,27 @@
     text-decoration: none;
     white-space: nowrap;
     outline: none;
+    transition:
+      border-color getCssVar('transition-duration-fast'),
+      background-color getCssVar('transition-duration-fast'),
+      color getCssVar('transition-duration-fast');
 
     &:hover,
     &:focus-visible {
+      border-color: var(--fsus-scholarly-blue);
       background: getCssVar('fill-color', 'light');
       color: getCssVar('text-color', 'primary');
     }
 
     @include when(active) {
+      border-color: var(--fsus-scholarly-blue);
       background: getCssVar('fill-color', 'light');
       color: getCssVar('text-color', 'primary');
       font-weight: 700;
     }
 
     &:focus-visible {
-      @include a11y-focus-ring(2px, getCssVar('border-radius-small'));
+      @include a11y-focus-ring(2px, var(--fsus-radius-control, 6px));
     }
   }
 
@@ -621,6 +641,18 @@
     }
 
     @include e(active-nav-indicator) {
+      transition: none;
+    }
+
+    @include e(mobile-search-trigger) {
+      transition: none;
+    }
+
+    @include e(mobile-nav-menu-trigger) {
+      transition: none;
+    }
+
+    @include e(mobile-nav-link) {
       transition: none;
     }
 

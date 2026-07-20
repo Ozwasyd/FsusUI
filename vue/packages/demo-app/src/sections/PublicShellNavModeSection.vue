@@ -7,7 +7,9 @@
     mobile-nav-label="Primary sections"
     mobile-nav-menu-label="Sections"
     :nav-items="navItems"
-    :show-search="false"
+    desktop-search-mode="none"
+    mobile-search-mode="trigger"
+    mobile-search-trigger-label="Search"
     :sticky="false"
     :csp-safe="cspSafe"
   >

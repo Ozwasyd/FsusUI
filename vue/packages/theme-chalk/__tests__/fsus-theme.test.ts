@@ -2065,8 +2065,9 @@ describe('Fsus theme visual baseline', () => {
       expectCssRule(css, '.el-public-shell__bottom-tab', ['display: none;'])
       expectCssRule(css, '.el-public-shell__mobile-nav-menu-trigger', [
         'display: inline-flex;',
-        'min-height: 40px;',
+        'min-height: 44px;',
         'border: 1px solid var(--el-border-color-lighter);',
+        'border-radius: var(--fsus-radius-control, 6px);',
         'background: var(--el-bg-color);',
         'list-style: none;',
       ])
@@ -2080,6 +2081,9 @@ describe('Fsus theme visual baseline', () => {
       expectCssRule(css, '.el-public-shell__mobile-nav-link', [
         'width: 100%;',
         'min-height: 44px;',
+        'border: 1px solid var(--el-border-color-lighter);',
+        'border-radius: var(--fsus-radius-control, 6px);',
+        'padding-inline: 12px;',
         'justify-content: flex-start;',
         'text-align: start;',
       ])
@@ -2200,9 +2204,18 @@ describe('Fsus theme visual baseline', () => {
 
     for (const css of [publicShellCss, criticalCss]) {
       expectCssRule(css, '.el-public-shell__mobile-search-trigger', [
-        'min-height: 40px;',
+        'display: inline-flex;',
+        'min-height: 44px;',
         'border: 1px solid var(--el-border-color-lighter);',
+        'border-radius: var(--fsus-radius-control, 6px);',
       ])
+      for (const selector of [
+        '.el-public-shell__mobile-search-trigger',
+        '.el-public-shell__mobile-nav-menu-trigger',
+        '.el-public-shell__mobile-nav-link',
+      ]) {
+        expectCssRule(css, selector, ['transition: none;'])
+      }
       expectCssRule(css, '.el-public-shell__mobile-search-row', [
         'display: none;',
         'margin-top: 12px;',

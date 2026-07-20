@@ -86,6 +86,57 @@ test('keeps menu focus order and navigation semantics native', async ({
   await expect(trigger).toBeFocused()
 })
 
+test('uses one 44px bordered affordance language at 375px', async ({
+  page,
+}, testInfo) => {
+  await page.setViewportSize({ width: 375, height: 1000 })
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await openMode(page, 'menu')
+
+  const header = page.locator('[data-public-shell-header]')
+  const menuTrigger = page.getByRole('button', { name: 'Sections' })
+  const searchTrigger = page.getByRole('link', { name: 'Search' })
+  await menuTrigger.focus()
+  await page.keyboard.press('Enter')
+  const navLinks = page
+    .getByRole('navigation', { name: 'Primary sections' })
+    .getByRole('link')
+
+  for (const control of [menuTrigger, searchTrigger, navLinks.first()]) {
+    await expect(control).toHaveCSS('min-height', '44px')
+    await expect(control).toHaveCSS('border-top-style', 'solid')
+    await expect(control).toHaveCSS('border-top-width', '1px')
+    await expect(control).toHaveCSS('border-radius', '6px')
+    await expect(control).toHaveCSS('transition-duration', /^(?:0s(?:, )?)+$/u)
+  }
+
+  for (let index = 0; index <= (await navLinks.count()); index += 1) {
+    await page.keyboard.press('Tab')
+  }
+  await expect(searchTrigger).toBeFocused()
+  await expect(searchTrigger).toHaveCSS(
+    'box-shadow',
+    /rgb\(42, 89, 156\) 0px 0px 0px 2px inset/u,
+  )
+  const rowHeights = await Promise.all(
+    [menuTrigger, searchTrigger].map((control) =>
+      control.evaluate((element) => element.getBoundingClientRect().height),
+    ),
+  )
+  expect(new Set(rowHeights)).toEqual(new Set([44]))
+  const overflow = await page.evaluate(
+    () =>
+      document.documentElement.scrollWidth -
+      document.documentElement.clientWidth,
+  )
+  expect(overflow).toBeLessThanOrEqual(1)
+
+  await testInfo.attach('public-shell-mobile-bordered-375', {
+    body: await header.screenshot({ animations: 'disabled' }),
+    contentType: 'image/png',
+  })
+})
+
 test('keeps CSP-safe menu open through its class-driven leave lifecycle', async ({
   page,
 }) => {
@@ -182,9 +233,15 @@ test('exposes inline, bottom, and none modes without duplicate landmarks', async
     Number.parseFloat(bottomMetrics.dockPaddingBottom),
   ).toBeGreaterThanOrEqual(0)
 
-  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
-  const footerBounds = await page.locator('.el-public-shell__footer').boundingBox()
-  const dockBounds = await page.locator('[data-fsus-bottom-tab-bar]').boundingBox()
+  await page.evaluate(() =>
+    window.scrollTo(0, document.documentElement.scrollHeight),
+  )
+  const footerBounds = await page
+    .locator('.el-public-shell__footer')
+    .boundingBox()
+  const dockBounds = await page
+    .locator('[data-fsus-bottom-tab-bar]')
+    .boundingBox()
   expect(footerBounds).not.toBeNull()
   expect(dockBounds).not.toBeNull()
   expect(footerBounds!.y + footerBounds!.height).toBeLessThanOrEqual(

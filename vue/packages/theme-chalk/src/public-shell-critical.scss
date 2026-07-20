@@ -243,17 +243,37 @@
   }
 
   @include e(mobile-search-trigger) {
-    min-height: 40px;
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
     border: 1px solid var(--#{$namespace}-border-color-lighter);
-    border-radius: var(--#{$namespace}-border-radius-small);
+    border-radius: var(--fsus-radius-control, 6px);
     padding: 0 12px;
     background: var(--#{$namespace}-bg-color);
-    color: var(--#{$namespace}-text-color-primary);
+    color: var(--#{$namespace}-text-color-secondary);
     font: inherit;
     font-size: 12px;
     font-weight: 700;
     line-height: 1;
     white-space: nowrap;
+    outline: none;
+    transition:
+      border-color var(--#{$namespace}-transition-duration-fast),
+      background-color var(--#{$namespace}-transition-duration-fast),
+      color var(--#{$namespace}-transition-duration-fast);
+
+    &:hover,
+    &:focus-visible {
+      border-color: var(--fsus-scholarly-blue);
+      background: var(--#{$namespace}-fill-color-light);
+      color: var(--#{$namespace}-text-color-primary);
+    }
+
+    &:focus-visible {
+      @include a11y-focus-ring(2px, var(--fsus-radius-control, 6px));
+    }
   }
 
   @include e(mobile-nav-menu) {
@@ -267,11 +287,12 @@
 
   @include e(mobile-nav-menu-trigger) {
     display: inline-flex;
-    min-height: 40px;
+    min-height: 44px;
     align-items: center;
     justify-content: center;
     border: 1px solid var(--#{$namespace}-border-color-lighter);
-    border-radius: var(--#{$namespace}-border-radius-small);
+    box-sizing: border-box;
+    border-radius: var(--fsus-radius-control, 6px);
     padding: 0 8px;
     background: var(--#{$namespace}-bg-color);
     color: var(--#{$namespace}-text-color-secondary);
@@ -280,6 +301,23 @@
     line-height: 1;
     list-style: none;
     white-space: nowrap;
+    outline: none;
+    transition:
+      border-color var(--#{$namespace}-transition-duration-fast),
+      background-color var(--#{$namespace}-transition-duration-fast),
+      color var(--#{$namespace}-transition-duration-fast);
+
+    &:hover,
+    &:focus-visible,
+    [open] > & {
+      border-color: var(--fsus-scholarly-blue);
+      background: var(--#{$namespace}-fill-color-light);
+      color: var(--#{$namespace}-text-color-primary);
+    }
+
+    &:focus-visible {
+      @include a11y-focus-ring(2px, var(--fsus-radius-control, 6px));
+    }
 
     &::-webkit-details-marker {
       display: none;
@@ -348,8 +386,9 @@
     align-items: center;
     justify-content: flex-start;
     box-sizing: border-box;
-    border-radius: var(--#{$namespace}-border-radius-small);
-    padding-inline: 10px;
+    border: 1px solid var(--#{$namespace}-border-color-lighter);
+    border-radius: var(--fsus-radius-control, 6px);
+    padding-inline: 12px;
     color: var(--#{$namespace}-text-color-secondary);
     font-size: 13px;
     font-weight: 500;
@@ -357,11 +396,28 @@
     text-align: start;
     text-decoration: none;
     white-space: nowrap;
+    outline: none;
+    transition:
+      border-color var(--#{$namespace}-transition-duration-fast),
+      background-color var(--#{$namespace}-transition-duration-fast),
+      color var(--#{$namespace}-transition-duration-fast);
+
+    &:hover,
+    &:focus-visible {
+      border-color: var(--fsus-scholarly-blue);
+      background: var(--#{$namespace}-fill-color-light);
+      color: var(--#{$namespace}-text-color-primary);
+    }
 
     @include when(active) {
+      border-color: var(--fsus-scholarly-blue);
       background: var(--#{$namespace}-fill-color-light);
       color: var(--#{$namespace}-text-color-primary);
       font-weight: 700;
+    }
+
+    &:focus-visible {
+      @include a11y-focus-ring(2px, var(--fsus-radius-control, 6px));
     }
   }
 
@@ -544,6 +600,18 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    @include e(mobile-search-trigger) {
+      transition: none;
+    }
+
+    @include e(mobile-nav-menu-trigger) {
+      transition: none;
+    }
+
+    @include e(mobile-nav-link) {
+      transition: none;
+    }
+
     &-mobile-nav-menu-enter-active,
     &-mobile-nav-menu-leave-active {
       transition: none;
