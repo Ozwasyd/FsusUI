@@ -144,14 +144,16 @@
 
   @include e(brand-nav) {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: var(--#{$namespace}-public-shell-nav-gap, 2rem);
     min-width: 0;
   }
 
   @include e(brand) {
     flex: 0 0 auto;
-    line-height: 1.2;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.25;
     text-decoration: none;
     white-space: nowrap;
   }
@@ -161,6 +163,23 @@
     align-items: center;
     gap: var(--#{$namespace}-public-shell-nav-gap, 2rem);
     min-width: 0;
+  }
+
+  @include e(nav-link) {
+    flex: 0 0 auto;
+    border-bottom: 2px solid transparent;
+    padding-bottom: 0;
+    color: var(--#{$namespace}-text-color-secondary);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+    text-decoration: none;
+    white-space: nowrap;
+
+    @include when(active) {
+      border-bottom-color: var(--fsus-scholarly-blue);
+      color: var(--#{$namespace}-text-color-primary);
+    }
   }
 
   @include e(actions) {

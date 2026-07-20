@@ -395,7 +395,9 @@ describe('Fsus theme visual baseline', () => {
     ])
     expectCssRule(publicShellCss, '.el-public-shell__nav-link', [
       'border-bottom: 2px solid transparent;',
-      'padding-bottom: 2px;',
+      'padding-bottom: 0;',
+      'font-size: 12px;',
+      'line-height: 1.5;',
     ])
     expectCssRule(publicShellCss, '.el-public-shell__nav-link.is-active', [
       'border-bottom-color: var(--fsus-scholarly-blue);',
@@ -2181,6 +2183,12 @@ describe('Fsus theme visual baseline', () => {
       'grid-template-columns: minmax(0, 1fr) auto;',
       'align-items: center;',
     ])
+    expectCssRule(css, '.el-site-header__brand-nav', ['align-items: baseline;'])
+    expectCssRule(css, '.el-site-header__brand', [
+      'font-size: 24px;',
+      'font-weight: 700;',
+      'line-height: 1.25;',
+    ])
     expectCssRule(css, '.el-site-header__desktop-nav', ['display: flex;'])
     expectCssRule(css, '.el-site-header__mobile-primary-actions', [
       'display: none;',
@@ -2196,6 +2204,23 @@ describe('Fsus theme visual baseline', () => {
     expectCssRule(css, '.el-site-header__mobile-primary-actions', [
       'display: inline-flex;',
     ])
+    for (const shellCss of [publicShellCss, criticalCss]) {
+      expectCssRule(shellCss, '.el-public-shell__brand-nav', [
+        'align-items: baseline;',
+      ])
+      expectCssRule(shellCss, '.el-public-shell__brand', [
+        'font-size: 24px;',
+        'font-weight: 700;',
+        'line-height: 1.25;',
+      ])
+      expectCssRule(shellCss, '.el-public-shell__nav-link', [
+        'border-bottom: 2px solid transparent;',
+        'padding-bottom: 0;',
+        'font-size: 12px;',
+        'font-weight: 700;',
+        'line-height: 1.5;',
+      ])
+    }
   })
 
   test('supports public shell trigger-based mobile search motion', () => {

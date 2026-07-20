@@ -41,7 +41,7 @@
 
   @include e(brand-nav) {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: var(--#{$namespace}-site-header-nav-gap, 2rem);
     min-width: 0;
   }
@@ -52,7 +52,7 @@
     color: getCssVar('text-color', 'primary');
     font-size: 24px;
     font-weight: 700;
-    line-height: 1.2;
+    line-height: 1.25;
     white-space: nowrap;
 
     :where(a, button) {

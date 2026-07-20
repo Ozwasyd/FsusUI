@@ -107,6 +107,43 @@ test('renders inline, trigger, and none without shifting shell geometry', async 
   }
 })
 
+test('aligns 30px brand and 18px navigation text at 1280px', async ({
+  page,
+}, testInfo) => {
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await openMode(page, 'inline')
+
+  const header = page.locator('[data-public-shell-header]')
+  const brand = header.locator('.el-public-shell__brand')
+  const navLink = header.locator('.el-public-shell__nav-link').first()
+  await expect(brand).toHaveCSS('font-size', '24px')
+  await expect(brand).toHaveCSS('line-height', '30px')
+  await expect(navLink).toHaveCSS('font-size', '12px')
+  await expect(navLink).toHaveCSS('line-height', '18px')
+  await expect(navLink).toHaveCSS('padding-bottom', '0px')
+
+  const textBaselines = await Promise.all(
+    [brand, navLink].map((locator) =>
+      locator.evaluate((element) => {
+        const marker = document.createElement('span')
+        marker.setAttribute('aria-hidden', 'true')
+        marker.style.cssText =
+          'display:inline-block;width:0;height:0;vertical-align:baseline;pointer-events:none'
+        element.append(marker)
+        const baseline = marker.getBoundingClientRect().bottom
+        marker.remove()
+        return baseline
+      }),
+    ),
+  )
+  expect(Math.abs(textBaselines[0] - textBaselines[1])).toBeLessThanOrEqual(1)
+
+  await testInfo.attach(`public-shell-baseline-1280-${testInfo.project.name}`, {
+    body: await header.screenshot({ animations: 'disabled' }),
+    contentType: 'image/png',
+  })
+})
+
 test('opens, submits, escapes, and closes outside without stealing focus', async ({
   page,
 }, testInfo) => {
