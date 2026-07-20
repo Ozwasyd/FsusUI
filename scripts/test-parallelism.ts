@@ -1,5 +1,5 @@
 import { availableParallelism, cpus } from 'node:os'
-import { resolveVisualCapacityPlan } from './visual-capacity.mjs'
+import { resolveVisualCapacityPlan } from './visual-capacity.cjs'
 
 const positiveInteger = (value: string | undefined) => {
   if (!value) return undefined

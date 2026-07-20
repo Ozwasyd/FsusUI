@@ -1,0 +1,9 @@
+{
+  "availableParallelism": 16,
+  "cpuCount": 32,
+  "totalMemoryBytes": 17179869184,
+  "files": {
+    "/sys/fs/cgroup/cpu,cpuacct/cpu.cfs_quota_us": "250000",
+    "/sys/fs/cgroup/cpu,cpuacct/cpu.cfs_period_us": "100000"
+  }
+}

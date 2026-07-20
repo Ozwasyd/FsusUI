@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { spawnSync } from 'node:child_process'
 import test from 'node:test'
 import { fileURLToPath } from 'node:url'
@@ -23,6 +24,8 @@ const fixture = (name) =>
       'utf8',
     ),
   )
+
+const require = createRequire(import.meta.url)
 
 test('parses cgroup v1 and v2 CPU and memory controllers', () => {
   assert.equal(parseCgroupV2CpuMax('250000 100000'), 2.5)
@@ -128,6 +131,24 @@ test('host probe supports virtual cgroup files without browser or network depend
   assert.equal(createVisualCapacityPlan(snapshot).effectiveCpu, 2)
 })
 
+test('host probe reads cgroup v1 CPU limits from a combined cpu,cpuacct mount', () => {
+  const combined = fixture('cgroup-v1-combined-controller')
+  const files = new Map(Object.entries(combined.files))
+  const snapshot = probeVisualCapacityHost({
+    readFile: (path) => {
+      if (!files.has(path)) throw new Error('ENOENT')
+      return files.get(path)
+    },
+    availableParallelism: () => combined.availableParallelism,
+    cpuCount: () => combined.cpuCount,
+    totalMemoryBytes: () => combined.totalMemoryBytes,
+  })
+
+  assert.equal(snapshot.cgroupV1CpuQuota, '250000')
+  assert.equal(snapshot.cgroupV1CpuPeriod, '100000')
+  assert.equal(createVisualCapacityPlan(snapshot).effectiveCpu, 2)
+})
+
 test('serializes one validated plan for every visual consumer', () => {
   const plan = createVisualCapacityPlan(fixture('high-resource'))
   const serialized = serializeVisualCapacityPlan(plan)
@@ -135,6 +156,18 @@ test('serializes one validated plan for every visual consumer', () => {
   assert.equal(
     serializeVisualCapacityPlan(parseVisualCapacityPlan(serialized)),
     serialized,
+  )
+})
+
+test('exposes the same planner through the Playwright-safe CommonJS boundary', () => {
+  const cjsCapacity = require('../scripts/visual-capacity.cjs')
+  const snapshot = fixture('high-resource')
+
+  assert.equal(
+    serializeVisualCapacityPlan(createVisualCapacityPlan(snapshot)),
+    cjsCapacity.serializeVisualCapacityPlan(
+      cjsCapacity.createVisualCapacityPlan(snapshot),
+    ),
   )
 })
 
@@ -171,7 +204,7 @@ test('rejects malformed shared plan input instead of silently reprobeing', () =>
 
 test('dry-run is deterministic from a fixture and imports no browser or network client', () => {
   const moduleSource = readFileSync(
-    new URL('../scripts/visual-capacity.mjs', import.meta.url),
+    new URL('../scripts/visual-capacity.cjs', import.meta.url),
     'utf8',
   )
   assert.doesNotMatch(
@@ -206,7 +239,7 @@ test('dry-run is deterministic from a fixture and imports no browser or network 
 
 test('policy source prevents cpus length from becoming a visual worker count', () => {
   const source = readFileSync(
-    new URL('../scripts/visual-capacity.mjs', import.meta.url),
+    new URL('../scripts/visual-capacity.cjs', import.meta.url),
     'utf8',
   )
 

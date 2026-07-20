@@ -22,7 +22,8 @@ const previewConfig = readFileSync('vue/playwright.config.ts', 'utf8')
 const devConfig = readFileSync('vue/playwright.dev.config.ts', 'utf8')
 const testParallelism = readFileSync('scripts/test-parallelism.ts', 'utf8')
 const auditSpec = readFileSync('vue/tests/visual/ui-audit-all.spec.ts', 'utf8')
-const capacitySource = readFileSync('scripts/visual-capacity.mjs', 'utf8')
+const capacitySource = readFileSync('scripts/visual-capacity.cjs', 'utf8')
+const capacityFacade = readFileSync('scripts/visual-capacity.mjs', 'utf8')
 const capacityFixture = JSON.parse(
   readFileSync('tests/fixtures/visual-capacity/high-resource.json', 'utf8'),
 )
@@ -175,11 +176,16 @@ assert(
   'dev config must consume devWorkers from the shared visual capacity plan',
 )
 assert(
-  testParallelism.includes("from './visual-capacity.mjs'") &&
+  testParallelism.includes("from './visual-capacity.cjs'") &&
     testParallelism.includes('resolveVisualAuditBucketCount') &&
     testParallelism.includes('resolveVisualCapacityPlan().previewWorkers') &&
     testParallelism.includes('resolveVisualCapacityPlan().devWorkers'),
   'visual worker and audit readers must share the visual capacity module',
+)
+assert(
+  capacityFacade.includes("from './visual-capacity.cjs'") &&
+    capacitySource.includes('module.exports ='),
+  'visual capacity must keep a CJS-safe core behind its ESM CLI facade',
 )
 assert(
   auditSpec.includes('resolveVisualAuditBucketCount()') &&
