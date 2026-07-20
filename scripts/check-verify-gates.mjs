@@ -37,7 +37,6 @@ for (const script of [
   '_verify:pr-fast:parallel',
   '_verify:parallel',
   '_test:unit:parallel',
-  '_test:visual:parallel',
   'typecheck',
   'typecheck:no-cache',
 ]) {
@@ -46,6 +45,10 @@ for (const script of [
     `${script} must collect every parallel failure before exiting`,
   )
 }
+assert(
+  scripts['test:visual:full']?.includes('scripts/run-visual-tests.mjs'),
+  'test:visual:full must use the visual orchestration runner',
+)
 assert(
   scripts['typecheck:affected']?.includes(
     'scripts/run-affected-gate.mjs typecheck',

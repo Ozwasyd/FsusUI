@@ -392,10 +392,6 @@ jobs:
   visual:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        project: [desktop-light, mobile-light, desktop-dark, mobile-dark]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -432,15 +428,20 @@ jobs:
           echo "icons-cache-hit=${{ steps.icons-cache.outputs.cache-hit }}"
           echo "wasm-cache-hit=${{ steps.wasm-cache.outputs.cache-hit }}"
       - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm test:visual --project=${{ matrix.project }}
+      - name: Print visual execution plan
+        run: pnpm test:visual:plan
+      - name: Run visual suites
+        run: pnpm test:visual:full
       - uses: actions/upload-artifact@v4
         if: failure()
         continue-on-error: true
         with:
-          name: avalonia-screenshots-${{ matrix.project }}
+          name: avalonia-screenshots-${{ inputs.group }}
           path: |
-            playwright-report
-            test-results
+            playwright-report/visual-preview
+            playwright-report/demo-app-dev
+            vue/test-results/visual-preview
+            vue/test-results/demo-app-dev
 
   stable-readiness:
     runs-on: ubuntu-latest
