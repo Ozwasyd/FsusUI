@@ -50,7 +50,10 @@ describe('TreeSelect row contract', () => {
       ruleBody(css, '.el-tree-select__popper .el-tree-node__expand-icon'),
     ).toContain('opacity: 1;')
     expect(
-      ruleBody(css, '.el-tree-select__popper .el-tree-node__content:hover'),
+      ruleBody(
+        css,
+        '.el-tree-select__popper .el-tree-node:not(.is-current) > .el-tree-node__content:hover',
+      ),
     ).toContain('background: var(--fsus-state-hover-bg);')
     expect(
       ruleBody(

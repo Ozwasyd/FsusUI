@@ -45,11 +45,6 @@
       color: getCssVar('text-color', 'regular');
       overflow: hidden;
 
-      &:hover {
-        background: var(--fsus-state-hover-bg);
-        color: var(--fsus-scholarly-blue);
-      }
-
       > .#{$namespace}-tree-node__expand-icon {
         grid-column: 1;
       }
@@ -67,6 +62,15 @@
       > .#{$namespace}-select-dropdown__item {
         grid-column: 4;
       }
+    }
+
+    // Keep TreeSelect's coherent row state above the generic Tree reset in
+    // fsus-theme.scss, whose non-current selector is intentionally stronger
+    // than the base Tree hover rule.
+    .#{$namespace}-tree-node:not(.is-current)
+      > .#{$namespace}-tree-node__content:hover {
+      background: var(--fsus-state-hover-bg);
+      color: var(--fsus-scholarly-blue);
     }
 
     .#{$namespace}-tree-node__expand-icon {

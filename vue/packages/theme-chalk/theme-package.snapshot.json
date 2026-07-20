@@ -3,6 +3,6 @@
   "source": "src/fsus.scss",
   "modes": ["light", "dark"],
   "components": ["Button", "Input", "Tabs", "Dialog", "Empty"],
-  "bytes": 561391,
-  "sha256": "ac59bbf21e2a19fb75023b2d70ed69c336ed33a335429bc3e8d83451ba5b2c4b"
+  "bytes": 561422,
+  "sha256": "fc83a4b7f0389b7966aea91549e6f4fec79c634284ba9db294e897e0613f8990"
 }
