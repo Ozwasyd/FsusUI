@@ -111,8 +111,19 @@ const validate = (source) => {
     'stable-readiness must aggregate both .NET jobs',
   )
   assert(
-    stable.includes('node scripts/check-dotnet-manifests.mjs'),
-    'stable-readiness must verify platform and package manifests',
+    stable.includes('node scripts/ci-readiness.mjs check') &&
+      stable.includes('--profile stable'),
+    'stable-readiness must verify platform and package manifests through the readiness aggregator',
+  )
+  assert(
+    platform.includes('gate: dotnet-platform') &&
+      platform.includes('platform=${{ matrix.platform }}'),
+    'each .NET platform owner must emit its structured platform manifest',
+  )
+  assert(
+    packageJob.includes('gate: dotnet-package') &&
+      packageJob.includes('nuget-candidate=dotnet/artifacts'),
+    'the unique NuGet owner must emit candidate digest evidence',
   )
   assert(
     !source.includes('pnpm run dotnet:verify'),

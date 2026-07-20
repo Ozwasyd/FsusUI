@@ -1,0 +1,32 @@
+[
+  {
+    "name": "missing job",
+    "mutation": "missing",
+    "expected": "Missing required leaf manifest"
+  },
+  {
+    "name": "duplicate shard",
+    "mutation": "duplicate",
+    "expected": "Duplicate readiness manifest"
+  },
+  {
+    "name": "SHA mismatch",
+    "mutation": "sha",
+    "expected": "commit SHA mismatch"
+  },
+  {
+    "name": "stale artifact",
+    "mutation": "stale",
+    "expected": "stale artifact"
+  },
+  {
+    "name": "digest mismatch",
+    "mutation": "digest",
+    "expected": "artifact digest mismatch"
+  },
+  {
+    "name": "cancelled leaf",
+    "mutation": "cancelled",
+    "expected": "leaf status is cancelled"
+  }
+]

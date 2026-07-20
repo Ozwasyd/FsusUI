@@ -47,7 +47,10 @@ const validateStableChecklistCoverage = (content, spec, label) => {
       .split('\n')
       .find((line) => line.includes(`\`${family}\``))
       ?.toLowerCase()
-    if (!familyLine || !familyLine.includes('release-evidence/avalonia-stable/')) {
+    if (
+      !familyLine ||
+      !familyLine.includes('release-evidence/avalonia-stable/')
+    ) {
       throw new Error(`${label} missing evidence link for ${family}`)
     }
   }
@@ -110,15 +113,11 @@ const validateWorkflow = (qualityWorkflow, reusableWorkflow, spec, label) => {
   assertIncludes(qualityWorkflow, 'workflow_dispatch:', label)
   assertIncludes(reusableWorkflow, 'workflow_call:', label)
   assertIncludes(reusableWorkflow, 'group:', label)
-  assertIncludes(reusableWorkflow, 'pnpm run verify:nightly', label)
-  assertIncludes(reusableWorkflow, 'pnpm run verify:release', label)
+  assertIncludes(reusableWorkflow, '--profile nightly', label)
+  assertIncludes(reusableWorkflow, '--profile release', label)
   assertIncludes(reusableWorkflow, 'dotnet-platform:', label)
   assertIncludes(reusableWorkflow, 'dotnet-package:', label)
-  assertIncludes(
-    reusableWorkflow,
-    'node scripts/check-dotnet-manifests.mjs',
-    label,
-  )
+  assertIncludes(reusableWorkflow, 'node scripts/ci-readiness.mjs check', label)
   assertIncludes(reusableWorkflow, 'actions/cache@v4', label)
 }
 
@@ -170,7 +169,8 @@ const runFixtureChecks = (spec) => {
       'invalid stable evidence',
     )
   } catch (error) {
-    stableEvidenceMessage = error instanceof Error ? error.message : String(error)
+    stableEvidenceMessage =
+      error instanceof Error ? error.message : String(error)
   }
   if (!stableEvidenceMessage.includes('consumer install results')) {
     throw new Error(

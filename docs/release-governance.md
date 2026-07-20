@@ -15,9 +15,14 @@ Public preview 的 registry 策略、包名策略、dist-tag 策略和 provenanc
 
 - `pnpm verify:pr-fast`：PR 默认快速门，覆盖 lint、按变更路径选择的 affected typecheck/unit、token/icon/design governance 和最小包构建 smoke，不包含 demo build、coverage、visual 或发布包安装。
 - `pnpm verify:full`：完整本地质量门，等价于历史 `pnpm verify` 行为，包含 `prepare:test-artifacts`、`_verify:parallel` 和 `build:demo`。
-- `pnpm verify:stable`：Avalonia stable 门，聚合 token/icon、interaction、visual、a11y、performance、conformance、governance 与 .NET 验证。
-- `pnpm verify:nightly`：nightly 门，在 full gate 之外复跑 coverage、visual、.NET 与 performance 预算。
-- `pnpm verify:release`：发布候选门，在 `verify:full` 和 `verify:stable` 之上增加 npm dist-tag、npm package 和 consumer-install 检查。
+- `pnpm verify:stable`：显式本地开发者入口，执行 token/icon、interaction、visual、a11y、performance、conformance、governance 与 .NET 验证。
+- `pnpm verify:nightly`：显式本地开发者入口，执行 full、coverage、visual、.NET 与 performance 验证。
+- `pnpm verify:release`：显式本地发布候选入口，执行完整检查和唯一 npm candidate/consumer-install 链路。
+
+CI 中的 `stable-readiness`、`nightly-readiness`、`release-readiness` 不调用
+上述 `verify:*`。它们只聚合当前 workflow run 的结构化 leaf manifests，
+校验 SHA、workflow group、run attempt、矩阵完整性、状态和工件 digest 后
+生成 evidence；完整契约与本地 fixtures 见 `docs/ci-readiness.md`。
 
 `pnpm verify` 保留为 `verify:full` 的安全别名，避免旧脚本降级覆盖面。
 
@@ -278,9 +283,11 @@ candidate validation:
   contracts, then records per-file hashes and one aggregate candidate SHA-256.
 - `static-quality` owns icons, tokens, conformance, governance, and the a11y
   contract. Those checks are never members of the .NET OS matrix.
-- `stable-readiness` downloads the three platform manifests and the exact
-  NuGet candidate, rejects duplicate/missing platforms or commit drift, and
-  recomputes the candidate digest before preserving evidence.
+- Each `.NET` leaf uploads a readiness manifest alongside its existing detailed
+  platform/package artifact. `stable-readiness` consumes the three platform
+  dimensions and unique NuGet owner through the common manifest aggregator,
+  rejecting duplicate/missing platforms, commit/run drift, failed status, or
+  changed artifact digest before preserving evidence.
 
 Use `pnpm dotnet:matrix:plan --os linux,windows,macos` for a static ownership
 plan on any host. `pnpm dotnet:platform:verify` and

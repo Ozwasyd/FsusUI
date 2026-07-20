@@ -40,7 +40,8 @@
     "dotnet-platform",
     "dotnet-nuget-candidate",
     "avalonia-screenshots",
-    "avalonia-generated-artifacts"
+    "avalonia-generated-artifacts",
+    "readiness-manifest-"
   ],
   "requiredEvidenceTerms": [
     "contract version",

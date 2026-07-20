@@ -4,7 +4,7 @@
 
 To regenerate this bundle from CI artifacts:
 
-1. Download `avalonia-stable-evidence`, `avalonia-generated-artifacts`,
+1. Download `avalonia-stable-evidence`, `readiness-manifest-*`, `avalonia-generated-artifacts`,
    `dotnet-platform-{linux,windows,macos}`, `dotnet-nuget-candidate`,
    `avalonia-screenshots-*`, `unit-test-artifacts`,
    and `fsusui-npm-candidate` from the successful release Quality Gates run.
@@ -12,7 +12,7 @@ To regenerate this bundle from CI artifacts:
 3. Run:
 
 ```bash
-pnpm run dotnet:manifests:check -- --root .dotnet-evidence
+pnpm ci:readiness:check --fixtures .readiness --group stable
 node scripts/check-avalonia-stable-readiness.mjs
 ```
 

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "workflowGroup": "stable",
+  "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "gate": "typecheck",
+  "status": "success",
+  "toolchain": { "node": "v22.0.0", "typescript": "5.9.0" },
+  "inputFingerprint": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "artifacts": [],
+  "dimensions": {},
+  "reportSummary": "reports/ok.json",
+  "createdAt": "2026-07-20T00:00:00.000Z",
+  "run": { "id": "42", "attempt": "1" }
+}

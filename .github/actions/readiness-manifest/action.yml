@@ -1,0 +1,54 @@
+name: Record readiness leaf result
+description: Emit and upload a structured result manifest for one CI leaf owner.
+inputs:
+  gate:
+    description: Canonical leaf gate name.
+    required: true
+  group:
+    description: Workflow group for this run.
+    required: true
+  status:
+    description: GitHub job status.
+    required: true
+  dimensions:
+    description: Optional comma-separated name=value dimensions.
+    required: false
+    default: ''
+  artifacts:
+    description: Optional newline-separated name=path artifacts.
+    required: false
+    default: ''
+  artifact-suffix:
+    description: Unique suffix for matrix copies of the same leaf gate.
+    required: false
+    default: single
+runs:
+  using: composite
+  steps:
+    - name: Emit structured leaf manifest
+      shell: bash
+      env:
+        READINESS_GATE: ${{ inputs.gate }}
+        READINESS_GROUP: ${{ inputs.group }}
+        READINESS_STATUS: ${{ inputs.status }}
+        READINESS_DIMENSIONS: ${{ inputs.dimensions }}
+        READINESS_ARTIFACTS: ${{ inputs.artifacts }}
+      run: |
+        args=(emit --gate "$READINESS_GATE" --group "$READINESS_GROUP" --status "$READINESS_STATUS")
+        IFS=',' read -ra dimensions <<< "$READINESS_DIMENSIONS"
+        for dimension in "${dimensions[@]}"; do
+          test -z "$dimension" || args+=(--dimension "$dimension")
+        done
+        while IFS= read -r artifact; do
+          test -z "$artifact" || args+=(--artifact "$artifact")
+        done <<< "$READINESS_ARTIFACTS"
+        node scripts/ci-readiness.mjs "${args[@]}"
+    - name: Upload structured leaf manifest
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: readiness-manifest-${{ inputs.gate }}-${{ inputs.artifact-suffix }}
+        path: .readiness
+        include-hidden-files: true
+        overwrite: true
+        retention-days: 7

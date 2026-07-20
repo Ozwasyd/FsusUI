@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "profiles": {
+    "stable": [
+      "static-quality",
+      "dotnet-platform",
+      "dotnet-package",
+      "typecheck",
+      "unit",
+      "coverage",
+      "build-package",
+      "consumer-install",
+      "build-demo",
+      "visual"
+    ],
+    "nightly": [
+      "static-quality",
+      "dotnet-platform",
+      "dotnet-package",
+      "typecheck",
+      "unit",
+      "coverage",
+      "build-package",
+      "consumer-install",
+      "build-demo",
+      "visual",
+      "real-render-performance"
+    ],
+    "release": [
+      "static-quality",
+      "dotnet-platform",
+      "dotnet-package",
+      "typecheck",
+      "unit",
+      "coverage",
+      "build-package",
+      "consumer-install",
+      "build-demo",
+      "visual",
+      "real-render-performance"
+    ]
+  },
+  "owners": {
+    "static-quality": { "cardinality": "single" },
+    "dotnet-platform": {
+      "cardinality": "matrix",
+      "dimension": "platform",
+      "values": ["linux", "windows", "macos"]
+    },
+    "dotnet-package": { "cardinality": "single" },
+    "typecheck": { "cardinality": "single" },
+    "unit": { "cardinality": "shards", "dimension": "shard" },
+    "coverage": { "cardinality": "single" },
+    "build-package": { "cardinality": "single" },
+    "consumer-install": { "cardinality": "single" },
+    "build-demo": { "cardinality": "single" },
+    "visual": { "cardinality": "single" },
+    "real-render-performance": { "cardinality": "single" }
+  },
+  "artifactBindings": [
+    {
+      "name": "npm-candidate",
+      "producer": "build-package",
+      "consumer": "consumer-install"
+    }
+  ]
+}

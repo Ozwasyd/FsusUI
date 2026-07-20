@@ -43,7 +43,10 @@ Required workflow artifacts:
 - `avalonia-stable-evidence`
 - `avalonia-nightly-evidence`
 - `avalonia-release-evidence`
+- `readiness-manifest-*` (schema-versioned leaf result manifests for this run)
 
-The stable gate is reproducible from workflow artifacts by unpacking
-`avalonia-stable-evidence`, restoring generated artifacts, and rerunning
-`pnpm run verify:stable`.
+The stable aggregation decision is reproducible without rerunning leaf work by
+unpacking `avalonia-stable-evidence` and running
+`pnpm ci:readiness:check --fixtures <unpacked-readiness-root>`. The explicit
+local `pnpm verify:stable` command remains available when a developer wants to
+execute all stable checks again; it is not the CI readiness implementation.
