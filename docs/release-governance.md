@@ -68,12 +68,17 @@ full quality 的 unit shard 由 `unit-artifacts` job 统一准备测试工件并
 和 `pnpm exec vitest run --config vue/vitest.config.ts --shard=<n>/4`。这样 cache miss/generation 日志只集中在
 前置 job，shard 不再重复执行 icon/WASM 生成。
 
-full quality 的 `consumer-install` 复用 `build-package` 产出的
-`fsusui-npm-package-dist`，下载后先用 `sha256sum` 校验
-`fsusui-npm-package-dist.tgz`，再解包 `dist/element-plus` 并运行
-`pnpm run build:package-smoke` 与 `pnpm test:consumer-install`。`verify:release`
-仍按本地 release 顺序执行 `build:npm-package` 后再跑 consumer install，保留
-independent rebuild 语义，便于发布前排查可复现性问题。
+full quality 的 `build-package` 只构建一次，并产出 `fsusui-npm-candidate`
+工件：`fsusui-npm-candidate.tgz`、SHA-256 sidecar 和 candidate manifest。
+manifest 把 candidate digest 绑定到 commit、package name/version、dist-tag、
+canonical package.json、Node/pnpm/npm、lockfile 与 build input fingerprint。
+`consumer-install` 先执行 `package:candidate:verify`，再从同一个 tarball 解包执行
+package smoke，并直接冷安装同一个 tarball；三处日志引用同一个 digest。
+
+`verify:release` 使用同样的本地链路：`package:candidate:build` →
+`package:candidate:verify` → fixture → consumer install，不依赖 Actions artifact
+服务或 npm 权限。需要独立可复现性重建时，将 B 输出到另一个目录，再运行
+`pnpm package:candidate:compare <A.tgz> <B.tgz>`；比较通过也不会替换已经测试的 A。
 
 发布前必须先通过：
 
@@ -156,6 +161,9 @@ workspace 依赖归一化由 `scripts/prepare-npm-package.mjs` 负责，当前�
 - `_quality.yml` 负责统一质量门
 - `publish-npm.yml` 只响应 `v*.*.*` 与 `v*.*.*-*` tag
 - `publish-npm.yml` 先运行可复用质量门，再执行发布
+- publish job 只下载并校验 quality 的 immutable candidate，核对 release profile、
+  commit/tag/package/digest 后执行 `npm publish ./fsusui-npm-candidate.tgz`；禁止重新
+  运行 build/prepare 或发布可变目录。版本已存在时可跳过，但仍记录 candidate digest。
 - 发布 job 不允许绕过质量门直接跑
 
 发布工作流还包含这些保护：

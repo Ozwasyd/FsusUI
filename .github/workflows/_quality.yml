@@ -8,6 +8,10 @@ on:
         required: false
         type: string
         default: main
+    outputs:
+      npm-candidate-digest:
+        description: SHA-256 of the immutable npm candidate tested by quality.
+        value: ${{ jobs.build-package.outputs.candidate-digest }}
 
 jobs:
   real-render-performance:
@@ -296,6 +300,8 @@ jobs:
   build-package:
     runs-on: ubuntu-latest
     timeout-minutes: 40
+    outputs:
+      candidate-digest: ${{ steps.candidate.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -303,7 +309,7 @@ jobs:
           version: 10.33.0
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 22.14.0
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
       - uses: emscripten-core/setup-emsdk@v15
@@ -311,6 +317,8 @@ jobs:
           version: 5.0.4
           actions-cache-folder: emsdk-cache
       - run: pnpm install --frozen-lockfile
+      - name: Use release npm toolchain
+        run: npm install -g npm@^11.5.1
       - name: Restore icons test artifact cache
         id: icons-cache
         uses: actions/cache@v4
@@ -331,17 +339,19 @@ jobs:
         run: |
           echo "icons-cache-hit=${{ steps.icons-cache.outputs.cache-hit }}"
           echo "wasm-cache-hit=${{ steps.wasm-cache.outputs.cache-hit }}"
-      - run: pnpm run build:npm-package
-      - name: Pack npm package dist artifact
+      - name: Build immutable npm candidate
+        id: candidate
         run: |
-          tar -czf fsusui-npm-package-dist.tgz dist/element-plus
-          sha256sum fsusui-npm-package-dist.tgz | tee fsusui-npm-package-dist.sha256
+          pnpm run package:candidate:build
+          digest="$(node -p "require('./dist/npm-candidate/fsusui-npm-candidate.manifest.json').artifact.sha256")"
+          echo "digest=${digest}" >> "${GITHUB_OUTPUT}"
       - uses: actions/upload-artifact@v4
         with:
-          name: fsusui-npm-package-dist
+          name: fsusui-npm-candidate
           path: |
-            fsusui-npm-package-dist.tgz
-            fsusui-npm-package-dist.sha256
+            dist/npm-candidate/fsusui-npm-candidate.tgz
+            dist/npm-candidate/fsusui-npm-candidate.sha256
+            dist/npm-candidate/fsusui-npm-candidate.manifest.json
           retention-days: 1
 
   consumer-install:
@@ -357,22 +367,23 @@ jobs:
           version: 10.33.0
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 22.14.0
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
+      - name: Use release npm toolchain
+        run: npm install -g npm@^11.5.1
       - uses: actions/download-artifact@v4
         with:
-          name: fsusui-npm-package-dist
-          path: .npm-package-artifact
-      - name: Restore npm package dist artifact
+          name: fsusui-npm-candidate
+          path: .npm-candidate
+      - name: Verify immutable npm candidate and package smoke
         run: |
-          (cd .npm-package-artifact && sha256sum -c fsusui-npm-package-dist.sha256)
-          tar -xzf .npm-package-artifact/fsusui-npm-package-dist.tgz
-          test -f dist/element-plus/package.json
-          echo "fsusui-npm-package-dist restored from build-package artifact"
-      - run: pnpm run build:package-smoke
-      - run: pnpm test:consumer-install
+          pnpm run package:candidate:verify -- --tarball .npm-candidate/fsusui-npm-candidate.tgz
+          digest="$(node -p "require('./.npm-candidate/fsusui-npm-candidate.manifest.json').artifact.sha256")"
+          test "${digest}" = "${{ needs.build-package.outputs.candidate-digest }}"
+      - name: Run cold consumer install against candidate
+        run: pnpm test:consumer-install -- .npm-candidate/fsusui-npm-candidate.tgz
 
   build-demo:
     runs-on: ubuntu-latest

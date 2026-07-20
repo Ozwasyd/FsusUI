@@ -6,6 +6,10 @@ const reusableQualityWorkflow = readFileSync(
   '.github/workflows/_quality.yml',
   'utf8',
 )
+const publishWorkflow = readFileSync(
+  '.github/workflows/publish-npm.yml',
+  'utf8',
+)
 const releaseGovernance = readFileSync('docs/release-governance.md', 'utf8')
 const engineeringHandoff = readFileSync('docs/engineering-handoff.md', 'utf8')
 
@@ -37,24 +41,26 @@ assert(
   'package.json must expose check:package-artifact-reuse',
 )
 assert(
-  scripts['governance:check']?.includes('check:package-artifact-reuse'),
-  'governance:check must include the package artifact reuse guard',
+  scripts['governance:check']?.includes('check:package-artifact-reuse') &&
+    scripts['governance:check']?.includes('test:package-candidate'),
+  'governance:check must include candidate policy and fixture guards',
 )
 assert(
-  scripts['verify:release']?.includes('build:npm-package')
-    && scripts['verify:release']?.includes('test:consumer-install'),
-  'verify:release must keep an independent package build before consumer install',
+  scripts['verify:release']?.includes('package:candidate:build') &&
+    scripts['verify:release']?.includes('package:candidate:verify') &&
+    scripts['verify:release']?.includes('test:consumer-install'),
+  'verify:release must build, verify, and consume one immutable candidate',
 )
 assert(buildPackageJob, '_quality.yml must define build-package job')
 assert(consumerInstallJob, '_quality.yml must define consumer-install job')
 for (const fragment of [
-  'pnpm run build:npm-package',
-  'fsusui-npm-package-dist.tgz',
-  'fsusui-npm-package-dist.sha256',
-  'dist/element-plus',
-  'sha256sum',
+  'pnpm run package:candidate:build',
+  'fsusui-npm-candidate.tgz',
+  'fsusui-npm-candidate.sha256',
+  'fsusui-npm-candidate.manifest.json',
   'actions/upload-artifact@v4',
-  'name: fsusui-npm-package-dist',
+  'name: fsusui-npm-candidate',
+  'candidate-digest',
 ]) {
   assert(
     buildPackageJob.includes(fragment),
@@ -63,11 +69,11 @@ for (const fragment of [
 }
 for (const fragment of [
   'actions/download-artifact@v4',
-  'name: fsusui-npm-package-dist',
-  'sha256sum -c',
-  'tar -xzf',
-  'pnpm run build:package-smoke',
-  'pnpm test:consumer-install',
+  'name: fsusui-npm-candidate',
+  'Verify immutable npm candidate and package smoke',
+  'package:candidate:verify',
+  'pnpm test:consumer-install -- .npm-candidate/fsusui-npm-candidate.tgz',
+  'needs.build-package.outputs.candidate-digest',
 ]) {
   assert(
     consumerInstallJob.includes(fragment),
@@ -85,11 +91,33 @@ for (const forbidden of [
   )
 }
 for (const fragment of [
-  'fsusui-npm-package-dist',
-  'sha256sum',
+  'name: fsusui-npm-candidate',
+  'package:candidate:verify',
+  'needs.quality.outputs.npm-candidate-digest',
+  'npm publish ./.npm-candidate/fsusui-npm-candidate.tgz',
+]) {
+  assert(
+    publishWorkflow.includes(fragment),
+    `publish-npm.yml must publish the tested candidate: ${fragment}`,
+  )
+}
+for (const forbidden of [
+  'pnpm run build:npm-package',
+  'pnpm run package:candidate:build',
+  'working-directory: dist/element-plus',
+]) {
+  assert(
+    !publishWorkflow.includes(forbidden),
+    `publish-npm.yml must not rebuild or publish a mutable directory: ${forbidden}`,
+  )
+}
+for (const fragment of [
+  'fsusui-npm-candidate',
+  'candidate manifest',
+  '同一个 tarball',
   'consumer-install',
   'verify:release',
-  'independent rebuild',
+  'package:candidate:compare',
 ]) {
   assert(
     docs.includes(fragment),

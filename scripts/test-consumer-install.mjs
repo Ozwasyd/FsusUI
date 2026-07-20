@@ -13,6 +13,11 @@ import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { brotliCompressSync, constants, gzipSync } from 'node:zlib'
 import { resolvePackageContract } from './npm-package-contract.mjs'
+import {
+  candidateTarballName,
+  readCandidatePackageJson,
+  verifyCandidate,
+} from './npm-candidate-lib.mjs'
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(scriptDir, '..')
@@ -25,6 +30,22 @@ const templateRoot = path.join(
 )
 const distRoot = path.join(repoRoot, 'dist', 'element-plus')
 const distPackagePath = path.join(distRoot, 'package.json')
+const defaultCandidatePath = path.join(
+  repoRoot,
+  'dist',
+  'npm-candidate',
+  candidateTarballName,
+)
+const candidateArgument = process.argv
+  .slice(2)
+  .find((argument) => argument !== '--')
+const candidateTarballPath = candidateArgument
+  ? path.resolve(candidateArgument)
+  : process.env.FSUSUI_NPM_CANDIDATE
+    ? path.resolve(process.env.FSUSUI_NPM_CANDIDATE)
+    : existsSync(defaultCandidatePath)
+      ? defaultCandidatePath
+      : undefined
 const sourcePackagePath = path.join(
   repoRoot,
   'vue',
@@ -46,7 +67,7 @@ const performanceBaseline = JSON.parse(
 const keepConsumerFixture = process.env.FSUS_KEEP_CONSUMER_FIXTURE === '1'
 const checkpointFixturePath = process.env.FSUS_CONSUMER_FIXTURE_PATH
 
-if (!existsSync(distPackagePath)) {
+if (!candidateTarballPath && !existsSync(distPackagePath)) {
   throw new Error(
     'Missing dist/element-plus/package.json. Run `pnpm run build:npm-package` before `pnpm test:consumer-install`.',
   )
@@ -71,7 +92,12 @@ function withCommandOptions(options) {
 }
 
 const sourcePackage = JSON.parse(readFileSync(sourcePackagePath, 'utf8'))
-const distPackage = JSON.parse(readFileSync(distPackagePath, 'utf8'))
+const candidateManifest = candidateTarballPath
+  ? verifyCandidate({ repoRoot, tarballPath: candidateTarballPath })
+  : undefined
+const distPackage = candidateTarballPath
+  ? readCandidatePackageJson(candidateTarballPath)
+  : JSON.parse(readFileSync(distPackagePath, 'utf8'))
 const { packageName, repositoryWebUrl } = resolvePackageContract({
   repoRoot,
   sourcePackageName: sourcePackage.name,
@@ -338,21 +364,23 @@ try {
     )
     writeFileSync(viteConfigPath, viteConfig)
 
-    const packOutput = execFileSync(
-      resolveExecutable('npm'),
-      ['pack', '--silent', '--pack-destination', artifactsRoot],
-      withCommandOptions({
-        cwd: distRoot,
-        encoding: 'utf8',
-      }),
-    )
+    let tarballPath = candidateTarballPath
+    if (!tarballPath) {
+      const packOutput = execFileSync(
+        resolveExecutable('npm'),
+        ['pack', '--silent', '--pack-destination', artifactsRoot],
+        withCommandOptions({
+          cwd: distRoot,
+          encoding: 'utf8',
+        }),
+      )
 
-    const tarballName = packOutput.trim().split(/\r?\n/u).at(-1)
-    if (!tarballName) {
-      throw new Error('npm pack did not return a tarball filename.')
+      const tarballName = packOutput.trim().split(/\r?\n/u).at(-1)
+      if (!tarballName) {
+        throw new Error('npm pack did not return a tarball filename.')
+      }
+      tarballPath = path.join(artifactsRoot, tarballName)
     }
-
-    const tarballPath = path.join(artifactsRoot, tarballName)
 
     run('pnpm', ['install', '--no-frozen-lockfile'], { cwd: fixtureRoot })
     run('pnpm', ['add', tarballPath], { cwd: fixtureRoot })
@@ -389,7 +417,9 @@ try {
   assertNoConsumerBuildWarnings(viteOutput)
   assertConsumerPerformanceGraph(performanceGraph)
 
-  console.log(`Consumer install smoke passed for ${packageName}.`)
+  console.log(
+    `Consumer install smoke passed for ${packageName}${candidateManifest ? ` from candidate ${candidateManifest.artifact.sha256}` : ''}.`,
+  )
 } finally {
   if (checkpointFixturePath) {
     console.log(`Consumer checkpoint preserved at ${fixtureRoot}.`)

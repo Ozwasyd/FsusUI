@@ -75,10 +75,8 @@ pnpm run check:npm-dist-tag
 Before publish, run and record:
 
 ```bash
-pnpm run build:npm-package
-cd dist/element-plus
-npm pack --dry-run --json
-pnpm pack --dry-run
+pnpm package:candidate:build
+pnpm package:candidate:verify dist/npm-candidate/fsusui-npm-candidate.tgz
 ```
 
 Audit the candidate package for:
@@ -104,7 +102,7 @@ Current evidence is recorded in `release-evidence/npm-public-preview/package-aud
 The public candidate must pass a fresh fixture install from the generated tarball:
 
 ```bash
-pnpm test:consumer-install
+pnpm test:consumer-install -- dist/npm-candidate/fsusui-npm-candidate.tgz
 ```
 
 The fixture must verify:
@@ -117,6 +115,33 @@ The fixture must verify:
 - chunk budget and forbidden Vite warning checks
 
 Current evidence is recorded in `release-evidence/npm-public-preview/consumer-install.md`.
+
+### Immutable candidate contract
+
+Release package verification uses one immutable candidate:
+
+```bash
+pnpm package:candidate:build
+pnpm package:candidate:verify dist/npm-candidate/fsusui-npm-candidate.tgz
+pnpm test:consumer-install -- dist/npm-candidate/fsusui-npm-candidate.tgz
+```
+
+The adjacent candidate manifest records the source commit, package identity,
+dist-tag, tarball and canonical package.json digests, Node/pnpm/npm versions,
+lockfile digest, build input fingerprint, and publish/provenance metadata.
+Package smoke, cold consumer installation, release aggregation, and publish all
+use the same tarball digest. The publish workflow never rebuilds the package and
+invokes `npm publish` with the verified `.tgz` path.
+
+An optional rebuild is diagnostic only. Compare it before use:
+
+```bash
+pnpm package:candidate:compare <tested-a.tgz> <rebuilt-b.tgz>
+```
+
+The comparison checks the canonical file list and content digests. There are no
+registered ignored nondeterministic fields. Even after a successful comparison,
+the tested candidate A remains the publish input.
 
 ## Release Evidence
 

@@ -99,14 +99,14 @@ FsusBlog 侧的消费规则：页面只消费 FsusUI 导出的 component / direc
 - `pnpm run build:wasm` 保留显式 force regeneration 语义；需要强制重建所有测试工件时可使用 `FORCE_REBUILD=1 pnpm run prepare:test-artifacts`。
 - `_quality.yml` 的 `unit-artifacts` job 会先生成并上传 `unit-test-artifacts`，unit shard 只下载该工件、解包、执行 `pnpm run check:test-artifacts-ready`，再运行 `pnpm exec vitest run --config vue/vitest.config.ts --shard=<n>/4`。
 - 本地复现 unit shard 时，先运行 `pnpm run prepare:test-artifacts`，再运行 `pnpm run check:test-artifacts-ready` 和目标 `vitest run --shard` 命令；不要在每个 shard 前重复生成 icon/WASM 工件。
-- `_quality.yml` 的 `build-package` job 会上传 `fsusui-npm-package-dist`，其中包含 `fsusui-npm-package-dist.tgz` 与 `sha256sum` 文件；`consumer-install` 只下载、校验、解包该工件并运行 `build:package-smoke` / `test:consumer-install`，不再重复执行 `build:npm-package`。
-- `verify:release` 仍保留 independent rebuild：本地发布验收会重新执行 `build:npm-package`，再运行 consumer install，避免发布路径只依赖 workflow artifact。
+- `_quality.yml` 的 `build-package` job 会上传 `fsusui-npm-candidate`，其中包含唯一 npm tarball、SHA-256 sidecar 与 candidate manifest，并导出 `candidate-digest`。`consumer-install` 校验该 digest，从同一个 tarball 执行 package smoke 和冷安装，不再构建第二份目录。
+- `verify:release` 可在本地从零运行 `package:candidate:build`、`package:candidate:verify`、candidate fixtures 与 consumer install。独立重建必须用 `package:candidate:compare` 比较 canonical 文件树；不得无比较地替换已测试 candidate。
 
 ### CI 入口
 
 - `.github/workflows/quality.yml` 是统一质量入口
 - `.github/workflows/_quality.yml` 是可复用质量门定义
-- `publish-npm.yml` 必须依赖质量门通过后再发布
+- `publish-npm.yml` 必须依赖 release quality 门，下载同一个 `fsusui-npm-candidate`，核对 commit/tag/package/digest，并以该 tarball 作为 `npm publish` 输入；publish job 禁止 build 或 prepare
 
 当前 CI job 分工：
 
