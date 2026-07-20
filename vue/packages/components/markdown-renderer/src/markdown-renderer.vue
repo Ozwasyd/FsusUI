@@ -6,16 +6,16 @@
       markdownSurfaceClasses.body,
       {
         'is-rendering': isRendering,
-        'is-rendering-empty': showInitialLoading,
+        'is-rendering-empty': showInitialLoading(),
       },
     ]"
     role="article"
     aria-live="polite"
     :aria-busy="isRendering ? 'true' : 'false'"
-    v-bind="rootRenderAttrs"
+    v-bind="rootRenderAttrs()"
   >
     <div
-      v-if="showInitialLoading"
+      v-if="showInitialLoading()"
       class="markdown-renderer__loading"
       v-bind="loadingAttrs"
       role="status"
@@ -29,7 +29,7 @@
         aria-hidden="true"
       />
     </div>
-    <template v-if="isChunkedRender">
+    <template v-if="chunkUnits.length">
       <div
         class="markdown-renderer__virtual-spacer"
         v-bind="topSpacerAttrs"
@@ -51,7 +51,7 @@
     </template>
     <div v-else v-html="renderedContent" />
     <span
-      v-if="showInlineLoading"
+      v-if="isRendering && !showInitialLoading()"
       class="markdown-renderer__loading-pulse"
       v-bind="loadingPulseAttrs"
       aria-hidden="true"
@@ -137,16 +137,10 @@ const emit = defineEmits<{
 }>()
 
 const rootEl = ref<HTMLElement | null>(null)
-const rootAttrs = {
-  'data-markdown-renderer': 'wasm',
-  'data-fsus-surface': 'reading',
-}
-const resolveMarkdownHtml = (html: string) =>
-  props.sanitizeHtml
-    ? sanitizeMarkdownHtml(html, props.trustedHtmlFactory)
-    : html
 const renderedContent = shallowRef(
-  props.initialHtml.trim() ? resolveMarkdownHtml(props.initialHtml) : '',
+  props.initialHtml && props.sanitizeHtml
+    ? sanitizeMarkdownHtml(props.initialHtml, props.trustedHtmlFactory)
+    : props.initialHtml,
 )
 const chunkUnits = shallowRef<readonly MarkdownRenderChunk[]>([])
 const MIN_INITIAL_MARKDOWN_CHUNKS = 3
@@ -156,35 +150,31 @@ const renderStrategy = shallowRef<'sync' | 'chunked-main' | 'chunked-worker'>(
   'sync',
 )
 const isRendering = shallowRef(false)
-const isChunkedRender = computed(() => chunkUnits.value.length > 0)
-const initialVisibleChunkCount = computed(() => {
-  const firstSectionHeadingIndex = chunkUnits.value.findIndex(
+const resolveInitialChunkCount = (units: readonly MarkdownRenderChunk[]) => {
+  const firstSectionHeadingIndex = units.findIndex(
     (unit, index) => index > 0 && unit.kind === 'heading',
   )
-  if (firstSectionHeadingIndex < 0) return MIN_INITIAL_MARKDOWN_CHUNKS
-
   return Math.min(
-    MAX_INITIAL_MARKDOWN_CHUNKS,
-    Math.max(MIN_INITIAL_MARKDOWN_CHUNKS, firstSectionHeadingIndex + 1),
+    units.length,
+    firstSectionHeadingIndex < 0
+      ? MIN_INITIAL_MARKDOWN_CHUNKS
+      : Math.min(
+          MAX_INITIAL_MARKDOWN_CHUNKS,
+          Math.max(MIN_INITIAL_MARKDOWN_CHUNKS, firstSectionHeadingIndex + 1),
+        ),
   )
-})
-const hasRenderedOutput = computed(
-  () => isChunkedRender.value || renderedContent.value.trim().length > 0,
+}
+const initialVisibleChunkCount = computed(() =>
+  resolveInitialChunkCount(chunkUnits.value),
 )
-const showInitialLoading = computed(
-  () => isRendering.value && !hasRenderedOutput.value,
-)
-const showInlineLoading = computed(
-  () => isRendering.value && hasRenderedOutput.value,
-)
-const strategyAttrs = computed(() => ({
+const showInitialLoading = () =>
+  isRendering.value && !chunkUnits.value.length && !renderedContent.value.trim()
+const rootRenderAttrs = () => ({
+  'data-markdown-renderer': 'wasm',
+  'data-fsus-surface': 'reading',
   'data-fsus-render-strategy': renderStrategy.value,
-}))
-const rootRenderAttrs = computed(() => ({
-  ...rootAttrs,
-  ...strategyAttrs.value,
   ...renderPipelineRuntime.hardwareAttrs.value,
-}))
+})
 const loadingAttrs = { 'data-markdown-renderer-loading': 'true' }
 const loadingPulseAttrs = { 'data-markdown-renderer-loading-pulse': 'true' }
 const topSpacerAttrs = { 'data-fsus-render-spacer': 'top' }
@@ -232,34 +222,14 @@ type RenderAnchor = {
   unitKey?: string
 }
 
-const anchorCandidateSelector = [
-  'h1',
-  'h2',
-  'h3',
-  'h4',
-  'h5',
-  'h6',
-  'p',
-  'li',
-  'pre',
-  'table',
-  'blockquote',
-  `.${markdownSurfaceClasses.paragraph}`,
-  `.${markdownSurfaceClasses.text}`,
-  `.${markdownSurfaceClasses.listItem}`,
-  `.${markdownSurfaceClasses.mermaid}`,
-  `.${markdownSurfaceClasses.latex}`,
-].join(',')
+const anchorCandidateSelector = `h1,h2,h3,h4,h5,h6,p,li,pre,table,blockquote,.${markdownSurfaceClasses.paragraph},.${markdownSurfaceClasses.text},.${markdownSurfaceClasses.listItem},.${markdownSurfaceClasses.mermaid},.${markdownSurfaceClasses.latex}`
 
 const afterFrame = () =>
-  new Promise<void>((resolve) => {
-    if (typeof requestAnimationFrame !== 'function') {
-      resolve()
-      return
-    }
-
-    requestAnimationFrame(() => resolve())
-  })
+  new Promise<void>((resolve) =>
+    typeof requestAnimationFrame === 'function'
+      ? requestAnimationFrame(() => resolve())
+      : resolve(),
+  )
 
 const readPerformanceNow = () =>
   typeof performance === 'undefined' ? Date.now() : performance.now()
@@ -514,9 +484,10 @@ const resolveMarkdownRenderResult = <
   TResult extends MarkdownRuntimeChunkResult | MarkdownRuntimeRenderResult,
 >(
   result: TResult,
-) => props.sanitizeHtml
-  ? sanitizeMarkdownRenderResult(result, props.trustedHtmlFactory)
-  : result
+) =>
+  props.sanitizeHtml
+    ? sanitizeMarkdownRenderResult(result, props.trustedHtmlFactory)
+    : result
 
 const canUseMarkdownWorker = () =>
   typeof Worker !== 'undefined' && typeof URL !== 'undefined'
@@ -633,12 +604,7 @@ const scheduleMeasurementWarmup = () => {
 
 const buildFallbackResult = (source: string): MarkdownRenderResult =>
   buildMarkdownRenderResult({
-    html: [
-      `<div class="${markdownSurfaceClasses.error}">`,
-      '<p>Markdown 渲染失败，已回退为安全文本。</p>',
-      `<pre><code>${escapeMarkdownHtml(source)}</code></pre>`,
-      '</div>',
-    ].join(''),
+    html: `<div class="${markdownSurfaceClasses.error}"><p>Markdown 渲染失败，已回退为安全文本。</p><pre><code>${escapeMarkdownHtml(source)}</code></pre></div>`,
     source,
   })
 
@@ -801,30 +767,15 @@ const performRender = async () => {
             sanitizeMarkdownChunk(unit, props.trustedHtmlFactory),
           )
         : document.units
-      const firstSectionHeadingIndex = resolvedUnits.findIndex(
-        (unit, index) => index > 0 && unit.kind === 'heading',
-      )
-      const initialCount = Math.min(
-        resolvedUnits.length,
-        firstSectionHeadingIndex < 0
-          ? MIN_INITIAL_MARKDOWN_CHUNKS
-          : Math.min(
-              MAX_INITIAL_MARKDOWN_CHUNKS,
-              Math.max(
-                MIN_INITIAL_MARKDOWN_CHUNKS,
-                firstSectionHeadingIndex + 1,
-              ),
-            ),
-      )
+      const initialCount = resolveInitialChunkCount(resolvedUnits)
 
       const commitStartedAt = readPerformanceNow()
       renderedContent.value = ''
       activeChunkResult = resolvedResult
       chunkUnits.value = resolvedUnits.slice(0, initialCount)
-      renderStrategy.value =
-        renderPipelineRuntime.renderedStrategy.value === 'chunked-worker'
-          ? 'chunked-worker'
-          : 'chunked-main'
+      renderStrategy.value = renderPipelineRuntime.renderedStrategy.value as
+        | 'chunked-main'
+        | 'chunked-worker'
       emit('render-profile', {
         engine: resolvedResult.engine,
         phase: 'chunks',

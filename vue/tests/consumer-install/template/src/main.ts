@@ -16,8 +16,11 @@ import '__FSUS_PACKAGE_NAME__/theme-chalk/base.css'
 import '__FSUS_PACKAGE_NAME__/theme-chalk/el-button.css'
 import '__FSUS_PACKAGE_NAME__/theme-chalk/el-empty-state.css'
 import '__FSUS_PACKAGE_NAME__/theme-chalk/el-markdown-renderer.css'
-import '__FSUS_PACKAGE_NAME__/dist/public-shell-critical.css'
 import App from './App.vue'
+
+const loadPublicShellCriticalCss = () =>
+  import('__FSUS_PACKAGE_NAME__/dist/public-shell-critical.css')
+void loadPublicShellCriticalCss
 
 const initialMarkdownNodes = () => [
   h('h1', { id: 'consumer-markdown' }, 'Consumer Markdown'),

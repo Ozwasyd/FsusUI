@@ -260,6 +260,15 @@ function assertRatchet(label, actual, baseline) {
 }
 
 function assertConsumerPerformanceGraph(graph) {
+  const eagerOptionalSourceKeys = [...graph.initialKeys].filter((key) =>
+    key.includes('public-shell-critical.css'),
+  )
+  if (eagerOptionalSourceKeys.length > 0) {
+    throw new Error(
+      `Consumer startup graph eagerly loaded optional CSS:\n${eagerOptionalSourceKeys.join('\n')}`,
+    )
+  }
+
   const forbiddenStartupFragments = [
     'cytoscape',
     'fsus-markdown',
