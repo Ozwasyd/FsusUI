@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process'
-
-const DEFAULT_OLD_SPACE_MB = 18_432
-const DEFAULT_SEMI_SPACE_MB = 128
+import {
+  formatCapacitySummary,
+  resolveCapacityPlan,
+  resolveNodeHeapMiB,
+} from './ci-capacity.mjs'
 
 const [, , rawCommand, ...rawArgs] = process.argv
 const command = rawCommand === '--' ? rawArgs.shift() : rawCommand
 const args = rawCommand === '--' ? rawArgs : rawArgs
 
 if (!command) {
-  console.error(
-    'Usage: node ./scripts/with-node-heap.mjs <command> [...args]',
-  )
+  console.error('Usage: node ./scripts/with-node-heap.mjs <command> [...args]')
   process.exit(1)
 }
 
@@ -25,11 +25,31 @@ const readPositiveInteger = (value, fallback) => {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
 }
 
-const optionExists = (nodeOptions, dashedName, underscoredName = dashedName) => {
+const optionExists = (
+  nodeOptions,
+  dashedName,
+  underscoredName = dashedName,
+) => {
   const pattern = new RegExp(
     `(?:^|\\s)--(?:${dashedName}|${underscoredName})(?:=|\\s|$)`,
   )
   return pattern.test(nodeOptions)
+}
+
+const inferHeapProfile = () => {
+  const requested = process.env.FSUS_NODE_HEAP_PROFILE
+  if (requested && requested !== 'auto') return requested
+  const invocation = [command, ...args].join(' ').toLowerCase()
+  if (invocation.includes('coverage')) return 'coverage'
+  if (invocation.includes('playwright') || invocation.includes('visual'))
+    return 'visual'
+  if (invocation.includes('typecheck') || invocation.includes('vue-tsc'))
+    return 'typecheck'
+  if (invocation.includes('build') || invocation.includes('rollup'))
+    return 'build'
+  if (invocation.includes('vitest') || invocation.includes('test:unit'))
+    return 'unit'
+  return requested === 'auto' ? 'auto' : 'small'
 }
 
 const buildNodeOptions = () => {
@@ -37,13 +57,12 @@ const buildNodeOptions = () => {
   if (disabled) return existing
 
   const options = existing ? [existing] : []
-  const oldSpaceMb = readPositiveInteger(
-    process.env.FSUS_NODE_HEAP_MB,
-    DEFAULT_OLD_SPACE_MB,
-  )
+  const capacityPlan = resolveCapacityPlan()
+  const heapProfile = inferHeapProfile()
+  const oldSpaceMb = resolveNodeHeapMiB(capacityPlan, heapProfile)
   const semiSpaceMb = readPositiveInteger(
     process.env.FSUS_NODE_SEMI_SPACE_MB,
-    DEFAULT_SEMI_SPACE_MB,
+    Math.max(16, Math.min(64, Math.floor(oldSpaceMb / 16))),
   )
 
   if (!optionExists(existing, 'max-old-space-size', 'max_old_space_size')) {
@@ -54,16 +73,39 @@ const buildNodeOptions = () => {
     options.push(`--max-semi-space-size=${semiSpaceMb}`)
   }
 
-  return options.join(' ').trim()
+  return {
+    nodeOptions: options.join(' ').trim(),
+    capacityPlan,
+    heapProfile,
+    oldSpaceMb,
+  }
 }
+
+const heapSettings = disabled
+  ? {
+      nodeOptions: process.env.NODE_OPTIONS?.trim() ?? '',
+      capacityPlan: undefined,
+      heapProfile: 'disabled',
+      oldSpaceMb: undefined,
+    }
+  : buildNodeOptions()
 
 const env = {
   ...process.env,
-  NODE_OPTIONS: buildNodeOptions(),
+  NODE_OPTIONS: heapSettings.nodeOptions,
 }
 
+if (process.env.FSUS_NODE_HEAP_MB) {
+  console.error(
+    `[fsus-node-heap] manual override requested=${process.env.FSUS_NODE_HEAP_MB} MiB applied=${heapSettings.oldSpaceMb} MiB profile=${heapSettings.heapProfile}`,
+  )
+}
 if (process.env.FSUS_NODE_HEAP_TRACE === '1') {
-  console.error(`[fsus-node-heap] NODE_OPTIONS=${env.NODE_OPTIONS}`)
+  console.error(
+    `[fsus-node-heap] profile=${heapSettings.heapProfile} NODE_OPTIONS=${env.NODE_OPTIONS}`,
+  )
+  if (heapSettings.capacityPlan)
+    console.error(formatCapacitySummary(heapSettings.capacityPlan))
 }
 
 const child = spawn(command, args, {

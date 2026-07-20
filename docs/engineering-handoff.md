@@ -97,9 +97,11 @@ FsusBlog 侧的消费规则：页面只消费 FsusUI 导出的 component / direc
 - GitHub Actions 日志会输出 `icons-cache-hit` 与 `wasm-cache-hit`；本地 wrapper 会继续输出 `cache hit` / `cache miss`、source hash 和 miss reason。
 - cache hit 会跳过对应 ensure 脚本；cache miss、restore-key 命中过期工件或 fingerprint 不一致时会重新生成。
 - `pnpm run build:wasm` 保留显式 force regeneration 语义；需要强制重建所有测试工件时可使用 `FORCE_REBUILD=1 pnpm run prepare:test-artifacts`。
-- `_quality.yml` 的 `unit-artifacts` job 会先生成并上传 `unit-test-artifacts`，unit shard 只下载该工件、解包、执行 `pnpm run check:test-artifacts-ready`，再运行 `pnpm exec vitest run --config vue/vitest.config.ts --shard=<n>/4`。
-- 本地复现 unit shard 时，先运行 `pnpm run prepare:test-artifacts`，再运行 `pnpm run check:test-artifacts-ready` 和目标 `vitest run --shard` 命令；不要在每个 shard 前重复生成 icon/WASM 工件。
-- `_quality.yml` 的 `build-package` job 会上传 `fsusui-npm-candidate`，其中包含唯一 npm tarball、SHA-256 sidecar 与 candidate manifest，并导出 `candidate-digest`。`consumer-install` 校验该 digest，从同一个 tarball 执行 package smoke 和冷安装，不再构建第二份目录。
+- `_quality.yml` 的 `capacity` job 根据测试文件数和 runner 的 CPU/内存限制生成 Unit matrix；`unit-artifacts` job 只生成一次 `unit-test-artifacts`。Unit shard 下载、解包并执行 `pnpm run check:test-artifacts-ready` 后，以 plan 给出的 `<n>/<total>` 和 `FSUS_VITEST_WORKERS` 运行 Vitest。
+- 本地运行 `pnpm ci:capacity:plan --dry-run` 可看到同一 shard/worker 计划；`pnpm test:unit` 会在一次 artifact prepare 后按该计划有限并发执行，等价的诊断入口是 `vitest run --shard=<n>/<total>`。不要在每个 shard 前重复生成 icon/WASM 工件。
+- Typecheck 四配置由 capacity runner 分批执行；`verify:pr-fast` / `verify:full` 的 sibling tasks 也按 lane 批次运行并保留完整失败收集语义，避免外层和内层同时占满全部 CPU。
+- `pnpm ci:capacity:check` 使用 v1、v2、无 cgroup、2C/8GB、4C/16GB、高配、CPU/内存不对称和 override fixtures 验证纯调度逻辑，不依赖 Actions、网络或固定耗时。
+- `_quality.yml` 的 `build-package` job 会上传 `fsusui-npm-candidate`，其中包含唯一 npm tarball、SHA-256 sidecar 与 candidate manifest，并导出 `candidate-digest`。`consumer-install` 校验该 digest，从同一个 tarball执行 package smoke 和冷安装，不再构建第二份目录。
 - `verify:release` 可在本地从零运行 `package:candidate:build`、`package:candidate:verify`、candidate fixtures 与 consumer install。独立重建必须用 `package:candidate:compare` 比较 canonical 文件树；不得无比较地替换已测试 candidate。
 
 ### CI 入口

@@ -1,5 +1,12 @@
+/* global module, require */
+
 const { readFileSync } = require('node:fs')
-const { availableParallelism, cpus, totalmem } = require('node:os')
+const {
+  CAPACITY_PLAN_ENV,
+  createCapacityPlan,
+  parseCapacityPlan,
+  probeCapacityHost,
+} = require('./ci-capacity.cjs')
 
 const DEFAULT_VISUAL_CAPACITY_POLICY = Object.freeze({
   baseReserveMiB: 1024,
@@ -12,8 +19,6 @@ const DEFAULT_VISUAL_CAPACITY_POLICY = Object.freeze({
 })
 
 const VISUAL_CAPACITY_PLAN_ENV = 'FSUS_VISUAL_CAPACITY_PLAN'
-
-const MIB = 1024 * 1024
 
 function parsePositiveNumber(value) {
   if (value === undefined || value === null || String(value).trim() === '')
@@ -51,11 +56,6 @@ function parseCgroupMemoryBytes(value) {
   return parsePositiveNumber(normalized)
 }
 
-function minimumDefined(values) {
-  const valid = values.filter((value) => Number.isFinite(value) && value > 0)
-  return valid.length > 0 ? Math.min(...valid) : undefined
-}
-
 function clampWorkerOverride(requested, safeLimit, label, reasons) {
   if (requested === undefined) return undefined
   const applied = Math.max(1, Math.min(requested, safeLimit))
@@ -67,92 +67,6 @@ function clampWorkerOverride(requested, safeLimit, label, reasons) {
       `${label} worker override was capped by resource safety limits`,
     )
   return applied
-}
-
-function resolveCpu(snapshot, env, reasons) {
-  const explicit = parsePositiveNumber(env.FSUS_VISUAL_CPU_LIMIT)
-  const cgroupV2 = parseCgroupV2CpuMax(snapshot.cgroupV2CpuMax)
-  const cgroupV1 = parseCgroupV1CpuQuota(
-    snapshot.cgroupV1CpuQuota,
-    snapshot.cgroupV1CpuPeriod,
-  )
-  const available = parsePositiveNumber(snapshot.availableParallelism)
-  // cpuCount is visibility evidence only. It is never used when
-  // availableParallelism is present and never becomes a worker count directly.
-  const visibilityFallback =
-    available === undefined ? parsePositiveNumber(snapshot.cpuCount) : undefined
-  const raw =
-    minimumDefined([
-      explicit,
-      cgroupV2,
-      cgroupV1,
-      available,
-      visibilityFallback,
-    ]) ?? 1
-  const effectiveCpu = Math.max(1, Math.floor(raw))
-
-  if (explicit !== undefined)
-    reasons.push(`CPU limit override constrained capacity to ${explicit}`)
-  if (cgroupV2 !== undefined && cgroupV2 <= raw)
-    reasons.push(`cgroup v2 CPU quota constrained capacity to ${cgroupV2}`)
-  if (cgroupV1 !== undefined && cgroupV1 <= raw)
-    reasons.push(`cgroup v1 CPU quota constrained capacity to ${cgroupV1}`)
-  if (visibilityFallback !== undefined)
-    reasons.push(
-      'availableParallelism unavailable; CPU visibility fallback recorded',
-    )
-
-  return {
-    effectiveCpu,
-    constraints: {
-      explicit,
-      cgroupV2,
-      cgroupV1,
-      available,
-      visibilityFallback,
-    },
-  }
-}
-
-function resolveMemory(snapshot, env, reasons) {
-  const explicitMiB = parsePositiveNumber(env.FSUS_VISUAL_MEMORY_LIMIT_MB)
-  const cgroupV2Bytes = parseCgroupMemoryBytes(snapshot.cgroupV2MemoryMax)
-  const cgroupV1Bytes = parseCgroupMemoryBytes(snapshot.cgroupV1MemoryLimit)
-  const hostBytes = parsePositiveNumber(snapshot.totalMemoryBytes)
-  const effectiveBytes =
-    minimumDefined([
-      explicitMiB === undefined ? undefined : explicitMiB * MIB,
-      cgroupV2Bytes,
-      cgroupV1Bytes,
-      hostBytes,
-    ]) ?? MIB
-  const effectiveMemoryMiB = Math.max(1, Math.floor(effectiveBytes / MIB))
-
-  if (explicitMiB !== undefined)
-    reasons.push(
-      `memory limit override constrained capacity to ${explicitMiB} MiB`,
-    )
-  if (cgroupV2Bytes !== undefined && cgroupV2Bytes <= effectiveBytes)
-    reasons.push('cgroup v2 memory limit constrained capacity')
-  if (cgroupV1Bytes !== undefined && cgroupV1Bytes <= effectiveBytes)
-    reasons.push('cgroup v1 memory limit constrained capacity')
-
-  return {
-    effectiveMemoryMiB,
-    constraints: {
-      explicitMiB,
-      cgroupV2MiB:
-        cgroupV2Bytes === undefined
-          ? undefined
-          : Math.floor(cgroupV2Bytes / MIB),
-      cgroupV1MiB:
-        cgroupV1Bytes === undefined
-          ? undefined
-          : Math.floor(cgroupV1Bytes / MIB),
-      hostMiB:
-        hostBytes === undefined ? undefined : Math.floor(hostBytes / MIB),
-    },
-  }
 }
 
 function workerSlots({ cpu, memoryMiB, serverCount, policy }) {
@@ -194,8 +108,47 @@ function createVisualCapacityPlan(snapshot, env = {}, policyOverrides = {}) {
     reasons.push(`maximum worker override set to ${maxWorkersOverride}`)
   }
 
-  const cpu = resolveCpu(snapshot, env, reasons)
-  const memory = resolveMemory(snapshot, env, reasons)
+  const hasLegacyBaseOverride =
+    env.FSUS_VISUAL_CPU_LIMIT !== undefined ||
+    env.FSUS_VISUAL_MEMORY_LIMIT_MB !== undefined
+  const sharedPlan =
+    (hasLegacyBaseOverride
+      ? undefined
+      : parseCapacityPlan(env[CAPACITY_PLAN_ENV])) ??
+    createCapacityPlan(
+      snapshot,
+      {
+        ...env,
+        FSUS_CI_CPU_LIMIT: env.FSUS_CI_CPU_LIMIT ?? env.FSUS_VISUAL_CPU_LIMIT,
+        FSUS_CI_MEMORY_LIMIT_MB:
+          env.FSUS_CI_MEMORY_LIMIT_MB ?? env.FSUS_VISUAL_MEMORY_LIMIT_MB,
+      },
+      { unitTestFileCount: 0 },
+    )
+  // cpuCount remains visibility evidence only; execution counts come from the
+  // validated repository capacity base.
+  reasons.push(
+    ...sharedPlan.reasons.map((reason) => `capacity base: ${reason}`),
+  )
+  const cpu = {
+    effectiveCpu: sharedPlan.effectiveCpu,
+    constraints: {
+      explicit: sharedPlan.limits.cpu.override,
+      cgroupV2: sharedPlan.limits.cpu.cgroupV2,
+      cgroupV1: sharedPlan.limits.cpu.cgroupV1,
+      available: sharedPlan.limits.cpu.availableParallelism,
+      visibilityFallback: sharedPlan.limits.cpu.visible,
+    },
+  }
+  const memory = {
+    effectiveMemoryMiB: sharedPlan.effectiveMemoryMiB,
+    constraints: {
+      explicitMiB: sharedPlan.limits.memory.overrideMiB,
+      cgroupV2MiB: sharedPlan.limits.memory.cgroupV2MiB,
+      cgroupV1MiB: sharedPlan.limits.memory.cgroupV1MiB,
+      hostMiB: sharedPlan.limits.memory.hostMiB,
+    },
+  }
   const serialSlots = workerSlots({
     cpu: cpu.effectiveCpu,
     memoryMiB: memory.effectiveMemoryMiB,
@@ -346,55 +299,13 @@ function parseVisualCapacityPlan(value) {
   } catch (error) {
     throw new Error(
       `invalid ${VISUAL_CAPACITY_PLAN_ENV}: ${error instanceof Error ? error.message : String(error)}`,
+      { cause: error },
     )
   }
 }
 
-function readFirst(paths, readFile = readFileSync) {
-  for (const path of paths) {
-    try {
-      return readFile(path, 'utf8')
-    } catch {
-      // Missing controller files are expected outside Linux containers.
-    }
-  }
-  return undefined
-}
-
 function probeVisualCapacityHost(dependencies = {}) {
-  const readFile = dependencies.readFile ?? readFileSync
-  const resolveAvailableParallelism =
-    dependencies.availableParallelism ?? availableParallelism
-  const resolveCpuCount = dependencies.cpuCount ?? (() => cpus().length)
-  const resolveTotalMemory = dependencies.totalMemoryBytes ?? totalmem
-  return {
-    availableParallelism: resolveAvailableParallelism?.(),
-    cpuCount: resolveCpuCount(),
-    totalMemoryBytes: resolveTotalMemory(),
-    cgroupV2CpuMax: readFirst(['/sys/fs/cgroup/cpu.max'], readFile),
-    cgroupV1CpuQuota: readFirst(
-      [
-        '/sys/fs/cgroup/cpu/cpu.cfs_quota_us',
-        '/sys/fs/cgroup/cpu,cpuacct/cpu.cfs_quota_us',
-      ],
-      readFile,
-    ),
-    cgroupV1CpuPeriod: readFirst(
-      [
-        '/sys/fs/cgroup/cpu/cpu.cfs_period_us',
-        '/sys/fs/cgroup/cpu,cpuacct/cpu.cfs_period_us',
-      ],
-      readFile,
-    ),
-    cgroupV2MemoryMax: readFirst(['/sys/fs/cgroup/memory.max'], readFile),
-    cgroupV1MemoryLimit: readFirst(
-      [
-        '/sys/fs/cgroup/memory/memory.limit_in_bytes',
-        '/sys/fs/cgroup/memory.limit_in_bytes',
-      ],
-      readFile,
-    ),
-  }
+  return probeCapacityHost(dependencies)
 }
 
 function resolveVisualCapacityPlan(options = {}) {

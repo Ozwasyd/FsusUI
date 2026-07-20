@@ -1,0 +1,8 @@
+{
+  "snapshot": {
+    "availableParallelism": 4,
+    "cpuCount": 4,
+    "totalMemoryBytes": 17179869184
+  },
+  "unitTestFileCount": 212
+}

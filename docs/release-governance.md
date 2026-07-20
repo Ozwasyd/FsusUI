@@ -63,10 +63,24 @@ restore-key 命中旧工件时会重新生成并写入 fingerprint。发布或�
 `pnpm run build:wasm` 或 `FORCE_REBUILD=1 pnpm run prepare:test-artifacts`，
 不要把 release regeneration 改成只依赖 cache。
 
-full quality 的 unit shard 由 `unit-artifacts` job 统一准备测试工件并上传
-`unit-test-artifacts`，各 shard 下载后运行 `pnpm run check:test-artifacts-ready`
-和 `pnpm exec vitest run --config vue/vitest.config.ts --shard=<n>/4`。这样 cache miss/generation 日志只集中在
-前置 job，shard 不再重复执行 icon/WASM 生成。
+full quality 的 Unit matrix 先由 `capacity` job 按测试文件数、有效 CPU 与有效
+内存生成，不再固定为四个 shard。`unit-artifacts` job 统一准备测试工件并上传
+`unit-test-artifacts`；各 shard 下载后运行 `pnpm run check:test-artifacts-ready`
+和 `pnpm exec vitest run --config vue/vitest.config.ts --shard=<n>/<total>`，同时使用
+plan 给出的 `FSUS_VITEST_WORKERS`。这样 shard 与内部 worker 共享同一预算，且
+cache miss/generation 日志只集中在前置 job。
+
+仓库级资源计划可通过 `pnpm ci:capacity:plan --dry-run` 查看，通过
+`pnpm ci:capacity:check` 运行无浏览器、无网络 fixture。计划取
+`FSUS_CI_CPU_LIMIT`、cgroup CPU quota、`availableParallelism()` 与可见 CPU 的
+最小值，并对 `FSUS_CI_MEMORY_LIMIT_MB`、cgroup memory limit 和 host memory
+执行同样的最小值约束。`FSUS_CI_MAX_PARALLEL_LANES` 可用于诊断性限流，所有
+override 都会显示 requested/applied 状态与原因。
+
+`with-node-heap.mjs` 依据同一 plan 为 small、unit、typecheck、build、coverage、
+visual 选择不同 heap cap，并保留 OS、文件缓存、Chromium/WASM/esbuild/Sass 与
+native memory。`FSUS_NODE_HEAP_PROFILE` 可显式选 profile；
+`FSUS_NODE_HEAP_MB` 是诊断 override，但仍会被安全预算封顶并输出人工覆盖日志。
 
 full quality 的 `build-package` 只构建一次，并产出 `fsusui-npm-candidate`
 工件：`fsusui-npm-candidate.tgz`、SHA-256 sidecar 和 candidate manifest。

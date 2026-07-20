@@ -18,7 +18,10 @@ function assert(condition, message) {
 
 function workflowJob(name) {
   const match = reusableQualityWorkflow.match(
-    new RegExp(`\\n  ${name}:\\n([\\s\\S]*?)(?=\\n  [a-zA-Z][\\w-]*:\\n|$)`, 'u'),
+    new RegExp(
+      `\\n  ${name}:\\n([\\s\\S]*?)(?=\\n  [a-zA-Z][\\w-]*:\\n|$)`,
+      'u',
+    ),
   )
   return match?.[1] ?? ''
 }
@@ -60,12 +63,12 @@ for (const fragment of [
   )
 }
 assert(
-  unitJob.includes('needs: unit-artifacts'),
-  'unit shards must depend on the unit-artifacts job',
+  unitJob.includes('- capacity') && unitJob.includes('- unit-artifacts'),
+  'unit shards must depend on capacity and unit-artifacts jobs',
 )
 assert(
-  unitJob.includes('actions/download-artifact@v4')
-    && unitJob.includes('name: unit-test-artifacts'),
+  unitJob.includes('actions/download-artifact@v4') &&
+    unitJob.includes('name: unit-test-artifacts'),
   'unit shards must download the prepared unit-test-artifacts artifact',
 )
 assert(

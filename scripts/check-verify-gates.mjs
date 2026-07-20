@@ -5,6 +5,7 @@ const scripts = packageJson.scripts ?? {}
 const qualityWorkflow = readFileSync('.github/workflows/quality.yml', 'utf8')
 const releaseGovernance = readFileSync('docs/release-governance.md', 'utf8')
 const engineeringHandoff = readFileSync('docs/engineering-handoff.md', 'utf8')
+const capacitySuite = readFileSync('scripts/run-capacity-suite.mjs', 'utf8')
 
 function assert(condition, message) {
   if (!condition) {
@@ -33,16 +34,20 @@ assert(
   scripts['verify:pr-fast']?.includes('_verify:pr-fast:parallel'),
   'verify:pr-fast must use the explicit PR-fast parallel group',
 )
-for (const script of [
-  '_verify:pr-fast:parallel',
-  '_verify:parallel',
-  '_test:unit:parallel',
-  'typecheck',
-  'typecheck:no-cache',
-]) {
+for (const script of ['_verify:pr-fast:parallel', '_verify:parallel']) {
   assert(
-    scripts[script]?.includes('run-p --continue-on-error'),
-    `${script} must collect every parallel failure before exiting`,
+    scripts[script]?.includes('run-capacity-suite.mjs'),
+    `${script} must use the capacity scheduler and collect every failure`,
+  )
+}
+assert(
+  scripts['_test:unit:parallel']?.includes('run-capacity-unit.mjs'),
+  '_test:unit:parallel must use the capacity Unit planner',
+)
+for (const script of ['typecheck', 'typecheck:no-cache']) {
+  assert(
+    scripts[script]?.includes('run-capacity-typecheck.mjs'),
+    `${script} must use capacity-based Typecheck batches`,
   )
 }
 assert(
@@ -80,18 +85,16 @@ assert(
   'build:package-smoke must not call the full package build',
 )
 assert(
-  scripts['_verify:pr-fast:parallel']?.includes('lint') &&
-    scripts['_verify:pr-fast:parallel']?.includes('typecheck:affected') &&
-    scripts['_verify:pr-fast:parallel']?.includes('test:unit:affected') &&
-    scripts['_verify:pr-fast:parallel']?.includes('tokens:check') &&
-    scripts['_verify:pr-fast:parallel']?.includes('icons:check') &&
-    scripts['_verify:pr-fast:parallel']?.includes('build:package-smoke'),
+  capacitySuite.includes("'lint'") &&
+    capacitySuite.includes("'typecheck:affected'") &&
+    capacitySuite.includes("'test:unit:affected'") &&
+    capacitySuite.includes("'tokens:check'") &&
+    capacitySuite.includes("'icons:check'") &&
+    capacitySuite.includes("'build:package-smoke'"),
   'PR-fast group must cover lint, affected typecheck/unit, tokens, icons, and package smoke',
 )
 assert(
-  scripts['_verify:pr-fast:parallel']?.includes(
-    'check:foundation-style-boundary',
-  ) && scripts['_verify:parallel']?.includes('check:foundation-style-boundary'),
+  capacitySuite.split("'check:foundation-style-boundary'").length - 1 === 2,
   'PR-fast and full verification must enforce the foundation style boundary',
 )
 assert(

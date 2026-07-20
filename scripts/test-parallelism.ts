@@ -1,4 +1,5 @@
 import { availableParallelism, cpus } from 'node:os'
+import { resolveCapacityPlan } from './ci-capacity.cjs'
 import { resolveVisualCapacityPlan } from './visual-capacity.cjs'
 
 const positiveInteger = (value: string | undefined) => {
@@ -18,10 +19,16 @@ export const resolveWorkerCount = (specificEnv: string) =>
   availableWorkers()
 
 export const resolveVitestWorkers = () =>
-  resolveWorkerCount('FSUS_VITEST_WORKERS')
+  Math.min(
+    resolveWorkerCount('FSUS_VITEST_WORKERS'),
+    resolveCapacityPlan().vitestWorkersPerShard,
+  )
 
 export const resolvePlaywrightWorkers = () =>
-  resolveWorkerCount('FSUS_PLAYWRIGHT_WORKERS')
+  Math.min(
+    resolveWorkerCount('FSUS_PLAYWRIGHT_WORKERS'),
+    resolveCapacityPlan().lanes.visual,
+  )
 
 export const resolveVisualPreviewWorkers = () =>
   resolveVisualCapacityPlan().previewWorkers

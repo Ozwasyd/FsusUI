@@ -169,6 +169,20 @@ jobs:
           echo "cache-primary-key=${{ steps.typecheck-cache.outputs.cache-primary-key }}"
       - run: pnpm typecheck
 
+  capacity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      unit-matrix: ${{ steps.plan.outputs.unit-matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Create repository capacity plan
+        id: plan
+        run: node ./scripts/ci-capacity.mjs --dry-run --github-output="$GITHUB_OUTPUT"
+
   unit-artifacts:
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -219,13 +233,14 @@ jobs:
           retention-days: 1
 
   unit:
-    needs: unit-artifacts
+    needs:
+      - capacity
+      - unit-artifacts
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
-      matrix:
-        shard: ['1/4', '2/4', '3/4', '4/4']
+      matrix: ${{ fromJSON(needs.capacity.outputs.unit-matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -246,7 +261,10 @@ jobs:
           sha256sum .unit-artifacts/unit-test-artifacts.tgz
           tar -xzf .unit-artifacts/unit-test-artifacts.tgz
       - run: pnpm run check:test-artifacts-ready
-      - run: pnpm exec vitest run --config vue/vitest.config.ts --shard=${{ matrix.shard }}
+      - name: Run capacity-planned Unit shard
+        env:
+          FSUS_VITEST_WORKERS: ${{ matrix.workers }}
+        run: node ./scripts/with-node-heap.mjs pnpm exec vitest run --config vue/vitest.config.ts --shard=${{ matrix.shard }}
 
   coverage:
     runs-on: ubuntu-latest

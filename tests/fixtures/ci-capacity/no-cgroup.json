@@ -1,0 +1,13 @@
+{
+  "snapshot": {
+    "availableParallelism": 8,
+    "cpuCount": 12,
+    "totalMemoryBytes": 17179869184,
+    "cgroupV2CpuMax": "max 100000",
+    "cgroupV2MemoryMax": "max",
+    "cgroupV1CpuQuota": "-1",
+    "cgroupV1CpuPeriod": "100000",
+    "cgroupV1MemoryLimit": "9223372036854771712"
+  },
+  "unitTestFileCount": 212
+}

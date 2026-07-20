@@ -1,0 +1,17 @@
+{
+  "snapshot": {
+    "availableParallelism": 24,
+    "cpuCount": 32,
+    "totalMemoryBytes": 68719476736
+  },
+  "env": {
+    "FSUS_CI_CPU_LIMIT": "4",
+    "FSUS_CI_MEMORY_LIMIT_MB": "8192",
+    "FSUS_CI_MAX_PARALLEL_LANES": "2",
+    "FSUS_CI_UNIT_SHARDS": "8",
+    "FSUS_VITEST_WORKERS": "8",
+    "FSUS_NODE_HEAP_PROFILE": "build",
+    "FSUS_NODE_HEAP_MB": "16000"
+  },
+  "unitTestFileCount": 600
+}

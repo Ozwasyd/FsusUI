@@ -9,6 +9,11 @@ const reusableQualityWorkflow = readFileSync(
 )
 const releaseGovernance = readFileSync('docs/release-governance.md', 'utf8')
 const engineeringHandoff = readFileSync('docs/engineering-handoff.md', 'utf8')
+const capacityTypecheck = readFileSync(
+  'scripts/run-capacity-typecheck.mjs',
+  'utf8',
+)
+const capacityPlanner = readFileSync('scripts/ci-capacity.cjs', 'utf8')
 
 function assert(condition, message) {
   if (!condition) {
@@ -32,33 +37,33 @@ assert(
   'governance:check must include the typecheck cache policy guard',
 )
 assert(
-  scripts.typecheck?.includes('typecheck:web')
-    && scripts.typecheck?.includes('typecheck:node')
-    && scripts.typecheck?.includes('typecheck:vite-config')
-    && scripts.typecheck?.includes('typecheck:vitest'),
+  scripts.typecheck?.includes('run-capacity-typecheck.mjs') &&
+    typecheckLanes.every((lane) => capacityPlanner.includes(`'${lane}'`)),
   'typecheck must keep the full four-lane graph',
 )
 assert(
-  scripts['typecheck:affected']?.includes('scripts/run-affected-gate.mjs typecheck'),
+  scripts['typecheck:affected']?.includes(
+    'scripts/run-affected-gate.mjs typecheck',
+  ),
   'typecheck:affected must keep affected PR-fast selection',
 )
 assert(
-  scripts['typecheck:no-cache']?.includes('typecheck:web:no-cache')
-    && scripts['typecheck:no-cache']?.includes('typecheck:node:no-cache')
-    && scripts['typecheck:no-cache']?.includes('typecheck:vite-config:no-cache')
-    && scripts['typecheck:no-cache']?.includes('typecheck:vitest:no-cache'),
+  scripts['typecheck:no-cache']?.includes(
+    'run-capacity-typecheck.mjs --no-cache',
+  ) && capacityTypecheck.includes("noCache ? ':no-cache' : ''"),
   'typecheck:no-cache must keep a full diagnostic/release path',
 )
 
 for (const lane of typecheckLanes) {
   assert(
-    scripts[`typecheck:${lane}`]?.includes('scripts/run-typecheck.mjs')
-      && scripts[`typecheck:${lane}`]?.includes(lane),
+    scripts[`typecheck:${lane}`]?.includes('scripts/run-typecheck.mjs') &&
+      scripts[`typecheck:${lane}`]?.includes(lane),
     `typecheck:${lane} must use the incremental cache wrapper`,
   )
   assert(
-    scripts[`typecheck:${lane}:no-cache`]?.includes('scripts/run-typecheck.mjs')
-      && scripts[`typecheck:${lane}:no-cache`]?.includes('--no-cache'),
+    scripts[`typecheck:${lane}:no-cache`]?.includes(
+      'scripts/run-typecheck.mjs',
+    ) && scripts[`typecheck:${lane}:no-cache`]?.includes('--no-cache'),
     `typecheck:${lane}:no-cache must use the cache-bypass wrapper`,
   )
 }
@@ -80,7 +85,10 @@ for (const fragment of [
   'vue/typings/**/*.d.ts',
   'scripts/run-typecheck.mjs',
 ]) {
-  assert(workflows.includes(fragment), `typecheck cache key must include ${fragment}`)
+  assert(
+    workflows.includes(fragment),
+    `typecheck cache key must include ${fragment}`,
+  )
 }
 for (const fragment of [
   'typecheck-cache-hit',

@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+
+/* global queueMicrotask */
 import { readFileSync } from 'node:fs'
 import { EventEmitter } from 'node:events'
 import {
