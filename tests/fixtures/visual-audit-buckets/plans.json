@@ -1,0 +1,42 @@
+{
+  "policy": {
+    "componentCount": 120,
+    "selectedProjectCount": 4,
+    "targetWaves": 2,
+    "minComponentsPerBucket": 8,
+    "maxComponentsPerBucket": 40
+  },
+  "resources": [
+    {
+      "name": "low",
+      "workerBudget": 2,
+      "expectedBucketCount": 3,
+      "expectedBucketSize": 40
+    },
+    {
+      "name": "medium",
+      "workerBudget": 8,
+      "expectedBucketCount": 4,
+      "expectedBucketSize": 30
+    },
+    {
+      "name": "high",
+      "workerBudget": 16,
+      "expectedBucketCount": 8,
+      "expectedBucketSize": 15
+    }
+  ],
+  "selectedComponents": [
+    "ElButton",
+    "ElDialog",
+    "ElInput",
+    "ElTable",
+    "ElTree"
+  ],
+  "projects": [
+    "desktop-light",
+    "desktop-dark",
+    "mobile-light",
+    "mobile-dark"
+  ]
+}
