@@ -258,6 +258,22 @@ assert(
   'preview config must consume previewWorkers from the shared visual capacity plan',
 )
 assert(
+  previewConfig.includes('actionTimeout: 10_000') &&
+    !/\.(?:focus|hover|click)\(\{[^}]*\btimeout\s*:/u.test(auditSpec) &&
+    auditSpec.includes('await expect(interactionTarget).toBeVisible()') &&
+    auditSpec.includes('await interactionTarget.hover({ force: true })'),
+  'UI audit interactions must use the shared action timeout and preserve an actionable real hover',
+)
+assert(
+  auditSpec.includes('visualAuditBaseBudgetMs') &&
+    auditSpec.includes('visualAuditComponentActionBudgetMs') &&
+    auditSpec.includes(
+      'bucket.components.length * visualAuditComponentActionBudgetMs',
+    ) &&
+    !auditSpec.includes('bucket.components.length * 2_000'),
+  'UI audit retry timeout must scale with the actual bucket component action budget',
+)
+assert(
   devConfig.includes('resolveVisualDevWorkers()') &&
     !/workers:\s*1[,\n]/u.test(devConfig),
   'dev config must consume devWorkers from the shared visual capacity plan',

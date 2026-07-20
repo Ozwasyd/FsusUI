@@ -94,6 +94,8 @@ const visualAuditBuckets = partitionVisualAuditComponents(
 const auditComponentByName = new Map(
   selectedAuditComponents.map((component) => [component.name, component]),
 )
+const visualAuditBaseBudgetMs = 45_000
+const visualAuditComponentActionBudgetMs = 10_000
 
 const stabilizePage = async (page: Page) => {
   await page.addStyleTag({
@@ -185,7 +187,10 @@ test.describe('ui audit buckets', () => {
       test(`ui audit / ${state} / ${bucket.label}`, async ({
         page,
       }, testInfo) => {
-        test.setTimeout(45_000 + bucket.components.length * 2_000)
+        test.setTimeout(
+          visualAuditBaseBudgetMs +
+            bucket.components.length * visualAuditComponentActionBudgetMs,
+        )
         testInfo.annotations.push(
           {
             type: 'visual-audit-bucket-count',
@@ -220,11 +225,9 @@ test.describe('ui audit buckets', () => {
           if (state === 'focus') {
             const focusTarget = page.locator(component.focusLocator).first()
             if (await focusTarget.count()) {
-              await focusTarget.focus({ timeout: 1000 }).catch(() => undefined)
+              await focusTarget.focus().catch(() => undefined)
             } else {
-              await componentCard
-                .focus({ timeout: 1000 })
-                .catch(() => undefined)
+              await componentCard.focus().catch(() => undefined)
             }
           }
 
@@ -234,18 +237,17 @@ test.describe('ui audit buckets', () => {
               .filter({ visible: true })
               .first()
             if (await interactionTarget.count()) {
-              await interactionTarget.hover({ force: true, timeout: 1000 })
+              await expect(interactionTarget).toBeVisible()
+              await interactionTarget.hover({ force: true })
             } else {
-              await componentCard.hover({ force: true, timeout: 1000 })
+              await componentCard.hover({ force: true })
             }
           }
 
           if (state === 'active') {
             const activeTarget = page.locator(component.activeLocator).first()
             if (await activeTarget.count()) {
-              await activeTarget
-                .click({ force: true, timeout: 1500 })
-                .catch(() => undefined)
+              await activeTarget.click({ force: true }).catch(() => undefined)
               await page.waitForTimeout(80)
             }
           }

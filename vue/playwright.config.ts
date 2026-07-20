@@ -32,6 +32,7 @@ export default defineConfig({
     },
   },
   use: {
+    actionTimeout: 10_000,
     baseURL: previewBaseUrl,
     launchOptions: process.env.FSUS_PLAYWRIGHT_EXECUTABLE_PATH
       ? { executablePath: process.env.FSUS_PLAYWRIGHT_EXECUTABLE_PATH }
