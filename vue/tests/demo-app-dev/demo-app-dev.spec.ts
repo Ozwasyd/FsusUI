@@ -316,15 +316,17 @@ test('default home TreeSelect dropdown does not bleed into the next section', as
   })
 
   expect(metrics.gap).toBeGreaterThanOrEqual(16)
-  expect(metrics.alpha).toBeGreaterThanOrEqual(0.99)
-  expect(metrics.backgroundColor).not.toContain('rgba')
+  expect(metrics.alpha).toBeCloseTo(250 / 255, 2)
+  expect(metrics.backgroundColor).toBe('rgba(255, 255, 255, 0.98)')
 })
 
 test('Others card header keeps title and action separated on narrow screens', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 320, height: 700 })
-  await page.goto('/?visual=others&theme=light', { waitUntil: 'domcontentloaded' })
+  await page.goto('/?visual=others&theme=light', {
+    waitUntil: 'domcontentloaded',
+  })
 
   const card = page.locator('.box-card').first()
   await expect(card).toBeVisible()
@@ -370,7 +372,9 @@ test('Others card header keeps title and action separated on narrow screens', as
 test('Calendar header controls use soft segmented styling', async ({
   page,
 }) => {
-  await page.goto('/?visual=data&theme=light', { waitUntil: 'domcontentloaded' })
+  await page.goto('/?visual=data&theme=light', {
+    waitUntil: 'domcontentloaded',
+  })
 
   const buttonGroup = page.locator('.el-calendar__button-group').first()
   await expect(buttonGroup).toBeVisible()
@@ -405,16 +409,18 @@ test('Calendar header controls use soft segmented styling', async ({
 
   expect(metrics.shellDisplay).toBe('inline-flex')
   expect(metrics.shellGap).toBe('2px')
-  expect(metrics.shellRadius).toBe('8px')
+  expect(metrics.shellRadius).toBe('6px')
   expect(metrics.buttonBorders).toEqual(['0px', '0px', '0px'])
   expect(metrics.buttonMargins).toEqual(['0px', '0px', '0px'])
-  expect(metrics.buttonRadii).toEqual(['6px', '6px', '6px'])
+  expect(metrics.buttonRadii).toEqual(['4px', '4px', '4px'])
 })
 
 test('Calendar title follows the browser locale in demo app', async ({
   page,
 }) => {
-  await page.goto('/?visual=data&theme=light', { waitUntil: 'domcontentloaded' })
+  await page.goto('/?visual=data&theme=light', {
+    waitUntil: 'domcontentloaded',
+  })
 
   const title = await page.locator('.el-calendar__title').first().textContent()
   expect(title?.trim()).toMatch(/^\d{4}年\d{1,2}月$/)
