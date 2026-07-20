@@ -28,6 +28,9 @@ export default defineConfig({
   use: {
     ...devices['Desktop Chrome'],
     baseURL: devBaseUrl,
+    launchOptions: process.env.FSUS_PLAYWRIGHT_EXECUTABLE_PATH
+      ? { executablePath: process.env.FSUS_PLAYWRIGHT_EXECUTABLE_PATH }
+      : undefined,
     locale: 'zh-CN',
     screenshot: evidencePolicy.screenshot,
     timezoneId: 'Asia/Shanghai',

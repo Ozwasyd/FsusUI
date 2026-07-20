@@ -220,6 +220,18 @@ assert(
     devConfig.includes("from '../scripts/visual-evidence-policy.cjs'"),
   'Playwright configs must consume the CJS-safe evidence policy boundary',
 )
+for (const [label, config] of [
+  ['preview', previewConfig],
+  ['dev', devConfig],
+]) {
+  assert(
+    occurrences(config, 'FSUS_PLAYWRIGHT_EXECUTABLE_PATH') === 2 &&
+      config.includes(
+        'executablePath: process.env.FSUS_PLAYWRIGHT_EXECUTABLE_PATH',
+      ),
+    `${label} config must honor the shared system Chromium executable path`,
+  )
+}
 assert(
   runtimeServer.includes('pnpm visual:prepare') &&
     runtimeServer.includes('inspectVisualRuntime(config)') &&
