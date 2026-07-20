@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { spawnSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import test from 'node:test'
 import { URL } from 'node:url'
@@ -9,7 +10,7 @@ import {
   fitVisualAuditBucketCount,
   partitionVisualAuditComponents,
   resolveVisualAuditBucketCount,
-} from '../scripts/visual-audit-buckets.ts'
+} from '../scripts/visual-audit-buckets.mjs'
 
 const fixture = JSON.parse(
   readFileSync(
@@ -206,7 +207,7 @@ test('rejects invalid bounds, mismatched counts, and duplicate components', () =
 
 test('stays independent from host capacity, browsers, network, and environment state', () => {
   const source = readFileSync(
-    new URL('../scripts/visual-audit-buckets.ts', import.meta.url),
+    new URL('../scripts/visual-audit-buckets.mjs', import.meta.url),
     'utf8',
   )
 
@@ -214,4 +215,23 @@ test('stays independent from host capacity, browsers, network, and environment s
     source,
     /visual-capacity|playwright|puppeteer|node:os|process\.env|fetch\(|node:https|node:http/u,
   )
+})
+
+test('loads through an explicit ESM boundary without typeless-package warnings', () => {
+  const moduleUrl = new URL(
+    '../scripts/visual-audit-buckets.mjs',
+    import.meta.url,
+  ).href
+  const result = spawnSync(
+    process.execPath,
+    [
+      '--input-type=module',
+      '--eval',
+      `await import(${JSON.stringify(moduleUrl)})`,
+    ],
+    { encoding: 'utf8' },
+  )
+
+  assert.equal(result.status, 0, result.stderr)
+  assert.doesNotMatch(result.stderr, /MODULE_TYPELESS_PACKAGE_JSON/u)
 })

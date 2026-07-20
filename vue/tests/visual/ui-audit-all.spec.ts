@@ -10,7 +10,7 @@ import {
   createVisualAuditPathNamespace,
   fitVisualAuditBucketCount,
   partitionVisualAuditComponents,
-} from '../../../scripts/visual-audit-buckets'
+} from '../../../scripts/visual-audit-buckets.mjs'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
 
 type VisualVariant = {

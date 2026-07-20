@@ -1,34 +1,11 @@
-export interface VisualAuditBucketCountOptions {
-  componentCount: number
-  selectedProjectCount: number
-  workerBudget: number
-  targetWaves: number
-  minComponentsPerBucket: number
-  maxComponentsPerBucket: number
-}
-
-export interface VisualAuditBucket<T extends string = string> {
-  components: T[]
-  index: number
-  label: string
-  number: number
-  total: number
-}
-
-export interface VisualAuditBucketPlanOptions<
-  T extends string = string,
-> extends VisualAuditBucketCountOptions {
-  componentIds?: readonly T[]
-}
-
-const positiveInteger = (value: unknown, label: string): number => {
+const positiveInteger = (value, label) => {
   if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 1) {
     throw new RangeError(`${label} must be a positive safe integer`)
   }
   return value
 }
 
-const componentCountValue = (value: unknown): number => {
+const componentCountValue = (value) => {
   if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < 0) {
     throw new RangeError('componentCount must be a non-negative safe integer')
   }
@@ -36,10 +13,10 @@ const componentCountValue = (value: unknown): number => {
 }
 
 const balancedBucketBounds = (
-  componentCount: number,
-  minComponentsPerBucket: number,
-  maxComponentsPerBucket: number,
-): { maximum: number; minimum: number } => {
+  componentCount,
+  minComponentsPerBucket,
+  maxComponentsPerBucket,
+) => {
   if (componentCount === 0) return { maximum: 0, minimum: 0 }
   if (componentCount < minComponentsPerBucket) {
     return { maximum: 1, minimum: 1 }
@@ -60,12 +37,7 @@ export function fitVisualAuditBucketCount({
   desiredBucketCount,
   maxComponentsPerBucket,
   minComponentsPerBucket,
-}: {
-  componentCount: number
-  desiredBucketCount: number
-  maxComponentsPerBucket: number
-  minComponentsPerBucket: number
-}): number {
+}) {
   const count = componentCountValue(componentCount)
   const desired = positiveInteger(desiredBucketCount, 'desiredBucketCount')
   const minimumSize = positiveInteger(
@@ -95,7 +67,7 @@ export function resolveVisualAuditBucketCount({
   selectedProjectCount,
   targetWaves,
   workerBudget,
-}: VisualAuditBucketCountOptions): number {
+}) {
   const count = componentCountValue(componentCount)
   const projects = positiveInteger(selectedProjectCount, 'selectedProjectCount')
   const workers = positiveInteger(workerBudget, 'workerBudget')
@@ -124,10 +96,7 @@ export function resolveVisualAuditBucketCount({
   })
 }
 
-export function partitionVisualAuditComponents<T extends string>(
-  componentIds: readonly T[],
-  bucketCount: number,
-): VisualAuditBucket<T>[] {
+export function partitionVisualAuditComponents(componentIds, bucketCount) {
   if (!Array.isArray(componentIds)) {
     throw new TypeError('componentIds must be an array')
   }
@@ -170,9 +139,7 @@ export function partitionVisualAuditComponents<T extends string>(
   })
 }
 
-export function createVisualAuditBucketPlan<T extends string = string>(
-  options: VisualAuditBucketPlanOptions<T>,
-) {
+export function createVisualAuditBucketPlan(options) {
   const componentIds = options.componentIds
   const componentCount = componentCountValue(options.componentCount)
   if (componentIds !== undefined && componentIds.length !== componentCount) {
@@ -198,7 +165,7 @@ export function createVisualAuditBucketPlan<T extends string = string>(
   }
 }
 
-const encodeNamespaceSegment = (value: unknown, label: string): string => {
+const encodeNamespaceSegment = (value, label) => {
   if (typeof value !== 'string' || value.length === 0) {
     throw new TypeError(`${label} must be a non-empty string`)
   }
@@ -213,12 +180,7 @@ export function createVisualAuditPathNamespace({
   projectName,
   stateName,
   suiteName,
-}: {
-  componentName: string
-  projectName: string
-  stateName: string
-  suiteName: string
-}): string {
+}) {
   return [
     `suite-${encodeNamespaceSegment(suiteName, 'suiteName')}`,
     `project-${encodeNamespaceSegment(projectName, 'projectName')}`,
