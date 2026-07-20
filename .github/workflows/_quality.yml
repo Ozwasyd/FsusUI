@@ -429,7 +429,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
+      FSUS_VISUAL_EVIDENCE: ${{ inputs.group == 'release' && '1' || '0' }}
       FSUS_VISUAL_SUITE_MODE: auto
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.tmp/playwright-browsers
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -445,6 +447,11 @@ jobs:
           version: 5.0.4
           actions-cache-folder: emsdk-cache
       - run: pnpm install --frozen-lockfile
+      - name: Restore Playwright Chromium cache
+        uses: actions/cache@v4
+        with:
+          path: .tmp/playwright-browsers
+          key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('package.json', 'pnpm-lock.yaml') }}
       - name: Restore icons test artifact cache
         id: icons-cache
         uses: actions/cache@v4
@@ -473,7 +480,7 @@ jobs:
       - name: Run visual suites
         run: pnpm test:visual:full
       - uses: actions/upload-artifact@v4
-        if: failure()
+        if: failure() && inputs.group != 'release'
         continue-on-error: true
         with:
           name: avalonia-screenshots-${{ inputs.group }}
@@ -482,6 +489,17 @@ jobs:
             playwright-report/demo-app-dev
             vue/test-results/visual-preview
             vue/test-results/demo-app-dev
+      - uses: actions/upload-artifact@v4
+        if: always() && inputs.group == 'release'
+        continue-on-error: true
+        with:
+          name: avalonia-screenshots-${{ inputs.group }}
+          path: |
+            playwright-report/visual-preview
+            playwright-report/demo-app-dev
+            vue/test-results/visual-preview
+            vue/test-results/demo-app-dev
+            screenshots
 
   stable-readiness:
     runs-on: ubuntu-latest

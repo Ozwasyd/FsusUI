@@ -14,6 +14,27 @@ import { dirname, isAbsolute, join, relative, resolve } from 'node:path'
 
 export const VISUAL_RUNTIME_SCHEMA_VERSION = 1
 
+export async function readVisualRuntimeTools(repositoryRoot) {
+  const packageJson = JSON.parse(
+    await readFile(resolve(repositoryRoot, 'package.json'), 'utf8'),
+  )
+  let playwright =
+    packageJson.devDependencies?.['@playwright/test'] ?? 'unknown'
+  try {
+    playwright = JSON.parse(
+      await readFile(
+        resolve(repositoryRoot, 'node_modules/@playwright/test/package.json'),
+        'utf8',
+      ),
+    ).version
+  } catch {}
+  return {
+    node: process.versions.node,
+    playwright,
+    pnpm: packageJson.packageManager ?? 'unknown',
+  }
+}
+
 const ignoredDirectoryNames = new Set([
   '.git',
   '.tmp',
@@ -171,6 +192,13 @@ export async function inspectVisualRuntime(rawConfig) {
     manifest.configurationFingerprint !== expectedConfigurationFingerprint
   ) {
     globalReasons.push('runtime manifest configuration fingerprint mismatch')
+  }
+  if (
+    manifest &&
+    config.tools &&
+    JSON.stringify(manifest.tools) !== JSON.stringify(config.tools)
+  ) {
+    globalReasons.push('runtime manifest tool versions mismatch')
   }
 
   const groups = []
@@ -344,7 +372,7 @@ export async function prepareVisualRuntime(rawConfig, options = {}) {
     },
     schemaVersion: VISUAL_RUNTIME_SCHEMA_VERSION,
     sourceFingerprint: before.sourceFingerprint,
-    tools: options.tools ?? {},
+    tools: options.tools ?? config.tools ?? {},
   }
   await mkdir(config.runtimeRoot, { recursive: true })
   const manifestPath = join(config.runtimeRoot, 'manifest.json')

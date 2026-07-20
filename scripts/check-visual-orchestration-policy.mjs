@@ -7,6 +7,7 @@ import {
   parseVisualArgs,
   runVisualPlan,
   runVisualPlanAsync,
+  runVisualRuntimePreparation,
   validateVisualPlan,
 } from './run-visual-tests.mjs'
 import {
@@ -24,6 +25,11 @@ const testParallelism = readFileSync('scripts/test-parallelism.ts', 'utf8')
 const auditSpec = readFileSync('vue/tests/visual/ui-audit-all.spec.ts', 'utf8')
 const capacitySource = readFileSync('scripts/visual-capacity.cjs', 'utf8')
 const capacityFacade = readFileSync('scripts/visual-capacity.mjs', 'utf8')
+const runtimeServer = readFileSync('scripts/serve-visual-runtime.mjs', 'utf8')
+const evidencePolicy = readFileSync(
+  'scripts/visual-evidence-policy.cjs',
+  'utf8',
+)
 const capacityFixture = JSON.parse(
   readFileSync('tests/fixtures/visual-capacity/high-resource.json', 'utf8'),
 )
@@ -78,6 +84,16 @@ assert(
   scripts['visual:capacity']?.includes('visual-capacity.mjs --dry-run'),
   'package.json must expose the browser-free visual capacity dry-run',
 )
+for (const [name, fragment] of [
+  ['visual:prepare', 'scripts/prepare-visual-runtime.mjs'],
+  ['visual:prepare:dry-run', 'scripts/prepare-visual-runtime.mjs --dry-run'],
+  ['visual:runtime:check', 'scripts/prepare-visual-runtime.mjs --check'],
+  ['visual:serve:preview', 'serve-visual-runtime.mjs --suite=preview'],
+  ['visual:serve:dev', 'serve-visual-runtime.mjs --suite=dev'],
+  ['test:visual:evidence', 'run-visual-tests.mjs --suite=full --evidence'],
+]) {
+  assert(scripts[name]?.includes(fragment), `${name} must use ${fragment}`)
+}
 assert(visualJob, '_quality.yml must define one visual job')
 assert(
   !/\n\s+matrix:\s*[\s\S]*?project:/u.test(visualJob),
@@ -165,6 +181,73 @@ assert(
     devConfig.includes("createPlaywrightReporter('demo-app-dev')"),
   'dev results and report must use the demo-app-dev suite namespace',
 )
+for (const [label, config, suite] of [
+  ['preview', previewConfig, 'preview'],
+  ['dev', devConfig, 'dev'],
+]) {
+  assert(
+    config.includes(`serve-visual-runtime.mjs --suite=${suite}`),
+    `${label} webServer must only serve a prepared visual runtime`,
+  )
+  for (const forbidden of [
+    'prepare:test-artifacts',
+    'ensure:wasm',
+    'demo-app build',
+  ]) {
+    assert(
+      !config.includes(forbidden),
+      `${label} webServer must not execute ${forbidden}`,
+    )
+  }
+  for (const fragment of [
+    "globalTeardown: '../scripts/visual-evidence-policy.cjs'",
+    'preserveOutput: evidencePolicy.preserveOutput',
+    'screenshot: evidencePolicy.screenshot',
+    'trace: evidencePolicy.trace',
+  ]) {
+    assert(
+      config.includes(fragment),
+      `${label} config must include ${fragment}`,
+    )
+  }
+}
+assert(
+  previewConfig.includes("from '../scripts/visual-evidence-policy.cjs'") &&
+    devConfig.includes("from '../scripts/visual-evidence-policy.cjs'"),
+  'Playwright configs must consume the CJS-safe evidence policy boundary',
+)
+assert(
+  runtimeServer.includes('pnpm visual:prepare') &&
+    runtimeServer.includes('inspectVisualRuntime(config)') &&
+    !runtimeServer.includes('ensure:wasm'),
+  'direct Playwright server must fail with a local prepare command and never rebuild',
+)
+assert(
+  evidencePolicy.includes(
+    "preserveOutput: evidence ? 'always' : 'failures-only'",
+  ) &&
+    evidencePolicy.includes(
+      "screenshot: evidence ? 'on' : 'only-on-failure'",
+    ) &&
+    evidencePolicy.includes("trace: evidence ? 'on' : 'retain-on-failure'"),
+  'visual evidence policy must keep normal success artifacts out of reports',
+)
+assert(
+  visualJob.includes("FSUS_VISUAL_EVIDENCE: ${{ inputs.group == 'release'") &&
+    visualJob.includes("always() && inputs.group == 'release'") &&
+    visualJob.includes('screenshots'),
+  'release mode must explicitly retain the complete visual evidence matrix',
+)
+assert(
+  visualJob.includes('PLAYWRIGHT_BROWSERS_PATH:') &&
+    visualJob.includes('Restore Playwright Chromium cache') &&
+    visualJob.includes(
+      "runner.os }}-playwright-chromium-${{ hashFiles('package.json', 'pnpm-lock.yaml')",
+    ) &&
+    (visualJob.match(/playwright install --with-deps chromium/gu)?.length ??
+      0) === 1,
+  'visual job must cache one fixed Chromium installation per OS and Playwright lock state',
+)
 assert(
   previewConfig.includes('resolveVisualPreviewWorkers()') &&
     !previewConfig.includes('resolvePlaywrightWorkers()'),
@@ -214,6 +297,18 @@ expectInvalid('preview worker drift', (plan) => {
 })
 
 const collectedSuites = []
+let preparationCount = 0
+assert(
+  runVisualRuntimePreparation((command, args) => {
+    preparationCount += 1
+    assert(
+      command === 'pnpm' && args.join(' ') === 'run visual:prepare',
+      'visual runner must invoke the dedicated runtime preparation command',
+    )
+    return { status: 0 }
+  }) === 0 && preparationCount === 1,
+  'visual runner must prepare the shared runtime exactly once',
+)
 const collectedExitCode = runVisualPlan(
   fullPlan,
   (_command, args, options) => {
@@ -249,7 +344,7 @@ function createAsyncSpawn(statuses) {
       options.env[VISUAL_CAPACITY_PLAN_ENV],
       'async visual runner must pass the shared plan environment',
     )
-    queueMicrotask(() => {
+    globalThis.queueMicrotask(() => {
       state.active -= 1
       child.emit('close', statuses[suite] ?? 0)
     })

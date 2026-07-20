@@ -4,16 +4,20 @@ import {
   resolveTestPort,
   resolveVisualPreviewWorkers,
 } from '../scripts/test-parallelism'
+import { visualEvidencePolicy } from '../scripts/visual-evidence-policy.cjs'
 
 delete process.env.NO_COLOR
 
 const previewPort = resolveTestPort('FSUS_VISUAL_PREVIEW_PORT', 4173)
 const previewBaseUrl = `http://127.0.0.1:${previewPort}`
+const evidencePolicy = visualEvidencePolicy()
 
 export default defineConfig({
   testDir: './tests/visual',
   outputDir: 'test-results/visual-preview',
   fullyParallel: true,
+  globalTeardown: '../scripts/visual-evidence-policy.cjs',
+  preserveOutput: evidencePolicy.preserveOutput,
   workers: resolveVisualPreviewWorkers(),
   retries: process.env.CI ? 2 : 0,
   reporter: createPlaywrightReporter('visual-preview'),
@@ -33,7 +37,9 @@ export default defineConfig({
       ? { executablePath: process.env.FSUS_PLAYWRIGHT_EXECUTABLE_PATH }
       : undefined,
     locale: 'zh-CN',
+    screenshot: evidencePolicy.screenshot,
     timezoneId: 'Asia/Shanghai',
+    trace: evidencePolicy.trace,
     colorScheme: 'light',
     viewport: { width: 1440, height: 1600 },
   },
@@ -72,7 +78,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `pnpm -C .. run prepare:test-artifacts && pnpm -C packages/demo-app build && pnpm -C packages/demo-app preview --host 127.0.0.1 --port ${previewPort} --strictPort`,
+    command: `node ../scripts/serve-visual-runtime.mjs --suite=preview --host=127.0.0.1 --port=${previewPort}`,
     url: previewBaseUrl,
     reuseExistingServer: !process.env.CI,
     timeout: 240_000,

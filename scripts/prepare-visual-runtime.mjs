@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process'
-import { readFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import {
   createDefaultVisualRuntimeConfig,
   inspectVisualRuntime,
   prepareVisualRuntime,
+  readVisualRuntimeTools,
 } from './visual-runtime-core.mjs'
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -19,17 +19,6 @@ const config = createDefaultVisualRuntimeConfig(
   repositoryRoot,
   runtimeRoot || '.tmp/visual-runtime',
 )
-
-async function packageMetadata() {
-  const packageJson = JSON.parse(
-    await readFile(resolve(repositoryRoot, 'package.json'), 'utf8'),
-  )
-  return {
-    node: process.versions.node,
-    playwright: packageJson.devDependencies?.['@playwright/test'] ?? 'unknown',
-    pnpm: packageJson.packageManager ?? 'unknown',
-  }
-}
 
 function buildGroup(group) {
   const [command, ...commandArgs] = group.command
@@ -45,6 +34,9 @@ function buildGroup(group) {
   }
 }
 
+const tools = await readVisualRuntimeTools(repositoryRoot)
+config.tools = tools
+
 if (check) {
   const inspection = await inspectVisualRuntime(config)
   for (const group of inspection.groups) {
@@ -59,7 +51,7 @@ if (check) {
   const result = await prepareVisualRuntime(config, {
     buildGroup,
     dryRun,
-    tools: await packageMetadata(),
+    tools,
   })
   if (!dryRun) {
     console.info(

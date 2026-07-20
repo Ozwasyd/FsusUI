@@ -26,6 +26,7 @@ function fixtureConfig(repositoryRoot) {
     })),
     repositoryRoot,
     runtimeRoot: 'runtime',
+    tools: fixedTools,
   }
 }
 
@@ -172,6 +173,7 @@ test('detects manifest configuration and fingerprint-file mismatches', async (t)
   const manifestPath = join(repositoryRoot, 'runtime', 'manifest.json')
   const manifest = JSON.parse(await readFile(manifestPath, 'utf8'))
   manifest.configurationFingerprint = 'mismatched-configuration'
+  manifest.tools.node = 'mismatched-node'
   await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
   await writeFile(
     join(repositoryRoot, 'runtime', 'fingerprints', 'icons.sha256'),
@@ -184,6 +186,7 @@ test('detects manifest configuration and fingerprint-file mismatches', async (t)
       'runtime manifest configuration fingerprint mismatch',
     ),
   )
+  assert(inspection.reasons.includes('runtime manifest tool versions mismatch'))
   assert(
     inspection.groups
       .find((group) => group.id === 'icons')

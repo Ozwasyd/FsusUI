@@ -28,6 +28,8 @@ Thumbs.db
 /vue/test-results/
 /blob-report/
 /screenshots/
+/.tmp/visual-runtime/
+/.tmp/playwright-browsers/
 .husky/_/
 vue/packages/*/dist
 vue/packages/*/dist/

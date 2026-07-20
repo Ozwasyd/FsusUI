@@ -7,6 +7,7 @@ import {
   resolveVisualCapacityPlan,
   serializeVisualCapacityPlan,
 } from './visual-capacity.mjs'
+import { cleanupSuccessfulVisualEvidence } from './visual-evidence-policy.mjs'
 
 export const PREVIEW_PROJECTS = [
   'desktop-light',
@@ -38,6 +39,7 @@ export function parseVisualArgs(args) {
   const shard = readOption(normalizedArgs, 'shard')
   const list =
     normalizedArgs.includes('--list') || normalizedArgs.includes('--dry-run')
+  const evidence = normalizedArgs.includes('--evidence')
 
   if (!SUITES.has(suite)) {
     throw new Error(`Unknown visual suite: ${suite}`)
@@ -68,7 +70,7 @@ export function parseVisualArgs(args) {
     }
   }
 
-  return { list, project, shard, suite }
+  return { evidence, list, project, shard, suite }
 }
 
 export function createVisualPlan(
@@ -183,6 +185,16 @@ function visualPlanEnvironment(capacityPlan, env = process.env) {
   }
 }
 
+export function runVisualRuntimePreparation(spawn = spawnSync) {
+  console.log('[visual-plan] runtime-prepare=pnpm run visual:prepare')
+  const result = spawn('pnpm', ['run', 'visual:prepare'], {
+    env: process.env,
+    stdio: 'inherit',
+    shell: process.platform === 'win32',
+  })
+  return result.status ?? 1
+}
+
 export function runVisualPlan(
   plan,
   spawn = spawnSync,
@@ -249,7 +261,27 @@ async function main() {
     validateVisualPlan(plan, capacityPlan)
     printVisualPlan(plan, capacityPlan)
     if (!options.list) {
-      process.exitCode = await runVisualPlanAsync(plan, { capacityPlan })
+      const preparationStatus = runVisualRuntimePreparation()
+      if (preparationStatus !== 0) {
+        process.exitCode = preparationStatus
+        return
+      }
+      const env = {
+        ...process.env,
+        FSUS_VISUAL_ORCHESTRATED: '1',
+        FSUS_VISUAL_EVIDENCE:
+          options.evidence || process.env.FSUS_VISUAL_EVIDENCE === '1'
+            ? '1'
+            : '0',
+      }
+      console.log(
+        `[visual-plan] evidence=${env.FSUS_VISUAL_EVIDENCE === '1' ? 'full' : 'failures-only'}`,
+      )
+      process.exitCode = await runVisualPlanAsync(plan, {
+        capacityPlan,
+        env,
+      })
+      await cleanupSuccessfulVisualEvidence(env, undefined, true)
     }
   } catch (error) {
     console.error(
