@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "9c2a6a9f28fa1604314bd41b47cf8e3f2fc80432",
+    "commitSha": "d77a42cd1bb065a293c830c6c0b15b21a603d626",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
@@ -6382,6 +6382,7 @@
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/public-shell-critical.scss",
         "vue/packages/theme-chalk/src/public-shell.scss",
         "vue/packages/theme-chalk/src/site-header.scss"
       ],
@@ -6398,6 +6399,7 @@
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/image-viewer.scss",
         "vue/packages/theme-chalk/src/mixins/_var.scss",
+        "vue/packages/theme-chalk/src/public-shell-critical.scss",
         "vue/packages/theme-chalk/src/public-shell.scss",
         "vue/packages/theme-chalk/src/select-dropdown.scss",
         "vue/packages/theme-chalk/src/site-header.scss"
@@ -7206,7 +7208,8 @@
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
-        "vue/packages/theme-chalk/src/generated/tokens.scss"
+        "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/radio-button.scss"
       ],
       "classification": "portable"
     },
@@ -8258,7 +8261,9 @@
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/common/var.scss",
         "vue/packages/theme-chalk/src/motion.scss",
-        "vue/packages/theme-chalk/src/public-shell-critical.scss"
+        "vue/packages/theme-chalk/src/public-shell-critical.scss",
+        "vue/packages/theme-chalk/src/public-shell.scss",
+        "vue/packages/theme-chalk/src/site-header.scss"
       ],
       "classification": "portable"
     },
@@ -8361,6 +8366,8 @@
         "vue/packages/theme-chalk/src/markdown-renderer.scss",
         "vue/packages/theme-chalk/src/metric-primitives.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss",
+        "vue/packages/theme-chalk/src/public-shell-critical.scss",
+        "vue/packages/theme-chalk/src/public-shell.scss",
         "vue/packages/theme-chalk/src/select-v2.scss",
         "vue/packages/theme-chalk/src/theme-mode-toggle.scss"
       ],
@@ -8920,7 +8927,9 @@
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
-        "vue/packages/theme-chalk/src/loading.scss"
+        "vue/packages/theme-chalk/src/loading.scss",
+        "vue/packages/theme-chalk/src/public-shell-critical.scss",
+        "vue/packages/theme-chalk/src/public-shell.scss"
       ],
       "classification": "portable"
     },
