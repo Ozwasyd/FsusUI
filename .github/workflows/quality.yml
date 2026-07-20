@@ -19,6 +19,11 @@ on:
           - main
           - nightly
           - release
+      release_tag:
+        description: Optional v-prefixed package version for manual Release identity evidence
+        default: ''
+        required: false
+        type: string
 
 jobs:
   pr-fast:
@@ -214,3 +219,4 @@ jobs:
     uses: ./.github/workflows/_quality.yml
     with:
       group: release
+      release_tag: ${{ inputs.release_tag }}

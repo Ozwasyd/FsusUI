@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "profiles": {
-    "stable": [
+    "main": [
       "static-quality",
       "dotnet-platform",
       "dotnet-package",
@@ -11,7 +11,8 @@
       "build-package",
       "consumer-install",
       "build-demo",
-      "visual"
+      "visual",
+      "real-render-performance"
     ],
     "nightly": [
       "static-quality",
@@ -39,6 +40,24 @@
       "visual",
       "real-render-performance"
     ]
+  },
+  "execution": {
+    "main": {
+      "aggregator": "stable-readiness",
+      "realRenderProfile": "quick",
+      "visualProfile": "full"
+    },
+    "nightly": {
+      "aggregator": "nightly-readiness",
+      "realRenderProfile": "full",
+      "visualProfile": "full"
+    },
+    "release": {
+      "aggregator": "release-readiness",
+      "realRenderProfile": "full",
+      "visualProfile": "evidence",
+      "identityBinding": "commit-tag-package"
+    }
   },
   "owners": {
     "static-quality": { "cardinality": "single" },

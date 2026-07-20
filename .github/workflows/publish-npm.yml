@@ -40,6 +40,7 @@ jobs:
     uses: ./.github/workflows/_quality.yml
     with:
       group: release
+      release_tag: ${{ github.ref_name }}
 
   preflight:
     runs-on: ubuntu-latest
@@ -59,6 +60,7 @@ jobs:
           path: .npm-candidate
       - name: Verify candidate and release plan before lock
         run: |
+          test -n "${{ needs.quality.outputs.release-readiness-digest }}"
           pnpm run package:candidate:verify -- --tarball .npm-candidate/fsusui-npm-candidate.tgz --tag-version "${GITHUB_REF_NAME}"
           digest="$(node -p "require('./.npm-candidate/fsusui-npm-candidate.manifest.json').artifact.sha256")"
           test "${digest}" = "${{ needs.quality.outputs.npm-candidate-digest }}"
@@ -109,6 +111,7 @@ jobs:
           path: .npm-candidate
       - name: Verify locked candidate identity
         run: |
+          test -n "${{ needs.quality.outputs.release-readiness-digest }}"
           pnpm run package:candidate:verify -- --tarball .npm-candidate/fsusui-npm-candidate.tgz --tag-version "${GITHUB_REF_NAME}"
           digest="$(node -p "require('./.npm-candidate/fsusui-npm-candidate.manifest.json').artifact.sha256")"
           test "${digest}" = "${{ needs.quality.outputs.npm-candidate-digest }}"

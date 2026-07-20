@@ -1,0 +1,12 @@
+name: Invalid npm publish fixture
+jobs:
+  quality:
+    uses: ./.github/workflows/_quality.yml
+  preflight:
+    needs: [quality, plan]
+    steps:
+      - run: test -n "${{ needs.quality.outputs.release-readiness-digest }}"
+  publish:
+    needs: [quality, plan, preflight]
+    steps:
+      - run: test -n "${{ needs.quality.outputs.release-readiness-digest }}"

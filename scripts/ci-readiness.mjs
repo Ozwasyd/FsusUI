@@ -10,6 +10,7 @@ import {
   sha256Path,
   validateReadiness,
 } from './ci-readiness-contract.mjs'
+import { verifyReleaseIdentity } from './release-profile-identity.mjs'
 
 const args = process.argv.slice(2).filter((arg) => arg !== '--')
 const command = args.shift()
@@ -56,7 +57,7 @@ const jsonFiles = (root) => {
 }
 
 if (command === 'plan') {
-  const profile = option('group', 'stable')
+  const profile = option('group', 'main')
   const required = readinessSpec.profiles[profile]
   if (!required) throw new Error(`Unknown readiness profile: ${profile}.`)
   console.log(
@@ -177,6 +178,16 @@ if (command === 'plan') {
     runAttempt: option('run-attempt', first.run?.attempt),
     root,
   })
+  const releaseIdentity =
+    evidence.profile === 'release'
+      ? verifyReleaseIdentity({
+          repoRoot: process.cwd(),
+          candidateManifestPath: option('candidate-manifest'),
+          releaseTag: option('release-tag'),
+          commitSha: evidence.commitSha,
+        })
+      : undefined
+  if (releaseIdentity) evidence.releaseIdentity = releaseIdentity
   const output = option('evidence')
   if (output) {
     const absolute = path.resolve(output)

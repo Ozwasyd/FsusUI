@@ -24,6 +24,14 @@ CI 中的 `stable-readiness`、`nightly-readiness`、`release-readiness` 不调�
 校验 SHA、workflow group、run attempt、矩阵完整性、状态和工件 digest 后
 生成 evidence；完整契约与本地 fixtures 见 `docs/ci-readiness.md`。
 
+`spec/ci/readiness-gates.json` 同时是 main、nightly、release 的机器可读
+profile registry。`pnpm ci:profile:plan --group release` 只打印 gate、执行画像
+和 artifact binding；`pnpm ci:profile:check` 静态验证 workflow 与 invalid
+fixture，不启动测试、浏览器或网络访问。tag workflow 必须显式传入
+`group: release` 与 tag，手工 Release dispatch 调用同一个 profile；release
+aggregator 将唯一 npm candidate 的 commit、tag、package version 和 digest
+写入 evidence，publish 依赖该 evidence digest 后才可进入 channel lock。
+
 `pnpm verify` 保留为 `verify:full` 的安全别名，避免旧脚本降级覆盖面。
 
 所有并行质量组都通过 `run-p --continue-on-error` 收集完整失败集；单项失败不会

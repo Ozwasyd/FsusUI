@@ -19,7 +19,7 @@ const load = (root) =>
         fs.readFileSync(path.join(root, 'manifests', file), 'utf8'),
       ),
     }))
-const check = (root, profile = 'stable', group = 'stable') =>
+const check = (root, profile = 'main', group = 'main') =>
   validateReadiness({
     manifests: load(root).map(({ file, manifest }) => ({
       file,

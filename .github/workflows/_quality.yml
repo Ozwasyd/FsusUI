@@ -8,10 +8,18 @@ on:
         required: false
         type: string
         default: main
+      release_tag:
+        description: Expected v-prefixed package version for release identity binding.
+        required: false
+        type: string
+        default: ''
     outputs:
       npm-candidate-digest:
         description: SHA-256 of the immutable npm candidate tested by quality.
         value: ${{ jobs.build-package.outputs.candidate-digest }}
+      release-readiness-digest:
+        description: SHA-256 of the release aggregator evidence bound to SHA, tag, and package.
+        value: ${{ jobs.release-readiness.outputs.evidence-digest }}
 
 jobs:
   real-render-performance:
@@ -761,6 +769,7 @@ jobs:
       - consumer-install
       - build-demo
       - visual
+      - real-render-performance
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -772,7 +781,7 @@ jobs:
         run: |
           node scripts/ci-readiness.mjs check \
             --root .readiness \
-            --profile stable \
+            --profile main \
             --workflow-group '${{ inputs.group }}' \
             --commit "$GITHUB_SHA" \
             --run-id "$GITHUB_RUN_ID" \
@@ -848,6 +857,8 @@ jobs:
     if: always() && inputs.group == 'release'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    outputs:
+      evidence-digest: ${{ steps.release-evidence.outputs.digest }}
     needs:
       - stable-readiness
       - real-render-performance
@@ -868,8 +879,19 @@ jobs:
           pattern: readiness-manifest-*
           path: .readiness
           merge-multiple: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: fsusui-npm-candidate
+          path: .npm-candidate
       - name: Aggregate release leaf evidence
+        id: release-evidence
+        env:
+          RELEASE_TAG_INPUT: ${{ inputs.release_tag }}
         run: |
+          release_tag="$RELEASE_TAG_INPUT"
+          if [ -z "$release_tag" ]; then
+            release_tag="v$(node -p "require('./vue/packages/element-plus/package.json').version")"
+          fi
           node scripts/ci-readiness.mjs check \
             --root .readiness \
             --profile release \
@@ -877,7 +899,11 @@ jobs:
             --commit "$GITHUB_SHA" \
             --run-id "$GITHUB_RUN_ID" \
             --run-attempt "$GITHUB_RUN_ATTEMPT" \
+            --release-tag "$release_tag" \
+            --candidate-manifest .npm-candidate/fsusui-npm-candidate.manifest.json \
             --evidence .readiness/evidence/release.json
+          digest="$(sha256sum .readiness/evidence/release.json | cut -d ' ' -f 1)"
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
       - name: Pack release evidence
         run: |
           tar -czf avalonia-release-evidence.tgz .readiness docs/releases spec/ci

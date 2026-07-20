@@ -1,6 +1,6 @@
 # CI readiness evidence aggregation
 
-Stable, nightly, and release readiness jobs are read-only aggregation gates.
+Main/stable, nightly, and release readiness jobs are read-only aggregation gates.
 They do not run a second copy of build, test, coverage, visual, package, or
 `.NET` verification. Each execution owner records one schema-versioned JSON
 manifest after its leaf job and uploads that small manifest under
@@ -15,12 +15,13 @@ consumer cannot attest to a different tarball.
 
 The profile contract lives in `spec/ci/readiness-gates.json`:
 
-- stable requires static quality, all three `.NET` platforms, the unique NuGet
+- main requires static quality, all three `.NET` platforms, the unique NuGet
   candidate, typecheck, the complete Unit shard set, final coverage, the unique
-  npm candidate and consumer install, demo build, and visual results;
-- nightly requires the stable leaves plus real-render performance;
-- release requires the same complete evidence set and preserves the immutable
-  candidate/channel-lock hand-off used by the publish workflow.
+  npm candidate and consumer install, demo build, visual results, and quick
+  real-render performance;
+- nightly selects full real-render performance with the same registry;
+- release selects full real-render and evidence visual profiles, then binds the
+  immutable candidate to commit SHA, the v-prefixed tag, and package version.
 
 The aggregator rejects a missing owner, duplicate owner/dimension, incomplete
 matrix or shard set, mixed commit or workflow group, non-success status, stale
@@ -33,7 +34,10 @@ The planning and fixture checks are local, deterministic, and require neither
 the GitHub API nor the Actions artifact service:
 
 ```bash
-pnpm ci:readiness:plan --group stable
+pnpm ci:profile:plan --group main
+pnpm ci:profile:plan --group nightly
+pnpm ci:profile:plan --group release
+pnpm ci:profile:check
 pnpm ci:readiness:check --fixtures tests/fixtures/ci-readiness/valid
 pnpm test:ci-readiness
 pnpm check:readiness-workflow
@@ -43,3 +47,10 @@ pnpm check:readiness-workflow
 developer entry points. They are intentionally not called by a readiness job.
 The workflow policy checker guards that boundary and does not use runner wall
 time as a correctness condition.
+
+The tag workflow passes `group: release` and its tag to the same reusable
+profile used by manual Release dispatch. `publish` consumes both the unique npm
+candidate digest and the release-readiness evidence digest; it cannot proceed
+from the reusable workflow's default Main profile. Manual Release may omit a
+tag input, in which case the aggregator derives the expected `v<packageVersion>`
+identity without creating or querying a tag.

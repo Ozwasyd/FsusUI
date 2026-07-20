@@ -109,6 +109,7 @@ FsusBlog 侧的消费规则：页面只消费 FsusUI 导出的 component / direc
 - `.github/workflows/quality.yml` 是统一质量入口
 - `.github/workflows/_quality.yml` 是可复用质量门定义
 - `publish-npm.yml` 必须依赖 release quality 门，下载同一个 `fsusui-npm-candidate`，核对 commit/tag/package/digest，并以该 tarball 作为 `npm publish` 输入；publish job 禁止 build 或 prepare
+- main/nightly/release 共用 `spec/ci/readiness-gates.json`；用 `pnpm ci:profile:plan --group release` 查看完整 leaf 计划，用 `pnpm ci:profile:check` 静态验证 tag 与手工 Release 编排。tag publish 显式传 `group: release`，并依赖 release-readiness evidence digest，不能落入 reusable workflow 的默认 Main profile
 
 当前 CI job 分工：
 

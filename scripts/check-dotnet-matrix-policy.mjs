@@ -112,7 +112,7 @@ const validate = (source) => {
   )
   assert(
     stable.includes('node scripts/ci-readiness.mjs check') &&
-      stable.includes('--profile stable'),
+      stable.includes('--profile main'),
     'stable-readiness must verify platform and package manifests through the readiness aggregator',
   )
   assert(
