@@ -101,6 +101,24 @@
 
   @include e(header) {
     width: 100%;
+    border-bottom: 1px solid var(--#{$namespace}-border-color-lighter);
+    background: var(--fsus-paper, var(--#{$namespace}-bg-color));
+    backdrop-filter: blur(0px) saturate(100%);
+    -webkit-backdrop-filter: blur(0px) saturate(100%);
+    z-index: 50;
+
+    &.is-glass,
+    &[data-fsus-material='glass'] {
+      background: color-mix(
+        in srgb,
+        var(--#{$namespace}-bg-color) 96%,
+        transparent
+      );
+      backdrop-filter: blur(var(--fsus-backdrop-blur-soft, 0px))
+        saturate(var(--fsus-backdrop-saturate, 100%));
+      -webkit-backdrop-filter: blur(var(--fsus-backdrop-blur-soft, 0px))
+        saturate(var(--fsus-backdrop-saturate, 100%));
+    }
 
     @include when(sticky) {
       position: sticky;

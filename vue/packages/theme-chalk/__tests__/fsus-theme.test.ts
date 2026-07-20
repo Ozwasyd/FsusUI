@@ -2125,12 +2125,44 @@ describe('Fsus theme visual baseline', () => {
 
   test('defines reusable site header chrome primitives', () => {
     const css = compileThemeFile('site-header.scss')
+    const publicShellCss = compileThemeFile('public-shell.scss')
+    const criticalCss = compileThemeFile('public-shell-critical.scss')
 
     expectCssRule(css, '.el-site-header', [
       'width: 100%;',
       'border-bottom: 1px solid var(--el-border-color-lighter);',
-      'background: color-mix(in srgb, var(--el-bg-color) 96%, transparent);',
+      'background: var(--fsus-paper, var(--el-bg-color));',
+      'backdrop-filter: blur(0px) saturate(100%);',
+      '-webkit-backdrop-filter: blur(0px) saturate(100%);',
     ])
+    for (const selector of [
+      '.el-site-header.is-glass',
+      '.el-site-header[data-fsus-material=glass]',
+    ]) {
+      expectCssRule(css, selector, [
+        'background: color-mix(in srgb, var(--el-bg-color) 96%, transparent);',
+        'backdrop-filter: blur(var(--fsus-backdrop-blur-soft, 0px)) saturate(var(--fsus-backdrop-saturate, 100%));',
+        '-webkit-backdrop-filter: blur(var(--fsus-backdrop-blur-soft, 0px)) saturate(var(--fsus-backdrop-saturate, 100%));',
+      ])
+    }
+    for (const shellCss of [publicShellCss, criticalCss]) {
+      expectCssRule(shellCss, '.el-public-shell__header', [
+        'border-bottom: 1px solid var(--el-border-color-lighter);',
+        'background: var(--fsus-paper, var(--el-bg-color));',
+        'backdrop-filter: blur(0px) saturate(100%);',
+        '-webkit-backdrop-filter: blur(0px) saturate(100%);',
+      ])
+      for (const selector of [
+        '.el-public-shell__header.is-glass',
+        '.el-public-shell__header[data-fsus-material=glass]',
+      ]) {
+        expectCssRule(shellCss, selector, [
+          'background: color-mix(in srgb, var(--el-bg-color) 96%, transparent);',
+          'backdrop-filter: blur(var(--fsus-backdrop-blur-soft, 0px)) saturate(var(--fsus-backdrop-saturate, 100%));',
+          '-webkit-backdrop-filter: blur(var(--fsus-backdrop-blur-soft, 0px)) saturate(var(--fsus-backdrop-saturate, 100%));',
+        ])
+      }
+    }
     expectCssRule(css, '.el-site-header.is-sticky', [
       'position: sticky;',
       'top: 0;',
