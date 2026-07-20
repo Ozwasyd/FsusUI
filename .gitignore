@@ -25,6 +25,7 @@ Thumbs.db
 /coverage/
 /playwright-report/
 /test-results/
+/vue/test-results/
 /blob-report/
 /screenshots/
 .husky/_/
