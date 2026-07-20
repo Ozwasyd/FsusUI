@@ -15,4 +15,12 @@ defineOptions({
 
 defineProps(fixtureWidgetProps)
 defineEmits(fixtureWidgetEmits)
+
+function focus() {}
+function reset() {}
+
+defineExpose({
+  focus,
+  reset,
+})
 </script>

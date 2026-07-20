@@ -4,11 +4,11 @@
   "sources": [
     {
       "path": "tests/conformance/accessibility/contracts.json",
-      "sha256": "ce54d98224e71c4673d9123adcc87e31e5bcdc56ab22756d02c97c3c8cd584f3"
+      "sha256": "eb341cb9d5ae97b3dd63a56342867ebe3e794572bf740a8e5e662334b4610ec3"
     },
     {
       "path": "tests/conformance/accessibility/automation-snapshots.json",
-      "sha256": "235ed4621868d55eae98b52925597a51bbd81c651e2b60dcab1aab49a93f7214"
+      "sha256": "36c8b8928b3f35cfec8263028ee9b607e7403d0881e6fea4fc0f3af33bf797a9"
     }
   ],
   "requiredContractFields": [
@@ -23,9 +23,9 @@
     "keyboardNavigation"
   ],
   "summary": {
-    "controls": 36,
-    "snapshots": 39,
-    "passed": 39,
+    "controls": 37,
+    "snapshots": 40,
+    "passed": 40,
     "appiumReleaseGates": 2,
     "allowedByOverride": 0
   },
@@ -902,6 +902,28 @@
       "tabOrder": 39,
       "evidenceSource": "avalonia-headless",
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/perception-challenge-stable40.json",
+      "allowedByOverride": [],
+      "passed": true,
+      "errors": []
+    },
+    {
+      "id": "perception-character-challenge-conformance",
+      "component": "perception-character-challenge",
+      "platform": "avalonia",
+      "role": "group",
+      "accessibleName": "Character recognition challenge",
+      "value": "raster audio unavailable alternative eight states labels errors live regions stable focus order non-autoplay",
+      "states": {
+        "disabled": false,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": true
+      },
+      "keyboard": ["Tab", "ShiftTab", "Enter"],
+      "tabOrder": 40,
+      "evidenceSource": "avalonia-headless",
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/perception-character-challenge-conformance.json",
       "allowedByOverride": [],
       "passed": true,
       "errors": []

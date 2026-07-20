@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "2b5ce39a0992c56e3c57c8fc325aadc59e593d4f",
+    "commitSha": "7aa091be17ef190d6b44f770e605135bb400b2e2",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
@@ -687,6 +687,14 @@
           "name": "range-separator",
           "scoped": false
         }
+      ],
+      "exposed": [
+        "focus",
+        "handleBlurInput",
+        "handleClose",
+        "handleFocusInput",
+        "handleOpen",
+        "onPick"
       ]
     },
     {
@@ -695,7 +703,8 @@
       "classification": "native-adapter",
       "props": [],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "DynamicSizeList",
@@ -703,7 +712,8 @@
       "classification": "native-adapter",
       "props": [],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "ElAffix",
@@ -716,7 +726,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": ["update", "updateRoot"]
     },
     {
       "name": "ElAlert",
@@ -741,7 +752,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElAside",
@@ -754,7 +766,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElAutocomplete",
@@ -808,6 +821,20 @@
           "name": "suffix",
           "scoped": false
         }
+      ],
+      "exposed": [
+        "activated",
+        "blur",
+        "close",
+        "focus",
+        "handleKeyEnter",
+        "handleSelect",
+        "highlight",
+        "highlightedIndex",
+        "inputRef",
+        "loading",
+        "popperRef",
+        "suggestions"
       ]
     },
     {
@@ -816,7 +843,8 @@
       "classification": "native-adapter",
       "props": ["disableHeight", "disableWidth", "onResize"],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "ElAvatar",
@@ -829,7 +857,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElBacktop",
@@ -842,7 +871,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElBadge",
@@ -855,7 +885,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": ["content"]
     },
     {
       "name": "ElBreadcrumb",
@@ -868,7 +899,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElBreadcrumbItem",
@@ -881,7 +913,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElButton",
@@ -923,7 +956,8 @@
           "name": "loading",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": ["disabled", "ref", "shouldAddSpace", "size", "type"]
     },
     {
       "name": "ElButtonGroup",
@@ -936,7 +970,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElCalendar",
@@ -957,6 +992,12 @@
           "name": "header",
           "scoped": true
         }
+      ],
+      "exposed": [
+        "calculateValidatedDateRange",
+        "pickDay",
+        "selectDate",
+        "selectedDay"
       ]
     },
     {
@@ -985,7 +1026,8 @@
           "name": "header",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElCarousel",
@@ -1010,7 +1052,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": ["next", "prev", "setActiveItem"]
     },
     {
       "name": "ElCarouselItem",
@@ -1023,7 +1066,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElCascader",
@@ -1063,6 +1107,12 @@
           "name": "empty",
           "scoped": false
         }
+      ],
+      "exposed": [
+        "cascaderPanelRef",
+        "contentRef",
+        "getCheckedNodes",
+        "togglePopperVisible"
       ]
     },
     {
@@ -1070,8 +1120,9 @@
       "module": "cascader-panel",
       "classification": "native-adapter",
       "props": ["...CommonProps", "border", "renderLabel"],
-      "emits": [],
-      "slots": []
+      "emits": ["emit", "slots"],
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "ElCheckbox",
@@ -1099,7 +1150,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElCheckboxButton",
@@ -1127,7 +1179,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElCheckboxGroup",
@@ -1151,7 +1204,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElCheckTag",
@@ -1164,7 +1218,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElCol",
@@ -1188,7 +1243,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElCollapse",
@@ -1201,7 +1257,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": ["activeNames", "setActiveNames"]
     },
     {
       "name": "ElCollapseItem",
@@ -1218,7 +1275,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": ["isActive"]
     },
     {
       "name": "ElCollapseTransition",
@@ -1231,7 +1289,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElCollectionSummary",
@@ -1260,7 +1319,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElCollectionToolbar",
@@ -1285,7 +1345,8 @@
           "name": "primary",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElColorPicker",
@@ -1311,7 +1372,8 @@
         "blur",
         "focus"
       ],
-      "slots": []
+      "slots": [],
+      "exposed": ["blur", "color", "focus", "hide", "show"]
     },
     {
       "name": "ElConfigProvider",
@@ -1332,7 +1394,8 @@
         "zIndex"
       ],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "ElContainer",
@@ -1345,7 +1408,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElConversationContextBar",
@@ -1358,7 +1422,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElConversationList",
@@ -1371,7 +1436,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElConversationListItem",
@@ -1405,7 +1471,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElCopyableDetail",
@@ -1433,7 +1500,8 @@
           "name": "feedback",
           "scoped": true
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElCountdown",
@@ -1446,7 +1514,8 @@
           "name": "name",
           "scoped": true
         }
-      ]
+      ],
+      "exposed": ["displayValue"]
     },
     {
       "name": "ElDangerZone",
@@ -1467,7 +1536,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElDataList",
@@ -1497,7 +1567,8 @@
           "name": "empty",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElDatePicker",
@@ -1510,7 +1581,8 @@
         "showWeekNumber"
       ],
       "emits": ["minDate"],
-      "slots": []
+      "slots": [],
+      "exposed": ["focus"]
     },
     {
       "name": "ElDescriptions",
@@ -1527,7 +1599,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElDescriptionsItem",
@@ -1544,7 +1617,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElDestructiveActionPanel",
@@ -1569,7 +1643,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElDiagnosticsItem",
@@ -1611,7 +1686,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElDiagnosticsList",
@@ -1624,7 +1700,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElDialog",
@@ -1677,7 +1754,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": ["dialogContentRef", "visible"]
     },
     {
       "name": "ElDistributionBarRow",
@@ -1698,7 +1776,8 @@
           "name": "value",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElDistributionList",
@@ -1711,7 +1790,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElDivider",
@@ -1724,21 +1804,15 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElDrawer",
       "module": "drawer",
       "classification": "platform-override",
-      "props": [
-        "...dialogProps",
-        "direction",
-        "headerAriaLevel",
-        "modalFade",
-        "size",
-        "withHeader"
-      ],
-      "emits": [],
+      "props": ["attrs", "slots"],
+      "emits": ["attrs", "slots"],
       "slots": [
         {
           "name": "default",
@@ -1756,40 +1830,15 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElDropdown",
       "module": "dropdown",
       "classification": "native-adapter",
-      "props": [
-        "...componentMotionProps",
-        "buttonProps",
-        "command",
-        "disabled",
-        "divided",
-        "effect",
-        "hideOnClick",
-        "hideTimeout",
-        "icon",
-        "id",
-        "loop",
-        "maxHeight",
-        "onKeydown",
-        "placement",
-        "popperClass",
-        "popperOptions",
-        "role",
-        "showTimeout",
-        "size",
-        "splitButton",
-        "tabindex",
-        "teleported",
-        "textValue",
-        "trigger",
-        "type"
-      ],
-      "emits": [],
+      "props": ["emit"],
+      "emits": ["emit"],
       "slots": [
         {
           "name": "default",
@@ -1799,20 +1848,22 @@
           "name": "dropdown",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElDropdownItem",
       "module": "dropdown",
       "classification": "native-adapter",
-      "props": ["command", "disabled", "divided", "icon", "textValue"],
-      "emits": [],
+      "props": ["attrs", "emit"],
+      "emits": ["attrs", "emit"],
       "slots": [
         {
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElDropdownMenu",
@@ -1825,7 +1876,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElEmpty",
@@ -1852,7 +1904,8 @@
           "name": "image",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElEmptySelectionState",
@@ -1873,7 +1926,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElEmptyState",
@@ -1911,7 +1965,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElFilterGroup",
@@ -1928,7 +1983,8 @@
           "name": "label",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElFooter",
@@ -1941,7 +1997,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElForm",
@@ -1971,6 +2028,13 @@
           "name": "default",
           "scoped": false
         }
+      ],
+      "exposed": [
+        "clearValidate",
+        "resetFields",
+        "scrollToField",
+        "validate",
+        "validateField"
       ]
     },
     {
@@ -2004,6 +2068,14 @@
           "name": "label",
           "scoped": true
         }
+      ],
+      "exposed": [
+        "clearValidate",
+        "resetField",
+        "size",
+        "validate",
+        "validateMessage",
+        "validateState"
       ]
     },
     {
@@ -2037,7 +2109,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElHeader",
@@ -2050,7 +2123,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElIcon",
@@ -2063,7 +2137,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElImage",
@@ -2100,7 +2175,8 @@
           "name": "viewer",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElImageViewer",
@@ -2124,7 +2200,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": ["setActiveItem"]
     },
     {
       "name": "ElInboxEmptyState",
@@ -2145,7 +2222,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElInboxLayout",
@@ -2162,7 +2240,8 @@
           "name": "list",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElInfiniteScroll",
@@ -2170,7 +2249,8 @@
       "classification": "web-only",
       "props": [],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "ElInlineActions",
@@ -2183,7 +2263,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElInput",
@@ -2247,6 +2328,18 @@
           "name": "suffix",
           "scoped": false
         }
+      ],
+      "exposed": [
+        "autosize",
+        "blur",
+        "clear",
+        "focus",
+        "input",
+        "ref",
+        "resizeTextarea",
+        "select",
+        "textarea",
+        "textareaStyle"
       ]
     },
     {
@@ -2279,7 +2372,8 @@
         "blur",
         "focus"
       ],
-      "slots": []
+      "slots": [],
+      "exposed": ["blur", "focus"]
     },
     {
       "name": "ElKeyValueGrid",
@@ -2292,7 +2386,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElKeyValueItem",
@@ -2309,7 +2404,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElKpiGroup",
@@ -2322,7 +2418,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElLink",
@@ -2339,7 +2436,8 @@
           "name": "icon",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElLoading",
@@ -2347,7 +2445,8 @@
       "classification": "platform-override",
       "props": [],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "ElLoadingDirective",
@@ -2355,7 +2454,8 @@
       "classification": "platform-override",
       "props": [],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "ElLoadingService",
@@ -2363,7 +2463,8 @@
       "classification": "platform-override",
       "props": [],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "ElLocalizationChallenge",
@@ -2384,7 +2485,8 @@
           "name": "render",
           "scoped": true
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElMain",
@@ -2397,7 +2499,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElMarkdownEditor",
@@ -2451,7 +2554,8 @@
           "name": "status",
           "scoped": true
         }
-      ]
+      ],
+      "exposed": ["insertMarkdownAtCursor"]
     },
     {
       "name": "ElMarkdownRenderer",
@@ -2476,7 +2580,8 @@
         "trustedScriptUrlFactory"
       ],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": ["rootEl"]
     },
     {
       "name": "ElMenu",
@@ -2518,14 +2623,15 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElMenuItem",
       "module": "menu",
       "classification": "native-adapter",
-      "props": ["disabled", "index", "route", "title"],
-      "emits": ["click"],
+      "props": ["emit"],
+      "emits": ["emit"],
       "slots": [
         {
           "name": "default",
@@ -2535,7 +2641,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElMenuItemGroup",
@@ -2552,7 +2659,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElMessage",
@@ -2580,7 +2688,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": ["bottom", "close", "visible"]
     },
     {
       "name": "ElMessageBox",
@@ -2599,13 +2708,14 @@
         "roundButton",
         "showClose"
       ],
-      "emits": [],
+      "emits": ["emit"],
       "slots": [
         {
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElMessageBubble",
@@ -2630,7 +2740,8 @@
           "name": "meta",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElMessageTimeline",
@@ -2643,7 +2754,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElMetadataItem",
@@ -2656,7 +2768,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElMetadataRow",
@@ -2669,7 +2782,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElMetricItem",
@@ -2694,7 +2808,8 @@
           "name": "secondary",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElMetricList",
@@ -2707,7 +2822,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElMicroInteractionChallenge",
@@ -2721,7 +2837,8 @@
         "title"
       ],
       "emits": ["submit"],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "ElNotification",
@@ -2750,7 +2867,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": ["close", "visible"]
     },
     {
       "name": "ElOption",
@@ -2763,7 +2881,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElOptionGroup",
@@ -2776,7 +2895,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElOverlay",
@@ -2784,7 +2904,8 @@
       "classification": "platform-override",
       "props": ["customMaskEvent", "mask", "overlayClass", "zIndex"],
       "emits": ["click"],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "ElPageHeader",
@@ -2817,7 +2938,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElPagination",
@@ -2825,7 +2947,8 @@
       "classification": "native-adapter",
       "props": ["size"],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "ElPaginationBar",
@@ -2846,7 +2969,8 @@
           "name": "summary",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElPerceptionChallenge",
@@ -2912,7 +3036,8 @@
           "name": "text-task",
           "scoped": true
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElPerceptionCharacterChallenge",
@@ -2958,7 +3083,8 @@
           "name": "raster",
           "scoped": true
         }
-      ]
+      ],
+      "exposed": ["focus", "inputRef", "reset"]
     },
     {
       "name": "ElPopconfirm",
@@ -2984,7 +3110,8 @@
           "name": "reference",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElPopover",
@@ -3030,7 +3157,8 @@
           "name": "reference",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": ["hide", "popperRef"]
     },
     {
       "name": "ElPopoverDirective",
@@ -3076,7 +3204,8 @@
           "name": "reference",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": ["hide", "popperRef"]
     },
     {
       "name": "ElPopper",
@@ -3089,7 +3218,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElPopperArrow",
@@ -3097,7 +3227,8 @@
       "classification": "web-only",
       "props": ["arrowOffset"],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": ["arrowRef"]
     },
     {
       "name": "ElPopperContent",
@@ -3105,7 +3236,8 @@
       "classification": "web-only",
       "props": ["arrowOffset"],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": ["arrowRef"]
     },
     {
       "name": "ElPopperTrigger",
@@ -3113,7 +3245,8 @@
       "classification": "web-only",
       "props": ["arrowOffset"],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": ["arrowRef"]
     },
     {
       "name": "ElProgress",
@@ -3141,7 +3274,8 @@
           "name": "default",
           "scoped": true
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElPublicShell",
@@ -3226,7 +3360,8 @@
           "name": "mobile-search",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElRadio",
@@ -3239,7 +3374,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElRadioButton",
@@ -3252,7 +3388,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElRadioGroup",
@@ -3275,7 +3412,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElRate",
@@ -3305,7 +3443,8 @@
         "voidIcon"
       ],
       "emits": ["[CHANGE_EVENT]", "[UPDATE_MODEL_EVENT]"],
-      "slots": []
+      "slots": [],
+      "exposed": ["resetCurrentValue", "setCurrentValue"]
     },
     {
       "name": "ElReplyComposerShell",
@@ -3330,7 +3469,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElResourceList",
@@ -3343,7 +3483,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElResourceListItem",
@@ -3372,7 +3513,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElResponsiveCollection",
@@ -3404,7 +3546,8 @@
           "name": "table",
           "scoped": true
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElResult",
@@ -3429,7 +3572,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElRiskNotice",
@@ -3446,7 +3590,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElRow",
@@ -3459,7 +3604,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElScrollbar",
@@ -3489,6 +3635,14 @@
           "name": "default",
           "scoped": false
         }
+      ],
+      "exposed": [
+        "handleScroll",
+        "scrollTo",
+        "setScrollLeft",
+        "setScrollTop",
+        "update",
+        "wrapRef"
       ]
     },
     {
@@ -3510,7 +3664,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElSectionNav",
@@ -3523,7 +3678,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElSegmentedControl",
@@ -3542,7 +3698,8 @@
           "name": "item",
           "scoped": true
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElSelect",
@@ -3612,15 +3769,17 @@
           "name": "prefix",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElSelectV2",
       "module": "select-v2",
       "classification": "native-adapter",
       "props": ["height", "item", "style"],
-      "emits": [],
-      "slots": []
+      "emits": ["emit"],
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "ElSettingsSection",
@@ -3653,7 +3812,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElSiteHeader",
@@ -3698,7 +3858,8 @@
           "name": "mobile-secondary-actions",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElSkeleton",
@@ -3715,7 +3876,8 @@
           "name": "template",
           "scoped": true
         }
-      ]
+      ],
+      "exposed": ["uiLoading"]
     },
     {
       "name": "ElSkeletonItem",
@@ -3723,7 +3885,8 @@
       "classification": "portable",
       "props": ["variant"],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "ElSlider",
@@ -3757,7 +3920,8 @@
         "vertical"
       ],
       "emits": ["[CHANGE_EVENT]", "[INPUT_EVENT]", "[UPDATE_MODEL_EVENT]"],
-      "slots": []
+      "slots": [],
+      "exposed": ["onSliderClick"]
     },
     {
       "name": "ElSpace",
@@ -3776,7 +3940,8 @@
         "wrap"
       ],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "ElSplitPane",
@@ -3799,7 +3964,8 @@
           "name": "list",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElStatistic",
@@ -3830,7 +3996,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": ["displayValue"]
     },
     {
       "name": "ElStatusSummary",
@@ -3859,7 +4026,8 @@
           "name": "updated",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElStep",
@@ -3880,7 +4048,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElSteps",
@@ -3900,7 +4069,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElSubMenu",
@@ -3926,7 +4096,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElSwitch",
@@ -3959,7 +4130,8 @@
         "width"
       ],
       "emits": ["[CHANGE_EVENT]", "[INPUT_EVENT]", "[UPDATE_MODEL_EVENT]"],
-      "slots": []
+      "slots": [],
+      "exposed": ["checked", "focus"]
     },
     {
       "name": "ElTable",
@@ -3980,7 +4152,8 @@
           "name": "empty",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElTableColumn",
@@ -3988,7 +4161,8 @@
       "classification": "native-adapter",
       "props": ["column", "placement", "store", "upDataColumn"],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "ElTableV2",
@@ -4000,7 +4174,9 @@
         "cellData",
         "cellProps",
         "class",
+        "column",
         "columnIndex",
+        "columns",
         "columnsStyles",
         "containerStyle",
         "data",
@@ -4055,7 +4231,8 @@
         "width"
       ],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "ElTabPane",
@@ -4068,7 +4245,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElTabs",
@@ -4076,7 +4254,8 @@
       "classification": "native-adapter",
       "props": ["tabs"],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": ["ref", "update"]
     },
     {
       "name": "ElTag",
@@ -4099,7 +4278,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElTaskPageHeader",
@@ -4120,7 +4300,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElText",
@@ -4133,7 +4314,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElTextTaskChallenge",
@@ -4147,7 +4329,8 @@
         "submitLabel"
       ],
       "emits": ["submit", "update:modelValue"],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "ElThemeModeToggle",
@@ -4165,7 +4348,8 @@
         "visibility"
       ],
       "emits": ["[CHANGE_EVENT]", "[UPDATE_MODEL_EVENT]"],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "ElThreadPanel",
@@ -4206,7 +4390,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElTimeline",
@@ -4232,7 +4417,8 @@
           "name": "dot",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElTimelineItem",
@@ -4258,7 +4444,8 @@
           "name": "dot",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElTimePicker",
@@ -4309,6 +4496,14 @@
           "name": "range-separator",
           "scoped": false
         }
+      ],
+      "exposed": [
+        "focus",
+        "handleBlurInput",
+        "handleClose",
+        "handleFocusInput",
+        "handleOpen",
+        "onPick"
       ]
     },
     {
@@ -4334,7 +4529,8 @@
         "step"
       ],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": ["blur", "focus"]
     },
     {
       "name": "ElTooltip",
@@ -4358,6 +4554,15 @@
           "name": "default",
           "scoped": false
         }
+      ],
+      "exposed": [
+        "contentRef",
+        "hide",
+        "isFocusInsideContent",
+        "onClose",
+        "onOpen",
+        "popperRef",
+        "updatePopper"
       ]
     },
     {
@@ -4366,7 +4571,8 @@
       "classification": "platform-override",
       "props": ["...tooltipV2ArrowProps", "...tooltipV2ArrowSpecialProps"],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "ElTransfer",
@@ -4403,7 +4609,8 @@
           "name": "right-footer",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": ["clearQuery", "leftPanel", "rightPanel"]
     },
     {
       "name": "ElTree",
@@ -4414,6 +4621,7 @@
         "allowDrag",
         "allowDrop",
         "autoExpandParent",
+        "broadcastExpanded",
         "checkDescendants",
         "checkOnClickNode",
         "checkStrictly",
@@ -4445,7 +4653,8 @@
           "name": "empty",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElTreeSelect",
@@ -4453,7 +4662,8 @@
       "classification": "native-adapter",
       "props": ["...ElSelect.props", "...ElTree.props", "cacheData"],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "ElTreeV2",
@@ -4466,11 +4676,13 @@
         "expanded",
         "hiddenExpandIcon",
         "indeterminate",
+        "itemSize",
         "node",
         "showCheckbox"
       ],
       "emits": ["check", "click", "toggle"],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "ElTypedConfirmField",
@@ -4493,7 +4705,8 @@
           "name": "description",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElUpload",
@@ -4529,6 +4742,13 @@
           "name": "trigger",
           "scoped": false
         }
+      ],
+      "exposed": [
+        "abort",
+        "clearFiles",
+        "handleRemove",
+        "handleStart",
+        "submit"
       ]
     },
     {
@@ -4542,7 +4762,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "ElWatermark",
@@ -4565,7 +4786,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FixedSizeGrid",
@@ -4573,7 +4795,8 @@
       "classification": "native-adapter",
       "props": [],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "FixedSizeList",
@@ -4581,7 +4804,8 @@
       "classification": "native-adapter",
       "props": [],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "FsusCollectionSummary",
@@ -4610,7 +4834,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusCollectionToolbar",
@@ -4635,7 +4860,8 @@
           "name": "primary",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusConversationContextBar",
@@ -4648,7 +4874,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusConversationList",
@@ -4661,7 +4888,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusConversationListItem",
@@ -4695,7 +4923,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusCopyableDetail",
@@ -4723,7 +4952,8 @@
           "name": "feedback",
           "scoped": true
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusDangerZone",
@@ -4744,7 +4974,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusDataList",
@@ -4774,7 +5005,8 @@
           "name": "empty",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusDestructiveActionPanel",
@@ -4799,7 +5031,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusDiagnosticsItem",
@@ -4841,7 +5074,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusDiagnosticsList",
@@ -4854,7 +5088,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusDistributionBarRow",
@@ -4875,7 +5110,8 @@
           "name": "value",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusDistributionList",
@@ -4888,7 +5124,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusEmptySelectionState",
@@ -4909,7 +5146,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusEmptyState",
@@ -4947,7 +5185,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusFilterGroup",
@@ -4964,7 +5203,8 @@
           "name": "label",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusFormSection",
@@ -4997,7 +5237,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusInboxEmptyState",
@@ -5018,7 +5259,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusInboxLayout",
@@ -5035,7 +5277,8 @@
           "name": "list",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusInlineActions",
@@ -5048,7 +5291,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusKeyValueGrid",
@@ -5061,7 +5305,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusKeyValueItem",
@@ -5078,7 +5323,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusKpiGroup",
@@ -5091,7 +5337,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusLocalizationChallenge",
@@ -5112,7 +5359,8 @@
           "name": "render",
           "scoped": true
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusMessageBubble",
@@ -5137,7 +5385,8 @@
           "name": "meta",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusMessageTimeline",
@@ -5150,7 +5399,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusMetadataItem",
@@ -5163,7 +5413,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusMetadataRow",
@@ -5176,7 +5427,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusMetricItem",
@@ -5201,7 +5453,8 @@
           "name": "secondary",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusMetricList",
@@ -5214,7 +5467,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusMicroInteractionChallenge",
@@ -5228,7 +5482,8 @@
         "title"
       ],
       "emits": ["submit"],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "FsusPaginationBar",
@@ -5249,7 +5504,8 @@
           "name": "summary",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusPerceptionChallenge",
@@ -5315,7 +5571,8 @@
           "name": "text-task",
           "scoped": true
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusPerceptionCharacterChallenge",
@@ -5361,7 +5618,8 @@
           "name": "raster",
           "scoped": true
         }
-      ]
+      ],
+      "exposed": ["focus", "inputRef", "reset"]
     },
     {
       "name": "FsusReplyComposerShell",
@@ -5386,7 +5644,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusResourceList",
@@ -5399,7 +5658,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusResourceListItem",
@@ -5428,7 +5688,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusRiskNotice",
@@ -5445,7 +5706,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusSectionHeader",
@@ -5466,7 +5728,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusSectionNav",
@@ -5479,7 +5742,8 @@
           "name": "default",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusSegmentedControl",
@@ -5498,7 +5762,8 @@
           "name": "item",
           "scoped": true
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusSettingsSection",
@@ -5531,7 +5796,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusSplitPane",
@@ -5554,7 +5820,8 @@
           "name": "list",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusStatusSummary",
@@ -5583,7 +5850,8 @@
           "name": "updated",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusTaskPageHeader",
@@ -5604,7 +5872,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusTextTaskChallenge",
@@ -5618,7 +5887,8 @@
         "submitLabel"
       ],
       "emits": ["submit", "update:modelValue"],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "FsusThreadPanel",
@@ -5659,7 +5929,8 @@
           "name": "title",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "FsusTypedConfirmField",
@@ -5682,7 +5953,8 @@
           "name": "description",
           "scoped": false
         }
-      ]
+      ],
+      "exposed": []
     },
     {
       "name": "TableV2",
@@ -5694,7 +5966,9 @@
         "cellData",
         "cellProps",
         "class",
+        "column",
         "columnIndex",
+        "columns",
         "columnsStyles",
         "containerStyle",
         "data",
@@ -5749,7 +6023,8 @@
         "width"
       ],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "TableV2Alignment",
@@ -5757,7 +6032,8 @@
       "classification": "native-adapter",
       "props": [],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "TableV2FixedDir",
@@ -5765,7 +6041,8 @@
       "classification": "native-adapter",
       "props": [],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "TableV2Placeholder",
@@ -5773,7 +6050,8 @@
       "classification": "native-adapter",
       "props": [],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "TableV2SortOrder",
@@ -5781,7 +6059,8 @@
       "classification": "native-adapter",
       "props": [],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     },
     {
       "name": "TimePickPanel",
@@ -5832,6 +6111,14 @@
           "name": "range-separator",
           "scoped": false
         }
+      ],
+      "exposed": [
+        "focus",
+        "handleBlurInput",
+        "handleClose",
+        "handleFocusInput",
+        "handleOpen",
+        "onPick"
       ]
     },
     {
@@ -5840,7 +6127,8 @@
       "classification": "platform-override",
       "props": [],
       "emits": [],
-      "slots": []
+      "slots": [],
+      "exposed": []
     }
   ],
   "directives": [

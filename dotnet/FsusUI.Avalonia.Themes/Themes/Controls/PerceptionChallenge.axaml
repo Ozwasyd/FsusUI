@@ -1,7 +1,7 @@
 <Styles
   xmlns="https://github.com/avaloniaui"
   xmlns:fsus="using:FsusUI.Avalonia.Controls">
-  <Style Selector="fsus|FsusPerceptionChallenge, fsus|FsusLocalizationChallenge, fsus|FsusMicroInteractionChallenge, fsus|FsusTextTaskChallenge">
+  <Style Selector="fsus|FsusPerceptionChallenge, fsus|FsusPerceptionCharacterChallenge, fsus|FsusLocalizationChallenge, fsus|FsusMicroInteractionChallenge, fsus|FsusTextTaskChallenge">
     <Setter Property="Padding" Value="{DynamicResource FsusSpace3}" />
     <Setter Property="Background" Value="{DynamicResource FsusThemePerceptionChallengeSurfaceBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
@@ -29,5 +29,18 @@
   <Style Selector="fsus|FsusPerceptionChallenge.fsus-disabled">
     <Setter Property="Background" Value="{DynamicResource FsusThemeDisabledSurfaceBrush}" />
     <Setter Property="Opacity" Value="{DynamicResource FsusThemeDisabledOpacity}" />
+  </Style>
+
+  <Style Selector="fsus|FsusPerceptionCharacterChallenge">
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="MaxWidth" Value="640" />
+  </Style>
+
+  <Style Selector="fsus|FsusPerceptionCharacterChallenge.fsus-error, fsus|FsusPerceptionCharacterChallenge.fsus-retryable, fsus|FsusPerceptionCharacterChallenge.fsus-expired">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeDangerBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusPerceptionCharacterChallenge:focus-visible">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusRingBrush}" />
   </Style>
 </Styles>

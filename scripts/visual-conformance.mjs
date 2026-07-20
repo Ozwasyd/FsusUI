@@ -1,7 +1,9 @@
 import crypto from 'node:crypto'
+import { Buffer } from 'node:buffer'
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
+import zlib from 'node:zlib'
 import { fileURLToPath } from 'node:url'
 import { format, resolveConfig } from 'prettier'
 
@@ -38,6 +40,162 @@ const readJson = (relativePath) => JSON.parse(read(relativePath))
 
 const sha256 = (content) =>
   crypto.createHash('sha256').update(content).digest('hex')
+
+const readBuffer = (relativePath) =>
+  fs.readFileSync(path.join(root, relativePath))
+
+const inspectPng = (relativePath) => {
+  const buffer = readBuffer(relativePath)
+  const signature = buffer.subarray(0, 8).toString('hex')
+  if (signature !== '89504e470d0a1a0a') {
+    throw new Error(`${relativePath} is not a PNG`)
+  }
+  let offset = 8
+  let width
+  let height
+  let bitDepth
+  let colorType
+  let interlace
+  const idat = []
+  while (offset + 12 <= buffer.length) {
+    const length = buffer.readUInt32BE(offset)
+    const type = buffer.subarray(offset + 4, offset + 8).toString('ascii')
+    const data = buffer.subarray(offset + 8, offset + 8 + length)
+    if (type === 'IHDR') {
+      width = data.readUInt32BE(0)
+      height = data.readUInt32BE(4)
+      bitDepth = data[8]
+      colorType = data[9]
+      interlace = data[12]
+    } else if (type === 'IDAT') idat.push(data)
+    else if (type === 'IEND') break
+    offset += 12 + length
+  }
+  if (!width || !height || bitDepth !== 8 || interlace !== 0) {
+    throw new Error(`${relativePath} must be a non-interlaced 8-bit PNG`)
+  }
+  const channels = colorType === 2 ? 3 : colorType === 6 ? 4 : undefined
+  if (!channels)
+    throw new Error(
+      `${relativePath} uses unsupported PNG color type ${colorType}`,
+    )
+  const stride = width * channels
+  const inflated = zlib.inflateSync(Buffer.concat(idat))
+  if (inflated.length !== (stride + 1) * height) {
+    throw new Error(`${relativePath} PNG scanline length is invalid`)
+  }
+  const pixels = Buffer.alloc(stride * height)
+  const paeth = (a, b, c) => {
+    const estimate = a + b - c
+    const pa = Math.abs(estimate - a)
+    const pb = Math.abs(estimate - b)
+    const pc = Math.abs(estimate - c)
+    return pa <= pb && pa <= pc ? a : pb <= pc ? b : c
+  }
+  for (let y = 0; y < height; y += 1) {
+    const source = y * (stride + 1)
+    const target = y * stride
+    const filter = inflated[source]
+    for (let x = 0; x < stride; x += 1) {
+      const raw = inflated[source + 1 + x]
+      const left = x >= channels ? pixels[target + x - channels] : 0
+      const up = y > 0 ? pixels[target + x - stride] : 0
+      const upperLeft =
+        y > 0 && x >= channels ? pixels[target + x - stride - channels] : 0
+      const value =
+        filter === 0
+          ? raw
+          : filter === 1
+            ? raw + left
+            : filter === 2
+              ? raw + up
+              : filter === 3
+                ? raw + Math.floor((left + up) / 2)
+                : filter === 4
+                  ? raw + paeth(left, up, upperLeft)
+                  : Number.NaN
+      if (!Number.isFinite(value))
+        throw new Error(`${relativePath} uses invalid PNG filter ${filter}`)
+      pixels[target + x] = value & 0xff
+    }
+  }
+  const background = [pixels[0], pixels[1], pixels[2]]
+  const isNonBackground = (x, y) => {
+    const index = y * stride + x * channels
+    return (
+      Math.abs(pixels[index] - background[0]) +
+        Math.abs(pixels[index + 1] - background[1]) +
+        Math.abs(pixels[index + 2] - background[2]) >
+      24
+    )
+  }
+  let nonBackground = 0
+  const colors = new Set()
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const index = y * stride + x * channels
+      colors.add(
+        (pixels[index] >> 3) |
+          ((pixels[index + 1] >> 3) << 5) |
+          ((pixels[index + 2] >> 3) << 10),
+      )
+      if (isNonBackground(x, y)) nonBackground += 1
+    }
+  }
+  const inspectRegion = (bounds) => {
+    const left = Math.max(0, Math.min(width - 1, Math.floor(bounds.X)))
+    const top = Math.max(0, Math.min(height - 1, Math.floor(bounds.Y)))
+    const right = Math.max(
+      left,
+      Math.min(width - 1, Math.ceil(bounds.Right) - 1),
+    )
+    const bottom = Math.max(
+      top,
+      Math.min(height - 1, Math.ceil(bounds.Y + bounds.Height) - 1),
+    )
+    const histogram = new Map()
+    let count = 0
+    let regionNonBackground = 0
+    let borderCount = 0
+    let borderNonBackground = 0
+    for (let y = top; y <= bottom; y += 1) {
+      for (let x = left; x <= right; x += 1) {
+        const index = y * stride + x * channels
+        const color =
+          (pixels[index] >> 3) |
+          ((pixels[index + 1] >> 3) << 5) |
+          ((pixels[index + 2] >> 3) << 10)
+        histogram.set(color, (histogram.get(color) ?? 0) + 1)
+        count += 1
+        if (isNonBackground(x, y)) regionNonBackground += 1
+      }
+    }
+    for (let x = left; x <= right; x += 1) {
+      borderCount += 2
+      if (isNonBackground(x, top)) borderNonBackground += 1
+      if (isNonBackground(x, bottom)) borderNonBackground += 1
+    }
+    for (let y = top + 1; y < bottom; y += 1) {
+      borderCount += 2
+      if (isNonBackground(left, y)) borderNonBackground += 1
+      if (isNonBackground(right, y)) borderNonBackground += 1
+    }
+    return {
+      nonBackgroundRatio: regionNonBackground / count,
+      borderNonBackgroundRatio: borderNonBackground / borderCount,
+      quantizedColorCount: histogram.size,
+      minorityColorRatio: 1 - Math.max(...histogram.values()) / count,
+    }
+  }
+  return {
+    buffer,
+    width,
+    height,
+    nonBackgroundRatio: nonBackground / (width * height),
+    quantizedColorCount: colors.size,
+    inspectRegion,
+  }
+}
 
 const toPosix = (value) => value.split(path.sep).join('/')
 
@@ -172,6 +330,189 @@ const ensureComparisonMode = (comparison) => {
   }
 }
 
+const evaluateRenderEvidence = (comparison, fixture) => {
+  const manifestPath = comparison.evidenceManifest
+  const absoluteManifest = path.join(root, manifestPath)
+  if (!fs.existsSync(absoluteManifest)) {
+    throw new Error(
+      `${comparison.id} render evidence manifest is missing: ${manifestPath}`,
+    )
+  }
+  const manifest = readJson(manifestPath)
+  if (
+    manifest.renderer?.runner !== 'headless-skia' ||
+    manifest.renderer?.control !== 'FsusPerceptionCharacterChallenge'
+  ) {
+    throw new Error(
+      `${comparison.id} manifest does not prove the Avalonia Headless Skia control render`,
+    )
+  }
+
+  const validateCapture = (capture) => {
+    if (!capture?.File || !fs.existsSync(path.join(root, capture.File))) {
+      throw new Error(
+        `${comparison.id} capture is missing: ${capture?.File ?? 'undefined'}`,
+      )
+    }
+    const png = inspectPng(capture.File)
+    if (sha256(png.buffer) !== capture.Sha256) {
+      throw new Error(`${comparison.id} capture hash drifted: ${capture.File}`)
+    }
+    if (
+      png.width !== capture.PixelSize?.Width ||
+      png.height !== capture.PixelSize?.Height
+    ) {
+      throw new Error(
+        `${comparison.id} capture dimensions drifted: ${capture.File}`,
+      )
+    }
+    if (png.nonBackgroundRatio <= 0.01 || png.quantizedColorCount < 4) {
+      throw new Error(`${comparison.id} capture is blank: ${capture.File}`)
+    }
+    if (
+      Math.abs(png.nonBackgroundRatio - capture.NonBackgroundPixelRatio) >
+      0.000001
+    ) {
+      throw new Error(
+        `${comparison.id} capture pixel evidence drifted: ${capture.File}`,
+      )
+    }
+    for (const bounds of capture.ControlBounds ?? []) {
+      if (
+        bounds.Width <= 0 ||
+        bounds.Height <= 0 ||
+        bounds.X < 0 ||
+        bounds.Y < 0 ||
+        bounds.Right > png.width + 0.01 ||
+        bounds.Y + bounds.Height > png.height + 0.01
+      ) {
+        throw new Error(
+          `${comparison.id} control bounds leave capture ${capture.File}`,
+        )
+      }
+    }
+    for (const control of capture.CriticalControls ?? []) {
+      const measured = png.inspectRegion(control.Bounds)
+      if (
+        measured.nonBackgroundRatio <= 0.01 ||
+        measured.borderNonBackgroundRatio <= 0.01
+      ) {
+        throw new Error(
+          `${comparison.id} critical control is not visible: ${control.State}/${control.AutomationId}`,
+        )
+      }
+      if (
+        control.AutomationId === 'character-raster' &&
+        (measured.quantizedColorCount < 2 ||
+          measured.minorityColorRatio <= 0.05)
+      ) {
+        throw new Error(
+          `${comparison.id} raster glyph content is blank: ${control.State}`,
+        )
+      }
+    }
+    return png
+  }
+
+  const web = manifest.webBaseline
+  if (web?.File !== comparison.baseline.screenshot) {
+    throw new Error(
+      `${comparison.id} Web baseline is not bound to the render manifest`,
+    )
+  }
+  const webPng = validateCapture({
+    ...web,
+    ControlBounds: [],
+    CriticalControls: [],
+  })
+  const captures = manifest.captures ?? []
+  const byId = new Map(captures.map((capture) => [capture.Id, capture]))
+  const overview = byId.get('perception-character-challenge-conformance')
+  const highContrast = byId.get('perception-character-challenge-high-contrast')
+  const zoom200 = byId.get('perception-character-challenge-zoom-200')
+  const zoom400 = byId.get('perception-character-challenge-zoom-400')
+  if (!overview || !highContrast || !zoom200 || !zoom400) {
+    throw new Error(
+      `${comparison.id} manifest must include overview, high contrast, 200%, and 400% captures`,
+    )
+  }
+  if (overview.File !== comparison.candidate.screenshot) {
+    throw new Error(
+      `${comparison.id} Avalonia candidate is not bound to the render manifest`,
+    )
+  }
+  for (const capture of [overview, highContrast, zoom200, zoom400])
+    validateCapture(capture)
+
+  const expectedStates = [
+    'loading',
+    'ready',
+    'verifying',
+    'retryable',
+    'reissue',
+    'expired',
+    'unavailable',
+    'disabled',
+  ]
+  for (const capture of [overview, highContrast]) {
+    if (
+      JSON.stringify(capture.States) !== JSON.stringify(expectedStates) ||
+      capture.ControlBounds?.length !== 8
+    ) {
+      throw new Error(
+        `${comparison.id} ${capture.Id} does not contain all eight measured states`,
+      )
+    }
+    const rasterStates = (capture.CriticalControls ?? [])
+      .filter((control) => control.AutomationId === 'character-raster')
+      .map((control) => control.State)
+      .sort()
+    if (
+      JSON.stringify(rasterStates) !==
+      JSON.stringify(['disabled', 'ready', 'retryable', 'verifying'])
+    ) {
+      throw new Error(
+        `${comparison.id} ${capture.Id} lacks four visible raster-state proofs`,
+      )
+    }
+  }
+  if (
+    !highContrast.HighContrast ||
+    zoom200.ZoomEquivalentPercent !== 200 ||
+    zoom400.ZoomEquivalentPercent !== 400
+  ) {
+    throw new Error(
+      `${comparison.id} contrast or zoom evidence metadata drifted`,
+    )
+  }
+
+  return {
+    id: comparison.id,
+    component: comparison.component,
+    state: comparison.fixture.state,
+    mode: comparison.mode,
+    platform: `${comparison.baseline.platform}->${comparison.candidate.platform}`,
+    token: comparison.token,
+    screenshotArtifact: comparison.candidate.screenshot,
+    diffArtifact: `${fixture.artifactRoot}/diffs/${comparison.id}.json`,
+    evidenceManifest: manifestPath,
+    evidence: {
+      web: { width: webPng.width, height: webPng.height, sha256: web.Sha256 },
+      avalonia: captures.map((capture) => ({
+        id: capture.Id,
+        width: capture.PixelSize.Width,
+        height: capture.PixelSize.Height,
+        sha256: capture.Sha256,
+      })),
+    },
+    deltas: {},
+    thresholds: {},
+    allowedByOverride: [],
+    passed: true,
+    failures: [],
+  }
+}
+
 const computeDeltas = (comparison) => ({
   geometry: maxAbsDelta(
     comparison.baseline.geometry,
@@ -245,6 +586,10 @@ const evaluateComparison = (comparison, fixture, overrides) => {
     fixture.artifactRoot,
   )
   ensureComparisonMode(comparison)
+
+  if (comparison.evidenceManifest) {
+    return evaluateRenderEvidence(comparison, fixture)
+  }
 
   const deltas = computeDeltas(comparison)
   const override = findOverride(comparison, overrides)

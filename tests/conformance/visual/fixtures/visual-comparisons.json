@@ -785,7 +785,12 @@
         "motionMode": "reduced"
       },
       "coverage": {
-        "controls": ["FsusDialog", "FsusDrawer", "FsusMessageBox", "FsusOverlayHost"],
+        "controls": [
+          "FsusDialog",
+          "FsusDrawer",
+          "FsusMessageBox",
+          "FsusOverlayHost"
+        ],
         "states": [
           "open",
           "loading",
@@ -1061,7 +1066,13 @@
       },
       "coverage": {
         "controls": ["FsusCalendar"],
-        "states": ["date-selection", "range-selection", "disabled-date", "keyboard-navigation", "locale-format"],
+        "states": [
+          "date-selection",
+          "range-selection",
+          "disabled-date",
+          "keyboard-navigation",
+          "locale-format"
+        ],
         "themes": ["light", "dark", "high-contrast"],
         "densities": ["compact", "default", "spacious"],
         "motionModes": ["system", "enabled", "reduced", "disabled"]
@@ -1112,8 +1123,20 @@
         "motionMode": "system"
       },
       "coverage": {
-        "controls": ["FsusDatePicker", "FsusTimePicker", "FsusTimeSelect", "FsusCalendar"],
-        "states": ["display-text", "value-binding", "clearable", "shortcuts", "disabled-time", "time-range"],
+        "controls": [
+          "FsusDatePicker",
+          "FsusTimePicker",
+          "FsusTimeSelect",
+          "FsusCalendar"
+        ],
+        "states": [
+          "display-text",
+          "value-binding",
+          "clearable",
+          "shortcuts",
+          "disabled-time",
+          "time-range"
+        ],
         "themes": ["light", "dark", "high-contrast"],
         "densities": ["compact", "default", "spacious"],
         "motionModes": ["system", "enabled", "reduced", "disabled"]
@@ -1164,8 +1187,18 @@
         "motionMode": "reduced"
       },
       "coverage": {
-        "controls": ["FsusDatePicker", "FsusTimePicker", "FsusTimeSelect", "FsusCalendar"],
-        "states": ["compact-density", "reduced-motion", "selected-date", "selected-time"],
+        "controls": [
+          "FsusDatePicker",
+          "FsusTimePicker",
+          "FsusTimeSelect",
+          "FsusCalendar"
+        ],
+        "states": [
+          "compact-density",
+          "reduced-motion",
+          "selected-date",
+          "selected-time"
+        ],
         "themes": ["light", "dark", "high-contrast"],
         "densities": ["compact", "default", "spacious"],
         "motionModes": ["system", "enabled", "reduced", "disabled"]
@@ -1217,7 +1250,14 @@
       },
       "coverage": {
         "controls": ["FsusSlider", "FsusRate", "FsusColorPicker"],
-        "states": ["keyboard-step", "pointer-drag", "marks", "half-rating", "alpha", "preset-colors"],
+        "states": [
+          "keyboard-step",
+          "pointer-drag",
+          "marks",
+          "half-rating",
+          "alpha",
+          "preset-colors"
+        ],
         "themes": ["light"],
         "densities": ["default"],
         "motionModes": ["system", "enabled", "reduced", "disabled"]
@@ -1269,7 +1309,12 @@
       },
       "coverage": {
         "controls": ["FsusSlider", "FsusRate", "FsusColorPicker"],
-        "states": ["disabled-state", "clearable-color", "alpha", "automation-value"],
+        "states": [
+          "disabled-state",
+          "clearable-color",
+          "alpha",
+          "automation-value"
+        ],
         "themes": ["dark"],
         "densities": ["spacious"],
         "motionModes": ["system", "enabled", "reduced", "disabled"]
@@ -1321,7 +1366,12 @@
       },
       "coverage": {
         "controls": ["FsusSlider", "FsusRate", "FsusColorPicker"],
-        "states": ["keyboard-step", "focus-visible", "invalid-form", "compact-density"],
+        "states": [
+          "keyboard-step",
+          "focus-visible",
+          "invalid-form",
+          "compact-density"
+        ],
         "themes": ["high-contrast"],
         "densities": ["compact"],
         "motionModes": ["system", "enabled", "reduced", "disabled"]
@@ -1373,7 +1423,17 @@
       },
       "coverage": {
         "controls": ["FsusUpload", "FsusTransfer"],
-        "states": ["queued", "uploading", "error", "retry", "remove-confirm", "filtered", "move-left-right", "keyboard-selection", "large-list"],
+        "states": [
+          "queued",
+          "uploading",
+          "error",
+          "retry",
+          "remove-confirm",
+          "filtered",
+          "move-left-right",
+          "keyboard-selection",
+          "large-list"
+        ],
         "themes": ["light", "dark", "high-contrast"],
         "densities": ["compact", "default", "spacious"],
         "motionModes": ["system", "enabled", "reduced", "disabled"]
@@ -1424,8 +1484,22 @@
         "motionMode": "system"
       },
       "coverage": {
-        "controls": ["FsusPagination", "FsusPaginationBar", "FsusDescriptions", "FsusTimeline", "FsusStatistic", "FsusCountdown"],
-        "states": ["page-change", "page-size", "descriptions-layout", "timeline-placement", "statistic-format", "countdown-complete"],
+        "controls": [
+          "FsusPagination",
+          "FsusPaginationBar",
+          "FsusDescriptions",
+          "FsusTimeline",
+          "FsusStatistic",
+          "FsusCountdown"
+        ],
+        "states": [
+          "page-change",
+          "page-size",
+          "descriptions-layout",
+          "timeline-placement",
+          "statistic-format",
+          "countdown-complete"
+        ],
         "themes": ["light", "dark", "high-contrast"],
         "densities": ["compact", "default", "spacious"],
         "motionModes": ["system", "enabled", "reduced", "disabled"]
@@ -1476,8 +1550,19 @@
         "motionMode": "reduced"
       },
       "coverage": {
-        "controls": ["FsusPagination", "FsusDescriptions", "FsusTimeline", "FsusStatistic", "FsusCountdown"],
-        "states": ["compact-density", "responsive-layout", "disabled-pagination", "deterministic-clock"],
+        "controls": [
+          "FsusPagination",
+          "FsusDescriptions",
+          "FsusTimeline",
+          "FsusStatistic",
+          "FsusCountdown"
+        ],
+        "states": [
+          "compact-density",
+          "responsive-layout",
+          "disabled-pagination",
+          "deterministic-clock"
+        ],
         "themes": ["light", "dark", "high-contrast"],
         "densities": ["compact", "default", "spacious"],
         "motionModes": ["system", "enabled", "reduced", "disabled"]
@@ -1528,8 +1613,21 @@
         "motionMode": "reduced"
       },
       "coverage": {
-        "controls": ["FsusImage", "FsusImageViewer", "FsusCarousel", "FsusCarouselItem", "FsusWatermark"],
-        "states": ["image-loaded", "image-error", "preview-open", "gallery-keyboard", "reduced-motion", "watermark-tiling"],
+        "controls": [
+          "FsusImage",
+          "FsusImageViewer",
+          "FsusCarousel",
+          "FsusCarouselItem",
+          "FsusWatermark"
+        ],
+        "states": [
+          "image-loaded",
+          "image-error",
+          "preview-open",
+          "gallery-keyboard",
+          "reduced-motion",
+          "watermark-tiling"
+        ],
         "themes": ["light", "dark", "high-contrast"],
         "densities": ["compact", "default", "spacious"],
         "motionModes": ["system", "enabled", "reduced", "disabled"]
@@ -1581,7 +1679,16 @@
       },
       "coverage": {
         "controls": ["FsusTable", "FsusDataTable"],
-        "states": ["sorted", "selected", "expanded", "fixed-columns", "virtualized", "loading", "empty", "error"],
+        "states": [
+          "sorted",
+          "selected",
+          "expanded",
+          "fixed-columns",
+          "virtualized",
+          "loading",
+          "empty",
+          "error"
+        ],
         "themes": ["light", "dark", "high-contrast"],
         "densities": ["compact", "default", "spacious"],
         "motionModes": ["system", "enabled", "reduced", "disabled"]
@@ -1633,7 +1740,14 @@
       },
       "coverage": {
         "controls": ["FsusVirtualList", "FsusAutoResizer", "FsusTableV2"],
-        "states": ["fixed-size", "variable-size", "anchor-correction", "recycling", "async-cancel", "two-axis-virtualized"],
+        "states": [
+          "fixed-size",
+          "variable-size",
+          "anchor-correction",
+          "recycling",
+          "async-cancel",
+          "two-axis-virtualized"
+        ],
         "themes": ["light", "dark", "high-contrast"],
         "densities": ["compact", "default", "spacious"],
         "motionModes": ["system", "enabled", "reduced", "disabled"]
@@ -1684,8 +1798,22 @@
         "motionMode": "reduced"
       },
       "coverage": {
-        "controls": ["FsusTree", "FsusTreeV2", "FsusTreeSelect", "FsusTreeTable"],
-        "states": ["expanded", "selected", "checked", "lazy-loaded", "filtered", "virtualized", "overlay-open", "tree-table"],
+        "controls": [
+          "FsusTree",
+          "FsusTreeV2",
+          "FsusTreeSelect",
+          "FsusTreeTable"
+        ],
+        "states": [
+          "expanded",
+          "selected",
+          "checked",
+          "lazy-loaded",
+          "filtered",
+          "virtualized",
+          "overlay-open",
+          "tree-table"
+        ],
         "themes": ["light", "dark", "high-contrast"],
         "densities": ["compact", "default", "spacious"],
         "motionModes": ["system", "enabled", "reduced", "disabled"]
@@ -1737,7 +1865,13 @@
       },
       "coverage": {
         "controls": ["FsusTextViewer"],
-        "states": ["structured-blocks", "mixed-language", "keyboard-focus", "virtualized", "canceled-render"],
+        "states": [
+          "structured-blocks",
+          "mixed-language",
+          "keyboard-focus",
+          "virtualized",
+          "canceled-render"
+        ],
         "themes": ["light", "dark", "high-contrast"],
         "densities": ["compact", "default", "spacious"],
         "motionModes": ["system", "enabled", "reduced", "disabled"]
@@ -1789,7 +1923,15 @@
       },
       "coverage": {
         "controls": ["FsusTextEditor", "FsusTextViewer"],
-        "states": ["typing", "selection", "composition", "paste", "undo-redo", "split-preview", "preview-synced"],
+        "states": [
+          "typing",
+          "selection",
+          "composition",
+          "paste",
+          "undo-redo",
+          "split-preview",
+          "preview-synced"
+        ],
         "themes": ["light", "dark", "high-contrast"],
         "densities": ["compact", "default", "spacious"],
         "motionModes": ["system", "enabled", "reduced", "disabled"]
@@ -1840,8 +1982,20 @@
         "motionMode": "reduced"
       },
       "coverage": {
-        "controls": ["FsusPublicShell", "FsusSiteHeader", "FsusThemeModeToggle", "FsusResponsiveCollection"],
-        "states": ["desktop-header", "mobile-header", "active-navigation", "theme-mode", "responsive-collection", "long-localized-labels"],
+        "controls": [
+          "FsusPublicShell",
+          "FsusSiteHeader",
+          "FsusThemeModeToggle",
+          "FsusResponsiveCollection"
+        ],
+        "states": [
+          "desktop-header",
+          "mobile-header",
+          "active-navigation",
+          "theme-mode",
+          "responsive-collection",
+          "long-localized-labels"
+        ],
         "themes": ["light", "dark", "high-contrast"],
         "densities": ["compact", "default", "spacious"],
         "motionModes": ["system", "enabled", "reduced", "disabled"]
@@ -1892,8 +2046,21 @@
         "motionMode": "reduced"
       },
       "coverage": {
-        "controls": ["FsusSettingsSection", "FsusSettingsSectionNav", "FsusDangerZone", "FsusTypedConfirmField"],
-        "states": ["empty", "loading", "error", "dense", "mobile", "keyboard", "long-text"],
+        "controls": [
+          "FsusSettingsSection",
+          "FsusSettingsSectionNav",
+          "FsusDangerZone",
+          "FsusTypedConfirmField"
+        ],
+        "states": [
+          "empty",
+          "loading",
+          "error",
+          "dense",
+          "mobile",
+          "keyboard",
+          "long-text"
+        ],
         "themes": ["light", "dark", "high-contrast"],
         "densities": ["compact", "default", "spacious"],
         "motionModes": ["system", "enabled", "reduced", "disabled"]
@@ -1944,8 +2111,22 @@
         "motionMode": "reduced"
       },
       "coverage": {
-        "controls": ["FsusMetricList", "FsusDistributionList", "FsusKpiGroup", "FsusDiagnosticsList", "FsusCopyableDetail"],
-        "states": ["empty", "loading", "error", "dense", "mobile", "keyboard", "long-text"],
+        "controls": [
+          "FsusMetricList",
+          "FsusDistributionList",
+          "FsusKpiGroup",
+          "FsusDiagnosticsList",
+          "FsusCopyableDetail"
+        ],
+        "states": [
+          "empty",
+          "loading",
+          "error",
+          "dense",
+          "mobile",
+          "keyboard",
+          "long-text"
+        ],
         "themes": ["light", "dark", "high-contrast"],
         "densities": ["compact", "default", "spacious"],
         "motionModes": ["system", "enabled", "reduced", "disabled"]
@@ -1996,8 +2177,22 @@
         "motionMode": "reduced"
       },
       "coverage": {
-        "controls": ["FsusInboxLayout", "FsusConversationList", "FsusThreadPanel", "FsusMessageTimeline", "FsusReplyComposerShell"],
-        "states": ["empty", "loading", "error", "dense", "mobile", "keyboard", "long-text"],
+        "controls": [
+          "FsusInboxLayout",
+          "FsusConversationList",
+          "FsusThreadPanel",
+          "FsusMessageTimeline",
+          "FsusReplyComposerShell"
+        ],
+        "states": [
+          "empty",
+          "loading",
+          "error",
+          "dense",
+          "mobile",
+          "keyboard",
+          "long-text"
+        ],
         "themes": ["light", "dark", "high-contrast"],
         "densities": ["compact", "default", "spacious"],
         "motionModes": ["system", "enabled", "reduced", "disabled"]
@@ -2048,8 +2243,22 @@
         "motionMode": "reduced"
       },
       "coverage": {
-        "controls": ["FsusPerceptionChallenge", "FsusTextTaskChallenge", "FsusLocalizationChallenge", "FsusMicroInteractionChallenge"],
-        "states": ["success", "failure", "retry", "loading", "disabled", "localized", "keyboard-only", "long-prompt"],
+        "controls": [
+          "FsusPerceptionChallenge",
+          "FsusTextTaskChallenge",
+          "FsusLocalizationChallenge",
+          "FsusMicroInteractionChallenge"
+        ],
+        "states": [
+          "success",
+          "failure",
+          "retry",
+          "loading",
+          "disabled",
+          "localized",
+          "keyboard-only",
+          "long-prompt"
+        ],
         "themes": ["light", "dark", "high-contrast"],
         "densities": ["compact", "default", "spacious"],
         "motionModes": ["system", "enabled", "reduced", "disabled"]
@@ -2084,6 +2293,64 @@
       "perceptualDelta": 0.05
     },
     {
+      "id": "perception-character-challenge-conformance-web-avalonia",
+      "component": "perception-character-challenge",
+      "mode": "crossPlatform",
+      "token": "perception.challenge.surface",
+      "fixture": {
+        "page": "visual/character-challenge-conformance",
+        "theme": "light-dark-high-contrast-forced-colors",
+        "density": "default",
+        "variant": "raster-audio-unavailable-alternative",
+        "size": "desktop-mobile-zoom-200-400",
+        "state": "loading-ready-verifying-retryable-reissue-expired-unavailable-disabled",
+        "locale": "mixed-cjk-latin-long-copy",
+        "direction": "ltr",
+        "motionMode": "enabled-reduced"
+      },
+      "coverage": {
+        "controls": ["FsusPerceptionCharacterChallenge"],
+        "states": [
+          "loading",
+          "ready",
+          "verifying",
+          "retryable",
+          "reissue",
+          "expired",
+          "unavailable",
+          "disabled"
+        ],
+        "media": [
+          "visual-raster",
+          "audio",
+          "unavailable-alternative",
+          "replacement-release"
+        ],
+        "viewports": ["desktop", "mobile", "zoom-200", "zoom-400"],
+        "themes": ["light", "dark", "high-contrast", "forced-colors"],
+        "motionModes": ["enabled", "reduced"],
+        "accessibility": [
+          "labels",
+          "error-association",
+          "live-region-owner",
+          "focus-order",
+          "non-autoplay",
+          "visible-focus"
+        ]
+      },
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/perception-character-challenge-conformance.png"
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/perception-character-challenge-conformance.png"
+      },
+      "evidenceManifest": "tests/conformance/visual/artifacts/perception-character-challenge-render-manifest.json"
+    },
+    {
       "id": "locale-formatting-stable41-web-avalonia",
       "component": "locale-formatting",
       "mode": "crossPlatform",
@@ -2101,7 +2368,15 @@
       },
       "coverage": {
         "controls": ["FsusAvaloniaLocaleProvider", "FsusLocalizedText"],
-        "states": ["english", "simplified-chinese", "missing-key-fallback", "date-format", "number-format", "layout-direction", "long-labels"],
+        "states": [
+          "english",
+          "simplified-chinese",
+          "missing-key-fallback",
+          "date-format",
+          "number-format",
+          "layout-direction",
+          "long-labels"
+        ],
         "themes": ["light", "dark", "high-contrast"],
         "densities": ["compact", "default", "spacious"],
         "motionModes": ["system", "enabled", "reduced", "disabled"]

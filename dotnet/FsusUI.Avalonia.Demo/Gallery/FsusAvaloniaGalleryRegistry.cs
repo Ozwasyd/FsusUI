@@ -1,4 +1,6 @@
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Media;
 using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Localization;
 using FsusUI.Avalonia.Themes;
@@ -135,7 +137,7 @@ public static class FsusAvaloniaGalleryRegistry
         panel.Children.Add(new FsusInboxLayout { AccessibleName = "Inbox" });
         break;
       case "perception-challenge":
-        panel.Children.Add(new FsusPerceptionChallenge { AccessibleName = "Challenge", Prompt = "请输入提示文本" });
+        AddPerceptionCharacterStates(panel);
         break;
       case "locale-formatting":
         var provider = FsusAvaloniaLocaleProvider.CreateDefault();
@@ -148,5 +150,83 @@ public static class FsusAvaloniaGalleryRegistry
         panel.Children.Add(new FsusInput { AccessibleName = "Invalid input", IsInvalid = true, Text = "中文 long localized input label" });
         break;
     }
+  }
+
+  private static void AddPerceptionCharacterStates(StackPanel panel)
+  {
+    var states = new (string Name, FsusPerceptionChallengeState State, string Error)[]
+    {
+      ("loading", FsusPerceptionChallengeState.Loading, string.Empty),
+      ("ready", FsusPerceptionChallengeState.Ready, string.Empty),
+      ("verifying", FsusPerceptionChallengeState.Verifying, string.Empty),
+      ("retryable", FsusPerceptionChallengeState.Retryable, "That response was not accepted. 请重试。"),
+      ("reissue", FsusPerceptionChallengeState.Reissue, string.Empty),
+      ("expired", FsusPerceptionChallengeState.Expired, string.Empty),
+      ("unavailable", FsusPerceptionChallengeState.Unavailable, string.Empty),
+      ("disabled", FsusPerceptionChallengeState.Disabled, string.Empty),
+    };
+
+    foreach (var (name, state, error) in states)
+    {
+      var challenge = new FsusPerceptionCharacterChallenge
+      {
+        AccessibleName = $"Character recognition challenge: {name}",
+        ChallengeId = $"character-gallery-{name}",
+        Prompt = "请输入图像中显示的字符 / Enter the visible characters",
+        Description = "Audio is available only after user activation. Long CJK + Latin copy wraps at narrow widths.",
+        State = state,
+        ErrorMessage = error,
+      };
+      if (state != FsusPerceptionChallengeState.Unavailable)
+      {
+        challenge.Media = CreatePerceptionCharacterMedia();
+      }
+
+      panel.Children.Add(new StackPanel
+      {
+        Spacing = 6,
+        Children =
+        {
+          new TextBlock { Text = name, FontWeight = FontWeight.SemiBold },
+          challenge,
+        },
+      });
+    }
+  }
+
+  private static FsusPerceptionCharacterMedia CreatePerceptionCharacterMedia()
+  {
+    var drawing = new DrawingGroup();
+    drawing.Children.Add(new GeometryDrawing
+    {
+      Brush = new SolidColorBrush(Color.Parse("#172033")),
+      Geometry = new RectangleGeometry(new Rect(0, 0, 240, 80)),
+    });
+    var glyphBrush = new SolidColorBrush(Color.Parse("#EAF2FF"));
+    foreach (var rectangle in new[]
+    {
+      new Rect(24, 18, 28, 44),
+      new Rect(72, 18, 28, 44),
+      new Rect(124, 18, 28, 44),
+      new Rect(172, 18, 44, 12),
+      new Rect(172, 36, 38, 12),
+    })
+    {
+      drawing.Children.Add(new GeometryDrawing
+      {
+        Brush = glyphBrush,
+        Geometry = new RectangleGeometry(rectangle),
+      });
+    }
+
+    return new FsusPerceptionCharacterMedia(
+      new FsusPerceptionCharacterRasterMedia(
+        new DrawingImage { Drawing = drawing },
+        240,
+        80,
+        "Characters to transcribe"),
+      new FsusPerceptionCharacterAudioMedia(
+        new Uri("https://example.invalid/final-audio.mp3"),
+        "Spoken characters to transcribe"));
   }
 }

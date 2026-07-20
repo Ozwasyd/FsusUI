@@ -402,7 +402,12 @@
       "expandedState": "not-applicable",
       "invalidState": "not-applicable",
       "expectedStates": { "disabled": false, "selected": true },
-      "keyboardNavigation": ["ArrowLeft", "ArrowRight", "Control+Z", "Control+Y"]
+      "keyboardNavigation": [
+        "ArrowLeft",
+        "ArrowRight",
+        "Control+Z",
+        "Control+Y"
+      ]
     },
     {
       "id": "public-shell",
@@ -515,6 +520,20 @@
       "invalidState": "not-applicable",
       "expectedStates": { "disabled": false },
       "keyboardNavigation": ["Enter", "Space", "Escape"]
+    },
+    {
+      "id": "perception-character-challenge",
+      "publicName": "FsusPerceptionCharacterChallenge",
+      "role": "group",
+      "accessibleName": "required",
+      "value": "required",
+      "disabledState": "required",
+      "selectedState": "not-applicable",
+      "checkedState": "not-applicable",
+      "expandedState": "not-applicable",
+      "invalidState": "required",
+      "expectedStates": { "disabled": false, "invalid": true },
+      "keyboardNavigation": ["Tab", "ShiftTab", "Enter"]
     }
   ]
 }

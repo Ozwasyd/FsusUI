@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/accessibility-conformance.mjs",
+  "snapshot": {
+    "id": "perception-character-challenge-conformance",
+    "component": "perception-character-challenge",
+    "platform": "avalonia",
+    "control": "FsusPerceptionCharacterChallenge",
+    "evidenceSource": "avalonia-headless",
+    "role": "group",
+    "accessibleName": "Character recognition challenge",
+    "value": "raster audio unavailable alternative eight states labels errors live regions stable focus order non-autoplay",
+    "states": {
+      "disabled": false,
+      "selected": null,
+      "checked": null,
+      "expanded": null,
+      "invalid": true
+    },
+    "keyboard": ["Tab", "ShiftTab", "Enter"],
+    "keyboardOperable": true,
+    "tabOrder": 40,
+    "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/perception-character-challenge-conformance.json"
+  }
+}

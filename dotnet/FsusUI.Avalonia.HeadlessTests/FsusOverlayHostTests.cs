@@ -77,7 +77,9 @@ public class FsusOverlayHostTests
     Assert.True(host.MoveFocus(FsusFocusNavigationDirection.Next));
     Assert.Same(primary, entry.FocusedElement);
 
-    Assert.True(await host.CloseTopAsync(FsusOverlayCloseReason.Keyboard));
+    Assert.True(await host.CloseTopAsync(
+      FsusOverlayCloseReason.Keyboard,
+      TestContext.Current.CancellationToken));
     Assert.True(entry.IsClosed);
     Assert.Same(restoreTarget, host.LastRestoredFocus);
     Assert.Empty(host.OpenOverlays);
@@ -101,14 +103,20 @@ public class FsusOverlayHostTests
 
     Assert.Equal(FsusOverlayPlacement.TopStart, entry.Placement);
 
-    Assert.False(await host.DismissPointerOutsideAsync(new Point(2, 2)));
+    Assert.False(await host.DismissPointerOutsideAsync(
+      new Point(2, 2),
+      TestContext.Current.CancellationToken));
     Assert.False(entry.IsClosed);
     Assert.Single(host.OpenOverlays);
 
     allowClose = true;
 
-    Assert.False(await host.DismissPointerOutsideAsync(entry.Bounds.Center));
-    Assert.True(await host.DismissPointerOutsideAsync(new Point(2, 2)));
+    Assert.False(await host.DismissPointerOutsideAsync(
+      entry.Bounds.Center,
+      TestContext.Current.CancellationToken));
+    Assert.True(await host.DismissPointerOutsideAsync(
+      new Point(2, 2),
+      TestContext.Current.CancellationToken));
     Assert.True(entry.IsClosed);
     Assert.Empty(host.OpenOverlays);
   }

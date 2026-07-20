@@ -3,8 +3,8 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "artifactRoot": "tests/conformance/visual/artifacts",
   "summary": {
-    "total": 39,
-    "passed": 39,
+    "total": 40,
+    "passed": 40,
     "allowedByOverride": 2
   },
   "comparisons": [
@@ -1196,6 +1196,55 @@
         "screenshotDiffPercent": 0.015,
         "perceptualDelta": 0.08
       },
+      "allowedByOverride": [],
+      "passed": true,
+      "failures": []
+    },
+    {
+      "id": "perception-character-challenge-conformance-web-avalonia",
+      "component": "perception-character-challenge",
+      "state": "loading-ready-verifying-retryable-reissue-expired-unavailable-disabled",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "token": "perception.challenge.surface",
+      "screenshotArtifact": "tests/conformance/visual/artifacts/screenshots/avalonia/perception-character-challenge-conformance.png",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/perception-character-challenge-conformance-web-avalonia.json",
+      "evidenceManifest": "tests/conformance/visual/artifacts/perception-character-challenge-render-manifest.json",
+      "evidence": {
+        "web": {
+          "width": 1440,
+          "height": 1600,
+          "sha256": "73e5ca4967b30adf4f66720c796c41c836307dc5aa683016a7718996a8f1aafb"
+        },
+        "avalonia": [
+          {
+            "id": "perception-character-challenge-conformance",
+            "width": 760,
+            "height": 2718,
+            "sha256": "42a991ce5a58d6b0843159860110e01b59a5f313c9bfac44d5bfd47bb1079f4d"
+          },
+          {
+            "id": "perception-character-challenge-high-contrast",
+            "width": 760,
+            "height": 2718,
+            "sha256": "e5f4ca9171b0882ace792700bdf8fac45c0be2530210e75c1344773b1cc3ba9b"
+          },
+          {
+            "id": "perception-character-challenge-zoom-200",
+            "width": 380,
+            "height": 495,
+            "sha256": "5720438114727bb35d128dbdd629c4276402caf60371aefa4557099ce3c23c06"
+          },
+          {
+            "id": "perception-character-challenge-zoom-400",
+            "width": 190,
+            "height": 693,
+            "sha256": "e68d3b7e696ca51e589d25db7ba28a988e6ca4327d9e49ef89f557a7525319a1"
+          }
+        ]
+      },
+      "deltas": {},
+      "thresholds": {},
       "allowedByOverride": [],
       "passed": true,
       "failures": []

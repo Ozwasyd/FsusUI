@@ -21,6 +21,12 @@
   "props": [],
   "events": [],
   "contentRegions": [],
+  "exposed": [
+    {
+      "name": "focus",
+      "signature": "vue-source"
+    }
+  ],
   "defaults": {
     "source": "fixture"
   },

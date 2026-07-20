@@ -3,7 +3,7 @@
   "generatedBy": "scripts/visual-conformance.mjs",
   "fixtureSource": {
     "path": "tests/conformance/visual/fixtures/visual-comparisons.json",
-    "sha256": "32bb4126c584065d193ad72bfa067ec09af04e70da63f300ed7306dfec07f185"
+    "sha256": "edf9043d5a4c6e7e92f332fcfdbfe5d7fb1dc014eb5ae158c25b0fabd475392f"
   },
   "artifactRoot": "tests/conformance/visual/artifacts",
   "thresholds": {
@@ -2337,6 +2337,32 @@
       }
     },
     {
+      "id": "perception-character-challenge-conformance-web-avalonia",
+      "component": "perception-character-challenge",
+      "fixture": {
+        "page": "visual/character-challenge-conformance",
+        "theme": "light-dark-high-contrast-forced-colors",
+        "density": "default",
+        "variant": "raster-audio-unavailable-alternative",
+        "size": "desktop-mobile-zoom-200-400",
+        "state": "loading-ready-verifying-retryable-reissue-expired-unavailable-disabled",
+        "locale": "mixed-cjk-latin-long-copy",
+        "direction": "ltr",
+        "motionMode": "enabled-reduced"
+      },
+      "token": "perception.challenge.surface",
+      "baseline": {
+        "platform": "web",
+        "runner": "playwright",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/web/perception-character-challenge-conformance.png"
+      },
+      "candidate": {
+        "platform": "avalonia",
+        "runner": "headless-skia",
+        "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/perception-character-challenge-conformance.png"
+      }
+    },
+    {
       "id": "locale-formatting-stable41-web-avalonia",
       "component": "locale-formatting",
       "fixture": {
@@ -2625,6 +2651,12 @@
       "mode": "crossPlatform",
       "platform": "web->avalonia",
       "diffArtifact": "tests/conformance/visual/artifacts/diffs/perception-challenge-stable40-web-avalonia.json"
+    },
+    {
+      "id": "perception-character-challenge-conformance-web-avalonia",
+      "mode": "crossPlatform",
+      "platform": "web->avalonia",
+      "diffArtifact": "tests/conformance/visual/artifacts/diffs/perception-character-challenge-conformance-web-avalonia.json"
     },
     {
       "id": "locale-formatting-stable41-web-avalonia",

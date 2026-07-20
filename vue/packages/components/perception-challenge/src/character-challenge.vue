@@ -26,6 +26,7 @@
           <slot name="raster" :media="media.raster" :alt="mediaAlt">
             <img
               v-if="media.raster.kind === 'image-url'"
+              :key="mediaIdentity"
               :class="ns.e('image')"
               :src="media.raster.src"
               :width="media.raster.width"
@@ -36,6 +37,7 @@
             />
             <canvas
               v-else
+              :key="mediaIdentity"
               ref="canvasRef"
               :class="ns.e('canvas')"
               :width="media.raster.width"
@@ -50,6 +52,8 @@
         <template v-else-if="activeMode === 'audio' && media?.audio">
           <slot name="audio" :media="media.audio" :label="mediaAlt">
             <audio
+              :key="mediaIdentity"
+              ref="audioRef"
               :class="ns.e('audio')"
               controls
               preload="metadata"
@@ -136,7 +140,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useId, useNamespace } from '@element-plus/hooks'
 import { ElButton } from '@element-plus/components/button'
 import { characterChallengeEmits, characterChallengeProps } from './shared'
@@ -170,6 +174,7 @@ const statusId = `${uid}-status`
 const errorId = `${uid}-error`
 const inputRef = ref<HTMLInputElement>()
 const canvasRef = ref<HTMLCanvasElement>()
+const audioRef = ref<HTMLAudioElement>()
 const internalResponse = ref(props.modelValue)
 const visibleError = ref(props.error)
 const activeMode = ref<'raster' | 'audio'>(
@@ -178,6 +183,9 @@ const activeMode = ref<'raster' | 'audio'>(
 const replacementRequest = ref<{
   identity: string
 } | null>(null)
+const releasedBitmaps = new WeakSet<ImageBitmap>()
+const resourceIdentities = new WeakMap<object, number>()
+let nextResourceIdentity = 1
 const rootAttrs = { 'data-fsus-perception-character-challenge': 'true' }
 const rasterAttrs = { 'data-test': 'perception-character-raster' }
 const audioAttrs = { 'data-test': 'perception-character-audio' }
@@ -242,15 +250,26 @@ const rootKls = computed(() => [
   ns.is('invalid', isInvalid.value === 'true'),
 ])
 const mediaIdentity = computed(() => {
+  const mediaKey = props.media ? identityFor(props.media) : 0
   const raster = props.media?.raster
   const rasterKey =
     raster?.kind === 'image-url'
       ? `${raster.kind}:${raster.src}`
       : raster
-        ? `${raster.kind}:${raster.width}x${raster.height}`
+        ? `${raster.kind}:${identityFor(
+            raster.kind === 'bitmap' ? raster.bitmap : raster.pixels,
+          )}:${raster.width}x${raster.height}`
         : ''
-  return `${props.challengeId}:${rasterKey}:${props.media?.audio?.src ?? ''}`
+  return `${props.challengeId}:${mediaKey}:${rasterKey}:${props.media?.audio?.src ?? ''}`
 })
+
+function identityFor(resource: object) {
+  const existing = resourceIdentities.get(resource)
+  if (existing) return existing
+  const identity = nextResourceIdentity++
+  resourceIdentities.set(resource, identity)
+  return identity
+}
 
 watch(
   () => props.modelValue,
@@ -260,26 +279,26 @@ watch(
 )
 
 watch(
-  () => [props.challengeId, props.error] as const,
-  ([identity, error], previous) => {
-    const oldIdentity = previous?.[0] ?? identity
-    if (identity !== oldIdentity) {
-      reset()
-      visibleError.value = ''
-      selectAvailableMode()
-      return
-    }
+  () => props.error,
+  (error) => {
     visibleError.value = error
   },
 )
 
+watch(mediaIdentity, (identity, previousIdentity) => {
+  if (identity === previousIdentity) return
+  reset()
+  visibleError.value = ''
+  selectAvailableMode()
+})
+
 watch(
   () => props.media,
-  () => {
+  (media, previousMedia) => {
+    releaseReplacedMedia(previousMedia, media)
     selectAvailableMode()
     void drawRaster()
   },
-  { deep: true },
 )
 
 watch(
@@ -310,12 +329,13 @@ async function drawRaster() {
   await nextTick()
   const raster = props.media?.raster
   const canvas = canvasRef.value
-  if (!canvas || !raster || raster.kind === 'image-url') return
+  if (!canvas) return
 
   const context = canvas.getContext('2d')
   if (!context) return
 
-  context.clearRect(0, 0, raster.width, raster.height)
+  context.clearRect(0, 0, canvas.width, canvas.height)
+  if (!raster || raster.kind === 'image-url') return
   if (raster.kind === 'bitmap') {
     context.drawImage(raster.bitmap, 0, 0)
     return
@@ -330,6 +350,44 @@ async function drawRaster() {
     0,
     0,
   )
+}
+
+function releaseReplacedMedia(
+  previousMedia: typeof props.media,
+  nextMedia: typeof props.media,
+) {
+  const previousBitmap =
+    previousMedia?.raster?.kind === 'bitmap'
+      ? previousMedia.raster.bitmap
+      : undefined
+  const nextBitmap =
+    nextMedia?.raster?.kind === 'bitmap' ? nextMedia.raster.bitmap : undefined
+  if (
+    previousBitmap &&
+    previousBitmap !== nextBitmap &&
+    !releasedBitmaps.has(previousBitmap)
+  ) {
+    if (typeof previousBitmap.close === 'function') previousBitmap.close()
+    releasedBitmaps.add(previousBitmap)
+  }
+
+  if (
+    previousMedia?.audio !== nextMedia?.audio ||
+    previousMedia?.audio?.src !== nextMedia?.audio?.src
+  ) {
+    invalidateAudioElement()
+  }
+}
+
+function invalidateAudioElement() {
+  const audio = audioRef.value
+  if (!audio) return
+  if (!audio.paused) audio.pause()
+  audio.removeAttribute('src')
+  for (const source of audio.querySelectorAll('source')) {
+    source.removeAttribute('src')
+  }
+  if (audio.networkState !== HTMLMediaElement.NETWORK_EMPTY) audio.load()
 }
 
 function toggleAlternative() {
@@ -374,6 +432,11 @@ function reset() {
   visibleError.value = ''
   emit('update:modelValue', '')
 }
+
+onBeforeUnmount(() => {
+  releaseReplacedMedia(props.media, null)
+  invalidateAudioElement()
+})
 
 defineExpose({
   focus,

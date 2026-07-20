@@ -1,4 +1,6 @@
 using Avalonia.Controls;
+using Avalonia.LogicalTree;
+using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Demo.Gallery;
 using FsusUI.Avalonia.Themes;
 
@@ -100,5 +102,39 @@ public class AvaloniaGalleryRegistryTests
       Assert.Empty(expected.Except(actual));
       Assert.Empty(actual.Except(expected));
     }
+  }
+
+  [Fact]
+  public void PerceptionGalleryInstantiatesAllEightCharacterStates()
+  {
+    var route = Assert.Single(
+      FsusAvaloniaGalleryRegistry.StableRoutes,
+      candidate => candidate.ComponentId == "perception-challenge");
+    var page = route.CreatePage();
+    var challenges = page.GetLogicalDescendants()
+      .OfType<FsusPerceptionCharacterChallenge>()
+      .ToArray();
+
+    Assert.Equal(
+      [
+        FsusPerceptionChallengeState.Loading,
+        FsusPerceptionChallengeState.Ready,
+        FsusPerceptionChallengeState.Verifying,
+        FsusPerceptionChallengeState.Retryable,
+        FsusPerceptionChallengeState.Reissue,
+        FsusPerceptionChallengeState.Expired,
+        FsusPerceptionChallengeState.Unavailable,
+        FsusPerceptionChallengeState.Disabled,
+      ],
+      challenges.Select(challenge => challenge.State));
+    Assert.All(challenges, challenge => Assert.Equal(FsusPerceptionChallengeKind.Character, challenge.Kind));
+    Assert.Null(challenges.Single(challenge => challenge.State == FsusPerceptionChallengeState.Unavailable).Media);
+    Assert.All(
+      challenges.Where(challenge => challenge.State != FsusPerceptionChallengeState.Unavailable),
+      challenge =>
+      {
+        Assert.True(challenge.HasRaster);
+        Assert.True(challenge.HasAudioAlternative);
+      });
   }
 }

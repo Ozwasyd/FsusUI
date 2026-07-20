@@ -820,6 +820,27 @@
       "keyboardOperable": true,
       "tabOrder": 39,
       "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/perception-challenge-stable40.json"
+    },
+    {
+      "id": "perception-character-challenge-conformance",
+      "component": "perception-character-challenge",
+      "platform": "avalonia",
+      "control": "FsusPerceptionCharacterChallenge",
+      "evidenceSource": "avalonia-headless",
+      "role": "group",
+      "accessibleName": "Character recognition challenge",
+      "value": "raster audio unavailable alternative eight states labels errors live regions stable focus order non-autoplay",
+      "states": {
+        "disabled": false,
+        "selected": null,
+        "checked": null,
+        "expanded": null,
+        "invalid": true
+      },
+      "keyboard": ["Tab", "ShiftTab", "Enter"],
+      "keyboardOperable": true,
+      "tabOrder": 40,
+      "evidenceArtifact": "tests/conformance/accessibility/artifacts/automation/perception-character-challenge-conformance.json"
     }
   ],
   "appiumReleaseGates": [

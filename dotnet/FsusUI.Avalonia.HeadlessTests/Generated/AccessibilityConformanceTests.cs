@@ -47,6 +47,7 @@ public class AccessibilityConformanceTests
     yield return new object[] { "metric-primitives-stable39", "metric-primitives", "list", "Metric list", 3, 37 };
     yield return new object[] { "inbox-primitives-stable39", "inbox-primitives", "group", "Inbox", 3, 38 };
     yield return new object[] { "perception-challenge-stable40", "perception-challenge", "group", "Challenge", 3, 39 };
+    yield return new object[] { "perception-character-challenge-conformance", "perception-character-challenge", "group", "Character recognition challenge", 3, 40 };
   }
 
   [Theory]

@@ -220,6 +220,8 @@ const parseObjectKeys = (objectSource) => {
         if (normal) return normal[1]
         const method = part.match(/^([A-Za-z_$][\w$-]*)\s*\(/)
         if (method) return method[1]
+        const shorthand = part.match(/^([A-Za-z_$][\w$]*)$/)
+        if (shorthand) return shorthand[1]
         return ''
       }),
   )
@@ -252,6 +254,15 @@ const parseDefineArguments = (vueSource, macroName) =>
       (match) => match[1].trim(),
     ),
   )
+
+const parseDefineExpose = (vueSource) => {
+  const exposed = []
+  for (const match of vueSource.matchAll(/defineExpose\s*\(/g)) {
+    const object = objectForExpression(vueSource, match.index + match[0].length)
+    if (object) exposed.push(...parseObjectKeys(object))
+  }
+  return uniqueSorted(exposed)
+}
 
 const parseOptionsApiObjects = (vueSource, key) => {
   const results = []
@@ -324,7 +335,12 @@ const parseComponentIndexModules = (root) => {
 }
 
 const parsePublicExports = (root, moduleName) => {
-  const file = path.join(root, 'vue/packages/components', moduleName, 'index.ts')
+  const file = path.join(
+    root,
+    'vue/packages/components',
+    moduleName,
+    'index.ts',
+  )
   if (!exists(file)) return []
   const content = read(file)
   const exports = []
@@ -418,8 +434,9 @@ const parseEntryPoints = (root, classifications) => {
 }
 
 const parseCssVariables = (root) => {
-  const files = walkFiles(path.join(root, 'vue/packages/theme-chalk/src'), (file) =>
-    /\.(scss|css)$/.test(file),
+  const files = walkFiles(
+    path.join(root, 'vue/packages/theme-chalk/src'),
+    (file) => /\.(scss|css)$/.test(file),
   )
   const variables = new Map()
   for (const file of files) {
@@ -562,6 +579,7 @@ const parseComponent = (root, moduleName, exportName, classification) => {
     props: uniqueSorted([...fromVue.props, ...fallback.props]),
     emits: uniqueSorted([...fromVue.emits, ...fallback.emits]),
     slots: vueSource ? parseSlotTags(vueSource.content) : [],
+    exposed: vueSource ? parseDefineExpose(vueSource.content) : [],
   }
 }
 
@@ -750,7 +768,7 @@ const renderReport = (baseline) => {
   const rows = baseline.components
     .map(
       (component) =>
-        `| \`${component.name}\` | \`${component.module}\` | ${component.classification} | ${component.props.length} | ${component.emits.length} | ${component.slots.map((slot) => (slot.scoped ? `${slot.name}*` : slot.name)).join(', ') || '-'} |`,
+        `| \`${component.name}\` | \`${component.module}\` | ${component.classification} | ${component.props.length} | ${component.emits.length} | ${component.slots.map((slot) => (slot.scoped ? `${slot.name}*` : slot.name)).join(', ') || '-'} | ${component.exposed.join(', ') || '-'} |`,
     )
     .join('\n')
 
@@ -794,8 +812,8 @@ ${classificationRows}
 
 ## Components
 
-| Export | Module | Classification | Props | Emits | Slots |
-| --- | --- | --- | ---: | ---: | --- |
+| Export | Module | Classification | Props | Emits | Slots | Exposed |
+| --- | --- | --- | ---: | ---: | --- | --- |
 ${rows}
 
 Slots marked with \`*\` are scoped slots in the Vue baseline.
@@ -842,6 +860,13 @@ const runFixtureAssertions = () => {
   }
   if (!widget.slots.some((slot) => slot.name === 'item' && slot.scoped)) {
     throw new Error('fixture scoped slot was not extracted')
+  }
+  for (const exposed of ['focus', 'reset']) {
+    if (!widget.exposed.includes(exposed)) {
+      throw new Error(
+        `fixture widget exposed member ${exposed} was not extracted`,
+      )
+    }
   }
   if (
     !baseline.deprecatedApis.some((api) => api.target.includes('legacyMode'))

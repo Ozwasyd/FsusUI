@@ -5,7 +5,7 @@
   "owner": "FsusUI Core",
   "baseline": {
     "path": "spec/baselines/vue-current.json",
-    "hash": "58112485c63ebf00e4353fd03368541be87b2d76458fd80a68fdf8590a53ec28",
+    "hash": "59061a5b26e38a3de2bddc55bd30b876e2010f2f32512335a28e681e1a298440",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
     "iconHash": "d61254b1b1ff9addaf45293153df217b0c0d01ec69ec602081c44a01008b78de"
@@ -253,6 +253,32 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "focus",
+          "signature": "vue-source"
+        },
+        {
+          "name": "handleBlurInput",
+          "signature": "vue-source"
+        },
+        {
+          "name": "handleClose",
+          "signature": "vue-source"
+        },
+        {
+          "name": "handleFocusInput",
+          "signature": "vue-source"
+        },
+        {
+          "name": "handleOpen",
+          "signature": "vue-source"
+        },
+        {
+          "name": "onPick",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -317,6 +343,7 @@
       "props": [],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -381,6 +408,7 @@
       "props": [],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -504,6 +532,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -581,6 +610,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -664,6 +694,7 @@
       ],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -880,6 +911,56 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "activated",
+          "signature": "vue-source"
+        },
+        {
+          "name": "blur",
+          "signature": "vue-source"
+        },
+        {
+          "name": "close",
+          "signature": "vue-source"
+        },
+        {
+          "name": "focus",
+          "signature": "vue-source"
+        },
+        {
+          "name": "handleKeyEnter",
+          "signature": "vue-source"
+        },
+        {
+          "name": "handleSelect",
+          "signature": "vue-source"
+        },
+        {
+          "name": "highlight",
+          "signature": "vue-source"
+        },
+        {
+          "name": "highlightedIndex",
+          "signature": "vue-source"
+        },
+        {
+          "name": "inputRef",
+          "signature": "vue-source"
+        },
+        {
+          "name": "loading",
+          "signature": "vue-source"
+        },
+        {
+          "name": "popperRef",
+          "signature": "vue-source"
+        },
+        {
+          "name": "suggestions",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -998,6 +1079,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -1099,6 +1181,12 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "content",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -1182,6 +1270,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -1271,6 +1360,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -1477,6 +1567,28 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "disabled",
+          "signature": "vue-source"
+        },
+        {
+          "name": "ref",
+          "signature": "vue-source"
+        },
+        {
+          "name": "shouldAddSpace",
+          "signature": "vue-source"
+        },
+        {
+          "name": "size",
+          "signature": "vue-source"
+        },
+        {
+          "name": "type",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -1560,6 +1672,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -1660,6 +1773,24 @@
           "name": "header",
           "scoped": true,
           "required": false
+        }
+      ],
+      "exposed": [
+        {
+          "name": "calculateValidatedDateRange",
+          "signature": "vue-source"
+        },
+        {
+          "name": "pickDay",
+          "signature": "vue-source"
+        },
+        {
+          "name": "selectDate",
+          "signature": "vue-source"
+        },
+        {
+          "name": "selectedDay",
+          "signature": "vue-source"
         }
       ],
       "defaults": {
@@ -1779,6 +1910,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -1921,6 +2053,20 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "next",
+          "signature": "vue-source"
+        },
+        {
+          "name": "prev",
+          "signature": "vue-source"
+        },
+        {
+          "name": "setActiveItem",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -2004,6 +2150,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -2212,6 +2359,24 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "cascaderPanelRef",
+          "signature": "vue-source"
+        },
+        {
+          "name": "contentRef",
+          "signature": "vue-source"
+        },
+        {
+          "name": "getCheckedNodes",
+          "signature": "vue-source"
+        },
+        {
+          "name": "togglePopperVisible",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -2293,8 +2458,18 @@
           "required": false
         }
       ],
-      "events": [],
+      "events": [
+        {
+          "name": "emit",
+          "payload": "vue-source"
+        },
+        {
+          "name": "slots",
+          "payload": "vue-source"
+        }
+      ],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -2381,6 +2556,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -2545,6 +2721,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -2709,6 +2886,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -2849,6 +3027,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -2980,6 +3159,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -3078,6 +3258,16 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "activeNames",
+          "signature": "vue-source"
+        },
+        {
+          "name": "setActiveNames",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -3170,6 +3360,12 @@
           "name": "title",
           "scoped": false,
           "required": false
+        }
+      ],
+      "exposed": [
+        {
+          "name": "isActive",
+          "signature": "vue-source"
         }
       ],
       "defaults": {
@@ -3295,6 +3491,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -3405,6 +3602,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -3557,6 +3755,28 @@
         }
       ],
       "contentRegions": [],
+      "exposed": [
+        {
+          "name": "blur",
+          "signature": "vue-source"
+        },
+        {
+          "name": "color",
+          "signature": "vue-source"
+        },
+        {
+          "name": "focus",
+          "signature": "vue-source"
+        },
+        {
+          "name": "hide",
+          "signature": "vue-source"
+        },
+        {
+          "name": "show",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -3694,6 +3914,7 @@
       ],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -3771,6 +3992,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -3848,6 +4070,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -3937,6 +4160,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -4076,6 +4300,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -4202,6 +4427,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -4318,6 +4544,12 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "displayValue",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -4429,6 +4661,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -4586,6 +4819,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -4680,6 +4914,12 @@
         }
       ],
       "contentRegions": [],
+      "exposed": [
+        {
+          "name": "focus",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -4792,6 +5032,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -4904,6 +5145,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -5008,6 +5250,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -5152,6 +5395,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -5235,6 +5479,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -5464,6 +5709,16 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "dialogContentRef",
+          "signature": "vue-source"
+        },
+        {
+          "name": "visible",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -5575,6 +5830,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -5658,6 +5914,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -5747,6 +6004,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -5810,43 +6068,28 @@
       },
       "props": [
         {
-          "name": "...dialogProps",
+          "name": "attrs",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "direction",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "headerAriaLevel",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "modalFade",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "size",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "withHeader",
+          "name": "slots",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         }
       ],
-      "events": [],
+      "events": [
+        {
+          "name": "attrs",
+          "payload": "vue-source"
+        },
+        {
+          "name": "slots",
+          "payload": "vue-source"
+        }
+      ],
       "contentRegions": [
         {
           "name": "default",
@@ -5869,6 +6112,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -5932,157 +6176,18 @@
       },
       "props": [
         {
-          "name": "...componentMotionProps",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "buttonProps",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "command",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "disabled",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "divided",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "effect",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "hideOnClick",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "hideTimeout",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "icon",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "id",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "loop",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "maxHeight",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "onKeydown",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "placement",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "popperClass",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "popperOptions",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "role",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "showTimeout",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "size",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "splitButton",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "tabindex",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "teleported",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "textValue",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "trigger",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "type",
+          "name": "emit",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         }
       ],
-      "events": [],
+      "events": [
+        {
+          "name": "emit",
+          "payload": "vue-source"
+        }
+      ],
       "contentRegions": [
         {
           "name": "default",
@@ -6095,6 +6200,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -6158,37 +6264,28 @@
       },
       "props": [
         {
-          "name": "command",
+          "name": "attrs",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "disabled",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "divided",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "icon",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "textValue",
+          "name": "emit",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         }
       ],
-      "events": [],
+      "events": [
+        {
+          "name": "attrs",
+          "payload": "vue-source"
+        },
+        {
+          "name": "emit",
+          "payload": "vue-source"
+        }
+      ],
       "contentRegions": [
         {
           "name": "default",
@@ -6196,6 +6293,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -6273,6 +6371,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -6384,6 +6483,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -6483,6 +6583,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -6622,6 +6723,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -6710,6 +6812,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -6787,6 +6890,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -6959,6 +7063,28 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "clearValidate",
+          "signature": "vue-source"
+        },
+        {
+          "name": "resetFields",
+          "signature": "vue-source"
+        },
+        {
+          "name": "scrollToField",
+          "signature": "vue-source"
+        },
+        {
+          "name": "validate",
+          "signature": "vue-source"
+        },
+        {
+          "name": "validateField",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -7106,6 +7232,32 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "clearValidate",
+          "signature": "vue-source"
+        },
+        {
+          "name": "resetField",
+          "signature": "vue-source"
+        },
+        {
+          "name": "size",
+          "signature": "vue-source"
+        },
+        {
+          "name": "validate",
+          "signature": "vue-source"
+        },
+        {
+          "name": "validateMessage",
+          "signature": "vue-source"
+        },
+        {
+          "name": "validateState",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -7234,6 +7386,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -7311,6 +7464,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -7400,6 +7554,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -7592,6 +7747,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -7736,6 +7892,12 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "setActiveItem",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -7816,6 +7978,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -7910,6 +8073,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -7993,6 +8157,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -8278,6 +8443,48 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "autosize",
+          "signature": "vue-source"
+        },
+        {
+          "name": "blur",
+          "signature": "vue-source"
+        },
+        {
+          "name": "clear",
+          "signature": "vue-source"
+        },
+        {
+          "name": "focus",
+          "signature": "vue-source"
+        },
+        {
+          "name": "input",
+          "signature": "vue-source"
+        },
+        {
+          "name": "ref",
+          "signature": "vue-source"
+        },
+        {
+          "name": "resizeTextarea",
+          "signature": "vue-source"
+        },
+        {
+          "name": "select",
+          "signature": "vue-source"
+        },
+        {
+          "name": "textarea",
+          "signature": "vue-source"
+        },
+        {
+          "name": "textareaStyle",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -8466,6 +8673,16 @@
         }
       ],
       "contentRegions": [],
+      "exposed": [
+        {
+          "name": "blur",
+          "signature": "vue-source"
+        },
+        {
+          "name": "focus",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -8543,6 +8760,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -8649,6 +8867,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -8726,6 +8945,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -8837,6 +9057,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -8901,6 +9122,7 @@
       "props": [],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -8965,6 +9187,7 @@
       "props": [],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -9029,6 +9252,7 @@
       "props": [],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -9155,6 +9379,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -9225,6 +9450,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -9511,6 +9737,12 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "insertMarkdownAtCursor",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -9672,6 +9904,12 @@
       ],
       "events": [],
       "contentRegions": [],
+      "exposed": [
+        {
+          "name": "rootEl",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -9928,6 +10166,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -9991,25 +10230,7 @@
       },
       "props": [
         {
-          "name": "disabled",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "index",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "route",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "title",
+          "name": "emit",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -10017,7 +10238,7 @@
       ],
       "events": [
         {
-          "name": "click",
+          "name": "emit",
           "payload": "vue-source"
         }
       ],
@@ -10033,6 +10254,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -10115,6 +10337,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -10275,6 +10498,20 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "bottom",
+          "signature": "vue-source"
+        },
+        {
+          "name": "close",
+          "signature": "vue-source"
+        },
+        {
+          "name": "visible",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -10404,7 +10641,12 @@
           "required": false
         }
       ],
-      "events": [],
+      "events": [
+        {
+          "name": "emit",
+          "payload": "vue-source"
+        }
+      ],
       "contentRegions": [
         {
           "name": "default",
@@ -10412,6 +10654,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -10522,6 +10765,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -10605,6 +10849,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -10700,6 +10945,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -10777,6 +11023,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -10893,6 +11140,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -10976,6 +11224,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -11076,6 +11325,7 @@
         }
       ],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -11242,6 +11492,16 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "close",
+          "signature": "vue-source"
+        },
+        {
+          "name": "visible",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -11337,6 +11597,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -11420,6 +11681,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -11514,6 +11776,7 @@
         }
       ],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -11633,6 +11896,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -11704,6 +11968,7 @@
       ],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -11797,6 +12062,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -12079,6 +12345,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -12306,6 +12573,20 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "focus",
+          "signature": "vue-source"
+        },
+        {
+          "name": "inputRef",
+          "signature": "vue-source"
+        },
+        {
+          "name": "reset",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -12458,6 +12739,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -12685,6 +12967,16 @@
           "name": "reference",
           "scoped": false,
           "required": false
+        }
+      ],
+      "exposed": [
+        {
+          "name": "hide",
+          "signature": "vue-source"
+        },
+        {
+          "name": "popperRef",
+          "signature": "vue-source"
         }
       ],
       "defaults": {
@@ -12916,6 +13208,16 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "hide",
+          "signature": "vue-source"
+        },
+        {
+          "name": "popperRef",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -13071,6 +13373,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -13382,6 +13685,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -13486,6 +13790,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -13569,6 +13874,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -13694,6 +14000,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -13894,6 +14201,16 @@
         }
       ],
       "contentRegions": [],
+      "exposed": [
+        {
+          "name": "resetCurrentValue",
+          "signature": "vue-source"
+        },
+        {
+          "name": "setCurrentValue",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -13998,6 +14315,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -14087,6 +14405,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -14196,6 +14515,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -14318,6 +14638,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -14422,6 +14743,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -14516,6 +14838,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -14611,6 +14934,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -14783,6 +15107,32 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "handleScroll",
+          "signature": "vue-source"
+        },
+        {
+          "name": "scrollTo",
+          "signature": "vue-source"
+        },
+        {
+          "name": "setScrollLeft",
+          "signature": "vue-source"
+        },
+        {
+          "name": "setScrollTop",
+          "signature": "vue-source"
+        },
+        {
+          "name": "update",
+          "signature": "vue-source"
+        },
+        {
+          "name": "wrapRef",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -14894,6 +15244,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -14989,6 +15340,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -15099,6 +15451,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -15430,6 +15783,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -15511,8 +15865,14 @@
           "required": false
         }
       ],
-      "events": [],
+      "events": [
+        {
+          "name": "emit",
+          "payload": "vue-source"
+        }
+      ],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -15641,6 +16001,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -15803,6 +16164,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -15909,6 +16271,12 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "uiLoading",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -15980,6 +16348,7 @@
       ],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -16208,6 +16577,12 @@
         }
       ],
       "contentRegions": [],
+      "exposed": [
+        {
+          "name": "onSliderClick",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -16333,6 +16708,7 @@
       ],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -16439,6 +16815,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -16574,6 +16951,12 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "displayValue",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -16695,6 +17078,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -16806,6 +17190,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -16918,6 +17303,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -17061,6 +17447,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -17283,6 +17670,16 @@
         }
       ],
       "contentRegions": [],
+      "exposed": [
+        {
+          "name": "checked",
+          "signature": "vue-source"
+        },
+        {
+          "name": "focus",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -17384,6 +17781,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -17464,6 +17862,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -17553,6 +17952,7 @@
       ],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -17646,7 +18046,19 @@
           "required": false
         },
         {
+          "name": "column",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "columnIndex",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "columns",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -17966,6 +18378,7 @@
       ],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -18037,6 +18450,16 @@
       ],
       "events": [],
       "contentRegions": [],
+      "exposed": [
+        {
+          "name": "ref",
+          "signature": "vue-source"
+        },
+        {
+          "name": "update",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -18171,6 +18594,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -18276,6 +18700,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -18377,6 +18802,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -18481,6 +18907,7 @@
         }
       ],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -18609,6 +19036,7 @@
         }
       ],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -18733,6 +19161,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -19007,6 +19436,32 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "focus",
+          "signature": "vue-source"
+        },
+        {
+          "name": "handleBlurInput",
+          "signature": "vue-source"
+        },
+        {
+          "name": "handleClose",
+          "signature": "vue-source"
+        },
+        {
+          "name": "handleFocusInput",
+          "signature": "vue-source"
+        },
+        {
+          "name": "handleOpen",
+          "signature": "vue-source"
+        },
+        {
+          "name": "onPick",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -19168,6 +19623,16 @@
       ],
       "events": [],
       "contentRegions": [],
+      "exposed": [
+        {
+          "name": "blur",
+          "signature": "vue-source"
+        },
+        {
+          "name": "focus",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -19292,6 +19757,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -19416,6 +19882,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -19528,6 +19995,36 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "contentRef",
+          "signature": "vue-source"
+        },
+        {
+          "name": "hide",
+          "signature": "vue-source"
+        },
+        {
+          "name": "isFocusInsideContent",
+          "signature": "vue-source"
+        },
+        {
+          "name": "onClose",
+          "signature": "vue-source"
+        },
+        {
+          "name": "onOpen",
+          "signature": "vue-source"
+        },
+        {
+          "name": "popperRef",
+          "signature": "vue-source"
+        },
+        {
+          "name": "updatePopper",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -19605,6 +20102,7 @@
       ],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -19782,6 +20280,20 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "clearQuery",
+          "signature": "vue-source"
+        },
+        {
+          "name": "leftPanel",
+          "signature": "vue-source"
+        },
+        {
+          "name": "rightPanel",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -19864,6 +20376,12 @@
         },
         {
           "name": "autoExpandParent",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "broadcastExpanded",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -20021,6 +20539,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -20104,6 +20623,7 @@
       ],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -20203,6 +20723,12 @@
           "required": false
         },
         {
+          "name": "itemSize",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "node",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -20230,6 +20756,7 @@
         }
       ],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -20364,6 +20891,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -20510,6 +21038,28 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "abort",
+          "signature": "vue-source"
+        },
+        {
+          "name": "clearFiles",
+          "signature": "vue-source"
+        },
+        {
+          "name": "handleRemove",
+          "signature": "vue-source"
+        },
+        {
+          "name": "handleStart",
+          "signature": "vue-source"
+        },
+        {
+          "name": "submit",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -20587,6 +21137,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -20712,6 +21263,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -20776,6 +21328,7 @@
       "props": [],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -20840,6 +21393,7 @@
       "props": [],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -20963,6 +21517,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -21073,6 +21628,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -21150,6 +21706,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -21239,6 +21796,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -21378,6 +21936,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -21504,6 +22063,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -21615,6 +22175,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -21772,6 +22333,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -21876,6 +22438,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -22020,6 +22583,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -22103,6 +22667,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -22214,6 +22779,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -22297,6 +22863,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -22396,6 +22963,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -22535,6 +23103,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -22623,6 +23192,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -22751,6 +23321,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -22831,6 +23402,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -22925,6 +23497,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -23008,6 +23581,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -23085,6 +23659,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -23191,6 +23766,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -23268,6 +23844,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -23394,6 +23971,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -23504,6 +24082,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -23587,6 +24166,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -23682,6 +24262,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -23759,6 +24340,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -23875,6 +24457,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -23958,6 +24541,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -24058,6 +24642,7 @@
         }
       ],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -24151,6 +24736,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -24433,6 +25019,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -24660,6 +25247,20 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "focus",
+          "signature": "vue-source"
+        },
+        {
+          "name": "inputRef",
+          "signature": "vue-source"
+        },
+        {
+          "name": "reset",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -24764,6 +25365,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -24853,6 +25455,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -24962,6 +25565,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -25056,6 +25660,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -25167,6 +25772,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -25262,6 +25868,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -25372,6 +25979,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -25500,6 +26108,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -25606,6 +26215,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -25727,6 +26337,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -25832,6 +26443,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -25936,6 +26548,7 @@
         }
       ],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -26060,6 +26673,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -26194,6 +26808,7 @@
           "required": false
         }
       ],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -26287,7 +26902,19 @@
           "required": false
         },
         {
+          "name": "column",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "columnIndex",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "columns",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -26607,6 +27234,7 @@
       ],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -26671,6 +27299,7 @@
       "props": [],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -26735,6 +27364,7 @@
       "props": [],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -26799,6 +27429,7 @@
       "props": [],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -26863,6 +27494,7 @@
       "props": [],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -27137,6 +27769,32 @@
           "required": false
         }
       ],
+      "exposed": [
+        {
+          "name": "focus",
+          "signature": "vue-source"
+        },
+        {
+          "name": "handleBlurInput",
+          "signature": "vue-source"
+        },
+        {
+          "name": "handleClose",
+          "signature": "vue-source"
+        },
+        {
+          "name": "handleFocusInput",
+          "signature": "vue-source"
+        },
+        {
+          "name": "handleOpen",
+          "signature": "vue-source"
+        },
+        {
+          "name": "onPick",
+          "signature": "vue-source"
+        }
+      ],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -27201,6 +27859,7 @@
       "props": [],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -27265,6 +27924,7 @@
       "props": [],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -27329,6 +27989,7 @@
       "props": [],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -27393,6 +28054,7 @@
       "props": [],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -27457,6 +28119,7 @@
       "props": [],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -27521,6 +28184,7 @@
       "props": [],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -27585,6 +28249,7 @@
       "props": [],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."
@@ -27649,6 +28314,7 @@
       "props": [],
       "events": [],
       "contentRegions": [],
+      "exposed": [],
       "defaults": {
         "source": "vue-baseline",
         "policy": "Preserve Vue defaults unless the platform override registry documents a supported difference."

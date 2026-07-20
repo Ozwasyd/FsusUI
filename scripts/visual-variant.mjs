@@ -28,6 +28,7 @@ export const VISUAL_PROJECT_NAMES = Object.freeze(Object.keys(variants))
 export const VISUAL_SPEC_OWNERSHIP = Object.freeze({
   desktop: Object.freeze([
     '**/audit.spec.ts',
+    '**/character-challenge-zoom.spec.ts',
     '**/empty-illustration.spec.ts',
     '**/public-shell-desktop-search.spec.ts',
     '**/tree-select-row.spec.ts',

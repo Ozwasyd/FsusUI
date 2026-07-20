@@ -77,6 +77,7 @@ import {
 import { initMarkdownRuntime } from '@element-plus/wasm'
 import { createDemoState, provideDemoState } from './demo-state'
 import BasicSection from './sections/BasicSection.vue'
+import CharacterChallengeConformanceSection from './sections/CharacterChallengeConformanceSection.vue'
 import DataSection from './sections/DataSection.vue'
 import EmptyIllustrationSection from './sections/EmptyIllustrationSection.vue'
 import FeedbackSection from './sections/FeedbackSection.vue'
@@ -167,6 +168,10 @@ const routeSections = new Map<string, DemoSection | { component: object }>([
     { component: markRaw(PublicShellSearchModeSection) },
   ],
   ['view-transitions', { component: markRaw(ViewTransitionSection) }],
+  [
+    'character-challenge-conformance',
+    { component: markRaw(CharacterChallengeConformanceSection) },
+  ],
 ])
 
 const isDefaultGallery = computed(() => !props.mode)

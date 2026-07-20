@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { afterEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { nextTick } from 'vue'
 import {
   ElPerceptionCharacterChallenge,
@@ -29,6 +29,16 @@ afterEach(() => {
   document.body.innerHTML = ''
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
+})
+
+beforeEach(() => {
+  vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue()
+  vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(
+    () => undefined,
+  )
+  vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(
+    () => undefined,
+  )
 })
 
 describe('perception character challenge', () => {
@@ -176,6 +186,217 @@ describe('perception character challenge', () => {
     await nextTick()
 
     expect(drawImage).toHaveBeenCalledWith(bitmap, 0, 0)
+  })
+
+  test('same challenge identity releases replaced bitmap and audio, then clears stale state without autoplay', async () => {
+    const oldClose = vi.fn()
+    const newClose = vi.fn()
+    const play = vi.mocked(HTMLMediaElement.prototype.play)
+    const pause = vi.mocked(HTMLMediaElement.prototype.pause)
+    const load = vi.mocked(HTMLMediaElement.prototype.load)
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
+      clearRect: vi.fn(),
+      drawImage: vi.fn(),
+    } as unknown as CanvasRenderingContext2D)
+
+    const oldBitmap = { close: oldClose } as unknown as ImageBitmap
+    const newBitmap = { close: newClose } as unknown as ImageBitmap
+    const wrapper = mount(FsusPerceptionCharacterChallenge, {
+      props: {
+        challengeId: 'characters-same',
+        state: 'retryable',
+        media: {
+          raster: {
+            kind: 'bitmap',
+            bitmap: oldBitmap,
+            width: 240,
+            height: 80,
+          },
+          audio: { src: 'old-audio.mp3' },
+        },
+        modelValue: 'STALE',
+        error: 'Stale verification error',
+      },
+    })
+    await wrapper
+      .find('[data-test="perception-character-alternative"]')
+      .trigger('click')
+    const oldAudio = wrapper.find('audio').element
+    Object.defineProperty(oldAudio, 'paused', {
+      configurable: true,
+      value: false,
+    })
+    Object.defineProperty(oldAudio, 'networkState', {
+      configurable: true,
+      value: HTMLMediaElement.NETWORK_IDLE,
+    })
+
+    await wrapper.setProps({
+      media: {
+        raster: {
+          kind: 'bitmap',
+          bitmap: newBitmap,
+          width: 240,
+          height: 80,
+        },
+        audio: { src: 'new-audio.mp3' },
+      },
+    })
+    await nextTick()
+
+    expect(wrapper.find('input').element.value).toBe('')
+    expect(
+      wrapper.find('.el-perception-character-challenge__error').exists(),
+    ).toBe(false)
+    expect(oldClose).toHaveBeenCalledTimes(1)
+    expect(newClose).not.toHaveBeenCalled()
+    expect(pause).toHaveBeenCalled()
+    expect(load).toHaveBeenCalled()
+    expect(play).not.toHaveBeenCalled()
+    expect(oldAudio.querySelector('source')?.getAttribute('src')).toBeNull()
+
+    wrapper.unmount()
+    expect(oldClose).toHaveBeenCalledTimes(1)
+    expect(newClose).toHaveBeenCalledTimes(1)
+  })
+
+  test('same challenge identity treats a replacement RGBA buffer as new media', async () => {
+    const putImageData = vi.fn()
+    vi.stubGlobal(
+      'ImageData',
+      class {
+        constructor(
+          readonly data: Uint8ClampedArray,
+          readonly width: number,
+          readonly height: number,
+        ) {}
+      },
+    )
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
+      clearRect: vi.fn(),
+      putImageData,
+    } as unknown as CanvasRenderingContext2D)
+
+    const previousPixels = new Uint8ClampedArray([0, 0, 0, 255])
+    const nextPixels = new Uint8ClampedArray([255, 255, 255, 255])
+    const wrapper = mount(FsusPerceptionCharacterChallenge, {
+      props: {
+        challengeId: 'characters-same',
+        state: 'retryable',
+        media: {
+          raster: {
+            kind: 'rgba-raster',
+            pixels: previousPixels,
+            width: 1,
+            height: 1,
+          },
+        },
+        modelValue: 'STALE',
+        error: 'Stale verification error',
+      },
+    })
+    await nextTick()
+    await nextTick()
+
+    await wrapper.setProps({
+      media: {
+        raster: {
+          kind: 'rgba-raster',
+          pixels: nextPixels,
+          width: 1,
+          height: 1,
+        },
+      },
+    })
+    await nextTick()
+    await nextTick()
+
+    expect(wrapper.find('input').element.value).toBe('')
+    expect(
+      wrapper.find('.el-perception-character-challenge__error').exists(),
+    ).toBe(false)
+    expect(putImageData).toHaveBeenLastCalledWith(
+      expect.objectContaining({ data: nextPixels }),
+      0,
+      0,
+    )
+    expect(HTMLMediaElement.prototype.play).not.toHaveBeenCalled()
+  })
+
+  test('same challenge identity clears stale state when image and audio sources change', async () => {
+    const wrapper = mount(FsusPerceptionCharacterChallenge, {
+      props: {
+        challengeId: 'characters-same',
+        state: 'retryable',
+        media: {
+          ...raster('old-image.png'),
+          audio: { src: 'old-audio.mp3' },
+        },
+        modelValue: 'STALE',
+        error: 'Stale verification error',
+      },
+    })
+
+    await wrapper.setProps({
+      media: {
+        ...raster('new-image.png'),
+        audio: { src: 'new-audio.mp3' },
+      },
+    })
+    await nextTick()
+
+    expect(wrapper.find('input').element.value).toBe('')
+    expect(
+      wrapper.find('.el-perception-character-challenge__error').exists(),
+    ).toBe(false)
+    expect(wrapper.find('img').attributes('src')).toBe('new-image.png')
+    expect(HTMLMediaElement.prototype.play).not.toHaveBeenCalled()
+  })
+
+  test('same challenge identity releases a replaced audio descriptor even when its source is unchanged', async () => {
+    const pause = vi.mocked(HTMLMediaElement.prototype.pause)
+    const load = vi.mocked(HTMLMediaElement.prototype.load)
+    const wrapper = mount(FsusPerceptionCharacterChallenge, {
+      props: {
+        challengeId: 'characters-same',
+        state: 'retryable',
+        media: {
+          ...raster(),
+          audio: { src: 'same-audio.mp3' },
+        },
+        modelValue: 'STALE',
+        error: 'Stale verification error',
+      },
+    })
+    await wrapper
+      .find('[data-test="perception-character-alternative"]')
+      .trigger('click')
+    const oldAudio = wrapper.find('audio').element
+    Object.defineProperty(oldAudio, 'paused', {
+      configurable: true,
+      value: false,
+    })
+    Object.defineProperty(oldAudio, 'networkState', {
+      configurable: true,
+      value: HTMLMediaElement.NETWORK_IDLE,
+    })
+
+    await wrapper.setProps({
+      media: {
+        ...raster(),
+        audio: { src: 'same-audio.mp3' },
+      },
+    })
+    await nextTick()
+
+    expect(wrapper.find('input').element.value).toBe('')
+    expect(
+      wrapper.find('.el-perception-character-challenge__error').exists(),
+    ).toBe(false)
+    expect(pause).toHaveBeenCalled()
+    expect(load).toHaveBeenCalled()
+    expect(oldAudio.querySelector('source')?.getAttribute('src')).toBeNull()
+    expect(HTMLMediaElement.prototype.play).not.toHaveBeenCalled()
   })
 
   test('uses one live region, one error owner, and a stable explicit label association', () => {

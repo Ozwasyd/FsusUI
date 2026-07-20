@@ -69,6 +69,7 @@ const requiredFields = [
   'props',
   'events',
   'contentRegions',
+  'exposed',
   'defaults',
   'stateMachine',
   'keyboardBehavior',
@@ -118,6 +119,7 @@ const validateContract = (contract) => {
     'props',
     'events',
     'contentRegions',
+    'exposed',
     'themeTokens',
   ]) {
     if (!Array.isArray(contract[arrayField])) {
@@ -268,6 +270,10 @@ const contractForEntry = (entry, kind) => ({
     scoped: Boolean(slot.scoped),
     required: false,
   })),
+  exposed: (entry.exposed ?? []).map((name) => ({
+    name,
+    signature: 'vue-source',
+  })),
   defaults: {
     source: 'vue-baseline',
     policy:
@@ -372,6 +378,7 @@ const runFixtureAssertions = () => {
     'missing version',
     'invalid changeClassification',
     'missing supported platform matrix',
+    'exposed must be an array',
   ]) {
     if (!invalidErrors.some((error) => error.includes(expected))) {
       throw new Error(`invalid contract fixture did not report ${expected}`)

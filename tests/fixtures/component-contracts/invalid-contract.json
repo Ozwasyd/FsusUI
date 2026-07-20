@@ -17,6 +17,7 @@
   "props": [],
   "events": [],
   "contentRegions": [],
+  "exposed": "invalid",
   "defaults": {},
   "stateMachine": {},
   "keyboardBehavior": {},
