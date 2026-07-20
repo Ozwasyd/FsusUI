@@ -14,6 +14,8 @@ const demoViteConfig = readFileSync(
   'utf8',
 )
 const manualChunkPolicy = readFileSync('scripts/vite-manual-chunks.mjs', 'utf8')
+const invalidFixtureFile = 'tests/fixtures/release-policy/invalid-cases.json'
+const invalidFixtures = JSON.parse(readFileSync(invalidFixtureFile, 'utf8'))
 
 function assert(condition, message) {
   if (!condition) {
@@ -21,6 +23,10 @@ function assert(condition, message) {
     process.exit(1)
   }
 }
+
+const hasSafeDemoChunkConfig = (source) =>
+  source.includes('chunkSizeWarningLimit: Number.POSITIVE_INFINITY') &&
+  source.includes('onlyExplicitManualChunks: false')
 
 const docs = `${releaseGovernance}\n${engineeringHandoff}`.toLowerCase()
 const decisionScriptPath = 'scripts/should-run-demo-build.mjs'
@@ -41,10 +47,13 @@ assert(
 )
 
 assert(
-  demoViteConfig.includes('chunkSizeWarningLimit: Number.POSITIVE_INFINITY') &&
-    demoViteConfig.includes('onlyExplicitManualChunks: true') &&
+  hasSafeDemoChunkConfig(demoViteConfig) &&
     !manualChunkPolicy.includes('FSUS_DEMO_CHUNK_SIZE_WARNING_LIMIT_KB'),
-  'demo build must avoid a guessed aggregate chunk limit and keep explicit chunk ownership',
+  'demo build must avoid a guessed aggregate chunk limit and allow Rollup to merge static dependencies without circular chunks',
+)
+assert(
+  !hasSafeDemoChunkConfig(invalidFixtures.demoViteConfig),
+  'demo build negative fixture must reject explicit-only manual chunks',
 )
 
 const decisionScript = existsSync(decisionScriptPath)

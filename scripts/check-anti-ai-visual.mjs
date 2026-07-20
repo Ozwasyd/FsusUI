@@ -5,6 +5,7 @@ import { join, relative, resolve } from 'node:path'
 const root = process.cwd()
 const violations = []
 const themeSourceRoot = 'vue/packages/theme-chalk/src'
+const invalidFixtureFile = 'tests/fixtures/release-policy/invalid-cases.json'
 const radiusBudgetPx = 12
 const pillRadiusPx = new Set([100, 999])
 const radiusLiteralPattern =
@@ -174,13 +175,29 @@ const assertIncludes = (file, source, expected, message) => {
   if (!source.includes(expected)) addViolation(file, 1, message)
 }
 
-const numericToken = (source, token) => {
-  const match = new RegExp(`${token}:\\s*([0-9.]+)px;`, 'u').exec(source)
+const resolveAdapterToken = (source, generatedSource, token) => {
+  const declaration = new RegExp(`${token}:\\s*([^;]+);`, 'u').exec(source)
+  if (!declaration) return undefined
+
+  const value = declaration[1].trim()
+  const generatedReference = /^#\{generated\.\$([\w-]+)\}$/u.exec(value)
+  if (!generatedReference) return value
+
+  const generatedDeclaration = new RegExp(
+    `\\$${generatedReference[1]}:\\s*([^;]+);`,
+    'u',
+  ).exec(generatedSource)
+  return generatedDeclaration?.[1].trim()
+}
+
+const numericToken = (source, generatedSource, token) => {
+  const value = resolveAdapterToken(source, generatedSource, token)
+  const match = /^([0-9.]+)px$/u.exec(value ?? '')
   return match ? Number(match[1]) : undefined
 }
 
-const assertTokenMax = (file, source, token, max) => {
-  const value = numericToken(source, token)
+const assertTokenMax = (file, source, generatedSource, token, max) => {
+  const value = numericToken(source, generatedSource, token)
   if (value === undefined) {
     addViolation(file, 1, `${token} must be declared as a px token`)
     return
@@ -190,9 +207,28 @@ const assertTokenMax = (file, source, token, max) => {
   }
 }
 
+const checkNegativeTokenFixture = () => {
+  const fixture = JSON.parse(read(invalidFixtureFile)).antiAiToken
+  const value = numericToken(
+    fixture.adapterSource,
+    fixture.generatedSource,
+    fixture.token,
+  )
+  if (value === undefined || value <= fixture.max) {
+    addViolation(
+      invalidFixtureFile,
+      1,
+      'anti-ai negative fixture must resolve the generated token and exceed its radius budget',
+    )
+  }
+}
+
 const checkCoreTokens = () => {
   const file = 'vue/packages/theme-chalk/src/common/fsus-tokens.scss'
   const source = read(file)
+  const generatedSource = read(
+    'vue/packages/theme-chalk/src/generated/tokens.scss',
+  )
   const canonicalSource = JSON.parse(read('spec/tokens/tokens.json'))
   const canonicalTokens = new Map(
     canonicalSource.tokens.map((token) => [token.name, token]),
@@ -203,20 +239,27 @@ const checkCoreTokens = () => {
     '--fsus-backdrop-blur-soft',
     '--fsus-backdrop-blur-overlay',
   ]) {
-    assertIncludes(
-      file,
-      source,
-      `${token}: 0px;`,
-      `${token} must default to 0px; glass belongs to opt-in selectors`,
-    )
+    if (resolveAdapterToken(source, generatedSource, token) !== '0px') {
+      addViolation(
+        file,
+        1,
+        `${token} must default to 0px; glass belongs to opt-in selectors`,
+      )
+    }
   }
 
-  assertTokenMax(file, source, '--fsus-radius-control', 6)
-  assertTokenMax(file, source, '--fsus-radius-control-small', 4)
-  assertTokenMax(file, source, '--fsus-radius-navigation', 6)
-  assertTokenMax(file, source, '--fsus-radius-panel', 12)
-  assertTokenMax(file, source, '--fsus-radius-floating', 12)
-  assertTokenMax(file, source, '--fsus-radius-popover', 10)
+  assertTokenMax(file, source, generatedSource, '--fsus-radius-control', 6)
+  assertTokenMax(
+    file,
+    source,
+    generatedSource,
+    '--fsus-radius-control-small',
+    4,
+  )
+  assertTokenMax(file, source, generatedSource, '--fsus-radius-navigation', 6)
+  assertTokenMax(file, source, generatedSource, '--fsus-radius-panel', 12)
+  assertTokenMax(file, source, generatedSource, '--fsus-radius-floating', 12)
+  assertTokenMax(file, source, generatedSource, '--fsus-radius-popover', 10)
 
   assertIncludes(
     file,
@@ -509,6 +552,7 @@ const checkMotionDocs = () => {
 }
 
 try {
+  checkNegativeTokenFixture()
   checkCoreTokens()
   checkGeometryMixinSemantics()
   checkScatteredRadiusLiterals()

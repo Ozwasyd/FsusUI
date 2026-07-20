@@ -100,7 +100,7 @@ html[data-theme-resolved='dark'] {
 
 - **额外能力**：`vue/packages/element-plus/index.ts` 额外转导出 `dayjs`（`export { default as dayjs } from 'dayjs'`）。
 - **图标源码归属**：`@element-plus/icons-svg` 在本仓库内作为原始 SVG 真源维护，`@element-plus/icons-vue` 由其生成并供组件代码直接引用；当前目标是源码内收与联调一致，不代表视觉体系已分叉。
-- **可选性能层**：新增 `@element-plus/wasm`，并在仓库 demo 构建中被拆到独立 chunk（`fsus-wasm`）。
+- **可选性能层**：新增 `@element-plus/wasm`。仓库 demo 的完整插件安装会将工作区运行时收拢到 `fsus-ui` chunk；按需 consumer 构建仍将其拆到独立 `fsus-wasm` chunk。
 
 ## B. 面向仓库开发者：本地联调与贡献
 
@@ -140,4 +140,4 @@ pnpm build:wasm
 ```
 
 - 构建依赖 Emscripten 工具链（`emsdk`）已安装并激活；脚本会在必要时尝试从环境中定位/激活。
-- demo 构建会把 WASM 相关模块拆分为 `fsus-wasm` chunk（见 `vue/packages/demo-app/vite.config.ts`）。
+- demo 的完整插件构建会把 WASM 与其他工作区运行时收拢为 `fsus-ui` chunk，以避免跨组件循环；按需 consumer 构建会把 WASM 相关模块拆分为 `fsus-wasm` chunk（见 `scripts/vite-manual-chunks.mjs`）。

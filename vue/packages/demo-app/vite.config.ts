@@ -11,7 +11,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: createFsusViteManualChunks(),
-        onlyExplicitManualChunks: true,
+        onlyExplicitManualChunks: false,
       },
     },
   },

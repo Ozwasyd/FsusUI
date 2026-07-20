@@ -36,10 +36,14 @@ Rollup 构建只静默已核验的第三方包内部循环：`mlly`、`semver`�
 只有这个无法安全并行的共享 Dispatcher 边界保持串行。
 
 Demo 会加载完整 Markdown/Mermaid 压力样例，因此不再用 Vite 无路径语义的单文件
-warning 数字冒充响应性能预算。consumer smoke 根据 manifest 分开计算首屏静态闭包
+warning 数字冒充响应性能预算。Demo 将工作区运行时收拢为单一 `fsus-ui` 所有权
+边界，第三方运行时仍按包分组；`onlyExplicitManualChunks` 保持关闭，让 Rollup 合并
+静态依赖并阻止跨组件循环 chunk。
+consumer smoke 根据 manifest 分开计算首屏静态闭包
 与 Markdown 冷水合闭包：首屏禁止提前引入 Markdown、WASM、Mermaid、Shiki、KaTeX
 或 Cytoscape，并以 `scripts/consumer-performance-baseline.json` 中的实测 raw/gzip/
-brotli 结果执行只减不增的棘轮。Demo 仍使用显式 chunk ownership；所有非尺寸类
+brotli 结果执行只减不增的棘轮。Consumer fixture 仍使用显式 tree-shaken
+chunk ownership；所有非尺寸类
 构建 warning 继续原样输出并由现有零 warning gate 拦截。
 诊断中可用 `FSUS_CONSUMER_FIXTURE_PATH` 指向一次完整安装后保留的 fixture，断点重跑
 运行时导出、类型检查、Vite 构建和性能棘轮；release gate 不设置该变量，始终从冷
@@ -122,8 +126,9 @@ consumer 性能采样使用按需组件导入与 `profile: 'consumer'` 分包策
 接口、类型和 pack smoke 独立校验；性能预算只对真实可达的首屏及动态依赖闭包计算
 raw、gzip 与 Brotli 体积。
 
-同理，性能采样只加载 `base.css`、实际组件 CSS 与
-`public-shell-critical.css`。完整 `dist/fsus.css` / `el-fsus-theme.css` 的内容、hash
+同理，性能采样首屏只加载 `base.css` 与实际首屏组件 CSS；
+`public-shell-critical.css` 保持可独立动态加载并由 package smoke 校验。完整
+`dist/fsus.css` / `el-fsus-theme.css` 的内容、hash
 和可安装性仍由 package smoke 校验；DataList、Motion、Perception 的 runtime export
 也由独立 Node contract smoke 校验，不再人为塞进按需消费首屏。
 

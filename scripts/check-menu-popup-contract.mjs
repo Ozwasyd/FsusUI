@@ -80,6 +80,17 @@ const topLevelBlocks = (source) => {
 }
 
 const failures = []
+const invalidFixtureFile = 'tests/fixtures/release-policy/invalid-cases.json'
+const invalidFixtures = JSON.parse(read(invalidFixtureFile))
+const sharedFocusRingPattern =
+  /@include\s+a11y-focus-ring\(\s*2px,\s*var\(\s*--fsus-radius-navigation,\s*var\(\s*--el-border-radius-base\s*\)\s*\)\s*\);/u
+
+if (sharedFocusRingPattern.test(invalidFixtures.menuFocusRing)) {
+  failures.push(
+    `${invalidFixtureFile}: Menu focus-ring negative fixture must reject a non-2px ring`,
+  )
+}
+
 const menuFile = 'vue/packages/theme-chalk/src/menu.scss'
 const menuSource = read(menuFile)
 const popupBlock = extractBlockAfter(menuSource, '@include m(popup)')
@@ -128,11 +139,7 @@ if (!menuItemMixin) {
     )
   }
 
-  if (
-    !menuItemMixin.body.includes(
-      "@include a11y-focus-ring(2px, getCssVar('border-radius-small'));",
-    )
-  ) {
+  if (!sharedFocusRingPattern.test(menuItemMixin.body)) {
     failures.push(
       `${menuFile}:${menuItemMixin.startLine} Menu item keyboard focus must use the shared 2px focus ring`,
     )

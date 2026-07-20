@@ -1,0 +1,10 @@
+{
+  "antiAiToken": {
+    "adapterSource": "--fsus-radius-control: #{generated.$fsus-radius-control};",
+    "generatedSource": "$fsus-radius-control: 7px;",
+    "token": "--fsus-radius-control",
+    "max": 6
+  },
+  "menuFocusRing": "@include a11y-focus-ring(1px, var(--fsus-radius-navigation, var(--el-border-radius-base)));",
+  "demoViteConfig": "chunkSizeWarningLimit: Number.POSITIVE_INFINITY, onlyExplicitManualChunks: true"
+}

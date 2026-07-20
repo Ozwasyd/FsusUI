@@ -145,6 +145,14 @@ export const resolveFsusViteManualChunk = (
   const consumerProfile = profile === 'consumer'
 
   if (
+    !consumerProfile &&
+    id.includes('/vue/packages/') &&
+    !id.includes('/vue/packages/demo-app/')
+  ) {
+    return 'fsus-ui'
+  }
+
+  if (
     id.includes('/vue/packages/wasm/') ||
     id.includes('/node_modules/@element-plus/wasm/') ||
     id.includes('/node_modules/@ozwasyd/element-plus/es/wasm/') ||

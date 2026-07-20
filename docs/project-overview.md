@@ -275,7 +275,7 @@ pnpm build:wasm
 - `vue/packages/demo-app/src/main.ts` 通过 `createApp(App).use(ElementPlus).mount('#app')` 挂载整包，并引入 `@element-plus/theme-chalk/src/fsus.scss`（与发布包 `dist/fsus.css` 对应的源码态完整入口）。
 - `vue/packages/demo-app/vite.config.ts`：
   - 通过 alias 直接指向工作区源码
-  - 将 `vue/packages/wasm` / `@element-plus/wasm` 拆分到 `fsus-wasm` chunk
+  - 将工作区运行时收拢到 `fsus-ui` chunk，避免完整插件安装产生跨组件循环；按需 consumer 构建仍将 WASM 拆分到 `fsus-wasm`
   - `optimizeDeps.exclude` 排除 `element-plus` 及多个 `@element-plus/*` 工作区包以保持源码联调
 
 ### 测试、类型检查与规范
