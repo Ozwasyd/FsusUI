@@ -4,6 +4,7 @@ export const {
   cleanupSuccessfulVisualEvidence,
   isVisualEvidenceMode,
   visualEvidencePolicy,
+  writeVisualEvidenceManifest,
 } = visualEvidence
 
 export default visualEvidence

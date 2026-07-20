@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 import {
   createPlaywrightReporter,
+  createVisualResultDirectory,
   resolveTestPort,
   resolveVisualPreviewWorkers,
 } from '../scripts/test-parallelism'
@@ -14,13 +15,12 @@ const evidencePolicy = visualEvidencePolicy()
 
 export default defineConfig({
   testDir: './tests/visual',
-  outputDir: 'test-results/visual-preview',
   fullyParallel: true,
   globalTeardown: '../scripts/visual-evidence-policy.cjs',
   preserveOutput: evidencePolicy.preserveOutput,
   workers: resolveVisualPreviewWorkers(),
   retries: process.env.CI ? 2 : 0,
-  reporter: createPlaywrightReporter('visual-preview'),
+  reporter: createPlaywrightReporter('preview'),
   timeout: 30_000,
   expect: {
     timeout: 20_000,
@@ -47,6 +47,7 @@ export default defineConfig({
   projects: [
     {
       name: 'desktop-light',
+      outputDir: createVisualResultDirectory('preview', 'desktop-light'),
       use: {
         ...devices['Desktop Chrome'],
         colorScheme: 'light',
@@ -55,6 +56,7 @@ export default defineConfig({
     },
     {
       name: 'mobile-light',
+      outputDir: createVisualResultDirectory('preview', 'mobile-light'),
       use: {
         ...devices['Pixel 7'],
         colorScheme: 'light',
@@ -63,6 +65,7 @@ export default defineConfig({
     },
     {
       name: 'desktop-dark',
+      outputDir: createVisualResultDirectory('preview', 'desktop-dark'),
       use: {
         ...devices['Desktop Chrome'],
         colorScheme: 'dark',
@@ -71,6 +74,7 @@ export default defineConfig({
     },
     {
       name: 'mobile-dark',
+      outputDir: createVisualResultDirectory('preview', 'mobile-dark'),
       use: {
         ...devices['Pixel 7'],
         colorScheme: 'dark',

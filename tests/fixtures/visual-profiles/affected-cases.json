@@ -1,0 +1,50 @@
+[
+  {
+    "name": "component source selects its audit owner and demo section",
+    "files": ["vue/packages/components/button/src/button.vue"],
+    "expected": {
+      "auditComponents": ["ElButton"],
+      "sections": ["basic"],
+      "fullRequired": false
+    }
+  },
+  {
+    "name": "component theme file uses the same owner",
+    "files": ["vue/packages/theme-chalk/src/input.scss"],
+    "expected": {
+      "auditComponents": ["ElInput"],
+      "sections": ["form"],
+      "fullRequired": false
+    }
+  },
+  {
+    "name": "global tokens request full without expanding affected into full",
+    "files": ["spec/tokens/tokens.json"],
+    "expected": {
+      "auditComponents": [],
+      "sections": [],
+      "fullRequired": true
+    }
+  },
+  {
+    "name": "demo section maps to its focused capture owner",
+    "files": ["vue/packages/demo-app/src/sections/FormSection.vue"],
+    "expected": {
+      "auditComponents": [],
+      "sections": ["form"],
+      "fullRequired": false
+    }
+  },
+  {
+    "name": "runtime and Playwright infrastructure request full",
+    "files": [
+      "scripts/prepare-visual-runtime.mjs",
+      "scripts/test-parallelism.ts"
+    ],
+    "expected": {
+      "auditComponents": [],
+      "sections": [],
+      "fullRequired": true
+    }
+  }
+]

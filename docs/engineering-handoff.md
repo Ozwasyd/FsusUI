@@ -38,14 +38,14 @@ pnpm verify
 
 ```bash
 pnpm test:coverage
-pnpm test:visual
+pnpm test:visual:full
 pnpm verify:release
 ```
 
 通过标准：
 
 - `test:coverage`：成功生成 `coverage/`，包含 `lcov`
-- `test:visual`：Playwright 多项目截图与 smoke 通过，不重建基线
+- `test:visual:full`：Playwright 四 project + 单次 Dev 的权威完整覆盖；普通 `test:visual` 仅打印 profile 帮助
 - `verify:release`：`verify`、`check:npm-dist-tag`、`build:npm-package` 和 `test:consumer-install` 一并通过
 
 ## WASM
@@ -88,7 +88,7 @@ FsusBlog 侧的消费规则：页面只消费 FsusUI 导出的 component / direc
 - `verify:full` 是完整本地质量门，等价于历史 `verify` 的覆盖面。
 - `verify` 保留为 `verify:full` 的安全别名，避免旧命令降低检查覆盖。
 - `verify:release` 用于发布前完整核验，在 `verify:full` 基础上增加 npm dist-tag、package build 和 consumer-install。
-- `verify:release` 不替代视觉/覆盖率证据；发布前仍需显式执行 `test:coverage` 与 `test:visual`。
+- `verify:release` 不替代视觉/覆盖率证据；发布前仍需显式执行 `test:coverage` 与 `test:visual:evidence`。
 
 ### Test artifact cache
 
@@ -132,7 +132,7 @@ FsusBlog 侧的消费规则：页面只消费 FsusUI 导出的 component / direc
 1. `pnpm verify:pr-fast`
 2. `pnpm verify:full`
 3. `pnpm test:coverage`
-4. `pnpm test:visual`
+4. `pnpm test:visual:evidence`
 5. `pnpm verify:release`
 6. `pnpm run check:npm-dist-tag`
 7. `pnpm run build:npm-package`
@@ -194,7 +194,7 @@ FsusBlog 侧的消费规则：页面只消费 FsusUI 导出的 component / direc
 ```bash
 pnpm install
 pnpm verify
-pnpm test:visual
+pnpm test:visual:full
 pnpm run build:npm-package
 pnpm test:consumer-install
 ```

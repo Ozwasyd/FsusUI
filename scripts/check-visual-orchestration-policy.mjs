@@ -17,6 +17,11 @@ import {
   createVisualCapacityPlan,
   parseVisualCapacityPlan,
 } from './visual-capacity.mjs'
+import {
+  createAffectedSelection,
+  createSmokeSelection,
+  loadVisualProfileRegistry,
+} from './visual-profiles.mjs'
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
 const scripts = packageJson.scripts ?? {}
@@ -40,6 +45,7 @@ const capacityFixture = JSON.parse(
   readFileSync('tests/fixtures/visual-capacity/high-resource.json', 'utf8'),
 )
 const capacityPlan = createVisualCapacityPlan(capacityFixture)
+const profileRegistry = loadVisualProfileRegistry()
 
 function assert(condition, message) {
   if (!condition) throw new Error(message)
@@ -96,7 +102,7 @@ for (const [name, fragment] of [
   ['visual:runtime:check', 'scripts/prepare-visual-runtime.mjs --check'],
   ['visual:serve:preview', 'serve-visual-runtime.mjs --suite=preview'],
   ['visual:serve:dev', 'serve-visual-runtime.mjs --suite=dev'],
-  ['test:visual:evidence', 'run-visual-tests.mjs --suite=full --evidence'],
+  ['test:visual:evidence', 'run-visual-tests.mjs --profile=evidence'],
 ]) {
   assert(scripts[name]?.includes(fragment), `${name} must use ${fragment}`)
 }
@@ -124,17 +130,26 @@ assert(
 )
 
 for (const [name, fragment] of [
-  ['test:visual', 'scripts/run-visual-tests.mjs --suite=full'],
-  ['test:visual:full', 'scripts/run-visual-tests.mjs --suite=full'],
+  ['test:visual', 'scripts/run-visual-tests.mjs --help-profiles'],
+  ['test:visual:smoke', 'scripts/run-visual-tests.mjs --profile=smoke'],
+  ['test:visual:affected', 'scripts/run-visual-tests.mjs --profile=affected'],
+  ['test:visual:full', 'scripts/run-visual-tests.mjs --profile=full'],
   [
     'test:visual:project',
     'scripts/run-visual-tests.mjs --suite=preview --project',
   ],
-  ['test:visual:plan', 'scripts/run-visual-tests.mjs --suite=full --list'],
+  ['test:visual:plan', 'scripts/run-visual-tests.mjs --profile=full --dry-run'],
 ]) {
   assert(scripts[name]?.includes(fragment), `${name} must use ${fragment}`)
 }
-for (const name of ['test:visual', 'test:visual:full', 'test:visual:project']) {
+for (const name of [
+  'test:visual',
+  'test:visual:smoke',
+  'test:visual:affected',
+  'test:visual:full',
+  'test:visual:evidence',
+  'test:visual:project',
+]) {
   assert(
     !/\brun-[ps]\b/u.test(scripts[name] ?? ''),
     `${name} must not depend on npm-run-all argument forwarding`,
@@ -154,7 +169,7 @@ assert(
 )
 
 const fullPlan = createVisualPlan(
-  parseVisualArgs(['--suite=full', '--list']),
+  parseVisualArgs(['--profile=full', '--dry-run']),
   capacityPlan,
 )
 validateVisualPlan(fullPlan, capacityPlan)
@@ -178,14 +193,14 @@ for (const project of PREVIEW_PROJECTS) {
   )
 }
 assert(
-  previewConfig.includes("outputDir: 'test-results/visual-preview'") &&
-    previewConfig.includes("createPlaywrightReporter('visual-preview')"),
-  'preview results and report must use the visual-preview suite namespace',
+  previewConfig.includes("createVisualResultDirectory('preview'") &&
+    previewConfig.includes("createPlaywrightReporter('preview')"),
+  'preview results and report must use profile/suite/project/shard namespaces',
 )
 assert(
-  devConfig.includes("outputDir: 'test-results/demo-app-dev'") &&
-    devConfig.includes("createPlaywrightReporter('demo-app-dev')"),
-  'dev results and report must use the demo-app-dev suite namespace',
+  devConfig.includes("createVisualResultDirectory('dev', 'default')") &&
+    devConfig.includes("createPlaywrightReporter('dev')"),
+  'dev results and report must use profile/suite/project/shard namespaces',
 )
 for (const [label, config, suite] of [
   ['preview', previewConfig, 'preview'],
@@ -252,9 +267,55 @@ assert(
 )
 assert(
   visualJob.includes("FSUS_VISUAL_EVIDENCE: ${{ inputs.group == 'release'") &&
+    visualJob.includes('pnpm test:visual:evidence') &&
     visualJob.includes("always() && inputs.group == 'release'") &&
+    visualJob.includes('playwright-report/profile-*') &&
+    visualJob.includes('vue/test-results/profile-*') &&
+    visualJob.includes('.tmp/visual-evidence/manifest.json') &&
+    visualJob.includes('.tmp/visual-runtime/manifest.json') &&
     visualJob.includes('screenshots'),
   'release mode must explicitly retain the complete visual evidence matrix',
+)
+assert(
+  scripts['verify:visual:affected']?.includes('test:visual:affected') &&
+    scripts['verify:visual:evidence']?.includes('test:visual:evidence') &&
+    scripts['verify:nightly']?.includes('test:visual:full'),
+  'affected, nightly, and evidence verification must select explicit visual profiles',
+)
+for (const name of ['verify', 'verify:full', 'verify:pr-fast']) {
+  assert(
+    !/test:visual|playwright|chromium/u.test(scripts[name] ?? ''),
+    `${name} must remain browser-free`,
+  )
+}
+assert(
+  !/test:visual:(?:full|evidence)/u.test(scripts.prepare ?? '') &&
+    !/test:visual:(?:full|evidence)/u.test(scripts.postinstall ?? '') &&
+    !/test:visual:(?:full|evidence)/u.test(scripts.build ?? ''),
+  'full and evidence profiles must not be implicit lifecycle/build dependencies',
+)
+
+const smokeSelection = createSmokeSelection(profileRegistry)
+const smokePlan = createVisualPlan(
+  parseVisualArgs(['--profile=smoke', '--dry-run']),
+  capacityPlan,
+  smokeSelection,
+)
+assert(
+  smokePlan.length === 1 &&
+    smokePlan[0].workers === 1 &&
+    smokePlan[0].selectedProjects.join(',') === 'desktop-light,mobile-dark',
+  'smoke must stay a one-worker representative desktop/light and compact/dark plan',
+)
+const affectedFallback = createAffectedSelection({
+  env: {},
+  git: () => ({ status: 1, stdout: '' }),
+  registry: profileRegistry,
+})
+assert(
+  affectedFallback.profile === 'smoke' &&
+    affectedFallback.requestedProfile === 'affected',
+  'affected must fall back explicitly to smoke when no local Git base exists',
 )
 assert(
   visualJob.includes('PLAYWRIGHT_BROWSERS_PATH:') &&

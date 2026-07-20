@@ -1,0 +1,256 @@
+{
+  "schemaVersion": 1,
+  "smoke": {
+    "projects": ["desktop-light", "mobile-dark"],
+    "specs": ["vue/tests/visual/capture-all.spec.ts"],
+    "grep": "capture basic in (light|dark) mode"
+  },
+  "commonContractSpecs": [
+    "vue/tests/visual/foundation-style-boundary.spec.ts",
+    "vue/tests/visual/material-contract.spec.ts",
+    "vue/tests/visual/theme-scale-contract.spec.ts",
+    "vue/tests/visual/typography-real-weights.spec.ts"
+  ],
+  "fullRequiredGlobs": [
+    "package.json",
+    "pnpm-lock.yaml",
+    "spec/tokens/**",
+    "spec/typography/**",
+    "vue/packages/components/base/**",
+    "vue/packages/components/public-shell/**",
+    "vue/packages/theme-chalk/src/common/**",
+    "vue/packages/theme-chalk/src/dark/**",
+    "vue/packages/theme-chalk/src/base.scss",
+    "vue/packages/theme-chalk/src/index.scss",
+    "vue/packages/theme-chalk/src/public-shell*.scss",
+    "vue/packages/theme-chalk/src/var.scss",
+    "vue/packages/demo-app/src/style.css",
+    "vue/packages/demo-app/src/ui-audit-manifest.ts",
+    "vue/playwright*.ts",
+    "vue/tests/visual/**",
+    "scripts/check-visual-orchestration-policy.mjs",
+    "scripts/prepare-visual-runtime.mjs",
+    "scripts/run-visual-tests.mjs",
+    "scripts/serve-visual-runtime.mjs",
+    "scripts/test-parallelism.ts",
+    "scripts/visual-*.mjs",
+    "scripts/visual-*.cjs",
+    "spec/ci/visual-profiles.json",
+    "tests/fixtures/visual-*/**",
+    "tests/visual-*.test.mjs",
+    "tests/visual-runtime/**"
+  ],
+  "componentGroups": [
+    {
+      "section": "basic",
+      "packages": [
+        "avatar",
+        "badge",
+        "button",
+        "button-group",
+        "check-tag",
+        "divider",
+        "icon",
+        "link",
+        "space",
+        "tag",
+        "text",
+        "visual-hidden"
+      ]
+    },
+    {
+      "section": "form",
+      "packages": [
+        "autocomplete",
+        "cascader",
+        "cascader-panel",
+        "checkbox",
+        "checkbox-button",
+        "checkbox-group",
+        "color-picker",
+        "date-picker",
+        "form",
+        "form-item",
+        "input",
+        "input-number",
+        "option",
+        "option-group",
+        "radio",
+        "radio-button",
+        "radio-group",
+        "rate",
+        "select",
+        "select-v2",
+        "slider",
+        "switch",
+        "time-picker",
+        "time-select",
+        "transfer",
+        "tree-select",
+        "upload"
+      ]
+    },
+    {
+      "section": "data",
+      "packages": [
+        "calendar",
+        "countdown",
+        "descriptions",
+        "descriptions-item",
+        "pagination",
+        "progress",
+        "statistic",
+        "table",
+        "table-column",
+        "table-v2",
+        "timeline",
+        "timeline-item",
+        "tree",
+        "tree-v2",
+        "virtual-list"
+      ]
+    },
+    {
+      "section": "navigation",
+      "packages": [
+        "breadcrumb",
+        "breadcrumb-item",
+        "dropdown",
+        "dropdown-item",
+        "dropdown-menu",
+        "menu",
+        "menu-item",
+        "menu-item-group",
+        "page-header",
+        "site-header",
+        "step",
+        "steps",
+        "sub-menu",
+        "tab-pane",
+        "tabs",
+        "task-page-header"
+      ]
+    },
+    {
+      "section": "feedback",
+      "packages": [
+        "alert",
+        "dialog",
+        "drawer",
+        "loading",
+        "message",
+        "message-box",
+        "notification",
+        "popconfirm",
+        "popover",
+        "result",
+        "skeleton",
+        "skeleton-item"
+      ]
+    },
+    {
+      "section": "others",
+      "packages": [
+        "__tests__",
+        "_internal",
+        "affix",
+        "aside",
+        "backtop",
+        "base",
+        "card",
+        "carousel",
+        "carousel-item",
+        "col",
+        "collapse",
+        "collapse-item",
+        "collapse-transition",
+        "collection",
+        "config-provider",
+        "container",
+        "empty",
+        "empty-state",
+        "focus-trap",
+        "footer",
+        "header",
+        "image",
+        "image-viewer",
+        "infinite-scroll",
+        "main",
+        "overlay",
+        "perception-challenge",
+        "popper",
+        "responsive-collection",
+        "roving-focus-group",
+        "row",
+        "scrollbar",
+        "slot",
+        "teleport",
+        "tooltip",
+        "tooltip-v2",
+        "watermark"
+      ]
+    },
+    {
+      "section": "issue-primitives",
+      "packages": [
+        "collection-primitives",
+        "inbox-primitives",
+        "metric-primitives",
+        "public-shell",
+        "settings-primitives",
+        "theme-mode-toggle"
+      ]
+    },
+    {
+      "section": "markdown-stress",
+      "packages": ["markdown-editor", "markdown-renderer"]
+    }
+  ],
+  "auditComponentOverrides": {
+    "collection-primitives": ["ElCollectionToolbar"],
+    "inbox-primitives": ["ElInboxLayout"],
+    "metric-primitives": ["ElMetricList"],
+    "settings-primitives": ["ElSectionNav"],
+    "table-v2": ["ElTableV2", "ElAutoResizer"],
+    "virtual-list": [
+      "FixedSizeList",
+      "DynamicSizeList",
+      "FixedSizeGrid",
+      "DynamicSizeGrid"
+    ],
+    "visual-hidden": ["ElVisuallyHidden"]
+  },
+  "nonAuditPackages": [
+    "__tests__",
+    "_internal",
+    "base",
+    "collection",
+    "focus-trap",
+    "infinite-scroll",
+    "loading",
+    "message",
+    "message-box",
+    "notification",
+    "roving-focus-group",
+    "slot",
+    "teleport"
+  ],
+  "demoSectionSpecs": {
+    "basic": ["vue/tests/visual/capture-all.spec.ts"],
+    "data": ["vue/tests/visual/capture-all.spec.ts"],
+    "feedback": ["vue/tests/visual/capture-all.spec.ts"],
+    "form": ["vue/tests/visual/capture-all.spec.ts"],
+    "icons": ["vue/tests/visual/capture-all.spec.ts"],
+    "issue-primitives": ["vue/tests/visual/issue-primitives.spec.ts"],
+    "markdown-stress": ["vue/tests/visual/material-contract.spec.ts"],
+    "navigation": ["vue/tests/visual/capture-all.spec.ts"],
+    "others": ["vue/tests/visual/capture-all.spec.ts"],
+    "public-shell-nav-mode": [
+      "vue/tests/visual/public-shell-mobile-nav.spec.ts"
+    ],
+    "public-shell-search-mode": [
+      "vue/tests/visual/public-shell-desktop-search.spec.ts"
+    ],
+    "view-transitions": ["vue/tests/visual/scroll-motion.spec.ts"]
+  }
+}

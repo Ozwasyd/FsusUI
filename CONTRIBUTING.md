@@ -213,17 +213,25 @@ Run visual tests for UI, theme, motion, icon, layout, demo, or screenshot
 changes:
 
 ```bash
-pnpm run test:visual
+pnpm run verify:visual:affected
 ```
 
-Focused commands:
+Explicit profiles:
 
 ```bash
+pnpm run test:visual:smoke
+pnpm run test:visual:affected
+pnpm run test:visual:full
+pnpm run test:visual:evidence
 pnpm run test:visual:preview
 pnpm run test:visual:dev
 pnpm run test:visual:reuse
 pnpm run audit:visual-boundaries
 ```
+
+`pnpm run test:visual` only prints profile help. See
+[`docs/visual-testing.md`](./docs/visual-testing.md) for affected baseline,
+offline dry-run, ownership registry, and evidence retention details.
 
 ### Review Visual Diffs
 

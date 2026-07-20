@@ -27,8 +27,8 @@ pnpm run build:demo
 
 The default gallery is split into sections:
 
-| Section          | File                                                        |
-| ---------------- | ----------------------------------------------------------- |
+| Section          | File                                                            |
+| ---------------- | --------------------------------------------------------------- |
 | Basic            | `vue/packages/demo-app/src/sections/BasicSection.vue`           |
 | Form             | `vue/packages/demo-app/src/sections/FormSection.vue`            |
 | Data             | `vue/packages/demo-app/src/sections/DataSection.vue`            |
@@ -54,11 +54,16 @@ The demo also has UI audit routes and metadata in
 ## Visual Regression Relationship
 
 Visual snapshots under `vue/tests/visual/demo-app.spec.ts-snapshots/` are generated
-from the demo app. The main command is:
+from the demo app. The normal local command is:
 
 ```bash
-pnpm run test:visual
+pnpm run verify:visual:affected
 ```
+
+Use `pnpm run test:visual:full` for the authoritative four-project matrix and
+`pnpm run test:visual:evidence` when successful artifacts must be retained. The
+unqualified `test:visual` command prints profile help; profile details live in
+[`visual-testing.md`](./visual-testing.md).
 
 Focused Playwright specs live under `vue/tests/visual/`, including demo smoke,
 interactive audit, UI audit, scroll motion, and issue primitive coverage.

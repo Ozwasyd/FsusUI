@@ -99,7 +99,7 @@ package smoke，并直接冷安装同一个 tarball；三处日志引用同一�
 ```bash
 pnpm verify:release
 pnpm test:coverage
-pnpm test:visual
+pnpm test:visual:evidence
 ```
 
 ## 2. Changesets 流程
@@ -125,7 +125,7 @@ pnpm test:visual
 
 1. `pnpm verify:release`
 2. `pnpm test:coverage`
-3. `pnpm test:visual`
+3. `pnpm test:visual:evidence`
 4. 检查 `dist/element-plus/package.json`
 5. 补充 `npm pack --dry-run` / `pnpm pack --dry-run` 记录，并更新 `release-evidence/npm-public-preview/`
 
@@ -237,7 +237,7 @@ workspace 依赖归一化由 `scripts/prepare-npm-package.mjs` 负责，当前�
 - `verify:release`
 - `test:coverage`
 - `test:consumer-install`
-- `test:visual`
+- `test:visual:evidence`
 - quality workflow
 - Changesets 基础目录与模板
 - npm public-preview package audit evidence

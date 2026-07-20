@@ -7,7 +7,16 @@ import {
   resolveVisualCapacityPlan,
   serializeVisualCapacityPlan,
 } from './visual-capacity.mjs'
-import { cleanupSuccessfulVisualEvidence } from './visual-evidence-policy.mjs'
+import {
+  cleanupSuccessfulVisualEvidence,
+  writeVisualEvidenceManifest,
+} from './visual-evidence-policy.mjs'
+import {
+  VISUAL_PROFILES,
+  createAffectedSelection,
+  createSmokeSelection,
+  loadVisualProfileRegistry,
+} from './visual-profiles.mjs'
 
 export const PREVIEW_PROJECTS = [
   'desktop-light',
@@ -15,6 +24,20 @@ export const PREVIEW_PROJECTS = [
   'desktop-dark',
   'mobile-dark',
 ]
+
+export function resolveProfileCapacityPlan(profile, capacityPlan) {
+  if (profile !== 'smoke') return capacityPlan
+  return {
+    ...capacityPlan,
+    auditBucketCount: 1,
+    previewWorkers: 1,
+    suiteMode: 'serial',
+    reasons: [
+      ...capacityPlan.reasons,
+      'smoke profile capped browser execution to one worker',
+    ],
+  }
+}
 
 const SUITES = new Set(['full', 'preview', 'dev'])
 
@@ -29,17 +52,38 @@ const readOption = (args, name) => {
 
 export function parseVisualArgs(args) {
   const normalizedArgs = args.filter((arg) => arg !== '--')
+  const profile = readOption(normalizedArgs, 'profile')
   const suite = readOption(normalizedArgs, 'suite') ?? 'full'
   const projectRequested = normalizedArgs.some(
     (arg) => arg === '--project' || arg.startsWith('--project='),
   )
   const projectOption = readOption(normalizedArgs, 'project')
-  const positionalProject = normalizedArgs.find((arg) => !arg.startsWith('-'))
+  const optionValueIndexes = new Set()
+  normalizedArgs.forEach((arg, index) => {
+    if (
+      ['--base', '--profile', '--project', '--shard', '--suite'].includes(arg)
+    ) {
+      optionValueIndexes.add(index + 1)
+    }
+  })
+  const positionalProject = normalizedArgs.find(
+    (arg, index) => !arg.startsWith('-') && !optionValueIndexes.has(index),
+  )
   const project = projectOption ?? positionalProject
   const shard = readOption(normalizedArgs, 'shard')
   const list =
     normalizedArgs.includes('--list') || normalizedArgs.includes('--dry-run')
   const evidence = normalizedArgs.includes('--evidence')
+  const base = readOption(normalizedArgs, 'base')
+  const help =
+    normalizedArgs.includes('--help') ||
+    normalizedArgs.includes('--help-profiles')
+
+  if (profile && !VISUAL_PROFILES.includes(profile)) {
+    throw new Error(
+      `Unknown visual profile: ${profile}. Expected one of ${VISUAL_PROFILES.join(', ')}`,
+    )
+  }
 
   if (!SUITES.has(suite)) {
     throw new Error(`Unknown visual suite: ${suite}`)
@@ -55,9 +99,10 @@ export function parseVisualArgs(args) {
       `Unknown preview project: ${project}. Expected one of ${PREVIEW_PROJECTS.join(', ')}`,
     )
   }
-  if (shard && (suite !== 'preview' || project)) {
+  const shardedFullProfile = profile === 'full' || profile === 'evidence'
+  if (shard && ((suite !== 'preview' && !shardedFullProfile) || project)) {
     throw new Error(
-      '--shard is only valid for the preview suite without a single-project selection',
+      '--shard is only valid for preview, full, or evidence without a single-project selection',
     )
   }
   if (shard && !/^\d+\/\d+$/u.test(shard)) {
@@ -70,14 +115,19 @@ export function parseVisualArgs(args) {
     }
   }
 
-  return { evidence, list, project, shard, suite }
+  return { base, evidence, help, list, profile, project, shard, suite }
 }
 
 export function createVisualPlan(
-  { project, shard, suite },
+  { profile, project, shard, suite },
   capacityPlan = resolveVisualCapacityPlan(),
+  selection,
 ) {
-  const selectedProjects = project ? [project] : [...PREVIEW_PROJECTS]
+  const namespaceProfile = profile ?? suite
+  const namespaceShard = (shard ?? 'local').replace(/[^a-zA-Z0-9._-]+/gu, '-')
+  const selectedProjects = project
+    ? [project]
+    : (selection?.projects ?? [...PREVIEW_PROJECTS])
   const previewArgs = [
     'exec',
     'playwright',
@@ -85,17 +135,33 @@ export function createVisualPlan(
     '--config=vue/playwright.config.ts',
     ...selectedProjects.map((name) => `--project=${name}`),
   ]
+  if (selection?.specs?.length) {
+    previewArgs.push(
+      ...selection.specs.map((spec) =>
+        spec.replace(/^vue\/tests\/visual\//u, ''),
+      ),
+    )
+  }
+  if (selection?.grep) previewArgs.push('--grep', selection.grep)
   if (shard) previewArgs.push(`--shard=${shard}`)
 
   const preview = {
     argv: ['pnpm', ...previewArgs],
     projectResultNamespaces: selectedProjects.map(
-      (name) => `vue/test-results/visual-preview/${name}`,
+      (name) =>
+        `vue/test-results/profile-${namespaceProfile}/suite-preview/project-${name}/shard-${namespaceShard}`,
     ),
-    reportDirectory: 'playwright-report/visual-preview',
+    reportDirectory: `playwright-report/profile-${namespaceProfile}/suite-preview/shard-${namespaceShard}`,
     selectedProjects,
     suite: 'preview',
-    workers: capacityPlan.previewWorkers,
+    workers:
+      profile === 'smoke'
+        ? Math.min(1, capacityPlan.previewWorkers)
+        : capacityPlan.previewWorkers,
+    environment:
+      selection?.auditComponents?.length > 0
+        ? { FSUS_UI_AUDIT_COMPONENTS: selection.auditComponents.join(',') }
+        : {},
   }
   const dev = {
     argv: [
@@ -105,15 +171,20 @@ export function createVisualPlan(
       'test',
       '--config=vue/playwright.dev.config.ts',
     ],
-    projectResultNamespaces: ['vue/test-results/demo-app-dev/default'],
-    reportDirectory: 'playwright-report/demo-app-dev',
+    projectResultNamespaces: [
+      `vue/test-results/profile-${namespaceProfile}/suite-dev/project-default/shard-${namespaceShard}`,
+    ],
+    reportDirectory: `playwright-report/profile-${namespaceProfile}/suite-dev/shard-${namespaceShard}`,
     selectedProjects: [],
     suite: 'dev',
     workers: capacityPlan.devWorkers,
+    environment: {},
   }
 
+  if (profile === 'smoke' || profile === 'affected') return [preview]
   if (suite === 'preview') return [preview]
   if (suite === 'dev') return [dev]
+  if (shard && Number(shard.split('/')[0]) !== 1) return [preview]
   return [preview, dev]
 }
 
@@ -175,6 +246,67 @@ export function printVisualPlan(plan, capacityPlan) {
     console.log(
       `[visual-plan] result-namespaces=${entry.projectResultNamespaces.join(',')}`,
     )
+    if (Object.keys(entry.environment ?? {}).length > 0) {
+      console.log(
+        `[visual-plan] environment=${Object.entries(entry.environment)
+          .map(([name, value]) => `${name}=${value}`)
+          .join(' ')}`,
+      )
+    }
+  }
+}
+
+export function printVisualProfileHelp() {
+  console.log('Visual profiles (browser execution is always explicit):')
+  console.log(
+    '  pnpm test:visual:smoke     representative desktop/light + compact/dark fixtures',
+  )
+  console.log(
+    '  pnpm test:visual:affected  local Git diff mapped to specs, sections, and audit components',
+  )
+  console.log(
+    '  pnpm test:visual:full      all four projects plus exactly one Dev suite',
+  )
+  console.log(
+    '  pnpm test:visual:evidence  full coverage with successful screenshots, traces, manifest, and HTML reports',
+  )
+  console.log(
+    'Add --dry-run to any profile to print a browser-free, network-free plan.',
+  )
+  console.log(
+    'Affected baseline: --base=<local-ref> or FSUS_VISUAL_BASE=<local-ref>.',
+  )
+}
+
+export function printVisualSelection(selection) {
+  if (!selection) return
+  console.log(`[visual-profile] profile=${selection.profile}`)
+  if (selection.requestedProfile) {
+    console.log(`[visual-profile] requested=${selection.requestedProfile}`)
+  }
+  if (selection.base) console.log(`[visual-profile] base=${selection.base}`)
+  if (selection.changedFiles) {
+    console.log(
+      `[visual-profile] changed-files=${selection.changedFiles.join(',') || 'none'}`,
+    )
+  }
+  console.log(`[visual-profile] specs=${selection.specs.join(',')}`)
+  console.log(
+    `[visual-profile] sections=${selection.sections.join(',') || 'none'}`,
+  )
+  console.log(
+    `[visual-profile] audit-components=${selection.auditComponents.join(',') || 'none'}`,
+  )
+  if (selection.fallbackReason) {
+    console.log(
+      `[visual-profile] fallback=smoke reason=${selection.fallbackReason}`,
+    )
+  }
+  if (selection.fullRequired) {
+    console.log(
+      `[visual-profile] full-required=yes files=${selection.fullRequiredFiles.join(',')}`,
+    )
+    console.log('[visual-profile] recommendation=pnpm test:visual:full')
   }
 }
 
@@ -206,7 +338,7 @@ export function runVisualPlan(
   for (const entry of plan) {
     const [command, ...args] = entry.argv
     const result = spawn(command, args, {
-      env,
+      env: { ...env, ...entry.environment },
       stdio: 'inherit',
       shell: process.platform === 'win32',
     })
@@ -220,7 +352,7 @@ function runVisualEntry(entry, spawn, env) {
   return new Promise((resolve) => {
     const [command, ...args] = entry.argv
     const child = spawn(command, args, {
-      env,
+      env: { ...env, ...entry.environment },
       stdio: 'inherit',
       shell: process.platform === 'win32',
     })
@@ -256,9 +388,24 @@ export async function runVisualPlanAsync(
 async function main() {
   try {
     const options = parseVisualArgs(process.argv.slice(2))
-    const capacityPlan = resolveVisualCapacityPlan()
-    const plan = createVisualPlan(options, capacityPlan)
+    if (options.help) {
+      printVisualProfileHelp()
+      return
+    }
+    const registry = loadVisualProfileRegistry()
+    const selection =
+      options.profile === 'smoke'
+        ? createSmokeSelection(registry)
+        : options.profile === 'affected'
+          ? createAffectedSelection({ base: options.base, registry })
+          : undefined
+    const capacityPlan = resolveProfileCapacityPlan(
+      options.profile,
+      resolveVisualCapacityPlan(),
+    )
+    const plan = createVisualPlan(options, capacityPlan, selection)
     validateVisualPlan(plan, capacityPlan)
+    printVisualSelection(selection)
     printVisualPlan(plan, capacityPlan)
     if (!options.list) {
       const preparationStatus = runVisualRuntimePreparation()
@@ -270,17 +417,31 @@ async function main() {
         ...process.env,
         FSUS_VISUAL_ORCHESTRATED: '1',
         FSUS_VISUAL_EVIDENCE:
-          options.evidence || process.env.FSUS_VISUAL_EVIDENCE === '1'
+          options.profile === 'evidence' ||
+          options.evidence ||
+          process.env.FSUS_VISUAL_EVIDENCE === '1'
             ? '1'
             : '0',
+        FSUS_VISUAL_PROFILE: options.profile ?? options.suite,
+        FSUS_VISUAL_SHARD: options.shard ?? 'local',
       }
       console.log(
         `[visual-plan] evidence=${env.FSUS_VISUAL_EVIDENCE === '1' ? 'full' : 'failures-only'}`,
       )
-      process.exitCode = await runVisualPlanAsync(plan, {
+      const testExitCode = await runVisualPlanAsync(plan, {
         capacityPlan,
         env,
       })
+      try {
+        await writeVisualEvidenceManifest(plan, capacityPlan, testExitCode, env)
+      } catch (error) {
+        console.error(
+          `[visual-evidence] failed to write manifest: ${error instanceof Error ? error.message : String(error)}`,
+        )
+        process.exitCode = 1
+        return
+      }
+      process.exitCode = testExitCode
       await cleanupSuccessfulVisualEvidence(env, undefined, true)
     }
   } catch (error) {

@@ -48,16 +48,27 @@ export const resolveTestPort = (specificEnv: string, fallback: number) =>
 export const resolveDomLayoutChunkSize = () =>
   positiveInteger(process.env.FSUS_DOM_LAYOUT_CHUNK_SIZE) ?? 12
 
-export const createPlaywrightReporter = (suiteName: string) =>
-  process.env.CI
-    ? [
-        ['github'],
-        [
-          'html',
-          {
-            open: 'never',
-            outputFolder: `playwright-report/${suiteName}`,
-          },
-        ],
-      ]
-    : 'list'
+const safeNamespace = (value: string | undefined, fallback: string) =>
+  (value || fallback).replace(/[^a-zA-Z0-9._-]+/g, '-')
+
+export const createVisualResultDirectory = (
+  suiteName: string,
+  projectName: string,
+) =>
+  `test-results/profile-${safeNamespace(process.env.FSUS_VISUAL_PROFILE, 'direct')}/suite-${safeNamespace(suiteName, 'unknown')}/project-${safeNamespace(projectName, 'default')}/shard-${safeNamespace(process.env.FSUS_VISUAL_SHARD, 'local')}`
+
+export const createPlaywrightReporter = (suiteName: string) => {
+  const outputFolder = `playwright-report/profile-${safeNamespace(process.env.FSUS_VISUAL_PROFILE, 'direct')}/suite-${safeNamespace(suiteName, 'unknown')}/shard-${safeNamespace(process.env.FSUS_VISUAL_SHARD, 'local')}`
+  const htmlReporter = [
+    'html',
+    {
+      open: 'never',
+      outputFolder,
+    },
+  ]
+  return process.env.CI
+    ? [['github'], htmlReporter]
+    : process.env.FSUS_VISUAL_EVIDENCE === '1'
+      ? [['list'], htmlReporter]
+      : 'list'
+}

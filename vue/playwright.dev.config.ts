@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 import {
   createPlaywrightReporter,
+  createVisualResultDirectory,
   resolveTestPort,
   resolveVisualDevWorkers,
 } from '../scripts/test-parallelism'
@@ -14,13 +15,13 @@ const evidencePolicy = visualEvidencePolicy()
 
 export default defineConfig({
   testDir: './tests/demo-app-dev',
-  outputDir: 'test-results/demo-app-dev',
+  outputDir: createVisualResultDirectory('dev', 'default'),
   fullyParallel: false,
   globalTeardown: '../scripts/visual-evidence-policy.cjs',
   preserveOutput: evidencePolicy.preserveOutput,
   workers: resolveVisualDevWorkers(),
   retries: process.env.CI ? 2 : 0,
-  reporter: createPlaywrightReporter('demo-app-dev'),
+  reporter: createPlaywrightReporter('dev'),
   timeout: 60_000,
   expect: {
     timeout: 20_000,

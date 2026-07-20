@@ -28,5 +28,5 @@ Closes #
 - [ ] `pnpm run typecheck`
 - [ ] `pnpm run test`
 - [ ] `pnpm run build`
-- [ ] `pnpm run test:visual` if UI, theme, motion, layout, icons, or demo output changed
+- [ ] `pnpm run verify:visual:affected` if UI, theme, motion, layout, icons, or demo output changed
 - [ ] `pnpm run test:consumer-install` if public package output, exports, install flow, or registry behavior changed
