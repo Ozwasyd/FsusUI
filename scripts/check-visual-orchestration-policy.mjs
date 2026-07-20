@@ -23,6 +23,10 @@ const previewConfig = readFileSync('vue/playwright.config.ts', 'utf8')
 const devConfig = readFileSync('vue/playwright.dev.config.ts', 'utf8')
 const testParallelism = readFileSync('scripts/test-parallelism.ts', 'utf8')
 const auditSpec = readFileSync('vue/tests/visual/ui-audit-all.spec.ts', 'utf8')
+const auditFixture = readFileSync(
+  'vue/packages/demo-app/src/AuditFixtures.vue',
+  'utf8',
+)
 const capacitySource = readFileSync('scripts/visual-capacity.cjs', 'utf8')
 const capacityFacade = readFileSync('scripts/visual-capacity.mjs', 'utf8')
 const runtimeServer = readFileSync('scripts/serve-visual-runtime.mjs', 'utf8')
@@ -271,9 +275,24 @@ assert(
   'visual capacity must keep a CJS-safe core behind its ESM CLI facade',
 )
 assert(
-  auditSpec.includes('resolveVisualAuditBucketCount()') &&
+  auditSpec.includes('process.env.FSUS_VISUAL_CAPACITY_PLAN') &&
+    auditSpec.includes('fitVisualAuditBucketCount') &&
+    auditSpec.includes('partitionVisualAuditComponents') &&
     auditSpec.includes('visual-audit-bucket-count'),
-  'UI audit must expose the plan-backed bucket count entry for #230',
+  'UI audit buckets must consume the serialized #229 capacity plan through the pure #230 planner',
+)
+assert(
+  auditSpec.includes('ui audit / ${state} / ${bucket.label}') &&
+    !auditSpec.includes("waitUntil: 'networkidle'") &&
+    auditSpec.includes("waitUntil: 'domcontentloaded'") &&
+    auditSpec.includes('\'[data-audit-ready="true"]\''),
+  'UI audit must declare retryable state/component buckets and wait on explicit readiness',
+)
+assert(
+  auditSpec.includes('createVisualAuditPathNamespace') &&
+    auditFixture.includes('data-audit-ready="true"') &&
+    auditFixture.includes(':data-audit-state="auditState"'),
+  'UI audit fixture and screenshot namespace must bind suite/project/state/component readiness',
 )
 assert(
   !/(?:previewWorkers|devWorkers|auditBucketCount)\s*[:=][^\n]*cpus\(\)\.length/u.test(

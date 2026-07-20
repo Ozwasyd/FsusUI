@@ -6,9 +6,10 @@ import { URL } from 'node:url'
 import {
   createVisualAuditBucketPlan,
   createVisualAuditPathNamespace,
+  fitVisualAuditBucketCount,
   partitionVisualAuditComponents,
   resolveVisualAuditBucketCount,
-} from '../scripts/visual-audit-buckets.mjs'
+} from '../scripts/visual-audit-buckets.ts'
 
 const fixture = JSON.parse(
   readFileSync(
@@ -25,9 +26,7 @@ const optionsFor = (workerBudget, overrides = {}) => ({
 
 test('changes the 120-component plan with the available worker budget', () => {
   for (const scenario of fixture.resources) {
-    const plan = createVisualAuditBucketPlan(
-      optionsFor(scenario.workerBudget),
-    )
+    const plan = createVisualAuditBucketPlan(optionsFor(scenario.workerBudget))
     assert.equal(plan.bucketCount, scenario.expectedBucketCount, scenario.name)
     assert.equal(plan.minimumBucketSize, scenario.expectedBucketSize)
     assert.equal(plan.maximumBucketSize, scenario.expectedBucketSize)
@@ -46,6 +45,27 @@ test('accounts for selected project count without exceeding size bounds', () => 
   assert.equal(fourProjects.totalProjectBuckets, 16)
 })
 
+test('fits the shared capacity bucket target to selected component bounds', () => {
+  assert.equal(
+    fitVisualAuditBucketCount({
+      componentCount: 120,
+      desiredBucketCount: 8,
+      maxComponentsPerBucket: 40,
+      minComponentsPerBucket: 8,
+    }),
+    8,
+  )
+  assert.equal(
+    fitVisualAuditBucketCount({
+      componentCount: 5,
+      desiredBucketCount: 32,
+      maxComponentsPerBucket: 40,
+      minComponentsPerBucket: 8,
+    }),
+    1,
+  )
+})
+
 test('assigns every component exactly once with no empty bucket', () => {
   const componentIds = Array.from({ length: 120 }, (_, index) => `El${index}`)
   const plan = createVisualAuditBucketPlan({
@@ -54,7 +74,10 @@ test('assigns every component exactly once with no empty bucket', () => {
   })
   const assigned = plan.buckets.flatMap((bucket) => bucket.components)
 
-  assert.equal(plan.buckets.every((bucket) => bucket.components.length > 0), true)
+  assert.equal(
+    plan.buckets.every((bucket) => bucket.components.length > 0),
+    true,
+  )
   assert.equal(new Set(assigned).size, componentIds.length)
   assert.deepEqual(assigned, componentIds)
 })
@@ -125,7 +148,10 @@ test('creates collision-free path namespaces across projects and states', () => 
     assert.match(namespace, /^suite-ui-audit\/project-/u)
     assert.match(namespace, /\/state-(?:focus|interaction|active)\//u)
     assert.match(namespace, /\/component-ElButton$/u)
-    assert.match(namespace, new RegExp(`project-${fixture.projects[Math.floor(index / 3)]}`))
+    assert.match(
+      namespace,
+      new RegExp(`project-${fixture.projects[Math.floor(index / 3)]}`),
+    )
   }
 })
 
@@ -180,7 +206,7 @@ test('rejects invalid bounds, mismatched counts, and duplicate components', () =
 
 test('stays independent from host capacity, browsers, network, and environment state', () => {
   const source = readFileSync(
-    new URL('../scripts/visual-audit-buckets.mjs', import.meta.url),
+    new URL('../scripts/visual-audit-buckets.ts', import.meta.url),
     'utf8',
   )
 

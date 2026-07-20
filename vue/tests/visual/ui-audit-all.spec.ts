@@ -6,7 +6,11 @@ import {
   auditComponents,
   auditStateNames,
 } from '../../packages/demo-app/src/ui-audit-manifest'
-import { resolveVisualAuditBucketCount } from '../../../scripts/test-parallelism'
+import {
+  createVisualAuditPathNamespace,
+  fitVisualAuditBucketCount,
+  partitionVisualAuditComponents,
+} from '../../../scripts/visual-audit-buckets'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
 
 type VisualVariant = {
@@ -31,7 +35,7 @@ if (
   requestedComponentNames.size > 0 &&
   selectedAuditComponents.length !== requestedComponentNames.size
 ) {
-  const selectedNames = new Set(
+  const selectedNames = new Set<string>(
     selectedAuditComponents.map((component) => component.name),
   )
   const unknownNames = [...requestedComponentNames].filter(
@@ -39,11 +43,57 @@ if (
   )
   throw new Error(`Unknown UI audit components: ${unknownNames.join(', ')}`)
 }
-const expectedScreenshotsPerProject =
-  selectedAuditComponents.length * auditStateNames.length
-// #230 owns bucket partitioning. This is the single plan-backed read entry it
-// will consume instead of deriving capacity again inside the audit suite.
-const visualAuditBucketCount = resolveVisualAuditBucketCount()
+const positiveIntegerEnv = (name: string, fallback: number) => {
+  const value = process.env[name]
+  if (value === undefined || value.trim() === '') return fallback
+  const parsed = Number(value)
+  if (!Number.isSafeInteger(parsed) || parsed < 1) {
+    throw new Error(`${name} must be a positive integer`)
+  }
+  return parsed
+}
+
+// Capacity is resolved once by the shared #229 plan. Optional audit overrides
+// can narrow the retry unit, but never probe or derive host resources here.
+const serializedCapacityPlan = process.env.FSUS_VISUAL_CAPACITY_PLAN
+if (!serializedCapacityPlan) {
+  throw new Error('FSUS_VISUAL_CAPACITY_PLAN must be prepared before UI audit')
+}
+const capacityPlan = JSON.parse(serializedCapacityPlan) as {
+  auditBucketCount?: unknown
+}
+const serializedBucketCount = Number(capacityPlan.auditBucketCount)
+if (!Number.isSafeInteger(serializedBucketCount) || serializedBucketCount < 1) {
+  throw new Error(
+    'FSUS_VISUAL_CAPACITY_PLAN.auditBucketCount must be a positive integer',
+  )
+}
+const capacityBucketCount = serializedBucketCount
+const desiredBucketCount = positiveIntegerEnv(
+  'FSUS_VISUAL_AUDIT_BUCKETS',
+  capacityBucketCount,
+)
+const minComponentsPerBucket = positiveIntegerEnv(
+  'FSUS_VISUAL_AUDIT_MIN_BUCKET_SIZE',
+  8,
+)
+const maxComponentsPerBucket = positiveIntegerEnv(
+  'FSUS_VISUAL_AUDIT_MAX_BUCKET_SIZE',
+  40,
+)
+const visualAuditBucketCount = fitVisualAuditBucketCount({
+  componentCount: selectedAuditComponents.length,
+  desiredBucketCount,
+  maxComponentsPerBucket,
+  minComponentsPerBucket,
+})
+const visualAuditBuckets = partitionVisualAuditComponents(
+  selectedAuditComponents.map((component) => component.name),
+  visualAuditBucketCount,
+)
+const auditComponentByName = new Map(
+  selectedAuditComponents.map((component) => [component.name, component]),
+)
 
 const stabilizePage = async (page: Page) => {
   await page.addStyleTag({
@@ -96,20 +146,24 @@ const screenshotPath = (
   path.join(
     process.cwd(),
     'screenshots',
-    'ui-audit',
-    componentName,
-    projectName,
-    `${stateName}.png`,
+    `${createVisualAuditPathNamespace({
+      componentName,
+      projectName,
+      stateName,
+      suiteName: 'ui-audit',
+    })}.png`,
   )
 
-const countProjectScreenshots = (projectName: string) => {
+const countBucketScreenshots = (
+  componentNames: readonly string[],
+  projectName: string,
+  stateName: string,
+) => {
   let count = 0
 
-  for (const component of selectedAuditComponents) {
-    for (const state of auditStateNames) {
-      if (fs.existsSync(screenshotPath(component.name, projectName, state))) {
-        count += 1
-      }
+  for (const componentName of componentNames) {
+    if (fs.existsSync(screenshotPath(componentName, projectName, stateName))) {
+      count += 1
     }
   }
 
@@ -125,72 +179,95 @@ test.afterEach(async ({ page }) => {
   expect(diagnostics.get(page) ?? []).toEqual([])
 })
 
-test('captures the registered component state matrix', async ({
-  page,
-}, testInfo) => {
-  test.setTimeout(360_000)
-  testInfo.annotations.push({
-    type: 'visual-audit-bucket-count',
-    description: String(visualAuditBucketCount),
-  })
-
+test.describe('ui audit buckets', () => {
   for (const state of auditStateNames) {
-    await page.goto(buildAuditUrl(state, testInfo.project.name), {
-      waitUntil: 'networkidle',
-    })
-    await stabilizePage(page)
+    for (const bucket of visualAuditBuckets) {
+      test(`ui audit / ${state} / ${bucket.label}`, async ({
+        page,
+      }, testInfo) => {
+        test.setTimeout(45_000 + bucket.components.length * 2_000)
+        testInfo.annotations.push(
+          {
+            type: 'visual-audit-bucket-count',
+            description: String(visualAuditBucketCount),
+          },
+          {
+            type: 'visual-audit-bucket',
+            description: `${bucket.label}: ${bucket.components.join(',')}`,
+          },
+        )
 
-    await expect(page.locator('[data-audit-component]')).toHaveCount(
-      auditComponents.length,
-    )
+        await page.goto(buildAuditUrl(state, testInfo.project.name), {
+          waitUntil: 'domcontentloaded',
+        })
+        const ready = page.locator('[data-audit-ready="true"]')
+        await expect(ready).toHaveAttribute('data-audit-state', state)
+        await expect(page.locator('[data-audit-component]')).toHaveCount(
+          auditComponents.length,
+        )
+        await stabilizePage(page)
 
-    for (const component of selectedAuditComponents) {
-      const componentCard = page.locator(component.locator)
-      await expect(componentCard).toBeVisible()
+        for (const componentName of bucket.components) {
+          const component = auditComponentByName.get(componentName)
+          expect(
+            component,
+            `${componentName} must exist in audit manifest`,
+          ).toBeDefined()
+          if (!component) continue
+          const componentCard = page.locator(component.locator)
+          await expect(componentCard).toBeVisible()
 
-      if (state === 'focus') {
-        const focusTarget = page.locator(component.focusLocator).first()
-        if (await focusTarget.count()) {
-          await focusTarget.focus({ timeout: 1000 }).catch(() => undefined)
-        } else {
-          await componentCard.focus({ timeout: 1000 }).catch(() => undefined)
+          if (state === 'focus') {
+            const focusTarget = page.locator(component.focusLocator).first()
+            if (await focusTarget.count()) {
+              await focusTarget.focus({ timeout: 1000 }).catch(() => undefined)
+            } else {
+              await componentCard
+                .focus({ timeout: 1000 })
+                .catch(() => undefined)
+            }
+          }
+
+          if (state === 'interaction') {
+            const interactionTarget = page
+              .locator(component.interactionLocator)
+              .filter({ visible: true })
+              .first()
+            if (await interactionTarget.count()) {
+              await interactionTarget.hover({ force: true, timeout: 1000 })
+            } else {
+              await componentCard.hover({ force: true, timeout: 1000 })
+            }
+          }
+
+          if (state === 'active') {
+            const activeTarget = page.locator(component.activeLocator).first()
+            if (await activeTarget.count()) {
+              await activeTarget
+                .click({ force: true, timeout: 1500 })
+                .catch(() => undefined)
+              await page.waitForTimeout(80)
+            }
+          }
+
+          const targetPath = screenshotPath(
+            component.name,
+            testInfo.project.name,
+            state,
+          )
+          fs.mkdirSync(path.dirname(targetPath), { recursive: true })
+          await componentCard.screenshot({ path: targetPath })
+          await page.keyboard.press('Escape').catch(() => undefined)
         }
-      }
 
-      if (state === 'interaction') {
-        const interactionTarget = page
-          .locator(component.interactionLocator)
-          .filter({ visible: true })
-          .first()
-        if (await interactionTarget.count()) {
-          await interactionTarget.hover({ force: true, timeout: 1000 })
-        } else {
-          await componentCard.hover({ force: true, timeout: 1000 })
-        }
-      }
-
-      if (state === 'active') {
-        const activeTarget = page.locator(component.activeLocator).first()
-        if (await activeTarget.count()) {
-          await activeTarget
-            .click({ force: true, timeout: 1500 })
-            .catch(() => undefined)
-          await page.waitForTimeout(80)
-        }
-      }
-
-      const targetPath = screenshotPath(
-        component.name,
-        testInfo.project.name,
-        state,
-      )
-      fs.mkdirSync(path.dirname(targetPath), { recursive: true })
-      await componentCard.screenshot({ path: targetPath })
-      await page.keyboard.press('Escape').catch(() => undefined)
+        expect(
+          countBucketScreenshots(
+            bucket.components,
+            testInfo.project.name,
+            state,
+          ),
+        ).toBe(bucket.components.length)
+      })
     }
   }
-
-  expect(countProjectScreenshots(testInfo.project.name)).toBe(
-    expectedScreenshotsPerProject,
-  )
 })

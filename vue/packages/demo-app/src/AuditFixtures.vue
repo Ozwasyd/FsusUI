@@ -2,6 +2,8 @@
   <div
     class="audit-page"
     :class="{ 'is-compact': compact, 'is-boundary': boundary }"
+    data-audit-ready="true"
+    :data-audit-state="auditState"
   >
     <header class="audit-page__header">
       <h1>{{ auditTitle }}</h1>
