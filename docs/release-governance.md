@@ -324,19 +324,30 @@ conformance, and governance checks remain separate named steps, so failure
 output still identifies the failing quality area while avoiding repeated
 checkout, Node setup, and dependency installation for each short check.
 
-## Coverage Sharding Evaluation
+## Coverage execution and merge contract
 
-The current local coverage baseline measured on 2026-06-15 is 44.1s wall-clock
-for `pnpm test:coverage` after the wrapper path (the wrapper logged 42.4s and
-Vitest reported 39.79s across 180 test files and 1888 tests). That is below
-the sharding trigger, so the default coverage lane remains a single run.
+`pnpm coverage:plan --dry-run` creates a deterministic plan without a browser,
+network access, or an external performance service. It uses the shared CI
+capacity base (effective CPU quota, effective memory/cgroup limit, and the
+repository lane budget), test-file count, minimum files per shard, and a
+per-shard memory estimate. Small workloads remain on one channel. A measured
+duration can be supplied as a scheduling signal with
+`FSUSUI_COVERAGE_KNOWN_SECONDS`; explicit shard/worker requests are still capped
+so `shards * workers` cannot exceed the shared capacity plan.
 
-Coverage sharding becomes mandatory when the single lane exceeds 180s. The
-threshold is controlled by `FSUSUI_COVERAGE_SHARD_THRESHOLD_SECONDS`, and the
-default `test:coverage` wrapper prints `duration-seconds` plus
-`shard-threshold-seconds` so CI logs show the decision point.
+`pnpm coverage:run` runs either one complete Vitest coverage process or truly
+parallel local shard processes. Every shard writes a unique blob, coverage
+fragment, and manifest containing its index/total, commit SHA, selection,
+config/toolchain digests, duration, and memory field. A shard explicitly records
+that it did not apply final thresholds, so a zero-threshold shard result cannot
+be presented as complete coverage.
 
-If sharding is enabled with `FSUSUI_COVERAGE_SHARDS=<n>`, each shard writes a
-Vitest blob report and disables per-shard coverage percentage thresholds. The
-wrapper then runs Vitest `--merge-reports` so shard outputs are merged before
-coverage thresholds are checked.
+`pnpm coverage:merge <blob-dir>` rejects missing or duplicate shard indexes,
+mixed totals, stale artifacts, digest changes, or shards that do not belong to
+the same commit, config, toolchain, and full test selection. Only the complete
+final merged result executes the repository coverage thresholds, exactly once.
+The scheduling target applies to both modes as a planning signal, not as a
+fixed GitHub-runner correctness claim. When a particular environment has an
+explicit wall-clock SLO, set `FSUSUI_COVERAGE_DURATION_BUDGET_SECONDS`; that
+budget is enforced for both single and sharded execution and therefore cannot
+be bypassed by changing modes.

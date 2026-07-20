@@ -257,15 +257,20 @@ shared setup/install. The job keeps contract, lint, token, icon, conformance,
 and governance as separate named steps so failure output remains easy to map
 back to the failing quality area.
 
-## Coverage Sharding
+## Coverage planning, execution, and merge
 
-`pnpm test:coverage` now runs through `scripts/run-coverage.mjs`. The measured
-baseline on 2026-06-15 was 44.1s wall-clock after the wrapper path (the wrapper
-logged 42.4s and Vitest reported 39.79s across 180 test files and 1888 tests),
-so coverage sharding stays disabled by default.
+Use `pnpm coverage:plan --dry-run` to inspect the local resource-aware plan,
+`pnpm coverage:run` to execute it, and `pnpm coverage:merge <blob-dir>` to merge
+artifacts produced elsewhere. Planning is offline and uses the same effective
+CPU, memory/cgroup, and lane budget as the rest of CI. Test scale and per-shard
+memory limit shard count; the product of shard count and workers per shard must
+remain inside that shared budget. Small workloads use one complete channel.
 
-The sharding threshold is 180s and is configurable with
-`FSUSUI_COVERAGE_SHARD_THRESHOLD_SECONDS`. If a single coverage lane exceeds the
-threshold, set `FSUSUI_COVERAGE_SHARDS=<n>` to run sharded coverage. Shards emit
-blob reports, then the wrapper calls Vitest `--merge-reports`; reports are
-merged before coverage thresholds are evaluated.
+Parallel shards run concurrently and each emits a blob, coverage fragment, and
+unique manifest. Merge first proves `1..N` completeness and rejects duplicate
+indexes, wrong totals, stale artifact digests, or differences in commit SHA,
+config, selection, or toolchain. Per-shard thresholds are never completion
+evidence: only the final merged result applies coverage thresholds, once. The
+default wall-clock target is a scheduling signal rather than a fixed runner
+correctness condition. Set `FSUSUI_COVERAGE_DURATION_BUDGET_SECONDS` for an
+environment-specific SLO; the same budget is enforced in both modes.

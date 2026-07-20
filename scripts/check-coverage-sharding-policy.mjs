@@ -1,84 +1,101 @@
+import assert from 'node:assert/strict'
 import { existsSync, readFileSync } from 'node:fs'
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
 const scripts = packageJson.scripts ?? {}
-const reusableQualityWorkflow = readFileSync(
-  '.github/workflows/_quality.yml',
-  'utf8',
+const workflow = readFileSync('.github/workflows/_quality.yml', 'utf8')
+const runner = readFileSync('scripts/run-coverage.mjs', 'utf8')
+const planner = readFileSync('scripts/coverage-plan.mjs', 'utf8')
+const contract = readFileSync('scripts/coverage-contract.mjs', 'utf8')
+const docs =
+  `${readFileSync('docs/release-governance.md', 'utf8')}\n${readFileSync('docs/engineering-handoff.md', 'utf8')}`.toLowerCase()
+
+for (const path of [
+  'scripts/run-coverage.mjs',
+  'scripts/coverage-plan.mjs',
+  'scripts/coverage-contract.mjs',
+  'scripts/test-coverage-sharding.mjs',
+  'tests/fixtures/coverage-sharding/contracts.json',
+])
+  assert.ok(existsSync(path), `${path} is required`)
+
+assert.ok(scripts['coverage:plan']?.includes('coverage-plan.mjs --dry-run'))
+assert.ok(scripts['coverage:run']?.includes('run-coverage.mjs run'))
+assert.ok(scripts['coverage:merge']?.includes('run-coverage.mjs merge'))
+assert.ok(scripts['_test:coverage']?.includes('run-coverage.mjs run'))
+assert.ok(
+  scripts['check:coverage-sharding']?.includes('test-coverage-sharding.mjs'),
 )
-const releaseGovernance = readFileSync('docs/release-governance.md', 'utf8')
-const engineeringHandoff = readFileSync('docs/engineering-handoff.md', 'utf8')
+assert.ok(scripts['governance:check']?.includes('check:coverage-sharding'))
 
-function assert(condition, message) {
-  if (!condition) {
-    console.error(`[coverage-sharding] ${message}`)
-    process.exit(1)
-  }
-}
-
-const runnerPath = 'scripts/run-coverage.mjs'
-const docs = `${releaseGovernance}\n${engineeringHandoff}`.toLowerCase()
-
-assert(
-  scripts['check:coverage-sharding']?.includes(
-    'scripts/check-coverage-sharding-policy.mjs',
-  ),
-  'package.json must expose check:coverage-sharding',
+assert.ok(runner.includes('Promise.all('), 'local shards must run concurrently')
+assert.ok(
+  !runner.includes('spawnSync'),
+  'coverage shard runner must not use spawnSync',
 )
-assert(
-  scripts['governance:check']?.includes('check:coverage-sharding'),
-  'governance:check must include the coverage sharding policy guard',
-)
-assert(
-  scripts['_test:coverage']?.includes(runnerPath),
-  '_test:coverage must run scripts/run-coverage.mjs',
-)
-assert(existsSync(runnerPath), 'coverage runner script is missing')
-
-const runner = existsSync(runnerPath) ? readFileSync(runnerPath, 'utf8') : ''
-
 for (const fragment of [
-  'FSUSUI_COVERAGE_SHARDS',
-  'FSUSUI_COVERAGE_SHARD_THRESHOLD_SECONDS',
-  'DEFAULT_SHARD_THRESHOLD_SECONDS = 180',
-  '--shard=',
-  '--reporter=blob',
-  '--merge-reports',
-  'coverage-shard',
+  'shard-manifest',
+  'coverage-final.json',
   'coverage-merge=before-thresholds',
-  'duration-seconds',
-  'duration-threshold',
-]) {
-  assert(
+  'final-threshold-evaluation=once',
+  'thresholdsApplied: false',
+])
+  assert.ok(
     runner.includes(fragment),
-    `coverage runner must define/log ${fragment}`,
+    `coverage runner must contain ${fragment}`,
   )
-}
-
-const coverageJob = reusableQualityWorkflow.match(
-  /\n {2}coverage:\n([\s\S]*?)(?=\n {2}[a-zA-Z][\w-]*:\n|$)/u,
-)?.[1] ?? ''
-
-assert(coverageJob, '_quality.yml must define a coverage job')
+for (const fragment of [
+  'effectiveCpu',
+  'effectiveMemoryMiB',
+  'minFilesPerShard',
+  'shardMemoryMiB',
+  'shardCount *',
+  'FSUSUI_COVERAGE_DURATION_BUDGET_SECONDS',
+])
+  assert.ok(
+    planner.includes(fragment),
+    `coverage planner must contain ${fragment}`,
+  )
+for (const fragment of [
+  'coverage shards incomplete',
+  'duplicate coverage shard',
+  'commitSha',
+  'configDigest',
+  'selectionDigest',
+  'artifact digest mismatch',
+])
+  assert.ok(
+    contract.includes(fragment),
+    `coverage contract must contain ${fragment}`,
+  )
 
 for (const fragment of [
-  'FSUSUI_COVERAGE_SHARD_THRESHOLD_SECONDS: 180',
-  'pnpm test:coverage',
-  'coverage-report',
-]) {
-  assert(coverageJob.includes(fragment), `coverage job must include ${fragment}`)
-}
+  'coverage-plan:',
+  'coverage-shard:',
+  'coverage-merge:',
+  'fromjson(needs.coverage-plan.outputs.matrix)',
+  'fsusui_coverage_shard_index',
+  'fsusui_coverage_shard_total',
+  'merge-multiple: true',
+])
+  assert.ok(
+    workflow.toLowerCase().includes(fragment),
+    `workflow must contain ${fragment}`,
+  )
+assert.ok(
+  !workflow.includes('FSUSUI_COVERAGE_SHARD_THRESHOLD_SECONDS: 180'),
+  'Actions must not use one fixed runner duration as a correctness condition',
+)
 
 for (const fragment of [
-  'coverage sharding',
-  '44.1s',
-  '180s',
-  'fsusui_coverage_shards',
-  'fsusui_coverage_shard_threshold_seconds',
-  'merge-reports',
-  'merged before coverage thresholds',
-]) {
-  assert(docs.includes(fragment), `docs must describe ${fragment}`)
-}
+  'coverage:plan --dry-run',
+  'coverage:run',
+  'coverage:merge',
+  'same commit',
+  'final merged result',
+  'cpu',
+  'memory',
+])
+  assert.ok(docs.includes(fragment), `docs must describe ${fragment}`)
 
-console.log('[coverage-sharding] ok')
+console.log('[coverage-sharding] policy ok')

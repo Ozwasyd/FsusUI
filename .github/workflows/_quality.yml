@@ -266,7 +266,25 @@ jobs:
           FSUS_VITEST_WORKERS: ${{ matrix.workers }}
         run: node ./scripts/with-node-heap.mjs pnpm exec vitest run --config vue/vitest.config.ts --shard=${{ matrix.shard }}
 
-  coverage:
+  coverage-plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      mode: ${{ steps.plan.outputs.mode }}
+      shard-count: ${{ steps.plan.outputs.shard_count }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - id: plan
+        name: Plan coverage from effective capacity and workload
+        run: node scripts/coverage-plan.mjs --dry-run --github-output="$GITHUB_OUTPUT"
+
+  coverage-single:
+    if: needs.coverage-plan.outputs.mode == 'single'
+    needs: coverage-plan
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -306,7 +324,7 @@ jobs:
           echo "wasm-cache-hit=${{ steps.wasm-cache.outputs.cache-hit }}"
       - name: Run coverage
         env:
-          FSUSUI_COVERAGE_SHARD_THRESHOLD_SECONDS: 180
+          FSUSUI_COVERAGE_SHARDS: 1
         run: pnpm test:coverage
       - uses: actions/upload-artifact@v4
         if: always()
@@ -314,6 +332,115 @@ jobs:
         with:
           name: coverage-report
           path: coverage
+
+  coverage-shard:
+    if: needs.coverage-plan.outputs.mode == 'sharded'
+    needs: coverage-plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.coverage-plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
+      - run: pnpm install --frozen-lockfile
+      - name: Restore icons test artifact cache
+        uses: actions/cache@v4
+        with:
+          path: vue/packages/icons-vue/dist
+          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('vue/packages/icons-vue/package.json', 'vue/packages/icons-vue/src/**', 'vue/packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
+          restore-keys: |
+            ${{ runner.os }}-fsusui-test-artifacts-icons-
+      - name: Restore WASM test artifact cache
+        uses: actions/cache@v4
+        with:
+          path: vue/packages/wasm/dist
+          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
+          restore-keys: |
+            ${{ runner.os }}-fsusui-test-artifacts-wasm-
+      - run: pnpm run prepare:test-artifacts
+      - name: Run one coverage shard
+        env:
+          FSUSUI_COVERAGE_SHARDS: ${{ matrix.total }}
+          FSUSUI_COVERAGE_WORKERS: ${{ matrix.workers }}
+          FSUSUI_COVERAGE_SHARD_INDEX: ${{ matrix.index }}
+          FSUSUI_COVERAGE_SHARD_TOTAL: ${{ matrix.total }}
+        run: pnpm coverage:run
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage-shard-${{ matrix.index }}-${{ matrix.total }}
+          path: .tmp/coverage-run
+          retention-days: 1
+
+  coverage-merge:
+    if: needs.coverage-plan.outputs.mode == 'sharded'
+    needs:
+      - coverage-plan
+      - coverage-shard
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-shard-*
+          path: .tmp/coverage-run
+          merge-multiple: true
+      - name: Validate shards, merge, and apply final thresholds once
+        run: pnpm coverage:merge .tmp/coverage-run
+      - uses: actions/upload-artifact@v4
+        if: always()
+        continue-on-error: true
+        with:
+          name: coverage-report
+          path: coverage
+
+  coverage:
+    if: always()
+    needs:
+      - coverage-plan
+      - coverage-single
+      - coverage-shard
+      - coverage-merge
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require the selected complete coverage path
+        env:
+          PLAN_RESULT: ${{ needs.coverage-plan.result }}
+          MODE: ${{ needs.coverage-plan.outputs.mode }}
+          SINGLE_RESULT: ${{ needs.coverage-single.result }}
+          SHARD_RESULT: ${{ needs.coverage-shard.result }}
+          MERGE_RESULT: ${{ needs.coverage-merge.result }}
+        run: |
+          test "$PLAN_RESULT" = success
+          if test "$MODE" = single; then
+            test "$SINGLE_RESULT" = success
+          else
+            test "$SHARD_RESULT" = success
+            test "$MERGE_RESULT" = success
+          fi
 
   build-package:
     runs-on: ubuntu-latest

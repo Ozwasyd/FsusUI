@@ -1,0 +1,30 @@
+{
+  "valid": [
+    { "schemaVersion": 1, "index": 1, "total": 2, "commitSha": "abc", "configDigest": "cfg", "selectionDigest": "selection", "toolchainDigest": "tools", "thresholdsApplied": false, "durationSeconds": 12, "thresholdSeconds": 30 },
+    { "schemaVersion": 1, "index": 2, "total": 2, "commitSha": "abc", "configDigest": "cfg", "selectionDigest": "selection", "toolchainDigest": "tools", "thresholdsApplied": false, "durationSeconds": 14, "thresholdSeconds": 30 }
+  ],
+  "missingShard": [
+    { "schemaVersion": 1, "index": 1, "total": 2, "commitSha": "abc", "configDigest": "cfg", "selectionDigest": "selection", "toolchainDigest": "tools", "thresholdsApplied": false, "durationSeconds": 12, "thresholdSeconds": 30 }
+  ],
+  "duplicateShard": [
+    { "schemaVersion": 1, "index": 1, "total": 2, "commitSha": "abc", "configDigest": "cfg", "selectionDigest": "selection", "toolchainDigest": "tools", "thresholdsApplied": false, "durationSeconds": 12, "thresholdSeconds": 30 },
+    { "schemaVersion": 1, "index": 1, "total": 2, "commitSha": "abc", "configDigest": "cfg", "selectionDigest": "selection", "toolchainDigest": "tools", "thresholdsApplied": false, "durationSeconds": 14, "thresholdSeconds": 30 }
+  ],
+  "shaMismatch": [
+    { "schemaVersion": 1, "index": 1, "total": 2, "commitSha": "abc", "configDigest": "cfg", "selectionDigest": "selection", "toolchainDigest": "tools", "thresholdsApplied": false, "durationSeconds": 12, "thresholdSeconds": 30 },
+    { "schemaVersion": 1, "index": 2, "total": 2, "commitSha": "def", "configDigest": "cfg", "selectionDigest": "selection", "toolchainDigest": "tools", "thresholdsApplied": false, "durationSeconds": 14, "thresholdSeconds": 30 }
+  ],
+  "configMismatch": [
+    { "schemaVersion": 1, "index": 1, "total": 2, "commitSha": "abc", "configDigest": "cfg-a", "selectionDigest": "selection", "toolchainDigest": "tools", "thresholdsApplied": false, "durationSeconds": 12, "thresholdSeconds": 30 },
+    { "schemaVersion": 1, "index": 2, "total": 2, "commitSha": "abc", "configDigest": "cfg-b", "selectionDigest": "selection", "toolchainDigest": "tools", "thresholdsApplied": false, "durationSeconds": 14, "thresholdSeconds": 30 }
+  ],
+  "wrongTotal": [
+    { "schemaVersion": 1, "index": 1, "total": 2, "commitSha": "abc", "configDigest": "cfg", "selectionDigest": "selection", "toolchainDigest": "tools", "thresholdsApplied": false, "durationSeconds": 12, "thresholdSeconds": 30 },
+    { "schemaVersion": 1, "index": 2, "total": 3, "commitSha": "abc", "configDigest": "cfg", "selectionDigest": "selection", "toolchainDigest": "tools", "thresholdsApplied": false, "durationSeconds": 14, "thresholdSeconds": 30 }
+  ],
+  "durationFailure": [
+    { "schemaVersion": 1, "index": 1, "total": 2, "commitSha": "abc", "configDigest": "cfg", "selectionDigest": "selection", "toolchainDigest": "tools", "thresholdsApplied": false, "durationSeconds": 31, "thresholdSeconds": 30 },
+    { "schemaVersion": 1, "index": 2, "total": 2, "commitSha": "abc", "configDigest": "cfg", "selectionDigest": "selection", "toolchainDigest": "tools", "thresholdsApplied": false, "durationSeconds": 14, "thresholdSeconds": 30 }
+  ],
+  "thresholdFailureExitCode": 1
+}
