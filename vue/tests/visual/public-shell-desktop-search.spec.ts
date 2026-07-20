@@ -144,6 +144,85 @@ test('aligns 30px brand and 18px navigation text at 1280px', async ({
   })
 })
 
+test('straddles the header border with a stable 2px active indicator', async ({
+  page,
+}, testInfo) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' })
+  await openMode(page, 'inline')
+
+  const header = page.locator('[data-public-shell-header]')
+  const nav = header.locator('.el-public-shell__desktop-nav')
+  const activeLink = nav.locator('.el-public-shell__nav-link.is-active')
+  const indicator = nav.locator('.el-public-shell__active-nav-indicator')
+  await expect(indicator).toBeVisible()
+  await expect(indicator).toHaveCSS('bottom', '-1px')
+  await expect(indicator).toHaveCSS('height', '2px')
+  await expect(indicator).toHaveCSS('border-radius', '1px')
+  await expect(indicator).not.toHaveCSS('transition-duration', '0s')
+
+  const geometry = await Promise.all(
+    [nav, activeLink, indicator].map((locator) =>
+      locator.evaluate((element) => {
+        const rect = element.getBoundingClientRect()
+        return {
+          top: rect.top,
+          right: rect.right,
+          bottom: rect.bottom,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
+        }
+      }),
+    ),
+  )
+  const [navRect, linkRect, indicatorRect] = geometry
+  expect(
+    Math.abs(indicatorRect.top - (navRect.bottom - 1)),
+  ).toBeLessThanOrEqual(0.5)
+  expect(
+    Math.abs(indicatorRect.bottom - (navRect.bottom + 1)),
+  ).toBeLessThanOrEqual(0.5)
+  expect(indicatorRect.left).toBeGreaterThanOrEqual(navRect.left)
+  expect(indicatorRect.right).toBeLessThanOrEqual(navRect.right)
+
+  await indicator.evaluate((element) => {
+    ;(element as HTMLElement).style.display = 'none'
+  })
+  const linkWithoutIndicator = await activeLink.evaluate((element) => {
+    const rect = element.getBoundingClientRect()
+    return {
+      top: rect.top,
+      left: rect.left,
+      width: rect.width,
+      height: rect.height,
+    }
+  })
+  expect(linkWithoutIndicator).toEqual({
+    top: linkRect.top,
+    left: linkRect.left,
+    width: linkRect.width,
+    height: linkRect.height,
+  })
+  await indicator.evaluate((element) => {
+    ;(element as HTMLElement).style.removeProperty('display')
+  })
+
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  const reducedDurations = await indicator.evaluate((element) =>
+    getComputedStyle(element)
+      .transitionDuration.split(',')
+      .map((duration) => Number.parseFloat(duration) || 0),
+  )
+  expect(Math.max(...reducedDurations)).toBeLessThanOrEqual(0.00001)
+  await testInfo.attach(
+    `public-shell-active-indicator-${testInfo.project.name}`,
+    {
+      body: await header.screenshot({ animations: 'disabled' }),
+      contentType: 'image/png',
+    },
+  )
+})
+
 test('opens, submits, escapes, and closes outside without stealing focus', async ({
   page,
 }, testInfo) => {

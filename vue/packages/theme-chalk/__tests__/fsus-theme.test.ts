@@ -2373,6 +2373,9 @@ describe('Fsus theme visual baseline', () => {
     )
     expectCssRule(publicShellCss, '.el-public-shell__active-nav-indicator', [
       'position: absolute;',
+      'inset-block-end: -1px;',
+      'block-size: 2px;',
+      'border-radius: var(--el-public-shell-active-nav-indicator-radius, 1px);',
       'pointer-events: none;',
       'transform: translate3d(var(--el-public-shell-active-nav-indicator-x, 0px), 0, 0);',
       'opacity: var(--el-public-shell-active-nav-indicator-opacity, 0);',

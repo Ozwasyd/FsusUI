@@ -517,14 +517,17 @@
 
   @include e(active-nav-indicator) {
     position: absolute;
-    inset-block-end: 0;
+    inset-block-end: -1px;
     inset-inline-start: 0;
     inline-size: var(
       --#{$namespace}-public-shell-active-nav-indicator-width,
       0px
     );
     block-size: 2px;
-    border-radius: 999px;
+    border-radius: var(
+      --#{$namespace}-public-shell-active-nav-indicator-radius,
+      1px
+    );
     background: var(--fsus-scholarly-blue);
     opacity: var(--#{$namespace}-public-shell-active-nav-indicator-opacity, 0);
     pointer-events: none;

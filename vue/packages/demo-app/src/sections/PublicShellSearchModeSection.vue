@@ -3,6 +3,7 @@
     brand="Field Notes"
     brand-href="#home"
     active-nav="archive"
+    active-nav-motion="indicator"
     :nav-items="navItems"
     :desktop-search-mode="activeSearchMode"
     desktop-search-trigger-label="Search archive"
