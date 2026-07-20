@@ -29,6 +29,7 @@
     "test:visual:full": "node ./scripts/with-node-heap.mjs node ./scripts/run-visual-tests.mjs --suite=full",
     "test:visual:project": "node ./scripts/with-node-heap.mjs node ./scripts/run-visual-tests.mjs --suite=preview --project",
     "test:visual:plan": "node ./scripts/with-node-heap.mjs node ./scripts/run-visual-tests.mjs --suite=full --list",
+    "visual:capacity": "node ./scripts/with-node-heap.mjs node ./scripts/visual-capacity.mjs --dry-run",
     "test:visual:preview": "node ./scripts/with-node-heap.mjs playwright test --config=vue/playwright.config.ts",
     "test:visual:dev": "node ./scripts/with-node-heap.mjs playwright test --config=vue/playwright.dev.config.ts",
     "test:view-transitions": "node ./scripts/with-node-heap.mjs playwright test --config=vue/playwright.view-transitions.config.ts",

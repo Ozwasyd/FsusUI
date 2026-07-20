@@ -1,4 +1,5 @@
 import { availableParallelism, cpus } from 'node:os'
+import { resolveVisualCapacityPlan } from './visual-capacity.mjs'
 
 const positiveInteger = (value: string | undefined) => {
   if (!value) return undefined
@@ -21,6 +22,15 @@ export const resolveVitestWorkers = () =>
 
 export const resolvePlaywrightWorkers = () =>
   resolveWorkerCount('FSUS_PLAYWRIGHT_WORKERS')
+
+export const resolveVisualPreviewWorkers = () =>
+  resolveVisualCapacityPlan().previewWorkers
+
+export const resolveVisualDevWorkers = () =>
+  resolveVisualCapacityPlan().devWorkers
+
+export const resolveVisualAuditBucketCount = () =>
+  resolveVisualCapacityPlan().auditBucketCount
 
 export const resolveDomLayoutWorkers = () =>
   positiveInteger(process.env.FSUS_DOM_LAYOUT_WORKERS) ?? 1

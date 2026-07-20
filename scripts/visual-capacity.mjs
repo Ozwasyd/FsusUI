@@ -14,6 +14,8 @@ export const DEFAULT_VISUAL_CAPACITY_POLICY = Object.freeze({
   parallelMinimumWorkerSlots: 6,
 })
 
+export const VISUAL_CAPACITY_PLAN_ENV = 'FSUS_VISUAL_CAPACITY_PLAN'
+
 const MIB = 1024 * 1024
 
 export function parsePositiveNumber(value) {
@@ -317,6 +319,44 @@ export function createVisualCapacityPlan(
   }
 }
 
+export function validateVisualCapacityPlan(plan) {
+  if (!plan || typeof plan !== 'object') {
+    throw new Error('visual capacity plan must be an object')
+  }
+  for (const field of [
+    'effectiveCpu',
+    'effectiveMemoryMiB',
+    'previewWorkers',
+    'devWorkers',
+    'auditBucketCount',
+  ]) {
+    if (!Number.isInteger(plan[field]) || plan[field] < 1) {
+      throw new Error(
+        `visual capacity plan ${field} must be a positive integer`,
+      )
+    }
+  }
+  if (!['serial', 'parallel'].includes(plan.suiteMode)) {
+    throw new Error('visual capacity plan suiteMode must be serial or parallel')
+  }
+  return plan
+}
+
+export function serializeVisualCapacityPlan(plan) {
+  return JSON.stringify(validateVisualCapacityPlan(plan))
+}
+
+export function parseVisualCapacityPlan(value) {
+  if (!value || String(value).trim() === '') return undefined
+  try {
+    return validateVisualCapacityPlan(JSON.parse(value))
+  } catch (error) {
+    throw new Error(
+      `invalid ${VISUAL_CAPACITY_PLAN_ENV}: ${error instanceof Error ? error.message : String(error)}`,
+    )
+  }
+}
+
 function readFirst(paths, readFile = readFileSync) {
   for (const path of paths) {
     try {
@@ -362,6 +402,18 @@ export function probeVisualCapacityHost(dependencies = {}) {
       readFile,
     ),
   }
+}
+
+export function resolveVisualCapacityPlan(options = {}) {
+  const env = options.env ?? process.env
+  const serialized = parseVisualCapacityPlan(env[VISUAL_CAPACITY_PLAN_ENV])
+  if (serialized) return serialized
+
+  const snapshot =
+    options.snapshot ?? probeVisualCapacityHost(options.dependencies)
+  const plan = createVisualCapacityPlan(snapshot, env, options.policyOverrides)
+  env[VISUAL_CAPACITY_PLAN_ENV] = serializeVisualCapacityPlan(plan)
+  return plan
 }
 
 export function formatVisualCapacitySummary(plan) {

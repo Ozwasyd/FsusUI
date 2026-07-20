@@ -392,6 +392,8 @@ jobs:
   visual:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      FSUS_VISUAL_SUITE_MODE: auto
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -428,6 +430,8 @@ jobs:
           echo "icons-cache-hit=${{ steps.icons-cache.outputs.cache-hit }}"
           echo "wasm-cache-hit=${{ steps.wasm-cache.outputs.cache-hit }}"
       - run: pnpm exec playwright install --with-deps chromium
+      - name: Probe visual capacity
+        run: pnpm visual:capacity
       - name: Print visual execution plan
         run: pnpm test:visual:plan
       - name: Run visual suites

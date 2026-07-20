@@ -1,8 +1,8 @@
 import { defineConfig, devices } from '@playwright/test'
 import {
   createPlaywrightReporter,
-  resolvePlaywrightWorkers,
   resolveTestPort,
+  resolveVisualPreviewWorkers,
 } from '../scripts/test-parallelism'
 
 delete process.env.NO_COLOR
@@ -14,7 +14,7 @@ export default defineConfig({
   testDir: './tests/visual',
   outputDir: 'test-results/visual-preview',
   fullyParallel: true,
-  workers: resolvePlaywrightWorkers(),
+  workers: resolveVisualPreviewWorkers(),
   retries: process.env.CI ? 2 : 0,
   reporter: createPlaywrightReporter('visual-preview'),
   timeout: 30_000,
@@ -72,8 +72,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command:
-      `pnpm -C .. run prepare:test-artifacts && pnpm -C packages/demo-app build && pnpm -C packages/demo-app preview --host 127.0.0.1 --port ${previewPort} --strictPort`,
+    command: `pnpm -C .. run prepare:test-artifacts && pnpm -C packages/demo-app build && pnpm -C packages/demo-app preview --host 127.0.0.1 --port ${previewPort} --strictPort`,
     url: previewBaseUrl,
     reuseExistingServer: !process.env.CI,
     timeout: 240_000,

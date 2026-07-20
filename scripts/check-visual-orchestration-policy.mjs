@@ -1,18 +1,32 @@
 #!/usr/bin/env node
 import { readFileSync } from 'node:fs'
+import { EventEmitter } from 'node:events'
 import {
   PREVIEW_PROJECTS,
   createVisualPlan,
   parseVisualArgs,
   runVisualPlan,
+  runVisualPlanAsync,
   validateVisualPlan,
 } from './run-visual-tests.mjs'
+import {
+  VISUAL_CAPACITY_PLAN_ENV,
+  createVisualCapacityPlan,
+  parseVisualCapacityPlan,
+} from './visual-capacity.mjs'
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
 const scripts = packageJson.scripts ?? {}
 const workflow = readFileSync('.github/workflows/_quality.yml', 'utf8')
 const previewConfig = readFileSync('vue/playwright.config.ts', 'utf8')
 const devConfig = readFileSync('vue/playwright.dev.config.ts', 'utf8')
+const testParallelism = readFileSync('scripts/test-parallelism.ts', 'utf8')
+const auditSpec = readFileSync('vue/tests/visual/ui-audit-all.spec.ts', 'utf8')
+const capacitySource = readFileSync('scripts/visual-capacity.mjs', 'utf8')
+const capacityFixture = JSON.parse(
+  readFileSync('tests/fixtures/visual-capacity/high-resource.json', 'utf8'),
+)
+const capacityPlan = createVisualCapacityPlan(capacityFixture)
 
 function assert(condition, message) {
   if (!condition) throw new Error(message)
@@ -34,11 +48,14 @@ function occurrences(value, fragment) {
 }
 
 function expectInvalid(label, mutate) {
-  const plan = createVisualPlan(parseVisualArgs(['--suite=full', '--list']))
+  const plan = createVisualPlan(
+    parseVisualArgs(['--suite=full', '--list']),
+    capacityPlan,
+  )
   mutate(plan)
   let message = ''
   try {
-    validateVisualPlan(plan)
+    validateVisualPlan(plan, capacityPlan)
   } catch (error) {
     message = error instanceof Error ? error.message : String(error)
   }
@@ -56,6 +73,10 @@ assert(
   scripts['governance:check']?.includes('check:visual-orchestration'),
   'governance:check must include the visual orchestration policy guard',
 )
+assert(
+  scripts['visual:capacity']?.includes('visual-capacity.mjs --dry-run'),
+  'package.json must expose the browser-free visual capacity dry-run',
+)
 assert(visualJob, '_quality.yml must define one visual job')
 assert(
   !/\n\s+matrix:\s*[\s\S]*?project:/u.test(visualJob),
@@ -68,6 +89,11 @@ assert(
 assert(
   occurrences(visualJob, 'pnpm test:visual:full') === 1,
   'visual job must contain exactly one full orchestration entry',
+)
+assert(
+  occurrences(visualJob, 'pnpm visual:capacity') === 1 &&
+    visualJob.includes('FSUS_VISUAL_SUITE_MODE: auto'),
+  'visual job must probe one auto-mode capacity plan before orchestration',
 )
 assert(
   occurrences(visualJob, 'test:visual:dev') === 0,
@@ -104,8 +130,11 @@ assert(
   'dev diagnostic command must call Playwright directly',
 )
 
-const fullPlan = createVisualPlan(parseVisualArgs(['--suite=full', '--list']))
-validateVisualPlan(fullPlan)
+const fullPlan = createVisualPlan(
+  parseVisualArgs(['--suite=full', '--list']),
+  capacityPlan,
+)
+validateVisualPlan(fullPlan, capacityPlan)
 assert(fullPlan.length === 2, 'full plan must contain preview and dev once')
 const preview = fullPlan.find((entry) => entry.suite === 'preview')
 const dev = fullPlan.find((entry) => entry.suite === 'dev')
@@ -135,6 +164,34 @@ assert(
     devConfig.includes("createPlaywrightReporter('demo-app-dev')"),
   'dev results and report must use the demo-app-dev suite namespace',
 )
+assert(
+  previewConfig.includes('resolveVisualPreviewWorkers()') &&
+    !previewConfig.includes('resolvePlaywrightWorkers()'),
+  'preview config must consume previewWorkers from the shared visual capacity plan',
+)
+assert(
+  devConfig.includes('resolveVisualDevWorkers()') &&
+    !/workers:\s*1[,\n]/u.test(devConfig),
+  'dev config must consume devWorkers from the shared visual capacity plan',
+)
+assert(
+  testParallelism.includes("from './visual-capacity.mjs'") &&
+    testParallelism.includes('resolveVisualAuditBucketCount') &&
+    testParallelism.includes('resolveVisualCapacityPlan().previewWorkers') &&
+    testParallelism.includes('resolveVisualCapacityPlan().devWorkers'),
+  'visual worker and audit readers must share the visual capacity module',
+)
+assert(
+  auditSpec.includes('resolveVisualAuditBucketCount()') &&
+    auditSpec.includes('visual-audit-bucket-count'),
+  'UI audit must expose the plan-backed bucket count entry for #230',
+)
+assert(
+  !/(?:previewWorkers|devWorkers|auditBucketCount)\s*[:=][^\n]*cpus\(\)\.length/u.test(
+    capacitySource,
+  ),
+  'visual capacity policy must not derive execution counts from cpus().length',
+)
 
 expectInvalid('duplicate preview project', (plan) => {
   const entry = plan.find((candidate) => candidate.suite === 'preview')
@@ -146,18 +203,74 @@ expectInvalid('duplicate dev suite', (plan) => {
 expectInvalid('shared result namespace', (plan) => {
   plan[1].projectResultNamespaces = [plan[0].projectResultNamespaces[0]]
 })
+expectInvalid('preview worker drift', (plan) => {
+  plan[0].workers += 1
+})
 
 const collectedSuites = []
-const collectedExitCode = runVisualPlan(fullPlan, (_command, args) => {
-  const suite = args.some((arg) => arg.includes('playwright.config.ts'))
-    ? 'preview'
-    : 'dev'
-  collectedSuites.push(suite)
-  return { status: suite === 'preview' ? 1 : 0 }
-})
+const collectedExitCode = runVisualPlan(
+  fullPlan,
+  (_command, args, options) => {
+    const suite = args.some((arg) => arg.includes('playwright.config.ts'))
+      ? 'preview'
+      : 'dev'
+    collectedSuites.push(suite)
+    assert(
+      parseVisualCapacityPlan(options.env[VISUAL_CAPACITY_PLAN_ENV])
+        .effectiveCpu === capacityPlan.effectiveCpu,
+      'runner must pass the same serialized visual capacity plan to every suite',
+    )
+    return { status: suite === 'preview' ? 1 : 0 }
+  },
+  capacityPlan,
+)
 assert(
   collectedSuites.join(',') === 'preview,dev' && collectedExitCode === 1,
   'full runner must execute dev after a preview failure and preserve failure status',
+)
+
+function createAsyncSpawn(statuses) {
+  const state = { active: 0, launches: [], maxActive: 0 }
+  const spawn = (_command, args, options) => {
+    const child = new EventEmitter()
+    const suite = args.some((arg) => arg.includes('playwright.config.ts'))
+      ? 'preview'
+      : 'dev'
+    state.active += 1
+    state.maxActive = Math.max(state.maxActive, state.active)
+    state.launches.push(suite)
+    assert(
+      options.env[VISUAL_CAPACITY_PLAN_ENV],
+      'async visual runner must pass the shared plan environment',
+    )
+    queueMicrotask(() => {
+      state.active -= 1
+      child.emit('close', statuses[suite] ?? 0)
+    })
+    return child
+  }
+  return { spawn, state }
+}
+
+const parallelSpawn = createAsyncSpawn({ preview: 0, dev: 0 })
+assert(
+  (await runVisualPlanAsync(fullPlan, {
+    capacityPlan,
+    spawn: parallelSpawn.spawn,
+  })) === 0 && parallelSpawn.state.maxActive === 2,
+  'parallel capacity plan must run preview and dev concurrently',
+)
+
+const serialSpawn = createAsyncSpawn({ preview: 1, dev: 0 })
+const serialCapacityPlan = { ...capacityPlan, suiteMode: 'serial' }
+assert(
+  (await runVisualPlanAsync(fullPlan, {
+    capacityPlan: serialCapacityPlan,
+    spawn: serialSpawn.spawn,
+  })) === 1 &&
+    serialSpawn.state.maxActive === 1 &&
+    serialSpawn.state.launches.join(',') === 'preview,dev',
+  'serial capacity plan must preserve order, continue after failure, and return failure',
 )
 
 console.log('[visual-orchestration] ok')

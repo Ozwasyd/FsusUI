@@ -5,11 +5,15 @@ import test from 'node:test'
 import { fileURLToPath } from 'node:url'
 
 import {
+  VISUAL_CAPACITY_PLAN_ENV,
   createVisualCapacityPlan,
   parseCgroupMemoryBytes,
   parseCgroupV1CpuQuota,
   parseCgroupV2CpuMax,
+  parseVisualCapacityPlan,
   probeVisualCapacityHost,
+  resolveVisualCapacityPlan,
+  serializeVisualCapacityPlan,
 } from '../scripts/visual-capacity.mjs'
 
 const fixture = (name) =>
@@ -122,6 +126,47 @@ test('host probe supports virtual cgroup files without browser or network depend
   assert.equal(snapshot.cgroupV2CpuMax, '200000 100000')
   assert.equal(snapshot.cgroupV2MemoryMax, '4294967296')
   assert.equal(createVisualCapacityPlan(snapshot).effectiveCpu, 2)
+})
+
+test('serializes one validated plan for every visual consumer', () => {
+  const plan = createVisualCapacityPlan(fixture('high-resource'))
+  const serialized = serializeVisualCapacityPlan(plan)
+
+  assert.equal(
+    serializeVisualCapacityPlan(parseVisualCapacityPlan(serialized)),
+    serialized,
+  )
+})
+
+test('reads the shared plan without probing host capacity again', () => {
+  const plan = createVisualCapacityPlan(fixture('high-resource'))
+  const env = {
+    [VISUAL_CAPACITY_PLAN_ENV]: serializeVisualCapacityPlan(plan),
+  }
+
+  assert.equal(
+    serializeVisualCapacityPlan(
+      resolveVisualCapacityPlan({
+        dependencies: {
+          availableParallelism: () => {
+            throw new Error('shared plan must skip host probing')
+          },
+        },
+        env,
+      }),
+    ),
+    env[VISUAL_CAPACITY_PLAN_ENV],
+  )
+})
+
+test('rejects malformed shared plan input instead of silently reprobeing', () => {
+  assert.throws(
+    () =>
+      resolveVisualCapacityPlan({
+        env: { [VISUAL_CAPACITY_PLAN_ENV]: '{"previewWorkers":0}' },
+      }),
+    new RegExp(`invalid ${VISUAL_CAPACITY_PLAN_ENV}`),
+  )
 })
 
 test('dry-run is deterministic from a fixture and imports no browser or network client', () => {

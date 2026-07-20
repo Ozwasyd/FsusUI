@@ -2,6 +2,7 @@ import { defineConfig, devices } from '@playwright/test'
 import {
   createPlaywrightReporter,
   resolveTestPort,
+  resolveVisualDevWorkers,
 } from '../scripts/test-parallelism'
 
 delete process.env.NO_COLOR
@@ -13,7 +14,7 @@ export default defineConfig({
   testDir: './tests/demo-app-dev',
   outputDir: 'test-results/demo-app-dev',
   fullyParallel: false,
-  workers: 1,
+  workers: resolveVisualDevWorkers(),
   retries: process.env.CI ? 2 : 0,
   reporter: createPlaywrightReporter('demo-app-dev'),
   timeout: 60_000,
@@ -29,8 +30,7 @@ export default defineConfig({
     viewport: { width: 1440, height: 1600 },
   },
   webServer: {
-    command:
-      `pnpm -C .. run ensure:wasm && pnpm -C packages/demo-app exec vite --host 127.0.0.1 --port ${devPort} --strictPort`,
+    command: `pnpm -C .. run ensure:wasm && pnpm -C packages/demo-app exec vite --host 127.0.0.1 --port ${devPort} --strictPort`,
     url: devBaseUrl,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

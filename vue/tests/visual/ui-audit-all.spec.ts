@@ -6,6 +6,7 @@ import {
   auditComponents,
   auditStateNames,
 } from '../../packages/demo-app/src/ui-audit-manifest'
+import { resolveVisualAuditBucketCount } from '../../../scripts/test-parallelism'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
 
 type VisualVariant = {
@@ -40,6 +41,9 @@ if (
 }
 const expectedScreenshotsPerProject =
   selectedAuditComponents.length * auditStateNames.length
+// #230 owns bucket partitioning. This is the single plan-backed read entry it
+// will consume instead of deriving capacity again inside the audit suite.
+const visualAuditBucketCount = resolveVisualAuditBucketCount()
 
 const stabilizePage = async (page: Page) => {
   await page.addStyleTag({
@@ -125,6 +129,10 @@ test('captures the registered component state matrix', async ({
   page,
 }, testInfo) => {
   test.setTimeout(360_000)
+  testInfo.annotations.push({
+    type: 'visual-audit-bucket-count',
+    description: String(visualAuditBucketCount),
+  })
 
   for (const state of auditStateNames) {
     await page.goto(buildAuditUrl(state, testInfo.project.name), {
