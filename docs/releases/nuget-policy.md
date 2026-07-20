@@ -47,19 +47,19 @@ release governance document explicitly makes a shared gate mandatory.
 Root-level .NET commands are exposed next to the existing Web checks:
 
 ```bash
-pnpm run dotnet:restore
-pnpm run dotnet:build
-pnpm run dotnet:test
-pnpm run dotnet:pack
-pnpm run dotnet:verify
+pnpm run dotnet:matrix:plan --os linux,windows,macos
+pnpm run dotnet:platform:verify
+pnpm run dotnet:package:verify
 ```
 
-`pnpm run dotnet:verify` restores the solution, builds Avalonia packages, runs
-unit and headless tests, executes the demo startup smoke, packs NuGet
-candidates, validates package metadata, checks generated token/icon freshness,
-and reruns cross-platform conformance/governance gates.
+`pnpm run dotnet:platform:verify` restores the solution, builds Avalonia projects,
+runs tests and startup smoke for the current platform, and emits its platform
+manifest. `pnpm run dotnet:package:verify` independently restores/builds and then
+packs the unique canonical NuGet candidate, validates metadata and contents,
+runs the packed-consumer and stable-package contracts, and records its aggregate
+SHA-256. Token, icon, conformance, governance, and a11y contracts remain in the
+single static-quality lane.
 
-Linux and Windows CI coverage is required for restore/build/test/pack before an
-Avalonia preview package can be considered releasable. macOS coverage is
-tracked as a later platform-matrix expansion unless a release owner makes it
-mandatory for a specific preview.
+Linux, Windows, and macOS CI coverage is required for platform
+restore/build/test/smoke. Pack and package validation run once on canonical
+Ubuntu; the other platforms never produce package candidates.

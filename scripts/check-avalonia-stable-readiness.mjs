@@ -110,10 +110,15 @@ const validateWorkflow = (qualityWorkflow, reusableWorkflow, spec, label) => {
   assertIncludes(qualityWorkflow, 'workflow_dispatch:', label)
   assertIncludes(reusableWorkflow, 'workflow_call:', label)
   assertIncludes(reusableWorkflow, 'group:', label)
-  assertIncludes(reusableWorkflow, 'pnpm run verify:stable', label)
   assertIncludes(reusableWorkflow, 'pnpm run verify:nightly', label)
   assertIncludes(reusableWorkflow, 'pnpm run verify:release', label)
-  assertIncludes(reusableWorkflow, 'pnpm run dotnet:verify', label)
+  assertIncludes(reusableWorkflow, 'dotnet-platform:', label)
+  assertIncludes(reusableWorkflow, 'dotnet-package:', label)
+  assertIncludes(
+    reusableWorkflow,
+    'node scripts/check-dotnet-manifests.mjs',
+    label,
+  )
   assertIncludes(reusableWorkflow, 'actions/cache@v4', label)
 }
 

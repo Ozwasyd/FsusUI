@@ -232,6 +232,32 @@ workspace 依赖归一化由 `scripts/prepare-npm-package.mjs` 负责，当前�
 
 ## Typecheck cache policy
 
+## .NET platform and package ownership
+
+The reusable quality workflow separates platform compatibility from NuGet
+candidate validation:
+
+- `dotnet-platform` runs restore, Release build, tests, and the demo startup
+  smoke on Linux, Windows, and macOS. Each runner uploads only its TRX results
+  and a platform manifest containing OS/architecture, SDK/runtime inventory,
+  solution fingerprint, test summary, smoke status, and commit SHA.
+- `dotnet-package` runs once on Ubuntu. It creates one clean NuGet candidate,
+  checks metadata, package contents, the packed consumer, and stable-package
+  contracts, then records per-file hashes and one aggregate candidate SHA-256.
+- `static-quality` owns icons, tokens, conformance, governance, and the a11y
+  contract. Those checks are never members of the .NET OS matrix.
+- `stable-readiness` downloads the three platform manifests and the exact
+  NuGet candidate, rejects duplicate/missing platforms or commit drift, and
+  recomputes the candidate digest before preserving evidence.
+
+Use `pnpm dotnet:matrix:plan --os linux,windows,macos` for a static ownership
+plan on any host. `pnpm dotnet:platform:verify` and
+`pnpm dotnet:package:verify` remain independently runnable on the current OS;
+local verification does not emulate or require the other operating systems.
+The restore cache key includes runner OS, pinned SDK, projects, solution,
+props/targets, and lock inputs. Final package directories are not cached or
+treated as trusted evidence.
+
 PR-fast uses `typecheck:affected`, which selects the affected TypeScript
 lanes and runs them through `scripts/run-typecheck.mjs`. The default
 `typecheck:*` lanes write `.tsbuildinfo` files under `.tmp/typecheck-cache`;

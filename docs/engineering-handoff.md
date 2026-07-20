@@ -201,6 +201,27 @@ pnpm test:consumer-install
 
 ## Typecheck cache policy
 
+## .NET quality lanes
+
+Run `pnpm dotnet:matrix:plan --os linux,windows,macos` to inspect ownership
+without attempting cross-OS execution. The three `dotnet-platform` matrix
+entries own only restore/build/test/startup smoke and each emit a distinct
+platform manifest. `pnpm dotnet:platform:verify` runs that same lane for the
+current host.
+
+`pnpm dotnet:package:verify` is the canonical Ubuntu package lane. It deletes
+the prior package output, restores/builds once, packs the three public projects,
+runs metadata/package/packed-consumer/stable checks, and emits a manifest with
+one aggregate candidate SHA-256. CI uploads that candidate separately from
+platform results. Icons, tokens, conformance, governance, and a11y remain in
+the single `static-quality` job.
+
+The `check:dotnet-matrix` governance guard includes negative fixtures that
+reject package or governance commands in the OS matrix and reject missing
+platform coverage. The final manifest check also rejects duplicate platforms,
+failed tests/smoke, commit mismatches, and candidate digest drift. A developer
+needs only the current operating system to run either local verification lane.
+
 PR-fast uses `typecheck:affected`, which selects the affected TypeScript
 lanes and runs them through `scripts/run-typecheck.mjs`. The default
 `typecheck:*` lanes write `.tsbuildinfo` files under `.tmp/typecheck-cache`;

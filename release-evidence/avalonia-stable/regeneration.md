@@ -5,14 +5,14 @@
 To regenerate this bundle from CI artifacts:
 
 1. Download `avalonia-stable-evidence`, `avalonia-generated-artifacts`,
-   `dotnet-build-output-*`, `avalonia-screenshots-*`, `unit-test-artifacts`,
+   `dotnet-platform-{linux,windows,macos}`, `dotnet-nuget-candidate`,
+   `avalonia-screenshots-*`, `unit-test-artifacts`,
    and `fsusui-npm-package-dist` from the successful release Quality Gates run.
 2. Restore generated artifacts into the repository root.
 3. Run:
 
 ```bash
-pnpm run verify:stable
-pnpm run dotnet:verify
+pnpm run dotnet:manifests:check -- --root .dotnet-evidence
 node scripts/check-avalonia-stable-readiness.mjs
 ```
 

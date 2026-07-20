@@ -69,24 +69,24 @@ jobs:
         run: pnpm run conformance
       - name: Run governance
         run: pnpm run governance:check
+      - name: Run accessibility contract
+        run: pnpm run a11y:check
 
-  dotnet:
+  dotnet-platform:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - platform: linux
+            os: ubuntu-latest
+          - platform: windows
+            os: windows-latest
+          - platform: macos
+            os: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: dotnet/global.json
@@ -96,20 +96,45 @@ jobs:
           path: |
             ~/.nuget/packages
             dotnet/**/obj
-          key: ${{ runner.os }}-fsusui-dotnet-${{ hashFiles('dotnet/**/*.csproj', 'dotnet/**/*.props', 'dotnet/**/*.slnx', 'dotnet/global.json') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-sdk-${{ hashFiles('dotnet/global.json') }}-${{ hashFiles('dotnet/**/*.csproj', 'dotnet/**/*.props', 'dotnet/**/*.targets', 'dotnet/**/*.slnx', 'dotnet/**/packages.lock.json', 'NuGet.config') }}
           restore-keys: |
-            ${{ runner.os }}-fsusui-dotnet-
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run dotnet:verify
-      - name: Run selected real-window readiness checks
-        run: pnpm run a11y:check
+            ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-sdk-${{ hashFiles('dotnet/global.json') }}-
+      - name: Run platform-owned restore, build, tests, and smoke
+        run: node scripts/dotnet-platform-verify.mjs --output dotnet/artifacts/platform/${{ matrix.platform }}/manifest.json
       - uses: actions/upload-artifact@v4
         if: always()
         continue-on-error: true
         with:
-          name: dotnet-build-output-${{ matrix.os }}
-          path: dotnet/**/bin/Release
-          retention-days: 3
+          name: dotnet-platform-${{ matrix.platform }}
+          path: dotnet/artifacts/platform/${{ matrix.platform }}
+          retention-days: 7
+
+  dotnet-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: dotnet/global.json
+      - name: Restore canonical .NET package cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.nuget/packages
+            dotnet/**/obj
+          key: ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-package-sdk-${{ hashFiles('dotnet/global.json') }}-${{ hashFiles('dotnet/**/*.csproj', 'dotnet/**/*.props', 'dotnet/**/*.targets', 'dotnet/**/*.slnx', 'dotnet/**/packages.lock.json', 'NuGet.config') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-package-sdk-${{ hashFiles('dotnet/global.json') }}-
+      - name: Build and verify the unique NuGet candidate
+        run: node scripts/dotnet-package-verify.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-nuget-candidate
+          path: |
+            dotnet/artifacts/nuget
+            dotnet/artifacts/package/manifest.json
+          retention-days: 7
 
   typecheck:
     runs-on: ubuntu-latest
@@ -452,7 +477,8 @@ jobs:
     timeout-minutes: 45
     needs:
       - static-quality
-      - dotnet
+      - dotnet-platform
+      - dotnet-package
       - typecheck
       - unit
       - coverage
@@ -462,20 +488,24 @@ jobs:
       - visual
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - uses: actions/download-artifact@v4
         with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
+          name: dotnet-platform-linux
+          path: .dotnet-evidence/platform/linux
+      - uses: actions/download-artifact@v4
         with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - uses: actions/setup-dotnet@v4
+          name: dotnet-platform-windows
+          path: .dotnet-evidence/platform/windows
+      - uses: actions/download-artifact@v4
         with:
-          global-json-file: dotnet/global.json
-      - run: pnpm install --frozen-lockfile
-      - name: Run stable readiness gate
-        run: pnpm run verify:stable
+          name: dotnet-platform-macos
+          path: .dotnet-evidence/platform/macos
+      - uses: actions/download-artifact@v4
+        with:
+          name: dotnet-nuget-candidate
+          path: .dotnet-evidence/package
+      - name: Verify .NET platform and package evidence
+        run: node scripts/check-dotnet-manifests.mjs
       - name: Pack stable evidence
         run: |
           tar -czf avalonia-stable-evidence.tgz docs/releases spec/components tests/conformance

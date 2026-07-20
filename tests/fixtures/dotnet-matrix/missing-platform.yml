@@ -1,0 +1,20 @@
+jobs:
+  static-quality:
+    steps:
+      [icons:check, tokens:check, conformance, governance:check, a11y:check]
+  dotnet-platform:
+    strategy:
+      matrix:
+        include:
+          - { platform: linux, os: ubuntu-latest }
+          - { platform: windows, os: windows-latest }
+    steps:
+      - run: node scripts/dotnet-platform-verify.mjs
+  dotnet-package:
+    runs-on: ubuntu-latest
+    steps:
+      - run: node scripts/dotnet-package-verify.mjs
+      - run: echo dotnet-nuget-candidate dotnet/artifacts/package/manifest.json
+  stable-readiness:
+    needs: [dotnet-platform, dotnet-package]
+    steps: [{ run: node scripts/check-dotnet-manifests.mjs }]

@@ -2,7 +2,12 @@
   "schemaVersion": 1,
   "groups": {
     "pr-fast": ["verify:pr-fast"],
-    "main": ["verify:full", "dotnet:verify", "governance:check"],
+    "main": [
+      "verify:full",
+      "dotnet:platform:verify",
+      "dotnet:package:verify",
+      "governance:check"
+    ],
     "nightly": ["verify:nightly"],
     "release": ["verify:release", "verify:stable"]
   },
@@ -13,7 +18,8 @@
   ],
   "requiredJobs": [
     "static-quality",
-    "dotnet",
+    "dotnet-platform",
+    "dotnet-package",
     "typecheck",
     "unit",
     "coverage",
@@ -31,7 +37,8 @@
     "avalonia-release-evidence",
     "unit-test-artifacts",
     "fsusui-npm-package-dist",
-    "dotnet-build-output",
+    "dotnet-platform",
+    "dotnet-nuget-candidate",
     "avalonia-screenshots",
     "avalonia-generated-artifacts"
   ],

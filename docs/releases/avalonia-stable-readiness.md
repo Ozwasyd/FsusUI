@@ -36,7 +36,8 @@ Required workflow artifacts:
 
 - `unit-test-artifacts`
 - `fsusui-npm-package-dist`
-- `dotnet-build-output-*`
+- `dotnet-platform-{linux,windows,macos}`
+- `dotnet-nuget-candidate`
 - `avalonia-screenshots-*`
 - `avalonia-generated-artifacts`
 - `avalonia-stable-evidence`
