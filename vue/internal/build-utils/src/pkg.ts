@@ -40,7 +40,10 @@ const excludedFilenamePatterns = [
 ]
 
 function shouldExcludeFile(filePath: string) {
-  const normalizedPath = filePath.split(/[\\/]+/u)
+  const ownedPath = path.isAbsolute(filePath)
+    ? path.relative(projRoot, filePath)
+    : filePath
+  const normalizedPath = ownedPath.split(/[\\/]+/u)
   const basename = path.basename(filePath)
 
   if (
