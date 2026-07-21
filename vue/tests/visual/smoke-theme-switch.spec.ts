@@ -1,7 +1,10 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { SMOKE_THEME_SWITCH_TEST_TITLE } from '../../../scripts/visual-profiles.mjs'
-import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
+import {
+  buildVisualUrl,
+  resolveVisualVariant,
+} from '../../../scripts/visual-variant.mjs'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
 
 const diagnostics = new WeakMap<Page, string[]>()
@@ -24,6 +27,8 @@ test.afterEach(async ({ page }) => {
 })
 
 test(SMOKE_THEME_SWITCH_TEST_TITLE, async ({ page }, testInfo) => {
+  const initialMode = resolveVisualVariant(testInfo.project.name).theme
+  const alternateMode = initialMode === 'light' ? 'dark' : 'light'
   await page.goto(buildVisualUrl('issue-primitives', testInfo.project.name), {
     waitUntil: 'domcontentloaded',
   })
@@ -36,23 +41,23 @@ test(SMOKE_THEME_SWITCH_TEST_TITLE, async ({ page }, testInfo) => {
   await expect(toggle).toBeVisible()
 
   const root = page.locator('html')
-  await expect(root).toHaveClass(/\blight\b/u)
-  await expect(root).toHaveAttribute('data-theme-mode', 'light')
-  await expect(root).toHaveAttribute('data-theme-resolved', 'light')
-  const lightAppearance = await readRenderedTheme(page)
+  await expect(root).toHaveClass(new RegExp(`\\b${initialMode}\\b`, 'u'))
+  await expect(root).not.toHaveClass(new RegExp(`\\b${alternateMode}\\b`, 'u'))
+  await expect(root).toHaveAttribute('data-theme-mode', initialMode)
+  await expect(root).toHaveAttribute('data-theme-resolved', initialMode)
+  const initialAppearance = await readRenderedTheme(page)
 
-  await toggle.locator('[data-theme-mode="dark"]').click()
-  await expect(root).toHaveClass(/\bdark\b/u)
-  await expect(root).not.toHaveClass(/\blight\b/u)
-  await expect(root).toHaveAttribute('data-theme-mode', 'dark')
-  await expect(root).toHaveAttribute('data-theme-resolved', 'dark')
-  const darkAppearance = await readRenderedTheme(page)
-  expect(darkAppearance).not.toEqual(lightAppearance)
+  await toggle.locator(`[data-theme-mode="${alternateMode}"]`).click()
+  await expect(root).toHaveClass(new RegExp(`\\b${alternateMode}\\b`, 'u'))
+  await expect(root).not.toHaveClass(new RegExp(`\\b${initialMode}\\b`, 'u'))
+  await expect(root).toHaveAttribute('data-theme-mode', alternateMode)
+  await expect(root).toHaveAttribute('data-theme-resolved', alternateMode)
+  expect(await readRenderedTheme(page)).not.toEqual(initialAppearance)
 
-  await toggle.locator('[data-theme-mode="light"]').click()
-  await expect(root).toHaveClass(/\blight\b/u)
-  await expect(root).not.toHaveClass(/\bdark\b/u)
-  await expect(root).toHaveAttribute('data-theme-mode', 'light')
-  await expect(root).toHaveAttribute('data-theme-resolved', 'light')
-  expect(await readRenderedTheme(page)).toEqual(lightAppearance)
+  await toggle.locator(`[data-theme-mode="${initialMode}"]`).click()
+  await expect(root).toHaveClass(new RegExp(`\\b${initialMode}\\b`, 'u'))
+  await expect(root).not.toHaveClass(new RegExp(`\\b${alternateMode}\\b`, 'u'))
+  await expect(root).toHaveAttribute('data-theme-mode', initialMode)
+  await expect(root).toHaveAttribute('data-theme-resolved', initialMode)
+  expect(await readRenderedTheme(page)).toEqual(initialAppearance)
 })
