@@ -31,6 +31,10 @@ const previewConfig = readFileSync('vue/playwright.config.ts', 'utf8')
 const devConfig = readFileSync('vue/playwright.dev.config.ts', 'utf8')
 const testParallelism = readFileSync('scripts/test-parallelism.ts', 'utf8')
 const auditSpec = readFileSync('vue/tests/visual/ui-audit-all.spec.ts', 'utf8')
+const smokeThemeSwitchSpec = readFileSync(
+  'vue/tests/visual/smoke-theme-switch.spec.ts',
+  'utf8',
+)
 const auditFixture = readFileSync(
   'vue/packages/demo-app/src/AuditFixtures.vue',
   'utf8',
@@ -320,8 +324,17 @@ assert(
     smokePlan[0].workers === 1 &&
     smokePlan[0].selectedProjects.join(',') === 'desktop-light,mobile-dark' &&
     smokePlan[0].argv.includes('vue/tests/visual/capture-all.spec.ts') &&
-    smokePlan[0].argv.includes('capture basic$'),
-  'smoke must stay a one-worker representative desktop/light and compact/dark plan',
+    smokePlan[0].argv.includes('vue/tests/visual/smoke-theme-switch.spec.ts') &&
+    smokePlan[0].argv.some((argument) =>
+      argument.includes('smoke theme mode toggles light and dark'),
+    ) &&
+    smokeThemeSwitchSpec.includes(
+      'toggle.locator(\'[data-theme-mode="dark"]\').click()',
+    ) &&
+    smokeThemeSwitchSpec.includes(
+      'toggle.locator(\'[data-theme-mode="light"]\').click()',
+    ),
+  'smoke must keep one worker while exercising a real desktop theme toggle plus compact/dark rendering',
 )
 const affectedFallback = createAffectedSelection({
   env: {},

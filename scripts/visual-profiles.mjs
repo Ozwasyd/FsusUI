@@ -11,6 +11,8 @@ const normalizePath = (value) =>
 const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&')
 
 export const createVisualCaptureTestTitle = (section) => `capture ${section}`
+export const SMOKE_THEME_SWITCH_TEST_TITLE =
+  'smoke theme mode toggles light and dark'
 
 export function loadVisualProfileRegistry(
   repositoryRoot = process.cwd(),
@@ -57,6 +59,24 @@ export function validateVisualProfileRegistry(registry, repositoryRoot) {
     throw new Error(
       `visual profile registry smoke grep does not select ${JSON.stringify(createVisualCaptureTestTitle('basic'))}`,
     )
+  }
+  if (!smokePattern.test(SMOKE_THEME_SWITCH_TEST_TITLE)) {
+    throw new Error(
+      `visual profile registry smoke grep does not select ${JSON.stringify(SMOKE_THEME_SWITCH_TEST_TITLE)}`,
+    )
+  }
+  if (
+    !Array.isArray(registry.smoke?.specs) ||
+    registry.smoke.specs.length < 2
+  ) {
+    throw new Error(
+      'visual profile registry smoke must include capture and interactive theme-switch specs',
+    )
+  }
+  for (const spec of registry.smoke.specs) {
+    if (!existsSync(resolve(repositoryRoot, spec))) {
+      throw new Error(`visual profile registry smoke spec is missing: ${spec}`)
+    }
   }
 
   const registered = registeredComponentPackages(registry)

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { EventEmitter } from 'node:events'
-import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises'
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import test from 'node:test'
@@ -10,6 +10,7 @@ import {
   createAffectedSelection,
   createSmokeSelection,
   createVisualCaptureTestTitle,
+  SMOKE_THEME_SWITCH_TEST_TITLE,
   loadVisualProfileRegistry,
   resolveAffectedFiles,
   selectAffectedVisualTargets,
@@ -63,6 +64,23 @@ test('registry rejects a smoke grep that selects no canonical capture test', () 
   )
 })
 
+test('registry rejects smoke plans without a real theme-switch interaction', () => {
+  assert.throws(
+    () =>
+      validateVisualProfileRegistry(
+        {
+          ...registry,
+          smoke: {
+            ...registry.smoke,
+            grep: 'capture basic$',
+          },
+        },
+        repositoryRoot,
+      ),
+    new RegExp(SMOKE_THEME_SWITCH_TEST_TITLE, 'u'),
+  )
+})
+
 test('registry rejects new public packages until an owner is registered', async (t) => {
   const root = await mkdtemp(join(tmpdir(), 'fsusui-visual-registry-'))
   t.after(() => rm(root, { recursive: true, force: true }))
@@ -70,6 +88,11 @@ test('registry rejects new public packages until an owner is registered', async 
   await mkdir(join(root, 'vue/packages/components/unowned-public-widget'), {
     recursive: true,
   })
+  for (const spec of registry.smoke.specs) {
+    const target = join(root, spec)
+    await mkdir(join(target, '..'), { recursive: true })
+    await writeFile(target, '')
+  }
   const fixture = {
     ...registry,
     auditComponentOverrides: {},
@@ -191,7 +214,11 @@ test('smoke is representative and capped to one shared-plan worker', () => {
   assert.deepEqual(plan[0].selectedProjects, ['desktop-light', 'mobile-dark'])
   assert.equal(plan[0].workers, 1)
   assert.ok(plan[0].argv.includes('vue/tests/visual/capture-all.spec.ts'))
-  assert.match(plan[0].argv.join(' '), /capture basic\$/u)
+  assert.ok(
+    plan[0].argv.includes('vue/tests/visual/smoke-theme-switch.spec.ts'),
+  )
+  assert.match(plan[0].argv.join(' '), /capture basic/u)
+  assert.match(plan[0].argv.join(' '), /smoke theme mode toggles/u)
 })
 
 test('smoke passes its one-worker capacity plan to Playwright', async () => {

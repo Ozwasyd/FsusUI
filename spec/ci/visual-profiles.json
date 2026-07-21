@@ -2,8 +2,11 @@
   "schemaVersion": 1,
   "smoke": {
     "projects": ["desktop-light", "mobile-dark"],
-    "specs": ["vue/tests/visual/capture-all.spec.ts"],
-    "grep": "capture basic$"
+    "specs": [
+      "vue/tests/visual/capture-all.spec.ts",
+      "vue/tests/visual/smoke-theme-switch.spec.ts"
+    ],
+    "grep": "(?:capture basic|smoke theme mode toggles light and dark)$"
   },
   "commonContractSpecs": [
     "vue/tests/visual/foundation-style-boundary.spec.ts",

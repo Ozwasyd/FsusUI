@@ -31,6 +31,7 @@ export const VISUAL_SPEC_OWNERSHIP = Object.freeze({
     '**/character-challenge-zoom.spec.ts',
     '**/empty-illustration.spec.ts',
     '**/public-shell-desktop-search.spec.ts',
+    '**/smoke-theme-switch.spec.ts',
     '**/tree-select-row.spec.ts',
   ]),
   mobile: Object.freeze(['**/public-shell-mobile-nav.spec.ts']),
