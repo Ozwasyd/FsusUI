@@ -85,6 +85,79 @@ function occurrences(value, fragment) {
   return value.split(fragment).length - 1
 }
 
+const smokeThemeSwitchContractPatterns = [
+  [/const initialMode = resolveVisualVariant\(testInfo\.project\.name\)\.theme/gu, 1],
+  [/const alternateMode = initialMode === 'light' \? 'dark' : 'light'/gu, 1],
+  [/toggle\.locator\(`\[data-theme-mode="\$\{alternateMode\}"\]`\)\.click\(\)/gu, 1],
+  [/toggle\.locator\(`\[data-theme-mode="\$\{initialMode\}"\]`\)\.click\(\)/gu, 1],
+  [/toHaveClass\(new RegExp\(`\\\\b\$\{initialMode\}\\\\b`, 'u'\)\)/gu, 2],
+  [/not\.toHaveClass\(new RegExp\(`\\\\b\$\{alternateMode\}\\\\b`, 'u'\)\)/gu, 2],
+  [/toHaveClass\(new RegExp\(`\\\\b\$\{alternateMode\}\\\\b`, 'u'\)\)/gu, 1],
+  [/not\.toHaveClass\(new RegExp\(`\\\\b\$\{initialMode\}\\\\b`, 'u'\)\)/gu, 1],
+  [/toHaveAttribute\('data-theme-mode', alternateMode\)/gu, 1],
+  [/toHaveAttribute\('data-theme-resolved', alternateMode\)/gu, 1],
+  [/expect\(await readRenderedTheme\(page\)\)\.not\.toEqual\(initialAppearance\)/gu, 1],
+  [/toHaveAttribute\('data-theme-mode', initialMode\)/gu, 2],
+  [/toHaveAttribute\('data-theme-resolved', initialMode\)/gu, 2],
+  [/expect\(await readRenderedTheme\(page\)\)\.toEqual\(initialAppearance\)/gu, 1],
+]
+
+const hasSmokeThemeSwitchContract = (source) =>
+  smokeThemeSwitchContractPatterns.every(
+    ([pattern, minimum]) => (source.match(pattern)?.length ?? 0) >= minimum,
+  )
+
+const smokeThemeSwitchNegativeFixtures = [
+  [
+    'project-derived initial mode',
+    (source) =>
+      source.replace(
+        'resolveVisualVariant(testInfo.project.name).theme',
+        "'light'",
+      ),
+  ],
+  [
+    'alternate mode derivation',
+    (source) =>
+      source.replace(
+        "const alternateMode = initialMode === 'light' ? 'dark' : 'light'",
+        "const alternateMode = 'dark'",
+      ),
+  ],
+  [
+    'alternate mode interaction',
+    (source) =>
+      source.replace(
+        'await toggle.locator(`[data-theme-mode="${alternateMode}"]`).click()',
+        '',
+      ),
+  ],
+  [
+    'initial mode restoration',
+    (source) =>
+      source.replace(
+        'await toggle.locator(`[data-theme-mode="${initialMode}"]`).click()',
+        '',
+      ),
+  ],
+  [
+    'alternate rendered state',
+    (source) =>
+      source.replace(
+        "await expect(root).toHaveAttribute('data-theme-resolved', alternateMode)",
+        '',
+      ),
+  ],
+  [
+    'restored appearance',
+    (source) =>
+      source.replace(
+        'expect(await readRenderedTheme(page)).toEqual(initialAppearance)',
+        '',
+      ),
+  ],
+]
+
 function expectInvalid(label, mutate) {
   const plan = createVisualPlan(
     parseVisualArgs(['--suite=full', '--list']),
@@ -349,14 +422,15 @@ assert(
     smokePlan[0].argv.some((argument) =>
       argument.includes('smoke theme mode toggles light and dark'),
     ) &&
-    smokeThemeSwitchSpec.includes(
-      'toggle.locator(\'[data-theme-mode="dark"]\').click()',
-    ) &&
-    smokeThemeSwitchSpec.includes(
-      'toggle.locator(\'[data-theme-mode="light"]\').click()',
-    ),
+    hasSmokeThemeSwitchContract(smokeThemeSwitchSpec),
   'smoke must keep one worker while exercising a real desktop theme toggle plus compact/dark rendering',
 )
+for (const [label, mutate] of smokeThemeSwitchNegativeFixtures) {
+  assert(
+    !hasSmokeThemeSwitchContract(mutate(smokeThemeSwitchSpec)),
+    `negative smoke theme-switch fixture did not reject ${label}`,
+  )
+}
 const affectedFallback = createAffectedSelection({
   env: {},
   git: () => ({ status: 1, stdout: '' }),
