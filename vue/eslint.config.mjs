@@ -32,6 +32,8 @@ export default [
       'docs/components.d.ts',
       'coverage/**',
       '.tmp/**',
+      'playwright-report/**',
+      'vue/playwright-report/**',
       'play/**',
       'ssr-testing/cases/*',
       'docs/.vitepress/i18n/*',

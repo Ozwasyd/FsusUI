@@ -25,6 +25,8 @@ import {
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
 const scripts = packageJson.scripts ?? {}
 const workflow = readFileSync('.github/workflows/_quality.yml', 'utf8')
+const gitIgnore = readFileSync('.gitignore', 'utf8')
+const eslintConfig = readFileSync('vue/eslint.config.mjs', 'utf8')
 const previewConfig = readFileSync('vue/playwright.config.ts', 'utf8')
 const devConfig = readFileSync('vue/playwright.dev.config.ts', 'utf8')
 const testParallelism = readFileSync('scripts/test-parallelism.ts', 'utf8')
@@ -280,6 +282,13 @@ assert(
     visualJob.includes('.tmp/visual-runtime/manifest.json') &&
     visualJob.includes('screenshots'),
   'release mode must explicitly retain the complete visual evidence matrix',
+)
+assert(
+  gitIgnore.includes('/vue/playwright-report/') &&
+    gitIgnore.includes('/vue/test-results/') &&
+    eslintConfig.includes("'vue/playwright-report/**'") &&
+    eslintConfig.includes("'test-results/**'"),
+  'visual evidence outputs must stay outside source ownership and lint inputs',
 )
 assert(
   scripts['verify:visual:affected']?.includes('test:visual:affected') &&

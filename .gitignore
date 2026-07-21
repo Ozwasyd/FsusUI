@@ -24,6 +24,7 @@ Thumbs.db
 /dist/
 /coverage/
 /playwright-report/
+/vue/playwright-report/
 /test-results/
 /vue/test-results/
 /blob-report/
