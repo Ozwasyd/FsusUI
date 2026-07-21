@@ -187,6 +187,10 @@ assert.ok(
 )
 assert.ok(!heapSource.includes('18_432'))
 assert.ok(heapSource.includes('resolveNodeHeapMiB'))
+assert.ok(
+  heapSource.includes('unitTestFileCount: countUnitTestFiles()'),
+  'heap wrapper must seed the shared plan with the authoritative unit workload'
+)
 assert.ok(visualSource.includes("require('./ci-capacity.cjs')"))
 assert.ok(parallelismSource.includes("from './ci-capacity.cjs'"))
 for (const [label, source] of [

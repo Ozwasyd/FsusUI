@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process'
 import {
+  countUnitTestFiles,
   formatCapacitySummary,
   resolveCapacityPlan,
   resolveNodeHeapMiB,
@@ -57,7 +58,9 @@ const buildNodeOptions = () => {
   if (disabled) return existing
 
   const options = existing ? [existing] : []
-  const capacityPlan = resolveCapacityPlan()
+  const capacityPlan = resolveCapacityPlan({
+    unitTestFileCount: countUnitTestFiles(),
+  })
   const heapProfile = inferHeapProfile()
   const oldSpaceMb = resolveNodeHeapMiB(capacityPlan, heapProfile)
   const semiSpaceMb = readPositiveInteger(
