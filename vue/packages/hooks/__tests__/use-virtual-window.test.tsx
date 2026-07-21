@@ -213,21 +213,14 @@ describe('useFsusVirtualWindow incremental measurements', () => {
 
   it('rejects duplicate keys deterministically', () => {
     const units = ref([{ key: 'duplicate' }, { key: 'duplicate' }])
-    const Probe = defineComponent({
-      setup() {
-        useFsusVirtualWindow({
-          estimateSize: () => 40,
-          getKey: (unit) => unit.key,
-          getViewport: () => null,
-          units,
-        })
-        return () => h('div')
-      },
-    })
-
-    expect(() => mount(Probe)).toThrow(
-      'useFsusVirtualWindow requires unique keys: duplicate',
-    )
+    expect(() =>
+      useFsusVirtualWindow({
+        estimateSize: () => 40,
+        getKey: (unit) => unit.key,
+        getViewport: () => null,
+        units,
+      }),
+    ).toThrow('useFsusVirtualWindow requires unique keys: duplicate')
   })
 
   it('applies one anchor correction for a measurement batch', async () => {

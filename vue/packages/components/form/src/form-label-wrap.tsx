@@ -42,7 +42,8 @@ export default defineComponent({
     const getLabelWidth = () => {
       if (el.value?.firstElementChild) {
         const width = window.getComputedStyle(el.value.firstElementChild).width
-        return Math.ceil(Number.parseFloat(width))
+        const parsedWidth = Math.ceil(Number.parseFloat(width))
+        return Number.isFinite(parsedWidth) ? parsedWidth : 0
       } else {
         return 0
       }
@@ -53,7 +54,7 @@ export default defineComponent({
         if (slots.default && props.isAutoWidth) {
           if (action === 'update') {
             computedWidth.value = getLabelWidth()
-          } else if (action === 'remove') {
+          } else if (action === 'remove' && computedWidth.value > 0) {
             formContext?.deregisterLabelWidth(computedWidth.value)
           }
         }

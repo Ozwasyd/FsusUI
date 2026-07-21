@@ -558,8 +558,11 @@ describe('motion primitives', () => {
     let observedMode: unknown
     const TransitionProbe = defineComponent({
       props: {
+        appear: Boolean,
+        css: Boolean,
         mode: String,
       },
+      emits: ['enter', 'leave'],
       setup(props, { slots }) {
         observedMode = props.mode
         return () => slots.default?.()
