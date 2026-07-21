@@ -193,13 +193,17 @@ assert.ok(
 )
 assert.ok(visualSource.includes("require('./ci-capacity.cjs')"))
 assert.ok(parallelismSource.includes("from './ci-capacity.cjs'"))
-for (const [label, source] of [
-  ['capacity CLI', capacityCliSource],
-  ['unit runner', unitRunnerSource],
-]) {
-  assert.ok(source.includes("from 'fast-glob'"), `${label} must use stable globbing`)
-  assert.ok(!source.includes('globSync'), `${label} must not emit Node glob warnings`)
-}
+assert.ok(capacityCliSource.includes("from 'fast-glob'"))
+assert.ok(!capacityCliSource.includes('globSync'))
+assert.ok(
+  unitRunnerSource.includes(
+    'resolveCapacityPlan({\n  unitTestFileCount: countUnitTestFiles(),'
+  ),
+  'unit runner must consume the shared authoritative capacity plan'
+)
+assert.ok(!unitRunnerSource.includes("from 'fast-glob'"))
+assert.ok(!unitRunnerSource.includes('createCapacityPlan'))
+assert.ok(!unitRunnerSource.includes('probeCapacityHost'))
 assert.ok(
   capacityCliSource.includes('cwd: repoRoot'),
   'unit discovery must be independent of the caller working directory'
