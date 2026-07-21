@@ -3,13 +3,27 @@ require('tsx/cjs')
 const assert = require('node:assert/strict')
 const path = require('node:path')
 const { test } = require('node:test')
-const { excludeFiles } = require('../src/pkg.ts')
+const { excludeFiles, shouldExcludeFile } = require('../src/pkg.ts')
 const { pkgRoot } = require('../src/paths.ts')
 
 test('worktree parent names do not become package path segments', () => {
-  const source = path.join(pkgRoot, 'components', 'button', 'src', 'button.ts')
+  const artificialRoot = path.join(
+    path.parse(pkgRoot).root,
+    'workspace',
+    'test-parent',
+    'repository'
+  )
+  const source = path.join(
+    artificialRoot,
+    'vue',
+    'packages',
+    'components',
+    'button',
+    'src',
+    'button.ts'
+  )
 
-  assert.deepEqual(excludeFiles([source]), [source])
+  assert.equal(shouldExcludeFile(source, artificialRoot), false)
 })
 
 test('owned test, mock, build, and dist paths stay excluded', () => {

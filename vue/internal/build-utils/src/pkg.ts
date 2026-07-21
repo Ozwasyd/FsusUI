@@ -39,9 +39,9 @@ const excludedFilenamePatterns = [
   /^[^.]+\.config\.[^.]+$/u,
 ]
 
-function shouldExcludeFile(filePath: string) {
+export function shouldExcludeFile(filePath: string, ownedRoot = projRoot) {
   const ownedPath = path.isAbsolute(filePath)
-    ? path.relative(projRoot, filePath)
+    ? path.relative(ownedRoot, filePath)
     : filePath
   const normalizedPath = ownedPath.split(/[\\/]+/u)
   const basename = path.basename(filePath)
