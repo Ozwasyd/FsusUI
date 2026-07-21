@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { test } from 'node:test'
 import {
+  createDefaultVisualRuntimeConfig,
   inspectVisualRuntime,
   prepareVisualRuntime,
 } from '../../scripts/visual-runtime-core.mjs'
@@ -62,6 +63,49 @@ const prepare = (config, buildGroup, overrides = {}) =>
     tools: fixedTools,
     ...overrides,
   })
+
+test('default Demo runtime invalidates when its base tsconfig changes', async (t) => {
+  const { config, repositoryRoot } = await createWorkspace(t)
+  const defaultConfig = createDefaultVisualRuntimeConfig(repositoryRoot)
+  const defaultDemo = defaultConfig.groups.find((group) => group.id === 'demo')
+
+  assert(defaultDemo)
+  assert(defaultDemo.inputPaths.includes('vue/packages'))
+  assert(defaultDemo.inputPaths.includes('vue/tsconfig.base.json'))
+  assert(!defaultDemo.inputPaths.includes('vue/packages/demo-app'))
+
+  const demo = config.groups.find((group) => group.id === 'demo')
+  demo.inputPaths.push('vue/tsconfig.base.json')
+  await mkdir(join(repositoryRoot, 'vue'), { recursive: true })
+  const baseTsconfig = join(repositoryRoot, 'vue', 'tsconfig.base.json')
+  await writeFile(baseTsconfig, '{"compilerOptions":{"strict":true}}')
+
+  const counts = new Map()
+  const buildGroup = fixtureBuilder(repositoryRoot, counts)
+  await prepare(config, buildGroup)
+  await writeFile(baseTsconfig, '{"compilerOptions":{"strict":false}}')
+
+  const stale = await inspectVisualRuntime(config)
+  assert.equal(stale.groups.find((group) => group.id === 'demo').fresh, false)
+  assert(
+    stale.groups
+      .find((group) => group.id === 'demo')
+      .reasons.includes('demo source fingerprint changed'),
+  )
+  assert.equal(stale.groups.find((group) => group.id === 'icons').fresh, true)
+  assert.equal(stale.groups.find((group) => group.id === 'wasm').fresh, true)
+
+  const rebuilt = await prepare(config, buildGroup)
+  assert.deepEqual(
+    rebuilt.actions.map(({ id, state }) => ({ id, state })),
+    [
+      { id: 'icons', state: 'reuse' },
+      { id: 'wasm', state: 'reuse' },
+      { id: 'demo', state: 'rebuild' },
+    ],
+  )
+  assert.deepEqual(Object.fromEntries(counts), { demo: 2, icons: 1, wasm: 1 })
+})
 
 test('prepares an empty runtime and writes a ready manifest', async (t) => {
   const { config, repositoryRoot } = await createWorkspace(t)

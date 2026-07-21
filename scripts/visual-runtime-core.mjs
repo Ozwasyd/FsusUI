@@ -440,7 +440,11 @@ export function createDefaultVisualRuntimeConfig(
           'package.json',
           'pnpm-lock.yaml',
           'scripts/vite-manual-chunks.mjs',
-          'vue/packages/demo-app',
+          'vue/tsconfig.base.json',
+          // The preview bundle resolves workspace package sources directly.
+          // Fingerprint every package source, not only the Demo app shell, so
+          // component and theme changes cannot reuse a stale visual runtime.
+          'vue/packages',
         ],
         runtimePath: 'demo-dist',
         sourceArtifactPath: 'vue/packages/demo-app/dist',
