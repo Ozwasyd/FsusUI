@@ -200,6 +200,10 @@ for (const [label, source] of [
   assert.ok(source.includes("from 'fast-glob'"), `${label} must use stable globbing`)
   assert.ok(!source.includes('globSync'), `${label} must not emit Node glob warnings`)
 }
+assert.ok(
+  capacityCliSource.includes('cwd: repoRoot'),
+  'unit discovery must be independent of the caller working directory'
+)
 assert.ok(verifyRunner.includes('Promise.all(batch.map(runTask))'))
 assert.ok(
   verifyRunner.includes(

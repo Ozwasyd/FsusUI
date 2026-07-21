@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 
 import { appendFileSync, readFileSync } from 'node:fs'
-import { pathToFileURL } from 'node:url'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import glob from 'fast-glob'
 import capacity from './ci-capacity.cjs'
+
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 
 export const {
   CAPACITY_PLAN_ENV,
@@ -30,7 +33,7 @@ export function countUnitTestFiles() {
       'vue/packages/**/__tests__/**/*.{test,spec,vitest}.{js,jsx,ts,tsx}',
       'vue/tests/boundary/**/*.{test,spec,vitest}.{js,jsx,ts,tsx}',
     ],
-    { ignore: ['**/node_modules/**'] },
+    { cwd: repoRoot, ignore: ['**/node_modules/**'] },
   ).length
 }
 
