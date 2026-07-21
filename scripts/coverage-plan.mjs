@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 import { appendFileSync } from 'node:fs'
-import { globSync } from 'node:fs'
 import { pathToFileURL } from 'node:url'
+import glob from 'fast-glob'
 import {
   formatCapacitySummary,
   probeCapacityHost,
@@ -36,8 +36,8 @@ function positiveNumber(value) {
 }
 
 export function countCoverageTestFiles() {
-  return globSync(COVERAGE_TEST_PATTERNS, {
-    exclude: ['**/node_modules/**'],
+  return glob.sync(COVERAGE_TEST_PATTERNS, {
+    ignore: ['**/node_modules/**'],
   }).length
 }
 

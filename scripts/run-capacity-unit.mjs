@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { globSync } from 'node:fs'
 import { spawn } from 'node:child_process'
+import glob from 'fast-glob'
 import {
   createCapacityPlan,
   createUnitMatrix,
@@ -10,12 +10,12 @@ import {
   serializeCapacityPlan,
 } from './ci-capacity.mjs'
 
-const unitTestFileCount = globSync(
+const unitTestFileCount = glob.sync(
   [
     'vue/packages/**/__tests__/**/*.{test,spec,vitest}.{js,jsx,ts,tsx}',
     'vue/tests/boundary/**/*.{test,spec,vitest}.{js,jsx,ts,tsx}',
   ],
-  { exclude: ['**/node_modules/**'] },
+  { ignore: ['**/node_modules/**'] },
 ).length
 const plan = createCapacityPlan(probeCapacityHost(), process.env, {
   unitTestFileCount,

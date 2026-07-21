@@ -29,6 +29,9 @@ assert.ok(
 assert.ok(scripts['governance:check']?.includes('check:coverage-sharding'))
 
 assert.ok(runner.includes('Promise.all('), 'local shards must run concurrently')
+assert.ok(runner.includes("from 'fast-glob'"), 'coverage must use stable globbing')
+assert.ok(planner.includes("from 'fast-glob'"), 'coverage plan must use stable globbing')
+assert.ok(!runner.includes('globSync') && !planner.includes('globSync'))
 assert.ok(
   !runner.includes('spawnSync'),
   'coverage shard runner must not use spawnSync',

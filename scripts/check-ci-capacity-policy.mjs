@@ -174,6 +174,8 @@ const workflow = readFileSync('.github/workflows/_quality.yml', 'utf8')
 const heapSource = readFileSync('scripts/with-node-heap.mjs', 'utf8')
 const visualSource = readFileSync('scripts/visual-capacity.cjs', 'utf8')
 const parallelismSource = readFileSync('scripts/test-parallelism.ts', 'utf8')
+const capacityCliSource = readFileSync('scripts/ci-capacity.mjs', 'utf8')
+const unitRunnerSource = readFileSync('scripts/run-capacity-unit.mjs', 'utf8')
 const verifyRunner = readFileSync('scripts/run-capacity-suite.mjs', 'utf8')
 assert.ok(packageJson.scripts['ci:capacity:plan']?.includes('--dry-run'))
 assert.ok(
@@ -187,6 +189,13 @@ assert.ok(!heapSource.includes('18_432'))
 assert.ok(heapSource.includes('resolveNodeHeapMiB'))
 assert.ok(visualSource.includes("require('./ci-capacity.cjs')"))
 assert.ok(parallelismSource.includes("from './ci-capacity.cjs'"))
+for (const [label, source] of [
+  ['capacity CLI', capacityCliSource],
+  ['unit runner', unitRunnerSource],
+]) {
+  assert.ok(source.includes("from 'fast-glob'"), `${label} must use stable globbing`)
+  assert.ok(!source.includes('globSync'), `${label} must not emit Node glob warnings`)
+}
 assert.ok(verifyRunner.includes('Promise.all(batch.map(runTask))'))
 assert.ok(workflow.includes('fromJSON(needs.capacity.outputs.unit-matrix)'))
 assert.ok(workflow.includes('FSUS_VITEST_WORKERS: ${{ matrix.workers }}'))

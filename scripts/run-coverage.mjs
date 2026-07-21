@@ -4,7 +4,6 @@ import { execFileSync, spawn } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { createRequire } from 'node:module'
 import {
-  globSync,
   mkdirSync,
   readFileSync,
   readdirSync,
@@ -13,6 +12,7 @@ import {
 } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
+import glob from 'fast-glob'
 import {
   assertFinalThresholdResult,
   sha256File,
@@ -74,8 +74,8 @@ function toolchainIdentity() {
 function selectionIdentity(extraArgs) {
   return {
     patterns: COVERAGE_TEST_PATTERNS,
-    files: globSync(COVERAGE_TEST_PATTERNS, {
-      exclude: ['**/node_modules/**'],
+    files: glob.sync(COVERAGE_TEST_PATTERNS, {
+      ignore: ['**/node_modules/**'],
     }).sort(),
     extraArgs,
   }

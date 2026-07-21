@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 import { appendFileSync, readFileSync } from 'node:fs'
-import { globSync } from 'node:fs'
 import { pathToFileURL } from 'node:url'
+import glob from 'fast-glob'
 import capacity from './ci-capacity.cjs'
 
 export const {
@@ -25,12 +25,12 @@ export const {
 } = capacity
 
 function countUnitTestFiles() {
-  return globSync(
+  return glob.sync(
     [
       'vue/packages/**/__tests__/**/*.{test,spec,vitest}.{js,jsx,ts,tsx}',
       'vue/tests/boundary/**/*.{test,spec,vitest}.{js,jsx,ts,tsx}',
     ],
-    { exclude: ['**/node_modules/**'] },
+    { ignore: ['**/node_modules/**'] },
   ).length
 }
 
