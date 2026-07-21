@@ -24,7 +24,7 @@ export const {
   validateCapacityPlan,
 } = capacity
 
-function countUnitTestFiles() {
+export function countUnitTestFiles() {
   return glob.sync(
     [
       'vue/packages/**/__tests__/**/*.{test,spec,vitest}.{js,jsx,ts,tsx}',

@@ -197,6 +197,12 @@ for (const [label, source] of [
   assert.ok(!source.includes('globSync'), `${label} must not emit Node glob warnings`)
 }
 assert.ok(verifyRunner.includes('Promise.all(batch.map(runTask))'))
+assert.ok(
+  verifyRunner.includes(
+    'resolveCapacityPlan({ unitTestFileCount: countUnitTestFiles() })'
+  ),
+  'suite scheduler must plan from the authoritative unit workload'
+)
 assert.ok(workflow.includes('fromJSON(needs.capacity.outputs.unit-matrix)'))
 assert.ok(workflow.includes('FSUS_VITEST_WORKERS: ${{ matrix.workers }}'))
 assert.ok(!workflow.includes("shard: ['1/4', '2/4', '3/4', '4/4']"))

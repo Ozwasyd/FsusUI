@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 
 import { spawn } from 'node:child_process'
-import { formatCapacitySummary, resolveCapacityPlan } from './ci-capacity.mjs'
+import {
+  countUnitTestFiles,
+  formatCapacitySummary,
+  resolveCapacityPlan,
+} from './ci-capacity.mjs'
 
 const suites = {
   'pr-fast': [
@@ -60,7 +64,7 @@ if (!suiteName || !suites[suiteName]) {
   process.exit(1)
 }
 
-const plan = resolveCapacityPlan()
+const plan = resolveCapacityPlan({ unitTestFileCount: countUnitTestFiles() })
 const capacity = plan.budgets.parallelLaneLimit
 
 function taskWeight(task) {
