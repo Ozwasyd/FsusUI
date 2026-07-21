@@ -31,6 +31,18 @@ const previewConfig = readFileSync('vue/playwright.config.ts', 'utf8')
 const devConfig = readFileSync('vue/playwright.dev.config.ts', 'utf8')
 const testParallelism = readFileSync('scripts/test-parallelism.ts', 'utf8')
 const auditSpec = readFileSync('vue/tests/visual/ui-audit-all.spec.ts', 'utf8')
+const auditRetrySpec = readFileSync(
+  'vue/tests/visual-retry/ui-audit-retry-contract.spec.ts',
+  'utf8',
+)
+const auditRetryConfig = readFileSync(
+  'vue/playwright.audit-retry.config.ts',
+  'utf8',
+)
+const auditRetryRunner = readFileSync(
+  'scripts/run-visual-audit-retry-contract.mjs',
+  'utf8',
+)
 const smokeThemeSwitchSpec = readFileSync(
   'vue/tests/visual/smoke-theme-switch.spec.ts',
   'utf8',
@@ -414,6 +426,32 @@ assert(
     auditFixture.includes("'data-audit-ready': 'true'") &&
     auditFixture.includes("'data-audit-state': auditState.value"),
   'UI audit fixture and screenshot namespace must bind suite/project/state/component readiness',
+)
+assert(
+  scripts['test:visual:audit-retry-contract']?.includes(
+    'scripts/run-visual-audit-retry-contract.mjs',
+  ) &&
+    auditRetryConfig.includes('fullyParallel: true') &&
+    auditRetryConfig.includes(
+      'workers: Math.min(2, resolveVisualPreviewWorkers())',
+    ) &&
+    auditRetryConfig.includes('retries: 1'),
+  'UI audit must expose a two-worker browser retry contract',
+)
+assert(
+  auditRetrySpec.includes('fitVisualAuditBucketCount') &&
+    auditRetrySpec.includes('partitionVisualAuditComponents') &&
+    auditRetrySpec.includes('FSUS_VISUAL_CAPACITY_PLAN') &&
+    auditRetrySpec.includes("buildVisualUrl('ui-states'") &&
+    auditRetrySpec.includes('testInfo.retry === 0'),
+  'retry contract must use the real adaptive audit page and inject one first-attempt bucket failure',
+)
+assert(
+  auditRetryRunner.includes('validateVisualAuditRetryResults') &&
+    auditRetryRunner.includes('delete environment.NO_COLOR') &&
+    auditRetryRunner.includes('first-attempt bucket intervals must overlap') &&
+    auditRetryRunner.includes('the unaffected bucket must run exactly once'),
+  'retry contract runner must prove concurrent buckets and isolated retry attempts',
 )
 assert(
   !/(?:previewWorkers|devWorkers|auditBucketCount)\s*[:=][^\n]*cpus\(\)\.length/u.test(

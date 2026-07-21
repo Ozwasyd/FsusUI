@@ -35,6 +35,7 @@
     "test:visual:project": "node ./scripts/with-node-heap.mjs node ./scripts/run-visual-tests.mjs --suite=preview --project",
     "test:visual:plan": "node ./scripts/with-node-heap.mjs node ./scripts/run-visual-tests.mjs --profile=full --dry-run",
     "test:visual:evidence": "node ./scripts/with-node-heap.mjs node ./scripts/run-visual-tests.mjs --profile=evidence",
+    "test:visual:audit-retry-contract": "node ./scripts/with-node-heap.mjs node ./scripts/run-visual-audit-retry-contract.mjs",
     "verify:visual:affected": "pnpm run test:visual:affected",
     "verify:visual:evidence": "pnpm run test:visual:evidence",
     "visual:capacity": "node ./scripts/with-node-heap.mjs node ./scripts/visual-capacity.mjs --dry-run",
