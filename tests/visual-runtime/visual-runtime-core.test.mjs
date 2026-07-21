@@ -70,6 +70,7 @@ test('default Demo runtime invalidates when its base tsconfig changes', async (t
   const defaultDemo = defaultConfig.groups.find((group) => group.id === 'demo')
 
   assert(defaultDemo)
+  assert.deepEqual(defaultDemo.excludedInputPaths, ['vue/packages/wasm/build'])
   assert(defaultDemo.inputPaths.includes('vue/packages'))
   assert(defaultDemo.inputPaths.includes('vue/tsconfig.base.json'))
   assert(!defaultDemo.inputPaths.includes('vue/packages/demo-app'))
@@ -105,6 +106,63 @@ test('default Demo runtime invalidates when its base tsconfig changes', async (t
     ],
   )
   assert.deepEqual(Object.fromEntries(counts), { demo: 2, icons: 1, wasm: 1 })
+})
+
+test('cold preparation ignores owned WASM build output and then reuses every layer', async (t) => {
+  const { config, repositoryRoot } = await createWorkspace(t)
+  const demo = config.groups.find((group) => group.id === 'demo')
+  demo.inputPaths.push('vue/packages')
+  demo.excludedInputPaths = ['vue/packages/wasm/build']
+
+  const wasmPackage = join(repositoryRoot, 'vue', 'packages', 'wasm')
+  const wasmSource = join(wasmPackage, 'src', 'decoder.ts')
+  const generatedBuild = join(wasmPackage, 'build')
+  await mkdir(join(wasmPackage, 'src'), { recursive: true })
+  await writeFile(wasmSource, 'export const decoder = "source-v1"\n')
+  await assert.rejects(readFile(join(generatedBuild, 'decoder.js')))
+
+  const counts = new Map()
+  const buildFixtureGroup = fixtureBuilder(repositoryRoot, counts)
+  const buildGroup = async (group) => {
+    await buildFixtureGroup(group)
+    if (group.id === 'wasm') {
+      await mkdir(generatedBuild, { recursive: true })
+      await writeFile(
+        join(generatedBuild, 'decoder.js'),
+        'export const generated = true\n',
+      )
+    }
+  }
+
+  const first = await prepare(config, buildGroup)
+  assert.equal(first.inspection.ready, true)
+  assert.deepEqual(
+    first.actions.map(({ id, state }) => ({ id, state })),
+    [
+      { id: 'icons', state: 'rebuild' },
+      { id: 'wasm', state: 'rebuild' },
+      { id: 'demo', state: 'rebuild' },
+    ],
+  )
+
+  const second = await prepare(config, buildGroup)
+  assert.deepEqual(
+    second.actions.map(({ id, state }) => ({ id, state })),
+    [
+      { id: 'icons', state: 'reuse' },
+      { id: 'wasm', state: 'reuse' },
+      { id: 'demo', state: 'reuse' },
+    ],
+  )
+  assert.deepEqual(Object.fromEntries(counts), { demo: 1, icons: 1, wasm: 1 })
+
+  await writeFile(wasmSource, 'export const decoder = "source-v2"\n')
+  const stale = await inspectVisualRuntime(config)
+  assert(
+    stale.groups
+      .find((group) => group.id === 'demo')
+      .reasons.includes('demo source fingerprint changed'),
+  )
 })
 
 test('prepares an empty runtime and writes a ready manifest', async (t) => {

@@ -21,6 +21,7 @@ import {
   createSmokeSelection,
   loadVisualProfileRegistry,
 } from './visual-profiles.mjs'
+import { createDefaultVisualRuntimeConfig } from './visual-runtime-core.mjs'
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
 const scripts = packageJson.scripts ?? {}
@@ -63,6 +64,7 @@ const capacityFixture = JSON.parse(
 )
 const capacityPlan = createVisualCapacityPlan(capacityFixture)
 const profileRegistry = loadVisualProfileRegistry()
+const visualRuntimeConfig = createDefaultVisualRuntimeConfig(process.cwd())
 
 function assert(condition, message) {
   if (!condition) throw new Error(message)
@@ -287,6 +289,13 @@ assert(
     ) &&
     evidencePolicy.includes("trace: evidence ? 'on' : 'retain-on-failure'"),
   'visual evidence policy must keep normal success artifacts out of reports',
+)
+assert(
+  JSON.stringify(
+    visualRuntimeConfig.groups.find((group) => group.id === 'demo')
+      ?.excludedInputPaths,
+  ) === JSON.stringify(['vue/packages/wasm/build']),
+  'Demo runtime inputs must exclude only the generated WASM build tree',
 )
 assert(
   visualJob.includes("FSUS_VISUAL_EVIDENCE: ${{ inputs.group == 'release'") &&

@@ -54,7 +54,16 @@ async function pathState(file) {
   }
 }
 
-async function collectPathEntries(base, target, label, entries, missing) {
+async function collectPathEntries(
+  base,
+  target,
+  label,
+  entries,
+  missing,
+  excludedPaths,
+) {
+  if (excludedPaths.has(label)) return
+
   const state = await pathState(target)
   if (!state) {
     missing.push(label)
@@ -84,17 +93,36 @@ async function collectPathEntries(base, target, label, entries, missing) {
   for (const child of children) {
     const childTarget = join(target, child.name)
     const childLabel = posixPath(join(label, child.name))
-    await collectPathEntries(base, childTarget, childLabel, entries, missing)
+    await collectPathEntries(
+      base,
+      childTarget,
+      childLabel,
+      entries,
+      missing,
+      excludedPaths,
+    )
   }
 }
 
-export async function fingerprintPaths(base, paths) {
+export async function fingerprintPaths(base, paths, options = {}) {
   const entries = []
   const missing = []
+  const excludedPaths = new Set(
+    (options.excludedPaths ?? []).map((path) =>
+      posixPath(isAbsolute(path) ? relative(base, path) : path),
+    ),
+  )
   for (const path of [...paths].sort()) {
     const target = isAbsolute(path) ? path : resolve(base, path)
     const label = isAbsolute(path) ? posixPath(relative(base, path)) : path
-    await collectPathEntries(base, target, posixPath(label), entries, missing)
+    await collectPathEntries(
+      base,
+      target,
+      posixPath(label),
+      entries,
+      missing,
+      excludedPaths,
+    )
   }
 
   const hash = createHash('sha256')
@@ -116,6 +144,9 @@ const hashJson = (value) =>
 function normalizedGroup(config, group) {
   return {
     ...group,
+    excludedInputPaths: [...(group.excludedInputPaths ?? [])]
+      .map(posixPath)
+      .sort(),
     inputPaths: [...group.inputPaths].map(posixPath).sort(),
     runtimePath: posixPath(group.runtimePath),
     sourceArtifactPath: posixPath(group.sourceArtifactPath),
@@ -133,6 +164,7 @@ function configurationFingerprint(config) {
   return hashJson({
     groups: config.groups.map((group) => ({
       command: group.command,
+      excludedInputPaths: group.excludedInputPaths,
       id: group.id,
       inputPaths: group.inputPaths,
       runtimePath: group.runtimePath,
@@ -206,6 +238,7 @@ export async function inspectVisualRuntime(rawConfig) {
     const source = await fingerprintPaths(
       config.repositoryRoot,
       group.inputPaths,
+      { excludedPaths: group.excludedInputPaths },
     )
     const reasons = [...globalReasons]
     const manifestGroup = manifest?.groups?.[group.id]
@@ -436,6 +469,11 @@ export function createDefaultVisualRuntimeConfig(
       {
         command: ['pnpm', 'run', '-C', 'vue/packages/demo-app', 'build'],
         id: 'demo',
+        excludedInputPaths: [
+          // ensure:wasm owns this generated tree. It may be created after the
+          // Demo source is inspected during a first cold preparation.
+          'vue/packages/wasm/build',
+        ],
         inputPaths: [
           'package.json',
           'pnpm-lock.yaml',
