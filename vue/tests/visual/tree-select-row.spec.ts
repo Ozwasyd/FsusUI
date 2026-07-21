@@ -19,6 +19,13 @@ test('TreeSelect renders one coherent navigation row', async ({
     .locator('.el-tree-node__content', { hasText: 'Level one 1' })
     .first()
   await expect(row).toBeVisible()
+  const option = row.locator('.el-select-dropdown__item')
+  await expect(option).toHaveClass(/selected/)
+  await expect
+    .poll(() =>
+      row.evaluate((element) => getComputedStyle(element).backgroundColor),
+    )
+    .not.toBe('rgba(0, 0, 0, 0)')
   await row.hover()
   await expect
     .poll(() =>

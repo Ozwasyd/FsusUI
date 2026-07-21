@@ -58,7 +58,19 @@ describe('TreeSelect row contract', () => {
     expect(
       ruleBody(
         css,
+        '.el-tree-select__popper .el-tree .el-tree-node__content:has(> .el-select-dropdown__item.hover)',
+      ),
+    ).toContain('background: var(--fsus-state-hover-bg);')
+    expect(
+      ruleBody(
+        css,
         '.el-tree-select__popper .el-tree .el-tree-node.is-current > .el-tree-node__content',
+      ),
+    ).toContain('background: var(--fsus-state-selected-bg);')
+    expect(
+      ruleBody(
+        css,
+        '.el-tree-select__popper .el-tree .el-tree-node__content:has(> .el-select-dropdown__item.selected)',
       ),
     ).toContain('background: var(--fsus-state-selected-bg);')
 

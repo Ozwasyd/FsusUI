@@ -73,6 +73,17 @@
       color: var(--fsus-scholarly-blue);
     }
 
+    // Select owns its managed hover/selected state on the nested option.
+    // Mirror that state onto the coherent TreeSelect row so a popper
+    // reposition cannot leave the row transparent after pointer hover.
+    .#{$namespace}-tree
+      .#{$namespace}-tree-node__content:has(
+        > .#{$namespace}-select-dropdown__item.hover
+      ) {
+      background: var(--fsus-state-hover-bg);
+      color: var(--fsus-scholarly-blue);
+    }
+
     .#{$namespace}-tree-node__expand-icon {
       width: var(--el-tree-select-row-expand-size);
       height: var(--el-tree-select-row-height);
@@ -133,6 +144,15 @@
     .#{$namespace}-tree
       .#{$namespace}-tree-node.is-current
       > .#{$namespace}-tree-node__content {
+      background: var(--fsus-state-selected-bg);
+      color: var(--fsus-scholarly-blue);
+      font-weight: inherit;
+    }
+
+    .#{$namespace}-tree
+      .#{$namespace}-tree-node__content:has(
+        > .#{$namespace}-select-dropdown__item.selected
+      ) {
       background: var(--fsus-state-selected-bg);
       color: var(--fsus-scholarly-blue);
       font-weight: inherit;
