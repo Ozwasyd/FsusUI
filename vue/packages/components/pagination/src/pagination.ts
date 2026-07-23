@@ -427,7 +427,11 @@ export default defineComponent({
                 disabled: props.disabled,
               }),
             ),
-            h('span', { class: ns.e('full-pager') }, TEMPLATE_MAP.pager),
+            h(
+              'span',
+              { class: ns.e('full-pager') },
+              TEMPLATE_MAP.pager ?? undefined,
+            ),
           )
         }
         if (requested.has('next')) navigationChildren.push(TEMPLATE_MAP.next)
