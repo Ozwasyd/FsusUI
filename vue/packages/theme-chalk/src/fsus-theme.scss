@@ -2534,11 +2534,11 @@ button.#{$namespace}-card:active {
 }
 
 .#{$namespace}-step__icon {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   font-size: 14px;
   font-weight: 700;
-  border-width: 1.5px;
+  border-width: 2px;
   border-color: var(--el-border-color-light);
   background: var(--el-bg-color);
 }

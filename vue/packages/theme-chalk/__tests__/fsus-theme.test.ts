@@ -83,6 +83,46 @@ describe('Fsus theme visual baseline', () => {
     expect(css).not.toMatch(/\bfloat:/)
   })
 
+  test('keeps responsive steps on container-owned geometry and spacing', () => {
+    const stepsCss = compileThemeFile('steps.scss')
+    const stepCss = compileThemeFile('step.scss')
+    const integratedCss = compileThemeFile('fsus-theme.scss')
+
+    expectCssRule(stepsCss, '.el-steps', [
+      'container-type: inline-size;',
+      'display: flex;',
+      'list-style: none;',
+    ])
+    expectCssRule(stepsCss, '.el-steps--vertical', [
+      'flex-flow: column;',
+      'gap: 16px;',
+    ])
+    expectCssRule(stepCss, '.el-step__icon', ['width: 32px;', 'height: 32px;'])
+    expectCssRule(stepCss, '.el-step__title', [
+      'font-size: 14px;',
+      'font-weight: 500;',
+      'line-height: 20px;',
+    ])
+    expectCssRule(stepCss, '.el-step__description', [
+      'margin-top: 4px;',
+      'padding: 0;',
+      'font-size: 13px;',
+      'line-height: 1.5;',
+    ])
+    expectCssRule(stepCss, '.el-step.is-clickable .el-step__content', [
+      'min-width: 40px;',
+      'min-height: 40px;',
+    ])
+    expectCssRule(integratedCss, '.el-step__icon', [
+      'width: 32px;',
+      'height: 32px;',
+      'border-width: 2px;',
+    ])
+    expect(stepCss).not.toMatch(/margin-top:\s*-\d/)
+    expect(stepCss).not.toMatch(/padding-(?:left|right):\s*\d+%/)
+    expect(stepCss).not.toMatch(/linear-gradient|radial-gradient|drop-shadow/)
+  })
+
   test('exposes a public touch-target modifier for radio button groups', () => {
     const css = compileThemeFile('radio-button.scss')
 

@@ -23,8 +23,8 @@ export const stepsProps = buildProps({
    */
   direction: {
     type: String,
-    default: 'horizontal',
-    values: ['horizontal', 'vertical'],
+    default: 'auto',
+    values: ['horizontal', 'vertical', 'auto'],
   },
   /**
    * @description whether to apply simple theme

@@ -123,11 +123,43 @@
     </div>
     <div class="demo-block">
       <h3>Steps & Step</h3>
-      <el-steps :active="1">
-        <el-step title="撰写" description="整理正文与封面" />
-        <el-step title="复核" description="检查摘要和权限" />
-        <el-step title="发布" description="同步到公开站点" />
-      </el-steps>
+      <div data-testid="steps-description">
+        <el-steps :active="1">
+          <el-step title="撰写" description="整理正文与封面" />
+          <el-step
+            title="复核"
+            description="检查摘要和权限"
+            clickable
+            @click="stepClicks += 1"
+          />
+          <el-step
+            title="发布"
+            description="同步到公开站点并确认 Long Latin destination 完整可见"
+          />
+        </el-steps>
+      </div>
+      <div class="navigation-steps-fixtures">
+        <div data-testid="steps-compact">
+          <el-steps :active="0">
+            <el-step title="起草" clickable @click="stepClicks += 1" />
+            <el-step title="发布" />
+          </el-steps>
+        </div>
+        <div data-testid="steps-six">
+          <el-steps :active="2">
+            <el-step title="收集资料" description="确认引用来源" />
+            <el-step title="整理结构" description="建立文章提纲" />
+            <el-step title="撰写正文" description="完成长篇中英文内容草稿" />
+            <el-step title="编辑复核" description="检查措辞、链接与权限" />
+            <el-step title="发布预览" description="确认窄屏与宽屏阅读效果" />
+            <el-step
+              title="正式发布"
+              description="同步公开站点并写入审计记录"
+            />
+          </el-steps>
+        </div>
+      </div>
+      <output data-testid="step-click-count">{{ stepClicks }}</output>
     </div>
     <div class="demo-block demo-backtop-block">
       <h3>Backtop</h3>
@@ -142,7 +174,9 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { ArrowDown, ArrowRight, useDemoState } from '../demo-state'
 
 const { activeTab, goBack } = useDemoState()
+const stepClicks = ref(0)
 </script>
