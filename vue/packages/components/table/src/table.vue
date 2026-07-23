@@ -21,6 +21,7 @@
       className,
       ns.b(),
       ns.m(`layout-${tableLayout}`),
+      ns.m(`responsive-${responsive}`),
     ]"
     :style="style"
     :data-prefix="ns.namespace.value"
@@ -57,12 +58,20 @@
           />
         </table>
       </div>
-      <div ref="bodyWrapper" :class="ns.e('body-wrapper')">
+      <div
+        ref="bodyWrapper"
+        :class="ns.e('body-wrapper')"
+        :tabindex="responsive === 'scroll' ? 0 : undefined"
+        :role="responsive === 'scroll' ? 'region' : undefined"
+        :aria-label="responsive === 'scroll' ? scrollAriaLabel : undefined"
+        @keydown="handleResponsiveScrollKeydown"
+      >
         <el-scrollbar
           ref="scrollBarRef"
           :view-style="scrollbarViewStyle"
           :wrap-style="scrollbarStyle"
           :always="scrollbarAlwaysOn"
+          @scroll="handleResponsiveScroll"
         >
           <table
             ref="tableBody"
@@ -126,6 +135,14 @@
             <slot name="append" />
           </div>
         </el-scrollbar>
+        <span
+          v-if="responsive === 'scroll'"
+          :class="[
+            ns.e('scroll-affordance'),
+            ns.is('consumed', responsiveHasScrolled),
+          ]"
+          aria-hidden="true"
+        />
       </div>
       <div
         v-if="showSummary && tableLayout === 'fixed'"
@@ -166,7 +183,13 @@
 
 <script lang="ts">
 // @ts-nocheck
-import { computed, defineComponent, getCurrentInstance, provide } from 'vue'
+import {
+  computed,
+  defineComponent,
+  getCurrentInstance,
+  provide,
+  ref,
+} from 'vue'
 import { debounce } from 'lodash-unified'
 import { Mousewheel } from '@element-plus/directives'
 import { useLocale, useNamespace } from '@element-plus/hooks'
@@ -219,8 +242,9 @@ export default defineComponent({
     'current-change',
     'header-dragend',
     'expand-change',
+    'scroll',
   ],
-  setup(props) {
+  setup(props, { emit }) {
     type Row = (typeof props.data)[number]
     const { t } = useLocale()
     const ns = useNamespace('table')
@@ -276,6 +300,25 @@ export default defineComponent({
 
     const { scrollBarRef, scrollTo, setScrollLeft, setScrollTop } =
       useScrollbar()
+    const responsiveHasScrolled = ref(false)
+    const handleResponsiveScroll = ({
+      scrollLeft,
+      scrollTop,
+    }: {
+      scrollLeft: number
+      scrollTop: number
+    }) => {
+      if (scrollLeft > 0) responsiveHasScrolled.value = true
+      emit('scroll', { scrollLeft, scrollTop })
+    }
+    const handleResponsiveScrollKeydown = (event: KeyboardEvent) => {
+      if (props.responsive !== 'scroll') return
+      if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return
+      const wrap = scrollBarRef.value?.wrapRef
+      if (!wrap) return
+      event.preventDefault()
+      setScrollLeft(wrap.scrollLeft + (event.key === 'ArrowRight' ? 80 : -80))
+    }
 
     const debouncedUpdateLayout = debounce(doLayout, 50)
 
@@ -339,6 +382,9 @@ export default defineComponent({
       scrollTo,
       setScrollLeft,
       setScrollTop,
+      responsiveHasScrolled,
+      handleResponsiveScroll,
+      handleResponsiveScrollKeydown,
       refresh: refreshData,
       getLayoutDiagnostics: store.getLayoutDiagnostics,
     }

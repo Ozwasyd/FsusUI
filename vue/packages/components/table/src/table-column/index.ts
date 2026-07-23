@@ -42,7 +42,7 @@ export default defineComponent({
 
     const { registerNormalWatchers, registerComplexWatchers } = useWatcher(
       owner,
-      props
+      props,
     )
     const {
       columnId,
@@ -103,6 +103,7 @@ export default defineComponent({
         'formatter',
         'fixed',
         'resizable',
+        'priority',
       ]
       const sortProps = ['sortMethod', 'sortBy', 'sortOrders']
       const selectProps = ['selectable', 'reserveSelection']
@@ -122,7 +123,7 @@ export default defineComponent({
       const chains = compose(
         setColumnRenders,
         setColumnWidth,
-        setColumnForcedProps
+        setColumnForcedProps,
       )
       column = chains(column)
       columnConfig.value = column
@@ -145,7 +146,7 @@ export default defineComponent({
           'insertColumn',
           columnConfig.value,
           isSubColumn.value ? parent.columnConfig.value : null,
-          updateColumnOrder
+          updateColumnOrder,
         )
     })
     onBeforeUnmount(() => {
@@ -153,7 +154,7 @@ export default defineComponent({
         'removeColumn',
         columnConfig.value,
         isSubColumn.value ? parent.columnConfig.value : null,
-        updateColumnOrder
+        updateColumnOrder,
       )
     })
     instance.columnId = columnId.value

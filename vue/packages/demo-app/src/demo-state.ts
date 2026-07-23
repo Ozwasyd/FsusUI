@@ -80,11 +80,21 @@ export const createDemoState = () => {
     {
       date: '2016-05-03',
       name: 'Tom',
+      author: '青砚',
+      status: '已发布',
+      category: '研究笔记',
+      views: 12840,
+      identifier: 'research-note-2016-05-03-long-identifier',
       address: 'No. 189, Grove St, Los Angeles',
     },
     {
       date: '2016-05-02',
       name: 'John',
+      author: 'Lin',
+      status: '草稿',
+      category: '随笔',
+      views: 320,
+      identifier: 'draft-2016-05-02',
       address: 'No. 189, Grove St, Los Angeles',
     },
   ]

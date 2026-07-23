@@ -16,6 +16,7 @@ import { TABLE_INJECTION_KEY } from '../tokens'
 import useEvent from './event-helper'
 import useStyle from './style.helper'
 import useUtils from './utils-helper'
+import { resolveTableColumnPriority } from '../responsive'
 import type { ComponentInternalInstance, PropType, Ref } from 'vue'
 import type { DefaultRow, Sort } from '../table/defaults'
 import type { Store } from '../store'
@@ -87,7 +88,7 @@ export default defineComponent({
       getHeaderCellClass,
     } = useStyle(props as TableHeaderProps<unknown>)
     const { isGroup, toggleAllSelection, columnRows } = useUtils(
-      props as TableHeaderProps<unknown>
+      props as TableHeaderProps<unknown>,
     )
 
     instance.state = {
@@ -160,7 +161,7 @@ export default defineComponent({
                   rowIndex,
                   cellIndex,
                   subColumns,
-                  column
+                  column,
                 ),
                 colspan: column.colSpan,
                 key: `${column.id}-thead`,
@@ -169,7 +170,11 @@ export default defineComponent({
                   rowIndex,
                   cellIndex,
                   subColumns,
-                  column
+                  column,
+                ),
+                'data-responsive-priority': resolveTableColumnPriority(
+                  store.states.columns.value,
+                  column,
                 ),
                 onClick: ($event) => handleHeaderClick($event, column),
                 onContextmenu: ($event) =>
@@ -216,7 +221,7 @@ export default defineComponent({
                               handleSortClick($event, column, 'descending'),
                             class: 'sort-caret descending',
                           }),
-                        ]
+                        ],
                       ),
                     column.filterable &&
                       h(FilterPanel, {
@@ -227,13 +232,13 @@ export default defineComponent({
                           column[key] = value
                         },
                       }),
-                  ]
+                  ],
                 ),
-              ]
+              ],
             )
-          })
-        )
-      )
+          }),
+        ),
+      ),
     )
   },
 })

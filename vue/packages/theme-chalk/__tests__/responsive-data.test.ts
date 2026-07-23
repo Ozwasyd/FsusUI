@@ -28,4 +28,16 @@ describe('responsive data component contracts', () => {
     expect(css).toContain('overflow-wrap: anywhere;')
     expect(css).toContain('width: 22px;')
   })
+
+  test('Table preserves hidden columns in flat row details or explicit scroll', () => {
+    const css = compileThemeFile('table.scss')
+
+    expect(css).toContain('@container (max-width: 639px)')
+    expect(css).toContain('col[data-responsive-priority=secondary]')
+    expect(css).toContain('.el-table__responsive-detail-row.is-expanded')
+    expect(css).toContain('min-width: 40px;')
+    expect(css).toContain('min-height: 40px;')
+    expect(css).toContain('.el-table--responsive-scroll')
+    expect(css).toContain('width: 22px;')
+  })
 })

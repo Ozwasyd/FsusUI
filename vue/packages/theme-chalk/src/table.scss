@@ -19,6 +19,7 @@
   background-color: getCssVar('table-bg-color');
   font-size: getCssVar('font-size', 'base');
   color: getCssVar('table-text-color');
+  container-type: inline-size;
 
   @include e(inner-wrapper) {
     position: relative;
@@ -666,6 +667,151 @@
     > .#{$namespace}-table__inner-wrapper {
       &::after {
         content: none;
+      }
+    }
+  }
+
+  @include e(scroll-affordance) {
+    position: absolute;
+    z-index: calc(getCssVar('table-index') + 3);
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 22px;
+    pointer-events: none;
+    background: linear-gradient(
+      to right,
+      transparent,
+      getCssVar('table-bg-color')
+    );
+    transition: opacity getCssVar('transition-duration');
+
+    @include when(consumed) {
+      opacity: 0;
+    }
+  }
+
+  @include m(responsive-scroll) {
+    .#{$namespace}-table__body-wrapper:focus-visible {
+      outline: 2px solid getCssVar('color-primary');
+      outline-offset: -2px;
+    }
+  }
+
+  @include e(responsive-toggle) {
+    display: none;
+    min-width: 40px;
+    min-height: 40px;
+    margin-inline-start: auto;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 6px;
+    color: getCssVar('color-primary');
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid getCssVar('color-primary');
+      outline-offset: 2px;
+    }
+  }
+
+  @include e(responsive-detail-row) {
+    display: none;
+  }
+
+  @include e(responsive-detail-cell) {
+    padding: 0 12px 12px !important;
+  }
+
+  @include e(responsive-detail-list) {
+    margin: 0;
+    padding: 0;
+  }
+
+  @include e(responsive-detail-field) {
+    padding: 8px 0;
+    border-top: getCssVar('table-border');
+  }
+
+  @include e(responsive-detail-label) {
+    margin: 0 0 4px;
+    color: getCssVar('text-color', 'secondary');
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  @include e(responsive-detail-value) {
+    margin: 0;
+    color: getCssVar('table-text-color');
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+
+    .cell {
+      padding: 0;
+      overflow: visible;
+      text-overflow: clip;
+    }
+  }
+
+  @container (max-width: 639px) {
+    &.#{$namespace}-table--responsive-auto,
+    &.#{$namespace}-table--responsive-priority {
+      .#{$namespace}-table__header,
+      .#{$namespace}-table__body,
+      .#{$namespace}-table__footer {
+        width: 100% !important;
+        table-layout: auto !important;
+      }
+
+      col[data-responsive-priority='secondary'],
+      col[data-responsive-priority='detail'],
+      th[data-responsive-priority='secondary'],
+      th[data-responsive-priority='detail'],
+      td[data-responsive-priority='secondary'],
+      td[data-responsive-priority='detail'] {
+        display: none;
+      }
+
+      .#{$namespace}-table-fixed-column--left,
+      .#{$namespace}-table-fixed-column--right {
+        position: static !important;
+      }
+
+      .#{$namespace}-table__cell {
+        padding-block: 10px;
+
+        .cell {
+          display: flex;
+          min-width: 0;
+          align-items: center;
+          padding-inline: 12px;
+          font-size: 14px;
+        }
+
+        button,
+        .#{$namespace}-button {
+          min-width: 40px;
+          min-height: 40px;
+        }
+      }
+
+      .#{$namespace}-table__responsive-toggle {
+        display: inline-flex;
+        flex: 0 0 40px;
+      }
+
+      .#{$namespace}-table__responsive-detail-row.is-expanded {
+        display: table-row;
+      }
+
+      .#{$namespace}-table__responsive-detail-cell {
+        display: table-cell;
       }
     }
   }

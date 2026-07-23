@@ -89,6 +89,7 @@ type CellStyle<T> =
       columnIndex: number
     }) => CSSProperties)
 type Layout = 'fixed' | 'auto'
+type ResponsiveMode = 'none' | 'auto' | 'priority' | 'scroll'
 export type TableDataChangeStrategy = 'identity' | 'version' | 'manual' | 'deep'
 interface TableProps<T> {
   data: T[]
@@ -149,6 +150,9 @@ interface TableProps<T> {
   scrollbarAlwaysOn?: boolean
   flexible?: boolean
   showOverflowTooltip?: boolean | TableOverflowTooltipOptions
+  responsive?: ResponsiveMode
+  responsiveDetailsLabel?: string
+  scrollAriaLabel?: string
 }
 
 interface Sort {
@@ -285,6 +289,20 @@ export default {
   showOverflowTooltip: [Boolean, Object] as PropType<
     TableProps<DefaultRow>['showOverflowTooltip']
   >,
+  responsive: {
+    type: String as PropType<ResponsiveMode>,
+    default: 'none',
+    validator: (value: string) =>
+      ['none', 'auto', 'priority', 'scroll'].includes(value),
+  },
+  responsiveDetailsLabel: {
+    type: String,
+    default: 'Show row details',
+  },
+  scrollAriaLabel: {
+    type: String,
+    default: 'Scrollable data table',
+  },
 }
 export type {
   SummaryMethod,
@@ -300,4 +318,5 @@ export type {
   Sort,
   Filter,
   TableColumnCtx,
+  ResponsiveMode,
 }

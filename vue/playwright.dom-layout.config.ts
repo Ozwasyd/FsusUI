@@ -22,6 +22,9 @@ export default defineConfig({
   },
   use: {
     baseURL: domLayoutBaseUrl,
+    launchOptions: process.env.FSUS_PLAYWRIGHT_EXECUTABLE_PATH
+      ? { executablePath: process.env.FSUS_PLAYWRIGHT_EXECUTABLE_PATH }
+      : undefined,
     locale: 'zh-CN',
     timezoneId: 'Asia/Shanghai',
     colorScheme: 'light',
@@ -65,8 +68,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command:
-      `pnpm -C .. run build:demo && pnpm -C packages/demo-app exec vite preview --host 127.0.0.1 --port ${domLayoutPort} --strictPort`,
+    command: `pnpm -C .. run build:demo && pnpm -C packages/demo-app exec vite preview --host 127.0.0.1 --port ${domLayoutPort} --strictPort`,
     url: domLayoutBaseUrl,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

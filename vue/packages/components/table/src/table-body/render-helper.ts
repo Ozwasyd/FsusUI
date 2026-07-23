@@ -1,9 +1,13 @@
 // @ts-nocheck
-import { computed, h, inject } from 'vue'
+import { computed, h, inject, ref } from 'vue'
 import { merge } from 'lodash-unified'
 import { useNamespace } from '@element-plus/hooks'
 import { getRowIdentity } from '../util'
 import { TABLE_INJECTION_KEY } from '../tokens'
+import {
+  getResponsiveDetailColumns,
+  resolveTableColumnPriority,
+} from '../responsive'
 import useEvents from './events-helper'
 import useStyles from './styles-helper'
 import type { TableBodyProps } from './defaults'
@@ -33,7 +37,19 @@ function useRender<T>(props: Partial<TableBodyProps<T>>) {
   } = useStyles(props)
   const firstDefaultColumnIndex = computed(() => {
     return props.store.states.columns.value.findIndex(
-      ({ type }) => type === 'default'
+      ({ type }) => type === 'default',
+    )
+  })
+  const isPriorityResponsive = computed(() =>
+    ['auto', 'priority'].includes(parent.props.responsive),
+  )
+  const responsiveExpandedRows = ref(new Set<string>())
+  const responsiveToggleColumn = computed(() => {
+    const columns = props.store.states.columns.value
+    return columns.find(
+      (column) =>
+        column.type === 'default' &&
+        resolveTableColumnPriority(columns, column) === 'primary',
     )
   })
   const getKeyOfRow = (row: T, index: number) => {
@@ -47,7 +63,7 @@ function useRender<T>(props: Partial<TableBodyProps<T>>) {
     row: T,
     $index: number,
     treeRowData?: TreeNode,
-    expanded = false
+    expanded = false,
   ) => {
     const { tooltipEffect, tooltipOptions, store } = props
     const { indent, columns } = store.states
@@ -83,7 +99,7 @@ function useRender<T>(props: Partial<TableBodyProps<T>>) {
         columnData.realWidth = getColspanRealWidth(
           columns.value,
           colspan,
-          cellIndex
+          cellIndex,
         )
         const data: RenderRowData<T> = {
           store: props.store,
@@ -113,6 +129,45 @@ function useRender<T>(props: Partial<TableBodyProps<T>>) {
         const baseKey = `${$index},${cellIndex}`
         const patchKey = columnData.columnKey || columnData.rawColumnKey || ''
         const tdChildren = cellChildren(cellIndex, column, data)
+        const responsiveRowKey = String(getKeyOfRow(row, $index))
+        const responsiveDetailsId = `${parent.tableId}-responsive-details-${$index}`
+        const isResponsiveExpanded =
+          responsiveExpandedRows.value.has(responsiveRowKey)
+        const cellContent = [tdChildren]
+        if (
+          isPriorityResponsive.value &&
+          column.id === responsiveToggleColumn.value?.id
+        ) {
+          cellContent.push(
+            h(
+              'button',
+              {
+                type: 'button',
+                class: ns.e('responsive-toggle'),
+                'aria-expanded': String(isResponsiveExpanded),
+                'aria-controls': responsiveDetailsId,
+                'aria-label': parent.props.responsiveDetailsLabel,
+                onClick: (event: MouseEvent) => {
+                  event.stopPropagation()
+                  const next = new Set(responsiveExpandedRows.value)
+                  if (next.has(responsiveRowKey)) {
+                    next.delete(responsiveRowKey)
+                  } else {
+                    next.add(responsiveRowKey)
+                  }
+                  responsiveExpandedRows.value = next
+                },
+              },
+              [
+                h(
+                  'span',
+                  { 'aria-hidden': 'true' },
+                  isResponsiveExpanded ? '−' : '+',
+                ),
+              ],
+            ),
+          )
+        }
         const mergedTooltipOptions =
           column.showOverflowTooltip &&
           merge(
@@ -120,7 +175,7 @@ function useRender<T>(props: Partial<TableBodyProps<T>>) {
               effect: tooltipEffect,
             },
             tooltipOptions,
-            column.showOverflowTooltip
+            column.showOverflowTooltip,
           )
         return h(
           'td',
@@ -130,24 +185,100 @@ function useRender<T>(props: Partial<TableBodyProps<T>>) {
             key: `${patchKey}${baseKey}`,
             rowspan,
             colspan,
+            'data-responsive-priority': resolveTableColumnPriority(
+              columns.value,
+              column,
+            ),
             onMouseenter: ($event) =>
               handleCellMouseEnter($event, row, mergedTooltipOptions),
             onMouseleave: handleCellMouseLeave,
           },
-          [tdChildren]
+          cellContent,
         )
-      })
+      }),
     )
   }
   const cellChildren = (cellIndex, column, data) => {
     return column.renderCell(data)
   }
 
+  const responsiveDetailRow = (row: T, $index: number) => {
+    if (!isPriorityResponsive.value) return null
+
+    const columns = props.store.states.columns.value
+    const detailColumns = getResponsiveDetailColumns(columns)
+    if (detailColumns.length === 0) return null
+
+    const responsiveRowKey = String(getKeyOfRow(row, $index))
+    const expanded = responsiveExpandedRows.value.has(responsiveRowKey)
+    const detailsId = `${parent.tableId}-responsive-details-${$index}`
+
+    return h(
+      'tr',
+      {
+        id: detailsId,
+        key: `responsive-details-${responsiveRowKey}`,
+        class: [ns.e('responsive-detail-row'), ns.is('expanded', expanded)],
+        'aria-hidden': String(!expanded),
+      },
+      [
+        h(
+          'td',
+          {
+            class: ns.e('responsive-detail-cell'),
+            colspan: columns.length,
+          },
+          [
+            h(
+              'dl',
+              { class: ns.e('responsive-detail-list') },
+              detailColumns.map((column, detailIndex) => {
+                const data: RenderRowData<T> = {
+                  store: props.store,
+                  _self: props.context || parent,
+                  column,
+                  row,
+                  $index,
+                  cellIndex: columns.indexOf(column),
+                  expanded,
+                }
+                return h(
+                  'div',
+                  {
+                    class: ns.e('responsive-detail-field'),
+                    key: column.id,
+                  },
+                  [
+                    h(
+                      'dt',
+                      { class: ns.e('responsive-detail-label') },
+                      column.label ||
+                        column.property ||
+                        `Field ${detailIndex + 1}`,
+                    ),
+                    h('dd', { class: ns.e('responsive-detail-value') }, [
+                      column.renderCell(data),
+                    ]),
+                  ],
+                )
+              }),
+            ),
+          ],
+        ),
+      ],
+    )
+  }
+
   const wrappedRowRender = (row: T, $index: number) => {
     const store = props.store
     const { isRowExpanded, assertRowKey } = store
-    const { hasTreeData, treeData, lazyTreeNodeMap, childrenColumnName, rowKey } =
-      store.states
+    const {
+      hasTreeData,
+      treeData,
+      lazyTreeNodeMap,
+      childrenColumnName,
+      rowKey,
+    } = store.states
     const columns = store.states.columns.value
     const hasExpandColumn = columns.some(({ type }) => type === 'expand')
     if (hasExpandColumn) {
@@ -176,9 +307,9 @@ function useRender<T>(props: Partial<TableBodyProps<T>>) {
                     colspan: columns.length,
                     class: `${ns.e('cell')} ${ns.e('expanded-cell')}`,
                   },
-                  [renderExpanded({ row, $index, store, expanded })]
+                  [renderExpanded({ row, $index, store, expanded })],
                 ),
-              ]
+              ],
             ),
           ],
         ]
@@ -277,7 +408,9 @@ function useRender<T>(props: Partial<TableBodyProps<T>>) {
       }
       return tmp
     } else {
-      return rowRender(row, $index, undefined)
+      const rowNode = rowRender(row, $index, undefined)
+      const detailNode = responsiveDetailRow(row, $index)
+      return detailNode ? [rowNode, detailNode] : rowNode
     }
   }
 

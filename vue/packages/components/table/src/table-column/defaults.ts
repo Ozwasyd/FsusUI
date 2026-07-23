@@ -40,7 +40,7 @@ interface TableColumnCtx<T> {
     row: T,
     column: TableColumnCtx<T>,
     cellValue,
-    index: number
+    index: number,
   ) => VNode | string
   selectable: (row: T, index: number) => boolean
   reserveSelection: boolean
@@ -64,6 +64,7 @@ interface TableColumnCtx<T> {
   getColumnIndex: () => number
   no: number
   filterOpened?: boolean
+  priority?: 'primary' | 'secondary' | 'detail'
 }
 
 interface TableColumn<T> extends ComponentInternalInstance {
@@ -133,6 +134,11 @@ export default {
     type: Boolean,
     default: true,
   },
+  priority: {
+    type: String as PropType<TableColumnCtx<DefaultRow>['priority']>,
+    validator: (value: string) =>
+      ['primary', 'secondary', 'detail'].includes(value),
+  },
   index: [Number, Function] as PropType<TableColumnCtx<DefaultRow>['index']>,
   sortOrders: {
     type: Array as PropType<TableColumnCtx<DefaultRow>['sortOrders']>,
@@ -141,7 +147,7 @@ export default {
     },
     validator: (val: TableColumnCtx<unknown>['sortOrders']) => {
       return val.every((order: string) =>
-        ['ascending', 'descending', null].includes(order)
+        ['ascending', 'descending', null].includes(order),
       )
     },
   },

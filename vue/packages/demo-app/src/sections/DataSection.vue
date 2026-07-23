@@ -3,11 +3,58 @@
     <h2>Data</h2>
     <div class="demo-block">
       <h3>Table & TableColumn</h3>
-      <el-table :data="tableData" border style="width: 100%">
-        <el-table-column prop="date" label="发布日期" width="180" />
-        <el-table-column prop="name" label="标题" width="180" />
-        <el-table-column prop="address" label="可见范围" />
+      <el-table
+        :data="tableData"
+        border
+        responsive="auto"
+        responsive-details-label="显示此行全部字段"
+        style="width: 100%"
+      >
+        <el-table-column type="selection" width="48" fixed />
+        <el-table-column
+          prop="name"
+          label="标题"
+          priority="primary"
+          width="180"
+        />
+        <el-table-column
+          prop="date"
+          label="发布日期"
+          priority="secondary"
+          width="180"
+        />
+        <el-table-column prop="author" label="作者" priority="secondary" />
+        <el-table-column prop="status" label="状态" priority="secondary" />
+        <el-table-column prop="category" label="分类" priority="detail" />
+        <el-table-column prop="views" label="阅读量" priority="detail" />
+        <el-table-column prop="identifier" label="标识符" priority="detail" />
+        <el-table-column prop="address" label="可见范围" priority="detail" />
+        <el-table-column
+          label="操作"
+          priority="primary"
+          width="80"
+          fixed="right"
+        >
+          <template #default>
+            <el-button text>打开</el-button>
+          </template>
+        </el-table-column>
       </el-table>
+      <div
+        class="demo-responsive-scroll-fixture"
+        data-testid="table-scroll-fixture"
+        style="width: 375px; max-width: 100%; margin-top: 16px"
+      >
+        <el-table
+          :data="tableData.slice(0, 1)"
+          responsive="scroll"
+          scroll-aria-label="横向浏览文章字段"
+        >
+          <el-table-column prop="name" label="标题" width="220" />
+          <el-table-column prop="identifier" label="标识符" width="360" />
+          <el-table-column prop="address" label="可见范围" width="320" />
+        </el-table>
+      </div>
     </div>
     <div class="demo-block">
       <h3>TableV2 & AutoResizer</h3>

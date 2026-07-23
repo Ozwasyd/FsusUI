@@ -85,6 +85,17 @@ WASM memory growth 后旧 TypedArray view 会失效，因此实现只持久化 p
 
 通过 `default` 插槽访问 `row`、`column`、`$index` 等数据，插入自定义内容。
 
+## 响应式列投影
+
+设置 `responsive="auto"` 或 `responsive="priority"` 后，组件宽度小于
+`640px` 时只在主行保留 `priority="primary"` 的列。`secondary` 与 `detail`
+列不会丢弃：每行的 40px 展开动作会将这些字段投影为平坦的 label/value
+详情列表。未声明 priority 时，第一个普通数据列为 primary，其余普通列为
+secondary；选择、索引、展开等功能列始终保留。
+
+设置 `responsive="scroll"` 可显式保留宽表。滚动区域可聚焦、有可访问名称，
+并在首次横向滚动前显示右边缘渐隐提示；键盘左右方向键可以浏览。
+
 ## 多选
 
 设置 `type="selection"` 列开启多选；配合 `toggleRowSelection`、`clearSelection` 等方法管理选中状态。
@@ -111,39 +122,42 @@ WASM memory growth 后旧 TypedArray view 会失效，因此实现只持久化 p
 
 ### Table Attributes
 
-| 属性名                | 说明                                         | 类型                                                                                 | 默认值                                                                       |
-| --------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
-| data                  | 表格数据                                     | `any[]`                                                                              | `[]`                                                                         |
-| data-change-strategy  | 数据变化提交策略                             | `'identity' \| 'version' \| 'manual' \| 'deep'`                                      | `deep`                                                                       |
-| data-version          | `version` 策略的显式版本                     | `string \| number`                                                                   | —                                                                            |
-| height                | 表格高度（数字为 px，字符串赋给 CSS height） | `string \| number`                                                                   | —                                                                            |
-| max-height            | 最大高度                                     | `string \| number`                                                                   | —                                                                            |
-| stripe                | 是否有斑马纹                                 | `boolean`                                                                            | `false`                                                                      |
-| border                | 是否有纵向边框                               | `boolean`                                                                            | `false`                                                                      |
-| size                  | 表格尺寸                                     | `'' \| 'large' \| 'default' \| 'small'`                                              | —                                                                            |
-| fit                   | 列宽是否自适应容器                           | `boolean`                                                                            | `true`                                                                       |
-| show-header           | 是否显示表头                                 | `boolean`                                                                            | `true`                                                                       |
-| highlight-current-row | 是否高亮当前行                               | `boolean`                                                                            | `false`                                                                      |
-| current-row-key       | 当前行的 key（仅设置时有效）                 | `string \| number`                                                                   | —                                                                            |
-| row-class-name        | 行 class 名称                                | `(data: { row, rowIndex }) => string \| string`                                      | —                                                                            |
-| row-style             | 行样式                                       | `(data: { row, rowIndex }) => CSSProperties \| CSSProperties`                        | —                                                                            |
-| cell-class-name       | 单元格 class 名称                            | `(data: { row, column, rowIndex, columnIndex }) => string \| string`                 | —                                                                            |
-| row-key               | 行数据的 key（树形数据和保留选中状态时必填） | `(row) => string \| string`                                                          | —                                                                            |
-| empty-text            | 数据为空时的显示文字                         | `string`                                                                             | `暂无数据`                                                                   |
-| default-expand-all    | 是否默认展开所有行                           | `boolean`                                                                            | `false`                                                                      |
-| default-sort          | 默认排序列和方向                             | `{ prop: string, order: 'ascending' \| 'descending' }`                               | —                                                                            |
-| tooltip-effect        | 溢出 tooltip 主题                            | `'dark' \| 'light'`                                                                  | `dark`                                                                       |
-| show-summary          | 是否显示合计行                               | `boolean`                                                                            | `false`                                                                      |
-| sum-text              | 合计行首列文字                               | `string`                                                                             | `合计`                                                                       |
-| summary-method        | 自定义合计方法                               | `(data: { columns, data }) => (VNode \| string)[]`                                   | —                                                                            |
-| span-method           | 合并行列的方法                               | `(data: { row, column, rowIndex, columnIndex }) => number[] \| { rowspan, colspan }` | —                                                                            |
-| indent                | 树形数据每层的缩进（px）                     | `number`                                                                             | `16`                                                                         |
-| lazy                  | 是否懒加载子节点                             | `boolean`                                                                            | `false`                                                                      |
-| load                  | 懒加载函数（`lazy` 为 true 时必填）          | `(row, treeNode, resolve) => void`                                                   | —                                                                            |
-| tree-props            | 树形配置                                     | `{ hasChildren?, children?, checkStrictly? }`                                        | `{ hasChildren: 'hasChildren', children: 'children', checkStrictly: false }` |
-| table-layout          | 表格布局算法                                 | `'fixed' \| 'auto'`                                                                  | `fixed`                                                                      |
-| scrollbar-always-on   | 是否始终显示滚动条                           | `boolean`                                                                            | `false`                                                                      |
-| show-overflow-tooltip | 是否溢出时显示 tooltip                       | `boolean \| object`                                                                  | —                                                                            |
+| 属性名                   | 说明                                         | 类型                                                                                 | 默认值                                                                       |
+| ------------------------ | -------------------------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| data                     | 表格数据                                     | `any[]`                                                                              | `[]`                                                                         |
+| data-change-strategy     | 数据变化提交策略                             | `'identity' \| 'version' \| 'manual' \| 'deep'`                                      | `deep`                                                                       |
+| data-version             | `version` 策略的显式版本                     | `string \| number`                                                                   | —                                                                            |
+| height                   | 表格高度（数字为 px，字符串赋给 CSS height） | `string \| number`                                                                   | —                                                                            |
+| max-height               | 最大高度                                     | `string \| number`                                                                   | —                                                                            |
+| stripe                   | 是否有斑马纹                                 | `boolean`                                                                            | `false`                                                                      |
+| border                   | 是否有纵向边框                               | `boolean`                                                                            | `false`                                                                      |
+| size                     | 表格尺寸                                     | `'' \| 'large' \| 'default' \| 'small'`                                              | —                                                                            |
+| fit                      | 列宽是否自适应容器                           | `boolean`                                                                            | `true`                                                                       |
+| show-header              | 是否显示表头                                 | `boolean`                                                                            | `true`                                                                       |
+| highlight-current-row    | 是否高亮当前行                               | `boolean`                                                                            | `false`                                                                      |
+| current-row-key          | 当前行的 key（仅设置时有效）                 | `string \| number`                                                                   | —                                                                            |
+| row-class-name           | 行 class 名称                                | `(data: { row, rowIndex }) => string \| string`                                      | —                                                                            |
+| row-style                | 行样式                                       | `(data: { row, rowIndex }) => CSSProperties \| CSSProperties`                        | —                                                                            |
+| cell-class-name          | 单元格 class 名称                            | `(data: { row, column, rowIndex, columnIndex }) => string \| string`                 | —                                                                            |
+| row-key                  | 行数据的 key（树形数据和保留选中状态时必填） | `(row) => string \| string`                                                          | —                                                                            |
+| empty-text               | 数据为空时的显示文字                         | `string`                                                                             | `暂无数据`                                                                   |
+| default-expand-all       | 是否默认展开所有行                           | `boolean`                                                                            | `false`                                                                      |
+| default-sort             | 默认排序列和方向                             | `{ prop: string, order: 'ascending' \| 'descending' }`                               | —                                                                            |
+| tooltip-effect           | 溢出 tooltip 主题                            | `'dark' \| 'light'`                                                                  | `dark`                                                                       |
+| show-summary             | 是否显示合计行                               | `boolean`                                                                            | `false`                                                                      |
+| sum-text                 | 合计行首列文字                               | `string`                                                                             | `合计`                                                                       |
+| summary-method           | 自定义合计方法                               | `(data: { columns, data }) => (VNode \| string)[]`                                   | —                                                                            |
+| span-method              | 合并行列的方法                               | `(data: { row, column, rowIndex, columnIndex }) => number[] \| { rowspan, colspan }` | —                                                                            |
+| indent                   | 树形数据每层的缩进（px）                     | `number`                                                                             | `16`                                                                         |
+| lazy                     | 是否懒加载子节点                             | `boolean`                                                                            | `false`                                                                      |
+| load                     | 懒加载函数（`lazy` 为 true 时必填）          | `(row, treeNode, resolve) => void`                                                   | —                                                                            |
+| tree-props               | 树形配置                                     | `{ hasChildren?, children?, checkStrictly? }`                                        | `{ hasChildren: 'hasChildren', children: 'children', checkStrictly: false }` |
+| table-layout             | 表格布局算法                                 | `'fixed' \| 'auto'`                                                                  | `fixed`                                                                      |
+| scrollbar-always-on      | 是否始终显示滚动条                           | `boolean`                                                                            | `false`                                                                      |
+| show-overflow-tooltip    | 是否溢出时显示 tooltip                       | `boolean \| object`                                                                  | —                                                                            |
+| responsive               | 响应式策略                                   | `'none' \| 'auto' \| 'priority' \| 'scroll'`                                         | `none`                                                                       |
+| responsive-details-label | 行详情按钮可访问名称                         | `string`                                                                             | `Show row details`                                                           |
+| scroll-aria-label        | scroll 模式滚动区可访问名称                  | `string`                                                                             | `Scrollable data table`                                                      |
 
 ### Table Events
 
@@ -218,6 +232,7 @@ WASM memory growth 后旧 TypedArray view 会失效，因此实现只持久化 p
 | filters               | 列筛选选项                                 | `Array<{text: string, value: string}>`               | —           |
 | filter-method         | 筛选方法                                   | `(value, row, column) => void`                       | —           |
 | filter-multiple       | 是否支持多选筛选                           | `boolean`                                            | `true`      |
+| priority              | 响应式列优先级                             | `'primary' \| 'secondary' \| 'detail'`               | —           |
 
 ### Table-column Slots
 

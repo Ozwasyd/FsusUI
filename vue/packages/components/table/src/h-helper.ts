@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { h } from 'vue'
+import { resolveTableColumnPriority } from './responsive'
 export function hColgroup(props) {
   const isAuto = props.tableLayout === 'auto'
   let columns = props.columns || []
@@ -13,6 +14,10 @@ export function hColgroup(props) {
       key: `${props.tableLayout}_${column.id}`,
       style: {},
       name: undefined,
+      'data-responsive-priority': resolveTableColumnPriority(
+        props.columns,
+        column,
+      ),
     }
     if (isAuto) {
       propsData.style = {
@@ -27,7 +32,7 @@ export function hColgroup(props) {
   return h(
     'colgroup',
     {},
-    columns.map((column) => h('col', getPropsData(column)))
+    columns.map((column) => h('col', getPropsData(column))),
   )
 }
 
