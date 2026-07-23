@@ -4,6 +4,13 @@ FsusUI exposes four explicit visual profiles. All four are orchestrated by
 `scripts/run-visual-tests.mjs`, consume the same resource capacity plan, and
 prepare `.tmp/visual-runtime` exactly once before browser execution.
 
+The orchestrator owns the Preview and Dev servers for each run. An unrelated
+process already listening on the configured port is rejected instead of being
+treated as current runtime evidence. `FSUS_VISUAL_REUSE_SERVER=1` is an
+explicit local debugging opt-in only; Full, Evidence, and release verification
+must leave it unset so the server is started from the validated runtime
+manifest.
+
 | Profile  | Command                     | Contract                                                                                                              |
 | -------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | Smoke    | `pnpm test:visual:smoke`    | Stable Basic fixtures in desktop/light and compact/dark projects. It uses one worker and keeps only failure evidence. |

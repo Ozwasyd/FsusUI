@@ -308,6 +308,12 @@ for (const [label, config, suite] of [
     config.includes(`serve-visual-runtime.mjs --suite=${suite}`),
     `${label} webServer must only serve a prepared visual runtime`,
   )
+  assert(
+    config.includes(
+      "reuseExistingServer: process.env.FSUS_VISUAL_REUSE_SERVER === '1'",
+    ) && !config.includes('reuseExistingServer: !process.env.CI'),
+    `${label} webServer reuse must be explicit so full/evidence cannot accept an unbound stale server`,
+  )
   for (const forbidden of [
     'prepare:test-artifacts',
     'ensure:wasm',
@@ -582,6 +588,10 @@ const collectedExitCode = runVisualPlan(
         .effectiveCpu === capacityPlan.effectiveCpu,
       'runner must pass the same serialized visual capacity plan to every suite',
     )
+    assert(
+      options.env.FSUS_VISUAL_REUSE_SERVER === '0',
+      'orchestrated visual suites must reject an unrelated existing server',
+    )
     return { status: suite === 'preview' ? 1 : 0 }
   },
   capacityPlan,
@@ -604,6 +614,10 @@ function createAsyncSpawn(statuses) {
     assert(
       options.env[VISUAL_CAPACITY_PLAN_ENV],
       'async visual runner must pass the shared plan environment',
+    )
+    assert(
+      options.env.FSUS_VISUAL_REUSE_SERVER === '0',
+      'async visual suites must reject an unrelated existing server',
     )
     globalThis.queueMicrotask(() => {
       state.active -= 1

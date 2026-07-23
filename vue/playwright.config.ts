@@ -90,7 +90,7 @@ export default defineConfig({
   webServer: {
     command: `node ../scripts/serve-visual-runtime.mjs --suite=preview --host=127.0.0.1 --port=${previewPort}`,
     url: previewBaseUrl,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: process.env.FSUS_VISUAL_REUSE_SERVER === '1',
     timeout: 240_000,
   },
 })

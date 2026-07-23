@@ -310,6 +310,7 @@ function visualPlanEnvironment(capacityPlan, env = process.env) {
   return {
     ...env,
     [VISUAL_CAPACITY_PLAN_ENV]: serializeVisualCapacityPlan(capacityPlan),
+    FSUS_VISUAL_REUSE_SERVER: '0',
   }
 }
 
