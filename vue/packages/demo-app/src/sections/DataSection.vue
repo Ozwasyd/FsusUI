@@ -55,6 +55,67 @@
           <el-table-column prop="address" label="可见范围" width="320" />
         </el-table>
       </div>
+      <div
+        v-if="showTableResponsiveMatrix"
+        class="demo-table-responsive-matrix"
+        data-testid="table-responsive-matrix"
+      >
+        <div
+          v-for="fixture in tableResponsiveFixtures"
+          :key="fixture.columnCount"
+          :data-testid="`table-matrix-${fixture.columnCount}`"
+        >
+          <el-table
+            :data="[fixture.row]"
+            border
+            responsive="auto"
+            responsive-details-label="显示此行全部字段"
+          >
+            <el-table-column type="selection" width="48" fixed />
+            <el-table-column
+              v-for="column in fixture.columns"
+              :key="column.prop"
+              :prop="column.prop"
+              :label="column.label"
+              :priority="column.priority"
+              :width="column.width"
+            />
+            <el-table-column
+              class-name="matrix-operation-column"
+              label="操作"
+              priority="primary"
+              width="80"
+              fixed="right"
+            >
+              <template #default>
+                <el-button text>打开</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+        <div data-testid="table-matrix-empty">
+          <el-table :data="[]" empty-text="暂无可展示的数据" responsive="auto">
+            <el-table-column prop="title" label="标题" priority="primary" />
+            <el-table-column prop="status" label="状态" priority="secondary" />
+            <el-table-column prop="owner" label="负责人" priority="detail" />
+          </el-table>
+        </div>
+        <div data-testid="table-matrix-scroll">
+          <el-table
+            :data="[tableResponsiveFixtures[2].row]"
+            responsive="scroll"
+            scroll-aria-label="横向浏览十五列数据"
+          >
+            <el-table-column
+              v-for="column in tableResponsiveFixtures[2].columns"
+              :key="column.prop"
+              :prop="column.prop"
+              :label="column.label"
+              :width="column.width"
+            />
+          </el-table>
+        </div>
+      </div>
     </div>
     <div class="demo-block">
       <h3>TableV2 & AutoResizer</h3>
@@ -214,6 +275,42 @@
 
 <script setup lang="ts">
 import { Share, useDemoState } from '../demo-state'
+
+const showTableResponsiveMatrix = new URLSearchParams(
+  window.location.search,
+).has('tableMatrix')
+
+const createTableResponsiveFixture = (columnCount: 3 | 8 | 15) => {
+  const columns = Array.from({ length: columnCount }, (_, index) => ({
+    label:
+      index === columnCount - 1
+        ? '超长中文表头用于验证窄屏字段披露'
+        : `字段 ${index + 1}`,
+    priority:
+      index === 0
+        ? ('primary' as const)
+        : index < 3
+          ? ('secondary' as const)
+          : ('detail' as const),
+    prop: `field${index + 1}`,
+    width: index === columnCount - 1 ? 300 : 140,
+  }))
+  const row = Object.fromEntries(
+    columns.map((column, index) => [
+      column.prop,
+      index === 1
+        ? 'latin-value-with-a-deliberately-long-unbroken-identifier'
+        : index === columnCount - 1
+          ? '超长中文字段值用于确认移动端不会静默丢失任何业务信息'
+          : `value-${index + 1}`,
+    ]),
+  )
+  return { columnCount, columns, row }
+}
+
+const tableResponsiveFixtures = ([3, 8, 15] as const).map(
+  createTableResponsiveFixture,
+)
 
 const {
   checkTag,
