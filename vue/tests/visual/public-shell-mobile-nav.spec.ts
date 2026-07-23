@@ -118,9 +118,7 @@ test('uses one 44px bordered affordance language in the mobile project', async (
     await expect(control).toHaveCSS('transition-duration', /^(?:0s(?:, )?)+$/u)
   }
 
-  for (let index = 0; index <= (await navLinks.count()); index += 1) {
-    await page.keyboard.press('Tab')
-  }
+  await searchTrigger.focus()
   await expect(searchTrigger).toBeFocused()
   const focusRing = await searchTrigger.evaluate((element) => {
     const probe = document.createElement('span')
@@ -154,6 +152,238 @@ test('uses one 44px bordered affordance language in the mobile project', async (
       contentType: 'image/png',
     },
   )
+})
+
+const contractFixtures = [
+  {
+    name: 'anonymous-zh-long-brand-320',
+    width: 320,
+    locale: 'zh',
+    session: 'anonymous',
+    longBrand: true,
+    zoom: 1,
+  },
+  {
+    name: 'authenticated-en-375',
+    width: 375,
+    locale: 'en',
+    session: 'authenticated',
+    longBrand: false,
+    zoom: 1,
+  },
+  {
+    name: 'authenticated-long-copy-390',
+    width: 390,
+    locale: 'long',
+    session: 'authenticated',
+    longBrand: true,
+    zoom: 1,
+  },
+  {
+    name: 'anonymous-en-breakpoint-768',
+    width: 768,
+    locale: 'en',
+    session: 'anonymous',
+    longBrand: true,
+    zoom: 1,
+  },
+  {
+    name: 'anonymous-zh-zoom-150',
+    width: 375,
+    locale: 'zh',
+    session: 'anonymous',
+    longBrand: true,
+    zoom: 1.5,
+  },
+  {
+    name: 'authenticated-long-copy-zoom-200',
+    width: 390,
+    locale: 'long',
+    session: 'authenticated',
+    longBrand: true,
+    zoom: 2,
+  },
+] as const
+
+for (const fixture of contractFixtures) {
+  test(`mobile action geometry ${fixture.name}`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width: fixture.width, height: 1200 })
+    await page.goto(
+      buildVisualUrl('public-shell-nav-mode', testInfo.project.name, {
+        contract: 1,
+        fixtureLocale: fixture.locale,
+        longBrand: fixture.longBrand ? 1 : 0,
+        navMode: 'menu',
+        session: fixture.session,
+      }),
+      { waitUntil: 'domcontentloaded' },
+    )
+    if (fixture.zoom !== 1) {
+      await page.evaluate((zoom) => {
+        document.documentElement.style.zoom = String(zoom)
+      }, fixture.zoom)
+    }
+    await expect(page.getByTestId('public-shell-nav-fixture')).toBeVisible()
+
+    const shell = page.locator('.el-public-shell')
+    const primary = shell.locator('.el-public-shell__mobile-primary-actions')
+    const menu = primary.locator('.el-public-shell__mobile-nav-menu-trigger')
+
+    const overflow = await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+    )
+    expect(overflow).toBeLessThanOrEqual(1)
+
+    if (fixture.width >= 768) {
+      await expect(primary).toBeHidden()
+      await expect(shell.locator('.el-public-shell__desktop-nav')).toBeVisible()
+      return
+    }
+
+    await expect(
+      primary.locator(':scope > .el-public-shell__auth-link'),
+    ).toHaveCount(0)
+    await expect(
+      primary.locator(':scope > [data-testid="public-shell-theme-action"]'),
+    ).toHaveCount(0)
+    await expect(
+      primary.locator(':scope > [data-testid="public-shell-locale-action"]'),
+    ).toHaveCount(0)
+
+    const geometry = await primary.evaluate((element) => {
+      const row = element.closest('.el-public-shell__primary-row')!
+      const brand = row.querySelector<HTMLElement>('.el-public-shell__brand')!
+      const search = element.querySelector<HTMLElement>(
+        '.el-public-shell__mobile-search-trigger',
+      )!
+      const menu = element.querySelector<HTMLElement>(
+        '.el-public-shell__mobile-nav-menu-trigger',
+      )!
+      const primaryRect = element.getBoundingClientRect()
+      const brandRect = brand.getBoundingClientRect()
+      const searchRect = search.getBoundingClientRect()
+      const menuRect = menu.getBoundingClientRect()
+      const searchStyle = getComputedStyle(search)
+      const menuStyle = getComputedStyle(menu)
+      return {
+        actionToken: getComputedStyle(element.closest('.el-public-shell')!)
+          .getPropertyValue('--fsus-public-shell-mobile-action-height')
+          .trim(),
+        brandOverlapsSearch: brandRect.right > searchRect.left + 1,
+        menu: {
+          border: menuStyle.borderTopWidth,
+          fontSize: menuStyle.fontSize,
+          fontWeight: menuStyle.fontWeight,
+          height: menuRect.height,
+          paddingInline: menuStyle.paddingInline,
+          radius: menuStyle.borderRadius,
+        },
+        primaryHeight: primaryRect.height,
+        search: {
+          border: searchStyle.borderTopWidth,
+          fontSize: searchStyle.fontSize,
+          fontWeight: searchStyle.fontWeight,
+          height: searchRect.height,
+          paddingInline: searchStyle.paddingInline,
+          radius: searchStyle.borderRadius,
+        },
+        verticalDelta: Math.abs(searchRect.top - menuRect.top),
+      }
+    })
+
+    expect(geometry.actionToken).toBe('44px')
+    expect(geometry.brandOverlapsSearch).toBe(false)
+    expect(geometry.verticalDelta).toBeLessThanOrEqual(1)
+    expect(geometry.primaryHeight).toBeGreaterThanOrEqual(
+      44 * fixture.zoom - 0.5,
+    )
+    for (const action of [geometry.search, geometry.menu]) {
+      expect(action.height).toBeGreaterThanOrEqual(44 * fixture.zoom - 0.5)
+      expect(action.fontWeight).toBe('500')
+      if (fixture.zoom === 1) {
+        expect(action.border).toBe('1px')
+        expect(action.radius).toBe('6px')
+        expect(action.paddingInline).toBe('12px')
+        expect(action.fontSize).toBe('14px')
+      } else {
+        // Chromium reports some computed lengths before CSS zoom and others
+        // after device-pixel rounding. Geometry above is the authoritative
+        // zoomed hit rectangle; these checks only ensure styles remain present.
+        expect(Number.parseFloat(action.border)).toBeGreaterThan(0)
+        expect(Number.parseFloat(action.radius)).toBeGreaterThan(0)
+        expect(Number.parseFloat(action.paddingInline)).toBeGreaterThan(0)
+        expect(Number.parseFloat(action.fontSize)).toBeGreaterThan(0)
+      }
+    }
+
+    await menu.click()
+    const panel = shell.locator('.el-public-shell__mobile-nav-menu-panel')
+    await expect(panel).toBeVisible()
+    const auth = panel.locator('.el-public-shell__auth-link--mobile')
+    const theme = panel.getByTestId('public-shell-theme-action')
+    const locale = panel.getByTestId('public-shell-locale-action')
+    for (const item of [auth, theme, locale]) {
+      await expect(item).toBeVisible()
+      const itemGeometry = await item.evaluate((element) => {
+        const style = getComputedStyle(element)
+        return {
+          height: element.getBoundingClientRect().height,
+          paddingInline: style.paddingInline,
+        }
+      })
+      expect(itemGeometry.height).toBeGreaterThanOrEqual(
+        44 * fixture.zoom - 0.5,
+      )
+      if (fixture.zoom === 1) {
+        expect(itemGeometry.paddingInline).toBe('16px')
+      } else {
+        expect(Number.parseFloat(itemGeometry.paddingInline)).toBeGreaterThan(0)
+      }
+    }
+
+    expect(
+      await page.evaluate(
+        () =>
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+      ),
+    ).toBeLessThanOrEqual(1)
+  })
+}
+
+test('keeps the default keyboard order brand, Search, Menu, then panel actions', async ({
+  page,
+}, testInfo) => {
+  await page.setViewportSize({ width: 320, height: 1000 })
+  await page.goto(
+    buildVisualUrl('public-shell-nav-mode', testInfo.project.name, {
+      contract: 1,
+      fixtureLocale: 'zh',
+      longBrand: 1,
+      navMode: 'menu',
+      session: 'anonymous',
+    }),
+    { waitUntil: 'domcontentloaded' },
+  )
+  await expect(page.getByTestId('public-shell-nav-fixture')).toBeVisible()
+
+  const brand = page.locator('.el-public-shell__brand')
+  const search = page.locator('.el-public-shell__mobile-search-trigger')
+  const menu = page.locator('.el-public-shell__mobile-nav-menu-trigger')
+  await page.keyboard.press('Tab')
+  await expect(brand).toBeFocused()
+  await page.keyboard.press('Tab')
+  await expect(search).toBeFocused()
+  await page.keyboard.press('Tab')
+  await expect(menu).toBeFocused()
+  await page.keyboard.press('Enter')
+  await expect(menu).toHaveAttribute('aria-expanded', 'true')
+  await page.keyboard.press('Tab')
+  await expect(
+    page.locator('.el-public-shell__mobile-nav-link').first(),
+  ).toBeFocused()
 })
 
 test('keeps CSP-safe menu open through its class-driven leave lifecycle', async ({

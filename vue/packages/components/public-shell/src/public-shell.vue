@@ -184,6 +184,21 @@
       </template>
 
       <template #mobile-primary-actions>
+        <a
+          v-if="showMobileSearchTrigger"
+          ref="mobileSearchTriggerRef"
+          :href="searchAction"
+          :class="[
+            ns.e('mobile-search-trigger'),
+            ns.is('expanded', mobileSearchExpanded),
+          ]"
+          :aria-expanded="mobileSearchExpanded"
+          :aria-controls="mobileSearchRowId"
+          :aria-label="mobileSearchButtonLabel"
+          @click="handleMobileSearchTrigger"
+        >
+          {{ mobileSearchButtonLabel }}
+        </a>
         <details
           v-if="showMobileMenu"
           ref="mobileNavMenuRef"
@@ -227,10 +242,24 @@
                 {{ item.label }}
               </a>
               <div
-                v-if="$slots['mobile-menu-actions']"
+                v-if="hasMobileMenuActions"
                 :class="ns.e('mobile-nav-menu-actions')"
               >
+                <a
+                  v-if="hasAuthLink"
+                  :href="authHref"
+                  :class="[
+                    ns.e('action-link'),
+                    ns.e('auth-link'),
+                    ns.em('auth-link', 'mobile'),
+                  ]"
+                  v-bind="{ 'data-public-nav': 'auth' }"
+                  @click="closeMobileNavMenu()"
+                >
+                  {{ authLabel }}
+                </a>
                 <slot name="mobile-menu-actions" />
+                <slot name="mobile-primary-actions" />
               </div>
             </nav>
             <nav
@@ -253,32 +282,31 @@
                 {{ item.label }}
               </a>
               <div
-                v-if="$slots['mobile-menu-actions']"
+                v-if="hasMobileMenuActions"
                 :class="ns.e('mobile-nav-menu-actions')"
               >
+                <a
+                  v-if="hasAuthLink"
+                  :href="authHref"
+                  :class="[
+                    ns.e('action-link'),
+                    ns.e('auth-link'),
+                    ns.em('auth-link', 'mobile'),
+                  ]"
+                  v-bind="{ 'data-public-nav': 'auth' }"
+                  @click="closeMobileNavMenu()"
+                >
+                  {{ authLabel }}
+                </a>
                 <slot name="mobile-menu-actions" />
+                <slot name="mobile-primary-actions" />
               </div>
             </nav>
           </Transition>
         </details>
+        <slot v-if="!showMobileMenu" name="mobile-primary-actions" />
         <a
-          v-if="showMobileSearchTrigger"
-          ref="mobileSearchTriggerRef"
-          :href="searchAction"
-          :class="[
-            ns.e('mobile-search-trigger'),
-            ns.is('expanded', mobileSearchExpanded),
-          ]"
-          :aria-expanded="mobileSearchExpanded"
-          :aria-controls="mobileSearchRowId"
-          :aria-label="mobileSearchButtonLabel"
-          @click="handleMobileSearchTrigger"
-        >
-          {{ mobileSearchButtonLabel }}
-        </a>
-        <slot name="mobile-primary-actions" />
-        <a
-          v-if="hasAuthLink"
+          v-if="showMobilePrimaryAuth"
           :href="authHref"
           :class="[
             ns.e('action-link'),
@@ -557,6 +585,15 @@ const showMobileBottomNav = computed(
   () => hasMobileNavItems.value && props.mobileNavMode === 'bottom',
 )
 const hasAuthLink = computed(() => Boolean(props.authLabel && props.authHref))
+const hasMobileMenuActions = computed(
+  () =>
+    hasAuthLink.value ||
+    Boolean(slots['mobile-menu-actions']) ||
+    Boolean(slots['mobile-primary-actions']),
+)
+const showMobilePrimaryAuth = computed(
+  () => hasAuthLink.value && props.mobileNavMode !== 'menu',
+)
 const mobileSearchTriggerText = computed(
   () => props.mobileSearchTriggerLabel || props.searchAriaLabel,
 )

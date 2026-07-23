@@ -11,7 +11,11 @@
 需要测量 sticky header 的 consumer 使用稳定的 `[data-public-shell-header]` hook；
 不得把 `.el-public-shell__header` 等内部 BEM class 当成应用运行时 API。
 
-当同时传入 `auth-label` 与 `auth-href` 时，`ElPublicShell` 会在 desktop actions 与 mobile primary actions 中各渲染一份默认账户入口，并保留 `data-public-nav="auth"`。如果业务完全自定义移动端账户入口，可将 `auth-label` 或 `auth-href` 置空并通过 slot 接管。
+当同时传入 `auth-label` 与 `auth-href` 时，`ElPublicShell` 会在 desktop actions
+渲染账户入口，并保留 `data-public-nav="auth"`。默认 `menu` 模式把 mobile
+账户入口放进菜单 panel，打开 Menu 后一步可达；显式选择其他 mobile 模式时才保留
+primary row 账户入口。如果业务完全自定义移动端账户入口，可将 `auth-label` 或
+`auth-href` 置空并通过 slot 接管。
 
 Desktop search 由 `desktop-search-mode` 显式选择。默认 `inline` 保留已有常驻
 input；`trigger` 输出指向 `search-action` 的原生链接，并由组件拥有相邻 panel、
@@ -93,7 +97,7 @@ import '@ozwasyd/element-plus/dist/fsus.css'
 | brand                  | 品牌区域，替换 `brand` 文本                                                    |
 | desktop-search         | desktop 搜索区域                                                               |
 | desktop-actions        | desktop 右侧工具区                                                             |
-| mobile-primary-actions | mobile 第一行高频工具区，位于品牌右侧，适合 search trigger / theme             |
+| mobile-primary-actions | mobile 高频工具兼容入口；`menu` 模式自动收纳进 panel，其他模式位于品牌右侧     |
 | mobile-menu-actions    | `menu` 导航面板内的 consumer 次级工具区；组件库不写入业务文案                  |
 | mobile-search          | mobile 搜索内容；`inline` 时位于 toolbar 内，`trigger` 时位于 primary row 下方 |
 | mobile-actions         | legacy mobile 次级工具区，保留兼容                                             |
@@ -140,6 +144,18 @@ trigger 文本保持稳定，展开/折叠语义由 `aria-expanded` 明确表达
 `--fsus-bottom-tab-height + env(safe-area-inset-bottom)` 的底部留白；其他模式
 不会为不存在的 fixed dock 预留空间。footer 在窄屏仍保留底部 safe-area。
 
+默认 `menu` 模式的第一行固定为可截断品牌 + Search + Menu。Search、Menu 消费
+`--fsus-public-shell-mobile-action-height: 44px`，水平 padding 为 `12px`，间距
+`8px`，文字为 `14px / 500`。账户入口、`mobile-menu-actions`，以及兼容的
+`mobile-primary-actions` 内容都进入 panel；panel action 至少 `44px` 高并使用
+`16px` 水平 padding。这样主题、语言和认证不会形成三个不等宽 bordered button，
+也不会在 320px 或高缩放下把品牌挤到下一行。
+
+Consumer 可以覆盖公开的 `--fsus-public-shell-mobile-action-height`，但不得设为低于
+`44px`；不得覆盖 `.el-public-shell__*` 内部 BEM selector。显式 `inline` 模式仍使用
+统一高度，icon-only action 的宽度也不得低于该 token，账户入口保持 text link
+层级而非 segmented-control item。
+
 `mobile-search-mode="trigger"` 使用指向 `search-action` 的原生链接作为触发器：
 有 JavaScript 时普通点击按需展开搜索行并把焦点移入输入框，Escape/再次点击关闭并
 恢复焦点；无 JavaScript 或修饰键点击时保留原生搜索页导航。折叠状态会显式标记
@@ -182,4 +198,7 @@ navigation 策略的 DOM/active state，并确认 desktop nav 在策略切换时
 以及 trigger open/closed；`public-shell-mobile-nav.spec.ts` 为 `menu | inline | bottom | none` 保存独立
 mobile snapshot，同时验证原生 summary 键盘顺序、navigation landmark、
 `aria-current="page"`、BottomTabBar fixed/safe-area/content padding，以及 `none`
-模式不会留下重复导航 landmark。
+模式不会留下重复导航 landmark。该套件还以真实 fixture 覆盖匿名/登录、长品牌、
+中文/英文/长语言文案、320/375/390/768px、Light/Dark、150%/200% zoom，并测量
+44px hit rectangle、panel padding、光学对齐、横向 overflow 和
+Brand → Search → Menu → panel 的键盘顺序。

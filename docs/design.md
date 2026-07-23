@@ -297,7 +297,7 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 
 | 模式                                | 适用场景                                                  | 触控高度                               | Active 表达                                           |
 | ----------------------------------- | --------------------------------------------------------- | -------------------------------------- | ----------------------------------------------------- |
-| **Header menu**                     | 编辑型站点、文档站、文章站的主导航                        | `40–44px` trigger，菜单项至少 `44px`   | 当前链接使用 Ink 文本与 `aria-current="page"`         |
+| **Header menu**                     | 编辑型站点、文档站、文章站的主导航                        | `44px` trigger，菜单项至少 `44px`      | 当前链接使用 Ink 文本与 `aria-current="page"`         |
 | **Header inline**                   | 项目很少、需要持续可见的移动主导航                        | `44px`                                 | Ink 文本；当前项加粗或使用 Scholarly Blue 标记        |
 | **Bottom tab bar**                  | 明确采用 app-like navigation 的 consumer 主导航（3–5 项） | `56–64px`（含 safe-area-inset-bottom） | Ink 图标 + Ink 文本 + Scholarly Blue 顶标或 icon fill |
 | **Segment control**                 | 单一页面内的视图切换（Tab/All/Following）                 | `36–40px`                              | Scholarly Blue 选中胶囊 + Ink 文本                    |
@@ -312,6 +312,21 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 - 同一页面同时输出全局 BottomTabBar 与正文 reading dock；`ElPublicShell` 不强制阻断外部 reading dock，但 `mobileNavMode` 契约声明二者互斥，consumer 装配层必须选择其中一个并在 dev 构建中对共存状态发出警告。
 
 Consumer 在公开 landing 上使用 FsusUI 时，必须在 Public Layout Rules 里指明 `inline | menu | bottom | none` 中的哪种模式、为什么，并记录 safe-area 与迁移策略。
+
+`ElPublicShell` 的默认 `menu` 模式使用
+`--fsus-public-shell-mobile-action-height: 44px` 统一 mobile action 几何。
+窄屏 header 第一行只保留可缩短的品牌和 Search、Menu 两个一级动作；两者使用
+`12px` 水平 padding、`8px` 间距、`6px` 圆角、`1px` 边框以及
+`14px / 500` 文字。认证、主题和语言位于 Menu 打开后一步可达的 panel，不得以三个
+intrinsic-width bordered button 挤占一级工具行。Panel item 至少 `44px` 高、水平
+padding `16px`；所有一级 trigger 与 panel action 的 `:focus-visible` 使用
+`2px inset` Scholarly Blue ring。
+
+`mobile-nav-mode="inline"` 是显式例外：Search/Menu 等 icon action 仍不得小于
+`44px × 44px`，认证保持 text link 语义，不得把不同动作伪装成等宽 segmented
+control。组件内部 BEM 几何由 FsusUI 单一拥有；consumer 不得以 `:deep()` 修补。
+验收至少覆盖匿名/登录、长品牌、中文/英文/长文案、320/375/390/768px、
+Light/Dark、150%/200% zoom 与键盘顺序，并确认无横向 overflow 或随机换行。
 
 ### Icons
 

@@ -1,18 +1,29 @@
 <template>
   <ElPublicShell
-    brand="Field Notes"
+    :brand="fixture.brand"
     brand-href="#home"
     active-nav="archive"
     :mobile-nav-mode="mobileNavMode"
-    mobile-nav-label="Primary sections"
-    mobile-nav-menu-label="Sections"
+    :mobile-nav-label="fixture.navigationLabel"
+    :mobile-nav-menu-label="fixture.menuLabel"
     :nav-items="navItems"
+    :auth-label="fixture.authLabel"
+    auth-href="#account"
     desktop-search-mode="none"
     mobile-search-mode="trigger"
-    mobile-search-trigger-label="Search"
+    :mobile-search-trigger-label="fixture.searchLabel"
     :sticky="false"
     :csp-safe="cspSafe"
   >
+    <template #mobile-menu-actions>
+      <button type="button" data-testid="public-shell-theme-action">
+        {{ fixture.themeLabel }}
+      </button>
+      <button type="button" data-testid="public-shell-locale-action">
+        {{ fixture.localeLabel }}
+      </button>
+    </template>
+
     <article
       class="public-shell-nav-fixture"
       data-testid="public-shell-nav-fixture"
@@ -64,17 +75,79 @@ const mobileNavMode = computed<PublicShellMobileNavMode>(() =>
     ? (props.navMode as PublicShellMobileNavMode)
     : 'menu',
 )
-const navItems = [
-  { key: 'home', label: 'Home', href: '#home' },
-  { key: 'archive', label: 'Archive', href: '#archive' },
-  { key: 'topics', label: 'Topics', href: '#topics' },
-  { key: 'about', label: 'About', href: '#about' },
-]
+const fixtureParams = new URLSearchParams(window.location.search)
+const fixtureLocale = fixtureParams.get('fixtureLocale') ?? 'en'
+const longBrand = fixtureParams.get('longBrand') === '1'
+const authenticated = fixtureParams.get('session') === 'authenticated'
+const exposesAuth = fixtureParams.has('session')
+const contractFixture = fixtureParams.get('contract') === '1'
+
+const fixture = computed(() => {
+  if (fixtureLocale === 'zh') {
+    return {
+      authLabel: exposesAuth
+        ? authenticated
+          ? '账户：长名称读者'
+          : '登录'
+        : '',
+      brand: longBrand ? '很长的公共知识库品牌名称' : '田野札记',
+      localeLabel: '语言：简体中文',
+      menuLabel: '菜单',
+      navigationLabel: '主要栏目',
+      searchLabel: '搜索',
+      themeLabel: '主题：跟随系统',
+    }
+  }
+
+  if (fixtureLocale === 'long') {
+    return {
+      authLabel: exposesAuth
+        ? authenticated
+          ? 'Account: International Researcher'
+          : 'Sign in to your account'
+        : '',
+      brand: longBrand
+        ? 'International Field Research Publications'
+        : 'Field Notes',
+      localeLabel: 'Language: English (International)',
+      menuLabel: 'Navigation menu',
+      navigationLabel: 'Primary publication sections',
+      searchLabel: 'Search',
+      themeLabel: 'Theme: Follow system preference',
+    }
+  }
+
+  return {
+    authLabel: exposesAuth ? (authenticated ? 'Account' : 'Sign in') : '',
+    brand: longBrand ? 'Field Notes Research Archive' : 'Field Notes',
+    localeLabel: 'Language: English',
+    menuLabel: contractFixture ? 'Menu' : 'Sections',
+    navigationLabel: 'Primary sections',
+    searchLabel: 'Search',
+    themeLabel: 'Theme: System',
+  }
+})
+const navItems = computed(() =>
+  fixtureLocale === 'zh'
+    ? [
+        { key: 'home', label: '首页', href: '#home' },
+        { key: 'archive', label: '归档', href: '#archive' },
+        { key: 'topics', label: '专题', href: '#topics' },
+        { key: 'about', label: '关于', href: '#about' },
+      ]
+    : [
+        { key: 'home', label: 'Home', href: '#home' },
+        { key: 'archive', label: 'Archive', href: '#archive' },
+        { key: 'topics', label: 'Topics', href: '#topics' },
+        { key: 'about', label: 'About', href: '#about' },
+      ],
+)
 </script>
 
 <style scoped>
 .public-shell-nav-fixture {
   min-height: 46rem;
+  overflow-wrap: anywhere;
 }
 
 .public-shell-nav-fixture__eyebrow {

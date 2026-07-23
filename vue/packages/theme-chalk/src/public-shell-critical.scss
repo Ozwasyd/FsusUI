@@ -98,6 +98,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  --fsus-public-shell-mobile-action-height: 44px;
 
   @include e(header) {
     width: 100%;
@@ -263,7 +264,8 @@
 
   @include e(mobile-search-trigger) {
     display: inline-flex;
-    min-height: 44px;
+    min-width: var(--fsus-public-shell-mobile-action-height, 44px);
+    min-height: var(--fsus-public-shell-mobile-action-height, 44px);
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
@@ -273,9 +275,11 @@
     background: var(--#{$namespace}-bg-color);
     color: var(--#{$namespace}-text-color-secondary);
     font: inherit;
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 500;
     line-height: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
     outline: none;
     transition:
@@ -297,7 +301,8 @@
 
   @include e(mobile-nav-menu) {
     position: static;
-    flex: 0 0 auto;
+    flex: 0 1 auto;
+    min-width: var(--fsus-public-shell-mobile-action-height, 44px);
 
     &:not([open]) > .#{$namespace}-public-shell__mobile-nav-menu-panel {
       display: none;
@@ -306,19 +311,23 @@
 
   @include e(mobile-nav-menu-trigger) {
     display: inline-flex;
-    min-height: 44px;
+    width: 100%;
+    min-width: var(--fsus-public-shell-mobile-action-height, 44px);
+    min-height: var(--fsus-public-shell-mobile-action-height, 44px);
     align-items: center;
     justify-content: center;
     border: 1px solid var(--#{$namespace}-border-color-lighter);
     box-sizing: border-box;
     border-radius: var(--fsus-radius-control, 6px);
-    padding: 0 8px;
+    padding: 0 12px;
     background: var(--#{$namespace}-bg-color);
     color: var(--#{$namespace}-text-color-secondary);
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 500;
     line-height: 1;
     list-style: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
     outline: none;
     transition:
@@ -401,13 +410,13 @@
   @include e(mobile-nav-link) {
     display: inline-flex;
     width: 100%;
-    min-height: 44px;
+    min-height: var(--fsus-public-shell-mobile-action-height, 44px);
     align-items: center;
     justify-content: flex-start;
     box-sizing: border-box;
     border: 1px solid var(--#{$namespace}-border-color-lighter);
     border-radius: var(--fsus-radius-control, 6px);
-    padding-inline: 12px;
+    padding-inline: 16px;
     color: var(--#{$namespace}-text-color-secondary);
     font-size: 13px;
     font-weight: 500;
@@ -441,10 +450,44 @@
   }
 
   @include e(mobile-nav-menu-actions) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
     min-width: 0;
     margin-top: 4px;
     padding-top: 6px;
     border-top: 1px solid var(--#{$namespace}-border-color-lighter);
+
+    > :where(a, button, [role='button']) {
+      display: inline-flex;
+      width: 100%;
+      min-height: var(--fsus-public-shell-mobile-action-height, 44px);
+      align-items: center;
+      justify-content: flex-start;
+      box-sizing: border-box;
+      border: 1px solid transparent;
+      border-radius: var(--fsus-radius-control, 6px);
+      padding: 0 16px;
+      background: transparent;
+      color: var(--#{$namespace}-text-color-secondary);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1;
+      text-align: start;
+    }
+
+    > :where(a, button, [role='button'])[aria-label]:empty {
+      min-width: var(--fsus-public-shell-mobile-action-height, 44px);
+    }
+
+    > :where(a, button, [role='button']):focus-visible {
+      @include a11y-focus-ring(2px, var(--fsus-radius-control, 6px));
+    }
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
   }
 
   @include e(mobile-search-row) {
@@ -476,15 +519,24 @@
     @include m(mobile) {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      min-height: 40px;
-      border: 1px solid var(--#{$namespace}-border-color-lighter);
-      border-radius: var(--#{$namespace}-border-radius-small);
-      padding: 0 12px;
-      background: var(--#{$namespace}-bg-color);
+      justify-content: flex-start;
+      min-height: var(--fsus-public-shell-mobile-action-height, 44px);
+      border: 1px solid transparent;
+      border-radius: var(--fsus-radius-control, 6px);
+      padding: 0 16px;
+      background: transparent;
       color: var(--#{$namespace}-text-color-primary);
       box-sizing: border-box;
+      font-size: 14px;
+      font-weight: 500;
       white-space: nowrap;
+    }
+  }
+
+  @include when(mobile-nav-inline) {
+    .#{$namespace}-public-shell__auth-link--mobile {
+      width: auto;
+      padding-inline: 8px;
     }
   }
 
@@ -571,6 +623,19 @@
 
     @include e(primary-row) {
       align-items: center;
+      gap: 8px;
+    }
+
+    @include e(brand-nav) {
+      overflow: hidden;
+    }
+
+    @include e(brand) {
+      display: block;
+      max-width: 100%;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     @include e(desktop-nav) {
@@ -583,10 +648,27 @@
 
     @include e(mobile-primary-actions) {
       display: inline-flex;
+      max-width: 100%;
       align-items: center;
       justify-content: flex-end;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       gap: 8px;
+
+      > :where(a, button, [role='button']) {
+        flex: 0 1 auto;
+        min-width: var(--fsus-public-shell-mobile-action-height, 44px);
+        min-height: var(--fsus-public-shell-mobile-action-height, 44px);
+        box-sizing: border-box;
+      }
+
+      > :where(a, button, [role='button'])[aria-label]:empty {
+        min-width: var(--fsus-public-shell-mobile-action-height, 44px);
+      }
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
     }
 
     @include e(mobile-toolbar) {

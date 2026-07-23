@@ -548,7 +548,7 @@ describe('PublicShell.vue', () => {
     ).toContain('display: none')
   })
 
-  test('renders default auth link in desktop and mobile primary actions', () => {
+  test('keeps default mobile auth and utilities one menu step from the two primary actions', () => {
     const wrapper = mount(PublicShell, {
       props: {
         brand: 'Fsus',
@@ -570,7 +570,13 @@ describe('PublicShell.vue', () => {
     const mobilePrimaryActions = wrapper.find(
       '.el-public-shell__mobile-primary-actions',
     )
-    const mobileAuth = mobilePrimaryActions.find('.el-public-shell__auth-link')
+    const mobileMenu = mobilePrimaryActions.find(
+      '.el-public-shell__mobile-nav-menu',
+    )
+    const mobileMenuActions = mobileMenu.find(
+      '.el-public-shell__mobile-nav-menu-actions',
+    )
+    const mobileAuth = mobileMenuActions.find('.el-public-shell__auth-link')
 
     expect(wrapper.findAll('.el-public-shell__auth-link')).toHaveLength(2)
     expect(desktopAuth.attributes('href')).toBe('/login')
@@ -580,13 +586,59 @@ describe('PublicShell.vue', () => {
     expect(mobileAuth.classes()).toContain('el-public-shell__auth-link--mobile')
     expect(mobileAuth.attributes('data-public-nav')).toBe('auth')
     expect(
+      Array.from(mobilePrimaryActions.element.children).map(
+        (element) => element.className,
+      ),
+    ).toEqual([
+      'el-public-shell__mobile-search-trigger',
+      'el-public-shell__mobile-nav-menu',
+    ])
+    expect(
       mobilePrimaryActions
         .find('.el-public-shell__mobile-search-trigger')
         .exists(),
     ).toBe(true)
+    expect(mobileMenuActions.find('[data-test="theme-toggle"]').exists()).toBe(
+      true,
+    )
     expect(
-      mobilePrimaryActions.find('[data-test="theme-toggle"]').exists(),
-    ).toBe(true)
+      mobilePrimaryActions.element.querySelector(
+        ':scope > .el-public-shell__auth-link',
+      ),
+    ).toBeNull()
+  })
+
+  test('keeps explicit inline mode actions equal-height in DOM order without turning auth into a menu action', () => {
+    const wrapper = mount(PublicShell, {
+      props: {
+        brand: 'Fsus',
+        navItems,
+        authLabel: 'Sign in',
+        authHref: '/login',
+        mobileNavMode: 'inline',
+        mobileSearchMode: 'trigger',
+        mobileSearchTriggerLabel: 'Search',
+      },
+      slots: {
+        'mobile-primary-actions':
+          '<button data-test="theme-toggle">Theme</button>',
+      },
+    })
+
+    const mobilePrimaryActions = wrapper.find(
+      '.el-public-shell__mobile-primary-actions',
+    )
+    expect(
+      mobilePrimaryActions.find('.el-public-shell__mobile-nav-menu').exists(),
+    ).toBe(false)
+    expect(
+      mobilePrimaryActions.findAll('a, button').map((node) => node.text()),
+    ).toEqual(['Search', 'Theme', 'Sign in'])
+    expect(
+      mobilePrimaryActions
+        .find('.el-public-shell__auth-link--mobile')
+        .attributes('href'),
+    ).toBe('/login')
   })
 
   test('omits desktop and mobile auth links when auth props are incomplete', () => {

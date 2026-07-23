@@ -2077,6 +2077,9 @@ describe('Fsus theme visual baseline', () => {
     const criticalCss = compileThemeFile('public-shell-critical.scss')
 
     for (const css of [publicShellCss, criticalCss]) {
+      expectCssRule(css, '.el-public-shell', [
+        '--fsus-public-shell-mobile-action-height: 44px;',
+      ])
       expectCssRule(css, '.el-public-shell__primary-row', [
         'display: grid;',
         'grid-template-columns: minmax(0, 1fr) auto;',
@@ -2102,11 +2105,20 @@ describe('Fsus theme visual baseline', () => {
       expectCssRule(css, '.el-public-shell__bottom-tab', ['display: none;'])
       expectCssRule(css, '.el-public-shell__mobile-nav-menu-trigger', [
         'display: inline-flex;',
-        'min-height: 44px;',
+        'min-height: var(--fsus-public-shell-mobile-action-height, 44px);',
         'border: 1px solid var(--el-border-color-lighter);',
         'border-radius: var(--fsus-radius-control, 6px);',
+        'padding: 0 12px;',
         'background: var(--el-bg-color);',
+        'font-size: 14px;',
+        'font-weight: 500;',
         'list-style: none;',
+      ])
+      expectCssRule(css, '.el-public-shell__mobile-search-trigger', [
+        'min-height: var(--fsus-public-shell-mobile-action-height, 44px);',
+        'padding: 0 12px;',
+        'font-size: 14px;',
+        'font-weight: 500;',
       ])
       expectCssRule(css, '.el-public-shell__mobile-nav-menu-panel', [
         'position: absolute;',
@@ -2117,10 +2129,10 @@ describe('Fsus theme visual baseline', () => {
       ])
       expectCssRule(css, '.el-public-shell__mobile-nav-link', [
         'width: 100%;',
-        'min-height: 44px;',
+        'min-height: var(--fsus-public-shell-mobile-action-height, 44px);',
         'border: 1px solid var(--el-border-color-lighter);',
         'border-radius: var(--fsus-radius-control, 6px);',
-        'padding-inline: 12px;',
+        'padding-inline: 16px;',
         'justify-content: flex-start;',
         'text-align: start;',
       ])
@@ -2139,9 +2151,18 @@ describe('Fsus theme visual baseline', () => {
         ],
       )
       expectCssRule(css, '.el-public-shell__mobile-nav-menu-actions', [
+        'display: grid;',
+        'grid-template-columns: minmax(0, 1fr);',
         'margin-top: 4px;',
         'padding-top: 6px;',
         'border-top: 1px solid var(--el-border-color-lighter);',
+      ])
+      expectCssRule(css, '.el-public-shell__auth-link--mobile', [
+        'min-height: var(--fsus-public-shell-mobile-action-height, 44px);',
+        'border: 1px solid transparent;',
+        'padding: 0 16px;',
+        'font-size: 14px;',
+        'font-weight: 500;',
       ])
       expect(css).toContain('.el-public-shell__mobile-nav-menu-trigger::marker')
       expectCssRule(css, '.el-public-shell.is-mobile-nav-bottom', [
@@ -2265,9 +2286,12 @@ describe('Fsus theme visual baseline', () => {
     for (const css of [publicShellCss, criticalCss]) {
       expectCssRule(css, '.el-public-shell__mobile-search-trigger', [
         'display: inline-flex;',
-        'min-height: 44px;',
+        'min-height: var(--fsus-public-shell-mobile-action-height, 44px);',
         'border: 1px solid var(--el-border-color-lighter);',
         'border-radius: var(--fsus-radius-control, 6px);',
+        'padding: 0 12px;',
+        'font-size: 14px;',
+        'font-weight: 500;',
       ])
       for (const selector of [
         '.el-public-shell__mobile-search-trigger',
@@ -2447,7 +2471,7 @@ describe('Fsus theme visual baseline', () => {
     }
   })
 
-  test('renders public shell mobile auth as a stable primary action', () => {
+  test('renders public shell mobile auth as a stable menu or inline text action', () => {
     const publicShellCss = compileThemeFile('public-shell.scss')
     const criticalCss = compileThemeFile('public-shell-critical.scss')
 
@@ -2455,9 +2479,13 @@ describe('Fsus theme visual baseline', () => {
       expectCssRule(css, '.el-public-shell__auth-link--mobile', [
         'display: inline-flex;',
         'align-items: center;',
-        'min-height: 40px;',
-        'border: 1px solid var(--el-border-color-lighter);',
-        'background: var(--el-bg-color);',
+        'justify-content: flex-start;',
+        'min-height: var(--fsus-public-shell-mobile-action-height, 44px);',
+        'border: 1px solid transparent;',
+        'padding: 0 16px;',
+        'background: transparent;',
+        'font-size: 14px;',
+        'font-weight: 500;',
         'white-space: nowrap;',
       ])
     }
