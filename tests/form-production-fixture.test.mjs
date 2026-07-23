@@ -44,3 +44,34 @@ test('production form fixture owns responsive width and rhythm contracts', () =>
     assert.ok(source.includes(contract), `missing contract: ${contract}`)
   }
 })
+
+test('production form fixture exposes locale and state stress cases', () => {
+  for (const contract of [
+    "'data-form-language'",
+    'data-testid="form-language-en"',
+    'data-testid="form-language-zh-CN"',
+    "'data-testid': 'form-validation-toggle'",
+    "'data-form-state': 'empty'",
+    "'data-form-state': 'disabled'",
+    "'data-form-state': 'loading'",
+    'task-copy-stress--long-label',
+    'task-copy-stress--long-helper',
+    'task-copy-stress--error',
+    '发布一条编辑更新',
+    'Publish an editorial update',
+  ]) {
+    assert.ok(source.includes(contract), `missing stress contract: ${contract}`)
+  }
+
+  for (const geometryContract of [
+    '.task-form-fixture :deep(.el-input-number)',
+    'grid-column: 1 / -1;',
+    'overflow-wrap: anywhere;',
+    'white-space: normal;',
+  ]) {
+    assert.ok(
+      source.includes(geometryContract),
+      `missing geometry stress contract: ${geometryContract}`,
+    )
+  }
+})

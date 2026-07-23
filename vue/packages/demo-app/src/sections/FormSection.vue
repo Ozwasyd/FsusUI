@@ -4,13 +4,32 @@
     <div
       class="demo-block production-form-fixtures"
       data-testid="production-form-fixtures"
+      v-bind="{ 'data-form-language': productionLocale }"
     >
       <header class="production-form-fixtures__header">
-        <h3>Publish an editorial update</h3>
-        <p>
-          Complete the release details, review validation guidance, and attach
-          the approved cover asset.
-        </p>
+        <h3>{{ copy.title }}</h3>
+        <p>{{ copy.introduction }}</p>
+        <div
+          class="production-form-fixtures__language"
+          aria-label="Fixture language"
+        >
+          <button
+            type="button"
+            data-testid="form-language-en"
+            :aria-pressed="productionLocale === 'en'"
+            @click="productionLocale = 'en'"
+          >
+            English
+          </button>
+          <button
+            type="button"
+            data-testid="form-language-zh-CN"
+            :aria-pressed="productionLocale === 'zh-CN'"
+            @click="productionLocale = 'zh-CN'"
+          >
+            简体中文
+          </button>
+        </div>
       </header>
 
       <el-form
@@ -20,104 +39,130 @@
       >
         <!-- @vue-ignore custom test contract attribute -->
         <section class="task-form-section" data-form-fixture="full-width">
-          <h4>Release details</h4>
-          <el-form-item label="Public title">
+          <h4>{{ copy.releaseDetails }}</h4>
+          <el-form-item :label="copy.publicTitle">
             <el-input
               v-model="productionForm.title"
-              placeholder="Summarize the update for readers"
+              v-bind="{ 'data-form-state': 'empty' }"
+              :placeholder="copy.publicTitlePlaceholder"
             />
-            <p class="task-field-message">
-              Use the same title shown in the release timeline.
-            </p>
+            <p class="task-field-message">{{ copy.publicTitleHelper }}</p>
           </el-form-item>
-          <el-form-item label="Audience">
+          <el-form-item :label="copy.audience">
             <el-select
               v-model="productionForm.audience"
-              placeholder="Choose who can read this update"
+              v-bind="{ 'data-form-state': 'empty' }"
+              :placeholder="copy.audiencePlaceholder"
             >
-              <el-option label="All readers" value="public" />
-              <el-option label="Signed-in members" value="members" />
+              <el-option :label="copy.audiencePublic" value="public" />
+              <el-option :label="copy.audienceMembers" value="members" />
             </el-select>
-            <p class="task-field-message">
-              This setting also controls search indexing.
-            </p>
+            <p class="task-field-message">{{ copy.audienceHelper }}</p>
           </el-form-item>
-          <el-form-item class="is-error" label="Release summary">
+          <el-form-item class="is-error">
+            <template #label>
+              <span class="task-copy-stress--long-label">
+                {{ copy.releaseSummary }}
+              </span>
+            </template>
             <el-input
               v-model="productionForm.summary"
+              v-bind="{ 'data-form-state': 'empty' }"
               type="textarea"
-              placeholder="Explain what changed and what readers should do next"
+              :placeholder="copy.releaseSummaryPlaceholder"
             />
-            <p class="task-field-message task-field-message--error">
-              Add a concrete next step before requesting approval.
+            <p
+              class="task-field-message task-field-message--error task-copy-stress--error"
+            >
+              {{ copy.releaseSummaryError }}
+            </p>
+            <p class="task-field-message task-copy-stress--long-helper">
+              {{ copy.releaseSummaryHelper }}
             </p>
           </el-form-item>
         </section>
 
         <!-- @vue-ignore custom test contract attribute -->
         <section class="task-form-section" data-form-fixture="short-values">
-          <h4>Schedule</h4>
+          <h4>{{ copy.schedule }}</h4>
           <div class="task-short-fields">
-            <el-form-item class="task-field--number" label="Review limit">
+            <el-form-item class="task-field--number" :label="copy.reviewLimit">
               <el-input-number
                 :model-value="productionForm.reviewLimit"
                 :min="1"
                 :max="30"
                 @update:model-value="productionForm.reviewLimit = $event ?? 1"
               />
-              <p class="task-field-message">Days before review expires.</p>
+              <p class="task-field-message">{{ copy.reviewLimitHelper }}</p>
             </el-form-item>
-            <el-form-item class="task-field--date" label="Publish date">
+            <el-form-item class="task-field--date" :label="copy.publishDate">
               <el-date-picker
                 v-model="productionForm.publishDate"
                 type="date"
-                placeholder="Choose a date"
+                :placeholder="copy.publishDatePlaceholder"
               />
-              <p class="task-field-message">Displayed in Asia/Shanghai.</p>
+              <p class="task-field-message">{{ copy.publishDateHelper }}</p>
             </el-form-item>
-            <el-form-item class="task-field--timezone" label="Time zone">
+            <el-form-item class="task-field--timezone" :label="copy.timezone">
               <el-select
                 v-model="productionForm.timezone"
-                placeholder="Choose a time zone"
+                :placeholder="copy.timezonePlaceholder"
               >
                 <el-option
-                  label="Asia/Shanghai (UTC+8)"
+                  :label="copy.timezoneShanghai"
                   value="Asia/Shanghai"
                 />
-                <el-option label="UTC" value="UTC" />
+                <el-option :label="copy.timezoneUtc" value="UTC" />
               </el-select>
-              <p class="task-field-message">Used by scheduled publishing.</p>
+              <p class="task-field-message">{{ copy.timezoneHelper }}</p>
             </el-form-item>
           </div>
         </section>
 
         <!-- @vue-ignore custom test contract attribute -->
         <section class="task-form-section" data-form-fixture="inline-pair">
-          <h4>Review window</h4>
+          <h4>{{ copy.reviewWindow }}</h4>
+          <el-button
+            v-bind="{ 'data-testid': 'form-validation-toggle' }"
+            @click="
+              productionForm.showInlineError = !productionForm.showInlineError
+            "
+          >
+            {{ copy.validationToggle }}
+          </el-button>
           <div class="task-inline-pair">
-            <el-form-item label="Starts">
+            <el-form-item
+              :class="{ 'is-error': productionForm.showInlineError }"
+              :label="copy.starts"
+            >
               <el-date-picker
                 v-model="productionForm.reviewStart"
                 type="date"
-                placeholder="Start date"
+                :placeholder="copy.startPlaceholder"
               />
-              <p class="task-field-message">Reviewers receive access.</p>
+              <p
+                v-if="productionForm.showInlineError"
+                class="task-field-message task-field-message--error"
+              >
+                {{ copy.startError }}
+              </p>
+              <p v-else class="task-field-message">{{ copy.startHelper }}</p>
             </el-form-item>
-            <el-form-item label="Ends">
+            <el-form-item :label="copy.ends">
               <el-date-picker
                 v-model="productionForm.reviewEnd"
                 type="date"
-                placeholder="End date"
+                :placeholder="copy.endPlaceholder"
               />
-              <p class="task-field-message">Open feedback becomes read-only.</p>
+              <p class="task-field-message">{{ copy.endHelper }}</p>
             </el-form-item>
           </div>
         </section>
 
         <!-- @vue-ignore custom test contract attribute -->
         <section class="task-form-section" data-form-fixture="upload">
-          <h4>Approved cover asset</h4>
-          <el-form-item label="Cover image">
+          <h4>{{ copy.coverAsset }}</h4>
+          <el-form-item :label="copy.coverImage">
             <el-upload
               class="task-upload-field"
               drag
@@ -125,13 +170,13 @@
               :auto-upload="false"
               :limit="3"
             >
-              <p>Drop the approved image here or choose a local file.</p>
+              <p>{{ copy.uploadAction }}</p>
               <template #tip>
                 <p class="task-field-message">
-                  PNG or JPEG, up to 2 MB. The editorial crop is 16:9.
+                  {{ copy.uploadHelper }}
                 </p>
                 <p class="task-field-message task-field-message--error">
-                  The current draft still needs an approved cover image.
+                  {{ copy.uploadError }}
                 </p>
               </template>
             </el-upload>
@@ -140,16 +185,18 @@
 
         <!-- @vue-ignore custom test contract attribute -->
         <section class="task-form-section" data-form-fixture="states">
-          <h4>Read-only and processing states</h4>
-          <el-form-item label="Release owner">
-            <el-input model-value="Editorial operations" disabled />
-            <p class="task-field-message">
-              Ownership changes require administrator approval.
-            </p>
+          <h4>{{ copy.states }}</h4>
+          <el-form-item :label="copy.releaseOwner">
+            <el-input
+              :model-value="copy.releaseOwnerValue"
+              v-bind="{ 'data-form-state': 'disabled' }"
+              disabled
+            />
+            <p class="task-field-message">{{ copy.releaseOwnerHelper }}</p>
           </el-form-item>
           <el-form-item
             class="task-approval-controls"
-            label="Approval controls"
+            :label="copy.approvalControls"
           >
             <el-checkbox
               :model-value="productionForm.requiresApproval"
@@ -157,12 +204,12 @@
                 productionForm.requiresApproval = Boolean($event)
               "
             >
-              Require editor approval before publishing
+              {{ copy.requireApproval }}
             </el-checkbox>
             <el-switch
               :model-value="productionForm.notifyReviewers"
-              active-text="Notify reviewers"
-              inactive-text="Do not notify"
+              :active-text="copy.notifyReviewers"
+              :inactive-text="copy.doNotNotify"
               @update:model-value="
                 productionForm.notifyReviewers = Boolean($event)
               "
@@ -171,11 +218,17 @@
               :model-value="productionForm.reviewMode"
               @update:model-value="productionForm.reviewMode = String($event)"
             >
-              <el-radio value="required">Approval required</el-radio>
-              <el-radio value="advisory">Advisory review</el-radio>
+              <el-radio value="required">{{ copy.approvalRequired }}</el-radio>
+              <el-radio value="advisory">{{ copy.advisoryReview }}</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-button type="primary" loading>Checking release policy</el-button>
+          <el-button
+            type="primary"
+            v-bind="{ 'data-form-state': 'loading' }"
+            loading
+          >
+            {{ copy.loading }}
+          </el-button>
         </section>
       </el-form>
     </div>
@@ -345,8 +398,126 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useDemoState } from '../demo-state'
+
+const productionCopy = {
+  en: {
+    advisoryReview: 'Advisory review',
+    approvalControls: 'Approval controls',
+    approvalRequired: 'Approval required',
+    audience: 'Audience',
+    audienceHelper: 'This setting also controls search indexing.',
+    audienceMembers: 'Signed-in members',
+    audiencePlaceholder: 'Choose who can read this update',
+    audiencePublic: 'All readers',
+    coverAsset: 'Approved cover asset',
+    coverImage: 'Cover image',
+    doNotNotify: 'Do not notify',
+    ends: 'Ends',
+    endHelper: 'Open feedback becomes read-only.',
+    endPlaceholder: 'End date',
+    introduction:
+      'Complete the release details, review validation guidance, and attach the approved cover asset.',
+    loading: 'Checking release policy',
+    notifyReviewers: 'Notify reviewers',
+    publicTitle: 'Public title',
+    publicTitleHelper: 'Use the same title shown in the release timeline.',
+    publicTitlePlaceholder: 'Summarize the update for readers',
+    publishDate: 'Publish date',
+    publishDateHelper: 'Displayed in Asia/Shanghai.',
+    publishDatePlaceholder: 'Choose a date',
+    releaseDetails: 'Release details',
+    releaseOwner: 'Release owner',
+    releaseOwnerHelper: 'Ownership changes require administrator approval.',
+    releaseOwnerValue: 'Editorial operations',
+    releaseSummary:
+      'Release summary for readers, reviewers, and support responders',
+    releaseSummaryError: 'Add a concrete next step before requesting approval.',
+    releaseSummaryHelper:
+      'Explain the customer impact, the rollout boundary, and the exact recovery action a reader should take if the updated workflow is unavailable.',
+    releaseSummaryPlaceholder:
+      'Explain what changed and what readers should do next',
+    requireApproval: 'Require editor approval before publishing',
+    reviewLimit: 'Review limit',
+    reviewLimitHelper: 'Days before review expires.',
+    reviewWindow: 'Review window',
+    schedule: 'Schedule',
+    startError: 'Choose a start date before opening review.',
+    startHelper: 'Reviewers receive access.',
+    startPlaceholder: 'Start date',
+    starts: 'Starts',
+    states: 'Read-only and processing states',
+    timezone: 'Time zone',
+    timezoneHelper: 'Used by scheduled publishing.',
+    timezonePlaceholder: 'Choose a time zone',
+    timezoneShanghai: 'Asia/Shanghai (UTC+8)',
+    timezoneUtc: 'UTC',
+    title: 'Publish an editorial update',
+    uploadAction: 'Drop the approved image here or choose a local file.',
+    uploadError: 'The current draft still needs an approved cover image.',
+    uploadHelper: 'PNG or JPEG, up to 2 MB. The editorial crop is 16:9.',
+    validationToggle: 'Toggle start-date validation example',
+  },
+  'zh-CN': {
+    advisoryReview: '建议性复核',
+    approvalControls: '审批控制',
+    approvalRequired: '必须审批',
+    audience: '读者范围',
+    audienceHelper: '此设置也会决定内容是否进入搜索索引。',
+    audienceMembers: '已登录成员',
+    audiencePlaceholder: '选择哪些读者可以查看本次更新',
+    audiencePublic: '所有读者',
+    coverAsset: '已批准的封面素材',
+    coverImage: '封面图片',
+    doNotNotify: '不通知',
+    ends: '结束日期',
+    endHelper: '到期后，已有反馈将变为只读。',
+    endPlaceholder: '选择结束日期',
+    introduction:
+      '填写发布信息，核对审批提示，并附上已经通过编辑审核的封面素材。',
+    loading: '正在核对发布策略',
+    notifyReviewers: '通知复核人',
+    publicTitle: '公开标题',
+    publicTitleHelper: '请使用与发布记录中完全一致的标题。',
+    publicTitlePlaceholder: '概括这次面向读者的更新',
+    publishDate: '发布日期',
+    publishDateHelper: '日期将按 Asia/Shanghai 时区展示。',
+    publishDatePlaceholder: '选择日期',
+    releaseDetails: '发布信息',
+    releaseOwner: '发布负责人',
+    releaseOwnerHelper: '负责人变更必须经过管理员审批。',
+    releaseOwnerValue: '内容运营团队',
+    releaseSummary: '供读者、复核人和支持团队共同使用的发布摘要',
+    releaseSummaryError: '发起审批前，请补充一个读者可以执行的明确下一步。',
+    releaseSummaryHelper:
+      '请完整说明对读者的影响、发布边界，以及更新后的流程不可用时应采取的准确恢复操作，避免只写内部实现细节。',
+    releaseSummaryPlaceholder: '说明发生了什么变化，以及读者接下来应该做什么',
+    requireApproval: '发布前必须由编辑审批',
+    reviewLimit: '复核有效期',
+    reviewLimitHelper: '超过此天数后复核将失效。',
+    reviewWindow: '复核时间窗',
+    schedule: '发布时间',
+    startError: '开启复核前必须选择开始日期。',
+    startHelper: '到达此日期后，复核人将获得访问权限。',
+    startPlaceholder: '选择开始日期',
+    starts: '开始日期',
+    states: '只读与处理中状态',
+    timezone: '发布时区',
+    timezoneHelper: '定时发布任务将使用此时区。',
+    timezonePlaceholder: '选择发布时区',
+    timezoneShanghai: '亚洲/上海（UTC+8）',
+    timezoneUtc: '协调世界时（UTC）',
+    title: '发布一条编辑更新',
+    uploadAction: '将已批准的图片拖到此处，或选择本地文件。',
+    uploadError: '当前草稿仍缺少通过审批的封面图片。',
+    uploadHelper: '支持 PNG 或 JPEG，最大 2 MB，编辑裁切比例为 16:9。',
+    validationToggle: '切换开始日期校验示例',
+  },
+} as const
+
+const productionLocale = ref<keyof typeof productionCopy>('en')
+const copy = computed(() => productionCopy[productionLocale.value])
 
 const productionForm = reactive({
   audience: '',
@@ -357,6 +528,7 @@ const productionForm = reactive({
   reviewEnd: new Date(Date.now() + 86_400_000),
   reviewLimit: 5,
   reviewStart: new Date(),
+  showInlineError: false,
   summary: '',
   timezone: 'Asia/Shanghai',
   title: '',
@@ -418,6 +590,29 @@ const {
   line-height: 1.57;
 }
 
+.production-form-fixtures__language {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.production-form-fixtures__language button {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--el-border-color);
+  border-radius: 6px;
+  color: var(--el-text-color-regular);
+  background: var(--el-fill-color-blank);
+  font: inherit;
+  cursor: pointer;
+}
+
+.production-form-fixtures__language button[aria-pressed='true'] {
+  border-color: var(--el-color-primary);
+  color: var(--el-color-primary);
+}
+
 .task-form-section + .task-form-section {
   margin-top: 28px;
 }
@@ -443,6 +638,7 @@ const {
 
 .task-form-fixture :deep(.el-form-item__content),
 .task-form-fixture :deep(.el-input),
+.task-form-fixture :deep(.el-input-number),
 .task-form-fixture :deep(.el-select),
 .task-form-fixture :deep(.el-date-editor),
 .task-upload-field {
@@ -483,8 +679,16 @@ const {
   max-width: 240px;
 }
 
+.task-field--timezone {
+  grid-column: 1 / -1;
+}
+
 .task-inline-pair {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+[data-form-fixture='inline-pair'] > .el-button {
+  margin-bottom: 16px;
 }
 
 .task-upload-field {
@@ -498,6 +702,22 @@ const {
 
 .task-form-fixture :deep(.task-approval-controls .el-form-item__content) {
   gap: 12px 16px;
+}
+
+.task-form-fixture :deep(.task-approval-controls .el-checkbox),
+.task-form-fixture :deep(.task-approval-controls .el-radio) {
+  max-width: 100%;
+  height: auto;
+  min-width: 0;
+  align-items: flex-start;
+  white-space: normal;
+}
+
+.task-form-fixture :deep(.task-approval-controls .el-checkbox__label),
+.task-form-fixture :deep(.task-approval-controls .el-radio__label) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 @media (max-width: 479px) {
