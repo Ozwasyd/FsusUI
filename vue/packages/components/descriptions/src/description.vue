@@ -12,14 +12,32 @@
       </div>
     </div>
 
-    <div :class="[ns.e('body'), ns.is('bordered', border)]">
-      <table :class="[ns.e('table'), ns.is('bordered', border)]">
-        <tbody>
-          <template v-for="(row, _index) in getRows()" :key="_index">
-            <el-descriptions-row :row="row" />
-          </template>
-        </tbody>
-      </table>
+    <div :class="ns.e('responsive-shell')">
+      <div
+        :class="[ns.e('body'), ns.is('bordered', border)]"
+        :tabindex="responsive === 'scroll' ? 0 : undefined"
+        :aria-label="responsive === 'scroll' ? scrollAriaLabel : undefined"
+      >
+        <table :class="[ns.e('table'), ns.is('bordered', border)]">
+          <tbody>
+            <template v-for="(row, _index) in getRows()" :key="_index">
+              <el-descriptions-row :row="row" />
+            </template>
+          </tbody>
+        </table>
+      </div>
+      <dl :class="ns.e('stack')" aria-label="Description fields">
+        <el-descriptions-stack-cell
+          v-for="(item, index) in getItems()"
+          :key="index"
+          :cell="item"
+        />
+      </dl>
+      <span
+        v-if="responsive === 'scroll'"
+        :class="ns.e('scroll-affordance')"
+        aria-hidden="true"
+      />
     </div>
   </div>
 </template>
@@ -30,6 +48,7 @@ import { flattedChildren } from '@element-plus/utils'
 import { useNamespace } from '@element-plus/hooks'
 import { useFormSize } from '@element-plus/components/form'
 import ElDescriptionsRow from './descriptions-row.vue'
+import ElDescriptionsStackCell from './descriptions-stack-cell'
 import { descriptionsKey } from './token'
 import { descriptionProps } from './description'
 
@@ -50,7 +69,20 @@ const slots = useSlots()
 
 provide(descriptionsKey, props as IDescriptionsInject)
 
-const descriptionKls = computed(() => [ns.b(), ns.m(descriptionsSize.value)])
+const descriptionKls = computed(() => [
+  ns.b(),
+  ns.m(descriptionsSize.value),
+  ns.m(`responsive-${props.responsive}`),
+])
+
+const getItems = () => {
+  if (!slots.default) return []
+
+  return flattedChildren(slots.default()).filter(
+    (node): node is DescriptionItemVNode =>
+      (node as any)?.type?.name === 'ElDescriptionsItem',
+  )
+}
 
 const filledNode = (
   node: DescriptionItemVNode,
@@ -72,12 +104,7 @@ const filledNode = (
 }
 
 const getRows = () => {
-  if (!slots.default) return []
-
-  const children = flattedChildren(slots.default()).filter(
-    (node): node is DescriptionItemVNode =>
-      (node as any)?.type?.name === 'ElDescriptionsItem',
-  )
+  const children = getItems()
   const rows: DescriptionItemVNode[][] = []
   let temp: DescriptionItemVNode[] = []
   let count = props.column

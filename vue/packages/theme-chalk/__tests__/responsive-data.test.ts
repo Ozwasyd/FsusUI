@@ -1,0 +1,31 @@
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { compile } from 'sass'
+import { describe, expect, test } from 'vitest'
+
+const dirname = path.dirname(fileURLToPath(import.meta.url))
+const themeSourceDir = path.resolve(dirname, '../src')
+
+const compileThemeFile = (fileName: string) =>
+  compile(path.resolve(themeSourceDir, fileName), {
+    loadPaths: [themeSourceDir],
+    style: 'expanded',
+  }).css
+
+describe('responsive data component contracts', () => {
+  test('Descriptions exposes flat stack and keyboard-scroll projections', () => {
+    const css = compileThemeFile('descriptions.scss')
+
+    expect(css).toContain('container-type: inline-size;')
+    expect(css).toContain(
+      '.el-descriptions--responsive-stack .el-descriptions__stack',
+    )
+    expect(css).toContain(
+      '.el-descriptions--responsive-scroll .el-descriptions__body',
+    )
+    expect(css).toContain('overflow-x: auto;')
+    expect(css).toContain('@container (max-width: 559px)')
+    expect(css).toContain('overflow-wrap: anywhere;')
+    expect(css).toContain('width: 22px;')
+  })
+})

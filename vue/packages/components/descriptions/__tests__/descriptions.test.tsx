@@ -207,4 +207,36 @@ describe('Descriptions.vue', () => {
     await nextTick()
     expect(wrapper.findComponent(ElTag).text()).toBe(CHANGE_VALUE)
   })
+
+  test('renders an accessible stack projection without truncating values', () => {
+    const longValue =
+      '江苏省苏州市吴中区吴中大道1188号 https://example.com/路径/identifier-very-long-value'
+    const wrapper = mount(() => (
+      <ElDescriptions responsive="stack">
+        <ElDescriptionsItem label="地址">{longValue}</ElDescriptionsItem>
+        <ElDescriptionsItem label="备注"></ElDescriptionsItem>
+      </ElDescriptions>
+    ))
+
+    expect(wrapper.classes()).toContain('el-descriptions--responsive-stack')
+    expect(wrapper.find('dl.el-descriptions__stack').exists()).toBe(true)
+    expect(wrapper.findAll('dt.el-descriptions__stack-label')).toHaveLength(2)
+    expect(wrapper.findAll('dd.el-descriptions__stack-value')).toHaveLength(2)
+    expect(wrapper.find('.el-descriptions__stack-value').text()).toBe(longValue)
+  })
+
+  test('makes the explicit scroll projection keyboard accessible', () => {
+    const wrapper = mount(() => (
+      <ElDescriptions responsive="scroll" scrollAriaLabel="完整用户资料">
+        <ElDescriptionsItem label="地址">long value</ElDescriptionsItem>
+      </ElDescriptions>
+    ))
+    const body = wrapper.find('.el-descriptions__body')
+
+    expect(body.attributes('tabindex')).toBe('0')
+    expect(body.attributes('aria-label')).toBe('完整用户资料')
+    expect(wrapper.find('.el-descriptions__scroll-affordance').exists()).toBe(
+      true,
+    )
+  })
 })

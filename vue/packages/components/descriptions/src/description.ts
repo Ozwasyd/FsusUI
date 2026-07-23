@@ -27,6 +27,21 @@ export const descriptionProps = buildProps({
     default: 'horizontal',
   },
   /**
+   * @description responsive projection used when the available inline size is constrained
+   */
+  responsive: {
+    type: String,
+    values: ['auto', 'stack', 'scroll'],
+    default: 'auto',
+  },
+  /**
+   * @description accessible name for the horizontal scroll container
+   */
+  scrollAriaLabel: {
+    type: String,
+    default: 'Scrollable descriptions',
+  },
+  /**
    * @description size of list
    */
   size: useSizeProp,

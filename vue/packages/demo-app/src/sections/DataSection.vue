@@ -69,10 +69,7 @@
       <el-space :size="30">
         <el-badge :value="12"><el-button>Comments</el-button></el-badge>
         <el-badge :value="3" is-dot>
-          <el-button
-            :icon="Share"
-            type="primary"
-          >
+          <el-button :icon="Share" type="primary">
             <el-visually-hidden>Share article</el-visually-hidden>
           </el-button>
         </el-badge>
@@ -110,10 +107,8 @@
     </div>
     <div class="demo-block">
       <h3>Descriptions & DescriptionsItem</h3>
-      <el-descriptions title="用户资料" border>
-        <el-descriptions-item label="笔名">
-          青砚
-        </el-descriptions-item>
+      <el-descriptions title="用户资料" border responsive="auto">
+        <el-descriptions-item label="笔名"> 青砚 </el-descriptions-item>
         <el-descriptions-item label="联系电话">
           18100000000
         </el-descriptions-item>
@@ -124,15 +119,15 @@
         <el-descriptions-item label="地址">
           江苏省苏州市吴中区吴中大道 1188 号
         </el-descriptions-item>
+        <el-descriptions-item label="主页" :span="2">
+          https://example.com/authors/青砚/research-notes-and-publications
+        </el-descriptions-item>
+        <el-descriptions-item label="备注"></el-descriptions-item>
       </el-descriptions>
     </div>
     <div class="demo-block">
       <h3>Result</h3>
-      <el-result
-        icon="success"
-        title="已发布"
-        sub-title="读者将看到最新版本"
-      >
+      <el-result icon="success" title="已发布" sub-title="读者将看到最新版本">
         <template #extra>
           <el-button type="primary">返回文章列表</el-button>
         </template>

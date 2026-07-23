@@ -4,6 +4,8 @@ export interface IDescriptionsInject {
   border: boolean
   column: number
   direction: 'horizontal' | 'vertical'
+  responsive: 'auto' | 'stack' | 'scroll'
+  scrollAriaLabel: string
   size: ComponentSize
   title: string
   extra: string
