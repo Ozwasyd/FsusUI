@@ -46,7 +46,9 @@ describe('Pagination responsive priority', () => {
     const root = wrapper.find('.el-pagination')
 
     expect(
-      Array.from(root.element.children).map((child) => child.className),
+      Array.from(root.element.children).map(
+        (child) => (child as HTMLElement).className,
+      ),
     ).toEqual([
       'el-pagination__navigation',
       'el-pagination__information is-has-total',
@@ -54,7 +56,7 @@ describe('Pagination responsive priority', () => {
     expect(
       Array.from(
         wrapper.find('.el-pagination__navigation').element.children,
-      ).map((child) => child.className),
+      ).map((child) => (child as HTMLElement).className),
     ).toEqual([
       'btn-prev',
       'el-pagination__compact-indicator',

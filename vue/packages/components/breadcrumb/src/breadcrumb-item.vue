@@ -43,6 +43,7 @@
       :class="[ns.e('inner'), ns.is('link', !!to)]"
       :role="to ? 'link' : undefined"
       :tabindex="to ? 0 : undefined"
+      :title="isCurrent ? itemState.label || undefined : undefined"
       @click="onClick"
       @keydown.enter.prevent="onClick"
       @keydown.space.prevent="onClick"

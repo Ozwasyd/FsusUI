@@ -277,6 +277,12 @@ test('Calendar keeps title, navigation, and date grid aligned without collisions
       )
       const firstAction = actions.locator('button').first()
       await firstAction.focus()
+      // Mobile-emulation projects expose a touch primary pointer. Move focus
+      // with the keyboard before checking :focus-visible so this assertion
+      // measures the keyboard contract instead of Playwright's programmatic
+      // focus heuristic.
+      await page.keyboard.press('Tab')
+      await page.keyboard.press('Shift+Tab')
       await expect(firstAction).toBeFocused()
       const focusPresentation = await firstAction.evaluate((node) => {
         const style = getComputedStyle(node)

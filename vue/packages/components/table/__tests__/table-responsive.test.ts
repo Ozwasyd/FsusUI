@@ -94,4 +94,19 @@ describe('Table responsive projection', () => {
     expect(scrollRegion.attributes('aria-label')).toBe('宽数据表')
     expect(wrapper.find('.el-table__scroll-affordance').exists()).toBe(true)
   })
+
+  it('makes auto mode overflow discoverable when desktop columns exceed the container', async () => {
+    const wrapper = createResponsiveTable(8)
+    await doubleWait()
+
+    const table = wrapper.findComponent(ElTable)
+    table.vm.layout.scrollX.value = true
+    await nextTick()
+
+    const scrollRegion = wrapper.find('.el-table__body-wrapper')
+    expect(scrollRegion.attributes('tabindex')).toBe('0')
+    expect(scrollRegion.attributes('role')).toBe('region')
+    expect(scrollRegion.attributes('aria-label')).toBe('Scrollable data table')
+    expect(wrapper.find('.el-table__scroll-affordance').exists()).toBe(true)
+  })
 })

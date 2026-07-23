@@ -61,9 +61,9 @@
       <div
         ref="bodyWrapper"
         :class="ns.e('body-wrapper')"
-        :tabindex="responsive === 'scroll' ? 0 : undefined"
-        :role="responsive === 'scroll' ? 'region' : undefined"
-        :aria-label="responsive === 'scroll' ? scrollAriaLabel : undefined"
+        :tabindex="responsiveScrollEnabled ? 0 : undefined"
+        :role="responsiveScrollEnabled ? 'region' : undefined"
+        :aria-label="responsiveScrollEnabled ? scrollAriaLabel : undefined"
         @keydown="handleResponsiveScrollKeydown"
       >
         <el-scrollbar
@@ -136,7 +136,7 @@
           </div>
         </el-scrollbar>
         <span
-          v-if="responsive === 'scroll'"
+          v-if="responsiveScrollEnabled"
           :class="[
             ns.e('scroll-affordance'),
             ns.is('consumed', responsiveHasScrolled),
@@ -300,6 +300,11 @@ export default defineComponent({
 
     const { scrollBarRef, scrollTo, setScrollLeft, setScrollTop } =
       useScrollbar()
+    const responsiveScrollEnabled = computed(
+      () =>
+        props.responsive === 'scroll' ||
+        (props.responsive === 'auto' && layout.scrollX.value),
+    )
     const responsiveHasScrolled = ref(false)
     const handleResponsiveScroll = ({
       scrollLeft,
@@ -312,7 +317,7 @@ export default defineComponent({
       emit('scroll', { scrollLeft, scrollTop })
     }
     const handleResponsiveScrollKeydown = (event: KeyboardEvent) => {
-      if (props.responsive !== 'scroll') return
+      if (!responsiveScrollEnabled.value) return
       if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return
       const wrap = scrollBarRef.value?.wrapRef
       if (!wrap) return
@@ -383,6 +388,7 @@ export default defineComponent({
       setScrollLeft,
       setScrollTop,
       responsiveHasScrolled,
+      responsiveScrollEnabled,
       handleResponsiveScroll,
       handleResponsiveScrollKeydown,
       refresh: refreshData,

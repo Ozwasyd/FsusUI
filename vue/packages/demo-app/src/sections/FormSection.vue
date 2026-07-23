@@ -18,6 +18,7 @@
         :model="productionForm"
         label-position="top"
       >
+        <!-- @vue-ignore custom test contract attribute -->
         <section class="task-form-section" data-form-fixture="full-width">
           <h4>Release details</h4>
           <el-form-item label="Public title">
@@ -53,14 +54,16 @@
           </el-form-item>
         </section>
 
+        <!-- @vue-ignore custom test contract attribute -->
         <section class="task-form-section" data-form-fixture="short-values">
           <h4>Schedule</h4>
           <div class="task-short-fields">
             <el-form-item class="task-field--number" label="Review limit">
               <el-input-number
-                v-model="productionForm.reviewLimit"
+                :model-value="productionForm.reviewLimit"
                 :min="1"
                 :max="30"
+                @update:model-value="productionForm.reviewLimit = $event ?? 1"
               />
               <p class="task-field-message">Days before review expires.</p>
             </el-form-item>
@@ -88,6 +91,7 @@
           </div>
         </section>
 
+        <!-- @vue-ignore custom test contract attribute -->
         <section class="task-form-section" data-form-fixture="inline-pair">
           <h4>Review window</h4>
           <div class="task-inline-pair">
@@ -110,6 +114,7 @@
           </div>
         </section>
 
+        <!-- @vue-ignore custom test contract attribute -->
         <section class="task-form-section" data-form-fixture="upload">
           <h4>Approved cover asset</h4>
           <el-form-item label="Cover image">
@@ -133,6 +138,7 @@
           </el-form-item>
         </section>
 
+        <!-- @vue-ignore custom test contract attribute -->
         <section class="task-form-section" data-form-fixture="states">
           <h4>Read-only and processing states</h4>
           <el-form-item label="Release owner">
@@ -145,15 +151,26 @@
             class="task-approval-controls"
             label="Approval controls"
           >
-            <el-checkbox v-model="productionForm.requiresApproval">
+            <el-checkbox
+              :model-value="productionForm.requiresApproval"
+              @update:model-value="
+                productionForm.requiresApproval = Boolean($event)
+              "
+            >
               Require editor approval before publishing
             </el-checkbox>
             <el-switch
-              v-model="productionForm.notifyReviewers"
+              :model-value="productionForm.notifyReviewers"
               active-text="Notify reviewers"
               inactive-text="Do not notify"
+              @update:model-value="
+                productionForm.notifyReviewers = Boolean($event)
+              "
             />
-            <el-radio-group v-model="productionForm.reviewMode">
+            <el-radio-group
+              :model-value="productionForm.reviewMode"
+              @update:model-value="productionForm.reviewMode = String($event)"
+            >
               <el-radio value="required">Approval required</el-radio>
               <el-radio value="advisory">Advisory review</el-radio>
             </el-radio-group>

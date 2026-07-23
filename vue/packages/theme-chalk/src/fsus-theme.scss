@@ -2875,7 +2875,7 @@ button.#{$namespace}-card:active {
   }
 
   .#{$namespace}-button:not(.is-disabled):hover,
-  .#{$namespace}-button:not(.is-disabled):focus {
+  .#{$namespace}-button:not(.is-disabled):focus:not(:focus-visible) {
     transform: none;
     box-shadow: none !important;
     outline: none;
@@ -2890,53 +2890,55 @@ button.#{$namespace}-card:active {
       .#{$namespace}-button--success
     ):not(.#{$namespace}-button--warning):not(
       .#{$namespace}-button--danger
-    ):not(.#{$namespace}-button--info):not(.is-disabled):focus {
+    ):not(.#{$namespace}-button--info):not(.is-disabled):focus:not(
+      :focus-visible
+    ) {
     background: transparent;
     border-color: var(--el-border-color);
     color: var(--el-text-color-primary);
   }
 
   .#{$namespace}-button--primary:not(.is-disabled):hover,
-  .#{$namespace}-button--primary:not(.is-disabled):focus {
+  .#{$namespace}-button--primary:not(.is-disabled):focus:not(:focus-visible) {
     background: var(--el-color-primary);
     border-color: var(--el-color-primary);
     color: var(--el-bg-color);
   }
 
   .#{$namespace}-button--success:not(.is-disabled):hover,
-  .#{$namespace}-button--success:not(.is-disabled):focus {
+  .#{$namespace}-button--success:not(.is-disabled):focus:not(:focus-visible) {
     background: rgba(22, 163, 74, 0.08);
     border-color: rgba(22, 163, 74, 0.18);
     color: #166534;
   }
 
   .#{$namespace}-button--warning:not(.is-disabled):hover,
-  .#{$namespace}-button--warning:not(.is-disabled):focus {
+  .#{$namespace}-button--warning:not(.is-disabled):focus:not(:focus-visible) {
     background: rgba(217, 119, 6, 0.08);
     border-color: rgba(217, 119, 6, 0.18);
     color: #92400e;
   }
 
   .#{$namespace}-button--danger:not(.is-disabled):hover,
-  .#{$namespace}-button--danger:not(.is-disabled):focus {
+  .#{$namespace}-button--danger:not(.is-disabled):focus:not(:focus-visible) {
     background: rgba(220, 38, 38, 0.08);
     border-color: rgba(220, 38, 38, 0.18);
     color: #991b1b;
   }
 
   .#{$namespace}-button--info:not(.is-disabled):hover,
-  .#{$namespace}-button--info:not(.is-disabled):focus {
+  .#{$namespace}-button--info:not(.is-disabled):focus:not(:focus-visible) {
     background: rgba(113, 113, 122, 0.08);
     border-color: rgba(113, 113, 122, 0.16);
     color: var(--el-text-color-regular);
   }
 
   .#{$namespace}-button.is-text:not(.is-disabled):hover,
-  .#{$namespace}-button.is-text:not(.is-disabled):focus,
+  .#{$namespace}-button.is-text:not(.is-disabled):focus:not(:focus-visible),
   .#{$namespace}-button.is-link:not(.is-disabled):hover,
-  .#{$namespace}-button.is-link:not(.is-disabled):focus,
+  .#{$namespace}-button.is-link:not(.is-disabled):focus:not(:focus-visible),
   .#{$namespace}-button--text:not(.is-disabled):hover,
-  .#{$namespace}-button--text:not(.is-disabled):focus {
+  .#{$namespace}-button--text:not(.is-disabled):focus:not(:focus-visible) {
     background: transparent;
     border-color: transparent;
     color: var(--el-text-color-regular);

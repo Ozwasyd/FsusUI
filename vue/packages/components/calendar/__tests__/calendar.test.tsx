@@ -283,7 +283,9 @@ describe('Calendar.vue', () => {
     const buttons = wrapper.findAll('.el-calendar__button-group button')
 
     expect(
-      Array.from(header.element.children).map((child) => child.className),
+      Array.from(header.element.children).map(
+        (child) => (child as HTMLElement).className,
+      ),
     ).toEqual(['el-calendar__title', 'el-calendar__button-group'])
     expect(buttons).toHaveLength(3)
     expect(buttons[0].attributes('aria-label')).toBe('Previous Month')
@@ -303,4 +305,22 @@ describe('Calendar.vue', () => {
 
     expectCalendarTitle(wrapper.find('.el-calendar__title'), 'September 2026')
   })
+
+  it.each([
+    [Chinese, '一', '日'],
+    [German, 'Mo', 'So'],
+  ])(
+    'uses the injected locale week order instead of the Day.js global locale',
+    (locale, first, last) => {
+      const wrapper = mount(() => (
+        <ConfigProvider locale={locale}>
+          <Calendar modelValue={new Date('2026-09-01')} />
+        </ConfigProvider>
+      ))
+      const headers = wrapper.findAll('.el-calendar-table thead th')
+
+      expect(headers[0]?.text()).toBe(first)
+      expect(headers[6]?.text()).toBe(last)
+    },
+  )
 })

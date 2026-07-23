@@ -348,7 +348,9 @@ describe('Transfer', () => {
       const children = root.get('.el-transfer__layout').element.children
 
       expect(root.classes()).toContain('is-auto')
-      expect(Array.from(children, (child) => child.className)).toEqual([
+      expect(
+        Array.from(children, (child) => (child as HTMLElement).className),
+      ).toEqual([
         'el-transfer-panel',
         'el-transfer__buttons',
         'el-transfer-panel',

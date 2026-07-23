@@ -119,6 +119,21 @@ describe('Breadcrumb.vue', () => {
     expect(wrapper.find('.el-breadcrumb__separator').text()).toBe('')
   })
 
+  it('discloses the complete current label when responsive layout clamps it', async () => {
+    const wrapper = _mount(() => (
+      <Breadcrumb>
+        <BreadcrumbItem>
+          Current destination with a complete label
+        </BreadcrumbItem>
+      </Breadcrumb>
+    ))
+    await nextTick()
+
+    expect(wrapper.find('.el-breadcrumb__inner').attributes('title')).toBe(
+      'Current destination with a complete label',
+    )
+  })
+
   describe('BreadcrumbItem', () => {
     it('should set the last item as current page', () => {
       const wrapper = _mount(() => (

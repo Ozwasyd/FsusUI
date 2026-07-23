@@ -587,7 +587,7 @@ describe('PublicShell.vue', () => {
     expect(mobileAuth.attributes('data-public-nav')).toBe('auth')
     expect(
       Array.from(mobilePrimaryActions.element.children).map(
-        (element) => element.className,
+        (element) => (element as HTMLElement).className,
       ),
     ).toEqual([
       'el-public-shell__mobile-search-trigger',

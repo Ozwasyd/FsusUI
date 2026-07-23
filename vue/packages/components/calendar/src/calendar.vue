@@ -7,8 +7,7 @@
           <el-button-group>
             <el-button
               size="small"
-              :aria-label="t('el.datepicker.prevMonth')"
-              :title="t('el.datepicker.prevMonth')"
+              v-bind="previousButtonA11y"
               @click="handleSelectDate('prev-month')"
             >
               <el-icon :class="ns.e('mobile-nav-icon')">
@@ -20,15 +19,14 @@
             </el-button>
             <el-button
               size="small"
-              :aria-label="t('el.datepicker.today')"
+              v-bind="todayButtonA11y"
               @click="handleSelectDate('today')"
             >
               {{ t('el.datepicker.today') }}
             </el-button>
             <el-button
               size="small"
-              :aria-label="t('el.datepicker.nextMonth')"
-              :title="t('el.datepicker.nextMonth')"
+              v-bind="nextButtonA11y"
               @click="handleSelectDate('next-month')"
             >
               <el-icon :class="ns.e('mobile-nav-icon')">
@@ -119,6 +117,17 @@ const {
 } = useCalendar(props, emit, COMPONENT_NAME)
 
 const { lang, t } = useLocale()
+const previousButtonA11y = computed<Record<string, string>>(() => ({
+  'aria-label': t('el.datepicker.prevMonth'),
+  title: t('el.datepicker.prevMonth'),
+}))
+const todayButtonA11y = computed<Record<string, string>>(() => ({
+  'aria-label': t('el.datepicker.today'),
+}))
+const nextButtonA11y = computed<Record<string, string>>(() => ({
+  'aria-label': t('el.datepicker.nextMonth'),
+  title: t('el.datepicker.nextMonth'),
+}))
 const calendarMotionDirection = ref<'backward' | 'forward' | 'neutral'>(
   'neutral',
 )

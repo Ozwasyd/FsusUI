@@ -17,13 +17,25 @@ import type {
 
 export const useDateTable = (
   props: DateTableProps,
-  emit: SetupContext<DateTableEmits>['emit']
+  emit: SetupContext<DateTableEmits>['emit'],
 ) => {
   dayjs.extend(localeData)
-  // https://day.js.org/docs/en/i18n/locale-data
-  const firstDayOfWeek: number = dayjs.localeData().firstDayOfWeek()
-
   const { t, lang } = useLocale()
+  // Resolve week order from the injected component locale instead of Day.js'
+  // process-global locale. ConfigProvider may intentionally differ from it,
+  // and Element Plus locale packs do not implicitly register Day.js locales.
+  const firstDayOfWeek = computed(() => {
+    if (lang.value.toLowerCase() === dayjs.locale().toLowerCase()) {
+      return dayjs.localeData().firstDayOfWeek()
+    }
+    const locale = new Intl.Locale(lang.value) as Intl.Locale & {
+      getWeekInfo?: () => { firstDay: number }
+      weekInfo?: { firstDay: number }
+    }
+    const weekInfo = locale.getWeekInfo?.() ?? locale.weekInfo
+    if (weekInfo?.firstDay) return weekInfo.firstDay % 7
+    return dayjs().locale(lang.value).localeData().firstDayOfWeek()
+  })
   const now = dayjs().locale(lang.value)
 
   const isInRange = computed(() => !!props.range && !!props.range.length)
@@ -33,7 +45,7 @@ export const useDateTable = (
     if (isInRange.value) {
       const [start, end] = props.range!
       const currentMonthRange: CalendarDateCell[] = rangeArr(
-        end.date() - start.date() + 1
+        end.date() - start.date() + 1,
       ).map((index) => ({
         text: start.date() + index,
         type: 'current',
@@ -45,14 +57,14 @@ export const useDateTable = (
         (_, index) => ({
           text: index + 1,
           type: 'next',
-        })
+        }),
       )
       days = currentMonthRange.concat(nextMonthRange)
     } else {
       const firstDay = props.date.startOf('month').day()
       const prevMonthDays: CalendarDateCell[] = getPrevMonthLastDays(
         props.date,
-        (firstDay - firstDayOfWeek + 7) % 7
+        (firstDay - firstDayOfWeek.value + 7) % 7,
       ).map((day) => ({
         text: day,
         type: 'prev',
@@ -61,7 +73,7 @@ export const useDateTable = (
         (day) => ({
           text: day,
           type: 'current',
-        })
+        }),
       )
       days = [...prevMonthDays, ...currentMonthDays]
       const remaining = 7 - (days.length % 7 || 7)
@@ -69,7 +81,7 @@ export const useDateTable = (
         (_, index) => ({
           text: index + 1,
           type: 'next',
-        })
+        }),
       )
       days = days.concat(nextMonthDays)
     }
@@ -77,7 +89,7 @@ export const useDateTable = (
   })
 
   const weekDays = computed(() => {
-    const start = firstDayOfWeek
+    const start = firstDayOfWeek.value
     if (start === 0) {
       return WEEK_DAYS.map((_) => t(`el.datepicker.weeks.${_}`))
     } else {

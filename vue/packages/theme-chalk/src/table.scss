@@ -698,6 +698,13 @@
     }
   }
 
+  &.#{$namespace}-table--responsive-auto.#{$namespace}-table--scrollable-x {
+    .#{$namespace}-table__body-wrapper:focus-visible {
+      outline: 2px solid getCssVar('color-primary');
+      outline-offset: -2px;
+    }
+  }
+
   @include e(responsive-toggle) {
     display: none;
     min-width: 40px;
