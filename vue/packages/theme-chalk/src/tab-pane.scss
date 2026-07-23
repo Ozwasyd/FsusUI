@@ -21,5 +21,6 @@
 @media (prefers-reduced-motion: reduce) {
   .#{$namespace}-tab-pane {
     animation-duration: 1ms;
+    transform: none !important;
   }
 }

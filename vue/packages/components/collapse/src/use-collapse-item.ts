@@ -1,6 +1,5 @@
 import { computed, inject, ref, unref } from 'vue'
-import { useNamespace } from '@element-plus/hooks'
-import { generateId } from '@element-plus/utils'
+import { useId, useNamespace } from '@element-plus/hooks'
 import { collapseContextKey } from './constants'
 
 import type { CollapseItemProps } from './collapse-item'
@@ -10,7 +9,7 @@ export const useCollapseItem = (props: CollapseItemProps) => {
 
   const focusing = ref(false)
   const isClick = ref(false)
-  const id = ref(generateId())
+  const id = useId()
 
   const isActive = computed(() =>
     collapse?.activeNames.value.includes(props.name)

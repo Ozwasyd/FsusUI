@@ -1487,6 +1487,10 @@ describe('Fsus theme visual baseline', () => {
       'animation-delay: 0ms !important;',
       'animation-iteration-count: 1 !important;',
     ])
+    expectCssRule(tabPaneCss, '.el-tab-pane', [
+      'animation-duration: 1ms;',
+      'transform: none !important;',
+    ])
     for (const selector of [
       '.el-zoom-in-top-enter-active',
       '.el-zoom-in-top-leave-active',

@@ -241,7 +241,10 @@ const toElements = (target: MaybeElementRef | MaybeElementRef[]) => {
 
   return targets
     .map((item) => unrefElement(item))
-    .filter((item): item is Element => item instanceof Element)
+    .filter(
+      (item): item is Element =>
+        typeof Element !== 'undefined' && item instanceof Element,
+    )
 }
 
 export interface UseResizeObserverReturn {
