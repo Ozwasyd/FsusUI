@@ -98,6 +98,12 @@ FsusUI 的色彩系统围绕 **Ink / Paper / Dot / Scholarly Blue** 展开。颜
 | Border          | `#E4E4E7`             | `#27272A` | `--fsus-border`, `--el-border-color`                                 | 默认边框和分隔线                          |
 | Scholarly Blue  | `#2A599C`             | `#4B79CC` | `--fsus-scholarly-blue`                                              | 链接、激活态、Focus Ring、交互 Hover      |
 
+暗色表单使用三层角色预算：label、helper、validation guidance 使用
+`--fsus-form-readable-text`（`#A1A1AA`）；placeholder 与 disabled text 使用
+`--fsus-form-state-text`（`#85858F`）；divider、dot 与非必要 icon 使用
+`--fsus-form-decorative`（`#71717A`）。disabled control 使用独立 fill 与 border，
+不得通过降低整个 control 的 opacity 表达不可用状态。
+
 ### Accent Rules
 
 - `Scholarly Blue` 只用于功能性反馈：链接、选中、焦点、键盘导航、少量 Hover 状态。

@@ -59,6 +59,9 @@
   --fsus-border-extra-light: var(--fsus-color-border-extra-light);
   --fsus-text-regular: var(--fsus-color-text-muted);
   --fsus-text-placeholder: var(--fsus-color-text-muted);
+  --fsus-form-readable-text: var(--fsus-color-text-quiet);
+  --fsus-form-state-text: var(--fsus-color-text-muted);
+  --fsus-form-decorative: var(--fsus-color-text-decorative);
   --fsus-highlight: rgba(255, 255, 255, 0.8);
 
   --fsus-radius-control: #{generated.$fsus-radius-control-md};
@@ -318,7 +321,10 @@
   --fsus-border-lighter: var(--fsus-color-border-lighter);
   --fsus-border-extra-light: var(--fsus-color-border-extra-light);
   --fsus-text-regular: #a1a1aa;
-  --fsus-text-placeholder: #71717a;
+  --fsus-text-placeholder: #85858f;
+  --fsus-form-readable-text: #a1a1aa;
+  --fsus-form-state-text: #85858f;
+  --fsus-form-decorative: #71717a;
   --fsus-highlight: rgba(255, 255, 255, 0.05);
   --fsus-shadow-panel: var(--fsus-shadow-overlay-md);
   --fsus-motion-trail: transparent;
@@ -353,5 +359,6 @@
   --el-fill-color-light: var(--fsus-color-fill-light);
   --el-fill-color-lighter: var(--fsus-color-fill-lighter);
   --el-disabled-bg-color: var(--fsus-color-fill-base);
+  --el-disabled-text-color: var(--fsus-form-state-text);
   --el-disabled-border-color: var(--fsus-border);
 }

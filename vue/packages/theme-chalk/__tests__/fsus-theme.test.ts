@@ -430,6 +430,42 @@ describe('Fsus theme visual baseline', () => {
     }
   })
 
+  test('keeps dark form text, state text, disabled fill, and borders distinct', () => {
+    const css = compileThemeFile('fsus-theme.scss')
+    const tokens = readFileSync(
+      path.resolve(dirname, '../src/common/fsus-tokens.scss'),
+      'utf8',
+    ).toLowerCase()
+
+    expect(tokens).toContain('--fsus-form-readable-text: #a1a1aa;')
+    expect(tokens).toContain('--fsus-form-state-text: #85858f;')
+    expect(tokens).toContain(
+      '--el-disabled-text-color: var(--fsus-form-state-text);',
+    )
+    for (const selector of ['.el-form-item__label', '.el-upload__tip']) {
+      expectCssRule(css, selector, ['color: var(--fsus-form-readable-text);'])
+    }
+    for (const selector of [
+      '.el-input__inner::placeholder',
+      '.el-textarea__inner::placeholder',
+      '.el-select__placeholder',
+    ]) {
+      expectCssRule(css, selector, [
+        'color: var(--fsus-form-state-text);',
+        'opacity: 1;',
+      ])
+    }
+    expectCssRule(css, '.el-input.is-disabled .el-input__wrapper', [
+      'background: var(--el-disabled-bg-color);',
+      'border-color: var(--el-disabled-border-color);',
+      'color: var(--el-disabled-text-color);',
+      'opacity: 1;',
+    ])
+    expect(css).not.toMatch(
+      /\.el-input\.is-disabled[^}]*opacity:\s*(?:0|0\.\d+)/,
+    )
+  })
+
   test('keeps invalid idle and keyboard focus rings visually distinct', () => {
     const css = compileThemeFile('form.scss')
 

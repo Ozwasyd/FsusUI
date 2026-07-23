@@ -61,3 +61,58 @@ test('keeps production form columns aligned from desktop to 320px', async ({
     .evaluate((element) => element.getBoundingClientRect().left)
   expect(uploadLeft).toBe(inputLeft)
 })
+
+test('captures dark form role hierarchy in color and grayscale', async ({
+  page,
+}, testInfo) => {
+  test.skip(!testInfo.project.name.includes('dark'))
+
+  const fixture = page.getByTestId('production-form-fixtures')
+  const selectors = [
+    '.el-input',
+    '.el-textarea',
+    '.el-select',
+    '.el-input-number',
+    '.el-date-editor',
+    '.el-upload',
+    '.el-checkbox',
+    '.el-switch',
+    '.el-radio',
+    '.el-button',
+  ]
+  for (const selector of selectors) {
+    await expect(fixture.locator(selector).first()).toBeVisible()
+  }
+
+  const label = fixture.locator('.el-form-item__label').first()
+  const placeholder = fixture.locator('input[placeholder]').first()
+  const disabled = fixture.locator('.el-input.is-disabled').first()
+  await expect(label).toHaveCSS('color', 'rgb(161, 161, 170)')
+  expect(
+    await placeholder.evaluate(
+      (element) => getComputedStyle(element, '::placeholder').color,
+    ),
+  ).toBe('rgb(133, 133, 143)')
+  await expect(disabled).not.toHaveCSS('opacity', /0\.\d+/)
+
+  await placeholder.focus()
+  const focusedWrapper = placeholder.locator('..')
+  await page.waitForTimeout(300)
+  await expect(focusedWrapper).toHaveCSS(
+    'box-shadow',
+    /rgb\(75, 121, 204\).*inset/,
+  )
+
+  await page.screenshot({
+    path: testInfo.outputPath('dark-form-original.png'),
+    fullPage: true,
+  })
+  await page.addStyleTag({
+    content:
+      '[data-testid="production-form-fixtures"] { filter: grayscale(1); }',
+  })
+  await page.screenshot({
+    path: testInfo.outputPath('dark-form-grayscale.png'),
+    fullPage: true,
+  })
+})

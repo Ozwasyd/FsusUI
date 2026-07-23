@@ -350,7 +350,7 @@ html.dark {
     border-color: var(--el-disabled-border-color);
     color: var(--el-disabled-text-color);
     transform: none;
-    opacity: 0.72;
+    opacity: 1;
   }
 }
 
@@ -480,6 +480,46 @@ html.dark {
   &::placeholder {
     color: var(--el-text-color-placeholder);
   }
+}
+
+.#{$namespace}-form-item__label,
+.#{$namespace}-form-item__content > .#{$namespace}-form-item__error,
+.#{$namespace}-upload__tip {
+  color: var(--fsus-form-readable-text);
+}
+
+.#{$namespace}-form-item__error {
+  color: var(--el-color-danger);
+}
+
+.#{$namespace}-input__inner::placeholder,
+.#{$namespace}-textarea__inner::placeholder,
+.#{$namespace}-range-input::placeholder,
+.#{$namespace}-select__placeholder,
+.#{$namespace}-select-v2__placeholder {
+  color: var(--fsus-form-state-text);
+  opacity: 1;
+}
+
+.#{$namespace}-input.is-disabled .#{$namespace}-input__wrapper,
+.#{$namespace}-textarea.is-disabled .#{$namespace}-textarea__inner,
+.#{$namespace}-select .#{$namespace}-select__wrapper.is-disabled,
+.#{$namespace}-select-v2__wrapper.is-disabled,
+.#{$namespace}-date-editor.is-disabled,
+.#{$namespace}-upload.is-disabled .#{$namespace}-upload-dragger {
+  background: var(--el-disabled-bg-color);
+  border-color: var(--el-disabled-border-color);
+  color: var(--el-disabled-text-color);
+  opacity: 1;
+}
+
+.#{$namespace}-input.is-disabled .#{$namespace}-input__inner,
+.#{$namespace}-textarea.is-disabled .#{$namespace}-textarea__inner,
+.#{$namespace}-select .#{$namespace}-select__wrapper.is-disabled,
+.#{$namespace}-select-v2__wrapper.is-disabled,
+.#{$namespace}-date-editor.is-disabled .#{$namespace}-input__inner {
+  color: var(--el-disabled-text-color);
+  -webkit-text-fill-color: var(--el-disabled-text-color);
 }
 
 .#{$namespace}-input-number {

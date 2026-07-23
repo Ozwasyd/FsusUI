@@ -141,6 +141,23 @@
               Ownership changes require administrator approval.
             </p>
           </el-form-item>
+          <el-form-item
+            class="task-approval-controls"
+            label="Approval controls"
+          >
+            <el-checkbox v-model="productionForm.requiresApproval">
+              Require editor approval before publishing
+            </el-checkbox>
+            <el-switch
+              v-model="productionForm.notifyReviewers"
+              active-text="Notify reviewers"
+              inactive-text="Do not notify"
+            />
+            <el-radio-group v-model="productionForm.reviewMode">
+              <el-radio value="required">Approval required</el-radio>
+              <el-radio value="advisory">Advisory review</el-radio>
+            </el-radio-group>
+          </el-form-item>
           <el-button type="primary" loading>Checking release policy</el-button>
         </section>
       </el-form>
@@ -316,7 +333,10 @@ import { useDemoState } from '../demo-state'
 
 const productionForm = reactive({
   audience: '',
+  notifyReviewers: true,
   publishDate: new Date(),
+  requiresApproval: true,
+  reviewMode: 'required',
   reviewEnd: new Date(Date.now() + 86_400_000),
   reviewLimit: 5,
   reviewStart: new Date(),
@@ -459,6 +479,10 @@ const {
   width: 100%;
 }
 
+.task-form-fixture :deep(.task-approval-controls .el-form-item__content) {
+  gap: 12px 16px;
+}
+
 @media (max-width: 479px) {
   .production-form-fixtures__header,
   .task-form-fixture,
@@ -473,6 +497,14 @@ const {
   .task-inline-pair {
     grid-template-columns: minmax(0, 1fr);
     gap: 0;
+  }
+
+  :deep(.el-space--vertical),
+  :deep(.el-space--vertical > .el-space__item),
+  :deep(.el-date-editor--daterange) {
+    width: 100% !important;
+    min-width: 0;
+    max-width: 100%;
   }
 }
 
