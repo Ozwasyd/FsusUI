@@ -203,14 +203,46 @@ test('issue primitives render in the demo route', async ({
   await expect(page.locator('.el-diagnostics-list')).toBeVisible()
   await expect(page.locator('.el-diagnostics-item')).toHaveCount(2)
   await expect(page.locator('.el-copyable-detail')).toBeVisible()
-  const themeModeToggles = page.locator(
-    isCompact
-      ? '.el-theme-mode-toggle--mobile'
-      : '.el-theme-mode-toggle--desktop',
+  const publicShellHeader = page.locator(
+    '.el-site-header[data-public-shell-header]',
   )
-  await expect(themeModeToggles).toHaveCount(2)
-  await expect(themeModeToggles.first()).toBeVisible()
-  await expect(themeModeToggles.last()).toBeVisible()
+  const siteHeaderFixture = page
+    .locator('.issue-primitives__site-header-fixtures .el-site-header')
+    .first()
+  const visibilityClass = isCompact ? 'mobile' : 'desktop'
+  const publicShellThemeModeToggle = publicShellHeader.locator(
+    `.el-theme-mode-toggle--${visibilityClass}`,
+  )
+  const siteHeaderFixtureThemeModeToggle = siteHeaderFixture.locator(
+    `.el-theme-mode-toggle--${visibilityClass}`,
+  )
+  await expect(publicShellThemeModeToggle).toHaveCount(1)
+  await expect(siteHeaderFixtureThemeModeToggle).toHaveCount(1)
+  await expect(siteHeaderFixtureThemeModeToggle).toBeVisible()
+  if (isCompact) {
+    const mobileNavMenu = publicShellHeader.locator(
+      '.el-public-shell__mobile-nav-menu',
+    )
+    const mobileNavMenuTrigger = mobileNavMenu.locator(
+      '.el-public-shell__mobile-nav-menu-trigger',
+    )
+
+    await expect(mobileNavMenuTrigger).toBeVisible()
+    await expect(mobileNavMenuTrigger).toHaveAttribute('aria-expanded', 'false')
+    await expect(publicShellThemeModeToggle).toBeHidden()
+
+    await mobileNavMenuTrigger.click()
+    await expect(mobileNavMenu).toHaveAttribute('open', '')
+    await expect(mobileNavMenuTrigger).toHaveAttribute('aria-expanded', 'true')
+    await expect(publicShellThemeModeToggle).toBeVisible()
+
+    await mobileNavMenuTrigger.click()
+    await expect(mobileNavMenu).not.toHaveAttribute('open', '')
+    await expect(mobileNavMenuTrigger).toHaveAttribute('aria-expanded', 'false')
+    await expect(publicShellThemeModeToggle).toBeHidden()
+  } else {
+    await expect(publicShellThemeModeToggle).toBeVisible()
+  }
 
   const collection = page.locator('.el-responsive-collection')
   await expect(collection).toBeVisible()
