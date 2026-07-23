@@ -22,6 +22,12 @@
 
 通过给数据项添加 `disabled: true` 禁止该项被移动。
 
+## 响应式方向
+
+`direction` 默认为 `auto`。组件容器可用宽度小于 `640px` 时，两侧列表会按“可用列表 → 操作按钮 → 已选列表”的 DOM 与视觉顺序纵向排列；判断依据是组件容器而不是全局 viewport。可使用 `horizontal` 或 `vertical` 强制固定方向。
+
+纵向模式会将移动图标转为上/下方向。默认数据项在单行省略时保留完整 `title`，移动按钮的可访问名称同时包含来源与目标列表标题。
+
 ---
 
 ## API
@@ -32,6 +38,7 @@
 |--------|------|------|--------|
 | model-value / v-model | 右侧列表元素的 key 数组 | `Array<string \| number>` | `[]` |
 | data | Transfer 的数据源 | `Array<{ key, label, disabled? }>` | `[]` |
+| direction | 布局方向；`auto` 在组件容器小于 `640px` 时切换为纵向 | `'horizontal' \| 'vertical' \| 'auto'` | `auto` |
 | filterable | 是否可搜索 | `boolean` | `false` |
 | filter-placeholder | 搜索框占位符 | `string` | — |
 | filter-method | 自定义搜索方法 | `(query: string, item: TransferDataItem) => boolean` | — |

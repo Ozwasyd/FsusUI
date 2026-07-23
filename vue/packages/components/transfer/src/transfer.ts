@@ -12,6 +12,7 @@ import type Transfer from './transfer.vue'
 
 export type TransferKey = string | number
 export type TransferDirection = 'left' | 'right'
+export type TransferLayoutDirection = 'horizontal' | 'vertical' | 'auto'
 
 export type TransferDataItem = Record<string, any>
 
@@ -40,6 +41,15 @@ export const LEFT_CHECK_CHANGE_EVENT = 'left-check-change'
 export const RIGHT_CHECK_CHANGE_EVENT = 'right-check-change'
 
 export const transferProps = buildProps({
+  /**
+   * @description layout direction. `auto` switches to a vertical layout when
+   * the component container is narrower than 640px
+   */
+  direction: {
+    type: String,
+    values: ['horizontal', 'vertical', 'auto'],
+    default: 'auto',
+  },
   /**
    * @description data source
    */

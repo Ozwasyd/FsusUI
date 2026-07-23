@@ -9,19 +9,27 @@
 
 @include b(transfer) {
   font-size: getCssVar('font-size', 'base');
+  container-type: inline-size;
+  width: 100%;
+  min-width: 0;
+
+  @include e(layout) {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+  }
 
   @include e(buttons) {
-    display: inline-block;
-    vertical-align: middle;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     padding: 0 30px;
   }
 
   @include e(button) {
-    vertical-align: top;
-
-    &:nth-child(2) {
-      margin: 0 0 0 10px;
-    }
+    min-width: 40px;
+    min-height: 40px;
+    margin: 0;
 
     i,
     span {
@@ -30,6 +38,41 @@
 
     & .#{$namespace}-icon + span {
       margin-left: 0;
+    }
+  }
+
+  @include e(direction-icon) {
+    width: 16px;
+    height: 16px;
+
+    svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 1.75;
+    }
+  }
+
+  @include when(vertical) {
+    @include e(layout) {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+      width: 100%;
+    }
+
+    @include e(buttons) {
+      justify-content: center;
+      padding: 0;
+    }
+
+    @include e(direction-icon) {
+      transform: rotate(90deg);
+    }
+
+    .#{$namespace}-transfer-panel {
+      width: 100%;
+      min-width: 0;
     }
   }
 }
@@ -76,8 +119,11 @@
   @include e(item) {
     height: getCssVar('transfer-item-height');
     line-height: getCssVar('transfer-item-height');
-    padding-left: 15px;
-    display: block !important;
+    min-height: 40px;
+    padding: 0 12px;
+    display: flex !important;
+    align-items: center;
+    box-sizing: border-box;
 
     & + .#{$namespace}-transfer-panel__item {
       margin-left: 0;
@@ -92,18 +138,27 @@
     }
 
     &.#{$namespace}-checkbox .#{$namespace}-checkbox__label {
-      width: 100%;
+      flex: 1;
+      min-width: 0;
       @include utils-ellipsis;
       display: block;
       box-sizing: border-box;
-      padding-left: 22px;
+      padding-left: 8px;
       line-height: getCssVar('transfer-item-height');
     }
 
     .#{$namespace}-checkbox__input {
-      position: absolute;
-      top: 8px;
+      position: static;
+      flex: none;
     }
+  }
+
+  @include e(item-label) {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   @include e(filter) {
@@ -200,5 +255,31 @@
       width: 3px;
       left: 4px;
     }
+  }
+}
+
+@container (max-width: 639px) {
+  .#{$namespace}-transfer.is-auto > .#{$namespace}-transfer__layout {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .#{$namespace}-transfer.is-auto
+    > .#{$namespace}-transfer__layout
+    > .#{$namespace}-transfer__buttons {
+    justify-content: center;
+    padding: 0;
+  }
+
+  .#{$namespace}-transfer.is-auto .#{$namespace}-transfer__direction-icon {
+    transform: rotate(90deg);
+  }
+
+  .#{$namespace}-transfer.is-auto .#{$namespace}-transfer-panel {
+    width: 100%;
+    min-width: 0;
   }
 }

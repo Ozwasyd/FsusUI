@@ -1295,14 +1295,14 @@ $collapse: map.merge(
 $transfer: () !default;
 $transfer: map.merge(
   (
-    'border-color': getCssVar('border-color-lighter'),
-    'border-radius': getCssVar('border-radius-base'),
+    'border-color': var(--fsus-border),
+    'border-radius': 12px,
     'panel-width': 200px,
     'panel-header-height': 40px,
     'panel-header-bg-color': getCssVar('fill-color', 'light'),
     'panel-footer-height': 40px,
     'panel-body-height': 278px,
-    'item-height': 30px,
+    'item-height': 40px,
     'filter-height': 32px,
   ),
   $transfer

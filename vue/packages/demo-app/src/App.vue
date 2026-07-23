@@ -90,6 +90,7 @@ import NavigationSection from './sections/NavigationSection.vue'
 import OthersSection from './sections/OthersSection.vue'
 import PublicShellNavModeSection from './sections/PublicShellNavModeSection.vue'
 import PublicShellSearchModeSection from './sections/PublicShellSearchModeSection.vue'
+import TransferResponsiveSection from './sections/TransferResponsiveSection.vue'
 import ViewTransitionSection from './sections/ViewTransitionSection.vue'
 
 import type { ComponentPublicInstance } from 'vue'
@@ -171,6 +172,10 @@ const routeSections = new Map<string, DemoSection | { component: object }>([
   [
     'character-challenge-conformance',
     { component: markRaw(CharacterChallengeConformanceSection) },
+  ],
+  [
+    'transfer-responsive',
+    { component: markRaw(TransferResponsiveSection) },
   ],
 ])
 

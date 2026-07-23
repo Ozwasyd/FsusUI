@@ -341,6 +341,56 @@ describe('Transfer', () => {
     })
   })
 
+  describe('responsive direction contract', () => {
+    it('defaults to auto and preserves source, actions, target DOM order', () => {
+      const wrapper = mount(() => <Transfer data={getTestData()} />)
+      const root = wrapper.get('.el-transfer')
+      const children = root.get('.el-transfer__layout').element.children
+
+      expect(root.classes()).toContain('is-auto')
+      expect(Array.from(children, (child) => child.className)).toEqual([
+        'el-transfer-panel',
+        'el-transfer__buttons',
+        'el-transfer-panel',
+      ])
+    })
+
+    it.each(['horizontal', 'vertical'] as const)(
+      'supports an explicit %s direction',
+      (direction) => {
+        const wrapper = mount(() => (
+          <Transfer direction={direction} data={getTestData()} />
+        ))
+
+        expect(wrapper.get('.el-transfer').classes()).toContain(
+          `is-${direction}`,
+        )
+      },
+    )
+
+    it('gives move controls direction-specific accessible names', () => {
+      const wrapper = mount(() => (
+        <Transfer titles={['可选文章', '已选文章']} data={getTestData()} />
+      ))
+      const buttons = wrapper.findAll('.el-transfer__button')
+
+      expect(buttons[0].attributes('aria-label')).toBe('已选文章 → 可选文章')
+      expect(buttons[1].attributes('aria-label')).toBe('可选文章 → 已选文章')
+    })
+
+    it('exposes the complete default option label when text is ellipsized', () => {
+      const longLabel =
+        '这是一条需要在窄屏中省略显示但仍可由辅助方式读取的完整文章标题'
+      const wrapper = mount(() => (
+        <Transfer data={[{ key: 1, label: longLabel }]} />
+      ))
+
+      expect(
+        wrapper.get('.el-transfer-panel__item-label').attributes('title'),
+      ).toBe(longLabel)
+    })
+  })
+
   describe('validate clearQuery', () => {
     it('set query and clear query', async () => {
       const value = ref([])

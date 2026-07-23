@@ -38,7 +38,12 @@
           :disabled="item[propsAlias.disabled]"
           :validate-event="false"
         >
-          <option-content :option="optionRender?.(item) ?? []" />
+          <div
+            :class="ns.be('panel', 'item-label')"
+            :title="String(item[propsAlias.label] ?? item[propsAlias.key])"
+          >
+            <option-content :option="optionRender?.(item) ?? []" />
+          </div>
         </el-checkbox>
       </el-checkbox-group>
       <p v-show="hasNoMatch || isEmpty(data)" :class="ns.be('panel', 'empty')">

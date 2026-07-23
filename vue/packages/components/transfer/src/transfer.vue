@@ -1,59 +1,63 @@
 <template>
-  <div :class="ns.b()">
-    <transfer-panel
-      ref="leftPanel"
-      :data="sourceData"
-      :option-render="optionRender"
-      :placeholder="panelFilterPlaceholder"
-      :title="leftPanelTitle"
-      :filterable="filterable"
-      :format="format"
-      :filter-method="filterMethod"
-      :default-checked="leftDefaultChecked"
-      :props="props.props"
-      @checked-change="onSourceCheckedChange"
-    >
-      <slot name="left-footer" />
-    </transfer-panel>
-    <div :class="ns.e('buttons')">
-      <el-button
-        type="primary"
-        :class="[ns.e('button'), ns.is('with-texts', hasButtonTexts)]"
-        :disabled="isEmpty(checkedState.rightChecked)"
-        @click="addToLeft"
+  <div :class="[ns.b(), ns.is(direction)]">
+    <div :class="ns.e('layout')">
+      <transfer-panel
+        ref="leftPanel"
+        :data="sourceData"
+        :option-render="optionRender"
+        :placeholder="panelFilterPlaceholder"
+        :title="leftPanelTitle"
+        :filterable="filterable"
+        :format="format"
+        :filter-method="filterMethod"
+        :default-checked="leftDefaultChecked"
+        :props="props.props"
+        @checked-change="onSourceCheckedChange"
       >
-        <el-icon><arrow-left /></el-icon>
-        <template v-if="!isUndefined(buttonTexts[0])">
-          {{ buttonTexts[0] }}
-        </template>
-      </el-button>
-      <el-button
-        type="primary"
-        :class="[ns.e('button'), ns.is('with-texts', hasButtonTexts)]"
-        :disabled="isEmpty(checkedState.leftChecked)"
-        @click="addToRight"
+        <slot name="left-footer" />
+      </transfer-panel>
+      <div :class="ns.e('buttons')">
+        <el-button
+          type="primary"
+          :class="[ns.e('button'), ns.is('with-texts', hasButtonTexts)]"
+          :disabled="isEmpty(checkedState.rightChecked)"
+          v-bind="{ 'aria-label': moveToLeftLabel }"
+          @click="addToLeft"
+        >
+          <el-icon :class="ns.e('direction-icon')"><arrow-left /></el-icon>
+          <template v-if="!isUndefined(buttonTexts[0])">
+            {{ buttonTexts[0] }}
+          </template>
+        </el-button>
+        <el-button
+          type="primary"
+          :class="[ns.e('button'), ns.is('with-texts', hasButtonTexts)]"
+          :disabled="isEmpty(checkedState.leftChecked)"
+          v-bind="{ 'aria-label': moveToRightLabel }"
+          @click="addToRight"
+        >
+          <template v-if="!isUndefined(buttonTexts[1])">
+            {{ buttonTexts[1] }}
+          </template>
+          <el-icon :class="ns.e('direction-icon')"><arrow-right /></el-icon>
+        </el-button>
+      </div>
+      <transfer-panel
+        ref="rightPanel"
+        :data="targetData"
+        :option-render="optionRender"
+        :placeholder="panelFilterPlaceholder"
+        :filterable="filterable"
+        :format="format"
+        :filter-method="filterMethod"
+        :title="rightPanelTitle"
+        :default-checked="rightDefaultChecked"
+        :props="props.props"
+        @checked-change="onTargetCheckedChange"
       >
-        <template v-if="!isUndefined(buttonTexts[1])">
-          {{ buttonTexts[1] }}
-        </template>
-        <el-icon><arrow-right /></el-icon>
-      </el-button>
+        <slot name="right-footer" />
+      </transfer-panel>
     </div>
-    <transfer-panel
-      ref="rightPanel"
-      :data="targetData"
-      :option-render="optionRender"
-      :placeholder="panelFilterPlaceholder"
-      :filterable="filterable"
-      :format="format"
-      :filter-method="filterMethod"
-      :title="rightPanelTitle"
-      :default-checked="rightDefaultChecked"
-      :props="props.props"
-      @checked-change="onTargetCheckedChange"
-    >
-      <slot name="right-footer" />
-    </transfer-panel>
   </div>
 </template>
 
@@ -131,6 +135,14 @@ const leftPanelTitle = computed(
 
 const rightPanelTitle = computed(
   () => props.titles[1] || t('el.transfer.titles.1')
+)
+
+const moveToLeftLabel = computed(
+  () => `${rightPanelTitle.value} → ${leftPanelTitle.value}`
+)
+
+const moveToRightLabel = computed(
+  () => `${leftPanelTitle.value} → ${rightPanelTitle.value}`
 )
 
 const panelFilterPlaceholder = computed(
