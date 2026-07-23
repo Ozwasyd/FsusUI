@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ElButton } from '../../components/button'
-import { ElCollapse, ElCollapseItem } from '../../components/collapse'
-import { ElDialog } from '../../components/dialog'
-import { ElDrawer } from '../../components/drawer'
 import {
+  ElButton,
+  ElCollapse,
+  ElCollapseItem,
+  ElDialog,
+  ElDrawer,
   ElDropdown,
   ElDropdownItem,
   ElDropdownMenu,
-} from '../../components/dropdown'
-import { vLoading } from '../../components/loading'
-import { ElNotification } from '../../components/notification'
-import { ElPopover } from '../../components/popover'
-import { ElTabPane, ElTabs } from '../../components/tabs'
+  ElNotification,
+  ElPopover,
+  ElTabPane,
+  ElTabs,
+  vLoading,
+} from '../../element-plus'
 
 import type { CollapseModelValue } from '../../components/collapse'
 import type { TabPaneName } from '../../components/tabs'
