@@ -88,6 +88,7 @@ import IssuePrimitivesSection from './sections/IssuePrimitivesSection.vue'
 import MarkdownStressSection from './sections/MarkdownStressSection.vue'
 import NavigationSection from './sections/NavigationSection.vue'
 import OthersSection from './sections/OthersSection.vue'
+import PaginationMatrixSection from './sections/PaginationMatrixSection.vue'
 import PublicShellNavModeSection from './sections/PublicShellNavModeSection.vue'
 import PublicShellSearchModeSection from './sections/PublicShellSearchModeSection.vue'
 import TransferResponsiveSection from './sections/TransferResponsiveSection.vue'
@@ -177,6 +178,7 @@ const routeSections = new Map<string, DemoSection | { component: object }>([
     'transfer-responsive',
     { component: markRaw(TransferResponsiveSection) },
   ],
+  ['pagination-matrix', { component: markRaw(PaginationMatrixSection) }],
 ])
 
 const isDefaultGallery = computed(() => !props.mode)
