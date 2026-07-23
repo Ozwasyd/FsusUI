@@ -1,6 +1,7 @@
 {
   "schemaVersion": 1,
   "componentModules": {
+    "fixture-options-widget": "portable",
     "fixture-service": "platform-override",
     "fixture-widget": "portable"
   },

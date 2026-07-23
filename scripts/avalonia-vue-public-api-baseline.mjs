@@ -235,6 +235,15 @@ const objectForExpression = (source, startIndex) => {
   return source.slice(openIndex, closeIndex + 1)
 }
 
+const objectLiteralAtExpression = (source, startIndex) => {
+  let openIndex = startIndex
+  while (/\s/.test(source[openIndex] ?? '')) openIndex += 1
+  if (source[openIndex] !== '{') return ''
+  const closeIndex = findMatchingBrace(source, openIndex)
+  if (closeIndex === -1) return ''
+  return source.slice(openIndex, closeIndex + 1)
+}
+
 const findConstObject = (sources, identifier) => {
   const assignment = new RegExp(
     `(?:export\\s+)?const\\s+${identifier.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*=`,
@@ -267,7 +276,10 @@ const parseDefineExpose = (vueSource) => {
 const parseOptionsApiObjects = (vueSource, key) => {
   const results = []
   for (const match of vueSource.matchAll(new RegExp(`${key}\\s*:\\s*`, 'g'))) {
-    const object = objectForExpression(vueSource, match.index + match[0].length)
+    const object = objectLiteralAtExpression(
+      vueSource,
+      match.index + match[0].length,
+    )
     if (object) results.push(object)
   }
   return results
@@ -843,6 +855,19 @@ const runFixtureAssertions = () => {
     (component) => component.name === 'ElFixtureWidget',
   )
   if (!widget) throw new Error('fixture widget missing from baseline')
+  const optionsWidget = baseline.components.find(
+    (component) => component.name === 'ElFixtureOptionsWidget',
+  )
+  if (!optionsWidget)
+    throw new Error('fixture options widget missing from baseline')
+  if (
+    optionsWidget.props.includes('emit') ||
+    optionsWidget.emits.includes('emit')
+  ) {
+    throw new Error(
+      'Options API setup context was misclassified as a prop or emit',
+    )
+  }
   for (const prop of ['label', 'legacyMode', 'modelValue']) {
     if (!widget.props.includes(prop)) {
       throw new Error(`fixture widget prop ${prop} was not extracted`)

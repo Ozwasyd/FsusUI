@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "7aa091be17ef190d6b44f770e605135bb400b2e2",
+    "commitSha": "634074da46547933aaea3964ad240b843a4e31d7",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
@@ -14,7 +14,7 @@
     "directives": 3,
     "services": 4,
     "plugins": 7,
-    "cssVariables": 432,
+    "cssVariables": 437,
     "deprecatedApis": 20,
     "componentCountByClassification": {
       "portable": 124,
@@ -892,7 +892,7 @@
       "name": "ElBreadcrumb",
       "module": "breadcrumb",
       "classification": "portable",
-      "props": ["separator", "separatorIcon"],
+      "props": ["ariaLabel", "separator", "separatorIcon"],
       "emits": [],
       "slots": [
         {
@@ -1120,7 +1120,7 @@
       "module": "cascader-panel",
       "classification": "native-adapter",
       "props": ["...CommonProps", "border", "renderLabel"],
-      "emits": ["emit", "slots"],
+      "emits": [],
       "slots": [],
       "exposed": []
     },
@@ -1588,7 +1588,16 @@
       "name": "ElDescriptions",
       "module": "descriptions",
       "classification": "portable",
-      "props": ["border", "column", "direction", "extra", "size", "title"],
+      "props": [
+        "border",
+        "column",
+        "direction",
+        "extra",
+        "responsive",
+        "scrollAriaLabel",
+        "size",
+        "title"
+      ],
       "emits": [],
       "slots": [
         {
@@ -1606,7 +1615,16 @@
       "name": "ElDescriptionsItem",
       "module": "descriptions",
       "classification": "portable",
-      "props": ["border", "column", "direction", "extra", "size", "title"],
+      "props": [
+        "border",
+        "column",
+        "direction",
+        "extra",
+        "responsive",
+        "scrollAriaLabel",
+        "size",
+        "title"
+      ],
       "emits": [],
       "slots": [
         {
@@ -1811,8 +1829,15 @@
       "name": "ElDrawer",
       "module": "drawer",
       "classification": "platform-override",
-      "props": ["attrs", "slots"],
-      "emits": ["attrs", "slots"],
+      "props": [
+        "...dialogProps",
+        "direction",
+        "headerAriaLevel",
+        "modalFade",
+        "size",
+        "withHeader"
+      ],
+      "emits": [],
       "slots": [
         {
           "name": "default",
@@ -1837,8 +1862,34 @@
       "name": "ElDropdown",
       "module": "dropdown",
       "classification": "native-adapter",
-      "props": ["emit"],
-      "emits": ["emit"],
+      "props": [
+        "...componentMotionProps",
+        "buttonProps",
+        "command",
+        "disabled",
+        "divided",
+        "effect",
+        "hideOnClick",
+        "hideTimeout",
+        "icon",
+        "id",
+        "loop",
+        "maxHeight",
+        "onKeydown",
+        "placement",
+        "popperClass",
+        "popperOptions",
+        "role",
+        "showTimeout",
+        "size",
+        "splitButton",
+        "tabindex",
+        "teleported",
+        "textValue",
+        "trigger",
+        "type"
+      ],
+      "emits": [],
       "slots": [
         {
           "name": "default",
@@ -1855,8 +1906,8 @@
       "name": "ElDropdownItem",
       "module": "dropdown",
       "classification": "native-adapter",
-      "props": ["attrs", "emit"],
-      "emits": ["attrs", "emit"],
+      "props": ["command", "disabled", "divided", "icon", "textValue"],
+      "emits": [],
       "slots": [
         {
           "name": "default",
@@ -2007,7 +2058,6 @@
       "props": [
         "...formMetaProps",
         "hideRequiredAsterisk",
-        "if",
         "inline",
         "inlineMessage",
         "labelPosition",
@@ -2630,8 +2680,8 @@
       "name": "ElMenuItem",
       "module": "menu",
       "classification": "native-adapter",
-      "props": ["emit"],
-      "emits": ["emit"],
+      "props": ["disabled", "index", "route", "title"],
+      "emits": ["click"],
       "slots": [
         {
           "name": "default",
@@ -2708,7 +2758,7 @@
         "roundButton",
         "showClose"
       ],
-      "emits": ["emit"],
+      "emits": [],
       "slots": [
         {
           "name": "default",
@@ -3777,7 +3827,7 @@
       "module": "select-v2",
       "classification": "native-adapter",
       "props": ["height", "item", "style"],
-      "emits": ["emit"],
+      "emits": [],
       "slots": [],
       "exposed": []
     },
@@ -4033,8 +4083,8 @@
       "name": "ElStep",
       "module": "steps",
       "classification": "portable",
-      "props": ["description", "icon", "name", "status", "title"],
-      "emits": [],
+      "props": ["clickable", "description", "icon", "status", "title"],
+      "emits": ["click"],
       "slots": [
         {
           "name": "description",
@@ -4581,6 +4631,7 @@
       "props": [
         "buttonTexts",
         "data",
+        "direction",
         "filterMethod",
         "filterPlaceholder",
         "filterable",
@@ -4621,7 +4672,6 @@
         "allowDrag",
         "allowDrop",
         "autoExpandParent",
-        "broadcastExpanded",
         "checkDescendants",
         "checkOnClickNode",
         "checkStrictly",
@@ -6212,7 +6262,8 @@
       "name": "--el-a11y-focus-color",
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
-        "vue/packages/theme-chalk/src/mixins/mixins.scss"
+        "vue/packages/theme-chalk/src/mixins/mixins.scss",
+        "vue/packages/theme-chalk/src/step.scss"
       ],
       "classification": "portable"
     },
@@ -6373,7 +6424,10 @@
     },
     {
       "name": "--el-color-danger",
-      "files": ["vue/packages/theme-chalk/src/markdown-renderer.scss"],
+      "files": [
+        "vue/packages/theme-chalk/src/fsus-theme.scss",
+        "vue/packages/theme-chalk/src/markdown-renderer.scss"
+      ],
       "classification": "portable"
     },
     {
@@ -6840,6 +6894,8 @@
         "vue/packages/theme-chalk/src/color-picker.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/common/var.scss",
+        "vue/packages/theme-chalk/src/descriptions.scss",
+        "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/motion.scss",
         "vue/packages/theme-chalk/src/public-shell-critical.scss",
         "vue/packages/theme-chalk/src/tooltip-v2.scss"
@@ -7448,6 +7504,7 @@
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/common/var.scss",
+        "vue/packages/theme-chalk/src/descriptions.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/perception-challenge.scss"
       ],
@@ -7833,6 +7890,11 @@
       "classification": "portable"
     },
     {
+      "name": "--fsus-empty-action-min-height",
+      "files": ["vue/packages/theme-chalk/src/fsus-theme.scss"],
+      "classification": "portable"
+    },
+    {
       "name": "--fsus-floating-control-radius",
       "files": [
         "vue/packages/theme-chalk/src/backtop.scss",
@@ -7888,6 +7950,27 @@
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/mixins/mixins.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss"
+      ],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-form-decorative",
+      "files": ["vue/packages/theme-chalk/src/common/fsus-tokens.scss"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-form-readable-text",
+      "files": [
+        "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
+        "vue/packages/theme-chalk/src/fsus-theme.scss"
+      ],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-form-state-text",
+      "files": [
+        "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
+        "vue/packages/theme-chalk/src/fsus-theme.scss"
       ],
       "classification": "portable"
     },
@@ -8011,6 +8094,7 @@
         "vue/packages/theme-chalk/src/carousel.scss",
         "vue/packages/theme-chalk/src/color-picker.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
+        "vue/packages/theme-chalk/src/descriptions.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/motion.scss",
         "vue/packages/theme-chalk/src/public-shell-critical.scss",
@@ -8760,6 +8844,14 @@
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/progress.scss"
+      ],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-public-shell-mobile-action-height",
+      "files": [
+        "vue/packages/theme-chalk/src/public-shell-critical.scss",
+        "vue/packages/theme-chalk/src/public-shell.scss"
       ],
       "classification": "portable"
     },
