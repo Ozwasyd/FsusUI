@@ -197,13 +197,18 @@ describe('Fsus theme visual baseline', () => {
         'border-radius: var(--fsus-radius-control);',
       ])
     }
-    for (const selector of ['.el-dialog', '.el-drawer', '.el-notification']) {
+    for (const selector of ['.el-dialog', '.el-drawer']) {
       expectCssRule(css, selector, [
-        'border: 1px solid var(--el-border-color);',
-        'border-radius: var(--fsus-radius-panel);',
-        'box-shadow: var(--fsus-shadow-panel);',
+        'border: 1px solid var(--el-border-color-light);',
+        'border-radius: var(--fsus-radius-floating);',
+        'box-shadow: var(--fsus-shadow-floating);',
       ])
     }
+    expectCssRule(css, '.el-notification', [
+      'border: 1px solid var(--el-border-color-light);',
+      'border-radius: var(--fsus-radius-popover);',
+      'box-shadow: var(--fsus-shadow-floating);',
+    ])
     expectCssRule(css, '.el-upload-dragger', [
       'border-radius: var(--fsus-radius-panel);',
     ])
@@ -544,6 +549,42 @@ describe('Fsus theme visual baseline', () => {
       'box-shadow: none;',
       'font-weight: 700;',
     ])
+  })
+
+  test('assigns root components to semantic surfaces instead of one panel mixin', () => {
+    const css = compileThemeFile('fsus-theme.scss')
+    const source = readFileSync(
+      path.resolve(dirname, '../src/fsus-theme.scss'),
+      'utf8',
+    )
+
+    for (const selector of [
+      '.el-alert',
+      '.el-result',
+      '.el-page-header',
+      '.el-statistic',
+      '.el-countdown',
+    ]) {
+      expectCssRule(css, selector, [
+        'background: transparent;',
+        'border: 0;',
+        'border-radius: 0;',
+        'box-shadow: none;',
+      ])
+    }
+    for (const selector of ['.el-calendar', '.el-transfer-panel']) {
+      expectCssRule(css, selector, [
+        'border: 1px solid var(--fsus-border);',
+        'border-radius: var(--fsus-radius-panel);',
+        'box-shadow: none;',
+      ])
+    }
+    expect(source).toContain(
+      '/* fsus-surface: data-region [calendar, transfer-panel] */',
+    )
+    expect(source).not.toMatch(
+      /\.#\{\$namespace\}-(?:alert|result|page-header|statistic)[\s\S]{0,500}@include fsus-panel/,
+    )
   })
 
   test('keeps empty descriptions readable in narrow states', () => {

@@ -30,6 +30,14 @@ const geometryCategories = new Set([
   'expressive',
   'pill',
 ])
+const surfaceRoles = new Set([
+  'document',
+  'control-group',
+  'data-region',
+  'overlay',
+  'expressive',
+  'navigation',
+])
 const pillGeometryContexts = [
   '-transfer__button',
   '-pagination button',
@@ -351,6 +359,60 @@ const checkGeometryMixinSemantics = () => {
   }
 }
 
+const checkSurfaceTaxonomy = () => {
+  const file = 'vue/packages/theme-chalk/src/fsus-theme.scss'
+  const source = read(file)
+  const forbiddenCrossRoleSelector =
+    /\.#\{\$namespace\}-(?:alert|result|page-header|statistic)[\s\S]{0,500}@include\s+fsus-panel/u
+
+  if (forbiddenCrossRoleSelector.test(source)) {
+    addViolation(
+      file,
+      1,
+      'document components must stay flat and cannot share the panel mixin',
+    )
+  }
+
+  for (const match of source.matchAll(
+    /\/\*\s*fsus-surface:\s*([\w-]+)\s*\[([^\]]+)\]\s*\*\//gu,
+  )) {
+    const role = match[1]
+    const components = match[2]
+      .split(',')
+      .map((value) => value.trim())
+      .filter(Boolean)
+    if (!surfaceRoles.has(role) || components.length === 0) {
+      addViolation(
+        file,
+        lineNumberOf(source, match.index ?? 0),
+        'surface taxonomy comment must declare a valid role and component list',
+      )
+    }
+  }
+
+  for (const match of source.matchAll(
+    /@include\s+fsus-panel(?:\([^)]*\))?;/gu,
+  )) {
+    const index = match.index ?? 0
+    const selector = selectorAt(source, index)
+    const componentCount = new Set(
+      [...selector.matchAll(/#\{\$namespace\}-([\w-]+)/gu)].map(
+        (component) => component[1],
+      ),
+    ).size
+    if (componentCount < 2) continue
+
+    const context = source.slice(Math.max(0, index - 600), index)
+    if (!/\/\*\s*fsus-surface:\s*[\w-]+\s*\[[^\]]+\]\s*\*\//u.test(context)) {
+      addViolation(
+        file,
+        lineNumberOf(source, index),
+        `broad panel selector requires a surface taxonomy comment and component list; selector was ${selector}`,
+      )
+    }
+  }
+}
+
 const checkDefaultInteractionEffects = () => {
   const file = 'vue/packages/theme-chalk/src/fsus-theme.scss'
   const source = read(file)
@@ -555,6 +617,7 @@ try {
   checkNegativeTokenFixture()
   checkCoreTokens()
   checkGeometryMixinSemantics()
+  checkSurfaceTaxonomy()
   checkScatteredRadiusLiterals()
   checkHoverTransforms()
   checkDefaultInteractionEffects()

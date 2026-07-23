@@ -714,7 +714,8 @@ html.dark {
 .#{$namespace}-switch__core {
   background: var(--fsus-switch-off-bg);
   border-color: var(--fsus-switch-off-border);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fsus-ink) 4%, transparent);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--fsus-ink) 4%, transparent);
   transition:
     background-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
     border-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
@@ -768,12 +769,15 @@ html.dark .#{$namespace}-switch__action {
     var(--el-color-white) 82%
   );
   --fsus-switch-action-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--fsus-scholarly-blue) 10%, transparent),
+    inset 0 0 0 1px
+      color-mix(in srgb, var(--fsus-scholarly-blue) 10%, transparent),
     0 1px 2px rgba(15, 15, 17, 0.16);
   background-color: var(--fsus-switch-checked-action-bg);
   left: calc(
-    var(--fsus-switch-core-width) - var(--fsus-switch-action-size) -
-      var(--fsus-switch-action-inset) - 1px
+    var(--fsus-switch-core-width) - var(--fsus-switch-action-size) - var(
+        --fsus-switch-action-inset
+      ) -
+      1px
   ) !important;
   transform: none;
 }
@@ -784,16 +788,44 @@ html.dark .#{$namespace}-switch__action {
   box-shadow: var(--fsus-switch-action-shadow);
 }
 
+/* fsus-surface: document [alert, result, page-header, statistic, countdown] */
 .#{$namespace}-alert,
-.#{$namespace}-calendar,
-.#{$namespace}-transfer-panel,
-.#{$namespace}-tree,
-.#{$namespace}-collapse,
 .#{$namespace}-result,
+.#{$namespace}-page-header,
+.#{$namespace}-statistic,
+.#{$namespace}-countdown {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* fsus-surface: data-region [calendar, transfer-panel] */
+.#{$namespace}-calendar,
+.#{$namespace}-transfer-panel {
+  background: var(--el-bg-color);
+  border: 1px solid var(--fsus-border);
+  border-radius: var(--fsus-radius-panel);
+  box-shadow: none;
+}
+
+/* fsus-surface: document [tree, collapse] */
+.#{$namespace}-tree,
+.#{$namespace}-collapse {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* fsus-surface: navigation [menu] */
 .#{$namespace}-menu:not(.#{$namespace}-menu--horizontal):not(
     .#{$namespace}-sub-menu .#{$namespace}-menu
   ):not(.#{$namespace}-menu--popup-container):not(.#{$namespace}-menu--popup) {
-  @include fsus-panel;
+  background: transparent;
+  border: 0;
+  border-radius: var(--fsus-radius-navigation);
+  box-shadow: none;
 }
 
 .#{$namespace}-empty {
@@ -810,12 +842,6 @@ html.dark .#{$namespace}-switch__action {
   border: none;
   box-shadow: none;
   border-radius: 0;
-}
-
-.#{$namespace}-page-header,
-.#{$namespace}-statistic,
-.#{$namespace}-countdown {
-  @include fsus-panel;
 }
 
 .#{$namespace}-page-header,
@@ -1021,14 +1047,16 @@ html.dark .#{$namespace}-switch__action {
   }
 
   .#{$namespace}-radio-button:focus-within .#{$namespace}-radio-button__inner {
-    border-color: var(--#{$namespace}-theme-mode-toggle-active-border-color, transparent) !important;
+    border-color: var(
+      --#{$namespace}-theme-mode-toggle-active-border-color,
+      transparent
+    ) !important;
     border-radius: 6px;
-    box-shadow:
-      inset 0 0 0 1px
-        var(
-          --#{$namespace}-theme-mode-toggle-active-ring,
-          color-mix(in srgb, var(--fsus-scholarly-blue) 24%, transparent)
-        ) !important;
+    box-shadow: inset 0 0 0 1px
+      var(
+        --#{$namespace}-theme-mode-toggle-active-ring,
+        color-mix(in srgb, var(--fsus-scholarly-blue) 24%, transparent)
+      ) !important;
   }
 
   .#{$namespace}-radio-button.is-active .#{$namespace}-radio-button__inner {
@@ -1036,12 +1064,11 @@ html.dark .#{$namespace}-switch__action {
       --#{$namespace}-theme-mode-toggle-active-bg,
       color-mix(in srgb, var(--fsus-scholarly-blue) 14%, var(--el-bg-color))
     );
-    box-shadow:
-      inset 0 0 0 1px
-        var(
-          --#{$namespace}-theme-mode-toggle-active-ring,
-          color-mix(in srgb, var(--fsus-scholarly-blue) 24%, transparent)
-        ) !important;
+    box-shadow: inset 0 0 0 1px
+      var(
+        --#{$namespace}-theme-mode-toggle-active-ring,
+        color-mix(in srgb, var(--fsus-scholarly-blue) 24%, transparent)
+      ) !important;
   }
 }
 
@@ -1187,10 +1214,13 @@ button.#{$namespace}-card:active {
   background-color: var(--fsus-component-overlay-scrim) !important;
 }
 
+/* fsus-surface: overlay [dialog, drawer] */
 .#{$namespace}-dialog,
 .#{$namespace}-drawer {
-  @include fsus-panel(panel);
   background: var(--el-bg-color-overlay);
+  border: 1px solid var(--el-border-color-light);
+  border-radius: var(--fsus-radius-floating);
+  box-shadow: var(--fsus-shadow-floating);
 }
 
 .#{$namespace}-message-box {
@@ -1200,9 +1230,12 @@ button.#{$namespace}-card:active {
   box-shadow: var(--fsus-shadow-panel, none);
 }
 
+/* fsus-surface: overlay [notification] */
 .#{$namespace}-notification {
-  @include fsus-panel(panel);
   background: var(--el-bg-color-overlay);
+  border: 1px solid var(--el-border-color-light);
+  border-radius: var(--fsus-radius-popover);
+  box-shadow: var(--fsus-shadow-floating);
 }
 
 .#{$namespace}-message {
@@ -1656,14 +1689,12 @@ button.#{$namespace}-card:active {
 }
 
 .#{$namespace}-date-picker-view-next {
-  animation: #{$namespace}-date-picker-view-next
-    var(--fsus-motion-panel, 360ms)
+  animation: #{$namespace}-date-picker-view-next var(--fsus-motion-panel, 360ms)
     var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1)) both;
 }
 
 .#{$namespace}-date-picker-view-prev {
-  animation: #{$namespace}-date-picker-view-prev
-    var(--fsus-motion-panel, 360ms)
+  animation: #{$namespace}-date-picker-view-prev var(--fsus-motion-panel, 360ms)
     var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1)) both;
 }
 

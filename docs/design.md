@@ -73,6 +73,19 @@ FsusUI 从 `Fsu's Blog.` 的句点中提取 **Punctuation Mark（标点）** 作
 
 FsusUI 的色彩系统围绕 **Ink / Paper / Dot / Scholarly Blue** 展开。颜色承担明确职责：文本、背景、结构、交互反馈四个角色互不重叠。
 
+### Surface taxonomy
+
+主题根组件必须先按职责归类，不能用同一个 panel mixin 批量制造卡片：
+
+- `document`：PageHeader、Result、Statistic、正文摘要与轻量反馈，默认透明、无外框、无阴影。
+- `control-group`：Input group、Segment、Toolbar，只包围真实交互组，使用 `6px` navigation/control radius。
+- `data-region`：Table、Calendar、Transfer，允许 `1px` border 与 `12px` panel radius，内部行或项目保持 flat。
+- `overlay`：Popover、Dropdown、Dialog、Drawer，使用 overlay token；Popover 为 `10px`，Dialog/Drawer 为 `12px`，阴影只表达浮层层级。
+- `expressive`：仅显式 `.is-expressive-surface` 或 `data-fsus-surface="expressive"` 可使用 `24px` radius。
+
+`fsus-theme.scss` 中跨多个根组件的 surface selector 必须带
+`fsus-surface: <role> [component-list]` 注释；anti-AI gate 会拒绝未声明职责的 broad panel selector。
+
 ### Core Palette
 
 | Concept         | Light                 | Dark      | Runtime Token                                                        | Usage                                     |
