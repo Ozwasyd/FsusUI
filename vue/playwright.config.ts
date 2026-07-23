@@ -6,7 +6,10 @@ import {
   resolveVisualPreviewWorkers,
 } from '../scripts/test-parallelism'
 import { visualEvidencePolicy } from '../scripts/visual-evidence-policy.cjs'
-import { visualProjectTestIgnore } from '../scripts/visual-variant.mjs'
+import {
+  visualProjectGrepInvert,
+  visualProjectTestIgnore,
+} from '../scripts/visual-variant.mjs'
 
 delete process.env.NO_COLOR
 
@@ -49,6 +52,7 @@ export default defineConfig({
     {
       name: 'desktop-light',
       outputDir: createVisualResultDirectory('preview', 'desktop-light'),
+      grepInvert: visualProjectGrepInvert('desktop-light'),
       testIgnore: visualProjectTestIgnore('desktop-light'),
       use: {
         ...devices['Desktop Chrome'],
@@ -59,6 +63,7 @@ export default defineConfig({
     {
       name: 'mobile-light',
       outputDir: createVisualResultDirectory('preview', 'mobile-light'),
+      grepInvert: visualProjectGrepInvert('mobile-light'),
       testIgnore: visualProjectTestIgnore('mobile-light'),
       use: {
         ...devices['Pixel 7'],
@@ -69,6 +74,7 @@ export default defineConfig({
     {
       name: 'desktop-dark',
       outputDir: createVisualResultDirectory('preview', 'desktop-dark'),
+      grepInvert: visualProjectGrepInvert('desktop-dark'),
       testIgnore: visualProjectTestIgnore('desktop-dark'),
       use: {
         ...devices['Desktop Chrome'],
@@ -79,6 +85,7 @@ export default defineConfig({
     {
       name: 'mobile-dark',
       outputDir: createVisualResultDirectory('preview', 'mobile-dark'),
+      grepInvert: visualProjectGrepInvert('mobile-dark'),
       testIgnore: visualProjectTestIgnore('mobile-dark'),
       use: {
         ...devices['Pixel 7'],

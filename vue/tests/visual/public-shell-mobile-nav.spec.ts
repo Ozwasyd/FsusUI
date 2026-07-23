@@ -1,7 +1,11 @@
-import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
 import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
+import {
+  expect,
+  test,
+  type VisualViewportName,
+} from '../support/visual-variant-fixture'
 
 const modes = ['menu', 'inline', 'bottom', 'none'] as const
 const diagnostics = new WeakMap<Page, string[]>()
@@ -157,6 +161,7 @@ test('uses one 44px bordered affordance language in the mobile project', async (
 const contractFixtures = [
   {
     name: 'anonymous-zh-long-brand-320',
+    viewport: 'public-shell-320',
     width: 320,
     locale: 'zh',
     session: 'anonymous',
@@ -165,6 +170,7 @@ const contractFixtures = [
   },
   {
     name: 'authenticated-en-375',
+    viewport: 'public-shell-375',
     width: 375,
     locale: 'en',
     session: 'authenticated',
@@ -173,6 +179,7 @@ const contractFixtures = [
   },
   {
     name: 'authenticated-long-copy-390',
+    viewport: 'public-shell-390',
     width: 390,
     locale: 'long',
     session: 'authenticated',
@@ -181,6 +188,7 @@ const contractFixtures = [
   },
   {
     name: 'anonymous-en-breakpoint-768',
+    viewport: 'public-shell-768',
     width: 768,
     locale: 'en',
     session: 'anonymous',
@@ -189,6 +197,7 @@ const contractFixtures = [
   },
   {
     name: 'anonymous-zh-zoom-150',
+    viewport: 'public-shell-375',
     width: 375,
     locale: 'zh',
     session: 'anonymous',
@@ -197,17 +206,29 @@ const contractFixtures = [
   },
   {
     name: 'authenticated-long-copy-zoom-200',
+    viewport: 'public-shell-390',
     width: 390,
     locale: 'long',
     session: 'authenticated',
     longBrand: true,
     zoom: 2,
   },
-] as const
+] as const satisfies readonly {
+  name: string
+  viewport: VisualViewportName
+  width: number
+  locale: string
+  session: string
+  longBrand: boolean
+  zoom: number
+}[]
 
 for (const fixture of contractFixtures) {
-  test(`mobile action geometry ${fixture.name}`, async ({ page }, testInfo) => {
-    await page.setViewportSize({ width: fixture.width, height: 1200 })
+  test(`mobile action geometry ${fixture.name}`, async ({
+    page,
+    useVisualViewport,
+  }, testInfo) => {
+    await useVisualViewport(fixture.viewport)
     await page.goto(
       buildVisualUrl('public-shell-nav-mode', testInfo.project.name, {
         contract: 1,
@@ -355,8 +376,9 @@ for (const fixture of contractFixtures) {
 
 test('keeps the default keyboard order brand, Search, Menu, then panel actions', async ({
   page,
+  useVisualViewport,
 }, testInfo) => {
-  await page.setViewportSize({ width: 320, height: 1000 })
+  await useVisualViewport('public-shell-keyboard')
   await page.goto(
     buildVisualUrl('public-shell-nav-mode', testInfo.project.name, {
       contract: 1,

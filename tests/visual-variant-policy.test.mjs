@@ -6,8 +6,10 @@ import {
   validateVisualVariantOwnership,
 } from '../scripts/check-visual-variant-policy.mjs'
 import {
+  DARK_ONLY_TEST_TAG,
   buildVisualUrl,
   resolveVisualVariant,
+  visualProjectGrepInvert,
   visualProjectTestIgnore,
 } from '../scripts/visual-variant.mjs'
 
@@ -51,6 +53,18 @@ test('selects desktop, mobile, and cross-theme specs before workers launch', () 
       '**/theme-scale-contract.spec.ts',
     ),
   )
+  assert(
+    visualProjectTestIgnore('mobile-dark').includes(
+      '**/transfer-responsive.spec.ts',
+    ),
+  )
+  assert(
+    visualProjectTestIgnore('desktop-light').includes(
+      '**/dark-form-authority-matrix.spec.ts',
+    ),
+  )
+  assert.equal(visualProjectGrepInvert('desktop-dark'), undefined)
+  assert(visualProjectGrepInvert('mobile-light')?.test(DARK_ONLY_TEST_TAG))
 })
 
 test('accepts the repository visual ownership baseline', () => {

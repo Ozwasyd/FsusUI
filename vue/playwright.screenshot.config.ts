@@ -3,7 +3,10 @@ import {
   createPlaywrightReporter,
   resolveTestPort,
 } from '../scripts/test-parallelism'
-import { visualProjectTestIgnore } from '../scripts/visual-variant.mjs'
+import {
+  visualProjectGrepInvert,
+  visualProjectTestIgnore,
+} from '../scripts/visual-variant.mjs'
 
 const screenshotPort = resolveTestPort('FSUS_SCREENSHOT_PORT', 5173)
 const screenshotBaseUrl = `http://127.0.0.1:${screenshotPort}`
@@ -23,6 +26,7 @@ export default defineConfig({
   projects: [
     {
       name: 'desktop-light',
+      grepInvert: visualProjectGrepInvert('desktop-light'),
       testIgnore: visualProjectTestIgnore('desktop-light'),
       use: {
         ...devices['Desktop Chrome'],
@@ -32,6 +36,7 @@ export default defineConfig({
     },
     {
       name: 'mobile-light',
+      grepInvert: visualProjectGrepInvert('mobile-light'),
       testIgnore: visualProjectTestIgnore('mobile-light'),
       use: {
         ...devices['Pixel 7'],
@@ -41,6 +46,7 @@ export default defineConfig({
     },
     {
       name: 'desktop-dark',
+      grepInvert: visualProjectGrepInvert('desktop-dark'),
       testIgnore: visualProjectTestIgnore('desktop-dark'),
       use: {
         ...devices['Desktop Chrome'],
@@ -50,6 +56,7 @@ export default defineConfig({
     },
     {
       name: 'mobile-dark',
+      grepInvert: visualProjectGrepInvert('mobile-dark'),
       testIgnore: visualProjectTestIgnore('mobile-dark'),
       use: {
         ...devices['Pixel 7'],

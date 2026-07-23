@@ -1319,12 +1319,12 @@ button.#{$namespace}-card:active {
   box-shadow: var(--fsus-shadow-panel, none);
 }
 
-/* fsus-surface: overlay [notification] */
 .#{$namespace}-notification {
+  /* fsus-surface: overlay [notification] */
   background: var(--el-bg-color-overlay);
   border: 1px solid var(--el-border-color-light);
   border-radius: var(--fsus-radius-popover);
-  box-shadow: var(--fsus-shadow-floating);
+  box-shadow: var(--fsus-shadow-panel, none);
 }
 
 .#{$namespace}-message {

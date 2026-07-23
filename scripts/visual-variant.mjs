@@ -32,10 +32,14 @@ export const VISUAL_SPEC_OWNERSHIP = Object.freeze({
     '**/empty-illustration.spec.ts',
     '**/public-shell-desktop-search.spec.ts',
     '**/smoke-theme-switch.spec.ts',
+    '**/transfer-responsive.spec.ts',
     '**/tree-select-row.spec.ts',
   ]),
   mobile: Object.freeze(['**/public-shell-mobile-nav.spec.ts']),
+  dark: Object.freeze(['**/dark-form-authority-matrix.spec.ts']),
 })
+
+export const DARK_ONLY_TEST_TAG = '@visual-dark-only'
 
 export const CROSS_THEME_CONTRACTS = Object.freeze([
   Object.freeze({
@@ -78,6 +82,7 @@ export const visualProjectTestIgnore = (projectName) => {
     ...(variant.viewportClass === 'desktop'
       ? VISUAL_SPEC_OWNERSHIP.mobile
       : VISUAL_SPEC_OWNERSHIP.desktop),
+    ...(variant.theme === 'dark' ? [] : VISUAL_SPEC_OWNERSHIP.dark),
   ]
 
   for (const contract of CROSS_THEME_CONTRACTS) {
@@ -86,3 +91,8 @@ export const visualProjectTestIgnore = (projectName) => {
 
   return ignored
 }
+
+export const visualProjectGrepInvert = (projectName) =>
+  resolveVisualVariant(projectName).theme === 'dark'
+    ? undefined
+    : new RegExp(DARK_ONLY_TEST_TAG, 'u')

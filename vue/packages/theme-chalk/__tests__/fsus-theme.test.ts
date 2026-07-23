@@ -273,9 +273,14 @@ describe('Fsus theme visual baseline', () => {
       ])
     }
     expectCssRule(css, '.el-notification', [
+      'background: var(--el-bg-color-overlay);',
       'border: 1px solid var(--el-border-color-light);',
       'border-radius: var(--fsus-radius-popover);',
-      'box-shadow: var(--fsus-shadow-floating);',
+      'box-shadow: var(--fsus-shadow-panel, none);',
+    ])
+    expectCssRule(css, '.el-notification', [
+      'position: fixed;',
+      'width: var(--fsus-notification-max-width);',
     ])
     expectCssRule(css, '.el-upload-dragger', [
       'border-radius: var(--fsus-radius-panel);',

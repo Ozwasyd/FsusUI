@@ -1,18 +1,25 @@
-import { expect, test } from '@playwright/test'
 import {
   buildVisualUrl,
   resolveVisualVariant,
 } from '../../../scripts/visual-variant.mjs'
+import {
+  expect,
+  test,
+  type VisualViewportName,
+} from '../support/visual-variant-fixture'
 
-const widths = [320, 375, 390, 768, 1440] as const
+const viewports = [
+  ['transfer-320', 320],
+  ['transfer-375', 375],
+  ['transfer-390', 390],
+  ['transfer-768', 768],
+  ['transfer-1440', 1440],
+] as const satisfies readonly (readonly [VisualViewportName, number])[]
 
 test('keeps Transfer usable across container widths, states, and themes', async ({
   page,
+  useVisualViewport,
 }, testInfo) => {
-  test.skip(
-    !testInfo.project.name.startsWith('desktop-'),
-    'The desktop light/dark projects exercise all required widths.',
-  )
   test.setTimeout(120_000)
 
   const variant = resolveVisualVariant(testInfo.project.name)
@@ -26,8 +33,8 @@ test('keeps Transfer usable across container widths, states, and themes', async 
   })
   page.on('pageerror', (error) => pageErrors.push(error.message))
 
-  for (const width of widths) {
-    await page.setViewportSize({ width, height: 1400 })
+  for (const [viewport, width] of viewports) {
+    await useVisualViewport(viewport)
     await page.goto(url, { waitUntil: 'networkidle' })
 
     const fixture = page.getByTestId('transfer-responsive-fixture')
@@ -176,14 +183,11 @@ test('keeps Transfer usable across container widths, states, and themes', async 
 
 test('keeps full labels, focus order, and keyboard move semantics on narrow containers', async ({
   page,
+  useVisualViewport,
 }, testInfo) => {
-  test.skip(
-    !testInfo.project.name.startsWith('desktop-'),
-    'The desktop light/dark projects exercise the narrow keyboard flow.',
-  )
   test.setTimeout(60_000)
 
-  await page.setViewportSize({ width: 390, height: 1400 })
+  await useVisualViewport('transfer-390')
   await page.goto(
     buildVisualUrl('transfer-responsive', testInfo.project.name),
     { waitUntil: 'networkidle' },
@@ -263,13 +267,11 @@ test('keeps full labels, focus order, and keyboard move semantics on narrow cont
   expect(focusGroups).toEqual(['source', 'actions', 'target'])
 })
 
-test('remains stable at 150 percent zoom', async ({ page }, testInfo) => {
-  test.skip(
-    !testInfo.project.name.startsWith('desktop-'),
-    'The desktop light/dark projects exercise zoom.',
-  )
-
-  await page.setViewportSize({ width: 390, height: 1400 })
+test('remains stable at 150 percent zoom', async ({
+  page,
+  useVisualViewport,
+}, testInfo) => {
+  await useVisualViewport('transfer-390')
   await page.goto(
     buildVisualUrl('transfer-responsive', testInfo.project.name),
     { waitUntil: 'networkidle' },

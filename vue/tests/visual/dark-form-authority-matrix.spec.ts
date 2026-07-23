@@ -1,7 +1,7 @@
 import { writeFile } from 'node:fs/promises'
-import { expect, test } from '@playwright/test'
 import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
+import { expect, screenshotPath, test } from '../support/visual-variant-fixture'
 
 const CONTROL_TYPES = [
   'input',
@@ -81,7 +81,6 @@ const contrast = (foreground: string, background: string) => {
 }
 
 test.beforeEach(async ({ page }, testInfo) => {
-  test.skip(!testInfo.project.name.includes('dark'))
   diagnostics.set(page, attachPageDiagnostics(page))
   await page.goto(buildVisualUrl('form', testInfo.project.name), {
     waitUntil: 'domcontentloaded',
@@ -304,7 +303,8 @@ test('enforces contrast, grayscale separation, stable geometry, and no glow', as
   expect(luminance(roles.state)).toBeGreaterThan(luminance(roles.decorative))
   expect(luminance(roles.decorative)).toBeGreaterThan(luminance(roles.border))
 
-  const contrastEvidencePath = testInfo.outputPath(
+  const contrastEvidencePath = screenshotPath(
+    testInfo,
     'dark-form-automatic-contrast.json',
   )
   await writeFile(

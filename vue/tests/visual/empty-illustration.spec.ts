@@ -1,7 +1,7 @@
-import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
 import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
+import { expect, test } from '../support/visual-variant-fixture'
 
 const variants = ['default', 'inline', 'compact', 'page'] as const
 const diagnostics = new WeakMap<Page, string[]>()
@@ -62,6 +62,7 @@ test('keeps illustrations quiet, decorative, and size-aware', async ({
 
 test('keeps empty-state actions touchable without using size as hierarchy', async ({
   page,
+  useVisualViewport,
 }) => {
   const actions = page.locator(
     '[data-empty-variant="primary-secondary"] .el-empty-state__actions',
@@ -73,20 +74,20 @@ test('keeps empty-state actions touchable without using size as hierarchy', asyn
   await expect(secondary).toHaveCSS('min-height', '40px')
   await expect(actions).toHaveCSS('gap', '8px')
 
-  await page.setViewportSize({ width: 420, height: 900 })
+  await useVisualViewport('empty-breakpoint-above')
   expect(
     await page.evaluate(() => matchMedia('(max-width: 419px)').matches),
   ).toBe(false)
   await expect(secondary).toHaveCSS('min-height', '40px')
 
-  await page.setViewportSize({ width: 419, height: 900 })
+  await useVisualViewport('empty-breakpoint-below')
   expect(
     await page.evaluate(() => matchMedia('(max-width: 419px)').matches),
   ).toBe(true)
   await expect(primary).toHaveCSS('min-height', '44px')
   await expect(secondary).toHaveCSS('min-height', '44px')
 
-  await page.setViewportSize({ width: 375, height: 900 })
+  await useVisualViewport('empty-mobile')
   await expect(primary).toHaveCSS('min-height', '44px')
   await expect(secondary).toHaveCSS('min-height', '44px')
   const mobileWidths = await actions.evaluate((element) => {
