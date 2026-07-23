@@ -1354,6 +1354,49 @@ describe('Fsus theme visual baseline', () => {
     expect(dialogCss).not.toContain('--fsus-motion-distance-xs')
   })
 
+  test('keeps reduced-motion state machines alive at one millisecond', () => {
+    const themeCss = compileThemeFile('fsus-theme.scss')
+    const transitionCss = compileThemeFile('common/transition.scss')
+    const dialogCss = compileThemeFile('dialog.scss')
+    const drawerCss = compileThemeFile('drawer.scss')
+    const notificationCss = compileThemeFile('notification.scss')
+    const tabPaneCss = compileThemeFile('tab-pane.scss')
+
+    expectCssRule(themeCss, '.el-tabs__item', [
+      'transition-duration: 1ms !important;',
+      'transition-delay: 0ms !important;',
+      'animation-duration: 1ms !important;',
+      'animation-delay: 0ms !important;',
+    ])
+    expectCssRule(themeCss, '.el-loading-spinner .circular', [
+      'animation-duration: 0.01ms !important;',
+      'animation-delay: 0ms !important;',
+      'animation-iteration-count: 1 !important;',
+    ])
+    for (const selector of [
+      '.el-zoom-in-top-enter-active',
+      '.el-zoom-in-top-leave-active',
+      '.el-collapse-transition-enter-active',
+      '.el-collapse-transition-leave-active',
+    ]) {
+      expectCssRule(transitionCss, selector, [
+        'transition-duration: 1ms !important;',
+        'transition-delay: 0ms !important;',
+      ])
+    }
+    for (const css of [
+      transitionCss,
+      dialogCss,
+      drawerCss,
+      notificationCss,
+      tabPaneCss,
+    ]) {
+      expect(css).not.toMatch(
+        /@media \(prefers-reduced-motion: reduce\)[\s\S]*?(?:enter-active|leave-active)[\s\S]*?transition:\s*none/,
+      )
+    }
+  })
+
   test('keeps overlay panels border-first by default', () => {
     const drawerCss = compileThemeFile('drawer.scss')
     const selectDropdownCss = compileThemeFile('select-dropdown.scss')

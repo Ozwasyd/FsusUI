@@ -230,6 +230,8 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 - 禁止弹跳、过冲和循环装饰动画。
 - 普通组件状态的 duration fallback 只能使用 `140 / 220 / 300 / 360ms` 四档 public token；不得在组件 SCSS 中创建 `90 / 120 / 160 / 180 / 240 / 250 / 280 / 320 / 400 / 500ms` 中间档位。显式 opt-in 的连续功能动画依照独立 component token，不属于普通状态 transition。
 - 必须支持 `prefers-reduced-motion: reduce`，将非必要动画降至 `1ms` 或移除 transform。
+- Vue enter/leave 状态机（Dialog、Drawer、Popover、Collapse、Dropdown、Notification、Tabs）必须保留 `1ms` duration 与 `0ms` delay；不得使用 `transition: none` 或 `0.01ms`，否则 transition hook、DOM removal 与 focus return 可能被跳过。
+- Skeleton、loading spinner 等不参与状态机的纯装饰无限动画可降到 `0.01ms` 并只执行一次。
 
 ### Rationale
 

@@ -2551,8 +2551,6 @@ button.#{$namespace}-card:active {
     --fsus-backdrop-blur-soft: 0px;
   }
 
-  .#{$namespace}-skeleton__item,
-  .#{$namespace}-loading-spinner .circular,
   .fsus-entry,
   .fsus-entry-control,
   [data-fsus-entry],
@@ -2565,9 +2563,19 @@ button.#{$namespace}-card:active {
   .#{$namespace}-slider__bar,
   .#{$namespace}-slider__button,
   .#{$namespace}-slider__button-wrapper {
-    transition: none;
-    animation-duration: 0.01ms;
-    animation-iteration-count: 1;
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+  }
+
+  // Decorative loops do not participate in Vue enter/leave hooks.
+  .#{$namespace}-skeleton__item,
+  .#{$namespace}-loading-spinner .circular,
+  .#{$namespace}-loading-spinner .path {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
   }
 
   .#{$namespace}-tabs__item {
