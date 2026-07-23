@@ -57,4 +57,18 @@ describe('responsive data component contracts', () => {
     expect(css).toContain('height: 40px;')
     expect(css).toContain('width: 60px;')
   })
+
+  test('Calendar uses a two-row mobile grid with aligned 40px controls', () => {
+    const css = compileThemeFile('calendar.scss')
+
+    expect(css).toContain('@container (max-width: 559px)')
+    expect(css).toContain('grid-template-rows: auto auto;')
+    expect(css).toContain('padding: 16px;')
+    expect(css).toContain('font-size: 16px;')
+    expect(css).toContain('font-weight: 700;')
+    expect(css).toContain('gap: 8px;')
+    expect(css).toContain('min-width: 40px;')
+    expect(css).toContain('min-height: 40px;')
+    expect(css).toContain('height: max(40px, var(--el-calendar-cell-width));')
+  })
 })

@@ -5,14 +5,38 @@
         <div :class="ns.e('title')">{{ i18nDate }}</div>
         <div v-if="validatedRange.length === 0" :class="ns.e('button-group')">
           <el-button-group>
-            <el-button size="small" @click="handleSelectDate('prev-month')">
-              {{ t('el.datepicker.prevMonth') }}
+            <el-button
+              size="small"
+              :aria-label="t('el.datepicker.prevMonth')"
+              :title="t('el.datepicker.prevMonth')"
+              @click="handleSelectDate('prev-month')"
+            >
+              <el-icon :class="ns.e('mobile-nav-icon')">
+                <arrow-left />
+              </el-icon>
+              <span :class="ns.e('nav-label')">
+                {{ t('el.datepicker.prevMonth') }}
+              </span>
             </el-button>
-            <el-button size="small" @click="handleSelectDate('today')">
+            <el-button
+              size="small"
+              :aria-label="t('el.datepicker.today')"
+              @click="handleSelectDate('today')"
+            >
               {{ t('el.datepicker.today') }}
             </el-button>
-            <el-button size="small" @click="handleSelectDate('next-month')">
-              {{ t('el.datepicker.nextMonth') }}
+            <el-button
+              size="small"
+              :aria-label="t('el.datepicker.nextMonth')"
+              :title="t('el.datepicker.nextMonth')"
+              @click="handleSelectDate('next-month')"
+            >
+              <el-icon :class="ns.e('mobile-nav-icon')">
+                <arrow-right />
+              </el-icon>
+              <span :class="ns.e('nav-label')">
+                {{ t('el.datepicker.nextMonth') }}
+              </span>
             </el-button>
           </el-button-group>
         </div>
@@ -20,10 +44,7 @@
     </div>
     <div
       :key="calendarBodyKey"
-      :class="[
-        ns.e('body'),
-        ns.is(`motion-${calendarMotionDirection}`),
-      ]"
+      :class="[ns.e('body'), ns.is(`motion-${calendarMotionDirection}`)]"
       v-bind="{ 'data-motion-direction': calendarMotionDirection }"
     >
       <date-table
@@ -67,6 +88,8 @@
 import { computed, ref } from 'vue'
 import dayjs from 'dayjs'
 import { ElButton, ElButtonGroup } from '@element-plus/components/button'
+import { ElIcon } from '@element-plus/components/icon'
+import { ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
 import { useLocale, useNamespace } from '@element-plus/hooks'
 
 import DateTable from './date-table.vue'
@@ -97,7 +120,7 @@ const {
 
 const { lang, t } = useLocale()
 const calendarMotionDirection = ref<'backward' | 'forward' | 'neutral'>(
-  'neutral'
+  'neutral',
 )
 
 const i18nDate = computed(() => {
@@ -120,7 +143,7 @@ const calendarBodyKey = computed(() => {
   return validatedRange.value
     .map(
       ([start, end]) =>
-        `${start.format('YYYY-MM-DD')}:${end.format('YYYY-MM-DD')}`
+        `${start.format('YYYY-MM-DD')}:${end.format('YYYY-MM-DD')}`,
     )
     .join('|')
 })

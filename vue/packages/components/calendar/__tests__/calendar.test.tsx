@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { clickPickerCell } from '../../../test-utils/dom'
 import ConfigProvider from '@element-plus/components/config-provider'
 import Chinese from '@element-plus/locale/lang/zh-cn'
+import German from '@element-plus/locale/lang/de'
 import updateLocale from 'dayjs/plugin/updateLocale'
 import dayjs from 'dayjs'
 import Calendar from '../src/calendar.vue'
@@ -20,13 +21,15 @@ const setDayjsWeekStart = (weekStart = 0) => {
 
 const queryCalendarRows = (wrapper: { element: unknown }) => {
   return Array.from(
-    (wrapper.element as HTMLElement).querySelectorAll('.el-calendar-table__row')
+    (wrapper.element as HTMLElement).querySelectorAll(
+      '.el-calendar-table__row',
+    ),
   ) as HTMLElement[]
 }
 
 const expectCalendarTitle = (
   titleEl: { element: Element },
-  expected: string
+  expected: string,
 ) => {
   expect(titleEl.element.textContent?.trim()).toBe(expected)
 }
@@ -64,7 +67,7 @@ describe('Calendar.vue', () => {
     const rows = queryCalendarRows(wrapper)
     expect(rows.length).toBe(4)
     expect(
-      wrapper.element.querySelector('.el-calendar__button-group')
+      wrapper.element.querySelector('.el-calendar__button-group'),
     ).toBeNull()
   })
 
@@ -78,7 +81,7 @@ describe('Calendar.vue', () => {
     const rows = queryCalendarRows(wrapper)
     expect(rows.length).toBe(5)
     expect(
-      wrapper.element.querySelector('.el-calendar__button-group')
+      wrapper.element.querySelector('.el-calendar__button-group'),
     ).toBeNull()
   })
 
@@ -89,7 +92,7 @@ describe('Calendar.vue', () => {
     const titleEl = wrapper.find('.el-calendar__title')
     expectCalendarTitle(titleEl, 'April 2019')
     const dateTables = wrapper.element.querySelectorAll(
-      '.el-calendar-table.is-range'
+      '.el-calendar-table.is-range',
     )
     expect(dateTables.length).toBe(2)
     const rows = queryCalendarRows(wrapper)
@@ -111,7 +114,7 @@ describe('Calendar.vue', () => {
     const titleEl = wrapper.find('.el-calendar__title')
     expectCalendarTitle(titleEl, 'January 2021')
     const dateTables = wrapper.element.querySelectorAll(
-      '.el-calendar-table.is-range'
+      '.el-calendar-table.is-range',
     )
     expect(dateTables.length).toBe(3)
     const rows = queryCalendarRows(wrapper)
@@ -196,13 +199,13 @@ describe('Calendar.vue', () => {
     await nextTick()
     expect(wrapper.find('.is-selected').text()).toBe('1')
     expect(
-      wrapper.find('.el-calendar__body').attributes('data-motion-direction')
+      wrapper.find('.el-calendar__body').attributes('data-motion-direction'),
     ).toBe('backward')
     await nextBtn?.trigger('click')
     await nextTick()
     expect(wrapper.find('.is-selected').text()).toBe('1')
     expect(
-      wrapper.find('.el-calendar__body').attributes('data-motion-direction')
+      wrapper.find('.el-calendar__body').attributes('data-motion-direction'),
     ).toBe('forward')
   })
 
@@ -213,7 +216,7 @@ describe('Calendar.vue', () => {
     const titleEl = wrapper.find('.el-calendar__title')
     expectCalendarTitle(titleEl, 'December 2021')
     const dateTables = wrapper.element.querySelectorAll(
-      '.el-calendar-table.is-range'
+      '.el-calendar-table.is-range',
     )
     expect(dateTables.length).toBe(3)
     const rows = queryCalendarRows(wrapper)
@@ -234,7 +237,7 @@ describe('Calendar.vue', () => {
     const titleEl = wrapper.find('.el-calendar__title')
     expectCalendarTitle(titleEl, 'December 2021')
     const dateTables = wrapper.element.querySelectorAll(
-      '.el-calendar-table.is-range'
+      '.el-calendar-table.is-range',
     )
     expect(dateTables.length).toBe(2)
     const rows = queryCalendarRows(wrapper)
@@ -270,5 +273,34 @@ describe('Calendar.vue', () => {
     ))
 
     expectCalendarTitle(wrapper.find('.el-calendar__title'), '2026年5月')
+  })
+
+  it('keeps accessible icon navigation and stable header source order', () => {
+    const wrapper = mount(() => (
+      <Calendar modelValue={new Date('2026-05-01')} />
+    ))
+    const header = wrapper.find('.el-calendar__header')
+    const buttons = wrapper.findAll('.el-calendar__button-group button')
+
+    expect(
+      Array.from(header.element.children).map((child) => child.className),
+    ).toEqual(['el-calendar__title', 'el-calendar__button-group'])
+    expect(buttons).toHaveLength(3)
+    expect(buttons[0].attributes('aria-label')).toBe('Previous Month')
+    expect(buttons[0].attributes('title')).toBe('Previous Month')
+    expect(buttons[0].find('.el-calendar__mobile-nav-icon').exists()).toBe(true)
+    expect(buttons[1].attributes('aria-label')).toBe('Today')
+    expect(buttons[2].attributes('aria-label')).toBe('Next Month')
+    expect(buttons[2].attributes('title')).toBe('Next Month')
+  })
+
+  it('preserves long localized month titles', () => {
+    const wrapper = mount(() => (
+      <ConfigProvider locale={German}>
+        <Calendar modelValue={new Date('2026-09-01')} />
+      </ConfigProvider>
+    ))
+
+    expectCalendarTitle(wrapper.find('.el-calendar__title'), 'September 2026')
   })
 })

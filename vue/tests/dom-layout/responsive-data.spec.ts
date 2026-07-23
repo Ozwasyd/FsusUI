@@ -233,3 +233,111 @@ test('Pagination converges in stable semantic zones without page overflow', asyn
   )
   expect(zoomOverflow).toBeLessThanOrEqual(1)
 })
+
+test('Calendar keeps title, navigation, and date grid aligned without collisions', async ({
+  page,
+}) => {
+  await openDataSection(page)
+  const calendar = page.locator('.el-calendar').first()
+
+  for (const width of [320, 375, 390, 560, 768, 1440]) {
+    await page.setViewportSize({ width, height: 1400 })
+    await settleResponsiveLayout(page)
+    const calendarBox = await calendar.boundingBox()
+    const availableWidth = calendarBox?.width ?? 0
+    const header = calendar.locator('.el-calendar__header')
+    const title = calendar.locator('.el-calendar__title')
+    const actions = calendar.locator('.el-calendar__button-group')
+
+    for (const button of await actions.locator('button').all()) {
+      const box = await button.boundingBox()
+      expect(box?.width ?? 0).toBeGreaterThanOrEqual(40)
+      expect(box?.height ?? 0).toBeGreaterThanOrEqual(40)
+    }
+
+    if (availableWidth < 560) {
+      const titleBox = await title.boundingBox()
+      const actionsBox = await actions.boundingBox()
+      expect(actionsBox?.y ?? 0).toBeGreaterThanOrEqual(
+        (titleBox?.y ?? 0) + (titleBox?.height ?? 0) + 7,
+      )
+      await expect(
+        actions.locator('.el-calendar__mobile-nav-icon').first(),
+      ).toBeVisible()
+      await expect(
+        actions.locator('.el-calendar__nav-label').first(),
+      ).toBeHidden()
+      await expect(actions.locator('button').first()).toHaveAttribute(
+        'aria-label',
+        /.+/,
+      )
+      await expect(actions.locator('button').first()).toHaveAttribute(
+        'title',
+        /.+/,
+      )
+      const firstAction = actions.locator('button').first()
+      await firstAction.focus()
+      await expect(firstAction).toBeFocused()
+      const focusPresentation = await firstAction.evaluate((node) => {
+        const style = getComputedStyle(node)
+        return {
+          outlineStyle: style.outlineStyle,
+          boxShadow: style.boxShadow,
+        }
+      })
+      expect(
+        focusPresentation.outlineStyle !== 'none' ||
+          focusPresentation.boxShadow !== 'none',
+      ).toBe(true)
+    } else {
+      await expect(
+        actions.locator('.el-calendar__nav-label').first(),
+      ).toBeVisible()
+    }
+
+    const headerBox = await header.boundingBox()
+    const bodyBox = await calendar.locator('.el-calendar__body').boundingBox()
+    const titleBox = await title.boundingBox()
+    const tableBox = await calendar.locator('.el-calendar-table').boundingBox()
+    expect(
+      Math.abs((titleBox?.x ?? 0) - (tableBox?.x ?? 0)),
+    ).toBeLessThanOrEqual(1)
+    expect(headerBox?.width ?? 0).toBe(bodyBox?.width ?? -1)
+
+    const firstDay = calendar.locator('.el-calendar-day').first()
+    const dayBox = await firstDay.boundingBox()
+    expect(dayBox?.height ?? 0).toBeGreaterThanOrEqual(40)
+
+    const pageOverflow = await page.evaluate(
+      () =>
+        Math.max(
+          document.documentElement.scrollWidth,
+          document.body.scrollWidth,
+        ) - document.documentElement.clientWidth,
+    )
+    expect(pageOverflow).toBeLessThanOrEqual(1)
+  }
+
+  await page.setViewportSize({ width: 720, height: 1400 })
+  await page.evaluate(() => {
+    document.body.style.zoom = '2'
+  })
+  await settleResponsiveLayout(page)
+  const zoomTitleBox = await calendar
+    .locator('.el-calendar__title')
+    .boundingBox()
+  const zoomActionsBox = await calendar
+    .locator('.el-calendar__button-group')
+    .boundingBox()
+  expect(zoomActionsBox?.y ?? 0).toBeGreaterThanOrEqual(
+    (zoomTitleBox?.y ?? 0) + (zoomTitleBox?.height ?? 0) + 7,
+  )
+  const zoomOverflow = await page.evaluate(
+    () =>
+      Math.max(
+        document.documentElement.scrollWidth,
+        document.body.scrollWidth,
+      ) - document.documentElement.clientWidth,
+  )
+  expect(zoomOverflow).toBeLessThanOrEqual(1)
+})
