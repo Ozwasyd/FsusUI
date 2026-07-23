@@ -176,6 +176,10 @@
     .#{$namespace}-calendar__body {
       padding: 12px 16px 24px;
     }
+
+    .#{$namespace}-calendar-table thead th {
+      overflow-wrap: anywhere;
+    }
   }
 }
 

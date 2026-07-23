@@ -69,6 +69,9 @@ describe('responsive data component contracts', () => {
     expect(css).toContain('gap: 8px;')
     expect(css).toContain('min-width: 40px;')
     expect(css).toContain('min-height: 40px;')
+    expect(css).toContain(
+      '.el-calendar .el-calendar-table thead th {\n    overflow-wrap: anywhere;',
+    )
     expect(css).toContain('height: max(40px, var(--el-calendar-cell-width));')
   })
 })
