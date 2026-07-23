@@ -5,7 +5,7 @@
   "owner": "FsusUI Core",
   "baseline": {
     "path": "spec/baselines/vue-current.json",
-    "hash": "59061a5b26e38a3de2bddc55bd30b876e2010f2f32512335a28e681e1a298440",
+    "hash": "a04edcb3128f7362a29d932dfd52481b6bbaaadb4977314f0ccee863e784402e",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
     "iconHash": "d61254b1b1ff9addaf45293153df217b0c0d01ec69ec602081c44a01008b78de"
@@ -1250,6 +1250,12 @@
       },
       "props": [
         {
+          "name": "ariaLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "separator",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -2458,16 +2464,7 @@
           "required": false
         }
       ],
-      "events": [
-        {
-          "name": "emit",
-          "payload": "vue-source"
-        },
-        {
-          "name": "slots",
-          "payload": "vue-source"
-        }
-      ],
+      "events": [],
       "contentRegions": [],
       "exposed": [],
       "defaults": {
@@ -5007,6 +5004,18 @@
           "required": false
         },
         {
+          "name": "responsive",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "scrollAriaLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "size",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -5115,6 +5124,18 @@
         },
         {
           "name": "extra",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "responsive",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "scrollAriaLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -6068,28 +6089,43 @@
       },
       "props": [
         {
-          "name": "attrs",
+          "name": "...dialogProps",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "slots",
+          "name": "direction",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "headerAriaLevel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "modalFade",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "size",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "withHeader",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         }
       ],
-      "events": [
-        {
-          "name": "attrs",
-          "payload": "vue-source"
-        },
-        {
-          "name": "slots",
-          "payload": "vue-source"
-        }
-      ],
+      "events": [],
       "contentRegions": [
         {
           "name": "default",
@@ -6176,18 +6212,157 @@
       },
       "props": [
         {
-          "name": "emit",
+          "name": "...componentMotionProps",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "buttonProps",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "command",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "disabled",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "divided",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "effect",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "hideOnClick",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "hideTimeout",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "icon",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "id",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "loop",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "maxHeight",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "onKeydown",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "placement",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "popperClass",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "popperOptions",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "role",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "showTimeout",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "size",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "splitButton",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "tabindex",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "teleported",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "textValue",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "trigger",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "type",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         }
       ],
-      "events": [
-        {
-          "name": "emit",
-          "payload": "vue-source"
-        }
-      ],
+      "events": [],
       "contentRegions": [
         {
           "name": "default",
@@ -6264,28 +6439,37 @@
       },
       "props": [
         {
-          "name": "attrs",
+          "name": "command",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         },
         {
-          "name": "emit",
+          "name": "disabled",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "divided",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "icon",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "textValue",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
         }
       ],
-      "events": [
-        {
-          "name": "attrs",
-          "payload": "vue-source"
-        },
-        {
-          "name": "emit",
-          "payload": "vue-source"
-        }
-      ],
+      "events": [],
       "contentRegions": [
         {
           "name": "default",
@@ -6961,12 +7145,6 @@
         },
         {
           "name": "hideRequiredAsterisk",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "if",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -10230,7 +10408,25 @@
       },
       "props": [
         {
-          "name": "emit",
+          "name": "disabled",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "index",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "route",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "title",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -10238,7 +10434,7 @@
       ],
       "events": [
         {
-          "name": "emit",
+          "name": "click",
           "payload": "vue-source"
         }
       ],
@@ -10641,12 +10837,7 @@
           "required": false
         }
       ],
-      "events": [
-        {
-          "name": "emit",
-          "payload": "vue-source"
-        }
-      ],
+      "events": [],
       "contentRegions": [
         {
           "name": "default",
@@ -15865,12 +16056,7 @@
           "required": false
         }
       ],
-      "events": [
-        {
-          "name": "emit",
-          "payload": "vue-source"
-        }
-      ],
+      "events": [],
       "contentRegions": [],
       "exposed": [],
       "defaults": {
@@ -17142,6 +17328,12 @@
       },
       "props": [
         {
+          "name": "clickable",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "description",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -17149,12 +17341,6 @@
         },
         {
           "name": "icon",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "name",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -17172,7 +17358,12 @@
           "required": false
         }
       ],
-      "events": [],
+      "events": [
+        {
+          "name": "click",
+          "payload": "vue-source"
+        }
+      ],
       "contentRegions": [
         {
           "name": "description",
@@ -20178,6 +20369,12 @@
           "required": false
         },
         {
+          "name": "direction",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "filterMethod",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -20376,12 +20573,6 @@
         },
         {
           "name": "autoExpandParent",
-          "type": "vue-source",
-          "default": "vue-baseline",
-          "required": false
-        },
-        {
-          "name": "broadcastExpanded",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
