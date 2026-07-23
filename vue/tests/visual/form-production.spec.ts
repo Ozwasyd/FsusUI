@@ -1,8 +1,48 @@
 import { expect, test } from '@playwright/test'
+import type { Page } from '@playwright/test'
 import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
 
 const diagnostics = new WeakMap<object, string[]>()
+
+const waitForStableLayout = async (page: Page) => {
+  await page.evaluate(async () => {
+    await document.fonts.ready
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+    })
+  })
+}
+
+const expectNoHorizontalOverflow = async (page: Page) => {
+  await waitForStableLayout(page)
+  const geometry = await page.evaluate(() => {
+    const viewportWidth = document.documentElement.clientWidth
+    const scrollWidth = Math.max(
+      document.documentElement.scrollWidth,
+      document.body.scrollWidth,
+    )
+    const offenders = [...document.body.querySelectorAll<HTMLElement>('*')]
+      .map((element) => {
+        const rect = element.getBoundingClientRect()
+        return {
+          selector: `${element.tagName.toLowerCase()}.${[...element.classList].join('.')}`,
+          left: Math.round(rect.left),
+          right: Math.round(rect.right),
+          width: Math.round(rect.width),
+        }
+      })
+      .filter(({ left, right }) => left < -1 || right > viewportWidth + 1)
+      .slice(0, 10)
+
+    return { offenders, scrollWidth, viewportWidth }
+  })
+
+  expect(
+    geometry.scrollWidth,
+    `horizontal overflow: ${JSON.stringify(geometry)}`,
+  ).toBeLessThanOrEqual(geometry.viewportWidth + 1)
+}
 
 test.beforeEach(async ({ page }, testInfo) => {
   diagnostics.set(page, attachPageDiagnostics(page))
@@ -16,30 +56,33 @@ test.afterEach(({ page }) => {
   expect(diagnostics.get(page) ?? []).toEqual([])
 })
 
-test('keeps production form columns aligned from desktop to 320px', async ({
+test('keeps production form columns aligned for its project viewport and 320px', async ({
   page,
-}) => {
+}, testInfo) => {
   const fixture = page.getByTestId('production-form-fixtures')
   const form = fixture.locator('.task-form-fixture')
-  await expect(form).toHaveCSS('max-width', '640px')
+  const startsDesktop = testInfo.project.name.startsWith('desktop-')
+
+  await waitForStableLayout(page)
+  await expect(form).toHaveCSS('max-width', startsDesktop ? '640px' : 'none')
 
   const pair = fixture.locator('[data-form-fixture="inline-pair"]')
-  const desktopFields = await pair
-    .locator('.el-form-item')
-    .evaluateAll((items) =>
-      items.map((item) => {
-        const rect = item.getBoundingClientRect()
-        return { left: rect.left, width: rect.width }
-      }),
-    )
-  expect(desktopFields).toHaveLength(2)
-  expect(desktopFields[0]?.left).toBeLessThan(desktopFields[1]?.left ?? 0)
+  if (startsDesktop) {
+    const desktopFields = await pair
+      .locator('.el-form-item')
+      .evaluateAll((items) =>
+        items.map((item) => {
+          const rect = item.getBoundingClientRect()
+          return { left: rect.left, width: rect.width }
+        }),
+      )
+    expect(desktopFields).toHaveLength(2)
+    expect(desktopFields[0]?.left).toBeLessThan(desktopFields[1]?.left ?? 0)
+  }
 
   await page.setViewportSize({ width: 320, height: 900 })
-  const overflow = await page.evaluate(
-    () => document.documentElement.scrollWidth - window.innerWidth,
-  )
-  expect(overflow).toBeLessThanOrEqual(0)
+  await expectNoHorizontalOverflow(page)
+  await expect(form).toHaveCSS('max-width', 'none')
 
   const mobileFields = await pair
     .locator('.el-form-item')
