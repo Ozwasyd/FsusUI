@@ -1049,7 +1049,7 @@ html.dark .#{$namespace}-switch__action {
   ):not(.#{$namespace}-button--warning):not(.#{$namespace}-button--danger):not(
     .#{$namespace}-button--info
   ) {
-  min-height: 40px;
+  min-height: var(--fsus-empty-action-min-height, 40px);
   padding-inline: 16px;
   background: transparent;
   border-color: transparent;
@@ -1068,6 +1068,8 @@ html.dark .#{$namespace}-switch__action {
 
 .#{$namespace}-empty__bottom,
 .#{$namespace}-empty-state__actions {
+  --fsus-empty-action-min-height: 40px;
+
   display: inline-flex;
   max-width: min(100%, 320px);
   flex-wrap: wrap;
@@ -1088,12 +1090,14 @@ html.dark .#{$namespace}-switch__action {
 .#{$namespace}-empty-state__actions
   .#{$namespace}-button:not(.#{$namespace}-button--primary),
 .#{$namespace}-empty-state__actions .#{$namespace}-link {
-  min-height: 40px;
+  min-height: var(--fsus-empty-action-min-height, 40px);
 }
 
 @media (max-width: 419px) {
   .#{$namespace}-empty__bottom,
   .#{$namespace}-empty-state__actions {
+    --fsus-empty-action-min-height: 44px;
+
     width: 100%;
     flex-direction: column;
     align-items: stretch;

@@ -651,8 +651,11 @@ describe('Fsus theme visual baseline', () => {
       'background: transparent;',
       'border-color: transparent;',
       'box-shadow: none;',
-      'min-height: 40px;',
+      'min-height: var(--fsus-empty-action-min-height, 40px);',
       'font-weight: 500;',
+    ])
+    expectCssRule(css, '.el-empty-state__actions', [
+      '--fsus-empty-action-min-height: 40px;',
     ])
     expectCssRule(css, '.el-empty__bottom .el-button--primary', [
       'min-height: 44px;',
@@ -661,8 +664,11 @@ describe('Fsus theme visual baseline', () => {
       'font-size: 14px;',
     ])
     expectCssRule(css, '.el-empty-state__actions .el-link', [
-      'min-height: 40px;',
+      'min-height: var(--fsus-empty-action-min-height, 40px);',
     ])
+    expect(css).toMatch(
+      /@media \(max-width: 419px\) \{[\s\S]*?\.el-empty__bottom,\s*\.el-empty-state__actions \{[^}]*--fsus-empty-action-min-height: 44px;/,
+    )
   })
 
   test('assigns root components to semantic surfaces instead of one panel mixin', () => {

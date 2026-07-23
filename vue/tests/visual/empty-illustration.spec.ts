@@ -73,11 +73,33 @@ test('keeps empty-state actions touchable without using size as hierarchy', asyn
   await expect(secondary).toHaveCSS('min-height', '40px')
   await expect(actions).toHaveCSS('gap', '8px')
 
+  await page.setViewportSize({ width: 420, height: 900 })
+  expect(
+    await page.evaluate(() => matchMedia('(max-width: 419px)').matches),
+  ).toBe(false)
+  await expect(secondary).toHaveCSS('min-height', '40px')
+
+  await page.setViewportSize({ width: 419, height: 900 })
+  expect(
+    await page.evaluate(() => matchMedia('(max-width: 419px)').matches),
+  ).toBe(true)
+  await expect(primary).toHaveCSS('min-height', '44px')
+  await expect(secondary).toHaveCSS('min-height', '44px')
+
   await page.setViewportSize({ width: 375, height: 900 })
   await expect(primary).toHaveCSS('min-height', '44px')
   await expect(secondary).toHaveCSS('min-height', '44px')
-  await expect(primary).toHaveCSS('width', '320px')
-  await expect(secondary).toHaveCSS('width', '320px')
+  const mobileWidths = await actions.evaluate((element) => {
+    const [primaryAction, secondaryAction] = element.children
+    return {
+      actions: element.getBoundingClientRect().width,
+      primary: primaryAction.getBoundingClientRect().width,
+      secondary: secondaryAction.getBoundingClientRect().width,
+    }
+  })
+  expect(mobileWidths.actions).toBeLessThanOrEqual(320)
+  expect(mobileWidths.primary).toBe(mobileWidths.actions)
+  expect(mobileWidths.secondary).toBe(mobileWidths.actions)
 
   const focusOutline = await primary.evaluate((element) => {
     ;(element as HTMLElement).focus()
