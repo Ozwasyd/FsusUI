@@ -9,6 +9,10 @@ const source = readFileSync(
   ),
   'utf8',
 )
+const themeSource = readFileSync(
+  new URL('../vue/packages/theme-chalk/src/fsus-theme.scss', import.meta.url),
+  'utf8',
+)
 
 const color = (name) => {
   const darkBlock = source.slice(source.indexOf('@mixin fsus-dark-tokens'))
@@ -57,4 +61,23 @@ test('dark form grayscale roles remain ordered and distinct', () => {
   assert.ok(decorative > border)
   assert.ok(readable - state > 0.05)
   assert.ok(state - border > 0.1)
+})
+
+test('dark form controls use the measured Paper fill, not a lighter fill assumption', () => {
+  assert.match(
+    themeSource,
+    /\.#\{\$namespace\}-color-picker__trigger\s*\{\s*@include fsus-control\(control\);\s*background: var\(--el-bg-color\);/u,
+  )
+  assert.match(
+    themeSource,
+    /\.#\{\$namespace\}-upload-dragger\s*\{\s*@include fsus-control\(panel\);\s*background: var\(--el-bg-color\);/u,
+  )
+  assert.match(
+    themeSource,
+    /\.#\{\$namespace\}-input-number\s*\{\s*@include fsus-control\(control\);\s*background: var\(--el-bg-color\);/u,
+  )
+  assert.match(
+    themeSource,
+    /\.#\{\$namespace\}-input-number\.is-disabled,\s*\.#\{\$namespace\}-upload\.is-disabled/u,
+  )
 })

@@ -419,6 +419,7 @@ html.dark {
 .#{$namespace}-input-group__prepend,
 .#{$namespace}-color-picker__trigger {
   @include fsus-control(control);
+  background: var(--el-bg-color);
   box-shadow: none !important;
 }
 
@@ -506,6 +507,7 @@ html.dark {
 .#{$namespace}-select .#{$namespace}-select__wrapper.is-disabled,
 .#{$namespace}-select-v2__wrapper.is-disabled,
 .#{$namespace}-date-editor.is-disabled,
+.#{$namespace}-input-number.is-disabled,
 .#{$namespace}-upload.is-disabled .#{$namespace}-upload-dragger {
   background: var(--el-disabled-bg-color);
   border-color: var(--el-disabled-border-color);
@@ -524,6 +526,7 @@ html.dark {
 
 .#{$namespace}-input-number {
   @include fsus-control(control);
+  background: var(--el-bg-color);
   overflow: hidden;
   padding: 0;
   display: inline-flex;
@@ -2346,6 +2349,7 @@ button.#{$namespace}-card:active {
 
 .#{$namespace}-upload-dragger {
   @include fsus-control(panel);
+  background: var(--el-bg-color);
   min-height: 180px;
   border-style: dashed;
   padding: 28px 20px;

@@ -65,6 +65,15 @@ describe('<upload />', () => {
       expect(onClick).toHaveBeenCalledTimes(3)
     })
 
+    test('projects disabled state onto the interactive upload surface', () => {
+      const wrapper = mount(() => <UploadContent disabled />)
+
+      expect(wrapper.classes()).toContain('is-disabled')
+      expect(wrapper.attributes('aria-disabled')).toBe('true')
+      expect(wrapper.attributes('tabindex')).toBe('-1')
+      expect(wrapper.find('input').attributes('disabled')).toBeDefined()
+    })
+
     test('works when upload file exceeds the limit', async () => {
       const onExceed = vi.fn()
       const wrapper = mount(() => (

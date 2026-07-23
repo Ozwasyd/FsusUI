@@ -232,6 +232,157 @@
         </section>
       </el-form>
     </div>
+    <div
+      class="demo-block dark-form-authority-matrix"
+      data-testid="dark-form-authority-matrix"
+    >
+      <header class="dark-form-authority-matrix__header">
+        <h3>Dark form state authority matrix</h3>
+        <p>
+          Compare readable guidance, secondary state text, and structural
+          borders without changing control geometry.
+        </p>
+      </header>
+
+      <div class="dark-form-authority-matrix__controls">
+        <!-- @vue-ignore custom visual contract attribute -->
+        <section
+          v-for="control in darkFormControls"
+          :key="control.id"
+          class="dark-form-control-group"
+          :data-control-group="control.id"
+        >
+          <h4>{{ control.label }}</h4>
+          <div class="dark-form-control-group__states">
+            <!-- @vue-ignore custom visual contract attributes -->
+            <div
+              v-for="state in darkFormStates"
+              :key="state"
+              class="dark-form-contract-cell"
+              data-dark-form-cell
+              :data-control="control.id"
+              :data-state="state"
+            >
+              <!-- @vue-ignore custom visual contract attribute -->
+              <span data-dark-form-label>
+                {{ control.label }} · {{ state }}
+              </span>
+
+              <el-input
+                v-if="control.id === 'input'"
+                :model-value="
+                  darkFormIsFilled(state) ? 'Release brief ready' : ''
+                "
+                :placeholder="darkFormPlaceholder(state, 'Enter release brief')"
+                :disabled="state === 'disabled'"
+              />
+              <el-input
+                v-else-if="control.id === 'textarea'"
+                type="textarea"
+                :model-value="
+                  darkFormIsFilled(state)
+                    ? 'Explain the reader-facing change.'
+                    : ''
+                "
+                :placeholder="
+                  darkFormPlaceholder(state, 'Add release guidance')
+                "
+                :disabled="state === 'disabled'"
+              />
+              <el-select
+                v-else-if="control.id === 'select'"
+                :model-value="darkFormIsFilled(state) ? 'members' : ''"
+                :placeholder="darkFormPlaceholder(state, 'Choose an audience')"
+                :disabled="state === 'disabled'"
+              >
+                <el-option label="Signed-in members" value="members" />
+              </el-select>
+              <el-select-v2
+                v-else-if="control.id === 'select-v2'"
+                :model-value="darkFormIsFilled(state) ? 'approval' : ''"
+                :options="darkFormSelectOptions"
+                :placeholder="darkFormPlaceholder(state, 'Choose a workflow')"
+                :disabled="state === 'disabled'"
+              />
+              <el-date-picker
+                v-else-if="control.id === 'date-picker'"
+                :model-value="
+                  darkFormIsFilled(state) ? darkFormDate : undefined
+                "
+                type="date"
+                :placeholder="darkFormPlaceholder(state, 'Choose a date')"
+                :disabled="state === 'disabled'"
+              />
+              <el-time-picker
+                v-else-if="control.id === 'time-picker'"
+                :model-value="
+                  darkFormIsFilled(state) ? darkFormDate : undefined
+                "
+                :placeholder="darkFormPlaceholder(state, 'Choose a time')"
+                :disabled="state === 'disabled'"
+              />
+              <el-time-select
+                v-else-if="control.id === 'time-select'"
+                :model-value="darkFormIsFilled(state) ? '09:00' : ''"
+                start="08:00"
+                step="00:30"
+                end="18:00"
+                :placeholder="
+                  darkFormPlaceholder(state, 'Choose a release slot')
+                "
+                :disabled="state === 'disabled'"
+              />
+              <el-input-number
+                v-else-if="control.id === 'input-number'"
+                :model-value="darkFormIsFilled(state) ? 7 : undefined"
+                :placeholder="darkFormPlaceholder(state, 'Set review days')"
+                :disabled="state === 'disabled'"
+              />
+              <el-cascader
+                v-else-if="control.id === 'cascader'"
+                :model-value="
+                  darkFormIsFilled(state) ? ['editorial', 'release'] : []
+                "
+                :options="darkFormCascaderOptions"
+                :placeholder="
+                  darkFormPlaceholder(state, 'Choose a release category')
+                "
+                :disabled="state === 'disabled'"
+              />
+              <el-upload
+                v-else
+                drag
+                action="#"
+                :auto-upload="false"
+                :disabled="state === 'disabled'"
+              >
+                <p>
+                  {{
+                    darkFormIsFilled(state)
+                      ? 'approved-cover.png'
+                      : state === 'placeholder'
+                        ? 'Choose an approved cover'
+                        : 'Drop a cover or browse'
+                  }}
+                </p>
+              </el-upload>
+
+              <!-- @vue-ignore custom visual contract attribute -->
+              <p
+                data-dark-form-helper
+                :class="{ 'is-invalid': state === 'invalid' }"
+              >
+                {{
+                  state === 'invalid'
+                    ? 'Resolve this value before publishing.'
+                    : 'Required release guidance remains readable.'
+                }}
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
     <div class="demo-block">
       <h3>Radio & RadioButton</h3>
       <el-space direction="vertical" alignment="flex-start">
@@ -519,6 +670,47 @@ const productionCopy = {
 const productionLocale = ref<keyof typeof productionCopy>('en')
 const copy = computed(() => productionCopy[productionLocale.value])
 
+const darkFormStates = [
+  'default',
+  'hover',
+  'focus',
+  'filled',
+  'placeholder',
+  'disabled',
+  'invalid',
+] as const
+
+const darkFormControls = [
+  { id: 'input', label: 'Input' },
+  { id: 'textarea', label: 'Textarea' },
+  { id: 'select', label: 'Select' },
+  { id: 'select-v2', label: 'Select V2' },
+  { id: 'date-picker', label: 'Date Picker' },
+  { id: 'time-picker', label: 'Time Picker' },
+  { id: 'time-select', label: 'Time Select' },
+  { id: 'input-number', label: 'Input Number' },
+  { id: 'cascader', label: 'Cascader' },
+  { id: 'upload', label: 'Upload' },
+] as const
+
+const darkFormDate = new Date(2026, 6, 24, 9, 0, 0)
+const darkFormSelectOptions = [
+  { label: 'Editorial approval', value: 'approval' },
+]
+const darkFormCascaderOptions = [
+  {
+    label: 'Editorial',
+    value: 'editorial',
+    children: [{ label: 'Release', value: 'release' }],
+  },
+]
+const darkFormIsFilled = (state: (typeof darkFormStates)[number]) =>
+  state === 'filled' || state === 'disabled'
+const darkFormPlaceholder = (
+  state: (typeof darkFormStates)[number],
+  value: string,
+) => (state === 'placeholder' ? value : '')
+
 const productionForm = reactive({
   audience: '',
   notifyReviewers: true,
@@ -564,6 +756,140 @@ const {
 .production-form-fixtures {
   width: 100%;
   overflow: hidden;
+}
+
+.dark-form-authority-matrix {
+  width: 100%;
+  overflow: visible;
+}
+
+.dark-form-authority-matrix__header {
+  margin-bottom: 24px;
+}
+
+.dark-form-authority-matrix__header h3,
+.dark-form-authority-matrix__header p,
+.dark-form-control-group h4,
+.dark-form-contract-cell > p {
+  margin: 0;
+}
+
+.dark-form-authority-matrix__header p {
+  max-width: 680px;
+  margin-top: 8px;
+  color: var(--fsus-form-readable-text);
+  font-size: 14px;
+  line-height: 1.57;
+}
+
+.dark-form-authority-matrix__controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.dark-form-control-group {
+  min-width: 0;
+}
+
+.dark-form-control-group h4 {
+  margin-bottom: 12px;
+  color: var(--el-text-color-primary);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.dark-form-control-group__states {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.dark-form-contract-cell {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--fsus-border);
+  border-radius: 8px;
+  background: var(--fsus-paper);
+}
+
+.dark-form-contract-cell > [data-dark-form-label],
+.dark-form-contract-cell > [data-dark-form-helper] {
+  display: block;
+  color: var(--fsus-form-readable-text);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.dark-form-contract-cell > [data-dark-form-label] {
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.dark-form-contract-cell > [data-dark-form-helper] {
+  min-height: 18px;
+  margin-top: 6px;
+}
+
+.dark-form-contract-cell > [data-dark-form-helper].is-invalid {
+  color: var(--el-color-danger);
+}
+
+.dark-form-contract-cell[data-state='placeholder'] :deep(.el-upload-dragger p),
+.dark-form-contract-cell[data-state='disabled'] :deep(.el-upload-dragger p) {
+  color: var(--fsus-form-state-text);
+}
+
+.dark-form-contract-cell :deep(.el-input),
+.dark-form-contract-cell :deep(.el-select),
+.dark-form-contract-cell :deep(.el-date-editor),
+.dark-form-contract-cell :deep(.el-input-number),
+.dark-form-contract-cell :deep(.el-cascader),
+.dark-form-contract-cell :deep(.el-upload),
+.dark-form-contract-cell :deep(.el-upload-dragger) {
+  width: 100%;
+  min-width: 0;
+}
+
+.dark-form-contract-cell[data-state='hover']
+  :deep(
+    .el-input__wrapper,
+    .el-textarea__inner,
+    .el-select__wrapper,
+    .el-date-editor.el-input__wrapper,
+    .el-input-number,
+    .el-upload-dragger
+  ) {
+  background: var(--el-bg-color);
+  border-color: var(--fsus-scholarly-blue);
+}
+
+.dark-form-contract-cell[data-state='focus']
+  :deep(
+    .el-input__wrapper,
+    .el-textarea__inner,
+    .el-select__wrapper,
+    .el-date-editor.el-input__wrapper,
+    .el-input-number,
+    .el-upload-dragger
+  ) {
+  background: var(--el-bg-color);
+  border-color: var(--fsus-scholarly-blue);
+  box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px)
+    var(--fsus-scholarly-blue) !important;
+}
+
+.dark-form-contract-cell[data-state='invalid']
+  :deep(
+    .el-input__wrapper,
+    .el-textarea__inner,
+    .el-select__wrapper,
+    .el-date-editor.el-input__wrapper,
+    .el-input-number,
+    .el-upload-dragger
+  ) {
+  border-color: var(--el-color-danger);
+  box-shadow: inset 0 0 0 1px var(--el-color-danger) !important;
 }
 
 .production-form-fixtures__header,
@@ -721,6 +1047,11 @@ const {
 }
 
 @media (max-width: 479px) {
+  .dark-form-authority-matrix__controls,
+  .dark-form-control-group__states {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .production-form-fixtures__header,
   .task-form-fixture,
   .task-field--number,
