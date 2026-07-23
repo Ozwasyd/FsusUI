@@ -272,6 +272,7 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 - Focus Visible 使用 `2px` inset blue ring，禁用浏览器默认 outline。
 - Invalid 状态优先显示语义色和错误文案，不使用动画或外发光吸引注意。
 - Disabled 状态使用 `--el-disabled-bg-color`、`--el-disabled-text-color`、`--el-disabled-border-color`，透明度不能低到影响可读性。
+- Empty 主操作保持 `44px` 高，次操作不得低于 `40px`；小于 `420px` 时操作组纵向排列且每个命中区至少 `44px`。主次由 variant、顺序与字重表达，不通过缩小次按钮表达。
 
 ### Dropdown, Select, Popover
 

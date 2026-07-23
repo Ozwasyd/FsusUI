@@ -547,7 +547,17 @@ describe('Fsus theme visual baseline', () => {
       'background: transparent;',
       'border-color: transparent;',
       'box-shadow: none;',
-      'font-weight: 700;',
+      'min-height: 40px;',
+      'font-weight: 500;',
+    ])
+    expectCssRule(css, '.el-empty__bottom .el-button--primary', [
+      'min-height: 44px;',
+      'padding-inline: 16px;',
+      'border-radius: var(--fsus-radius-control);',
+      'font-size: 14px;',
+    ])
+    expectCssRule(css, '.el-empty-state__actions .el-link', [
+      'min-height: 40px;',
     ])
   })
 

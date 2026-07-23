@@ -1006,13 +1006,13 @@ html.dark .#{$namespace}-switch__action {
   ):not(.#{$namespace}-button--warning):not(.#{$namespace}-button--danger):not(
     .#{$namespace}-button--info
   ) {
-  min-height: 36px;
-  padding-inline: 8px;
+  min-height: 40px;
+  padding-inline: 16px;
   background: transparent;
   border-color: transparent;
   color: var(--el-text-color-primary);
   box-shadow: none;
-  font-weight: 700;
+  font-weight: 500;
 
   &:hover,
   &:focus {
@@ -1020,6 +1020,48 @@ html.dark .#{$namespace}-switch__action {
     border-color: transparent;
     color: var(--fsus-scholarly-blue);
     transform: none;
+  }
+}
+
+.#{$namespace}-empty__bottom,
+.#{$namespace}-empty-state__actions {
+  display: inline-flex;
+  max-width: min(100%, 320px);
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.#{$namespace}-empty__bottom .#{$namespace}-button--primary,
+.#{$namespace}-empty-state__actions .#{$namespace}-button--primary {
+  min-height: 44px;
+  padding-inline: 16px;
+  border-radius: var(--fsus-radius-control);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.#{$namespace}-empty-state__actions
+  .#{$namespace}-button:not(.#{$namespace}-button--primary),
+.#{$namespace}-empty-state__actions .#{$namespace}-link {
+  min-height: 40px;
+}
+
+@media (max-width: 419px) {
+  .#{$namespace}-empty__bottom,
+  .#{$namespace}-empty-state__actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .#{$namespace}-empty__bottom .#{$namespace}-button,
+  .#{$namespace}-empty-state__actions .#{$namespace}-button,
+  .#{$namespace}-empty-state__actions .#{$namespace}-link {
+    width: 100%;
+    min-height: 44px;
+    margin-inline: 0;
   }
 }
 

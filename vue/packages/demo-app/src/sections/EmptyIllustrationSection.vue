@@ -17,8 +17,20 @@
         <ElEmpty
           description="No archived documents yet. Import one to start this collection."
         >
-          <ElButton>Import document</ElButton>
+          <ElButton type="primary">Import document</ElButton>
         </ElEmpty>
+      </article>
+
+      <article
+        class="empty-illustration-fixture__panel"
+        v-bind="{ 'data-empty-variant': 'no-action' }"
+      >
+        <h2>No action</h2>
+        <FsusEmptyState
+          size="compact"
+          title="All review notes are resolved"
+          description="New review notes will appear here when a teammate requests a change."
+        />
       </article>
 
       <article
@@ -45,6 +57,37 @@
           description="Choose a document to inspect its metadata."
         >
           <ElButton>Browse documents</ElButton>
+        </FsusEmptyState>
+      </article>
+
+      <article
+        class="empty-illustration-fixture__panel"
+        v-bind="{ 'data-empty-variant': 'primary-secondary' }"
+      >
+        <h2>Primary and secondary</h2>
+        <FsusEmptyState
+          size="compact"
+          action-variant="primary"
+          title="No deployment target is configured"
+          description="Choose the production workspace, then verify its release policy before the first deployment."
+        >
+          <ElButton type="primary">Choose workspace</ElButton>
+          <ElButton>Review release policy</ElButton>
+        </FsusEmptyState>
+      </article>
+
+      <article
+        class="empty-illustration-fixture__panel"
+        v-bind="{ 'data-empty-variant': 'disabled-loading' }"
+      >
+        <h2>Loading and disabled</h2>
+        <FsusEmptyState
+          size="compact"
+          title="The archive is still being indexed"
+          description="You can retry when indexing completes, or return to the document list without losing your filters."
+        >
+          <ElButton type="primary" loading>Checking archive</ElButton>
+          <ElButton disabled>Retry indexing</ElButton>
         </FsusEmptyState>
       </article>
 

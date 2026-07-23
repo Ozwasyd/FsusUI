@@ -59,3 +59,34 @@ test('keeps illustrations quiet, decorative, and size-aware', async ({
     page.locator('[data-empty-variant="page"] .el-empty-state__illustration'),
   ).toHaveAttribute('aria-hidden', 'true')
 })
+
+test('keeps empty-state actions touchable without using size as hierarchy', async ({
+  page,
+}) => {
+  const actions = page.locator(
+    '[data-empty-variant="primary-secondary"] .el-empty-state__actions',
+  )
+  const primary = actions.locator('.el-button--primary')
+  const secondary = actions.locator('.el-button:not(.el-button--primary)')
+
+  await expect(primary).toHaveCSS('min-height', '44px')
+  await expect(secondary).toHaveCSS('min-height', '40px')
+  await expect(actions).toHaveCSS('gap', '8px')
+
+  await page.setViewportSize({ width: 375, height: 900 })
+  await expect(primary).toHaveCSS('min-height', '44px')
+  await expect(secondary).toHaveCSS('min-height', '44px')
+  await expect(primary).toHaveCSS('width', '320px')
+  await expect(secondary).toHaveCSS('width', '320px')
+
+  const focusOutline = await primary.evaluate((element) => {
+    ;(element as HTMLElement).focus()
+    const style = getComputedStyle(element)
+    return {
+      height: element.getBoundingClientRect().height,
+      radius: style.borderRadius,
+    }
+  })
+  expect(focusOutline.height).toBeGreaterThanOrEqual(44)
+  expect(focusOutline.radius).toBe('6px')
+})
