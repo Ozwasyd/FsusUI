@@ -55,6 +55,34 @@ const expectCssRule = (
 }
 
 describe('Fsus theme visual baseline', () => {
+  test('keeps breadcrumb separators inside semantic flex path units', () => {
+    const css = compileThemeFile('breadcrumb.scss')
+
+    expectCssRule(css, '.el-breadcrumb', [
+      'container-type: inline-size;',
+      'font-size: var(--el-font-size-base);',
+    ])
+    expectCssRule(css, '.el-breadcrumb__list', [
+      'display: flex;',
+      'flex-wrap: wrap;',
+      'list-style: none;',
+    ])
+    expectCssRule(css, '.el-breadcrumb__item', [
+      'display: inline-flex;',
+      'min-height: 40px;',
+      'break-inside: avoid;',
+    ])
+    expectCssRule(css, '.el-breadcrumb__collapse-trigger', [
+      'width: 40px;',
+      'height: 40px;',
+    ])
+    expectCssRule(css, '.el-breadcrumb__collapse-menu-item', [
+      'min-height: 44px;',
+    ])
+    expect(css).toContain('@container (max-width: 559px)')
+    expect(css).not.toMatch(/\bfloat:/)
+  })
+
   test('exposes a public touch-target modifier for radio button groups', () => {
     const css = compileThemeFile('radio-button.scss')
 

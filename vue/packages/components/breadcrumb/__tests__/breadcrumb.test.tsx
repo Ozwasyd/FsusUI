@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils'
+import { nextTick } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 import { Check } from '@element-plus/icons-vue'
 import Breadcrumb from '../src/breadcrumb.vue'
@@ -37,6 +38,70 @@ describe('Breadcrumb.vue', () => {
     ))
     expect(wrapper.find('.el-breadcrumb__separator').text()).toBe('')
     expect(wrapper.findComponent(Check).exists()).toBe(true)
+  })
+
+  it('uses native navigation and ordered-list semantics', async () => {
+    const wrapper = _mount(() => (
+      <Breadcrumb ariaLabel="Article location">
+        <BreadcrumbItem>A</BreadcrumbItem>
+        <BreadcrumbItem>B</BreadcrumbItem>
+      </Breadcrumb>
+    ))
+    await nextTick()
+
+    expect(wrapper.element.tagName).toBe('NAV')
+    expect(wrapper.attributes('aria-label')).toBe('Article location')
+    expect(wrapper.find(':scope > ol').exists()).toBe(true)
+    expect(wrapper.findAll(':scope > ol > li')).toHaveLength(2)
+    expect(
+      wrapper.findAllComponents(BreadcrumbItem)[1].attributes(),
+    ).toMatchObject({
+      'aria-current': 'page',
+    })
+    expect(
+      wrapper.findAll('.el-breadcrumb__separator')[0].attributes('aria-hidden'),
+    ).toBe('true')
+  })
+
+  it('exposes a complete ordered path through the narrow-layout collapse', async () => {
+    const wrapper = _mount(() => (
+      <Breadcrumb>
+        {['Root', 'One', 'Two', 'Parent', 'Current'].map((label, index) => (
+          <BreadcrumbItem key={label} to={index < 4 ? `/${index}` : undefined}>
+            {label}
+          </BreadcrumbItem>
+        ))}
+      </Breadcrumb>
+    ))
+    await nextTick()
+
+    const collapse = wrapper.find('.el-breadcrumb__collapse')
+    expect(collapse.exists()).toBe(true)
+    expect(
+      collapse.element.parentElement?.previousElementSibling?.textContent,
+    ).toContain('Root')
+    expect(
+      collapse
+        .findAll('.el-breadcrumb__collapse-menu-item')
+        .map((item) => item.text()),
+    ).toEqual(['Root', 'One', 'Two', 'Parent', 'Current'])
+    expect(
+      wrapper
+        .findAll('.el-breadcrumb__item')
+        .map((item) => item.classes().includes('is-collapsed')),
+    ).toEqual([false, true, true, false, false])
+  })
+
+  it('does not add a collapse affordance to a two-level path', async () => {
+    const wrapper = _mount(() => (
+      <Breadcrumb>
+        <BreadcrumbItem>Root</BreadcrumbItem>
+        <BreadcrumbItem>Current</BreadcrumbItem>
+      </Breadcrumb>
+    ))
+    await nextTick()
+
+    expect(wrapper.find('.el-breadcrumb__collapse').exists()).toBe(false)
   })
 
   it('to', () => {
@@ -79,10 +144,14 @@ describe('Breadcrumb.vue', () => {
         {
           replace,
           push,
-        }
+        },
       )
       await wrapper.find('.el-breadcrumb__inner').trigger('click')
       expect(push).toHaveBeenCalled()
+      await wrapper.find('.el-breadcrumb__inner').trigger('keydown', {
+        key: 'Enter',
+      })
+      expect(push).toHaveBeenCalledTimes(2)
       wrapper.unmount()
       wrapper = _mount(
         () => (
@@ -95,7 +164,7 @@ describe('Breadcrumb.vue', () => {
         {
           replace,
           push,
-        }
+        },
       )
 
       await wrapper.find('.el-breadcrumb__inner').trigger('click')

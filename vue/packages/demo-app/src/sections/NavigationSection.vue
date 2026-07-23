@@ -25,13 +25,82 @@
     </div>
     <div class="demo-block">
       <h3>Breadcrumb & BreadcrumbItem</h3>
-      <el-breadcrumb separator="/">
-        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-        <el-breadcrumb-item>
-          <a href="/">内容管理</a>
-        </el-breadcrumb-item>
-        <el-breadcrumb-item>文章列表</el-breadcrumb-item>
-      </el-breadcrumb>
+      <div data-testid="breadcrumb-5">
+        <el-breadcrumb separator="/" ariaLabel="Article location">
+          <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+          <el-breadcrumb-item :to="{ path: '/workspace' }">
+            内容工作区
+          </el-breadcrumb-item>
+          <el-breadcrumb-item :to="{ path: '/workspace/articles' }">
+            文章管理
+          </el-breadcrumb-item>
+          <el-breadcrumb-item :to="{ path: '/workspace/articles/drafts' }">
+            待复核草稿
+          </el-breadcrumb-item>
+          <el-breadcrumb-item>
+            响应式导航契约与 Long Latin title verification
+          </el-breadcrumb-item>
+        </el-breadcrumb>
+      </div>
+      <div class="navigation-breadcrumb-fixtures">
+        <div data-testid="breadcrumb-2">
+          <el-breadcrumb separator="→" ariaLabel="Short article location">
+            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item>当前文章</el-breadcrumb-item>
+          </el-breadcrumb>
+        </div>
+        <div data-testid="breadcrumb-10">
+          <el-breadcrumb
+            :separator-icon="ArrowRight"
+            ariaLabel="Deep article location"
+          >
+            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/library' }">
+              知识库
+            </el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/library/design' }">
+              设计系统
+            </el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/library/design/components' }">
+              组件规范
+            </el-breadcrumb-item>
+            <el-breadcrumb-item
+              :to="{ path: '/library/design/components/navigation' }"
+            >
+              导航组件
+            </el-breadcrumb-item>
+            <el-breadcrumb-item
+              :to="{ path: '/library/design/components/navigation/mobile' }"
+            >
+              移动端
+            </el-breadcrumb-item>
+            <el-breadcrumb-item
+              :to="{
+                path: '/library/design/components/navigation/mobile/layout',
+              }"
+            >
+              布局
+            </el-breadcrumb-item>
+            <el-breadcrumb-item
+              :to="{
+                path: '/library/design/components/navigation/mobile/layout/wrapping',
+              }"
+            >
+              换行规则
+            </el-breadcrumb-item>
+            <el-breadcrumb-item
+              :to="{
+                path: '/library/design/components/navigation/mobile/layout/wrapping/evidence',
+              }"
+            >
+              验收证据
+            </el-breadcrumb-item>
+            <el-breadcrumb-item>
+              超长当前层级 Long current breadcrumb destination
+            </el-breadcrumb-item>
+          </el-breadcrumb>
+        </div>
+      </div>
     </div>
     <div class="demo-block">
       <h3>PageHeader</h3>
@@ -73,7 +142,7 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowDown, useDemoState } from '../demo-state'
+import { ArrowDown, ArrowRight, useDemoState } from '../demo-state'
 
 const { activeTab, goBack } = useDemoState()
 </script>

@@ -3,6 +3,13 @@ import type { ExtractPropTypes } from 'vue'
 
 export const breadcrumbProps = buildProps({
   /**
+   * @description accessible label for the breadcrumb navigation landmark
+   */
+  ariaLabel: {
+    type: String,
+    default: 'Breadcrumb',
+  },
+  /**
    * @description separator character
    */
   separator: {

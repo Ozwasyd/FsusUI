@@ -1,37 +1,63 @@
 @use 'mixins/mixins' as *;
-@use 'mixins/utils' as *;
 @use 'common/var' as *;
 
 @include b(breadcrumb) {
+  container-type: inline-size;
   font-size: getCssVar('font-size', 'base');
-  line-height: 1;
-  @include utils-clearfix;
+  line-height: 20px;
+
+  @include e(list) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
 
   @include e(separator) {
-    margin: 0 9px;
-    font-weight: bold;
+    flex: none;
+    margin: 0 8px;
+    font-weight: 400;
     color: getCssVar('text-color', 'placeholder');
+    pointer-events: none;
 
     &.#{$namespace}-icon {
-      margin: 0 6px;
+      width: 16px;
+      height: 16px;
+      margin: 0 8px;
       font-weight: normal;
+
       svg {
+        width: 100%;
+        height: 100%;
         vertical-align: middle;
       }
     }
   }
 
   @include e(item) {
-    float: left;
     display: inline-flex;
+    flex: none;
     align-items: center;
+    min-height: 40px;
+    break-inside: avoid;
 
     @include e(inner) {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 20px;
       color: getCssVar('text-color', 'regular');
+      overflow-wrap: anywhere;
 
       &.is-link,
       & a {
-        font-weight: bold;
+        min-width: 40px;
+        justify-content: center;
+        font-weight: 400;
         text-decoration: none;
         transition: getCssVar('transition', 'color');
         color: getCssVar('text-color', 'primary');
@@ -48,7 +74,13 @@
       .#{$namespace}-breadcrumb__inner a {
         &,
         &:hover {
-          font-weight: normal;
+          display: -webkit-box;
+          max-width: 100%;
+          max-height: 40px;
+          overflow: hidden;
+          font-weight: 500;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
           color: getCssVar('text-color', 'regular');
           cursor: text;
         }
@@ -56,6 +88,112 @@
 
       .#{$namespace}-breadcrumb__separator {
         display: none;
+      }
+    }
+  }
+
+  @include e(collapse) {
+    position: relative;
+    display: none;
+    flex: none;
+    min-height: 40px;
+  }
+
+  @include e(collapse-trigger) {
+    display: inline-flex;
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    color: getCssVar('text-color', 'regular');
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+  }
+
+  @include e(collapse-menu) {
+    position: absolute;
+    z-index: getCssVar('index', 'popper');
+    inset-block-start: calc(100% + 4px);
+    inset-inline-start: 0;
+    width: max-content;
+    min-width: 220px;
+    max-width: min(280px, calc(100vw - 32px));
+    margin: 0;
+    padding: 4px;
+    list-style: none;
+    border: 1px solid getCssVar('border-color');
+    border-radius: getCssVar('border-radius', 'base');
+    background: getCssVar('bg-color', 'overlay');
+    box-shadow: getCssVar('box-shadow', 'light');
+  }
+
+  @include e(collapse-menu-item) {
+    display: flex;
+    min-height: 44px;
+    align-items: stretch;
+  }
+
+  @include e(collapse-menu-target) {
+    display: flex;
+    width: 100%;
+    min-height: 44px;
+    align-items: center;
+    padding: 8px 12px;
+    border: 0;
+    border-radius: getCssVar('border-radius', 'small');
+    color: getCssVar('text-color', 'regular');
+    background: transparent;
+    font: inherit;
+    line-height: 20px;
+    text-align: start;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      color: getCssVar('color-primary');
+      background: getCssVar('fill-color', 'light');
+    }
+  }
+
+  @container (max-width: 559px) {
+    @include e(collapse) {
+      display: inline-flex;
+    }
+
+    @include e(item) {
+      @include when(collapsed) {
+        display: none;
+      }
+
+      @include when(collapse-anchor) {
+        display: inline-flex;
+
+        > .#{$namespace}-breadcrumb__inner,
+        > .#{$namespace}-breadcrumb__separator {
+          display: none;
+        }
+      }
+
+      &:last-child {
+        flex: 1 1 120px;
+        min-width: 0;
+      }
+    }
+  }
+
+  @container (max-width: 389px) {
+    @include e(list) {
+      &:has(> .is-collapse-anchor) {
+        > .#{$namespace}-breadcrumb__item:first-child {
+          display: none;
+        }
       }
     }
   }
