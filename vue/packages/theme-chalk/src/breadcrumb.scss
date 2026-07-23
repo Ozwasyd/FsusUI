@@ -175,8 +175,7 @@
       @include when(collapse-anchor) {
         display: inline-flex;
 
-        > .#{$namespace}-breadcrumb__inner,
-        > .#{$namespace}-breadcrumb__separator {
+        > .#{$namespace}-breadcrumb__inner {
           display: none;
         }
       }
