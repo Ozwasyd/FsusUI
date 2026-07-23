@@ -21,6 +21,7 @@ import {
   createSmokeSelection,
   loadVisualProfileRegistry,
 } from './visual-profiles.mjs'
+import { visualEvidencePolicy } from './visual-evidence-policy.mjs'
 import { createDefaultVisualRuntimeConfig } from './visual-runtime-core.mjs'
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
@@ -365,9 +366,13 @@ assert(
   ) &&
     evidencePolicy.includes(
       "screenshot: evidence ? 'on' : 'only-on-failure'",
-    ) &&
-    evidencePolicy.includes("trace: evidence ? 'on' : 'retain-on-failure'"),
+    ),
   'visual evidence policy must keep normal success artifacts out of reports',
+)
+const evidenceTrace = visualEvidencePolicy({ FSUS_VISUAL_EVIDENCE: '1' }).trace
+assert(
+  evidenceTrace === 'retain-on-failure',
+  'visual evidence must retain necessary failure traces without recording a success trace alongside every success screenshot',
 )
 assert(
   JSON.stringify(

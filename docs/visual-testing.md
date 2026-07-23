@@ -73,3 +73,7 @@ also writes `.tmp/visual-evidence/manifest.json`. Result paths are namespaced by
 profile, suite, project, and shard; HTML report paths are namespaced by profile,
 suite, and shard. A failure while writing the evidence manifest fails the
 evidence command and never changes its Full-equivalent test selection.
+Evidence retains a trace for every failure while the authoritative
+`screenshot: on` matrix records every successful rendered state. Recording a
+second trace for every success is intentionally disabled because it competes
+with the success screenshot fixture and can block browser-context teardown.

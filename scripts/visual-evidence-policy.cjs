@@ -14,7 +14,7 @@ const visualEvidencePolicy = (env = process.env) => {
     evidence,
     preserveOutput: evidence ? 'always' : 'failures-only',
     screenshot: evidence ? 'on' : 'only-on-failure',
-    trace: evidence ? 'on' : 'retain-on-failure',
+    trace: 'retain-on-failure',
   }
 }
 
