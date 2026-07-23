@@ -108,6 +108,9 @@
       <el-pagination
         background
         layout="prev, pager, next, jumper, total"
+        responsive="auto"
+        aria-label="文章分页"
+        :default-current-page="5"
         :total="1000"
       />
     </div>

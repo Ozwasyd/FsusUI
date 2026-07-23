@@ -40,4 +40,21 @@ describe('responsive data component contracts', () => {
     expect(css).toContain('.el-table--responsive-scroll')
     expect(css).toContain('width: 22px;')
   })
+
+  test('Pagination converges by container width without shrinking hit targets', () => {
+    const css = compileThemeFile('pagination.scss')
+
+    expect(css).toContain('.el-pagination--responsive-auto')
+    expect(css).toContain('@container (max-width: 359px)')
+    expect(css).toContain(
+      '@container (min-width: 360px) and (max-width: 559px)',
+    )
+    expect(css).toContain(
+      '@container (min-width: 560px) and (max-width: 767px)',
+    )
+    expect(css).toContain('@container (min-width: 768px)')
+    expect(css).toContain('min-width: 40px;')
+    expect(css).toContain('height: 40px;')
+    expect(css).toContain('width: 60px;')
+  })
 })

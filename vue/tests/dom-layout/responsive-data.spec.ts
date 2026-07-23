@@ -145,3 +145,91 @@ test('Table priority projection preserves every column and explicit scroll is ke
     '0',
   )
 })
+
+test('Pagination converges in stable semantic zones without page overflow', async ({
+  page,
+}) => {
+  await openDataSection(page)
+  const pagination = page.locator('.el-pagination--responsive-auto')
+
+  for (const width of [320, 360, 375, 560, 768, 1440]) {
+    await page.setViewportSize({ width, height: 1300 })
+    await settleResponsiveLayout(page)
+    await expect(pagination).toBeVisible()
+    const paginationBox = await pagination.boundingBox()
+    const availableWidth = paginationBox?.width ?? 0
+
+    const prev = pagination.locator('.btn-prev')
+    const next = pagination.locator('.btn-next')
+    for (const action of [prev, next]) {
+      const box = await action.boundingBox()
+      expect(box?.width ?? 0).toBeGreaterThanOrEqual(40)
+      expect(box?.height ?? 0).toBeGreaterThanOrEqual(40)
+    }
+
+    if (availableWidth < 360) {
+      await expect(
+        pagination.locator('.el-pagination__compact-indicator'),
+      ).toBeVisible()
+      await expect(
+        pagination.locator('.el-pagination__compact-pager'),
+      ).toBeHidden()
+      await expect(
+        pagination.locator('.el-pagination__information'),
+      ).toBeHidden()
+    } else if (availableWidth < 560) {
+      await expect(
+        pagination.locator('.el-pagination__compact-pager'),
+      ).toBeVisible()
+      await expect(
+        pagination.locator('.el-pagination__full-pager'),
+      ).toBeHidden()
+      const navigationBox = await pagination
+        .locator('.el-pagination__navigation')
+        .boundingBox()
+      const informationBox = await pagination
+        .locator('.el-pagination__information')
+        .boundingBox()
+      expect(informationBox?.y ?? 0).toBeGreaterThanOrEqual(
+        (navigationBox?.y ?? 0) + (navigationBox?.height ?? 0),
+      )
+    } else if (availableWidth < 768) {
+      await expect(
+        pagination.locator('.el-pagination__full-pager'),
+      ).toBeVisible()
+      await expect(pagination.locator('.el-pagination__total')).toBeVisible()
+      await expect(pagination.locator('.el-pagination__jump')).toBeHidden()
+    } else {
+      await expect(
+        pagination.locator('.el-pagination__full-pager'),
+      ).toBeVisible()
+      await expect(pagination.locator('.el-pagination__jump')).toBeVisible()
+    }
+
+    const pageOverflow = await page.evaluate(
+      () =>
+        Math.max(
+          document.documentElement.scrollWidth,
+          document.body.scrollWidth,
+        ) - document.documentElement.clientWidth,
+    )
+    expect(pageOverflow).toBeLessThanOrEqual(1)
+  }
+
+  await page.setViewportSize({ width: 720, height: 1300 })
+  await page.evaluate(() => {
+    document.body.style.zoom = '2'
+  })
+  await settleResponsiveLayout(page)
+  await expect(
+    pagination.locator('.el-pagination__compact-indicator'),
+  ).toBeVisible()
+  const zoomOverflow = await page.evaluate(
+    () =>
+      Math.max(
+        document.documentElement.scrollWidth,
+        document.body.scrollWidth,
+      ) - document.documentElement.clientWidth,
+  )
+  expect(zoomOverflow).toBeLessThanOrEqual(1)
+})

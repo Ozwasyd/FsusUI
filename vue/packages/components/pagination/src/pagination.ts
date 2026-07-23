@@ -160,6 +160,21 @@ export const paginationProps = buildProps({
    * @description whether to hide when there's only one page
    */
   hideOnSinglePage: Boolean,
+  /**
+   * @description container-driven responsive layout
+   */
+  responsive: {
+    type: String,
+    values: ['off', 'auto'],
+    default: 'off',
+  },
+  /**
+   * @description accessible name for the responsive navigation region
+   */
+  ariaLabel: {
+    type: String,
+    default: 'Pagination',
+  },
 } as const)
 export type PaginationProps = ExtractPropTypes<typeof paginationProps>
 
@@ -229,10 +244,10 @@ export default defineComponent({
     })
 
     const innerPageSize = ref(
-      isAbsent(props.defaultPageSize) ? 10 : props.defaultPageSize
+      isAbsent(props.defaultPageSize) ? 10 : props.defaultPageSize,
     )
     const innerCurrentPage = ref(
-      isAbsent(props.defaultCurrentPage) ? 1 : props.defaultCurrentPage
+      isAbsent(props.defaultCurrentPage) ? 1 : props.defaultCurrentPage,
     )
 
     const pageSizeBridge = computed({
@@ -340,7 +355,7 @@ export default defineComponent({
       const rightWrapperRoot = h(
         'div',
         { class: ns.e('rightwrapper') },
-        rightWrapperChildren
+        rightWrapperChildren,
       )
       const TEMPLATE_MAP: Record<
         Exclude<LayoutKey, '->'>,
@@ -387,6 +402,79 @@ export default defineComponent({
         .split(',')
         .map((item: string) => item.trim()) as LayoutKey[]
 
+      if (props.responsive === 'auto') {
+        const requested = new Set(components)
+        const navigationChildren: Array<VNode | VNode[] | null> = []
+        if (requested.has('prev')) navigationChildren.push(TEMPLATE_MAP.prev)
+        if (requested.has('pager')) {
+          navigationChildren.push(
+            h(
+              'span',
+              {
+                class: ns.e('compact-indicator'),
+                'aria-live': 'polite',
+              },
+              `${currentPageBridge.value} / ${pageCountBridge.value}`,
+            ),
+            h(
+              'span',
+              { class: ns.e('compact-pager') },
+              h(Pager, {
+                currentPage: currentPageBridge.value,
+                pageCount: pageCountBridge.value,
+                pagerCount: 5,
+                onChange: handleCurrentChange,
+                disabled: props.disabled,
+              }),
+            ),
+            h('span', { class: ns.e('full-pager') }, TEMPLATE_MAP.pager),
+          )
+        }
+        if (requested.has('next')) navigationChildren.push(TEMPLATE_MAP.next)
+
+        const informationChildren = (
+          ['total', 'sizes', 'jumper', 'slot'] as const
+        )
+          .filter((key) => requested.has(key))
+          .map((key) => TEMPLATE_MAP[key])
+
+        return h(
+          'div',
+          {
+            class: [
+              ns.b(),
+              ns.m('responsive-auto'),
+              ns.is('background', props.background),
+              {
+                [ns.m('small')]: props.small,
+              },
+            ],
+          },
+          [
+            h(
+              'nav',
+              {
+                class: ns.e('navigation'),
+                'aria-label': props.ariaLabel,
+              },
+              navigationChildren,
+            ),
+            informationChildren.length > 0
+              ? h(
+                  'div',
+                  {
+                    class: [
+                      ns.e('information'),
+                      ns.is('has-total', requested.has('total')),
+                    ],
+                  },
+                  informationChildren,
+                )
+              : null,
+          ],
+        )
+      }
+
       let haveRightWrapper = false
 
       components.forEach((c) => {
@@ -408,7 +496,7 @@ export default defineComponent({
         addClass(rightWrapperChildren[0], ns.is('first'))
         addClass(
           rightWrapperChildren[rightWrapperChildren.length - 1],
-          ns.is('last')
+          ns.is('last'),
         )
         rootChildren.push(rightWrapperRoot)
       }
@@ -423,7 +511,7 @@ export default defineComponent({
             },
           ],
         },
-        rootChildren
+        rootChildren,
       )
     }
   },

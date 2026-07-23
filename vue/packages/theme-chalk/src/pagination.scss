@@ -171,15 +171,9 @@
           --fsus-pagination-active-bg,
           var(--fsus-state-selected-bg)
         );
-        color: var(
-          --fsus-pagination-active-text,
-          var(--fsus-scholarly-blue)
-        );
+        color: var(--fsus-pagination-active-text, var(--fsus-scholarly-blue));
         box-shadow: inset 0 0 0 1px
-          var(
-            --fsus-pagination-active-border,
-            var(--fsus-state-focus-border)
-          );
+          var(--fsus-pagination-active-border, var(--fsus-state-focus-border));
       }
 
       &:disabled,
@@ -216,6 +210,146 @@
 
     .#{$namespace}-select .#{$namespace}-input {
       width: 100px;
+    }
+  }
+
+  @include m(responsive-auto) {
+    width: 100%;
+    min-width: 0;
+    white-space: normal;
+    container-type: inline-size;
+    display: block;
+
+    @include e(navigation) {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: 8px;
+    }
+
+    @include e(information) {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: 12px;
+    }
+
+    @include e(compact-indicator) {
+      display: none;
+      min-width: 0;
+      flex: 1;
+      text-align: center;
+      color: getCssVar('text-color', 'regular');
+      font-variant-numeric: tabular-nums;
+    }
+
+    @include e(compact-pager) {
+      display: none;
+    }
+
+    .btn-prev,
+    .btn-next,
+    .#{$namespace}-pager li {
+      min-width: 40px;
+      height: 40px;
+      line-height: 40px;
+      border-radius: 6px;
+      margin: 0;
+    }
+
+    @include e((total, sizes, jump)) {
+      margin-left: 0;
+    }
+
+    @include e(jump) {
+      min-height: 40px;
+      white-space: nowrap;
+
+      @include e(editor) {
+        &.#{$namespace}-input {
+          width: 60px;
+        }
+
+        .#{$namespace}-input__wrapper {
+          min-height: 40px;
+        }
+      }
+    }
+
+    @include e(sizes) {
+      .#{$namespace}-select .#{$namespace}-input {
+        width: 128px;
+      }
+
+      .#{$namespace}-input__wrapper {
+        min-height: 40px;
+      }
+    }
+
+    @container (max-width: 359px) {
+      .#{$namespace}-pagination__full-pager,
+      .#{$namespace}-pagination__compact-pager,
+      .#{$namespace}-pagination__information {
+        display: none;
+      }
+
+      .#{$namespace}-pagination__compact-indicator {
+        display: block;
+      }
+
+      .#{$namespace}-pagination__navigation {
+        height: 40px;
+      }
+    }
+
+    @container (min-width: 360px) and (max-width: 559px) {
+      .#{$namespace}-pagination__full-pager {
+        display: none;
+      }
+
+      .#{$namespace}-pagination__compact-pager {
+        display: block;
+        min-width: 0;
+      }
+
+      .#{$namespace}-pagination__information {
+        margin-top: 8px;
+      }
+
+      .#{$namespace}-pagination__sizes,
+      .#{$namespace}-pagination__jump {
+        display: none;
+      }
+    }
+
+    @container (min-width: 560px) and (max-width: 767px) {
+      .#{$namespace}-pagination__navigation {
+        gap: 12px;
+      }
+
+      .#{$namespace}-pagination__information {
+        margin-top: 8px;
+      }
+
+      .#{$namespace}-pagination__jump,
+      .#{$namespace}-pagination__information.is-has-total
+        .#{$namespace}-pagination__sizes {
+        display: none;
+      }
+    }
+
+    @container (min-width: 768px) {
+      display: flex;
+      gap: 16px;
+
+      .#{$namespace}-pagination__navigation {
+        gap: 8px;
+      }
+
+      .#{$namespace}-pagination__information {
+        gap: 16px;
+        margin-inline-start: auto;
+      }
     }
   }
 }
