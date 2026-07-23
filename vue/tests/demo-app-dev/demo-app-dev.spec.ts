@@ -408,7 +408,7 @@ test('Calendar header controls use soft segmented styling', async ({
   })
 
   expect(metrics.shellDisplay).toBe('inline-flex')
-  expect(metrics.shellGap).toBe('2px')
+  expect(metrics.shellGap).toBe('8px')
   expect(metrics.shellRadius).toBe('6px')
   expect(metrics.buttonBorders).toEqual(['0px', '0px', '0px'])
   expect(metrics.buttonMargins).toEqual(['0px', '0px', '0px'])
