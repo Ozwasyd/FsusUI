@@ -840,6 +840,39 @@ describe('Fsus theme visual baseline', () => {
       'align-items: center;',
       'justify-content: space-between;',
     ])
+    expectCssRule(css, '.el-data-list--navigation .el-data-list__row', [
+      'min-height: 58px;',
+      'column-gap: 12px;',
+      'border-bottom: 1px solid var(--el-border-color-lighter);',
+    ])
+    expectCssRule(
+      css,
+      '.el-data-list--navigation.is-interactive .el-data-list__row:focus-visible',
+      [
+        'background: var(--el-data-list-hover-background);',
+        'box-shadow: inset 0 0 0 2px var(--el-data-list-focus-ring);',
+        'outline: none;',
+      ],
+    )
+    expectCssRule(
+      css,
+      '.el-data-list--navigation .el-data-list__row.is-active',
+      [
+        'background: var(--el-data-list-active-background);',
+        'box-shadow: inset 2px 0 0 var(--el-data-list-active-indicator);',
+      ],
+    )
+    expectCssRule(
+      css,
+      '.el-data-list--navigation .el-data-list__cell:first-child',
+      ['padding-left: 20px;'],
+    )
+    expectCssRule(
+      css,
+      '.el-data-list--navigation .el-data-list__cell:last-child',
+      ['padding-right: 16px;'],
+    )
+    expectCssRule(css, '.el-data-list__cell', ['box-sizing: border-box;'])
     expect(css).not.toMatch(/\.el-collection-toolbar\s*\{[^}]*box-shadow:/s)
   })
 

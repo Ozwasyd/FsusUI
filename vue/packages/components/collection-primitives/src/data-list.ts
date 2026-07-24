@@ -6,7 +6,7 @@ import type { ExtractPropTypes } from 'vue'
 import type DataList from './data-list.vue'
 
 export type DataListRowKey = string | number
-export const dataListVariants = ['default', 'summary'] as const
+export const dataListVariants = ['default', 'summary', 'navigation'] as const
 
 export type DataListColumn = {
   key: string

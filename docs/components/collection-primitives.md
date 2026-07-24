@@ -88,6 +88,38 @@ Live region behavior is opt-in:
 <FsusCollectionSummary title="Results" :total="0" aria-live="polite" />
 ```
 
+## Data List
+
+Use `FsusDataList` with `variant="navigation"` for a compact collection whose
+rows navigate to, preview, or select one record. The variant owns the row
+height, cell insets, hover and focus surfaces, active indicator, and end-column
+alignment; consumers should not target `.el-data-list__row` or
+`.el-data-list__cell`.
+
+```vue
+<FsusDataList
+  :rows="regions"
+  :columns="[
+    { key: 'name', label: 'Region' },
+    { key: 'indicator', label: 'Open', align: 'end' },
+  ]"
+  row-key="code"
+  :active-key="selectedCode"
+  :href="regionHref"
+  density="compact"
+  variant="navigation"
+  :show-header="false"
+/>
+```
+
+Slotted content can consume `--el-data-list-row-accent-color` and
+`--el-data-list-row-accent-opacity` so its icon or indicator follows hover,
+keyboard focus, and active state without reaching into component internals.
+Products may map the documented
+`--el-data-list-hover-background`, `--el-data-list-active-background`,
+`--el-data-list-focus-ring`, and `--el-data-list-active-indicator` variables to
+their semantic theme tokens on the component root.
+
 ## Empty State
 
 Use `FsusEmptyState size="inline"` inside compact collection bodies. Do not

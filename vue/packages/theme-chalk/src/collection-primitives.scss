@@ -141,6 +141,20 @@
 
 @include b(data-list) {
   --el-data-list-columns: minmax(0, 1fr);
+  --el-data-list-hover-background: color-mix(
+    in srgb,
+    #{getCssVar('color-primary')} 5%,
+    transparent
+  );
+  --el-data-list-active-background: color-mix(
+    in srgb,
+    #{getCssVar('color-primary')} 8%,
+    transparent
+  );
+  --el-data-list-focus-ring: #{getCssVar('color-primary-light-5')};
+  --el-data-list-active-indicator: #{getCssVar('color-primary')};
+  --el-data-list-row-accent-color: #{getCssVar('text-color-secondary')};
+  --el-data-list-row-accent-opacity: 0.72;
 
   display: grid;
   grid-template-columns: var(--el-data-list-columns);
@@ -194,6 +208,7 @@
   }
 
   @include e(cell) {
+    box-sizing: border-box;
     min-width: 0;
     padding: 0 16px;
     overflow: hidden;
@@ -263,6 +278,54 @@
       padding: 16px 20px;
       overflow: visible;
       white-space: normal;
+    }
+  }
+
+  @include m(navigation) {
+    @include e(row) {
+      min-height: 58px;
+      column-gap: 12px;
+      border-bottom: 1px solid getCssVar('border-color-lighter');
+
+      @include when(active) {
+        --el-data-list-row-accent-color: #{getCssVar('color-primary')};
+        --el-data-list-row-accent-opacity: 1;
+
+        background: var(--el-data-list-active-background);
+        box-shadow: inset 2px 0 0 var(--el-data-list-active-indicator);
+      }
+    }
+
+    @include e(cell) {
+      padding-block: 12px;
+
+      &:first-child {
+        padding-left: 20px;
+      }
+
+      &:last-child {
+        padding-right: 16px;
+      }
+    }
+
+    @include when(interactive) {
+      @include e(row) {
+        &:hover {
+          --el-data-list-row-accent-color: #{getCssVar('color-primary')};
+          --el-data-list-row-accent-opacity: 1;
+
+          background: var(--el-data-list-hover-background);
+        }
+
+        &:focus-visible {
+          --el-data-list-row-accent-color: #{getCssVar('color-primary')};
+          --el-data-list-row-accent-opacity: 1;
+
+          background: var(--el-data-list-hover-background);
+          box-shadow: inset 0 0 0 2px var(--el-data-list-focus-ring);
+          outline: none;
+        }
+      }
     }
   }
 }

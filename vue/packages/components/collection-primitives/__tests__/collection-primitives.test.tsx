@@ -112,6 +112,33 @@ describe('collection primitives', () => {
     expect(wrapper.find('.el-data-list__row').element.tagName).toBe('DIV')
   })
 
+  test('renders navigation rows through the public variant contract', () => {
+    const wrapper = mount(DataList, {
+      props: {
+        rows: [{ id: 'cn', region: 'China', indicator: 'Open' }],
+        columns: [
+          { key: 'region', label: 'Region' },
+          { key: 'indicator', label: 'Open', align: 'end' },
+        ],
+        rowKey: 'id',
+        activeKey: 'cn',
+        showHeader: false,
+        density: 'compact',
+        variant: 'navigation',
+      },
+    })
+
+    expect(wrapper.classes()).toContain('el-data-list--navigation')
+    expect(wrapper.classes()).toContain('el-data-list--compact')
+    expect(wrapper.classes()).toContain('is-interactive')
+    expect(wrapper.find('.el-data-list__row').attributes('aria-current')).toBe(
+      'true',
+    )
+    expect(wrapper.findAll('.el-data-list__cell')[1]?.classes()).toContain(
+      'el-data-list__cell--end',
+    )
+  })
+
   test('emits segmented control changes from click and keyboard', async () => {
     const wrapper = mount(SegmentedControl, {
       props: {
