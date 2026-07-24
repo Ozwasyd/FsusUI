@@ -99,6 +99,20 @@
   display: flex;
   flex-direction: column;
   --fsus-public-shell-mobile-action-height: 44px;
+  --fsus-public-shell-action-height: 44px;
+
+  @include e(search-input) {
+    --#{$namespace}-input-height: var(
+      --#{$namespace}-public-shell-control-height,
+      40px
+    );
+
+    .#{$namespace}-input__wrapper {
+      height: var(--fsus-public-shell-action-height, 44px);
+      min-height: var(--fsus-public-shell-action-height, 44px);
+      box-sizing: border-box;
+    }
+  }
 
   @include e(header) {
     width: 100%;
@@ -171,8 +185,8 @@
     border-bottom: 2px solid transparent;
     padding-bottom: 0;
     color: var(--#{$namespace}-text-color-secondary);
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 500;
     line-height: 1.5;
     text-decoration: none;
     white-space: nowrap;
@@ -187,9 +201,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    min-height: calc(
-      var(--#{$namespace}-public-shell-control-height, 40px) + 8px
-    );
+    min-height: var(--fsus-public-shell-action-height, 44px);
     min-width: max-content;
   }
 
@@ -201,9 +213,7 @@
 
   @include e(desktop-search-trigger) {
     display: inline-flex;
-    min-height: calc(
-      var(--#{$namespace}-public-shell-control-height, 40px) + 8px
-    );
+    min-height: var(--fsus-public-shell-action-height, 44px);
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
@@ -212,8 +222,8 @@
     padding: 0 10px;
     background: transparent;
     color: var(--#{$namespace}-text-color-secondary);
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 500;
     line-height: 1;
     text-decoration: none;
     white-space: nowrap;
@@ -506,10 +516,13 @@
   }
 
   @include e(action-link) {
+    display: inline-flex;
+    min-height: var(--fsus-public-shell-action-height, 44px);
+    align-items: center;
     border-radius: var(--#{$namespace}-border-radius-small);
     color: var(--#{$namespace}-text-color-secondary);
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 500;
     text-decoration: none;
     white-space: nowrap;
     outline: none;

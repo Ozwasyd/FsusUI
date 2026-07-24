@@ -108,7 +108,7 @@ test('renders inline, trigger, and none without shifting shell geometry', async 
   }
 })
 
-test('aligns 30px brand and 18px navigation text in the desktop project', async ({
+test('aligns 30px brand and 21px navigation text in the desktop project', async ({
   page,
 }, testInfo) => {
   await openMode(page, testInfo.project.name, 'inline')
@@ -118,8 +118,9 @@ test('aligns 30px brand and 18px navigation text in the desktop project', async 
   const navLink = header.locator('.el-public-shell__nav-link').first()
   await expect(brand).toHaveCSS('font-size', '24px')
   await expect(brand).toHaveCSS('line-height', '30px')
-  await expect(navLink).toHaveCSS('font-size', '12px')
-  await expect(navLink).toHaveCSS('line-height', '18px')
+  await expect(navLink).toHaveCSS('font-size', '14px')
+  await expect(navLink).toHaveCSS('font-weight', '500')
+  await expect(navLink).toHaveCSS('line-height', '21px')
   await expect(navLink).toHaveCSS('padding-bottom', '0px')
 
   const textBaselines = await Promise.all(

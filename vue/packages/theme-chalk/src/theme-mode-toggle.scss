@@ -111,16 +111,19 @@
 
     .#{$namespace}-radio-button__original-radio:focus-visible
       + .#{$namespace}-radio-button__inner {
-      box-shadow:
-        inset 0 0 0 1px var(--#{$namespace}-theme-mode-toggle-active-ring) !important;
+      box-shadow: inset 0 0 0 1px
+        var(--#{$namespace}-theme-mode-toggle-active-ring) !important;
       border-radius: 6px;
     }
 
-    .#{$namespace}-radio-button:focus-within .#{$namespace}-radio-button__inner {
-      border-color: var(--#{$namespace}-theme-mode-toggle-active-border-color) !important;
+    .#{$namespace}-radio-button:focus-within
+      .#{$namespace}-radio-button__inner {
+      border-color: var(
+        --#{$namespace}-theme-mode-toggle-active-border-color
+      ) !important;
       border-radius: 6px;
-      box-shadow:
-        inset 0 0 0 1px var(--#{$namespace}-theme-mode-toggle-active-ring) !important;
+      box-shadow: inset 0 0 0 1px
+        var(--#{$namespace}-theme-mode-toggle-active-ring) !important;
     }
 
     .#{$namespace}-radio-button__original-radio:checked
@@ -129,8 +132,8 @@
       border-color: var(--#{$namespace}-theme-mode-toggle-active-border-color);
       background: var(--#{$namespace}-theme-mode-toggle-active-bg);
       color: var(--#{$namespace}-theme-mode-toggle-active-color);
-      box-shadow:
-        inset 0 0 0 1px var(--#{$namespace}-theme-mode-toggle-active-ring) !important;
+      box-shadow: inset 0 0 0 1px
+        var(--#{$namespace}-theme-mode-toggle-active-ring) !important;
     }
 
     .#{$namespace}-radio-button__original-radio:disabled
@@ -213,15 +216,15 @@
   }
 
   @include e(menu-button) {
-    min-height: 40px;
+    min-height: 44px;
     border: 1px solid var(--#{$namespace}-border-color-lighter);
     border-radius: var(--#{$namespace}-border-radius-small);
     padding: 0 12px;
     background: var(--#{$namespace}-bg-color);
     color: var(--#{$namespace}-text-color-primary);
     font: inherit;
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 500;
     line-height: 1;
     white-space: nowrap;
     cursor: pointer;
@@ -259,15 +262,15 @@
   @include e(menu-item) {
     display: block;
     width: 100%;
-    min-height: 36px;
+    min-height: 44px;
     border: 0;
     border-radius: 6px;
     padding: 8px 10px;
     background: transparent;
     color: var(--#{$namespace}-text-color-regular);
     font: inherit;
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 500;
     line-height: 1.35;
     text-align: left;
     white-space: nowrap;

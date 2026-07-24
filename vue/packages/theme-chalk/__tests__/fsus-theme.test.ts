@@ -485,7 +485,8 @@ describe('Fsus theme visual baseline', () => {
     expectCssRule(publicShellCss, '.el-public-shell__nav-link', [
       'border-bottom: 2px solid transparent;',
       'padding-bottom: 0;',
-      'font-size: 12px;',
+      'font-size: 14px;',
+      'font-weight: 500;',
       'line-height: 1.5;',
     ])
     expectCssRule(publicShellCss, '.el-public-shell__nav-link.is-active', [
@@ -1104,9 +1105,11 @@ describe('Fsus theme visual baseline', () => {
     const css = compileThemeFile('theme-mode-toggle.scss')
 
     expectCssRule(css, '.el-theme-mode-toggle__menu-button', [
-      'min-height: 40px;',
+      'min-height: 44px;',
       'border: 1px solid var(--el-border-color-lighter);',
       'border-radius: var(--el-border-radius-small);',
+      'font-size: 14px;',
+      'font-weight: 500;',
     ])
     expectCssRule(css, '.el-theme-mode-toggle__menu', [
       'position: absolute;',
@@ -1117,8 +1120,10 @@ describe('Fsus theme visual baseline', () => {
       'box-shadow: var(--el-box-shadow-light);',
     ])
     expectCssRule(css, '.el-theme-mode-toggle__menu-item', [
-      'min-height: 36px;',
+      'min-height: 44px;',
       'background: transparent;',
+      'font-size: 14px;',
+      'font-weight: 500;',
       'text-align: left;',
     ])
     expectCssRule(css, '.el-theme-mode-toggle__menu-item[aria-checked=true]', [
@@ -2485,8 +2490,8 @@ describe('Fsus theme visual baseline', () => {
       expectCssRule(shellCss, '.el-public-shell__nav-link', [
         'border-bottom: 2px solid transparent;',
         'padding-bottom: 0;',
-        'font-size: 12px;',
-        'font-weight: 700;',
+        'font-size: 14px;',
+        'font-weight: 500;',
         'line-height: 1.5;',
       ])
     }
@@ -2548,7 +2553,12 @@ describe('Fsus theme visual baseline', () => {
 
     for (const css of [publicShellCss, criticalCss]) {
       expectCssRule(css, '.el-public-shell__actions', [
-        'min-height: calc(var(--el-public-shell-control-height, 40px) + 8px);',
+        'min-height: var(--fsus-public-shell-action-height, 44px);',
+      ])
+      expectCssRule(css, '.el-public-shell__search-input .el-input__wrapper', [
+        'height: var(--fsus-public-shell-action-height, 44px);',
+        'min-height: var(--fsus-public-shell-action-height, 44px);',
+        'box-sizing: border-box;',
       ])
       expectCssRule(css, '.el-public-shell__desktop-search-disclosure', [
         'position: relative;',
@@ -2556,11 +2566,11 @@ describe('Fsus theme visual baseline', () => {
       ])
       expectCssRule(css, '.el-public-shell__desktop-search-trigger', [
         'display: inline-flex;',
-        'min-height: calc(var(--el-public-shell-control-height, 40px) + 8px);',
+        'min-height: var(--fsus-public-shell-action-height, 44px);',
         'border: 1px solid transparent;',
         'background: transparent;',
-        'font-size: 12px;',
-        'font-weight: 700;',
+        'font-size: 14px;',
+        'font-weight: 500;',
       ])
       expectCssRule(css, '.el-public-shell__desktop-search-panel', [
         'position: absolute;',
@@ -2676,8 +2686,10 @@ describe('Fsus theme visual baseline', () => {
     for (const css of [publicShellCss, criticalCss]) {
       expectCssRule(css, '.el-public-shell__action-link', [
         'color: var(--el-text-color-secondary);',
-        'font-size: 12px;',
-        'font-weight: 700;',
+        'display: inline-flex;',
+        'min-height: var(--fsus-public-shell-action-height, 44px);',
+        'font-size: 14px;',
+        'font-weight: 500;',
         'text-decoration: none;',
         'white-space: nowrap;',
       ])
