@@ -5,7 +5,7 @@
   "owner": "FsusUI Core",
   "baseline": {
     "path": "spec/baselines/vue-current.json",
-    "hash": "a04edcb3128f7362a29d932dfd52481b6bbaaadb4977314f0ccee863e784402e",
+    "hash": "de027ac75d3adea52969ea1789dbb3d6edfbaa7d151a07769ea69e6d11b4b59f",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
     "iconHash": "d61254b1b1ff9addaf45293153df217b0c0d01ec69ec602081c44a01008b78de"
@@ -8537,6 +8537,12 @@
           "required": false
         },
         {
+          "name": "textareaVariant",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "type",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -13659,6 +13665,12 @@
         },
         {
           "name": "brandHref",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "contentFlow",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
