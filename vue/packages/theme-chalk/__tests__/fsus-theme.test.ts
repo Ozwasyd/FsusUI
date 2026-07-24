@@ -870,7 +870,7 @@ describe('Fsus theme visual baseline', () => {
     expectCssRule(
       css,
       '.el-data-list--navigation .el-data-list__cell:last-child',
-      ['padding-right: 16px;'],
+      ['padding-left: 0;', 'padding-right: 16px;'],
     )
     expectCssRule(css, '.el-data-list__cell', ['box-sizing: border-box;'])
     expect(css).not.toMatch(/\.el-collection-toolbar\s*\{[^}]*box-shadow:/s)

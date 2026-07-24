@@ -120,6 +120,10 @@ Products may map the documented
 `--el-data-list-focus-ring`, and `--el-data-list-active-indicator` variables to
 their semantic theme tokens on the component root.
 
+An end column that contains an icon must reserve the icon width plus the
+variant's 16px trailing inset. A 22px indicator therefore uses a track of at
+least 40px; narrower tracks can force the cell outside its row.
+
 ## Empty State
 
 Use `FsusEmptyState size="inline"` inside compact collection bodies. Do not
