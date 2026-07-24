@@ -11,6 +11,7 @@ import type Input from './input.vue'
 import type { ExtractPropTypes, StyleValue } from 'vue'
 
 export type InputAutoSize = { minRows?: number; maxRows?: number } | boolean
+export type TextareaVariant = 'default' | 'editor-title'
 
 export const inputProps = buildProps({
   /**
@@ -59,6 +60,14 @@ export const inputProps = buildProps({
   autosize: {
     type: definePropType<InputAutoSize>([Boolean, Object]),
     default: false,
+  },
+  /**
+   * @description semantic textarea presentation owned by FsusUI
+   */
+  textareaVariant: {
+    type: String,
+    values: ['default', 'editor-title'],
+    default: 'default',
   },
   /**
    * @description native input autocomplete

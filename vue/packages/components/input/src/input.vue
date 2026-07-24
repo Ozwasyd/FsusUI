@@ -256,16 +256,16 @@ const { wrapperRef, isFocused, handleFocus, handleBlur } = useFocusController(
         formItem?.validate?.('blur').catch((err) => debugWarn(err))
       }
     },
-  }
+  },
 )
 
 const needStatusIcon = computed(() => form?.statusIcon ?? false)
 const validateState = computed(() => formItem?.validateState || '')
 const validateIcon = computed(
-  () => validateState.value && ValidateComponentsMap[validateState.value]
+  () => validateState.value && ValidateComponentsMap[validateState.value],
 )
 const passwordIcon = computed(() =>
-  passwordVisible.value ? IconView : IconHide
+  passwordVisible.value ? IconView : IconHide,
 )
 const containerStyle = computed<StyleValue>(() => [
   rawAttrs.style as StyleValue,
@@ -278,6 +278,10 @@ const textareaStyle = computed<StyleValue>(() => [
 ])
 const containerBindingAttrs = computed(() => ({
   ...containerAttrs.value,
+  'data-textarea-variant':
+    props.type === 'textarea' && props.textareaVariant !== 'default'
+      ? props.textareaVariant
+      : undefined,
   ...(props.cspSafe ? {} : { style: containerStyle.value }),
 }))
 const inputBindingAttrs = computed(() => ({
@@ -288,11 +292,11 @@ const textareaBindingAttrs = computed(() => ({
   ...attrs.value,
   ...(props.cspSafe ? {} : { style: textareaStyle.value }),
 }))
-const nativeAriaLabel = computed(() => (
-  props.label || (rawAttrs['aria-label'] as string | undefined)
-))
+const nativeAriaLabel = computed(
+  () => props.label || (rawAttrs['aria-label'] as string | undefined),
+)
 const nativeInputValue = computed(() =>
-  isNil(props.modelValue) ? '' : String(props.modelValue)
+  isNil(props.modelValue) ? '' : String(props.modelValue),
 )
 const showClear = computed(
   () =>
@@ -300,7 +304,7 @@ const showClear = computed(
     !inputDisabled.value &&
     !props.readonly &&
     !!nativeInputValue.value &&
-    (isFocused.value || hovering.value)
+    (isFocused.value || hovering.value),
 )
 const showPwdVisible = computed(
   () =>
@@ -308,7 +312,7 @@ const showPwdVisible = computed(
     !inputDisabled.value &&
     !props.readonly &&
     !!nativeInputValue.value &&
-    (!!nativeInputValue.value || isFocused.value)
+    (!!nativeInputValue.value || isFocused.value),
 )
 const isWordLimitVisible = computed(
   () =>
@@ -317,14 +321,14 @@ const isWordLimitVisible = computed(
     (props.type === 'text' || props.type === 'textarea') &&
     !inputDisabled.value &&
     !props.readonly &&
-    !props.showPassword
+    !props.showPassword,
 )
 const textLength = computed(() => nativeInputValue.value.length)
 const inputExceed = computed(
   () =>
     // show exceed style if length of initial value greater then maxlength
     !!isWordLimitVisible.value &&
-    textLength.value > Number(attrs.value.maxlength)
+    textLength.value > Number(attrs.value.maxlength),
 )
 const suffixVisible = computed(
   () =>
@@ -333,7 +337,7 @@ const suffixVisible = computed(
     showClear.value ||
     props.showPassword ||
     isWordLimitVisible.value ||
-    (!!validateState.value && needStatusIcon.value)
+    (!!validateState.value && needStatusIcon.value),
 )
 
 const [recordCursor, setCursor] = useCursor(input)
@@ -518,7 +522,7 @@ watch(
     if (props.validateEvent) {
       formItem?.validate?.('change').catch((err) => debugWarn(err))
     }
-  }
+  },
 )
 
 // native input value is set explicitly
@@ -535,14 +539,14 @@ watch(
     await nextTick()
     setNativeInputValue()
     resizeTextarea()
-  }
+  },
 )
 
 onMounted(() => {
   if (!props.formatter && props.parser) {
     debugWarn(
       'ElInput',
-      'If you set the parser, you also need to set the formatter.'
+      'If you set the parser, you also need to set the formatter.',
     )
   }
   setNativeInputValue()

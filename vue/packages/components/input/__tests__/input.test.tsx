@@ -201,6 +201,17 @@ describe('Input.vue', () => {
     expect(wrapper.classes('el-textarea')).toBe(true)
   })
 
+  test('exposes the editor-title textarea variant on the owned root', () => {
+    const wrapper = mount(() => (
+      <Input type="textarea" textareaVariant="editor-title" />
+    ))
+
+    expect(wrapper.attributes('data-textarea-variant')).toBe('editor-title')
+    expect(
+      wrapper.find('textarea').attributes('data-textarea-variant'),
+    ).toBeUndefined()
+  })
+
   test('rows', () => {
     const wrapper = mount(() => <_Input type="textarea" rows={3} />)
     expect(wrapper.find('textarea').element.rows).toEqual(3)

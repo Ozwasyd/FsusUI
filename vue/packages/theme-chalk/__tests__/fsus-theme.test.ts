@@ -55,6 +55,43 @@ const expectCssRule = (
 }
 
 describe('Fsus theme visual baseline', () => {
+  test('owns the editor title textarea hierarchy without consumer deep selectors', () => {
+    const css = compileThemeFile('input.scss')
+
+    expectCssRule(css, '.el-textarea[data-textarea-variant=editor-title]', [
+      'width: 100%;',
+      'min-width: 0;',
+    ])
+    expectCssRule(
+      css,
+      '.el-textarea[data-textarea-variant=editor-title] .el-textarea__inner',
+      [
+        'min-height: 74px;',
+        'resize: none;',
+        'font-size: clamp(2.25rem, 2.8vw, 2.5rem);',
+        'font-weight: var(--fsus-typography-weight-bold, 700);',
+        'line-height: 1.2;',
+      ],
+    )
+    expectCssRule(
+      css,
+      '.el-textarea[data-textarea-variant=editor-title] .el-textarea__inner::placeholder',
+      ['font-weight: var(--fsus-typography-weight-medium, 500);'],
+    )
+    expectCssRule(
+      css,
+      '.el-textarea[data-textarea-variant=editor-title] .el-input__count',
+      ['font-weight: var(--fsus-typography-weight-medium, 500);'],
+    )
+    expect(css).toContain('@media (max-width: 640px)')
+    expect(css).not.toMatch(/font-weight:\s*(?:600|650)\b/u)
+    const variantRules = cssRules(
+      css,
+      '.el-textarea[data-textarea-variant=editor-title]',
+    ).join(' ')
+    expect(variantRules).not.toContain('!important')
+  })
+
   test('keeps breadcrumb separators inside semantic flex path units', () => {
     const css = compileThemeFile('breadcrumb.scss')
 

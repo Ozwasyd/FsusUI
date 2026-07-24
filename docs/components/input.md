@@ -42,6 +42,13 @@
 
 设置 `type="textarea"` 改为原生 `textarea`，通过 `rows` 控制初始行高。使用 `autosize` 可自适应高度，可设置 `{ minRows, maxRows }` 限制行数范围。
 
+文章、知识库等编辑任务的标题输入可使用
+`type="textarea" textarea-variant="editor-title"`。该公开 variant 由 FsusUI
+统一拥有标题字号、批准字重、移动端收缩、字数统计位置与 focus ring，consumer
+只需在组件根节点通过 `--fsus-editor-title-*` 公开变量映射产品色彩，不应使用
+`:deep()` 或 `.el-textarea__inner` 覆盖内部结构。默认值 `default` 保持常规
+textarea 外观。
+
 ## 复合型输入框
 
 使用 `prepend` / `append` 插槽在输入框前后追加元素（标签或按钮）。
@@ -64,35 +71,36 @@
 
 ### Attributes
 
-| 属性名                | 说明                                                          | 类型                                                                                      | 默认值   |
-| --------------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | -------- |
-| type                  | 输入框类型，参考 MDN                                          | `'text' \| 'textarea' \| 'password' \| 'number' \| 'email' \| 'search' \| 'tel' \| 'url'` | `text`   |
-| model-value / v-model | 绑定值                                                        | `string \| number`                                                                        | —        |
-| maxlength             | 原生 `maxlength` 属性                                         | `string \| number`                                                                        | —        |
-| minlength             | 原生 `minlength` 属性                                         | `string \| number`                                                                        | —        |
-| show-word-limit       | 是否显示字数统计（需配合 `maxlength`）                        | `boolean`                                                                                 | `false`  |
-| word-limit-position   | 字数统计的显示位置                                            | `'inside' \| 'outside'`                                                                   | `inside` |
-| placeholder           | 输入框占位符                                                  | `string`                                                                                  | —        |
-| clearable             | 是否显示清空按钮                                              | `boolean`                                                                                 | `false`  |
-| formatter             | 输入框显示格式化函数                                          | `(value: string \| number) => string`                                                     | —        |
-| parser                | 从格式化输入中提取原始值                                      | `(value: string) => string`                                                               | —        |
-| show-password         | 是否显示切换密码图标                                          | `boolean`                                                                                 | `false`  |
-| disabled              | 是否禁用                                                      | `boolean`                                                                                 | `false`  |
-| size                  | 输入框尺寸（不适用于 textarea）                               | `'large' \| 'default' \| 'small'`                                                         | —        |
-| prefix-icon           | 前缀图标组件                                                  | `string \| Component`                                                                     | —        |
-| suffix-icon           | 后缀图标组件                                                  | `string \| Component`                                                                     | —        |
-| rows                  | textarea 初始行数                                             | `number`                                                                                  | `2`      |
-| autosize              | textarea 自适应高度                                           | `boolean \| { minRows?: number, maxRows?: number }`                                       | `false`  |
-| autocomplete          | 原生 `autocomplete` 属性                                      | `string`                                                                                  | `off`    |
-| name                  | 原生 `name` 属性                                              | `string`                                                                                  | —        |
-| readonly              | 原生 `readonly` 属性                                          | `boolean`                                                                                 | `false`  |
-| resize                | textarea 缩放方向                                             | `'none' \| 'both' \| 'horizontal' \| 'vertical'`                                          | —        |
-| autofocus             | 原生 `autofocus` 属性                                         | `boolean`                                                                                 | `false`  |
-| tabindex              | 输入框 tabindex                                               | `string \| number`                                                                        | —        |
-| validate-event        | 是否触发表单校验                                              | `boolean`                                                                                 | `true`   |
-| input-style           | 输入框或 textarea 的 style                                    | `string \| CSSProperties \| CSSProperties[]`                                              | `{}`     |
-| csp-safe              | 禁止 container/input/textarea/count 的 inline style 绑定；autosize 与自定义 input-style 由 consumer 的静态样式接管 | `boolean` | `false` |
-| count-graphemes       | 自定义字符计数函数（设置后 `maxlength`/`minlength` 不再生效） | `(value: string) => number`                                                               | —        |
+| 属性名                | 说明                                                                                                               | 类型                                                                                      | 默认值    |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- | --------- |
+| type                  | 输入框类型，参考 MDN                                                                                               | `'text' \| 'textarea' \| 'password' \| 'number' \| 'email' \| 'search' \| 'tel' \| 'url'` | `text`    |
+| model-value / v-model | 绑定值                                                                                                             | `string \| number`                                                                        | —         |
+| maxlength             | 原生 `maxlength` 属性                                                                                              | `string \| number`                                                                        | —         |
+| minlength             | 原生 `minlength` 属性                                                                                              | `string \| number`                                                                        | —         |
+| show-word-limit       | 是否显示字数统计（需配合 `maxlength`）                                                                             | `boolean`                                                                                 | `false`   |
+| word-limit-position   | 字数统计的显示位置                                                                                                 | `'inside' \| 'outside'`                                                                   | `inside`  |
+| placeholder           | 输入框占位符                                                                                                       | `string`                                                                                  | —         |
+| clearable             | 是否显示清空按钮                                                                                                   | `boolean`                                                                                 | `false`   |
+| formatter             | 输入框显示格式化函数                                                                                               | `(value: string \| number) => string`                                                     | —         |
+| parser                | 从格式化输入中提取原始值                                                                                           | `(value: string) => string`                                                               | —         |
+| show-password         | 是否显示切换密码图标                                                                                               | `boolean`                                                                                 | `false`   |
+| disabled              | 是否禁用                                                                                                           | `boolean`                                                                                 | `false`   |
+| size                  | 输入框尺寸（不适用于 textarea）                                                                                    | `'large' \| 'default' \| 'small'`                                                         | —         |
+| prefix-icon           | 前缀图标组件                                                                                                       | `string \| Component`                                                                     | —         |
+| suffix-icon           | 后缀图标组件                                                                                                       | `string \| Component`                                                                     | —         |
+| rows                  | textarea 初始行数                                                                                                  | `number`                                                                                  | `2`       |
+| autosize              | textarea 自适应高度                                                                                                | `boolean \| { minRows?: number, maxRows?: number }`                                       | `false`   |
+| textarea-variant      | textarea 语义外观；`editor-title` 用于编辑任务标题                                                                 | `'default' \| 'editor-title'`                                                             | `default` |
+| autocomplete          | 原生 `autocomplete` 属性                                                                                           | `string`                                                                                  | `off`     |
+| name                  | 原生 `name` 属性                                                                                                   | `string`                                                                                  | —         |
+| readonly              | 原生 `readonly` 属性                                                                                               | `boolean`                                                                                 | `false`   |
+| resize                | textarea 缩放方向                                                                                                  | `'none' \| 'both' \| 'horizontal' \| 'vertical'`                                          | —         |
+| autofocus             | 原生 `autofocus` 属性                                                                                              | `boolean`                                                                                 | `false`   |
+| tabindex              | 输入框 tabindex                                                                                                    | `string \| number`                                                                        | —         |
+| validate-event        | 是否触发表单校验                                                                                                   | `boolean`                                                                                 | `true`    |
+| input-style           | 输入框或 textarea 的 style                                                                                         | `string \| CSSProperties \| CSSProperties[]`                                              | `{}`      |
+| csp-safe              | 禁止 container/input/textarea/count 的 inline style 绑定；autosize 与自定义 input-style 由 consumer 的静态样式接管 | `boolean`                                                                                 | `false`   |
+| count-graphemes       | 自定义字符计数函数（设置后 `maxlength`/`minlength` 不再生效）                                                      | `(value: string) => number`                                                               | —         |
 
 ### Events
 

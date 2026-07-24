@@ -5,22 +5,32 @@
 @use 'common/var' as *;
 
 @mixin inset-prepend-border($color) {
-  box-shadow: 1px 0 0 0 $color inset, 0 1px 0 0 $color inset,
+  box-shadow:
+    1px 0 0 0 $color inset,
+    0 1px 0 0 $color inset,
     0 -1px 0 0 $color inset;
 }
 
 @mixin inset-append-border($color) {
-  box-shadow: 0 1px 0 0 $color inset, 0 -1px 0 0 $color inset,
+  box-shadow:
+    0 1px 0 0 $color inset,
+    0 -1px 0 0 $color inset,
     -1px 0 0 0 $color inset;
 }
 
 @mixin inset-prepend-input-border($color) {
-  box-shadow: 1px 0 0 0 $color inset, 1px 0 0 0 $color, 0 1px 0 0 $color inset,
+  box-shadow:
+    1px 0 0 0 $color inset,
+    1px 0 0 0 $color,
+    0 1px 0 0 $color inset,
     0 -1px 0 0 $color inset !important;
 }
 
 @mixin inset-append-input-border($color) {
-  box-shadow: -1px 0 0 0 $color, -1px 0 0 0 $color inset, 0 1px 0 0 $color inset,
+  box-shadow:
+    -1px 0 0 0 $color,
+    -1px 0 0 0 $color inset,
+    0 1px 0 0 $color inset,
     0 -1px 0 0 $color inset !important;
 }
 
@@ -111,6 +121,62 @@
     font-variant-numeric: tabular-nums;
   }
 
+  &[data-textarea-variant='editor-title'] {
+    width: 100%;
+    min-width: 0;
+
+    .#{$namespace}-textarea__inner {
+      min-height: 74px;
+      resize: none;
+      overflow-wrap: anywhere;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      border-radius: 0;
+      padding: 14px clamp(16px, 3vw, 24px);
+      color: var(
+        --fsus-editor-title-text-color,
+        var(--fsus-color-text-primary, var(--el-text-color-primary))
+      );
+      background: transparent;
+      font-family: inherit;
+      font-size: clamp(2.25rem, 2.8vw, 2.5rem);
+      font-weight: var(--fsus-typography-weight-bold, 700);
+      line-height: 1.2;
+      letter-spacing: 0;
+
+      &:not(:focus-visible) {
+        box-shadow: none;
+      }
+
+      &:hover,
+      &:focus {
+        border-bottom-color: var(
+          --fsus-editor-title-border-color,
+          var(--el-border-color)
+        );
+      }
+
+      &::placeholder {
+        color: var(
+          --fsus-editor-title-placeholder-color,
+          var(--fsus-color-text-quiet, var(--el-text-color-placeholder))
+        );
+        font-weight: var(--fsus-typography-weight-medium, 500);
+        opacity: 0.78;
+      }
+    }
+
+    .#{$namespace}-input__count {
+      right: clamp(16px, 3vw, 24px);
+      bottom: 6px;
+      color: var(
+        --fsus-editor-title-count-color,
+        var(--fsus-color-text-quiet, var(--el-text-color-placeholder))
+      );
+      font-weight: var(--fsus-typography-weight-medium, 500);
+    }
+  }
+
   @include when(disabled) {
     .#{$namespace}-textarea__inner {
       @include inset-input-border(#{getCssVar('disabled-border-color')});
@@ -131,6 +197,22 @@
 
     .#{$namespace}-input__count {
       color: getCssVar('color-danger');
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  @include b(textarea) {
+    &[data-textarea-variant='editor-title'] {
+      .#{$namespace}-textarea__inner {
+        min-height: 68px;
+        padding: 14px 8px;
+        font-size: 1.875rem;
+      }
+
+      .#{$namespace}-input__count {
+        display: none;
+      }
     }
   }
 }
@@ -186,7 +268,8 @@
     flex-grow: 1;
     align-items: center;
     justify-content: center;
-    padding: $border-width map.get($input-padding-horizontal, 'default')-$border-width;
+    padding: $border-width
+      map.get($input-padding-horizontal, 'default')-$border-width;
     background-color: var(
       #{getCssVarName('input-bg-color')},
       map.get($input, 'bg-color')
@@ -215,7 +298,13 @@
     }
 
     &:focus-visible {
-      @include a11y-focus-ring(2px, getCssVarWithDefault('input-border-radius', map.get($input, 'border-radius')));
+      @include a11y-focus-ring(
+        2px,
+        getCssVarWithDefault(
+          'input-border-radius',
+          map.get($input, 'border-radius')
+        )
+      );
     }
   }
 
@@ -227,7 +316,8 @@
         var(
             #{getCssVarName('input-height')},
             #{map.get($input-height, 'default')}
-          ) - $border-width * 2
+          ) -
+          $border-width * 2
       )
     );
 
@@ -276,7 +366,9 @@
         #{getCssVarName('input-icon-color')},
         map.get($input, 'icon-color')
       );
-      transition: color getCssVar('transition-duration'), opacity getCssVar('transition-duration');
+      transition:
+        color getCssVar('transition-duration'),
+        opacity getCssVar('transition-duration');
       pointer-events: none;
     }
 
@@ -311,7 +403,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: color getCssVar('transition-duration'), opacity getCssVar('transition-duration');
+    transition:
+      color getCssVar('transition-duration'),
+      opacity getCssVar('transition-duration');
     margin-left: 8px;
   }
 
@@ -372,7 +466,8 @@
       font-size: map.get($input-font-size, $size);
 
       @include e(wrapper) {
-        padding: $border-width map.get($input-padding-horizontal, $size)-$border-width;
+        padding: $border-width
+          map.get($input-padding-horizontal, $size)-$border-width;
       }
 
       @include e(inner) {
@@ -382,7 +477,8 @@
             var(
                 #{getCssVarName('input-height')},
                 #{map.get($input-height, $size)}
-              ) - $border-width * 2
+              ) -
+              $border-width * 2
           )
         );
       }
