@@ -66,6 +66,28 @@ describe('PublicShell.vue', () => {
     expect(
       wrapper.find('.el-public-shell__active-nav-indicator').exists(),
     ).toBe(false)
+    expect(
+      wrapper.find('.el-public-shell__main').attributes('data-content-flow'),
+    ).toBe('viewport-stable')
+  })
+
+  test('exposes content-driven main flow without consumer selectors', async () => {
+    const wrapper = mount(PublicShell, {
+      props: {
+        brand: 'Fsus',
+        contentFlow: 'content-driven',
+      },
+    })
+
+    expect(
+      wrapper.find('.el-public-shell__main').attributes('data-content-flow'),
+    ).toBe('content-driven')
+
+    await wrapper.setProps({ contentFlow: 'viewport-stable' })
+
+    expect(
+      wrapper.find('.el-public-shell__main').attributes('data-content-flow'),
+    ).toBe('viewport-stable')
   })
 
   test('renders opt-in semantic active nav indicator for desktop while bottom tabs track active key', async () => {

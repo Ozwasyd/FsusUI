@@ -616,6 +616,11 @@
     margin-inline: auto;
     padding: 40px 24px 96px;
     box-sizing: border-box;
+
+    &[data-content-flow='content-driven'] {
+      flex: 0 0 auto;
+      padding-bottom: 0;
+    }
   }
 
   @include e(footer) {

@@ -463,7 +463,7 @@
       :label="mobileNavLabel"
     />
 
-    <main :class="ns.e('main')">
+    <main :class="ns.e('main')" v-bind="{ 'data-content-flow': contentFlow }">
       <slot />
     </main>
 

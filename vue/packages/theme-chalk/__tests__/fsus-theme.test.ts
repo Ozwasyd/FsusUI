@@ -2696,6 +2696,19 @@ describe('Fsus theme visual baseline', () => {
     }
   })
 
+  test('supports content-driven public shell main flow in critical and full css', () => {
+    const publicShellCss = compileThemeFile('public-shell.scss')
+    const criticalCss = compileThemeFile('public-shell-critical.scss')
+
+    for (const css of [publicShellCss, criticalCss]) {
+      expectCssRule(
+        css,
+        '.el-public-shell__main[data-content-flow=content-driven]',
+        ['flex: 0 0 auto;', 'padding-bottom: 0;'],
+      )
+    }
+  })
+
   test('renders public shell mobile auth as a stable menu or inline text action', () => {
     const publicShellCss = compileThemeFile('public-shell.scss')
     const criticalCss = compileThemeFile('public-shell-critical.scss')

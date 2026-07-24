@@ -84,6 +84,7 @@ import '@ozwasyd/element-plus/dist/fsus.css'
 | spa-search                   | 是否用事件接管搜索提交                                     | `boolean`                                  | `false`              |
 | sticky                       | header 是否 sticky                                         | `boolean`                                  | `true`               |
 | max-width                    | shell 最大宽度                                             | `string`                                   | `64rem`              |
+| content-flow                 | 主内容高度策略                                             | `'viewport-stable' \| 'content-driven'`    | `viewport-stable`    |
 | nav-gap                      | desktop brand/nav gap                                      | `string`                                   | `2rem`               |
 | mobile-nav-gap               | `inline` mobile nav 项目间距                               | `string`                                   | `1.5rem`             |
 | mobile-search-width          | mobile search width                                        | `string`                                   | `7rem`               |
@@ -128,6 +129,17 @@ BEM selector。
 自行拥有其 markup/state，`desktop-search-mode` 只控制默认内容。新迁移应优先使用
 `trigger`，而不是复制 disclosure 状态机。组件没有单独的 desktop cancel label：
 trigger 文本保持稳定，展开/折叠语义由 `aria-expanded` 明确表达。
+
+## Main content flow
+
+`content-flow="viewport-stable"` 是默认策略：shell 主内容继续填充可用视口并保留
+底部节奏。文章详情、空状态等由内容高度决定的短页面可显式使用
+`content-flow="content-driven"`。组件会在自己拥有的 `main` 上输出
+`data-content-flow`，并由 full/critical theme 同步处理 flex 与底部 padding。
+
+consumer 不应通过 `:deep()`、`:has()` 或 `.el-public-shell__main` 等内部 BEM
+selector 改写 shell 主内容布局；业务内容内部仍可使用自己的稳定 data attribute
+表达页面级最小高度等语义。
 
 ## Mobile navigation 策略
 

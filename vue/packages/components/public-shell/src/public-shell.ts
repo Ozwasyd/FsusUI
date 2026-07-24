@@ -14,6 +14,7 @@ export type PublicShellDesktopSearchMode = 'inline' | 'trigger' | 'none'
 export type PublicShellMobileSearchMode = 'inline' | 'trigger' | 'none'
 export type PublicShellMobileNavMode = 'inline' | 'menu' | 'bottom' | 'none'
 export type PublicShellActiveNavMotion = 'none' | 'indicator'
+export type PublicShellContentFlow = 'viewport-stable' | 'content-driven'
 
 export const publicShellProps = buildProps({
   /**
@@ -188,6 +189,14 @@ export const publicShellProps = buildProps({
   maxWidth: {
     type: String,
     default: '64rem',
+  },
+  /**
+   * @description main content sizing; content-driven removes viewport fill and trailing shell padding without consumer selectors
+   */
+  contentFlow: {
+    type: definePropType<PublicShellContentFlow>(String),
+    values: ['viewport-stable', 'content-driven'],
+    default: 'viewport-stable',
   },
   /**
    * @description desktop brand/navigation gap
