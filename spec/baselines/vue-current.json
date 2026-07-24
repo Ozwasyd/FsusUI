@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "634074da46547933aaea3964ad240b843a4e31d7",
+    "commitSha": "f5755e8b7b95d461ed5280225f8a71cdda66b0a3",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
@@ -14,7 +14,7 @@
     "directives": 3,
     "services": 4,
     "plugins": 7,
-    "cssVariables": 437,
+    "cssVariables": 448,
     "deprecatedApis": 20,
     "componentCountByClassification": {
       "portable": 124,
@@ -2344,6 +2344,7 @@
         "size",
         "suffixIcon",
         "tabindex",
+        "textareaVariant",
         "type",
         "validateEvent"
       ],
@@ -3338,6 +3339,7 @@
         "authLabel",
         "brand",
         "brandHref",
+        "contentFlow",
         "cspSafe",
         "desktopSearchMode",
         "desktopSearchTriggerLabel",
@@ -6303,6 +6305,7 @@
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
+        "vue/packages/theme-chalk/src/input.scss",
         "vue/packages/theme-chalk/src/markdown-renderer.scss"
       ],
       "classification": "portable"
@@ -6463,7 +6466,37 @@
       "classification": "portable"
     },
     {
+      "name": "--el-data-list-active-background",
+      "files": ["vue/packages/theme-chalk/src/collection-primitives.scss"],
+      "classification": "portable"
+    },
+    {
+      "name": "--el-data-list-active-indicator",
+      "files": ["vue/packages/theme-chalk/src/collection-primitives.scss"],
+      "classification": "portable"
+    },
+    {
       "name": "--el-data-list-columns",
+      "files": ["vue/packages/theme-chalk/src/collection-primitives.scss"],
+      "classification": "portable"
+    },
+    {
+      "name": "--el-data-list-focus-ring",
+      "files": ["vue/packages/theme-chalk/src/collection-primitives.scss"],
+      "classification": "portable"
+    },
+    {
+      "name": "--el-data-list-hover-background",
+      "files": ["vue/packages/theme-chalk/src/collection-primitives.scss"],
+      "classification": "portable"
+    },
+    {
+      "name": "--el-data-list-row-accent-color",
+      "files": ["vue/packages/theme-chalk/src/collection-primitives.scss"],
+      "classification": "portable"
+    },
+    {
+      "name": "--el-data-list-row-accent-opacity",
       "files": ["vue/packages/theme-chalk/src/collection-primitives.scss"],
       "classification": "portable"
     },
@@ -6693,7 +6726,8 @@
       "name": "--el-text-color-placeholder",
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
-        "vue/packages/theme-chalk/src/fsus-theme.scss"
+        "vue/packages/theme-chalk/src/fsus-theme.scss",
+        "vue/packages/theme-chalk/src/input.scss"
       ],
       "classification": "portable"
     },
@@ -6702,6 +6736,7 @@
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
+        "vue/packages/theme-chalk/src/input.scss",
         "vue/packages/theme-chalk/src/markdown-renderer.scss"
       ],
       "classification": "portable"
@@ -7495,7 +7530,8 @@
       "name": "--fsus-color-text-primary",
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
-        "vue/packages/theme-chalk/src/generated/tokens.css"
+        "vue/packages/theme-chalk/src/generated/tokens.css",
+        "vue/packages/theme-chalk/src/input.scss"
       ],
       "classification": "portable"
     },
@@ -7506,6 +7542,7 @@
         "vue/packages/theme-chalk/src/common/var.scss",
         "vue/packages/theme-chalk/src/descriptions.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
+        "vue/packages/theme-chalk/src/input.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss"
       ],
       "classification": "portable"
@@ -7887,6 +7924,26 @@
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/metric-primitives.scss"
       ],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-editor-title-border-color",
+      "files": ["vue/packages/theme-chalk/src/input.scss"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-editor-title-count-color",
+      "files": ["vue/packages/theme-chalk/src/input.scss"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-editor-title-placeholder-color",
+      "files": ["vue/packages/theme-chalk/src/input.scss"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-editor-title-text-color",
+      "files": ["vue/packages/theme-chalk/src/input.scss"],
       "classification": "portable"
     },
     {
@@ -8848,6 +8905,14 @@
       "classification": "portable"
     },
     {
+      "name": "--fsus-public-shell-action-height",
+      "files": [
+        "vue/packages/theme-chalk/src/public-shell-critical.scss",
+        "vue/packages/theme-chalk/src/public-shell.scss"
+      ],
+      "classification": "portable"
+    },
+    {
       "name": "--fsus-public-shell-mobile-action-height",
       "files": [
         "vue/packages/theme-chalk/src/public-shell-critical.scss",
@@ -9771,12 +9836,18 @@
     },
     {
       "name": "--fsus-typography-weight-bold",
-      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
+      "files": [
+        "vue/packages/theme-chalk/src/generated/tokens.css",
+        "vue/packages/theme-chalk/src/input.scss"
+      ],
       "classification": "portable"
     },
     {
       "name": "--fsus-typography-weight-medium",
-      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
+      "files": [
+        "vue/packages/theme-chalk/src/generated/tokens.css",
+        "vue/packages/theme-chalk/src/input.scss"
+      ],
       "classification": "portable"
     },
     {
