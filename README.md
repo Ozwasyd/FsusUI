@@ -147,6 +147,10 @@ Public-preview readiness evidence:
 
 ## Governance
 
+- [Documentation center](./docs/index.md)
+- [Documentation architecture](./docs/governance/documentation-architecture.md)
+- [Design documentation](./docs/design/README.md)
+- [Consumer integration boundary](./docs/consumers/design-integration.md)
 - [Contributing](./CONTRIBUTING.md)
 - [Security policy](./SECURITY.md)
 - [Code of conduct](./CODE_OF_CONDUCT.md)

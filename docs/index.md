@@ -1,175 +1,71 @@
 # FsusUI 文档中心
 
-FsusUI 是基于 Vue 3 的组件库（pnpm monorepo；public preview 主包为 `@ozwasyd/element-plus`）；默认视觉语言为 The Intellectual Minimalist（详见设计规范 `docs/design.md`）。
+FsusUI 是基于 Vue 3 与 Element Plus 兼容面的跨平台组件系统。当前 npm public-preview 主包为 `@ozwasyd/element-plus`。本文只负责导航；设计、规范、API 和验证规则以各自的权威文档为准。
 
----
+## 从你的任务开始
 
-## 工程文档
+| 任务 | 首要入口 | 后续文档 |
+| --- | --- | --- |
+| 安装和使用 Web/Vue 包 | [快速开始](./guide/quickstart.md) | [安装](./guide/installation.md)、[主题](./guide/theming.md)、[组件总览](./components/overview.md) |
+| 修改 FsusUI 视觉或交互 | [设计文档地图](./design/README.md) | [设计合同](./design.md)、[变更归类](./design/change-classification.md)、[视觉变更流程](./workflows/visual-change.md) |
+| 在 FsusBlog 或其他产品中调用 FsusUI | [调用方文档](./consumers/README.md) | [设计集成边界](./consumers/design-integration.md)、[FsusBlog 示例](./ux/fsusblog-consumption-examples.md) |
+| 修改 token、motion 或主题 | [主题 token](./theme/tokens.md) | [canonical spec](../spec/tokens/README.md)、[motion](./theme/motion.md)、[customization](./theme/customization.md) |
+| 修改 Web/Vue 组件 | [组件总览](./components/overview.md) | 对应组件文档、[API 稳定性](./api-stability.md)、[视觉测试](./visual-testing.md) |
+| 修改 Avalonia/.NET | [Avalonia 文档](./avalonia/README.md) | [平台差异](./avalonia/platform-differences.md)、[Vue 迁移](./avalonia/vue-migration.md) |
+| 理解仓库或跨平台结构 | [架构文档](./architecture/README.md) | [项目概览](./project-overview.md)、[spec 架构](../spec/architecture.md) |
+| 维护、验证或发布 | [工作流文档](./workflows/README.md) | [工程交接](./engineering-handoff.md)、[治理](./governance/README.md)、[发布治理](./release-governance.md) |
 
-| 文档                                                              | 说明                                                                                     |
-| ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| [项目概览](./project-overview.md)                                 | Monorepo 结构、工作区划分、主要入口                                                      |
-| [设计规范](./design.md)                                           | 设计语言：The Intellectual Minimalist（色彩、字体、spacing token 详见 `docs/design.md`） |
-| [平台中立规范](../spec/README.md)                                 | tokens、组件合同、UX 模式、a11y 与 motion 语义                                           |
-| [跨平台路线收口](./cross-platform-roadmap.md)                     | Web/Vue 与 Avalonia/.NET 分层、issue 状态与边界                                          |
-| [Avalonia 复杂组件规划](./avalonia/complex-components-roadmap.md) | DataTable、VirtualList、Terminal、FileManager 等复杂组件路线                             |
-| [Playground / Demo App](./playground.md)                          | demo app 启动、覆盖范围、视觉回归与公开样例规范                                          |
-| [Visual test profiles](./visual-testing.md)                       | smoke、affected、full、evidence 的选择、映射与证据边界                                   |
-| [图标系统](./icons.md)                                            | 图标导入、生成流程、SVG 审查和命名稳定性                                                 |
-| [Element Plus 接入指南](./element-plus-integration.md)            | 与 Element Plus 的差异点、包名约定、WASM 策略                                            |
-| [API 稳定性](./api-stability.md)                                  | public preview 导出、稳定性等级、内部路径边界                                            |
-| [跨平台 API 边界](./api/cross-platform-api-boundary.md)           | Web/Avalonia/product integration 公私有边界                                              |
-| [Web 合同映射](./api/web-contract-mapping.md)                     | Web/Vue API 与平台中立合同的对应关系                                                     |
-| [Element Plus 兼容策略](./element-plus-compatibility.md)          | 兼容承诺、已知差异、支持与不支持的使用面                                                 |
-| [从 Element Plus 迁移](./migration/from-element-plus.md)          | 包名、CSS、图标、运行时目标与迁移检查                                                    |
-| [Element Plus 归属说明](./legal/element-plus-attribution.md)      | 派生关系、许可、资产边界、包名说明                                                       |
-| [Public Preview 发布说明](./releases/public-preview.md)           | 预览状态、可用包、限制、验证证据                                                         |
-| [贡献指南](../CONTRIBUTING.md)                                    | 本地开发、changeset、视觉回归、发布验证流程                                              |
-| [安全策略](../SECURITY.md)                                        | 漏洞报告、支持版本、XSS/SVG/WASM/供应链范围                                              |
-| [行为准则](../CODE_OF_CONDUCT.md)                                 | public-preview 协作和安全披露行为约束                                                    |
-| [工程维护交接](./engineering-handoff.md)                          | 环境基线、标准命令、CI 分工、常见问题排查                                                |
-| [发布治理](./release-governance.md)                               | npm 发布流程、Changesets 版本管理                                                        |
-| [跨平台发布治理](./releases/cross-platform-governance.md)         | spec、npm、NuGet、token 与 contract 版本关系                                             |
-| [NuGet 发布策略](./releases/nuget-policy.md)                      | Avalonia NuGet metadata、preview 和 evidence                                             |
-| [npm 发布策略](./release/npm-registry-policy.md)                  | npm registry、provenance、dist-tag 与包审计策略                                          |
-| [模板审计报告](./runtime-template-audit.md)                       | 模板 DOM 扫描结果（Wave 0 已全部完成）                                                   |
-| [模板重构计划](./runtime-template-refactor-plan.md)               | 模板重构 Guardrails 与审计命令                                                           |
-| [UX 语义指南](./ux/dont-make-me-think-guidelines.md)              | Don’t Make Me Think 风格约束与检查器规则                                                 |
-| [任务导向组件语义](./ux/task-oriented-components.md)              | 页面任务、危险操作、空状态、筛选摘要等契约                                               |
-| [FsusBlog 消费示例](./ux/fsusblog-consumption-examples.md)        | 内容后台消费 UX 语义模式的组合示例                                                       |
+## 文档权威顺序
 
----
+1. [`spec/`](../spec/README.md)：平台中立、机器可验证的 canonical 合同。
+2. [`docs/design.md`](./design.md)：唯一的人类可读视觉设计合同。
+3. API、theme、UX、component、Avalonia 等领域合同。
+4. governance 与 workflow：解释如何分类、变更和验证，不重定义设计值。
+5. guide、consumer 文档和示例：说明如何采用公开合同。
+6. generated、release、benchmark、audit 与 archive：派生输出或时间点记录。
 
-## 使用指南
+详细的文档角色、目录和新增文件放置规则见 [Documentation Architecture](./governance/documentation-architecture.md)。
 
-| 文档                                           | 说明                                                   |
-| ---------------------------------------------- | ------------------------------------------------------ |
-| [安装](./guide/installation.md)                | 环境要求、通过 npm public registry 安装                |
-| [快速开始](./guide/quickstart.md)              | 全量引入、按需引入、全局配置                           |
-| [主题定制](./guide/theming.md)                 | CSS 变量覆盖、SCSS 变量、FsusUI 学术蓝配色规范         |
-| [主题 Customization](./theme/customization.md) | 颜色、圆角、间距、阴影、theme-chalk 与安全覆盖模式     |
-| [主题 Token 稳定性](./theme/tokens.md)         | 公开主题变量、实验变量、内部变量边界                   |
-| [Motion Token 稳定性](./theme/motion.md)       | ConfigProvider motion、公开动效 token、低动效策略      |
-| [暗色模式](./guide/dark-mode.md)               | 接入 `themeMode`、跟随系统主题、自定义暗色变量         |
-| [国际化](./guide/i18n.md)                      | 多语言切换、Day.js 时区配置                            |
-| [自定义命名空间](./guide/namespace.md)         | 修改组件 CSS 类名前缀                                  |
-| [服务端渲染 (SSR)](./guide/ssr.md)             | SSR 水合错误处理、Teleport 注入                        |
-| [自定义默认值](./guide/custom-defaults.md)     | `setPropsDefaults` 用法与限制                          |
-| [Render Pipeline](./guide/render-pipeline.md)  | 统一渲染预算、外部 adapter、Worker 与虚拟挂载          |
-| [Result Mode](./guide/result-mode.md)          | `FsusResult<T>`、错误码、可恢复失败迁移与 release gate |
+## 文档领域
 
----
+| 领域 | 入口 | 内容 |
+| --- | --- | --- |
+| 设计系统 | [docs/design/](./design/README.md) | 设计合同、解释规则、变更归类、UX 与视觉证据 |
+| 平台中立规范 | [spec/](../spec/README.md) | tokens、组件合同、interaction、a11y、motion、platform overrides |
+| 架构 | [docs/architecture/](./architecture/README.md) | monorepo、runtime、跨平台、API 边界 |
+| Web/Vue 组件 | [组件总览](./components/overview.md) | 组件 API、状态、键盘行为、tokens 与限制 |
+| Avalonia | [Avalonia adoption](./avalonia/README.md) | .NET 包、组件、平台差异和迁移 |
+| 调用方 | [docs/consumers/](./consumers/README.md) | FsusUI 与产品的所有权、集成和消费示例 |
+| 使用指南 | [docs/guide/](./guide/quickstart.md) | 安装、主题、暗色、i18n、SSR、namespace、默认值 |
+| 工作流 | [docs/workflows/](./workflows/README.md) | 维护、视觉变更、测试、Demo 与发布执行 |
+| 治理 | [docs/governance/](./governance/README.md) | 文档、设计、API、CI、兼容性和发布治理 |
+| 迁移与兼容 | [Element Plus 兼容](./element-plus-compatibility.md) | 接入、迁移、包名和支持边界 |
+| 版本与证据 | [Public Preview](./releases/public-preview.md) | release/readiness、性能、审计和发布证据 |
 
-## 组件文档
+## 稳定顶层入口
 
-### 基础组件
+以下路径被脚本、测试、贡献指南或外部链接直接引用，因此暂时保留在 `docs/` 根目录；它们已在上述领域入口中归类：
 
-| 组件                             | 文档                                                                 |
-| -------------------------------- | -------------------------------------------------------------------- |
-| 按钮 Button                      | [components/button.md](./components/button.md)                       |
-| 图标 Icon                        | [components/icon.md](./components/icon.md)                           |
-| 链接 Link                        | [components/link.md](./components/link.md)                           |
-| 文本 Text                        | [components/text.md](./components/text.md)                           |
-| 站点头部 SiteHeader              | [components/site-header.md](./components/site-header.md)             |
-| 公共页面外壳 PublicShell         | [components/public-shell.md](./components/public-shell.md)           |
-| Markdown 渲染器 MarkdownRenderer | [components/markdown-renderer.md](./components/markdown-renderer.md) |
-| Markdown 编辑器 MarkdownEditor   | [components/markdown-editor.md](./components/markdown-editor.md)     |
-| 滚动条 Scrollbar                 | [components/scrollbar.md](./components/scrollbar.md)                 |
-| 间距 Space                       | [components/space.md](./components/space.md)                         |
-| 布局 Layout                      | [components/layout.md](./components/layout.md)                       |
-| 分割线 Divider                   | [components/divider.md](./components/divider.md)                     |
-| 动效 Motion                      | [components/motion.md](./components/motion.md)                       |
+- [设计合同](./design.md)
+- [项目概览](./project-overview.md)
+- [工程维护交接](./engineering-handoff.md)
+- [Visual test profiles](./visual-testing.md)
+- [发布治理](./release-governance.md)
+- [API 稳定性](./api-stability.md)
+- [Element Plus 接入](./element-plus-integration.md)
+- [Element Plus 兼容](./element-plus-compatibility.md)
+- [图标系统](./icons.md)
+- [Playground / Demo](./playground.md)
 
-### 表单组件
+新文档默认不得继续堆到 `docs/` 根目录。先按 [Documentation Architecture](./governance/documentation-architecture.md) 选择领域。
 
-| 组件                   | 文档                                                       |
-| ---------------------- | ---------------------------------------------------------- |
-| 输入框 Input           | [components/input.md](./components/input.md)               |
-| 数字输入框 InputNumber | [components/input-number.md](./components/input-number.md) |
-| 选择器 Select          | [components/select.md](./components/select.md)             |
-| 虚拟化选择器 SelectV2  | [components/select-v2.md](./components/select-v2.md)       |
-| 单选框 Radio           | [components/radio.md](./components/radio.md)               |
-| 多选框 Checkbox        | [components/checkbox.md](./components/checkbox.md)         |
-| 级联选择器 Cascader    | [components/cascader.md](./components/cascader.md)         |
-| 表单 Form              | [components/form.md](./components/form.md)                 |
-| 日期选择器 DatePicker  | [components/date-picker.md](./components/date-picker.md)   |
-| 时间选择器 TimePicker  | [components/time-picker.md](./components/time-picker.md)   |
-| 时间选择 TimeSelect    | [components/time-select.md](./components/time-select.md)   |
-| 开关 Switch            | [components/switch.md](./components/switch.md)             |
-| 滑块 Slider            | [components/slider.md](./components/slider.md)             |
-| 上传 Upload            | [components/upload.md](./components/upload.md)             |
-| 评分 Rate              | [components/rate.md](./components/rate.md)                 |
-| 颜色选择器 ColorPicker | [components/color-picker.md](./components/color-picker.md) |
-| 穿梭框 Transfer        | [components/transfer.md](./components/transfer.md)         |
+## 关键公共文档
 
-### 数据展示
+- [贡献指南](../CONTRIBUTING.md)
+- [安全策略](../SECURITY.md)
+- [行为准则](../CODE_OF_CONDUCT.md)
+- [许可与归属](./legal/element-plus-attribution.md)
+- [从 Element Plus 迁移](./migration/from-element-plus.md)
+- [Public Preview 发布说明](./releases/public-preview.md)
 
-| 组件                    | 文档                                                             |
-| ----------------------- | ---------------------------------------------------------------- |
-| 表格 Table              | [components/table.md](./components/table.md)                     |
-| 虚拟化表格 TableV2      | [components/table-v2.md](./components/table-v2.md)               |
-| 虚拟列表 VirtualList    | [components/virtual-list.md](./components/virtual-list.md)       |
-| 分页 Pagination         | [components/pagination.md](./components/pagination.md)           |
-| 树形控件 Tree           | [components/tree.md](./components/tree.md)                       |
-| 虚拟树 TreeV2           | [components/tree-v2.md](./components/tree-v2.md)                 |
-| 树形选择 TreeSelect     | [components/tree-select.md](./components/tree-select.md)         |
-| 自动补全 Autocomplete   | [components/autocomplete.md](./components/autocomplete.md)       |
-| 头像 Avatar             | [components/avatar.md](./components/avatar.md)                   |
-| 徽章 Badge              | [components/badge.md](./components/badge.md)                     |
-| 日历 Calendar           | [components/calendar.md](./components/calendar.md)               |
-| 卡片 Card               | [components/card.md](./components/card.md)                       |
-| 走马灯 Carousel         | [components/carousel.md](./components/carousel.md)               |
-| 折叠面板 Collapse       | [components/collapse.md](./components/collapse.md)               |
-| 倒计时 Countdown        | [components/countdown.md](./components/countdown.md)             |
-| 描述列表 Descriptions   | [components/descriptions.md](./components/descriptions.md)       |
-| 空状态 Empty            | [components/empty.md](./components/empty.md)                     |
-| 图片 Image              | [components/image.md](./components/image.md)                     |
-| 图片预览 ImageViewer    | [components/image-viewer.md](./components/image-viewer.md)       |
-| 无限滚动 InfiniteScroll | [components/infinite-scroll.md](./components/infinite-scroll.md) |
-| 统计数值 Statistic      | [components/statistic.md](./components/statistic.md)             |
-| 标签 Tag                | [components/tag.md](./components/tag.md)                         |
-| 时间线 Timeline         | [components/timeline.md](./components/timeline.md)               |
-| 水印 Watermark          | [components/watermark.md](./components/watermark.md)             |
-| 骨架屏 Skeleton         | [components/skeleton.md](./components/skeleton.md)               |
-
-### 导航
-
-| 组件              | 文档                                                     |
-| ----------------- | -------------------------------------------------------- |
-| 导航菜单 Menu     | [components/menu.md](./components/menu.md)               |
-| 标签页 Tabs       | [components/tabs.md](./components/tabs.md)               |
-| 面包屑 Breadcrumb | [components/breadcrumb.md](./components/breadcrumb.md)   |
-| 页头 PageHeader   | [components/page-header.md](./components/page-header.md) |
-| 下拉菜单 Dropdown | [components/dropdown.md](./components/dropdown.md)       |
-| 步骤条 Steps      | [components/steps.md](./components/steps.md)             |
-| 固钉 Affix        | [components/affix.md](./components/affix.md)             |
-| 回到顶部 Backtop  | [components/backtop.md](./components/backtop.md)         |
-
-### 反馈
-
-| 组件                  | 文档                                                       |
-| --------------------- | ---------------------------------------------------------- |
-| 警告 Alert            | [components/alert.md](./components/alert.md)               |
-| 对话框 Dialog         | [components/dialog.md](./components/dialog.md)             |
-| 抽屉 Drawer           | [components/drawer.md](./components/drawer.md)             |
-| 加载 Loading          | [components/loading.md](./components/loading.md)           |
-| 消息 Message          | [components/message.md](./components/message.md)           |
-| 消息弹框 MessageBox   | [components/message-box.md](./components/message-box.md)   |
-| 通知 Notification     | [components/notification.md](./components/notification.md) |
-| 气泡卡片 Popover      | [components/popover.md](./components/popover.md)           |
-| 气泡确认框 Popconfirm | [components/popconfirm.md](./components/popconfirm.md)     |
-| 文字提示 Tooltip      | [components/tooltip.md](./components/tooltip.md)           |
-| 进度条 Progress       | [components/progress.md](./components/progress.md)         |
-| 结果 Result           | [components/result.md](./components/result.md)             |
-
-### 配置
-
-| 组件                    | 文档                                                             |
-| ----------------------- | ---------------------------------------------------------------- |
-| 全局配置 ConfigProvider | [components/config-provider.md](./components/config-provider.md) |
-
-> **Name note:** FsusUI is the recommended public-facing name for this fork and
-> compatibility-focused Vue 3 component library based on Element Plus. Element
-> Plus is retained as upstream provenance, API-alignment, and package-naming
-> context. The current npm public-preview package is `@ozwasyd/element-plus`,
-> which maps to the FsusUI compatibility build rather than the upstream package.
+> **Name note:** FsusUI is the recommended public-facing name for this fork and compatibility-focused Vue 3 component library based on Element Plus. Element Plus remains the upstream provenance and API-alignment context. The current npm public-preview package is `@ozwasyd/element-plus`, which maps to the FsusUI compatibility build rather than the upstream package.

@@ -1,6 +1,10 @@
 # FsusBlog 消费示例
 
-这些示例展示内容后台如何消费 FsusUI 的 UX 语义模式，不绑定具体业务流程。可运行的 Vue 片段放在 `examples/ux-semantics`，并由 `npm run check:ux-semantics` 校验。
+> **Role:** Non-normative consumer example
+> **Applies to:** FsusBlog as one FsusUI consumer
+> **Authority:** Demonstrates [`docs/consumers/design-integration.md`](../consumers/design-integration.md) and UX contracts. It does not define FsusUI defaults or FsusBlog route-level design rules.
+
+这些示例展示内容后台如何消费 FsusUI 的 UX 语义模式，不绑定具体业务流程。可运行的 Vue 片段放在 `examples/ux-semantics`，并由 `npm run check:ux-semantics` 校验。FsusBlog 的公开、阅读和产品级页面构图仍由 FsusBlog 自己的设计规则拥有；示例不得反向扩张 FsusUI 的 task-surface 默认值。
 
 ## 文章编辑器
 
