@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
 const scripts = packageJson.scripts ?? {}
 const qualityWorkflow = readFileSync('.github/workflows/quality.yml', 'utf8')
-const releaseGovernance = readFileSync('docs/release-governance.md', 'utf8')
+const releaseGovernance = readFileSync('docs/releases/governance.md', 'utf8')
 const engineeringHandoff = readFileSync('docs/engineering-handoff.md', 'utf8')
 const capacitySuite = readFileSync('scripts/run-capacity-suite.mjs', 'utf8')
 

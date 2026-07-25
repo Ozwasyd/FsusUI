@@ -16,8 +16,8 @@ Workflow documents describe repeatable execution and evidence. They must referen
 ## Quality and release
 
 - [CI readiness](../ci-readiness.md)
-- [Release governance](../release-governance.md)
-- [Cross-platform release governance](../releases/cross-platform-governance.md)
+- [Release governance](../releases/governance.md)
+- [Cross-platform release policy](../releases/policy/cross-platform.md)
 - [Performance benchmarks](../performance/real-render-benchmarks.md)
 
 ## Reusable agent workflow

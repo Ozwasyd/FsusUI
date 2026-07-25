@@ -1,5 +1,8 @@
 # Cross-Platform Release Governance
 
+> **Role:** Normative cross-platform release policy
+> **Applies to:** Shared spec versions, Web/Avalonia release classification, evidence, and bounded platform variance
+
 FsusUI cross-platform releases are governed by a shared spec version, Web npm
 package versions, Avalonia NuGet package versions, token schema version, and
 component contract version.

@@ -13,9 +13,9 @@ From highest to lowest authority:
 1. **Platform-neutral specification** under [`spec/`](../../spec/README.md): canonical tokens, component contracts, interaction semantics, accessibility, motion, and registered platform differences.
 2. **Human-readable design contract** in [`docs/design.md`](../design.md): the intended visual language and its component-level interpretation.
 3. **Domain contracts** under `docs/api/`, `docs/theme/`, `docs/ux/`, `docs/components/`, and `docs/avalonia/`: public behavior and implementation-facing rules for one domain.
-4. **Governance and workflows** under `docs/governance/` and `docs/workflows/`: how changes are classified, reviewed, verified, released, and documented.
+4. **Governance, release policy, and workflows** under `docs/governance/`, `docs/releases/`, and `docs/workflows/`: how changes are classified, reviewed, verified, released, and documented.
 5. **Consumer guides** under `docs/guide/`, `docs/consumers/`, and `docs/migration/`: how downstream applications adopt the public contracts.
-6. **Records and generated output** under `docs/releases/`, `docs/performance/`, `docs/theme/generated/`, and release-evidence directories: evidence, generated references, and point-in-time status.
+6. **Records and generated output** under `docs/releases/evidence/`, `docs/releases/readiness/`, `docs/performance/`, and generated reference directories: evidence, generated references, and point-in-time status.
 7. **Archive** under `docs/archive/`: retained history that no longer defines current behavior.
 
 A lower layer may explain or apply a higher layer. It must not redefine it.
@@ -31,7 +31,7 @@ A lower layer may explain or apply a higher layer. It must not redefine it.
 | Workflow | Defines repeatable implementation and verification steps | Procedural | `docs/workflows/` and stable workflow entrypoints |
 | Guide | Helps a consumer perform a supported task | No, unless it links to a contract | `docs/guide/`, `docs/consumers/`, `docs/migration/` |
 | Reference | Catalogs stable APIs, components, icons, or tokens | Derived | `docs/components/`, `docs/icons/`, generated reference directories |
-| Record | Captures a release, audit, benchmark, roadmap, or readiness state | Point-in-time | `docs/releases/`, `docs/performance/`, audit documents |
+| Record | Captures a release, audit, benchmark, roadmap, or readiness state | Point-in-time | `docs/releases/evidence/`, `docs/performance/`, audit documents |
 | Archive | Preserves obsolete material for history | No | `docs/archive/` |
 
 Every new substantive document should state its role, applicability, and authority near the top. Existing documents may adopt this metadata incrementally when they are materially revised.
@@ -54,8 +54,7 @@ Every new substantive document should state its role, applicability, and authori
 | [`docs/workflows/`](../workflows/README.md) | Repeatable development, visual-change, and maintenance workflows |
 | [`docs/governance/`](./README.md) | Documentation, design, API, CI, and release governance map |
 | [`docs/migration/`](../migration/from-element-plus.md) | Migration instructions and compatibility transitions |
-| [`docs/releases/`](../releases/public-preview.md) | Release/readiness records and platform policy records |
-| [`docs/release/`](../release/npm-registry-policy.md) | Registry and release-mechanism policy |
+| [`docs/releases/`](../releases/README.md) | Release governance, policy, channel status, readiness contracts, and point-in-time evidence |
 | [`docs/performance/`](../performance/real-render-benchmarks.md) | Performance methodology and results |
 | [`docs/legal/`](../legal/element-plus-attribution.md) | Attribution and legal boundaries |
 | [`docs/archive/`](../archive/github-packages/README.md) | Historical, non-current material |
@@ -70,7 +69,6 @@ Several documents remain at `docs/` root because scripts, tests, contributor lin
 - `project-overview.md`
 - `engineering-handoff.md`
 - `visual-testing.md`
-- `release-governance.md`
 - `api-stability.md`
 - `element-plus-integration.md`
 - `element-plus-compatibility.md`
@@ -78,7 +76,7 @@ Several documents remain at `docs/` root because scripts, tests, contributor lin
 - `playground.md`
 - existing runtime and cross-platform reports
 
-Do not add another root-level document merely because its topic is important. New documents belong in the closest domain directory unless they are intentionally approved as stable entrypoints. Moving a stable entrypoint requires updating every script, test, link, and external reference in the same change; a forwarding stub is not sufficient when automation reads the file contents.
+Do not add another root-level document merely because its topic is important. Release material belongs under the canonical `docs/releases/` domain; the single-form `docs/release/` path and repository-root `release-evidence/` are retired and must not be recreated. New documents belong in the closest domain directory unless they are intentionally approved as stable entrypoints. Moving a stable entrypoint requires updating every script, test, link, and external reference in the same change; a forwarding stub is not sufficient when automation reads the file contents. `pnpm check:documentation-architecture` enforces the canonical release domain and rejects the retired competing directories.
 
 ## 5. Placement decision
 

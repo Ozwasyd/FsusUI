@@ -18,7 +18,7 @@ const complexRoadmapPath = 'spec/components/complex-components-roadmap.yaml'
 
 const outputPaths = {
   report: 'tests/conformance/performance/artifacts/avalonia-budget-report.json',
-  releaseEvidence: 'docs/releases/avalonia-performance-budgets.md',
+  releaseEvidence: 'docs/releases/readiness/avalonia-performance-budgets.md',
   generatedTests:
     'dotnet/FsusUI.Avalonia.PerformanceTests/Generated/PerformanceBudgetTests.cs',
 }

@@ -1,6 +1,9 @@
 # npm Registry Publishing Policy
 
-This policy defines FsusUI public npm registry publishing for public preview. It complements the release workflow in [release governance](../release-governance.md).
+> **Role:** Normative npm distribution policy
+> **Applies to:** Package naming, registry selection, dist-tags, trusted publishing, and npm evidence requirements
+
+This policy defines FsusUI public npm registry publishing for public preview. It complements the release workflow in [release governance](../governance.md).
 
 ## Package Name Policy
 
@@ -54,7 +57,7 @@ Preferred public npm publishing approach:
 - The npmjs.com trusted publisher entry must match owner `Ozwasyd`, repo `FsusUI`, workflow filename `publish-npm.yml`, and the `npm publish` action.
 - CI logs must never print npm tokens, `.npmrc` contents, or auth headers.
 
-The provenance evidence for the current public-preview candidate is tracked in `release-evidence/npm-public-preview/provenance.md`.
+The provenance evidence for the current public-preview candidate is tracked in `docs/releases/evidence/npm-public-preview/provenance.md`.
 
 ## Dist-Tag Policy
 
@@ -133,7 +136,7 @@ private screenshots / docs
 large unused files
 ```
 
-Current evidence is recorded in `release-evidence/npm-public-preview/package-audit.md`.
+Current evidence is recorded in `docs/releases/evidence/npm-public-preview/package-audit.md`.
 
 ## Consumer Install Verification
 
@@ -152,7 +155,7 @@ The fixture must verify:
 - icon imports
 - chunk budget and forbidden Vite warning checks
 
-Current evidence is recorded in `release-evidence/npm-public-preview/consumer-install.md`.
+Current evidence is recorded in `docs/releases/evidence/npm-public-preview/consumer-install.md`.
 
 ### Immutable candidate contract
 
@@ -186,7 +189,7 @@ the tested candidate A remains the publish input.
 Public-preview publishing requires evidence files under:
 
 ```text
-release-evidence/npm-public-preview/
+docs/releases/evidence/npm-public-preview/
 ```
 
 Required records:

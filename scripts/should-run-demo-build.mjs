@@ -56,7 +56,6 @@ const skippableMetadataPatterns = [
   /^docs\//,
   /^\.github\/(ISSUE_TEMPLATE|PULL_REQUEST_TEMPLATE\.md)/,
   /^\.changeset\//,
-  /^release-evidence\//,
   /^\.vscode\//,
   /^\.editorconfig$/,
   /^\.gitattributes$/,

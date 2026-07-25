@@ -13,7 +13,7 @@ FsusUI 是基于 Vue 3 与 Element Plus 兼容面的跨平台组件系统。当�
 | 修改 Web/Vue 组件 | [组件总览](./components/overview.md) | 对应组件文档、[API 稳定性](./api-stability.md)、[视觉测试](./visual-testing.md) |
 | 修改 Avalonia/.NET | [Avalonia 文档](./avalonia/README.md) | [平台差异](./avalonia/platform-differences.md)、[Vue 迁移](./avalonia/vue-migration.md) |
 | 理解仓库或跨平台结构 | [架构文档](./architecture/README.md) | [项目概览](./project-overview.md)、[spec 架构](../spec/architecture.md) |
-| 维护、验证或发布 | [工作流文档](./workflows/README.md) | [工程交接](./engineering-handoff.md)、[治理](./governance/README.md)、[发布治理](./release-governance.md) |
+| 维护、验证或发布 | [工作流文档](./workflows/README.md) | [工程交接](./engineering-handoff.md)、[治理](./governance/README.md)、[发布文档](./releases/README.md) |
 
 ## 文档权威顺序
 
@@ -22,7 +22,7 @@ FsusUI 是基于 Vue 3 与 Element Plus 兼容面的跨平台组件系统。当�
 3. API、theme、UX、component、Avalonia 等领域合同。
 4. governance 与 workflow：解释如何分类、变更和验证，不重定义设计值。
 5. guide、consumer 文档和示例：说明如何采用公开合同。
-6. generated、release、benchmark、audit 与 archive：派生输出或时间点记录。
+6. generated、release evidence、benchmark、audit 与 archive：派生输出或时间点记录。
 
 详细的文档角色、目录和新增文件放置规则见 [Documentation Architecture](./governance/documentation-architecture.md)。
 
@@ -40,7 +40,7 @@ FsusUI 是基于 Vue 3 与 Element Plus 兼容面的跨平台组件系统。当�
 | 工作流 | [docs/workflows/](./workflows/README.md) | 维护、视觉变更、测试、Demo 与发布执行 |
 | 治理 | [docs/governance/](./governance/README.md) | 文档、设计、API、CI、兼容性和发布治理 |
 | 迁移与兼容 | [Element Plus 兼容](./element-plus-compatibility.md) | 接入、迁移、包名和支持边界 |
-| 版本与证据 | [Public Preview](./releases/public-preview.md) | release/readiness、性能、审计和发布证据 |
+| 版本与证据 | [发布文档](./releases/README.md) | release/readiness、性能、审计和发布证据 |
 
 ## 稳定顶层入口
 
@@ -50,7 +50,6 @@ FsusUI 是基于 Vue 3 与 Element Plus 兼容面的跨平台组件系统。当�
 - [项目概览](./project-overview.md)
 - [工程维护交接](./engineering-handoff.md)
 - [Visual test profiles](./visual-testing.md)
-- [发布治理](./release-governance.md)
 - [API 稳定性](./api-stability.md)
 - [Element Plus 接入](./element-plus-integration.md)
 - [Element Plus 兼容](./element-plus-compatibility.md)
@@ -66,6 +65,6 @@ FsusUI 是基于 Vue 3 与 Element Plus 兼容面的跨平台组件系统。当�
 - [行为准则](../CODE_OF_CONDUCT.md)
 - [许可与归属](./legal/element-plus-attribution.md)
 - [从 Element Plus 迁移](./migration/from-element-plus.md)
-- [Public Preview 发布说明](./releases/public-preview.md)
+- [发布文档与证据](./releases/README.md)
 
 > **Name note:** FsusUI is the recommended public-facing name for this fork and compatibility-focused Vue 3 component library based on Element Plus. Element Plus remains the upstream provenance and API-alignment context. The current npm public-preview package is `@ozwasyd/element-plus`, which maps to the FsusUI compatibility build rather than the upstream package.

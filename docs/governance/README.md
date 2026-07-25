@@ -24,10 +24,10 @@ Governance documents define ownership, precedence, exceptions, verification, and
 
 - [CI readiness](../ci-readiness.md)
 - [Visual testing profiles](../visual-testing.md)
-- [Release governance](../release-governance.md)
-- [Cross-platform release governance](../releases/cross-platform-governance.md)
-- [npm registry policy](../release/npm-registry-policy.md)
-- [NuGet policy](../releases/nuget-policy.md)
+- [Release governance](../releases/governance.md)
+- [Cross-platform release policy](../releases/policy/cross-platform.md)
+- [npm registry policy](../releases/policy/npm-registry.md)
+- [NuGet policy](../releases/policy/nuget.md)
 
 ## Security and collaboration
 

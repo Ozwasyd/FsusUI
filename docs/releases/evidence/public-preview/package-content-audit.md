@@ -7,9 +7,9 @@ Candidate commit: this file's containing commit
 The package content dry-run audit for the public-preview candidate is recorded
 in:
 
-- `release-evidence/npm-public-preview/package-audit.md`
-- `release-evidence/npm-public-preview/consumer-install.md`
-- `release-evidence/npm-public-preview/provenance.md`
+- `docs/releases/evidence/npm-public-preview/package-audit.md`
+- `docs/releases/evidence/npm-public-preview/consumer-install.md`
+- `docs/releases/evidence/npm-public-preview/provenance.md`
 
 The package audit records:
 

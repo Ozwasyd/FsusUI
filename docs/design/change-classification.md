@@ -16,7 +16,7 @@ Classify a change before implementation. The classification determines ownership
 | Avalonia implementation | XAML themes, .NET controls, Avalonia platform behavior | Web DOM assumptions | `dotnet/`, `docs/avalonia/` |
 | Platform override | A necessary, bounded difference that cannot be eliminated | Convenience divergence or unregistered design preference | `spec/platform-overrides/` |
 | Consumer integration | Product routing, business copy, information architecture, page composition, product-specific public/marketing/reading rules | FsusUI internals or new `--fsus-*` truth | consumer repository, `docs/consumers/` |
-| Example or record | Demonstrates usage or records evidence | New normative behavior | examples, Demo, `docs/releases/`, audit reports |
+| Example or record | Demonstrates usage or records evidence | New normative behavior | examples, Demo, `docs/releases/evidence/`, audit reports |
 
 ## 2. Surface classification
 
