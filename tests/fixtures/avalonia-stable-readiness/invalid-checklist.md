@@ -2,4 +2,4 @@
 
 | Area | Evidence |
 | --- | --- |
-| `button` | release-evidence/avalonia-stable/README.md |
+| `button` | docs/releases/evidence/avalonia-stable/README.md |

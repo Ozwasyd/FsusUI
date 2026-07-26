@@ -10,7 +10,7 @@ const publishWorkflow = readFileSync(
   '.github/workflows/publish-npm.yml',
   'utf8',
 )
-const releaseGovernance = readFileSync('docs/release-governance.md', 'utf8')
+const releaseGovernance = readFileSync('docs/releases/governance.md', 'utf8')
 const engineeringHandoff = readFileSync('docs/engineering-handoff.md', 'utf8')
 
 function assert(condition, message) {

@@ -47,4 +47,4 @@ an explicit asset policy before they can be added to the public repository.
 The active public-preview package name is `@ozwasyd/element-plus`. The internal
 workspace package still uses `element-plus` naming for compatibility with the
 existing source layout. Long-term naming policy is documented in
-[`docs/release/npm-registry-policy.md`](../release/npm-registry-policy.md).
+[`docs/releases/policy/npm-registry.md`](../releases/policy/npm-registry.md).

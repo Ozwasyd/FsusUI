@@ -8,7 +8,7 @@ const runner = readFileSync('scripts/run-coverage.mjs', 'utf8')
 const planner = readFileSync('scripts/coverage-plan.mjs', 'utf8')
 const contract = readFileSync('scripts/coverage-contract.mjs', 'utf8')
 const docs =
-  `${readFileSync('docs/release-governance.md', 'utf8')}\n${readFileSync('docs/engineering-handoff.md', 'utf8')}`.toLowerCase()
+  `${readFileSync('docs/releases/governance.md', 'utf8')}\n${readFileSync('docs/engineering-handoff.md', 'utf8')}`.toLowerCase()
 
 for (const path of [
   'scripts/run-coverage.mjs',

@@ -13,7 +13,7 @@ pnpm install @ozwasyd/element-plus
 ```
 
 Registry policy, provenance, dist-tags, and promotion rules are tracked in
-[`docs/release/npm-registry-policy.md`](../release/npm-registry-policy.md).
+[`docs/releases/policy/npm-registry.md`](../releases/policy/npm-registry.md).
 
 ## Replace Runtime Imports
 

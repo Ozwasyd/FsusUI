@@ -1,5 +1,7 @@
 # Avalonia Stable RC Evidence
 
+> **Role:** Point-in-time Avalonia stable signoff evidence
+
 This bundle is the release-candidate signoff record for marking
 `FsusUI.Avalonia`, `FsusUI.Avalonia.Themes`, and `FsusUI.Avalonia.Icons`
 stable. It is regenerated from CI artifacts by restoring the Quality Gates

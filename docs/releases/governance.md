@@ -1,5 +1,8 @@
 # FsusUI 发布治理交接
 
+> **Role:** Normative release governance and operational workflow
+> **Applies to:** Versioning, quality gates, candidate construction, publishing, and rollback decisions
+
 本文定义当前仓库的版本与发布规则，目标是让后续维护者能够独立完成版本变更、包校验、npm 发布和失败回滚判断。
 
 ## 1. 当前发布目标
@@ -9,7 +12,7 @@
 - 当前包名：`@ozwasyd/element-plus`
 - 发布触发：推送 `vX.Y.Z` 或 `vX.Y.Z-*` tag
 
-Public preview 的 registry 策略、包名策略、dist-tag 策略和 provenance 要求见 [npm Registry Publishing Policy](./release/npm-registry-policy.md)。旧的包注册表自动发布流程已移入 `docs/archive/github-vue/packages/`，仅作历史参考，不再自动发布，也不作为 npm 发布后的镜像。
+Public preview 的 registry 策略、包名策略、dist-tag 策略和 provenance 要求见 [npm Registry Publishing Policy](./policy/npm-registry.md)。旧的包注册表自动发布流程已移入 `docs/archive/github-vue/packages/`，仅作历史参考，不再自动发布，也不作为 npm 发布后的镜像。
 
 常用验证门分为三层：
 
@@ -140,7 +143,7 @@ pnpm test:visual:evidence
 2. `pnpm test:coverage`
 3. `pnpm test:visual:evidence`
 4. 检查 `dist/element-plus/package.json`
-5. 补充 `npm pack --dry-run` / `pnpm pack --dry-run` 记录，并更新 `release-evidence/npm-public-preview/`
+5. 补充 `npm pack --dry-run` / `pnpm pack --dry-run` 记录，并更新 `docs/releases/evidence/npm-public-preview/`
 
 发布工件检查重点：
 

@@ -191,9 +191,9 @@ const scanForUnregisteredMarkers = () => {
 }
 
 const validateReleaseEvidence = (entries) => {
-  const evidenceFile = path.join(root, 'docs/releases/platform-overrides.md')
+  const evidenceFile = path.join(root, 'docs/releases/readiness/platform-overrides.md')
   if (!exists(evidenceFile))
-    return ['docs/releases/platform-overrides.md missing']
+    return ['docs/releases/readiness/platform-overrides.md missing']
   const evidence = read(evidenceFile)
   return entries
     .filter((entry) => entry.status === 'accepted')

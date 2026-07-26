@@ -1,5 +1,8 @@
 # Public Preview Release Notes
 
+> **Role:** Release-channel status and consumer-facing notes
+> **Authority:** Informational; package and publishing rules remain in `../policy/`
+
 FsusUI public preview is intended for evaluation, controlled internal adoption,
 and FsusBlog integration. It is not a stable production SLA release.
 
@@ -14,9 +17,9 @@ Production SLA: None
 ```
 
 Documented components, package entry points, theme tokens, and motion tokens are
-classified in [`docs/api-stability.md`](../api-stability.md),
-[`docs/theme/tokens.md`](../theme/tokens.md), and
-[`docs/theme/motion.md`](../theme/motion.md).
+classified in [`docs/api-stability.md`](../../api-stability.md),
+[`docs/theme/tokens.md`](../../theme/tokens.md), and
+[`docs/theme/motion.md`](../../theme/motion.md).
 
 ## Available Packages
 
@@ -52,7 +55,7 @@ createApp(App).use(FsusUI).mount('#app')
 ```
 
 The npm registry publishing policy is documented in
-[`docs/release/npm-registry-policy.md`](../release/npm-registry-policy.md).
+[`docs/releases/policy/npm-registry.md`](../policy/npm-registry.md).
 
 ## Known Limitations
 
@@ -70,18 +73,18 @@ The npm registry publishing policy is documented in
 ## Compatibility Status
 
 Compatibility is best-effort unless covered by local tests or explicit docs.
-See [`docs/element-plus-compatibility.md`](../element-plus-compatibility.md)
-and [`docs/migration/from-element-plus.md`](../migration/from-element-plus.md).
+See [`docs/element-plus-compatibility.md`](../../element-plus-compatibility.md)
+and [`docs/migration/from-element-plus.md`](../../migration/from-element-plus.md).
 
 ## Release Verification Evidence
 
 | Evidence                | Status                                                                 |
 | ----------------------- | ---------------------------------------------------------------------- |
-| Secret and history scan | Recorded in `release-evidence/public-preview/secret-history-scan.md`.  |
-| Asset scan              | Recorded in `release-evidence/public-preview/asset-scan.md`.           |
-| Package dry-run audit   | Recorded in `release-evidence/npm-public-preview/package-audit.md`.    |
-| Consumer install test   | Recorded in `release-evidence/npm-public-preview/consumer-install.md`. |
-| Provenance policy       | Recorded in `release-evidence/npm-public-preview/provenance.md`.       |
+| Secret and history scan | Recorded in `docs/releases/evidence/public-preview/secret-history-scan.md`.  |
+| Asset scan              | Recorded in `docs/releases/evidence/public-preview/asset-scan.md`.           |
+| Package dry-run audit   | Recorded in `docs/releases/evidence/npm-public-preview/package-audit.md`.    |
+| Consumer install test   | Recorded in `docs/releases/evidence/npm-public-preview/consumer-install.md`. |
+| Provenance plan         | Recorded in `docs/releases/evidence/npm-public-preview/provenance.md`.       |
 
 Version tags determine dist-tags: stable `X.Y.Z` releases publish to `latest`,
 `preview` prereleases publish to `preview`, and `alpha` / `beta` / `rc` /

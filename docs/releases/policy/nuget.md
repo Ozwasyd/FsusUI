@@ -1,5 +1,8 @@
 # NuGet Policy
 
+> **Role:** Normative NuGet distribution policy
+> **Applies to:** Avalonia package scope, metadata, preview/stable status, and package verification
+
 Avalonia packages are preview packages until the cross-platform conformance
 matrix is complete.
 

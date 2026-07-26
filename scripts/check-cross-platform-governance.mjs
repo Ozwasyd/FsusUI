@@ -54,8 +54,8 @@ const checkRegistry = () => {
 
 const checkReleaseDocs = () => {
   const docs = [
-    'docs/releases/cross-platform-governance.md',
-    'docs/releases/nuget-policy.md',
+    'docs/releases/policy/cross-platform.md',
+    'docs/releases/policy/nuget.md',
     'docs/api/cross-platform-api-boundary.md',
   ]
   for (const file of docs) {
@@ -63,7 +63,7 @@ const checkReleaseDocs = () => {
   }
 
   const governance = read(
-    'docs/releases/cross-platform-governance.md',
+    'docs/releases/policy/cross-platform.md',
   ).toLowerCase()
   for (const term of [
     'spec version',
@@ -78,7 +78,7 @@ const checkReleaseDocs = () => {
     )
   }
 
-  const nuget = read('docs/releases/nuget-policy.md').toLowerCase()
+  const nuget = read('docs/releases/policy/nuget.md').toLowerCase()
   for (const term of [
     'NuGet',
     'package metadata',

@@ -209,8 +209,10 @@ pnpm run verify:release
 
 ## Visual Regression Workflow
 
-Run visual tests for UI, theme, motion, icon, layout, demo, or screenshot
-changes:
+Before changing rendered output, classify ownership and impact using
+[`docs/design/change-classification.md`](./docs/design/change-classification.md), then
+follow [`docs/workflows/visual-change.md`](./docs/workflows/visual-change.md). Run
+visual tests for UI, theme, motion, icon, layout, demo, or screenshot changes:
 
 ```bash
 pnpm run verify:visual:affected
@@ -267,14 +269,25 @@ Use synthetic data and safe public examples only.
 
 ## Documentation Workflow
 
+Read [`docs/governance/documentation-architecture.md`](./docs/governance/documentation-architecture.md) before adding or moving a document. Classify the content as a specification, contract, governance rule, workflow, guide, reference, record, generated output, or archive. Do not create a second source of truth or add a new root-level `docs/*.md` file when an existing domain owns the topic.
+
 Public-facing changes should update the nearest relevant docs:
 
+- design interpretation and classification under `docs/design/` while keeping `docs/design.md` as the sole human-readable visual contract
 - component docs under `docs/components/`
-- API stability in `docs/api-stability.md`
+- API stability in `docs/api-stability.md` and `docs/api/`
 - Element Plus compatibility in `docs/element-plus-compatibility.md`
 - migration notes in `docs/migration/from-element-plus.md`
 - theme docs under `docs/theme/`
+- UX semantics under `docs/ux/`
+- consumer integration under `docs/consumers/`
+- repeatable maintenance procedures under `docs/workflows/`
+- governance and ownership policy under `docs/governance/`
 - icon docs in `docs/icons.md`
 - playground docs in `docs/playground.md`
 
-Docs must label preview and experimental APIs clearly.
+State each normative rule once and link to it from lower-authority documents. Do not copy token values, component geometry, motion budgets, or design prohibitions into workflows or Skills. Generated documents must identify their generator and must not be edited manually.
+
+Docs must label preview and experimental APIs clearly. A wording change that alters a public contract is a contract change, not a docs-only cleanup, and requires matching tests, migration guidance, and release impact.
+
+The repository-local `fsusui-design-conformance` Skill under `.agents/skills/` is a reusable workflow for FsusUI and confirmed FsusUI consumers. It routes work through these documents; it does not replace them.

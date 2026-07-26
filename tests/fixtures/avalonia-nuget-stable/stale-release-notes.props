@@ -5,7 +5,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>fsusui;avalonia;components;design-system;cross-platform</PackageTags>
-    <PackageReleaseNotes>Preview package candidate. See release-evidence/avalonia-preview for build, test, package, and platform evidence.</PackageReleaseNotes>
+    <PackageReleaseNotes>Preview package candidate. See docs/releases/evidence/avalonia-preview for build, test, package, and platform evidence.</PackageReleaseNotes>
     <Deterministic>true</Deterministic>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>

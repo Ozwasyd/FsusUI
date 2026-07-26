@@ -1,6 +1,9 @@
-# Avalonia Stable Readiness Evidence
+# Avalonia Stable Readiness Contract
 
-This evidence file records the stable gate inputs required before publishing
+> **Role:** Normative stable-readiness contract
+> **Applies to:** Required inputs and signoff records before final Avalonia package publication
+
+This contract records the stable gate inputs required before publishing
 final Avalonia packages.
 
 | Evidence                    | Mapping                                                                                                                                    |
@@ -10,18 +13,18 @@ final Avalonia packages.
 | Icon version                | `spec/icons/registry.yaml` version `1` plus generated Avalonia icon keys.                                                                  |
 | npm version                 | `@ozwasyd/element-plus` package version recorded in `spec/baselines/vue-current.json`.                                                     |
 | NuGet version               | `dotnet/Directory.Build.props` package version and generated NuGet metadata checks.                                                        |
-| CI run ids                  | `release-evidence/avalonia-stable/ci-run-ids.md` records the RC Quality Gates run ids.                                                     |
-| Platform matrix             | `release-evidence/avalonia-stable/platform-matrix.md` records Ubuntu, Windows, and macOS coverage.                                         |
-| Package audit               | `release-evidence/avalonia-stable/package-audit.md` records NuGet metadata, symbol, dependency, and content checks.                        |
-| Consumer install results    | `release-evidence/avalonia-stable/consumer-install.md` records packed-package restore/build/smoke results.                                 |
-| Visual diff summary         | `release-evidence/avalonia-stable/visual-diff-summary.md` records visual conformance output.                                               |
-| Accessibility summary       | `release-evidence/avalonia-stable/accessibility-summary.md` records automation and headless test output.                                   |
-| Performance summary         | `release-evidence/avalonia-stable/performance-summary.md` records budget and performance test output.                                      |
-| Platform overrides          | Active IDs in `spec/platform-overrides/*.yaml` and `docs/releases/platform-overrides.md`.                                                  |
-| Active platform overrides   | `release-evidence/avalonia-stable/active-platform-overrides.md` lists every accepted active override.                                      |
-| Stable-readiness checklist  | `release-evidence/avalonia-stable/stable-readiness-checklist.md` links every required issue and component family.                          |
-| Release notes               | `release-evidence/avalonia-stable/release-notes.md` summarizes stable consumer changes.                                                    |
-| Preview-to-stable migration | `release-evidence/avalonia-stable/preview-to-stable-migration.md` records migration steps.                                                 |
+| CI run ids                  | `docs/releases/evidence/avalonia-stable/ci-run-ids.md` records the RC Quality Gates run ids.                                                     |
+| Platform matrix             | `docs/releases/evidence/avalonia-stable/platform-matrix.md` records Ubuntu, Windows, and macOS coverage.                                         |
+| Package audit               | `docs/releases/evidence/avalonia-stable/package-audit.md` records NuGet metadata, symbol, dependency, and content checks.                        |
+| Consumer install results    | `docs/releases/evidence/avalonia-stable/consumer-install.md` records packed-package restore/build/smoke results.                                 |
+| Visual diff summary         | `docs/releases/evidence/avalonia-stable/visual-diff-summary.md` records visual conformance output.                                               |
+| Accessibility summary       | `docs/releases/evidence/avalonia-stable/accessibility-summary.md` records automation and headless test output.                                   |
+| Performance summary         | `docs/releases/evidence/avalonia-stable/performance-summary.md` records budget and performance test output.                                      |
+| Platform overrides          | Active IDs in `spec/platform-overrides/*.yaml` and `docs/releases/readiness/platform-overrides.md`.                                                  |
+| Active platform overrides   | `docs/releases/evidence/avalonia-stable/active-platform-overrides.md` lists every accepted active override.                                      |
+| Stable-readiness checklist  | `docs/releases/evidence/avalonia-stable/stable-readiness-checklist.md` links every required issue and component family.                          |
+| Release notes               | `docs/releases/evidence/avalonia-stable/release-notes.md` summarizes stable consumer changes.                                                    |
+| Preview-to-stable migration | `docs/releases/evidence/avalonia-stable/preview-to-stable-migration.md` records migration steps.                                                 |
 | Known limitations           | Complex controls remain deferred until their roadmap entries have contracts, budgets, accessibility evidence, and platform review.         |
 | Cache and sharding policy   | Unit shards consume `unit-test-artifacts`; screenshot and .NET build output artifacts are uploaded per matrix axis with short retention.   |
 

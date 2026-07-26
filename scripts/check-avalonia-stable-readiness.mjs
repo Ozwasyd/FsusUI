@@ -49,7 +49,7 @@ const validateStableChecklistCoverage = (content, spec, label) => {
       ?.toLowerCase()
     if (
       !familyLine ||
-      !familyLine.includes('release-evidence/avalonia-stable/')
+      !familyLine.includes('docs/releases/evidence/avalonia-stable/')
     ) {
       throw new Error(`${label} missing evidence link for ${family}`)
     }
@@ -57,7 +57,7 @@ const validateStableChecklistCoverage = (content, spec, label) => {
 }
 
 const validateStableEvidenceBundle = (spec) => {
-  const evidenceRoot = 'release-evidence/avalonia-stable'
+  const evidenceRoot = 'docs/releases/evidence/avalonia-stable'
   for (const file of spec.requiredStableEvidenceFiles) {
     const relativePath = `${evidenceRoot}/${file}`
     if (!fs.existsSync(path.join(root, relativePath))) {
@@ -225,7 +225,7 @@ try {
     'quality workflow',
   )
   validateReleaseEvidence(
-    read('docs/releases/avalonia-stable-readiness.md'),
+    read('docs/releases/readiness/avalonia-stable.md'),
     spec,
     'avalonia stable release evidence',
   )

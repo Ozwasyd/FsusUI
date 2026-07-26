@@ -57,7 +57,7 @@ pnpm install @ozwasyd/element-plus
 
 No package-specific `.npmrc` or GitHub package token is required. The npm
 registry policy is documented in
-[npm registry publishing policy](./docs/release/npm-registry-policy.md).
+[npm registry publishing policy](./docs/releases/policy/npm-registry.md).
 
 ## Basic Vue Usage
 
@@ -134,19 +134,24 @@ Visual regression and public sample guidance are documented in
 [playground docs](./docs/playground.md) and
 [contributing docs](./CONTRIBUTING.md).
 
-## Release Evidence
+## Release Documentation and Evidence
 
-Public-preview readiness evidence:
+The release-domain map is maintained in [docs/releases/](./docs/releases/README.md). Public-preview readiness evidence:
 
-- [Public preview release notes](./docs/releases/public-preview.md)
-- [Secret and history scan](./release-evidence/public-preview/secret-history-scan.md)
-- [Asset scan](./release-evidence/public-preview/asset-scan.md)
-- [Package content audit](./release-evidence/npm-public-preview/package-audit.md)
-- [Consumer install evidence](./release-evidence/npm-public-preview/consumer-install.md)
-- [Provenance policy](./release-evidence/npm-public-preview/provenance.md)
+- [Public preview release notes](./docs/releases/channels/public-preview.md)
+- [Secret and history scan](./docs/releases/evidence/public-preview/secret-history-scan.md)
+- [Asset scan](./docs/releases/evidence/public-preview/asset-scan.md)
+- [Package content audit](./docs/releases/evidence/npm-public-preview/package-audit.md)
+- [Consumer install evidence](./docs/releases/evidence/npm-public-preview/consumer-install.md)
+- [Provenance plan and evidence](./docs/releases/evidence/npm-public-preview/provenance.md)
 
 ## Governance
 
+- [Documentation center](./docs/index.md)
+- [Documentation architecture](./docs/governance/documentation-architecture.md)
+- [Design documentation](./docs/design/README.md)
+- [Release documentation](./docs/releases/README.md)
+- [Consumer integration boundary](./docs/consumers/design-integration.md)
 - [Contributing](./CONTRIBUTING.md)
 - [Security policy](./SECURITY.md)
 - [Code of conduct](./CODE_OF_CONDUCT.md)

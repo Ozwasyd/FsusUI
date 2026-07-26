@@ -1,5 +1,9 @@
 # Visual test profiles
 
+> **Role:** Verification workflow
+> **Applies to:** FsusUI rendered output and evidence generation
+> **Authority:** Selects repository visual profiles. Visual acceptance still follows [`docs/workflows/visual-change.md`](./workflows/visual-change.md).
+
 FsusUI exposes four explicit visual profiles. All four are orchestrated by
 `scripts/run-visual-tests.mjs`, consume the same resource capacity plan, and
 prepare `.tmp/visual-runtime` exactly once before browser execution.
@@ -10,6 +14,12 @@ treated as current runtime evidence. `FSUS_VISUAL_REUSE_SERVER=1` is an
 explicit local debugging opt-in only; Full, Evidence, and release verification
 must leave it unset so the server is started from the validated runtime
 manifest.
+
+## What the profiles prove
+
+A passing profile proves that the selected, existing fixtures conform to their recorded baselines and contracts. It does not prove a new state, viewport, locale, content length, platform, or consumer composition that is absent from the selected fixtures.
+
+The person or agent performing the change must inspect the rendered evidence and confirm that the fixture matrix covers the actual impact. Do not treat a zero-diff result, static checker, or generated report as visual acceptance for an untested state.
 
 | Profile  | Command                     | Contract                                                                                                              |
 | -------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------- |

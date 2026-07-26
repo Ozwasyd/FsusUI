@@ -1,6 +1,9 @@
 # Active Platform Overrides
 
-This file is stable release evidence for accepted platform differences. The
+> **Role:** Generated stable-readiness reference
+> **Generator/validator:** `scripts/check-platform-overrides.mjs` and `spec/platform-overrides/*.yaml`
+
+This generated readiness reference lists accepted platform differences required by stable release checks. The
 source of truth remains `spec/platform-overrides/*.yaml`; CI verifies every
 active override id appears here.
 
