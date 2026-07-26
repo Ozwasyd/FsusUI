@@ -97,7 +97,7 @@
     "governance:motion": "node ./scripts/with-node-heap.mjs node ./scripts/check-motion-governance.mjs",
     "check:ux-semantics": "node ./scripts/with-node-heap.mjs node ./scripts/check-ux-semantics.mjs",
     "check:design-source-drift": "node ./scripts/with-node-heap.mjs node ./scripts/check-design-source-drift.mjs",
-    "check:documentation-architecture": "node ./scripts/with-node-heap.mjs node ./scripts/check-documentation-architecture.mjs",
+    "check:documentation-architecture": "node ./scripts/with-node-heap.mjs node ./scripts/check-documentation-architecture.mjs && node ./scripts/with-node-heap.mjs node ./scripts/test-documentation-architecture.mjs",
     "check:foundation-style-boundary": "node ./scripts/with-node-heap.mjs node ./scripts/check-foundation-style-boundary.mjs",
     "check:focus-ring-contract": "node ./scripts/with-node-heap.mjs node ./scripts/check-focus-ring-contract.mjs",
     "check:theme-scale-contract": "node ./scripts/with-node-heap.mjs node ./scripts/check-theme-scale-contract.mjs",

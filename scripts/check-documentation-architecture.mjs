@@ -30,7 +30,19 @@ for (const file of requiredFiles) {
   if (!existsSync(resolve(root, file))) violations.push(`${file} missing`)
 }
 
-for (const retiredPath of ['docs/release', 'release-evidence']) {
+const retiredPaths = [
+  'docs/release',
+  'release-evidence',
+  'docs/release-governance.md',
+  'docs/releases/public-preview.md',
+  'docs/releases/cross-platform-governance.md',
+  'docs/releases/nuget-policy.md',
+  'docs/releases/avalonia-stable-readiness.md',
+  'docs/releases/avalonia-performance-budgets.md',
+  'docs/releases/platform-overrides.md',
+]
+
+for (const retiredPath of retiredPaths) {
   if (existsSync(resolve(root, retiredPath))) {
     violations.push(`${retiredPath} is retired; use docs/releases/`)
   }
@@ -41,7 +53,9 @@ for (const entry of readdirSync(docsRoot, { withFileTypes: true })) {
   if (!entry.isDirectory()) continue
   if (entry.name === 'releases') continue
   if (/^releases?$/u.test(entry.name)) {
-    violations.push(`docs/${entry.name}/ conflicts with the canonical docs/releases/ domain`)
+    violations.push(
+      `docs/${entry.name}/ conflicts with the canonical docs/releases/ domain`,
+    )
   }
 }
 
