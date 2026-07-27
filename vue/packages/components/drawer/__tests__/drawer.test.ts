@@ -465,4 +465,31 @@ describe('Drawer', () => {
       )
     })
   })
+
+  test.each(['ltr', 'rtl', 'ttb', 'btt'] as const)(
+    'viewport-safe direction class matrix: %s keeps edge class without extra wrapper',
+    async (direction) => {
+      const wrapper = _mount(
+        `
+        <el-drawer
+          v-model='visible'
+          direction='${direction}'
+          ref="drawer">
+          <span>${content}</span>
+        </el-drawer>
+        `,
+        () => ({
+          visible: true,
+        })
+      )
+      await nextTick()
+      const drawer = wrapper.find('.el-drawer')
+      expect(drawer.classes()).toContain(direction)
+      expect(drawer.find('.el-drawer__header').exists()).toBe(true)
+      expect(drawer.find('.el-drawer__body').exists()).toBe(true)
+      // Panel is still a direct overlay descendant (focus-trap is slot-only).
+      expect(drawer.element.closest('.el-overlay')).toBeTruthy()
+      expect(wrapper.findAll('.el-drawer')).toHaveLength(1)
+    }
+  )
 })

@@ -67,9 +67,21 @@ safe-area insets: `vue/packages/theme-chalk/src/common/fsus-tokens.scss` (via
 `fsus-core-tokens` on `:root`). Components and SCSS must consume
 `--fsus-safe-area-inset-*` or the unique helpers in
 `vue/packages/theme-chalk/src/mixins/safe-area.scss`
-(`fsus-safe-area-inset`, `fsus-safe-area-max`, `fsus-padding-safe-area`). Direct
+(`fsus-safe-area-inset`, `fsus-safe-area-max`, `fsus-padding-safe-area`,
+`fsus-overlay-scrim`, `fsus-viewport-safe-overlay-host`,
+`fsus-viewport-safe-block-size`, `fsus-inset-safe-area`). Direct
 `env(safe-area-inset-*)` outside the canonical token source is rejected by
 `pnpm run check:viewport-safe-area-contract`.
+
+Overlay geometry is two-layered:
+
+1. **Scrim** (`.el-overlay`, ImageViewer wrapper/mask): `position: fixed; inset: 0`
+   only. Safe-area must never shrink the scrim (no `height: 100%` / `100vh`
+   coverage fallback).
+2. **Interactive content** (Dialog / MessageBox hosts, Drawer chrome,
+   ImageViewer controls): consume the shared helpers above. Components declare
+   only their semantic differences; they must not re-copy `max(gap, safe-area)`
+   formulas.
 
 These custom properties are intentionally overridable in tests and embeds.
 Defaults still resolve from the browser environment when not overridden.
@@ -77,8 +89,9 @@ Defaults still resolve from the browser environment when not overridden.
 The consumer document owns `<meta name="viewport">`, including
 `viewport-fit=cover` when notched-device insets must be non-zero. FsusUI never
 injects or rewrites that meta at runtime. Consumers must not redeclare
-synonymous FsusUI safe-area tokens or patch component-internal selectors to
-reimplement inset math.
+synonymous FsusUI safe-area tokens, invent a second viewport algorithm, or
+patch component-internal selectors (for example `:deep(.el-overlay)` /
+`.el-overlay-dialog`) to reimplement inset math.
 
 ### Spacing Tokens
 

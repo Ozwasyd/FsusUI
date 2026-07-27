@@ -62,7 +62,10 @@ describe('viewport / safe-area runtime contract', () => {
 
     expect(mixinSource).toContain('@function fsus-safe-area-max(')
     expect(mixinSource).toContain('@function fsus-safe-area-inset(')
+    expect(mixinSource).toContain('@function fsus-viewport-safe-block-size(')
     expect(mixinSource).toContain('@mixin fsus-padding-safe-area(')
+    expect(mixinSource).toContain('@mixin fsus-overlay-scrim')
+    expect(mixinSource).toContain('@mixin fsus-viewport-safe-overlay-host')
     expect(mixinSource).toContain("'block-start': 'top'")
     expect(mixinSource).toContain("'inline-end': 'right'")
     // Runtime formula must not emit env(); comments may mention the forbid list.

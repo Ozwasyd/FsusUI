@@ -477,4 +477,29 @@ describe('MessageBox', () => {
       expect(label.textContent).toBe(message)
     })
   })
+
+  test('viewport-safe host: overlay-message-box remains single host with actions reachable in DOM', async () => {
+    silencePromise(
+      MessageBox.confirm('Long body copy for scroll reachability.', 'Title', {
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+      }),
+    )
+    await rAF()
+    const overlay = document.querySelector('.el-overlay.is-message-box')
+    const host = document.querySelector('.el-overlay-message-box')
+    const box = document.querySelector('.el-message-box')
+    const btns = document.querySelector('.el-message-box__btns')
+    expect(overlay).toBeTruthy()
+    expect(host).toBeTruthy()
+    expect(box).toBeTruthy()
+    expect(btns).toBeTruthy()
+    expect(host!.parentElement).toBe(overlay)
+    expect(box!.closest('.el-overlay-message-box')).toBe(host)
+    // No legacy ::after centering pseudo is required by DOM structure.
+    expect(document.querySelectorAll('.el-overlay-message-box').length).toBe(1)
+    MessageBox.close()
+    await rAF()
+  })
 })

@@ -10,13 +10,19 @@
 | basic usage            | 传入 `url-list`，通过 `v-if` 或业务状态控制挂载，监听 `close` 后移除预览器。                    |
 | props / events / slots | 本页 `ImageViewer API` 覆盖公开 props 和 events；当前没有公开 slots。                           |
 | accessibility          | 保留 ESC 关闭能力，确保打开预览时背景内容不可操作；图片应在触发入口处提供上下文文本或替代说明。 |
-| theme token notes      | 跟随公开 overlay、文本、主色、阴影和 motion overlay token。                                     |
+| theme token notes      | 跟随公开 overlay、文本、主色、阴影和 motion overlay token；wrapper/mask 全 viewport 覆盖，控件偏移消费统一 safe-area helper。 |
 | known limitations      | 预览器只负责展示已加载 URL，不处理鉴权、下载、图片安全扫描或错误重试。                          |
 | stability level        | Preview public component。                                                                      |
 
 > 💡 **运行示例**：启动 demo-app（`pnpm dev`，端口 5173）查看交互效果。
 
 ---
+
+## Viewport / safe-area
+
+- wrapper 与 mask 覆盖完整 viewport（scrim 语义，不被 safe-area 缩小）。
+- close / prev / next / actions 使用统一 `max(base, safe-area)` helper，不再以裸
+  `40px` / `30px` 作为相对屏幕边缘的唯一距离；横屏刘海在左或右时两侧导航仍位于安全矩形内。
 
 ## 基础用法
 

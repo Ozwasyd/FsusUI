@@ -3,6 +3,8 @@
 @use 'common/var' as *;
 
 $directions: rtl, ltr, ttb, btt;
+$drawer-block-pad: var(--fsus-space-4);
+$drawer-inline-pad: getCssVar('drawer-padding-primary');
 
 @include b(drawer) {
   @include set-component-css-var('drawer', $drawer);
@@ -29,7 +31,7 @@ $directions: rtl, ltr, ttb, btt;
     color: getCssVar('text-color', 'primary');
     display: flex;
     margin-bottom: 0;
-    padding: var(--fsus-space-4) getCssVar('drawer-padding-primary');
+    padding: $drawer-block-pad $drawer-inline-pad;
     position: relative;
 
     & > :first-child {
@@ -48,7 +50,7 @@ $directions: rtl, ltr, ttb, btt;
   }
 
   @include e(footer) {
-    padding: var(--fsus-space-4) getCssVar('drawer-padding-primary');
+    padding: $drawer-block-pad $drawer-inline-pad;
     text-align: right;
   }
 
@@ -82,41 +84,137 @@ $directions: rtl, ltr, ttb, btt;
 
   &__body {
     flex: 1;
-    padding: var(--fsus-space-4) getCssVar('drawer-padding-primary');
+    padding: $drawer-block-pad $drawer-inline-pad;
     overflow: auto;
     & > * {
       box-sizing: border-box;
     }
   }
 
+  // Edge-attached positioning without redundant height: 100%.
+  // Background stays flush to the screen edge; safe-area enters content padding.
   &.ltr,
   &.rtl {
-    height: 100%;
     top: 0;
     bottom: 0;
   }
 
   &.ttb,
   &.btt {
-    width: 100%;
     left: 0;
     right: 0;
   }
 
   &.ltr {
     left: 0;
+
+    .#{$namespace}-drawer__header {
+      @include fsus-padding-safe-area(top, $drawer-block-pad);
+      @include fsus-padding-safe-area(left, $drawer-inline-pad);
+    }
+
+    .#{$namespace}-drawer__body {
+      @include fsus-padding-safe-area(left, $drawer-inline-pad);
+    }
+
+    .#{$namespace}-drawer__footer {
+      @include fsus-padding-safe-area(bottom, $drawer-block-pad);
+      @include fsus-padding-safe-area(left, $drawer-inline-pad);
+    }
+
+    &:not(:has(.#{$namespace}-drawer__header)) {
+      .#{$namespace}-drawer__body {
+        @include fsus-padding-safe-area(top, $drawer-block-pad);
+      }
+    }
+
+    &:not(:has(.#{$namespace}-drawer__footer)) {
+      .#{$namespace}-drawer__body {
+        @include fsus-padding-safe-area(bottom, $drawer-block-pad);
+      }
+    }
   }
 
   &.rtl {
     right: 0;
+
+    .#{$namespace}-drawer__header {
+      @include fsus-padding-safe-area(top, $drawer-block-pad);
+      @include fsus-padding-safe-area(right, $drawer-inline-pad);
+    }
+
+    .#{$namespace}-drawer__body {
+      @include fsus-padding-safe-area(right, $drawer-inline-pad);
+    }
+
+    .#{$namespace}-drawer__footer {
+      @include fsus-padding-safe-area(bottom, $drawer-block-pad);
+      @include fsus-padding-safe-area(right, $drawer-inline-pad);
+    }
+
+    &:not(:has(.#{$namespace}-drawer__header)) {
+      .#{$namespace}-drawer__body {
+        @include fsus-padding-safe-area(top, $drawer-block-pad);
+      }
+    }
+
+    &:not(:has(.#{$namespace}-drawer__footer)) {
+      .#{$namespace}-drawer__body {
+        @include fsus-padding-safe-area(bottom, $drawer-block-pad);
+      }
+    }
   }
 
   &.ttb {
     top: 0;
+
+    .#{$namespace}-drawer__header {
+      @include fsus-padding-safe-area(top, $drawer-block-pad);
+      @include fsus-padding-safe-area(left, $drawer-inline-pad);
+      @include fsus-padding-safe-area(right, $drawer-inline-pad);
+    }
+
+    .#{$namespace}-drawer__body {
+      @include fsus-padding-safe-area(left, $drawer-inline-pad);
+      @include fsus-padding-safe-area(right, $drawer-inline-pad);
+    }
+
+    .#{$namespace}-drawer__footer {
+      @include fsus-padding-safe-area(left, $drawer-inline-pad);
+      @include fsus-padding-safe-area(right, $drawer-inline-pad);
+    }
+
+    &:not(:has(.#{$namespace}-drawer__header)) {
+      .#{$namespace}-drawer__body {
+        @include fsus-padding-safe-area(top, $drawer-block-pad);
+      }
+    }
   }
 
   &.btt {
     bottom: 0;
+
+    .#{$namespace}-drawer__header {
+      @include fsus-padding-safe-area(left, $drawer-inline-pad);
+      @include fsus-padding-safe-area(right, $drawer-inline-pad);
+    }
+
+    .#{$namespace}-drawer__body {
+      @include fsus-padding-safe-area(left, $drawer-inline-pad);
+      @include fsus-padding-safe-area(right, $drawer-inline-pad);
+    }
+
+    .#{$namespace}-drawer__footer {
+      @include fsus-padding-safe-area(bottom, $drawer-block-pad);
+      @include fsus-padding-safe-area(left, $drawer-inline-pad);
+      @include fsus-padding-safe-area(right, $drawer-inline-pad);
+    }
+
+    &:not(:has(.#{$namespace}-drawer__footer)) {
+      .#{$namespace}-drawer__body {
+        @include fsus-padding-safe-area(bottom, $drawer-block-pad);
+      }
+    }
   }
 }
 
@@ -128,8 +226,7 @@ $directions: rtl, ltr, ttb, btt;
 
     @each $direction in $directions {
       .#{$direction} {
-        transition: transform
-          getCssVar('transition-duration')
+        transition: transform getCssVar('transition-duration')
           getCssVar('transition-function-fast-bezier');
       }
     }

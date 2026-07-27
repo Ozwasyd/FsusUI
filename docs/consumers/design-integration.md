@@ -34,7 +34,10 @@ The consumer owns:
 
 FsusUI does not rewrite `<meta name="viewport">` at runtime. Consumers must not
 redeclare synonymous safe-area tokens, invent parallel `--fsus-safe-*` aliases,
-or override component-internal selectors to reimplement safe-area math.
+override component-internal selectors (including `:deep(.el-overlay)`,
+`.el-overlay-dialog`, `.el-overlay-message-box`, Drawer direction classes, or
+ImageViewer control selectors) to reimplement safe-area or viewport math, or
+ship a second viewport algorithm beside the FsusUI helpers.
 
 ## 2. Required adoption sequence
 

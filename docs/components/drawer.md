@@ -10,7 +10,7 @@
 | basic usage            | 使用 `v-model` 控制显示，`direction` 决定方向，`size` 控制宽高，`footer` slot 放置操作。         |
 | props / events / slots | 本页 `API` 覆盖公开 props、events、slots 和 exposes。                                            |
 | accessibility          | 默认保留标题区域；隐藏标题时应通过业务内容提供等价名称；可调整大小时不要让关键控件离开可视区域。 |
-| theme token notes      | 跟随公开 surface、文本、边框、阴影、圆角、backdrop blur 和 panel/overlay motion token。          |
+| theme token notes      | 跟随公开 surface、文本、边框、阴影、圆角、backdrop blur 和 panel/overlay motion token；方向相关 safe-area 由统一 helper 写入 header/body/footer 内容内边距。 |
 | known limitations      | 内容懒渲染，依赖 DOM 的逻辑应在 `open` / `opened` 后执行；嵌套 Drawer 需要单独验证滚动锁定。     |
 | stability level        | Preview public component。                                                                       |
 
@@ -21,6 +21,17 @@
 ## 基础用法
 
 通过 `v-model` 控制显示，`direction` 设置滑出方向，`size` 设置宽度/高度（默认 30%）。
+
+## Viewport / safe-area
+
+Drawer 背景贴齐屏幕边缘；safe-area 进入内容内边距，不离开边缘：
+
+- `ltr`：top / bottom / left
+- `rtl`：top / bottom / right
+- `ttb`：top / left / right
+- `btt`：bottom / left / right
+
+遮罩仍由 Overlay scrim 覆盖完整 viewport。不要在 consumer 中补丁式覆盖 Drawer 内部几何。
 
 ## 无标题
 

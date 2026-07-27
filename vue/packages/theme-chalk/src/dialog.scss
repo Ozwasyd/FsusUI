@@ -20,6 +20,9 @@
   box-shadow: getCssVar('dialog', 'box-shadow');
   box-sizing: border-box;
   width: var(#{getCssVarName('dialog-width')}, 50%);
+  // Non-fullscreen max block-size: viewport − top/bottom safe gap (unique helper).
+  max-block-size: fsus-viewport-safe-block-size($fsus-overlay-content-gap);
+  overflow: auto;
 
   &:focus {
     outline: none !important;
@@ -33,18 +36,62 @@
     @include set-css-var-value('dialog-width', 100%);
     @include set-css-var-value('dialog-margin-top', 0);
 
-    margin-bottom: 0;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+    // Stretch to the fixed host (which drops safe padding when hosting fullscreen).
+    min-block-size: 100%;
+    max-block-size: none;
     height: 100%;
     overflow: auto;
+    border-radius: 0;
+
+    // Fullscreen surface covers the viewport; interactive chrome avoids safe-area.
+    @include e(header) {
+      @include fsus-padding-safe-area(top, var(--fsus-space-4));
+      @include fsus-padding-safe-area(
+        right,
+        getCssVar('dialog', 'padding-primary')
+      );
+      @include fsus-padding-safe-area(
+        left,
+        getCssVar('dialog', 'padding-primary')
+      );
+    }
+
+    @include e(body) {
+      @include fsus-padding-safe-area(
+        right,
+        getCssVar('dialog', 'padding-primary')
+      );
+      @include fsus-padding-safe-area(
+        left,
+        getCssVar('dialog', 'padding-primary')
+      );
+    }
+
+    @include e(footer) {
+      @include fsus-padding-safe-area(bottom, var(--fsus-space-4));
+      @include fsus-padding-safe-area(
+        right,
+        getCssVar('dialog', 'padding-primary')
+      );
+      @include fsus-padding-safe-area(
+        left,
+        getCssVar('dialog', 'padding-primary')
+      );
+    }
+
+    // Close control sits in the header corner — keep it inside the safe rectangle.
+    @include e(headerbtn) {
+      @include fsus-inset-safe-area(top, 6px);
+      @include fsus-inset-safe-area(right, 0px);
+    }
   }
 
   @include e(wrapper) {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    overflow: auto;
+    // Legacy host alias: same interactive host geometry as overlay-dialog.
+    @include fsus-viewport-safe-overlay-host($fsus-overlay-content-gap);
     margin: 0;
   }
 
@@ -113,12 +160,18 @@
 }
 
 .#{$namespace}-overlay-dialog {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  overflow: auto;
+  // Interactive content host — not the scrim. Safe gap + scroll + centering.
+  @include fsus-viewport-safe-overlay-host($fsus-overlay-content-gap);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  // Fullscreen paper must edge-bleed; drop host padding so the surface covers
+  // the full viewport while header/body/footer absorb safe-area above.
+  &:has(.#{$namespace}-dialog.is-fullscreen) {
+    padding: 0;
+    display: block;
+  }
 }
 
 .dialog-fade-enter-active {

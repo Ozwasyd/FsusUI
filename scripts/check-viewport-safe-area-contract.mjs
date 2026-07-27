@@ -31,6 +31,32 @@ const VIEWPORT_BLOCK_WITH_VH_FALLBACK =
 const DUAL_VH_DVH_HEIGHT =
   /(?:^|[;{])\s*height\s*:\s*100vh\s*;\s*height\s*:\s*100dvh\s*;/giu
 
+/** Overlay/Dialog/MessageBox/Drawer/ImageViewer geometry sources (issue #261). */
+export const VIEWPORT_OVERLAY_GEOMETRY_SOURCES = [
+  'vue/packages/theme-chalk/src/overlay.scss',
+  'vue/packages/theme-chalk/src/dialog.scss',
+  'vue/packages/theme-chalk/src/message-box.scss',
+  'vue/packages/theme-chalk/src/drawer.scss',
+  'vue/packages/theme-chalk/src/image-viewer.scss',
+]
+
+/** Scrim roots that must stay full-viewport (never safe-area shrunk). */
+export const VIEWPORT_OVERLAY_SCRIM_SOURCES = [
+  'vue/packages/theme-chalk/src/overlay.scss',
+]
+
+const SCRIM_SAFE_AREA_EDGE =
+  /(?:^|[;{])\s*(?:top|right|bottom|left)\s*:\s*[^;]*var\(\s*--fsus-safe-area-inset-/giu
+
+const OVERLAY_HEIGHT_100_PERCENT =
+  /(?:^|[;{])\s*height\s*:\s*100%\s*;/giu
+
+const BARE_100VH =
+  /(?:^|[;{])\s*(?:height|min-height|max-height|block-size|min-block-size|max-block-size)\s*:\s*100vh\s*;/giu
+
+const COMPONENT_DIRECT_ENV =
+  /env\(\s*safe-area-inset-(?:top|right|bottom|left)\b/giu
+
 const stripComments = (source) =>
   source
     .replace(/\/\*[\s\S]*?\*\//gu, '')
@@ -193,12 +219,89 @@ export const findViewportSafeAreaViolations = (options = {}) => {
   return violations
 }
 
+/**
+ * Fail closed on overlay geometry regressions (issue #261):
+ * - scrim must not be inset by safe-area tokens
+ * - overlay.scss must not reintroduce height: 100%
+ * - overlay geometry sources must not use bare 100vh or direct env()
+ * @param {{ root?: string }} [options]
+ * @returns {string[]}
+ */
+export const findViewportOverlayGeometryViolations = (options = {}) => {
+  const baseRoot = options.root ? path.resolve(options.root) : root
+  const violations = []
+
+  for (const relativePath of VIEWPORT_OVERLAY_SCRIM_SOURCES) {
+    const absolutePath = path.join(baseRoot, relativePath)
+    if (!fs.existsSync(absolutePath)) {
+      // Fixture roots may omit production files; skip missing scrim sources.
+      continue
+    }
+    const source = stripComments(fs.readFileSync(absolutePath, 'utf8'))
+
+    OVERLAY_HEIGHT_100_PERCENT.lastIndex = 0
+    for (const match of source.matchAll(OVERLAY_HEIGHT_100_PERCENT)) {
+      violations.push(
+        `${relativePath}:${lineForIndex(source, match.index ?? 0)} overlay scrim must not use height: 100%`,
+      )
+    }
+
+    SCRIM_SAFE_AREA_EDGE.lastIndex = 0
+    for (const match of source.matchAll(SCRIM_SAFE_AREA_EDGE)) {
+      violations.push(
+        `${relativePath}:${lineForIndex(source, match.index ?? 0)} overlay scrim must not shrink edges with safe-area tokens`,
+      )
+    }
+  }
+
+  for (const relativePath of VIEWPORT_OVERLAY_GEOMETRY_SOURCES) {
+    const absolutePath = path.join(baseRoot, relativePath)
+    if (!fs.existsSync(absolutePath)) continue
+    const source = stripComments(fs.readFileSync(absolutePath, 'utf8'))
+
+    BARE_100VH.lastIndex = 0
+    for (const match of source.matchAll(BARE_100VH)) {
+      violations.push(
+        `${relativePath}:${lineForIndex(source, match.index ?? 0)} bare 100vh viewport coverage is forbidden`,
+      )
+    }
+
+    COMPONENT_DIRECT_ENV.lastIndex = 0
+    for (const match of source.matchAll(COMPONENT_DIRECT_ENV)) {
+      violations.push(
+        `${relativePath}:${lineForIndex(source, match.index ?? 0)} direct env(safe-area-inset-*) outside canonical token source`,
+      )
+    }
+
+    // Reject per-component formula copy that bypasses the shared helper:
+    // hard-coded max(Npx, var(--fsus-safe-area-inset-*)) outside safe-area.scss
+    // is allowed in compiled CSS, but source should use fsus-* helpers.
+    // Enforce that sources still call the shared mixins rather than only raw
+    // max() with safe-area vars without helper usage.
+    if (
+      /max\(\s*[^)]*var\(\s*--fsus-safe-area-inset-/.test(source) &&
+      !/fsus-(?:safe-area-max|padding-safe-area|inset-safe-area|viewport-safe-overlay-host|overlay-scrim|viewport-safe-block-size)/.test(
+        source,
+      )
+    ) {
+      violations.push(
+        `${relativePath}: component copies safe-area max() formula without unique helper`,
+      )
+    }
+  }
+
+  return violations
+}
+
 const isMain =
   process.argv[1] &&
   path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
 
 if (isMain) {
-  const violations = findViewportSafeAreaViolations()
+  const violations = [
+    ...findViewportSafeAreaViolations(),
+    ...findViewportOverlayGeometryViolations(),
+  ]
 
   if (violations.length > 0) {
     console.error(

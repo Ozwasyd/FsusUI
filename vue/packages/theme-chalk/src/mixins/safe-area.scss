@@ -4,6 +4,10 @@
 // Unique safe-area composition helpers. Components must not re-copy
 // max(base, inset) formulas or read browser safe-area env functions directly.
 // Canonical safe-area env sources live only in common/fsus-tokens.scss.
+//
+// Viewport-overlay geometry (issue #261) is also owned here:
+// - Scrim: full browser-drawable viewport; never shrink by safe-area.
+// - Interactive host/content: consume canonical vars via these helpers only.
 
 $fsus-safe-area-sides: (
   'top': 'top',
@@ -15,6 +19,9 @@ $fsus-safe-area-sides: (
   'inline-start': 'left',
   'inline-end': 'right',
 );
+
+/// Default outer gap for centered overlay interactive hosts (Dialog / MessageBox).
+$fsus-overlay-content-gap: 16px !default;
 
 @function fsus-safe-area-physical-side($side) {
   $key: '#{$side}';
@@ -37,7 +44,43 @@ $fsus-safe-area-sides: (
   @return string.unquote('max(#{$base}, #{fsus-safe-area-inset($side)})');
 }
 
+/// Available block size inside the safe viewport after gap/safe-area on both ends.
+@function fsus-viewport-safe-block-size($gap: $fsus-overlay-content-gap) {
+  @return string.unquote(
+    'calc(var(--fsus-viewport-block-size) - #{fsus-safe-area-max($gap, top)} - #{fsus-safe-area-max($gap, bottom)})'
+  );
+}
+
 /// padding-<side>: max($base, safe-area inset).
 @mixin fsus-padding-safe-area($side, $base: 0px) {
   padding-#{$side}: fsus-safe-area-max($base, $side);
+}
+
+/// Four-direction padding: max($base, safe-area) on every physical side.
+@mixin fsus-padding-safe-area-box($base: 0px) {
+  @include fsus-padding-safe-area(top, $base);
+  @include fsus-padding-safe-area(right, $base);
+  @include fsus-padding-safe-area(bottom, $base);
+  @include fsus-padding-safe-area(left, $base);
+}
+
+/// Full-viewport scrim coverage. Safe-area must NEVER shrink this layer.
+/// Do not add height: 100% / 100vh / 100dvh coverage here.
+@mixin fsus-overlay-scrim {
+  position: fixed;
+  inset: 0;
+}
+
+/// Interactive overlay host: fixed full viewport, scrollable, four-side safe gap.
+/// Used by Dialog / MessageBox content hosts — never by the scrim root.
+@mixin fsus-viewport-safe-overlay-host($gap: $fsus-overlay-content-gap) {
+  @include fsus-overlay-scrim;
+  overflow: auto;
+  box-sizing: border-box;
+  @include fsus-padding-safe-area-box($gap);
+}
+
+/// Absolutely positioned control offset from one physical edge.
+@mixin fsus-inset-safe-area($side, $base: 0px) {
+  #{$side}: fsus-safe-area-max($base, $side);
 }

@@ -172,4 +172,35 @@ describe('<image-viewer /> keyboard and pointer scope', () => {
     expect(wrapper.emitted('close')).toEqual([[]])
     wrapper.unmount()
   })
+
+  test('viewport-safe controls: close/prev/next/actions remain present and focusable', async () => {
+    const wrapper = mount(
+      <ImageViewer
+        urlList={[
+          `${IMAGE_SUCCESS}?viewer-safe-1`,
+          `${IMAGE_SUCCESS}?viewer-safe-2`,
+        ]}
+      />,
+    )
+    await doubleWait()
+
+    const close = wrapper.find('.el-image-viewer__close')
+    const prev = wrapper.find('.el-image-viewer__prev')
+    const next = wrapper.find('.el-image-viewer__next')
+    const actions = wrapper.find('.el-image-viewer__actions')
+    const mask = wrapper.find('.el-image-viewer__mask')
+    const viewerWrapper = wrapper.find('.el-image-viewer__wrapper')
+
+    expect(viewerWrapper.exists()).toBe(true)
+    expect(mask.exists()).toBe(true)
+    for (const control of [close, prev, next, actions]) {
+      expect(control.exists()).toBe(true)
+    }
+    expect(close.attributes('tabindex')).toBe('0')
+    expect(prev.attributes('tabindex')).toBe('0')
+    expect(next.attributes('tabindex')).toBe('0')
+    // No extra geometry wrapper beyond the existing wrapper surface.
+    expect(wrapper.findAll('.el-image-viewer__wrapper')).toHaveLength(1)
+    wrapper.unmount()
+  })
 })

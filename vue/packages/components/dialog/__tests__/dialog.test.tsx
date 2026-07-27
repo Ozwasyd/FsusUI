@@ -378,4 +378,27 @@ describe('Dialog.vue', () => {
       )
     })
   })
+
+  test('viewport-safe host: overlay-dialog remains the sole interactive host (no extra wrapper)', async () => {
+    const wrapper = mount(
+      <Dialog modelValue={true} fullscreen>
+        {AXIOM}
+      </Dialog>,
+    )
+    await nextTick()
+    await rAF()
+    await nextTick()
+
+    const overlay = wrapper.find('.el-overlay')
+    const host = wrapper.find('.el-overlay-dialog')
+    const surface = wrapper.find('.el-dialog')
+    expect(overlay.exists()).toBe(true)
+    expect(host.exists()).toBe(true)
+    expect(surface.exists()).toBe(true)
+    expect(surface.classes()).toContain('is-fullscreen')
+    // DOM depth: overlay > overlay-dialog > focus-trap slot > dialog surface
+    expect(host.element.parentElement).toBe(overlay.element)
+    expect(surface.element.closest('.el-overlay-dialog')).toBe(host.element)
+    expect(wrapper.findAll('.el-overlay-dialog')).toHaveLength(1)
+  })
 })

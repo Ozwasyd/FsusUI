@@ -45,6 +45,29 @@ describe('Overlay.vue', () => {
     expect(wrapper.find(selector).exists()).toBe(true)
   })
 
+  test('mask true/false share fixed full-viewport boundary (inset 0)', async () => {
+    const wrapperMasked = mount(() => <Overlay mask>{AXIOM}</Overlay>)
+    const maskedEl = wrapperMasked.find('.el-overlay').element as HTMLElement
+    // Scrim class owns fixed + inset: 0 via theme; component only sets z-index.
+    expect(maskedEl.style.position).toBe('')
+    expect(maskedEl.getAttribute('style') ?? '').not.toMatch(/height:\s*100%/)
+
+    const wrapperBare = mount(() => (
+      <Overlay mask={false} overlayClass="bare-overlay">
+        {AXIOM}
+      </Overlay>
+    ))
+    const bareEl = wrapperBare.find('.bare-overlay').element as HTMLElement
+    expect(bareEl.style.position).toBe('fixed')
+    expect(bareEl.style.inset).toBe('0px')
+    // No per-side safe-area shrink on the mask=false host.
+    expect(bareEl.style.top).toBe('')
+    expect(bareEl.style.right).toBe('')
+    expect(bareEl.style.bottom).toBe('')
+    expect(bareEl.style.left).toBe('')
+    expect(bareEl.style.height).toBe('')
+  })
+
   test('global', async () => {
     const testNamespace = 'test'
     const callout = () => {

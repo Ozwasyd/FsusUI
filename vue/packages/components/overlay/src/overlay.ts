@@ -77,13 +77,12 @@ export default defineComponent({
             'div',
             {
               class: props.overlayClass,
+              // mask=false keeps the same fixed full-viewport boundary as the
+              // scrim (inset: 0) without applying scrim paint styles.
               style: {
                 zIndex: props.zIndex,
                 position: 'fixed',
-                top: '0px',
-                right: '0px',
-                bottom: '0px',
-                left: '0px',
+                inset: '0',
               } as CSSProperties,
             },
             [renderSlot(slots, 'default')]

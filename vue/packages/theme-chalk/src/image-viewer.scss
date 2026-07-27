@@ -9,11 +9,8 @@
 
 @include b(image-viewer) {
   @include e(wrapper) {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+    // Scrim-equivalent surface: full viewport coverage, never safe-area shrunk.
+    @include fsus-overlay-scrim;
   }
 
   @include e(btn) {
@@ -65,8 +62,8 @@
   }
 
   @include e(close) {
-    top: 40px;
-    right: 40px;
+    @include fsus-inset-safe-area(top, 40px);
+    @include fsus-inset-safe-area(right, 40px);
     width: 40px;
     height: 40px;
     font-size: 40px;
@@ -84,7 +81,7 @@
 
   @include e(actions) {
     left: 50%;
-    bottom: 30px;
+    @include fsus-inset-safe-area(bottom, 30px);
     transform: translateX(-50%);
     width: 282px;
     height: 44px;
@@ -123,14 +120,14 @@
   @include e(prev) {
     top: 50%;
     transform: translateY(-50%);
-    left: 40px;
+    @include fsus-inset-safe-area(left, 40px);
     @include op-icon();
   }
 
   @include e(next) {
     top: 50%;
     transform: translateY(-50%);
-    right: 40px;
+    @include fsus-inset-safe-area(right, 40px);
     text-indent: 2px;
     @include op-icon();
   }
@@ -140,11 +137,9 @@
   }
 
   @include e(mask) {
+    // Full-viewport mask under the controls; never safe-area shrunk.
     position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
+    inset: 0;
     opacity: 1;
     background: var(--fsus-image-viewer-overlay-bg, rgba(0, 0, 0, 0.72));
     backdrop-filter: blur(var(--fsus-backdrop-blur-overlay, 0px))

@@ -21,10 +21,13 @@
   font-size: getCssVar('messagebox-font-size');
   box-shadow: var(--fsus-shadow-panel, none);
   text-align: left;
-  overflow: hidden;
+  overflow: auto;
   backface-visibility: hidden;
   // To avoid small screen overflowing, see #11919
   box-sizing: border-box;
+  // Fit inside the safe interactive host (unique viewport helper).
+  max-block-size: fsus-viewport-safe-block-size($fsus-overlay-content-gap);
+  margin-block: auto;
 
   &:focus {
     outline: none !important;
@@ -32,22 +35,13 @@
 
   @at-root .#{$namespace}-overlay.is-message-box {
     .#{$namespace}-overlay-message-box {
+      // Interactive content host — not the scrim. Drop the ::after centering
+      // hack so short/large-type viewports can still scroll to actions.
+      @include fsus-viewport-safe-overlay-host($fsus-overlay-content-gap);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       text-align: center;
-      position: fixed;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      padding: 16px;
-      overflow: auto;
-
-      &::after {
-        content: '';
-        display: inline-block;
-        height: 100%;
-        width: 0;
-        vertical-align: middle;
-      }
     }
   }
 

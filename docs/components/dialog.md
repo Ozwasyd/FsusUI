@@ -10,7 +10,7 @@
 | basic usage            | 使用 `v-model` 控制显示，`title` 或 `header` slot 提供标题，`footer` slot 放置主次操作。      |
 | props / events / slots | 本页 `API` 覆盖公开 props、events、slots 和 exposes。                                         |
 | accessibility          | 必须提供可读标题；自定义 `header` 时保留 `titleId`；避免在 Dialog 内打开无必要的嵌套 Dialog。 |
-| theme token notes      | 跟随公开 surface、文本、边框、阴影、圆角、backdrop blur 和 panel/overlay motion token。       |
+| theme token notes      | 跟随公开 surface、文本、边框、阴影、圆角、backdrop blur 和 panel/overlay motion token；交互几何消费 `#260` canonical viewport/safe-area 变量与统一 SCSS helper（见 `docs/theme/tokens.md`）。 |
 | known limitations      | Teleport 内容不继承 SFC scoped 样式；嵌套 Dialog 必须显式处理 `append-to-body` 和焦点顺序。   |
 | stability level        | Preview public component。                                                                    |
 
@@ -41,6 +41,13 @@
 ## 全屏
 
 设置 `fullscreen` 为 `true` 打开全屏对话框。
+
+## Viewport / safe-area
+
+- 遮罩（scrim）始终 `position: fixed; inset: 0`，不会被 safe-area 缩小。
+- `.el-overlay-dialog` 通过统一 helper 提供四方向安全间距、滚动与居中；非全屏 Dialog 的 `max-block-size` 由 `--fsus-viewport-block-size` 与上下 safe-area/基础间距共同计算。
+- 全屏表面可铺满 viewport，但 header/body/footer 交互内容避开安全区。
+- 不要在 consumer 中用 `:deep(.el-overlay-dialog)` 等方式重写几何。
 
 ## 销毁内容
 
