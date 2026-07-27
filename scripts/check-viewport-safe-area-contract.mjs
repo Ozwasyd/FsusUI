@@ -293,6 +293,214 @@ export const findViewportOverlayGeometryViolations = (options = {}) => {
   return violations
 }
 
+/**
+ * Issue #262: safe-area visual matrix must stay wired into existing boundary
+ * infrastructure with real geometry assertions (not screenshot-only).
+ *
+ * @param {{ root?: string }} [options]
+ * @returns {string[]}
+ */
+export function findSafeAreaVisualMatrixViolations(options = {}) {
+  const baseRoot = options.root ? path.resolve(options.root) : root
+  const violations = []
+
+  const profilePath = path.join(baseRoot, 'scripts/safe-area-profiles.mjs')
+  const assertPath = path.join(
+    baseRoot,
+    'vue/tests/support/dom-layout-assertions.ts',
+  )
+  const supportProfilePath = path.join(
+    baseRoot,
+    'vue/tests/support/safe-area-profile.ts',
+  )
+  const fixturePath = path.join(
+    baseRoot,
+    'vue/packages/demo-app/src/AuditFixtures.vue',
+  )
+  const matrixSpecPath = path.join(
+    baseRoot,
+    'vue/tests/visual-boundary/safe-area-overlay-matrix.spec.ts',
+  )
+  const boundaryConfigPath = path.join(
+    baseRoot,
+    'vue/playwright.boundary-audit.config.ts',
+  )
+  const packageJsonPath = path.join(baseRoot, 'package.json')
+
+  const requiredFiles = {
+    'scripts/safe-area-profiles.mjs': profilePath,
+    'vue/tests/support/dom-layout-assertions.ts': assertPath,
+    'vue/tests/support/safe-area-profile.ts': supportProfilePath,
+    'vue/packages/demo-app/src/AuditFixtures.vue': fixturePath,
+    'vue/tests/visual-boundary/safe-area-overlay-matrix.spec.ts': matrixSpecPath,
+    'vue/playwright.boundary-audit.config.ts': boundaryConfigPath,
+    'package.json': packageJsonPath,
+  }
+
+  for (const [label, filePath] of Object.entries(requiredFiles)) {
+    if (!fs.existsSync(filePath)) {
+      violations.push(`safe-area visual matrix missing required file: ${label}`)
+    }
+  }
+
+  if (violations.length > 0) return violations
+
+  const profileSource = fs.readFileSync(profilePath, 'utf8')
+  const assertSource = fs.readFileSync(assertPath, 'utf8')
+  const supportProfileSource = fs.readFileSync(supportProfilePath, 'utf8')
+  const fixtureSource = fs.readFileSync(fixturePath, 'utf8')
+  const matrixSpecSource = fs.readFileSync(matrixSpecPath, 'utf8')
+  const boundaryConfigSource = fs.readFileSync(boundaryConfigPath, 'utf8')
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
+
+  for (const id of [
+    'no-inset',
+    'portrait-notch',
+    'landscape-notch',
+    'short-visual',
+  ]) {
+    if (!profileSource.includes(`'${id}'`)) {
+      violations.push(
+        `scripts/safe-area-profiles.mjs missing SafeAreaProfile id ${id}`,
+      )
+    }
+  }
+
+  if (
+    !profileSource.includes('top: 47') ||
+    !profileSource.includes('bottom: 34') ||
+    !profileSource.includes('right: 59') ||
+    !profileSource.includes('left: 59') ||
+    !profileSource.includes('height: 430')
+  ) {
+    violations.push(
+      'scripts/safe-area-profiles.mjs must encode portrait/landscape/short inset geometry from issue #262',
+    )
+  }
+
+  const assertionNames = [
+    'assertScrimCoversViewport',
+    'assertControlsInsideSafeRect',
+    'assertOverlayActionsReachable',
+    'assertNoBodyOverflowLeak',
+    'assertDirectionalDrawerSafeInsets',
+  ]
+
+  for (const name of assertionNames) {
+    if (!assertSource.includes(`export const ${name}`)) {
+      violations.push(
+        `vue/tests/support/dom-layout-assertions.ts missing shared assertion ${name}`,
+      )
+    }
+    if (!matrixSpecSource.includes(name)) {
+      violations.push(
+        `safe-area matrix spec must call shared assertion ${name} (geometry, not screenshot-only)`,
+      )
+    }
+  }
+
+  if (
+    /toHaveScreenshot|expect\(.*\)\.toMatchSnapshot/.test(matrixSpecSource) &&
+    !assertionNames.every((name) => matrixSpecSource.includes(name))
+  ) {
+    violations.push(
+      'safe-area matrix must not degrade to screenshot-only acceptance',
+    )
+  }
+
+  if (!supportProfileSource.includes('scripts/safe-area-profiles.mjs')) {
+    violations.push(
+      'vue/tests/support/safe-area-profile.ts must re-export the canonical scripts/safe-area-profiles.mjs source',
+    )
+  }
+
+  if (!supportProfileSource.includes('applySafeAreaProfile')) {
+    violations.push(
+      'vue/tests/support/safe-area-profile.ts must expose applySafeAreaProfile (CSS variable override only)',
+    )
+  }
+
+  if (
+    /getBoundingClientRect\s*=|prototype\.getBoundingClientRect/.test(
+      matrixSpecSource,
+    ) ||
+    /getBoundingClientRect\s*=|prototype\.getBoundingClientRect/.test(
+      supportProfileSource,
+    )
+  ) {
+    violations.push(
+      'safe-area matrix must not mock getBoundingClientRect()',
+    )
+  }
+
+  if (
+    /\.el-overlay\s*\{[^}]*inset\s*:\s*0\s*!important/s.test(fixtureSource) ||
+    /audit-floating-overlay/.test(
+      fixtureSource.match(
+        /data-safe-area-lab[\s\S]*?(?=<div class="audit-grid"|$)/u,
+      )?.[0] ?? '',
+    )
+  ) {
+    violations.push(
+      'AuditFixtures safe-area lab must not patch overlay geometry with test-only CSS classes',
+    )
+  }
+
+  for (const surface of [
+    'overlay',
+    'dialog',
+    'dialog-fullscreen',
+    'message-box',
+    'drawer-ltr',
+    'drawer-rtl',
+    'drawer-ttb',
+    'drawer-btt',
+    'image-viewer',
+  ]) {
+    if (!fixtureSource.includes(`data-safe-area-open="${surface}"`)) {
+      violations.push(
+        `AuditFixtures.vue missing stable safe-area open control for ${surface}`,
+      )
+    }
+  }
+
+  if (!/name:\s*['"]safe-area-chromium['"]/.test(boundaryConfigSource)) {
+    violations.push(
+      'vue/playwright.boundary-audit.config.ts must declare safe-area-chromium project',
+    )
+  }
+  if (!/name:\s*['"]safe-area-webkit['"]/.test(boundaryConfigSource)) {
+    violations.push(
+      'vue/playwright.boundary-audit.config.ts must declare safe-area-webkit project (Chromium-only is not Safari evidence)',
+    )
+  }
+  if (!/Desktop Safari|webkit/i.test(boundaryConfigSource)) {
+    violations.push(
+      'vue/playwright.boundary-audit.config.ts safe-area lane must use WebKit/Desktop Safari',
+    )
+  }
+
+  const scripts = packageJson.scripts ?? {}
+  for (const name of Object.keys(scripts)) {
+    if (
+      /ios-overlay|safe-area-matrix|check:ios/i.test(name) &&
+      name !== 'check:viewport-safe-area-contract'
+    ) {
+      violations.push(
+        `package.json must not introduce parallel safe-area command ${name}; use audit:visual-boundaries`,
+      )
+    }
+  }
+
+  if (!scripts['audit:visual-boundaries']?.includes('boundary-audit.config')) {
+    violations.push(
+      'package.json audit:visual-boundaries must remain the boundary lane entry for the safe-area matrix',
+    )
+  }
+
+  return violations
+}
+
 const isMain =
   process.argv[1] &&
   path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
@@ -301,6 +509,7 @@ if (isMain) {
   const violations = [
     ...findViewportSafeAreaViolations(),
     ...findViewportOverlayGeometryViolations(),
+    ...findSafeAreaVisualMatrixViolations(),
   ]
 
   if (violations.length > 0) {

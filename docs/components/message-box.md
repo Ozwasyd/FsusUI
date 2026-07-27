@@ -61,7 +61,8 @@ Promise 返回值是稳定的 `FsusResult<MessageBoxData>`。业务侧需要复�
 硬编码时长。
 
 MessageBox 交互宿主与 Dialog 共用统一 viewport-safe overlay helper：四方向安全间距、
-可滚动居中，小屏/横屏/大字号下按钮区可滚动到达。不要复制 `max(gap, safe-area)`
+可滚动居中，小屏/横屏/大字号下按钮区可滚动到达。`pnpm audit:visual-boundaries`
+safe-area 矩阵在 `short-visual` 等 profile 下断言 actions 可达。不要复制 `max(gap, safe-area)`
 公式或用 product class 覆盖 `.el-overlay-message-box` 几何。
 
 ---

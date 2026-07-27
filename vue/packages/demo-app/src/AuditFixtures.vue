@@ -9,6 +9,156 @@
       <p>{{ auditComponentNames.length }} components · {{ auditState }}</p>
     </header>
 
+    <!--
+      Safe-area lab (#262): public component APIs only.
+      No modal-class geometry patches, no test-only forks, no selector overrides.
+      Profile overrides are applied by tests via #260 CSS variables on :root.
+    -->
+    <section class="audit-safe-area-lab" data-safe-area-lab>
+      <h2 class="audit-safe-area-lab__title">Safe-area surfaces</h2>
+      <div class="audit-safe-area-lab__controls">
+        <el-button
+          data-safe-area-open="overlay"
+          @click="safeOverlayVisible = true"
+        >
+          Open Overlay
+        </el-button>
+        <el-button
+          data-safe-area-open="dialog"
+          @click="openSafeDialog(false)"
+        >
+          Open Dialog
+        </el-button>
+        <el-button
+          data-safe-area-open="dialog-fullscreen"
+          @click="openSafeDialog(true)"
+        >
+          Open Fullscreen Dialog
+        </el-button>
+        <el-button data-safe-area-open="message-box" @click="openSafeMessageBox">
+          Open MessageBox
+        </el-button>
+        <el-button
+          data-safe-area-open="drawer-ltr"
+          @click="openSafeDrawer('ltr')"
+        >
+          Open Drawer LTR
+        </el-button>
+        <el-button
+          data-safe-area-open="drawer-rtl"
+          @click="openSafeDrawer('rtl')"
+        >
+          Open Drawer RTL
+        </el-button>
+        <el-button
+          data-safe-area-open="drawer-ttb"
+          @click="openSafeDrawer('ttb')"
+        >
+          Open Drawer TTB
+        </el-button>
+        <el-button
+          data-safe-area-open="drawer-btt"
+          @click="openSafeDrawer('btt')"
+        >
+          Open Drawer BTT
+        </el-button>
+        <el-button
+          data-safe-area-open="image-viewer"
+          @click="safeImageViewerVisible = true"
+        >
+          Open ImageViewer
+        </el-button>
+      </div>
+
+      <el-overlay
+        v-if="safeOverlayVisible"
+        :z-index="4000"
+        @click="safeOverlayVisible = false"
+      >
+        <div class="audit-safe-area-lab__panel" @click.stop>
+          <p>Safe-area Overlay content</p>
+          <el-button
+            data-safe-area-action="overlay-close"
+            @click="safeOverlayVisible = false"
+          >
+            Close Overlay
+          </el-button>
+        </div>
+      </el-overlay>
+
+      <el-dialog
+        v-model="safeDialogVisible"
+        :title="
+          safeDialogFullscreen
+            ? 'Safe-area Fullscreen Dialog'
+            : 'Safe-area Dialog'
+        "
+        :fullscreen="safeDialogFullscreen"
+        width="320px"
+        append-to-body
+        destroy-on-close
+      >
+        <div class="audit-safe-area-lab__long-body">
+          <p v-for="index in safeAreaLongParagraphCount" :key="index">
+            Safe-area dialog paragraph {{ index }}. Long copy forces short
+            viewports to scroll so footer actions remain reachable.
+          </p>
+        </div>
+        <template #footer>
+          <el-button
+            data-safe-area-action="dialog-cancel"
+            @click="safeDialogVisible = false"
+          >
+            Cancel
+          </el-button>
+          <el-button
+            type="primary"
+            data-safe-area-action="dialog-confirm"
+            @click="safeDialogVisible = false"
+          >
+            Confirm
+          </el-button>
+        </template>
+      </el-dialog>
+
+      <el-drawer
+        v-model="safeDrawerVisible"
+        :direction="safeDrawerDirection"
+        :title="`Safe-area Drawer ${safeDrawerDirection.toUpperCase()}`"
+        size="70%"
+        append-to-body
+        destroy-on-close
+      >
+        <div class="audit-safe-area-lab__long-body">
+          <p v-for="index in safeAreaLongParagraphCount" :key="index">
+            Drawer {{ safeDrawerDirection }} body {{ index }}.
+          </p>
+        </div>
+        <template #footer>
+          <el-button
+            data-safe-area-action="drawer-cancel"
+            @click="safeDrawerVisible = false"
+          >
+            Cancel
+          </el-button>
+          <el-button
+            type="primary"
+            data-safe-area-action="drawer-confirm"
+            @click="safeDrawerVisible = false"
+          >
+            Confirm
+          </el-button>
+        </template>
+      </el-drawer>
+
+      <el-image-viewer
+        v-if="safeImageViewerVisible"
+        :url-list="safeImageViewerUrls"
+        teleported
+        @close="safeImageViewerVisible = false"
+      />
+    </section>
+
     <div class="audit-grid">
       <AuditCard name="FixedSizeList" :state="auditState">
         <div class="audit-virtual-frame audit-virtual-frame--list">
@@ -1539,6 +1689,7 @@ import {
   ElKeyValueGrid,
   ElKeyValueItem,
   ElKpiGroup,
+  ElMessageBox,
   ElMetadataItem,
   ElMetadataRow,
   ElMessageBubble,
@@ -1722,11 +1873,57 @@ const dialogVisible = ref(false)
 const drawerVisible = ref(false)
 const imageViewerVisible = ref(false)
 
+type SafeDrawerDirection = 'ltr' | 'rtl' | 'ttb' | 'btt'
+const safeOverlayVisible = ref(false)
+const safeDialogVisible = ref(false)
+const safeDialogFullscreen = ref(false)
+const safeDrawerVisible = ref(false)
+const safeDrawerDirection = ref<SafeDrawerDirection>('rtl')
+const safeImageViewerVisible = ref(false)
+const safeAreaLongParagraphCount = 20
+const safeImageViewerUrls = computed(() => [imageData.value, imageData.value])
+
+const openSafeDialog = (fullscreen: boolean) => {
+  safeDialogFullscreen.value = fullscreen
+  safeDialogVisible.value = true
+}
+
+const openSafeDrawer = (direction: SafeDrawerDirection) => {
+  safeDrawerDirection.value = direction
+  safeDrawerVisible.value = true
+}
+
+const openSafeMessageBox = () => {
+  const message = Array.from(
+    { length: safeAreaLongParagraphCount },
+    (_, index) =>
+      `Safe-area MessageBox paragraph ${index + 1}. Short viewports must scroll to reach confirm/cancel.`,
+  ).join('\n\n')
+
+  void ElMessageBox.confirm(message, 'Safe-area MessageBox', {
+    confirmButtonText: 'Confirm',
+    cancelButtonText: 'Cancel',
+    distinguishCancelAndClose: true,
+    closeOnClickModal: false,
+    customClass: 'audit-safe-area-message-box',
+  }).catch(() => undefined)
+}
+
+const resetSafeAreaSurfaces = () => {
+  safeOverlayVisible.value = false
+  safeDialogVisible.value = false
+  safeDialogFullscreen.value = false
+  safeDrawerVisible.value = false
+  safeImageViewerVisible.value = false
+  ElMessageBox.close()
+}
+
 watch(auditState, () => {
   transitionVisible.value = false
   dialogVisible.value = false
   drawerVisible.value = false
   imageViewerVisible.value = false
+  resetSafeAreaSurfaces()
 })
 
 const cascaderOptions = computed(() => [

@@ -86,6 +86,28 @@ Overlay geometry is two-layered:
 These custom properties are intentionally overridable in tests and embeds.
 Defaults still resolve from the browser environment when not overridden.
 
+### Automated safe-area evidence (#262)
+
+The boundary lane (`pnpm audit:visual-boundaries`) runs a safe-area overlay
+matrix on **Chromium and WebKit** using the unique `SafeAreaProfile` model in
+`scripts/safe-area-profiles.mjs` (`no-inset`, `portrait-notch`,
+`landscape-notch`, `short-visual`). Profiles only override the #260 CSS
+variables above; they do not patch component selectors or mock
+`getBoundingClientRect()`.
+
+Shared geometry assertions live in
+`vue/tests/support/dom-layout-assertions.ts`
+(`assertScrimCoversViewport`, `assertControlsInsideSafeRect`,
+`assertOverlayActionsReachable`, `assertNoBodyOverflowLeak`,
+`assertDirectionalDrawerSafeInsets`). Passing the matrix proves the
+**viewport-safe CSS contract** under deterministic desktop browser geometry.
+It does **not** prove real iOS Safari browser chrome (URL bar expand/collapse,
+notch hardware). Device release evidence remains required for that surface.
+
+Do not add parallel commands such as `check:ios-overlay` or a second viewport
+profile registry. PR smoke may use `FSUS_SAFE_AREA_MATRIX_MODE=smoke`; the full
+required matrix stays in the visual-boundary lane.
+
 The consumer document owns `<meta name="viewport">`, including
 `viewport-fit=cover` when notched-device insets must be non-zero. FsusUI never
 injects or rewrites that meta at runtime. Consumers must not redeclare

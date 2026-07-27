@@ -87,3 +87,20 @@ Evidence retains a trace for every failure while the authoritative
 `screenshot: on` matrix records every successful rendered state. Recording a
 second trace for every success is intentionally disabled because it competes
 with the success screenshot fixture and can block browser-context teardown.
+
+## Safe-area overlay matrix (visual-boundary)
+
+Viewport-safe floating surfaces (Overlay, Dialog, fullscreen Dialog,
+MessageBox, Drawer directions, ImageViewer) are covered by geometry
+assertions in the existing boundary lane:
+
+```bash
+pnpm audit:visual-boundaries
+# optional representative subset
+FSUS_SAFE_AREA_MATRIX_MODE=smoke pnpm audit:visual-boundaries -- --project=safe-area-chromium
+```
+
+Canonical profiles: `scripts/safe-area-profiles.mjs`. Projects:
+`safe-area-chromium` and `safe-area-webkit`. Assertions are bounding-box and
+reachability checks over #260 CSS variable overrides — not screenshot-only
+acceptance, and not a substitute for real iOS Safari release evidence.

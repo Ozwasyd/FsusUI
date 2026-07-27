@@ -31,7 +31,12 @@ Drawer 背景贴齐屏幕边缘；safe-area 进入内容内边距，不离开边
 - `ttb`：top / left / right
 - `btt`：bottom / left / right
 
+绝对定位的关闭按钮不随 header padding 位移，因此额外通过 `fsus-inset-safe-area`
+消费 top（以及 `rtl` 的 right）安全区。
+
 遮罩仍由 Overlay scrim 覆盖完整 viewport。不要在 consumer 中补丁式覆盖 Drawer 内部几何。
+
+自动门禁：`pnpm audit:visual-boundaries` 的 safe-area 矩阵覆盖四方向 Drawer；验证的是 viewport-safe CSS contract，不是真机 Safari 工具栏。
 
 ## 无标题
 

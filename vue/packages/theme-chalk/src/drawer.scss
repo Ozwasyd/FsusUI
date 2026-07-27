@@ -70,6 +70,9 @@ $drawer-inline-pad: getCssVar('drawer-padding-primary');
     background-color: transparent;
     outline: none;
     border-radius: 999px;
+    // Absolute close is not shifted by header padding; consume top safe-area.
+    @include fsus-inset-safe-area(top, $drawer-block-pad);
+    right: $drawer-inline-pad;
     &:focus,
     &:hover {
       i {
@@ -141,6 +144,11 @@ $drawer-inline-pad: getCssVar('drawer-padding-primary');
     .#{$namespace}-drawer__header {
       @include fsus-padding-safe-area(top, $drawer-block-pad);
       @include fsus-padding-safe-area(right, $drawer-inline-pad);
+    }
+
+    // Close sits on the screen-right edge for rtl panels.
+    .#{$namespace}-drawer__close-btn {
+      @include fsus-inset-safe-area(right, $drawer-inline-pad);
     }
 
     .#{$namespace}-drawer__body {

@@ -1437,7 +1437,6 @@ button.#{$namespace}-card:active {
 }
 
 .#{$namespace}-dialog__headerbtn,
-.#{$namespace}-drawer__close-btn,
 .#{$namespace}-notification__closeBtn,
 .#{$namespace}-alert__close-btn {
   position: absolute;
@@ -1450,15 +1449,23 @@ button.#{$namespace}-card:active {
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: translate(
-    25%,
-    -25%
-  ); // Slight offset for optical balance at the corner
+  // Keep close controls fully inside the drawable/safe rectangle.
+  // Outward optical translate (25%, -25%) pushed boxes past viewport edges and
+  // fought fullscreen/safe-area insets from #261/#262.
+  transform: none;
 }
 
+// Drawer close: size/alignment only. top/right safe insets are owned by
+// drawer.scss helpers (absolute close is not shifted by header padding).
 .#{$namespace}-drawer__close-btn {
-  top: getCssVar('drawer-padding-primary');
-  right: getCssVar('drawer-padding-primary');
+  margin: 0;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: none;
 }
 
 .#{$namespace}-dialog__headerbtn:focus-visible,

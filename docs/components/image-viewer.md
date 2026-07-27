@@ -21,6 +21,7 @@
 ## Viewport / safe-area
 
 - wrapper 与 mask 覆盖完整 viewport（scrim 语义，不被 safe-area 缩小）。
+- 自动门禁：`pnpm audit:visual-boundaries` 的 safe-area 矩阵断言 wrapper 全 viewport 覆盖与控件落在 safe rectangle 内（#260 变量覆盖；真机 evidence 另附）。
 - close / prev / next / actions 使用统一 `max(base, safe-area)` helper，不再以裸
   `40px` / `30px` 作为相对屏幕边缘的唯一距离；横屏刘海在左或右时两侧导航仍位于安全矩形内。
 

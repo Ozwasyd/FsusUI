@@ -48,6 +48,7 @@
 - `.el-overlay-dialog` 通过统一 helper 提供四方向安全间距、滚动与居中；非全屏 Dialog 的 `max-block-size` 由 `--fsus-viewport-block-size` 与上下 safe-area/基础间距共同计算。
 - 全屏表面可铺满 viewport，但 header/body/footer 交互内容避开安全区。
 - 不要在 consumer 中用 `:deep(.el-overlay-dialog)` 等方式重写几何。
+- 自动门禁：`pnpm audit:visual-boundaries` 的 safe-area 矩阵在 Chromium/WebKit 上通过覆盖 #260 CSS 变量做几何断言；真机 Safari 浏览器 UI 仍需 release evidence。
 
 ## 销毁内容
 

@@ -12,9 +12,14 @@ import { fileURLToPath } from 'node:url'
 import { afterEach, describe, expect, test } from 'vitest'
 import { compile } from 'sass'
 import {
+  findSafeAreaVisualMatrixViolations,
   findViewportOverlayGeometryViolations,
   findViewportSafeAreaViolations,
 } from '../../../../scripts/check-viewport-safe-area-contract.mjs'
+import {
+  SAFE_AREA_PROFILES,
+  profileCssVariableOverrides,
+} from '../../../../scripts/safe-area-profiles.mjs'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(dirname, '../../../..')
@@ -27,40 +32,30 @@ const compileThemeFile = (fileName: string) =>
     style: 'expanded',
   }).css
 
-const VIEWPORT_PROFILES = {
-  'no-inset': {
-    width: 390,
-    height: 844,
-    top: '0px',
-    right: '0px',
-    bottom: '0px',
-    left: '0px',
-  },
-  'portrait-notch': {
-    width: 390,
-    height: 844,
-    top: '47px',
-    right: '0px',
-    bottom: '34px',
-    left: '0px',
-  },
-  'landscape-notch': {
-    width: 844,
-    height: 390,
-    top: '0px',
-    right: '59px',
-    bottom: '21px',
-    left: '59px',
-  },
-  'short-visual': {
-    width: 390,
-    height: 430,
-    top: '47px',
-    right: '0px',
-    bottom: '34px',
-    left: '0px',
-  },
-} as const
+/** Canonical profiles from scripts/safe-area-profiles.mjs (#262). */
+const VIEWPORT_PROFILES = Object.fromEntries(
+  Object.entries(SAFE_AREA_PROFILES).map(([id, profile]) => [
+    id,
+    {
+      width: profile.viewport.width,
+      height: profile.viewport.height,
+      top: `${profile.insets.top}px`,
+      right: `${profile.insets.right}px`,
+      bottom: `${profile.insets.bottom}px`,
+      left: `${profile.insets.left}px`,
+    },
+  ]),
+) as Record<
+  string,
+  {
+    width: number
+    height: number
+    top: string
+    right: string
+    bottom: string
+    left: string
+  }
+>
 
 const temporaryRoots: string[] = []
 
@@ -81,16 +76,12 @@ const pathToFileUrl = (filePath: string) => {
 
 const applyProfileVars = (
   element: HTMLElement,
-  profile: (typeof VIEWPORT_PROFILES)[keyof typeof VIEWPORT_PROFILES],
+  profileId: keyof typeof SAFE_AREA_PROFILES,
 ) => {
-  element.style.setProperty('--fsus-safe-area-inset-top', profile.top)
-  element.style.setProperty('--fsus-safe-area-inset-right', profile.right)
-  element.style.setProperty('--fsus-safe-area-inset-bottom', profile.bottom)
-  element.style.setProperty('--fsus-safe-area-inset-left', profile.left)
-  element.style.setProperty(
-    '--fsus-viewport-block-size',
-    `${profile.height}px`,
-  )
+  const overrides = profileCssVariableOverrides(SAFE_AREA_PROFILES[profileId])
+  for (const [name, value] of Object.entries(overrides)) {
+    element.style.setProperty(name, value)
+  }
 }
 
 describe('viewport-safe overlay geometry (#261)', () => {
@@ -281,9 +272,12 @@ describe('viewport-safe overlay geometry (#261)', () => {
     style.textContent = [overlayCss, dialogCss, imageViewerCss].join('\n')
     document.head.append(style)
 
-    for (const [name, profile] of Object.entries(VIEWPORT_PROFILES)) {
+    for (const name of Object.keys(SAFE_AREA_PROFILES) as Array<
+      keyof typeof SAFE_AREA_PROFILES
+    >) {
+      const profile = VIEWPORT_PROFILES[name]
       const host = document.createElement('div')
-      applyProfileVars(host, profile)
+      applyProfileVars(host, name)
       host.style.position = 'relative'
       document.body.append(host)
 
@@ -489,5 +483,112 @@ describe('viewport-safe overlay geometry (#261)', () => {
     expect(result.stderr + result.stdout).toMatch(
       /height: 100%|100vh|env\(safe-area-inset-\*\)/,
     )
+  })
+
+  test('safe-area visual matrix gate passes on the repository', () => {
+    expect(findSafeAreaVisualMatrixViolations({ root: repoRoot })).toEqual([])
+  })
+
+  test('mutation: deleting WebKit project fails the matrix gate', () => {
+    const fixtureRoot = mkdtempSync(
+      path.join(tmpdir(), 'fsusui-safe-area-webkit-'),
+    )
+    temporaryRoots.push(fixtureRoot)
+
+    const copyRelative = (relativePath: string, mutate?: (source: string) => string) => {
+      const sourcePath = path.join(repoRoot, relativePath)
+      const targetPath = path.join(fixtureRoot, relativePath)
+      mkdirSync(path.dirname(targetPath), { recursive: true })
+      const source = readFileSync(sourcePath, 'utf8')
+      writeFileSync(targetPath, mutate ? mutate(source) : source)
+    }
+
+    copyRelative('scripts/safe-area-profiles.mjs')
+    copyRelative('vue/tests/support/dom-layout-assertions.ts')
+    copyRelative('vue/tests/support/safe-area-profile.ts')
+    copyRelative('vue/packages/demo-app/src/AuditFixtures.vue')
+    copyRelative('vue/tests/visual-boundary/safe-area-overlay-matrix.spec.ts')
+    copyRelative('package.json')
+    copyRelative('vue/playwright.boundary-audit.config.ts', (source) =>
+      source
+        .replace(/\{\s*name:\s*'safe-area-webkit'[\s\S]*?\},/u, '')
+        .replace(/Desktop Safari/gu, 'Desktop Chrome'),
+    )
+
+    const violations = findSafeAreaVisualMatrixViolations({ root: fixtureRoot })
+    expect(
+      violations.some((item) =>
+        item.includes('safe-area-webkit project'),
+      ),
+    ).toBe(true)
+  })
+
+  test('mutation: screenshot-only matrix without shared asserts fails the gate', () => {
+    const fixtureRoot = mkdtempSync(
+      path.join(tmpdir(), 'fsusui-safe-area-screenshot-'),
+    )
+    temporaryRoots.push(fixtureRoot)
+
+    const copyRelative = (relativePath: string, mutate?: (source: string) => string) => {
+      const sourcePath = path.join(repoRoot, relativePath)
+      const targetPath = path.join(fixtureRoot, relativePath)
+      mkdirSync(path.dirname(targetPath), { recursive: true })
+      const source = readFileSync(sourcePath, 'utf8')
+      writeFileSync(targetPath, mutate ? mutate(source) : source)
+    }
+
+    copyRelative('scripts/safe-area-profiles.mjs')
+    copyRelative('vue/tests/support/dom-layout-assertions.ts')
+    copyRelative('vue/tests/support/safe-area-profile.ts')
+    copyRelative('vue/packages/demo-app/src/AuditFixtures.vue')
+    copyRelative('vue/playwright.boundary-audit.config.ts')
+    copyRelative('package.json')
+    copyRelative(
+      'vue/tests/visual-boundary/safe-area-overlay-matrix.spec.ts',
+      () => `
+import { expect, test } from '@playwright/test'
+test('screenshot only', async ({ page }) => {
+  await page.goto('/')
+  await expect(page).toHaveScreenshot('safe-area.png')
+})
+`,
+    )
+
+    const violations = findSafeAreaVisualMatrixViolations({ root: fixtureRoot })
+    expect(
+      violations.some((item) =>
+        item.includes('shared assertion assertScrimCoversViewport'),
+      ),
+    ).toBe(true)
+  })
+
+  test('mutation: removing a lab surface open control fails the gate', () => {
+    const fixtureRoot = mkdtempSync(
+      path.join(tmpdir(), 'fsusui-safe-area-fixture-'),
+    )
+    temporaryRoots.push(fixtureRoot)
+
+    const copyRelative = (relativePath: string, mutate?: (source: string) => string) => {
+      const sourcePath = path.join(repoRoot, relativePath)
+      const targetPath = path.join(fixtureRoot, relativePath)
+      mkdirSync(path.dirname(targetPath), { recursive: true })
+      const source = readFileSync(sourcePath, 'utf8')
+      writeFileSync(targetPath, mutate ? mutate(source) : source)
+    }
+
+    copyRelative('scripts/safe-area-profiles.mjs')
+    copyRelative('vue/tests/support/dom-layout-assertions.ts')
+    copyRelative('vue/tests/support/safe-area-profile.ts')
+    copyRelative('vue/tests/visual-boundary/safe-area-overlay-matrix.spec.ts')
+    copyRelative('vue/playwright.boundary-audit.config.ts')
+    copyRelative('package.json')
+    copyRelative('vue/packages/demo-app/src/AuditFixtures.vue', (source) =>
+      source.replace('data-safe-area-open="image-viewer"', 'data-open="image"'),
+    )
+
+    const violations = findSafeAreaVisualMatrixViolations({ root: fixtureRoot })
+    expect(
+      violations.some((item) => item.includes('image-viewer')),
+    ).toBe(true)
   })
 })

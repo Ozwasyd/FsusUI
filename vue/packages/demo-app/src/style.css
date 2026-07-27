@@ -1345,3 +1345,49 @@ body {
 .audit-card .el-transfer-panel__filter {
   padding: 8px;
 }
+
+/* Safe-area lab (#262): toolbar + content only. Never patch overlay geometry. */
+.audit-safe-area-lab {
+  margin: 0 0 var(--fsus-space-6);
+  padding: var(--fsus-space-4);
+  border: 1px solid var(--el-border-color-light);
+  border-radius: var(--fsus-radius-panel);
+  background: var(--el-bg-color);
+}
+
+.audit-safe-area-lab__title {
+  margin: 0 0 var(--fsus-space-3);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.audit-safe-area-lab__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--fsus-space-2);
+}
+
+.audit-safe-area-lab__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fsus-space-3);
+  width: min(280px, calc(100% - 32px));
+  margin: 20vh auto 0;
+  padding: var(--fsus-space-4);
+  color: var(--el-text-color-primary);
+  background: var(--el-bg-color);
+  border: 1px solid var(--el-border-color);
+  border-radius: var(--fsus-radius-panel);
+  box-shadow: var(--fsus-shadow-panel, none);
+}
+
+.audit-safe-area-lab__long-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fsus-space-3);
+}
+
+.audit-safe-area-lab__long-body p {
+  margin: 0;
+  line-height: 1.5;
+}

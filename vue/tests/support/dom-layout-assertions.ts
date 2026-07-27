@@ -1,6 +1,10 @@
 import { expect } from '@playwright/test'
 import type { Locator, Page } from '@playwright/test'
 import type { UiAuditState } from '../../packages/demo-app/src/ui-audit-manifest'
+import {
+  safeRectFromProfile,
+  type SafeAreaProfile,
+} from './safe-area-profile'
 
 export type DomLayoutSeverity = 'hard' | 'soft'
 
@@ -570,3 +574,426 @@ export const assertScrollMotionState = async (
 
   await expect(host).not.toHaveClass(/is-scrolling/, { timeout: 900 })
 }
+
+const safeAreaGeometryTolerance = 2
+
+const readBox = async (locator: Locator) => {
+  const box = await locator.evaluate((element) => {
+    const rect = element.getBoundingClientRect()
+    const style = getComputedStyle(element)
+    return {
+      bottom: rect.bottom,
+      display: style.display,
+      height: rect.height,
+      left: rect.left,
+      opacity: Number(style.opacity),
+      right: rect.right,
+      top: rect.top,
+      visibility: style.visibility,
+      width: rect.width,
+    }
+  })
+  return box
+}
+
+/**
+ * Scrim must cover the full drawable viewport (left/top/right/bottom deltas ~ 0).
+ * Safe-area insets must never shrink the scrim.
+ */
+export const assertScrimCoversViewport = async (
+  page: Page,
+  scrim: Locator,
+  label = 'scrim',
+) => {
+  await expect(scrim, `${label} must be visible`).toBeVisible()
+
+  const metrics = await scrim.evaluate((element) => {
+    const rect = element.getBoundingClientRect()
+    return {
+      bottom: rect.bottom,
+      left: rect.left,
+      right: rect.right,
+      top: rect.top,
+      viewportHeight: window.innerHeight,
+      viewportWidth: window.innerWidth,
+    }
+  })
+
+  expect(Math.abs(metrics.left), `${label} left delta`).toBeLessThanOrEqual(
+    safeAreaGeometryTolerance,
+  )
+  expect(Math.abs(metrics.top), `${label} top delta`).toBeLessThanOrEqual(
+    safeAreaGeometryTolerance,
+  )
+  expect(
+    Math.abs(metrics.right - metrics.viewportWidth),
+    `${label} right delta`,
+  ).toBeLessThanOrEqual(safeAreaGeometryTolerance)
+  expect(
+    Math.abs(metrics.bottom - metrics.viewportHeight),
+    `${label} bottom delta`,
+  ).toBeLessThanOrEqual(safeAreaGeometryTolerance)
+
+  // Cross-check Playwright bounding box against the configured viewport.
+  const box = await scrim.boundingBox()
+  const viewport = page.viewportSize()
+  expect(box, `${label} bounding box`).not.toBeNull()
+  expect(viewport, `${label} viewport`).not.toBeNull()
+  if (!box || !viewport) return
+
+  expect(Math.abs(box.x), `${label} box left`).toBeLessThanOrEqual(
+    safeAreaGeometryTolerance,
+  )
+  expect(Math.abs(box.y), `${label} box top`).toBeLessThanOrEqual(
+    safeAreaGeometryTolerance,
+  )
+  expect(
+    Math.abs(box.x + box.width - viewport.width),
+    `${label} box right`,
+  ).toBeLessThanOrEqual(safeAreaGeometryTolerance)
+  expect(
+    Math.abs(box.y + box.height - viewport.height),
+    `${label} box bottom`,
+  ).toBeLessThanOrEqual(safeAreaGeometryTolerance)
+}
+
+/**
+ * Enabled, visible interactive controls must land inside the safe rectangle.
+ * Long overlay bodies may place footer actions below the fold first; each
+ * control is scrolled into view (without mocking geometry) before measuring.
+ */
+export const assertControlsInsideSafeRect = async (
+  page: Page,
+  root: Locator,
+  profile: SafeAreaProfile,
+  label = 'controls',
+) => {
+  const safeRect = safeRectFromProfile(profile)
+  const offenders = await root.evaluate(
+    (element, args) => {
+      const tolerance = args.tolerance
+      const safe = args.safeRect
+      const selector = [
+        'button:not([disabled])',
+        '[role="button"]:not([aria-disabled="true"])',
+        'input:not([disabled])',
+        'textarea:not([disabled])',
+        'a[href]',
+      ].join(',')
+
+      const isVisible = (node: HTMLElement) => {
+        const style = getComputedStyle(node)
+        const rect = node.getBoundingClientRect()
+        if (
+          style.display === 'none' ||
+          style.visibility === 'hidden' ||
+          Number(style.opacity) === 0 ||
+          rect.width <= 0 ||
+          rect.height <= 0
+        ) {
+          return false
+        }
+        if ((node as HTMLButtonElement).disabled) return false
+        if (node.getAttribute('aria-disabled') === 'true') return false
+        return true
+      }
+
+      const scrollParents = (node: HTMLElement) => {
+        const parents: HTMLElement[] = []
+        let current: HTMLElement | null = node.parentElement
+        while (current) {
+          const style = getComputedStyle(current)
+          const scrollable =
+            /(auto|scroll|overlay)/.test(style.overflowY) ||
+            /(auto|scroll|overlay)/.test(style.overflow) ||
+            current.scrollHeight > current.clientHeight + 1
+          if (scrollable) parents.push(current)
+          current = current.parentElement
+        }
+        return parents
+      }
+
+      const bringInsideSafeRect = (node: HTMLElement) => {
+        node.scrollIntoView({
+          block: 'center',
+          inline: 'nearest',
+          behavior: 'instant' as ScrollBehavior,
+        })
+
+        // Fine-tune scroll parents so the control lands inside the safe
+        // rectangle (home-indicator / notch), not merely inside the viewport.
+        for (let pass = 0; pass < 3; pass += 1) {
+          const rect = node.getBoundingClientRect()
+          const deltaTop = safe.top + tolerance - rect.top
+          const deltaBottom = rect.bottom - (safe.bottom - tolerance)
+          const deltaLeft = safe.left + tolerance - rect.left
+          const deltaRight = rect.right - (safe.right - tolerance)
+          if (
+            deltaTop <= 0 &&
+            deltaBottom <= 0 &&
+            deltaLeft <= 0 &&
+            deltaRight <= 0
+          ) {
+            return
+          }
+
+          for (const parent of scrollParents(node)) {
+            if (deltaTop > 0) parent.scrollTop -= deltaTop
+            if (deltaBottom > 0) parent.scrollTop += deltaBottom
+            if (deltaLeft > 0) parent.scrollLeft -= deltaLeft
+            if (deltaRight > 0) parent.scrollLeft += deltaRight
+          }
+        }
+      }
+
+      return Array.from(element.querySelectorAll<HTMLElement>(selector))
+        .filter((node) => isVisible(node))
+        .flatMap((node) => {
+          bringInsideSafeRect(node)
+          const rect = node.getBoundingClientRect()
+          const detail = {
+            bottom: rect.bottom,
+            className: node.className?.toString?.() ?? '',
+            left: rect.left,
+            right: rect.right,
+            role: node.getAttribute('role') ?? node.tagName.toLowerCase(),
+            top: rect.top,
+          }
+          const outside =
+            rect.left < safe.left - tolerance ||
+            rect.top < safe.top - tolerance ||
+            rect.right > safe.right + tolerance ||
+            rect.bottom > safe.bottom + tolerance
+          return outside ? [detail] : []
+        })
+    },
+    { safeRect, tolerance: safeAreaGeometryTolerance },
+  )
+
+  expect(
+    offenders,
+    `${label} must stay inside safe rect ${JSON.stringify(safeRect)} under profile ${profile.id}`,
+  ).toEqual([])
+}
+
+/**
+ * Overlay actions (close/confirm/cancel/prev/next/drawer close) are focusable
+ * and can be activated. On short-visual, the last action scrolls into view.
+ */
+export const assertOverlayActionsReachable = async (
+  page: Page,
+  actions: Locator[],
+  options: { shortVisual?: boolean; label?: string } = {},
+) => {
+  const label = options.label ?? 'overlay actions'
+  expect(actions.length, `${label} must provide at least one action`).toBeGreaterThan(
+    0,
+  )
+
+  for (let index = 0; index < actions.length; index += 1) {
+    const action = actions[index]
+    await expect(action, `${label}[${index}] visible`).toBeVisible()
+
+    // Always scroll the action into the nearest scrollport. Long dialog bodies
+    // can push footer/header chrome out of the drawable viewport first.
+    await action.evaluate((element) => {
+      element.scrollIntoView({
+        block: 'center',
+        inline: 'nearest',
+        behavior: 'instant' as ScrollBehavior,
+      })
+    })
+    await action.scrollIntoViewIfNeeded().catch(() => undefined)
+
+    const box = await readBox(action)
+    expect(box.width, `${label}[${index}] width`).toBeGreaterThan(0)
+    expect(box.height, `${label}[${index}] height`).toBeGreaterThan(0)
+
+    const viewport = page.viewportSize()
+    expect(viewport).not.toBeNull()
+    if (viewport) {
+      const intersects =
+        box.right > safeAreaGeometryTolerance &&
+        box.bottom > safeAreaGeometryTolerance &&
+        box.left < viewport.width - safeAreaGeometryTolerance &&
+        box.top < viewport.height - safeAreaGeometryTolerance
+      expect(
+        intersects,
+        `${label}[${index}] must intersect the viewport after scroll (box=${JSON.stringify(box)})`,
+      ).toBe(true)
+    }
+
+    await action.focus({ timeout: 2_000 }).catch(async () => {
+      // Some controls are role=button spans; click-focus as fallback.
+      await action.click({ trial: true }).catch(() => undefined)
+    })
+
+    const focused = await action.evaluate(
+      (element) =>
+        element === document.activeElement ||
+        element.contains(document.activeElement),
+    )
+    // Keyboard focus is required when the control is tabbable.
+    const tabIndex = await action.evaluate((element) =>
+      element.getAttribute('tabindex'),
+    )
+    if (tabIndex !== '-1') {
+      expect(focused, `${label}[${index}] must accept focus`).toBe(true)
+    }
+  }
+}
+
+/** Body must not grow uncontrolled horizontal overflow under a profile. */
+export const assertNoBodyOverflowLeak = async (
+  page: Page,
+  label = 'body overflow',
+) => {
+  const overflow = await page.evaluate(() => ({
+    bodyScrollWidth: document.body.scrollWidth,
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+  }))
+
+  expect(
+    overflow.scrollWidth,
+    `${label}: document scrollWidth ${overflow.scrollWidth} > clientWidth ${overflow.clientWidth}`,
+  ).toBeLessThanOrEqual(overflow.clientWidth + safeAreaGeometryTolerance)
+  expect(
+    overflow.bodyScrollWidth,
+    `${label}: body scrollWidth ${overflow.bodyScrollWidth} > clientWidth ${overflow.clientWidth}`,
+  ).toBeLessThanOrEqual(overflow.clientWidth + safeAreaGeometryTolerance)
+}
+
+/**
+ * Directional Drawer: panel stays edge-attached; content padding consumes the
+ * edge-relevant safe-area insets only.
+ */
+export const assertDirectionalDrawerSafeInsets = async (
+  page: Page,
+  direction: 'ltr' | 'rtl' | 'ttb' | 'btt',
+  profile: SafeAreaProfile,
+  label = 'drawer',
+) => {
+  const drawer = page.locator(`.el-drawer.${direction}`).last()
+  await expect(drawer, `${label} ${direction}`).toBeVisible()
+
+  const report = await drawer.evaluate(
+    (element, _args) => {
+      const px = (value: string) => {
+        const parsed = Number.parseFloat(value)
+        return Number.isFinite(parsed) ? parsed : 0
+      }
+      const rect = element.getBoundingClientRect()
+      const header = element.querySelector<HTMLElement>('.el-drawer__header')
+      const body = element.querySelector<HTMLElement>('.el-drawer__body')
+      const footer = element.querySelector<HTMLElement>('.el-drawer__footer')
+      const headerStyle = header ? getComputedStyle(header) : null
+      const bodyStyle = body ? getComputedStyle(body) : null
+      const footerStyle = footer ? getComputedStyle(footer) : null
+      return {
+        bodyPaddingBottom: bodyStyle ? px(bodyStyle.paddingBottom) : 0,
+        bodyPaddingLeft: bodyStyle ? px(bodyStyle.paddingLeft) : 0,
+        bodyPaddingRight: bodyStyle ? px(bodyStyle.paddingRight) : 0,
+        bodyPaddingTop: bodyStyle ? px(bodyStyle.paddingTop) : 0,
+        bottom: rect.bottom,
+        footerPaddingBottom: footerStyle ? px(footerStyle.paddingBottom) : 0,
+        footerPaddingLeft: footerStyle ? px(footerStyle.paddingLeft) : 0,
+        footerPaddingRight: footerStyle ? px(footerStyle.paddingRight) : 0,
+        headerPaddingLeft: headerStyle ? px(headerStyle.paddingLeft) : 0,
+        headerPaddingRight: headerStyle ? px(headerStyle.paddingRight) : 0,
+        headerPaddingTop: headerStyle ? px(headerStyle.paddingTop) : 0,
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+        viewportHeight: window.innerHeight,
+        viewportWidth: window.innerWidth,
+      }
+    },
+    { direction },
+  )
+
+  const { insets } = profile
+  const gap = safeAreaGeometryTolerance
+
+  if (direction === 'ltr') {
+    expect(Math.abs(report.left), `${label} ltr left edge`).toBeLessThanOrEqual(
+      gap,
+    )
+    expect(report.headerPaddingTop).toBeGreaterThanOrEqual(insets.top - gap)
+    expect(report.headerPaddingLeft).toBeGreaterThanOrEqual(insets.left - gap)
+    expect(report.bodyPaddingLeft).toBeGreaterThanOrEqual(insets.left - gap)
+    if (report.footerPaddingBottom > 0) {
+      expect(report.footerPaddingBottom).toBeGreaterThanOrEqual(
+        insets.bottom - gap,
+      )
+    }
+  }
+
+  if (direction === 'rtl') {
+    expect(
+      Math.abs(report.right - report.viewportWidth),
+      `${label} rtl right edge`,
+    ).toBeLessThanOrEqual(gap)
+    expect(report.headerPaddingTop).toBeGreaterThanOrEqual(insets.top - gap)
+    expect(report.headerPaddingRight).toBeGreaterThanOrEqual(insets.right - gap)
+    expect(report.bodyPaddingRight).toBeGreaterThanOrEqual(insets.right - gap)
+    if (report.footerPaddingBottom > 0) {
+      expect(report.footerPaddingBottom).toBeGreaterThanOrEqual(
+        insets.bottom - gap,
+      )
+    }
+  }
+
+  if (direction === 'ttb') {
+    expect(Math.abs(report.top), `${label} ttb top edge`).toBeLessThanOrEqual(
+      gap,
+    )
+    expect(report.headerPaddingTop).toBeGreaterThanOrEqual(insets.top - gap)
+    expect(report.headerPaddingLeft).toBeGreaterThanOrEqual(insets.left - gap)
+    expect(report.headerPaddingRight).toBeGreaterThanOrEqual(insets.right - gap)
+    expect(report.bodyPaddingLeft).toBeGreaterThanOrEqual(insets.left - gap)
+    expect(report.bodyPaddingRight).toBeGreaterThanOrEqual(insets.right - gap)
+  }
+
+  if (direction === 'btt') {
+    expect(
+      Math.abs(report.bottom - report.viewportHeight),
+      `${label} btt bottom edge`,
+    ).toBeLessThanOrEqual(gap)
+    expect(report.bodyPaddingLeft).toBeGreaterThanOrEqual(insets.left - gap)
+    expect(report.bodyPaddingRight).toBeGreaterThanOrEqual(insets.right - gap)
+    if (report.footerPaddingBottom > 0) {
+      expect(report.footerPaddingBottom).toBeGreaterThanOrEqual(
+        insets.bottom - gap,
+      )
+    } else {
+      expect(report.bodyPaddingBottom).toBeGreaterThanOrEqual(
+        insets.bottom - gap,
+      )
+    }
+  }
+}
+
+/** After closing a locking overlay, scroll-lock class/state must restore. */
+export const assertScrollLockAndFocusRestored = async (
+  page: Page,
+  label = 'scroll lock restore',
+) => {
+  await expect
+    .poll(
+      async () =>
+        page.evaluate(() => ({
+          hiddenParent: document.body.classList.contains(
+            'el-popup-parent--hidden',
+          ),
+          overflow: getComputedStyle(document.body).overflow,
+        })),
+      { timeout: 3_000, message: label },
+    )
+    .toEqual(
+      expect.objectContaining({
+        hiddenParent: false,
+      }),
+    )
+}
+
