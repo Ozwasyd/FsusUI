@@ -109,6 +109,7 @@
     "check:message-box-contract": "node ./scripts/with-node-heap.mjs node ./scripts/check-message-box-contract.mjs",
     "check:message-contract": "node ./scripts/with-node-heap.mjs node ./scripts/check-message-contract.mjs",
     "check:notification-contract": "node ./scripts/with-node-heap.mjs node ./scripts/check-notification-contract.mjs",
+    "check:viewport-safe-area-contract": "node ./scripts/with-node-heap.mjs node ./scripts/check-viewport-safe-area-contract.mjs",
     "tokens:generate": "node ./scripts/with-node-heap.mjs node ./scripts/token-pipeline.mjs generate",
     "tokens:check": "node ./scripts/with-node-heap.mjs node ./scripts/token-pipeline.mjs check",
     "tokens:lint": "node ./scripts/with-node-heap.mjs node ./scripts/token-pipeline.mjs lint",

@@ -54,6 +54,31 @@ FsusUI semantic aliases on top.
 | `--fsus-state-emphasis-bg`         | Registered emphasized background with light/dark values.                              |
 | `--fsus-state-focus-border`        | Registered focus border with light/dark values.                                       |
 | `--fsus-state-invalid-border`      | Registered invalid border mapped to the danger semantic.                              |
+| `--fsus-viewport-block-size`       | Dynamic viewport block size (`100dvh` only; no `100vh` fallback).                     |
+| `--fsus-safe-area-inset-top`       | Top safe-area inset; defaults to `env(safe-area-inset-top, 0px)`.                     |
+| `--fsus-safe-area-inset-right`     | Right safe-area inset; defaults to `env(safe-area-inset-right, 0px)`.                 |
+| `--fsus-safe-area-inset-bottom`    | Bottom safe-area inset; defaults to `env(safe-area-inset-bottom, 0px)`.               |
+| `--fsus-safe-area-inset-left`      | Left safe-area inset; defaults to `env(safe-area-inset-left, 0px)`.                   |
+
+### Viewport and safe-area contract
+
+FsusUI owns a single runtime source for viewport block size and four-direction
+safe-area insets: `vue/packages/theme-chalk/src/common/fsus-tokens.scss` (via
+`fsus-core-tokens` on `:root`). Components and SCSS must consume
+`--fsus-safe-area-inset-*` or the unique helpers in
+`vue/packages/theme-chalk/src/mixins/safe-area.scss`
+(`fsus-safe-area-inset`, `fsus-safe-area-max`, `fsus-padding-safe-area`). Direct
+`env(safe-area-inset-*)` outside the canonical token source is rejected by
+`pnpm run check:viewport-safe-area-contract`.
+
+These custom properties are intentionally overridable in tests and embeds.
+Defaults still resolve from the browser environment when not overridden.
+
+The consumer document owns `<meta name="viewport">`, including
+`viewport-fit=cover` when notched-device insets must be non-zero. FsusUI never
+injects or rewrites that meta at runtime. Consumers must not redeclare
+synonymous FsusUI safe-area tokens or patch component-internal selectors to
+reimplement inset math.
 
 ### Spacing Tokens
 

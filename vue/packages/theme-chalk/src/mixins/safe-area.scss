@@ -1,0 +1,43 @@
+@use 'sass:map';
+@use 'sass:string';
+
+// Unique safe-area composition helpers. Components must not re-copy
+// max(base, inset) formulas or read browser safe-area env functions directly.
+// Canonical safe-area env sources live only in common/fsus-tokens.scss.
+
+$fsus-safe-area-sides: (
+  'top': 'top',
+  'right': 'right',
+  'bottom': 'bottom',
+  'left': 'left',
+  'block-start': 'top',
+  'block-end': 'bottom',
+  'inline-start': 'left',
+  'inline-end': 'right',
+);
+
+@function fsus-safe-area-physical-side($side) {
+  $key: '#{$side}';
+
+  @if not map.has-key($fsus-safe-area-sides, $key) {
+    @error 'Unknown FsusUI safe-area side: #{$side}. Use top|right|bottom|left or block-start|block-end|inline-start|inline-end.';
+  }
+
+  @return map.get($fsus-safe-area-sides, $key);
+}
+
+/// CSS custom property for one safe-area inset direction.
+@function fsus-safe-area-inset($side) {
+  $physical: fsus-safe-area-physical-side($side);
+  @return string.unquote('var(--fsus-safe-area-inset-#{$physical})');
+}
+
+/// max(base spacing, safe-area inset) for one direction.
+@function fsus-safe-area-max($base, $side) {
+  @return string.unquote('max(#{$base}, #{fsus-safe-area-inset($side)})');
+}
+
+/// padding-<side>: max($base, safe-area inset).
+@mixin fsus-padding-safe-area($side, $base: 0px) {
+  padding-#{$side}: fsus-safe-area-max($base, $side);
+}

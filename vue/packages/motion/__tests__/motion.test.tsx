@@ -960,7 +960,10 @@ describe('motion primitives', () => {
     const dock = wrapper.find('[data-fsus-mobile-dock="bottom"]')
 
     expect(dock.attributes('data-fsus-motion-preset')).toBe('dock-settle')
-    expect(dock.attributes('style')).toContain('safe-area-inset-bottom')
+    expect(dock.attributes('style')).toContain(
+      'var(--fsus-safe-area-inset-bottom)',
+    )
+    expect(dock.attributes('style')).not.toContain('env(safe-area-inset-')
     expect(dock.attributes('style')).not.toContain('backdrop-filter')
     expect(wrapper.find('[data-fsus-bottom-action-bar]').exists()).toBe(true)
   })
@@ -987,7 +990,10 @@ describe('motion primitives', () => {
     expect(dock.exists()).toBe(true)
     expect(dock.attributes('data-fsus-mobile-dock')).toBe('bottom')
     expect(dock.attributes('aria-label')).toBe('主导航')
-    expect(dock.attributes('style')).toContain('safe-area-inset-bottom')
+    expect(dock.attributes('style')).toContain(
+      'var(--fsus-safe-area-inset-bottom)',
+    )
+    expect(dock.attributes('style')).not.toContain('env(safe-area-inset-')
     expect(links).toHaveLength(3)
     expect(links[1].attributes('aria-current')).toBe('page')
     expect(links[1].classes()).toContain('is-active')

@@ -12,6 +12,9 @@ FsusUI owns:
 
 - public component API and component geometry;
 - canonical and public theme/motion tokens;
+- the unique viewport / safe-area CSS contract (`--fsus-viewport-block-size`,
+  `--fsus-safe-area-inset-{top,right,bottom,left}`) and component geometry that
+  consumes it;
 - component states and keyboard behavior;
 - shared accessibility semantics;
 - documented task-surface defaults;
@@ -23,9 +26,15 @@ The consumer owns:
 - routes, information architecture, business workflows, and product copy;
 - page composition and content priority;
 - public, marketing, editorial, and product-specific reading layouts;
+- the document-level viewport meta, including `viewport-fit=cover` when
+  safe-area insets must be non-zero on notched devices;
 - selection among documented component variants;
 - consumer-specific tokens under `--{consumer-name}-*`;
 - consumer fixtures and end-to-end evidence.
+
+FsusUI does not rewrite `<meta name="viewport">` at runtime. Consumers must not
+redeclare synonymous safe-area tokens, invent parallel `--fsus-safe-*` aliases,
+or override component-internal selectors to reimplement safe-area math.
 
 ## 2. Required adoption sequence
 

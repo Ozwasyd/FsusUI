@@ -96,6 +96,14 @@
   --fsus-cascader-suggestion-max-height: #{generated.$fsus-component-cascader-suggestion-max-height};
   --fsus-mobile-page-padding: 16px;
   --fsus-desktop-page-padding: 24px;
+  // Unique viewport / safe-area runtime contract (issue #260).
+  // Components consume these vars or the fsus-safe-area-* SCSS helpers only.
+  // Defaults remain browser-resolved; tests/embeds may override on :root.
+  --fsus-viewport-block-size: 100dvh;
+  --fsus-safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --fsus-safe-area-inset-right: env(safe-area-inset-right, 0px);
+  --fsus-safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --fsus-safe-area-inset-left: env(safe-area-inset-left, 0px);
   --fsus-floating-viewport-gap: 24px;
   --fsus-floating-viewport-gap-double: 48px;
   --fsus-floating-safe-width: calc(

@@ -153,8 +153,11 @@ selector 改写 shell 主内容布局；业务内容内部仍可使用自己的�
 所有模式都保留 desktop navigation。`menu` 与 `inline` 为 active link 写入
 `aria-current="page"`，菜单使用原生 summary 键盘语义，并支持 Escape
 关闭后把焦点还给 summary。`bottom` 才给 shell 增加
-`--fsus-bottom-tab-height + env(safe-area-inset-bottom)` 的底部留白；其他模式
-不会为不存在的 fixed dock 预留空间。footer 在窄屏仍保留底部 safe-area。
+`--fsus-bottom-tab-height + var(--fsus-safe-area-inset-bottom)` 的底部留白；其他模式
+不会为不存在的 fixed dock 预留空间。footer 在窄屏仍保留底部 safe-area
+（`max(40px, 24px + var(--fsus-safe-area-inset-bottom))`）。safe-area 与动态
+viewport 的唯一来源见 [`docs/theme/tokens.md`](../theme/tokens.md)；consumer 负责
+文档级 `viewport-fit=cover`，不得在组件内再写 `env(safe-area-inset-*)`。
 
 默认 `menu` 模式的第一行固定为可截断品牌 + Search + Menu。Search、Menu 消费
 `--fsus-public-shell-mobile-action-height: 44px`，水平 padding 为 `12px`，间距

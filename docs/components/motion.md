@@ -694,8 +694,12 @@ actions.
 ```
 
 Base dock and overlay components do not add default glass, blur, or large slide
-distances. `FsuMobileDock` respects `safe-area-inset-bottom` by default, while
-`FsuOverlayTransition` restores focus to the trigger after close.
+distances. `FsuMobileDock` consumes the canonical
+`var(--fsus-safe-area-inset-bottom)` token by default (never a direct
+`env(safe-area-inset-*)` read), while `FsuOverlayTransition` restores focus to
+the trigger after close. Document-level `viewport-fit=cover` remains a consumer
+responsibility; see [`docs/theme/tokens.md`](../theme/tokens.md) and
+[`docs/consumers/design-integration.md`](../consumers/design-integration.md).
 
 ## Motion Governance And Adoption Checks
 

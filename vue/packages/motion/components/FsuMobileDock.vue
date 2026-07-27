@@ -55,7 +55,7 @@ const dockStyle = computed(() =>
   props.safeArea && props.position === 'bottom'
     ? {
         paddingBottom:
-          'max(var(--fsus-mobile-dock-padding-bottom, 0px), env(safe-area-inset-bottom))',
+          'max(var(--fsus-mobile-dock-padding-bottom, 0px), var(--fsus-safe-area-inset-bottom))',
       }
     : undefined,
 )

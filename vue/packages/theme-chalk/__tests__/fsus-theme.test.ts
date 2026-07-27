@@ -2454,10 +2454,10 @@ describe('Fsus theme visual baseline', () => {
       ])
       expect(css).toContain('.el-public-shell__mobile-nav-menu-trigger::marker')
       expectCssRule(css, '.el-public-shell.is-mobile-nav-bottom', [
-        'padding-bottom: calc(var(--fsus-bottom-tab-height, 56px) + env(safe-area-inset-bottom));',
+        'padding-bottom: calc(var(--fsus-bottom-tab-height, 56px) + var(--fsus-safe-area-inset-bottom));',
       ])
       expectCssRule(css, '.el-public-shell__footer', [
-        'padding-bottom: max(40px, 24px + env(safe-area-inset-bottom));',
+        'padding-bottom: max(40px, 24px + var(--fsus-safe-area-inset-bottom));',
       ])
       expectCssRule(css, '.el-public-shell__desktop-nav', ['display: none;'])
       expectCssRule(css, '.el-public-shell__actions', ['display: none;'])

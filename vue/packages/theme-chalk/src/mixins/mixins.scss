@@ -7,6 +7,7 @@
 @forward 'config';
 @forward 'function';
 @forward '_var';
+@forward 'safe-area';
 @use 'config' as *;
 
 $B: null;

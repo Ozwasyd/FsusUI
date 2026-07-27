@@ -48,6 +48,7 @@ const suites = {
     'check:message-box-contract',
     'check:message-contract',
     'check:notification-contract',
+    'check:viewport-safe-area-contract',
     '_test:unit:parallel',
     'build',
   ],
