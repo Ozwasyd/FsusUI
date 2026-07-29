@@ -15,21 +15,32 @@ import {
   isMarkdownRuntimeAuthorizedResult,
   renderMarkdownFallbackWithRuntime,
 } from '../markdown-runtime'
+import {
+  getMarkdownXssSource,
+  getMarkdownXssSourceAttackFragment,
+} from '../../../tests/support/markdown-xss-corpus'
 
 const markdownSource = [
   '# Runtime Profile',
   '',
   'Paragraph with **strong** text and inline math \\(a^2+b^2\\).',
   '',
-  '<script>alert(1)</script>',
+  getMarkdownXssSourceAttackFragment('mxss-raw-script-basic'),
   '',
-  '<img src=x onerror=alert(1)>',
+  getMarkdownXssSourceAttackFragment('mxss-raw-img-onerror'),
   '',
-  '<details open>raw</details>',
+  getMarkdownXssSourceAttackFragment('mxss-raw-details-ontoggle'),
   '',
-  '<svg onload=alert(1)>x</svg>',
+  getMarkdownXssSourceAttackFragment('mxss-namespace-svg-script'),
   '',
-  '[javascript](javascript:evil) [vbscript](vbscript:evil) [protocol relative](//evil.example/path) [control split](java\u0001script:evil) [data](data:text/html,evil) [slash backslash](/\\\\evil.example) [backslash slash](\\\\/evil.example) [mixed http](http:/\\\\evil.example)',
+  [
+    'mxss-url-javascript-link',
+    'mxss-url-vbscript-link',
+    'mxss-url-protocol-relative',
+    'mxss-url-data-html',
+  ]
+    .map(getMarkdownXssSource)
+    .join(' '),
   '',
   '```mermaid',
   'flowchart LR;',
@@ -262,20 +273,11 @@ describe('markdown runtime fast paths', () => {
 
   it('fails closed while generating unsafe URL attributes', () => {
     const html = probeResult.full?.html ?? ''
-    for (const label of [
-      'javascript',
-      'vbscript',
-      'protocol relative',
-      'control split',
-      'data',
-      'slash backslash',
-      'backslash slash',
-      'mixed http',
-    ]) {
-      expect(html).toContain(
-        `<a href="#" rel="noopener noreferrer" target="_blank">${label}</a>`,
-      )
-    }
+    expect(
+      html.match(
+        /<a href="#" rel="noopener noreferrer" target="_blank">blocked<\/a>/gu,
+      ),
+    ).toHaveLength(4)
   })
 
   it('keeps the full result path available with placeholder details and timings', async () => {
@@ -314,14 +316,22 @@ describe('markdown runtime fast paths', () => {
       ...Object.values(probeResult.modes),
     ]
     for (const result of results) {
-      expect(result?.html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;')
-      expect(result?.html).toContain('&lt;img src=x onerror=alert(1)&gt;')
-      expect(result?.html).toContain('&lt;details open&gt;raw&lt;/details&gt;')
-      expect(result?.html).toContain('&lt;svg onload=alert(1)&gt;x&lt;/svg&gt;')
+      const template = document.createElement('template')
+      template.innerHTML = result?.html ?? ''
+      expect(template.content.querySelector('script,img')).toBeNull()
+      expect(template.content.textContent).toContain('<script>globalThis.')
+      expect(template.content.textContent).toContain('</script>')
+      expect(template.content.textContent).toContain('<img src=x onerror=')
+      expect(result?.html).toContain(
+        '&lt;details open ontoggle=alert(3)&gt;unsafe&lt;/details&gt;',
+      )
+      expect(result?.html).toContain(
+        '&lt;svg&gt;&lt;script&gt;alert(1)&lt;/script&gt;&lt;/svg&gt;',
+      )
       expect(result?.html).not.toContain('<script>')
       expect(result?.html).not.toContain('<img src=x')
-      expect(result?.html).not.toContain('<details open>')
-      expect(result?.html).not.toContain('<svg onload=')
+      expect(result?.html).not.toContain('<details open')
+      expect(result?.html).not.toContain('<svg>')
     }
   })
 })

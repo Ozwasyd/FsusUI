@@ -32,6 +32,14 @@ import type {
 } from '@element-plus/wasm'
 import type { FsusResult } from '@element-plus/utils'
 import type { MarkdownRendererProps } from '../src/markdown-renderer'
+import { getMarkdownXssSourceAttackFragment } from '../../../../tests/support/markdown-xss-corpus'
+
+const rawScriptSource = getMarkdownXssSourceAttackFragment(
+  'mxss-raw-script-basic',
+)
+const rawImageSource = getMarkdownXssSourceAttackFragment(
+  'mxss-raw-img-onerror',
+)
 
 const markdownAuthorityMocks = vi.hoisted(() => ({
   results: new WeakSet<object>(),
@@ -372,24 +380,28 @@ describe('MarkdownRenderer.vue', () => {
 
   test('defaults to escaped raw html and enabled latex/mermaid', async () => {
     renderMarkdownHtml.mockResolvedValue(
-      fsusOk(makeHtmlResult('&lt;script&gt;alert(1)&lt;/script&gt;')),
+      fsusOk(
+        makeHtmlResult(
+          '&lt;script&gt;globalThis.__FSUS_XSS__=1&lt;/script&gt;',
+        ),
+      ),
     )
     renderMarkdownResult.mockResolvedValue(
       fsusOk(
         makeResult(
-          '<script>alert(1)</script>',
-          '&lt;script&gt;alert(1)&lt;/script&gt;',
+          rawScriptSource,
+          '&lt;script&gt;globalThis.__FSUS_XSS__=1&lt;/script&gt;',
         ),
       ),
     )
 
-    mount(() => <MarkdownRenderer content="<script>alert(1)</script>" />)
+    mount(() => <MarkdownRenderer content={rawScriptSource} />)
     await flushRenderer()
 
     expect(renderMarkdownHtml).not.toHaveBeenCalled()
     expect(renderMarkdownResult).toHaveBeenCalledWith(
       expect.objectContaining({
-        source: '<script>alert(1)</script>',
+        source: rawScriptSource,
         allowLatex: true,
         allowMermaid: true,
         mode: 'article',
@@ -450,14 +462,14 @@ describe('MarkdownRenderer.vue', () => {
         content: '# Current',
         initialRender: makeResult(
           '# Stale',
-          '<img src="x" onerror="alert(1)">',
+          rawImageSource,
         ),
       },
     })
     const source = '# Current'
     const forged = {
       ...makeResult(source, '<h1>Trusted source</h1>'),
-      html: safeHtml('<img src="x" onerror="alert(1)">'),
+      html: safeHtml(rawImageSource),
     }
     const forgedWrapper = mount(MarkdownRenderer, {
       props: { content: source, initialRender: forged },
@@ -469,7 +481,7 @@ describe('MarkdownRenderer.vue', () => {
             content: '# Current',
             initialRender: makeResult(
               '# Stale',
-              '<img src="x" onerror="alert(1)">',
+              rawImageSource,
             ),
           }),
       }),
@@ -1118,12 +1130,14 @@ describe('MarkdownRenderer.vue', () => {
     )
 
     const wrapper = mount(MarkdownRenderer, {
-      props: { content: '<script>alert(1)</script>' },
+      props: { content: rawScriptSource },
     })
     await flushRenderer()
 
     expect(wrapper.html()).toContain('Markdown 渲染失败')
-    expect(wrapper.html()).toContain('&lt;script&gt;alert(1)&lt;/script&gt;')
+    expect(wrapper.html()).toContain(
+      '&lt;script&gt;globalThis.__FSUS_XSS__=1&lt;/script&gt;',
+    )
     expect(wrapper.emitted('render-error')).toHaveLength(1)
     expect(wrapper.emitted('render-complete')).toHaveLength(1)
   })

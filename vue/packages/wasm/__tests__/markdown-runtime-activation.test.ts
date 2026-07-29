@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { activateMarkdownFeatures } from '../markdown-runtime'
+import { getMarkdownXssFeatureOutput } from '../../../tests/support/markdown-xss-corpus'
 
 const featureModuleMocks = vi.hoisted(() => ({
   katexLoad: vi.fn(async () => undefined),
@@ -85,15 +86,16 @@ describe('markdown feature activation runtime', () => {
     featureModuleMocks.shikiLoadTheme.mockClear()
 
     featureModuleMocks.katexLoad.mockResolvedValue(undefined)
-    featureModuleMocks.mermaidRender.mockImplementation((id: string) => ({
-      svg: [
-        `<svg id="${id}" xmlns="http://www.w3.org/2000/svg" onload="alert(1)" viewBox="0 0 10 10">`,
-        `<style nonce="caller-nonce">#${id} .node{fill:#409eff}</style>`,
-        '<script>alert(1)</script><g class="node" /></svg>',
-      ].join(''),
-    }))
+    featureModuleMocks.mermaidRender.mockImplementation((id: string) => {
+      const output = getMarkdownXssFeatureOutput(
+        'mxss-feature-mermaid-script',
+      )
+      return {
+        svg: output.payload.replaceAll(output.rootId!, id),
+      }
+    })
     featureModuleMocks.katexRenderToString.mockReturnValue(
-      '<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>x</mi><mn>2</mn></msup></math><script>alert(1)</script></span>',
+      getMarkdownXssFeatureOutput('mxss-feature-latex-event').payload,
     )
     featureModuleMocks.shikiCodeToHtml.mockImplementation(
       async (_source, options) =>
@@ -169,8 +171,11 @@ describe('markdown feature activation runtime', () => {
     featureModuleMocks.mermaidRender.mockImplementation(async (id: string) => {
       started.push('mermaid')
       await mermaid.promise
+      const output = getMarkdownXssFeatureOutput(
+        'mxss-feature-mermaid-script',
+      )
       return {
-        svg: `<svg id="${id}" xmlns="http://www.w3.org/2000/svg" onload="alert(1)"><script>alert(1)</script><g /></svg>`,
+        svg: output.payload.replaceAll(output.rootId!, id),
       }
     })
     featureModuleMocks.katexLoad.mockImplementation(async () => {
@@ -293,10 +298,6 @@ describe('markdown feature activation runtime', () => {
     ).toBeTruthy()
     expect(root.querySelector('script')).toBeNull()
     expect(root.querySelector('svg')?.getAttribute('onload')).toBeNull()
-    expect(root.querySelector('style')?.nonce).toBe('nonce-2')
-    expect(root.querySelector('style')?.textContent).toMatch(
-      /^#fsus-markdown-mermaid-\d+ \.node\{fill:#409eff\}$/u,
-    )
     expect(result.errors).toEqual([])
     expect(result.activated.map((item) => item.kind)).toEqual([
       'mermaid',

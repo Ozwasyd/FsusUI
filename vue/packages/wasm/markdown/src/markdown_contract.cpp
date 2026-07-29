@@ -569,7 +569,7 @@ std::string render_inline(
         continue;
       }
       flush_segment(index);
-      out.push_back(text[index + 1]);
+      append_escaped(out, text.substr(index + 1, 1));
       index += 2;
       segment_start = index;
       continue;

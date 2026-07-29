@@ -1,4 +1,4 @@
-export const MARKDOWN_RENDERER_VERSION = 'markdown-wasm-contract@2026-07-28'
+export const MARKDOWN_RENDERER_VERSION = 'markdown-wasm-contract@2026-07-29'
 
 declare const markdownSafeHtmlBrand: unique symbol
 declare const markdownSafeRenderResultBrand: unique symbol

@@ -1,6 +1,21 @@
 import { Buffer } from 'node:buffer'
+import {
+  getMarkdownXssSource,
+  loadMarkdownXssCorpus,
+} from '../../../scripts/markdown-xss-corpus.mjs'
 
 export const DEFAULT_MARKDOWN_EXTREME_SIZE = 500_000
+export const MARKDOWN_EXTREME_SECURITY_CASE_IDS = Object.freeze([
+  'mxss-raw-script-basic',
+  'mxss-raw-img-onerror',
+  'mxss-container-iframe-srcdoc',
+])
+
+const markdownXssCorpus = await loadMarkdownXssCorpus()
+export const getMarkdownExtremeSecuritySources = () =>
+  MARKDOWN_EXTREME_SECURITY_CASE_IDS.map((id) =>
+    getMarkdownXssSource(markdownXssCorpus, id),
+  )
 
 export function normalizeMarkdownExtremeSize(value) {
   const parsed = Number(value)
@@ -28,11 +43,12 @@ export function buildMarkdownExtremeCorpus(
   targetSize = DEFAULT_MARKDOWN_EXTREME_SIZE,
 ) {
   const normalizedTargetSize = normalizeMarkdownExtremeSize(targetSize)
+  const securitySources = getMarkdownExtremeSecuritySources()
   const seedBlocks = [
     '\uFEFF# Markdown Extreme Corpus',
     '',
     'Intro paragraph with **strong**, *emphasis*, `inline code`, [link](https://example.com/path?q=markdown&x=1), 中文、かな、한글、emoji-like text, and escaped HTML.',
-    '<script>alert("xss")</script><img src=x onerror=alert(1)>',
+    ...securitySources,
     '',
     '| Column A | Column B | Column C |',
     '| --- | ---: | :--- |',
@@ -86,7 +102,7 @@ export function buildMarkdownExtremeCorpus(
         blockIndex % 9 === 0
           ? '$$\n\\sum_{i=1}^{n} \\frac{i^2}{n}\n$$'
           : '| a | b |\n| --- | --- |\n| 1 | 2 |',
-        `Escaped html probe ${blockIndex}: <iframe src="javascript:alert(${blockIndex})"></iframe>`,
+        `Raw html boundary ${blockIndex}: <aside data-boundary="${blockIndex}">retained</aside>`,
         `Long url ${blockIndex}: https://example.com/${'segment/'.repeat(12)}?q=${blockIndex}&unsafe=%3Cscript%3E`,
       ].join('\n'),
     )
@@ -110,7 +126,8 @@ export function describeMarkdownExtremeCorpus(source) {
     hasMermaid:
       normalized.includes('```mermaid') && normalized.includes(':::mermaid'),
     hasLatex: normalized.includes('\\(') && normalized.includes('$$'),
-    hasDangerousHtmlProbe:
-      normalized.includes('<script>') && normalized.includes('javascript:'),
+    hasDangerousHtmlProbe: getMarkdownExtremeSecuritySources().every((source) =>
+      normalized.includes(source),
+    ),
   }
 }

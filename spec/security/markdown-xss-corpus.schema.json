@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fsusui.dev/spec/security/markdown-xss-corpus.schema.json",
+  "title": "FsusUI Markdown XSS differential corpus",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "version", "seed", "categories", "surfaces", "cases"],
+  "properties": {
+    "$schema": { "const": "./markdown-xss-corpus.schema.json" },
+    "version": { "const": 1 },
+    "seed": { "type": "integer", "minimum": 1, "maximum": 4294967295 },
+    "categories": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/category" }
+    },
+    "surfaces": {
+      "type": "array",
+      "minItems": 8,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/surface" }
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 60,
+      "items": { "$ref": "#/$defs/case" }
+    }
+  },
+  "$defs": {
+    "category": {
+      "enum": [
+        "raw-event",
+        "malformed-separator",
+        "entity-control-protocol",
+        "dangerous-url",
+        "namespace",
+        "container-navigation",
+        "mutation-serialization",
+        "feature-output",
+        "resource-boundary"
+      ]
+    },
+    "surface": {
+      "enum": [
+        "core-sync",
+        "wasm",
+        "worker",
+        "chunked",
+        "ssr-no-dom",
+        "initial-render",
+        "feature-gateway",
+        "browser-dom"
+      ]
+    },
+    "featureOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "payload"],
+      "properties": {
+        "kind": { "enum": ["mermaid", "latex", "code-highlight"] },
+        "payload": { "type": "string", "minLength": 1 },
+        "rootId": { "type": "string", "pattern": "^[A-Za-z_][\\w:.-]*$" }
+      }
+    },
+    "invariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["forbidSelectors", "forbidExternalUrls", "allowedNamespaces"],
+      "properties": {
+        "forbidSelectors": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "forbidExternalUrls": { "const": true },
+        "allowedNamespaces": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "http://www.w3.org/1999/xhtml",
+              "http://www.w3.org/2000/svg",
+              "http://www.w3.org/1998/Math/MathML"
+            ]
+          }
+        }
+      }
+    },
+    "preserve": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text", "selectors"],
+      "properties": {
+        "text": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "selectors": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "category",
+        "surfaces",
+        "invariants",
+        "preserve",
+        "reviewed"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^mxss-[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "category": { "$ref": "#/$defs/category" },
+        "source": { "type": "string", "minLength": 1 },
+        "featureOutput": { "$ref": "#/$defs/featureOutput" },
+        "surfaces": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/surface" }
+        },
+        "invariants": { "$ref": "#/$defs/invariants" },
+        "preserve": { "$ref": "#/$defs/preserve" },
+        "reviewed": { "const": true }
+      },
+      "oneOf": [
+        { "required": ["source"], "not": { "required": ["featureOutput"] } },
+        {
+          "required": ["featureOutput"],
+          "not": { "required": ["source"] }
+        }
+      ]
+    }
+  }
+}

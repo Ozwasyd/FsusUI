@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "corpus": "markdown-xss-corpus.json",
+  "schema": "markdown-xss-corpus.schema.json",
+  "sha256": "a7f16d7be2cf826aa978f91413a30f51ca7f5b2ae2f7c9acf7bcd81cf2cc7b9b",
+  "caseCount": 65,
+  "minimumCaseCount": 60,
+  "categories": {
+    "raw-event": 7,
+    "malformed-separator": 7,
+    "entity-control-protocol": 7,
+    "dangerous-url": 7,
+    "namespace": 7,
+    "container-navigation": 7,
+    "mutation-serialization": 8,
+    "feature-output": 8,
+    "resource-boundary": 7
+  },
+  "fuzz": {
+    "algorithm": "xorshift32-v1",
+    "seed": 2662026,
+    "fastIterations": 2000,
+    "releaseIterations": 20000
+  },
+  "productionExport": false
+}

@@ -1,0 +1,621 @@
+{
+  "$schema": "./markdown-xss-corpus.schema.json",
+  "version": 1,
+  "seed": 2662026,
+  "categories": [
+    "raw-event",
+    "malformed-separator",
+    "entity-control-protocol",
+    "dangerous-url",
+    "namespace",
+    "container-navigation",
+    "mutation-serialization",
+    "feature-output",
+    "resource-boundary"
+  ],
+  "surfaces": [
+    "core-sync",
+    "wasm",
+    "worker",
+    "chunked",
+    "ssr-no-dom",
+    "initial-render",
+    "feature-gateway",
+    "browser-dom"
+  ],
+  "cases": [
+    {
+      "id": "mxss-raw-script-basic",
+      "category": "raw-event",
+      "source": "RAW-01 retained\n\n<script>globalThis.__FSUS_XSS__=1</script>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["script", "[onload]", "[onerror]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["RAW-01 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-raw-img-onerror",
+      "category": "raw-event",
+      "source": "RAW-02 retained\n\n<img src=x onerror=\"globalThis.__FSUS_XSS__=2\">",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["script", "[onerror]", "img[src='x']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["RAW-02 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-raw-details-ontoggle",
+      "category": "raw-event",
+      "source": "RAW-03 retained\n\n<details open ontoggle=alert(3)>unsafe</details>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["[ontoggle]", "details[open]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["RAW-03 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-raw-body-onpageshow",
+      "category": "raw-event",
+      "source": "RAW-04 retained\n\n<body onpageshow=alert(4)>unsafe</body>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["[onpageshow]", "body body"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["RAW-04 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-raw-input-onfocus",
+      "category": "raw-event",
+      "source": "RAW-05 retained\n\n<input autofocus onfocus=alert(5)>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["[onfocus]", "input[autofocus]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["RAW-05 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-raw-video-onerror",
+      "category": "raw-event",
+      "source": "RAW-06 retained\n\n<video><source src=x onerror=alert(6)></video>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["[onerror]", "video", "source"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["RAW-06 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-raw-marquee-onstart",
+      "category": "raw-event",
+      "source": "RAW-07 retained\n\n<marquee onstart=alert(7)>unsafe</marquee>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["[onstart]", "marquee"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["RAW-07 retained"], "selectors": [] },
+      "reviewed": true
+    },
+
+    {
+      "id": "mxss-malformed-unclosed-script",
+      "category": "malformed-separator",
+      "source": "MAL-01 retained\n\n<script src=//attacker.invalid/x.js",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["script", "[src*='attacker.invalid']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["MAL-01 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-malformed-img-slash",
+      "category": "malformed-separator",
+      "source": "MAL-02 retained\n\n<img/src=x/onerror=alert(2)>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["[onerror]", "img[src='x']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["MAL-02 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-malformed-backtick-attribute",
+      "category": "malformed-separator",
+      "source": "MAL-03 retained\n\n<img src=`x` onerror=alert(3)>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["[onerror]", "img"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["MAL-03 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-malformed-null-tag",
+      "category": "malformed-separator",
+      "source": "MAL-04 retained\n\n<scr\u0000ipt>alert(4)</scr\u0000ipt>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["script", "[onerror]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["MAL-04 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-malformed-table-breakout",
+      "category": "malformed-separator",
+      "source": "MAL-05 retained\n\n<table><tr><td></style><img src=x onerror=alert(5)>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["[onerror]", "img[src='x']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["MAL-05 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-malformed-quote-breakout",
+      "category": "malformed-separator",
+      "source": "MAL-06 retained\n\n<a title=\"safe' onmouseover='alert(6)\">link</a>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["[onmouseover]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["MAL-06 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-malformed-newline-attribute",
+      "category": "malformed-separator",
+      "source": "MAL-07 retained\n\n<img src=x\nonerror=alert(7)>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["[onerror]", "img[src='x']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["MAL-07 retained"], "selectors": [] },
+      "reviewed": true
+    },
+
+    {
+      "id": "mxss-entity-javascript-colon",
+      "category": "entity-control-protocol",
+      "source": "ENT-01 retained [blocked](java&#x73;cript:alert(1))",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["a[href*='script:']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["ENT-01 retained", "blocked"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-entity-tab-protocol",
+      "category": "entity-control-protocol",
+      "source": "ENT-02 retained [blocked](java&#9;script:alert(2))",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["a[href*='script:']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["ENT-02 retained", "blocked"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-entity-newline-protocol",
+      "category": "entity-control-protocol",
+      "source": "ENT-03 retained [blocked](java&#10;script:alert(3))",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["a[href*='script:']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["ENT-03 retained", "blocked"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-entity-double-encoded",
+      "category": "entity-control-protocol",
+      "source": "ENT-04 retained [blocked](java&amp;#x73;cript:alert(4))",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["a[href^='javascript:']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["ENT-04 retained", "blocked"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-control-nul-protocol",
+      "category": "entity-control-protocol",
+      "source": "ENT-05 retained [blocked](java\u0000script:alert(5))",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["a[href*='script:']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["ENT-05 retained", "blocked"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-control-carriage-return",
+      "category": "entity-control-protocol",
+      "source": "ENT-06 retained [blocked](java\rscript:alert(6))",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["a[href*='script:']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["ENT-06 retained", "blocked"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-control-nonbreaking-space",
+      "category": "entity-control-protocol",
+      "source": "ENT-07 retained [blocked](java\u00a0script:alert(7))",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["a[href*='script:']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["ENT-07 retained", "blocked"], "selectors": [] },
+      "reviewed": true
+    },
+
+    {
+      "id": "mxss-url-javascript-link",
+      "category": "dangerous-url",
+      "source": "URL-01 retained [blocked](javascript:alert(1))",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["a[href^='javascript:']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["URL-01 retained", "blocked"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-url-vbscript-link",
+      "category": "dangerous-url",
+      "source": "URL-02 retained [blocked](vbscript:msgbox(2))",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["a[href^='vbscript:']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["URL-02 retained", "blocked"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-url-data-html",
+      "category": "dangerous-url",
+      "source": "URL-03 retained [blocked](data:text/html,<script>alert(3)</script>)",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["a[href^='data:']", "script"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["URL-03 retained", "blocked"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-url-protocol-relative",
+      "category": "dangerous-url",
+      "source": "URL-04 retained [blocked](//attacker.invalid/collect)",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["a[href*='attacker.invalid']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["URL-04 retained", "blocked"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-url-data-svg-image",
+      "category": "dangerous-url",
+      "source": "URL-05 retained ![blocked](data:image/svg+xml,<svg onload=alert(5)></svg>)",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["img[src^='data:']", "[onload]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["URL-05 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-url-file-scheme",
+      "category": "dangerous-url",
+      "source": "URL-06 retained [blocked](file:///etc/passwd)",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["a[href^='file:']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["URL-06 retained", "blocked"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-url-safe-relative-control",
+      "category": "dangerous-url",
+      "source": "URL-07 retained [safe link](/docs/security) and ![safe image](/assets/safe.png)",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["[onerror]", "[srcdoc]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["URL-07 retained", "safe link"], "selectors": ["a[href='/docs/security']", "img[src='/assets/safe.png']"] },
+      "reviewed": true
+    },
+
+    {
+      "id": "mxss-namespace-svg-script",
+      "category": "namespace",
+      "source": "NS-01 retained\n\n<svg><script>alert(1)</script></svg>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["svg", "script"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["NS-01 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-namespace-svg-foreignobject",
+      "category": "namespace",
+      "source": "NS-02 retained\n\n<svg><foreignObject><iframe srcdoc='<script>alert(2)</script>'></iframe></foreignObject></svg>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["svg", "foreignObject", "iframe", "[srcdoc]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["NS-02 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-namespace-math-annotation",
+      "category": "namespace",
+      "source": "NS-03 retained\n\n<math><annotation-xml encoding='text/html'><img src=x onerror=alert(3)></annotation-xml></math>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["math", "annotation-xml", "[onerror]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["NS-03 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-namespace-svg-use-external",
+      "category": "namespace",
+      "source": "NS-04 retained\n\n<svg><use href='//attacker.invalid/a.svg#x'></use></svg>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["svg", "use", "[href*='attacker.invalid']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["NS-04 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-namespace-svg-animation",
+      "category": "namespace",
+      "source": "NS-05 retained\n\n<svg><animate attributeName=href values='javascript:alert(5)'></animate></svg>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["svg", "animate"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["NS-05 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-namespace-math-href",
+      "category": "namespace",
+      "source": "NS-06 retained\n\n<math href='javascript:alert(6)'><mtext>unsafe</mtext></math>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["math", "[href^='javascript:']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["NS-06 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-namespace-xml-custom",
+      "category": "namespace",
+      "source": "NS-07 retained\n\n<x:script xmlns:x='urn:attacker'>alert(7)</x:script>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["script", "[xmlns]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["NS-07 retained"], "selectors": [] },
+      "reviewed": true
+    },
+
+    {
+      "id": "mxss-container-comment-breakout",
+      "category": "container-navigation",
+      "source": "CON-01 retained\n\n<!--><script>alert(1)</script>-->",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["script"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["CON-01 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-container-template",
+      "category": "container-navigation",
+      "source": "CON-02 retained\n\n<template><img src=x onerror=alert(2)></template>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["template", "[onerror]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["CON-02 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-container-form-action",
+      "category": "container-navigation",
+      "source": "CON-03 retained\n\n<form action='https://attacker.invalid'><button>send</button></form>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["form", "button", "[action]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["CON-03 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-container-base",
+      "category": "container-navigation",
+      "source": "CON-04 retained\n\n<base href='https://attacker.invalid/'>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["base"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["CON-04 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-container-iframe-srcdoc",
+      "category": "container-navigation",
+      "source": "CON-05 retained\n\n<iframe srcdoc='<script>parent.__FSUS_XSS__=5</script>'></iframe>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["iframe", "[srcdoc]", "script"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["CON-05 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-container-object-data",
+      "category": "container-navigation",
+      "source": "CON-06 retained\n\n<object data='data:text/html,<script>alert(6)</script>'></object>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["object", "[data^='data:']", "script"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["CON-06 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-container-embed",
+      "category": "container-navigation",
+      "source": "CON-07 retained\n\n<embed src='https://attacker.invalid/plugin'>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["embed", "[src*='attacker.invalid']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["CON-07 retained"], "selectors": [] },
+      "reviewed": true
+    },
+
+    {
+      "id": "mxss-mutation-noscript-image",
+      "category": "mutation-serialization",
+      "source": "MUT-01 retained\n\n<noscript><img src=x onerror=alert(1)></noscript>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["noscript", "[onerror]", "img[src='x']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["MUT-01 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-mutation-style-breakout",
+      "category": "mutation-serialization",
+      "source": "MUT-02 retained\n\n<style><img src=x onerror=alert(2)></style>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["style", "[onerror]", "img"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["MUT-02 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-mutation-textarea-breakout",
+      "category": "mutation-serialization",
+      "source": "MUT-03 retained\n\n<textarea></textarea><img src=x onerror=alert(3)>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["textarea", "[onerror]", "img[src='x']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["MUT-03 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-mutation-title-breakout",
+      "category": "mutation-serialization",
+      "source": "MUT-04 retained\n\n<title></title><svg onload=alert(4)>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["title", "svg", "[onload]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["MUT-04 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-mutation-select-option",
+      "category": "mutation-serialization",
+      "source": "MUT-05 retained\n\n<select><option><style></select><img src=x onerror=alert(5)>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["select", "option", "style", "[onerror]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["MUT-05 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-mutation-svg-desc",
+      "category": "mutation-serialization",
+      "source": "MUT-06 retained\n\n<svg><desc><![CDATA[</desc><script>alert(6)</script>]]></svg>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["svg", "script"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["MUT-06 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-mutation-math-svg-switch",
+      "category": "mutation-serialization",
+      "source": "MUT-07 retained\n\n<math><mtext><svg><foreignObject><img src=x onerror=alert(7)>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["math", "svg", "foreignObject", "[onerror]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["MUT-07 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-mutation-backslash-html-opener",
+      "category": "mutation-serialization",
+      "source": "MUT-08 retained\n\n\\<object data='data:text/html,<script>globalThis.__FSUS_XSS__=8</script>'>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["object", "object[data]", "script"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["MUT-08 retained"], "selectors": [] },
+      "reviewed": true
+    },
+
+    {
+      "id": "mxss-feature-mermaid-script",
+      "category": "feature-output",
+      "featureOutput": { "kind": "mermaid", "rootId": "fsus-markdown-mermaid-mxss1", "payload": "<svg id='fsus-markdown-mermaid-mxss1' class='flowchart' xmlns='http://www.w3.org/2000/svg'><script>alert(1)</script><text>FEATURE-01 retained</text></svg>" },
+      "surfaces": ["feature-gateway", "browser-dom"],
+      "invariants": { "forbidSelectors": ["script", "foreignObject", "[onload]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml", "http://www.w3.org/2000/svg"] },
+      "preserve": { "text": ["FEATURE-01 retained"], "selectors": ["svg.flowchart", "text"] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-feature-mermaid-foreignobject",
+      "category": "feature-output",
+      "featureOutput": { "kind": "mermaid", "rootId": "fsus-markdown-mermaid-mxss2", "payload": "<svg id='fsus-markdown-mermaid-mxss2' class='flowchart' xmlns='http://www.w3.org/2000/svg'><text>FEATURE-02 retained</text><foreignObject><iframe srcdoc='<script>alert(2)</script>'></iframe></foreignObject></svg>" },
+      "surfaces": ["feature-gateway", "browser-dom"],
+      "invariants": { "forbidSelectors": ["foreignObject", "iframe", "[srcdoc]", "script"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml", "http://www.w3.org/2000/svg"] },
+      "preserve": { "text": ["FEATURE-02 retained"], "selectors": ["svg.flowchart", "text"] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-feature-mermaid-external-use",
+      "category": "feature-output",
+      "featureOutput": { "kind": "mermaid", "rootId": "fsus-markdown-mermaid-mxss3", "payload": "<svg id='fsus-markdown-mermaid-mxss3' class='flowchart' xmlns='http://www.w3.org/2000/svg'><text>FEATURE-03 retained</text><use href='https://attacker.invalid/x.svg#p'/></svg>" },
+      "surfaces": ["feature-gateway", "browser-dom"],
+      "invariants": { "forbidSelectors": ["use[href]", "[href*='attacker.invalid']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml", "http://www.w3.org/2000/svg"] },
+      "preserve": { "text": ["FEATURE-03 retained"], "selectors": ["svg.flowchart", "text"] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-feature-latex-event",
+      "category": "feature-output",
+      "featureOutput": { "kind": "latex", "payload": "<span class='katex'><span aria-hidden='true'>FEATURE-04 retained</span><math xmlns='http://www.w3.org/1998/Math/MathML'><mtext>x</mtext></math><img src=x onerror=alert(4)></span>" },
+      "surfaces": ["feature-gateway", "browser-dom"],
+      "invariants": { "forbidSelectors": ["img", "[onerror]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml", "http://www.w3.org/1998/Math/MathML"] },
+      "preserve": { "text": ["FEATURE-04 retained"], "selectors": ["span.katex"] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-feature-latex-annotation",
+      "category": "feature-output",
+      "featureOutput": { "kind": "latex", "payload": "<span class='katex'><math xmlns='http://www.w3.org/1998/Math/MathML'><semantics><mtext>FEATURE-05 retained</mtext><annotation encoding='application/x-tex'>x</annotation><annotation-xml encoding='text/html'><img onerror=alert(5)></annotation-xml></semantics></math></span>" },
+      "surfaces": ["feature-gateway", "browser-dom"],
+      "invariants": { "forbidSelectors": ["annotation-xml", "img", "[onerror]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml", "http://www.w3.org/1998/Math/MathML"] },
+      "preserve": { "text": ["FEATURE-05 retained"], "selectors": ["span.katex", "math", "mtext"] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-feature-shiki-event",
+      "category": "feature-output",
+      "featureOutput": { "kind": "code-highlight", "payload": "<pre class='shiki github-dark'><code><span style='color:#123456' onclick='alert(6)'>FEATURE-06 retained</span></code></pre>" },
+      "surfaces": ["feature-gateway", "browser-dom"],
+      "invariants": { "forbidSelectors": ["[onclick]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["FEATURE-06 retained"], "selectors": ["pre.shiki.github-dark", "code", "span"] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-feature-shiki-style-url",
+      "category": "feature-output",
+      "featureOutput": { "kind": "code-highlight", "payload": "<pre class='shiki github-light' style='background:url(https://attacker.invalid/x)'><code><span style='color:#654321'>FEATURE-07 retained</span><iframe srcdoc='x'></iframe></code></pre>" },
+      "surfaces": ["feature-gateway", "browser-dom"],
+      "invariants": { "forbidSelectors": ["iframe", "[srcdoc]", "[style*='url']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["FEATURE-07 retained"], "selectors": ["pre.shiki.github-light", "code", "span"] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-feature-mermaid-css-escape",
+      "category": "feature-output",
+      "featureOutput": { "kind": "mermaid", "rootId": "fsus-markdown-mermaid-mxss8", "payload": "<svg id='fsus-markdown-mermaid-mxss8' class='flowchart' xmlns='http://www.w3.org/2000/svg'><defs><marker id='fsus-markdown-mermaid-mxss8_marker'></marker></defs><style>#fsus-markdown-mermaid-mxss8 .node{fill:#409eff}@import 'https://attacker.invalid/theme.css';</style><g class='node' style='fill:#409eff;filter:u\\72l(https://attacker.invalid/a)'><text>FEATURE-08 retained</text><path marker-end='url(#fsus-markdown-mermaid-mxss8_marker)'></path></g></svg>" },
+      "surfaces": ["feature-gateway", "browser-dom"],
+      "invariants": { "forbidSelectors": ["[style*='url']", "style"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml", "http://www.w3.org/2000/svg"] },
+      "preserve": { "text": ["FEATURE-08 retained"], "selectors": ["svg.flowchart", "g.node", "text"] },
+      "reviewed": true
+    },
+
+    {
+      "id": "mxss-resource-large-link-label",
+      "category": "resource-boundary",
+      "source": "RES-01 retained [AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA](javascript:alert(1))",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["a[href^='javascript:']"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["RES-01 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-resource-deep-emphasis",
+      "category": "resource-boundary",
+      "source": "RES-02 retained ********************************************************deep******************************************************** <img onerror=alert(2)>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["img", "[onerror]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["RES-02 retained", "deep"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-resource-deep-blockquote",
+      "category": "resource-boundary",
+      "source": "RES-03 retained\n\n> > > > > > > > > > > > > > > > > > > > nested\n\n<svg onload=alert(3)>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["svg", "[onload]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["RES-03 retained", "nested"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-resource-degenerate-brackets",
+      "category": "resource-boundary",
+      "source": "RES-04 retained [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[javascript:alert(4)]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["a[href^='javascript:']", "script"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["RES-04 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-resource-long-attribute",
+      "category": "resource-boundary",
+      "source": "RES-05 retained\n\n<img alt='BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB' onerror=alert(5)>",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["img", "[onerror]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["RES-05 retained"], "selectors": [] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-resource-many-table-cells",
+      "category": "resource-boundary",
+      "source": "RES-06 retained\n\n| A | B | C | D | E | F |\n|---|---|---|---|---|---|\n| safe | safe | safe | safe | safe | <script>alert(6)</script> |",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["script"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["RES-06 retained", "safe"], "selectors": ["table"] },
+      "reviewed": true
+    },
+    {
+      "id": "mxss-resource-code-fence",
+      "category": "resource-boundary",
+      "source": "RES-07 retained\n\n```html\n<script>alert(7)</script>\n<img src=x onerror=alert(7)>\n```\n\nFootnote[^safe].\n\n[^safe]: retained footnote",
+      "surfaces": ["core-sync", "wasm", "worker", "chunked", "ssr-no-dom", "initial-render", "browser-dom"],
+      "invariants": { "forbidSelectors": ["script", "[onerror]"], "forbidExternalUrls": true, "allowedNamespaces": ["http://www.w3.org/1999/xhtml"] },
+      "preserve": { "text": ["RES-07 retained", "<script>alert(7)</script>", "retained footnote"], "selectors": ["pre", "code"] },
+      "reviewed": true
+    }
+  ]
+}

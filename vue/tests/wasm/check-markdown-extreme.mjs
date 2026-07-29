@@ -8,6 +8,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 import {
   buildMarkdownExtremeCorpus,
   describeMarkdownExtremeCorpus,
+  getMarkdownExtremeSecuritySources,
   normalizeMarkdownSource,
   normalizeMarkdownExtremeSize,
 } from '../support/markdown-extreme-corpus.mjs'
@@ -346,21 +347,17 @@ function assertRejectedRenderAbi(module, kind) {
 }
 
 function assertSanitized(html, kind, label) {
+  for (const source of getMarkdownExtremeSecuritySources()) {
+    assert(
+      !html.includes(source),
+      `[markdown-extreme] authoritative security source leaked: ${kind}/${label}`,
+    )
+  }
   assert(
-    !html.includes('<script>alert'),
-    `[markdown-extreme] unsafe script leaked: ${kind}/${label}`,
-  )
-  assert(
-    !html.includes('<img src=x onerror='),
-    `[markdown-extreme] unsafe img leaked: ${kind}/${label}`,
-  )
-  assert(
-    !html.includes('<iframe src="javascript:'),
-    `[markdown-extreme] unsafe iframe leaked: ${kind}/${label}`,
-  )
-  assert(
-    html.includes('&lt;script&gt;') || html.includes('&lt;iframe'),
-    `[markdown-extreme] dangerous html probes should be escaped: ${kind}/${label}`,
+    html.includes('RAW-01 retained') &&
+      html.includes('RAW-02 retained') &&
+      html.includes('CON-05 retained'),
+    `[markdown-extreme] authoritative security probes should remain observable: ${kind}/${label}`,
   )
 }
 

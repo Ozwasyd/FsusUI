@@ -75,7 +75,7 @@ struct render_result final {
   render_metadata metadata;
 };
 
-inline constexpr std::string_view renderer_version = "markdown-wasm-contract@2026-07-28";
+inline constexpr std::string_view renderer_version = "markdown-wasm-contract@2026-07-29";
 
 [[nodiscard]] std::string normalize_source(std::string_view input);
 [[nodiscard]] std::string escape_html(std::string_view input);

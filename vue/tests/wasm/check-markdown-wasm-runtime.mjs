@@ -4,6 +4,11 @@ import { pathToFileURL } from 'node:url'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { TextDecoder, TextEncoder } from 'node:util'
+import {
+  getMarkdownXssSource,
+  getMarkdownXssSourceAttackFragment,
+  loadMarkdownXssCorpus,
+} from '../../../scripts/markdown-xss-corpus.mjs'
 
 function assert(condition, message) {
   if (!condition) {
@@ -78,6 +83,7 @@ async function loadMarkdownModule(kind) {
 }
 
 async function renderWithKind(kind) {
+  const xssCorpus = await loadMarkdownXssCorpus()
   const module = await loadMarkdownModule(kind)
   const raw = module
 
@@ -113,15 +119,28 @@ async function renderWithKind(kind) {
     '',
     'Paragraph with [link](https://example.com), `code`, **strong**, *emphasis*, ***combo***, inline math \\(x^2\\), and mermaid/latex placeholders.',
     '',
-    '<script>alert(1)</script>',
+    getMarkdownXssSourceAttackFragment(xssCorpus, 'mxss-raw-script-basic'),
     '',
-    '<img src=x onerror=alert(1)>',
+    getMarkdownXssSourceAttackFragment(xssCorpus, 'mxss-raw-img-onerror'),
     '',
-    '<details open>raw</details>',
+    getMarkdownXssSourceAttackFragment(
+      xssCorpus,
+      'mxss-raw-details-ontoggle',
+    ),
     '',
-    '<svg onload=alert(1)>x</svg>',
+    getMarkdownXssSourceAttackFragment(
+      xssCorpus,
+      'mxss-namespace-svg-script',
+    ),
     '',
-    '[javascript](javascript:evil) [vbscript](vbscript:evil) [protocol relative](//evil.example/path) [control split](java\u0001script:evil) [data](data:text/html,evil) [slash backslash](/\\\\evil.example) [backslash slash](\\\\/evil.example) [mixed http](http:/\\\\evil.example)',
+    [
+      'mxss-url-javascript-link',
+      'mxss-url-vbscript-link',
+      'mxss-url-protocol-relative',
+      'mxss-url-data-html',
+    ]
+      .map((id) => getMarkdownXssSource(xssCorpus, id))
+      .join(' '),
     'Reference [link][docs], collapsed [docs][], autolink <https://example.com/auto>, ~~removed~~, and ``code ` tick``.',
     '',
     'Setext Heading',
@@ -222,15 +241,33 @@ async function renderWithKind(kind) {
       `[markdown-wasm-runtime] missing heading: ${kind}`,
     )
     for (const [rawProbe, escapedProbe] of [
-      ['<script>alert(1)</script>', '&lt;script&gt;alert(1)&lt;/script&gt;'],
-      ['<img src=x onerror=alert(1)>', '&lt;img src=x onerror=alert(1)&gt;'],
       [
-        '<details open>raw</details>',
-        '&lt;details open&gt;raw&lt;/details&gt;',
+        getMarkdownXssSourceAttackFragment(
+          xssCorpus,
+          'mxss-raw-script-basic',
+        ),
+        '&lt;script&gt;globalThis.__FSUS_XSS__=1&lt;/script&gt;',
       ],
       [
-        '<svg onload=alert(1)>x</svg>',
-        '&lt;svg onload=alert(1)&gt;x&lt;/svg&gt;',
+        getMarkdownXssSourceAttackFragment(
+          xssCorpus,
+          'mxss-raw-img-onerror',
+        ),
+        '&lt;img src=x onerror=&quot;globalThis.__FSUS_XSS__=2&quot;&gt;',
+      ],
+      [
+        getMarkdownXssSourceAttackFragment(
+          xssCorpus,
+          'mxss-raw-details-ontoggle',
+        ),
+        '&lt;details open ontoggle=alert(3)&gt;unsafe&lt;/details&gt;',
+      ],
+      [
+        getMarkdownXssSourceAttackFragment(
+          xssCorpus,
+          'mxss-namespace-svg-script',
+        ),
+        '&lt;svg&gt;&lt;script&gt;alert(1)&lt;/script&gt;&lt;/svg&gt;',
       ],
     ]) {
       assert(

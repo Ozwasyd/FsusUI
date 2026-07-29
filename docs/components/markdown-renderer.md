@@ -57,6 +57,26 @@ WASM 渲染器会保留 Mermaid、LaTeX/KaTeX 相关的 HTML、MathML、SVG 或 
 
 feature renderer 不再接受调用方 DOM adapter。内建 Mermaid、KaTeX、Shiki 只读取不可变 source、theme 和受控 token，返回带 `kind` 的 `FeatureRenderOutput`；输出统一经过 FsusUI-owned gateway 的独立 Mermaid SVG、KaTeX MathML、Shiki HTML policy 后才提交。Mermaid 强制使用原生 SVG text 而不是 `foreignObject`，进入第三方 renderer 前的颜色 token 也会按受控颜色语法验证。三类 policy 不共享标签或属性并集，未知标签、namespace、属性、事件、可执行 URL 与外部资源都会被移除。迁移方法见[收敛 Markdown feature 输出网关](../migration/markdown-feature-output-gateway.md)。
 
+### Test-only XSS differential corpus
+
+`spec/security/markdown-xss-corpus.json` 是 Markdown 安全测试的唯一 case
+事实源；schema 与消费者 manifest 位于同一目录。FsusBlog 等消费者只能从
+FsusUI 单向读取或使用
+`node scripts/export-markdown-xss-corpus.mjs --out <test-fixture-directory>`
+复制这三份 test-only 文件，不能在 production runtime import corpus，也不能让
+FsusUI 反向依赖消费者。manifest 的 SHA-256 与静态门禁确保副本可检测漂移。
+
+`pnpm run check:markdown-xss` 固定使用 `xorshift32-v1`、seed `2662026`
+执行至少 2,000 次 mutation；release lane
+`pnpm run check:markdown-xss:release` 执行至少 20,000 次。可用
+`FSUS_MARKDOWN_XSS_SEED=<reported-seed>` 和
+`FSUS_MARKDOWN_XSS_FUZZ_ITERATIONS=<count>` 复现；失败会同时输出 case ID、
+surface、seed 和最小输入。两个门禁都让 Chromium、Firefox、WebKit 解析最终
+DOM，并覆盖 sync、Wasm、Worker、chunked、SSR/no-DOM、`initialRender`
+hydration 与 Mermaid/KaTeX/Shiki gateway。corpus、manifest 和六个 kill
+control 没有 package export，静态 gate 还会扫描 production source、ESM/CJS、
+browser chunk 与 Wasm artifact，阻止 test-only marker 进入发布产物。
+
 ## Raw HTML 安全边界
 
 Markdown 协议不接受原始 HTML。核心渲染器会在 sync、Worker、chunked 和 html-only 路径中统一转义 HTML 块与行内标签，并在生成链接与图片属性时拒绝危险协议、协议相对 URL、控制字符、反斜杠混淆和 data URL。所有可提交 HTML 都封装在不透明的 `MarkdownSafeHtml` / `MarkdownSafeRenderResult` 中；普通 `string` 不能赋给这些类型，组件也不提供二次清洗开关或字符串构造入口。

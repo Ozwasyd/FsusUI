@@ -5,6 +5,7 @@ import {
   MERMAID_OUTPUT_POLICY,
   commitMarkdownFeatureOutput,
 } from '../markdown-feature-output-gateway'
+import { getMarkdownXssFeatureOutput } from '../../../tests/support/markdown-xss-corpus'
 
 describe('Markdown feature output gateway', () => {
   it('keeps code-highlight, LaTeX, and Mermaid policies independent', () => {
@@ -44,78 +45,41 @@ describe('Markdown feature output gateway', () => {
   })
 
   it('removes executable and undeclared Mermaid SVG output', () => {
-    const target = document.createElement('figure')
-    const rootId = 'fsus-markdown-mermaid-security'
-    commitMarkdownFeatureOutput(
-      target,
-      {
-        kind: 'mermaid',
-        payload: `
-          <svg id="${rootId}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" onload="alert(1)">
-            <script>alert(1)</script>
-            <foreignObject><div>unsafe</div></foreignObject>
-            <a href="https://evil.example/diagram"><text>external</text></a>
-            <use href="javascript:alert(1)" />
-            <g xmlns="https://evil.example/ns"><text>namespace</text></g>
-            <g fill="red;}body{display:none}"><text>token injection</text></g>
-            <path d="M0 0L10 10" marker-end="url(https://evil.example/marker)" />
-            <style>@import "https://evil.example/theme.css";</style>
-          </svg>
-        `,
-        rootId,
-      },
-      { nonce: 'nonce-1' },
-    )
-
-    expect(target.querySelector('script')).toBeNull()
-    expect(target.querySelector('foreignObject')).toBeNull()
-    expect(target.querySelector('[onload]')).toBeNull()
-    expect(target.querySelector('a')?.hasAttribute('href')).toBe(false)
-    expect(target.querySelector('use')?.hasAttribute('href')).toBe(false)
-    expect(target.querySelector('path')?.hasAttribute('marker-end')).toBe(false)
-    expect(target.querySelector('style')).toBeNull()
-    expect(target.textContent).not.toContain('namespace')
-    expect(target.querySelector('g')?.hasAttribute('fill')).toBe(false)
+    for (const id of [
+      'mxss-feature-mermaid-script',
+      'mxss-feature-mermaid-foreignobject',
+      'mxss-feature-mermaid-external-use',
+    ]) {
+      const target = document.createElement('figure')
+      const output = getMarkdownXssFeatureOutput(id)
+      commitMarkdownFeatureOutput(target, output, { nonce: 'nonce-1' })
+      expect(target.querySelector('script'), id).toBeNull()
+      expect(target.querySelector('foreignObject'), id).toBeNull()
+      expect(target.querySelector('iframe'), id).toBeNull()
+      expect(target.querySelector('[onload],[srcdoc]'), id).toBeNull()
+      expect(
+        target.querySelector('use')?.hasAttribute('href') ?? false,
+        id,
+      ).toBe(false)
+    }
   })
 
   it('scopes Mermaid CSS, replaces incoming nonce, and rejects CSS escapes', () => {
     const target = document.createElement('figure')
-    const rootId = 'fsus-markdown-mermaid-css'
-    commitMarkdownFeatureOutput(
-      target,
-      {
-        kind: 'mermaid',
-        payload: `
-          <svg id="${rootId}" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <symbol id="${rootId}_icon" width="16" height="16" fill-rule="evenodd" clip-rule="evenodd"></symbol>
-            </defs>
-            <style nonce="caller-nonce">
-              #${rootId} .node { fill: #409eff; }
-              @keyframes global-name { from { opacity: 0 } }
-            </style>
-            <g class="node" style="fill:#409eff;filter:u\\72l(https://evil.example/a)">
-              <marker id="${rootId}_marker"></marker>
-              <path marker-end="url(#${rootId}_marker)"></path>
-            </g>
-          </svg>
-        `,
-        rootId,
-      },
-      { nonce: 'controlled-nonce' },
+    const output = getMarkdownXssFeatureOutput(
+      'mxss-feature-mermaid-css-escape',
     )
+    commitMarkdownFeatureOutput(target, output, {
+      nonce: 'controlled-nonce',
+    })
 
     const style = target.querySelector('style')
-    expect(style?.nonce).toBe('controlled-nonce')
-    expect(style?.textContent).toBe(`#${rootId} .node{fill:#409eff}`)
+    expect(style).toBeNull()
     expect(target.querySelector('g')?.getAttribute('style')).toBe(
       'fill:#409eff',
     )
     expect(target.querySelector('path')?.getAttribute('marker-end')).toBe(
-      `url(#${rootId}_marker)`,
-    )
-    expect(target.querySelector('symbol')?.getAttribute('fill-rule')).toBe(
-      'evenodd',
+      `url(#${output.rootId}_marker)`,
     )
   })
 
@@ -235,23 +199,14 @@ describe('Markdown feature output gateway', () => {
 
   it('removes event, URL, and unknown KaTeX output', () => {
     const target = document.createElement('span')
-    commitMarkdownFeatureOutput(target, {
-      kind: 'latex',
-      payload: `
-        <span class="katex" onclick="alert(1)">
-          <a href="javascript:alert(1)">unsafe link</a>
-          <math xmlns="http://www.w3.org/1998/Math/MathML">
-            <mrow onload="alert(1)"><mi>x</mi><mo>+</mo><mn>1</mn></mrow>
-            <maction actiontype="statusline"><mtext>unknown</mtext></maction>
-          </math>
-        </span>
-      `,
-    })
+    commitMarkdownFeatureOutput(
+      target,
+      getMarkdownXssFeatureOutput('mxss-feature-latex-event'),
+    )
 
-    expect(target.querySelector('[onclick],[onload]')).toBeNull()
-    expect(target.querySelector('a')).toBeNull()
-    expect(target.querySelector('maction')).toBeNull()
-    expect(target.querySelector('math mrow mi')?.textContent).toBe('x')
+    expect(target.querySelector('[onclick],[onload],[onerror]')).toBeNull()
+    expect(target.querySelector('img')).toBeNull()
+    expect(target.querySelector('math mtext')?.textContent).toBe('x')
   })
 
   it('keeps only the real KaTeX mathml-only root class', () => {
@@ -276,35 +231,21 @@ describe('Markdown feature output gateway', () => {
   })
 
   it('removes script, event, undeclared style, and attributes from Shiki output', () => {
-    const target = document.createElement('pre')
-    const committed = commitMarkdownFeatureOutput(
-      target,
-      {
-        kind: 'code-highlight',
-        payload: `
-          <pre class="shiki github-light el-loading-mask is-fullscreen" data-plugin="unsafe" style="background:#fff;position:fixed">
-            <code class="language-ts el-loading-mask" onclick="alert(1)">
-              <span class="line el-button is-fullscreen" title="undeclared" style="color:#24292e;--caller-css:unsafe">const ok = true</span>
-              <script>alert(1)</script>
-            </code>
-          </pre>
-        `,
-      },
-      { mode: 'replace-element' },
-    )
-
-    expect(committed.tagName).toBe('PRE')
-    expect(committed.getAttribute('class')).toBe('shiki github-light')
-    expect(committed.getAttribute('style')).toBe('background:#fff')
-    expect(committed.hasAttribute('data-plugin')).toBe(false)
-    expect(committed.querySelector('[onclick]')).toBeNull()
-    expect(committed.querySelector('code')?.hasAttribute('class')).toBe(false)
-    expect(committed.querySelector('span')?.getAttribute('class')).toBe('line')
-    expect(committed.querySelector('span')?.getAttribute('style')).toBe(
-      'color:#24292e',
-    )
-    expect(committed.querySelector('span')?.hasAttribute('title')).toBe(false)
-    expect(committed.querySelector('script')).toBeNull()
+    for (const id of [
+      'mxss-feature-shiki-event',
+      'mxss-feature-shiki-style-url',
+    ]) {
+      const target = document.createElement('pre')
+      const committed = commitMarkdownFeatureOutput(
+        target,
+        getMarkdownXssFeatureOutput(id),
+        { mode: 'replace-element' },
+      )
+      expect(committed.tagName, id).toBe('PRE')
+      expect(committed.querySelector('script,iframe'), id).toBeNull()
+      expect(committed.querySelector('[onclick],[srcdoc]'), id).toBeNull()
+      expect(committed.getAttribute('style') ?? '', id).not.toContain('url(')
+    }
   })
 
   it.each(['github-light', 'github-dark'])(

@@ -29,6 +29,7 @@ export default defineConfig({
     ],
     exclude: [
       '**/node_modules/**',
+      'vue/packages/wasm/__tests__/markdown-xss-ssr.test.ts',
       'vue/tests/visual/**',
       'vue/playwright.config.ts',
       'vue/playwright.reuse.config.ts',
