@@ -1,12 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import {
-  activateMarkdownFeatures,
-  defaultCodeHighlightAdapter,
-  defaultLatexAdapter,
-  defaultMermaidAdapter,
-} from '../markdown-runtime'
+import { activateMarkdownFeatures } from '../markdown-runtime'
 
 const featureModuleMocks = vi.hoisted(() => ({
+  katexLoad: vi.fn(async () => undefined),
   katexRenderToString: vi.fn(),
   mermaidInitialize: vi.fn(),
   mermaidRender: vi.fn(),
@@ -15,12 +11,15 @@ const featureModuleMocks = vi.hoisted(() => ({
   shikiLoadTheme: vi.fn(async () => undefined),
 }))
 
-vi.mock('katex', () => ({
-  default: {
+vi.mock('katex', async () => {
+  await featureModuleMocks.katexLoad()
+  return {
+    default: {
+      renderToString: featureModuleMocks.katexRenderToString,
+    },
     renderToString: featureModuleMocks.katexRenderToString,
-  },
-  renderToString: featureModuleMocks.katexRenderToString,
-}))
+  }
+})
 
 vi.mock('shiki/core', () => ({
   createHighlighterCore: vi.fn(async () => ({
@@ -58,6 +57,14 @@ vi.mock('shiki/dist/themes/github-light.mjs', () => ({
   default: { name: 'github-light' },
 }))
 
+const createDeferred = () => {
+  let release = () => undefined
+  const promise = new Promise<void>((resolve) => {
+    release = resolve
+  })
+  return { promise, release }
+}
+
 describe('markdown feature activation runtime', () => {
   const globalWithMermaid = globalThis as typeof globalThis & {
     mermaid?: unknown
@@ -69,6 +76,7 @@ describe('markdown feature activation runtime', () => {
       render: featureModuleMocks.mermaidRender,
     }
 
+    featureModuleMocks.katexLoad.mockReset()
     featureModuleMocks.katexRenderToString.mockReset()
     featureModuleMocks.mermaidInitialize.mockReset()
     featureModuleMocks.mermaidRender.mockReset()
@@ -76,18 +84,20 @@ describe('markdown feature activation runtime', () => {
     featureModuleMocks.shikiLoadLanguage.mockClear()
     featureModuleMocks.shikiLoadTheme.mockClear()
 
-    featureModuleMocks.mermaidRender.mockResolvedValue({
+    featureModuleMocks.katexLoad.mockResolvedValue(undefined)
+    featureModuleMocks.mermaidRender.mockImplementation((id: string) => ({
       svg: [
-        '<style>.node{fill:var(--el-color-primary)}</style>',
-        '<script>alert(1)</script>',
-        '<svg onload="alert(1)" viewBox="0 0 10 10"><g /></svg>',
+        `<svg id="${id}" xmlns="http://www.w3.org/2000/svg" onload="alert(1)" viewBox="0 0 10 10">`,
+        `<style nonce="caller-nonce">#${id} .node{fill:#409eff}</style>`,
+        '<script>alert(1)</script><g class="node" /></svg>',
       ].join(''),
-    })
+    }))
     featureModuleMocks.katexRenderToString.mockReturnValue(
-      '<span class="katex"><span>x^2</span><script>alert(1)</script></span>',
+      '<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><msup><mi>x</mi><mn>2</mn></msup></math><script>alert(1)</script></span>',
     )
-    featureModuleMocks.shikiCodeToHtml.mockResolvedValue(
-      '<pre class="shiki" style="background:#fff"><code><span style="color:#24292e">const ok = true</span></code></pre>',
+    featureModuleMocks.shikiCodeToHtml.mockImplementation(
+      async (_source, options) =>
+        `<pre class="shiki ${options.theme}" style="background:#fff"><code><span class="line"><span style="color:#24292e">const ok = true</span></span></code></pre>`,
     )
   })
 
@@ -95,8 +105,9 @@ describe('markdown feature activation runtime', () => {
     delete globalWithMermaid.mermaid
   })
 
-  it('normalizes headings, links, csp styles, placeholders, and code blocks', async () => {
+  it('normalizes headings, links, and csp styles independently of feature rendering', async () => {
     const root = document.createElement('article')
+    const getComputedStyle = vi.spyOn(window, 'getComputedStyle')
     root.innerHTML = [
       '<h2>Release Notes</h2>',
       '<a href="#release-notes">hash</a>',
@@ -106,12 +117,14 @@ describe('markdown feature activation runtime', () => {
       '<span class="markdown-renderer__latex" data-latex-placeholder="true"></span>',
       '<pre><code class="language-ts">const ok = true</code></pre>',
     ].join('')
-    const mermaidAdapter = vi.fn()
-
     const result = await activateMarkdownFeatures({
       baseUrl: 'https://fsus.local/docs',
       cspNonce: 'nonce-1',
-      mermaidAdapter,
+      features: {
+        codeHighlight: false,
+        latex: false,
+        mermaid: false,
+      },
       root,
     })
 
@@ -130,37 +143,93 @@ describe('markdown feature activation runtime', () => {
       root.querySelector('a[href^="https://example.com"]')?.getAttribute('rel'),
     ).toContain('noopener')
     expect(root.querySelector('style')?.nonce).toBe('nonce-1')
-    expect(
-      root
-        .querySelector('.markdown-renderer__mermaid')
-        ?.getAttribute('data-markdown-feature-activated'),
-    ).toBe('mermaid')
-    expect(
-      root
-        .querySelector('.markdown-renderer__latex')
-        ?.getAttribute('data-markdown-feature-activated'),
-    ).toBe('latex')
-    expect(
-      root
-        .querySelector('code')
-        ?.getAttribute('data-markdown-feature-activated'),
-    ).toBe('code-highlight')
-    expect(mermaidAdapter).toHaveBeenCalledTimes(1)
     expect(result.errors).toEqual([])
     expect(result.activated.map((item) => item.kind)).toEqual([
       'heading',
       'external-link',
       'hash-link',
       'csp-style',
-      'mermaid',
-      'latex',
-      'code-highlight',
     ])
+    expect(getComputedStyle).not.toHaveBeenCalled()
+    getComputedStyle.mockRestore()
   })
 
-  it('renders Mermaid, KaTeX, and Shiki with the default adapters', async () => {
+  it('starts Mermaid, KaTeX, and Shiki together with the default global concurrency', async () => {
     const root = document.createElement('article')
+    root.innerHTML = [
+      '<figure class="markdown-renderer__mermaid" data-mermaid-placeholder="true"><code>flowchart LR; A --> B;</code></figure>',
+      '<span class="markdown-renderer__latex" data-latex-placeholder="true"><code>x^2</code></span>',
+      '<pre><code class="language-typescript">const ok = true</code></pre>',
+    ].join('')
+    const mermaid = createDeferred()
+    const latex = createDeferred()
+    const shiki = createDeferred()
+    const started: string[] = []
+
+    featureModuleMocks.mermaidRender.mockImplementation(async (id: string) => {
+      started.push('mermaid')
+      await mermaid.promise
+      return {
+        svg: `<svg id="${id}" xmlns="http://www.w3.org/2000/svg" onload="alert(1)"><script>alert(1)</script><g /></svg>`,
+      }
+    })
+    featureModuleMocks.katexLoad.mockImplementation(async () => {
+      started.push('latex')
+      await latex.promise
+    })
+    featureModuleMocks.shikiCodeToHtml.mockImplementation(async () => {
+      started.push('code-highlight')
+      await shiki.promise
+      return '<pre class="shiki github-light"><code><span class="line">const ok = true</span></code></pre>'
+    })
+
+    const activation = activateMarkdownFeatures({ root })
+
+    await vi.waitFor(() =>
+      expect(new Set(started)).toEqual(
+        new Set(['mermaid', 'latex', 'code-highlight']),
+      ),
+    )
+    expect(root.querySelector('[data-markdown-feature-activated]')).toBeNull()
+    mermaid.release()
+    latex.release()
+    shiki.release()
+    const result = await activation
+
+    expect(featureModuleMocks.mermaidRender).toHaveBeenCalledTimes(1)
+    expect(featureModuleMocks.katexRenderToString).toHaveBeenCalledTimes(1)
+    expect(featureModuleMocks.shikiCodeToHtml).toHaveBeenCalledTimes(1)
+    expect(featureModuleMocks.shikiLoadLanguage).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'typescript' }),
+    )
+    expect(featureModuleMocks.shikiLoadTheme).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'github-light' }),
+    )
+    expect(
+      root.querySelectorAll('[data-markdown-feature-activated]'),
+    ).toHaveLength(3)
+    expect(root.querySelector('script')).toBeNull()
+    expect(root.querySelector('svg')?.getAttribute('onload')).toBeNull()
+    expect(result).toEqual({
+      activated: [
+        { count: 1, kind: 'mermaid' },
+        { count: 1, kind: 'latex' },
+        { count: 1, kind: 'code-highlight' },
+      ],
+      errors: [],
+    })
+  })
+
+  it('renders Mermaid, KaTeX, and Shiki through the built-in output gateway', async () => {
+    const root = document.createElement('article')
+    const createElement = vi.spyOn(document, 'createElement')
+    const getComputedStyle = vi.spyOn(window, 'getComputedStyle')
     root.setAttribute('data-theme-resolved', 'dark')
+    root.style.setProperty('--el-color-primary', 'red;} body{display:none')
+    root.style.setProperty(
+      '--el-color-danger',
+      'url(https://evil.example/color)',
+    )
     root.innerHTML = [
       '<figure class="markdown-renderer__mermaid" data-mermaid-placeholder="true"><code>flowchart LR; A --> B;</code></figure>',
       '<span class="markdown-renderer__latex" data-latex-placeholder="true"><code>x^2</code></span>',
@@ -168,32 +237,38 @@ describe('markdown feature activation runtime', () => {
     ].join('')
 
     const result = await activateMarkdownFeatures({
-      codeHighlightAdapter: defaultCodeHighlightAdapter,
       cspNonce: 'nonce-2',
-      latexAdapter: defaultLatexAdapter,
-      mermaidAdapter: defaultMermaidAdapter,
       root,
     })
 
     expect(featureModuleMocks.mermaidInitialize).toHaveBeenCalledWith(
       expect.objectContaining({
+        htmlLabels: false,
         securityLevel: 'strict',
         startOnLoad: false,
         theme: 'dark',
+        themeVariables: expect.objectContaining({
+          nodeBorder: '#409eff',
+          primaryBorderColor: '#409eff',
+        }),
       }),
     )
     expect(featureModuleMocks.mermaidRender).toHaveBeenCalledWith(
       expect.stringMatching(/^fsus-markdown-mermaid-/),
       'flowchart LR; A --> B;',
     )
+    expect(featureModuleMocks.mermaidRender).toHaveBeenCalledTimes(1)
     expect(featureModuleMocks.katexRenderToString).toHaveBeenCalledWith(
       'x^2',
       expect.objectContaining({
         displayMode: false,
+        errorColor: '#f56c6c',
+        output: 'mathml',
         throwOnError: false,
         trust: false,
       }),
     )
+    expect(featureModuleMocks.katexRenderToString).toHaveBeenCalledTimes(1)
     expect(featureModuleMocks.shikiCodeToHtml).toHaveBeenCalledWith(
       'const ok = true',
       expect.objectContaining({
@@ -201,14 +276,11 @@ describe('markdown feature activation runtime', () => {
         theme: 'github-dark',
       }),
     )
-    expect(featureModuleMocks.shikiLoadLanguage).toHaveBeenCalledTimes(1)
-    expect(featureModuleMocks.shikiLoadLanguage).toHaveBeenCalledWith(
-      expect.objectContaining({ name: 'typescript' }),
-    )
-    expect(featureModuleMocks.shikiLoadTheme).toHaveBeenCalledTimes(1)
-    expect(featureModuleMocks.shikiLoadTheme).toHaveBeenCalledWith(
-      expect.objectContaining({ name: 'github-dark' }),
-    )
+    expect(featureModuleMocks.shikiCodeToHtml).toHaveBeenCalledTimes(1)
+    expect(getComputedStyle).toHaveBeenCalledTimes(1)
+    expect(
+      createElement.mock.calls.filter(([tagName]) => tagName === 'template'),
+    ).toHaveLength(3)
 
     expect(
       root.querySelector('[data-mermaid-rendered="true"] svg'),
@@ -222,12 +294,97 @@ describe('markdown feature activation runtime', () => {
     expect(root.querySelector('script')).toBeNull()
     expect(root.querySelector('svg')?.getAttribute('onload')).toBeNull()
     expect(root.querySelector('style')?.nonce).toBe('nonce-2')
+    expect(root.querySelector('style')?.textContent).toMatch(
+      /^#fsus-markdown-mermaid-\d+ \.node\{fill:#409eff\}$/u,
+    )
     expect(result.errors).toEqual([])
     expect(result.activated.map((item) => item.kind)).toEqual([
       'mermaid',
       'latex',
       'code-highlight',
     ])
+    createElement.mockRestore()
+    getComputedStyle.mockRestore()
+  })
+
+  it('commits every built-in feature exactly once for five distinct revisions', async () => {
+    const root = document.createElement('article')
+    const createElement = vi.spyOn(document, 'createElement')
+    const getComputedStyle = vi.spyOn(window, 'getComputedStyle')
+    document.body.append(root)
+
+    for (let revision = 1; revision <= 5; revision += 1) {
+      const dark = revision % 2 === 0
+      const primaryColor = dark ? '#123456' : '#abcdef'
+      const dangerColor = dark ? '#654321' : '#fedcba'
+      root.setAttribute('data-theme-resolved', dark ? 'dark' : 'light')
+      root.style.setProperty('--el-color-primary', primaryColor)
+      root.style.setProperty('--el-color-danger', dangerColor)
+      root.innerHTML = [
+        `<figure class="markdown-renderer__mermaid" data-mermaid-placeholder="true"><code>sequenceDiagram\nAlice-->>Bob: revision ${revision}</code></figure>`,
+        `<span class="markdown-renderer__latex" data-latex-placeholder="true"><code>x_${revision}</code></span>`,
+        `<pre><code class="language-typescript">const revision = ${revision}</code></pre>`,
+      ].join('')
+
+      const result = await activateMarkdownFeatures({ root })
+
+      expect(result.errors).toEqual([])
+      expect(result.activated).toEqual([
+        { count: 1, kind: 'mermaid' },
+        { count: 1, kind: 'latex' },
+        { count: 1, kind: 'code-highlight' },
+      ])
+      expect(
+        root.querySelectorAll('[data-markdown-feature-activated]'),
+      ).toHaveLength(3)
+      expect(featureModuleMocks.mermaidInitialize).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          theme: dark ? 'dark' : 'default',
+          themeVariables: expect.objectContaining({
+            nodeBorder: primaryColor,
+            primaryBorderColor: primaryColor,
+          }),
+        }),
+      )
+      expect(featureModuleMocks.katexRenderToString).toHaveBeenLastCalledWith(
+        `x_${revision}`,
+        expect.objectContaining({ errorColor: dangerColor }),
+      )
+      expect(featureModuleMocks.shikiCodeToHtml).toHaveBeenLastCalledWith(
+        `const revision = ${revision}`,
+        expect.objectContaining({
+          theme: dark ? 'github-dark' : 'github-light',
+        }),
+      )
+      expect(getComputedStyle).toHaveBeenCalledTimes(revision)
+    }
+
+    expect(featureModuleMocks.mermaidRender).toHaveBeenCalledTimes(5)
+    expect(featureModuleMocks.katexRenderToString).toHaveBeenCalledTimes(5)
+    expect(featureModuleMocks.shikiCodeToHtml).toHaveBeenCalledTimes(5)
+    expect(
+      createElement.mock.calls.filter(([tagName]) => tagName === 'template'),
+    ).toHaveLength(15)
+    root.remove()
+    createElement.mockRestore()
+    getComputedStyle.mockRestore()
+  })
+
+  it('does not count empty or already committed feature elements', async () => {
+    const root = document.createElement('article')
+    root.innerHTML = [
+      '<figure class="markdown-renderer__mermaid" data-mermaid-placeholder="true"></figure>',
+      '<span class="markdown-renderer__latex" data-latex-rendered="katex"><span class="katex"></span></span>',
+      '<pre data-code-highlighted="shiki"><code class="language-ts">already highlighted</code></pre>',
+    ].join('')
+
+    const result = await activateMarkdownFeatures({ root })
+
+    expect(result.errors).toEqual([])
+    expect(result.activated).toEqual([])
+    expect(featureModuleMocks.mermaidRender).not.toHaveBeenCalled()
+    expect(featureModuleMocks.katexRenderToString).not.toHaveBeenCalled()
+    expect(featureModuleMocks.shikiCodeToHtml).not.toHaveBeenCalled()
   })
 
   it('records default adapter failures as activation errors', async () => {
@@ -236,14 +393,13 @@ describe('markdown feature activation runtime', () => {
     )
     const root = document.createElement('article')
     root.innerHTML =
-      '<figure class="markdown-renderer__mermaid" data-mermaid-placeholder="true"><code>broken</code></figure>'
+      '<figure class="markdown-renderer__mermaid" data-mermaid-placeholder="true"><code>&lt;img src=x onerror=alert(1)&gt;</code></figure>'
 
     const result = await activateMarkdownFeatures({
       features: {
         codeHighlight: false,
         latex: false,
       },
-      mermaidAdapter: defaultMermaidAdapter,
       root,
     })
 
@@ -257,6 +413,125 @@ describe('markdown feature activation runtime', () => {
     expect(
       root.querySelector('.el-markdown-renderer__feature-error'),
     ).toBeTruthy()
+    expect(
+      root.querySelector('.el-markdown-renderer__feature-error code')
+        ?.textContent,
+    ).toBe('<img src=x onerror=alert(1)>')
+    expect(
+      root.querySelector('.el-markdown-renderer__feature-error img'),
+    ).toBeNull()
+  })
+
+  it('shares an explicit concurrency limit across mixed feature kinds', async () => {
+    const root = document.createElement('article')
+    root.innerHTML = [
+      '<figure class="markdown-renderer__mermaid" data-mermaid-placeholder="true"><code>diagram-1</code></figure>',
+      '<figure class="markdown-renderer__mermaid" data-mermaid-placeholder="true"><code>diagram-2</code></figure>',
+      '<span class="markdown-renderer__latex" data-latex-placeholder="true"><code>x^2</code></span>',
+      '<pre><code class="language-typescript">code-1</code></pre>',
+      '<pre><code class="language-typescript">code-2</code></pre>',
+    ].join('')
+    const releases = new Map<string, () => void>()
+    const started: string[] = []
+    let active = 0
+    let maxActive = 0
+    const waitForRelease = async (label: string) => {
+      const deferred = createDeferred()
+      releases.set(label, deferred.release)
+      started.push(label)
+      active += 1
+      maxActive = Math.max(maxActive, active)
+      await deferred.promise
+      active -= 1
+    }
+
+    featureModuleMocks.mermaidRender.mockImplementation(
+      async (id: string, source: string) => {
+        await waitForRelease(`mermaid:${source}`)
+        return {
+          svg: `<svg id="${id}" xmlns="http://www.w3.org/2000/svg"><g /></svg>`,
+        }
+      },
+    )
+    featureModuleMocks.katexRenderToString.mockImplementation((source) => {
+      const label = `latex:${source}`
+      started.push(label)
+      active += 1
+      maxActive = Math.max(maxActive, active)
+      active -= 1
+      return '<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi></math></span>'
+    })
+    featureModuleMocks.shikiCodeToHtml.mockImplementation(async (source) => {
+      await waitForRelease(`code-highlight:${source}`)
+      return `<pre class="shiki github-light"><code><span class="line">${source}</span></code></pre>`
+    })
+
+    const activation = activateMarkdownFeatures({
+      concurrency: 2,
+      root,
+    })
+
+    await vi.waitFor(() => expect(started).toHaveLength(2))
+    expect(started).toEqual(['mermaid:diagram-1', 'mermaid:diagram-2'])
+    releases.get('mermaid:diagram-1')?.()
+    await vi.waitFor(() => expect(started).toHaveLength(4))
+    expect(started.slice(2)).toEqual(['latex:x^2', 'code-highlight:code-1'])
+    releases.get('mermaid:diagram-2')?.()
+    await vi.waitFor(() => expect(started).toHaveLength(5))
+    releases.get('code-highlight:code-1')?.()
+    releases.get('code-highlight:code-2')?.()
+    const result = await activation
+
+    expect(maxActive).toBe(2)
+    expect(result).toEqual({
+      activated: [
+        { count: 2, kind: 'mermaid' },
+        { count: 1, kind: 'latex' },
+        { count: 2, kind: 'code-highlight' },
+      ],
+      errors: [],
+    })
+    expect(
+      root.querySelectorAll('[data-markdown-feature-activated]'),
+    ).toHaveLength(5)
+  })
+
+  it('keeps stable feature-kind order when concurrency is one', async () => {
+    const root = document.createElement('article')
+    root.innerHTML = [
+      '<figure class="markdown-renderer__mermaid" data-mermaid-placeholder="true"><code>diagram</code></figure>',
+      '<span class="markdown-renderer__latex" data-latex-placeholder="true"><code>x</code></span>',
+      '<pre><code class="language-typescript">code</code></pre>',
+    ].join('')
+    const started: string[] = []
+
+    featureModuleMocks.mermaidRender.mockImplementation((id: string) => {
+      started.push('mermaid')
+      return {
+        svg: `<svg id="${id}" xmlns="http://www.w3.org/2000/svg"><g /></svg>`,
+      }
+    })
+    featureModuleMocks.katexRenderToString.mockImplementation(() => {
+      started.push('latex')
+      return '<span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><mi>x</mi></math></span>'
+    })
+    featureModuleMocks.shikiCodeToHtml.mockImplementation(async () => {
+      started.push('code-highlight')
+      return '<pre class="shiki github-light"><code><span class="line">code</span></code></pre>'
+    })
+
+    const result = await activateMarkdownFeatures({
+      concurrency: 1,
+      root,
+    })
+
+    expect(started).toEqual(['mermaid', 'latex', 'code-highlight'])
+    expect(result.activated.map((item) => item.kind)).toEqual([
+      'mermaid',
+      'latex',
+      'code-highlight',
+    ])
+    expect(result.errors).toEqual([])
   })
 
   it('limits concurrent feature work and stops scheduling after cancellation', async () => {
@@ -270,16 +545,16 @@ describe('markdown feature activation runtime', () => {
     let active = 0
     let maxActive = 0
     const started: string[] = []
-    const codeHighlightAdapter = vi.fn(async (element: HTMLElement) => {
-      started.push(element.textContent ?? '')
+    featureModuleMocks.shikiCodeToHtml.mockImplementation(async (source) => {
+      started.push(source)
       active += 1
       maxActive = Math.max(maxActive, active)
       await new Promise<void>((resolve) => releases.push(resolve))
       active -= 1
+      return `<pre class="shiki github-light"><code><span class="line"><span style="color:#24292e">${source}</span></span></code></pre>`
     })
 
     const activation = activateMarkdownFeatures({
-      codeHighlightAdapter,
       concurrency: 2,
       features: {
         cspNonce: false,
@@ -301,6 +576,11 @@ describe('markdown feature activation runtime', () => {
     expect(maxActive).toBe(2)
     expect(started).toEqual(['item-0', 'item-1'])
     expect(result.activated).toEqual([])
+    expect(result.errors).toEqual([
+      { kind: 'code-highlight', message: 'shiki_render_aborted' },
+      { kind: 'code-highlight', message: 'shiki_render_aborted' },
+    ])
+    expect(featureModuleMocks.shikiCodeToHtml).toHaveBeenCalledTimes(2)
     expect(root.querySelector('[data-markdown-feature-activated]')).toBeNull()
   })
 })

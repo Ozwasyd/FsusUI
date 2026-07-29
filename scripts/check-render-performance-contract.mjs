@@ -14,6 +14,9 @@ const [
   impactPlanner,
   ownership,
   impactFixtures,
+  performanceFixture,
+  markdownFeatureFixture,
+  markdownFeatureMigration,
 ] = await Promise.all([
   read('scripts/web-render-performance.mjs'),
   read('dotnet/FsusUI.Avalonia.Demo/RenderPerformanceRunner.cs'),
@@ -25,6 +28,9 @@ const [
   read('scripts/render-performance-impact-plan.mjs'),
   read('spec/ci/pr-render-performance-ownership.json'),
   read('tests/fixtures/render-performance-impact-plan/cases.json'),
+  read('vue/packages/demo-app/src/PerformanceFixture.vue'),
+  read('vue/packages/demo-app/src/markdown-feature-performance.ts'),
+  read('docs/migration/markdown-feature-output-gateway.md'),
 ])
 
 const failures = []
@@ -36,6 +42,7 @@ for (const token of [
   "['virtual-grid', 100_000]",
   "['markdown-cold', 24 * 1024]",
   "['markdown-hot', 1024 * 1024]",
+  "['markdown-feature-activation', 4_096]",
   "['select-v2', 100_000]",
   "['table', 1_000]",
   "['data-pipeline-table', 100_000]",
@@ -47,8 +54,44 @@ for (const token of [
   'workerPoolBurstProbe',
   'wasmProbe',
   'dataPipelineProbe',
+  'revision !== activationRevisions[index - 1] + 1',
+  'samples !== 5',
+  "scenario === 'markdown-feature-activation'",
+  'if (measureDomParses)',
+  'DOM parser instrumentation is unavailable',
+  'iteration, measureDomParses',
+  'domParseOperationStats',
+  'domParseOperations.some((entry) => entry.unsupported.length > 0)',
+  'domParseOperationTotal(entry.counts) <= 0',
+  'Number.isFinite(before)',
+  'beforeDom.max',
+  'afterDom.max > beforeDom.max',
+  "entry.scenario === 'markdown-feature-activation'",
+  "['p50', 'p95']",
+  'after > before * 1.05',
 ]) {
   if (!web.includes(token)) failures.push(`web runner missing ${token}`)
+}
+for (const token of [
+  ':content-version="markdownContentVersion"',
+  '@features-activated="captureMarkdownFeatureActivation"',
+  'await cycle.completion',
+  'activationRevision: completedMarkdownActivationRevision.value',
+]) {
+  if (!performanceFixture.includes(token))
+    failures.push(`Markdown feature fixture missing ${token}`)
+}
+for (const token of [
+  "'code-highlight'",
+  "'latex'",
+  "'mermaid'",
+  "'sequenceDiagram'",
+  String.raw`\begin{aligned}`,
+  "'```typescript'",
+  'markdown_feature_activation_already_pending',
+]) {
+  if (!markdownFeatureFixture.includes(token))
+    failures.push(`Markdown feature activation contract missing ${token}`)
 }
 for (const token of [
   'RenderTargetBitmap',
@@ -77,6 +120,24 @@ for (const token of [
 }
 if (!packageJson.includes('"perf:render"'))
   failures.push('single reproduction command missing')
+const buildDemoCommand = JSON.parse(packageJson).scripts?.['build:demo'] ?? ''
+if (
+  !buildDemoCommand.includes('pnpm run ensure:wasm') ||
+  !buildDemoCommand.includes('pnpm run -C vue/packages/demo-app build') ||
+  buildDemoCommand.indexOf('pnpm run ensure:wasm') >
+    buildDemoCommand.indexOf('pnpm run -C vue/packages/demo-app build')
+) {
+  failures.push('Release demo owner must materialize Wasm before demo build')
+}
+if (!markdownFeatureMigration.includes('pnpm run build:demo'))
+  failures.push('Markdown feature migration missing complete Release demo owner')
+if (
+  markdownFeatureMigration.includes('pnpm -C vue/packages/demo-app build')
+) {
+  failures.push(
+    'Markdown feature migration must not use a bare demo build for paired Release measurement',
+  )
+}
 if (!quality.includes('pr-real-render-performance'))
   failures.push('PR quick matrix missing')
 if (!quality.includes('performance-baseline'))

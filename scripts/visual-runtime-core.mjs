@@ -455,6 +455,7 @@ export function createDefaultVisualRuntimeConfig(
           'vue/packages/wasm/build.config.ts',
           'vue/packages/wasm/index.ts',
           'vue/packages/wasm/markdown.ts',
+          'vue/packages/wasm/markdown-feature-output-gateway.ts',
           'vue/packages/wasm/markdown-runtime.ts',
           'vue/packages/wasm/runtime',
           'vue/packages/wasm/src',

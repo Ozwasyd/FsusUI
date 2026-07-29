@@ -187,6 +187,32 @@ function collectManifestClosure(manifest, entryKey) {
   return visited
 }
 
+const manifestClosureContainsFile = (manifest, closure, targetFile) =>
+  [...closure].some((key) => manifest[key]?.file === targetFile)
+
+const isMarkdownFeatureOutputGatewayModule = (key) =>
+  /\/wasm\/markdown-feature-output-gateway\.mjs$/u.test(key)
+
+function hasDynamicManifestPath(manifest, entryKey, targetKey) {
+  const visited = new Set()
+  const visit = (key, crossedDynamicBoundary) => {
+    const visitKey = `${crossedDynamicBoundary}:${key}`
+    if (visited.has(visitKey)) return false
+    visited.add(visitKey)
+    if (key === targetKey) return crossedDynamicBoundary
+
+    const entry = manifest[key]
+    if (!entry) return false
+    return [
+      ...(entry.imports ?? []).map((dependency) => [dependency, false]),
+      ...(entry.dynamicImports ?? []).map((dependency) => [dependency, true]),
+    ].some(([dependency, isDynamic]) =>
+      visit(dependency, crossedDynamicBoundary || isDynamic),
+    )
+  }
+  return visit(entryKey, false)
+}
+
 function measureManifestClosure(
   fixtureRoot,
   manifest,
@@ -324,6 +350,52 @@ function assertConsumerPerformanceGraph(graph) {
   if (!markdownHydration) {
     throw new Error('Consumer graph lost the lazy Markdown hydration entry.')
   }
+  const gatewayKeys = Object.keys(graph.manifest).filter(
+    isMarkdownFeatureOutputGatewayModule,
+  )
+  if (gatewayKeys.length !== 1) {
+    throw new Error(
+      `Consumer graph must expose exactly one Markdown feature output gateway module, found ${gatewayKeys.length}.`,
+    )
+  }
+  const gatewayKey = gatewayKeys[0]
+  const gateway = graph.manifest[gatewayKey]
+  if (!gateway?.isDynamicEntry) {
+    throw new Error(
+      'Consumer Markdown feature output gateway must remain a dynamic manifest entry.',
+    )
+  }
+  if (
+    graph.initialKeys.has(gatewayKey) ||
+    manifestClosureContainsFile(graph.manifest, graph.initialKeys, gateway.file)
+  ) {
+    throw new Error(
+      'Consumer startup graph eagerly contains the Markdown feature output gateway.',
+    )
+  }
+  const markdownHydrationClosure = collectManifestClosure(
+    graph.manifest,
+    markdownHydration.key,
+  )
+  if (
+    markdownHydrationClosure.has(gatewayKey) ||
+    manifestClosureContainsFile(
+      graph.manifest,
+      markdownHydrationClosure,
+      gateway.file,
+    )
+  ) {
+    throw new Error(
+      'Consumer Markdown hydration closure eagerly contains the Markdown feature output gateway chunk.',
+    )
+  }
+  if (
+    !hasDynamicManifestPath(graph.manifest, markdownHydration.key, gatewayKey)
+  ) {
+    throw new Error(
+      'Consumer Markdown hydration graph no longer reaches the feature output gateway through a dynamic import.',
+    )
+  }
   assertRatchet(
     'Consumer Markdown hydration graph',
     markdownHydration,
@@ -399,19 +471,45 @@ try {
       '--eval',
       [
         `import { createRequire } from 'node:module'`,
+        `import path from 'node:path'`,
         `const root = await import('${packageName}')`,
         `const wasm = await import('${packageName}/wasm')`,
         `const markdownRuntime = await import('${packageName}/markdown-runtime')`,
         `const motion = await import('${packageName}/motion')`,
         `const perception = await import('${packageName}/perception-challenge')`,
         `const require = createRequire(import.meta.url)`,
+        `const rootCjs = require('${packageName}')`,
+        `const wasmCjs = require('${packageName}/wasm')`,
+        `const markdownRuntimeCjs = require('${packageName}/markdown-runtime')`,
+        `const componentEntry = await import('${packageName}/es/components/button/index')`,
+        `const componentEntryCjs = require('${packageName}/lib/components/button/index')`,
+        `const componentEntryWithExtension = await import('${packageName}/es/components/button/index.mjs')`,
+        `const componentEntryCjsWithExtension = require('${packageName}/lib/components/button/index.js')`,
+        `const localeLang = await import('${packageName}/es/locale/lang/en')`,
+        `const localeLangCjs = require('${packageName}/lib/locale/lang/en')`,
+        `const expectEsmPathNotExported = async (specifier) => { try { await import(specifier) } catch (error) { if (error?.code === 'ERR_PACKAGE_PATH_NOT_EXPORTED') return; throw error } throw new Error('ES deep import unexpectedly exported ' + specifier) }`,
+        `const expectCjsPathNotExported = (specifier) => { try { require(specifier) } catch (error) { if (error?.code === 'ERR_PACKAGE_PATH_NOT_EXPORTED') return; throw error } throw new Error('CJS deep import unexpectedly exported ' + specifier) }`,
+        `const expectEsmMissingInternalPath = async (specifier) => { let expectedUrl; try { expectedUrl = import.meta.resolve(specifier) } catch (error) { if (error?.code === 'ERR_PACKAGE_PATH_NOT_EXPORTED') return; throw error } try { await import(specifier) } catch (error) { if (error?.code === 'ERR_MODULE_NOT_FOUND' && error?.url === expectedUrl) return; throw error } throw new Error('ES internal path unexpectedly loaded ' + specifier) }`,
+        `const packageRoot = path.dirname(path.dirname(require.resolve('${packageName}')))`,
+        `const expectCjsMissingInternalPath = (specifier, expectedTarget) => { try { require.resolve(specifier) } catch (error) { const firstLine = String(error?.message ?? '').split(/\\r?\\n/u)[0]; if (error?.code === 'ERR_PACKAGE_PATH_NOT_EXPORTED') return; if (error?.code === 'MODULE_NOT_FOUND' && firstLine === "Cannot find module '" + expectedTarget + "'" && !error?.requireStack) return; throw error } throw new Error('CJS internal path unexpectedly resolved ' + specifier) }`,
         `const forbiddenAuthorityBuilders = ['authorizeMarkdownRuntimeResult', 'brandMarkdownSafeHtml', 'brandMarkdownSafeRenderResult']`,
         `for (const [surface, exports] of [['root', root], ['wasm', wasm], ['markdown-runtime', markdownRuntime]]) for (const name of forbiddenAuthorityBuilders) if (name in exports) throw new Error(surface + ' exposes forbidden Markdown authority builder ' + name)`,
-        `await import('${packageName}/es/wasm/markdown-safe.mjs').then(() => { throw new Error('ES deep import exposed Markdown authority builders') }, () => undefined)`,
-        `try { require('${packageName}/lib/wasm/markdown-safe.js'); throw new Error('CJS deep import exposed Markdown authority builders') } catch (error) { if (error instanceof Error && error.message === 'CJS deep import exposed Markdown authority builders') throw error }`,
-        `await import('${packageName}/es/components/markdown-renderer/src/markdown-renderer-cache.mjs').then(() => { throw new Error('ES deep import exposed caller-writable Markdown cache') }, () => undefined)`,
-        `try { require('${packageName}/lib/components/markdown-renderer/src/markdown-renderer-cache.js'); throw new Error('CJS deep import exposed caller-writable Markdown cache') } catch (error) { if (error instanceof Error && error.message === 'CJS deep import exposed caller-writable Markdown cache') throw error }`,
+        `await expectEsmPathNotExported('${packageName}/es/wasm/markdown-safe')`,
+        `expectCjsPathNotExported('${packageName}/lib/wasm/markdown-safe')`,
+        `await expectEsmPathNotExported('${packageName}/es/wasm/markdown-feature-output-gateway.mjs')`,
+        `await expectEsmPathNotExported('${packageName}/es/wasm/%6darkdown-feature-output-gateway.mjs')`,
+        `await expectEsmPathNotExported('${packageName}/es/%77asm/markdown-feature-output-gateway.mjs')`,
+        `expectCjsPathNotExported('${packageName}/lib/wasm/markdown-feature-output-gateway.js')`,
+        `expectCjsPathNotExported('${packageName}/lib/wasm/%6darkdown-feature-output-gateway.js')`,
+        `expectCjsPathNotExported('${packageName}/lib/%77asm/markdown-feature-output-gateway.js')`,
+        `await expectEsmMissingInternalPath('${packageName}/es/components/markdown-renderer/src/markdown-renderer-cache')`,
+        `expectCjsMissingInternalPath('${packageName}/lib/components/markdown-renderer/src/markdown-renderer-cache', path.join(packageRoot, 'lib', 'components', 'markdown-renderer', 'src', 'markdown-renderer-cache.js'))`,
         `if (root.FsusDataList?.name !== 'FsusDataList') throw new Error('FsusDataList runtime export drifted')`,
+        `if (rootCjs.FsusDataList?.name !== 'FsusDataList') throw new Error('FsusDataList CJS runtime export drifted')`,
+        `if (typeof wasm.ensureWasmReady !== 'function' || typeof wasmCjs.ensureWasmReady !== 'function') throw new Error('Wasm public entry resolution drifted')`,
+        `if (typeof markdownRuntime.activateMarkdownFeatures !== 'function' || typeof markdownRuntimeCjs.activateMarkdownFeatures !== 'function') throw new Error('Markdown runtime public entry resolution drifted')`,
+        `if (!componentEntry.ElButton || !componentEntryCjs.ElButton || !componentEntryWithExtension.ElButton || !componentEntryCjsWithExtension.ElButton) throw new Error('Documented component compatibility path drifted')`,
+        `if (localeLang.default?.name !== 'en' || localeLangCjs.default?.name !== 'en') throw new Error('Documented locale compatibility path drifted')`,
         `if (motion.FsuTransition?.name !== 'FsuTransition') throw new Error('FsuTransition runtime export drifted')`,
         `if (perception.FsusPerceptionChallenge?.name !== 'FsusPerceptionChallenge') throw new Error('FsusPerceptionChallenge runtime export drifted')`,
         `if (perception.FsusPerceptionCharacterChallenge?.name !== 'FsusPerceptionCharacterChallenge') throw new Error('FsusPerceptionCharacterChallenge runtime export drifted')`,
@@ -420,15 +518,31 @@ try {
     ],
     { cwd: fixtureRoot },
   )
-  const markdownTypeProbe = path.join(fixtureRoot, 'src', 'markdown-safe-html.ts')
+  const markdownTypeProbe = path.join(
+    fixtureRoot,
+    'src',
+    'markdown-safe-html.ts',
+  )
   writeFileSync(
     markdownTypeProbe,
     [
       `import type { MarkdownSafeHtml as WasmSafeHtml } from '${packageName}/wasm'`,
       `import type { MarkdownSafeHtml as RuntimeSafeHtml } from '${packageName}/markdown-runtime'`,
+      `import type { MarkdownRendererProps } from '${packageName}'`,
+      `// @ts-expect-error legacy DOM-mutating feature adapters are removed`,
+      `import type { MarkdownFeatureAdapter } from '${packageName}/markdown-runtime'`,
+      `// @ts-expect-error internal Markdown feature output gateway is blocked by package exports`,
+      `import type { FeatureRenderOutput } from '${packageName}/es/wasm/markdown-feature-output-gateway'`,
       `declare const wasmSafe: WasmSafeHtml`,
+      `declare const rendererProps: MarkdownRendererProps`,
       `const runtimeSafe: RuntimeSafeHtml = wasmSafe`,
       `void runtimeSafe`,
+      `// @ts-expect-error Mermaid adapter prop is removed`,
+      `rendererProps.mermaidAdapter`,
+      `// @ts-expect-error LaTeX adapter prop is removed`,
+      `rendererProps.latexAdapter`,
+      `// @ts-expect-error code highlight adapter prop is removed`,
+      `rendererProps.codeHighlightAdapter`,
       `// @ts-expect-error plain strings must never satisfy the published safe HTML brand`,
       `const unsafe: RuntimeSafeHtml = '<p>unsafe</p>'`,
       `void unsafe`,
@@ -452,9 +566,23 @@ try {
       },
     },
   )
-  const viteOutput = runAndCollect('pnpm', ['exec', 'vite', 'build'], {
-    cwd: fixtureRoot,
-  })
+  const viteOutput = runAndCollect(
+    'node',
+    [
+      path.join(repoRoot, 'scripts', 'with-node-heap.mjs'),
+      'pnpm',
+      'exec',
+      'vite',
+      'build',
+    ],
+    {
+      cwd: fixtureRoot,
+      env: {
+        FSUS_NODE_HEAP_PROFILE: 'build',
+        NODE_OPTIONS: '',
+      },
+    },
+  )
   const performanceGraph = reportConsumerPerformanceGraph(fixtureRoot)
   assertNoConsumerBuildWarnings(viteOutput)
   assertConsumerPerformanceGraph(performanceGraph)

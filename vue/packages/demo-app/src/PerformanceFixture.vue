@@ -56,13 +56,15 @@
     <el-markdown-renderer
       v-else-if="scenario.startsWith('markdown')"
       :content="markdown"
+      :content-version="markdownContentVersion"
       :allow-latex="true"
       :allow-mermaid="true"
       mode="article"
       class="performance-scroll-target performance-markdown"
+      @features-activated="captureMarkdownFeatureActivation"
       @render-profile="captureWasmProfile"
-      @render-complete="ready = 'true'"
-      @render-error="ready = 'error'"
+      @render-complete="captureMarkdownRenderComplete"
+      @render-error="captureMarkdownRenderError"
     />
 
     <el-select-v2
@@ -124,8 +126,18 @@ import {
   useFsusRenderScheduler,
 } from '@element-plus/hooks'
 import { createWasmSortController } from '@element-plus/components/table/src/composables/use-wasm-sort'
+import {
+  MARKDOWN_FEATURE_ACTIVATION_SCENARIO,
+  MarkdownFeatureActivationSequence,
+  createMarkdownFeatureActivationSource,
+  hasCompleteMarkdownFeatureActivation,
+} from './markdown-feature-performance'
 
-import type { MarkdownRuntimeProfile } from '@element-plus/wasm'
+import type {
+  MarkdownFeatureActivationResult,
+  MarkdownRuntimeProfile,
+  MarkdownSafeRenderResult,
+} from '@element-plus/wasm'
 import type { FsusScheduledWork } from '@element-plus/hooks'
 
 const props = defineProps<{
@@ -140,6 +152,10 @@ const selection = ref<unknown[]>([])
 const tableFilter = ref('')
 const tableRevision = ref(0)
 const pipelineRevision = ref(0)
+const markdownActivationRevision = ref(0)
+const completedMarkdownActivationRevision = ref(0)
+const markdownFeatureActivationSequence =
+  new MarkdownFeatureActivationSequence()
 const tablePipeline = createWasmSortController('performance-fixture')
 const renderScheduler = useFsusRenderScheduler()
 const virtualList = ref<{ scrollTo: (offset: number) => void } | null>(null)
@@ -224,11 +240,21 @@ const displayedTableRows = computed(() => {
   }))
 })
 const markdown = computed(() => {
+  if (props.scenario === MARKDOWN_FEATURE_ACTIVATION_SCENARIO) {
+    return createMarkdownFeatureActivationSource(
+      markdownActivationRevision.value,
+    )
+  }
   const target = Math.max(1024, props.size)
   const paragraph =
     '## Rendering fixture\n\nParagraph with **bold**, `code`, [link](https://example.com), and 中文文本.\n\n'
   return paragraph.repeat(Math.ceil(target / paragraph.length)).slice(0, target)
 })
+const markdownContentVersion = computed(() =>
+  props.scenario === MARKDOWN_FEATURE_ACTIVATION_SCENARIO
+    ? `feature-activation-${markdownActivationRevision.value}`
+    : null,
+)
 
 type PerformanceFixtureApi = {
   act: (iteration: number) => Promise<void>
@@ -249,6 +275,7 @@ type PerformanceFixtureApi = {
     workerSubmitBlockMs: number
   } | null>
   markdownPhaseProbe: () => {
+    activationRevision: number
     activationMs: number
     commitMs: number
     parseMs: number
@@ -350,7 +377,13 @@ declare global {
 
 const act = async (iteration: number) => {
   const ratio = ((iteration % 5) + 1) / 6
-  if (props.scenario.startsWith('virtual-list')) {
+  if (props.scenario === MARKDOWN_FEATURE_ACTIVATION_SCENARIO) {
+    const cycle = markdownFeatureActivationSequence.begin()
+    markdownActivationRevision.value = cycle.revision
+    await nextTick()
+    await cycle.completion
+    return
+  } else if (props.scenario.startsWith('virtual-list')) {
     virtualList.value?.scrollTo(Math.floor(items.value.length * 32 * ratio))
   } else if (props.scenario === 'virtual-grid') {
     virtualGrid.value?.scrollTo({
@@ -529,6 +562,34 @@ const captureWasmProfile = (profile: MarkdownRuntimeProfile) => {
   }
 }
 
+const captureMarkdownFeatureActivation = (
+  activation: MarkdownFeatureActivationResult,
+  result: MarkdownSafeRenderResult,
+) => {
+  if (props.scenario !== MARKDOWN_FEATURE_ACTIVATION_SCENARIO) return
+  if (result.normalizedSource !== markdown.value) return
+  if (!hasCompleteMarkdownFeatureActivation(activation)) {
+    const error = new Error('markdown_feature_activation_incomplete')
+    ready.value = 'error'
+    markdownFeatureActivationSequence.fail(error)
+    return
+  }
+  completedMarkdownActivationRevision.value = markdownActivationRevision.value
+  markdownFeatureActivationSequence.complete(activation)
+  ready.value = 'true'
+}
+
+const captureMarkdownRenderComplete = () => {
+  if (props.scenario !== MARKDOWN_FEATURE_ACTIVATION_SCENARIO) {
+    ready.value = 'true'
+  }
+}
+
+const captureMarkdownRenderError = (error: unknown) => {
+  ready.value = 'error'
+  markdownFeatureActivationSequence.fail(error)
+}
+
 const wasmProbe = async () => {
   const started = performance.now()
   const runtime = await import('@element-plus/wasm')
@@ -570,6 +631,7 @@ const markdownPhaseProbe = () => {
     '[data-markdown-renderer="wasm"]',
   )
   return {
+    activationRevision: completedMarkdownActivationRevision.value,
     activationMs: Number(renderer?.dataset.fsusMarkdownActivationMs ?? '0'),
     commitMs:
       Number(renderer?.dataset.fsusMarkdownCommitMs ?? '0') ||
@@ -593,6 +655,9 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
+  markdownFeatureActivationSequence.fail(
+    new Error('markdown_feature_activation_fixture_unmounted'),
+  )
   tablePipeline.dispose()
   delete window.__FSUSUI_PERFORMANCE_FIXTURE__
 })

@@ -10,6 +10,8 @@ import {
   createAffectedSelection,
   createSmokeSelection,
   createVisualCaptureTestTitle,
+  SMOKE_MARKDOWN_FEATURE_SPEC,
+  SMOKE_MARKDOWN_FEATURE_TEST_TITLE,
   SMOKE_THEME_SWITCH_TEST_TITLE,
   loadVisualProfileRegistry,
   resolveAffectedFiles,
@@ -78,6 +80,42 @@ test('registry rejects smoke plans without a real theme-switch interaction', () 
         repositoryRoot,
       ),
     new RegExp(SMOKE_THEME_SWITCH_TEST_TITLE, 'u'),
+  )
+})
+
+test('registry rejects smoke plans without the Markdown feature activation spec', () => {
+  assert.throws(
+    () =>
+      validateVisualProfileRegistry(
+        {
+          ...registry,
+          smoke: {
+            ...registry.smoke,
+            specs: registry.smoke.specs.filter(
+              (spec) => spec !== SMOKE_MARKDOWN_FEATURE_SPEC,
+            ),
+          },
+        },
+        repositoryRoot,
+      ),
+    /must include "vue\/tests\/visual\/markdown-feature-smoke\.spec\.ts"/u,
+  )
+})
+
+test('registry rejects smoke greps that omit Markdown feature activation', () => {
+  assert.throws(
+    () =>
+      validateVisualProfileRegistry(
+        {
+          ...registry,
+          smoke: {
+            ...registry.smoke,
+            grep: '(?:capture basic|smoke theme mode toggles light and dark)$',
+          },
+        },
+        repositoryRoot,
+      ),
+    new RegExp(SMOKE_MARKDOWN_FEATURE_TEST_TITLE, 'u'),
   )
 })
 
@@ -217,8 +255,10 @@ test('smoke is representative and capped to one shared-plan worker', () => {
   assert.ok(
     plan[0].argv.includes('vue/tests/visual/smoke-theme-switch.spec.ts'),
   )
+  assert.ok(plan[0].argv.includes(SMOKE_MARKDOWN_FEATURE_SPEC))
   assert.match(plan[0].argv.join(' '), /capture basic/u)
   assert.match(plan[0].argv.join(' '), /smoke theme mode toggles/u)
+  assert.match(plan[0].argv.join(' '), /smoke markdown feature activation/u)
 })
 
 test('smoke passes its one-worker capacity plan to Playwright', async () => {

@@ -9,7 +9,7 @@
 | 字段                   | 说明                                                                                                                                             |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | purpose                | 将 Markdown 内容渲染为可激活的安全文章 DOM，并为长文档提供分块和虚拟挂载能力。                                                                   |
-| basic usage            | 传入 `content`，按需配置 `features`、adapter 和 Render Pipeline 预算。                                                                           |
+| basic usage            | 传入 `content`，按需配置 `features` 与 Render Pipeline 预算。                                                                                    |
 | props / events / slots | 本页 `API` 覆盖公开 props、events 和 exposes；runtime 深层实现不属于组件 API。                                                                   |
 | accessibility          | 业务侧需要为文章容器提供标题层级和阅读上下文；Mermaid、LaTeX、代码块等增强内容应保留文本回退或错误提示。                                         |
 | theme token notes      | 组件默认无完整文章主题；可使用公开文本、背景、主色、代码块和 motion token 绑定业务排版。                                                         |
@@ -44,24 +44,18 @@ WASM 渲染器会保留 Mermaid、LaTeX/KaTeX 相关的 HTML、MathML、SVG 或 
 </template>
 ```
 
-默认 adapter 会按 `data-theme-resolved`、Element Plus token 和 `csp-nonce` 设置 Mermaid themeVariables、KaTeX 错误色、Shiki light/dark theme，以及动态 `<style>` 的 nonce。Mermaid、KaTeX 与 Shiki 只在对应 chunk 接近 viewport 时激活；Shiki 只加载实际遇到的 grammar 和当前 theme。多个 renderer 的 activation 使用有界并发，不共享一把全局 Promise 锁。失败时不会让整个 renderer 崩溃，组件会输出 `el-markdown-renderer__feature-error` 节点并在 `features-activated.errors` 中报告错误。
+内建 renderer 会按 `data-theme-resolved`、Element Plus token 和 `csp-nonce` 设置 Mermaid themeVariables、KaTeX 错误色、Shiki light/dark theme，以及允许的动态 `<style>` nonce。Mermaid、KaTeX 与 Shiki 只在对应 chunk 接近 viewport 时激活；安全 gateway 与对应第三方 renderer 并行按需加载，三类 activation 共享同一个 gateway 单例加载结果；Shiki 只加载实际遇到的 grammar 和当前 theme。多个 renderer 的 activation 使用有界并发，不共享一把全局 Promise 锁。失败时不会让整个 renderer 崩溃，组件会用 `textContent` 构造 `el-markdown-renderer__feature-error` 节点，并在 `features-activated.errors` 中报告错误。
 
-`features` 用于关闭某类 activation；adapter prop 用于覆盖或禁用默认渲染器：
+`features` 用于关闭某类 activation：
 
 ```vue
 <template>
   <!-- 完全关闭 Mermaid activation，不扫描也不标记 -->
   <el-markdown-renderer :content="content" :features="{ mermaid: false }" />
-
-  <!-- 保留 Mermaid 节点标记，但不使用默认 Mermaid renderer -->
-  <el-markdown-renderer :content="content" :mermaid-adapter="null" />
-
-  <!-- 用业务 adapter 覆盖默认 Mermaid renderer -->
-  <el-markdown-renderer :content="content" :mermaid-adapter="renderMermaid" />
 </template>
 ```
 
-同样的语义适用于 `latex-adapter` 和 `code-highlight-adapter`。直接使用 public runtime 时，也可以从 `@ozwasyd/element-plus/markdown-runtime` 复用 `defaultMermaidAdapter`、`defaultLatexAdapter` 与 `defaultCodeHighlightAdapter`。
+feature renderer 不再接受调用方 DOM adapter。内建 Mermaid、KaTeX、Shiki 只读取不可变 source、theme 和受控 token，返回带 `kind` 的 `FeatureRenderOutput`；输出统一经过 FsusUI-owned gateway 的独立 Mermaid SVG、KaTeX MathML、Shiki HTML policy 后才提交。Mermaid 强制使用原生 SVG text 而不是 `foreignObject`，进入第三方 renderer 前的颜色 token 也会按受控颜色语法验证。三类 policy 不共享标签或属性并集，未知标签、namespace、属性、事件、可执行 URL 与外部资源都会被移除。迁移方法见[收敛 Markdown feature 输出网关](../migration/markdown-feature-output-gateway.md)。
 
 ## Raw HTML 安全边界
 
@@ -166,22 +160,19 @@ chunk 边界由 WASM 渲染流程产出，类型包括 `heading`、`paragraph`�
 
 ### Attributes
 
-| 属性名                     | 说明                                                                                     | 类型                                            | 默认值    |
-| -------------------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------- | --------- |
-| content                    | Markdown 源文本                                                                          | `string`                                        | `''`      |
-| content-version            | 可选稳定内容版本；大文档提供后可跳过主线程完整哈希，并参与 generation/cache fingerprint  | `string \| number \| null`                      | `null`    |
-| initial-render             | 同源同版本且持有 runtime authority 的安全结果，用于 SSR 或可信缓存首显                   | `MarkdownSafeRenderResult \| null`              | `null`    |
-| trusted-html-factory       | 将安全 HTML 转为宿主 policy 的 `TrustedHTML`；不承担清洗职责                             | `(html: MarkdownSafeHtml) => object`            | —         |
-| trusted-script-url-factory | 将 Markdown worker URL 转为宿主 policy 的 `TrustedScriptURL`                             | `(url: URL) => unknown`                         | —         |
-| allow-latex                | 是否启用 LaTeX/MathML 输出                                                               | `boolean`                                       | `true`    |
-| allow-mermaid              | 是否启用 Mermaid 输出                                                                    | `boolean`                                       | `true`    |
-| mode                       | 渲染模式元数据                                                                           | `'article' \| 'about' \| 'preview' \| 'editor'` | `article` |
-| base-url                   | 渲染元数据与 link activation 的基础 URL                                                  | `string \| null`                                | `null`    |
-| csp-nonce                  | 写入 renderer 内动态 style 的 CSP nonce                                                  | `string \| null`                                | `null`    |
-| features                   | DOM feature activation 开关                                                              | `MarkdownFeatureActivationFeatureOptions`       | —         |
-| mermaid-adapter            | Mermaid DOM activation adapter；`undefined` 使用默认 adapter，`null` 只标记不渲染        | `MarkdownFeatureAdapter \| null`                | —         |
-| latex-adapter              | LaTeX/KaTeX DOM activation adapter；`undefined` 使用默认 adapter，`null` 只标记不渲染    | `MarkdownFeatureAdapter \| null`                | —         |
-| code-highlight-adapter     | 代码高亮 DOM activation adapter；`undefined` 使用默认 Shiki adapter，`null` 只标记不渲染 | `MarkdownFeatureAdapter \| null`                | —         |
+| 属性名                     | 说明                                                                                    | 类型                                            | 默认值    |
+| -------------------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------- | --------- |
+| content                    | Markdown 源文本                                                                         | `string`                                        | `''`      |
+| content-version            | 可选稳定内容版本；大文档提供后可跳过主线程完整哈希，并参与 generation/cache fingerprint | `string \| number \| null`                      | `null`    |
+| initial-render             | 同源同版本且持有 runtime authority 的安全结果，用于 SSR 或可信缓存首显                  | `MarkdownSafeRenderResult \| null`              | `null`    |
+| trusted-html-factory       | 将安全 HTML 转为宿主 policy 的 `TrustedHTML`；不承担清洗职责                            | `(html: MarkdownSafeHtml) => object`            | —         |
+| trusted-script-url-factory | 将 Markdown worker URL 转为宿主 policy 的 `TrustedScriptURL`                            | `(url: URL) => unknown`                         | —         |
+| allow-latex                | 是否启用 LaTeX/MathML 输出                                                              | `boolean`                                       | `true`    |
+| allow-mermaid              | 是否启用 Mermaid 输出                                                                   | `boolean`                                       | `true`    |
+| mode                       | 渲染模式元数据                                                                          | `'article' \| 'about' \| 'preview' \| 'editor'` | `article` |
+| base-url                   | 渲染元数据与 link activation 的基础 URL                                                 | `string \| null`                                | `null`    |
+| csp-nonce                  | 写入 renderer 内动态 style 的 CSP nonce                                                 | `string \| null`                                | `null`    |
+| features                   | 内建 feature activation 开关                                                            | `MarkdownFeatureActivationFeatureOptions`       | —         |
 
 ### Events
 

@@ -22,7 +22,80 @@ const iconsVueTypesEntry = path.resolve(
   projRoot,
   'vue/packages/icons-vue/dist/index.d.ts',
 )
-const wasmTypesEntry = path.resolve(projRoot, 'vue/packages/wasm/dist/index.d.ts')
+const wasmTypesEntry = path.resolve(
+  projRoot,
+  'vue/packages/wasm/dist/index.d.ts',
+)
+const wasmPublicDeclaration = "export * from './wasm/index'\n"
+const wasmPublishedTypesEntry = path.join(
+  outDir,
+  'packages',
+  'wasm',
+  'index.d.ts',
+)
+const wasmPublicTypeExports = [
+  'MarkdownSafeHtml',
+  'MarkdownSafeRenderResult',
+] as const
+
+const assertWasmDeclarationOwner = (
+  declaration: string,
+  label: string,
+  { allowWorkspaceSpecifier = false } = {},
+) => {
+  const finalTypeExport = [
+    ...declaration.matchAll(/export type\s*\{([^}]*)\}/gu),
+  ].at(-1)?.[1]
+
+  for (const typeName of wasmPublicTypeExports) {
+    if (
+      !finalTypeExport
+        ?.split(',')
+        .map((name) => name.trim())
+        .includes(typeName)
+    ) {
+      throw new Error(
+        `${label} must include ${typeName} in its final type export.`,
+      )
+    }
+  }
+
+  if (
+    /from\s+['"](?:\/|[A-Za-z]:[\\/])/u.test(declaration) ||
+    declaration.includes(projRoot) ||
+    /(?:^|[\\/])(?:FsusUI|[^\\/]*worktree[^\\/]*)(?:[\\/]|$)/iu.test(
+      declaration,
+    )
+  ) {
+    throw new Error(`${label} must not contain repository-local paths.`)
+  }
+
+  if (!allowWorkspaceSpecifier && declaration.includes('@element-plus/')) {
+    throw new Error(`${label} must not contain private workspace specifiers.`)
+  }
+}
+
+const writeWasmDeclarationOwner = async () => {
+  const sourceDeclaration = await readFile(wasmTypesEntry, 'utf8')
+  assertWasmDeclarationOwner(sourceDeclaration, 'WASM source declaration', {
+    allowWorkspaceSpecifier: true,
+  })
+
+  const publishedDeclaration = pathRewriter('esm')(sourceDeclaration)
+  assertWasmDeclarationOwner(publishedDeclaration, 'WASM published declaration')
+
+  await mkdir(path.dirname(wasmPublishedTypesEntry), {
+    recursive: true,
+  })
+  await writeFile(wasmPublishedTypesEntry, publishedDeclaration, 'utf8')
+  consola.success(
+    chalk.green(
+      `Definition owner for file: ${chalk.bold(
+        path.relative(outDir, wasmPublishedTypesEntry),
+      )} generated`,
+    ),
+  )
+}
 
 /**
  * fork = require( https://github.com/egoist/vue-dts-gen/blob/main/src/index.ts
@@ -37,14 +110,18 @@ const runGenerateTypesDefinitions = async () => {
       '@element-plus/motion': [
         path.resolve(projRoot, 'vue/packages/motion/index.ts'),
       ],
-      '@element-plus/motion/*': [path.resolve(projRoot, 'vue/packages/motion/*')],
+      '@element-plus/motion/*': [
+        path.resolve(projRoot, 'vue/packages/motion/*'),
+      ],
       '@element-plus/*': [path.resolve(projRoot, 'vue/packages/*')],
       '@element-plus/icons-vue': [iconsVueTypesEntry],
       '@element-plus/icons-vue/*': [
         path.resolve(projRoot, 'vue/packages/icons-vue/dist/*'),
       ],
       '@element-plus/wasm': [wasmTypesEntry],
-      '@element-plus/wasm/*': [path.resolve(projRoot, 'vue/packages/wasm/dist/*')],
+      '@element-plus/wasm/*': [
+        path.resolve(projRoot, 'vue/packages/wasm/dist/*'),
+      ],
     },
     // pnpm links workspace package peer deps through nested symlinks. Keeping the
     // symlink path here makes Vue's own d.ts re-exports unable to resolve
@@ -59,7 +136,7 @@ const runGenerateTypesDefinitions = async () => {
     skipAddingFilesFromTsConfig: true,
   })
 
-  const sourceFiles = await addSourceFiles(project)
+  await addSourceFiles(project)
   consola.success('Added source files')
 
   typeCheck(project)
@@ -71,35 +148,38 @@ const runGenerateTypesDefinitions = async () => {
   const emitFiles = emitOutput.getFiles()
   if (emitFiles.length === 0) {
     consola.info(chalk.yellow('No declaration files were emitted.'))
-    return
-  }
+  } else {
+    const tasks = emitFiles.map(async (outputFile) => {
+      const filepath = outputFile.filePath
+      const relativePath = path.relative(outDir, filepath)
+      const declaration =
+        relativePath === path.join('packages', 'wasm.d.ts')
+          ? wasmPublicDeclaration
+          : outputFile.text
 
-  const tasks = emitFiles.map(async (outputFile) => {
-    const filepath = outputFile.filePath
-    const relativePath = path.relative(outDir, filepath)
-    const declaration =
-      relativePath === path.join('packages', 'wasm.d.ts')
-        ? await readFile(wasmTypesEntry, 'utf8')
-        : outputFile.text
+      consola.trace(
+        chalk.yellow(
+          `Generating definition for file: ${chalk.bold(relativePath)}`,
+        ),
+      )
 
-    consola.trace(
-      chalk.yellow(
-        `Generating definition for file: ${chalk.bold(relativePath)}`,
-      ),
-    )
+      await mkdir(path.dirname(filepath), {
+        recursive: true,
+      })
 
-    await mkdir(path.dirname(filepath), {
-      recursive: true,
+      await writeFile(filepath, pathRewriter('esm')(declaration), 'utf8')
+
+      consola.success(
+        chalk.green(
+          `Definition for file: ${chalk.bold(relativePath)} generated`,
+        ),
+      )
     })
 
-    await writeFile(filepath, pathRewriter('esm')(declaration), 'utf8')
+    await Promise.all(tasks)
+  }
 
-    consola.success(
-      chalk.green(`Definition for file: ${chalk.bold(relativePath)} generated`),
-    )
-  })
-
-  await Promise.all(tasks)
+  await writeWasmDeclarationOwner()
 }
 
 export const generateTypesDefinitions: TaskFunction = (done) => {

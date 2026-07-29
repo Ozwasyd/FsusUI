@@ -47,6 +47,7 @@ const definitions = [
   ['render-pipeline-cooperative', 2_000_000],
   ['virtual-window-index-legacy', 100_000],
   ['virtual-window-index-incremental', 100_000],
+  ['markdown-feature-activation', 4_096],
 ]
 
 const quickDimensions = [
@@ -76,6 +77,7 @@ const quickDefinitions = [
   definitions[19],
   definitions[20],
   definitions[21],
+  definitions[22],
 ]
 const dimensions = profile === 'full' ? fullDimensions : quickDimensions
 const scenarioDefinitions = (
@@ -112,6 +114,29 @@ const sumTrace = (events, names) =>
   events
     .filter((event) => names.has(event.name) && typeof event.dur === 'number')
     .reduce((sum, event) => sum + event.dur / 1000, 0)
+
+const domParseOperationNames = [
+  'elementInnerHTML',
+  'elementOuterHTML',
+  'elementInsertAdjacentHTML',
+  'rangeCreateContextualFragment',
+  'domParserParseFromString',
+  'shadowRootInnerHTML',
+]
+
+const domParseOperationTotal = (counts) =>
+  domParseOperationNames.reduce((total, name) => total + (counts[name] ?? 0), 0)
+
+const domParseOperationStats = (samples) => ({
+  total: stats(samples.map((sample) => domParseOperationTotal(sample.counts))),
+  byEntryPoint: Object.fromEntries(
+    domParseOperationNames.map((name) => [
+      name,
+      stats(samples.map((sample) => sample.counts[name] ?? 0)),
+    ]),
+  ),
+  unsupported: [...new Set(samples.flatMap((sample) => sample.unsupported))],
+})
 
 const waitForServer = async (server) => {
   const deadline = Date.now() + 120_000
@@ -192,24 +217,115 @@ try {
         ),
       )
     })
-    await page.addInitScript((targetHz) => {
-      window.__fsusFrameIntervals = []
-      window.__fsusLongTasks = []
-      let previous = performance.now()
-      const tick = (now) => {
-        window.__fsusFrameIntervals.push(now - previous)
-        previous = now
+    const measureDomParses = scenario === 'markdown-feature-activation'
+    await page.addInitScript(
+      ({ measureDomParses, targetHz }) => {
+        if (measureDomParses) {
+          const counts = {
+            domParserParseFromString: 0,
+            elementInnerHTML: 0,
+            elementInsertAdjacentHTML: 0,
+            elementOuterHTML: 0,
+            rangeCreateContextualFragment: 0,
+            shadowRootInnerHTML: 0,
+          }
+          const unsupported = []
+          const installSetter = (
+            prototype,
+            property,
+            counter,
+            optional = false,
+          ) => {
+            const descriptor = Object.getOwnPropertyDescriptor(
+              prototype,
+              property,
+            )
+            if (!descriptor && optional) return
+            if (
+              !descriptor?.configurable ||
+              !descriptor.get ||
+              !descriptor.set
+            ) {
+              unsupported.push(counter)
+              return
+            }
+            Object.defineProperty(prototype, property, {
+              ...descriptor,
+              set(value) {
+                counts[counter] += 1
+                return descriptor.set.call(this, value)
+              },
+            })
+          }
+          const installMethod = (prototype, property, counter) => {
+            const descriptor = Object.getOwnPropertyDescriptor(
+              prototype,
+              property,
+            )
+            if (
+              !descriptor?.configurable ||
+              typeof descriptor.value !== 'function'
+            ) {
+              unsupported.push(counter)
+              return
+            }
+            Object.defineProperty(prototype, property, {
+              ...descriptor,
+              value(...args) {
+                counts[counter] += 1
+                return descriptor.value.apply(this, args)
+              },
+            })
+          }
+          installSetter(Element.prototype, 'innerHTML', 'elementInnerHTML')
+          installSetter(Element.prototype, 'outerHTML', 'elementOuterHTML')
+          installMethod(
+            Element.prototype,
+            'insertAdjacentHTML',
+            'elementInsertAdjacentHTML',
+          )
+          installMethod(
+            Range.prototype,
+            'createContextualFragment',
+            'rangeCreateContextualFragment',
+          )
+          installMethod(
+            DOMParser.prototype,
+            'parseFromString',
+            'domParserParseFromString',
+          )
+          installSetter(
+            ShadowRoot.prototype,
+            'innerHTML',
+            'shadowRootInnerHTML',
+            true,
+          )
+          window.__fsusDomParseOperations = {
+            snapshot: () => ({
+              counts: { ...counts },
+              unsupported: [...unsupported],
+            }),
+          }
+        }
+        window.__fsusFrameIntervals = []
+        window.__fsusLongTasks = []
+        let previous = performance.now()
+        const tick = (now) => {
+          window.__fsusFrameIntervals.push(now - previous)
+          previous = now
+          requestAnimationFrame(tick)
+        }
         requestAnimationFrame(tick)
-      }
-      requestAnimationFrame(tick)
-      try {
-        new PerformanceObserver((list) => {
-          for (const entry of list.getEntries())
-            window.__fsusLongTasks.push(entry.duration)
-        }).observe({ type: 'longtask', buffered: true })
-      } catch {}
-      window.__fsusTargetHz = targetHz
-    }, refreshHz)
+        try {
+          new PerformanceObserver((list) => {
+            for (const entry of list.getEntries())
+              window.__fsusLongTasks.push(entry.duration)
+          }).observe({ type: 'longtask', buffered: true })
+        } catch {}
+        window.__fsusTargetHz = targetHz
+      },
+      { measureDomParses, targetHz: refreshHz },
+    )
     const url = `${baseURL}/?performance=${scenario}&size=${size}&motion=${motion}`
     const navigationStarted = performance.now()
     await page.goto(url, { waitUntil: 'domcontentloaded' })
@@ -244,19 +360,50 @@ try {
     const wasm = []
     const markdownPhases = []
     const dataPipeline = []
+    const domParseOperations = []
     for (let index = 0; index < samples; index++) {
-      const sample = await page.evaluate(async (iteration) => {
-        const started = performance.now()
-        await window.__FSUSUI_PERFORMANCE_FIXTURE__.act(iteration)
-        const actionCompleted = performance.now()
-        await new Promise((resolve) => requestAnimationFrame(() => resolve()))
-        return {
-          frameWorkMs: actionCompleted - started,
-          inputToNextFrameMs: performance.now() - started,
-        }
-      }, index + warmups)
+      const sample = await page.evaluate(
+        async ({ iteration, measureDomParses }) => {
+          const before = measureDomParses
+            ? window.__fsusDomParseOperations?.snapshot()
+            : null
+          if (measureDomParses && !before) {
+            throw new Error('DOM parser instrumentation is unavailable')
+          }
+          const started = performance.now()
+          await window.__FSUSUI_PERFORMANCE_FIXTURE__.act(iteration)
+          const actionCompleted = performance.now()
+          const after = measureDomParses
+            ? window.__fsusDomParseOperations.snapshot()
+            : null
+          await new Promise((resolve) => requestAnimationFrame(() => resolve()))
+          return {
+            domParseOperations:
+              before && after
+                ? {
+                    counts: Object.fromEntries(
+                      Object.entries(after.counts).map(([name, count]) => [
+                        name,
+                        count - (before.counts[name] ?? 0),
+                      ]),
+                    ),
+                    unsupported: after.unsupported,
+                  }
+                : null,
+            frameWorkMs: actionCompleted - started,
+            inputToNextFrameMs: performance.now() - started,
+          }
+        },
+        { iteration: index + warmups, measureDomParses },
+      )
       frameWork.push(sample.frameWorkMs)
       inputToFrame.push(sample.inputToNextFrameMs)
+      if (scenario === 'markdown-feature-activation') {
+        if (!sample.domParseOperations) {
+          throw new Error('DOM parser instrumentation is unavailable')
+        }
+        domParseOperations.push(sample.domParseOperations)
+      }
       worker.push(
         await page.evaluate(
           (iteration) =>
@@ -264,7 +411,11 @@ try {
           index,
         ),
       )
-      if (scenario.startsWith('markdown') || scenario === 'select-v2') {
+      if (
+        (scenario.startsWith('markdown') &&
+          scenario !== 'markdown-feature-activation') ||
+        scenario === 'select-v2'
+      ) {
         workerPoolBursts.push(
           await page.evaluate(() =>
             window.__FSUSUI_PERFORMANCE_FIXTURE__.workerPoolBurstProbe(),
@@ -272,11 +423,13 @@ try {
         )
       }
       if (scenario.startsWith('markdown')) {
-        wasm.push(
-          await page.evaluate(() =>
-            window.__FSUSUI_PERFORMANCE_FIXTURE__.wasmProbe(),
-          ),
-        )
+        if (scenario !== 'markdown-feature-activation') {
+          wasm.push(
+            await page.evaluate(() =>
+              window.__FSUSUI_PERFORMANCE_FIXTURE__.wasmProbe(),
+            ),
+          )
+        }
         markdownPhases.push(
           await page.evaluate(() =>
             window.__FSUSUI_PERFORMANCE_FIXTURE__.markdownPhaseProbe(),
@@ -295,6 +448,35 @@ try {
         sampleMetrics.metrics.find(({ name }) => name === 'JSHeapUsedSize')
           ?.value ?? 0,
       )
+    }
+    if (scenario === 'markdown-feature-activation') {
+      const activationRevisions = markdownPhases.map(
+        (entry) => entry.activationRevision,
+      )
+      if (
+        samples !== 5 ||
+        markdownPhases.length !== samples ||
+        activationRevisions.some(
+          (revision, index) =>
+            index > 0 && revision !== activationRevisions[index - 1] + 1,
+        ) ||
+        activationRevisions.some((revision) => revision <= 0) ||
+        markdownPhases.some((entry) => entry.activationMs <= 0) ||
+        domParseOperations.length !== samples ||
+        domParseOperations.some((entry) => entry.unsupported.length > 0) ||
+        domParseOperations.some(
+          (entry) => domParseOperationTotal(entry.counts) <= 0,
+        ) ||
+        new Set(
+          domParseOperations.map((entry) =>
+            domParseOperationTotal(entry.counts),
+          ),
+        ).size !== 1
+      ) {
+        throw new Error(
+          'Markdown feature activation samples must be consecutive and have stable DOM parser instrumentation.',
+        )
+      }
     }
     await session.send('Tracing.end')
     const traceStream = await traceComplete
@@ -336,6 +518,7 @@ try {
       workerPoolBursts,
       wasm,
       markdownPhases,
+      domParseOperations,
       dataPipeline,
       trace: {
         styleMs: sumTrace(
@@ -425,6 +608,9 @@ try {
             paintMs: raw.trace.paintMs,
           }
         : null,
+      domParseOperations: domParseOperations.length
+        ? domParseOperationStats(domParseOperations)
+        : null,
       dataPipeline: dataPipeline.length
         ? {
             legacyBlockMs: stats(
@@ -477,7 +663,62 @@ try {
     )
     const regressions = results.flatMap((entry) => {
       const previous = baselineMap.get(entry.id)
-      if (!previous) return []
+      if (!previous) {
+        return entry.scenario === 'markdown-feature-activation'
+          ? [`${entry.id}: missing Markdown feature activation baseline`]
+          : []
+      }
+      if (
+        entry.scenario === 'markdown-feature-activation' &&
+        previous.markdownPhases &&
+        entry.markdownPhases
+      ) {
+        const regressions = ['p50', 'p95'].flatMap((percentile) => {
+          const before = previous.markdownPhases.activationMs[percentile]
+          const after = entry.markdownPhases.activationMs[percentile]
+          if (
+            !Number.isFinite(before) ||
+            !Number.isFinite(after) ||
+            before <= 0 ||
+            after <= 0
+          ) {
+            return [`${entry.id}: invalid activation ${percentile} evidence`]
+          }
+          return after > before * 1.05
+            ? [
+                `${entry.id}: activation ${percentile} ${after.toFixed(2)}ms > baseline ${before.toFixed(2)}ms + 5%`,
+              ]
+            : []
+        })
+        const beforeDom = previous.domParseOperations?.total
+        const afterDom = entry.domParseOperations?.total
+        if (!beforeDom || !afterDom) {
+          return [
+            ...regressions,
+            `${entry.id}: missing DOM parser baseline or current evidence`,
+          ]
+        }
+        if (
+          !Number.isFinite(beforeDom.max) ||
+          !Number.isFinite(afterDom.max) ||
+          beforeDom.samples !== samples ||
+          afterDom.samples !== samples
+        ) {
+          return [
+            ...regressions,
+            `${entry.id}: incomplete DOM parser sample evidence`,
+          ]
+        }
+        if (afterDom.max > beforeDom.max) {
+          regressions.push(
+            `${entry.id}: DOM parser operations max ${afterDom.max} > baseline ${beforeDom.max}`,
+          )
+        }
+        return regressions
+      }
+      if (entry.scenario === 'markdown-feature-activation') {
+        return [`${entry.id}: incomplete Markdown feature activation baseline`]
+      }
       const before = previous.inputToNextFrameMs.p95
       const after = entry.inputToNextFrameMs.p95
       return before > 0 && after > before * (1 + regressionLimit)

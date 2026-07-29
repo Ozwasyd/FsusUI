@@ -19,6 +19,11 @@ import {
   type MarkdownRenderTimings,
 } from './markdown'
 import type {
+  FeatureRenderOutput,
+  MarkdownFeatureOutputCommitOptions,
+  MarkdownFeatureOutputKind,
+} from './markdown-feature-output-gateway'
+import type {
   FsusErrorCode,
   FsusErrorDetail,
   FsusResult,
@@ -221,30 +226,52 @@ export interface MarkdownFeatureActivationResult {
 
 export type MarkdownFeatureActivationTheme = 'dark' | 'light'
 
-export interface MarkdownFeatureAdapterContext {
-  baseUrl?: string | null
-  cspNonce?: string | null
-  kind: MarkdownFeatureActivationKind
-  root: ParentNode
-  signal?: AbortSignal
-  theme: MarkdownFeatureActivationTheme
+export interface MarkdownFeatureThemeTokens {
+  readonly background: string
+  readonly danger: string
+  readonly edgeLabelBackground: string
+  readonly lineColor: string
+  readonly mainBackground: string
+  readonly nodeBorder: string
+  readonly primaryBorderColor: string
+  readonly primaryColor: string
+  readonly primaryTextColor: string
+  readonly secondaryColor: string
+  readonly tertiaryColor: string
 }
 
-export type MarkdownFeatureAdapter = (
-  element: HTMLElement,
-  context?: MarkdownFeatureAdapterContext,
-) => void | Promise<void>
+export interface MarkdownFeatureRenderContext {
+  readonly signal?: AbortSignal
+  readonly theme: MarkdownFeatureActivationTheme
+  readonly tokens: Readonly<MarkdownFeatureThemeTokens>
+}
 
 export interface MarkdownFeatureActivationOptions {
   baseUrl?: string | null
-  codeHighlightAdapter?: MarkdownFeatureAdapter | null
   concurrency?: number
   cspNonce?: string | null
   features?: MarkdownFeatureActivationFeatureOptions
-  latexAdapter?: MarkdownFeatureAdapter | null
-  mermaidAdapter?: MarkdownFeatureAdapter | null
   root: ParentNode
   signal?: AbortSignal
+}
+
+export type { FeatureRenderOutput }
+
+type MarkdownFeatureOutputGateway = Readonly<{
+  commitMarkdownFeatureOutput: (
+    target: HTMLElement,
+    output: FeatureRenderOutput,
+    options?: MarkdownFeatureOutputCommitOptions,
+  ) => HTMLElement
+}>
+
+let markdownFeatureOutputGatewayPromise: Promise<MarkdownFeatureOutputGateway> | null =
+  null
+
+const loadMarkdownFeatureOutputGateway = () => {
+  markdownFeatureOutputGatewayPromise ??=
+    import('./markdown-feature-output-gateway')
+  return markdownFeatureOutputGatewayPromise
 }
 
 const defaultMarkdownFeatureOptions: Required<MarkdownFeatureActivationFeatureOptions> =
@@ -469,61 +496,31 @@ const resolveFeatureTheme = (
 }
 
 const getComputedToken = (
-  element: Element | null,
+  style: CSSStyleDeclaration | null,
   token: string,
   fallback: string,
 ) => {
-  if (!element || typeof window === 'undefined') return fallback
-  const value = window.getComputedStyle(element).getPropertyValue(token).trim()
-  return value || fallback
+  if (!style) return fallback
+  const value = style.getPropertyValue(token).trim()
+  if (
+    !value ||
+    value.length > 128 ||
+    /[;{}@\\]|\/\*|\*\//u.test(value) ||
+    !(
+      /^#[0-9a-f]{3,8}$/iu.test(value) ||
+      /^[a-z]+$/iu.test(value) ||
+      /^(?:color|color-mix|hsl|hsla|lab|lch|oklab|oklch|rgb|rgba)\([0-9a-z.%+\-,/\s]+\)$/iu.test(
+        value,
+      )
+    )
+  ) {
+    return fallback
+  }
+  return value
 }
 
 const getFeatureStyleRoot = (element: HTMLElement, root: ParentNode) =>
   getRootElement(root) ?? element.ownerDocument.documentElement
-
-const unsafeFeatureElementNames = new Set([
-  'base',
-  'embed',
-  'foreignobject',
-  'iframe',
-  'link',
-  'meta',
-  'object',
-  'script',
-])
-
-const featureUrlAttributeNames = new Set([
-  'action',
-  'formaction',
-  'href',
-  'poster',
-  'src',
-  'xlink:href',
-])
-
-const unsafeFeatureUrlProtocolRe = /^(?:javascript|vbscript):/i
-const featureDataUrlRe = /^data:/i
-const safeFeatureDataImageRe =
-  /^data:image\/(?:gif|jpeg|jpg|png|webp|svg\+xml);base64,/i
-
-const stripFeatureUrlControlChars = (value: string) =>
-  Array.from(value)
-    .filter((char) => {
-      const code = char.charCodeAt(0)
-      return code > 31 && code !== 127 && !/\s/.test(char)
-    })
-    .join('')
-
-const isUnsafeFeatureUrl = (value: string) => {
-  const normalized = stripFeatureUrlControlChars(value)
-  if (unsafeFeatureUrlProtocolRe.test(normalized)) return true
-  return (
-    featureDataUrlRe.test(normalized) && !safeFeatureDataImageRe.test(value)
-  )
-}
-
-const hasUnsafeFeatureStyle = (value: string) =>
-  /(?:expression\s*\(|url\s*\(\s*['"]?\s*(?:javascript|vbscript):)/i.test(value)
 
 const applyNonceToFeatureStyles = (
   root: ParentNode | Node,
@@ -545,110 +542,6 @@ const applyNonceToFeatureStyles = (
       ;(style as HTMLStyleElement).nonce = nonce
     }
   })
-}
-
-const sanitizeFeatureFragment = (
-  fragment: DocumentFragment,
-  nonce?: string | null,
-) => {
-  const elements = Array.from(fragment.querySelectorAll('*'))
-  for (const element of elements) {
-    const name = element.tagName.toLowerCase()
-
-    if (unsafeFeatureElementNames.has(name)) {
-      element.remove()
-      continue
-    }
-
-    for (const attribute of Array.from(element.attributes)) {
-      const attributeName = attribute.name.toLowerCase()
-      const value = attribute.value.trim()
-
-      if (attributeName.startsWith('on') || attributeName === 'srcdoc') {
-        element.removeAttribute(attribute.name)
-        continue
-      }
-
-      if (
-        featureUrlAttributeNames.has(attributeName) &&
-        isUnsafeFeatureUrl(value)
-      ) {
-        element.removeAttribute(attribute.name)
-        continue
-      }
-
-      if (attributeName === 'style' && hasUnsafeFeatureStyle(value)) {
-        element.removeAttribute(attribute.name)
-      }
-    }
-  }
-
-  applyNonceToFeatureStyles(fragment, nonce)
-  return fragment
-}
-
-const createSafeFeatureFragment = (
-  document: Document,
-  html: string,
-  nonce?: string | null,
-) => {
-  const template = document.createElement('template')
-  template.innerHTML = html
-  return sanitizeFeatureFragment(template.content, nonce)
-}
-
-const nonceBridgeQueues = new WeakMap<Document, Promise<void>>()
-
-const withStyleNonceBridge = async <T>(
-  document: Document,
-  nonce: string | null | undefined,
-  task: () => T | Promise<T>,
-): Promise<T> => {
-  const nodePrototype = document.defaultView?.Node?.prototype
-  if (!nonce || !nodePrototype) return task()
-
-  const previous = nonceBridgeQueues.get(document) ?? Promise.resolve()
-  let release!: () => void
-  const current = new Promise<void>((resolve) => {
-    release = resolve
-  })
-  nonceBridgeQueues.set(document, current)
-  await previous
-
-  const originalAppendChild = nodePrototype.appendChild
-  const originalInsertBefore = nodePrototype.insertBefore
-  const originalReplaceChild = nodePrototype.replaceChild
-
-  nodePrototype.appendChild = function (this: Node, node: Node) {
-    applyNonceToFeatureStyles(node, nonce)
-    return originalAppendChild.call(this, node)
-  } as typeof nodePrototype.appendChild
-
-  nodePrototype.insertBefore = function (
-    this: Node,
-    node: Node,
-    child: Node | null,
-  ) {
-    applyNonceToFeatureStyles(node, nonce)
-    return originalInsertBefore.call(this, node, child)
-  } as typeof nodePrototype.insertBefore
-
-  nodePrototype.replaceChild = function (this: Node, node: Node, child: Node) {
-    applyNonceToFeatureStyles(node, nonce)
-    return originalReplaceChild.call(this, node, child)
-  } as typeof nodePrototype.replaceChild
-
-  try {
-    return await task()
-  } finally {
-    nodePrototype.appendChild = originalAppendChild
-    nodePrototype.insertBefore = originalInsertBefore
-    nodePrototype.replaceChild = originalReplaceChild
-    release()
-    if (nonceBridgeQueues.get(document) === current) {
-      nonceBridgeQueues.delete(document)
-    }
-  }
 }
 
 const formatFeatureErrorMessage = (
@@ -924,113 +817,90 @@ const loadShikiRuntime = async () => {
 
 let markdownMermaidRenderId = 0
 
-const createMermaidThemeVariables = (
+const resolveMarkdownFeatureThemeTokens = (
   element: HTMLElement,
-  context: MarkdownFeatureAdapterContext,
-) => {
-  const styleRoot = getFeatureStyleRoot(element, context.root)
-  return {
-    background: getComputedToken(styleRoot, '--el-bg-color', '#ffffff'),
+  root: ParentNode,
+): MarkdownFeatureThemeTokens => {
+  const styleRoot = getFeatureStyleRoot(element, root)
+  const style =
+    styleRoot && typeof window !== 'undefined'
+      ? window.getComputedStyle(styleRoot)
+      : null
+  return Object.freeze({
+    background: getComputedToken(style, '--el-bg-color', '#ffffff'),
+    danger: getComputedToken(style, '--el-color-danger', '#f56c6c'),
     edgeLabelBackground: getComputedToken(
-      styleRoot,
+      style,
       '--el-bg-color-overlay',
       '#ffffff',
     ),
-    lineColor: getComputedToken(
-      styleRoot,
-      '--el-border-color-darker',
-      '#909399',
-    ),
-    mainBkg: getComputedToken(styleRoot, '--el-fill-color-light', '#f5f7fa'),
-    nodeBorder: getComputedToken(styleRoot, '--el-color-primary', '#409eff'),
+    lineColor: getComputedToken(style, '--el-border-color-darker', '#909399'),
+    mainBackground: getComputedToken(style, '--el-fill-color-light', '#f5f7fa'),
+    nodeBorder: getComputedToken(style, '--el-color-primary', '#409eff'),
     primaryBorderColor: getComputedToken(
-      styleRoot,
+      style,
       '--el-color-primary',
       '#409eff',
     ),
-    primaryColor: getComputedToken(
-      styleRoot,
-      '--el-fill-color-light',
-      '#f5f7fa',
-    ),
+    primaryColor: getComputedToken(style, '--el-fill-color-light', '#f5f7fa'),
     primaryTextColor: getComputedToken(
-      styleRoot,
+      style,
       '--el-text-color-primary',
       '#303133',
     ),
-    secondaryColor: getComputedToken(
-      styleRoot,
-      '--el-fill-color-blank',
-      '#ffffff',
-    ),
+    secondaryColor: getComputedToken(style, '--el-fill-color-blank', '#ffffff'),
     tertiaryColor: getComputedToken(
-      styleRoot,
+      style,
       '--el-fill-color-lighter',
       '#fafafa',
     ),
-  }
+  })
 }
 
-export const defaultMermaidAdapter: MarkdownFeatureAdapter = async (
-  element,
-  context,
-) => {
-  if (
-    element.dataset.mermaidRendered === 'true' &&
-    !element.querySelector('code')
-  ) {
-    applyNonceToFeatureStyles(element, context?.cspNonce)
-    return
+const renderMermaidFeature = async (
+  source: string,
+  context: MarkdownFeatureRenderContext,
+): Promise<FeatureRenderOutput> => {
+  const mermaid = await loadMermaidRuntime()
+  if (context.signal?.aborted) {
+    throw createMarkdownRuntimeError('infra', 'mermaid_render_aborted')
+  }
+  if (typeof mermaid.render !== 'function') {
+    throw createMarkdownRuntimeError('infra', 'mermaid_render_unavailable')
   }
 
-  const source = extractFeatureSource(element, [
-    'mermaidSource',
-    'markdownSource',
-    'source',
-  ]).trim()
-  if (!source) return
+  mermaid.initialize?.({
+    htmlLabels: false,
+    securityLevel: 'strict',
+    startOnLoad: false,
+    theme: context.theme === 'dark' ? 'dark' : 'default',
+    themeVariables: {
+      background: context.tokens.background,
+      edgeLabelBackground: context.tokens.edgeLabelBackground,
+      lineColor: context.tokens.lineColor,
+      mainBkg: context.tokens.mainBackground,
+      nodeBorder: context.tokens.nodeBorder,
+      primaryBorderColor: context.tokens.primaryBorderColor,
+      primaryColor: context.tokens.primaryColor,
+      primaryTextColor: context.tokens.primaryTextColor,
+      secondaryColor: context.tokens.secondaryColor,
+      tertiaryColor: context.tokens.tertiaryColor,
+    },
+  })
 
-  try {
-    const mermaid = await loadMermaidRuntime()
-    if (context?.signal?.aborted) return
-    if (typeof mermaid.render !== 'function') {
-      throw createMarkdownRuntimeError('infra', 'mermaid_render_unavailable')
-    }
-
-    mermaid.initialize?.({
-      securityLevel: 'strict',
-      startOnLoad: false,
-      theme: context?.theme === 'dark' ? 'dark' : 'default',
-      themeVariables: context
-        ? createMermaidThemeVariables(element, context)
-        : undefined,
-    })
-
-    const renderId = `fsus-markdown-mermaid-${++markdownMermaidRenderId}`
-    const rendered = await withStyleNonceBridge(
-      element.ownerDocument,
-      context?.cspNonce,
-      () => mermaid.render!(renderId, source),
-    )
-    if (context?.signal?.aborted) return
-    const svg =
+  const renderId = `fsus-markdown-mermaid-${++markdownMermaidRenderId}`
+  const rendered = await mermaid.render(renderId, source)
+  if (context.signal?.aborted) {
+    throw createMarkdownRuntimeError('infra', 'mermaid_render_aborted')
+  }
+  return Object.freeze({
+    kind: 'mermaid',
+    payload:
       typeof rendered === 'string'
         ? rendered
-        : (rendered as { svg: string }).svg
-    const fragment = createSafeFeatureFragment(
-      element.ownerDocument,
-      svg,
-      context?.cspNonce,
-    )
-
-    element.replaceChildren(fragment)
-    element.dataset.mermaidRendered = 'true'
-    element.dataset.markdownFeatureActivated = 'mermaid'
-    element.removeAttribute('data-mermaid-placeholder')
-  } catch (error) {
-    renderFeatureError(element, 'mermaid', error, source)
-    throw error
-  }
+        : (rendered as { svg: string }).svg,
+    rootId: renderId,
+  })
 }
 
 const isBlockLatexElement = (element: HTMLElement) =>
@@ -1038,53 +908,30 @@ const isBlockLatexElement = (element: HTMLElement) =>
   element.tagName === 'FIGURE' ||
   element.dataset.latexDisplay === 'block'
 
-export const defaultLatexAdapter: MarkdownFeatureAdapter = async (
-  element,
-  context,
-) => {
-  if (element.dataset.latexRendered && !element.querySelector('code')) {
-    applyNonceToFeatureStyles(element, context?.cspNonce)
-    return
+const renderLatexFeature = async (
+  source: string,
+  context: MarkdownFeatureRenderContext,
+  displayMode: boolean,
+): Promise<FeatureRenderOutput> => {
+  const katex = await loadKatexRuntime()
+  if (context.signal?.aborted) {
+    throw createMarkdownRuntimeError('infra', 'katex_render_aborted')
+  }
+  if (typeof katex.renderToString !== 'function') {
+    throw createMarkdownRuntimeError('infra', 'katex_render_unavailable')
   }
 
-  const source = extractFeatureSource(element, [
-    'latexSource',
-    'markdownSource',
-    'source',
-  ]).trim()
-  if (!source) return
-
-  try {
-    const katex = await loadKatexRuntime()
-    if (context?.signal?.aborted) return
-    if (typeof katex.renderToString !== 'function') {
-      throw createMarkdownRuntimeError('infra', 'katex_render_unavailable')
-    }
-
-    const styleRoot = context
-      ? getFeatureStyleRoot(element, context.root)
-      : element.ownerDocument.documentElement
-    const html = katex.renderToString(source, {
-      displayMode: isBlockLatexElement(element),
-      errorColor: getComputedToken(styleRoot, '--el-color-danger', '#f56c6c'),
-      throwOnError: false,
-      trust: false,
-    })
-    if (context?.signal?.aborted) return
-    const fragment = createSafeFeatureFragment(
-      element.ownerDocument,
-      html,
-      context?.cspNonce,
-    )
-
-    element.replaceChildren(fragment)
-    element.dataset.latexRendered = 'katex'
-    element.dataset.markdownFeatureActivated = 'latex'
-    element.removeAttribute('data-latex-placeholder')
-  } catch (error) {
-    renderFeatureError(element, 'latex', error, source)
-    throw error
+  const payload = katex.renderToString(source, {
+    displayMode,
+    errorColor: context.tokens.danger,
+    output: 'mathml',
+    throwOnError: false,
+    trust: false,
+  })
+  if (context.signal?.aborted) {
+    throw createMarkdownRuntimeError('infra', 'katex_render_aborted')
   }
+  return Object.freeze({ kind: 'latex', payload })
 }
 
 const languageAliases = new Map([
@@ -1128,101 +975,238 @@ const renderShikiHtml = async (
   }
 }
 
-export const defaultCodeHighlightAdapter: MarkdownFeatureAdapter = async (
-  element,
-  context,
-) => {
-  const code =
-    element.tagName === 'CODE' ? element : element.querySelector('code')
-  if (!code) return
+const renderCodeHighlightFeature = async (
+  source: string,
+  language: string,
+  context: MarkdownFeatureRenderContext,
+): Promise<FeatureRenderOutput> => {
+  const theme = context.theme === 'dark' ? 'github-dark' : 'github-light'
+  const shiki = await loadShikiRuntime()
+  await shiki.ensureLoaded?.(language, theme)
+  if (context.signal?.aborted) {
+    throw createMarkdownRuntimeError('infra', 'shiki_render_aborted')
+  }
+  const payload = await renderShikiHtml(shiki, source, language, theme)
+  if (context.signal?.aborted) {
+    throw createMarkdownRuntimeError('infra', 'shiki_render_aborted')
+  }
+  return Object.freeze({ kind: 'code-highlight', payload })
+}
 
-  const pre = code.closest('pre') ?? code
-  if (pre instanceof HTMLElement && pre.dataset.codeHighlighted === 'shiki') {
-    applyNonceToFeatureStyles(pre, context?.cspNonce)
-    return
+interface MarkdownFeatureActivationContext extends Omit<
+  MarkdownFeatureRenderContext,
+  'tokens'
+> {
+  readonly cspNonce?: string | null
+  readonly kind: Extract<
+    MarkdownFeatureActivationKind,
+    MarkdownFeatureOutputKind
+  >
+  readonly resolveTokens: (
+    element: HTMLElement,
+  ) => Readonly<MarkdownFeatureThemeTokens>
+  readonly root: ParentNode
+}
+
+const toFeatureRenderContext = (
+  context: MarkdownFeatureActivationContext,
+  element: HTMLElement,
+): MarkdownFeatureRenderContext =>
+  Object.freeze({
+    signal: context.signal,
+    theme: context.theme,
+    tokens: context.resolveTokens(element),
+  })
+
+const activateBuiltInFeature = async (
+  element: HTMLElement,
+  context: MarkdownFeatureActivationContext,
+): Promise<boolean> => {
+  const { kind } = context
+
+  if (kind === 'mermaid') {
+    if (
+      element.dataset.mermaidRendered === 'true' &&
+      !element.querySelector('code')
+    ) {
+      applyNonceToFeatureStyles(element, context.cspNonce)
+      return false
+    }
+    const source = extractFeatureSource(element, [
+      'mermaidSource',
+      'markdownSource',
+      'source',
+    ]).trim()
+    if (!source) return false
+    try {
+      const [output, gateway] = await Promise.all([
+        renderMermaidFeature(source, toFeatureRenderContext(context, element)),
+        loadMarkdownFeatureOutputGateway(),
+      ])
+      if (context.signal?.aborted) return false
+      gateway.commitMarkdownFeatureOutput(element, output, {
+        nonce: context.cspNonce,
+      })
+      element.dataset.mermaidRendered = 'true'
+      element.dataset.markdownFeatureActivated = 'mermaid'
+      element.removeAttribute('data-mermaid-placeholder')
+      return true
+    } catch (error) {
+      renderFeatureError(element, 'mermaid', error, source)
+      throw error
+    }
   }
 
+  if (kind === 'latex') {
+    if (element.dataset.latexRendered && !element.querySelector('code')) {
+      applyNonceToFeatureStyles(element, context.cspNonce)
+      return false
+    }
+    const source = extractFeatureSource(element, [
+      'latexSource',
+      'markdownSource',
+      'source',
+    ]).trim()
+    if (!source) return false
+    try {
+      const [output, gateway] = await Promise.all([
+        renderLatexFeature(
+          source,
+          toFeatureRenderContext(context, element),
+          isBlockLatexElement(element),
+        ),
+        loadMarkdownFeatureOutputGateway(),
+      ])
+      if (context.signal?.aborted) return false
+      gateway.commitMarkdownFeatureOutput(element, output, {
+        nonce: context.cspNonce,
+      })
+      element.dataset.latexRendered = 'katex'
+      element.dataset.markdownFeatureActivated = 'latex'
+      element.removeAttribute('data-latex-placeholder')
+      return true
+    } catch (error) {
+      renderFeatureError(element, 'latex', error, source)
+      throw error
+    }
+  }
+
+  const code =
+    element.tagName === 'CODE' ? element : element.querySelector('code')
+  if (!code) return false
+  const pre = code.closest('pre') ?? code
+  if (pre instanceof HTMLElement && pre.dataset.codeHighlighted === 'shiki') {
+    applyNonceToFeatureStyles(pre, context.cspNonce)
+    return false
+  }
   const source = code.textContent ?? ''
-  const language = extractCodeLanguage(code)
-  const theme = context?.theme === 'dark' ? 'github-dark' : 'github-light'
-
+  if (!source) return false
   try {
-    const shiki = await loadShikiRuntime()
-    await shiki.ensureLoaded?.(language, theme)
-    if (context?.signal?.aborted) return
-    const html = await renderShikiHtml(shiki, source, language, theme)
-    if (context?.signal?.aborted) return
-    const fragment = createSafeFeatureFragment(
-      element.ownerDocument,
-      html,
-      context?.cspNonce,
-    )
-    const highlightedPre = Array.from(fragment.childNodes).find(
-      (node): node is HTMLElement =>
-        isElementNode(node) && node.tagName === 'PRE',
-    )
-
-    if (pre instanceof HTMLElement) {
-      if (highlightedPre) {
-        highlightedPre.dataset.codeHighlighted = 'shiki'
-        highlightedPre.dataset.markdownFeatureActivated = 'code-highlight'
-        pre.replaceWith(highlightedPre)
-      } else {
-        pre.replaceChildren(fragment)
-        pre.dataset.codeHighlighted = 'shiki'
-        pre.dataset.markdownFeatureActivated = 'code-highlight'
-      }
-    } else {
-      element.replaceChildren(fragment)
-      element.dataset.codeHighlighted = 'shiki'
-      element.dataset.markdownFeatureActivated = 'code-highlight'
-    }
+    const [output, gateway] = await Promise.all([
+      renderCodeHighlightFeature(
+        source,
+        extractCodeLanguage(code),
+        toFeatureRenderContext(context, element),
+      ),
+      loadMarkdownFeatureOutputGateway(),
+    ])
+    if (context.signal?.aborted) return false
+    const committed = gateway.commitMarkdownFeatureOutput(pre, output, {
+      mode: 'replace-element',
+      nonce: context.cspNonce,
+    })
+    committed.dataset.codeHighlighted = 'shiki'
+    committed.dataset.markdownFeatureActivated = 'code-highlight'
+    return true
   } catch (error) {
-    if (pre instanceof HTMLElement) {
-      replaceWithFeatureError(pre, 'code-highlight', error, source)
-    } else {
-      renderFeatureError(element, 'code-highlight', error, source)
-    }
+    replaceWithFeatureError(pre, 'code-highlight', error, source)
     throw error
   }
 }
 
-const markElements = async (
-  root: ParentNode,
-  selector: string,
-  kind: MarkdownFeatureActivationKind,
-  adapter: MarkdownFeatureAdapter | null | undefined,
-  context: MarkdownFeatureAdapterContext,
+interface MarkdownFeatureActivationWork {
+  readonly completed: Promise<void>
+  readonly context: MarkdownFeatureActivationContext
+  readonly dependencies: readonly MarkdownFeatureActivationWork[]
+  readonly element: HTMLElement
+  error?: MarkdownFeatureActivationError
+  committed?: boolean
+  complete: () => void
+}
+
+interface MarkdownFeatureActivationBatch {
+  readonly context: MarkdownFeatureActivationContext
+  readonly errors: MarkdownFeatureActivationError[]
+  readonly work: MarkdownFeatureActivationWork[]
+}
+
+const isElementInActivationRoot = (root: ParentNode, element: HTMLElement) => {
+  const rootNode = root as Node
+  return rootNode === element || rootNode.contains(element)
+}
+
+const createMarkdownFeatureActivationWork = (
+  element: HTMLElement,
+  context: MarkdownFeatureActivationContext,
+  dependencies: readonly MarkdownFeatureActivationWork[],
+): MarkdownFeatureActivationWork => {
+  let complete: () => void = () => undefined
+  const completed = new Promise<void>((resolve) => {
+    complete = () => resolve()
+  })
+  return {
+    complete,
+    completed,
+    context,
+    dependencies,
+    element,
+  }
+}
+
+const activateMarkdownFeatureWork = async (
+  batches: readonly MarkdownFeatureActivationBatch[],
   concurrency: number,
   signal?: AbortSignal,
 ) => {
-  const elements = selectMarkdownFeatureElements(root, selector)
-  const errors: MarkdownFeatureActivationError[] = []
-  let count = 0
-
+  const work = batches.flatMap((batch) => batch.work)
   let nextIndex = 0
+
   const activateNext = async () => {
-    while (nextIndex < elements.length) {
-      if (signal?.aborted) return
-      const element = elements[nextIndex++]
-      if (!element) continue
+    while (!signal?.aborted) {
+      const current = work[nextIndex++]
+      if (!current) return
+
       try {
-        if (adapter) await adapter(element, context)
-        if (signal?.aborted) return
-        element.dataset.markdownFeatureActivated = kind
-        count += 1
+        await Promise.all(
+          current.dependencies.map((dependency) => dependency.completed),
+        )
+        if (
+          signal?.aborted ||
+          !isElementInActivationRoot(current.context.root, current.element)
+        ) {
+          continue
+        }
+
+        const committed = await activateBuiltInFeature(
+          current.element,
+          current.context,
+        )
+        if (!signal?.aborted) {
+          current.committed = committed
+        }
       } catch (error) {
-        errors.push(createActivationError(kind, error))
+        current.error = createActivationError(current.context.kind, error)
+      } finally {
+        current.complete()
       }
     }
   }
+
   await Promise.all(
-    Array.from(
-      { length: Math.min(elements.length, Math.max(1, concurrency)) },
-      () => activateNext(),
+    Array.from({ length: Math.min(work.length, concurrency) }, () =>
+      activateNext(),
     ),
   )
-  return { count, errors }
 }
 
 export const activateMarkdownFeatures = async (
@@ -1233,6 +1217,9 @@ export const activateMarkdownFeatures = async (
   const errors: MarkdownFeatureActivationError[] = []
   const theme = resolveFeatureTheme(options.root)
   const concurrency = Math.max(1, Math.min(4, options.concurrency ?? 3))
+  let themeTokens: Readonly<MarkdownFeatureThemeTokens> | undefined
+  const resolveTokens = (element: HTMLElement) =>
+    (themeTokens ??= resolveMarkdownFeatureThemeTokens(element, options.root))
 
   if (options.signal?.aborted) return { activated, errors }
 
@@ -1258,22 +1245,19 @@ export const activateMarkdownFeatures = async (
     )
   }
 
-  for (const [kind, selector, adapter] of [
+  const batches: MarkdownFeatureActivationBatch[] = []
+  const priorWork: MarkdownFeatureActivationWork[] = []
+
+  for (const [kind, selector] of [
     [
       'mermaid',
       '.markdown-renderer__mermaid,[data-mermaid-placeholder],[data-mermaid-rendered]',
-      options.mermaidAdapter,
     ],
     [
       'latex',
       '.markdown-renderer__latex,[data-latex-placeholder],[data-latex-rendered]',
-      options.latexAdapter,
     ],
-    [
-      'code-highlight',
-      'pre code[class*="language-"]',
-      options.codeHighlightAdapter,
-    ],
+    ['code-highlight', 'pre code[class*="language-"]'],
   ] as const) {
     if (options.signal?.aborted) break
     if (
@@ -1284,29 +1268,55 @@ export const activateMarkdownFeatures = async (
       continue
     }
 
+    const context: MarkdownFeatureActivationContext = {
+      cspNonce: options.cspNonce,
+      kind,
+      resolveTokens,
+      root: options.root,
+      signal: options.signal,
+      theme,
+    }
+    const batch: MarkdownFeatureActivationBatch = {
+      context,
+      errors: [],
+      work: [],
+    }
+    batches.push(batch)
+
     try {
-      const result = await markElements(
-        options.root,
-        selector,
-        kind,
-        adapter,
-        {
-          baseUrl: options.baseUrl,
-          cspNonce: options.cspNonce,
-          kind,
-          root: options.root,
-          signal: options.signal,
-          theme,
+      selectMarkdownFeatureElements(options.root, selector).forEach(
+        (element) => {
+          const dependencies = priorWork.filter(
+            (prior) =>
+              prior.element !== element && prior.element.contains(element),
+          )
+          const current = createMarkdownFeatureActivationWork(
+            element,
+            context,
+            dependencies,
+          )
+          batch.work.push(current)
+          priorWork.push(current)
         },
-        concurrency,
-        options.signal,
       )
-      pushActivation(activated, kind, result.count)
-      errors.push(...result.errors)
     } catch (error) {
-      errors.push(createActivationError(kind, error))
+      batch.errors.push(createActivationError(kind, error))
     }
   }
+
+  await activateMarkdownFeatureWork(batches, concurrency, options.signal)
+
+  batches.forEach((batch) => {
+    pushActivation(
+      activated,
+      batch.context.kind,
+      batch.work.filter((work) => work.committed).length,
+    )
+    errors.push(
+      ...batch.errors,
+      ...batch.work.flatMap((work) => (work.error ? [work.error] : [])),
+    )
+  })
 
   return { activated, errors }
 }

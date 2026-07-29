@@ -81,9 +81,6 @@ import {
   MARKDOWN_RENDERER_VERSION,
   activateMarkdownFeatures,
   renderMarkdownFallbackWithRuntime,
-  defaultCodeHighlightAdapter,
-  defaultLatexAdapter,
-  defaultMermaidAdapter,
   isMarkdownRuntimeAuthorizedResult,
   normalizeMarkdownSource,
   resolveMarkdownSourceIdentity,
@@ -696,11 +693,6 @@ const resolveMarkdownFeatureOptions = () => ({
   mermaid: props.features?.mermaid ?? props.allowMermaid,
 })
 
-const resolveMarkdownFeatureAdapter = <TAdapter,>(
-  adapter: TAdapter | null | undefined,
-  defaultAdapter: TAdapter,
-) => (adapter === undefined ? defaultAdapter : adapter)
-
 const resetFeatureActivation = () => {
   activationController?.abort()
   activationController = new AbortController()
@@ -725,21 +717,9 @@ const activateRenderedFeatures = async (
   const activationStartedAt = readPerformanceNow()
   const activation = await activateMarkdownFeatures({
     baseUrl: props.baseUrl,
-    codeHighlightAdapter: resolveMarkdownFeatureAdapter(
-      props.codeHighlightAdapter,
-      defaultCodeHighlightAdapter,
-    ),
     concurrency: 3,
     cspNonce: props.cspNonce,
     features: resolveMarkdownFeatureOptions(),
-    latexAdapter: resolveMarkdownFeatureAdapter(
-      props.latexAdapter,
-      defaultLatexAdapter,
-    ),
-    mermaidAdapter: resolveMarkdownFeatureAdapter(
-      props.mermaidAdapter,
-      defaultMermaidAdapter,
-    ),
     root: activationRoot,
     signal,
   })
@@ -946,9 +926,6 @@ watch(
     props.baseUrl,
     props.cspNonce,
     props.features,
-    props.mermaidAdapter,
-    props.latexAdapter,
-    props.codeHighlightAdapter,
   ],
   () => {
     if (debounceTimer) {

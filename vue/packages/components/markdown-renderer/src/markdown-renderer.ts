@@ -2,7 +2,6 @@ import { buildProps } from '@element-plus/utils'
 
 import type { ExtractPropTypes, PropType } from 'vue'
 import type {
-  MarkdownFeatureAdapter,
   MarkdownFeatureActivationFeatureOptions,
   MarkdownRenderMode,
   MarkdownSafeHtml,
@@ -64,18 +63,6 @@ export const markdownRendererProps = buildProps({
   },
   features: {
     type: Object as PropType<MarkdownFeatureActivationFeatureOptions>,
-    default: undefined,
-  },
-  mermaidAdapter: {
-    type: Function as unknown as PropType<MarkdownFeatureAdapter | null>,
-    default: undefined,
-  },
-  latexAdapter: {
-    type: Function as unknown as PropType<MarkdownFeatureAdapter | null>,
-    default: undefined,
-  },
-  codeHighlightAdapter: {
-    type: Function as unknown as PropType<MarkdownFeatureAdapter | null>,
     default: undefined,
   },
 } as const)

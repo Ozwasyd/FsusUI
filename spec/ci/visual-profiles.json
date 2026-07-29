@@ -4,9 +4,10 @@
     "projects": ["desktop-light", "mobile-dark"],
     "specs": [
       "vue/tests/visual/capture-all.spec.ts",
-      "vue/tests/visual/smoke-theme-switch.spec.ts"
+      "vue/tests/visual/smoke-theme-switch.spec.ts",
+      "vue/tests/visual/markdown-feature-smoke.spec.ts"
     ],
-    "grep": "(?:capture basic|smoke theme mode toggles light and dark)$"
+    "grep": "(?:capture basic|smoke theme mode toggles light and dark|smoke markdown feature activation commits Mermaid, KaTeX, and Shiki)$"
   },
   "commonContractSpecs": [
     "vue/tests/visual/foundation-style-boundary.spec.ts",

@@ -13,6 +13,10 @@ const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&')
 export const createVisualCaptureTestTitle = (section) => `capture ${section}`
 export const SMOKE_THEME_SWITCH_TEST_TITLE =
   'smoke theme mode toggles light and dark'
+export const SMOKE_MARKDOWN_FEATURE_TEST_TITLE =
+  'smoke markdown feature activation commits Mermaid, KaTeX, and Shiki'
+export const SMOKE_MARKDOWN_FEATURE_SPEC =
+  'vue/tests/visual/markdown-feature-smoke.spec.ts'
 
 export function loadVisualProfileRegistry(
   repositoryRoot = process.cwd(),
@@ -65,12 +69,24 @@ export function validateVisualProfileRegistry(registry, repositoryRoot) {
       `visual profile registry smoke grep does not select ${JSON.stringify(SMOKE_THEME_SWITCH_TEST_TITLE)}`,
     )
   }
-  if (
-    !Array.isArray(registry.smoke?.specs) ||
-    registry.smoke.specs.length < 2
-  ) {
+  if (!smokePattern.test(SMOKE_MARKDOWN_FEATURE_TEST_TITLE)) {
     throw new Error(
-      'visual profile registry smoke must include capture and interactive theme-switch specs',
+      `visual profile registry smoke grep does not select ${JSON.stringify(SMOKE_MARKDOWN_FEATURE_TEST_TITLE)}`,
+    )
+  }
+  if (!Array.isArray(registry.smoke?.specs)) {
+    throw new Error(
+      'visual profile registry smoke must include capture, interactive theme-switch, and Markdown feature specs',
+    )
+  }
+  if (!registry.smoke.specs.includes(SMOKE_MARKDOWN_FEATURE_SPEC)) {
+    throw new Error(
+      `visual profile registry smoke must include ${JSON.stringify(SMOKE_MARKDOWN_FEATURE_SPEC)}`,
+    )
+  }
+  if (registry.smoke.specs.length < 3) {
+    throw new Error(
+      'visual profile registry smoke must include capture, interactive theme-switch, and Markdown feature specs',
     )
   }
   for (const spec of registry.smoke.specs) {

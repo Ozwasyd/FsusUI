@@ -137,12 +137,21 @@ const resolveElementPlusSupportChunk = (id) => {
   return undefined
 }
 
+const isMarkdownFeatureOutputGateway = (id) =>
+  /\/(?:vue\/packages\/wasm|node_modules\/@element-plus\/wasm|node_modules\/@ozwasyd\/element-plus\/es\/wasm)\/markdown-feature-output-gateway\.(?:[cm]?[jt]sx?)$/u.test(
+    id,
+  )
+
 export const resolveFsusViteManualChunk = (
   moduleId,
   { profile = 'full' } = {},
 ) => {
   const id = normalizeModuleId(moduleId)
   const consumerProfile = profile === 'consumer'
+
+  if (isMarkdownFeatureOutputGateway(id)) {
+    return 'fsus-markdown-feature-gateway'
+  }
 
   if (
     !consumerProfile &&

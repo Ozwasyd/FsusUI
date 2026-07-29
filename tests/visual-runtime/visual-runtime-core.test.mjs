@@ -68,12 +68,21 @@ test('default Demo runtime invalidates when its base tsconfig changes', async (t
   const { config, repositoryRoot } = await createWorkspace(t)
   const defaultConfig = createDefaultVisualRuntimeConfig(repositoryRoot)
   const defaultDemo = defaultConfig.groups.find((group) => group.id === 'demo')
+  const defaultWasm = defaultConfig.groups.find((group) => group.id === 'wasm')
 
   assert(defaultDemo)
+  assert(defaultWasm)
   assert.deepEqual(defaultDemo.excludedInputPaths, ['vue/packages/wasm/build'])
   assert(defaultDemo.inputPaths.includes('vue/packages'))
   assert(defaultDemo.inputPaths.includes('vue/tsconfig.base.json'))
   assert(!defaultDemo.inputPaths.includes('vue/packages/demo-app'))
+  assert(
+    defaultWasm.inputPaths.includes(
+      'vue/packages/wasm/markdown-feature-output-gateway.ts',
+    ),
+  )
+  assert(!defaultWasm.inputPaths.includes('vue/packages/wasm/build'))
+  assert(!defaultWasm.inputPaths.includes('vue/packages/wasm/dist'))
 
   const demo = config.groups.find((group) => group.id === 'demo')
   demo.inputPaths.push('vue/tsconfig.base.json')

@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs'
+import { resolveFsusViteManualChunk } from './vite-manual-chunks.mjs'
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
 const scripts = packageJson.scripts ?? {}
@@ -55,6 +56,41 @@ assert(
   !hasSafeDemoChunkConfig(invalidFixtures.demoViteConfig),
   'demo build negative fixture must reject explicit-only manual chunks',
 )
+
+const gatewayChunkOwner = 'fsus-markdown-feature-gateway'
+for (const profile of ['full', 'consumer']) {
+  for (const moduleId of [
+    '/workspace/vue/packages/wasm/markdown-feature-output-gateway.ts',
+    '/workspace/node_modules/@element-plus/wasm/markdown-feature-output-gateway.mjs',
+    '/workspace/node_modules/@ozwasyd/element-plus/es/wasm/markdown-feature-output-gateway.mjs',
+  ]) {
+    assert(
+      resolveFsusViteManualChunk(moduleId, { profile }) === gatewayChunkOwner,
+      `${profile} must isolate the exact Markdown feature output gateway module`,
+    )
+  }
+}
+assert(
+  resolveFsusViteManualChunk(
+    '/workspace/vue/packages/wasm/markdown-runtime.ts',
+  ) === 'fsus-ui' &&
+    resolveFsusViteManualChunk(
+      '/workspace/vue/packages/wasm/markdown-runtime.ts',
+      { profile: 'consumer' },
+    ) === 'fsus-wasm',
+  'ordinary Markdown runtime must retain its existing full and consumer owners',
+)
+for (const moduleId of [
+  '/workspace/vue/packages/wasm/markdown-feature-output-gateway-sibling.ts',
+  '/workspace/vue/packages/wasm/markdown-feature-output-gateway.ts/child.ts',
+  '/workspace/vue/packages/wasm/markdown-feature-output-gateway.ts?query',
+  '/workspace/vue/packages/wasm/%6darkdown-feature-output-gateway.ts',
+]) {
+  assert(
+    resolveFsusViteManualChunk(moduleId) !== gatewayChunkOwner,
+    `gateway chunk owner must reject non-exact module id ${moduleId}`,
+  )
+}
 
 const decisionScript = existsSync(decisionScriptPath)
   ? readFileSync(decisionScriptPath, 'utf8')

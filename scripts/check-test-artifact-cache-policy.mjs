@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { artifactGroups, expandInputPatterns } from './test-artifact-cache.mjs'
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
 const scripts = packageJson.scripts ?? {}
@@ -19,6 +20,28 @@ function assert(condition, message) {
 
 const workflows = `${qualityWorkflow}\n${reusableQualityWorkflow}`
 const docs = `${releaseGovernance}\n${engineeringHandoff}`
+const wasmBundleFingerprint = artifactGroups.wasm.fingerprints.find(
+  (fingerprint) => fingerprint.id === 'bundle',
+)
+
+assert(wasmBundleFingerprint, 'WASM bundle fingerprint must exist')
+const wasmBundleInputs = await expandInputPatterns(
+  wasmBundleFingerprint.inputPatterns,
+)
+assert(
+  wasmBundleInputs.includes(
+    'vue/packages/wasm/markdown-feature-output-gateway.ts',
+  ),
+  'WASM bundle fingerprint must include the Markdown feature output gateway owner',
+)
+assert(
+  !wasmBundleInputs.some(
+    (inputPath) =>
+      inputPath.startsWith('vue/packages/wasm/build/') ||
+      inputPath.startsWith('vue/packages/wasm/dist/'),
+  ),
+  'WASM bundle fingerprint must exclude generated build and dist artifacts',
+)
 
 assert(
   scripts['prepare:test-artifacts']?.includes(
@@ -27,7 +50,9 @@ assert(
   'prepare:test-artifacts must use the source-hash aware wrapper',
 )
 assert(
-  !scripts['prepare:test-artifacts']?.includes('run-p ensure:icons ensure:wasm'),
+  !scripts['prepare:test-artifacts']?.includes(
+    'run-p ensure:icons ensure:wasm',
+  ),
   'prepare:test-artifacts must not directly run both ensure scripts on every test entry',
 )
 assert(

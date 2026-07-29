@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { relative, resolve } from 'node:path'
 import fg from 'fast-glob'
+import * as ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 
 const repoRoot = process.cwd()
@@ -157,6 +158,130 @@ describe('HTML and injection boundary surface', () => {
       /MarkdownTrustedHtmlFactory = \(\s*safeHtml: MarkdownSafeHtml/,
     )
     expect(rendererProps).not.toMatch(removedRendererProps)
+  })
+
+  it('keeps third-party Markdown feature HTML inside the single owned gateway', async () => {
+    const featureSources = await fg(
+      [
+        'vue/packages/wasm/markdown*.ts',
+        'vue/packages/components/markdown-renderer/src/*.{ts,vue}',
+      ],
+      {
+        cwd: repoRoot,
+        ignore: ignorePatterns,
+        onlyFiles: true,
+      },
+    )
+    const parserSink =
+      /\.innerHTML\s*=|\.outerHTML\s*=|insertAdjacentHTML\s*\(|createContextualFragment\s*\(/
+    const sinks = featureSources
+      .filter((file) => parserSink.test(read(file)))
+      .sort()
+
+    expect(sinks).toEqual([
+      'vue/packages/wasm/markdown-feature-output-gateway.ts',
+    ])
+
+    const gateway = read('vue/packages/wasm/markdown-feature-output-gateway.ts')
+    const runtime = read('vue/packages/wasm/markdown-runtime.ts')
+    const wasmIndex = read('vue/packages/wasm/index.ts')
+    const publicRuntime = read('vue/packages/element-plus/markdown-runtime.ts')
+    const rendererProps = read(
+      'vue/packages/components/markdown-renderer/src/markdown-renderer.ts',
+    )
+    expect(gateway).toMatch(/CODE_HIGHLIGHT_OUTPUT_POLICY/)
+    expect(gateway).toMatch(/LATEX_OUTPUT_POLICY/)
+    expect(gateway).toMatch(/MERMAID_OUTPUT_POLICY/)
+    expect(gateway).toMatch(/commitMarkdownFeatureOutput/)
+    expect(gateway).toMatch(/sanitizeMermaidStyleSheet/)
+    expect(gateway).toMatch(/sanitizeMermaidRoot/)
+    expect(wasmIndex).not.toMatch(/markdown-feature-output-gateway/)
+    expect(publicRuntime).not.toMatch(/commitMarkdownFeatureOutput/)
+
+    const runtimeSource = ts.createSourceFile(
+      'markdown-runtime.ts',
+      runtime,
+      ts.ScriptTarget.Latest,
+      true,
+      ts.ScriptKind.TS,
+    )
+    const staticGatewayImports = runtimeSource.statements.filter(
+      (statement): statement is ts.ImportDeclaration =>
+        ts.isImportDeclaration(statement) &&
+        ts.isStringLiteral(statement.moduleSpecifier) &&
+        statement.moduleSpecifier.text === './markdown-feature-output-gateway',
+    )
+    expect(staticGatewayImports).toHaveLength(1)
+    expect(staticGatewayImports[0]?.importClause?.isTypeOnly).toBe(true)
+
+    const literalGatewayImports = Array.from(
+      runtime.matchAll(
+        /\bimport\(\s*(['"])\.\/markdown-feature-output-gateway\1\s*\)/gu,
+      ),
+    )
+    expect(literalGatewayImports).toHaveLength(1)
+    const loaderStart = runtime.indexOf(
+      'let markdownFeatureOutputGatewayPromise:',
+    )
+    const loaderEnd = runtime.indexOf(
+      '\nconst defaultMarkdownFeatureOptions',
+      loaderStart,
+    )
+    const loader = runtime.slice(loaderStart, loaderEnd)
+    expect(loaderStart).toBeGreaterThanOrEqual(0)
+    expect(loaderEnd).toBeGreaterThan(loaderStart)
+    expect(loader).toMatch(
+      /^let markdownFeatureOutputGatewayPromise:\s*Promise<MarkdownFeatureOutputGateway>\s*\|\s*null\s*=\s*null/u,
+    )
+    expect(loader).toMatch(
+      /const loadMarkdownFeatureOutputGateway = \(\) => \{\s*markdownFeatureOutputGatewayPromise \?\?=\s*import\(\s*['"]\.\/markdown-feature-output-gateway['"]\s*\)\s*return markdownFeatureOutputGatewayPromise\s*\}\s*$/u,
+    )
+    expect(runtime).not.toMatch(
+      /export\s+(?:const|function|let|var)\s+(?:loadMarkdownFeatureOutputGateway|markdownFeatureOutputGatewayPromise|commitMarkdownFeatureOutput)\b/u,
+    )
+
+    const activationStart = runtime.indexOf(
+      'const activateBuiltInFeature = async',
+    )
+    const activationEnd = runtime.indexOf(
+      '\ninterface MarkdownFeatureActivationWork',
+      activationStart,
+    )
+    const activation = runtime.slice(activationStart, activationEnd)
+    expect(activationStart).toBeGreaterThanOrEqual(0)
+    expect(activationEnd).toBeGreaterThan(activationStart)
+    expect(
+      activation.match(/loadMarkdownFeatureOutputGateway\(\)/gu),
+    ).toHaveLength(3)
+    expect(
+      activation.match(/gateway\.commitMarkdownFeatureOutput\(/gu),
+    ).toHaveLength(3)
+    for (const renderer of [
+      'renderMermaidFeature',
+      'renderLatexFeature',
+      'renderCodeHighlightFeature',
+    ]) {
+      expect(activation).toMatch(
+        new RegExp(
+          `Promise\\.all\\(\\[\\s*${renderer}\\([\\s\\S]*?\\),\\s*loadMarkdownFeatureOutputGateway\\(\\),\\s*\\]\\)`,
+          'u',
+        ),
+      )
+    }
+    expect(activation).toMatch(
+      /const source = code\.textContent \?\? ''\s*if \(!source\) return false\s*try \{[\s\S]*?loadMarkdownFeatureOutputGateway\(\)/u,
+    )
+    expect(runtime).not.toMatch(
+      /sanitizeFeatureFragment|createSafeFeatureFragment/,
+    )
+    expect(runtime).not.toMatch(/default(?:CodeHighlight|Latex|Mermaid)Adapter/)
+    expect(runtime).toMatch(
+      /const toFeatureRenderContext[\s\S]*Object\.freeze\(\{[\s\S]*signal: context\.signal,[\s\S]*theme: context\.theme,[\s\S]*tokens: context\.resolveTokens\(element\)/,
+    )
+    expect(runtime).toMatch(/code\.textContent = source/)
+    expect(rendererProps).not.toMatch(
+      /mermaidAdapter|latexAdapter|codeHighlightAdapter|MarkdownFeatureAdapter/,
+    )
   })
 
   it('does not add SQL execution surfaces to the browser UI package', async () => {

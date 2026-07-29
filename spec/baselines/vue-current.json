@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "c6e43630218495212fe108af9ebd4c168677ed02",
+    "commitSha": "729e4bf348aeefd7abf5def215fcecc1d16cd407",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
@@ -2614,14 +2614,11 @@
         "allowLatex",
         "allowMermaid",
         "baseUrl",
-        "codeHighlightAdapter",
         "content",
         "contentVersion",
         "cspNonce",
         "features",
         "initialRender",
-        "latexAdapter",
-        "mermaidAdapter",
         "mode",
         "trustedHtmlFactory",
         "trustedScriptUrlFactory"
@@ -10034,15 +10031,15 @@
       "classification": "portable"
     },
     {
-      "path": "./*",
-      "classification": "portable"
-    },
-    {
       "path": "./dist/el-fsus-theme.css",
       "classification": "portable"
     },
     {
       "path": "./dist/fsus.css",
+      "classification": "portable"
+    },
+    {
+      "path": "./dist/index.css",
       "classification": "portable"
     },
     {
@@ -10054,12 +10051,104 @@
       "classification": "portable"
     },
     {
-      "path": "./es/*",
+      "path": "./es/components",
       "classification": "portable"
     },
     {
-      "path": "./es/*.mjs",
+      "path": "./es/components/*",
       "classification": "portable"
+    },
+    {
+      "path": "./es/components/*.mjs",
+      "classification": "portable"
+    },
+    {
+      "path": "./es/constants",
+      "classification": "portable"
+    },
+    {
+      "path": "./es/constants/*",
+      "classification": "portable"
+    },
+    {
+      "path": "./es/constants/*.mjs",
+      "classification": "portable"
+    },
+    {
+      "path": "./es/directives",
+      "classification": "portable"
+    },
+    {
+      "path": "./es/directives/*",
+      "classification": "portable"
+    },
+    {
+      "path": "./es/directives/*.mjs",
+      "classification": "portable"
+    },
+    {
+      "path": "./es/hooks",
+      "classification": "portable"
+    },
+    {
+      "path": "./es/hooks/*",
+      "classification": "portable"
+    },
+    {
+      "path": "./es/hooks/*.mjs",
+      "classification": "portable"
+    },
+    {
+      "path": "./es/icons-vue",
+      "classification": "portable"
+    },
+    {
+      "path": "./es/index",
+      "classification": "portable"
+    },
+    {
+      "path": "./es/locale",
+      "classification": "portable"
+    },
+    {
+      "path": "./es/locale/*",
+      "classification": "portable"
+    },
+    {
+      "path": "./es/locale/*.mjs",
+      "classification": "portable"
+    },
+    {
+      "path": "./es/motion",
+      "classification": "portable"
+    },
+    {
+      "path": "./es/motion/*",
+      "classification": "portable"
+    },
+    {
+      "path": "./es/motion/*.mjs",
+      "classification": "portable"
+    },
+    {
+      "path": "./es/utils",
+      "classification": "portable"
+    },
+    {
+      "path": "./es/utils/*",
+      "classification": "portable"
+    },
+    {
+      "path": "./es/utils/*.mjs",
+      "classification": "portable"
+    },
+    {
+      "path": "./es/wasm",
+      "classification": "web-only"
+    },
+    {
+      "path": "./es/wasm/*",
+      "classification": "web-only"
     },
     {
       "path": "./global",
@@ -10074,12 +10163,104 @@
       "classification": "portable"
     },
     {
-      "path": "./lib/*",
+      "path": "./lib/components",
       "classification": "portable"
     },
     {
-      "path": "./lib/*.js",
+      "path": "./lib/components/*",
       "classification": "portable"
+    },
+    {
+      "path": "./lib/components/*.js",
+      "classification": "portable"
+    },
+    {
+      "path": "./lib/constants",
+      "classification": "portable"
+    },
+    {
+      "path": "./lib/constants/*",
+      "classification": "portable"
+    },
+    {
+      "path": "./lib/constants/*.js",
+      "classification": "portable"
+    },
+    {
+      "path": "./lib/directives",
+      "classification": "portable"
+    },
+    {
+      "path": "./lib/directives/*",
+      "classification": "portable"
+    },
+    {
+      "path": "./lib/directives/*.js",
+      "classification": "portable"
+    },
+    {
+      "path": "./lib/hooks",
+      "classification": "portable"
+    },
+    {
+      "path": "./lib/hooks/*",
+      "classification": "portable"
+    },
+    {
+      "path": "./lib/hooks/*.js",
+      "classification": "portable"
+    },
+    {
+      "path": "./lib/icons-vue",
+      "classification": "portable"
+    },
+    {
+      "path": "./lib/index",
+      "classification": "portable"
+    },
+    {
+      "path": "./lib/locale",
+      "classification": "portable"
+    },
+    {
+      "path": "./lib/locale/*",
+      "classification": "portable"
+    },
+    {
+      "path": "./lib/locale/*.js",
+      "classification": "portable"
+    },
+    {
+      "path": "./lib/motion",
+      "classification": "portable"
+    },
+    {
+      "path": "./lib/motion/*",
+      "classification": "portable"
+    },
+    {
+      "path": "./lib/motion/*.js",
+      "classification": "portable"
+    },
+    {
+      "path": "./lib/utils",
+      "classification": "portable"
+    },
+    {
+      "path": "./lib/utils/*",
+      "classification": "portable"
+    },
+    {
+      "path": "./lib/utils/*.js",
+      "classification": "portable"
+    },
+    {
+      "path": "./lib/wasm",
+      "classification": "web-only"
+    },
+    {
+      "path": "./lib/wasm/*",
+      "classification": "web-only"
     },
     {
       "path": "./markdown-runtime",
@@ -10103,6 +10284,10 @@
     },
     {
       "path": "./theme",
+      "classification": "portable"
+    },
+    {
+      "path": "./theme-chalk/*",
       "classification": "portable"
     },
     {

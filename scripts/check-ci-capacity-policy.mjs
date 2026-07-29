@@ -193,7 +193,7 @@ assert.ok(!heapSource.includes('18_432'))
 assert.ok(heapSource.includes('resolveNodeHeapMiB'))
 assert.ok(
   heapSource.includes('unitTestFileCount: countUnitTestFiles()'),
-  'heap wrapper must seed the shared plan with the authoritative unit workload'
+  'heap wrapper must seed the shared plan with the authoritative unit workload',
 )
 assert.ok(visualSource.includes("require('./ci-capacity.cjs')"))
 assert.ok(parallelismSource.includes("from './ci-capacity.cjs'"))
@@ -201,23 +201,23 @@ assert.ok(capacityCliSource.includes("from 'fast-glob'"))
 assert.ok(!capacityCliSource.includes('globSync'))
 assert.ok(
   unitRunnerSource.includes(
-    'resolveCapacityPlan({\n  unitTestFileCount: countUnitTestFiles(),'
+    'resolveCapacityPlan({\n  unitTestFileCount: countUnitTestFiles(),',
   ),
-  'unit runner must consume the shared authoritative capacity plan'
+  'unit runner must consume the shared authoritative capacity plan',
 )
 assert.ok(!unitRunnerSource.includes("from 'fast-glob'"))
 assert.ok(!unitRunnerSource.includes('createCapacityPlan'))
 assert.ok(!unitRunnerSource.includes('probeCapacityHost'))
 assert.ok(
   capacityCliSource.includes('cwd: repoRoot'),
-  'unit discovery must be independent of the caller working directory'
+  'unit discovery must be independent of the caller working directory',
 )
 assert.ok(verifyRunner.includes('Promise.all(batch.map(runTask))'))
 assert.ok(
   verifyRunner.includes(
-    'resolveCapacityPlan({ unitTestFileCount: countUnitTestFiles() })'
+    'resolveCapacityPlan({ unitTestFileCount: countUnitTestFiles() })',
   ),
-  'suite scheduler must plan from the authoritative unit workload'
+  'suite scheduler must plan from the authoritative unit workload',
 )
 assert.ok(workflow.includes('fromJSON(needs.capacity.outputs.unit-matrix)'))
 assert.ok(workflow.includes('FSUS_VITEST_WORKERS: ${{ matrix.workers }}'))
@@ -235,6 +235,13 @@ assert.ok(
 assert.ok(
   consumerInstallSource.includes("NODE_OPTIONS: ''"),
   'consumer typecheck must clear the inherited small-task heap limit',
+)
+const consumerViteBuildCall = consumerInstallSource.match(
+  /const viteOutput = runAndCollect\(\s*'node',\s*\[\s*path\.join\(repoRoot, 'scripts', 'with-node-heap\.mjs'\),\s*'pnpm',\s*'exec',\s*'vite',\s*'build',\s*\],\s*\{\s*cwd: fixtureRoot,\s*env: \{\s*FSUS_NODE_HEAP_PROFILE: 'build',\s*NODE_OPTIONS: '',\s*\},\s*\},\s*\)/u,
+)
+assert.ok(
+  consumerViteBuildCall,
+  'consumer Vite build must use the shared build heap profile without inheriting small-task NODE_OPTIONS',
 )
 
 console.log('[ci-capacity] fixtures ok')
