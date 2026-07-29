@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "f5755e8b7b95d461ed5280225f8a71cdda66b0a3",
+    "commitSha": "c6e43630218495212fe108af9ebd4c168677ed02",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
@@ -14,7 +14,7 @@
     "directives": 3,
     "services": 4,
     "plugins": 7,
-    "cssVariables": 448,
+    "cssVariables": 454,
     "deprecatedApis": 20,
     "componentCountByClassification": {
       "portable": 124,
@@ -2559,7 +2559,6 @@
       "classification": "native-adapter",
       "props": [
         "actionOverflowKeys",
-        "allowHtml",
         "commandOverflowLabel",
         "commands",
         "defaultMode",
@@ -2576,7 +2575,6 @@
         "previewCspNonce",
         "previewFeatures",
         "primaryCommandKeys",
-        "sanitizeHtml",
         "saveActionLabel",
         "showActions",
         "showImageAction",
@@ -2613,7 +2611,6 @@
       "module": "markdown-renderer",
       "classification": "native-adapter",
       "props": [
-        "allowHtml",
         "allowLatex",
         "allowMermaid",
         "baseUrl",
@@ -2622,11 +2619,10 @@
         "contentVersion",
         "cspNonce",
         "features",
-        "initialHtml",
+        "initialRender",
         "latexAdapter",
         "mermaidAdapter",
         "mode",
-        "sanitizeHtml",
         "trustedHtmlFactory",
         "trustedScriptUrlFactory"
       ],
@@ -9109,6 +9105,31 @@
       "classification": "portable"
     },
     {
+      "name": "--fsus-safe-area-inset-",
+      "files": ["vue/packages/theme-chalk/src/mixins/safe-area.scss"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-safe-area-inset-bottom",
+      "files": ["vue/packages/theme-chalk/src/common/fsus-tokens.scss"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-safe-area-inset-left",
+      "files": ["vue/packages/theme-chalk/src/common/fsus-tokens.scss"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-safe-area-inset-right",
+      "files": ["vue/packages/theme-chalk/src/common/fsus-tokens.scss"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-safe-area-inset-top",
+      "files": ["vue/packages/theme-chalk/src/common/fsus-tokens.scss"],
+      "classification": "portable"
+    },
+    {
       "name": "--fsus-scholarly-blue",
       "files": [
         "vue/packages/theme-chalk/src/calendar.scss",
@@ -9873,6 +9894,14 @@
     {
       "name": "--fsus-view-transition-z-index",
       "files": ["vue/packages/theme-chalk/src/motion.scss"],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-viewport-block-size",
+      "files": [
+        "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
+        "vue/packages/theme-chalk/src/mixins/safe-area.scss"
+      ],
       "classification": "portable"
     },
     {

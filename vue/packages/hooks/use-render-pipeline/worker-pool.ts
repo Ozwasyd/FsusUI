@@ -58,6 +58,7 @@ export type FsusWorkerExecutorOptions = {
   maxWorkers?: number
   name?: string
   onEvent?: (event: FsusWorkerExecutorEvent) => void
+  requireGenerationEcho?: boolean
   requestTimeoutMs?: number
   reservedCores?: number
   serializeError?: (error: unknown) => unknown
@@ -545,6 +546,23 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
         id: payload?.id,
         workerId: slot.id,
       })
+      return
+    }
+    if (
+      options.requireGenerationEcho &&
+      payload.generation !== task.generation
+    ) {
+      const error = createFsusError(
+        'protocol',
+        'fsus_worker_generation_mismatch',
+      )
+      emit('protocol-error', {
+        error,
+        generation: task.generation,
+        id: task.id,
+        workerId: slot.id,
+      })
+      settleTask(task, fsusErr(error), 'request-reject', error)
       return
     }
     if (

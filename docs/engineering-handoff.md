@@ -53,8 +53,8 @@ pnpm verify:release
 本仓库的 WASM 包位于 `vue/packages/wasm`，当前构建会生成：
 
 - `ep_wasm.mjs/.wasm`：表格排序、虚拟列表行高等通用加速能力。
-- `markdown_basic.js/.wasm`：Markdown raw HTML 渲染器的标量 fallback。
-- `markdown_simd.js/.wasm`：Markdown raw HTML 渲染器的 SIMD 版本。
+- `markdown_basic.js/.wasm`：Markdown 渲染器的标量 fallback。
+- `markdown_simd.js/.wasm`：Markdown 渲染器的 SIMD 版本。
 
 维护 Markdown 渲染器时，优先跑下面的窄门：
 

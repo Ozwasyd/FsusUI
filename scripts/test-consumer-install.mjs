@@ -398,19 +398,60 @@ try {
       '--input-type=module',
       '--eval',
       [
+        `import { createRequire } from 'node:module'`,
         `const root = await import('${packageName}')`,
+        `const wasm = await import('${packageName}/wasm')`,
+        `const markdownRuntime = await import('${packageName}/markdown-runtime')`,
         `const motion = await import('${packageName}/motion')`,
         `const perception = await import('${packageName}/perception-challenge')`,
+        `const require = createRequire(import.meta.url)`,
+        `const forbiddenAuthorityBuilders = ['authorizeMarkdownRuntimeResult', 'brandMarkdownSafeHtml', 'brandMarkdownSafeRenderResult']`,
+        `for (const [surface, exports] of [['root', root], ['wasm', wasm], ['markdown-runtime', markdownRuntime]]) for (const name of forbiddenAuthorityBuilders) if (name in exports) throw new Error(surface + ' exposes forbidden Markdown authority builder ' + name)`,
+        `await import('${packageName}/es/wasm/markdown-safe.mjs').then(() => { throw new Error('ES deep import exposed Markdown authority builders') }, () => undefined)`,
+        `try { require('${packageName}/lib/wasm/markdown-safe.js'); throw new Error('CJS deep import exposed Markdown authority builders') } catch (error) { if (error instanceof Error && error.message === 'CJS deep import exposed Markdown authority builders') throw error }`,
+        `await import('${packageName}/es/components/markdown-renderer/src/markdown-renderer-cache.mjs').then(() => { throw new Error('ES deep import exposed caller-writable Markdown cache') }, () => undefined)`,
+        `try { require('${packageName}/lib/components/markdown-renderer/src/markdown-renderer-cache.js'); throw new Error('CJS deep import exposed caller-writable Markdown cache') } catch (error) { if (error instanceof Error && error.message === 'CJS deep import exposed caller-writable Markdown cache') throw error }`,
         `if (root.FsusDataList?.name !== 'FsusDataList') throw new Error('FsusDataList runtime export drifted')`,
         `if (motion.FsuTransition?.name !== 'FsuTransition') throw new Error('FsuTransition runtime export drifted')`,
         `if (perception.FsusPerceptionChallenge?.name !== 'FsusPerceptionChallenge') throw new Error('FsusPerceptionChallenge runtime export drifted')`,
         `if (perception.FsusPerceptionCharacterChallenge?.name !== 'FsusPerceptionCharacterChallenge') throw new Error('FsusPerceptionCharacterChallenge runtime export drifted')`,
-        `console.log('Consumer runtime export contract passed.')`,
+        `console.log('Consumer runtime export and Markdown authority contract passed.')`,
       ].join(';'),
     ],
     { cwd: fixtureRoot },
   )
-  run('pnpm', ['exec', 'vue-tsc', '--noEmit'], { cwd: fixtureRoot })
+  const markdownTypeProbe = path.join(fixtureRoot, 'src', 'markdown-safe-html.ts')
+  writeFileSync(
+    markdownTypeProbe,
+    [
+      `import type { MarkdownSafeHtml as WasmSafeHtml } from '${packageName}/wasm'`,
+      `import type { MarkdownSafeHtml as RuntimeSafeHtml } from '${packageName}/markdown-runtime'`,
+      `declare const wasmSafe: WasmSafeHtml`,
+      `const runtimeSafe: RuntimeSafeHtml = wasmSafe`,
+      `void runtimeSafe`,
+      `// @ts-expect-error plain strings must never satisfy the published safe HTML brand`,
+      `const unsafe: RuntimeSafeHtml = '<p>unsafe</p>'`,
+      `void unsafe`,
+      ``,
+    ].join('\n'),
+  )
+  run(
+    'node',
+    [
+      path.join(repoRoot, 'scripts', 'with-node-heap.mjs'),
+      'pnpm',
+      'exec',
+      'vue-tsc',
+      '--noEmit',
+    ],
+    {
+      cwd: fixtureRoot,
+      env: {
+        FSUS_NODE_HEAP_PROFILE: 'typecheck',
+        NODE_OPTIONS: '',
+      },
+    },
+  )
   const viteOutput = runAndCollect('pnpm', ['exec', 'vite', 'build'], {
     cwd: fixtureRoot,
   })

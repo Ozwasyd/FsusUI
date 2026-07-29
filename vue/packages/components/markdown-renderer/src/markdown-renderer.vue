@@ -41,7 +41,7 @@
         :ref="(element) => setChunkUnitTemplateRef(item.key, element)"
         class="markdown-renderer__virtual-unit"
         v-bind="getChunkUnitAttrs(item, visibleIndex)"
-        v-html="item.unit.html"
+        v-html="resolveCommittedHtml(item.unit.html)"
       />
       <div
         class="markdown-renderer__virtual-spacer"
@@ -49,7 +49,7 @@
         :style="{ height: `${virtualWindow.bottomSpacer.value}px` }"
       />
     </template>
-    <div v-else v-html="renderedContent" />
+    <div v-else v-html="resolveCommittedHtml(renderedContent)" />
     <span
       v-if="isRendering && !showInitialLoading()"
       class="markdown-renderer__loading-pulse"
@@ -66,6 +66,7 @@ import {
   onBeforeUnmount,
   ref,
   shallowRef,
+  toRaw,
   watch,
 } from 'vue'
 import { useGlobalConfig } from '@element-plus/components/config-provider'
@@ -77,13 +78,15 @@ import {
 } from '@element-plus/hooks'
 import {
   MARKDOWN_RENDERER_SURFACE_CLASSES as markdownSurfaceClasses,
+  MARKDOWN_RENDERER_VERSION,
   activateMarkdownFeatures,
-  buildMarkdownRenderResult,
+  renderMarkdownFallbackWithRuntime,
   defaultCodeHighlightAdapter,
   defaultLatexAdapter,
   defaultMermaidAdapter,
-  escapeMarkdownHtml,
+  isMarkdownRuntimeAuthorizedResult,
   normalizeMarkdownSource,
+  resolveMarkdownSourceIdentity,
   renderMarkdownChunksWithRuntime,
   renderMarkdownResultWithRuntime,
 } from '@element-plus/wasm'
@@ -92,26 +95,17 @@ import {
   markdownRendererProps,
   resolveMarkdownWorkerScriptUrl,
 } from './markdown-renderer'
-import {
-  getMarkdownRendererRuntimeCache,
-  setMarkdownRendererRuntimeCache,
-} from './markdown-renderer-cache'
-import {
-  sanitizeMarkdownChunk,
-  sanitizeMarkdownHtml,
-  sanitizeMarkdownRenderResult,
-} from './markdown-sanitize'
-
 import type { FsusRenderPipelineAdapter } from '@element-plus/hooks'
 import type { FsusErrorDetail } from '@element-plus/utils'
 import type {
-  MarkdownRenderResult,
   MarkdownRenderChunk,
   MarkdownRenderRequest,
   MarkdownFeatureActivationResult,
   MarkdownRuntimeChunkResult,
   MarkdownRuntimeProfile,
-  MarkdownRuntimeRenderResult,
+  MarkdownSafeHtml,
+  MarkdownSafeRenderAuthority,
+  MarkdownSafeRenderResult,
 } from '@element-plus/wasm'
 import type { ComponentPublicInstance } from 'vue'
 
@@ -121,27 +115,46 @@ defineOptions({
 
 const props = defineProps(markdownRendererProps)
 const emit = defineEmits<{
-  (event: 'render-complete', result: MarkdownRenderResult): void
+  (event: 'render-complete', result: MarkdownSafeRenderResult): void
   (event: 'render-error', error: FsusErrorDetail): void
   (
     event: 'placeholders-ready',
-    placeholders: MarkdownRenderResult['placeholders'],
-    result: MarkdownRenderResult,
+    placeholders: MarkdownSafeRenderResult['placeholders'],
+    result: MarkdownSafeRenderResult,
   ): void
   (
     event: 'features-activated',
     activation: MarkdownFeatureActivationResult,
-    result: MarkdownRenderResult,
+    result: MarkdownSafeRenderResult,
   ): void
   (event: 'render-profile', profile: MarkdownRuntimeProfile): void
 }>()
 
 const rootEl = ref<HTMLElement | null>(null)
-const renderedContent = shallowRef(
-  props.initialHtml && props.sanitizeHtml
-    ? sanitizeMarkdownHtml(props.initialHtml, props.trustedHtmlFactory)
-    : props.initialHtml,
+const initialRequest: MarkdownRenderRequest = {
+  source: normalizeMarkdownSource(props.content),
+  baseUrl: props.baseUrl,
+  mode: props.mode,
+  allowLatex: props.allowLatex,
+  allowMermaid: props.allowMermaid,
+  contentVersion: props.contentVersion,
+}
+const initialRenderCandidate = props.initialRender
+  ? toRaw(props.initialRender)
+  : undefined
+const validInitialRender =
+  isMarkdownRuntimeAuthorizedResult(initialRenderCandidate) &&
+  initialRenderCandidate.rendererVersion === MARKDOWN_RENDERER_VERSION &&
+  initialRenderCandidate.normalizedSource === initialRequest.source &&
+  initialRenderCandidate.sourceIdentity ===
+    resolveMarkdownSourceIdentity(initialRequest)
+    ? initialRenderCandidate
+    : null
+const renderedContent = shallowRef<MarkdownSafeHtml | null>(
+  validInitialRender?.html ?? null,
 )
+const resolveCommittedHtml = (html: MarkdownSafeHtml | null) =>
+  html === null ? null : (props.trustedHtmlFactory?.(html) ?? html)
 const chunkUnits = shallowRef<readonly MarkdownRenderChunk[]>([])
 const MIN_INITIAL_MARKDOWN_CHUNKS = 3
 const MAX_INITIAL_MARKDOWN_CHUNKS = 12
@@ -168,7 +181,7 @@ const initialVisibleChunkCount = computed(() =>
   resolveInitialChunkCount(chunkUnits.value),
 )
 const showInitialLoading = () =>
-  isRendering.value && !chunkUnits.value.length && !renderedContent.value.trim()
+  isRendering.value && !chunkUnits.value.length && !renderedContent.value
 const rootRenderAttrs = () => ({
   'data-markdown-renderer': 'wasm',
   'data-fsus-surface': 'reading',
@@ -371,7 +384,10 @@ const restoreRenderAnchor = async (anchor: RenderAnchor | null) => {
   }
 }
 
-const commitRenderedContent = async (html: string, preserveAnchor = false) => {
+const commitRenderedContent = async (
+  html: MarkdownSafeHtml,
+  preserveAnchor = false,
+) => {
   if (renderedContent.value === html) return false
 
   const startedAt = readPerformanceNow()
@@ -443,7 +459,6 @@ const createMarkdownRenderRequest = (
   source,
   baseUrl: props.baseUrl,
   mode: props.mode,
-  allowHtml: props.allowHtml,
   allowLatex: props.allowLatex,
   allowMermaid: props.allowMermaid,
   contentVersion: props.contentVersion,
@@ -475,19 +490,116 @@ const fingerprintMarkdownRenderRequest = (request: MarkdownRenderRequest) =>
     request.source.length,
     request.baseUrl ?? '',
     request.mode,
-    request.allowHtml ? 'html' : 'no-html',
     request.allowLatex ? 'latex' : 'no-latex',
     request.allowMermaid ? 'mermaid' : 'no-mermaid',
   ].join('\u0000')
 
-const resolveMarkdownRenderResult = <
-  TResult extends MarkdownRuntimeChunkResult | MarkdownRuntimeRenderResult,
->(
-  result: TResult,
+const matchesMarkdownRenderRequest = (
+  request: MarkdownRenderRequest,
+  result: MarkdownSafeRenderResult,
 ) =>
-  props.sanitizeHtml
-    ? sanitizeMarkdownRenderResult(result, props.trustedHtmlFactory)
-    : result
+  result.rendererVersion === MARKDOWN_RENDERER_VERSION &&
+  result.normalizedSource === normalizeMarkdownSource(request.source) &&
+  result.sourceIdentity === resolveMarkdownSourceIdentity(request)
+
+const brokerAuthorizedResults = new WeakSet<object>()
+const markdownChunkKindPattern =
+  /^(?:heading|paragraph|list|table|code|blockquote|latex|mermaid|footnotes|rule|generated)$/
+const markdownRuntimeKindPattern = /^(?:SIMD-128|SCALAR-BASIC|UNKNOWN)$/
+
+const isFiniteNonNegative = (value: unknown): value is number =>
+  typeof value === 'number' && Number.isFinite(value) && value >= 0
+
+const deepSealBrokerValue = <T,>(value: T): T => {
+  if (typeof value !== 'object' || value === null || Object.isFrozen(value)) {
+    return value
+  }
+  for (const nested of Object.values(value)) {
+    deepSealBrokerValue(nested)
+  }
+  return Object.freeze(value)
+}
+
+const authorizeBrokerResult = <T extends object>(
+  result: T,
+): T & MarkdownSafeRenderAuthority => {
+  const sealed = deepSealBrokerValue(result)
+  brokerAuthorizedResults.add(sealed)
+  return sealed as T & MarkdownSafeRenderAuthority
+}
+
+const materializeMarkdownWorkerResult = (
+  request: MarkdownRenderRequest,
+  result: MarkdownRuntimeChunkResult,
+  units: readonly MarkdownRenderChunk[],
+): MarkdownRuntimeChunkResult | null => {
+  const metadata = result.metadata
+  if (
+    !matchesMarkdownRenderRequest(request, result) ||
+    result.chunks !== units ||
+    !markdownRuntimeKindPattern.test(result.engine) ||
+    !Array.isArray(result.features) ||
+    !Array.isArray(result.placeholders) ||
+    !Array.isArray(result.chunks) ||
+    result.chunks.length === 0 ||
+    !metadata ||
+    metadata.mode !== (request.mode ?? 'article') ||
+    metadata.baseUrl !== (request.baseUrl ?? null) ||
+    metadata.allowLatex !== (request.allowLatex !== false) ||
+    metadata.allowMermaid !== (request.allowMermaid !== false) ||
+    metadata.sourceLength !== request.source.length ||
+    metadata.normalizedSourceLength !== result.normalizedSource.length ||
+    metadata.featureCount !== result.features.length ||
+    metadata.placeholderCount !== result.placeholders.length ||
+    metadata.rendererVersion !== MARKDOWN_RENDERER_VERSION ||
+    !Object.values(result.timings).every(isFiniteNonNegative)
+  ) {
+    return null
+  }
+
+  let expectedOffset = 0
+  let combinedHtml = ''
+  const chunkKeys = new Set<string>()
+  for (const chunk of result.chunks) {
+    if (
+      typeof chunk.key !== 'string' ||
+      chunkKeys.has(chunk.key) ||
+      !markdownChunkKindPattern.test(chunk.kind) ||
+      typeof chunk.html !== 'string' ||
+      !Number.isFinite(chunk.estimatedSize) ||
+      chunk.estimatedSize <= 0 ||
+      chunk.htmlStartOffset !== expectedOffset ||
+      chunk.htmlEndOffset !== expectedOffset + chunk.html.length
+    ) {
+      return null
+    }
+    chunkKeys.add(chunk.key)
+    expectedOffset = chunk.htmlEndOffset
+    combinedHtml += chunk.html
+  }
+  if (combinedHtml !== result.html || expectedOffset !== result.html.length) {
+    return null
+  }
+
+  return authorizeBrokerResult({
+    html: result.html,
+    normalizedSource: result.normalizedSource,
+    sourceIdentity: result.sourceIdentity,
+    features: [...result.features],
+    placeholders: result.placeholders.map((placeholder) => ({
+      ...placeholder,
+    })),
+    rendererVersion: result.rendererVersion,
+    metadata: { ...metadata },
+    chunks: result.chunks.map((chunk) => ({ ...chunk })),
+    engine: result.engine,
+    timings: { ...result.timings },
+  })
+}
+
+const hasMarkdownCommitAuthority = (result: MarkdownSafeRenderResult) =>
+  isMarkdownRuntimeAuthorizedResult(result) ||
+  brokerAuthorizedResults.has(result)
 
 const canUseMarkdownWorker = () =>
   typeof Worker !== 'undefined' && typeof URL !== 'undefined'
@@ -518,18 +630,6 @@ const markdownRenderPipelineAdapter: FsusRenderPipelineAdapter<
       return { units: [] }
     }
 
-    const cacheKey = fingerprintMarkdownRenderRequest(request)
-    const cached = getMarkdownRendererRuntimeCache<MarkdownRuntimeChunkResult>(
-      'chunks',
-      cacheKey,
-    )
-    if (cached) {
-      return {
-        metadata: cached,
-        units: cached.chunks,
-      }
-    }
-
     const result = await renderMarkdownChunksWithRuntime(request)
     if (signal.aborted) {
       throw new DOMException('Aborted', 'AbortError')
@@ -537,8 +637,10 @@ const markdownRenderPipelineAdapter: FsusRenderPipelineAdapter<
     if (isFsusErr(result)) {
       throw result.error
     }
+    if (!matchesMarkdownRenderRequest(request, result.value)) {
+      throw new Error('markdown_safe_result_identity_mismatch')
+    }
 
-    setMarkdownRendererRuntimeCache('chunks', cacheKey, result.value)
     return {
       metadata: result.value,
       units: result.value.chunks,
@@ -548,8 +650,8 @@ const markdownRenderPipelineAdapter: FsusRenderPipelineAdapter<
     createWorker: createMarkdownRendererWorker,
     idleTerminateMs: 30_000,
     name: 'fsus-markdown-renderer',
-    pool: 'shared',
-    poolKey: 'fsus-markdown-renderer',
+    pool: 'runtime',
+    requireGenerationEcho: true,
     requestTimeoutMs: 60_000,
   },
 }
@@ -573,24 +675,6 @@ const renderScheduler = useFsusRenderScheduler(
   computed(() => resolvedRenderPipelineConfig.value.budget),
 )
 
-const renderMarkdownResultCached = async (
-  request: MarkdownRenderRequest,
-  generation: number,
-) => {
-  const cacheKey = fingerprintMarkdownRenderRequest(request)
-  const cached = getMarkdownRendererRuntimeCache<MarkdownRuntimeRenderResult>(
-    'result',
-    cacheKey,
-  )
-  if (cached) return { ok: true as const, value: cached }
-
-  const result = await renderMarkdownResultWithRuntime(request)
-  if (!isFsusErr(result) && generation === currentTaskId) {
-    setMarkdownRendererRuntimeCache('result', cacheKey, result.value)
-  }
-  return result
-}
-
 const scheduleMeasurementWarmup = () => {
   measurementWarmupCancel?.()
   measurementWarmupCancel = renderScheduler.schedule(
@@ -601,12 +685,6 @@ const scheduleMeasurementWarmup = () => {
     { priority: 'background' },
   )
 }
-
-const buildFallbackResult = (source: string): MarkdownRenderResult =>
-  buildMarkdownRenderResult({
-    html: `<div class="${markdownSurfaceClasses.error}"><p>Markdown 渲染失败，已回退为安全文本。</p><pre><code>${escapeMarkdownHtml(source)}</code></pre></div>`,
-    source,
-  })
 
 const resolveMarkdownFeatureOptions = () => ({
   codeHighlight: props.features?.codeHighlight ?? true,
@@ -636,7 +714,7 @@ const resetFeatureActivation = () => {
 }
 
 const activateRenderedFeatures = async (
-  result: MarkdownRenderResult,
+  result: MarkdownSafeRenderResult,
   activationRoot: ParentNode | null = rootEl.value,
   signal: AbortSignal | undefined = activationController?.signal,
 ) => {
@@ -761,16 +839,21 @@ const performRender = async () => {
         )
       }
 
-      const resolvedResult = resolveMarkdownRenderResult(result)
-      const resolvedUnits = props.sanitizeHtml
-        ? document.units.map((unit) =>
-            sanitizeMarkdownChunk(unit, props.trustedHtmlFactory),
-          )
-        : document.units
+      const resolvedResult = hasMarkdownCommitAuthority(result)
+        ? result
+        : materializeMarkdownWorkerResult(request, result, document.units)
+      if (!resolvedResult) {
+        throw toFsusError(
+          'markdown_safe_result_authority_invalid',
+          'markdown_safe_result_authority_invalid',
+          'invariant',
+        )
+      }
+      const resolvedUnits = resolvedResult.chunks
       const initialCount = resolveInitialChunkCount(resolvedUnits)
 
       const commitStartedAt = readPerformanceNow()
-      renderedContent.value = ''
+      renderedContent.value = null
       activeChunkResult = resolvedResult
       chunkUnits.value = resolvedUnits.slice(0, initialCount)
       renderStrategy.value = renderPipelineRuntime.renderedStrategy.value as
@@ -800,7 +883,7 @@ const performRender = async () => {
       return
     }
 
-    const result = await renderMarkdownResultCached(request, taskId)
+    const result = await renderMarkdownResultWithRuntime(request)
 
     if (taskId !== currentTaskId) {
       return
@@ -809,8 +892,18 @@ const performRender = async () => {
     if (isFsusErr(result)) {
       throw result.error
     }
+    if (
+      !hasMarkdownCommitAuthority(result.value) ||
+      !matchesMarkdownRenderRequest(request, result.value)
+    ) {
+      throw toFsusError(
+        'markdown_safe_result_authority_invalid',
+        'markdown_safe_result_authority_invalid',
+        'invariant',
+      )
+    }
 
-    const resolvedResult = resolveMarkdownRenderResult(result.value)
+    const resolvedResult = result.value
 
     await commitRenderedContent(resolvedResult.html, true)
     await activateRenderedFeatures(resolvedResult)
@@ -827,7 +920,7 @@ const performRender = async () => {
       return
     }
 
-    const fallback = buildFallbackResult(source)
+    const fallback = renderMarkdownFallbackWithRuntime(request)
     await commitRenderedContent(fallback.html, true)
     await activateRenderedFeatures(fallback)
     emit(
@@ -847,8 +940,6 @@ watch(
   () => [
     props.content,
     props.contentVersion,
-    props.allowHtml,
-    props.sanitizeHtml,
     props.allowLatex,
     props.allowMermaid,
     props.mode,

@@ -13,7 +13,8 @@ namespace {
 
 enum class ErrorCode : std::uint8_t {
   None = 0,
-  InvalidInput = 1
+  InvalidInput = 1,
+  InvalidArgumentCount = 2
 };
 
 enum class PayloadMode : std::uint8_t {
@@ -38,6 +39,8 @@ const char* to_error_string(ErrorCode code) {
       return "";
     case ErrorCode::InvalidInput:
       return "source_invalid";
+    case ErrorCode::InvalidArgumentCount:
+      return "argument_count_invalid";
     default:
       return "markdown_render_failed";
   }
@@ -167,8 +170,6 @@ std::string build_metadata_payload(const fsusblog::wasm::markdown::render_result
   append_payload_string(payload, render_mode_name(result.metadata.mode));
   payload.append(",\"baseUrl\":");
   append_payload_string(payload, result.metadata.base_url);
-  payload.append(",\"allowHtml\":");
-  payload.append(result.metadata.allow_html ? "true" : "false");
   payload.append(",\"allowLatex\":");
   payload.append(result.metadata.allow_latex ? "true" : "false");
   payload.append(",\"allowMermaid\":");
@@ -338,7 +339,7 @@ std::string chunk_kind(std::string_view chunk) {
   if (starts_tag("hr")) return "rule";
   if (chunk.find("markdown-renderer__mermaid") != std::string_view::npos) return "mermaid";
   if (chunk.find("markdown-renderer__latex") != std::string_view::npos) return "latex";
-  return "html";
+  return "generated";
 }
 
 std::size_t read_dimension_attr(std::string_view chunk, std::string_view attr) {
@@ -501,7 +502,7 @@ void free_buffer(void* ptr) {
   markdown_free_buffer(ptr);
 }
 
-int render_with_payload_mode(const char* source_ptr, int source_len, int allow_html, int allow_latex, int allow_mermaid, PayloadMode mode) {
+int render_with_payload_mode(const char* source_ptr, int source_len, int allow_latex, int allow_mermaid, PayloadMode mode) {
   if (source_ptr == nullptr || source_len < 0) {
     set_error(ErrorCode::InvalidInput, to_error_string(ErrorCode::InvalidInput));
     return 0;
@@ -509,7 +510,6 @@ int render_with_payload_mode(const char* source_ptr, int source_len, int allow_h
 
   fsusblog::wasm::markdown::render_request request;
   request.source.assign(source_ptr, source_ptr + source_len);
-  request.allow_html = allow_html != 0;
   request.allow_latex = allow_latex != 0;
   request.allow_mermaid = allow_mermaid != 0;
 
@@ -526,12 +526,20 @@ int render_with_payload_mode(const char* source_ptr, int source_len, int allow_h
 }
 
 EMSCRIPTEN_KEEPALIVE
-int markdown_render(const char* source_ptr, int source_len, int allow_html, int allow_latex, int allow_mermaid) {
-  return render_with_payload_mode(source_ptr, source_len, allow_html, allow_latex, allow_mermaid, PayloadMode::Full);
+int markdown_render(const char* source_ptr, int source_len, int allow_latex, int allow_mermaid, int argument_count) {
+  if (argument_count != 4) {
+    set_error(ErrorCode::InvalidArgumentCount, to_error_string(ErrorCode::InvalidArgumentCount));
+    return 0;
+  }
+  return render_with_payload_mode(source_ptr, source_len, allow_latex, allow_mermaid, PayloadMode::Full);
 }
 
 EMSCRIPTEN_KEEPALIVE
-int markdown_render_profile(const char* source_ptr, int source_len, int allow_html, int allow_latex, int allow_mermaid, int payload_mode) {
+int markdown_render_profile(const char* source_ptr, int source_len, int allow_latex, int allow_mermaid, int payload_mode, int argument_count) {
+  if (argument_count != 5) {
+    set_error(ErrorCode::InvalidArgumentCount, to_error_string(ErrorCode::InvalidArgumentCount));
+    return 0;
+  }
   const auto mode = payload_mode == 3
     ? PayloadMode::Chunks
     : payload_mode == 2
@@ -539,12 +547,12 @@ int markdown_render_profile(const char* source_ptr, int source_len, int allow_ht
     : payload_mode == 1
       ? PayloadMode::Summary
       : PayloadMode::Full;
-  return render_with_payload_mode(source_ptr, source_len, allow_html, allow_latex, allow_mermaid, mode);
+  return render_with_payload_mode(source_ptr, source_len, allow_latex, allow_mermaid, mode);
 }
 
 EMSCRIPTEN_KEEPALIVE
-int render_markdown(const char* source_ptr, int source_len, int allow_html, int allow_latex, int allow_mermaid) {
-  return markdown_render(source_ptr, source_len, allow_html, allow_latex, allow_mermaid);
+int render_markdown(const char* source_ptr, int source_len, int allow_latex, int allow_mermaid, int argument_count) {
+  return markdown_render(source_ptr, source_len, allow_latex, allow_mermaid, argument_count);
 }
 
 EMSCRIPTEN_KEEPALIVE

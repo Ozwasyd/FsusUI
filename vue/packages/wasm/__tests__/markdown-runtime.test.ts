@@ -4,12 +4,32 @@ import { execFile } from 'node:child_process'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { promisify } from 'node:util'
-import { beforeAll, describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, expectTypeOf, it } from 'vitest'
+import { reactive, toRaw } from 'vue'
+import type {
+  MarkdownRenderRequest,
+  MarkdownSafeHtml,
+  MarkdownSafeRenderResult,
+} from '../markdown'
+import {
+  isMarkdownRuntimeAuthorizedResult,
+  renderMarkdownFallbackWithRuntime,
+} from '../markdown-runtime'
 
 const markdownSource = [
   '# Runtime Profile',
   '',
   'Paragraph with **strong** text and inline math \\(a^2+b^2\\).',
+  '',
+  '<script>alert(1)</script>',
+  '',
+  '<img src=x onerror=alert(1)>',
+  '',
+  '<details open>raw</details>',
+  '',
+  '<svg onload=alert(1)>x</svg>',
+  '',
+  '[javascript](javascript:evil) [vbscript](vbscript:evil) [protocol relative](//evil.example/path) [control split](java\u0001script:evil) [data](data:text/html,evil) [slash backslash](/\\\\evil.example) [backslash slash](\\\\/evil.example) [mixed http](http:/\\\\evil.example)',
   '',
   '```mermaid',
   'flowchart LR;',
@@ -42,15 +62,23 @@ const markdownSource = [
 const execFileAsync = promisify(execFile)
 const testDir = dirname(fileURLToPath(import.meta.url))
 const packageDir = resolve(testDir, '..')
-const runtimeEntryUrl = pathToFileURL(resolve(packageDir, 'dist/index.mjs')).href
+const runtimeEntryUrl = pathToFileURL(
+  resolve(packageDir, 'dist/index.mjs'),
+).href
 
 interface RuntimeProbeResult {
+  authority: {
+    cloned: boolean
+    deeplyImmutable: boolean
+    runtime: boolean
+  }
   engine: string
   htmlOnly: RuntimeHtmlResult | null
   summary: RuntimeSummaryResult | null
   helper: string | null
   full: RuntimeFullResult | null
   chunks: RuntimeChunkResult | null
+  modes: Record<string, RuntimeFullResult | null>
 }
 
 interface RuntimeTimings {
@@ -60,7 +88,9 @@ interface RuntimeTimings {
 
 interface RuntimeHtmlResult {
   html: string
+  normalizedSource: string
   rendererVersion: string
+  sourceIdentity: string
   timings: RuntimeTimings
 }
 
@@ -87,6 +117,41 @@ interface RuntimeChunkResult extends RuntimeFullResult {
 let probeResult: RuntimeProbeResult
 
 describe('markdown runtime fast paths', () => {
+  it('deep-seals authorized results and rejects copied result shapes', () => {
+    const result = renderMarkdownFallbackWithRuntime(
+      '# Current\n\n```mermaid\nflowchart LR\n```',
+    )
+    const proxy = reactive(result)
+    const originalHtml = result.html
+
+    expect(Reflect.set(result, 'html', '<svg onload=alert(1)>')).toBe(false)
+    expect(Reflect.set(proxy, 'html', '<svg onload=alert(1)>')).toBe(false)
+    expect(toRaw(proxy)).toBe(result)
+    expect(
+      result.placeholders[0]
+        ? Reflect.set(result.placeholders[0], 'label', 'mutated')
+        : true,
+    ).toBe(false)
+    expect(result.html).toBe(originalHtml)
+    expect(Object.isFrozen(result)).toBe(true)
+    expect(Object.isFrozen(result.features)).toBe(true)
+    expect(Object.isFrozen(result.placeholders)).toBe(true)
+    expect(isMarkdownRuntimeAuthorizedResult(result)).toBe(true)
+    expect(isMarkdownRuntimeAuthorizedResult({ ...result })).toBe(false)
+    expect(isMarkdownRuntimeAuthorizedResult(structuredClone(result))).toBe(
+      false,
+    )
+  })
+
+  it('does not expose the removed raw HTML request field', () => {
+    const removedCapability = `allow${'Html'}` as const
+    expectTypeOf<MarkdownRenderRequest>().not.toHaveProperty(removedCapability)
+    expectTypeOf<string>().not.toMatchTypeOf<MarkdownSafeHtml>()
+    expectTypeOf<{
+      html: string
+    }>().not.toMatchTypeOf<MarkdownSafeRenderResult>()
+  })
+
   beforeAll(async () => {
     const source = JSON.stringify(markdownSource)
     const entry = JSON.stringify(runtimeEntryUrl)
@@ -95,7 +160,6 @@ describe('markdown runtime fast paths', () => {
       const source = ${source};
       const request = {
         source,
-        allowHtml: false,
         allowLatex: true,
         allowMermaid: true,
       };
@@ -110,12 +174,26 @@ describe('markdown runtime fast paths', () => {
       const helper = unwrap(await wasm.renderMarkdownWithRuntime(request));
       const full = unwrap(await wasm.renderMarkdownResultWithRuntime(request));
       const chunks = unwrap(await wasm.renderMarkdownChunksWithRuntime(request));
-      process.stdout.write(JSON.stringify({ engine, htmlOnly, summary, helper, full, chunks }));
+      const authority = {
+        runtime: wasm.isMarkdownRuntimeAuthorizedResult(full),
+        cloned: wasm.isMarkdownRuntimeAuthorizedResult(structuredClone(full)),
+        deeplyImmutable: [
+          full, full.features, full.placeholders, ...full.placeholders,
+          full.metadata, full.timings, chunks, chunks.chunks, ...chunks.chunks,
+        ].every((value) => value == null || Object.isFrozen(value)) &&
+          Reflect.set(full.metadata, 'placeholderCount', 999) === false &&
+          Reflect.set(chunks.chunks[0], 'html', '<svg onload=alert(1)>') === false,
+      };
+      const modes = {};
+      for (const mode of ['article', 'about', 'preview', 'editor']) {
+        modes[mode] = unwrap(await wasm.renderMarkdownResultWithRuntime({ ...request, mode }));
+      }
+      process.stdout.write(JSON.stringify({ authority, engine, htmlOnly, summary, helper, full, chunks, modes }));
     `
     const { stdout } = await execFileAsync(
       process.execPath,
       ['--input-type=module', '-e', script],
-      { cwd: packageDir, maxBuffer: 1024 * 1024 * 4 }
+      { cwd: packageDir, maxBuffer: 1024 * 1024 * 4 },
     )
     probeResult = JSON.parse(stdout) as RuntimeProbeResult
   })
@@ -140,6 +218,7 @@ describe('markdown runtime fast paths', () => {
     expect(result?.html).toContain('pub enum AppError')
     expect(result?.html).not.toContain('::p')
     expect(result?.rendererVersion).toContain('markdown-wasm-contract')
+    expect(result?.sourceIdentity).toMatch(/^markdown:/)
     expect(result?.timings.totalMs).toBeGreaterThanOrEqual(0)
     expect(result?.timings.readPlaceholdersMs).toBe(0)
     expect(Object.hasOwn(result ?? {}, 'placeholders')).toBe(false)
@@ -157,11 +236,46 @@ describe('markdown runtime fast paths', () => {
     expect(Object.hasOwn(result ?? {}, 'placeholders')).toBe(false)
   })
 
-  it('keeps the string helper compatible while using the html-only path', async () => {
+  it('keeps the branded helper compatible while using the html-only path', async () => {
     const html = probeResult.helper
 
     expect(html).toContain('Runtime Profile')
     expect(html).toContain('data-fsus-paragraph')
+  })
+
+  it('keeps every runtime payload on one immutable authority family', () => {
+    expect(probeResult.authority).toEqual({
+      runtime: true,
+      cloned: false,
+      deeplyImmutable: true,
+    })
+    expect(probeResult.summary?.sourceIdentity).toBe(
+      probeResult.htmlOnly?.sourceIdentity,
+    )
+    expect(probeResult.full?.sourceIdentity).toBe(
+      probeResult.htmlOnly?.sourceIdentity,
+    )
+    expect(probeResult.chunks?.sourceIdentity).toBe(
+      probeResult.htmlOnly?.sourceIdentity,
+    )
+  })
+
+  it('fails closed while generating unsafe URL attributes', () => {
+    const html = probeResult.full?.html ?? ''
+    for (const label of [
+      'javascript',
+      'vbscript',
+      'protocol relative',
+      'control split',
+      'data',
+      'slash backslash',
+      'backslash slash',
+      'mixed http',
+    ]) {
+      expect(html).toContain(
+        `<a href="#" rel="noopener noreferrer" target="_blank">${label}</a>`,
+      )
+    }
   })
 
   it('keeps the full result path available with placeholder details and timings', async () => {
@@ -189,5 +303,25 @@ describe('markdown runtime fast paths', () => {
     expect(result?.chunks.map((chunk) => chunk.html).join('')).toBe(
       result?.html,
     )
+  })
+
+  it('renders raw HTML as text in every public mode and payload path', () => {
+    const results = [
+      probeResult.htmlOnly,
+      probeResult.summary,
+      probeResult.full,
+      probeResult.chunks,
+      ...Object.values(probeResult.modes),
+    ]
+    for (const result of results) {
+      expect(result?.html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;')
+      expect(result?.html).toContain('&lt;img src=x onerror=alert(1)&gt;')
+      expect(result?.html).toContain('&lt;details open&gt;raw&lt;/details&gt;')
+      expect(result?.html).toContain('&lt;svg onload=alert(1)&gt;x&lt;/svg&gt;')
+      expect(result?.html).not.toContain('<script>')
+      expect(result?.html).not.toContain('<img src=x')
+      expect(result?.html).not.toContain('<details open>')
+      expect(result?.html).not.toContain('<svg onload=')
+    }
   })
 })

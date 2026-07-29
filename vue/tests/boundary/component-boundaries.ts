@@ -81,6 +81,11 @@ const rawHtmlOptInBoundaries: BoundaryType[] = [
   'raw-html-opt-in',
 ]
 
+const markdownTextBoundaries: BoundaryType[] = [
+  'safe-text',
+  'injection-payload',
+]
+
 const entry = (
   boundaries: BoundaryType[],
   options: Omit<ComponentBoundaryCoverage, 'exports' | 'boundaries'> = {},
@@ -91,7 +96,6 @@ const entry = (
 })
 
 export const rawHtmlBoundaryComponents = [
-  'markdown-renderer',
   'message',
   'message-box',
   'notification',
@@ -224,7 +228,7 @@ export const publicComponentBoundaries: Record<
   }),
   loading: entry(pluginBoundaries, { fixtureModes: ['states', 'overlays'] }),
   'markdown-renderer': entry(
-    [...dataBoundaries, 'overflow-virtual', ...rawHtmlOptInBoundaries],
+    [...dataBoundaries, 'overflow-virtual', ...markdownTextBoundaries],
     {
       fixtureModes: ['data-boundaries'],
     },
@@ -235,7 +239,7 @@ export const publicComponentBoundaries: Record<
       'slot',
       'keyboard-focus',
       'overflow-virtual',
-      ...rawHtmlOptInBoundaries,
+      ...markdownTextBoundaries,
     ],
     {
       fixtureModes: ['forms', 'data-boundaries'],

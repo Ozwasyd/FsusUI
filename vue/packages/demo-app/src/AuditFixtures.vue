@@ -14,56 +14,62 @@
       No modal-class geometry patches, no test-only forks, no selector overrides.
       Profile overrides are applied by tests via #260 CSS variables on :root.
     -->
-    <section class="audit-safe-area-lab" data-safe-area-lab>
+    <section
+      class="audit-safe-area-lab"
+      v-bind="safeAreaDataAttributes.lab"
+    >
       <h2 class="audit-safe-area-lab__title">Safe-area surfaces</h2>
       <div class="audit-safe-area-lab__controls">
         <el-button
-          data-safe-area-open="overlay"
+          v-bind="safeAreaDataAttributes.openOverlay"
           @click="safeOverlayVisible = true"
         >
           Open Overlay
         </el-button>
         <el-button
-          data-safe-area-open="dialog"
+          v-bind="safeAreaDataAttributes.openDialog"
           @click="openSafeDialog(false)"
         >
           Open Dialog
         </el-button>
         <el-button
-          data-safe-area-open="dialog-fullscreen"
+          v-bind="safeAreaDataAttributes.openDialogFullscreen"
           @click="openSafeDialog(true)"
         >
           Open Fullscreen Dialog
         </el-button>
-        <el-button data-safe-area-open="message-box" @click="openSafeMessageBox">
+        <el-button
+          v-bind="safeAreaDataAttributes.openMessageBox"
+          @click="openSafeMessageBox"
+        >
           Open MessageBox
         </el-button>
         <el-button
-          data-safe-area-open="drawer-ltr"
+          v-bind="safeAreaDataAttributes.openDrawerLtr"
           @click="openSafeDrawer('ltr')"
         >
           Open Drawer LTR
         </el-button>
         <el-button
-          data-safe-area-open="drawer-rtl"
+          v-bind="safeAreaDataAttributes.openDrawerRtl"
           @click="openSafeDrawer('rtl')"
         >
           Open Drawer RTL
         </el-button>
         <el-button
-          data-safe-area-open="drawer-ttb"
+          v-bind="safeAreaDataAttributes.openDrawerTtb"
           @click="openSafeDrawer('ttb')"
         >
           Open Drawer TTB
         </el-button>
         <el-button
-          data-safe-area-open="drawer-btt"
+          v-bind="safeAreaDataAttributes.openDrawerBtt"
           @click="openSafeDrawer('btt')"
         >
           Open Drawer BTT
         </el-button>
         <el-button
-          data-safe-area-open="image-viewer"
+          v-bind="safeAreaDataAttributes.openImageViewer"
           @click="safeImageViewerVisible = true"
         >
           Open ImageViewer
@@ -78,7 +84,7 @@
         <div class="audit-safe-area-lab__panel" @click.stop>
           <p>Safe-area Overlay content</p>
           <el-button
-            data-safe-area-action="overlay-close"
+            v-bind="safeAreaDataAttributes.actionOverlayClose"
             @click="safeOverlayVisible = false"
           >
             Close Overlay
@@ -106,14 +112,14 @@
         </div>
         <template #footer>
           <el-button
-            data-safe-area-action="dialog-cancel"
+            v-bind="safeAreaDataAttributes.actionDialogCancel"
             @click="safeDialogVisible = false"
           >
             Cancel
           </el-button>
           <el-button
             type="primary"
-            data-safe-area-action="dialog-confirm"
+            v-bind="safeAreaDataAttributes.actionDialogConfirm"
             @click="safeDialogVisible = false"
           >
             Confirm
@@ -136,14 +142,14 @@
         </div>
         <template #footer>
           <el-button
-            data-safe-area-action="drawer-cancel"
+            v-bind="safeAreaDataAttributes.actionDrawerCancel"
             @click="safeDrawerVisible = false"
           >
             Cancel
           </el-button>
           <el-button
             type="primary"
-            data-safe-area-action="drawer-confirm"
+            v-bind="safeAreaDataAttributes.actionDrawerConfirm"
             @click="safeDrawerVisible = false"
           >
             Confirm
@@ -1753,6 +1759,23 @@ const auditRootDataAttributes = computed(
       'data-audit-state': auditState.value,
     }) satisfies Record<`data-${string}`, string>,
 )
+const safeAreaDataAttributes = {
+  lab: { 'data-safe-area-lab': '' },
+  openOverlay: { 'data-safe-area-open': 'overlay' },
+  openDialog: { 'data-safe-area-open': 'dialog' },
+  openDialogFullscreen: { 'data-safe-area-open': 'dialog-fullscreen' },
+  openMessageBox: { 'data-safe-area-open': 'message-box' },
+  openDrawerLtr: { 'data-safe-area-open': 'drawer-ltr' },
+  openDrawerRtl: { 'data-safe-area-open': 'drawer-rtl' },
+  openDrawerTtb: { 'data-safe-area-open': 'drawer-ttb' },
+  openDrawerBtt: { 'data-safe-area-open': 'drawer-btt' },
+  openImageViewer: { 'data-safe-area-open': 'image-viewer' },
+  actionOverlayClose: { 'data-safe-area-action': 'overlay-close' },
+  actionDialogCancel: { 'data-safe-area-action': 'dialog-cancel' },
+  actionDialogConfirm: { 'data-safe-area-action': 'dialog-confirm' },
+  actionDrawerCancel: { 'data-safe-area-action': 'drawer-cancel' },
+  actionDrawerConfirm: { 'data-safe-area-action': 'drawer-confirm' },
+} satisfies Record<string, Record<`data-${string}`, string>>
 const active = computed(() => auditState.value === 'active')
 const activeText = computed(() => {
   if (props.boundary) {

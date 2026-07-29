@@ -168,6 +168,12 @@ bool is_safe_url(std::string_view input) {
     return false;
   }
 
+  for (const unsigned char ch : url) {
+    if (ch <= 0x20 || ch == 0x7f || ch == '\\') {
+      return false;
+    }
+  }
+
   if (url.starts_with("//")) {
     return false;
   }
@@ -197,7 +203,7 @@ std::string resolve_url(std::string_view base_url, std::string_view input) {
   }
 
   const std::string_view base = trim(base_url);
-  if (base.empty()) {
+  if (base.empty() || !is_safe_url(base)) {
     return escape_html(url);
   }
 
@@ -1519,13 +1525,6 @@ std::string render_document_v2(
       continue;
     }
 
-    if (request.allow_html && trimmed.starts_with('<') && trimmed.find('>') != std::string_view::npos) {
-      flush_paragraph();
-      flush_list();
-      html.append(line.data(), line.size());
-      continue;
-    }
-
     if (is_paragraph_group_start(line)) {
       flush_paragraph();
       flush_list();
@@ -2040,7 +2039,6 @@ void fill_feature_metadata(render_result& result, const render_request& request,
 
   result.metadata.mode = request.mode;
   result.metadata.base_url = request.base_url;
-  result.metadata.allow_html = request.allow_html;
   result.metadata.allow_latex = request.allow_latex;
   result.metadata.allow_mermaid = request.allow_mermaid;
   result.metadata.source_length = request.source.size();

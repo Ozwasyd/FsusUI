@@ -40,8 +40,6 @@ import {
 | preview-base-url  | preview renderer 的基础 URL                 | `string \| null`                          | `null`   |
 | preview-csp-nonce | preview renderer 的 CSP nonce               | `string \| null`                          | `null`   |
 | preview-features  | preview renderer 的 feature activation 开关 | `MarkdownFeatureActivationFeatureOptions` | —        |
-| allow-html        | preview 是否允许 raw HTML                   | `boolean`                                 | `false`  |
-| sanitize-html     | preview DOM 提交前是否 sanitize             | `boolean`                                 | `true`   |
 | min-rows          | 编辑区最小行数                              | `number`                                  | `12`     |
 
 ### Events

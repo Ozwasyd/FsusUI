@@ -167,9 +167,11 @@ raw、gzip 与 Brotli 体积。
 和可安装性仍由 package smoke 校验；DataList、Motion、Perception 的 runtime export
 也由独立 Node contract smoke 校验，不再人为塞进按需消费首屏。
 
-Markdown 首屏采样必须提供与 `content` 同源的 `initialHtml`，模拟 SSR、AOT shell
-或可信缓存立即首显；WASM 仍在后台完成正式解析并替换内容。这样首个可见文本不依赖
-WASM 下载，同时 consumer smoke 仍会真实请求并验证打包后的 WASM runtime。
+Markdown 首屏采样必须提供与 `content` 同源、同 renderer version 的
+`initialRender`，模拟 SSR、AOT shell 或可信缓存立即首显；该值必须来自 Markdown
+runtime 的 `MarkdownSafeRenderResult`，不能用普通 HTML 字符串构造。WASM 仍在后台
+完成正式解析并替换内容。这样首个可见文本不依赖 WASM 下载，同时 consumer smoke
+仍会真实请求并验证打包后的 WASM runtime。
 
 性能 fixture 还会在首次 idle 之前使用同源静态 HTML，之后才异步加载
 `ElMarkdownRenderer` 并 hydration。该边界用于证明 Markdown runtime、worker 与 WASM

@@ -562,7 +562,7 @@ test('screenshot only', async ({ page }) => {
     ).toBe(true)
   })
 
-  test('mutation: removing a lab surface open control fails the gate', () => {
+  test('mutation: changing a lab surface attribute bag mapping fails the gate', () => {
     const fixtureRoot = mkdtempSync(
       path.join(tmpdir(), 'fsusui-safe-area-fixture-'),
     )
@@ -583,12 +583,63 @@ test('screenshot only', async ({ page }) => {
     copyRelative('vue/playwright.boundary-audit.config.ts')
     copyRelative('package.json')
     copyRelative('vue/packages/demo-app/src/AuditFixtures.vue', (source) =>
-      source.replace('data-safe-area-open="image-viewer"', 'data-open="image"'),
+      source
+        .replace(
+          "openImageViewer: { 'data-safe-area-open': 'image-viewer' }",
+          "openImageViewer: { 'data-open': 'image' }",
+        )
+        .replace(
+          'const active = computed',
+          "const detachedSafeAreaMapping = \"openImageViewer: { 'data-safe-area-open': 'image-viewer' }\"\nvoid detachedSafeAreaMapping\nconst active = computed",
+        ),
     )
 
     const violations = findSafeAreaVisualMatrixViolations({ root: fixtureRoot })
     expect(
       violations.some((item) => item.includes('image-viewer')),
+    ).toBe(true)
+  })
+
+  test('mutation: disconnecting a lab surface attribute bag from its template owner fails the gate', () => {
+    const fixtureRoot = mkdtempSync(
+      path.join(tmpdir(), 'fsusui-safe-area-fixture-owner-'),
+    )
+    temporaryRoots.push(fixtureRoot)
+
+    const copyRelative = (
+      relativePath: string,
+      mutate?: (source: string) => string,
+    ) => {
+      const sourcePath = path.join(repoRoot, relativePath)
+      const targetPath = path.join(fixtureRoot, relativePath)
+      mkdirSync(path.dirname(targetPath), { recursive: true })
+      const source = readFileSync(sourcePath, 'utf8')
+      writeFileSync(targetPath, mutate ? mutate(source) : source)
+    }
+
+    copyRelative('scripts/safe-area-profiles.mjs')
+    copyRelative('vue/tests/support/dom-layout-assertions.ts')
+    copyRelative('vue/tests/support/safe-area-profile.ts')
+    copyRelative('vue/tests/visual-boundary/safe-area-overlay-matrix.spec.ts')
+    copyRelative('vue/playwright.boundary-audit.config.ts')
+    copyRelative('package.json')
+    copyRelative('vue/packages/demo-app/src/AuditFixtures.vue', (source) =>
+      source
+        .replace(
+          'v-bind="safeAreaDataAttributes.openImageViewer"',
+          'v-bind="safeAreaDataAttributes.openOverlay"',
+        )
+        .replace(
+          'const active = computed',
+          "const detachedSafeAreaBinding = 'v-bind=\"safeAreaDataAttributes.openImageViewer\"'\nvoid detachedSafeAreaBinding\nconst active = computed",
+        ),
+    )
+
+    const violations = findSafeAreaVisualMatrixViolations({ root: fixtureRoot })
+    expect(
+      violations.some((item) =>
+        item.includes('safeAreaDataAttributes.openImageViewer'),
+      ),
     ).toBe(true)
   })
 })

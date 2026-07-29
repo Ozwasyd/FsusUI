@@ -49,7 +49,6 @@ struct placeholder final {
 struct render_metadata final {
   render_mode mode{render_mode::article};
   std::string base_url;
-  bool allow_html{false};
   bool allow_latex{true};
   bool allow_mermaid{true};
   std::size_t source_length{0};
@@ -64,7 +63,6 @@ struct render_request final {
   std::string source;
   std::string base_url;
   render_mode mode{render_mode::article};
-  bool allow_html{false};
   bool allow_latex{true};
   bool allow_mermaid{true};
 };
@@ -77,7 +75,7 @@ struct render_result final {
   render_metadata metadata;
 };
 
-inline constexpr std::string_view renderer_version = "markdown-wasm-contract@2026-05-02-2";
+inline constexpr std::string_view renderer_version = "markdown-wasm-contract@2026-07-28";
 
 [[nodiscard]] std::string normalize_source(std::string_view input);
 [[nodiscard]] std::string escape_html(std::string_view input);

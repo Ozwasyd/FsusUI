@@ -6,15 +6,15 @@
 
 ## Public Preview Notes
 
-| 字段                   | 说明                                                                                                                                                            |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| purpose                | 将可信或已清理的 Markdown 内容渲染为可激活的文章 DOM，并为长文档提供分块和虚拟挂载能力。                                                                        |
-| basic usage            | 传入 `content`，按需配置 `features`、`allow-html`、`sanitize-html`、adapter 和 Render Pipeline 预算。                                                           |
-| props / events / slots | 本页 `API` 覆盖公开 props、events 和 exposes；runtime 深层实现不属于组件 API。                                                                                  |
-| accessibility          | 业务侧需要为文章容器提供标题层级和阅读上下文；Mermaid、LaTeX、代码块等增强内容应保留文本回退或错误提示。                                                        |
-| theme token notes      | 组件默认无完整文章主题；可使用公开文本、背景、主色、代码块和 motion token 绑定业务排版。                                                                        |
-| known limitations      | Markdown runtime、WASM、feature activation 和 chunked rendering 在 public preview 期间均为 experimental；不可信 HTML 必须保持 `allow-html=false` 或在上游清理。 |
-| stability level        | Experimental component。                                                                                                                                        |
+| 字段                   | 说明                                                                                                                                             |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| purpose                | 将 Markdown 内容渲染为可激活的安全文章 DOM，并为长文档提供分块和虚拟挂载能力。                                                                   |
+| basic usage            | 传入 `content`，按需配置 `features`、adapter 和 Render Pipeline 预算。                                                                           |
+| props / events / slots | 本页 `API` 覆盖公开 props、events 和 exposes；runtime 深层实现不属于组件 API。                                                                   |
+| accessibility          | 业务侧需要为文章容器提供标题层级和阅读上下文；Mermaid、LaTeX、代码块等增强内容应保留文本回退或错误提示。                                         |
+| theme token notes      | 组件默认无完整文章主题；可使用公开文本、背景、主色、代码块和 motion token 绑定业务排版。                                                         |
+| known limitations      | Markdown runtime、WASM、feature activation 和 chunked rendering 在 public preview 期间均为 experimental；Markdown 源码中的 HTML 永远按文本呈现。 |
+| stability level        | Experimental component。                                                                                                                         |
 
 ---
 
@@ -65,11 +65,11 @@ WASM 渲染器会保留 Mermaid、LaTeX/KaTeX 相关的 HTML、MathML、SVG 或 
 
 ## Raw HTML 安全边界
 
-`allow-html` 默认关闭。默认情况下，Markdown 源码中的 HTML 会被转义，避免把不可信内容直接注入页面。组件提交到 DOM 前还会默认执行一层 HTML sanitize，覆盖 `initial-html`、完整结果和 chunked 结果。
+Markdown 协议不接受原始 HTML。核心渲染器会在 sync、Worker、chunked 和 html-only 路径中统一转义 HTML 块与行内标签，并在生成链接与图片属性时拒绝危险协议、协议相对 URL、控制字符、反斜杠混淆和 data URL。所有可提交 HTML 都封装在不透明的 `MarkdownSafeHtml` / `MarkdownSafeRenderResult` 中；普通 `string` 不能赋给这些类型，组件也不提供二次清洗开关或字符串构造入口。
 
-只有在调用方确认内容可信时才应开启 `allow-html`。如业务已经在上游完成可信 HTML 过滤，并且需要保留完整 HTML 能力，可以显式设置 `:sanitize-html="false"` 关闭组件层 sanitize。
+SSR 或可信缓存首显应把 runtime 返回的完整结果传给 `initial-render`。组件只复用持有 runtime authority，且 renderer version、规范化源文和 `sourceIdentity` 都与当前请求一致的结果；任一条件不匹配都会丢弃首显结果并重新渲染。
 
-启用 `require-trusted-types-for 'script'` 的宿主应传入 `trusted-html-factory` 与 `trusted-script-url-factory`。组件会先执行保守字符串清理，再把结果交给 HTML factory 生成宿主 policy 的 `TrustedHTML`，随后继续执行 DOM 级清理；worker factory 只接收构建生成的 Markdown worker `URL`。FsusUI 不创建或公开宿主的 Trusted Types policy。
+启用 `require-trusted-types-for 'script'` 的宿主应传入 `trusted-html-factory` 与 `trusted-script-url-factory`。HTML factory 只接收 `MarkdownSafeHtml`，不负责清洗；worker factory 只接收构建生成的 Markdown worker `URL`。FsusUI 不创建或公开宿主的 Trusted Types policy。
 
 ## Fsus 显式段落组
 
@@ -95,7 +95,7 @@ pub enum AppError {
 - `::` 必须独占一行，表示当前显式段落组结束。
 - 组内内容仍按普通 Markdown 解析，支持代码块、表格、列表、引用、Mermaid 与 LaTeX。
 - 普通双换行段落不受影响；只有显式写出 `::p ... ::` 时才生成段落组。
-- 该语法不是 raw HTML，`allow-html=false` 时仍然可用。
+- 该语法不是原始 HTML，始终可用。
 - DOM 不会输出非法的 `<p><pre>...</pre></p>`，而是输出合法结构：
 
 ```html
@@ -140,7 +140,7 @@ import {
 
 `renderMarkdownHtmlWithRuntime` 的 `value` 只包含 HTML 与 timings；`renderMarkdownSummaryWithRuntime` 返回 HTML、features 和 metadata counts；`renderMarkdownResultWithRuntime` 返回 `html`、`features`、`placeholders`、`metadata`、timings 和当前 engine 信息；`renderMarkdownChunksWithRuntime` 额外返回 block 级 `chunks`，供 Render Pipeline 做虚拟挂载；`renderMarkdownWithRuntime` 只返回 HTML 字符串。
 
-chunk 边界由 WASM 渲染流程产出，类型包括 `heading`、`paragraph`、`list`、`table`、`code`、`blockquote`、`latex`、`mermaid`、`footnotes`、`rule`、`html`。组件不会在 Vue 层用正则切最终 HTML。
+chunk 边界由 WASM 渲染流程产出，类型包括 `heading`、`paragraph`、`list`、`table`、`code`、`blockquote`、`latex`、`mermaid`、`footnotes`、`rule`、`generated`。`generated` 仅表示无法归入其他类别的渲染器生成块，不表示原始 HTML 输入能力。组件不会在 Vue 层用正则切最终 HTML。
 
 ## 长文档虚拟挂载
 
@@ -154,7 +154,7 @@ chunk 边界由 WASM 渲染流程产出，类型包括 `heading`、`paragraph`�
 - SSR 或无 `ResizeObserver` 环境不创建观察器，首次挂载仍以确定性的 `offsetHeight` 回填估算值。
 - Mermaid、KaTeX 与 Shiki activation 由带预加载边界的 `IntersectionObserver` 驱动；不支持该 API 时保持兼容，立即激活当前已挂载 chunk。
 - 新 `content` generation 会同时取消解析、结果传输、分帧提交、activation 与过期 cache write；Worker 解析中的同步 WASM 任务会通过终止其 parser worker 实际停止，而不是只丢弃最终结果。
-- renderer cache 每个 fingerprint 只保留一份最强 canonical payload；chunk result 可派生 result/HTML 视图，不同时保存 chunks、HTML 与 result 三份副本。
+- Worker 内部 cache 每个 fingerprint 只保留由本次 WASM runtime 生成的一份 canonical payload；主线程组件不暴露可写 cache 或 setter，也不会接受 caller 注入的缓存结果。
 
 阈值与预算通过 `ElConfigProvider` 的 `render-pipeline` 配置统一控制；MarkdownRenderer 不新增专属开关。
 
@@ -166,30 +166,28 @@ chunk 边界由 WASM 渲染流程产出，类型包括 `heading`、`paragraph`�
 
 ### Attributes
 
-| 属性名                 | 说明                                                                                     | 类型                                            | 默认值    |
-| ---------------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------- | --------- |
-| content                | Markdown 源文本                                                                          | `string`                                        | `''`      |
-| content-version        | 可选稳定内容版本；大文档提供后可跳过主线程完整哈希，并参与 generation/cache fingerprint  | `string \| number \| null`                      | `null`    |
-| initial-html           | 初始 HTML，用于首帧占位                                                                  | `string`                                        | `''`      |
-| allow-html             | 是否允许 Markdown 源码中的 raw HTML                                                      | `boolean`                                       | `false`   |
-| sanitize-html          | DOM 提交前是否清理不安全 HTML                                                            | `boolean`                                       | `true`    |
-| trusted-html-factory   | 将保守清理后的 HTML 转为宿主 policy 的 `TrustedHTML`；严格 Trusted Types 页面使用       | `(html: string) => unknown`                     | —         |
-| trusted-script-url-factory | 将 Markdown worker URL 转为宿主 policy 的 `TrustedScriptURL`                         | `(url: URL) => unknown`                         | —         |
-| allow-latex            | 是否启用 LaTeX/MathML 输出                                                               | `boolean`                                       | `true`    |
-| allow-mermaid          | 是否启用 Mermaid 输出                                                                    | `boolean`                                       | `true`    |
-| mode                   | 渲染模式元数据                                                                           | `'article' \| 'about' \| 'preview' \| 'editor'` | `article` |
-| base-url               | 渲染元数据与 link activation 的基础 URL                                                  | `string \| null`                                | `null`    |
-| csp-nonce              | 写入 renderer 内动态 style 的 CSP nonce                                                  | `string \| null`                                | `null`    |
-| features               | DOM feature activation 开关                                                              | `MarkdownFeatureActivationFeatureOptions`       | —         |
-| mermaid-adapter        | Mermaid DOM activation adapter；`undefined` 使用默认 adapter，`null` 只标记不渲染        | `MarkdownFeatureAdapter \| null`                | —         |
-| latex-adapter          | LaTeX/KaTeX DOM activation adapter；`undefined` 使用默认 adapter，`null` 只标记不渲染    | `MarkdownFeatureAdapter \| null`                | —         |
-| code-highlight-adapter | 代码高亮 DOM activation adapter；`undefined` 使用默认 Shiki adapter，`null` 只标记不渲染 | `MarkdownFeatureAdapter \| null`                | —         |
+| 属性名                     | 说明                                                                                     | 类型                                            | 默认值    |
+| -------------------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------- | --------- |
+| content                    | Markdown 源文本                                                                          | `string`                                        | `''`      |
+| content-version            | 可选稳定内容版本；大文档提供后可跳过主线程完整哈希，并参与 generation/cache fingerprint  | `string \| number \| null`                      | `null`    |
+| initial-render             | 同源同版本且持有 runtime authority 的安全结果，用于 SSR 或可信缓存首显                   | `MarkdownSafeRenderResult \| null`              | `null`    |
+| trusted-html-factory       | 将安全 HTML 转为宿主 policy 的 `TrustedHTML`；不承担清洗职责                             | `(html: MarkdownSafeHtml) => object`            | —         |
+| trusted-script-url-factory | 将 Markdown worker URL 转为宿主 policy 的 `TrustedScriptURL`                             | `(url: URL) => unknown`                         | —         |
+| allow-latex                | 是否启用 LaTeX/MathML 输出                                                               | `boolean`                                       | `true`    |
+| allow-mermaid              | 是否启用 Mermaid 输出                                                                    | `boolean`                                       | `true`    |
+| mode                       | 渲染模式元数据                                                                           | `'article' \| 'about' \| 'preview' \| 'editor'` | `article` |
+| base-url                   | 渲染元数据与 link activation 的基础 URL                                                  | `string \| null`                                | `null`    |
+| csp-nonce                  | 写入 renderer 内动态 style 的 CSP nonce                                                  | `string \| null`                                | `null`    |
+| features                   | DOM feature activation 开关                                                              | `MarkdownFeatureActivationFeatureOptions`       | —         |
+| mermaid-adapter            | Mermaid DOM activation adapter；`undefined` 使用默认 adapter，`null` 只标记不渲染        | `MarkdownFeatureAdapter \| null`                | —         |
+| latex-adapter              | LaTeX/KaTeX DOM activation adapter；`undefined` 使用默认 adapter，`null` 只标记不渲染    | `MarkdownFeatureAdapter \| null`                | —         |
+| code-highlight-adapter     | 代码高亮 DOM activation adapter；`undefined` 使用默认 Shiki adapter，`null` 只标记不渲染 | `MarkdownFeatureAdapter \| null`                | —         |
 
 ### Events
 
 | 事件名             | 说明                                                              |
 | ------------------ | ----------------------------------------------------------------- |
-| render-complete    | 渲染完成，参数为完整 `MarkdownRenderResult`                       |
+| render-complete    | 渲染完成，参数为完整 `MarkdownSafeRenderResult`                   |
 | render-error       | WASM runtime 渲染失败，参数为 `FsusErrorDetail`                   |
 | features-activated | DOM feature activation 完成，参数为 activation 结果与完整渲染结果 |
 | placeholders-ready | 占位符可用，参数为 `placeholders` 与完整渲染结果                  |

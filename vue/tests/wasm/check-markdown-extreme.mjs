@@ -269,9 +269,9 @@ async function renderSnapshot(module, kind, source, flags) {
     const ok = render(
       ptr,
       bytes.byteLength,
-      0,
       flags.allowLatex ? 1 : 0,
       flags.allowMermaid ? 1 : 0,
+      4,
     )
     const elapsedMs = performance.now() - startedAt
     assert(ok === 1, `[markdown-extreme] render failed: ${kind}/${flags.label}`)
@@ -297,6 +297,49 @@ async function renderSnapshot(module, kind, source, flags) {
       'metadata',
     )
     return { html, features, placeholders, metadata, elapsedMs }
+  } finally {
+    free(ptr)
+  }
+}
+
+function assertRejectedRenderAbi(module, kind) {
+  const raw = module
+  const render = pickExport(raw, 'markdown_render')
+  const getErrorPtr = pickExport(raw, 'markdown_get_last_error_ptr')
+  const getErrorLen = pickExport(raw, 'markdown_get_last_error_len')
+  const getErrorCode = pickExport(raw, 'markdown_get_last_error_code')
+  const alloc = pickExport(raw, 'markdown_alloc_buffer')
+  const free = pickExport(raw, 'markdown_free_buffer')
+  const bytes = new TextEncoder().encode('# ABI rejection probe')
+  const ptr = alloc(bytes.byteLength)
+  assert(ptr > 0, `[markdown-extreme] ABI probe alloc failed: ${kind}`)
+
+  const assertRejected = (result, label) => {
+    assert(
+      result === 0,
+      `[markdown-extreme] ${label} unexpectedly accepted: ${kind}`,
+    )
+    assert(
+      getErrorCode() === 2,
+      `[markdown-extreme] ${label} error code drifted: ${kind}`,
+    )
+    assert(
+      readCString(module, getErrorPtr(), getErrorLen()) ===
+        'argument_count_invalid',
+      `[markdown-extreme] ${label} error text drifted: ${kind}`,
+    )
+  }
+
+  try {
+    module.HEAPU8.set(bytes, ptr)
+    assertRejected(
+      render(ptr, bytes.byteLength, 0, 1, 1),
+      'legacy raw-html parameter layout',
+    )
+    assertRejected(
+      render(ptr, bytes.byteLength, 1, 1, 3),
+      'invalid argument_count sentinel',
+    )
   } finally {
     free(ptr)
   }
@@ -414,6 +457,7 @@ function assertSnapshot(snapshot, source, kind, flags) {
 
 async function assertKind(kind, source) {
   const module = await loadMarkdownModule(kind)
+  assertRejectedRenderAbi(module, kind)
   const enabled = await renderSnapshot(module, kind, source, {
     label: 'enabled',
     allowLatex: true,

@@ -1,4 +1,15 @@
-export const MARKDOWN_RENDERER_VERSION = 'markdown-wasm-contract@2026-05-02-2'
+export const MARKDOWN_RENDERER_VERSION = 'markdown-wasm-contract@2026-07-28'
+
+declare const markdownSafeHtmlBrand: unique symbol
+declare const markdownSafeRenderResultBrand: unique symbol
+
+export type MarkdownSafeHtml = string & {
+  readonly [markdownSafeHtmlBrand]: true
+}
+
+export interface MarkdownSafeRenderAuthority {
+  readonly [markdownSafeRenderResultBrand]: true
+}
 
 export type MarkdownRenderMode = 'article' | 'about' | 'preview' | 'editor'
 export type MarkdownRenderFeature =
@@ -17,49 +28,48 @@ export type MarkdownPlaceholderKind =
   | 'mermaid_block'
 
 export interface MarkdownRenderMetadata {
-  mode: MarkdownRenderMode
-  baseUrl: string | null
-  allowHtml: boolean
-  allowLatex: boolean
-  allowMermaid: boolean
-  sourceLength: number
-  sourceLineCount?: number
-  normalizedSourceLength?: number
-  featureCount: number
-  placeholderCount: number
-  rendererVersion: string
+  readonly mode: MarkdownRenderMode
+  readonly baseUrl: string | null
+  readonly allowLatex: boolean
+  readonly allowMermaid: boolean
+  readonly sourceLength: number
+  readonly sourceLineCount?: number
+  readonly normalizedSourceLength?: number
+  readonly featureCount: number
+  readonly placeholderCount: number
+  readonly rendererVersion: string
 }
 
 export interface MarkdownRenderRequest {
   source: string
   baseUrl?: string | null
   mode?: MarkdownRenderMode
-  allowHtml?: boolean
   allowLatex?: boolean
   allowMermaid?: boolean
   contentVersion?: number | string | null
 }
 
 export interface MarkdownRenderPlaceholder {
-  kind: MarkdownPlaceholderKind
-  token: string
-  label: string
-  line: number
-  source?: string
-  column?: number
-  endLine?: number
-  endColumn?: number
-  startOffset?: number
-  endOffset?: number
+  readonly kind: MarkdownPlaceholderKind
+  readonly token: string
+  readonly label: string
+  readonly line: number
+  readonly source?: string
+  readonly column?: number
+  readonly endLine?: number
+  readonly endColumn?: number
+  readonly startOffset?: number
+  readonly endOffset?: number
 }
 
-export interface MarkdownRenderResult {
-  html: string
-  normalizedSource: string
-  features: readonly MarkdownRenderFeature[]
-  placeholders: readonly MarkdownRenderPlaceholder[]
-  rendererVersion: string
-  metadata?: MarkdownRenderMetadata
+export interface MarkdownSafeRenderResult extends MarkdownSafeRenderAuthority {
+  readonly html: MarkdownSafeHtml
+  readonly normalizedSource: string
+  readonly sourceIdentity: string
+  readonly features: readonly MarkdownRenderFeature[]
+  readonly placeholders: readonly MarkdownRenderPlaceholder[]
+  readonly rendererVersion: string
+  readonly metadata?: MarkdownRenderMetadata
 }
 
 export type MarkdownRenderChunkKind =
@@ -73,26 +83,26 @@ export type MarkdownRenderChunkKind =
   | 'mermaid'
   | 'footnotes'
   | 'rule'
-  | 'html'
+  | 'generated'
 
 export interface MarkdownRenderChunk {
-  key: string
-  kind: MarkdownRenderChunkKind
-  html: string
-  estimatedSize: number
-  htmlStartOffset: number
-  htmlEndOffset: number
+  readonly key: string
+  readonly kind: MarkdownRenderChunkKind
+  readonly html: MarkdownSafeHtml
+  readonly estimatedSize: number
+  readonly htmlStartOffset: number
+  readonly htmlEndOffset: number
 }
 
 export interface MarkdownRenderTimings {
-  initMs: number
-  encodeMs: number
-  wasmRenderMs: number
-  readHtmlMs: number
-  readFeaturesMs: number
-  readPlaceholdersMs: number
-  readMetadataMs: number
-  totalMs: number
+  readonly initMs: number
+  readonly encodeMs: number
+  readonly wasmRenderMs: number
+  readonly readHtmlMs: number
+  readonly readFeaturesMs: number
+  readonly readPlaceholdersMs: number
+  readonly readMetadataMs: number
+  readonly totalMs: number
 }
 
 export interface MarkdownRendererSurfaceContract {
@@ -131,6 +141,29 @@ export const MARKDOWN_RENDERER_SURFACE_CLASSES: MarkdownRendererSurfaceContract 
 export function normalizeMarkdownSource(input: string): string {
   const raw = typeof input === 'string' ? input : ''
   return raw.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n')
+}
+
+export function resolveMarkdownSourceIdentity(
+  request: MarkdownRenderRequest | string,
+): string {
+  const payload = typeof request === 'string' ? { source: request } : request
+  const source = normalizeMarkdownSource(payload.source)
+  let hash = 0x811c9dc5
+  const identityInput = [
+    MARKDOWN_RENDERER_VERSION,
+    source,
+    payload.baseUrl ?? '',
+    payload.mode ?? 'article',
+    payload.allowLatex === false ? 'no-latex' : 'latex',
+    payload.allowMermaid === false ? 'no-mermaid' : 'mermaid',
+  ].join('\u0000')
+
+  for (let index = 0; index < identityInput.length; index += 1) {
+    hash ^= identityInput.charCodeAt(index)
+    hash = Math.imul(hash, 0x01000193)
+  }
+
+  return `markdown:${identityInput.length}:${(hash >>> 0).toString(36)}`
 }
 
 export function escapeMarkdownHtml(input: string): string {
@@ -230,27 +263,4 @@ export function detectMarkdownPlaceholders(
   })
 
   return placeholders
-}
-
-export function buildMarkdownRenderResult(input: {
-  html: string
-  source: string
-  features?: readonly MarkdownRenderFeature[]
-  placeholders?: readonly MarkdownRenderPlaceholder[]
-  rendererVersion?: string
-  metadata?: MarkdownRenderMetadata
-}): MarkdownRenderResult {
-  const normalizedSource = normalizeMarkdownSource(input.source)
-  return {
-    html: input.html,
-    normalizedSource,
-    features: input.features
-      ? [...input.features]
-      : detectMarkdownFeatures(normalizedSource),
-    placeholders: input.placeholders
-      ? [...input.placeholders]
-      : detectMarkdownPlaceholders(normalizedSource),
-    rendererVersion: input.rendererVersion ?? MARKDOWN_RENDERER_VERSION,
-    metadata: input.metadata,
-  }
 }

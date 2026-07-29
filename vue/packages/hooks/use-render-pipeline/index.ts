@@ -2458,6 +2458,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       maxQueue: workerOptions.maxQueue,
       maxWorkers: workerOptions.maxWorkers,
       name: workerOptions.name ?? activeAdapter.id,
+      requireGenerationEcho: workerOptions.requireGenerationEcho,
       requestTimeoutMs: workerOptions.requestTimeoutMs,
       reservedCores: workerOptions.reservedCores,
       serializeError: workerOptions.serializeError,

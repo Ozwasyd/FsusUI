@@ -56,7 +56,6 @@
           <el-markdown-renderer
             class="markdown-stress-content"
             :content="componentContent"
-            :allow-html="false"
             :allow-latex="true"
             :allow-mermaid="true"
             mode="article"
@@ -92,7 +91,7 @@ import {
   renderMarkdownResultWithRuntime,
   renderMarkdownSummaryWithRuntime,
   type MarkdownRenderPlaceholder,
-  type MarkdownRenderResult,
+  type MarkdownSafeRenderResult,
   type MarkdownRenderTimings,
   type MarkdownRuntimeKind,
   type MarkdownRuntimeProfile,
@@ -134,7 +133,6 @@ const renderPhase = shallowRef('idle')
 
 const request = {
   source: content,
-  allowHtml: false,
   allowLatex: true,
   allowMermaid: true,
   mode: 'article' as const,
@@ -238,7 +236,7 @@ const runStressProfile = async () => {
   }
 }
 
-const handleRenderComplete = (result: MarkdownRenderResult) => {
+const handleRenderComplete = (result: MarkdownSafeRenderResult) => {
   if (componentContent.value !== content) return
   status.value = 'complete'
   htmlLength.value = result.html.length

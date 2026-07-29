@@ -5,9 +5,14 @@ import type {
   MarkdownFeatureAdapter,
   MarkdownFeatureActivationFeatureOptions,
   MarkdownRenderMode,
+  MarkdownSafeHtml,
+  MarkdownSafeRenderResult,
 } from '@element-plus/wasm'
 
-export type MarkdownTrustedHtmlFactory = (sanitizedHtml: string) => unknown
+export type MarkdownTrustedHtml = object
+export type MarkdownTrustedHtmlFactory = (
+  safeHtml: MarkdownSafeHtml,
+) => MarkdownTrustedHtml
 export type MarkdownTrustedScriptUrlFactory = (moduleUrl: URL) => unknown
 
 export const resolveMarkdownWorkerScriptUrl = (
@@ -24,17 +29,9 @@ export const markdownRendererProps = buildProps({
     type: [String, Number] as PropType<string | number | null>,
     default: null,
   },
-  initialHtml: {
-    type: String,
-    default: '',
-  },
-  allowHtml: {
-    type: Boolean,
-    default: false,
-  },
-  sanitizeHtml: {
-    type: Boolean,
-    default: true,
+  initialRender: {
+    type: Object as PropType<MarkdownSafeRenderResult | null>,
+    default: null,
   },
   trustedHtmlFactory: {
     type: Function as PropType<MarkdownTrustedHtmlFactory>,

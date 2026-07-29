@@ -4,6 +4,21 @@
 
 ---
 
+## Markdown 首屏结果
+
+`ElMarkdownRenderer` 的服务端首屏只接受 runtime 产出的
+`MarkdownSafeRenderResult`：
+
+```vue
+<el-markdown-renderer :content="content" :initial-render="serverRender" />
+```
+
+客户端会核对 runtime authority、`rendererVersion`、规范化源文和
+`sourceIdentity`。不匹配的结果不会进入 `v-html`，而是被丢弃并由当前 runtime
+重新渲染。旧的字符串首显 prop 和 HTML 清洗开关不再属于公开契约。
+
+---
+
 ## 注入唯一 ID
 
 FsusUI 内部使用自增 ID 管理无障碍属性。在 SSR 中，服务端与客户端生成的 ID 必须保持一致，否则会产生水合错误。

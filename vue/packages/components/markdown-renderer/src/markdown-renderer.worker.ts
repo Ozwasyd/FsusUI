@@ -5,7 +5,7 @@ import type {
 } from '@element-plus/wasm'
 
 type MarkdownWorkerRunRequest = {
-  generation?: number
+  generation: number
   id: number
   key?: string
   request: MarkdownRenderRequest
@@ -13,7 +13,7 @@ type MarkdownWorkerRunRequest = {
 }
 
 type MarkdownWorkerCancelRequest = {
-  generation?: number
+  generation: number
   id: number
   key?: string
   type: 'cancel'
@@ -30,6 +30,7 @@ type MarkdownWorkerDocument = {
 
 type MarkdownWorkerResponse =
   | {
+      generation: number
       id: number
       result: MarkdownWorkerDocument
       status?: 'complete'
@@ -37,9 +38,10 @@ type MarkdownWorkerResponse =
     }
   | {
       error: { code?: string; message: string; name: string }
+      generation: number
       id: number
     }
-  | { generation?: number; id: number; status: 'aborted' }
+  | { generation: number; id: number; status: 'aborted' }
 
 type ParserResponse =
   | { id: number; result: Exclude<MarkdownWorkerDocument, null> }
@@ -69,12 +71,18 @@ const ensureParser = () => {
   parser.onmessage = (event: MessageEvent<ParserResponse>) => {
     const message = event.data
     if (!active || message.id !== active.id) return
+    const completed = active
     active = undefined
     if ('error' in message) {
-      workerScope.postMessage({ error: message.error, id: message.id })
+      workerScope.postMessage({
+        error: message.error,
+        generation: completed.generation,
+        id: message.id,
+      })
       return
     }
     workerScope.postMessage({
+      generation: completed.generation,
       id: message.id,
       result: message.result,
       status: 'complete',
@@ -93,6 +101,7 @@ const ensureParser = () => {
         message: event.message || 'markdown_parser_worker_failed',
         name: 'WorkerError',
       },
+      generation: current.generation,
       id: current.id,
     })
   }
@@ -114,7 +123,7 @@ workerScope.onmessage = (event) => {
     return
   }
 
-  const generation = message.generation ?? 0
+  const generation = message.generation
   if (active) {
     terminateParser()
     workerScope.postMessage({

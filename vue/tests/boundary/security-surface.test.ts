@@ -27,21 +27,12 @@ const expectedHtmlSinks: Record<string, ExpectedSink> = {
     evidence: [/\.\.\.\(svg \? \{ innerHTML: svg \} : \{\}\)/],
   },
   'vue/packages/components/markdown-renderer/src/markdown-renderer.vue': {
-    contract: 'sanitized by default through sanitizeHtml before v-html commit',
+    contract: 'only branded runtime HTML or host TrustedHTML reaches v-html',
     evidence: [
-      /v-html="item\.unit\.html"/,
-      /v-html="renderedContent"/,
-      /sanitizeMarkdownHtml/,
-      /props\.sanitizeHtml/,
-    ],
-  },
-  'vue/packages/components/markdown-renderer/src/markdown-sanitize.ts': {
-    contract: 'local template parsing only; sanitized output is returned',
-    evidence: [
-      /template\.innerHTML = [\s\S]{0,160}preSanitizedHtml/,
-      /sanitizeHtmlWithoutDom/,
-      /unsafeElementNames/,
-      /isUnsafeUrlValue/,
+      /v-html="resolveCommittedHtml\(item\.unit\.html\)"/,
+      /v-html="resolveCommittedHtml\(renderedContent\)"/,
+      /html: MarkdownSafeHtml/,
+      /props\.trustedHtmlFactory\?\.\(html\)/,
     ],
   },
   'vue/packages/components/message-box/src/index.vue': {
@@ -78,9 +69,7 @@ const listHtmlSinkFiles = async () => {
     onlyFiles: true,
   })
 
-  return files
-    .filter((file) => htmlSinkRe.test(read(file)))
-    .sort()
+  return files.filter((file) => htmlSinkRe.test(read(file))).sort()
 }
 
 describe('HTML and injection boundary surface', () => {
@@ -101,12 +90,8 @@ describe('HTML and injection boundary surface', () => {
     }
   })
 
-  it('keeps raw HTML and sanitizer escape hatches default-safe', () => {
+  it('keeps raw HTML escape hatches default-safe', () => {
     const defaultSafeContracts: Record<string, RegExp[]> = {
-      'vue/packages/components/markdown-renderer/src/markdown-renderer.ts': [
-        /allowHtml:\s*\{[\s\S]*?default:\s*false/,
-        /sanitizeHtml:\s*\{[\s\S]*?default:\s*true/,
-      ],
       'vue/packages/components/message/src/message.ts': [
         /dangerouslyUseHTMLString:\s*false/,
       ],
@@ -132,6 +117,46 @@ describe('HTML and injection boundary surface', () => {
         )
       }
     }
+  })
+
+  it('keeps Markdown HTML construction inside its branded runtime boundary', () => {
+    const markdownTypes = read('vue/packages/wasm/markdown.ts')
+    const markdownRuntime = read('vue/packages/wasm/markdown-runtime.ts')
+    const rendererProps = read(
+      'vue/packages/components/markdown-renderer/src/markdown-renderer.ts',
+    )
+
+    expect(markdownTypes).toMatch(/export type MarkdownSafeHtml = string &/)
+    expect(markdownTypes).toMatch(/export interface MarkdownSafeRenderResult/)
+    expect(
+      existsSync(resolve(repoRoot, 'vue/packages/wasm/markdown-safe.ts')),
+    ).toBe(false)
+    expect(
+      existsSync(
+        resolve(
+          repoRoot,
+          'vue/packages/components/markdown-renderer/src/markdown-renderer-cache.ts',
+        ),
+      ),
+    ).toBe(false)
+    const removedBuilder = new RegExp(
+      `export function buildMarkdown${'RenderResult'}`,
+    )
+    const removedRendererProps = new RegExp(
+      `${['initial', 'Html'].join('')}|${['sanitize', 'Html'].join('')}`,
+    )
+    expect(markdownTypes).not.toMatch(removedBuilder)
+    expect(markdownRuntime).toMatch(/const authorizeMarkdownRuntimeResult/)
+    expect(markdownRuntime).toMatch(
+      /const markdownRuntimeAuthority = new WeakSet<object>\(\)/,
+    )
+    expect(markdownRuntime).not.toMatch(
+      /export const (?:authorize|brand)Markdown/,
+    )
+    expect(rendererProps).toMatch(
+      /MarkdownTrustedHtmlFactory = \(\s*safeHtml: MarkdownSafeHtml/,
+    )
+    expect(rendererProps).not.toMatch(removedRendererProps)
   })
 
   it('does not add SQL execution surfaces to the browser UI package', async () => {

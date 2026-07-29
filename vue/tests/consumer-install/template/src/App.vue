@@ -3,7 +3,6 @@
     <el-button type="primary">FsusUI Consumer Smoke</el-button>
     <el-markdown-renderer
       content="# Consumer Markdown&#10;&#10;This render path validates packaged WASM assets."
-      initial-html="<h1 id=&quot;consumer-markdown&quot;>Consumer Markdown</h1><p>This render path validates packaged WASM assets.</p>"
       mode="preview"
     />
     <el-empty-state

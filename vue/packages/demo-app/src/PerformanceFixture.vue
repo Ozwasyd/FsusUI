@@ -56,7 +56,6 @@
     <el-markdown-renderer
       v-else-if="scenario.startsWith('markdown')"
       :content="markdown"
-      :allow-html="false"
       :allow-latex="true"
       :allow-mermaid="true"
       mode="article"
@@ -538,7 +537,6 @@ const wasmProbe = async () => {
   const initialized = performance.now()
   const result = await runtime.renderMarkdownResultWithRuntime({
     source: markdown.value,
-    allowHtml: false,
     allowLatex: true,
     allowMermaid: true,
     mode: 'article',

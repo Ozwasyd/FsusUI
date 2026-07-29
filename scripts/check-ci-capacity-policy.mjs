@@ -177,6 +177,10 @@ const parallelismSource = readFileSync('scripts/test-parallelism.ts', 'utf8')
 const capacityCliSource = readFileSync('scripts/ci-capacity.mjs', 'utf8')
 const unitRunnerSource = readFileSync('scripts/run-capacity-unit.mjs', 'utf8')
 const verifyRunner = readFileSync('scripts/run-capacity-suite.mjs', 'utf8')
+const consumerInstallSource = readFileSync(
+  'scripts/test-consumer-install.mjs',
+  'utf8',
+)
 assert.ok(packageJson.scripts['ci:capacity:plan']?.includes('--dry-run'))
 assert.ok(
   packageJson.scripts['ci:capacity:check']?.includes('check-ci-capacity'),
@@ -218,5 +222,19 @@ assert.ok(
 assert.ok(workflow.includes('fromJSON(needs.capacity.outputs.unit-matrix)'))
 assert.ok(workflow.includes('FSUS_VITEST_WORKERS: ${{ matrix.workers }}'))
 assert.ok(!workflow.includes("shard: ['1/4', '2/4', '3/4', '4/4']"))
+assert.ok(
+  consumerInstallSource.includes(
+    "path.join(repoRoot, 'scripts', 'with-node-heap.mjs')",
+  ),
+  'consumer typecheck must use the shared Node heap wrapper',
+)
+assert.ok(
+  consumerInstallSource.includes("FSUS_NODE_HEAP_PROFILE: 'typecheck'"),
+  'consumer typecheck must request the typecheck heap profile',
+)
+assert.ok(
+  consumerInstallSource.includes("NODE_OPTIONS: ''"),
+  'consumer typecheck must clear the inherited small-task heap limit',
+)
 
 console.log('[ci-capacity] fixtures ok')

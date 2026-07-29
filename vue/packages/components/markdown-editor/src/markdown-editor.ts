@@ -279,14 +279,6 @@ export const markdownEditorProps = buildProps({
     type: Object as PropType<MarkdownFeatureActivationFeatureOptions>,
     default: undefined,
   },
-  allowHtml: {
-    type: Boolean,
-    default: false,
-  },
-  sanitizeHtml: {
-    type: Boolean,
-    default: true,
-  },
   minRows: {
     type: Number,
     default: 12,

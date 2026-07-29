@@ -1,28 +1,36 @@
 import { flushPromises, mount } from '@vue/test-utils'
-import { computed } from 'vue'
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+import { createSSRApp, computed, h } from 'vue'
+import { renderToString } from '@vue/server-renderer'
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  expectTypeOf,
+  test,
+  vi,
+} from 'vitest'
 import { configProviderContextKey } from '@element-plus/components/config-provider'
 import MarkdownRenderer from '../src/markdown-renderer.vue'
 import { resolveMarkdownWorkerScriptUrl } from '../src/markdown-renderer'
 import {
-  buildMarkdownRenderResult,
+  MARKDOWN_RENDERER_VERSION,
+  renderMarkdownFallbackWithRuntime,
   renderMarkdownChunksWithRuntime,
   renderMarkdownHtmlWithRuntime,
   renderMarkdownResultWithRuntime,
+  resolveMarkdownSourceIdentity,
 } from '@element-plus/wasm'
 import { createFsusError, fsusErr, fsusOk } from '@element-plus/utils'
-import {
-  clearMarkdownRendererRuntimeCache,
-  getMarkdownRendererRuntimeCache,
-  setMarkdownRendererRuntimeCache,
-} from '../src/markdown-renderer-cache'
-
 import type {
   MarkdownRuntimeHtmlResult,
   MarkdownRuntimeChunkResult,
   MarkdownRuntimeRenderResult,
+  MarkdownRenderRequest,
+  MarkdownSafeHtml,
 } from '@element-plus/wasm'
 import type { FsusResult } from '@element-plus/utils'
+import type { MarkdownRendererProps } from '../src/markdown-renderer'
 
 const markdownFeatureAdapterMocks = vi.hoisted(() => ({
   defaultCodeHighlightAdapter: vi.fn(async (element: HTMLElement) => {
@@ -34,6 +42,9 @@ const markdownFeatureAdapterMocks = vi.hoisted(() => ({
   defaultMermaidAdapter: vi.fn(async (element: HTMLElement) => {
     element.dataset.defaultMermaidAdapter = 'true'
   }),
+}))
+const markdownAuthorityMocks = vi.hoisted(() => ({
+  results: new WeakSet<object>(),
 }))
 
 vi.mock('@element-plus/wasm', async () => {
@@ -52,6 +63,14 @@ vi.mock('@element-plus/wasm', async () => {
       markdownFeatureAdapterMocks.defaultCodeHighlightAdapter,
     defaultLatexAdapter: markdownFeatureAdapterMocks.defaultLatexAdapter,
     defaultMermaidAdapter: markdownFeatureAdapterMocks.defaultMermaidAdapter,
+    isMarkdownRuntimeAuthorizedResult: (value: unknown) =>
+      runtime.isMarkdownRuntimeAuthorizedResult(value) ||
+      (typeof value === 'object' &&
+        value !== null &&
+        Object.isFrozen(value) &&
+        markdownAuthorityMocks.results.has(value)),
+    renderMarkdownFallbackWithRuntime:
+      runtime.renderMarkdownFallbackWithRuntime,
     renderMarkdownChunksWithRuntime: vi.fn(),
     renderMarkdownHtmlWithRuntime: vi.fn(),
     renderMarkdownResultWithRuntime: vi.fn(),
@@ -73,60 +92,75 @@ const makeTimings = () => ({
   totalMs: 4,
 })
 
+const safeHtml = (html: string) => html as MarkdownSafeHtml
+
+const authorizeTestResult = <T extends object>(result: T): T => {
+  const seal = (value: unknown): void => {
+    if (typeof value !== 'object' || value === null || Object.isFrozen(value)) {
+      return
+    }
+    Object.values(value).forEach(seal)
+    Object.freeze(value)
+  }
+  seal(result)
+  markdownAuthorityMocks.results.add(result)
+  return result
+}
+
 const makeResult = (
   source: string,
   html: string,
   overrides: Partial<MarkdownRuntimeRenderResult> = {},
-): MarkdownRuntimeRenderResult => ({
-  ...buildMarkdownRenderResult({
-    html,
-    source,
-    placeholders: overrides.placeholders,
-    features: overrides.features,
-    metadata: overrides.metadata,
-  }),
-  engine: 'SCALAR-BASIC',
-  timings: makeTimings(),
-  ...overrides,
-})
+): MarkdownRuntimeRenderResult =>
+  authorizeTestResult({
+    ...renderMarkdownFallbackWithRuntime(source),
+    html: safeHtml(html),
+    engine: 'SCALAR-BASIC' as const,
+    timings: makeTimings(),
+    ...overrides,
+  })
 
 const makeHtmlResult = (
   html: string,
   overrides: Partial<MarkdownRuntimeHtmlResult> = {},
-): MarkdownRuntimeHtmlResult => ({
-  html,
-  engine: 'SCALAR-BASIC',
-  rendererVersion: 'markdown-wasm-contract@test',
-  timings: makeTimings(),
-  ...overrides,
-})
+): MarkdownRuntimeHtmlResult =>
+  authorizeTestResult({
+    ...renderMarkdownFallbackWithRuntime(''),
+    html: safeHtml(html),
+    normalizedSource: '',
+    engine: 'SCALAR-BASIC' as const,
+    rendererVersion: MARKDOWN_RENDERER_VERSION,
+    timings: makeTimings(),
+    ...overrides,
+  })
 
 const makeChunkResult = (
   source: string,
   html: string,
   overrides: Partial<MarkdownRuntimeChunkResult> = {},
-): MarkdownRuntimeChunkResult => ({
-  ...makeResult(source, html, overrides),
-  chunks: [
-    {
-      key: 'md-0-0',
-      kind: 'heading',
-      html: '<h1>Chunked</h1>',
-      estimatedSize: 48,
-      htmlStartOffset: 0,
-      htmlEndOffset: 16,
-    },
-    {
-      key: 'md-1-16',
-      kind: 'paragraph',
-      html: '<p>Chunk body</p>',
-      estimatedSize: 48,
-      htmlStartOffset: 16,
-      htmlEndOffset: html.length,
-    },
-  ],
-  ...overrides,
-})
+): MarkdownRuntimeChunkResult =>
+  authorizeTestResult({
+    ...makeResult(source, html, overrides),
+    chunks: [
+      {
+        key: 'md-0-0',
+        kind: 'heading',
+        html: safeHtml('<h1>Chunked</h1>'),
+        estimatedSize: 48,
+        htmlStartOffset: 0,
+        htmlEndOffset: 16,
+      },
+      {
+        key: 'md-1-16',
+        kind: 'paragraph',
+        html: safeHtml('<p>Chunk body</p>'),
+        estimatedSize: 48,
+        htmlStartOffset: 16,
+        htmlEndOffset: html.length,
+      },
+    ],
+    ...overrides,
+  })
 
 const flushRenderer = async () => {
   await vi.advanceTimersByTimeAsync(250)
@@ -149,10 +183,99 @@ const forcedChunkedPipeline = {
   },
 }
 
+const forcedSyncPipeline = {
+  global: {
+    provide: {
+      [configProviderContextKey as symbol]: computed(() => ({
+        renderPipeline: {
+          mode: 'disabled',
+          worker: 'disabled',
+        },
+      })),
+    },
+  },
+}
+
+type MarkdownWorkerPost = {
+  generation?: number
+  id: number
+  request?: MarkdownRenderRequest
+  type?: 'cancel' | 'run'
+}
+
+class MarkdownWorkerHarness {
+  static instances: MarkdownWorkerHarness[] = []
+
+  onerror: OnErrorEventHandler = null
+  onmessage: ((event: MessageEvent) => void) | null = null
+  posts: MarkdownWorkerPost[] = []
+  terminated = false
+
+  constructor() {
+    MarkdownWorkerHarness.instances.push(this)
+  }
+
+  postMessage(message: MarkdownWorkerPost) {
+    this.posts.push(message)
+  }
+
+  terminate() {
+    this.terminated = true
+  }
+
+  respond(data: unknown) {
+    this.onmessage?.({ data } as MessageEvent)
+  }
+}
+
+const workerChunkedPipeline = {
+  global: {
+    provide: {
+      [configProviderContextKey as symbol]: computed(() => ({
+        renderPipeline: {
+          budget: { measureBatch: 2 },
+          mode: 'enabled',
+          worker: 'enabled',
+        },
+      })),
+    },
+  },
+}
+
+const makeWorkerChunkResult = (
+  source: string,
+  html = '<h1>Chunked</h1><p>Chunk body</p>',
+) => {
+  const result = makeChunkResult(source, html)
+  return authorizeTestResult({
+    ...result,
+    metadata: {
+      mode: 'article' as const,
+      baseUrl: null,
+      allowLatex: true,
+      allowMermaid: true,
+      sourceLength: source.length,
+      normalizedSourceLength: source.length,
+      featureCount: result.features.length,
+      placeholderCount: result.placeholders.length,
+      rendererVersion: MARKDOWN_RENDERER_VERSION,
+    },
+  })
+}
+
 describe('MarkdownRenderer.vue', () => {
+  test('does not expose the removed raw HTML prop', () => {
+    const removedCapability = `allow${'Html'}` as const
+    expectTypeOf<MarkdownRendererProps>().not.toHaveProperty(removedCapability)
+    expectTypeOf<string>().not.toMatchTypeOf<MarkdownSafeHtml>()
+    expectTypeOf<
+      MarkdownRendererProps['initialRender']
+    >().not.toMatchTypeOf<string>()
+  })
+
   beforeEach(() => {
     vi.useFakeTimers()
-    clearMarkdownRendererRuntimeCache()
+    MarkdownWorkerHarness.instances = []
     renderMarkdownChunks.mockReset()
     renderMarkdownHtml.mockReset()
     renderMarkdownResult.mockReset()
@@ -169,8 +292,8 @@ describe('MarkdownRenderer.vue', () => {
   })
 
   afterEach(() => {
-    clearMarkdownRendererRuntimeCache()
     vi.runOnlyPendingTimers()
+    vi.unstubAllGlobals()
     vi.useRealTimers()
   })
 
@@ -264,7 +387,6 @@ describe('MarkdownRenderer.vue', () => {
     expect(renderMarkdownResult).toHaveBeenCalledWith(
       expect.objectContaining({
         source: '<script>alert(1)</script>',
-        allowHtml: false,
         allowLatex: true,
         allowMermaid: true,
         mode: 'article',
@@ -273,75 +395,86 @@ describe('MarkdownRenderer.vue', () => {
     )
   })
 
-  test('sanitizes runtime html by default before committing to the DOM', async () => {
-    const unsafeHtml = [
-      '<h1>Safe heading</h1>',
-      '<script>alert("xss")</script>',
-      '<img src="x" onerror="alert(1)">',
-      '<a href="javascript:alert(1)">bad link</a>',
-      '<p style="background:url(javascript:alert(1))">styled</p>',
-    ].join('')
-
-    renderMarkdownHtml.mockResolvedValue(fsusOk(makeHtmlResult(unsafeHtml)))
-    renderMarkdownResult.mockResolvedValue(
-      fsusOk(makeResult('# Unsafe', unsafeHtml)),
-    )
+  test('commits branded runtime html without a second transformation', async () => {
+    const html = '<h1>Safe heading &amp; text</h1>'
+    const trustedHtmlFactory = vi.fn((value: MarkdownSafeHtml) => ({
+      toString: () => value,
+    }))
+    renderMarkdownResult.mockResolvedValue(fsusOk(makeResult('# Safe', html)))
 
     const wrapper = mount(MarkdownRenderer, {
-      props: { content: '# Unsafe', allowHtml: true },
+      props: { content: '# Safe', trustedHtmlFactory },
     })
     await flushRenderer()
 
-    const heading = wrapper.find('h1')
-    expect(heading.text()).toBe('Safe heading')
-    expect(heading.attributes('data-markdown-heading')).toBe('safe-heading')
-    expect(wrapper.find('script').exists()).toBe(false)
-    expect(wrapper.find('img').attributes('onerror')).toBeUndefined()
-    expect(wrapper.find('a').attributes('href')).toBeUndefined()
-    expect(wrapper.find('p').attributes('style')).toBeUndefined()
-    expect(wrapper.html()).not.toContain('javascript:')
-    expect(wrapper.html()).not.toContain('onerror')
+    expect(wrapper.find('h1').text()).toBe('Safe heading & text')
+    expect(trustedHtmlFactory).toHaveBeenCalledWith(html)
     expect(wrapper.emitted('render-complete')?.[0]?.[0]).toEqual(
-      expect.objectContaining({
-        html: expect.not.stringContaining('javascript:'),
+      expect.objectContaining({ html }),
+    )
+  })
+
+  test('uses only an initial render with matching source identity and version', () => {
+    const source = '# Prefill'
+    const initialRender = makeResult(source, '<h1>Prefill</h1>')
+    const wrapper = mount(MarkdownRenderer, {
+      props: { content: source, initialRender },
+    })
+
+    expect(wrapper.html()).toContain('<h1>Prefill</h1>')
+  })
+
+  test('keeps canonical initial render fields unchanged during SSR', async () => {
+    const source = '# Canonical SSR'
+    const initialRender = makeResult(source, '<h1>Canonical SSR</h1>')
+    const html = await renderToString(
+      createSSRApp({
+        render: () => h(MarkdownRenderer, { content: source, initialRender }),
       }),
     )
+
+    expect(html).toContain('<h1>Canonical SSR</h1>')
+    expect(initialRender.normalizedSource).toBe(source)
+    expect(initialRender.sourceIdentity).toBe(
+      resolveMarkdownSourceIdentity({ source }),
+    )
+    expect(initialRender.rendererVersion).toBe(MARKDOWN_RENDERER_VERSION)
   })
 
-  test('sanitizes initial html before the async render path settles', () => {
-    const wrapper = mount(MarkdownRenderer, {
+  test('discards stale or forged initial render authority', async () => {
+    const stale = mount(MarkdownRenderer, {
       props: {
-        initialHtml:
-          '<p>prefill</p><img src="x" onerror="alert(1)"><script>alert(1)</script>',
+        content: '# Current',
+        initialRender: makeResult(
+          '# Stale',
+          '<img src="x" onerror="alert(1)">',
+        ),
       },
     })
-
-    expect(wrapper.html()).toContain('<p>prefill</p>')
-    expect(wrapper.find('script').exists()).toBe(false)
-    expect(wrapper.find('img').attributes('onerror')).toBeUndefined()
-  })
-
-  test('allows trusted callers to opt out of markdown html sanitizing', async () => {
-    const unsafeHtml =
-      '<img src="x" onerror="alert(1)"><script>alert("trusted")</script>'
-
-    renderMarkdownHtml.mockResolvedValue(fsusOk(makeHtmlResult(unsafeHtml)))
-    renderMarkdownResult.mockResolvedValue(
-      fsusOk(makeResult('trusted', unsafeHtml)),
+    const source = '# Current'
+    const forged = {
+      ...makeResult(source, '<h1>Trusted source</h1>'),
+      html: safeHtml('<img src="x" onerror="alert(1)">'),
+    }
+    const forgedWrapper = mount(MarkdownRenderer, {
+      props: { content: source, initialRender: forged },
+    })
+    const staleSsr = await renderToString(
+      createSSRApp({
+        render: () =>
+          h(MarkdownRenderer, {
+            content: '# Current',
+            initialRender: makeResult(
+              '# Stale',
+              '<img src="x" onerror="alert(1)">',
+            ),
+          }),
+      }),
     )
 
-    const wrapper = mount(MarkdownRenderer, {
-      props: {
-        content: 'trusted',
-        allowHtml: true,
-        sanitizeHtml: false,
-      },
-    })
-    await flushRenderer()
-
-    expect(wrapper.find('img').attributes('onerror')).toBe('alert(1)')
-    expect(wrapper.find('script').exists()).toBe(true)
-    expect(wrapper.html()).toContain('trusted')
+    expect(stale.find('img').exists()).toBe(false)
+    expect(forgedWrapper.find('img').exists()).toBe(false)
+    expect(staleSsr).not.toContain('<img')
   })
 
   test('emits placeholders from the raw html contract', async () => {
@@ -385,7 +518,14 @@ describe('MarkdownRenderer.vue', () => {
     ].join('')
     renderMarkdownHtml.mockResolvedValue(fsusOk(makeHtmlResult(html)))
     renderMarkdownResult.mockResolvedValue(
-      fsusOk(makeResult('activation', html)),
+      fsusOk(
+        makeResult('activation', html, {
+          sourceIdentity: resolveMarkdownSourceIdentity({
+            source: 'activation',
+            baseUrl: 'https://fsus.local/docs',
+          }),
+        }),
+      ),
     )
 
     const wrapper = mount(MarkdownRenderer, {
@@ -393,7 +533,6 @@ describe('MarkdownRenderer.vue', () => {
         baseUrl: 'https://fsus.local/docs',
         content: 'activation',
         cspNonce: 'nonce-1',
-        sanitizeHtml: false,
       },
     })
     await flushRenderer()
@@ -463,7 +602,6 @@ describe('MarkdownRenderer.vue', () => {
         content: 'adapters',
         latexAdapter: null,
         mermaidAdapter: null,
-        sanitizeHtml: false,
       },
     })
     await flushRenderer()
@@ -492,7 +630,6 @@ describe('MarkdownRenderer.vue', () => {
       props: {
         content: 'adapters',
         mermaidAdapter: customMermaidAdapter,
-        sanitizeHtml: false,
       },
     })
     await flushRenderer()
@@ -522,7 +659,6 @@ describe('MarkdownRenderer.vue', () => {
         features: {
           mermaid: false,
         },
-        sanitizeHtml: false,
       },
     })
     await flushRenderer()
@@ -609,7 +745,10 @@ describe('MarkdownRenderer.vue', () => {
       attachTo: scroller,
       props: {
         content: source,
-        initialHtml: '<p data-anchor="stable">Anchor</p><p>Before</p>',
+        initialRender: makeResult(
+          source,
+          '<p data-anchor="stable">Anchor</p><p>Before</p>',
+        ),
       },
     })
 
@@ -674,17 +813,18 @@ describe('MarkdownRenderer.vue', () => {
     expect(wrapper.emitted('render-complete')?.[0]?.[0]).toEqual(result)
   })
 
-  test('sanitizes chunked markdown units and emitted chunk results', async () => {
-    const source = `${'# Unsafe large\n\n'}${'Paragraph\n\n'.repeat(1_600)}`
-    const result = makeChunkResult(source, '<h1>Chunked</h1>', {
+  test('commits only branded chunk html and preserves the runtime result', async () => {
+    const source = `${'# Safe large\n\n'}${'Paragraph\n\n'.repeat(1_600)}`
+    const html = '<h1>Chunked</h1><p>Safe body</p>'
+    const result = makeChunkResult(source, html, {
       chunks: [
         {
-          key: 'md-unsafe-0',
-          kind: 'paragraph',
-          html: '<img src="x" onerror="alert(1)"><a href="javascript:alert(1)">bad</a>',
+          key: 'md-safe-0',
+          kind: 'heading',
+          html: safeHtml(html),
           estimatedSize: 48,
           htmlStartOffset: 0,
-          htmlEndOffset: 84,
+          htmlEndOffset: html.length,
         },
       ],
     })
@@ -692,22 +832,13 @@ describe('MarkdownRenderer.vue', () => {
 
     const wrapper = mount(MarkdownRenderer, {
       ...forcedChunkedPipeline,
-      props: { content: source, allowHtml: true },
+      props: { content: source },
     })
     await flushRenderer()
 
-    expect(wrapper.find('img').attributes('onerror')).toBeUndefined()
-    expect(wrapper.find('a').attributes('href')).toBeUndefined()
-    expect(wrapper.html()).not.toContain('javascript:')
-    expect(wrapper.emitted('render-complete')?.[0]?.[0]).toEqual(
-      expect.objectContaining({
-        chunks: [
-          expect.objectContaining({
-            html: expect.not.stringContaining('javascript:'),
-          }),
-        ],
-      }),
-    )
+    expect(wrapper.find('h1').text()).toBe('Chunked')
+    expect(wrapper.find('p').text()).toBe('Safe body')
+    expect(wrapper.emitted('render-complete')?.[0]?.[0]).toBe(result)
   })
 
   test('commits the first readable chunks before staging the remaining document', async () => {
@@ -750,76 +881,314 @@ describe('MarkdownRenderer.vue', () => {
     expect(wrapper.emitted('render-complete')?.[0]?.[0]).toEqual(result)
   })
 
-  test('reuses cached chunk results for matching markdown fingerprints', async () => {
-    const source = `${'# Cached large\n\n'}${'Cached paragraph\n\n'.repeat(1_600)}`
-    const result = makeChunkResult(source, '<h1>Cached</h1><p>Chunk body</p>')
-    renderMarkdownChunks.mockResolvedValue(fsusOk(result))
+  test('accepts one response only from the exact pending markdown worker', async () => {
+    vi.stubGlobal('Worker', MarkdownWorkerHarness)
+    const source = `${'# Worker\n\n'}${'Paragraph\n\n'.repeat(1_600)}`
+    const wrapper = mount(MarkdownRenderer, {
+      ...workerChunkedPipeline,
+      props: { content: source },
+    })
+    await vi.advanceTimersByTimeAsync(250)
+    await flushPromises()
 
-    const first = mount(MarkdownRenderer, {
-      ...forcedChunkedPipeline,
+    const worker = MarkdownWorkerHarness.instances[0]!
+    const post = worker.posts.find((message) => message.type === 'run')!
+    const result = structuredClone(
+      makeWorkerChunkResult(source),
+    ) as MarkdownRuntimeChunkResult
+    const attacker = new MarkdownWorkerHarness()
+    attacker.respond({
+      generation: post.generation,
+      id: post.id,
+      result: { metadata: result, units: result.chunks },
+      status: 'complete',
+    })
+    expect(wrapper.emitted('render-complete')).toBeUndefined()
+
+    worker.respond({
+      generation: post.generation,
+      id: post.id,
+      result: { metadata: result, units: result.chunks },
+      status: 'complete',
+    })
+    await flushRenderer()
+    expect(wrapper.find('h1').text()).toBe('Chunked')
+    expect(wrapper.emitted('render-complete')).toHaveLength(1)
+
+    const replay = structuredClone(result)
+    const forgedHtml = safeHtml('<svg onload="alert(1)"></svg>')
+    Reflect.set(replay, 'html', forgedHtml)
+    Reflect.set(replay, 'chunks', [
+      {
+        key: 'forged',
+        kind: 'generated',
+        html: forgedHtml,
+        estimatedSize: 48,
+        htmlStartOffset: 0,
+        htmlEndOffset: forgedHtml.length,
+      },
+    ])
+    worker.respond({
+      generation: post.generation,
+      id: post.id,
+      result: { metadata: replay, units: replay.chunks },
+      status: 'complete',
+    })
+    await flushPromises()
+    expect(wrapper.find('svg').exists()).toBe(false)
+    expect(wrapper.emitted('render-complete')).toHaveLength(1)
+  })
+
+  test('keeps one canonical result aligned across sync, worker, and SSR paths', async () => {
+    vi.stubGlobal('Worker', MarkdownWorkerHarness)
+    const source = `${'# Canonical\n\n'}${'Paragraph\n\n'.repeat(1_600)}`
+    const canonical = makeWorkerChunkResult(source)
+    renderMarkdownResult.mockResolvedValue(fsusOk(canonical))
+
+    const sync = mount(MarkdownRenderer, {
+      ...forcedSyncPipeline,
       props: { content: source },
     })
     await flushRenderer()
-    first.unmount()
-
-    const second = mount(MarkdownRenderer, {
-      ...forcedChunkedPipeline,
+    const worker = mount(MarkdownRenderer, {
+      ...workerChunkedPipeline,
       props: { content: source },
     })
-    await flushRenderer()
-
-    expect(renderMarkdownChunks).toHaveBeenCalledTimes(1)
-    expect(second.emitted('render-complete')?.[0]?.[0]).toEqual(result)
-  })
-
-  test('does not cache oversized markdown chunk results', () => {
-    const hugeHtml = 'x'.repeat(3 * 1024 * 1024 + 1)
-    const result = makeChunkResult('huge cached large', hugeHtml, {
-      chunks: [
-        {
-          key: 'md-huge-0',
-          kind: 'paragraph',
-          html: '<p>Huge paragraph</p>',
-          estimatedSize: 48,
-          htmlStartOffset: 0,
-          htmlEndOffset: 21,
-        },
-      ],
+    await vi.advanceTimersByTimeAsync(250)
+    await flushPromises()
+    const workerInstance = MarkdownWorkerHarness.instances[0]!
+    const post = workerInstance.posts.find((message) => message.type === 'run')!
+    const cloned = structuredClone(canonical) as MarkdownRuntimeChunkResult
+    workerInstance.respond({
+      generation: post.generation,
+      id: post.id,
+      result: { metadata: cloned, units: cloned.chunks },
+      status: 'complete',
     })
-
-    setMarkdownRendererRuntimeCache('chunks', 'oversized', result)
-
-    expect(
-      getMarkdownRendererRuntimeCache<MarkdownRuntimeChunkResult>(
-        'chunks',
-        'oversized',
-      ),
-    ).toBeNull()
-  })
-
-  test('keeps one canonical chunk payload when weaker cache views are written', () => {
-    const html = `<h1>Canonical</h1>${'<p>Body</p>'.repeat(100)}`
-    const result = makeChunkResult('canonical source', html)
-
-    setMarkdownRendererRuntimeCache('chunks', 'canonical', result)
-    setMarkdownRendererRuntimeCache(
-      'html',
-      'canonical',
-      makeHtmlResult('<p>weaker duplicate</p>'.repeat(100)),
+    await flushRenderer()
+    const ssr = await renderToString(
+      createSSRApp({
+        render: () =>
+          h(MarkdownRenderer, { content: source, initialRender: canonical }),
+      }),
     )
 
-    expect(
-      getMarkdownRendererRuntimeCache<MarkdownRuntimeChunkResult>(
-        'chunks',
-        'canonical',
-      ),
-    ).toBe(result)
-    expect(
-      getMarkdownRendererRuntimeCache<MarkdownRuntimeHtmlResult>(
-        'html',
-        'canonical',
-      )?.html,
-    ).toBe(html)
+    const syncResult = sync.emitted('render-complete')?.at(-1)?.[0]
+    const workerResult = worker.emitted('render-complete')?.at(-1)?.[0]
+    for (const field of [
+      'html',
+      'normalizedSource',
+      'sourceIdentity',
+      'rendererVersion',
+    ] as const) {
+      expect(syncResult?.[field]).toBe(canonical[field])
+      expect(workerResult?.[field]).toBe(canonical[field])
+    }
+    expect(ssr).toContain(canonical.html)
+  })
+
+  test.each([
+    ['missing generation', (post: MarkdownWorkerPost) => ({ id: post.id })],
+    [
+      'wrong generation',
+      (post: MarkdownWorkerPost) => ({
+        generation: (post.generation ?? 0) + 1,
+        id: post.id,
+      }),
+    ],
+    [
+      'wrong id',
+      (post: MarkdownWorkerPost) => ({
+        generation: post.generation,
+        id: post.id + 1,
+      }),
+    ],
+  ])('does not commit a worker response with %s', async (_label, envelope) => {
+    vi.stubGlobal('Worker', MarkdownWorkerHarness)
+    const source = `${'# Invalid envelope\n\n'}${'Paragraph\n\n'.repeat(1_600)}`
+    const wrapper = mount(MarkdownRenderer, {
+      ...workerChunkedPipeline,
+      props: { content: source },
+    })
+    await vi.advanceTimersByTimeAsync(250)
+    await flushPromises()
+
+    const worker = MarkdownWorkerHarness.instances[0]!
+    const post = worker.posts.find((message) => message.type === 'run')!
+    const result = structuredClone(
+      makeWorkerChunkResult(source),
+    ) as MarkdownRuntimeChunkResult
+    worker.respond({
+      ...envelope(post),
+      result: { metadata: result, units: result.chunks },
+      status: 'complete',
+    })
+
+    expect(wrapper.find('h1').exists()).toBe(false)
+    expect(wrapper.emitted('render-complete')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  test('routes a generation-bound Markdown worker error to render-error', async () => {
+    vi.stubGlobal('Worker', MarkdownWorkerHarness)
+    const source = `${'# Worker error\n\n'}${'Paragraph\n\n'.repeat(1_600)}`
+    const wrapper = mount(MarkdownRenderer, {
+      ...workerChunkedPipeline,
+      props: { content: source },
+    })
+    await vi.advanceTimersByTimeAsync(250)
+    await flushPromises()
+
+    const worker = MarkdownWorkerHarness.instances[0]!
+    const post = worker.posts.find((message) => message.type === 'run')!
+    worker.respond({
+      error: {
+        code: 'markdown_parse_failed',
+        message: 'invalid markdown',
+        name: 'MarkdownRuntimeError',
+      },
+      generation: post.generation,
+      id: post.id,
+    })
+    await flushRenderer()
+
+    expect(wrapper.emitted('render-error')).toHaveLength(1)
+    expect(wrapper.html()).toContain('Markdown 渲染失败')
+    expect(wrapper.attributes('data-fsus-render-strategy')).not.toBe(
+      'chunked-worker',
+    )
+  })
+
+  test.each(['cancel', 'terminate'] as const)(
+    'invalidates a pending worker before a late reply after %s',
+    async (action) => {
+      vi.stubGlobal('Worker', MarkdownWorkerHarness)
+      const source = `${'# Late worker\n\n'}${'Paragraph\n\n'.repeat(1_600)}`
+      const wrapper = mount(MarkdownRenderer, {
+        ...workerChunkedPipeline,
+        props: { content: source },
+      })
+      await vi.advanceTimersByTimeAsync(250)
+      await flushPromises()
+
+      const worker = MarkdownWorkerHarness.instances[0]!
+      const post = worker.posts.find((message) => message.type === 'run')!
+      if (action === 'cancel') {
+        await wrapper.setProps({ content: `${source}\nReplacement` })
+        await vi.advanceTimersByTimeAsync(250)
+        await flushPromises()
+        expect(worker.posts).toContainEqual(
+          expect.objectContaining({ id: post.id, type: 'cancel' }),
+        )
+      } else {
+        worker.onerror?.({
+          error: new Error('worker terminated'),
+          message: 'worker terminated',
+          preventDefault: vi.fn(),
+        } as unknown as ErrorEvent)
+        expect(worker.terminated).toBe(true)
+      }
+      const result = structuredClone(
+        makeWorkerChunkResult(source),
+      ) as MarkdownRuntimeChunkResult
+      worker.respond({
+        generation: post.generation,
+        id: post.id,
+        result: { metadata: result, units: result.chunks },
+        status: 'complete',
+      })
+      expect(wrapper.find('h1').exists()).toBe(false)
+      expect(wrapper.emitted('render-complete')).toBeUndefined()
+      wrapper.unmount()
+    },
+  )
+
+  test.each([
+    [
+      'missing chunk',
+      (result: MarkdownRuntimeChunkResult) => {
+        Reflect.set(result, 'chunks', [])
+      },
+    ],
+    [
+      'reordered chunk',
+      (result: MarkdownRuntimeChunkResult) => {
+        Reflect.set(result, 'chunks', [...result.chunks].reverse())
+      },
+    ],
+    [
+      'duplicate chunk',
+      (result: MarkdownRuntimeChunkResult) => {
+        Reflect.set(result, 'chunks', [result.chunks[0]!, result.chunks[0]!])
+      },
+    ],
+    [
+      'gap offset',
+      (result: MarkdownRuntimeChunkResult) => {
+        Reflect.set(result.chunks[0]!, 'htmlStartOffset', 1)
+      },
+    ],
+    [
+      'wrong html',
+      (result: MarkdownRuntimeChunkResult) => {
+        Reflect.set(result, 'html', safeHtml('<svg onload="alert(1)"></svg>'))
+      },
+    ],
+    [
+      'wrong source',
+      (result: MarkdownRuntimeChunkResult) => {
+        Reflect.set(result, 'normalizedSource', '# Wrong')
+      },
+    ],
+    [
+      'wrong version',
+      (result: MarkdownRuntimeChunkResult) => {
+        Reflect.set(result, 'rendererVersion', 'markdown-wasm-contract@wrong')
+      },
+    ],
+    [
+      'wrong identity',
+      (result: MarkdownRuntimeChunkResult) => {
+        Reflect.set(result, 'sourceIdentity', 'markdown:forged')
+      },
+    ],
+    [
+      'wrong metadata',
+      (result: MarkdownRuntimeChunkResult) => {
+        Reflect.set(result.metadata!, 'sourceLength', 0)
+      },
+    ],
+  ])('rejects worker response with %s', async (_label, mutate) => {
+    vi.stubGlobal('Worker', MarkdownWorkerHarness)
+    const source = `${'# Invalid worker\n\n'}${'Paragraph\n\n'.repeat(1_600)}`
+    renderMarkdownChunks.mockResolvedValue(
+      fsusOk(makeWorkerChunkResult(source)),
+    )
+    const wrapper = mount(MarkdownRenderer, {
+      ...workerChunkedPipeline,
+      props: { content: source },
+    })
+    await vi.advanceTimersByTimeAsync(250)
+    await flushPromises()
+
+    const worker = MarkdownWorkerHarness.instances[0]!
+    const post = worker.posts.find((message) => message.type === 'run')!
+    const forged = structuredClone(
+      makeWorkerChunkResult(source),
+    ) as MarkdownRuntimeChunkResult
+    mutate(forged)
+    worker.respond({
+      generation: post.generation,
+      id: post.id,
+      result: { metadata: forged, units: forged.chunks },
+      status: 'complete',
+    })
+    await flushRenderer()
+
+    expect(wrapper.find('svg').exists()).toBe(false)
+    expect(wrapper.html()).not.toContain('onload')
+    expect(wrapper.attributes('data-fsus-render-strategy')).toBe('sync')
+    expect(wrapper.emitted('render-error')).toHaveLength(1)
   })
 
   test('uses a safe fallback and emits render-error when runtime fails', async () => {

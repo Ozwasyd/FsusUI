@@ -3,14 +3,19 @@ import { resolveMarkdownAsset, type MarkdownAssetKind } from './runtime/assets'
 import { decodeUtf8, encodeUtf8 } from './runtime/utf8'
 import {
   MARKDOWN_RENDERER_VERSION,
-  buildMarkdownRenderResult,
+  detectMarkdownFeatures,
+  detectMarkdownPlaceholders,
+  escapeMarkdownHtml,
   normalizeMarkdownSource,
+  resolveMarkdownSourceIdentity,
   type MarkdownRenderChunk,
   type MarkdownRenderFeature,
   type MarkdownRenderMetadata,
   type MarkdownRenderPlaceholder,
   type MarkdownRenderRequest,
-  type MarkdownRenderResult,
+  type MarkdownSafeHtml,
+  type MarkdownSafeRenderAuthority,
+  type MarkdownSafeRenderResult,
   type MarkdownRenderTimings,
 } from './markdown'
 import type {
@@ -97,29 +102,80 @@ export type MarkdownRuntimeProfilePhase =
   | 'summary'
   | 'full-result'
   | 'chunks'
-export type MarkdownRuntimeRenderResult = MarkdownRenderResult & {
-  engine: MarkdownRuntimeKind
-  timings: MarkdownRenderTimings
+export type MarkdownRuntimeRenderResult = MarkdownSafeRenderResult & {
+  readonly engine: MarkdownRuntimeKind
+  readonly timings: MarkdownRenderTimings
 }
 
-export interface MarkdownRuntimeHtmlResult {
-  html: string
-  engine: MarkdownRuntimeKind
-  rendererVersion: string
-  timings: MarkdownRenderTimings
+export interface MarkdownRuntimeHtmlResult extends MarkdownSafeRenderAuthority {
+  readonly html: MarkdownSafeHtml
+  readonly normalizedSource: string
+  readonly sourceIdentity: string
+  readonly engine: MarkdownRuntimeKind
+  readonly rendererVersion: string
+  readonly timings: MarkdownRenderTimings
 }
 
-export interface MarkdownRuntimeSummaryResult {
-  html: string
-  engine: MarkdownRuntimeKind
-  features: readonly MarkdownRenderFeature[]
-  metadata: MarkdownRenderMetadata
-  rendererVersion: string
-  timings: MarkdownRenderTimings
+export interface MarkdownRuntimeSummaryResult extends MarkdownSafeRenderAuthority {
+  readonly html: MarkdownSafeHtml
+  readonly normalizedSource: string
+  readonly sourceIdentity: string
+  readonly engine: MarkdownRuntimeKind
+  readonly features: readonly MarkdownRenderFeature[]
+  readonly metadata: MarkdownRenderMetadata
+  readonly rendererVersion: string
+  readonly timings: MarkdownRenderTimings
 }
 
 export type MarkdownRuntimeChunkResult = MarkdownRuntimeRenderResult & {
-  chunks: readonly MarkdownRenderChunk[]
+  readonly chunks: readonly MarkdownRenderChunk[]
+}
+
+const markdownRuntimeAuthority = new WeakSet<object>()
+
+const deepSealMarkdownRuntimeValue = <T>(value: T): T => {
+  if (Object(value) !== value || Object.isFrozen(value)) {
+    return value
+  }
+  Object.values(value as Record<string, unknown>).forEach(
+    deepSealMarkdownRuntimeValue,
+  )
+  return Object.freeze(value)
+}
+
+const authorizeMarkdownRuntimeResult = <TResult extends object>(
+  result: TResult,
+): TResult & MarkdownSafeRenderAuthority => {
+  deepSealMarkdownRuntimeValue(result)
+  markdownRuntimeAuthority.add(result)
+  return result as TResult & MarkdownSafeRenderAuthority
+}
+
+export const isMarkdownRuntimeAuthorizedResult = (
+  result: unknown,
+): result is
+  | MarkdownRuntimeChunkResult
+  | MarkdownRuntimeHtmlResult
+  | MarkdownRuntimeRenderResult
+  | MarkdownRuntimeSummaryResult
+  | MarkdownSafeRenderResult =>
+  Object(result) === result &&
+  Object.isFrozen(result) &&
+  markdownRuntimeAuthority.has(result as object)
+
+export const renderMarkdownFallbackWithRuntime = (
+  request: MarkdownRenderRequest | string,
+): MarkdownSafeRenderResult => {
+  const payload = typeof request === 'string' ? { source: request } : request
+  const normalizedSource = normalizeMarkdownSource(payload.source)
+  return authorizeMarkdownRuntimeResult({
+    html: `<div class="markdown-renderer__error"><p>Markdown 渲染失败，已回退为安全文本。</p><pre><code>${escapeMarkdownHtml(payload.source)}</code></pre></div>` as MarkdownSafeHtml,
+    normalizedSource,
+    sourceIdentity: resolveMarkdownSourceIdentity(payload),
+    features: detectMarkdownFeatures(normalizedSource),
+    placeholders: detectMarkdownPlaceholders(normalizedSource),
+    rendererVersion: MARKDOWN_RENDERER_VERSION,
+  })
 }
 
 export interface MarkdownRuntimeProfile {
@@ -1261,17 +1317,17 @@ type MarkdownModule = {
   _markdown_render?: (
     ptr: number,
     len: number,
-    allowHtml: number,
     allowLatex: number,
     allowMermaid: number,
+    argumentCount: number,
   ) => number
   _markdown_render_profile?: (
     ptr: number,
     len: number,
-    allowHtml: number,
     allowLatex: number,
     allowMermaid: number,
     payloadMode: number,
+    argumentCount: number,
   ) => number
   _markdown_get_last_html_ptr?: () => number
   _markdown_get_last_html_len?: () => number
@@ -1382,19 +1438,19 @@ async function initMarkdownRuntimeModule(): Promise<{
           (
             ptr: number,
             len: number,
-            allowHtml: number,
             allowLatex: number,
             allowMermaid: number,
+            argumentCount: number,
           ) => number
         >(raw, 'markdown_render', 'render_markdown'),
         _markdown_render_profile: pickExport<
           (
             ptr: number,
             len: number,
-            allowHtml: number,
             allowLatex: number,
             allowMermaid: number,
             payloadMode: number,
+            argumentCount: number,
           ) => number
         >(raw, 'markdown_render_profile'),
         _markdown_get_last_html_ptr: pickExport<() => number>(
@@ -1702,7 +1758,11 @@ const now = () => {
 
 const roundMs = (value: number) => Math.round(value * 100) / 100
 
-const createTimings = (): MarkdownRenderTimings => ({
+type MutableMarkdownRenderTimings = {
+  -readonly [TKey in keyof MarkdownRenderTimings]: MarkdownRenderTimings[TKey]
+}
+
+const createTimings = (): MutableMarkdownRenderTimings => ({
   initMs: 0,
   encodeMs: 0,
   wasmRenderMs: 0,
@@ -1713,7 +1773,10 @@ const createTimings = (): MarkdownRenderTimings => ({
   totalMs: 0,
 })
 
-const finalizeTimings = (timings: MarkdownRenderTimings, startedAt: number) => {
+const finalizeTimings = (
+  timings: MutableMarkdownRenderTimings,
+  startedAt: number,
+): MarkdownRenderTimings => {
   timings.totalMs = roundMs(now() - startedAt)
   timings.initMs = roundMs(timings.initMs)
   timings.encodeMs = roundMs(timings.encodeMs)
@@ -1743,7 +1806,6 @@ const buildDefaultMetadata = (
 ): MarkdownRenderMetadata => ({
   mode: payload.mode ?? 'article',
   baseUrl: payload.baseUrl ?? null,
-  allowHtml: !!payload.allowHtml,
   allowLatex: payload.allowLatex !== false,
   allowMermaid: payload.allowMermaid !== false,
   sourceLength: source.length,
@@ -1834,17 +1896,17 @@ async function renderMarkdownPayloadWithRuntime(
         ? module._markdown_render_profile(
             ptr,
             bytes.byteLength,
-            payload.allowHtml ? 1 : 0,
             payload.allowLatex === false ? 0 : 1,
             payload.allowMermaid === false ? 0 : 1,
             payloadModeToWasmMode(payloadMode),
+            5,
           )
         : module._markdown_render?.(
             ptr,
             bytes.byteLength,
-            payload.allowHtml ? 1 : 0,
             payload.allowLatex === false ? 0 : 1,
             payload.allowMermaid === false ? 0 : 1,
+            4,
           )
     timings.wasmRenderMs = now() - renderStartedAt
 
@@ -1874,16 +1936,18 @@ async function renderMarkdownPayloadWithRuntime(
     timings.readMetadataMs = now() - metadataStartedAt
 
     if (payloadMode === 'html-only') {
-      return {
-        html,
+      return authorizeMarkdownRuntimeResult({
+        html: html as MarkdownSafeHtml,
+        normalizedSource: source,
+        sourceIdentity: resolveMarkdownSourceIdentity(payload),
         engine,
         rendererVersion,
         timings: finalizeTimings(timings, startedAt),
-      }
+      })
     }
 
     const featuresStartedAt = now()
-    const features = readStructured<MarkdownRenderResult['features']>(
+    const features = readStructured<MarkdownSafeRenderResult['features']>(
       memory,
       getFeaturesPtr(),
       getFeaturesLen(),
@@ -1901,14 +1965,16 @@ async function renderMarkdownPayloadWithRuntime(
     timings.readMetadataMs += now() - metadataReadStartedAt
 
     if (payloadMode === 'summary') {
-      return {
-        html,
+      return authorizeMarkdownRuntimeResult({
+        html: html as MarkdownSafeHtml,
+        normalizedSource: source,
+        sourceIdentity: resolveMarkdownSourceIdentity(payload),
         engine,
         features,
         metadata,
         rendererVersion,
         timings: finalizeTimings(timings, startedAt),
-      }
+      })
     }
 
     const placeholdersStartedAt = now()
@@ -1920,6 +1986,15 @@ async function renderMarkdownPayloadWithRuntime(
     )
     timings.readPlaceholdersMs = now() - placeholdersStartedAt
 
+    const safeResult = {
+      html: html as MarkdownSafeHtml,
+      normalizedSource: source,
+      sourceIdentity: resolveMarkdownSourceIdentity(payload),
+      features,
+      placeholders,
+      rendererVersion,
+      metadata,
+    }
     if (payloadMode === 'chunks') {
       const chunks = readStructured<MarkdownRenderChunk[]>(
         memory,
@@ -1927,33 +2002,19 @@ async function renderMarkdownPayloadWithRuntime(
         getChunksLen(),
         [],
       )
-      return {
-        ...buildMarkdownRenderResult({
-          html,
-          source,
-          features,
-          placeholders,
-          rendererVersion,
-          metadata,
-        }),
+      return authorizeMarkdownRuntimeResult({
+        ...safeResult,
         chunks,
         engine,
         timings: finalizeTimings(timings, startedAt),
-      }
+      })
     }
 
-    return {
-      ...buildMarkdownRenderResult({
-        html,
-        source,
-        features,
-        placeholders,
-        rendererVersion,
-        metadata,
-      }),
+    return authorizeMarkdownRuntimeResult({
+      ...safeResult,
       engine,
       timings: finalizeTimings(timings, startedAt),
-    }
+    })
   } finally {
     free(ptr)
   }
@@ -2001,7 +2062,7 @@ export async function renderMarkdownSummaryWithRuntime(
 
 export async function renderMarkdownWithRuntime(
   request: MarkdownRenderRequest | string,
-): Promise<FsusResult<string>> {
+): Promise<FsusResult<MarkdownSafeHtml>> {
   const result = await renderMarkdownHtmlWithRuntime(request)
   return isFsusErr(result) ? fsusErr(result.error) : fsusOk(result.value.html)
 }

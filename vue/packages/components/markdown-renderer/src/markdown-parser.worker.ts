@@ -51,7 +51,6 @@ const requestKey = (request: MarkdownRenderRequest) =>
     request.source.length,
     request.baseUrl ?? '',
     request.mode ?? 'article',
-    request.allowHtml ? 1 : 0,
     request.allowLatex === false ? 0 : 1,
     request.allowMermaid === false ? 0 : 1,
   ].join('\u0000')

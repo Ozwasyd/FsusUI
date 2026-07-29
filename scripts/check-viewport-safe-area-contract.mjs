@@ -446,20 +446,52 @@ export function findSafeAreaVisualMatrixViolations(options = {}) {
     )
   }
 
-  for (const surface of [
-    'overlay',
-    'dialog',
-    'dialog-fullscreen',
-    'message-box',
-    'drawer-ltr',
-    'drawer-rtl',
-    'drawer-ttb',
-    'drawer-btt',
-    'image-viewer',
-  ]) {
-    if (!fixtureSource.includes(`data-safe-area-open="${surface}"`)) {
+  const safeAreaOpenBindings = [
+    ['openOverlay', 'overlay'],
+    ['openDialog', 'dialog'],
+    ['openDialogFullscreen', 'dialog-fullscreen'],
+    ['openMessageBox', 'message-box'],
+    ['openDrawerLtr', 'drawer-ltr'],
+    ['openDrawerRtl', 'drawer-rtl'],
+    ['openDrawerTtb', 'drawer-ttb'],
+    ['openDrawerBtt', 'drawer-btt'],
+    ['openImageViewer', 'image-viewer'],
+  ]
+  const fixtureWithoutComments = stripComments(fixtureSource)
+  const scriptStart = fixtureWithoutComments.indexOf('<script')
+  const fixtureTemplateSource =
+    scriptStart >= 0
+      ? fixtureWithoutComments.slice(0, scriptStart)
+      : fixtureWithoutComments
+  const attributeBagStart = fixtureWithoutComments.indexOf(
+    'const safeAreaDataAttributes = {',
+  )
+  const attributeBagEnd = fixtureWithoutComments.indexOf(
+    '} satisfies Record<string, Record<`data-${string}`, string>>',
+    attributeBagStart,
+  )
+  const attributeBagSource =
+    attributeBagStart >= 0 && attributeBagEnd > attributeBagStart
+      ? fixtureWithoutComments.slice(attributeBagStart, attributeBagEnd + 1)
+      : ''
+
+  for (const [owner, surface] of safeAreaOpenBindings) {
+    const mappingPattern = new RegExp(
+      String.raw`\b${owner}\s*:\s*\{\s*['"]data-safe-area-open['"]\s*:\s*['"]${surface}['"]\s*\}`,
+      'gu',
+    )
+    const ownerBindingPattern = new RegExp(
+      String.raw`v-bind\s*=\s*["']safeAreaDataAttributes\.${owner}["']`,
+      'gu',
+    )
+    if ([...attributeBagSource.matchAll(mappingPattern)].length !== 1) {
       violations.push(
-        `AuditFixtures.vue missing stable safe-area open control for ${surface}`,
+        `AuditFixtures.vue safeAreaDataAttributes.${owner} must map exactly once to data-safe-area-open="${surface}"`,
+      )
+    }
+    if ([...fixtureTemplateSource.matchAll(ownerBindingPattern)].length !== 1) {
+      violations.push(
+        `AuditFixtures.vue must bind safeAreaDataAttributes.${owner} exactly once in the template for ${surface}`,
       )
     }
   }

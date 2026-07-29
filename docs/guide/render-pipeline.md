@@ -92,7 +92,7 @@ const unregisterPolicy = registerFsusRenderPipelineComponentPolicy({
 })
 ```
 
-Worker 消息协议由统一 executor 托管。run 请求为 `{ type: 'run', id, generation, key?, lane, request }`，取消为 `{ type: 'cancel', id, generation, key? }`；响应为 `{ id, status?: 'complete', result, timings? }`、`{ id, status: 'aborted' }` 或 `{ id, error }`。旧 adapter 继续调用 `run(request, signal)` 即可；需要调度能力时可传入 `{ signal, lane, key, generation, transfer }`。
+Worker 消息协议由统一 executor 托管。run 请求为 `{ type: 'run', id, generation, key?, lane, request }`，取消为 `{ type: 'cancel', id, generation, key? }`；响应为 `{ id, generation?, status?: 'complete', result, timings? }`、`{ id, generation?, status: 'aborted' }` 或 `{ id, generation?, error }`。旧 adapter 继续调用 `run(request, signal)` 即可；需要调度能力时可传入 `{ signal, lane, key, generation, transfer }`。`requireGenerationEcho` 默认关闭以兼容既有 producer；只有声明该能力的安全敏感 adapter 才要求 success、error 和 abort 都精确回显 generation，Markdown worker 即采用此模式。
 
 executor 是真正的有界 Worker pool：默认根据 `navigator.hardwareConcurrency - reservedCores` 和 `deviceMemory` 校准，并限制在 1–4 个 Worker，至少为主线程/渲染保留一个核心。`maxWorkers`、`reservedCores` 可覆盖上限，但仍受安全范围约束。`pool: 'shared'` 按 `poolKey` 在 runtime 间复用整个 pool；最后一个 listener 释放且无 pending 后，registry 条目和 Worker 会一起销毁。
 

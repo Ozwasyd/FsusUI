@@ -4,7 +4,7 @@ import { existsSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
 const root = process.cwd()
-const wasmDir = join(root, 'packages', 'wasm', 'dist')
+const wasmDir = join(root, 'vue', 'packages', 'wasm', 'dist')
 
 const artifacts = [
   'markdown_basic.js',

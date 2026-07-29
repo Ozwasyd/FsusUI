@@ -77,6 +77,10 @@ const runGenerateTypesDefinitions = async () => {
   const tasks = emitFiles.map(async (outputFile) => {
     const filepath = outputFile.filePath
     const relativePath = path.relative(outDir, filepath)
+    const declaration =
+      relativePath === path.join('packages', 'wasm.d.ts')
+        ? await readFile(wasmTypesEntry, 'utf8')
+        : outputFile.text
 
     consola.trace(
       chalk.yellow(
@@ -88,7 +92,7 @@ const runGenerateTypesDefinitions = async () => {
       recursive: true,
     })
 
-    await writeFile(filepath, pathRewriter('esm')(outputFile.text), 'utf8')
+    await writeFile(filepath, pathRewriter('esm')(declaration), 'utf8')
 
     consola.success(
       chalk.green(`Definition for file: ${chalk.bold(relativePath)} generated`),

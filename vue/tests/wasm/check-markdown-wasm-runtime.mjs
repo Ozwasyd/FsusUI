@@ -82,6 +82,7 @@ async function renderWithKind(kind) {
   const raw = module
 
   const render = pickExport(raw, 'markdown_render')
+  const renderProfile = pickExport(raw, 'markdown_render_profile')
   const getHtmlPtr = pickExport(raw, 'markdown_get_last_html_ptr')
   const getHtmlLen = pickExport(raw, 'markdown_get_last_html_len')
   const getFeaturesPtr = pickExport(raw, 'markdown_get_last_features_ptr')
@@ -111,6 +112,16 @@ async function renderWithKind(kind) {
     '# Markdown Wasm',
     '',
     'Paragraph with [link](https://example.com), `code`, **strong**, *emphasis*, ***combo***, inline math \\(x^2\\), and mermaid/latex placeholders.',
+    '',
+    '<script>alert(1)</script>',
+    '',
+    '<img src=x onerror=alert(1)>',
+    '',
+    '<details open>raw</details>',
+    '',
+    '<svg onload=alert(1)>x</svg>',
+    '',
+    '[javascript](javascript:evil) [vbscript](vbscript:evil) [protocol relative](//evil.example/path) [control split](java\u0001script:evil) [data](data:text/html,evil) [slash backslash](/\\\\evil.example) [backslash slash](\\\\/evil.example) [mixed http](http:/\\\\evil.example)',
     'Reference [link][docs], collapsed [docs][], autolink <https://example.com/auto>, ~~removed~~, and ``code ` tick``.',
     '',
     'Setext Heading',
@@ -169,7 +180,27 @@ async function renderWithKind(kind) {
 
   try {
     module.HEAPU8.set(bytes, ptr)
-    const ok = render(ptr, bytes.byteLength, 0, 1, 1)
+    const oldAbiOk = render(ptr, bytes.byteLength, 0, 1, 1)
+    assert(
+      oldAbiOk === 0,
+      `[markdown-wasm-runtime] legacy raw-html ABI unexpectedly accepted: ${kind}`,
+    )
+    const oldAbiError = readCString(
+      module,
+      pickExport(raw, 'markdown_get_last_error_ptr')(),
+      pickExport(raw, 'markdown_get_last_error_len')(),
+    )
+    assert(
+      oldAbiError === 'argument_count_invalid',
+      `[markdown-wasm-runtime] legacy ABI did not fail explicitly: ${kind}`,
+    )
+    const oldProfileAbiOk = renderProfile(ptr, bytes.byteLength, 0, 1, 1, 0)
+    assert(
+      oldProfileAbiOk === 0,
+      `[markdown-wasm-runtime] legacy profile ABI unexpectedly accepted: ${kind}`,
+    )
+
+    const ok = render(ptr, bytes.byteLength, 1, 1, 4)
     assert(ok === 1, `[markdown-wasm-runtime] render failed: ${kind}`)
 
     const html = readCString(module, getHtmlPtr(), getHtmlLen())
@@ -190,10 +221,48 @@ async function renderWithKind(kind) {
       html.includes('<h1>Markdown Wasm</h1>'),
       `[markdown-wasm-runtime] missing heading: ${kind}`,
     )
+    for (const [rawProbe, escapedProbe] of [
+      ['<script>alert(1)</script>', '&lt;script&gt;alert(1)&lt;/script&gt;'],
+      ['<img src=x onerror=alert(1)>', '&lt;img src=x onerror=alert(1)&gt;'],
+      [
+        '<details open>raw</details>',
+        '&lt;details open&gt;raw&lt;/details&gt;',
+      ],
+      [
+        '<svg onload=alert(1)>x</svg>',
+        '&lt;svg onload=alert(1)&gt;x&lt;/svg&gt;',
+      ],
+    ]) {
+      assert(
+        html.includes(escapedProbe),
+        `[markdown-wasm-runtime] raw HTML was not rendered as text (${rawProbe}): ${kind}`,
+      )
+      assert(
+        !html.includes(rawProbe),
+        `[markdown-wasm-runtime] raw HTML element reached output (${rawProbe}): ${kind}`,
+      )
+    }
     assert(
       html.includes('<a href="https://example.com"'),
       `[markdown-wasm-runtime] missing link: ${kind}`,
     )
+    for (const label of [
+      'javascript',
+      'vbscript',
+      'protocol relative',
+      'control split',
+      'data',
+      'slash backslash',
+      'backslash slash',
+      'mixed http',
+    ]) {
+      assert(
+        html.includes(
+          `<a href="#" rel="noopener noreferrer" target="_blank">${label}</a>`,
+        ),
+        `[markdown-wasm-runtime] unsafe URL did not fail closed (${label}): ${kind}`,
+      )
+    }
     assert(
       html.includes('<code>code</code>'),
       `[markdown-wasm-runtime] missing inline code: ${kind}`,
@@ -317,6 +386,10 @@ async function renderWithKind(kind) {
       `[markdown-wasm-runtime] missing metadata counts: ${kind}`,
     )
     assert(
+      !metadata.includes(['allow', 'Html'].join('')),
+      `[markdown-wasm-runtime] raw-html metadata leaked: ${kind}`,
+    )
+    assert(
       html.includes('<section class="footnotes"'),
       `[markdown-wasm-runtime] missing footnote section: ${kind}`,
     )
@@ -384,6 +457,27 @@ async function renderWithKind(kind) {
       !html.includes('::p'),
       `[markdown-wasm-runtime] leaked explicit paragraph marker: ${kind}`,
     )
+
+    for (const payloadMode of [0, 1, 2, 3]) {
+      const profileOk = renderProfile(
+        ptr,
+        bytes.byteLength,
+        1,
+        1,
+        payloadMode,
+        5,
+      )
+      assert(
+        profileOk === 1,
+        `[markdown-wasm-runtime] profile render failed mode=${payloadMode}: ${kind}`,
+      )
+      const profileHtml = readCString(module, getHtmlPtr(), getHtmlLen())
+      assert(
+        profileHtml.includes('&lt;script&gt;alert(1)&lt;/script&gt;') &&
+          !profileHtml.includes('<script>'),
+        `[markdown-wasm-runtime] raw HTML escaped contract failed mode=${payloadMode}: ${kind}`,
+      )
+    }
   } finally {
     free(ptr)
   }
@@ -413,7 +507,7 @@ async function renderNestedListWithKind(kind) {
     assert(ptr > 0, `[markdown-wasm-runtime] alloc failed: ${kind}`)
     try {
       module.HEAPU8.set(bytes, ptr)
-      const ok = render(ptr, bytes.byteLength, 0, 0, 0)
+      const ok = render(ptr, bytes.byteLength, 0, 0, 4)
       assert(ok === 1, `[markdown-wasm-runtime] render failed: ${kind}`)
       return readCString(module, getHtmlPtr(), getHtmlLen())
     } finally {

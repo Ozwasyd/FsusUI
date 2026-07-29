@@ -1,12 +1,18 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, expectTypeOf, it } from 'vitest'
 import MarkdownEditor from '../src/markdown-editor.vue'
 import {
   applyMarkdownEditorCommand,
   defaultMarkdownEditorCommands,
 } from '../src/markdown-editor'
+import type { MarkdownEditorProps } from '../src/markdown-editor'
 
 describe('MarkdownEditor', () => {
+  it('does not expose the removed raw HTML preview prop', () => {
+    const removedCapability = `allow${'Html'}` as const
+    expectTypeOf<MarkdownEditorProps>().not.toHaveProperty(removedCapability)
+  })
+
   it('applies built-in selection commands through public primitives', () => {
     const bold = defaultMarkdownEditorCommands.find(
       (item) => item.key === 'bold',
@@ -70,7 +76,9 @@ describe('MarkdownEditor', () => {
     expect(wrapper.emitted('command')?.[0]?.[0]).toEqual(
       expect.objectContaining({ key: 'image' }),
     )
-    expect(wrapper.find('.el-markdown-editor__command-tray').exists()).toBe(false)
+    expect(wrapper.find('.el-markdown-editor__command-tray').exists()).toBe(
+      false,
+    )
   })
 
   it('lets consumers choose primary commands and compact mobile behavior', async () => {
@@ -217,7 +225,9 @@ describe('MarkdownEditor', () => {
     await wrapper.setProps({ modelValue: '  第一行\n  第二行' })
     ;(textarea.element as HTMLTextAreaElement).setSelectionRange(0, 11)
     await textarea.trigger('keydown', { key: 'Tab', shiftKey: true })
-    expect(wrapper.emitted('update:modelValue')?.[1]).toEqual(['第一行\n第二行'])
+    expect(wrapper.emitted('update:modelValue')?.[1]).toEqual([
+      '第一行\n第二行',
+    ])
   })
 
   it('exposes save, submit, upload, and preview shell events', async () => {

@@ -14,6 +14,7 @@ export const buildMarkdownStressCorpus = (
     '',
     'Intro paragraph with **strong**, *emphasis*, `inline code`, [link](https://example.com/path?q=markdown&x=1), CJK text, and escaped HTML probes.',
     '<script>alert("xss")</script><img src=x onerror=alert(1)>',
+    '<details open>raw</details><svg onload=alert(1)>x</svg>',
     '',
     '| Column A | Column B | Column C |',
     '| --- | ---: | :--- |',

@@ -81,7 +81,7 @@ FsusUI 内置 WASM 加速模块，在特定场景下自动启用，无需额外�
 - **Table 排序**：number / ASCII string 数据可通过 Worker/WASM 返回稳定行索引；运行时依据真实端到端历史动态选择加速或分块 JS 路径，不按固定行数切换。
 - **SelectV2 过滤**：选项变化时建立一次持久索引，连续 query 使用 generation/cancel 和 transferable 索引结果；WASM 未就绪时继续显示 JS 过滤结果。
 - **VirtualList 行高预估**：当列表项 ≥ 2000 时，自动启用 WASM 动态行高预估，低于阈值时自动降级。
-- **MarkdownRenderer**：内置 raw HTML Markdown 渲染器，产物包含 `markdown_basic.js/.wasm` 与 `markdown_simd.js/.wasm`，组件本身不包含 Markdown 样式。
+- **MarkdownRenderer**：内置仅接受 Markdown、将原始 HTML 作为文本呈现的渲染器，产物包含 `markdown_basic.js/.wasm` 与 `markdown_simd.js/.wasm`，组件本身不包含 Markdown 样式。
 
 若需要在项目中重新编译 WASM 模块，需要 Emscripten `5.0.4`：
 

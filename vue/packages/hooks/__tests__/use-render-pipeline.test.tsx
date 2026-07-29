@@ -76,16 +76,25 @@ class TestWorker {
     result: unknown,
     postIndex = this.posts.length - 1,
     timings?: { computeDurationMs?: number },
+    generation?: number,
   ) {
     const post = this.posts[postIndex]
     if (!post) throw new Error('test_worker_post_missing')
-    this.onmessage?.({ data: { id: post.id, result, timings } } as MessageEvent)
+    this.onmessage?.({
+      data: { generation, id: post.id, result, timings },
+    } as MessageEvent)
   }
 
-  reject(error: unknown, postIndex = this.posts.length - 1) {
+  reject(
+    error: unknown,
+    postIndex = this.posts.length - 1,
+    generation?: number,
+  ) {
     const post = this.posts[postIndex]
     if (!post) throw new Error('test_worker_post_missing')
-    this.onmessage?.({ data: { error, id: post.id } } as MessageEvent)
+    this.onmessage?.({
+      data: { error, generation, id: post.id },
+    } as MessageEvent)
   }
 
   fail(error = new Error('test_worker_failure')) {
@@ -1069,6 +1078,94 @@ describe('use-render-pipeline', () => {
 
     vi.advanceTimersByTime(20)
     expect(worker.terminated).toBe(true)
+  })
+
+  it('keeps generation echo optional for legacy worker producers', async () => {
+    const executor = createFsusWorkerExecutor<string, string>(
+      () => new TestWorker() as unknown as Worker,
+    )
+    const result = executor.run('legacy', {
+      generation: 7,
+      key: 'legacy-producer',
+    })
+    TestWorker.instances[0]!.resolve('compatible')
+
+    await expect(result).resolves.toEqual({ ok: true, value: 'compatible' })
+    executor.dispose()
+  })
+
+  it('rejects missing or wrong generation echoes when explicitly required', async () => {
+    const events: string[] = []
+    const executor = createFsusWorkerExecutor<string, string>(
+      () => new TestWorker() as unknown as Worker,
+      {
+        onEvent: (event) => events.push(event.type),
+        requireGenerationEcho: true,
+      },
+    )
+    const missing = executor.run('missing', {
+      generation: 3,
+      key: 'markdown',
+    })
+    TestWorker.instances[0]!.resolve('forged')
+    await expect(missing).resolves.toMatchObject({
+      error: {
+        code: 'protocol',
+        message: 'fsus_worker_generation_mismatch',
+      },
+      ok: false,
+    })
+
+    const wrong = executor.run('wrong', {
+      generation: 4,
+      key: 'markdown',
+    })
+    TestWorker.instances[0]!.reject(new Error('markdown_parse_failed'), 1, 3)
+    await expect(wrong).resolves.toMatchObject({
+      error: {
+        code: 'protocol',
+        message: 'fsus_worker_generation_mismatch',
+      },
+      ok: false,
+    })
+    expect(events).toEqual(
+      expect.arrayContaining([
+        'protocol-error',
+        'request-reject',
+        'protocol-error',
+        'request-reject',
+      ]),
+    )
+    expect(events).not.toContain('request-cancel')
+    executor.dispose()
+  })
+
+  it('routes generation-bound worker errors through request rejection', async () => {
+    const events: string[] = []
+    const executor = createFsusWorkerExecutor<string, string>(
+      () => new TestWorker() as unknown as Worker,
+      {
+        onEvent: (event) => events.push(event.type),
+        requireGenerationEcho: true,
+      },
+    )
+    const result = executor.run('invalid markdown', {
+      generation: 9,
+      key: 'markdown',
+    })
+    TestWorker.instances[0]!.reject(
+      { code: 'markdown_parse_failed', message: 'invalid markdown' },
+      0,
+      9,
+    )
+
+    await expect(result).resolves.toMatchObject({
+      error: { code: 'infra' },
+      ok: false,
+    })
+    expect(events).toContain('request-reject')
+    expect(events).not.toContain('request-cancel')
+    executor.dispose()
   })
 
   it('sizes pools from cores and memory while reserving render capacity', () => {
