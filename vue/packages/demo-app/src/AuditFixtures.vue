@@ -14,10 +14,7 @@
       No modal-class geometry patches, no test-only forks, no selector overrides.
       Profile overrides are applied by tests via #260 CSS variables on :root.
     -->
-    <section
-      class="audit-safe-area-lab"
-      v-bind="safeAreaDataAttributes.lab"
-    >
+    <section class="audit-safe-area-lab" v-bind="safeAreaDataAttributes.lab">
       <h2 class="audit-safe-area-lab__title">Safe-area surfaces</h2>
       <div class="audit-safe-area-lab__controls">
         <el-button
@@ -163,6 +160,95 @@
         teleported
         @close="safeImageViewerVisible = false"
       />
+    </section>
+
+    <section
+      v-if="markdownEditorTransactionFixture"
+      data-testid="markdown-editor-transaction-fixture"
+    >
+      <el-markdown-editor
+        ref="markdownTransactionEditor"
+        v-model="markdownTransactionValue"
+        :min-rows="6"
+        :show-actions="false"
+        :show-mode-switcher="false"
+        @history-change="markdownTransactionHistory = $event"
+        @selection-change="markdownTransactionSelection = $event"
+        @transaction="recordMarkdownTransaction"
+      />
+      <div aria-label="Markdown transaction controls">
+        <button
+          type="button"
+          data-testid="markdown-programmatic"
+          @click="insertMarkdownFixture"
+        >
+          Programmatic insert
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-placeholder"
+          @click="insertMarkdownPlaceholder"
+        >
+          Insert placeholder
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-replace-placeholder"
+          @click="replaceMarkdownPlaceholder"
+        >
+          Replace placeholder
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-stale-replacement"
+          @click="dispatchStaleMarkdownReplacement"
+        >
+          Dispatch stale replacement
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-undo"
+          @click="markdownTransactionEditor?.undo()"
+        >
+          Undo
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-redo"
+          @click="markdownTransactionEditor?.redo()"
+        >
+          Redo
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-external-reset"
+          @click="markdownTransactionValue = '外部重置😀éאב'"
+        >
+          External reset
+        </button>
+        <button
+          type="button"
+          data-testid="markdown-large-document"
+          @click="loadLargeMarkdownDocument"
+        >
+          Load 100k document
+        </button>
+      </div>
+      <output data-testid="markdown-editor-value">
+        {{ markdownTransactionValue.length }}
+      </output>
+      <output data-testid="markdown-editor-revision">
+        {{ markdownTransactionRevision }}
+      </output>
+      <output data-testid="markdown-editor-history">
+        {{ JSON.stringify(markdownTransactionHistory) }}
+      </output>
+      <output data-testid="markdown-editor-last-transaction">
+        {{ JSON.stringify(markdownLastTransaction) }}
+      </output>
+      <output data-testid="markdown-editor-selection">
+        {{ JSON.stringify(markdownTransactionSelection) }}
+      </output>
     </section>
 
     <div class="audit-grid">
@@ -1718,6 +1804,13 @@ import {
   ElThreadPanel,
   ElTypedConfirmField,
 } from '../../element-plus'
+import type {
+  MarkdownEditorDispatchResult,
+  MarkdownEditorHistoryState,
+  MarkdownEditorInstance,
+  MarkdownEditorSelectionEvent,
+  MarkdownEditorTransactionEvent,
+} from '../../element-plus'
 import AuditCard from './AuditCard.vue'
 import {
   auditComponentNames,
@@ -1741,6 +1834,95 @@ const props = withDefaults(
     theme: 'light',
   },
 )
+
+const markdownEditorTransactionFixture =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get(
+    'markdownEditorTransaction',
+  ) === '1'
+const markdownEditorImeFixture =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownEditorIme') === '1'
+const markdownTransactionEditor = ref<MarkdownEditorInstance>()
+const markdownTransactionValue = ref(
+  markdownEditorImeFixture ? '' : 'A😀éאב\n- 列表',
+)
+const markdownTransactionHistory = ref<MarkdownEditorHistoryState>({
+  canRedo: false,
+  canUndo: false,
+  redoDepth: 0,
+  retainedUnits: 0,
+  undoDepth: 0,
+})
+const markdownLastTransaction = ref<MarkdownEditorTransactionEvent | null>(null)
+const markdownTransactionSelection = ref<MarkdownEditorSelectionEvent | null>(
+  null,
+)
+const markdownTransactionRevision = computed(
+  () => markdownLastTransaction.value?.revision ?? 0,
+)
+let markdownPlaceholderRevision: number | undefined
+
+const recordMarkdownTransaction = (event: MarkdownEditorTransactionEvent) => {
+  markdownLastTransaction.value = event
+}
+
+const insertMarkdownFixture = () => {
+  markdownTransactionEditor.value?.insertMarkdownAtCursor('【程序插入】', {
+    metadata: { fixture: 'programmatic' },
+  })
+}
+
+const insertMarkdownPlaceholder = () => {
+  const from = markdownTransactionValue.value.length
+  const result = markdownTransactionEditor.value?.dispatchTransaction({
+    changes: [{ from, insert: '![uploading]', to: from }],
+    history: 'separate',
+    metadata: { fixture: 'placeholder' },
+    origin: 'programmatic',
+    selection: { end: from + 12, start: from + 12 },
+  }) as MarkdownEditorDispatchResult | undefined
+  if (result?.accepted) markdownPlaceholderRevision = result.revision
+}
+
+const replaceMarkdownPlaceholder = () => {
+  const index = markdownTransactionValue.value.indexOf('![uploading]')
+  if (index < 0 || markdownPlaceholderRevision === undefined) return
+  const replacement = '![完成](asset.png)'
+  markdownTransactionEditor.value?.dispatchTransaction({
+    changes: [
+      {
+        from: index,
+        insert: replacement,
+        to: index + '![uploading]'.length,
+      },
+    ],
+    expectedRevision: markdownPlaceholderRevision,
+    history: 'separate',
+    metadata: { fixture: 'async-replacement' },
+    origin: 'programmatic',
+    selection: {
+      direction: 'none',
+      end: index + replacement.length,
+      start: index + replacement.length,
+    },
+  })
+}
+
+const dispatchStaleMarkdownReplacement = () => {
+  markdownTransactionEditor.value?.dispatchTransaction({
+    changes: [{ from: 0, insert: 'STALE', to: 0 }],
+    expectedRevision: markdownPlaceholderRevision ?? 0,
+    history: 'separate',
+    metadata: { fixture: 'stale-replacement' },
+    origin: 'programmatic',
+    selection: { direction: 'none', end: 5, start: 5 },
+  })
+}
+
+const loadLargeMarkdownDocument = () => {
+  markdownTransactionValue.value = '界'.repeat(100_000)
+}
 
 const boundaryText =
   'Boundary review text with a deliberately long scholarly label, dense metadata, and no artificial short word fallback'

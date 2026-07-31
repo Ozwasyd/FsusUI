@@ -17,7 +17,7 @@
           :key="command.key"
           type="button"
           :class="ns.e('command')"
-          :disabled="disabled"
+          :disabled="editingBlocked"
           :title="command.title || command.label"
           @click="runCommand(command)"
         >
@@ -31,11 +31,13 @@
           :aria-controls="commandTrayId"
           :aria-label="commandOverflowAriaLabel"
           aria-haspopup="true"
-          :disabled="disabled"
+          :disabled="editingBlocked"
           @click="toggleCommands"
         >
           <span>{{ commandOverflowLabel }}</span>
-          <span :class="ns.e('command-more-count')">{{ overflowItemCount }}</span>
+          <span :class="ns.e('command-more-count')">{{
+            overflowItemCount
+          }}</span>
         </button>
       </div>
 
@@ -51,24 +53,25 @@
           type="button"
           role="tab"
           :aria-selected="currentMode === mode"
-          :class="[ns.e('mode'), `${ns.e('mode')}--${mode}`, ns.is('active', currentMode === mode)]"
-          :disabled="disabled"
+          :class="[
+            ns.e('mode'),
+            `${ns.e('mode')}--${mode}`,
+            ns.is('active', currentMode === mode),
+          ]"
+          :disabled="editingBlocked"
           @click="setMode(mode)"
         >
           {{ modeLabel(mode) }}
         </button>
       </div>
 
-      <div
-        v-if="primaryActions.length"
-        :class="ns.e('actions')"
-      >
+      <div v-if="primaryActions.length" :class="ns.e('actions')">
         <button
           v-for="action in primaryActions"
           :key="action.key"
           type="button"
           :class="ns.e('action')"
-          :disabled="disabled"
+          :disabled="editingBlocked"
           @click="runAction(action)"
         >
           {{ action.label }}
@@ -86,7 +89,7 @@
           :key="command.key"
           type="button"
           :class="ns.e('command')"
-          :disabled="disabled"
+          :disabled="editingBlocked"
           :title="command.title || command.label"
           @click="runOverflowCommand(command)"
         >
@@ -97,7 +100,7 @@
           :key="action.key"
           type="button"
           :class="[ns.e('command'), ns.e('command-tray-action')]"
-          :disabled="disabled"
+          :disabled="editingBlocked"
           @click="runOverflowAction(action)"
         >
           {{ action.label }}
@@ -111,21 +114,30 @@
         :id="textareaId"
         ref="textareaRef"
         :class="ns.e('textarea')"
-        :aria-disabled="disabled"
-        :disabled="disabled"
+        :aria-busy="loading || undefined"
+        :aria-disabled="editingBlocked"
+        :disabled="editingBlocked"
         :name="textareaName"
         :placeholder="effectivePlaceholder"
         :rows="minRows"
-        :value="modelValue"
+        :value="editorValue"
+        @beforeinput="handleBeforeInput"
+        @blur="handleBlur"
+        @click="handleSelectionMove"
+        @compositionend="handleCompositionEnd"
+        @compositionstart="handleCompositionStart"
+        @drop="handleDrop"
         @input="handleInput"
         @keydown="handleKeydown"
+        @paste="handlePaste"
+        @select="handleSelectionMove"
       />
 
       <el-markdown-renderer
         v-if="currentMode !== 'write'"
         :class="ns.e('preview')"
         :base-url="previewBaseUrl"
-        :content="modelValue"
+        :content="editorValue"
         :csp-nonce="previewCspNonce"
         :features="previewFeatures"
         mode="editor"
@@ -156,6 +168,7 @@ import {
   onBeforeUnmount,
   onMounted,
   ref,
+  triggerRef,
   useId,
   watch,
 } from 'vue'
@@ -167,14 +180,27 @@ import {
   markdownEditorEmits,
   markdownEditorProps,
 } from './markdown-editor'
+import {
+  deriveMarkdownEditorChange,
+  MarkdownEditorTransactionStore,
+  toMarkdownEditorTransactionEvent,
+} from './markdown-editor-transaction'
 
 import type {
   MarkdownEditorActionItem,
   MarkdownEditorActionKey,
   MarkdownEditorCommand,
+  MarkdownEditorInsertOptions,
   MarkdownEditorMode,
-  MarkdownEditorSelection,
 } from './markdown-editor'
+import type {
+  MarkdownEditorDispatchResult,
+  MarkdownEditorHistoryState,
+  MarkdownEditorInputMergeDirection,
+  MarkdownEditorSelection,
+  MarkdownEditorTransaction,
+  MarkdownEditorTransactionRejection,
+} from './markdown-editor-transaction'
 
 defineOptions({
   name: 'ElMarkdownEditor',
@@ -188,21 +214,330 @@ const commandTrayId = `${useId()}-command-tray`
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const commandsExpanded = ref(false)
 const visualViewportHeight = ref(0)
+const editingBlocked = computed(() => props.disabled || props.loading)
 const compactMode = computed(() => props.mobileLayout === 'compact')
-const normalizeModeForLayout = (mode: MarkdownEditorMode): MarkdownEditorMode =>
+const normalizeModeForLayout = (
+  mode: MarkdownEditorMode,
+): MarkdownEditorMode =>
   compactMode.value && mode === 'split' ? 'write' : mode
 const currentMode = ref<MarkdownEditorMode>(
   normalizeModeForLayout(props.mode ?? props.defaultMode),
 )
+const initialSelection: MarkdownEditorSelection = {
+  direction: 'none',
+  end: props.modelValue.length,
+  start: props.modelValue.length,
+}
+const transactionStore = new MarkdownEditorTransactionStore(
+  props.modelValue,
+  initialSelection,
+)
+const editorValue = ref(transactionStore.value)
+const isComposing = ref(false)
+
+interface BeforeInputSnapshot {
+  readonly data: string | null
+  readonly inputType: string
+  readonly selection: MarkdownEditorSelection
+  readonly value: string
+}
+
+type EditorOperation =
+  | {
+      readonly allowBlocked?: boolean
+      readonly emitValue?: boolean
+      readonly internalPropReset?: boolean
+      readonly kind: 'transaction'
+      readonly mergeDirection?: MarkdownEditorInputMergeDirection
+      readonly restoreSelection?: boolean
+      readonly transaction: MarkdownEditorTransaction
+    }
+  | {
+      readonly kind: 'undo' | 'redo'
+      readonly restoreSelection?: boolean
+    }
+
+let beforeInputSnapshot: BeforeInputSnapshot | undefined
+let discardInvalidatedCompositionInput = false
+let discardInvalidatedCompositionInputEpoch = 0
+let invalidatedComposition = false
+let invalidatedCompositionEpoch = 0
+let pendingInputOrigin: 'drop' | 'paste' | undefined
+let pendingCompositionCommit = false
+let pendingCompositionCommitEpoch = 0
+let restoringSelection = false
+let skipCompositionInputValue: string | undefined
+
+const clearPendingCompositionCommit = () => {
+  pendingCompositionCommit = false
+  pendingCompositionCommitEpoch += 1
+}
+
+const deferPendingCompositionCommit = () => {
+  pendingCompositionCommit = true
+  const epoch = ++pendingCompositionCommitEpoch
+  setTimeout(() => {
+    if (pendingCompositionCommitEpoch === epoch) {
+      pendingCompositionCommit = false
+    }
+  }, 0)
+}
+
+const clearInvalidatedCompositionInput = () => {
+  discardInvalidatedCompositionInput = false
+  discardInvalidatedCompositionInputEpoch += 1
+}
+
+const deferInvalidatedCompositionInput = () => {
+  discardInvalidatedCompositionInput = true
+  const epoch = ++discardInvalidatedCompositionInputEpoch
+  setTimeout(() => {
+    if (discardInvalidatedCompositionInputEpoch === epoch) {
+      discardInvalidatedCompositionInput = false
+    }
+  }, 0)
+}
+
+const clearInvalidatedComposition = () => {
+  invalidatedComposition = false
+  invalidatedCompositionEpoch += 1
+}
+
+const deferInvalidatedComposition = () => {
+  invalidatedComposition = true
+  const epoch = ++invalidatedCompositionEpoch
+  setTimeout(() => {
+    if (invalidatedCompositionEpoch === epoch) {
+      invalidatedComposition = false
+    }
+  }, 0)
+}
+
+const historiesEqual = (
+  first: MarkdownEditorHistoryState,
+  second: MarkdownEditorHistoryState,
+) =>
+  first.undoDepth === second.undoDepth &&
+  first.redoDepth === second.redoDepth &&
+  first.retainedUnits === second.retainedUnits &&
+  first.canUndo === second.canUndo &&
+  first.canRedo === second.canRedo
+
+const rejectedResult = (
+  reason: MarkdownEditorTransactionRejection,
+): MarkdownEditorDispatchResult =>
+  Object.freeze({
+    accepted: false,
+    history: transactionStore.history,
+    reason,
+    revision: transactionStore.revision,
+    selection: transactionStore.selection,
+    value: transactionStore.value,
+  })
+
+const operationTransaction = (
+  operation: EditorOperation,
+): MarkdownEditorTransaction => {
+  if (operation.kind === 'transaction') return operation.transaction
+  return Object.freeze({
+    changes: [],
+    history: 'skip',
+    metadata: Object.freeze({ action: operation.kind }),
+    origin: 'command',
+  })
+}
+
+const restoreTextareaSelection = async (
+  selection: MarkdownEditorSelection,
+  focus = true,
+) => {
+  if (isComposing.value) return
+  await nextTick()
+  if (isComposing.value) return
+  const textarea = textareaRef.value
+  if (!textarea) return
+
+  restoringSelection = true
+  if (focus) textarea.focus()
+  textarea.setSelectionRange(
+    selection.start,
+    selection.end,
+    selection.direction,
+  )
+  queueMicrotask(() => {
+    restoringSelection = false
+  })
+}
+
+const dispatchEditorOperation = (
+  operation: EditorOperation,
+): MarkdownEditorDispatchResult => {
+  const transaction = operationTransaction(operation)
+  const blocked =
+    operation.kind === 'transaction'
+      ? !operation.allowBlocked && editingBlocked.value
+      : editingBlocked.value
+  const compositionBlocked =
+    isComposing.value &&
+    !(operation.kind === 'transaction' && operation.internalPropReset)
+  if (blocked || compositionBlocked) {
+    const result = rejectedResult(blocked ? 'disabled' : 'composition-active')
+    emit('transaction', toMarkdownEditorTransactionEvent(transaction, result))
+    return result
+  }
+
+  const previousValue = transactionStore.value
+  const previousSelection = transactionStore.selection
+  const previousHistory = transactionStore.history
+  const result =
+    operation.kind === 'transaction'
+      ? transactionStore.dispatch(operation.transaction, {
+          mergeDirection: operation.mergeDirection,
+          now: Date.now(),
+        })
+      : operation.kind === 'undo'
+        ? transactionStore.undo()
+        : transactionStore.redo()
+
+  editorValue.value = result.value
+  emit('transaction', toMarkdownEditorTransactionEvent(transaction, result))
+
+  if (
+    result.accepted &&
+    result.value !== previousValue &&
+    (operation.kind !== 'transaction' || operation.emitValue !== false)
+  ) {
+    emit(UPDATE_MODEL_EVENT, result.value)
+    emit(CHANGE_EVENT, result.value)
+  }
+  if (
+    result.accepted &&
+    (result.selection.start !== previousSelection.start ||
+      result.selection.end !== previousSelection.end ||
+      result.selection.direction !== previousSelection.direction)
+  ) {
+    emit(
+      'selection-change',
+      Object.freeze({
+        revision: result.revision,
+        selection: result.selection,
+      }),
+    )
+  }
+  if (result.accepted && !historiesEqual(previousHistory, result.history)) {
+    emit('history-change', result.history)
+  }
+  if (
+    result.accepted &&
+    operation.restoreSelection !== false &&
+    operation.kind !== 'transaction'
+  ) {
+    void restoreTextareaSelection(result.selection)
+  } else if (
+    result.accepted &&
+    operation.kind === 'transaction' &&
+    operation.restoreSelection !== false
+  ) {
+    void restoreTextareaSelection(result.selection)
+  }
+  return result
+}
+
+const readSelectionFrom = (
+  textarea: HTMLTextAreaElement | null,
+): MarkdownEditorSelection => {
+  if (!textarea) return transactionStore.selection
+  return {
+    direction: textarea.selectionDirection,
+    end: textarea.selectionEnd,
+    start: textarea.selectionStart,
+  }
+}
+
+const captureSelection = (breakMerge = true) => {
+  const previous = transactionStore.selection
+  transactionStore.setSelection(
+    readSelectionFrom(textareaRef.value),
+    breakMerge,
+  )
+  const selection = transactionStore.selection
+  if (
+    selection.start !== previous.start ||
+    selection.end !== previous.end ||
+    selection.direction !== previous.direction
+  ) {
+    emit(
+      'selection-change',
+      Object.freeze({
+        revision: transactionStore.revision,
+        selection,
+      }),
+    )
+  }
+  return selection
+}
+
+const dispatchReplacement = (
+  nextValue: string,
+  selection: MarkdownEditorSelection,
+  options: Omit<MarkdownEditorTransaction, 'changes' | 'selection'>,
+  mergeDirection: MarkdownEditorInputMergeDirection = 'none',
+) => {
+  const change = deriveMarkdownEditorChange(transactionStore.value, nextValue)
+  return dispatchEditorOperation({
+    kind: 'transaction',
+    mergeDirection,
+    transaction: {
+      ...options,
+      changes: change ? [change] : [],
+      selection,
+    },
+  })
+}
 
 watch(
   [() => props.mode, () => props.defaultMode, () => props.mobileLayout],
   ([mode, defaultMode]) => {
+    transactionStore.breakMergeGroup()
     currentMode.value = normalizeModeForLayout(mode ?? defaultMode)
   },
 )
 
-const characterCount = computed(() => props.modelValue.length)
+watch(
+  () => props.modelValue,
+  (value) => {
+    if (value === transactionStore.value) return
+
+    if (isComposing.value) deferInvalidatedComposition()
+    isComposing.value = false
+    beforeInputSnapshot = undefined
+    clearPendingCompositionCommit()
+    pendingInputOrigin = undefined
+    skipCompositionInputValue = undefined
+    dispatchEditorOperation({
+      allowBlocked: true,
+      emitValue: false,
+      internalPropReset: true,
+      kind: 'transaction',
+      restoreSelection: false,
+      transaction: {
+        changes: [
+          {
+            from: 0,
+            insert: value,
+            to: transactionStore.value.length,
+          },
+        ],
+        history: 'skip',
+        metadata: Object.freeze({ kind: 'external-reset' }),
+        origin: 'external',
+        selection: transactionStore.selection,
+      },
+    })
+  },
+)
+
+const characterCount = computed(() => editorValue.value.length)
 const effectivePlaceholder = computed(
   () => props.writingPlaceholder || props.placeholder,
 )
@@ -259,6 +594,20 @@ const overflowActions = computed(() =>
 const overflowItemCount = computed(
   () => overflowCommands.value.length + overflowActions.value.length,
 )
+watch([editingBlocked, overflowItemCount], ([blocked, itemCount]) => {
+  if (blocked || !itemCount) commandsExpanded.value = false
+  if (!blocked) return
+
+  transactionStore.breakMergeGroup()
+  if (isComposing.value) {
+    deferInvalidatedComposition()
+    isComposing.value = false
+    beforeInputSnapshot = undefined
+    clearPendingCompositionCommit()
+    pendingInputOrigin = undefined
+    triggerRef(editorValue)
+  }
+})
 const commandOverflowAriaLabel = computed(
   () => `${props.commandOverflowLabel}，${overflowItemCount.value} 个工具`,
 )
@@ -266,23 +615,9 @@ const visibleModes = computed(() =>
   compactMode.value ? modes.filter((mode) => mode !== 'split') : modes,
 )
 const wordCount = computed(() => {
-  const trimmed = props.modelValue.trim()
+  const trimmed = editorValue.value.trim()
   return trimmed ? trimmed.split(/\s+/).length : 0
 })
-
-watch(
-  [() => props.disabled, overflowItemCount],
-  ([disabled, itemCount]) => {
-    if (disabled || !itemCount) {
-      commandsExpanded.value = false
-    }
-  },
-)
-
-const emitValue = (value: string) => {
-  emit(UPDATE_MODEL_EVENT, value)
-  emit(CHANGE_EVENT, value)
-}
 
 const updateVisualViewportHeight = () => {
   if (typeof window === 'undefined') return
@@ -312,31 +647,198 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', updateVisualViewportHeight)
 })
 
+const handleBeforeInput = (event: InputEvent) => {
+  if (editingBlocked.value) {
+    event.preventDefault()
+    return
+  }
+  if (
+    invalidatedComposition ||
+    discardInvalidatedCompositionInput ||
+    (!isComposing.value &&
+      (event.isComposing || event.inputType === 'insertCompositionText'))
+  ) {
+    event.preventDefault()
+    beforeInputSnapshot = undefined
+    pendingInputOrigin = undefined
+    triggerRef(editorValue)
+    return
+  }
+  if (event.inputType === 'historyUndo') {
+    event.preventDefault()
+    undo()
+    return
+  }
+  if (event.inputType === 'historyRedo') {
+    event.preventDefault()
+    redo()
+    return
+  }
+
+  beforeInputSnapshot = {
+    data: event.data,
+    inputType: event.inputType,
+    selection: captureSelection(!isComposing.value),
+    value: transactionStore.value,
+  }
+}
+
+const inputMergeDirection = (
+  snapshot: BeforeInputSnapshot,
+): MarkdownEditorInputMergeDirection => {
+  if (snapshot.selection.start !== snapshot.selection.end) return 'none'
+  if (snapshot.inputType === 'deleteContentBackward') return 'backward'
+  if (
+    snapshot.inputType === 'deleteContentForward' ||
+    snapshot.inputType === 'insertText' ||
+    snapshot.inputType === 'insertLineBreak'
+  ) {
+    return 'forward'
+  }
+  return 'none'
+}
+
 const handleInput = (event: Event) => {
-  if (props.disabled) return
-
   const target = event.target
-  if (target instanceof HTMLTextAreaElement) {
-    emitValue(target.value)
+  if (!(target instanceof HTMLTextAreaElement)) return
+  const orphanedCompositionInput =
+    event instanceof InputEvent &&
+    !isComposing.value &&
+    (event.isComposing || event.inputType === 'insertCompositionText')
+  if (
+    invalidatedComposition ||
+    discardInvalidatedCompositionInput ||
+    orphanedCompositionInput
+  ) {
+    if (!invalidatedComposition) clearInvalidatedCompositionInput()
+    beforeInputSnapshot = undefined
+    clearPendingCompositionCommit()
+    pendingInputOrigin = undefined
+    triggerRef(editorValue)
+    return
   }
-}
-
-const readSelection = (): MarkdownEditorSelection => {
-  const textarea = textareaRef.value
-  return {
-    start: textarea?.selectionStart ?? props.modelValue.length,
-    end: textarea?.selectionEnd ?? props.modelValue.length,
+  if (editingBlocked.value) {
+    triggerRef(editorValue)
+    return
   }
-}
+  if (isComposing.value) return
+  if (
+    skipCompositionInputValue !== undefined &&
+    target.value === skipCompositionInputValue &&
+    target.value === transactionStore.value
+  ) {
+    skipCompositionInputValue = undefined
+    return
+  }
+  skipCompositionInputValue = undefined
+  const compositionCommit = pendingCompositionCommit
+  clearPendingCompositionCommit()
 
-const restoreSelection = async (selection: MarkdownEditorSelection) => {
-  await nextTick()
-  const textarea = textareaRef.value
-  textarea?.focus()
-  textarea?.setSelectionRange(
-    Math.max(0, Math.min(props.modelValue.length, selection.start)),
-    Math.max(0, Math.min(props.modelValue.length, selection.end)),
+  const snapshot =
+    beforeInputSnapshot?.value === transactionStore.value
+      ? beforeInputSnapshot
+      : {
+          data: null,
+          inputType: 'insertText',
+          selection: transactionStore.selection,
+          value: transactionStore.value,
+        }
+  const inputType = snapshot.inputType
+  const origin = compositionCommit
+    ? 'input'
+    : (pendingInputOrigin ??
+      (inputType === 'insertFromPaste'
+        ? 'paste'
+        : inputType === 'insertFromDrop'
+          ? 'drop'
+          : 'input'))
+  const history = compositionCommit || origin !== 'input' ? 'separate' : 'merge'
+  dispatchReplacement(
+    target.value,
+    readSelectionFrom(target),
+    {
+      history,
+      metadata: Object.freeze({
+        ...(compositionCommit ? { composition: true } : {}),
+        data: snapshot.data,
+        inputType,
+      }),
+      origin,
+    },
+    origin === 'input' && !compositionCommit
+      ? inputMergeDirection(snapshot)
+      : 'none',
   )
+  beforeInputSnapshot = undefined
+  pendingInputOrigin = undefined
+}
+
+const handleCompositionStart = () => {
+  if (editingBlocked.value) return
+  clearInvalidatedComposition()
+  clearInvalidatedCompositionInput()
+  transactionStore.breakMergeGroup()
+  captureSelection()
+  beforeInputSnapshot = undefined
+  clearPendingCompositionCommit()
+  pendingInputOrigin = undefined
+  isComposing.value = true
+}
+
+const handleCompositionEnd = (event: CompositionEvent) => {
+  const target = event.target
+  if (!(target instanceof HTMLTextAreaElement)) return
+  if (invalidatedComposition || !isComposing.value) {
+    clearInvalidatedComposition()
+    isComposing.value = false
+    beforeInputSnapshot = undefined
+    clearPendingCompositionCommit()
+    pendingInputOrigin = undefined
+    skipCompositionInputValue = undefined
+    deferInvalidatedCompositionInput()
+    triggerRef(editorValue)
+    return
+  }
+  if (editingBlocked.value) {
+    isComposing.value = false
+    triggerRef(editorValue)
+    return
+  }
+
+  isComposing.value = false
+  const beforeValue = transactionStore.value
+  const result = dispatchReplacement(target.value, readSelectionFrom(target), {
+    history: 'separate',
+    metadata: Object.freeze({
+      composition: true,
+      data: event.data,
+      inputType: 'insertCompositionText',
+    }),
+    origin: 'input',
+  })
+  if (result.accepted) {
+    if (target.value === beforeValue) deferPendingCompositionCommit()
+    else skipCompositionInputValue = result.value
+  }
+  beforeInputSnapshot = undefined
+  pendingInputOrigin = undefined
+}
+
+const handlePaste = () => {
+  if (!editingBlocked.value && !isComposing.value) pendingInputOrigin = 'paste'
+}
+
+const handleDrop = () => {
+  if (!editingBlocked.value && !isComposing.value) pendingInputOrigin = 'drop'
+}
+
+const handleSelectionMove = () => {
+  if (restoringSelection || isComposing.value) return
+  captureSelection()
+}
+
+const handleBlur = () => {
+  transactionStore.breakMergeGroup()
 }
 
 const replaceValueRange = (
@@ -344,19 +846,21 @@ const replaceValueRange = (
   end: number,
   replacement: string,
   nextSelection: MarkdownEditorSelection,
+  metadata: Readonly<Record<string, unknown>>,
 ) => {
-  const value = props.modelValue
-  const safeStart = Math.max(0, Math.min(value.length, start))
-  const safeEnd = Math.max(safeStart, Math.min(value.length, end))
-  emitValue(value.slice(0, safeStart) + replacement + value.slice(safeEnd))
-  void restoreSelection(nextSelection)
+  const value = transactionStore.value
+  const nextValue = value.slice(0, start) + replacement + value.slice(end)
+  return dispatchReplacement(nextValue, nextSelection, {
+    history: 'separate',
+    metadata,
+    origin: 'command',
+  })
 }
 
-const selectedLineRange = () => {
-  const value = props.modelValue
-  const selection = readSelection()
-  const rangeStart = Math.max(0, Math.min(value.length, selection.start))
-  const rangeEnd = Math.max(rangeStart, Math.min(value.length, selection.end))
+const selectedLineRange = (selection: MarkdownEditorSelection) => {
+  const value = transactionStore.value
+  const rangeStart = selection.start
+  const rangeEnd = selection.end
   const blockEndSeed =
     rangeEnd > rangeStart && value[rangeEnd - 1] === '\n'
       ? rangeEnd - 1
@@ -373,8 +877,10 @@ const selectedLineRange = () => {
 }
 
 const applyLineIndent = (outdent: boolean) => {
-  const value = props.modelValue
-  const { lineEnd, lineStart, rangeEnd, rangeStart } = selectedLineRange()
+  const selection = captureSelection()
+  const value = transactionStore.value
+  const { lineEnd, lineStart, rangeEnd, rangeStart } =
+    selectedLineRange(selection)
   const block = value.slice(lineStart, lineEnd)
   const lines = block.split('\n')
   let charsBeforeSelectionStart = 0
@@ -409,18 +915,25 @@ const applyLineIndent = (outdent: boolean) => {
   })
 
   const replacement = nextLines.join('\n')
-  replaceValueRange(lineStart, lineEnd, replacement, {
-    start: Math.max(lineStart, rangeStart + charsBeforeSelectionStart),
-    end: Math.max(lineStart, rangeEnd + charsBeforeSelectionEnd),
-  })
+  replaceValueRange(
+    lineStart,
+    lineEnd,
+    replacement,
+    {
+      direction: selection.direction,
+      start: Math.max(lineStart, rangeStart + charsBeforeSelectionStart),
+      end: Math.max(lineStart, rangeEnd + charsBeforeSelectionEnd),
+    },
+    Object.freeze({ command: outdent ? 'outdent' : 'indent' }),
+  )
 }
 
 const handleLineContinuation = () => {
-  const value = props.modelValue
-  const selection = readSelection()
+  const value = transactionStore.value
+  const selection = captureSelection()
   if (selection.start !== selection.end) return false
 
-  const cursor = Math.max(0, Math.min(value.length, selection.start))
+  const cursor = selection.start
   const lineStart = value.lastIndexOf('\n', Math.max(0, cursor - 1)) + 1
   const beforeCursor = value.slice(lineStart, cursor)
   const unordered = beforeCursor.match(
@@ -430,18 +943,26 @@ const handleLineContinuation = () => {
   if (unordered) {
     const [, indent, marker, taskMarker, text] = unordered
     if (!text.trim()) {
-      replaceValueRange(lineStart, cursor, indent, {
-        start: lineStart + indent.length,
-        end: lineStart + indent.length,
-      })
+      const caret = lineStart + indent.length
+      replaceValueRange(
+        lineStart,
+        cursor,
+        indent,
+        { direction: 'none', start: caret, end: caret },
+        Object.freeze({ command: 'continue-list-exit' }),
+      )
       return true
     }
 
     const nextMarker = `${indent}${marker} ${taskMarker ? '[ ] ' : ''}`
-    replaceValueRange(cursor, cursor, `\n${nextMarker}`, {
-      start: cursor + nextMarker.length + 1,
-      end: cursor + nextMarker.length + 1,
-    })
+    const caret = cursor + nextMarker.length + 1
+    replaceValueRange(
+      cursor,
+      cursor,
+      `\n${nextMarker}`,
+      { direction: 'none', start: caret, end: caret },
+      Object.freeze({ command: 'continue-list' }),
+    )
     return true
   }
 
@@ -449,18 +970,26 @@ const handleLineContinuation = () => {
   if (ordered) {
     const [, indent, numberText, suffix, text] = ordered
     if (!text.trim()) {
-      replaceValueRange(lineStart, cursor, indent, {
-        start: lineStart + indent.length,
-        end: lineStart + indent.length,
-      })
+      const caret = lineStart + indent.length
+      replaceValueRange(
+        lineStart,
+        cursor,
+        indent,
+        { direction: 'none', start: caret, end: caret },
+        Object.freeze({ command: 'continue-ordered-exit' }),
+      )
       return true
     }
 
     const nextMarker = `${indent}${Number(numberText) + 1}${suffix} `
-    replaceValueRange(cursor, cursor, `\n${nextMarker}`, {
-      start: cursor + nextMarker.length + 1,
-      end: cursor + nextMarker.length + 1,
-    })
+    const caret = cursor + nextMarker.length + 1
+    replaceValueRange(
+      cursor,
+      cursor,
+      `\n${nextMarker}`,
+      { direction: 'none', start: caret, end: caret },
+      Object.freeze({ command: 'continue-ordered' }),
+    )
     return true
   }
 
@@ -468,17 +997,24 @@ const handleLineContinuation = () => {
   if (quote) {
     const [, marker, text] = quote
     if (!text.trim()) {
-      replaceValueRange(lineStart, cursor, '', {
-        start: lineStart,
-        end: lineStart,
-      })
+      replaceValueRange(
+        lineStart,
+        cursor,
+        '',
+        { direction: 'none', start: lineStart, end: lineStart },
+        Object.freeze({ command: 'continue-quote-exit' }),
+      )
       return true
     }
 
-    replaceValueRange(cursor, cursor, `\n${marker}`, {
-      start: cursor + marker.length + 1,
-      end: cursor + marker.length + 1,
-    })
+    const caret = cursor + marker.length + 1
+    replaceValueRange(
+      cursor,
+      cursor,
+      `\n${marker}`,
+      { direction: 'none', start: caret, end: caret },
+      Object.freeze({ command: 'continue-quote' }),
+    )
     return true
   }
 
@@ -486,18 +1022,24 @@ const handleLineContinuation = () => {
 }
 
 const runCommand = (command: MarkdownEditorCommand) => {
-  if (props.disabled) return
+  if (editingBlocked.value || isComposing.value) return
 
+  const selection = captureSelection()
   const result = applyMarkdownEditorCommand(
-    props.modelValue,
-    readSelection(),
+    transactionStore.value,
+    selection,
     command,
   )
-  emitValue(result.value)
-  emit('command', command)
-  if (result.nextSelection) {
-    void restoreSelection(result.nextSelection)
-  }
+  const dispatchResult = dispatchReplacement(
+    result.value,
+    result.nextSelection ?? selection,
+    {
+      history: 'separate',
+      metadata: Object.freeze({ command: command.key }),
+      origin: 'command',
+    },
+  )
+  if (dispatchResult.accepted) emit('command', command)
 }
 
 const runOverflowCommand = (command: MarkdownEditorCommand) => {
@@ -523,14 +1065,14 @@ const runOverflowAction = (action: MarkdownEditorActionItem) => {
 }
 
 const toggleCommands = () => {
-  if (props.disabled) return
-
+  if (editingBlocked.value || isComposing.value) return
   commandsExpanded.value = !commandsExpanded.value
 }
 
 const setMode = (mode: MarkdownEditorMode) => {
-  if (props.disabled) return
+  if (editingBlocked.value || isComposing.value) return
 
+  transactionStore.breakMergeGroup()
   const nextMode = normalizeModeForLayout(mode)
   currentMode.value = nextMode
   emit('mode-change', nextMode)
@@ -542,20 +1084,17 @@ const modeLabel = (mode: MarkdownEditorMode) => {
 }
 
 const emitSave = () => {
-  if (props.disabled) return
-
-  emit('save', props.modelValue)
+  if (editingBlocked.value || isComposing.value) return
+  emit('save', editorValue.value)
 }
 
 const emitSubmit = () => {
-  if (props.disabled) return
-
-  emit('submit', props.modelValue)
+  if (editingBlocked.value || isComposing.value) return
+  emit('submit', editorValue.value)
 }
 
 const emitUploadImage = () => {
-  if (props.disabled) return
-
+  if (editingBlocked.value || isComposing.value) return
   emit('upload-image')
 }
 
@@ -575,7 +1114,23 @@ const emitRenderEvent = (
 }
 
 const handleKeydown = (event: KeyboardEvent) => {
-  if (props.disabled) return
+  if (editingBlocked.value || isComposing.value) return
+
+  const isMod = event.metaKey || event.ctrlKey
+  const key = event.key.toLowerCase()
+  if (isMod && !event.shiftKey && key === 'z') {
+    event.preventDefault()
+    undo()
+    return
+  }
+  if (
+    isMod &&
+    ((event.shiftKey && key === 'z') || (!event.shiftKey && key === 'y'))
+  ) {
+    event.preventDefault()
+    redo()
+    return
+  }
 
   if (event.key === 'Tab') {
     event.preventDefault()
@@ -595,10 +1150,8 @@ const handleKeydown = (event: KeyboardEvent) => {
     return
   }
 
-  const isMod = event.metaKey || event.ctrlKey
   if (!isMod) return
 
-  const key = event.key.toLowerCase()
   if (key === 's') {
     event.preventDefault()
     emitSave()
@@ -621,23 +1174,53 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 }
 
-const insertMarkdownAtCursor = (markdown: string) => {
-  if (props.disabled) return false
+const dispatchTransaction = (transaction: MarkdownEditorTransaction) =>
+  dispatchEditorOperation({
+    kind: 'transaction',
+    transaction,
+  })
 
-  const selection = readSelection()
-  const start = Math.max(0, Math.min(props.modelValue.length, selection.start))
-  const end = Math.max(0, Math.min(props.modelValue.length, selection.end))
-  const value =
-    props.modelValue.slice(0, start) + markdown + props.modelValue.slice(end)
-  const cursor = start + markdown.length
+function undo() {
+  return dispatchEditorOperation({ kind: 'undo' })
+}
 
-  emitValue(value)
-  void restoreSelection({ start: cursor, end: cursor })
+function redo() {
+  return dispatchEditorOperation({ kind: 'redo' })
+}
 
-  return true
+const insertMarkdownAtCursor = (
+  markdown: string,
+  options: MarkdownEditorInsertOptions = {},
+) => {
+  const selection = options.selection ?? captureSelection()
+  const cursor = selection.start + markdown.length
+  return dispatchEditorOperation({
+    kind: 'transaction',
+    transaction: {
+      changes: [
+        {
+          from: selection.start,
+          insert: markdown,
+          to: selection.end,
+        },
+      ],
+      expectedRevision: options.expectedRevision,
+      history: 'separate',
+      metadata: options.metadata,
+      origin: 'programmatic',
+      selection: {
+        direction: 'none',
+        end: cursor,
+        start: cursor,
+      },
+    },
+  }).accepted
 }
 
 defineExpose({
+  dispatchTransaction,
   insertMarkdownAtCursor,
+  redo,
+  undo,
 })
 </script>

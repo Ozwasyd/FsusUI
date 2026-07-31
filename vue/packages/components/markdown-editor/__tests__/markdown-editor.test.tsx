@@ -1,13 +1,23 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, expectTypeOf, it } from 'vitest'
+import { nextTick } from 'vue'
+import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import MarkdownEditor from '../src/markdown-editor.vue'
 import {
   applyMarkdownEditorCommand,
   defaultMarkdownEditorCommands,
 } from '../src/markdown-editor'
-import type { MarkdownEditorProps } from '../src/markdown-editor'
+import type {
+  MarkdownEditorInstance,
+  MarkdownEditorProps,
+  MarkdownEditorSelection,
+  MarkdownEditorTransactionEvent,
+} from '../src/markdown-editor'
 
 describe('MarkdownEditor', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   it('does not expose the removed raw HTML preview prop', () => {
     const removedCapability = `allow${'Html'}` as const
     expectTypeOf<MarkdownEditorProps>().not.toHaveProperty(removedCapability)
@@ -20,9 +30,31 @@ describe('MarkdownEditor', () => {
     if (!bold) throw new Error('missing bold command')
 
     expect(
-      applyMarkdownEditorCommand('write markdown', { start: 6, end: 14 }, bold),
+      applyMarkdownEditorCommand(
+        'write markdown',
+        { direction: 'forward', start: 6, end: 14 },
+        bold,
+      ),
     ).toEqual({
-      nextSelection: { start: 8, end: 16 },
+      nextSelection: { direction: 'forward', start: 8, end: 16 },
+      value: 'write **markdown**',
+    })
+  })
+
+  it('accepts legacy selections without an explicit direction', () => {
+    expectTypeOf<
+      MarkdownEditorInstance['insertMarkdownAtCursor']
+    >().returns.toEqualTypeOf<boolean>()
+    const legacySelection: MarkdownEditorSelection = { start: 6, end: 14 }
+    const bold = defaultMarkdownEditorCommands.find(
+      (item) => item.key === 'bold',
+    )
+    if (!bold) throw new Error('missing bold command')
+
+    expect(
+      applyMarkdownEditorCommand('write markdown', legacySelection, bold),
+    ).toEqual({
+      nextSelection: { direction: 'none', start: 8, end: 16 },
       value: 'write **markdown**',
     })
   })
@@ -301,7 +333,484 @@ describe('MarkdownEditor', () => {
 
     await wrapper.setProps({ disabled: false })
     ;(textarea.element as HTMLTextAreaElement).setSelectionRange(7, 7)
-    expect(wrapper.vm.insertMarkdownAtCursor(' text')).toBe(true)
+    expect(wrapper.vm.insertMarkdownAtCursor(' text') === true).toBe(true)
+    expect(wrapper.emitted('transaction')?.at(-1)?.[0]).toMatchObject({
+      accepted: true,
+      revision: 1,
+      value: 'initial text',
+    })
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['initial text'])
+  })
+
+  it('exposes revision-checked programmatic transactions with independent undo units', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        modelValue: '',
+      },
+    })
+    const textarea = wrapper.find('textarea')
+    ;(textarea.element as HTMLTextAreaElement).setSelectionRange(0, 0)
+
+    const placeholder = wrapper.vm.dispatchTransaction({
+      changes: [{ from: 0, insert: '![uploading]', to: 0 }],
+      expectedRevision: 0,
+      history: 'separate',
+      metadata: { operation: 'placeholder' },
+      origin: 'programmatic',
+      selection: { start: 12, end: 12 },
+    })
+    expect(placeholder).toMatchObject({
+      accepted: true,
+      revision: 1,
+      value: '![uploading]',
+    })
+
+    const replacement = wrapper.vm.dispatchTransaction({
+      changes: [{ from: 0, insert: '![image](asset.png)', to: 12 }],
+      expectedRevision: placeholder.revision,
+      history: 'separate',
+      metadata: { operation: 'async-replacement' },
+      origin: 'programmatic',
+      selection: { direction: 'none', start: 19, end: 19 },
+    })
+    expect(replacement).toMatchObject({
+      accepted: true,
+      revision: 2,
+      value: '![image](asset.png)',
+    })
+
+    const stale = wrapper.vm.dispatchTransaction({
+      changes: [{ from: 0, insert: 'stale', to: 0 }],
+      expectedRevision: placeholder.revision,
+      history: 'separate',
+      origin: 'programmatic',
+      selection: { direction: 'none', start: 5, end: 5 },
+    })
+    expect(stale).toMatchObject({
+      accepted: false,
+      reason: 'stale-revision',
+      revision: 2,
+      value: '![image](asset.png)',
+    })
+
+    expect(wrapper.vm.undo()).toMatchObject({
+      accepted: true,
+      value: '![uploading]',
+    })
+    expect(wrapper.vm.undo()).toMatchObject({ accepted: true, value: '' })
+    expect(wrapper.vm.redo()).toMatchObject({
+      accepted: true,
+      value: '![uploading]',
+    })
+
+    expect(
+      wrapper.emitted('transaction')?.map(([rawEvent]) => {
+        const event = rawEvent as MarkdownEditorTransactionEvent
+        return {
+          accepted: event.accepted,
+          origin: event.transaction.origin,
+          reason: event.reason,
+        }
+      }),
+    ).toEqual(
+      expect.arrayContaining([
+        { accepted: true, origin: 'programmatic', reason: undefined },
+        {
+          accepted: false,
+          origin: 'programmatic',
+          reason: 'stale-revision',
+        },
+      ]),
+    )
+  })
+
+  it('treats parent echo as confirmation and a different prop as a hard reset', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        modelValue: 'A',
+      },
+    })
+    const textarea = wrapper.find('textarea')
+    ;(textarea.element as HTMLTextAreaElement).setSelectionRange(1, 1)
+
+    const inserted = wrapper.vm.insertMarkdownAtCursor('B')
+    expect(inserted).toBe(true)
+    expect(wrapper.emitted('transaction')?.at(-1)?.[0]).toMatchObject({
+      revision: 1,
+      value: 'AB',
+    })
+    const transactionCount = wrapper.emitted('transaction')?.length
+
+    await wrapper.setProps({ modelValue: 'AB' })
+    expect(wrapper.emitted('transaction')).toHaveLength(transactionCount ?? 0)
+
+    await wrapper.setProps({ modelValue: '外部重置' })
+    expect(wrapper.find('textarea').element.value).toBe('外部重置')
+    expect(wrapper.emitted('transaction')?.at(-1)?.[0]).toMatchObject({
+      accepted: true,
+      history: { canRedo: false, canUndo: false },
+      transaction: { origin: 'external' },
+      value: '外部重置',
+    })
+    expect(wrapper.vm.undo()).toMatchObject({
+      accepted: false,
+      reason: 'no-history',
+      value: '外部重置',
+    })
+  })
+
+  it('keeps public external transactions synchronized through v-model', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        modelValue: 'server',
+      },
+    })
+
+    expect(
+      wrapper.vm.dispatchTransaction({
+        changes: [{ from: 0, insert: 'client', to: 6 }],
+        history: 'skip',
+        origin: 'external',
+        selection: { direction: 'none', start: 6, end: 6 },
+      }),
+    ).toMatchObject({
+      accepted: true,
+      value: 'client',
+    })
+    expect(wrapper.emitted('update:modelValue')).toEqual([['client']])
+    await nextTick()
+    expect(wrapper.find('textarea').element.value).toBe('client')
+  })
+
+  it('rejects public external transactions during composition', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        modelValue: 'server',
+      },
+    })
+    const element = wrapper.find('textarea').element as HTMLTextAreaElement
+
+    element.dispatchEvent(
+      new CompositionEvent('compositionstart', { bubbles: true }),
+    )
+
+    expect(
+      wrapper.vm.dispatchTransaction({
+        changes: [{ from: 0, insert: 'client', to: 6 }],
+        history: 'skip',
+        origin: 'external',
+        selection: { direction: 'none', start: 6, end: 6 },
+      }),
+    ).toMatchObject({
+      accepted: false,
+      reason: 'composition-active',
+      value: 'server',
+    })
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+  })
+
+  it('does not revive invalidated IME text after a parent hard reset', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        modelValue: 'server-before',
+      },
+    })
+    const element = wrapper.find('textarea').element as HTMLTextAreaElement
+
+    element.dispatchEvent(
+      new CompositionEvent('compositionstart', { bubbles: true }),
+    )
+    element.value = '作成中'
+    element.dispatchEvent(
+      new InputEvent('input', {
+        bubbles: true,
+        data: '作成中',
+        inputType: 'insertCompositionText',
+        isComposing: true,
+      }),
+    )
+
+    await wrapper.setProps({ modelValue: 'server-after' })
+    expect(element.value).toBe('server-after')
+    const resetTransactionCount = wrapper.emitted('transaction')?.length
+
+    element.value = '作成中'
+    element.dispatchEvent(
+      new CompositionEvent('compositionend', {
+        bubbles: true,
+        data: '作成中',
+      }),
+    )
+    element.dispatchEvent(
+      new InputEvent('beforeinput', {
+        bubbles: true,
+        data: '旧',
+        inputType: 'insertText',
+      }),
+    )
+    element.value = '作成中旧'
+    element.dispatchEvent(
+      new InputEvent('input', {
+        bubbles: true,
+        data: '旧',
+        inputType: 'insertText',
+      }),
+    )
+    await nextTick()
+
+    expect(element.value).toBe('server-after')
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    expect(wrapper.emitted('transaction')).toHaveLength(
+      resetTransactionCount ?? 0,
+    )
+  })
+
+  it('recovers ordinary input when a hard reset receives no compositionend', async () => {
+    vi.useFakeTimers()
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        modelValue: 'server-before',
+      },
+    })
+    const element = wrapper.find('textarea').element as HTMLTextAreaElement
+
+    element.dispatchEvent(
+      new CompositionEvent('compositionstart', { bubbles: true }),
+    )
+    element.value = '未確定'
+    await wrapper.setProps({ modelValue: 'server-after' })
+
+    await vi.runOnlyPendingTimersAsync()
+    element.value = '未確定'
+    element.dispatchEvent(
+      new InputEvent('beforeinput', {
+        bubbles: true,
+        cancelable: true,
+        data: '未確定',
+        inputType: 'insertCompositionText',
+        isComposing: true,
+      }),
+    )
+    element.dispatchEvent(
+      new InputEvent('input', {
+        bubbles: true,
+        data: '未確定',
+        inputType: 'insertCompositionText',
+        isComposing: true,
+      }),
+    )
+    await nextTick()
+
+    expect(element.value).toBe('server-after')
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+
+    element.dispatchEvent(
+      new InputEvent('beforeinput', {
+        bubbles: true,
+        cancelable: true,
+        data: '!',
+        inputType: 'insertText',
+      }),
+    )
+    element.value = 'server-after!'
+    element.setSelectionRange(element.value.length, element.value.length)
+    element.dispatchEvent(
+      new InputEvent('input', {
+        bubbles: true,
+        data: '!',
+        inputType: 'insertText',
+      }),
+    )
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')).toEqual([['server-after!']])
+    expect(element.value).toBe('server-after!')
+  })
+
+  it.each(['简体中文', '繁體中文', '日本語', '한국어'])(
+    'commits %s composition once and freezes commands during composition',
+    async (composed) => {
+      const wrapper = mount(MarkdownEditor, {
+        props: {
+          modelValue: '',
+        },
+      })
+      const textarea = wrapper.find('textarea')
+      const element = textarea.element as HTMLTextAreaElement
+
+      element.dispatchEvent(
+        new CompositionEvent('compositionstart', { bubbles: true }),
+      )
+      await nextTick()
+      await wrapper.find('.el-markdown-editor__command').trigger('click')
+      expect(wrapper.emitted('command')).toBeUndefined()
+
+      element.value = composed
+      element.setSelectionRange(composed.length, composed.length)
+      element.dispatchEvent(
+        new InputEvent('input', {
+          bubbles: true,
+          data: composed,
+          inputType: 'insertCompositionText',
+          isComposing: true,
+        }),
+      )
+      await nextTick()
+      expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+
+      element.dispatchEvent(
+        new CompositionEvent('compositionend', {
+          bubbles: true,
+          data: composed,
+        }),
+      )
+      await nextTick()
+      expect(wrapper.emitted('update:modelValue')).toEqual([[composed]])
+      expect(wrapper.emitted('history-change')?.at(-1)?.[0]).toMatchObject({
+        undoDepth: 1,
+      })
+      expect(wrapper.emitted('transaction')?.at(-1)?.[0]).toMatchObject({
+        accepted: true,
+        transaction: {
+          history: 'separate',
+          metadata: { composition: true },
+          origin: 'input',
+        },
+      })
+    },
+  )
+
+  it('keeps native post-composition insertText commits separate from following input', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        modelValue: '',
+      },
+    })
+    const element = wrapper.find('textarea').element as HTMLTextAreaElement
+
+    const commitNativeComposition = (committed: string) => {
+      element.dispatchEvent(
+        new CompositionEvent('compositionstart', { bubbles: true }),
+      )
+      element.setSelectionRange(element.value.length, element.value.length)
+      element.dispatchEvent(
+        new CompositionEvent('compositionend', {
+          bubbles: true,
+          data: '',
+        }),
+      )
+      element.dispatchEvent(
+        new InputEvent('beforeinput', {
+          bubbles: true,
+          data: committed,
+          inputType: 'insertText',
+        }),
+      )
+      element.value += committed
+      element.setSelectionRange(element.value.length, element.value.length)
+      element.dispatchEvent(
+        new InputEvent('input', {
+          bubbles: true,
+          data: committed,
+          inputType: 'insertText',
+        }),
+      )
+    }
+
+    commitNativeComposition('한')
+    commitNativeComposition('글')
+    element.dispatchEvent(
+      new InputEvent('beforeinput', {
+        bubbles: true,
+        inputType: 'insertLineBreak',
+      }),
+    )
+    element.value += '\n'
+    element.setSelectionRange(element.value.length, element.value.length)
+    element.dispatchEvent(
+      new InputEvent('input', {
+        bubbles: true,
+        inputType: 'insertLineBreak',
+      }),
+    )
+    await nextTick()
+
+    expect(wrapper.vm.undo()).toMatchObject({ value: '한글' })
+    expect(wrapper.vm.undo()).toMatchObject({ value: '한' })
+    expect(wrapper.vm.undo()).toMatchObject({ value: '' })
+  })
+
+  it('routes beforeinput/input paste and drop through separate dispatcher transactions', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        modelValue: '',
+      },
+    })
+    const element = wrapper.find('textarea').element as HTMLTextAreaElement
+
+    const nativeInput = async (
+      value: string,
+      inputType: 'insertFromDrop' | 'insertFromPaste',
+    ) => {
+      element.setSelectionRange(element.value.length, element.value.length)
+      element.dispatchEvent(
+        new InputEvent('beforeinput', {
+          bubbles: true,
+          data: value,
+          inputType,
+        }),
+      )
+      element.value += value
+      element.setSelectionRange(element.value.length, element.value.length)
+      element.dispatchEvent(
+        new InputEvent('input', {
+          bubbles: true,
+          data: value,
+          inputType,
+        }),
+      )
+      await nextTick()
+    }
+
+    await nativeInput('粘贴', 'insertFromPaste')
+    await nativeInput('拖放', 'insertFromDrop')
+
+    expect(
+      wrapper
+        .emitted('transaction')
+        ?.map(([event]) => event as MarkdownEditorTransactionEvent)
+        .filter((event) => event.accepted)
+        .map((event) => event.transaction.origin),
+    ).toEqual(['paste', 'drop'])
+    expect(wrapper.emitted('history-change')?.at(-1)?.[0]).toMatchObject({
+      undoDepth: 2,
+    })
+    expect(wrapper.vm.undo()).toMatchObject({ value: '粘贴' })
+  })
+
+  it('rejects public mutations while loading without changing the optimistic value', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        loading: true,
+        modelValue: 'draft',
+      },
+    })
+    expect(wrapper.find('textarea').attributes('aria-busy')).toBe('true')
+    expect(
+      wrapper.vm.dispatchTransaction({
+        changes: [{ from: 5, insert: '!', to: 5 }],
+        history: 'separate',
+        origin: 'programmatic',
+        selection: { direction: 'none', start: 6, end: 6 },
+      }),
+    ).toMatchObject({
+      accepted: false,
+      reason: 'disabled',
+      value: 'draft',
+    })
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+
+    await wrapper.setProps({ loading: false })
+    expect(wrapper.find('textarea').attributes('aria-busy')).toBeUndefined()
   })
 })

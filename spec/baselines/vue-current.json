@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "729e4bf348aeefd7abf5def215fcecc1d16cd407",
+    "commitSha": "d198bedc6e8cd4500e16543684f14e99abbfab8c",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
@@ -2566,6 +2566,7 @@
         "editorProfile",
         "imageActionLabel",
         "interactionProfile",
+        "loading",
         "minRows",
         "mobileLayout",
         "mode",
@@ -2591,11 +2592,14 @@
         "[UPDATE_MODEL_EVENT]",
         "command",
         "features-activated",
+        "history-change",
         "mode-change",
         "render-complete",
         "render-error",
         "save",
+        "selection-change",
         "submit",
+        "transaction",
         "upload-image"
       ],
       "slots": [
@@ -2604,7 +2608,12 @@
           "scoped": true
         }
       ],
-      "exposed": ["insertMarkdownAtCursor"]
+      "exposed": [
+        "dispatchTransaction",
+        "insertMarkdownAtCursor",
+        "redo",
+        "undo"
+      ]
     },
     {
       "name": "ElMarkdownRenderer",

@@ -4,6 +4,27 @@ import { buildProps, definePropType } from '@element-plus/utils'
 import type { ExtractPropTypes, PropType } from 'vue'
 import type { MarkdownFeatureActivationFeatureOptions } from '@element-plus/wasm'
 import type MarkdownEditor from './markdown-editor.vue'
+import type {
+  MarkdownEditorHistoryState,
+  MarkdownEditorSelection,
+  MarkdownEditorSelectionEvent,
+  MarkdownEditorTransactionEvent,
+} from './markdown-editor-transaction'
+
+export type {
+  MarkdownEditorChange,
+  MarkdownEditorDispatchResult,
+  MarkdownEditorHistoryMode,
+  MarkdownEditorHistoryState,
+  MarkdownEditorResolvedSelection,
+  MarkdownEditorSelection,
+  MarkdownEditorSelectionDirection,
+  MarkdownEditorSelectionEvent,
+  MarkdownEditorTransaction,
+  MarkdownEditorTransactionEvent,
+  MarkdownEditorTransactionOrigin,
+  MarkdownEditorTransactionRejection,
+} from './markdown-editor-transaction'
 
 export type MarkdownEditorMode = 'write' | 'split' | 'preview'
 export type MarkdownEditorMobileLayout = 'auto' | 'compact' | 'standard'
@@ -14,11 +35,6 @@ export type MarkdownEditorActionKey = 'image' | 'save' | 'submit'
 export interface MarkdownEditorActionItem {
   key: MarkdownEditorActionKey
   label: string
-}
-
-export interface MarkdownEditorSelection {
-  end: number
-  start: number
 }
 
 export interface MarkdownEditorCommandResult {
@@ -37,10 +53,17 @@ export interface MarkdownEditorCommand {
   ) => MarkdownEditorCommandResult
 }
 
+export interface MarkdownEditorInsertOptions {
+  readonly expectedRevision?: number
+  readonly metadata?: Readonly<Record<string, unknown>>
+  readonly selection?: MarkdownEditorSelection
+}
+
 const clampSelection = (
   value: string,
   selection: MarkdownEditorSelection,
 ): MarkdownEditorSelection => ({
+  direction: selection.direction ?? 'none',
   end: Math.max(0, Math.min(value.length, selection.end)),
   start: Math.max(0, Math.min(value.length, selection.start)),
 })
@@ -57,6 +80,8 @@ const replaceRange = (
     value.slice(0, range.start) + replacement + value.slice(range.end)
   return {
     nextSelection: {
+      direction:
+        selectStartOffset === selectEndOffset ? 'none' : range.direction,
       start: range.start + selectStartOffset,
       end: range.start + selectEndOffset,
     },
@@ -98,7 +123,7 @@ const prefixSelectedLines = (
     .join('\n')
   return replaceRange(
     value,
-    { start: lineStart, end: lineEnd },
+    { direction: range.direction, start: lineStart, end: lineEnd },
     replacement,
     range.start - lineStart + prefix.length,
     range.end - lineStart + prefix.length,
@@ -214,6 +239,7 @@ export const markdownEditorProps = buildProps({
     default: undefined,
   },
   disabled: Boolean,
+  loading: Boolean,
   showModeSwitcher: {
     type: Boolean,
     default: true,
@@ -297,6 +323,17 @@ export const markdownEditorEmits = {
   'render-complete': (..._args: unknown[]) => true,
   'render-error': (..._args: unknown[]) => true,
   'features-activated': (..._args: unknown[]) => true,
+  transaction: (event: MarkdownEditorTransactionEvent) =>
+    typeof event?.accepted === 'boolean' &&
+    typeof event.revision === 'number' &&
+    typeof event.value === 'string',
+  'selection-change': (event: MarkdownEditorSelectionEvent) =>
+    typeof event?.revision === 'number' &&
+    typeof event.selection?.start === 'number' &&
+    typeof event.selection?.end === 'number',
+  'history-change': (history: MarkdownEditorHistoryState) =>
+    typeof history?.undoDepth === 'number' &&
+    typeof history.redoDepth === 'number',
 }
 
 export type MarkdownEditorProps = ExtractPropTypes<typeof markdownEditorProps>

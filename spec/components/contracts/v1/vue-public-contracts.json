@@ -5,7 +5,7 @@
   "owner": "FsusUI Core",
   "baseline": {
     "path": "spec/baselines/vue-current.json",
-    "hash": "4a7b8fda11476dc7f02423eb50e3b58056d7c5b5ba85e48483e3bfa35977afc6",
+    "hash": "6f3a5977cab910f16914ddf184e60f58480d76b368c96e3d6e878b2d6a4c976e",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
     "iconHash": "d61254b1b1ff9addaf45293153df217b0c0d01ec69ec602081c44a01008b78de"
@@ -9746,6 +9746,12 @@
           "required": false
         },
         {
+          "name": "loading",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "minRows",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -9878,6 +9884,10 @@
           "payload": "vue-source"
         },
         {
+          "name": "history-change",
+          "payload": "vue-source"
+        },
+        {
           "name": "mode-change",
           "payload": "vue-source"
         },
@@ -9894,7 +9904,15 @@
           "payload": "vue-source"
         },
         {
+          "name": "selection-change",
+          "payload": "vue-source"
+        },
+        {
           "name": "submit",
+          "payload": "vue-source"
+        },
+        {
+          "name": "transaction",
           "payload": "vue-source"
         },
         {
@@ -9911,7 +9929,19 @@
       ],
       "exposed": [
         {
+          "name": "dispatchTransaction",
+          "signature": "vue-source"
+        },
+        {
           "name": "insertMarkdownAtCursor",
+          "signature": "vue-source"
+        },
+        {
+          "name": "redo",
+          "signature": "vue-source"
+        },
+        {
+          "name": "undo",
           "signature": "vue-source"
         }
       ],
