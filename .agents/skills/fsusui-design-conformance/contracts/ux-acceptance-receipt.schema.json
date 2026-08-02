@@ -1,0 +1,268 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://fsusui.dev/contracts/ux-acceptance-receipt.v1.schema.json",
+  "title": "FsusUI UX acceptance receipt v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "classificationReceiptDigest",
+    "dispatchReceiptDigest",
+    "candidateSha",
+    "candidateDigest",
+    "verificationClass",
+    "routingProfile",
+    "actualModel",
+    "actualEffort",
+    "verifierRole",
+    "implementationRunIdentityDigest",
+    "verifierRunIdentityDigest",
+    "requiredSkillDigests",
+    "authorityDigests",
+    "activeBaselineIdentityDigest",
+    "workPlanDigest",
+    "slicePlanDigest",
+    "compiledPromptDigest",
+    "executionRouteDigest",
+    "routingPolicyDigest",
+    "slicePolicyDigest",
+    "freshContext",
+    "sandbox",
+    "writeScope",
+    "modifiedPaths",
+    "productionFixture",
+    "viewportStateMatrix",
+    "inspectedRenderedArtifacts",
+    "blockers",
+    "status",
+    "receiptDigest"
+  ],
+  "properties": {
+    "schema": {
+      "const": "fsusui-design-conformance.ux-acceptance-receipt.v1"
+    },
+    "classificationReceiptDigest": {
+      "$ref": "#/definitions/hash"
+    },
+    "dispatchReceiptDigest": {
+      "$ref": "#/definitions/hash"
+    },
+    "candidateSha": {
+      "$ref": "#/definitions/sha"
+    },
+    "candidateDigest": {
+      "$ref": "#/definitions/hash"
+    },
+    "verificationClass": {
+      "enum": ["ux-local", "ux-path", "ux-system"]
+    },
+    "routingProfile": {
+      "enum": ["sol-medium", "sol-high", "sol-xhigh"]
+    },
+    "actualModel": {
+      "const": "gpt-5.6-sol"
+    },
+    "actualEffort": {
+      "enum": ["medium", "high", "xhigh"]
+    },
+    "verifierRole": {
+      "const": "ux-acceptance-verifier"
+    },
+    "implementationRunIdentityDigest": {
+      "$ref": "#/definitions/hash"
+    },
+    "verifierRunIdentityDigest": {
+      "$ref": "#/definitions/hash"
+    },
+    "requiredSkillDigests": {
+      "$ref": "#/definitions/hashes"
+    },
+    "authorityDigests": {
+      "$ref": "#/definitions/hashes"
+    },
+    "activeBaselineIdentityDigest": {
+      "$ref": "#/definitions/hash"
+    },
+    "workPlanDigest": {
+      "$ref": "#/definitions/hash"
+    },
+    "slicePlanDigest": {
+      "$ref": "#/definitions/hash"
+    },
+    "compiledPromptDigest": {
+      "$ref": "#/definitions/hash"
+    },
+    "executionRouteDigest": {
+      "$ref": "#/definitions/hash"
+    },
+    "routingPolicyDigest": {
+      "$ref": "#/definitions/hash"
+    },
+    "slicePolicyDigest": {
+      "$ref": "#/definitions/hash"
+    },
+    "freshContext": {
+      "const": true
+    },
+    "sandbox": {
+      "const": "read-only"
+    },
+    "writeScope": {
+      "const": "none"
+    },
+    "modifiedPaths": {
+      "type": "array",
+      "maxItems": 0
+    },
+    "productionFixture": {
+      "const": true
+    },
+    "viewportStateMatrix": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "viewport",
+          "state",
+          "theme",
+          "inputModes",
+          "evidenceDigest"
+        ],
+        "properties": {
+          "viewport": {
+            "type": "string",
+            "minLength": 1
+          },
+          "state": {
+            "type": "string",
+            "minLength": 1
+          },
+          "theme": {
+            "enum": ["light", "dark"]
+          },
+          "inputModes": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "pointer",
+                "keyboard",
+                "touch",
+                "screen-reader",
+                "reduced-motion",
+                "zoom"
+              ]
+            }
+          },
+          "evidenceDigest": {
+            "$ref": "#/definitions/hash"
+          }
+        }
+      }
+    },
+    "inspectedRenderedArtifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "path",
+          "digest",
+          "inspected",
+          "fixtureClass"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "screenshot",
+              "video",
+              "trace",
+              "accessibility-tree",
+              "screen-reader-report"
+            ]
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "digest": {
+            "$ref": "#/definitions/hash"
+          },
+          "inspected": {
+            "const": true
+          },
+          "fixtureClass": {
+            "const": "production"
+          }
+        }
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "status": {
+      "enum": ["accepted", "rejected"]
+    },
+    "receiptDigest": {
+      "$ref": "#/definitions/hash"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "accepted"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "blockers": {
+            "maxItems": 0
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "blockers": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ],
+  "definitions": {
+    "hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "hashes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/hash"
+      }
+    },
+    "sha": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    }
+  }
+}

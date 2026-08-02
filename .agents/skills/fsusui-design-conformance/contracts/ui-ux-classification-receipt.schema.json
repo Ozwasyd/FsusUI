@@ -1,0 +1,186 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://fsusui.dev/contracts/ui-ux-classification-receipt.v1.schema.json",
+  "title": "FsusUI UI/UX classification receipt v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "ownerRepository",
+    "affectedSurfaces",
+    "uiDecisionClass",
+    "verificationClass",
+    "requiredAuthorities",
+    "requiredSkillDigests",
+    "activeBaselineIdentity",
+    "candidateSha",
+    "candidateDigest",
+    "stateEvidenceMatrix",
+    "inScope",
+    "outOfScope",
+    "classificationEvidenceDigest",
+    "routingPolicyDigest",
+    "slicePolicyDigest",
+    "status",
+    "receiptDigest"
+  ],
+  "properties": {
+    "schema": {
+      "const": "fsusui-design-conformance.ui-ux-classification-receipt.v1"
+    },
+    "ownerRepository": {
+      "$ref": "#/definitions/repository"
+    },
+    "affectedSurfaces": {
+      "$ref": "#/definitions/nonEmptyStrings"
+    },
+    "uiDecisionClass": {
+      "enum": [
+        "prescribed",
+        "bounded-composition",
+        "layout-judgment",
+        "interaction-judgment",
+        "system-design-dispute"
+      ]
+    },
+    "verificationClass": {
+      "enum": ["ux-local", "ux-path", "ux-system"]
+    },
+    "requiredAuthorities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "path", "digest"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "digest": {
+            "$ref": "#/definitions/hash"
+          }
+        }
+      }
+    },
+    "requiredSkillDigests": {
+      "$ref": "#/definitions/hashes"
+    },
+    "activeBaselineIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "revision",
+        "skillDigest",
+        "authorityDigest",
+        "dirtyFingerprint"
+      ],
+      "properties": {
+        "repository": {
+          "const": "Ozwasyd/FsusUI"
+        },
+        "revision": {
+          "$ref": "#/definitions/sha"
+        },
+        "skillDigest": {
+          "$ref": "#/definitions/hash"
+        },
+        "authorityDigest": {
+          "$ref": "#/definitions/hash"
+        },
+        "dirtyFingerprint": {
+          "$ref": "#/definitions/hash"
+        }
+      }
+    },
+    "candidateSha": {
+      "$ref": "#/definitions/sha"
+    },
+    "candidateDigest": {
+      "$ref": "#/definitions/hash"
+    },
+    "stateEvidenceMatrix": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["state", "viewport", "theme", "evidenceDigest"],
+        "properties": {
+          "state": {
+            "type": "string",
+            "minLength": 1
+          },
+          "viewport": {
+            "type": "string",
+            "minLength": 1
+          },
+          "theme": {
+            "enum": ["light", "dark", "both", "not-applicable"]
+          },
+          "evidenceDigest": {
+            "$ref": "#/definitions/hash"
+          }
+        }
+      }
+    },
+    "inScope": {
+      "$ref": "#/definitions/nonEmptyStrings"
+    },
+    "outOfScope": {
+      "$ref": "#/definitions/nonEmptyStrings"
+    },
+    "classificationEvidenceDigest": {
+      "$ref": "#/definitions/hash"
+    },
+    "routingPolicyDigest": {
+      "$ref": "#/definitions/hash"
+    },
+    "slicePolicyDigest": {
+      "$ref": "#/definitions/hash"
+    },
+    "status": {
+      "const": "frozen"
+    },
+    "receiptDigest": {
+      "$ref": "#/definitions/hash"
+    }
+  },
+  "definitions": {
+    "hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "hashes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/hash"
+      }
+    },
+    "sha": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "repository": {
+      "type": "string",
+      "pattern": "^[^/]+/[^/]+$"
+    },
+    "nonEmptyStrings": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

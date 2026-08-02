@@ -120,7 +120,14 @@ Do not fix both sides by adding a compatibility layer. Use one owning implementa
 
 The canonical `fsusui-design-conformance` Skill lives in the FsusUI repository under `.agents/skills/`. It is discovered automatically when Codex runs in a workspace scope that exposes that directory. A separate consumer repository may expose the exact canonical Skill through its workspace configuration or a revision-pinned copy, but it must not fork the workflow or embed copied design values. The consumer must record which FsusUI revision supplies the Skill and documents.
 
-The Skill is optional execution assistance. The documents and public contracts remain authoritative even when the Skill is unavailable or not activated.
+The Skill is optional assistance for direct human-led work; the documents and
+public contracts remain authoritative even when no agent workflow is active.
+For an orchestrated UI writer, adjudicator, or UX verifier, however, the
+canonical Skill is a required procedural contract: dispatch and acceptance must
+bind its exact digest and the active FsusUI baseline. Missing or unobservable
+Skill load fails that orchestration stage and cannot be replaced by a copied
+summary. This requirement does not raise the Skill above `spec/`,
+`docs/design.md`, or domain contracts.
 
 ## 8. Consumer evidence
 
