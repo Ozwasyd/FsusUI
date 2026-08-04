@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test'
+import { projectsForSuite } from '../scripts/playwright-suite-projects.mjs'
 import {
   createPlaywrightReporter,
   resolveTestPort,
@@ -29,20 +30,15 @@ export default defineConfig({
     trace: 'retain-on-failure',
     video: 'off',
   },
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-  ],
+  projects: projectsForSuite('markdown-editor-interaction').map((cell) => ({
+    name: cell.project,
+    use:
+      cell.browser === 'chromium'
+        ? { ...devices['Desktop Chrome'] }
+        : cell.browser === 'firefox'
+          ? { ...devices['Desktop Firefox'] }
+          : { ...devices['Desktop Safari'] },
+  })),
   webServer: {
     command: `pnpm -C .. run build:demo && pnpm -C packages/demo-app exec vite preview --host 127.0.0.1 --port ${port} --strictPort`,
     url: baseURL,

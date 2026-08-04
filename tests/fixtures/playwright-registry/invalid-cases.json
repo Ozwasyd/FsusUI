@@ -1,0 +1,11 @@
+[
+  { "name": "deleted WebKit cell", "mutation": "delete-webkit", "expected": "bidirectionally identical" },
+  { "name": "project name used as browser", "mutation": "browser-is-project", "expected": "chromium, firefox, or webkit" },
+  { "name": "project renamed without planner", "mutation": "project-renamed", "expected": "bidirectionally identical" },
+  { "name": "package command drift", "mutation": "command-drift", "expected": "must equal" },
+  { "name": "artifact namespace collision", "mutation": "namespace-collision", "expected": "collides" },
+  { "name": "unknown profile", "mutation": "unknown-profile", "expected": "unknown profile" },
+  { "name": "implicit chromium", "mutation": "missing-browser", "expected": "explicitly" },
+  { "name": "runtime reuse counted as compatibility", "mutation": "reuse-browser-coverage", "expected": "runtime-contract" },
+  { "name": "runtime guessed empty cells", "mutation": "empty-cells", "expected": "non-empty" }
+]

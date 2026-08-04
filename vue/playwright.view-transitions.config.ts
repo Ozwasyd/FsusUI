@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test'
+import { projectsForSuite } from '../scripts/playwright-suite-projects.mjs'
 import {
   createPlaywrightReporter,
   resolvePlaywrightWorkers,
@@ -24,19 +25,20 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
-  projects: [
-    {
-      name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-        launchOptions: process.env.FSUS_PLAYWRIGHT_EXECUTABLE_PATH
-          ? { executablePath: process.env.FSUS_PLAYWRIGHT_EXECUTABLE_PATH }
-          : undefined,
-      },
-    },
-    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
-    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
-  ],
+  projects: projectsForSuite('view-transitions').map((cell) => ({
+    name: cell.project,
+    use:
+      cell.browser === 'chromium'
+        ? {
+            ...devices['Desktop Chrome'],
+            launchOptions: process.env.FSUS_PLAYWRIGHT_EXECUTABLE_PATH
+              ? { executablePath: process.env.FSUS_PLAYWRIGHT_EXECUTABLE_PATH }
+              : undefined,
+          }
+        : cell.browser === 'firefox'
+          ? { ...devices['Desktop Firefox'] }
+          : { ...devices['Desktop Safari'] },
+  })),
   webServer: {
     command: `pnpm -C packages/demo-app dev --host 127.0.0.1 --port ${port} --strictPort`,
     url: baseURL,

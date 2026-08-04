@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test'
+import { projectsForSuite } from '../scripts/playwright-suite-projects.mjs'
 import {
   createPlaywrightReporter,
   resolveDomLayoutWorkers,
@@ -33,40 +34,17 @@ export default defineConfig({
     trace: 'off',
     video: 'off',
   },
-  projects: [
-    {
-      name: 'desktop-light',
-      use: {
-        ...devices['Desktop Chrome'],
-        colorScheme: 'light',
-        viewport: { width: 1440, height: 1600 },
-      },
+  projects: projectsForSuite('dom-layout').map((cell) => ({
+    name: cell.project,
+    use: {
+      ...(cell.viewport === 'mobile' ? devices['Pixel 7'] : devices['Desktop Chrome']),
+      colorScheme: cell.theme,
+      viewport:
+        cell.viewport === 'mobile'
+          ? { width: 412, height: 1200 }
+          : { width: 1440, height: 1600 },
     },
-    {
-      name: 'mobile-light',
-      use: {
-        ...devices['Pixel 7'],
-        colorScheme: 'light',
-        viewport: { width: 412, height: 1200 },
-      },
-    },
-    {
-      name: 'desktop-dark',
-      use: {
-        ...devices['Desktop Chrome'],
-        colorScheme: 'dark',
-        viewport: { width: 1440, height: 1600 },
-      },
-    },
-    {
-      name: 'mobile-dark',
-      use: {
-        ...devices['Pixel 7'],
-        colorScheme: 'dark',
-        viewport: { width: 412, height: 1200 },
-      },
-    },
-  ],
+  })),
   webServer: {
     command: `pnpm -C .. run build:demo && pnpm -C packages/demo-app exec vite preview --host 127.0.0.1 --port ${domLayoutPort} --strictPort`,
     url: domLayoutBaseUrl,

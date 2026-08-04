@@ -1,4 +1,5 @@
 import { defineConfig } from '@playwright/test'
+import { projectsForSuite } from '../scripts/playwright-suite-projects.mjs'
 import {
   createPlaywrightReporter,
   resolveTestPort,
@@ -19,7 +20,6 @@ export default defineConfig({
   expect: { timeout: 20_000 },
   use: {
     baseURL,
-    browserName: 'chromium',
     colorScheme: 'light',
     locale: 'zh-CN',
     timezoneId: 'Asia/Shanghai',
@@ -31,6 +31,10 @@ export default defineConfig({
     trace: 'off',
     video: 'off',
   },
+  projects: projectsForSuite('geometry-smoke').map((cell) => ({
+    name: cell.project,
+    use: { browserName: cell.browser },
+  })),
   webServer: {
     command: `pnpm -C .. run build:demo && pnpm -C packages/demo-app exec vite preview --host 127.0.0.1 --port ${port} --strictPort`,
     url: baseURL,

@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test'
+import { projectsForSuite } from '../scripts/playwright-suite-projects.mjs'
 import {
   createPlaywrightReporter,
   resolveTestPort,
@@ -26,82 +27,26 @@ export default defineConfig({
     colorScheme: 'light',
     viewport: { width: 1440, height: 1600 },
   },
-  projects: [
-    {
-      name: 'desktop-light',
-      testIgnore: '**/safe-area-*.spec.ts',
-      use: {
-        ...devices['Desktop Chrome'],
-        colorScheme: 'light',
-        viewport: { width: 1440, height: 1600 },
-      },
+  projects: projectsForSuite('visual-boundary-audit').map((cell) => ({
+    name: cell.project,
+    ...(cell.safeArea
+      ? { testMatch: '**/safe-area-*.spec.ts' }
+      : { testIgnore: '**/safe-area-*.spec.ts' }),
+    use: {
+      ...(cell.browser === 'webkit'
+        ? devices['Desktop Safari']
+        : cell.viewport === 'mobile' || cell.viewport === 'tiny'
+          ? devices['Pixel 7']
+          : devices['Desktop Chrome']),
+      colorScheme: cell.theme,
+      viewport:
+        cell.viewport === 'tiny'
+          ? { width: 320, height: 900 }
+          : cell.viewport === 'mobile'
+            ? { width: cell.safeArea ? 390 : 412, height: cell.safeArea ? 844 : 1200 }
+            : { width: 1440, height: 1600 },
     },
-    {
-      name: 'mobile-light',
-      testIgnore: '**/safe-area-*.spec.ts',
-      use: {
-        ...devices['Pixel 7'],
-        colorScheme: 'light',
-        viewport: { width: 412, height: 1200 },
-      },
-    },
-    {
-      name: 'tiny-light',
-      testIgnore: '**/safe-area-*.spec.ts',
-      use: {
-        ...devices['Pixel 7'],
-        colorScheme: 'light',
-        viewport: { width: 320, height: 900 },
-      },
-    },
-    {
-      name: 'desktop-dark',
-      testIgnore: '**/safe-area-*.spec.ts',
-      use: {
-        ...devices['Desktop Chrome'],
-        colorScheme: 'dark',
-        viewport: { width: 1440, height: 1600 },
-      },
-    },
-    {
-      name: 'mobile-dark',
-      testIgnore: '**/safe-area-*.spec.ts',
-      use: {
-        ...devices['Pixel 7'],
-        colorScheme: 'dark',
-        viewport: { width: 412, height: 1200 },
-      },
-    },
-    {
-      name: 'tiny-dark',
-      testIgnore: '**/safe-area-*.spec.ts',
-      use: {
-        ...devices['Pixel 7'],
-        colorScheme: 'dark',
-        viewport: { width: 320, height: 900 },
-      },
-    },
-    // Issue #262: safe-area geometry matrix on Chromium + WebKit.
-    // Profiles set viewport size at runtime; default here is portrait phone.
-    {
-      name: 'safe-area-chromium',
-      testMatch: '**/safe-area-*.spec.ts',
-      use: {
-        ...devices['Desktop Chrome'],
-        colorScheme: 'light',
-        viewport: { width: 390, height: 844 },
-      },
-    },
-    {
-      name: 'safe-area-webkit',
-      testMatch: '**/safe-area-*.spec.ts',
-      use: {
-        ...devices['Desktop Safari'],
-        colorScheme: 'light',
-        viewport: { width: 390, height: 844 },
-      },
-    },
-  ],
+  })),
   webServer: {
     command:
       `pnpm -C .. run ensure:wasm && pnpm -C packages/demo-app exec vite --host 127.0.0.1 --port ${boundaryAuditPort} --strictPort`,
