@@ -2,7 +2,7 @@
 
 > **Version:** 0.1 · **Status:** Stable · **Scope:** FsusUI component library defaults, documentation examples, and product integration · **Last updated:** 2026-07-11
 >
-> 维护者：FsusUI core team。关联文档：[`docs/theme/tokens.md`](../theme/tokens.md)、[`docs/theme/motion.md`](../theme/motion.md)、[`docs/element-plus-integration.md`](../element-plus-integration.md)、[`docs/api-stability.md`](../api-stability.md)。术语约定见 [§13 Terminology](#13-terminology)。
+> 关联文档：[`docs/theme/tokens.md`](../theme/tokens.md)、[`docs/theme/motion.md`](../theme/motion.md)、[`docs/element-plus-integration.md`](../element-plus-integration.md)、[`docs/api-stability.md`](../api-stability.md)。术语约定见 [§13 Terminology](#13-terminology)。
 
 ## 1. Scope and Intent
 
