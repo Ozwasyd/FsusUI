@@ -6,7 +6,7 @@
 
 ## 1. Scope and Intent
 
-FsusUI 2026 的设计语言定义为 **The Intellectual Minimalist（高智感极简主义）**。它不是一组装饰风格，而是一套用于组件库实现、文档示例和产品集成的设计约束。
+FsusUI 的设计语言定义为 **The Intellectual Minimalist**。
 
 核心目标：
 
