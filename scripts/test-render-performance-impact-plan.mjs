@@ -7,6 +7,7 @@ import process from 'node:process'
 import { promisify } from 'node:util'
 import {
   createImpactPlan,
+  isPlaywrightRegistryOnlyPackageMutation,
   loadOwnershipRegistry,
   verifyImpactPlan,
 } from './render-performance-impact.mjs'
@@ -25,6 +26,14 @@ for (const fixture of cases) {
     changedFiles: fixture.files,
     registry,
     baseRef: 'fixture-base',
+    ownershipOverrides: fixture.packageRegistryOnly
+      ? {
+          'package.json': {
+            id: 'playwright-registry-package-scripts',
+            scope: 'skip',
+          },
+        }
+      : {},
   })
   verifyImpactPlan(plan)
   assert.equal(plan.scope, fixture.scope, fixture.name)
@@ -37,6 +46,44 @@ for (const fixture of cases) {
       fixture.name,
     )
 }
+
+const baselinePackage = {
+  private: true,
+  scripts: {
+    test: 'vitest',
+    'test:markdown-editor:interaction':
+      'node ./scripts/with-node-heap.mjs playwright test --config=vue/playwright.markdown-editor.config.ts --project=chromium --project=firefox',
+  },
+  dependencies: { vue: '^3.5.0' },
+}
+const registryPackage = structuredClone(baselinePackage)
+registryPackage.scripts = {
+  ...registryPackage.scripts,
+  'test:markdown-editor:interaction':
+    'node ./scripts/with-node-heap.mjs playwright test --config=vue/playwright.markdown-editor.config.ts',
+  'ci:playwright:plan': 'node ./scripts/playwright-suites.mjs plan',
+  'ci:playwright:check': 'node ./scripts/playwright-suites.mjs check',
+  'test:ci-playwright-registry': 'node ./scripts/test-playwright-suites.mjs',
+}
+assert.equal(
+  isPlaywrightRegistryOnlyPackageMutation(baselinePackage, registryPackage),
+  true,
+)
+const dependencyMutation = structuredClone(registryPackage)
+dependencyMutation.dependencies.vue = '^3.6.0'
+assert.equal(
+  isPlaywrightRegistryOnlyPackageMutation(baselinePackage, dependencyMutation),
+  false,
+)
+const unrelatedScriptMutation = structuredClone(registryPackage)
+unrelatedScriptMutation.scripts.build = 'vite build'
+assert.equal(
+  isPlaywrightRegistryOnlyPackageMutation(
+    baselinePackage,
+    unrelatedScriptMutation,
+  ),
+  false,
+)
 
 const fallback = createImpactPlan({
   changedFiles: [],
