@@ -1,10 +1,11 @@
 import { execFile } from 'node:child_process'
-import { appendFile, mkdir, writeFile } from 'node:fs/promises'
+import { appendFile, mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
 import { promisify } from 'node:util'
 import {
   createImpactPlan,
+  isPlaywrightRegistryOnlyPackageMutation,
   loadOwnershipRegistry,
 } from './render-performance-impact.mjs'
 
@@ -22,6 +23,27 @@ const outputArgument = valueOf(
 )
 const output = path.resolve(root, outputArgument)
 const registry = await loadOwnershipRegistry(root)
+
+const registryOnlyPackageOverride = async (ref) => {
+  try {
+    const [{ stdout: baselineSource }, currentSource] = await Promise.all([
+      execFileAsync('git', ['show', `${ref}:package.json`], { cwd: root }),
+      readFile(path.join(root, 'package.json'), 'utf8'),
+    ])
+    const baseline = JSON.parse(baselineSource)
+    const current = JSON.parse(currentSource)
+    return isPlaywrightRegistryOnlyPackageMutation(baseline, current)
+      ? {
+          'package.json': {
+            id: 'playwright-registry-package-scripts',
+            scope: 'skip',
+          },
+        }
+      : {}
+  } catch {
+    return {}
+  }
+}
 
 let changedFiles = []
 let fallbackReason = null
@@ -45,11 +67,16 @@ if (!baseRef) {
   }
 }
 
+const ownershipOverrides =
+  baseRef && changedFiles.includes('package.json')
+    ? await registryOnlyPackageOverride(baseRef)
+    : {}
 const plan = createImpactPlan({
   changedFiles,
   registry,
   baseRef,
   fallbackReason,
+  ownershipOverrides,
 })
 const reason =
   plan.fallbackReason ||
