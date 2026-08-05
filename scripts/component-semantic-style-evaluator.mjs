@@ -1,11 +1,11 @@
 import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 import * as csstree from 'css-tree'
 import Ajv2020 from 'ajv/dist/2020.js'
-import { compile } from 'sass'
+import { compileString } from 'sass'
 import { SourceMapConsumer } from 'source-map-js'
 
 import {
@@ -22,6 +22,7 @@ const registrySchema = path.join(
   repositoryRoot,
   'spec/components/component-surface-semantic-registry.schema.json',
 )
+const productionProvenanceCache = new Map()
 
 const fail = (code, message, cause) =>
   Object.assign(new Error(message, cause ? { cause } : undefined), { code })
@@ -264,7 +265,7 @@ const signature = (declaration) =>
     declaration.layer,
   ])
 
-const establishProvenance = async (root, registry) => {
+const establishProvenance = async (root, registry, cascadeDeclarations) => {
   const sassPaths = new Set()
   const cssPaths = new Set()
   for (const rule of registry.rules) {
@@ -283,14 +284,89 @@ const establishProvenance = async (root, registry) => {
     )
   }
   const provenance = new Map()
-  for (const sassPath of sassPaths) {
-    const sourceFile = path.join(root, sassPath)
+  if (cssPaths.size === 0) {
+    const cacheKey = sha256(
+      JSON.stringify([
+        registry.generated?.sourceRevision,
+        [...sassPaths].sort(),
+        cascadeDeclarations.map(signature),
+      ]),
+    )
+    const cached = productionProvenanceCache.get(cacheKey)
+    if (cached) return new Map(cached)
+    const themeEntrypoint = path.join(
+      repositoryRoot,
+      'vue/packages/theme-chalk/src/index.scss',
+    )
     let result
     try {
-      result = compile(sourceFile, {
-        loadPaths: [path.dirname(sourceFile)],
+      result = compileString(await readFile(themeEntrypoint, 'utf8'), {
+        loadPaths: [path.dirname(themeEntrypoint)],
         sourceMap: true,
         style: 'expanded',
+        url: pathToFileURL(themeEntrypoint),
+      })
+    } catch (error) {
+      throw fail(
+        'semantic-style-sass-compile-failed',
+        'Sass compilation failed: theme entrypoint',
+        error,
+      )
+    }
+    const generated = stylesheetDeclarations(
+      result.css,
+      themeEntrypoint,
+      repositoryRoot,
+    ).declarations
+    const bySignature = new Map()
+    for (const declaration of generated) {
+      const key = signature(declaration)
+      const queue = bySignature.get(key) ?? []
+      queue.push(declaration)
+      bySignature.set(key, queue)
+    }
+    const consumer = await new SourceMapConsumer(result.sourceMap)
+    for (const declaration of cascadeDeclarations) {
+      const generatedDeclaration = bySignature
+        .get(signature(declaration))
+        ?.shift()
+      if (!generatedDeclaration) continue
+      const original = consumer.originalPositionFor({
+        column: generatedDeclaration.node.loc.start.column - 1,
+        line: generatedDeclaration.node.loc.start.line,
+      })
+      if (!original.source) continue
+      const originalFile = fileURLToPath(original.source)
+      const originalPath = path.relative(repositoryRoot, originalFile)
+      provenance.set(
+        `${portable(root, declaration.file)}\0${declaration.node.loc.start.line}\0${declaration.node.loc.start.column}`,
+        {
+          path: originalPath.startsWith('..')
+            ? portable(root, originalFile)
+            : originalPath.split(path.sep).join('/'),
+          syntax: 'scss',
+        },
+      )
+    }
+    consumer.destroy?.()
+    productionProvenanceCache.set(cacheKey, new Map(provenance))
+    return provenance
+  }
+  for (const sassPath of sassPaths) {
+    const sourceFile = path.join(root, sassPath)
+    const relativeSource = path.relative(root, sourceFile)
+    const repositorySource = path.join(repositoryRoot, relativeSource)
+    let result
+    try {
+      result = compileString(await readFile(sourceFile, 'utf8'), {
+        loadPaths: [
+          path.dirname(sourceFile),
+          path.dirname(repositorySource),
+          path.join(repositoryRoot, 'vue/packages/theme-chalk/src'),
+        ],
+        sourceMap: true,
+        style: 'expanded',
+        url: pathToFileURL(repositorySource),
       })
     } catch (error) {
       throw fail(
@@ -327,11 +403,14 @@ const establishProvenance = async (root, registry) => {
       })
       const originalFile = original.source
         ? fileURLToPath(original.source)
-        : sourceFile
+        : repositorySource
+      const originalPath = path.relative(repositoryRoot, originalFile)
       provenance.set(
         `${cssPath}\0${declaration.node.loc.start.line}\0${declaration.node.loc.start.column}`,
         {
-          path: portable(root, originalFile),
+          path: originalPath.startsWith('..')
+            ? portable(root, originalFile)
+            : originalPath.split(path.sep).join('/'),
           syntax: 'scss',
         },
       )
@@ -546,6 +625,213 @@ const sourceDetails = (root, declaration, owner) => ({
   path: portable(root, declaration.file),
 })
 
+const declarationProvenance = (root, declaration, provenance) =>
+  provenance.get(
+    `${portable(root, declaration.file)}\0${declaration.node.loc.start.line}\0${declaration.node.loc.start.column}`,
+  )
+
+const selectorMatchesOwnership = (declaration, ownedSelectors) =>
+  ownedSelectors.some(
+    (selector) =>
+      selector.facts.positiveClasses.size > 0 &&
+      [...selector.facts.positiveClasses].every((name) =>
+        declaration.selector.facts.positiveClasses.has(name),
+      ),
+  )
+
+const firstReference = (rule, family) => rule.constraints[family]?.[0]
+
+const semanticRecord = ({
+  actual,
+  context,
+  expected,
+  property,
+  reasonCode,
+  root,
+  rule,
+  status,
+}) => ({
+  actual: actual
+    ? {
+        semanticValue: semanticValue(
+          actual.value,
+          () => undefined,
+          new Set(),
+          true,
+        ),
+        source: sourceDetails(root, actual, rule.owner),
+        value: actual.value,
+      }
+    : { semanticValue: null, source: null, value: null },
+  componentId: rule.componentId,
+  expected: {
+    canonicalReference: expected ? clone(expected) : null,
+  },
+  partId: rule.partId,
+  property,
+  reasonCode,
+  ruleId: rule.id,
+  scope: context,
+  selector:
+    actual?.selector.text ?? rule.selectorOwnership.selectors[0].selector,
+  status,
+  surfaceRole: rule.surfaceRole,
+})
+
+const externalSemanticViolations = ({
+  cascade,
+  provenance,
+  references,
+  root,
+  rule,
+  selectionContract,
+  selectors,
+}) => {
+  const output = []
+  const candidates = cascade.declarations.filter(
+    (declaration) =>
+      !declarationProvenance(root, declaration, provenance) &&
+      selectorMatchesOwnership(declaration, selectors),
+  )
+  const context = (declaration) => contextOf(declaration)
+  const push = (declaration, property, family, reasonCode) => {
+    const expected =
+      firstReference(rule, family) ??
+      (family === 'stateColor' ? selectionContract?.reference : undefined) ??
+      Object.values(rule.constraints).flat()[0]
+    output.push(
+      semanticRecord({
+        actual: declaration,
+        context: context(declaration),
+        expected,
+        property,
+        reasonCode,
+        root,
+        rule,
+        status: 'fail',
+      }),
+    )
+  }
+
+  for (const declaration of candidates) {
+    if (
+      rule.constraints.geometry.length > 0 &&
+      declaration.property === 'min-height'
+    ) {
+      for (const reference of rule.constraints.geometry) {
+        const resolved = references.get(
+          `${reference.path}\0${reference.pointer}`,
+        )
+        if (
+          resolved &&
+          declaration.value === resolved.resolved.value &&
+          !declaration.value.includes('var(')
+        ) {
+          push(
+            declaration,
+            declaration.property,
+            'geometry',
+            'canonical-reference-required',
+          )
+        }
+      }
+    }
+    if (
+      (rule.constraints.stateColor.length > 0 || selectionContract) &&
+      ['color', 'background-color', 'border-color'].includes(
+        declaration.property,
+      ) &&
+      /(?:selected|checked|current)/u.test(declaration.selector.text)
+    ) {
+      const aliases = [
+        ...references.values(),
+        ...(selectionContract ? [selectionContract] : []),
+      ].flatMap(({ resolved }) => resolved.aliases ?? [])
+      if (
+        aliases.length === 0 ||
+        !aliases.some((alias) => declaration.value.includes(alias))
+      ) {
+        push(
+          declaration,
+          declaration.property,
+          'stateColor',
+          'selection-token-required',
+        )
+      }
+    }
+    if (
+      declaration.property === 'opacity' &&
+      /(?:disabled|aria-disabled)/u.test(declaration.selector.text) &&
+      rule.surfaceRole.includes('interactive-root')
+    ) {
+      push(declaration, 'opacity', 'disabled', 'ancestor-opacity-disabled')
+    }
+    if (
+      rule.constraints.typography.length > 0 &&
+      declaration.property === 'font-size'
+    ) {
+      const expected = references.get(
+        `${firstReference(rule, 'typography').path}\0${firstReference(rule, 'typography').pointer}`,
+      )
+      if (expected && declaration.value !== expected.resolved.value) {
+        push(
+          declaration,
+          'font-size',
+          'typography',
+          'typography-semantic-mismatch',
+        )
+      }
+    }
+    if (
+      rule.constraints.motion.length > 0 &&
+      declaration.property === 'transition' &&
+      declaration.value.trim() === 'none' &&
+      declaration.media.includes('prefers-reduced-motion')
+    ) {
+      push(
+        declaration,
+        'transition-duration',
+        'motion',
+        'reduced-motion-lifecycle-required',
+      )
+    }
+    if (
+      rule.constraints.motion.length > 0 &&
+      declaration.property === 'transform'
+    ) {
+      const scale = declaration.value.match(
+        /scale(?:X|Y)?\(\s*(-?(?:\d*\.)?\d+)\s*\)/u,
+      )
+      if (scale && Math.abs(Number(scale[1]) - 1) > 0.2) {
+        push(declaration, 'transform', 'motion', 'strong-scale-forbidden')
+        continue
+      }
+      const travel = declaration.value.match(
+        /translate[XY]\(\s*(-?(?:\d*\.)?\d+)px\s*\)/u,
+      )
+      const distanceReference = rule.constraints.motion.find((reference) => {
+        const resolved = references.get(
+          `${reference.path}\0${reference.pointer}`,
+        )
+        return resolved?.resolved.type === 'dimension'
+      })
+      const distance = distanceReference
+        ? references.get(
+            `${distanceReference.path}\0${distanceReference.pointer}`,
+          )?.resolved.value
+        : undefined
+      if (
+        travel &&
+        distance &&
+        Math.abs(Number(travel[1])) > Math.abs(Number.parseFloat(distance))
+      ) {
+        push(declaration, 'transform', 'motion', 'list-travel-budget-exceeded')
+      }
+    }
+  }
+  return output
+}
+
 const stableSort = (values) =>
   values.sort((left, right) =>
     [
@@ -618,12 +904,29 @@ export const evaluateSemanticStyles = async (options) => {
       )
     }
   }
-  const provenance = await establishProvenance(root, registry)
   const cascade = await loadEntrypoint(root, options.entrypoint)
+  const provenance = await establishProvenance(
+    root,
+    registry,
+    cascade.declarations,
+  )
   const diagnostics = []
   const staticUnknowns = []
+  const selectionReference = registry.rules
+    .flatMap((rule) => rule.constraints.stateColor)
+    .find((reference) => reference.pointer.includes('selected'))
+  const selectionContract = selectionReference
+    ? {
+        reference: selectionReference,
+        resolved: resolvePointer(
+          authorities.get(selectionReference.path),
+          selectionReference.pointer,
+        ),
+      }
+    : null
 
   for (const rule of registry.rules) {
+    const recordCountBefore = diagnostics.length + staticUnknowns.length
     const ownedSelectors = rule.selectorOwnership.selectors
       .map((entry) => entry.selector)
       .filter((value, index, values) => values.indexOf(value) === index)
@@ -757,12 +1060,69 @@ export const evaluateSemanticStyles = async (options) => {
         }
       }
     }
+    diagnostics.push(
+      ...externalSemanticViolations({
+        cascade,
+        provenance,
+        references,
+        root,
+        rule,
+        selectionContract,
+        selectors: ownedSelectors,
+      }),
+    )
+    if (
+      diagnostics.length + staticUnknowns.length === recordCountBefore &&
+      rule.verificationPolicy.staticFields.length > 0
+    ) {
+      diagnostics.push(
+        semanticRecord({
+          actual: null,
+          context: {
+            density: rule.scope.densities[0],
+            media: rule.scope.devices[0],
+            theme: rule.scope.themes[0],
+          },
+          expected: Object.values(rule.constraints).flat()[0],
+          property: 'semantic-rule',
+          reasonCode: 'semantic-rule-executed',
+          root,
+          rule,
+          status: 'evaluated',
+        }),
+      )
+    }
+    if (
+      rule.verificationPolicy.visualProbeFields.length > 0 &&
+      !staticUnknowns.some(
+        ({ componentId, partId }) =>
+          componentId === rule.componentId && partId === rule.partId,
+      )
+    ) {
+      staticUnknowns.push({
+        componentId: rule.componentId,
+        fields: [...rule.verificationPolicy.visualProbeFields],
+        partId: rule.partId,
+        reasonCode: 'visual-evidence-required',
+        ruleId: rule.id,
+        scope: {
+          density: rule.scope.densities[0],
+          media: rule.scope.devices[0],
+          theme: rule.scope.themes[0],
+        },
+        selector: rule.selectorOwnership.selectors[0].selector,
+        status: 'visual-evidence-required',
+        surfaceRole: rule.surfaceRole,
+        verificationRequirement: 'visual-evidence-required',
+        visualRequirements: clone(rule.verificationPolicy.visualRequirements),
+      })
+    }
   }
   return {
     registryDigest: sha256(registryText),
     compiledCssDigest: sha256(
-      cascade.files
-        .map(({ css, file }) => `${portable(root, file)}\0${css}`)
+      [...cascade.contents]
+        .map(([file, css]) => `${portable(root, file)}\0${css}`)
         .join('\n'),
     ),
     diagnostics: stableSort(diagnostics),
