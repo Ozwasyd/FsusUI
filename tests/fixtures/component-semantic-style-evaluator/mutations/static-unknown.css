@@ -1,0 +1,3 @@
+.el-select-dropdown__item {
+  min-height: clamp(32px, 4cqi, 40px);
+}

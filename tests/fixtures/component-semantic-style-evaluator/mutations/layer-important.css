@@ -1,0 +1,13 @@
+@layer base, override;
+
+@layer base {
+  .el-select-dropdown__item {
+    min-height: 34px !important;
+  }
+}
+
+@layer override {
+  #fixture-select .scope .el-select-dropdown__item {
+    min-height: 32px !important;
+  }
+}
