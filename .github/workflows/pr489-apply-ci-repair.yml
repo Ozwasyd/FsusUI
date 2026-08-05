@@ -8,6 +8,7 @@ on:
 permissions:
   contents: write
 
+# Triggered after the workflow exists on the branch so GitHub registers it.
 jobs:
   repair:
     if: github.actor != 'github-actions[bot]'
