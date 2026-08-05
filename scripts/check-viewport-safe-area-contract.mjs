@@ -325,6 +325,10 @@ export function findSafeAreaVisualMatrixViolations(options = {}) {
     baseRoot,
     'vue/playwright.boundary-audit.config.ts',
   )
+  const playwrightRegistryPath = path.join(
+    baseRoot,
+    'spec/ci/playwright-suites.json',
+  )
   const packageJsonPath = path.join(baseRoot, 'package.json')
 
   const requiredFiles = {
@@ -334,6 +338,7 @@ export function findSafeAreaVisualMatrixViolations(options = {}) {
     'vue/packages/demo-app/src/AuditFixtures.vue': fixturePath,
     'vue/tests/visual-boundary/safe-area-overlay-matrix.spec.ts': matrixSpecPath,
     'vue/playwright.boundary-audit.config.ts': boundaryConfigPath,
+    'spec/ci/playwright-suites.json': playwrightRegistryPath,
     'package.json': packageJsonPath,
   }
 
@@ -351,6 +356,9 @@ export function findSafeAreaVisualMatrixViolations(options = {}) {
   const fixtureSource = fs.readFileSync(fixturePath, 'utf8')
   const matrixSpecSource = fs.readFileSync(matrixSpecPath, 'utf8')
   const boundaryConfigSource = fs.readFileSync(boundaryConfigPath, 'utf8')
+  const playwrightRegistry = JSON.parse(
+    fs.readFileSync(playwrightRegistryPath, 'utf8'),
+  )
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
 
   for (const id of [
@@ -496,19 +504,42 @@ export function findSafeAreaVisualMatrixViolations(options = {}) {
     }
   }
 
-  if (!/name:\s*['"]safe-area-chromium['"]/.test(boundaryConfigSource)) {
+  const boundarySuite = playwrightRegistry.suites?.find(
+    (suite) => suite.id === 'visual-boundary-audit',
+  )
+  const hasSafeAreaCell = (project, browser) =>
+    boundarySuite?.cells?.some(
+      (cell) =>
+        cell.project === project &&
+        cell.browser === browser &&
+        cell.safeArea === true,
+    )
+  if (!hasSafeAreaCell('safe-area-chromium', 'chromium')) {
     violations.push(
-      'vue/playwright.boundary-audit.config.ts must declare safe-area-chromium project',
+      'spec/ci/playwright-suites.json must declare safe-area-chromium as a Chromium safe-area cell',
     )
   }
-  if (!/name:\s*['"]safe-area-webkit['"]/.test(boundaryConfigSource)) {
+  if (!hasSafeAreaCell('safe-area-webkit', 'webkit')) {
     violations.push(
-      'vue/playwright.boundary-audit.config.ts must declare safe-area-webkit project (Chromium-only is not Safari evidence)',
+      'spec/ci/playwright-suites.json must declare safe-area-webkit as a WebKit safe-area cell',
     )
   }
-  if (!/Desktop Safari|webkit/i.test(boundaryConfigSource)) {
+  if (
+    !boundaryConfigSource.includes(
+      "projectsForSuite('visual-boundary-audit')",
+    )
+  ) {
     violations.push(
-      'vue/playwright.boundary-audit.config.ts safe-area lane must use WebKit/Desktop Safari',
+      'vue/playwright.boundary-audit.config.ts must consume the visual-boundary-audit registry project contract',
+    )
+  }
+  if (
+    !/Desktop Safari|cell\.browser\s*===\s*['"]webkit['"]/i.test(
+      boundaryConfigSource,
+    )
+  ) {
+    violations.push(
+      'vue/playwright.boundary-audit.config.ts safe-area lane must map WebKit cells to WebKit/Desktop Safari',
     )
   }
 
