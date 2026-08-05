@@ -1,0 +1,38 @@
+name: Apply PR 489 baseline repair
+
+on:
+  push:
+    branches:
+      - agent/issue-479-playwright-registry
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/issue-479-playwright-registry
+          fetch-depth: 0
+      - name: Replace unsupported demo font weight
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('vue/packages/demo-app/src/style.css')
+          source = path.read_text(encoding='utf-8')
+          old = ".audit-safe-area-lab__title {\n  margin: 0 0 var(--fsus-space-3);\n  font-size: 1rem;\n  font-weight: 600;\n}"
+          new = ".audit-safe-area-lab__title {\n  margin: 0 0 var(--fsus-space-3);\n  font-size: 1rem;\n  font-weight: 500;\n}"
+          if old not in source:
+              raise SystemExit('Expected unsupported font-weight block was not found')
+          path.write_text(source.replace(old, new, 1), encoding='utf-8')
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add vue/packages/demo-app/src/style.css
+          git commit -m "fix(theme): use supported demo font weight"
+          git push origin HEAD:agent/issue-479-playwright-registry
