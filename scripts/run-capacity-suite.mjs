@@ -117,7 +117,18 @@ function runTask(task) {
       console.error(`[ci-capacity] failed to start ${task}:`, error)
       resolve(1)
     })
-    child.on('close', (code) => resolve(code ?? 1))
+    child.on('close', (code) => {
+      const status = code ?? 1
+      if (status === 0) {
+        console.log(`[ci-capacity] ${task} passed`)
+      } else {
+        console.error(`[ci-capacity] ${task} failed (exit ${status})`)
+        console.error(
+          `::error title=CI capacity task failed::${task} exited with ${status}`,
+        )
+      }
+      resolve(status)
+    })
   })
 }
 
