@@ -1,0 +1,34 @@
+:root {
+  --fixture-row-base: 30px;
+  --fixture-row-gap: 4px;
+  --fixture-option-row-height: calc(
+    var(--fixture-row-base) + var(--fixture-row-gap)
+  );
+  --fixture-option-row-compact-height: calc(
+    var(--fixture-option-row-height) - 2px
+  );
+  --fixture-option-row-selected-color: #2a599c0d;
+  --fixture-panel-radius: 12px;
+}
+
+.el-select-dropdown {
+  border-radius: var(--fixture-panel-radius);
+}
+
+.el-select-dropdown__item {
+  min-height: 32px;
+}
+
+.el-select-dropdown__item.is-selected {
+  background-color: var(--fixture-option-row-selected-color);
+}
+
+[data-density='compact'] .el-select-dropdown__item {
+  min-height: var(--fixture-option-row-compact-height);
+}
+
+@media (width <= 480px) {
+  .el-select-dropdown__item {
+    min-height: var(--fixture-option-row-height);
+  }
+}

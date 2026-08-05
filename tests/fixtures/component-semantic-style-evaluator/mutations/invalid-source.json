@@ -1,0 +1,3 @@
+{
+  "source": "@use 'tokens';\n\n.el-select-dropdown__item {\n  min-height: var(--fixture-option-row-height);\n"
+}

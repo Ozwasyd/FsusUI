@@ -1,0 +1,9 @@
+/*
+ * A string-only checker can stop on this compliant-looking declaration:
+ * .el-select-dropdown__item { min-height: 34px; }
+ */
+@media (min-width: 0px) {
+  :where(.el-select-dropdown) > :is(.el-select-dropdown__item) {
+    min-height: calc(16px * 2);
+  }
+}

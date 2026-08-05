@@ -1,0 +1,5 @@
+@use 'tokens';
+
+.dark .el-select-dropdown__item.is-selected {
+  background-color: var(--fixture-option-row-selected-color);
+}

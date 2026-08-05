@@ -1,0 +1,99 @@
+{
+  "issue": 401,
+  "schemaVersion": "fsusui.component-semantic-style-evaluator-test-contract.v1",
+  "acceptanceCriteria": [
+    {
+      "id": "AC-401-1",
+      "description": "source compliant but compiled override wrong is detected",
+      "testIds": ["CSC-401-02", "CSC-401-07A"]
+    },
+    {
+      "id": "AC-401-2",
+      "description": "diagnostic identifies owning selector and source with actual cascade",
+      "testIds": ["CSC-401-03", "CSC-401-07D"]
+    },
+    {
+      "id": "AC-401-3",
+      "description": "panel root and internal row roles are not conflated",
+      "testIds": ["CSC-401-04", "CSC-401-07C"]
+    },
+    {
+      "id": "AC-401-4",
+      "description": "unsupported or static-unknown values require visual evidence and preserve registry-owned visual requirements",
+      "testIds": ["CSC-401-05"]
+    },
+    {
+      "id": "AC-401-5",
+      "description": "mutation fixtures kill source-only, regex-only, wrong-owner, and hidden-cascade implementations",
+      "testIds": ["CSC-401-07A", "CSC-401-07B", "CSC-401-07C", "CSC-401-07D"]
+    },
+    {
+      "id": "AC-401-6",
+      "description": "the evaluator invokes the corrected #400 checker and closed schema instead of a local weak substitute",
+      "testIds": ["CSC-401-01", "CSC-401-10"]
+    },
+    {
+      "id": "AC-401-7",
+      "description": "registered Sass is actually compiled and invalid Sass cannot be hidden by synchronized digests or stale compiled CSS",
+      "testIds": ["CSC-401-11A"]
+    },
+    {
+      "id": "AC-401-8",
+      "description": "compiled owningSource provenance comes from real compilation rather than basename selector comment or string guesses",
+      "testIds": ["CSC-401-12A", "CSC-401-12B", "CSC-401-12C"]
+    },
+    {
+      "id": "AC-401-9",
+      "description": "scoped custom properties and nested media preserve theme density and conjunctive media ownership",
+      "testIds": ["CSC-401-13A", "CSC-401-13B"]
+    },
+    {
+      "id": "AC-401-10",
+      "description": "var fallback resolves statically while unresolved and cyclic values require visual evidence",
+      "testIds": ["CSC-401-14A", "CSC-401-14B", "CSC-401-14C"]
+    },
+    {
+      "id": "AC-401-11",
+      "description": "is and not use maximum argument specificity where is zero and equal specificity uses later source order",
+      "testIds": ["CSC-401-15A", "CSC-401-15B", "CSC-401-15C", "CSC-401-15D"]
+    },
+    {
+      "id": "AC-401-12",
+      "description": "normal and important cascade layers plus ordinary important specificity follow CSS cascade precedence",
+      "testIds": ["CSC-401-16A", "CSC-401-16B", "CSC-401-16C"]
+    },
+    {
+      "id": "AC-401-13",
+      "description": "scoped variable hidden cascade and post-theme overrides fail with exact owner source and actual value",
+      "testIds": ["CSC-401-03", "CSC-401-07D", "CSC-401-13A", "CSC-401-17A"]
+    }
+  ],
+  "fixedConstraints": [
+    {
+      "id": "FC-401-A",
+      "description": "checker is read-only and never modifies or auto-fixes CSS",
+      "testIds": ["CSC-401-08"]
+    },
+    {
+      "id": "FC-401-B",
+      "description": "compiled cascade cannot be ignored",
+      "testIds": ["CSC-401-02", "CSC-401-07A", "CSC-401-07D"]
+    },
+    {
+      "id": "FC-401-C",
+      "description": "engine consumes canonical references from the validated #400 registry instead of copying numeric truth",
+      "testIds": ["CSC-401-06", "CSC-401-09"]
+    },
+    {
+      "id": "FC-401-D",
+      "description": "an unbounded selector allowlist cannot hide parser or ownership failures",
+      "testIds": ["CSC-401-07B", "CSC-401-09"]
+    }
+  ],
+  "nonGoals": [
+    "all geometry, color, and motion rule families",
+    "screenshots or visual planning",
+    "CI wiring",
+    "CSS mutation or automatic repair"
+  ]
+}
