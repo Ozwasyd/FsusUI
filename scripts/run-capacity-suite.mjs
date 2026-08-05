@@ -16,6 +16,7 @@ const suites = {
     'icons:check',
     'icons:lint',
     'governance:check',
+    'test:ci-playwright-registry',
     'check:consumer-contract',
     'check:ux-semantics',
     'check:design-source-drift',
