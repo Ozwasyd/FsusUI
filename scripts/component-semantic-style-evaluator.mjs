@@ -93,6 +93,7 @@ const selectorFacts = (selector) => {
     classes: new Set(),
     positiveClasses: new Set(),
     specificity: selectorSpecificity(selector),
+    terminalClasses: new Set(),
   }
   const visit = (node, negative = false) => {
     if (node.type === 'ClassSelector') {
@@ -118,6 +119,25 @@ const selectorFacts = (selector) => {
     }
   }
   visit(selector)
+  const terminalNodes = []
+  for (const child of selector.children ?? []) {
+    if (child.type === 'Combinator') terminalNodes.length = 0
+    else terminalNodes.push(child)
+  }
+  const collectTerminalClasses = (node, negative = false) => {
+    if (node.type === 'ClassSelector' && !negative) {
+      facts.terminalClasses.add(node.name)
+    }
+    if (!node.children) return
+    for (const child of node.children) {
+      collectTerminalClasses(
+        child,
+        negative ||
+          (node.type === 'PseudoClassSelector' && node.name === 'not'),
+      )
+    }
+  }
+  for (const node of terminalNodes) collectTerminalClasses(node)
   return facts
 }
 
@@ -293,7 +313,18 @@ const establishProvenance = async (root, registry, cascadeDeclarations) => {
       ]),
     )
     const cached = productionProvenanceCache.get(cacheKey)
-    if (cached) return new Map(cached)
+    if (cached) {
+      const restored = new Map()
+      cascadeDeclarations.forEach((declaration, index) => {
+        const owningSource = cached[index]
+        if (!owningSource) return
+        restored.set(
+          `${portable(root, declaration.file)}\0${declaration.node.loc.start.line}\0${declaration.node.loc.start.column}`,
+          owningSource,
+        )
+      })
+      return restored
+    }
     const themeEntrypoint = path.join(
       repositoryRoot,
       'vue/packages/theme-chalk/src/index.scss',
@@ -349,7 +380,14 @@ const establishProvenance = async (root, registry, cascadeDeclarations) => {
       )
     }
     consumer.destroy?.()
-    productionProvenanceCache.set(cacheKey, new Map(provenance))
+    productionProvenanceCache.set(
+      cacheKey,
+      cascadeDeclarations.map((declaration) =>
+        provenance.get(
+          `${portable(root, declaration.file)}\0${declaration.node.loc.start.line}\0${declaration.node.loc.start.column}`,
+        ),
+      ),
+    )
     return provenance
   }
   for (const sassPath of sassPaths) {
@@ -633,9 +671,9 @@ const declarationProvenance = (root, declaration, provenance) =>
 const selectorMatchesOwnership = (declaration, ownedSelectors) =>
   ownedSelectors.some(
     (selector) =>
-      selector.facts.positiveClasses.size > 0 &&
-      [...selector.facts.positiveClasses].every((name) =>
-        declaration.selector.facts.positiveClasses.has(name),
+      selector.facts.terminalClasses.size > 0 &&
+      [...selector.facts.terminalClasses].every((name) =>
+        declaration.selector.facts.terminalClasses.has(name),
       ),
   )
 
@@ -680,8 +718,10 @@ const semanticRecord = ({
 
 const externalSemanticViolations = ({
   cascade,
+  panelGeometryContracts,
   provenance,
   references,
+  reducedMotionContract,
   root,
   rule,
   selectionContract,
@@ -737,6 +777,22 @@ const externalSemanticViolations = ({
       }
     }
     if (
+      declaration.property === 'border-radius' &&
+      /(?:row|item|cell)/u.test(rule.surfaceRole)
+    ) {
+      const panelAliases = panelGeometryContracts.flatMap(
+        ({ resolved }) => resolved.aliases ?? [],
+      )
+      if (panelAliases.some((alias) => declaration.value.includes(alias))) {
+        push(
+          declaration,
+          'border-radius',
+          'geometry',
+          'internal-row-panel-geometry-forbidden',
+        )
+      }
+    }
+    if (
       (rule.constraints.stateColor.length > 0 || selectionContract) &&
       ['color', 'background-color', 'border-color'].includes(
         declaration.property,
@@ -760,11 +816,49 @@ const externalSemanticViolations = ({
       }
     }
     if (
+      declaration.property === 'background-color' &&
+      /(?:hover|\.hover)/u.test(declaration.selector.text) &&
+      selectionContract?.resolved.aliases?.some((alias) =>
+        declaration.value.includes(alias),
+      )
+    ) {
+      push(
+        declaration,
+        'background-color',
+        'stateColor',
+        'hover-selection-token-forbidden',
+      )
+    }
+    if (
+      declaration.property === 'color' &&
+      rule.surfaceRole.includes('rate') &&
+      selectionContract?.resolved.aliases?.some((alias) =>
+        declaration.value.includes(alias),
+      )
+    ) {
+      push(declaration, 'color', 'stateColor', 'rate-warning-token-required')
+    }
+    if (
       declaration.property === 'opacity' &&
       /(?:disabled|aria-disabled)/u.test(declaration.selector.text) &&
       rule.surfaceRole.includes('interactive-root')
     ) {
       push(declaration, 'opacity', 'disabled', 'ancestor-opacity-disabled')
+    }
+    if (
+      ['background-color', 'border-color', 'color'].includes(
+        declaration.property,
+      ) &&
+      /(?:disabled|aria-disabled)/u.test(declaration.selector.text) &&
+      rule.constraints.disabled.length > 0 &&
+      !declaration.value.includes('var(')
+    ) {
+      push(
+        declaration,
+        declaration.property,
+        'disabled',
+        'disabled-state-token-required',
+      )
     }
     if (
       rule.constraints.typography.length > 0 &&
@@ -783,6 +877,22 @@ const externalSemanticViolations = ({
       }
     }
     if (
+      rule.constraints.typography.length > 0 &&
+      declaration.property === 'font-weight'
+    ) {
+      const expected = [...references.values()].find(
+        ({ resolved }) => resolved.type === 'fontWeight',
+      )
+      if (expected && declaration.value !== expected.resolved.value) {
+        push(
+          declaration,
+          'font-weight',
+          'typography',
+          'typography-semantic-mismatch',
+        )
+      }
+    }
+    if (
       rule.constraints.motion.length > 0 &&
       declaration.property === 'transition' &&
       declaration.value.trim() === 'none' &&
@@ -794,6 +904,44 @@ const externalSemanticViolations = ({
         'motion',
         'reduced-motion-lifecycle-required',
       )
+    }
+    if (
+      rule.constraints.motion.length > 0 &&
+      declaration.property === 'transition-duration'
+    ) {
+      const duration =
+        [...references.values()].find(
+          ({ resolved }) => resolved.type === 'duration',
+        ) ?? reducedMotionContract
+      const reducedDuration =
+        duration?.resolved.modeValues?.motionReduced?.value ??
+        duration?.resolved.modeValues?.motionDisabled?.value
+      if (
+        declaration.media.includes('prefers-reduced-motion') &&
+        reducedDuration &&
+        declaration.value !== reducedDuration
+      ) {
+        push(
+          declaration,
+          'transition-duration',
+          'motion',
+          'reduced-motion-lifecycle-required',
+        )
+      } else if (
+        duration &&
+        !declaration.media.includes('prefers-reduced-motion') &&
+        declaration.value !== duration.resolved.value &&
+        !duration.resolved.aliases?.some((alias) =>
+          declaration.value.includes(alias),
+        )
+      ) {
+        push(
+          declaration,
+          'transition-duration',
+          'motion',
+          'motion-duration-semantic-mismatch',
+        )
+      }
     }
     if (
       rule.constraints.motion.length > 0 &&
@@ -924,6 +1072,39 @@ export const evaluateSemanticStyles = async (options) => {
         ),
       }
     : null
+  const reducedMotionReference = registry.rules
+    .flatMap((rule) => rule.constraints.motion)
+    .find((reference) => {
+      const resolved = resolvePointer(
+        authorities.get(reference.path),
+        reference.pointer,
+      )
+      return (
+        resolved?.type === 'duration' &&
+        (resolved.modeValues?.motionReduced?.value !== undefined ||
+          resolved.modeValues?.motionDisabled?.value !== undefined)
+      )
+    })
+  const reducedMotionContract = reducedMotionReference
+    ? {
+        reference: reducedMotionReference,
+        resolved: resolvePointer(
+          authorities.get(reducedMotionReference.path),
+          reducedMotionReference.pointer,
+        ),
+      }
+    : null
+  const panelGeometryContracts = registry.rules
+    .filter(({ surfaceRole }) => /(?:panel|root)/u.test(surfaceRole))
+    .flatMap((rule) => rule.constraints.geometry)
+    .map((reference) => ({
+      reference,
+      resolved: resolvePointer(
+        authorities.get(reference.path),
+        reference.pointer,
+      ),
+    }))
+    .filter(({ resolved }) => resolved?.value !== undefined)
 
   for (const rule of registry.rules) {
     const recordCountBefore = diagnostics.length + staticUnknowns.length
@@ -963,10 +1144,7 @@ export const evaluateSemanticStyles = async (options) => {
       const matching = cascade.declarations.filter(
         (declaration) =>
           declaration.property === property &&
-          target.facts.positiveClasses.size > 0 &&
-          [...target.facts.positiveClasses].every((name) =>
-            declaration.selector.facts.positiveClasses.has(name),
-          ),
+          selectorMatchesOwnership(declaration, [target]),
       )
       if (!matching.length) continue
       const contexts = new Map()
@@ -992,7 +1170,8 @@ export const evaluateSemanticStyles = async (options) => {
               declaration.property === name &&
               applies(declaration, context) &&
               (declaration.selector.text === ':root' ||
-                declaration.selector.facts.classes.has('dark')),
+                declaration.selector.facts.classes.has('dark') ||
+                selectorMatchesOwnership(declaration, [target])),
           )
           return winner(candidates)?.value
         }
@@ -1063,7 +1242,9 @@ export const evaluateSemanticStyles = async (options) => {
     diagnostics.push(
       ...externalSemanticViolations({
         cascade,
+        panelGeometryContracts,
         provenance,
+        reducedMotionContract,
         references,
         root,
         rule,
@@ -1075,22 +1256,23 @@ export const evaluateSemanticStyles = async (options) => {
       diagnostics.length + staticUnknowns.length === recordCountBefore &&
       rule.verificationPolicy.staticFields.length > 0
     ) {
-      diagnostics.push(
-        semanticRecord({
-          actual: null,
-          context: {
-            density: rule.scope.densities[0],
-            media: rule.scope.devices[0],
-            theme: rule.scope.themes[0],
-          },
-          expected: Object.values(rule.constraints).flat()[0],
-          property: 'semantic-rule',
-          reasonCode: 'semantic-rule-executed',
-          root,
-          rule,
-          status: 'evaluated',
-        }),
+      const observed = cascade.declarations.find((declaration) =>
+        selectorMatchesOwnership(declaration, ownedSelectors),
       )
+      if (observed) {
+        diagnostics.push(
+          semanticRecord({
+            actual: observed,
+            context: contextOf(observed),
+            expected: Object.values(rule.constraints).flat()[0],
+            property: observed.property,
+            reasonCode: 'semantic-cascade-observed',
+            root,
+            rule,
+            status: 'observed',
+          }),
+        )
+      }
     }
     if (
       rule.verificationPolicy.visualProbeFields.length > 0 &&
