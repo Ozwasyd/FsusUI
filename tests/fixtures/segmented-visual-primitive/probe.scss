@@ -1,0 +1,21 @@
+@use 'common/fsus-tokens' as tokens;
+@use 'mixins/segmented-visual-primitive' as segmented;
+
+:root {
+  @include tokens.fsus-core-tokens;
+}
+
+:root[data-theme-resolved='dark'] {
+  @include tokens.fsus-dark-tokens;
+}
+
+[data-fsus-segmented-probe] {
+  @include segmented.fsus-segmented-visual-primitive(
+    $item-selector: '[data-fsus-segment-item]',
+    $selected-selector: "[data-selected='true']",
+    $disabled-selector: ':disabled',
+    $icon-selector: '[data-fsus-segment-icon]',
+    $label-selector: '[data-fsus-segment-label]',
+    $focus-selector: '[data-fsus-segment-item]:focus-visible'
+  );
+}

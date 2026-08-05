@@ -1,0 +1,139 @@
+<main data-segmented-fixture>
+  <section aria-labelledby="form-radio-title">
+    <h1 id="form-radio-title">Single choice</h1>
+    <div
+      data-fsus-segmented-probe
+      data-semantic-fixture="form-radio"
+      role="radiogroup"
+      aria-label="Review state"
+    >
+      <button
+        data-fsus-segment-item
+        data-selected="true"
+        role="radio"
+        aria-checked="true"
+        type="button"
+      >
+        <svg
+          data-fsus-segment-icon
+          aria-hidden="true"
+          viewBox="0 0 16 16"
+          width="16"
+          height="16"
+        >
+          <circle cx="8" cy="8" r="5"></circle>
+        </svg>
+        <span data-fsus-segment-label>In review</span>
+      </button>
+      <button
+        data-fsus-segment-item
+        data-selected="false"
+        role="radio"
+        aria-checked="false"
+        type="button"
+      >
+        <span data-fsus-segment-label
+          >Needs a longer editorial review label</span
+        >
+      </button>
+      <button
+        data-fsus-segment-item
+        data-selected="false"
+        role="radio"
+        aria-checked="false"
+        type="button"
+        disabled
+      >
+        <span data-fsus-segment-label>Archived</span>
+      </button>
+    </div>
+  </section>
+
+  <section aria-labelledby="form-checkbox-title">
+    <h2 id="form-checkbox-title">Multiple choice</h2>
+    <div
+      data-fsus-segmented-probe
+      data-semantic-fixture="form-checkbox"
+      role="group"
+      aria-labelledby="form-checkbox-title"
+    >
+      <button
+        data-fsus-segment-item
+        data-selected="true"
+        role="checkbox"
+        aria-checked="true"
+        type="button"
+      >
+        <span data-fsus-segment-label>Assigned</span>
+      </button>
+      <button
+        data-fsus-segment-item
+        data-selected="false"
+        role="checkbox"
+        aria-checked="false"
+        type="button"
+      >
+        <span data-fsus-segment-label>Mentioned</span>
+      </button>
+    </div>
+  </section>
+
+  <section aria-labelledby="navigation-title">
+    <h2 id="navigation-title">View mode</h2>
+    <nav aria-labelledby="navigation-title">
+      <div
+        data-fsus-segmented-probe
+        data-semantic-fixture="navigation-toggle"
+        role="toolbar"
+      >
+        <button
+          data-fsus-segment-item
+          data-selected="true"
+          aria-pressed="true"
+          type="button"
+        >
+          <span data-fsus-segment-label>List</span>
+        </button>
+        <button
+          data-fsus-segment-item
+          data-selected="false"
+          aria-pressed="false"
+          type="button"
+        >
+          <span data-fsus-segment-label>Timeline</span>
+        </button>
+      </div>
+    </nav>
+  </section>
+
+  <section dir="rtl" lang="ar" aria-labelledby="rtl-title">
+    <h2 id="rtl-title">اتجاه من اليمين إلى اليسار</h2>
+    <div data-fsus-segmented-probe data-semantic-fixture="rtl" role="toolbar">
+      <button
+        data-fsus-segment-item
+        data-selected="true"
+        aria-pressed="true"
+        type="button"
+      >
+        <svg
+          data-fsus-segment-icon
+          aria-hidden="true"
+          viewBox="0 0 16 16"
+          width="16"
+          height="16"
+        >
+          <path d="M3 8h10M8 3l5 5-5 5"></path>
+        </svg>
+        <span data-fsus-segment-label>عرض القائمة الطويلة</span>
+      </button>
+      <button
+        data-fsus-segment-item
+        data-selected="false"
+        aria-pressed="false"
+        type="button"
+      >
+        <span data-fsus-segment-label>المخطط الزمني</span>
+      </button>
+    </div>
+  </section>
+</main>

@@ -1,0 +1,122 @@
+[
+  {
+    "id": "SEG459-M01-RADIUS-10",
+    "expectedViolation": "SEG459-E-SHELL-RADIUS",
+    "replacements": [
+      {
+        "from": "border-radius: var(--fsus-radius-control);",
+        "to": "border-radius: 10px;"
+      }
+    ]
+  },
+  {
+    "id": "SEG459-M02-RADIUS-12",
+    "expectedViolation": "SEG459-E-SHELL-RADIUS",
+    "replacements": [
+      {
+        "from": "border-radius: var(--fsus-radius-control);",
+        "to": "border-radius: 12px;"
+      }
+    ]
+  },
+  {
+    "id": "SEG459-M03-HEIGHT-28",
+    "expectedViolation": "SEG459-E-ITEM-HEIGHT",
+    "replacements": [
+      {
+        "from": "min-height: var(--fsus-control-height-action);",
+        "to": "min-height: 28px;"
+      }
+    ]
+  },
+  {
+    "id": "SEG459-M04-HEIGHT-32",
+    "expectedViolation": "SEG459-E-ITEM-HEIGHT",
+    "replacements": [
+      {
+        "from": "min-height: var(--fsus-control-height-action);",
+        "to": "min-height: 32px;"
+      }
+    ]
+  },
+  {
+    "id": "SEG459-M05-NEUTRAL-SELECTED",
+    "expectedViolation": "SEG459-E-SELECTED-SEMANTICS",
+    "replacements": [
+      {
+        "from": "background: var(--fsus-state-selected-bg);\n  border-color: var(--fsus-state-focus-border);\n  color: var(--fsus-scholarly-blue);",
+        "to": "background: var(--fsus-paper);\n  border-color: var(--fsus-border);\n  color: var(--fsus-ink);"
+      }
+    ]
+  },
+  {
+    "id": "SEG459-M06-FOCUS-1",
+    "expectedViolation": "SEG459-E-FOCUS-INSET",
+    "replacements": [
+      {
+        "from": "box-shadow: inset 0 0 0 var(--fsus-focus-ring-width)",
+        "to": "box-shadow: inset 0 0 0 1px"
+      }
+    ]
+  },
+  {
+    "id": "SEG459-M07-DISABLED-OPACITY",
+    "expectedViolation": "SEG459-E-DISABLED",
+    "replacements": [
+      {
+        "from": "border-color: var(--el-disabled-border-color);\n  box-shadow: none;\n  opacity: 1;",
+        "to": "border-color: var(--el-disabled-border-color);\n  box-shadow: none;\n  opacity: 0.46;"
+      }
+    ]
+  },
+  {
+    "id": "SEG459-M08-ITEM-SHADOW",
+    "expectedViolation": "SEG459-E-ITEM-SURFACE",
+    "replacements": [
+      {
+        "from": "color: var(--fsus-ink);\n  box-shadow: none;",
+        "to": "color: var(--fsus-ink);\n  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);"
+      }
+    ]
+  },
+  {
+    "id": "SEG459-M09-RADIUS-PILL",
+    "expectedViolation": "SEG459-E-SHELL-RADIUS",
+    "replacements": [
+      {
+        "from": "border-radius: var(--fsus-radius-control);",
+        "to": "border-radius: var(--fsus-radius-pill);"
+      }
+    ]
+  },
+  {
+    "id": "SEG459-M10-OUTER-GLOW",
+    "expectedViolation": "SEG459-E-SHELL-SURFACE",
+    "replacements": [
+      {
+        "from": "box-shadow: none;\n  opacity: 1;",
+        "to": "box-shadow: 0 0 0 4px color-mix(in srgb, var(--fsus-scholarly-blue) 24%, transparent);\n  opacity: 1;"
+      }
+    ]
+  },
+  {
+    "id": "SEG459-M11-LABEL-CLIP",
+    "expectedViolation": "SEG459-E-CONTENT-BIDI",
+    "replacements": [
+      {
+        "from": "min-inline-size: max-content;\n  overflow: visible;\n  white-space: nowrap;",
+        "to": "min-inline-size: 0;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;"
+      }
+    ]
+  },
+  {
+    "id": "SEG459-M12-SHELL-CLIP",
+    "expectedViolation": "SEG459-E-SHELL-CLIP",
+    "replacements": [
+      {
+        "from": "border-radius: var(--fsus-radius-control);\n  box-shadow: none;",
+        "to": "border-radius: var(--fsus-radius-control);\n  overflow: hidden;\n  box-shadow: none;"
+      }
+    ]
+  }
+]
