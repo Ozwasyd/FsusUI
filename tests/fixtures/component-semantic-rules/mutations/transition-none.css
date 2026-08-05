@@ -1,0 +1,6 @@
+/* fsus-rule-id: web.public-shell.disclosure-transition */
+@media (prefers-reduced-motion: reduce) {
+  __RULE_SELECTOR__ {
+    transition: none;
+  }
+}

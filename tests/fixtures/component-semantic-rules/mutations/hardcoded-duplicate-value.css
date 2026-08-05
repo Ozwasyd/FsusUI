@@ -1,0 +1,4 @@
+/* fsus-rule-id: web.select.option-row */
+__RULE_SELECTOR__ {
+  min-height: __CANONICAL_VALUE__;
+}

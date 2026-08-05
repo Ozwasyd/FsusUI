@@ -1,0 +1,6 @@
+/* fsus-rule-id: web.rate.filled-icon */
+/* fsus-reference-rule-id: web.radio-button.segmented-item */
+/* fsus-reference-family: stateColor */
+__RULE_SELECTOR__.is-selected {
+  color: var(__REFERENCE_ALIAS__);
+}

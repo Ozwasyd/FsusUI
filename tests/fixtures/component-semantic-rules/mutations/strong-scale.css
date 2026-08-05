@@ -1,0 +1,4 @@
+/* fsus-rule-id: web.motion.control-enter-from */
+__RULE_SELECTOR__ {
+  transform: scaleX(0);
+}

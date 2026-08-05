@@ -1,0 +1,6 @@
+/* fsus-rule-id: web.reply-composer-shell.disabled-control */
+__RULE_SELECTOR__.is-disabled {
+  background-color: hotpink;
+  border-color: hotpink;
+  color: hotpink;
+}

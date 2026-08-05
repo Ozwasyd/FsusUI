@@ -1,0 +1,136 @@
+{
+  "issue": 402,
+  "schemaVersion": "fsusui.component-semantic-rules-test-contract.v1",
+  "acceptanceCriteria": [
+    {
+      "id": "AC-402-1",
+      "description": "all registered static error families from issues 293 through 310 execute against compiled cascade fixtures",
+      "testIds": [
+        "CSR-402-02",
+        "CSR-402-03",
+        "CSR-402-04",
+        "CSR-402-05",
+        "CSR-402-06",
+        "CSR-402-07",
+        "CSR-402-08",
+        "CSR-402-17",
+        "CSR-402-18A",
+        "CSR-402-18B",
+        "CSR-402-18C",
+        "CSR-402-18D",
+        "CSR-402-18E",
+        "CSR-402-18F",
+        "CSR-402-19",
+        "CSR-402-20"
+      ]
+    },
+    {
+      "id": "AC-402-2",
+      "description": "legal outer panels are not rejected by internal row geometry rules",
+      "testIds": ["CSR-402-02", "CSR-402-16"]
+    },
+    {
+      "id": "AC-402-3",
+      "description": "theme density and media scopes are evaluated independently",
+      "testIds": ["CSR-402-09"]
+    },
+    {
+      "id": "AC-402-4",
+      "description": "fail diagnostics include role expected actual and owning source",
+      "testIds": ["CSR-402-10", "CSR-402-20"]
+    },
+    {
+      "id": "AC-402-5",
+      "description": "required mutation controls kill duplicate truth neutral selection ancestor opacity 11px headers transition none and scaleX zero",
+      "testIds": [
+        "CSR-402-11A",
+        "CSR-402-11B",
+        "CSR-402-11C",
+        "CSR-402-11D",
+        "CSR-402-11E",
+        "CSR-402-11F",
+        "CSR-402-18A",
+        "CSR-402-18B",
+        "CSR-402-18C",
+        "CSR-402-18D",
+        "CSR-402-18E",
+        "CSR-402-18F",
+        "CSR-402-19"
+      ]
+    }
+  ],
+  "fixedConstraints": [
+    {
+      "id": "FC-402-A",
+      "description": "expected values resolve only through canonical references from the validated issue 400 registry",
+      "testIds": ["CSR-402-12", "CSR-402-20"]
+    },
+    {
+      "id": "FC-402-B",
+      "description": "optical alignment and card stack uncertainty require visual evidence",
+      "testIds": ["CSR-402-08", "CSR-402-13"]
+    },
+    {
+      "id": "FC-402-C",
+      "description": "current violations cannot be made compliant through exceptions",
+      "testIds": ["CSR-402-14"]
+    },
+    {
+      "id": "FC-402-D",
+      "description": "token focus form and motion gates remain independent required checks",
+      "testIds": ["CSR-402-15"]
+    }
+  ],
+  "issueCoverage": [
+    {
+      "issue": 293,
+      "testIds": [
+        "CSR-402-02",
+        "CSR-402-03",
+        "CSR-402-04",
+        "CSR-402-16",
+        "CSR-402-17",
+        "CSR-402-18A",
+        "CSR-402-18B"
+      ]
+    },
+    { "issue": 294, "testIds": ["CSR-402-03", "CSR-402-04", "CSR-402-05"] },
+    { "issue": 295, "testIds": ["CSR-402-03", "CSR-402-04", "CSR-402-07"] },
+    { "issue": 296, "testIds": ["CSR-402-02", "CSR-402-04"] },
+    { "issue": 297, "testIds": ["CSR-402-02", "CSR-402-04"] },
+    { "issue": 298, "testIds": ["CSR-402-08"] },
+    { "issue": 299, "testIds": ["CSR-402-03"] },
+    { "issue": 300, "testIds": ["CSR-402-02", "CSR-402-06", "CSR-402-07"] },
+    { "issue": 301, "testIds": ["CSR-402-03", "CSR-402-04", "CSR-402-05"] },
+    {
+      "issue": 302,
+      "testIds": ["CSR-402-04", "CSR-402-17", "CSR-402-18C"]
+    },
+    { "issue": 303, "testIds": ["CSR-402-06", "CSR-402-07"] },
+    {
+      "issue": 304,
+      "testIds": ["CSR-402-06", "CSR-402-17", "CSR-402-18E"]
+    },
+    { "issue": 305, "testIds": ["CSR-402-05", "CSR-402-06", "CSR-402-08"] },
+    { "issue": 306, "testIds": ["CSR-402-06", "CSR-402-08"] },
+    {
+      "issue": 307,
+      "testIds": ["CSR-402-05", "CSR-402-17", "CSR-402-18D"]
+    },
+    {
+      "issue": 308,
+      "testIds": ["CSR-402-07", "CSR-402-17", "CSR-402-18F"]
+    },
+    { "issue": 309, "testIds": ["CSR-402-03", "CSR-402-05"] },
+    {
+      "issue": 310,
+      "testIds": ["CSR-402-07", "CSR-402-17", "CSR-402-19"]
+    }
+  ],
+  "nonGoals": [
+    "a complete negative corpus",
+    "visual scenario execution or screenshot planning",
+    "CI wiring",
+    "production CSS mutation or automatic repair"
+  ]
+}

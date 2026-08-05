@@ -1,0 +1,6 @@
+/* fsus-rule-id: web.select.option-row */
+/* fsus-reference-rule-id: web.radio-button.segmented-item */
+/* fsus-reference-family: stateColor */
+__RULE_SELECTOR__:hover {
+  background-color: var(__REFERENCE_ALIAS__);
+}
