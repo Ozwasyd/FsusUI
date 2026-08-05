@@ -9,6 +9,49 @@ const scopeRank = new Map([
   ['both', 2],
 ])
 
+export const playwrightRegistryPackageScripts = Object.freeze({
+  'test:markdown-editor:interaction':
+    'node ./scripts/with-node-heap.mjs playwright test --config=vue/playwright.markdown-editor.config.ts',
+  'ci:playwright:plan': 'node ./scripts/playwright-suites.mjs plan',
+  'ci:playwright:check': 'node ./scripts/playwright-suites.mjs check',
+  'test:ci-playwright-registry': 'node ./scripts/test-playwright-suites.mjs',
+})
+
+const legacyPlaywrightRegistryPackageScripts = Object.freeze({
+  'test:markdown-editor:interaction':
+    'node ./scripts/with-node-heap.mjs playwright test --config=vue/playwright.markdown-editor.config.ts --project=chromium --project=firefox',
+})
+
+const normalizeManifestForRegistryComparison = (manifest) => {
+  const normalized = structuredClone(manifest)
+  if (normalized.scripts) {
+    for (const script of Object.keys(playwrightRegistryPackageScripts))
+      delete normalized.scripts[script]
+  }
+  return normalized
+}
+
+export const isPlaywrightRegistryOnlyPackageMutation = (baseline, current) => {
+  if (!baseline || !current) return false
+  for (const [script, command] of Object.entries(
+    playwrightRegistryPackageScripts,
+  )) {
+    if (current.scripts?.[script] !== command) return false
+    const baselineCommand = baseline.scripts?.[script]
+    const legacyCommand = legacyPlaywrightRegistryPackageScripts[script]
+    if (
+      baselineCommand !== undefined &&
+      baselineCommand !== command &&
+      baselineCommand !== legacyCommand
+    )
+      return false
+  }
+  return (
+    JSON.stringify(normalizeManifestForRegistryComparison(baseline)) ===
+    JSON.stringify(normalizeManifestForRegistryComparison(current))
+  )
+}
+
 const escapeRegex = (value) => value.replace(/[.+^${}()|[\]\\]/g, '\\$&')
 
 export const patternToRegex = (pattern) => {
@@ -68,6 +111,7 @@ export const createImpactPlan = ({
   registry,
   baseRef = null,
   fallbackReason = null,
+  ownershipOverrides = {},
 }) => {
   const files = [
     ...new Set(changedFiles.map((file) => file.replaceAll('\\', '/'))),
@@ -75,9 +119,11 @@ export const createImpactPlan = ({
   const matches = []
   let scope = 'skip'
   for (const file of files) {
-    const rule = registry.rules.find((candidate) =>
-      candidate.patterns.some((pattern) => matchesPattern(file, pattern)),
-    )
+    const rule =
+      ownershipOverrides[file] ??
+      registry.rules.find((candidate) =>
+        candidate.patterns.some((pattern) => matchesPattern(file, pattern)),
+      )
     if (!rule) {
       matches.push({
         file,
