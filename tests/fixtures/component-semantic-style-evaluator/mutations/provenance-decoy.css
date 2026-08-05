@@ -1,0 +1,8 @@
+.el-select-dropdown::before {
+  content: '.el-select-dropdown__item { min-height: 32px; }';
+}
+
+/*
+ * source/select.scss
+ * .el-select-dropdown__item { min-height: 32px; }
+ */

@@ -1,0 +1,15 @@
+#fixture-select .el-select-dropdown__item {
+  min-height: 34px !important;
+}
+
+.el-select-dropdown__item {
+  min-height: 32px !important;
+}
+
+#fixture-select .el-select-dropdown__item {
+  min-height: 32px !important;
+}
+
+#fixture-select .el-select-dropdown__item {
+  min-height: 34px !important;
+}

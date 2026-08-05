@@ -1,0 +1,3 @@
+.el-select-dropdown__item {
+  min-height: var(--fixture-missing-height);
+}

@@ -1,0 +1,8 @@
+:root {
+  --fixture-cycle-a: var(--fixture-cycle-b);
+  --fixture-cycle-b: var(--fixture-cycle-a);
+}
+
+.el-select-dropdown__item {
+  min-height: var(--fixture-cycle-a);
+}

@@ -1,0 +1,67 @@
+[data-fsus-segmented-probe] {
+  display: inline-flex;
+  gap: 0;
+  border: 1px solid var(--fsus-border);
+  border-radius: var(--fsus-radius-control);
+  box-shadow: none;
+  opacity: 1;
+}
+
+[data-fsus-segmented-probe] > [data-fsus-segment-item] {
+  display: inline-flex;
+  min-width: 0;
+  min-height: var(--fsus-control-height-action);
+  max-height: var(--fsus-control-height-compact);
+  align-items: center;
+  justify-content: center;
+  gap: var(--fsus-space-1);
+  padding-inline: var(--fsus-space-2);
+  border: 1px solid var(--fsus-border);
+  border-radius: 0;
+  background: var(--fsus-paper);
+  color: var(--fsus-ink);
+  box-shadow: none;
+  opacity: 1;
+  text-align: start;
+}
+
+[data-fsus-segmented-probe]
+  > [data-fsus-segment-item]
+  + [data-fsus-segment-item] {
+  margin-inline-start: -1px;
+}
+
+[data-fsus-segmented-probe] > [data-fsus-segment-item]:hover {
+  background: var(--fsus-state-hover-bg);
+}
+
+[data-fsus-segmented-probe] > [data-fsus-segment-item][data-selected='true'] {
+  background: var(--fsus-state-selected-bg);
+  border-color: var(--fsus-state-focus-border);
+  color: var(--fsus-scholarly-blue);
+  box-shadow: none;
+}
+
+[data-fsus-segmented-probe] > [data-fsus-segment-item]:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 var(--fsus-focus-ring-width)
+    var(--fsus-scholarly-blue);
+}
+
+[data-fsus-segmented-probe] > [data-fsus-segment-item]:disabled {
+  background: var(--el-disabled-bg-color);
+  color: var(--el-disabled-text-color);
+  border-color: var(--el-disabled-border-color);
+  box-shadow: none;
+  opacity: 1;
+}
+
+[data-fsus-segmented-probe] [data-fsus-segment-icon] {
+  flex: 0 0 auto;
+}
+
+[data-fsus-segmented-probe] [data-fsus-segment-label] {
+  min-inline-size: max-content;
+  overflow: visible;
+  white-space: nowrap;
+}

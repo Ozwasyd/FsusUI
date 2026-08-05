@@ -1,0 +1,4 @@
+/* fsus-rule-id: web.reply-composer-shell.interactive-root */
+__RULE_SELECTOR__.is-disabled {
+  opacity: 0.64;
+}

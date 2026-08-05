@@ -1,0 +1,4 @@
+/* fsus-rule-id: web.motion.list-enter-from */
+__RULE_SELECTOR__ {
+  transform: translateY(-30px);
+}

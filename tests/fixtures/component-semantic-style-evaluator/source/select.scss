@@ -1,0 +1,25 @@
+@use 'tokens';
+
+.el-select-dropdown {
+  border-radius: var(--fixture-panel-radius);
+}
+
+.el-select-dropdown__item {
+  min-height: var(--fixture-option-row-height);
+
+  &.is-selected {
+    background-color: var(--fixture-option-row-selected-color);
+  }
+}
+
+[data-density='compact'] {
+  .el-select-dropdown__item {
+    min-height: var(--fixture-option-row-compact-height);
+  }
+}
+
+@media (width <= 480px) {
+  .el-select-dropdown__item {
+    min-height: var(--fixture-option-row-height);
+  }
+}

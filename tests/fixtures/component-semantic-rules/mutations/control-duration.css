@@ -1,0 +1,4 @@
+/* fsus-rule-id: web.motion.control-transition */
+__RULE_SELECTOR__ {
+  transition-duration: 999ms;
+}

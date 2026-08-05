@@ -1,0 +1,7 @@
+.el-select-dropdown {
+  min-height: calc(30px + 2px);
+}
+
+.el-select-dropdown__item {
+  min-height: var(--fixture-option-row-height);
+}

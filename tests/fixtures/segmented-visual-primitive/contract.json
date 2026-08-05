@@ -1,0 +1,168 @@
+{
+  "schemaVersion": "fsusui.issue-459.segmented-visual-test-contract.v1",
+  "issue": 459,
+  "baseline": "700e484b5fb78e934b2d9c702b6951a45047be8a",
+  "sassApi": {
+    "entry": "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
+    "mixin": "fsus-segmented-visual-primitive",
+    "requiredParameters": [
+      "item-selector",
+      "selected-selector",
+      "disabled-selector",
+      "icon-selector",
+      "label-selector"
+    ],
+    "optionalParameters": ["focus-selector"]
+  },
+  "canonicalRefs": {
+    "shellRadius": {
+      "sourceId": "token-contract",
+      "path": "spec/tokens/tokens.json",
+      "pointer": "/tokens/radius.control.md",
+      "runtimeAlias": "--fsus-radius-control"
+    },
+    "itemHeightMin": {
+      "sourceId": "token-contract",
+      "path": "spec/tokens/tokens.json",
+      "pointer": "/tokens/density.control.action.y",
+      "runtimeAlias": "--fsus-control-height-action"
+    },
+    "itemHeightMax": {
+      "sourceId": "token-contract",
+      "path": "spec/tokens/tokens.json",
+      "pointer": "/tokens/density.control.compact.y",
+      "runtimeAlias": "--fsus-control-height-compact"
+    },
+    "selectedBackground": {
+      "sourceId": "token-contract",
+      "path": "spec/tokens/tokens.json",
+      "pointer": "/tokens/component-state.surface.selected.background",
+      "runtimeAlias": "--fsus-state-selected-bg"
+    },
+    "selectedBorder": {
+      "sourceId": "token-contract",
+      "path": "spec/tokens/tokens.json",
+      "pointer": "/tokens/component-state.surface.focus.border",
+      "runtimeAlias": "--fsus-state-focus-border"
+    },
+    "selectedIndicatorAndText": {
+      "sourceId": "token-contract",
+      "path": "spec/tokens/tokens.json",
+      "pointer": "/tokens/color.action.primary",
+      "runtimeAlias": "--fsus-scholarly-blue"
+    },
+    "hoverBackground": {
+      "sourceId": "token-contract",
+      "path": "spec/tokens/tokens.json",
+      "pointer": "/tokens/component-state.surface.hover.background",
+      "runtimeAlias": "--fsus-state-hover-bg"
+    },
+    "focusWidth": {
+      "sourceId": "token-contract",
+      "path": "spec/tokens/tokens.json",
+      "pointer": "/tokens/thickness.focus.md",
+      "runtimeAlias": "--fsus-focus-ring-width"
+    },
+    "disabled": {
+      "sourceId": "design-contract",
+      "path": "docs/design.md",
+      "pointer": "#form-controls",
+      "runtimeAliases": [
+        "--el-disabled-bg-color",
+        "--el-disabled-text-color",
+        "--el-disabled-border-color"
+      ]
+    },
+    "controlGroup": {
+      "sourceId": "design-contract",
+      "path": "docs/design.md",
+      "pointer": "#surface-taxonomy"
+    }
+  },
+  "semanticRegistry": {
+    "path": "spec/components/component-surface-semantic-registry.json",
+    "rules": [
+      {
+        "id": "web.radio-button.segmented-item",
+        "componentId": "web.radio-button",
+        "partId": "segmented-item",
+        "surfaceRole": "control-group.form-single-choice-option"
+      },
+      {
+        "id": "web.checkbox-button.segmented-item",
+        "componentId": "web.checkbox-button",
+        "partId": "segmented-item",
+        "surfaceRole": "control-group.form-multiple-choice-option"
+      },
+      {
+        "id": "web.theme-mode-toggle.segmented-item",
+        "componentId": "web.theme-mode-toggle",
+        "partId": "segmented-item",
+        "surfaceRole": "control-group.navigation-mode-toggle-option"
+      },
+      {
+        "id": "web.segmented-control.segmented-item",
+        "componentId": "web.segmented-control",
+        "partId": "segmented-item",
+        "surfaceRole": "control-group.navigation-view-toggle-option"
+      }
+    ]
+  },
+  "acceptance": [
+    {
+      "id": "SEG459-A01-PRIMITIVE-OUTPUT",
+      "covers": [
+        "shell-radius",
+        "item-height-range",
+        "selected-semantics",
+        "focus-visible-inset",
+        "disabled-opacity"
+      ]
+    },
+    {
+      "id": "SEG459-A02-SEMANTIC-SEPARATION",
+      "covers": [
+        "shared-visual-contract",
+        "form-radio-role",
+        "form-checkbox-role",
+        "navigation-mode-toggle-role",
+        "navigation-view-toggle-role"
+      ]
+    },
+    {
+      "id": "SEG459-A03-STATE-COMPOSITION",
+      "covers": ["selected-focus", "hover", "disabled"]
+    },
+    {
+      "id": "SEG459-A04-MUTATION-CONTROLS",
+      "covers": [
+        "shell-radius-mutations",
+        "item-height-mutations",
+        "neutral-selection-mutation",
+        "focus-width-mutation",
+        "disabled-opacity-mutation",
+        "item-shadow-mutation",
+        "label-clipping-mutation",
+        "shell-clipping-mutation"
+      ]
+    },
+    {
+      "id": "SEG459-A05-CONTENT-AND-BIDI",
+      "covers": [
+        "icon-text-baseline",
+        "long-label-intrinsic-no-clipping",
+        "rtl-logical-order"
+      ]
+    }
+  ],
+  "nonGoals": [
+    "merge-component-api",
+    "merge-aria-or-keyboard-semantics",
+    "consumer-specific-segmented-theme",
+    "second-token-system",
+    "radio-production-migration",
+    "checkbox-production-migration",
+    "theme-mode-toggle-production-migration",
+    "collection-production-migration"
+  ]
+}
