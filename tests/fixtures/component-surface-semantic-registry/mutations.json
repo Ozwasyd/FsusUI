@@ -1,0 +1,51 @@
+[
+  {
+    "id": "duplicate-numeric-truth",
+    "operation": "replace",
+    "path": "/rules/0/constraints/geometry/0",
+    "value": {
+      "literal": "34px"
+    },
+    "expectedCode": "registry-duplicate-numeric-truth"
+  },
+  {
+    "id": "broad-role",
+    "operation": "replace",
+    "path": "/rules/0/surfaceRole",
+    "value": "overlay",
+    "expectedCode": "registry-broad-role"
+  },
+  {
+    "id": "unowned-exception",
+    "operation": "append",
+    "path": "/rules/0/exceptions",
+    "value": {
+      "id": "legacy-option-card",
+      "source": {
+        "sourceId": "design-contract",
+        "path": "docs/design.md",
+        "pointer": "#exceptions"
+      },
+      "scope": {
+        "themes": ["light"],
+        "densities": ["default"],
+        "devices": ["desktop"]
+      },
+      "constraintOverrides": {
+        "surfaceCardMotif": [
+          {
+            "sourceId": "design-contract",
+            "path": "docs/design.md",
+            "pointer": "#surface-taxonomy"
+          }
+        ]
+      },
+      "reviewPolicy": {
+        "mode": "source-digest-required",
+        "ownerReviewRequired": true,
+        "reviewAfter": "2026-11-05"
+      }
+    },
+    "expectedCode": "registry-exception-owner-required"
+  }
+]

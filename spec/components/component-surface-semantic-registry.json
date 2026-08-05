@@ -1,0 +1,5845 @@
+{
+  "$schema": "./component-surface-semantic-registry.schema.json",
+  "schemaVersion": "fsusui.component-surface-semantic-registry.v1",
+  "registryVersion": "1.1.0",
+  "owner": {
+    "id": "fsusui.design-governance",
+    "kind": "specification"
+  },
+  "reviewPolicy": {
+    "mode": "source-digest-required",
+    "ownerReviewRequired": true,
+    "reviewAfter": "2026-11-05"
+  },
+  "generated": {
+    "producer": "scripts/check-component-surface-semantic-registry.mjs",
+    "sourceRevision": "700e484b5fb78e934b2d9c702b6951a45047be8a",
+    "digestAlgorithm": "sha256"
+  },
+  "sourceDigests": {
+    "design-contract": {
+      "path": "docs/design.md",
+      "kind": "authority",
+      "algorithm": "sha256",
+      "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
+    },
+    "token-contract": {
+      "path": "spec/tokens/tokens.json",
+      "kind": "authority",
+      "algorithm": "sha256",
+      "digest": "09262677ffabf44dc0895f434d27dec50b448ccf1d6dfceac8c60a06e001e964"
+    },
+    "component-contracts": {
+      "path": "spec/components/contracts/v1/vue-public-contracts.json",
+      "kind": "authority",
+      "algorithm": "sha256",
+      "digest": "717330dae01e6db3fdd8869520033a9a62bb4a63f167456418b38471bd6f367c"
+    },
+    "component-motion": {
+      "path": "docs/components/motion.md",
+      "kind": "authority",
+      "algorithm": "sha256",
+      "digest": "f4d475d4e04e4b084a7a262445dad60eb6ef63bfacf8e4d1e85a20aa0950dbc8"
+    },
+    "component-public-shell": {
+      "path": "docs/components/public-shell.md",
+      "kind": "authority",
+      "algorithm": "sha256",
+      "digest": "31b0f203ca102c874d55f66c935268de145077fa70cadee18089bfa6813fa2b1"
+    },
+    "implementation-01": {
+      "path": "vue/packages/theme-chalk/src/select-dropdown.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "d4cbee04be5d7c411cec28967ca2c022026731325220390dc3deaa7a556dc55d"
+    },
+    "implementation-02": {
+      "path": "vue/packages/theme-chalk/src/tree.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "b9094fe2eda0cb690347916749412087f95790db5b11b8cd31164611a078c334"
+    },
+    "implementation-03": {
+      "path": "vue/packages/theme-chalk/src/date-picker/picker-panel.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "c7f9f9339c1008b136951cf9c0f0a881c9cc1b530bb653263ccb6269522367bd"
+    },
+    "implementation-04": {
+      "path": "vue/packages/theme-chalk/src/date-picker/date-table.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "06d26e0af447cb9f0ec98f56a649327d29f671c66e237c6b09ec3968ea36452d"
+    },
+    "implementation-05": {
+      "path": "vue/packages/theme-chalk/src/date-picker/time-spinner.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "f6823cf21f51ae029ded14440abc2a4c809ddcc2dc2ca4d04337ec6a3f2eddaf"
+    },
+    "implementation-06": {
+      "path": "vue/packages/theme-chalk/src/upload.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "7e4e0834649165b800bd10aa4f3e67019f653ba09b9d1d5bc4ea5c2a82e73f28"
+    },
+    "implementation-07": {
+      "path": "vue/packages/theme-chalk/src/metric-primitives.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "c17c069574ecb1296169293264f1554c6f10198e109b68b490aedf03f4f7b938"
+    },
+    "implementation-08": {
+      "path": "vue/packages/theme-chalk/src/tabs.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "acd0ff470450a080f447fdecb2100c76bbb5dc7949adc23c28b1fd82ab9a24fd"
+    },
+    "implementation-09": {
+      "path": "vue/packages/theme-chalk/src/menu.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "45b1c4a308f583a43650a95a4fd5bb393a889f0d70fc927e54a7d4fd646aecb2"
+    },
+    "implementation-10": {
+      "path": "vue/packages/theme-chalk/src/radio-button.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "984d75fa78b447143e3c656c6e9ef45cdc3eff84554e3a6203bfb9828ba4b39a"
+    },
+    "implementation-11": {
+      "path": "vue/packages/theme-chalk/src/checkbox-button.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "ff4bf4a19e2b019e3153619d834cedead00a80e1388ac2ce6df2c90e7a75fe69"
+    },
+    "implementation-12": {
+      "path": "vue/packages/theme-chalk/src/fsus-theme.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "c5e0866a0eaa8d95f2268de67389531f6a9c3b7c83d8f9e7fa40a2e7810f0cdf"
+    },
+    "implementation-13": {
+      "path": "vue/packages/theme-chalk/src/collection-primitives.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "131729f07f27ad59eba293e0520efe608c5c7ad1139e9b8ac9127a97081fdd4c"
+    },
+    "implementation-14": {
+      "path": "vue/packages/theme-chalk/src/input-number.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "660a6030946fe4570735b0d12cc59f5630e9ab208f9b7ae0b1689873778de8d0"
+    },
+    "implementation-15": {
+      "path": "vue/packages/theme-chalk/src/dialog.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "b71bea06aab1ce38f9eea703c2416617a2403f4a17c7d2f0911c267c48de6914"
+    },
+    "implementation-16": {
+      "path": "vue/packages/theme-chalk/src/inbox-primitives.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "4ebe9e8ab9a18613f3b76295d6a0867eb37d569c7db5af09b0355633fc1ace2e"
+    },
+    "implementation-17": {
+      "path": "vue/packages/theme-chalk/src/settings-primitives.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "ac183b45b1adbf732c343a5cf1d6d7ccae6fd6163d52877075745c25da8e03cc"
+    },
+    "implementation-18": {
+      "path": "vue/packages/theme-chalk/src/loading.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "e49a4e53a9a88aa2b3b2d70e4a5dd813ab3bc730b7b52ab3bcb7942f3eca832f"
+    },
+    "implementation-19": {
+      "path": "vue/packages/theme-chalk/src/table.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "57e48c5d92f0df9635e07ed35121f4682cbd27b824bb4c26fd69d7a8de7254f7"
+    },
+    "implementation-20": {
+      "path": "vue/packages/theme-chalk/src/common/transition.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "1d3d8fc531de7657e0ec05153f0644000856afd83d650268e923ada7ddad556b"
+    },
+    "implementation-21": {
+      "path": "vue/packages/theme-chalk/src/public-shell.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "b0841f1e7c9e1cef86dafb97f7d05b00a453ad36c27c3ec082139aa6e356bc94"
+    },
+    "implementation-22": {
+      "path": "vue/packages/theme-chalk/src/drawer.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "448251331af2081312b9b63a0c1cc080d72801a78c62130f8686060ede8ff7c2"
+    },
+    "implementation-23": {
+      "path": "vue/packages/theme-chalk/src/notification.scss",
+      "kind": "implementation",
+      "algorithm": "sha256",
+      "digest": "6db558f46d42f3f1347907c309bb62835dee6727dde7986da97cb60361b097c1"
+    }
+  },
+  "rules": [
+    {
+      "id": "web.select.option-row",
+      "componentId": "web.select",
+      "partId": "option-row",
+      "surfaceRole": "overlay.option-row",
+      "issues": [293],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-select-dropdown__item",
+            "source": {
+              "sourceId": "implementation-01",
+              "path": "vue/packages/theme-chalk/src/select-dropdown.scss",
+              "pointer": "selector:.el-select-dropdown__item"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-01",
+            "path": "vue/packages/theme-chalk/src/select-dropdown.scss",
+            "pointer": "selector:.el-select-dropdown__item"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/density.select.option.y"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-select"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/density.select.option.y"
+          }
+        ],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.select.option-row.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.select.overlay-root",
+      "componentId": "web.select",
+      "partId": "overlay-root",
+      "surfaceRole": "overlay.panel-root",
+      "issues": [293],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-select-dropdown",
+            "source": {
+              "sourceId": "implementation-01",
+              "path": "vue/packages/theme-chalk/src/select-dropdown.scss",
+              "pointer": "selector:.el-select-dropdown"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-01",
+            "path": "vue/packages/theme-chalk/src/select-dropdown.scss",
+            "pointer": "selector:.el-select-dropdown"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#dropdown-select-popover"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/radius.surface.md"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-select"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/radius.surface.md"
+          }
+        ],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": [
+          {
+            "sourceId": "design-contract",
+            "path": "docs/design.md",
+            "pointer": "#dropdown-select-popover"
+          }
+        ]
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.select.overlay-root.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#dropdown-select-popover"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.tree.tree-row",
+      "componentId": "web.tree",
+      "partId": "tree-row",
+      "surfaceRole": "data-region.tree-node-row",
+      "issues": [296],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-tree-node__content",
+            "source": {
+              "sourceId": "implementation-02",
+              "path": "vue/packages/theme-chalk/src/tree.scss",
+              "pointer": "selector:.el-tree-node__content"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-02",
+            "path": "vue/packages/theme-chalk/src/tree.scss",
+            "pointer": "selector:.el-tree-node__content"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/density.control.default.y"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-tree"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/density.control.default.y"
+          }
+        ],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": [
+          {
+            "sourceId": "design-contract",
+            "path": "docs/design.md",
+            "pointer": "#surface-taxonomy"
+          }
+        ]
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.tree.tree-row.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.date-picker.data-region-root",
+      "componentId": "web.date-picker",
+      "partId": "data-region-root",
+      "surfaceRole": "data-region.picker-root",
+      "issues": [297],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-picker-panel",
+            "source": {
+              "sourceId": "implementation-03",
+              "path": "vue/packages/theme-chalk/src/date-picker/picker-panel.scss",
+              "pointer": "selector:.el-picker-panel"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-03",
+            "path": "vue/packages/theme-chalk/src/date-picker/picker-panel.scss",
+            "pointer": "selector:.el-picker-panel"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/radius.surface.md"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-date-picker"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/radius.surface.md"
+          }
+        ],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": [
+          {
+            "sourceId": "design-contract",
+            "path": "docs/design.md",
+            "pointer": "#surface-taxonomy"
+          }
+        ]
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.date-picker.data-region-root.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.date-picker.date-cell",
+      "componentId": "web.date-picker",
+      "partId": "date-cell",
+      "surfaceRole": "data-region.date-time-cell",
+      "issues": [297],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-date-table-cell__text",
+            "source": {
+              "sourceId": "implementation-04",
+              "path": "vue/packages/theme-chalk/src/date-picker/date-table.scss",
+              "pointer": "selector:.el-date-table-cell__text"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-04",
+            "path": "vue/packages/theme-chalk/src/date-picker/date-table.scss",
+            "pointer": "selector:.el-date-table-cell__text"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/density.control.default.y"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-date-picker"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/density.control.default.y"
+          }
+        ],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": [
+          {
+            "sourceId": "design-contract",
+            "path": "docs/design.md",
+            "pointer": "#surface-taxonomy"
+          }
+        ]
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.date-picker.date-cell.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.time-picker.time-row",
+      "componentId": "web.time-picker",
+      "partId": "time-row",
+      "surfaceRole": "overlay.time-option-row",
+      "issues": [297],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-time-spinner__item",
+            "source": {
+              "sourceId": "implementation-05",
+              "path": "vue/packages/theme-chalk/src/date-picker/time-spinner.scss",
+              "pointer": "selector:.el-time-spinner__item"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-05",
+            "path": "vue/packages/theme-chalk/src/date-picker/time-spinner.scss",
+            "pointer": "selector:.el-time-spinner__item"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/density.select.option.y"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-time-picker"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/density.select.option.y"
+          }
+        ],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.time-picker.time-row.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.upload.file-row",
+      "componentId": "web.upload",
+      "partId": "file-row",
+      "surfaceRole": "data-region.file-row",
+      "issues": [300],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-upload-list__item",
+            "source": {
+              "sourceId": "implementation-06",
+              "path": "vue/packages/theme-chalk/src/upload.scss",
+              "pointer": "selector:.el-upload-list__item"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-06",
+            "path": "vue/packages/theme-chalk/src/upload.scss",
+            "pointer": "selector:.el-upload-list__item"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/density.control.default.y"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-upload"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/density.control.default.y"
+          }
+        ],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/motion.duration.panel"
+          }
+        ],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.upload.file-row.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.diagnostics-list.diagnostic-row",
+      "componentId": "web.diagnostics-list",
+      "partId": "diagnostic-row",
+      "surfaceRole": "data-region.diagnostic-row",
+      "issues": [305, 306],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-diagnostics-item",
+            "source": {
+              "sourceId": "implementation-07",
+              "path": "vue/packages/theme-chalk/src/metric-primitives.scss",
+              "pointer": "selector:.el-diagnostics-item"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-07",
+            "path": "vue/packages/theme-chalk/src/metric-primitives.scss",
+            "pointer": "selector:.el-diagnostics-item"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/typography.caption.md.size"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-diagnostics-list"
+        }
+      ],
+      "constraints": {
+        "geometry": [],
+        "typography": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/typography.caption.md.size"
+          }
+        ],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.diagnostics-list.diagnostic-row.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.tabs.tab-item",
+      "componentId": "web.tabs",
+      "partId": "tab-item",
+      "surfaceRole": "navigation.tab-item",
+      "issues": [295],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-tabs__item",
+            "source": {
+              "sourceId": "implementation-08",
+              "path": "vue/packages/theme-chalk/src/tabs.scss",
+              "pointer": "selector:.el-tabs__item"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-08",
+            "path": "vue/packages/theme-chalk/src/tabs.scss",
+            "pointer": "selector:.el-tabs__item"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#tabs-and-navigation"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/density.control.compact.y"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-tabs"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/density.control.compact.y"
+          }
+        ],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": [
+          {
+            "sourceId": "design-contract",
+            "path": "docs/design.md",
+            "pointer": "#tabs-and-navigation"
+          }
+        ]
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.tabs.tab-item.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#tabs-and-navigation"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.menu.vertical-item",
+      "componentId": "web.menu",
+      "partId": "vertical-item",
+      "surfaceRole": "navigation.vertical-menu-item",
+      "issues": [294],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-menu--vertical",
+            "source": {
+              "sourceId": "implementation-09",
+              "path": "vue/packages/theme-chalk/src/menu.scss",
+              "pointer": "selector:.el-menu--vertical"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-09",
+            "path": "vue/packages/theme-chalk/src/menu.scss",
+            "pointer": "selector:.el-menu--vertical"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/density.menu.item.y"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-menu"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/density.menu.item.y"
+          }
+        ],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.menu.vertical-item.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.menu.horizontal-item",
+      "componentId": "web.menu",
+      "partId": "horizontal-item",
+      "surfaceRole": "navigation.horizontal-menu-item",
+      "issues": [294],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-menu--horizontal",
+            "source": {
+              "sourceId": "implementation-09",
+              "path": "vue/packages/theme-chalk/src/menu.scss",
+              "pointer": "selector:.el-menu--horizontal"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-09",
+            "path": "vue/packages/theme-chalk/src/menu.scss",
+            "pointer": "selector:.el-menu--horizontal"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/density.menu.horizontal.y"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-menu"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/density.menu.horizontal.y"
+          }
+        ],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.menu.horizontal-item.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.radio-button.segmented-item",
+      "componentId": "web.radio-button",
+      "partId": "segmented-item",
+      "surfaceRole": "control-group.form-single-choice-option",
+      "issues": [301],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-radio-button__inner",
+            "source": {
+              "sourceId": "implementation-10",
+              "path": "vue/packages/theme-chalk/src/radio-button.scss",
+              "pointer": "selector:.el-radio-button__inner"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-10",
+            "path": "vue/packages/theme-chalk/src/radio-button.scss",
+            "pointer": "selector:.el-radio-button__inner"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/density.control.action.y"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-radio-button"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/density.control.action.y"
+          },
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/density.control.compact.y"
+          }
+        ],
+        "typography": [],
+        "stateColor": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/component-state.surface.selected.background"
+          }
+        ],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.radio-button.segmented-item.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.checkbox-button.segmented-item",
+      "componentId": "web.checkbox-button",
+      "partId": "segmented-item",
+      "surfaceRole": "control-group.form-multiple-choice-option",
+      "issues": [301],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-checkbox-button__inner",
+            "source": {
+              "sourceId": "implementation-11",
+              "path": "vue/packages/theme-chalk/src/checkbox-button.scss",
+              "pointer": "selector:.el-checkbox-button__inner"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-11",
+            "path": "vue/packages/theme-chalk/src/checkbox-button.scss",
+            "pointer": "selector:.el-checkbox-button__inner"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/density.control.action.y"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-checkbox-button"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/density.control.action.y"
+          },
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/density.control.compact.y"
+          }
+        ],
+        "typography": [],
+        "stateColor": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/component-state.surface.selected.background"
+          }
+        ],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.checkbox-button.segmented-item.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.theme-mode-toggle.segmented-item",
+      "componentId": "web.theme-mode-toggle",
+      "partId": "segmented-item",
+      "surfaceRole": "control-group.navigation-mode-toggle-option",
+      "issues": [301],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-theme-mode-toggle",
+            "source": {
+              "sourceId": "implementation-12",
+              "path": "vue/packages/theme-chalk/src/fsus-theme.scss",
+              "pointer": "selector:.el-theme-mode-toggle"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-12",
+            "path": "vue/packages/theme-chalk/src/fsus-theme.scss",
+            "pointer": "selector:.el-theme-mode-toggle"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/density.control.action.y"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-theme-mode-toggle"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/density.control.action.y"
+          },
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/density.control.compact.y"
+          }
+        ],
+        "typography": [],
+        "stateColor": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/component-state.surface.selected.background"
+          },
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/component-state.surface.focus.border"
+          }
+        ],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.theme-mode-toggle.segmented-item.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.segmented-control.segmented-item",
+      "componentId": "web.segmented-control",
+      "partId": "segmented-item",
+      "surfaceRole": "control-group.navigation-view-toggle-option",
+      "issues": [301],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-segmented-control__item",
+            "source": {
+              "sourceId": "implementation-13",
+              "path": "vue/packages/theme-chalk/src/collection-primitives.scss",
+              "pointer": "selector:.el-segmented-control__item"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-13",
+            "path": "vue/packages/theme-chalk/src/collection-primitives.scss",
+            "pointer": "selector:.el-segmented-control__item"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/density.control.action.y"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-segmented-control"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/density.control.action.y"
+          },
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/density.control.compact.y"
+          }
+        ],
+        "typography": [],
+        "stateColor": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/component-state.surface.selected.background"
+          },
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/component-state.surface.focus.border"
+          }
+        ],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.segmented-control.segmented-item.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.input-number.action",
+      "componentId": "web.input-number",
+      "partId": "action",
+      "surfaceRole": "form-control.input-number-action",
+      "issues": [309],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-input-number__increase",
+            "source": {
+              "sourceId": "implementation-14",
+              "path": "vue/packages/theme-chalk/src/input-number.scss",
+              "pointer": "selector:.el-input-number__increase"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-14",
+            "path": "vue/packages/theme-chalk/src/input-number.scss",
+            "pointer": "selector:.el-input-number__increase"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/density.icon.target"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-input-number"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/density.icon.target"
+          }
+        ],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.input-number.action.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.input-number.interactive-root",
+      "componentId": "web.input-number",
+      "partId": "interactive-root",
+      "surfaceRole": "form-control.input-number-interactive-root",
+      "issues": [309],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-input-number",
+            "source": {
+              "sourceId": "implementation-14",
+              "path": "vue/packages/theme-chalk/src/input-number.scss",
+              "pointer": "selector:.el-input-number"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-14",
+            "path": "vue/packages/theme-chalk/src/input-number.scss",
+            "pointer": "selector:.el-input-number"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/density.control.default.y"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-input-number"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/density.control.default.y"
+          }
+        ],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.input-number.interactive-root.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.dialog.overlay-close",
+      "componentId": "web.dialog",
+      "partId": "overlay-close",
+      "surfaceRole": "overlay.close-action",
+      "issues": [299],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-dialog__headerbtn",
+            "source": {
+              "sourceId": "implementation-15",
+              "path": "vue/packages/theme-chalk/src/dialog.scss",
+              "pointer": "selector:.el-dialog__headerbtn"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-15",
+            "path": "vue/packages/theme-chalk/src/dialog.scss",
+            "pointer": "selector:.el-dialog__headerbtn"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#dialog-and-drawer"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/typography.body.md.size"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-dialog"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "design-contract",
+            "path": "docs/design.md",
+            "pointer": "#dialog-and-drawer"
+          }
+        ],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.dialog.overlay-close.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#dialog-and-drawer"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.rate.filled-icon",
+      "componentId": "web.rate",
+      "partId": "filled-icon",
+      "surfaceRole": "form-control.rate-filled-icon",
+      "issues": [302],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-rate__icon",
+            "source": {
+              "sourceId": "implementation-12",
+              "path": "vue/packages/theme-chalk/src/fsus-theme.scss",
+              "pointer": "selector:.el-rate__icon"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-12",
+            "path": "vue/packages/theme-chalk/src/fsus-theme.scss",
+            "pointer": "selector:.el-rate__icon"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#accent-rules"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/typography.body.md.size"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-rate"
+        }
+      ],
+      "constraints": {
+        "geometry": [],
+        "typography": [],
+        "stateColor": [
+          {
+            "sourceId": "design-contract",
+            "path": "docs/design.md",
+            "pointer": "#accent-rules"
+          }
+        ],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.rate.filled-icon.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#accent-rules"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.reply-composer-shell.interactive-root",
+      "componentId": "web.reply-composer-shell",
+      "partId": "interactive-root",
+      "surfaceRole": "task.reply-composer-interactive-root",
+      "issues": [307],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-reply-composer-shell",
+            "source": {
+              "sourceId": "implementation-16",
+              "path": "vue/packages/theme-chalk/src/inbox-primitives.scss",
+              "pointer": "selector:.el-reply-composer-shell"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-16",
+            "path": "vue/packages/theme-chalk/src/inbox-primitives.scss",
+            "pointer": "selector:.el-reply-composer-shell"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/density.control.default.y"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-reply-composer-shell"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/density.control.default.y"
+          }
+        ],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.reply-composer-shell.interactive-root.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.reply-composer-shell.disabled-control",
+      "componentId": "web.reply-composer-shell",
+      "partId": "disabled-control",
+      "surfaceRole": "task.reply-composer-disabled-control",
+      "issues": [307],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-reply-composer-shell",
+            "source": {
+              "sourceId": "implementation-16",
+              "path": "vue/packages/theme-chalk/src/inbox-primitives.scss",
+              "pointer": "selector:.el-reply-composer-shell"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-16",
+            "path": "vue/packages/theme-chalk/src/inbox-primitives.scss",
+            "pointer": "selector:.el-reply-composer-shell"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#form-controls"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/typography.body.md.size"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-reply-composer-shell"
+        }
+      ],
+      "constraints": {
+        "geometry": [],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [
+          {
+            "sourceId": "design-contract",
+            "path": "docs/design.md",
+            "pointer": "#form-controls"
+          }
+        ],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.reply-composer-shell.disabled-control.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#form-controls"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.task-primitives.metadata",
+      "componentId": "web.task-primitives",
+      "partId": "metadata",
+      "surfaceRole": "task.typography-metadata",
+      "issues": [305, 306],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-metadata-item__label",
+            "source": {
+              "sourceId": "implementation-17",
+              "path": "vue/packages/theme-chalk/src/settings-primitives.scss",
+              "pointer": "selector:.el-metadata-item__label"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-17",
+            "path": "vue/packages/theme-chalk/src/settings-primitives.scss",
+            "pointer": "selector:.el-metadata-item__label"
+          },
+          {
+            "sourceId": "implementation-17",
+            "path": "vue/packages/theme-chalk/src/settings-primitives.scss",
+            "pointer": "selector:.el-settings-section"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/typography.caption.sm.size"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-settings-section"
+        }
+      ],
+      "constraints": {
+        "geometry": [],
+        "typography": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/typography.caption.sm.size"
+          }
+        ],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.task-primitives.metadata.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.task-primitives.body",
+      "componentId": "web.task-primitives",
+      "partId": "body",
+      "surfaceRole": "task.typography-body",
+      "issues": [305, 306],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-settings-section__body",
+            "source": {
+              "sourceId": "implementation-17",
+              "path": "vue/packages/theme-chalk/src/settings-primitives.scss",
+              "pointer": "selector:.el-settings-section__body"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-17",
+            "path": "vue/packages/theme-chalk/src/settings-primitives.scss",
+            "pointer": "selector:.el-settings-section__body"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/typography.body.md.size"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-settings-section"
+        }
+      ],
+      "constraints": {
+        "geometry": [],
+        "typography": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/typography.body.md.size"
+          }
+        ],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.task-primitives.body.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.task-primitives.title",
+      "componentId": "web.task-primitives",
+      "partId": "title",
+      "surfaceRole": "task.typography-title",
+      "issues": [305, 306],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-settings-section__title",
+            "source": {
+              "sourceId": "implementation-17",
+              "path": "vue/packages/theme-chalk/src/settings-primitives.scss",
+              "pointer": "selector:.el-settings-section__title"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-17",
+            "path": "vue/packages/theme-chalk/src/settings-primitives.scss",
+            "pointer": "selector:.el-settings-section__title"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/typography.heading.sm.size"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-settings-section"
+        }
+      ],
+      "constraints": {
+        "geometry": [],
+        "typography": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/typography.heading.sm.size"
+          }
+        ],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.task-primitives.title.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.loading.metadata",
+      "componentId": "web.loading",
+      "partId": "metadata",
+      "surfaceRole": "feedback.loading-metadata",
+      "issues": [303],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-loading-text",
+            "source": {
+              "sourceId": "implementation-18",
+              "path": "vue/packages/theme-chalk/src/loading.scss",
+              "pointer": "selector:.el-loading-text"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-18",
+            "path": "vue/packages/theme-chalk/src/loading.scss",
+            "pointer": "selector:.el-loading-text"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/typography.caption.md.size"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-loading"
+        }
+      ],
+      "constraints": {
+        "geometry": [],
+        "typography": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/typography.caption.md.size"
+          }
+        ],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.loading.metadata.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.loading.text",
+      "componentId": "web.loading",
+      "partId": "text",
+      "surfaceRole": "feedback.loading-text",
+      "issues": [303],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-loading-text",
+            "source": {
+              "sourceId": "implementation-18",
+              "path": "vue/packages/theme-chalk/src/loading.scss",
+              "pointer": "selector:.el-loading-text"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-18",
+            "path": "vue/packages/theme-chalk/src/loading.scss",
+            "pointer": "selector:.el-loading-text"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/typography.body.md.size"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-loading"
+        }
+      ],
+      "constraints": {
+        "geometry": [],
+        "typography": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/typography.body.md.size"
+          }
+        ],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.loading.text.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.metric-primitives.label",
+      "componentId": "web.metric-primitives",
+      "partId": "label",
+      "surfaceRole": "data-region.metric-label",
+      "issues": [306],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-metric-item__label",
+            "source": {
+              "sourceId": "implementation-07",
+              "path": "vue/packages/theme-chalk/src/metric-primitives.scss",
+              "pointer": "selector:.el-metric-item__label"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-07",
+            "path": "vue/packages/theme-chalk/src/metric-primitives.scss",
+            "pointer": "selector:.el-metric-item__label"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/typography.caption.md.size"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-metric-item"
+        }
+      ],
+      "constraints": {
+        "geometry": [],
+        "typography": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/typography.caption.md.size"
+          }
+        ],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.metric-primitives.label.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.metric-primitives.value",
+      "componentId": "web.metric-primitives",
+      "partId": "value",
+      "surfaceRole": "data-region.metric-value",
+      "issues": [306],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-metric-item__primary",
+            "source": {
+              "sourceId": "implementation-07",
+              "path": "vue/packages/theme-chalk/src/metric-primitives.scss",
+              "pointer": "selector:.el-metric-item__primary"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-07",
+            "path": "vue/packages/theme-chalk/src/metric-primitives.scss",
+            "pointer": "selector:.el-metric-item__primary"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/typography.heading.md.size"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-metric-item"
+        }
+      ],
+      "constraints": {
+        "geometry": [],
+        "typography": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/typography.heading.md.size"
+          }
+        ],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.metric-primitives.value.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.table.header-cell",
+      "componentId": "web.table",
+      "partId": "header-cell",
+      "surfaceRole": "data-region.table-header-cell",
+      "issues": [304],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-table__header",
+            "source": {
+              "sourceId": "implementation-19",
+              "path": "vue/packages/theme-chalk/src/table.scss",
+              "pointer": "selector:.el-table__header"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-19",
+            "path": "vue/packages/theme-chalk/src/table.scss",
+            "pointer": "selector:.el-table__header"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/typography.body.md.size"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-table"
+        }
+      ],
+      "constraints": {
+        "geometry": [],
+        "typography": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/typography.body.md.size"
+          },
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/typography.weight.medium"
+          }
+        ],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.table.header-cell.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.table.small-header-cell",
+      "componentId": "web.table",
+      "partId": "small-header-cell",
+      "surfaceRole": "data-region.table-small-header-cell",
+      "issues": [304],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-table--small .el-table__header",
+            "source": {
+              "sourceId": "implementation-19",
+              "path": "vue/packages/theme-chalk/src/table.scss",
+              "pointer": "selector:.el-table--small .el-table__header"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-19",
+            "path": "vue/packages/theme-chalk/src/table.scss",
+            "pointer": "selector:.el-table--small .el-table__header"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/typography.caption.sm.size"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-table"
+        }
+      ],
+      "constraints": {
+        "geometry": [],
+        "typography": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/typography.caption.sm.size"
+          }
+        ],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.table.small-header-cell.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.motion.control-transition",
+      "componentId": "web.motion",
+      "partId": "control-transition",
+      "surfaceRole": "interaction.control-transition",
+      "issues": [308],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-fade-in-enter-active",
+            "source": {
+              "sourceId": "implementation-20",
+              "path": "vue/packages/theme-chalk/src/common/transition.scss",
+              "pointer": "selector:.el-fade-in-enter-active"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-20",
+            "path": "vue/packages/theme-chalk/src/common/transition.scss",
+            "pointer": "selector:.el-fade-in-enter-active"
+          },
+          {
+            "sourceId": "implementation-08",
+            "path": "vue/packages/theme-chalk/src/tabs.scss",
+            "pointer": "selector:.el-tabs"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/motion.duration.control"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-tabs"
+        }
+      ],
+      "constraints": {
+        "geometry": [],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/motion.duration.control"
+          }
+        ],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.motion.control-transition.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.motion.control-enter-from",
+      "componentId": "web.motion",
+      "partId": "control-enter-from",
+      "surfaceRole": "interaction.control-enter-from",
+      "issues": [308],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-fade-in-enter-from",
+            "source": {
+              "sourceId": "implementation-20",
+              "path": "vue/packages/theme-chalk/src/common/transition.scss",
+              "pointer": "selector:.el-fade-in-enter-from"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-20",
+            "path": "vue/packages/theme-chalk/src/common/transition.scss",
+            "pointer": "selector:.el-fade-in-enter-from"
+          },
+          {
+            "sourceId": "implementation-08",
+            "path": "vue/packages/theme-chalk/src/tabs.scss",
+            "pointer": "selector:.el-tabs"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/motion.duration.control.fast"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-tabs"
+        }
+      ],
+      "constraints": {
+        "geometry": [],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/motion.duration.control.fast"
+          },
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/motion.distance.small"
+          }
+        ],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.motion.control-enter-from.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.motion.list-enter-from",
+      "componentId": "web.motion",
+      "partId": "list-enter-from",
+      "surfaceRole": "interaction.list-enter-from",
+      "issues": [300, 308],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-list-enter-from",
+            "source": {
+              "sourceId": "implementation-20",
+              "path": "vue/packages/theme-chalk/src/common/transition.scss",
+              "pointer": "selector:.el-list-enter-from"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-20",
+            "path": "vue/packages/theme-chalk/src/common/transition.scss",
+            "pointer": "selector:.el-list-enter-from"
+          },
+          {
+            "sourceId": "implementation-06",
+            "path": "vue/packages/theme-chalk/src/upload.scss",
+            "pointer": "selector:.el-upload"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/motion.duration.panel"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-upload"
+        }
+      ],
+      "constraints": {
+        "geometry": [],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/motion.duration.panel"
+          },
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/motion.distance.small"
+          }
+        ],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.motion.list-enter-from.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.public-shell.disclosure-transition",
+      "componentId": "web.public-shell",
+      "partId": "disclosure-transition",
+      "surfaceRole": "interaction.public-shell-transition",
+      "issues": [310],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-public-shell__mobile-nav-menu-panel",
+            "source": {
+              "sourceId": "implementation-21",
+              "path": "vue/packages/theme-chalk/src/public-shell.scss",
+              "pointer": "selector:.el-public-shell__mobile-nav-menu-panel"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-21",
+            "path": "vue/packages/theme-chalk/src/public-shell.scss",
+            "pointer": "selector:.el-public-shell__mobile-nav-menu-panel"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/typography.body.md.size"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-public-shell"
+        }
+      ],
+      "constraints": {
+        "geometry": [],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [
+          {
+            "sourceId": "component-public-shell",
+            "path": "docs/components/public-shell.md",
+            "pointer": "#verification-contract"
+          }
+        ],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.public-shell.disclosure-transition.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.dialog.overlay-root",
+      "componentId": "web.dialog",
+      "partId": "overlay-root",
+      "surfaceRole": "overlay.dialog-root",
+      "issues": [298],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-dialog",
+            "source": {
+              "sourceId": "implementation-15",
+              "path": "vue/packages/theme-chalk/src/dialog.scss",
+              "pointer": "selector:.el-dialog"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-15",
+            "path": "vue/packages/theme-chalk/src/dialog.scss",
+            "pointer": "selector:.el-dialog"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#dialog-and-drawer"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/component.dialog.padding"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-dialog"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/component.dialog.padding"
+          }
+        ],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": [
+          {
+            "sourceId": "design-contract",
+            "path": "docs/design.md",
+            "pointer": "#dialog-and-drawer"
+          }
+        ]
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.dialog.overlay-root.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#dialog-and-drawer"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.drawer.overlay-root",
+      "componentId": "web.drawer",
+      "partId": "overlay-root",
+      "surfaceRole": "overlay.drawer-root",
+      "issues": [298],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-drawer",
+            "source": {
+              "sourceId": "implementation-22",
+              "path": "vue/packages/theme-chalk/src/drawer.scss",
+              "pointer": "selector:.el-drawer"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-22",
+            "path": "vue/packages/theme-chalk/src/drawer.scss",
+            "pointer": "selector:.el-drawer"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#dialog-and-drawer"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/radius.surface.lg"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-drawer"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/radius.surface.lg"
+          }
+        ],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": [
+          {
+            "sourceId": "design-contract",
+            "path": "docs/design.md",
+            "pointer": "#dialog-and-drawer"
+          }
+        ]
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.drawer.overlay-root.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#dialog-and-drawer"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.notification.overlay-root",
+      "componentId": "web.notification",
+      "partId": "overlay-root",
+      "surfaceRole": "overlay.notification-root",
+      "issues": [298],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-notification",
+            "source": {
+              "sourceId": "implementation-23",
+              "path": "vue/packages/theme-chalk/src/notification.scss",
+              "pointer": "selector:.el-notification"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-23",
+            "path": "vue/packages/theme-chalk/src/notification.scss",
+            "pointer": "selector:.el-notification"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#overlay-material"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/radius.surface.md"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-notification"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/radius.surface.md"
+          }
+        ],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": [
+          {
+            "sourceId": "design-contract",
+            "path": "docs/design.md",
+            "pointer": "#overlay-material"
+          }
+        ]
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.notification.overlay-root.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#overlay-material"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.panel.panel-root",
+      "componentId": "web.panel",
+      "partId": "panel-root",
+      "surfaceRole": "data-region.panel-root",
+      "issues": [305, 306],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-settings-section",
+            "source": {
+              "sourceId": "implementation-17",
+              "path": "vue/packages/theme-chalk/src/settings-primitives.scss",
+              "pointer": "selector:.el-settings-section"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-17",
+            "path": "vue/packages/theme-chalk/src/settings-primitives.scss",
+            "pointer": "selector:.el-settings-section"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/radius.surface.md"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-settings-section"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/radius.surface.md"
+          }
+        ],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": [
+          {
+            "sourceId": "design-contract",
+            "path": "docs/design.md",
+            "pointer": "#surface-taxonomy"
+          }
+        ]
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.panel.panel-root.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.panel.expressive-panel-root",
+      "componentId": "web.panel",
+      "partId": "expressive-panel-root",
+      "surfaceRole": "expressive.opt-in-panel-root",
+      "issues": [305, 306],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-thread-panel",
+            "source": {
+              "sourceId": "implementation-16",
+              "path": "vue/packages/theme-chalk/src/inbox-primitives.scss",
+              "pointer": "selector:.el-thread-panel"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-16",
+            "path": "vue/packages/theme-chalk/src/inbox-primitives.scss",
+            "pointer": "selector:.el-thread-panel"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/radius.surface.lg"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-thread-panel"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/radius.surface.lg"
+          }
+        ],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": [
+          {
+            "sourceId": "design-contract",
+            "path": "docs/design.md",
+            "pointer": "#surface-taxonomy"
+          }
+        ]
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.panel.expressive-panel-root.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.key-value-grid.label-motif",
+      "componentId": "web.key-value-grid",
+      "partId": "label-motif",
+      "surfaceRole": "data-region.label-motif",
+      "issues": [306],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-key-value-item__label",
+            "source": {
+              "sourceId": "implementation-07",
+              "path": "vue/packages/theme-chalk/src/metric-primitives.scss",
+              "pointer": "selector:.el-key-value-item__label"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-07",
+            "path": "vue/packages/theme-chalk/src/metric-primitives.scss",
+            "pointer": "selector:.el-key-value-item__label"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#2-brand-motif-punctuation"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/typography.caption.sm.size"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-key-value-grid"
+        }
+      ],
+      "constraints": {
+        "geometry": [],
+        "typography": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/typography.caption.sm.size"
+          }
+        ],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": [
+          {
+            "sourceId": "design-contract",
+            "path": "docs/design.md",
+            "pointer": "#2-brand-motif-punctuation"
+          }
+        ]
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.key-value-grid.label-motif.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#2-brand-motif-punctuation"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.dialog.overlay-close-optical",
+      "componentId": "web.dialog",
+      "partId": "overlay-close-optical",
+      "surfaceRole": "overlay.close-optical-alignment",
+      "issues": [299],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-dialog__headerbtn",
+            "source": {
+              "sourceId": "implementation-15",
+              "path": "vue/packages/theme-chalk/src/dialog.scss",
+              "pointer": "selector:.el-dialog__headerbtn"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-15",
+            "path": "vue/packages/theme-chalk/src/dialog.scss",
+            "pointer": "selector:.el-dialog__headerbtn"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/density.icon.target"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-dialog"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/density.icon.target"
+          },
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/thickness.focus.md"
+          }
+        ],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.dialog.overlay-close-optical.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.diagnostics-list.composition",
+      "componentId": "web.diagnostics-list",
+      "partId": "list-composition",
+      "surfaceRole": "data-region.diagnostic-list-composition",
+      "issues": [305, 306],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-diagnostics-list",
+            "source": {
+              "sourceId": "implementation-07",
+              "path": "vue/packages/theme-chalk/src/metric-primitives.scss",
+              "pointer": "selector:.el-diagnostics-list"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-07",
+            "path": "vue/packages/theme-chalk/src/metric-primitives.scss",
+            "pointer": "selector:.el-diagnostics-list"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/typography.body.md.size"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-diagnostics-list"
+        }
+      ],
+      "constraints": {
+        "geometry": [],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": [
+          {
+            "sourceId": "design-contract",
+            "path": "docs/design.md",
+            "pointer": "#surface-taxonomy"
+          }
+        ]
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.diagnostics-list.composition.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.settings-primitives.action",
+      "componentId": "web.settings-primitives",
+      "partId": "action",
+      "surfaceRole": "task.settings-action",
+      "issues": [305],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-settings-section__actions",
+            "source": {
+              "sourceId": "implementation-17",
+              "path": "vue/packages/theme-chalk/src/settings-primitives.scss",
+              "pointer": "selector:.el-settings-section__actions"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-17",
+            "path": "vue/packages/theme-chalk/src/settings-primitives.scss",
+            "pointer": "selector:.el-settings-section__actions"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/density.control.action.y"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-settings-section"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/density.control.action.y"
+          }
+        ],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.settings-primitives.action.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.loading.indicator",
+      "componentId": "web.loading",
+      "partId": "indicator",
+      "surfaceRole": "feedback.loading-indicator",
+      "issues": [303],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-loading-spinner",
+            "source": {
+              "sourceId": "implementation-18",
+              "path": "vue/packages/theme-chalk/src/loading.scss",
+              "pointer": "selector:.el-loading-spinner"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-18",
+            "path": "vue/packages/theme-chalk/src/loading.scss",
+            "pointer": "selector:.el-loading-spinner"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/motion.duration.control"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-loading"
+        }
+      ],
+      "constraints": {
+        "geometry": [],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/motion.duration.control"
+          }
+        ],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.loading.indicator.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "web.metric-primitives.metric-row",
+      "componentId": "web.metric-primitives",
+      "partId": "metric-row",
+      "surfaceRole": "data-region.metric-row",
+      "issues": [306],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
+      "selectorOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "selectors": [
+          {
+            "platform": "web",
+            "selector": ".el-metric-item",
+            "source": {
+              "sourceId": "implementation-07",
+              "path": "vue/packages/theme-chalk/src/metric-primitives.scss",
+              "pointer": "selector:.el-metric-item"
+            }
+          }
+        ]
+      },
+      "sourceOwnership": {
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
+        "sources": [
+          {
+            "sourceId": "implementation-07",
+            "path": "vue/packages/theme-chalk/src/metric-primitives.scss",
+            "pointer": "selector:.el-metric-item"
+          },
+          {
+            "sourceId": "implementation-07",
+            "path": "vue/packages/theme-chalk/src/metric-primitives.scss",
+            "pointer": "selector:.el-metric-list"
+          }
+        ]
+      },
+      "canonicalSources": [
+        {
+          "sourceId": "design-contract",
+          "path": "docs/design.md",
+          "pointer": "#surface-taxonomy"
+        },
+        {
+          "sourceId": "token-contract",
+          "path": "spec/tokens/tokens.json",
+          "pointer": "/tokens/density.control.spacious.y"
+        },
+        {
+          "sourceId": "component-contracts",
+          "path": "spec/components/contracts/v1/vue-public-contracts.json",
+          "pointer": "/components/component.el-metric-list"
+        }
+      ],
+      "constraints": {
+        "geometry": [
+          {
+            "sourceId": "token-contract",
+            "path": "spec/tokens/tokens.json",
+            "pointer": "/tokens/density.control.spacious.y"
+          }
+        ],
+        "typography": [],
+        "stateColor": [],
+        "disabled": [],
+        "motion": [],
+        "surfaceCardMotif": []
+      },
+      "scope": {
+        "themes": ["light", "dark"],
+        "densities": ["default", "compact", "touch"],
+        "devices": ["desktop", "mobile", "touch"]
+      },
+      "variants": [],
+      "exceptions": [],
+      "verificationPolicy": {
+        "staticFields": [
+          "geometry",
+          "typography",
+          "stateColor",
+          "disabled",
+          "motion"
+        ],
+        "visualProbeFields": ["surfaceCardMotif"],
+        "visualRequirements": [
+          {
+            "id": "web.metric-primitives.metric-row.semantic-evidence",
+            "states": ["default", "hover", "focus-visible", "disabled"],
+            "themes": ["light", "dark"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [100, 150, 200],
+            "inputs": ["mouse", "keyboard", "touch"],
+            "expectedSemanticEvidence": [
+              {
+                "sourceId": "design-contract",
+                "path": "docs/design.md",
+                "pointer": "#surface-taxonomy"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "issueMappings": [
+    {
+      "issue": 293,
+      "errorId": "option-row-cardification",
+      "ruleIds": ["web.select.option-row", "web.select.overlay-root"],
+      "semanticRoles": ["overlay.option-row", "overlay.panel-root"]
+    },
+    {
+      "issue": 294,
+      "errorId": "menu-navigation-density-state",
+      "ruleIds": ["web.menu.vertical-item", "web.menu.horizontal-item"],
+      "semanticRoles": [
+        "navigation.vertical-menu-item",
+        "navigation.horizontal-menu-item"
+      ]
+    },
+    {
+      "issue": 295,
+      "errorId": "tabs-button-cardification",
+      "ruleIds": ["web.tabs.tab-item"],
+      "semanticRoles": ["navigation.tab-item"]
+    },
+    {
+      "issue": 296,
+      "errorId": "tree-node-cardification",
+      "ruleIds": ["web.tree.tree-row"],
+      "semanticRoles": ["data-region.tree-node-row"]
+    },
+    {
+      "issue": 297,
+      "errorId": "date-time-cell-cardification",
+      "ruleIds": [
+        "web.date-picker.data-region-root",
+        "web.date-picker.date-cell",
+        "web.time-picker.time-row"
+      ],
+      "semanticRoles": [
+        "data-region.picker-root",
+        "data-region.date-time-cell",
+        "overlay.time-option-row"
+      ]
+    },
+    {
+      "issue": 298,
+      "errorId": "overlay-depth-inversion",
+      "ruleIds": [
+        "web.dialog.overlay-root",
+        "web.drawer.overlay-root",
+        "web.notification.overlay-root"
+      ],
+      "semanticRoles": [
+        "overlay.dialog-root",
+        "overlay.drawer-root",
+        "overlay.notification-root"
+      ]
+    },
+    {
+      "issue": 299,
+      "errorId": "overlay-close-target",
+      "ruleIds": [
+        "web.dialog.overlay-close",
+        "web.dialog.overlay-close-optical"
+      ],
+      "semanticRoles": [
+        "overlay.close-action",
+        "overlay.close-optical-alignment"
+      ]
+    },
+    {
+      "issue": 300,
+      "errorId": "upload-file-row-legacy-surface",
+      "ruleIds": ["web.upload.file-row", "web.motion.list-enter-from"],
+      "semanticRoles": ["data-region.file-row", "interaction.list-enter-from"]
+    },
+    {
+      "issue": 301,
+      "errorId": "segmented-role-conflation",
+      "ruleIds": [
+        "web.radio-button.segmented-item",
+        "web.checkbox-button.segmented-item",
+        "web.theme-mode-toggle.segmented-item",
+        "web.segmented-control.segmented-item"
+      ],
+      "semanticRoles": [
+        "control-group.form-single-choice-option",
+        "control-group.form-multiple-choice-option",
+        "control-group.navigation-mode-toggle-option",
+        "control-group.navigation-view-toggle-option"
+      ]
+    },
+    {
+      "issue": 302,
+      "errorId": "rate-primary-color-role",
+      "ruleIds": ["web.rate.filled-icon"],
+      "semanticRoles": ["form-control.rate-filled-icon"]
+    },
+    {
+      "issue": 303,
+      "errorId": "loading-indicator-semantic-loss",
+      "ruleIds": [
+        "web.loading.metadata",
+        "web.loading.text",
+        "web.loading.indicator"
+      ],
+      "semanticRoles": [
+        "feedback.loading-metadata",
+        "feedback.loading-text",
+        "feedback.loading-indicator"
+      ]
+    },
+    {
+      "issue": 304,
+      "errorId": "table-header-typography",
+      "ruleIds": ["web.table.header-cell", "web.table.small-header-cell"],
+      "semanticRoles": [
+        "data-region.table-header-cell",
+        "data-region.table-small-header-cell"
+      ]
+    },
+    {
+      "issue": 305,
+      "errorId": "settings-surface-target-state",
+      "ruleIds": [
+        "web.diagnostics-list.diagnostic-row",
+        "web.task-primitives.metadata",
+        "web.task-primitives.body",
+        "web.task-primitives.title",
+        "web.panel.panel-root",
+        "web.panel.expressive-panel-root",
+        "web.diagnostics-list.composition",
+        "web.settings-primitives.action"
+      ],
+      "semanticRoles": [
+        "data-region.diagnostic-row",
+        "task.typography-metadata",
+        "task.typography-body",
+        "task.typography-title",
+        "data-region.panel-root",
+        "expressive.opt-in-panel-root",
+        "data-region.diagnostic-list-composition",
+        "task.settings-action"
+      ]
+    },
+    {
+      "issue": 306,
+      "errorId": "metric-typography-motif-surface",
+      "ruleIds": [
+        "web.diagnostics-list.diagnostic-row",
+        "web.task-primitives.metadata",
+        "web.task-primitives.body",
+        "web.task-primitives.title",
+        "web.metric-primitives.label",
+        "web.metric-primitives.value",
+        "web.panel.panel-root",
+        "web.panel.expressive-panel-root",
+        "web.key-value-grid.label-motif",
+        "web.diagnostics-list.composition",
+        "web.metric-primitives.metric-row"
+      ],
+      "semanticRoles": [
+        "data-region.diagnostic-row",
+        "task.typography-metadata",
+        "task.typography-body",
+        "task.typography-title",
+        "data-region.metric-label",
+        "data-region.metric-value",
+        "data-region.panel-root",
+        "expressive.opt-in-panel-root",
+        "data-region.label-motif",
+        "data-region.diagnostic-list-composition",
+        "data-region.metric-row"
+      ]
+    },
+    {
+      "issue": 307,
+      "errorId": "reply-composer-disabled-opacity",
+      "ruleIds": [
+        "web.reply-composer-shell.interactive-root",
+        "web.reply-composer-shell.disabled-control"
+      ],
+      "semanticRoles": [
+        "task.reply-composer-interactive-root",
+        "task.reply-composer-disabled-control"
+      ]
+    },
+    {
+      "issue": 308,
+      "errorId": "legacy-transition-motion",
+      "ruleIds": [
+        "web.motion.control-transition",
+        "web.motion.control-enter-from",
+        "web.motion.list-enter-from"
+      ],
+      "semanticRoles": [
+        "interaction.control-transition",
+        "interaction.control-enter-from",
+        "interaction.list-enter-from"
+      ]
+    },
+    {
+      "issue": 309,
+      "errorId": "input-number-stepper-target",
+      "ruleIds": [
+        "web.input-number.action",
+        "web.input-number.interactive-root"
+      ],
+      "semanticRoles": [
+        "form-control.input-number-action",
+        "form-control.input-number-interactive-root"
+      ]
+    },
+    {
+      "issue": 310,
+      "errorId": "public-shell-reduced-motion-lifecycle",
+      "ruleIds": ["web.public-shell.disclosure-transition"],
+      "semanticRoles": ["interaction.public-shell-transition"]
+    }
+  ]
+}

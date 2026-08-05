@@ -1,0 +1,321 @@
+{
+  "schemaVersion": "fsusui.component-surface-semantic-rule-inventory.v1",
+  "expectedRuleCount": 45,
+  "rules": [
+    {
+      "id": "web.select.option-row",
+      "componentId": "web.select",
+      "partId": "option-row",
+      "surfaceRole": "overlay.option-row",
+      "issues": [293]
+    },
+    {
+      "id": "web.select.overlay-root",
+      "componentId": "web.select",
+      "partId": "overlay-root",
+      "surfaceRole": "overlay.panel-root",
+      "issues": [293]
+    },
+    {
+      "id": "web.tree.tree-row",
+      "componentId": "web.tree",
+      "partId": "tree-row",
+      "surfaceRole": "data-region.tree-node-row",
+      "issues": [296]
+    },
+    {
+      "id": "web.date-picker.data-region-root",
+      "componentId": "web.date-picker",
+      "partId": "data-region-root",
+      "surfaceRole": "data-region.picker-root",
+      "issues": [297]
+    },
+    {
+      "id": "web.date-picker.date-cell",
+      "componentId": "web.date-picker",
+      "partId": "date-cell",
+      "surfaceRole": "data-region.date-time-cell",
+      "issues": [297]
+    },
+    {
+      "id": "web.time-picker.time-row",
+      "componentId": "web.time-picker",
+      "partId": "time-row",
+      "surfaceRole": "overlay.time-option-row",
+      "issues": [297]
+    },
+    {
+      "id": "web.upload.file-row",
+      "componentId": "web.upload",
+      "partId": "file-row",
+      "surfaceRole": "data-region.file-row",
+      "issues": [300]
+    },
+    {
+      "id": "web.diagnostics-list.diagnostic-row",
+      "componentId": "web.diagnostics-list",
+      "partId": "diagnostic-row",
+      "surfaceRole": "data-region.diagnostic-row",
+      "issues": [305, 306]
+    },
+    {
+      "id": "web.tabs.tab-item",
+      "componentId": "web.tabs",
+      "partId": "tab-item",
+      "surfaceRole": "navigation.tab-item",
+      "issues": [295]
+    },
+    {
+      "id": "web.menu.vertical-item",
+      "componentId": "web.menu",
+      "partId": "vertical-item",
+      "surfaceRole": "navigation.vertical-menu-item",
+      "issues": [294]
+    },
+    {
+      "id": "web.menu.horizontal-item",
+      "componentId": "web.menu",
+      "partId": "horizontal-item",
+      "surfaceRole": "navigation.horizontal-menu-item",
+      "issues": [294]
+    },
+    {
+      "id": "web.radio-button.segmented-item",
+      "componentId": "web.radio-button",
+      "partId": "segmented-item",
+      "surfaceRole": "control-group.form-single-choice-option",
+      "issues": [301]
+    },
+    {
+      "id": "web.checkbox-button.segmented-item",
+      "componentId": "web.checkbox-button",
+      "partId": "segmented-item",
+      "surfaceRole": "control-group.form-multiple-choice-option",
+      "issues": [301]
+    },
+    {
+      "id": "web.theme-mode-toggle.segmented-item",
+      "componentId": "web.theme-mode-toggle",
+      "partId": "segmented-item",
+      "surfaceRole": "control-group.navigation-mode-toggle-option",
+      "issues": [301]
+    },
+    {
+      "id": "web.segmented-control.segmented-item",
+      "componentId": "web.segmented-control",
+      "partId": "segmented-item",
+      "surfaceRole": "control-group.navigation-view-toggle-option",
+      "issues": [301]
+    },
+    {
+      "id": "web.input-number.action",
+      "componentId": "web.input-number",
+      "partId": "action",
+      "surfaceRole": "form-control.input-number-action",
+      "issues": [309]
+    },
+    {
+      "id": "web.input-number.interactive-root",
+      "componentId": "web.input-number",
+      "partId": "interactive-root",
+      "surfaceRole": "form-control.input-number-interactive-root",
+      "issues": [309]
+    },
+    {
+      "id": "web.dialog.overlay-close",
+      "componentId": "web.dialog",
+      "partId": "overlay-close",
+      "surfaceRole": "overlay.close-action",
+      "issues": [299]
+    },
+    {
+      "id": "web.rate.filled-icon",
+      "componentId": "web.rate",
+      "partId": "filled-icon",
+      "surfaceRole": "form-control.rate-filled-icon",
+      "issues": [302]
+    },
+    {
+      "id": "web.reply-composer-shell.interactive-root",
+      "componentId": "web.reply-composer-shell",
+      "partId": "interactive-root",
+      "surfaceRole": "task.reply-composer-interactive-root",
+      "issues": [307]
+    },
+    {
+      "id": "web.reply-composer-shell.disabled-control",
+      "componentId": "web.reply-composer-shell",
+      "partId": "disabled-control",
+      "surfaceRole": "task.reply-composer-disabled-control",
+      "issues": [307]
+    },
+    {
+      "id": "web.task-primitives.metadata",
+      "componentId": "web.task-primitives",
+      "partId": "metadata",
+      "surfaceRole": "task.typography-metadata",
+      "issues": [305, 306]
+    },
+    {
+      "id": "web.task-primitives.body",
+      "componentId": "web.task-primitives",
+      "partId": "body",
+      "surfaceRole": "task.typography-body",
+      "issues": [305, 306]
+    },
+    {
+      "id": "web.task-primitives.title",
+      "componentId": "web.task-primitives",
+      "partId": "title",
+      "surfaceRole": "task.typography-title",
+      "issues": [305, 306]
+    },
+    {
+      "id": "web.loading.metadata",
+      "componentId": "web.loading",
+      "partId": "metadata",
+      "surfaceRole": "feedback.loading-metadata",
+      "issues": [303]
+    },
+    {
+      "id": "web.loading.text",
+      "componentId": "web.loading",
+      "partId": "text",
+      "surfaceRole": "feedback.loading-text",
+      "issues": [303]
+    },
+    {
+      "id": "web.metric-primitives.label",
+      "componentId": "web.metric-primitives",
+      "partId": "label",
+      "surfaceRole": "data-region.metric-label",
+      "issues": [306]
+    },
+    {
+      "id": "web.metric-primitives.value",
+      "componentId": "web.metric-primitives",
+      "partId": "value",
+      "surfaceRole": "data-region.metric-value",
+      "issues": [306]
+    },
+    {
+      "id": "web.table.header-cell",
+      "componentId": "web.table",
+      "partId": "header-cell",
+      "surfaceRole": "data-region.table-header-cell",
+      "issues": [304]
+    },
+    {
+      "id": "web.table.small-header-cell",
+      "componentId": "web.table",
+      "partId": "small-header-cell",
+      "surfaceRole": "data-region.table-small-header-cell",
+      "issues": [304]
+    },
+    {
+      "id": "web.motion.control-transition",
+      "componentId": "web.motion",
+      "partId": "control-transition",
+      "surfaceRole": "interaction.control-transition",
+      "issues": [308]
+    },
+    {
+      "id": "web.motion.control-enter-from",
+      "componentId": "web.motion",
+      "partId": "control-enter-from",
+      "surfaceRole": "interaction.control-enter-from",
+      "issues": [308]
+    },
+    {
+      "id": "web.motion.list-enter-from",
+      "componentId": "web.motion",
+      "partId": "list-enter-from",
+      "surfaceRole": "interaction.list-enter-from",
+      "issues": [300, 308]
+    },
+    {
+      "id": "web.public-shell.disclosure-transition",
+      "componentId": "web.public-shell",
+      "partId": "disclosure-transition",
+      "surfaceRole": "interaction.public-shell-transition",
+      "issues": [310]
+    },
+    {
+      "id": "web.dialog.overlay-root",
+      "componentId": "web.dialog",
+      "partId": "overlay-root",
+      "surfaceRole": "overlay.dialog-root",
+      "issues": [298]
+    },
+    {
+      "id": "web.drawer.overlay-root",
+      "componentId": "web.drawer",
+      "partId": "overlay-root",
+      "surfaceRole": "overlay.drawer-root",
+      "issues": [298]
+    },
+    {
+      "id": "web.notification.overlay-root",
+      "componentId": "web.notification",
+      "partId": "overlay-root",
+      "surfaceRole": "overlay.notification-root",
+      "issues": [298]
+    },
+    {
+      "id": "web.panel.panel-root",
+      "componentId": "web.panel",
+      "partId": "panel-root",
+      "surfaceRole": "data-region.panel-root",
+      "issues": [305, 306]
+    },
+    {
+      "id": "web.panel.expressive-panel-root",
+      "componentId": "web.panel",
+      "partId": "expressive-panel-root",
+      "surfaceRole": "expressive.opt-in-panel-root",
+      "issues": [305, 306]
+    },
+    {
+      "id": "web.key-value-grid.label-motif",
+      "componentId": "web.key-value-grid",
+      "partId": "label-motif",
+      "surfaceRole": "data-region.label-motif",
+      "issues": [306]
+    },
+    {
+      "id": "web.dialog.overlay-close-optical",
+      "componentId": "web.dialog",
+      "partId": "overlay-close-optical",
+      "surfaceRole": "overlay.close-optical-alignment",
+      "issues": [299]
+    },
+    {
+      "id": "web.diagnostics-list.composition",
+      "componentId": "web.diagnostics-list",
+      "partId": "list-composition",
+      "surfaceRole": "data-region.diagnostic-list-composition",
+      "issues": [305, 306]
+    },
+    {
+      "id": "web.settings-primitives.action",
+      "componentId": "web.settings-primitives",
+      "partId": "action",
+      "surfaceRole": "task.settings-action",
+      "issues": [305]
+    },
+    {
+      "id": "web.loading.indicator",
+      "componentId": "web.loading",
+      "partId": "indicator",
+      "surfaceRole": "feedback.loading-indicator",
+      "issues": [303]
+    },
+    {
+      "id": "web.metric-primitives.metric-row",
+      "componentId": "web.metric-primitives",
+      "partId": "metric-row",
+      "surfaceRole": "data-region.metric-row",
+      "issues": [306]
+    }
+  ]
+}
