@@ -1,13 +1,17 @@
 [
   {
     "name": "web-only targeted markdown",
-    "files": ["vue/packages/wasm/markdown-runtime.ts"],
+    "files": [
+      "vue/packages/wasm/markdown-runtime.ts"
+    ],
     "scope": "web-only",
     "webScenario": "markdown-"
   },
   {
     "name": "avalonia-only targeted virtualization",
-    "files": ["dotnet/FsusUI.Avalonia/Controls/FsusVirtualizationControls.cs"],
+    "files": [
+      "dotnet/FsusUI.Avalonia/Controls/FsusVirtualizationControls.cs"
+    ],
     "scope": "avalonia-only",
     "avaloniaScenario": "virtual-"
   },
@@ -21,12 +25,75 @@
   },
   {
     "name": "skip-safe documentation",
-    "files": ["docs/guide/getting-started.md"],
+    "files": [
+      "docs/guide/getting-started.md"
+    ],
     "scope": "skip"
   },
   {
     "name": "unknown becomes both",
-    "files": ["toolchain/new-global-runtime.config"],
+    "files": [
+      "toolchain/new-global-runtime.config"
+    ],
     "scope": "both"
+  },
+  {
+    "name": "playwright registry control plane skips real-render measurement",
+    "files": [
+      "package.json",
+      "scripts/playwright-suite-projects.mjs",
+      "scripts/playwright-suites-contract.mjs",
+      "scripts/playwright-suites.mjs",
+      "scripts/test-playwright-suites.mjs",
+      "spec/ci/playwright-suites.json",
+      "spec/ci/playwright-suites.schema.json",
+      "tests/fixtures/playwright-registry/invalid-cases.json",
+      "vue/playwright.boundary-audit.config.ts",
+      "vue/playwright.dom-layout.config.ts",
+      "vue/playwright.geometry.config.ts",
+      "vue/playwright.markdown-editor.config.ts",
+      "vue/playwright.motion-ssr.config.ts",
+      "vue/playwright.reuse.config.ts",
+      "vue/playwright.view-transitions.config.ts",
+      "scripts/render-performance-impact-plan.mjs",
+      "scripts/render-performance-impact.mjs",
+      "scripts/test-render-performance-impact-plan.mjs",
+      "spec/ci/pr-render-performance-ownership.json",
+      "tests/fixtures/render-performance-impact-plan/cases.json",
+      "scripts/run-capacity-suite.mjs",
+      "scripts/check-viewport-safe-area-contract.mjs"
+    ],
+    "scope": "skip",
+    "packageRegistryOnly": true
+  },
+  {
+    "name": "playwright registry plus demo typography fix runs web only",
+    "files": [
+      "package.json",
+      "scripts/playwright-suite-projects.mjs",
+      "scripts/playwright-suites-contract.mjs",
+      "scripts/playwright-suites.mjs",
+      "scripts/test-playwright-suites.mjs",
+      "spec/ci/playwright-suites.json",
+      "spec/ci/playwright-suites.schema.json",
+      "tests/fixtures/playwright-registry/invalid-cases.json",
+      "vue/playwright.boundary-audit.config.ts",
+      "vue/playwright.dom-layout.config.ts",
+      "vue/playwright.geometry.config.ts",
+      "vue/playwright.markdown-editor.config.ts",
+      "vue/playwright.motion-ssr.config.ts",
+      "vue/playwright.reuse.config.ts",
+      "vue/playwright.view-transitions.config.ts",
+      "scripts/render-performance-impact-plan.mjs",
+      "scripts/render-performance-impact.mjs",
+      "scripts/test-render-performance-impact-plan.mjs",
+      "spec/ci/pr-render-performance-ownership.json",
+      "tests/fixtures/render-performance-impact-plan/cases.json",
+      "scripts/run-capacity-suite.mjs",
+      "scripts/check-viewport-safe-area-contract.mjs",
+      "vue/packages/demo-app/src/style.css"
+    ],
+    "scope": "web-only",
+    "packageRegistryOnly": true
   }
 ]
