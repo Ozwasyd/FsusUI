@@ -1,0 +1,496 @@
+{
+  "schemaVersion": "fsusui.component-surface-semantic-ownership-contract.v1",
+  "expectedRuleCount": 45,
+  "authoritySources": {
+    "design": "docs/design.md",
+    "tokens": "spec/tokens/tokens.json",
+    "components": "spec/components/contracts/v1/vue-public-contracts.json",
+    "motion": "docs/components/motion.md",
+    "publicShell": "docs/components/public-shell.md"
+  },
+  "constraintProfiles": {
+    "selectOption": {
+      "geometry": ["tokens:/tokens/density.select.option.y"]
+    },
+    "selectOverlay": {
+      "geometry": ["tokens:/tokens/radius.surface.md"],
+      "surfaceCardMotif": ["design:#dropdown-select-popover"]
+    },
+    "treeRow": {
+      "geometry": ["tokens:/tokens/density.control.default.y"],
+      "surfaceCardMotif": ["design:#surface-taxonomy"]
+    },
+    "pickerRoot": {
+      "geometry": ["tokens:/tokens/radius.surface.md"],
+      "surfaceCardMotif": ["design:#surface-taxonomy"]
+    },
+    "dateCell": {
+      "geometry": ["tokens:/tokens/density.control.default.y"],
+      "surfaceCardMotif": ["design:#surface-taxonomy"]
+    },
+    "timeRow": {
+      "geometry": ["tokens:/tokens/density.select.option.y"]
+    },
+    "uploadRow": {
+      "geometry": ["tokens:/tokens/density.control.default.y"],
+      "motion": ["tokens:/tokens/motion.duration.panel"]
+    },
+    "diagnosticRow": {
+      "typography": ["tokens:/tokens/typography.caption.md.size"]
+    },
+    "tabItem": {
+      "geometry": ["tokens:/tokens/density.control.compact.y"],
+      "surfaceCardMotif": ["design:#tabs-and-navigation"]
+    },
+    "verticalMenu": {
+      "geometry": ["tokens:/tokens/density.menu.item.y"]
+    },
+    "horizontalMenu": {
+      "geometry": ["tokens:/tokens/density.menu.horizontal.y"]
+    },
+    "segmentedForm": {
+      "geometry": [
+        "tokens:/tokens/density.control.action.y",
+        "tokens:/tokens/density.control.compact.y"
+      ],
+      "stateColor": [
+        "tokens:/tokens/component-state.surface.selected.background"
+      ]
+    },
+    "segmentedNavigation": {
+      "geometry": [
+        "tokens:/tokens/density.control.action.y",
+        "tokens:/tokens/density.control.compact.y"
+      ],
+      "stateColor": [
+        "tokens:/tokens/component-state.surface.selected.background",
+        "tokens:/tokens/component-state.surface.focus.border"
+      ]
+    },
+    "inputNumberAction": {
+      "geometry": ["tokens:/tokens/density.icon.target"]
+    },
+    "inputNumberRoot": {
+      "geometry": ["tokens:/tokens/density.control.default.y"]
+    },
+    "overlayClose": {
+      "geometry": ["design:#dialog-and-drawer"]
+    },
+    "rateWarning": {
+      "stateColor": ["design:#accent-rules"]
+    },
+    "replyComposerRoot": {
+      "geometry": ["tokens:/tokens/density.control.default.y"]
+    },
+    "disabledControl": {
+      "disabled": ["design:#form-controls"]
+    },
+    "taskMetadata": {
+      "typography": ["tokens:/tokens/typography.caption.sm.size"]
+    },
+    "taskBody": {
+      "typography": ["tokens:/tokens/typography.body.md.size"]
+    },
+    "taskTitle": {
+      "typography": ["tokens:/tokens/typography.heading.sm.size"]
+    },
+    "loadingMetadata": {
+      "typography": ["tokens:/tokens/typography.caption.md.size"]
+    },
+    "loadingText": {
+      "typography": ["tokens:/tokens/typography.body.md.size"]
+    },
+    "loadingIndicator": {
+      "motion": ["tokens:/tokens/motion.duration.control"]
+    },
+    "metricLabel": {
+      "typography": ["tokens:/tokens/typography.caption.md.size"]
+    },
+    "metricValue": {
+      "typography": ["tokens:/tokens/typography.heading.md.size"]
+    },
+    "metricRow": {
+      "geometry": ["tokens:/tokens/density.control.spacious.y"]
+    },
+    "tableHeader": {
+      "typography": [
+        "tokens:/tokens/typography.body.md.size",
+        "tokens:/tokens/typography.weight.medium"
+      ]
+    },
+    "tableSmallHeader": {
+      "typography": ["tokens:/tokens/typography.caption.sm.size"]
+    },
+    "controlTransition": {
+      "motion": ["tokens:/tokens/motion.duration.control"]
+    },
+    "controlEnter": {
+      "motion": [
+        "tokens:/tokens/motion.duration.control.fast",
+        "tokens:/tokens/motion.distance.small"
+      ]
+    },
+    "listEnter": {
+      "motion": [
+        "tokens:/tokens/motion.duration.panel",
+        "tokens:/tokens/motion.distance.small"
+      ]
+    },
+    "publicShellMotion": {
+      "motion": ["publicShell:#verification-contract"]
+    },
+    "dialogRoot": {
+      "geometry": ["tokens:/tokens/component.dialog.padding"],
+      "surfaceCardMotif": ["design:#dialog-and-drawer"]
+    },
+    "drawerRoot": {
+      "geometry": ["tokens:/tokens/radius.surface.lg"],
+      "surfaceCardMotif": ["design:#dialog-and-drawer"]
+    },
+    "notificationRoot": {
+      "geometry": ["tokens:/tokens/radius.surface.md"],
+      "surfaceCardMotif": ["design:#overlay-material"]
+    },
+    "panelRoot": {
+      "geometry": ["tokens:/tokens/radius.surface.md"],
+      "surfaceCardMotif": ["design:#surface-taxonomy"]
+    },
+    "expressivePanel": {
+      "geometry": ["tokens:/tokens/radius.surface.lg"],
+      "surfaceCardMotif": ["design:#surface-taxonomy"]
+    },
+    "labelMotif": {
+      "typography": ["tokens:/tokens/typography.caption.sm.size"],
+      "surfaceCardMotif": ["design:#2-brand-motif-punctuation"]
+    },
+    "closeOptical": {
+      "geometry": [
+        "tokens:/tokens/density.icon.target",
+        "tokens:/tokens/thickness.focus.md"
+      ]
+    },
+    "diagnosticComposition": {
+      "surfaceCardMotif": ["design:#surface-taxonomy"]
+    },
+    "settingsAction": {
+      "geometry": ["tokens:/tokens/density.control.action.y"]
+    }
+  },
+  "rules": [
+    [
+      "web.select.option-row",
+      "component.el-select",
+      "vue/packages/theme-chalk/src/select-dropdown.scss",
+      ".el-select-dropdown__item",
+      "selectOption"
+    ],
+    [
+      "web.select.overlay-root",
+      "component.el-select",
+      "vue/packages/theme-chalk/src/select-dropdown.scss",
+      ".el-select-dropdown",
+      "selectOverlay"
+    ],
+    [
+      "web.tree.tree-row",
+      "component.el-tree",
+      "vue/packages/theme-chalk/src/tree.scss",
+      ".el-tree-node__content",
+      "treeRow"
+    ],
+    [
+      "web.date-picker.data-region-root",
+      "component.el-date-picker",
+      "vue/packages/theme-chalk/src/date-picker/picker-panel.scss",
+      ".el-picker-panel",
+      "pickerRoot"
+    ],
+    [
+      "web.date-picker.date-cell",
+      "component.el-date-picker",
+      "vue/packages/theme-chalk/src/date-picker/date-table.scss",
+      ".el-date-table-cell__text",
+      "dateCell"
+    ],
+    [
+      "web.time-picker.time-row",
+      "component.el-time-picker",
+      "vue/packages/theme-chalk/src/date-picker/time-spinner.scss",
+      ".el-time-spinner__item",
+      "timeRow"
+    ],
+    [
+      "web.upload.file-row",
+      "component.el-upload",
+      "vue/packages/theme-chalk/src/upload.scss",
+      ".el-upload-list__item",
+      "uploadRow"
+    ],
+    [
+      "web.diagnostics-list.diagnostic-row",
+      "component.el-diagnostics-list",
+      "vue/packages/theme-chalk/src/metric-primitives.scss",
+      ".el-diagnostics-item",
+      "diagnosticRow"
+    ],
+    [
+      "web.tabs.tab-item",
+      "component.el-tabs",
+      "vue/packages/theme-chalk/src/tabs.scss",
+      ".el-tabs__item",
+      "tabItem"
+    ],
+    [
+      "web.menu.vertical-item",
+      "component.el-menu",
+      "vue/packages/theme-chalk/src/menu.scss",
+      ".el-menu--vertical",
+      "verticalMenu"
+    ],
+    [
+      "web.menu.horizontal-item",
+      "component.el-menu",
+      "vue/packages/theme-chalk/src/menu.scss",
+      ".el-menu--horizontal",
+      "horizontalMenu"
+    ],
+    [
+      "web.radio-button.segmented-item",
+      "component.el-radio-button",
+      "vue/packages/theme-chalk/src/radio-button.scss",
+      ".el-radio-button__inner",
+      "segmentedForm"
+    ],
+    [
+      "web.checkbox-button.segmented-item",
+      "component.el-checkbox-button",
+      "vue/packages/theme-chalk/src/checkbox-button.scss",
+      ".el-checkbox-button__inner",
+      "segmentedForm"
+    ],
+    [
+      "web.theme-mode-toggle.segmented-item",
+      "component.el-theme-mode-toggle",
+      "vue/packages/theme-chalk/src/fsus-theme.scss",
+      ".el-theme-mode-toggle",
+      "segmentedNavigation"
+    ],
+    [
+      "web.segmented-control.segmented-item",
+      "component.el-segmented-control",
+      "vue/packages/theme-chalk/src/collection-primitives.scss",
+      ".el-segmented-control__item",
+      "segmentedNavigation"
+    ],
+    [
+      "web.input-number.action",
+      "component.el-input-number",
+      "vue/packages/theme-chalk/src/input-number.scss",
+      ".el-input-number__increase",
+      "inputNumberAction"
+    ],
+    [
+      "web.input-number.interactive-root",
+      "component.el-input-number",
+      "vue/packages/theme-chalk/src/input-number.scss",
+      ".el-input-number",
+      "inputNumberRoot"
+    ],
+    [
+      "web.dialog.overlay-close",
+      "component.el-dialog",
+      "vue/packages/theme-chalk/src/dialog.scss",
+      ".el-dialog__headerbtn",
+      "overlayClose"
+    ],
+    [
+      "web.rate.filled-icon",
+      "component.el-rate",
+      "vue/packages/theme-chalk/src/fsus-theme.scss",
+      ".el-rate__icon",
+      "rateWarning"
+    ],
+    [
+      "web.reply-composer-shell.interactive-root",
+      "component.el-reply-composer-shell",
+      "vue/packages/theme-chalk/src/inbox-primitives.scss",
+      ".el-reply-composer-shell",
+      "replyComposerRoot"
+    ],
+    [
+      "web.reply-composer-shell.disabled-control",
+      "component.el-reply-composer-shell",
+      "vue/packages/theme-chalk/src/inbox-primitives.scss",
+      ".el-reply-composer-shell",
+      "disabledControl"
+    ],
+    [
+      "web.task-primitives.metadata",
+      "component.el-settings-section",
+      "vue/packages/theme-chalk/src/settings-primitives.scss",
+      ".el-metadata-item__label",
+      "taskMetadata"
+    ],
+    [
+      "web.task-primitives.body",
+      "component.el-settings-section",
+      "vue/packages/theme-chalk/src/settings-primitives.scss",
+      ".el-settings-section__body",
+      "taskBody"
+    ],
+    [
+      "web.task-primitives.title",
+      "component.el-settings-section",
+      "vue/packages/theme-chalk/src/settings-primitives.scss",
+      ".el-settings-section__title",
+      "taskTitle"
+    ],
+    [
+      "web.loading.metadata",
+      "component.el-loading",
+      "vue/packages/theme-chalk/src/loading.scss",
+      ".el-loading-text",
+      "loadingMetadata"
+    ],
+    [
+      "web.loading.text",
+      "component.el-loading",
+      "vue/packages/theme-chalk/src/loading.scss",
+      ".el-loading-text",
+      "loadingText"
+    ],
+    [
+      "web.metric-primitives.label",
+      "component.el-metric-item",
+      "vue/packages/theme-chalk/src/metric-primitives.scss",
+      ".el-metric-item__label",
+      "metricLabel"
+    ],
+    [
+      "web.metric-primitives.value",
+      "component.el-metric-item",
+      "vue/packages/theme-chalk/src/metric-primitives.scss",
+      ".el-metric-item__primary",
+      "metricValue"
+    ],
+    [
+      "web.table.header-cell",
+      "component.el-table",
+      "vue/packages/theme-chalk/src/table.scss",
+      ".el-table__header",
+      "tableHeader"
+    ],
+    [
+      "web.table.small-header-cell",
+      "component.el-table",
+      "vue/packages/theme-chalk/src/table.scss",
+      ".el-table--small .el-table__header",
+      "tableSmallHeader"
+    ],
+    [
+      "web.motion.control-transition",
+      "component.el-tabs",
+      "vue/packages/theme-chalk/src/common/transition.scss",
+      ".el-fade-in-enter-active",
+      "controlTransition"
+    ],
+    [
+      "web.motion.control-enter-from",
+      "component.el-tabs",
+      "vue/packages/theme-chalk/src/common/transition.scss",
+      ".el-fade-in-enter-from",
+      "controlEnter"
+    ],
+    [
+      "web.motion.list-enter-from",
+      "component.el-upload",
+      "vue/packages/theme-chalk/src/common/transition.scss",
+      ".el-list-enter-from",
+      "listEnter"
+    ],
+    [
+      "web.public-shell.disclosure-transition",
+      "component.el-public-shell",
+      "vue/packages/theme-chalk/src/public-shell.scss",
+      ".el-public-shell__mobile-nav-menu-panel",
+      "publicShellMotion"
+    ],
+    [
+      "web.dialog.overlay-root",
+      "component.el-dialog",
+      "vue/packages/theme-chalk/src/dialog.scss",
+      ".el-dialog",
+      "dialogRoot"
+    ],
+    [
+      "web.drawer.overlay-root",
+      "component.el-drawer",
+      "vue/packages/theme-chalk/src/drawer.scss",
+      ".el-drawer",
+      "drawerRoot"
+    ],
+    [
+      "web.notification.overlay-root",
+      "component.el-notification",
+      "vue/packages/theme-chalk/src/notification.scss",
+      ".el-notification",
+      "notificationRoot"
+    ],
+    [
+      "web.panel.panel-root",
+      "component.el-settings-section",
+      "vue/packages/theme-chalk/src/settings-primitives.scss",
+      ".el-settings-section",
+      "panelRoot"
+    ],
+    [
+      "web.panel.expressive-panel-root",
+      "component.el-thread-panel",
+      "vue/packages/theme-chalk/src/inbox-primitives.scss",
+      ".el-thread-panel",
+      "expressivePanel"
+    ],
+    [
+      "web.key-value-grid.label-motif",
+      "component.el-key-value-grid",
+      "vue/packages/theme-chalk/src/metric-primitives.scss",
+      ".el-key-value-item__label",
+      "labelMotif"
+    ],
+    [
+      "web.dialog.overlay-close-optical",
+      "component.el-dialog",
+      "vue/packages/theme-chalk/src/dialog.scss",
+      ".el-dialog__headerbtn",
+      "closeOptical"
+    ],
+    [
+      "web.diagnostics-list.composition",
+      "component.el-diagnostics-list",
+      "vue/packages/theme-chalk/src/metric-primitives.scss",
+      ".el-diagnostics-list",
+      "diagnosticComposition"
+    ],
+    [
+      "web.settings-primitives.action",
+      "component.el-settings-section",
+      "vue/packages/theme-chalk/src/settings-primitives.scss",
+      ".el-settings-section__actions",
+      "settingsAction"
+    ],
+    [
+      "web.loading.indicator",
+      "component.el-loading",
+      "vue/packages/theme-chalk/src/loading.scss",
+      ".el-loading-spinner",
+      "loadingIndicator"
+    ],
+    [
+      "web.metric-primitives.metric-row",
+      "component.el-metric-list",
+      "vue/packages/theme-chalk/src/metric-primitives.scss",
+      ".el-metric-item",
+      "metricRow"
+    ]
+  ]
+}

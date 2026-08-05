@@ -1,0 +1,96 @@
+{
+  "issue": 400,
+  "schemaVersion": "fsusui.component-surface-semantic-registry.v1",
+  "expectedRuleCount": 45,
+  "productionTargets": [
+    "spec/components/component-surface-semantic-registry.json",
+    "spec/components/component-surface-semantic-registry.schema.json",
+    "scripts/check-component-surface-semantic-registry.mjs"
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "T400-01",
+      "requirement": "Option, tree, and date rows are distinct from panel roots by stable component, part, and surface role."
+    },
+    {
+      "id": "T400-02",
+      "requirement": "Every rule traces geometry, typography, state color, disabled, motion, and surface/card/motif constraints to canonical authority sources without literal truth; implementation ownership is digest-only."
+    },
+    {
+      "id": "T400-03",
+      "requirement": "Canonical source changes produce an explicit source-digest drift failure."
+    },
+    {
+      "id": "T400-04",
+      "requirement": "Missing owner, source, role, or verification policy fails closed."
+    },
+    {
+      "id": "T400-05",
+      "requirement": "Mutation controls kill duplicate numeric truth, broad roles, and unowned exceptions."
+    },
+    {
+      "id": "T400-06",
+      "requirement": "Variants and exceptions have exact theme, density, and device scope; wildcard allowlists are rejected."
+    },
+    {
+      "id": "T400-07",
+      "requirement": "The complete 45-rule production inventory maps each confirmed issue from #293 through #310 to semantic roles, not filenames."
+    },
+    {
+      "id": "T400-08",
+      "requirement": "Validation is data-only and does not parse Sass/CSS, run visual tests, bind CI, or modify CSS."
+    },
+    {
+      "id": "T400-09",
+      "requirement": "The JSON Schema closes and types every root, ownership, reference, constraint, scope, variant, exception, verification, visual evidence, and issue mapping structure."
+    },
+    {
+      "id": "T400-10",
+      "requirement": "The validator executes the supplied JSON Schema and meta-validates owner/rule closure, required identities, typed canonical arrays, issue bounds, and required visual evidence against weak-schema substitution."
+    },
+    {
+      "id": "T400-11",
+      "requirement": "Malformed review policy or generated provenance fails; v1 issue mappings contain exactly one entry for every issue #293-#310 even when a schema-valid unique 46th rule is added, rejecting missing #310, duplicate #293, out-of-range, and mismatched mappings."
+    },
+    {
+      "id": "T400-12",
+      "requirement": "Missing component authority, every production direct authority replaced by component.el-button, same-module menu/metric sibling substitution, unrelated transition fallback, fake ownership, and selectors absent from their implementation file fail closed."
+    },
+    {
+      "id": "T400-13",
+      "requirement": "Dotted broad roles, literal or fake-source owned exceptions, and unresolved visual evidence fail closed."
+    },
+    {
+      "id": "T400-14",
+      "requirement": "A tests-only semantic ownership contract covers all 45 identities with real component authorities, part selectors, and role-specific canonical constraint references."
+    },
+    {
+      "id": "T400-15",
+      "requirement": "Production rules match the 45-rule semantic ownership contract, exact #293-#310 rule and role mappings, and a non-cloned constraint profile set."
+    }
+  ],
+  "issueCoverage": [
+    { "issue": 293, "errorId": "option-row-cardification" },
+    { "issue": 294, "errorId": "menu-navigation-density-state" },
+    { "issue": 295, "errorId": "tabs-button-cardification" },
+    { "issue": 296, "errorId": "tree-node-cardification" },
+    { "issue": 297, "errorId": "date-time-cell-cardification" },
+    { "issue": 298, "errorId": "overlay-depth-inversion" },
+    { "issue": 299, "errorId": "overlay-close-target" },
+    { "issue": 300, "errorId": "upload-file-row-legacy-surface" },
+    { "issue": 301, "errorId": "segmented-role-conflation" },
+    { "issue": 302, "errorId": "rate-primary-color-role" },
+    { "issue": 303, "errorId": "loading-indicator-semantic-loss" },
+    { "issue": 304, "errorId": "table-header-typography" },
+    { "issue": 305, "errorId": "settings-surface-target-state" },
+    { "issue": 306, "errorId": "metric-typography-motif-surface" },
+    { "issue": 307, "errorId": "reply-composer-disabled-opacity" },
+    { "issue": 308, "errorId": "legacy-transition-motion" },
+    { "issue": 309, "errorId": "input-number-stepper-target" },
+    { "issue": 310, "errorId": "public-shell-reduced-motion-lifecycle" }
+  ],
+  "outOfScope": {
+    "pathGlobs": ["**/*.css", "**/*.scss", ".github/**"],
+    "commands": ["pnpm run verify:visual:affected", "pnpm run test:visual"]
+  }
+}
