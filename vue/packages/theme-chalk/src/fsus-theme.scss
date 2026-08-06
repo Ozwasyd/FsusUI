@@ -2517,16 +2517,23 @@ button.#{$namespace}-card:active {
   display: none;
 }
 
+// Table/TableV2 headers serve scan density, not dashboard label chrome.
+// Default: 14px / 500 / no tracking / no forced uppercase (docs/design.md Table).
+// Small density: 12px only — never collapse to 11px on narrow viewports.
 .#{$namespace}-table th.#{$namespace}-table__cell,
 .#{$namespace}-table-v2__header-cell {
   background: var(--el-fill-color-light);
   color: var(--el-text-color-regular);
   border-bottom-color: var(--el-border-color);
   border-right: none !important; // Minimalist: no vertical borders
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.#{$namespace}-table--small th.#{$namespace}-table__cell {
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .#{$namespace}-table td.#{$namespace}-table__cell,
@@ -2869,12 +2876,6 @@ button.#{$namespace}-card:active {
 
   .#{$namespace}-dialog__footer .dialog-footer {
     flex-wrap: nowrap;
-  }
-
-  .#{$namespace}-table th.#{$namespace}-table__cell,
-  .#{$namespace}-table-v2__header-cell {
-    font-size: 11px;
-    letter-spacing: 0.06em;
   }
 
   .#{$namespace}-tree {

@@ -3209,6 +3209,69 @@ describe('Fsus theme visual baseline', () => {
       ])
     }
   })
+
+  test('converges Table/TableV2 header typography without dashboard uppercase (#304)', () => {
+    // Real consumer path: fsus.scss pulls table.scss / table-v2 then fsus-theme.
+    // fsus-theme historically forced 12px/700/uppercase/.08em (and 11px on mobile).
+    const themeCss = compileThemeFile('fsus-theme.scss')
+    const tableCss = compileThemeFile('table.scss')
+    const tableV2Css = compileThemeFile('table-v2.scss')
+    const shippedCss = compileThemeFile('fsus.scss')
+
+    for (const css of [themeCss, shippedCss]) {
+      expectCssRule(css, '.el-table th.el-table__cell', [
+        'font-size: 14px;',
+        'font-weight: 500;',
+        'letter-spacing: 0;',
+        'text-transform: none;',
+      ])
+      expectCssRule(css, '.el-table-v2__header-cell', [
+        'font-size: 14px;',
+        'font-weight: 500;',
+        'letter-spacing: 0;',
+        'text-transform: none;',
+      ])
+      expectCssRule(css, '.el-table--small th.el-table__cell', [
+        'font-size: 12px;',
+      ])
+    }
+
+    expectCssRule(tableCss, '.el-table thead th', [
+      'font-weight: 500;',
+      'letter-spacing: 0;',
+      'text-transform: none;',
+    ])
+    expectCssRule(tableV2Css, '.el-table-v2__header-cell', [
+      'font-weight: 500;',
+      'letter-spacing: 0;',
+      'text-transform: none;',
+    ])
+
+    // Mutation kill: uppercase / tracking / 11px / broad 700 must not return.
+    const headerRules = [
+      ...cssRules(themeCss, '.el-table th.el-table__cell'),
+      ...cssRules(themeCss, '.el-table-v2__header-cell'),
+      ...cssRules(shippedCss, '.el-table th.el-table__cell'),
+      ...cssRules(shippedCss, '.el-table-v2__header-cell'),
+    ]
+    expect(headerRules.length).toBeGreaterThan(0)
+    for (const rule of headerRules) {
+      expect(rule).not.toMatch(/font-size:\s*11px/)
+      expect(rule).not.toMatch(/letter-spacing:\s*0\.08em/)
+      expect(rule).not.toMatch(/letter-spacing:\s*0\.06em/)
+      expect(rule).not.toMatch(/text-transform:\s*uppercase/)
+    }
+    expect(themeCss).not.toMatch(
+      /@media\s*\(\s*max-width:\s*760px\s*\)[\s\S]{0,800}?\.el-table th\.el-table__cell[\s\S]{0,120}?font-size:\s*11px/,
+    )
+    expect(themeCss).not.toMatch(
+      /\.el-table th\.el-table__cell[^{]*\{[^}]*font-weight:\s*700/,
+    )
+    expect(themeCss).not.toMatch(
+      /\.el-table-v2__header-cell[^{]*\{[^}]*font-weight:\s*700/,
+    )
+  })
+
   test('prevents table interaction motion from overlapping fixed columns', () => {
     const themeCss = compileThemeFile('fsus-theme.scss')
     const tableCss = compileThemeFile('table.scss')
