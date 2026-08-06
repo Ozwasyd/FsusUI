@@ -2671,7 +2671,15 @@ describe('Fsus theme visual baseline', () => {
       expectCssRule(
         css,
         '.el-public-shell-mobile-search-enter-active, .el-public-shell-mobile-search-leave-active',
-        ['transition: none;'],
+        [
+          'transition-duration: 1ms !important;',
+          'transition-delay: 0ms !important;',
+        ],
+      )
+      expectCssRule(
+        css,
+        '.el-public-shell-mobile-search-enter-from, .el-public-shell-mobile-search-leave-to',
+        ['transform: none;'],
       )
     }
   })
@@ -2730,7 +2738,15 @@ describe('Fsus theme visual baseline', () => {
       expectCssRule(
         css,
         '.el-public-shell-desktop-search-enter-active, .el-public-shell-desktop-search-leave-active',
-        ['transition: none;'],
+        [
+          'transition-duration: 1ms !important;',
+          'transition-delay: 0ms !important;',
+        ],
+      )
+      expectCssRule(
+        css,
+        '.el-public-shell-desktop-search-enter-from, .el-public-shell-desktop-search-leave-to',
+        ['transform: none;'],
       )
     }
   })
@@ -2761,12 +2777,88 @@ describe('Fsus theme visual baseline', () => {
       expectCssRule(
         css,
         '.el-public-shell-mobile-nav-menu-enter-active, .el-public-shell-mobile-nav-menu-leave-active',
-        ['transition: none;'],
+        [
+          'transition-duration: 1ms !important;',
+          'transition-delay: 0ms !important;',
+        ],
       )
       expectCssRule(
         css,
         '.el-public-shell-mobile-nav-menu-enter-from, .el-public-shell-mobile-nav-menu-leave-to',
         ['transform: none;'],
+      )
+    }
+  })
+
+  test('keeps public-shell Vue disclosure state machines at 1ms under reduced motion', () => {
+    const publicShellCss = compileThemeFile('public-shell.scss')
+    const criticalCss = compileThemeFile('public-shell-critical.scss')
+    const reducedMotionActiveSelectors = [
+      '.el-public-shell-mobile-nav-menu-enter-active',
+      '.el-public-shell-mobile-nav-menu-leave-active',
+      '.el-public-shell-mobile-search-enter-active',
+      '.el-public-shell-mobile-search-leave-active',
+      '.el-public-shell-desktop-search-enter-active',
+      '.el-public-shell-desktop-search-leave-active',
+    ] as const
+    const reducedMotionFromToSelectors = [
+      '.el-public-shell-mobile-nav-menu-enter-from',
+      '.el-public-shell-mobile-nav-menu-leave-to',
+      '.el-public-shell-mobile-search-enter-from',
+      '.el-public-shell-mobile-search-leave-to',
+      '.el-public-shell-desktop-search-enter-from',
+      '.el-public-shell-desktop-search-leave-to',
+    ] as const
+
+    const extractReducedMotionBlocks = (css: string) => {
+      const blocks: string[] = []
+      const pattern =
+        /@media\s*\(\s*prefers-reduced-motion:\s*reduce\s*\)\s*\{/g
+      for (const hit of css.matchAll(pattern)) {
+        const start = hit.index! + hit[0].length
+        let depth = 1
+        let i = start
+        while (i < css.length && depth > 0) {
+          if (css[i] === '{') depth += 1
+          else if (css[i] === '}') depth -= 1
+          i += 1
+        }
+        blocks.push(css.slice(start, i - 1))
+      }
+      return blocks.join('\n')
+    }
+
+    for (const css of [publicShellCss, criticalCss]) {
+      const reduced = extractReducedMotionBlocks(css)
+      expect(reduced.length).toBeGreaterThan(0)
+
+      for (const selector of reducedMotionActiveSelectors) {
+        expectCssRule(reduced, selector, [
+          'transition-duration: 1ms !important;',
+          'transition-delay: 0ms !important;',
+        ])
+        const rules = cssRules(reduced, selector)
+        expect(rules.length).toBeGreaterThan(0)
+        for (const rule of rules) {
+          expect(rule).not.toMatch(/transition\s*:\s*none/i)
+          expect(rule).not.toMatch(/transition-duration\s*:\s*0(?:\.0+)?ms/i)
+          expect(rule).not.toMatch(/transition-duration\s*:\s*0\.01ms/i)
+          expect(rule).toMatch(/transition-duration\s*:\s*1ms\s*!important/i)
+          expect(rule).toMatch(/transition-delay\s*:\s*0ms\s*!important/i)
+        }
+      }
+
+      for (const selector of reducedMotionFromToSelectors) {
+        expectCssRule(reduced, selector, ['transform: none;'])
+      }
+
+      expectCssRule(
+        reduced,
+        '.el-public-shell-mobile-nav-menu-enter-active, .el-public-shell-mobile-nav-menu-leave-active, .el-public-shell-mobile-search-enter-active, .el-public-shell-mobile-search-leave-active, .el-public-shell-desktop-search-enter-active, .el-public-shell-desktop-search-leave-active',
+        [
+          'transition-duration: 1ms !important;',
+          'transition-delay: 0ms !important;',
+        ],
       )
     }
   })
