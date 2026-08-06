@@ -2121,56 +2121,103 @@ button.#{$namespace}-card:active {
   font-weight: 700;
 }
 
+// Menu navigation density + state contract (issue #294 / docs/design.md):
+// - vertical item / SubMenu title: 56px via --fsus-menu-item-height
+// - horizontal top-level item / SubMenu title: 60px via --fsus-menu-horizontal-height
+// - active = Ink text + Scholarly Blue functional marker (side rail or bottom mark)
+// - not gray fill + font-weight 700 alone; hover/expanded/active/focus stay distinct
 .#{$namespace}-menu {
   border-color: var(--el-border-color);
 }
 
 .#{$namespace}-menu.#{$namespace}-menu--horizontal {
-  align-items: center;
-  gap: 8px;
-  padding: 5px 6px;
+  align-items: stretch;
+  gap: 0;
+  // No vertical padding: padding would shrink the 60px track.
+  padding: 0;
+  height: var(--el-menu-horizontal-height, var(--fsus-menu-horizontal-height));
+  min-height: var(
+    --el-menu-horizontal-height,
+    var(--fsus-menu-horizontal-height)
+  );
 }
 
 .#{$namespace}-menu.#{$namespace}-menu--horizontal > .#{$namespace}-menu-item,
 .#{$namespace}-menu.#{$namespace}-menu--horizontal
   > .#{$namespace}-sub-menu
   > .#{$namespace}-sub-menu__title {
-  height: 48px;
-  min-height: 48px;
+  height: var(--el-menu-horizontal-height, var(--fsus-menu-horizontal-height));
+  min-height: var(
+    --el-menu-horizontal-height,
+    var(--fsus-menu-horizontal-height)
+  );
   margin: 0;
-  border: 0 !important;
-  border-radius: var(--el-border-radius-base);
+  // Preserve transparent bottom border so active can paint Scholarly Blue mark.
+  border-radius: 0;
   background-clip: padding-box;
-  line-height: 48px;
+  line-height: var(
+    --el-menu-horizontal-height,
+    var(--fsus-menu-horizontal-height)
+  );
 }
 
 .#{$namespace}-menu-item,
-.#{$namespace}-sub-menu__title,
-.#{$namespace}-menu-item-group__title {
-  min-height: 44px;
+.#{$namespace}-sub-menu__title {
+  height: var(--el-menu-item-height, var(--fsus-menu-item-height));
+  min-height: var(--el-menu-item-height, var(--fsus-menu-item-height));
+  line-height: var(--el-menu-item-height, var(--fsus-menu-item-height));
   color: var(--el-text-color-regular);
 }
 
+.#{$namespace}-menu-item-group__title {
+  color: var(--el-text-color-secondary);
+}
+
+// Hover: weak fill / ink text only — no translate, scale, or shadow.
 .#{$namespace}-menu-item:hover,
 .#{$namespace}-sub-menu__title:hover,
 .#{$namespace}-menu--horizontal > .#{$namespace}-menu-item:hover,
 .#{$namespace}-menu--horizontal
   > .#{$namespace}-sub-menu:hover
   .#{$namespace}-sub-menu__title {
-  background: var(--el-fill-color);
+  background: var(--fsus-state-hover-bg, var(--el-fill-color-light));
   color: var(--el-text-color-primary);
 }
 
-.#{$namespace}-menu-item.is-active,
-.#{$namespace}-sub-menu.is-active > .#{$namespace}-sub-menu__title,
+// Vertical current page: Ink + Scholarly Blue side rail (not bold gray pill).
+.#{$namespace}-menu-item.is-active {
+  background: transparent;
+  color: var(--el-text-color-primary);
+  font-weight: 500;
+  box-shadow: inset 3px 0 0 var(--fsus-scholarly-blue);
+}
+
+// Expanded parent of an active child must not impersonate the current page rail.
+.#{$namespace}-sub-menu.is-active > .#{$namespace}-sub-menu__title {
+  background: transparent;
+  color: var(--el-text-color-primary);
+  font-weight: 500;
+  box-shadow: none;
+}
+
+// Horizontal current / active ancestor: Ink + Scholarly Blue bottom mark.
 .#{$namespace}-menu--horizontal > .#{$namespace}-menu-item.is-active,
 .#{$namespace}-menu--horizontal
   > .#{$namespace}-sub-menu.is-active
   .#{$namespace}-sub-menu__title {
-  background: var(--el-fill-color);
+  background: transparent;
   color: var(--el-text-color-primary);
-  font-weight: 700;
-  border-bottom-color: transparent !important;
+  font-weight: 500;
+  border-bottom: 2px solid var(--fsus-scholarly-blue) !important;
+  box-shadow: none;
+}
+
+// focus-visible must beat the active side-rail so keyboard ring stays distinct.
+.#{$namespace}-menu-item.is-active:focus-visible,
+.#{$namespace}-sub-menu.is-active > .#{$namespace}-sub-menu__title:focus-visible {
+  outline: none !important;
+  box-shadow: inset 0 0 0 2px
+    var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;
 }
 
 // Tabs: desktop/task surface uses a stable 40px header. Active is Ink text +

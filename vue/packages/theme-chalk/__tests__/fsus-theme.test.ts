@@ -1716,10 +1716,11 @@ describe('Fsus theme visual baseline', () => {
     expectCssRule(selectV2Css, '.el-select-v2__wrapper.is-focused', [
       'border-radius: var(--fsus-radius-control, var(--el-border-radius-base));',
     ])
-    expectCssRule(menuCss, '.el-menu-item', [
-      'border-radius: var(--fsus-radius-navigation, var(--el-border-radius-base));',
-    ])
+    // Flat navigation track (issue #294): no per-item panel radius / button wall.
+    expectCssRule(menuCss, '.el-menu-item', ['border-radius: 0;'])
     expectCssRule(menuCss, '.el-menu-item:focus-visible', [
+      'outline: none !important;',
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
       'border-radius: var(--fsus-radius-navigation, var(--el-border-radius-base));',
     ])
     for (const css of [dropdownMenuCss, dropdownCss]) {
@@ -2534,6 +2535,8 @@ describe('Fsus theme visual baseline', () => {
     ])
     expectCssRule(menuCss, ':root', [
       '--el-menu-item-height: var(--fsus-menu-item-height);',
+      // Nested vertical items share the 56px density contract (issue #294).
+      '--el-menu-sub-item-height: var(--fsus-menu-item-height);',
       '--el-menu-horizontal-height: var(--fsus-menu-horizontal-height);',
       '--el-menu-horizontal-sub-item-height: calc(var(--fsus-menu-horizontal-height) - 24px);',
     ])
@@ -3206,7 +3209,6 @@ describe('Fsus theme visual baseline', () => {
       ])
     }
   })
-
   test('prevents table interaction motion from overlapping fixed columns', () => {
     const themeCss = compileThemeFile('fsus-theme.scss')
     const tableCss = compileThemeFile('table.scss')
@@ -3386,6 +3388,124 @@ describe('Fsus theme visual baseline', () => {
       /\.el-distribution-bar-row__bar-fill\s*\{[^}]*var\(--el-color-primary\)/s,
     )
     expect(css).not.toMatch(/gradient|backdrop-filter|blur\(/)
+  })
+
+  test('restores menu navigation density and Scholarly Blue active markers (#294)', () => {
+    const themeCss = compileThemeFile('fsus-theme.scss')
+    const menuCss = compileThemeFile('menu.scss')
+    const shippedCss = compileThemeFile('fsus.scss')
+
+    // Vertical density: 56px via canonical tokens on item + SubMenu title.
+    expectCssRule(menuCss, ':root', [
+      '--el-menu-item-height: var(--fsus-menu-item-height);',
+      '--el-menu-sub-item-height: var(--fsus-menu-item-height);',
+    ])
+    expectCssRule(menuCss, '.el-menu-item', [
+      'height: var(--el-menu-item-height);',
+      'min-height: var(--el-menu-item-height);',
+    ])
+    expectCssRule(menuCss, '.el-sub-menu__title', [
+      'height: var(--el-menu-item-height);',
+      'min-height: var(--el-menu-item-height);',
+    ])
+    expectCssRule(themeCss, '.el-menu-item', [
+      'height: var(--el-menu-item-height, var(--fsus-menu-item-height));',
+      'min-height: var(--el-menu-item-height, var(--fsus-menu-item-height));',
+    ])
+    expectCssRule(themeCss, '.el-sub-menu__title', [
+      'height: var(--el-menu-item-height, var(--fsus-menu-item-height));',
+      'min-height: var(--el-menu-item-height, var(--fsus-menu-item-height));',
+    ])
+
+    // Horizontal density: 60px top-level track.
+    expectCssRule(menuCss, ':root', [
+      '--el-menu-horizontal-height: var(--fsus-menu-horizontal-height);',
+    ])
+    expectCssRule(themeCss, '.el-menu.el-menu--horizontal', [
+      'height: var(--el-menu-horizontal-height, var(--fsus-menu-horizontal-height));',
+      'min-height: var(--el-menu-horizontal-height, var(--fsus-menu-horizontal-height));',
+    ])
+    expectCssRule(themeCss, '.el-menu.el-menu--horizontal > .el-menu-item', [
+      'height: var(--el-menu-horizontal-height, var(--fsus-menu-horizontal-height));',
+      'min-height: var(--el-menu-horizontal-height, var(--fsus-menu-horizontal-height));',
+    ])
+    expectCssRule(
+      themeCss,
+      '.el-menu.el-menu--horizontal > .el-sub-menu > .el-sub-menu__title',
+      [
+        'height: var(--el-menu-horizontal-height, var(--fsus-menu-horizontal-height));',
+        'min-height: var(--el-menu-horizontal-height, var(--fsus-menu-horizontal-height));',
+      ],
+    )
+
+    // Active: Scholarly Blue functional markers + Ink text (not gray fill + 700).
+    expectCssRule(themeCss, '.el-menu-item.is-active', [
+      'background: transparent;',
+      'color: var(--el-text-color-primary);',
+      'font-weight: 500;',
+      'box-shadow: inset 3px 0 0 var(--fsus-scholarly-blue);',
+    ])
+    expectCssRule(
+      themeCss,
+      '.el-menu--horizontal > .el-menu-item.is-active',
+      [
+        'background: transparent;',
+        'color: var(--el-text-color-primary);',
+        'font-weight: 500;',
+        'border-bottom: 2px solid var(--fsus-scholarly-blue) !important;',
+      ],
+    )
+    // Expanded parent must not steal the current-page side rail.
+    expectCssRule(themeCss, '.el-sub-menu.is-active > .el-sub-menu__title', [
+      'background: transparent;',
+      'color: var(--el-text-color-primary);',
+      'box-shadow: none;',
+    ])
+    // focus-visible on active keeps the full inset ring (not only the side rail).
+    expectCssRule(themeCss, '.el-menu-item.is-active:focus-visible', [
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
+    ])
+
+    // Mutation kill: wrong density literals (44px vertical / 48px horizontal).
+    for (const css of [themeCss, shippedCss]) {
+      expect(css).not.toMatch(
+        /\.el-menu-item\s*,\s*\.el-sub-menu__title(?:\s*,\s*\.el-menu-item-group__title)?\s*\{[^}]*min-height:\s*44px/s,
+      )
+      expect(css).not.toMatch(
+        /\.el-menu\.el-menu--horizontal\s*>\s*\.el-menu-item[^{]*\{[^}]*height:\s*48px/s,
+      )
+      expect(css).not.toMatch(
+        /\.el-menu\.el-menu--horizontal\s*>\s*\.el-menu-item[^{]*\{[^}]*min-height:\s*48px/s,
+      )
+      expect(css).not.toMatch(
+        /\.el-menu\.el-menu--horizontal\s*>\s*\.el-menu-item[^{]*\{[^}]*line-height:\s*48px/s,
+      )
+    }
+
+    // Mutation kill: non-blue active (gray fill + bold only, transparent bottom mark).
+    for (const css of [themeCss, shippedCss]) {
+      expect(css).not.toMatch(
+        /\.el-menu-item\.is-active[^{]*\{[^}]*background:\s*var\(--el-fill-color\)[^}]*font-weight:\s*700/s,
+      )
+      expect(css).not.toMatch(
+        /\.el-menu-item\.is-active[^{]*\{[^}]*border-bottom-color:\s*transparent\s*!important/s,
+      )
+      expect(css).not.toMatch(
+        /\.el-menu--horizontal\s*>\s*\.el-menu-item\.is-active[^{]*\{[^}]*border-bottom-color:\s*transparent/s,
+      )
+      // Horizontal must keep a Scholarly Blue bottom mark, not zeroed borders.
+      expect(css).not.toMatch(
+        /\.el-menu\.el-menu--horizontal\s*>\s*\.el-menu-item[^{]*\{[^}]*border:\s*0\s*!important/s,
+      )
+    }
+
+    // Positive Scholarly Blue marker presence in shipped consumer path.
+    expect(shippedCss).toContain(
+      'box-shadow: inset 3px 0 0 var(--fsus-scholarly-blue)',
+    )
+    expect(shippedCss).toContain(
+      'border-bottom: 2px solid var(--fsus-scholarly-blue) !important',
+    )
   })
 
   test('keeps card surfaces flat by default', () => {
