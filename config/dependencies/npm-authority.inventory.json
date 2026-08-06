@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-06T15:58:30.307Z",
+  "generatedAt": "2026-08-06T16:39:22.146Z",
   "externalPackageCount": 94,
   "packages": {
     "@changesets/cli": {
@@ -8,7 +8,7 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^2.31.0"
+          "version": "2.31.0"
         }
       ]
     },
@@ -33,7 +33,7 @@
         {
           "path": "vue/packages/theme-chalk/package.json",
           "field": "devDependencies",
-          "version": "^2.2.1"
+          "version": "2.4.4"
         }
       ]
     },
@@ -43,12 +43,12 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^10.0.1"
+          "version": "10.0.1"
         },
         {
           "path": "vue/internal/eslint-config/package.json",
           "field": "dependencies",
-          "version": "^10.0.1"
+          "version": "10.0.1"
         }
       ]
     },
@@ -58,7 +58,7 @@
         {
           "path": "package.json",
           "field": "dependencies",
-          "version": "^1.7.6"
+          "version": "1.7.6"
         },
         {
           "path": "vue/packages/element-plus/package.json",
@@ -73,7 +73,7 @@
         {
           "path": "vue/packages/demo-app/package.json",
           "field": "dependencies",
-          "version": "^5.2.1"
+          "version": "5.2.1"
         }
       ]
     },
@@ -83,7 +83,7 @@
         {
           "path": "vue/packages/demo-app/package.json",
           "field": "dependencies",
-          "version": "^5.2.9"
+          "version": "5.2.9"
         }
       ]
     },
@@ -93,7 +93,7 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^1.59.1"
+          "version": "1.59.1"
         }
       ]
     },
@@ -103,17 +103,17 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^4.0.16"
-        },
-        {
-          "path": "vue/internal/build/package.json",
-          "field": "dependencies",
-          "version": "^4.0.16"
+          "version": "4.0.43"
         },
         {
           "path": "vue/internal/build-utils/package.json",
           "field": "dependencies",
-          "version": "^4.0.16"
+          "version": "4.0.43"
+        },
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
+          "version": "4.0.43"
         }
       ]
     },
@@ -123,17 +123,17 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^4.0.0"
-        },
-        {
-          "path": "vue/internal/build/package.json",
-          "field": "dependencies",
-          "version": "^4.0.0"
+          "version": "4.0.0"
         },
         {
           "path": "vue/internal/build-utils/package.json",
           "field": "dependencies",
-          "version": "^4.0.0"
+          "version": "4.0.0"
+        },
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
+          "version": "4.0.0"
         }
       ]
     },
@@ -143,22 +143,22 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^8.4.0"
+          "version": "8.10.0"
         },
         {
           "path": "vue/internal/build/package.json",
           "field": "devDependencies",
-          "version": "^8.4.0"
+          "version": "8.10.0"
         }
       ]
     },
     "@popperjs/core": {
-      "installPin": "npm:@sxzz/popperjs-es@^2.11.7",
+      "installPin": "2.11.8",
       "occurrences": [
         {
           "path": "package.json",
           "field": "dependencies",
-          "version": "npm:@sxzz/popperjs-es@^2.11.7"
+          "version": "npm:@sxzz/popperjs-es@2.11.8"
         },
         {
           "path": "vue/packages/element-plus/package.json",
@@ -168,12 +168,12 @@
       ]
     },
     "@rollup/plugin-commonjs": {
-      "installPin": "28.0.9",
+      "installPin": "29.0.2",
       "occurrences": [
         {
           "path": "vue/internal/build/package.json",
           "field": "dependencies",
-          "version": "^29.0.2"
+          "version": "29.0.2"
         }
       ]
     },
@@ -183,7 +183,7 @@
         {
           "path": "vue/internal/build/package.json",
           "field": "dependencies",
-          "version": "^6.1.0"
+          "version": "6.1.0"
         }
       ]
     },
@@ -193,7 +193,7 @@
         {
           "path": "vue/internal/build/package.json",
           "field": "dependencies",
-          "version": "^16.0.3"
+          "version": "16.0.3"
         }
       ]
     },
@@ -203,7 +203,7 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^11.0.4"
+          "version": "11.0.4"
         }
       ]
     },
@@ -213,7 +213,7 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^4.0.17"
+          "version": "4.0.18"
         }
       ]
     },
@@ -223,7 +223,7 @@
         {
           "path": "vue/packages/theme-chalk/package.json",
           "field": "devDependencies",
-          "version": "^0.0.33"
+          "version": "0.0.33"
         }
       ]
     },
@@ -233,7 +233,7 @@
         {
           "path": "vue/packages/theme-chalk/package.json",
           "field": "devDependencies",
-          "version": "^4.3.0"
+          "version": "4.3.4"
         }
       ]
     },
@@ -243,7 +243,7 @@
         {
           "path": "vue/packages/theme-chalk/package.json",
           "field": "devDependencies",
-          "version": "^2.0.1"
+          "version": "2.0.7"
         }
       ]
     },
@@ -253,7 +253,7 @@
         {
           "path": "vue/packages/theme-chalk/package.json",
           "field": "devDependencies",
-          "version": "^5.0.0"
+          "version": "5.0.4"
         }
       ]
     },
@@ -263,7 +263,7 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^21.1.7"
+          "version": "21.1.7"
         }
       ]
     },
@@ -283,12 +283,12 @@
         {
           "path": "package.json",
           "field": "dependencies",
-          "version": "^4.17.6"
+          "version": "4.17.12"
         },
         {
           "path": "vue/internal/metadata/package.json",
           "field": "devDependencies",
-          "version": "^4.17.6"
+          "version": "4.17.12"
         },
         {
           "path": "vue/packages/element-plus/package.json",
@@ -298,22 +298,22 @@
       ]
     },
     "@types/node": {
-      "installPin": "12.20.55",
+      "installPin": "25.5.2",
       "occurrences": [
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "*"
+          "version": "25.5.2"
         },
         {
           "path": "vue/packages/element-plus/package.json",
           "field": "devDependencies",
-          "version": "*"
+          "version": "25.5.2"
         },
         {
           "path": "vue/packages/icons-vue/package.json",
           "field": "devDependencies",
-          "version": "*"
+          "version": "25.5.2"
         }
       ]
     },
@@ -323,7 +323,7 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^1.45.0"
+          "version": "1.45.0"
         }
       ]
     },
@@ -333,17 +333,17 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^6.0.5"
+          "version": "6.0.5"
         },
         {
           "path": "vue/internal/build/package.json",
           "field": "dependencies",
-          "version": "^6.0.5"
+          "version": "6.0.5"
         },
         {
           "path": "vue/packages/demo-app/package.json",
           "field": "devDependencies",
-          "version": "^6.0.5"
+          "version": "6.0.5"
         },
         {
           "path": "vue/tests/consumer-install/template/package.json",
@@ -358,17 +358,17 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^5.1.5"
+          "version": "5.1.5"
         },
         {
           "path": "vue/internal/build/package.json",
           "field": "dependencies",
-          "version": "^5.1.5"
+          "version": "5.1.5"
         },
         {
           "path": "vue/packages/demo-app/package.json",
           "field": "devDependencies",
-          "version": "^5.1.5"
+          "version": "5.1.5"
         }
       ]
     },
@@ -378,7 +378,7 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^4.1.5"
+          "version": "4.1.5"
         }
       ]
     },
@@ -388,7 +388,7 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^4.1.5"
+          "version": "4.1.5"
         }
       ]
     },
@@ -408,7 +408,7 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^2.4.6"
+          "version": "2.4.6"
         }
       ]
     },
@@ -418,17 +418,17 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^0.7.0"
+          "version": "0.7.0"
         }
       ]
     },
     "ajv": {
-      "installPin": "6.14.0",
+      "installPin": "8.20.0",
       "occurrences": [
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^8.20.0"
+          "version": "8.20.0"
         }
       ]
     },
@@ -438,7 +438,7 @@
         {
           "path": "package.json",
           "field": "dependencies",
-          "version": "^4.2.5"
+          "version": "4.2.5"
         },
         {
           "path": "vue/packages/element-plus/package.json",
@@ -448,27 +448,27 @@
       ]
     },
     "camelcase": {
-      "installPin": "5.3.1",
+      "installPin": "9.0.0",
       "occurrences": [
         {
           "path": "vue/packages/icons-vue/package.json",
           "field": "devDependencies",
-          "version": "^9.0.0"
+          "version": "9.0.0"
         }
       ]
     },
     "chalk": {
-      "installPin": "2.4.2",
+      "installPin": "5.6.2",
       "occurrences": [
         {
           "path": "vue/internal/build/package.json",
           "field": "dependencies",
-          "version": "^5.6.2"
+          "version": "5.6.2"
         },
         {
           "path": "vue/internal/metadata/package.json",
           "field": "devDependencies",
-          "version": "^5.0.1"
+          "version": "5.6.2"
         },
         {
           "path": "vue/packages/theme-chalk/package.json",
@@ -483,7 +483,7 @@
         {
           "path": "vue/internal/build/package.json",
           "field": "dependencies",
-          "version": "^2.1.4"
+          "version": "2.2.0"
         }
       ]
     },
@@ -493,32 +493,32 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^9.1.0"
+          "version": "9.2.1"
         }
       ]
     },
     "consola": {
-      "installPin": "2.15.3",
+      "installPin": "3.4.2",
       "occurrences": [
-        {
-          "path": "vue/internal/build/package.json",
-          "field": "dependencies",
-          "version": "^3.4.2"
-        },
         {
           "path": "vue/internal/build-utils/package.json",
           "field": "dependencies",
-          "version": "^3.4.2"
+          "version": "3.4.2"
+        },
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
+          "version": "3.4.2"
         },
         {
           "path": "vue/internal/metadata/package.json",
           "field": "devDependencies",
-          "version": "^2.15.3"
+          "version": "3.4.2"
         },
         {
           "path": "vue/packages/icons-vue/package.json",
           "field": "devDependencies",
-          "version": "^3.4.2"
+          "version": "3.4.2"
         },
         {
           "path": "vue/packages/theme-chalk/package.json",
@@ -528,17 +528,17 @@
       ]
     },
     "csstype": {
-      "installPin": "2.6.21",
+      "installPin": "3.2.3",
       "occurrences": [
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^3.1.4"
+          "version": "3.2.3"
         },
         {
           "path": "vue/packages/element-plus/package.json",
           "field": "devDependencies",
-          "version": "^2.6.20"
+          "version": "3.2.3"
         }
       ]
     },
@@ -548,7 +548,7 @@
         {
           "path": "package.json",
           "field": "dependencies",
-          "version": "^1.11.20"
+          "version": "1.11.20"
         },
         {
           "path": "vue/packages/element-plus/package.json",
@@ -558,17 +558,17 @@
       ]
     },
     "esbuild": {
-      "installPin": "0.18.20",
+      "installPin": "0.28.0",
       "occurrences": [
         {
           "path": "vue/internal/build/package.json",
           "field": "dependencies",
-          "version": "^0.28.0"
+          "version": "0.28.0"
         },
         {
           "path": "vue/packages/icons-vue/package.json",
           "field": "devDependencies",
-          "version": "^0.28.0"
+          "version": "0.28.0"
         }
       ]
     },
@@ -578,7 +578,7 @@
         {
           "path": "vue/packages/icons-vue/package.json",
           "field": "devDependencies",
-          "version": "^0.2.0"
+          "version": "0.2.0"
         }
       ]
     },
@@ -588,7 +588,7 @@
         {
           "path": "package.json",
           "field": "dependencies",
-          "version": "^1.0.3"
+          "version": "1.0.3"
         },
         {
           "path": "vue/packages/element-plus/package.json",
@@ -603,17 +603,17 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^10.2.0"
+          "version": "10.2.0"
         },
         {
           "path": "vue/internal/eslint-config/package.json",
           "field": "devDependencies",
-          "version": "^10.2.0"
+          "version": "10.2.0"
         },
         {
           "path": "vue/internal/eslint-config/package.json",
           "field": "peerDependencies",
-          "version": "^10.0.0"
+          "version": "10.2.0"
         }
       ]
     },
@@ -623,12 +623,12 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^64.0.0"
+          "version": "64.0.0"
         },
         {
           "path": "vue/internal/eslint-config/package.json",
           "field": "dependencies",
-          "version": "^64.0.0"
+          "version": "64.0.0"
         }
       ]
     },
@@ -638,12 +638,12 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^10.8.0"
+          "version": "10.8.0"
         },
         {
           "path": "vue/internal/eslint-config/package.json",
           "field": "dependencies",
-          "version": "^10.8.0"
+          "version": "10.8.0"
         }
       ]
     },
@@ -653,7 +653,7 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^1.2.1"
+          "version": "1.3.0"
         }
       ]
     },
@@ -663,27 +663,27 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^3.3.3"
+          "version": "3.3.3"
         },
         {
           "path": "vue/internal/build/package.json",
           "field": "dependencies",
-          "version": "^3.3.3"
+          "version": "3.3.3"
         },
         {
           "path": "vue/internal/metadata/package.json",
           "field": "devDependencies",
-          "version": "^3.2.11"
+          "version": "3.3.3"
         }
       ]
     },
     "fs-extra": {
-      "installPin": "10.1.0",
+      "installPin": "11.3.4",
       "occurrences": [
         {
           "path": "vue/internal/build/package.json",
           "field": "dependencies",
-          "version": "^11.3.4"
+          "version": "11.3.4"
         }
       ]
     },
@@ -698,7 +698,7 @@
         {
           "path": "vue/packages/motion/package.json",
           "field": "dependencies",
-          "version": "^3.15.0"
+          "version": "3.15.0"
         }
       ]
     },
@@ -713,7 +713,7 @@
         {
           "path": "vue/internal/build/package.json",
           "field": "dependencies",
-          "version": "^5.0.1"
+          "version": "5.0.1"
         }
       ]
     },
@@ -723,7 +723,7 @@
         {
           "path": "vue/packages/theme-chalk/package.json",
           "field": "devDependencies",
-          "version": "^8.0.0"
+          "version": "8.0.0"
         }
       ]
     },
@@ -733,7 +733,7 @@
         {
           "path": "vue/packages/theme-chalk/package.json",
           "field": "devDependencies",
-          "version": "^4.3.0"
+          "version": "4.3.0"
         }
       ]
     },
@@ -743,7 +743,7 @@
         {
           "path": "vue/packages/theme-chalk/package.json",
           "field": "devDependencies",
-          "version": "^2.0.0"
+          "version": "2.1.0"
         }
       ]
     },
@@ -753,7 +753,7 @@
         {
           "path": "vue/packages/theme-chalk/package.json",
           "field": "devDependencies",
-          "version": "^5.1.0"
+          "version": "5.1.0"
         }
       ]
     },
@@ -763,7 +763,7 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^9.1.7"
+          "version": "9.1.7"
         }
       ]
     },
@@ -773,12 +773,12 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^29.0.1"
+          "version": "29.0.1"
         }
       ]
     },
     "katex": {
-      "installPin": "0.16.47",
+      "installPin": "0.17.0",
       "occurrences": [
         {
           "path": "vue/packages/element-plus/package.json",
@@ -788,7 +788,7 @@
         {
           "path": "vue/packages/wasm/package.json",
           "field": "dependencies",
-          "version": "^0.17.0"
+          "version": "0.17.0"
         }
       ]
     },
@@ -798,7 +798,7 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^15.5.1"
+          "version": "15.5.2"
         }
       ]
     },
@@ -808,7 +808,7 @@
         {
           "path": "vue/packages/demo-app/package.json",
           "field": "devDependencies",
-          "version": "^2.0.2"
+          "version": "2.0.2"
         }
       ]
     },
@@ -833,17 +833,17 @@
         {
           "path": "package.json",
           "field": "dependencies",
-          "version": "^4.17.21"
+          "version": "4.18.1"
         },
         {
           "path": "vue/internal/build/package.json",
           "field": "dependencies",
-          "version": "^4.17.21"
+          "version": "4.18.1"
         },
         {
           "path": "vue/internal/metadata/package.json",
           "field": "devDependencies",
-          "version": "^4.17.21"
+          "version": "4.18.1"
         },
         {
           "path": "vue/packages/element-plus/package.json",
@@ -858,7 +858,7 @@
         {
           "path": "package.json",
           "field": "dependencies",
-          "version": "^1.0.3"
+          "version": "1.0.3"
         },
         {
           "path": "vue/packages/element-plus/package.json",
@@ -873,7 +873,7 @@
         {
           "path": "package.json",
           "field": "dependencies",
-          "version": "^6.0.0"
+          "version": "6.0.0"
         },
         {
           "path": "vue/packages/element-plus/package.json",
@@ -893,7 +893,7 @@
         {
           "path": "vue/packages/wasm/package.json",
           "field": "dependencies",
-          "version": "^11.15.0"
+          "version": "11.15.0"
         }
       ]
     },
@@ -903,7 +903,7 @@
         {
           "path": "package.json",
           "field": "dependencies",
-          "version": "^12.40.0"
+          "version": "12.40.0"
         },
         {
           "path": "vue/packages/element-plus/package.json",
@@ -913,7 +913,7 @@
         {
           "path": "vue/packages/hooks/package.json",
           "field": "dependencies",
-          "version": "^12.40.0"
+          "version": "12.40.0"
         }
       ]
     },
@@ -923,7 +923,7 @@
         {
           "path": "package.json",
           "field": "dependencies",
-          "version": "^1.2.0"
+          "version": "1.2.0"
         },
         {
           "path": "vue/packages/element-plus/package.json",
@@ -938,17 +938,17 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^4.1.5"
+          "version": "4.1.5"
         },
         {
           "path": "vue/internal/metadata/package.json",
           "field": "devDependencies",
-          "version": "^4.1.5"
+          "version": "4.1.5"
         },
         {
           "path": "vue/packages/icons-vue/package.json",
           "field": "devDependencies",
-          "version": "^4.1.5"
+          "version": "4.1.5"
         }
       ]
     },
@@ -958,27 +958,27 @@
         {
           "path": "vue/internal/metadata/package.json",
           "field": "devDependencies",
-          "version": "^2.0.3"
+          "version": "2.1.0"
         }
       ]
     },
     "prettier": {
-      "installPin": "2.8.8",
+      "installPin": "3.8.1",
       "occurrences": [
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^3.8.1"
+          "version": "3.8.1"
         },
         {
           "path": "vue/internal/eslint-config/package.json",
           "field": "dependencies",
-          "version": "^3.8.1"
+          "version": "3.8.1"
         },
         {
           "path": "vue/packages/icons-vue/package.json",
           "field": "devDependencies",
-          "version": "^3.8.1"
+          "version": "3.8.1"
         }
       ]
     },
@@ -988,22 +988,22 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^1.5.1"
+          "version": "1.5.1"
         }
       ]
     },
     "rimraf": {
-      "installPin": "2.7.1",
+      "installPin": "6.1.3",
       "occurrences": [
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^6.1.3"
+          "version": "6.1.3"
         },
         {
           "path": "vue/packages/wasm/package.json",
           "field": "devDependencies",
-          "version": "^6.1.3"
+          "version": "6.1.3"
         }
       ]
     },
@@ -1013,7 +1013,7 @@
         {
           "path": "vue/internal/build/package.json",
           "field": "dependencies",
-          "version": "^4.60.1"
+          "version": "4.60.1"
         }
       ]
     },
@@ -1023,7 +1023,7 @@
         {
           "path": "vue/internal/build/package.json",
           "field": "dependencies",
-          "version": "^6.2.1"
+          "version": "6.2.1"
         }
       ]
     },
@@ -1033,12 +1033,12 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^1.99.0"
+          "version": "1.99.0"
         },
         {
           "path": "vue/packages/demo-app/package.json",
           "field": "devDependencies",
-          "version": "^1.99.0"
+          "version": "1.99.0"
         }
       ]
     },
@@ -1053,7 +1053,7 @@
         {
           "path": "vue/packages/wasm/package.json",
           "field": "dependencies",
-          "version": "^4.2.0"
+          "version": "4.2.0"
         }
       ]
     },
@@ -1063,7 +1063,7 @@
         {
           "path": "vue/packages/icons-svg/package.json",
           "field": "devDependencies",
-          "version": "^4.0.0"
+          "version": "4.0.1"
         }
       ]
     },
@@ -1073,7 +1073,7 @@
         {
           "path": "vue/packages/icons-vue/package.json",
           "field": "devDependencies",
-          "version": "^0.2.15"
+          "version": "0.2.15"
         }
       ]
     },
@@ -1083,47 +1083,47 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^27.0.2"
+          "version": "27.0.2"
         },
         {
           "path": "vue/internal/build/package.json",
           "field": "dependencies",
-          "version": "^27.0.2"
+          "version": "27.0.2"
         }
       ]
     },
     "tsx": {
-      "installPin": "3.14.0",
+      "installPin": "4.21.0",
       "occurrences": [
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^4.21.0"
+          "version": "4.21.0"
         },
         {
           "path": "vue/internal/build/package.json",
           "field": "devDependencies",
-          "version": "^4.21.0"
+          "version": "4.21.0"
         },
         {
           "path": "vue/internal/metadata/package.json",
           "field": "devDependencies",
-          "version": "^3.6.0"
+          "version": "4.21.0"
         },
         {
           "path": "vue/packages/icons-vue/package.json",
           "field": "devDependencies",
-          "version": "^4.21.0"
+          "version": "4.21.0"
         }
       ]
     },
     "type-fest": {
-      "installPin": "0.20.2",
+      "installPin": "4.41.0",
       "occurrences": [
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^4.41.0"
+          "version": "4.41.0"
         }
       ]
     },
@@ -1133,17 +1133,17 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^6.0.2"
+          "version": "6.0.2"
         },
         {
           "path": "vue/packages/demo-app/package.json",
           "field": "devDependencies",
-          "version": "^6.0.2"
+          "version": "6.0.2"
         },
         {
           "path": "vue/packages/icons-vue/package.json",
           "field": "devDependencies",
-          "version": "^6.0.2"
+          "version": "6.0.2"
         },
         {
           "path": "vue/tests/consumer-install/template/package.json",
@@ -1158,12 +1158,12 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^8.58.0"
+          "version": "8.58.0"
         },
         {
           "path": "vue/internal/eslint-config/package.json",
           "field": "dependencies",
-          "version": "^8.58.0"
+          "version": "8.58.0"
         }
       ]
     },
@@ -1171,24 +1171,24 @@
       "installPin": "3.6.1",
       "occurrences": [
         {
-          "path": "vue/internal/build/package.json",
-          "field": "devDependencies",
-          "version": "^3.6.1"
-        },
-        {
           "path": "vue/internal/build-constants/package.json",
           "field": "devDependencies",
-          "version": "^3.6.1"
+          "version": "3.6.1"
         },
         {
           "path": "vue/internal/build-utils/package.json",
           "field": "devDependencies",
-          "version": "^3.6.1"
+          "version": "3.6.1"
+        },
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "devDependencies",
+          "version": "3.6.1"
         },
         {
           "path": "vue/packages/wasm/package.json",
           "field": "devDependencies",
-          "version": "^3.6.1"
+          "version": "3.6.1"
         }
       ]
     },
@@ -1198,7 +1198,7 @@
         {
           "path": "vue/packages/icons-vue/package.json",
           "field": "devDependencies",
-          "version": "^7.1.0"
+          "version": "7.1.1"
         }
       ]
     },
@@ -1208,12 +1208,12 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^2.14.5"
+          "version": "2.14.5"
         },
         {
           "path": "vue/internal/build/package.json",
           "field": "dependencies",
-          "version": "^2.14.5"
+          "version": "2.14.5"
         }
       ]
     },
@@ -1223,12 +1223,12 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^7.3.1"
+          "version": "7.3.1"
         },
         {
           "path": "vue/packages/demo-app/package.json",
           "field": "devDependencies",
-          "version": "^7.1.7"
+          "version": "7.3.1"
         },
         {
           "path": "vue/tests/consumer-install/template/package.json",
@@ -1243,7 +1243,7 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^4.1.5"
+          "version": "4.1.5"
         }
       ]
     },
@@ -1253,7 +1253,7 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^3.5.32"
+          "version": "3.5.32"
         },
         {
           "path": "package.json",
@@ -1263,7 +1263,7 @@
         {
           "path": "vue/internal/build/package.json",
           "field": "devDependencies",
-          "version": "^3.5.32"
+          "version": "3.5.32"
         },
         {
           "path": "vue/internal/build/package.json",
@@ -1273,22 +1273,22 @@
         {
           "path": "vue/packages/components/package.json",
           "field": "peerDependencies",
-          "version": "^3.2.0"
+          "version": "^3.5.0"
         },
         {
           "path": "vue/packages/demo-app/package.json",
           "field": "dependencies",
-          "version": "^3.5.32"
+          "version": "3.5.32"
         },
         {
           "path": "vue/packages/directives/package.json",
           "field": "peerDependencies",
-          "version": "^3.2.0"
+          "version": "^3.5.0"
         },
         {
           "path": "vue/packages/element-plus/package.json",
           "field": "devDependencies",
-          "version": "^3.2.37"
+          "version": "3.5.32"
         },
         {
           "path": "vue/packages/element-plus/package.json",
@@ -1298,17 +1298,17 @@
         {
           "path": "vue/packages/hooks/package.json",
           "field": "peerDependencies",
-          "version": "^3.2.0"
+          "version": "^3.5.0"
         },
         {
           "path": "vue/packages/icons-vue/package.json",
           "field": "devDependencies",
-          "version": "^3.5.32"
+          "version": "3.5.32"
         },
         {
           "path": "vue/packages/icons-vue/package.json",
           "field": "peerDependencies",
-          "version": "^3.2.0"
+          "version": "^3.5.0"
         },
         {
           "path": "vue/packages/motion/package.json",
@@ -1318,7 +1318,7 @@
         {
           "path": "vue/packages/utils/package.json",
           "field": "peerDependencies",
-          "version": "^3.2.0"
+          "version": "^3.5.0"
         },
         {
           "path": "vue/tests/consumer-install/template/package.json",
@@ -1333,12 +1333,12 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^9.4.3"
+          "version": "9.4.3"
         },
         {
           "path": "vue/internal/eslint-config/package.json",
           "field": "dependencies",
-          "version": "^9.4.3"
+          "version": "9.4.3"
         }
       ]
     },
@@ -1348,12 +1348,12 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^4.5.0"
+          "version": "4.6.4"
         },
         {
           "path": "vue/packages/element-plus/package.json",
           "field": "devDependencies",
-          "version": "^4.0.16"
+          "version": "4.6.4"
         }
       ]
     },
@@ -1363,17 +1363,17 @@
         {
           "path": "package.json",
           "field": "devDependencies",
-          "version": "^3.2.6"
+          "version": "3.2.6"
         },
         {
           "path": "vue/packages/demo-app/package.json",
           "field": "devDependencies",
-          "version": "^3.2.6"
+          "version": "3.2.6"
         },
         {
           "path": "vue/packages/icons-vue/package.json",
           "field": "devDependencies",
-          "version": "^3.2.6"
+          "version": "3.2.6"
         },
         {
           "path": "vue/tests/consumer-install/template/package.json",
@@ -1383,13 +1383,5 @@
       ]
     }
   },
-  "unresolved": [
-    {
-      "id": "@popperjs/core",
-      "versions": [
-        "npm:@sxzz/popperjs-es@^2.11.7",
-        "npm:@sxzz/popperjs-es@^2.11.7"
-      ]
-    }
-  ]
+  "unresolved": []
 }

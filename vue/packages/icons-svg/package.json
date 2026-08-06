@@ -24,6 +24,6 @@
     "optimize": "node ../../../scripts/with-node-heap.mjs svgo -f . -o ."
   },
   "devDependencies": {
-    "svgo": "^4.0.0"
+    "svgo": "4.0.1"
   }
 }

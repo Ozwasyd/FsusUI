@@ -1,13 +1,36 @@
 {
   "schemaVersion": 1,
-  "purpose": "zero-version-change migration freeze for issue #405",
-  "createdAt": "2026-08-06T15:58:30.310Z",
+  "purpose": "zero-version-change migration freeze; updated after deps:sync (#406) pin correction + exact install projection",
+  "createdAt": "2026-08-06T16:39:22.151Z",
   "files": {
-    "pnpm-lock.yaml": "a8ec855ca67e4aaa979a14c1abd718e4d8a7b3a889cd17aa3a0664a2d5dec85d",
-    "package.json": "3f909e0175b20c8b1faf146f0c35e67d3b69d1911588a7a95a6019491b80401e",
-    "vue/packages/element-plus/package.json": "19ccaf53d5ffb12e51d22669d0e29aceda8061cd298697b30482f2df8863f028",
-    "config/dependencies/npm-authority.json": "433b9abf4b535fab39bf142d2023f7e270d099e2ec39578619fb043f3273f44b"
+    "pnpm-lock.yaml": "9160eda59f2ebd9e27701d9df9718ccb7b327ceb83d418310ef542b1651451d7",
+    "package.json": "a5f669abfae53858e5c3ee53a7d8a1611d3e27167014e4350c792f435733c96b",
+    "vue/packages/element-plus/package.json": "e869928c42ed32578ebbc269e1fb66293a85a64324f484ce7dc142afae9e884c",
+    "config/dependencies/npm-authority.json": "cbbfc945c7fbc24bb65fe2c94074bb552494cc1e16c2f7ad0d087835fb14df13"
   },
   "installPackageCount": 94,
-  "note": "Subsequent deps:sync (#406) must not change resolved lock package versions relative to this baseline."
+  "note": "deps:sync projects install exact versions into workspace manifests and published ranges into element-plus. Multi-version direct deps (consola/tsx/csstype) unified to majority direct lock resolutions; transitive dual versions may remain. Subsequent changes must not upgrade install pins without an intentional dependency upgrade issue.",
+  "multiVersionUnifications": {
+    "consola": {
+      "from": [
+        "2.15.3",
+        "3.4.2"
+      ],
+      "to": "3.4.2"
+    },
+    "tsx": {
+      "from": [
+        "3.14.0",
+        "4.21.0"
+      ],
+      "to": "4.21.0"
+    },
+    "csstype": {
+      "from": [
+        "2.6.21",
+        "3.2.3"
+      ],
+      "to": "3.2.3"
+    }
+  }
 }

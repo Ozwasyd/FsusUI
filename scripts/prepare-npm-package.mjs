@@ -9,6 +9,10 @@ import {
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { registryUrl, resolvePackageContract } from './npm-package-contract.mjs'
+import {
+  loadAuthority,
+  applyPublishedExternalFields,
+} from './npm-authority-lib.mjs'
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(scriptDir, '..')
@@ -844,6 +848,10 @@ packageJson.publishConfig = {
   registry: registryUrl,
 }
 
+// External dependency versions come only from npm authority projection.
+// prepare-npm-package must not invent install/published version strings.
+const authority = loadAuthority()
+applyPublishedExternalFields(packageJson, authority)
 normalizeWorkspaceProtocols(packageJson, workspaceVersions)
 const removedBundledWorkspaceDependencies =
   removeBundledWorkspaceDependencies(packageJson)
