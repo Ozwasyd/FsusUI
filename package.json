@@ -185,7 +185,7 @@
     "dotnet:manifests:check": "node ./scripts/with-node-heap.mjs node ./scripts/check-dotnet-manifests.mjs",
     "dotnet:verify": "node ./scripts/with-node-heap.mjs run-s dotnet:platform:verify dotnet:package:verify",
     "verify": "node ./scripts/with-node-heap.mjs run-s verify:full",
-    "verify:pr-fast": "run-s prepare:test-artifacts _verify:pr-fast:parallel",
+    "verify:pr-fast": "run-s prepare:test-artifacts build:theme _verify:pr-fast:parallel",
     "_verify:pr-fast:parallel": "node ./scripts/run-capacity-suite.mjs --suite=pr-fast",
     "verify:full": "node ./scripts/with-node-heap.mjs run-s prepare:test-artifacts _verify:parallel build:demo",
     "_verify:parallel": "node ./scripts/run-capacity-suite.mjs --suite=full",
