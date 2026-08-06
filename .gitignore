@@ -118,6 +118,7 @@ id_ed25519
 id_ed25519.*
 *.local
 .eslintcache
+/emsdk-cache/
 cypress/screenshots/
 cypress/videos/
 /tmp/
