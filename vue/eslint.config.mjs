@@ -15,6 +15,7 @@ export default [
     ignores: [
       '**/dist/**',
       '**/node_modules/**',
+      '**/emsdk-cache/**',
       '**/__tests__/**',
       '**/mocks/**',
       '**/setup-mock.ts',
