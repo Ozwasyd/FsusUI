@@ -236,6 +236,80 @@
         <el-descriptions-item label="备注"></el-descriptions-item>
       </el-descriptions>
     </div>
+    <div
+      class="demo-block"
+      data-testid="descriptions-spacing-fixtures"
+      data-descriptions-spacing-fixtures
+    >
+      <h3>Descriptions spacing matrix</h3>
+      <el-space direction="vertical" :size="16" fill style="width: 100%">
+        <el-descriptions
+          border
+          :column="2"
+          size="large"
+          data-descriptions-case="bordered-large"
+          title="bordered large"
+        >
+          <el-descriptions-item label="笔名">青砚</el-descriptions-item>
+          <el-descriptions-item label="所在地">苏州</el-descriptions-item>
+          <el-descriptions-item label="主页" :span="2">
+            https://example.com/authors/qingyan
+          </el-descriptions-item>
+        </el-descriptions>
+        <el-descriptions
+          border
+          :column="2"
+          data-descriptions-case="bordered-default"
+          title="bordered default"
+        >
+          <el-descriptions-item label="笔名">青砚</el-descriptions-item>
+          <el-descriptions-item label="所在地">苏州</el-descriptions-item>
+          <el-descriptions-item label="地址" :span="2">
+            江苏省苏州市吴中区吴中大道 1188 号
+          </el-descriptions-item>
+        </el-descriptions>
+        <el-descriptions
+          border
+          :column="2"
+          size="small"
+          data-descriptions-case="bordered-small"
+          title="bordered small"
+        >
+          <el-descriptions-item label="笔名">青砚</el-descriptions-item>
+          <el-descriptions-item label="所在地">苏州</el-descriptions-item>
+        </el-descriptions>
+        <el-descriptions
+          :column="2"
+          data-descriptions-case="non-bordered-default"
+          title="non-bordered default"
+        >
+          <el-descriptions-item label="笔名">青砚</el-descriptions-item>
+          <el-descriptions-item label="所在地">苏州</el-descriptions-item>
+        </el-descriptions>
+        <el-descriptions
+          border
+          :column="2"
+          direction="vertical"
+          data-descriptions-case="bordered-vertical"
+          title="bordered vertical"
+        >
+          <el-descriptions-item label="笔名">青砚</el-descriptions-item>
+          <el-descriptions-item label="备注">
+            长备注：研究笔记、出版记录与公开主页摘要。
+          </el-descriptions-item>
+        </el-descriptions>
+        <el-descriptions
+          border
+          :column="2"
+          responsive="stack"
+          data-descriptions-case="responsive-stack"
+          title="responsive stack"
+        >
+          <el-descriptions-item label="笔名">青砚</el-descriptions-item>
+          <el-descriptions-item label="所在地">苏州</el-descriptions-item>
+        </el-descriptions>
+      </el-space>
+    </div>
     <div class="demo-block">
       <h3>Result</h3>
       <el-result icon="success" title="已发布" sub-title="读者将看到最新版本">

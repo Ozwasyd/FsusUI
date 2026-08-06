@@ -894,6 +894,7 @@ describe('Fsus theme visual baseline', () => {
       [
         'border-right: var(--el-descriptions-table-border);',
         'border-bottom: var(--el-descriptions-table-border);',
+        'padding: var(--fsus-space-2) var(--fsus-space-3);',
       ],
     )
     expectCssRule(
@@ -911,6 +912,66 @@ describe('Fsus theme visual baseline', () => {
     )
     expect(fsusCss).not.toMatch(
       /\.el-descriptions(?:,|\s)[^{]*\{[^}]*box-shadow:[^;}]*var\(--el-box-shadow-light\)/s,
+    )
+  })
+
+  test('Descriptions bordered cell padding uses 4px spacing scale tokens without 15/11/7px', () => {
+    const descriptionsCss = compileThemeFile('descriptions.scss')
+    const fsusCss = compileThemeFile('fsus.scss')
+
+    // Density ladder from canonical --fsus-space-* (12/16, 8/12, 4/8).
+    expectCssRule(
+      descriptionsCss,
+      '.el-descriptions__body .el-descriptions__table.is-bordered .el-descriptions__cell',
+      ['padding: var(--fsus-space-2) var(--fsus-space-3);'],
+    )
+    expectCssRule(
+      descriptionsCss,
+      '.el-descriptions--large .el-descriptions__body .el-descriptions__table.is-bordered .el-descriptions__cell',
+      ['padding: var(--fsus-space-3) var(--fsus-space-4);'],
+    )
+    expectCssRule(
+      descriptionsCss,
+      '.el-descriptions--small .el-descriptions__body .el-descriptions__table.is-bordered .el-descriptions__cell',
+      ['padding: var(--fsus-space-1) var(--fsus-space-2);'],
+    )
+
+    // Non-bordered + stack share the same horizontal space-3 rhythm.
+    expectCssRule(
+      descriptionsCss,
+      '.el-descriptions__body .el-descriptions__table:not(.is-bordered) .el-descriptions__cell',
+      ['padding-inline: var(--fsus-space-3);'],
+    )
+    expectCssRule(descriptionsCss, '.el-descriptions__stack', [
+      'padding: 0 var(--fsus-space-3);',
+    ])
+
+    // Production CSS must not emit the legacy off-scale horizontal paddings.
+    for (const css of [descriptionsCss, fsusCss]) {
+      expect(css).not.toMatch(
+        /\.el-descriptions__body[^}]*\.is-bordered[^{]*\.el-descriptions__cell\s*\{[^}]*padding:\s*12px 15px/s,
+      )
+      expect(css).not.toMatch(
+        /\.el-descriptions__body[^}]*\.is-bordered[^{]*\.el-descriptions__cell\s*\{[^}]*padding:\s*8px 11px/s,
+      )
+      expect(css).not.toMatch(
+        /\.el-descriptions--small[^}]*\.is-bordered[^{]*\.el-descriptions__cell\s*\{[^}]*padding:\s*4px 7px/s,
+      )
+      expect(css).not.toMatch(
+        /\.el-descriptions--large[^}]*\.is-bordered[^{]*\.el-descriptions__cell\s*\{[^}]*padding:\s*12px 15px/s,
+      )
+      // No private descriptions padding alias reintroducing off-scale values.
+      expect(css).not.toMatch(
+        /--(?:el-)?descriptions[^:;{}]*padding[^:;{}]*:\s*(?:15|11|7)px/,
+      )
+    }
+
+    // Cells stay flat — no per-cell radius/shadow.
+    expect(descriptionsCss).not.toMatch(
+      /\.el-descriptions__cell\s*\{[^}]*border-radius:/s,
+    )
+    expect(descriptionsCss).not.toMatch(
+      /\.el-descriptions__cell\s*\{[^}]*box-shadow:/s,
     )
   })
 
