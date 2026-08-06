@@ -1,5 +1,7 @@
 #!/usr/bin/env node
+import { createHash } from 'node:crypto'
 import { spawn } from 'node:child_process'
+import { readFile } from 'node:fs/promises'
 import {
   countUnitTestFiles,
   formatCapacitySummary,
@@ -122,10 +124,26 @@ child.on('error', (error) => {
   process.exit(1)
 })
 
-child.on('exit', (code, signal) => {
+child.on('exit', async (code, signal) => {
   if (signal) {
     process.kill(process.pid, signal)
     return
+  }
+
+  if (
+    code &&
+    args.some((argument) => argument.includes('check-package-build-smoke.mjs'))
+  ) {
+    try {
+      const css = await readFile('vue/packages/theme-chalk/dist/fsus.css')
+      console.error(
+        `[package-smoke] complete theme actual sha256=${createHash('sha256').update(css).digest('hex')} bytes=${css.byteLength}`,
+      )
+    } catch (error) {
+      console.error(
+        `[package-smoke] unable to inspect complete theme: ${error instanceof Error ? error.message : String(error)}`,
+      )
+    }
   }
 
   process.exit(code ?? 1)
