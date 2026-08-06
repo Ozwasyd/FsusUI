@@ -1569,7 +1569,8 @@ button.#{$namespace}-card:active {
   padding-bottom: 0;
 }
 
-.#{$namespace}-dialog__headerbtn,
+// Compact inline closes (Notification / Alert) remain the 44px icon ladder.
+// Overlay chrome closes are intentionally larger — see block below (#299).
 .#{$namespace}-notification__closeBtn,
 .#{$namespace}-alert__close-btn {
   position: absolute;
@@ -1578,31 +1579,36 @@ button.#{$namespace}-card:active {
   margin: 0;
   min-width: 44px;
   min-height: 44px;
-  border-radius: 999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: var(--fsus-radius-pill, 999px);
+  display: inline-grid;
+  place-items: center;
   // Keep close controls fully inside the drawable/safe rectangle.
   // Outward optical translate (25%, -25%) pushed boxes past viewport edges and
   // fought fullscreen/safe-area insets from #261/#262.
   transform: none;
 }
 
-// Drawer close: size/alignment only. top/right safe insets are owned by
-// drawer.scss helpers (absolute close is not shifted by header padding).
-.#{$namespace}-drawer__close-btn {
+// Dialog / Drawer / MessageBox overlay close: unified 54x54 hit target.
+// Component SCSS owns edge insets + safe-area; theme owns size convergence.
+// Do not regress Notification/Alert compact closes into this contract.
+.#{$namespace}-dialog__headerbtn,
+.#{$namespace}-drawer__close-btn,
+.#{$namespace}-message-box__headerbtn {
   margin: 0;
-  min-width: 44px;
-  min-height: 44px;
-  border-radius: 999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 54px;
+  height: 54px;
+  min-width: 54px;
+  min-height: 54px;
+  border-radius: var(--fsus-radius-pill, 999px);
+  display: inline-grid;
+  place-items: center;
   transform: none;
+  z-index: 1;
 }
 
 .#{$namespace}-dialog__headerbtn:focus-visible,
 .#{$namespace}-drawer__close-btn:focus-visible,
+.#{$namespace}-message-box__headerbtn:focus-visible,
 .#{$namespace}-notification__closeBtn:focus-visible,
 .#{$namespace}-alert__close-btn:focus-visible {
   @include a11y-focus-ring($radius: 999px);

@@ -137,6 +137,7 @@ export const createDemoState = () => {
   const showTransition = ref(true)
   const showImageViewer = ref(false)
   const dialogVisible = ref(false)
+  const longTitleDialogVisible = ref(false)
   const drawerVisible = ref(false)
   const overlayVisible = ref(false)
 
@@ -149,7 +150,11 @@ export const createDemoState = () => {
     cb([{ value: 'vue' }, { value: 'element' }])
   }
   const showMessage = () => ElMessage('This is a message.')
-  const showMessageBox = () => ElMessageBox.alert('This is a message', 'Title')
+  const showMessageBox = () =>
+    ElMessageBox.alert(
+      'This is a message',
+      'Title long close-clearance title Confirmation title must clear the close hit target',
+    )
   const showNotification = () =>
     ElNotification({
       title: 'Notification',
@@ -171,6 +176,7 @@ export const createDemoState = () => {
     date,
     dateRange,
     dialogVisible,
+    longTitleDialogVisible,
     drawerVisible,
     formModel,
     goBack,

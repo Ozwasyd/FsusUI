@@ -103,21 +103,33 @@
   }
 
   @include e(header) {
+    position: relative;
     padding: var(--fsus-space-4) getCssVar('dialog', 'padding-primary');
-    margin-right: 16px;
+    // Stable reserve for the 54x54 overlay close so titles never underlap (#299).
+    padding-inline-end: calc(
+      #{getCssVar('dialog', 'padding-primary')} + 54px
+    );
   }
 
   @include e(headerbtn) {
     position: absolute;
-    top: 6px;
+    top: 0;
     right: 0;
     padding: 0;
+    // Overlay chrome close hit target (docs/design.md Dialog/Drawer 54px).
     width: 54px;
     height: 54px;
+    min-width: 54px;
+    min-height: 54px;
+    display: inline-grid;
+    place-items: center;
     background: transparent;
     border: none;
     outline: none;
     cursor: pointer;
+    border-radius: var(--fsus-radius-pill, 999px);
+    transform: none;
+    z-index: 1;
     font-size: var(
       #{getCssVarName('message-close-size')},
       map.get($message, 'close-size')
