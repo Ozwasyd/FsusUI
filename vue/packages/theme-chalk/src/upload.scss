@@ -245,35 +245,74 @@
   }
 }
 
+// Ordinary text file-list contract (#456):
+// flat rows + dividers, always-visible status/actions, 140/220ms motion, no ribbon/panel.
 @include b(upload-list) {
   margin: 10px 0 0;
   padding: 0;
   list-style: none;
   position: relative;
-  @include e(item) {
+
+  // Dedicated insert/remove transition (not legacy el-list 500ms/30px).
+  &-enter-active,
+  &-leave-active {
     transition:
-      opacity 0.5s cubic-bezier(0.55, 0, 0.1, 1),
-      transform 0.5s cubic-bezier(0.55, 0, 0.1, 1),
-      background-color 0.5s cubic-bezier(0.55, 0, 0.1, 1);
+      opacity var(--fsus-motion-control, 220ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+      transform var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
+  }
+
+  &-enter-from,
+  &-leave-to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  &-leave-active {
+    position: absolute !important;
+    width: 100%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &-enter-active,
+    &-leave-active {
+      transition-duration: 1ms !important;
+      transition-property: opacity !important;
+    }
+
+    &-enter-from,
+    &-leave-to {
+      transform: none;
+    }
+  }
+
+  @include e(item) {
+    // Item-level hover/background only — no 500ms opacity/transform travel.
+    transition:
+      background-color var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+      color var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
     font-size: getCssVar('font-size', 'base');
     color: getCssVar('text-color', 'regular');
-    margin-bottom: 5px;
+    margin: 0;
     position: relative;
     box-sizing: border-box;
-    border-radius: getCssVar('border-radius', 'base');
+    border-radius: 0;
+    box-shadow: none;
     overflow: hidden;
     width: 100%;
 
     .#{bem('progress')} {
-      position: absolute;
-      top: 20px;
+      position: relative;
+      top: auto;
       width: 100%;
+      margin-top: 4px;
     }
 
     .#{bem('progress', 'text')} {
-      position: absolute;
-      right: 0;
-      top: -13px;
+      position: static;
     }
 
     .#{bem('progress-bar')} {
@@ -285,15 +324,30 @@
       color: getCssVar('color-success');
     }
 
+    & .#{bem('icon', '', 'upload-fail')} {
+      color: getCssVar('color-danger');
+    }
+
+    & .#{bem('icon', '', 'upload-progress')} {
+      color: getCssVar('color-primary');
+    }
+
+    // Default (picture/picture-card) close remains positioned; text list overrides below.
     .#{bem('icon', '', 'close')} {
-      @include ghost-icon-button(28px, 999px, 0, true);
+      @include ghost-icon-button(
+        var(--fsus-icon-target-small, 32px),
+        999px,
+        0,
+        true
+      );
       display: none;
       position: absolute;
       right: 5px;
       top: 50%;
       opacity: 0.75;
       color: getCssVar('text-color', 'regular');
-      transition: opacity getCssVar('transition-duration');
+      transition: opacity var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
       transform: translateY(-50%);
 
       &:hover {
@@ -325,10 +379,6 @@
       .#{bem('icon', '', 'close')} {
         display: inline-flex;
       }
-
-      .#{bem('progress', 'text')} {
-        display: none;
-      }
     }
 
     .#{bem('upload-list', 'item-info')} {
@@ -337,6 +387,7 @@
       flex-direction: column;
       width: calc(100% - 30px);
       margin-left: 4px;
+      min-width: 0;
     }
 
     @include when(success) {
@@ -368,25 +419,218 @@
         }
       }
     }
+
+    @include when(disabled) {
+      color: var(--el-disabled-text-color);
+      background: transparent;
+      opacity: 1;
+      cursor: not-allowed;
+
+      .#{bem('upload-list', 'item-name')} {
+        color: var(--el-disabled-text-color);
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  // Text list: flat document rows with divider, always-visible status/actions.
+  @include m(text) {
+    .#{bem('upload-list', 'item')} {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      column-gap: 8px;
+      row-gap: 4px;
+      min-height: var(--fsus-control-height-compact, 40px);
+      padding: 8px 0;
+      margin: 0;
+      border-radius: 0;
+      box-shadow: none;
+      border: none;
+      border-bottom: 1px solid getCssVar('border-color', 'lighter');
+      background: transparent;
+      overflow: visible;
+
+      // Kill legacy per-item panel geometry and hover-only action swap.
+      &:hover,
+      &:focus-within {
+        background: var(--fsus-state-hover-bg, getCssVar('fill-color', 'light'));
+
+        .#{bem('upload-list', 'item-status-label')} {
+          display: inline-flex;
+          opacity: 1;
+        }
+
+        .#{bem('icon', '', 'close')},
+        .#{bem('upload-list', 'item-delete')} {
+          display: inline-flex;
+        }
+      }
+
+      &:focus-visible {
+        @include a11y-focus-ring(2px, 0);
+      }
+
+      &.is-success,
+      &.is-fail,
+      &.is-uploading,
+      &.is-ready {
+        .#{bem('upload-list', 'item-status-label')} {
+          display: inline-flex;
+          opacity: 1;
+        }
+      }
+
+      // Override legacy success hover that hid status in favor of remove.
+      &.is-success:hover,
+      &.is-success:focus-within {
+        .#{bem('upload-list', 'item-status-label')} {
+          display: inline-flex;
+          opacity: 1;
+        }
+      }
+    }
+
+    .#{bem('upload-list', 'item-info')} {
+      flex: 1 1 auto;
+      width: auto;
+      min-width: 0;
+      margin-left: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .#{bem('upload-list', 'item-name')} {
+      max-width: 100%;
+      min-width: 0;
+      text-align: start;
+    }
+
+    .#{bem('upload-list', 'item-status-label')} {
+      position: static;
+      transform: none;
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 4px;
+      line-height: 1.2;
+      color: getCssVar('text-color', 'secondary');
+      font-size: 12px;
+      white-space: nowrap;
+      opacity: 1;
+    }
+
+    .#{bem('upload-list', 'item-status-text')} {
+      font-size: 12px;
+      color: inherit;
+    }
+
+    .#{bem('upload-list', 'item')}.is-success
+      .#{bem('upload-list', 'item-status-label')} {
+      color: getCssVar('color-success');
+    }
+
+    .#{bem('upload-list', 'item')}.is-fail
+      .#{bem('upload-list', 'item-status-label')} {
+      color: getCssVar('color-danger');
+    }
+
+    .#{bem('upload-list', 'item')}.is-uploading
+      .#{bem('upload-list', 'item-status-label')} {
+      color: getCssVar('color-primary');
+    }
+
+    // Always-visible row-end actions (mouse / keyboard / touch).
+    .#{bem('upload-list', 'item-actions')} {
+      position: static;
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 4px;
+      opacity: 1;
+      background: transparent;
+      width: auto;
+      height: auto;
+    }
+
+    .#{bem('icon', '', 'close')},
+    .#{bem('upload-list', 'item-delete')} {
+      @include ghost-icon-button(
+        var(--fsus-icon-target-small, 32px),
+        999px,
+        0,
+        true
+      );
+      position: static;
+      display: inline-flex;
+      transform: none;
+      opacity: 1;
+      top: auto;
+      right: auto;
+      color: getCssVar('text-color', 'regular');
+
+      &:hover {
+        color: getCssVar('color-primary');
+      }
+
+      &:focus-visible {
+        @include a11y-focus-ring(2px, 999px);
+      }
+    }
+
+    // Prefer ≥40px compact desktop / ≥44px touch when density tokens allow.
+    @media (pointer: coarse) {
+      .#{bem('icon', '', 'close')},
+      .#{bem('upload-list', 'item-delete')} {
+        @include ghost-icon-button(
+          var(--fsus-icon-target, 44px),
+          999px,
+          0,
+          true
+        );
+      }
+
+      .#{bem('upload-list', 'item')} {
+        min-height: var(--fsus-control-height, 44px);
+      }
+    }
+
+    .#{bem('progress')} {
+      position: relative;
+      top: auto;
+      margin-top: 4px;
+    }
+
+    // No rotated success ribbon / corner badge on ordinary rows.
+    .#{bem('upload-list', 'item-status-label')} {
+      background: transparent;
+      width: auto;
+      height: auto;
+    }
   }
 
   @include e(item-name) {
     color: getCssVar('text-color', 'regular');
     display: inline-flex;
-    text-align: center;
+    text-align: start;
     align-items: center;
     border: none;
     background: transparent;
+    max-width: 100%;
+    min-width: 0;
 
     padding: 0 4px;
 
-    transition: color getCssVar('transition-duration');
+    transition: color var(--fsus-motion-control-fast, 140ms)
+      var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
     font-size: getCssVar('font-size', 'base');
     font: inherit;
     cursor: pointer;
 
     .#{$namespace}-icon {
       margin-right: 6px;
+      flex-shrink: 0;
       color: getCssVar('text-color', 'secondary');
     }
   }
@@ -395,6 +639,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    min-width: 0;
   }
 
   @include e(item-status-label) {
@@ -408,7 +653,8 @@
     justify-content: center;
     align-items: center;
 
-    transition: opacity getCssVar('transition-duration');
+    transition: opacity var(--fsus-motion-control-fast, 140ms)
+      var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
   }
 
   @include e(item-delete) {

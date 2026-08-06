@@ -2747,13 +2747,37 @@ button.#{$namespace}-card:active {
   box-shadow: 0 0 0 2px var(--el-color-danger) inset !important;
 }
 
-.#{$namespace}-upload-list__item {
-  @include fsus-control(panel);
-  padding: 10px 12px;
+// Upload ordinary file rows are flat document rows (#456) — not per-item panels.
+// picture / picture-card keep their own surface rules in upload.scss.
+.#{$namespace}-upload-list--text .#{$namespace}-upload-list__item {
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+  background: transparent;
+  padding: 8px 0;
+  margin: 0;
 
   &:hover {
-    background: var(--el-bg-color);
+    background: var(--fsus-state-hover-bg, var(--el-fill-color-light));
   }
+
+  // Independent disabled tokens (not ancestor opacity).
+  &.is-disabled,
+  .#{$namespace}-upload-list.is-disabled & {
+    background: transparent;
+    color: var(--el-disabled-text-color);
+    border-bottom-color: var(--el-disabled-border-color);
+    opacity: 1;
+    cursor: not-allowed;
+  }
+}
+
+// Non-text list items no longer inherit a 12px panel chrome by default.
+.#{$namespace}-upload-list:not(.#{$namespace}-upload-list--text)
+  .#{$namespace}-upload-list__item {
+  // picture / picture-card supply their own border + radius in upload.scss
+  box-shadow: none;
 }
 
 .#{$namespace}-progress-bar__outer,
