@@ -34,3 +34,5 @@ jobs:
           git diff --cached --check
           git commit -m "fix(ci): repair generated contracts and baselines"
           git push origin HEAD:agent/fix-ci-artifact-preparation
+
+# One-shot workflow: the helper removes this file in its generated commit.
