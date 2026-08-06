@@ -117,7 +117,7 @@ const normalizedThemeSource = withoutLineComments(themeSource).replace(
   'NS',
 )
 let hasNotificationSafeWidth = false
-let hasNotificationPanelMaterial = false
+let hasNotificationFloatingMaterial = false
 let hasNotificationFixedPosition = false
 
 if (
@@ -150,12 +150,21 @@ for (const block of topLevelBlocks(themeSource)) {
     hasNotificationFixedPosition = true
   }
 
+  // #298: Notification is a high-level floating overlay, not a paper panel.
   if (
-    block.body.includes('@include fsus-panel(panel)') ||
-    (block.body.includes('border: 1px solid') &&
-      block.body.includes('box-shadow: var(--fsus-shadow-panel'))
+    /box-shadow:\s*var\(--fsus-shadow-panel/u.test(block.body) ||
+    /box-shadow:\s*none\b/u.test(block.body)
   ) {
-    hasNotificationPanelMaterial = true
+    failures.push(
+      `${themeFile}:${block.startLine} Notification must not use panel/no-shadow (depth inversion vs Dialog/Drawer)`,
+    )
+  }
+
+  if (
+    block.body.includes('border: 1px solid') &&
+    /box-shadow:\s*var\(--fsus-shadow-floating/u.test(block.body)
+  ) {
+    hasNotificationFloatingMaterial = true
   }
 }
 
@@ -165,15 +174,44 @@ if (!hasNotificationSafeWidth) {
   )
 }
 
-if (!hasNotificationPanelMaterial) {
+if (!hasNotificationFloatingMaterial) {
   failures.push(
-    `${themeFile}: Notification needs border-first panel material coverage`,
+    `${themeFile}: Notification needs border + --fsus-shadow-floating material coverage`,
   )
 }
 
 if (!hasNotificationFixedPosition) {
   failures.push(
     `${themeFile}: Notification must preserve fixed viewport positioning`,
+  )
+}
+
+// #298 companion: Dialog/Drawer theme overrides must stay panel/no-shadow.
+let hasDialogDrawerPanelDepth = false
+for (const block of topLevelBlocks(themeSource)) {
+  const items = selectorItems(block.selector)
+  // Selectors may carry preceding block comments; match by includes.
+  const hasDialog = items.some((item) => item.includes('.NS-dialog'))
+  const hasDrawer = items.some((item) => item.includes('.NS-drawer'))
+  if (!(hasDialog && hasDrawer)) continue
+
+  if (/box-shadow:\s*var\(--fsus-shadow-floating/u.test(block.body)) {
+    failures.push(
+      `${themeFile}:${block.startLine} Dialog/Drawer must not use --fsus-shadow-floating by default`,
+    )
+  }
+
+  if (
+    block.body.includes('border: 1px solid') &&
+    block.body.includes('box-shadow: var(--fsus-shadow-panel, none)')
+  ) {
+    hasDialogDrawerPanelDepth = true
+  }
+}
+
+if (!hasDialogDrawerPanelDepth) {
+  failures.push(
+    `${themeFile}: Dialog/Drawer need border-first panel/no-shadow depth (issue #298)`,
   )
 }
 
