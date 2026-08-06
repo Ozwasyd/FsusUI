@@ -32,6 +32,27 @@ try {
       ).href
     )
     baseContract.verifyImpactPlan(plan)
+
+    const avaloniaTokens = await readFile(
+      path.join(
+        directory,
+        'dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml',
+      ),
+      'utf8',
+    )
+    const invalidShadow = [
+      ...avaloniaTokens.matchAll(
+        /<BoxShadows[^>]*>([^<]+)<\/BoxShadows>/gu,
+      ),
+    ].find(
+      ([, value]) =>
+        value !== 'none' && /(?:\b\d+(?:\.\d+)?px\b|rgba\()/u.test(value),
+    )
+    if (invalidShadow) {
+      available = false
+      reason =
+        'contract-changed: base Avalonia shadow artifacts use non-parseable CSS syntax'
+    }
   }
 } catch (error) {
   available = false

@@ -15,6 +15,7 @@ export default [
     ignores: [
       '**/dist/**',
       '**/node_modules/**',
+      '**/emsdk-cache/**',
       '**/__tests__/**',
       '**/mocks/**',
       '**/setup-mock.ts',
@@ -166,6 +167,40 @@ export default [
       'no-empty': 'off',
       'vue/prefer-import-from-vue': 'off',
       'unicorn/prefer-object-from-entries': 'off',
+    },
+  },
+
+  {
+    files: ['scripts/check-markdown-xss-browser.mjs'],
+    languageOptions: {
+      globals: {
+        URL: 'readonly',
+        performance: 'readonly',
+      },
+    },
+  },
+
+  {
+    files: ['scripts/markdown-xss-corpus.mjs'],
+    languageOptions: {
+      globals: {
+        structuredClone: 'readonly',
+      },
+    },
+  },
+
+  {
+    files: ['scripts/web-render-performance.mjs'],
+    languageOptions: {
+      globals: {
+        DOMParser: 'readonly',
+        Element: 'readonly',
+        Range: 'readonly',
+        ShadowRoot: 'readonly',
+      },
+    },
+    rules: {
+      'no-setter-return': 'off',
     },
   },
 

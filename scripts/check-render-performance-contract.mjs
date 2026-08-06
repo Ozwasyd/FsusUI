@@ -50,6 +50,10 @@ for (const token of [
   "['enabled', 'reduced', 'disabled']",
   'scenarioDefinitions.flatMap',
   'Tracing.start',
+  'measurementWindowStartedAt = Number.POSITIVE_INFINITY',
+  'entry.startTime >= measurementWindowStartedAt',
+  'window.__fsusResetMeasurementWindow = () =>',
+  'Performance measurement window reset is unavailable',
   'workerProbe',
   'workerPoolBurstProbe',
   'wasmProbe',
@@ -71,6 +75,22 @@ for (const token of [
   'after > before * 1.05',
 ]) {
   if (!web.includes(token)) failures.push(`web runner missing ${token}`)
+}
+const warmupBoundary = web.indexOf(
+  'for (let index = 0; index < warmups; index++)',
+)
+const measurementReset = web.indexOf(
+  'window.__fsusResetMeasurementWindow()',
+)
+const tracingStart = web.indexOf('Tracing.start')
+if (
+  warmupBoundary < 0 ||
+  measurementReset <= warmupBoundary ||
+  tracingStart <= measurementReset
+) {
+  failures.push(
+    'web measurement window must reset after warmups and before tracing',
+  )
 }
 for (const token of [
   ':content-version="markdownContentVersion"',
@@ -151,6 +171,22 @@ for (const token of [
 ]) {
   if (!quality.includes(token))
     failures.push(`PR impact workflow missing ${token}`)
+}
+for (const token of [
+  'emscripten-core/setup-emsdk@v15',
+  'Prepare baseline WASM artifacts',
+  'Prepare current WASM artifacts',
+  'pnpm run ensure:wasm',
+]) {
+  if (!quality.includes(token))
+    failures.push(`PR real-render artifact preflight missing ${token}`)
+}
+for (const token of [
+  'emscripten-core/setup-emsdk@v15',
+  'pnpm run ensure:wasm',
+]) {
+  if (!reusable.includes(token))
+    failures.push(`Reusable real-render artifact preflight missing ${token}`)
 }
 if (
   quality.indexOf('Plan PR real-render impact before heavy setup') >

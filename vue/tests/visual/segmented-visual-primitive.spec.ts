@@ -3,6 +3,7 @@ import path from 'node:path'
 import { expect, test } from '@playwright/test'
 import { compile } from 'sass'
 import type { Locator, Page, TestInfo } from '@playwright/test'
+import { resolveVisualVariant } from '../../../scripts/visual-variant.mjs'
 
 const repoRoot = path.resolve(process.cwd())
 const fixtureRoot = path.join(
@@ -57,16 +58,14 @@ const attachEvidence = async (
   testInfo: TestInfo,
   theme: 'light' | 'dark',
 ) => {
-  const pathName = testInfo.outputPath(
-    `segmented-visual-primitive-${theme}.png`,
-  )
+  const fileName = `segmented-visual-primitive-${theme}.png`
   await page.screenshot({
-    path: pathName,
+    path: testInfo.outputPath(fileName),
     animations: 'disabled',
     fullPage: true,
   })
   await testInfo.attach(`segmented-visual-primitive-${theme}`, {
-    path: pathName,
+    path: testInfo.outputPath(fileName),
     contentType: 'image/png',
   })
 }
@@ -74,7 +73,7 @@ const attachEvidence = async (
 test('issue #459 probe renders canonical geometry, layered states, content and RTL', async ({
   page,
 }, testInfo) => {
-  const theme = testInfo.project.name.includes('dark') ? 'dark' : 'light'
+  const { theme } = resolveVisualVariant(testInfo.project.name)
   const css = compileProbeCss()
 
   await page.setContent(`

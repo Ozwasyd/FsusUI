@@ -7,7 +7,7 @@
     "vue/packages/theme-chalk/src/generated/tokens.css": "4c1b664a0ef1711ab5a4ed3aa9688bedb6d008834a5e9fe2634cce7295a9d3ad",
     "vue/packages/theme-chalk/src/generated/tokens.scss": "f6e4a7fc2280f8830de42fdbb234d23dcb48c7942886d5d02ac52dd470485de2",
     "vue/packages/theme-chalk/src/generated/tokens.json": "7460c4a4335b85bc5b5568d9c0e2e13f9b63271e8c87de703ea994f2195ccf93",
-    "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml": "47450e8844d7c6e4450dace59197a648fa1ba2383f49aa3a7b69c158e52aea66",
+    "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml": "f49f99f10a02457468cdfa6d99713057996754d839f4543c72185a452ae6a3fe",
     "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs": "cd017e80961330b8bccb44cb4b582b62d50a8eeb444042e1d3febcb267f378fd",
     "docs/theme/generated/tokens.md": "2495120888485eef7596dbbf43659928a5a61a8c642e5afca026ddff4d5802e5"
   }

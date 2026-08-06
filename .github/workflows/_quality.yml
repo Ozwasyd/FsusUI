@@ -35,10 +35,15 @@ jobs:
           node-version: 22
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
+      - uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
       - uses: actions/setup-dotnet@v4
         with:
           global-json-file: dotnet/global.json
       - run: pnpm install --frozen-lockfile
+      - run: pnpm run ensure:wasm
       - run: pnpm exec playwright install --with-deps chromium
       - name: Run real-render matrix
         run: pnpm perf:render -- --profile ${{ inputs.group == 'main' && 'quick' || 'full' }} --output .tmp/performance/current
