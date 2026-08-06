@@ -34,12 +34,15 @@ $descriptions-cell-padding-bottom: map.merge(
   $descriptions-cell-padding-bottom
 );
 
+// Bordered cell padding must sit on the canonical 4px spacing scale
+// (--fsus-space-*). Do not reintroduce off-scale 15/11/7px optical tweaks or
+// private --descriptions-* padding aliases here.
 $descriptions-bordered-cell-padding: () !default;
 $descriptions-bordered-cell-padding: map.merge(
   (
-    'large': 12px 15px,
-    'default': 8px 11px,
-    'small': 4px 7px,
+    'large': var(--fsus-space-3) var(--fsus-space-4), // 12 16
+    'default': var(--fsus-space-2) var(--fsus-space-3), // 8 12
+    'small': var(--fsus-space-1) var(--fsus-space-2), // 4 8
   ),
   $descriptions-bordered-cell-padding
 );
@@ -139,7 +142,8 @@ $descriptions-cell-font-size: map.merge(
       &:not(.is-bordered) {
         .#{$namespace}-descriptions__cell {
           padding-bottom: map.get($descriptions-cell-padding-bottom, 'default');
-          padding-inline: 12px;
+          // Same horizontal rhythm as bordered default (space-3 = 12px).
+          padding-inline: var(--fsus-space-3);
 
           &:first-child {
             padding-inline-start: 0;
@@ -156,12 +160,13 @@ $descriptions-cell-font-size: map.merge(
   @include e(stack) {
     display: none;
     margin: 0;
-    padding: 0 12px;
+    // Match non-bordered / bordered default horizontal inset (space-3).
+    padding: 0 var(--fsus-space-3);
   }
 
   @include e(stack-item) {
     display: block;
-    padding: 12px 0;
+    padding: var(--fsus-space-3) 0;
     border-bottom: 1px solid var(--fsus-border, #{getCssVar('border-color')});
 
     &:last-child {
@@ -170,7 +175,7 @@ $descriptions-cell-font-size: map.merge(
   }
 
   @include e(stack-label) {
-    margin: 0 0 4px;
+    margin: 0 0 var(--fsus-space-1);
     color: var(
       --fsus-color-text-quiet,
       #{getCssVar('text-color', 'secondary')}
@@ -207,7 +212,7 @@ $descriptions-cell-font-size: map.merge(
   @include m(responsive-scroll) {
     .#{$namespace}-descriptions__body {
       overflow-x: auto;
-      padding-inline-end: 24px;
+      padding-inline-end: var(--fsus-space-6);
       overscroll-behavior-inline: contain;
     }
 
