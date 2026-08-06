@@ -136,6 +136,13 @@ jobs:
           cache-dependency-path: |
             current/pnpm-lock.yaml
             baseline/pnpm-lock.yaml
+      - uses: emscripten-core/setup-emsdk@v15
+        if: >-
+          steps.render-impact.outputs.run == 'true' &&
+          steps.render-impact.outputs.scope != 'avalonia-only'
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
       - uses: actions/setup-dotnet@v4
         if: >-
           steps.render-impact.outputs.run == 'true' &&
@@ -169,6 +176,18 @@ jobs:
         if: steps.baseline-contract.outputs.available == 'true'
         working-directory: baseline
         run: pnpm install --frozen-lockfile
+      - name: Prepare baseline WASM artifacts
+        if: >-
+          steps.baseline-contract.outputs.available == 'true' &&
+          steps.render-impact.outputs.scope != 'avalonia-only'
+        working-directory: baseline
+        run: pnpm run ensure:wasm
+      - name: Prepare current WASM artifacts
+        if: >-
+          steps.render-impact.outputs.run == 'true' &&
+          steps.render-impact.outputs.scope != 'avalonia-only'
+        working-directory: current
+        run: pnpm run ensure:wasm
       - name: Measure same-runner baseline first
         if: steps.baseline-contract.outputs.available == 'true'
         working-directory: baseline
