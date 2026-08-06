@@ -1653,27 +1653,33 @@ button.#{$namespace}-card:active {
   -webkit-backdrop-filter: blur(0px) saturate(100%);
 }
 
+// Loading feedback (#303): identifiable spinner path + readable text.
+// Do not reintroduce decorative capsules, hidden paths, or micro uppercase labels.
 .#{$namespace}-loading-spinner {
   .circular {
     display: inline-block;
-    width: 28px;
-    height: 6px;
-    border-radius: 999px;
-    background: var(--el-fill-color-light);
-    box-shadow: inset 0 0 0 1px var(--el-border-color-lighter);
-    animation: none;
+    width: var(--el-loading-spinner-size, 42px);
+    height: var(--el-loading-spinner-size, 42px);
+    background: transparent;
+    box-shadow: none;
+    animation: loading-rotate 2s linear infinite;
   }
 
   .path {
-    display: none;
+    display: block;
+    animation: loading-dash 1.5s ease-in-out infinite;
+    stroke-dasharray: 90, 150;
+    stroke: var(--el-text-color-placeholder);
+    stroke-linecap: round;
+    stroke-width: 2;
   }
 
   .#{$namespace}-loading-text {
     color: var(--el-text-color-regular);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
+    font-size: var(--el-font-size-base, 14px);
+    font-weight: var(--el-font-weight-primary, 500);
+    letter-spacing: 0;
+    text-transform: none;
     margin-top: 12px;
   }
 }
