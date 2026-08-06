@@ -16,11 +16,11 @@
     "stub": "node ../../../scripts/with-node-heap.mjs unbuild --stub"
   },
   "dependencies": {
-    "@pnpm/find-workspace-packages": "^4.0.16",
-    "@pnpm/logger": "^4.0.0",
-    "consola": "^3.4.2"
+    "@pnpm/find-workspace-packages": "4.0.43",
+    "@pnpm/logger": "4.0.0",
+    "consola": "3.4.2"
   },
   "devDependencies": {
-    "unbuild": "^3.6.1"
+    "unbuild": "3.6.1"
   }
 }

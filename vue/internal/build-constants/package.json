@@ -15,6 +15,6 @@
     "stub": "node ../../../scripts/with-node-heap.mjs unbuild --stub"
   },
   "devDependencies": {
-    "unbuild": "^3.6.1"
+    "unbuild": "3.6.1"
   }
 }
