@@ -102,13 +102,6 @@ export default [
         navigator: 'readonly',
         console: 'readonly',
         process: 'readonly',
-        URL: 'readonly',
-        performance: 'readonly',
-        structuredClone: 'readonly',
-        Element: 'readonly',
-        Range: 'readonly',
-        DOMParser: 'readonly',
-        ShadowRoot: 'readonly',
         __DEV__: 'readonly',
       },
     },
@@ -117,7 +110,6 @@ export default [
       'no-console': ['warn', { allow: ['error'] }],
       'no-debugger': 'warn',
       'no-empty': 'off',
-      'no-setter-return': 'off',
       'no-useless-assignment': 'off',
       'no-var': 'error',
       'prefer-const': ['warn', { destructuring: 'all' }],
@@ -175,6 +167,40 @@ export default [
       'no-empty': 'off',
       'vue/prefer-import-from-vue': 'off',
       'unicorn/prefer-object-from-entries': 'off',
+    },
+  },
+
+  {
+    files: ['scripts/check-markdown-xss-browser.mjs'],
+    languageOptions: {
+      globals: {
+        URL: 'readonly',
+        performance: 'readonly',
+      },
+    },
+  },
+
+  {
+    files: ['scripts/markdown-xss-corpus.mjs'],
+    languageOptions: {
+      globals: {
+        structuredClone: 'readonly',
+      },
+    },
+  },
+
+  {
+    files: ['scripts/web-render-performance.mjs'],
+    languageOptions: {
+      globals: {
+        DOMParser: 'readonly',
+        Element: 'readonly',
+        Range: 'readonly',
+        ShadowRoot: 'readonly',
+      },
+    },
+    rules: {
+      'no-setter-return': 'off',
     },
   },
 
