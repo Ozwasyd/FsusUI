@@ -1282,20 +1282,32 @@ describe('Fsus theme visual baseline', () => {
     )
   })
 
-  test('keeps default loading primitives neutral and non-looping', () => {
+  test('ships identifiable loading spinner path, not a decorative capsule (#303)', () => {
+    // Real consumer path: fsus.scss pulls loading.scss then fsus-theme overrides.
+    // fsus-theme historically hid .path and flattened .circular into a 28×6 capsule
+    // with 11px uppercase tracking text — that is the #303 regression surface.
     const loadingCss = compileThemeFile('loading.scss')
+    const themeCss = compileThemeFile('fsus-theme.scss')
+    const shippedCss = compileThemeFile('fsus.scss')
     const spinnerCss = compileThemeFile('spinner.scss')
     const skeletonCss = compileThemeFile('skeleton.scss')
     const markdownCss = compileThemeFile('markdown-renderer.scss')
-    const themeCss = compileThemeFile('fsus-theme.scss')
 
+    // Default Loading: square spinner + visible path + low-noise stroke motion.
     expectCssRule(loadingCss, '.el-loading-spinner .circular', [
-      'background: var(--el-fill-color-light);',
-      'animation: none;',
+      'background: transparent;',
+      'box-shadow: none;',
+      'animation: loading-rotate 2s linear infinite;',
     ])
     expectCssRule(loadingCss, '.el-loading-spinner .path', [
-      'animation: none;',
-      'stroke: var(--el-border-color);',
+      'animation: loading-dash 1.5s ease-in-out infinite;',
+      'stroke: var(--el-text-color-placeholder);',
+      'stroke-dasharray: 90, 150;',
+    ])
+    expectCssRule(loadingCss, '.el-loading-spinner .el-loading-text', [
+      'font-size: var(--el-font-size-base);',
+      'letter-spacing: 0;',
+      'text-transform: none;',
     ])
     expectCssRule(loadingCss, '.el-loading-spinner.is-animated .circular', [
       'animation: loading-rotate 2s linear infinite;',
@@ -1305,6 +1317,87 @@ describe('Fsus theme visual baseline', () => {
       '[data-fsus-loading-motion=spinner] .el-loading-spinner .path',
       ['animation: loading-dash 1.5s ease-in-out infinite;'],
     )
+
+    // Theme override must reinforce the spinner contract, never capsule geometry.
+    expectCssRule(themeCss, '.el-loading-spinner .circular', [
+      'width: var(--el-loading-spinner-size, 42px);',
+      'height: var(--el-loading-spinner-size, 42px);',
+      'background: transparent;',
+      'box-shadow: none;',
+      'animation: loading-rotate 2s linear infinite;',
+    ])
+    expectCssRule(themeCss, '.el-loading-spinner .path', [
+      'display: block;',
+      'animation: loading-dash 1.5s ease-in-out infinite;',
+      'stroke: var(--el-text-color-placeholder);',
+    ])
+    expectCssRule(themeCss, '.el-loading-spinner .el-loading-text', [
+      'font-size: var(--el-font-size-base, 14px);',
+      'letter-spacing: 0;',
+      'text-transform: none;',
+    ])
+
+    // Mutation kill: decorative 28×6 capsule must not reappear on circular.
+    const circularRules = [
+      ...cssRules(loadingCss, '.el-loading-spinner .circular'),
+      ...cssRules(themeCss, '.el-loading-spinner .circular'),
+      ...cssRules(shippedCss, '.el-loading-spinner .circular'),
+    ].filter((rule) => !rule.includes('animation-duration'))
+    expect(circularRules.length).toBeGreaterThan(0)
+    for (const rule of circularRules) {
+      expect(rule).not.toMatch(/width:\s*28px/)
+      expect(rule).not.toMatch(/height:\s*6px/)
+      expect(rule).not.toMatch(/border-radius:\s*999px/)
+      expect(rule).not.toMatch(/background:\s*var\(--el-fill-color-light\)/)
+      expect(rule).not.toMatch(/animation:\s*none/)
+      expect(rule).not.toContain('punctuation-zinc-pulse')
+    }
+
+    // Mutation kill: spinner path must stay visible (not display:none).
+    const pathRules = [
+      ...cssRules(loadingCss, '.el-loading-spinner .path'),
+      ...cssRules(themeCss, '.el-loading-spinner .path'),
+      ...cssRules(shippedCss, '.el-loading-spinner .path'),
+    ].filter((rule) => !rule.includes('animation-duration'))
+    expect(pathRules.length).toBeGreaterThan(0)
+    for (const rule of pathRules) {
+      expect(rule).not.toMatch(/display:\s*none/)
+    }
+
+    // Mutation kill: micro uppercase / tracking loading copy must not return.
+    const textRules = [
+      ...cssRules(loadingCss, '.el-loading-text'),
+      ...cssRules(themeCss, '.el-loading-text'),
+      ...cssRules(shippedCss, '.el-loading-text'),
+    ]
+    expect(textRules.length).toBeGreaterThan(0)
+    for (const rule of textRules) {
+      expect(rule).not.toMatch(/font-size:\s*11px/)
+      expect(rule).not.toMatch(/letter-spacing:\s*0\.15em/)
+      expect(rule).not.toMatch(/text-transform:\s*uppercase/)
+      expect(rule).not.toMatch(/font-weight:\s*700/)
+    }
+
+    // Integrated bundle keeps spinner motion and paper mask.
+    expect(shippedCss).toContain('animation: loading-rotate 2s linear infinite')
+    expect(shippedCss).toContain(
+      'animation: loading-dash 1.5s ease-in-out infinite',
+    )
+    expect(shippedCss).toContain('text-transform: none')
+    expectCssRule(shippedCss, '.el-loading-mask', [
+      'backdrop-filter: blur(0px) saturate(100%);',
+    ])
+    // No shimmer / pulse / brand glow on the loading surface.
+    expect(shippedCss).not.toContain('punctuation-zinc-pulse')
+    expect(themeCss).not.toContain('punctuation-zinc-pulse 1.2s')
+    expect(loadingCss).not.toMatch(
+      /\.el-loading-spinner[^{]*\{[^}]*linear-gradient/s,
+    )
+    expect(themeCss).not.toMatch(
+      /\.el-loading-spinner[^{]*\{[^}]*linear-gradient/s,
+    )
+
+    // Adjacent feedback primitives stay neutral (out of #303 spinner scope).
     expectCssRule(spinnerCss, '.el-spinner-inner', [
       'background-color: var(--el-fill-color-light, #f4f4f5);',
       'animation: none;',
@@ -1322,11 +1415,6 @@ describe('Fsus theme visual baseline', () => {
       'animation: none;',
     ])
     expect(markdownCss).not.toContain('markdown-renderer-spin')
-    expectCssRule(themeCss, '.el-loading-spinner .circular', [
-      'background: var(--el-fill-color-light);',
-      'animation: none;',
-    ])
-    expect(themeCss).not.toContain('punctuation-zinc-pulse 1.2s')
   })
 
   test('keeps inline action buttons from wrapping into neighboring content', () => {
@@ -2671,7 +2759,15 @@ describe('Fsus theme visual baseline', () => {
       expectCssRule(
         css,
         '.el-public-shell-mobile-search-enter-active, .el-public-shell-mobile-search-leave-active',
-        ['transition: none;'],
+        [
+          'transition-duration: 1ms !important;',
+          'transition-delay: 0ms !important;',
+        ],
+      )
+      expectCssRule(
+        css,
+        '.el-public-shell-mobile-search-enter-from, .el-public-shell-mobile-search-leave-to',
+        ['transform: none;'],
       )
     }
   })
@@ -2730,7 +2826,15 @@ describe('Fsus theme visual baseline', () => {
       expectCssRule(
         css,
         '.el-public-shell-desktop-search-enter-active, .el-public-shell-desktop-search-leave-active',
-        ['transition: none;'],
+        [
+          'transition-duration: 1ms !important;',
+          'transition-delay: 0ms !important;',
+        ],
+      )
+      expectCssRule(
+        css,
+        '.el-public-shell-desktop-search-enter-from, .el-public-shell-desktop-search-leave-to',
+        ['transform: none;'],
       )
     }
   })
@@ -2761,12 +2865,88 @@ describe('Fsus theme visual baseline', () => {
       expectCssRule(
         css,
         '.el-public-shell-mobile-nav-menu-enter-active, .el-public-shell-mobile-nav-menu-leave-active',
-        ['transition: none;'],
+        [
+          'transition-duration: 1ms !important;',
+          'transition-delay: 0ms !important;',
+        ],
       )
       expectCssRule(
         css,
         '.el-public-shell-mobile-nav-menu-enter-from, .el-public-shell-mobile-nav-menu-leave-to',
         ['transform: none;'],
+      )
+    }
+  })
+
+  test('keeps public-shell Vue disclosure state machines at 1ms under reduced motion', () => {
+    const publicShellCss = compileThemeFile('public-shell.scss')
+    const criticalCss = compileThemeFile('public-shell-critical.scss')
+    const reducedMotionActiveSelectors = [
+      '.el-public-shell-mobile-nav-menu-enter-active',
+      '.el-public-shell-mobile-nav-menu-leave-active',
+      '.el-public-shell-mobile-search-enter-active',
+      '.el-public-shell-mobile-search-leave-active',
+      '.el-public-shell-desktop-search-enter-active',
+      '.el-public-shell-desktop-search-leave-active',
+    ] as const
+    const reducedMotionFromToSelectors = [
+      '.el-public-shell-mobile-nav-menu-enter-from',
+      '.el-public-shell-mobile-nav-menu-leave-to',
+      '.el-public-shell-mobile-search-enter-from',
+      '.el-public-shell-mobile-search-leave-to',
+      '.el-public-shell-desktop-search-enter-from',
+      '.el-public-shell-desktop-search-leave-to',
+    ] as const
+
+    const extractReducedMotionBlocks = (css: string) => {
+      const blocks: string[] = []
+      const pattern =
+        /@media\s*\(\s*prefers-reduced-motion:\s*reduce\s*\)\s*\{/g
+      for (const hit of css.matchAll(pattern)) {
+        const start = hit.index! + hit[0].length
+        let depth = 1
+        let i = start
+        while (i < css.length && depth > 0) {
+          if (css[i] === '{') depth += 1
+          else if (css[i] === '}') depth -= 1
+          i += 1
+        }
+        blocks.push(css.slice(start, i - 1))
+      }
+      return blocks.join('\n')
+    }
+
+    for (const css of [publicShellCss, criticalCss]) {
+      const reduced = extractReducedMotionBlocks(css)
+      expect(reduced.length).toBeGreaterThan(0)
+
+      for (const selector of reducedMotionActiveSelectors) {
+        expectCssRule(reduced, selector, [
+          'transition-duration: 1ms !important;',
+          'transition-delay: 0ms !important;',
+        ])
+        const rules = cssRules(reduced, selector)
+        expect(rules.length).toBeGreaterThan(0)
+        for (const rule of rules) {
+          expect(rule).not.toMatch(/transition\s*:\s*none/i)
+          expect(rule).not.toMatch(/transition-duration\s*:\s*0(?:\.0+)?ms/i)
+          expect(rule).not.toMatch(/transition-duration\s*:\s*0\.01ms/i)
+          expect(rule).toMatch(/transition-duration\s*:\s*1ms\s*!important/i)
+          expect(rule).toMatch(/transition-delay\s*:\s*0ms\s*!important/i)
+        }
+      }
+
+      for (const selector of reducedMotionFromToSelectors) {
+        expectCssRule(reduced, selector, ['transform: none;'])
+      }
+
+      expectCssRule(
+        reduced,
+        '.el-public-shell-mobile-nav-menu-enter-active, .el-public-shell-mobile-nav-menu-leave-active, .el-public-shell-mobile-search-enter-active, .el-public-shell-mobile-search-leave-active, .el-public-shell-desktop-search-enter-active, .el-public-shell-desktop-search-leave-active',
+        [
+          'transition-duration: 1ms !important;',
+          'transition-delay: 0ms !important;',
+        ],
       )
     }
   })

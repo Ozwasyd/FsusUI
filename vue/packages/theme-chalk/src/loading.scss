@@ -57,29 +57,34 @@
 
   .#{$namespace}-loading-text {
     color: getCssVar('text-color', 'regular');
-    margin: 3px 0;
+    margin: 12px 0 3px;
     font-size: getCssVar('font-size', 'base');
+    font-weight: getCssVar('font-weight-primary');
+    letter-spacing: 0;
+    text-transform: none;
   }
 
+  // Default: identifiable circular spinner path (not a decorative capsule).
+  // Low-noise stroke + rotate/dash; no fill, shimmer, glow, or pulse.
   .circular {
     display: inline-block;
     height: getCssVar('loading-spinner-size');
     width: getCssVar('loading-spinner-size');
-    border-radius: 999px;
-    background: getCssVar('fill-color', 'light');
-    box-shadow: inset 0 0 0 1px getCssVar('border-color-lighter');
-    animation: none;
+    background: transparent;
+    box-shadow: none;
+    animation: loading-rotate 2s linear infinite;
   }
 
   .path {
-    animation: none;
-    stroke-dasharray: none;
+    animation: loading-dash 1.5s ease-in-out infinite;
+    stroke-dasharray: 90, 150;
     stroke-dashoffset: 0;
     stroke-width: 2;
-    stroke: getCssVar('border-color');
+    stroke: getCssVar('text-color', 'placeholder');
     stroke-linecap: round;
   }
 
+  // Opt-in aliases keep the same identifiable spinner contract.
   @include when(animated) {
     .circular {
       background: transparent;
@@ -144,9 +149,11 @@
     transition-duration: 1ms !important;
   }
 
+  // Decorative loops collapse to a single static frame; text/ARIA still carry
+  // the loading state (see design.md reduced-motion policy for non-state-machine loops).
   .#{$namespace}-loading-spinner .circular,
   .#{$namespace}-loading-spinner .path {
-    animation-duration: 1ms !important;
+    animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
 }
