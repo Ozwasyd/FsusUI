@@ -1,0 +1,177 @@
+name: Apply CI artifact preparation fix
+
+on:
+  push:
+    branches:
+      - agent/fix-ci-artifact-preparation
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/fix-ci-artifact-preparation
+          fetch-depth: 0
+      - name: Apply verified CI patch
+        shell: python
+        run: |
+          from pathlib import Path
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              file = Path(path)
+              text = file.read_text(encoding='utf-8')
+              if new in text:
+                  return
+              if old not in text:
+                  raise SystemExit(f'expected fragment missing from {path}: {old!r}')
+              file.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          replace_once(
+              'vue/eslint.config.mjs',
+              "      '**/node_modules/**',\n",
+              "      '**/node_modules/**',\n      '**/emsdk-cache/**',\n",
+          )
+          replace_once(
+              '.gitignore',
+              ".eslintcache\n",
+              ".eslintcache\n/emsdk-cache/\n",
+          )
+          replace_once(
+              'package.json',
+              '    "verify:pr-fast": "run-s prepare:test-artifacts _verify:pr-fast:parallel",\n',
+              '    "verify:pr-fast": "run-s prepare:test-artifacts build:theme _verify:pr-fast:parallel",\n',
+          )
+          replace_once(
+              '.github/workflows/quality.yml',
+              """          cache-dependency-path: |
+            current/pnpm-lock.yaml
+            baseline/pnpm-lock.yaml
+      - uses: actions/setup-dotnet@v4
+""",
+              """          cache-dependency-path: |
+            current/pnpm-lock.yaml
+            baseline/pnpm-lock.yaml
+      - uses: emscripten-core/setup-emsdk@v15
+        if: >-
+          steps.render-impact.outputs.run == 'true' &&
+          steps.render-impact.outputs.scope != 'avalonia-only'
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
+      - uses: actions/setup-dotnet@v4
+""",
+          )
+          replace_once(
+              '.github/workflows/quality.yml',
+              """      - name: Install baseline dependencies
+        if: steps.baseline-contract.outputs.available == 'true'
+        working-directory: baseline
+        run: pnpm install --frozen-lockfile
+      - name: Measure same-runner baseline first
+""",
+              """      - name: Install baseline dependencies
+        if: steps.baseline-contract.outputs.available == 'true'
+        working-directory: baseline
+        run: pnpm install --frozen-lockfile
+      - name: Prepare baseline WASM artifacts
+        if: >-
+          steps.baseline-contract.outputs.available == 'true' &&
+          steps.render-impact.outputs.scope != 'avalonia-only'
+        working-directory: baseline
+        run: pnpm run ensure:wasm
+      - name: Prepare current WASM artifacts
+        if: >-
+          steps.render-impact.outputs.run == 'true' &&
+          steps.render-impact.outputs.scope != 'avalonia-only'
+        working-directory: current
+        run: pnpm run ensure:wasm
+      - name: Measure same-runner baseline first
+""",
+          )
+          replace_once(
+              '.github/workflows/_quality.yml',
+              """      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: dotnet/global.json
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+""",
+              """      - uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: dotnet/global.json
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run ensure:wasm
+      - run: pnpm exec playwright install --with-deps chromium
+""",
+          )
+          replace_once(
+              'scripts/check-verify-gates.mjs',
+              """assert(
+  scripts['verify:pr-fast']?.includes('_verify:pr-fast:parallel'),
+  'verify:pr-fast must use the explicit PR-fast parallel group',
+)
+for (const script of ['_verify:pr-fast:parallel', '_verify:parallel']) {
+""",
+              """assert(
+  scripts['verify:pr-fast']?.includes('_verify:pr-fast:parallel'),
+  'verify:pr-fast must use the explicit PR-fast parallel group',
+)
+assert(
+  scripts['verify:pr-fast']?.includes('build:theme') &&
+    scripts['verify:pr-fast'].indexOf('build:theme') <
+      scripts['verify:pr-fast'].indexOf('_verify:pr-fast:parallel'),
+  'verify:pr-fast must prepare theme artifacts before package smoke enters the parallel group',
+)
+for (const script of ['_verify:pr-fast:parallel', '_verify:parallel']) {
+""",
+          )
+          replace_once(
+              'scripts/check-render-performance-contract.mjs',
+              """for (const token of impactOutputTokens) {
+  if (!quality.includes(token))
+    failures.push(`PR impact workflow missing ${token}`)
+}
+if (
+""",
+              """for (const token of impactOutputTokens) {
+  if (!quality.includes(token))
+    failures.push(`PR impact workflow missing ${token}`)
+}
+for (const token of [
+  'emscripten-core/setup-emsdk@v15',
+  'Prepare baseline WASM artifacts',
+  'Prepare current WASM artifacts',
+  'pnpm run ensure:wasm',
+]) {
+  if (!quality.includes(token))
+    failures.push(`PR real-render artifact preflight missing ${token}`)
+}
+for (const token of [
+  'emscripten-core/setup-emsdk@v15',
+  'pnpm run ensure:wasm',
+]) {
+  if (!reusable.includes(token))
+    failures.push(`Reusable real-render artifact preflight missing ${token}`)
+}
+if (
+""",
+          )
+
+          Path('.github/workflows/agent-apply-ci-fix.yml').unlink()
+      - name: Commit applied fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "fix(ci): prepare generated artifacts before quality gates"
+          git push origin HEAD:agent/fix-ci-artifact-preparation
