@@ -25,6 +25,15 @@
         >
           查看审阅记录
         </el-button>
+<<<<<<< Updated upstream
+=======
+        <el-button
+          v-bind="{ 'data-testid': 'open-long-title-dialog' }"
+          @click="longTitleDialogVisible = true"
+        >
+          长标题 Dialog
+        </el-button>
+>>>>>>> Stashed changes
         <el-dialog v-model="dialogVisible" title="确认发布" width="30%">
           <span>发布后读者将看到最新版本。</span>
           <template #footer>
@@ -36,7 +45,18 @@
             </span>
           </template>
         </el-dialog>
-        <el-drawer v-model="drawerVisible" title="审阅记录" direction="rtl">
+        <el-dialog
+          v-model="longTitleDialogVisible"
+          title="确认发布超长中英文标题 Confirmation with very long Latin and 中文混合标题避免与关闭按钮重叠"
+          width="30%"
+        >
+          <span>长标题不得侵入 54px 关闭命中盒。</span>
+        </el-dialog>
+        <el-drawer
+          v-model="drawerVisible"
+          title="审阅记录超长标题 Review history with extended Latin and 中文"
+          direction="rtl"
+        >
           <span>查看最近一次修改摘要。</span>
         </el-drawer>
       </el-space>
@@ -68,6 +88,7 @@
       <h3>Message / MessageBox / Notification</h3>
       <el-space wrap>
         <el-button @click="showMessage">Message</el-button>
+<<<<<<< Updated upstream
         <el-button @click="showMessageBox">MessageBox</el-button>
         <el-button
           v-bind="{ 'data-testid': 'open-notification' }"
@@ -75,6 +96,15 @@
         >
           Notification
         </el-button>
+=======
+        <el-button
+          v-bind="{ 'data-testid': 'open-message-box' }"
+          @click="showMessageBox"
+        >
+          MessageBox
+        </el-button>
+        <el-button @click="showNotification">Notification</el-button>
+>>>>>>> Stashed changes
       </el-space>
     </div>
     <div class="demo-block">
@@ -109,6 +139,7 @@ import { useDemoState } from '../demo-state'
 
 const {
   dialogVisible,
+  longTitleDialogVisible,
   drawerVisible,
   overlayVisible,
   showMessage,

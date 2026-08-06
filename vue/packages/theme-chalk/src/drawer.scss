@@ -32,16 +32,20 @@ $drawer-inline-pad: getCssVar('drawer-padding-primary');
     display: flex;
     margin-bottom: 0;
     padding: $drawer-block-pad $drawer-inline-pad;
+    // Stable reserve for absolute 54x54 close (LTR + RTL panels) (#299).
+    padding-inline-end: calc(#{$drawer-inline-pad} + 54px);
     position: relative;
 
     & > :first-child {
       flex: 1;
+      min-width: 0;
     }
   }
 
   &__title {
     margin: 0;
     flex: 1;
+    min-width: 0;
     line-height: 1.2;
     font-size: 1.5rem;
     font-weight: 700;
@@ -55,9 +59,10 @@ $drawer-inline-pad: getCssVar('drawer-padding-primary');
   }
 
   &__close-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    // Overlay chrome close: 54x54 hit box, ~16px optical icon (#299).
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
     width: 54px;
     height: 54px;
     min-width: 54px;
@@ -69,8 +74,11 @@ $drawer-inline-pad: getCssVar('drawer-padding-primary');
     color: inherit;
     background-color: transparent;
     outline: none;
-    border-radius: 999px;
+    border-radius: var(--fsus-radius-pill, 999px);
+    transform: none;
+    z-index: 1;
     // Absolute close is not shifted by header padding; consume top safe-area.
+    position: absolute;
     @include fsus-inset-safe-area(top, $drawer-block-pad);
     right: $drawer-inline-pad;
     &:focus,

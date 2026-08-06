@@ -56,6 +56,10 @@
     position: relative;
     padding: getCssVar('messagebox-padding-primary');
     padding-bottom: 10px;
+    // Reserve the 54px overlay-close hit box so long titles never underlap (#299).
+    padding-inline-end: calc(
+      #{getCssVar('messagebox-padding-primary')} + 54px
+    );
   }
 
   @include e(title) {
@@ -67,11 +71,16 @@
   }
 
   @include e(headerbtn) {
-    @include ghost-icon-button(44px, 999px);
+    // Overlay chrome close: fixed 54x54 hit target; icon stays ~16-18px (#299).
+    @include ghost-icon-button(54px, var(--fsus-radius-pill, 999px), 0, true);
+    min-width: 54px;
+    min-height: 54px;
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 0;
+    right: 0;
     outline: none;
+    transform: none;
+    z-index: 1;
     font-size: var(
       #{getCssVarName('message-close-size')},
       map.get($message, 'close-size')

@@ -1620,7 +1620,58 @@ describe('Fsus theme visual baseline', () => {
       'min-width: 54px;',
       'min-height: 54px;',
       'padding: 0;',
+      'position: absolute;',
+      'transform: none;',
     ])
+    const dialogCss = compileThemeFile('dialog.scss')
+    expectCssRule(dialogCss, '.el-dialog__headerbtn', [
+      'width: 54px;',
+      'height: 54px;',
+      'min-width: 54px;',
+      'min-height: 54px;',
+      'transform: none;',
+    ])
+    const messageBoxCss = compileThemeFile('message-box.scss')
+    expectCssRule(messageBoxCss, '.el-message-box__headerbtn', [
+      'width: 54px;',
+      'height: 54px;',
+      'min-width: 54px;',
+      'min-height: 54px;',
+      'transform: none;',
+    ])
+    // Theme convergence: overlay closes share 54px; compact notification/alert stay 44.
+    const themeCss = compileThemeFile('fsus-theme.scss')
+    expectCssRule(themeCss, '.el-dialog__headerbtn', [
+      'width: 54px;',
+      'height: 54px;',
+      'min-width: 54px;',
+      'min-height: 54px;',
+    ])
+    expectCssRule(themeCss, '.el-drawer__close-btn', [
+      'width: 54px;',
+      'height: 54px;',
+      'min-width: 54px;',
+      'min-height: 54px;',
+    ])
+    expectCssRule(themeCss, '.el-message-box__headerbtn', [
+      'width: 54px;',
+      'height: 54px;',
+      'min-width: 54px;',
+      'min-height: 54px;',
+    ])
+    expectCssRule(themeCss, '.el-notification__closeBtn', [
+      'min-width: 44px;',
+      'min-height: 44px;',
+    ])
+    expectCssRule(themeCss, '.el-alert__close-btn', [
+      'min-width: 44px;',
+      'min-height: 44px;',
+    ])
+    // Mutation kill: overlay closes must not stay on the 44px compact ladder.
+    expect(messageBoxCss).not.toContain('min-width: 44px')
+    expect(themeCss).not.toMatch(
+      /\.el-dialog__headerbtn[^{]*\{[^}]*min-width:\s*44px/s,
+    )
     expectCssRule(dropdownCss, '.el-dropdown-menu', ['padding: 8px 0;'])
     expectCssRule(tableCss, '.el-table .cell', ['padding: 0 16px;'])
     expectCssRule(
