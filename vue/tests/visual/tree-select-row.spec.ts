@@ -63,7 +63,8 @@ test('TreeSelect renders one coherent navigation row', async ({
 
   expect(metrics.display).toBe('grid')
   expect(metrics.height).toBe('44px')
-  expect(metrics.radius).toBe('6px')
+  // Flat row contract (#296): computed radius is 0 — not navigation card chrome.
+  expect(metrics.radius).toBe('0px')
   expect(metrics.background).not.toBe('rgba(0, 0, 0, 0)')
   expect(metrics.expandOpacity).toBe('1')
   expect(metrics.expandVisibility).toBe('visible')

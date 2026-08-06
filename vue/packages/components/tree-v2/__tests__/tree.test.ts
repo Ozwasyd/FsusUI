@@ -178,7 +178,7 @@ const createTree = (
           defaultCheckedKeys: undefined,
           checkStrictly: false,
           defaultExpandedKeys: undefined,
-          indent: 16,
+          indent: 24,
           itemSize: 26,
           iconClass: undefined,
           expandOnClickNode: true,

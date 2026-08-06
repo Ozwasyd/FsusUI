@@ -134,7 +134,8 @@ export default defineComponent({
     accordion: Boolean,
     indent: {
       type: Number,
-      default: 18,
+      // Shared Tree / TreeV2 / TreeSelect hierarchy indent contract (#296).
+      default: 24,
     },
     icon: {
       type: iconPropType,

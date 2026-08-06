@@ -206,7 +206,12 @@
   --fsus-tree-drop-indicator-color: var(--fsus-state-focus-border);
   --fsus-tree-drop-inner-bg: var(--fsus-state-emphasis-bg);
   --fsus-tree-drop-inner-text: var(--fsus-ink);
+  // Tree/TreeV2/TreeSelect shared row contract (#296): flat rows, 24px indent,
+  // Scholarly Blue current marker (not gray fill alone).
+  --fsus-tree-indent: 24px;
   --fsus-tree-current-bg: var(--fsus-state-selected-bg);
+  --fsus-tree-current-text: var(--fsus-scholarly-blue);
+  --fsus-tree-current-marker: var(--fsus-scholarly-blue);
   --fsus-pagination-active-bg: var(--fsus-state-selected-bg);
   --fsus-pagination-active-text: var(--fsus-scholarly-blue);
   --fsus-pagination-active-border: var(--fsus-state-focus-border);

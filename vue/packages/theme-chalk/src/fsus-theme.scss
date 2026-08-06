@@ -2566,24 +2566,68 @@ button.#{$namespace}-card:active {
   background: var(--el-fill-color-light);
 }
 
+// Tree / TreeV2 / TreeSelect shared document-row contract (#296):
+// - flat node rows (radius 0, no shadow, no vertical card gap)
+// - hierarchy via 24px indent (--fsus-tree-indent) + expand icon, not card chrome
+// - hover = weak fill; current = Scholarly Blue side marker + selected fill
+// - focus-visible = 2px inset ring, visible together with current
 .#{$namespace}-tree {
   padding: 12px;
 }
 
 .#{$namespace}-tree-node__content {
-  min-height: 44px;
+  min-height: var(--el-tree-node-content-height, 44px);
+  margin: 0;
   padding-right: 10px;
-  border-radius: 12px;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
   color: var(--el-text-color-regular);
 }
 
-.#{$namespace}-tree-node__content:hover,
-.#{$namespace}-tree-node:focus > .#{$namespace}-tree-node__content,
+// Hover: weak fill only — no radius, no lift, no panel chrome.
+.#{$namespace}-tree-node__content:hover {
+  background: var(--fsus-state-hover-bg, var(--el-fill-color-light));
+  color: var(--el-text-color-primary);
+}
+
+// Current: Scholarly Blue functional marker (not gray fill / bold alone).
 .#{$namespace}-tree--highlight-current
   .#{$namespace}-tree-node.is-current
   > .#{$namespace}-tree-node__content {
-  background: var(--el-fill-color);
-  color: var(--el-text-color-primary);
+  background: var(--fsus-tree-current-bg, var(--fsus-state-selected-bg));
+  color: var(--fsus-tree-current-text, var(--fsus-scholarly-blue));
+  font-weight: 500;
+  box-shadow: inset 3px 0 0
+    var(--fsus-tree-current-marker, var(--fsus-scholarly-blue));
+}
+
+// Keyboard focus: 2px inset ring on the flat row.
+.#{$namespace}-tree-node:focus-visible > .#{$namespace}-tree-node__content {
+  outline: none !important;
+  box-shadow: inset 0 0 0 2px
+    var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;
+}
+
+// Current + focus-visible: side marker and ring both remain visible.
+.#{$namespace}-tree--highlight-current
+  .#{$namespace}-tree-node.is-current:focus-visible
+  > .#{$namespace}-tree-node__content {
+  outline: none !important;
+  box-shadow:
+    inset 3px 0 0 var(--fsus-tree-current-marker, var(--fsus-scholarly-blue)),
+    inset 0 0 0 2px
+      var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;
+}
+
+// Disabled rows stay readable (no opacity fade that collapses hierarchy).
+.#{$namespace}-tree-node.is-disabled > .#{$namespace}-tree-node__content,
+.#{$namespace}-tree-node[aria-disabled='true']
+  > .#{$namespace}-tree-node__content {
+  color: var(--el-text-color-disabled);
+  cursor: not-allowed;
+  background: transparent;
+  box-shadow: none;
 }
 
 .#{$namespace}-tree-node__expand-icon {
@@ -3276,7 +3320,7 @@ button.#{$namespace}-card:active {
   .#{$namespace}-pager li:not(.is-active):focus,
   .#{$namespace}-tree-node:not(.is-current)
     > .#{$namespace}-tree-node__content:hover,
-  .#{$namespace}-tree-node:not(.is-current):focus
+  .#{$namespace}-tree-node:not(.is-current):focus:not(:focus-visible)
     > .#{$namespace}-tree-node__content,
   .#{$namespace}-table
     .#{$namespace}-table__row:hover
@@ -3295,13 +3339,20 @@ button.#{$namespace}-card:active {
     > .#{$namespace}-sub-menu__title:active,
   .#{$namespace}-pagination button:not(:disabled):active,
   .#{$namespace}-pager li:not(.is-active):active,
-  .#{$namespace}-tree-node:not(.is-current)
-    > .#{$namespace}-tree-node__content:active,
   .#{$namespace}-upload-list__item:active {
     background: var(--fsus-state-hover-bg);
     color: var(--fsus-scholarly-blue);
     box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);
     transform: translate3d(0, 1px, 0);
+  }
+
+  // Tree rows keep stable hit geometry on coarse pointers (no press translate).
+  .#{$namespace}-tree-node:not(.is-current)
+    > .#{$namespace}-tree-node__content:active {
+    background: var(--fsus-state-hover-bg);
+    color: var(--fsus-scholarly-blue);
+    box-shadow: none;
+    transform: none;
   }
 
   // Tabs keep a stable hit geometry on coarse pointers too — active is color +

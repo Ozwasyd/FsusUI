@@ -47,11 +47,12 @@
 @include b(tree-node) {
   white-space: nowrap;
   outline: none;
-  &:focus {
-    /* focus */
+
+  // Flat document rows: keyboard focus uses a 2px inset ring (no panel radius).
+  // Pair with current so both markers stay visible when focused+current (#296).
+  &:focus-visible {
     > .#{$namespace}-tree-node__content {
-      background-color: getCssVar('tree-node-hover-bg-color');
-      @include a11y-focus-ring(2px, getCssVar('border-radius-base'));
+      @include a11y-focus-ring(2px, 0);
     }
   }
 
@@ -71,8 +72,11 @@
     display: flex;
     align-items: center;
     height: getCssVar('tree-node-content-height');
+    margin: 0;
     padding-right: 10px;
-    border-radius: getCssVar('border-radius-base');
+    // Flat row: hierarchy is indent + expand, not per-node card chrome (#296).
+    border-radius: 0;
+    box-shadow: none;
     cursor: pointer;
 
     & > .#{$namespace}-tree-node__expand-icon {
@@ -138,6 +142,8 @@
   }
 }
 
+// Current: Scholarly Blue side marker + selected fill + blue text.
+// Not gray fill or bold alone (#296).
 .#{$namespace}-tree--highlight-current
   .#{$namespace}-tree-node.is-current
   > .#{$namespace}-tree-node__content {
@@ -145,4 +151,19 @@
     --fsus-tree-current-bg,
     var(--fsus-state-selected-bg)
   );
+  color: var(--fsus-tree-current-text, var(--fsus-scholarly-blue));
+  font-weight: 500;
+  box-shadow: inset 3px 0 0
+    var(--fsus-tree-current-marker, var(--fsus-scholarly-blue));
+}
+
+// Current + focus-visible: side marker and full inset ring both remain visible.
+.#{$namespace}-tree--highlight-current
+  .#{$namespace}-tree-node.is-current:focus-visible
+  > .#{$namespace}-tree-node__content {
+  outline: none !important;
+  box-shadow:
+    inset 3px 0 0 var(--fsus-tree-current-marker, var(--fsus-scholarly-blue)),
+    inset 0 0 0 2px
+      var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;
 }
