@@ -3958,4 +3958,176 @@ describe('Fsus theme visual baseline', () => {
     )
     expect(shippedCss).toContain('--fsus-tree-indent: 24px')
   })
+
+  test('ships low-noise Upload dragger input area with restrained drag-over (#455)', () => {
+    // Real consumer path: fsus.scss pulls upload.scss then fsus-theme overrides.
+    // Historical surface: 67px decorative icon, 2px border+padding drag-over shift,
+    // 180px tall center composition, 6px radius, active translate displacement.
+    const uploadCss = compileThemeFile('upload.scss')
+    const themeCss = compileThemeFile('fsus-theme.scss')
+    const formCss = compileThemeFile('form.scss')
+    const shippedCss = compileThemeFile('fsus.scss')
+    const varSource = readFileSync(
+      path.resolve(themeSourceDir, 'common/var.scss'),
+      'utf8',
+    )
+
+    // Paper panel geometry: 12px panel radius, dashed border, ≥44px hit path.
+    expectCssRule(uploadCss, '.el-upload-dragger', [
+      'border-radius: var(--fsus-radius-panel, 12px);',
+      'min-height: 44px;',
+      'letter-spacing: normal;',
+      'font-size: var(--el-font-size-base);',
+    ])
+    expectCssRule(themeCss, '.el-upload-dragger', [
+      'border-radius: var(--fsus-radius-panel);',
+      'min-height: 44px;',
+      'background: var(--el-bg-color);',
+      'border-style: dashed;',
+    ])
+    expect(themeCss).toMatch(
+      /\.el-upload-dragger\s*\{[^}]*min-height:\s*44px/s,
+    )
+    // Compact padding — not the old 180px decorative stage.
+    expect(themeCss).not.toMatch(
+      /\.el-upload-dragger\s*\{[^}]*min-height:\s*180px/s,
+    )
+    expect(varSource).toContain("'dragger-padding-horizontal': 16px")
+    expect(varSource).toContain("'dragger-padding-vertical': 20px")
+    expect(varSource).not.toContain("'dragger-padding-horizontal': 40px")
+
+    // Auxiliary icon budget 16–24px (token defaults to 16md); never 67px.
+    expectCssRule(uploadCss, '.el-icon--upload', [
+      'font-size: var(--el-upload-dragger-icon-size, var(--fsus-icon-size-md, 16px));',
+    ])
+    expectCssRule(themeCss, '.el-upload-dragger .el-icon--upload', [
+      'font-size: var(--el-upload-dragger-icon-size, 16px);',
+    ])
+    expect(themeCss).toContain(
+      '--el-upload-dragger-icon-size: var(--fsus-icon-size-md, 16px)',
+    )
+
+    // Mutation kill: giant decorative icon must not reappear.
+    for (const css of [uploadCss, themeCss, shippedCss]) {
+      expect(css).not.toMatch(/font-size:\s*67px/)
+      expect(css).not.toMatch(/line-height:\s*50px/)
+    }
+
+    // Primary instruction 14px; optional help 12px; no 11px micro-copy.
+    expectCssRule(uploadCss, '.el-upload-dragger .el-upload__text', [
+      'font-size: var(--el-font-size-base);',
+      'letter-spacing: normal;',
+    ])
+    expectCssRule(themeCss, '.el-upload-dragger .el-upload__text', [
+      'font-size: var(--el-font-size-base, 14px);',
+      'letter-spacing: normal;',
+    ])
+    expectCssRule(themeCss, '.el-upload-dragger > [data-upload-help]', [
+      'font-size: 12px;',
+      'letter-spacing: normal;',
+    ])
+    expectCssRule(uploadCss, '.el-upload__tip', ['font-size: 12px;'])
+
+    const textRules = [
+      ...cssRules(uploadCss, '.el-upload__text'),
+      ...cssRules(themeCss, '.el-upload__text'),
+      ...cssRules(shippedCss, '.el-upload__text'),
+    ]
+    expect(textRules.length).toBeGreaterThan(0)
+    for (const rule of textRules) {
+      expect(rule).not.toMatch(/font-size:\s*11px/)
+      expect(rule).not.toMatch(/letter-spacing:\s*0\.1/)
+      expect(rule).not.toMatch(/text-transform:\s*uppercase/)
+    }
+
+    // Drag-over: border + weak background only — no padding/border-width shift,
+    // no glow, scale, shimmer, pulse, or translate displacement.
+    expectCssRule(uploadCss, '.el-upload-dragger.is-dragover', [
+      'background-color: var(--fsus-state-emphasis-bg);',
+      'border-width: 1px;',
+      'box-shadow: none;',
+      'transform: none;',
+    ])
+    expectCssRule(themeCss, '.el-upload-dragger.is-dragover', [
+      'background: var(--fsus-state-emphasis-bg);',
+      'border-width: 1px;',
+      'box-shadow: none;',
+      'transform: none;',
+    ])
+    // Mutation kill: 2px border + padding compensation (layout shift) must not return.
+    expect(uploadCss).not.toMatch(
+      /\.el-upload-dragger\.is-dragover\s*\{[^}]*border:\s*2px/s,
+    )
+    expect(uploadCss).not.toMatch(
+      /\.el-upload-dragger\.is-dragover\s*\{[^}]*padding:\s*calc/s,
+    )
+    for (const css of [uploadCss, themeCss, shippedCss]) {
+      const dragoverRules = cssRules(css, '.el-upload-dragger.is-dragover')
+      for (const rule of dragoverRules) {
+        expect(rule).not.toMatch(/box-shadow:\s*(?!none)[^;]*rgba/)
+        expect(rule).not.toMatch(/filter:\s*(?!none)[^;]*blur/)
+        expect(rule).not.toMatch(/transform:\s*(?!none)[^;]*scale/)
+        expect(rule).not.toMatch(/transform:\s*(?!none)[^;]*translate/)
+        expect(rule).not.toMatch(/animation:/)
+      }
+    }
+
+    // Hover / active: no translate displacement on the input area.
+    const activeRules = cssRules(themeCss, '.el-upload-dragger:active')
+    expect(activeRules.length).toBeGreaterThan(0)
+    for (const rule of activeRules) {
+      expect(rule).not.toMatch(/translate/)
+      expect(rule).toMatch(/transform:\s*none/)
+    }
+
+    // Focus-visible maps onto the Paper panel radius ring.
+    expect(uploadCss).toMatch(
+      /\.el-upload\.is-focus-visible-dragger\s+\.el-upload-dragger/,
+    )
+    expect(uploadCss).toMatch(/\.el-upload\.is-drag:focus-visible/)
+    expectCssRule(
+      uploadCss,
+      '.el-upload.is-focus-visible-dragger .el-upload-dragger',
+      ['box-shadow:'],
+    )
+
+    // Disabled keeps solid disabled tokens (opacity 1, not faded).
+    expectCssRule(
+      themeCss,
+      '.el-upload.is-disabled .el-upload-dragger',
+      [
+        'background: var(--el-disabled-bg-color);',
+        'border-color: var(--el-disabled-border-color);',
+        'opacity: 1;',
+      ],
+    )
+
+    // Error / invalid form state is distinguishable on the dragger.
+    expectCssRule(formCss, '.el-form-item.is-error .el-upload-dragger', [
+      'border-color: var(--el-color-danger);',
+    ])
+    expectCssRule(themeCss, '.el-form-item.is-error .el-upload-dragger', [
+      'border-color: var(--el-color-danger);',
+    ])
+
+    // Default material: no blur / glass / gradient / illustration on the control.
+    const draggerRules = [
+      ...cssRules(uploadCss, '.el-upload-dragger'),
+      ...cssRules(themeCss, '.el-upload-dragger'),
+    ]
+    for (const rule of draggerRules) {
+      expect(rule).not.toMatch(/backdrop-filter:\s*(?!none)[^;]*blur\([^0]/)
+      expect(rule).not.toMatch(/linear-gradient/)
+    }
+    expect(themeCss).toMatch(
+      /\.el-upload-dragger\s*\{[^}]*backdrop-filter:\s*none/s,
+    )
+
+    // Shipped consumer CSS retains the contract (not consumer deep selectors).
+    expect(shippedCss).toContain('min-height: 44px')
+    expect(shippedCss).not.toContain('font-size: 67px')
+    expect(shippedCss).toMatch(
+      /\.el-upload-dragger\.is-dragover\s*\{[^}]*border-width:\s*1px/s,
+    )
+  })
 })

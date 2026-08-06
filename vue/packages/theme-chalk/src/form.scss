@@ -252,6 +252,12 @@ $form-item-label-top-margin-bottom: map.merge(
       }
     }
 
+    // Upload drag input area participates in form invalid chrome (#455).
+    .#{$namespace}-upload-dragger {
+      border-color: getCssVar('color-danger');
+      @include form-invalid-idle-ring;
+    }
+
     .#{$namespace}-select {
       &:hover {
         box-shadow: 0 0 0 1px transparent;

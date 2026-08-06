@@ -128,6 +128,15 @@
     }
   }
 
+  // Keyboard focus on the whole drag control maps onto the Paper input area.
+  &.is-drag:focus-visible {
+    outline: none;
+
+    .#{$namespace}-upload-dragger {
+      @include a11y-focus-ring(2px, var(--fsus-radius-panel, 12px));
+    }
+  }
+
   &.is-focus-visible-dragger {
     .#{$namespace}-upload-dragger {
       @include a11y-focus-ring(2px, var(--fsus-radius-panel, 12px));
@@ -136,22 +145,44 @@
 }
 
 @include b(upload-dragger) {
+  // Low-noise Paper input area (#455): panel radius, thin dashed border,
+  // auxiliary icon 16–24px, 14/12 type, ≥44px hit path. No layout-shift drag-over.
+  --#{$namespace}-upload-dragger-icon-size: var(--fsus-icon-size-md, 16px);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 44px;
   padding: getCssVar('upload-dragger-padding-horizontal')
     getCssVar('upload-dragger-padding-vertical');
   background-color: getCssVar('fill-color', 'blank');
   border: 1px dashed getCssVar('border-color');
-  border-radius: 6px;
+  border-radius: var(--fsus-radius-panel, 12px);
   box-sizing: border-box;
   text-align: center;
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  font-size: getCssVar('font-size', 'base');
+  letter-spacing: normal;
+  line-height: 1.5;
+  color: getCssVar('text-color', 'regular');
 
-  .#{bem('icon', '', 'upload')} {
-    font-size: 67px;
+  // Auxiliary icon only — never a 67px decorative centerpiece.
+  .#{bem('icon', '', 'upload')},
+  > .#{$namespace}-icon {
+    font-size: var(
+      --#{$namespace}-upload-dragger-icon-size,
+      var(--fsus-icon-size-md, 16px)
+    );
+    width: 1em;
+    height: 1em;
     color: getCssVar('text-color', 'placeholder');
-    margin-bottom: 16px;
-    line-height: 50px;
+    margin: 0 0 4px;
+    line-height: 1;
+    flex-shrink: 0;
   }
 
   + .#{bem('upload', 'tip')} {
@@ -164,10 +195,18 @@
     padding-top: 5px;
   }
 
-  .#{bem('upload', 'text')} {
+  // Primary instruction: 14px / base, natural tracking, wrap long CJK/Latin/RTL.
+  .#{bem('upload', 'text')},
+  > p {
+    margin: 0;
     color: getCssVar('text-color', 'regular');
     font-size: getCssVar('font-size', 'base');
+    letter-spacing: normal;
+    line-height: 1.5;
     text-align: center;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 
     em {
       color: getCssVar('color-primary');
@@ -175,15 +214,34 @@
     }
   }
 
+  // Optional constraints / help inside the control: 12px.
+  .#{bem('upload', 'text')} ~ p,
+  > .#{bem('upload', 'tip')},
+  > [data-upload-help] {
+    margin: 0;
+    font-size: getCssVar('font-size', 'extra-small');
+    color: getCssVar('text-color', 'secondary');
+    letter-spacing: normal;
+    line-height: 1.5;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
   &:hover {
     border-color: getCssVar('color', 'scholarly-blue');
   }
 
+  // Drag-over: border + weak fill only. No padding/border-width change (no
+  // displacement), no glow/scale/shimmer/pulse.
   @include when(dragover) {
-    padding: calc(#{getCssVar('upload-dragger-padding-horizontal')} - 1px)
-      calc(#{getCssVar('upload-dragger-padding-vertical')} - 1px);
     background-color: var(--fsus-state-emphasis-bg);
-    border: 2px dashed getCssVar('color', 'scholarly-blue');
+    border-color: getCssVar('color', 'scholarly-blue');
+    border-width: 1px;
+    border-style: dashed;
+    box-shadow: none;
+    transform: none;
+    filter: none;
   }
 }
 

@@ -1474,11 +1474,13 @@ $result: map.merge(
 
 // Upload
 // css3 var in packages/theme-chalk/src/upload.scss
+// Note: historical Element Plus names map to CSS `padding: H V` (top/bottom then
+// left/right). Values keep a compact low-noise input area (#455).
 $upload: () !default;
 $upload: map.merge(
   (
-    'dragger-padding-horizontal': 40px,
-    'dragger-padding-vertical': 10px,
+    'dragger-padding-horizontal': 16px,
+    'dragger-padding-vertical': 20px,
   ),
   $upload
 );

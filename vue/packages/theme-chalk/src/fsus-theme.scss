@@ -2652,19 +2652,99 @@ button.#{$namespace}-card:active {
   width: 100%;
 }
 
+// Upload dragger (#455): Paper panel, thin dashed border, 12px radius,
+// 16–24px auxiliary icon, 14/12 type, ≥44px hit path, restrained drag-over.
 .#{$namespace}-upload-dragger {
   @include fsus-control(panel);
   background: var(--el-bg-color);
-  min-height: 180px;
+  --el-upload-dragger-icon-size: var(--fsus-icon-size-md, 16px);
+  min-height: 44px;
   border-style: dashed;
-  padding: 28px 20px;
+  border-radius: var(--fsus-radius-panel, 12px);
+  padding: 16px 20px;
+  letter-spacing: normal;
+  font-size: var(--el-font-size-base, 14px);
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  box-shadow: none;
+  filter: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transform: none;
 
-  &:hover,
-  &.is-dragover {
-    background: var(--el-bg-color);
-    border-color: var(--el-border-color);
-    box-shadow: inset 0 0 0 1px var(--el-border-color-light);
+  .#{$namespace}-icon--upload,
+  > .#{$namespace}-icon {
+    font-size: var(--el-upload-dragger-icon-size, 16px);
+    width: 1em;
+    height: 1em;
+    margin: 0 0 4px;
+    line-height: 1;
+    color: var(--el-text-color-placeholder);
+    flex-shrink: 0;
   }
+
+  .#{$namespace}-upload__text,
+  > p {
+    margin: 0;
+    font-size: var(--el-font-size-base, 14px);
+    letter-spacing: normal;
+    line-height: 1.5;
+    color: var(--el-text-color-regular);
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .#{$namespace}-upload__text ~ p,
+  > .#{$namespace}-upload__tip,
+  > [data-upload-help] {
+    margin: 0;
+    font-size: 12px;
+    letter-spacing: normal;
+    line-height: 1.5;
+    color: var(--el-text-color-secondary);
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  &:hover {
+    background: var(--el-bg-color);
+    border-color: var(--fsus-state-focus-border, var(--el-border-color));
+    box-shadow: none;
+    transform: none;
+    filter: none;
+  }
+
+  // Drag-over: weak emphasis fill + primary border only (no glow/scale/shift).
+  &.is-dragover {
+    background: var(--fsus-state-emphasis-bg);
+    border-color: var(--fsus-scholarly-blue, var(--el-color-primary));
+    border-width: 1px;
+    border-style: dashed;
+    box-shadow: none;
+    transform: none;
+    filter: none;
+  }
+}
+
+// Form invalid maps onto the Paper dragger border (not a separate chrome layer).
+.#{$namespace}-form-item.is-error .#{$namespace}-upload-dragger {
+  border-color: var(--el-color-danger);
+  box-shadow: 0 0 0 1px var(--el-color-danger) inset;
+}
+
+.#{$namespace}-form-item.is-error
+  .#{$namespace}-upload.is-drag:focus-visible
+  .#{$namespace}-upload-dragger,
+.#{$namespace}-form-item.is-error
+  .#{$namespace}-upload.is-focus-visible-dragger
+  .#{$namespace}-upload-dragger {
+  box-shadow: 0 0 0 2px var(--el-color-danger) inset !important;
 }
 
 .#{$namespace}-upload-list__item {
@@ -3409,16 +3489,18 @@ button.#{$namespace}-card:active {
   }
 
   .#{$namespace}-upload-dragger:hover {
-    background: var(--el-fill-color-lighter);
-    border-color: var(--el-border-color);
+    background: var(--el-bg-color);
+    border-color: var(--fsus-state-focus-border, var(--el-border-color));
     box-shadow: none !important;
+    transform: none;
   }
 
+  // Pressed: color only — no translate / glow / scale displacement (#455).
   .#{$namespace}-upload-dragger:active {
     background: var(--fsus-state-hover-bg);
     border-color: var(--fsus-state-focus-border);
-    box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border) !important;
-    transform: translate3d(0, 1px, 0);
+    box-shadow: none !important;
+    transform: none;
   }
 
   .#{$namespace}-color-picker__trigger:hover:not(.is-focus) {

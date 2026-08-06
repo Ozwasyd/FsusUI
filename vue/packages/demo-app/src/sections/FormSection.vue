@@ -170,11 +170,9 @@
               :auto-upload="false"
               :limit="3"
             >
-              <p>{{ copy.uploadAction }}</p>
+              <div class="el-upload__text">{{ copy.uploadAction }}</div>
+              <p data-upload-help>{{ copy.uploadHelper }}</p>
               <template #tip>
-                <p class="task-field-message">
-                  {{ copy.uploadHelper }}
-                </p>
                 <p class="task-field-message task-field-message--error">
                   {{ copy.uploadError }}
                 </p>

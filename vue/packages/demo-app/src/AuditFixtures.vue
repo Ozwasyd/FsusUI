@@ -1743,8 +1743,11 @@
 
       <AuditCard name="ElUpload" :state="auditState">
         <el-upload action="#" :auto-upload="false" drag>
-          <el-icon><UploadFilled /></el-icon>
-          <div class="el-upload__text">Drop file or click</div>
+          <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
+          <div class="el-upload__text">
+            Drop a file here or <em>browse</em>
+          </div>
+          <p data-upload-help>PNG/JPG, max 10 MB</p>
         </el-upload>
       </AuditCard>
 
