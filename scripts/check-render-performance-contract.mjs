@@ -152,6 +152,22 @@ for (const token of [
   if (!quality.includes(token))
     failures.push(`PR impact workflow missing ${token}`)
 }
+for (const token of [
+  'emscripten-core/setup-emsdk@v15',
+  'Prepare baseline WASM artifacts',
+  'Prepare current WASM artifacts',
+  'pnpm run ensure:wasm',
+]) {
+  if (!quality.includes(token))
+    failures.push(`PR real-render artifact preflight missing ${token}`)
+}
+for (const token of [
+  'emscripten-core/setup-emsdk@v15',
+  'pnpm run ensure:wasm',
+]) {
+  if (!reusable.includes(token))
+    failures.push(`Reusable real-render artifact preflight missing ${token}`)
+}
 if (
   quality.indexOf('Plan PR real-render impact before heavy setup') >
   quality.indexOf('Install current dependencies')
