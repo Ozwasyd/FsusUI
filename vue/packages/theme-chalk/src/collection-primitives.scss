@@ -86,14 +86,17 @@
   max-width: 100%;
   align-items: center;
   gap: 2px;
+  overflow-x: auto;
   padding: 2px;
   border: 1px solid getCssVar('border-color-lighter');
   border-radius: getCssVar('border-radius-base');
   background: transparent;
 
   @include e(item) {
-    min-width: 0;
+    flex: 0 0 auto;
+    min-width: max-content;
     min-height: 32px;
+    white-space: nowrap;
     padding: 0 10px;
     border: 0;
     border-radius: calc(#{getCssVar('border-radius-base')} - 2px);
