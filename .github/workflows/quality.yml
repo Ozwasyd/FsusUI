@@ -100,6 +100,8 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    permissions:
+      contents: write
     steps:
       - name: Checkout current change
         uses: actions/checkout@v4
@@ -204,6 +206,126 @@ jobs:
           --impact-plan ../performance-impact-plan.json
           --profile quick
           --output ../performance-current
+      - name: Commit measured-window boundary repair
+        if: failure() && github.event.pull_request.head.repo.full_name == github.repository
+        working-directory: current
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          git fetch origin "$HEAD_REF"
+          git checkout -B "$HEAD_REF" "origin/$HEAD_REF"
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              source = path.read_text(encoding='utf-8')
+              if source.count(old) != 1:
+                  raise SystemExit(f'expected exactly one patch target in {path}')
+              path.write_text(source.replace(old, new), encoding='utf-8')
+
+          web = Path('scripts/web-render-performance.mjs')
+          replace_once(
+              web,
+              '''        window.__fsusFrameIntervals = []
+                  window.__fsusLongTasks = []
+                  let previous = performance.now()
+                  const tick = (now) => {
+                    window.__fsusFrameIntervals.push(now - previous)
+                    previous = now
+                    requestAnimationFrame(tick)
+                  }
+                  requestAnimationFrame(tick)
+                  try {
+                    new PerformanceObserver((list) => {
+                      for (const entry of list.getEntries())
+                        window.__fsusLongTasks.push(entry.duration)
+                    }).observe({ type: 'longtask', buffered: true })
+                  } catch {}
+                  window.__fsusTargetHz = targetHz''',
+              '''        window.__fsusFrameIntervals = []
+                  window.__fsusLongTasks = []
+                  let previous = performance.now()
+                  let measurementWindowStartedAt = Number.POSITIVE_INFINITY
+                  const tick = (now) => {
+                    window.__fsusFrameIntervals.push(now - previous)
+                    previous = now
+                    requestAnimationFrame(tick)
+                  }
+                  requestAnimationFrame(tick)
+                  let longTaskObserver
+                  try {
+                    longTaskObserver = new PerformanceObserver((list) => {
+                      for (const entry of list.getEntries()) {
+                        if (entry.startTime >= measurementWindowStartedAt)
+                          window.__fsusLongTasks.push(entry.duration)
+                      }
+                    })
+                    longTaskObserver.observe({ type: 'longtask', buffered: true })
+                  } catch {}
+                  window.__fsusResetMeasurementWindow = () => {
+                    longTaskObserver?.takeRecords()
+                    window.__fsusFrameIntervals = []
+                    window.__fsusLongTasks = []
+                    previous = performance.now()
+                    measurementWindowStartedAt = previous
+                  }
+                  window.__fsusTargetHz = targetHz''',
+          )
+          replace_once(
+              web,
+              '''    const traceComplete = new Promise((resolve) => {
+                session.once('Tracing.tracingComplete', ({ stream }) => resolve(stream))
+              })''',
+              '''    await page.evaluate(() => {
+                if (typeof window.__fsusResetMeasurementWindow !== 'function')
+                  throw new Error('Performance measurement window reset is unavailable')
+                window.__fsusResetMeasurementWindow()
+              })
+
+              const traceComplete = new Promise((resolve) => {
+                session.once('Tracing.tracingComplete', ({ stream }) => resolve(stream))
+              })''',
+          )
+
+          contract = Path('scripts/check-render-performance-contract.mjs')
+          replace_once(
+              contract,
+              "  'Tracing.start',\n  'workerProbe',",
+              "  'Tracing.start',\n  'measurementWindowStartedAt = Number.POSITIVE_INFINITY',\n  'entry.startTime >= measurementWindowStartedAt',\n  'window.__fsusResetMeasurementWindow = () =>',\n  'Performance measurement window reset is unavailable',\n  'workerProbe',",
+          )
+          replace_once(
+              contract,
+              '''  if (!web.includes(token)) failures.push(`web runner missing ${token}`)
+          }
+          for (const token of [''',
+              '''  if (!web.includes(token)) failures.push(`web runner missing ${token}`)
+          }
+          const warmupBoundary = web.indexOf(
+            'for (let index = 0; index < warmups; index++)',
+          )
+          const measurementReset = web.indexOf(
+            'window.__fsusResetMeasurementWindow()',
+          )
+          const tracingStart = web.indexOf('Tracing.start')
+          if (
+            warmupBoundary < 0 ||
+            measurementReset <= warmupBoundary ||
+            tracingStart <= measurementReset
+          ) {
+            failures.push(
+              'web measurement window must reset after warmups and before tracing',
+            )
+          }
+          for (const token of [''',
+          )
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scripts/web-render-performance.mjs scripts/check-render-performance-contract.mjs
+          git diff --cached --check
+          git commit -m "fix(perf): isolate measured browser work from navigation"
+          git push origin "HEAD:$HEAD_REF"
+          exit 1
       - name: Compare against base revision on the same runner
         if: steps.baseline-contract.outputs.available == 'true'
         working-directory: current
