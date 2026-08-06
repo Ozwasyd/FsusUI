@@ -1429,28 +1429,35 @@ button.#{$namespace}-card:active {
   background-color: var(--fsus-component-overlay-scrim) !important;
 }
 
-/* fsus-surface: overlay [dialog, drawer] */
+/* fsus-surface: overlay [dialog, drawer]
+ * Paper panel overlays: border-first, 12px panel radius, no default elevation.
+ * Depth comes from scrim + border, not a heavy floating shadow.
+ * (#298 overlay-depth-inversion)
+ */
 .#{$namespace}-dialog,
 .#{$namespace}-drawer {
   background: var(--el-bg-color-overlay);
   border: 1px solid var(--el-border-color-light);
-  border-radius: var(--fsus-radius-floating);
-  box-shadow: var(--fsus-shadow-floating);
+  border-radius: var(--fsus-radius-panel);
+  box-shadow: var(--fsus-shadow-panel, none);
 }
 
 .#{$namespace}-message-box {
   background: var(--el-bg-color-overlay);
   border: 1px solid var(--el-border-color-light);
-  border-radius: var(--fsus-radius-floating);
+  border-radius: var(--fsus-radius-panel);
   box-shadow: var(--fsus-shadow-panel, none);
 }
 
 .#{$namespace}-notification {
-  /* fsus-surface: overlay [notification] */
+  /* fsus-surface: high-level floating overlay [notification]
+   * Short-lived, cross-content toast: popover radius + floating shadow.
+   * Must not share Dialog/Drawer panel/no-shadow depth (#298).
+   */
   background: var(--el-bg-color-overlay);
   border: 1px solid var(--el-border-color-light);
   border-radius: var(--fsus-radius-popover);
-  box-shadow: var(--fsus-shadow-panel, none);
+  box-shadow: var(--fsus-shadow-floating);
 }
 
 .#{$namespace}-message {

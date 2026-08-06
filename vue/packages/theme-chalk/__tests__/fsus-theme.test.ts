@@ -375,15 +375,15 @@ describe('Fsus theme visual baseline', () => {
     for (const selector of ['.el-dialog', '.el-drawer']) {
       expectCssRule(css, selector, [
         'border: 1px solid var(--el-border-color-light);',
-        'border-radius: var(--fsus-radius-floating);',
-        'box-shadow: var(--fsus-shadow-floating);',
+        'border-radius: var(--fsus-radius-panel);',
+        'box-shadow: var(--fsus-shadow-panel, none);',
       ])
     }
     expectCssRule(css, '.el-notification', [
       'background: var(--el-bg-color-overlay);',
       'border: 1px solid var(--el-border-color-light);',
       'border-radius: var(--fsus-radius-popover);',
-      'box-shadow: var(--fsus-shadow-panel, none);',
+      'box-shadow: var(--fsus-shadow-floating);',
     ])
     expectCssRule(css, '.el-notification', [
       'position: fixed;',
