@@ -1647,6 +1647,65 @@ describe('Fsus theme visual baseline', () => {
     expect(css).not.toContain('#f7ba2a')
   })
 
+  test('ships rate fill on the warning semantic chain, never primary (#302)', () => {
+    // Real consumer path: fsus.scss pulls rate.scss then fsus-theme overrides.
+    // rate.scss alone is insufficient — fsus-theme historically recolored fill to primary.
+    const themeCss = compileThemeFile('fsus-theme.scss')
+    const rateCss = compileThemeFile('rate.scss')
+    const shippedCss = compileThemeFile('fsus.scss')
+
+    expectCssRule(themeCss, '.el-rate', [
+      '--el-rate-fill-color: var(--el-color-warning);',
+    ])
+    expectCssRule(themeCss, '.el-rate__item .el-rate__icon', [
+      'color: var(--el-rate-void-color, var(--el-border-color-darker));',
+    ])
+    expectCssRule(
+      themeCss,
+      '.el-rate.is-disabled .el-rate__item .el-rate__icon',
+      ['color: var(--el-rate-disabled-void-color, var(--el-fill-color));'],
+    )
+    expectCssRule(themeCss, '.el-rate__item .el-rate__icon.is-active', [
+      'color: var(--el-rate-fill-color, var(--el-color-warning));',
+    ])
+    expectCssRule(themeCss, '.el-rate__item .hover', [
+      'color: var(--el-rate-fill-color, var(--el-color-warning));',
+    ])
+
+    // Mutation kill: primary / Scholarly Blue must not own default rate fill.
+    expect(themeCss).not.toMatch(
+      /\.el-rate\s*\{[^}]*--el-rate-fill-color:\s*var\(--el-color-primary\)/s,
+    )
+    // Active/hover fill declarations must not hardcode primary.
+    const activeFillRules = [
+      ...cssRules(themeCss, '.el-rate__item .el-rate__icon.is-active'),
+      ...cssRules(themeCss, '.el-rate__item .hover'),
+    ]
+    expect(activeFillRules.length).toBeGreaterThan(0)
+    for (const rule of activeFillRules) {
+      expect(rule).not.toContain('var(--el-color-primary)')
+      expect(rule).not.toContain('var(--fsus-scholarly-blue)')
+      expect(rule).toContain('var(--el-color-warning)')
+    }
+
+    // Component tokens and integrated bundle stay on the same warning chain.
+    expectCssRule(rateCss, '.el-rate', [
+      '--el-rate-fill-color: var(--el-color-warning);',
+    ])
+    expect(shippedCss).toContain('--el-rate-fill-color: var(--el-color-warning);')
+    expect(shippedCss).not.toMatch(
+      /--el-rate-fill-color:\s*var\(--el-color-primary\)/,
+    )
+    // Focus remains Scholarly Blue (focus role), not warning.
+    expectCssRule(rateCss, '.el-rate:focus-visible', [
+      'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
+    ])
+    // No gradient / glow / scale flourishes on the default rate surface.
+    expect(themeCss).not.toMatch(/\.el-rate[^{]*\{[^}]*gradient/s)
+    expect(themeCss).not.toContain('transform: scale(')
+    expect(themeCss).not.toMatch(/\.el-rate[^}]*drop-shadow/s)
+  })
+
   test('keeps backtop aligned with floating focus tokens', () => {
     const css = compileThemeFile('backtop.scss')
 

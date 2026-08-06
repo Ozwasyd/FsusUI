@@ -2507,17 +2507,27 @@ button.#{$namespace}-card:active {
 }
 
 .#{$namespace}-rate {
-  // 覆盖 fill-color CSS 变量，消除拟物化金色，符合 design.md 极简主义规范
-  --el-rate-fill-color: var(--el-color-primary);
+  // Rating filled stars use semantic warning only (design.md Accent Rules / #302).
+  // Scholarly Blue stays reserved for focus, selection, and links — not score value.
+  // Custom colors remain opt-in via public API / --el-rate-fill-color on the root.
+  --el-rate-fill-color: var(--el-color-warning);
 }
 
 .#{$namespace}-rate__item .#{$namespace}-rate__icon {
-  color: var(--el-border-color);
+  // Empty: border/decorative gray, distinct from disabled void fill.
+  color: var(--el-rate-void-color, var(--el-border-color-darker));
+}
+
+.#{$namespace}-rate.is-disabled .#{$namespace}-rate__item .#{$namespace}-rate__icon {
+  // Independent disabled void token; filled value stays readable via .is-active.
+  color: var(--el-rate-disabled-void-color, var(--el-fill-color));
 }
 
 .#{$namespace}-rate__item .hover,
 .#{$namespace}-rate__item .#{$namespace}-rate__icon.is-active {
-  color: var(--el-color-primary);
+  // Committed value + hover preview: warning by default (or consumer opt-in fill).
+  // Structural hover (translateY) provides preview distinction without primary Blue.
+  color: var(--el-rate-fill-color, var(--el-color-warning));
 }
 
 .#{$namespace}-timeline {

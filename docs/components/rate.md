@@ -41,9 +41,9 @@
 | allow-half | 是否允许半选 | `boolean` | `false` |
 | low-threshold | 低等级阈值（含） | `number` | `2` |
 | high-threshold | 高等级阈值（含） | `number` | `4` |
-| colors | 各等级颜色（3 元素数组或以阈值为 key 的对象） | `string[] \| Record<number, string>` | `['#f7ba2a', '#f7ba2a', '#f7ba2a']` |
-| void-color | 未选中图标颜色 | `string` | `#c6d1de` |
-| disabled-void-color | 只读状态下未选中图标颜色 | `string` | `#eff2f7` |
+| colors | 各等级颜色（opt-in；3 元素数组或以阈值为 key 的对象）。默认留空以消费主题 `--el-rate-fill-color`（warning 语义），勿当作推荐默认色 | `string[] \| Record<number, string>` | `['', '', '']` |
+| void-color | 未选中图标颜色（opt-in；默认走主题 void token） | `string` | `''` |
+| disabled-void-color | 只读状态下未选中图标颜色（opt-in；默认走主题 disabled void token） | `string` | `''` |
 | icons | 各等级图标（3 元素数组或以阈值为 key 的对象） | `string[] \| Component[] \| Record<number, string \| Component>` | `[StarFilled, StarFilled, StarFilled]` |
 | void-icon | 未选中时的图标 | `string \| Component` | `Star` |
 | disabled-void-icon | 只读状态下未选中图标 | `string \| Component` | `StarFilled` |
