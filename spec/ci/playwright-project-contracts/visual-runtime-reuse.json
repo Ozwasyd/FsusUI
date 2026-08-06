@@ -1,0 +1,42 @@
+{
+  "suiteId": "visual-runtime-reuse",
+  "config": "vue/playwright.reuse.config.ts",
+  "projects": [
+    {
+      "name": "desktop-light",
+      "dimensions": {
+        "browser": "chromium",
+        "viewport": "desktop",
+        "theme": "light",
+        "runtimeMode": "reuse"
+      }
+    },
+    {
+      "name": "mobile-light",
+      "dimensions": {
+        "browser": "chromium",
+        "viewport": "mobile",
+        "theme": "light",
+        "runtimeMode": "reuse"
+      }
+    },
+    {
+      "name": "desktop-dark",
+      "dimensions": {
+        "browser": "chromium",
+        "viewport": "desktop",
+        "theme": "dark",
+        "runtimeMode": "reuse"
+      }
+    },
+    {
+      "name": "mobile-dark",
+      "dimensions": {
+        "browser": "chromium",
+        "viewport": "mobile",
+        "theme": "dark",
+        "runtimeMode": "reuse"
+      }
+    }
+  ]
+}

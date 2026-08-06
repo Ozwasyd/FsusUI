@@ -1,0 +1,10 @@
+{
+  "suiteId": "motion-ssr",
+  "config": "vue/playwright.motion-ssr.config.ts",
+  "projects": [
+    {
+      "name": "default",
+      "dimensions": { "browser": "chromium", "runtimeMode": "ssr" }
+    }
+  ]
+}

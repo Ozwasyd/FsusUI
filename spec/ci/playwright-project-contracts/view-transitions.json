@@ -1,0 +1,9 @@
+{
+  "suiteId": "view-transitions",
+  "config": "vue/playwright.view-transitions.config.ts",
+  "projects": [
+    { "name": "chromium", "dimensions": { "browser": "chromium" } },
+    { "name": "firefox", "dimensions": { "browser": "firefox" } },
+    { "name": "webkit", "dimensions": { "browser": "webkit" } }
+  ]
+}

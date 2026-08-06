@@ -1,0 +1,10 @@
+{
+  "suiteId": "geometry-smoke",
+  "config": "vue/playwright.geometry.config.ts",
+  "projects": [
+    {
+      "name": "default",
+      "dimensions": { "browser": "chromium" }
+    }
+  ]
+}

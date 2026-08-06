@@ -1,0 +1,407 @@
+{
+  "schemaVersion": 1,
+  "suites": [
+    {
+      "id": "view-transitions",
+      "command": "pnpm test:view-transitions",
+      "config": "vue/playwright.view-transitions.config.ts",
+      "runtime": "browser-product",
+      "projectContract": "spec/ci/playwright-project-contracts/view-transitions.json",
+      "cells": [
+        {
+          "id": "view-transitions/chromium",
+          "project": "chromium",
+          "dimensions": { "browser": "chromium" }
+        },
+        {
+          "id": "view-transitions/firefox",
+          "project": "firefox",
+          "dimensions": { "browser": "firefox" }
+        },
+        {
+          "id": "view-transitions/webkit",
+          "project": "webkit",
+          "dimensions": { "browser": "webkit" }
+        }
+      ],
+      "impactRoots": [
+        "vue/packages/components/**",
+        "vue/packages/theme-chalk/**",
+        "vue/tests/view-transitions/**",
+        "vue/playwright.view-transitions.config.ts"
+      ],
+      "artifacts": {
+        "namespace": "playwright-suite-view-transitions",
+        "reportDirectory": "playwright-report/view-transitions",
+        "traceDirectory": "vue/test-results/view-transitions",
+        "screenshotDirectory": "vue/test-results/view-transitions",
+        "receiptPath": ".readiness/receipts/playwright-view-transitions.json"
+      },
+      "allowAffectedSkip": true,
+      "skipReasonTypes": ["unaffected-sources", "browser-not-installed"],
+      "countsTowardProductBrowserCoverage": true
+    },
+    {
+      "id": "motion-ssr",
+      "command": "pnpm test:motion:ssr",
+      "config": "vue/playwright.motion-ssr.config.ts",
+      "runtime": "browser-ssr",
+      "projectContract": "spec/ci/playwright-project-contracts/motion-ssr.json",
+      "cells": [
+        {
+          "id": "motion-ssr/chromium",
+          "project": "default",
+          "dimensions": { "browser": "chromium", "runtimeMode": "ssr" }
+        }
+      ],
+      "impactRoots": [
+        "vue/packages/components/**",
+        "vue/packages/hooks/use-motion/**",
+        "vue/tests/motion-ssr/**",
+        "vue/playwright.motion-ssr.config.ts"
+      ],
+      "artifacts": {
+        "namespace": "playwright-suite-motion-ssr",
+        "reportDirectory": "playwright-report/motion-ssr",
+        "traceDirectory": "vue/test-results/motion-ssr",
+        "screenshotDirectory": "vue/test-results/motion-ssr",
+        "receiptPath": ".readiness/receipts/playwright-motion-ssr.json"
+      },
+      "allowAffectedSkip": true,
+      "skipReasonTypes": ["unaffected-sources", "browser-not-installed"],
+      "countsTowardProductBrowserCoverage": true
+    },
+    {
+      "id": "dom-layout",
+      "command": "pnpm test:dom-layout",
+      "config": "vue/playwright.dom-layout.config.ts",
+      "runtime": "browser-product",
+      "projectContract": "spec/ci/playwright-project-contracts/dom-layout.json",
+      "cells": [
+        {
+          "id": "dom-layout/desktop-light",
+          "project": "desktop-light",
+          "dimensions": {
+            "browser": "chromium",
+            "viewport": "desktop",
+            "theme": "light"
+          }
+        },
+        {
+          "id": "dom-layout/mobile-light",
+          "project": "mobile-light",
+          "dimensions": {
+            "browser": "chromium",
+            "viewport": "mobile",
+            "theme": "light"
+          }
+        },
+        {
+          "id": "dom-layout/desktop-dark",
+          "project": "desktop-dark",
+          "dimensions": {
+            "browser": "chromium",
+            "viewport": "desktop",
+            "theme": "dark"
+          }
+        },
+        {
+          "id": "dom-layout/mobile-dark",
+          "project": "mobile-dark",
+          "dimensions": {
+            "browser": "chromium",
+            "viewport": "mobile",
+            "theme": "dark"
+          }
+        }
+      ],
+      "impactRoots": [
+        "vue/packages/components/**",
+        "vue/packages/theme-chalk/**",
+        "vue/tests/dom-layout/**",
+        "vue/playwright.dom-layout.config.ts"
+      ],
+      "artifacts": {
+        "namespace": "playwright-suite-dom-layout",
+        "reportDirectory": "playwright-report/dom-layout",
+        "traceDirectory": "vue/test-results/dom-layout",
+        "screenshotDirectory": "vue/test-results/dom-layout",
+        "receiptPath": ".readiness/receipts/playwright-dom-layout.json"
+      },
+      "allowAffectedSkip": true,
+      "skipReasonTypes": ["unaffected-sources", "browser-not-installed"],
+      "countsTowardProductBrowserCoverage": true
+    },
+    {
+      "id": "geometry-smoke",
+      "command": "pnpm test:geometry:smoke",
+      "config": "vue/playwright.geometry.config.ts",
+      "runtime": "browser-product",
+      "projectContract": "spec/ci/playwright-project-contracts/geometry-smoke.json",
+      "cells": [
+        {
+          "id": "geometry-smoke/chromium",
+          "project": "default",
+          "dimensions": { "browser": "chromium" }
+        }
+      ],
+      "impactRoots": [
+        "vue/packages/components/**",
+        "vue/tests/geometry/**",
+        "vue/playwright.geometry.config.ts"
+      ],
+      "artifacts": {
+        "namespace": "playwright-suite-geometry-smoke",
+        "reportDirectory": "playwright-report/geometry",
+        "traceDirectory": "vue/test-results/geometry",
+        "screenshotDirectory": "vue/test-results/geometry",
+        "receiptPath": ".readiness/receipts/playwright-geometry-smoke.json"
+      },
+      "allowAffectedSkip": true,
+      "skipReasonTypes": ["unaffected-sources", "browser-not-installed"],
+      "countsTowardProductBrowserCoverage": true
+    },
+    {
+      "id": "markdown-editor-interaction",
+      "command": "pnpm test:markdown-editor:interaction",
+      "config": "vue/playwright.markdown-editor.config.ts",
+      "runtime": "browser-product",
+      "projectContract": "spec/ci/playwright-project-contracts/markdown-editor-interaction.json",
+      "cells": [
+        {
+          "id": "markdown-editor-interaction/chromium",
+          "project": "chromium",
+          "dimensions": { "browser": "chromium" }
+        },
+        {
+          "id": "markdown-editor-interaction/firefox",
+          "project": "firefox",
+          "dimensions": { "browser": "firefox" }
+        },
+        {
+          "id": "markdown-editor-interaction/webkit",
+          "project": "webkit",
+          "dimensions": { "browser": "webkit" }
+        }
+      ],
+      "impactRoots": [
+        "vue/packages/components/markdown-editor/**",
+        "vue/packages/components/markdown-renderer/**",
+        "vue/packages/wasm/**",
+        "vue/tests/markdown-editor/**",
+        "vue/playwright.markdown-editor.config.ts"
+      ],
+      "artifacts": {
+        "namespace": "playwright-suite-markdown-editor-interaction",
+        "reportDirectory": "playwright-report/markdown-editor",
+        "traceDirectory": "vue/test-results/markdown-editor",
+        "screenshotDirectory": "vue/test-results/markdown-editor",
+        "receiptPath": ".readiness/receipts/playwright-markdown-editor-interaction.json"
+      },
+      "allowAffectedSkip": true,
+      "skipReasonTypes": ["unaffected-sources", "browser-not-installed"],
+      "countsTowardProductBrowserCoverage": true
+    },
+    {
+      "id": "visual-boundary-audit",
+      "command": "pnpm audit:visual-boundaries",
+      "config": "vue/playwright.boundary-audit.config.ts",
+      "runtime": "browser-product",
+      "projectContract": "spec/ci/playwright-project-contracts/visual-boundary-audit.json",
+      "cells": [
+        {
+          "id": "visual-boundary-audit/desktop-light",
+          "project": "desktop-light",
+          "dimensions": {
+            "browser": "chromium",
+            "viewport": "desktop",
+            "theme": "light"
+          }
+        },
+        {
+          "id": "visual-boundary-audit/mobile-light",
+          "project": "mobile-light",
+          "dimensions": {
+            "browser": "chromium",
+            "viewport": "mobile",
+            "theme": "light"
+          }
+        },
+        {
+          "id": "visual-boundary-audit/tiny-light",
+          "project": "tiny-light",
+          "dimensions": {
+            "browser": "chromium",
+            "viewport": "tiny",
+            "theme": "light"
+          }
+        },
+        {
+          "id": "visual-boundary-audit/desktop-dark",
+          "project": "desktop-dark",
+          "dimensions": {
+            "browser": "chromium",
+            "viewport": "desktop",
+            "theme": "dark"
+          }
+        },
+        {
+          "id": "visual-boundary-audit/mobile-dark",
+          "project": "mobile-dark",
+          "dimensions": {
+            "browser": "chromium",
+            "viewport": "mobile",
+            "theme": "dark"
+          }
+        },
+        {
+          "id": "visual-boundary-audit/tiny-dark",
+          "project": "tiny-dark",
+          "dimensions": {
+            "browser": "chromium",
+            "viewport": "tiny",
+            "theme": "dark"
+          }
+        },
+        {
+          "id": "visual-boundary-audit/safe-area-chromium",
+          "project": "safe-area-chromium",
+          "dimensions": { "browser": "chromium", "safeArea": true }
+        },
+        {
+          "id": "visual-boundary-audit/safe-area-webkit",
+          "project": "safe-area-webkit",
+          "dimensions": { "browser": "webkit", "safeArea": true }
+        }
+      ],
+      "impactRoots": [
+        "vue/packages/components/**",
+        "vue/packages/theme-chalk/**",
+        "vue/tests/visual-boundary/**",
+        "vue/playwright.boundary-audit.config.ts"
+      ],
+      "artifacts": {
+        "namespace": "playwright-suite-visual-boundary-audit",
+        "reportDirectory": "playwright-report/visual-boundary",
+        "traceDirectory": "vue/test-results/visual-boundary",
+        "screenshotDirectory": "vue/test-results/visual-boundary",
+        "receiptPath": ".readiness/receipts/playwright-visual-boundary-audit.json"
+      },
+      "allowAffectedSkip": true,
+      "skipReasonTypes": ["unaffected-sources", "browser-not-installed"],
+      "countsTowardProductBrowserCoverage": true
+    },
+    {
+      "id": "visual-runtime-reuse",
+      "command": "pnpm test:visual:reuse",
+      "config": "vue/playwright.reuse.config.ts",
+      "runtime": "runtime-contract",
+      "projectContract": "spec/ci/playwright-project-contracts/visual-runtime-reuse.json",
+      "cells": [
+        {
+          "id": "visual-runtime-reuse/desktop-light",
+          "project": "desktop-light",
+          "dimensions": {
+            "browser": "chromium",
+            "viewport": "desktop",
+            "theme": "light",
+            "runtimeMode": "reuse"
+          }
+        },
+        {
+          "id": "visual-runtime-reuse/mobile-light",
+          "project": "mobile-light",
+          "dimensions": {
+            "browser": "chromium",
+            "viewport": "mobile",
+            "theme": "light",
+            "runtimeMode": "reuse"
+          }
+        },
+        {
+          "id": "visual-runtime-reuse/desktop-dark",
+          "project": "desktop-dark",
+          "dimensions": {
+            "browser": "chromium",
+            "viewport": "desktop",
+            "theme": "dark",
+            "runtimeMode": "reuse"
+          }
+        },
+        {
+          "id": "visual-runtime-reuse/mobile-dark",
+          "project": "mobile-dark",
+          "dimensions": {
+            "browser": "chromium",
+            "viewport": "mobile",
+            "theme": "dark",
+            "runtimeMode": "reuse"
+          }
+        }
+      ],
+      "impactRoots": [
+        "scripts/prepare-visual-runtime.mjs",
+        "scripts/serve-visual-runtime.mjs",
+        "scripts/visual-runtime-core.mjs",
+        "vue/playwright.reuse.config.ts",
+        "vue/playwright.config.ts"
+      ],
+      "artifacts": {
+        "namespace": "playwright-suite-visual-runtime-reuse",
+        "reportDirectory": "playwright-report/visual-reuse",
+        "traceDirectory": "vue/test-results/visual-reuse",
+        "screenshotDirectory": "vue/test-results/visual-reuse",
+        "receiptPath": ".readiness/receipts/playwright-visual-runtime-reuse.json"
+      },
+      "allowAffectedSkip": true,
+      "skipReasonTypes": [
+        "unaffected-sources",
+        "runtime-unavailable",
+        "browser-not-installed"
+      ],
+      "countsTowardProductBrowserCoverage": false
+    }
+  ],
+  "profiles": {
+    "pr": {
+      "suiteIds": [
+        "geometry-smoke",
+        "motion-ssr",
+        "visual-runtime-reuse"
+      ]
+    },
+    "main": {
+      "suiteIds": [
+        "view-transitions",
+        "motion-ssr",
+        "dom-layout",
+        "geometry-smoke",
+        "markdown-editor-interaction",
+        "visual-boundary-audit",
+        "visual-runtime-reuse"
+      ]
+    },
+    "nightly": {
+      "suiteIds": [
+        "view-transitions",
+        "motion-ssr",
+        "dom-layout",
+        "geometry-smoke",
+        "markdown-editor-interaction",
+        "visual-boundary-audit",
+        "visual-runtime-reuse"
+      ]
+    },
+    "release": {
+      "suiteIds": [
+        "view-transitions",
+        "motion-ssr",
+        "dom-layout",
+        "geometry-smoke",
+        "markdown-editor-interaction",
+        "visual-boundary-audit",
+        "visual-runtime-reuse"
+      ]
+    }
+  }
+}

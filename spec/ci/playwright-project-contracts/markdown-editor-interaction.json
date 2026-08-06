@@ -1,0 +1,9 @@
+{
+  "suiteId": "markdown-editor-interaction",
+  "config": "vue/playwright.markdown-editor.config.ts",
+  "projects": [
+    { "name": "chromium", "dimensions": { "browser": "chromium" } },
+    { "name": "firefox", "dimensions": { "browser": "firefox" } },
+    { "name": "webkit", "dimensions": { "browser": "webkit" } }
+  ]
+}
