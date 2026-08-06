@@ -3,6 +3,11 @@ import type { FeatureRenderOutput } from '../../packages/wasm/markdown-feature-o
 
 export type MarkdownXssCorpusCase = (typeof corpusJson.cases)[number]
 
+type MermaidFeatureRenderOutput = Extract<
+  FeatureRenderOutput,
+  { kind: 'mermaid' }
+>
+
 const casesById = new Map(
   corpusJson.cases.map((entry) => [entry.id, entry] as const),
 )
@@ -27,7 +32,11 @@ export const getMarkdownXssSourceAttackFragment = (id: string) => {
   return separator < 0 ? source : source.slice(separator + 2)
 }
 
-export const getMarkdownXssFeatureOutput = (id: string) => {
+export function getMarkdownXssFeatureOutput(
+  id: `mxss-feature-mermaid-${string}`,
+): MermaidFeatureRenderOutput
+export function getMarkdownXssFeatureOutput(id: string): FeatureRenderOutput
+export function getMarkdownXssFeatureOutput(id: string): FeatureRenderOutput {
   const entry = getMarkdownXssCorpusCase(id)
   if (!('featureOutput' in entry) || !entry.featureOutput) {
     throw new Error(`markdown_xss_feature_output_missing:${id}`)
