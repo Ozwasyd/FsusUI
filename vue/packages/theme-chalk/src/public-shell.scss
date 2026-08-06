@@ -759,26 +759,22 @@
       transition: none;
     }
 
+    // Vue enter/leave state machines must keep a 1ms duration so after-leave,
+    // closing cleanup, focus return, and DOM removal stay ordered.
     &-mobile-nav-menu-enter-active,
-    &-mobile-nav-menu-leave-active {
-      transition: none;
+    &-mobile-nav-menu-leave-active,
+    &-mobile-search-enter-active,
+    &-mobile-search-leave-active,
+    &-desktop-search-enter-active,
+    &-desktop-search-leave-active {
+      transition-duration: 1ms !important;
+      transition-delay: 0ms !important;
     }
 
     &-mobile-nav-menu-enter-from,
-    &-mobile-nav-menu-leave-to {
-      transform: none;
-    }
-
-    &-mobile-search-enter-active,
-    &-mobile-search-leave-active {
-      transition: none;
-    }
-
-    &-desktop-search-enter-active,
-    &-desktop-search-leave-active {
-      transition: none;
-    }
-
+    &-mobile-nav-menu-leave-to,
+    &-mobile-search-enter-from,
+    &-mobile-search-leave-to,
     &-desktop-search-enter-from,
     &-desktop-search-leave-to {
       transform: none;

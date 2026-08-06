@@ -1019,4 +1019,98 @@ describe('PublicShell.vue', () => {
     expect(actions.find('[data-test="theme"]').exists()).toBe(true)
     expect(actions.find('.el-public-shell__auth-link').exists()).toBe(false)
   })
+
+  test.each([
+    { cspSafe: false, label: 'non-CSP v-show' },
+    { cspSafe: true, label: 'CSP-safe v-if' },
+  ] as const)(
+    'completes mobile menu leave under 1ms reduced-motion styles ($label)',
+    async ({ cspSafe }) => {
+      const style = document.createElement('style')
+      style.textContent = `
+        .el-public-shell-mobile-nav-menu-enter-active,
+        .el-public-shell-mobile-nav-menu-leave-active {
+          transition: opacity 200ms ease, transform 200ms ease;
+          transition-duration: 1ms !important;
+          transition-delay: 0ms !important;
+        }
+        .el-public-shell-mobile-nav-menu-enter-from,
+        .el-public-shell-mobile-nav-menu-leave-to {
+          opacity: 0;
+          transform: none;
+        }
+      `
+      document.head.appendChild(style)
+
+      try {
+        const wrapper = mount(PublicShell, {
+          attachTo: document.body,
+          props: {
+            brand: 'Fsus',
+            navItems,
+            mobileNavMode: 'menu',
+            cspSafe,
+            mobileSearchMode: 'trigger',
+          },
+        })
+
+        const details = wrapper.find<HTMLDetailsElement>(
+          '.el-public-shell__mobile-nav-menu',
+        )
+        const trigger = wrapper.find<HTMLElement>(
+          '[data-mobile-nav-menu-trigger]',
+        )
+
+        await nextTick()
+        await trigger.trigger('click', { button: 0 })
+        await vi.waitFor(() => {
+          expect(trigger.attributes('aria-expanded')).toBe('true')
+        })
+
+        const openPanel = wrapper.find<HTMLElement>(
+          '.el-public-shell__mobile-nav-menu-panel',
+        )
+        expect(openPanel.exists()).toBe(true)
+
+        const sheet = style.sheet
+        expect(sheet).not.toBeNull()
+        const activeRule = Array.from(sheet!.cssRules).find(
+          (rule): rule is CSSStyleRule =>
+            rule instanceof CSSStyleRule &&
+            rule.selectorText.includes(
+              'el-public-shell-mobile-nav-menu-leave-active',
+            ) &&
+            rule.style.transitionDuration.includes('1ms'),
+        )
+        expect(activeRule).toBeTruthy()
+        expect(activeRule!.style.transitionDuration).toContain('1ms')
+        expect(activeRule!.style.transitionDelay).toContain('0ms')
+
+        await trigger.trigger('click', { button: 0 })
+        expect(details.element.open).toBe(true)
+        expect(details.classes()).toContain('is-closing')
+        expect(trigger.attributes('aria-expanded')).toBe('false')
+        expect(openPanel.attributes('aria-hidden')).toBe('true')
+        expect(openPanel.attributes()).toHaveProperty('inert')
+        expect(openPanel.classes()).toContain(
+          'el-public-shell-mobile-nav-menu-leave-active',
+        )
+
+        await vi.waitFor(() => expect(details.element.open).toBe(false))
+        if (cspSafe) {
+          expect(
+            wrapper.find('.el-public-shell__mobile-nav-menu-panel').exists(),
+          ).toBe(false)
+        } else {
+          expect(details.element.open).toBe(false)
+        }
+        expect(details.classes()).not.toContain('is-closing')
+        expect(trigger.attributes('aria-expanded')).toBe('false')
+
+        wrapper.unmount()
+      } finally {
+        style.remove()
+      }
+    },
+  )
 })
