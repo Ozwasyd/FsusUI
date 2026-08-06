@@ -34,6 +34,12 @@ assert(
   scripts['verify:pr-fast']?.includes('_verify:pr-fast:parallel'),
   'verify:pr-fast must use the explicit PR-fast parallel group',
 )
+assert(
+  scripts['verify:pr-fast']?.includes('build:theme') &&
+    scripts['verify:pr-fast'].indexOf('build:theme') <
+      scripts['verify:pr-fast'].indexOf('_verify:pr-fast:parallel'),
+  'verify:pr-fast must prepare theme artifacts before package smoke enters the parallel group',
+)
 for (const script of ['_verify:pr-fast:parallel', '_verify:parallel']) {
   assert(
     scripts[script]?.includes('run-capacity-suite.mjs'),
