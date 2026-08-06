@@ -12,6 +12,7 @@ import type {
 } from './markdown-editor-transaction'
 
 export type {
+  BeforeInputSnapshot,
   MarkdownEditorChange,
   MarkdownEditorDispatchResult,
   MarkdownEditorHistoryMode,

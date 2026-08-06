@@ -507,6 +507,15 @@ const markdownRuntimeKindPattern = /^(?:SIMD-128|SCALAR-BASIC|UNKNOWN)$/
 const isFiniteNonNegative = (value: unknown): value is number =>
   typeof value === 'number' && Number.isFinite(value) && value >= 0
 
+// Wasm chunk offsets are UTF-8 byte indices into the HTML payload. JS
+// `string.length` is UTF-16 code units, so multi-byte characters (CJK, Greek
+// math glyphs, etc.) must be measured with TextEncoder or worker
+// re-authorization falsely rejects valid results.
+const utf8ByteLength = (value: string) =>
+  typeof TextEncoder === 'undefined'
+    ? value.length
+    : new TextEncoder().encode(value).byteLength
+
 const deepSealBrokerValue = <T,>(value: T): T => {
   if (typeof value !== 'object' || value === null || Object.isFrozen(value)) {
     return value
@@ -531,6 +540,16 @@ const materializeMarkdownWorkerResult = (
   units: readonly MarkdownRenderChunk[],
 ): MarkdownRuntimeChunkResult | null => {
   const metadata = result.metadata
+  // Wasm metadata may use '' for a missing base URL while the host request uses
+  // undefined/null; treat both as the same unbound origin.
+  const normalizeBaseUrl = (value: string | null | undefined) =>
+    value == null || value === '' ? null : value
+  // Chunks-mode payloads keep placeholderCount in metadata but often ship an
+  // empty placeholders array (placeholders are activated later). When the array
+  // is non-empty it must still match the declared count.
+  const placeholdersConsistent =
+    result.placeholders.length === 0 ||
+    metadata?.placeholderCount === result.placeholders.length
   if (
     !matchesMarkdownRenderRequest(request, result) ||
     result.chunks !== units ||
@@ -541,13 +560,13 @@ const materializeMarkdownWorkerResult = (
     result.chunks.length === 0 ||
     !metadata ||
     metadata.mode !== (request.mode ?? 'article') ||
-    metadata.baseUrl !== (request.baseUrl ?? null) ||
+    normalizeBaseUrl(metadata.baseUrl) !== normalizeBaseUrl(request.baseUrl) ||
     metadata.allowLatex !== (request.allowLatex !== false) ||
     metadata.allowMermaid !== (request.allowMermaid !== false) ||
     metadata.sourceLength !== request.source.length ||
     metadata.normalizedSourceLength !== result.normalizedSource.length ||
     metadata.featureCount !== result.features.length ||
-    metadata.placeholderCount !== result.placeholders.length ||
+    !placeholdersConsistent ||
     metadata.rendererVersion !== MARKDOWN_RENDERER_VERSION ||
     !Object.values(result.timings).every(isFiniteNonNegative)
   ) {
@@ -558,6 +577,7 @@ const materializeMarkdownWorkerResult = (
   let combinedHtml = ''
   const chunkKeys = new Set<string>()
   for (const chunk of result.chunks) {
+    const chunkByteLength = utf8ByteLength(chunk.html)
     if (
       typeof chunk.key !== 'string' ||
       chunkKeys.has(chunk.key) ||
@@ -566,7 +586,7 @@ const materializeMarkdownWorkerResult = (
       !Number.isFinite(chunk.estimatedSize) ||
       chunk.estimatedSize <= 0 ||
       chunk.htmlStartOffset !== expectedOffset ||
-      chunk.htmlEndOffset !== expectedOffset + chunk.html.length
+      chunk.htmlEndOffset !== expectedOffset + chunkByteLength
     ) {
       return null
     }
@@ -574,7 +594,10 @@ const materializeMarkdownWorkerResult = (
     expectedOffset = chunk.htmlEndOffset
     combinedHtml += chunk.html
   }
-  if (combinedHtml !== result.html || expectedOffset !== result.html.length) {
+  if (
+    combinedHtml !== result.html ||
+    expectedOffset !== utf8ByteLength(result.html)
+  ) {
     return null
   }
 

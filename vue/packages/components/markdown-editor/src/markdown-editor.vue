@@ -194,6 +194,7 @@ import type {
   MarkdownEditorMode,
 } from './markdown-editor'
 import type {
+  BeforeInputSnapshot,
   MarkdownEditorDispatchResult,
   MarkdownEditorHistoryState,
   MarkdownEditorInputMergeDirection,
@@ -234,13 +235,6 @@ const transactionStore = new MarkdownEditorTransactionStore(
 )
 const editorValue = ref(transactionStore.value)
 const isComposing = ref(false)
-
-interface BeforeInputSnapshot {
-  readonly data: string | null
-  readonly inputType: string
-  readonly selection: MarkdownEditorSelection
-  readonly value: string
-}
 
 type EditorOperation =
   | {

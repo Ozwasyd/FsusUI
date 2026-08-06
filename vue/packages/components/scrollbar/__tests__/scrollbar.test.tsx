@@ -601,6 +601,61 @@ describe('ScrollBar', () => {
     scrollHeightRestore()
   })
 
+  test('heavy-dom motion scrollbar uses page-step track clicks instead of jump-to-position', async () => {
+    const outerHeight = 760
+    // Density ~278 with a mid-size long document: below the old 420 threshold
+    // but still long enough that absolute mid-track jumps break reading UX.
+    const innerHeight = 190_000
+    const wrapper = mount(() => (
+      <Scrollbar
+        class="is-heavy-dom-motion"
+        style={`height: ${outerHeight}px;`}
+        always
+      >
+        <div style={`height: ${innerHeight}px;`}></div>
+      </Scrollbar>
+    ))
+    const scrollDom = wrapper.find('.el-scrollbar__wrap')
+      .element as HTMLElement
+    const track = wrapper.find('.el-scrollbar__bar.is-vertical')
+      .element as HTMLDivElement
+    const thumb = wrapper.find(
+      '.el-scrollbar__bar.is-vertical .el-scrollbar__thumb',
+    ).element as HTMLDivElement
+
+    const offsetHeightRestore = defineGetter(scrollDom, 'offsetHeight', outerHeight)
+    const clientHeightRestore = defineGetter(scrollDom, 'clientHeight', outerHeight)
+    const scrollHeightRestore = defineGetter(scrollDom, 'scrollHeight', innerHeight)
+    const trackHeightRestore = defineGetter(track, 'offsetHeight', 700)
+    const thumbHeightRestore = defineGetter(thumb, 'offsetHeight', 12)
+    vi.spyOn(track, 'getBoundingClientRect').mockReturnValue(
+      rect({ top: 0, bottom: 700, height: 700 }),
+    )
+    vi.spyOn(thumb, 'getBoundingClientRect').mockReturnValue(
+      rect({ top: 0, bottom: 12, height: 12 }),
+    )
+
+    await makeScroll(scrollDom, 'scrollTop', 0)
+    // Click mid-track, below the thumb at the top → page-step forward.
+    track.dispatchEvent(
+      createPointerEvent('pointerdown', {
+        clientY: 350,
+        pointerId: 3,
+        pointerType: 'mouse',
+      }),
+    )
+    await rAF()
+
+    expect(scrollDom.scrollTop).toBeGreaterThan(0)
+    expect(scrollDom.scrollTop).toBeLessThanOrEqual(outerHeight * 1.2)
+
+    offsetHeightRestore()
+    clientHeightRestore()
+    scrollHeightRestore()
+    trackHeightRestore()
+    thumbHeightRestore()
+  })
+
   test('smooths notched mouse wheel distance', async () => {
     const outerHeight = 204
     const innerHeight = 1000
