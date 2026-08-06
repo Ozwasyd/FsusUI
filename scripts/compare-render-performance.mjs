@@ -3,8 +3,9 @@ import path from 'node:path'
 import process from 'node:process'
 import { verifyImpactPlan } from './render-performance-impact.mjs'
 
+// pnpm/npm may forward a literal `--` when invoked as `pnpm script -- args`.
 const [baselineDirectory, currentDirectory, limitArgument = '0.15'] =
-  process.argv.slice(2)
+  process.argv.slice(2).filter((argument) => argument !== '--')
 if (!baselineDirectory || !currentDirectory) {
   throw new Error(
     'Usage: compare-render-performance.mjs <baseline-dir> <current-dir> [relative-limit]',
