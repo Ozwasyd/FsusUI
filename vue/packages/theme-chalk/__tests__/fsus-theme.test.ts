@@ -3346,6 +3346,27 @@ describe('Fsus theme visual baseline', () => {
     expect(css).not.toMatch(
       /\.el-(?:inbox-layout|split-pane|message-bubble)[^{]*\{[^}]*(?:linear-gradient|backdrop-filter|filter:\s*blur)/s,
     )
+
+    // Issue #307: disabled ReplyComposerShell must not fade the whole surface.
+    // Ancestor opacity would mute title, helper, reason text, and controls together.
+    // Mutation kill: reintroducing opacity on `.is-disabled` fails this contract.
+    expect(css).not.toMatch(
+      /\.el-reply-composer-shell\.is-disabled[^{]*\{[^}]*\bopacity\s*:/s,
+    )
+    expect(css).not.toMatch(
+      /\.el-reply-composer-shell\.is-disabled[^{]*\{[^}]*opacity:\s*(?:0|0\.\d+)/s,
+    )
+    // Title stays a readable text role (primary), not disabled/placeholder gray.
+    expectCssRule(css, '.el-reply-composer-shell__title', [
+      'color: var(--el-text-color-primary);',
+    ])
+    // No full-surface gray wash / overlay motif on the composer shell.
+    expect(css).not.toMatch(
+      /\.el-reply-composer-shell[^{]*\{[^}]*(?:linear-gradient|backdrop-filter|filter:\s*grayscale)/s,
+    )
+    expect(css).not.toMatch(
+      /\.el-reply-composer-shell\.is-disabled[^{]*\{[^}]*(?:background:\s*(?:#|rgb|gray)|filter:)/s,
+    )
   })
 
   test('keeps perception challenge states task-focused and token aligned', () => {
