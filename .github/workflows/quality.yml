@@ -25,9 +25,6 @@ on:
         required: false
         type: string
 
-permissions:
-  contents: write
-
 jobs:
   pr-fast:
     if: github.event_name == 'pull_request'
@@ -84,38 +81,6 @@ jobs:
           echo "cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
           echo "cache-primary-key=${{ steps.typecheck-cache.outputs.cache-primary-key }}"
       - run: pnpm run verify:pr-fast
-      - name: Commit typography weight repair
-        if: failure() && github.event.pull_request.head.repo.full_name == github.repository
-        env:
-          HEAD_REF: ${{ github.head_ref }}
-        run: |
-          git fetch origin "$HEAD_REF"
-          git checkout -B "$HEAD_REF" "origin/$HEAD_REF"
-          python - <<'PY'
-          from pathlib import Path
-
-          path = Path('vue/packages/demo-app/src/style.css')
-          source = path.read_text(encoding='utf-8')
-          old = '''.audit-safe-area-lab__title {
-            margin: 0 0 var(--fsus-space-3);
-            font-size: 1rem;
-            font-weight: 600;
-          }'''
-          new = '''.audit-safe-area-lab__title {
-            margin: 0 0 var(--fsus-space-3);
-            font-size: 1rem;
-            font-weight: 700;
-          }'''
-          if source.count(old) != 1:
-              raise SystemExit('expected one audit safe-area title weight declaration')
-          path.write_text(source.replace(old, new), encoding='utf-8')
-          PY
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add vue/packages/demo-app/src/style.css
-          git commit -m "fix(demo): use an available title font weight"
-          git push origin "HEAD:$HEAD_REF"
-          exit 1
       - name: Determine PR demo build path impact
         id: demo-build-path
         run: node ./scripts/with-node-heap.mjs node ./scripts/should-run-demo-build.mjs
