@@ -107,6 +107,8 @@ Use `FsusInboxEmptyState` inside the list pane and `FsusEmptySelectionState` ins
 
 `FsusReplyComposerShell` is form-compatible layout only. Consumers provide labels, controls, validation, disabled behavior, and action copy. Keep the input label associated with the actual input control.
 
+When `disabled` is set, the shell root keeps full opacity and only marks the surface with `is-disabled` / `aria-disabled`. Do not rely on fading the whole composer: put standard disabled fill, text, and border on the real input and action controls, and keep titles, helpers, and permission-reason copy on readable text roles. FsusUI does not invent lock icons, banners, or helper copy for permission denial.
+
 ## Scroll Ownership
 
 - `FsusInboxLayout` and `FsusSplitPane` own the outer list/detail pane overflow.

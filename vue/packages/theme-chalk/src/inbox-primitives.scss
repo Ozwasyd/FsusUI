@@ -434,9 +434,9 @@
     min-width: 0;
   }
 
-  @include when(disabled) {
-    opacity: 0.64;
-  }
+  // Disabled is owned by slotted controls (fill/text/border tokens + native
+  // disabled). Do not express shell disabled via ancestor opacity — title,
+  // helper, and permission-reason copy must stay fully readable (issue #307).
 
   @include m(compact) {
     gap: 8px;

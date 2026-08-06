@@ -194,4 +194,39 @@ describe('inbox primitives', () => {
     })
     expect(wrapper.find('.el-inbox-empty-state__title').text()).toBe('No items')
   })
+
+  test('disabled composer keeps readable title and reason copy without shell opacity', () => {
+    const wrapper = mount(() => (
+      <ElReplyComposerShell title="Reply" disabled>
+        {{
+          input: () => (
+            <>
+              <p class="permission-reason">
+                You do not have permission to reply to this conversation.
+              </p>
+              <textarea aria-label="Reply body" disabled />
+            </>
+          ),
+          actions: () => (
+            <button type="submit" disabled>
+              Send
+            </button>
+          ),
+        }}
+      </ElReplyComposerShell>
+    ))
+
+    const shell = wrapper.find('.el-reply-composer-shell')
+    expect(shell.classes()).toContain('is-disabled')
+    expect(shell.attributes('aria-disabled')).toBe('true')
+    // Shell layout only — no inline opacity fade; CSS contract forbids ancestor
+    // opacity (see fsus-theme + CSR ancestor-opacity mutation).
+    expect(shell.attributes('style') ?? '').not.toMatch(/opacity/i)
+    expect(wrapper.find('.el-reply-composer-shell__title').text()).toBe('Reply')
+    expect(wrapper.find('.permission-reason').text()).toContain(
+      'permission to reply',
+    )
+    expect(wrapper.find('textarea').attributes('disabled')).toBeDefined()
+    expect(wrapper.find('button').attributes('disabled')).toBeDefined()
+  })
 })
