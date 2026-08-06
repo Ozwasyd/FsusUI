@@ -310,18 +310,30 @@ try {
         window.__fsusFrameIntervals = []
         window.__fsusLongTasks = []
         let previous = performance.now()
+        let measurementWindowStartedAt = Number.POSITIVE_INFINITY
         const tick = (now) => {
           window.__fsusFrameIntervals.push(now - previous)
           previous = now
           requestAnimationFrame(tick)
         }
         requestAnimationFrame(tick)
+        let longTaskObserver
         try {
-          new PerformanceObserver((list) => {
-            for (const entry of list.getEntries())
-              window.__fsusLongTasks.push(entry.duration)
-          }).observe({ type: 'longtask', buffered: true })
+          longTaskObserver = new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+              if (entry.startTime >= measurementWindowStartedAt)
+                window.__fsusLongTasks.push(entry.duration)
+            }
+          })
+          longTaskObserver.observe({ type: 'longtask', buffered: true })
         } catch {}
+        window.__fsusResetMeasurementWindow = () => {
+          longTaskObserver?.takeRecords()
+          window.__fsusFrameIntervals = []
+          window.__fsusLongTasks = []
+          previous = performance.now()
+          measurementWindowStartedAt = previous
+        }
         window.__fsusTargetHz = targetHz
       },
       { measureDomParses, targetHz: refreshHz },
@@ -343,6 +355,12 @@ try {
         () => new Promise((resolve) => requestAnimationFrame(() => resolve())),
       )
     }
+
+    await page.evaluate(() => {
+      if (typeof window.__fsusResetMeasurementWindow !== 'function')
+        throw new Error('Performance measurement window reset is unavailable')
+      window.__fsusResetMeasurementWindow()
+    })
 
     const traceComplete = new Promise((resolve) => {
       session.once('Tracing.tracingComplete', ({ stream }) => resolve(stream))

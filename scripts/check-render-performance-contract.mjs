@@ -50,6 +50,10 @@ for (const token of [
   "['enabled', 'reduced', 'disabled']",
   'scenarioDefinitions.flatMap',
   'Tracing.start',
+  'measurementWindowStartedAt = Number.POSITIVE_INFINITY',
+  'entry.startTime >= measurementWindowStartedAt',
+  'window.__fsusResetMeasurementWindow = () =>',
+  'Performance measurement window reset is unavailable',
   'workerProbe',
   'workerPoolBurstProbe',
   'wasmProbe',
@@ -71,6 +75,22 @@ for (const token of [
   'after > before * 1.05',
 ]) {
   if (!web.includes(token)) failures.push(`web runner missing ${token}`)
+}
+const warmupBoundary = web.indexOf(
+  'for (let index = 0; index < warmups; index++)',
+)
+const measurementReset = web.indexOf(
+  'window.__fsusResetMeasurementWindow()',
+)
+const tracingStart = web.indexOf('Tracing.start')
+if (
+  warmupBoundary < 0 ||
+  measurementReset <= warmupBoundary ||
+  tracingStart <= measurementReset
+) {
+  failures.push(
+    'web measurement window must reset after warmups and before tracing',
+  )
 }
 for (const token of [
   ':content-version="markdownContentVersion"',
