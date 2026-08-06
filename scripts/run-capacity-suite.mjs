@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
-import { spawn } from 'node:child_process'
+import crypto from 'node:crypto'
+import { spawn, spawnSync } from 'node:child_process'
+import fs from 'node:fs'
+import { gzipSync } from 'node:zlib'
 import {
   countUnitTestFiles,
   formatCapacitySummary,
@@ -120,6 +123,43 @@ function runTask(task) {
   })
 }
 
+const printGeneratedDiagnostics = () => {
+  try {
+    const css = fs.readFileSync('vue/packages/theme-chalk/dist/el-fsus.css')
+    console.error(
+      `[pr-fast-diagnostic] theme sha256=${crypto.createHash('sha256').update(css).digest('hex')} bytes=${css.byteLength}`,
+    )
+  } catch (error) {
+    console.error(
+      `[pr-fast-diagnostic] theme unavailable: ${error instanceof Error ? error.message : String(error)}`,
+    )
+  }
+
+  const generated = spawnSync('pnpm', ['run', 'avalonia:baseline'], {
+    stdio: 'inherit',
+    env: process.env,
+    shell: process.platform === 'win32',
+  })
+  if (generated.status !== 0) return
+
+  for (const [label, file] of [
+    ['vue-current.json', 'spec/baselines/vue-current.json'],
+    [
+      'vue-public-api-baseline.md',
+      'docs/avalonia/vue-public-api-baseline.md',
+    ],
+  ]) {
+    try {
+      const encoded = gzipSync(fs.readFileSync(file)).toString('base64')
+      console.error(`[pr-fast-diagnostic] ${label}.gz.b64=${encoded}`)
+    } catch (error) {
+      console.error(
+        `[pr-fast-diagnostic] ${label} unavailable: ${error instanceof Error ? error.message : String(error)}`,
+      )
+    }
+  }
+}
+
 const batches = createBatches(suites[suiteName])
 console.log(formatCapacitySummary(plan))
 console.log(
@@ -131,4 +171,5 @@ for (const batch of batches) {
   const statuses = await Promise.all(batch.map(runTask))
   if (statuses.some((status) => status !== 0)) failed = true
 }
+if (failed && suiteName === 'pr-fast') printGeneratedDiagnostics()
 process.exitCode = failed ? 1 : 0
