@@ -214,7 +214,9 @@
     "ci:playwright:check": "node ./scripts/playwright-suites.mjs check && node ./scripts/test-playwright-suites.mjs",
     "deps:authority:check": "node ./scripts/check-npm-authority.mjs",
     "deps:sync": "node ./scripts/deps-sync.mjs",
-    "test:deps-sync": "node ./scripts/test-deps-sync.mjs"
+    "deps:check": "node ./scripts/deps-check.mjs",
+    "test:deps-sync": "node ./scripts/test-deps-sync.mjs",
+    "test:deps-check": "node ./scripts/test-deps-check.mjs"
   },
   "peerDependencies": {
     "vue": "^3.5.0"
