@@ -90,7 +90,8 @@ export const treeProps = buildProps({
   },
   indent: {
     type: Number,
-    default: 16,
+    // Shared Tree / TreeV2 / TreeSelect hierarchy indent contract (#296).
+    default: 24,
   },
   itemSize,
   icon: {

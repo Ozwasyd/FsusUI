@@ -2129,8 +2129,15 @@ describe('Fsus theme visual baseline', () => {
       '.el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content',
       [
         'background-color: var(--fsus-tree-current-bg, var(--fsus-state-selected-bg));',
+        'color: var(--fsus-tree-current-text, var(--fsus-scholarly-blue));',
+        'box-shadow: inset 3px 0 0 var(--fsus-tree-current-marker, var(--fsus-scholarly-blue));',
       ],
     )
+    expectCssRule(css, '.el-tree-node__content', [
+      'border-radius: 0;',
+      'box-shadow: none;',
+      'margin: 0;',
+    ])
     expect(css).not.toContain('color: #fff;')
     expect(css).not.toContain('var(--el-color-primary)')
     expect(css).not.toContain('var(--el-color-primary-light-9)')
@@ -3780,5 +3787,124 @@ describe('Fsus theme visual baseline', () => {
     expect(themeCss).toMatch(
       /\.el-input-number\.is-disabled[\s\S]*?opacity:\s*1/,
     )
+  })
+
+  test('flattens Tree/TreeV2/TreeSelect node rows and uses Scholarly Blue markers (#296)', () => {
+    const themeCss = compileThemeFile('fsus-theme.scss')
+    const treeCss = compileThemeFile('tree.scss')
+    const treeSelectCss = compileThemeFile('tree-select.scss')
+    const shippedCss = compileThemeFile('fsus.scss')
+    const tokensSource = readFileSync(
+      path.resolve(themeSourceDir, 'common/fsus-tokens.scss'),
+      'utf8',
+    )
+
+    // Shared indent token documents the 24px hierarchy contract.
+    expect(tokensSource).toContain('--fsus-tree-indent: 24px;')
+    expect(tokensSource).toContain(
+      '--fsus-tree-current-marker: var(--fsus-scholarly-blue);',
+    )
+    expect(tokensSource).toContain(
+      '--fsus-tree-current-text: var(--fsus-scholarly-blue);',
+    )
+
+    // Flat geometry on node content (theme override + base tree).
+    for (const css of [themeCss, treeCss, shippedCss]) {
+      expectCssRule(css, '.el-tree-node__content', [
+        'border-radius: 0;',
+        'box-shadow: none;',
+      ])
+    }
+    expectCssRule(themeCss, '.el-tree-node__content', [
+      'margin: 0;',
+      'background: transparent;',
+    ])
+
+    // Hover uses weak state fill, not panel card chrome.
+    expectCssRule(themeCss, '.el-tree-node__content:hover', [
+      'background: var(--fsus-state-hover-bg, var(--el-fill-color-light));',
+    ])
+
+    // Current: Scholarly Blue side marker + selected fill + blue text.
+    expectCssRule(
+      themeCss,
+      '.el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content',
+      [
+        'background: var(--fsus-tree-current-bg, var(--fsus-state-selected-bg));',
+        'color: var(--fsus-tree-current-text, var(--fsus-scholarly-blue));',
+        'font-weight: 500;',
+        'box-shadow: inset 3px 0 0 var(--fsus-tree-current-marker, var(--fsus-scholarly-blue));',
+      ],
+    )
+    expectCssRule(
+      treeCss,
+      '.el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content',
+      [
+        'background-color: var(--fsus-tree-current-bg, var(--fsus-state-selected-bg));',
+        'box-shadow: inset 3px 0 0 var(--fsus-tree-current-marker, var(--fsus-scholarly-blue));',
+      ],
+    )
+
+    // focus-visible: 2px inset ring on flat row.
+    expectCssRule(
+      themeCss,
+      '.el-tree-node:focus-visible > .el-tree-node__content',
+      [
+        'box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;',
+      ],
+    )
+
+    // Current + focus-visible: both side marker and ring remain present.
+    expectCssRule(
+      themeCss,
+      '.el-tree--highlight-current .el-tree-node.is-current:focus-visible > .el-tree-node__content',
+      [
+        'inset 3px 0 0 var(--fsus-tree-current-marker, var(--fsus-scholarly-blue))',
+        'inset 0 0 0 2px var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight))',
+      ],
+    )
+
+    // TreeSelect shares the same flat/current contract.
+    expect(treeSelectCss).toContain('--el-tree-select-row-radius: 0;')
+    expect(treeSelectCss).not.toContain(
+      '--el-tree-select-row-radius: var(--fsus-radius-navigation, 6px);',
+    )
+    expect(treeSelectCss).not.toContain('margin: 2px 0')
+    expectCssRule(
+      treeSelectCss,
+      '.el-tree-select__popper .el-tree .el-tree-node.is-current > .el-tree-node__content',
+      [
+        'box-shadow: inset 3px 0 0 var(--fsus-tree-current-marker, var(--fsus-scholarly-blue));',
+        'color: var(--fsus-tree-current-text, var(--fsus-scholarly-blue));',
+      ],
+    )
+
+    // Mutation kill: cardified 12px panel radius on tree rows.
+    for (const css of [themeCss, shippedCss]) {
+      expect(css).not.toMatch(
+        /\.el-tree-node__content\s*\{[^}]*border-radius:\s*12px/s,
+      )
+      expect(css).not.toMatch(
+        /\.el-tree-node__content\s*\{[^}]*border-radius:\s*var\(--fsus-radius-navigation/s,
+      )
+      // Mutation kill: gray-only current (fill without Scholarly Blue marker).
+      expect(css).not.toMatch(
+        /\.el-tree--highlight-current\s+\.el-tree-node\.is-current\s*>\s*\.el-tree-node__content\s*\{[^}]*background:\s*var\(--el-fill-color\)[^}]*color:\s*var\(--el-text-color-primary\)/s,
+      )
+    }
+
+    // Mutation kill: base tree must not reintroduce panel radius on content.
+    expect(treeCss).not.toMatch(
+      /\.el-tree-node__content\s*\{[^}]*border-radius:\s*var\(--el-border-radius-base\)/s,
+    )
+    expect(treeCss).not.toMatch(
+      /\.el-tree-node:focus\s*>\s*\.el-tree-node__content/s,
+    )
+
+    // Positive Scholarly Blue marker presence on shipped consumer path.
+    expect(shippedCss).toContain(
+      'box-shadow: inset 3px 0 0 var(--fsus-tree-current-marker, var(--fsus-scholarly-blue))',
+    )
+    expect(shippedCss).toContain('--fsus-tree-indent: 24px')
   })
 })

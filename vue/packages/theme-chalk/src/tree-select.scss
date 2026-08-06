@@ -8,8 +8,10 @@
 
 @include b(tree-select) {
   @include e(popper) {
+    // Shared Tree/TreeV2/TreeSelect row contract (#296): flat rows, 0 radius,
+    // no card gap. Hierarchy from indent (Tree prop default 24px) + expand.
     --el-tree-select-row-height: 44px;
-    --el-tree-select-row-radius: var(--fsus-radius-navigation, 6px);
+    --el-tree-select-row-radius: 0;
     --el-tree-select-row-expand-size: 32px;
     --el-tree-select-row-content-padding: 12px;
 
@@ -37,9 +39,10 @@
       align-items: center;
       height: var(--el-tree-select-row-height);
       min-height: var(--el-tree-select-row-height);
-      margin: 2px 0;
+      margin: 0;
       padding-right: var(--el-tree-select-row-content-padding);
       border-radius: var(--el-tree-select-row-radius);
+      box-shadow: none;
       box-sizing: border-box;
       background: transparent;
       color: getCssVar('text-color', 'regular');
@@ -141,25 +144,45 @@
       }
     }
 
+    // Current/selected: Scholarly Blue side marker + selected fill (shared with Tree).
     .#{$namespace}-tree
       .#{$namespace}-tree-node.is-current
       > .#{$namespace}-tree-node__content {
-      background: var(--fsus-state-selected-bg);
-      color: var(--fsus-scholarly-blue);
-      font-weight: inherit;
+      background: var(--fsus-tree-current-bg, var(--fsus-state-selected-bg));
+      color: var(--fsus-tree-current-text, var(--fsus-scholarly-blue));
+      font-weight: 500;
+      box-shadow: inset 3px 0 0
+        var(--fsus-tree-current-marker, var(--fsus-scholarly-blue));
     }
 
     .#{$namespace}-tree
       .#{$namespace}-tree-node__content:has(
         > .#{$namespace}-select-dropdown__item.selected
       ) {
-      background: var(--fsus-state-selected-bg);
-      color: var(--fsus-scholarly-blue);
-      font-weight: inherit;
+      background: var(--fsus-tree-current-bg, var(--fsus-state-selected-bg));
+      color: var(--fsus-tree-current-text, var(--fsus-scholarly-blue));
+      font-weight: 500;
+      box-shadow: inset 3px 0 0
+        var(--fsus-tree-current-marker, var(--fsus-scholarly-blue));
     }
 
     .#{$namespace}-tree-node:focus-visible > .#{$namespace}-tree-node__content {
-      @include a11y-focus-ring(2px, var(--el-tree-select-row-radius));
+      @include a11y-focus-ring(2px, 0);
+    }
+
+    .#{$namespace}-tree
+      .#{$namespace}-tree-node.is-current:focus-visible
+      > .#{$namespace}-tree-node__content,
+    .#{$namespace}-tree
+      .#{$namespace}-tree-node:focus-visible
+      > .#{$namespace}-tree-node__content:has(
+        > .#{$namespace}-select-dropdown__item.selected
+      ) {
+      outline: none !important;
+      box-shadow:
+        inset 3px 0 0 var(--fsus-tree-current-marker, var(--fsus-scholarly-blue)),
+        inset 0 0 0 2px
+          var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;
     }
   }
 }
