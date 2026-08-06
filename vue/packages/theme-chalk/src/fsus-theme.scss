@@ -527,17 +527,40 @@ html.dark {
 .#{$namespace}-input-number {
   @include fsus-control(control);
   background: var(--el-bg-color);
+  // Shared action-size token (48/44/40 ladder). Both controls-position modes
+  // consume this token — no per-mode hardcoded widths.
+  --fsus-input-number-action-size: var(--fsus-control-height, 44px);
+  --fsus-input-number-icon-size: var(--fsus-icon-size-md, 16px);
   overflow: hidden;
   padding: 0;
   display: inline-flex;
   align-items: stretch;
+  min-height: var(--fsus-control-height, 44px);
+
+  &.#{$namespace}-input-number--large {
+    --fsus-input-number-action-size: var(--fsus-control-height-spacious, 48px);
+    min-height: var(--fsus-control-height-spacious, 48px);
+  }
+
+  &.#{$namespace}-input-number--small {
+    --fsus-input-number-action-size: var(--fsus-control-height-compact, 40px);
+    min-height: var(--fsus-control-height-compact, 40px);
+  }
+
+  .#{$namespace}-input {
+    flex: 1;
+    min-width: 0;
+  }
 
   .#{$namespace}-input__wrapper {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
     flex: 1;
-    padding: 0 12px;
+    min-height: inherit;
+    // Reserve side strips for left/right decrease/increase hit targets.
+    padding-left: var(--fsus-input-number-action-size);
+    padding-right: var(--fsus-input-number-action-size);
   }
 
   .#{$namespace}-input-number__increase,
@@ -545,8 +568,16 @@ html.dark {
     background: transparent;
     color: var(--el-text-color-regular);
     border: none;
-    width: 38px;
+    box-shadow: none;
+    transform: none;
+    width: var(--fsus-input-number-action-size);
+    min-width: var(--fsus-input-number-action-size);
+    // Extend into the 1px control border so the hit box equals the full border-box
+    // control height (small 40 stays ≥40; no 38px collapse from inset).
+    top: -1px;
+    bottom: -1px;
     height: auto;
+    min-height: var(--fsus-input-number-action-size);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -554,9 +585,45 @@ html.dark {
       background-color var(--fsus-motion-control, 220ms),
       color var(--fsus-motion-control, 220ms);
 
+    .#{$namespace}-icon {
+      font-size: var(--fsus-input-number-icon-size);
+      width: 1em;
+      height: 1em;
+      transform: none;
+    }
+
     &:hover {
       background: var(--el-fill-color);
       color: var(--el-text-color-primary);
+      box-shadow: none;
+      transform: none;
+    }
+
+    &:active {
+      background: var(--el-fill-color-dark, var(--el-fill-color));
+      box-shadow: none;
+      transform: none;
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px)
+        var(--fsus-scholarly-blue);
+    }
+
+    &.is-disabled {
+      color: var(--el-disabled-text-color);
+      background: transparent;
+      opacity: 1;
+      cursor: not-allowed;
+
+      &:hover,
+      &:active {
+        color: var(--el-disabled-text-color);
+        background: transparent;
+        box-shadow: none;
+        transform: none;
+      }
     }
   }
 
@@ -566,6 +633,65 @@ html.dark {
 
   .#{$namespace}-input-number__increase {
     border-left: 1px solid var(--el-border-color-lighter);
+  }
+
+  // controls-position="right" shares the same action-size token.
+  &.is-controls-right {
+    .#{$namespace}-input__wrapper {
+      padding-left: 12px;
+      padding-right: var(--fsus-input-number-action-size);
+    }
+
+    .#{$namespace}-input-number__increase,
+    .#{$namespace}-input-number__decrease {
+      width: var(--fsus-input-number-action-size);
+      min-width: var(--fsus-input-number-action-size);
+      // Stacked strip: each row is half the control; width still ≥40 via token.
+      min-height: 0;
+      height: 50%;
+      top: auto;
+      bottom: auto;
+
+      .#{$namespace}-icon {
+        transform: none;
+      }
+
+      &:hover {
+        box-shadow: none;
+        transform: none;
+      }
+    }
+
+    .#{$namespace}-input-number__increase {
+      top: 0;
+      bottom: auto;
+      border-bottom: 1px solid var(--el-border-color-lighter);
+      border-left: 1px solid var(--el-border-color-lighter);
+      border-radius: 0;
+    }
+
+    .#{$namespace}-input-number__decrease {
+      bottom: 0;
+      top: auto;
+      right: 0;
+      left: auto;
+      border-right: none;
+      border-left: 1px solid var(--el-border-color-lighter);
+      border-radius: 0;
+    }
+  }
+
+  &.is-disabled {
+    .#{$namespace}-input-number__increase,
+    .#{$namespace}-input-number__decrease {
+      color: var(--el-disabled-text-color);
+      opacity: 1;
+
+      &:hover {
+        color: var(--el-disabled-text-color);
+        background: transparent;
+      }
+    }
   }
 }
 

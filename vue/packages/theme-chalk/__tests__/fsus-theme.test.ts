@@ -3094,4 +3094,79 @@ describe('Fsus theme visual baseline', () => {
     expect(css).toContain('@media (max-width: 640px)')
     expect(css).not.toMatch(/linear-gradient|backdrop-filter|filter:\s*blur/)
   })
+
+  test('InputNumber stepper actions share ≥40px action-size tokens without 38px', () => {
+    const themeCss = compileThemeFile('fsus-theme.scss')
+    const inputNumberCss = compileThemeFile('input-number.scss')
+
+    // Production CSS must not hardcode 38px as the action size.
+    expect(themeCss).not.toMatch(
+      /\.el-input-number__increase[^{]*\{[^}]*\bwidth:\s*38px\b/s,
+    )
+    expect(themeCss).not.toMatch(
+      /\.el-input-number__decrease[^{]*\{[^}]*\bwidth:\s*38px\b/s,
+    )
+    expect(inputNumberCss).not.toMatch(/\bwidth:\s*38px\b/)
+
+    // Shared action-size token on the control ladder (48/44/40).
+    expect(themeCss).toContain(
+      '--fsus-input-number-action-size: var(--fsus-control-height, 44px)',
+    )
+    expect(themeCss).toContain(
+      '--fsus-input-number-action-size: var(--fsus-control-height-spacious, 48px)',
+    )
+    expect(themeCss).toContain(
+      '--fsus-input-number-action-size: var(--fsus-control-height-compact, 40px)',
+    )
+    expect(inputNumberCss).toContain('--fsus-input-number-action-size:')
+
+    expectCssRule(themeCss, '.el-input-number .el-input-number__increase', [
+      'width: var(--fsus-input-number-action-size);',
+      'min-width: var(--fsus-input-number-action-size);',
+      'transform: none;',
+    ])
+    expectCssRule(themeCss, '.el-input-number .el-input-number__decrease', [
+      'width: var(--fsus-input-number-action-size);',
+      'min-width: var(--fsus-input-number-action-size);',
+    ])
+
+    // controls-position right reuses the same token (no separate hardcoded width).
+    expectCssRule(
+      themeCss,
+      '.el-input-number.is-controls-right .el-input-number__increase',
+      ['width: var(--fsus-input-number-action-size);'],
+    )
+    expectCssRule(
+      inputNumberCss,
+      '.el-input-number.is-controls-right .el-input-number__increase',
+      ['width: var(--fsus-input-number-action-size);'],
+    )
+
+    // Icon ~16px, optically centered (no scale transforms).
+    expect(themeCss).toContain(
+      '--fsus-input-number-icon-size: var(--fsus-icon-size-md, 16px)',
+    )
+    expect(inputNumberCss).toContain('--fsus-input-number-icon-size: 16px')
+    expect(themeCss).not.toMatch(
+      /\.el-input-number[^{]*\{[^}]*transform:\s*scale\(/s,
+    )
+    expect(inputNumberCss).not.toMatch(/transform:\s*scale\(/)
+
+    // Hover/active must not introduce shadow or translate displacement.
+    const increaseHover = themeCss.match(
+      /\.el-input-number\s+\.el-input-number__increase:hover\s*\{([^}]*)\}/,
+    )
+    expect(increaseHover?.[1] ?? '').not.toMatch(/box-shadow:\s*(?!none)/)
+    expect(increaseHover?.[1] ?? '').not.toMatch(/translate/)
+
+    // Disabled uses independent tokens with opacity: 1 (not opacity fade).
+    expectCssRule(
+      themeCss,
+      '.el-input-number .el-input-number__increase.is-disabled',
+      ['opacity: 1;', 'color: var(--el-disabled-text-color);'],
+    )
+    expect(themeCss).toMatch(
+      /\.el-input-number\.is-disabled[\s\S]*?opacity:\s*1/,
+    )
+  })
 })
