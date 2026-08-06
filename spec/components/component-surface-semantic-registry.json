@@ -13,7 +13,7 @@
   },
   "generated": {
     "producer": "scripts/check-component-surface-semantic-registry.mjs",
-    "sourceRevision": "700e484b5fb78e934b2d9c702b6951a45047be8a",
+    "sourceRevision": "edc1b75557aef0771fa615030110181a5aeae013",
     "digestAlgorithm": "sha256"
   },
   "sourceDigests": {
@@ -33,7 +33,7 @@
       "path": "spec/components/contracts/v1/vue-public-contracts.json",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "717330dae01e6db3fdd8869520033a9a62bb4a63f167456418b38471bd6f367c"
+      "digest": "acb6f8ba6edf1414d99d96a67dd63ad0eeab8b17f811e38b19a0d3899e4de72d"
     },
     "component-motion": {
       "path": "docs/components/motion.md",
@@ -93,13 +93,13 @@
       "path": "vue/packages/theme-chalk/src/tabs.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "acd0ff470450a080f447fdecb2100c76bbb5dc7949adc23c28b1fd82ab9a24fd"
+      "digest": "304da45579dd5b5ac350804f7fd85ed4854d36f3a8164e6cff7cf8b60dfd06a8"
     },
     "implementation-09": {
       "path": "vue/packages/theme-chalk/src/menu.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "45b1c4a308f583a43650a95a4fd5bb393a889f0d70fc927e54a7d4fd646aecb2"
+      "digest": "888253eb20a985b13ebe0e10039f7c0f79251105c45a03da2d5d811e9e946de7"
     },
     "implementation-10": {
       "path": "vue/packages/theme-chalk/src/radio-button.scss",
@@ -117,19 +117,19 @@
       "path": "vue/packages/theme-chalk/src/fsus-theme.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "c5e0866a0eaa8d95f2268de67389531f6a9c3b7c83d8f9e7fa40a2e7810f0cdf"
+      "digest": "dbe86c95e98f8d766e99b141031b7091736a82e5b8659368eb51f766a80a9f3d"
     },
     "implementation-13": {
       "path": "vue/packages/theme-chalk/src/collection-primitives.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "131729f07f27ad59eba293e0520efe608c5c7ad1139e9b8ac9127a97081fdd4c"
+      "digest": "6fd6947d3e1b8b401ff0741cad727398a4d116b3d6a4ef3fd5c6f90ad4b86650"
     },
     "implementation-14": {
       "path": "vue/packages/theme-chalk/src/input-number.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "660a6030946fe4570735b0d12cc59f5630e9ab208f9b7ae0b1689873778de8d0"
+      "digest": "669dd2d102f7ece9d70be491d8713d930ad40ca672656c0ad056a75292aba221"
     },
     "implementation-15": {
       "path": "vue/packages/theme-chalk/src/dialog.scss",
@@ -153,13 +153,13 @@
       "path": "vue/packages/theme-chalk/src/loading.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "e49a4e53a9a88aa2b3b2d70e4a5dd813ab3bc730b7b52ab3bcb7942f3eca832f"
+      "digest": "4571b9e10ba703cf2b54d34151755cbea90fc951a06508276b8a04255144c52d"
     },
     "implementation-19": {
       "path": "vue/packages/theme-chalk/src/table.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "57e48c5d92f0df9635e07ed35121f4682cbd27b824bb4c26fd69d7a8de7254f7"
+      "digest": "51dd8ea5f1a778caef995362d24e99a883dace611774a5dbf70bd2ea294f3467"
     },
     "implementation-20": {
       "path": "vue/packages/theme-chalk/src/common/transition.scss",
@@ -171,7 +171,7 @@
       "path": "vue/packages/theme-chalk/src/public-shell.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "b0841f1e7c9e1cef86dafb97f7d05b00a453ad36c27c3ec082139aa6e356bc94"
+      "digest": "33ee18f381c3715818ffd17bdd3c75543e084b0f7f7dafd1335f3f650132fb74"
     },
     "implementation-22": {
       "path": "vue/packages/theme-chalk/src/drawer.scss",
@@ -192,7 +192,9 @@
       "componentId": "web.select",
       "partId": "option-row",
       "surfaceRole": "overlay.option-row",
-      "issues": [293],
+      "issues": [
+        293
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -259,9 +261,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -273,12 +286,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.select.option-row.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -291,8 +314,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -309,7 +340,9 @@
       "componentId": "web.select",
       "partId": "overlay-root",
       "surfaceRole": "overlay.panel-root",
-      "issues": [293],
+      "issues": [
+        293
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -382,9 +415,20 @@
         ]
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -396,12 +440,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.select.overlay-root.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -414,8 +468,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -432,7 +494,9 @@
       "componentId": "web.tree",
       "partId": "tree-row",
       "surfaceRole": "data-region.tree-node-row",
-      "issues": [296],
+      "issues": [
+        296
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -505,9 +569,20 @@
         ]
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -519,12 +594,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.tree.tree-row.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -537,8 +622,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -555,7 +648,9 @@
       "componentId": "web.date-picker",
       "partId": "data-region-root",
       "surfaceRole": "data-region.picker-root",
-      "issues": [297],
+      "issues": [
+        297
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -628,9 +723,20 @@
         ]
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -642,12 +748,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.date-picker.data-region-root.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -660,8 +776,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -678,7 +802,9 @@
       "componentId": "web.date-picker",
       "partId": "date-cell",
       "surfaceRole": "data-region.date-time-cell",
-      "issues": [297],
+      "issues": [
+        297
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -751,9 +877,20 @@
         ]
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -765,12 +902,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.date-picker.date-cell.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -783,8 +930,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -801,7 +956,9 @@
       "componentId": "web.time-picker",
       "partId": "time-row",
       "surfaceRole": "overlay.time-option-row",
-      "issues": [297],
+      "issues": [
+        297
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -868,9 +1025,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -882,12 +1050,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.time-picker.time-row.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -900,8 +1078,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -918,7 +1104,9 @@
       "componentId": "web.upload",
       "partId": "file-row",
       "surfaceRole": "data-region.file-row",
-      "issues": [300],
+      "issues": [
+        300
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -991,9 +1179,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -1005,12 +1204,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.upload.file-row.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -1023,8 +1232,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -1041,7 +1258,10 @@
       "componentId": "web.diagnostics-list",
       "partId": "diagnostic-row",
       "surfaceRole": "data-region.diagnostic-row",
-      "issues": [305, 306],
+      "issues": [
+        305,
+        306
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -1108,9 +1328,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -1122,12 +1353,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.diagnostics-list.diagnostic-row.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -1140,8 +1381,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -1158,7 +1407,9 @@
       "componentId": "web.tabs",
       "partId": "tab-item",
       "surfaceRole": "navigation.tab-item",
-      "issues": [295],
+      "issues": [
+        295
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -1231,9 +1482,20 @@
         ]
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -1245,12 +1507,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.tabs.tab-item.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -1263,8 +1535,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -1281,7 +1561,9 @@
       "componentId": "web.menu",
       "partId": "vertical-item",
       "surfaceRole": "navigation.vertical-menu-item",
-      "issues": [294],
+      "issues": [
+        294
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -1348,9 +1630,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -1362,12 +1655,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.menu.vertical-item.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -1380,8 +1683,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -1398,7 +1709,9 @@
       "componentId": "web.menu",
       "partId": "horizontal-item",
       "surfaceRole": "navigation.horizontal-menu-item",
-      "issues": [294],
+      "issues": [
+        294
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -1465,9 +1778,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -1479,12 +1803,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.menu.horizontal-item.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -1497,8 +1831,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -1515,7 +1857,9 @@
       "componentId": "web.radio-button",
       "partId": "segmented-item",
       "surfaceRole": "control-group.form-single-choice-option",
-      "issues": [301],
+      "issues": [
+        301
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -1593,9 +1937,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -1607,12 +1962,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.radio-button.segmented-item.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -1625,8 +1990,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -1643,7 +2016,9 @@
       "componentId": "web.checkbox-button",
       "partId": "segmented-item",
       "surfaceRole": "control-group.form-multiple-choice-option",
-      "issues": [301],
+      "issues": [
+        301
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -1721,9 +2096,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -1735,12 +2121,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.checkbox-button.segmented-item.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -1753,8 +2149,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -1771,7 +2175,9 @@
       "componentId": "web.theme-mode-toggle",
       "partId": "segmented-item",
       "surfaceRole": "control-group.navigation-mode-toggle-option",
-      "issues": [301],
+      "issues": [
+        301
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -1854,9 +2260,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -1868,12 +2285,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.theme-mode-toggle.segmented-item.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -1886,8 +2313,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -1904,7 +2339,9 @@
       "componentId": "web.segmented-control",
       "partId": "segmented-item",
       "surfaceRole": "control-group.navigation-view-toggle-option",
-      "issues": [301],
+      "issues": [
+        301
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -1987,9 +2424,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -2001,12 +2449,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.segmented-control.segmented-item.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -2019,8 +2477,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -2037,7 +2503,9 @@
       "componentId": "web.input-number",
       "partId": "action",
       "surfaceRole": "form-control.input-number-action",
-      "issues": [309],
+      "issues": [
+        309
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -2104,9 +2572,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -2118,12 +2597,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.input-number.action.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -2136,8 +2625,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -2154,7 +2651,9 @@
       "componentId": "web.input-number",
       "partId": "interactive-root",
       "surfaceRole": "form-control.input-number-interactive-root",
-      "issues": [309],
+      "issues": [
+        309
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -2221,9 +2720,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -2235,12 +2745,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.input-number.interactive-root.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -2253,8 +2773,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -2271,7 +2799,9 @@
       "componentId": "web.dialog",
       "partId": "overlay-close",
       "surfaceRole": "overlay.close-action",
-      "issues": [299],
+      "issues": [
+        299
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -2338,9 +2868,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -2352,12 +2893,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.dialog.overlay-close.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -2370,8 +2921,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -2388,7 +2947,9 @@
       "componentId": "web.rate",
       "partId": "filled-icon",
       "surfaceRole": "form-control.rate-filled-icon",
-      "issues": [302],
+      "issues": [
+        302
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -2455,9 +3016,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -2469,12 +3041,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.rate.filled-icon.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -2487,8 +3069,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -2505,7 +3095,9 @@
       "componentId": "web.reply-composer-shell",
       "partId": "interactive-root",
       "surfaceRole": "task.reply-composer-interactive-root",
-      "issues": [307],
+      "issues": [
+        307
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -2572,9 +3164,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -2586,12 +3189,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.reply-composer-shell.interactive-root.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -2604,8 +3217,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -2622,7 +3243,9 @@
       "componentId": "web.reply-composer-shell",
       "partId": "disabled-control",
       "surfaceRole": "task.reply-composer-disabled-control",
-      "issues": [307],
+      "issues": [
+        307
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -2689,9 +3312,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -2703,12 +3337,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.reply-composer-shell.disabled-control.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -2721,8 +3365,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -2739,7 +3391,10 @@
       "componentId": "web.task-primitives",
       "partId": "metadata",
       "surfaceRole": "task.typography-metadata",
-      "issues": [305, 306],
+      "issues": [
+        305,
+        306
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -2811,9 +3466,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -2825,12 +3491,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.task-primitives.metadata.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -2843,8 +3519,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -2861,7 +3545,10 @@
       "componentId": "web.task-primitives",
       "partId": "body",
       "surfaceRole": "task.typography-body",
-      "issues": [305, 306],
+      "issues": [
+        305,
+        306
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -2928,9 +3615,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -2942,12 +3640,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.task-primitives.body.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -2960,8 +3668,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -2978,7 +3694,10 @@
       "componentId": "web.task-primitives",
       "partId": "title",
       "surfaceRole": "task.typography-title",
-      "issues": [305, 306],
+      "issues": [
+        305,
+        306
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -3045,9 +3764,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -3059,12 +3789,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.task-primitives.title.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -3077,8 +3817,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -3095,7 +3843,9 @@
       "componentId": "web.loading",
       "partId": "metadata",
       "surfaceRole": "feedback.loading-metadata",
-      "issues": [303],
+      "issues": [
+        303
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -3162,9 +3912,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -3176,12 +3937,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.loading.metadata.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -3194,8 +3965,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -3212,7 +3991,9 @@
       "componentId": "web.loading",
       "partId": "text",
       "surfaceRole": "feedback.loading-text",
-      "issues": [303],
+      "issues": [
+        303
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -3279,9 +4060,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -3293,12 +4085,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.loading.text.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -3311,8 +4113,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -3329,7 +4139,9 @@
       "componentId": "web.metric-primitives",
       "partId": "label",
       "surfaceRole": "data-region.metric-label",
-      "issues": [306],
+      "issues": [
+        306
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -3396,9 +4208,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -3410,12 +4233,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.metric-primitives.label.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -3428,8 +4261,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -3446,7 +4287,9 @@
       "componentId": "web.metric-primitives",
       "partId": "value",
       "surfaceRole": "data-region.metric-value",
-      "issues": [306],
+      "issues": [
+        306
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -3513,9 +4356,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -3527,12 +4381,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.metric-primitives.value.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -3545,8 +4409,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -3563,7 +4435,9 @@
       "componentId": "web.table",
       "partId": "header-cell",
       "surfaceRole": "data-region.table-header-cell",
-      "issues": [304],
+      "issues": [
+        304
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -3576,11 +4450,20 @@
         "selectors": [
           {
             "platform": "web",
-            "selector": ".el-table__header",
+            "selector": ".el-table th.el-table__cell",
             "source": {
-              "sourceId": "implementation-19",
-              "path": "vue/packages/theme-chalk/src/table.scss",
-              "pointer": "selector:.el-table__header"
+              "sourceId": "implementation-12",
+              "path": "vue/packages/theme-chalk/src/fsus-theme.scss",
+              "pointer": "selector:.el-table th.el-table__cell"
+            }
+          },
+          {
+            "platform": "web",
+            "selector": ".el-table-v2__header-cell",
+            "source": {
+              "sourceId": "implementation-12",
+              "path": "vue/packages/theme-chalk/src/fsus-theme.scss",
+              "pointer": "selector:.el-table-v2__header-cell"
             }
           }
         ]
@@ -3592,9 +4475,14 @@
         },
         "sources": [
           {
+            "sourceId": "implementation-12",
+            "path": "vue/packages/theme-chalk/src/fsus-theme.scss",
+            "pointer": "selector:.el-table th.el-table__cell"
+          },
+          {
             "sourceId": "implementation-19",
             "path": "vue/packages/theme-chalk/src/table.scss",
-            "pointer": "selector:.el-table__header"
+            "pointer": "selector:.el-table thead th"
           }
         ]
       },
@@ -3635,9 +4523,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -3649,12 +4548,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.table.header-cell.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -3667,8 +4576,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -3685,7 +4602,9 @@
       "componentId": "web.table",
       "partId": "small-header-cell",
       "surfaceRole": "data-region.table-small-header-cell",
-      "issues": [304],
+      "issues": [
+        304
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -3698,11 +4617,11 @@
         "selectors": [
           {
             "platform": "web",
-            "selector": ".el-table--small .el-table__header",
+            "selector": ".el-table--small th.el-table__cell",
             "source": {
-              "sourceId": "implementation-19",
-              "path": "vue/packages/theme-chalk/src/table.scss",
-              "pointer": "selector:.el-table--small .el-table__header"
+              "sourceId": "implementation-12",
+              "path": "vue/packages/theme-chalk/src/fsus-theme.scss",
+              "pointer": "selector:.el-table--small th.el-table__cell"
             }
           }
         ]
@@ -3714,9 +4633,9 @@
         },
         "sources": [
           {
-            "sourceId": "implementation-19",
-            "path": "vue/packages/theme-chalk/src/table.scss",
-            "pointer": "selector:.el-table--small .el-table__header"
+            "sourceId": "implementation-12",
+            "path": "vue/packages/theme-chalk/src/fsus-theme.scss",
+            "pointer": "selector:.el-table--small th.el-table__cell"
           }
         ]
       },
@@ -3752,9 +4671,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -3766,12 +4696,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.table.small-header-cell.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -3784,8 +4724,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -3802,7 +4750,9 @@
       "componentId": "web.motion",
       "partId": "control-transition",
       "surfaceRole": "interaction.control-transition",
-      "issues": [308],
+      "issues": [
+        308
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -3874,9 +4824,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -3888,12 +4849,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.motion.control-transition.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -3906,8 +4877,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -3924,7 +4903,9 @@
       "componentId": "web.motion",
       "partId": "control-enter-from",
       "surfaceRole": "interaction.control-enter-from",
-      "issues": [308],
+      "issues": [
+        308
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -4001,9 +4982,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -4015,12 +5007,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.motion.control-enter-from.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -4033,8 +5035,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -4051,7 +5061,10 @@
       "componentId": "web.motion",
       "partId": "list-enter-from",
       "surfaceRole": "interaction.list-enter-from",
-      "issues": [300, 308],
+      "issues": [
+        300,
+        308
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -4128,9 +5141,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -4142,12 +5166,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.motion.list-enter-from.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -4160,8 +5194,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -4178,7 +5220,9 @@
       "componentId": "web.public-shell",
       "partId": "disclosure-transition",
       "surfaceRole": "interaction.public-shell-transition",
-      "issues": [310],
+      "issues": [
+        310
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -4245,9 +5289,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -4259,12 +5314,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.public-shell.disclosure-transition.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -4277,8 +5342,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -4295,7 +5368,9 @@
       "componentId": "web.dialog",
       "partId": "overlay-root",
       "surfaceRole": "overlay.dialog-root",
-      "issues": [298],
+      "issues": [
+        298
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -4368,9 +5443,20 @@
         ]
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -4382,12 +5468,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.dialog.overlay-root.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -4400,8 +5496,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -4418,7 +5522,9 @@
       "componentId": "web.drawer",
       "partId": "overlay-root",
       "surfaceRole": "overlay.drawer-root",
-      "issues": [298],
+      "issues": [
+        298
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -4491,9 +5597,20 @@
         ]
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -4505,12 +5622,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.drawer.overlay-root.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -4523,8 +5650,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -4541,7 +5676,9 @@
       "componentId": "web.notification",
       "partId": "overlay-root",
       "surfaceRole": "overlay.notification-root",
-      "issues": [298],
+      "issues": [
+        298
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -4614,9 +5751,20 @@
         ]
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -4628,12 +5776,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.notification.overlay-root.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -4646,8 +5804,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -4664,7 +5830,10 @@
       "componentId": "web.panel",
       "partId": "panel-root",
       "surfaceRole": "data-region.panel-root",
-      "issues": [305, 306],
+      "issues": [
+        305,
+        306
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -4737,9 +5906,20 @@
         ]
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -4751,12 +5931,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.panel.panel-root.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -4769,8 +5959,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -4787,7 +5985,10 @@
       "componentId": "web.panel",
       "partId": "expressive-panel-root",
       "surfaceRole": "expressive.opt-in-panel-root",
-      "issues": [305, 306],
+      "issues": [
+        305,
+        306
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -4860,9 +6061,20 @@
         ]
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -4874,12 +6086,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.panel.expressive-panel-root.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -4892,8 +6114,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -4910,7 +6140,9 @@
       "componentId": "web.key-value-grid",
       "partId": "label-motif",
       "surfaceRole": "data-region.label-motif",
-      "issues": [306],
+      "issues": [
+        306
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -4983,9 +6215,20 @@
         ]
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -4997,12 +6240,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.key-value-grid.label-motif.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -5015,8 +6268,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -5033,7 +6294,9 @@
       "componentId": "web.dialog",
       "partId": "overlay-close-optical",
       "surfaceRole": "overlay.close-optical-alignment",
-      "issues": [299],
+      "issues": [
+        299
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -5105,9 +6368,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -5119,12 +6393,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.dialog.overlay-close-optical.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -5137,8 +6421,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -5155,7 +6447,10 @@
       "componentId": "web.diagnostics-list",
       "partId": "list-composition",
       "surfaceRole": "data-region.diagnostic-list-composition",
-      "issues": [305, 306],
+      "issues": [
+        305,
+        306
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -5222,9 +6517,20 @@
         ]
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -5236,12 +6542,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.diagnostics-list.composition.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -5254,8 +6570,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -5272,7 +6596,9 @@
       "componentId": "web.settings-primitives",
       "partId": "action",
       "surfaceRole": "task.settings-action",
-      "issues": [305],
+      "issues": [
+        305
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -5339,9 +6665,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -5353,12 +6690,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.settings-primitives.action.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -5371,8 +6718,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -5389,7 +6744,9 @@
       "componentId": "web.loading",
       "partId": "indicator",
       "surfaceRole": "feedback.loading-indicator",
-      "issues": [303],
+      "issues": [
+        303
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -5456,9 +6813,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -5470,12 +6838,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.loading.indicator.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -5488,8 +6866,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -5506,7 +6892,9 @@
       "componentId": "web.metric-primitives",
       "partId": "metric-row",
       "surfaceRole": "data-region.metric-row",
-      "issues": [306],
+      "issues": [
+        306
+      ],
       "owner": {
         "id": "fsusui.web.vue",
         "kind": "implementation"
@@ -5578,9 +6966,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -5592,12 +6991,22 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.metric-primitives.metric-row.semantic-evidence",
-            "states": ["default", "hover", "focus-visible", "disabled"],
-            "themes": ["light", "dark"],
+            "states": [
+              "default",
+              "hover",
+              "focus-visible",
+              "disabled"
+            ],
+            "themes": [
+              "light",
+              "dark"
+            ],
             "viewports": [
               {
                 "id": "mobile",
@@ -5610,8 +7019,16 @@
                 "height": 768
               }
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -5628,13 +7045,22 @@
     {
       "issue": 293,
       "errorId": "option-row-cardification",
-      "ruleIds": ["web.select.option-row", "web.select.overlay-root"],
-      "semanticRoles": ["overlay.option-row", "overlay.panel-root"]
+      "ruleIds": [
+        "web.select.option-row",
+        "web.select.overlay-root"
+      ],
+      "semanticRoles": [
+        "overlay.option-row",
+        "overlay.panel-root"
+      ]
     },
     {
       "issue": 294,
       "errorId": "menu-navigation-density-state",
-      "ruleIds": ["web.menu.vertical-item", "web.menu.horizontal-item"],
+      "ruleIds": [
+        "web.menu.vertical-item",
+        "web.menu.horizontal-item"
+      ],
       "semanticRoles": [
         "navigation.vertical-menu-item",
         "navigation.horizontal-menu-item"
@@ -5643,14 +7069,22 @@
     {
       "issue": 295,
       "errorId": "tabs-button-cardification",
-      "ruleIds": ["web.tabs.tab-item"],
-      "semanticRoles": ["navigation.tab-item"]
+      "ruleIds": [
+        "web.tabs.tab-item"
+      ],
+      "semanticRoles": [
+        "navigation.tab-item"
+      ]
     },
     {
       "issue": 296,
       "errorId": "tree-node-cardification",
-      "ruleIds": ["web.tree.tree-row"],
-      "semanticRoles": ["data-region.tree-node-row"]
+      "ruleIds": [
+        "web.tree.tree-row"
+      ],
+      "semanticRoles": [
+        "data-region.tree-node-row"
+      ]
     },
     {
       "issue": 297,
@@ -5695,8 +7129,14 @@
     {
       "issue": 300,
       "errorId": "upload-file-row-legacy-surface",
-      "ruleIds": ["web.upload.file-row", "web.motion.list-enter-from"],
-      "semanticRoles": ["data-region.file-row", "interaction.list-enter-from"]
+      "ruleIds": [
+        "web.upload.file-row",
+        "web.motion.list-enter-from"
+      ],
+      "semanticRoles": [
+        "data-region.file-row",
+        "interaction.list-enter-from"
+      ]
     },
     {
       "issue": 301,
@@ -5717,8 +7157,12 @@
     {
       "issue": 302,
       "errorId": "rate-primary-color-role",
-      "ruleIds": ["web.rate.filled-icon"],
-      "semanticRoles": ["form-control.rate-filled-icon"]
+      "ruleIds": [
+        "web.rate.filled-icon"
+      ],
+      "semanticRoles": [
+        "form-control.rate-filled-icon"
+      ]
     },
     {
       "issue": 303,
@@ -5737,7 +7181,10 @@
     {
       "issue": 304,
       "errorId": "table-header-typography",
-      "ruleIds": ["web.table.header-cell", "web.table.small-header-cell"],
+      "ruleIds": [
+        "web.table.header-cell",
+        "web.table.small-header-cell"
+      ],
       "semanticRoles": [
         "data-region.table-header-cell",
         "data-region.table-small-header-cell"
@@ -5838,8 +7285,12 @@
     {
       "issue": 310,
       "errorId": "public-shell-reduced-motion-lifecycle",
-      "ruleIds": ["web.public-shell.disclosure-transition"],
-      "semanticRoles": ["interaction.public-shell-transition"]
+      "ruleIds": [
+        "web.public-shell.disclosure-transition"
+      ],
+      "semanticRoles": [
+        "interaction.public-shell-transition"
+      ]
     }
   ]
 }

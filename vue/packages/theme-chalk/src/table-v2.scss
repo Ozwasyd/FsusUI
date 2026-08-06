@@ -149,6 +149,8 @@
       background-color: getCssVar('table-header', 'bg-color');
       color: getCssVar('table-header', 'text-color');
       font-weight: 500;
+      letter-spacing: 0;
+      text-transform: none;
 
       @include when(sortable) {
         cursor: pointer;
