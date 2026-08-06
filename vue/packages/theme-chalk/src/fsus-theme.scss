@@ -2173,6 +2173,10 @@ button.#{$namespace}-card:active {
   border-bottom-color: transparent !important;
 }
 
+// Tabs: desktop/task surface uses a stable 40px header. Active is Ink text +
+// Scholarly Blue indicator. Card/border-card share a continuous navigation
+// baseline — not a row of independent CTA buttons (gap + per-item border +
+// hover lift / active press). See docs/design.md §Tabs and issue #295.
 .#{$namespace}-tabs__header {
   margin-bottom: 18px;
 }
@@ -2181,20 +2185,21 @@ button.#{$namespace}-card:active {
 .#{$namespace}-tabs--card > .#{$namespace}-tabs__header,
 .#{$namespace}-tabs--border-card > .#{$namespace}-tabs__header {
   border-color: var(--el-border-color);
-  background: transparent;
 }
 
 .#{$namespace}-tabs__active-bar {
   background-color: var(--fsus-scholarly-blue);
   height: 2px;
-  border-radius: var(--fsus-radius-pill, 999px);
+  border-radius: 0;
 }
 
 .#{$namespace}-tabs__item {
-  height: 44px;
+  height: 40px;
   padding: 0 14px;
   @include fsus-geometry(navigation);
   color: var(--el-text-color-regular);
+  // Geometry stays fixed across default / hover / active / disabled.
+  transform: none;
 }
 
 .#{$namespace}-tabs__item:hover {
@@ -2208,10 +2213,11 @@ button.#{$namespace}-card:active {
   font-weight: 700;
 }
 
+// --- card / border-card: continuous strip ---------------------------------
 .#{$namespace}-tabs--card > .#{$namespace}-tabs__header,
 .#{$namespace}-tabs--border-card > .#{$namespace}-tabs__header {
-  height: auto;
-  border-bottom: 0;
+  height: var(--el-tabs-header-height, 40px);
+  border-bottom: 1px solid var(--el-border-color-light);
 }
 
 .#{$namespace}-tabs--card
@@ -2223,16 +2229,26 @@ button.#{$namespace}-card:active {
   margin-bottom: 0;
 }
 
+// Shared nav chrome — one control group, not spaced independent buttons.
 .#{$namespace}-tabs--card
   > .#{$namespace}-tabs__header
-  .#{$namespace}-tabs__nav,
+  .#{$namespace}-tabs__nav {
+  gap: 0;
+  border: 1px solid var(--el-border-color-light);
+  border-bottom: none;
+  border-radius: var(--fsus-radius-control-small)
+    var(--fsus-radius-control-small) 0 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
 .#{$namespace}-tabs--border-card
   > .#{$namespace}-tabs__header
   .#{$namespace}-tabs__nav {
-  gap: 8px;
+  gap: 0;
   border: 0;
   border-radius: 0;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .#{$namespace}-tabs--card
@@ -2241,39 +2257,57 @@ button.#{$namespace}-card:active {
 .#{$namespace}-tabs--border-card
   > .#{$namespace}-tabs__header
   .#{$namespace}-tabs__item {
-  height: 36px;
+  height: var(--el-tabs-header-height, 40px);
   margin: 0;
-  padding: 0 13px;
-  border: 1px solid var(--el-border-color-lighter);
-  border-radius: var(--fsus-radius-control-small);
+  padding: 0 20px;
+  border-radius: 0;
   background: transparent;
   color: var(--el-text-color-regular);
   box-shadow: none;
-  transform: translateZ(0);
+  transform: none;
+  will-change: auto;
   transition:
     background-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
     border-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
-    box-shadow var(--fsus-motion-control-fast) var(--fsus-motion-standard),
-    color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
-    transform var(--fsus-motion-control-fast) var(--fsus-motion-emphasized);
-  will-change: transform;
+    color var(--fsus-motion-control-fast) var(--fsus-motion-standard);
+}
+
+// Card items: vertical separators only (continuous strip).
+.#{$namespace}-tabs--card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item {
+  border: none;
+  border-left: 1px solid var(--el-border-color-light);
+  border-bottom: 2px solid transparent;
 }
 
 .#{$namespace}-tabs--card
   > .#{$namespace}-tabs__header
-  .#{$namespace}-tabs__item:first-child,
+  .#{$namespace}-tabs__item:first-child {
+  border-left: none;
+}
+
+// Border-card items stay on the header baseline; no per-item CTA border.
+.#{$namespace}-tabs--border-card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item {
+  border: 1px solid transparent;
+  border-bottom: 2px solid transparent;
+  margin-top: -1px;
+  color: var(--el-text-color-secondary);
+}
+
 .#{$namespace}-tabs--border-card
   > .#{$namespace}-tabs__header
   .#{$namespace}-tabs__item:first-child {
-  margin-left: 0;
-  border-left: 1px solid var(--el-border-color-lighter);
+  margin-left: -1px;
 }
 
 .#{$namespace}-tabs--border-card
   > .#{$namespace}-tabs__header
   .#{$namespace}-tabs__item
   + .#{$namespace}-tabs__item {
-  margin-left: 0;
+  margin-left: -1px;
 }
 
 .#{$namespace}-tabs--card
@@ -2283,36 +2317,47 @@ button.#{$namespace}-card:active {
   > .#{$namespace}-tabs__header
   .#{$namespace}-tabs__item:not(.is-disabled):hover {
   background: var(--el-fill-color-lighter);
-  border-color: var(--el-border-color-light);
-  color: var(--el-text-color-primary);
+  color: var(--fsus-scholarly-blue);
   box-shadow: none;
-  transform: translate3d(0, -1px, 0);
+  transform: none;
 }
 
+// Active: Ink text + Scholarly Blue bottom marker (card has no active-bar).
 .#{$namespace}-tabs--card
   > .#{$namespace}-tabs__header
-  .#{$namespace}-tabs__item.is-active,
+  .#{$namespace}-tabs__item.is-active {
+  background: var(--el-bg-color);
+  border-bottom-color: var(--fsus-scholarly-blue);
+  color: var(--el-text-color-primary);
+  font-weight: 700;
+  box-shadow: none;
+  transform: none;
+}
+
 .#{$namespace}-tabs--border-card
   > .#{$namespace}-tabs__header
   .#{$namespace}-tabs__item.is-active {
-  background: var(--fsus-state-selected-bg);
-  border-color: var(--el-border-color-light);
+  background: var(--el-bg-color-overlay);
+  border-left-color: var(--el-border-color);
+  border-right-color: var(--el-border-color);
+  border-bottom-color: var(--fsus-scholarly-blue);
   color: var(--el-text-color-primary);
-  box-shadow: inset 0 0 0 1px rgba(42, 89, 156, 0.08);
-  transform: translateZ(0);
+  font-weight: 700;
+  box-shadow: none;
+  transform: none;
 }
 
+// Active press keeps color feedback only — no geometric press.
 .#{$namespace}-tabs--card
   > .#{$namespace}-tabs__header
   .#{$namespace}-tabs__item:not(.is-disabled):active,
 .#{$namespace}-tabs--border-card
   > .#{$namespace}-tabs__header
   .#{$namespace}-tabs__item:not(.is-disabled):active {
-  background: var(--fsus-state-emphasis-bg);
-  border-color: var(--fsus-state-focus-border);
+  background: var(--el-fill-color-lighter);
   color: var(--fsus-scholarly-blue);
-  box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);
-  transform: translate3d(0, 1px, 0);
+  box-shadow: none;
+  transform: none;
 }
 
 .#{$namespace}-tabs--card
@@ -2322,14 +2367,20 @@ button.#{$namespace}-card:active {
   > .#{$namespace}-tabs__header
   .#{$namespace}-tabs__item.is-disabled {
   background: transparent;
-  border-color: var(--el-border-color-extra-light);
   color: var(--el-disabled-text-color);
+  cursor: not-allowed;
 }
 
 .#{$namespace}-tabs--border-card {
-  border-color: var(--el-border-color-lighter);
+  background: var(--el-bg-color-overlay);
+  border: 1px solid var(--el-border-color-lighter);
   border-radius: var(--fsus-radius-control);
   box-shadow: none;
+}
+
+.#{$namespace}-tabs--border-card > .#{$namespace}-tabs__header {
+  background-color: var(--el-fill-color-light);
+  margin: 0;
 }
 
 .#{$namespace}-tabs--border-card > .#{$namespace}-tabs__content {
@@ -3194,7 +3245,6 @@ button.#{$namespace}-card:active {
   .#{$namespace}-menu-item:not(.is-active):active,
   .#{$namespace}-sub-menu:not(.is-active)
     > .#{$namespace}-sub-menu__title:active,
-  .#{$namespace}-tabs__item:not(.is-active):active,
   .#{$namespace}-pagination button:not(:disabled):active,
   .#{$namespace}-pager li:not(.is-active):active,
   .#{$namespace}-tree-node:not(.is-current)
@@ -3204,6 +3254,15 @@ button.#{$namespace}-card:active {
     color: var(--fsus-scholarly-blue);
     box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);
     transform: translate3d(0, 1px, 0);
+  }
+
+  // Tabs keep a stable hit geometry on coarse pointers too — active is color +
+  // Scholarly Blue bar/border, not a pressed translate.
+  .#{$namespace}-tabs__item:not(.is-active):active {
+    background: var(--fsus-state-hover-bg);
+    color: var(--fsus-scholarly-blue);
+    box-shadow: none;
+    transform: none;
   }
 
   .#{$namespace}-tag:hover,

@@ -236,60 +236,130 @@ describe('Fsus theme visual baseline', () => {
     ])
   })
 
-  test('renders card tabs as quiet segmented navigation', () => {
-    const css = compileThemeFile('fsus-theme.scss')
+  test('ships 40px task tabs and continuous card strip, not buttonized CTAs (#295)', () => {
+    // Real consumer path: fsus.scss pulls tabs.scss then fsus-theme overrides.
+    // #295 regression: default item 44px + card/border-card as 36px separated
+    // buttons (gap, per-item border/radius, hover lift, active press).
+    const themeCss = compileThemeFile('fsus-theme.scss')
+    const tabsCss = compileThemeFile('tabs.scss')
+    const shippedCss = compileThemeFile('fsus.scss')
 
-    expect(css).not.toContain('@keyframes fsus-tabs-indicator-in')
-    expectCssRule(css, '.el-tabs__item', [
+    expect(themeCss).not.toContain('@keyframes fsus-tabs-indicator-in')
+
+    // Default desktop/task tab item is 40px with navigation geometry.
+    expectCssRule(themeCss, '.el-tabs__item', [
+      'height: 40px;',
       'border-radius: var(--fsus-radius-navigation);',
+      'transform: none;',
     ])
-    expectCssRule(css, '.el-tabs__item.is-active', ['background: transparent;'])
-    expectCssRule(css, '.el-tabs--card > .el-tabs__header', [
-      'height: auto;',
-      'border-bottom: 0;',
-    ])
-    expectCssRule(css, '.el-tabs--card > .el-tabs__header .el-tabs__nav', [
-      'gap: 8px;',
-      'border: 0;',
-      'border-radius: 0;',
-      'overflow: visible;',
-    ])
-    expectCssRule(css, '.el-tabs--card > .el-tabs__header .el-tabs__item', [
-      'height: 36px;',
-      'margin: 0;',
-      'border: 1px solid var(--el-border-color-lighter);',
-      'border-radius: var(--fsus-radius-control-small);',
+    expectCssRule(themeCss, '.el-tabs__item.is-active', [
       'background: transparent;',
-      'transform: translateZ(0);',
-      'will-change: transform;',
+      'color: var(--el-text-color-primary);',
+      'font-weight: 700;',
+    ])
+    expectCssRule(themeCss, '.el-tabs__active-bar', [
+      'background-color: var(--fsus-scholarly-blue);',
+      'height: 2px;',
+      'border-radius: 0;',
+    ])
+    // Base token still documents the 40px contract.
+    expectCssRule(tabsCss, '.el-tabs', ['--el-tabs-header-height: 40px;'])
+    expectCssRule(tabsCss, '.el-tabs__item', [
+      'height: var(--el-tabs-header-height);',
+    ])
+    expectCssRule(tabsCss, '.el-tabs__nav-next, .el-tabs__nav-prev', [
+      'line-height: var(--el-tabs-header-height);',
+    ])
+
+    // Card header is a continuous strip at header height, not height:auto button row.
+    expectCssRule(themeCss, '.el-tabs--card > .el-tabs__header', [
+      'height: var(--el-tabs-header-height, 40px);',
+      'border-bottom: 1px solid var(--el-border-color-light);',
+    ])
+    expectCssRule(themeCss, '.el-tabs--card > .el-tabs__header .el-tabs__nav', [
+      'gap: 0;',
+      'border: 1px solid var(--el-border-color-light);',
+      'border-bottom: none;',
+      'overflow: hidden;',
+    ])
+    expectCssRule(themeCss, '.el-tabs--card > .el-tabs__header .el-tabs__item', [
+      'height: var(--el-tabs-header-height, 40px);',
+      'border-radius: 0;',
+      'background: transparent;',
+      'transform: none;',
+      'will-change: auto;',
     ])
     expectCssRule(
-      css,
+      themeCss,
       '.el-tabs--card > .el-tabs__header .el-tabs__item:not(.is-disabled):hover',
-      ['box-shadow: none;', 'transform: translate3d(0, -1px, 0);'],
-    )
-    expectCssRule(
-      css,
-      '.el-tabs--card > .el-tabs__header .el-tabs__item:not(.is-disabled):active',
       [
-        'background: var(--fsus-state-emphasis-bg);',
-        'border-color: var(--fsus-state-focus-border);',
         'color: var(--fsus-scholarly-blue);',
-        'box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);',
-        'transform: translate3d(0, 1px, 0);',
+        'box-shadow: none;',
+        'transform: none;',
       ],
     )
     expectCssRule(
-      css,
+      themeCss,
+      '.el-tabs--card > .el-tabs__header .el-tabs__item:not(.is-disabled):active',
+      ['box-shadow: none;', 'transform: none;'],
+    )
+    expectCssRule(
+      themeCss,
       '.el-tabs--card > .el-tabs__header .el-tabs__item.is-active',
       [
-        'background: var(--fsus-state-selected-bg);',
-        'border-color: var(--el-border-color-light);',
+        'border-bottom-color: var(--fsus-scholarly-blue);',
         'color: var(--el-text-color-primary);',
-        'transform: translateZ(0);',
+        'font-weight: 700;',
+        'transform: none;',
       ],
     )
-    expect(css).not.toMatch(
+
+    // Mutation kill: default task tabs must not re-grow to 44px control height.
+    expect(themeCss).not.toMatch(/\.el-tabs__item\s*\{[^}]*height:\s*44px/s)
+    expect(shippedCss).not.toMatch(
+      /\.el-tabs__item\s*\{[^}]*height:\s*44px/s,
+    )
+
+    // Mutation kill: buttonized card geometry must not return.
+    const cardItemRules = [
+      ...cssRules(themeCss, '.el-tabs--card > .el-tabs__header .el-tabs__item'),
+      ...cssRules(
+        shippedCss,
+        '.el-tabs--card > .el-tabs__header .el-tabs__item',
+      ),
+    ]
+    expect(cardItemRules.length).toBeGreaterThan(0)
+    for (const rule of cardItemRules) {
+      expect(rule).not.toMatch(/height:\s*36px/)
+      expect(rule).not.toMatch(/will-change:\s*transform/)
+      expect(rule).not.toMatch(/transform:\s*translate3d\(0,\s*-1px/)
+      expect(rule).not.toMatch(/transform:\s*translate3d\(0,\s*1px/)
+      expect(rule).not.toMatch(
+        /border-radius:\s*var\(--fsus-radius-control-small\)/,
+      )
+      expect(rule).not.toMatch(
+        /border:\s*1px solid var\(--el-border-color-lighter\)/,
+      )
+    }
+
+    const cardNavRules = [
+      ...cssRules(themeCss, '.el-tabs--card > .el-tabs__header .el-tabs__nav'),
+      ...cssRules(shippedCss, '.el-tabs--card > .el-tabs__header .el-tabs__nav'),
+    ]
+    for (const rule of cardNavRules) {
+      expect(rule).not.toMatch(/gap:\s*8px/)
+      expect(rule).not.toMatch(/overflow:\s*visible/)
+    }
+
+    // Integrated bundle keeps continuous strip + Scholarly Blue markers.
+    expect(shippedCss).toContain('--el-tabs-header-height: 40px')
+    expect(shippedCss).toContain(
+      'border-bottom-color: var(--fsus-scholarly-blue)',
+    )
+    expect(shippedCss).not.toMatch(
+      /\.el-tabs--card[^{]*\.el-tabs__item[^{]*\{[^}]*height:\s*36px/s,
+    )
+    expect(themeCss).not.toMatch(
       /\.el-tabs--(?:border-)?card[^{}]*\.el-tabs__item[^{}]*\.is-active::after/s,
     )
   })
@@ -450,29 +520,42 @@ describe('Fsus theme visual baseline', () => {
     )
   })
 
-  test('keeps border-card tabs on the same quiet baseline', () => {
+  test('keeps border-card tabs on the continuous navigation baseline (#295)', () => {
     const css = compileThemeFile('fsus-theme.scss')
     const tabsCss = compileThemeFile('tabs.scss')
+    const shippedCss = compileThemeFile('fsus.scss')
 
     expectCssRule(css, '.el-tabs--border-card > .el-tabs__header', [
-      'height: auto;',
-      'border-bottom: 0;',
+      'height: var(--el-tabs-header-height, 40px);',
+      'border-bottom: 1px solid var(--el-border-color-light);',
     ])
     expectCssRule(
       css,
       '.el-tabs--border-card > .el-tabs__header .el-tabs__item',
       [
-        'height: 36px;',
-        'margin: 0;',
-        'border: 1px solid var(--el-border-color-lighter);',
+        'height: var(--el-tabs-header-height, 40px);',
+        'border-radius: 0;',
         'background: transparent;',
+        'transform: none;',
+        'will-change: auto;',
+      ],
+    )
+    expectCssRule(
+      css,
+      '.el-tabs--border-card > .el-tabs__header .el-tabs__item.is-active',
+      [
+        'border-bottom-color: var(--fsus-scholarly-blue);',
+        'color: var(--el-text-color-primary);',
+        'font-weight: 700;',
+        'transform: none;',
       ],
     )
     expectCssRule(css, '.el-tabs--border-card', [
-      'border-color: var(--el-border-color-lighter);',
+      'border: 1px solid var(--el-border-color-lighter);',
       'border-radius: var(--fsus-radius-control);',
       'box-shadow: none;',
     ])
+    // Vertical card still uses edge borders (not horizontal underline logic).
     expectCssRule(
       tabsCss,
       '.el-tabs--left.el-tabs--card .el-tabs__item.is-left.is-active',
@@ -494,6 +577,31 @@ describe('Fsus theme visual baseline', () => {
     }
     expect(tabsCss).not.toContain('rgb(209, 219, 229)')
     expect(tabsCss).not.toMatch(/border-(?:left|right)-color:\s*#fff;/)
+
+    // Mutation kill: border-card must not re-buttonize (36px + gap + lift).
+    const borderCardItemRules = [
+      ...cssRules(
+        css,
+        '.el-tabs--border-card > .el-tabs__header .el-tabs__item',
+      ),
+      ...cssRules(
+        shippedCss,
+        '.el-tabs--border-card > .el-tabs__header .el-tabs__item',
+      ),
+    ]
+    expect(borderCardItemRules.length).toBeGreaterThan(0)
+    for (const rule of borderCardItemRules) {
+      expect(rule).not.toMatch(/height:\s*36px/)
+      expect(rule).not.toMatch(/will-change:\s*transform/)
+      expect(rule).not.toMatch(/transform:\s*translate3d\(0,\s*-1px/)
+      expect(rule).not.toMatch(/transform:\s*translate3d\(0,\s*1px/)
+      expect(rule).not.toMatch(
+        /box-shadow:\s*inset 0 0 0 1px rgba\(42,\s*89,\s*156/,
+      )
+    }
+    expect(css).not.toMatch(
+      /\.el-tabs--border-card[^{]*\.el-tabs__nav[^{]*\{[^}]*gap:\s*8px/s,
+    )
   })
 
   test('aligns public focus and active states with Scholarly Blue', () => {

@@ -84,7 +84,8 @@
   @include e((nav-next, nav-prev)) {
     position: absolute;
     cursor: pointer;
-    line-height: 44px;
+    // Match desktop/task tab header height (40px), not the 44px control ladder.
+    line-height: getCssVar('tabs', 'header-height');
     font-size: 12px;
     color: getCssVar('text-color', 'secondary');
     width: 20px;
