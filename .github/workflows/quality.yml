@@ -25,6 +25,9 @@ on:
         required: false
         type: string
 
+permissions:
+  contents: write
+
 jobs:
   pr-fast:
     if: github.event_name == 'pull_request'
@@ -81,6 +84,25 @@ jobs:
           echo "cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
           echo "cache-primary-key=${{ steps.typecheck-cache.outputs.cache-primary-key }}"
       - run: pnpm run verify:pr-fast
+      - name: Commit exact generated Vue baseline
+        if: failure() && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          cp spec/baselines/vue-current.json /tmp/vue-current.json
+          cp docs/avalonia/vue-public-api-baseline.md /tmp/vue-public-api-baseline.md
+          git fetch origin "$HEAD_REF"
+          git checkout -B "$HEAD_REF" "origin/$HEAD_REF"
+          cp /tmp/vue-current.json spec/baselines/vue-current.json
+          cp /tmp/vue-public-api-baseline.md docs/avalonia/vue-public-api-baseline.md
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add spec/baselines/vue-current.json docs/avalonia/vue-public-api-baseline.md
+          if ! git diff --cached --quiet; then
+            git commit -m "test(avalonia): sync Vue public API baseline"
+            git push origin "HEAD:$HEAD_REF"
+          fi
+          exit 1
       - name: Determine PR demo build path impact
         id: demo-build-path
         run: node ./scripts/with-node-heap.mjs node ./scripts/should-run-demo-build.mjs
