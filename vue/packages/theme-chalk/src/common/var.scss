@@ -1163,7 +1163,8 @@ $menu: map.merge(
     'bg-color': getCssVar('fill-color', 'blank'),
     'hover-bg-color': var(--fsus-state-hover-bg),
     'item-height': var(--fsus-menu-item-height),
-    'sub-item-height': calc(#{getCssVar('menu-item-height')} - 6px),
+    // Nested vertical items share the 56px density contract (issue #294).
+    'sub-item-height': var(--fsus-menu-item-height),
     'horizontal-height': var(--fsus-menu-horizontal-height),
     'horizontal-sub-item-height': calc(
       var(--fsus-menu-horizontal-height) - 24px

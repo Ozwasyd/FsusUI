@@ -7,7 +7,9 @@
 @mixin menu-item {
   display: flex;
   align-items: center;
+  // Vertical density contract: 56px stable block size (issue #294).
   height: getCssVar('menu-item-height');
+  min-height: getCssVar('menu-item-height');
   line-height: getCssVar('menu-item-height');
   font-size: getCssVar('menu-item-font-size');
   color: getCssVar('menu-text-color');
@@ -15,12 +17,14 @@
   list-style: none;
   cursor: pointer;
   position: relative;
-  border-radius: var(--fsus-radius-navigation, var(--el-border-radius-base));
-  margin: 2px 6px;
+  // Flat navigation track — avoid card-like per-item panel radius + margin wall.
+  border-radius: 0;
+  margin: 0;
   transition:
     border-color getCssVar('transition-duration'),
     background-color getCssVar('transition-duration'),
-    color getCssVar('transition-duration');
+    color getCssVar('transition-duration'),
+    box-shadow getCssVar('transition-duration');
   box-sizing: border-box;
   white-space: nowrap;
 
@@ -38,6 +42,7 @@
   }
 
   &:focus-visible {
+    // Shared 2px inset Scholarly Blue ring (menu-popup-contract).
     @include a11y-focus-ring(
       2px,
       var(--fsus-radius-navigation, var(--el-border-radius-base))
