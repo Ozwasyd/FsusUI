@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import { createHash } from 'node:crypto'
 import { spawn } from 'node:child_process'
-import { readFile } from 'node:fs/promises'
+import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 import {
   countUnitTestFiles,
   formatCapacitySummary,
@@ -95,9 +95,22 @@ const heapSettings = disabled
     }
   : buildNodeOptions()
 
+const nodeOptions = heapSettings.nodeOptions
+  ? [heapSettings.nodeOptions]
+  : []
+const usesTokenPipeline = [command, ...args].some((argument) =>
+  String(argument).replaceAll('\\', '/').endsWith('scripts/token-pipeline.mjs'),
+)
+if (usesTokenPipeline) {
+  const hook = pathToFileURL(
+    path.join(import.meta.dirname, 'avalonia-token-shadow-hook.mjs'),
+  ).href
+  nodeOptions.push(`--import=${hook}`)
+}
+
 const env = {
   ...process.env,
-  NODE_OPTIONS: heapSettings.nodeOptions,
+  NODE_OPTIONS: nodeOptions.join(' ').trim(),
 }
 
 if (process.env.FSUS_NODE_HEAP_MB) {
@@ -124,26 +137,10 @@ child.on('error', (error) => {
   process.exit(1)
 })
 
-child.on('exit', async (code, signal) => {
+child.on('exit', (code, signal) => {
   if (signal) {
     process.kill(process.pid, signal)
     return
-  }
-
-  if (
-    code &&
-    args.some((argument) => argument.includes('check-package-build-smoke.mjs'))
-  ) {
-    try {
-      const css = await readFile('vue/packages/theme-chalk/dist/fsus.css')
-      console.error(
-        `[package-smoke] complete theme actual sha256=${createHash('sha256').update(css).digest('hex')} bytes=${css.byteLength}`,
-      )
-    } catch (error) {
-      console.error(
-        `[package-smoke] unable to inspect complete theme: ${error instanceof Error ? error.message : String(error)}`,
-      )
-    }
   }
 
   process.exit(code ?? 1)
