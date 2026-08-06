@@ -7,7 +7,9 @@
   $focus-selector: null
 ) {
   display: inline-flex;
+  max-width: 100%;
   gap: 0;
+  overflow-x: auto;
   border: 1px solid var(--fsus-border);
   border-radius: var(--fsus-radius-control);
   box-shadow: none;
