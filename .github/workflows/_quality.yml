@@ -230,9 +230,15 @@ jobs:
       unit-matrix: ${{ steps.plan.outputs.unit-matrix }}
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Create repository capacity plan
         id: plan
         run: node ./scripts/ci-capacity.mjs --dry-run --github-output="$GITHUB_OUTPUT"
@@ -338,9 +344,15 @@ jobs:
       matrix: ${{ steps.plan.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile --ignore-scripts
       - id: plan
         name: Plan coverage from effective capacity and workload
         run: node scripts/coverage-plan.mjs --dry-run --github-output="$GITHUB_OUTPUT"

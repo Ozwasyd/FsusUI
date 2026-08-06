@@ -6,6 +6,14 @@ export interface MarkdownEditorSelection {
   readonly start: number
 }
 
+/** Snapshot of textarea state captured on beforeinput for merge/history. */
+export interface BeforeInputSnapshot {
+  readonly data: string | null
+  readonly inputType: string
+  readonly selection: MarkdownEditorSelection
+  readonly value: string
+}
+
 export interface MarkdownEditorResolvedSelection extends MarkdownEditorSelection {
   readonly direction: MarkdownEditorSelectionDirection
 }

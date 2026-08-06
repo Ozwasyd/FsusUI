@@ -201,6 +201,7 @@ public class FsusDateTimePrimitiveTests
       RepositoryRoot(),
       "docs",
       "releases",
+      "readiness",
       "platform-overrides.md"));
     Assert.Contains("avalonia-date-time-native-picker-001", releaseEvidence);
   }

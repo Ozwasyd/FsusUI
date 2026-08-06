@@ -70,7 +70,10 @@ const offsetRatio = computed(
     thumb.value![bar.value.offset],
 )
 
-const LONG_RANGE_TRACK_DENSITY = 420
+// Density = scrollRange / trackTravel. Markdown stress and other heavy reading
+// surfaces land around ~250–350 with measured heights; 420 only fired for
+// multi-hundred-thousand-px documents and left mid-track clicks in jump mode.
+const LONG_RANGE_TRACK_DENSITY = 200
 
 const getScrollRange = () => {
   const wrap = scrollbar.wrapElement
@@ -88,7 +91,11 @@ const getTrackTravel = () => {
   )
 }
 
+const isHeavyDomMotionScrollbar = () =>
+  scrollbar.scrollbarElement?.classList.contains('is-heavy-dom-motion') === true
+
 const isLongRangeScroll = () =>
+  isHeavyDomMotionScrollbar() ||
   getScrollRange() / getTrackTravel() > LONG_RANGE_TRACK_DENSITY
 
 const resolveLongRangeDragOffset = (
