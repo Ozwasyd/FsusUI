@@ -421,9 +421,64 @@
         />
       </el-space>
     </div>
-    <div class="demo-block">
+    <div
+      class="demo-block"
+      data-testid="input-number-hit-fixtures"
+      data-input-number-hit-fixtures
+    >
       <h3>InputNumber</h3>
-      <el-input-number v-model="inputNumber" :min="1" :max="10" />
+      <el-space wrap :size="16">
+        <el-input-number
+          v-model="inputNumber"
+          :min="1"
+          :max="10"
+          data-input-number-case="default-sides"
+        />
+        <el-input-number
+          v-model="inputNumber"
+          size="small"
+          :min="1"
+          :max="10"
+          data-input-number-case="small-sides"
+        />
+        <el-input-number
+          v-model="inputNumber"
+          size="large"
+          :min="1"
+          :max="10"
+          data-input-number-case="large-sides"
+        />
+        <el-input-number
+          v-model="inputNumber"
+          controls-position="right"
+          :min="1"
+          :max="10"
+          data-input-number-case="default-right"
+        />
+        <el-input-number
+          v-model="inputNumber"
+          size="small"
+          controls-position="right"
+          :min="1"
+          :max="10"
+          data-input-number-case="small-right"
+        />
+        <el-input-number
+          v-model="inputNumber"
+          size="large"
+          controls-position="right"
+          :min="1"
+          :max="10"
+          data-input-number-case="large-right"
+        />
+        <el-input-number
+          v-model="inputNumber"
+          :min="1"
+          :max="10"
+          disabled
+          data-input-number-case="disabled-sides"
+        />
+      </el-space>
     </div>
     <div class="demo-block">
       <h3>Select & Option & OptionGroup</h3>

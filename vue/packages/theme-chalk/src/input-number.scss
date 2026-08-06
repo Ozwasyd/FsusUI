@@ -1,10 +1,14 @@
-@use 'sass:math';
 @use 'sass:map';
 
 @use 'mixins/mixins' as *;
 @use 'common/var' as *;
 
 @include b(input-number) {
+  // Shared action-size token consumed by both left/right and controls-right.
+  // Size ladder matches control heights: large 48 / default 44 / small 40.
+  --fsus-input-number-action-size: #{map.get($input-height, 'default')};
+  --fsus-input-number-icon-size: 16px;
+
   position: relative;
   display: inline-flex;
   width: map.get($input-number-width, 'default');
@@ -12,8 +16,8 @@
 
   .#{$namespace}-input {
     &__wrapper {
-      padding-left: #{map.get($input-height, 'default') + 10};
-      padding-right: #{map.get($input-height, 'default') + 10};
+      padding-left: var(--fsus-input-number-action-size);
+      padding-right: var(--fsus-input-number-action-size);
     }
 
     &__inner {
@@ -37,44 +41,49 @@
 
     position: absolute;
     z-index: 1;
-    top: 1px;
-    bottom: 1px;
+    // Extend into the control border so the hit box matches the full control height.
+    top: -1px;
+    bottom: -1px;
 
-    width: map.get($input-height, 'default');
+    width: var(--fsus-input-number-action-size);
+    min-width: var(--fsus-input-number-action-size);
+    min-height: var(--fsus-input-number-action-size);
     background: getCssVar('fill-color', 'light');
     color: getCssVar('text-color', 'regular');
     cursor: pointer;
-    font-size: 13px;
+    font-size: var(--fsus-input-number-icon-size);
     user-select: none;
+    box-shadow: none;
+    transform: none;
 
+    [class*='#{$namespace}-icon'] {
+      font-size: var(--fsus-input-number-icon-size);
+      width: 1em;
+      height: 1em;
+      transform: none;
+    }
+
+    // State color only — no shadow / translate that shifts layout.
     &:hover {
       color: getCssVar('color-primary');
-
-      & ~ .#{$namespace}-input:not(.is-disabled) .#{$namespace}-input__wrapper {
-        box-shadow: 0 0 0 1px
-          var(
-            #{getCssVarName('input', 'focus-border-color')},
-            map.get($input, 'focus-border-color')
-          )
-          inset;
-      }
     }
 
     &.is-disabled {
       color: getCssVar('disabled-text-color');
       cursor: not-allowed;
+      opacity: 1;
     }
   }
 
   @include e(increase) {
-    right: 1px;
+    right: 0;
     border-radius: 0 getCssVar('border-radius-base')
       getCssVar('border-radius-base') 0;
     border-left: getCssVar('border');
   }
 
   @include e(decrease) {
-    left: 1px;
+    left: 0;
     border-radius: getCssVar('border-radius-base') 0 0
       getCssVar('border-radius-base');
     border-right: getCssVar('border');
@@ -83,10 +92,11 @@
   @include when(disabled) {
     @include e((increase, decrease)) {
       border-color: getCssVar('disabled-border-color');
-      color: getCssVar('disabled-border-color');
+      color: getCssVar('disabled-text-color');
+      opacity: 1;
 
       &:hover {
-        color: getCssVar('disabled-border-color');
+        color: getCssVar('disabled-text-color');
         cursor: not-allowed;
       }
     }
@@ -94,25 +104,20 @@
 
   @each $size in (large, small) {
     @include m($size) {
+      --fsus-input-number-action-size: #{map.get($input-height, $size)};
+
       width: map.get($input-number-width, $size);
       line-height: #{map.get($input-height, $size) - 2};
 
       @include e((increase, decrease)) {
-        width: map.get($input-height, $size);
-        font-size: map.get($input-font-size, $size);
+        width: var(--fsus-input-number-action-size);
+        min-width: var(--fsus-input-number-action-size);
+        font-size: var(--fsus-input-number-icon-size);
       }
 
       .#{$namespace}-input__wrapper {
-        padding-left: #{map.get($input-height, $size) + 7};
-        padding-right: #{map.get($input-height, $size) + 7};
-      }
-    }
-  }
-
-  @include m(small) {
-    @include e((increase, decrease)) {
-      [class*='#{$namespace}-icon'] {
-        transform: scale(0.9);
+        padding-left: var(--fsus-input-number-action-size);
+        padding-right: var(--fsus-input-number-action-size);
       }
     }
   }
@@ -127,24 +132,23 @@
   @include when(controls-right) {
     .#{$namespace}-input__wrapper {
       padding-left: 15px;
-      padding-right: #{map.get($input-height, 'default') + 10};
+      padding-right: var(--fsus-input-number-action-size);
     }
 
     @include e((increase, decrease)) {
-      @include set-css-var-value(
-        ('input', 'number-controls-height'),
-        math.div(map.get($input-height, 'default') - 2, 2)
-      );
-
-      height: getCssVar('input-number-controls-height');
-      line-height: getCssVar('input-number-controls-height');
+      // Width still uses the shared action-size token (not a separate hardcoded value).
+      width: var(--fsus-input-number-action-size);
+      min-width: var(--fsus-input-number-action-size);
+      height: 50%;
+      line-height: 1;
 
       [class*='#{$namespace}-icon'] {
-        transform: scale(0.8);
+        transform: none;
       }
     }
 
     @include e(increase) {
+      top: 0;
       bottom: auto;
       left: auto;
       border-radius: 0 getCssVar('border-radius-base') 0 0;
@@ -152,24 +156,13 @@
     }
 
     @include e(decrease) {
-      right: 1px;
+      right: 0;
       top: auto;
+      bottom: 0;
       left: auto;
       border-right: none;
       border-left: getCssVar('border');
       border-radius: 0 0 getCssVar('border-radius-base') 0;
-    }
-
-    @each $size in (large, small) {
-      &[class*='#{$size}'] {
-        [class*='increase'],
-        [class*='decrease'] {
-          @include set-css-var-value(
-            ('input', 'number-controls-height'),
-            math.div(map.get($input-height, $size) - 2, 2)
-          );
-        }
-      }
     }
   }
 }
