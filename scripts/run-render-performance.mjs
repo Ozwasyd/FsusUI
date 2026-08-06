@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process'
-import { access, copyFile, mkdir, readFile, writeFile } from 'node:fs/promises'
+import { access, mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
 import { verifyImpactPlan } from './render-performance-impact.mjs'
@@ -137,25 +137,6 @@ if (!webOnly && !avaloniaOnly) {
       valueOf('--regression-limit', '0.15'),
     ])
   }
-}
-
-if (
-  process.env.GITHUB_ACTIONS === 'true' &&
-  path.basename(output) === 'performance-current'
-) {
-  const generated = path.join(output, 'generated-baseline')
-  await run(process.execPath, [
-    'scripts/avalonia-vue-public-api-baseline.mjs',
-  ])
-  await mkdir(generated, { recursive: true })
-  await copyFile(
-    path.join(root, 'spec/baselines/vue-current.json'),
-    path.join(generated, 'vue-current.json'),
-  )
-  await copyFile(
-    path.join(root, 'docs/avalonia/vue-public-api-baseline.md'),
-    path.join(generated, 'vue-public-api-baseline.md'),
-  )
 }
 
 console.info(
