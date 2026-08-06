@@ -132,6 +132,12 @@ export default {
       delete: 'Delete',
       preview: 'Preview',
       continue: 'Continue',
+      ready: 'Pending',
+      uploading: 'Uploading',
+      success: 'Uploaded',
+      error: 'Failed',
+      cancel: 'Cancel',
+      retry: 'Retry',
     },
     slider: {
       defaultLabel: 'slider between {min} and {max}',

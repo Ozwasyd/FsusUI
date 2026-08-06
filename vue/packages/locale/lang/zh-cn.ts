@@ -101,6 +101,12 @@ export default {
       delete: '删除',
       preview: '查看图片',
       continue: '继续上传',
+      ready: '待上传',
+      uploading: '上传中',
+      success: '已上传',
+      error: '失败',
+      cancel: '取消',
+      retry: '重试',
     },
     table: {
       emptyText: '暂无数据',
