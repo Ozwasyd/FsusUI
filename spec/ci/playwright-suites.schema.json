@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fsusui.local/spec/ci/playwright-suites.schema.json",
+  "title": "FsusUI release-critical Playwright suite registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "suites", "profiles"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "suites": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/suite" }
+    },
+    "profiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pr", "main", "nightly", "release"],
+      "properties": {
+        "pr": { "$ref": "#/$defs/profile" },
+        "main": { "$ref": "#/$defs/profile" },
+        "nightly": { "$ref": "#/$defs/profile" },
+        "release": { "$ref": "#/$defs/profile" }
+      }
+    }
+  },
+  "$defs": {
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["suiteIds"],
+      "properties": {
+        "suiteIds": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "suite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "command",
+        "config",
+        "runtime",
+        "cells",
+        "impactRoots",
+        "artifacts",
+        "allowAffectedSkip",
+        "skipReasonTypes",
+        "countsTowardProductBrowserCoverage"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "enum": [
+            "view-transitions",
+            "motion-ssr",
+            "dom-layout",
+            "geometry-smoke",
+            "markdown-editor-interaction",
+            "visual-boundary-audit",
+            "visual-runtime-reuse"
+          ]
+        },
+        "command": { "type": "string", "minLength": 1 },
+        "config": { "type": "string", "minLength": 1 },
+        "runtime": {
+          "type": "string",
+          "enum": ["browser-product", "browser-ssr", "runtime-contract"]
+        },
+        "cells": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/cell" }
+        },
+        "impactRoots": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "artifacts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "namespace",
+            "reportDirectory",
+            "traceDirectory",
+            "screenshotDirectory",
+            "receiptPath"
+          ],
+          "properties": {
+            "namespace": { "type": "string", "minLength": 1 },
+            "reportDirectory": { "type": "string", "minLength": 1 },
+            "traceDirectory": { "type": "string", "minLength": 1 },
+            "screenshotDirectory": { "type": "string", "minLength": 1 },
+            "receiptPath": { "type": "string", "minLength": 1 }
+          }
+        },
+        "allowAffectedSkip": { "type": "boolean" },
+        "skipReasonTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "unaffected-sources",
+              "runtime-unavailable",
+              "browser-not-installed"
+            ]
+          }
+        },
+        "countsTowardProductBrowserCoverage": { "type": "boolean" },
+        "projectContract": {
+          "type": "string",
+          "description": "Path to pure-data project cell contract JSON relative to repo root"
+        }
+      }
+    },
+    "cell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "project", "dimensions"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "project": { "type": "string", "minLength": 1 },
+        "dimensions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["browser"],
+          "properties": {
+            "browser": {
+              "type": "string",
+              "enum": ["chromium", "firefox", "webkit"]
+            },
+            "viewport": {
+              "type": "string",
+              "enum": ["desktop", "mobile", "tiny"]
+            },
+            "theme": { "type": "string", "enum": ["light", "dark"] },
+            "safeArea": { "type": "boolean" },
+            "runtimeMode": {
+              "type": "string",
+              "enum": ["ssr", "reuse", "product"]
+            }
+          }
+        }
+      }
+    }
+  }
+}

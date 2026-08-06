@@ -1,0 +1,38 @@
+{
+  "suiteId": "dom-layout",
+  "config": "vue/playwright.dom-layout.config.ts",
+  "projects": [
+    {
+      "name": "desktop-light",
+      "dimensions": {
+        "browser": "chromium",
+        "viewport": "desktop",
+        "theme": "light"
+      }
+    },
+    {
+      "name": "mobile-light",
+      "dimensions": {
+        "browser": "chromium",
+        "viewport": "mobile",
+        "theme": "light"
+      }
+    },
+    {
+      "name": "desktop-dark",
+      "dimensions": {
+        "browser": "chromium",
+        "viewport": "desktop",
+        "theme": "dark"
+      }
+    },
+    {
+      "name": "mobile-dark",
+      "dimensions": {
+        "browser": "chromium",
+        "viewport": "mobile",
+        "theme": "dark"
+      }
+    }
+  ]
+}

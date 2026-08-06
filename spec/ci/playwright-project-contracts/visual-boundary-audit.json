@@ -1,0 +1,68 @@
+{
+  "suiteId": "visual-boundary-audit",
+  "config": "vue/playwright.boundary-audit.config.ts",
+  "projects": [
+    {
+      "name": "desktop-light",
+      "dimensions": {
+        "browser": "chromium",
+        "viewport": "desktop",
+        "theme": "light"
+      }
+    },
+    {
+      "name": "mobile-light",
+      "dimensions": {
+        "browser": "chromium",
+        "viewport": "mobile",
+        "theme": "light"
+      }
+    },
+    {
+      "name": "tiny-light",
+      "dimensions": {
+        "browser": "chromium",
+        "viewport": "tiny",
+        "theme": "light"
+      }
+    },
+    {
+      "name": "desktop-dark",
+      "dimensions": {
+        "browser": "chromium",
+        "viewport": "desktop",
+        "theme": "dark"
+      }
+    },
+    {
+      "name": "mobile-dark",
+      "dimensions": {
+        "browser": "chromium",
+        "viewport": "mobile",
+        "theme": "dark"
+      }
+    },
+    {
+      "name": "tiny-dark",
+      "dimensions": {
+        "browser": "chromium",
+        "viewport": "tiny",
+        "theme": "dark"
+      }
+    },
+    {
+      "name": "safe-area-chromium",
+      "dimensions": {
+        "browser": "chromium",
+        "safeArea": true
+      }
+    },
+    {
+      "name": "safe-area-webkit",
+      "dimensions": {
+        "browser": "webkit",
+        "safeArea": true
+      }
+    }
+  ]
+}

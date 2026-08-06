@@ -170,7 +170,7 @@
     "avalonia:baseline": "node ./scripts/with-node-heap.mjs node ./scripts/avalonia-vue-public-api-baseline.mjs",
     "avalonia:baseline:check": "node ./scripts/with-node-heap.mjs node ./scripts/avalonia-vue-public-api-baseline.mjs --check",
     "governance:cross-platform": "node ./scripts/with-node-heap.mjs node ./scripts/check-cross-platform-governance.mjs",
-    "governance:check": "node ./scripts/with-node-heap.mjs run-s check:verify-gates check:typecheck-cache check:gulp-task-portability check:rollup-warning-policy check:demo-build-path check:short-quality-consolidation check:coverage-sharding check:visual-orchestration check:visual-variant-ownership check:test-artifact-cache check:unit-artifact-dedup check:package-artifact-reuse test:ci-readiness check:readiness-workflow ci:profile:check test:package-candidate test:release-channel check:npm-release-workflow check:dotnet-matrix check:avalonia-motion-contract check:avalonia-stable-readiness check:render-performance-contract avalonia:performance:check avalonia:baseline:check check:fsusui-design-conformance check:documentation-architecture typography:check governance:cross-platform",
+    "governance:check": "node ./scripts/with-node-heap.mjs run-s check:verify-gates check:typecheck-cache check:gulp-task-portability check:rollup-warning-policy check:demo-build-path check:short-quality-consolidation check:coverage-sharding check:visual-orchestration check:visual-variant-ownership check:test-artifact-cache check:unit-artifact-dedup check:package-artifact-reuse test:ci-readiness check:readiness-workflow ci:profile:check ci:playwright:check test:package-candidate test:release-channel check:npm-release-workflow check:dotnet-matrix check:avalonia-motion-contract check:avalonia-stable-readiness check:render-performance-contract avalonia:performance:check avalonia:baseline:check check:fsusui-design-conformance check:documentation-architecture typography:check governance:cross-platform",
     "dotnet:restore": "dotnet restore dotnet/FsusUI.Avalonia.slnx",
     "dotnet:build": "dotnet build dotnet/FsusUI.Avalonia.slnx --no-restore --configuration Release",
     "dotnet:test": "dotnet test dotnet/FsusUI.Avalonia.slnx --no-build --configuration Release",
@@ -209,7 +209,9 @@
     "test:unit:affected": "node ./scripts/with-node-heap.mjs node ./scripts/run-affected-gate.mjs unit",
     "stub": "node ./scripts/with-node-heap.mjs pnpm run -r --parallel stub",
     "prepare": "husky",
-    "postinstall": "pnpm stub"
+    "postinstall": "pnpm stub",
+    "ci:playwright:plan": "node ./scripts/playwright-suites.mjs plan",
+    "ci:playwright:check": "node ./scripts/playwright-suites.mjs check && node ./scripts/test-playwright-suites.mjs"
   },
   "peerDependencies": {
     "vue": "^3.5.0"
