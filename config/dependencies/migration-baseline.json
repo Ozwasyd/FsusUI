@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "purpose": "zero-version-change migration freeze for issue #405",
+  "createdAt": "2026-08-06T15:58:30.310Z",
+  "files": {
+    "pnpm-lock.yaml": "a8ec855ca67e4aaa979a14c1abd718e4d8a7b3a889cd17aa3a0664a2d5dec85d",
+    "package.json": "3f909e0175b20c8b1faf146f0c35e67d3b69d1911588a7a95a6019491b80401e",
+    "vue/packages/element-plus/package.json": "19ccaf53d5ffb12e51d22669d0e29aceda8061cd298697b30482f2df8863f028",
+    "config/dependencies/npm-authority.json": "433b9abf4b535fab39bf142d2023f7e270d099e2ec39578619fb043f3273f44b"
+  },
+  "installPackageCount": 94,
+  "note": "Subsequent deps:sync (#406) must not change resolved lock package versions relative to this baseline."
+}

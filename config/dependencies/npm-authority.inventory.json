@@ -1,0 +1,1395 @@
+{
+  "generatedAt": "2026-08-06T15:58:30.307Z",
+  "externalPackageCount": 94,
+  "packages": {
+    "@changesets/cli": {
+      "installPin": "2.31.0",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^2.31.0"
+        }
+      ]
+    },
+    "@ctrl/tinycolor": {
+      "installPin": "3.6.1",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "3.6.1"
+        },
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "dependencies",
+          "version": "^3.4.1"
+        }
+      ]
+    },
+    "@esbuild-kit/cjs-loader": {
+      "installPin": "2.4.4",
+      "occurrences": [
+        {
+          "path": "vue/packages/theme-chalk/package.json",
+          "field": "devDependencies",
+          "version": "^2.2.1"
+        }
+      ]
+    },
+    "@eslint/js": {
+      "installPin": "10.0.1",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^10.0.1"
+        },
+        {
+          "path": "vue/internal/eslint-config/package.json",
+          "field": "dependencies",
+          "version": "^10.0.1"
+        }
+      ]
+    },
+    "@floating-ui/dom": {
+      "installPin": "1.7.6",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "dependencies",
+          "version": "^1.7.6"
+        },
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "dependencies",
+          "version": "^1.0.1"
+        }
+      ]
+    },
+    "@fontsource/google-sans": {
+      "installPin": "5.2.1",
+      "occurrences": [
+        {
+          "path": "vue/packages/demo-app/package.json",
+          "field": "dependencies",
+          "version": "^5.2.1"
+        }
+      ]
+    },
+    "@fontsource/noto-sans-sc": {
+      "installPin": "5.2.9",
+      "occurrences": [
+        {
+          "path": "vue/packages/demo-app/package.json",
+          "field": "dependencies",
+          "version": "^5.2.9"
+        }
+      ]
+    },
+    "@playwright/test": {
+      "installPin": "1.59.1",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^1.59.1"
+        }
+      ]
+    },
+    "@pnpm/find-workspace-packages": {
+      "installPin": "4.0.43",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^4.0.16"
+        },
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
+          "version": "^4.0.16"
+        },
+        {
+          "path": "vue/internal/build-utils/package.json",
+          "field": "dependencies",
+          "version": "^4.0.16"
+        }
+      ]
+    },
+    "@pnpm/logger": {
+      "installPin": "4.0.0",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^4.0.0"
+        },
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
+          "version": "^4.0.0"
+        },
+        {
+          "path": "vue/internal/build-utils/package.json",
+          "field": "dependencies",
+          "version": "^4.0.0"
+        }
+      ]
+    },
+    "@pnpm/types": {
+      "installPin": "8.10.0",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^8.4.0"
+        },
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "devDependencies",
+          "version": "^8.4.0"
+        }
+      ]
+    },
+    "@popperjs/core": {
+      "installPin": "npm:@sxzz/popperjs-es@^2.11.7",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "dependencies",
+          "version": "npm:@sxzz/popperjs-es@^2.11.7"
+        },
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "dependencies",
+          "version": "npm:@sxzz/popperjs-es@^2.11.7"
+        }
+      ]
+    },
+    "@rollup/plugin-commonjs": {
+      "installPin": "28.0.9",
+      "occurrences": [
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
+          "version": "^29.0.2"
+        }
+      ]
+    },
+    "@rollup/plugin-json": {
+      "installPin": "6.1.0",
+      "occurrences": [
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
+          "version": "^6.1.0"
+        }
+      ]
+    },
+    "@rollup/plugin-node-resolve": {
+      "installPin": "16.0.3",
+      "occurrences": [
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
+          "version": "^16.0.3"
+        }
+      ]
+    },
+    "@types/fs-extra": {
+      "installPin": "11.0.4",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^11.0.4"
+        }
+      ]
+    },
+    "@types/gulp": {
+      "installPin": "4.0.18",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^4.0.17"
+        }
+      ]
+    },
+    "@types/gulp-autoprefixer": {
+      "installPin": "0.0.33",
+      "occurrences": [
+        {
+          "path": "vue/packages/theme-chalk/package.json",
+          "field": "devDependencies",
+          "version": "^0.0.33"
+        }
+      ]
+    },
+    "@types/gulp-clean-css": {
+      "installPin": "4.3.4",
+      "occurrences": [
+        {
+          "path": "vue/packages/theme-chalk/package.json",
+          "field": "devDependencies",
+          "version": "^4.3.0"
+        }
+      ]
+    },
+    "@types/gulp-rename": {
+      "installPin": "2.0.7",
+      "occurrences": [
+        {
+          "path": "vue/packages/theme-chalk/package.json",
+          "field": "devDependencies",
+          "version": "^2.0.1"
+        }
+      ]
+    },
+    "@types/gulp-sass": {
+      "installPin": "5.0.4",
+      "occurrences": [
+        {
+          "path": "vue/packages/theme-chalk/package.json",
+          "field": "devDependencies",
+          "version": "^5.0.0"
+        }
+      ]
+    },
+    "@types/jsdom": {
+      "installPin": "21.1.7",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^21.1.7"
+        }
+      ]
+    },
+    "@types/lodash": {
+      "installPin": "4.17.24",
+      "occurrences": [
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "dependencies",
+          "version": "^4.14.182"
+        }
+      ]
+    },
+    "@types/lodash-es": {
+      "installPin": "4.17.12",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "dependencies",
+          "version": "^4.17.6"
+        },
+        {
+          "path": "vue/internal/metadata/package.json",
+          "field": "devDependencies",
+          "version": "^4.17.6"
+        },
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "dependencies",
+          "version": "^4.17.6"
+        }
+      ]
+    },
+    "@types/node": {
+      "installPin": "12.20.55",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "*"
+        },
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "devDependencies",
+          "version": "*"
+        },
+        {
+          "path": "vue/packages/icons-vue/package.json",
+          "field": "devDependencies",
+          "version": "*"
+        }
+      ]
+    },
+    "@types/sass": {
+      "installPin": "1.45.0",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^1.45.0"
+        }
+      ]
+    },
+    "@vitejs/plugin-vue": {
+      "installPin": "6.0.5",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^6.0.5"
+        },
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
+          "version": "^6.0.5"
+        },
+        {
+          "path": "vue/packages/demo-app/package.json",
+          "field": "devDependencies",
+          "version": "^6.0.5"
+        },
+        {
+          "path": "vue/tests/consumer-install/template/package.json",
+          "field": "devDependencies",
+          "version": "6.0.5"
+        }
+      ]
+    },
+    "@vitejs/plugin-vue-jsx": {
+      "installPin": "5.1.5",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^5.1.5"
+        },
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
+          "version": "^5.1.5"
+        },
+        {
+          "path": "vue/packages/demo-app/package.json",
+          "field": "devDependencies",
+          "version": "^5.1.5"
+        }
+      ]
+    },
+    "@vitest/coverage-v8": {
+      "installPin": "4.1.5",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^4.1.5"
+        }
+      ]
+    },
+    "@vitest/ui": {
+      "installPin": "4.1.5",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^4.1.5"
+        }
+      ]
+    },
+    "@vue/shared": {
+      "installPin": "3.5.32",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "3.5.32"
+        }
+      ]
+    },
+    "@vue/test-utils": {
+      "installPin": "2.4.6",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^2.4.6"
+        }
+      ]
+    },
+    "@vue/tsconfig": {
+      "installPin": "0.7.0",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^0.7.0"
+        }
+      ]
+    },
+    "ajv": {
+      "installPin": "6.14.0",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^8.20.0"
+        }
+      ]
+    },
+    "async-validator": {
+      "installPin": "4.2.5",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "dependencies",
+          "version": "^4.2.5"
+        },
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "dependencies",
+          "version": "^4.2.5"
+        }
+      ]
+    },
+    "camelcase": {
+      "installPin": "5.3.1",
+      "occurrences": [
+        {
+          "path": "vue/packages/icons-vue/package.json",
+          "field": "devDependencies",
+          "version": "^9.0.0"
+        }
+      ]
+    },
+    "chalk": {
+      "installPin": "2.4.2",
+      "occurrences": [
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
+          "version": "^5.6.2"
+        },
+        {
+          "path": "vue/internal/metadata/package.json",
+          "field": "devDependencies",
+          "version": "^5.0.1"
+        },
+        {
+          "path": "vue/packages/theme-chalk/package.json",
+          "field": "devDependencies",
+          "version": "5.6.2"
+        }
+      ]
+    },
+    "components-helper": {
+      "installPin": "2.2.0",
+      "occurrences": [
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
+          "version": "^2.1.4"
+        }
+      ]
+    },
+    "concurrently": {
+      "installPin": "9.2.1",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^9.1.0"
+        }
+      ]
+    },
+    "consola": {
+      "installPin": "2.15.3",
+      "occurrences": [
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
+          "version": "^3.4.2"
+        },
+        {
+          "path": "vue/internal/build-utils/package.json",
+          "field": "dependencies",
+          "version": "^3.4.2"
+        },
+        {
+          "path": "vue/internal/metadata/package.json",
+          "field": "devDependencies",
+          "version": "^2.15.3"
+        },
+        {
+          "path": "vue/packages/icons-vue/package.json",
+          "field": "devDependencies",
+          "version": "^3.4.2"
+        },
+        {
+          "path": "vue/packages/theme-chalk/package.json",
+          "field": "devDependencies",
+          "version": "3.4.2"
+        }
+      ]
+    },
+    "csstype": {
+      "installPin": "2.6.21",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^3.1.4"
+        },
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "devDependencies",
+          "version": "^2.6.20"
+        }
+      ]
+    },
+    "dayjs": {
+      "installPin": "1.11.20",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "dependencies",
+          "version": "^1.11.20"
+        },
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "dependencies",
+          "version": "^1.11.3"
+        }
+      ]
+    },
+    "esbuild": {
+      "installPin": "0.18.20",
+      "occurrences": [
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
+          "version": "^0.28.0"
+        },
+        {
+          "path": "vue/packages/icons-vue/package.json",
+          "field": "devDependencies",
+          "version": "^0.28.0"
+        }
+      ]
+    },
+    "esbuild-plugin-globals": {
+      "installPin": "0.2.0",
+      "occurrences": [
+        {
+          "path": "vue/packages/icons-vue/package.json",
+          "field": "devDependencies",
+          "version": "^0.2.0"
+        }
+      ]
+    },
+    "escape-html": {
+      "installPin": "1.0.3",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "dependencies",
+          "version": "^1.0.3"
+        },
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "dependencies",
+          "version": "^1.0.3"
+        }
+      ]
+    },
+    "eslint": {
+      "installPin": "10.2.0",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^10.2.0"
+        },
+        {
+          "path": "vue/internal/eslint-config/package.json",
+          "field": "devDependencies",
+          "version": "^10.2.0"
+        },
+        {
+          "path": "vue/internal/eslint-config/package.json",
+          "field": "peerDependencies",
+          "version": "^10.0.0"
+        }
+      ]
+    },
+    "eslint-plugin-unicorn": {
+      "installPin": "64.0.0",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^64.0.0"
+        },
+        {
+          "path": "vue/internal/eslint-config/package.json",
+          "field": "dependencies",
+          "version": "^64.0.0"
+        }
+      ]
+    },
+    "eslint-plugin-vue": {
+      "installPin": "10.8.0",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^10.8.0"
+        },
+        {
+          "path": "vue/internal/eslint-config/package.json",
+          "field": "dependencies",
+          "version": "^10.8.0"
+        }
+      ]
+    },
+    "expect-type": {
+      "installPin": "1.3.0",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^1.2.1"
+        }
+      ]
+    },
+    "fast-glob": {
+      "installPin": "3.3.3",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^3.3.3"
+        },
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
+          "version": "^3.3.3"
+        },
+        {
+          "path": "vue/internal/metadata/package.json",
+          "field": "devDependencies",
+          "version": "^3.2.11"
+        }
+      ]
+    },
+    "fs-extra": {
+      "installPin": "10.1.0",
+      "occurrences": [
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
+          "version": "^11.3.4"
+        }
+      ]
+    },
+    "gsap": {
+      "installPin": "3.15.0",
+      "occurrences": [
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "dependencies",
+          "version": "^3.15.0"
+        },
+        {
+          "path": "vue/packages/motion/package.json",
+          "field": "dependencies",
+          "version": "^3.15.0"
+        }
+      ]
+    },
+    "gulp": {
+      "installPin": "5.0.1",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "5.0.1"
+        },
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
+          "version": "^5.0.1"
+        }
+      ]
+    },
+    "gulp-autoprefixer": {
+      "installPin": "8.0.0",
+      "occurrences": [
+        {
+          "path": "vue/packages/theme-chalk/package.json",
+          "field": "devDependencies",
+          "version": "^8.0.0"
+        }
+      ]
+    },
+    "gulp-clean-css": {
+      "installPin": "4.3.0",
+      "occurrences": [
+        {
+          "path": "vue/packages/theme-chalk/package.json",
+          "field": "devDependencies",
+          "version": "^4.3.0"
+        }
+      ]
+    },
+    "gulp-rename": {
+      "installPin": "2.1.0",
+      "occurrences": [
+        {
+          "path": "vue/packages/theme-chalk/package.json",
+          "field": "devDependencies",
+          "version": "^2.0.0"
+        }
+      ]
+    },
+    "gulp-sass": {
+      "installPin": "5.1.0",
+      "occurrences": [
+        {
+          "path": "vue/packages/theme-chalk/package.json",
+          "field": "devDependencies",
+          "version": "^5.1.0"
+        }
+      ]
+    },
+    "husky": {
+      "installPin": "9.1.7",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^9.1.7"
+        }
+      ]
+    },
+    "jsdom": {
+      "installPin": "29.0.1",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^29.0.1"
+        }
+      ]
+    },
+    "katex": {
+      "installPin": "0.16.47",
+      "occurrences": [
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "dependencies",
+          "version": "^0.17.0"
+        },
+        {
+          "path": "vue/packages/wasm/package.json",
+          "field": "dependencies",
+          "version": "^0.17.0"
+        }
+      ]
+    },
+    "lint-staged": {
+      "installPin": "15.5.2",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^15.5.1"
+        }
+      ]
+    },
+    "localtunnel": {
+      "installPin": "2.0.2",
+      "occurrences": [
+        {
+          "path": "vue/packages/demo-app/package.json",
+          "field": "devDependencies",
+          "version": "^2.0.2"
+        }
+      ]
+    },
+    "lodash": {
+      "installPin": "4.18.1",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "4.18.1"
+        },
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "dependencies",
+          "version": "^4.17.21"
+        }
+      ]
+    },
+    "lodash-es": {
+      "installPin": "4.18.1",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "dependencies",
+          "version": "^4.17.21"
+        },
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
+          "version": "^4.17.21"
+        },
+        {
+          "path": "vue/internal/metadata/package.json",
+          "field": "devDependencies",
+          "version": "^4.17.21"
+        },
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "dependencies",
+          "version": "^4.17.21"
+        }
+      ]
+    },
+    "lodash-unified": {
+      "installPin": "1.0.3",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "dependencies",
+          "version": "^1.0.3"
+        },
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "dependencies",
+          "version": "^1.0.2"
+        }
+      ]
+    },
+    "memoize-one": {
+      "installPin": "6.0.0",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "dependencies",
+          "version": "^6.0.0"
+        },
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "dependencies",
+          "version": "^6.0.0"
+        }
+      ]
+    },
+    "mermaid": {
+      "installPin": "11.15.0",
+      "occurrences": [
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "dependencies",
+          "version": "^11.15.0"
+        },
+        {
+          "path": "vue/packages/wasm/package.json",
+          "field": "dependencies",
+          "version": "^11.15.0"
+        }
+      ]
+    },
+    "motion-dom": {
+      "installPin": "12.40.0",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "dependencies",
+          "version": "^12.40.0"
+        },
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "dependencies",
+          "version": "^12.40.0"
+        },
+        {
+          "path": "vue/packages/hooks/package.json",
+          "field": "dependencies",
+          "version": "^12.40.0"
+        }
+      ]
+    },
+    "normalize-wheel-es": {
+      "installPin": "1.2.0",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "dependencies",
+          "version": "^1.2.0"
+        },
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "dependencies",
+          "version": "^1.2.0"
+        }
+      ]
+    },
+    "npm-run-all": {
+      "installPin": "4.1.5",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^4.1.5"
+        },
+        {
+          "path": "vue/internal/metadata/package.json",
+          "field": "devDependencies",
+          "version": "^4.1.5"
+        },
+        {
+          "path": "vue/packages/icons-vue/package.json",
+          "field": "devDependencies",
+          "version": "^4.1.5"
+        }
+      ]
+    },
+    "octokit": {
+      "installPin": "2.1.0",
+      "occurrences": [
+        {
+          "path": "vue/internal/metadata/package.json",
+          "field": "devDependencies",
+          "version": "^2.0.3"
+        }
+      ]
+    },
+    "prettier": {
+      "installPin": "2.8.8",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^3.8.1"
+        },
+        {
+          "path": "vue/internal/eslint-config/package.json",
+          "field": "dependencies",
+          "version": "^3.8.1"
+        },
+        {
+          "path": "vue/packages/icons-vue/package.json",
+          "field": "devDependencies",
+          "version": "^3.8.1"
+        }
+      ]
+    },
+    "resize-observer-polyfill": {
+      "installPin": "1.5.1",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^1.5.1"
+        }
+      ]
+    },
+    "rimraf": {
+      "installPin": "2.7.1",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^6.1.3"
+        },
+        {
+          "path": "vue/packages/wasm/package.json",
+          "field": "devDependencies",
+          "version": "^6.1.3"
+        }
+      ]
+    },
+    "rollup": {
+      "installPin": "4.60.1",
+      "occurrences": [
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
+          "version": "^4.60.1"
+        }
+      ]
+    },
+    "rollup-plugin-esbuild": {
+      "installPin": "6.2.1",
+      "occurrences": [
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
+          "version": "^6.2.1"
+        }
+      ]
+    },
+    "sass": {
+      "installPin": "1.99.0",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^1.99.0"
+        },
+        {
+          "path": "vue/packages/demo-app/package.json",
+          "field": "devDependencies",
+          "version": "^1.99.0"
+        }
+      ]
+    },
+    "shiki": {
+      "installPin": "4.2.0",
+      "occurrences": [
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "dependencies",
+          "version": "^4.2.0"
+        },
+        {
+          "path": "vue/packages/wasm/package.json",
+          "field": "dependencies",
+          "version": "^4.2.0"
+        }
+      ]
+    },
+    "svgo": {
+      "installPin": "4.0.1",
+      "occurrences": [
+        {
+          "path": "vue/packages/icons-svg/package.json",
+          "field": "devDependencies",
+          "version": "^4.0.0"
+        }
+      ]
+    },
+    "tinyglobby": {
+      "installPin": "0.2.15",
+      "occurrences": [
+        {
+          "path": "vue/packages/icons-vue/package.json",
+          "field": "devDependencies",
+          "version": "^0.2.15"
+        }
+      ]
+    },
+    "ts-morph": {
+      "installPin": "27.0.2",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^27.0.2"
+        },
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
+          "version": "^27.0.2"
+        }
+      ]
+    },
+    "tsx": {
+      "installPin": "3.14.0",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^4.21.0"
+        },
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "devDependencies",
+          "version": "^4.21.0"
+        },
+        {
+          "path": "vue/internal/metadata/package.json",
+          "field": "devDependencies",
+          "version": "^3.6.0"
+        },
+        {
+          "path": "vue/packages/icons-vue/package.json",
+          "field": "devDependencies",
+          "version": "^4.21.0"
+        }
+      ]
+    },
+    "type-fest": {
+      "installPin": "0.20.2",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^4.41.0"
+        }
+      ]
+    },
+    "typescript": {
+      "installPin": "6.0.2",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^6.0.2"
+        },
+        {
+          "path": "vue/packages/demo-app/package.json",
+          "field": "devDependencies",
+          "version": "^6.0.2"
+        },
+        {
+          "path": "vue/packages/icons-vue/package.json",
+          "field": "devDependencies",
+          "version": "^6.0.2"
+        },
+        {
+          "path": "vue/tests/consumer-install/template/package.json",
+          "field": "devDependencies",
+          "version": "6.0.2"
+        }
+      ]
+    },
+    "typescript-eslint": {
+      "installPin": "8.58.0",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^8.58.0"
+        },
+        {
+          "path": "vue/internal/eslint-config/package.json",
+          "field": "dependencies",
+          "version": "^8.58.0"
+        }
+      ]
+    },
+    "unbuild": {
+      "installPin": "3.6.1",
+      "occurrences": [
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "devDependencies",
+          "version": "^3.6.1"
+        },
+        {
+          "path": "vue/internal/build-constants/package.json",
+          "field": "devDependencies",
+          "version": "^3.6.1"
+        },
+        {
+          "path": "vue/internal/build-utils/package.json",
+          "field": "devDependencies",
+          "version": "^3.6.1"
+        },
+        {
+          "path": "vue/packages/wasm/package.json",
+          "field": "devDependencies",
+          "version": "^3.6.1"
+        }
+      ]
+    },
+    "unplugin-vue": {
+      "installPin": "7.1.1",
+      "occurrences": [
+        {
+          "path": "vue/packages/icons-vue/package.json",
+          "field": "devDependencies",
+          "version": "^7.1.0"
+        }
+      ]
+    },
+    "unplugin-vue-macros": {
+      "installPin": "2.14.5",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^2.14.5"
+        },
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
+          "version": "^2.14.5"
+        }
+      ]
+    },
+    "vite": {
+      "installPin": "7.3.1",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^7.3.1"
+        },
+        {
+          "path": "vue/packages/demo-app/package.json",
+          "field": "devDependencies",
+          "version": "^7.1.7"
+        },
+        {
+          "path": "vue/tests/consumer-install/template/package.json",
+          "field": "devDependencies",
+          "version": "7.3.1"
+        }
+      ]
+    },
+    "vitest": {
+      "installPin": "4.1.5",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^4.1.5"
+        }
+      ]
+    },
+    "vue": {
+      "installPin": "3.5.32",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^3.5.32"
+        },
+        {
+          "path": "package.json",
+          "field": "peerDependencies",
+          "version": "^3.5.0"
+        },
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "devDependencies",
+          "version": "^3.5.32"
+        },
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "peerDependencies",
+          "version": "^3.5.0"
+        },
+        {
+          "path": "vue/packages/components/package.json",
+          "field": "peerDependencies",
+          "version": "^3.2.0"
+        },
+        {
+          "path": "vue/packages/demo-app/package.json",
+          "field": "dependencies",
+          "version": "^3.5.32"
+        },
+        {
+          "path": "vue/packages/directives/package.json",
+          "field": "peerDependencies",
+          "version": "^3.2.0"
+        },
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "devDependencies",
+          "version": "^3.2.37"
+        },
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "peerDependencies",
+          "version": "^3.5.0"
+        },
+        {
+          "path": "vue/packages/hooks/package.json",
+          "field": "peerDependencies",
+          "version": "^3.2.0"
+        },
+        {
+          "path": "vue/packages/icons-vue/package.json",
+          "field": "devDependencies",
+          "version": "^3.5.32"
+        },
+        {
+          "path": "vue/packages/icons-vue/package.json",
+          "field": "peerDependencies",
+          "version": "^3.2.0"
+        },
+        {
+          "path": "vue/packages/motion/package.json",
+          "field": "peerDependencies",
+          "version": "^3.5.0"
+        },
+        {
+          "path": "vue/packages/utils/package.json",
+          "field": "peerDependencies",
+          "version": "^3.2.0"
+        },
+        {
+          "path": "vue/tests/consumer-install/template/package.json",
+          "field": "dependencies",
+          "version": "3.5.32"
+        }
+      ]
+    },
+    "vue-eslint-parser": {
+      "installPin": "9.4.3",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^9.4.3"
+        },
+        {
+          "path": "vue/internal/eslint-config/package.json",
+          "field": "dependencies",
+          "version": "^9.4.3"
+        }
+      ]
+    },
+    "vue-router": {
+      "installPin": "4.6.4",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^4.5.0"
+        },
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "devDependencies",
+          "version": "^4.0.16"
+        }
+      ]
+    },
+    "vue-tsc": {
+      "installPin": "3.2.6",
+      "occurrences": [
+        {
+          "path": "package.json",
+          "field": "devDependencies",
+          "version": "^3.2.6"
+        },
+        {
+          "path": "vue/packages/demo-app/package.json",
+          "field": "devDependencies",
+          "version": "^3.2.6"
+        },
+        {
+          "path": "vue/packages/icons-vue/package.json",
+          "field": "devDependencies",
+          "version": "^3.2.6"
+        },
+        {
+          "path": "vue/tests/consumer-install/template/package.json",
+          "field": "devDependencies",
+          "version": "3.2.6"
+        }
+      ]
+    }
+  },
+  "unresolved": [
+    {
+      "id": "@popperjs/core",
+      "versions": [
+        "npm:@sxzz/popperjs-es@^2.11.7",
+        "npm:@sxzz/popperjs-es@^2.11.7"
+      ]
+    }
+  ]
+}
