@@ -10,43 +10,77 @@
   },
   "constraintProfiles": {
     "selectOption": {
-      "geometry": ["tokens:/tokens/density.select.option.y"]
+      "geometry": [
+        "tokens:/tokens/density.select.option.y"
+      ]
     },
     "selectOverlay": {
-      "geometry": ["tokens:/tokens/radius.surface.md"],
-      "surfaceCardMotif": ["design:#dropdown-select-popover"]
+      "geometry": [
+        "tokens:/tokens/radius.surface.md"
+      ],
+      "surfaceCardMotif": [
+        "design:#dropdown-select-popover"
+      ]
     },
     "treeRow": {
-      "geometry": ["tokens:/tokens/density.control.default.y"],
-      "surfaceCardMotif": ["design:#surface-taxonomy"]
+      "geometry": [
+        "tokens:/tokens/density.control.default.y"
+      ],
+      "surfaceCardMotif": [
+        "design:#surface-taxonomy"
+      ]
     },
     "pickerRoot": {
-      "geometry": ["tokens:/tokens/radius.surface.md"],
-      "surfaceCardMotif": ["design:#surface-taxonomy"]
+      "geometry": [
+        "tokens:/tokens/radius.surface.md"
+      ],
+      "surfaceCardMotif": [
+        "design:#surface-taxonomy"
+      ]
     },
     "dateCell": {
-      "geometry": ["tokens:/tokens/density.control.default.y"],
-      "surfaceCardMotif": ["design:#surface-taxonomy"]
+      "geometry": [
+        "tokens:/tokens/density.control.default.y"
+      ],
+      "surfaceCardMotif": [
+        "design:#surface-taxonomy"
+      ]
     },
     "timeRow": {
-      "geometry": ["tokens:/tokens/density.select.option.y"]
+      "geometry": [
+        "tokens:/tokens/density.select.option.y"
+      ]
     },
     "uploadRow": {
-      "geometry": ["tokens:/tokens/density.control.default.y"],
-      "motion": ["tokens:/tokens/motion.duration.panel"]
+      "geometry": [
+        "tokens:/tokens/density.control.default.y"
+      ],
+      "motion": [
+        "tokens:/tokens/motion.duration.panel"
+      ]
     },
     "diagnosticRow": {
-      "typography": ["tokens:/tokens/typography.caption.md.size"]
+      "typography": [
+        "tokens:/tokens/typography.caption.md.size"
+      ]
     },
     "tabItem": {
-      "geometry": ["tokens:/tokens/density.control.compact.y"],
-      "surfaceCardMotif": ["design:#tabs-and-navigation"]
+      "geometry": [
+        "tokens:/tokens/density.control.compact.y"
+      ],
+      "surfaceCardMotif": [
+        "design:#tabs-and-navigation"
+      ]
     },
     "verticalMenu": {
-      "geometry": ["tokens:/tokens/density.menu.item.y"]
+      "geometry": [
+        "tokens:/tokens/density.menu.item.y"
+      ]
     },
     "horizontalMenu": {
-      "geometry": ["tokens:/tokens/density.menu.horizontal.y"]
+      "geometry": [
+        "tokens:/tokens/density.menu.horizontal.y"
+      ]
     },
     "segmentedForm": {
       "geometry": [
@@ -68,49 +102,79 @@
       ]
     },
     "inputNumberAction": {
-      "geometry": ["tokens:/tokens/density.icon.target"]
+      "geometry": [
+        "tokens:/tokens/density.icon.target"
+      ]
     },
     "inputNumberRoot": {
-      "geometry": ["tokens:/tokens/density.control.default.y"]
+      "geometry": [
+        "tokens:/tokens/density.control.default.y"
+      ]
     },
     "overlayClose": {
-      "geometry": ["design:#dialog-and-drawer"]
+      "geometry": [
+        "design:#dialog-and-drawer"
+      ]
     },
     "rateWarning": {
-      "stateColor": ["design:#accent-rules"]
+      "stateColor": [
+        "design:#accent-rules"
+      ]
     },
     "replyComposerRoot": {
-      "geometry": ["tokens:/tokens/density.control.default.y"]
+      "geometry": [
+        "tokens:/tokens/density.control.default.y"
+      ]
     },
     "disabledControl": {
-      "disabled": ["design:#form-controls"]
+      "disabled": [
+        "design:#form-controls"
+      ]
     },
     "taskMetadata": {
-      "typography": ["tokens:/tokens/typography.caption.sm.size"]
+      "typography": [
+        "tokens:/tokens/typography.caption.sm.size"
+      ]
     },
     "taskBody": {
-      "typography": ["tokens:/tokens/typography.body.md.size"]
+      "typography": [
+        "tokens:/tokens/typography.body.md.size"
+      ]
     },
     "taskTitle": {
-      "typography": ["tokens:/tokens/typography.heading.sm.size"]
+      "typography": [
+        "tokens:/tokens/typography.heading.sm.size"
+      ]
     },
     "loadingMetadata": {
-      "typography": ["tokens:/tokens/typography.caption.md.size"]
+      "typography": [
+        "tokens:/tokens/typography.caption.md.size"
+      ]
     },
     "loadingText": {
-      "typography": ["tokens:/tokens/typography.body.md.size"]
+      "typography": [
+        "tokens:/tokens/typography.body.md.size"
+      ]
     },
     "loadingIndicator": {
-      "motion": ["tokens:/tokens/motion.duration.control"]
+      "motion": [
+        "tokens:/tokens/motion.duration.control"
+      ]
     },
     "metricLabel": {
-      "typography": ["tokens:/tokens/typography.caption.md.size"]
+      "typography": [
+        "tokens:/tokens/typography.caption.md.size"
+      ]
     },
     "metricValue": {
-      "typography": ["tokens:/tokens/typography.heading.md.size"]
+      "typography": [
+        "tokens:/tokens/typography.heading.md.size"
+      ]
     },
     "metricRow": {
-      "geometry": ["tokens:/tokens/density.control.spacious.y"]
+      "geometry": [
+        "tokens:/tokens/density.control.spacious.y"
+      ]
     },
     "tableHeader": {
       "typography": [
@@ -119,10 +183,14 @@
       ]
     },
     "tableSmallHeader": {
-      "typography": ["tokens:/tokens/typography.caption.sm.size"]
+      "typography": [
+        "tokens:/tokens/typography.caption.sm.size"
+      ]
     },
     "controlTransition": {
-      "motion": ["tokens:/tokens/motion.duration.control"]
+      "motion": [
+        "tokens:/tokens/motion.duration.control"
+      ]
     },
     "controlEnter": {
       "motion": [
@@ -137,31 +205,57 @@
       ]
     },
     "publicShellMotion": {
-      "motion": ["publicShell:#verification-contract"]
+      "motion": [
+        "publicShell:#verification-contract"
+      ]
     },
     "dialogRoot": {
-      "geometry": ["tokens:/tokens/component.dialog.padding"],
-      "surfaceCardMotif": ["design:#dialog-and-drawer"]
+      "geometry": [
+        "tokens:/tokens/component.dialog.padding"
+      ],
+      "surfaceCardMotif": [
+        "design:#dialog-and-drawer"
+      ]
     },
     "drawerRoot": {
-      "geometry": ["tokens:/tokens/radius.surface.lg"],
-      "surfaceCardMotif": ["design:#dialog-and-drawer"]
+      "geometry": [
+        "tokens:/tokens/radius.surface.lg"
+      ],
+      "surfaceCardMotif": [
+        "design:#dialog-and-drawer"
+      ]
     },
     "notificationRoot": {
-      "geometry": ["tokens:/tokens/radius.surface.md"],
-      "surfaceCardMotif": ["design:#overlay-material"]
+      "geometry": [
+        "tokens:/tokens/radius.surface.md"
+      ],
+      "surfaceCardMotif": [
+        "design:#overlay-material"
+      ]
     },
     "panelRoot": {
-      "geometry": ["tokens:/tokens/radius.surface.md"],
-      "surfaceCardMotif": ["design:#surface-taxonomy"]
+      "geometry": [
+        "tokens:/tokens/radius.surface.md"
+      ],
+      "surfaceCardMotif": [
+        "design:#surface-taxonomy"
+      ]
     },
     "expressivePanel": {
-      "geometry": ["tokens:/tokens/radius.surface.lg"],
-      "surfaceCardMotif": ["design:#surface-taxonomy"]
+      "geometry": [
+        "tokens:/tokens/radius.surface.lg"
+      ],
+      "surfaceCardMotif": [
+        "design:#surface-taxonomy"
+      ]
     },
     "labelMotif": {
-      "typography": ["tokens:/tokens/typography.caption.sm.size"],
-      "surfaceCardMotif": ["design:#2-brand-motif-punctuation"]
+      "typography": [
+        "tokens:/tokens/typography.caption.sm.size"
+      ],
+      "surfaceCardMotif": [
+        "design:#2-brand-motif-punctuation"
+      ]
     },
     "closeOptical": {
       "geometry": [
@@ -170,10 +264,14 @@
       ]
     },
     "diagnosticComposition": {
-      "surfaceCardMotif": ["design:#surface-taxonomy"]
+      "surfaceCardMotif": [
+        "design:#surface-taxonomy"
+      ]
     },
     "settingsAction": {
-      "geometry": ["tokens:/tokens/density.control.action.y"]
+      "geometry": [
+        "tokens:/tokens/density.control.action.y"
+      ]
     }
   },
   "rules": [
@@ -376,15 +474,15 @@
     [
       "web.table.header-cell",
       "component.el-table",
-      "vue/packages/theme-chalk/src/table.scss",
-      ".el-table__header",
+      "vue/packages/theme-chalk/src/fsus-theme.scss",
+      ".el-table th.el-table__cell",
       "tableHeader"
     ],
     [
       "web.table.small-header-cell",
       "component.el-table",
-      "vue/packages/theme-chalk/src/table.scss",
-      ".el-table--small .el-table__header",
+      "vue/packages/theme-chalk/src/fsus-theme.scss",
+      ".el-table--small th.el-table__cell",
       "tableSmallHeader"
     ],
     [

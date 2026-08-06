@@ -135,6 +135,8 @@
 
     th {
       font-weight: 500;
+      letter-spacing: 0;
+      text-transform: none;
       background-color: getCssVar('bg-color', 'page') !important;
       border-bottom: 1px solid getCssVar('border-color', 'dark') !important;
     }
