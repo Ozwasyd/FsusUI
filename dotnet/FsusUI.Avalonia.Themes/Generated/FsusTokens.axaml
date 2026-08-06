@@ -131,10 +131,10 @@
   <CornerRadius x:Key="FsusRadiusPill">999</CornerRadius>
   <Thickness x:Key="FsusBorderControlWidth">1</Thickness>
   <BoxShadows x:Key="FsusShadowOverlayMd">none</BoxShadows>
-  <BoxShadows x:Key="FsusShadowPanelLight">0 8px 24px rgba(15, 23, 42, 0.05)</BoxShadows>
-  <BoxShadows x:Key="FsusShadowPanelLighter">0 2px 8px rgba(15, 23, 42, 0.04)</BoxShadows>
-  <BoxShadows x:Key="FsusShadowPanelDark">0 16px 40px rgba(15, 23, 42, 0.1)</BoxShadows>
-  <BoxShadows x:Key="FsusShadowFloating">0 12px 32px rgba(15, 23, 42, 0.08)</BoxShadows>
+  <BoxShadows x:Key="FsusShadowPanelLight">0 8 24 #0D0F172A</BoxShadows>
+  <BoxShadows x:Key="FsusShadowPanelLighter">0 2 8 #0A0F172A</BoxShadows>
+  <BoxShadows x:Key="FsusShadowPanelDark">0 16 40 #1A0F172A</BoxShadows>
+  <BoxShadows x:Key="FsusShadowFloating">0 12 32 #140F172A</BoxShadows>
   <x:Double x:Key="FsusOpacityDisabledContent">0.46</x:Double>
   <x:Int32 x:Key="FsusZOverlayDialog">2000</x:Int32>
   <x:TimeSpan x:Key="FsusMotionDurationControlFast">00:00:00.1400000</x:TimeSpan>
