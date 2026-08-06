@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fsusui.local/config/dependencies/npm-authority.schema.json",
+  "title": "FsusUI npm dependency authority",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "install", "published", "consumerProfiles"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "install": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "type": "string", "minLength": 1 },
+      "additionalProperties": { "$ref": "#/$defs/exactVersion" }
+    },
+    "published": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dependencies", "peerDependencies", "optionalDependencies"],
+      "properties": {
+        "dependencies": { "$ref": "#/$defs/rangeMap" },
+        "peerDependencies": { "$ref": "#/$defs/rangeMap" },
+        "optionalDependencies": { "$ref": "#/$defs/rangeMap" }
+      }
+    },
+    "consumerProfiles": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["description", "packages"],
+        "additionalProperties": false,
+        "properties": {
+          "description": { "type": "string" },
+          "packages": {
+            "type": "object",
+            "additionalProperties": { "$ref": "#/$defs/exactVersion" }
+          }
+        }
+      }
+    },
+    "semantics": { "type": "object" },
+    "meta": { "type": "object" }
+  },
+  "$defs": {
+    "exactVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+([.-][0-9A-Za-z.-]+)?$",
+      "not": {
+        "enum": ["*", "latest"]
+      }
+    },
+    "rangeMap": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "not": { "enum": ["*", "latest"] }
+      }
+    }
+  }
+}
