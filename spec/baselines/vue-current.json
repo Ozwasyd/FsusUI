@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "d198bedc6e8cd4500e16543684f14e99abbfab8c",
+    "commitSha": "8245fbd8ffd1c94aa59a701c224794a40ae827d3",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
@@ -6511,7 +6511,8 @@
       "name": "--el-disabled-bg-color",
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
-        "vue/packages/theme-chalk/src/fsus-theme.scss"
+        "vue/packages/theme-chalk/src/fsus-theme.scss",
+        "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss"
       ],
       "classification": "portable"
     },
@@ -6519,7 +6520,8 @@
       "name": "--el-disabled-border-color",
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
-        "vue/packages/theme-chalk/src/fsus-theme.scss"
+        "vue/packages/theme-chalk/src/fsus-theme.scss",
+        "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss"
       ],
       "classification": "portable"
     },
@@ -6527,7 +6529,8 @@
       "name": "--el-disabled-text-color",
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
-        "vue/packages/theme-chalk/src/fsus-theme.scss"
+        "vue/packages/theme-chalk/src/fsus-theme.scss",
+        "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss"
       ],
       "classification": "portable"
     },
@@ -6933,6 +6936,7 @@
         "vue/packages/theme-chalk/src/common/var.scss",
         "vue/packages/theme-chalk/src/descriptions.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
+        "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/motion.scss",
         "vue/packages/theme-chalk/src/public-shell-critical.scss",
         "vue/packages/theme-chalk/src/tooltip-v2.scss"
@@ -7731,6 +7735,7 @@
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/tabs.scss"
       ],
       "classification": "portable"
@@ -7742,6 +7747,7 @@
         "vue/packages/theme-chalk/src/common/var.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss"
       ],
       "classification": "portable"
@@ -8008,6 +8014,7 @@
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/mixins/mixins.scss",
+        "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss"
       ],
       "classification": "portable"
@@ -8155,6 +8162,7 @@
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/descriptions.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
+        "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/motion.scss",
         "vue/packages/theme-chalk/src/public-shell-critical.scss",
         "vue/packages/theme-chalk/src/tooltip-v2.scss",
@@ -8821,6 +8829,7 @@
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/common/var.scss",
+        "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/motion.scss",
         "vue/packages/theme-chalk/src/public-shell-critical.scss",
         "vue/packages/theme-chalk/src/public-shell.scss",
@@ -8942,6 +8951,7 @@
         "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/markdown-renderer.scss",
         "vue/packages/theme-chalk/src/metric-primitives.scss",
+        "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss",
         "vue/packages/theme-chalk/src/public-shell-critical.scss",
         "vue/packages/theme-chalk/src/public-shell.scss",
@@ -9152,6 +9162,7 @@
         "vue/packages/theme-chalk/src/link.scss",
         "vue/packages/theme-chalk/src/metric-primitives.scss",
         "vue/packages/theme-chalk/src/mixins/mixins.scss",
+        "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/motion.scss",
         "vue/packages/theme-chalk/src/option-item.scss",
         "vue/packages/theme-chalk/src/pagination.scss",
@@ -9358,6 +9369,7 @@
         "vue/packages/theme-chalk/src/check-tag.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
+        "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/motion.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss",
         "vue/packages/theme-chalk/src/public-shell-critical.scss",
@@ -9373,6 +9385,7 @@
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/markdown-renderer.scss",
+        "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/motion.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss",
         "vue/packages/theme-chalk/src/public-shell-critical.scss",
@@ -9456,6 +9469,7 @@
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/markdown-editor.scss",
+        "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/pagination.scss",
         "vue/packages/theme-chalk/src/select-v2.scss",
         "vue/packages/theme-chalk/src/tree.scss"
@@ -9474,6 +9488,7 @@
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/markdown-editor.scss",
+        "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/motion.scss",
         "vue/packages/theme-chalk/src/option-item.scss",
         "vue/packages/theme-chalk/src/tree-select.scss"
@@ -9501,6 +9516,7 @@
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/inbox-primitives.scss",
         "vue/packages/theme-chalk/src/markdown-editor.scss",
+        "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/option-item.scss",
         "vue/packages/theme-chalk/src/pagination.scss",
         "vue/packages/theme-chalk/src/table-column.scss",
