@@ -3,6 +3,9 @@ name: Temporary Component Contract Refresh
 on:
   pull_request:
 
+permissions:
+  contents: write
+
 jobs:
   generate:
     if: github.event.pull_request.head.repo.full_name == github.repository
@@ -10,6 +13,9 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
       - uses: pnpm/action-setup@v4
         with:
           version: 10.33.0
@@ -20,8 +26,14 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
       - run: pnpm run component-contracts:generate
-      - uses: actions/upload-artifact@v4
-        with:
-          name: component-contract-registry-refresh
-          path: spec/components/contracts/v1/vue-public-contracts.json
-          retention-days: 1
+      - name: Commit generated registry
+        run: |
+          if git diff --quiet -- spec/components/contracts/v1/vue-public-contracts.json; then
+            echo "Component contract registry already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add spec/components/contracts/v1/vue-public-contracts.json
+          git commit -m "test(ci): refresh component contract registry"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
