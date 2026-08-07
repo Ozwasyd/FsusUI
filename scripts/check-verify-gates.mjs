@@ -14,6 +14,15 @@ function assert(condition, message) {
   }
 }
 
+function workflowJob(name) {
+  const marker = `\n  ${name}:\n`
+  const start = qualityWorkflow.indexOf(marker)
+  assert(start !== -1, `quality workflow must define ${name}`)
+  const body = qualityWorkflow.slice(start + marker.length)
+  const nextJob = body.search(/\n  [A-Za-z0-9_-]+:\n/)
+  return nextJob === -1 ? body : body.slice(0, nextJob)
+}
+
 assert(scripts['verify:pr-fast'], 'package.json must expose verify:pr-fast')
 assert(scripts['verify:full'], 'package.json must expose verify:full')
 assert(
@@ -103,18 +112,73 @@ assert(
   capacitySuite.split("'check:foundation-style-boundary'").length - 1 === 2,
   'PR-fast and full verification must enforce the foundation style boundary',
 )
+
+const prFeedbackJob = workflowJob('pr-feedback')
+const prRenderJob = workflowJob('pr-real-render-performance')
+const premergeMainJob = workflowJob('premerge-main')
+const prFastJob = workflowJob('pr-fast')
+const mergeGroupPrFastJob = workflowJob('merge-group-pr-fast')
+const mergeGroupRenderJob = workflowJob('merge-group-real-render-performance')
+const mainJob = workflowJob('main')
+
 assert(
-  qualityWorkflow.includes('pnpm run verify:pr-fast') &&
-    qualityWorkflow.includes("github.event_name == 'pull_request'"),
-  'PR workflow must run verify:pr-fast by default',
+  qualityWorkflow.includes('merge_group:') &&
+    qualityWorkflow.includes('checks_requested'),
+  'quality workflow must listen for merge_group checks_requested events',
 )
 assert(
-  qualityWorkflow.includes("github.event_name == 'push'") &&
-    qualityWorkflow.includes("inputs.group == 'main'") &&
+  qualityWorkflow.includes('concurrency:') &&
+    qualityWorkflow.includes(
+      "cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}",
+    ),
+  'PR and merge-group quality runs must cancel superseded candidates',
+)
+assert(
+  prFeedbackJob.includes("github.event_name == 'pull_request'") &&
+    prFeedbackJob.includes('pnpm run verify:pr-fast'),
+  'PR workflow must keep verify:pr-fast as an early feedback job',
+)
+assert(
+  prRenderJob.includes("github.event_name == 'pull_request'"),
+  'PR workflow must keep differential real-render performance feedback',
+)
+assert(
+  premergeMainJob.includes(
+    "github.event_name == 'pull_request' || github.event_name == 'merge_group'",
+  ) &&
+    premergeMainJob.includes('uses: ./.github/workflows/_quality.yml') &&
+    premergeMainJob.includes('group: main'),
+  'PR heads and merge-group candidates must run the complete main quality profile before merge',
+)
+assert(
+  prFastJob.includes('if: always()') &&
+    prFastJob.includes('pr-feedback') &&
+    prFastJob.includes('pr-real-render-performance') &&
+    prFastJob.includes('premerge-main') &&
+    prFastJob.includes('PREMERGE_MAIN_RESULT') &&
+    !prFastJob.includes('pnpm run verify:pr-fast'),
+  'required pr-fast check must aggregate fast feedback, render feedback, and complete premerge main quality',
+)
+assert(
+  mergeGroupPrFastJob.includes('name: pr-fast') &&
+    mergeGroupPrFastJob.includes("github.event_name == 'merge_group'") &&
+    mergeGroupPrFastJob.includes('premerge-main'),
+  'merge-group candidates must preserve the existing required pr-fast check context',
+)
+assert(
+  mergeGroupRenderJob.includes('name: pr-real-render-performance') &&
+    mergeGroupRenderJob.includes("github.event_name == 'merge_group'") &&
+    mergeGroupRenderJob.includes('premerge-main'),
+  'merge-group candidates must preserve the existing required render check context',
+)
+assert(
+  mainJob.includes("github.event_name == 'push'") &&
+    mainJob.includes("inputs.group == 'main'") &&
+    mainJob.includes('uses: ./.github/workflows/_quality.yml') &&
+    mainJob.includes('group: main') &&
     qualityWorkflow.includes("inputs.group == 'nightly'") &&
-    qualityWorkflow.includes("inputs.group == 'release'") &&
-    qualityWorkflow.includes('uses: ./.github/workflows/_quality.yml'),
-  'non-PR quality workflow must split reusable gates into main, nightly, and release groups',
+    qualityWorkflow.includes("inputs.group == 'release'"),
+  'post-merge main, nightly, and release quality must keep using reusable quality profiles',
 )
 assert(
   releaseGovernance.includes('verify:pr-fast') &&
