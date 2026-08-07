@@ -22,6 +22,9 @@ interface FsusAuditAttributes {
   'data-audit-focus'?: string | boolean
   'data-audit-target'?: string | boolean
   'data-testid'?: string
+  'data-upload-help'?: string | boolean
+  'data-descriptions-spacing-fixtures'?: string | boolean
+  'data-input-number-hit-fixtures'?: string | boolean
 }
 
 interface FsusInputModelAttributes {
@@ -36,6 +39,9 @@ declare module '@vue/runtime-dom' {
     'data-audit-focus'?: string | boolean
     'data-audit-target'?: string | boolean
     'data-testid'?: string
+    'data-upload-help'?: string | boolean
+    'data-descriptions-spacing-fixtures'?: string | boolean
+    'data-input-number-hit-fixtures'?: string | boolean
   }
 
   export interface AnchorHTMLAttributes extends FsusAuditAttributes {}
@@ -69,6 +75,8 @@ declare module 'vue' {
     dataAuditComponent?: string
     dataAuditFocus?: string | boolean
     dataAuditTarget?: string | boolean
+    dataDescriptionsCase?: string
+    dataInputNumberCase?: string
   }
 
   export interface HTMLAttributes extends FsusAuditAttributes {}
