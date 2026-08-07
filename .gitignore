@@ -19,6 +19,10 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 
+# Python helper caches
+__pycache__/
+*.pyc
+
 # Bundles, reports, and generated visual evidence
 /dist
 /dist/

@@ -22,6 +22,7 @@ interface FsusAuditAttributes {
   'data-audit-focus'?: string | boolean
   'data-audit-target'?: string | boolean
   'data-testid'?: string
+  'data-markdown-editor-probe-id'?: string
   'data-upload-help'?: string | boolean
   'data-descriptions-spacing-fixtures'?: string | boolean
   'data-input-number-hit-fixtures'?: string | boolean
@@ -39,6 +40,7 @@ declare module '@vue/runtime-dom' {
     'data-audit-focus'?: string | boolean
     'data-audit-target'?: string | boolean
     'data-testid'?: string
+    'data-markdown-editor-probe-id'?: string
     'data-upload-help'?: string | boolean
     'data-descriptions-spacing-fixtures'?: string | boolean
     'data-input-number-hit-fixtures'?: string | boolean
