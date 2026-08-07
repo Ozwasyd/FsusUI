@@ -9,6 +9,7 @@ Workflow documents describe repeatable execution and evidence. They must referen
 
 - [Engineering handoff](../engineering-handoff.md)
 - [Visual change workflow](./visual-change.md)
+- [Native CJK IME acceptance](./native-ime.md)
 - [Visual testing profiles](../visual-testing.md)
 - [Playground and Demo](../playground.md)
 - [Contributing](../../CONTRIBUTING.md)

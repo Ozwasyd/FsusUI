@@ -163,8 +163,9 @@
     </section>
 
     <section
-      v-if="markdownEditorTransactionFixture"
+      v-if="markdownEditorTransactionFixture && markdownEditorMountReady"
       data-testid="markdown-editor-transaction-fixture"
+      :data-markdown-editor-probe-id="markdownEditorProbeId"
     >
       <el-markdown-editor
         ref="markdownTransactionEditor"
@@ -1846,6 +1847,36 @@ const markdownEditorTransactionFixture =
 const markdownEditorImeFixture =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('markdownEditorIme') === '1'
+const markdownEditorDelayMount =
+  typeof window !== 'undefined'
+    ? Number(
+        new URLSearchParams(window.location.search).get(
+          'markdownEditorDelayMount',
+        ) ?? 0,
+      )
+    : 0
+const markdownEditorMountReady = ref(markdownEditorDelayMount === 0)
+const markdownEditorProbeKey = 'fsus-markdown-editor-probe-id'
+const createMarkdownEditorProbeId = () =>
+  typeof globalThis.crypto?.randomUUID === 'function'
+    ? globalThis.crypto.randomUUID()
+    : `markdown-editor-probe-${Math.random().toString(36).slice(2)}`
+const markdownEditorProbeId = (() => {
+  try {
+    const existing = window.sessionStorage.getItem(markdownEditorProbeKey)
+    if (existing) return existing
+    const created = createMarkdownEditorProbeId()
+    window.sessionStorage.setItem(markdownEditorProbeKey, created)
+    return created
+  } catch {
+    return createMarkdownEditorProbeId()
+  }
+})()
+if (markdownEditorDelayMount > 0) {
+  window.setTimeout(() => {
+    markdownEditorMountReady.value = true
+  }, markdownEditorDelayMount)
+}
 const markdownTransactionEditor = ref<MarkdownEditorInstance>()
 const markdownTransactionValue = ref(
   markdownEditorImeFixture ? '' : 'A😀éאב\n- 列表',
