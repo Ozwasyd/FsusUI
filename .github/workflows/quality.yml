@@ -30,6 +30,8 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 35
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -81,23 +83,34 @@ jobs:
           echo "cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
           echo "cache-primary-key=${{ steps.typecheck-cache.outputs.cache-primary-key }}"
       - run: pnpm run verify:pr-fast
-      - name: Capture stale CI baselines
-        if: failure()
+      - name: Refresh stale generated baselines on the PR branch
+        if: failure() && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          HEAD_BRANCH: ${{ github.head_ref }}
         run: |
-          mkdir -p .tmp/ci-baseline-repair
+          git fetch origin "$HEAD_BRANCH"
+          git checkout -B "$HEAD_BRANCH" "origin/$HEAD_BRANCH"
           pnpm run avalonia:baseline
-          node -e "const fs=require('node:fs');const crypto=require('node:crypto');const p='vue/packages/theme-chalk/dist/el-fsus.css';const css=fs.readFileSync(p);const out={bytes:css.byteLength,sha256:crypto.createHash('sha256').update(css).digest('hex')};fs.writeFileSync('.tmp/ci-baseline-repair/theme-package.actual.json',JSON.stringify(out,null,2)+'\n');console.log(out)"
-      - name: Upload stale CI baseline evidence
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ci-baseline-repair
-          path: |
-            spec/baselines/vue-current.json
-            docs/avalonia/vue-public-api-baseline.md
-            vue/packages/theme-chalk/dist/el-fsus.css
-            .tmp/ci-baseline-repair/theme-package.actual.json
-          retention-days: 2
+          pnpm run build:theme
+          node <<'NODE'
+          const fs = require('node:fs')
+          const crypto = require('node:crypto')
+          const snapshotPath = 'vue/packages/theme-chalk/theme-package.snapshot.json'
+          const cssPath = 'vue/packages/theme-chalk/dist/el-fsus.css'
+          const snapshot = JSON.parse(fs.readFileSync(snapshotPath, 'utf8'))
+          const css = fs.readFileSync(cssPath)
+          snapshot.bytes = css.byteLength
+          snapshot.sha256 = crypto.createHash('sha256').update(css).digest('hex')
+          fs.writeFileSync(snapshotPath, `${JSON.stringify(snapshot, null, 2)}\n`)
+          console.log({ bytes: snapshot.bytes, sha256: snapshot.sha256 })
+          NODE
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add spec/baselines/vue-current.json docs/avalonia/vue-public-api-baseline.md vue/packages/theme-chalk/theme-package.snapshot.json
+          if ! git diff --cached --quiet; then
+            git commit -m "test(ci): refresh generated baselines"
+            git push origin HEAD:"$HEAD_BRANCH"
+          fi
       - name: Determine PR demo build path impact
         id: demo-build-path
         run: node ./scripts/with-node-heap.mjs node ./scripts/should-run-demo-build.mjs
