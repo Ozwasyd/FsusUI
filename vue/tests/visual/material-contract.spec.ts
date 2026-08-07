@@ -160,8 +160,10 @@ test('paper overlays keep blur disabled', async ({ page }, testInfo) => {
 test('dialog drawer notification keep correct overlay depth hierarchy', async ({
   page,
 }, testInfo) => {
-  // #298: same-screen depth comparison — panels are border-first (no shadow),
-  // Notification uses floating elevation. Inversion must fail this fixture.
+  // #298: same-screen depth comparison. This fixture intentionally coexists
+  // multiple modal layers to compare computed material; only the first action
+  // models user interaction. Later controls are dispatched programmatically so
+  // the test does not require pointer events to pass through an active modal.
   const { theme } = resolveVisualVariant(testInfo.project.name)
   await page.emulateMedia({ reducedMotion: 'no-preference' })
   await page.goto(buildVisualUrl('feedback', testInfo.project.name), {
@@ -172,11 +174,11 @@ test('dialog drawer notification keep correct overlay depth hierarchy', async ({
   const dialog = page.locator('.el-dialog').last()
   await expect(dialog).toBeVisible()
 
-  await page.getByTestId('open-review-drawer').click()
+  await page.getByTestId('open-review-drawer').dispatchEvent('click')
   const drawer = page.locator('.el-drawer').last()
   await expect(drawer).toBeVisible()
 
-  await page.getByTestId('open-notification').click()
+  await page.getByTestId('open-notification').dispatchEvent('click')
   const notification = page.locator('.el-notification').last()
   await expect(notification).toBeVisible()
 
