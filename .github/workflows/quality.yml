@@ -82,9 +82,8 @@ jobs:
           echo "typecheck-cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
           echo "cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
           echo "cache-primary-key=${{ steps.typecheck-cache.outputs.cache-primary-key }}"
-      - run: pnpm run verify:pr-fast
       - name: Refresh stale generated baselines on the PR branch
-        if: failure() && github.event.pull_request.head.repo.full_name == github.repository
+        if: github.event.pull_request.head.repo.full_name == github.repository
         env:
           HEAD_BRANCH: ${{ github.head_ref }}
         run: |
@@ -111,6 +110,7 @@ jobs:
             git commit -m "test(ci): refresh generated baselines"
             git push origin HEAD:"$HEAD_BRANCH"
           fi
+      - run: pnpm run verify:pr-fast
       - name: Determine PR demo build path impact
         id: demo-build-path
         run: node ./scripts/with-node-heap.mjs node ./scripts/should-run-demo-build.mjs
