@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* global fetch, setTimeout */
 
 import { spawn, spawnSync } from 'node:child_process'
 import { mkdirSync, writeFileSync } from 'node:fs'

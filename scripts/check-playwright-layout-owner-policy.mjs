@@ -43,10 +43,6 @@ const FIXED_NAMESPACES = {
   'geometry-smoke/chromium': 'playwright-layout-geometry-chromium',
 }
 
-const fail = (message) => {
-  throw new Error(message)
-}
-
 const workflowJob = (source, name) =>
   source.match(
     new RegExp(
@@ -195,7 +191,7 @@ for (const job of ['premerge-playwright', 'main-playwright', 'nightly-playwright
 }
 assert.equal(occurrences(topWorkflow, 'uses: ./.github/workflows/_quality-playwright.yml'), 4)
 const premergePlaywrightBlock = topWorkflow.slice(topWorkflow.indexOf('premerge-playwright:'))
-const premergePlaywrightJob = premergePlaywrightBlock.slice(0, premergePlaywrightBlock.search(/\n  [a-zA-Z0-9_-]+:\s*\n/))
+const premergePlaywrightJob = premergePlaywrightBlock.slice(0, premergePlaywrightBlock.search(/\n {2}[a-zA-Z0-9_-]+:\s*\n/))
 assert.ok(
   /uses: \.\/\.github\/workflows\/_quality-playwright\.yml[\s\S]*?group: pr/u.test(premergePlaywrightJob),
   'premerge-playwright must run the PR registry group (geometry-smoke only)',
