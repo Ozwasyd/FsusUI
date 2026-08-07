@@ -1,0 +1,4 @@
+/* fsus-rule-id: web.metric-primitives.metric-row */
+.fsusui-corpus-scope __RULE_SELECTOR__ {
+  min-height: 12px;
+}

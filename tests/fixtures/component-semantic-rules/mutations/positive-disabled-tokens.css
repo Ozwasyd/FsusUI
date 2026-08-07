@@ -1,0 +1,6 @@
+/* fsus-rule-id: web.reply-composer-shell.disabled-control */
+.fsusui-corpus-scope __RULE_SELECTOR__.is-disabled {
+  background-color: var(--el-disabled-bg-color);
+  border-color: var(--el-disabled-border-color);
+  color: var(--el-disabled-text-color);
+}
