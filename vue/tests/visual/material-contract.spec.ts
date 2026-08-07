@@ -24,37 +24,25 @@ const computedOverlayDepth = (locator: Locator) =>
   locator.evaluate((element) => {
     const style = window.getComputedStyle(element)
     const root = getComputedStyle(document.documentElement)
-    const resolveToken = (name: string) => {
-      const raw = root.getPropertyValue(name).trim()
-      if (!raw || raw === 'none') return 'none'
-      if (raw.startsWith('var(')) {
-        const inner = raw.slice(4, -1).split(',')[0]?.trim()
-        if (inner) {
-          const nested = root.getPropertyValue(inner).trim()
-          return nested || raw
-        }
-      }
-      return raw
-    }
-    const panel = resolveToken('--fsus-shadow-panel')
-    const floating = resolveToken('--fsus-shadow-floating')
-    const boxShadow = style.boxShadow === 'none' ? 'none' : style.boxShadow
     const normalize = (value: string) =>
       value.replace(/\s+/g, ' ').trim().toLowerCase()
-    const normalizedShadow = normalize(boxShadow)
-    const normalizedPanel = normalize(panel || 'none')
-    const normalizedFloating = normalize(floating)
-    const matchesToken = (token: string) => {
-      if (!token || token === 'none') return normalizedShadow === 'none'
-      return (
-        normalizedShadow === token ||
-        normalizedShadow.includes(token) ||
-        (token !== 'none' &&
-          normalizedShadow !== 'none' &&
-          token.split(' ').slice(0, 3).join(' ') ===
-            normalizedShadow.split(' ').slice(0, 3).join(' '))
-      )
+    const resolveTokenShadow = (name: string) => {
+      if (!root.getPropertyValue(name).trim()) return ''
+
+      const probe = document.createElement('div')
+      probe.style.boxShadow = `var(${name})`
+      document.body.append(probe)
+      const computed = getComputedStyle(probe).boxShadow
+      probe.remove()
+      return computed === 'none' ? 'none' : computed
     }
+
+    const panel = resolveTokenShadow('--fsus-shadow-panel')
+    const floating = resolveTokenShadow('--fsus-shadow-floating')
+    const boxShadow = style.boxShadow === 'none' ? 'none' : style.boxShadow
+    const normalizedShadow = normalize(boxShadow)
+    const matchesToken = (token: string) =>
+      token !== '' && normalizedShadow === normalize(token)
 
     return {
       boxShadow,
@@ -65,8 +53,8 @@ const computedOverlayDepth = (locator: Locator) =>
         .trim(),
       panelToken: panel || 'none',
       floatingToken: floating,
-      matchesPanel: matchesToken(normalizedPanel),
-      matchesFloating: matchesToken(normalizedFloating),
+      matchesPanel: matchesToken(panel),
+      matchesFloating: matchesToken(floating),
       isNone: normalizedShadow === 'none',
     }
   })
@@ -182,37 +170,30 @@ test('dialog drawer notification keep correct overlay depth hierarchy', async ({
   const notification = page.locator('.el-notification').last()
   await expect(notification).toBeVisible()
 
-  await expect
-    .poll(async () => {
-      const dialogDepth = await computedOverlayDepth(dialog)
-      const drawerDepth = await computedOverlayDepth(drawer)
-      const notificationDepth = await computedOverlayDepth(notification)
-      return {
-        dialogIsPanel: dialogDepth.matchesPanel || dialogDepth.isNone,
-        drawerIsPanel: drawerDepth.matchesPanel || drawerDepth.isNone,
-        dialogNotFloating: !dialogDepth.matchesFloating || dialogDepth.isNone,
-        drawerNotFloating: !drawerDepth.matchesFloating || drawerDepth.isNone,
-        notificationIsFloating:
-          notificationDepth.matchesFloating && !notificationDepth.isNone,
-        dialogBlur: dialogDepth.blurOverlay,
-        drawerBlur: drawerDepth.blurOverlay,
-        notificationBlur: notificationDepth.blurOverlay,
-      }
-    })
-    .toMatchObject({
-      dialogIsPanel: true,
-      drawerIsPanel: true,
-      dialogNotFloating: true,
-      drawerNotFloating: true,
-      notificationIsFloating: true,
-      dialogBlur: '0px',
-      drawerBlur: '0px',
-      notificationBlur: '0px',
-    })
-
   const dialogDepth = await computedOverlayDepth(dialog)
   const drawerDepth = await computedOverlayDepth(drawer)
   const notificationDepth = await computedOverlayDepth(notification)
+  expect({
+    dialogIsPanel: dialogDepth.matchesPanel || dialogDepth.isNone,
+    drawerIsPanel: drawerDepth.matchesPanel || drawerDepth.isNone,
+    dialogNotFloating: !dialogDepth.matchesFloating || dialogDepth.isNone,
+    drawerNotFloating: !drawerDepth.matchesFloating || drawerDepth.isNone,
+    notificationIsFloating:
+      notificationDepth.matchesFloating && !notificationDepth.isNone,
+    dialogBlur: dialogDepth.blurOverlay,
+    drawerBlur: drawerDepth.blurOverlay,
+    notificationBlur: notificationDepth.blurOverlay,
+  }).toMatchObject({
+    dialogIsPanel: true,
+    drawerIsPanel: true,
+    dialogNotFloating: true,
+    drawerNotFloating: true,
+    notificationIsFloating: true,
+    dialogBlur: '0px',
+    drawerBlur: '0px',
+    notificationBlur: '0px',
+  })
+
   expect(dialogDepth.borderRadius).toMatch(/^12px$/)
   expect(drawerDepth.borderRadius).toMatch(/^12px$/)
   expect(notificationDepth.borderRadius).toMatch(/^10px$/)
