@@ -20,6 +20,7 @@
         "spec/components/contracts/**",
         "scripts/check-*.mjs",
         "scripts/*conformance.mjs",
+        "scripts/native-ime-*",
         "scripts/npm-authority-lib.mjs",
         "scripts/playwright-suites.mjs",
         "scripts/test-deps-*.mjs",
@@ -104,7 +105,10 @@
     },
     {
       "id": "web-demo-non-performance",
-      "patterns": ["vue/packages/demo-app/src/sections/**"],
+      "patterns": [
+        "vue/packages/demo-app/src/sections/**",
+        "vue/packages/demo-app/src/AuditFixtures.vue"
+      ],
       "scope": "skip"
     },
     {

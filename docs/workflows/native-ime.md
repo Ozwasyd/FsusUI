@@ -40,7 +40,7 @@ runners do not provide a real CJK IME session.
 ## Running
 
 ```bash
-pnpm run test:markdown-editor:ime
+node ./scripts/native-ime-harness.mjs
 ```
 
 Reuse an existing demo build and write evidence to a custom directory:
@@ -122,7 +122,7 @@ The output directory contains:
 ## Negative-path self test
 
 ```bash
-pnpm run test:markdown-editor:ime:self-test
+node ./scripts/native-ime-harness-self-test.mjs
 ```
 
 The self test reuses an existing demo build and asserts three failures:
