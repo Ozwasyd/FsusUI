@@ -30,8 +30,6 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 35
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -82,34 +80,6 @@ jobs:
           echo "typecheck-cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
           echo "cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
           echo "cache-primary-key=${{ steps.typecheck-cache.outputs.cache-primary-key }}"
-      - name: Refresh stale generated baselines on the PR branch
-        if: github.event.pull_request.head.repo.full_name == github.repository
-        env:
-          HEAD_BRANCH: ${{ github.head_ref }}
-        run: |
-          git fetch origin "$HEAD_BRANCH"
-          git checkout -B "$HEAD_BRANCH" "origin/$HEAD_BRANCH"
-          pnpm run avalonia:baseline
-          pnpm run build:theme
-          node <<'NODE'
-          const fs = require('node:fs')
-          const crypto = require('node:crypto')
-          const snapshotPath = 'vue/packages/theme-chalk/theme-package.snapshot.json'
-          const cssPath = 'vue/packages/theme-chalk/dist/el-fsus.css'
-          const snapshot = JSON.parse(fs.readFileSync(snapshotPath, 'utf8'))
-          const css = fs.readFileSync(cssPath)
-          snapshot.bytes = css.byteLength
-          snapshot.sha256 = crypto.createHash('sha256').update(css).digest('hex')
-          fs.writeFileSync(snapshotPath, `${JSON.stringify(snapshot, null, 2)}\n`)
-          console.log({ bytes: snapshot.bytes, sha256: snapshot.sha256 })
-          NODE
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add spec/baselines/vue-current.json docs/avalonia/vue-public-api-baseline.md vue/packages/theme-chalk/theme-package.snapshot.json
-          if ! git diff --cached --quiet; then
-            git commit -m "test(ci): refresh generated baselines"
-            git push origin HEAD:"$HEAD_BRANCH"
-          fi
       - run: pnpm run verify:pr-fast
       - name: Determine PR demo build path impact
         id: demo-build-path
