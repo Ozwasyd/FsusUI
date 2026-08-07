@@ -81,6 +81,23 @@ jobs:
           echo "cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
           echo "cache-primary-key=${{ steps.typecheck-cache.outputs.cache-primary-key }}"
       - run: pnpm run verify:pr-fast
+      - name: Capture stale CI baselines
+        if: failure()
+        run: |
+          mkdir -p .tmp/ci-baseline-repair
+          pnpm run avalonia:baseline
+          node -e "const fs=require('node:fs');const crypto=require('node:crypto');const p='vue/packages/theme-chalk/dist/el-fsus.css';const css=fs.readFileSync(p);const out={bytes:css.byteLength,sha256:crypto.createHash('sha256').update(css).digest('hex')};fs.writeFileSync('.tmp/ci-baseline-repair/theme-package.actual.json',JSON.stringify(out,null,2)+'\n');console.log(out)"
+      - name: Upload stale CI baseline evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-baseline-repair
+          path: |
+            spec/baselines/vue-current.json
+            docs/avalonia/vue-public-api-baseline.md
+            vue/packages/theme-chalk/dist/el-fsus.css
+            .tmp/ci-baseline-repair/theme-package.actual.json
+          retention-days: 2
       - name: Determine PR demo build path impact
         id: demo-build-path
         run: node ./scripts/with-node-heap.mjs node ./scripts/should-run-demo-build.mjs
