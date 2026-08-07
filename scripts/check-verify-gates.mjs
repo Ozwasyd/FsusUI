@@ -19,7 +19,7 @@ function workflowJob(name) {
   const start = qualityWorkflow.indexOf(marker)
   assert(start !== -1, `quality workflow must define ${name}`)
   const body = qualityWorkflow.slice(start + marker.length)
-  const nextJob = body.search(/\n  [A-Za-z0-9_-]+:\n/)
+  const nextJob = body.search(/\n {2}[A-Za-z0-9_-]+:\n/)
   return nextJob === -1 ? body : body.slice(0, nextJob)
 }
 
