@@ -234,12 +234,19 @@ jobs:
     with:
       group: main
 
+  premerge-playwright:
+    if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+    uses: ./.github/workflows/_quality-playwright.yml
+    with:
+      group: pr
+
   pr-fast:
     if: always() && github.event_name == 'pull_request'
     needs:
       - pr-feedback
       - pr-real-render-performance
       - premerge-main
+      - premerge-playwright
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -248,26 +255,33 @@ jobs:
           PR_FEEDBACK_RESULT: ${{ needs.pr-feedback.result }}
           PR_RENDER_RESULT: ${{ needs.pr-real-render-performance.result }}
           PREMERGE_MAIN_RESULT: ${{ needs.premerge-main.result }}
+          PR_PLAYWRIGHT_RESULT: ${{ needs.premerge-playwright.result }}
         run: |
           echo "pr-feedback=${PR_FEEDBACK_RESULT}"
           echo "pr-real-render-performance=${PR_RENDER_RESULT}"
           echo "premerge-main=${PREMERGE_MAIN_RESULT}"
+          echo "premerge-playwright=${PR_PLAYWRIGHT_RESULT}"
           test "${PR_FEEDBACK_RESULT}" = "success"
           test "${PR_RENDER_RESULT}" = "success"
           test "${PREMERGE_MAIN_RESULT}" = "success"
+          test "${PR_PLAYWRIGHT_RESULT}" = "success"
 
   merge-group-pr-fast:
     name: pr-fast
     if: always() && github.event_name == 'merge_group'
     needs:
       - premerge-main
+      - premerge-playwright
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Preserve required PR gate on merge queue candidates
         env:
           PREMERGE_MAIN_RESULT: ${{ needs.premerge-main.result }}
-        run: test "${PREMERGE_MAIN_RESULT}" = "success"
+          PR_PLAYWRIGHT_RESULT: ${{ needs.premerge-playwright.result }}
+        run: |
+          test "${PREMERGE_MAIN_RESULT}" = "success"
+          test "${PR_PLAYWRIGHT_RESULT}" = "success"
 
   merge-group-real-render-performance:
     name: pr-real-render-performance
@@ -288,9 +302,21 @@ jobs:
     with:
       group: main
 
+  main-playwright:
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.group == 'main')
+    uses: ./.github/workflows/_quality-playwright.yml
+    with:
+      group: main
+
   nightly:
     if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.group == 'nightly')
     uses: ./.github/workflows/_quality.yml
+    with:
+      group: nightly
+
+  nightly-playwright:
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.group == 'nightly')
+    uses: ./.github/workflows/_quality-playwright.yml
     with:
       group: nightly
 
@@ -300,3 +326,9 @@ jobs:
     with:
       group: release
       release_tag: ${{ inputs.release_tag }}
+
+  release-playwright:
+    if: github.event_name == 'workflow_dispatch' && inputs.group == 'release'
+    uses: ./.github/workflows/_quality-playwright.yml
+    with:
+      group: release

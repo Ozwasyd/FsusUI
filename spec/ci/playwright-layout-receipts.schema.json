@@ -1,0 +1,253 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Ozwasyd/FsusUI/spec/ci/playwright-layout-receipts.schema.json",
+  "title": "Playwright Layout Owner Cell Receipt",
+  "description": "Per-cell evidence receipt produced by the playwright-layout owner for dom-layout and geometry-smoke cells. The verifier enforces the same contract at runtime; this schema is the durable data contract.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "owner",
+    "gate",
+    "suiteId",
+    "cellId",
+    "project",
+    "dimensions",
+    "commitSha",
+    "workflowGroup",
+    "run",
+    "toolchain",
+    "runtime",
+    "config",
+    "tests",
+    "report",
+    "status",
+    "startedAt",
+    "endedAt"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "owner": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "gate": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "suiteId": {
+      "type": "string",
+      "enum": [
+        "dom-layout",
+        "geometry-smoke"
+      ]
+    },
+    "cellId": {
+      "type": "string",
+      "pattern": "^(dom-layout|geometry-smoke)/[a-z0-9-]+$"
+    },
+    "project": {
+      "type": "string"
+    },
+    "dimensions": {
+      "type": "object",
+      "required": [
+        "browser",
+        "viewport",
+        "theme",
+        "deviceScaleFactor"
+      ],
+      "properties": {
+        "browser": {
+          "const": "chromium"
+        },
+        "viewport": {
+          "enum": [
+            "desktop",
+            "mobile",
+            "tiny",
+            null
+          ]
+        },
+        "theme": {
+          "enum": [
+            "light",
+            "dark",
+            null
+          ]
+        },
+        "deviceScaleFactor": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      }
+    },
+    "commitSha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "workflowGroup": {
+      "enum": [
+        "pr",
+        "main",
+        "nightly",
+        "release"
+      ]
+    },
+    "run": {
+      "type": "object",
+      "required": [
+        "id",
+        "attempt"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "attempt": {
+          "type": "string"
+        }
+      }
+    },
+    "toolchain": {
+      "type": "object",
+      "required": [
+        "node",
+        "pnpm",
+        "playwright"
+      ],
+      "properties": {
+        "node": {
+          "type": "string"
+        },
+        "pnpm": {
+          "type": "string"
+        },
+        "playwright": {
+          "type": "string"
+        },
+        "chromiumRevision": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "required": [
+        "runtimeMode",
+        "manifestDigest",
+        "sourceFingerprint"
+      ],
+      "properties": {
+        "runtimeMode": {
+          "const": "prepared-preview"
+        },
+        "manifestDigest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "sourceFingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "config": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "tests": {
+      "type": "object",
+      "required": [
+        "total",
+        "passed",
+        "failed",
+        "skipped",
+        "flaky"
+      ],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "skipped": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "flaky": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "report": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "status": {
+      "enum": [
+        "success",
+        "failure"
+      ]
+    },
+    "failureReason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "startedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "endedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

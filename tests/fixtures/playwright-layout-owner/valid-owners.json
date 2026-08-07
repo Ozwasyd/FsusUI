@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "owners": {
+    "playwright-layout": {
+      "gate": "playwright-layout",
+      "suiteIds": ["dom-layout", "geometry-smoke"],
+      "runtimeMode": "prepared-preview",
+      "artifactNamespace": {
+        "dom-layout": "playwright-layout-dom-{project}",
+        "geometry-smoke": "playwright-layout-geometry-{browser}"
+      },
+      "deviceByProject": {
+        "dom-layout/desktop-light": "Desktop Chrome",
+        "dom-layout/mobile-light": "Pixel 7",
+        "dom-layout/desktop-dark": "Desktop Chrome",
+        "dom-layout/mobile-dark": "Pixel 7"
+      },
+      "receiptDirectory": ".readiness/receipts/playwright-layout",
+      "evidenceDirectory": ".tmp/playwright-layout"
+    }
+  }
+}

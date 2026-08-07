@@ -8,7 +8,8 @@ import {
 delete process.env.NO_COLOR
 
 const domLayoutPort = resolveTestPort('FSUS_DOM_LAYOUT_PORT', 5174)
-const domLayoutBaseUrl = `http://127.0.0.1:${domLayoutPort}`
+const externalServer = process.env.FSUS_PLAYWRIGHT_EXTERNAL_SERVER
+const domLayoutBaseUrl = externalServer ?? `http://127.0.0.1:${domLayoutPort}`
 
 export default defineConfig({
   testDir: './tests/dom-layout',
@@ -67,10 +68,10 @@ export default defineConfig({
       },
     },
   ],
-  webServer: {
+  ...(externalServer ? {} : { webServer: {
     command: `pnpm -C .. run build:demo && pnpm -C packages/demo-app exec vite preview --host 127.0.0.1 --port ${domLayoutPort} --strictPort`,
     url: domLayoutBaseUrl,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
-  },
+  } }),
 })

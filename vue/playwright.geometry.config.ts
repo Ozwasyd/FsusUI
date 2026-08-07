@@ -7,7 +7,8 @@ import {
 delete process.env.NO_COLOR
 
 const port = resolveTestPort('FSUS_GEOMETRY_PORT', 5177)
-const baseURL = `http://127.0.0.1:${port}`
+const externalServer = process.env.FSUS_PLAYWRIGHT_EXTERNAL_SERVER
+const baseURL = externalServer ?? `http://127.0.0.1:${port}`
 
 export default defineConfig({
   testDir: './tests/geometry',
@@ -31,10 +32,18 @@ export default defineConfig({
     trace: 'off',
     video: 'off',
   },
-  webServer: {
+  projects: [
+    {
+      name: 'default',
+      use: {
+        browserName: 'chromium',
+      },
+    },
+  ],
+  ...(externalServer ? {} : { webServer: {
     command: `pnpm -C .. run build:demo && pnpm -C packages/demo-app exec vite preview --host 127.0.0.1 --port ${port} --strictPort`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 300_000,
-  },
+  } }),
 })

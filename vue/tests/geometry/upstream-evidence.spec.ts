@@ -1,8 +1,9 @@
 import { chromium, expect, test } from '@playwright/test'
 import type { Locator, Page, TestInfo } from '@playwright/test'
 
+const externalServer = process.env.FSUS_PLAYWRIGHT_EXTERNAL_SERVER
 const geometryPort = process.env.FSUS_GEOMETRY_PORT ?? '5177'
-const geometryBaseURL = `http://127.0.0.1:${geometryPort}`
+const geometryBaseURL = externalServer ?? `http://127.0.0.1:${geometryPort}`
 
 const setTheme = async (page: Page, theme: 'dark' | 'light') => {
   await page.evaluate((value) => {

@@ -35,6 +35,7 @@ __pycache__/
 /screenshots/
 /.tmp/visual-runtime/
 /.tmp/playwright-browsers/
+/.readiness/
 .husky/_/
 vue/packages/*/dist
 vue/packages/*/dist/
