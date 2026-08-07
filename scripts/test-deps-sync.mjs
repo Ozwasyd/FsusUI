@@ -36,11 +36,6 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url))
 const syncScriptPath = path.join(scriptDir, 'deps-sync.mjs')
 const libScriptPath = path.join(scriptDir, 'npm-authority-lib.mjs')
 
-function fail(message) {
-  console.error(`[test-deps-sync] FAIL: ${message}`)
-  process.exit(1)
-}
-
 function ok(message) {
   console.log(`[test-deps-sync] ok: ${message}`)
 }
@@ -96,7 +91,7 @@ function ok(message) {
   )
 
   // Mutated authority must change projection (kills hardcoded fallback)
-  const mutated = structuredClone(authority)
+  const mutated = JSON.parse(JSON.stringify(authority))
   mutated.install.vue = '3.0.0'
   assert.equal(projectInstallSpecifier('vue', mutated), '3.0.0')
   ok('projection reads authority (mutation kills hardcoded pin)')
