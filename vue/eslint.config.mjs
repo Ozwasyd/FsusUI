@@ -102,6 +102,7 @@ export default [
         navigator: 'readonly',
         console: 'readonly',
         process: 'readonly',
+        structuredClone: 'readonly',
         __DEV__: 'readonly',
       },
     },
