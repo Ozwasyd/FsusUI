@@ -109,7 +109,8 @@
         "vue/packages/directives/**",
         "vue/packages/utils/**",
         "vue/packages/element-plus/**",
-        "vue/packages/demo-app/**"
+        "vue/packages/demo-app/**",
+        "vue/packages/locale/**"
       ],
       "scope": "web-only"
     },
