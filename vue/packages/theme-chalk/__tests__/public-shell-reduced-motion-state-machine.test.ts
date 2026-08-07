@@ -67,7 +67,7 @@ describe('public-shell reduced-motion Vue state machine (shipped CSS)', () => {
     ['public-shell-critical.scss', 'critical'],
   ] as const)(
     'CSSOM exposes 1ms duration / 0ms delay on every disclosure active class (%s)',
-    (fileName) => {
+    (fileName, _variant) => {
       const css = compileThemeFile(fileName)
       const style = injectCss(css)
       const sheet = style.sheet

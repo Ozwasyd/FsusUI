@@ -135,7 +135,7 @@ export function projectManifestDependencies(
   role,
   options = {},
 ) {
-  const next = structuredClone(manifest)
+  const next = JSON.parse(JSON.stringify(manifest))
 
   if (role === 'published-source') {
     projectPublishedSource(next, authority)

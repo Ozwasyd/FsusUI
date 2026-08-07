@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { createHash } from 'node:crypto'
-import { existsSync, readFileSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
@@ -27,9 +27,6 @@ const DIMENSION_KEYS = Object.freeze([
 ])
 
 export const PLAYWRIGHT_SUITE_REGISTRY_PATH = REGISTRY_PATH
-
-const readJson = (relativePath) =>
-  JSON.parse(readFileSync(resolve(root, relativePath), 'utf8'))
 
 const fail = (message) => {
   throw new Error(message)

@@ -25,15 +25,12 @@
         >
           查看审阅记录
         </el-button>
-<<<<<<< Updated upstream
-=======
         <el-button
           v-bind="{ 'data-testid': 'open-long-title-dialog' }"
           @click="longTitleDialogVisible = true"
         >
           长标题 Dialog
         </el-button>
->>>>>>> Stashed changes
         <el-dialog v-model="dialogVisible" title="确认发布" width="30%">
           <span>发布后读者将看到最新版本。</span>
           <template #footer>
@@ -88,23 +85,18 @@
       <h3>Message / MessageBox / Notification</h3>
       <el-space wrap>
         <el-button @click="showMessage">Message</el-button>
-<<<<<<< Updated upstream
-        <el-button @click="showMessageBox">MessageBox</el-button>
-        <el-button
-          v-bind="{ 'data-testid': 'open-notification' }"
-          @click="showNotification"
-        >
-          Notification
-        </el-button>
-=======
         <el-button
           v-bind="{ 'data-testid': 'open-message-box' }"
           @click="showMessageBox"
         >
           MessageBox
         </el-button>
-        <el-button @click="showNotification">Notification</el-button>
->>>>>>> Stashed changes
+        <el-button
+          v-bind="{ 'data-testid': 'open-notification' }"
+          @click="showNotification"
+        >
+          Notification
+        </el-button>
       </el-space>
     </div>
     <div class="demo-block">
