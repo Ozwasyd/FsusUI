@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict'
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { listControlledManifests } from './npm-authority-lib.mjs'
 
 const root = process.cwd()
 const AUTHORITY = 'config/dependencies/npm-authority.json'
@@ -28,36 +29,12 @@ const isForbidden = (version) =>
       version.startsWith('github:') ||
       version.includes('://')))
 
-function walkPackageJson(dir, out = []) {
-  for (const name of readdirSync(dir)) {
-    if (
-      ['node_modules', 'dist', '.git', '.tmp', 'playwright-report'].includes(
-        name,
-      )
-    ) {
-      continue
-    }
-    const path = resolve(dir, name)
-    let st
-    try {
-      st = statSync(path)
-    } catch {
-      continue
-    }
-    if (st.isDirectory()) walkPackageJson(path, out)
-    else if (name === 'package.json') out.push(path)
-  }
-  return out
-}
-
 function collectExternalIds() {
   const ids = new Map()
-  for (const path of walkPackageJson(root)) {
-    const rel = path.slice(root.length + 1)
-    if (rel.includes('node_modules')) continue
+  for (const { absolute, relative } of listControlledManifests(root)) {
     let data
     try {
-      data = JSON.parse(readFileSync(path, 'utf8'))
+      data = JSON.parse(readFileSync(absolute, 'utf8'))
     } catch {
       continue
     }
@@ -70,7 +47,7 @@ function collectExternalIds() {
       for (const [id, version] of Object.entries(data[field] || {})) {
         if (String(version).startsWith('workspace:')) continue
         if (!ids.has(id)) ids.set(id, [])
-        ids.get(id).push({ path: rel, field, version })
+        ids.get(id).push({ path: relative, field, version })
       }
     }
   }
@@ -157,7 +134,7 @@ function expectFail(label, mutate) {
   let failed = false
   try {
     // re-run critical assertions
-    for (const [id, version] of Object.entries(clone.install)) {
+    for (const version of Object.values(clone.install)) {
       if (!isExact(version) || isForbidden(version)) throw new Error('bad pin')
     }
     for (const field of [
