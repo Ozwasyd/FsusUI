@@ -1,8 +1,17 @@
 {
   "entry": "dist/fsus.css",
   "source": "src/fsus.scss",
-  "modes": ["light", "dark"],
-  "components": ["Button", "Input", "Tabs", "Dialog", "Empty"],
-  "bytes": 598048,
-  "sha256": "bf375e0ad4b2906ff9e7b911ed38bf37cc0fe925bb13a8b06c2f173ce501de43"
+  "modes": [
+    "light",
+    "dark"
+  ],
+  "components": [
+    "Button",
+    "Input",
+    "Tabs",
+    "Dialog",
+    "Empty"
+  ],
+  "bytes": 614956,
+  "sha256": "8fe8a9341b86e9d222610088b2617333508e7a3aaf8b26e30bc8eb5b36bf4d36"
 }
