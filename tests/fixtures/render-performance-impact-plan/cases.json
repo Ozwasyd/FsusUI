@@ -25,6 +25,20 @@
     "scope": "skip"
   },
   {
+    "name": "skip-safe CI orchestration and generated component contracts",
+    "files": [
+      ".github/workflows/quality.yml",
+      "scripts/check-verify-gates.mjs",
+      "spec/components/contracts/v1/vue-public-contracts.json"
+    ],
+    "scope": "skip"
+  },
+  {
+    "name": "reusable performance workflow remains performance-owned",
+    "files": [".github/workflows/_quality.yml"],
+    "scope": "both"
+  },
+  {
     "name": "unknown becomes both",
     "files": ["toolchain/new-global-runtime.config"],
     "scope": "both"

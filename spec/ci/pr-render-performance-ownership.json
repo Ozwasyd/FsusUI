@@ -4,7 +4,6 @@
     {
       "id": "performance-contract",
       "patterns": [
-        ".github/workflows/quality.yml",
         ".github/workflows/_quality.yml",
         "docs/performance/**",
         "scripts/*render-performance*.mjs",
@@ -16,7 +15,9 @@
     {
       "id": "static-governance-and-tests",
       "patterns": [
+        ".github/workflows/quality.yml",
         "spec/ci/pr-render-performance-ownership.json",
+        "spec/components/contracts/**",
         "scripts/check-*.mjs",
         "scripts/*conformance.mjs",
         "scripts/npm-authority-lib.mjs",

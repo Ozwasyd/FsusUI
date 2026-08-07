@@ -2,6 +2,9 @@ name: Quality Gates
 
 on:
   pull_request:
+  merge_group:
+    types:
+      - checks_requested
   push:
     branches:
       - main
@@ -25,8 +28,12 @@ on:
         required: false
         type: string
 
+concurrency:
+  group: quality-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
+
 jobs:
-  pr-fast:
+  pr-feedback:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 35
@@ -220,6 +227,60 @@ jobs:
             performance-current
             performance-impact-plan.json
           retention-days: 14
+
+  premerge-main:
+    if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+    uses: ./.github/workflows/_quality.yml
+    with:
+      group: main
+
+  pr-fast:
+    if: always() && github.event_name == 'pull_request'
+    needs:
+      - pr-feedback
+      - pr-real-render-performance
+      - premerge-main
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Enforce complete PR merge readiness
+        env:
+          PR_FEEDBACK_RESULT: ${{ needs.pr-feedback.result }}
+          PR_RENDER_RESULT: ${{ needs.pr-real-render-performance.result }}
+          PREMERGE_MAIN_RESULT: ${{ needs.premerge-main.result }}
+        run: |
+          echo "pr-feedback=${PR_FEEDBACK_RESULT}"
+          echo "pr-real-render-performance=${PR_RENDER_RESULT}"
+          echo "premerge-main=${PREMERGE_MAIN_RESULT}"
+          test "${PR_FEEDBACK_RESULT}" = "success"
+          test "${PR_RENDER_RESULT}" = "success"
+          test "${PREMERGE_MAIN_RESULT}" = "success"
+
+  merge-group-pr-fast:
+    name: pr-fast
+    if: always() && github.event_name == 'merge_group'
+    needs:
+      - premerge-main
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Preserve required PR gate on merge queue candidates
+        env:
+          PREMERGE_MAIN_RESULT: ${{ needs.premerge-main.result }}
+        run: test "${PREMERGE_MAIN_RESULT}" = "success"
+
+  merge-group-real-render-performance:
+    name: pr-real-render-performance
+    if: always() && github.event_name == 'merge_group'
+    needs:
+      - premerge-main
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Preserve required render gate on merge queue candidates
+        env:
+          PREMERGE_MAIN_RESULT: ${{ needs.premerge-main.result }}
+        run: test "${PREMERGE_MAIN_RESULT}" = "success"
 
   main:
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.group == 'main')
