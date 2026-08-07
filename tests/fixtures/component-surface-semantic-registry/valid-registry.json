@@ -10,7 +10,7 @@
   },
   "generated": {
     "producer": "scripts/generate-component-surface-semantic-registry.mjs",
-    "sourceRevision": "700e484b5fb78e934b2d9c702b6951a45047be8a",
+    "sourceRevision": "26d8576dbd7f4aa27b42d171895d72bc9454a769",
     "digestAlgorithm": "sha256"
   },
   "sourceDigests": {
@@ -30,7 +30,7 @@
       "path": "spec/components/contracts/v1/vue-public-contracts.json",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "717330dae01e6db3fdd8869520033a9a62bb4a63f167456418b38471bd6f367c"
+      "digest": "c6ece7b275d1dace443e411802d54b1deffe0c4df73ea2b51ddeb537f54d5e40"
     },
     "component-select": {
       "path": "docs/components/select.md",
@@ -66,7 +66,7 @@
       "path": "vue/packages/theme-chalk/src/tree.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "b9094fe2eda0cb690347916749412087f95790db5b11b8cd31164611a078c334"
+      "digest": "98caf37066d93eaeb1d8400c3c03186beac059df56460070f4fd66d16d9c0fb0"
     },
     "implementation-date-picker": {
       "path": "vue/packages/theme-chalk/src/date-picker/date-table.scss",
@@ -78,7 +78,7 @@
       "path": "vue/packages/theme-chalk/src/dialog.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "b71bea06aab1ce38f9eea703c2416617a2403f4a17c7d2f0911c267c48de6914"
+      "digest": "2238cb483fd7ed38c75012a0dc75696384bb89814bb13b3c5a8410224e50c85b"
     }
   },
   "rules": [
