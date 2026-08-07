@@ -23,6 +23,7 @@
         "scripts/playwright-suites.mjs",
         "scripts/test-deps-*.mjs",
         "vue/eslint.config.mjs",
+        "vue/packages/theme-chalk/theme-package.snapshot.json",
         "tests/conformance/**",
         "tests/fixtures/**",
         "vue/**/__tests__/**",
