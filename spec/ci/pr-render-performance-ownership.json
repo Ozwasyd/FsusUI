@@ -9,10 +9,29 @@
         "docs/performance/**",
         "scripts/*render-performance*.mjs",
         "scripts/avalonia-performance-budget.mjs",
-        "tests/performance/**",
-        "spec/ci/pr-render-performance-ownership.json"
+        "tests/performance/**"
       ],
       "scope": "both"
+    },
+    {
+      "id": "static-governance-and-tests",
+      "patterns": [
+        "spec/ci/pr-render-performance-ownership.json",
+        "scripts/check-*.mjs",
+        "scripts/*conformance.mjs",
+        "scripts/npm-authority-lib.mjs",
+        "scripts/playwright-suites.mjs",
+        "scripts/test-deps-*.mjs",
+        "vue/eslint.config.mjs",
+        "tests/conformance/**",
+        "tests/fixtures/**",
+        "vue/**/__tests__/**",
+        "vue/tests/**",
+        "spec/accessibility/**",
+        "spec/baselines/**",
+        "spec/platform-overrides/**"
+      ],
+      "scope": "skip"
     },
     {
       "id": "shared-build-runtime",
@@ -82,23 +101,13 @@
       "scope": "web-only"
     },
     {
-      "id": "type-only",
-      "patterns": ["vue/typings/**", "**/*.d.ts"],
+      "id": "web-demo-non-performance",
+      "patterns": ["vue/packages/demo-app/src/sections/**"],
       "scope": "skip"
     },
     {
-      "id": "static-governance-and-tests",
-      "patterns": [
-        "scripts/check-*.mjs",
-        "scripts/*conformance.mjs",
-        "tests/conformance/**",
-        "tests/fixtures/**",
-        "vue/**/__tests__/**",
-        "vue/tests/**",
-        "spec/accessibility/**",
-        "spec/baselines/**",
-        "spec/platform-overrides/**"
-      ],
+      "id": "type-only",
+      "patterns": ["vue/typings/**", "**/*.d.ts"],
       "scope": "skip"
     },
     {
