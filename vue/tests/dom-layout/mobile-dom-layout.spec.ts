@@ -17,7 +17,7 @@ import {
   type DomLayoutIssue,
 } from '../support/dom-layout-assertions'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
-import { resolveDomLayoutChunkSize } from '../../scripts/test-parallelism'
+import { resolveDomLayoutChunkSize } from '../../../scripts/test-parallelism'
 
 const diagnostics = new WeakMap<Page, string[]>()
 const transparentPng = Buffer.from(

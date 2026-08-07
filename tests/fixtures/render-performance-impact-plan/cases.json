@@ -25,6 +25,24 @@
     "scope": "skip"
   },
   {
+    "name": "skip-safe playwright layout owner and gates",
+    "files": [
+      ".github/workflows/_quality-playwright.yml",
+      "scripts/layout-playwright-plan.mjs",
+      "scripts/layout-playwright-runner.mjs",
+      "scripts/layout-playwright-owner-run.mjs",
+      "scripts/layout-playwright-verify.mjs",
+      "scripts/check-playwright-layout-owner-policy.mjs",
+      "scripts/test-playwright-layout-owner.mjs",
+      "spec/ci/playwright-owners.json",
+      "spec/ci/playwright-layout-receipts.schema.json",
+      "vue/playwright.dom-layout.config.ts",
+      "vue/playwright.geometry.config.ts",
+      "tests/fixtures/playwright-layout-owner/valid-owners.json"
+    ],
+    "scope": "skip"
+  },
+  {
     "name": "skip-safe CI orchestration and generated component contracts",
     "files": [
       ".github/workflows/quality.yml",
