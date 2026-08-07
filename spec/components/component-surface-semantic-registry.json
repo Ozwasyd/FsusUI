@@ -13,7 +13,7 @@
   },
   "generated": {
     "producer": "scripts/check-component-surface-semantic-registry.mjs",
-    "sourceRevision": "edc1b75557aef0771fa615030110181a5aeae013",
+    "sourceRevision": "26d8576dbd7f4aa27b42d171895d72bc9454a769",
     "digestAlgorithm": "sha256"
   },
   "sourceDigests": {
@@ -33,7 +33,7 @@
       "path": "spec/components/contracts/v1/vue-public-contracts.json",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "acb6f8ba6edf1414d99d96a67dd63ad0eeab8b17f811e38b19a0d3899e4de72d"
+      "digest": "c6ece7b275d1dace443e411802d54b1deffe0c4df73ea2b51ddeb537f54d5e40"
     },
     "component-motion": {
       "path": "docs/components/motion.md",
@@ -57,7 +57,7 @@
       "path": "vue/packages/theme-chalk/src/tree.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "b9094fe2eda0cb690347916749412087f95790db5b11b8cd31164611a078c334"
+      "digest": "98caf37066d93eaeb1d8400c3c03186beac059df56460070f4fd66d16d9c0fb0"
     },
     "implementation-03": {
       "path": "vue/packages/theme-chalk/src/date-picker/picker-panel.scss",
@@ -81,7 +81,7 @@
       "path": "vue/packages/theme-chalk/src/upload.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "7e4e0834649165b800bd10aa4f3e67019f653ba09b9d1d5bc4ea5c2a82e73f28"
+      "digest": "2082e8602507bba929ad4787ed3fc237c3d86c835941efd7875b26d81866c04a"
     },
     "implementation-07": {
       "path": "vue/packages/theme-chalk/src/metric-primitives.scss",
@@ -117,7 +117,7 @@
       "path": "vue/packages/theme-chalk/src/fsus-theme.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "dbe86c95e98f8d766e99b141031b7091736a82e5b8659368eb51f766a80a9f3d"
+      "digest": "45bef0244def7505b8da449d0ae5bf2174022ad39de321dbba2d28b4f226b942"
     },
     "implementation-13": {
       "path": "vue/packages/theme-chalk/src/collection-primitives.scss",
@@ -135,7 +135,7 @@
       "path": "vue/packages/theme-chalk/src/dialog.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "b71bea06aab1ce38f9eea703c2416617a2403f4a17c7d2f0911c267c48de6914"
+      "digest": "2238cb483fd7ed38c75012a0dc75696384bb89814bb13b3c5a8410224e50c85b"
     },
     "implementation-16": {
       "path": "vue/packages/theme-chalk/src/inbox-primitives.scss",
@@ -177,7 +177,7 @@
       "path": "vue/packages/theme-chalk/src/drawer.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "448251331af2081312b9b63a0c1cc080d72801a78c62130f8686060ede8ff7c2"
+      "digest": "2b273dd1be59a098370a33cd2a5853d7867dff1edd5fd2331c1120d138e92fad"
     },
     "implementation-23": {
       "path": "vue/packages/theme-chalk/src/notification.scss",

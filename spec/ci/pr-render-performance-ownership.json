@@ -18,6 +18,8 @@
         ".github/workflows/quality.yml",
         "spec/ci/pr-render-performance-ownership.json",
         "spec/components/contracts/**",
+        "spec/components/component-surface-semantic-registry.json",
+        "spec/components/component-surface-semantic-registry.schema.json",
         "scripts/check-*.mjs",
         "scripts/*conformance.mjs",
         "scripts/native-ime-*",
