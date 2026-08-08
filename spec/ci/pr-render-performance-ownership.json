@@ -35,9 +35,11 @@
         "scripts/test-deps-*.mjs",
         "scripts/test-playwright-suites.mjs",
         "scripts/test-playwright-layout-owner.mjs",
-        "vue/playwright.dom-layout.config.ts",
-        "vue/playwright.geometry.config.ts",
-        "vue/eslint.config.mjs",
+    "vue/playwright.dom-layout.config.ts",
+    "vue/playwright.geometry.config.ts",
+    "vue/playwright.motion-ssr.config.ts",
+    "vue/playwright.view-transitions.config.ts",
+    "vue/eslint.config.mjs",
         "vue/packages/theme-chalk/theme-package.snapshot.json",
         "tests/conformance/**",
         "tests/fixtures/**",
@@ -45,7 +47,14 @@
         "vue/tests/**",
         "spec/accessibility/**",
         "spec/baselines/**",
-        "spec/platform-overrides/**"
+        "spec/platform-overrides/**",
+        "spec/ci/playwright-motion-receipts.schema.json",
+        "scripts/motion-playwright-plan.mjs",
+        "scripts/motion-playwright-runner.mjs",
+        "scripts/motion-playwright-owner-run.mjs",
+        "scripts/motion-playwright-verify.mjs",
+        "scripts/check-playwright-motion-owner-policy.mjs",
+        "scripts/test-playwright-motion-owner.mjs"
       ],
       "scope": "skip"
     },
@@ -83,7 +92,9 @@
     },
     {
       "id": "web-select-v2",
-      "patterns": ["vue/packages/components/select-v2/**"],
+      "patterns": [
+        "vue/packages/components/select-v2/**"
+      ],
       "scope": "web-only",
       "webScenario": "select-v2"
     },
@@ -126,7 +137,10 @@
     },
     {
       "id": "type-only",
-      "patterns": ["vue/typings/**", "**/*.d.ts"],
+      "patterns": [
+        "vue/typings/**",
+        "**/*.d.ts"
+      ],
       "scope": "skip"
     },
     {
@@ -188,7 +202,11 @@
     },
     {
       "id": "non-performance-docs",
-      "patterns": ["**/*.md", ".github/ISSUE_TEMPLATE/**", ".changeset/**"],
+      "patterns": [
+        "**/*.md",
+        ".github/ISSUE_TEMPLATE/**",
+        ".changeset/**"
+      ],
       "scope": "skip"
     },
     {

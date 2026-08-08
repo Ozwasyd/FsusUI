@@ -66,8 +66,10 @@ export function validatePlaywrightOwners(owners, registry) {
     if (!Array.isArray(owner.suiteIds) || owner.suiteIds.length === 0) {
       fail(`owner ${ownerId} must declare non-empty suiteIds`)
     }
-    if (owner.runtimeMode !== 'prepared-preview') {
-      fail(`owner ${ownerId} must use runtimeMode prepared-preview`)
+    if (!['prepared-preview', 'native'].includes(owner.runtimeMode)) {
+      fail(
+        `owner ${ownerId} runtimeMode must be prepared-preview|native, got ${JSON.stringify(owner.runtimeMode)}`,
+      )
     }
     if (!owner.receiptDirectory || typeof owner.receiptDirectory !== 'string') {
       fail(`owner ${ownerId} missing receiptDirectory`)
@@ -340,11 +342,13 @@ function main(argv = process.argv.slice(2)) {
     const owners = loadPlaywrightOwners()
     validatePlaywrightOwners(owners, registry)
     validatePlaywrightSuiteRegistry(registry)
-    for (const group of GROUP_NAMES) {
-      const plan = planOwnerCells('playwright-layout', group, registry, owners)
-      const isolation = validatePlanIsolation(plan)
-      if (isolation.length > 0) {
-        fail(`plan isolation failed for ${group}: ${isolation.join('; ')}`)
+    for (const ownerId of Object.keys(owners.owners)) {
+      for (const group of GROUP_NAMES) {
+        const plan = planOwnerCells(ownerId, group, registry, owners)
+        const isolation = validatePlanIsolation(plan)
+        if (isolation.length > 0) {
+          fail(`plan isolation failed for ${ownerId} ${group}: ${isolation.join('; ')}`)
+        }
       }
     }
     console.log('[layout-playwright] owners + plan check ok')

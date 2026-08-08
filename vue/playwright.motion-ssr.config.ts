@@ -31,6 +31,14 @@ export default defineConfig({
     trace: 'off',
     video: 'off',
   },
+  projects: [
+    {
+      name: 'default',
+      use: {
+        browserName: 'chromium',
+      },
+    },
+  ],
   webServer: {
     command: `node tests/motion-ssr/serve-motion-ssr.mjs --port=${port}`,
     url: `${baseURL}/health`,
