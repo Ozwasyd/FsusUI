@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "41e3d0974772c27adf5682005b2212e37cc616da",
+    "commitSha": "6901e75801ccbacf7b334ba413cf9d6822c6caa2",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
@@ -8258,8 +8258,7 @@
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
-        "vue/packages/theme-chalk/src/generated/tokens.scss",
-        "vue/packages/theme-chalk/src/upload.scss"
+        "vue/packages/theme-chalk/src/generated/tokens.scss"
       ],
       "classification": "portable"
     },
