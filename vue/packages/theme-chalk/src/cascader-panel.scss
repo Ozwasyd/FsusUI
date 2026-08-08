@@ -1,5 +1,6 @@
 @use 'mixins/mixins' as *;
 @use 'mixins/var' as *;
+@use 'mixins/overlay-option-row-primitive' as option-row;
 @use 'common/var' as *;
 
 @include b(cascader-panel) {
@@ -142,6 +143,8 @@
     }
   }
 }
+
+@include option-row.fsus-overlay-option-row-primitive('.el-cascader-node');
 
 @media (max-width: 760px) {
   .#{$namespace}-cascader-menu {

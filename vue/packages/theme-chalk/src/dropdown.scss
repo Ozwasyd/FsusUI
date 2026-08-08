@@ -2,6 +2,7 @@
 
 @use 'mixins/mixins' as *;
 @use 'mixins/var' as *;
+@use 'mixins/overlay-option-row-primitive' as option-row;
 @use 'common/var' as *;
 
 $dropdown-item-line-height: () !default;
@@ -189,6 +190,8 @@ $dropdown-menu-padding-vertical: map.merge(
       color: getCssVar('text-color-disabled');
     }
   }
+
+  @include option-row.fsus-overlay-option-row-primitive('.el-dropdown-menu__item');
 
   @each $size in (large, small) {
     @include m($size) {
