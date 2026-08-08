@@ -64,7 +64,6 @@ function resolveCurrent(entry) {
 
   if (ds === 'npm') {
     // Read installed version from pnpm-lock.yaml via npm ls
-    const pkgName = entry.packageName
     // For npm workspace, deps:check already verifies consistency.
     // Freshness: check if lockfile is current vs registry for key packages.
     // Use the first specific package name from the group
@@ -80,11 +79,6 @@ function resolveCurrent(entry) {
     const modPath = path.resolve(repoRoot, 'node_modules', keyPkg, 'package.json')
     if (!existsSync(modPath)) return null
     return JSON.parse(readFileSync(modPath, 'utf-8')).version
-    if (!existsSync(lockPath)) return null
-    const lock = readFileSync(lockPath, 'utf-8')
-    const re = new RegExp(`/${keyPkg}/([\\d.]+):`, '')
-    const match = lock.match(re)
-    return match ? match[1] : null
   }
 
   if (ds === 'nuget') {

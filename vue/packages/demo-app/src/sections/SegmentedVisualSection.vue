@@ -134,16 +134,17 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import type { CheckboxGroupValueType } from '@element-plus/components/checkbox'
 
-const radio1 = ref('a')
-const radio2 = ref('a')
-const radio3 = ref('a')
-const radio4 = ref('zh')
-const radio5 = ref('a')
+const radio1 = ref<string | number | boolean>('a')
+const radio2 = ref<string | number | boolean>('a')
+const radio3 = ref<string | number | boolean>('a')
+const radio4 = ref<string | number | boolean>('zh')
+const radio5 = ref<string | number | boolean>('a')
 
-const checkbox1 = ref<string[]>(['a'])
-const checkbox2 = ref<string[]>(['a'])
-const checkbox3 = ref<string[]>(['a', 'c'])
+const checkbox1 = ref<CheckboxGroupValueType>(['a'])
+const checkbox2 = ref<CheckboxGroupValueType>(['a'])
+const checkbox3 = ref<CheckboxGroupValueType>(['a', 'c'])
 
 const collectionActive = ref('全部')
 const collectionItems = ['全部', '进行中', '已完成']
