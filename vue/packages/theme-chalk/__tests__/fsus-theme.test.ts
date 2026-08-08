@@ -3482,7 +3482,7 @@ describe('Fsus theme visual baseline', () => {
 
     expectCssRule(css, '.el-metric-list', [
       'display: grid;',
-      'box-shadow: none;',
+      'min-width: 0;',
     ])
     expectCssRule(css, '.el-metric-item__primary', [
       'font-variant-numeric: tabular-nums;',
