@@ -3447,9 +3447,8 @@ describe('Fsus theme visual baseline', () => {
     ])
     expectCssRule(css, '.el-section-header__description', ['font-size: 14px;'])
     expectCssRule(css, '.el-resource-list', [
-      'border: 1px solid var(--el-border-color-lighter);',
-      'border-radius: var(--fsus-radius-panel, 12px);',
-      'box-shadow: none;',
+      'display: grid;',
+      'min-width: 0;',
     ])
     expectCssRule(css, '.el-resource-list-item__title', [
       'font-size: 14px;',
