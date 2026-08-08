@@ -2,82 +2,24 @@
 
 @use 'mixins/mixins' as *;
 @use 'mixins/var' as *;
+@use 'mixins/overlay-option-row-primitive' as option-row;
 @use 'common/var' as *;
 
 @include b(select-dropdown) {
   @include e(option-item) {
-    font-size: getCssVar('select-font-size');
     // 20 as the padding of option item, 12 as the size of ✓ icon size
     padding: 0 #{20 + 12}px 0 20px;
     position: relative;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color: map.get($select-option, 'text-color');
-    height: map.get($select-option, 'height');
-    line-height: map.get($select-option, 'height');
-    box-sizing: border-box;
-    cursor: pointer;
-
-    @include when(disabled) {
-      color: map.get($select-option, 'disabled-color');
-      cursor: not-allowed;
-
-      &:hover {
-        background-color: getCssVar('bg-color');
-      }
-    }
-
-    @include when(selected) {
-      background-color: var(
-        --fsus-select-option-selected-bg,
-        var(--fsus-state-selected-bg)
-      );
-      font-weight: 500;
-
-      &:not(.is-multiple) {
-        color: var(
-          --fsus-select-option-selected-text,
-          var(--fsus-scholarly-blue)
-        );
-      }
-    }
-
-    &.hover {
-      background-color: var(
-        --fsus-select-option-hover-bg,
-        var(--fsus-state-hover-bg)
-      ) !important;
-    }
-
-    &.is-selected.hover {
-      background-color: var(
-        --fsus-select-option-selected-bg,
-        var(--fsus-state-selected-bg)
-      ) !important;
-    }
-
-    &:hover {
-      background-color: var(
-        --fsus-select-option-hover-bg,
-        var(--fsus-state-hover-bg)
-      );
-    }
   }
+
+  @include option-row.fsus-overlay-option-row-primitive(
+    '.el-select-dropdown__option-item'
+  );
 
   @include when(multiple) {
     .#{$namespace}-select-dropdown__option-item {
       &.is-selected {
-        color: var(
-          --fsus-select-option-selected-text,
-          var(--fsus-scholarly-blue)
-        );
-        background-color: var(
-          --fsus-select-option-selected-bg,
-          var(--fsus-state-selected-bg)
-        );
-
-        & .#{$namespace}-icon {
+        .#{$namespace}-icon {
           position: absolute;
           right: 20px;
           top: 0;

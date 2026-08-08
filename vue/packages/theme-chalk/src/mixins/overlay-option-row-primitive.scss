@@ -1,0 +1,101 @@
+// Shared overlay option-row visual primitive
+//
+// Contract (ref #449):
+// - 34px block size (--fsus-select-option-height)
+// - radius 0, margin 0, no border/shadow/inset panel geometry
+// - hover: weak background only, no ::before bar, no translate, no shadow
+// - selected: Scholarly Blue text + registered selected background
+// - focus-visible: 2px inset Scholarly Blue, overlayable with selected
+// - disabled: flat disabled tokens, opacity=1, no ancestor opacity
+//
+// Usage:
+//   @include fsus-overlay-option-row-primitive('.el-select-dropdown__item');
+
+@use 'sass:map';
+@use '../common/var' as *;
+
+@mixin fsus-overlay-option-row-primitive($option-selector) {
+  #{$option-selector} {
+    // Geometry
+    block-size: var(--fsus-select-option-height);
+    line-height: var(--fsus-select-option-height);
+    border-radius: 0;
+    margin: 0;
+    border: none;
+    box-shadow: none;
+
+    box-sizing: border-box;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    // Typography
+    font-size: var(--fsus-select-font-size);
+    color: var(--fsus-el-text-color-regular, var(--el-text-color-regular));
+    font-weight: var(--fsus-font-weight-regular, 400);
+
+    // Default flat surface
+    background: transparent;
+
+    // Hover: weak background only
+    &:hover,
+    &.hover {
+      background-color: var(
+        --fsus-select-option-hover-bg,
+        var(--fsus-state-hover-bg)
+      );
+      color: var(--fsus-scholarly-blue);
+
+      // No ::before bar
+      &::before {
+        content: none;
+      }
+    }
+
+    // Selected
+    &.selected {
+      color: var(--fsus-scholarly-blue);
+      font-weight: var(--fsus-font-weight-medium, 500);
+      background-color: var(
+        --fsus-select-option-selected-bg,
+        var(--fsus-state-selected-bg)
+      );
+    }
+
+    // Focus-visible: 2px inset Scholarly Blue
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset
+        0
+        0
+        0
+        var(--fsus-focus-ring-width, 2px)
+        var(--fsus-scholarly-blue);
+    }
+
+    // Selected + focus-visible overlay
+    &.selected:focus-visible {
+      outline: none;
+      box-shadow: inset
+        0
+        0
+        0
+        var(--fsus-focus-ring-width, 2px)
+        var(--fsus-scholarly-blue);
+    }
+
+    // Disabled: flat, opacity=1
+    &.is-disabled {
+      color: var(--fsus-el-disabled-text-color, map.get($select-option, 'disabled-color'));
+      cursor: not-allowed;
+      background: transparent;
+      opacity: 1;
+
+      &:hover,
+      &.hover {
+        background: transparent;
+      }
+    }
+  }
+}
