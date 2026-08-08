@@ -1,0 +1,4 @@
+/* fsus-rule-id: web.motion.control-transition */
+.fsusui-corpus-scope __RULE_SELECTOR__ {
+  transition-duration: var(--fsus-motion-control);
+}

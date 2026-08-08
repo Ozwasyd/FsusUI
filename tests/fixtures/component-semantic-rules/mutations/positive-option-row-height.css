@@ -1,0 +1,4 @@
+/* fsus-rule-id: web.select.option-row */
+.fsusui-corpus-scope __RULE_SELECTOR__ {
+  min-height: var(--fsus-select-option-height);
+}

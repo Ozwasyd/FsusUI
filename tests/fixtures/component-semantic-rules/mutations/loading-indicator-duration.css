@@ -1,0 +1,4 @@
+/* fsus-rule-id: web.loading.indicator */
+.fsusui-corpus-scope __RULE_SELECTOR__ {
+  transition-duration: 999ms;
+}

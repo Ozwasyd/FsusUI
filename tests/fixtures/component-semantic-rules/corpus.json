@@ -1,0 +1,341 @@
+{
+  "schemaVersion": "fsusui.component-semantic-corpus.v1",
+  "issue": 403,
+  "producer": "scripts/check-component-semantic-corpus.mjs",
+  "digestAlgorithm": "sha256",
+  "baseline": {
+    "description": "unmutated production theme evaluated in an isolated temp fixture; known current violations surface as fail diagnostics and are never attributed to corpus fixtures",
+    "recordedAt": "2026-08-08"
+  },
+  "cases": [
+    {
+      "id": "NEG-403-01",
+      "mutation": "option-row-twelve-pixel.css",
+      "issues": [293],
+      "ruleId": "web.select.option-row",
+      "property": "min-height",
+      "injection": "12px option row"
+    },
+    {
+      "id": "NEG-403-02",
+      "mutation": "option-row-forty-four-pixel.css",
+      "issues": [293],
+      "ruleId": "web.select.option-row",
+      "property": "min-height",
+      "injection": "44px option row"
+    },
+    {
+      "id": "NEG-403-03",
+      "mutation": "neutral-only-selected.css",
+      "issues": [293],
+      "ruleId": "web.select.option-row",
+      "property": "color",
+      "reasonCode": "selection-token-required",
+      "injection": "neutral-only selected option"
+    },
+    {
+      "id": "NEG-403-04",
+      "mutation": "hardcoded-duplicate-value.css",
+      "issues": [293],
+      "ruleId": "web.select.option-row",
+      "property": "min-height",
+      "reasonCode": "canonical-reference-required",
+      "injection": "hardcoded canonical duplicate"
+    },
+    {
+      "id": "NEG-403-05",
+      "mutation": "row-panel-radius.css",
+      "issues": [293],
+      "ruleId": "web.select.option-row",
+      "property": "border-radius",
+      "reasonCode": "internal-row-panel-geometry-forbidden",
+      "injection": "row inherits panel radius"
+    },
+    {
+      "id": "NEG-403-06",
+      "mutation": "hover-selected-token.css",
+      "issues": [293],
+      "ruleId": "web.select.option-row",
+      "property": "background-color",
+      "reasonCode": "hover-selection-token-forbidden",
+      "injection": "hover impersonates selected"
+    },
+    {
+      "id": "NEG-403-07",
+      "mutation": "menu-vertical-item-twelve-pixel.css",
+      "issues": [294],
+      "ruleId": "web.menu.vertical-item",
+      "property": "min-height",
+      "injection": "12px vertical menu item"
+    },
+    {
+      "id": "NEG-403-08",
+      "mutation": "tab-item-twelve-pixel.css",
+      "issues": [295],
+      "ruleId": "web.tabs.tab-item",
+      "property": "min-height",
+      "injection": "12px tab item"
+    },
+    {
+      "id": "NEG-403-09",
+      "mutation": "tree-row-twelve-pixel.css",
+      "issues": [296],
+      "ruleId": "web.tree.tree-row",
+      "property": "min-height",
+      "injection": "12px tree row"
+    },
+    {
+      "id": "NEG-403-10",
+      "mutation": "date-cell-twelve-pixel.css",
+      "issues": [297],
+      "ruleId": "web.date-picker.date-cell",
+      "property": "min-height",
+      "injection": "12px date cell"
+    },
+    {
+      "id": "NEG-403-11",
+      "mutation": "time-row-twelve-pixel.css",
+      "issues": [297],
+      "ruleId": "web.time-picker.time-row",
+      "property": "min-height",
+      "injection": "12px time row"
+    },
+    {
+      "id": "NEG-403-12",
+      "mutation": "drawer-radius-square.css",
+      "issues": [298],
+      "ruleId": "web.drawer.overlay-root",
+      "property": "border-radius",
+      "injection": "square drawer radius"
+    },
+    {
+      "id": "NEG-403-13",
+      "mutation": "dialog-close-twelve-pixel.css",
+      "issues": [299],
+      "ruleId": "web.dialog.overlay-close-optical",
+      "property": "min-height",
+      "injection": "12px dialog close optical target"
+    },
+    {
+      "id": "NEG-403-14",
+      "mutation": "upload-file-row-twelve-pixel.css",
+      "issues": [300],
+      "ruleId": "web.upload.file-row",
+      "property": "min-height",
+      "injection": "12px upload file row"
+    },
+    {
+      "id": "NEG-403-15",
+      "mutation": "list-overtravel.css",
+      "issues": [300, 308],
+      "ruleId": "web.motion.list-enter-from",
+      "property": "transform",
+      "reasonCode": "list-travel-budget-exceeded",
+      "injection": "legacy list motion overtravel"
+    },
+    {
+      "id": "NEG-403-16",
+      "mutation": "radio-button-segmented-twelve-pixel.css",
+      "issues": [301],
+      "ruleId": "web.radio-button.segmented-item",
+      "property": "min-height",
+      "injection": "12px segmented radio option"
+    },
+    {
+      "id": "NEG-403-17",
+      "mutation": "rate-selected-token.css",
+      "issues": [302],
+      "ruleId": "web.rate.filled-icon",
+      "property": "color",
+      "reasonCode": "rate-warning-token-required",
+      "injection": "Rate uses primary/selection token"
+    },
+    {
+      "id": "NEG-403-18",
+      "mutation": "loading-indicator-duration.css",
+      "issues": [303],
+      "ruleId": "web.loading.indicator",
+      "property": "transition-duration",
+      "reasonCode": "motion-duration-semantic-mismatch",
+      "injection": "legacy loading indicator duration"
+    },
+    {
+      "id": "NEG-403-19",
+      "mutation": "eleven-pixel-header.css",
+      "issues": [304],
+      "ruleId": "web.table.header-cell",
+      "property": "font-size",
+      "reasonCode": "typography-semantic-mismatch",
+      "injection": "11px uppercase table header"
+    },
+    {
+      "id": "NEG-403-20",
+      "mutation": "table-header-weight.css",
+      "issues": [304],
+      "ruleId": "web.table.header-cell",
+      "property": "font-weight",
+      "reasonCode": "typography-semantic-mismatch",
+      "injection": "table header weight 100"
+    },
+    {
+      "id": "NEG-403-21",
+      "mutation": "settings-section-radius.css",
+      "issues": [305],
+      "ruleId": "web.panel.panel-root",
+      "property": "border-radius",
+      "injection": "square settings section radius"
+    },
+    {
+      "id": "NEG-403-22",
+      "mutation": "metric-row-twelve-pixel.css",
+      "issues": [306],
+      "ruleId": "web.metric-primitives.metric-row",
+      "property": "min-height",
+      "injection": "12px metric row"
+    },
+    {
+      "id": "NEG-403-23",
+      "mutation": "ancestor-opacity.css",
+      "issues": [307],
+      "ruleId": "web.reply-composer-shell.interactive-root",
+      "property": "opacity",
+      "reasonCode": "ancestor-opacity-disabled",
+      "injection": "ancestor opacity disabled"
+    },
+    {
+      "id": "NEG-403-24",
+      "mutation": "disabled-independent-colors.css",
+      "issues": [307],
+      "ruleId": "web.reply-composer-shell.disabled-control",
+      "properties": ["background-color", "color", "border-color"],
+      "reasonCode": "disabled-state-token-required",
+      "injection": "disabled control hardcoded colors"
+    },
+    {
+      "id": "NEG-403-25",
+      "mutation": "control-duration.css",
+      "issues": [308],
+      "ruleId": "web.motion.control-transition",
+      "property": "transition-duration",
+      "reasonCode": "motion-duration-semantic-mismatch",
+      "injection": "legacy control transition duration"
+    },
+    {
+      "id": "NEG-403-26",
+      "mutation": "strong-scale.css",
+      "issues": [308],
+      "ruleId": "web.motion.control-enter-from",
+      "property": "transform",
+      "reasonCode": "strong-scale-forbidden",
+      "injection": "legacy scaleX(0) enter motion"
+    },
+    {
+      "id": "NEG-403-27",
+      "mutation": "input-number-twelve-pixel.css",
+      "issues": [309],
+      "ruleId": "web.input-number.interactive-root",
+      "property": "min-height",
+      "injection": "12px input number root"
+    },
+    {
+      "id": "NEG-403-28",
+      "mutation": "transition-none.css",
+      "issues": [310],
+      "ruleId": "web.public-shell.disclosure-transition",
+      "property": "transition-duration",
+      "reasonCode": "reduced-motion-lifecycle-required",
+      "injection": "transition:none under reduced motion"
+    },
+    {
+      "id": "NEG-403-29",
+      "mutation": "reduced-zero-duration.css",
+      "issues": [310],
+      "ruleId": "web.public-shell.disclosure-transition",
+      "property": "transition-duration",
+      "reasonCode": "reduced-motion-lifecycle-required",
+      "injection": "zero duration under reduced motion"
+    }
+  ],
+  "positiveFixtures": [
+    {
+      "id": "POS-403-01",
+      "mutation": "positive-option-row-height.css",
+      "ruleId": "web.select.option-row",
+      "family": "geometry",
+      "description": "option row height references the canonical density alias"
+    },
+    {
+      "id": "POS-403-02",
+      "mutation": "positive-drawer-radius.css",
+      "ruleId": "web.drawer.overlay-root",
+      "family": "radius",
+      "description": "drawer radius references the canonical surface radius alias"
+    },
+    {
+      "id": "POS-403-03",
+      "mutation": "positive-table-header-type.css",
+      "ruleId": "web.table.header-cell",
+      "family": "typography",
+      "description": "table header uses the canonical body-md size and medium weight"
+    },
+    {
+      "id": "POS-403-04",
+      "mutation": "positive-control-transition-duration.css",
+      "ruleId": "web.motion.control-transition",
+      "family": "motion",
+      "description": "control transition references the canonical motion duration alias"
+    },
+    {
+      "id": "POS-403-05",
+      "mutation": "positive-rate-warning-color.css",
+      "ruleId": "web.rate.filled-icon",
+      "family": "stateColor",
+      "description": "active Rate icon keeps the warning fill token instead of selection token"
+    },
+    {
+      "id": "POS-403-06",
+      "mutation": "positive-disabled-tokens.css",
+      "ruleId": "web.reply-composer-shell.disabled-control",
+      "family": "disabled",
+      "description": "disabled control colors reference disabled tokens instead of hardcoded colors"
+    }
+  ],
+  "issueCoverage": [
+    {
+      "issue": 293,
+      "caseIds": [
+        "NEG-403-01",
+        "NEG-403-02",
+        "NEG-403-03",
+        "NEG-403-04",
+        "NEG-403-05",
+        "NEG-403-06"
+      ]
+    },
+    { "issue": 294, "caseIds": ["NEG-403-07"] },
+    { "issue": 295, "caseIds": ["NEG-403-08"] },
+    { "issue": 296, "caseIds": ["NEG-403-09"] },
+    { "issue": 297, "caseIds": ["NEG-403-10", "NEG-403-11"] },
+    { "issue": 298, "caseIds": ["NEG-403-12"] },
+    { "issue": 299, "caseIds": ["NEG-403-13"] },
+    { "issue": 300, "caseIds": ["NEG-403-14", "NEG-403-15"] },
+    { "issue": 301, "caseIds": ["NEG-403-16"] },
+    { "issue": 302, "caseIds": ["NEG-403-17"] },
+    { "issue": 303, "caseIds": ["NEG-403-18"] },
+    { "issue": 304, "caseIds": ["NEG-403-19", "NEG-403-20"] },
+    { "issue": 305, "caseIds": ["NEG-403-21"] },
+    { "issue": 306, "caseIds": ["NEG-403-22"] },
+    { "issue": 307, "caseIds": ["NEG-403-23", "NEG-403-24"] },
+    { "issue": 308, "caseIds": ["NEG-403-15", "NEG-403-25", "NEG-403-26"] },
+    { "issue": 309, "caseIds": ["NEG-403-27"] },
+    { "issue": 310, "caseIds": ["NEG-403-28", "NEG-403-29"] }
+  ],
+  "nonGoals": [
+    "required workflow configuration",
+    "allowlist governance",
+    "release gate wiring",
+    "automated aesthetic judgement",
+    "AI screenshot scoring",
+    "external design-system specification import"
+  ]
+}

@@ -1,0 +1,5 @@
+/* fsus-rule-id: web.table.header-cell */
+.fsusui-corpus-scope .el-table-v2__header-cell {
+  font-size: 14px;
+  font-weight: 500;
+}

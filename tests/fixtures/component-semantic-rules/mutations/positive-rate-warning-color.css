@@ -1,0 +1,4 @@
+/* fsus-rule-id: web.rate.filled-icon */
+.fsusui-corpus-scope __RULE_SELECTOR__.is-active {
+  color: var(--el-rate-fill-color);
+}

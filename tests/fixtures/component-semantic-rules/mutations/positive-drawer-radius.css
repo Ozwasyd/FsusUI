@@ -1,0 +1,4 @@
+/* fsus-rule-id: web.drawer.overlay-root */
+.fsusui-corpus-scope __RULE_SELECTOR__ {
+  border-radius: var(--fsus-radius-panel-large);
+}
