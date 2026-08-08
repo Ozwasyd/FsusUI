@@ -8,6 +8,7 @@
     "ownerReviewRequired": true,
     "reviewAfter": "2026-11-05"
   },
+  "allowlist": [],
   "generated": {
     "producer": "scripts/generate-component-surface-semantic-registry.mjs",
     "sourceRevision": "26d8576dbd7f4aa27b42d171895d72bc9454a769",

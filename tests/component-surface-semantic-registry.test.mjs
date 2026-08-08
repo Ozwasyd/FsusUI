@@ -470,6 +470,7 @@ test('T400-09 closes every nested schema structure instead of accepting bare obj
   const { schema } = await loadAssets()
   assertClosedObjectSchema(schema, 'root')
   const expectedDefinitions = [
+    'allowlistEntry',
     'canonicalReference',
     'constraints',
     'exception',

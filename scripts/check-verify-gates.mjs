@@ -193,5 +193,36 @@ assert(
     engineeringHandoff.includes('verify:release'),
   'engineering handoff docs must explain verify gate selection',
 )
+assert(
+  scripts['check:visual-governance']?.includes(
+    'scripts/check-visual-governance.mjs',
+  ),
+  'package.json must expose the composite visual governance gate',
+)
+assert(
+  scripts['governance:check']?.includes('check:visual-governance'),
+  'governance:check must include the visual governance gate',
+)
+assert(
+  scripts['test:visual-governance']?.includes(
+    'test:visual-governance:registry',
+  ) &&
+    scripts['test:visual-governance']?.includes(
+      'test:visual-governance:evaluator',
+    ) &&
+    scripts['test:visual-governance']?.includes(
+      'test:visual-governance:corpus',
+    ) &&
+    scripts['test:visual-governance:registry']?.includes(
+      'component-surface-semantic-registry.test.mjs',
+    ) &&
+    scripts['test:visual-governance:evaluator']?.includes(
+      'component-semantic-style-evaluator.test.mjs',
+    ) &&
+    scripts['test:visual-governance:corpus']?.includes(
+      'component-semantic-corpus.test.mjs',
+    ),
+  'test:visual-governance must run the registry, evaluator, and corpus suites',
+)
 
 console.log('[verify-gates] ok')

@@ -178,6 +178,7 @@ const selectorIsDeclared = (source, selector) => {
   })
 }
 const expectedSchemaDefinitions = [
+  'allowlistEntry',
   'canonicalReference',
   'constraints',
   'exception',
@@ -236,6 +237,10 @@ const validateSchemaContract = (schema) => {
       canonicalArray(constraintProperties[field]),
     )
   const issueContract = definitions.issueMapping?.properties?.issue
+
+  const allowlistContract =
+    schema?.properties?.allowlist?.type === 'array' &&
+    schema.properties.allowlist.items?.$ref === '#/$defs/allowlistEntry'
   const visualContract = definitions.visualRequirement
   if (
     !schema ||
@@ -245,6 +250,7 @@ const validateSchemaContract = (schema) => {
     !schema.properties ||
     !closedDefinitions ||
     !constraintContract ||
+    !allowlistContract ||
     issueContract?.type !== 'integer' ||
     issueContract.minimum !== 293 ||
     issueContract.maximum !== 310 ||
@@ -496,6 +502,118 @@ const validateOverrides = ({ entries, category, registry, contents }) => {
   }
 }
 
+const todayUtc = () => {
+  const now = new Date()
+  return `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}-${String(now.getUTCDate()).padStart(2, '0')}`
+}
+const permanentMarker = (value) =>
+  /^(?:permanent|never|none|indefinite|forever|na|n\/a|tbd)$/iu.test(
+    String(value).trim(),
+  ) || /\bpermanent\b/iu.test(String(value))
+const emptyTestPolicy = (value) =>
+  /^(?:none|no test|no-tests?|n\/a)$/iu.test(String(value).trim())
+
+const validateAllowlist = (registry) => {
+  const entries = registry.allowlist ?? []
+  if (
+    !Array.isArray(entries) ||
+    entries.some(
+      (entry) =>
+        entry === '*' || (typeof entry === 'string' && entry.includes('*')),
+    )
+  ) {
+    fail('registry-unbounded-allowlist', 'wildcard allowlists are forbidden')
+  }
+  const byId = new Map(registry.rules.map((rule) => [rule.id, rule]))
+  const seen = new Set()
+  const today = todayUtc()
+  for (const [index, entry] of entries.entries()) {
+    const label = `allowlist[${index}]`
+    if (
+      !entry ||
+      typeof entry !== 'object' ||
+      Array.isArray(entry) ||
+      [
+        'ruleId',
+        'component',
+        'part',
+        'selector',
+        'file',
+        'reason',
+        'testPolicy',
+        'removalCondition',
+      ].some(
+        (field) =>
+          typeof entry[field] !== 'string' || entry[field].length === 0,
+      ) ||
+      !hasOwner(entry.owner) ||
+      typeof entry.reviewAfter !== 'string' ||
+      !/^\d{4}-\d{2}-\d{2}$/u.test(entry.reviewAfter)
+    ) {
+      fail(
+        'registry-allowlist-entry-invalid',
+        `${label} is missing a required governance field`,
+      )
+    }
+    if (
+      [entry.component, entry.part, entry.selector, entry.file].some((value) =>
+        value.includes('*'),
+      )
+    ) {
+      fail('registry-allowlist-broad-entry', `${label} uses a wildcard target`)
+    }
+    if (entry.reviewAfter < today) {
+      fail('registry-allowlist-expired', `${label} review date has passed`)
+    }
+    if (permanentMarker(entry.removalCondition)) {
+      fail(
+        'registry-allowlist-permanent-exception',
+        `${label} removal condition is permanent`,
+      )
+    }
+    if (emptyTestPolicy(entry.testPolicy)) {
+      fail(
+        'registry-allowlist-test-policy-required',
+        `${label} test policy is missing`,
+      )
+    }
+    const rule = byId.get(entry.ruleId)
+    if (!rule) {
+      fail(
+        'registry-allowlist-entry-invalid',
+        `${label} ruleId does not resolve to a registry rule`,
+      )
+    }
+    if (entry.component !== rule.componentId || entry.part !== rule.partId) {
+      fail(
+        'registry-allowlist-mismatch',
+        `${label} component/part does not match ${rule.id}`,
+      )
+    }
+    const owned = rule.selectorOwnership.selectors.find(
+      (selector) =>
+        selector.platform === 'web' && selector.selector === entry.selector,
+    )
+    if (!owned || owned.source.path !== entry.file) {
+      fail(
+        'registry-allowlist-mismatch',
+        `${label} selector/file is not an owned implementation of ${rule.id}`,
+      )
+    }
+    const key = [
+      entry.ruleId,
+      entry.component,
+      entry.part,
+      entry.selector,
+      entry.file,
+    ].join('|')
+    if (seen.has(key)) {
+      fail('registry-allowlist-duplicate', `${label} duplicates another entry`)
+    }
+    seen.add(key)
+  }
+}
+
 export const validateComponentSurfaceSemanticRegistry = async ({
   registry,
   schema,
@@ -516,11 +634,7 @@ export const validateComponentSurfaceSemanticRegistry = async ({
   ) {
     fail('registry-generated-invalid', 'generated metadata is invalid')
   }
-  if (
-    registry.allowlist?.some((entry) => entry === '*' || entry.includes('*'))
-  ) {
-    fail('registry-unbounded-allowlist', 'wildcard allowlists are forbidden')
-  }
+  validateAllowlist(registry)
   const readPaths = []
   const parsedPaths = []
   const contents = new Map()

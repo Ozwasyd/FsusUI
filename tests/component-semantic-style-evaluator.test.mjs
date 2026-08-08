@@ -776,7 +776,7 @@ contractTest(
       (error) => error?.code === 'registry-unbounded-allowlist',
     )
 
-    delete registry.allowlist
+    registry.allowlist = []
     const canonicalSource = `${JSON.stringify(canonical, null, 2)}\n`
     await writeFile(
       join(temporaryRoot, 'spec/tokens/tokens.json'),

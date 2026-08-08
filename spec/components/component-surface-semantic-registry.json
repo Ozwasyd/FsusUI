@@ -11,9 +11,10 @@
     "ownerReviewRequired": true,
     "reviewAfter": "2026-11-05"
   },
+  "allowlist": [],
   "generated": {
     "producer": "scripts/check-component-surface-semantic-registry.mjs",
-    "sourceRevision": "26d8576dbd7f4aa27b42d171895d72bc9454a769",
+    "sourceRevision": "2225bc5df2ab037a2753477b799bc6edacdaec9c",
     "digestAlgorithm": "sha256"
   },
   "sourceDigests": {
@@ -69,7 +70,7 @@
       "path": "vue/packages/theme-chalk/src/date-picker/date-table.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "06d26e0af447cb9f0ec98f56a649327d29f671c66e237c6b09ec3968ea36452d"
+      "digest": "2f6568e5ae8ee58698ea709533ba07e9ca1703eebdb2a12ca239e13f00bf7cf6"
     },
     "implementation-05": {
       "path": "vue/packages/theme-chalk/src/date-picker/time-spinner.scss",
@@ -81,13 +82,13 @@
       "path": "vue/packages/theme-chalk/src/upload.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "2082e8602507bba929ad4787ed3fc237c3d86c835941efd7875b26d81866c04a"
+      "digest": "00f12cfaf3615f3758f0d84dd7c7fc5dd525ed6339ac3b9f36d557cd11f89a23"
     },
     "implementation-07": {
       "path": "vue/packages/theme-chalk/src/metric-primitives.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "c17c069574ecb1296169293264f1554c6f10198e109b68b490aedf03f4f7b938"
+      "digest": "f0b890cba11e5815250b8eede20c8828c076617048c1f2c295d0d45768b66d10"
     },
     "implementation-08": {
       "path": "vue/packages/theme-chalk/src/tabs.scss",
@@ -105,25 +106,25 @@
       "path": "vue/packages/theme-chalk/src/radio-button.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "984d75fa78b447143e3c656c6e9ef45cdc3eff84554e3a6203bfb9828ba4b39a"
+      "digest": "9c8c4b0c9d5f586246158c77184055e7813274d17511109a433a005e5dc806b5"
     },
     "implementation-11": {
       "path": "vue/packages/theme-chalk/src/checkbox-button.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "ff4bf4a19e2b019e3153619d834cedead00a80e1388ac2ce6df2c90e7a75fe69"
+      "digest": "54c5e4b5fb018be692d9b81c76d52662d209e7354e1d25c21feaf36cc33b0467"
     },
     "implementation-12": {
       "path": "vue/packages/theme-chalk/src/fsus-theme.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "45bef0244def7505b8da449d0ae5bf2174022ad39de321dbba2d28b4f226b942"
+      "digest": "e9aee18b46bcbe3176c75ec08df2a69b3d0c92bf0fa9039ff3ad1298d4c79261"
     },
     "implementation-13": {
       "path": "vue/packages/theme-chalk/src/collection-primitives.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "6fd6947d3e1b8b401ff0741cad727398a4d116b3d6a4ef3fd5c6f90ad4b86650"
+      "digest": "7feb775b1a3630b05f5d690d3fdb3740b41e08e7f68cdcbca4379c8e563c1722"
     },
     "implementation-14": {
       "path": "vue/packages/theme-chalk/src/input-number.scss",
@@ -147,7 +148,7 @@
       "path": "vue/packages/theme-chalk/src/settings-primitives.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "ac183b45b1adbf732c343a5cf1d6d7ccae6fd6163d52877075745c25da8e03cc"
+      "digest": "77695623ba8ef68aa2262648c9fb987553e6c70390aef27b6bbce2b4ec7d3c47"
     },
     "implementation-18": {
       "path": "vue/packages/theme-chalk/src/loading.scss",
@@ -165,7 +166,7 @@
       "path": "vue/packages/theme-chalk/src/common/transition.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "1d3d8fc531de7657e0ec05153f0644000856afd83d650268e923ada7ddad556b"
+      "digest": "c6659ec0606eb443746a801b68cbab10b8fa7ca92edf6c9934dd86cd0f11eb24"
     },
     "implementation-21": {
       "path": "vue/packages/theme-chalk/src/public-shell.scss",
