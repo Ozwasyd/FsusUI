@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "surfaces": [
+    {
+      "id": "npm-workspace-root",
+      "datasource": "npm",
+      "packageName": "root package.json dependencies",
+      "manager": "npm",
+      "files": ["package.json", "pnpm-lock.yaml"],
+      "versioning": "semver",
+      "group": "npm-release-tooling"
+    },
+    {
+      "id": "npm-vue-runtime",
+      "datasource": "npm",
+      "packageName": "@vue/* runtime packages",
+      "manager": "npm",
+      "files": ["vue/packages/element-plus/package.json", "pnpm-lock.yaml"],
+      "versioning": "semver",
+      "group": "vue-runtime-dependencies"
+    },
+    {
+      "id": "npm-vue-build",
+      "datasource": "npm",
+      "packageName": "vite/rollup/sass build toolchain",
+      "manager": "npm",
+      "files": ["package.json", "vue/packages/*/package.json", "pnpm-lock.yaml"],
+      "versioning": "semver",
+      "group": "vue-build-toolchain"
+    },
+    {
+      "id": "npm-js-test",
+      "datasource": "npm",
+      "packageName": "vitest/playwright/eslint test tooling",
+      "manager": "npm",
+      "files": ["package.json", "pnpm-lock.yaml"],
+      "versioning": "semver",
+      "group": "js-test-quality-tooling"
+    },
+    {
+      "id": "nuget-avalonia",
+      "datasource": "nuget",
+      "packageName": "Avalonia",
+      "manager": "nuget",
+      "files": ["dotnet/Directory.Packages.props"],
+      "versioning": "nuget",
+      "group": "avalonia-platform"
+    },
+    {
+      "id": "nuget-dotnet-test",
+      "datasource": "nuget",
+      "packageName": "xunit/coverlet/Microsoft.NET.Test.Sdk",
+      "manager": "nuget",
+      "files": ["dotnet/Directory.Packages.props"],
+      "versioning": "nuget",
+      "group": "dotnet-test-performance"
+    },
+    {
+      "id": "dotnet-sdk",
+      "datasource": "dotnet-version",
+      "packageName": "dotnet-sdk",
+      "manager": "dotnet-version",
+      "files": ["dotnet/global.json"],
+      "versioning": "loose",
+      "group": "node-dotnet-sdk-images"
+    },
+    {
+      "id": "node-runtime",
+      "datasource": "node-version",
+      "packageName": "node",
+      "manager": "regex",
+      "customManager": "Node.js runtime version from CI setup-node action",
+      "files": [".github/workflows/quality.yml", ".github/workflows/_quality.yml"],
+      "versioning": "node",
+      "group": "node-dotnet-sdk-images"
+    },
+    {
+      "id": "pnpm-package-manager",
+      "datasource": "npm",
+      "packageName": "pnpm",
+      "manager": "regex",
+      "customManager": "pnpm package manager version from package.json",
+      "files": ["package.json"],
+      "versioning": "semver",
+      "group": "vue-build-toolchain"
+    },
+    {
+      "id": "emsdk-toolchain",
+      "datasource": "github-releases",
+      "packageName": "emscripten-core/emsdk",
+      "manager": "regex",
+      "customManager": "Emscripten SDK version from CI setup-emsdk action",
+      "files": [".github/workflows/quality.yml"],
+      "versioning": "semver-coerced",
+      "group": "wasm-toolchain"
+    },
+    {
+      "id": "github-actions",
+      "datasource": "github-releases",
+      "packageName": "GitHub Actions",
+      "manager": "github-actions",
+      "files": [".github/workflows/*.yml"],
+      "versioning": "semver",
+      "group": "github-actions"
+    }
+  ],
+  "exclusions": [],
+  "governance": {
+    "automerge": false,
+    "majorEnabled": true,
+    "minorEnabled": true,
+    "patchEnabled": true,
+    "digestEnabled": true,
+    "lockfileMaintenanceEnabled": true,
+    "permanentIgnoreCount": 0
+  }
+}
