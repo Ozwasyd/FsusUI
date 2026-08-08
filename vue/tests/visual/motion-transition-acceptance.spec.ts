@@ -31,13 +31,13 @@ test('zoom-in transitions use opacity+translate, no axis scale', async ({ page }
       try {
         const t = Array.from(s.cssRules).map((r) => r.cssText).join('\\n')
         // No scaleX(0) or scaleY(0) — axis compression
-        if ((t.includes('zoom-in') || t.includes('el-zoom-in')) && /scale[XY]\\(0\\)/.test(t))
+        if ((t.includes('zoom-in') || t.includes('el-zoom-in')) && /scale[XY]\(0\)/.test(t))
           v.push('axis scale-to-zero found')
         // No scale(0.45) — strong zoom
-        if ((t.includes('zoom-in') || t.includes('el-zoom-in')) && /scale\\(0\\.45/.test(t))
+        if ((t.includes('zoom-in') || t.includes('el-zoom-in')) && /scale\(0\.45\)/.test(t))
           v.push('scale(0.45) found')
         // No translateY(-30px) — large displacement
-        if (t.includes('list-enter-from') && /translateY\\(-30px\\)/.test(t))
+        if (t.includes('list-enter-from') && /translateY\(-30px\)/.test(t))
           v.push('30px list displacement found')
         // fade-linear must not have scaleX(0)
         if (t.includes('zoom-in-center') && /scaleX/.test(t))
@@ -60,7 +60,7 @@ test('list transitions use <=8px displacement', async ({ page }, testInfo) => {
       try {
         const t = Array.from(s.cssRules).map((r) => r.cssText).join('\\n')
         if (t.includes('list-enter-from') || t.includes('list-leave-to')) {
-          const m = t.match(/translateY\\((-?\\d+)px\\)/g)
+          const m = t.match(/translateY\((-?\d+)px\)/g)
           if (m) d.push(...m)
         }
       } catch {}
@@ -84,7 +84,7 @@ test('zoom-in overlay transitions have scale >= 0.98', async ({ page }, testInfo
       try {
         const t = Array.from(sheet.cssRules).map((r) => r.cssText).join('\\n')
         if (t.includes('zoom-in-bottom-enter-from') || t.includes('zoom-in-left-enter-from')) {
-          const m = t.match(/scale\\(([0-9.]+)\\)/g)
+          const m = t.match(/scale\(([0-9.]+)\)/g)
           if (m) s.push(...m)
         }
       } catch {}
