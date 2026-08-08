@@ -292,3 +292,69 @@ jobs:
             .tmp/visual-runtime-playwright/manifest.json
             .readiness/receipts/playwright-boundary
           retention-days: 14
+  visual-runtime-reuse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.tmp/playwright-browsers
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
+      - run: pnpm install --frozen-lockfile
+      - name: Restore Playwright Chromium cache
+        uses: actions/cache@v4
+        with:
+          path: .tmp/playwright-browsers
+          key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('package.json', 'pnpm-lock.yaml') }}
+      - name: Restore icons test artifact cache
+        id: icons-cache
+        uses: actions/cache@v4
+        with:
+          path: vue/packages/icons-vue/dist
+          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('vue/packages/icons-vue/package.json', 'vue/packages/icons-vue/src/**', 'vue/packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
+          restore-keys: |
+            ${{ runner.os }}-fsusui-test-artifacts-icons-
+      - name: Restore WASM test artifact cache
+        id: wasm-cache
+        uses: actions/cache@v4
+        with:
+          path: vue/packages/wasm/dist
+          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
+          restore-keys: |
+            ${{ runner.os }}-fsusui-test-artifacts-wasm-
+      - name: Log test artifact cache status
+        run: |
+          echo "icons-cache-hit=${{ steps.icons-cache.outputs.cache-hit }}"
+          echo "wasm-cache-hit=${{ steps.wasm-cache.outputs.cache-hit }}"
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Run playwright visual-reuse owner policy check
+        run: node scripts/check-playwright-visual-reuse-owner-policy.mjs
+      - name: Run playwright visual-reuse owner cells
+        run: >-
+          node scripts/visual-reuse-playwright-owner-run.mjs
+          --owner visual-runtime-reuse
+          --group ${{ inputs.group }}
+          --runtime-dir .tmp/visual-runtime-reuse-runtime
+          --evidence-dir .tmp/visual-runtime-reuse
+          --server-port 4182
+      - uses: actions/upload-artifact@v4
+        if: always()
+        continue-on-error: true
+        with:
+          name: visual-runtime-reuse-evidence-${{ inputs.group }}
+          path: |
+            .tmp/visual-runtime-reuse
+            .tmp/visual-runtime-reuse-runtime/manifest.json
+            .readiness/receipts/visual-runtime-reuse
+          retention-days: 14

@@ -66,7 +66,7 @@ export function validatePlaywrightOwners(owners, registry) {
     if (!Array.isArray(owner.suiteIds) || owner.suiteIds.length === 0) {
       fail(`owner ${ownerId} must declare non-empty suiteIds`)
     }
-    if (!['prepared-preview', 'native'].includes(owner.runtimeMode)) {
+    if (!['prepared-preview', 'native', 'prepared-reuse'].includes(owner.runtimeMode)) {
       fail(
         `owner ${ownerId} runtimeMode must be prepared-preview|native, got ${JSON.stringify(owner.runtimeMode)}`,
       )
