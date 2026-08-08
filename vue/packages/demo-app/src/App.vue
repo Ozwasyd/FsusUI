@@ -94,6 +94,7 @@ import PublicShellSearchModeSection from './sections/PublicShellSearchModeSectio
 import SegmentedVisualSection from './sections/SegmentedVisualSection.vue'
 import TransferResponsiveSection from './sections/TransferResponsiveSection.vue'
 import SettingsCompositionSection from './sections/SettingsCompositionSection.vue'
+import MetricCompositionSection from './sections/MetricCompositionSection.vue'
 import UploadVisualSection from './sections/UploadVisualSection.vue'
 import ViewTransitionSection from './sections/ViewTransitionSection.vue'
 
@@ -183,6 +184,7 @@ const routeSections = new Map<string, DemoSection | { component: object }>([
   ],
   ['segmented-visual', { component: markRaw(SegmentedVisualSection) }],
   ['settings-visual', { component: markRaw(SettingsCompositionSection) }],
+  ['metric-visual', { component: markRaw(MetricCompositionSection) }],
   ['upload-visual', { component: markRaw(UploadVisualSection) }],
   ['pagination-matrix', { component: markRaw(PaginationMatrixSection) }],
 ])
