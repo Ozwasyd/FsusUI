@@ -14,7 +14,7 @@
   @include e(link) {
     display: inline-flex;
     align-items: center;
-    min-height: 32px;
+    min-height: 40px;
     max-width: 100%;
     padding: 0 10px;
     border: 1px solid transparent;
@@ -53,6 +53,7 @@
       color: getCssVar('text-color', 'disabled');
       cursor: not-allowed;
       pointer-events: none;
+      opacity: 1;
     }
   }
 }
@@ -468,7 +469,7 @@
   @include e(input) {
     box-sizing: border-box;
     width: 100%;
-    min-height: 36px;
+    min-height: 40px;
     padding: 0 10px;
     border: 1px solid getCssVar('border-color');
     border-radius: var(--fsus-radius-control-small, 6px);
@@ -478,15 +479,20 @@
     outline: none;
 
     &:focus {
-      border-color: getCssVar('color-primary');
-      box-shadow: 0 0 0 2px
-        color-mix(in srgb, getCssVar('color-primary') 18%, transparent);
+      border-color: var(--fsus-scholarly-blue, getCssVar('color-primary'));
+      box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px) var(--fsus-scholarly-blue, getCssVar('color-primary'));
+      outline: none;
     }
   }
 
   @include when(invalid) {
     .#{$namespace}-typed-confirm-field__input {
       border-color: getCssVar('color-danger');
+
+      &:focus {
+        border-color: getCssVar('color-danger');
+        box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px) getCssVar('color-danger');
+      }
     }
   }
 }
