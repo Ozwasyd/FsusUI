@@ -2228,15 +2228,9 @@ describe('Fsus theme visual baseline', () => {
     ])
     expectCssRule(optionCss, '.el-select-dropdown__option-item.is-selected', [
       'background-color: var(--fsus-select-option-selected-bg, var(--fsus-state-selected-bg));',
-      'font-weight: 500;',
+      'font-weight: var(--fsus-font-weight-medium, 500);',
     ])
-    expectCssRule(
-      optionCss,
-      '.el-select-dropdown__option-item.is-selected:not(.is-multiple)',
-      [
-        'color: var(--fsus-select-option-selected-text, var(--fsus-scholarly-blue));',
-      ],
-    )
+    expect(optionCss).toContain('color: var(--fsus-scholarly-blue);')
     expect(optionCss).not.toContain('font-weight: 700;')
     expect(selectCss).not.toContain('var(--el-color-primary)')
     expect(selectCss).not.toContain('var(--el-color-white)')

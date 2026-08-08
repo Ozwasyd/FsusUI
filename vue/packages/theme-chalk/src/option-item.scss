@@ -16,6 +16,13 @@
     '.el-select-dropdown__option-item'
   );
 
+  // SelectV2 uses .is-selected instead of .selected (Element Plus convention).
+  .#{$namespace}-select-dropdown__option-item.is-selected {
+    color: var(--fsus-scholarly-blue);
+    font-weight: var(--fsus-font-weight-medium, 500);
+    background-color: var(--fsus-select-option-selected-bg, var(--fsus-state-selected-bg));
+  }
+
   @include when(multiple) {
     .#{$namespace}-select-dropdown__option-item {
       &.is-selected {
