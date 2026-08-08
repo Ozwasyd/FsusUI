@@ -82,7 +82,7 @@
         <el-theme-mode-toggle visibility="desktop" compact />
       </div>
       <div class="segmented-fixture-row" data-segmented-variant="toggle-menu">
-        <el-theme-mode-toggle visibility="mobile" variant="menu-button" />
+        <el-theme-mode-toggle visibility="always" variant="menu-button" />
       </div>
     </div>
 

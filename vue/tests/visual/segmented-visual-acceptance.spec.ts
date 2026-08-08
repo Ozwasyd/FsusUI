@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
+import { collectCssRules } from '../support/css-scan'
 import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
 
 const diagnostics = new WeakMap<Page, string[]>()
@@ -47,23 +48,23 @@ test('production CSS has no legacy segmented tokens', async ({ page }, testInfo)
   await stabilizePage(page)
   await expect(page.getByTestId('segmented-visual-fixtures')).toBeVisible()
 
-  const bannedPatterns = await page.evaluate(() => {
-    const patterns: string[] = []
-    for (const sheet of Array.from(document.styleSheets)) {
-      try {
-        const cssText = Array.from(sheet.cssRules).map((r) => r.cssText).join('\n')
-        if (/opacity:\s*0\.46/.test(cssText) && cssText.includes('radio-button'))
-          patterns.push('ancestor opacity disabled found')
-        if (/min-height:\s*28px/.test(cssText) && cssText.includes('segmented-control'))
-          patterns.push('28px item height found in collection')
-        if (/outline:\s*2px solid/.test(cssText) && cssText.includes('segmented') && !cssText.includes('inset'))
-          patterns.push('outer outline focus found')
-        if (/box-shadow:\s*inset 0 0 0 1px/.test(cssText) && cssText.includes('radio-button'))
-          patterns.push('1px focus ring found')
-      } catch { /* cross-origin */ }
-    }
-    return patterns
-  })
+  // Selector-scoped gate: legacy patterns only count when the rule that
+  // targets the segmented primitive carries them (joined whole-sheet text
+  // false-positives on unrelated rules in the same stylesheet).
+  const rules = await collectCssRules(page)
+  const bannedPatterns: string[] = []
+  for (const rule of rules) {
+    const selector = rule.selectorText
+    const css = rule.cssText
+    if (/opacity:\s*0\.46/.test(css) && selector.includes('radio-button'))
+      bannedPatterns.push('ancestor opacity disabled found')
+    if (/min-height:\s*28px/.test(css) && selector.includes('segmented-control'))
+      bannedPatterns.push('28px item height found in collection')
+    if (/outline:\s*2px solid/.test(css) && selector.includes('segmented') && !css.includes('inset'))
+      bannedPatterns.push('outer outline focus found')
+    if (/box-shadow:\s*inset 0 0 0 1px/.test(css) && selector.includes('radio-button'))
+      bannedPatterns.push('1px focus ring found')
+  }
   expect(bannedPatterns).toEqual([])
 })
 
@@ -233,6 +234,9 @@ test('CheckboxButton supports multi-selection', async ({ page }, testInfo) => {
   await page.goto(buildVisualUrl('segmented-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
   await stabilizePage(page)
   const items = page.locator('[data-segmented-variant="checkbox-multi"] .el-checkbox-button')
+  // count() is non-waiting; ensure the fixture group has mounted before
+  // measuring the pre-selected state.
+  await expect(items.first()).toBeAttached()
   const activeCount = await items.locator('.is-checked').count()
   expect(activeCount).toBeGreaterThanOrEqual(2)
 })

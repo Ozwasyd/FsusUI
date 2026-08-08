@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
+import { collectCssRules } from '../support/css-scan'
 import {
   buildVisualUrl,
   resolveVisualVariant,
@@ -52,28 +53,33 @@ test('production CSS contains no legacy motion tokens (500ms, 30px)', async ({
   await stabilizePage(page)
   await expect(page.getByTestId('upload-visual-fixtures')).toBeVisible()
 
-  // Check all stylesheets for banned legacy motion values
-  const bannedPatterns = await page.evaluate(() => {
-    const patterns: string[] = []
-    for (const sheet of Array.from(document.styleSheets)) {
-      try {
-        const cssText = Array.from(sheet.cssRules)
-          .map((r) => r.cssText)
-          .join('\n')
+  // Selector-scoped gate: legacy motion values only count when the rule that
+  // targets the upload/motion primitive carries them (joined whole-sheet text
+  // false-positives on unrelated rules such as `padding: 1px 30px`).
+  const rules = await collectCssRules(page)
+  const bannedPatterns: string[] = []
+  for (const rule of rules) {
+    const selector = rule.selectorText
+    const css = rule.cssText
+    const motionTarget =
+      selector.includes('upload') ||
+      selector.includes('zoom-in') ||
+      selector.includes('list-enter') ||
+      selector.includes('list-leave') ||
+      selector.includes('-enter-from') ||
+      selector.includes('-leave-to')
 
-        if (/500ms/.test(cssText)) patterns.push('500ms found in stylesheet')
-        if (/ 30px /.test(cssText) || /translateY\(30px\)/.test(cssText))
-          patterns.push('30px displacement found in stylesheet')
-        if (/(\b|-)scale[XY]?\(0\.?[0-4]/.test(cssText))
-          patterns.push('scale(0) legacy motion found')
-        if (/scale\(0\.45\)/.test(cssText))
-          patterns.push('scale(0.45) zoom-in legacy found')
-      } catch {
-        // cross-origin stylesheet — skip
-      }
-    }
-    return patterns
-  })
+    if (/500ms/.test(css)) bannedPatterns.push('500ms found in stylesheet')
+    if (
+      motionTarget &&
+      (/translateY\(-?30px\)/.test(css) || / 30px /.test(css))
+    )
+      bannedPatterns.push('30px displacement found in stylesheet')
+    if (motionTarget && /(\b|-)scale[XY]?\(0\.?[0-4]/.test(css))
+      bannedPatterns.push('scale(0) legacy motion found')
+    if (motionTarget && /scale\(0\.45\)/.test(css))
+      bannedPatterns.push('scale(0.45) zoom-in legacy found')
+  }
   expect(bannedPatterns).toEqual([])
 })
 
@@ -568,33 +574,18 @@ test('upload list transitions use 140/220ms tokens, not 500ms', async ({
   })
   await stabilizePage(page)
 
-  const durations = await page.evaluate(() => {
-    const items: string[] = []
-    for (const sheet of Array.from(document.styleSheets)) {
-      try {
-        const cssText = Array.from(sheet.cssRules)
-          .map((r) => r.cssText)
-          .join('\n')
-        // Check for upload-list transition rules
-        if (
-          cssText.includes('upload-list') &&
-          (cssText.includes('enter-active') ||
-            cssText.includes('leave-active'))
-        ) {
-          // Extract transition-duration values
-          const durMatches = cssText.match(/transition-duration:\s*([^;]+)/g)
-          if (durMatches) {
-            for (const m of durMatches) {
-              items.push(m)
-            }
-          }
-        }
-      } catch {
-        // cross-origin
-      }
+  const rules = await collectCssRules(page)
+  const durations: string[] = []
+  for (const rule of rules) {
+    const selector = rule.selectorText
+    if (
+      selector.includes('upload-list') &&
+      (selector.includes('enter-active') || selector.includes('leave-active'))
+    ) {
+      const durMatches = rule.cssText.match(/transition-duration:\s*([^;]+)/g)
+      if (durMatches) durations.push(...durMatches)
     }
-    return items
-  })
+  }
 
   // No 500ms in any upload-list transition
   const hasLegacyMs = durations.some((d) => d.includes('500ms'))
@@ -609,31 +600,17 @@ test('upload list enter transition uses ≤8px displacement', async ({
   })
   await stabilizePage(page)
 
-  const displacements = await page.evaluate(() => {
-    const items: string[] = []
-    for (const sheet of Array.from(document.styleSheets)) {
-      try {
-        const cssText = Array.from(sheet.cssRules)
-          .map((r) => r.cssText)
-          .join('\n')
-        if (
-          cssText.includes('upload-list') &&
-          cssText.includes('enter-from')
-        ) {
-          // Look for translateY(-XXpx) values
-          const matches = cssText.match(/translateY\((-?\d+)px\)/g)
-          if (matches) {
-            for (const m of matches) {
-              items.push(m)
-            }
-          }
-        }
-      } catch {
-        // cross-origin
-      }
+  const rules = await collectCssRules(page)
+  const displacements: string[] = []
+  for (const rule of rules) {
+    if (
+      rule.selectorText.includes('upload-list') &&
+      rule.selectorText.includes('enter-from')
+    ) {
+      const matches = rule.cssText.match(/translateY\((-?\d+)px\)/g)
+      if (matches) displacements.push(...matches)
     }
-    return items
-  })
+  }
 
   // Displacement should be ≤8px
   for (const d of displacements) {
@@ -708,10 +685,14 @@ test('dragger drag-over changes border and background only, no glow/scale', asyn
   const preBox = await dragger.boundingBox()
   expect(preBox).toBeTruthy()
 
-  // Simulate drag-over by dispatching dragover event
-  await dragger.dispatchEvent('dragover', {
-    dataTransfer: { types: ['Files'] },
-  })
+  // Simulate drag-over with a real DataTransfer (constructing a DragEvent
+  // from a plain dataTransfer object is not supported by Chromium).
+  await page.evaluate((element) => {
+    const transfer = new DataTransfer()
+    element.dispatchEvent(
+      new DragEvent('dragover', { dataTransfer: transfer, bubbles: true }),
+    )
+  }, dragger)
 
   // Check the is-dragover class was applied
   await expect(dragger).toHaveClass(/is-dragover/)
@@ -755,20 +736,12 @@ test('media field wrapper has aspect-ratio support', async ({
   await stabilizePage(page)
 
   // Verify the upload-field CSS class exists in the stylesheet
-  const hasMediaField = await page.evaluate(() => {
-    for (const sheet of Array.from(document.styleSheets)) {
-      try {
-        const cssText = Array.from(sheet.cssRules)
-          .map((r) => r.cssText)
-          .join('\n')
-        if (cssText.includes('upload-field') && cssText.includes('media-field'))
-          return true
-      } catch {
-        // skip
-      }
-    }
-    return false
-  })
+  const rules = await collectCssRules(page)
+  const hasMediaField = rules.some(
+    (rule) =>
+      rule.selectorText.includes('upload-field') &&
+      rule.selectorText.includes('media-field'),
+  )
   expect(hasMediaField).toBe(true)
 })
 

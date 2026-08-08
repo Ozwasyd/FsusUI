@@ -579,12 +579,12 @@
       }
     }
 
-    // Prefer ≥40px compact desktop / ≥44px touch when density tokens allow.
+    // Prefer ≥40px compact desktop; enforce ≥44px touch target on coarse pointers.
     @media (pointer: coarse) {
       .#{bem('icon', '', 'close')},
       .#{bem('upload-list', 'item-delete')} {
         @include ghost-icon-button(
-          var(--fsus-icon-target, 44px),
+          44px,
           999px,
           0,
           true

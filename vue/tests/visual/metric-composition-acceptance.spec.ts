@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
+import { collectCssRules } from '../support/css-scan'
 import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
 
 const diagnostics = new WeakMap<Page, string[]>()
@@ -26,21 +27,20 @@ test('production CSS has no card surfaces on metric primitives', async ({ page }
   await stabilizePage(page)
   await expect(page.getByTestId('metric-visual-fixtures')).toBeVisible()
 
-  const banned = await page.evaluate(() => {
-    const p: string[] = []
-    for (const s of Array.from(document.styleSheets)) {
-      try {
-        const t = Array.from(s.cssRules).map((r) => r.cssText).join('\\n')
-        if (t.includes('metric-list') && t.includes('border: 1px solid') && t.includes('12px'))
-          p.push('MetricList has card surface')
-        if (t.includes('key-value-grid') && t.includes('border: 1px solid'))
-          p.push('KeyValueGrid has card surface')
-        if (t.includes('diagnostics-item') && t.includes('padding: 12px') && t.includes('border: 1px'))
-          p.push('DiagnosticsItem has card surface')
-      } catch {}
-    }
-    return p
-  })
+  // Selector-scoped gate: a card surface only counts when a rule that targets
+  // the primitive itself carries the card pattern (joined whole-sheet text
+  // would match unrelated rules in the same stylesheet).
+  const rules = await collectCssRules(page)
+  const banned: string[] = []
+  for (const rule of rules) {
+    const css = rule.cssText
+    if (rule.selectorText.includes('metric-list') && /border:\s*1px\s+solid/.test(css) && /\b12px\b/.test(css))
+      banned.push('MetricList has card surface')
+    if (rule.selectorText.includes('key-value-grid') && /border:\s*1px\s+solid/.test(css))
+      banned.push('KeyValueGrid has card surface')
+    if (rule.selectorText.includes('diagnostics-item') && /padding:\s*12px/.test(css) && /border:\s*1px/.test(css))
+      banned.push('DiagnosticsItem has card surface')
+  }
   expect(banned).toEqual([])
 })
 
