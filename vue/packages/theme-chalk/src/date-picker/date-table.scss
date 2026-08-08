@@ -98,18 +98,10 @@
       color: getCssVar('text-color', 'placeholder');
     }
 
-    &.selected .#{$namespace}-date-table-cell {
-      margin-left: 5px;
-      margin-right: 5px;
-      background-color: getCssVar('datepicker-inrange-bg-color');
-      &:hover {
-        background-color: getCssVar('datepicker-inrange-hover-bg-color');
-      }
-    }
-
+    // Single-date selected: flat Scholarly Blue marker, no card gaps (ref #453)
     &.selected .#{$namespace}-date-table-cell__text {
-      background-color: getCssVar('datepicker-active-color');
-      color: $color-white;
+      background-color: var(--fsus-scholarly-blue);
+      color: var(--fsus-color-white, #ffffff);
     }
 
     &.week {
