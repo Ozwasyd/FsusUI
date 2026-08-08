@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "9795080231942b6a677d4029b1aad9f741beb8f4",
+    "commitSha": "dbe51f99954cac4427efab34e77f696f01d2f863",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
@@ -7809,6 +7809,7 @@
       "name": "--fsus-control-height-action",
       "files": [
         "vue/packages/theme-chalk/src/button.scss",
+        "vue/packages/theme-chalk/src/collection-primitives.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
@@ -7820,6 +7821,7 @@
     {
       "name": "--fsus-control-height-compact",
       "files": [
+        "vue/packages/theme-chalk/src/collection-primitives.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/common/var.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
@@ -8089,13 +8091,18 @@
     {
       "name": "--fsus-focus-ring-width",
       "files": [
+        "vue/packages/theme-chalk/src/collection-primitives.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/metric-primitives.scss",
         "vue/packages/theme-chalk/src/mixins/mixins.scss",
         "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
-        "vue/packages/theme-chalk/src/perception-challenge.scss"
+        "vue/packages/theme-chalk/src/perception-challenge.scss",
+        "vue/packages/theme-chalk/src/settings-primitives.scss",
+        "vue/packages/theme-chalk/src/theme-mode-toggle.scss",
+        "vue/packages/theme-chalk/src/upload.scss"
       ],
       "classification": "portable"
     },
@@ -9054,13 +9061,13 @@
         "vue/packages/theme-chalk/src/inbox-primitives.scss",
         "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/markdown-renderer.scss",
-        "vue/packages/theme-chalk/src/metric-primitives.scss",
         "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss",
         "vue/packages/theme-chalk/src/public-shell-critical.scss",
         "vue/packages/theme-chalk/src/public-shell.scss",
         "vue/packages/theme-chalk/src/select-v2.scss",
-        "vue/packages/theme-chalk/src/theme-mode-toggle.scss"
+        "vue/packages/theme-chalk/src/theme-mode-toggle.scss",
+        "vue/packages/theme-chalk/src/upload.scss"
       ],
       "classification": "portable"
     },
@@ -9258,6 +9265,7 @@
         "vue/packages/theme-chalk/src/carousel.scss",
         "vue/packages/theme-chalk/src/check-tag.scss",
         "vue/packages/theme-chalk/src/checkbox-button.scss",
+        "vue/packages/theme-chalk/src/collection-primitives.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/common/var.scss",
         "vue/packages/theme-chalk/src/date-picker/picker-panel.scss",
@@ -9279,12 +9287,14 @@
         "vue/packages/theme-chalk/src/radio-button.scss",
         "vue/packages/theme-chalk/src/radio.scss",
         "vue/packages/theme-chalk/src/scrollbar.scss",
+        "vue/packages/theme-chalk/src/settings-primitives.scss",
         "vue/packages/theme-chalk/src/step.scss",
         "vue/packages/theme-chalk/src/table-column.scss",
         "vue/packages/theme-chalk/src/tabs.scss",
         "vue/packages/theme-chalk/src/theme-mode-toggle.scss",
         "vue/packages/theme-chalk/src/tree-select.scss",
         "vue/packages/theme-chalk/src/tree.scss",
+        "vue/packages/theme-chalk/src/upload.scss",
         "vue/packages/theme-chalk/src/virtual-list.scss"
       ],
       "classification": "portable"
@@ -9626,6 +9636,7 @@
       "name": "--fsus-state-selected-bg",
       "files": [
         "vue/packages/theme-chalk/src/check-tag.scss",
+        "vue/packages/theme-chalk/src/collection-primitives.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/common/var.scss",
         "vue/packages/theme-chalk/src/date-picker/picker-panel.scss",
