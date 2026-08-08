@@ -20,7 +20,7 @@ const output = path.resolve(root, valueOf('--output', '.tmp/performance/web'))
 const baselinePath = valueOf('--baseline', '')
 const port = Number(valueOf('--port', '5188'))
 const warmups = Number(valueOf('--warmups', profile === 'full' ? '3' : '1'))
-const samples = Number(valueOf('--samples', profile === 'full' ? '12' : '5'))
+const samples = Number(valueOf('--samples', profile === 'full' ? '12' : '21'))
 const regressionLimit = Number(valueOf('--regression-limit', '0.15'))
 const baseURL = `http://127.0.0.1:${port}`
 
@@ -472,7 +472,7 @@ try {
         (entry) => entry.activationRevision,
       )
       if (
-        samples !== 5 ||
+        samples < 5 ||
         markdownPhases.length !== samples ||
         activationRevisions.some(
           (revision, index) =>
