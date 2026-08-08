@@ -14,7 +14,7 @@
   "allowlist": [],
   "generated": {
     "producer": "scripts/check-component-surface-semantic-registry.mjs",
-    "sourceRevision": "22c4a906959c434c9cfbab9cf08594dfaefad490",
+    "sourceRevision": "5143490eef7fa45b58f5fbab8717f2569c2bb91b",
     "digestAlgorithm": "sha256"
   },
   "sourceDigests": {
@@ -34,7 +34,7 @@
       "path": "spec/components/contracts/v1/vue-public-contracts.json",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "71d70398d8d2b54e93a2c905e8c6dacf48a36b1ff8d1e4cd434876cbd6eea5af"
+      "digest": "97de22adb3cb1a2c72c6dd5399fccd76ce40497b25169cb184b2b0e63205d221"
     },
     "component-motion": {
       "path": "docs/components/motion.md",
@@ -82,7 +82,7 @@
       "path": "vue/packages/theme-chalk/src/upload.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "26be2aebff4ae15ddbfc2902844be353b8a697d6dea006ccc38f2ffd826bf932"
+      "digest": "c060a32e1bf3901f0cb9d2902505f700a9b53c0f4146baf56a43ba1e89c6ac84"
     },
     "implementation-07": {
       "path": "vue/packages/theme-chalk/src/metric-primitives.scss",
@@ -118,7 +118,7 @@
       "path": "vue/packages/theme-chalk/src/fsus-theme.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "5fca3d2ecf3fc4a261949a7c5a196150be7c91b5e955476a7356e1fac9f3ff54"
+      "digest": "7bf7b06b912721cc82ed5ee5cda6cf9f00ea9d7e50e30a0343a8e23fd24e06fb"
     },
     "implementation-13": {
       "path": "vue/packages/theme-chalk/src/collection-primitives.scss",
