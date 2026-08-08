@@ -1,0 +1,62 @@
+[
+  {
+    "id": "SEG460-M01-DISABLED-OPACITY",
+    "expectedViolation": "SEG460-E-DISABLED-OPACITY",
+    "replacements": [
+      {
+        "from": "box-shadow: none;\n        opacity: 1;",
+        "to": "box-shadow: none;\n        opacity: 0.46;"
+      }
+    ]
+  },
+  {
+    "id": "SEG460-M02-NEUTRAL-SELECTED",
+    "expectedViolation": "SEG460-E-SELECTED-SEMANTICS",
+    "replacements": [
+      {
+        "from": "radio-button-checked-bg-color",
+        "to": "button-bg-color"
+      }
+    ]
+  },
+  {
+    "id": "SEG460-M03-FOCUS-OUTLINE",
+    "expectedViolation": "SEG460-E-FOCUS-INSET",
+    "replacements": [
+      {
+        "from": "outline: none !important;",
+        "to": "outline: 2px solid Highlight !important;"
+      }
+    ]
+  },
+  {
+    "id": "SEG460-M04-RADIUS-10",
+    "expectedViolation": "SEG460-E-SHELL-RADIUS",
+    "replacements": [
+      {
+        "from": "getCssVar('border-radius-base')",
+        "to": "10px"
+      }
+    ]
+  },
+  {
+    "id": "SEG460-M05-API-UNIFICATION",
+    "expectedViolation": "SEG460-E-ROLE-SEPARATION",
+    "replacements": [
+      {
+        "from": "role=\"radio\"",
+        "to": "role=\"checkbox\""
+      }
+    ]
+  },
+  {
+    "id": "SEG460-M06-GEOMETRY-28",
+    "expectedViolation": "SEG460-E-ITEM-HEIGHT",
+    "replacements": [
+      {
+        "from": "map.get($button-padding-vertical, 'default')",
+        "to": "6px"
+      }
+    ]
+  }
+]
