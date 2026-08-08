@@ -1,6 +1,7 @@
 @use 'mixins/mixins' as *;
 @use 'mixins/var' as *;
 @use 'common/var' as *;
+@use 'mixins/calendar-cell-primitive' as calendar-cell;
 
 @include b(calendar) {
   @include set-component-css-var('calendar', $calendar);
@@ -240,24 +241,6 @@
     border-bottom: getCssVar('calendar', 'border');
     border-right: getCssVar('calendar', 'border');
     vertical-align: top;
-    transition:
-      background-color
-        var(--fsus-calendar-cell-duration, var(--fsus-motion-control, 220ms))
-        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
-      color
-        var(--fsus-calendar-cell-duration, var(--fsus-motion-control, 220ms))
-        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
-      box-shadow
-        var(--fsus-calendar-cell-duration, var(--fsus-motion-control, 220ms))
-        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
-
-    @include when(selected) {
-      background-color: getCssVar('calendar', 'selected-bg-color');
-    }
-
-    @include when(today) {
-      color: getCssVar('color-primary');
-    }
   }
 
   tr:first-child td {
@@ -276,26 +259,12 @@
     box-sizing: border-box;
     padding: 8px;
     height: max(40px, getCssVar('calendar', 'cell-width'));
-    border-radius: var(--fsus-radius-control, 6px);
-    transition:
-      background-color
-        var(--fsus-calendar-cell-duration, var(--fsus-motion-control, 220ms))
-        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
-      box-shadow
-        var(--fsus-calendar-cell-duration, var(--fsus-motion-control, 220ms))
-        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
-      transform
-        var(--fsus-calendar-cell-duration, var(--fsus-motion-control, 220ms))
-        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
-
-    &:hover {
-      cursor: pointer;
-      background-color: getCssVar('calendar', 'selected-bg-color');
-      box-shadow: inset 0 0 0 1px rgba(42, 89, 156, 0.12);
-      transform: translate3d(0, -1px, 0);
-    }
+    // Visual primitives delegated to mixins/calendar-cell-primitive
   }
 }
+
+// Calendar cell visual primitives (ref #452)
+@include calendar-cell.fsus-calendar-cell-primitive('.el-calendar-day');
 
 @media (prefers-reduced-motion: reduce) {
   .#{$namespace}-calendar__body,

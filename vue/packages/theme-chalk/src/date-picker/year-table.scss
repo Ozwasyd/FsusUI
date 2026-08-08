@@ -1,5 +1,6 @@
 @use '../mixins/mixins' as *;
 @use '../common/var' as *;
+@use '../mixins/calendar-cell-primitive' as calendar-cell;
 
 @include b(year-table) {
   font-size: 12px;
@@ -15,22 +16,6 @@
     padding: 20px 3px;
     cursor: pointer;
 
-    &.today {
-      .cell {
-        color: getCssVar('color', 'primary');
-        font-weight: bold;
-      }
-    }
-
-    &.disabled .cell {
-      background-color: getCssVar('fill-color', 'light');
-      cursor: not-allowed;
-      color: getCssVar('text-color', 'placeholder');
-
-      &:hover {
-        color: getCssVar('text-color', 'placeholder');
-      }
-    }
 
     .cell {
       width: 48px;
@@ -38,7 +23,6 @@
       display: block;
       line-height: 36px;
       color: getCssVar('datepicker-text-color');
-      border-radius: 12px;
       margin: 0 auto;
 
       &:hover {
@@ -46,15 +30,9 @@
       }
     }
 
-    &.current:not(.disabled) .cell {
-      color: getCssVar('datepicker-active-color');
-    }
 
-    &:focus-visible {
-      outline: none;
-      .cell {
-        @include a11y-focus-ring(2px, 12px);
-      }
-    }
   }
 }
+
+// Year table cell visual primitives (ref #452)
+@include calendar-cell.fsus-calendar-cell-primitive-cell-inner('.el-year-table .cell');
