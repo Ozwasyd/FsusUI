@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "c91ccf08b0374c880d8f373beca40728975b2356",
+    "commitSha": "2c3ff0773fcef30775b8876df43001ec7068687f",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
@@ -9,7 +9,7 @@
   },
   "summary": {
     "componentModules": 93,
-    "components": 226,
+    "components": 228,
     "installableComponents": 153,
     "directives": 3,
     "services": 4,
@@ -17,7 +17,7 @@
     "cssVariables": 483,
     "deprecatedApis": 20,
     "componentCountByClassification": {
-      "portable": 124,
+      "portable": 126,
       "native-adapter": 73,
       "platform-override": 21,
       "web-only": 8
@@ -3736,6 +3736,20 @@
       "exposed": []
     },
     {
+      "name": "ElSectionNavLink",
+      "module": "settings-primitives",
+      "classification": "portable",
+      "props": ["active", "disabled", "to"],
+      "emits": [],
+      "slots": [
+        {
+          "name": "default",
+          "scoped": false
+        }
+      ],
+      "exposed": []
+    },
+    {
       "name": "ElSegmentedControl",
       "module": "collection-primitives",
       "classification": "portable",
@@ -5790,6 +5804,20 @@
       "module": "settings-primitives",
       "classification": "portable",
       "props": ["ariaLabel", "ariaLabelledby", "density", "items"],
+      "emits": [],
+      "slots": [
+        {
+          "name": "default",
+          "scoped": false
+        }
+      ],
+      "exposed": []
+    },
+    {
+      "name": "FsusSectionNavLink",
+      "module": "settings-primitives",
+      "classification": "portable",
+      "props": ["active", "disabled", "to"],
       "emits": [],
       "slots": [
         {
