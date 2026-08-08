@@ -136,8 +136,10 @@ const assertUploadListContract = (css: string, label: string) => {
     )
   }
 
+  // Contract requires opacity:1 on disabled items outside of picture-card
+  // (picture-card has its own independent disabled surface rules).
   expect(css, `${label}: disabled independent opacity`).toMatch(
-    /\.el-upload-list__item\.is-disabled[\s\S]{0,120}?opacity:\s*1/,
+    /(?<!picture-card\s)\.el-upload-list__item\.is-disabled[\s\S]{0,120}?opacity:\s*1/,
   )
 }
 
