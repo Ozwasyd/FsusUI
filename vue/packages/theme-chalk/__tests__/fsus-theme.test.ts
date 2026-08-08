@@ -1812,6 +1812,96 @@ describe('Fsus theme visual baseline', () => {
     }
   })
 
+  test('enforces shared popper surface and arrow geometry contract (#475)', () => {
+    const popperCss = compileThemeFile('popper.scss')
+
+    // Surface: 10px root radius (ref #473)
+    expectCssRule(popperCss, '.el-popper', [
+      'border-radius: var(--el-popper-border-radius);',
+    ])
+    expectCssRule(popperCss, '.el-popper', [
+      '--el-popper-border-radius: var(--el-popover-border-radius);',
+    ])
+
+    // 4px-scale padding: 8×12px (ref #473)
+    expectCssRule(popperCss, '.el-popper', [
+      'padding: 8px 12px;',
+    ])
+
+    // Pure variant: zero padding
+    expectCssRule(popperCss, '.el-popper.is-pure', [
+      'padding: 0;',
+    ])
+
+    // Single arrow geometry: 10×10px (ref #473)
+    const arrow = '.el-popper__arrow'
+    expectCssRule(popperCss, arrow, [
+      'width: 10px;',
+      'height: 10px;',
+    ])
+    expectCssRule(popperCss, `${arrow}::before`, [
+      'width: 10px;',
+      'height: 10px;',
+      'transform: rotate(45deg);',
+    ])
+
+    // Arrow edge placement: -5px from the opposite edge
+    for (const placement of ['top', 'bottom', 'left', 'right']) {
+      const selector = `.el-popper[data-popper-placement^=${placement}] > ${arrow}`
+      // The opposite edge should be -5px
+      expect(popperCss).toContain(selector)
+    }
+
+    // Arrow border transparency per placement (prevents double-line seams)
+    const placementPairs: Record<string, string[]> = {
+      top: ['left'],
+      bottom: ['right'],
+      left: ['bottom'],
+      right: ['top'],
+    }
+    for (const [placement, adjacencies] of Object.entries(placementPairs)) {
+      const selector = `.el-popper[data-popper-placement^=${placement}]`
+      // Each placement hides two borders of the arrow ::before to form a triangle
+      expect(popperCss).toContain(selector)
+    }
+
+    // Light theme: overlay background + light border
+    expectCssRule(popperCss, '.el-popper.is-light', [
+      'background: var(--el-bg-color-overlay);',
+      'border: 1px solid var(--el-border-color-light);',
+    ])
+
+    // Dark theme: primary text background
+    expectCssRule(popperCss, '.el-popper.is-dark', [
+      'color: var(--el-bg-color);',
+      'background: var(--el-text-color-primary);',
+      'border: 1px solid var(--el-text-color-primary);',
+    ])
+
+    // Light arrow: matches light surface border
+    expectCssRule(popperCss, '.el-popper.is-light .el-popper__arrow::before', [
+      'border: 1px solid var(--el-border-color-light);',
+      'background: var(--el-bg-color-overlay);',
+    ])
+
+    // Dark arrow: matches dark surface border
+    expectCssRule(popperCss, '.el-popper.is-dark .el-popper__arrow::before', [
+      'border: 1px solid var(--el-text-color-primary);',
+      'background: var(--el-text-color-primary);',
+    ])
+
+    // No magic geometry: reject 2/5/11px values
+    expect(popperCss).not.toContain('border-radius: 2px')
+    expect(popperCss).not.toContain('border-radius: 5px')
+    expect(popperCss).not.toContain('border-radius: 11px')
+    expect(popperCss).not.toContain('padding: 2px')
+    expect(popperCss).not.toContain('padding: 5px')
+    // Reject per-placement arrow size forks
+    expect(popperCss).not.toMatch(/arrow.*width:\s*(?!10px)[\d]+px/)
+    expect(popperCss).not.toMatch(/arrow.*height:\s*(?!10px)[\d]+px/)
+  })
+
+
   test('supports component-level motion disablement and dialog scale fade', () => {
     const themeCss = compileThemeFile('fsus-theme.scss')
     const dialogCss = compileThemeFile('dialog.scss')
