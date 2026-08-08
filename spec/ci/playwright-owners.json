@@ -46,6 +46,18 @@
       },
       "receiptDirectory": ".readiness/receipts/playwright-boundary",
       "evidenceDirectory": ".tmp/playwright-boundary"
+    },
+    "playwright-markdown": {
+      "gate": "playwright-markdown",
+      "suiteIds": [
+        "markdown-editor-interaction"
+      ],
+      "runtimeMode": "native",
+      "artifactNamespace": {
+        "markdown-editor-interaction": "playwright-markdown-{browser}"
+      },
+      "receiptDirectory": ".readiness/receipts/playwright-markdown",
+      "evidenceDirectory": ".tmp/playwright-markdown"
     }
   }
 }

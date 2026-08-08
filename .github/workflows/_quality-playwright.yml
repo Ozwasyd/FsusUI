@@ -80,6 +80,76 @@ jobs:
             .tmp/visual-runtime-playwright/manifest.json
             .readiness/receipts/playwright-layout
           retention-days: 14
+
+  playwright-markdown:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.tmp/playwright-browsers
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
+      - run: pnpm install --frozen-lockfile
+      - name: Restore Playwright browser cache
+        uses: actions/cache@v4
+        with:
+          path: .tmp/playwright-browsers
+          key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('package.json', 'pnpm-lock.yaml') }}
+      - name: Restore icons test artifact cache
+        id: icons-cache
+        uses: actions/cache@v4
+        with:
+          path: vue/packages/icons-vue/dist
+          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('vue/packages/icons-vue/package.json', 'vue/packages/icons-vue/src/**', 'vue/packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
+          restore-keys: |
+            ${{ runner.os }}-fsusui-test-artifacts-icons-
+      - name: Restore WASM test artifact cache
+        id: wasm-cache
+        uses: actions/cache@v4
+        with:
+          path: vue/packages/wasm/dist
+          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
+          restore-keys: |
+            ${{ runner.os }}-fsusui-test-artifacts-wasm-
+      - name: Log test artifact cache status
+        run: |
+          echo "icons-cache-hit=${{ steps.icons-cache.outputs.cache-hit }}"
+          echo "wasm-cache-hit=${{ steps.wasm-cache.outputs.cache-hit }}"
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Install Firefox for markdown-editor cells
+        if: ${{ inputs.group != 'pr' }}
+        run: pnpm exec playwright install --with-deps firefox
+      - name: Install WebKit for markdown-editor cells
+        if: ${{ inputs.group != 'pr' }}
+        run: pnpm exec playwright install --with-deps webkit
+      - name: Run playwright markdown owner policy check
+        run: node scripts/check-playwright-markdown-owner-policy.mjs
+      - name: Run playwright markdown owner cells
+        run: >-
+          node scripts/markdown-playwright-owner-run.mjs
+          --owner playwright-markdown
+          --group ${{ inputs.group }}
+          --evidence-dir .tmp/playwright-markdown
+      - uses: actions/upload-artifact@v4
+        if: always()
+        continue-on-error: true
+        with:
+          name: playwright-markdown-evidence-${{ inputs.group }}
+          path: |
+            .tmp/playwright-markdown
+            .readiness/receipts/playwright-markdown
+          retention-days: 14
   playwright-motion:
     runs-on: ubuntu-latest
     timeout-minutes: 120
