@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "6e3745ff0f201da9fbbedddb788d6ad6933e3ef1",
+    "commitSha": "c91ccf08b0374c880d8f373beca40728975b2356",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
@@ -14,7 +14,7 @@
     "directives": 3,
     "services": 4,
     "plugins": 7,
-    "cssVariables": 474,
+    "cssVariables": 483,
     "deprecatedApis": 20,
     "componentCountByClassification": {
       "portable": 124,
@@ -6815,7 +6815,8 @@
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
-        "vue/packages/theme-chalk/src/markdown-renderer.scss"
+        "vue/packages/theme-chalk/src/markdown-renderer.scss",
+        "vue/packages/theme-chalk/src/mixins/overlay-option-row-primitive.scss"
       ],
       "classification": "portable"
     },
@@ -7186,7 +7187,10 @@
     },
     {
       "name": "--fsus-calendar-cell-duration",
-      "files": ["vue/packages/theme-chalk/src/calendar.scss"],
+      "files": [
+        "vue/packages/theme-chalk/src/calendar.scss",
+        "vue/packages/theme-chalk/src/mixins/calendar-cell-primitive.scss"
+      ],
       "classification": "portable"
     },
     {
@@ -7629,6 +7633,15 @@
       "classification": "portable"
     },
     {
+      "name": "--fsus-color-white",
+      "files": [
+        "vue/packages/theme-chalk/src/date-picker/date-table.scss",
+        "vue/packages/theme-chalk/src/fsus-theme.scss",
+        "vue/packages/theme-chalk/src/mixins/calendar-cell-primitive.scss"
+      ],
+      "classification": "portable"
+    },
+    {
       "name": "--fsus-component-button-padding-x",
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
@@ -7845,6 +7858,11 @@
       "classification": "portable"
     },
     {
+      "name": "--fsus-date-range-bg",
+      "files": ["vue/packages/theme-chalk/src/date-picker/date-table.scss"],
+      "classification": "portable"
+    },
+    {
       "name": "--fsus-datepicker-action-radius",
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
@@ -8037,6 +8055,27 @@
       "classification": "portable"
     },
     {
+      "name": "--fsus-el-disabled-text-color",
+      "files": [
+        "vue/packages/theme-chalk/src/mixins/overlay-option-row-primitive.scss"
+      ],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-el-text-color-placeholder",
+      "files": [
+        "vue/packages/theme-chalk/src/mixins/calendar-cell-primitive.scss"
+      ],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-el-text-color-regular",
+      "files": [
+        "vue/packages/theme-chalk/src/mixins/overlay-option-row-primitive.scss"
+      ],
+      "classification": "portable"
+    },
+    {
       "name": "--fsus-empty-action-min-height",
       "files": ["vue/packages/theme-chalk/src/fsus-theme.scss"],
       "classification": "portable"
@@ -8097,12 +8136,37 @@
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/metric-primitives.scss",
+        "vue/packages/theme-chalk/src/mixins/calendar-cell-primitive.scss",
         "vue/packages/theme-chalk/src/mixins/mixins.scss",
+        "vue/packages/theme-chalk/src/mixins/overlay-option-row-primitive.scss",
         "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss",
         "vue/packages/theme-chalk/src/settings-primitives.scss",
         "vue/packages/theme-chalk/src/theme-mode-toggle.scss",
         "vue/packages/theme-chalk/src/upload.scss"
+      ],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-font-weight-medium",
+      "files": [
+        "vue/packages/theme-chalk/src/mixins/overlay-option-row-primitive.scss",
+        "vue/packages/theme-chalk/src/option-item.scss"
+      ],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-font-weight-regular",
+      "files": [
+        "vue/packages/theme-chalk/src/mixins/overlay-option-row-primitive.scss"
+      ],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-font-weight-semibold",
+      "files": [
+        "vue/packages/theme-chalk/src/date-picker/time-picker.scss",
+        "vue/packages/theme-chalk/src/mixins/calendar-cell-primitive.scss"
       ],
       "classification": "portable"
     },
@@ -8465,6 +8529,7 @@
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/mixins/calendar-cell-primitive.scss",
         "vue/packages/theme-chalk/src/progress.scss",
         "vue/packages/theme-chalk/src/tab-pane.scss",
         "vue/packages/theme-chalk/src/table.scss",
@@ -8483,13 +8548,13 @@
         "vue/packages/theme-chalk/src/color-picker.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/common/transition.scss",
-        "vue/packages/theme-chalk/src/date-picker/date-table.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/image-viewer.scss",
         "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/message.scss",
+        "vue/packages/theme-chalk/src/mixins/calendar-cell-primitive.scss",
         "vue/packages/theme-chalk/src/motion.scss",
         "vue/packages/theme-chalk/src/public-shell.scss",
         "vue/packages/theme-chalk/src/rate.scss",
@@ -8843,7 +8908,6 @@
         "vue/packages/theme-chalk/src/collapse.scss",
         "vue/packages/theme-chalk/src/color-picker.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
-        "vue/packages/theme-chalk/src/date-picker/date-table.scss",
         "vue/packages/theme-chalk/src/dialog.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
@@ -8851,6 +8915,7 @@
         "vue/packages/theme-chalk/src/image-viewer.scss",
         "vue/packages/theme-chalk/src/message-box.scss",
         "vue/packages/theme-chalk/src/message.scss",
+        "vue/packages/theme-chalk/src/mixins/calendar-cell-primitive.scss",
         "vue/packages/theme-chalk/src/motion.scss",
         "vue/packages/theme-chalk/src/progress.scss",
         "vue/packages/theme-chalk/src/public-shell.scss",
@@ -9268,14 +9333,18 @@
         "vue/packages/theme-chalk/src/collection-primitives.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/common/var.scss",
+        "vue/packages/theme-chalk/src/date-picker/date-table.scss",
         "vue/packages/theme-chalk/src/date-picker/picker-panel.scss",
+        "vue/packages/theme-chalk/src/date-picker/time-picker.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/inbox-primitives.scss",
         "vue/packages/theme-chalk/src/link.scss",
         "vue/packages/theme-chalk/src/metric-primitives.scss",
+        "vue/packages/theme-chalk/src/mixins/calendar-cell-primitive.scss",
         "vue/packages/theme-chalk/src/mixins/mixins.scss",
+        "vue/packages/theme-chalk/src/mixins/overlay-option-row-primitive.scss",
         "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/motion.scss",
         "vue/packages/theme-chalk/src/option-item.scss",
@@ -9310,13 +9379,21 @@
       "classification": "portable"
     },
     {
+      "name": "--fsus-select-font-size",
+      "files": [
+        "vue/packages/theme-chalk/src/mixins/overlay-option-row-primitive.scss"
+      ],
+      "classification": "portable"
+    },
+    {
       "name": "--fsus-select-option-height",
       "files": [
         "vue/packages/theme-chalk/src/cascader.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/common/var.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
-        "vue/packages/theme-chalk/src/generated/tokens.scss"
+        "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/mixins/overlay-option-row-primitive.scss"
       ],
       "classification": "portable"
     },
@@ -9325,7 +9402,7 @@
       "files": [
         "vue/packages/theme-chalk/src/autocomplete.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
-        "vue/packages/theme-chalk/src/option-item.scss"
+        "vue/packages/theme-chalk/src/mixins/overlay-option-row-primitive.scss"
       ],
       "classification": "portable"
     },
@@ -9333,16 +9410,14 @@
       "name": "--fsus-select-option-selected-bg",
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
+        "vue/packages/theme-chalk/src/mixins/overlay-option-row-primitive.scss",
         "vue/packages/theme-chalk/src/option-item.scss"
       ],
       "classification": "portable"
     },
     {
       "name": "--fsus-select-option-selected-text",
-      "files": [
-        "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
-        "vue/packages/theme-chalk/src/option-item.scss"
-      ],
+      "files": ["vue/packages/theme-chalk/src/common/fsus-tokens.scss"],
       "classification": "portable"
     },
     {
@@ -9610,14 +9685,14 @@
         "vue/packages/theme-chalk/src/check-tag.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/common/var.scss",
-        "vue/packages/theme-chalk/src/date-picker/date-table.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/markdown-editor.scss",
+        "vue/packages/theme-chalk/src/mixins/calendar-cell-primitive.scss",
+        "vue/packages/theme-chalk/src/mixins/overlay-option-row-primitive.scss",
         "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/motion.scss",
-        "vue/packages/theme-chalk/src/option-item.scss",
         "vue/packages/theme-chalk/src/tree-select.scss",
         "vue/packages/theme-chalk/src/upload.scss"
       ],
@@ -9639,12 +9714,14 @@
         "vue/packages/theme-chalk/src/collection-primitives.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/common/var.scss",
+        "vue/packages/theme-chalk/src/date-picker/date-table.scss",
         "vue/packages/theme-chalk/src/date-picker/picker-panel.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/inbox-primitives.scss",
         "vue/packages/theme-chalk/src/markdown-editor.scss",
+        "vue/packages/theme-chalk/src/mixins/overlay-option-row-primitive.scss",
         "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/option-item.scss",
         "vue/packages/theme-chalk/src/pagination.scss",
