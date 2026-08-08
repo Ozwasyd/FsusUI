@@ -679,6 +679,7 @@
     margin: 0;
 
     .#{bem('upload-list', 'item')} {
+      position: relative;
       overflow: hidden;
       background-color: getCssVar('fill-color', 'blank');
       border: 1px solid getCssVar('border-color');
@@ -689,26 +690,39 @@
       margin: 0 8px 8px 0;
       padding: 0;
 
-      display: inline-flex;
+      display: flex;
+      flex-direction: column;
 
       .#{bem('icon', '' ,'check')},
       .#{bem('icon', '' ,'circle-check')} {
-        color: $color-white;
+        color: getCssVar('color-success');
       }
 
       .#{bem('icon', '', 'close')} {
         display: none;
       }
-      &:hover,
-      &:focus-within {
-        .#{bem('upload-list', 'item-status-label')} {
-          opacity: 0;
-          // for fade out
-          display: block;
-        }
 
-        .#{$namespace}-progress__text {
-          display: block;
+      // Focus ring on the card
+      &:focus-within {
+        box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px) var(--fsus-scholarly-blue, getCssVar('color-primary'));
+      }
+
+      // Loading / error state borders
+      &.is-success {
+        border-color: getCssVar('color-success');
+      }
+
+      &.is-error {
+        border-color: getCssVar('color-danger');
+      }
+
+      // Disabled state
+      &.is-disabled {
+        opacity: 1;
+        pointer-events: none;
+
+        .#{bem('upload-list', 'item-actions')} {
+          opacity: 0.38;
         }
       }
     }
@@ -719,49 +733,81 @@
       }
     }
 
+    // Thumbnail fills the available space above actions bar
     .#{bem('upload-list', 'item-thumbnail')} {
+      flex: 1 1 0;
+      min-height: 0;
       width: 100%;
-      height: 100%;
-      object-fit: contain;
+      object-fit: cover;
     }
 
+    // Status label: small indicator in top-right corner
     .#{bem('upload-list', 'item-status-label')} {
-      @include upload-success();
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: getCssVar('fill-color', 'blank');
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+      font-size: 12px;
+      z-index: 1;
+
+      .#{bem('icon', '' ,'check')} {
+        color: getCssVar('color-success');
+      }
     }
 
+    // Actions bar: always visible at the bottom of the card
     .#{bem('upload-list', 'item-actions')} {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      left: 0;
-      top: 0;
-      cursor: default;
-
-      display: inline-flex;
-      justify-content: center;
+      display: flex;
       align-items: center;
-
-      color: #fff;
-      opacity: 0;
-      font-size: 20px;
-      background-color: getCssVar('overlay-color', 'lighter');
-      transition: opacity getCssVar('transition-duration');
+      justify-content: center;
+      gap: 8px;
+      min-height: 36px;
+      padding: 4px 8px;
+      background: getCssVar('fill-color', 'blank');
+      border-top: 1px solid getCssVar('border-color-lighter');
 
       span,
       button {
-        display: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
         cursor: pointer;
         border: none;
+        border-radius: var(--fsus-radius-control, 6px);
         background: transparent;
         padding: 0;
-        color: inherit;
-      }
+        color: getCssVar('text-color', 'regular');
+        font-size: 16px;
+        transition:
+          background-color var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+          color var(--fsus-motion-control-fast, 140ms) var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
 
-      span + span,
-      button + button,
-      span + button,
-      button + span {
-        margin-left: 1rem;
+        &:hover {
+          background: var(--fsus-state-hover-bg, getCssVar('fill-color', 'light'));
+          color: getCssVar('text-color', 'primary');
+        }
+
+        &:focus-visible {
+          outline: none;
+          box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px) var(--fsus-scholarly-blue, getCssVar('color-primary'));
+        }
+
+        // Delete button with danger tint on hover
+        &.#{bem('upload-list', 'item-delete')} {
+          &:hover {
+            color: getCssVar('color-danger');
+            background: color-mix(in srgb, getCssVar('color-danger') 8%, transparent);
+          }
+        }
       }
 
       .#{bem('upload-list', 'item-delete')} {
@@ -769,23 +815,16 @@
         font-size: inherit;
         color: inherit;
       }
-
-      &:hover,
-      &:focus-within {
-        opacity: 1;
-        span,
-        button {
-          display: inline-flex;
-        }
-      }
     }
 
+    // Progress bar: overlay at bottom of thumbnail area
     .#{bem('progress')} {
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      bottom: auto;
-      width: 126px;
+      position: absolute;
+      bottom: 36px;
+      left: 0;
+      right: 0;
+      width: auto;
+      transform: none;
 
       .#{$namespace}-progress__text {
         top: 50%;
