@@ -1,170 +1,256 @@
 {
-  // =========================================================================
-  // FsusUI Renovate configuration (#413)
-  //
-  // Covers npm, NuGet, .NET SDK, GitHub Actions, Emscripten/Wasm toolchain,
-  // Playwright/browser, and runtime pins. Each real version field has exactly
-  // one manager owner.
-  //
-  // Does not enable automerge, grouping, schedules, or PR policies (#414).
-  // Does not install the Mend App (#417).
-  // =========================================================================
-
-  $schema: "https://docs.renovatebot.com/renovate-schema.json",
-
-  // -----------------------------------------------------------------------
-  // Platform defaults
-  // -----------------------------------------------------------------------
-  platform: "github",
-  repositories: ["Ozwasyd/FsusUI"],
-
-  // Extends: no presets — explicit config only
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  platform: 'github',
+  repositories: [
+    'Ozwasyd/FsusUI',
+  ],
   extends: [],
-
-  // -----------------------------------------------------------------------
-  // 1. npm / pnpm workspace (covers package.json + pnpm-lock.yaml)
-  //    npm authority is the sole Renovate target for npm versions.
-  //    Generated projections under config/dependencies/ are NOT separate
-  //    dependency identities.
-  // -----------------------------------------------------------------------
   npm: {
     enabled: true,
     fileMatch: [
-      "^package\\.json$",
-      "^vue/packages/[^/]+/package\\.json$",
+      '^package\\.json$',
+      '^vue/packages/[^/]+/package\\.json$',
     ],
-    lockFileMaintenance: { enabled: false }, // enable in #414
-    // The npm authority JSON is a generated projection, not a dependency source.
-    // Renovate reads actual package.json files via the standard npm manager.
+    lockFileMaintenance: {
+      enabled: false,
+    },
     ignorePaths: [
-      "config/dependencies/npm-authority\\.json",
-      "config/dependencies/npm-authority\\.inventory\\.json",
-      "config/dependencies/migration-baseline\\.json",
+      'config/dependencies/npm-authority\\.json',
+      'config/dependencies/npm-authority\\.inventory\\.json',
+      'config/dependencies/migration-baseline\\.json',
     ],
   },
-
-  // -----------------------------------------------------------------------
-  // 2. NuGet (covers csproj + Directory.Packages.props central versions)
-  // -----------------------------------------------------------------------
   nuget: {
     enabled: true,
     fileMatch: [
-      "^dotnet/[^/]+\\.csproj$",
-      "^dotnet/Directory\\.Packages\\.props$",
+      '^dotnet/[^/]+\\.csproj$',
+      '^dotnet/Directory\\.Packages\\.props$',
     ],
   },
-
-  // -----------------------------------------------------------------------
-  // 3. GitHub Actions (covers workflow uses: refs)
-  // -----------------------------------------------------------------------
-  "github-actions": {
+  'github-actions': {
     enabled: true,
     fileMatch: [
-      "^\\.github/workflows/[^/]+\\.ya?ml$",
-      "^\\.github/actions/[^/]+/action\\.ya?ml$",
+      '^\\.github/workflows/[^/]+\\.ya?ml$',
+      '^\\.github/actions/[^/]+/action\\.ya?ml$',
     ],
   },
-
-  // -----------------------------------------------------------------------
-  // 4. .NET SDK (covers dotnet/global.json sdk.version)
-  // -----------------------------------------------------------------------
-  "dotnet-version": {
+  'dotnet-version': {
     enabled: true,
-    fileMatch: ["^dotnet/global\\.json$"],
+    fileMatch: [
+      '^dotnet/global\\.json$',
+    ],
   },
-
-  // -----------------------------------------------------------------------
-  // 5. Custom manager: Emscripten SDK version
-  //    Extracts version from emscripten-core/setup-emsdk@<version> in CI.
-  // -----------------------------------------------------------------------
   customManagers: [
     {
-      customType: "regex",
-      description: "Emscripten SDK version from CI setup-emsdk action",
-      fileMatch: ["^\\.github/workflows/quality\\.yml$"],
-      matchStrings: [
-        "emscripten-core/setup-emsdk@(?<currentValue>v\\d+\\.\\d+\\.\\d+)",
-      ],
-      datasourceTemplate: "github-releases",
-      depNameTemplate: "emscripten-core/emsdk",
-      versioningTemplate: "semver-coerced",
-    },
-
-    // -----------------------------------------------------------------------
-    // 6. Custom manager: Node.js version from CI
-    //    Extracts node-version from actions/setup-node config in CI.
-    // -----------------------------------------------------------------------
-    {
-      customType: "regex",
-      description: "Node.js runtime version from CI setup-node action",
+      customType: 'regex',
+      description: 'Emscripten SDK version from CI setup-emsdk action',
       fileMatch: [
-        "^\\.github/workflows/quality\\.yml$",
-        "^\\.github/workflows/_quality\\.yml$",
-        "^\\.github/workflows/publish-npm\\.yml$",
+        '^\\.github/workflows/quality\\.yml$',
       ],
       matchStrings: [
-        "node-version:\\s*(?<currentValue>\\d+)",
+        'emscripten-core/setup-emsdk@(?<currentValue>v\\d+\\.\\d+\\.\\d+)',
       ],
-      datasourceTemplate: "node-version",
-      depNameTemplate: "node",
-      versioningTemplate: "node",
+      datasourceTemplate: 'github-releases',
+      depNameTemplate: 'emscripten-core/emsdk',
+      versioningTemplate: 'semver-coerced',
     },
-
-    // -----------------------------------------------------------------------
-    // 7. Custom manager: pnpm version from package.json packageManager
-    // -----------------------------------------------------------------------
     {
-      customType: "regex",
-      description: "pnpm package manager version from package.json",
-      fileMatch: ["^package\\.json$"],
-      matchStrings: [
-        "\"packageManager\"\\s*:\\s*\"pnpm@(?<currentValue>\\d+\\.\\d+\\.\\d+)\"",
+      customType: 'regex',
+      description: 'Node.js runtime version from CI setup-node action',
+      fileMatch: [
+        '^\\.github/workflows/quality\\.yml$',
+        '^\\.github/workflows/_quality\\.yml$',
+        '^\\.github/workflows/publish-npm\\.yml$',
       ],
-      datasourceTemplate: "npm",
-      depNameTemplate: "pnpm",
-      versioningTemplate: "semver",
+      matchStrings: [
+        'node-version:\\s*(?<currentValue>\\d+)',
+      ],
+      datasourceTemplate: 'node-version',
+      depNameTemplate: 'node',
+      versioningTemplate: 'node',
     },
-
-    // -----------------------------------------------------------------------
-    // 8. Custom manager: NuGet lockfile maintenance hint
-    //    Ensures packages.lock.json is regenerated after NuGet updates.
-    // -----------------------------------------------------------------------
     {
-      customType: "regex",
-      description: "NuGet lockfile regeneration config",
-      fileMatch: ["^dotnet/[^/]+\\.csproj$"],
-      matchStrings: [
-        // Placeholder: NuGet lockfiles are committed; standard nuget manager
-        // handles updates. This manager exists for ownership completeness.
+      customType: 'regex',
+      description: 'pnpm package manager version from package.json',
+      fileMatch: [
+        '^package\\.json$',
       ],
-      datasourceTemplate: "nuget",
-      depNameTemplate: "nuget-lockfile-dummy",
-      // This custom manager is intentionally a no-op for the discovery pass;
-      // NuGet lockfiles are consumed by the standard nuget manager above.
-      // It is registered to satisfy the "every real version field has exactly
-      // one manager owner" constraint.
+      matchStrings: [
+        '"packageManager"\\s*:\\s*"pnpm@(?<currentValue>\\d+\\.\\d+\\.\\d+)"',
+      ],
+      datasourceTemplate: 'npm',
+      depNameTemplate: 'pnpm',
+      versioningTemplate: 'semver',
+    },
+    {
+      customType: 'regex',
+      description: 'NuGet lockfile regeneration config',
+      fileMatch: [
+        '^dotnet/[^/]+\\.csproj$',
+      ],
+      matchStrings: [],
+      datasourceTemplate: 'nuget',
+      depNameTemplate: 'nuget-lockfile-dummy',
     },
   ],
-
-  // -----------------------------------------------------------------------
-  // Global constraints
-  // -----------------------------------------------------------------------
-  // pnpm workspace constraint: Renovate uses npm manager with pnpm support.
-  // Node.js version constraint is read from CI config via custom manager.
-
-  // No broad ignorePaths. No generated projections as dependency identities.
-  // No automerge, grouping, schedules, or PR policies (belong in #414).
-  // No Dependabot, self-hosted bot, or PAT.
-
-  // -----------------------------------------------------------------------
-  // Versioning and datasource defaults
-  // -----------------------------------------------------------------------
-  versioning: "semver",
-
-  // postUpdateOptions: regenerate lockfiles after updates
-  postUpdateOptions: ["npmDedupe"],
-
-  // Suppress noisy onboarding
+  versioning: 'semver',
+  postUpdateOptions: [
+    'npmDedupe',
+  ],
   onboarding: false,
-  requireConfig: "required",
+  requireConfig: 'required',
+  schedule: [
+    'every 6 hours',
+  ],
+  minimumReleaseAge: '0 days',
+  lockFileMaintenance: {
+    enabled: true,
+    schedule: [
+      'before 4am',
+    ],
+  },
+  vulnerabilityAlerts: {
+    enabled: true,
+    schedule: [],
+  },
+  automerge: false,
+  separateMajorMinor: false,
+  rangeStrategy: 'pin',
+  packageRules: [
+    {
+      description: 'Vue build toolchain',
+      groupName: 'vue-build-toolchain',
+      matchDepNames: [
+        'vite',
+        'rollup',
+        '@vitejs/plugin-vue',
+        '@vitejs/plugin-vue-jsx',
+        'unplugin-vue-macros',
+        'esbuild',
+        'sass',
+        'gulp',
+        'postcss',
+        'autoprefixer',
+        'cssnano',
+      ],
+      matchPackagePrefixes: [
+        '@vitejs/',
+        '@rollup/',
+      ],
+    },
+    {
+      description: 'Vue runtime dependencies',
+      groupName: 'vue-runtime-dependencies',
+      matchDepNames: [
+        'vue',
+        '@vue/shared',
+        '@vue/runtime-core',
+        '@vue/runtime-dom',
+        '@vue/compiler-sfc',
+        '@vue/compiler-dom',
+        '@vue/compiler-core',
+      ],
+      matchPackagePrefixes: [
+        '@vue/',
+      ],
+    },
+    {
+      description: 'JS test and quality tooling',
+      groupName: 'js-test-quality-tooling',
+      matchDepNames: [
+        'vitest',
+        'playwright',
+        'eslint',
+        'prettier',
+        'typescript',
+        '@types/node',
+        'tsx',
+      ],
+      matchPackagePrefixes: [
+        '@types/',
+        '@vitest/',
+        '@eslint/',
+        'eslint-',
+      ],
+    },
+    {
+      description: 'npm release tooling',
+      groupName: 'npm-release-tooling',
+      matchDepNames: [
+        'semver',
+        'chalk',
+        'execa',
+        'commander',
+        'fs-extra',
+        'ora',
+        'enquirer',
+      ],
+    },
+    {
+      description: 'Avalonia platform',
+      groupName: 'avalonia-platform',
+      matchDepNames: [
+        'Avalonia',
+        'Avalonia.Desktop',
+        'Avalonia.Headless.XUnit',
+        'Avalonia.Themes.Fluent',
+      ],
+      matchDatasources: [
+        'nuget',
+      ],
+    },
+    {
+      description: '.NET test and performance tooling',
+      groupName: 'dotnet-test-performance',
+      matchDepNames: [
+        'coverlet.collector',
+        'Microsoft.NET.Test.Sdk',
+        'xunit',
+        'xunit.runner.visualstudio',
+        'xunit.v3',
+      ],
+      matchDatasources: [
+        'nuget',
+      ],
+    },
+    {
+      description: 'Wasm toolchain',
+      groupName: 'wasm-toolchain',
+      matchDepNames: [
+        'emscripten-core/emsdk',
+      ],
+      matchDatasources: [
+        'github-releases',
+      ],
+    },
+    {
+      description: 'Node, .NET SDK, and container images',
+      groupName: 'node-dotnet-sdk-images',
+      matchDepNames: [
+        'node',
+      ],
+      matchDatasources: [
+        'node-version',
+      ],
+    },
+    {
+      description: 'GitHub Actions',
+      groupName: 'github-actions',
+      matchManagers: [
+        'github-actions',
+      ],
+    },
+  ],
+  postUpgradeTasks: {
+    commands: [
+      'pnpm deps:sync',
+      'pnpm deps:check',
+    ],
+    fileFilters: [
+      'package.json',
+      'vue/packages/*/package.json',
+      'pnpm-lock.yaml',
+    ],
+    executionMode: 'branch',
+  },
 }
