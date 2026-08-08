@@ -86,6 +86,21 @@ export function validateCellReceipt(receipt, cell) {
   if (receipt.dimensions?.browser && receipt.dimensions.browser.includes('-')) {
     fail(`receipt browser must not be composite: ${receipt.dimensions.browser}`)
   }
+  if (typeof receipt.toolchain?.chromiumRevision !== 'string') {
+    fail('receipt toolchain.chromiumRevision must be a string')
+  }
+  if (
+    receipt.toolchain.firefoxRevision !== undefined &&
+    typeof receipt.toolchain.firefoxRevision !== 'string'
+  ) {
+    fail('receipt toolchain.firefoxRevision must be a string when present')
+  }
+  if (
+    receipt.toolchain.webkitRevision !== undefined &&
+    typeof receipt.toolchain.webkitRevision !== 'string'
+  ) {
+    fail('receipt toolchain.webkitRevision must be a string when present')
+  }
   return true
 }
 

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "owners": {
+    "playwright-motion": {
+      "gate": "playwright-motion",
+      "suiteIds": [
+        "view-transitions",
+        "motion-ssr"
+      ],
+      "runtimeMode": "native",
+      "artifactNamespace": {
+        "view-transitions": "playwright-motion-view-transitions-{browser}",
+        "motion-ssr": "playwright-motion-motion-ssr-{browser}"
+      },
+      "receiptDirectory": ".readiness/receipts/playwright-motion",
+      "evidenceDirectory": ".tmp/playwright-motion"
+    }
+  }
+}

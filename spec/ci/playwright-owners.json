@@ -3,7 +3,10 @@
   "owners": {
     "playwright-layout": {
       "gate": "playwright-layout",
-      "suiteIds": ["dom-layout", "geometry-smoke"],
+      "suiteIds": [
+        "dom-layout",
+        "geometry-smoke"
+      ],
       "runtimeMode": "prepared-preview",
       "artifactNamespace": {
         "dom-layout": "playwright-layout-dom-{project}",
@@ -17,6 +20,20 @@
       },
       "receiptDirectory": ".readiness/receipts/playwright-layout",
       "evidenceDirectory": ".tmp/playwright-layout"
+    },
+    "playwright-motion": {
+      "gate": "playwright-motion",
+      "suiteIds": [
+        "view-transitions",
+        "motion-ssr"
+      ],
+      "runtimeMode": "native",
+      "artifactNamespace": {
+        "view-transitions": "playwright-motion-view-transitions-{browser}",
+        "motion-ssr": "playwright-motion-motion-ssr-{browser}"
+      },
+      "receiptDirectory": ".readiness/receipts/playwright-motion",
+      "evidenceDirectory": ".tmp/playwright-motion"
     }
   }
 }

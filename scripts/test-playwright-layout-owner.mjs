@@ -142,7 +142,7 @@ const receiptFor = (cell) => ({
   commitSha: 'a'.repeat(40),
   workflowGroup: 'main',
   run: { id: 'local', attempt: '1' },
-  toolchain: { node: 'v22', pnpm: '10.33.0', playwright: '1.59.1' },
+  toolchain: { node: 'v22', pnpm: '10.33.0', playwright: '1.59.1', chromiumRevision: 'chromium-1234' },
   runtime: {
     runtimeMode: 'prepared-preview',
     manifestDigest: 'b'.repeat(64),
