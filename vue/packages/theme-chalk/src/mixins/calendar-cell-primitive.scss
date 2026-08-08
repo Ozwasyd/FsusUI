@@ -1,0 +1,205 @@
+// Shared calendar cell visual primitive
+//
+// Contract (ref #452):
+// - Flat cells: 0 radius, no shadow, no gap, no transform on hover
+// - Selected: Scholarly Blue bg + white text
+// - Today: Scholarly Blue text, distinct from selected, no bg
+// - Hover: weak bg only, no transform/shadow
+// - Focus-visible: 2px inset Scholarly Blue
+// - Disabled: flat placeholder, opacity=1
+// - Outside-month: placeholder color
+//
+// Usage:
+//   @include fsus-calendar-cell-primitive('.el-calendar-day');
+
+@use 'sass:map';
+@use '../common/var' as *;
+
+@mixin fsus-calendar-cell-primitive($cell-selector) {
+  #{$cell-selector} {
+    border-radius: 0;
+    box-shadow: none;
+
+    transition:
+      background-color
+        var(--fsus-calendar-cell-duration, var(--fsus-motion-control, 220ms))
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+      color
+        var(--fsus-calendar-cell-duration, var(--fsus-motion-control, 220ms))
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
+
+    // Hover: weak background only, no transform, no shadow
+    &:hover {
+      background-color: var(--fsus-state-hover-bg);
+      box-shadow: none;
+      transform: none;
+      cursor: pointer;
+    }
+
+    // Selected: Scholarly Blue solid
+    &.is-selected {
+      background-color: var(--fsus-scholarly-blue);
+      color: getCssVar('color-white');
+
+      &:hover {
+        background-color: var(--fsus-scholarly-blue);
+      }
+    }
+
+    // Today: Scholarly Blue text only, distinct from selected
+    &.is-today:not(.is-selected) {
+      color: var(--fsus-scholarly-blue);
+      font-weight: var(--fsus-font-weight-semibold, 600);
+      background-color: transparent;
+    }
+
+    // Focus-visible: 2px inset
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset
+        0
+        0
+        0
+        var(--fsus-focus-ring-width, 2px)
+        var(--fsus-scholarly-blue);
+    }
+
+    // Selected + focus-visible overlay
+    &.is-selected:focus-visible {
+      outline: none;
+      box-shadow: inset
+        0
+        0
+        0
+        var(--fsus-focus-ring-width, 2px)
+        var(--fsus-color-white);
+    }
+
+    // Outside-month (prev/next): muted
+    &.prev,
+    &.next {
+      color: var(--fsus-el-text-color-placeholder, getCssVar('text-color', 'placeholder'));
+    }
+
+    // Disabled: flat, opacity=1
+    &.is-disabled,
+    &.disabled {
+      background-color: transparent;
+      color: var(--fsus-el-text-color-placeholder, getCssVar('text-color', 'placeholder'));
+      cursor: not-allowed;
+      opacity: 1;
+
+      &:hover {
+        background-color: transparent;
+      }
+    }
+  }
+}
+
+// Date picker inner text cell variant (smaller, tighter)
+@mixin fsus-date-picker-cell-primitive($cell-selector) {
+  #{$cell-selector} {
+    border-radius: 0;
+    box-shadow: none;
+
+    transition:
+      background-color var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+      color var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+      box-shadow var(--fsus-motion-control-fast, 140ms)
+        var(--fsus-motion-standard, cubic-bezier(0.4, 0, 0.2, 1));
+
+    // Today: Scholarly Blue text only
+    &.today:not(.current):not(.start-date):not(.end-date) {
+      color: var(--fsus-scholarly-blue);
+    }
+
+    // Hover
+    &.available:hover {
+      background-color: var(--fsus-state-hover-bg);
+      color: var(--fsus-scholarly-blue);
+    }
+
+    // Selected / current
+    &.current:not(.disabled) {
+      background-color: var(--fsus-scholarly-blue);
+      color: getCssVar('color-white');
+    }
+
+    // Focus-visible
+    &:focus-visible {
+      outline: none;
+    }
+
+    &.current:not(.disabled):focus-visible {
+      outline: none;
+      box-shadow: inset
+        0
+        0
+        0
+        var(--fsus-focus-ring-width, 2px)
+        var(--fsus-scholarly-blue);
+    }
+
+    // Outside month
+    &.prev-month,
+    &.next-month {
+      color: var(--fsus-el-text-color-placeholder, getCssVar('text-color', 'placeholder'));
+    }
+
+    // Disabled
+    &.disabled {
+      background-color: transparent;
+      color: var(--fsus-el-text-color-placeholder, getCssVar('text-color', 'placeholder'));
+      cursor: not-allowed;
+      opacity: 1;
+
+      &:hover {
+        background-color: transparent;
+      }
+    }
+  }
+}
+
+// Month/year table cell variant
+@mixin fsus-calendar-cell-primitive-cell-inner($cell-selector) {
+  #{$cell-selector} {
+    border-radius: 0;
+    box-shadow: none;
+
+    &:hover {
+      background-color: var(--fsus-state-hover-bg);
+      color: var(--fsus-scholarly-blue);
+    }
+
+    // Current (selected)
+    td.current:not(.disabled) & {
+      background-color: var(--fsus-scholarly-blue);
+      color: getCssVar('color-white');
+    }
+
+    // Focus-visible
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset
+        0
+        0
+        0
+        var(--fsus-focus-ring-width, 2px)
+        var(--fsus-scholarly-blue);
+    }
+
+    // Disabled
+    td.disabled & {
+      background-color: transparent;
+      color: var(--fsus-el-text-color-placeholder, getCssVar('text-color', 'placeholder'));
+      cursor: not-allowed;
+      opacity: 1;
+
+      &:hover {
+        background-color: transparent;
+      }
+    }
+  }
+}
