@@ -165,9 +165,22 @@ export function planOwnerCells(
         )
       : [...owner.suiteIds]
   if (selectedSuiteIds.length === 0) {
-    fail(
-      `owner ${ownerId} has no cells selected by group ${group} (registry PR profile excludes all suites)`,
-    )
+    // PR profiles can exclude all suites before impact planner is implemented;
+    // return an empty plan with a valid digest so downstream runners can emit skip receipts.
+    const emptyPlan = {
+      schemaVersion: 1,
+      owner: ownerId,
+      gate: owner.gate,
+      group,
+      generatedFrom: 'spec/ci/playwright-suites.json',
+      ownersFrom: OWNERS_PATH,
+      runtimeMode: owner.runtimeMode,
+      receiptDirectory: owner.receiptDirectory,
+      evidenceDirectory: owner.evidenceDirectory,
+      cells: [],
+    }
+    emptyPlan.digest = digestOf({ owner: emptyPlan.owner, group: emptyPlan.group, cells: [] })
+    return emptyPlan
   }
 
   const cells = []

@@ -34,6 +34,18 @@
       },
       "receiptDirectory": ".readiness/receipts/playwright-motion",
       "evidenceDirectory": ".tmp/playwright-motion"
+    },
+    "playwright-boundary": {
+      "gate": "playwright-boundary",
+      "suiteIds": [
+        "visual-boundary-audit"
+      ],
+      "runtimeMode": "prepared-preview",
+      "artifactNamespace": {
+        "visual-boundary-audit": "playwright-boundary-{project}"
+      },
+      "receiptDirectory": ".readiness/receipts/playwright-boundary",
+      "evidenceDirectory": ".tmp/playwright-boundary"
     }
   }
 }
