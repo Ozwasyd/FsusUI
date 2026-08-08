@@ -212,6 +212,7 @@
     "postinstall": "pnpm stub",
     "ci:playwright:plan": "node ./scripts/playwright-suites.mjs plan",
     "ci:playwright:check": "node ./scripts/playwright-suites.mjs check && node ./scripts/test-playwright-suites.mjs",
+    "ci:playwright:impact": "node ./scripts/playwright-impact-plan.mjs",
     "deps:authority:check": "node ./scripts/check-npm-authority.mjs",
     "deps:sync": "node ./scripts/deps-sync.mjs",
     "deps:check": "node ./scripts/deps-check.mjs",
