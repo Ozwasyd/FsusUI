@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "config/dependencies/exceptions.schema.json",
+  "title": "FsusUI Dependency Freshness Exceptions",
+  "description": "Temporary exceptions for dependency freshness checks (#411).",
+  "type": "object",
+  "required": ["schemaVersion", "exceptions"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "exceptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "dependencyId", "datasource", "packageName",
+          "currentVersion", "targetVersion", "reason",
+          "evidence", "owner", "createdAt", "expiresAt"
+        ],
+        "properties": {
+          "dependencyId": {
+            "type": "string",
+            "description": "Must match an id in update-surface.json"
+          },
+          "datasource": { "type": "string" },
+          "packageName": { "type": "string" },
+          "currentVersion": { "type": "string" },
+          "targetVersion": { "type": "string" },
+          "reason": { "type": "string" },
+          "evidence": { "type": "string" },
+          "owner": { "type": "string" },
+          "createdAt": { "type": "string" },
+          "expiresAt": { "type": "string" },
+          "vulnerability": {
+            "type": "boolean",
+            "default": false,
+            "description": "If true, max expiry is 72 hours instead of 14 days"
+          }
+        }
+      }
+    }
+  }
+}
