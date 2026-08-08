@@ -91,6 +91,7 @@ import OthersSection from './sections/OthersSection.vue'
 import PaginationMatrixSection from './sections/PaginationMatrixSection.vue'
 import PublicShellNavModeSection from './sections/PublicShellNavModeSection.vue'
 import PublicShellSearchModeSection from './sections/PublicShellSearchModeSection.vue'
+import SegmentedVisualSection from './sections/SegmentedVisualSection.vue'
 import TransferResponsiveSection from './sections/TransferResponsiveSection.vue'
 import UploadVisualSection from './sections/UploadVisualSection.vue'
 import ViewTransitionSection from './sections/ViewTransitionSection.vue'
@@ -179,6 +180,7 @@ const routeSections = new Map<string, DemoSection | { component: object }>([
     'transfer-responsive',
     { component: markRaw(TransferResponsiveSection) },
   ],
+  ['segmented-visual', { component: markRaw(SegmentedVisualSection) }],
   ['upload-visual', { component: markRaw(UploadVisualSection) }],
   ['pagination-matrix', { component: markRaw(PaginationMatrixSection) }],
 ])
