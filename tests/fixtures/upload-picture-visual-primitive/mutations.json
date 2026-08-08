@@ -1,0 +1,62 @@
+[
+  {
+    "id": "UP457-M01-HOVER-ONLY-OVERLAY",
+    "expectedViolation": "UP457-E-HOVER-ONLY",
+    "replacements": [
+      {
+        "from": "display: flex;\n  align-items: center;\n  justify-content: center;\n  gap: 8px;\n  min-height: 36px;",
+        "to": "position: absolute;\n  width: 100%;\n  height: 100%;\n  left: 0;\n  top: 0;\n  opacity: 0;\n  background-color: getCssVar('overlay-color', 'lighter');"
+      }
+    ]
+  },
+  {
+    "id": "UP457-M02-DARK-OVERLAY",
+    "expectedViolation": "UP457-E-NO-DARK-OVERLAY",
+    "replacements": [
+      {
+        "from": "background: getCssVar('fill-color', 'blank');\n  border-top: 1px solid getCssVar('border-color-lighter');",
+        "to": "background-color: getCssVar('overlay-color', 'lighter');"
+      }
+    ]
+  },
+  {
+    "id": "UP457-M03-HIDDEN-TOOLBAR",
+    "expectedViolation": "UP457-E-ALWAYS-VISIBLE",
+    "replacements": [
+      {
+        "from": "display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  width: 32px;",
+        "to": "display: none;"
+      }
+    ]
+  },
+  {
+    "id": "UP457-M04-BLUR-GLOW",
+    "expectedViolation": "UP457-E-NO-BLUR-GLOW",
+    "replacements": [
+      {
+        "from": "border: 1px solid getCssVar('border-color');\n  border-radius: 6px;",
+        "to": "border: 1px solid getCssVar('border-color');\n  border-radius: 6px;\n  backdrop-filter: blur(8px);\n  box-shadow: 0 0 24px rgba(0,0,0,0.15);"
+      }
+    ]
+  },
+  {
+    "id": "UP457-M05-OVERLAY-COVER",
+    "expectedViolation": "UP457-E-STATUS-VISIBLE",
+    "replacements": [
+      {
+        "from": "position: absolute;\n  top: 6px;\n  right: 6px;\n  width: 22px;\n  height: 22px;",
+        "to": "position: absolute;\n  width: 100%;\n  height: 100%;\n  left: 0;\n  top: 0;"
+      }
+    ]
+  },
+  {
+    "id": "UP457-M06-INACCESSIBLE-TARGET",
+    "expectedViolation": "UP457-E-ACCESSIBLE-ACTIONS",
+    "replacements": [
+      {
+        "from": "width: 32px;\n  height: 32px;",
+        "to": "width: 20px;\n  height: 20px;"
+      }
+    ]
+  }
+]
