@@ -14,6 +14,9 @@ component contract version.
 - Web package version: npm release workflow for `@ozwasyd/element-plus`.
 - Avalonia package version: NuGet package metadata under `dotnet/`.
 - component contract version: component contract files under `spec/components/`.
+- Contract V2 version: `spec/components/contracts/v2/contract-v2.json` maps the
+  real Web and Avalonia semantic baselines; it must be regenerated and checked
+  (`pnpm run contract-v2:check`) whenever either baseline changes.
 
 Web npm packages, Avalonia NuGet packages, and generated token/spec artifacts
 share the same platform-neutral contract but remain separate distribution

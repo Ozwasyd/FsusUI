@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "component": "ElMarkdownEditor",
+  "blocked": true,
+  "blockedBy": [338, 339, 340, 341, 342, 343],
+  "requiredStatus": "partial",
+  "reason": "Avalonia FsusMarkdownEditor public shell, theme API, and cross-platform alignment candidates are still open."
+}
