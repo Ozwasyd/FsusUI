@@ -389,7 +389,7 @@
   min-width: 0;
   padding: 10px 12px;
   border: 1px solid getCssVar('border-color-lighter');
-  border-radius: var(--fsus-radius-control-small, 6px);
+  border-radius: 6px;
   color: getCssVar('text-color', 'regular');
   font-size: 12px;
   line-height: 1.6;

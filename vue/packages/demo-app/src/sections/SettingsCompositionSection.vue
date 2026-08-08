@@ -6,7 +6,7 @@
     <div class="demo-block" data-settings-fixture="full-page">
       <h3>Settings Page</h3>
       <div class="settings-fixture-row" data-settings-variant="default">
-        <ElSectionNav aria-label="Settings">
+        <ElSectionNav ariaLabel="Settings">
           <ElSectionNavLink to="#general">General</ElSectionNavLink>
           <ElSectionNavLink to="#security" active>Security</ElSectionNavLink>
           <ElSectionNavLink to="#notifications">Notifications</ElSectionNavLink>
@@ -50,7 +50,7 @@
               Permanently delete your account and all associated data.
             </template>
           </ElDestructiveActionPanel>
-          <ElTypedConfirmField confirmation-phrase="DELETE" />
+          <ElTypedConfirmField phrase="DELETE" />
         </ElDangerZone>
       </div>
     </div>
@@ -59,10 +59,10 @@
     <div class="demo-block" data-settings-fixture="typed-confirm">
       <h3>TypedConfirmField</h3>
       <div class="settings-fixture-row" data-settings-variant="typed-default">
-        <ElTypedConfirmField confirmation-phrase="DELETE" />
+        <ElTypedConfirmField phrase="DELETE" />
       </div>
       <div class="settings-fixture-row" data-settings-variant="typed-invalid">
-        <ElTypedConfirmField confirmation-phrase="DELETE" invalid />
+        <ElTypedConfirmField phrase="DELETE" model-value="wrong-phrase" />
       </div>
     </div>
 

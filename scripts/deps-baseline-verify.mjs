@@ -49,9 +49,7 @@ if (errors.length > 0) {
   )
   for (const error of errors) {
     console.error(
-      `[deps:baseline] FAIL file=${error.file} ${error.error}` +
-        (error.expected ? ` expected=${error.expected}` : '') +
-        (error.actual ? ` actual=${error.actual}` : ''),
+      `[deps:baseline] FAIL file=${error.file} ${error.error}${error.expected ? ` expected=${error.expected}` : ''}${error.actual ? ` actual=${error.actual}` : ''}`,
     )
   }
   process.exit(1)

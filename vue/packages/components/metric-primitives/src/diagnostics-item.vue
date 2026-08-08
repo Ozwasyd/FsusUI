@@ -49,5 +49,10 @@ const hasMessage = computed(() => Boolean(props.message || slots.message))
 const hasMeta = computed(() => Boolean(props.meta || slots.meta))
 const hasDetail = computed(() => Boolean(props.detail || slots.detail))
 const hasActions = computed(() => Boolean(slots.actions))
-const itemKls = computed(() => [ns.b(), ns.m(props.density), ns.m(props.tone)])
+const itemKls = computed(() => [
+  ns.b(),
+  ns.m(props.density),
+  ns.m(props.tone),
+  ns.is(props.tone),
+])
 </script>

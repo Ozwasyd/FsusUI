@@ -58,6 +58,18 @@
       },
       "receiptDirectory": ".readiness/receipts/playwright-markdown",
       "evidenceDirectory": ".tmp/playwright-markdown"
+    },
+    "visual-runtime-reuse": {
+      "gate": "visual-runtime-reuse",
+      "suiteIds": [
+        "visual-runtime-reuse"
+      ],
+      "runtimeMode": "prepared-reuse",
+      "artifactNamespace": {
+        "visual-runtime-reuse": "visual-runtime-reuse-{project}"
+      },
+      "receiptDirectory": ".readiness/receipts/visual-runtime-reuse",
+      "evidenceDirectory": ".tmp/visual-runtime-reuse"
     }
   }
 }

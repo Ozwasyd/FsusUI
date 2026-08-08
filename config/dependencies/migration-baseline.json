@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
   "purpose": "zero-version-change migration freeze; updated after deps:sync (#406) pin correction + exact install projection",
-  "createdAt": "2026-08-06T16:39:22.151Z",
+  "createdAt": "2026-08-09T02:20:00.000Z",
   "files": {
     "pnpm-lock.yaml": "9160eda59f2ebd9e27701d9df9718ccb7b327ceb83d418310ef542b1651451d7",
-    "package.json": "6db2d8e04e9460d148efac1767fc4cfc55d614661ea05d2afeacb2ed81465575",
+    "package.json": "c8496bbfbb275951b8eaaf46c9c88227757fadd1adb111a3e573433a3bfb7206",
     "vue/packages/element-plus/package.json": "e869928c42ed32578ebbc269e1fb66293a85a64324f484ce7dc142afae9e884c",
     "config/dependencies/npm-authority.json": "cbbfc945c7fbc24bb65fe2c94074bb552494cc1e16c2f7ad0d087835fb14df13"
   },
   "installPackageCount": 94,
-  "note": "deps:sync projects install exact versions into workspace manifests and published ranges into element-plus. Multi-version direct deps (consola/tsx/csstype) unified to majority direct lock resolutions; transitive dual versions may remain. Subsequent changes must not upgrade install pins without an intentional dependency upgrade issue. Baseline updated after CI gate wiring (#410).",
+  "note": "zero-version-change migration freeze; refreshed package.json hash after #415/#562/#404 added governance scripts (no version-pin changes). Other files unchanged.",
   "multiVersionUnifications": {
     "consola": {
       "from": [

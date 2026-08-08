@@ -20,7 +20,7 @@ The command starts the demo fixture server, runs Chromium, starts the Avalonia d
 - `avalonia/summary.json` plus per-scenario raw samples and disposal timings;
 - environment identity including OS, CPU, logical cores, runtime/browser/Avalonia versions, DPR, refresh target, window DPI and the resolved Avalonia renderer/window backend.
 
-On headless Linux the command requires `xvfb-run`; otherwise it uses the active desktop session. The quick profile uses one warm-up and five measured samples. The full profile uses three warm-ups and twelve measured samples:
+On headless Linux the command requires `xvfb-run`; otherwise it uses the active desktop session. The quick profile uses one warm-up and twenty-one measured samples so its p95 is a true 95th-percentile tail statistic instead of the single worst sample. The full profile uses three warm-ups and twelve measured samples:
 
 ```bash
 pnpm perf:render -- --profile full --output .tmp/performance/full
@@ -130,10 +130,13 @@ not used.
 
 When the base revision is compatible, CI measures the base SHA and proposed SHA
 sequentially on the same GitHub runner, then rejects a p95 regression above 15%.
-Both checkouts have independent `node_modules` and process/server lifetimes, but
-their installs share the runner's pnpm store cache. Chromium is installed once.
-This preserves isolation without comparing unrelated hardware or concurrent
-CPU, GC, renderer and I/O noise.
+The quick profile collects twenty-one samples per scenario on each side, so a
+single scheduler or GC spike cannot decide the gate; a real tail regression must
+still show up in the 95th percentile. Both checkouts have independent
+`node_modules` and process/server lifetimes, but their installs share the
+runner's pnpm store cache. Chromium is installed once. This preserves isolation
+without comparing unrelated hardware or concurrent CPU, GC, renderer and I/O
+noise.
 
 The complete local paired workflow is:
 

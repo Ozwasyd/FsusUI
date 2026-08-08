@@ -14,7 +14,8 @@ import {
 delete process.env.NO_COLOR
 
 const previewPort = resolveTestPort('FSUS_VISUAL_PREVIEW_PORT', 4173)
-const previewBaseUrl = `http://127.0.0.1:${previewPort}`
+const externalServer = process.env.FSUS_PLAYWRIGHT_EXTERNAL_SERVER
+const previewBaseUrl = externalServer ?? `http://127.0.0.1:${previewPort}`
 const evidencePolicy = visualEvidencePolicy()
 
 export default defineConfig({
@@ -94,10 +95,10 @@ export default defineConfig({
       },
     },
   ],
-  webServer: {
+  ...(externalServer ? {} : { webServer: {
     command: `node ../scripts/serve-visual-runtime.mjs --suite=preview --host=127.0.0.1 --port=${previewPort}`,
     url: previewBaseUrl,
     reuseExistingServer: process.env.FSUS_VISUAL_REUSE_SERVER === '1',
     timeout: 240_000,
-  },
+  } }),
 })

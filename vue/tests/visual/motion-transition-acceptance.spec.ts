@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
+import { collectCssRules } from '../support/css-scan'
 import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
 
 const diagnostics = new WeakMap<Page, string[]>()
@@ -25,27 +26,23 @@ test('zoom-in transitions use opacity+translate, no axis scale', async ({ page }
   await page.goto(buildVisualUrl('', testInfo.project.name), { waitUntil: 'domcontentloaded' })
   await stabilizePage(page)
 
-  const violations = await page.evaluate(() => {
-    const v: string[] = []
-    for (const s of Array.from(document.styleSheets)) {
-      try {
-        const t = Array.from(s.cssRules).map((r) => r.cssText).join('\\n')
-        // No scaleX(0) or scaleY(0) — axis compression
-        if ((t.includes('zoom-in') || t.includes('el-zoom-in')) && /scale[XY]\\(0\\)/.test(t))
-          v.push('axis scale-to-zero found')
-        // No scale(0.45) — strong zoom
-        if ((t.includes('zoom-in') || t.includes('el-zoom-in')) && /scale\\(0\\.45/.test(t))
-          v.push('scale(0.45) found')
-        // No translateY(-30px) — large displacement
-        if (t.includes('list-enter-from') && /translateY\\(-30px\\)/.test(t))
-          v.push('30px list displacement found')
-        // fade-linear must not have scaleX(0)
-        if (t.includes('zoom-in-center') && /scaleX/.test(t))
-          v.push('fade-linear axis compression found')
-      } catch {}
-    }
-    return v
-  })
+  // Selector-scoped gate: evaluate each rule against its own selector and
+  // declarations, not joined whole-sheet text (cross-rule joins false-positive
+  // on unrelated rules in the same stylesheet).
+  const rules = await collectCssRules(page)
+  const violations: string[] = []
+  for (const rule of rules) {
+    const selector = rule.selectorText
+    const css = rule.cssText
+    if ((selector.includes('zoom-in') || selector.includes('el-zoom-in')) && /scale[XY]\(0\)/.test(css))
+      violations.push('axis scale-to-zero found')
+    if ((selector.includes('zoom-in') || selector.includes('el-zoom-in')) && /scale\(0\.45\)/.test(css))
+      violations.push('scale(0.45) found')
+    if (selector.includes('list-enter-from') && /translateY\(-30px\)/.test(css))
+      violations.push('30px list displacement found')
+    if (selector.includes('zoom-in-center') && /scaleX/.test(css))
+      violations.push('fade-linear axis compression found')
+  }
   expect(violations).toEqual([])
 })
 
@@ -54,19 +51,17 @@ test('list transitions use <=8px displacement', async ({ page }, testInfo) => {
   await page.goto(buildVisualUrl('', testInfo.project.name), { waitUntil: 'domcontentloaded' })
   await stabilizePage(page)
 
-  const displacements = await page.evaluate(() => {
-    const d: string[] = []
-    for (const s of Array.from(document.styleSheets)) {
-      try {
-        const t = Array.from(s.cssRules).map((r) => r.cssText).join('\\n')
-        if (t.includes('list-enter-from') || t.includes('list-leave-to')) {
-          const m = t.match(/translateY\\((-?\\d+)px\\)/g)
-          if (m) d.push(...m)
-        }
-      } catch {}
+  const rules = await collectCssRules(page)
+  const displacements: string[] = []
+  for (const rule of rules) {
+    if (
+      rule.selectorText.includes('list-enter-from') ||
+      rule.selectorText.includes('list-leave-to')
+    ) {
+      const m = rule.cssText.match(/translateY\((-?\d+)px\)/g)
+      if (m) displacements.push(...m)
     }
-    return d
-  })
+  }
   for (const d of displacements) {
     const px = parseInt(d.match(/(-?\d+)/)?.[1] ?? '0')
     expect(Math.abs(px)).toBeLessThanOrEqual(8)
@@ -78,19 +73,17 @@ test('zoom-in overlay transitions have scale >= 0.98', async ({ page }, testInfo
   await page.goto(buildVisualUrl('', testInfo.project.name), { waitUntil: 'domcontentloaded' })
   await stabilizePage(page)
 
-  const scales = await page.evaluate(() => {
-    const s: string[] = []
-    for (const sheet of Array.from(document.styleSheets)) {
-      try {
-        const t = Array.from(sheet.cssRules).map((r) => r.cssText).join('\\n')
-        if (t.includes('zoom-in-bottom-enter-from') || t.includes('zoom-in-left-enter-from')) {
-          const m = t.match(/scale\\(([0-9.]+)\\)/g)
-          if (m) s.push(...m)
-        }
-      } catch {}
+  const rules = await collectCssRules(page)
+  const scales: string[] = []
+  for (const rule of rules) {
+    if (
+      rule.selectorText.includes('zoom-in-bottom-enter-from') ||
+      rule.selectorText.includes('zoom-in-left-enter-from')
+    ) {
+      const m = rule.cssText.match(/scale\(([0-9.]+)\)/g)
+      if (m) scales.push(...m)
     }
-    return s
-  })
+  }
   for (const sc of scales) {
     const val = parseFloat(sc.match(/\(([0-9.]+)\)/)?.[1] ?? '0')
     expect(val).toBeGreaterThanOrEqual(0.98)
@@ -102,15 +95,10 @@ test('no transition uses 500ms', async ({ page }, testInfo) => {
   await page.goto(buildVisualUrl('', testInfo.project.name), { waitUntil: 'domcontentloaded' })
   await stabilizePage(page)
 
-  const has500ms = await page.evaluate(() => {
-    for (const s of Array.from(document.styleSheets)) {
-      try {
-        const t = Array.from(s.cssRules).map((r) => r.cssText).join('\\n')
-        if (/transition-duration:\\s*500ms/.test(t)) return true
-      } catch {}
-    }
-    return false
-  })
+  const rules = await collectCssRules(page)
+  const has500ms = rules.some((rule) =>
+    /transition-duration:\s*500ms/.test(rule.cssText),
+  )
   expect(has500ms).toBe(false)
 })
 

@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
   "policy": "no-growth-ratchet",
-  "provenance": "2026-08-06 consumer Vite manifest after markdown worker UTF-8 re-auth fix (cold package install); raw ratchet measured on main Quality Gates consumer-install leaf",
+  "provenance": "2026-08-09 consumer Vite manifest refreshed for premerge gate repair (cold package install on main base c463db9f2f); PR #565 npm candidate is byte-identical to the main candidate in the 7-file consumer startup A/B; startup drift since 2026-08-06 comes from the motion legacy alias registry (#469) and theme surface refactors on main",
   "startup": {
-    "raw": 143183,
-    "gzip": 46187,
-    "brotli": 41475
+    "raw": 143893,
+    "gzip": 46296,
+    "brotli": 41498
   },
   "markdownHydration": {
     "raw": 81771,

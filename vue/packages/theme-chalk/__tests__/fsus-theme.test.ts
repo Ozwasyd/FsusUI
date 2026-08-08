@@ -1103,7 +1103,7 @@ describe('Fsus theme visual baseline', () => {
       [
         'border-color: var(--el-theme-mode-toggle-active-border-color, transparent) !important;',
         'border-radius: 6px;',
-        'box-shadow: inset 0 0 0 1px var(--el-theme-mode-toggle-active-ring, color-mix(in srgb, var(--fsus-scholarly-blue) 24%, transparent)) !important;',
+        'box-shadow: inset 0 0 0 2px var(--el-theme-mode-toggle-active-ring, color-mix(in srgb, var(--fsus-scholarly-blue) 24%, transparent)) !important;',
       ],
     )
     expectCssRule(
@@ -1111,7 +1111,7 @@ describe('Fsus theme visual baseline', () => {
       '.el-theme-mode-toggle .el-radio-button.is-active .el-radio-button__inner',
       [
         'background: var(--el-theme-mode-toggle-active-bg, color-mix(in srgb, var(--fsus-scholarly-blue) 14%, var(--el-bg-color)));',
-        'box-shadow: inset 0 0 0 1px var(--el-theme-mode-toggle-active-ring, color-mix(in srgb, var(--fsus-scholarly-blue) 24%, transparent)) !important;',
+        'box-shadow: inset 0 0 0 2px var(--el-theme-mode-toggle-active-ring, color-mix(in srgb, var(--fsus-scholarly-blue) 24%, transparent)) !important;',
       ],
     )
   })
@@ -1135,7 +1135,7 @@ describe('Fsus theme visual baseline', () => {
       [
         'border-color: transparent !important;',
         'var(--el-box-shadow-lighter),',
-        'inset 0 0 0 1px color-mix(in srgb, var(--fsus-scholarly-blue) 18%, transparent) !important;',
+        'inset 0 0 0 2px color-mix(in srgb, var(--fsus-scholarly-blue) 18%, transparent) !important;',
         'z-index: 1;',
       ],
     )

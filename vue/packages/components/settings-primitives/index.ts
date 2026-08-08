@@ -11,6 +11,7 @@ import ResourceListItem from './src/resource-list-item.vue'
 import RiskNotice from './src/risk-notice.vue'
 import SectionHeader from './src/section-header.vue'
 import SectionNav from './src/section-nav.vue'
+import SectionNavLink from './src/section-nav-link.vue'
 import SettingsSection from './src/settings-section.vue'
 import TypedConfirmField from './src/typed-confirm-field.vue'
 
@@ -26,6 +27,11 @@ export const ElSectionNav = withInstall(SectionNav, {
   FsusSectionNav: withFsusAlias(SectionNav, 'FsusSectionNav'),
 })
 export const FsusSectionNav = ElSectionNav.FsusSectionNav
+
+export const ElSectionNavLink = withInstall(SectionNavLink, {
+  FsusSectionNavLink: withFsusAlias(SectionNavLink, 'FsusSectionNavLink'),
+})
+export const FsusSectionNavLink = ElSectionNavLink.FsusSectionNavLink
 
 export const ElSettingsSection = withInstall(SettingsSection, {
   FsusSettingsSection: withFsusAlias(SettingsSection, 'FsusSettingsSection'),

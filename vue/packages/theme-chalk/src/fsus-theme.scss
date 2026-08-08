@@ -778,7 +778,7 @@ html.dark {
   border-color: transparent !important;
   box-shadow:
     var(--el-box-shadow-lighter),
-    inset 0 0 0 1px
+    inset 0 0 0 2px
       color-mix(in srgb, var(--fsus-scholarly-blue) 18%, transparent) !important;
   z-index: 1;
 }
@@ -1266,7 +1266,7 @@ html.dark .#{$namespace}-switch__action {
       transparent
     ) !important;
     border-radius: 6px;
-    box-shadow: inset 0 0 0 1px
+    box-shadow: inset 0 0 0 2px
       var(
         --#{$namespace}-theme-mode-toggle-active-ring,
         color-mix(in srgb, var(--fsus-scholarly-blue) 24%, transparent)
@@ -1278,7 +1278,7 @@ html.dark .#{$namespace}-switch__action {
       --#{$namespace}-theme-mode-toggle-active-bg,
       color-mix(in srgb, var(--fsus-scholarly-blue) 14%, var(--el-bg-color))
     );
-    box-shadow: inset 0 0 0 1px
+    box-shadow: inset 0 0 0 2px
       var(
         --#{$namespace}-theme-mode-toggle-active-ring,
         color-mix(in srgb, var(--fsus-scholarly-blue) 24%, transparent)
@@ -3382,8 +3382,11 @@ button.#{$namespace}-card:active {
 
   .#{$namespace}-checkbox-button.is-focus:not(.is-checked)
     .#{$namespace}-checkbox-button__inner,
-  .#{$namespace}-radio-button:not(.is-active):focus-within
-    .#{$namespace}-radio-button__inner {
+  // Suppress the ring only for touch (non-focus-visible) focus on inactive
+  // segments; keyboard focus-visible must keep the 2px inset ring contract.
+  .#{$namespace}-radio-button:not(.is-active)
+    .#{$namespace}-radio-button__original-radio:focus:not(:focus-visible)
+    + .#{$namespace}-radio-button__inner {
     border-color: var(--el-border-color) !important;
     box-shadow: none !important;
     z-index: auto;

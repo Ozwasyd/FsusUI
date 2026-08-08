@@ -204,7 +204,7 @@ const pictureFiles: UploadUserFile[] = [
     name: 'banner-hero.png',
     status: 'success',
     uid: 8001,
-    url: 'https://fuss10.elemecdn.com/3/28/bb3e3c3e0b3e3c3e0b3e3c3e0b3e3c3e.png',
+    url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
   },
 ]
 
@@ -213,20 +213,20 @@ const pictureMultiFiles: UploadUserFile[] = [
     name: 'product-shot-1.jpg',
     status: 'success',
     uid: 8002,
-    url: 'https://fuss10.elemecdn.com/3/28/bb3e3c3e0b3e3c3e0b3e3c3e0b3e3c3e.png',
+    url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
   },
   {
     name: 'product-shot-2.jpg',
     status: 'uploading',
     uid: 8003,
     percentage: 55,
-    url: 'https://fuss10.elemecdn.com/3/28/bb3e3c3e0b3e3c3e0b3e3c3e0b3e3c3e.png',
+    url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
   },
   {
     name: 'product-shot-3.jpg',
     status: 'fail',
     uid: 8004,
-    url: 'https://fuss10.elemecdn.com/3/28/bb3e3c3e0b3e3c3e0b3e3c3e0b3e3c3e.png',
+    url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
   },
 ]
 
@@ -235,26 +235,26 @@ const pictureCardFiles: UploadUserFile[] = [
     name: 'screenshot-1.png',
     status: 'success',
     uid: 9001,
-    url: 'https://fuss10.elemecdn.com/3/28/bb3e3c3e0b3e3c3e0b3e3c3e0b3e3c3e.png',
+    url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
   },
   {
     name: 'screenshot-2.png',
     status: 'success',
     uid: 9002,
-    url: 'https://fuss10.elemecdn.com/e/5e/0b3e3c3e0b3e3c3e0b3e3c3e0b3e3c3e.png',
+    url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
   },
   {
     name: 'screenshot-3.png',
     status: 'uploading',
     uid: 9003,
     percentage: 78,
-    url: 'https://fuss10.elemecdn.com/3/28/bb3e3c3e0b3e3c3e0b3e3c3e0b3e3c3e.png',
+    url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
   },
   {
     name: 'broken-thumbnail.jpg',
     status: 'fail',
     uid: 9004,
-    url: 'https://example.com/missing-image-404.jpg',
+    url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
   },
 ]
 
@@ -263,13 +263,13 @@ const pictureCardDisabledFiles: UploadUserFile[] = [
     name: 'locked-pic-1.png',
     status: 'success',
     uid: 9005,
-    url: 'https://fuss10.elemecdn.com/3/28/bb3e3c3e0b3e3c3e0b3e3c3e0b3e3c3e.png',
+    url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
   },
   {
     name: 'locked-pic-2.png',
     status: 'success',
     uid: 9006,
-    url: 'https://fuss10.elemecdn.com/e/5e/0b3e3c3e0b3e3c3e0b3e3c3e0b3e3c3e.png',
+    url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
   },
 ]
 </script>

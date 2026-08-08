@@ -38,7 +38,7 @@ internal static class RenderPerformanceRunner
     profile = ReadArgument(args, "--profile") ?? "quick";
     outputPath = ReadArgument(args, "--output") ?? outputPath;
     warmups = ReadInt(args, "--warmups", profile == "full" ? 3 : 1);
-    samples = ReadInt(args, "--samples", profile == "full" ? 12 : 5);
+    samples = ReadInt(args, "--samples", profile == "full" ? 12 : 21);
     longScrollIterations = ReadInt(args, "--long-scroll-iterations", 256);
     requestedBackend = ReadArgument(args, "--backend") ?? "auto";
     scenarioFilter = ReadArgument(args, "--scenario");

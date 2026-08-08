@@ -168,13 +168,13 @@
 .#{$namespace}-zoom-in-center-enter-from,
 .#{$namespace}-zoom-in-center-leave-to {
   opacity: 0;
-  transform: scaleX(0);
+  transform: scale(0.98);
 }
 
 .#{$namespace}-zoom-in-center-leave-from,
 .#{$namespace}-zoom-in-center-enter-to {
   opacity: 1;
-  transform: scaleX(1);
+  transform: scale(1);
 }
 
 .#{$namespace}-zoom-in-top-enter-active {
@@ -230,13 +230,13 @@
 .#{$namespace}-zoom-in-bottom-enter-from,
 .#{$namespace}-zoom-in-bottom-leave-to {
   opacity: 0;
-  transform: scaleY(0);
+  transform: translate3d(0, 6px, 0) scale(0.98);
 }
 
 .#{$namespace}-zoom-in-bottom-leave-from,
 .#{$namespace}-zoom-in-bottom-enter-to {
   opacity: 1;
-  transform: scaleY(1);
+  transform: translate3d(0, 0, 0) scale(1);
 }
 
 .#{$namespace}-zoom-in-left-enter-active {
@@ -254,13 +254,13 @@
 .#{$namespace}-zoom-in-left-enter-from,
 .#{$namespace}-zoom-in-left-leave-to {
   opacity: 0;
-  transform: scale(0.45, 0.45);
+  transform: translate3d(0, 6px, 0) scale(0.98);
 }
 
 .#{$namespace}-zoom-in-left-leave-from,
 .#{$namespace}-zoom-in-left-enter-to {
   opacity: 1;
-  transform: scale(1, 1);
+  transform: translate3d(0, 0, 0) scale(1);
 }
 
 .#{$namespace}-list-enter-active {
@@ -283,7 +283,7 @@
 .#{$namespace}-list-enter-from,
 .#{$namespace}-list-leave-to {
   opacity: 0;
-  transform: translateY(-30px);
+  transform: translateY(-8px);
 }
 
 .#{$namespace}-list-leave-from,

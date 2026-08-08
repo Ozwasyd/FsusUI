@@ -1,18 +1,13 @@
 #!/usr/bin/env node
-/* global fetch, setTimeout */
+/* global URL */
 
 import { createHash } from 'node:crypto'
 import { spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import {
-  loadPlaywrightOwners,
-  planOwnerCells,
-} from './layout-playwright-plan.mjs'
-import { loadPlaywrightSuiteRegistry } from './playwright-suites.mjs'
 import { sha256File, validateCellReceipt } from './layout-playwright-verify.mjs'
-import { BOUNDARY_FIXED_CELLS, loadBoundaryOwnerPlan } from './boundary-playwright-plan.mjs'
+import { loadBoundaryOwnerPlan } from './boundary-playwright-plan.mjs'
 import { fingerprintPaths } from './visual-runtime-core.mjs'
 import fg from 'fast-glob'
 

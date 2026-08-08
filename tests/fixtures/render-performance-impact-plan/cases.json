@@ -43,6 +43,21 @@
     "scope": "skip"
   },
   {
+    "name": "skip-safe premerge static gate ownership",
+    "files": [
+      "config/dependencies/migration-baseline.json",
+      "scripts/boundary-playwright-owner-run.mjs",
+      "scripts/boundary-playwright-runner.mjs",
+      "scripts/consumer-performance-baseline.json",
+      "scripts/deps-baseline-verify.mjs",
+      "scripts/deps-freshness.mjs",
+      "scripts/markdown-playwright-owner-run.mjs",
+      "scripts/test-playwright-visual-reuse-owner.mjs",
+      "vue/playwright.config.ts"
+    ],
+    "scope": "skip"
+  },
+  {
     "name": "skip-safe CI orchestration and generated component contracts",
     "files": [
       ".github/workflows/quality.yml",

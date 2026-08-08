@@ -116,7 +116,7 @@ export const createImpactPlan = ({
     measurement: {
       profile: 'quick',
       warmups: 1,
-      samples: 5,
+      samples: 21,
       order: ['baseline', 'current'],
       sameRunner: true,
       isolatedState: true,
@@ -139,7 +139,7 @@ export const verifyImpactPlan = (plan) => {
     throw new Error('Performance impact plan digest is invalid')
   if (plan.measurement?.profile !== 'quick')
     throw new Error('PR performance impact plan must use the quick profile')
-  if (plan.measurement?.warmups !== 1 || plan.measurement?.samples !== 5)
+  if (plan.measurement?.warmups !== 1 || plan.measurement?.samples !== 21)
     throw new Error('PR performance impact plan has an unsupported sample plan')
   if (JSON.stringify(plan.measurement?.order) !== '["baseline","current"]')
     throw new Error(
