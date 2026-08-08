@@ -687,12 +687,12 @@ test('dragger drag-over changes border and background only, no glow/scale', asyn
 
   // Simulate drag-over with a real DataTransfer (constructing a DragEvent
   // from a plain dataTransfer object is not supported by Chromium).
-  await page.evaluate((element) => {
+  await dragger.evaluate((element) => {
     const transfer = new DataTransfer()
     element.dispatchEvent(
       new DragEvent('dragover', { dataTransfer: transfer, bubbles: true }),
     )
-  }, dragger)
+  })
 
   // Check the is-dragover class was applied
   await expect(dragger).toHaveClass(/is-dragover/)

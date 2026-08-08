@@ -3382,8 +3382,11 @@ button.#{$namespace}-card:active {
 
   .#{$namespace}-checkbox-button.is-focus:not(.is-checked)
     .#{$namespace}-checkbox-button__inner,
-  .#{$namespace}-radio-button:not(.is-active):focus-within
-    .#{$namespace}-radio-button__inner {
+  // Suppress the ring only for touch (non-focus-visible) focus on inactive
+  // segments; keyboard focus-visible must keep the 2px inset ring contract.
+  .#{$namespace}-radio-button:not(.is-active)
+    .#{$namespace}-radio-button__original-radio:focus:not(:focus-visible)
+    + .#{$namespace}-radio-button__inner {
     border-color: var(--el-border-color) !important;
     box-shadow: none !important;
     z-index: auto;

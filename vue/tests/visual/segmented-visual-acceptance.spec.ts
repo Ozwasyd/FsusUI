@@ -234,11 +234,10 @@ test('CheckboxButton supports multi-selection', async ({ page }, testInfo) => {
   await page.goto(buildVisualUrl('segmented-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
   await stabilizePage(page)
   const items = page.locator('[data-segmented-variant="checkbox-multi"] .el-checkbox-button')
-  // count() is non-waiting; ensure the fixture group has mounted before
-  // measuring the pre-selected state.
-  await expect(items.first()).toBeAttached()
-  const activeCount = await items.locator('.is-checked').count()
-  expect(activeCount).toBeGreaterThanOrEqual(2)
+  // is-checked is applied to the button label itself, so :scope is required;
+  // toHaveCount auto-waits for Vue to flush the pre-selected state. The
+  // fixture model is ['a', 'c'], so exactly two buttons must be checked.
+  await expect(items.locator(':scope.is-checked')).toHaveCount(2)
 })
 
 // ============================================================
