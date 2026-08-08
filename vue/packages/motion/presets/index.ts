@@ -43,6 +43,21 @@ export const motionPresetAliases = {
   'list-stagger': 'index-list-settle',
   'route-fade': 'route-settle',
   'card-hover': 'paper-settle',
+  // zoom-in-* overlay/menu/popover transitions
+  'zoom-in-center': 'dialog-settle',
+  'zoom-in-top': 'sheet-settle',
+  'zoom-in-bottom': 'sheet-settle',
+  'zoom-in-left': 'sheet-settle',
+  'el-zoom-in-center': 'dialog-settle',
+  'el-zoom-in-top': 'sheet-settle',
+  'el-zoom-in-bottom': 'sheet-settle',
+  'el-zoom-in-left': 'sheet-settle',
+  // generic fade / collapse / list
+  'el-fade-in-linear': 'surface-settle',
+  'el-fade-in': 'surface-settle',
+  'collapse-transition': 'index-list-settle',
+  'list': 'index-list-settle',
+  'list-inline': 'index-list-settle',
 } as const satisfies Record<MotionLegacyPresetName, MotionPresetName>
 
 // Each preset picks a pattern + tier from the M3 4×2 scale. The runtime

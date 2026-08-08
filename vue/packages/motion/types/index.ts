@@ -64,6 +64,19 @@ export const motionLegacyPresetNames = [
   'list-stagger',
   'route-fade',
   'card-hover',
+  'zoom-in-center',
+  'zoom-in-top',
+  'zoom-in-bottom',
+  'zoom-in-left',
+  'el-zoom-in-center',
+  'el-zoom-in-top',
+  'el-zoom-in-bottom',
+  'el-zoom-in-left',
+  'el-fade-in-linear',
+  'el-fade-in',
+  'collapse-transition',
+  'list',
+  'list-inline',
 ] as const
 
 export type MotionLegacyPresetName = (typeof motionLegacyPresetNames)[number]
