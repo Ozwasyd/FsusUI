@@ -174,6 +174,30 @@ const receiptFor = (cell, overrides = {}) => ({
 })
 const allReceipts = mainPlan.cells.map(receiptFor)
 validateCellReceipt(allReceipts[0], mainPlan.cells[0])
+validateCellReceipt(
+  receiptFor(mainPlan.cells[0], {
+    toolchain: {
+      node: 'v22',
+      pnpm: '10.33.0',
+      playwright: '1.59.1',
+      chromiumRevision: 'chromium-1234',
+    },
+  }),
+  mainPlan.cells[0],
+)
+
+expectFailure('receipt with null firefoxRevision rejected', () => {
+  const receipt = receiptFor(mainPlan.cells[0], {
+    toolchain: {
+      node: 'v22',
+      pnpm: '10.33.0',
+      playwright: '1.59.1',
+      chromiumRevision: 'chromium-1234',
+      firefoxRevision: null,
+    },
+  })
+  validateCellReceipt(receipt, mainPlan.cells[0])
+})
 
 expectFailure('receipt zero passed is fail-closed', () => {
   const receipt = receiptFor(mainPlan.cells[0], {

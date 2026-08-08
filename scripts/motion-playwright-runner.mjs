@@ -70,6 +70,17 @@ const readBrowserRevision = (prefix) => {
   }
 }
 
+export const readBrowserToolchain = () => {
+  const chromiumRevision = readBrowserRevision('chromium')
+  const firefoxRevision = readBrowserRevision('firefox')
+  const webkitRevision = readBrowserRevision('webkit')
+  return {
+    chromiumRevision,
+    ...(firefoxRevision ? { firefoxRevision } : {}),
+    ...(webkitRevision ? { webkitRevision } : {}),
+  }
+}
+
 const allocateFreePort = async () =>
   new Promise((resolvePromise, rejectPromise) => {
     const probe = createServer()
@@ -271,9 +282,7 @@ export async function runMotionCell(ownerId, cellId, group, options = {}) {
           playwrightVersion.status === 0
             ? playwrightVersion.stdout.trim()
             : findPlaywrightPackage(),
-        chromiumRevision: readBrowserRevision('chromium'),
-        firefoxRevision: readBrowserRevision('firefox'),
-        webkitRevision: readBrowserRevision('webkit'),
+        ...readBrowserToolchain(),
       },
       runtime: {
         runtimeMode: runtime.runtimeMode,
@@ -327,9 +336,7 @@ export async function runMotionCell(ownerId, cellId, group, options = {}) {
           node: process.version,
           pnpm: 'unknown',
           playwright: findPlaywrightPackage(),
-          chromiumRevision: readBrowserRevision('chromium'),
-          firefoxRevision: readBrowserRevision('firefox'),
-          webkitRevision: readBrowserRevision('webkit'),
+          ...readBrowserToolchain(),
         },
         runtime,
         config: { path: cell.config, sha256: cell.configSha256 },
