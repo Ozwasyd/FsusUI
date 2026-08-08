@@ -1258,7 +1258,7 @@ describe('Fsus theme visual baseline', () => {
         'background: var(--el-theme-mode-toggle-active-bg);',
         'border-color: var(--el-theme-mode-toggle-active-border-color);',
         'color: var(--el-theme-mode-toggle-active-color);',
-        'box-shadow: inset 0 0 0 1px var(--el-theme-mode-toggle-active-ring) !important;',
+        'box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px) var(--el-theme-mode-toggle-active-ring) !important;',
       ],
     )
   })
@@ -1316,7 +1316,7 @@ describe('Fsus theme visual baseline', () => {
       css,
       '.el-theme-mode-toggle--segmented .el-radio-button__original-radio:focus-visible + .el-radio-button__inner',
       [
-        'box-shadow: inset 0 0 0 1px var(--el-theme-mode-toggle-active-ring) !important;',
+        'box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px) var(--el-theme-mode-toggle-active-ring) !important;',
         'border-radius: 6px;',
       ],
     )
@@ -1326,7 +1326,7 @@ describe('Fsus theme visual baseline', () => {
       [
         'border-color: var(--el-theme-mode-toggle-active-border-color) !important;',
         'border-radius: 6px;',
-        'box-shadow: inset 0 0 0 1px var(--el-theme-mode-toggle-active-ring) !important;',
+        'box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px) var(--el-theme-mode-toggle-active-ring) !important;',
       ],
     )
     expectCssRule(
@@ -1335,7 +1335,7 @@ describe('Fsus theme visual baseline', () => {
       [
         'background: var(--el-theme-mode-toggle-active-bg);',
         'color: var(--el-theme-mode-toggle-active-color);',
-        'box-shadow: inset 0 0 0 1px var(--el-theme-mode-toggle-active-ring) !important;',
+        'box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px) var(--el-theme-mode-toggle-active-ring) !important;',
       ],
     )
   })
