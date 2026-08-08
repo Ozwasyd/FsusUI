@@ -219,7 +219,8 @@
     "test:deps-sync": "node ./scripts/test-deps-sync.mjs",
     "test:deps-check": "node ./scripts/test-deps-check.mjs",
     "deps:baseline:verify": "node ./scripts/deps-baseline-verify.mjs",
-    "check:update-surface": "node ./scripts/with-node-heap.mjs node ./scripts/check-update-surface.mjs"
+    "check:update-surface": "node ./scripts/with-node-heap.mjs node ./scripts/check-update-surface.mjs",
+    "deps:freshness": "node ./scripts/deps-freshness.mjs"
   },
   "peerDependencies": {
     "vue": "^3.5.0"
