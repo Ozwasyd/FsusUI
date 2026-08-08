@@ -3465,7 +3465,7 @@ describe('Fsus theme visual baseline', () => {
       'border-top: 1px solid color-mix(in srgb, var(--el-color-danger) 38%, var(--el-border-color-lighter));',
     ])
     expectCssRule(css, '.el-typed-confirm-field__input:focus', [
-      'border-color: var(--el-color-primary);',
+      'border-color: var(--fsus-scholarly-blue, var(--el-color-primary));',
     ])
     expect(css).toContain('@media (max-width: 640px)')
     expect(css).toContain('grid-template-columns: minmax(0, 1fr);')
