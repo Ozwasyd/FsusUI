@@ -3,7 +3,6 @@ using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Threading;
-using System.Reflection;
 
 namespace FsusUI.Avalonia.Controls;
 
@@ -402,6 +401,38 @@ public class FsusFormItem : ContentControl
     set => SetValue(AsyncValidatorProperty, value);
   }
 
+  private IFsusFormFieldAdapter? fieldAdapter;
+
+  /// <summary>
+  /// Explicit strongly typed adapter for the hosted field control. When set it
+  /// wins over the attached <see cref="FsusFormFieldAdapter.AdapterProperty"/>
+  /// and the built-in control mapping. FsusFormItem never owns or disposes the
+  /// adapter; the reference is used only while this item hosts its field.
+  /// </summary>
+  public IFsusFormFieldAdapter? FieldAdapter
+  {
+    get => fieldAdapter;
+    set
+    {
+      if (ReferenceEquals(fieldAdapter, value))
+      {
+        return;
+      }
+
+      fieldAdapter = value;
+      initialValueCaptured = false;
+      CaptureInitialValue();
+      ApplySizeToField(effectiveSize);
+    }
+  }
+
+  /// <summary>
+  /// Last locatable adapter error (unsupported control, type mismatch, missing
+  /// capability, ...). Cleared whenever an adapter operation succeeds. Unknown
+  /// controls fail clearly through this property instead of silently no-op.
+  /// </summary>
+  public FsusFormFieldAdapterError? FieldAdapterError { get; private set; }
+
   public Control? FieldControl => Content as Control;
 
   public async ValueTask<FsusFormValidationError?> ValidateAsync()
@@ -445,7 +476,7 @@ public class FsusFormItem : ContentControl
   {
     if (initialValueCaptured)
     {
-      SetFieldValue(initialValue);
+      ResetFieldValue(initialValue);
     }
 
     ClearValidation();
@@ -523,65 +554,52 @@ public class FsusFormItem : ContentControl
 
   private string? ResolveRequiredError()
   {
-    if (!IsRequired || !IsEmptyFieldValue(GetFieldValue()))
+    if (!IsRequired)
     {
       return null;
     }
 
-    var label = !string.IsNullOrWhiteSpace(Label) ? Label : FieldName;
-    return $"{label} is required.";
-  }
-
-  private object? GetFieldValue()
-  {
-    var control = FieldControl;
-    return control switch
+    var read = GetFieldValue();
+    if (!read.Status.IsSuccess)
     {
-      FsusInput input => input.Text,
-      TextBox textBox => textBox.Text,
-      FsusCheckbox checkbox => checkbox.IsChecked,
-      FsusRadio radio => radio.IsChecked,
-      FsusSwitch fsusSwitch => fsusSwitch.IsChecked,
-      ToggleButton toggleButton => toggleButton.IsChecked,
-      ComboBox comboBox => comboBox.SelectedItem,
-      _ => ReadProperty(control, "SelectedValue") ??
-        ReadProperty(control, "Value") ??
-        ReadProperty(control, "Text"),
-    };
-  }
-
-  private void SetFieldValue(object? value)
-  {
-    var control = FieldControl;
-    switch (control)
-    {
-      case FsusInput input:
-        input.Text = value as string ?? string.Empty;
-        return;
-      case TextBox textBox:
-        textBox.Text = value as string ?? string.Empty;
-        return;
-      case FsusCheckbox checkbox:
-        checkbox.IsChecked = value as bool?;
-        return;
-      case FsusRadio radio:
-        radio.IsChecked = value as bool?;
-        return;
-      case FsusSwitch fsusSwitch:
-        fsusSwitch.IsChecked = value as bool?;
-        return;
-      case ToggleButton toggleButton:
-        toggleButton.IsChecked = value as bool?;
-        return;
-      case ComboBox comboBox:
-        comboBox.SelectedItem = value;
-        return;
-      default:
-        WriteProperty(control, "SelectedValue", value);
-        WriteProperty(control, "Value", value);
-        WriteProperty(control, "Text", value);
-        return;
+      var label = !string.IsNullOrWhiteSpace(Label) ? Label : FieldName;
+      return $"{label} cannot be validated: {read.Status.Error!.Message}";
     }
+
+    if (!IsEmptyFieldValue(read.Value))
+    {
+      return null;
+    }
+
+    var requiredLabel = !string.IsNullOrWhiteSpace(Label) ? Label : FieldName;
+    return $"{requiredLabel} is required.";
+  }
+
+  private FsusFormFieldReadResult GetFieldValue()
+  {
+    var adapter = ResolveFieldAdapter();
+    if (adapter is null)
+    {
+      var error = CreateUnsupportedAdapterError();
+      SetFieldAdapterError(error);
+      return FsusFormFieldReadResult.Failure(error);
+    }
+
+    var result = adapter.ReadValue();
+    SetFieldAdapterError(result.Status.Error);
+    return result;
+  }
+
+  private void ResetFieldValue(object? initialValue)
+  {
+    var adapter = ResolveFieldAdapter();
+    if (adapter is null)
+    {
+      SetFieldAdapterError(CreateUnsupportedAdapterError());
+      return;
+    }
+
+    SetFieldAdapterError(adapter.TryResetValue(initialValue).Error);
   }
 
   private void CaptureInitialValue()
@@ -591,8 +609,51 @@ public class FsusFormItem : ContentControl
       return;
     }
 
-    initialValue = GetFieldValue();
+    initialValue = GetFieldValue().Value;
     initialValueCaptured = true;
+  }
+
+  private IFsusFormFieldAdapter? ResolveFieldAdapter()
+  {
+    if (FieldAdapter is not null)
+    {
+      return FieldAdapter;
+    }
+
+    if (FieldControl is Control attachedControl &&
+      FsusFormFieldAdapter.GetAdapter(attachedControl) is { } attached)
+    {
+      return attached;
+    }
+
+    if (FieldControl is Control control &&
+      FsusBuiltInFormFieldAdapter.TryResolve(control, out var builtIn))
+    {
+      return builtIn;
+    }
+
+    return null;
+  }
+
+  private void SetFieldAdapterError(FsusFormFieldAdapterError? error)
+  {
+    if (ReferenceEquals(FieldAdapterError, error))
+    {
+      return;
+    }
+
+    FieldAdapterError = error;
+  }
+
+  private FsusFormFieldAdapterError CreateUnsupportedAdapterError()
+  {
+    var controlType = FieldControl?.GetType();
+    return new FsusFormFieldAdapterError(
+      FsusFormFieldAdapterErrorKind.UnsupportedControl,
+      $"No form field adapter is registered for control type {controlType?.Name ?? "null"}. " +
+      "Provide an IFsusFormFieldAdapter explicitly through FsusFormItem.FieldAdapter " +
+      "or FsusFormFieldAdapter.SetAdapter.",
+      controlType);
   }
 
   private static bool IsEmptyFieldValue(object? value) =>
@@ -644,37 +705,31 @@ public class FsusFormItem : ContentControl
       return;
     }
 
-    switch (control)
+    var adapter = ResolveFieldAdapter();
+    if (adapter is null)
     {
-      case FsusTextarea textarea:
-        textarea.Size = size;
-        return;
-      case FsusInputNumber inputNumber:
-        inputNumber.Size = size;
-        return;
-      case FsusInput input:
-        input.Size = size;
-        return;
-      case FsusCheckbox checkbox:
-        checkbox.Size = size;
-        return;
-      case FsusRadio radio:
-        radio.Size = size;
-        return;
-      case FsusSwitch fsusSwitch:
-        fsusSwitch.Size = size;
-        return;
+      SetFieldAdapterError(CreateUnsupportedAdapterError());
+      return;
     }
 
-    WriteProperty(control, "Size", size);
+    SetFieldAdapterError(adapter.TryApplySize(size).Error);
   }
 
   private void ApplyInvalidStateToField(bool isInvalid)
   {
-    if (FieldControl is FsusInput input)
+    var adapter = ResolveFieldAdapter();
+    if (adapter is null)
     {
-      input.IsInvalid = isInvalid;
+      return;
     }
+
+    var result = adapter.TryApplyInvalidState(isInvalid);
+    if (result.Error?.Kind == FsusFormFieldAdapterErrorKind.MissingCapability)
+    {
+      return;
+    }
+
+    SetFieldAdapterError(result.Error);
   }
 
   private void SyncClasses()
@@ -732,45 +787,6 @@ public class FsusFormItem : ContentControl
       FsusFormValidationState.Error => "invalid",
       _ => "none",
     });
-  }
-
-  private static object? ReadProperty(object? target, string propertyName)
-  {
-    if (target is null)
-    {
-      return null;
-    }
-
-    var property = target
-      .GetType()
-      .GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public);
-    return property?.CanRead == true ? property.GetValue(target) : null;
-  }
-
-  private static void WriteProperty(
-    object? target,
-    string propertyName,
-    object? value)
-  {
-    if (target is null)
-    {
-      return;
-    }
-
-    var property = target
-      .GetType()
-      .GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public);
-    if (property?.CanWrite != true)
-    {
-      return;
-    }
-
-    if (value is not null && !property.PropertyType.IsInstanceOfType(value))
-    {
-      return;
-    }
-
-    property.SetValue(target, value);
   }
 
   private static async ValueTask<T> OnUiThreadAsync<T>(Func<T> action)
