@@ -8,6 +8,7 @@
     "ownerReviewRequired": true,
     "reviewAfter": "2026-11-05"
   },
+  "allowlist": [],
   "generated": {
     "producer": "scripts/generate-component-surface-semantic-registry.mjs",
     "sourceRevision": "26d8576dbd7f4aa27b42d171895d72bc9454a769",
@@ -72,7 +73,7 @@
       "path": "vue/packages/theme-chalk/src/date-picker/date-table.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "06d26e0af447cb9f0ec98f56a649327d29f671c66e237c6b09ec3968ea36452d"
+      "digest": "2f6568e5ae8ee58698ea709533ba07e9ca1703eebdb2a12ca239e13f00bf7cf6"
     },
     "implementation-dialog": {
       "path": "vue/packages/theme-chalk/src/dialog.scss",
