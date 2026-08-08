@@ -80,8 +80,8 @@ const validateLayoutWorkflowSource = (source) => {
   ) {
     failures.push('playwright-layout job must not invoke full-config suite commands')
   }
-  if (occurrences(source, 'prepare-visual-runtime.mjs') !== 1) {
-    failures.push('runtime must be prepared exactly once in the reusable workflow')
+  if (occurrences(source, 'prepare-visual-runtime.mjs') !== 2) {
+    failures.push('runtime must be prepared exactly twice in the reusable workflow (layout + boundary)')
   }
   if (occurrences(job, 'playwright install --with-deps chromium') !== 1) {
     failures.push('playwright-layout job must install one fixed Chromium')
