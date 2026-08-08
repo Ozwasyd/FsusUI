@@ -1779,7 +1779,7 @@ button.#{$namespace}-card:active {
   min-width: 40px;
   min-height: 40px;
   line-height: 40px;
-  border-radius: 12px;
+  border-radius: 0;
 }
 
 .#{$namespace}-date-table
@@ -1789,7 +1789,7 @@ button.#{$namespace}-card:active {
 .#{$namespace}-year-table td .cell:hover,
 .#{$namespace}-time-spinner__item:hover:not(.disabled):not(.active) {
   background: var(--fsus-state-hover-bg);
-  color: var(--el-text-color-primary);
+  color: var(--fsus-scholarly-blue);
 }
 
 .#{$namespace}-date-table
@@ -1798,8 +1798,8 @@ button.#{$namespace}-card:active {
 .#{$namespace}-month-table td.current:not(.disabled) .cell,
 .#{$namespace}-year-table td.current:not(.disabled) .cell,
 .#{$namespace}-time-spinner__item.active:not(.disabled) {
-  background: var(--el-color-primary);
-  color: var(--el-bg-color);
+  background: var(--fsus-scholarly-blue);
+  color: var(--fsus-color-white, #ffffff);
 }
 
 .#{$namespace}-date-editor .#{$namespace}-input__inner::selection,
