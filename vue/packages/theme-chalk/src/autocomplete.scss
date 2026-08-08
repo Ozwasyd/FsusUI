@@ -1,5 +1,6 @@
 @use 'mixins/mixins' as *;
 @use 'mixins/utils' as *;
+@use 'mixins/overlay-option-row-primitive' as option-row;
 @use 'common/var' as *;
 
 @include b(autocomplete) {
@@ -95,4 +96,6 @@
       vertical-align: middle;
     }
   }
+
+  @include option-row.fsus-overlay-option-row-primitive('li');
 }
