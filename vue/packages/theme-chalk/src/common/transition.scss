@@ -41,7 +41,6 @@
 .#{$namespace}-zoom-in-center-enter-from,
 .#{$namespace}-zoom-in-center-leave-active {
   opacity: 0;
-  transform: scaleX(0);
 }
 
 .#{$namespace}-zoom-in-top-enter-active,
@@ -188,7 +187,7 @@
 .#{$namespace}-list-enter-from,
 .#{$namespace}-list-leave-to {
   opacity: 0;
-  transform: translateY(-30px);
+  transform: translateY(-8px);
 }
 
 .#{$namespace}-list-leave-active {
