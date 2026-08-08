@@ -65,30 +65,30 @@
     }
 
 
-    &.in-range .#{$namespace}-date-table-cell {
-      background-color: getCssVar('datepicker-inrange-bg-color');
+    // Continuous in-range background band (ref #453)
+    // Applied at the td level so the background spans across adjacent cells.
+    &.in-range {
+      background-color: var(--fsus-date-range-bg, var(--fsus-state-selected-bg));
       &:hover {
-        background-color: getCssVar('datepicker-inrange-hover-bg-color');
+        background-color: var(--fsus-date-range-bg, var(--fsus-state-selected-bg));
+      }
+      .#{$namespace}-date-table-cell {
+        background-color: transparent;
+        &:hover {
+          background-color: transparent;
+        }
       }
     }
 
-
+    // Range start/end anchors: Scholarly Blue solid marker (ref #453)
     &.start-date .#{$namespace}-date-table-cell,
     &.end-date .#{$namespace}-date-table-cell {
-      color: $color-white;
+      color: var(--fsus-color-white, #ffffff);
     }
 
     &.start-date .#{$namespace}-date-table-cell__text,
     &.end-date .#{$namespace}-date-table-cell__text {
-      background-color: getCssVar('datepicker-active-color');
-    }
-
-    &.start-date .#{$namespace}-date-table-cell {
-      margin-left: 5px;
-    }
-
-    &.end-date .#{$namespace}-date-table-cell {
-      margin-right: 5px;
+      background-color: var(--fsus-scholarly-blue);
     }
 
     &.disabled .#{$namespace}-date-table-cell {
