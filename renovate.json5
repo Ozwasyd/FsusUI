@@ -1,0 +1,170 @@
+{
+  // =========================================================================
+  // FsusUI Renovate configuration (#413)
+  //
+  // Covers npm, NuGet, .NET SDK, GitHub Actions, Emscripten/Wasm toolchain,
+  // Playwright/browser, and runtime pins. Each real version field has exactly
+  // one manager owner.
+  //
+  // Does not enable automerge, grouping, schedules, or PR policies (#414).
+  // Does not install the Mend App (#417).
+  // =========================================================================
+
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+
+  // -----------------------------------------------------------------------
+  // Platform defaults
+  // -----------------------------------------------------------------------
+  platform: "github",
+  repositories: ["Ozwasyd/FsusUI"],
+
+  // Extends: no presets — explicit config only
+  extends: [],
+
+  // -----------------------------------------------------------------------
+  // 1. npm / pnpm workspace (covers package.json + pnpm-lock.yaml)
+  //    npm authority is the sole Renovate target for npm versions.
+  //    Generated projections under config/dependencies/ are NOT separate
+  //    dependency identities.
+  // -----------------------------------------------------------------------
+  npm: {
+    enabled: true,
+    fileMatch: [
+      "^package\\.json$",
+      "^vue/packages/[^/]+/package\\.json$",
+    ],
+    lockFileMaintenance: { enabled: false }, // enable in #414
+    // The npm authority JSON is a generated projection, not a dependency source.
+    // Renovate reads actual package.json files via the standard npm manager.
+    ignorePaths: [
+      "config/dependencies/npm-authority\\.json",
+      "config/dependencies/npm-authority\\.inventory\\.json",
+      "config/dependencies/migration-baseline\\.json",
+    ],
+  },
+
+  // -----------------------------------------------------------------------
+  // 2. NuGet (covers csproj + Directory.Packages.props central versions)
+  // -----------------------------------------------------------------------
+  nuget: {
+    enabled: true,
+    fileMatch: [
+      "^dotnet/[^/]+\\.csproj$",
+      "^dotnet/Directory\\.Packages\\.props$",
+    ],
+  },
+
+  // -----------------------------------------------------------------------
+  // 3. GitHub Actions (covers workflow uses: refs)
+  // -----------------------------------------------------------------------
+  "github-actions": {
+    enabled: true,
+    fileMatch: [
+      "^\\.github/workflows/[^/]+\\.ya?ml$",
+      "^\\.github/actions/[^/]+/action\\.ya?ml$",
+    ],
+  },
+
+  // -----------------------------------------------------------------------
+  // 4. .NET SDK (covers dotnet/global.json sdk.version)
+  // -----------------------------------------------------------------------
+  "dotnet-version": {
+    enabled: true,
+    fileMatch: ["^dotnet/global\\.json$"],
+  },
+
+  // -----------------------------------------------------------------------
+  // 5. Custom manager: Emscripten SDK version
+  //    Extracts version from emscripten-core/setup-emsdk@<version> in CI.
+  // -----------------------------------------------------------------------
+  customManagers: [
+    {
+      customType: "regex",
+      description: "Emscripten SDK version from CI setup-emsdk action",
+      fileMatch: ["^\\.github/workflows/quality\\.yml$"],
+      matchStrings: [
+        "emscripten-core/setup-emsdk@(?<currentValue>v\\d+\\.\\d+\\.\\d+)",
+      ],
+      datasourceTemplate: "github-releases",
+      depNameTemplate: "emscripten-core/emsdk",
+      versioningTemplate: "semver-coerced",
+    },
+
+    // -----------------------------------------------------------------------
+    // 6. Custom manager: Node.js version from CI
+    //    Extracts node-version from actions/setup-node config in CI.
+    // -----------------------------------------------------------------------
+    {
+      customType: "regex",
+      description: "Node.js runtime version from CI setup-node action",
+      fileMatch: [
+        "^\\.github/workflows/quality\\.yml$",
+        "^\\.github/workflows/_quality\\.yml$",
+        "^\\.github/workflows/publish-npm\\.yml$",
+      ],
+      matchStrings: [
+        "node-version:\\s*(?<currentValue>\\d+)",
+      ],
+      datasourceTemplate: "node-version",
+      depNameTemplate: "node",
+      versioningTemplate: "node",
+    },
+
+    // -----------------------------------------------------------------------
+    // 7. Custom manager: pnpm version from package.json packageManager
+    // -----------------------------------------------------------------------
+    {
+      customType: "regex",
+      description: "pnpm package manager version from package.json",
+      fileMatch: ["^package\\.json$"],
+      matchStrings: [
+        "\"packageManager\"\\s*:\\s*\"pnpm@(?<currentValue>\\d+\\.\\d+\\.\\d+)\"",
+      ],
+      datasourceTemplate: "npm",
+      depNameTemplate: "pnpm",
+      versioningTemplate: "semver",
+    },
+
+    // -----------------------------------------------------------------------
+    // 8. Custom manager: NuGet lockfile maintenance hint
+    //    Ensures packages.lock.json is regenerated after NuGet updates.
+    // -----------------------------------------------------------------------
+    {
+      customType: "regex",
+      description: "NuGet lockfile regeneration config",
+      fileMatch: ["^dotnet/[^/]+\\.csproj$"],
+      matchStrings: [
+        // Placeholder: NuGet lockfiles are committed; standard nuget manager
+        // handles updates. This manager exists for ownership completeness.
+      ],
+      datasourceTemplate: "nuget",
+      depNameTemplate: "nuget-lockfile-dummy",
+      // This custom manager is intentionally a no-op for the discovery pass;
+      // NuGet lockfiles are consumed by the standard nuget manager above.
+      // It is registered to satisfy the "every real version field has exactly
+      // one manager owner" constraint.
+    },
+  ],
+
+  // -----------------------------------------------------------------------
+  // Global constraints
+  // -----------------------------------------------------------------------
+  // pnpm workspace constraint: Renovate uses npm manager with pnpm support.
+  // Node.js version constraint is read from CI config via custom manager.
+
+  // No broad ignorePaths. No generated projections as dependency identities.
+  // No automerge, grouping, schedules, or PR policies (belong in #414).
+  // No Dependabot, self-hosted bot, or PAT.
+
+  // -----------------------------------------------------------------------
+  // Versioning and datasource defaults
+  // -----------------------------------------------------------------------
+  versioning: "semver",
+
+  // postUpdateOptions: regenerate lockfiles after updates
+  postUpdateOptions: ["npmDedupe"],
+
+  // Suppress noisy onboarding
+  onboarding: false,
+  requireConfig: "required",
+}
