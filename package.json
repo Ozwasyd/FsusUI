@@ -170,7 +170,7 @@
     "avalonia:baseline": "node ./scripts/with-node-heap.mjs node ./scripts/avalonia-vue-public-api-baseline.mjs",
     "avalonia:baseline:check": "node ./scripts/with-node-heap.mjs node ./scripts/avalonia-vue-public-api-baseline.mjs --check",
     "governance:cross-platform": "node ./scripts/with-node-heap.mjs node ./scripts/check-cross-platform-governance.mjs",
-    "governance:check": "node ./scripts/with-node-heap.mjs run-s check:verify-gates check:typecheck-cache check:gulp-task-portability check:rollup-warning-policy check:demo-build-path check:short-quality-consolidation check:coverage-sharding check:visual-orchestration check:visual-variant-ownership check:test-artifact-cache check:unit-artifact-dedup check:package-artifact-reuse test:ci-readiness check:readiness-workflow ci:profile:check ci:playwright:check deps:authority:check test:package-candidate test:release-channel check:npm-release-workflow check:dotnet-matrix check:avalonia-motion-contract check:avalonia-stable-readiness check:render-performance-contract avalonia:performance:check avalonia:baseline:check check:fsusui-design-conformance check:documentation-architecture typography:check governance:cross-platform",
+    "governance:check": "node ./scripts/with-node-heap.mjs run-s deps:check check:verify-gates check:typecheck-cache check:gulp-task-portability check:rollup-warning-policy check:demo-build-path check:short-quality-consolidation check:coverage-sharding check:visual-orchestration check:visual-variant-ownership check:test-artifact-cache check:unit-artifact-dedup check:package-artifact-reuse test:ci-readiness check:readiness-workflow ci:profile:check ci:playwright:check deps:authority:check test:package-candidate test:release-channel check:npm-release-workflow check:dotnet-matrix check:avalonia-motion-contract check:avalonia-stable-readiness check:render-performance-contract avalonia:performance:check avalonia:baseline:check check:fsusui-design-conformance check:documentation-architecture typography:check governance:cross-platform",
     "dotnet:restore": "dotnet restore dotnet/FsusUI.Avalonia.slnx",
     "dotnet:build": "dotnet build dotnet/FsusUI.Avalonia.slnx --no-restore --configuration Release",
     "dotnet:test": "dotnet test dotnet/FsusUI.Avalonia.slnx --no-build --configuration Release",
@@ -192,7 +192,7 @@
     "verify:strict": "node ./scripts/with-node-heap.mjs run-s verify:release",
     "verify:stable": "node ./scripts/with-node-heap.mjs run-s tokens:check icons:check interactions:check visual:check a11y:check avalonia:performance:check conformance governance:check dotnet:verify",
     "verify:nightly": "node ./scripts/with-node-heap.mjs run-s verify:full test:coverage test:visual:full dotnet:verify avalonia:performance",
-    "verify:release": "node ./scripts/with-node-heap.mjs run-s verify:full verify:stable check:npm-dist-tag test:release-channel package:candidate:build package:candidate:verify test:package-candidate test:consumer-install",
+    "verify:release": "node ./scripts/with-node-heap.mjs run-s deps:check verify:full verify:stable check:npm-dist-tag test:release-channel package:candidate:build package:candidate:verify test:package-candidate test:consumer-install",
     "changeset": "node ./scripts/with-node-heap.mjs changeset",
     "version-packages": "node ./scripts/with-node-heap.mjs changeset version",
     "typecheck": "node ./scripts/run-capacity-typecheck.mjs",
@@ -217,7 +217,8 @@
     "deps:sync": "node ./scripts/deps-sync.mjs",
     "deps:check": "node ./scripts/deps-check.mjs",
     "test:deps-sync": "node ./scripts/test-deps-sync.mjs",
-    "test:deps-check": "node ./scripts/test-deps-check.mjs"
+    "test:deps-check": "node ./scripts/test-deps-check.mjs",
+    "deps:baseline:verify": "node ./scripts/deps-baseline-verify.mjs"
   },
   "peerDependencies": {
     "vue": "^3.5.0"
