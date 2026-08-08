@@ -102,6 +102,7 @@
         map.get($button, 'disabled-border-color')
       );
       box-shadow: none;
+      opacity: 1;
     }
     &:first-child .#{$namespace}-checkbox-button__inner {
       border-left-color: var(

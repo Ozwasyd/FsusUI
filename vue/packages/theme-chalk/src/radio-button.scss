@@ -124,6 +124,7 @@
           map.get($button, 'disabled-border-color')
         );
         box-shadow: none;
+        opacity: 1;
       }
       &:checked + .#{$namespace}-radio-button__inner {
         background-color: getCssVar('radio-button-disabled-checked-fill');
