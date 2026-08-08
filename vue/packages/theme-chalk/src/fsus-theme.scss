@@ -1523,16 +1523,6 @@ button.#{$namespace}-card:active {
   color: var(--el-text-color-primary);
 }
 
-.#{$namespace}-popper .#{$namespace}-popper__arrow::before,
-.#{$namespace}-popper.is-dark .#{$namespace}-popper__arrow::before,
-.#{$namespace}-popper.is-light .#{$namespace}-popper__arrow::before,
-.#{$namespace}-popper.is-pure .#{$namespace}-popper__arrow::before,
-.#{$namespace}-popover.#{$namespace}-popper
-  .#{$namespace}-popper__arrow::before {
-  background: var(--el-bg-color-overlay);
-  border-color: var(--el-border-color-light);
-}
-
 .#{$namespace}-tooltip-v2__content,
 .#{$namespace}-tooltip-v2__content.is-dark {
   --#{$namespace}-tooltip-v2-padding: 8px 12px;
