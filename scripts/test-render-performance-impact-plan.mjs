@@ -63,6 +63,8 @@ const compareRoot = await mkdtemp(path.join(os.tmpdir(), 'fsusui-impact-test-'))
 try {
   const baseline = path.join(compareRoot, 'baseline')
   const current = path.join(compareRoot, 'current')
+  const baselineRepeat = path.join(compareRoot, 'baseline-repeat')
+  const currentRepeat = path.join(compareRoot, 'current-repeat')
   const webPlan = createImpactPlan({
     changedFiles: cases[0].files,
     registry,
@@ -76,7 +78,7 @@ try {
       },
     ],
   }
-  for (const directory of [baseline, current]) {
+  for (const directory of [baseline, current, baselineRepeat, currentRepeat]) {
     await mkdir(path.join(directory, 'web'), { recursive: true })
     await writeFile(
       path.join(directory, 'impact-plan.json'),
@@ -96,6 +98,53 @@ try {
       current,
     ],
     { cwd: root },
+  )
+  const slower = {
+    results: [
+      {
+        id: 'markdown-cold-fixture',
+        inputToNextFrameMs: { p95: 20 },
+      },
+    ],
+  }
+  await writeFile(
+    path.join(current, 'web/summary.json'),
+    `${JSON.stringify(slower)}\n`,
+  )
+  await writeFile(
+    path.join(baselineRepeat, 'web/summary.json'),
+    `${JSON.stringify(slower)}\n`,
+  )
+  await execFileAsync(
+    process.execPath,
+    [
+      path.join(root, 'scripts/compare-render-performance.mjs'),
+      baseline,
+      current,
+      '0.15',
+      baselineRepeat,
+      currentRepeat,
+    ],
+    { cwd: root },
+  )
+  await writeFile(
+    path.join(baselineRepeat, 'web/summary.json'),
+    `${JSON.stringify(summary)}\n`,
+  )
+  await assert.rejects(
+    execFileAsync(
+      process.execPath,
+      [
+        path.join(root, 'scripts/compare-render-performance.mjs'),
+        baseline,
+        current,
+        '0.15',
+        baselineRepeat,
+        currentRepeat,
+      ],
+      { cwd: root },
+    ),
+    /order-balanced p95/u,
   )
   await writeFile(
     path.join(current, 'impact-plan.json'),

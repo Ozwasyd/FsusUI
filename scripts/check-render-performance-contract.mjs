@@ -79,9 +79,7 @@ for (const token of [
 const warmupBoundary = web.indexOf(
   'for (let index = 0; index < warmups; index++)',
 )
-const measurementReset = web.indexOf(
-  'window.__fsusResetMeasurementWindow()',
-)
+const measurementReset = web.indexOf('window.__fsusResetMeasurementWindow()')
 const tracingStart = web.indexOf('Tracing.start')
 if (
   warmupBoundary < 0 ||
@@ -150,10 +148,10 @@ if (
   failures.push('Release demo owner must materialize Wasm before demo build')
 }
 if (!markdownFeatureMigration.includes('pnpm run build:demo'))
-  failures.push('Markdown feature migration missing complete Release demo owner')
-if (
-  markdownFeatureMigration.includes('pnpm -C vue/packages/demo-app build')
-) {
+  failures.push(
+    'Markdown feature migration missing complete Release demo owner',
+  )
+if (markdownFeatureMigration.includes('pnpm -C vue/packages/demo-app build')) {
   failures.push(
     'Markdown feature migration must not use a bare demo build for paired Release measurement',
   )
@@ -168,6 +166,10 @@ for (const token of [
   'performance-impact-plan.json',
   'Measure same-runner baseline first',
   'Measure current quick matrix',
+  'Repeat current quick matrix for order balance',
+  'Repeat baseline quick matrix last for order balance',
+  'performance-baseline-repeat',
+  'performance-current-repeat',
 ]) {
   if (!quality.includes(token))
     failures.push(`PR impact workflow missing ${token}`)
@@ -193,11 +195,24 @@ if (
   quality.indexOf('Install current dependencies')
 )
   failures.push('PR impact plan must precede dependency installation')
-if (
-  quality.indexOf('Measure same-runner baseline first') >
-  quality.indexOf('Measure current quick matrix')
+const baselineFirst = quality.indexOf('Measure same-runner baseline first')
+const currentFirst = quality.indexOf('Measure current quick matrix')
+const currentRepeat = quality.indexOf(
+  'Repeat current quick matrix for order balance',
 )
-  failures.push('PR measurements must remain sequential baseline then current')
+const baselineRepeat = quality.indexOf(
+  'Repeat baseline quick matrix last for order balance',
+)
+if (
+  !(
+    baselineFirst < currentFirst &&
+    currentFirst < currentRepeat &&
+    currentRepeat < baselineRepeat
+  )
+)
+  failures.push(
+    'PR measurements must remain in order-balanced baseline/current/current/baseline order',
+  )
 for (const token of [
   'Git base is unavailable; selecting both full quick sets.',
   'GITHUB_OUTPUT',

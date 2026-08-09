@@ -4,13 +4,22 @@ import process from 'node:process'
 import { verifyImpactPlan } from './render-performance-impact.mjs'
 
 // pnpm/npm may forward a literal `--` when invoked as `pnpm script -- args`.
-const [baselineDirectory, currentDirectory, limitArgument = '0.15'] =
-  process.argv.slice(2).filter((argument) => argument !== '--')
+const [
+  baselineDirectory,
+  currentDirectory,
+  limitArgument = '0.15',
+  baselineRepeatDirectory,
+  currentRepeatDirectory,
+] = process.argv.slice(2).filter((argument) => argument !== '--')
 if (!baselineDirectory || !currentDirectory) {
   throw new Error(
-    'Usage: compare-render-performance.mjs <baseline-dir> <current-dir> [relative-limit]',
+    'Usage: compare-render-performance.mjs <baseline-dir> <current-dir> [relative-limit] [baseline-repeat-dir current-repeat-dir]',
   )
 }
+if (Boolean(baselineRepeatDirectory) !== Boolean(currentRepeatDirectory))
+  throw new Error(
+    'Order-balanced comparison requires both baseline and current repeat directories',
+  )
 const limit = Number(limitArgument)
 const read = async (directory, platform) =>
   JSON.parse(
@@ -28,11 +37,25 @@ const readPlan = async (directory) =>
     })
 const baselinePlan = await readPlan(baselineDirectory)
 const currentPlan = await readPlan(currentDirectory)
-if (Boolean(baselinePlan) !== Boolean(currentPlan))
-  throw new Error('Performance plan is missing from one side of the comparison')
-if (baselinePlan?.planDigest !== currentPlan?.planDigest)
+const baselineRepeatPlan = baselineRepeatDirectory
+  ? await readPlan(baselineRepeatDirectory)
+  : null
+const currentRepeatPlan = currentRepeatDirectory
+  ? await readPlan(currentRepeatDirectory)
+  : null
+const plans = [
+  baselinePlan,
+  currentPlan,
+  baselineRepeatPlan,
+  currentRepeatPlan,
+].filter(Boolean)
+const expectedPlanCount = baselineRepeatDirectory ? 4 : 2
+if (
+  (plans.length !== 0 && plans.length !== expectedPlanCount) ||
+  plans.some((plan) => plan.planDigest !== plans[0]?.planDigest)
+)
   throw new Error(
-    `Performance plan digest mismatch: baseline=${baselinePlan?.planDigest} current=${currentPlan?.planDigest}`,
+    `Performance plan digest mismatch: ${plans.map((plan) => plan.planDigest).join(' ')}`,
   )
 
 const regressions = []
@@ -40,10 +63,18 @@ for (const platform of ['web', 'avalonia']) {
   if (currentPlan && !currentPlan.platforms[platform].run) continue
   const baseline = await read(baselineDirectory, platform)
   const current = await read(currentDirectory, platform)
-  const baselineMap = new Map(
-    baseline.results?.map((entry) => [entry.id, entry]) ??
-      baseline.Results.map((entry) => [entry.Id, entry]),
-  )
+  const baselineRepeat = baselineRepeatDirectory
+    ? await read(baselineRepeatDirectory, platform)
+    : null
+  const currentRepeat = currentRepeatDirectory
+    ? await read(currentRepeatDirectory, platform)
+    : null
+  const entriesOf = (summary) => summary.results ?? summary.Results
+  const mapOf = (summary) =>
+    new Map(entriesOf(summary).map((entry) => [entry.id ?? entry.Id, entry]))
+  const baselineMap = mapOf(baseline)
+  const baselineRepeatMap = baselineRepeat ? mapOf(baselineRepeat) : null
+  const currentRepeatMap = currentRepeat ? mapOf(currentRepeat) : null
   const currentResults = current.results ?? current.Results
   const currentIds = new Set(
     currentResults.map((entry) => entry.id ?? entry.Id),
@@ -63,11 +94,25 @@ for (const platform of ['web', 'avalonia']) {
       )
       continue
     }
-    const before = metricValue(previous, platform)
-    const after = metricValue(entry, platform)
+    const previousRepeat = baselineRepeatMap?.get(id)
+    const entryRepeat = currentRepeatMap?.get(id)
+    if (baselineRepeatDirectory && (!previousRepeat || !entryRepeat)) {
+      regressions.push(
+        `${platform}/${id}: order-balanced repeat is missing from the shared plan`,
+      )
+      continue
+    }
+    const beforeFirst = metricValue(previous, platform)
+    const afterFirst = metricValue(entry, platform)
+    const before = previousRepeat
+      ? Math.sqrt(beforeFirst * metricValue(previousRepeat, platform))
+      : beforeFirst
+    const after = entryRepeat
+      ? Math.sqrt(afterFirst * metricValue(entryRepeat, platform))
+      : afterFirst
     if (before > 0 && after > before * (1 + limit)) {
       regressions.push(
-        `${platform}/${id}: p95 ${after.toFixed(2)}ms > ${before.toFixed(2)}ms + ${(limit * 100).toFixed(0)}%`,
+        `${platform}/${id}: ${baselineRepeatDirectory ? 'order-balanced ' : ''}p95 ${after.toFixed(2)}ms > ${before.toFixed(2)}ms + ${(limit * 100).toFixed(0)}%`,
       )
     }
   }
@@ -78,5 +123,5 @@ if (regressions.length) {
   )
 }
 console.info(
-  `Relative real-render performance passed (limit ${(limit * 100).toFixed(0)}%).`,
+  `Relative real-render performance passed (${baselineRepeatDirectory ? 'order-balanced, ' : ''}limit ${(limit * 100).toFixed(0)}%).`,
 )

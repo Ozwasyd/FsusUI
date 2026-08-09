@@ -211,10 +211,32 @@ jobs:
           --impact-plan ../performance-impact-plan.json
           --profile quick
           --output ../performance-current
+      - name: Repeat current quick matrix for order balance
+        if: steps.baseline-contract.outputs.available == 'true'
+        working-directory: current
+        run: >-
+          pnpm perf:render --
+          --impact-plan ../performance-impact-plan.json
+          --profile quick
+          --output ../performance-current-repeat
+      - name: Repeat baseline quick matrix last for order balance
+        if: steps.baseline-contract.outputs.available == 'true'
+        working-directory: baseline
+        run: >-
+          pnpm perf:render --
+          --impact-plan ../performance-impact-plan.json
+          --profile quick
+          --output ../performance-baseline-repeat
       - name: Compare against base revision on the same runner
         if: steps.baseline-contract.outputs.available == 'true'
         working-directory: current
-        run: pnpm perf:render:compare -- ../performance-baseline ../performance-current 0.15
+        run: >-
+          pnpm perf:render:compare --
+          ../performance-baseline
+          ../performance-current
+          0.15
+          ../performance-baseline-repeat
+          ../performance-current-repeat
       - name: Skip unaffected PR real-render measurement
         if: steps.render-impact.outputs.run != 'true'
         run: echo "Skipping real-render measurement; ownership plan is skip-safe."
@@ -224,7 +246,9 @@ jobs:
           name: pr-real-render-performance
           path: |
             performance-baseline
+            performance-baseline-repeat
             performance-current
+            performance-current-repeat
             performance-impact-plan.json
           retention-days: 14
 

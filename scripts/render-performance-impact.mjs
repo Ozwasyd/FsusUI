@@ -118,6 +118,8 @@ export const createImpactPlan = ({
       warmups: 1,
       samples: 21,
       order: ['baseline', 'current'],
+      repetitions: 2,
+      sequence: ['baseline', 'current', 'current', 'baseline'],
       sameRunner: true,
       isolatedState: true,
     },
@@ -143,7 +145,15 @@ export const verifyImpactPlan = (plan) => {
     throw new Error('PR performance impact plan has an unsupported sample plan')
   if (JSON.stringify(plan.measurement?.order) !== '["baseline","current"]')
     throw new Error(
-      'PR performance impact plan must run baseline before current',
+      'PR performance impact plan must run baseline before current within each pair',
+    )
+  if (
+    plan.measurement?.repetitions !== 2 ||
+    JSON.stringify(plan.measurement?.sequence) !==
+      '["baseline","current","current","baseline"]'
+  )
+    throw new Error(
+      'PR performance impact plan must use the order-balanced baseline/current sequence',
     )
   return plan
 }
