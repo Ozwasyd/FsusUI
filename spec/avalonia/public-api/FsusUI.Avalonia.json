@@ -78,6 +78,12 @@
     "FsusFocusNavigationDirection",
     "FsusFooter",
     "FsusForm",
+    "FsusFormFieldAdapter",
+    "FsusFormFieldAdapterCapabilities",
+    "FsusFormFieldAdapterError",
+    "FsusFormFieldAdapterErrorKind",
+    "FsusFormFieldAdapterResult",
+    "FsusFormFieldReadResult",
     "FsusFormFieldValidatedEventArgs",
     "FsusFormItem",
     "FsusFormLabelPosition",
@@ -284,6 +290,7 @@
     "FsusVisualHidden",
     "FsusWatermark",
     "FsusWatermarkTile",
+    "IFsusFormFieldAdapter",
     "IFsusOverlayLifecycle"
   ]
 }
