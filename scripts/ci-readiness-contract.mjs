@@ -350,7 +350,7 @@ function aggregateDigest(evidence) {
     .digest('hex')
 }
 
-function playwrightEvidence({ profile, group, planDigest, expectedCells, observedCells, manifestEntries }) {
+function playwrightEvidence({ profile, planDigest, expectedCells, observedCells, manifestEntries }) {
   const cells = [...observedCells].sort((left, right) =>
     `${left.owner}\0${left.cellId}`.localeCompare(
       `${right.owner}\0${right.cellId}`,
@@ -497,7 +497,7 @@ export function validateReadiness({
           : [],
       )
   const observedCells = []
-  for (const { manifest, identity } of manifestEntries) {
+  for (const { manifest } of manifestEntries) {
     if (!isPlaywrightGate(manifest.gate)) continue
     const block = manifest.playwright
     observedCells.push({
@@ -531,7 +531,6 @@ export function validateReadiness({
       .sort((left, right) => left.identity.localeCompare(right.identity)),
     playwright: playwrightEvidence({
       profile,
-      group,
       expectedCells,
       observedCells,
       manifestEntries,
@@ -724,7 +723,6 @@ export function validatePlaywrightPrReadiness({
       .sort((left, right) => left.identity.localeCompare(right.identity)),
     playwright: playwrightEvidence({
       profile: 'pr',
-      group,
       planDigest: plan.planDigest,
       expectedCells,
       observedCells,

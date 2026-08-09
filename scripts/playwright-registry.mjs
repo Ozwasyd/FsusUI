@@ -52,7 +52,7 @@ export function computePlaywrightRegistryHash(registry) {
 /** Map suiteId -> owning gate (from the #479 owners registry). */
 export function suiteOwnerGate(registry) {
   const map = new Map()
-  for (const [ownerId, owner] of Object.entries(registry.owners.owners ?? {})) {
+  for (const owner of Object.values(registry.owners.owners ?? {})) {
     for (const suiteId of owner.suiteIds ?? []) {
       if (map.has(suiteId) && map.get(suiteId) !== owner.gate) {
         throw new Error(

@@ -93,7 +93,7 @@ const computeInputFingerprint = (root, explicitInputs) => {
   return fingerprint.digest('hex')
 }
 
-const runIdentity = (root) => ({
+const runIdentity = () => ({
   id: String(option('run-id', process.env.GITHUB_RUN_ID ?? 'local')),
   attempt: String(
     option('run-attempt', process.env.GITHUB_RUN_ATTEMPT ?? '1'),
@@ -113,10 +113,10 @@ const baseManifest = (root, gate, group, status) => ({
   },
   inputFingerprint: computeInputFingerprint(root, options('input')),
   createdAt: new Date().toISOString(),
-  run: runIdentity(root),
+  run: runIdentity(),
 })
 
-const emitPlaywright = (root, gate, group, status) => {
+const emitPlaywright = (root, gate, group) => {
   const evidenceRoot = path.resolve(root, option('evidence-root', '.readiness'))
   const profile = group === 'pr' ? 'pr' : group
   const expected = expectedPlaywrightCells(
@@ -321,7 +321,7 @@ if (command === 'plan') {
     throw new Error(`Unknown leaf gate: ${gate}.`)
   if (!group) throw new Error('--group is required.')
   if (isPlaywrightGate(gate)) {
-    emitPlaywright(root, gate, group, status)
+    emitPlaywright(root, gate, group)
     process.exit(0)
   }
   const dimensions = pairs(options('dimension'), '--dimension')
