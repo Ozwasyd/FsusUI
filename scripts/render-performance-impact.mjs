@@ -120,6 +120,7 @@ export const createImpactPlan = ({
       order: ['baseline', 'current'],
       repetitions: 2,
       sequence: ['baseline', 'current', 'current', 'baseline'],
+      aggregation: 'geometric-mean-p95',
       sameRunner: true,
       isolatedState: true,
     },
@@ -150,7 +151,8 @@ export const verifyImpactPlan = (plan) => {
   if (
     plan.measurement?.repetitions !== 2 ||
     JSON.stringify(plan.measurement?.sequence) !==
-      '["baseline","current","current","baseline"]'
+      '["baseline","current","current","baseline"]' ||
+    plan.measurement?.aggregation !== 'geometric-mean-p95'
   )
     throw new Error(
       'PR performance impact plan must use the order-balanced baseline/current sequence',

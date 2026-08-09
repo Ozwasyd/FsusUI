@@ -122,8 +122,8 @@ ordinary local verify.
 
 The resolved changed-file list, platform/scenario selection, quick dimensions,
 sample profile, repetition count and mandatory `baseline` → `current` →
-`current` → `baseline` sequence form an immutable SHA-256 plan digest. All
-result directories contain the same
+`current` → `baseline` sequence, plus the `geometric-mean-p95` aggregation,
+form an immutable SHA-256 plan digest. All result directories contain the same
 `impact-plan.json`; comparison fails before inspecting timings if those digests
 differ. A base runner that cannot consume this plan is reported as
 `baseline-unavailable` or `contract-changed`, and its incomparable numbers are
