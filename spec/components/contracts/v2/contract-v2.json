@@ -10,7 +10,7 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "e143c118b39af8784825ebc4a2b997a062ca11a8557e2f714b17ad718f68b0eb",
+      "hash": "1b9ba0990ef5c22e9f7e26f12288e5e7c2f65132aed61b801fb5b3513e31c94b",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
@@ -77065,6 +77065,293 @@
       }
     },
     {
+      "id": "component-v2.el-section-nav-link",
+      "version": "2.0.0",
+      "releaseClassification": "preview",
+      "owner": "FsusUI Core",
+      "component": {
+        "name": "ElSectionNavLink",
+        "module": "settings-primitives",
+        "classification": "portable",
+        "exportStatus": "missing"
+      },
+      "bindings": {
+        "web": {
+          "status": "source",
+          "package": "@ozwasyd/element-plus",
+          "memberRef": {
+            "baseline": "spec/baselines/vue-current.json",
+            "kind": "component"
+          }
+        },
+        "avalonia": {
+          "status": "unbound",
+          "package": null,
+          "type": null
+        }
+      },
+      "inputs": [
+        {
+          "name": "active",
+          "kind": "input",
+          "web": {
+            "member": "active",
+            "categories": [
+              "boolean"
+            ],
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "default": {
+              "kind": "missing"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-section-nav-link.input.active"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "disabled",
+          "kind": "input",
+          "web": {
+            "member": "disabled",
+            "categories": [
+              "boolean"
+            ],
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "default": {
+              "kind": "missing"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-section-nav-link.input.disabled"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "to",
+          "kind": "input",
+          "web": {
+            "member": "to",
+            "categories": [
+              "string"
+            ],
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "default": {
+              "kind": "missing"
+            },
+            "values": null,
+            "required": true,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-section-nav-link.input.to"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        }
+      ],
+      "outputs": [],
+      "operations": [],
+      "contentRegions": [
+        {
+          "name": "default",
+          "kind": "contentRegion",
+          "scoped": false,
+          "web": {
+            "member": "default",
+            "scoped": false,
+            "baseline": "spec/baselines/vue-current.json"
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-section-nav-link.content-region.default"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        }
+      ],
+      "states": {
+        "machine": "fsus-section-nav-link",
+        "states": [
+          {
+            "name": "default",
+            "kind": "initial"
+          },
+          {
+            "name": "disabled",
+            "kind": "derived"
+          }
+        ],
+        "transitions": [
+          {
+            "from": "default",
+            "to": "disabled",
+            "trigger": "disabled input becomes true"
+          }
+        ]
+      },
+      "requirements": {
+        "keyboard": [
+          "All public operations must be keyboard reachable and activatable."
+        ],
+        "pointer": [
+          "Disabled surfaces must not respond to pointer activation."
+        ],
+        "focus": [
+          "Focus entry must surface the same public focus state on both platforms."
+        ],
+        "a11y": [
+          "Interactive surfaces must expose an accessible name and role.",
+          "Content regions must preserve accessible text content semantics."
+        ],
+        "motion": [
+          "Honor user reduced-motion preference."
+        ],
+        "perf": [
+          "Render and interaction budgets must match the component performance contract."
+        ]
+      },
+      "platformDifferences": [
+        {
+          "member": "active",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "disabled",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "to",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "default",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        }
+      ],
+      "avaloniaExtras": [],
+      "scenarioIds": [
+        "scenario.v2.el-section-nav-link.input.active",
+        "scenario.v2.el-section-nav-link.input.disabled",
+        "scenario.v2.el-section-nav-link.input.to",
+        "scenario.v2.el-section-nav-link.content-region.default",
+        "scenario.v2.el-section-nav-link.state.default",
+        "scenario.v2.el-section-nav-link.state.disabled",
+        "scenario.v2.el-section-nav-link.keyboard",
+        "scenario.v2.el-section-nav-link.pointer",
+        "scenario.v2.el-section-nav-link.focus",
+        "scenario.v2.el-section-nav-link.a11y",
+        "scenario.v2.el-section-nav-link.a11y",
+        "scenario.v2.el-section-nav-link.motion",
+        "scenario.v2.el-section-nav-link.perf"
+      ],
+      "coverage": {
+        "total": 4,
+        "alignedCandidate": 0,
+        "partial": 0,
+        "missing": 4,
+        "webOnly": 0,
+        "mappedPercent": 0
+      }
+    },
+    {
       "id": "component-v2.el-segmented-control",
       "version": "2.0.0",
       "releaseClassification": "preview",
@@ -125000,6 +125287,293 @@
       }
     },
     {
+      "id": "component-v2.fsus-section-nav-link",
+      "version": "2.0.0",
+      "releaseClassification": "preview",
+      "owner": "FsusUI Core",
+      "component": {
+        "name": "FsusSectionNavLink",
+        "module": "settings-primitives",
+        "classification": "portable",
+        "exportStatus": "missing"
+      },
+      "bindings": {
+        "web": {
+          "status": "source",
+          "package": "@ozwasyd/element-plus",
+          "memberRef": {
+            "baseline": "spec/baselines/vue-current.json",
+            "kind": "component"
+          }
+        },
+        "avalonia": {
+          "status": "unbound",
+          "package": null,
+          "type": null
+        }
+      },
+      "inputs": [
+        {
+          "name": "active",
+          "kind": "input",
+          "web": {
+            "member": "active",
+            "categories": [
+              "boolean"
+            ],
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "default": {
+              "kind": "missing"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.fsus-section-nav-link.input.active"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "disabled",
+          "kind": "input",
+          "web": {
+            "member": "disabled",
+            "categories": [
+              "boolean"
+            ],
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "default": {
+              "kind": "missing"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.fsus-section-nav-link.input.disabled"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "to",
+          "kind": "input",
+          "web": {
+            "member": "to",
+            "categories": [
+              "string"
+            ],
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "default": {
+              "kind": "missing"
+            },
+            "values": null,
+            "required": true,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.fsus-section-nav-link.input.to"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        }
+      ],
+      "outputs": [],
+      "operations": [],
+      "contentRegions": [
+        {
+          "name": "default",
+          "kind": "contentRegion",
+          "scoped": false,
+          "web": {
+            "member": "default",
+            "scoped": false,
+            "baseline": "spec/baselines/vue-current.json"
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.fsus-section-nav-link.content-region.default"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        }
+      ],
+      "states": {
+        "machine": "fsus-section-nav-link",
+        "states": [
+          {
+            "name": "default",
+            "kind": "initial"
+          },
+          {
+            "name": "disabled",
+            "kind": "derived"
+          }
+        ],
+        "transitions": [
+          {
+            "from": "default",
+            "to": "disabled",
+            "trigger": "disabled input becomes true"
+          }
+        ]
+      },
+      "requirements": {
+        "keyboard": [
+          "All public operations must be keyboard reachable and activatable."
+        ],
+        "pointer": [
+          "Disabled surfaces must not respond to pointer activation."
+        ],
+        "focus": [
+          "Focus entry must surface the same public focus state on both platforms."
+        ],
+        "a11y": [
+          "Interactive surfaces must expose an accessible name and role.",
+          "Content regions must preserve accessible text content semantics."
+        ],
+        "motion": [
+          "Honor user reduced-motion preference."
+        ],
+        "perf": [
+          "Render and interaction budgets must match the component performance contract."
+        ]
+      },
+      "platformDifferences": [
+        {
+          "member": "active",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "disabled",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "to",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "default",
+          "kind": "contentRegion",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia content region in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        }
+      ],
+      "avaloniaExtras": [],
+      "scenarioIds": [
+        "scenario.v2.fsus-section-nav-link.input.active",
+        "scenario.v2.fsus-section-nav-link.input.disabled",
+        "scenario.v2.fsus-section-nav-link.input.to",
+        "scenario.v2.fsus-section-nav-link.content-region.default",
+        "scenario.v2.fsus-section-nav-link.state.default",
+        "scenario.v2.fsus-section-nav-link.state.disabled",
+        "scenario.v2.fsus-section-nav-link.keyboard",
+        "scenario.v2.fsus-section-nav-link.pointer",
+        "scenario.v2.fsus-section-nav-link.focus",
+        "scenario.v2.fsus-section-nav-link.a11y",
+        "scenario.v2.fsus-section-nav-link.a11y",
+        "scenario.v2.fsus-section-nav-link.motion",
+        "scenario.v2.fsus-section-nav-link.perf"
+      ],
+      "coverage": {
+        "total": 4,
+        "alignedCandidate": 0,
+        "partial": 0,
+        "missing": 4,
+        "webOnly": 0,
+        "mappedPercent": 0
+      }
+    },
+    {
       "id": "component-v2.fsus-segmented-control",
       "version": "2.0.0",
       "releaseClassification": "preview",
@@ -135179,9 +135753,9 @@
   "coverage": {
     "aligned-candidate": 49,
     "partial": 74,
-    "missing": 2019,
+    "missing": 2027,
     "web-only": 20,
-    "total": 2162,
+    "total": 2170,
     "mappedPercent": 5.7
   }
 }
