@@ -63,6 +63,12 @@ function check(publishPath) {
     'release',
   ])
   const releaseGates = readinessSpec.profiles.release
+  const playwrightGates = releaseGates.filter((gate) =>
+    readinessSpec.playwright?.ownerIds?.includes(gate),
+  )
+  const workflowGates = releaseGates.filter(
+    (gate) => !readinessSpec.playwright?.ownerIds?.includes(gate),
+  )
   containsAll(
     releaseGates,
     [
@@ -91,8 +97,12 @@ function check(publishPath) {
   const releaseAggregator = job(reusable, 'release-readiness')
   containsAll(
     releaseAggregator,
-    releaseGates.map((gate) => `- ${gate}`),
+    workflowGates.map((gate) => `- ${gate}`),
     'release-readiness needs',
+  )
+  assert.ok(
+    playwrightGates.length > 0,
+    'release profile must include playwright gates',
   )
   containsAll(
     releaseAggregator,
@@ -138,6 +148,21 @@ function check(publishPath) {
     job(qualityWorkflow, 'release'),
     ['group: release', 'release_tag: ${{ inputs.release_tag }}'],
     'manual release job',
+  )
+  containsAll(
+    job(qualityWorkflow, 'release-playwright'),
+    ['uses: ./.github/workflows/_quality-playwright.yml', 'group: release'],
+    'release playwright job',
+  )
+  containsAll(
+    job(qualityWorkflow, 'release'),
+    ['needs: release-playwright'],
+    'manual release job ordering',
+  )
+  containsAll(
+    job(publish, 'quality'),
+    ['needs: quality-playwright'],
+    'publish quality ordering',
   )
   console.log(
     `[ci-profile] profiles=${Object.keys(readinessSpec.profiles).join(',')} publish=${publishPath} status=valid`,
