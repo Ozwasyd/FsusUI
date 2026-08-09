@@ -121,18 +121,22 @@ an unavailable Git base expands to both complete quick sets without blocking an
 ordinary local verify.
 
 The resolved changed-file list, platform/scenario selection, quick dimensions,
-sample profile and mandatory `baseline` then `current` order form an immutable
-SHA-256 plan digest. Both result directories contain the same
+sample profile, repetition count and mandatory `baseline` → `current` →
+`current` → `baseline` sequence, plus the `geometric-mean-p95` aggregation,
+form an immutable SHA-256 plan digest. All result directories contain the same
 `impact-plan.json`; comparison fails before inspecting timings if those digests
 differ. A base runner that cannot consume this plan is reported as
 `baseline-unavailable` or `contract-changed`, and its incomparable numbers are
 not used.
 
 When the base revision is compatible, CI measures the base SHA and proposed SHA
-sequentially on the same GitHub runner, then rejects a p95 regression above 15%.
-The quick profile collects twenty-one samples per scenario on each side, so a
-single scheduler or GC spike cannot decide the gate; a real tail regression must
-still show up in the 95th percentile. Both checkouts have independent
+twice on the same GitHub runner in the symmetric order `baseline`, `current`,
+`current`, `baseline`. It takes the geometric mean of each side's two p95
+measurements, then rejects an order-balanced regression above 15%. The symmetric
+sequence gives both revisions one early and one late measurement, cancelling
+systematic warm-state or runner-load bias without changing the threshold. Each
+measurement still collects twenty-one samples per scenario, so a single
+scheduler or GC spike cannot decide the gate. Both checkouts have independent
 `node_modules` and process/server lifetimes, but their installs share the
 runner's pnpm store cache. Chromium is installed once. This preserves isolation
 without comparing unrelated hardware or concurrent CPU, GC, renderer and I/O
@@ -145,16 +149,22 @@ pnpm perf:render:pr --base <ref>
 ```
 
 It creates an isolated temporary base worktree, validates runner compatibility,
-installs through the shared pnpm store, resolves Chromium once, runs baseline
-before current, and removes only that temporary worktree. No remote performance
-database or fixed wall-clock threshold is involved.
+installs through the shared pnpm store, resolves Chromium once, runs the
+order-balanced four-measurement sequence, and removes only that temporary
+worktree. No remote performance database or fixed wall-clock threshold is
+involved.
 
 `main` runs the quick matrix. Nightly and release workflow groups run the full matrix. All jobs upload raw samples, environment metadata and summaries. Absolute limits in `tests/performance/render-performance-policy.json` only catch obvious loss of control; they are not used to claim cross-machine performance parity.
 
 To compare two same-runner result directories manually:
 
 ```bash
-pnpm perf:render:compare -- .tmp/performance/baseline .tmp/performance/current 0.15
+pnpm perf:render:compare -- \
+  .tmp/performance/baseline \
+  .tmp/performance/current \
+  0.15 \
+  .tmp/performance/baseline-repeat \
+  .tmp/performance/current-repeat
 ```
 
 Do not compare absolute values from different machines. When fixture inputs, browser versions, renderer backends or environment metadata differ, collect a new paired baseline.

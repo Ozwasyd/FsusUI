@@ -1,0 +1,341 @@
+{
+  "schemaVersion": 2,
+  "registryVersion": "2.0.0",
+  "releaseClassification": "preview",
+  "owner": "FsusUI Core",
+  "contracts": [
+    {
+      "id": "component-v2.el-fixture",
+      "version": "2.0.0",
+      "releaseClassification": "preview",
+      "owner": "FsusUI Core",
+      "component": {
+        "name": "ElFixture",
+        "module": "fixture",
+        "classification": "portable",
+        "exportStatus": "partial"
+      },
+      "bindings": {
+        "web": {
+          "status": "source",
+          "package": "@ozwasyd/element-plus",
+          "memberRef": {
+            "baseline": "spec/baselines/vue-current.json",
+            "kind": "component"
+          }
+        },
+        "avalonia": {
+          "status": "bound",
+          "package": "FsusUI.Avalonia",
+          "type": "FsusUI.Avalonia.Controls.FsusFixture"
+        }
+      },
+      "inputs": [
+        {
+          "name": "loading",
+          "kind": "input",
+          "web": {
+            "member": "loading",
+            "categories": ["boolean"],
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "default": { "kind": "missing" },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": {
+            "member": "IsLoading",
+            "categories": ["boolean"],
+            "type": "System.Boolean",
+            "nullable": false
+          },
+          "status": "aligned-candidate",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": ["scenario.v2.el-fixture.input.loading"],
+          "governance": null
+        },
+        {
+          "name": "label",
+          "kind": "input",
+          "web": {
+            "member": "label",
+            "categories": ["string"],
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "default": { "kind": "literal", "value": "default" },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": {
+            "member": "Label",
+            "categories": ["string"],
+            "type": "System.String",
+            "nullable": true
+          },
+          "status": "partial",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": "web nullable=false vs avalonia nullable=true",
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": ["scenario.v2.el-fixture.input.label"],
+          "governance": {
+            "reason": "Real member exists on both sides but semantic drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        }
+      ],
+      "outputs": [],
+      "operations": [],
+      "contentRegions": [],
+      "states": {
+        "machine": "fsus-fixture",
+        "states": [
+          { "name": "default", "kind": "initial" },
+          { "name": "loading", "kind": "derived" }
+        ],
+        "transitions": [
+          {
+            "from": "default",
+            "to": "loading",
+            "trigger": "loading input becomes true"
+          }
+        ]
+      },
+      "requirements": {
+        "keyboard": [
+          "All public operations must be keyboard reachable and activatable."
+        ],
+        "pointer": [],
+        "focus": [
+          "Focus entry must surface the same public focus state on both platforms."
+        ],
+        "a11y": [],
+        "motion": ["Honor user reduced-motion preference."],
+        "perf": [
+          "Render and interaction budgets must match the component performance contract."
+        ]
+      },
+      "platformDifferences": [
+        {
+          "member": "label",
+          "kind": "input",
+          "status": "partial",
+          "governance": {
+            "reason": "Real member exists on both sides but semantic drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        }
+      ],
+      "avaloniaExtras": [
+        {
+          "member": "AccessibleName",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": ["scenario.v2.el-fixture.avalonia-extra.accessible-name"]
+        }
+      ],
+      "scenarioIds": [
+        "scenario.v2.el-fixture.input.loading",
+        "scenario.v2.el-fixture.input.label",
+        "scenario.v2.el-fixture.state.default",
+        "scenario.v2.el-fixture.state.loading",
+        "scenario.v2.el-fixture.keyboard",
+        "scenario.v2.el-fixture.focus",
+        "scenario.v2.el-fixture.motion",
+        "scenario.v2.el-fixture.perf"
+      ],
+      "coverage": {
+        "total": 2,
+        "alignedCandidate": 1,
+        "partial": 1,
+        "missing": 0,
+        "webOnly": 0,
+        "mappedPercent": 100
+      }
+    },
+    {
+      "id": "component-v2.el-markdown-editor",
+      "version": "2.0.0",
+      "releaseClassification": "preview",
+      "owner": "FsusUI Core",
+      "component": {
+        "name": "ElMarkdownEditor",
+        "module": "markdown-editor",
+        "classification": "native-adapter",
+        "exportStatus": "partial"
+      },
+      "bindings": {
+        "web": {
+          "status": "source",
+          "package": "@ozwasyd/element-plus",
+          "memberRef": {
+            "baseline": "spec/baselines/vue-current.json",
+            "kind": "component"
+          }
+        },
+        "avalonia": {
+          "status": "unbound",
+          "package": null,
+          "type": null
+        }
+      },
+      "inputs": [
+        {
+          "name": "mode",
+          "kind": "input",
+          "web": {
+            "member": "mode",
+            "categories": ["string"],
+            "runtimeType": "String",
+            "semanticType": "PropType<MarkdownEditorMode | undefined>",
+            "nullable": true,
+            "default": { "kind": "undefined" },
+            "values": ["write", "split", "preview"],
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": ["scenario.v2.el-markdown-editor.input.mode"],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        }
+      ],
+      "outputs": [],
+      "operations": [],
+      "contentRegions": [],
+      "states": {
+        "machine": "fsus-markdown-editor",
+        "states": [
+          { "name": "default", "kind": "initial" },
+          { "name": "source", "kind": "derived-mode" },
+          { "name": "live", "kind": "derived-mode" },
+          { "name": "split", "kind": "derived-mode" },
+          { "name": "preview", "kind": "derived-mode" }
+        ],
+        "transitions": []
+      },
+      "requirements": {
+        "keyboard": [
+          "All public operations must be keyboard reachable and activatable."
+        ],
+        "pointer": [],
+        "focus": [
+          "Focus entry must surface the same public focus state on both platforms."
+        ],
+        "a11y": [],
+        "motion": ["Honor user reduced-motion preference."],
+        "perf": [
+          "Render and interaction budgets must match the component performance contract."
+        ]
+      },
+      "platformDifferences": [
+        {
+          "member": "mode",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        }
+      ],
+      "avaloniaExtras": [],
+      "markdownEditor": {
+        "modes": ["source", "live", "split", "preview"],
+        "capabilities": ["source", "live", "split", "preview", "readonly", "disabled"],
+        "writeAlias": false,
+        "canonical": true
+      },
+      "markdownEditorGate": {
+        "blocked": true,
+        "blockedBy": [338, 339, 340, 341, 342, 343],
+        "requiredStatus": "partial"
+      },
+      "scenarioIds": [
+        "scenario.v2.el-markdown-editor.input.mode",
+        "scenario.v2.el-markdown-editor.state.default",
+        "scenario.v2.el-markdown-editor.state.source",
+        "scenario.v2.el-markdown-editor.state.live",
+        "scenario.v2.el-markdown-editor.state.split",
+        "scenario.v2.el-markdown-editor.state.preview",
+        "scenario.v2.el-markdown-editor.keyboard",
+        "scenario.v2.el-markdown-editor.focus",
+        "scenario.v2.el-markdown-editor.motion",
+        "scenario.v2.el-markdown-editor.perf"
+      ],
+      "coverage": {
+        "total": 1,
+        "alignedCandidate": 0,
+        "partial": 0,
+        "missing": 1,
+        "webOnly": 0,
+        "mappedPercent": 0
+      }
+    }
+  ],
+  "componentMap": [
+    {
+      "vue": { "name": "ElFixture", "module": "fixture" },
+      "avalonia": {
+        "type": "FsusUI.Avalonia.Controls.FsusFixture",
+        "packageId": "avalonia"
+      },
+      "basis": "name-equality"
+    }
+  ],
+  "avaloniaOnlyTypes": [
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
+      "kind": "class",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 30,
+      "scenarioIds": ["scenario.v2.avalonia-only.fsus-anchored-overlay-surface"],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    }
+  ]
+}

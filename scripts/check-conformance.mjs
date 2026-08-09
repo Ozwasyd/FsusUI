@@ -104,6 +104,18 @@ const checkContracts = () => {
       stdio: 'inherit',
     },
   )
+  execFileSync(process.execPath, ['scripts/contract-v2.mjs', '--check'], {
+    cwd: root,
+    stdio: 'inherit',
+  })
+  execFileSync(
+    process.execPath,
+    ['--test', 'tests/contract-v2.test.mjs'],
+    {
+      cwd: root,
+      stdio: 'inherit',
+    },
+  )
   const webMappingFile = 'docs/api/web-contract-mapping.md'
   const webMapping = read(webMappingFile).toLowerCase()
   for (const component of requiredComponents) {

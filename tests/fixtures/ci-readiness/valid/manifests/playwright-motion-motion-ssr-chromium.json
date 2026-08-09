@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "workflowGroup": "stable",
+  "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "gate": "playwright-motion",
+  "status": "success",
+  "toolchain": {
+    "node": "v22.0.0",
+    "playwright": "1.59.1"
+  },
+  "inputFingerprint": "c96c6d5be8d08a12e7b5cdc1b207fa6b2430974c86803d8891675e76fd992c20",
+  "artifacts": [
+    {
+      "name": "receipt-motion-ssr/chromium",
+      "path": "receipts/playwright-motion/motion-ssr-chromium.json",
+      "sha256": "73f6721b63491fcbe8dbe785136d195550f71caa11771e47f813010169b5a438"
+    },
+    {
+      "name": "report-motion-ssr/chromium",
+      "path": "receipts/playwright-motion/reports/motion-ssr-chromium.json",
+      "sha256": "0e3041de86a8faf91f34c159dbd12720a480c636b405b3c2aa38c9196e436ff5"
+    }
+  ],
+  "dimensions": {},
+  "playwright": {
+    "decision": "run",
+    "suiteId": "motion-ssr",
+    "cellId": "motion-ssr/chromium",
+    "dimensions": {
+      "browser": "chromium",
+      "runtimeMode": "ssr"
+    },
+    "registryHash": "7091a274991a1af109a40377e5acc49daaca13d3697912e60e8bc4f4adc96982",
+    "tests": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    "config": {
+      "path": "vue/playwright.motion-ssr.config.ts",
+      "sha256": "a986458acf24ceccb4cb2666fd3f67b48f729f1d297cd973ad9fc2dbf1e8dccf"
+    },
+    "runtime": {
+      "browser": "chromium",
+      "browserRevision": "1100001",
+      "runtimeMode": "browser-ssr"
+    },
+    "report": {
+      "path": "receipts/playwright-motion/reports/motion-ssr-chromium.json",
+      "sha256": "0e3041de86a8faf91f34c159dbd12720a480c636b405b3c2aa38c9196e436ff5"
+    },
+    "receiptPath": "receipts/playwright-motion/motion-ssr-chromium.json",
+    "receiptDigest": "73f6721b63491fcbe8dbe785136d195550f71caa11771e47f813010169b5a438"
+  },
+  "reportSummary": "reports/playwright-motion-motion-ssr-chromium.json",
+  "createdAt": "2026-08-01T00:00:05.000Z",
+  "run": {
+    "id": "42",
+    "attempt": "1"
+  }
+}

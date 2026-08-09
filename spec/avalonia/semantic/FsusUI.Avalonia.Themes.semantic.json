@@ -1,0 +1,1136 @@
+{
+  "packageId": "FsusUI.Avalonia.Themes",
+  "baselineVersion": "1.0.0",
+  "source": {
+    "tool": "FsusUI.Avalonia.ApiTool@1.0.0",
+    "assemblyVersion": "0.0.0.0"
+  },
+  "semanticTypes": [
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusThemeMode",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Light",
+          "value": 0
+        },
+        {
+          "name": "Dark",
+          "value": 1
+        },
+        {
+          "name": "System",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusThemeModeChangedEventArgs",
+      "kind": "class",
+      "baseType": "System.EventArgs",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Mode",
+          "type": "FsusUI.Avalonia.Controls.FsusThemeMode",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusThemeModeToggle",
+      "kind": "class",
+      "baseType": "Avalonia.Controls.ContentControl",
+      "isAbstract": false,
+      "isSealed": false,
+      "properties": [
+        {
+          "name": "AccessibleName",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Compact",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "CurrentMode",
+          "type": "FsusUI.Avalonia.Controls.FsusThemeMode",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Labels",
+          "type": "FsusUI.Avalonia.Controls.FsusThemeModeToggleLabels",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ThemeManager",
+          "type": "FsusUI.Avalonia.Themes.FsusThemeManager",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Variant",
+          "type": "FsusUI.Avalonia.Controls.FsusThemeModeToggleVariant",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Visibility",
+          "type": "FsusUI.Avalonia.Controls.FsusThemeModeToggleVisibility",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "VisibleLabels",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CSystem.String\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [
+        {
+          "name": "ModeChanged",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusThemeModeChangedEventArgs\u003E",
+          "isStatic": false
+        }
+      ],
+      "methods": [
+        {
+          "name": "SetMode",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "mode",
+              "type": "FsusUI.Avalonia.Controls.FsusThemeMode",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusThemeModeToggleLabels",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Dark",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "DarkShort",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Light",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "LightShort",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "System",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "SystemShort",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusThemeModeToggleLabels",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusThemeModeToggleVariant",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Segmented",
+          "value": 0
+        },
+        {
+          "name": "MenuButton",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusThemeModeToggleVisibility",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Always",
+          "value": 0
+        },
+        {
+          "name": "Desktop",
+          "value": 1
+        },
+        {
+          "name": "Mobile",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Themes.FsusDensity",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Compact",
+          "value": 0
+        },
+        {
+          "name": "Default",
+          "value": 1
+        },
+        {
+          "name": "Spacious",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Themes.FsusMotionMode",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "System",
+          "value": 0
+        },
+        {
+          "name": "Enabled",
+          "value": 1
+        },
+        {
+          "name": "Reduced",
+          "value": 2
+        },
+        {
+          "name": "Disabled",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Themes.FsusMotionModeChangedEventArgs",
+      "kind": "class",
+      "baseType": "System.EventArgs",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "CurrentEffectiveMode",
+          "type": "FsusUI.Avalonia.Themes.FsusResolvedMotionMode",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "CurrentMode",
+          "type": "FsusUI.Avalonia.Themes.FsusMotionMode",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "PreviousEffectiveMode",
+          "type": "FsusUI.Avalonia.Themes.FsusResolvedMotionMode",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "PreviousMode",
+          "type": "FsusUI.Avalonia.Themes.FsusMotionMode",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Themes.FsusMotionPhase",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Enter",
+          "value": 0
+        },
+        {
+          "name": "Leave",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Themes.FsusMotionPlan",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Delay",
+          "type": "System.TimeSpan",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Duration",
+          "type": "System.TimeSpan",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "DurationToken",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Easing",
+          "type": "Avalonia.Animation.Easings.IEasing",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "EasingToken",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "EffectiveMode",
+          "type": "FsusUI.Avalonia.Themes.FsusResolvedMotionMode",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "From",
+          "type": "FsusUI.Avalonia.Themes.FsusMotionVisualState",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsAnimated",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Phase",
+          "type": "FsusUI.Avalonia.Themes.FsusMotionPhase",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "PreservesFocus",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Preset",
+          "type": "FsusUI.Avalonia.Themes.FsusMotionPreset",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "TerminalState",
+          "type": "FsusUI.Avalonia.Themes.FsusMotionVisualState",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "To",
+          "type": "FsusUI.Avalonia.Themes.FsusMotionVisualState",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Themes.FsusMotionPlan",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "Preset",
+              "type": "FsusUI.Avalonia.Themes.FsusMotionPreset\u0026",
+              "optional": false
+            },
+            {
+              "name": "Phase",
+              "type": "FsusUI.Avalonia.Themes.FsusMotionPhase\u0026",
+              "optional": false
+            },
+            {
+              "name": "EffectiveMode",
+              "type": "FsusUI.Avalonia.Themes.FsusResolvedMotionMode\u0026",
+              "optional": false
+            },
+            {
+              "name": "Duration",
+              "type": "System.TimeSpan\u0026",
+              "optional": false
+            },
+            {
+              "name": "Delay",
+              "type": "System.TimeSpan\u0026",
+              "optional": false
+            },
+            {
+              "name": "Easing",
+              "type": "Avalonia.Animation.Easings.IEasing\u0026",
+              "optional": false
+            },
+            {
+              "name": "DurationToken",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "EasingToken",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "From",
+              "type": "FsusUI.Avalonia.Themes.FsusMotionVisualState\u0026",
+              "optional": false
+            },
+            {
+              "name": "To",
+              "type": "FsusUI.Avalonia.Themes.FsusMotionVisualState\u0026",
+              "optional": false
+            },
+            {
+              "name": "TerminalState",
+              "type": "FsusUI.Avalonia.Themes.FsusMotionVisualState\u0026",
+              "optional": false
+            },
+            {
+              "name": "IsAnimated",
+              "type": "System.Boolean\u0026",
+              "optional": false
+            },
+            {
+              "name": "PreservesFocus",
+              "type": "System.Boolean\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Themes.FsusMotionPreset",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "ControlFeedback",
+          "value": 0
+        },
+        {
+          "name": "PanelEnter",
+          "value": 1
+        },
+        {
+          "name": "OverlayTransition",
+          "value": 2
+        },
+        {
+          "name": "ListItemAppearance",
+          "value": 3
+        },
+        {
+          "name": "ActionRowSafe",
+          "value": 4
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Themes.FsusMotionRequest",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Index",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Phase",
+          "type": "FsusUI.Avalonia.Themes.FsusMotionPhase",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Preset",
+          "type": "FsusUI.Avalonia.Themes.FsusMotionPreset",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Themes.FsusMotionRequest",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "Preset",
+              "type": "FsusUI.Avalonia.Themes.FsusMotionPreset\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Themes.FsusMotionService",
+      "kind": "class",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "EffectiveMode",
+          "type": "FsusUI.Avalonia.Themes.FsusResolvedMotionMode",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "RequestedMode",
+          "type": "FsusUI.Avalonia.Themes.FsusMotionMode",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "SystemPrefersReducedMotion",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [
+        {
+          "name": "MotionModeChanged",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Themes.FsusMotionModeChangedEventArgs\u003E",
+          "isStatic": false
+        }
+      ],
+      "methods": [
+        {
+          "name": "Resolve",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Themes.FsusMotionPlan",
+          "parameters": [
+            {
+              "name": "preset",
+              "type": "FsusUI.Avalonia.Themes.FsusMotionPreset",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "Resolve",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Themes.FsusMotionPlan",
+          "parameters": [
+            {
+              "name": "request",
+              "type": "FsusUI.Avalonia.Themes.FsusMotionRequest",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "SetMode",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "mode",
+              "type": "FsusUI.Avalonia.Themes.FsusMotionMode",
+              "optional": false
+            },
+            {
+              "name": "systemPrefersReducedMotion",
+              "type": "System.Boolean?",
+              "optional": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Themes.FsusMotionTransform",
+      "kind": "struct",
+      "baseType": "System.ValueType",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Scale",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Terminal",
+          "type": "FsusUI.Avalonia.Themes.FsusMotionTransform",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true
+        },
+        {
+          "name": "X",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Y",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "X",
+              "type": "System.Double\u0026",
+              "optional": false
+            },
+            {
+              "name": "Y",
+              "type": "System.Double\u0026",
+              "optional": false
+            },
+            {
+              "name": "Scale",
+              "type": "System.Double\u0026",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "TranslateY",
+          "isStatic": true,
+          "returnType": "FsusUI.Avalonia.Themes.FsusMotionTransform",
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Double",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Themes.FsusMotionVisualState",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Opacity",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Terminal",
+          "type": "FsusUI.Avalonia.Themes.FsusMotionVisualState",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true
+        },
+        {
+          "name": "Transform",
+          "type": "FsusUI.Avalonia.Themes.FsusMotionTransform",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Themes.FsusMotionVisualState",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "Opacity",
+              "type": "System.Double\u0026",
+              "optional": false
+            },
+            {
+              "name": "Transform",
+              "type": "FsusUI.Avalonia.Themes.FsusMotionTransform\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Themes.FsusResolvedMotionMode",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Enabled",
+          "value": 0
+        },
+        {
+          "name": "Reduced",
+          "value": 1
+        },
+        {
+          "name": "Disabled",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Themes.FsusThemeManager",
+      "kind": "class",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "CurrentOptions",
+          "type": "FsusUI.Avalonia.Themes.FsusThemeOptions",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "Apply",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Themes.FsusThemeOptions",
+          "parameters": [
+            {
+              "name": "application",
+              "type": "Avalonia.Application",
+              "optional": false
+            },
+            {
+              "name": "options",
+              "type": "FsusUI.Avalonia.Themes.FsusThemeOptions",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "Apply",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Themes.FsusThemeOptions",
+          "parameters": [
+            {
+              "name": "resources",
+              "type": "Avalonia.Controls.IResourceDictionary",
+              "optional": false
+            },
+            {
+              "name": "options",
+              "type": "FsusUI.Avalonia.Themes.FsusThemeOptions",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Themes.FsusThemeOptions",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "AccentOverride",
+          "type": "Avalonia.Media.Color?",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Default",
+          "type": "FsusUI.Avalonia.Themes.FsusThemeOptions",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true
+        },
+        {
+          "name": "Density",
+          "type": "FsusUI.Avalonia.Themes.FsusDensity",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "FollowSystemTheme",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "HighContrast",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "MotionMode",
+          "type": "FsusUI.Avalonia.Themes.FsusMotionMode",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Typography",
+          "type": "FsusUI.Avalonia.Themes.FsusTypographyOptions",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Variant",
+          "type": "FsusUI.Avalonia.Themes.FsusThemeVariant",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Themes.FsusThemeOptions",
+          "parameters": []
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Themes.FsusThemeResourceKeys",
+      "kind": "class",
+      "baseType": "System.Object",
+      "isAbstract": true,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Themes.FsusThemeVariant",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Light",
+          "value": 0
+        },
+        {
+          "name": "Dark",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Themes.FsusTypographyOptions",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "ApplicationFontFamilies",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CSystem.String\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ApplicationMonospaceFontFamilies",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CSystem.String\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Default",
+          "type": "FsusUI.Avalonia.Themes.FsusTypographyOptions",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true
+        },
+        {
+          "name": "UseSystemFallback",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Themes.FsusTypographyOptions",
+          "parameters": []
+        }
+      ]
+    }
+  ]
+}

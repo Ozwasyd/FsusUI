@@ -7,6 +7,7 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { loadVisualReuseOwnerPlan } from './visual-reuse-playwright-plan.mjs'
 import { runVisualReuseCell } from './visual-reuse-playwright-runner.mjs'
+import { filterOwnerPlanByImpact } from './playwright-impact-filter.mjs'
 import {
   loadVisualReuseReceiptsFromDirectory,
   verifyVisualReuseOwnerReceipts,
@@ -87,13 +88,20 @@ async function main(argv = process.argv.slice(2)) {
   const evidenceDir = option(argv, 'evidence-dir', '.tmp/visual-runtime-reuse')
   const runtimeDir = option(argv, 'runtime-dir', '.tmp/visual-runtime-reuse-runtime')
   const serverPort = Number(option(argv, 'server-port', '4182'))
+  const impactPlanPath = option(argv, 'impact-plan', '')
   const skipPrepare = hasFlag(argv, 'skip-prepare')
   const dryRun = hasFlag(argv, 'dry-run')
 
   const plan = loadVisualReuseOwnerPlan(group)
+  const { plan: selectedPlan, impactPlanDigest } = filterOwnerPlanByImpact({
+    root,
+    plan,
+    group,
+    impactPlanPath,
+  })
   const cells = requestedCell
-    ? plan.cells.filter((cell) => cell.id === requestedCell)
-    : plan.cells
+    ? selectedPlan.cells.filter((cell) => cell.id === requestedCell)
+    : selectedPlan.cells
   if (requestedCell && cells.length === 0) {
     fail(`unknown cell ${requestedCell} for owner ${ownerId} group ${group}`)
   }
@@ -164,13 +172,13 @@ async function main(argv = process.argv.slice(2)) {
 
   // Step 7: Verify receipts
   const receipts = loadVisualReuseReceiptsFromDirectory(
-    resolve(root, plan.receiptDirectory),
+    resolve(root, selectedPlan.receiptDirectory),
   )
   const { summary, failed } = await verifyVisualReuseOwnerReceipts(
     ownerId,
     group,
     receipts,
-    plan,
+    selectedPlan,
     {
       runtimeDir,
       expectedCommitSha: commitSha || undefined,
@@ -184,6 +192,7 @@ async function main(argv = process.argv.slice(2)) {
     group,
     commitSha,
     planDigest: plan.digest,
+    impactPlanDigest,
     runtimeMode: plan.runtimeMode,
     runtimeIntegrity: {
       beforeManifestDigest,

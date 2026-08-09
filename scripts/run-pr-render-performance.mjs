@@ -93,11 +93,35 @@ try {
   ])
   if (baselineStatus.available)
     await run('pnpm', [
+      'perf:render',
+      '--',
+      '--impact-plan',
+      plan,
+      '--output',
+      path.join(output, 'current-repeat'),
+    ])
+  if (baselineStatus.available)
+    await run(
+      'pnpm',
+      [
+        'perf:render',
+        '--',
+        '--impact-plan',
+        plan,
+        '--output',
+        path.join(output, 'baseline-repeat'),
+      ],
+      baseline,
+    )
+  if (baselineStatus.available)
+    await run('pnpm', [
       'perf:render:compare',
       '--',
       path.join(output, 'baseline'),
       path.join(output, 'current'),
       '0.15',
+      path.join(output, 'baseline-repeat'),
+      path.join(output, 'current-repeat'),
     ])
 } finally {
   if (ownsWorktree)

@@ -800,6 +800,7 @@ jobs:
             --root .readiness \
             --profile main \
             --workflow-group '${{ inputs.group }}' \
+            --playwright-group ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 'pr' || 'main' }} \
             --commit "$GITHUB_SHA" \
             --run-id "$GITHUB_RUN_ID" \
             --run-attempt "$GITHUB_RUN_ATTEMPT" \
@@ -854,6 +855,7 @@ jobs:
             --root .readiness \
             --profile nightly \
             --workflow-group nightly \
+            --playwright-group nightly \
             --commit "$GITHUB_SHA" \
             --run-id "$GITHUB_RUN_ID" \
             --run-attempt "$GITHUB_RUN_ATTEMPT" \
@@ -913,6 +915,7 @@ jobs:
             --root .readiness \
             --profile release \
             --workflow-group release \
+            --playwright-group release \
             --commit "$GITHUB_SHA" \
             --run-id "$GITHUB_RUN_ID" \
             --run-attempt "$GITHUB_RUN_ATTEMPT" \

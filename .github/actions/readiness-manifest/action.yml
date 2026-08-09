@@ -22,6 +22,14 @@ inputs:
     description: Unique suffix for matrix copies of the same leaf gate.
     required: false
     default: single
+  playwright-receipts:
+    description: Directory containing Playwright cell receipts for a playwright gate (relative to repository root).
+    required: false
+    default: ''
+  playwright-plan:
+    description: Path to the #485 impact plan receipt (relative to repository root). Required for PR playwright gates.
+    required: false
+    default: ''
 runs:
   using: composite
   steps:
@@ -33,8 +41,16 @@ runs:
         READINESS_STATUS: ${{ inputs.status }}
         READINESS_DIMENSIONS: ${{ inputs.dimensions }}
         READINESS_ARTIFACTS: ${{ inputs.artifacts }}
+        READINESS_PLAYWRIGHT_RECEIPTS: ${{ inputs.playwright-receipts }}
+        READINESS_PLAYWRIGHT_PLAN: ${{ inputs.playwright-plan }}
       run: |
         args=(emit --gate "$READINESS_GATE" --group "$READINESS_GROUP" --status "$READINESS_STATUS")
+        if [ -n "$READINESS_PLAYWRIGHT_RECEIPTS" ]; then
+          args+=(--playwright-receipts "$READINESS_PLAYWRIGHT_RECEIPTS")
+        fi
+        if [ -n "$READINESS_PLAYWRIGHT_PLAN" ]; then
+          args+=(--playwright-plan "$READINESS_PLAYWRIGHT_PLAN")
+        fi
         IFS=',' read -ra dimensions <<< "$READINESS_DIMENSIONS"
         for dimension in "${dimensions[@]}"; do
           test -z "$dimension" || args+=(--dimension "$dimension")
@@ -50,5 +66,6 @@ runs:
         name: readiness-manifest-${{ inputs.gate }}-${{ inputs.artifact-suffix }}
         path: .readiness
         include-hidden-files: true
+        if-no-files-found: warn
         overwrite: true
         retention-days: 7

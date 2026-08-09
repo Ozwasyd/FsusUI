@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "owner": "playwright-layout",
+  "gate": "playwright-layout",
+  "suiteId": "geometry-smoke",
+  "cellId": "geometry-smoke/chromium",
+  "project": "default",
+  "dimensions": {
+    "browser": "chromium"
+  },
+  "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "workflowGroup": "pr",
+  "run": {
+    "id": "42",
+    "attempt": "1"
+  },
+  "toolchain": {
+    "node": "v22.0.0",
+    "chromiumRevision": "1100001",
+    "firefoxRevision": "1350.0",
+    "webkitRevision": "17.4"
+  },
+  "runtime": {
+    "mode": "browser-product",
+    "manifestDigest": "d92c6a81b2ff50096bcda80885427d1f59a25b5f483f7055523504925d16ab23",
+    "sourceFingerprint": "41cf6794ba4200b839c53531555f0f3998df4cbb01a4d5cb0b94e3ca5e23947d"
+  },
+  "config": {
+    "path": "vue/playwright.geometry.config.ts",
+    "sha256": "4e37bcf667f4bd8523d0741a1d19b6989cf608c0da06f1c0edaafe4fee2e46a1"
+  },
+  "tests": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0
+  },
+  "report": {
+    "path": "receipts/playwright-layout/reports/geometry-smoke-chromium.json",
+    "sha256": "afc34552a1501671f87669768aa8fae38aad98fd9db4fecb4a0d7a08f90f9447"
+  },
+  "status": "success",
+  "startedAt": "2026-08-01T00:00:00.000Z",
+  "endedAt": "2026-08-01T00:00:05.000Z"
+}

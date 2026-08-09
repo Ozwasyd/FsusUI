@@ -1,0 +1,32 @@
+[
+  {
+    "name": "PR run cell missing",
+    "mutation": "pr-missing-cell",
+    "expected": "missing run cell"
+  },
+  {
+    "name": "PR skip manifest missing",
+    "mutation": "pr-missing-skip",
+    "expected": "missing skip manifest"
+  },
+  {
+    "name": "PR skip manifest plan digest mismatch",
+    "mutation": "pr-skip-digest",
+    "expected": "impact plan digest mismatch"
+  },
+  {
+    "name": "PR run suite with skip receipt",
+    "mutation": "pr-run-as-skip",
+    "expected": "expected run receipt but found skip"
+  },
+  {
+    "name": "PR unexpected cell",
+    "mutation": "pr-extra-cell",
+    "expected": "not in the PR profile"
+  },
+  {
+    "name": "PR impact plan digest invalid",
+    "mutation": "pr-plan-digest",
+    "expected": "plan digest is invalid"
+  }
+]

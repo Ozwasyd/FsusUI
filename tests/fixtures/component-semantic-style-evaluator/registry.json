@@ -2,7 +2,10 @@
   "$schema": "../../../spec/components/component-surface-semantic-registry.schema.json",
   "schemaVersion": "fsusui.component-surface-semantic-registry.v1",
   "registryVersion": "1.0.0",
-  "owner": { "id": "fsusui.design-governance", "kind": "specification" },
+  "owner": {
+    "id": "fsusui.design-governance",
+    "kind": "specification"
+  },
   "reviewPolicy": {
     "mode": "source-digest-required",
     "ownerReviewRequired": true,
@@ -11,7 +14,7 @@
   "allowlist": [],
   "generated": {
     "producer": "scripts/generate-component-surface-semantic-registry.mjs",
-    "sourceRevision": "26d8576dbd7f4aa27b42d171895d72bc9454a769",
+    "sourceRevision": "c463db9f2fbaa08baa249d5a792d128104087053",
     "digestAlgorithm": "sha256"
   },
   "sourceDigests": {
@@ -31,7 +34,7 @@
       "path": "spec/components/contracts/v1/vue-public-contracts.json",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "c6ece7b275d1dace443e411802d54b1deffe0c4df73ea2b51ddeb537f54d5e40"
+      "digest": "2f4c5e5d205f9193f689c800bc4de0324b5e799a47a3ca56d6a7257e6cff5be6"
     },
     "implementation-tokens": {
       "path": "source/_tokens.scss",
@@ -71,12 +74,34 @@
       "partId": "overlay-root",
       "surfaceRole": "overlay.panel-root",
       "issues": [
-        293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306,
-        307, 308, 309, 310
+        293,
+        294,
+        295,
+        296,
+        297,
+        298,
+        299,
+        300,
+        301,
+        302,
+        303,
+        304,
+        305,
+        306,
+        307,
+        308,
+        309,
+        310
       ],
-      "owner": { "id": "fsusui.web.vue", "kind": "implementation" },
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
       "selectorOwnership": {
-        "owner": { "id": "fsusui.web.vue", "kind": "implementation" },
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
         "selectors": [
           {
             "platform": "web",
@@ -99,7 +124,10 @@
         ]
       },
       "sourceOwnership": {
-        "owner": { "id": "fsusui.web.vue", "kind": "implementation" },
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
         "sources": [
           {
             "sourceId": "implementation-select",
@@ -151,9 +179,20 @@
         ]
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -165,18 +204,42 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.select.overlay-root.semantic-evidence",
-            "states": ["default", "open"],
-            "themes": ["light", "dark"],
-            "viewports": [
-              { "id": "mobile", "width": 375, "height": 812 },
-              { "id": "desktop", "width": 1366, "height": 768 }
+            "states": [
+              "default",
+              "open"
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "themes": [
+              "light",
+              "dark"
+            ],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -194,12 +257,34 @@
       "partId": "option-row",
       "surfaceRole": "overlay.option-row",
       "issues": [
-        293, 294, 295, 296, 297, 298, 299, 300, 301, 302, 303, 304, 305, 306,
-        307, 308, 309, 310
+        293,
+        294,
+        295,
+        296,
+        297,
+        298,
+        299,
+        300,
+        301,
+        302,
+        303,
+        304,
+        305,
+        306,
+        307,
+        308,
+        309,
+        310
       ],
-      "owner": { "id": "fsusui.web.vue", "kind": "implementation" },
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
       "selectorOwnership": {
-        "owner": { "id": "fsusui.web.vue", "kind": "implementation" },
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
         "selectors": [
           {
             "platform": "web",
@@ -258,7 +343,10 @@
         ]
       },
       "sourceOwnership": {
-        "owner": { "id": "fsusui.web.vue", "kind": "implementation" },
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
         "sources": [
           {
             "sourceId": "implementation-select",
@@ -335,9 +423,20 @@
         "surfaceCardMotif": []
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -349,18 +448,44 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "web.select.option-row.semantic-evidence",
-            "states": ["default", "hover", "selected", "focus-visible"],
-            "themes": ["light", "dark"],
-            "viewports": [
-              { "id": "mobile", "width": 375, "height": 812 },
-              { "id": "desktop", "width": 1366, "height": 768 }
+            "states": [
+              "default",
+              "hover",
+              "selected",
+              "focus-visible"
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "themes": [
+              "light",
+              "dark"
+            ],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -377,110 +502,218 @@
     {
       "issue": 293,
       "errorId": "semantic-cascade-contract",
-      "ruleIds": ["web.select.overlay-root", "web.select.option-row"],
-      "semanticRoles": ["overlay.panel-root", "overlay.option-row"]
+      "ruleIds": [
+        "web.select.overlay-root",
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.panel-root",
+        "overlay.option-row"
+      ]
     },
     {
       "issue": 294,
       "errorId": "semantic-cascade-contract",
-      "ruleIds": ["web.select.overlay-root", "web.select.option-row"],
-      "semanticRoles": ["overlay.panel-root", "overlay.option-row"]
+      "ruleIds": [
+        "web.select.overlay-root",
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.panel-root",
+        "overlay.option-row"
+      ]
     },
     {
       "issue": 295,
       "errorId": "semantic-cascade-contract",
-      "ruleIds": ["web.select.overlay-root", "web.select.option-row"],
-      "semanticRoles": ["overlay.panel-root", "overlay.option-row"]
+      "ruleIds": [
+        "web.select.overlay-root",
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.panel-root",
+        "overlay.option-row"
+      ]
     },
     {
       "issue": 296,
       "errorId": "semantic-cascade-contract",
-      "ruleIds": ["web.select.overlay-root", "web.select.option-row"],
-      "semanticRoles": ["overlay.panel-root", "overlay.option-row"]
+      "ruleIds": [
+        "web.select.overlay-root",
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.panel-root",
+        "overlay.option-row"
+      ]
     },
     {
       "issue": 297,
       "errorId": "semantic-cascade-contract",
-      "ruleIds": ["web.select.overlay-root", "web.select.option-row"],
-      "semanticRoles": ["overlay.panel-root", "overlay.option-row"]
+      "ruleIds": [
+        "web.select.overlay-root",
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.panel-root",
+        "overlay.option-row"
+      ]
     },
     {
       "issue": 298,
       "errorId": "semantic-cascade-contract",
-      "ruleIds": ["web.select.overlay-root", "web.select.option-row"],
-      "semanticRoles": ["overlay.panel-root", "overlay.option-row"]
+      "ruleIds": [
+        "web.select.overlay-root",
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.panel-root",
+        "overlay.option-row"
+      ]
     },
     {
       "issue": 299,
       "errorId": "semantic-cascade-contract",
-      "ruleIds": ["web.select.overlay-root", "web.select.option-row"],
-      "semanticRoles": ["overlay.panel-root", "overlay.option-row"]
+      "ruleIds": [
+        "web.select.overlay-root",
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.panel-root",
+        "overlay.option-row"
+      ]
     },
     {
       "issue": 300,
       "errorId": "semantic-cascade-contract",
-      "ruleIds": ["web.select.overlay-root", "web.select.option-row"],
-      "semanticRoles": ["overlay.panel-root", "overlay.option-row"]
+      "ruleIds": [
+        "web.select.overlay-root",
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.panel-root",
+        "overlay.option-row"
+      ]
     },
     {
       "issue": 301,
       "errorId": "semantic-cascade-contract",
-      "ruleIds": ["web.select.overlay-root", "web.select.option-row"],
-      "semanticRoles": ["overlay.panel-root", "overlay.option-row"]
+      "ruleIds": [
+        "web.select.overlay-root",
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.panel-root",
+        "overlay.option-row"
+      ]
     },
     {
       "issue": 302,
       "errorId": "semantic-cascade-contract",
-      "ruleIds": ["web.select.overlay-root", "web.select.option-row"],
-      "semanticRoles": ["overlay.panel-root", "overlay.option-row"]
+      "ruleIds": [
+        "web.select.overlay-root",
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.panel-root",
+        "overlay.option-row"
+      ]
     },
     {
       "issue": 303,
       "errorId": "semantic-cascade-contract",
-      "ruleIds": ["web.select.overlay-root", "web.select.option-row"],
-      "semanticRoles": ["overlay.panel-root", "overlay.option-row"]
+      "ruleIds": [
+        "web.select.overlay-root",
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.panel-root",
+        "overlay.option-row"
+      ]
     },
     {
       "issue": 304,
       "errorId": "semantic-cascade-contract",
-      "ruleIds": ["web.select.overlay-root", "web.select.option-row"],
-      "semanticRoles": ["overlay.panel-root", "overlay.option-row"]
+      "ruleIds": [
+        "web.select.overlay-root",
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.panel-root",
+        "overlay.option-row"
+      ]
     },
     {
       "issue": 305,
       "errorId": "semantic-cascade-contract",
-      "ruleIds": ["web.select.overlay-root", "web.select.option-row"],
-      "semanticRoles": ["overlay.panel-root", "overlay.option-row"]
+      "ruleIds": [
+        "web.select.overlay-root",
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.panel-root",
+        "overlay.option-row"
+      ]
     },
     {
       "issue": 306,
       "errorId": "semantic-cascade-contract",
-      "ruleIds": ["web.select.overlay-root", "web.select.option-row"],
-      "semanticRoles": ["overlay.panel-root", "overlay.option-row"]
+      "ruleIds": [
+        "web.select.overlay-root",
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.panel-root",
+        "overlay.option-row"
+      ]
     },
     {
       "issue": 307,
       "errorId": "semantic-cascade-contract",
-      "ruleIds": ["web.select.overlay-root", "web.select.option-row"],
-      "semanticRoles": ["overlay.panel-root", "overlay.option-row"]
+      "ruleIds": [
+        "web.select.overlay-root",
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.panel-root",
+        "overlay.option-row"
+      ]
     },
     {
       "issue": 308,
       "errorId": "semantic-cascade-contract",
-      "ruleIds": ["web.select.overlay-root", "web.select.option-row"],
-      "semanticRoles": ["overlay.panel-root", "overlay.option-row"]
+      "ruleIds": [
+        "web.select.overlay-root",
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.panel-root",
+        "overlay.option-row"
+      ]
     },
     {
       "issue": 309,
       "errorId": "semantic-cascade-contract",
-      "ruleIds": ["web.select.overlay-root", "web.select.option-row"],
-      "semanticRoles": ["overlay.panel-root", "overlay.option-row"]
+      "ruleIds": [
+        "web.select.overlay-root",
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.panel-root",
+        "overlay.option-row"
+      ]
     },
     {
       "issue": 310,
       "errorId": "semantic-cascade-contract",
-      "ruleIds": ["web.select.overlay-root", "web.select.option-row"],
-      "semanticRoles": ["overlay.panel-root", "overlay.option-row"]
+      "ruleIds": [
+        "web.select.overlay-root",
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.panel-root",
+        "overlay.option-row"
+      ]
     }
   ]
 }

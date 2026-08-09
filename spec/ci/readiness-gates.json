@@ -1,5 +1,16 @@
 {
   "schemaVersion": 1,
+  "playwright": {
+    "owners": "spec/ci/playwright-owners.json",
+    "suites": "spec/ci/playwright-suites.json",
+    "ownerIds": [
+      "playwright-motion",
+      "playwright-layout",
+      "playwright-boundary",
+      "playwright-markdown",
+      "visual-runtime-reuse"
+    ]
+  },
   "profiles": {
     "main": [
       "static-quality",
@@ -12,6 +23,11 @@
       "consumer-install",
       "build-demo",
       "visual",
+      "playwright-motion",
+      "playwright-layout",
+      "playwright-boundary",
+      "playwright-markdown",
+      "visual-runtime-reuse",
       "real-render-performance"
     ],
     "nightly": [
@@ -25,6 +41,11 @@
       "consumer-install",
       "build-demo",
       "visual",
+      "playwright-motion",
+      "playwright-layout",
+      "playwright-boundary",
+      "playwright-markdown",
+      "visual-runtime-reuse",
       "real-render-performance"
     ],
     "release": [
@@ -38,6 +59,11 @@
       "consumer-install",
       "build-demo",
       "visual",
+      "playwright-motion",
+      "playwright-layout",
+      "playwright-boundary",
+      "playwright-markdown",
+      "visual-runtime-reuse",
       "real-render-performance"
     ]
   },
@@ -74,6 +100,11 @@
     "consumer-install": { "cardinality": "single" },
     "build-demo": { "cardinality": "single" },
     "visual": { "cardinality": "single" },
+    "playwright-motion": { "cardinality": "playwright" },
+    "playwright-layout": { "cardinality": "playwright" },
+    "playwright-boundary": { "cardinality": "playwright" },
+    "playwright-markdown": { "cardinality": "playwright" },
+    "visual-runtime-reuse": { "cardinality": "playwright" },
     "real-render-performance": { "cardinality": "single" }
   },
   "artifactBindings": [

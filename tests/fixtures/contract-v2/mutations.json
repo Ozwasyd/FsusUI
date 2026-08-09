@@ -1,0 +1,77 @@
+[
+  {
+    "name": "auto-counterpart",
+    "operation": "replace",
+    "path": "/contracts/0/inputs/0/avalonia",
+    "value": null,
+    "expectError": "auto counterpart"
+  },
+  {
+    "name": "broad-override",
+    "operation": "replace",
+    "path": "/contracts/0/platformDifferences/0/scope",
+    "value": "family",
+    "expectError": "broad scope"
+  },
+  {
+    "name": "write-alias-modes",
+    "operation": "replace",
+    "path": "/contracts/1/markdownEditor/modes",
+    "value": ["write", "split", "preview"],
+    "expectError": "must be source/live/split/preview"
+  },
+  {
+    "name": "write-alias-flag",
+    "operation": "replace",
+    "path": "/contracts/1/markdownEditor/writeAlias",
+    "value": true,
+    "expectError": "write alias"
+  },
+  {
+    "name": "capability-set",
+    "operation": "replace",
+    "path": "/contracts/1/markdownEditor/capabilities",
+    "value": ["source", "live", "split", "preview"],
+    "expectError": "six canonical values"
+  },
+  {
+    "name": "unmapped-member",
+    "operation": "delete",
+    "path": "/contracts/0/inputs/0/status",
+    "expectError": "invalid status"
+  },
+  {
+    "name": "missing-scenario",
+    "operation": "replace",
+    "path": "/contracts/0/inputs/0/scenarioIds",
+    "value": [],
+    "expectError": "without scenario coverage id"
+  },
+  {
+    "name": "missing-governance",
+    "operation": "delete",
+    "path": "/contracts/0/inputs/1/governance/reviewPolicy",
+    "expectError": "governance missing reviewPolicy"
+  },
+  {
+    "name": "aligned-false-claim",
+    "operation": "add-property",
+    "path": "/contracts/0",
+    "value": { "aligned": true },
+    "expectError": "must not hand-write final aligned: true"
+  },
+  {
+    "name": "gate-flip",
+    "operation": "replace",
+    "path": "/contracts/1/component/exportStatus",
+    "value": "aligned-candidate",
+    "expectError": "must stay partial while"
+  },
+  {
+    "name": "drift-aligned",
+    "operation": "replace",
+    "path": "/contracts/0/inputs/0/drift/type",
+    "value": "web boolean vs avalonia string",
+    "expectError": "claims aligned-candidate with type drift"
+  }
+]

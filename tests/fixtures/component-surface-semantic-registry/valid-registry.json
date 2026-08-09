@@ -2,7 +2,10 @@
   "$schema": "../../../spec/components/component-surface-semantic-registry.schema.json",
   "schemaVersion": "fsusui.component-surface-semantic-registry.v1",
   "registryVersion": "1.0.0",
-  "owner": { "id": "fsusui.design-governance", "kind": "specification" },
+  "owner": {
+    "id": "fsusui.design-governance",
+    "kind": "specification"
+  },
   "reviewPolicy": {
     "mode": "source-digest-required",
     "ownerReviewRequired": true,
@@ -11,7 +14,7 @@
   "allowlist": [],
   "generated": {
     "producer": "scripts/generate-component-surface-semantic-registry.mjs",
-    "sourceRevision": "26d8576dbd7f4aa27b42d171895d72bc9454a769",
+    "sourceRevision": "c463db9f2fbaa08baa249d5a792d128104087053",
     "digestAlgorithm": "sha256"
   },
   "sourceDigests": {
@@ -31,7 +34,7 @@
       "path": "spec/components/contracts/v1/vue-public-contracts.json",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "c6ece7b275d1dace443e411802d54b1deffe0c4df73ea2b51ddeb537f54d5e40"
+      "digest": "2f4c5e5d205f9193f689c800bc4de0324b5e799a47a3ca56d6a7257e6cff5be6"
     },
     "component-select": {
       "path": "docs/components/select.md",
@@ -88,10 +91,22 @@
       "componentId": "web.select",
       "partId": "option-row",
       "surfaceRole": "overlay.option-row",
-      "issues": [293, 294, 295, 301, 309],
-      "owner": { "id": "fsusui.web.vue", "kind": "implementation" },
+      "issues": [
+        293,
+        294,
+        295,
+        301,
+        309
+      ],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
       "selectorOwnership": {
-        "owner": { "id": "fsusui.web.vue", "kind": "implementation" },
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
         "selectors": [
           {
             "platform": "web",
@@ -105,7 +120,10 @@
         ]
       },
       "sourceOwnership": {
-        "owner": { "id": "fsusui.web.vue", "kind": "implementation" },
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
         "sources": [
           {
             "sourceId": "implementation-select",
@@ -181,23 +199,44 @@
         ]
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [
         {
           "id": "touch-target",
-          "owner": { "id": "fsusui.web.vue", "kind": "implementation" },
+          "owner": {
+            "id": "fsusui.web.vue",
+            "kind": "implementation"
+          },
           "source": {
             "sourceId": "design-contract",
             "path": "docs/design.md",
             "pointer": "#density"
           },
           "scope": {
-            "themes": ["light", "dark"],
-            "densities": ["touch"],
-            "devices": ["touch"]
+            "themes": [
+              "light",
+              "dark"
+            ],
+            "densities": [
+              "touch"
+            ],
+            "devices": [
+              "touch"
+            ]
           },
           "constraintOverrides": {
             "geometry": [
@@ -224,7 +263,9 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "option-row-state-layering",
@@ -235,13 +276,32 @@
               "focus-visible",
               "disabled"
             ],
-            "themes": ["light", "dark"],
-            "viewports": [
-              { "id": "mobile", "width": 375, "height": 812 },
-              { "id": "desktop", "width": 1366, "height": 768 }
+            "themes": [
+              "light",
+              "dark"
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -258,10 +318,21 @@
       "componentId": "web.tree",
       "partId": "tree-row",
       "surfaceRole": "data-region.tree-node-row",
-      "issues": [296, 300, 304, 306],
-      "owner": { "id": "fsusui.web.vue", "kind": "implementation" },
+      "issues": [
+        296,
+        300,
+        304,
+        306
+      ],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
       "selectorOwnership": {
-        "owner": { "id": "fsusui.web.vue", "kind": "implementation" },
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
         "selectors": [
           {
             "platform": "web",
@@ -275,7 +346,10 @@
         ]
       },
       "sourceOwnership": {
-        "owner": { "id": "fsusui.web.vue", "kind": "implementation" },
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
         "sources": [
           {
             "sourceId": "implementation-tree",
@@ -351,9 +425,20 @@
         ]
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -365,7 +450,9 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "tree-row-state-layering",
@@ -376,13 +463,32 @@
               "focus-visible",
               "disabled"
             ],
-            "themes": ["light", "dark"],
-            "viewports": [
-              { "id": "mobile", "width": 375, "height": 812 },
-              { "id": "desktop", "width": 1366, "height": 768 }
+            "themes": [
+              "light",
+              "dark"
             ],
-            "zooms": [100, 150, 200],
-            "inputs": ["mouse", "keyboard", "touch"],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [
+              100,
+              150,
+              200
+            ],
+            "inputs": [
+              "mouse",
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -399,10 +505,20 @@
       "componentId": "web.date-picker",
       "partId": "date-cell",
       "surfaceRole": "data-region.date-time-cell",
-      "issues": [297, 302, 308],
-      "owner": { "id": "fsusui.web.vue", "kind": "implementation" },
+      "issues": [
+        297,
+        302,
+        308
+      ],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
       "selectorOwnership": {
-        "owner": { "id": "fsusui.web.vue", "kind": "implementation" },
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
         "selectors": [
           {
             "platform": "web",
@@ -416,7 +532,10 @@
         ]
       },
       "sourceOwnership": {
-        "owner": { "id": "fsusui.web.vue", "kind": "implementation" },
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
         "sources": [
           {
             "sourceId": "implementation-date-picker",
@@ -492,9 +611,20 @@
         ]
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default", "compact", "touch"],
-        "devices": ["desktop", "mobile", "touch"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default",
+          "compact",
+          "touch"
+        ],
+        "devices": [
+          "desktop",
+          "mobile",
+          "touch"
+        ]
       },
       "variants": [],
       "exceptions": [],
@@ -506,18 +636,39 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "date-range-continuity",
-            "states": ["range-start+in-range+range-end"],
-            "themes": ["light", "dark"],
-            "viewports": [
-              { "id": "mobile", "width": 375, "height": 812 },
-              { "id": "desktop", "width": 1366, "height": 768 }
+            "states": [
+              "range-start+in-range+range-end"
             ],
-            "zooms": [100, 200],
-            "inputs": ["keyboard", "touch"],
+            "themes": [
+              "light",
+              "dark"
+            ],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [
+              100,
+              200
+            ],
+            "inputs": [
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -539,10 +690,23 @@
       "componentId": "web.dialog",
       "partId": "overlay-root",
       "surfaceRole": "overlay.dialog-root",
-      "issues": [298, 299, 303, 305, 307, 310],
-      "owner": { "id": "fsusui.web.vue", "kind": "implementation" },
+      "issues": [
+        298,
+        299,
+        303,
+        305,
+        307,
+        310
+      ],
+      "owner": {
+        "id": "fsusui.web.vue",
+        "kind": "implementation"
+      },
       "selectorOwnership": {
-        "owner": { "id": "fsusui.web.vue", "kind": "implementation" },
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
         "selectors": [
           {
             "platform": "web",
@@ -556,7 +720,10 @@
         ]
       },
       "sourceOwnership": {
-        "owner": { "id": "fsusui.web.vue", "kind": "implementation" },
+        "owner": {
+          "id": "fsusui.web.vue",
+          "kind": "implementation"
+        },
         "sources": [
           {
             "sourceId": "implementation-dialog",
@@ -632,24 +799,43 @@
         ]
       },
       "scope": {
-        "themes": ["light", "dark"],
-        "densities": ["default"],
-        "devices": ["desktop", "mobile"]
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "densities": [
+          "default"
+        ],
+        "devices": [
+          "desktop",
+          "mobile"
+        ]
       },
       "variants": [],
       "exceptions": [
         {
           "id": "explicit-expressive-surface",
-          "owner": { "id": "fsusui.specification", "kind": "specification" },
+          "owner": {
+            "id": "fsusui.specification",
+            "kind": "specification"
+          },
           "source": {
             "sourceId": "design-contract",
             "path": "docs/design.md",
             "pointer": "#surface-taxonomy"
           },
           "scope": {
-            "themes": ["light", "dark"],
-            "densities": ["default"],
-            "devices": ["desktop", "mobile"]
+            "themes": [
+              "light",
+              "dark"
+            ],
+            "densities": [
+              "default"
+            ],
+            "devices": [
+              "desktop",
+              "mobile"
+            ]
           },
           "constraintOverrides": {
             "surfaceCardMotif": [
@@ -675,18 +861,41 @@
           "disabled",
           "motion"
         ],
-        "visualProbeFields": ["surfaceCardMotif"],
+        "visualProbeFields": [
+          "surfaceCardMotif"
+        ],
         "visualRequirements": [
           {
             "id": "dialog-surface-depth",
-            "states": ["default", "scrollable", "nested"],
-            "themes": ["light", "dark"],
-            "viewports": [
-              { "id": "mobile", "width": 375, "height": 812 },
-              { "id": "desktop", "width": 1366, "height": 768 }
+            "states": [
+              "default",
+              "scrollable",
+              "nested"
             ],
-            "zooms": [100, 200],
-            "inputs": ["keyboard", "touch"],
+            "themes": [
+              "light",
+              "dark"
+            ],
+            "viewports": [
+              {
+                "id": "mobile",
+                "width": 375,
+                "height": 812
+              },
+              {
+                "id": "desktop",
+                "width": 1366,
+                "height": 768
+              }
+            ],
+            "zooms": [
+              100,
+              200
+            ],
+            "inputs": [
+              "keyboard",
+              "touch"
+            ],
             "expectedSemanticEvidence": [
               {
                 "sourceId": "design-contract",
@@ -703,110 +912,182 @@
     {
       "issue": 293,
       "errorId": "option-row-cardification",
-      "ruleIds": ["web.select.option-row"],
-      "semanticRoles": ["overlay.option-row"]
+      "ruleIds": [
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.option-row"
+      ]
     },
     {
       "issue": 294,
       "errorId": "menu-navigation-density-state",
-      "ruleIds": ["web.select.option-row"],
-      "semanticRoles": ["overlay.option-row"]
+      "ruleIds": [
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.option-row"
+      ]
     },
     {
       "issue": 295,
       "errorId": "tabs-button-cardification",
-      "ruleIds": ["web.select.option-row"],
-      "semanticRoles": ["overlay.option-row"]
+      "ruleIds": [
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.option-row"
+      ]
     },
     {
       "issue": 296,
       "errorId": "tree-node-cardification",
-      "ruleIds": ["web.tree.tree-row"],
-      "semanticRoles": ["data-region.tree-node-row"]
+      "ruleIds": [
+        "web.tree.tree-row"
+      ],
+      "semanticRoles": [
+        "data-region.tree-node-row"
+      ]
     },
     {
       "issue": 297,
       "errorId": "date-time-cell-cardification",
-      "ruleIds": ["web.date-picker.date-cell"],
-      "semanticRoles": ["data-region.date-time-cell"]
+      "ruleIds": [
+        "web.date-picker.date-cell"
+      ],
+      "semanticRoles": [
+        "data-region.date-time-cell"
+      ]
     },
     {
       "issue": 298,
       "errorId": "overlay-depth-inversion",
-      "ruleIds": ["web.dialog.overlay-root"],
-      "semanticRoles": ["overlay.dialog-root"]
+      "ruleIds": [
+        "web.dialog.overlay-root"
+      ],
+      "semanticRoles": [
+        "overlay.dialog-root"
+      ]
     },
     {
       "issue": 299,
       "errorId": "overlay-close-target",
-      "ruleIds": ["web.dialog.overlay-root"],
-      "semanticRoles": ["overlay.dialog-root"]
+      "ruleIds": [
+        "web.dialog.overlay-root"
+      ],
+      "semanticRoles": [
+        "overlay.dialog-root"
+      ]
     },
     {
       "issue": 300,
       "errorId": "upload-file-row-legacy-surface",
-      "ruleIds": ["web.tree.tree-row"],
-      "semanticRoles": ["data-region.tree-node-row"]
+      "ruleIds": [
+        "web.tree.tree-row"
+      ],
+      "semanticRoles": [
+        "data-region.tree-node-row"
+      ]
     },
     {
       "issue": 301,
       "errorId": "segmented-role-conflation",
-      "ruleIds": ["web.select.option-row"],
-      "semanticRoles": ["overlay.option-row"]
+      "ruleIds": [
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.option-row"
+      ]
     },
     {
       "issue": 302,
       "errorId": "rate-primary-color-role",
-      "ruleIds": ["web.date-picker.date-cell"],
-      "semanticRoles": ["data-region.date-time-cell"]
+      "ruleIds": [
+        "web.date-picker.date-cell"
+      ],
+      "semanticRoles": [
+        "data-region.date-time-cell"
+      ]
     },
     {
       "issue": 303,
       "errorId": "loading-indicator-semantic-loss",
-      "ruleIds": ["web.dialog.overlay-root"],
-      "semanticRoles": ["overlay.dialog-root"]
+      "ruleIds": [
+        "web.dialog.overlay-root"
+      ],
+      "semanticRoles": [
+        "overlay.dialog-root"
+      ]
     },
     {
       "issue": 304,
       "errorId": "table-header-typography",
-      "ruleIds": ["web.tree.tree-row"],
-      "semanticRoles": ["data-region.tree-node-row"]
+      "ruleIds": [
+        "web.tree.tree-row"
+      ],
+      "semanticRoles": [
+        "data-region.tree-node-row"
+      ]
     },
     {
       "issue": 305,
       "errorId": "settings-surface-target-state",
-      "ruleIds": ["web.dialog.overlay-root"],
-      "semanticRoles": ["overlay.dialog-root"]
+      "ruleIds": [
+        "web.dialog.overlay-root"
+      ],
+      "semanticRoles": [
+        "overlay.dialog-root"
+      ]
     },
     {
       "issue": 306,
       "errorId": "metric-typography-motif-surface",
-      "ruleIds": ["web.tree.tree-row"],
-      "semanticRoles": ["data-region.tree-node-row"]
+      "ruleIds": [
+        "web.tree.tree-row"
+      ],
+      "semanticRoles": [
+        "data-region.tree-node-row"
+      ]
     },
     {
       "issue": 307,
       "errorId": "reply-composer-disabled-opacity",
-      "ruleIds": ["web.dialog.overlay-root"],
-      "semanticRoles": ["overlay.dialog-root"]
+      "ruleIds": [
+        "web.dialog.overlay-root"
+      ],
+      "semanticRoles": [
+        "overlay.dialog-root"
+      ]
     },
     {
       "issue": 308,
       "errorId": "legacy-transition-motion",
-      "ruleIds": ["web.date-picker.date-cell"],
-      "semanticRoles": ["data-region.date-time-cell"]
+      "ruleIds": [
+        "web.date-picker.date-cell"
+      ],
+      "semanticRoles": [
+        "data-region.date-time-cell"
+      ]
     },
     {
       "issue": 309,
       "errorId": "input-number-stepper-target",
-      "ruleIds": ["web.select.option-row"],
-      "semanticRoles": ["overlay.option-row"]
+      "ruleIds": [
+        "web.select.option-row"
+      ],
+      "semanticRoles": [
+        "overlay.option-row"
+      ]
     },
     {
       "issue": 310,
       "errorId": "public-shell-reduced-motion-lifecycle",
-      "ruleIds": ["web.dialog.overlay-root"],
-      "semanticRoles": ["overlay.dialog-root"]
+      "ruleIds": [
+        "web.dialog.overlay-root"
+      ],
+      "semanticRoles": [
+        "overlay.dialog-root"
+      ]
     }
   ]
 }
