@@ -4,12 +4,12 @@
   "createdAt": "2026-08-09T02:20:00.000Z",
   "files": {
     "pnpm-lock.yaml": "9160eda59f2ebd9e27701d9df9718ccb7b327ceb83d418310ef542b1651451d7",
-    "package.json": "c8496bbfbb275951b8eaaf46c9c88227757fadd1adb111a3e573433a3bfb7206",
+    "package.json": "65ddbefd8322d0de3540acebca32615c55b1ed43e3884fedcceed4154623a8bf",
     "vue/packages/element-plus/package.json": "e869928c42ed32578ebbc269e1fb66293a85a64324f484ce7dc142afae9e884c",
     "config/dependencies/npm-authority.json": "cbbfc945c7fbc24bb65fe2c94074bb552494cc1e16c2f7ad0d087835fb14df13"
   },
   "installPackageCount": 94,
-  "note": "zero-version-change migration freeze; refreshed package.json hash after #415/#562/#404 added governance scripts (no version-pin changes). Other files unchanged.",
+  "note": "zero-version-change migration freeze; refreshed package.json hash after #346/#565 merged governance/contract scripts (no version-pin changes). Other files unchanged.",
   "multiVersionUnifications": {
     "consola": {
       "from": [
