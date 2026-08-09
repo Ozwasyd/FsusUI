@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "baseRef": "main",
+  "headRef": "HEAD",
+  "group": "pr",
+  "registryHash": "7091a274991a1af109a40377e5acc49daaca13d3697912e60e8bc4f4adc96982",
+  "generatedAt": "2026-08-01T00:00:00.000Z",
+  "changedFiles": [
+    "vue/packages/components/button/src/button.vue"
+  ],
+  "decisions": [
+    {
+      "suiteId": "view-transitions",
+      "decision": "skip",
+      "reasonCode": "documentation-only",
+      "reason": "documentation-only fixture",
+      "cells": [],
+      "matchedRoots": []
+    },
+    {
+      "suiteId": "motion-ssr",
+      "decision": "skip",
+      "reasonCode": "documentation-only",
+      "reason": "documentation-only fixture",
+      "cells": [],
+      "matchedRoots": []
+    },
+    {
+      "suiteId": "dom-layout",
+      "decision": "skip",
+      "reasonCode": "documentation-only",
+      "reason": "documentation-only fixture",
+      "cells": [],
+      "matchedRoots": []
+    },
+    {
+      "suiteId": "geometry-smoke",
+      "decision": "skip",
+      "reasonCode": "documentation-only",
+      "reason": "documentation-only fixture",
+      "cells": [],
+      "matchedRoots": []
+    },
+    {
+      "suiteId": "markdown-editor-interaction",
+      "decision": "skip",
+      "reasonCode": "documentation-only",
+      "reason": "documentation-only fixture",
+      "cells": [],
+      "matchedRoots": []
+    },
+    {
+      "suiteId": "visual-boundary-audit",
+      "decision": "skip",
+      "reasonCode": "documentation-only",
+      "reason": "documentation-only fixture",
+      "cells": [],
+      "matchedRoots": []
+    },
+    {
+      "suiteId": "visual-runtime-reuse",
+      "decision": "skip",
+      "reasonCode": "documentation-only",
+      "reason": "documentation-only fixture",
+      "cells": [],
+      "matchedRoots": []
+    }
+  ],
+  "planDigest": "c7dee84550f9ab52fb2680fb42bdf9632adf77b99ff9369d9048076308f6ed64"
+}

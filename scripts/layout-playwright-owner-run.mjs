@@ -12,6 +12,7 @@ import {
   validatePlanIsolation,
 } from './layout-playwright-plan.mjs'
 import { runCell } from './layout-playwright-runner.mjs'
+import { filterOwnerPlanByImpact } from './playwright-impact-filter.mjs'
 import {
   loadReceiptsFromDirectory,
   verifyOwnerReceipts,
@@ -89,6 +90,7 @@ async function main(argv = process.argv.slice(2)) {
   const runtimeDir = option(argv, 'runtime-dir', '.tmp/visual-runtime-playwright')
   const evidenceDir = option(argv, 'evidence-dir', '.tmp/playwright-layout')
   const serverPort = Number(option(argv, 'server-port', '4181'))
+  const impactPlanPath = option(argv, 'impact-plan', '')
   const skipPrepare = hasFlag(argv, 'skip-prepare')
   const dryRun = hasFlag(argv, 'dry-run')
 
@@ -102,9 +104,15 @@ async function main(argv = process.argv.slice(2)) {
   if (isolation.length > 0) {
     fail(`owner plan isolation failed: ${isolation.join('; ')}`)
   }
+  const { plan: selectedPlan, impactPlanDigest } = filterOwnerPlanByImpact({
+    root,
+    plan,
+    group,
+    impactPlanPath,
+  })
   const cells = requestedCell
-    ? plan.cells.filter((cell) => cell.id === requestedCell)
-    : plan.cells
+    ? selectedPlan.cells.filter((cell) => cell.id === requestedCell)
+    : selectedPlan.cells
   if (requestedCell && cells.length === 0) {
     fail(`unknown cell ${requestedCell} for owner ${ownerId} group ${group}`)
   }
@@ -157,13 +165,13 @@ async function main(argv = process.argv.slice(2)) {
   }
 
   const receipts = loadReceiptsFromDirectory(
-    resolve(root, plan.receiptDirectory),
+    resolve(root, selectedPlan.receiptDirectory),
   )
   const { summary, failed } = verifyOwnerReceipts(
     ownerId,
     group,
     receipts,
-    plan,
+    selectedPlan,
     {
       runtimeManifestPath: `${runtimeDir}/manifest.json`,
       expectedCommitSha: commitSha || undefined,
@@ -176,6 +184,7 @@ async function main(argv = process.argv.slice(2)) {
     group,
     commitSha,
     planDigest: plan.digest,
+    impactPlanDigest,
     runtimeManifest: `${runtimeDir}/manifest.json`,
     cells: results,
     aggregate: summary,

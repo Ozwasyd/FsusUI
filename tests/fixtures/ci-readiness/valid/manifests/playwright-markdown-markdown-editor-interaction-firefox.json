@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "workflowGroup": "stable",
+  "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "gate": "playwright-markdown",
+  "status": "success",
+  "toolchain": {
+    "node": "v22.0.0",
+    "playwright": "1.59.1"
+  },
+  "inputFingerprint": "c96c6d5be8d08a12e7b5cdc1b207fa6b2430974c86803d8891675e76fd992c20",
+  "artifacts": [
+    {
+      "name": "receipt-markdown-editor-interaction/firefox",
+      "path": "receipts/playwright-markdown/markdown-editor-interaction-firefox.json",
+      "sha256": "5a4e3595884458aabeaf08683df6d5c7f44cbc1f820f747cd41decd1f7d77f04"
+    },
+    {
+      "name": "report-markdown-editor-interaction/firefox",
+      "path": "receipts/playwright-markdown/reports/markdown-editor-interaction-firefox.json",
+      "sha256": "fb87e99d7be333cbeda2d7d4ae635d62898d744a055bc7d65c41d8e1ff6957ef"
+    }
+  ],
+  "dimensions": {},
+  "playwright": {
+    "decision": "run",
+    "suiteId": "markdown-editor-interaction",
+    "cellId": "markdown-editor-interaction/firefox",
+    "dimensions": {
+      "browser": "firefox"
+    },
+    "registryHash": "7091a274991a1af109a40377e5acc49daaca13d3697912e60e8bc4f4adc96982",
+    "tests": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    "config": {
+      "path": "vue/playwright.markdown-editor.config.ts",
+      "sha256": "f922f93911938ea6e191abd0d12f0c894b0bfb61355ad6d6df6556e329acb8eb"
+    },
+    "runtime": {
+      "browser": "firefox",
+      "browserRevision": "1350.0",
+      "runtimeMode": "browser-product"
+    },
+    "report": {
+      "path": "receipts/playwright-markdown/reports/markdown-editor-interaction-firefox.json",
+      "sha256": "fb87e99d7be333cbeda2d7d4ae635d62898d744a055bc7d65c41d8e1ff6957ef"
+    },
+    "receiptPath": "receipts/playwright-markdown/markdown-editor-interaction-firefox.json",
+    "receiptDigest": "5a4e3595884458aabeaf08683df6d5c7f44cbc1f820f747cd41decd1f7d77f04"
+  },
+  "reportSummary": "reports/playwright-markdown-markdown-editor-interaction-firefox.json",
+  "createdAt": "2026-08-01T00:00:05.000Z",
+  "run": {
+    "id": "42",
+    "attempt": "1"
+  }
+}

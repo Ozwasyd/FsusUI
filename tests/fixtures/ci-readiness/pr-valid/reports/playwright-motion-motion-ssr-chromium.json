@@ -1,0 +1,5 @@
+{
+  "gate": "playwright-motion",
+  "status": "success",
+  "cellId": "motion-ssr/chromium"
+}

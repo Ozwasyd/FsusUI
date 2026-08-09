@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "workflowGroup": "pr",
+  "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "gate": "playwright-motion",
+  "status": "success",
+  "toolchain": {
+    "node": "v22.0.0",
+    "playwright": "1.59.1"
+  },
+  "inputFingerprint": "c96c6d5be8d08a12e7b5cdc1b207fa6b2430974c86803d8891675e76fd992c20",
+  "artifacts": [
+    {
+      "name": "receipt-motion-ssr/chromium",
+      "path": "receipts/playwright-motion/motion-ssr-chromium.json",
+      "sha256": "1cf15e7e78ef2757f70b10013f9df4fe1c7dc11852e78748f68eb865e30e10ff"
+    },
+    {
+      "name": "report-motion-ssr/chromium",
+      "path": "receipts/playwright-motion/reports/motion-ssr-chromium.json",
+      "sha256": "0e3041de86a8faf91f34c159dbd12720a480c636b405b3c2aa38c9196e436ff5"
+    }
+  ],
+  "dimensions": {},
+  "playwright": {
+    "decision": "run",
+    "suiteId": "motion-ssr",
+    "cellId": "motion-ssr/chromium",
+    "dimensions": {
+      "browser": "chromium",
+      "runtimeMode": "ssr"
+    },
+    "registryHash": "7091a274991a1af109a40377e5acc49daaca13d3697912e60e8bc4f4adc96982",
+    "impactPlanDigest": "21f48174a6bc2760cdb9dfa1f22d750d6c96e97089cd30f2dc071faf7616b228",
+    "tests": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    "config": {
+      "path": "vue/playwright.motion-ssr.config.ts",
+      "sha256": "7a469636d1d56b371e42a9582ab94c80430d2d08a397cbbad4a48f6832411b1f"
+    },
+    "runtime": {
+      "browser": "chromium",
+      "browserRevision": "1100001",
+      "runtimeMode": "browser-ssr"
+    },
+    "report": {
+      "path": "receipts/playwright-motion/reports/motion-ssr-chromium.json",
+      "sha256": "0e3041de86a8faf91f34c159dbd12720a480c636b405b3c2aa38c9196e436ff5"
+    },
+    "receiptPath": "receipts/playwright-motion/motion-ssr-chromium.json",
+    "receiptDigest": "1cf15e7e78ef2757f70b10013f9df4fe1c7dc11852e78748f68eb865e30e10ff"
+  },
+  "reportSummary": "reports/playwright-motion-motion-ssr-chromium.json",
+  "createdAt": "2026-08-01T00:00:05.000Z",
+  "run": {
+    "id": "42",
+    "attempt": "1"
+  }
+}

@@ -12,6 +12,7 @@ import {
   validatePlanIsolation,
 } from './layout-playwright-plan.mjs'
 import { runBoundaryCell } from './boundary-playwright-runner.mjs'
+import { filterOwnerPlanByImpact } from './playwright-impact-filter.mjs'
 import {
   loadBoundaryReceiptsFromDirectory,
   verifyBoundaryOwnerReceipts,
@@ -83,6 +84,7 @@ async function main(argv = process.argv.slice(2)) {
   const runtimeDir = option(argv, 'runtime-dir', '.tmp/visual-runtime-playwright')
   const evidenceDir = option(argv, 'evidence-dir', '.tmp/playwright-boundary')
   const serverPort = Number(option(argv, 'server-port', '4181'))
+  const impactPlanPath = option(argv, 'impact-plan', '')
   const skipPrepare = hasFlag(argv, 'skip-prepare')
   const dryRun = hasFlag(argv, 'dry-run')
 
@@ -96,9 +98,15 @@ async function main(argv = process.argv.slice(2)) {
   if (isolation.length > 0) {
     fail(`boundary owner plan isolation failed: ${isolation.join('; ')}`)
   }
+  const { plan: selectedPlan, impactPlanDigest } = filterOwnerPlanByImpact({
+    root,
+    plan,
+    group,
+    impactPlanPath,
+  })
   const cells = requestedCell
-    ? plan.cells.filter((cell) => cell.id === requestedCell)
-    : plan.cells
+    ? selectedPlan.cells.filter((cell) => cell.id === requestedCell)
+    : selectedPlan.cells
   if (requestedCell && cells.length === 0) {
     fail(`unknown cell ${requestedCell} for owner ${ownerId} group ${group}`)
   }
@@ -116,6 +124,7 @@ async function main(argv = process.argv.slice(2)) {
       group,
       commitSha,
       planDigest: plan.digest,
+      impactPlanDigest,
       runtimeMode: plan.runtimeMode,
       skipReason: 'no cells selected for profile',
       status: 'success',
@@ -177,13 +186,13 @@ async function main(argv = process.argv.slice(2)) {
   }
 
   const receipts = loadBoundaryReceiptsFromDirectory(
-    resolve(root, plan.receiptDirectory),
+    resolve(root, selectedPlan.receiptDirectory),
   )
   const { summary, failed } = await verifyBoundaryOwnerReceipts(
     ownerId,
     group,
     receipts,
-    plan,
+    selectedPlan,
     {
       evidenceDir,
       expectedCommitSha: commitSha || undefined,
@@ -196,6 +205,7 @@ async function main(argv = process.argv.slice(2)) {
     group,
     commitSha,
     planDigest: plan.digest,
+    impactPlanDigest,
     runtimeMode: plan.runtimeMode,
     runtimeManifest: `${runtimeDir}/manifest.json`,
     cells: results,

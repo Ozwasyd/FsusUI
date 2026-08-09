@@ -28,5 +28,65 @@
     "name": "cancelled leaf",
     "mutation": "cancelled",
     "expected": "leaf status is cancelled"
+  },
+ {
+  "name": "missing markdown webkit cell",
+  "mutation": "pw-missing-cell",
+  "expected": "missing playwright cell"
+ },
+ {
+  "name": "missing safe-area webkit cell",
+  "mutation": "pw-missing-safe-area-webkit",
+  "expected": "missing playwright cell"
+ },
+ {
+  "name": "duplicate playwright cell",
+  "mutation": "pw-duplicate",
+  "expected": "Duplicate readiness manifest"
+ },
+ {
+  "name": "workflow attempt mixing",
+  "mutation": "attempt-mix",
+  "expected": "stale artifact from workflow attempt"
+ },
+  {
+    "name": "motion-ssr wrong browser dimension",
+    "mutation": "pw-wrong-dims",
+    "expected": "dimensions mismatch"
+  },
+  {
+    "name": "cell claimed by wrong owner",
+    "mutation": "pw-wrong-owner",
+    "expected": "claimed by owner"
+  },
+  {
+    "name": "success with zero tests",
+    "mutation": "pw-zero-tests",
+    "expected": "zero tests"
+  },
+  {
+    "name": "skip manifest in main profile",
+    "mutation": "pw-skip-main",
+    "expected": "skip manifest is not allowed"
+  },
+  {
+    "name": "registry hash mixing",
+    "mutation": "pw-registry-hash",
+    "expected": "registry hash mismatch"
+  },
+  {
+    "name": "report digest tampered",
+    "mutation": "pw-report-digest",
+    "expected": "report digest mismatch"
+  },
+  {
+    "name": "receipt digest tampered",
+    "mutation": "pw-receipt-digest",
+    "expected": "receipt digest mismatch"
+  },
+  {
+    "name": "artifact digest tampered",
+    "mutation": "pw-artifact-digest",
+    "expected": "artifact digest mismatch"
   }
 ]

@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "workflowGroup": "stable",
+  "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "gate": "playwright-motion",
+  "status": "success",
+  "toolchain": {
+    "node": "v22.0.0",
+    "playwright": "1.59.1"
+  },
+  "inputFingerprint": "c96c6d5be8d08a12e7b5cdc1b207fa6b2430974c86803d8891675e76fd992c20",
+  "artifacts": [
+    {
+      "name": "receipt-view-transitions/chromium",
+      "path": "receipts/playwright-motion/view-transitions-chromium.json",
+      "sha256": "df5ef680c81ed6f6cf6a1dfc123d32136fa9dbb029795c65ac6b16898045948f"
+    },
+    {
+      "name": "report-view-transitions/chromium",
+      "path": "receipts/playwright-motion/reports/view-transitions-chromium.json",
+      "sha256": "9b62e5fcd9d14e0f5a73eef171ae42e384ba4903bb86c2a5160932073384f3e6"
+    }
+  ],
+  "dimensions": {},
+  "playwright": {
+    "decision": "run",
+    "suiteId": "view-transitions",
+    "cellId": "view-transitions/chromium",
+    "dimensions": {
+      "browser": "chromium"
+    },
+    "registryHash": "7091a274991a1af109a40377e5acc49daaca13d3697912e60e8bc4f4adc96982",
+    "tests": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    "config": {
+      "path": "vue/playwright.view-transitions.config.ts",
+      "sha256": "b49e6bcf7f164bded69aebe03296737f611de57c68a3f9fcb0ded62c78ede733"
+    },
+    "runtime": {
+      "browser": "chromium",
+      "browserRevision": "1100001",
+      "runtimeMode": "browser-product"
+    },
+    "report": {
+      "path": "receipts/playwright-motion/reports/view-transitions-chromium.json",
+      "sha256": "9b62e5fcd9d14e0f5a73eef171ae42e384ba4903bb86c2a5160932073384f3e6"
+    },
+    "receiptPath": "receipts/playwright-motion/view-transitions-chromium.json",
+    "receiptDigest": "df5ef680c81ed6f6cf6a1dfc123d32136fa9dbb029795c65ac6b16898045948f"
+  },
+  "reportSummary": "reports/playwright-motion-view-transitions-chromium.json",
+  "createdAt": "2026-08-01T00:00:05.000Z",
+  "run": {
+    "id": "42",
+    "attempt": "1"
+  }
+}

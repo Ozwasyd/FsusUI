@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "workflowGroup": "stable",
+  "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "gate": "playwright-motion",
+  "status": "success",
+  "toolchain": {
+    "node": "v22.0.0",
+    "playwright": "1.59.1"
+  },
+  "inputFingerprint": "c96c6d5be8d08a12e7b5cdc1b207fa6b2430974c86803d8891675e76fd992c20",
+  "artifacts": [
+    {
+      "name": "receipt-view-transitions/webkit",
+      "path": "receipts/playwright-motion/view-transitions-webkit.json",
+      "sha256": "af904410b917d521bb9303032529e773d0fe9e3333095d37121839e9dba6dcce"
+    },
+    {
+      "name": "report-view-transitions/webkit",
+      "path": "receipts/playwright-motion/reports/view-transitions-webkit.json",
+      "sha256": "fd9dbad9a35f4522276ab177628686e01583d2f94bdc4b6b048bbc88a1da8ff9"
+    }
+  ],
+  "dimensions": {},
+  "playwright": {
+    "decision": "run",
+    "suiteId": "view-transitions",
+    "cellId": "view-transitions/webkit",
+    "dimensions": {
+      "browser": "webkit"
+    },
+    "registryHash": "7091a274991a1af109a40377e5acc49daaca13d3697912e60e8bc4f4adc96982",
+    "tests": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    "config": {
+      "path": "vue/playwright.view-transitions.config.ts",
+      "sha256": "b49e6bcf7f164bded69aebe03296737f611de57c68a3f9fcb0ded62c78ede733"
+    },
+    "runtime": {
+      "browser": "webkit",
+      "browserRevision": "17.4",
+      "runtimeMode": "browser-product"
+    },
+    "report": {
+      "path": "receipts/playwright-motion/reports/view-transitions-webkit.json",
+      "sha256": "fd9dbad9a35f4522276ab177628686e01583d2f94bdc4b6b048bbc88a1da8ff9"
+    },
+    "receiptPath": "receipts/playwright-motion/view-transitions-webkit.json",
+    "receiptDigest": "af904410b917d521bb9303032529e773d0fe9e3333095d37121839e9dba6dcce"
+  },
+  "reportSummary": "reports/playwright-motion-view-transitions-webkit.json",
+  "createdAt": "2026-08-01T00:00:05.000Z",
+  "run": {
+    "id": "42",
+    "attempt": "1"
+  }
+}

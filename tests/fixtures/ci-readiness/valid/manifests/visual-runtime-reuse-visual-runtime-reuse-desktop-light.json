@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "workflowGroup": "stable",
+  "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "gate": "visual-runtime-reuse",
+  "status": "success",
+  "toolchain": {
+    "node": "v22.0.0",
+    "playwright": "1.59.1"
+  },
+  "inputFingerprint": "c96c6d5be8d08a12e7b5cdc1b207fa6b2430974c86803d8891675e76fd992c20",
+  "artifacts": [
+    {
+      "name": "receipt-visual-runtime-reuse/desktop-light",
+      "path": "receipts/visual-runtime-reuse/visual-runtime-reuse-desktop-light.json",
+      "sha256": "a627c05f4f77083e0f563bcd8a4200baabe9052b8d8ea976bbadcffa73c2a39d"
+    },
+    {
+      "name": "report-visual-runtime-reuse/desktop-light",
+      "path": "receipts/visual-runtime-reuse/reports/visual-runtime-reuse-desktop-light.json",
+      "sha256": "22bec825e76cda4ae9a30e1153555f2c3b27ee5cd44a53b07de9ffd981cd4041"
+    }
+  ],
+  "dimensions": {},
+  "playwright": {
+    "decision": "run",
+    "suiteId": "visual-runtime-reuse",
+    "cellId": "visual-runtime-reuse/desktop-light",
+    "dimensions": {
+      "browser": "chromium",
+      "viewport": "desktop",
+      "theme": "light",
+      "runtimeMode": "reuse"
+    },
+    "registryHash": "7091a274991a1af109a40377e5acc49daaca13d3697912e60e8bc4f4adc96982",
+    "tests": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    "config": {
+      "path": "vue/playwright.reuse.config.ts",
+      "sha256": "6a1c50cdd6f3a59d3019c1861c258edc24918b52cb1ba6e4c7f686050c4dea85"
+    },
+    "runtime": {
+      "browser": "chromium",
+      "browserRevision": "1100001",
+      "runtimeMode": "runtime-contract"
+    },
+    "report": {
+      "path": "receipts/visual-runtime-reuse/reports/visual-runtime-reuse-desktop-light.json",
+      "sha256": "22bec825e76cda4ae9a30e1153555f2c3b27ee5cd44a53b07de9ffd981cd4041"
+    },
+    "receiptPath": "receipts/visual-runtime-reuse/visual-runtime-reuse-desktop-light.json",
+    "receiptDigest": "a627c05f4f77083e0f563bcd8a4200baabe9052b8d8ea976bbadcffa73c2a39d"
+  },
+  "reportSummary": "reports/visual-runtime-reuse-visual-runtime-reuse-desktop-light.json",
+  "createdAt": "2026-08-01T00:00:05.000Z",
+  "run": {
+    "id": "42",
+    "attempt": "1"
+  }
+}

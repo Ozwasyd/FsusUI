@@ -298,6 +298,7 @@ jobs:
 
   main:
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.group == 'main')
+    needs: main-playwright
     uses: ./.github/workflows/_quality.yml
     with:
       group: main
@@ -310,6 +311,7 @@ jobs:
 
   nightly:
     if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.group == 'nightly')
+    needs: nightly-playwright
     uses: ./.github/workflows/_quality.yml
     with:
       group: nightly
@@ -322,6 +324,7 @@ jobs:
 
   release:
     if: github.event_name == 'workflow_dispatch' && inputs.group == 'release'
+    needs: release-playwright
     uses: ./.github/workflows/_quality.yml
     with:
       group: release

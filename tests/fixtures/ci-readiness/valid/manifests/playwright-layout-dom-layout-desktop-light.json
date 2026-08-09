@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "workflowGroup": "stable",
+  "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "gate": "playwright-layout",
+  "status": "success",
+  "toolchain": {
+    "node": "v22.0.0",
+    "playwright": "1.59.1"
+  },
+  "inputFingerprint": "c96c6d5be8d08a12e7b5cdc1b207fa6b2430974c86803d8891675e76fd992c20",
+  "artifacts": [
+    {
+      "name": "receipt-dom-layout/desktop-light",
+      "path": "receipts/playwright-layout/dom-layout-desktop-light.json",
+      "sha256": "c2d7c1b4ffb2485bc637e082a0bc3a7335ec9e7a2b9aeea1426d89b6d7054256"
+    },
+    {
+      "name": "report-dom-layout/desktop-light",
+      "path": "receipts/playwright-layout/reports/dom-layout-desktop-light.json",
+      "sha256": "5e3641862b4d8551e538177e06b469190726f3867a6e2d737167a6906b11ed50"
+    }
+  ],
+  "dimensions": {},
+  "playwright": {
+    "decision": "run",
+    "suiteId": "dom-layout",
+    "cellId": "dom-layout/desktop-light",
+    "dimensions": {
+      "browser": "chromium",
+      "viewport": "desktop",
+      "theme": "light"
+    },
+    "registryHash": "7091a274991a1af109a40377e5acc49daaca13d3697912e60e8bc4f4adc96982",
+    "tests": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    "config": {
+      "path": "vue/playwright.dom-layout.config.ts",
+      "sha256": "eeb9116f2111a6192c976c102a0704e7fe613b19e94f793b1946e1c0e73fd469"
+    },
+    "runtime": {
+      "browser": "chromium",
+      "browserRevision": "1100001",
+      "runtimeMode": "browser-product"
+    },
+    "report": {
+      "path": "receipts/playwright-layout/reports/dom-layout-desktop-light.json",
+      "sha256": "5e3641862b4d8551e538177e06b469190726f3867a6e2d737167a6906b11ed50"
+    },
+    "receiptPath": "receipts/playwright-layout/dom-layout-desktop-light.json",
+    "receiptDigest": "c2d7c1b4ffb2485bc637e082a0bc3a7335ec9e7a2b9aeea1426d89b6d7054256"
+  },
+  "reportSummary": "reports/playwright-layout-dom-layout-desktop-light.json",
+  "createdAt": "2026-08-01T00:00:05.000Z",
+  "run": {
+    "id": "42",
+    "attempt": "1"
+  }
+}

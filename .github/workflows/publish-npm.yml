@@ -37,10 +37,16 @@ jobs:
             --github-output
 
   quality:
+    needs: quality-playwright
     uses: ./.github/workflows/_quality.yml
     with:
       group: release
       release_tag: ${{ github.ref_name }}
+
+  quality-playwright:
+    uses: ./.github/workflows/_quality-playwright.yml
+    with:
+      group: release
 
   preflight:
     runs-on: ubuntu-latest
