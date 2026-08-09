@@ -5070,6 +5070,332 @@
       ]
     },
     {
+      "name": "FsusUI.Avalonia.Controls.FsusFormFieldAdapter",
+      "kind": "class",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": false,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "GetAdapter",
+          "isStatic": true,
+          "returnType": "FsusUI.Avalonia.Controls.IFsusFormFieldAdapter",
+          "parameters": [
+            {
+              "name": "control",
+              "type": "Avalonia.Controls.Control",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "SetAdapter",
+          "isStatic": true,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "control",
+              "type": "Avalonia.Controls.Control",
+              "optional": false
+            },
+            {
+              "name": "adapter",
+              "type": "FsusUI.Avalonia.Controls.IFsusFormFieldAdapter",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusFormFieldAdapterCapabilities",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "None",
+          "value": 0
+        },
+        {
+          "name": "ReadValue",
+          "value": 1
+        },
+        {
+          "name": "WriteValue",
+          "value": 2
+        },
+        {
+          "name": "ResetValue",
+          "value": 4
+        },
+        {
+          "name": "ApplySize",
+          "value": 8
+        },
+        {
+          "name": "ApplyInvalidState",
+          "value": 16
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusFormFieldAdapterError",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "ControlType",
+          "type": "System.Type",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Kind",
+          "type": "FsusUI.Avalonia.Controls.FsusFormFieldAdapterErrorKind",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "MemberName",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Message",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusFormFieldAdapterError",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "Kind",
+              "type": "FsusUI.Avalonia.Controls.FsusFormFieldAdapterErrorKind\u0026",
+              "optional": false
+            },
+            {
+              "name": "Message",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "ControlType",
+              "type": "System.Type\u0026",
+              "optional": false
+            },
+            {
+              "name": "MemberName",
+              "type": "System.String\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusFormFieldAdapterErrorKind",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "UnsupportedControl",
+          "value": 0
+        },
+        {
+          "name": "TypeMismatch",
+          "value": 1
+        },
+        {
+          "name": "ReadOnly",
+          "value": 2
+        },
+        {
+          "name": "MissingCapability",
+          "value": 3
+        },
+        {
+          "name": "InvalidOperation",
+          "value": 4
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusFormFieldAdapterResult",
+      "kind": "class",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Error",
+          "type": "FsusUI.Avalonia.Controls.FsusFormFieldAdapterError",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "IsSuccess",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Success",
+          "type": "FsusUI.Avalonia.Controls.FsusFormFieldAdapterResult",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "Failure",
+          "isStatic": true,
+          "returnType": "FsusUI.Avalonia.Controls.FsusFormFieldAdapterResult",
+          "parameters": [
+            {
+              "name": "error",
+              "type": "FsusUI.Avalonia.Controls.FsusFormFieldAdapterError",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "RequireSuccess",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusFormFieldAdapterResult",
+          "parameters": [
+            {
+              "name": "operation",
+              "type": "System.String",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusFormFieldReadResult",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Status",
+          "type": "FsusUI.Avalonia.Controls.FsusFormFieldAdapterResult",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Value",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusFormFieldReadResult",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "Value",
+              "type": "System.Object\u0026",
+              "optional": false
+            },
+            {
+              "name": "Status",
+              "type": "FsusUI.Avalonia.Controls.FsusFormFieldAdapterResult\u0026",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "Failure",
+          "isStatic": true,
+          "returnType": "FsusUI.Avalonia.Controls.FsusFormFieldReadResult",
+          "parameters": [
+            {
+              "name": "error",
+              "type": "FsusUI.Avalonia.Controls.FsusFormFieldAdapterError",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "Success",
+          "isStatic": true,
+          "returnType": "FsusUI.Avalonia.Controls.FsusFormFieldReadResult",
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Object",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "FsusUI.Avalonia.Controls.FsusFormFieldValidatedEventArgs",
       "kind": "class",
       "baseType": "System.EventArgs",
@@ -5123,6 +5449,22 @@
         {
           "name": "ErrorText",
           "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "FieldAdapter",
+          "type": "FsusUI.Avalonia.Controls.IFsusFormFieldAdapter",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "FieldAdapterError",
+          "type": "FsusUI.Avalonia.Controls.FsusFormFieldAdapterError",
           "nullable": true,
           "canRead": true,
           "canWrite": true,
@@ -18049,6 +18391,80 @@
             {
               "name": "Rotate",
               "type": "System.Double\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.IFsusFormFieldAdapter",
+      "kind": "interface",
+      "isAbstract": true,
+      "isSealed": false,
+      "properties": [
+        {
+          "name": "Capabilities",
+          "type": "FsusUI.Avalonia.Controls.FsusFormFieldAdapterCapabilities",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "ReadValue",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusFormFieldReadResult",
+          "parameters": []
+        },
+        {
+          "name": "TryApplyInvalidState",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusFormFieldAdapterResult",
+          "parameters": [
+            {
+              "name": "isInvalid",
+              "type": "System.Boolean",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "TryApplySize",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusFormFieldAdapterResult",
+          "parameters": [
+            {
+              "name": "size",
+              "type": "FsusUI.Avalonia.Controls.FsusComponentSize",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "TryResetValue",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusFormFieldAdapterResult",
+          "parameters": [
+            {
+              "name": "initialValue",
+              "type": "System.Object",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "TryWriteValue",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusFormFieldAdapterResult",
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.Object",
               "optional": false
             }
           ]
