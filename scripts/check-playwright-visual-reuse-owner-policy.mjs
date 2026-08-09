@@ -6,7 +6,6 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import {
   loadPlaywrightOwners,
-  planOwnerCells,
 } from './layout-playwright-plan.mjs'
 import {
   loadPlaywrightSuiteRegistry,
@@ -14,7 +13,6 @@ import {
 } from './playwright-suites.mjs'
 import {
   VISUAL_REUSE_FIXED_CELLS,
-  VISUAL_REUSE_OWNER,
   loadVisualReuseOwnerPlan,
 } from './visual-reuse-playwright-plan.mjs'
 
@@ -86,7 +84,6 @@ for (const group of ['main', 'nightly', 'release', 'pr']) {
 }
 
 const reusableWorkflow = readSync('.github/workflows/_quality-playwright.yml')
-const topWorkflow = readSync('.github/workflows/quality.yml')
 const reuseWorkflowFailures = validateReuseWorkflowSource(reusableWorkflow)
 assert.deepEqual(
   reuseWorkflowFailures,

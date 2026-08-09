@@ -492,7 +492,10 @@
     }
 
     .#{bem('upload-list', 'item-info')} {
-      flex: 1 1 auto;
+      // flex-basis 0 keeps the info cell from claiming a full wrap line from
+      // its (unshrunk) max-content width, so status + actions stay on the
+      // same row and the filename ellipsizes inside the remaining space.
+      flex: 1 1 0;
       width: auto;
       min-width: 0;
       margin-left: 0;
@@ -579,12 +582,12 @@
       }
     }
 
-    // Prefer ≥40px compact desktop / ≥44px touch when density tokens allow.
+    // Prefer ≥40px compact desktop; enforce ≥44px touch target on coarse pointers.
     @media (pointer: coarse) {
       .#{bem('icon', '', 'close')},
       .#{bem('upload-list', 'item-delete')} {
         @include ghost-icon-button(
-          var(--fsus-icon-target, 44px),
+          44px,
           999px,
           0,
           true

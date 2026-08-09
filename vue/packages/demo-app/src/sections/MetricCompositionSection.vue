@@ -7,9 +7,9 @@
       <h3>MetricList</h3>
       <div class="metric-fixture-row" data-metric-variant="metric-default">
         <ElMetricList>
-          <ElMetricItem label="Active Users" value="12,847" />
-          <ElMetricItem label="Avg Session" value="4m 32s" />
-          <ElMetricItem label="Bounce Rate" value="23.4%" />
+          <ElMetricItem label="Active Users" primary="12,847" />
+          <ElMetricItem label="Avg Session" primary="4m 32s" />
+          <ElMetricItem label="Bounce Rate" primary="23.4%" />
         </ElMetricList>
       </div>
     </div>
@@ -20,8 +20,8 @@
       <div class="metric-fixture-row" data-metric-variant="kpi-default">
         <ElKpiGroup>
           <ElMetricList>
-            <ElMetricItem label="Total Revenue" value="$847,230" />
-            <ElMetricItem label="Conversion" value="3.2%" />
+            <ElMetricItem label="Total Revenue" primary="$847,230" />
+            <ElMetricItem label="Conversion" primary="3.2%" />
           </ElMetricList>
         </ElKpiGroup>
       </div>
@@ -44,14 +44,14 @@
       <h3>DiagnosticsList</h3>
       <div class="metric-fixture-row" data-metric-variant="diag-default">
         <ElDiagnosticsList>
-          <ElDiagnosticsItem title="Memory Usage" status="warning">
+          <ElDiagnosticsItem title="Memory Usage" tone="warning">
             <template #detail>75% of allocated memory consumed</template>
           </ElDiagnosticsItem>
         </ElDiagnosticsList>
       </div>
       <div class="metric-fixture-row" data-metric-variant="diag-danger">
         <ElDiagnosticsList>
-          <ElDiagnosticsItem title="Disk Space" status="danger">
+          <ElDiagnosticsItem title="Disk Space" tone="danger">
             <template #detail>98% full — immediate action required</template>
           </ElDiagnosticsItem>
         </ElDiagnosticsList>
@@ -62,7 +62,7 @@
     <div class="demo-block" data-metric-fixture="copyable">
       <h3>CopyableDetail</h3>
       <div class="metric-fixture-row" data-metric-variant="copy-default">
-        <ElCopyableDetail text="sk-proj-abc123def456" />
+        <ElCopyableDetail value="sk-proj-abc123def456" />
       </div>
     </div>
 

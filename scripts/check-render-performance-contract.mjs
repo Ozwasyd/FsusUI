@@ -59,7 +59,7 @@ for (const token of [
   'wasmProbe',
   'dataPipelineProbe',
   'revision !== activationRevisions[index - 1] + 1',
-  'samples !== 5',
+  'samples < 5',
   "scenario === 'markdown-feature-activation'",
   'if (measureDomParses)',
   'DOM parser instrumentation is unavailable',

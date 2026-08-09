@@ -1,21 +1,21 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "c463db9f2fbaa08baa249d5a792d128104087053",
+    "commitSha": "ab268fa82817dd2166d6c1cf3880a34a39877d15",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
     "iconHash": "d61254b1b1ff9addaf45293153df217b0c0d01ec69ec602081c44a01008b78de",
     "toolVersion": "avalonia-vue-public-api-baseline@1.0.0+vue-semantic-baseline@1.0.0",
-    "inputTreeHash": "e0898ab75970c9041216ee5860656d1c642e781280f701bd49ba4076545f9b8f",
+    "inputTreeHash": "e012449a173895aa4b83c186cec6f702bddf30480757dab1697bd8426b303271",
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "c34672b82bae2556abbb41b75f61416cf00bfa3a04aa2b018d788a1a544eb96e"
+    "outputHash": "cf66cd9367a304b5094ebe2811bc4907ee06f783b0380e8bcca2359b1cf7d5a7"
   },
   "summary": {
     "componentModules": 93,
-    "components": 226,
+    "components": 228,
     "installableComponents": 153,
     "directives": 3,
     "services": 4,
@@ -23,7 +23,7 @@
     "cssVariables": 483,
     "deprecatedApis": 20,
     "componentCountByClassification": {
-      "portable": 124,
+      "portable": 126,
       "native-adapter": 73,
       "platform-override": 21,
       "web-only": 8
@@ -17931,6 +17931,68 @@
       }
     },
     {
+      "name": "ElSectionNavLink",
+      "module": "settings-primitives",
+      "classification": "portable",
+      "props": ["active", "disabled", "to"],
+      "emits": [],
+      "slots": [
+        {
+          "name": "default",
+          "scoped": false
+        }
+      ],
+      "exposed": [],
+      "semantic": {
+        "props": [
+          {
+            "name": "active",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "disabled",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "to",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": true,
+            "readonly": false
+          }
+        ],
+        "emits": [],
+        "exposed": [],
+        "slots": [
+          {
+            "name": "default",
+            "scoped": false
+          }
+        ]
+      }
+    },
+    {
       "name": "ElSegmentedControl",
       "module": "collection-primitives",
       "classification": "portable",
@@ -29031,6 +29093,68 @@
       }
     },
     {
+      "name": "FsusSectionNavLink",
+      "module": "settings-primitives",
+      "classification": "portable",
+      "props": ["active", "disabled", "to"],
+      "emits": [],
+      "slots": [
+        {
+          "name": "default",
+          "scoped": false
+        }
+      ],
+      "exposed": [],
+      "semantic": {
+        "props": [
+          {
+            "name": "active",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "disabled",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "to",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": true,
+            "readonly": false
+          }
+        ],
+        "emits": [],
+        "exposed": [],
+        "slots": [
+          {
+            "name": "default",
+            "scoped": false
+          }
+        ]
+      }
+    },
+    {
       "name": "FsusSegmentedControl",
       "module": "collection-primitives",
       "classification": "portable",
@@ -32777,8 +32901,7 @@
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
-        "vue/packages/theme-chalk/src/generated/tokens.scss",
-        "vue/packages/theme-chalk/src/upload.scss"
+        "vue/packages/theme-chalk/src/generated/tokens.scss"
       ],
       "classification": "portable"
     },
@@ -34204,6 +34327,7 @@
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/option-item.scss",
         "vue/packages/theme-chalk/src/tree.scss",
         "vue/packages/theme-chalk/src/upload.scss"
       ],
@@ -34219,6 +34343,7 @@
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
+        "vue/packages/theme-chalk/src/option-item.scss",
         "vue/packages/theme-chalk/src/pagination.scss",
         "vue/packages/theme-chalk/src/select-v2.scss",
         "vue/packages/theme-chalk/src/tree.scss"

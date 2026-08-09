@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
+import { collectCssRules } from '../support/css-scan'
 import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
 
 const diagnostics = new WeakMap<Page, string[]>()
@@ -26,21 +27,30 @@ test('production CSS has no card-on-card in settings', async ({ page }, testInfo
   await stabilizePage(page)
   await expect(page.getByTestId('settings-visual-fixtures')).toBeVisible()
 
-  const banned = await page.evaluate(() => {
-    const p: string[] = []
-    for (const s of Array.from(document.styleSheets)) {
-      try {
-        const t = Array.from(s.cssRules).map((r) => r.cssText).join('\\n')
-        if (t.includes('resource-list') && t.includes('border-radius:') && t.includes('12px') && t.includes('border: 1px'))
-          p.push('ResourceList still has card surface')
-        if (t.includes('destructive-action-panel') && t.includes('color-mix') && t.includes('30%'))
-          p.push('DestructiveActionPanel still has 30% danger border')
-        if (t.includes('risk-notice') && t.includes('12px'))
-          p.push('RiskNotice still has panel radius')
-      } catch {}
-    }
-    return p
-  })
+  // Selector-scoped gate: card patterns only count when the rule that targets
+  // the component carries them, not when unrelated rules in the same sheet do.
+  const rules = await collectCssRules(page)
+  const banned: string[] = []
+  for (const rule of rules) {
+    const css = rule.cssText
+    if (
+      rule.selectorText.includes('resource-list') &&
+      /border-radius:\s*12px/.test(css) &&
+      /border:\s*1px/.test(css)
+    )
+      banned.push('ResourceList still has card surface')
+    if (
+      rule.selectorText.includes('destructive-action-panel') &&
+      /color-mix/.test(css) &&
+      /30%/.test(css)
+    )
+      banned.push('DestructiveActionPanel still has 30% danger border')
+    if (
+      rule.selectorText.includes('risk-notice') &&
+      /border-radius:\s*12px/.test(css)
+    )
+      banned.push('RiskNotice still has panel radius')
+  }
   expect(banned).toEqual([])
 })
 

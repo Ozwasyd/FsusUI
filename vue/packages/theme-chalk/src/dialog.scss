@@ -294,11 +294,18 @@
   .dialog-fade-enter-active,
   .dialog-fade-leave-active,
   .dialog-scale-fade-enter-active,
-  .dialog-scale-fade-leave-active,
+  .dialog-scale-fade-leave-active {
+    animation-duration: 1ms !important;
+  }
+
   .dialog-fade-enter-active .#{$namespace}-overlay-dialog,
   .dialog-fade-leave-active .#{$namespace}-overlay-dialog,
   .dialog-scale-fade-enter-active .#{$namespace}-overlay-dialog,
   .dialog-scale-fade-leave-active .#{$namespace}-overlay-dialog {
-    animation-duration: 1ms !important;
+    // A 1ms animation still samples the 0% keyframe (e.g. -20px translate)
+    // for the first rendered frames, shifting the dialog in reduced motion.
+    // Disable the overlay-dialog animation entirely so the surface appears
+    // at its final box with no positional flash.
+    animation: none !important;
   }
 }

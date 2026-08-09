@@ -1,23 +1,17 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
 import {
   loadPlaywrightOwners,
   planOwnerCells,
   validatePlaywrightOwners,
 } from './layout-playwright-plan.mjs'
-import { validateCellReceipt } from './layout-playwright-verify.mjs'
 import { loadPlaywrightSuiteRegistry } from './playwright-suites.mjs'
 import {
   VISUAL_REUSE_FIXED_CELLS,
   VISUAL_REUSE_OWNER,
   loadVisualReuseOwnerPlan,
 } from './visual-reuse-playwright-plan.mjs'
-
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 
 function expectFailure(label, fn) {
   let failed = false
@@ -101,5 +95,3 @@ expectFailure('non-chromium cell must be rejected (product coverage is false)', 
 
 // The plan system validates runtimeMode against the allowlist, not per-owner expectations.
 // Verify the positive case: owner reports prepared-reuse.
-
-  const mutated = deepClone(owners)

@@ -42,6 +42,15 @@ export const sectionNavProps = buildProps({
   },
 } as const)
 
+export const sectionNavLinkProps = buildProps({
+  to: {
+    type: String,
+    required: true,
+  },
+  active: Boolean,
+  disabled: Boolean,
+} as const)
+
 export const settingsSectionProps = buildProps({
   id: String,
   title: {
@@ -239,6 +248,7 @@ export const typedConfirmFieldEmits = {
 }
 
 export type SectionNavProps = ExtractPropTypes<typeof sectionNavProps>
+export type SectionNavLinkProps = ExtractPropTypes<typeof sectionNavLinkProps>
 export type SettingsSectionProps = ExtractPropTypes<typeof settingsSectionProps>
 export type SectionHeaderProps = ExtractPropTypes<typeof sectionHeaderProps>
 export type ResourceListProps = ExtractPropTypes<typeof resourceListProps>

@@ -69,6 +69,33 @@ const expectNoPageOverflow = async (page: Page) => {
   expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.clientWidth + 1)
 }
 
+/**
+ * Deterministic settle before geometry measurement. CSS entry animations run
+ * at page load; sampling a bounding rect mid-frame yields fractional values
+ * (e.g. 43.9999px instead of the 44px min-height). Finish running finite
+ * animations and wait two frames so measurements observe the settled layout.
+ */
+const settleAnimations = async (page: Page) => {
+  await page.evaluate(() => {
+    for (const animation of document.getAnimations()) {
+      const timing = animation.effect?.getTiming()
+      if (
+        animation.playState === 'running' &&
+        timing &&
+        timing.iterations !== Infinity
+      ) {
+        animation.finish()
+      }
+    }
+  })
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+      }),
+  )
+}
+
 test('surface role map has light/dark desktop/mobile rendered evidence', async ({
   browser: _browser,
 }, testInfo) => {
@@ -166,6 +193,7 @@ test('Empty has the complete viewport, theme, action and focus matrix', async ({
       )
       for (let index = 0; index < (await actions.count()); index += 1) {
         const action = actions.nth(index)
+        await settleAnimations(page)
         const before = await action.evaluate((element) => {
           const value = element.getBoundingClientRect()
           return {
@@ -176,6 +204,7 @@ test('Empty has the complete viewport, theme, action and focus matrix', async ({
           }
         })
         await action.focus()
+        await settleAnimations(page)
         const after = await action.evaluate((element) => {
           const value = element.getBoundingClientRect()
           return {

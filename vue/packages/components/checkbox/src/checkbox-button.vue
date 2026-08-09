@@ -4,6 +4,7 @@
       v-if="trueLabel || falseLabel"
       v-model="model"
       :class="ns.be('button', 'original')"
+      role="checkbox"
       type="checkbox"
       :name="name"
       :tabindex="tabindex"
@@ -19,6 +20,7 @@
       v-else
       v-model="model"
       :class="ns.be('button', 'original')"
+      role="checkbox"
       type="checkbox"
       :name="name"
       :tabindex="tabindex"

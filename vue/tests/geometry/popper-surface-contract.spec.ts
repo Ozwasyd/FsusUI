@@ -61,8 +61,12 @@ test('popper shared surface and arrow geometry contract (#475)', async ({
       await attach(page, testInfo, `tooltip-${theme}`, tooltipPopper)
     }
 
-    // Popover: click to trigger
-    const popoverBtn = page.locator('.el-popover__reference').first()
+    // Popover: click to trigger (ElPopover renders through ElTooltipTrigger,
+    // so the trigger carries the tooltip trigger class; locate by role instead)
+    const popoverBtn = page.getByRole('button', {
+      exact: true,
+      name: 'Popover',
+    })
     await popoverBtn.scrollIntoViewIfNeeded()
     await popoverBtn.click()
     await page.waitForTimeout(500)
@@ -180,7 +184,10 @@ test('popper shared surface and arrow geometry contract (#475)', async ({
       const cpRadius = await colorPickerPopper.evaluate((el) =>
         getComputedStyle(el).borderRadius,
       )
-      expect(cpRadius).toBe('10px')
+      // Registered exception (#475): the ColorPicker panel is a floating
+      // surface and uses --fsus-radius-floating (radius.surface.md = 12px),
+      // not the shared 10px popper surface radius.
+      expect(cpRadius).toBe('12px')
 
       await attach(page, testInfo, `colorpicker-${theme}`, colorPickerPopper)
     }

@@ -4,11 +4,7 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import {
-  MARKDOWN_FIXED_CELLS,
-  MARKDOWN_OWNER,
-  loadMarkdownOwnerPlan,
-} from './markdown-playwright-plan.mjs'
+import { loadMarkdownOwnerPlan } from './markdown-playwright-plan.mjs'
 import { runMarkdownCell } from './markdown-playwright-runner.mjs'
 import {
   loadMarkdownReceiptsFromDirectory,
