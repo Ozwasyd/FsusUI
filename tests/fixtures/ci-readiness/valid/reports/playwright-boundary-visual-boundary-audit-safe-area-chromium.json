@@ -1,0 +1,5 @@
+{
+  "gate": "playwright-boundary",
+  "status": "success",
+  "cellId": "visual-boundary-audit/safe-area-chromium"
+}

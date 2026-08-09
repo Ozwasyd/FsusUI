@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "owner": "playwright-motion",
+  "gate": "playwright-motion",
+  "suiteId": "view-transitions",
+  "cellId": "view-transitions/firefox",
+  "project": "firefox",
+  "dimensions": {
+    "browser": "firefox"
+  },
+  "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "workflowGroup": "main",
+  "run": {
+    "id": "42",
+    "attempt": "1"
+  },
+  "toolchain": {
+    "node": "v22.0.0",
+    "chromiumRevision": "1350.0",
+    "firefoxRevision": "1350.0",
+    "webkitRevision": "17.2"
+  },
+  "runtime": {
+    "mode": "browser-product",
+    "manifestDigest": "d92c6a81b2ff50096bcda80885427d1f59a25b5f483f7055523504925d16ab23",
+    "sourceFingerprint": "41cf6794ba4200b839c53531555f0f3998df4cbb01a4d5cb0b94e3ca5e23947d"
+  },
+  "config": {
+    "path": "vue/playwright.view-transitions.config.ts",
+    "sha256": "b49e6bcf7f164bded69aebe03296737f611de57c68a3f9fcb0ded62c78ede733"
+  },
+  "tests": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0
+  },
+  "report": {
+    "path": "receipts/playwright-motion/reports/view-transitions-firefox.json",
+    "sha256": "0fa5f81b9a5829ca25c41b234ada49432b0674620a2ff5c793a2c96903df9bcf"
+  },
+  "status": "success",
+  "startedAt": "2026-08-01T00:00:00.000Z",
+  "endedAt": "2026-08-01T00:00:05.000Z"
+}

@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "workflowGroup": "stable",
+  "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "gate": "playwright-markdown",
+  "status": "success",
+  "toolchain": {
+    "node": "v22.0.0",
+    "playwright": "1.59.1"
+  },
+  "inputFingerprint": "c96c6d5be8d08a12e7b5cdc1b207fa6b2430974c86803d8891675e76fd992c20",
+  "artifacts": [
+    {
+      "name": "receipt-markdown-editor-interaction/webkit",
+      "path": "receipts/playwright-markdown/markdown-editor-interaction-webkit.json",
+      "sha256": "e3bea104f1416bc12602c9666ba6d872be8b896628b7aeb587a316a4e1aed3df"
+    },
+    {
+      "name": "report-markdown-editor-interaction/webkit",
+      "path": "receipts/playwright-markdown/reports/markdown-editor-interaction-webkit.json",
+      "sha256": "dd36433870a75ff6789b5000469b1425448600f18780e38416d656dfebace876"
+    }
+  ],
+  "dimensions": {},
+  "playwright": {
+    "decision": "run",
+    "suiteId": "markdown-editor-interaction",
+    "cellId": "markdown-editor-interaction/webkit",
+    "dimensions": {
+      "browser": "webkit"
+    },
+    "registryHash": "7091a274991a1af109a40377e5acc49daaca13d3697912e60e8bc4f4adc96982",
+    "tests": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    "config": {
+      "path": "vue/playwright.markdown-editor.config.ts",
+      "sha256": "f922f93911938ea6e191abd0d12f0c894b0bfb61355ad6d6df6556e329acb8eb"
+    },
+    "runtime": {
+      "browser": "webkit",
+      "browserRevision": "17.4",
+      "runtimeMode": "browser-product"
+    },
+    "report": {
+      "path": "receipts/playwright-markdown/reports/markdown-editor-interaction-webkit.json",
+      "sha256": "dd36433870a75ff6789b5000469b1425448600f18780e38416d656dfebace876"
+    },
+    "receiptPath": "receipts/playwright-markdown/markdown-editor-interaction-webkit.json",
+    "receiptDigest": "e3bea104f1416bc12602c9666ba6d872be8b896628b7aeb587a316a4e1aed3df"
+  },
+  "reportSummary": "reports/playwright-markdown-markdown-editor-interaction-webkit.json",
+  "createdAt": "2026-08-01T00:00:05.000Z",
+  "run": {
+    "id": "42",
+    "attempt": "1"
+  }
+}

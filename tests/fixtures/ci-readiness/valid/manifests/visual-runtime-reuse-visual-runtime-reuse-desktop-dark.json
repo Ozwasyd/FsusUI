@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "workflowGroup": "stable",
+  "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "gate": "visual-runtime-reuse",
+  "status": "success",
+  "toolchain": {
+    "node": "v22.0.0",
+    "playwright": "1.59.1"
+  },
+  "inputFingerprint": "c96c6d5be8d08a12e7b5cdc1b207fa6b2430974c86803d8891675e76fd992c20",
+  "artifacts": [
+    {
+      "name": "receipt-visual-runtime-reuse/desktop-dark",
+      "path": "receipts/visual-runtime-reuse/visual-runtime-reuse-desktop-dark.json",
+      "sha256": "e25ac39674563b57dad27cc23a814fef8eb6268be84ec26582f87b615928cf70"
+    },
+    {
+      "name": "report-visual-runtime-reuse/desktop-dark",
+      "path": "receipts/visual-runtime-reuse/reports/visual-runtime-reuse-desktop-dark.json",
+      "sha256": "5a17d798454eae17d7df740e877841f9e9ff92b19b43784354beec2a8166448d"
+    }
+  ],
+  "dimensions": {},
+  "playwright": {
+    "decision": "run",
+    "suiteId": "visual-runtime-reuse",
+    "cellId": "visual-runtime-reuse/desktop-dark",
+    "dimensions": {
+      "browser": "chromium",
+      "viewport": "desktop",
+      "theme": "dark",
+      "runtimeMode": "reuse"
+    },
+    "registryHash": "7091a274991a1af109a40377e5acc49daaca13d3697912e60e8bc4f4adc96982",
+    "tests": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    "config": {
+      "path": "vue/playwright.reuse.config.ts",
+      "sha256": "6a1c50cdd6f3a59d3019c1861c258edc24918b52cb1ba6e4c7f686050c4dea85"
+    },
+    "runtime": {
+      "browser": "chromium",
+      "browserRevision": "1100001",
+      "runtimeMode": "runtime-contract"
+    },
+    "report": {
+      "path": "receipts/visual-runtime-reuse/reports/visual-runtime-reuse-desktop-dark.json",
+      "sha256": "5a17d798454eae17d7df740e877841f9e9ff92b19b43784354beec2a8166448d"
+    },
+    "receiptPath": "receipts/visual-runtime-reuse/visual-runtime-reuse-desktop-dark.json",
+    "receiptDigest": "e25ac39674563b57dad27cc23a814fef8eb6268be84ec26582f87b615928cf70"
+  },
+  "reportSummary": "reports/visual-runtime-reuse-visual-runtime-reuse-desktop-dark.json",
+  "createdAt": "2026-08-01T00:00:05.000Z",
+  "run": {
+    "id": "42",
+    "attempt": "1"
+  }
+}

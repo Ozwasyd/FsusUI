@@ -1,0 +1,21 @@
+{
+  "packageId": "FsusUI.Avalonia.Icons",
+  "baselineVersion": "1.0.0",
+  "source": {
+    "tool": "FsusUI.Avalonia.ApiTool@1.0.0",
+    "assemblyVersion": "0.0.0.0"
+  },
+  "semanticTypes": [
+    {
+      "name": "FsusUI.Avalonia.Icons.FsusIconKeys",
+      "kind": "class",
+      "baseType": "System.Object",
+      "isAbstract": true,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": []
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "baseRef": "main",
+  "headRef": "HEAD",
+  "group": "pr",
+  "registryHash": "7091a274991a1af109a40377e5acc49daaca13d3697912e60e8bc4f4adc96982",
+  "generatedAt": "2026-08-01T00:00:00.000Z",
+  "changedFiles": [
+    "vue/packages/components/button/src/button.vue"
+  ],
+  "decisions": [
+    {
+      "suiteId": "view-transitions",
+      "decision": "skip",
+      "reasonCode": "documentation-only",
+      "reason": "fixture skip decision",
+      "cells": [],
+      "matchedRoots": []
+    },
+    {
+      "suiteId": "motion-ssr",
+      "decision": "run",
+      "reasonCode": "suite-source-changed",
+      "reason": "fixture run decision",
+      "cells": [
+        "motion-ssr/chromium"
+      ],
+      "matchedRoots": [
+        "vue/packages/components/button/src/button.vue"
+      ]
+    },
+    {
+      "suiteId": "dom-layout",
+      "decision": "skip",
+      "reasonCode": "documentation-only",
+      "reason": "fixture skip decision",
+      "cells": [],
+      "matchedRoots": []
+    },
+    {
+      "suiteId": "geometry-smoke",
+      "decision": "run",
+      "reasonCode": "suite-source-changed",
+      "reason": "fixture run decision",
+      "cells": [
+        "geometry-smoke/chromium"
+      ],
+      "matchedRoots": [
+        "vue/packages/components/button/src/button.vue"
+      ]
+    },
+    {
+      "suiteId": "markdown-editor-interaction",
+      "decision": "skip",
+      "reasonCode": "documentation-only",
+      "reason": "fixture skip decision",
+      "cells": [],
+      "matchedRoots": []
+    },
+    {
+      "suiteId": "visual-boundary-audit",
+      "decision": "skip",
+      "reasonCode": "documentation-only",
+      "reason": "fixture skip decision",
+      "cells": [],
+      "matchedRoots": []
+    },
+    {
+      "suiteId": "visual-runtime-reuse",
+      "decision": "skip",
+      "reasonCode": "documentation-only",
+      "reason": "fixture skip decision",
+      "cells": [],
+      "matchedRoots": []
+    }
+  ],
+  "planDigest": "21f48174a6bc2760cdb9dfa1f22d750d6c96e97089cd30f2dc071faf7616b228"
+}

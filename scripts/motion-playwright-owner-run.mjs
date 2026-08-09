@@ -6,6 +6,7 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { loadMotionOwnerPlan } from './motion-playwright-plan.mjs'
 import { runMotionCell } from './motion-playwright-runner.mjs'
+import { filterOwnerPlanByImpact } from './playwright-impact-filter.mjs'
 import {
   loadMotionReceiptsFromDirectory,
   verifyMotionOwnerReceipts,
@@ -39,12 +40,19 @@ async function main(argv = process.argv.slice(2)) {
   const group = option(argv, 'group', 'main')
   const requestedCell = option(argv, 'cell')
   const evidenceDir = option(argv, 'evidence-dir', '.tmp/playwright-motion')
+  const impactPlanPath = option(argv, 'impact-plan', '')
   const dryRun = hasFlag(argv, 'dry-run')
 
   const plan = loadMotionOwnerPlan(group)
+  const { plan: selectedPlan, impactPlanDigest } = filterOwnerPlanByImpact({
+    root,
+    plan,
+    group,
+    impactPlanPath,
+  })
   const cells = requestedCell
-    ? plan.cells.filter((cell) => cell.id === requestedCell)
-    : plan.cells
+    ? selectedPlan.cells.filter((cell) => cell.id === requestedCell)
+    : selectedPlan.cells
   if (requestedCell && cells.length === 0) {
     fail(`unknown cell ${requestedCell} for owner ${ownerId} group ${group}`)
   }
@@ -69,13 +77,13 @@ async function main(argv = process.argv.slice(2)) {
   }
 
   const receipts = loadMotionReceiptsFromDirectory(
-    resolve(root, plan.receiptDirectory),
+    resolve(root, selectedPlan.receiptDirectory),
   )
   const { summary, failed } = await verifyMotionOwnerReceipts(
     ownerId,
     group,
     receipts,
-    plan,
+    selectedPlan,
     {
       evidenceDir,
       expectedCommitSha: commitSha || undefined,
@@ -88,6 +96,7 @@ async function main(argv = process.argv.slice(2)) {
     group,
     commitSha,
     planDigest: plan.digest,
+    impactPlanDigest,
     runtimeMode: plan.runtimeMode,
     cells: results,
     aggregate: summary,

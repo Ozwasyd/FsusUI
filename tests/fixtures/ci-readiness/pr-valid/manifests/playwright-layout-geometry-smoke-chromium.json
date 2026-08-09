@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "workflowGroup": "pr",
+  "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "gate": "playwright-layout",
+  "status": "success",
+  "toolchain": {
+    "node": "v22.0.0",
+    "playwright": "1.59.1"
+  },
+  "inputFingerprint": "c96c6d5be8d08a12e7b5cdc1b207fa6b2430974c86803d8891675e76fd992c20",
+  "artifacts": [
+    {
+      "name": "receipt-geometry-smoke/chromium",
+      "path": "receipts/playwright-layout/geometry-smoke-chromium.json",
+      "sha256": "3fe5b9bd6628c2757bbc2b7560364976ab04e01bff7ee924ec21b898686d8a0b"
+    },
+    {
+      "name": "report-geometry-smoke/chromium",
+      "path": "receipts/playwright-layout/reports/geometry-smoke-chromium.json",
+      "sha256": "b53ac2c733056d663ccc9a428cdbaa9b51dcb0d4405fae509c0ed553bdab0576"
+    }
+  ],
+  "dimensions": {},
+  "playwright": {
+    "decision": "run",
+    "suiteId": "geometry-smoke",
+    "cellId": "geometry-smoke/chromium",
+    "dimensions": {
+      "browser": "chromium"
+    },
+    "registryHash": "7091a274991a1af109a40377e5acc49daaca13d3697912e60e8bc4f4adc96982",
+    "impactPlanDigest": "21f48174a6bc2760cdb9dfa1f22d750d6c96e97089cd30f2dc071faf7616b228",
+    "tests": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    "config": {
+      "path": "vue/playwright.geometry.config.ts",
+      "sha256": "4e37bcf667f4bd8523d0741a1d19b6989cf608c0da06f1c0edaafe4fee2e46a1"
+    },
+    "runtime": {
+      "browser": "chromium",
+      "browserRevision": "1100001",
+      "runtimeMode": "browser-product"
+    },
+    "report": {
+      "path": "receipts/playwright-layout/reports/geometry-smoke-chromium.json",
+      "sha256": "b53ac2c733056d663ccc9a428cdbaa9b51dcb0d4405fae509c0ed553bdab0576"
+    },
+    "receiptPath": "receipts/playwright-layout/geometry-smoke-chromium.json",
+    "receiptDigest": "3fe5b9bd6628c2757bbc2b7560364976ab04e01bff7ee924ec21b898686d8a0b"
+  },
+  "reportSummary": "reports/playwright-layout-geometry-smoke-chromium.json",
+  "createdAt": "2026-08-01T00:00:05.000Z",
+  "run": {
+    "id": "42",
+    "attempt": "1"
+  }
+}

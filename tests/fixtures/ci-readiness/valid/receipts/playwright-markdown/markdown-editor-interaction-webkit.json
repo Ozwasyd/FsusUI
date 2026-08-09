@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "owner": "playwright-markdown",
+  "gate": "playwright-markdown",
+  "suiteId": "markdown-editor-interaction",
+  "cellId": "markdown-editor-interaction/webkit",
+  "project": "webkit",
+  "dimensions": {
+    "browser": "webkit"
+  },
+  "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "workflowGroup": "main",
+  "run": {
+    "id": "42",
+    "attempt": "1"
+  },
+  "toolchain": {
+    "node": "v22.0.0",
+    "chromiumRevision": "17.4",
+    "firefoxRevision": "1340.0",
+    "webkitRevision": "17.4"
+  },
+  "runtime": {
+    "mode": "browser-product",
+    "manifestDigest": "d92c6a81b2ff50096bcda80885427d1f59a25b5f483f7055523504925d16ab23",
+    "sourceFingerprint": "41cf6794ba4200b839c53531555f0f3998df4cbb01a4d5cb0b94e3ca5e23947d"
+  },
+  "config": {
+    "path": "vue/playwright.markdown-editor.config.ts",
+    "sha256": "f922f93911938ea6e191abd0d12f0c894b0bfb61355ad6d6df6556e329acb8eb"
+  },
+  "tests": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0
+  },
+  "report": {
+    "path": "receipts/playwright-markdown/reports/markdown-editor-interaction-webkit.json",
+    "sha256": "c2c48c8979b26067e22aea6d3d74a6f5d09131b54274ae04a94b87312781ecc1"
+  },
+  "status": "success",
+  "startedAt": "2026-08-01T00:00:00.000Z",
+  "endedAt": "2026-08-01T00:00:05.000Z"
+}

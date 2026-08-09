@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "workflowGroup": "stable",
+  "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "gate": "playwright-layout",
+  "status": "success",
+  "toolchain": {
+    "node": "v22.0.0",
+    "playwright": "1.59.1"
+  },
+  "inputFingerprint": "c96c6d5be8d08a12e7b5cdc1b207fa6b2430974c86803d8891675e76fd992c20",
+  "artifacts": [
+    {
+      "name": "receipt-geometry-smoke/chromium",
+      "path": "receipts/playwright-layout/geometry-smoke-chromium.json",
+      "sha256": "620e7ea81b4aa64ba65904f883755674bce21b398dfabac87400320f3a8a315a"
+    },
+    {
+      "name": "report-geometry-smoke/chromium",
+      "path": "receipts/playwright-layout/reports/geometry-smoke-chromium.json",
+      "sha256": "b53ac2c733056d663ccc9a428cdbaa9b51dcb0d4405fae509c0ed553bdab0576"
+    }
+  ],
+  "dimensions": {},
+  "playwright": {
+    "decision": "run",
+    "suiteId": "geometry-smoke",
+    "cellId": "geometry-smoke/chromium",
+    "dimensions": {
+      "browser": "chromium"
+    },
+    "registryHash": "7091a274991a1af109a40377e5acc49daaca13d3697912e60e8bc4f4adc96982",
+    "tests": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    "config": {
+      "path": "vue/playwright.geometry.config.ts",
+      "sha256": "f03dcd3db012dd47f8831e08b33e6630f9c742b2db5d5876fe6a0ed1d243d419"
+    },
+    "runtime": {
+      "browser": "chromium",
+      "browserRevision": "1100001",
+      "runtimeMode": "browser-product"
+    },
+    "report": {
+      "path": "receipts/playwright-layout/reports/geometry-smoke-chromium.json",
+      "sha256": "b53ac2c733056d663ccc9a428cdbaa9b51dcb0d4405fae509c0ed553bdab0576"
+    },
+    "receiptPath": "receipts/playwright-layout/geometry-smoke-chromium.json",
+    "receiptDigest": "620e7ea81b4aa64ba65904f883755674bce21b398dfabac87400320f3a8a315a"
+  },
+  "reportSummary": "reports/playwright-layout-geometry-smoke-chromium.json",
+  "createdAt": "2026-08-01T00:00:05.000Z",
+  "run": {
+    "id": "42",
+    "attempt": "1"
+  }
+}

@@ -3,7 +3,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import { execFileSync } from 'node:child_process'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
+import { extractComponentSemantics } from './vue-semantic-baseline.mjs'
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url))
 const defaultRoot = path.resolve(scriptDir, '..')
@@ -45,6 +46,8 @@ const hashFiles = (root, files) => {
   }
   return hash.digest('hex')
 }
+
+const sha256 = (value) => crypto.createHash('sha256').update(value).digest('hex')
 
 const walkFiles = (dir, predicate = () => true) => {
   if (!exists(dir)) return []
@@ -583,6 +586,12 @@ const parseComponent = (root, moduleName, exportName, classification) => {
     fromVue.props.length || fromVue.emits.length
       ? { props: [], emits: [] }
       : fallbackPropsAndEmits(sources, exportName)
+  const semantics = extractComponentSemantics({
+    root,
+    moduleSources: sources,
+    vueSource,
+    exportName,
+  })
 
   return {
     name: exportName,
@@ -592,6 +601,12 @@ const parseComponent = (root, moduleName, exportName, classification) => {
     emits: uniqueSorted([...fromVue.emits, ...fallback.emits]),
     slots: vueSource ? parseSlotTags(vueSource.content) : [],
     exposed: vueSource ? parseDefineExpose(vueSource.content) : [],
+    semantic: {
+      props: semantics.semanticProps,
+      emits: semantics.semanticEmits,
+      exposed: semantics.semanticExposed,
+      slots: semantics.semanticSlots,
+    },
   }
 }
 
@@ -651,7 +666,7 @@ const parseServicesAndDirectives = (
   }
 }
 
-const buildArtifacts = (root, options = {}) => {
+export const buildArtifacts = (root, options = {}) => {
   const classifications = loadClassifications(root)
   const packageJson = parseJson(
     path.join(root, 'vue/packages/element-plus/package.json'),
@@ -723,6 +738,32 @@ const buildArtifacts = (root, options = {}) => {
     ).length
   }
 
+  const semanticVersion = '1.0.0'
+  const compilerOptionsHash = sha256(
+    stableJson({
+      parser: ['@babel/parser'],
+      plugins: ['typescript', 'jsx', 'decorators-legacy', 'importAttributes', 'topLevelAwait'],
+      sfcCompiler: 'vue/compiler-sfc',
+    }),
+  )
+  const dependencyVersionHash = sha256(
+    stableJson({
+      vue: read(path.join(defaultRoot, 'node_modules/vue/package.json')).match(/"version":\s*"([^"]+)"/)?.[1],
+      '@vue/compiler-sfc': read(path.join(defaultRoot, 'node_modules/@vue/compiler-sfc/package.json')).match(/"version":\s*"([^"]+)"/)?.[1],
+      '@babel/parser': read(path.join(defaultRoot, 'node_modules/@babel/parser/package.json')).match(/"version":\s*"([^"]+)"/)?.[1],
+      typescript: read(path.join(defaultRoot, 'node_modules/typescript/package.json')).match(/"version":\s*"([^"]+)"/)?.[1],
+    }),
+  )
+  const inputTreeHash = hashFiles(root, [
+    ...walkFiles(path.join(root, 'vue/packages/components'), (file) => /\.(ts|vue|json)$/.test(file) && !file.includes('__tests__')).map((file) => toPosix(path.relative(root, file))),
+    ...walkFiles(path.join(root, 'vue/packages/hooks'), (file) => /\.ts$/.test(file) && !file.includes('__tests__')).map((file) => toPosix(path.relative(root, file))),
+    ...walkFiles(path.join(root, 'vue/packages/constants'), (file) => /\.ts$/.test(file)).map((file) => toPosix(path.relative(root, file))),
+    ...walkFiles(path.join(root, 'vue/packages/utils'), (file) => /\.ts$/.test(file) && !file.includes('__tests__')).map((file) => toPosix(path.relative(root, file))),
+    'vue/packages/components/motion.ts',
+    'vue/packages/element-plus/package.json',
+    'spec/baselines/vue-public-api-classifications.json',
+  ])
+
   const baseline = {
     schemaVersion: 1,
     source: {
@@ -731,6 +772,12 @@ const buildArtifacts = (root, options = {}) => {
       packageVersion: packageJson.version,
       tokenHash: hashFiles(root, tokenFiles),
       iconHash: hashFiles(root, iconFiles),
+      toolVersion: `avalonia-vue-public-api-baseline@${semanticVersion}+vue-semantic-baseline@${semanticVersion}`,
+      inputTreeHash,
+      compilerOptionsHash,
+      dependencyVersionHash,
+      contractSchemaVersion: '2.0.0',
+      outputHash: '',
     },
     summary: {
       componentModules: componentModules.length,
@@ -769,6 +816,13 @@ const buildArtifacts = (root, options = {}) => {
         .map((plugin) => plugin.name),
     ]),
   }
+
+  baseline.source.outputHash = sha256(
+    stableJson({
+      ...baseline,
+      source: { ...baseline.source, outputHash: '' },
+    }),
+  )
 
   return {
     baseline,
@@ -954,9 +1008,15 @@ const main = async () => {
   }
 }
 
-try {
-  await main()
-} catch (error) {
-  console.error(error instanceof Error ? error.message : error)
-  process.exitCode = 1
+const isMain =
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+
+if (isMain) {
+  try {
+    await main()
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : error)
+    process.exitCode = 1
+  }
 }

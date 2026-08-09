@@ -1,6 +1,10 @@
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
+import {
+  computePlaywrightRegistryHash,
+  loadPlaywrightRegistry,
+} from './playwright-registry.mjs'
 
 const digestOf = (value) =>
   createHash('sha256').update(JSON.stringify(value)).digest('hex')
@@ -126,17 +130,22 @@ function finalizePlanDigest(plan) {
 export function createPlaywrightImpactPlan({
   changedFiles,
   registry,
+  registryHash,
   baseRef,
   headRef,
   fallbackReason,
   group,
 }) {
+  const effectiveRegistryHash =
+    registryHash ??
+    registry._hash ??
+    computePlaywrightRegistryHash(loadPlaywrightRegistry(path.resolve(import.meta.dirname, '..')))
   const plan = {
     schemaVersion: 1,
     baseRef: baseRef || null,
     headRef: headRef || null,
     group: group || 'pr',
-    registryHash: registry._hash || null,
+    registryHash: effectiveRegistryHash,
     generatedAt: new Date().toISOString(),
     changedFiles: [...new Set(changedFiles.map((f) => f.replaceAll('\\', '/').trim()).filter(Boolean))].sort(),
     decisions: [],

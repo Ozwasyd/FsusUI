@@ -32,13 +32,6 @@ const receipt = path.resolve(root, receiptArg)
 const json = hasFlag('--json')
 
 const registry = loadPlaywrightSuiteRegistry(root)
-registry._hash = createPlaywrightImpactPlan({
-  changedFiles: [],
-  registry,
-  baseRef: null,
-  headRef: null,
-  group: 'pr',
-}).registryHash || 'none'
 
 let changedFiles = []
 let fallbackReason = null

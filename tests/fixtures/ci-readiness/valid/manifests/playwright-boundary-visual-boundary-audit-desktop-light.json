@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "workflowGroup": "stable",
+  "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "gate": "playwright-boundary",
+  "status": "success",
+  "toolchain": {
+    "node": "v22.0.0",
+    "playwright": "1.59.1"
+  },
+  "inputFingerprint": "c96c6d5be8d08a12e7b5cdc1b207fa6b2430974c86803d8891675e76fd992c20",
+  "artifacts": [
+    {
+      "name": "receipt-visual-boundary-audit/desktop-light",
+      "path": "receipts/playwright-boundary/visual-boundary-audit-desktop-light.json",
+      "sha256": "569af231d4d15d897fd246e61f4597bcf9e4b50dfd4cdae2391ab32ade79fea9"
+    },
+    {
+      "name": "report-visual-boundary-audit/desktop-light",
+      "path": "receipts/playwright-boundary/reports/visual-boundary-audit-desktop-light.json",
+      "sha256": "0e0f10ad2883b4458694e37cd0a554b0137869fbd65ff4cffcb8edd767d7f407"
+    }
+  ],
+  "dimensions": {},
+  "playwright": {
+    "decision": "run",
+    "suiteId": "visual-boundary-audit",
+    "cellId": "visual-boundary-audit/desktop-light",
+    "dimensions": {
+      "browser": "chromium",
+      "viewport": "desktop",
+      "theme": "light"
+    },
+    "registryHash": "7091a274991a1af109a40377e5acc49daaca13d3697912e60e8bc4f4adc96982",
+    "tests": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    "config": {
+      "path": "vue/playwright.boundary-audit.config.ts",
+      "sha256": "b8cdbfc145f4e97aae00b92aecf497fc8667844160a29de34ea89ef37d200d46"
+    },
+    "runtime": {
+      "browser": "chromium",
+      "browserRevision": "1100001",
+      "runtimeMode": "browser-product"
+    },
+    "report": {
+      "path": "receipts/playwright-boundary/reports/visual-boundary-audit-desktop-light.json",
+      "sha256": "0e0f10ad2883b4458694e37cd0a554b0137869fbd65ff4cffcb8edd767d7f407"
+    },
+    "receiptPath": "receipts/playwright-boundary/visual-boundary-audit-desktop-light.json",
+    "receiptDigest": "569af231d4d15d897fd246e61f4597bcf9e4b50dfd4cdae2391ab32ade79fea9"
+  },
+  "reportSummary": "reports/playwright-boundary-visual-boundary-audit-desktop-light.json",
+  "createdAt": "2026-08-01T00:00:05.000Z",
+  "run": {
+    "id": "42",
+    "attempt": "1"
+  }
+}

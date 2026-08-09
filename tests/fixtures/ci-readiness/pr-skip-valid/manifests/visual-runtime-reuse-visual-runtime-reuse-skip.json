@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "workflowGroup": "pr",
+  "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "gate": "visual-runtime-reuse",
+  "status": "success",
+  "toolchain": {
+    "node": "v22.0.0",
+    "playwright": "1.59.1"
+  },
+  "inputFingerprint": "c96c6d5be8d08a12e7b5cdc1b207fa6b2430974c86803d8891675e76fd992c20",
+  "artifacts": [],
+  "dimensions": {},
+  "playwright": {
+    "decision": "skip",
+    "suiteId": "visual-runtime-reuse",
+    "registryHash": "7091a274991a1af109a40377e5acc49daaca13d3697912e60e8bc4f4adc96982",
+    "impactPlanDigest": "c7dee84550f9ab52fb2680fb42bdf9632adf77b99ff9369d9048076308f6ed64",
+    "tests": {
+      "total": 0,
+      "passed": 0,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "reportSummary": "reports/visual-runtime-reuse-visual-runtime-reuse-skip.json",
+  "createdAt": "2026-08-01T00:00:05.000Z",
+  "run": {
+    "id": "42",
+    "attempt": "1"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "gate": "playwright-layout",
+  "status": "success",
+  "suiteId": "geometry-smoke",
+  "skip": true
+}
