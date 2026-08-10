@@ -405,9 +405,9 @@ public class FsusFormItem : ContentControl
 
   /// <summary>
   /// Explicit strongly typed adapter for the hosted field control. When set it
-  /// wins over the attached <see cref="FsusFormFieldAdapter.AdapterProperty"/>
-  /// and the built-in control mapping. FsusFormItem never owns or disposes the
-  /// adapter; the reference is used only while this item hosts its field.
+  /// wins over the attached <see cref="FsusFormFieldAdapter.AdapterProperty"/>.
+  /// FsusFormItem never owns or disposes the adapter; the reference is used
+  /// only while this item hosts its field.
   /// </summary>
   public IFsusFormFieldAdapter? FieldAdapter
   {
@@ -624,12 +624,6 @@ public class FsusFormItem : ContentControl
       FsusFormFieldAdapter.GetAdapter(attachedControl) is { } attached)
     {
       return attached;
-    }
-
-    if (FieldControl is Control control &&
-      FsusBuiltInFormFieldAdapter.TryResolve(control, out var builtIn))
-    {
-      return builtIn;
     }
 
     return null;
