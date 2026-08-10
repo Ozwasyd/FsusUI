@@ -157,36 +157,21 @@ public class FsusFormFieldAdapterTests
   }
 
   [Fact]
-  public void BuiltInAdapterMapsSizeAndInvalidStateForFsusInput()
+  public void ExplicitAdapterAppliesSizeWithoutControlMemberGuessing()
   {
-    var input = new FsusInput { Text = "a" };
-    var item = new FsusFormItem { FieldName = "title", Content = input };
+    var control = new GuessableControl { Text = "a" };
+    var item = new FsusFormItem
+    {
+      FieldName = "title",
+      Content = control,
+      FieldAdapter = new TextFieldAdapter(control),
+    };
     var form = new FsusForm { Size = FsusComponentSize.Lg };
     form.Children.Add(item);
     form.RefreshFormState();
 
-    Assert.Equal(FsusComponentSize.Lg, input.Size);
+    Assert.Equal(FsusComponentSize.Lg, control.Size);
     Assert.Null(item.FieldAdapterError);
-
-    input.Text = "b";
-    item.ResetField();
-
-    Assert.Equal("a", input.Text);
-    Assert.Null(item.FieldAdapterError);
-  }
-
-  [Fact]
-  public void BuiltInAdapterExposesMissingSizeCapabilityForPlainTextBox()
-  {
-    var textBox = new TextBox { Text = "a" };
-    var item = new FsusFormItem { FieldName = "title", Content = textBox };
-    var form = new FsusForm { Size = FsusComponentSize.Lg };
-    form.Children.Add(item);
-    form.RefreshFormState();
-
-    Assert.NotNull(item.FieldAdapterError);
-    Assert.Equal(FsusFormFieldAdapterErrorKind.MissingCapability, item.FieldAdapterError!.Kind);
-    Assert.Equal("Size", item.FieldAdapterError.MemberName);
   }
 
   private sealed class GuessableControl : ContentControl
@@ -236,8 +221,11 @@ public class FsusFormFieldAdapterTests
     public FsusFormFieldAdapterResult TryResetValue(object? initialValue) =>
       TryWriteValue(initialValue);
 
-    public FsusFormFieldAdapterResult TryApplySize(FsusComponentSize size) =>
-      FsusFormFieldAdapterResult.Success;
+    public FsusFormFieldAdapterResult TryApplySize(FsusComponentSize size)
+    {
+      control.Size = size;
+      return FsusFormFieldAdapterResult.Success;
+    }
 
     public FsusFormFieldAdapterResult TryApplyInvalidState(bool isInvalid) =>
       FsusFormFieldAdapterResult.Success;
