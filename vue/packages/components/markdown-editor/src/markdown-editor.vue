@@ -117,6 +117,7 @@
         :id="textareaId"
         ref="textareaRef"
         :class="ns.e('textarea')"
+        :aria-label="textareaAriaLabel"
         :aria-busy="loading || undefined"
         :aria-disabled="editingBlocked"
         :disabled="editingBlocked"
@@ -219,6 +220,9 @@ const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const commandsExpanded = ref(false)
 const visualViewportHeight = ref(0)
 const editingBlocked = computed(() => props.disabled || props.loading)
+const textareaAriaLabel = computed(() =>
+  currentMode.value === 'live' ? 'Markdown editor live editing surface' : 'Markdown editor source',
+)
 const compactMode = computed(() => props.mobileLayout === 'compact')
 const normalizeModeForLayout = (
   mode: MarkdownEditorMode,

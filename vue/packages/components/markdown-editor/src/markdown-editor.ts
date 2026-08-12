@@ -36,6 +36,7 @@ export type {
 
 export type MarkdownEditorMode = 'source' | 'live' | 'split' | 'preview'
 export type MarkdownEditorChrome = 'framed' | 'embedded' | 'minimal'
+export const markdownEditorChromes = ['framed', 'embedded', 'minimal'] as const
 export type MarkdownEditorMobileLayout = 'auto' | 'compact' | 'standard'
 export type MarkdownEditorProfile = 'markdown' | 'prose'
 export type MarkdownEditorInteractionProfile = 'auto' | 'touch' | 'keyboard'
@@ -351,7 +352,7 @@ export const markdownEditorProps = buildProps({
   },
   chrome: {
     type: String as PropType<MarkdownEditorChrome>,
-    values: ['framed', 'embedded', 'minimal'],
+    values: markdownEditorChromes,
     default: 'framed',
   },
   placeholder: {
