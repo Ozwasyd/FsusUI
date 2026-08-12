@@ -886,6 +886,44 @@ describe('MarkdownEditor', () => {
       }
     },
   )
+
+  it('keeps the editable surface and its selection when chrome changes', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        chrome: 'framed',
+        mode: 'source',
+        modelValue: '# Stable document',
+      },
+    })
+    const root = wrapper.element
+    const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
+    textarea.setSelectionRange(2, 8)
+
+    await wrapper.setProps({ chrome: 'embedded' })
+    expect(wrapper.element).toBe(root)
+    expect(wrapper.find('textarea').element).toBe(textarea)
+    expect(textarea.selectionStart).toBe(2)
+    expect(textarea.selectionEnd).toBe(8)
+
+    await wrapper.setProps({ chrome: 'minimal' })
+    expect(wrapper.element).toBe(root)
+    expect(wrapper.find('textarea').element).toBe(textarea)
+    expect(wrapper.find('.el-markdown-editor__toolbar').exists()).toBe(false)
+    expect(wrapper.find('.el-markdown-editor__status').exists()).toBe(false)
+  })
+
+  it.each(['embedded', 'minimal'] as const)(
+    'keeps focus semantics without a framed root when chrome is %s',
+    (chrome) => {
+      const wrapper = mount(MarkdownEditor, {
+        props: { chrome, modelValue: 'focus contract' },
+      })
+
+      expect(wrapper.find('[aria-label="Markdown editor"]').exists()).toBe(true)
+      expect(wrapper.find('textarea').attributes('aria-label')).toBeTruthy()
+      expect(wrapper.classes()).not.toContain('el-markdown-editor--surface-card')
+    },
+  )
 })
 
 describe('MarkdownEditor command contract migration', () => {
