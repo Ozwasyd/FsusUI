@@ -1,9 +1,10 @@
 # MarkdownEditor Markdown 编辑器
 
-`ElMarkdownEditor` 提供通用 Markdown 编辑外壳：toolbar command model、受控
+`ElMarkdownEditor` 提供通用 Markdown 编辑外壳：toolbar command registry、受控
 `modelValue`、单一 transaction dispatcher、selection/history/IME 状态，以及
-write/split/preview 模式和保存、提交、上传图片事件。业务项目仍只拥有上传、保存
-草稿、发布等业务 glue，不维护第二份 document、selection 或 undo authority。
+source/live/split/preview 模式和保存、提交、上传图片事件。业务项目仍只拥有上传、
+保存草稿、发布等业务 glue，不维护第二份 document、selection、command 或 undo
+authority。
 
 ## 基础用法
 
@@ -99,7 +100,53 @@ const placeholder = editor.value?.dispatchTransaction({
 
 组件不公开 textarea ref、内部 store、DOM/HTML state 或第三方 editor 类型。
 `applyMarkdownEditorCommand` 与 `defaultMarkdownEditorCommands` 仍是可复用的纯
-command transform；在组件内，transform 结果必须交给 dispatcher 执行。
+command transform；`applyMarkdownEditorCommand` 仅用于同步旧调用迁移。新代码通过
+`runMarkdownEditorCommand` 使用稳定 command context，并把 result 交给 dispatcher。
+
+## Chrome variants
+
+`chrome` 只控制编辑器外围区域，不改变 mode、Markdown source、selection、history、
+transaction、renderer、事件或 editor identity：
+
+| Chrome | 使用场景 | Toolbar 与 status | 根表面 |
+| --- | --- | --- | --- |
+| `framed` | 表单、设置和独立编辑器 | 默认显示 | 完整公共 token frame |
+| `embedded` | 已有 document/task surface | 保留，避免丢失 command 与状态 | 不重复根边框、圆角或 material |
+| `minimal` | consumer 自行组合 command/status | 不渲染空 toolbar/footer | 仅内容表面与必要语义 |
+
+三个 chrome 变体共享同一语义区域结构，并适用于全部公共 mode。隐藏外围区域不得留下
+空 separator、不可达控件或保留高度；`embedded` 与 `minimal` 的 focus-visible
+由活动区域提供。切换 chrome 不应重建 editor、丢失 selection/history 或改变
+scroll-container identity。
+
+| Mode | 编辑表面 | 渲染表面 | 可修改 |
+| --- | --- | --- | --- |
+| `source` | 精确源码 | 无 | 是 |
+| `live` | 同一渐进渲染编辑表面 | 内嵌于编辑表面 | 是 |
+| `split` | 编辑 pane | renderer pane | 是 |
+| `preview` | 无 | renderer surface | 否 |
+
+`live` 不是 source textarea 上覆盖第二个 preview chrome。`split` 的 separator
+只表达真实 pane 边界；`preview` 即使没有编辑表面，仍保留可访问名称和
+loading/error/capability 状态。
+
+## Command registry
+
+所有 command surface 消费同一 `MarkdownEditorCommand` registry。Command 使用稳定
+`key`、`label`、`group`、受控 icon token、shortcut 和 presentation targets；
+`when(context)` 决定是否呈现，`enabled(context)` 决定是否可执行。Shortcut 冲突
+必须显式失败，不能由数组顺序决定。
+
+Command context 只公开 document identity、revision、selection、mode、read-only
+状态、syntax projection、position map、abort signal 与 transaction dispatcher。
+Command 不得解析 Markdown、查询 rendered DOM、访问 textarea/editor instance，或
+保存裸 selection offset 自行猜测 rebase。Syntax/node/range 事实由 editor
+projection 提供；内容修改通过 transaction dispatcher 完成。
+
+`run(context)` 可以同步或异步返回受控 transaction result。异步 command 的结果在
+document epoch 变化、abort 或 anchor 删除后不得提交；consumer 负责以自己的反馈
+组件展示错误，command 本身不调用 toast。Toolbar、keyboard、palette、slash 和
+selection presentation 共享同一 key、可用状态与 pending/result authority。
 
 ## History and grouping
 
@@ -161,7 +208,9 @@ commit 也不会越过当前受控值。
 | 属性名            | 说明                                        | 类型                                      | 默认值   |
 | ----------------- | ------------------------------------------- | ----------------------------------------- | -------- |
 | model-value       | 唯一公开 Markdown 内容 authority            | `string`                                  | `''`     |
-| default-mode      | 初始编辑模式                                | `'write' \| 'split' \| 'preview'`         | `write`  |
+| default-mode      | 初始编辑模式                                | `'source' \| 'live' \| 'split' \| 'preview'` | `source` |
+| mode              | 受控编辑模式                                | `'source' \| 'live' \| 'split' \| 'preview'` | — |
+| chrome            | 外围区域与根表面变体                        | `'framed' \| 'embedded' \| 'minimal'`     | `framed` |
 | placeholder       | 文本域占位文本                              | `string`                                  | `''`     |
 | commands          | toolbar command model                       | `MarkdownEditorCommand[]`                 | 内置命令 |
 | disabled          | 禁用输入与全部 mutation method              | `boolean`                                 | `false`  |

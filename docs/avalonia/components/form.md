@@ -121,6 +121,30 @@ them, and it only uses the adapter while it hosts the field control. Setting
   `ApplyInvalidState` is skipped benignly, while missing reset/size
   capabilities surface on `FieldAdapterError`.
 
+## Form adapter source generator
+
+`FsusUI.Avalonia.FormGenerator` is an analyzer-only incremental source
+generator. The runtime package does not depend on the generator assembly.
+Consumers register form types through the canonical assembly-level
+`FsusFormAdapterAttribute`; file names, type suffixes, JSON inventories and a
+second handwritten registry are not registration authorities.
+
+The generator resolves Roslyn symbols and emits direct, strongly typed member
+access. It never generates property-name lookup or runtime reflection. Invalid
+registrations produce stable `FSUSFORM001` compile diagnostics; an unexpected
+generator failure is converted to `FSUSFORM999` instead of escaping as an
+unstructured exception. Registrations and hint names are ordered
+deterministically so input enumeration order does not change registry
+semantics.
+
+The current registration contract requires one instance, non-nullable,
+readable and writable `string Number` property declared on the registered
+type. Missing, duplicate, inherited-only, static, indexed, nullable,
+inaccessible or incompatible members fail during compilation. Expanding the
+supported control/member mapping must extend this single declaration and
+diagnostic contract rather than adding runtime discovery or a parallel
+registry.
+
 ## Known Limitations
 
 Vue rule objects are not interpreted directly; adapt them to the public

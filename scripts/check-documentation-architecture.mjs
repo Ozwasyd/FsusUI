@@ -59,6 +59,24 @@ for (const entry of readdirSync(docsRoot, { withFileTypes: true })) {
   }
 }
 
+const narrativeMarkdownName =
+  /(?:^|[-_])\d{4}-\d{2}-\d{2}(?:[-_.]|$)|^(?:issue|ticket|run|actor|receipt|acceptance|verification)[-_].*\.md$|^[a-z0-9]+-[a-z0-9]+-\d+\.md$/iu
+
+const inspectDocumentationFiles = (directory, relativeDirectory = 'docs') => {
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const relativePath = `${relativeDirectory}/${entry.name}`
+    if (entry.isDirectory()) {
+      inspectDocumentationFiles(resolve(directory, entry.name), relativePath)
+    } else if (entry.isFile() && narrativeMarkdownName.test(entry.name)) {
+      violations.push(
+        `${relativePath} is workflow narration; update an existing durable document`,
+      )
+    }
+  }
+}
+
+inspectDocumentationFiles(docsRoot)
+
 const pathContracts = [
   {
     file: '.github/workflows/_quality.yml',

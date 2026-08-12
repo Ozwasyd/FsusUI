@@ -81,10 +81,26 @@ try {
     )
     fs.rmSync(path.join(fixtureRoot, retiredPath))
   }
+
+  const narrativeFiles = [
+    'docs/ozwasyd-fsusui-267.md',
+    'docs/issue-267.md',
+    'docs/components/2026-08-13-acceptance.md',
+  ]
+  for (const narrativePath of narrativeFiles) {
+    write(narrativePath)
+    const invalid = run()
+    assert.notEqual(invalid.status, 0)
+    assert.match(
+      `${invalid.stdout}\n${invalid.stderr}`,
+      /is workflow narration; update an existing durable document/u,
+    )
+    fs.rmSync(path.join(fixtureRoot, narrativePath))
+  }
 } finally {
   fs.rmSync(fixtureRoot, { recursive: true, force: true })
 }
 
 console.log(
-  '[documentation-architecture-fixtures] valid=1 retired-directories=2 retired-files=7',
+  '[documentation-architecture-fixtures] valid=1 retired-directories=2 retired-files=7 narrative-files=3',
 )

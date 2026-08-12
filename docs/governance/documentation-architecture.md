@@ -78,6 +78,17 @@ Several documents remain at `docs/` root because scripts, tests, contributor lin
 
 Do not add another root-level document merely because its topic is important. Release material belongs under the canonical `docs/releases/` domain; the single-form `docs/release/` path and repository-root `release-evidence/` are retired and must not be recreated. New documents belong in the closest domain directory unless they are intentionally approved as stable entrypoints. Moving a stable entrypoint requires updating every script, test, link, and external reference in the same change; a forwarding stub is not sufficient when automation reads the file contents. `pnpm check:documentation-architecture` enforces the canonical release domain and rejects the retired competing directories.
 
+Issue delivery must update the existing authoritative domain document. Do not
+create root-level or domain-level narrative Markdown named after an issue,
+ticket, date, run, actor, receipt, acceptance pass, or verification session
+(for example `docs/owner-repository-123.md`, `docs/issue-123.md`, or
+`docs/2026-08-13.md`). A genuinely new stable topic document is allowed only
+when no existing authority owns the topic, its name describes the durable
+subject rather than the delivery event, and the owning index/navigation is
+updated in the same change. Issue bodies, execution summaries, acceptance
+receipts and point-in-time workflow narration remain in the issue or external
+run state, not in the product documentation tree.
+
 ## 5. Placement decision
 
 Before creating a document, answer in order:
