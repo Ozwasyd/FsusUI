@@ -4,10 +4,15 @@ import { buildProps, definePropType } from '@element-plus/utils'
 import type { ExtractPropTypes, PropType } from 'vue'
 import type { MarkdownFeatureActivationFeatureOptions } from '@element-plus/wasm'
 import type MarkdownEditor from './markdown-editor.vue'
+import { applyMarkdownEditorChanges } from './markdown-editor-transaction'
+
 import type {
   MarkdownEditorHistoryState,
+  MarkdownEditorDocumentIdentity,
   MarkdownEditorSelection,
   MarkdownEditorSelectionEvent,
+  MarkdownEditorTransaction,
+  MarkdownEditorTransactionDispatcher,
   MarkdownEditorTransactionEvent,
 } from './markdown-editor-transaction'
 
@@ -15,6 +20,7 @@ export type {
   BeforeInputSnapshot,
   MarkdownEditorChange,
   MarkdownEditorDispatchResult,
+  MarkdownEditorDocumentIdentity,
   MarkdownEditorHistoryMode,
   MarkdownEditorHistoryState,
   MarkdownEditorResolvedSelection,
@@ -22,6 +28,7 @@ export type {
   MarkdownEditorSelectionDirection,
   MarkdownEditorSelectionEvent,
   MarkdownEditorTransaction,
+  MarkdownEditorTransactionDispatcher,
   MarkdownEditorTransactionEvent,
   MarkdownEditorTransactionOrigin,
   MarkdownEditorTransactionRejection,
@@ -39,19 +46,73 @@ export interface MarkdownEditorActionItem {
 }
 
 export interface MarkdownEditorCommandResult {
-  nextSelection?: MarkdownEditorSelection
-  value: string
+  readonly transaction?: MarkdownEditorTransaction
+}
+
+export type MarkdownEditorCommandLifecycleState =
+  | 'idle'
+  | 'pending'
+  | 'resolved-current'
+  | 'rejected'
+  | 'aborted'
+  | 'stale'
+
+export type MarkdownEditorCommandIcon =
+  | 'bold'
+  | 'code'
+  | 'heading'
+  | 'image'
+  | 'italic'
+  | 'link'
+  | 'quote'
+
+export type MarkdownEditorCommandPresentation =
+  | 'toolbar'
+  | 'selection'
+  | 'slash'
+  | 'palette'
+
+/** Syntax is supplied by the editor projection, never derived by commands. */
+export interface MarkdownEditorSyntaxContext {
+  readonly nodeId?: string
+  readonly range?: Readonly<{ end: number; start: number }>
+  readonly type?: string
+}
+
+/** Position mapping is owned by the transaction layer and used to rebase async anchors. */
+export interface MarkdownEditorPositionMap {
+  rebase(anchor: Readonly<{ end: number; start: number }>):
+    | Readonly<{ end: number; start: number }>
+    | undefined
+}
+
+export interface MarkdownEditorCommandContext {
+  readonly dispatch: MarkdownEditorTransactionDispatcher
+  readonly documentIdentity: MarkdownEditorDocumentIdentity
+  readonly mode: MarkdownEditorMode
+  readonly positionMap?: MarkdownEditorPositionMap
+  readonly readonly: boolean
+  readonly revision: number
+  readonly selection: MarkdownEditorSelection
+  readonly signal: AbortSignal
+  readonly syntax?: MarkdownEditorSyntaxContext
+  readonly value: string
 }
 
 export interface MarkdownEditorCommand {
-  key: string
-  label: string
-  shortcut?: string
-  title?: string
-  apply: (
-    value: string,
-    selection: MarkdownEditorSelection,
-  ) => MarkdownEditorCommandResult
+  readonly key: string
+  readonly label: string
+  readonly description?: string
+  readonly group: string
+  readonly icon?: MarkdownEditorCommandIcon
+  readonly shortcut?: string
+  readonly title?: string
+  readonly presentation?: readonly MarkdownEditorCommandPresentation[]
+  readonly when?: (context: MarkdownEditorCommandContext) => boolean
+  readonly enabled?: (context: MarkdownEditorCommandContext) => boolean
+  readonly run: (
+    context: MarkdownEditorCommandContext,
+  ) => MarkdownEditorCommandResult | Promise<MarkdownEditorCommandResult>
 }
 
 export interface MarkdownEditorInsertOptions {
@@ -75,18 +136,19 @@ const replaceRange = (
   replacement: string,
   selectStartOffset = 0,
   selectEndOffset = replacement.length,
-): MarkdownEditorCommandResult => {
+): MarkdownEditorTransaction => {
   const range = clampSelection(value, selection)
-  const nextValue =
-    value.slice(0, range.start) + replacement + value.slice(range.end)
   return {
-    nextSelection: {
+    changes: [{ from: range.start, insert: replacement, to: range.end }],
+    expectedRevision: undefined,
+    history: 'separate',
+    origin: 'command',
+    selection: {
       direction:
         selectStartOffset === selectEndOffset ? 'none' : range.direction,
       start: range.start + selectStartOffset,
       end: range.start + selectEndOffset,
     },
-    value: nextValue,
   }
 }
 
@@ -135,68 +197,141 @@ export const defaultMarkdownEditorCommands: readonly MarkdownEditorCommand[] = [
   {
     key: 'bold',
     label: 'B',
+    group: 'format',
+    icon: 'bold',
     shortcut: 'Mod+B',
     title: 'Bold',
-    apply: (value, selection) =>
-      wrapSelection(value, selection, '**', '**', 'text'),
+    when: () => true,
+    enabled: () => true,
+    run: (context) => ({ transaction: wrapSelection(context.value, context.selection, '**', '**', 'text') }),
   },
   {
     key: 'italic',
     label: 'I',
+    group: 'format',
+    icon: 'italic',
     shortcut: 'Mod+I',
     title: 'Italic',
-    apply: (value, selection) =>
-      wrapSelection(value, selection, '*', '*', 'text'),
+    when: () => true,
+    enabled: () => true,
+    run: (context) => ({ transaction: wrapSelection(context.value, context.selection, '*', '*', 'text') }),
   },
   {
     key: 'heading',
     label: 'H',
+    group: 'block',
+    icon: 'heading',
     shortcut: 'Mod+Alt+H',
     title: 'Heading',
-    apply: (value, selection) => prefixSelectedLines(value, selection, '## '),
+    when: () => true,
+    enabled: () => true,
+    run: (context) => ({ transaction: prefixSelectedLines(context.value, context.selection, '## ') }),
   },
   {
     key: 'quote',
     label: 'Q',
+    group: 'block',
+    icon: 'quote',
     title: 'Quote',
-    apply: (value, selection) => prefixSelectedLines(value, selection, '> '),
+    when: () => true,
+    enabled: () => true,
+    run: (context) => ({ transaction: prefixSelectedLines(context.value, context.selection, '> ') }),
   },
   {
     key: 'code',
     label: '{}',
+    group: 'format',
+    icon: 'code',
     shortcut: 'Mod+E',
     title: 'Code',
-    apply: (value, selection) =>
-      wrapSelection(value, selection, '`', '`', 'code'),
+    when: () => true,
+    enabled: () => true,
+    run: (context) => ({ transaction: wrapSelection(context.value, context.selection, '`', '`', 'code') }),
   },
   {
     key: 'link',
     label: 'Link',
+    group: 'insert',
+    icon: 'link',
     shortcut: 'Mod+K',
     title: 'Link',
-    apply: (value, selection) =>
-      wrapSelection(value, selection, '[', '](https://example.com)', 'label'),
+    when: () => true,
+    enabled: () => true,
+    run: (context) => ({ transaction: wrapSelection(context.value, context.selection, '[', '](https://example.com)', 'label') }),
   },
   {
     key: 'image',
     label: '图片',
+    group: 'insert',
+    icon: 'image',
     title: '插入图片',
-    apply: (value, selection) =>
-      wrapSelection(
-        value,
-        selection,
+    when: () => true,
+    enabled: () => true,
+    run: (context) => ({ transaction: wrapSelection(
+        context.value,
+        context.selection,
         '![',
         '](https://example.com/image.png)',
         'alt',
-      ),
+      ) }),
   },
 ]
 
+export const isMarkdownEditorCommandVisible = (
+  command: MarkdownEditorCommand,
+  context: MarkdownEditorCommandContext,
+) => command.when?.(context) ?? true
+
+export const isMarkdownEditorCommandEnabled = (
+  command: MarkdownEditorCommand,
+  context: MarkdownEditorCommandContext,
+) => !context.readonly && !context.signal.aborted && (command.enabled?.(context) ?? true)
+
+export const getMarkdownEditorCommand = (
+  commands: readonly MarkdownEditorCommand[], key: string,
+) => commands.find((command) => command.key === key)
+
+export const filterMarkdownEditorCommands = (
+  commands: readonly MarkdownEditorCommand[], context: MarkdownEditorCommandContext,
+  presentation?: MarkdownEditorCommandPresentation,
+) => commands.filter((command) => isMarkdownEditorCommandVisible(command, context) && (!presentation || !command.presentation || command.presentation.includes(presentation)))
+
+export const resolveMarkdownEditorShortcut = (
+  commands: readonly MarkdownEditorCommand[], shortcut: string,
+) => {
+  const matches = commands.filter((command) => command.shortcut?.toLowerCase() === shortcut.toLowerCase())
+  if (matches.length > 1) throw new Error(`Markdown editor shortcut conflict: ${shortcut}`)
+  return matches[0]
+}
+
+export const runMarkdownEditorCommand = async (
+  command: MarkdownEditorCommand,
+  context: MarkdownEditorCommandContext,
+) => {
+  if (!isMarkdownEditorCommandVisible(command, context) || !isMarkdownEditorCommandEnabled(command, context)) return undefined
+  return await command.run(context)
+}
+
+/** @deprecated Use runMarkdownEditorCommand with a stable context. */
 export const applyMarkdownEditorCommand = (
   value: string,
   selection: MarkdownEditorSelection,
   command: MarkdownEditorCommand,
-): MarkdownEditorCommandResult => command.apply(value, selection)
+) => {
+  const result = command.run({
+    dispatch: { dispatch: () => { throw new Error('legacy command dispatch') } },
+    documentIdentity: { epoch: 0, id: 'legacy' },
+    mode: 'write', readonly: false, revision: 0, selection,
+    signal: new AbortController().signal, value,
+  })
+  if (result instanceof Promise) throw new Error('Async commands require a command context')
+  const transaction = result.transaction
+  const applied = transaction && applyMarkdownEditorChanges(value, transaction.changes)
+  return {
+    nextSelection: transaction?.selection ?? selection,
+    value: applied?.value ?? value,
+  }
+}
 
 export const markdownEditorProps = buildProps({
   modelValue: {

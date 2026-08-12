@@ -72,6 +72,21 @@ export interface MarkdownEditorTransactionEvent extends MarkdownEditorDispatchRe
   readonly transaction: MarkdownEditorTransaction
 }
 
+/** A stable identity for a document; callers must replace it on document switch. */
+export interface MarkdownEditorDocumentIdentity {
+  readonly epoch: number
+  readonly id: string
+}
+
+export interface MarkdownEditorCommandAnchor {
+  readonly end: number
+  readonly start: number
+}
+
+export interface MarkdownEditorTransactionDispatcher {
+  dispatch(transaction: MarkdownEditorTransaction): MarkdownEditorDispatchResult
+}
+
 export interface MarkdownEditorSelectionEvent {
   readonly revision: number
   readonly selection: MarkdownEditorResolvedSelection

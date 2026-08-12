@@ -176,9 +176,9 @@ import { ElMarkdownRenderer } from '@element-plus/components/markdown-renderer'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
 import { useNamespace } from '@element-plus/hooks'
 import {
-  applyMarkdownEditorCommand,
   markdownEditorEmits,
   markdownEditorProps,
+  runMarkdownEditorCommand,
 } from './markdown-editor'
 import {
   deriveMarkdownEditorChange,
@@ -233,6 +233,7 @@ const transactionStore = new MarkdownEditorTransactionStore(
   props.modelValue,
   initialSelection,
 )
+const documentIdentity = Object.freeze({ epoch: 0, id: commandTrayId })
 const editorValue = ref(transactionStore.value)
 const isComposing = ref(false)
 
@@ -1015,24 +1016,29 @@ const handleLineContinuation = () => {
   return false
 }
 
-const runCommand = (command: MarkdownEditorCommand) => {
+const runCommand = async (command: MarkdownEditorCommand) => {
   if (editingBlocked.value || isComposing.value) return
 
   const selection = captureSelection()
-  const result = applyMarkdownEditorCommand(
-    transactionStore.value,
+  const controller = new AbortController()
+  const result = await runMarkdownEditorCommand(command, {
+    dispatch: { dispatch: dispatchTransaction },
+    documentIdentity,
+    mode: currentMode.value,
+    readonly: editingBlocked.value,
+    revision: transactionStore.revision,
     selection,
-    command,
-  )
-  const dispatchResult = dispatchReplacement(
-    result.value,
-    result.nextSelection ?? selection,
-    {
-      history: 'separate',
-      metadata: Object.freeze({ command: command.key }),
-      origin: 'command',
-    },
-  )
+    signal: controller.signal,
+    value: transactionStore.value,
+  })
+  if (!result?.transaction) return
+  const dispatchResult = dispatchTransaction({
+    ...result.transaction,
+    expectedRevision: transactionStore.revision,
+    history: result.transaction.history ?? 'separate',
+    metadata: Object.freeze({ command: command.key }),
+    origin: 'command',
+  })
   if (dispatchResult.accepted) emit('command', command)
 }
 
