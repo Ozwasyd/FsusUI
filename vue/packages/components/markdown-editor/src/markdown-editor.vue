@@ -3,14 +3,17 @@
     :class="[
       ns.b(),
       ns.m(currentMode),
+      ns.m(`chrome-${chrome}`),
       ns.m(`mobile-${mobileLayout}`),
       ns.m(`profile-${editorProfile}`),
       ns.m(`interaction-${interactionProfile}`),
       ns.is('commands-expanded', commandsExpanded),
     ]"
+    role="region"
+    aria-label="Markdown editor"
     :style="editorStyle"
   >
-    <header :class="ns.e('toolbar')">
+    <header v-if="chrome !== 'minimal'" :class="ns.e('toolbar')">
       <div :class="ns.e('commands')">
         <button
           v-for="command in primaryCommands"
@@ -110,7 +113,7 @@
 
     <div :class="ns.e('body')">
       <textarea
-        v-show="currentMode !== 'preview'"
+        v-if="currentMode !== 'preview'"
         :id="textareaId"
         ref="textareaRef"
         :class="ns.e('textarea')"
@@ -134,7 +137,7 @@
       />
 
       <el-markdown-renderer
-        v-if="currentMode !== 'write'"
+        v-if="currentMode !== 'source'"
         :class="ns.e('preview')"
         :base-url="previewBaseUrl"
         :content="editorValue"
@@ -147,7 +150,7 @@
       />
     </div>
 
-    <footer :class="ns.e('status')">
+    <footer v-if="chrome !== 'minimal'" :class="ns.e('status')">
       <slot
         name="status"
         :characters="characterCount"
@@ -210,7 +213,7 @@ defineOptions({
 const props = defineProps(markdownEditorProps)
 const emit = defineEmits(markdownEditorEmits)
 const ns = useNamespace('markdown-editor')
-const modes: MarkdownEditorMode[] = ['write', 'split', 'preview']
+const modes: MarkdownEditorMode[] = ['source', 'live', 'split', 'preview']
 const commandTrayId = `${useId()}-command-tray`
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const commandsExpanded = ref(false)
@@ -220,7 +223,7 @@ const compactMode = computed(() => props.mobileLayout === 'compact')
 const normalizeModeForLayout = (
   mode: MarkdownEditorMode,
 ): MarkdownEditorMode =>
-  compactMode.value && mode === 'split' ? 'write' : mode
+  compactMode.value && mode === 'split' ? 'source' : mode
 const currentMode = ref<MarkdownEditorMode>(
   normalizeModeForLayout(props.mode ?? props.defaultMode),
 )
@@ -607,7 +610,9 @@ const commandOverflowAriaLabel = computed(
   () => `${props.commandOverflowLabel}，${overflowItemCount.value} 个工具`,
 )
 const visibleModes = computed(() =>
-  compactMode.value ? modes.filter((mode) => mode !== 'split') : modes,
+  compactMode.value
+    ? modes.filter((mode) => mode !== 'split' && mode !== 'live')
+    : modes,
 )
 const wordCount = computed(() => {
   const trimmed = editorValue.value.trim()
@@ -1080,7 +1085,8 @@ const setMode = (mode: MarkdownEditorMode) => {
 
 const modeLabel = (mode: MarkdownEditorMode) => {
   if (mode === 'split') return '分屏'
-  return mode === 'preview' ? '预览' : '编写'
+  if (mode === 'preview') return '预览'
+  return mode === 'live' ? '实时' : '编写'
 }
 
 const emitSave = () => {

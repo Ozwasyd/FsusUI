@@ -34,7 +34,8 @@ export type {
   MarkdownEditorTransactionRejection,
 } from './markdown-editor-transaction'
 
-export type MarkdownEditorMode = 'write' | 'split' | 'preview'
+export type MarkdownEditorMode = 'source' | 'live' | 'split' | 'preview'
+export type MarkdownEditorChrome = 'framed' | 'embedded' | 'minimal'
 export type MarkdownEditorMobileLayout = 'auto' | 'compact' | 'standard'
 export type MarkdownEditorProfile = 'markdown' | 'prose'
 export type MarkdownEditorInteractionProfile = 'auto' | 'touch' | 'keyboard'
@@ -321,7 +322,7 @@ export const applyMarkdownEditorCommand = (
   const result = command.run({
     dispatch: { dispatch: () => { throw new Error('legacy command dispatch') } },
     documentIdentity: { epoch: 0, id: 'legacy' },
-    mode: 'write', readonly: false, revision: 0, selection,
+    mode: 'source', readonly: false, revision: 0, selection,
     signal: new AbortController().signal, value,
   })
   if (result instanceof Promise) throw new Error('Async commands require a command context')
@@ -340,13 +341,18 @@ export const markdownEditorProps = buildProps({
   },
   defaultMode: {
     type: String as PropType<MarkdownEditorMode>,
-    values: ['write', 'split', 'preview'],
-    default: 'write',
+    values: ['source', 'live', 'split', 'preview'],
+    default: 'source',
   },
   mode: {
     type: String as PropType<MarkdownEditorMode | undefined>,
-    values: ['write', 'split', 'preview'],
+    values: ['source', 'live', 'split', 'preview'],
     default: undefined,
+  },
+  chrome: {
+    type: String as PropType<MarkdownEditorChrome>,
+    values: ['framed', 'embedded', 'minimal'],
+    default: 'framed',
   },
   placeholder: {
     type: String,
@@ -452,7 +458,7 @@ export const markdownEditorEmits = {
   [CHANGE_EVENT]: (value: string) => typeof value === 'string',
   command: (command: MarkdownEditorCommand) => Boolean(command?.key),
   'mode-change': (mode: MarkdownEditorMode) =>
-    mode === 'write' || mode === 'split' || mode === 'preview',
+    mode === 'source' || mode === 'live' || mode === 'split' || mode === 'preview',
   save: (value: string) => typeof value === 'string',
   submit: (value: string) => typeof value === 'string',
   'upload-image': () => true,
