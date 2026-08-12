@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
@@ -812,5 +814,17 @@ describe('MarkdownEditor', () => {
 
     await wrapper.setProps({ loading: false })
     expect(wrapper.find('textarea').attributes('aria-busy')).toBeUndefined()
+  })
+})
+
+describe('MarkdownEditor command contract migration', () => {
+  it('does not retain the legacy apply(value, selection) command execution path', () => {
+    const source = readFileSync(
+      resolve(process.cwd(), 'vue/packages/components/markdown-editor/src/markdown-editor.ts'),
+      'utf8',
+    )
+
+    expect(source).not.toMatch(/\bapply\s*\(\s*value\s*,\s*selection\s*\)/)
+    expect(source).toMatch(/\brun\s*:/)
   })
 })
