@@ -33,13 +33,13 @@ describe('MarkdownEditor', () => {
 
     expect(
       applyMarkdownEditorCommand(
-        'write markdown',
-        { direction: 'forward', start: 6, end: 14 },
+        'edit markdown',
+        { direction: 'forward', start: 5, end: 13 },
         bold,
       ),
     ).toEqual({
-      nextSelection: { direction: 'forward', start: 8, end: 16 },
-      value: 'write **markdown**',
+      nextSelection: { direction: 'forward', start: 7, end: 15 },
+      value: 'edit **markdown**',
     })
   })
 
@@ -47,17 +47,17 @@ describe('MarkdownEditor', () => {
     expectTypeOf<
       MarkdownEditorInstance['insertMarkdownAtCursor']
     >().returns.toEqualTypeOf<boolean>()
-    const legacySelection: MarkdownEditorSelection = { start: 6, end: 14 }
+    const legacySelection: MarkdownEditorSelection = { start: 5, end: 13 }
     const bold = defaultMarkdownEditorCommands.find(
       (item) => item.key === 'bold',
     )
     if (!bold) throw new Error('missing bold command')
 
     expect(
-      applyMarkdownEditorCommand('write markdown', legacySelection, bold),
+      applyMarkdownEditorCommand('edit markdown', legacySelection, bold),
     ).toEqual({
-      nextSelection: { direction: 'none', start: 8, end: 16 },
-      value: 'write **markdown**',
+      nextSelection: { direction: 'none', start: 7, end: 15 },
+      value: 'edit **markdown**',
     })
   })
 
@@ -127,7 +127,7 @@ describe('MarkdownEditor', () => {
     })
 
     expect(wrapper.classes()).toContain('el-markdown-editor--mobile-compact')
-    expect(wrapper.classes()).toContain('el-markdown-editor--write')
+    expect(wrapper.classes()).toContain('el-markdown-editor--source')
     expect(
       wrapper
         .findAll('.el-markdown-editor__commands > .el-markdown-editor__command')
@@ -326,7 +326,7 @@ describe('MarkdownEditor', () => {
     expect(wrapper.find('.el-markdown-editor__actions').exists()).toBe(false)
     expect(wrapper.find('.el-markdown-editor__modes').exists()).toBe(false)
 
-    await wrapper.setProps({ mode: 'write' })
+    await wrapper.setProps({ mode: 'source' })
     const textarea = wrapper.find('textarea')
     expect(textarea.attributes('id')).toBe('markdown-body')
     expect(textarea.attributes('name')).toBe('body')
@@ -815,6 +815,77 @@ describe('MarkdownEditor', () => {
     await wrapper.setProps({ loading: false })
     expect(wrapper.find('textarea').attributes('aria-busy')).toBeUndefined()
   })
+
+  it.each(['framed', 'embedded', 'minimal'] as const)(
+    'keeps a single semantic editor shell when chrome is %s',
+    async (chrome) => {
+      const wrapper = mount(MarkdownEditor, {
+        props: {
+          chrome,
+          modelValue: '# Contract',
+        },
+        global: {
+          stubs: {
+            ElMarkdownRenderer: {
+              props: ['content'],
+              template: '<div data-stub-markdown-renderer />',
+            },
+          },
+        },
+      })
+
+      expect(wrapper.classes()).toContain(`el-markdown-editor--chrome-${chrome}`)
+      expect(wrapper.findAll('[role="region"]')).toHaveLength(1)
+      expect(wrapper.find('[aria-label="Markdown editor"]').exists()).toBe(true)
+
+      if (chrome === 'minimal') {
+        expect(wrapper.find('.el-markdown-editor__toolbar').exists()).toBe(false)
+        expect(wrapper.find('.el-markdown-editor__status').exists()).toBe(false)
+      }
+
+      if (chrome === 'embedded') {
+        expect(wrapper.classes()).not.toContain('el-markdown-editor--surface-card')
+      }
+    },
+  )
+
+  it.each(['source', 'live', 'split', 'preview'] as const)(
+    'preserves the root, accessible name, and active region across %s mode',
+    async (mode) => {
+      const wrapper = mount(MarkdownEditor, {
+        props: {
+          chrome: 'embedded',
+          mode,
+          modelValue: '# Contract',
+        },
+        global: {
+          stubs: {
+            ElMarkdownRenderer: {
+              props: ['content'],
+              template: '<div data-stub-markdown-renderer />',
+            },
+          },
+        },
+      })
+
+      const root = wrapper.element
+      expect(wrapper.classes()).toContain(`el-markdown-editor--${mode}`)
+      expect(wrapper.find('[aria-label="Markdown editor"]').exists()).toBe(true)
+
+      await wrapper.setProps({ chrome: 'minimal' })
+      expect(wrapper.element).toBe(root)
+      expect(wrapper.find('[aria-label="Markdown editor"]').exists()).toBe(true)
+
+      if (mode === 'preview') {
+        expect(wrapper.find('textarea').exists()).toBe(false)
+        expect(wrapper.find('[data-stub-markdown-renderer]').exists()).toBe(true)
+      } else {
+        expect(wrapper.find('[data-stub-markdown-renderer]').exists()).toBe(
+          mode !== 'source',
+        )
+      }
+    },
+  )
 })
 
 describe('MarkdownEditor command contract migration', () => {
@@ -826,5 +897,20 @@ describe('MarkdownEditor command contract migration', () => {
 
     expect(source).not.toMatch(/\bapply\s*\(\s*value\s*,\s*selection\s*\)/)
     expect(source).toMatch(/\brun\s*:/)
+  })
+
+  it('removes the write mode alias from the public component contract', () => {
+    const component = readFileSync(
+      resolve(process.cwd(), 'vue/packages/components/markdown-editor/src/markdown-editor.vue'),
+      'utf8',
+    )
+    const model = readFileSync(
+      resolve(process.cwd(), 'vue/packages/components/markdown-editor/src/markdown-editor.ts'),
+      'utf8',
+    )
+
+    expect(component).not.toMatch(/mode-write|--write|is-write/)
+    expect(model).not.toMatch(/['\"]write['\"]/)
+    expect(model).toMatch(/['\"]source['\"]\s*\|\s*['\"]live['\"]\s*\|\s*['\"]split['\"]\s*\|\s*['\"]preview['\"]/)
   })
 })
