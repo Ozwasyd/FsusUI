@@ -397,6 +397,41 @@ const computeTarget = (page) =>
     }
   })
 
+/**
+ * A visible fixture is not sufficient for native input: a delayed Vue mount can
+ * replace the textarea after the locator resolves.  Bind the trace and X11
+ * target only after the final textarea is connected, enabled, and has a usable
+ * layout box in the current document.
+ */
+const waitForInteractiveEditor = async (page, editorSelector, timeoutMs) => {
+  try {
+    await page
+      .locator(`[data-testid="${fixtureTestId}"]`)
+      .waitFor({ state: 'visible', timeout: timeoutMs })
+    await page.locator(editorSelector).waitFor({ state: 'visible', timeout: timeoutMs })
+    await page.waitForFunction(
+      (selector) => {
+        const textarea = document.querySelector(selector)
+        if (!(textarea instanceof HTMLTextAreaElement)) return false
+        const rectangle = textarea.getBoundingClientRect()
+        return (
+          textarea.isConnected &&
+          !textarea.disabled &&
+          rectangle.width > 0 &&
+          rectangle.height > 0
+        )
+      },
+      editorSelector,
+      { timeout: timeoutMs },
+    )
+  } catch (error) {
+    fail(
+      'target-absent',
+      `fixture/editor did not become interactive within ${timeoutMs}ms: ${error.message}`,
+    )
+  }
+}
+
 const hasEvent = (trace, name) => trace.some((entry) => entry.name === name)
 
 const writeJson = (path, value) => {
@@ -618,23 +653,7 @@ const main = async () => {
       fail('page-not-ready', `page readyState=${pageReady.readyState}`)
     }
 
-    try {
-      await page
-        .locator(`[data-testid="${fixtureTestId}"]`)
-        .waitFor({ state: 'visible', timeout: mountTimeoutMs })
-      await page
-        .locator(editorSelector)
-        .waitFor({ state: 'visible', timeout: mountTimeoutMs })
-      const enabled = await page.locator(editorSelector).isEnabled()
-      if (!enabled) {
-        fail('target-absent', 'editor textarea is not enabled')
-      }
-    } catch (error) {
-      fail(
-        'target-absent',
-        `fixture/editor did not become interactive within ${mountTimeoutMs}ms: ${error.message}`,
-      )
-    }
+    await waitForInteractiveEditor(page, editorSelector, mountTimeoutMs)
 
     const documentIdentity = await bindDocumentIdentity(page)
     const fixtureIdentity = await page
@@ -725,19 +744,7 @@ const main = async () => {
     for (const scenario of scenarios) {
       if (scenario.fresh) {
         await page.reload({ waitUntil: 'domcontentloaded' })
-        try {
-          await page
-            .locator(`[data-testid="${fixtureTestId}"]`)
-            .waitFor({ state: 'visible', timeout: mountTimeoutMs })
-          await page
-            .locator(editorSelector)
-            .waitFor({ state: 'visible', timeout: mountTimeoutMs })
-        } catch (error) {
-          fail(
-            'target-absent',
-            `fixture/editor did not reappear after reload: ${error.message}`,
-          )
-        }
+        await waitForInteractiveEditor(page, editorSelector, mountTimeoutMs)
         await bindDocumentIdentity(page)
       }
 
