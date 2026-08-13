@@ -9,6 +9,8 @@ function readEditorSource(file: string) {
 }
 
 describe('Markdown editor command contract', () => {
+  // #268 is a tracking parent: automated source checks may protect the
+  // transaction contract, but cannot substitute for a real native-IME matrix.
   it('exposes a single public command model rather than the legacy apply callback', () => {
     const source = readEditorSource('markdown-editor.ts')
 
@@ -49,5 +51,14 @@ describe('Markdown editor command contract', () => {
     expect(source).toMatch(/stale/)
     expect(source).toMatch(/positionMap|rebase/)
     expect(source).not.toMatch(/selection(?:Start|End)?\s*[=:].*\+\s*\w*(?:delta|change)/)
+  })
+
+  it('does not present simulated composition coverage as native IME acceptance', () => {
+    const interactionTests = readFileSync(
+      resolve(editorRoot, '__tests__', 'markdown-editor.test.tsx'),
+      'utf8',
+    )
+
+    expect(interactionTests).not.toMatch(/native[- ]IME.*(?:passed|accepted)/i)
   })
 })

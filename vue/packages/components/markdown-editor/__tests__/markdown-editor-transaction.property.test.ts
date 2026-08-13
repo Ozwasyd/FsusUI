@@ -49,6 +49,8 @@ const seededRandom = (seed: number) => {
 }
 
 describe('MarkdownEditor transaction properties', () => {
+  // Unit and property coverage protects the transaction core; native browser
+  // and operating-system IME evidence remains a separately-owned acceptance.
   it('round-trips arbitrary sorted non-overlapping UTF-16 changes through inverse changes', () => {
     const random = seededRandom(268)
     const alphabet = ['a', '中', '한', '😀', 'e\u0301', 'אב', '\n']

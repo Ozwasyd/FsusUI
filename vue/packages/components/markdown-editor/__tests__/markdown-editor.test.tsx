@@ -16,6 +16,7 @@ import type {
 } from '../src/markdown-editor'
 
 describe('MarkdownEditor', () => {
+  // Synthetic composition events in this suite are not native-IME evidence.
   afterEach(() => {
     vi.useRealTimers()
   })
