@@ -239,3 +239,24 @@ MarkdownEditor 在 Avalonia baseline 中分类为 `native-adapter`：公开 tran
 revision、history 与 selection direction 语义保持一致；Avalonia 使用 native text
 control 与 selection API，不暴露 Web DOM。平台分类见
 [Avalonia platform differences](../avalonia/platform-differences.md)。
+
+## Document identity and position maps
+
+Consumers provide an opaque document identity (`key` with an optional `epoch`) when
+the editor is used for more than one document. A key or epoch change is a complete
+document switch even when the Markdown bytes are identical: the editor isolates
+undo/redo, selection, merge state, pending composition, and asynchronous anchors
+from the previous document. Re-sending the same value for the same identity is a
+no-op and does not clear history.
+
+Every accepted transaction reports its before/new revision, identity, selection,
+history state, and a deterministic position map. Async commands, attachments,
+search, outline, diagnostics, and projections must retain the identity and expected
+revision with a mapped anchor; they must not keep a bare offset or implement a
+consumer-local delta rebase. A stale revision, deleted anchor, or changed document
+identity rejects the result instead of applying it at a guessed location.
+
+The transaction implementation is complete, but its tracking acceptance remains
+separate: native CJK IME commit, cancel, and undo require direct evidence from real
+browser/OS/input-method combinations. Synthetic composition events validate only the
+component state machine and are not native-IME acceptance evidence.
