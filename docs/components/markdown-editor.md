@@ -119,6 +119,13 @@ transaction、renderer、事件或 editor identity：
 由活动区域提供。切换 chrome 不应重建 editor、丢失 selection/history 或改变
 scroll-container identity。
 
+Toolbar/command surface 与 status surface 由各自的默认内容或对应 slot 提供：有 slot
+时 slot 替换该区域的默认内容，而不是创建第二个 region。`framed` 默认呈现两者；
+`embedded` 仅在该区域有默认内容或 slot 时呈现；`minimal` 默认不呈现两者，只有调用方
+提供相应 slot 时才呈现。body 始终是当前 mode 的唯一内容 region；`live` 不额外创建
+preview region，`split` 才同时呈现编辑 pane 和 renderer pane，`preview` 则只呈现
+renderer surface。
+
 | Mode | 编辑表面 | 渲染表面 | 可修改 |
 | --- | --- | --- | --- |
 | `source` | 精确源码 | 无 | 是 |
