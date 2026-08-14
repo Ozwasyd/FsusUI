@@ -180,8 +180,12 @@ import { ElMarkdownRenderer } from '@element-plus/components/markdown-renderer'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
 import { useNamespace } from '@element-plus/hooks'
 import {
+  filterMarkdownEditorCommands,
+  isMarkdownEditorCommandEnabled,
+  isMarkdownEditorCommandVisible,
   markdownEditorEmits,
   markdownEditorProps,
+  resolveMarkdownEditorShortcut,
   runMarkdownEditorCommand,
 } from './markdown-editor'
 import {
@@ -243,6 +247,15 @@ const transactionStore = new MarkdownEditorTransactionStore(
 const documentIdentity = Object.freeze({ epoch: 0, id: commandTrayId })
 const editorValue = ref(transactionStore.value)
 const isComposing = ref(false)
+const pendingCommandKeys = ref(new Set<string>())
+const commandControllers = new Map<string, AbortController>()
+const commandContextSignal = new AbortController().signal
+
+const abortPendingCommands = () => {
+  for (const controller of commandControllers.values()) controller.abort()
+  commandControllers.clear()
+  pendingCommandKeys.value = new Set()
+}
 
 type EditorOperation =
   | {
@@ -510,6 +523,7 @@ watch(
   (value) => {
     if (value === transactionStore.value) return
 
+    abortPendingCommands()
     if (isComposing.value) deferInvalidatedComposition()
     isComposing.value = false
     beforeInputSnapshot = undefined
@@ -553,17 +567,33 @@ const editorStyle = computed<Record<string, string> | undefined>(() =>
 const primaryCommandKeySet = computed(() =>
   props.primaryCommandKeys?.length ? new Set(props.primaryCommandKeys) : null,
 )
+const commandContext = computed(() => ({
+  dispatch: {
+    dispatch: (transaction: MarkdownEditorTransaction) =>
+      dispatchEditorOperation({ kind: 'transaction', transaction }),
+  },
+  documentIdentity,
+  mode: currentMode.value,
+  readonly: editingBlocked.value,
+  revision: transactionStore.revision,
+  selection: transactionStore.selection,
+  signal: commandContextSignal,
+  value: transactionStore.value,
+}))
+const toolbarCommands = computed(() =>
+  filterMarkdownEditorCommands(props.commands, commandContext.value, 'toolbar'),
+)
 const primaryCommands = computed(() => {
   const keySet = primaryCommandKeySet.value
   return keySet
-    ? props.commands.filter((command) => keySet.has(command.key))
-    : props.commands.slice(0, 6)
+    ? toolbarCommands.value.filter((command) => keySet.has(command.key))
+    : toolbarCommands.value.filter((_, index) => index < 6)
 })
 const overflowCommands = computed(() => {
   const keySet = primaryCommandKeySet.value
   return keySet
-    ? props.commands.filter((command) => !keySet.has(command.key))
-    : props.commands.slice(6)
+    ? toolbarCommands.value.filter((command) => !keySet.has(command.key))
+    : toolbarCommands.value.filter((_, index) => index >= 6)
 })
 const visibleActions = computed<MarkdownEditorActionItem[]>(() => {
   if (!props.showActions) return []
@@ -638,6 +668,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  abortPendingCommands()
   if (typeof window === 'undefined') return
 
   window.visualViewport?.removeEventListener(
@@ -1027,28 +1058,45 @@ const handleLineContinuation = () => {
 
 const runCommand = async (command: MarkdownEditorCommand) => {
   if (editingBlocked.value || isComposing.value) return
+  if (pendingCommandKeys.value.has(command.key)) return
 
   const selection = captureSelection()
-  const controller = new AbortController()
-  const result = await runMarkdownEditorCommand(command, {
-    dispatch: { dispatch: dispatchTransaction },
-    documentIdentity,
-    mode: currentMode.value,
-    readonly: editingBlocked.value,
-    revision: transactionStore.revision,
-    selection,
-    signal: controller.signal,
-    value: transactionStore.value,
-  })
-  if (!result?.transaction) return
-  const dispatchResult = dispatchTransaction({
-    ...result.transaction,
-    expectedRevision: transactionStore.revision,
-    history: result.transaction.history ?? 'separate',
-    metadata: Object.freeze({ command: command.key }),
-    origin: 'command',
-  })
-  if (dispatchResult.accepted) emit('command', command)
+  const commandController = new AbortController()
+  commandControllers.set(command.key, commandController)
+  pendingCommandKeys.value = new Set(pendingCommandKeys.value).add(command.key)
+  const revision = transactionStore.revision
+  const value = transactionStore.value
+  try {
+    const context = {
+      dispatch: { dispatch: dispatchTransaction },
+      documentIdentity,
+      mode: currentMode.value,
+      readonly: editingBlocked.value,
+      revision,
+      selection,
+      signal: commandController.signal,
+      value,
+    }
+    if (!isMarkdownEditorCommandVisible(command, context) || !isMarkdownEditorCommandEnabled(command, context)) return
+    const result = await runMarkdownEditorCommand(command, context)
+    if (commandController.signal.aborted || commandControllers.get(command.key) !== commandController) return
+    if (!result?.transaction) return
+    const dispatchResult = dispatchTransaction({
+      ...result.transaction,
+      expectedRevision: revision,
+      history: result.transaction.history ?? 'separate',
+      metadata: Object.freeze({ command: command.key }),
+      origin: 'command',
+    })
+    if (dispatchResult.accepted) emit('command', command)
+  } finally {
+    if (commandControllers.get(command.key) === commandController) {
+      commandControllers.delete(command.key)
+      const pending = new Set(pendingCommandKeys.value)
+      pending.delete(command.key)
+      pendingCommandKeys.value = pending
+    }
+  }
 }
 
 const runOverflowCommand = (command: MarkdownEditorCommand) => {
@@ -1173,10 +1221,7 @@ const handleKeydown = (event: KeyboardEvent) => {
     return
   }
 
-  const command = props.commands.find((item) => {
-    const shortcut = item.shortcut?.toLowerCase()
-    return shortcut === `mod+${key}`
-  })
+  const command = resolveMarkdownEditorShortcut(props.commands, `mod+${key}`)
 
   if (command) {
     event.preventDefault()

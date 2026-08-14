@@ -4,11 +4,10 @@ import { buildProps, definePropType } from '@element-plus/utils'
 import type { ExtractPropTypes, PropType } from 'vue'
 import type { MarkdownFeatureActivationFeatureOptions } from '@element-plus/wasm'
 import type MarkdownEditor from './markdown-editor.vue'
-import { applyMarkdownEditorChanges } from './markdown-editor-transaction'
-
 import type {
   MarkdownEditorHistoryState,
   MarkdownEditorDocumentIdentity,
+  MarkdownEditorPositionMap,
   MarkdownEditorSelection,
   MarkdownEditorSelectionEvent,
   MarkdownEditorTransaction,
@@ -23,6 +22,7 @@ export type {
   MarkdownEditorDocumentIdentity,
   MarkdownEditorHistoryMode,
   MarkdownEditorHistoryState,
+  MarkdownEditorPositionMap,
   MarkdownEditorResolvedSelection,
   MarkdownEditorSelection,
   MarkdownEditorSelectionDirection,
@@ -79,13 +79,6 @@ export interface MarkdownEditorSyntaxContext {
   readonly nodeId?: string
   readonly range?: Readonly<{ end: number; start: number }>
   readonly type?: string
-}
-
-/** Position mapping is owned by the transaction layer and used to rebase async anchors. */
-export interface MarkdownEditorPositionMap {
-  rebase(anchor: Readonly<{ end: number; start: number }>):
-    | Readonly<{ end: number; start: number }>
-    | undefined
 }
 
 export interface MarkdownEditorCommandContext {
@@ -312,27 +305,6 @@ export const runMarkdownEditorCommand = async (
 ) => {
   if (!isMarkdownEditorCommandVisible(command, context) || !isMarkdownEditorCommandEnabled(command, context)) return undefined
   return await command.run(context)
-}
-
-/** @deprecated Use runMarkdownEditorCommand with a stable context. */
-export const applyMarkdownEditorCommand = (
-  value: string,
-  selection: MarkdownEditorSelection,
-  command: MarkdownEditorCommand,
-) => {
-  const result = command.run({
-    dispatch: { dispatch: () => { throw new Error('legacy command dispatch') } },
-    documentIdentity: { epoch: 0, id: 'legacy' },
-    mode: 'source', readonly: false, revision: 0, selection,
-    signal: new AbortController().signal, value,
-  })
-  if (result instanceof Promise) throw new Error('Async commands require a command context')
-  const transaction = result.transaction
-  const applied = transaction && applyMarkdownEditorChanges(value, transaction.changes)
-  return {
-    nextSelection: transaction?.selection ?? selection,
-    value: applied?.value ?? value,
-  }
 }
 
 export const markdownEditorProps = buildProps({

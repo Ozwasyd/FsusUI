@@ -83,6 +83,42 @@ export interface MarkdownEditorCommandAnchor {
   readonly start: number
 }
 
+/** Maps command anchors through committed transactions without exposing editor internals. */
+export interface MarkdownEditorPositionMap {
+  rebase(anchor: MarkdownEditorCommandAnchor): MarkdownEditorCommandAnchor | undefined
+}
+
+export const createMarkdownEditorPositionMap = (
+  changes: readonly MarkdownEditorChange[],
+): MarkdownEditorPositionMap => ({
+  rebase(anchor) {
+    let start = anchor.start
+    let end = anchor.end
+    let delta = 0
+
+    for (const change of changes) {
+      const from = change.from + delta
+      const to = change.to + delta
+      const insertedEnd = from + change.insert.length
+      if (start >= from && end <= to && start !== end) return undefined
+      if (end <= from) continue
+      if (start >= to) {
+        const difference = insertedEnd - to
+        start += difference
+        end += difference
+        delta += difference
+        continue
+      }
+      if (start < from || end > to) return undefined
+      start = insertedEnd
+      end = insertedEnd
+      delta += insertedEnd - to
+    }
+
+    return Object.freeze({ start, end })
+  },
+})
+
 export interface MarkdownEditorTransactionDispatcher {
   dispatch(transaction: MarkdownEditorTransaction): MarkdownEditorDispatchResult
 }
