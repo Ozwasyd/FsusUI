@@ -11,13 +11,14 @@ function readEditorSource(file: string) {
 describe('Markdown editor command contract', () => {
   // #268 is a tracking parent: automated source checks may protect the
   // transaction contract, but cannot substitute for a real native-IME matrix.
-  it('exposes a single public command model rather than the legacy apply callback', () => {
+  it('exposes a single public command model without a legacy apply execution path', () => {
     const source = readEditorSource('markdown-editor.ts')
 
     expect(source).toMatch(/MarkdownEditorCommandContext/)
     expect(source).toMatch(/MarkdownEditorCommandResult/)
     expect(source).toMatch(/\brun\s*:/)
     expect(source).not.toMatch(/\bapply\s*\(\s*value\s*,\s*selection\s*\)/)
+    expect(source).not.toMatch(/applyMarkdownEditorCommand/)
   })
 
   it('keeps command context on stable editor projections and transactions', () => {
@@ -51,6 +52,22 @@ describe('Markdown editor command contract', () => {
     expect(source).toMatch(/stale/)
     expect(source).toMatch(/positionMap|rebase/)
     expect(source).not.toMatch(/selection(?:Start|End)?\s*[=:].*\+\s*\w*(?:delta|change)/)
+  })
+
+  it('requires command lifecycle ownership instead of creating a controller for each invocation', () => {
+    const component = readFileSync(resolve(editorRoot, 'src', 'markdown-editor.vue'), 'utf8')
+
+    expect(component).toMatch(/pending.*command|command.*pending/is)
+    expect(component).toMatch(/abort\(/)
+    expect(component).not.toMatch(/const controller = new AbortController\(\)/)
+  })
+
+  it('keeps the command source shared by every command surface', () => {
+    const component = readFileSync(resolve(editorRoot, 'src', 'markdown-editor.vue'), 'utf8')
+
+    expect(component).toMatch(/isMarkdownEditorCommandVisible/)
+    expect(component).toMatch(/isMarkdownEditorCommandEnabled/)
+    expect(component).not.toMatch(/props\.commands\.slice\(0, 6\)/)
   })
 
   it('does not present simulated composition coverage as native IME acceptance', () => {

@@ -5,8 +5,8 @@ import { nextTick } from 'vue'
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import MarkdownEditor from '../src/markdown-editor.vue'
 import {
-  applyMarkdownEditorCommand,
   defaultMarkdownEditorCommands,
+  runMarkdownEditorCommand,
 } from '../src/markdown-editor'
 import type {
   MarkdownEditorInstance,
@@ -26,39 +26,27 @@ describe('MarkdownEditor', () => {
     expectTypeOf<MarkdownEditorProps>().not.toHaveProperty(removedCapability)
   })
 
-  it('applies built-in selection commands through public primitives', () => {
+  it('runs built-in selection commands through the public context contract', async () => {
     const bold = defaultMarkdownEditorCommands.find(
       (item) => item.key === 'bold',
     )
     if (!bold) throw new Error('missing bold command')
 
-    expect(
-      applyMarkdownEditorCommand(
-        'edit markdown',
-        { direction: 'forward', start: 5, end: 13 },
-        bold,
-      ),
-    ).toEqual({
-      nextSelection: { direction: 'forward', start: 7, end: 15 },
-      value: 'edit **markdown**',
-    })
-  })
-
-  it('accepts legacy selections without an explicit direction', () => {
-    expectTypeOf<
-      MarkdownEditorInstance['insertMarkdownAtCursor']
-    >().returns.toEqualTypeOf<boolean>()
-    const legacySelection: MarkdownEditorSelection = { start: 5, end: 13 }
-    const bold = defaultMarkdownEditorCommands.find(
-      (item) => item.key === 'bold',
-    )
-    if (!bold) throw new Error('missing bold command')
-
-    expect(
-      applyMarkdownEditorCommand('edit markdown', legacySelection, bold),
-    ).toEqual({
-      nextSelection: { direction: 'none', start: 7, end: 15 },
-      value: 'edit **markdown**',
+    await expect(runMarkdownEditorCommand(bold, {
+      dispatch: { dispatch: () => { throw new Error('not expected in command construction') } },
+      documentIdentity: { epoch: 1, id: 'test-document' },
+      mode: 'source',
+      readonly: false,
+      revision: 1,
+      selection: { direction: 'forward', start: 5, end: 13 },
+      signal: new AbortController().signal,
+      syntax: { range: { start: 5, end: 13 }, type: 'paragraph' },
+      value: 'edit markdown',
+    })).resolves.toEqual({
+      transaction: expect.objectContaining({
+        expectedRevision: undefined,
+        selection: { direction: 'forward', start: 7, end: 15 },
+      }),
     })
   })
 
