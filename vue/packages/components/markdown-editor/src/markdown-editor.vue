@@ -113,6 +113,7 @@
 
     <div
       :class="ns.e('body')"
+      :data-markdown-reveal-state="liveReveal.state"
       :data-markdown-surface-owner="liveSurface.inputOwner"
     >
       <textarea
@@ -132,7 +133,7 @@
         :value="editorValue"
         @beforeinput="handleBeforeInput"
         @blur="handleBlur"
-        @click="handleSelectionMove"
+        @click="handlePointerReveal"
         @compositionend="handleCompositionEnd"
         @compositionstart="handleCompositionStart"
         @copy="handleCopy"
@@ -249,6 +250,10 @@ import {
 } from './markdown-editor-clipboard'
 import { createMarkdownEditorNativeEventMachine } from './markdown-editor-native-event'
 import { createMarkdownLiveSurface } from './markdown-editor-live-surface'
+import {
+  resolveMarkdownLiveSyntaxReveal,
+  type MarkdownLiveRevealIntent,
+} from './markdown-editor-live-reveal'
 
 defineOptions({
   name: 'ElMarkdownEditor',
@@ -293,6 +298,31 @@ const liveSurface = computed(() =>
     source: editorValue.value,
   }),
 )
+const liveReveal = ref(
+  resolveMarkdownLiveSyntaxReveal({
+    documentIdentity,
+    mode: currentMode.value,
+    selection: transactionStore.selection,
+    source: editorValue.value,
+  }),
+)
+const refreshLiveReveal = (
+  extras: {
+    readonly intent?: MarkdownLiveRevealIntent
+    readonly pointerOffset?: number
+  } = {},
+) => {
+  liveReveal.value = resolveMarkdownLiveSyntaxReveal({
+    composing: isComposing.value,
+    documentIdentity,
+    intent: extras.intent,
+    mode: currentMode.value,
+    pointerOffset: extras.pointerOffset,
+    previous: liveReveal.value,
+    selection: transactionStore.selection,
+    source: transactionStore.value,
+  })
+}
 const isComposing = ref(false)
 const pendingCommandKeys = ref(new Set<string>())
 const commandControllers = new Map<string, AbortController>()
@@ -795,6 +825,7 @@ const handleCompositionStart = () => {
   beforeInputSnapshot = undefined
   pendingClipboardIdentity = undefined
   pendingInputOrigin = undefined
+  refreshLiveReveal()
 }
 
 const handleCompositionEnd = (event: CompositionEvent) => {
@@ -828,6 +859,7 @@ const handleCompositionEnd = (event: CompositionEvent) => {
     }),
     origin: 'input',
   })
+  refreshLiveReveal()
 }
 
 const applyClipboardTransfer = (
@@ -936,6 +968,16 @@ const handleCut = (event: ClipboardEvent) => {
 const handleSelectionMove = () => {
   if (restoringSelection || isComposing.value) return
   captureSelection()
+  refreshLiveReveal()
+}
+
+const handlePointerReveal = () => {
+  if (restoringSelection || isComposing.value) return
+  captureSelection()
+  refreshLiveReveal({
+    intent: 'pointer',
+    pointerOffset: transactionStore.selection.start,
+  })
 }
 
 const handleBlur = () => {
@@ -1059,6 +1101,16 @@ const emitRenderEvent = (
 
 const handleKeydown = (event: KeyboardEvent) => {
   if (editingBlocked.value || nativeMachine.freezeSmartInput) return
+
+  if (
+    event.key === 'Escape' &&
+    currentMode.value === 'live' &&
+    liveReveal.value.state !== 'inactive'
+  ) {
+    event.preventDefault()
+    refreshLiveReveal({ intent: 'escape' })
+    return
+  }
 
   const isMod = event.metaKey || event.ctrlKey
   const key = event.key.toLowerCase()

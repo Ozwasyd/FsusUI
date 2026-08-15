@@ -963,6 +963,30 @@ describe('MarkdownEditor', () => {
     expect(wrapper.find('textarea').isVisible()).toBe(true)
   })
 
+  it('reveals live markers from the caret and hides them on Escape without editing source', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        mode: 'live',
+        modelValue: 'intro ***nested*** tail',
+      },
+    })
+    const textarea = wrapper.find('textarea')
+    const element = textarea.element as HTMLTextAreaElement
+    const caret = 'intro ***nested*** tail'.indexOf('nested')
+    element.setSelectionRange(caret, caret)
+    await textarea.trigger('select')
+    expect(wrapper.find('[data-markdown-reveal-state]').attributes(
+      'data-markdown-reveal-state',
+    )).toBe('caret-inside')
+    const before = wrapper.emitted('update:modelValue')?.length ?? 0
+    await textarea.trigger('keydown', { key: 'Escape' })
+    expect(wrapper.find('[data-markdown-reveal-state]').attributes(
+      'data-markdown-reveal-state',
+    )).toBe('inactive')
+    expect(wrapper.emitted('update:modelValue')?.length ?? 0).toBe(before)
+    expect(element.value).toBe('intro ***nested*** tail')
+  })
+
   it('keeps the editable surface and its selection when chrome changes', async () => {
     const wrapper = mount(MarkdownEditor, {
       props: {

@@ -60,6 +60,19 @@ export {
   type MarkdownLiveSurfacePlan,
 } from './markdown-editor-live-surface'
 export {
+  MARKDOWN_LIVE_REVEAL_STATES,
+  evaluateMarkdownLiveRevealMutations,
+  resolveMarkdownLiveSyntaxReveal,
+  type MarkdownLiveRevealField,
+  type MarkdownLiveRevealIntent,
+  type MarkdownLiveRevealMutationKind,
+  type MarkdownLiveRevealPlan,
+  type MarkdownLiveRevealRange,
+  type MarkdownLiveRevealRangeRole,
+  type MarkdownLiveRevealState,
+  type MarkdownLiveRevealTarget,
+} from './markdown-editor-live-reveal'
+export {
   MARKDOWN_BLOCK_INPUT_CONTEXTS,
   MARKDOWN_BLOCK_INPUT_KEYS,
   MARKDOWN_BLOCK_INPUT_POSITIONS,

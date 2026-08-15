@@ -37,6 +37,11 @@ selection/focus/IME host. Split and preview may show the safe renderer pane;
 live does not. Projection failure keeps the source bytes and falls back to a
 source-only surface.
 
+`resolveMarkdownLiveSyntaxReveal` is the #334 marker state machine. Reveal and
+hide do not write source, history, or selection. Nested emphasis/link/code
+prefer the innermost marker range. Composition freezes structural reveal
+changes. Esc returns focus without editing.
+
 ## Acceptance gate
 
 `evaluateMarkdownInputAcceptance` composes the four planners and rejects
