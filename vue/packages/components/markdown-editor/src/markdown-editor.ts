@@ -72,6 +72,31 @@ export {
   type MarkdownPairMutationKind,
   type MarkdownPairRejection,
 } from './markdown-editor-pair-input'
+export {
+  MARKDOWN_CLIPBOARD_MAX_PASTE_UNITS,
+  MARKDOWN_CLIPBOARD_PASTE_PRIORITY,
+  evaluateMarkdownClipboardMutations,
+  htmlToSafePlainText,
+  markdownClipboardItemsFromDataTransfer,
+  resolveMarkdownClipboardCopy,
+  resolveMarkdownClipboardCut,
+  resolveMarkdownClipboardPaste,
+  visibleTextFromMarkdownSource,
+  writeMarkdownClipboardPayload,
+  type MarkdownAttachmentClipboardIntent,
+  type MarkdownClipboardCopyKind,
+  type MarkdownClipboardCopyPlan,
+  type MarkdownClipboardCutPlan,
+  type MarkdownClipboardFileRef,
+  type MarkdownClipboardItem,
+  type MarkdownClipboardMutationKind,
+  type MarkdownClipboardOrigin,
+  type MarkdownClipboardPasteKind,
+  type MarkdownClipboardPastePlan,
+  type MarkdownClipboardPayload,
+  type MarkdownClipboardRejection,
+  type MarkdownClipboardTransfer,
+} from './markdown-editor-clipboard'
 export type MarkdownEditorChrome = 'framed' | 'embedded' | 'minimal'
 export const markdownEditorChromes = ['framed', 'embedded', 'minimal'] as const
 export type MarkdownEditorMobileLayout = 'auto' | 'compact' | 'standard'

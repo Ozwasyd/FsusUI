@@ -130,6 +130,8 @@
         @click="handleSelectionMove"
         @compositionend="handleCompositionEnd"
         @compositionstart="handleCompositionStart"
+        @copy="handleCopy"
+        @cut="handleCut"
         @drop="handleDrop"
         @input="handleInput"
         @keydown="handleKeydown"
@@ -218,6 +220,13 @@ import {
   MARKDOWN_PAIR_DEFAULTS,
   resolveMarkdownPairInput,
 } from './markdown-editor-pair-input'
+import {
+  markdownClipboardItemsFromDataTransfer,
+  resolveMarkdownClipboardCopy,
+  resolveMarkdownClipboardCut,
+  resolveMarkdownClipboardPaste,
+  writeMarkdownClipboardPayload,
+} from './markdown-editor-clipboard'
 
 defineOptions({
   name: 'ElMarkdownEditor',
@@ -285,6 +294,7 @@ let discardInvalidatedCompositionInput = false
 let discardInvalidatedCompositionInputEpoch = 0
 let invalidatedComposition = false
 let invalidatedCompositionEpoch = 0
+let pendingClipboardIdentity: string | undefined
 let pendingInputOrigin: 'drop' | 'paste' | undefined
 let pendingCompositionCommit = false
 let pendingCompositionCommitEpoch = 0
@@ -536,6 +546,7 @@ watch(
     isComposing.value = false
     beforeInputSnapshot = undefined
     clearPendingCompositionCommit()
+    pendingClipboardIdentity = undefined
     pendingInputOrigin = undefined
     skipCompositionInputValue = undefined
     dispatchEditorOperation({
@@ -644,6 +655,7 @@ watch([editingBlocked, overflowItemCount], ([blocked, itemCount]) => {
     isComposing.value = false
     beforeInputSnapshot = undefined
     clearPendingCompositionCommit()
+    pendingClipboardIdentity = undefined
     pendingInputOrigin = undefined
     triggerRef(editorValue)
   }
@@ -703,8 +715,17 @@ const handleBeforeInput = (event: InputEvent) => {
   ) {
     event.preventDefault()
     beforeInputSnapshot = undefined
+    pendingClipboardIdentity = undefined
     pendingInputOrigin = undefined
     triggerRef(editorValue)
+    return
+  }
+  if (
+    pendingClipboardIdentity &&
+    (event.inputType === 'insertFromPaste' ||
+      event.inputType === 'insertFromDrop')
+  ) {
+    event.preventDefault()
     return
   }
   if (event.inputType === 'historyUndo') {
@@ -756,8 +777,19 @@ const handleInput = (event: Event) => {
     if (!invalidatedComposition) clearInvalidatedCompositionInput()
     beforeInputSnapshot = undefined
     clearPendingCompositionCommit()
+    pendingClipboardIdentity = undefined
     pendingInputOrigin = undefined
     triggerRef(editorValue)
+    return
+  }
+  if (pendingClipboardIdentity) {
+    pendingClipboardIdentity = undefined
+    pendingInputOrigin = undefined
+    beforeInputSnapshot = undefined
+    if (target.value !== transactionStore.value) {
+      triggerRef(editorValue)
+      void restoreTextareaSelection(transactionStore.selection)
+    }
     return
   }
   if (editingBlocked.value) {
@@ -813,6 +845,7 @@ const handleInput = (event: Event) => {
       : 'none',
   )
   beforeInputSnapshot = undefined
+  pendingClipboardIdentity = undefined
   pendingInputOrigin = undefined
 }
 
@@ -824,6 +857,7 @@ const handleCompositionStart = () => {
   captureSelection()
   beforeInputSnapshot = undefined
   clearPendingCompositionCommit()
+  pendingClipboardIdentity = undefined
   pendingInputOrigin = undefined
   isComposing.value = true
 }
@@ -836,6 +870,7 @@ const handleCompositionEnd = (event: CompositionEvent) => {
     isComposing.value = false
     beforeInputSnapshot = undefined
     clearPendingCompositionCommit()
+    pendingClipboardIdentity = undefined
     pendingInputOrigin = undefined
     skipCompositionInputValue = undefined
     deferInvalidatedCompositionInput()
@@ -864,15 +899,102 @@ const handleCompositionEnd = (event: CompositionEvent) => {
     else skipCompositionInputValue = result.value
   }
   beforeInputSnapshot = undefined
+  pendingClipboardIdentity = undefined
   pendingInputOrigin = undefined
 }
 
-const handlePaste = () => {
-  if (!editingBlocked.value && !isComposing.value) pendingInputOrigin = 'paste'
+const applyClipboardTransfer = (
+  event: { preventDefault(): void; dataTransfer?: DataTransfer | null },
+  origin: 'paste' | 'drop',
+  data: DataTransfer | null | undefined,
+) => {
+  const transfer = markdownClipboardItemsFromDataTransfer(data ?? null)
+  const hasTransfer = transfer.items.length > 0 || transfer.files.length > 0
+  if (!hasTransfer) {
+    if (!editingBlocked.value && !isComposing.value) pendingInputOrigin = origin
+    return
+  }
+
+  const plan = resolveMarkdownClipboardPaste({
+    composing: isComposing.value,
+    disabled: editingBlocked.value,
+    documentIdentity,
+    files: transfer.files,
+    items: transfer.items,
+    mode: currentMode.value,
+    origin,
+    revision: transactionStore.revision,
+    selection: captureSelection(),
+    source: transactionStore.value,
+  })
+
+  if (
+    plan.rejected === 'composition-active' ||
+    plan.rejected === 'disabled' ||
+    plan.rejected === 'preview' ||
+    plan.rejected === 'readonly' ||
+    plan.rejected === 'stale-document' ||
+    plan.rejected === 'budget-exceeded' ||
+    plan.rejected === 'cancelled'
+  ) {
+    event.preventDefault()
+    return
+  }
+
+  if (plan.action === 'attachment-intent' || plan.transaction) {
+    event.preventDefault()
+    pendingClipboardIdentity = plan.identity
+    pendingInputOrigin = origin
+    if (plan.transaction) dispatchTransaction(plan.transaction)
+    return
+  }
+
+  event.preventDefault()
 }
 
-const handleDrop = () => {
-  if (!editingBlocked.value && !isComposing.value) pendingInputOrigin = 'drop'
+const handlePaste = (event: ClipboardEvent) => {
+  applyClipboardTransfer(event, 'paste', event.clipboardData)
+}
+
+const handleDrop = (event: DragEvent) => {
+  applyClipboardTransfer(event, 'drop', event.dataTransfer)
+}
+
+const handleCopy = (event: ClipboardEvent) => {
+  const plan = resolveMarkdownClipboardCopy({
+    composing: isComposing.value,
+    disabled: editingBlocked.value,
+    documentIdentity,
+    mode: currentMode.value,
+    revision: transactionStore.revision,
+    selection: captureSelection(false),
+    source: transactionStore.value,
+  })
+  if (plan.rejected) {
+    event.preventDefault()
+    return
+  }
+  event.preventDefault()
+  writeMarkdownClipboardPayload(event.clipboardData, plan.payload)
+}
+
+const handleCut = (event: ClipboardEvent) => {
+  const plan = resolveMarkdownClipboardCut({
+    composing: isComposing.value,
+    disabled: editingBlocked.value,
+    documentIdentity,
+    mode: currentMode.value,
+    revision: transactionStore.revision,
+    selection: captureSelection(),
+    source: transactionStore.value,
+  })
+  if (plan.rejected || !plan.transaction) {
+    event.preventDefault()
+    return
+  }
+  event.preventDefault()
+  writeMarkdownClipboardPayload(event.clipboardData, plan.copy.payload)
+  dispatchTransaction(plan.transaction)
 }
 
 const handleSelectionMove = () => {
