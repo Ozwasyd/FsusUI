@@ -1,3 +1,7 @@
+import {
+  MarkdownRuntimeError,
+  type MarkdownRuntimeErrorCode,
+} from './markdown-runtime-error'
 import { loadEmscriptenModule } from './runtime/emscripten'
 import { resolveMarkdownAsset, type MarkdownAssetKind } from './runtime/assets'
 import { decodeUtf8, encodeUtf8 } from './runtime/utf8'
@@ -29,17 +33,17 @@ import type {
   FsusResult,
 } from '@element-plus/utils'
 
-export type MarkdownRuntimeErrorCode = 'invariant' | 'protocol' | 'infra'
-
-export class MarkdownRuntimeError extends Error {
-  constructor(
-    public readonly code: MarkdownRuntimeErrorCode,
-    message: string,
-  ) {
-    super(message)
-    this.name = 'MarkdownRuntimeError'
-  }
-}
+export { MarkdownRuntimeError, type MarkdownRuntimeErrorCode }
+export {
+  createMarkdownSourceCoordinateMap,
+  type MarkdownSourceAffinity,
+  type MarkdownSourceCoordinateMap,
+  type MarkdownSourceGraphemeBoundary,
+  type MarkdownSourceLineColumn,
+  type MarkdownSourceOffset,
+  type MarkdownSourceRange,
+  type MarkdownSourceUtf8Offset,
+} from './markdown-source-coordinate-map'
 
 const fsusErrorCategories = {
   aborted: 'runtime',
