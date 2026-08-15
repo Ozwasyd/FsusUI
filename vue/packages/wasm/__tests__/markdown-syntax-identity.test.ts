@@ -102,4 +102,78 @@ describe('markdown syntax stable identity', () => {
     expect(afterDelete.nodes[1].id).toBe(twins.nodes[2].id)
     expect(afterDelete.nodes[1].id).not.toBe(twins.nodes[0].id)
   })
+
+  it('keeps identity when a node is wrapped or unwrapped into another syntax kind', () => {
+    const document = { id: 'doc-1', epoch: 4 }
+    const paragraph = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('Hello world.\n'),
+      document,
+    )
+    const quoted = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('> Hello world.\n'),
+      document,
+      paragraph,
+    )
+    expect(quoted.nodes).toHaveLength(1)
+    expect(quoted.nodes[0].kind).toBe('quote')
+    expect(quoted.nodes[0].id).toBe(paragraph.nodes[0].id)
+    expect(quoted.resolve(paragraph.nodes[0].id).status).toBe('current')
+    expect(quoted.resolve(paragraph.nodes[0].id).node?.kind).toBe('quote')
+
+    const unwrapped = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('Hello world.\n'),
+      document,
+      quoted,
+    )
+    expect(unwrapped.nodes[0].kind).toBe('paragraph')
+    expect(unwrapped.nodes[0].id).toBe(paragraph.nodes[0].id)
+
+    const listed = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('- Hello world.\n'),
+      document,
+      paragraph,
+    )
+    expect(listed.nodes[0].kind).toBe('list')
+    expect(listed.nodes[0].id).toBe(paragraph.nodes[0].id)
+
+    const heading = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('# Title\n'),
+      document,
+    )
+    const quotedHeading = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('> # Title\n'),
+      document,
+      heading,
+    )
+    expect(quotedHeading.nodes[0].kind).toBe('quote')
+    expect(quotedHeading.nodes[0].id).toBe(heading.nodes[0].id)
+
+    const pair = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('Hello world.\n\nTail.\n'),
+      document,
+    )
+    const wrapFirst = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('> Hello world.\n\nTail.\n'),
+      document,
+      pair,
+    )
+    expect(wrapFirst.nodes.map((node) => node.kind)).toEqual(['quote', 'paragraph'])
+    expect(wrapFirst.nodes[0].id).toBe(pair.nodes[0].id)
+    expect(wrapFirst.nodes[1].id).toBe(pair.nodes[1].id)
+
+    const twins = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('Hello world.\n\nHello world.\n'),
+      document,
+    )
+    const wrapTwin = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('> Hello world.\n\nHello world.\n'),
+      document,
+      twins,
+    )
+    expect(wrapTwin.nodes[0].id).toBe(twins.nodes[0].id)
+    expect(wrapTwin.nodes[1].id).toBe(twins.nodes[1].id)
+    expect(wrapTwin.nodes[1].id).not.toBe(twins.nodes[0].id)
+    expect(wrapTwin.resolve(twins.nodes[0].id).node?.kind).toBe('quote')
+    expect(wrapTwin.resolve(twins.nodes[1].id).node?.kind).toBe('paragraph')
+  })
 })
