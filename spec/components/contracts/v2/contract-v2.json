@@ -47022,10 +47022,11 @@
             "nullable": false,
             "default": {
               "kind": "literal",
-              "value": "write"
+              "value": "source"
             },
             "values": [
-              "write",
+              "source",
+              "live",
               "split",
               "preview"
             ],
@@ -47349,7 +47350,8 @@
               "kind": "undefined"
             },
             "values": [
-              "write",
+              "source",
+              "live",
               "split",
               "preview"
             ],
