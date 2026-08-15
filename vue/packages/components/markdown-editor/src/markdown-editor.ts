@@ -73,6 +73,24 @@ export {
   type MarkdownLiveRevealTarget,
 } from './markdown-editor-live-reveal'
 export {
+  applyMarkdownCodeLanguageChange,
+  evaluateMarkdownCodeMutations,
+  insertMarkdownCodeFence,
+  resolveMarkdownCodeCopy,
+  resolveMarkdownCodeInput,
+  resolveMarkdownCodeLanguage,
+  resolveMarkdownCodePresentation,
+  resolveMarkdownCodeSession,
+  type MarkdownCodeFenceChar,
+  type MarkdownCodeFencePlan,
+  type MarkdownCodeInputKey,
+  type MarkdownCodeLanguageChangePlan,
+  type MarkdownCodeLanguagePlan,
+  type MarkdownCodeMutationKind,
+  type MarkdownCodePresentation,
+  type MarkdownCodePresentationPlan,
+} from './markdown-editor-code'
+export {
   MARKDOWN_TECHNICAL_NODE_KINDS,
   MARKDOWN_TECHNICAL_STATES,
   commitMarkdownTechnicalFeatureResult,

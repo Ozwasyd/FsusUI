@@ -1105,20 +1105,54 @@ const renderLatexFeature = async (
   return Object.freeze({ kind: 'latex', payload })
 }
 
-const languageAliases = new Map([
-  ['csharp', 'c#'],
-  ['cs', 'c#'],
-  ['javascript', 'js'],
-  ['typescript', 'ts'],
-  ['shell', 'bash'],
-  ['sh', 'bash'],
-])
+export const MARKDOWN_CODE_LANGUAGE_ALIASES = Object.freeze({
+  csharp: 'c#',
+  cs: 'c#',
+  javascript: 'js',
+  typescript: 'ts',
+  shell: 'bash',
+  sh: 'bash',
+} as const)
 
-const normalizeCodeLanguage = (language: string | undefined) => {
+export const MARKDOWN_CODE_LANGUAGES = Object.freeze([
+  'bash',
+  'c#',
+  'js',
+  'text',
+  'ts',
+] as const)
+
+export type MarkdownCodeLanguage = (typeof MARKDOWN_CODE_LANGUAGES)[number]
+
+export const normalizeMarkdownCodeLanguage = (language: string | undefined) => {
   if (!language) return 'text'
   const normalized = language.trim().toLowerCase()
-  return languageAliases.get(normalized) ?? normalized ?? 'text'
+  return (
+    MARKDOWN_CODE_LANGUAGE_ALIASES[
+      normalized as keyof typeof MARKDOWN_CODE_LANGUAGE_ALIASES
+    ] ?? normalized
+  )
 }
+
+export const resolveMarkdownCodeLanguageAvailability = (
+  language: string | undefined,
+) => {
+  const info = language ?? ''
+  const canonical = normalizeMarkdownCodeLanguage(language)
+  const available =
+    canonical === 'text' ||
+    canonical in shikiLanguageLoaders ||
+    (MARKDOWN_CODE_LANGUAGES as readonly string[]).includes(canonical)
+  return Object.freeze({
+    available,
+    canonical: available ? canonical : 'text',
+    fallback: available ? ('none' as const) : ('plain' as const),
+    info,
+  })
+}
+
+const normalizeCodeLanguage = (language: string | undefined) =>
+  normalizeMarkdownCodeLanguage(language)
 
 const extractCodeLanguage = (element: HTMLElement) => {
   for (const className of Array.from(element.classList)) {
