@@ -111,19 +111,24 @@
       </div>
     </header>
 
-    <div :class="ns.e('body')">
+    <div
+      :class="ns.e('body')"
+      :data-markdown-surface-owner="liveSurface.inputOwner"
+    >
       <textarea
-        v-if="currentMode !== 'preview'"
         :id="textareaId"
         ref="textareaRef"
         :class="ns.e('textarea')"
+        :aria-hidden="liveSurface.inputVisible ? undefined : 'true'"
         :aria-label="textareaAriaLabel"
         :aria-busy="loading || undefined"
         :aria-disabled="editingBlocked"
         :disabled="editingBlocked"
+        :hidden="!liveSurface.inputVisible || undefined"
         :name="textareaName"
         :placeholder="effectivePlaceholder"
         :rows="minRows"
+        :tabindex="liveSurface.inputVisible ? undefined : -1"
         :value="editorValue"
         @beforeinput="handleBeforeInput"
         @blur="handleBlur"
@@ -139,8 +144,23 @@
         @select="handleSelectionMove"
       />
 
+      <div
+        v-if="liveSurface.decorations.length"
+        :class="ns.e('live-decorations')"
+        aria-hidden="true"
+        data-markdown-live-decorations
+      >
+        <span
+          v-for="decoration in liveSurface.decorations"
+          :key="decoration.nodeId"
+          :data-kind="decoration.kind"
+          :data-node-id="decoration.nodeId"
+          :data-role="decoration.role"
+        />
+      </div>
+
       <el-markdown-renderer
-        v-if="currentMode !== 'source'"
+        v-if="liveSurface.rendererVisible"
         :class="ns.e('preview')"
         :base-url="previewBaseUrl"
         :content="editorValue"
@@ -228,6 +248,7 @@ import {
   writeMarkdownClipboardPayload,
 } from './markdown-editor-clipboard'
 import { createMarkdownEditorNativeEventMachine } from './markdown-editor-native-event'
+import { createMarkdownLiveSurface } from './markdown-editor-live-surface'
 
 defineOptions({
   name: 'ElMarkdownEditor',
@@ -264,6 +285,14 @@ const transactionStore = new MarkdownEditorTransactionStore(
 )
 const documentIdentity = Object.freeze({ epoch: 0, id: commandTrayId })
 const editorValue = ref(transactionStore.value)
+const liveSurface = computed(() =>
+  createMarkdownLiveSurface({
+    documentIdentity,
+    mode: currentMode.value,
+    revision: transactionStore.revision,
+    source: editorValue.value,
+  }),
+)
 const isComposing = ref(false)
 const pendingCommandKeys = ref(new Set<string>())
 const commandControllers = new Map<string, AbortController>()

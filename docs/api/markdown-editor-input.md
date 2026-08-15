@@ -32,6 +32,11 @@ Public editor mode is exactly `source` / `live` / `split` / `preview`. Live
 capability tokens are exactly the six frozen values from
 `markdownLiveCapabilities`. There is no `write` mode alias.
 
+`createMarkdownLiveSurface` is the #333 owner plan: one `source-textarea`
+selection/focus/IME host. Split and preview may show the safe renderer pane;
+live does not. Projection failure keeps the source bytes and falls back to a
+source-only surface.
+
 ## Acceptance gate
 
 `evaluateMarkdownInputAcceptance` composes the four planners and rejects

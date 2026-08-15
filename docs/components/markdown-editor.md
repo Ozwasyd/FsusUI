@@ -140,7 +140,9 @@ renderer surface。
 
 `live` 不是 source textarea 上覆盖第二个 preview chrome。`split` 的 separator
 只表达真实 pane 边界；`preview` 即使没有编辑表面，仍保留可访问名称和
-loading/error/capability 状态。公共 mode 只有 `source` / `live` / `split` /
+loading/error/capability 状态。Live 只有一个 `source-textarea` 作为
+input/selection/IME owner；projection decoration 锚定 `syn:` node range，不可编辑，
+也不把 HTML 写回 source。Mode 切换不重建 textarea、history 或 document identity。公共 mode 只有 `source` / `live` / `split` /
 `preview`，没有 `write` 别名；源码模式的可见文案是「源码」。
 
 Live capability 只使用六个冻结 token：`supported`、`unsupported-platform`、
