@@ -64,6 +64,28 @@ export {
   type MarkdownStableSyntaxNode,
   type MarkdownSyntaxIdentityStatus,
 } from './markdown-syntax-identity'
+export {
+  createMarkdownAnchorMap,
+  type MarkdownAnchorAffinity,
+  type MarkdownAnchorMap,
+  type MarkdownAnchorMapInput,
+  type MarkdownAnchorSyntaxInput,
+  type MarkdownAnchorSyntaxNode,
+  type MarkdownAnchorSyntaxRange,
+  type MarkdownRangeMutation,
+  type MarkdownRemappedRange,
+  type MarkdownRevealQuery,
+  type MarkdownRevealTarget,
+  type MarkdownSelectionDirection,
+  type MarkdownSourcePosition,
+  type MarkdownSourceSelection,
+  type MarkdownVisualKind,
+  type MarkdownVisualPoint,
+  type MarkdownVisualPointName,
+  type MarkdownVisualPointQuery,
+  type MarkdownVisualSelection,
+  type SourceSelection,
+} from './markdown-anchor-map'
 
 const fsusErrorCategories = {
   aborted: 'runtime',
