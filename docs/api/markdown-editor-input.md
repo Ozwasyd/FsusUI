@@ -48,6 +48,12 @@ through `createMarkdownAnchorMap`. Image, table, code, Mermaid, LaTeX,
 footnote, and attachment share one before/after/source/copy/delete/focus path.
 Atomic visuals are not Tab traps and are not source/history authority.
 
+`resolveMarkdownLiveLayoutStability` and `resolveMarkdownLiveVirtualWindow`
+are the #336 source-anchored caret/viewport plan. Height changes restore from
+`#325` node/range/affinity. User wheel/touch/scrollbar/selection-drag yields.
+Stale feature results do not commit. Ordinary input stays inside a numeric
+mounted-node budget and does not remount the full visual tree.
+
 ## Acceptance gate
 
 `evaluateMarkdownInputAcceptance` composes the four planners and rejects

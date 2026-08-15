@@ -117,6 +117,8 @@
       :data-markdown-surface-owner="liveSurface.inputOwner"
       :data-markdown-atomic-kind="liveAtomic?.kind || undefined"
       :data-markdown-atomic-status="liveAtomic?.state || undefined"
+      :data-markdown-layout-action="liveLayout.action"
+      :data-markdown-layout-smooth="liveLayout.smooth ? 'true' : 'false'"
     >
       <textarea
         :id="textareaId"
@@ -144,17 +146,20 @@
         @input="handleInput"
         @keydown="handleKeydown"
         @paste="handlePaste"
+        @scroll="handleLayoutScroll"
         @select="handleSelectionMove"
+        @touchmove="handleLayoutTouch"
+        @wheel="handleLayoutWheel"
       />
 
       <div
-        v-if="liveSurface.decorations.length"
+        v-if="liveDecorations.length"
         :class="ns.e('live-decorations')"
         aria-hidden="true"
         data-markdown-live-decorations
       >
         <span
-          v-for="decoration in liveSurface.decorations"
+          v-for="decoration in liveDecorations"
           :key="decoration.nodeId"
           :data-kind="decoration.kind"
           :data-node-id="decoration.nodeId"
@@ -264,6 +269,14 @@ import {
   type MarkdownAtomicNodeSession,
   type MarkdownLiveSelectionMotion,
 } from './markdown-editor-live-selection'
+import {
+  resolveMarkdownLiveLayoutStability,
+  resolveMarkdownLiveVirtualWindow,
+  type MarkdownLiveLayoutGesture,
+  type MarkdownLiveLayoutPlan,
+  type MarkdownLiveLayoutTrigger,
+  type MarkdownLiveVirtualWindow,
+} from './markdown-editor-live-layout'
 
 defineOptions({
   name: 'ElMarkdownEditor',
@@ -319,12 +332,95 @@ const liveReveal = ref(
 const isComposing = ref(false)
 const atomicSession = ref<MarkdownAtomicNodeSession | null>(null)
 const liveAtomic = ref<MarkdownAtomicNodePlan | null>(null)
+const layoutGesture = ref<MarkdownLiveLayoutGesture | null>(null)
+const liveWindow = ref<MarkdownLiveVirtualWindow | null>(null)
+const liveLayout = ref<MarkdownLiveLayoutPlan>(
+  resolveMarkdownLiveLayoutStability({
+    documentIdentity,
+    revision: transactionStore.revision,
+    selection: transactionStore.selection,
+    source: editorValue.value,
+    trigger: 'block-height-change',
+  }),
+)
+let layoutGestureTimer: ReturnType<typeof setTimeout> | undefined
+let restoringViewport = false
+const liveDecorations = computed(() => {
+  const decorations = liveSurface.value.decorations
+  if (currentMode.value !== 'live' || !liveWindow.value) return decorations
+  const mounted = new Set(liveWindow.value.mountedNodeIds)
+  return decorations.filter((decoration) => mounted.has(decoration.nodeId))
+})
+const restoreTextareaViewport = (plan: MarkdownLiveLayoutPlan) => {
+  const textarea = textareaRef.value
+  if (!textarea || plan.action !== 'restore' || !plan.anchor) return
+  const line =
+    transactionStore.value.slice(0, plan.anchor.sourceOffset).split('\n')
+      .length - 1
+  const lineHeight =
+    Number.parseFloat(window.getComputedStyle(textarea).lineHeight) || 20
+  const next = Math.max(0, line * lineHeight - textarea.clientHeight / 3)
+  if (Math.abs(textarea.scrollTop - next) <= 1) return
+  restoringViewport = true
+  textarea.scrollTop = next
+  queueMicrotask(() => {
+    restoringViewport = false
+  })
+}
+const applyLiveLayout = (
+  trigger: MarkdownLiveLayoutTrigger,
+  extras: {
+    readonly gesture?: MarkdownLiveLayoutGesture | null
+    readonly reducedMotion?: boolean
+  } = {},
+) => {
+  const plan = resolveMarkdownLiveLayoutStability({
+    composing: isComposing.value,
+    documentIdentity,
+    gesture: extras.gesture ?? layoutGesture.value,
+    previousAnchor: liveLayout.value.anchor,
+    reducedMotion: extras.reducedMotion,
+    revision: transactionStore.revision,
+    selection: transactionStore.selection,
+    source: transactionStore.value,
+    trigger,
+  })
+  liveLayout.value = plan
+  if (plan.action === 'restore') restoreTextareaViewport(plan)
+  return plan
+}
+const refreshLiveWindow = (
+  origin: 'input' | 'document-switch' | 'mode-switch' | 'feature' | 'initial',
+) => {
+  liveWindow.value = resolveMarkdownLiveVirtualWindow({
+    documentIdentity,
+    origin,
+    previousMountedNodeIds: liveWindow.value?.mountedNodeIds,
+    selection: transactionStore.selection,
+    source: transactionStore.value,
+  })
+}
+const markLayoutGesture = (gesture: MarkdownLiveLayoutGesture) => {
+  layoutGesture.value = gesture
+  applyLiveLayout('block-height-change', { gesture })
+  if (layoutGestureTimer) clearTimeout(layoutGestureTimer)
+  layoutGestureTimer = setTimeout(() => {
+    layoutGesture.value = null
+  }, 200)
+}
+const handleLayoutWheel = () => markLayoutGesture('wheel')
+const handleLayoutTouch = () => markLayoutGesture('touch')
+const handleLayoutScroll = () => {
+  if (restoringSelection || restoringViewport) return
+  markLayoutGesture('scrollbar')
+}
 const refreshLiveReveal = (
   extras: {
     readonly intent?: MarkdownLiveRevealIntent
     readonly pointerOffset?: number
   } = {},
 ) => {
+  const previousState = liveReveal.value.state
   liveReveal.value = resolveMarkdownLiveSyntaxReveal({
     composing: isComposing.value,
     documentIdentity,
@@ -335,6 +431,14 @@ const refreshLiveReveal = (
     selection: transactionStore.selection,
     source: transactionStore.value,
   })
+  if (previousState === 'inactive' && liveReveal.value.state !== 'inactive') {
+    applyLiveLayout('marker-reveal')
+  } else if (
+    previousState !== 'inactive' &&
+    liveReveal.value.state === 'inactive'
+  ) {
+    applyLiveLayout('marker-hide')
+  }
 }
 
 const applyLiveSelectionMotion = (
@@ -518,6 +622,7 @@ const dispatchEditorOperation = (
   ) {
     emit(UPDATE_MODEL_EVENT, result.value)
     emit(CHANGE_EVENT, result.value)
+    refreshLiveWindow('input')
   }
   if (
     result.accepted &&
@@ -758,11 +863,18 @@ const wordCount = computed(() => {
 const updateVisualViewportHeight = () => {
   if (typeof window === 'undefined') return
 
+  const previous = visualViewportHeight.value
   visualViewportHeight.value =
     window.visualViewport?.height || window.innerHeight || 0
+  const trigger =
+    previous > 0 && visualViewportHeight.value + 80 < previous
+      ? 'soft-keyboard'
+      : 'visual-viewport'
+  applyLiveLayout(trigger)
 }
 
 onMounted(() => {
+  refreshLiveWindow('initial')
   updateVisualViewportHeight()
   window.visualViewport?.addEventListener('resize', updateVisualViewportHeight)
   window.visualViewport?.addEventListener('scroll', updateVisualViewportHeight)
@@ -771,6 +883,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   abortPendingCommands()
+  if (layoutGestureTimer) clearTimeout(layoutGestureTimer)
   if (typeof window === 'undefined') return
 
   window.visualViewport?.removeEventListener(
@@ -1053,6 +1166,7 @@ const handleSelectionMove = () => {
   if (currentMode.value === 'live') {
     const selection = transactionStore.selection
     if (selection.start !== selection.end) {
+      markLayoutGesture('selection-drag')
       applyLiveSelectionMotion('pointer-drag', {
         dragOffset:
           selection.direction === 'backward' ? selection.start : selection.end,
@@ -1166,6 +1280,8 @@ const setMode = (mode: MarkdownEditorMode) => {
   currentMode.value = nextMode
   emit('mode-change', nextMode)
   void restoreTextareaSelection(retained.selection, false)
+  applyLiveLayout('mode-switch')
+  refreshLiveWindow('mode-switch')
   refreshLiveReveal()
 }
 

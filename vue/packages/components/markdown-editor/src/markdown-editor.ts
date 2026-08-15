@@ -73,6 +73,26 @@ export {
   type MarkdownLiveRevealTarget,
 } from './markdown-editor-live-reveal'
 export {
+  MARKDOWN_LIVE_LAYOUT_BUDGET,
+  MARKDOWN_LIVE_LAYOUT_GESTURES,
+  MARKDOWN_LIVE_LAYOUT_TRIGGERS,
+  captureMarkdownLiveLayoutAnchor,
+  commitMarkdownLiveFeatureResult,
+  evaluateMarkdownLiveLayoutMutations,
+  resolveMarkdownLiveLayoutStability,
+  resolveMarkdownLiveVirtualWindow,
+  retainMarkdownLiveLayoutAcrossModes,
+  type MarkdownLiveFeatureCommit,
+  type MarkdownLiveLayoutAction,
+  type MarkdownLiveLayoutAnchor,
+  type MarkdownLiveLayoutGesture,
+  type MarkdownLiveLayoutMutationKind,
+  type MarkdownLiveLayoutOrigin,
+  type MarkdownLiveLayoutPlan,
+  type MarkdownLiveLayoutTrigger,
+  type MarkdownLiveVirtualWindow,
+} from './markdown-editor-live-layout'
+export {
   MARKDOWN_ATOMIC_NODE_KINDS,
   MARKDOWN_LIVE_SELECTION_MOTIONS,
   createMarkdownLiveAnchorMap,
