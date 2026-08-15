@@ -18,6 +18,7 @@ import {
   readCandidatePackageJson,
   verifyCandidate,
 } from './npm-candidate-lib.mjs'
+import { parseConsumerInstallArgs } from './consumer-install-args.mjs'
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(scriptDir, '..')
@@ -36,9 +37,15 @@ const defaultCandidatePath = path.join(
   'npm-candidate',
   candidateTarballName,
 )
-const candidateArgument = process.argv
+const requestedFlags = process.argv
   .slice(2)
-  .find((argument) => argument !== '--')
+  .some((argument) => argument === '--profile' || argument === '--candidate')
+const parsedInstallArgs = requestedFlags
+  ? parseConsumerInstallArgs(process.argv.slice(2), process.env)
+  : undefined
+const candidateArgument = parsedInstallArgs
+  ? parsedInstallArgs.candidate
+  : process.argv.slice(2).find((argument) => argument !== '--')
 const candidateTarballPath = candidateArgument
   ? path.resolve(candidateArgument)
   : process.env.FSUSUI_NPM_CANDIDATE
