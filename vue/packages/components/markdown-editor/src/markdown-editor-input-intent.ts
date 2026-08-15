@@ -61,6 +61,87 @@ export type MarkdownBlockInputPosition =
 
 export type MarkdownBlockInputRejection = 'composition-active'
 
+export const MARKDOWN_BLOCK_INPUT_KEYS = Object.freeze([
+  'enter',
+  'shift-enter',
+  'backspace',
+  'delete',
+  'tab',
+  'shift-tab',
+] as const)
+
+export const MARKDOWN_BLOCK_INPUT_CONTEXTS = Object.freeze([
+  'paragraph',
+  'heading',
+  'list',
+  'task',
+  'quote',
+  'code',
+  'table',
+  'atomic',
+  'ordinary',
+] as const)
+
+export const MARKDOWN_BLOCK_INPUT_POSITIONS = Object.freeze([
+  'document-start',
+  'start',
+  'middle',
+  'end',
+  'empty',
+  'document-end',
+] as const)
+
+export type MarkdownTableInputHook = (input: {
+  readonly source: string
+  readonly selection: MarkdownEditorSelection
+  readonly key: MarkdownBlockInputKey
+  readonly position: MarkdownBlockInputPosition
+}) => MarkdownEditorTransaction | null
+
+export const markdownBlockInputActionFor = (
+  context: MarkdownBlockInputContextKind,
+  key: MarkdownBlockInputKey,
+  position: MarkdownBlockInputPosition,
+): MarkdownBlockInputAction => {
+  if (context === 'table') return 'table-hook'
+  if (key === 'tab') {
+    if (context === 'list' || context === 'task') return 'indent-list'
+    if (context === 'code') return 'insert-spaces'
+    return 'passthrough-tab'
+  }
+  if (key === 'shift-tab') {
+    if (context === 'list' || context === 'task') return 'outdent-list'
+    return 'passthrough-tab'
+  }
+  if (key === 'shift-enter') return 'insert-break'
+  if (key === 'enter') {
+    if ((context === 'list' || context === 'task') && position === 'empty') {
+      return 'exit-list'
+    }
+    if (context === 'list' || context === 'task') return 'continue-list'
+    if (context === 'quote' && position === 'empty') return 'exit-quote'
+    if (context === 'quote') return 'continue-quote'
+    return 'insert-break'
+  }
+  if (key === 'backspace') {
+    if (
+      (context === 'list' || context === 'task' || context === 'quote') &&
+      (position === 'start' || position === 'empty')
+    ) {
+      return 'strip-marker'
+    }
+    if (position === 'start' || position === 'document-start') {
+      return 'merge-previous'
+    }
+    return 'delete-backward'
+  }
+  if (key === 'delete') {
+    if (position === 'end' || position === 'document-end') return 'merge-next'
+    return 'delete-forward'
+  }
+  return 'noop'
+}
+
 export interface MarkdownBlockInputIntent {
   readonly key: MarkdownBlockInputKey
   readonly context: MarkdownBlockInputContextKind
@@ -202,13 +283,40 @@ const transactionOf = (
     }),
   })
 
+const contentStartOf = (
+  source: string,
+  offset: number,
+  kind: MarkdownBlockInputContextKind,
+) => {
+  const line = lineBoundsAt(source, offset)
+  const text = source.slice(line.start, line.end)
+  if (kind === 'list' || kind === 'task') {
+    const marker = listMarkerOf(text, kind)
+    return marker ? line.start + marker.contentStart : line.start
+  }
+  if (kind === 'quote') {
+    const quote = quotePrefixOf(text)
+    return quote ? line.start + quote.contentStart : line.start
+  }
+  if (kind === 'heading') {
+    let index = 0
+    while (text[index] === '#') index += 1
+    if (text[index] === ' ') index += 1
+    return line.start + index
+  }
+  return line.start
+}
+
 const positionOf = (
   source: string,
   offset: number,
   node: MarkdownStableSyntaxNode | null,
+  kind: MarkdownBlockInputContextKind,
   empty: boolean,
 ): MarkdownBlockInputPosition => {
   if (empty) return 'empty'
+  const contentStart = contentStartOf(source, offset, kind)
+  if (offset === contentStart && offset !== 0) return 'start'
   if (offset === 0) return 'document-start'
   if (offset === source.length) return 'document-end'
   if (!node) return 'middle'
@@ -388,6 +496,7 @@ export const resolveMarkdownBlockInputIntent = (input: {
   readonly composing?: boolean
   readonly documentIdentity?: MarkdownDocumentIdentity
   readonly projection?: MarkdownStableProjection
+  readonly tableHook?: MarkdownTableInputHook
 }): MarkdownBlockInputPlan => {
   const source = input.source
   const selection = input.selection
@@ -413,7 +522,7 @@ export const resolveMarkdownBlockInputIntent = (input: {
       : context.kind === 'quote'
         ? Boolean(quotePrefixOf(lineText) && !lineText.slice(quotePrefixOf(lineText)!.contentStart).trim())
         : Boolean(context.node && source.slice(context.node.rawRange.start, context.node.rawRange.end).trim() === '')
-  const position = positionOf(source, caret, context.node, empty)
+  const position = positionOf(source, caret, context.node, context.kind, empty)
   const baseIntent = {
     key: input.key,
     context: context.kind,
@@ -458,64 +567,68 @@ export const resolveMarkdownBlockInputIntent = (input: {
     )
   }
 
-  if (context.kind === 'table') {
-    return finish('table-hook', null)
+  const action = markdownBlockInputActionFor(context.kind, input.key, position)
+
+  if (action === 'table-hook') {
+    return finish(
+      action,
+      input.tableHook?.({
+        source,
+        selection,
+        key: input.key,
+        position,
+      }) ?? null,
+    )
+  }
+  if (action === 'indent-list' || action === 'indent-selection') {
+    return finish(action, indentLines(source, selection, false))
+  }
+  if (action === 'outdent-list' || action === 'outdent-selection') {
+    return finish(action, indentLines(source, selection, true))
+  }
+  if (action === 'insert-spaces') {
+    return finish(action, transactionOf(caret, caret, '  ', caret + 2))
+  }
+  if (action === 'passthrough-tab' || action === 'noop') {
+    return finish(action, null)
+  }
+  if (action === 'continue-list' || action === 'exit-list') {
+    const planned = planListEnter(
+      source,
+      caret,
+      context.kind === 'task' ? 'task' : 'list',
+    )
+    return finish(action, planned.transaction)
+  }
+  if (action === 'continue-quote' || action === 'exit-quote') {
+    const planned = planQuoteEnter(source, caret)
+    return finish(action, planned.transaction)
+  }
+  if (action === 'insert-break') {
+    return finish(action, transactionOf(caret, caret, '\n', caret + 1))
+  }
+  if (action === 'strip-marker') {
+    const stripped = planStripMarker(
+      source,
+      caret,
+      context.kind === 'quote' ? 'quote' : context.kind === 'task' ? 'task' : 'list',
+    )
+    return finish(action, stripped)
+  }
+  if (action === 'merge-previous') {
+    return finish(action, mergeAcross(source, caret, 'previous'))
+  }
+  if (action === 'merge-next') {
+    return finish(action, mergeAcross(source, caret, 'next'))
+  }
+  if (action === 'delete-backward') {
+    return finish(action, deleteGrapheme(source, caret, 'backward'))
+  }
+  if (action === 'delete-forward') {
+    return finish(action, deleteGrapheme(source, caret, 'forward'))
   }
 
-  if (input.key === 'tab') {
-    if (context.kind === 'list' || context.kind === 'task') {
-      return finish('indent-list', indentLines(source, selection, false))
-    }
-    if (context.kind === 'code') {
-      return finish('insert-spaces', transactionOf(caret, caret, '  ', caret + 2))
-    }
-    return finish('passthrough-tab', null)
-  }
-
-  if (input.key === 'shift-tab') {
-    if (context.kind === 'list' || context.kind === 'task') {
-      return finish('outdent-list', indentLines(source, selection, true))
-    }
-    return finish('passthrough-tab', null)
-  }
-
-  if (input.key === 'shift-enter') {
-    return finish('insert-break', transactionOf(caret, caret, '\n', caret + 1))
-  }
-
-  if (input.key === 'enter') {
-    if (context.kind === 'list' || context.kind === 'task') {
-      const planned = planListEnter(source, caret, context.kind)
-      return finish(planned.action, planned.transaction)
-    }
-    if (context.kind === 'quote') {
-      const planned = planQuoteEnter(source, caret)
-      return finish(planned.action, planned.transaction)
-    }
-    return finish('insert-break', transactionOf(caret, caret, '\n', caret + 1))
-  }
-
-  if (input.key === 'backspace') {
-    if (context.kind === 'list' || context.kind === 'task' || context.kind === 'quote') {
-      const stripped = planStripMarker(source, caret, context.kind)
-      if (stripped) return finish('strip-marker', stripped)
-    }
-    const merged = mergeAcross(source, caret, 'previous')
-    if (merged && (position === 'start' || position === 'document-start')) {
-      return finish('merge-previous', merged)
-    }
-    return finish('delete-backward', deleteGrapheme(source, caret, 'backward'))
-  }
-
-  if (input.key === 'delete') {
-    const merged = mergeAcross(source, caret, 'next')
-    if (merged && (position === 'end' || position === 'document-end')) {
-      return finish('merge-next', merged)
-    }
-    return finish('delete-forward', deleteGrapheme(source, caret, 'forward'))
-  }
-
-  return finish('noop', null)
+  return finish(action, null)
 }
 
 export const evaluateMarkdownBlockInputMutations = (source = '```\n- not a list\n```\n') => {

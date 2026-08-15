@@ -5,7 +5,10 @@ import {
   MarkdownEditorTransactionStore,
 } from '../src/markdown-editor-transaction'
 import {
+  MARKDOWN_BLOCK_INPUT_CONTEXTS,
+  MARKDOWN_BLOCK_INPUT_KEYS,
   evaluateMarkdownBlockInputMutations,
+  markdownBlockInputActionFor,
   resolveMarkdownBlockInputIntent,
 } from '../src/markdown-editor-input-intent'
 
@@ -129,6 +132,92 @@ describe('markdown block input intents', () => {
     })
     expect(table.intent.action).toBe('table-hook')
     expect(table.transaction).toBeNull()
+  })
+
+  it('matches the documented action for every context, key, and block position', () => {
+    const samples: Record<
+      string,
+      { source: string; offsets: Partial<Record<string, number>> }
+    > = {
+      paragraph: { source: 'Hello world.\n', offsets: { 'document-start': 0, start: 0, middle: 6, end: 12, 'document-end': 13 } },
+      heading: { source: '# Title\n', offsets: { 'document-start': 0, start: 2, middle: 4, end: 7, 'document-end': 8 } },
+      list: { source: '- item\n', offsets: { 'document-start': 0, start: 2, middle: 4, end: 6, empty: undefined, 'document-end': 7 } },
+      task: { source: '- [ ] task\n', offsets: { start: 6, middle: 8, end: 10 } },
+      quote: { source: '> quoted\n', offsets: { start: 2, middle: 4, end: 8 } },
+      code: { source: '```\ncode\n```\n', offsets: { middle: 7, end: 8 } },
+      table: { source: '| h |\n| --- |\n| c |\n', offsets: { middle: 2, end: 4 } },
+      atomic: { source: '![alt](img.png)\n', offsets: { start: 0, middle: 6, end: 15 } },
+      ordinary: { source: '\n\n', offsets: { middle: 1, 'document-start': 0, 'document-end': 2 } },
+    }
+    const emptyList = resolveMarkdownBlockInputIntent({
+      source: '- ',
+      selection: { start: 2, end: 2 },
+      key: 'enter',
+    })
+    expect(emptyList.intent.position).toBe('empty')
+    expect(emptyList.intent.action).toBe(
+      markdownBlockInputActionFor('list', 'enter', 'empty'),
+    )
+
+    for (const context of MARKDOWN_BLOCK_INPUT_CONTEXTS) {
+      const sample = samples[context]
+      expect(sample).toBeDefined()
+      for (const key of MARKDOWN_BLOCK_INPUT_KEYS) {
+        for (const [position, offset] of Object.entries(sample.offsets)) {
+          if (offset === undefined) continue
+          const plan = resolveMarkdownBlockInputIntent({
+            source: sample.source,
+            selection: { start: offset, end: offset },
+            key,
+          })
+          expect(plan.intent.context).toBe(context)
+          expect(plan.intent.action).toBe(
+            markdownBlockInputActionFor(plan.intent.context, key, plan.intent.position),
+          )
+          expect(MARKDOWN_BLOCK_INPUT_KEYS.includes(key)).toBe(true)
+          expect(position.length).toBeGreaterThan(0)
+        }
+      }
+    }
+  })
+
+  it('strips list markers, merges blocks, indents lists, and invokes the table hook', () => {
+    const stripped = apply('- item', 2, 'backspace')
+    expect(stripped.plan.intent.action).toBe('strip-marker')
+    expect(stripped.next).toBe('item')
+
+    const merged = apply('# Title\n\npara', 9, 'backspace')
+    expect(merged.plan.intent.action).toBe('merge-previous')
+    expect(merged.next).toBe('# Title\npara')
+
+    const indented = apply('- item', 2, 'tab')
+    expect(indented.plan.intent.action).toBe('indent-list')
+    expect(indented.next).toBe('  - item')
+
+    const outdented = apply('  - item', 4, 'shift-tab')
+    expect(outdented.plan.intent.action).toBe('outdent-list')
+    expect(outdented.next).toBe('- item')
+
+    const hooked = resolveMarkdownBlockInputIntent({
+      source: '| h |\n| --- |\n| c |\n',
+      selection: { start: 2, end: 2 },
+      key: 'tab',
+      tableHook: () => ({
+        changes: [{ from: 2, to: 2, insert: '\t' }],
+        history: 'separate',
+        origin: 'input',
+        selection: { start: 3, end: 3, direction: 'none' },
+      }),
+    })
+    expect(hooked.intent.action).toBe('table-hook')
+    expect(hooked.transaction?.changes[0]?.insert).toBe('\t')
+    expect(
+      resolveMarkdownBlockInputIntent({
+        source: '| h |\n| --- |\n| c |\n',
+        selection: { start: 2, end: 2 },
+        key: 'enter',
+      }).transaction,
+    ).toBeNull()
   })
 
   it('rejects regex context, consumer keydown, DOM mutation, and full-document normalize', () => {
