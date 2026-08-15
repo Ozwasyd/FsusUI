@@ -57,6 +57,13 @@ export {
   type MarkdownSourceRange,
   type MarkdownSourceUtf8Offset,
 } from './markdown-source-coordinate-map'
+export {
+  stabilizeMarkdownEditorProjection,
+  type MarkdownDocumentIdentity,
+  type MarkdownStableProjection,
+  type MarkdownStableSyntaxNode,
+  type MarkdownSyntaxIdentityStatus,
+} from './markdown-syntax-identity'
 
 const fsusErrorCategories = {
   aborted: 'runtime',
