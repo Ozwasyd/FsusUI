@@ -142,6 +142,12 @@ export {
   type MarkdownRetainedSyntaxNode,
 } from './markdown-projection-invalidation'
 export {
+  evaluateMarkdownAnchorMutations,
+  type MarkdownAnchorMutationKind,
+  type MarkdownAnchorMutationReport,
+  type MarkdownAnchorMutationResult,
+} from './markdown-anchor-mutations'
+export {
   MARKDOWN_POINTER_PLATFORMS,
   createMarkdownAnchorMap,
   type MarkdownAnchorAffinity,
