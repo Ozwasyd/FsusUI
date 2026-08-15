@@ -208,6 +208,15 @@
     }
   }
 
+  @include e(live-decorations) {
+    pointer-events: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
   @include e(preview) {
     min-width: 0;
     overflow: auto;

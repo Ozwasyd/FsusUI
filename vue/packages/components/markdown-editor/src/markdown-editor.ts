@@ -49,6 +49,17 @@ export {
   type MarkdownLiveCapabilityResult,
 } from './markdown-editor-live-contract'
 export {
+  MARKDOWN_LIVE_SURFACE_OWNER,
+  createMarkdownLiveSurface,
+  evaluateMarkdownLiveSurfaceMutations,
+  resolveMarkdownLiveSurface,
+  type MarkdownLiveDecoration,
+  type MarkdownLiveDecorationRole,
+  type MarkdownLiveSurfaceMutationKind,
+  type MarkdownLiveSurfaceOwner,
+  type MarkdownLiveSurfacePlan,
+} from './markdown-editor-live-surface'
+export {
   MARKDOWN_BLOCK_INPUT_CONTEXTS,
   MARKDOWN_BLOCK_INPUT_KEYS,
   MARKDOWN_BLOCK_INPUT_POSITIONS,

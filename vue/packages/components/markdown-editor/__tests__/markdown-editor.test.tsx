@@ -905,16 +905,63 @@ describe('MarkdownEditor', () => {
       expect(wrapper.element).toBe(root)
       expect(wrapper.find('[aria-label="Markdown editor"]').exists()).toBe(true)
 
+      const textarea = wrapper.find('textarea')
+      expect(textarea.exists()).toBe(true)
       if (mode === 'preview') {
-        expect(wrapper.find('textarea').exists()).toBe(false)
+        expect(textarea.isVisible()).toBe(false)
         expect(wrapper.find('[data-stub-markdown-renderer]').exists()).toBe(true)
       } else {
+        expect(textarea.isVisible()).toBe(true)
         expect(wrapper.find('[data-stub-markdown-renderer]').exists()).toBe(
-          mode !== 'source',
+          mode === 'split',
         )
       }
     },
   )
+
+  it('keeps one textarea owner across source/live/split/preview without rebuilding history', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        mode: 'source',
+        modelValue: '# Stable',
+      },
+      global: {
+        stubs: {
+          ElMarkdownRenderer: {
+            template: '<div data-stub-markdown-renderer />',
+          },
+        },
+      },
+    })
+    const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
+    textarea.setSelectionRange(2, 8)
+    wrapper.vm.dispatchTransaction({
+      changes: [{ from: 8, insert: '!', to: 8 }],
+      history: 'separate',
+      origin: 'input',
+      selection: { direction: 'forward', end: 9, start: 2 },
+    })
+    const revision = wrapper.vm.undo().revision
+    wrapper.vm.redo()
+
+    for (const mode of ['live', 'split', 'preview', 'source'] as const) {
+      await wrapper.setProps({ mode })
+      expect(wrapper.find('textarea').element).toBe(textarea)
+      expect(wrapper.find('[data-markdown-surface-owner]').attributes(
+        'data-markdown-surface-owner',
+      )).toBe('source-textarea')
+    }
+
+    expect(wrapper.vm.undo()).toMatchObject({
+      accepted: true,
+      value: '# Stable',
+    })
+    expect(revision).toBeGreaterThan(0)
+    expect(wrapper.find('[data-markdown-live-decorations]').exists()).toBe(false)
+    await wrapper.setProps({ mode: 'live' })
+    expect(wrapper.find('[data-stub-markdown-renderer]').exists()).toBe(false)
+    expect(wrapper.find('textarea').isVisible()).toBe(true)
+  })
 
   it('keeps the editable surface and its selection when chrome changes', async () => {
     const wrapper = mount(MarkdownEditor, {
