@@ -227,6 +227,7 @@ import {
   resolveMarkdownClipboardPaste,
   writeMarkdownClipboardPayload,
 } from './markdown-editor-clipboard'
+import { createMarkdownEditorNativeEventMachine } from './markdown-editor-native-event'
 
 defineOptions({
   name: 'ElMarkdownEditor',
@@ -289,61 +290,16 @@ type EditorOperation =
       readonly restoreSelection?: boolean
     }
 
+const nativeMachine = createMarkdownEditorNativeEventMachine({
+  documentIdentity,
+})
 let beforeInputSnapshot: BeforeInputSnapshot | undefined
-let discardInvalidatedCompositionInput = false
-let discardInvalidatedCompositionInputEpoch = 0
-let invalidatedComposition = false
-let invalidatedCompositionEpoch = 0
 let pendingClipboardIdentity: string | undefined
 let pendingInputOrigin: 'drop' | 'paste' | undefined
-let pendingCompositionCommit = false
-let pendingCompositionCommitEpoch = 0
 let restoringSelection = false
-let skipCompositionInputValue: string | undefined
 
-const clearPendingCompositionCommit = () => {
-  pendingCompositionCommit = false
-  pendingCompositionCommitEpoch += 1
-}
-
-const deferPendingCompositionCommit = () => {
-  pendingCompositionCommit = true
-  const epoch = ++pendingCompositionCommitEpoch
-  setTimeout(() => {
-    if (pendingCompositionCommitEpoch === epoch) {
-      pendingCompositionCommit = false
-    }
-  }, 0)
-}
-
-const clearInvalidatedCompositionInput = () => {
-  discardInvalidatedCompositionInput = false
-  discardInvalidatedCompositionInputEpoch += 1
-}
-
-const deferInvalidatedCompositionInput = () => {
-  discardInvalidatedCompositionInput = true
-  const epoch = ++discardInvalidatedCompositionInputEpoch
-  setTimeout(() => {
-    if (discardInvalidatedCompositionInputEpoch === epoch) {
-      discardInvalidatedCompositionInput = false
-    }
-  }, 0)
-}
-
-const clearInvalidatedComposition = () => {
-  invalidatedComposition = false
-  invalidatedCompositionEpoch += 1
-}
-
-const deferInvalidatedComposition = () => {
-  invalidatedComposition = true
-  const epoch = ++invalidatedCompositionEpoch
-  setTimeout(() => {
-    if (invalidatedCompositionEpoch === epoch) {
-      invalidatedComposition = false
-    }
-  }, 0)
+const syncNativeComposing = () => {
+  isComposing.value = nativeMachine.composing
 }
 
 const historiesEqual = (
@@ -542,13 +498,16 @@ watch(
     if (value === transactionStore.value) return
 
     abortPendingCommands()
-    if (isComposing.value) deferInvalidatedComposition()
-    isComposing.value = false
+    nativeMachine.apply({
+      documentIdentity,
+      kind: 'external-reset',
+      revision: transactionStore.revision,
+      value,
+    })
+    syncNativeComposing()
     beforeInputSnapshot = undefined
-    clearPendingCompositionCommit()
     pendingClipboardIdentity = undefined
     pendingInputOrigin = undefined
-    skipCompositionInputValue = undefined
     dispatchEditorOperation({
       allowBlocked: true,
       emitValue: false,
@@ -651,10 +610,13 @@ watch([editingBlocked, overflowItemCount], ([blocked, itemCount]) => {
 
   transactionStore.breakMergeGroup()
   if (isComposing.value) {
-    deferInvalidatedComposition()
-    isComposing.value = false
+    nativeMachine.apply({
+      documentIdentity,
+      kind: 'external-reset',
+      revision: transactionStore.revision,
+    })
+    syncNativeComposing()
     beforeInputSnapshot = undefined
-    clearPendingCompositionCommit()
     pendingClipboardIdentity = undefined
     pendingInputOrigin = undefined
     triggerRef(editorValue)
@@ -703,204 +665,140 @@ onBeforeUnmount(() => {
 })
 
 const handleBeforeInput = (event: InputEvent) => {
-  if (editingBlocked.value) {
-    event.preventDefault()
-    return
-  }
-  if (
-    invalidatedComposition ||
-    discardInvalidatedCompositionInput ||
-    (!isComposing.value &&
-      (event.isComposing || event.inputType === 'insertCompositionText'))
-  ) {
-    event.preventDefault()
-    beforeInputSnapshot = undefined
-    pendingClipboardIdentity = undefined
-    pendingInputOrigin = undefined
-    triggerRef(editorValue)
-    return
-  }
-  if (
-    pendingClipboardIdentity &&
-    (event.inputType === 'insertFromPaste' ||
-      event.inputType === 'insertFromDrop')
-  ) {
-    event.preventDefault()
-    return
-  }
-  if (event.inputType === 'historyUndo') {
-    event.preventDefault()
+  const plan = nativeMachine.apply({
+    clipboardIdentity: pendingClipboardIdentity,
+    data: event.data,
+    disabled: editingBlocked.value,
+    documentIdentity,
+    inputType: event.inputType,
+    isComposing: event.isComposing,
+    kind: 'beforeinput',
+    origin: pendingInputOrigin,
+    previousValue: transactionStore.value,
+    revision: transactionStore.revision,
+    selection: captureSelection(!nativeMachine.composing),
+  })
+  syncNativeComposing()
+  if (plan.snapshot) beforeInputSnapshot = plan.snapshot
+  if (plan.preventDefault) event.preventDefault()
+  if (plan.restoreDisplay) triggerRef(editorValue)
+  if (plan.action === 'undo') {
     undo()
     return
   }
-  if (event.inputType === 'historyRedo') {
-    event.preventDefault()
+  if (plan.action === 'redo') {
     redo()
     return
   }
-
-  beforeInputSnapshot = {
-    data: event.data,
-    inputType: event.inputType,
-    selection: captureSelection(!isComposing.value),
-    value: transactionStore.value,
-  }
-}
-
-const inputMergeDirection = (
-  snapshot: BeforeInputSnapshot,
-): MarkdownEditorInputMergeDirection => {
-  if (snapshot.selection.start !== snapshot.selection.end) return 'none'
-  if (snapshot.inputType === 'deleteContentBackward') return 'backward'
-  if (
-    snapshot.inputType === 'deleteContentForward' ||
-    snapshot.inputType === 'insertText' ||
-    snapshot.inputType === 'insertLineBreak'
-  ) {
-    return 'forward'
-  }
-  return 'none'
 }
 
 const handleInput = (event: Event) => {
   const target = event.target
   if (!(target instanceof HTMLTextAreaElement)) return
-  const orphanedCompositionInput =
-    event instanceof InputEvent &&
-    !isComposing.value &&
-    (event.isComposing || event.inputType === 'insertCompositionText')
-  if (
-    invalidatedComposition ||
-    discardInvalidatedCompositionInput ||
-    orphanedCompositionInput
-  ) {
-    if (!invalidatedComposition) clearInvalidatedCompositionInput()
-    beforeInputSnapshot = undefined
-    clearPendingCompositionCommit()
-    pendingClipboardIdentity = undefined
-    pendingInputOrigin = undefined
-    triggerRef(editorValue)
-    return
-  }
-  if (pendingClipboardIdentity) {
-    pendingClipboardIdentity = undefined
-    pendingInputOrigin = undefined
-    beforeInputSnapshot = undefined
-    if (target.value !== transactionStore.value) {
-      triggerRef(editorValue)
-      void restoreTextareaSelection(transactionStore.selection)
-    }
-    return
-  }
-  if (editingBlocked.value) {
-    triggerRef(editorValue)
-    return
-  }
-  if (isComposing.value) return
-  if (
-    skipCompositionInputValue !== undefined &&
-    target.value === skipCompositionInputValue &&
-    target.value === transactionStore.value
-  ) {
-    skipCompositionInputValue = undefined
-    return
-  }
-  skipCompositionInputValue = undefined
-  const compositionCommit = pendingCompositionCommit
-  clearPendingCompositionCommit()
-
+  const inputEvent = event instanceof InputEvent ? event : undefined
   const snapshot =
     beforeInputSnapshot?.value === transactionStore.value
       ? beforeInputSnapshot
-      : {
-          data: null,
-          inputType: 'insertText',
-          selection: transactionStore.selection,
-          value: transactionStore.value,
-        }
-  const inputType = snapshot.inputType
-  const origin = compositionCommit
-    ? 'input'
-    : (pendingInputOrigin ??
-      (inputType === 'insertFromPaste'
-        ? 'paste'
-        : inputType === 'insertFromDrop'
-          ? 'drop'
-          : 'input'))
-  const history = compositionCommit || origin !== 'input' ? 'separate' : 'merge'
+      : nativeMachine.snapshot
+  const plan = nativeMachine.apply({
+    clipboardIdentity: pendingClipboardIdentity,
+    data: inputEvent?.data ?? snapshot?.data ?? null,
+    disabled: editingBlocked.value,
+    documentIdentity,
+    inputType: inputEvent?.inputType ?? snapshot?.inputType,
+    isComposing: inputEvent?.isComposing,
+    kind: 'input',
+    origin: pendingInputOrigin,
+    previousValue: transactionStore.value,
+    revision: transactionStore.revision,
+    selection: readSelectionFrom(target),
+    value: target.value,
+  })
+  syncNativeComposing()
+  beforeInputSnapshot = undefined
+  if (plan.action === 'dedup' || plan.action === 'prevent' || plan.action === 'ignore') {
+    pendingClipboardIdentity = undefined
+    pendingInputOrigin = undefined
+    if (plan.restoreDisplay && target.value !== transactionStore.value) {
+      triggerRef(editorValue)
+      void restoreTextareaSelection(transactionStore.selection)
+    } else if (plan.restoreDisplay) {
+      triggerRef(editorValue)
+    }
+    return
+  }
+  if (plan.action !== 'dispatch' && plan.action !== 'commit') {
+    pendingClipboardIdentity = undefined
+    pendingInputOrigin = undefined
+    return
+  }
+
   dispatchReplacement(
     target.value,
     readSelectionFrom(target),
     {
-      history,
+      history: plan.history,
       metadata: Object.freeze({
-        ...(compositionCommit ? { composition: true } : {}),
-        data: snapshot.data,
-        inputType,
+        ...(plan.composition ? { composition: true } : {}),
+        data: snapshot?.data ?? inputEvent?.data ?? null,
+        identity: plan.identity,
+        inputType: snapshot?.inputType ?? inputEvent?.inputType ?? 'insertText',
       }),
-      origin,
+      origin: plan.origin,
     },
-    origin === 'input' && !compositionCommit
-      ? inputMergeDirection(snapshot)
-      : 'none',
+    plan.mergeDirection,
   )
-  beforeInputSnapshot = undefined
   pendingClipboardIdentity = undefined
   pendingInputOrigin = undefined
 }
 
 const handleCompositionStart = () => {
-  if (editingBlocked.value) return
-  clearInvalidatedComposition()
-  clearInvalidatedCompositionInput()
+  nativeMachine.apply({
+    disabled: editingBlocked.value,
+    documentIdentity,
+    kind: 'compositionstart',
+    revision: transactionStore.revision,
+  })
+  syncNativeComposing()
+  if (editingBlocked.value || !nativeMachine.composing) return
   transactionStore.breakMergeGroup()
   captureSelection()
   beforeInputSnapshot = undefined
-  clearPendingCompositionCommit()
   pendingClipboardIdentity = undefined
   pendingInputOrigin = undefined
-  isComposing.value = true
 }
 
 const handleCompositionEnd = (event: CompositionEvent) => {
   const target = event.target
   if (!(target instanceof HTMLTextAreaElement)) return
-  if (invalidatedComposition || !isComposing.value) {
-    clearInvalidatedComposition()
-    isComposing.value = false
-    beforeInputSnapshot = undefined
-    clearPendingCompositionCommit()
-    pendingClipboardIdentity = undefined
-    pendingInputOrigin = undefined
-    skipCompositionInputValue = undefined
-    deferInvalidatedCompositionInput()
-    triggerRef(editorValue)
+  const plan = nativeMachine.apply({
+    data: event.data,
+    disabled: editingBlocked.value,
+    documentIdentity,
+    kind: 'compositionend',
+    previousValue: transactionStore.value,
+    revision: transactionStore.revision,
+    selection: readSelectionFrom(target),
+    value: target.value,
+  })
+  syncNativeComposing()
+  beforeInputSnapshot = undefined
+  pendingClipboardIdentity = undefined
+  pendingInputOrigin = undefined
+  if (plan.action !== 'commit') {
+    if (plan.restoreDisplay) triggerRef(editorValue)
     return
   }
-  if (editingBlocked.value) {
-    isComposing.value = false
-    triggerRef(editorValue)
-    return
-  }
-
-  isComposing.value = false
-  const beforeValue = transactionStore.value
-  const result = dispatchReplacement(target.value, readSelectionFrom(target), {
-    history: 'separate',
+  dispatchReplacement(target.value, readSelectionFrom(target), {
+    history: plan.history,
     metadata: Object.freeze({
       composition: true,
       data: event.data,
+      identity: plan.identity,
       inputType: 'insertCompositionText',
     }),
     origin: 'input',
   })
-  if (result.accepted) {
-    if (target.value === beforeValue) deferPendingCompositionCommit()
-    else skipCompositionInputValue = result.value
-  }
-  beforeInputSnapshot = undefined
-  pendingClipboardIdentity = undefined
-  pendingInputOrigin = undefined
 }
 
 const applyClipboardTransfer = (
@@ -911,7 +809,9 @@ const applyClipboardTransfer = (
   const transfer = markdownClipboardItemsFromDataTransfer(data ?? null)
   const hasTransfer = transfer.items.length > 0 || transfer.files.length > 0
   if (!hasTransfer) {
-    if (!editingBlocked.value && !isComposing.value) pendingInputOrigin = origin
+    if (!editingBlocked.value && !nativeMachine.freezeSmartInput) {
+      pendingInputOrigin = origin
+    }
     return
   }
 
@@ -945,6 +845,13 @@ const applyClipboardTransfer = (
     event.preventDefault()
     pendingClipboardIdentity = plan.identity
     pendingInputOrigin = origin
+    nativeMachine.apply({
+      clipboardIdentity: plan.identity,
+      documentIdentity,
+      kind: origin,
+      origin,
+      revision: transactionStore.revision,
+    })
     if (plan.transaction) dispatchTransaction(plan.transaction)
     return
   }
@@ -1007,7 +914,7 @@ const handleBlur = () => {
 }
 
 const runCommand = async (command: MarkdownEditorCommand) => {
-  if (editingBlocked.value || isComposing.value) return
+  if (editingBlocked.value || nativeMachine.freezeSmartInput) return
   if (pendingCommandKeys.value.has(command.key)) return
 
   const selection = captureSelection()
@@ -1122,7 +1029,7 @@ const emitRenderEvent = (
 }
 
 const handleKeydown = (event: KeyboardEvent) => {
-  if (editingBlocked.value || isComposing.value) return
+  if (editingBlocked.value || nativeMachine.freezeSmartInput) return
 
   const isMod = event.metaKey || event.ctrlKey
   const key = event.key.toLowerCase()
