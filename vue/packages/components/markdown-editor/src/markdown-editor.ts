@@ -63,6 +63,15 @@ export {
   type MarkdownBlockInputRejection,
   type MarkdownTableInputHook,
 } from './markdown-editor-input-intent'
+export {
+  MARKDOWN_PAIR_DEFAULTS,
+  evaluateMarkdownPairInputMutations,
+  resolveMarkdownPairInput,
+  type MarkdownPairAction,
+  type MarkdownPairInputPlan,
+  type MarkdownPairMutationKind,
+  type MarkdownPairRejection,
+} from './markdown-editor-pair-input'
 export type MarkdownEditorChrome = 'framed' | 'embedded' | 'minimal'
 export const markdownEditorChromes = ['framed', 'embedded', 'minimal'] as const
 export type MarkdownEditorMobileLayout = 'auto' | 'compact' | 'standard'
