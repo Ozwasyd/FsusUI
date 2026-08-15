@@ -240,3 +240,79 @@ export const createMarkdownEditorProjection = (
     }),
   })
 }
+
+const sameRange = (
+  left: MarkdownEditorSourceRange | null,
+  right: MarkdownEditorSourceRange | null,
+) => {
+  if (left === null || right === null) return left === right
+  return left.start === right.start && left.end === right.end
+}
+
+const sameRangeList = (
+  left: readonly MarkdownEditorSourceRange[],
+  right: readonly MarkdownEditorSourceRange[],
+) =>
+  left.length === right.length &&
+  left.every((range, index) => sameRange(range, right[index] ?? null))
+
+export const transferMarkdownEditorProjection = (
+  projection: MarkdownEditorProjectionResult,
+): MarkdownEditorProjectionResult =>
+  JSON.parse(JSON.stringify(projection)) as MarkdownEditorProjectionResult
+
+export const createMarkdownEditorWorkerProjection = (
+  rawSource: string,
+): MarkdownEditorProjectionResult =>
+  transferMarkdownEditorProjection(createMarkdownEditorProjection(rawSource))
+
+export const markdownEditorProjectionsEquivalent = (
+  left: MarkdownEditorProjectionResult,
+  right: MarkdownEditorProjectionResult,
+): boolean => {
+  if (!markdownRenderIdentitiesEqual(left, right)) return false
+  if (left.syntaxCoverage.parser !== right.syntaxCoverage.parser) return false
+  if (left.syntaxCoverage.version !== right.syntaxCoverage.version) return false
+  if (left.syntaxCoverage.kinds.length !== right.syntaxCoverage.kinds.length) {
+    return false
+  }
+  if (
+    !left.syntaxCoverage.kinds.every(
+      (kind, index) => kind === right.syntaxCoverage.kinds[index],
+    )
+  ) {
+    return false
+  }
+  if (left.diagnostics.length !== right.diagnostics.length) return false
+  if (left.nodes.length !== right.nodes.length) return false
+  return left.nodes.every((node, index) => {
+    const other = right.nodes[index]
+    if (!other) return false
+    return (
+      node.kind === other.kind &&
+      node.presentation === other.presentation &&
+      sameRange(node.rawRange, other.rawRange) &&
+      sameRange(node.normalizedRange, other.normalizedRange) &&
+      sameRange(node.parentRawRange, other.parentRawRange) &&
+      sameRange(node.parentNormalizedRange, other.parentNormalizedRange) &&
+      sameRangeList(node.childRawRanges, other.childRawRanges) &&
+      sameRangeList(node.childNormalizedRanges, other.childNormalizedRanges)
+    )
+  })
+}
+
+export const compareMarkdownEditorProjectionThreads = (
+  rawSource: string,
+): {
+  readonly equivalent: boolean
+  readonly main: MarkdownEditorProjectionResult
+  readonly worker: MarkdownEditorProjectionResult
+} => {
+  const main = createMarkdownEditorProjection(rawSource)
+  const worker = createMarkdownEditorWorkerProjection(rawSource)
+  return Object.freeze({
+    equivalent: markdownEditorProjectionsEquivalent(main, worker),
+    main,
+    worker,
+  })
+}
