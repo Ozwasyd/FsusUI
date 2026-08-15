@@ -66,6 +66,22 @@ export {
   type MarkdownSyntaxIdentityStatus,
 } from './markdown-syntax-identity'
 export {
+  MARKDOWN_PROJECTION_WORKER_REQUEST,
+  MARKDOWN_PROJECTION_WORKER_RESULT,
+  createMarkdownProjectionWorkerHost,
+  isMarkdownProjectionWorkerRequest,
+  isMarkdownProjectionWorkerResult,
+  projectMarkdownOnWorker,
+  reviveMarkdownStableProjection,
+  snapshotMarkdownStableProjection,
+  type MarkdownProjectionWorkerHost,
+  type MarkdownProjectionWorkerPort,
+  type MarkdownProjectionWorkerRequest,
+  type MarkdownProjectionWorkerResult,
+  type MarkdownProjectionWorkerSnapshot,
+  type MarkdownProjectionWorkerSnapshotNode,
+} from './markdown-projection-worker'
+export {
   MARKDOWN_PROJECTION_INVALIDATION_BUDGET,
   createMarkdownProjectionSession,
   createMarkdownProjectionTask,
