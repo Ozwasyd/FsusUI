@@ -214,6 +214,10 @@ import {
   resolveMarkdownBlockInputIntent,
   type MarkdownBlockInputKey,
 } from './markdown-editor-input-intent'
+import {
+  MARKDOWN_PAIR_DEFAULTS,
+  resolveMarkdownPairInput,
+} from './markdown-editor-pair-input'
 
 defineOptions({
   name: 'ElMarkdownEditor',
@@ -1012,6 +1016,32 @@ const handleKeydown = (event: KeyboardEvent) => {
     event.preventDefault()
     redo()
     return
+  }
+
+  const pairChars = new Set(
+    MARKDOWN_PAIR_DEFAULTS.flatMap(([open, close]) => [open, close]),
+  )
+  if (
+    !event.altKey &&
+    !event.ctrlKey &&
+    !event.metaKey &&
+    (event.key === 'Backspace' || pairChars.has(event.key))
+  ) {
+    const pairPlan = resolveMarkdownPairInput({
+      source: transactionStore.value,
+      selection: captureSelection(),
+      inserted: event.key === 'Backspace' ? undefined : event.key,
+      key: event.key === 'Backspace' ? 'backspace' : undefined,
+      composing: isComposing.value,
+      readonly: props.disabled,
+      mode: currentMode.value,
+      documentIdentity,
+    })
+    if (pairPlan.transaction) {
+      event.preventDefault()
+      dispatchTransaction(pairPlan.transaction)
+      return
+    }
   }
 
   const blockKey =
