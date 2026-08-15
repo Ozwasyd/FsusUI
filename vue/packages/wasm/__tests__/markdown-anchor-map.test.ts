@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  MARKDOWN_POINTER_PLATFORMS,
   createMarkdownAnchorMap,
   createMarkdownEditorProjection,
   createMarkdownSourceCoordinateMap,
@@ -217,5 +218,120 @@ describe('markdown source/syntax/visual anchor map', () => {
       status: 'mapped',
       range: { start: 8, end: 13 },
     })
+  })
+
+  it('maps platform-neutral pointer hits through hidden markers without DOM or HTML offsets', () => {
+    const source = 'A **bold** word'
+    const map = createMarkdownAnchorMap({
+      identity: 'shared-document',
+      source,
+      syntax: [
+        { id: 'marker-open', range: [2, 4], hidden: true },
+        { id: 'nested', range: [4, 8], parentId: 'marker-open' },
+        { id: 'marker-close', range: [8, 10], hidden: true },
+      ],
+    })
+
+    const platforms = MARKDOWN_POINTER_PLATFORMS.map((platform) =>
+      map.pointerHitToSource(
+        { anchorId: 'marker-open', point: 'start' },
+        { platform },
+      ),
+    )
+    expect(new Set(platforms.map((hit) => hit.offset)).size).toBe(1)
+    expect(platforms[0]).toMatchObject({
+      offset: 2,
+      hidden: true,
+      platform: 'source',
+    })
+    expect(
+      map.pointerHitToSource({
+        anchorId: 'marker-open',
+        point: 'after',
+        affinity: 'after',
+      }),
+    ).toMatchObject({ offset: 4, hidden: true })
+    expect(
+      map.pointerHitToSource({ anchorId: 'nested', point: 'start' }),
+    ).toMatchObject({ offset: 4, hidden: false })
+
+    const forward = map.traverseHiddenMarker({
+      anchorId: 'marker-open',
+      direction: 'forward',
+    })
+    expect(forward).toMatchObject({
+      offset: 4,
+      crossed: true,
+      hidden: true,
+      nextAnchorId: 'nested',
+    })
+    const backward = map.traverseHiddenMarker({
+      anchorId: 'marker-close',
+      direction: 'backward',
+    })
+    expect(backward).toMatchObject({
+      offset: 8,
+      crossed: true,
+      nextAnchorId: 'nested',
+    })
+
+    const revealed = map.sourceRangeToReveal({ start: 2, end: 10 })
+    expect(revealed.highlights.map((item) => item.anchorId)).toEqual([
+      'marker-open',
+      'nested',
+      'marker-close',
+    ])
+    expect(revealed.reveal.anchorId).toBe('marker-open')
+    expect(revealed.reveal.range).toEqual({ start: 2, end: 4 })
+    expect(source.slice(2, 10)).not.toBe('bold')
+  })
+
+  it('snaps pointer hits to graphemes and does not reveal a nearby identical neighbor', () => {
+    const raw = '\uFEFF# Title\r\n\n# Title\n'
+    const document = { id: 'doc-1', epoch: 3 }
+    const stable = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection(raw),
+      document,
+    )
+    const map = createMarkdownAnchorMap({
+      identity: document,
+      source: raw,
+      projection: stable,
+    })
+    const second = stable.nodes[1]
+    expect(second).toBeDefined()
+
+    const platforms = MARKDOWN_POINTER_PLATFORMS.map((platform) =>
+      map.pointerHitToSource(
+        { anchorId: second!.id, point: 'start' },
+        { platform },
+      ),
+    )
+    expect(new Set(platforms.map((hit) => `${hit.offset}:${hit.anchorId}`)).size).toBe(1)
+    expect(platforms[0]!.offset).toBe(second!.rawRange.start)
+    expect(platforms[0]!.offset).not.toBe(raw.indexOf('# Title'))
+
+    const revealed = map.sourceRangeToReveal(second!.rawRange)
+    expect(revealed.reveal.anchorId).toBe(second!.id)
+    expect(revealed.reveal.range).toEqual(second!.rawRange)
+
+    const emojiSource = 'a👩‍💻b'
+    const emojiMap = createMarkdownAnchorMap({
+      identity: 'emoji',
+      source: emojiSource,
+      syntax: [{ id: 'line', range: [0, emojiSource.length] }],
+    })
+    const emoji = emojiSource.indexOf('👩')
+    const midEmoji = emoji + 1
+    const boundary = createMarkdownSourceCoordinateMap(emojiSource).graphemeBoundaryAt(
+      midEmoji,
+    )
+    const snapped = emojiMap.pointerHitToSource({
+      anchorId: 'line',
+      point: 'caret',
+      localOffset: midEmoji,
+    })
+    expect(snapped.offset).toBe(boundary.start)
+    expect(snapped.offset).not.toBe(midEmoji)
   })
 })

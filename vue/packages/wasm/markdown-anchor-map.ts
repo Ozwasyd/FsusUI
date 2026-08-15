@@ -32,6 +32,59 @@ export type MarkdownVisualPointName =
 
 export type MarkdownSelectionDirection = 'collapsed' | 'forward' | 'backward'
 
+export const MARKDOWN_POINTER_PLATFORMS = Object.freeze([
+  'source',
+  'live',
+  'split',
+  'preview',
+] as const)
+
+export type MarkdownPointerPlatform = (typeof MARKDOWN_POINTER_PLATFORMS)[number]
+
+export type MarkdownHiddenTraversalDirection = 'forward' | 'backward'
+
+export interface MarkdownPointerHit {
+  readonly anchorId: string
+  readonly point: MarkdownVisualPointName
+  readonly affinity?: MarkdownAnchorAffinity
+  readonly localOffset?: number
+}
+
+export interface MarkdownPointerSourcePosition {
+  readonly offset: number
+  readonly end: number
+  readonly platform: MarkdownPointerPlatform
+  readonly hidden: boolean
+  readonly virtual: boolean
+  readonly anchorId: string
+}
+
+export interface MarkdownHiddenTraversalQuery {
+  readonly anchorId: string
+  readonly direction: MarkdownHiddenTraversalDirection
+}
+
+export interface MarkdownHiddenTraversal {
+  readonly offset: number
+  readonly crossed: boolean
+  readonly hidden: boolean
+  readonly nextAnchorId: string
+}
+
+export interface MarkdownRevealHighlight {
+  readonly anchorId: string
+  readonly hidden: boolean
+  readonly virtual: boolean
+  readonly range: MarkdownSourceRange
+}
+
+export interface MarkdownSourceReveal {
+  readonly identity: string
+  readonly documentIdentity: MarkdownDocumentIdentity
+  readonly highlights: readonly MarkdownRevealHighlight[]
+  readonly reveal: MarkdownRevealTarget
+}
+
 export type MarkdownAnchorSyntaxRange =
   | readonly [number, number]
   | MarkdownSourceRange
@@ -143,6 +196,14 @@ export interface MarkdownAnchorMap {
     mutation: MarkdownRangeMutation,
   ): MarkdownRemappedRange
   sourceRangeToVisual(range: MarkdownSourceRange): MarkdownVisualSelection
+  pointerHitToSource(
+    hit: MarkdownPointerHit,
+    options?: { readonly platform?: MarkdownPointerPlatform },
+  ): MarkdownPointerSourcePosition
+  traverseHiddenMarker(
+    query: MarkdownHiddenTraversalQuery,
+  ): MarkdownHiddenTraversal
+  sourceRangeToReveal(range: MarkdownSourceRange): MarkdownSourceReveal
 }
 
 const documentIdentityOf = (
@@ -510,6 +571,124 @@ export const createMarkdownAnchorMap = (
   const sourceRangeToVisual = (range: MarkdownSourceRange) =>
     sourceSelectionToVisual({ anchor: range.start, focus: range.end })
 
+  const resolveHitOffset = (hit: MarkdownPointerHit, node: MarkdownAnchorSyntaxNode) => {
+    if (Number.isInteger(hit.localOffset)) {
+      const raw = node.start + (hit.localOffset as number)
+      assertIntegerInRange(raw, 'pointer local offset', source.length)
+      if (raw < node.start || raw > node.end) {
+        throw new MarkdownRuntimeError(
+          'protocol',
+          'pointer local offset is outside the anchor',
+        )
+      }
+      return raw
+    }
+    if (hit.point === 'end' || hit.point === 'after') return node.end
+    if (hit.point === 'caret' && hit.affinity === 'after') return node.end
+    return node.start
+  }
+
+  const pointerHitToSource = (
+    hit: MarkdownPointerHit,
+    options?: { readonly platform?: MarkdownPointerPlatform },
+  ): MarkdownPointerSourcePosition => {
+    const platform = options?.platform ?? 'live'
+    if (!MARKDOWN_POINTER_PLATFORMS.includes(platform)) {
+      throw new MarkdownRuntimeError(
+        'protocol',
+        `unknown pointer platform: ${String(platform)}`,
+      )
+    }
+    const node = requireNode(hit.anchorId)
+    const raw = resolveHitOffset(hit, node)
+    const boundary = coordinates.graphemeBoundaryAt(raw)
+    const offset =
+      hit.affinity === 'after' && raw > boundary.start && raw < boundary.end
+        ? boundary.end
+        : raw > boundary.start && raw < boundary.end
+          ? boundary.start
+          : raw
+    return Object.freeze({
+      offset,
+      end: node.end,
+      platform,
+      hidden: node.hidden,
+      virtual: node.virtual,
+      anchorId: node.id,
+    })
+  }
+
+  const nodeAtBoundary = (
+    offset: number,
+    side: 'start' | 'end',
+    preferVisible: boolean,
+  ) => {
+    const matches = syntax.filter((node) =>
+      side === 'start' ? node.start === offset : node.end === offset,
+    )
+    if (matches.length === 0) return undefined
+    const visible = matches.filter((node) => !node.hidden)
+    const pool = preferVisible && visible.length > 0 ? visible : matches
+    return smallestNode(pool)
+  }
+
+  const traverseHiddenMarker = (
+    query: MarkdownHiddenTraversalQuery,
+  ): MarkdownHiddenTraversal => {
+    const node = requireNode(query.anchorId)
+    if (query.direction !== 'forward' && query.direction !== 'backward') {
+      throw new MarkdownRuntimeError('protocol', 'hidden traversal requires a direction')
+    }
+    if (query.direction === 'forward') {
+      const next = nodeAtBoundary(node.end, 'start', true)
+      return Object.freeze({
+        offset: node.end,
+        crossed: node.hidden,
+        hidden: node.hidden,
+        nextAnchorId: next?.id ?? documentAnchorId,
+      })
+    }
+    const previous = nodeAtBoundary(node.start, 'end', true)
+    return Object.freeze({
+      offset: node.start,
+      crossed: node.hidden,
+      hidden: node.hidden,
+      nextAnchorId: previous?.id ?? documentAnchorId,
+    })
+  }
+
+  const sourceRangeToReveal = (range: MarkdownSourceRange): MarkdownSourceReveal => {
+    assertIntegerInRange(range.start, 'reveal start', source.length)
+    assertIntegerInRange(range.end, 'reveal end', source.length)
+    const start = Math.min(range.start, range.end)
+    const end = Math.max(range.start, range.end)
+    const overlapping = syntax.filter((node) => node.start < end && node.end > start)
+    const highlights = overlapping.map((node) =>
+      Object.freeze({
+        anchorId: node.id,
+        hidden: node.hidden,
+        virtual: node.virtual,
+        range: Object.freeze({ start: node.start, end: node.end }),
+      }),
+    )
+    const revealNode =
+      overlapping.find((node) => node.hidden || node.virtual) ?? overlapping[0]
+    return Object.freeze({
+      identity,
+      documentIdentity,
+      highlights: Object.freeze(highlights),
+      reveal: revealNode
+        ? reveal({ anchorId: revealNode.id })
+        : Object.freeze({
+            virtual: false,
+            identity,
+            documentIdentity,
+            anchorId: documentAnchorId,
+            range: Object.freeze({ start, end }),
+          }),
+    })
+  }
+
   return Object.freeze({
     identity,
     documentIdentity,
@@ -523,5 +702,8 @@ export const createMarkdownAnchorMap = (
     reveal,
     remapRange,
     sourceRangeToVisual,
+    pointerHitToSource,
+    traverseHiddenMarker,
+    sourceRangeToReveal,
   })
 }
