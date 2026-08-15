@@ -35,6 +35,15 @@ import type {
 
 export { MarkdownRuntimeError, type MarkdownRuntimeErrorCode }
 export {
+  MARKDOWN_EDITOR_PROJECTION_PARSER,
+  createMarkdownEditorProjection,
+  type MarkdownEditorProjectionDiagnostic,
+  type MarkdownEditorProjectionIdentity,
+  type MarkdownEditorProjectionResult,
+  type MarkdownEditorSyntaxCoverage,
+  type MarkdownEditorSyntaxNode,
+} from './markdown-editor-projection'
+export {
   createMarkdownSourceCoordinateMap,
   type MarkdownSourceAffinity,
   type MarkdownSourceCoordinateMap,
