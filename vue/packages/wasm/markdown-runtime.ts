@@ -66,6 +66,7 @@ export {
   type MarkdownSyntaxIdentityStatus,
 } from './markdown-syntax-identity'
 export {
+  MARKDOWN_PROJECTION_INVALIDATION_BUDGET,
   createMarkdownProjectionSession,
   createMarkdownProjectionTask,
   planMarkdownProjectionInvalidation,

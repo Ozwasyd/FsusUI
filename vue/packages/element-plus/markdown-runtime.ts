@@ -8,6 +8,7 @@ export {
   presentationForSyntaxKind,
   stabilizeMarkdownEditorProjection,
   createMarkdownAnchorMap,
+  MARKDOWN_PROJECTION_INVALIDATION_BUDGET,
   createMarkdownProjectionSession,
   createMarkdownProjectionTask,
   planMarkdownProjectionInvalidation,

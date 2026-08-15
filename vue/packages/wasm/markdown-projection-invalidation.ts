@@ -27,9 +27,17 @@ export type MarkdownProjectionTaskFailure =
   | 'stale-revision'
   | 'document-switch'
 
+export const MARKDOWN_PROJECTION_INVALIDATION_BUDGET = Object.freeze({
+  maxScannedBytes: 4096,
+  maxExaminedNodes: 64,
+})
+
 export interface MarkdownProjectionInvalidationBudget {
   readonly scannedBytes: number
   readonly examinedNodes: number
+  readonly maxScannedBytes: number
+  readonly maxExaminedNodes: number
+  readonly capped: boolean
 }
 
 export interface MarkdownRetainedSyntaxNode {
@@ -181,6 +189,55 @@ const reasonFromChangedText = (slice: string, insert: string) => {
   return null
 }
 
+const boundNeighborhood = (
+  source: string,
+  change: MarkdownProjectionChange,
+  maxBytes: number,
+) => {
+  const pad = Math.min(256, Math.max(32, Math.floor(maxBytes / 4)))
+  let start = Math.max(0, change.from - pad)
+  let end = Math.min(source.length, change.to + pad)
+  while (start > 0 && source[start - 1] !== '\n' && change.from - start < maxBytes) {
+    start -= 1
+  }
+  if (start > 0) {
+    let previous = start - 1
+    while (previous > 0 && source[previous - 1] !== '\n' && start - previous < pad) {
+      previous -= 1
+    }
+    start = previous
+  }
+  while (end < source.length && source[end] !== '\n' && end - change.to < maxBytes) {
+    end += 1
+  }
+  if (end < source.length) end += 1
+  if (end - start > maxBytes) {
+    start = Math.max(0, change.from - Math.floor(maxBytes / 2))
+    end = Math.min(source.length, start + maxBytes)
+  }
+  return { start, end, text: source.slice(start, end) }
+}
+
+const firstCandidateIndex = (
+  nodes: readonly MarkdownStableSyntaxNode[],
+  change: MarkdownProjectionChange,
+  onExamine: () => void,
+) => {
+  let low = 0
+  let high = nodes.length
+  while (low < high) {
+    onExamine()
+    const mid = (low + high) >> 1
+    const node = nodes[mid]
+    if (!node || node.rawRange.end < change.from) {
+      low = mid + 1
+    } else {
+      high = mid
+    }
+  }
+  return low
+}
+
 const mergeRanges = (ranges: readonly MarkdownSourceRange[]) => {
   const ordered = [...ranges].sort((left, right) => left.start - right.start)
   const merged: { start: number; end: number }[] = []
@@ -235,24 +292,60 @@ export const planMarkdownProjectionInvalidation = (
 
   const change = input.change
   const nodes = input.previous.nodes
-  const slice = input.previousSource.slice(change.from, change.to)
-  const scannedBytes = slice.length + change.insert.length
+  const maxScannedBytes = MARKDOWN_PROJECTION_INVALIDATION_BUDGET.maxScannedBytes
+  const maxExaminedNodes = MARKDOWN_PROJECTION_INVALIDATION_BUDGET.maxExaminedNodes
+  const neighborhood = boundNeighborhood(
+    input.previousSource,
+    change,
+    maxScannedBytes,
+  )
+  const insertForBudget =
+    change.insert.length > maxScannedBytes
+      ? change.insert.slice(0, maxScannedBytes)
+      : change.insert
+  const scannedBytes = neighborhood.text.length + insertForBudget.length
   let examinedNodes = 0
+  let capped = change.insert.length > maxScannedBytes
 
   const overlapping: MarkdownStableSyntaxNode[] = []
-  for (const node of nodes) {
+  const firstIndex = firstCandidateIndex(nodes, change, () => {
     examinedNodes += 1
+  })
+  for (
+    let index = firstIndex;
+    index < nodes.length && examinedNodes < maxExaminedNodes;
+    index += 1
+  ) {
+    const node = nodes[index]
+    if (!node) break
+    examinedNodes += 1
+    if (node.rawRange.start > change.to) break
     if (overlapsChange(node.rawRange, change)) overlapping.push(node)
   }
+  if (firstIndex < nodes.length && examinedNodes >= maxExaminedNodes) {
+    const remaining = nodes[Math.min(nodes.length - 1, firstIndex + overlapping.length)]
+    if (remaining && remaining.rawRange.start <= change.to) {
+      capped = true
+    }
+  }
 
-  const textReason = reasonFromChangedText(slice, change.insert)
+  const textReason = reasonFromChangedText(neighborhood.text, insertForBudget)
   const overlappingUnsafe = overlapping.filter((node) => UNSAFE_KINDS.has(node.kind))
-  const openFence = nodes.find(
-    (node) =>
+  let openFence: MarkdownStableSyntaxNode | undefined
+  const fenceScanStart = Math.max(0, nodes.length - 4)
+  for (let index = nodes.length - 1; index >= fenceScanStart; index -= 1) {
+    const node = nodes[index]
+    if (!node) break
+    examinedNodes += 1
+    if (
       (node.kind === 'code' || node.kind === 'mermaid' || node.kind === 'latex') &&
       node.rawRange.end === input.previousSource.length &&
-      node.rawRange.start <= change.from,
-  )
+      node.rawRange.start <= change.from
+    ) {
+      openFence = node
+      break
+    }
+  }
 
   const nextLength =
     input.previousSource.length + change.insert.length - (change.to - change.from)
@@ -284,7 +377,7 @@ export const planMarkdownProjectionInvalidation = (
     invalidateFrom = 0
     invalidateTo = nextLength
   } else if (textReason === 'setext-heading') {
-    const { before } = neighborsOf(nodes, change)
+    const before = firstIndex > 0 ? nodes[firstIndex - 1] : undefined
     reason = 'setext-heading'
     expanded = true
     invalidateFrom = toNextOffset(before?.rawRange.start ?? change.from)
@@ -302,6 +395,11 @@ export const planMarkdownProjectionInvalidation = (
     reason = 'expanded-unsafe'
     expanded = true
     invalidateFrom = toNextOffset(overlappingUnsafe[0]!.rawRange.start)
+    invalidateTo = nextLength
+  } else if (capped) {
+    reason = 'expanded-unsafe'
+    expanded = true
+    invalidateFrom = toNextOffset(overlapping[0]?.rawRange.start ?? change.from)
     invalidateTo = nextLength
   }
 
@@ -378,6 +476,9 @@ export const planMarkdownProjectionInvalidation = (
     budget: Object.freeze({
       scannedBytes,
       examinedNodes,
+      maxScannedBytes,
+      maxExaminedNodes,
+      capped,
     }),
   })
 }
