@@ -1,10 +1,9 @@
 import {
   MARKDOWN_RENDERER_VERSION,
-  detectMarkdownPlaceholders,
   normalizeMarkdownSource,
   resolveMarkdownSourceIdentity,
-  type MarkdownPlaceholderKind,
 } from './markdown'
+import { collectMarkdownSyntaxNodesFromParser } from './markdown-syntax-collect'
 import { createMarkdownSourceCoordinateMap } from './markdown-source-coordinate-map'
 
 export const MARKDOWN_EDITOR_PROJECTION_PARSER = 'fsus-markdown-runtime'
@@ -99,34 +98,6 @@ export const presentationForSyntaxKind = (
   throw new Error(`unregistered markdown editor projection kind: ${kind}`)
 }
 
-const placeholderKindToSyntax = (
-  kind: MarkdownPlaceholderKind,
-): MarkdownEditorRequiredSyntaxKind => {
-  if (kind === 'mermaid_block') {
-    return 'mermaid'
-  }
-  if (kind === 'latex_block' || kind === 'latex_inline') {
-    return 'latex'
-  }
-  throw new Error(`unregistered markdown placeholder kind: ${kind}`)
-}
-
-const normalizedOffsetAtLine = (normalized: string, line: number) => {
-  if (line <= 1) {
-    return 0
-  }
-  let seen = 1
-  for (let index = 0; index < normalized.length; index += 1) {
-    if (normalized[index] === '\n') {
-      seen += 1
-      if (seen === line) {
-        return index + 1
-      }
-    }
-  }
-  return normalized.length
-}
-
 export const createMarkdownEditorProjection = (
   rawSource: string,
 ): MarkdownEditorProjectionResult => {
@@ -137,24 +108,17 @@ export const createMarkdownEditorProjection = (
   }
 
   const sourceIdentity = resolveMarkdownSourceIdentity(rawSource)
-  const placeholders = detectMarkdownPlaceholders(rawSource)
+  const parserNodes = collectMarkdownSyntaxNodesFromParser(rawSource)
   const nodes: MarkdownEditorSyntaxNode[] = []
   const diagnostics: MarkdownEditorProjectionDiagnostic[] = []
 
-  for (const placeholder of placeholders) {
-    const kind = placeholderKindToSyntax(placeholder.kind)
-    const start = normalizedOffsetAtLine(normalizedSource, placeholder.line)
-    const endLine = placeholder.endLine ?? placeholder.line
-    const end = Math.max(
-      start,
-      normalizedOffsetAtLine(normalizedSource, endLine + 1),
-    )
+  for (const node of parserNodes) {
     nodes.push(
       Object.freeze({
-        kind,
-        presentation: presentationForSyntaxKind(kind),
-        normalizedRange: { start, end },
-        rawRange: coordinates.toRawRange({ start, end }),
+        kind: node.kind,
+        presentation: presentationForSyntaxKind(node.kind),
+        normalizedRange: { start: node.start, end: node.end },
+        rawRange: coordinates.toRawRange({ start: node.start, end: node.end }),
       }),
     )
   }

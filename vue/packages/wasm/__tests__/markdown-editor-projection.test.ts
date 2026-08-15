@@ -30,10 +30,27 @@ describe('markdown editor projection contract', () => {
     expect(projection.syntaxCoverage.parser).toBe(projection.identity.parser)
     expect(projection.syntaxCoverage.version).toBe(projection.identity.version)
     expect(projection.syntaxCoverage.kinds).toEqual(MARKDOWN_EDITOR_REQUIRED_SYNTAX_KINDS)
+    expect(projection.nodes.map((node) => node.kind)).toEqual(['heading', 'paragraph'])
   })
 
-  it('maps mermaid/latex placeholders through the #321 coordinate map', () => {
-    const raw = '\uFEFF```mermaid\r\nflowchart LR\r\n```\n\n\\(a^2\\)'
+  it('projects heading, paragraph, list, and table nodes from the C++ parse pass', () => {
+    const raw = '\uFEFF# Title\r\n\nA paragraph.\r\n\n- one\r\n- two\r\n\n| h |\r\n| --- |\r\n| c |\n'
+    const projection = createMarkdownEditorProjection(raw)
+    const kinds = projection.nodes.map((node) => node.kind)
+    expect(kinds).toEqual(['heading', 'paragraph', 'list', 'table'])
+
+    const heading = projection.nodes[0]
+    expect(raw.slice(heading.rawRange.start, heading.rawRange.end)).toContain('# Title')
+    const paragraph = projection.nodes[1]
+    expect(raw.slice(paragraph.rawRange.start, paragraph.rawRange.end)).toContain('A paragraph.')
+    const list = projection.nodes[2]
+    expect(raw.slice(list.rawRange.start, list.rawRange.end)).toContain('- one')
+    const table = projection.nodes[3]
+    expect(raw.slice(table.rawRange.start, table.rawRange.end)).toContain('| h |')
+  })
+
+  it('maps mermaid/latex blocks through the #321 coordinate map', () => {
+    const raw = '\uFEFF```mermaid\r\nflowchart LR\r\n```\n\n$$\na^2\n$$'
     const projection = createMarkdownEditorProjection(raw)
     const kinds = projection.nodes.map((node) => node.kind)
     expect(kinds).toContain('mermaid')

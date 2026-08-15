@@ -1772,6 +1772,363 @@ std::string render_document(std::string_view source, const render_request& reque
   return render_document_v2(source, request, footnote_refs, footnote_defs, reference_defs, true);
 }
 
+struct SourceLine {
+  std::string_view text;
+  std::size_t start;
+  std::size_t end;
+};
+
+bool is_atx_heading_line(std::string_view line) {
+  const std::string_view trimmed = trim_left(line);
+  std::size_t level = 0;
+  while (level < trimmed.size() && trimmed[level] == '#') {
+    ++level;
+  }
+  return level >= 1 && level <= 6 && level < trimmed.size() && trimmed[level] == ' ';
+}
+
+bool is_footnote_definition_line(std::string_view line) {
+  const std::string_view trimmed = trim_left(line);
+  if (!trimmed.starts_with("[^")) {
+    return false;
+  }
+  return trimmed.find("]:") != std::string_view::npos;
+}
+
+bool is_reference_definition_line(std::string_view line) {
+  const std::string_view trimmed = trim_left(line);
+  if (!trimmed.starts_with("[") || trimmed.starts_with("[^")) {
+    return false;
+  }
+  const std::size_t label_end = trimmed.find("]:");
+  if (label_end == std::string_view::npos) {
+    return false;
+  }
+  std::string_view destination = trim_left(trimmed.substr(label_end + 2));
+  return !normalize_reference_label(trimmed.substr(1, label_end - 1)).empty() &&
+    !destination.empty();
+}
+
+std::size_t exclusive_line_end(std::string_view source, const SourceLine& line) {
+  if (line.end < source.size()) {
+    return line.end + 1;
+  }
+  return line.end;
+}
+
+std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
+  std::vector<SourceLine> raw_lines;
+  std::size_t line_start = 0;
+  while (line_start <= source.size()) {
+    const std::size_t line_end = source.find('\n', line_start);
+    if (line_end == std::string_view::npos) {
+      raw_lines.push_back({source.substr(line_start), line_start, source.size()});
+      break;
+    }
+    raw_lines.push_back({
+      source.substr(line_start, line_end - line_start),
+      line_start,
+      line_end,
+    });
+    line_start = line_end + 1;
+  }
+
+  std::vector<SourceLine> lines;
+  lines.reserve(raw_lines.size());
+  for (const auto& line : raw_lines) {
+    if (is_footnote_definition_line(line.text) || is_reference_definition_line(line.text)) {
+      continue;
+    }
+    lines.push_back(line);
+  }
+
+  std::vector<syntax_node> nodes;
+  std::size_t paragraph_start = 0;
+  bool in_paragraph = false;
+  std::size_t list_start = 0;
+  std::size_t list_end = 0;
+  bool in_list = false;
+  bool list_is_task = false;
+  bool in_code_block = false;
+  std::size_t code_start = 0;
+  char fence_char = '`';
+  std::string_view fence_lang;
+  bool in_latex_block = false;
+  std::size_t latex_start = 0;
+
+  auto flush_paragraph = [&](std::size_t end_offset) {
+    if (!in_paragraph) {
+      return;
+    }
+    nodes.push_back({syntax_kind::paragraph, paragraph_start, end_offset});
+    in_paragraph = false;
+  };
+
+  auto flush_list = [&]() {
+    if (!in_list) {
+      return;
+    }
+    nodes.push_back({
+      list_is_task ? syntax_kind::task : syntax_kind::list,
+      list_start,
+      list_end,
+    });
+    in_list = false;
+    list_is_task = false;
+  };
+
+  auto start_paragraph = [&](std::size_t start_offset) {
+    if (!in_paragraph) {
+      paragraph_start = start_offset;
+      in_paragraph = true;
+    }
+  };
+
+  auto append_list_item = [&](const SourceLine& line, bool task_item) {
+    if (!in_list) {
+      list_start = line.start;
+      list_is_task = task_item;
+      in_list = true;
+    } else if (task_item) {
+      list_is_task = true;
+    }
+    list_end = exclusive_line_end(source, line);
+  };
+
+  for (std::size_t index = 0; index < lines.size(); ++index) {
+    const SourceLine& line = lines[index];
+    const std::string_view trimmed = trim(line.text);
+
+    if (in_code_block) {
+      if (parse_fence_end(line.text, fence_char)) {
+        in_code_block = false;
+        const syntax_kind kind = trim(fence_lang) == "mermaid"
+          ? syntax_kind::mermaid
+          : syntax_kind::code;
+        nodes.push_back({kind, code_start, exclusive_line_end(source, line)});
+      }
+      continue;
+    }
+
+    if (in_latex_block) {
+      if (trimmed == "$$") {
+        in_latex_block = false;
+        nodes.push_back({syntax_kind::latex, latex_start, exclusive_line_end(source, line)});
+      }
+      continue;
+    }
+
+    if (trimmed.empty()) {
+      flush_paragraph(line.start);
+      flush_list();
+      continue;
+    }
+
+    if (is_paragraph_group_start(line.text)) {
+      flush_paragraph(line.start);
+      flush_list();
+      std::size_t group_index = index + 1;
+      std::size_t depth = 1;
+      while (group_index < lines.size()) {
+        if (is_paragraph_group_start(lines[group_index].text)) {
+          ++depth;
+        } else if (is_paragraph_group_end(lines[group_index].text)) {
+          --depth;
+          if (depth == 0) {
+            break;
+          }
+        }
+        ++group_index;
+      }
+      if (group_index < lines.size() && depth == 0) {
+        nodes.push_back({
+          syntax_kind::explicit_paragraph,
+          line.start,
+          exclusive_line_end(source, lines[group_index]),
+        });
+        index = group_index;
+        continue;
+      }
+    }
+
+    if (!trimmed.empty() && trimmed.front() == '>') {
+      flush_paragraph(line.start);
+      flush_list();
+      std::size_t quote_index = index;
+      while (quote_index < lines.size()) {
+        const std::string_view quote_trimmed = trim_left(lines[quote_index].text);
+        if (quote_trimmed.empty() || quote_trimmed.front() != '>') {
+          break;
+        }
+        ++quote_index;
+      }
+      if (quote_index > index) {
+        nodes.push_back({
+          syntax_kind::quote,
+          line.start,
+          exclusive_line_end(source, lines[quote_index - 1]),
+        });
+        index = quote_index - 1;
+      }
+      continue;
+    }
+
+    if (is_horizontal_rule(line.text)) {
+      flush_paragraph(line.start);
+      flush_list();
+      continue;
+    }
+
+    if (index + 1 < lines.size()) {
+      const int setext_level = parse_setext_heading_level(lines[index + 1].text);
+      char setext_fence_char = '\0';
+      std::string_view setext_fence_lang;
+      if (
+        setext_level > 0 &&
+        !trimmed.empty() &&
+        trimmed.front() != '>' &&
+        !parse_fence_start(line.text, setext_fence_char, setext_fence_lang)
+      ) {
+        flush_paragraph(line.start);
+        flush_list();
+        nodes.push_back({
+          syntax_kind::heading,
+          line.start,
+          exclusive_line_end(source, lines[index + 1]),
+        });
+        ++index;
+        continue;
+      }
+    }
+
+    if (trimmed.front() == '#' && is_atx_heading_line(line.text)) {
+      flush_paragraph(line.start);
+      flush_list();
+      nodes.push_back({syntax_kind::heading, line.start, exclusive_line_end(source, line)});
+      continue;
+    }
+
+    if (parse_fence_start(line.text, fence_char, fence_lang)) {
+      flush_paragraph(line.start);
+      flush_list();
+      in_code_block = true;
+      code_start = line.start;
+      continue;
+    }
+
+    if (is_indented_code_line(line.text)) {
+      flush_paragraph(line.start);
+      flush_list();
+      std::size_t code_index = index;
+      while (code_index < lines.size()) {
+        if (trim(lines[code_index].text).empty()) {
+          ++code_index;
+          continue;
+        }
+        if (!is_indented_code_line(lines[code_index].text)) {
+          break;
+        }
+        ++code_index;
+      }
+      nodes.push_back({
+        syntax_kind::code,
+        line.start,
+        exclusive_line_end(source, lines[code_index > index ? code_index - 1 : index]),
+      });
+      index = code_index > 0 ? code_index - 1 : index;
+      continue;
+    }
+
+    if (trimmed.starts_with(":::mermaid")) {
+      flush_paragraph(line.start);
+      flush_list();
+      std::size_t mermaid_index = index + 1;
+      while (mermaid_index < lines.size() && trim(lines[mermaid_index].text) != ":::") {
+        ++mermaid_index;
+      }
+      const SourceLine& last = mermaid_index < lines.size() ? lines[mermaid_index] : line;
+      nodes.push_back({syntax_kind::mermaid, line.start, exclusive_line_end(source, last)});
+      index = mermaid_index < lines.size() ? mermaid_index : index;
+      continue;
+    }
+
+    if (trimmed.starts_with("$$")) {
+      flush_paragraph(line.start);
+      flush_list();
+      if (trimmed.size() > 4 && trimmed.ends_with("$$")) {
+        nodes.push_back({syntax_kind::latex, line.start, exclusive_line_end(source, line)});
+      } else {
+        in_latex_block = true;
+        latex_start = line.start;
+      }
+      continue;
+    }
+
+    if (index + 1 < lines.size() && trimmed.find('|') != std::string_view::npos) {
+      std::vector<std::string_view> views;
+      views.reserve(lines.size());
+      for (const auto& item : lines) {
+        views.push_back(item.text);
+      }
+      std::vector<table_alignment> alignments;
+      const std::size_t separator = find_next_non_empty_line(views, index + 1);
+      if (
+        separator != std::string_view::npos &&
+        parse_table_separator_row(trim(lines[separator].text), alignments)
+      ) {
+        flush_paragraph(line.start);
+        flush_list();
+        std::size_t cursor = separator + 1;
+        while (cursor < lines.size()) {
+          std::string_view row = trim(lines[cursor].text);
+          if (row.empty()) {
+            break;
+          }
+          std::vector<table_alignment> row_alignments;
+          if (row.find('|') == std::string_view::npos || parse_table_separator_row(row, row_alignments)) {
+            break;
+          }
+          ++cursor;
+        }
+        const std::size_t last_index = cursor > index ? cursor - 1 : index;
+        nodes.push_back({
+          syntax_kind::table,
+          line.start,
+          exclusive_line_end(source, lines[last_index]),
+        });
+        index = last_index;
+        continue;
+      }
+    }
+
+    std::string_view list_item;
+    if (parse_unordered_list_item(line.text, list_item) || parse_ordered_list_item(line.text, list_item)) {
+      flush_paragraph(line.start);
+      bool checked = false;
+      std::string_view task_content;
+      append_list_item(line, parse_task_list_marker(list_item, checked, task_content));
+      continue;
+    }
+
+    flush_list();
+    start_paragraph(line.start);
+  }
+
+  if (in_code_block) {
+    nodes.push_back({
+      trim(fence_lang) == "mermaid" ? syntax_kind::mermaid : syntax_kind::code,
+      code_start,
+      source.size(),
+    });
+  }
+  if (in_latex_block) {
+    nodes.push_back({syntax_kind::latex, latex_start, source.size()});
+  }
+  flush_paragraph(source.size());
+  flush_list();
+  return nodes;
+}
+
 } // namespace
 
 std::string normalize_source(std::string_view input) {
@@ -1996,6 +2353,30 @@ std::vector<placeholder> collect_placeholders(std::string_view source) {
   return placeholders;
 }
 
+std::string_view syntax_kind_name(syntax_kind kind) {
+  switch (kind) {
+    case syntax_kind::heading: return "heading";
+    case syntax_kind::paragraph: return "paragraph";
+    case syntax_kind::list: return "list";
+    case syntax_kind::task: return "task";
+    case syntax_kind::quote: return "quote";
+    case syntax_kind::table: return "table";
+    case syntax_kind::link: return "link";
+    case syntax_kind::image: return "image";
+    case syntax_kind::code: return "code";
+    case syntax_kind::latex: return "latex";
+    case syntax_kind::mermaid: return "mermaid";
+    case syntax_kind::footnote: return "footnote";
+    case syntax_kind::explicit_paragraph: return "explicit-paragraph";
+    case syntax_kind::malformed: return "malformed";
+  }
+  return "malformed";
+}
+
+std::vector<syntax_node> collect_syntax_nodes(std::string_view source) {
+  return collect_syntax_nodes_impl(source);
+}
+
 std::size_t count_placeholders(std::string_view source) {
   std::size_t placeholder_count = 0;
   std::size_t line_start = 0;
@@ -2065,6 +2446,7 @@ render_result build_render_result(const render_request& request) {
   fill_feature_metadata(result, request, normalized);
 
   result.placeholders = collect_placeholders(normalized);
+  result.syntax_nodes = collect_syntax_nodes(normalized);
   result.metadata.placeholder_count = result.placeholders.size();
   result.html = render_document(normalized, request);
   return result;
