@@ -334,4 +334,45 @@ describe('markdown source/syntax/visual anchor map', () => {
     expect(snapped.offset).toBe(boundary.start)
     expect(snapped.offset).not.toBe(midEmoji)
   })
+
+  it('round-trips mixed LTR/RTL selections in source order, not bidi display order', () => {
+    const source = 'Hello \u05e9\u05dc\u05d5\u05dd (world) \u0645\u0631\u062d\u0628\u0627'
+    const map = createMarkdownAnchorMap({
+      identity: 'rtl-doc',
+      source,
+      syntax: [
+        { id: 'hello', range: [0, 6] },
+        { id: 'hebrew', range: [6, 10] },
+        { id: 'arabic', range: [19, source.length] },
+      ],
+    })
+    const hebrewStart = source.indexOf('\u05e9')
+    const hebrewEnd = hebrewStart + 4
+    const arabicStart = source.indexOf('\u0645')
+    const selections = [
+      { anchor: hebrewStart, focus: hebrewEnd },
+      { anchor: hebrewEnd, focus: hebrewStart },
+      { anchor: 0, focus: arabicStart },
+      { anchor: arabicStart, focus: source.length },
+    ] as const
+    for (const selection of selections) {
+      const visual = map.sourceSelectionToVisual(selection)
+      expect(map.visualAnchorToSourceSelection(visual)).toEqual(selection)
+    }
+    const hebrewVisual = map.sourceSelectionToVisual({
+      anchor: hebrewStart,
+      focus: hebrewEnd,
+    })
+    expect(hebrewVisual.anchor.sourceOffset).toBe(hebrewStart)
+    expect(hebrewVisual.focus.sourceOffset).toBe(hebrewEnd)
+    expect(hebrewVisual.anchor.sourceOffset).not.toBe(
+      [...source].reverse().join('').indexOf('\u05dd'),
+    )
+    expect(
+      map.visualPointToSource({ anchorId: 'hebrew', point: 'start' }).offset,
+    ).toBe(hebrewStart)
+    expect(
+      map.visualPointToSource({ anchorId: 'hebrew', point: 'start' }).offset,
+    ).not.toBe(source.indexOf('Hello'))
+  })
 })
