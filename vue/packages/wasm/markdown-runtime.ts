@@ -82,6 +82,19 @@ export {
   type MarkdownSourceUtf8Offset,
 } from './markdown-source-coordinate-map'
 export {
+  compareMarkdownSourceCoordinateMapThreads,
+  createMarkdownSourceCoordinateMapOnWorker,
+  evaluateMarkdownSourceCoordinateMutations,
+  markdownSourceCoordinateSnapshotsEquivalent,
+  snapshotMarkdownSourceCoordinateMap,
+  transferMarkdownSourceCoordinateMap,
+  type MarkdownSourceCoordinateMutationKind,
+  type MarkdownSourceCoordinateMutationReport,
+  type MarkdownSourceCoordinateMutationResult,
+  type MarkdownSourceCoordinateSnapshot,
+  type MarkdownSourceCoordinateThreadComparison,
+} from './markdown-source-coordinate-threads'
+export {
   stabilizeMarkdownEditorProjection,
   type MarkdownDocumentIdentity,
   type MarkdownStableProjection,
