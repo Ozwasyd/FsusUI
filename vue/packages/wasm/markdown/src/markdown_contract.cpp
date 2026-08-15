@@ -1816,6 +1816,211 @@ std::size_t exclusive_line_end(std::string_view source, const SourceLine& line) 
   return line.end;
 }
 
+bool skip_inline_code_span(std::string_view text, std::size_t index, std::size_t& next_index) {
+  std::string ignored;
+  return try_render_code_span(text, index, ignored, next_index);
+}
+
+bool skip_inline_latex(std::string_view text, std::size_t index, std::size_t& next_index) {
+  if (index + 1 >= text.size() || text[index] != '\\') {
+    return false;
+  }
+  if (text[index + 1] != '(' && text[index + 1] != '[') {
+    return false;
+  }
+  const std::string_view needle = text[index + 1] == '(' ? std::string_view{"\\)"} : std::string_view{"\\]"};
+  const std::size_t close = text.find(needle, index + 2);
+  if (close == std::string_view::npos) {
+    return false;
+  }
+  next_index = close + 2;
+  return true;
+}
+
+bool match_autolink(std::string_view text, std::size_t index, std::size_t& end_offset) {
+  if (index >= text.size() || text[index] != '<') {
+    return false;
+  }
+  const std::size_t close = text.find('>', index + 1);
+  if (close == std::string_view::npos) {
+    return false;
+  }
+  const std::string_view target = text.substr(index + 1, close - index - 1);
+  const std::string lower = to_lower_ascii(target);
+  const bool is_autolink = lower.starts_with("http://")
+    || lower.starts_with("https://")
+    || lower.starts_with("mailto:");
+  const bool is_email = target.find('@') != std::string_view::npos
+    && target.find(' ') == std::string_view::npos
+    && target.find(':') == std::string_view::npos;
+  if (!is_autolink && !is_email) {
+    return false;
+  }
+  end_offset = close + 1;
+  return true;
+}
+
+bool match_footnote_ref(std::string_view text, std::size_t index, std::size_t& end_offset) {
+  if (index + 1 >= text.size() || text[index] != '[' || text[index + 1] != '^') {
+    return false;
+  }
+  const std::size_t label_end = text.find(']', index + 2);
+  if (label_end == std::string_view::npos || label_end == index + 2) {
+    return false;
+  }
+  end_offset = label_end + 1;
+  return true;
+}
+
+bool match_bracket_destination(std::string_view text, std::size_t label_end, std::size_t& end_offset) {
+  if (label_end + 1 >= text.size()) {
+    return false;
+  }
+  if (text[label_end + 1] == '(') {
+    const std::size_t url_end = text.find(')', label_end + 2);
+    if (url_end == std::string_view::npos) {
+      return false;
+    }
+    end_offset = url_end + 1;
+    return true;
+  }
+  if (text[label_end + 1] == '[') {
+    const std::size_t ref_end = text.find(']', label_end + 2);
+    if (ref_end == std::string_view::npos) {
+      return false;
+    }
+    end_offset = ref_end + 1;
+    return true;
+  }
+  return false;
+}
+
+bool unclosed_bracket_destination(std::string_view text, std::size_t label_end) {
+  return label_end + 1 < text.size()
+    && text[label_end + 1] == '('
+    && text.find(')', label_end + 2) == std::string_view::npos;
+}
+
+bool match_image(std::string_view text, std::size_t index, std::size_t& end_offset) {
+  if (index + 1 >= text.size() || text[index] != '!' || text[index + 1] != '[') {
+    return false;
+  }
+  const std::size_t label_end = text.find(']', index + 2);
+  if (label_end == std::string_view::npos) {
+    return false;
+  }
+  return match_bracket_destination(text, label_end, end_offset);
+}
+
+bool match_inline_link(std::string_view text, std::size_t index, std::size_t& end_offset) {
+  if (index >= text.size() || text[index] != '[' || (index + 1 < text.size() && text[index + 1] == '^')) {
+    return false;
+  }
+  const std::size_t label_end = text.find(']', index + 1);
+  if (label_end == std::string_view::npos) {
+    return false;
+  }
+  return match_bracket_destination(text, label_end, end_offset);
+}
+
+void scan_inline_syntax(
+  std::string_view source,
+  std::size_t start,
+  std::size_t end,
+  std::vector<syntax_node>& nodes
+) {
+  if (end > source.size()) {
+    end = source.size();
+  }
+  if (start >= end) {
+    return;
+  }
+
+  const std::string_view text = source.substr(start, end - start);
+  std::size_t index = 0;
+  while (index < text.size()) {
+    const char ch = text[index];
+    std::size_t next_index = index;
+
+    if (skip_inline_latex(text, index, next_index)) {
+      index = next_index;
+      continue;
+    }
+
+    if (ch == '\\' && index + 1 < text.size()) {
+      index += 2;
+      continue;
+    }
+
+    if (ch == '`' && skip_inline_code_span(text, index, next_index)) {
+      index = next_index;
+      continue;
+    }
+
+    if (match_autolink(text, index, next_index)) {
+      nodes.push_back({syntax_kind::link, start + index, start + next_index});
+      index = next_index;
+      continue;
+    }
+
+    if (match_footnote_ref(text, index, next_index)) {
+      nodes.push_back({syntax_kind::footnote, start + index, start + next_index});
+      index = next_index;
+      continue;
+    }
+
+    if (ch == '[' && index + 1 < text.size() && text[index + 1] == '^') {
+      nodes.push_back({syntax_kind::malformed, start + index, start + text.size()});
+      break;
+    }
+
+    if (match_image(text, index, next_index)) {
+      nodes.push_back({syntax_kind::image, start + index, start + next_index});
+      index = next_index;
+      continue;
+    }
+
+    if (ch == '!' && index + 1 < text.size() && text[index + 1] == '[') {
+      const std::size_t label_end = text.find(']', index + 2);
+      if (label_end == std::string_view::npos || unclosed_bracket_destination(text, label_end)) {
+        nodes.push_back({syntax_kind::malformed, start + index, start + text.size()});
+        break;
+      }
+    }
+
+    if (match_inline_link(text, index, next_index)) {
+      nodes.push_back({syntax_kind::link, start + index, start + next_index});
+      index = next_index;
+      continue;
+    }
+
+    if (ch == '[') {
+      const std::size_t label_end = text.find(']', index + 1);
+      if (label_end != std::string_view::npos && unclosed_bracket_destination(text, label_end)) {
+        nodes.push_back({syntax_kind::malformed, start + index, start + text.size()});
+        break;
+      }
+    }
+
+    ++index;
+  }
+}
+
+bool is_inline_bearing_kind(syntax_kind kind) {
+  switch (kind) {
+    case syntax_kind::heading:
+    case syntax_kind::paragraph:
+    case syntax_kind::list:
+    case syntax_kind::task:
+    case syntax_kind::quote:
+    case syntax_kind::table:
+    case syntax_kind::explicit_paragraph:
+      return true;
+    default:
+      return false;
+  }
+}
+
 std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
   std::vector<SourceLine> raw_lines;
   std::size_t line_start = 0;
@@ -1833,16 +2038,23 @@ std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
     line_start = line_end + 1;
   }
 
+  std::vector<syntax_node> nodes;
   std::vector<SourceLine> lines;
   lines.reserve(raw_lines.size());
   for (const auto& line : raw_lines) {
-    if (is_footnote_definition_line(line.text) || is_reference_definition_line(line.text)) {
+    if (is_footnote_definition_line(line.text)) {
+      nodes.push_back({
+        syntax_kind::footnote,
+        line.start,
+        exclusive_line_end(source, line),
+      });
+      continue;
+    }
+    if (is_reference_definition_line(line.text)) {
       continue;
     }
     lines.push_back(line);
   }
-
-  std::vector<syntax_node> nodes;
   std::size_t paragraph_start = 0;
   bool in_paragraph = false;
   std::size_t list_start = 0;
@@ -1949,6 +2161,12 @@ std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
         index = group_index;
         continue;
       }
+      nodes.push_back({
+        syntax_kind::malformed,
+        line.start,
+        exclusive_line_end(source, line),
+      });
+      continue;
     }
 
     if (!trimmed.empty() && trimmed.front() == '>') {
@@ -2126,6 +2344,23 @@ std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
   }
   flush_paragraph(source.size());
   flush_list();
+
+  const std::vector<syntax_node> blocks = nodes;
+  for (const auto& block : blocks) {
+    if (is_inline_bearing_kind(block.kind)) {
+      scan_inline_syntax(source, block.start_offset, block.end_offset, nodes);
+    }
+  }
+
+  std::sort(nodes.begin(), nodes.end(), [](const syntax_node& left, const syntax_node& right) {
+    if (left.start_offset != right.start_offset) {
+      return left.start_offset < right.start_offset;
+    }
+    if (left.end_offset != right.end_offset) {
+      return left.end_offset > right.end_offset;
+    }
+    return static_cast<int>(left.kind) < static_cast<int>(right.kind);
+  });
   return nodes;
 }
 
