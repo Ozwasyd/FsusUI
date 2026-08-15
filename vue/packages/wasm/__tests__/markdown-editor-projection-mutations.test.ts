@@ -19,6 +19,10 @@ describe('markdown editor projection mutation fixtures', () => {
     expect(markdownProjectionHasCompleteCoverage(report.authority)).toBe(true)
     expect(byKind['html-dom-reverse']?.equivalent).toBe(false)
     expect(byKind['html-dom-reverse']?.accepted).toBe(false)
+    expect(byKind['html-innerhtml-reverse']?.equivalent).toBe(false)
+    expect(byKind['html-innerhtml-reverse']?.accepted).toBe(false)
+    expect(byKind['dom-path-reverse']?.equivalent).toBe(false)
+    expect(byKind['dom-path-reverse']?.accepted).toBe(false)
     expect(byKind['second-parser-regex']?.equivalent).toBe(false)
     expect(byKind['second-parser-regex']?.accepted).toBe(false)
     expect(byKind['missing-syntax-coverage']?.accepted).toBe(false)
@@ -57,5 +61,66 @@ describe('markdown editor projection mutation fixtures', () => {
     expect(createMarkdownEditorProjection(raw).nodes.map((node) => node.kind)).toEqual(
       report.authority.nodes.map((node) => node.kind),
     )
+  })
+
+  it('rejects innerHTML offsets and DOM-path reverse engineering', () => {
+    const raw = [
+      '# Title',
+      '',
+      '- Title',
+      '',
+      '> Title',
+      '',
+      '| Title | Title |',
+      '| ----- | ----- |',
+      '| Title | Title |',
+      '',
+      '[same](a) and [same](b)',
+      '',
+      'Not \\[escaped](no)',
+    ].join('\n')
+    const report = evaluateMarkdownProjectionMutations(raw)
+    const byKind = Object.fromEntries(
+      report.mutations.map((mutation) => [mutation.kind, mutation]),
+    )
+    const headings = report.authority.nodes.filter((node) => node.kind === 'heading')
+    const lists = report.authority.nodes.filter((node) => node.kind === 'list')
+    const quotes = report.authority.nodes.filter((node) => node.kind === 'quote')
+    const tables = report.authority.nodes.filter((node) => node.kind === 'table')
+    const links = report.authority.nodes.filter((node) => node.kind === 'link')
+
+    expect(headings.length).toBeGreaterThan(0)
+    expect(lists.length).toBeGreaterThan(0)
+    expect(quotes.length).toBeGreaterThan(0)
+    expect(tables.length).toBeGreaterThan(0)
+    expect(links).toHaveLength(2)
+    expect(raw.slice(headings[0]!.rawRange.start, headings[0]!.rawRange.end)).toContain(
+      '# Title',
+    )
+    expect(raw.slice(lists[0]!.rawRange.start, lists[0]!.rawRange.end)).toContain(
+      '- Title',
+    )
+    expect(headings[0]!.rawRange.start).not.toBe(lists[0]!.rawRange.start)
+    expect(links[0]!.rawRange.start).not.toBe(links[1]!.rawRange.start)
+    expect(
+      report.authority.nodes.some(
+        (node) =>
+          node.kind === 'link' &&
+          raw.slice(node.rawRange.start, node.rawRange.end).includes('escaped'),
+      ),
+    ).toBe(false)
+
+    expect(byKind['html-innerhtml-reverse']?.equivalent).toBe(false)
+    expect(byKind['html-innerhtml-reverse']?.accepted).toBe(false)
+    expect(byKind['dom-path-reverse']?.equivalent).toBe(false)
+    expect(byKind['dom-path-reverse']?.accepted).toBe(false)
+    expect(byKind['html-dom-reverse']?.accepted).toBe(false)
+    expect(
+      report.mutations.every(
+        (mutation) =>
+          mutation.kind === 'missing-syntax-coverage' ||
+          mutation.equivalent === false,
+      ),
+    ).toBe(true)
   })
 })
