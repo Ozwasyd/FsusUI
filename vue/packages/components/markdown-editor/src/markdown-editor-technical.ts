@@ -254,6 +254,24 @@ const partitionRanges = (
   const bom = slice.startsWith('\uFEFF') ? 1 : 0
   const indent = leadingIndent(slice, bom)
 
+  if (node.kind === 'latex' && (slice.startsWith('\\(', indent) || slice.startsWith('\\[', indent))) {
+    const openEnd = indent + 2
+    const closer = slice.startsWith('\\(', indent) ? '\\)' : '\\]'
+    const closeAt = slice.indexOf(closer, openEnd)
+    const closed = closeAt !== -1
+    const bodyEnd = closed ? start + closeAt : end
+    return Object.freeze({
+      body: mappedRange(coordinates, start + openEnd, bodyEnd),
+      closed,
+      closing: closed
+        ? mappedRange(coordinates, start + closeAt, start + closeAt + 2)
+        : emptyMapped(coordinates, end),
+      info: emptyMapped(coordinates, start + openEnd),
+      infoText: '',
+      opening: mappedRange(coordinates, start + indent, start + openEnd),
+    })
+  }
+
   if (node.kind === 'latex' && slice.startsWith('$$', indent)) {
     const openEnd = indent + 2
     const firstBreak = lineBreakAt(slice, openEnd)
