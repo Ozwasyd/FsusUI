@@ -6,6 +6,7 @@ export {
   createMarkdownEditorProjection,
   MARKDOWN_EDITOR_REQUIRED_SYNTAX_KINDS,
   presentationForSyntaxKind,
+  stabilizeMarkdownEditorProjection,
   createMarkdownSourceCoordinateMap,
   MARKDOWN_EDITOR_PROJECTION_PARSER,
   renderMarkdownFallbackWithRuntime,
@@ -23,6 +24,7 @@ export {
 } from '@element-plus/wasm'
 
 export type {
+  MarkdownDocumentIdentity,
   MarkdownEditorPresentation,
   MarkdownEditorProjectionDiagnostic,
   MarkdownEditorProjectionIdentity,
@@ -60,6 +62,9 @@ export type {
   MarkdownRuntimeProfilePhase,
   MarkdownRuntimeRenderResult,
   MarkdownRuntimeSummaryResult,
+  MarkdownStableProjection,
+  MarkdownStableSyntaxNode,
+  MarkdownSyntaxIdentityStatus,
   MarkdownSourceAffinity,
   MarkdownSourceCoordinateMap,
   MarkdownSourceGraphemeBoundary,
