@@ -987,6 +987,48 @@ describe('MarkdownEditor', () => {
     expect(element.value).toBe('intro ***nested*** tail')
   })
 
+  it('snaps live caret around atomic images and deletes them through the shared primitive', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        mode: 'live',
+        modelValue: 'go ![alt](img.png) on',
+      },
+    })
+    const textarea = wrapper.find('textarea')
+    const element = textarea.element as HTMLTextAreaElement
+    const image = 'go ![alt](img.png) on'.indexOf('!')
+    element.setSelectionRange(image, image)
+    await textarea.trigger('keydown', { key: 'ArrowRight' })
+    expect(element.selectionStart).toBe('go ![alt](img.png)'.length)
+    expect(wrapper.find('[data-markdown-atomic-kind]').attributes(
+      'data-markdown-atomic-kind',
+    )).toBe('image')
+    await textarea.trigger('keydown', { key: 'Backspace' })
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe('go  on')
+  })
+
+  it('keeps selection direction when switching live to source', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        mode: 'live',
+        modelValue: 'keep this range',
+      },
+    })
+    const textarea = wrapper.find('textarea')
+    const element = textarea.element as HTMLTextAreaElement
+    element.setSelectionRange(0, 4, 'forward')
+    await textarea.trigger('select')
+    const sourceTab = wrapper
+      .findAll('[role="tab"]')
+      .find((button) => button.text() === '源码')
+    expect(sourceTab).toBeTruthy()
+    await sourceTab!.trigger('click')
+    await nextTick()
+    expect(element.selectionStart).toBe(0)
+    expect(element.selectionEnd).toBe(4)
+    expect(element.selectionDirection).toBe('forward')
+  })
+
   it('keeps the editable surface and its selection when chrome changes', async () => {
     const wrapper = mount(MarkdownEditor, {
       props: {

@@ -42,6 +42,12 @@ hide do not write source, history, or selection. Nested emphasis/link/code
 prefer the innermost marker range. Composition freezes structural reveal
 changes. Esc returns focus without editing.
 
+`roundTripMarkdownLiveSelection` and `resolveMarkdownAtomicNodeIntent` are the
+#335 source↔visual selection and generic atomic primitive. All mapping goes
+through `createMarkdownAnchorMap`. Image, table, code, Mermaid, LaTeX,
+footnote, and attachment share one before/after/source/copy/delete/focus path.
+Atomic visuals are not Tab traps and are not source/history authority.
+
 ## Acceptance gate
 
 `evaluateMarkdownInputAcceptance` composes the four planners and rejects

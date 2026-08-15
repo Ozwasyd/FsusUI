@@ -73,6 +73,26 @@ export {
   type MarkdownLiveRevealTarget,
 } from './markdown-editor-live-reveal'
 export {
+  MARKDOWN_ATOMIC_NODE_KINDS,
+  MARKDOWN_LIVE_SELECTION_MOTIONS,
+  createMarkdownLiveAnchorMap,
+  evaluateMarkdownLiveSelectionMutations,
+  resolveMarkdownAtomicNodeIntent,
+  resolveMarkdownLiveSelectionMotion,
+  retainMarkdownLiveSelection,
+  roundTripMarkdownLiveSelection,
+  type MarkdownAtomicAccessibility,
+  type MarkdownAtomicNodeAction,
+  type MarkdownAtomicNodeKind,
+  type MarkdownAtomicNodePhase,
+  type MarkdownAtomicNodePlan,
+  type MarkdownAtomicNodeSession,
+  type MarkdownAtomicNodeStatus,
+  type MarkdownLiveSelectionMotion,
+  type MarkdownLiveSelectionMutationKind,
+  type MarkdownLiveSelectionPlan,
+} from './markdown-editor-live-selection'
+export {
   MARKDOWN_BLOCK_INPUT_CONTEXTS,
   MARKDOWN_BLOCK_INPUT_KEYS,
   MARKDOWN_BLOCK_INPUT_POSITIONS,
