@@ -54,6 +54,12 @@ are the #336 source-anchored caret/viewport plan. Height changes restore from
 Stale feature results do not commit. Ordinary input stays inside a numeric
 mounted-node budget and does not remount the full visual tree.
 
+`resolveMarkdownTechnicalNode` and `createMarkdownTechnicalFeatureRequest`
+are the #382 shared contract for fenced code, Mermaid, and LaTeX. Ranges
+come from the projection node, not a second fence regex. Feature output
+must use the unique gateway. Local errors keep source and reveal an exact
+range. Height and atomic actions reuse #335/#336.
+
 ## Acceptance gate
 
 `evaluateMarkdownInputAcceptance` composes the four planners and rejects

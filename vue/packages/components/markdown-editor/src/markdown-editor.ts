@@ -73,6 +73,28 @@ export {
   type MarkdownLiveRevealTarget,
 } from './markdown-editor-live-reveal'
 export {
+  MARKDOWN_TECHNICAL_NODE_KINDS,
+  MARKDOWN_TECHNICAL_STATES,
+  commitMarkdownTechnicalFeatureResult,
+  createMarkdownTechnicalFeatureRequest,
+  evaluateMarkdownTechnicalMutations,
+  resolveMarkdownTechnicalAtomic,
+  resolveMarkdownTechnicalDiagnostic,
+  resolveMarkdownTechnicalHeight,
+  resolveMarkdownTechnicalNode,
+  type MarkdownTechnicalDiagnostic,
+  type MarkdownTechnicalFeatureCommit,
+  type MarkdownTechnicalFeatureKind,
+  type MarkdownTechnicalFeatureOutput,
+  type MarkdownTechnicalFeatureRequest,
+  type MarkdownTechnicalMappedRange,
+  type MarkdownTechnicalMutationKind,
+  type MarkdownTechnicalNodeKind,
+  type MarkdownTechnicalNodePlan,
+  type MarkdownTechnicalNodeState,
+  type MarkdownTechnicalRanges,
+} from './markdown-editor-technical'
+export {
   MARKDOWN_LIVE_LAYOUT_BUDGET,
   MARKDOWN_LIVE_LAYOUT_GESTURES,
   MARKDOWN_LIVE_LAYOUT_TRIGGERS,
