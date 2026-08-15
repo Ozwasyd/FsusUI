@@ -61,6 +61,70 @@ describe('markdown editor projection contract', () => {
     }
   })
 
+  it('projects link, image, footnote, and malformed nodes from the C++ parse pass', () => {
+    const raw =
+      '\uFEFFSee [docs](https://x.test) and ![alt](img.png) and a note.[^n]\r\n\n[^n]: footnote body\n\n[broken](http://x\n'
+    const projection = createMarkdownEditorProjection(raw)
+    const kinds = projection.nodes.map((node) => node.kind)
+    expect(kinds).toContain('paragraph')
+    expect(kinds).toContain('link')
+    expect(kinds).toContain('image')
+    expect(kinds).toContain('footnote')
+    expect(kinds).toContain('malformed')
+
+    const link = projection.nodes.find((node) => node.kind === 'link')
+    const image = projection.nodes.find((node) => node.kind === 'image')
+    const footnoteRef = projection.nodes.find(
+      (node) =>
+        node.kind === 'footnote' &&
+        raw.slice(node.rawRange.start, node.rawRange.end) === '[^n]',
+    )
+    const footnoteDef = projection.nodes.find(
+      (node) =>
+        node.kind === 'footnote' &&
+        raw.slice(node.rawRange.start, node.rawRange.end).includes('[^n]:'),
+    )
+    const malformed = projection.nodes.find((node) => node.kind === 'malformed')
+    expect(link).toBeDefined()
+    expect(image).toBeDefined()
+    expect(footnoteRef).toBeDefined()
+    expect(footnoteDef).toBeDefined()
+    expect(malformed).toBeDefined()
+    expect(raw.slice(link!.rawRange.start, link!.rawRange.end)).toBe(
+      '[docs](https://x.test)',
+    )
+    expect(raw.slice(image!.rawRange.start, image!.rawRange.end)).toBe(
+      '![alt](img.png)',
+    )
+    expect(raw.slice(malformed!.rawRange.start, malformed!.rawRange.end)).toContain(
+      '[broken](http://x',
+    )
+    expect(link!.presentation).toBe('live-decorated')
+    expect(image!.presentation).toBe('live-atomic')
+    expect(footnoteRef!.presentation).toBe('live-decorated')
+    expect(malformed!.presentation).toBe('unsupported-error')
+  })
+
+  it('does not invent links from escaped text, code spans, or HTML indexOf', () => {
+    const raw = 'Not \\[escaped](no) and `[code](no)` then [same](a) and [same](b)\n'
+    const projection = createMarkdownEditorProjection(raw)
+    const links = projection.nodes.filter((node) => node.kind === 'link')
+    expect(links).toHaveLength(2)
+    expect(raw.slice(links[0]!.rawRange.start, links[0]!.rawRange.end)).toBe(
+      '[same](a)',
+    )
+    expect(raw.slice(links[1]!.rawRange.start, links[1]!.rawRange.end)).toBe(
+      '[same](b)',
+    )
+    expect(links[1]!.rawRange.start).not.toBe(raw.indexOf('[same]'))
+    expect(projection.nodes.some((node) => node.kind === 'link' && raw.slice(node.rawRange.start, node.rawRange.end).includes('escaped'))).toBe(
+      false,
+    )
+    expect(projection.nodes.some((node) => node.kind === 'link' && raw.slice(node.rawRange.start, node.rawRange.end).includes('[code]'))).toBe(
+      false,
+    )
+  })
+
   it('fails closed when a required syntax kind is not registered', () => {
     expect(() => presentationForSyntaxKind('html-dom-inferred')).toThrow(
       /unregistered markdown editor projection kind/i,
