@@ -44,6 +44,20 @@ export {
   type MarkdownLiveCapability,
   type MarkdownLiveCapabilityResult,
 } from './markdown-editor-live-contract'
+export {
+  evaluateMarkdownBlockInputMutations,
+  resolveMarkdownBlockInputContext,
+  resolveMarkdownBlockInputIntent,
+  type MarkdownBlockInputAction,
+  type MarkdownBlockInputContextKind,
+  type MarkdownBlockInputIntent,
+  type MarkdownBlockInputKey,
+  type MarkdownBlockInputMutationKind,
+  type MarkdownBlockInputMutationResult,
+  type MarkdownBlockInputPlan,
+  type MarkdownBlockInputPosition,
+  type MarkdownBlockInputRejection,
+} from './markdown-editor-input-intent'
 export type MarkdownEditorChrome = 'framed' | 'embedded' | 'minimal'
 export const markdownEditorChromes = ['framed', 'embedded', 'minimal'] as const
 export type MarkdownEditorMobileLayout = 'auto' | 'compact' | 'standard'

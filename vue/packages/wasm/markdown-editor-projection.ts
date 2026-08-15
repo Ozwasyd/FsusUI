@@ -174,6 +174,37 @@ export const presentationForSyntaxKind = (
   throw new Error(`unregistered markdown editor projection kind: ${kind}`)
 }
 
+const utf8OffsetToNormalizedUtf16 = (normalized: string) => {
+  const table = new Map<number, number>()
+  let utf8Offset = 0
+  let utf16Offset = 0
+  table.set(0, 0)
+  while (utf16Offset < normalized.length) {
+    const code = normalized.charCodeAt(utf16Offset)
+    if (code >= 0xd800 && code <= 0xdbff) {
+      utf8Offset += 4
+      utf16Offset += 2
+    } else if (code <= 0x7f) {
+      utf8Offset += 1
+      utf16Offset += 1
+    } else if (code <= 0x7ff) {
+      utf8Offset += 2
+      utf16Offset += 1
+    } else {
+      utf8Offset += 3
+      utf16Offset += 1
+    }
+    table.set(utf8Offset, utf16Offset)
+  }
+  return (offset: number) => {
+    const mapped = table.get(offset)
+    if (mapped === undefined) {
+      throw new Error(`parser UTF-8 offset ${offset} is outside the normalized source`)
+    }
+    return mapped
+  }
+}
+
 export const createMarkdownEditorProjection = (
   rawSource: string,
 ): MarkdownEditorProjectionResult => {
@@ -187,11 +218,12 @@ export const createMarkdownEditorProjection = (
   const parserNodes = collectMarkdownSyntaxNodesFromParser(rawSource)
   const nodes: MarkdownEditorSyntaxNode[] = []
   const diagnostics: MarkdownEditorProjectionDiagnostic[] = []
+  const toUtf16 = utf8OffsetToNormalizedUtf16(normalizedSource)
 
   const toNormalizedRange = (start: number, end: number) =>
-    Object.freeze({ start, end })
+    Object.freeze({ start: toUtf16(start), end: toUtf16(end) })
   const toRawRange = (start: number, end: number) =>
-    Object.freeze(coordinates.toRawRange({ start, end }))
+    Object.freeze(coordinates.toRawRange(toNormalizedRange(start, end)))
 
   for (const node of parserNodes) {
     const hasParent =
