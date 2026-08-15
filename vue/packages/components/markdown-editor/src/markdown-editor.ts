@@ -97,6 +97,26 @@ export {
   type MarkdownClipboardRejection,
   type MarkdownClipboardTransfer,
 } from './markdown-editor-clipboard'
+export {
+  MARKDOWN_NATIVE_SYNTHETIC_BROWSERS,
+  MARKDOWN_NATIVE_TRACE_LIMIT,
+  createMarkdownEditorNativeEventMachine,
+  driveMarkdownNativeHarnessTrace,
+  evaluateMarkdownNativeEventMutations,
+  markdownNativeEventIdentity,
+  markdownNativeSyntheticCompositionScript,
+  type MarkdownEditorNativeEventMachine,
+  type MarkdownNativeAction,
+  type MarkdownNativeEventInput,
+  type MarkdownNativeEventKind,
+  type MarkdownNativeEventPlan,
+  type MarkdownNativeHarnessResult,
+  type MarkdownNativeMutationKind,
+  type MarkdownNativePhase,
+  type MarkdownNativeRejection,
+  type MarkdownNativeSyntheticBrowser,
+  type MarkdownNativeTraceEntry,
+} from './markdown-editor-native-event'
 export type MarkdownEditorChrome = 'framed' | 'embedded' | 'minimal'
 export const markdownEditorChromes = ['framed', 'embedded', 'minimal'] as const
 export type MarkdownEditorMobileLayout = 'auto' | 'compact' | 'standard'
