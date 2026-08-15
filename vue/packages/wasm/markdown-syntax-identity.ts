@@ -105,14 +105,41 @@ const unwrapOnce = (text: string) => {
     return lines.map((line) => line.replace(/^> ?/, '')).join('\n')
   }
 
+  const fence = /^```[^\n]*\n([\s\S]*?)\n```$/.exec(trimmedEnd)
+  if (fence) return fence[1] ?? ''
+  const fenceLoose = /^```[^\n]*\n([\s\S]*?)```$/.exec(trimmedEnd)
+  if (fenceLoose) return (fenceLoose[1] ?? '').replace(/\n$/, '')
+
+  if (
+    lines.length > 0 &&
+    lines.every((line) => line === '' || /^\|/.test(line)) &&
+    lines.some((line) => /^\|/.test(line))
+  ) {
+    const cells = lines
+      .filter(
+        (line) => /^\|/.test(line) && !/^\|[\s:|-]+\|$/.test(line.trim()),
+      )
+      .flatMap((line) =>
+        line
+          .split('|')
+          .slice(1, -1)
+          .map((cell) => cell.trim()),
+      )
+      .filter((cell) => cell.length > 0)
+    const joined = cells.join('\n')
+    if (joined && joined !== trimmedEnd) return joined
+  }
+
   const onlyLine = lines.length === 1 ? lines[0]! : undefined
   if (onlyLine) {
-    const withoutList = onlyLine.replace(/^(?:[-*+]|\d+[.)]) /, '')
-    if (withoutList !== onlyLine) return withoutList
     const withoutTask = onlyLine.replace(/^(?:[-*+]|\d+[.)]) \[[ xX]\] /, '')
     if (withoutTask !== onlyLine) return withoutTask
+    const withoutList = onlyLine.replace(/^(?:[-*+]|\d+[.)]) /, '')
+    if (withoutList !== onlyLine) return withoutList
     const withoutHeading = onlyLine.replace(/^#{1,6} /, '')
     if (withoutHeading !== onlyLine) return withoutHeading
+    const withoutFootnote = onlyLine.replace(/^\[\^[^\]]+\]:\s?/, '')
+    if (withoutFootnote !== onlyLine) return withoutFootnote
   }
 
   if (
@@ -175,6 +202,31 @@ const assignIdentities = (
       .map((_, index) => index)
       .filter((index) => assigned[index] === undefined)
 
+  const kindTextKey = (kind: string, text: string) => `${kind}\0${text}`
+  const previousKindTextCount = new Map<string, number>()
+  const nextKindTextCount = new Map<string, number>()
+  for (const node of previous.nodes) {
+    const key = kindTextKey(node.kind, sliceOf(previousSource, node))
+    previousKindTextCount.set(key, (previousKindTextCount.get(key) ?? 0) + 1)
+  }
+  for (const node of projection.nodes) {
+    const key = kindTextKey(node.kind, sliceOf(nextSource, node))
+    nextKindTextCount.set(key, (nextKindTextCount.get(key) ?? 0) + 1)
+  }
+  const surplusKindText = new Map<string, number>()
+  for (const [key, count] of previousKindTextCount) {
+    const extra = count - (nextKindTextCount.get(key) ?? 0)
+    if (extra > 0) surplusKindText.set(key, extra)
+  }
+
+  const consumeSurplus = (previousIndex: number) => {
+    const node = previous.nodes[previousIndex]
+    if (!node) return
+    const key = kindTextKey(node.kind, sliceOf(previousSource, node))
+    const remaining = surplusKindText.get(key) ?? 0
+    if (remaining > 0) surplusKindText.set(key, remaining - 1)
+  }
+
   for (const nextIndex of leftoverNextIndexes()) {
     const nextNode = projection.nodes[nextIndex]
     if (!nextNode) continue
@@ -186,6 +238,11 @@ const assignIdentities = (
     for (const previousIndex of leftoverPreviousIndexes()) {
       const previousNode = previous.nodes[previousIndex]
       if (!previousNode || previousNode.kind === nextNode.kind) continue
+      const previousKey = kindTextKey(
+        previousNode.kind,
+        sliceOf(previousSource, previousNode),
+      )
+      if ((surplusKindText.get(previousKey) ?? 0) <= 0) continue
       const previousPayload = payloadOf(sliceOf(previousSource, previousNode))
       if (previousPayload !== nextPayload) continue
       const distance = Math.abs(
@@ -196,7 +253,10 @@ const assignIdentities = (
         best = previousIndex
       }
     }
-    if (best !== undefined) claim(nextIndex, best)
+    if (best !== undefined) {
+      consumeSurplus(best)
+      claim(nextIndex, best)
+    }
   }
 
   const kinds = new Set([

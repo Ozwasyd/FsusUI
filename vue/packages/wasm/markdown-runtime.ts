@@ -89,6 +89,12 @@ export {
   type MarkdownSyntaxIdentityStatus,
 } from './markdown-syntax-identity'
 export {
+  evaluateMarkdownSyntaxIdentityMutations,
+  type MarkdownSyntaxIdentityMutationKind,
+  type MarkdownSyntaxIdentityMutationReport,
+  type MarkdownSyntaxIdentityMutationResult,
+} from './markdown-syntax-identity-mutations'
+export {
   createMarkdownOutlineEntries,
   createMarkdownTableEntries,
   resolveMarkdownConsumerIdentity,

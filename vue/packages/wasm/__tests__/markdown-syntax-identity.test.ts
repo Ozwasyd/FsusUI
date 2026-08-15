@@ -176,4 +176,66 @@ describe('markdown syntax stable identity', () => {
     expect(wrapTwin.resolve(twins.nodes[0].id).node?.kind).toBe('quote')
     expect(wrapTwin.resolve(twins.nodes[1].id).node?.kind).toBe('paragraph')
   })
+
+  it('keeps identity when wrapping into task, table, code, footnote, or explicit paragraph', () => {
+    const document = { id: 'doc-1', epoch: 4 }
+    const paragraph = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('Hello world.\n'),
+      document,
+    )
+    const wraps = [
+      { raw: '- [ ] Hello world.\n', kind: 'task' },
+      { raw: '| Hello world. |\n| --- |\n', kind: 'table' },
+      { raw: '```\nHello world.\n```\n', kind: 'code' },
+      { raw: '[^n]: Hello world.\n', kind: 'footnote' },
+      { raw: '::p\nHello world.\n::\n', kind: 'explicit-paragraph' },
+    ] as const
+
+    for (const wrap of wraps) {
+      const wrapped = stabilizeMarkdownEditorProjection(
+        createMarkdownEditorProjection(wrap.raw),
+        document,
+        paragraph,
+      )
+      expect(wrapped.nodes[0]?.kind).toBe(wrap.kind)
+      expect(wrapped.nodes[0]?.id).toBe(paragraph.nodes[0]!.id)
+      const unwrapped = stabilizeMarkdownEditorProjection(
+        createMarkdownEditorProjection('Hello world.\n'),
+        document,
+        wrapped,
+      )
+      expect(unwrapped.nodes[0]?.kind).toBe('paragraph')
+      expect(unwrapped.nodes[0]?.id).toBe(paragraph.nodes[0]!.id)
+    }
+
+    const pair = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('Hello world.\n\nTail.\n'),
+      document,
+    )
+    const wrapFirstTask = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('- [ ] Hello world.\n\nTail.\n'),
+      document,
+      pair,
+    )
+    expect(wrapFirstTask.nodes.map((node) => node.kind)).toEqual(['task', 'paragraph'])
+    expect(wrapFirstTask.nodes[0]!.id).toBe(pair.nodes[0]!.id)
+    expect(wrapFirstTask.nodes[1]!.id).toBe(pair.nodes[1]!.id)
+  })
+
+  it('does not let an offset insert of the same visible text steal a heading identity', () => {
+    const document = { id: 'doc-1', epoch: 4 }
+    const heading = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('# Alpha\n'),
+      document,
+    )
+    const inserted = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('Alpha\n\n# Alpha\n'),
+      document,
+      heading,
+    )
+    expect(inserted.nodes.map((node) => node.kind)).toEqual(['paragraph', 'heading'])
+    expect(inserted.nodes[1]!.id).toBe(heading.nodes[0]!.id)
+    expect(inserted.nodes[0]!.id).not.toBe(heading.nodes[0]!.id)
+    expect(inserted.resolve(heading.nodes[0]!.id).node?.kind).toBe('heading')
+  })
 })
