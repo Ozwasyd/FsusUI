@@ -3,7 +3,9 @@ export {
   MARKDOWN_RENDERER_VERSION,
   MarkdownRuntimeError,
   activateMarkdownFeatures,
+  createMarkdownEditorProjection,
   createMarkdownSourceCoordinateMap,
+  MARKDOWN_EDITOR_PROJECTION_PARSER,
   renderMarkdownFallbackWithRuntime,
   detectMarkdownFeatures,
   detectMarkdownPlaceholders,
@@ -19,6 +21,11 @@ export {
 } from '@element-plus/wasm'
 
 export type {
+  MarkdownEditorProjectionDiagnostic,
+  MarkdownEditorProjectionIdentity,
+  MarkdownEditorProjectionResult,
+  MarkdownEditorSyntaxCoverage,
+  MarkdownEditorSyntaxNode,
   MarkdownFeatureActivationError,
   MarkdownFeatureActivationFeatureOptions,
   MarkdownFeatureActivationItem,
