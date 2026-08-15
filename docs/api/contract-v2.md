@@ -20,6 +20,8 @@ explicit or when semantic drift is hidden.
 | Gate | `spec/components/contracts/v2/markdown-editor-gate.json` | MarkdownEditor blocking state |
 | Runtime projection | `spec/components/contracts/v2/markdown-runtime-projection.json` | Unique editor projection authority and #273/#274/#277/#278/#279 consumer exports |
 | Runtime projection docs | `docs/api/markdown-runtime-projection.md` | Consumer-facing runtime API |
+| Editor input | `spec/components/contracts/v2/markdown-editor-input.json` | Unique #327–#331 input pipeline and acceptance exports |
+| Editor input docs | `docs/api/markdown-editor-input.md` | Consumer-facing input contract |
 | Generator + comparator | `scripts/contract-v2.mjs` | `generate` / `--check` / exported validators |
 | Mutation fixtures | `tests/fixtures/contract-v2/` | Kill-fixtures for every forbidden pattern |
 | Tests | `tests/contract-v2.test.mjs` | `node --test` suite |
