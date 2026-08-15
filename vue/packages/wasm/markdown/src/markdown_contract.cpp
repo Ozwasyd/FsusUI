@@ -1943,6 +1943,7 @@ void scan_inline_syntax(
     std::size_t next_index = index;
 
     if (skip_inline_latex(text, index, next_index)) {
+      nodes.push_back({syntax_kind::latex, start + index, start + next_index});
       index = next_index;
       continue;
     }

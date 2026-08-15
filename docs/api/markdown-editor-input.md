@@ -73,6 +73,12 @@ gateway. Invalid, large, abort, and stale results stay local and source-only.
 Height restore uses #336. Consumer SVG/innerHTML and auto-rewrites are
 rejected.
 
+`planMarkdownLatexPreview` is the #385 inline/block math contract. Nodes and
+marker/body ranges come from the projection. Valid math commits only through
+the feature gateway. Invalid, large, abort, and stale results stay local.
+Inline math keeps wrapping; block math restores height from #336. Consumer
+DOM and auto-rewrites are rejected.
+
 ## Acceptance gate
 
 `evaluateMarkdownInputAcceptance` composes the four planners and rejects

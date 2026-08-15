@@ -73,6 +73,20 @@ export {
   type MarkdownLiveRevealTarget,
 } from './markdown-editor-live-reveal'
 export {
+  MARKDOWN_LATEX_BUDGET,
+  classifyMarkdownLatexBody,
+  commitMarkdownLatexPreview,
+  evaluateMarkdownLatexMutations,
+  planMarkdownLatexPreview,
+  type MarkdownLatexClassification,
+  type MarkdownLatexDisplay,
+  type MarkdownLatexMutationKind,
+  type MarkdownLatexPresentation,
+  type MarkdownLatexPreviewAction,
+  type MarkdownLatexPreviewPlan,
+  type MarkdownLatexVerdict,
+} from './markdown-editor-latex'
+export {
   MARKDOWN_MERMAID_BUDGET,
   classifyMarkdownMermaidBody,
   commitMarkdownMermaidPreview,
