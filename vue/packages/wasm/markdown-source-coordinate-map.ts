@@ -26,6 +26,13 @@ export interface MarkdownSourceCoordinateMap {
   readonly rawSource: string
   readonly normalizedSource: string
   toNormalizedOffset(rawOffset: MarkdownSourceOffset): MarkdownSourceOffset
+  rawCaretsAtNormalized(
+    normalizedOffset: MarkdownSourceOffset,
+  ): readonly MarkdownSourceOffset[]
+  collapsedRawRangeAtNormalized(
+    normalizedOffset: MarkdownSourceOffset,
+  ): MarkdownSourceRange
+  toUniqueRawOffset(normalizedOffset: MarkdownSourceOffset): MarkdownSourceOffset
   toRawOffset(
     normalizedOffset: MarkdownSourceOffset,
     options?: { readonly affinity?: MarkdownSourceAffinity },
@@ -33,7 +40,10 @@ export interface MarkdownSourceCoordinateMap {
   toNormalizedRange(rawRange: MarkdownSourceRange): MarkdownSourceRange
   toRawRange(
     normalizedRange: MarkdownSourceRange,
-    options?: { readonly affinity?: MarkdownSourceAffinity },
+    options?: {
+      readonly affinity?: MarkdownSourceAffinity
+      readonly expandCollapsed?: boolean
+    },
   ): MarkdownSourceRange
   toRawLineColumn(rawOffset: MarkdownSourceOffset): MarkdownSourceLineColumn
   toRawOffsetFromLineColumn(
@@ -214,15 +224,7 @@ export const createMarkdownSourceCoordinateMap = (
   const rawLineStarts = lineStartsInRaw(rawSource)
   const graphemes = graphemeSegments(rawSource)
 
-  const toNormalizedOffset = (rawOffset: MarkdownSourceOffset) => {
-    assertIntegerOffset(rawOffset, 'raw offset', rawSource.length)
-    return rawToNormalized[rawOffset] as number
-  }
-
-  const toRawOffset = (
-    normalizedOffset: MarkdownSourceOffset,
-    options?: { readonly affinity?: MarkdownSourceAffinity },
-  ) => {
+  const caretsAtNormalized = (normalizedOffset: MarkdownSourceOffset) => {
     assertIntegerOffset(normalizedOffset, 'normalized offset', normalizedSource.length)
     const carets = rawCaretsByNormalized[normalizedOffset]
     if (!carets || carets.length === 0) {
@@ -231,6 +233,43 @@ export const createMarkdownSourceCoordinateMap = (
         `normalized offset ${normalizedOffset} has no raw caret`,
       )
     }
+    return carets
+  }
+
+  const toNormalizedOffset = (rawOffset: MarkdownSourceOffset) => {
+    assertIntegerOffset(rawOffset, 'raw offset', rawSource.length)
+    return rawToNormalized[rawOffset] as number
+  }
+
+  const rawCaretsAtNormalized = (normalizedOffset: MarkdownSourceOffset) =>
+    Object.freeze([...caretsAtNormalized(normalizedOffset)])
+
+  const collapsedRawRangeAtNormalized = (
+    normalizedOffset: MarkdownSourceOffset,
+  ): MarkdownSourceRange => {
+    const carets = caretsAtNormalized(normalizedOffset)
+    return Object.freeze({
+      start: carets[0] as number,
+      end: carets[carets.length - 1] as number,
+    })
+  }
+
+  const toUniqueRawOffset = (normalizedOffset: MarkdownSourceOffset) => {
+    const carets = caretsAtNormalized(normalizedOffset)
+    if (carets.length !== 1) {
+      throw new MarkdownRuntimeError(
+        'protocol',
+        `normalized offset ${normalizedOffset} is not a unique raw caret`,
+      )
+    }
+    return carets[0] as number
+  }
+
+  const toRawOffset = (
+    normalizedOffset: MarkdownSourceOffset,
+    options?: { readonly affinity?: MarkdownSourceAffinity },
+  ) => {
+    const carets = caretsAtNormalized(normalizedOffset)
     return options?.affinity === 'forward' ? carets[carets.length - 1]! : carets[0]!
   }
 
@@ -242,10 +281,17 @@ export const createMarkdownSourceCoordinateMap = (
 
   const toRawRange = (
     normalizedRange: MarkdownSourceRange,
-    options?: { readonly affinity?: MarkdownSourceAffinity },
+    options?: {
+      readonly affinity?: MarkdownSourceAffinity
+      readonly expandCollapsed?: boolean
+    },
   ): MarkdownSourceRange => {
-    const start = toRawOffset(normalizedRange.start, options)
-    const end = toRawOffset(normalizedRange.end, options)
+    const start = options?.expandCollapsed
+      ? toRawOffset(normalizedRange.start, { affinity: 'backward' })
+      : toRawOffset(normalizedRange.start, options)
+    const end = options?.expandCollapsed
+      ? toRawOffset(normalizedRange.end, { affinity: 'forward' })
+      : toRawOffset(normalizedRange.end, options)
     return start <= end ? { start, end } : { start: end, end: start }
   }
 
@@ -343,6 +389,9 @@ export const createMarkdownSourceCoordinateMap = (
     rawSource,
     normalizedSource,
     toNormalizedOffset,
+    rawCaretsAtNormalized,
+    collapsedRawRangeAtNormalized,
+    toUniqueRawOffset,
     toRawOffset,
     toNormalizedRange,
     toRawRange,

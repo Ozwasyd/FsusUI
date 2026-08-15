@@ -2,36 +2,41 @@ import { describe, expect, it } from 'vitest'
 
 import { createMarkdownSourceCoordinateMap } from '../markdown-runtime'
 
-const isCollapsedInterior = (raw: string, offset: number) => {
-  if (offset === 0 && raw.startsWith('\uFEFF')) {
-    return true
+const assertEveryRawCaret = (raw: string) => {
+  const map = createMarkdownSourceCoordinateMap(raw)
+  for (let rawOffset = 0; rawOffset <= raw.length; rawOffset += 1) {
+    const normalized = map.toNormalizedOffset(rawOffset)
+    const carets = map.rawCaretsAtNormalized(normalized)
+    const collapsed = map.collapsedRawRangeAtNormalized(normalized)
+    expect(carets).toContain(rawOffset)
+    expect(carets[0]).toBe(collapsed.start)
+    expect(carets[carets.length - 1]).toBe(collapsed.end)
+    expect(map.toRawOffset(normalized, { affinity: 'backward' })).toBe(carets[0])
+    expect(map.toRawOffset(normalized, { affinity: 'forward' })).toBe(
+      carets[carets.length - 1],
+    )
+    expect(rawOffset).toBeGreaterThanOrEqual(collapsed.start)
+    expect(rawOffset).toBeLessThanOrEqual(collapsed.end)
+    if (carets.length === 1) {
+      expect(map.toUniqueRawOffset(normalized)).toBe(rawOffset)
+      expect(map.toRawOffset(normalized)).toBe(rawOffset)
+    } else {
+      expect(() => map.toUniqueRawOffset(normalized)).toThrow(/not a unique raw caret/i)
+    }
   }
-  if (offset > 0 && raw[offset] === '\n' && raw[offset - 1] === '\r') {
-    return true
-  }
-  if (raw[offset] === '\r' && raw[offset + 1] === '\n') {
-    return true
-  }
-  return false
+  return map
 }
 
 describe('Markdown source coordinate map contract', () => {
-  it('round-trips raw UTF-16 positions through parser-normalized source', () => {
+  it('accounts for every raw UTF-16 caret including BOM and CRLF interiors', () => {
     const raw = '\uFEFFheader\r\n\r\n中\t  \\  \r\n👩‍💻e\u0301\n'
-    const map = createMarkdownSourceCoordinateMap(raw)
+    const map = assertEveryRawCaret(raw)
 
     expect(map.rawSource).toBe(raw)
     expect(map.normalizedSource).toBe('header\n\n中\t  \\  \n👩‍💻e\u0301\n')
     expect(Object.is(map.rawSource, raw)).toBe(true)
-
-    for (let rawOffset = 0; rawOffset <= raw.length; rawOffset += 1) {
-      if (isCollapsedInterior(raw, rawOffset)) {
-        continue
-      }
-      const normalized = map.toNormalizedOffset(rawOffset)
-      const roundTrip = map.toRawOffset(normalized, { affinity: 'forward' })
-      expect(roundTrip).toBe(rawOffset)
-    }
+    expect(map.rawCaretsAtNormalized(0)).toEqual([0, 1])
+    expect(map.collapsedRawRangeAtNormalized(0)).toEqual({ start: 0, end: 1 })
   })
 
   it('does not use a normalized offset directly against CRLF raw source', () => {
@@ -54,7 +59,7 @@ describe('Markdown source coordinate map contract', () => {
 
   it('covers BOM, LF, CRLF, mixed newlines, CJK, emoji/ZWJ, combining marks, and RTL', () => {
     const raw = '\uFEFF拉丁\n中文\r\n👩‍💻e\u0301\rשלום\n'
-    const map = createMarkdownSourceCoordinateMap(raw)
+    const map = assertEveryRawCaret(raw)
 
     expect(map.rawSource).toBe(raw)
     expect(map.normalizedSource).toBe('拉丁\n中文\n👩‍💻e\u0301\nשלום\n')
@@ -114,12 +119,35 @@ describe('Markdown source coordinate map contract', () => {
 
   it('uses affinity when a normalized caret spans a collapsed CRLF pair', () => {
     const raw = 'a\r\nb'
-    const map = createMarkdownSourceCoordinateMap(raw)
+    const map = assertEveryRawCaret(raw)
 
     expect(map.toNormalizedOffset(1)).toBe(1)
     expect(map.toNormalizedOffset(2)).toBe(1)
+    expect(map.rawCaretsAtNormalized(1)).toEqual([1, 2])
     expect(map.toRawOffset(1, { affinity: 'backward' })).toBe(1)
     expect(map.toRawOffset(1, { affinity: 'forward' })).toBe(2)
+    expect(map.toRawRange({ start: 1, end: 1 }, { expandCollapsed: true })).toEqual({
+      start: 1,
+      end: 2,
+    })
+    expect(() => map.toUniqueRawOffset(1)).toThrow(/not a unique raw caret/i)
+  })
+
+  it('expands BOM+CRLF interiors instead of skipping or inventing a unique reverse', () => {
+    const raw = '\uFEFF\r\nbody'
+    const map = assertEveryRawCaret(raw)
+    expect(map.toNormalizedOffset(0)).toBe(0)
+    expect(map.toNormalizedOffset(1)).toBe(0)
+    expect(map.toNormalizedOffset(2)).toBe(0)
+    expect(map.rawCaretsAtNormalized(0)).toEqual([0, 1, 2])
+    expect(map.collapsedRawRangeAtNormalized(0)).toEqual({ start: 0, end: 2 })
+    expect(map.toRawOffset(0, { affinity: 'backward' })).toBe(0)
+    expect(map.toRawOffset(0, { affinity: 'forward' })).toBe(2)
+    expect(map.toRawRange({ start: 0, end: 0 }, { expandCollapsed: true })).toEqual({
+      start: 0,
+      end: 2,
+    })
+    expect(() => map.toUniqueRawOffset(0)).toThrow(/not a unique raw caret/i)
   })
 
   it('maps lone CR the same way as LF in the normalized view', () => {
