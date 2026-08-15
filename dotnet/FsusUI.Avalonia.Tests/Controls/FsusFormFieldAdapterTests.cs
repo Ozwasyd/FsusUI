@@ -174,6 +174,39 @@ public class FsusFormFieldAdapterTests
     Assert.Null(item.FieldAdapterError);
   }
 
+  [Fact]
+  public void FormRuntimeSourcesDoNotGuessMembersThroughReflection()
+  {
+    var testsDir = AppContext.BaseDirectory;
+    var cursor = new DirectoryInfo(testsDir);
+    string? repoRoot = null;
+    while (cursor is not null)
+    {
+      if (File.Exists(Path.Combine(cursor.FullName, "dotnet", "FsusUI.Avalonia", "FsusUI.Avalonia.csproj")))
+      {
+        repoRoot = cursor.FullName;
+        break;
+      }
+      cursor = cursor.Parent;
+    }
+
+    Assert.NotNull(repoRoot);
+    var sources = new[]
+    {
+      Path.Combine(repoRoot!, "dotnet", "FsusUI.Avalonia", "Controls", "FsusFormControls.cs"),
+      Path.Combine(repoRoot!, "dotnet", "FsusUI.Avalonia", "Controls", "FsusFormFieldAdapter.cs"),
+    };
+
+    foreach (var sourcePath in sources)
+    {
+      var text = File.ReadAllText(sourcePath);
+      Assert.DoesNotContain("GetProperty(", text, StringComparison.Ordinal);
+      Assert.DoesNotContain("PropertyInfo", text, StringComparison.Ordinal);
+      Assert.DoesNotContain("ReadProperty", text, StringComparison.Ordinal);
+      Assert.DoesNotContain("WriteProperty", text, StringComparison.Ordinal);
+    }
+  }
+
   private sealed class GuessableControl : ContentControl
   {
     public string? Text { get; set; }
