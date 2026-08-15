@@ -65,6 +65,22 @@ export {
   type MarkdownSyntaxIdentityStatus,
 } from './markdown-syntax-identity'
 export {
+  createMarkdownProjectionSession,
+  createMarkdownProjectionTask,
+  planMarkdownProjectionInvalidation,
+  type MarkdownInvalidationReason,
+  type MarkdownProjectionChange,
+  type MarkdownProjectionInvalidationBudget,
+  type MarkdownProjectionInvalidationInput,
+  type MarkdownProjectionInvalidationPlan,
+  type MarkdownProjectionSession,
+  type MarkdownProjectionTask,
+  type MarkdownProjectionTaskCommitErr,
+  type MarkdownProjectionTaskCommitOk,
+  type MarkdownProjectionTaskFailure,
+  type MarkdownRetainedSyntaxNode,
+} from './markdown-projection-invalidation'
+export {
   createMarkdownAnchorMap,
   type MarkdownAnchorAffinity,
   type MarkdownAnchorMap,
