@@ -56,6 +56,13 @@ export {
   type MarkdownEditorSyntaxNode,
 } from './markdown-editor-projection'
 export {
+  evaluateMarkdownProjectionMutations,
+  markdownProjectionHasCompleteCoverage,
+  type MarkdownProjectionMutationKind,
+  type MarkdownProjectionMutationReport,
+  type MarkdownProjectionMutationResult,
+} from './markdown-projection-mutations'
+export {
   createMarkdownSourceCoordinateMap,
   type MarkdownSourceAffinity,
   type MarkdownSourceCoordinateMap,
