@@ -79,6 +79,11 @@ the feature gateway. Invalid, large, abort, and stale results stay local.
 Inline math keeps wrapping; block math restores height from #336. Consumer
 DOM and auto-rewrites are rejected.
 
+`evaluateMarkdownTechnicalAcceptance` is the #386 local gate for #382–#385.
+It checks 0/1/100 nodes, language/fence, invalid/large Mermaid/LaTeX, stale
+results, atomic undo, XSS payload reject, and the shared mutation fixtures.
+Native IME, screen-reader hardware, and the 375/1440 zoom matrix stay leftover.
+
 ## Acceptance gate
 
 `evaluateMarkdownInputAcceptance` composes the four planners and rejects
