@@ -56,10 +56,14 @@ export {
   type MarkdownEditorSyntaxNode,
 } from './markdown-editor-projection'
 export {
+  MARKDOWN_PROJECTION_ACCEPTANCE_SCALE,
   MARKDOWN_PROJECTION_ACCEPTANCE_VERSION,
+  createMarkdownProjectionAcceptanceScaleSource,
   evaluateMarkdownProjectionAcceptance,
+  recordMarkdownProjectionAcceptanceScale,
   type MarkdownProjectionAcceptanceBudgets,
   type MarkdownProjectionAcceptanceReport,
+  type MarkdownProjectionAcceptanceScaleRecord,
 } from './markdown-projection-acceptance'
 export {
   evaluateMarkdownProjectionMutations,
@@ -115,13 +119,17 @@ export {
 } from './markdown-syntax-identity-mutations'
 export {
   createMarkdownOutlineEntries,
+  createMarkdownPropertyEntries,
   createMarkdownTableEntries,
+  createMarkdownTechnicalEntries,
   resolveMarkdownConsumerIdentity,
   searchMarkdownStableProjection,
   type MarkdownIdentityConsumerEntry,
   type MarkdownOutlineEntry,
+  type MarkdownPropertyEntry,
   type MarkdownSearchHit,
   type MarkdownTableEntry,
+  type MarkdownTechnicalEntry,
 } from './markdown-syntax-consumers'
 export {
   MARKDOWN_PROJECTION_WORKER_REQUEST,

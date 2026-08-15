@@ -4,7 +4,11 @@ import {
   compareMarkdownEditorProjectionThreads,
   createMarkdownEditorProjection,
 } from './markdown-editor-projection'
-import { MARKDOWN_PROJECTION_INVALIDATION_BUDGET } from './markdown-projection-invalidation'
+import {
+  MARKDOWN_PROJECTION_INVALIDATION_BUDGET,
+  planMarkdownProjectionInvalidation,
+  type MarkdownProjectionInvalidationBudget,
+} from './markdown-projection-invalidation'
 import { createMarkdownProjectionWorkerHost } from './markdown-projection-worker'
 import { evaluateMarkdownProjectionKeystrokeMutations } from './markdown-projection-keystroke-mutations'
 import { evaluateMarkdownProjectionMutations } from './markdown-projection-mutations'
@@ -18,10 +22,34 @@ import {
 export const MARKDOWN_PROJECTION_ACCEPTANCE_VERSION =
   'markdown-projection-acceptance@2026-08-15'
 
+export const MARKDOWN_PROJECTION_ACCEPTANCE_SCALE = Object.freeze({
+  minSourceChars: 100_000,
+  minBlocks: 3_000,
+  minHeadings: 10_000,
+})
+
 export interface MarkdownProjectionAcceptanceBudgets {
   readonly version: typeof MARKDOWN_PROJECTION_ACCEPTANCE_VERSION
   readonly maxScannedBytes: number
   readonly maxExaminedNodes: number
+}
+
+export interface MarkdownProjectionAcceptanceScaleRecord {
+  readonly version: typeof MARKDOWN_PROJECTION_ACCEPTANCE_VERSION
+  readonly sourceChars: number
+  readonly blockCount: number
+  readonly headingCount: number
+  readonly parserDurationMs: number
+  readonly projectorDurationMs: number
+  readonly taskId: string
+  readonly aborted: boolean
+  readonly invalidatedRangeCount: number
+  readonly preservedIdentityCount: number
+  readonly retainedNodeCount: number
+  readonly heapUsedBefore: number
+  readonly heapUsedAfter: number
+  readonly heapDelta: number
+  readonly budget: MarkdownProjectionInvalidationBudget
 }
 
 export interface MarkdownProjectionAcceptanceReport {
@@ -174,5 +202,69 @@ export const evaluateMarkdownProjectionAcceptance = (input?: {
       maxScannedBytes: MARKDOWN_PROJECTION_INVALIDATION_BUDGET.maxScannedBytes,
       maxExaminedNodes: MARKDOWN_PROJECTION_INVALIDATION_BUDGET.maxExaminedNodes,
     }),
+  })
+}
+
+export const createMarkdownProjectionAcceptanceScaleSource = (): string => {
+  const chunks = Array.from(
+    { length: MARKDOWN_PROJECTION_ACCEPTANCE_SCALE.minHeadings },
+    (_, index) => `# H${String(index).padStart(5, '0')}\n\n`,
+  )
+  let source = chunks.join('')
+  while (source.length < MARKDOWN_PROJECTION_ACCEPTANCE_SCALE.minSourceChars) {
+    source += 'x'
+  }
+  return source
+}
+
+const heapUsed = () => {
+  const memory = (
+    globalThis as { process?: { memoryUsage?: () => { heapUsed: number } } }
+  ).process?.memoryUsage?.()
+  return memory?.heapUsed ?? 0
+}
+
+export const recordMarkdownProjectionAcceptanceScale = (input?: {
+  readonly source?: string
+  readonly documentIdentity?: MarkdownDocumentIdentity
+}): MarkdownProjectionAcceptanceScaleRecord => {
+  const source = input?.source ?? createMarkdownProjectionAcceptanceScaleSource()
+  const documentIdentity = input?.documentIdentity ??
+    Object.freeze({ id: 'scale-doc', epoch: 1 })
+  const heapUsedBefore = heapUsed()
+  const parseStarted = performance.now()
+  const projection = createMarkdownEditorProjection(source)
+  const parserDurationMs = performance.now() - parseStarted
+  const projectStarted = performance.now()
+  const stable = stabilizeMarkdownEditorProjection(projection, documentIdentity)
+  const projectorDurationMs = performance.now() - projectStarted
+  const headings = stable.nodes.filter((node) => node.kind === 'heading')
+  const target = headings[Math.floor(headings.length / 2)] ?? stable.nodes[0]
+  const from = target ? target.rawRange.start + 2 : 0
+  const plan = planMarkdownProjectionInvalidation({
+    identity: documentIdentity,
+    revision: 1,
+    previousSource: source,
+    change: { from, to: from, insert: 'x' },
+    previous: stable,
+  })
+  const heapUsedAfter = heapUsed()
+
+  return Object.freeze({
+    version: MARKDOWN_PROJECTION_ACCEPTANCE_VERSION,
+    sourceChars: source.length,
+    blockCount: stable.nodes.length,
+    headingCount: headings.length,
+    parserDurationMs,
+    projectorDurationMs,
+    taskId: plan.taskId,
+    aborted: false,
+    invalidatedRangeCount: plan.invalidatedRanges.length,
+    preservedIdentityCount: plan.retainedNodeIds.length,
+    retainedNodeCount: plan.retainedNodeIds.length,
+    heapUsedBefore,
+    heapUsedAfter,
+    heapDelta: heapUsedAfter - heapUsedBefore,
+    budget: plan.budget,
   })
 }

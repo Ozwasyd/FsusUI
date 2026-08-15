@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest'
 import {
   createMarkdownEditorProjection,
   createMarkdownOutlineEntries,
+  createMarkdownPropertyEntries,
   createMarkdownTableEntries,
+  createMarkdownTechnicalEntries,
   resolveMarkdownConsumerIdentity,
   searchMarkdownStableProjection,
   stabilizeMarkdownEditorProjection,
@@ -82,5 +84,38 @@ describe('markdown outline/table/search identity consumers', () => {
     expect(
       searchMarkdownStableProjection(afterDelete, 'Beta')[0]?.id,
     ).toBe(firstOutline[1]!.id)
+  })
+
+  it('projects technical and property entries from the same syntax identities', () => {
+    const source =
+      'See [docs](https://x.test) and ![alt](img.png)\n\n```js\nconst x = 1\n```\n\n$$\na^2\n$$\n\n```mermaid\nflowchart LR\n```\n'
+    const stable = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection(source),
+      document,
+    )
+    const technical = createMarkdownTechnicalEntries(stable)
+    const properties = createMarkdownPropertyEntries(stable)
+    expect(technical.map((entry) => entry.kind).sort()).toEqual([
+      'code',
+      'latex',
+      'mermaid',
+    ])
+    expect(properties.map((entry) => entry.kind).sort()).toEqual(['image', 'link'])
+    expect(
+      technical.every(
+        (entry) =>
+          entry.id.startsWith('syn:') &&
+          resolveMarkdownConsumerIdentity(stable, entry.id).status === 'current',
+      ),
+    ).toBe(true)
+    expect(
+      properties.every(
+        (entry) =>
+          entry.id.startsWith('syn:') &&
+          resolveMarkdownConsumerIdentity(stable, entry.id).status === 'current',
+      ),
+    ).toBe(true)
+    expect(technical.some((entry) => entry.id.startsWith('hash:'))).toBe(false)
+    expect(properties[0]!.id).not.toBe(`link:${properties[0]!.range.start}`)
   })
 })

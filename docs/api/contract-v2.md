@@ -18,6 +18,8 @@ explicit or when semantic drift is hidden.
 | --- | --- | --- |
 | Registry | `spec/components/contracts/v2/contract-v2.json` | Generated, committed, verified |
 | Gate | `spec/components/contracts/v2/markdown-editor-gate.json` | MarkdownEditor blocking state |
+| Runtime projection | `spec/components/contracts/v2/markdown-runtime-projection.json` | Unique editor projection authority and #273/#274/#277/#278/#279 consumer exports |
+| Runtime projection docs | `docs/api/markdown-runtime-projection.md` | Consumer-facing runtime API |
 | Generator + comparator | `scripts/contract-v2.mjs` | `generate` / `--check` / exported validators |
 | Mutation fixtures | `tests/fixtures/contract-v2/` | Kill-fixtures for every forbidden pattern |
 | Tests | `tests/contract-v2.test.mjs` | `node --test` suite |
@@ -82,6 +84,13 @@ carry at least one scenario coverage id.
    (`source`, `live`, `split`, `preview`, `readonly`, `disabled`) and carries
    no `write` alias. While `#338`–`#343` are open the gate keeps the export
    status at `partial` automatically.
+
+The editor projection kernel is not a Vue/Avalonia component member map. It is
+the unique runtime authority on
+`@ozwasyd/element-plus/markdown-runtime`. Contract V2 records that authority in
+`markdown-runtime-projection.json` so outline, table, search, technical, and
+property consumers stay bound to the same `syn:` identities. That file does not
+clear the MarkdownEditor gate.
 
 ## Avalonia-only surface
 

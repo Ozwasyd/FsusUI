@@ -8,6 +8,7 @@ documented package APIs.
 - platform-neutral tokens and generated token artifacts
 - component contracts under `spec/components/`
 - documented Web component APIs
+- documented Markdown runtime projection consumers on `@ozwasyd/element-plus/markdown-runtime`
 - documented Avalonia controls under `FsusUI.Avalonia`
 - documented theme resources under `FsusUI.Avalonia.Themes`
 
@@ -18,7 +19,7 @@ documented package APIs.
 - Avalonia template internals, private resource keys, control template parts, or
   implementation-only XAML structure
 - product integrations such as FsusBlog or FsusPanel business state
-- Web-only WASM runtime paths
+- Web-only WASM runtime paths other than the documented `/markdown-runtime` projection consumers
 
 Product integrations must consume public FsusUI packages and contracts rather
 than implementation internals. Platform-specific implementation details can be
