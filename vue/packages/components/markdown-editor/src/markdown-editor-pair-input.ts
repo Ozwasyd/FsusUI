@@ -193,9 +193,24 @@ export const resolveMarkdownPairInput = (input: {
   }
 
   if (inserted === '(' && collapsed && start > 0 && source[start - 1] === ']') {
+    if (insideLinkDestination(projection, source, start)) {
+      return Object.freeze({
+        action: 'passthrough' as const,
+        transaction: null,
+        rejected: 'disabled-context' as const,
+      })
+    }
     return Object.freeze({
       action: 'insert-pair' as const,
       transaction: transactionOf(start, end, '()', start + 1),
+    })
+  }
+
+  if (insideLinkDestination(projection, source, start)) {
+    return Object.freeze({
+      action: 'passthrough' as const,
+      transaction: null,
+      rejected: 'disabled-context' as const,
     })
   }
 
@@ -205,10 +220,6 @@ export const resolveMarkdownPairInput = (input: {
     start > 0 &&
     isWordChar(source[start - 1]!)
   ) {
-    return Object.freeze({ action: 'passthrough' as const, transaction: null })
-  }
-
-  if (insideLinkDestination(projection, source, start) && inserted === '(') {
     return Object.freeze({ action: 'passthrough' as const, transaction: null })
   }
 
