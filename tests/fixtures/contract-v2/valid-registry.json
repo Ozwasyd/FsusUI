@@ -281,7 +281,7 @@
       "avaloniaExtras": [],
       "markdownEditor": {
         "modes": ["source", "live", "split", "preview"],
-        "capabilities": ["source", "live", "split", "preview", "readonly", "disabled"],
+        "capabilities": ["supported", "unsupported-platform", "runtime-unavailable", "projection-failed", "feature-degraded", "fatal"],
         "writeAlias": false,
         "canonical": true
       },

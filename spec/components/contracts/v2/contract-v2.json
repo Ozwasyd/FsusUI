@@ -10,7 +10,7 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "1b9ba0990ef5c22e9f7e26f12288e5e7c2f65132aed61b801fb5b3513e31c94b",
+      "hash": "8b8e52714e7015aa8049cf4b6c08cefcfeac78d66e85f7854974d56f15916cad",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
@@ -49150,12 +49150,12 @@
           "preview"
         ],
         "capabilities": [
-          "source",
-          "live",
-          "split",
-          "preview",
-          "readonly",
-          "disabled"
+          "supported",
+          "unsupported-platform",
+          "runtime-unavailable",
+          "projection-failed",
+          "feature-degraded",
+          "fatal"
         ],
         "writeAlias": false,
         "canonical": true

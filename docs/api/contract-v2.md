@@ -82,10 +82,12 @@ carry at least one scenario coverage id.
 4. **No broad family mapping.** An override must be member-scoped; a
    family/wildcard scope fails.
 5. **MarkdownEditor canonical modes.** The contract uses
-   `source/live/split/preview` with the six-value capability set
-   (`source`, `live`, `split`, `preview`, `readonly`, `disabled`) and carries
-   no `write` alias. While `#338`–`#343` are open the gate keeps the export
-   status at `partial` automatically.
+   `source/live/split/preview` with the six frozen Live capability tokens
+   (`supported`, `unsupported-platform`, `runtime-unavailable`,
+   `projection-failed`, `feature-degraded`, `fatal`) and carries no `write`
+   alias. `readonly`/`disabled` are editor props, not capability tokens.
+   While `#338`–`#343` are open the gate keeps the export status at
+   `partial` automatically.
 
 The editor projection kernel is not a Vue/Avalonia component member map. It is
 the unique runtime authority on
