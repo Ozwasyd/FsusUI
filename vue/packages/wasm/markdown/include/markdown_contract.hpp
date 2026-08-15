@@ -33,6 +33,29 @@ enum class placeholder_kind : std::uint8_t {
   mermaid_block = 2
 };
 
+enum class syntax_kind : std::uint8_t {
+  heading = 0,
+  paragraph = 1,
+  list = 2,
+  task = 3,
+  quote = 4,
+  table = 5,
+  link = 6,
+  image = 7,
+  code = 8,
+  latex = 9,
+  mermaid = 10,
+  footnote = 11,
+  explicit_paragraph = 12,
+  malformed = 13
+};
+
+struct syntax_node final {
+  syntax_kind kind{};
+  std::size_t start_offset{0};
+  std::size_t end_offset{0};
+};
+
 struct placeholder final {
   placeholder_kind kind{};
   std::string token;
@@ -72,6 +95,7 @@ struct render_result final {
   std::string normalized_source;
   std::vector<feature> features;
   std::vector<placeholder> placeholders;
+  std::vector<syntax_node> syntax_nodes;
   render_metadata metadata;
 };
 
@@ -82,6 +106,8 @@ inline constexpr std::string_view renderer_version = "markdown-wasm-contract@202
 [[nodiscard]] bool contains_feature(std::string_view source, feature kind);
 [[nodiscard]] std::size_t count_placeholders(std::string_view source);
 [[nodiscard]] std::vector<placeholder> collect_placeholders(std::string_view source);
+[[nodiscard]] std::string_view syntax_kind_name(syntax_kind kind);
+[[nodiscard]] std::vector<syntax_node> collect_syntax_nodes(std::string_view source);
 [[nodiscard]] render_result build_summary_result(const render_request& request);
 [[nodiscard]] render_result build_render_result(const render_request& request);
 [[nodiscard]] render_result build_placeholder_result(const render_request& request);
