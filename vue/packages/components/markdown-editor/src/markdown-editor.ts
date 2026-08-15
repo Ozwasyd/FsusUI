@@ -118,6 +118,16 @@ export {
   type MarkdownCodePresentationPlan,
 } from './markdown-editor-code'
 export {
+  MARKDOWN_TECHNICAL_ACCEPTANCE_MODES,
+  MARKDOWN_TECHNICAL_ACCEPTANCE_SCALES,
+  MARKDOWN_TECHNICAL_ACCEPTANCE_VERSION,
+  evaluateMarkdownTechnicalAcceptance,
+  evaluateMarkdownTechnicalAcceptanceMutations,
+  type MarkdownTechnicalAcceptanceLeftover,
+  type MarkdownTechnicalAcceptanceMutationKind,
+  type MarkdownTechnicalAcceptanceReport,
+} from './markdown-editor-technical-acceptance'
+export {
   MARKDOWN_TECHNICAL_NODE_KINDS,
   MARKDOWN_TECHNICAL_STATES,
   commitMarkdownTechnicalFeatureResult,
