@@ -210,6 +210,10 @@ import type {
   MarkdownEditorTransaction,
   MarkdownEditorTransactionRejection,
 } from './markdown-editor-transaction'
+import {
+  resolveMarkdownBlockInputIntent,
+  type MarkdownBlockInputKey,
+} from './markdown-editor-input-intent'
 
 defineOptions({
   name: 'ElMarkdownEditor',
@@ -876,186 +880,6 @@ const handleBlur = () => {
   transactionStore.breakMergeGroup()
 }
 
-const replaceValueRange = (
-  start: number,
-  end: number,
-  replacement: string,
-  nextSelection: MarkdownEditorSelection,
-  metadata: Readonly<Record<string, unknown>>,
-) => {
-  const value = transactionStore.value
-  const nextValue = value.slice(0, start) + replacement + value.slice(end)
-  return dispatchReplacement(nextValue, nextSelection, {
-    history: 'separate',
-    metadata,
-    origin: 'command',
-  })
-}
-
-const selectedLineRange = (selection: MarkdownEditorSelection) => {
-  const value = transactionStore.value
-  const rangeStart = selection.start
-  const rangeEnd = selection.end
-  const blockEndSeed =
-    rangeEnd > rangeStart && value[rangeEnd - 1] === '\n'
-      ? rangeEnd - 1
-      : rangeEnd
-  const lineStart = value.lastIndexOf('\n', Math.max(0, rangeStart - 1)) + 1
-  const lineEndIndex = value.indexOf('\n', blockEndSeed)
-  const lineEnd = lineEndIndex === -1 ? value.length : lineEndIndex
-  return {
-    lineEnd,
-    lineStart,
-    rangeEnd,
-    rangeStart,
-  }
-}
-
-const applyLineIndent = (outdent: boolean) => {
-  const selection = captureSelection()
-  const value = transactionStore.value
-  const { lineEnd, lineStart, rangeEnd, rangeStart } =
-    selectedLineRange(selection)
-  const block = value.slice(lineStart, lineEnd)
-  const lines = block.split('\n')
-  let charsBeforeSelectionStart = 0
-  let charsBeforeSelectionEnd = 0
-  let originalOffset = 0
-
-  const nextLines = lines.map((line) => {
-    if (!outdent) {
-      if (lineStart + originalOffset < rangeStart) {
-        charsBeforeSelectionStart += 2
-      }
-      if (lineStart + originalOffset < rangeEnd) {
-        charsBeforeSelectionEnd += 2
-      }
-      originalOffset += line.length + 1
-      return `  ${line}`
-    }
-
-    const removable = line.startsWith('  ')
-      ? 2
-      : line.startsWith(' ') || line.startsWith('\t')
-        ? 1
-        : 0
-    if (lineStart + originalOffset < rangeStart) {
-      charsBeforeSelectionStart -= removable
-    }
-    if (lineStart + originalOffset < rangeEnd) {
-      charsBeforeSelectionEnd -= removable
-    }
-    originalOffset += line.length + 1
-    return removable > 0 ? line.slice(removable) : line
-  })
-
-  const replacement = nextLines.join('\n')
-  replaceValueRange(
-    lineStart,
-    lineEnd,
-    replacement,
-    {
-      direction: selection.direction,
-      start: Math.max(lineStart, rangeStart + charsBeforeSelectionStart),
-      end: Math.max(lineStart, rangeEnd + charsBeforeSelectionEnd),
-    },
-    Object.freeze({ command: outdent ? 'outdent' : 'indent' }),
-  )
-}
-
-const handleLineContinuation = () => {
-  const value = transactionStore.value
-  const selection = captureSelection()
-  if (selection.start !== selection.end) return false
-
-  const cursor = selection.start
-  const lineStart = value.lastIndexOf('\n', Math.max(0, cursor - 1)) + 1
-  const beforeCursor = value.slice(lineStart, cursor)
-  const unordered = beforeCursor.match(
-    /^(\s*)([-*+])\s+(?:(\[[ xX]\])\s+)?(.*)$/u,
-  )
-
-  if (unordered) {
-    const [, indent, marker, taskMarker, text] = unordered
-    if (!text.trim()) {
-      const caret = lineStart + indent.length
-      replaceValueRange(
-        lineStart,
-        cursor,
-        indent,
-        { direction: 'none', start: caret, end: caret },
-        Object.freeze({ command: 'continue-list-exit' }),
-      )
-      return true
-    }
-
-    const nextMarker = `${indent}${marker} ${taskMarker ? '[ ] ' : ''}`
-    const caret = cursor + nextMarker.length + 1
-    replaceValueRange(
-      cursor,
-      cursor,
-      `\n${nextMarker}`,
-      { direction: 'none', start: caret, end: caret },
-      Object.freeze({ command: 'continue-list' }),
-    )
-    return true
-  }
-
-  const ordered = beforeCursor.match(/^(\s*)(\d+)([.)])\s+(.*)$/u)
-  if (ordered) {
-    const [, indent, numberText, suffix, text] = ordered
-    if (!text.trim()) {
-      const caret = lineStart + indent.length
-      replaceValueRange(
-        lineStart,
-        cursor,
-        indent,
-        { direction: 'none', start: caret, end: caret },
-        Object.freeze({ command: 'continue-ordered-exit' }),
-      )
-      return true
-    }
-
-    const nextMarker = `${indent}${Number(numberText) + 1}${suffix} `
-    const caret = cursor + nextMarker.length + 1
-    replaceValueRange(
-      cursor,
-      cursor,
-      `\n${nextMarker}`,
-      { direction: 'none', start: caret, end: caret },
-      Object.freeze({ command: 'continue-ordered' }),
-    )
-    return true
-  }
-
-  const quote = beforeCursor.match(/^(\s*> ?)(.*)$/u)
-  if (quote) {
-    const [, marker, text] = quote
-    if (!text.trim()) {
-      replaceValueRange(
-        lineStart,
-        cursor,
-        '',
-        { direction: 'none', start: lineStart, end: lineStart },
-        Object.freeze({ command: 'continue-quote-exit' }),
-      )
-      return true
-    }
-
-    const caret = cursor + marker.length + 1
-    replaceValueRange(
-      cursor,
-      cursor,
-      `\n${marker}`,
-      { direction: 'none', start: caret, end: caret },
-      Object.freeze({ command: 'continue-quote' }),
-    )
-    return true
-  }
-
-  return false
-}
-
 const runCommand = async (command: MarkdownEditorCommand) => {
   if (editingBlocked.value || isComposing.value) return
   if (pendingCommandKeys.value.has(command.key)) return
@@ -1190,21 +1014,37 @@ const handleKeydown = (event: KeyboardEvent) => {
     return
   }
 
-  if (event.key === 'Tab') {
-    event.preventDefault()
-    applyLineIndent(event.shiftKey)
-    return
-  }
-
+  const blockKey =
+    event.key === 'Tab'
+      ? event.shiftKey
+        ? 'shift-tab'
+        : 'tab'
+      : event.key === 'Enter'
+        ? event.shiftKey
+          ? 'shift-enter'
+          : 'enter'
+        : event.key === 'Backspace'
+          ? 'backspace'
+          : event.key === 'Delete'
+            ? 'delete'
+            : null
   if (
-    event.key === 'Enter' &&
+    blockKey &&
     !event.altKey &&
     !event.ctrlKey &&
-    !event.metaKey &&
-    !event.shiftKey &&
-    handleLineContinuation()
+    !event.metaKey
   ) {
+    const plan = resolveMarkdownBlockInputIntent({
+      source: transactionStore.value,
+      selection: captureSelection(),
+      key: blockKey as MarkdownBlockInputKey,
+      composing: isComposing.value,
+      documentIdentity,
+    })
+    if (plan.rejected === 'composition-active') return
+    if (!plan.transaction) return
     event.preventDefault()
+    dispatchTransaction(plan.transaction)
     return
   }
 
