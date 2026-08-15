@@ -6,6 +6,7 @@ import { loadEmscriptenModule } from './runtime/emscripten'
 import { resolveMarkdownAsset, type MarkdownAssetKind } from './runtime/assets'
 import { decodeUtf8, encodeUtf8 } from './runtime/utf8'
 import {
+  MARKDOWN_RENDER_PARSER,
   MARKDOWN_RENDERER_VERSION,
   detectMarkdownFeatures,
   detectMarkdownPlaceholders,
@@ -38,7 +39,9 @@ export {
   MARKDOWN_EDITOR_PROJECTION_PARSER,
   MARKDOWN_EDITOR_REQUIRED_SYNTAX_KINDS,
   createMarkdownEditorProjection,
+  markdownRenderIdentitiesEqual,
   presentationForSyntaxKind,
+  readMarkdownRenderIdentity,
   type MarkdownEditorPresentation,
   type MarkdownEditorProjectionDiagnostic,
   type MarkdownEditorProjectionIdentity,
@@ -203,6 +206,8 @@ export type MarkdownRuntimeRenderResult = MarkdownSafeRenderResult & {
 
 export interface MarkdownRuntimeHtmlResult extends MarkdownSafeRenderAuthority {
   readonly html: MarkdownSafeHtml
+  readonly parser: string
+  readonly rawSource: string
   readonly normalizedSource: string
   readonly sourceIdentity: string
   readonly engine: MarkdownRuntimeKind
@@ -212,6 +217,8 @@ export interface MarkdownRuntimeHtmlResult extends MarkdownSafeRenderAuthority {
 
 export interface MarkdownRuntimeSummaryResult extends MarkdownSafeRenderAuthority {
   readonly html: MarkdownSafeHtml
+  readonly parser: string
+  readonly rawSource: string
   readonly normalizedSource: string
   readonly sourceIdentity: string
   readonly engine: MarkdownRuntimeKind
@@ -264,6 +271,8 @@ export const renderMarkdownFallbackWithRuntime = (
   const normalizedSource = normalizeMarkdownSource(payload.source)
   return authorizeMarkdownRuntimeResult({
     html: `<div class="markdown-renderer__error"><p>Markdown 渲染失败，已回退为安全文本。</p><pre><code>${escapeMarkdownHtml(payload.source)}</code></pre></div>` as MarkdownSafeHtml,
+    parser: MARKDOWN_RENDER_PARSER,
+    rawSource: payload.source,
     normalizedSource,
     sourceIdentity: resolveMarkdownSourceIdentity(payload),
     features: detectMarkdownFeatures(normalizedSource),
@@ -2037,6 +2046,8 @@ async function renderMarkdownPayloadWithRuntime(
     if (payloadMode === 'html-only') {
       return authorizeMarkdownRuntimeResult({
         html: html as MarkdownSafeHtml,
+        parser: MARKDOWN_RENDER_PARSER,
+        rawSource: payload.source,
         normalizedSource: source,
         sourceIdentity: resolveMarkdownSourceIdentity(payload),
         engine,
@@ -2066,6 +2077,8 @@ async function renderMarkdownPayloadWithRuntime(
     if (payloadMode === 'summary') {
       return authorizeMarkdownRuntimeResult({
         html: html as MarkdownSafeHtml,
+        parser: MARKDOWN_RENDER_PARSER,
+        rawSource: payload.source,
         normalizedSource: source,
         sourceIdentity: resolveMarkdownSourceIdentity(payload),
         engine,
@@ -2087,6 +2100,8 @@ async function renderMarkdownPayloadWithRuntime(
 
     const safeResult = {
       html: html as MarkdownSafeHtml,
+      parser: MARKDOWN_RENDER_PARSER,
+      rawSource: payload.source,
       normalizedSource: source,
       sourceIdentity: resolveMarkdownSourceIdentity(payload),
       features,
@@ -2206,4 +2221,4 @@ export async function renderMarkdownChunksWithRuntime(
   }
 }
 
-export { MARKDOWN_RENDERER_VERSION }
+export { MARKDOWN_RENDER_PARSER, MARKDOWN_RENDERER_VERSION }
