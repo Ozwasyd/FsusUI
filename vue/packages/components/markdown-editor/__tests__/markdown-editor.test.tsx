@@ -1007,6 +1007,30 @@ describe('MarkdownEditor', () => {
     expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe('go  on')
   })
 
+  it('windows live decorations and yields viewport restore to wheel', async () => {
+    const modelValue = Array.from(
+      { length: 40 },
+      (_, index) => `# Heading ${index}\n\nparagraph ${index}\n`,
+    ).join('\n')
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        mode: 'live',
+        modelValue,
+      },
+    })
+    await nextTick()
+    const decorations = wrapper.findAll('[data-markdown-live-decorations] [data-node-id]')
+    expect(decorations.length).toBeGreaterThan(0)
+    expect(decorations.length).toBeLessThanOrEqual(96)
+    const textarea = wrapper.find('textarea')
+    await textarea.trigger('wheel')
+    expect(
+      wrapper.find('[data-markdown-layout-action]').attributes(
+        'data-markdown-layout-action',
+      ),
+    ).toBe('yield')
+  })
+
   it('keeps selection direction when switching live to source', async () => {
     const wrapper = mount(MarkdownEditor, {
       props: {
