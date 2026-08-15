@@ -44,6 +44,7 @@ export {
   type MarkdownEditorProjectionIdentity,
   type MarkdownEditorProjectionResult,
   type MarkdownEditorRequiredSyntaxKind,
+  type MarkdownEditorSourceRange,
   type MarkdownEditorSyntaxCoverage,
   type MarkdownEditorSyntaxNode,
 } from './markdown-editor-projection'

@@ -54,6 +54,7 @@ struct syntax_node final {
   syntax_kind kind{};
   std::size_t start_offset{0};
   std::size_t end_offset{0};
+  std::size_t parent_index{static_cast<std::size_t>(-1)};
 };
 
 struct placeholder final {
