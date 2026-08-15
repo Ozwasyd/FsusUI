@@ -46,4 +46,60 @@ describe('markdown syntax stable identity', () => {
     expect(second.resolve(second.nodes[0].id).status).toBe('current')
     expect(second.resolve('not-an-id').status).toBe('invalid')
   })
+
+  it('keeps identities across move, split, and merge and does not retarget a deleted neighbor', () => {
+    const document = { id: 'doc-1', epoch: 4 }
+    const movedFrom = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('# Alpha\n\n# Beta\n'),
+      document,
+    )
+    const moved = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('# Beta\n\n# Alpha\n'),
+      document,
+      movedFrom,
+    )
+    expect(moved.nodes[0].id).toBe(movedFrom.nodes[1].id)
+    expect(moved.nodes[1].id).toBe(movedFrom.nodes[0].id)
+
+    const beforeSplit = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('Hello world.\n'),
+      document,
+    )
+    const split = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('Hello\n\nworld.\n'),
+      document,
+      beforeSplit,
+    )
+    expect(split.nodes).toHaveLength(2)
+    expect(split.nodes[0].id).toBe(beforeSplit.nodes[0].id)
+    expect(split.nodes[1].id).not.toBe(beforeSplit.nodes[0].id)
+    expect(split.resolve(beforeSplit.nodes[0].id).status).toBe('current')
+
+    const beforeMerge = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('Hello\n\nworld.\n'),
+      document,
+    )
+    const merged = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('Hello world.\n'),
+      document,
+      beforeMerge,
+    )
+    expect(merged.nodes).toHaveLength(1)
+    expect(merged.nodes[0].id).toBe(beforeMerge.nodes[0].id)
+    expect(merged.resolve(beforeMerge.nodes[1].id).status).toBe('deleted')
+
+    const twins = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('# Alpha\n\n# Beta\n\n# Alpha\n'),
+      document,
+    )
+    const afterDelete = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('# Beta\n\n# Alpha\n'),
+      document,
+      twins,
+    )
+    expect(afterDelete.resolve(twins.nodes[0].id).status).toBe('deleted')
+    expect(afterDelete.nodes[0].id).toBe(twins.nodes[1].id)
+    expect(afterDelete.nodes[1].id).toBe(twins.nodes[2].id)
+    expect(afterDelete.nodes[1].id).not.toBe(twins.nodes[0].id)
+  })
 })
