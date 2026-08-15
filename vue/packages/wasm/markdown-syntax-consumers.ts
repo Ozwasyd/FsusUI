@@ -25,6 +25,14 @@ export interface MarkdownSearchHit extends MarkdownIdentityConsumerEntry {
   readonly query: string
 }
 
+export interface MarkdownTechnicalEntry extends MarkdownIdentityConsumerEntry {
+  readonly kind: 'code' | 'latex' | 'mermaid'
+}
+
+export interface MarkdownPropertyEntry extends MarkdownIdentityConsumerEntry {
+  readonly kind: 'link' | 'image'
+}
+
 const headingTitleOf = (source: string, node: MarkdownStableSyntaxNode) => {
   const slice = source.slice(node.normalizedRange.start, node.normalizedRange.end)
   const match = /^(#{1,6})\s+(.*)$/m.exec(slice.trimEnd())
@@ -130,3 +138,56 @@ export const resolveMarkdownConsumerIdentity = (
   projection: MarkdownStableProjection,
   id: string,
 ) => resolveThrough(requireStableProjection(projection), id)
+
+const entryFromNode = (
+  node: MarkdownStableSyntaxNode,
+): MarkdownIdentityConsumerEntry =>
+  Object.freeze({
+    id: node.id,
+    kind: node.kind,
+    range: Object.freeze({
+      start: node.rawRange.start,
+      end: node.rawRange.end,
+    }),
+  })
+
+export const createMarkdownTechnicalEntries = (
+  projection: MarkdownStableProjection,
+): readonly MarkdownTechnicalEntry[] => {
+  const stable = requireStableProjection(projection)
+  return Object.freeze(
+    stable.nodes
+      .filter(
+        (node): node is MarkdownStableSyntaxNode & {
+          kind: MarkdownTechnicalEntry['kind']
+        } =>
+          node.kind === 'code' || node.kind === 'latex' || node.kind === 'mermaid',
+      )
+      .map((node) =>
+        Object.freeze({
+          ...entryFromNode(node),
+          kind: node.kind,
+        }),
+      ),
+  )
+}
+
+export const createMarkdownPropertyEntries = (
+  projection: MarkdownStableProjection,
+): readonly MarkdownPropertyEntry[] => {
+  const stable = requireStableProjection(projection)
+  return Object.freeze(
+    stable.nodes
+      .filter(
+        (node): node is MarkdownStableSyntaxNode & {
+          kind: MarkdownPropertyEntry['kind']
+        } => node.kind === 'link' || node.kind === 'image',
+      )
+      .map((node) =>
+        Object.freeze({
+          ...entryFromNode(node),
+          kind: node.kind,
+        }),
+      ),
+  )
+}

@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "id": "markdown-runtime-projection",
+  "version": "markdown-projection-acceptance@2026-08-15",
+  "exportPath": "./markdown-runtime",
+  "package": "@ozwasyd/element-plus/markdown-runtime",
+  "classification": "native-adapter",
+  "authority": "unique-projection",
+  "scale": {
+    "minSourceChars": 100000,
+    "minBlocks": 3000,
+    "minHeadings": 10000
+  },
+  "budgets": {
+    "maxScannedBytes": 4096,
+    "maxExaminedNodes": 64
+  },
+  "consumers": [
+    {
+      "trackingIssue": 273,
+      "surface": "outline",
+      "export": "createMarkdownOutlineEntries"
+    },
+    {
+      "trackingIssue": 274,
+      "surface": "table",
+      "export": "createMarkdownTableEntries"
+    },
+    {
+      "trackingIssue": 277,
+      "surface": "search",
+      "export": "searchMarkdownStableProjection"
+    },
+    {
+      "trackingIssue": 278,
+      "surface": "technical",
+      "export": "createMarkdownTechnicalEntries"
+    },
+    {
+      "trackingIssue": 279,
+      "surface": "properties",
+      "export": "createMarkdownPropertyEntries"
+    }
+  ],
+  "forbidden": [
+    "second-parser",
+    "regex-scan",
+    "dom-query",
+    "html-offset",
+    "title-hash-identity",
+    "normalized-offset-as-raw"
+  ]
+}
