@@ -60,6 +60,13 @@ come from the projection node, not a second fence regex. Feature output
 must use the unique gateway. Local errors keep source and reveal an exact
 range. Height and atomic actions reuse #335/#336.
 
+`resolveMarkdownCodeLanguage` and `applyMarkdownCodeLanguageChange` are the
+#383 fenced-code contract. Language aliases come from the Shiki grammar
+authority. Unknown info strings stay put and fall back to plain code.
+Language edits touch only the info range. Keyboard and clipboard stay on
+the #287 pipeline. Fences are not identified by regex and bodies are not
+executed.
+
 ## Acceptance gate
 
 `evaluateMarkdownInputAcceptance` composes the four planners and rejects
