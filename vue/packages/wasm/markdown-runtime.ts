@@ -36,10 +36,14 @@ import type {
 export { MarkdownRuntimeError, type MarkdownRuntimeErrorCode }
 export {
   MARKDOWN_EDITOR_PROJECTION_PARSER,
+  MARKDOWN_EDITOR_REQUIRED_SYNTAX_KINDS,
   createMarkdownEditorProjection,
+  presentationForSyntaxKind,
+  type MarkdownEditorPresentation,
   type MarkdownEditorProjectionDiagnostic,
   type MarkdownEditorProjectionIdentity,
   type MarkdownEditorProjectionResult,
+  type MarkdownEditorRequiredSyntaxKind,
   type MarkdownEditorSyntaxCoverage,
   type MarkdownEditorSyntaxNode,
 } from './markdown-editor-projection'

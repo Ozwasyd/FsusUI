@@ -4,6 +4,8 @@ export {
   MarkdownRuntimeError,
   activateMarkdownFeatures,
   createMarkdownEditorProjection,
+  MARKDOWN_EDITOR_REQUIRED_SYNTAX_KINDS,
+  presentationForSyntaxKind,
   createMarkdownSourceCoordinateMap,
   MARKDOWN_EDITOR_PROJECTION_PARSER,
   renderMarkdownFallbackWithRuntime,
@@ -21,9 +23,11 @@ export {
 } from '@element-plus/wasm'
 
 export type {
+  MarkdownEditorPresentation,
   MarkdownEditorProjectionDiagnostic,
   MarkdownEditorProjectionIdentity,
   MarkdownEditorProjectionResult,
+  MarkdownEditorRequiredSyntaxKind,
   MarkdownEditorSyntaxCoverage,
   MarkdownEditorSyntaxNode,
   MarkdownFeatureActivationError,
