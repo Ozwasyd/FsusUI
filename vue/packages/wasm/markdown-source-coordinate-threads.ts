@@ -24,6 +24,7 @@ export interface MarkdownSourceCoordinateSnapshot {
   readonly normalizedToRawForward: readonly number[]
   readonly rawLineColumns: readonly MarkdownSourceLineColumn[]
   readonly rawUtf8: readonly number[]
+  readonly rawCaretsByNormalized: readonly (readonly number[])[]
 }
 
 export interface MarkdownSourceCoordinateThreadComparison {
@@ -81,6 +82,11 @@ const snapshotFromMap = (
     rawUtf8: Object.freeze(
       utf16Boundaries.map((offset) => map.toRawUtf8Offset(offset)),
     ),
+    rawCaretsByNormalized: Object.freeze(
+      Array.from({ length: normalizedLength + 1 }, (_, offset) =>
+        Object.freeze([...map.rawCaretsAtNormalized(offset)]),
+      ),
+    ),
   })
 }
 
@@ -109,7 +115,13 @@ export const markdownSourceCoordinateSnapshotsEquivalent = (
     (value, index) => value === right.normalizedToRawForward[index],
   ) &&
   sameLineColumns(left.rawLineColumns, right.rawLineColumns) &&
-  left.rawUtf8.every((value, index) => value === right.rawUtf8[index])
+  left.rawUtf8.every((value, index) => value === right.rawUtf8[index]) &&
+  left.rawCaretsByNormalized.length === right.rawCaretsByNormalized.length &&
+  left.rawCaretsByNormalized.every(
+    (carets, index) =>
+      carets.length === right.rawCaretsByNormalized[index]?.length &&
+      carets.every((caret, caretIndex) => caret === right.rawCaretsByNormalized[index]?.[caretIndex]),
+  )
 
 export const snapshotMarkdownSourceCoordinateMap = (
   rawSource: string | MarkdownSourceCoordinateMap,
@@ -165,6 +177,9 @@ const identitySnapshot = (raw: string): MarkdownSourceCoordinateSnapshot =>
     ),
     rawUtf8: Object.freeze(
       Array.from({ length: raw.length + 1 }, (_, offset) => offset),
+    ),
+    rawCaretsByNormalized: Object.freeze(
+      Array.from({ length: raw.length + 1 }, (_, offset) => Object.freeze([offset])),
     ),
   })
 

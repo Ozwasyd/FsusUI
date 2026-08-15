@@ -16,6 +16,7 @@ const fixtures = [
   'a\rb',
   '\uFEFF拉丁\n中文\r\n👩‍💻e\u0301\rשלום\n',
   'Hello \u05e9\u05dc\u05d5\u05dd \u2066world\u2069',
+  '\uFEFF\r\nbody',
 ] as const
 
 describe('markdown source coordinate worker/main threads', () => {
