@@ -2361,6 +2361,31 @@ std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
     }
     return static_cast<int>(left.kind) < static_cast<int>(right.kind);
   });
+
+  for (std::size_t index = 0; index < nodes.size(); ++index) {
+    std::size_t best = static_cast<std::size_t>(-1);
+    std::size_t best_span = static_cast<std::size_t>(-1);
+    for (std::size_t candidate = 0; candidate < nodes.size(); ++candidate) {
+      if (candidate == index) {
+        continue;
+      }
+      const syntax_node& parent = nodes[candidate];
+      const syntax_node& child = nodes[index];
+      const bool contains =
+        parent.start_offset <= child.start_offset &&
+        parent.end_offset >= child.end_offset &&
+        (parent.start_offset < child.start_offset || parent.end_offset > child.end_offset);
+      if (!contains) {
+        continue;
+      }
+      const std::size_t span = parent.end_offset - parent.start_offset;
+      if (span < best_span) {
+        best_span = span;
+        best = candidate;
+      }
+    }
+    nodes[index].parent_index = best;
+  }
   return nodes;
 }
 

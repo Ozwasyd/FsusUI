@@ -2,10 +2,18 @@ import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+export interface MarkdownParserSyntaxRange {
+  readonly start: number
+  readonly end: number
+}
+
 export interface MarkdownParserSyntaxNode {
   readonly kind: string
   readonly start: number
   readonly end: number
+  readonly parentStart?: number
+  readonly parentEnd?: number
+  readonly children?: readonly MarkdownParserSyntaxRange[]
 }
 
 type SyntaxCollectExports = {

@@ -34,6 +34,7 @@ export type {
   MarkdownEditorProjectionIdentity,
   MarkdownEditorProjectionResult,
   MarkdownEditorRequiredSyntaxKind,
+  MarkdownEditorSourceRange,
   MarkdownEditorSyntaxCoverage,
   MarkdownEditorSyntaxNode,
   MarkdownFeatureActivationError,

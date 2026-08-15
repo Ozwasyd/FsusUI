@@ -103,6 +103,45 @@ describe('markdown editor projection contract', () => {
     expect(image!.presentation).toBe('live-atomic')
     expect(footnoteRef!.presentation).toBe('live-decorated')
     expect(malformed!.presentation).toBe('unsupported-error')
+
+    const paragraph = projection.nodes.find(
+      (node) =>
+        node.kind === 'paragraph' &&
+        raw.slice(node.rawRange.start, node.rawRange.end).includes('[docs]'),
+    )
+    expect(paragraph).toBeDefined()
+    expect(link!.parentRawRange).toEqual(paragraph!.rawRange)
+    expect(link!.parentNormalizedRange).toEqual(paragraph!.normalizedRange)
+    expect(image!.parentRawRange).toEqual(paragraph!.rawRange)
+    expect(footnoteRef!.parentRawRange).toEqual(paragraph!.rawRange)
+    expect(paragraph!.childRawRanges).toEqual(
+      expect.arrayContaining([link!.rawRange, image!.rawRange, footnoteRef!.rawRange]),
+    )
+    expect(footnoteDef!.parentRawRange).toBeNull()
+    expect(footnoteDef!.childRawRanges).toEqual([])
+  })
+
+  it('keeps parent/child ranges on the parser projection, not HTML nesting', () => {
+    const raw = '\uFEFF# See [docs](https://x.test)\r\n\n![alt](img.png)\n'
+    const projection = createMarkdownEditorProjection(raw)
+    const heading = projection.nodes.find((node) => node.kind === 'heading')
+    const link = projection.nodes.find((node) => node.kind === 'link')
+    const image = projection.nodes.find((node) => node.kind === 'image')
+    const paragraph = projection.nodes.find((node) => node.kind === 'paragraph')
+    expect(heading).toBeDefined()
+    expect(link).toBeDefined()
+    expect(image).toBeDefined()
+    expect(paragraph).toBeDefined()
+    expect(heading!.parentRawRange).toBeNull()
+    expect(paragraph!.parentRawRange).toBeNull()
+    expect(link!.parentRawRange).toEqual(heading!.rawRange)
+    expect(image!.parentRawRange).toEqual(paragraph!.rawRange)
+    expect(heading!.childRawRanges).toEqual([link!.rawRange])
+    expect(paragraph!.childRawRanges).toEqual([image!.rawRange])
+    expect(raw.slice(heading!.rawRange.start, heading!.rawRange.end)).toContain('# See')
+    expect(raw.slice(link!.parentRawRange!.start, link!.parentRawRange!.end)).not.toMatch(
+      /<h1|<p|<a /i,
+    )
   })
 
   it('does not invent links from escaped text, code spans, or HTML indexOf', () => {

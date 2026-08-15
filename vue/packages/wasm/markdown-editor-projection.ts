@@ -59,11 +59,20 @@ export interface MarkdownEditorProjectionIdentity {
   readonly sourceIdentity: string
 }
 
+export interface MarkdownEditorSourceRange {
+  readonly start: number
+  readonly end: number
+}
+
 export interface MarkdownEditorSyntaxNode {
   readonly kind: string
   readonly presentation: MarkdownEditorPresentation
-  readonly rawRange: { readonly start: number; readonly end: number }
-  readonly normalizedRange: { readonly start: number; readonly end: number }
+  readonly rawRange: MarkdownEditorSourceRange
+  readonly normalizedRange: MarkdownEditorSourceRange
+  readonly parentRawRange: MarkdownEditorSourceRange | null
+  readonly parentNormalizedRange: MarkdownEditorSourceRange | null
+  readonly childRawRanges: readonly MarkdownEditorSourceRange[]
+  readonly childNormalizedRanges: readonly MarkdownEditorSourceRange[]
 }
 
 export interface MarkdownEditorProjectionDiagnostic {
@@ -112,13 +121,36 @@ export const createMarkdownEditorProjection = (
   const nodes: MarkdownEditorSyntaxNode[] = []
   const diagnostics: MarkdownEditorProjectionDiagnostic[] = []
 
+  const toNormalizedRange = (start: number, end: number) =>
+    Object.freeze({ start, end })
+  const toRawRange = (start: number, end: number) =>
+    Object.freeze(coordinates.toRawRange({ start, end }))
+
   for (const node of parserNodes) {
+    const hasParent =
+      Number.isInteger(node.parentStart) && Number.isInteger(node.parentEnd)
+    const childNormalizedRanges = Object.freeze(
+      (node.children ?? []).map((child) =>
+        toNormalizedRange(child.start, child.end),
+      ),
+    )
+    const childRawRanges = Object.freeze(
+      (node.children ?? []).map((child) => toRawRange(child.start, child.end)),
+    )
     nodes.push(
       Object.freeze({
         kind: node.kind,
         presentation: presentationForSyntaxKind(node.kind),
-        normalizedRange: { start: node.start, end: node.end },
-        rawRange: coordinates.toRawRange({ start: node.start, end: node.end }),
+        normalizedRange: toNormalizedRange(node.start, node.end),
+        rawRange: toRawRange(node.start, node.end),
+        parentNormalizedRange: hasParent
+          ? toNormalizedRange(node.parentStart as number, node.parentEnd as number)
+          : null,
+        parentRawRange: hasParent
+          ? toRawRange(node.parentStart as number, node.parentEnd as number)
+          : null,
+        childNormalizedRanges,
+        childRawRanges,
       }),
     )
   }
