@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "id": "markdown-editor-input",
+  "version": "markdown-input-acceptance@2026-08-15",
+  "exportPath": "./markdown-editor",
+  "package": "@ozwasyd/element-plus/components/markdown-editor",
+  "classification": "native-adapter",
+  "authority": "unique-transaction",
+  "modes": ["source", "live", "split"],
+  "contexts": [
+    "empty",
+    "paragraph",
+    "heading",
+    "list",
+    "task",
+    "quote",
+    "table",
+    "code",
+    "link",
+    "image",
+    "atomic"
+  ],
+  "selections": ["collapsed", "forward", "backward", "multiline"],
+  "unicode": [
+    "latin",
+    "cjk",
+    "emoji-zwj",
+    "combining",
+    "rtl",
+    "bom-crlf",
+    "tab",
+    "trailing-space",
+    "hard-break",
+    "blank-lines"
+  ],
+  "surfaces": [
+    {
+      "trackingIssue": 327,
+      "surface": "block",
+      "export": "resolveMarkdownBlockInputIntent"
+    },
+    {
+      "trackingIssue": 328,
+      "surface": "pair",
+      "export": "resolveMarkdownPairInput"
+    },
+    {
+      "trackingIssue": 329,
+      "surface": "clipboard",
+      "export": "resolveMarkdownClipboardPaste"
+    },
+    {
+      "trackingIssue": 330,
+      "surface": "native",
+      "export": "driveMarkdownNativeHarnessTrace"
+    },
+    {
+      "trackingIssue": 331,
+      "surface": "acceptance",
+      "export": "evaluateMarkdownInputAcceptance"
+    }
+  ],
+  "forbidden": [
+    "consumer-keydown",
+    "dom-mutation",
+    "html-paste",
+    "pair-drift",
+    "double-insert",
+    "full-normalize",
+    "second-input-pipeline",
+    "timeout-dedup",
+    "native-undo-authority"
+  ]
+}

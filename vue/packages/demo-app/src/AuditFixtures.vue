@@ -173,6 +173,7 @@
         :min-rows="6"
         :show-actions="false"
         :show-mode-switcher="false"
+        data-markdown-input-authority="transaction-store"
         @history-change="markdownTransactionHistory = $event"
         @selection-change="markdownTransactionSelection = $event"
         @transaction="recordMarkdownTransaction"

@@ -24,6 +24,11 @@ authority。
 `v-model` 回显时维护同值的 optimistic document 和 revision，但 DOM、HTML、
 Markdown AST 与 preview renderer 都不是可写内容源。
 
+Enter/Delete/Tab、智能配对、clipboard 与 beforeinput/composition 共用同一个
+transaction dispatcher。source/live/split 对相同输入必须产生相同 raw source
+transaction。输入合同与验收入口见
+[Markdown editor input](../api/markdown-editor-input.md)。
+
 ## Transaction contract
 
 公共 transaction 使用升序、互不重叠的 UTF-16 code-unit ranges，与 browser

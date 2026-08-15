@@ -117,6 +117,18 @@ export {
   type MarkdownNativeSyntheticBrowser,
   type MarkdownNativeTraceEntry,
 } from './markdown-editor-native-event'
+export {
+  MARKDOWN_INPUT_ACCEPTANCE_CONTEXTS,
+  MARKDOWN_INPUT_ACCEPTANCE_MODES,
+  MARKDOWN_INPUT_ACCEPTANCE_SELECTIONS,
+  MARKDOWN_INPUT_ACCEPTANCE_UNICODE,
+  MARKDOWN_INPUT_ACCEPTANCE_VERSION,
+  evaluateMarkdownInputAcceptance,
+  evaluateMarkdownInputAcceptanceMutations,
+  type MarkdownInputAcceptanceContextCell,
+  type MarkdownInputAcceptanceMutationKind,
+  type MarkdownInputAcceptanceReport,
+} from './markdown-editor-input-acceptance'
 export type MarkdownEditorChrome = 'framed' | 'embedded' | 'minimal'
 export const markdownEditorChromes = ['framed', 'embedded', 'minimal'] as const
 export type MarkdownEditorMobileLayout = 'auto' | 'compact' | 'standard'
