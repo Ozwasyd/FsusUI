@@ -69,6 +69,16 @@ export interface MarkdownProjectionWorkerPort {
   post(request: MarkdownProjectionWorkerRequest): void
 }
 
+export interface MarkdownProjectionWorkerScope {
+  onmessage: ((event: { readonly data: unknown }) => void) | null
+  postMessage(message: unknown): void
+  addEventListener?(
+    type: 'message',
+    listener: (event: { readonly data: unknown }) => void,
+  ): void
+  on?(type: 'message', listener: (data: unknown) => void): void
+}
+
 const sameIdentity = (
   left: MarkdownDocumentIdentity,
   right: MarkdownDocumentIdentity,
@@ -170,6 +180,62 @@ export const reviveMarkdownStableProjection = (
       return { status: 'current' as const, node }
     },
   })
+}
+
+export const handleMarkdownProjectionWorkerMessage = (
+  data: unknown,
+): MarkdownProjectionWorkerResult | null => {
+  if (!isMarkdownProjectionWorkerRequest(data)) return null
+  return projectMarkdownOnWorker(data)
+}
+
+export const bindMarkdownProjectionWorkerScope = (
+  scope: MarkdownProjectionWorkerScope,
+) => {
+  const onMessage = (event: { readonly data: unknown } | unknown) => {
+    const data =
+      event && typeof event === 'object' && 'data' in event
+        ? (event as { data: unknown }).data
+        : event
+    const result = handleMarkdownProjectionWorkerMessage(data)
+    if (result) scope.postMessage(result)
+  }
+  scope.onmessage = onMessage
+  scope.addEventListener?.('message', onMessage)
+  scope.on?.('message', (data) => onMessage({ data }))
+}
+
+export const connectMarkdownProjectionWorker = (input: {
+  readonly documentIdentity: MarkdownDocumentIdentity
+  readonly revision?: number
+  readonly worker: Pick<MarkdownProjectionWorkerScope, 'postMessage'> &
+    Partial<Pick<MarkdownProjectionWorkerScope, 'onmessage' | 'on' | 'addEventListener'>>
+  readonly onCommit?: (
+    result:
+      | MarkdownProjectionTaskCommitOk<MarkdownProjectionWorkerResult>
+      | MarkdownProjectionTaskCommitErr,
+  ) => void
+}): MarkdownProjectionWorkerHost => {
+  const host = createMarkdownProjectionWorkerHost({
+    documentIdentity: input.documentIdentity,
+    revision: input.revision,
+    port: {
+      post(request) {
+        input.worker.postMessage(request)
+      },
+    },
+  })
+  const onReply = (data: unknown) => {
+    input.onCommit?.(host.accept(data))
+  }
+  if (typeof input.worker.on === 'function') {
+    input.worker.on('message', onReply)
+  } else if (typeof input.worker.addEventListener === 'function') {
+    input.worker.addEventListener('message', (event) => onReply(event.data))
+  } else {
+    input.worker.onmessage = (event) => onReply(event.data)
+  }
+  return host
 }
 
 export const projectMarkdownOnWorker = (

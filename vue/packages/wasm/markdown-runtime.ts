@@ -92,7 +92,10 @@ export {
 export {
   MARKDOWN_PROJECTION_WORKER_REQUEST,
   MARKDOWN_PROJECTION_WORKER_RESULT,
+  bindMarkdownProjectionWorkerScope,
+  connectMarkdownProjectionWorker,
   createMarkdownProjectionWorkerHost,
+  handleMarkdownProjectionWorkerMessage,
   isMarkdownProjectionWorkerRequest,
   isMarkdownProjectionWorkerResult,
   projectMarkdownOnWorker,
@@ -100,6 +103,7 @@ export {
   snapshotMarkdownStableProjection,
   type MarkdownProjectionWorkerHost,
   type MarkdownProjectionWorkerPort,
+  type MarkdownProjectionWorkerScope,
   type MarkdownProjectionWorkerRequest,
   type MarkdownProjectionWorkerResult,
   type MarkdownProjectionWorkerSnapshot,
