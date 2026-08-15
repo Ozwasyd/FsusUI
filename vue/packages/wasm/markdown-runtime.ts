@@ -56,6 +56,12 @@ export {
   type MarkdownEditorSyntaxNode,
 } from './markdown-editor-projection'
 export {
+  MARKDOWN_PROJECTION_ACCEPTANCE_VERSION,
+  evaluateMarkdownProjectionAcceptance,
+  type MarkdownProjectionAcceptanceBudgets,
+  type MarkdownProjectionAcceptanceReport,
+} from './markdown-projection-acceptance'
+export {
   evaluateMarkdownProjectionMutations,
   markdownProjectionHasCompleteCoverage,
   type MarkdownProjectionMutationKind,
