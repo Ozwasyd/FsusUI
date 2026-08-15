@@ -214,7 +214,7 @@
             "semanticType": "PropType<MarkdownEditorMode | undefined>",
             "nullable": true,
             "default": { "kind": "undefined" },
-            "values": ["write", "split", "preview"],
+            "values": ["source", "live", "split", "preview"],
             "required": false,
             "readonly": false
           },

@@ -34,7 +34,16 @@ export type {
   MarkdownEditorTransactionRejection,
 } from './markdown-editor-transaction'
 
-export type MarkdownEditorMode = 'source' | 'live' | 'split' | 'preview'
+import { type MarkdownEditorMode } from './markdown-editor-live-contract'
+
+export {
+  markdownEditorModes,
+  markdownLiveCapabilities,
+  resolveMarkdownLiveCapability,
+  type MarkdownEditorMode,
+  type MarkdownLiveCapability,
+  type MarkdownLiveCapabilityResult,
+} from './markdown-editor-live-contract'
 export type MarkdownEditorChrome = 'framed' | 'embedded' | 'minimal'
 export const markdownEditorChromes = ['framed', 'embedded', 'minimal'] as const
 export type MarkdownEditorMobileLayout = 'auto' | 'compact' | 'standard'

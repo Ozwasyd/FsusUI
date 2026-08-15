@@ -6,6 +6,8 @@ import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import MarkdownEditor from '../src/markdown-editor.vue'
 import {
   defaultMarkdownEditorCommands,
+  markdownLiveCapabilities,
+  resolveMarkdownLiveCapability,
   runMarkdownEditorCommand,
 } from '../src/markdown-editor'
 import type {
@@ -935,9 +937,51 @@ describe('MarkdownEditor command contract migration', () => {
       resolve(process.cwd(), 'vue/packages/components/markdown-editor/src/markdown-editor.ts'),
       'utf8',
     )
+    const liveContract = readFileSync(
+      resolve(
+        process.cwd(),
+        'vue/packages/components/markdown-editor/src/markdown-editor-live-contract.ts',
+      ),
+      'utf8',
+    )
 
     expect(component).not.toMatch(/mode-write|--write|is-write/)
     expect(model).not.toMatch(/['\"]write['\"]/)
-    expect(model).toMatch(/['\"]source['\"]\s*\|\s*['\"]live['\"]\s*\|\s*['\"]split['\"]\s*\|\s*['\"]preview['\"]/)
+    expect(liveContract).not.toMatch(/['\"]write['\"]/)
+    expect(liveContract).toMatch(/['\"]source['\"]\s*\|\s*['\"]live['\"]\s*\|\s*['\"]split['\"]\s*\|\s*['\"]preview['\"]/)
+  })
+
+  it('resolves only the six frozen live capability tokens with document identity', () => {
+    expect([...markdownLiveCapabilities]).toEqual([
+      'supported',
+      'unsupported-platform',
+      'runtime-unavailable',
+      'projection-failed',
+      'feature-degraded',
+      'fatal',
+    ])
+
+    const identity = { epoch: 2, id: 'doc-a' }
+    const supported = resolveMarkdownLiveCapability('supported', {
+      documentIdentity: identity,
+      revision: 4,
+    })
+    expect(supported.capability).toBe('supported')
+    expect(supported.documentIdentity).toEqual(identity)
+    expect(supported.revision).toBe(4)
+
+    expect(() =>
+      resolveMarkdownLiveCapability('write', {
+        documentIdentity: identity,
+        revision: 4,
+      }),
+    ).toThrow(/unknown markdown live capability token/i)
+
+    expect(() =>
+      resolveMarkdownLiveCapability('supported', {
+        documentIdentity: { epoch: 1, id: '' },
+        revision: 4,
+      }),
+    ).toThrow(/missing identity/i)
   })
 })

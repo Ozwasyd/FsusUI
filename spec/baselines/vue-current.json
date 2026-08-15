@@ -11086,10 +11086,10 @@
             "runtimeType": "String",
             "semanticType": "PropType<MarkdownEditorMode>",
             "nullable": false,
-            "values": ["write", "split", "preview"],
+            "values": ["source", "live", "split", "preview"],
             "default": {
               "kind": "literal",
-              "value": "write"
+              "value": "source"
             },
             "required": false,
             "readonly": false
@@ -11188,7 +11188,7 @@
             "runtimeType": "String",
             "semanticType": "PropType<MarkdownEditorMode | undefined>",
             "nullable": true,
-            "values": ["write", "split", "preview"],
+            "values": ["source", "live", "split", "preview"],
             "default": {
               "kind": "undefined"
             },
