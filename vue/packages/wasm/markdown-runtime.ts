@@ -63,6 +63,15 @@ export {
   type MarkdownProjectionMutationResult,
 } from './markdown-projection-mutations'
 export {
+  evaluateMarkdownProjectionKeystrokeMutations,
+  markdownKeystrokeFullReparseRejected,
+  markdownKeystrokePlanStaysBounded,
+  type MarkdownKeystrokeMutationKind,
+  type MarkdownKeystrokeMutationReport,
+  type MarkdownKeystrokeMutationResult,
+  type MarkdownKeystrokeStroke,
+} from './markdown-projection-keystroke-mutations'
+export {
   createMarkdownSourceCoordinateMap,
   type MarkdownSourceAffinity,
   type MarkdownSourceCoordinateMap,
