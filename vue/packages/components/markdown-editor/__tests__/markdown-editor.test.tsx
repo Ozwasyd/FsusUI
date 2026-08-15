@@ -781,6 +781,44 @@ describe('MarkdownEditor', () => {
     expect(wrapper.vm.undo()).toMatchObject({ value: '粘贴' })
   })
 
+  it('pastes mixed MIME once as plain text and ignores the follow-up input event', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        modelValue: '',
+      },
+    })
+    const element = wrapper.find('textarea').element as HTMLTextAreaElement
+    const paste = new Event('paste', { bubbles: true, cancelable: true })
+    Object.defineProperty(paste, 'clipboardData', {
+      value: {
+        files: [],
+        getData: (type: string) =>
+          type === 'text/html' ? '<b>HTML</b>' : 'plain',
+        types: ['text/html', 'text/plain'],
+      },
+    })
+    element.dispatchEvent(paste)
+    await nextTick()
+
+    element.value += 'plain'
+    element.setSelectionRange(element.value.length, element.value.length)
+    element.dispatchEvent(
+      new InputEvent('input', {
+        bubbles: true,
+        data: 'plain',
+        inputType: 'insertFromPaste',
+      }),
+    )
+    await nextTick()
+
+    const accepted = wrapper
+      .emitted('transaction')
+      ?.map(([event]) => event as MarkdownEditorTransactionEvent)
+      .filter((event) => event.accepted)
+    expect(accepted?.map((event) => event.value)).toEqual(['plain'])
+    expect(accepted?.map((event) => event.transaction.origin)).toEqual(['paste'])
+  })
+
   it('rejects public mutations while loading without changing the optimistic value', async () => {
     const wrapper = mount(MarkdownEditor, {
       props: {
