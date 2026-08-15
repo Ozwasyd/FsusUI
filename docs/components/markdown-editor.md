@@ -140,7 +140,16 @@ renderer surface。
 
 `live` 不是 source textarea 上覆盖第二个 preview chrome。`split` 的 separator
 只表达真实 pane 边界；`preview` 即使没有编辑表面，仍保留可访问名称和
-loading/error/capability 状态。
+loading/error/capability 状态。公共 mode 只有 `source` / `live` / `split` /
+`preview`，没有 `write` 别名；源码模式的可见文案是「源码」。
+
+Live capability 只使用六个冻结 token：`supported`、`unsupported-platform`、
+`runtime-unavailable`、`projection-failed`、`feature-degraded`、`fatal`。
+结果必须绑定 document identity、epoch 与 source revision；same-source
+different-document 不得复用。unknown token、数字码、`write`/`ok` 别名和
+`readonly`/`disabled` 映射都 fail closed。`resolveMarkdownLiveCapability` 与
+`readMarkdownLiveCapability` 是唯一入口，不能从 DOM、class 或 error string
+猜测状态。
 
 ## Command registry
 

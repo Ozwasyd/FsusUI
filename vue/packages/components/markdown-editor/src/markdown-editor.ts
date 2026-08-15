@@ -37,11 +37,15 @@ export type {
 import { type MarkdownEditorMode } from './markdown-editor-live-contract'
 
 export {
+  evaluateMarkdownLiveCapabilityMutations,
   markdownEditorModes,
   markdownLiveCapabilities,
+  markdownLiveCapabilityKey,
+  readMarkdownLiveCapability,
   resolveMarkdownLiveCapability,
   type MarkdownEditorMode,
   type MarkdownLiveCapability,
+  type MarkdownLiveCapabilityMutationKind,
   type MarkdownLiveCapabilityResult,
 } from './markdown-editor-live-contract'
 export {

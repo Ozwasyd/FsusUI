@@ -21,12 +21,12 @@ export const MEMBER_STATUSES = [
 export const GOVERNANCE_FIELDS = ['reason', 'owner', 'testPolicy', 'reviewPolicy']
 export const MARKDOWN_EDITOR_MODES = ['source', 'live', 'split', 'preview']
 export const MARKDOWN_EDITOR_CAPABILITIES = [
-  'source',
-  'live',
-  'split',
-  'preview',
-  'readonly',
-  'disabled',
+  'supported',
+  'unsupported-platform',
+  'runtime-unavailable',
+  'projection-failed',
+  'feature-degraded',
+  'fatal',
 ]
 
 export const VUE_BASELINE_PATH = 'spec/baselines/vue-current.json'

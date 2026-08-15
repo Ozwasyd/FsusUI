@@ -995,7 +995,7 @@ const setMode = (mode: MarkdownEditorMode) => {
 const modeLabel = (mode: MarkdownEditorMode) => {
   if (mode === 'split') return '分屏'
   if (mode === 'preview') return '预览'
-  return mode === 'live' ? '实时' : '编写'
+  return mode === 'live' ? '实时' : '源码'
 }
 
 const emitSave = () => {

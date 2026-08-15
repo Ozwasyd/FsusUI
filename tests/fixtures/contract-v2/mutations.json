@@ -35,6 +35,27 @@
     "expectError": "six canonical values"
   },
   {
+    "name": "capability-consumer-mapping",
+    "operation": "replace",
+    "path": "/contracts/1/markdownEditor/capabilities",
+    "value": ["source", "live", "split", "preview", "readonly", "disabled"],
+    "expectError": "six canonical values"
+  },
+  {
+    "name": "capability-numeric-codes",
+    "operation": "replace",
+    "path": "/contracts/1/markdownEditor/capabilities",
+    "value": [0, 1, 2, 3, 4, 5],
+    "expectError": "six canonical values"
+  },
+  {
+    "name": "capability-unknown-fallback",
+    "operation": "replace",
+    "path": "/contracts/1/markdownEditor/capabilities",
+    "value": ["supported", "ok", "runtime-unavailable", "projection-failed", "feature-degraded", "fatal"],
+    "expectError": "six canonical values"
+  },
+  {
     "name": "unmapped-member",
     "operation": "delete",
     "path": "/contracts/0/inputs/0/status",

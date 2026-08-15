@@ -131,7 +131,7 @@ describe('MarkdownEditor', () => {
     expect(more.attributes('aria-label')).toContain('更多格式')
     expect(
       wrapper.findAll('.el-markdown-editor__mode').map((item) => item.text()),
-    ).toEqual(['编写', '预览'])
+    ).toEqual(['源码', '预览'])
 
     await more.trigger('click')
     const tray = wrapper.find('.el-markdown-editor__command-tray')

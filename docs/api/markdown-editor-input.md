@@ -28,6 +28,10 @@ or attachment IO.
 `driveMarkdownNativeHarnessTrace` is the #319 read/drive surface. Synthetic
 Chromium/Firefox/WebKit scripts are not native OS IME evidence.
 
+Public editor mode is exactly `source` / `live` / `split` / `preview`. Live
+capability tokens are exactly the six frozen values from
+`markdownLiveCapabilities`. There is no `write` mode alias.
+
 ## Acceptance gate
 
 `evaluateMarkdownInputAcceptance` composes the four planners and rejects
