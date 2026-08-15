@@ -94,6 +94,47 @@ const canMergeSlices = (left: string, right: string, merged: string) =>
   merged === `${left.replace(/\n$/, '')} ${right}` ||
   merged === `${left}\n${right}`
 
+const unwrapOnce = (text: string) => {
+  const trimmedEnd = text.replace(/\n+$/g, '')
+  const lines = trimmedEnd.split('\n')
+  if (
+    lines.length > 0 &&
+    lines.every((line) => line === '' || /^> ?/.test(line)) &&
+    lines.some((line) => line.startsWith('>'))
+  ) {
+    return lines.map((line) => line.replace(/^> ?/, '')).join('\n')
+  }
+
+  const onlyLine = lines.length === 1 ? lines[0]! : undefined
+  if (onlyLine) {
+    const withoutList = onlyLine.replace(/^(?:[-*+]|\d+[.)]) /, '')
+    if (withoutList !== onlyLine) return withoutList
+    const withoutTask = onlyLine.replace(/^(?:[-*+]|\d+[.)]) \[[ xX]\] /, '')
+    if (withoutTask !== onlyLine) return withoutTask
+    const withoutHeading = onlyLine.replace(/^#{1,6} /, '')
+    if (withoutHeading !== onlyLine) return withoutHeading
+  }
+
+  if (
+    trimmedEnd.startsWith('::p\n') &&
+    (trimmedEnd.endsWith('\n::') || trimmedEnd === '::p\n::')
+  ) {
+    return trimmedEnd.slice(4, trimmedEnd.endsWith('\n::') ? -3 : undefined)
+  }
+
+  return trimmedEnd
+}
+
+const payloadOf = (text: string) => {
+  let current = text.replace(/\n+$/g, '')
+  for (let step = 0; step < 8; step += 1) {
+    const next = unwrapOnce(current)
+    if (next === current) return current
+    current = next
+  }
+  return current
+}
+
 const assignIdentities = (
   projection: MarkdownEditorProjectionResult,
   documentIdentity: MarkdownDocumentIdentity,
@@ -116,12 +157,46 @@ const assignIdentities = (
 
   const claim = (nextIndex: number, previousIndex: number) => {
     const previousNode = previous.nodes[previousIndex]
-    if (!previousNode) return
+    if (!previousNode || usedPrevious.has(previousIndex)) return
+    if (assigned[nextIndex] !== undefined) return
     assigned[nextIndex] = previousNode.id
     usedPrevious.add(previousIndex)
     const ordinals = usedOrdinals.get(previousNode.kind) ?? new Set<number>()
     ordinals.add(ordinalFromIdentity(previousNode.id))
     usedOrdinals.set(previousNode.kind, ordinals)
+  }
+
+  const leftoverPreviousIndexes = () =>
+    previous.nodes
+      .map((_, index) => index)
+      .filter((index) => !usedPrevious.has(index))
+  const leftoverNextIndexes = () =>
+    projection.nodes
+      .map((_, index) => index)
+      .filter((index) => assigned[index] === undefined)
+
+  for (const nextIndex of leftoverNextIndexes()) {
+    const nextNode = projection.nodes[nextIndex]
+    if (!nextNode) continue
+    const nextPayload = payloadOf(sliceOf(nextSource, nextNode))
+    if (!nextPayload) continue
+
+    let best: number | undefined
+    let bestDistance = Number.POSITIVE_INFINITY
+    for (const previousIndex of leftoverPreviousIndexes()) {
+      const previousNode = previous.nodes[previousIndex]
+      if (!previousNode || previousNode.kind === nextNode.kind) continue
+      const previousPayload = payloadOf(sliceOf(previousSource, previousNode))
+      if (previousPayload !== nextPayload) continue
+      const distance = Math.abs(
+        previousNode.normalizedRange.start - nextNode.normalizedRange.start,
+      )
+      if (distance < bestDistance) {
+        bestDistance = distance
+        best = previousIndex
+      }
+    }
+    if (best !== undefined) claim(nextIndex, best)
   }
 
   const kinds = new Set([
@@ -131,10 +206,14 @@ const assignIdentities = (
 
   for (const kind of kinds) {
     const previousIndexes = previous.nodes
-      .map((node, index) => (node.kind === kind ? index : -1))
+      .map((node, index) =>
+        node.kind === kind && !usedPrevious.has(index) ? index : -1,
+      )
       .filter((index) => index >= 0)
     const nextIndexes = projection.nodes
-      .map((node, index) => (node.kind === kind ? index : -1))
+      .map((node, index) =>
+        node.kind === kind && assigned[index] === undefined ? index : -1,
+      )
       .filter((index) => index >= 0)
     const previousTexts = previousIndexes.map((index) =>
       sliceOf(previousSource, previous.nodes[index] as MarkdownEditorSyntaxNode),
