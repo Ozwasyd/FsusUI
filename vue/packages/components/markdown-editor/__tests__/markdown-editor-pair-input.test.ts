@@ -118,6 +118,75 @@ describe('markdown smart pairing', () => {
     expect(store.value).toBe('ab()')
     store.undo()
     expect(store.value).toBe('ab')
+    store.redo()
+    expect(store.value).toBe('ab()')
+    expect(store.selection.start).toBe(3)
+
+    const wrapStore = new MarkdownEditorTransactionStore('ab', { start: 0, end: 2 })
+    wrapStore.dispatch(
+      resolveMarkdownPairInput({
+        source: wrapStore.value,
+        selection: wrapStore.selection,
+        inserted: '[',
+      }).transaction!,
+    )
+    expect(wrapStore.value).toBe('[ab]')
+    wrapStore.undo()
+    expect(wrapStore.value).toBe('ab')
+    wrapStore.redo()
+    expect(wrapStore.value).toBe('[ab]')
+
+    const deleteStore = new MarkdownEditorTransactionStore('ab()', { start: 3, end: 3 })
+    deleteStore.dispatch(
+      resolveMarkdownPairInput({
+        source: deleteStore.value,
+        selection: deleteStore.selection,
+        key: 'backspace',
+      }).transaction!,
+    )
+    expect(deleteStore.value).toBe('ab')
+    deleteStore.undo()
+    expect(deleteStore.value).toBe('ab()')
+    deleteStore.redo()
+    expect(deleteStore.value).toBe('ab')
+  })
+
+  it('does not pair inside URL destinations or malformed link fragments', () => {
+    const url = 'See [docs](https://x.test) end\n'
+    const dest = url.indexOf('https')
+    for (const inserted of ['(', '[', '"', "'", '`']) {
+      const plan = resolveMarkdownPairInput({
+        source: url,
+        selection: { start: dest, end: dest },
+        inserted,
+        documentIdentity: { id: 'doc', epoch: 1 },
+      })
+      expect(plan.action).toBe('passthrough')
+      expect(plan.rejected).toBe('disabled-context')
+    }
+
+    const broken = '[broken](http://x\n'
+    const inside = broken.indexOf('http')
+    const malformed = resolveMarkdownPairInput({
+      source: broken,
+      selection: { start: inside, end: inside },
+      inserted: '(',
+      documentIdentity: { id: 'doc', epoch: 1 },
+    })
+    expect(malformed.action).toBe('passthrough')
+    expect(malformed.rejected).toBe('disabled-context')
+
+    const afterBracket = resolveMarkdownPairInput({
+      source: '[docs]',
+      selection: { start: 6, end: 6 },
+      inserted: '(',
+    })
+    expect(afterBracket.action).toBe('insert-pair')
+    expect(applyMarkdownEditorChanges('[docs]', afterBracket.transaction!.changes)?.value).toBe(
+      '[docs]()',
+    )
+
+    expect(apply('~~', 2, '~').plan.action).toBe('passthrough')
   })
 
   it('rejects pair drift, composition pairing, auto-strong, and consumer keydown', () => {
