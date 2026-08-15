@@ -3018,6 +3018,9 @@ describe('Fsus theme visual baseline', () => {
         'font-weight: 700;',
         'line-height: 1.25;',
       ])
+      expect(shellCss).toContain(
+        'min-height: var(--fsus-public-shell-mobile-action-height, 44px);',
+      )
       expectCssRule(shellCss, '.el-public-shell__nav-link', [
         'border-bottom: 2px solid transparent;',
         'padding-bottom: 0;',

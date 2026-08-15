@@ -658,9 +658,12 @@
     }
 
     @include e(brand) {
-      display: block;
+      display: inline-flex;
+      align-items: center;
+      box-sizing: border-box;
       max-width: 100%;
       min-width: 0;
+      min-height: var(--fsus-public-shell-mobile-action-height, 44px);
       overflow: hidden;
       text-overflow: ellipsis;
     }
