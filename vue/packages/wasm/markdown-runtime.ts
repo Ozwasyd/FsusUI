@@ -80,6 +80,16 @@ export {
   type MarkdownSyntaxIdentityStatus,
 } from './markdown-syntax-identity'
 export {
+  createMarkdownOutlineEntries,
+  createMarkdownTableEntries,
+  resolveMarkdownConsumerIdentity,
+  searchMarkdownStableProjection,
+  type MarkdownIdentityConsumerEntry,
+  type MarkdownOutlineEntry,
+  type MarkdownSearchHit,
+  type MarkdownTableEntry,
+} from './markdown-syntax-consumers'
+export {
   MARKDOWN_PROJECTION_WORKER_REQUEST,
   MARKDOWN_PROJECTION_WORKER_RESULT,
   createMarkdownProjectionWorkerHost,
