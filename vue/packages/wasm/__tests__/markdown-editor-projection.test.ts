@@ -6,8 +6,14 @@ import {
   MARKDOWN_RENDERER_VERSION,
   createMarkdownEditorProjection,
   createMarkdownSourceCoordinateMap,
+  markdownRenderIdentitiesEqual,
   presentationForSyntaxKind,
+  readMarkdownRenderIdentity,
+  renderMarkdownChunksWithRuntime,
   renderMarkdownFallbackWithRuntime,
+  renderMarkdownHtmlWithRuntime,
+  renderMarkdownResultWithRuntime,
+  renderMarkdownSummaryWithRuntime,
 } from '../markdown-runtime'
 import { resolveMarkdownSourceIdentity } from '../markdown'
 
@@ -25,6 +31,7 @@ describe('markdown editor projection contract', () => {
     expect(projection.identity.sourceIdentity).toBe(resolveMarkdownSourceIdentity(raw))
     expect(projection.identity.sourceIdentity).toBe(rendered.sourceIdentity)
     expect(projection.identity.version).toBe(rendered.rendererVersion)
+    expect(markdownRenderIdentitiesEqual(projection, rendered)).toBe(true)
     expect(Array.isArray(projection.nodes)).toBe(true)
     expect(Array.isArray(projection.diagnostics)).toBe(true)
     expect(projection.syntaxCoverage.parser).toBe(projection.identity.parser)
@@ -170,5 +177,39 @@ describe('markdown editor projection contract', () => {
     )
     expect(MARKDOWN_EDITOR_REQUIRED_SYNTAX_KINDS).toContain('heading')
     expect(presentationForSyntaxKind('heading')).toBe('live-decorated')
+  })
+
+  it('matches projection identity to full WASM render payloads, not HTML', async () => {
+    const raw = '\uFEFF# Title\r\n\nA paragraph with [docs](https://x.test).\n'
+    const projection = createMarkdownEditorProjection(raw)
+    const fallback = renderMarkdownFallbackWithRuntime(raw)
+    const unwrap = <T>(result: { ok: true; value: T } | { ok: false; error: { message: string } }) => {
+      if (!result.ok) {
+        throw new Error(result.error.message)
+      }
+      return result.value
+    }
+
+    const html = unwrap(await renderMarkdownHtmlWithRuntime(raw))
+    const summary = unwrap(await renderMarkdownSummaryWithRuntime(raw))
+    const full = unwrap(await renderMarkdownResultWithRuntime(raw))
+    const chunks = unwrap(await renderMarkdownChunksWithRuntime(raw))
+
+    expect(markdownRenderIdentitiesEqual(projection, fallback)).toBe(true)
+    expect(markdownRenderIdentitiesEqual(projection, html)).toBe(true)
+    expect(markdownRenderIdentitiesEqual(projection, summary)).toBe(true)
+    expect(markdownRenderIdentitiesEqual(projection, full)).toBe(true)
+    expect(markdownRenderIdentitiesEqual(projection, chunks)).toBe(true)
+
+    const identity = readMarkdownRenderIdentity(html)
+    expect(identity.parser).toBe(MARKDOWN_EDITOR_PROJECTION_PARSER)
+    expect(identity.rawSource).toBe(raw)
+    expect(identity.normalizedSource).toBe(projection.identity.normalizedSource)
+    expect(identity.version).toBe(MARKDOWN_RENDERER_VERSION)
+    expect(identity.sourceIdentity).toBe(projection.identity.sourceIdentity)
+    expect(identity.sourceIdentity).not.toBe(html.html)
+    expect(markdownRenderIdentitiesEqual(html, { ...html, rawSource: 'other' })).toBe(
+      false,
+    )
   })
 })

@@ -1,4 +1,5 @@
 import {
+  MARKDOWN_RENDER_PARSER,
   MARKDOWN_RENDERER_VERSION,
   normalizeMarkdownSource,
   resolveMarkdownSourceIdentity,
@@ -6,7 +7,7 @@ import {
 import { collectMarkdownSyntaxNodesFromParser } from './markdown-syntax-collect'
 import { createMarkdownSourceCoordinateMap } from './markdown-source-coordinate-map'
 
-export const MARKDOWN_EDITOR_PROJECTION_PARSER = 'fsus-markdown-runtime'
+export const MARKDOWN_EDITOR_PROJECTION_PARSER = MARKDOWN_RENDER_PARSER
 
 export type MarkdownEditorPresentation =
   | 'live-decorated'
@@ -94,6 +95,72 @@ export interface MarkdownEditorProjectionResult {
   readonly nodes: readonly MarkdownEditorSyntaxNode[]
   readonly diagnostics: readonly MarkdownEditorProjectionDiagnostic[]
   readonly syntaxCoverage: MarkdownEditorSyntaxCoverage
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  Object(value) === value
+
+export const readMarkdownRenderIdentity = (
+  value: unknown,
+): MarkdownEditorProjectionIdentity => {
+  if (!isRecord(value)) {
+    throw new Error('markdown render identity requires an object')
+  }
+
+  if (isRecord(value.identity)) {
+    return readMarkdownRenderIdentity(value.identity)
+  }
+
+  const parser =
+    typeof value.parser === 'string'
+      ? value.parser
+      : MARKDOWN_EDITOR_PROJECTION_PARSER
+  const rawSource =
+    typeof value.rawSource === 'string' ? value.rawSource : undefined
+  const normalizedSource =
+    typeof value.normalizedSource === 'string'
+      ? value.normalizedSource
+      : undefined
+  const sourceIdentity =
+    typeof value.sourceIdentity === 'string' ? value.sourceIdentity : undefined
+  const version =
+    typeof value.version === 'string'
+      ? value.version
+      : typeof value.rendererVersion === 'string'
+        ? value.rendererVersion
+        : undefined
+
+  if (
+    !rawSource ||
+    normalizedSource === undefined ||
+    !sourceIdentity ||
+    !version
+  ) {
+    throw new Error('markdown render identity is missing parser/source/version')
+  }
+
+  return Object.freeze({
+    parser,
+    rawSource,
+    normalizedSource,
+    version,
+    sourceIdentity,
+  })
+}
+
+export const markdownRenderIdentitiesEqual = (
+  left: unknown,
+  right: unknown,
+): boolean => {
+  const first = readMarkdownRenderIdentity(left)
+  const second = readMarkdownRenderIdentity(right)
+  return (
+    first.parser === second.parser &&
+    first.rawSource === second.rawSource &&
+    first.normalizedSource === second.normalizedSource &&
+    first.version === second.version &&
+    first.sourceIdentity === second.sourceIdentity
+  )
 }
 
 export const presentationForSyntaxKind = (

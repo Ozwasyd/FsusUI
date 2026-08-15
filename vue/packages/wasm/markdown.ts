@@ -1,4 +1,5 @@
 export const MARKDOWN_RENDERER_VERSION = 'markdown-wasm-contract@2026-07-29'
+export const MARKDOWN_RENDER_PARSER = 'fsus-markdown-runtime'
 
 declare const markdownSafeHtmlBrand: unique symbol
 declare const markdownSafeRenderResultBrand: unique symbol
@@ -64,6 +65,8 @@ export interface MarkdownRenderPlaceholder {
 
 export interface MarkdownSafeRenderResult extends MarkdownSafeRenderAuthority {
   readonly html: MarkdownSafeHtml
+  readonly parser: string
+  readonly rawSource: string
   readonly normalizedSource: string
   readonly sourceIdentity: string
   readonly features: readonly MarkdownRenderFeature[]
