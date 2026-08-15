@@ -115,6 +115,8 @@
       :class="ns.e('body')"
       :data-markdown-reveal-state="liveReveal.state"
       :data-markdown-surface-owner="liveSurface.inputOwner"
+      :data-markdown-atomic-kind="liveAtomic?.kind || undefined"
+      :data-markdown-atomic-status="liveAtomic?.state || undefined"
     >
       <textarea
         :id="textareaId"
@@ -254,6 +256,14 @@ import {
   resolveMarkdownLiveSyntaxReveal,
   type MarkdownLiveRevealIntent,
 } from './markdown-editor-live-reveal'
+import {
+  resolveMarkdownAtomicNodeIntent,
+  resolveMarkdownLiveSelectionMotion,
+  retainMarkdownLiveSelection,
+  type MarkdownAtomicNodePlan,
+  type MarkdownAtomicNodeSession,
+  type MarkdownLiveSelectionMotion,
+} from './markdown-editor-live-selection'
 
 defineOptions({
   name: 'ElMarkdownEditor',
@@ -306,6 +316,9 @@ const liveReveal = ref(
     source: editorValue.value,
   }),
 )
+const isComposing = ref(false)
+const atomicSession = ref<MarkdownAtomicNodeSession | null>(null)
+const liveAtomic = ref<MarkdownAtomicNodePlan | null>(null)
 const refreshLiveReveal = (
   extras: {
     readonly intent?: MarkdownLiveRevealIntent
@@ -323,7 +336,55 @@ const refreshLiveReveal = (
     source: transactionStore.value,
   })
 }
-const isComposing = ref(false)
+
+const applyLiveSelectionMotion = (
+  motion: MarkdownLiveSelectionMotion,
+  extras: {
+    readonly dragOffset?: number
+    readonly pointerOffset?: number
+    readonly shift?: boolean
+  } = {},
+) => {
+  const plan = resolveMarkdownLiveSelectionMotion({
+    composing: isComposing.value,
+    documentIdentity,
+    dragOffset: extras.dragOffset,
+    mode: currentMode.value,
+    motion,
+    pointerOffset: extras.pointerOffset,
+    revision: transactionStore.revision,
+    selection: captureSelection(false),
+    session: atomicSession.value,
+    shift: extras.shift,
+    source: transactionStore.value,
+  })
+  liveAtomic.value = plan.atomic
+  atomicSession.value = plan.atomic?.session ?? null
+  if (!plan.transaction) return plan
+  dispatchTransaction(plan.transaction)
+  refreshLiveReveal()
+  return plan
+}
+
+const applyAtomicIntent = (
+  action: Parameters<typeof resolveMarkdownAtomicNodeIntent>[0]['action'],
+) => {
+  const plan = resolveMarkdownAtomicNodeIntent({
+    action,
+    composing: isComposing.value,
+    documentIdentity,
+    mode: currentMode.value,
+    revision: transactionStore.revision,
+    selection: captureSelection(),
+    session: atomicSession.value,
+    source: transactionStore.value,
+  })
+  liveAtomic.value = plan.state === 'unsupported' ? null : plan
+  atomicSession.value = plan.session
+  if (plan.transaction) dispatchTransaction(plan.transaction)
+  refreshLiveReveal()
+  return plan
+}
 const pendingCommandKeys = ref(new Set<string>())
 const commandControllers = new Map<string, AbortController>()
 const commandContextSignal = new AbortController().signal
@@ -929,6 +990,14 @@ const handleDrop = (event: DragEvent) => {
 }
 
 const handleCopy = (event: ClipboardEvent) => {
+  if (currentMode.value === 'live' && atomicSession.value?.phase === 'selected') {
+    const atomic = applyAtomicIntent('copy-source')
+    if (atomic.copy && 'payload' in atomic.copy) {
+      event.preventDefault()
+      writeMarkdownClipboardPayload(event.clipboardData, atomic.copy.payload)
+      return
+    }
+  }
   const plan = resolveMarkdownClipboardCopy({
     composing: isComposing.value,
     disabled: editingBlocked.value,
@@ -947,6 +1016,19 @@ const handleCopy = (event: ClipboardEvent) => {
 }
 
 const handleCut = (event: ClipboardEvent) => {
+  if (currentMode.value === 'live' && atomicSession.value?.phase === 'selected') {
+    const atomic = applyAtomicIntent('cut')
+    if (atomic.copy && 'payload' in atomic.copy) {
+      event.preventDefault()
+      writeMarkdownClipboardPayload(event.clipboardData, atomic.copy.payload)
+      return
+    }
+    if (atomic.copy && 'copy' in atomic.copy) {
+      event.preventDefault()
+      writeMarkdownClipboardPayload(event.clipboardData, atomic.copy.copy.payload)
+      return
+    }
+  }
   const plan = resolveMarkdownClipboardCut({
     composing: isComposing.value,
     disabled: editingBlocked.value,
@@ -968,12 +1050,27 @@ const handleCut = (event: ClipboardEvent) => {
 const handleSelectionMove = () => {
   if (restoringSelection || isComposing.value) return
   captureSelection()
+  if (currentMode.value === 'live') {
+    const selection = transactionStore.selection
+    if (selection.start !== selection.end) {
+      applyLiveSelectionMotion('pointer-drag', {
+        dragOffset:
+          selection.direction === 'backward' ? selection.start : selection.end,
+      })
+      return
+    }
+  }
   refreshLiveReveal()
 }
 
 const handlePointerReveal = () => {
   if (restoringSelection || isComposing.value) return
   captureSelection()
+  if (currentMode.value === 'live') {
+    applyLiveSelectionMotion('pointer-click', {
+      pointerOffset: transactionStore.selection.start,
+    })
+  }
   refreshLiveReveal({
     intent: 'pointer',
     pointerOffset: transactionStore.selection.start,
@@ -1059,8 +1156,17 @@ const setMode = (mode: MarkdownEditorMode) => {
 
   transactionStore.breakMergeGroup()
   const nextMode = normalizeModeForLayout(mode)
+  const retained = retainMarkdownLiveSelection({
+    documentIdentity,
+    mode: nextMode,
+    selection: captureSelection(false),
+    source: transactionStore.value,
+  })
+  transactionStore.setSelection(retained.selection, false)
   currentMode.value = nextMode
   emit('mode-change', nextMode)
+  void restoreTextareaSelection(retained.selection, false)
+  refreshLiveReveal()
 }
 
 const modeLabel = (mode: MarkdownEditorMode) => {
@@ -1102,14 +1208,108 @@ const emitRenderEvent = (
 const handleKeydown = (event: KeyboardEvent) => {
   if (editingBlocked.value || nativeMachine.freezeSmartInput) return
 
-  if (
-    event.key === 'Escape' &&
-    currentMode.value === 'live' &&
-    liveReveal.value.state !== 'inactive'
-  ) {
-    event.preventDefault()
-    refreshLiveReveal({ intent: 'escape' })
-    return
+  if (event.key === 'Escape' && currentMode.value === 'live') {
+    if (atomicSession.value) {
+      event.preventDefault()
+      applyAtomicIntent('escape')
+      return
+    }
+    if (liveReveal.value.state !== 'inactive') {
+      event.preventDefault()
+      refreshLiveReveal({ intent: 'escape' })
+      return
+    }
+  }
+
+  if (currentMode.value === 'live') {
+    const motionKey =
+      event.key === 'ArrowLeft'
+        ? event.ctrlKey || event.altKey
+          ? 'word-left'
+          : 'left'
+        : event.key === 'ArrowRight'
+          ? event.ctrlKey || event.altKey
+            ? 'word-right'
+            : 'right'
+          : event.key === 'Home'
+            ? 'home'
+            : event.key === 'End'
+              ? 'end'
+              : event.key === 'PageUp'
+                ? 'page-up'
+                : event.key === 'PageDown'
+                  ? 'page-down'
+                  : null
+    if (motionKey) {
+      event.preventDefault()
+      applyLiveSelectionMotion(motionKey, { shift: event.shiftKey })
+      return
+    }
+    if (event.key === 'Enter' && !event.altKey && !event.ctrlKey && !event.metaKey) {
+      const atomic = resolveMarkdownAtomicNodeIntent({
+        action: 'caret-before',
+        composing: isComposing.value,
+        documentIdentity,
+        mode: currentMode.value,
+        revision: transactionStore.revision,
+        selection: captureSelection(),
+        session: atomicSession.value,
+        source: transactionStore.value,
+      })
+      if (atomic.state === 'current') {
+        event.preventDefault()
+        applyAtomicIntent(event.shiftKey ? 'enter-source' : 'enter')
+        return
+      }
+    }
+    if (
+      (event.key === 'Backspace' || event.key === 'Delete') &&
+      !event.altKey &&
+      !event.ctrlKey &&
+      !event.metaKey
+    ) {
+      const selection = captureSelection()
+      const atomic = resolveMarkdownAtomicNodeIntent({
+        action: event.key === 'Backspace' ? 'backspace' : 'delete',
+        composing: isComposing.value,
+        documentIdentity,
+        mode: currentMode.value,
+        revision: transactionStore.revision,
+        selection,
+        session: atomicSession.value,
+        source: transactionStore.value,
+      })
+      if (atomic.state === 'current' && atomic.nodeId) {
+        const before = resolveMarkdownAtomicNodeIntent({
+          action: 'caret-before',
+          documentIdentity,
+          mode: currentMode.value,
+          nodeId: atomic.nodeId,
+          revision: transactionStore.revision,
+          selection,
+          source: transactionStore.value,
+        })
+        const after = resolveMarkdownAtomicNodeIntent({
+          action: 'caret-after',
+          documentIdentity,
+          mode: currentMode.value,
+          nodeId: atomic.nodeId,
+          revision: transactionStore.revision,
+          selection,
+          source: transactionStore.value,
+        })
+        const caret = selection.start
+        const shouldDelete =
+          atomicSession.value?.phase === 'selected' ||
+          (event.key === 'Delete' && caret === before.selection.start) ||
+          (event.key === 'Backspace' && caret === after.selection.start)
+        if (shouldDelete) {
+          event.preventDefault()
+          applyAtomicIntent(event.key === 'Backspace' ? 'backspace' : 'delete')
+          return
+        }
+      }
+    }
   }
 
   const isMod = event.metaKey || event.ctrlKey
