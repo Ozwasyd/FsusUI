@@ -67,6 +67,12 @@ Language edits touch only the info range. Keyboard and clipboard stay on
 the #287 pipeline. Fences are not identified by regex and bodies are not
 executed.
 
+`planMarkdownMermaidPreview` is the #384 Mermaid preview contract. Requests
+reuse the #382 identity. Valid diagrams preview through the unique feature
+gateway. Invalid, large, abort, and stale results stay local and source-only.
+Height restore uses #336. Consumer SVG/innerHTML and auto-rewrites are
+rejected.
+
 ## Acceptance gate
 
 `evaluateMarkdownInputAcceptance` composes the four planners and rejects

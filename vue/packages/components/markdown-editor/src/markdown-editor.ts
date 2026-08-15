@@ -73,6 +73,19 @@ export {
   type MarkdownLiveRevealTarget,
 } from './markdown-editor-live-reveal'
 export {
+  MARKDOWN_MERMAID_BUDGET,
+  classifyMarkdownMermaidBody,
+  commitMarkdownMermaidPreview,
+  evaluateMarkdownMermaidMutations,
+  planMarkdownMermaidPreview,
+  type MarkdownMermaidClassification,
+  type MarkdownMermaidMutationKind,
+  type MarkdownMermaidPresentation,
+  type MarkdownMermaidPreviewAction,
+  type MarkdownMermaidPreviewPlan,
+  type MarkdownMermaidVerdict,
+} from './markdown-editor-mermaid'
+export {
   applyMarkdownCodeLanguageChange,
   evaluateMarkdownCodeMutations,
   insertMarkdownCodeFence,
