@@ -239,10 +239,10 @@ const assertIntegerInRange = (value: number, label: string, max: number) => {
 }
 
 const asRange = (range: MarkdownAnchorSyntaxRange): MarkdownSourceRange => {
-  if (Array.isArray(range)) {
-    return { start: range[0] as number, end: range[1] as number }
+  if ('start' in range) {
+    return { start: range.start, end: range.end }
   }
-  return { start: range.start, end: range.end }
+  return { start: range[0], end: range[1] }
 }
 
 const rangeLength = (node: MarkdownAnchorSyntaxNode) => node.end - node.start

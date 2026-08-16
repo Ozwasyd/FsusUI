@@ -16,6 +16,7 @@ import { resolvePackageContract } from './npm-package-contract.mjs'
 import {
   candidateTarballName,
   readCandidatePackageJson,
+  sha256File,
   verifyCandidate,
 } from './npm-candidate-lib.mjs'
 import { parseConsumerInstallArgs } from './consumer-install-args.mjs'
@@ -497,8 +498,7 @@ try {
         `const expectEsmPathNotExported = async (specifier) => { try { await import(specifier) } catch (error) { if (error?.code === 'ERR_PACKAGE_PATH_NOT_EXPORTED') return; throw error } throw new Error('ES deep import unexpectedly exported ' + specifier) }`,
         `const expectCjsPathNotExported = (specifier) => { try { require(specifier) } catch (error) { if (error?.code === 'ERR_PACKAGE_PATH_NOT_EXPORTED') return; throw error } throw new Error('CJS deep import unexpectedly exported ' + specifier) }`,
         `const expectEsmMissingInternalPath = async (specifier) => { let expectedUrl; try { expectedUrl = import.meta.resolve(specifier) } catch (error) { if (error?.code === 'ERR_PACKAGE_PATH_NOT_EXPORTED') return; throw error } try { await import(specifier) } catch (error) { if (error?.code === 'ERR_MODULE_NOT_FOUND' && error?.url === expectedUrl) return; throw error } throw new Error('ES internal path unexpectedly loaded ' + specifier) }`,
-        `const packageRoot = path.dirname(path.dirname(require.resolve('${packageName}')))`,
-        `const expectCjsMissingInternalPath = (specifier, expectedTarget) => { try { require.resolve(specifier) } catch (error) { const firstLine = String(error?.message ?? '').split(/\\r?\\n/u)[0]; if (error?.code === 'ERR_PACKAGE_PATH_NOT_EXPORTED') return; if (error?.code === 'MODULE_NOT_FOUND' && firstLine === "Cannot find module '" + expectedTarget + "'" && !error?.requireStack) return; throw error } throw new Error('CJS internal path unexpectedly resolved ' + specifier) }`,
+        `const expectCjsMissingInternalPath = (specifier, relativeTarget) => { try { require.resolve(specifier) } catch (error) { if (error?.code === 'ERR_PACKAGE_PATH_NOT_EXPORTED') return; if (error?.code === 'MODULE_NOT_FOUND') { const firstLine = String(error?.message ?? '').split(/\\r?\\n/u)[0]; const expectedTarget = error?.path ? path.join(error.path, relativeTarget) : null; if (expectedTarget && firstLine === "Cannot find module '" + expectedTarget + "'") return; } throw error } throw new Error('CJS internal path unexpectedly resolved ' + specifier) }`,
         `const forbiddenAuthorityBuilders = ['authorizeMarkdownRuntimeResult', 'brandMarkdownSafeHtml', 'brandMarkdownSafeRenderResult']`,
         `for (const [surface, exports] of [['root', root], ['wasm', wasm], ['markdown-runtime', markdownRuntime]]) for (const name of forbiddenAuthorityBuilders) if (name in exports) throw new Error(surface + ' exposes forbidden Markdown authority builder ' + name)`,
         `await expectEsmPathNotExported('${packageName}/es/wasm/markdown-safe')`,
@@ -510,7 +510,7 @@ try {
         `expectCjsPathNotExported('${packageName}/lib/wasm/%6darkdown-feature-output-gateway.js')`,
         `expectCjsPathNotExported('${packageName}/lib/%77asm/markdown-feature-output-gateway.js')`,
         `await expectEsmMissingInternalPath('${packageName}/es/components/markdown-renderer/src/markdown-renderer-cache')`,
-        `expectCjsMissingInternalPath('${packageName}/lib/components/markdown-renderer/src/markdown-renderer-cache', path.join(packageRoot, 'lib', 'components', 'markdown-renderer', 'src', 'markdown-renderer-cache.js'))`,
+        `expectCjsMissingInternalPath('${packageName}/lib/components/markdown-renderer/src/markdown-renderer-cache', 'lib/components/markdown-renderer/src/markdown-renderer-cache.js')`,
         `if (root.FsusDataList?.name !== 'FsusDataList') throw new Error('FsusDataList runtime export drifted')`,
         `if (rootCjs.FsusDataList?.name !== 'FsusDataList') throw new Error('FsusDataList CJS runtime export drifted')`,
         `if (typeof wasm.ensureWasmReady !== 'function' || typeof wasmCjs.ensureWasmReady !== 'function') throw new Error('Wasm public entry resolution drifted')`,
@@ -593,6 +593,40 @@ try {
   const performanceGraph = reportConsumerPerformanceGraph(fixtureRoot)
   assertNoConsumerBuildWarnings(viteOutput)
   assertConsumerPerformanceGraph(performanceGraph)
+
+  if (candidateTarballPath && candidateManifest) {
+    const postInstallSha256 = sha256File(candidateTarballPath)
+    if (postInstallSha256 !== candidateManifest.artifact.sha256) {
+      throw new Error(
+        'Candidate tarball was mutated during consumer install; profiles must consume the candidate read-only.',
+      )
+    }
+  }
+
+  if (artifactsRoot) {
+    writeFileSync(
+      path.join(artifactsRoot, 'consumer-install-receipt.json'),
+      `${JSON.stringify(
+        {
+          schemaVersion: 1,
+          candidate: candidateManifest
+            ? {
+                filename: candidateManifest.artifact.filename,
+                sha256: candidateManifest.artifact.sha256,
+              }
+            : null,
+          profile: parsedInstallArgs?.profile ?? null,
+          fixture: {
+            path: fixtureRoot,
+            packageName,
+            packageVersion: distPackage.version,
+          },
+        },
+        null,
+        2,
+      )}\n`,
+    )
+  }
 
   console.log(
     `Consumer install smoke passed for ${packageName}${candidateManifest ? ` from candidate ${candidateManifest.artifact.sha256}` : ''}.`,

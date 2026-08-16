@@ -552,7 +552,7 @@ export const evaluateMarkdownLiveLayoutMutations = () => {
         kind: 'dom-anchor' as const,
       }),
       Object.freeze({
-        accepted: authority.scrollIntoView === true,
+        accepted: authority.scrollIntoView,
         detail: 'height restore must not call unconditional scrollIntoView',
         kind: 'scroll-into-view' as const,
       }),

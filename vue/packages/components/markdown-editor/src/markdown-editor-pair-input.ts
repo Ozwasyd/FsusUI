@@ -48,8 +48,8 @@ export type MarkdownPairMutationKind =
   | 'auto-strong'
   | 'consumer-keydown'
 
-const OPEN_TO_CLOSE = new Map(MARKDOWN_PAIR_DEFAULTS.map(([open, close]) => [open, close]))
-const CLOSE_TO_OPEN = new Map(MARKDOWN_PAIR_DEFAULTS.map(([open, close]) => [close, open]))
+const OPEN_TO_CLOSE = new Map<string, string>(MARKDOWN_PAIR_DEFAULTS.map(([open, close]) => [open, close]))
+const CLOSE_TO_OPEN = new Map<string, string>(MARKDOWN_PAIR_DEFAULTS.map(([open, close]) => [close, open]))
 
 const isWordChar = (value: string) => /[0-9A-Za-z\u00c0-\u024f]/.test(value)
 

@@ -23,6 +23,17 @@ interface FsusAuditAttributes {
   'data-audit-target'?: string | boolean
   'data-testid'?: string
   'data-markdown-editor-probe-id'?: string
+  'data-markdown-reveal-state'?: string | boolean
+  'data-markdown-surface-owner'?: string | boolean
+  'data-markdown-atomic-kind'?: string | boolean
+  'data-markdown-atomic-status'?: string | boolean
+  'data-markdown-layout-action'?: string | boolean
+  'data-markdown-layout-smooth'?: string | boolean
+  'data-markdown-live-decorations'?: string | boolean
+  'data-markdown-input-authority'?: string | boolean
+  'data-kind'?: string | boolean
+  'data-node-id'?: string | boolean
+  'data-role'?: string | boolean
   'data-upload-help'?: string | boolean
   'data-descriptions-spacing-fixtures'?: string | boolean
   'data-input-number-hit-fixtures'?: string | boolean
@@ -41,6 +52,17 @@ declare module '@vue/runtime-dom' {
     'data-audit-target'?: string | boolean
     'data-testid'?: string
     'data-markdown-editor-probe-id'?: string
+    'data-markdown-reveal-state'?: string | boolean
+    'data-markdown-surface-owner'?: string | boolean
+    'data-markdown-atomic-kind'?: string | boolean
+    'data-markdown-atomic-status'?: string | boolean
+    'data-markdown-layout-action'?: string | boolean
+    'data-markdown-layout-smooth'?: string | boolean
+    'data-markdown-live-decorations'?: string | boolean
+    'data-markdown-input-authority'?: string | boolean
+    'data-kind'?: string | boolean
+    'data-node-id'?: string | boolean
+    'data-role'?: string | boolean
     'data-upload-help'?: string | boolean
     'data-descriptions-spacing-fixtures'?: string | boolean
     'data-input-number-hit-fixtures'?: string | boolean
@@ -79,6 +101,7 @@ declare module 'vue' {
     dataAuditTarget?: string | boolean
     dataDescriptionsCase?: string
     dataInputNumberCase?: string
+    dataMarkdownInputAuthority?: string
   }
 
   export interface HTMLAttributes extends FsusAuditAttributes {}

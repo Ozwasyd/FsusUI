@@ -1444,7 +1444,7 @@ const handleKeydown = (event: KeyboardEvent) => {
     return
   }
 
-  const pairChars = new Set(
+  const pairChars = new Set<string>(
     MARKDOWN_PAIR_DEFAULTS.flatMap(([open, close]) => [open, close]),
   )
   if (

@@ -794,7 +794,7 @@ export const evaluateMarkdownLiveSelectionMutations = () => {
         kind: 'per-kind-caret' as const,
       }),
       Object.freeze({
-        accepted: authority.accessibility.tabStop === true,
+        accepted: authority.accessibility.tabStop,
         detail: 'atomic ordinary presentation is not a permanent Tab stop',
         equivalent: false,
         kind: 'tab-trap' as const,

@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
   "policy": "no-growth-ratchet",
-  "provenance": "2026-08-09 consumer Vite manifest refreshed for premerge gate repair (cold package install on main base c463db9f2f); PR #565 npm candidate is byte-identical to the main candidate in the 7-file consumer startup A/B; startup drift since 2026-08-06 comes from the motion legacy alias registry (#469) and theme surface refactors on main",
+  "provenance": "2026-08-16 consumer baseline refreshed on Node v24.16.0. Startup raw/gzip are byte-identical to the 2026-08-09 baseline (143893/46296); brotli 41498->41520 is encoder drift on identical content. Markdown hydration raw 81771->81881 comes from restoring the required parser/rawSource fields on the authorized broker result (MarkdownSafeRenderResult contract fix), with the remainder from the same brotli encoder drift.",
   "startup": {
     "raw": 143893,
     "gzip": 46296,
-    "brotli": 41498
+    "brotli": 41520
   },
   "markdownHydration": {
-    "raw": 81771,
-    "gzip": 29209,
-    "brotli": 26510
+    "raw": 81881,
+    "gzip": 29241,
+    "brotli": 26555
   }
 }

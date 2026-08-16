@@ -50,7 +50,7 @@ const loadSyntaxCollectExports = (): SyntaxCollectExports => {
   if (!wasmBytes) {
     throw new Error('markdown syntax collector is unavailable outside Node.js')
   }
-  const module = new WebAssembly.Module(wasmBytes)
+  const module = new WebAssembly.Module(wasmBytes as BufferSource)
   const instance = new WebAssembly.Instance(module, wasmImports)
   const exports = instance.exports as unknown as SyntaxCollectExports
   exports._initialize?.()

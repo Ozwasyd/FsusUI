@@ -589,6 +589,8 @@ const materializeMarkdownWorkerResult = (
   }
 
   return authorizeBrokerResult({
+    parser: result.parser,
+    rawSource: result.rawSource,
     html: result.html,
     normalizedSource: result.normalizedSource,
     sourceIdentity: result.sourceIdentity,
