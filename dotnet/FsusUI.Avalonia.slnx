@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="FsusUI.Avalonia.FormGenerator.Tests/FsusUI.Avalonia.FormGenerator.Tests.csproj" />
   <Project Path="FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj" />
   <Project Path="FsusUI.Avalonia.ConsumerSample/FsusUI.Avalonia.ConsumerSample.csproj" />
   <Project Path="FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj" />

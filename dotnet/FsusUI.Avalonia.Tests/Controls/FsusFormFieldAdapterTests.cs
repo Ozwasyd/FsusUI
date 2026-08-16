@@ -211,6 +211,48 @@ public class FsusFormFieldAdapterTests
   }
 
   [Fact]
+  public void FormRuntimeSourcesDoNotUseDynamicAssemblyScanOrTrimAnnotations()
+  {
+    var testsDir = AppContext.BaseDirectory;
+    var cursor = new DirectoryInfo(testsDir);
+    string? repoRoot = null;
+    while (cursor is not null)
+    {
+      if (File.Exists(Path.Combine(cursor.FullName, "dotnet", "FsusUI.Avalonia", "FsusUI.Avalonia.csproj")))
+      {
+        repoRoot = cursor.FullName;
+        break;
+      }
+      cursor = cursor.Parent;
+    }
+
+    Assert.NotNull(repoRoot);
+    var sources = new[]
+    {
+      Path.Combine(repoRoot!, "dotnet", "FsusUI.Avalonia", "Controls", "FsusFormControls.cs"),
+      Path.Combine(repoRoot!, "dotnet", "FsusUI.Avalonia", "Controls", "FsusFormFieldAdapter.cs"),
+      Path.Combine(repoRoot!, "dotnet", "FsusUI.Avalonia", "Controls", "FsusFormFieldAdapters.cs"),
+      Path.Combine(repoRoot!, "dotnet", "FsusUI.Avalonia.FormGenerator", "FsusFormAdapterIncrementalGenerator.cs"),
+    };
+
+    foreach (var sourcePath in sources)
+    {
+      var text = File.ReadAllText(sourcePath);
+      Assert.DoesNotContain("dynamic", text, StringComparison.Ordinal);
+      Assert.DoesNotContain("Activator", text, StringComparison.Ordinal);
+      Assert.DoesNotContain("Assembly.", text, StringComparison.Ordinal);
+      Assert.DoesNotContain("DynamicallyAccessedMembers", text, StringComparison.Ordinal);
+      Assert.DoesNotContain("DynamicDependency", text, StringComparison.Ordinal);
+      Assert.DoesNotContain("RequiresDynamicCode", text, StringComparison.Ordinal);
+      Assert.DoesNotContain("RequiresAssemblyFiles", text, StringComparison.Ordinal);
+      Assert.DoesNotContain("UnmanagedCallersOnly", text, StringComparison.Ordinal);
+      Assert.DoesNotContain("SuppressMessage", text, StringComparison.Ordinal);
+      Assert.DoesNotContain("IsAotCompatible", text, StringComparison.Ordinal);
+      Assert.DoesNotContain("PublishAot", text, StringComparison.Ordinal);
+    }
+  }
+
+  [Fact]
   public async Task BuiltInFsusInputResolvesReadsResetsSizesAndValidates()
   {
     var control = new FsusInput { Text = "initial" };
