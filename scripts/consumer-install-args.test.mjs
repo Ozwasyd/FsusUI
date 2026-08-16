@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
+import path from 'node:path'
 
 import { parseConsumerInstallArgs } from './consumer-install-args.mjs'
 
@@ -50,4 +51,24 @@ test('env and flag profile must match', () => {
       ),
     /must resolve to the same profile/,
   )
+})
+
+test('env and flag candidate must resolve to the same absolute file', () => {
+  assert.throws(
+    () =>
+      parseConsumerInstallArgs(
+        ['--profile', 'npm-latest', '--candidate', '/tmp/a.tgz'],
+        { FSUSUI_NPM_CANDIDATE: '/tmp/b.tgz' },
+      ),
+    /must resolve to the same candidate file/,
+  )
+})
+
+test('env and flag candidate agree across relative and absolute forms', () => {
+  const parsed = parseConsumerInstallArgs(
+    ['--profile', 'npm-latest', '--candidate', './a.tgz'],
+    { FSUSUI_NPM_CANDIDATE: path.resolve('a.tgz') },
+  )
+  assert.equal(parsed.profile, 'npm-latest')
+  assert.equal(parsed.candidate, './a.tgz')
 })
