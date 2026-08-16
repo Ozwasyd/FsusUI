@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
+using System.Threading;
 using Xunit;
 
 namespace FsusUI.Avalonia.FormGenerator.Tests;
@@ -91,6 +92,71 @@ public sealed class FsusFormAdapterIncrementalGeneratorTests
     Assert.Empty(withoutRegistrySources);
   }
 
+  [Fact]
+  public void Deterministic_registry_for_identical_input()
+  {
+    const string source = """
+      using System;
+      public sealed class FsusFormFieldAdapterForAttribute : Attribute
+      {
+        public FsusFormFieldAdapterForAttribute(Type controlType) => ControlType = controlType;
+        public Type ControlType { get; }
+      }
+      public interface IFsusFormFieldAdapter { }
+      public class ControlBase { }
+      public class DerivedControl : ControlBase { }
+      [FsusFormFieldAdapterFor(typeof(ControlBase))]
+      public sealed class ControlBaseAdapter : IFsusFormFieldAdapter { public ControlBaseAdapter(ControlBase control) { } }
+      [FsusFormFieldAdapterFor(typeof(DerivedControl))]
+      public sealed class DerivedControlAdapter : IFsusFormFieldAdapter { public DerivedControlAdapter(DerivedControl control) { } }
+      """;
+
+    var first = SingleRegistrySource(Run(source));
+    var second = SingleRegistrySource(Run(source));
+
+    Assert.Equal(first, second);
+  }
+
+  [Fact]
+  public void Incremental_generator_recomputes_registry_when_registration_changes()
+  {
+    const string header = """
+      using System;
+      public sealed class FsusFormFieldAdapterForAttribute : Attribute
+      {
+        public FsusFormFieldAdapterForAttribute(Type controlType) => ControlType = controlType;
+        public Type ControlType { get; }
+      }
+      public interface IFsusFormFieldAdapter { }
+      public class ControlBase { }
+      """;
+
+    var initialTree = CSharpSyntaxTree.ParseText(SourceText.From(header + """
+      [FsusFormFieldAdapterFor(typeof(ControlBase))]
+      public sealed class Adapter : IFsusFormFieldAdapter { public Adapter(ControlBase control) { } }
+      """));
+    var initialCompilation = CreateCompilation(initialTree);
+
+    GeneratorDriver driver = CSharpGeneratorDriver.Create(new FsusFormAdapterIncrementalGenerator());
+    driver = driver.RunGenerators(initialCompilation, CancellationToken.None);
+    var before = RegistrySources(driver.GetRunResult());
+
+    Assert.Single(before);
+    Assert.Contains("new global::Adapter", before[0], StringComparison.Ordinal);
+
+    var modifiedTree = initialTree.WithChangedText(SourceText.From(header + """
+      [FsusFormFieldAdapterFor(typeof(ControlBase))]
+      public sealed class ReplacementAdapter : IFsusFormFieldAdapter { public ReplacementAdapter(ControlBase control) { } }
+      """));
+    var modifiedCompilation = initialCompilation.ReplaceSyntaxTree(initialTree, modifiedTree);
+    driver = driver.RunGenerators(modifiedCompilation, CancellationToken.None);
+    var after = RegistrySources(driver.GetRunResult());
+
+    Assert.Single(after);
+    Assert.DoesNotContain("new global::Adapter", after[0], StringComparison.Ordinal);
+    Assert.Contains("new global::ReplacementAdapter", after[0], StringComparison.Ordinal);
+  }
+
   [Theory]
   [InlineData("[FsusFormFieldAdapterFor(typeof(ControlBase))] public sealed class Adapter : IFsusFormFieldAdapter { public Adapter() { } }")]
   [InlineData("[FsusFormFieldAdapterFor(typeof(ControlBase))] public sealed class Adapter : IFsusFormFieldAdapter { public Adapter(ControlBase a, ControlBase b) { } }")]
@@ -160,9 +226,16 @@ public sealed class FsusFormAdapterIncrementalGeneratorTests
 
   private static GeneratorDriverRunResult Run(string source)
   {
-    var compilation = CSharpCompilation.Create(
+    var compilation = CreateCompilation(CSharpSyntaxTree.ParseText(SourceText.From(source)));
+    GeneratorDriver driver = CSharpGeneratorDriver.Create(new FsusFormAdapterIncrementalGenerator());
+    driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out _);
+    return driver.GetRunResult();
+  }
+
+  private static CSharpCompilation CreateCompilation(params SyntaxTree[] syntaxTrees) =>
+    CSharpCompilation.Create(
       assemblyName: "GeneratorFixture",
-      syntaxTrees: [CSharpSyntaxTree.ParseText(SourceText.From(source))],
+      syntaxTrees: syntaxTrees,
       references:
       [
         MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
@@ -170,10 +243,12 @@ public sealed class FsusFormAdapterIncrementalGeneratorTests
       ],
       options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-    GeneratorDriver driver = CSharpGeneratorDriver.Create(new FsusFormAdapterIncrementalGenerator());
-    driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out _, out _);
-    return driver.GetRunResult();
-  }
+  private static string[] RegistrySources(GeneratorDriverRunResult result) =>
+    result.Results
+      .SelectMany(generatorResult => generatorResult.GeneratedSources)
+      .Where(generated => generated.HintName == "BuiltInFormFieldAdapterRegistry.g.cs")
+      .Select(generated => generated.SourceText.ToString())
+      .ToArray();
 
   private static string SingleRegistrySource(GeneratorDriverRunResult result)
   {
