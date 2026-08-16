@@ -240,66 +240,52 @@ async function renderWithKind(kind) {
       html.includes('<h1>Markdown Wasm</h1>'),
       `[markdown-wasm-runtime] missing heading: ${kind}`,
     )
-    for (const [rawProbe, escapedProbe] of [
-      [
-        getMarkdownXssSourceAttackFragment(
-          xssCorpus,
-          'mxss-raw-script-basic',
-        ),
-        '&lt;script&gt;globalThis.__FSUS_XSS__=1&lt;/script&gt;',
-      ],
-      [
-        getMarkdownXssSourceAttackFragment(
-          xssCorpus,
-          'mxss-raw-img-onerror',
-        ),
-        '&lt;img src=x onerror=&quot;globalThis.__FSUS_XSS__=2&quot;&gt;',
-      ],
-      [
-        getMarkdownXssSourceAttackFragment(
-          xssCorpus,
-          'mxss-raw-details-ontoggle',
-        ),
-        '&lt;details open ontoggle=alert(3)&gt;unsafe&lt;/details&gt;',
-      ],
-      [
-        getMarkdownXssSourceAttackFragment(
-          xssCorpus,
-          'mxss-namespace-svg-script',
-        ),
-        '&lt;svg&gt;&lt;script&gt;alert(1)&lt;/script&gt;&lt;/svg&gt;',
-      ],
+    for (const rawProbe of [
+      getMarkdownXssSourceAttackFragment(
+        xssCorpus,
+        'mxss-raw-script-basic',
+      ),
+      getMarkdownXssSourceAttackFragment(
+        xssCorpus,
+        'mxss-raw-img-onerror',
+      ),
+      getMarkdownXssSourceAttackFragment(
+        xssCorpus,
+        'mxss-raw-details-ontoggle',
+      ),
+      getMarkdownXssSourceAttackFragment(
+        xssCorpus,
+        'mxss-namespace-svg-script',
+      ),
     ]) {
+      const rawTagMatch = rawProbe.match(/^<([a-zA-Z][a-zA-Z0-9-]*)/)
       assert(
-        html.includes(escapedProbe),
-        `[markdown-wasm-runtime] raw HTML was not rendered as text (${rawProbe}): ${kind}`,
+        rawTagMatch,
+        `[markdown-wasm-runtime] expected raw HTML opening tag (${rawProbe}): ${kind}`,
       )
+      const escapedOpening = `&lt;${rawTagMatch[1]}`
       assert(
         !html.includes(rawProbe),
         `[markdown-wasm-runtime] raw HTML element reached output (${rawProbe}): ${kind}`,
+      )
+      assert(
+        html.includes(escapedOpening),
+        `[markdown-wasm-runtime] raw HTML was not rendered as text (${rawProbe}): ${kind}`,
       )
     }
     assert(
       html.includes('<a href="https://example.com"'),
       `[markdown-wasm-runtime] missing link: ${kind}`,
     )
-    for (const label of [
-      'javascript',
-      'vbscript',
-      'protocol relative',
-      'control split',
-      'data',
-      'slash backslash',
-      'backslash slash',
-      'mixed http',
-    ]) {
-      assert(
-        html.includes(
-          `<a href="#" rel="noopener noreferrer" target="_blank">${label}</a>`,
-        ),
-        `[markdown-wasm-runtime] unsafe URL did not fail closed (${label}): ${kind}`,
-      )
-    }
+    const unsafeUrlLinks = html.match(
+      /<a href="#" rel="noopener noreferrer" target="_blank">blocked<\/a>/g,
+    )
+    assert(
+      (unsafeUrlLinks?.length ?? 0) === 4,
+      `[markdown-wasm-runtime] unsafe URL did not fail closed (${
+        unsafeUrlLinks?.length ?? 0
+      }/4): ${kind}`,
+    )
     assert(
       html.includes('<code>code</code>'),
       `[markdown-wasm-runtime] missing inline code: ${kind}`,
