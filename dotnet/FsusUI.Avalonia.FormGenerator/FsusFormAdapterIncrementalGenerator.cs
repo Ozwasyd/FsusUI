@@ -1,129 +1,260 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace FsusUI.Avalonia.FormGenerator;
 
-[AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-public sealed class FsusFormAdapterAttribute : Attribute
-{
-  public FsusFormAdapterAttribute(Type formType) => FormType = formType;
-
-  public Type FormType { get; }
-}
-
 [Generator]
 public sealed class FsusFormAdapterIncrementalGenerator : IIncrementalGenerator
 {
+  private const string AdapterForAttributeName = "FsusFormFieldAdapterFor";
+  private const string AdapterInterfaceName = "IFsusFormFieldAdapter";
+  private const string GeneratedNamespace = "FsusUI.Avalonia.Controls.Generated";
+  private const string ControlTypeName = "global::Avalonia.Controls.Control";
+  private const string AdapterTypeName = "global::FsusUI.Avalonia.Controls.IFsusFormFieldAdapter";
+
   private static readonly DiagnosticDescriptor InvalidRegistration = new(
-    "FSUSFORM001", "Invalid form adapter registration", "{0}", "FsusForm", DiagnosticSeverity.Error, true);
+    "FSUSFORM001",
+    "Invalid form field adapter registration",
+    "{0}",
+    "FsusForm",
+    DiagnosticSeverity.Error,
+    true);
+
   private static readonly DiagnosticDescriptor GeneratorFailure = new(
-    "FSUSFORM999", "Form adapter generator failure", "The form adapter generator failed safely: {0}", "FsusForm", DiagnosticSeverity.Error, true);
+    "FSUSFORM999",
+    "Form adapter generator failure",
+    "The form adapter generator failed safely: {0}",
+    "FsusForm",
+    DiagnosticSeverity.Error,
+    true);
 
   public void Initialize(IncrementalGeneratorInitializationContext context)
   {
-    context.RegisterSourceOutput(context.CompilationProvider, static (productionContext, compilation) =>
-    {
-      try { Generate(productionContext, compilation); }
-      catch (Exception exception)
+    context.RegisterSourceOutput(
+      context.CompilationProvider,
+      static (productionContext, compilation) =>
       {
-        productionContext.ReportDiagnostic(Diagnostic.Create(GeneratorFailure, Location.None, exception.GetType().Name));
-      }
-    });
+        try
+        {
+          Generate(productionContext, compilation);
+        }
+        catch (Exception exception)
+        {
+          productionContext.ReportDiagnostic(
+            Diagnostic.Create(
+              GeneratorFailure,
+              Location.None,
+              exception.GetType().Name));
+        }
+      });
   }
 
   private static void Generate(SourceProductionContext context, Compilation compilation)
   {
     var registrations = compilation.SyntaxTrees
       .SelectMany(tree => tree.GetRoot().DescendantNodes().OfType<AttributeSyntax>())
-      .Where(attribute => attribute.Name.ToString().EndsWith("FsusFormAdapter", StringComparison.Ordinal) || attribute.Name.ToString().EndsWith("FsusFormAdapterAttribute", StringComparison.Ordinal))
-      .Select(attribute => (Location: attribute.GetLocation(), Type: ResolveRegistrationType(compilation, attribute)))
-      .OrderBy(item => item.Type?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), StringComparer.Ordinal)
+      .Where(IsAdapterForAttribute)
+      .Select(attribute => CreateRegistration(compilation, attribute))
+      .Where(registration => registration is not null)
+      .Select(registration => registration!)
       .ToArray();
 
-    // Roslyn retains a trailing assembly attribute as malformed syntax rather
-    // than an AttributeSyntax. Preserve deterministic generation while the
-    // compiler reports that placement error independently.
-    if (registrations.Length == 0 && compilation.SyntaxTrees.Any(tree => tree.GetText().ToString().Contains("FsusFormAdapter", StringComparison.Ordinal)))
+    if (registrations.Length == 0)
     {
-      registrations = compilation.SyntaxTrees
-        .SelectMany(tree => tree.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>())
-        .Select(declaration => (Location: declaration.Identifier.GetLocation(), Type: compilation.GetSemanticModel(declaration.SyntaxTree).GetDeclaredSymbol(declaration) as INamedTypeSymbol))
-        .Where(item => item.Type is not null)
-        .OrderBy(item => item.Type!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), StringComparer.Ordinal)
-        .ToArray();
+      return;
     }
 
-    var duplicateTypes = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
-    foreach (var group in registrations.Where(item => item.Type is not null)
-      .GroupBy(item => item.Type!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), StringComparer.Ordinal)
-      .Where(group => group.Count() > 1))
-      duplicateTypes.Add(group.First().Type!);
+    var controlTypes = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+    var adapterTypes = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+    var valid = new List<Registration>();
 
     foreach (var registration in registrations)
     {
-      if (registration.Type is null)
+      var error = ValidateRegistration(registration, controlTypes, adapterTypes);
+      if (error is not null)
       {
-        Report(context, registration.Location, "Registration requires a concrete form type.");
-        continue;
-      }
-      if (duplicateTypes.Contains(registration.Type))
-      {
-        Report(context, registration.Location, $"Duplicate registration for '{registration.Type.ToDisplayString()}'.");
+        Report(context, registration.Location, error);
         continue;
       }
 
-      var property = ValidateNumberProperty(context, registration.Location, registration.Type);
-      if (property is null)
-        continue;
+      controlTypes.Add(registration.ControlType!);
+      adapterTypes.Add(registration.AdapterType!);
+      valid.Add(registration);
+    }
 
-      var formName = registration.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-      var safeName = string.Concat(registration.Type.ToDisplayString().Select(character => char.IsLetterOrDigit(character) ? character : '_'));
-      context.AddSource($"FsusFormAdapter_{safeName}.g.cs", $$"""
-        // <auto-generated/>
-        namespace FsusUI.Avalonia.FormGenerator.Generated;
-        internal static class FsusFormAdapter_{{safeName}}
+    if (valid.Count == 0)
+    {
+      return;
+    }
+
+    var ordered = valid
+      .OrderByDescending(registration => InheritanceDepth(registration.ControlType!))
+      .ThenBy(
+        registration => registration.ControlType!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+        StringComparer.Ordinal)
+      .ToArray();
+
+    var source = BuildRegistrySource(ordered);
+    context.AddSource("BuiltInFormFieldAdapterRegistry.g.cs", source);
+  }
+
+  private static string BuildRegistrySource(IReadOnlyList<Registration> registrations)
+  {
+    var cases = new List<string>();
+    for (var index = 0; index < registrations.Count; index++)
+    {
+      var registration = registrations[index];
+      var control = registration.ControlType!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+      var adapter = registration.AdapterType!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+      cases.Add($"      if (control is {control} c{index}) return new {adapter}(c{index});");
+    }
+
+    return $$"""
+      // <auto-generated/>
+      #nullable enable
+      namespace {{GeneratedNamespace}};
+
+      internal static class BuiltInFormFieldAdapterRegistry
+      {
+        internal static {{AdapterTypeName}}? Resolve({{ControlTypeName}}? control)
         {
-          internal static string Read({{formName}} form) => form.Number;
-          internal static void Write({{formName}} form, string value) => form.Number = value;
+          if (control is null)
+          {
+            return null;
+          }
+
+      {{string.Join("\n", cases)}}
+
+          return null;
         }
-        """);
-    }
+      }
+      """;
   }
 
-  private static IPropertySymbol? ValidateNumberProperty(SourceProductionContext context, Location location, INamedTypeSymbol type)
+  private static Registration? CreateRegistration(Compilation compilation, AttributeSyntax attribute)
   {
-    var properties = type.GetMembers("Number").OfType<IPropertySymbol>().Where(property => !property.IsIndexer).ToArray();
-    if (properties.Length != 1)
-    {
-      Report(context, location, $"'{type.ToDisplayString()}' must declare exactly one readable and writable string Number property.");
-      return null;
-    }
+    var location = attribute.GetLocation();
+    var controlType = ResolveControlType(compilation, attribute);
+    var adapterType =
+      attribute.Parent?.Parent is ClassDeclarationSyntax declaration
+        ? compilation.GetSemanticModel(declaration.SyntaxTree).GetDeclaredSymbol(declaration) as INamedTypeSymbol
+        : null;
 
-    var property = properties[0];
-    if (!SymbolEqualityComparer.Default.Equals(property.ContainingType, type) ||
-        property.IsStatic || property.GetMethod is null || property.SetMethod is null ||
-        property.Type.SpecialType != SpecialType.System_String || property.NullableAnnotation == NullableAnnotation.Annotated)
-    {
-      Report(context, location, $"'{type.ToDisplayString()}.Number' must be an instance, non-nullable, readable and writable string property declared on the registered type.");
-      return null;
-    }
-    return property;
+    return new Registration(location, controlType, adapterType);
   }
 
-  private static INamedTypeSymbol? ResolveRegistrationType(Compilation compilation, AttributeSyntax syntax)
+  private static string? ValidateRegistration(
+    Registration registration,
+    HashSet<INamedTypeSymbol> controlTypes,
+    HashSet<INamedTypeSymbol> adapterTypes)
   {
-    if (syntax.ArgumentList?.Arguments.Count > 0 && syntax.ArgumentList.Arguments[0].Expression is TypeOfExpressionSyntax typeOf)
+    if (registration.ControlType is null)
     {
-      var semanticType = compilation.GetSemanticModel(typeOf.SyntaxTree).GetTypeInfo(typeOf.Type).Type as INamedTypeSymbol;
-      return semanticType ?? compilation.GlobalNamespace.GetTypeMembers(typeOf.Type.ToString()).FirstOrDefault();
+      return "The FsusFormFieldAdapterFor registration requires a concrete control type.";
     }
+
+    if (registration.AdapterType is null)
+    {
+      return "The FsusFormFieldAdapterFor attribute must be applied to a class.";
+    }
+
+    if (registration.ControlType.IsAbstract)
+    {
+      return $"Control type '{registration.ControlType.ToDisplayString()}' must be concrete.";
+    }
+
+    if (controlTypes.Contains(registration.ControlType))
+    {
+      return $"Duplicate control registration for '{registration.ControlType.ToDisplayString()}'.";
+    }
+
+    if (adapterTypes.Contains(registration.AdapterType))
+    {
+      return $"Adapter '{registration.AdapterType.ToDisplayString()}' is registered more than once.";
+    }
+
+    if (!registration.AdapterType.AllInterfaces.Any(@interface => @interface.Name == AdapterInterfaceName))
+    {
+      return $"Adapter '{registration.AdapterType.ToDisplayString()}' must implement IFsusFormFieldAdapter.";
+    }
+
+    if (!HasCanonicalConstructor(registration.AdapterType, registration.ControlType))
+    {
+      return $"Adapter '{registration.AdapterType.ToDisplayString()}' must declare exactly one accessible constructor taking a single '{registration.ControlType.ToDisplayString()}' parameter.";
+    }
+
     return null;
+  }
+
+  private static bool IsAdapterForAttribute(AttributeSyntax attribute)
+  {
+    var name = attribute.Name.ToString();
+    return name.EndsWith(AdapterForAttributeName, StringComparison.Ordinal) ||
+           name.EndsWith(AdapterForAttributeName + "Attribute", StringComparison.Ordinal);
+  }
+
+  private static INamedTypeSymbol? ResolveControlType(Compilation compilation, AttributeSyntax attribute)
+  {
+    if (attribute.ArgumentList?.Arguments.Count != 1)
+    {
+      return null;
+    }
+
+    if (attribute.ArgumentList.Arguments[0].Expression is not TypeOfExpressionSyntax typeOf)
+    {
+      return null;
+    }
+
+    return compilation.GetSemanticModel(typeOf.SyntaxTree).GetTypeInfo(typeOf.Type).Type as INamedTypeSymbol;
+  }
+
+  private static bool HasCanonicalConstructor(INamedTypeSymbol adapter, INamedTypeSymbol controlType)
+  {
+    var constructors = adapter.InstanceConstructors
+      .Where(constructor =>
+        constructor.DeclaredAccessibility is Accessibility.Public or Accessibility.Internal)
+      .ToArray();
+
+    if (constructors.Length != 1)
+    {
+      return false;
+    }
+
+    var constructor = constructors[0];
+    return constructor.Parameters.Length == 1 &&
+           SymbolEqualityComparer.Default.Equals(constructor.Parameters[0].Type, controlType);
+  }
+
+  private static int InheritanceDepth(INamedTypeSymbol type)
+  {
+    var depth = 0;
+    for (var current = type.BaseType; current is not null; current = current.BaseType)
+    {
+      depth++;
+    }
+
+    return depth;
   }
 
   private static void Report(SourceProductionContext context, Location location, string message) =>
     context.ReportDiagnostic(Diagnostic.Create(InvalidRegistration, location, message));
+
+  private sealed class Registration
+  {
+    public Registration(Location location, INamedTypeSymbol? controlType, INamedTypeSymbol? adapterType)
+    {
+      Location = location;
+      ControlType = controlType;
+      AdapterType = adapterType;
+    }
+
+    public Location Location { get; }
+
+    public INamedTypeSymbol? ControlType { get; }
+
+    public INamedTypeSymbol? AdapterType { get; }
+  }
 }

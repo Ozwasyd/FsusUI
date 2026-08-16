@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using FsusUI.Avalonia.Controls;
 
 namespace FsusUI.Avalonia.Tests.Controls;
@@ -195,6 +196,8 @@ public class FsusFormFieldAdapterTests
     {
       Path.Combine(repoRoot!, "dotnet", "FsusUI.Avalonia", "Controls", "FsusFormControls.cs"),
       Path.Combine(repoRoot!, "dotnet", "FsusUI.Avalonia", "Controls", "FsusFormFieldAdapter.cs"),
+      Path.Combine(repoRoot!, "dotnet", "FsusUI.Avalonia", "Controls", "FsusFormFieldAdapters.cs"),
+      Path.Combine(repoRoot!, "dotnet", "FsusUI.Avalonia.FormGenerator", "FsusFormAdapterIncrementalGenerator.cs"),
     };
 
     foreach (var sourcePath in sources)
@@ -205,6 +208,217 @@ public class FsusFormFieldAdapterTests
       Assert.DoesNotContain("ReadProperty", text, StringComparison.Ordinal);
       Assert.DoesNotContain("WriteProperty", text, StringComparison.Ordinal);
     }
+  }
+
+  [Fact]
+  public async Task BuiltInFsusInputResolvesReadsResetsSizesAndValidates()
+  {
+    var control = new FsusInput { Text = "initial" };
+    var item = new FsusFormItem
+    {
+      FieldName = "name",
+      Label = "Name",
+      IsRequired = true,
+      Content = control,
+      Size = FsusComponentSize.Sm,
+    };
+    var form = new FsusForm { Size = FsusComponentSize.Lg };
+    form.Children.Add(item);
+    form.RefreshFormState();
+
+    Assert.Null(item.FieldAdapterError);
+    Assert.Equal(FsusComponentSize.Sm, control.Size);
+
+    control.Text = "changed";
+    item.ResetField();
+    Assert.Equal("initial", control.Text);
+
+    control.Text = string.Empty;
+    var result = await form.ValidateAsync();
+    Assert.False(result.IsValid);
+    Assert.Contains("is required", result.Errors[0].Message, StringComparison.Ordinal);
+  }
+
+  [Fact]
+  public void BuiltInFsusInputNumberResolvesMostSpecificAdapterAndCapturesDecimal()
+  {
+    var control = new FsusInputNumber { Value = 12.5m };
+    var item = new FsusFormItem { FieldName = "amount", Content = control };
+    var form = new FsusForm();
+    form.Children.Add(item);
+    form.RefreshFormState();
+
+    Assert.Null(item.FieldAdapterError);
+
+    control.Value = 30m;
+    item.ResetField();
+
+    Assert.Equal(12.5m, control.Value);
+  }
+
+  [Fact]
+  public void BuiltInFsusCheckboxReadsNullableBoolean()
+  {
+    var control = new FsusCheckbox { IsChecked = false };
+    var item = new FsusFormItem { FieldName = "agree", Content = control };
+    var form = new FsusForm();
+    form.Children.Add(item);
+    form.RefreshFormState();
+    Assert.Null(item.FieldAdapterError);
+
+    control.IsChecked = true;
+    item.ResetField();
+
+    Assert.False(control.IsChecked);
+  }
+
+  [Fact]
+  public void BuiltInFsusSwitchReadsBoolean()
+  {
+    var control = new FsusSwitch { IsChecked = false };
+    var item = new FsusFormItem { FieldName = "enabled", Content = control };
+    var form = new FsusForm();
+    form.Children.Add(item);
+    form.RefreshFormState();
+    Assert.Null(item.FieldAdapterError);
+
+    control.IsChecked = true;
+    item.ResetField();
+
+    Assert.False(control.IsChecked);
+  }
+
+  [Fact]
+  public void BuiltInFsusRadioReadsBoolean()
+  {
+    var control = new FsusRadio { IsChecked = false };
+    var item = new FsusFormItem { FieldName = "choice", Content = control };
+    var form = new FsusForm();
+    form.Children.Add(item);
+    form.RefreshFormState();
+    Assert.Null(item.FieldAdapterError);
+
+    control.IsChecked = true;
+    item.ResetField();
+
+    Assert.False(control.IsChecked);
+  }
+
+  [Fact]
+  public void BuiltInComboBoxReadsSelectedItemAsCustomObject()
+  {
+    var selected = new object();
+    var control = new ComboBox { SelectedItem = selected };
+    var item = new FsusFormItem { FieldName = "choice", Content = control };
+    var form = new FsusForm();
+    form.Children.Add(item);
+    form.RefreshFormState();
+    Assert.NotEqual(FsusFormFieldAdapterErrorKind.UnsupportedControl, item.FieldAdapterError?.Kind);
+
+    control.SelectedItem = null;
+    item.ResetField();
+
+    Assert.Same(selected, control.SelectedItem);
+  }
+
+  [Fact]
+  public void BuiltInFsusDatePickerReadsResetsAndAppliesSize()
+  {
+    var control = new FsusDatePicker { IsClearable = true };
+    Assert.True(control.SelectDate(new DateOnly(2026, 7, 2)));
+
+    var item = new FsusFormItem
+    {
+      FieldName = "due",
+      Content = control,
+      Size = FsusComponentSize.Lg,
+    };
+    var form = new FsusForm();
+    form.Children.Add(item);
+    form.RefreshFormState();
+
+    Assert.Null(item.FieldAdapterError);
+    Assert.Equal(FsusComponentSize.Lg, control.Size);
+
+    control.SelectDate(new DateOnly(2026, 8, 1));
+    item.ResetField();
+
+    Assert.Equal(new DateOnly(2026, 7, 2), control.Value);
+  }
+
+  [Fact]
+  public void BuiltInFsusTimePickerReadsResetsAndAppliesSize()
+  {
+    var control = new FsusTimePicker { IsClearable = true };
+    Assert.True(control.SelectTime(new TimeOnly(9, 30)));
+
+    var item = new FsusFormItem
+    {
+      FieldName = "time",
+      Content = control,
+      Size = FsusComponentSize.Sm,
+    };
+    var form = new FsusForm();
+    form.Children.Add(item);
+    form.RefreshFormState();
+
+    Assert.Null(item.FieldAdapterError);
+    Assert.Equal(FsusComponentSize.Sm, control.Size);
+
+    control.SelectTime(new TimeOnly(10, 0));
+    item.ResetField();
+
+    Assert.Equal(new TimeOnly(9, 30), control.Value);
+  }
+
+  [Fact]
+  public void BuiltInFsusTimeSelectReadsResetsAndAppliesSize()
+  {
+    var control = new FsusTimeSelect
+    {
+      IsClearable = true,
+      Start = new TimeOnly(9, 0),
+      End = new TimeOnly(10, 0),
+      Step = TimeSpan.FromMinutes(30),
+    };
+    control.RefreshOptions();
+    Assert.True(control.SelectTime(new TimeOnly(9, 0)));
+
+    var item = new FsusFormItem
+    {
+      FieldName = "time",
+      Content = control,
+      Size = FsusComponentSize.Sm,
+    };
+    var form = new FsusForm();
+    form.Children.Add(item);
+    form.RefreshFormState();
+
+    Assert.Null(item.FieldAdapterError);
+    Assert.Equal(FsusComponentSize.Sm, control.Size);
+
+    control.SelectTime(new TimeOnly(9, 30));
+    item.ResetField();
+
+    Assert.Equal(new TimeOnly(9, 0), control.Value);
+  }
+
+  [Fact]
+  public void BuiltInTextBoxToggleButtonAndTextareaResolveWithoutExplicitAdapter()
+  {
+    AssertBuiltInResolves(new TextBox { Text = "text" });
+    AssertBuiltInResolves(new ToggleButton { IsChecked = true });
+    AssertBuiltInResolves(new FsusTextarea { Text = "text" });
+  }
+
+  private static void AssertBuiltInResolves(Control control)
+  {
+    var item = new FsusFormItem { FieldName = "field", Content = control };
+    var form = new FsusForm();
+    form.Children.Add(item);
+    form.RefreshFormState();
+
+    Assert.NotEqual(FsusFormFieldAdapterErrorKind.UnsupportedControl, item.FieldAdapterError?.Kind);
   }
 
   private sealed class GuessableControl : ContentControl

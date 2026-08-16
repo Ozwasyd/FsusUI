@@ -626,7 +626,7 @@ public class FsusFormItem : ContentControl
       return attached;
     }
 
-    return null;
+    return Generated.BuiltInFormFieldAdapterRegistry.Resolve(FieldControl);
   }
 
   private void SetFieldAdapterError(FsusFormFieldAdapterError? error)
