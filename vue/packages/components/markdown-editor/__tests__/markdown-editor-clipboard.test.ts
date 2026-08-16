@@ -14,6 +14,12 @@ import {
   applyMarkdownEditorChanges,
   MarkdownEditorTransactionStore,
 } from '../src/markdown-editor-transaction'
+import { getMarkdownXssSourceAttackFragment } from '../../../../tests/support/markdown-xss-corpus'
+
+const scriptAttack = getMarkdownXssSourceAttackFragment('mxss-raw-script-basic')
+const imageOnErrorAttack = getMarkdownXssSourceAttackFragment(
+  'mxss-raw-img-onerror',
+)
 
 const paste = (
   extras: Partial<Parameters<typeof resolveMarkdownClipboardPaste>[0]> & {
@@ -65,12 +71,12 @@ describe('markdown clipboard priority', () => {
     expect(plain.insert).toBe('  keep  \n')
 
     const html = paste({
-      items: [{ type: 'text/html', text: '<b>bold</b><script>x()</script>' }],
+      items: [{ type: 'text/html', text: `<b>bold</b>${scriptAttack}` }],
     })
     expect(html.action).toBe('html-plain')
     expect(html.insert).toBe('bold')
     expect(html.insert).not.toContain('<')
-    expect(html.insert).not.toContain('x()')
+    expect(html.insert).not.toContain('__FSUS_XSS__')
 
     const files = paste({
       files: [{ name: 'a.png', size: 4, type: 'image/png' }],
@@ -94,7 +100,7 @@ describe('markdown clipboard priority', () => {
     })
     expect(plan.action).toBe('markdown-source')
     expect(plan.insert).toBe('# Title\n\npara')
-    expect(htmlToSafePlainText('<img src=x onerror=alert(1)><br>ok')).toBe('\nok')
+    expect(htmlToSafePlainText(`${imageOnErrorAttack}<br>ok`)).toBe('\nok')
   })
 
   it('rejects composition, readonly, disabled, preview, stale, cancel, and oversize paste', () => {

@@ -1,6 +1,4 @@
-import { readFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { readNodeWasmBinary } from './runtime/emscripten'
 
 export interface MarkdownParserSyntaxRange {
   readonly start: number
@@ -43,12 +41,16 @@ const loadSyntaxCollectExports = (): SyntaxCollectExports => {
   if (cachedExports) {
     return cachedExports
   }
-  const wasmPath = join(
-    dirname(fileURLToPath(import.meta.url)),
-    'markdown',
-    'syntax-collect.wasm',
-  )
-  const module = new WebAssembly.Module(readFileSync(wasmPath))
+  const moduleUrl = import.meta.url
+  const wasmUrl = `${moduleUrl.slice(
+    0,
+    moduleUrl.lastIndexOf('/') + 1,
+  )}markdown/syntax-collect.wasm`
+  const wasmBytes = readNodeWasmBinary(wasmUrl)
+  if (!wasmBytes) {
+    throw new Error('markdown syntax collector is unavailable outside Node.js')
+  }
+  const module = new WebAssembly.Module(wasmBytes)
   const instance = new WebAssembly.Instance(module, wasmImports)
   const exports = instance.exports as unknown as SyntaxCollectExports
   exports._initialize?.()
