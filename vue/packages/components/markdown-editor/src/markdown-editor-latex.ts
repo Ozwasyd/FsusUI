@@ -402,7 +402,7 @@ export const evaluateMarkdownLatexMutations = () => {
         kind: 'regex-parse' as const,
       }),
       Object.freeze({
-        accepted: failed.classification.rewrite === true || !failed.sourceUnchanged,
+        accepted: failed.classification.rewrite || !failed.sourceUnchanged,
         detail: 'malformed latex must not rewrite source',
         kind: 'auto-rewrite' as const,
       }),

@@ -512,7 +512,13 @@ export const createMarkdownProjectionTask = (input: {
     abort() {
       aborted = true
     },
-    commit(current, value) {
+    commit<T>(
+      current: {
+        readonly revision: number
+        readonly documentIdentity: MarkdownDocumentIdentity
+      },
+      value: T,
+    ) {
       if (aborted) return { ok: false as const, reason: 'aborted' as const }
       if (!sameIdentity(current.documentIdentity, documentIdentity)) {
         return { ok: false as const, reason: 'document-switch' as const }

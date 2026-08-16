@@ -140,7 +140,7 @@ export const readMarkdownRenderIdentity = (
   }
 
   return Object.freeze({
-    parser,
+    parser: parser as typeof MARKDOWN_EDITOR_PROJECTION_PARSER,
     rawSource,
     normalizedSource,
     version,

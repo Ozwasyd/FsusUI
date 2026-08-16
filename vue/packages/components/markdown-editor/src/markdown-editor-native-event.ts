@@ -419,8 +419,7 @@ export const createMarkdownEditorNativeEventMachine = (options: {
       }
       if (
         (phase === 'aborted' || phase === 'idle') &&
-        isCompositionInputType(event.inputType, event.isComposing) &&
-        phase !== 'committing'
+        isCompositionInputType(event.inputType, event.isComposing)
       ) {
         const next = planOf('prevent', phase, {
           identity,

@@ -422,7 +422,7 @@ export const evaluateMarkdownMermaidMutations = () => {
         kind: 'whole-editor-failure' as const,
       }),
       Object.freeze({
-        accepted: failed.classification.rewrite === true || !failed.sourceUnchanged,
+        accepted: failed.classification.rewrite || !failed.sourceUnchanged,
         detail: 'malformed mermaid must not rewrite source',
         kind: 'auto-rewrite' as const,
       }),
