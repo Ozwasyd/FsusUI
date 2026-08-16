@@ -1,5 +1,8 @@
 import { createMarkdownEditorProjection } from './markdown-editor-projection'
-import { type MarkdownProjectionInvalidationPlan } from './markdown-projection-invalidation'
+import {
+  MARKDOWN_PROJECTION_INVALIDATION_BUDGET,
+  type MarkdownProjectionInvalidationPlan,
+} from './markdown-projection-invalidation'
 import {
   createMarkdownProjectionWorkerHost,
   projectMarkdownOnWorker,
