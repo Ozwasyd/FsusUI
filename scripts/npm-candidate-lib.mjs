@@ -140,6 +140,46 @@ function validatePackageShape(packageRoot, packageJson) {
         .join(', ')}`,
     )
   }
+  validateDependencyManifest(packageJson)
+}
+
+const PUBLIC_NPM_REGISTRY = 'https://registry.npmjs.org'
+const DEPENDENCY_FIELDS = [
+  'dependencies',
+  'devDependencies',
+  'peerDependencies',
+  'optionalDependencies',
+]
+
+function isPublicRegistry(registry) {
+  return registry?.replace(/\/+$/u, '') === PUBLIC_NPM_REGISTRY
+}
+
+function validateDependencyManifest(packageJson) {
+  for (const field of DEPENDENCY_FIELDS) {
+    const dependencies = packageJson[field]
+    if (!dependencies || typeof dependencies !== 'object' || Array.isArray(dependencies)) {
+      continue
+    }
+    for (const [name, specifier] of Object.entries(dependencies)) {
+      if (typeof specifier !== 'string') continue
+      const protocolMatch = /^(file|link|workspace):/u.exec(specifier)
+      if (protocolMatch) {
+        throw new Error(
+          `Candidate dependency '${name}' leaks a ${protocolMatch[1]} protocol reference: ${specifier}`,
+        )
+      }
+      if (/^https?:\/\//u.test(specifier) && !specifier.startsWith(`${PUBLIC_NPM_REGISTRY}/`)) {
+        throw new Error(
+          `Candidate dependency '${name}' references a non-public registry URL: ${specifier}`,
+        )
+      }
+    }
+  }
+  const registry = packageJson.publishConfig?.registry
+  if (registry && !isPublicRegistry(registry)) {
+    throw new Error(`Candidate publishConfig leaks a private registry: ${registry}`)
+  }
 }
 
 function collectFiles(rootDir, currentDir = rootDir) {

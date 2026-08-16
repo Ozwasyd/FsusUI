@@ -145,6 +145,53 @@ try {
     'workspace protocol fixture',
   )
 
+  const fileDependencyRoot = path.join(tempRoot, 'file-dependency-package')
+  makePackage(fileDependencyRoot, { dependencies: { local: 'file:../local-pkg' } })
+  assertThrows(
+    () =>
+      createCandidate({
+        repoRoot,
+        packageRoot: fileDependencyRoot,
+        outputDir: path.join(tempRoot, 'file-dependency-candidate'),
+        commitSha,
+      }),
+    /file protocol reference/iu,
+    'file protocol fixture',
+  )
+
+  const linkDependencyRoot = path.join(tempRoot, 'link-dependency-package')
+  makePackage(linkDependencyRoot, { dependencies: { local: 'link:../local-pkg' } })
+  assertThrows(
+    () =>
+      createCandidate({
+        repoRoot,
+        packageRoot: linkDependencyRoot,
+        outputDir: path.join(tempRoot, 'link-dependency-candidate'),
+        commitSha,
+      }),
+    /link protocol reference/iu,
+    'link protocol fixture',
+  )
+
+  const privateRegistryRoot = path.join(tempRoot, 'private-registry-package')
+  makePackage(privateRegistryRoot, {
+    publishConfig: {
+      access: 'public',
+      registry: 'https://npm.internal.example.com/',
+    },
+  })
+  assertThrows(
+    () =>
+      createCandidate({
+        repoRoot,
+        packageRoot: privateRegistryRoot,
+        outputDir: path.join(tempRoot, 'private-registry-candidate'),
+        commitSha,
+      }),
+    /private registry/iu,
+    'private registry fixture',
+  )
+
   const tampered = createFixture('tampered')
   appendFileSync(tampered.tarball, 'tampered')
   assertThrows(
@@ -199,7 +246,7 @@ try {
     'reproducibility mismatch fixture',
   )
 
-  console.log('[npm-candidate] 7 fixture scenarios passed')
+  console.log('[npm-candidate] 10 fixture scenarios passed')
 } finally {
   rmSync(tempRoot, { force: true, recursive: true })
 }

@@ -1,3 +1,5 @@
+import path from 'node:path'
+
 const PROFILES = new Set(['npm-latest', 'pnpm-latest', 'npm-peer-floor'])
 
 export const parseConsumerInstallArgs = (
@@ -29,8 +31,12 @@ export const parseConsumerInstallArgs = (
   if (flags.profile && envProfile && flags.profile !== envProfile) {
     throw new Error('--profile and FSUS_CONSUMER_PROFILE must resolve to the same profile')
   }
-  if (flags.candidate && envCandidate) {
-    // identity compared by the caller after path.resolve
+  if (
+    flags.candidate &&
+    envCandidate &&
+    path.resolve(flags.candidate) !== path.resolve(envCandidate)
+  ) {
+    throw new Error('--candidate and FSUSUI_NPM_CANDIDATE must resolve to the same candidate file')
   }
 
   const profile = flags.profile ?? envProfile
