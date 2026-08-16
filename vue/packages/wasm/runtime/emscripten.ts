@@ -109,7 +109,7 @@ function resolveNodeDirname(moduleUrl: string): string | null {
   return fileUrlToPath(new URL('.', moduleUrl).href).replace(/[\\/]+$/u, '')
 }
 
-function readNodeWasmBinary(wasmUrl: string): Uint8Array | undefined {
+export function readNodeWasmBinary(wasmUrl: string): Uint8Array | undefined {
   if (!wasmUrl.startsWith('file://')) {
     return undefined
   }
