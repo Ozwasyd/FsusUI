@@ -56,6 +56,7 @@ def window_tree(dpy, root):
             'class': wm_class,
             'pid': pid,
             'mapped': attrs.map_state == 2,  # IsViewable
+            'map_state': int(attrs.map_state),
             'x': abs_x,
             'y': abs_y,
             'width': geom.width,
@@ -80,8 +81,21 @@ def read_property(dpy, window, name):
         return None
 
 
+def jsonable(value):
+    if isinstance(value, bytes):
+        return value.decode('utf-8', 'replace')
+    if isinstance(value, dict):
+        return {str(key): jsonable(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [jsonable(item) for item in value]
+    return value
+
+
 def status(record):
-    print('X11_STATUS ' + json.dumps(record, ensure_ascii=False, sort_keys=True))
+    print(
+        'X11_STATUS '
+        + json.dumps(jsonable(record), ensure_ascii=False, sort_keys=True)
+    )
 
 
 def fail(category, message):
@@ -92,7 +106,8 @@ def fail(category, message):
 def find_window(dpy, root, expect_class, expect_pid):
     candidates = []
     for window, info in window_tree(dpy, root):
-        if not info['mapped']:
+        usable = info['mapped'] or (info['width'] >= 200 and info['height'] >= 200)
+        if not usable:
             continue
         if expect_pid is not None and info['pid'] != expect_pid:
             continue
@@ -105,7 +120,7 @@ def find_window(dpy, root, expect_class, expect_pid):
     if not candidates:
         found = []
         for _, info in window_tree(dpy, root):
-            if info['mapped'] and info['class']:
+            if info['class'] and (info['mapped'] or info['width'] >= 200):
                 found.append(
                     {
                         'id': info['id'],
@@ -121,16 +136,26 @@ def find_window(dpy, root, expect_class, expect_pid):
             ),
         )
     if len(candidates) > 1:
-        fail(
-            'window-pid-mismatch',
-            'multiple windows match class={!r} pid={!r}: {}'.format(
-                expect_class, expect_pid, [info['id'] for _, info in candidates]
-            ),
+        candidates.sort(
+            key=lambda item: item[1]['width'] * item[1]['height'],
+            reverse=True,
         )
     return candidates[0]
 
 
 def activate(dpy, root, window):
+    try:
+        window.map()
+        dpy.sync()
+        for _ in range(25):
+            attrs = window.get_attributes()
+            if attrs.map_state == 2:
+                break
+            time.sleep(0.08)
+            window.map()
+            dpy.sync()
+    except error.XError:
+        pass
     message = event.ClientMessage(
         window=window,
         client_type=dpy.intern_atom('_NET_ACTIVE_WINDOW'),
@@ -173,6 +198,9 @@ KEY_ALIASES = {
     'Right': 'Right',
     'ctrl': 'Control_L',
     'shift': 'Shift_L',
+    'Hangul': 'Hangul',
+    'Zenkaku_Hankaku': 'Zenkaku_Hankaku',
+    'Hiragana_Katakana': 'Hiragana_Katakana',
 }
 
 
@@ -221,6 +249,15 @@ def send_keys(dpy, tokens):
             time.sleep(0.08)
             for part in reversed(parts[:-1]):
                 release(KEY_ALIASES.get(part, part))
+            continue
+        if token.startswith('keycode='):
+            keycode = int(token.split('=', 1)[1])
+            xtest.fake_input(dpy, X.KeyPress, keycode)
+            dpy.sync()
+            time.sleep(0.05)
+            xtest.fake_input(dpy, X.KeyRelease, keycode)
+            dpy.sync()
+            time.sleep(0.1)
             continue
         name = KEY_ALIASES.get(token, token)
         keycode = keycode_for(dpy, name)

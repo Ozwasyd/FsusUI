@@ -1,0 +1,193 @@
+/**
+ * Linux-local native IME matrix profiles.
+ *
+ * Required cells analogize Windows/macOS CJK IMEs and Safari to ibus engines
+ * and headed Chromium/Firefox/WebKit windows. Synthetic composition events
+ * are still not acceptance evidence.
+ */
+
+export const ENGINE_PROFILES = {
+  libpinyin: {
+    ibusName: 'libpinyin',
+    processMatch: 'ibus-engine-libpinyin',
+    locale: 'zh-CN',
+    scriptName: 'Han',
+    hasCandidates: true,
+    activateKeys: [],
+    commitKeys: ['n', 'i', 'h', 'a', 'o', 'delay=300', 'space'],
+    cancelKeys: ['n', 'i', 'h', 'a', 'o', 'delay=300', 'Escape'],
+    candidateKeys: [
+      'n',
+      'i',
+      'h',
+      'a',
+      'o',
+      'delay=300',
+      'Down',
+      'delay=200',
+      'space',
+    ],
+  },
+  chewing: {
+    ibusName: 'chewing',
+    processMatch: 'ibus-engine-chewing',
+    locale: 'zh-TW',
+    scriptName: 'Han',
+    hasCandidates: true,
+    activateKeys: [],
+    // 你好 in default chewing (Bopomofo): ㄋㄧˇㄏㄠˇ = su3cl3
+    // Return finalizes the still-open composition after Space commits the phrase.
+    commitKeys: [
+      's',
+      'u',
+      '3',
+      'c',
+      'l',
+      '3',
+      'delay=300',
+      'space',
+      'delay=200',
+      'Return',
+    ],
+    cancelKeys: ['s', 'u', 'delay=250', 'Escape'],
+    candidateKeys: [
+      's',
+      'u',
+      '3',
+      'c',
+      'l',
+      '3',
+      'delay=300',
+      'Down',
+      'delay=200',
+      'space',
+    ],
+  },
+  'mozc-jp': {
+    ibusName: 'mozc-jp',
+    processMatch: 'ibus-engine-mozc',
+    locale: 'ja-JP',
+    scriptName: 'Hiragana',
+    hasCandidates: true,
+    activateKeys: ['keycode=248', 'delay=250'],
+    commitKeys: [
+      'k',
+      'o',
+      'n',
+      'n',
+      'i',
+      'c',
+      'h',
+      'i',
+      'h',
+      'a',
+      'delay=400',
+      'space',
+      'delay=200',
+      'Return',
+    ],
+    cancelKeys: [
+      'k',
+      'o',
+      'n',
+      'n',
+      'i',
+      'c',
+      'h',
+      'i',
+      'h',
+      'a',
+      'delay=400',
+      'Escape',
+    ],
+    candidateKeys: [
+      'k',
+      'o',
+      'n',
+      'n',
+      'i',
+      'c',
+      'h',
+      'i',
+      'h',
+      'a',
+      'delay=400',
+      'Down',
+      'delay=200',
+      'space',
+      'delay=200',
+      'Return',
+    ],
+  },
+  hangul: {
+    ibusName: 'hangul',
+    processMatch: 'ibus-engine-hangul',
+    locale: 'ko-KR',
+    scriptName: 'Hangul',
+    hasCandidates: false,
+    activateKeys: ['keycode=209', 'delay=250'],
+    // 안녕 on 2-set Korean (US keycaps): dkssud
+    commitKeys: ['d', 'k', 's', 's', 'u', 'd', 'delay=300', 'space'],
+    cancelKeys: ['d', 'k', 'delay=200', 'Escape'],
+    candidateKeys: ['d', 'k', 's', 's', 'u', 'd', 'delay=300'],
+  },
+}
+
+export const BROWSER_PROFILES = {
+  chromium: {
+    name: 'chromium',
+    windowClass: 'Google-chrome',
+    needsSystemChrome: true,
+    args: [
+      '--no-sandbox',
+      '--disable-dev-shm-usage',
+      '--no-first-run',
+      '--no-default-browser-check',
+      '--window-size=1280,1100',
+      '--window-position=80,80',
+    ],
+  },
+  firefox: {
+    name: 'firefox',
+    windowClass: 'firefox',
+    needsSystemChrome: false,
+    args: [],
+    firefoxUserPrefs: {
+      'ui.osk.enabled': false,
+    },
+  },
+  webkit: {
+    name: 'webkit',
+    windowClass: 'WebKit',
+    needsSystemChrome: false,
+    args: [],
+  },
+}
+
+export const scriptPattern = (scriptName) => {
+  if (scriptName === 'Hangul') return /\p{Script=Hangul}/u
+  if (scriptName === 'Hiragana') {
+    return /\p{Script=Hiragana}|\p{Script=Katakana}|\p{Script=Han}/u
+  }
+  return /\p{Script=Han}/u
+}
+
+export const resolveEngineProfile = (name) => {
+  const profile = ENGINE_PROFILES[name]
+  if (!profile) {
+    throw new Error(
+      `unknown IME engine "${name}"; expected ${Object.keys(ENGINE_PROFILES).join(', ')}`,
+    )
+  }
+  return profile
+}
+
+export const resolveBrowserProfile = (name) => {
+  const profile = BROWSER_PROFILES[name]
+  if (!profile) {
+    throw new Error(
+      `unknown browser "${name}"; expected ${Object.keys(BROWSER_PROFILES).join(', ')}`,
+    )
+  }
+  return profile
+}

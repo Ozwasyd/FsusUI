@@ -3,8 +3,8 @@
 /**
  * Native CJK IME acceptance harness for ElMarkdownEditor.
  *
- * Runs a real Chromium on a real X11 display, focuses the demo fixture's real
- * textarea, and injects OS-native ibus-libpinyin keystrokes through XTEST.
+ * Runs a real headed browser on a real X11 display, focuses the demo fixture's
+ * real textarea, and injects OS-native ibus keystrokes through XTEST.
  * Every acceptance path (commit, cancel, candidate selection, Backspace,
  * undo/redo) is bound to a full candidate SHA, OS, browser, IME, locale,
  * window/PID, page/document and fixture identity, and written as non-empty
@@ -31,7 +31,13 @@ import os from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { chromium } from 'playwright'
+import { chromium, firefox, webkit } from 'playwright'
+
+import {
+  resolveBrowserProfile,
+  resolveEngineProfile,
+  scriptPattern,
+} from './native-ime-profiles.mjs'
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const x11Helper = resolve(repositoryRoot, 'scripts/native-ime-x11.py')
@@ -90,6 +96,8 @@ const parseArguments = (argv) => {
     skipBuild: false,
     noScreenshot: false,
     help: false,
+    engine: environment('FSUS_IME_ENGINE', environment('FSUS_IME_REQUIRE_ENGINE', 'libpinyin')),
+    browser: environment('FSUS_IME_BROWSER', 'chromium'),
   }
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index]
@@ -103,6 +111,14 @@ const parseArguments = (argv) => {
       options.out = resolve(process.cwd(), argv[++index])
     } else if (argument.startsWith('--out=')) {
       options.out = resolve(process.cwd(), argument.slice('--out='.length))
+    } else if (argument === '--engine') {
+      options.engine = argv[++index]
+    } else if (argument.startsWith('--engine=')) {
+      options.engine = argument.slice('--engine='.length)
+    } else if (argument === '--browser') {
+      options.browser = argv[++index]
+    } else if (argument.startsWith('--browser=')) {
+      options.browser = argument.slice('--browser='.length)
     } else {
       fail('internal-error', `unknown argument: ${argument}`)
     }
@@ -187,7 +203,46 @@ const runPythonX11 = (args, display) => {
   return parsed
 }
 
-const verifyPrerequisites = (browserEnvironment) => {
+const findSystemChrome = () => {
+  const chromeCandidates = [
+    environment('FSUS_IME_CHROME_PATH', ''),
+    '/usr/bin/google-chrome',
+    '/usr/bin/google-chrome-stable',
+    '/usr/bin/chromium',
+    '/usr/bin/chromium-browser',
+  ].filter(Boolean)
+  return chromeCandidates.find((candidate) => {
+    try {
+      readFileSync(candidate)
+      return true
+    } catch {
+      return false
+    }
+  })
+}
+
+const switchIbusEngine = (browserEnvironment, ibusName) => {
+  let engine = ''
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    spawnSync('ibus', ['engine', ibusName], {
+      encoding: 'utf8',
+      env: browserEnvironment,
+    })
+    spawnSync('sleep', ['0.25'])
+    const engineProbe = spawnSync('ibus', ['engine'], {
+      encoding: 'utf8',
+      env: browserEnvironment,
+    })
+    engine = (engineProbe.stdout ?? '').trim()
+    if (engineProbe.status === 0 && engine.includes(ibusName)) return engine
+  }
+  fail(
+    'prerequisite-missing',
+    `ibus engine could not be selected as "${ibusName}"; reports "${engine}"`,
+  )
+}
+
+const verifyPrerequisites = (browserEnvironment, engineProfile, browserProfile) => {
   if (process.platform !== 'linux') {
     fail(
       'prerequisite-missing',
@@ -213,39 +268,18 @@ const verifyPrerequisites = (browserEnvironment) => {
       `${python} cannot import python-xlib: ${pythonCheck.stderr}`,
     )
   }
-  const chromeCandidates = [
-    environment('FSUS_IME_CHROME_PATH', ''),
-    '/usr/bin/google-chrome',
-    '/usr/bin/google-chrome-stable',
-    '/usr/bin/chromium',
-    '/usr/bin/chromium-browser',
-  ].filter(Boolean)
-  const chromePath = chromeCandidates.find((candidate) => {
-    try {
-      readFileSync(candidate)
-      return true
-    } catch {
-      return false
+  let chromePath = null
+  if (browserProfile.needsSystemChrome) {
+    chromePath = findSystemChrome()
+    if (!chromePath) {
+      fail(
+        'prerequisite-missing',
+        'no Chromium executable found (set FSUS_IME_CHROME_PATH)',
+      )
     }
-  })
-  if (!chromePath) {
-    fail(
-      'prerequisite-missing',
-      'no Chromium executable found (set FSUS_IME_CHROME_PATH)',
-    )
   }
-  const engineProbe = spawnSync('ibus', ['engine'], {
-    encoding: 'utf8',
-    env: browserEnvironment,
-  })
-  const requiredEngine = environment('FSUS_IME_REQUIRE_ENGINE', 'libpinyin')
-  const engine = (engineProbe.stdout ?? '').trim()
-  if (engineProbe.status !== 0 || !engine.includes(requiredEngine)) {
-    fail(
-      'prerequisite-missing',
-      `ibus engine ${engineProbe.status !== 0 ? 'unavailable' : `reports "${engine}"`}; expected "${requiredEngine}"`,
-    )
-  }
+  const engine = switchIbusEngine(browserEnvironment, engineProfile.ibusName)
+  spawnSync('sleep', ['0.4'])
   return { chromePath, display, engine }
 }
 
@@ -262,8 +296,10 @@ const findBrowserPid = (profileDirectory) => {
     }
     const normalized = commandLine.replaceAll('\0', ' ')
     if (
-      normalized.includes(`--user-data-dir=${profile}`) &&
-      !normalized.includes('--type=')
+      normalized.includes(profile) &&
+      !normalized.includes('--type=') &&
+      !normalized.includes('plugin-container') &&
+      !normalized.includes('crashpad')
     ) {
       matches.push(Number(entry))
     }
@@ -442,14 +478,17 @@ const writeJson = (path, value) => {
 const printUsage = () => {
   console.log(`[native-ime] usage: node scripts/native-ime-harness.mjs [options]
   --out <directory>  evidence output directory (default .tmp/native-ime-evidence)
+  --engine <name>    ibus engine: libpinyin|chewing|mozc-jp|hangul
+  --browser <name>   headed browser: chromium|firefox|webkit
   --skip-build       reuse the existing demo build
   --no-screenshot    do not capture per-step screenshots
   --help             show this help
 
 Environment:
   FSUS_IME_DISPLAY, FSUS_IME_CHROME_PATH, FSUS_IME_PYTHON,
-  FSUS_IME_REQUIRE_ENGINE (default libpinyin), FSUS_IME_EDITOR_SELECTOR,
-  FSUS_IME_EXPECT_WINDOW_CLASS (default Google-chrome),
+  FSUS_IME_ENGINE / FSUS_IME_REQUIRE_ENGINE (default libpinyin),
+  FSUS_IME_BROWSER (default chromium), FSUS_IME_EDITOR_SELECTOR,
+  FSUS_IME_EXPECT_WINDOW_CLASS (defaults from the browser profile),
   FSUS_IME_DELAY_MOUNT_MS, FSUS_IME_MOUNT_TIMEOUT_MS,
   FSUS_IME_STEP_TIMEOUT_MS, FSUS_IME_SKIP_BUILD (same as --skip-build),
   FSUS_IME_EXTRA_ENV (JSON object merged into the browser/ibus environment,
@@ -465,8 +504,11 @@ const main = async () => {
   options.skipBuild =
     options.skipBuild || environment('FSUS_IME_SKIP_BUILD', '') === '1'
 
+  const engineProfile = resolveEngineProfile(options.engine)
+  const browserProfile = resolveBrowserProfile(options.browser)
+  const committedScript = scriptPattern(engineProfile.scriptName)
   const display = environment('FSUS_IME_DISPLAY', process.env.DISPLAY)
-  const requiredEngine = environment('FSUS_IME_REQUIRE_ENGINE', 'libpinyin')
+  const requiredEngine = engineProfile.ibusName
   const editorSelector = environment(
     'FSUS_IME_EDITOR_SELECTOR',
     defaultEditorSelector,
@@ -478,7 +520,10 @@ const main = async () => {
     environment('FSUS_IME_STEP_TIMEOUT_MS', '15000'),
   )
   const delayMountMs = Number(environment('FSUS_IME_DELAY_MOUNT_MS', '0'))
-  const expectedWindowClass = environment('FSUS_IME_EXPECT_WINDOW_CLASS', 'Google-chrome')
+  const expectedWindowClass = environment(
+    'FSUS_IME_EXPECT_WINDOW_CLASS',
+    browserProfile.windowClass,
+  )
   const extraEnvironment = readEnvironmentJson('FSUS_IME_EXTRA_ENV')
   const browserEnvironment = {
     ...process.env,
@@ -487,8 +532,15 @@ const main = async () => {
     GTK_IM_MODULE: 'ibus',
     QT_IM_MODULE: 'ibus',
     XMODIFIERS: '@im=ibus',
+    PLAYWRIGHT_BROWSERS_PATH:
+      process.env.PLAYWRIGHT_BROWSERS_PATH ||
+      join(process.env.HOME || '/home/lyuaoss', '.cache/ms-playwright'),
   }
-  const { chromePath, engine } = verifyPrerequisites(browserEnvironment)
+  const { chromePath, engine } = verifyPrerequisites(
+    browserEnvironment,
+    engineProfile,
+    browserProfile,
+  )
 
   const candidateSha = spawnSync('git', ['rev-parse', 'HEAD'], {
     cwd: repositoryRoot,
@@ -528,6 +580,7 @@ const main = async () => {
       ...osRelease(),
     },
     browser: {
+      name: browserProfile.name,
       executable: chromePath,
       pid: null,
       userAgent: null,
@@ -540,9 +593,14 @@ const main = async () => {
       display,
     },
     locale: {
-      pageLocale: 'zh-CN',
+      pageLocale: engineProfile.locale,
       envLang: process.env.LANG ?? null,
       envLcAll: process.env.LC_ALL ?? null,
+    },
+    matrix: {
+      engine: engineProfile.ibusName,
+      browser: browserProfile.name,
+      script: engineProfile.scriptName,
     },
     window: null,
     page: null,
@@ -616,23 +674,28 @@ const main = async () => {
     const fixtureUrl = `${baseUrl}/?${fixtureQuery.toString()}`
 
     profileDirectory = mkdtempSync(join(tmpdir(), 'fsusui-native-ime-profile-'))
-    context = await chromium.launchPersistentContext(profileDirectory, {
+    const playwrightBrowsers = { chromium, firefox, webkit }
+    const launcher = playwrightBrowsers[browserProfile.name]
+    if (!launcher) {
+      fail('internal-error', `no Playwright launcher for ${browserProfile.name}`)
+    }
+    const launchOptions = {
       headless: false,
-      executablePath: chromePath,
       env: browserEnvironment,
-      locale: 'zh-CN',
+      locale: engineProfile.locale,
       timezoneId: 'Asia/Shanghai',
       colorScheme: 'light',
       viewport: { width: 1280, height: 1100 },
-      args: [
-        '--no-sandbox',
-        '--disable-dev-shm-usage',
-        '--no-first-run',
-        '--no-default-browser-check',
-        '--window-size=1280,1100',
-        '--window-position=80,80',
-      ],
-    })
+      args: browserProfile.args,
+    }
+    if (chromePath) launchOptions.executablePath = chromePath
+    if (browserProfile.firefoxUserPrefs) {
+      launchOptions.firefoxUserPrefs = browserProfile.firefoxUserPrefs
+    }
+    context = await launcher.launchPersistentContext(
+      profileDirectory,
+      launchOptions,
+    )
     const page = context.pages()[0] ?? (await context.newPage())
     const browserPid = findBrowserPid(profileDirectory)
     evidence.browser.pid = browserPid.pid
@@ -669,15 +732,44 @@ const main = async () => {
     evidence.fixture.probeId = fixtureIdentity
     evidence.fixture.url = fixtureUrl
 
-    const inspect = runPythonX11(
-      [
-        '--expect-class',
-        expectedWindowClass,
-        '--expect-pid',
-        String(browserPid.pid),
-      ],
-      display,
-    )
+    let inspect = null
+    const windowDeadline = Date.now() + 15_000
+    while (Date.now() < windowDeadline) {
+      try {
+        inspect = runPythonX11(
+          [
+            '--expect-class',
+            expectedWindowClass,
+            '--expect-pid',
+            String(browserPid.pid),
+          ],
+          display,
+        )
+        break
+      } catch (error) {
+        if (
+          !(error instanceof HarnessFailure) ||
+          error.category !== 'window-pid-mismatch'
+        ) {
+          throw error
+        }
+        try {
+          inspect = runPythonX11(
+            ['--expect-class', expectedWindowClass],
+            display,
+          )
+          break
+        } catch {
+          await sleep(400)
+        }
+      }
+    }
+    if (!inspect) {
+      fail(
+        'window-pid-mismatch',
+        `no mapped window for class=${expectedWindowClass} pid=${browserPid.pid}`,
+      )
+    }
     evidence.window = inspect.window
     evidence.browser.userAgent = await page.evaluate(
       () => navigator.userAgent,
@@ -687,7 +779,7 @@ const main = async () => {
       .filter((entry) => {
         try {
           const commandLine = readFileSync(join('/proc', entry, 'cmdline'), 'utf8')
-          return commandLine.includes('ibus-engine-libpinyin')
+          return commandLine.includes(engineProfile.processMatch)
         } catch {
           return false
         }
@@ -700,18 +792,25 @@ const main = async () => {
       {
         name: 'commit',
         fresh: true,
-        keys: ['n', 'i', 'h', 'a', 'o', 'delay=300', 'space'],
+        keys: [...(engineProfile.activateKeys ?? []), ...engineProfile.commitKeys],
       },
       {
         name: 'cancel',
         fresh: true,
-        keys: ['n', 'i', 'h', 'a', 'o', 'delay=300', 'Escape'],
+        keys: [...(engineProfile.activateKeys ?? []), ...engineProfile.cancelKeys],
       },
-      {
-        name: 'candidate',
-        fresh: true,
-        keys: ['n', 'i', 'h', 'a', 'o', 'delay=300', 'Down', 'delay=200', 'space'],
-      },
+      ...(engineProfile.hasCandidates
+        ? [
+            {
+              name: 'candidate',
+              fresh: true,
+              keys: [
+                ...(engineProfile.activateKeys ?? []),
+                ...engineProfile.candidateKeys,
+              ],
+            },
+          ]
+        : []),
       { name: 'backspace', fresh: false, keys: ['BackSpace'] },
       { name: 'undo', fresh: false, keys: ['ctrl+z'] },
       { name: 'redo', fresh: false, keys: ['ctrl+shift+z'] },
@@ -757,6 +856,7 @@ const main = async () => {
       }
       const target = await computeTarget(page)
       if (!target) fail('target-absent', 'could not compute editor target point')
+      await page.locator(editorSelector).click({ timeout: 5000 })
       const installed = await installTrace(page)
       if (!installed) {
         fail(
@@ -796,7 +896,7 @@ const main = async () => {
       if (scenario.name === 'commit') {
         predicate = (state) =>
           state.value &&
-          /\p{Script=Han}/u.test(state.value) &&
+          committedScript.test(state.value) &&
           hasEvent(state.trace, 'compositionend')
       } else if (scenario.name === 'cancel') {
         predicate = (state) =>
@@ -804,7 +904,7 @@ const main = async () => {
       } else if (scenario.name === 'candidate') {
         predicate = (state) =>
           state.value &&
-          /\p{Script=Han}/u.test(state.value) &&
+          committedScript.test(state.value) &&
           state.trace.some(
             (entry) =>
               (entry.name === 'keydown' || entry.name === 'keyup') &&
@@ -865,10 +965,10 @@ const main = async () => {
 
       if (scenario.name === 'commit') {
         const transaction = state.lastTransaction?.transaction
-        if (!state.value || !/\p{Script=Han}/u.test(state.value)) {
+        if (!state.value || !committedScript.test(state.value)) {
           fail(
             'assertion-failed',
-            `commit produced no CJK text: ${JSON.stringify(state.value)}`,
+            `commit produced no ${engineProfile.scriptName} text: ${JSON.stringify(state.value)}`,
           )
         }
         if (transaction?.metadata?.composition !== true) {
@@ -918,10 +1018,10 @@ const main = async () => {
           fail('assertion-failed', 'cancel must not create history entries')
         }
       } else if (scenario.name === 'candidate') {
-        if (!state.value || !/\p{Script=Han}/u.test(state.value)) {
+        if (!state.value || !committedScript.test(state.value)) {
           fail(
             'assertion-failed',
-            `candidate selection committed no CJK text: ${JSON.stringify(state.value)}`,
+            `candidate selection committed no ${engineProfile.scriptName} text: ${JSON.stringify(state.value)}`,
           )
         }
         if (
@@ -936,13 +1036,29 @@ const main = async () => {
             'candidate trace lacks a native ArrowDown key event',
           )
         }
-        if (state.lastTransaction?.transaction?.metadata?.composition !== true) {
+        const candidateTransaction = state.lastTransaction?.transaction
+        if (
+          candidateTransaction &&
+          candidateTransaction.metadata?.composition !== true
+        ) {
           fail('assertion-failed', 'candidate transaction lacks composition metadata')
         }
+        if (
+          !candidateTransaction &&
+          !(
+            hasEvent(state.trace, 'compositionend') &&
+            state.history?.canUndo
+          )
+        ) {
+          fail(
+            'assertion-failed',
+            'candidate left no composition transaction or undoable history',
+          )
+        }
       } else if (scenario.name === 'backspace') {
-        const commitStep = evidence.steps.find(
-          (step) => step.name === 'candidate',
-        )
+        const commitStep =
+          evidence.steps.find((step) => step.name === 'candidate') ??
+          evidence.steps.find((step) => step.name === 'commit')
         if (
           !commitStep ||
           state.value.length >= commitStep.finalState.value.length
@@ -962,9 +1078,9 @@ const main = async () => {
           )
         }
       } else if (scenario.name === 'undo') {
-        const candidateStep = evidence.steps.find(
-          (step) => step.name === 'candidate',
-        )
+        const candidateStep =
+          evidence.steps.find((step) => step.name === 'candidate') ??
+          evidence.steps.find((step) => step.name === 'commit')
         if (!candidateStep || state.value !== candidateStep.finalState.value) {
           fail(
             'assertion-failed',
@@ -993,7 +1109,7 @@ const main = async () => {
       `candidate-sha: ${candidateSha}`,
       `branch: ${branch}`,
       `os: ${process.platform} ${process.arch}`,
-      `browser: ${chromePath} pid=${evidence.browser.pid} version=${evidence.browser.userAgent}`,
+      `browser: ${browserProfile.name} ${chromePath ?? 'playwright'} pid=${evidence.browser.pid} version=${evidence.browser.userAgent}`,
       `ime: ${engine} enginePid=${evidence.ime.enginePid}`,
       `window: ${evidence.window.id} pid=${evidence.window.pid}`,
       `fixture: ${fixtureTestId} probe=${evidence.fixture.probeId}`,

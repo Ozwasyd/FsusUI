@@ -6,9 +6,14 @@
 > MarkdownEditor transaction contract; it cannot redefine them.
 
 The native IME harness proves that real OS-level ibus input reaches the real
-`ElMarkdownEditor` textarea in a real Chromium window. It never substitutes
-synthetic `compositionstart`/`compositionend` events and never prints a green
-receipt when the editor target is absent.
+`ElMarkdownEditor` textarea in a real headed browser window. It never
+substitutes synthetic `compositionstart`/`compositionend` events and never
+prints a green receipt when the editor target is absent.
+
+Issue #320's required matrix is the Linux-local analog: ibus `libpinyin`,
+`chewing`, `mozc-jp`, and `hangul` across headed Chromium, Firefox, and
+WebKit. Windows Microsoft IME, macOS system IME, and Safari browser UI are
+optional off-host cells.
 
 ## What it verifies
 
@@ -30,8 +35,10 @@ source/selection/history state.
   `/usr/bin/google-chrome-stable`, `/usr/bin/chromium`, or
   `/usr/bin/chromium-browser` (override with `FSUS_IME_CHROME_PATH`).
 - `python3` with `python-xlib` (`import Xlib; import Xlib.ext.xtest`).
-- A running ibus daemon with the `libpinyin` engine selected. The engine name
-  is checked with `ibus engine` before any browser is launched.
+- A running ibus daemon. Start an isolated Xvfb session with
+  `scripts/native-ime-session.sh` when no desktop display is available.
+- The engine under test selected (`libpinyin`, `chewing`, `mozc-jp`, or
+  `hangul`). The harness switches the engine before launch.
 - A built demo (`pnpm run build:demo`); the harness builds it by default.
 
 The harness is intentionally **not** part of the default CI gates because CI
@@ -40,7 +47,16 @@ runners do not provide a real CJK IME session.
 ## Running
 
 ```bash
+./scripts/native-ime-session.sh
+source /tmp/fsus-ime-session/env
 node ./scripts/native-ime-harness.mjs
+```
+
+Required Linux-local matrix:
+
+```bash
+source /tmp/fsus-ime-session/env
+node ./scripts/native-ime-matrix.mjs --skip-build --out /tmp/fsus-ime-matrix
 ```
 
 Reuse an existing demo build and write evidence to a custom directory:
@@ -61,6 +77,8 @@ and forced `GTK_IM_MODULE=ibus`/`QT_IM_MODULE=ibus`/`XMODIFIERS=@im=ibus`.
 | Option | Effect |
 | --- | --- |
 | `--out <dir>` | Evidence output directory (default `.tmp/native-ime-evidence`) |
+| `--engine <name>` | `libpinyin` (default), `chewing`, `mozc-jp`, or `hangul` |
+| `--browser <name>` | `chromium` (default), `firefox`, or `webkit` |
 | `--skip-build` | Reuse the existing demo build (or `FSUS_IME_SKIP_BUILD=1`) |
 | `--no-screenshot` | Skip per-step screenshots |
 | `--help` | Print usage |
@@ -70,7 +88,8 @@ and forced `GTK_IM_MODULE=ibus`/`QT_IM_MODULE=ibus`/`XMODIFIERS=@im=ibus`.
 | `FSUS_IME_DISPLAY` | X11 display (default `DISPLAY`) |
 | `FSUS_IME_CHROME_PATH` | Chrome executable override |
 | `FSUS_IME_PYTHON` | Python interpreter (default `python3`) |
-| `FSUS_IME_REQUIRE_ENGINE` | Expected ibus engine (default `libpinyin`) |
+| `FSUS_IME_ENGINE` / `FSUS_IME_REQUIRE_ENGINE` | ibus engine (default `libpinyin`) |
+| `FSUS_IME_BROWSER` | headed browser (default `chromium`) |
 | `FSUS_IME_EDITOR_SELECTOR` | Editor selector inside the fixture (default `[data-testid="markdown-editor-transaction-fixture"] .el-markdown-editor textarea`) |
 | `FSUS_IME_EXPECT_WINDOW_CLASS` | Browser window class (default `Google-chrome`) |
 | `FSUS_IME_DELAY_MOUNT_MS` | Delay the fixture mount (negative-path testing) |
@@ -137,6 +156,19 @@ On Chromium with ibus on Linux, keys consumed by the IME reach the page as
 key used for candidate navigation can surface with `code: "NumpadEnter"` and a
 `keyup` carrying `key: "ArrowDown"`; the harness matches the real event shape
 instead of assuming a canonical `code`.
+
+## Screen reader (Orca / AT-SPI)
+
+Issue #337's required Linux-local screen-reader cell is headed Chromium plus
+Orca and an AT-SPI tree dump. NVDA and VoiceOver remain optional off-host.
+
+```bash
+source /tmp/fsus-ime-session/env
+node ./scripts/native-screen-reader-harness.mjs --skip-build --out /tmp/fsus-screen-reader
+```
+
+The receipt is green only when AT-SPI is reachable, a textbox is exposed, and
+the editor document is not a document-wide `aria-live` region.
 
 ## Cleanup
 
