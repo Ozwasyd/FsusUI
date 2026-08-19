@@ -294,6 +294,46 @@ export interface MarkdownEditorSurfaceOptions {
   readonly toolbar?: boolean
 }
 
+export type MarkdownEditorStatusDensity = 'none' | 'minimal' | 'detailed'
+
+export interface MarkdownEditorMetricsOptions {
+  readonly locale?: string
+  readonly includeBytes?: boolean
+}
+
+export interface MarkdownEditorMetrics {
+  readonly codeUnitLength: number
+  readonly graphemeCount: number
+  readonly wordCount: number
+  readonly lineCount: number
+  readonly byteCount?: number
+}
+
+export const calculateMarkdownEditorMetrics = (
+  source: string,
+  options: MarkdownEditorMetricsOptions = {},
+): MarkdownEditorMetrics => {
+  const Segmenter = Intl.Segmenter
+  const graphemeCount = Segmenter
+    ? [...new Segmenter(options.locale, { granularity: 'grapheme' }).segment(source)]
+        .length
+    : Array.from(source).length
+  const wordCount = Segmenter
+    ? [...new Segmenter(options.locale, { granularity: 'word' }).segment(source)].filter(
+        (part) => part.isWordLike,
+      ).length
+    : Array.from(source).filter((character) => /[\p{L}\p{N}]/u.test(character)).length
+  return {
+    codeUnitLength: source.length,
+    graphemeCount,
+    wordCount,
+    lineCount: source.length === 0 ? 1 : source.split(/\r\n|\r|\n/).length,
+    ...(options.includeBytes
+      ? { byteCount: new TextEncoder().encode(source).length }
+      : {}),
+  }
+}
+
 export const resolveMarkdownEditorToolbarLimit = (
   density: MarkdownEditorToolbarDensity,
   commandCount: number,
@@ -589,6 +629,15 @@ export const markdownEditorProps = buildProps({
     type: String as PropType<MarkdownEditorChrome>,
     values: markdownEditorChromes,
     default: 'framed',
+  },
+  statusDensity: {
+    type: String as PropType<MarkdownEditorStatusDensity>,
+    values: ['none', 'minimal', 'detailed'],
+    default: 'minimal',
+  },
+  metrics: {
+    type: definePropType<MarkdownEditorMetricsOptions>(Object),
+    default: undefined,
   },
   toolbarDensity: {
     type: String as PropType<MarkdownEditorToolbarDensity>,
