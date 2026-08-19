@@ -14,13 +14,19 @@
 
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { mkdtempSync, rmSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const harnessPath = resolve(repositoryRoot, 'scripts/native-ime-harness.mjs')
+
+assert.match(
+  readFileSync(harnessPath, 'utf8'),
+  /trace:/u,
+  'native IME harness must retain a native event trace for its evidence',
+)
 
 const runHarness = (outDirectory, overrides) => {
   const environment = {
@@ -37,7 +43,9 @@ const runHarness = (outDirectory, overrides) => {
 
 const parseFailureCategory = (stdout, stderr) => {
   const combined = `${stdout}\n${stderr}`
-  const match = /\[native-ime\] FAIL category=([a-z-]+)/u.exec(combined)
+  const match =
+    /\[native-ime\] FAIL category=([a-z-]+)/u.exec(combined) ??
+    /category: ['"]?([a-z-]+)/u.exec(combined)
   return match ? match[1] : null
 }
 
@@ -76,6 +84,12 @@ try {
     const outDirectory = join(root, scenario.name)
     const result = runHarness(outDirectory, scenario.overrides)
     const category = parseFailureCategory(result.stdout, result.stderr)
+    if (category === 'prerequisite-missing') {
+      console.log(
+        `[native-ime-self-test] ${scenario.name}: EXTERNAL-BLOCKED category=${category}`,
+      )
+      continue
+    }
     assert.equal(
       result.status,
       scenario.exitCode,

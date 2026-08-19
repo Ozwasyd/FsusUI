@@ -3,16 +3,18 @@ export interface MarkdownEditorTableInsert {
   readonly columns: number
 }
 
-const emptyRow = (columns: number, fill: string) =>
-  `| ${Array.from({ length: columns }, () => fill).join(' | ')} |`
+const emptyRow = (columns: number, fill: (index: number) => string) =>
+  `| ${Array.from({ length: columns }, (_, index) => fill(index)).join(' | ')} |`
 
 export const insertMarkdownTable = ({
   rows,
   columns,
 }: MarkdownEditorTableInsert): string => {
-  const header = emptyRow(columns, 'Column')
+  const header = emptyRow(columns, (index) => `Column ${index + 1}`)
   const divider = `| ${Array.from({ length: columns }, () => '---').join(' | ')} |`
-  const body = Array.from({ length: Math.max(0, rows) }, () => emptyRow(columns, ''))
+  const body = Array.from({ length: Math.max(0, rows) }, () =>
+    emptyRow(columns, () => ''),
+  )
   return [header, divider, ...body].join('\n')
 }
 
@@ -49,21 +51,29 @@ const splitTableCells = (line: string): string[] => {
   return cells
 }
 
+const isAlignmentCell = (cell: string) => /^:?-+:?$/u.test(cell.replace(/\s/g, ''))
+
+const formatAlignmentCell = (cell: string): string => {
+  const trimmed = cell.replace(/\s/g, '')
+  if (!isAlignmentCell(trimmed)) return '---'
+  const left = trimmed.startsWith(':')
+  const right = trimmed.endsWith(':')
+  if (left && right) return ':---:'
+  if (right) return '---:'
+  if (left) return ':---'
+  return '---'
+}
+
 export const formatMarkdownTable = (source: string): string => {
   const lines = source.split(/\r\n|\r|\n/)
-  const tableLines = lines.filter((line) => line.includes('|'))
-  if (tableLines.length === 0) return source
-  const rows = tableLines.map((line) => splitTableCells(line))
-  const widths = rows[0].map((_, index) =>
-    Math.max(...rows.map((row) => (row[index] ?? '').length), 3),
-  )
-  const formatRow = (row: string[]) =>
-    `| ${widths
-      .map((width, index) => (row[index] ?? '').padEnd(width, ' '))
-      .join(' | ')} |`
-  return [
-    formatRow(rows[0]),
-    `| ${widths.map((width) => '-'.repeat(width)).join(' | ')} |`,
-    ...rows.slice(2).map(formatRow),
-  ].join('\n')
+  const formatted = lines.map((line) => {
+    if (!line.includes('|')) return line
+    const cells = splitTableCells(line)
+    if (cells.length === 0) return line
+    if (cells.every((cell) => isAlignmentCell(cell))) {
+      return `| ${cells.map((cell) => formatAlignmentCell(cell)).join(' | ')} |`
+    }
+    return `| ${cells.join(' | ')} |`
+  })
+  return formatted.join('\n')
 }

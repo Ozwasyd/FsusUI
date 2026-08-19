@@ -3,7 +3,11 @@ import { resolve } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { resolveMarkdownEditorToolbarLimit } from '../src/markdown-editor'
+import {
+  resolveMarkdownEditorOverflowCommands,
+  resolveMarkdownEditorPrimaryCommands,
+  resolveMarkdownEditorToolbarLimit,
+} from '../src/markdown-editor'
 
 const editorRoot = resolve(__dirname, '..')
 
@@ -15,6 +19,27 @@ describe('markdown editor leftover command surfaces', () => {
     expect(resolveMarkdownEditorToolbarLimit('minimal', 1)).toBe(1)
   })
 
+  it('keeps every non-primary command in overflow when primaryCommandKeys is set', () => {
+    const commands = Array.from({ length: 10 }, (_, index) => ({
+      key: index === 0 ? 'bold' : `cmd-${index}`,
+    }))
+    expect(
+      resolveMarkdownEditorPrimaryCommands(commands, 'standard', ['bold']).map(
+        (command) => command.key,
+      ),
+    ).toEqual(['bold'])
+    expect(
+      resolveMarkdownEditorOverflowCommands(commands, 'standard', ['bold']).map(
+        (command) => command.key,
+      ),
+    ).toEqual(commands.slice(1).map((command) => command.key))
+    expect(
+      resolveMarkdownEditorOverflowCommands(commands, 'standard').map(
+        (command) => command.key,
+      ),
+    ).toEqual(commands.slice(6).map((command) => command.key))
+  })
+
   it('keeps toolbarDensity and opt-in surfaces on the shipped editor props', () => {
     const api = readFileSync(resolve(editorRoot, 'src', 'markdown-editor.ts'), 'utf8')
     const surface = readFileSync(resolve(editorRoot, 'src', 'markdown-editor.vue'), 'utf8')
@@ -23,8 +48,9 @@ describe('markdown editor leftover command surfaces', () => {
     expect(api).toMatch(/commandPalette/)
     expect(api).toMatch(/selectionToolbar/)
     expect(api).toMatch(/slashMenu/)
-    expect(surface).toMatch(/resolveMarkdownEditorToolbarLimit/)
+    expect(surface).toMatch(/resolveMarkdownEditorOverflowCommands/)
     expect(surface).toMatch(/surfaceOptions/)
+    expect(surface).toMatch(/:aria-label="command.title \|\| command.label"/)
     expect(surface).not.toMatch(/props\.commands\.slice\(0, 6\)/)
   })
 })

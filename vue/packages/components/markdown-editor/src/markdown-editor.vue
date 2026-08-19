@@ -11,7 +11,7 @@
       ns.is('commands-expanded', commandsExpanded),
     ]"
     role="region"
-    aria-label="Markdown editor"
+    :aria-label="localeText.editorAria"
     :style="editorStyle"
   >
     <header
@@ -25,6 +25,7 @@
           type="button"
           :class="ns.e('command')"
           :disabled="editingBlocked"
+          :aria-label="command.title || command.label"
           :title="command.title || command.label"
           @click="runCommand(command)"
         >
@@ -52,7 +53,7 @@
         v-if="showModeSwitcher"
         :class="ns.e('modes')"
         role="tablist"
-        aria-label="Markdown mode"
+        :aria-label="localeText.modeSwitcherAria"
       >
         <button
           v-for="mode in visibleModes"
@@ -97,6 +98,7 @@
           type="button"
           :class="ns.e('command')"
           :disabled="editingBlocked"
+          :aria-label="command.title || command.label"
           :title="command.title || command.label"
           @click="runOverflowCommand(command)"
         >
@@ -195,8 +197,10 @@
         :mode="currentMode"
         :words="wordCount"
       >
-        <span>{{ characterCount }} chars</span>
-        <span>{{ wordCount }} words</span>
+        <span>{{ characterCount }} {{ localeText.metrics.characters }}</span>
+        <span v-if="statusDensity === 'detailed'">
+          {{ wordCount }} {{ localeText.metrics.words }}
+        </span>
       </slot>
     </footer>
   </section>
@@ -223,8 +227,10 @@ import {
   markdownEditorEmits,
   markdownEditorProps,
   calculateMarkdownEditorMetrics,
+  resolveMarkdownEditorLocaleText,
+  resolveMarkdownEditorOverflowCommands,
+  resolveMarkdownEditorPrimaryCommands,
   resolveMarkdownEditorShortcut,
-  resolveMarkdownEditorToolbarLimit,
   runMarkdownEditorCommand,
 } from './markdown-editor'
 import {
@@ -786,9 +792,6 @@ const editorStyle = computed<Record<string, string> | undefined>(() =>
       }
     : undefined,
 )
-const primaryCommandKeySet = computed(() =>
-  props.primaryCommandKeys?.length ? new Set(props.primaryCommandKeys) : null,
-)
 const commandContext = computed(() => ({
   dispatch: {
     dispatch: (transaction: MarkdownEditorTransaction) =>
@@ -805,28 +808,23 @@ const commandContext = computed(() => ({
 const toolbarCommands = computed(() =>
   filterMarkdownEditorCommands(props.commands, commandContext.value, 'toolbar'),
 )
-const primaryCommands = computed(() => {
-  const keySet = primaryCommandKeySet.value
-  const commands = keySet
-    ? toolbarCommands.value.filter((command) => keySet.has(command.key))
-    : toolbarCommands.value
-  const limit = resolveMarkdownEditorToolbarLimit(
+const localeText = computed(() =>
+  resolveMarkdownEditorLocaleText(props.localeText),
+)
+const primaryCommands = computed(() =>
+  resolveMarkdownEditorPrimaryCommands(
+    toolbarCommands.value,
     props.toolbarDensity,
-    commands.length,
-  )
-  return commands.slice(0, limit)
-})
-const overflowCommands = computed(() => {
-  const keySet = primaryCommandKeySet.value
-  const commands = keySet
-    ? toolbarCommands.value.filter((command) => !keySet.has(command.key))
-    : toolbarCommands.value
-  const limit = resolveMarkdownEditorToolbarLimit(
+    props.primaryCommandKeys,
+  ),
+)
+const overflowCommands = computed(() =>
+  resolveMarkdownEditorOverflowCommands(
+    toolbarCommands.value,
     props.toolbarDensity,
-    commands.length,
-  )
-  return commands.slice(limit)
-})
+    props.primaryCommandKeys,
+  ),
+)
 const visibleActions = computed<MarkdownEditorActionItem[]>(() => {
   if (!props.showActions) return []
 
@@ -876,8 +874,10 @@ watch([editingBlocked, overflowItemCount], ([blocked, itemCount]) => {
     triggerRef(editorValue)
   }
 })
-const commandOverflowAriaLabel = computed(
-  () => `${props.commandOverflowLabel}，${overflowItemCount.value} 个工具`,
+const commandOverflowAriaLabel = computed(() =>
+  props.localeText?.overflowAria
+    ? props.localeText.overflowAria(overflowItemCount.value)
+    : `${props.commandOverflowLabel}，${overflowItemCount.value} 个工具`,
 )
 const visibleModes = computed(() =>
   compactMode.value
@@ -1311,11 +1311,7 @@ const setMode = (mode: MarkdownEditorMode) => {
   refreshLiveReveal()
 }
 
-const modeLabel = (mode: MarkdownEditorMode) => {
-  if (mode === 'split') return '分屏'
-  if (mode === 'preview') return '预览'
-  return mode === 'live' ? '实时' : '源码'
-}
+const modeLabel = (mode: MarkdownEditorMode) => localeText.value.modes[mode]
 
 const emitSave = () => {
   if (editingBlocked.value || isComposing.value) return
