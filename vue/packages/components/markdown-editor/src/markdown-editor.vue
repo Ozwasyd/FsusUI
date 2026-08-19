@@ -185,7 +185,10 @@
       />
     </div>
 
-    <footer v-if="chrome !== 'minimal'" :class="ns.e('status')">
+    <footer
+      v-if="chrome !== 'minimal' && statusDensity !== 'none'"
+      :class="ns.e('status')"
+    >
       <slot
         name="status"
         :characters="characterCount"
@@ -219,6 +222,7 @@ import {
   isMarkdownEditorCommandVisible,
   markdownEditorEmits,
   markdownEditorProps,
+  calculateMarkdownEditorMetrics,
   resolveMarkdownEditorShortcut,
   resolveMarkdownEditorToolbarLimit,
   runMarkdownEditorCommand,
@@ -768,7 +772,10 @@ watch(
   },
 )
 
-const characterCount = computed(() => editorValue.value.length)
+const editorMetrics = computed(() =>
+  calculateMarkdownEditorMetrics(editorValue.value, props.metrics),
+)
+const characterCount = computed(() => editorMetrics.value.codeUnitLength)
 const effectivePlaceholder = computed(
   () => props.writingPlaceholder || props.placeholder,
 )
@@ -877,10 +884,7 @@ const visibleModes = computed(() =>
     ? modes.filter((mode) => mode !== 'split' && mode !== 'live')
     : modes,
 )
-const wordCount = computed(() => {
-  const trimmed = editorValue.value.trim()
-  return trimmed ? trimmed.split(/\s+/).length : 0
-})
+const wordCount = computed(() => editorMetrics.value.wordCount)
 
 const updateVisualViewportHeight = () => {
   if (typeof window === 'undefined') return
