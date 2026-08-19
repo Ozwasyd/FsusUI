@@ -7,13 +7,17 @@
       ns.m(`mobile-${mobileLayout}`),
       ns.m(`profile-${editorProfile}`),
       ns.m(`interaction-${interactionProfile}`),
+      ns.m(`toolbar-${toolbarDensity}`),
       ns.is('commands-expanded', commandsExpanded),
     ]"
     role="region"
     aria-label="Markdown editor"
     :style="editorStyle"
   >
-    <header v-if="chrome !== 'minimal'" :class="ns.e('toolbar')">
+    <header
+      v-if="chrome !== 'minimal' && surfaceOptions.toolbar"
+      :class="ns.e('toolbar')"
+    >
       <div :class="ns.e('commands')">
         <button
           v-for="command in primaryCommands"
@@ -216,6 +220,7 @@ import {
   markdownEditorEmits,
   markdownEditorProps,
   resolveMarkdownEditorShortcut,
+  resolveMarkdownEditorToolbarLimit,
   runMarkdownEditorCommand,
 } from './markdown-editor'
 import {
@@ -230,6 +235,7 @@ import type {
   MarkdownEditorCommand,
   MarkdownEditorInsertOptions,
   MarkdownEditorMode,
+  MarkdownEditorSurfaceOptions,
 } from './markdown-editor'
 import type {
   BeforeInputSnapshot,
@@ -291,6 +297,12 @@ const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const commandsExpanded = ref(false)
 const visualViewportHeight = ref(0)
 const editingBlocked = computed(() => props.disabled || props.loading)
+const surfaceOptions = computed<Required<MarkdownEditorSurfaceOptions>>(() => ({
+  commandPalette: props.surfaces.commandPalette ?? false,
+  selectionToolbar: props.surfaces.selectionToolbar ?? false,
+  slashMenu: props.surfaces.slashMenu ?? false,
+  toolbar: props.surfaces.toolbar ?? true,
+}))
 const textareaAriaLabel = computed(() =>
   currentMode.value === 'live' ? 'Markdown editor live editing surface' : 'Markdown editor source',
 )
@@ -788,15 +800,25 @@ const toolbarCommands = computed(() =>
 )
 const primaryCommands = computed(() => {
   const keySet = primaryCommandKeySet.value
-  return keySet
+  const commands = keySet
     ? toolbarCommands.value.filter((command) => keySet.has(command.key))
-    : toolbarCommands.value.filter((_, index) => index < 6)
+    : toolbarCommands.value
+  const limit = resolveMarkdownEditorToolbarLimit(
+    props.toolbarDensity,
+    commands.length,
+  )
+  return commands.slice(0, limit)
 })
 const overflowCommands = computed(() => {
   const keySet = primaryCommandKeySet.value
-  return keySet
+  const commands = keySet
     ? toolbarCommands.value.filter((command) => !keySet.has(command.key))
-    : toolbarCommands.value.filter((_, index) => index >= 6)
+    : toolbarCommands.value
+  const limit = resolveMarkdownEditorToolbarLimit(
+    props.toolbarDensity,
+    commands.length,
+  )
+  return commands.slice(limit)
 })
 const visibleActions = computed<MarkdownEditorActionItem[]>(() => {
   if (!props.showActions) return []
