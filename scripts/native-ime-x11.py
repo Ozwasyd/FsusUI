@@ -271,7 +271,7 @@ def send_keys(dpy, tokens):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--expect-class', default='Google-chrome')
+    parser.add_argument('--expect-class', default='')
     parser.add_argument('--expect-pid', type=int)
     parser.add_argument('--target-x', type=int)
     parser.add_argument('--target-y', type=int)

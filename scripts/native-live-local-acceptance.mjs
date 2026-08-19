@@ -119,7 +119,7 @@ const main = async () => {
 
         const perfPage = await browser.newPage({ viewport: { width: 1280, height: 900 } })
         await perfPage.goto(
-          `${baseUrl}/?markdownEditorTransaction=1&markdownEditorIme=1`,
+          `${baseUrl}/?audit=ui-states&markdownEditorTransaction=1&markdownEditorIme=1`,
           { waitUntil: 'domcontentloaded' },
         )
         const textarea = perfPage.locator(

@@ -336,6 +336,20 @@ export const createMarkdownEditorNativeEventMachine = (options: {
         return next
       }
       if (phase !== 'composing') {
+        if (event.data) {
+          phase = 'idle'
+          lastCommitValue = (event.previousValue ?? '') + event.data
+          lastIdentity = identity
+          const next = planOf('commit', phase, {
+            composition: true,
+            freezeSmartInput: false,
+            history: 'separate',
+            identity,
+            origin: 'input',
+          })
+          pushTrace(event, next)
+          return next
+        }
         const next = planOf('prevent', phase, {
           identity,
           rejected: 'orphaned-composition',
@@ -347,6 +361,22 @@ export const createMarkdownEditorNativeEventMachine = (options: {
       const value = event.value ?? ''
       const previous = event.previousValue ?? ''
       if (value === previous) {
+        if (event.data) {
+          // WebKit hangul: compositionend.data holds the committed text
+          // before the textarea value updates.
+          phase = 'idle'
+          lastCommitValue = previous + event.data
+          lastIdentity = identity
+          const next = planOf('commit', phase, {
+            composition: true,
+            freezeSmartInput: false,
+            history: 'separate',
+            identity,
+            origin: 'input',
+          })
+          pushTrace(event, next)
+          return next
+        }
         phase = 'committing'
         const next = planOf('ignore', phase, {
           freezeSmartInput: true,

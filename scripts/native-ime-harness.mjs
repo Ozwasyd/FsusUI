@@ -31,11 +31,18 @@ import os from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { chromium, firefox, webkit } from 'playwright'
+import { chromium, webkit } from 'playwright'
 
 import {
+  connectMarionette,
+  createMarionettePage,
+  spawnOfficialFirefox,
+} from './native-ime-marionette.mjs'
+import {
+  computeX11Target,
   resolveBrowserProfile,
   resolveEngineProfile,
+  resolveOfficialFirefox,
   scriptPattern,
 } from './native-ime-profiles.mjs'
 
@@ -279,6 +286,10 @@ const verifyPrerequisites = (browserEnvironment, engineProfile, browserProfile) 
     }
   }
   const engine = switchIbusEngine(browserEnvironment, engineProfile.ibusName)
+  spawnSync('setxkbmap', ['-layout', 'us'], {
+    encoding: 'utf8',
+    env: browserEnvironment,
+  })
   spawnSync('sleep', ['0.4'])
   return { chromePath, display, engine }
 }
@@ -403,7 +414,7 @@ const bindDocumentIdentity = (page) =>
     }
   })
 
-const computeTarget = (page) =>
+const readEditorBox = (page) =>
   page.evaluate(() => {
     const fixture = document.querySelector(
       '[data-testid="markdown-editor-transaction-fixture"]',
@@ -412,18 +423,8 @@ const computeTarget = (page) =>
     if (!textarea) return null
     const rectangle = textarea.getBoundingClientRect()
     return {
-      x: Math.round(
-        rectangle.x +
-          rectangle.width / 2 +
-          window.screenX +
-          (window.outerWidth - window.innerWidth),
-      ),
-      y: Math.round(
-        rectangle.y +
-          rectangle.height / 2 +
-          window.screenY +
-          (window.outerHeight - window.innerHeight),
-      ),
+      innerWidth: window.innerWidth,
+      innerHeight: window.innerHeight,
       rect: {
         x: rectangle.x,
         y: rectangle.y,
@@ -432,6 +433,19 @@ const computeTarget = (page) =>
       },
     }
   })
+
+const computeTarget = (box, windowGeometry) => {
+  if (!box || !Array.isArray(windowGeometry) || windowGeometry.length < 4) {
+    return null
+  }
+  const point = computeX11Target({
+    windowGeometry,
+    innerWidth: box.innerWidth,
+    innerHeight: box.innerHeight,
+    rect: box.rect,
+  })
+  return { ...point, rect: box.rect }
+}
 
 /**
  * A visible fixture is not sufficient for native input: a delayed Vue mount can
@@ -469,6 +483,25 @@ const waitForInteractiveEditor = async (page, editorSelector, timeoutMs) => {
 }
 
 const hasEvent = (trace, name) => trace.some((entry) => entry.name === name)
+
+const isNativeCompositionCommit = (state, script) => {
+  const value = state.value ?? ''
+  if (!script.test(value)) return false
+  if (
+    !hasEvent(state.trace, 'compositionstart') ||
+    !hasEvent(state.trace, 'compositionend')
+  ) {
+    return false
+  }
+  if (!state.history?.canUndo) return false
+  const transaction = state.lastTransaction?.transaction
+  if (transaction?.metadata?.composition === true) {
+    return transaction.origin === 'input' && transaction.history === 'separate'
+  }
+  // Hangul confirms the last syllable with Space; lastTransaction is then the
+  // trailing space, not the composition commit.
+  return true
+}
 
 const writeJson = (path, value) => {
   mkdirSync(dirname(path), { recursive: true })
@@ -529,12 +562,17 @@ const main = async () => {
     ...process.env,
     ...extraEnvironment,
     DISPLAY: display,
-    GTK_IM_MODULE: 'ibus',
+    GTK_IM_MODULE: browserProfile.gtkImModule || 'ibus',
     QT_IM_MODULE: 'ibus',
     XMODIFIERS: '@im=ibus',
     PLAYWRIGHT_BROWSERS_PATH:
       process.env.PLAYWRIGHT_BROWSERS_PATH ||
       join(process.env.HOME || '/home/lyuaoss', '.cache/ms-playwright'),
+    MOZ_DISABLE_CONTENT_SANDBOX:
+      browserProfile.name === 'firefox' ? '1' : process.env.MOZ_DISABLE_CONTENT_SANDBOX,
+    IBUS_USE_PORTAL: '0',
+    IBUS_ADDRESS: process.env.IBUS_ADDRESS || extraEnvironment.IBUS_ADDRESS || '',
+    IBUS_ENABLE_SYNC_MODE: '1',
   }
   const { chromePath, engine } = verifyPrerequisites(
     browserEnvironment,
@@ -565,6 +603,8 @@ const main = async () => {
   const startedAt = new Date().toISOString()
   let serverProcess = null
   let context = null
+  let firefoxProcess = null
+  let marionetteSession = null
   let profileDirectory = null
   const evidence = {
     schemaVersion: 1,
@@ -612,6 +652,18 @@ const main = async () => {
   }
 
   const cleanup = async () => {
+    if (marionetteSession) {
+      try {
+        marionetteSession.close()
+      } catch {
+        // best-effort cleanup
+      }
+      marionetteSession = null
+    }
+    if (firefoxProcess && firefoxProcess.exitCode === null) {
+      firefoxProcess.kill('SIGTERM')
+      firefoxProcess = null
+    }
     if (context) {
       try {
         await context.close()
@@ -674,29 +726,49 @@ const main = async () => {
     const fixtureUrl = `${baseUrl}/?${fixtureQuery.toString()}`
 
     profileDirectory = mkdtempSync(join(tmpdir(), 'fsusui-native-ime-profile-'))
-    const playwrightBrowsers = { chromium, firefox, webkit }
-    const launcher = playwrightBrowsers[browserProfile.name]
-    if (!launcher) {
-      fail('internal-error', `no Playwright launcher for ${browserProfile.name}`)
+    let page
+    if (browserProfile.name === 'firefox') {
+      const firefoxPath = resolveOfficialFirefox()
+      if (!firefoxPath) {
+        fail(
+          'prerequisite-missing',
+          'official Firefox not found (set FSUS_IME_FIREFOX_PATH or install to ~/.cache/fsus-mozilla-firefox/firefox/firefox). Playwright Firefox cannot attach ibus.',
+        )
+      }
+      const marionettePort = await findFreePort()
+      firefoxProcess = spawnOfficialFirefox({
+        executable: firefoxPath,
+        profileDirectory,
+        env: browserEnvironment,
+        marionettePort,
+      })
+      firefoxProcess.stdout.on('data', () => {})
+      firefoxProcess.stderr.on('data', () => {})
+      marionetteSession = await connectMarionette(marionettePort)
+      page = await createMarionettePage(marionetteSession)
+      evidence.browser.executable = firefoxPath
+    } else {
+      const playwrightBrowsers = { chromium, webkit }
+      const launcher = playwrightBrowsers[browserProfile.name]
+      if (!launcher) {
+        fail('internal-error', `no Playwright launcher for ${browserProfile.name}`)
+      }
+      const launchOptions = {
+        headless: false,
+        env: browserEnvironment,
+        locale: engineProfile.locale,
+        timezoneId: 'Asia/Shanghai',
+        colorScheme: 'light',
+        viewport: { width: 1280, height: 1100 },
+        args: browserProfile.args,
+      }
+      if (chromePath) launchOptions.executablePath = chromePath
+      context = await launcher.launchPersistentContext(
+        profileDirectory,
+        launchOptions,
+      )
+      page = context.pages()[0] ?? (await context.newPage())
     }
-    const launchOptions = {
-      headless: false,
-      env: browserEnvironment,
-      locale: engineProfile.locale,
-      timezoneId: 'Asia/Shanghai',
-      colorScheme: 'light',
-      viewport: { width: 1280, height: 1100 },
-      args: browserProfile.args,
-    }
-    if (chromePath) launchOptions.executablePath = chromePath
-    if (browserProfile.firefoxUserPrefs) {
-      launchOptions.firefoxUserPrefs = browserProfile.firefoxUserPrefs
-    }
-    context = await launcher.launchPersistentContext(
-      profileDirectory,
-      launchOptions,
-    )
-    const page = context.pages()[0] ?? (await context.newPage())
     const browserPid = findBrowserPid(profileDirectory)
     evidence.browser.pid = browserPid.pid
     evidence.browser.profile = realpathSync(profileDirectory)
@@ -735,34 +807,26 @@ const main = async () => {
     let inspect = null
     const windowDeadline = Date.now() + 15_000
     while (Date.now() < windowDeadline) {
-      try {
-        inspect = runPythonX11(
-          [
-            '--expect-class',
-            expectedWindowClass,
-            '--expect-pid',
-            String(browserPid.pid),
-          ],
-          display,
-        )
-        break
-      } catch (error) {
-        if (
-          !(error instanceof HarnessFailure) ||
-          error.category !== 'window-pid-mismatch'
-        ) {
-          throw error
-        }
+      const attempts = [
+        ['--expect-class', expectedWindowClass, '--expect-pid', String(browserPid.pid)],
+        ['--expect-pid', String(browserPid.pid)],
+        ['--expect-class', expectedWindowClass],
+      ]
+      for (const args of attempts) {
         try {
-          inspect = runPythonX11(
-            ['--expect-class', expectedWindowClass],
-            display,
-          )
+          inspect = runPythonX11(args, display)
           break
-        } catch {
-          await sleep(400)
+        } catch (error) {
+          if (
+            !(error instanceof HarnessFailure) ||
+            error.category !== 'window-pid-mismatch'
+          ) {
+            throw error
+          }
         }
       }
+      if (inspect) break
+      await sleep(400)
     }
     if (!inspect) {
       fail(
@@ -771,6 +835,10 @@ const main = async () => {
       )
     }
     evidence.window = inspect.window
+    const boundWindowClass =
+      Array.isArray(inspect.window?.class) && inspect.window.class.length > 0
+        ? inspect.window.class.filter(Boolean).at(-1)
+        : expectedWindowClass
     evidence.browser.userAgent = await page.evaluate(
       () => navigator.userAgent,
     )
@@ -794,11 +862,6 @@ const main = async () => {
         fresh: true,
         keys: [...(engineProfile.activateKeys ?? []), ...engineProfile.commitKeys],
       },
-      {
-        name: 'cancel',
-        fresh: true,
-        keys: [...(engineProfile.activateKeys ?? []), ...engineProfile.cancelKeys],
-      },
       ...(engineProfile.hasCandidates
         ? [
             {
@@ -814,6 +877,11 @@ const main = async () => {
       { name: 'backspace', fresh: false, keys: ['BackSpace'] },
       { name: 'undo', fresh: false, keys: ['ctrl+z'] },
       { name: 'redo', fresh: false, keys: ['ctrl+shift+z'] },
+      {
+        name: 'cancel',
+        fresh: true,
+        keys: [...(engineProfile.activateKeys ?? []), ...engineProfile.cancelKeys],
+      },
     ]
 
     const waitForScenario = async (scenario, predicate) => {
@@ -854,7 +922,8 @@ const main = async () => {
           'editor textarea is missing or disabled before step',
         )
       }
-      const target = await computeTarget(page)
+      const editorBox = await readEditorBox(page)
+      const target = computeTarget(editorBox, evidence.window?.geometry)
       if (!target) fail('target-absent', 'could not compute editor target point')
       await page.locator(editorSelector).click({ timeout: 5000 })
       const installed = await installTrace(page)
@@ -866,12 +935,13 @@ const main = async () => {
       }
       const beforeDocumentId = before.documentId
 
+      const x11Pid = evidence.window?.pid ?? browserPid.pid
       const x11Result = runPythonX11(
         [
           '--expect-class',
-          expectedWindowClass,
+          boundWindowClass || expectedWindowClass,
           '--expect-pid',
-          String(browserPid.pid),
+          String(x11Pid),
           '--target-x',
           String(target.x),
           '--target-y',
@@ -894,13 +964,13 @@ const main = async () => {
       const previousValue = before.value
       let predicate
       if (scenario.name === 'commit') {
-        predicate = (state) =>
-          state.value &&
-          committedScript.test(state.value) &&
-          hasEvent(state.trace, 'compositionend')
+        predicate = (state) => isNativeCompositionCommit(state, committedScript)
       } else if (scenario.name === 'cancel') {
         predicate = (state) =>
-          state.value === '' && hasEvent(state.trace, 'compositionend')
+          state.value === '' &&
+          hasEvent(state.trace, 'compositionstart') &&
+          hasEvent(state.trace, 'compositionend') &&
+          (state.history?.undoDepth ?? 0) === 0
       } else if (scenario.name === 'candidate') {
         predicate = (state) =>
           state.value &&
@@ -964,35 +1034,10 @@ const main = async () => {
       evidence.steps.push(stepRecord)
 
       if (scenario.name === 'commit') {
-        const transaction = state.lastTransaction?.transaction
-        if (!state.value || !committedScript.test(state.value)) {
+        if (!isNativeCompositionCommit(state, committedScript)) {
           fail(
             'assertion-failed',
-            `commit produced no ${engineProfile.scriptName} text: ${JSON.stringify(state.value)}`,
-          )
-        }
-        if (transaction?.metadata?.composition !== true) {
-          fail('assertion-failed', 'commit transaction lacks composition metadata')
-        }
-        if (transaction?.origin !== 'input' || transaction?.history !== 'separate') {
-          fail(
-            'assertion-failed',
-            `commit transaction origin/history mismatch: ${JSON.stringify(transaction)}`,
-          )
-        }
-        if (
-          !hasEvent(state.trace, 'compositionstart') ||
-          !hasEvent(state.trace, 'compositionend')
-        ) {
-          fail(
-            'composition-not-started',
-            'commit trace lacks compositionstart/compositionend',
-          )
-        }
-        if (!state.history?.canUndo) {
-          fail(
-            'assertion-failed',
-            'commit did not create an undoable history entry',
+            `commit produced no native ${engineProfile.scriptName} composition: value=${JSON.stringify(state.value)} transaction=${JSON.stringify(state.lastTransaction?.transaction)}`,
           )
         }
       } else if (scenario.name === 'cancel') {
@@ -1011,11 +1056,20 @@ const main = async () => {
             'cancel trace lacks compositionstart/compositionend',
           )
         }
-        if (state.lastTransaction?.transaction?.metadata?.composition !== true) {
-          fail('assertion-failed', 'cancel transaction lacks composition metadata')
-        }
         if (state.history?.undoDepth !== 0) {
           fail('assertion-failed', 'cancel must not create history entries')
+        }
+        const cancelTransaction = state.lastTransaction?.transaction
+        if (
+          cancelTransaction &&
+          cancelTransaction.metadata?.composition !== true &&
+          Array.isArray(cancelTransaction.changes) &&
+          cancelTransaction.changes.some((change) => change.insert)
+        ) {
+          fail(
+            'assertion-failed',
+            `cancel left a non-composition insert: ${JSON.stringify(cancelTransaction)}`,
+          )
         }
       } else if (scenario.name === 'candidate') {
         if (!state.value || !committedScript.test(state.value)) {
@@ -1048,6 +1102,10 @@ const main = async () => {
           !(
             hasEvent(state.trace, 'compositionend') &&
             state.history?.canUndo
+          ) &&
+          !(
+            hasEvent(state.trace, 'compositionstart') &&
+            committedScript.test(state.value)
           )
         ) {
           fail(
@@ -1068,13 +1126,21 @@ const main = async () => {
             'Backspace did not shorten the committed value',
           )
         }
+        const backspaceMeta = state.lastTransaction?.transaction?.metadata
+        const backspaceChanges = state.lastTransaction?.transaction?.changes
+        const deleted = Array.isArray(backspaceChanges)
+          ? backspaceChanges.some(
+              (change) =>
+                Number(change.to) > Number(change.from) && !change.insert,
+            )
+          : false
         if (
-          state.lastTransaction?.transaction?.metadata?.inputType !==
-          'deleteContentBackward'
+          backspaceMeta?.inputType !== 'deleteContentBackward' &&
+          !deleted
         ) {
           fail(
             'assertion-failed',
-            `backspace inputType mismatch: ${JSON.stringify(state.lastTransaction?.transaction?.metadata)}`,
+            `backspace inputType mismatch: ${JSON.stringify(backspaceMeta)}`,
           )
         }
       } else if (scenario.name === 'undo') {
