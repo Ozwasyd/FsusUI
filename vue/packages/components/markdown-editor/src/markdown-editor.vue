@@ -1049,7 +1049,21 @@ const handleCompositionEnd = (event: CompositionEvent) => {
     if (plan.restoreDisplay) triggerRef(editorValue)
     return
   }
-  dispatchReplacement(target.value, readSelectionFrom(target), {
+  const laggedComposition =
+    target.value === transactionStore.value && event.data
+      ? `${transactionStore.value}${event.data}`
+      : target.value
+  const laggedSelection = {
+    direction: 'forward' as const,
+    end: laggedComposition.length,
+    start: laggedComposition.length,
+  }
+  dispatchReplacement(
+    laggedComposition,
+    target.value === transactionStore.value && event.data
+      ? laggedSelection
+      : readSelectionFrom(target),
+    {
     history: plan.history,
     metadata: Object.freeze({
       composition: true,
@@ -1058,7 +1072,8 @@ const handleCompositionEnd = (event: CompositionEvent) => {
       inputType: 'insertCompositionText',
     }),
     origin: 'input',
-  })
+  },
+  )
   refreshLiveReveal()
 }
 

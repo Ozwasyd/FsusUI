@@ -1,3 +1,7 @@
+import { existsSync } from 'node:fs'
+import { homedir } from 'node:os'
+import { join } from 'node:path'
+
 /**
  * Linux-local native IME matrix profiles.
  *
@@ -59,8 +63,12 @@ export const ENGINE_PROFILES = {
       '3',
       'delay=300',
       'Down',
-      'delay=200',
+      'delay=300',
       'space',
+      'delay=300',
+      'Return',
+      'delay=300',
+      'Return',
     ],
   },
   'mozc-jp': {
@@ -125,10 +133,16 @@ export const ENGINE_PROFILES = {
     locale: 'ko-KR',
     scriptName: 'Hangul',
     hasCandidates: false,
-    activateKeys: ['keycode=209', 'delay=250'],
-    // 안녕 on 2-set Korean (US keycaps): dkssud
+    // Session gsettings start hangul in Hangul mode. Do not send Hangul/keycode
+    // 209 here: that toggle flips back to latin/English on this host.
+    activateKeys: [],
+    // 안녕 on 2-set Korean (US keycaps): dkssud. Space confirms the last
+    // syllable; the following lastTransaction may be the space itself.
     commitKeys: ['d', 'k', 's', 's', 'u', 'd', 'delay=300', 'space'],
-    cancelKeys: ['d', 'k', 'delay=200', 'Escape'],
+    // Chromium+ibus-hangul treats Escape as "commit preedit". Native cancel
+    // is BackSpace while the first jamo is still composing, then Escape to
+    // end the empty composition.
+    cancelKeys: ['d', 'BackSpace', 'Escape'],
     candidateKeys: ['d', 'k', 's', 's', 'u', 'd', 'delay=300'],
   },
 }
@@ -154,14 +168,50 @@ export const BROWSER_PROFILES = {
     args: [],
     firefoxUserPrefs: {
       'ui.osk.enabled': false,
+      // Playwright Firefox otherwise injects keys as Latin and skips ibus.
+      'security.sandbox.content.level': 0,
+      'security.sandbox.gpu.level': 0,
+      'fission.autostart': false,
+      // Autoconfig enables testmode, which keeps IME from attaching to XTEST.
+      'focusmanager.testmode': false,
     },
+    gtkImModule: 'ibus',
   },
   webkit: {
     name: 'webkit',
-    windowClass: 'WebKit',
+    windowClass: 'MiniBrowser',
     needsSystemChrome: false,
     args: [],
   },
+}
+
+/**
+ * Convert a textarea client rect into an X11 root coordinate using the real
+ * mapped window geometry. Playwright `screenX`/`outerHeight` omit Firefox and
+ * WebKit chrome, so clicks that use them land in the tab/URL bar.
+ */
+export const officialFirefoxCandidates = () =>
+  [
+    process.env.FSUS_IME_FIREFOX_PATH,
+    join(homedir(), '.cache/fsus-mozilla-firefox/firefox/firefox'),
+  ].filter(Boolean)
+
+export const resolveOfficialFirefox = () =>
+  officialFirefoxCandidates().find((candidate) => existsSync(candidate)) ?? null
+
+export const computeX11Target = ({
+  windowGeometry,
+  innerWidth,
+  innerHeight,
+  rect,
+}) => {
+  const [windowX, windowY, windowWidth, windowHeight] = windowGeometry
+  const topChrome = Math.max(0, windowHeight - innerHeight)
+  const leftChrome = Math.max(0, windowWidth - innerWidth)
+  return {
+    x: Math.round(windowX + leftChrome + rect.x + rect.width / 2),
+    y: Math.round(windowY + topChrome + rect.y + rect.height / 2),
+  }
 }
 
 export const scriptPattern = (scriptName) => {

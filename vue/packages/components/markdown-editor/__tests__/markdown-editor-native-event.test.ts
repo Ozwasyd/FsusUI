@@ -74,6 +74,39 @@ describe('markdown native event machine', () => {
     }
   })
 
+  it('commits a lagged WebKit compositionend even after a prior composition is idle', () => {
+    const machine = createMarkdownEditorNativeEventMachine({
+      documentIdentity: { epoch: 0, id: 'doc' },
+    })
+    const plan = machine.apply({
+      data: '안녕',
+      documentIdentity: { epoch: 0, id: 'doc' },
+      kind: 'compositionend',
+      previousValue: ' ',
+      value: ' ',
+    })
+    expect(plan.action).toBe('commit')
+    expect(plan.composition).toBe(true)
+  })
+
+  it('commits compositionend data when the textarea value has not updated yet', () => {
+    const machine = createMarkdownEditorNativeEventMachine({
+      documentIdentity: { epoch: 0, id: 'doc' },
+    })
+    machine.apply({ kind: 'compositionstart' })
+    const plan = machine.apply({
+      data: '안녕',
+      documentIdentity: { epoch: 0, id: 'doc' },
+      kind: 'compositionend',
+      previousValue: ' ',
+      value: ' ',
+    })
+    expect(plan.action).toBe('commit')
+    expect(plan.composition).toBe(true)
+    expect(plan.history).toBe('separate')
+    expect(machine.phase).toBe('idle')
+  })
+
   it('treats empty compositionend plus insertText as a single Korean-style commit', () => {
     const applied = commitThroughStore([
       { kind: 'compositionstart' },

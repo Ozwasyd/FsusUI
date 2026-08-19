@@ -4,7 +4,8 @@
  * ibus libpinyin/chewing/mozc-jp/hangul × Chromium/Firefox/WebKit.
  */
 import { spawnSync } from 'node:child_process'
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -18,6 +19,48 @@ export const REQUIRED_LINUX_IME_CELLS = Object.freeze(
     Object.keys(BROWSER_PROFILES).map((browser) => `${engine}__${browser}`),
   ),
 )
+
+export const OPTIONAL_OFF_HOST_IME_CELLS = Object.freeze([
+  'Windows Microsoft IME',
+  'macOS system IME',
+  'Safari browser UI',
+])
+
+export const digestTrace = (trace) =>
+  createHash('sha256').update(JSON.stringify(trace ?? [])).digest('hex')
+
+/** Map one harness `manifest.json` onto a matrix v1 cell. Never marks synthetic. */
+export const cellFromHarnessEvidence = ({ engine, browser, harnessManifest }) => {
+  const id = `${engine}__${browser}`
+  const steps = Array.isArray(harnessManifest?.steps) ? harnessManifest.steps : []
+  const trace = steps.flatMap((step) => step.trace ?? [])
+  const osName =
+    harnessManifest?.os?.name ?? harnessManifest?.os?.platform ?? 'linux'
+  let status = 'failed'
+  if (harnessManifest?.verdict === 'pass') status = 'success'
+  else if (harnessManifest?.failure?.category === 'prerequisite-missing') {
+    status = 'external-blocked'
+  }
+  return {
+    id,
+    status,
+    synthetic: false,
+    candidateSha: harnessManifest?.candidateSha ?? '',
+    os: osName,
+    browser,
+    browserVersion: harnessManifest?.browser?.userAgent ?? 'unknown',
+    ime: harnessManifest?.ime?.engine ?? engine,
+    imeVersion: String(harnessManifest?.ime?.enginePid ?? 'system'),
+    locale: harnessManifest?.locale?.pageLocale ?? '',
+    fixture: harnessManifest?.fixture?.testId ?? '',
+    traceDigest: digestTrace(trace),
+    operations: steps.map((step) => step.name).filter(Boolean),
+    blocker:
+      status === 'success'
+        ? undefined
+        : harnessManifest?.failure?.message ?? 'harness did not pass',
+  }
+}
 
 const requiredManifestFields = [
   'candidateSha',
@@ -36,7 +79,11 @@ const isDigest = (value) =>
   typeof value === 'string' && /^[0-9a-f]{64}$/u.test(value)
 
 /** Machine-check leftover #320 evidence manifests. Synthetic cells are never valid. */
-export const validateManifest = (manifest, expectedCandidateSha) => {
+export const validateManifest = (
+  manifest,
+  expectedCandidateSha,
+  options = {},
+) => {
   const errors = []
   if (!manifest || typeof manifest !== 'object' || Array.isArray(manifest)) {
     return { valid: false, errors: ['manifest must be an object'] }
@@ -61,6 +108,9 @@ export const validateManifest = (manifest, expectedCandidateSha) => {
     }
     if (cell.synthetic === true) {
       errors.push(`synthetic evidence is not admissible for ${cell.id}`)
+    }
+    if (options.requireSuccess && cell.status !== 'success') {
+      errors.push(`required cell ${cell.id} is ${cell.status}`)
     }
     for (const field of requiredManifestFields) {
       if (!cell[field]) errors.push(`missing ${field} for ${cell.id}`)
@@ -135,41 +185,74 @@ const runMatrix = () => {
       env: process.env,
       stdio: 'inherit',
     })
-    cells.push({
-      engine,
-      browser,
-      status: result.status,
-      durationMs: Date.now() - started,
-      out: cellDirectory,
-      required: true,
-    })
+    let harnessManifest = null
+    try {
+      harnessManifest = JSON.parse(
+        readFileSync(join(cellDirectory, 'manifest.json'), 'utf8'),
+      )
+    } catch {
+      harnessManifest = {
+        verdict: 'fail',
+        failure: {
+          category: 'internal-error',
+          message: `missing harness manifest; exit=${result.status}`,
+        },
+      }
+    }
+    cells.push(
+      cellFromHarnessEvidence({
+        engine,
+        browser,
+        harnessManifest,
+      }),
+    )
+    cells.at(-1).durationMs = Date.now() - started
+    cells.at(-1).out = cellDirectory
+    cells.at(-1).exitCode = result.status
   }
   }
 
-  const passed = cells.filter((cell) => cell.status === 0).length
-  const failed = cells.filter((cell) => cell.status !== 0)
+  const candidateSha = spawnSync('git', ['rev-parse', 'HEAD'], {
+    cwd: repositoryRoot,
+    encoding: 'utf8',
+  }).stdout.trim()
+  const matrixManifest = {
+    schema: 'fsusui.native-ime-evidence-matrix.v1',
+    optionalOffHost: [...OPTIONAL_OFF_HOST_IME_CELLS],
+    cells,
+  }
+  const check = validateManifest(matrixManifest, candidateSha, {
+    requireSuccess: true,
+  })
+  const passed = cells.filter((cell) => cell.status === 'success').length
+  const failed = cells.filter((cell) => cell.status !== 'success')
   const summary = {
     schemaVersion: 1,
     kind: 'native-ime-linux-local-matrix',
     candidateCommand: 'git rev-parse HEAD',
+    candidateSha,
     requiredCells: cells,
-    optionalOffHost: [
-      'Windows Microsoft IME',
-      'macOS system IME',
-      'Safari browser UI',
-    ],
+    optionalOffHost: [...OPTIONAL_OFF_HOST_IME_CELLS],
     passed,
     failed: failed.length,
-    verdict: failed.length === 0 ? 'pass' : 'fail',
+    validationErrors: check.errors,
+    verdict: check.valid ? 'pass' : 'fail',
   }
   writeFileSync(
     join(options.out, 'summary.json'),
     `${JSON.stringify(summary, null, 2)}\n`,
   )
+  writeFileSync(
+    join(options.out, 'manifest.json'),
+    `${JSON.stringify(matrixManifest, null, 2)}\n`,
+  )
   console.log(
     `[matrix] ${summary.verdict} passed=${passed}/${cells.length} evidence=${options.out}`,
   )
-  process.exitCode = failed.length === 0 ? 0 : 1
+  if (!check.valid) {
+    for (const error of check.errors) console.error(`[matrix] ${error}`)
+  }
+  process.exitCode = check.valid ? 0 : 1
 }
 
 const isMain =

@@ -37,7 +37,7 @@ const wasmImports = {
 
 let cachedExports: SyntaxCollectExports | undefined
 
-const loadSyntaxCollectExports = (): SyntaxCollectExports => {
+const loadSyntaxCollectExports = (): SyntaxCollectExports | null => {
   if (cachedExports) {
     return cachedExports
   }
@@ -48,7 +48,7 @@ const loadSyntaxCollectExports = (): SyntaxCollectExports => {
   )}markdown/syntax-collect.wasm`
   const wasmBytes = readNodeWasmBinary(wasmUrl)
   if (!wasmBytes) {
-    throw new Error('markdown syntax collector is unavailable outside Node.js')
+    return null
   }
   const module = new WebAssembly.Module(wasmBytes as BufferSource)
   const instance = new WebAssembly.Instance(module, wasmImports)
@@ -65,6 +65,9 @@ export const collectMarkdownSyntaxNodesFromParser = (
   source: string,
 ): MarkdownParserSyntaxNode[] => {
   const exports = loadSyntaxCollectExports()
+  if (!exports) {
+    return []
+  }
   const encoded = new TextEncoder().encode(source)
   const pointer = exports.markdown_syntax_alloc(encoded.byteLength || 1)
   if (pointer <= 0) {
