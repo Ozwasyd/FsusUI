@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <IsPackable>true</IsPackable>
+    <IsAotCompatible>true</IsAotCompatible>
     <PackageId>FsusUI.Avalonia</PackageId>
     <Description>Platform-neutral FsusUI Avalonia constants and shared contracts.</Description>
   </PropertyGroup>
