@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <IsPackable>true</IsPackable>
+    <IsAotCompatible>true</IsAotCompatible>
     <PackageId>FsusUI.Avalonia.Themes</PackageId>
     <Description>FsusUI Avalonia theme resources generated from shared design tokens.</Description>
   </PropertyGroup>
