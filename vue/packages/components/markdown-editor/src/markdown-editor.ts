@@ -279,6 +279,30 @@ export const markdownEditorChromes = ['framed', 'embedded', 'minimal'] as const
 export type MarkdownEditorMobileLayout = 'auto' | 'compact' | 'standard'
 export type MarkdownEditorProfile = 'markdown' | 'prose'
 export type MarkdownEditorInteractionProfile = 'auto' | 'touch' | 'keyboard'
+export type MarkdownEditorToolbarDensity = 'minimal' | 'standard' | 'full'
+export type MarkdownEditorSurface =
+  | 'toolbar'
+  | 'selection-toolbar'
+  | 'command-palette'
+  | 'slash-menu'
+
+/** Opt-in command surfaces share the same command registry and context. */
+export interface MarkdownEditorSurfaceOptions {
+  readonly commandPalette?: boolean
+  readonly selectionToolbar?: boolean
+  readonly slashMenu?: boolean
+  readonly toolbar?: boolean
+}
+
+export const resolveMarkdownEditorToolbarLimit = (
+  density: MarkdownEditorToolbarDensity,
+  commandCount: number,
+): number => {
+  if (density === 'minimal') return Math.min(2, commandCount)
+  if (density === 'full') return commandCount
+  return Math.min(6, commandCount)
+}
+
 export type MarkdownEditorActionKey = 'image' | 'save' | 'submit'
 
 export interface MarkdownEditorActionItem {
@@ -565,6 +589,15 @@ export const markdownEditorProps = buildProps({
     type: String as PropType<MarkdownEditorChrome>,
     values: markdownEditorChromes,
     default: 'framed',
+  },
+  toolbarDensity: {
+    type: String as PropType<MarkdownEditorToolbarDensity>,
+    values: ['minimal', 'standard', 'full'],
+    default: 'standard',
+  },
+  surfaces: {
+    type: definePropType<MarkdownEditorSurfaceOptions>(Object),
+    default: () => ({ toolbar: true }),
   },
   placeholder: {
     type: String,
