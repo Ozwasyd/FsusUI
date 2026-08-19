@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { calculateMarkdownEditorMetrics } from '../src/markdown-editor'
+import {
+  calculateMarkdownEditorMetrics,
+  defaultMarkdownEditorLocaleText,
+  resolveMarkdownEditorLocaleText,
+} from '../src/markdown-editor'
 
 describe('markdown editor leftover locale/status metrics', () => {
   it('counts graphemes and locale words through Intl.Segmenter, not whitespace split', () => {
@@ -13,5 +17,18 @@ describe('markdown editor leftover locale/status metrics', () => {
     expect(metrics.byteCount).toBe(new TextEncoder().encode('你好 world').length)
     expect(calculateMarkdownEditorMetrics('').lineCount).toBe(1)
     expect(calculateMarkdownEditorMetrics('a\nb\nc').lineCount).toBe(3)
+  })
+
+  it('merges leftover localeText onto the default copy authority', () => {
+    const resolved = resolveMarkdownEditorLocaleText({
+      modes: { ...defaultMarkdownEditorLocaleText.modes, live: 'Live mode' },
+      overflow: 'More',
+    })
+    expect(resolved.modes.live).toBe('Live mode')
+    expect(resolved.modes.source).toBe(defaultMarkdownEditorLocaleText.modes.source)
+    expect(resolved.overflow).toBe('More')
+    expect(resolved.actions.image).toBe(defaultMarkdownEditorLocaleText.actions.image)
+    expect(resolved.overflowAria(3)).toBe(defaultMarkdownEditorLocaleText.overflowAria(3))
+    expect(resolved.editorAria).toBe(defaultMarkdownEditorLocaleText.editorAria)
   })
 })

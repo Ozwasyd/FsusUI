@@ -343,6 +343,39 @@ export const resolveMarkdownEditorToolbarLimit = (
   return Math.min(6, commandCount)
 }
 
+export const resolveMarkdownEditorPrimaryCommands = <
+  T extends { readonly key: string },
+>(
+  commands: readonly T[],
+  density: MarkdownEditorToolbarDensity,
+  primaryKeys?: readonly string[],
+): T[] => {
+  const keySet = primaryKeys?.length ? new Set(primaryKeys) : null
+  const selected = keySet
+    ? commands.filter((command) => keySet.has(command.key))
+    : [...commands]
+  return selected.slice(
+    0,
+    resolveMarkdownEditorToolbarLimit(density, selected.length),
+  )
+}
+
+export const resolveMarkdownEditorOverflowCommands = <
+  T extends { readonly key: string },
+>(
+  commands: readonly T[],
+  density: MarkdownEditorToolbarDensity,
+  primaryKeys?: readonly string[],
+): T[] => {
+  const keySet = primaryKeys?.length ? new Set(primaryKeys) : null
+  if (keySet) {
+    return commands.filter((command) => !keySet.has(command.key))
+  }
+  return commands.slice(
+    resolveMarkdownEditorToolbarLimit(density, commands.length),
+  )
+}
+
 export type MarkdownEditorActionKey = 'image' | 'save' | 'submit'
 
 export interface MarkdownEditorActionItem {
@@ -376,6 +409,80 @@ export type MarkdownEditorCommandPresentation =
   | 'selection'
   | 'slash'
   | 'palette'
+
+/**
+ * All editor-owned copy is collected here so consumers can replace it without
+ * duplicating command, mode, or status semantics. A partial value is merged
+ * with this source; missing entries always fall back to the same locale.
+ */
+export interface MarkdownEditorLocaleText {
+  readonly modes: Readonly<Record<MarkdownEditorMode, string>>
+  readonly commands: Readonly<Record<MarkdownEditorCommandIcon, string>>
+  readonly actions: Readonly<Record<MarkdownEditorActionKey, string>>
+  readonly overflow: string
+  readonly overflowAria: (count: number) => string
+  readonly editorAria: string
+  readonly modeSwitcherAria: string
+  readonly metrics: Readonly<{ characters: string; words: string }>
+}
+
+export type MarkdownEditorLocaleTextOverride = {
+  readonly [K in keyof MarkdownEditorLocaleText]?: MarkdownEditorLocaleText[K]
+}
+
+export const defaultMarkdownEditorLocaleText: MarkdownEditorLocaleText =
+  Object.freeze({
+    modes: Object.freeze({
+      source: '源码',
+      live: '实时',
+      split: '分屏',
+      preview: '预览',
+    }),
+    commands: Object.freeze({
+      bold: 'Bold',
+      code: 'Code',
+      heading: 'Heading',
+      image: 'Insert image',
+      italic: 'Italic',
+      link: 'Link',
+      quote: 'Quote',
+    }),
+    actions: Object.freeze({
+      image: '上传图片',
+      save: '保存',
+      submit: '提交',
+    }),
+    overflow: '格式工具',
+    overflowAria: (count) => `格式工具，${count} 个工具`,
+    editorAria: 'Markdown editor',
+    modeSwitcherAria: 'Markdown mode',
+    metrics: Object.freeze({ characters: 'chars', words: 'words' }),
+  })
+
+export const resolveMarkdownEditorLocaleText = (
+  localeText?: MarkdownEditorLocaleTextOverride,
+): MarkdownEditorLocaleText => ({
+  ...defaultMarkdownEditorLocaleText,
+  ...localeText,
+  actions: {
+    ...defaultMarkdownEditorLocaleText.actions,
+    ...localeText?.actions,
+  },
+  commands: {
+    ...defaultMarkdownEditorLocaleText.commands,
+    ...localeText?.commands,
+  },
+  metrics: {
+    ...defaultMarkdownEditorLocaleText.metrics,
+    ...localeText?.metrics,
+  },
+  modes: {
+    ...defaultMarkdownEditorLocaleText.modes,
+    ...localeText?.modes,
+  },
+  overflowAria:
+    localeText?.overflowAria ?? defaultMarkdownEditorLocaleText.overflowAria,
+})
 
 /** Syntax is supplied by the editor projection, never derived by commands. */
 export interface MarkdownEditorSyntaxContext {
@@ -630,6 +737,10 @@ export const markdownEditorProps = buildProps({
     values: markdownEditorChromes,
     default: 'framed',
   },
+  localeText: {
+    type: definePropType<MarkdownEditorLocaleTextOverride>(Object),
+    default: undefined,
+  },
   statusDensity: {
     type: String as PropType<MarkdownEditorStatusDensity>,
     values: ['none', 'minimal', 'detailed'],
@@ -690,7 +801,7 @@ export const markdownEditorProps = buildProps({
   },
   imageActionLabel: {
     type: String,
-    default: '上传图片',
+    default: defaultMarkdownEditorLocaleText.actions.image,
   },
   showSaveAction: {
     type: Boolean,
@@ -698,7 +809,7 @@ export const markdownEditorProps = buildProps({
   },
   saveActionLabel: {
     type: String,
-    default: '保存',
+    default: defaultMarkdownEditorLocaleText.actions.save,
   },
   showSubmitAction: {
     type: Boolean,
@@ -706,7 +817,7 @@ export const markdownEditorProps = buildProps({
   },
   submitActionLabel: {
     type: String,
-    default: '提交',
+    default: defaultMarkdownEditorLocaleText.actions.submit,
   },
   actionOverflowKeys: {
     type: definePropType<readonly MarkdownEditorActionKey[]>(Array),
@@ -722,7 +833,7 @@ export const markdownEditorProps = buildProps({
   },
   commandOverflowLabel: {
     type: String,
-    default: '格式工具',
+    default: defaultMarkdownEditorLocaleText.overflow,
   },
   mobileLayout: {
     type: String as PropType<MarkdownEditorMobileLayout>,
