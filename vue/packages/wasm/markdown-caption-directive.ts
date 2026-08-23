@@ -60,11 +60,7 @@ const fail = (
 export const parseMarkdownCaptionLine = (
   line: string,
   lineStart = 0,
-): Omit<MarkdownCaptionNode, 'ok'> &
-  (
-    | { readonly ok: true; readonly text: string; mediaRange?: never }
-    | MarkdownCaptionInvalidNode
-  ) | null => {
+): Omit<MarkdownCaptionValidNode, 'mediaRange'> | MarkdownCaptionInvalidNode | null => {
   const indent = /^[ \t]+/.exec(line)?.[0].length ?? 0
   const body = indent > 0 ? line.slice(indent) : line
   if (!body.startsWith('::caption[')) return null

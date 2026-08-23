@@ -4,10 +4,20 @@ import {
   collectMarkdownCaptionNodes,
   createMarkdownEditorProjection,
   evaluateMarkdownCaptionMutations,
+  parseMarkdownCaptionLine,
 } from '../markdown-runtime'
 
 describe('markdown caption directive grammar', () => {
   it('owns a caption only when it immediately follows an image', () => {
+    const parsed = parseMarkdownCaptionLine('::caption[Figure one]')
+    expect(parsed?.ok).toBe(true)
+    if (parsed?.ok) {
+      expect(parsed.text).toBe('Figure one')
+      expect(parsed.ranges.full).toEqual({
+        start: 0,
+        end: '::caption[Figure one]'.length,
+      })
+    }
     const source = '![alt](img.png)\n::caption[Figure one]\n'
     const nodes = collectMarkdownCaptionNodes(source)
     expect(nodes).toHaveLength(1)

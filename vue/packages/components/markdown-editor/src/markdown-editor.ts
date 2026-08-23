@@ -496,7 +496,7 @@ export const defaultMarkdownEditorLocaleText: MarkdownEditorLocaleText =
       submit: '提交',
     }),
     overflow: '格式工具',
-    overflowAria: (count) => `格式工具，${count} 个工具`,
+    overflowAria: (count: number) => `格式工具，${count} 个工具`,
     editorAria: 'Markdown editor',
     modeSwitcherAria: 'Markdown mode',
     metrics: Object.freeze({ characters: 'chars', words: 'words' }),
