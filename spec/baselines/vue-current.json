@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "2b32686f3ab8645cc5e578ad8218e37459da17a6",
+    "commitSha": "3c2c19e7accd56003982ebf5fe0a9939e2b98983",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
     "iconHash": "d61254b1b1ff9addaf45293153df217b0c0d01ec69ec602081c44a01008b78de",
     "toolVersion": "avalonia-vue-public-api-baseline@1.0.0+vue-semantic-baseline@1.0.0",
-    "inputTreeHash": "e012449a173895aa4b83c186cec6f702bddf30480757dab1697bd8426b303271",
+    "inputTreeHash": "6a17cfbd24db2aa02e7b28d4f3b65a60db382c06efdb0bc3ce856b90f70f9694",
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "10d8f23436e656c17fca14184a75de7f7116432ca6dc5b73a6eb3189e355dfe7"
+    "outputHash": "e58e42c3cb2f46f563beb1d9adf2b93a6f0e8b0c2a3b913555f5dde5eefb3d91"
   },
   "summary": {
     "componentModules": 93,
@@ -10985,6 +10985,7 @@
       "classification": "native-adapter",
       "props": [
         "actionOverflowKeys",
+        "chrome",
         "commandOverflowLabel",
         "commands",
         "defaultMode",
@@ -10993,6 +10994,8 @@
         "imageActionLabel",
         "interactionProfile",
         "loading",
+        "localeText",
+        "metrics",
         "minRows",
         "mobileLayout",
         "mode",
@@ -11008,9 +11011,12 @@
         "showModeSwitcher",
         "showSaveAction",
         "showSubmitAction",
+        "statusDensity",
         "submitActionLabel",
+        "surfaces",
         "textareaId",
         "textareaName",
+        "toolbarDensity",
         "writingPlaceholder"
       ],
       "emits": [
@@ -11056,14 +11062,27 @@
             "readonly": false
           },
           {
+            "name": "chrome",
+            "runtimeType": "String",
+            "semanticType": "PropType<MarkdownEditorChrome>",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "framed"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
             "name": "commandOverflowLabel",
             "runtimeType": "String",
             "semanticType": null,
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "literal",
-              "value": "格式工具"
+              "kind": "expression",
+              "sourceHash": "b1ac4ded467282039b6812765914d78aaf09c61357460318b1eeebaf1360baf4"
             },
             "required": false,
             "readonly": false
@@ -11126,8 +11145,8 @@
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "literal",
-              "value": "上传图片"
+              "kind": "expression",
+              "sourceHash": "0c3c9da9090af2f3d5abf85fe4d16089e5003acb63a77f133a05ddfd8f1d3873"
             },
             "required": false,
             "readonly": false
@@ -11153,6 +11172,30 @@
             "values": null,
             "default": {
               "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "localeText",
+            "runtimeType": "Object",
+            "semanticType": "MarkdownEditorLocaleTextOverride",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "undefined"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "metrics",
+            "runtimeType": "Object",
+            "semanticType": "MarkdownEditorMetricsOptions",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "undefined"
             },
             "required": false,
             "readonly": false
@@ -11278,8 +11321,8 @@
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "literal",
-              "value": "保存"
+              "kind": "expression",
+              "sourceHash": "2968093feca443c24116a2a1f9bd69b43c074a4c5257099618b28cec90492948"
             },
             "required": false,
             "readonly": false
@@ -11350,14 +11393,40 @@
             "readonly": false
           },
           {
+            "name": "statusDensity",
+            "runtimeType": "String",
+            "semanticType": "PropType<MarkdownEditorStatusDensity>",
+            "nullable": false,
+            "values": ["none", "minimal", "detailed"],
+            "default": {
+              "kind": "literal",
+              "value": "minimal"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
             "name": "submitActionLabel",
             "runtimeType": "String",
             "semanticType": null,
             "nullable": false,
             "values": null,
             "default": {
-              "kind": "literal",
-              "value": "提交"
+              "kind": "expression",
+              "sourceHash": "cfc15051a6dd0136bee28f5b717bc886c658f75188c89ae1f44492778daa03db"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "surfaces",
+            "runtimeType": "Object",
+            "semanticType": "MarkdownEditorSurfaceOptions",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "function",
+              "sourceHash": "5b9e387da6b3363a3bc392e5dcba308d8f4981a38c579521d226f4c76453a3ed"
             },
             "required": false,
             "readonly": false
@@ -11382,6 +11451,19 @@
             "values": null,
             "default": {
               "kind": "undefined"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "toolbarDensity",
+            "runtimeType": "String",
+            "semanticType": "PropType<MarkdownEditorToolbarDensity>",
+            "nullable": false,
+            "values": ["minimal", "standard", "full"],
+            "default": {
+              "kind": "literal",
+              "value": "standard"
             },
             "required": false,
             "readonly": false

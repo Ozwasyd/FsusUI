@@ -5,7 +5,7 @@
   "owner": "FsusUI Core",
   "baseline": {
     "path": "spec/baselines/vue-current.json",
-    "hash": "6b90bb102240701fc6a07247efd5b8a5d22c619beca312f79835ba78677a3501",
+    "hash": "6a1d39118081ea8e8f68f649a7b36bd104bbcf18176a908dbd3f1edf49fa893f",
     "packageVersion": "1.5.1",
     "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
     "iconHash": "d61254b1b1ff9addaf45293153df217b0c0d01ec69ec602081c44a01008b78de"
@@ -9704,6 +9704,12 @@
           "required": false
         },
         {
+          "name": "chrome",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "commandOverflowLabel",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -9747,6 +9753,18 @@
         },
         {
           "name": "loading",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "localeText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "metrics",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -9842,7 +9860,19 @@
           "required": false
         },
         {
+          "name": "statusDensity",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "submitActionLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "surfaces",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -9855,6 +9885,12 @@
         },
         {
           "name": "textareaName",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "toolbarDensity",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
