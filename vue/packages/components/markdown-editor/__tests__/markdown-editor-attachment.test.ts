@@ -4,6 +4,11 @@ import {
   createMarkdownAttachmentRequest,
   evaluateMarkdownAttachmentMutations,
 } from '../src/markdown-editor-attachment'
+import {
+  cancelMarkdownAttachmentJob,
+  createMarkdownAttachmentJob,
+  progressMarkdownAttachmentJob,
+} from '../src/markdown-editor-attachment-lifecycle'
 
 describe('markdown attachment provider contract', () => {
   it('keeps consumer-owned request identity', () => {
@@ -21,5 +26,10 @@ describe('markdown attachment provider contract', () => {
     expect(request.intent).toBe('paste')
     const report = evaluateMarkdownAttachmentMutations(request)
     expect(report.mutations.every((mutation) => mutation.accepted === false)).toBe(true)
+    const job = createMarkdownAttachmentJob('att-1')
+    progressMarkdownAttachmentJob(job, 40)
+    expect(job.phase).toBe('progress')
+    cancelMarkdownAttachmentJob(job)
+    expect(job.phase).toBe('cancelled')
   })
 })
