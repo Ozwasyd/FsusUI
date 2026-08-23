@@ -7,6 +7,11 @@ import {
   parseMarkdownCaptionLine,
 } from '../markdown-runtime'
 
+const diagnosticCode = (node?: unknown) =>
+  node && typeof node === 'object' && 'code' in node
+    ? String((node as { code: unknown }).code)
+    : undefined
+
 describe('markdown caption directive grammar', () => {
   it('owns a caption only when it immediately follows an image', () => {
     const parsed = parseMarkdownCaptionLine('::caption[Figure one]')
@@ -33,25 +38,29 @@ describe('markdown caption directive grammar', () => {
 
   it('rejects orphan, duplicate, cross-gap, non-media, and markup captions', () => {
     expect(collectMarkdownCaptionNodes('::caption[lonely]\n')[0]?.ok).toBe(false)
-    expect(collectMarkdownCaptionNodes('hello\n::caption[no]\n')[0]?.code).toBe(
-      'caption-non-media',
-    )
     expect(
-      collectMarkdownCaptionNodes('![a](a.png)\n\n::caption[gap]\n')[0]?.code,
+      diagnosticCode(collectMarkdownCaptionNodes('hello\n::caption[no]\n')[0]),
+    ).toBe('caption-non-media')
+    expect(
+      diagnosticCode(collectMarkdownCaptionNodes('![a](a.png)\n\n::caption[gap]\n')[0]),
     ).toBe('caption-cross-gap')
     expect(
-      collectMarkdownCaptionNodes(
-        '![a](a.png)\n::caption[one]\n::caption[two]\n',
-      )[1]?.code,
+      diagnosticCode(
+        collectMarkdownCaptionNodes(
+          '![a](a.png)\n::caption[one]\n::caption[two]\n',
+        )[1],
+      ),
     ).toBe('caption-duplicate')
-    expect(collectMarkdownCaptionNodes('![a](a.png)\n::caption[]\n')[0]?.code).toBe(
-      'caption-empty',
-    )
     expect(
-      collectMarkdownCaptionNodes('![a](a.png)\n::caption[**bold**]\n')[0]?.code,
+      diagnosticCode(collectMarkdownCaptionNodes('![a](a.png)\n::caption[]\n')[0]),
+    ).toBe('caption-empty')
+    expect(
+      diagnosticCode(collectMarkdownCaptionNodes('![a](a.png)\n::caption[**bold**]\n')[0]),
     ).toBe('caption-markdown')
     expect(
-      collectMarkdownCaptionNodes('![a](a.png)\n  ::caption[indented]\n')[0]?.code,
+      diagnosticCode(
+        collectMarkdownCaptionNodes('![a](a.png)\n  ::caption[indented]\n')[0],
+      ),
     ).toBe('caption-indent')
   })
 

@@ -1,7 +1,5 @@
 import { describe, expect, it } from 'vitest'
 
-import { describe, expect, it } from 'vitest'
-
 import {
   MARKDOWN_EDITOR_PROJECTION_PARSER,
   MARKDOWN_RENDERER_VERSION,

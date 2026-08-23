@@ -51,7 +51,7 @@ describe('markdown editor leftover outline planner', () => {
     ).toBe('success')
     expect(
       revealHeading(outline, nodeId, { documentIdentity: identity, revision: 1 }, {
-        documentIdentity: { key: 'doc-a', epoch: 2 },
+        documentIdentity: { id: 'doc-a', epoch: 2 },
         revision: 1,
       }),
     ).toBe('stale')

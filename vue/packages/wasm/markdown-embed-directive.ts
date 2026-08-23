@@ -187,7 +187,7 @@ export const parseMarkdownEmbedLine = (
   }
   cursor += 'target='.length
   const targetQuote = parseQuoted(line, cursor)
-  if (!targetQuote.ok) {
+  if ('code' in targetQuote) {
     return fail(lineStart, lineEnd, targetQuote.code, 'embed target is invalid')
   }
   if (targetQuote.value.length === 0) {
@@ -205,7 +205,7 @@ export const parseMarkdownEmbedLine = (
   }
   cursor += 'mode='.length
   const modeQuote = parseQuoted(line, cursor)
-  if (!modeQuote.ok) {
+  if ('code' in modeQuote) {
     return fail(lineStart, lineEnd, modeQuote.code, 'embed mode is invalid')
   }
   const modeRange = Object.freeze({
@@ -389,7 +389,7 @@ const consumerRegexScan = (source: string): MarkdownEmbedNode[] => {
 
 const inferModeScan = (source: string): MarkdownEmbedNode[] =>
   collectMarkdownEmbedNodes(source).map((node) => {
-    if (node.ok) return node
+    if ('ranges' in node) return node
     if (node.code === 'embed-inferred-mode' || node.code === 'embed-invalid-mode') {
       const line = source.slice(node.range.start, node.range.end)
       const modeMatch = /mode="([^"]*)"/.exec(line)
@@ -414,7 +414,7 @@ const inferModeScan = (source: string): MarkdownEmbedNode[] =>
 
 const extraAttrScan = (source: string): MarkdownEmbedNode[] =>
   collectMarkdownEmbedNodes(source).map((node) => {
-    if (node.ok) return node
+    if ('ranges' in node) return node
     if (node.code === 'embed-unknown-attribute') {
       return {
         ok: true,

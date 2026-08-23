@@ -28,13 +28,17 @@ describe('markdown block anchor grammar', () => {
 
   it('rejects invalid ids, duplicates, orphans, and aliases', () => {
     expect(collectMarkdownAnchorNodes('text ^BAD\n')[0]?.ok).toBe(false)
-    expect(collectMarkdownAnchorNodes('text ^1bad\n')[0]?.code).toBe('anchor-invalid-id')
+    expect(
+      (collectMarkdownAnchorNodes('text ^1bad\n')[0] as { code?: string } | undefined)?.code,
+    ).toBe('anchor-invalid-id')
     const duplicates = collectMarkdownAnchorNodes('one ^same\n\ntwo ^same\n')
     expect(duplicates.filter((node) => node.ok)).toHaveLength(1)
-    expect(duplicates.some((node) => !node.ok && node.code === 'anchor-duplicate')).toBe(
-      true,
-    )
-    expect(collectMarkdownAnchorNodes('^orphan\n')[0]?.code).toBe('anchor-orphan')
+    expect(
+      duplicates.some((node) => 'code' in node && node.code === 'anchor-duplicate'),
+    ).toBe(true)
+    expect(
+      (collectMarkdownAnchorNodes('^orphan\n')[0] as { code?: string } | undefined)?.code,
+    ).toBe('anchor-orphan')
     expect(collectMarkdownAnchorNodes('paragraph {#custom}\n').some((node) => node.ok)).toBe(
       false,
     )

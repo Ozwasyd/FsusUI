@@ -207,6 +207,25 @@ export default [
 
   {
     files: [
+      'scripts/native-ime-harness.mjs',
+      'scripts/native-ime-marionette.mjs',
+      'scripts/native-live-local-acceptance.mjs',
+      'scripts/native-screen-reader-harness.mjs',
+    ],
+    languageOptions: {
+      globals: {
+        AbortSignal: 'readonly',
+        Buffer: 'readonly',
+        Event: 'readonly',
+        HTMLTextAreaElement: 'readonly',
+        getComputedStyle: 'readonly',
+        setTimeout: 'readonly',
+      },
+    },
+  },
+
+  {
+    files: [
       'scripts/**/*.{js,mjs,ts}',
       'vue/packages/icons-vue/build/**/*.{js,mjs,ts}',
       'vue/playwright.config.ts',

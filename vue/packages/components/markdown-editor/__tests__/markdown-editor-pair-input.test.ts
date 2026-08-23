@@ -15,7 +15,10 @@ const apply = (
   start: number,
   inserted?: string,
   end = start,
-  extras: Parameters<typeof resolveMarkdownPairInput>[0] = {} as never,
+  extras: Omit<
+    Partial<Parameters<typeof resolveMarkdownPairInput>[0]>,
+    'source' | 'selection'
+  > = {},
 ) => {
   const plan = resolveMarkdownPairInput({
     source,

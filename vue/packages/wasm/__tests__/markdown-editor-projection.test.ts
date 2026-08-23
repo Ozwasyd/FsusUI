@@ -184,7 +184,7 @@ describe('markdown editor projection contract', () => {
     const projection = createMarkdownEditorProjection(raw)
     const fallback = renderMarkdownFallbackWithRuntime(raw)
     const unwrap = <T>(result: { ok: true; value: T } | { ok: false; error: { message: string } }) => {
-      if (!result.ok) {
+      if ('error' in result) {
         throw new Error(result.error.message)
       }
       return result.value

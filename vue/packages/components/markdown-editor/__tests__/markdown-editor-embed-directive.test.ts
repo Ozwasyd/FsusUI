@@ -11,19 +11,21 @@ import {
 const context = (
   value: string,
 ): MarkdownEditorCommandContext => ({
-  dispatch: () => ({
-    accepted: true,
-    history: {
-      canRedo: false,
-      canUndo: false,
-      redoDepth: 0,
-      retainedUnits: 0,
-      undoDepth: 0,
-    },
-    revision: 1,
-    selection: { direction: 'none', end: value.length, start: value.length },
-    value,
-  }),
+  dispatch: {
+    dispatch: () => ({
+      accepted: true,
+      history: {
+        canRedo: false,
+        canUndo: false,
+        redoDepth: 0,
+        retainedUnits: 0,
+        undoDepth: 0,
+      },
+      revision: 1,
+      selection: { direction: 'none', end: value.length, start: value.length },
+      value,
+    }),
+  },
   documentIdentity: { epoch: 1, id: 'doc' },
   mode: 'source',
   readonly: false,

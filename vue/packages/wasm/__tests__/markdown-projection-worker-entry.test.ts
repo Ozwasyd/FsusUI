@@ -70,9 +70,9 @@ describe('markdown projection dedicated worker entry', () => {
     workerScope.onmessage = (event) => {
       const accepted = host.accept(event.data)
       commits.push(
-        accepted.ok
-          ? { ok: true, revision: accepted.value.revision }
-          : { ok: false, reason: accepted.reason },
+        'reason' in accepted
+          ? { ok: false, reason: accepted.reason }
+          : { ok: true, revision: accepted.value.revision },
       )
     }
 
@@ -132,7 +132,9 @@ describe('markdown projection dedicated worker entry', () => {
         },
         onCommit(result) {
           commits.push(
-            result.ok ? { ok: true } : { ok: false, reason: result.reason },
+            'reason' in result
+              ? { ok: false, reason: result.reason }
+              : { ok: true },
           )
         },
       })

@@ -26,19 +26,21 @@ import { resolveMarkdownSelectionToolbarPlacement } from '../src/markdown-editor
 import { createWritingAidsController } from '../src/markdown-editor-writing-aids'
 
 const context = (revision = 1): MarkdownEditorCommandContext => ({
-  dispatch: () => ({
-    accepted: true,
-    history: {
-      canRedo: false,
-      canUndo: false,
-      redoDepth: 0,
-      retainedUnits: 0,
-      undoDepth: 0,
-    },
-    revision,
-    selection: { direction: 'none', end: 0, start: 0 },
-    value: '',
-  }),
+  dispatch: {
+    dispatch: () => ({
+      accepted: true,
+      history: {
+        canRedo: false,
+        canUndo: false,
+        redoDepth: 0,
+        retainedUnits: 0,
+        undoDepth: 0,
+      },
+      revision,
+      selection: { direction: 'none', end: 0, start: 0 },
+      value: '',
+    }),
+  },
   documentIdentity: { epoch: 1, id: 'doc' },
   mode: 'source',
   readonly: false,

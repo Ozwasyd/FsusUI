@@ -34,44 +34,30 @@ describe('markdown embed directive grammar', () => {
   })
 
   it('rejects indent, trailing content, extra attributes, and inferred modes', () => {
+    const codeOf = (line: string) =>
+      (parseMarkdownEmbedLine(line) as { code?: string } | null)?.code
     expect(parseMarkdownEmbedLine('  ::embed[target="a" mode="article"]')?.ok).toBe(
       false,
     )
-    expect(parseMarkdownEmbedLine('  ::embed[target="a" mode="article"]')?.code).toBe(
-      'embed-indent',
+    expect(codeOf('  ::embed[target="a" mode="article"]')).toBe('embed-indent')
+    expect(codeOf('::embed[target="a" mode="article"] trailing')).toBe(
+      'embed-trailing-content',
     )
-    expect(
-      parseMarkdownEmbedLine('::embed[target="a" mode="article"] trailing')?.code,
-    ).toBe('embed-trailing-content')
-    expect(
-      parseMarkdownEmbedLine(
-        '::embed[target="a" mode="article" style="card"]',
-      )?.code,
-    ).toBe('embed-unknown-attribute')
-    expect(parseMarkdownEmbedLine('::embed[mode="article" target="a"]')?.code).toBe(
-      'embed-attribute-order',
+    expect(codeOf('::embed[target="a" mode="article" style="card"]')).toBe(
+      'embed-unknown-attribute',
     )
-    expect(parseMarkdownEmbedLine('::embed[target="a"]')?.code).toBe(
-      'embed-missing-mode',
+    expect(codeOf('::embed[mode="article" target="a"]')).toBe('embed-attribute-order')
+    expect(codeOf('::embed[target="a"]')).toBe('embed-missing-mode')
+    expect(codeOf('::embed[target="a" mode="Article"]')).toBe('embed-inferred-mode')
+    expect(codeOf('::embed[target="a" mode="card"]')).toBe('embed-invalid-mode')
+    expect(codeOf('::embed[target="" mode="article"]')).toBe('embed-empty-target')
+    expect(codeOf('::embed[target="a\\nb" mode="article"]')).toBe(
+      'embed-unknown-escape',
     )
-    expect(parseMarkdownEmbedLine('::embed[target="a" mode="Article"]')?.code).toBe(
-      'embed-inferred-mode',
+    expect(codeOf('::embed[target="a\\x" mode="article"]')).toBe(
+      'embed-unknown-escape',
     )
-    expect(parseMarkdownEmbedLine('::embed[target="a" mode="card"]')?.code).toBe(
-      'embed-invalid-mode',
-    )
-    expect(parseMarkdownEmbedLine('::embed[target="" mode="article"]')?.code).toBe(
-      'embed-empty-target',
-    )
-    expect(
-      parseMarkdownEmbedLine('::embed[target="a\\nb" mode="article"]')?.code,
-    ).toBe('embed-unknown-escape')
-    expect(
-      parseMarkdownEmbedLine('::embed[target="a\\x" mode="article"]')?.code,
-    ).toBe('embed-unknown-escape')
-    expect(
-      parseMarkdownEmbedLine('::embed[target="a\u202E" mode="article"]')?.code,
-    ).toBe('embed-bidi-char')
+    expect(codeOf('::embed[target="a\u202E" mode="article"]')).toBe('embed-bidi-char')
   })
 
   it('unescapes only backslash and quote in target', () => {

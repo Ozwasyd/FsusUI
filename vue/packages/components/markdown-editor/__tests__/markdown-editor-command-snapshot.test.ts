@@ -7,19 +7,21 @@ import {
 import { evaluateMarkdownEditorCommandMutations } from '../src/markdown-editor-command-snapshot'
 
 const context = (): MarkdownEditorCommandContext => ({
-  dispatch: () => ({
-    accepted: true,
-    history: {
-      canRedo: false,
-      canUndo: false,
-      redoDepth: 0,
-      retainedUnits: 0,
-      undoDepth: 0,
-    },
-    revision: 1,
-    selection: { direction: 'none', end: 0, start: 0 },
-    value: '',
-  }),
+  dispatch: {
+    dispatch: () => ({
+      accepted: true,
+      history: {
+        canRedo: false,
+        canUndo: false,
+        redoDepth: 0,
+        retainedUnits: 0,
+        undoDepth: 0,
+      },
+      revision: 1,
+      selection: { direction: 'none', end: 0, start: 0 },
+      value: '',
+    }),
+  },
   documentIdentity: { epoch: 1, id: 'doc' },
   mode: 'source',
   readonly: false,

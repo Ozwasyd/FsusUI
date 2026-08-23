@@ -88,19 +88,17 @@ export const mergeMarkdownDirectiveSyntax = (
   }
 
   for (const embed of embeds) {
-    const lineStart = embed.ok ? embed.ranges.full.start : embed.range.start
-    const lineEnd = embed.ok ? embed.ranges.full.end : embed.range.end
-    if (embed.ok) {
-      pushDirective('embed', lineStart, lineEnd)
+    if ('ranges' in embed) {
+      pushDirective('embed', embed.ranges.full.start, embed.ranges.full.end)
     } else {
-      pushDirective('malformed', lineStart, lineEnd, {
+      pushDirective('malformed', embed.range.start, embed.range.end, {
         code: embed.code,
         message: embed.message,
       })
     }
   }
   for (const caption of captions) {
-    if (caption.ok) {
+    if ('ranges' in caption) {
       pushDirective('caption', caption.ranges.full.start, caption.ranges.full.end)
     } else {
       pushDirective('malformed', caption.range.start, caption.range.end, {
@@ -110,7 +108,7 @@ export const mergeMarkdownDirectiveSyntax = (
     }
   }
   for (const anchor of anchors) {
-    if (anchor.ok) {
+    if ('ranges' in anchor) {
       pushDirective('anchor', anchor.ranges.full.start, anchor.ranges.full.end)
     } else {
       pushDirective('malformed', anchor.range.start, anchor.range.end, {

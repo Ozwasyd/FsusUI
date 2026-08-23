@@ -142,7 +142,7 @@ export const collectMarkdownCaptionNodes = (
     const line = lines[index]!
     const parsed = parseMarkdownCaptionLine(line.text, line.start)
     if (!parsed) continue
-    if (!parsed.ok) {
+    if ('code' in parsed) {
       captions.push(parsed)
       continue
     }

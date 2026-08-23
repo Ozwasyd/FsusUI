@@ -156,9 +156,9 @@ export const evaluateMarkdownProjectionKeystrokeMutations = (input: {
   const results = posted.map((request) => projectMarkdownOnWorker(request))
   const commits = results.map((result) => {
     const commit = host.accept(result)
-    return commit.ok
-      ? { ok: true as const, revision: commit.value.revision }
-      : { ok: false as const, reason: commit.reason }
+    return 'reason' in commit
+      ? { ok: false as const, reason: commit.reason }
+      : { ok: true as const, revision: commit.value.revision }
   })
 
   const fullEquivalent = strokes.every((stroke) => {

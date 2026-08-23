@@ -18,7 +18,7 @@ describe('markdown embed consumer provider', () => {
     })
     const provider = async (current) => ({
       requestId: current.requestId,
-      status: 'resolved',
+      status: 'resolved' as const,
       target: current.target,
       mode: current.mode,
       version: current.version,

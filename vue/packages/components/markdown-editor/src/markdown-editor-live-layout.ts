@@ -380,7 +380,7 @@ export const commitMarkdownLiveFeatureResult = (input: {
     },
     input.incoming.nodeId,
   )
-  if (!committed.ok) {
+  if ('reason' in committed) {
     return Object.freeze({
       accepted: false,
       reason:
