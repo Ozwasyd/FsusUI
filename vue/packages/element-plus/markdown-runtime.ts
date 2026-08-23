@@ -22,6 +22,7 @@ export {
   createMarkdownEmbedRequest,
   evaluateMarkdownHtmlImportMutations,
   evaluateMarkdownUrlMutations,
+  importMarkdownClipboardSnapshot,
   sanitizeMarkdownHtmlImport,
   validateMarkdownUrl,
   evaluateMarkdownBlockAnchorMutations,

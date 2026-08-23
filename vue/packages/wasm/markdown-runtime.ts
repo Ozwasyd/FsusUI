@@ -103,10 +103,23 @@ export {
   type MarkdownEmbedResult,
 } from './markdown-embed-provider'
 export {
+  MARKDOWN_HTML_IMPORT_BUDGET,
+  MARKDOWN_HTML_IMPORT_IMPORTER_VERSION,
+  MARKDOWN_HTML_IMPORT_SCHEMA_VERSION,
   evaluateMarkdownHtmlImportMutations,
+  importMarkdownClipboardSnapshot,
   sanitizeMarkdownHtmlImport,
+  type MarkdownHtmlImportBudget,
+  type MarkdownHtmlImportFinding,
   type MarkdownHtmlImportMutationKind,
+  type MarkdownHtmlImportNode,
+  type MarkdownHtmlImportOutcome,
+  type MarkdownHtmlImportReject,
   type MarkdownHtmlImportResult,
+  type MarkdownHtmlImportSnapshot,
+  type MarkdownHtmlImportStats,
+  type MarkdownHtmlImportTask,
+  type MarkdownHtmlImportTree,
 } from './markdown-html-import'
 export {
   MARKDOWN_EMBED_BUDGET,
