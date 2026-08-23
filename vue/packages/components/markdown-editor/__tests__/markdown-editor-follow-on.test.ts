@@ -22,6 +22,7 @@ import {
   resolveMarkdownSlashQuery,
   searchMarkdownEditorCommands,
 } from '../src/markdown-editor-surfaces'
+import { resolveMarkdownSelectionToolbarPlacement } from '../src/markdown-editor-selection-toolbar'
 import { createWritingAidsController } from '../src/markdown-editor-writing-aids'
 
 const context = (revision = 1): MarkdownEditorCommandContext => ({
@@ -96,6 +97,15 @@ describe('markdown follow-on contracts', () => {
     expect(groupMarkdownEditorCommands(defaultMarkdownEditorCommands).size).toBeGreaterThan(0)
     expect(resolveMarkdownSlashQuery('see /bol', 8)).toBe('bol')
     expect(resolveMarkdownSlashQuery('https://x', 9)).toBeNull()
+    expect(
+      resolveMarkdownSelectionToolbarPlacement({ start: 1, end: 4 }, 3, 3).visible,
+    ).toBe(true)
+    expect(
+      resolveMarkdownSelectionToolbarPlacement({ start: 1, end: 1 }, 3, 3).visible,
+    ).toBe(false)
+    expect(
+      resolveMarkdownSelectionToolbarPlacement({ start: 1, end: 4 }, 2, 3).reason,
+    ).toBe('stale')
   })
 
   it('keeps writing aids on projection identity', () => {
