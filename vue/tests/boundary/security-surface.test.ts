@@ -27,6 +27,14 @@ const expectedHtmlSinks: Record<string, ExpectedSink> = {
     contract: 'explicit custom SVG override only; default spinner is VNode',
     evidence: [/\.\.\.\(svg \? \{ innerHTML: svg \} : \{\}\)/],
   },
+  'vue/packages/components/markdown-editor/src/markdown-editor-latex.ts': {
+    contract: 'mutation fixtures reject consumer innerHTML; no DOM HTML write',
+    evidence: [/latex output must not accept consumer innerHTML or DOM/],
+  },
+  'vue/packages/components/markdown-editor/src/markdown-editor-mermaid.ts': {
+    contract: 'mutation fixtures reject consumer innerHTML; no DOM HTML write',
+    evidence: [/mermaid output must not accept consumer innerHTML or SVG/],
+  },
   'vue/packages/components/markdown-renderer/src/markdown-renderer.vue': {
     contract: 'only branded runtime HTML or host TrustedHTML reaches v-html',
     evidence: [
