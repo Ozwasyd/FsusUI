@@ -15,7 +15,7 @@
     :style="editorStyle"
   >
     <header
-      v-if="chrome !== 'minimal' && surfaceOptions.toolbar"
+      v-if="chromeRegions.toolbar && surfaceOptions.toolbar"
       :class="ns.e('toolbar')"
     >
       <div :class="ns.e('commands')">
@@ -188,7 +188,7 @@
     </div>
 
     <footer
-      v-if="chrome !== 'minimal' && statusDensity !== 'none'"
+      v-if="chromeRegions.status && statusDensity !== 'none'"
       :class="ns.e('status')"
     >
       <slot
@@ -233,6 +233,7 @@ import {
   resolveMarkdownEditorShortcut,
   runMarkdownEditorCommand,
 } from './markdown-editor'
+import { resolveMarkdownEditorChromeRegions } from './markdown-editor-chrome'
 import {
   deriveMarkdownEditorChange,
   MarkdownEditorTransactionStore,
@@ -313,6 +314,12 @@ const surfaceOptions = computed<Required<MarkdownEditorSurfaceOptions>>(() => ({
   slashMenu: props.surfaces.slashMenu ?? false,
   toolbar: props.surfaces.toolbar ?? true,
 }))
+const chromeRegions = computed(() =>
+  resolveMarkdownEditorChromeRegions(props.chrome, {
+    toolbar: surfaceOptions.value.toolbar,
+    status: props.statusDensity !== 'none',
+  }),
+)
 const textareaAriaLabel = computed(() =>
   currentMode.value === 'live' ? 'Markdown editor live editing surface' : 'Markdown editor source',
 )
