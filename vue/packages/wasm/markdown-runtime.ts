@@ -202,6 +202,20 @@ export {
   type MarkdownSyntaxIdentityMutationResult,
 } from './markdown-syntax-identity-mutations'
 export {
+  MARKDOWN_SEARCH_BUDGET,
+  boundMarkdownSearchRegex,
+  cancelMarkdownSearchTask,
+  commitMarkdownSearchExecution,
+  createMarkdownSearchTask,
+  evaluateMarkdownSearchWorkerMutations,
+  runMarkdownSearchTask,
+  type MarkdownSearchBudget,
+  type MarkdownSearchExecution,
+  type MarkdownSearchExecutionStatus,
+  type MarkdownSearchTask,
+  type MarkdownSearchWorkerMutationKind,
+} from './markdown-search-worker'
+export {
   evaluateMarkdownSearchModelMutations,
   isMarkdownSearchMatchCurrent,
   searchMarkdownRawSource,
