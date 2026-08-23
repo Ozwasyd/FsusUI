@@ -227,6 +227,20 @@ export {
   type MarkdownSearchResult,
 } from './markdown-search-model'
 export {
+  applyMarkdownReplacePlan,
+  evaluateMarkdownReplaceMutations,
+  isMarkdownReplacePlan,
+  planMarkdownReplaceAll,
+  planMarkdownReplaceCurrent,
+  planMarkdownReplaceCurrentInSet,
+  type MarkdownReplaceChange,
+  type MarkdownReplaceDocument,
+  type MarkdownReplaceMutationKind,
+  type MarkdownReplacePlan,
+  type MarkdownReplaceRejection,
+  type MarkdownReplaceResult,
+} from './markdown-replace'
+export {
   createMarkdownOutlineEntries,
   createMarkdownPropertyEntries,
   createMarkdownTableEntries,

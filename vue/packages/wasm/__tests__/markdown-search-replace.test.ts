@@ -9,7 +9,11 @@ import {
   evaluateMarkdownSearchWorkerMutations,
   runMarkdownSearchTask,
 } from '../markdown-search-worker'
-import { planMarkdownReplaceAll, planMarkdownReplaceCurrent } from '../markdown-replace'
+import {
+  isMarkdownReplacePlan,
+  planMarkdownReplaceAll,
+  planMarkdownReplaceCurrent,
+} from '../markdown-replace'
 
 describe('search replace and attachment lifecycle', () => {
   it('cancels search tasks and bounds regex', () => {
@@ -92,19 +96,33 @@ describe('search replace and attachment lifecycle', () => {
   })
 
   it('replaces current/all hits with stale checks', () => {
-    const hit = {
-      id: 'syn:heading:0',
-      kind: 'heading',
-      range: { start: 2, end: 7 },
-      query: 'Alpha',
+    const document = {
+      source: '# Alpha\n',
+      documentId: 'doc',
+      documentEpoch: 1,
+      revision: 1,
+      query: { text: 'Alpha', mode: 'plain' as const, queryVersion: 1 },
     }
-    const current = planMarkdownReplaceCurrent('# Alpha\n', hit, 'Beta', 1, 1)
-    expect('changes' in current).toBe(true)
-    expect(planMarkdownReplaceCurrent('# Alpha\n', hit, 'Beta', 1, 2)).toEqual({
+    const hit = {
+      documentId: 'doc',
+      documentEpoch: 1,
+      revision: 1,
+      queryVersion: 1,
+      range: { start: 2, end: 7 },
+    }
+    const current = planMarkdownReplaceCurrent(document, hit, 'Beta')
+    expect(isMarkdownReplacePlan(current)).toBe(true)
+    expect(
+      planMarkdownReplaceCurrent({ ...document, revision: 2 }, hit, 'Beta'),
+    ).toEqual({
       rejected: 'stale',
     })
-    const all = planMarkdownReplaceAll('# Alpha\n# Alpha\n', [hit, { ...hit, range: { start: 10, end: 15 } }], 'Beta', 1, 1)
-    expect('changes' in all && all.changes.length).toBe(2)
+    const all = planMarkdownReplaceAll(
+      { ...document, source: '# Alpha\n# Alpha\n' },
+      [hit, { ...hit, range: { start: 10, end: 15 } }],
+      'Beta',
+    )
+    expect(isMarkdownReplacePlan(all) && all.changes.length).toBe(2)
   })
 
 })

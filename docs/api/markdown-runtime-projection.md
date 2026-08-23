@@ -23,7 +23,7 @@ WASM internals under `@ozwasyd/element-plus/es/wasm/*` stay unsupported.
 | --- | --- | --- |
 | #273 outline | `createMarkdownOutlineEntries` | heading `syn:` nodes |
 | #274 table | `createMarkdownTableEntries` | table `syn:` nodes |
-| #277 search | `searchMarkdownRawSource` / `searchMarkdownStableProjection` | raw UTF-16 matches and `syn:` hits |
+| #277 search | `searchMarkdownRawSource` / `searchMarkdownStableProjection` / `planMarkdownReplaceCurrent` / `planMarkdownReplaceAll` | raw UTF-16 matches, `syn:` hits, and source replace transactions |
 | #278 technical | `createMarkdownTechnicalEntries` | `code`, `latex`, `mermaid` |
 | #279 properties | `createMarkdownPropertyEntries` | `link`, `image` |
 | #290 embed | `parseMarkdownEmbedLine` / `collectMarkdownEmbedNodes` | `embed` projection nodes |
