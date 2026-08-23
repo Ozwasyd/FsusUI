@@ -71,6 +71,23 @@ describe('markdown caption directive grammar', () => {
     expect(nodes[0]?.ok && nodes[0].text).toBe('1] 2\\ 3')
   })
 
+  it('keeps caption ranges correct across BOM and CRLF', () => {
+    const raw = '\uFEFF![alt](img.png)\r\n::caption[图 one 😀]\r\n'
+    const nodes = collectMarkdownCaptionNodes(raw)
+    expect(nodes).toHaveLength(1)
+    expect(nodes[0]?.ok).toBe(true)
+    if (!nodes[0]?.ok) return
+    expect(nodes[0].text).toBe('图 one 😀')
+    expect(
+      raw.slice(nodes[0].mediaRange.start, nodes[0].mediaRange.end),
+    ).toContain('![alt](img.png)')
+    expect(raw.slice(nodes[0].ranges.full.start, nodes[0].ranges.full.end)).toBe(
+      '::caption[图 one 😀]',
+    )
+    const projection = createMarkdownEditorProjection(raw)
+    expect(projection.nodes.some((node) => node.kind === 'caption')).toBe(true)
+  })
+
   it('keeps alt text independent from caption text', () => {
     const nodes = collectMarkdownCaptionNodes(
       '![alt text](img.png)\n::caption[visible caption]\n',

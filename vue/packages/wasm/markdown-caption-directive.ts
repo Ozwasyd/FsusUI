@@ -124,7 +124,9 @@ const splitLines = (source: string) => {
   let offset = 0
   while (offset <= source.length) {
     const newline = source.indexOf('\n', offset)
-    const end = newline === -1 ? source.length : newline
+    const rawEnd = newline === -1 ? source.length : newline
+    const end =
+      rawEnd > offset && source[rawEnd - 1] === '\r' ? rawEnd - 1 : rawEnd
     lines.push({ text: source.slice(offset, end), start: offset, end })
     if (newline === -1) break
     offset = newline + 1

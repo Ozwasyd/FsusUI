@@ -27,6 +27,8 @@ WASM internals under `@ozwasyd/element-plus/es/wasm/*` stay unsupported.
 | #278 technical | `createMarkdownTechnicalEntries` | `code`, `latex`, `mermaid` |
 | #279 properties | `createMarkdownPropertyEntries` | `link`, `image` |
 | #290 embed | `parseMarkdownEmbedLine` / `collectMarkdownEmbedNodes` | `embed` projection nodes |
+| #314 caption | `parseMarkdownCaptionLine` / `collectMarkdownCaptionNodes` | `caption` projection nodes |
+| #289 anchor | `parseMarkdownAnchorMarker` / `collectMarkdownAnchorNodes` | `anchor` projection nodes |
 
 All entries reuse `stabilizeMarkdownEditorProjection` identities.
 `resolveMarkdownConsumerIdentity` reports `current`, `deleted`, or `invalid`.
