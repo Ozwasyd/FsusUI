@@ -27,6 +27,8 @@ export {
   validateMarkdownUrl,
   evaluateMarkdownBlockAnchorMutations,
   evaluateMarkdownCaptionMutations,
+  evaluateMarkdownCaptionRendererMutations,
+  renderMarkdownCaptionFigure,
   evaluateMarkdownEmbedMutations,
   formatMarkdownEmbedDirective,
   parseMarkdownAnchorMarker,

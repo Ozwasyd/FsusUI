@@ -68,6 +68,14 @@ export {
   type MarkdownCaptionValidNode,
 } from './markdown-caption-directive'
 export {
+  evaluateMarkdownCaptionRendererMutations,
+  renderMarkdownCaptionFigure,
+  type MarkdownCaptionFigureRender,
+  type MarkdownCaptionLabelRender,
+  type MarkdownCaptionMediaRender,
+  type MarkdownCaptionRendererMutationKind,
+} from './markdown-caption-renderer'
+export {
   MARKDOWN_ANCHOR_DIAGNOSTIC_CODES,
   MARKDOWN_ANCHOR_ID,
   collectMarkdownAnchorNodes,

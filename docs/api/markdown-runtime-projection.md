@@ -27,7 +27,7 @@ WASM internals under `@ozwasyd/element-plus/es/wasm/*` stay unsupported.
 | #278 technical | `createMarkdownTechnicalEntries` | `code`, `latex`, `mermaid` |
 | #279 properties | `createMarkdownPropertyEntries` | `link`, `image` |
 | #290 embed | `parseMarkdownEmbedLine` / `collectMarkdownEmbedNodes` | `embed` projection nodes |
-| #314 caption | `parseMarkdownCaptionLine` / `collectMarkdownCaptionNodes` | `caption` projection nodes |
+| #314 caption | `parseMarkdownCaptionLine` / `collectMarkdownCaptionNodes` / `renderMarkdownCaptionFigure` | `caption` projection nodes and safe `figure`/`figcaption` |
 | #289 anchor | `parseMarkdownAnchorMarker` / `collectMarkdownAnchorNodes` | `anchor` projection nodes |
 | #291 import | `importMarkdownClipboardSnapshot` / `sanitizeMarkdownHtmlImport` | explicit clipboard snapshot → isolated import tree |
 
