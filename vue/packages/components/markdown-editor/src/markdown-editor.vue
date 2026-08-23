@@ -12,6 +12,8 @@
     ]"
     role="region"
     :aria-label="localeText.editorAria"
+    :data-markdown-instance="commandTrayId"
+    data-markdown-scroll-container="body"
     :style="editorStyle"
   >
     <header
@@ -119,6 +121,7 @@
 
     <div
       :class="ns.e('body')"
+      data-markdown-scroll-container="body"
       :data-markdown-reveal-state="liveReveal.state"
       :data-markdown-surface-owner="liveSurface.inputOwner"
       :data-markdown-atomic-kind="liveAtomic?.kind || undefined"
