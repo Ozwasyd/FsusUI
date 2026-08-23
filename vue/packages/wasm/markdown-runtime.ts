@@ -110,9 +110,25 @@ export {
 } from './markdown-html-import'
 export {
   MARKDOWN_EMBED_BUDGET,
+  commitMarkdownEmbedWalk,
+  createMarkdownEmbedBudgetSession,
   detectMarkdownEmbedCycle,
   evaluateMarkdownEmbedBudget,
   evaluateMarkdownEmbedBudgetMutations,
+  markdownEmbedCacheKey,
+  markdownEmbedTargetIdentityKey,
+  pathContainsMarkdownEmbedCycle,
+  type MarkdownEmbedBudget,
+  type MarkdownEmbedBudgetFailure,
+  type MarkdownEmbedBudgetMutationKind,
+  type MarkdownEmbedBudgetSession,
+  type MarkdownEmbedBudgetTask,
+  type MarkdownEmbedCacheKey,
+  type MarkdownEmbedTargetIdentity,
+  type MarkdownEmbedWalkFailure,
+  type MarkdownEmbedWalkNode,
+  type MarkdownEmbedWalkResult,
+  type MarkdownEmbedWalkSuccess,
 } from './markdown-embed-budget'
 export {
   createMarkdownInteractionTrace,
