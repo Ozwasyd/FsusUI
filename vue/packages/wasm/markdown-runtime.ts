@@ -109,6 +109,17 @@ export {
   type MarkdownHtmlImportResult,
 } from './markdown-html-import'
 export {
+  MARKDOWN_EMBED_BUDGET,
+  detectMarkdownEmbedCycle,
+  evaluateMarkdownEmbedBudget,
+  evaluateMarkdownEmbedBudgetMutations,
+} from './markdown-embed-budget'
+export {
+  createMarkdownInteractionTrace,
+  evaluateMarkdownInteractionTraceMutations,
+  type MarkdownInteractionTrace,
+} from './markdown-interaction-trace'
+export {
   MARKDOWN_EDITOR_PROJECTION_PARSER,
   MARKDOWN_EDITOR_REQUIRED_SYNTAX_KINDS,
   compareMarkdownEditorProjectionThreads,
