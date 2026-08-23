@@ -63,6 +63,7 @@ public static class FsusAvaloniaGalleryRegistry
     Entry("tree", "Tree"),
     Entry("text-viewer", "Text viewer"),
     Entry("text-editor", "Text editor"),
+    Entry("markdown-editor", "Markdown editor"),
     Entry("public-shell", "Public shell"),
     Entry("product-primitives", "Product primitives"),
     Entry("perception-challenge", "Perception challenge"),
@@ -125,6 +126,18 @@ public static class FsusAvaloniaGalleryRegistry
         break;
       case "text-editor":
         panel.Children.Add(new FsusTextEditor { AccessibleName = "Gallery editor" });
+        break;
+      case "markdown-editor":
+        panel.Children.Add(
+          new FsusMarkdownEditor
+          {
+            Document = "# Gallery\n\n中文 markdown editor shell",
+            DocumentIdentity = new FsusMarkdownDocumentIdentity("gallery-doc", 1),
+            Mode = FsusMarkdownEditorMode.Source,
+            Chrome = FsusMarkdownEditorChrome.Framed,
+            StatusDensity = FsusMarkdownEditorStatusDensity.Minimal,
+            CapabilityState = "partial",
+          });
         break;
       case "public-shell":
         var shell = new FsusPublicShell { Brand = "Fsus", ActiveNav = "home" };

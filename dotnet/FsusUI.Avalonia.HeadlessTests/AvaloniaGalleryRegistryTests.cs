@@ -32,6 +32,7 @@ public class AvaloniaGalleryRegistryTests
     "tree",
     "text-viewer",
     "text-editor",
+    "markdown-editor",
     "public-shell",
     "product-primitives",
     "perception-challenge",
@@ -102,6 +103,21 @@ public class AvaloniaGalleryRegistryTests
       Assert.Empty(expected.Except(actual));
       Assert.Empty(actual.Except(expected));
     }
+  }
+
+  [Fact]
+  public void MarkdownEditorGalleryInstantiatesPublicFsusMarkdownEditor()
+  {
+    var route = Assert.Single(
+      FsusAvaloniaGalleryRegistry.StableRoutes,
+      candidate => candidate.ComponentId == "markdown-editor");
+    var page = route.CreatePage();
+    var editors = page.GetLogicalDescendants()
+      .OfType<FsusMarkdownEditor>()
+      .ToArray();
+    Assert.Single(editors);
+    Assert.Equal("partial", editors[0].CapabilityState);
+    Assert.Equal(typeof(FsusMarkdownEditor), editors[0].GetType());
   }
 
   [Fact]
