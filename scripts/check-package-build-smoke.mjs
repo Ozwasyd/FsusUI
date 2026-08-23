@@ -599,6 +599,10 @@ if (existsSync(path.join(publishedDistRoot, 'package.json'))) {
     !distPackage.dependencies?.['@element-plus/motion'],
     'published package must not depend on unpublished @element-plus/motion',
   )
+  assert(
+    !distPackage.dependencies?.['@element-plus/icons-vue'],
+    'published package must not depend on unpublished @element-plus/icons-vue',
+  )
 
   const emptyStateDistChecks = [
     [

@@ -35,6 +35,10 @@ const installDependencyFields = [
   'optionalDependencies',
 ]
 const bundledWorkspaceDependencyNames = new Set(['@element-plus/motion'])
+const unpublishedWorkspaceDependencyNames = new Set([
+  '@element-plus/motion',
+  '@element-plus/icons-vue',
+])
 const wasmRuntimeArtifacts = [
   'dist/ep_wasm.wasm',
   'es/wasm/ep_wasm.mjs',
@@ -637,7 +641,7 @@ function removeBundledWorkspaceDependencies(packageJson) {
     const dependencies = packageJson[field]
     if (!dependencies) continue
 
-    for (const dependencyName of bundledWorkspaceDependencyNames) {
+    for (const dependencyName of unpublishedWorkspaceDependencyNames) {
       if (Object.hasOwn(dependencies, dependencyName)) {
         delete dependencies[dependencyName]
         removed += 1
@@ -775,7 +779,7 @@ function assertNoBundledWorkspaceDependencyReferences(packageJson, rootDir) {
     const dependencies = packageJson[field]
     if (!dependencies) continue
 
-    for (const dependencyName of bundledWorkspaceDependencyNames) {
+    for (const dependencyName of unpublishedWorkspaceDependencyNames) {
       if (Object.hasOwn(dependencies, dependencyName)) {
         manifestLeaks.push(`${field}.${dependencyName}`)
       }

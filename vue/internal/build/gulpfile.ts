@@ -56,6 +56,7 @@ const packageReferenceExtensions = [
 const copyElementPlusPackageManifest = async () => {
   const packageJson = JSON.parse(await readFile(epPackage, 'utf8'))
   delete packageJson.dependencies?.['@element-plus/motion']
+  delete packageJson.dependencies?.['@element-plus/icons-vue']
 
   await writeFile(
     path.join(epOutput, 'package.json'),
