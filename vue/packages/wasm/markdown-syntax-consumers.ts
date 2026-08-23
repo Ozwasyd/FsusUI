@@ -34,12 +34,22 @@ export interface MarkdownPropertyEntry extends MarkdownIdentityConsumerEntry {
 }
 
 const headingTitleOf = (source: string, node: MarkdownStableSyntaxNode) => {
-  const slice = source.slice(node.normalizedRange.start, node.normalizedRange.end)
-  const match = /^(#{1,6})\s+(.*)$/m.exec(slice.trimEnd())
-  return {
-    level: match ? match[1].length : 1,
-    title: (match?.[2] ?? slice).trim(),
+  const slice = source
+    .slice(node.normalizedRange.start, node.normalizedRange.end)
+    .replace(/\r$/, '')
+  const trimmed = slice.trimEnd()
+  const atx = /^(#{1,6})\s*(.*)$/u.exec(trimmed)
+  if (atx) {
+    return { level: atx[1]!.length, title: atx[2]!.trim() }
   }
+  const setext = /^(.*)\n(=+|-+)\s*$/u.exec(trimmed)
+  if (setext) {
+    return {
+      level: setext[2]!.startsWith('=') ? 1 : 2,
+      title: setext[1]!.trim(),
+    }
+  }
+  return { level: 1, title: trimmed.trim() }
 }
 
 const requireStableProjection = (projection: MarkdownStableProjection) => {

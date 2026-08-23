@@ -93,10 +93,25 @@ describe('markdown outline projection model', () => {
     })
     expect(otherDoc.items[0]?.id).not.toBe(first.items[0]?.id)
 
-    const many = Array.from({ length: 80 }, (_, index) => `# H${index}`).join('\n\n')
+    const many = Array.from({ length: 1000 }, (_, index) => `# H${index}`).join('\n\n')
     const large = createMarkdownOutlineModel(many, document)
+    expect(large.items).toHaveLength(1000)
     const largeEdited = createMarkdownOutlineModel(`intro\n\n${many}`, document, large.projection)
     expect(largeEdited.items.map((item) => item.id)).toEqual(large.items.map((item) => item.id))
+
+    const setext = createMarkdownOutlineModel('Title\n=====\n\nSub\n---\n', document)
+    expect(setext.items.map((item) => ({ depth: item.depth, text: item.text }))).toEqual([
+      { depth: 1, text: 'Title' },
+      { depth: 2, text: 'Sub' },
+    ])
+    expect(setext.items.every((item) => item.id.startsWith('syn:'))).toBe(true)
+
+    const empty = createMarkdownOutlineModel('#\n\n#  \n', document)
+    expect(empty.items.every((item) => item.text === '')).toBe(true)
+    const jumped = createMarkdownOutlineModel('# One\n\n### Nested\n', document)
+    expect(jumped.items[1]?.diagnostics.some((item) => item.code === 'heading-layer-jump')).toBe(
+      true,
+    )
   })
 
   it('kills regex, text, offset, and full-rebuild outline keys', () => {
