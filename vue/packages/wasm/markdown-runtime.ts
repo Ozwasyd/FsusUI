@@ -202,6 +202,17 @@ export {
   type MarkdownSyntaxIdentityMutationResult,
 } from './markdown-syntax-identity-mutations'
 export {
+  evaluateMarkdownSearchModelMutations,
+  isMarkdownSearchMatchCurrent,
+  searchMarkdownRawSource,
+  MARKDOWN_SEARCH_MODES,
+  type MarkdownSearchMatch,
+  type MarkdownSearchMode,
+  type MarkdownSearchQuery,
+  type MarkdownSearchRejectCode,
+  type MarkdownSearchResult,
+} from './markdown-search-model'
+export {
   createMarkdownOutlineEntries,
   createMarkdownPropertyEntries,
   createMarkdownTableEntries,
