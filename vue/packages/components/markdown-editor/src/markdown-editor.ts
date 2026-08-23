@@ -313,69 +313,15 @@ export interface MarkdownEditorSurfaceOptions {
 
 export type MarkdownEditorStatusDensity = 'none' | 'minimal' | 'detailed'
 
-export interface MarkdownEditorMetricsOptions {
-  readonly locale?: string
-  readonly includeBytes?: boolean
-}
-
-export interface MarkdownEditorMetrics {
-  readonly codeUnitLength: number
-  readonly graphemeCount: number
-  readonly wordCount: number
-  readonly lineCount: number
-  readonly caretLine: number
-  readonly caretColumn: number
-  readonly selectionLength: number
-  readonly byteCount?: number
-  readonly segmenter: 'intl' | 'fallback'
-}
-
-export const calculateMarkdownEditorMetrics = (
-  source: string,
-  options: MarkdownEditorMetricsOptions & {
-    readonly selection?: { readonly start: number; readonly end: number }
-  } = {},
-): MarkdownEditorMetrics => {
-  const Segmenter = Intl.Segmenter
-  const segmenter: 'intl' | 'fallback' = Segmenter ? 'intl' : 'fallback'
-  const graphemeCount = Segmenter
-    ? [...new Segmenter(options.locale, { granularity: 'grapheme' }).segment(source)]
-        .length
-    : Array.from(source).length
-  const wordCount = Segmenter
-    ? [...new Segmenter(options.locale, { granularity: 'word' }).segment(source)].filter(
-        (part) => part.isWordLike,
-      ).length
-    : Array.from(source).filter((character) => /[\p{L}\p{N}]/u.test(character)).length
-  const caret = Math.max(
-    0,
-    Math.min(source.length, options.selection?.start ?? source.length),
-  )
-  const before = source.slice(0, caret)
-  const lineBreaks = before.match(/\r\n|\r|\n/g)
-  const caretLine = (lineBreaks?.length ?? 0) + 1
-  const lastBreak = Math.max(
-    before.lastIndexOf('\n'),
-    before.lastIndexOf('\r'),
-  )
-  const caretColumn = caret - (lastBreak >= 0 ? lastBreak + 1 : 0) + 1
-  const selectionLength = options.selection
-    ? Math.abs(options.selection.end - options.selection.start)
-    : 0
-  return {
-    codeUnitLength: source.length,
-    graphemeCount,
-    wordCount,
-    lineCount: source.length === 0 ? 1 : source.split(/\r\n|\r|\n/).length,
-    caretLine,
-    caretColumn,
-    selectionLength,
-    segmenter,
-    ...(options.includeBytes
-      ? { byteCount: new TextEncoder().encode(source).length }
-      : {}),
-  }
-}
+export {
+  calculateMarkdownEditorMetrics,
+  createMarkdownEditorMetricsSession,
+  evaluateMarkdownEditorMetricsMutations,
+  type MarkdownEditorMetrics,
+  type MarkdownEditorMetricsChange,
+  type MarkdownEditorMetricsOptions,
+  type MarkdownEditorMetricsSelection,
+} from './markdown-editor-metrics'
 
 export const resolveMarkdownEditorToolbarLimit = (
   density: MarkdownEditorToolbarDensity,

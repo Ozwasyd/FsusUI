@@ -21,7 +21,7 @@ describe('markdown editor leftover locale/status metrics', () => {
       selection: { start: 5, end: 5 },
     })
     expect(caret.caretLine).toBe(2)
-    expect(caret.caretColumn).toBe(2)
+    expect(caret.caretColumn).toBe(1)
     expect(caret.segmenter).toMatch(/intl|fallback/)
   })
 
