@@ -39,5 +39,23 @@ describe('markdown embed consumer provider', () => {
     for (const mutation of report.mutations) {
       expect(mutation.accepted).toBe(false)
     }
+    expect(report.mutations.map((mutation) => mutation.kind)).toEqual(
+      expect.arrayContaining([
+        'stale-commit',
+        'html-result',
+        'provider-source-mutation',
+        'target-only-cache',
+      ]),
+    )
+    const otherDoc = createMarkdownEmbedRequest({
+      documentIdentity: { id: 'other', epoch: 1 },
+      revision: 3,
+      nodeId: 'syn:embed:1',
+      target: 'note-a',
+      mode: 'article',
+      version: 1,
+    })
+    expect(otherDoc.requestId).not.toBe(request.requestId)
   })
 })
+

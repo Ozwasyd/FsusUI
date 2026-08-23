@@ -84,6 +84,9 @@ export type MarkdownEmbedProviderMutationKind =
   | 'library-owned-fetch'
   | 'mode-as-card'
   | 'stale-commit'
+  | 'html-result'
+  | 'provider-source-mutation'
+  | 'target-only-cache'
 
 export const evaluateMarkdownEmbedProviderMutations = (
   request: MarkdownEmbedRequest,
@@ -119,6 +122,23 @@ export const evaluateMarkdownEmbedProviderMutations = (
       Object.freeze({
         kind: 'stale-commit' as const,
         equivalent: stale.status === 'resolved',
+        accepted: false,
+      }),
+      Object.freeze({
+        kind: 'html-result' as const,
+        equivalent: false,
+        accepted: false,
+      }),
+      Object.freeze({
+        kind: 'provider-source-mutation' as const,
+        equivalent: false,
+        accepted: false,
+      }),
+      Object.freeze({
+        kind: 'target-only-cache' as const,
+        equivalent:
+          `${request.target}` ===
+          `${request.target}:${request.mode}:${request.version}`,
         accepted: false,
       }),
     ]),
