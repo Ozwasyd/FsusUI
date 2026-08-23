@@ -10,7 +10,7 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "8b8e52714e7015aa8049cf4b6c08cefcfeac78d66e85f7854974d56f15916cad",
+      "hash": "1ce0431889d30cec9f03954f5bc688efd6eda9c021accec8fc29ab7e394324e6",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
@@ -46943,6 +46943,52 @@
           }
         },
         {
+          "name": "chrome",
+          "kind": "input",
+          "web": {
+            "member": "chrome",
+            "categories": [
+              "string"
+            ],
+            "runtimeType": "String",
+            "semanticType": "PropType<MarkdownEditorChrome>",
+            "nullable": false,
+            "default": {
+              "kind": "literal",
+              "value": "framed"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": {
+            "member": "Chrome",
+            "categories": [
+              "FsusMarkdownEditorChrome"
+            ],
+            "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorChrome",
+            "nullable": false
+          },
+          "status": "partial",
+          "drift": {
+            "type": "web string vs avalonia FsusMarkdownEditorChrome",
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.input.chrome"
+          ],
+          "governance": {
+            "reason": "Real member exists on both sides but semantic drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "commandOverflowLabel",
           "kind": "input",
           "web": {
@@ -46954,8 +47000,8 @@
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "literal",
-              "value": "格式工具"
+              "kind": "expression",
+              "sourceHash": "b1ac4ded467282039b6812765914d78aaf09c61357460318b1eeebaf1360baf4"
             },
             "values": null,
             "required": false,
@@ -47156,8 +47202,8 @@
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "literal",
-              "value": "上传图片"
+              "kind": "expression",
+              "sourceHash": "0c3c9da9090af2f3d5abf85fe4d16089e5003acb63a77f133a05ddfd8f1d3873"
             },
             "values": null,
             "required": false,
@@ -47256,6 +47302,82 @@
           },
           "scenarioIds": [
             "scenario.v2.el-markdown-editor.input.loading"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "localeText",
+          "kind": "input",
+          "web": {
+            "member": "localeText",
+            "categories": [
+              "object"
+            ],
+            "runtimeType": "Object",
+            "semanticType": "MarkdownEditorLocaleTextOverride",
+            "nullable": false,
+            "default": {
+              "kind": "undefined"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.input.locale-text"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "metrics",
+          "kind": "input",
+          "web": {
+            "member": "metrics",
+            "categories": [
+              "object"
+            ],
+            "runtimeType": "Object",
+            "semanticType": "MarkdownEditorMetricsOptions",
+            "nullable": false,
+            "default": {
+              "kind": "undefined"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.input.metrics"
           ],
           "governance": {
             "reason": "No matching real Avalonia public member in the semantic baseline.",
@@ -47640,8 +47762,8 @@
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "literal",
-              "value": "保存"
+              "kind": "expression",
+              "sourceHash": "2968093feca443c24116a2a1f9bd69b43c074a4c5257099618b28cec90492948"
             },
             "values": null,
             "required": false,
@@ -47863,6 +47985,56 @@
           }
         },
         {
+          "name": "statusDensity",
+          "kind": "input",
+          "web": {
+            "member": "statusDensity",
+            "categories": [
+              "string"
+            ],
+            "runtimeType": "String",
+            "semanticType": "PropType<MarkdownEditorStatusDensity>",
+            "nullable": false,
+            "default": {
+              "kind": "literal",
+              "value": "minimal"
+            },
+            "values": [
+              "none",
+              "minimal",
+              "detailed"
+            ],
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": {
+            "member": "StatusDensity",
+            "categories": [
+              "FsusMarkdownEditorStatusDensity"
+            ],
+            "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorStatusDensity",
+            "nullable": false
+          },
+          "status": "partial",
+          "drift": {
+            "type": "web string vs avalonia FsusMarkdownEditorStatusDensity",
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.input.status-density"
+          ],
+          "governance": {
+            "reason": "Real member exists on both sides but semantic drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "submitActionLabel",
           "kind": "input",
           "web": {
@@ -47874,8 +48046,8 @@
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "literal",
-              "value": "提交"
+              "kind": "expression",
+              "sourceHash": "cfc15051a6dd0136bee28f5b717bc886c658f75188c89ae1f44492778daa03db"
             },
             "values": null,
             "required": false,
@@ -47893,6 +48065,45 @@
           },
           "scenarioIds": [
             "scenario.v2.el-markdown-editor.input.submit-action-label"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "surfaces",
+          "kind": "input",
+          "web": {
+            "member": "surfaces",
+            "categories": [
+              "object"
+            ],
+            "runtimeType": "Object",
+            "semanticType": "MarkdownEditorSurfaceOptions",
+            "nullable": false,
+            "default": {
+              "kind": "function",
+              "sourceHash": "5b9e387da6b3363a3bc392e5dcba308d8f4981a38c579521d226f4c76453a3ed"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.input.surfaces"
           ],
           "governance": {
             "reason": "No matching real Avalonia public member in the semantic baseline.",
@@ -47969,6 +48180,49 @@
           },
           "scenarioIds": [
             "scenario.v2.el-markdown-editor.input.textarea-name"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "toolbarDensity",
+          "kind": "input",
+          "web": {
+            "member": "toolbarDensity",
+            "categories": [
+              "string"
+            ],
+            "runtimeType": "String",
+            "semanticType": "PropType<MarkdownEditorToolbarDensity>",
+            "nullable": false,
+            "default": {
+              "kind": "literal",
+              "value": "standard"
+            },
+            "values": [
+              "minimal",
+              "standard",
+              "full"
+            ],
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.input.toolbar-density"
           ],
           "governance": {
             "reason": "No matching real Avalonia public member in the semantic baseline.",
@@ -48592,6 +48846,17 @@
           }
         },
         {
+          "member": "chrome",
+          "kind": "input",
+          "status": "partial",
+          "governance": {
+            "reason": "Real member exists on both sides but semantic drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "commandOverflowLabel",
           "kind": "input",
           "status": "missing",
@@ -48670,6 +48935,28 @@
         },
         {
           "member": "loading",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "localeText",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "metrics",
           "kind": "input",
           "status": "missing",
           "governance": {
@@ -48845,7 +49132,29 @@
           }
         },
         {
+          "member": "statusDensity",
+          "kind": "input",
+          "status": "partial",
+          "governance": {
+            "reason": "Real member exists on both sides but semantic drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "submitActionLabel",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "surfaces",
           "kind": "input",
           "status": "missing",
           "governance": {
@@ -48868,6 +49177,17 @@
         },
         {
           "member": "textareaName",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "toolbarDensity",
           "kind": "input",
           "status": "missing",
           "governance": {
@@ -49102,19 +49422,6 @@
           ]
         },
         {
-          "member": "Chrome",
-          "kind": "avalonia-extra",
-          "governance": {
-            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          },
-          "scenarioIds": [
-            "scenario.v2.el-markdown-editor.avalonia-extra.chrome"
-          ]
-        },
-        {
           "member": "Document",
           "kind": "avalonia-extra",
           "governance": {
@@ -49180,19 +49487,6 @@
           ]
         },
         {
-          "member": "StatusDensity",
-          "kind": "avalonia-extra",
-          "governance": {
-            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
-            "owner": "FsusUI Core",
-            "testPolicy": "contract",
-            "reviewPolicy": "pr-review"
-          },
-          "scenarioIds": [
-            "scenario.v2.el-markdown-editor.avalonia-extra.status-density"
-          ]
-        },
-        {
           "member": "TryRunCommand",
           "kind": "avalonia-extra",
           "governance": {
@@ -49208,6 +49502,7 @@
       ],
       "scenarioIds": [
         "scenario.v2.el-markdown-editor.input.action-overflow-keys",
+        "scenario.v2.el-markdown-editor.input.chrome",
         "scenario.v2.el-markdown-editor.input.command-overflow-label",
         "scenario.v2.el-markdown-editor.input.commands",
         "scenario.v2.el-markdown-editor.input.default-mode",
@@ -49216,6 +49511,8 @@
         "scenario.v2.el-markdown-editor.input.image-action-label",
         "scenario.v2.el-markdown-editor.input.interaction-profile",
         "scenario.v2.el-markdown-editor.input.loading",
+        "scenario.v2.el-markdown-editor.input.locale-text",
+        "scenario.v2.el-markdown-editor.input.metrics",
         "scenario.v2.el-markdown-editor.input.min-rows",
         "scenario.v2.el-markdown-editor.input.mobile-layout",
         "scenario.v2.el-markdown-editor.input.mode",
@@ -49231,9 +49528,12 @@
         "scenario.v2.el-markdown-editor.input.show-mode-switcher",
         "scenario.v2.el-markdown-editor.input.show-save-action",
         "scenario.v2.el-markdown-editor.input.show-submit-action",
+        "scenario.v2.el-markdown-editor.input.status-density",
         "scenario.v2.el-markdown-editor.input.submit-action-label",
+        "scenario.v2.el-markdown-editor.input.surfaces",
         "scenario.v2.el-markdown-editor.input.textarea-id",
         "scenario.v2.el-markdown-editor.input.textarea-name",
+        "scenario.v2.el-markdown-editor.input.toolbar-density",
         "scenario.v2.el-markdown-editor.input.writing-placeholder",
         "scenario.v2.el-markdown-editor.output.change-event",
         "scenario.v2.el-markdown-editor.output.update-model-event",
@@ -49271,12 +49571,12 @@
         "scenario.v2.el-markdown-editor.perf"
       ],
       "coverage": {
-        "total": 46,
+        "total": 52,
         "alignedCandidate": 0,
-        "partial": 1,
-        "missing": 45,
+        "partial": 3,
+        "missing": 49,
         "webOnly": 0,
-        "mappedPercent": 2.2
+        "mappedPercent": 5.8
       },
       "markdownEditor": {
         "modes": [
@@ -136139,10 +136439,10 @@
   ],
   "coverage": {
     "aligned-candidate": 49,
-    "partial": 75,
-    "missing": 2026,
+    "partial": 77,
+    "missing": 2030,
     "web-only": 20,
-    "total": 2170,
-    "mappedPercent": 5.7
+    "total": 2176,
+    "mappedPercent": 5.8
   }
 }
