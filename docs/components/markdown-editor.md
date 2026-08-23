@@ -29,6 +29,11 @@ transaction dispatcher。source/live/split 对相同输入必须产生相同 raw
 transaction。输入合同与验收入口见
 [Markdown editor input](../api/markdown-editor-input.md)。
 
+文档嵌入语法由唯一 `::embed[target="..." mode="article|heading|block"]`
+block directive 进入 projection，不推断 mode，不把 target 解释为路径或权限。
+Grammar 与 mutation fixture 见
+[Markdown runtime projection](../api/markdown-runtime-projection.md)。
+
 ## Transaction contract
 
 公共 transaction 使用升序、互不重叠的 UTF-16 code-unit ranges，与 browser

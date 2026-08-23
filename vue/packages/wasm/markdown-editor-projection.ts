@@ -4,6 +4,7 @@ import {
   normalizeMarkdownSource,
   resolveMarkdownSourceIdentity,
 } from './markdown'
+import { mergeMarkdownDirectiveSyntax } from './markdown-directive-syntax'
 import { collectMarkdownSyntaxNodesFromParser } from './markdown-syntax-collect'
 import { createMarkdownSourceCoordinateMap } from './markdown-source-coordinate-map'
 
@@ -29,6 +30,9 @@ export const MARKDOWN_EDITOR_REQUIRED_SYNTAX_KINDS = Object.freeze([
   'mermaid',
   'footnote',
   'explicit-paragraph',
+  'embed',
+  'caption',
+  'anchor',
   'malformed',
 ] as const)
 
@@ -49,6 +53,9 @@ const MARKDOWN_EDITOR_KIND_PRESENTATION = Object.freeze({
   mermaid: 'live-atomic',
   footnote: 'live-decorated',
   'explicit-paragraph': 'live-decorated',
+  embed: 'live-atomic',
+  caption: 'live-decorated',
+  anchor: 'live-decorated',
   malformed: 'unsupported-error',
 } as const satisfies Record<MarkdownEditorRequiredSyntaxKind, MarkdownEditorPresentation>)
 
@@ -216,8 +223,9 @@ export const createMarkdownEditorProjection = (
 
   const sourceIdentity = resolveMarkdownSourceIdentity(rawSource)
   const parserNodes = collectMarkdownSyntaxNodesFromParser(rawSource)
+  const directed = mergeMarkdownDirectiveSyntax(normalizedSource, parserNodes)
   const nodes: MarkdownEditorSyntaxNode[] = []
-  const diagnostics: MarkdownEditorProjectionDiagnostic[] = []
+  const diagnostics: MarkdownEditorProjectionDiagnostic[] = [...directed.diagnostics]
   const toUtf16 = utf8OffsetToNormalizedUtf16(normalizedSource)
 
   const toNormalizedRange = (start: number, end: number) =>
@@ -225,7 +233,7 @@ export const createMarkdownEditorProjection = (
   const toRawRange = (start: number, end: number) =>
     Object.freeze(coordinates.toRawRange(toNormalizedRange(start, end)))
 
-  for (const node of parserNodes) {
+  for (const node of directed.nodes) {
     const hasParent =
       Number.isInteger(node.parentStart) && Number.isInteger(node.parentEnd)
     const childNormalizedRanges = Object.freeze(

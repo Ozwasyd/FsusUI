@@ -2258,6 +2258,19 @@ std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
       continue;
     }
 
+    if (line.text.starts_with("::embed[") || trim_left(line.text).starts_with("::embed[")) {
+      flush_paragraph(line.start);
+      flush_list();
+      const bool looks_closed = line.text.starts_with("::embed[") &&
+        line.text.find(']') != std::string_view::npos;
+      nodes.push_back({
+        looks_closed ? syntax_kind::embed : syntax_kind::malformed,
+        line.start,
+        exclusive_line_end(source, line),
+      });
+      continue;
+    }
+
     if (trimmed.starts_with(":::mermaid")) {
       flush_paragraph(line.start);
       flush_list();
@@ -2629,6 +2642,7 @@ std::string_view syntax_kind_name(syntax_kind kind) {
     case syntax_kind::mermaid: return "mermaid";
     case syntax_kind::footnote: return "footnote";
     case syntax_kind::explicit_paragraph: return "explicit-paragraph";
+    case syntax_kind::embed: return "embed";
     case syntax_kind::malformed: return "malformed";
   }
   return "malformed";

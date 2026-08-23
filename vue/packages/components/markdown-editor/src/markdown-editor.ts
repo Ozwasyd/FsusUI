@@ -263,6 +263,19 @@ export {
   type MarkdownNativeTraceEntry,
 } from './markdown-editor-native-event'
 export {
+  createMarkdownOutlineModel,
+  evaluateMarkdownOutlineMutations,
+  resolveMarkdownEditorOutline,
+  revealHeading,
+  revealSourceRange,
+} from './markdown-editor-outline'
+export {
+  collectMarkdownEmbedNodes,
+  runMarkdownEmbedEdit,
+  runMarkdownEmbedInsert,
+  runMarkdownEmbedRemove,
+} from './markdown-editor-embed'
+export {
   MARKDOWN_INPUT_ACCEPTANCE_CONTEXTS,
   MARKDOWN_INPUT_ACCEPTANCE_MODES,
   MARKDOWN_INPUT_ACCEPTANCE_SELECTIONS,

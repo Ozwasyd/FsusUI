@@ -36,6 +36,49 @@ import type {
 
 export { MarkdownRuntimeError, type MarkdownRuntimeErrorCode }
 export {
+  MARKDOWN_EMBED_DIAGNOSTIC_CODES,
+  MARKDOWN_EMBED_MODES,
+  collectMarkdownEmbedNodes,
+  evaluateMarkdownEmbedMutations,
+  formatMarkdownEmbedDirective,
+  parseMarkdownEmbedLine,
+  planMarkdownEmbedEdit,
+  planMarkdownEmbedInsert,
+  planMarkdownEmbedRemove,
+  type MarkdownEmbedCommandPlan,
+  type MarkdownEmbedDiagnosticCode,
+  type MarkdownEmbedInvalidNode,
+  type MarkdownEmbedMode,
+  type MarkdownEmbedMutationKind,
+  type MarkdownEmbedMutationReport,
+  type MarkdownEmbedMutationResult,
+  type MarkdownEmbedNode,
+  type MarkdownEmbedRanges,
+  type MarkdownEmbedSourceRange,
+  type MarkdownEmbedValidNode,
+} from './markdown-embed-directive'
+export {
+  MARKDOWN_CAPTION_DIAGNOSTIC_CODES,
+  collectMarkdownCaptionNodes,
+  evaluateMarkdownCaptionMutations,
+  parseMarkdownCaptionLine,
+  type MarkdownCaptionDiagnosticCode,
+  type MarkdownCaptionInvalidNode,
+  type MarkdownCaptionNode,
+  type MarkdownCaptionValidNode,
+} from './markdown-caption-directive'
+export {
+  MARKDOWN_ANCHOR_DIAGNOSTIC_CODES,
+  MARKDOWN_ANCHOR_ID,
+  collectMarkdownAnchorNodes,
+  evaluateMarkdownBlockAnchorMutations,
+  parseMarkdownAnchorMarker,
+  type MarkdownAnchorDiagnosticCode,
+  type MarkdownAnchorInvalidNode,
+  type MarkdownAnchorNode,
+  type MarkdownAnchorValidNode,
+} from './markdown-anchor-grammar'
+export {
   MARKDOWN_EDITOR_PROJECTION_PARSER,
   MARKDOWN_EDITOR_REQUIRED_SYNTAX_KINDS,
   compareMarkdownEditorProjectionThreads,

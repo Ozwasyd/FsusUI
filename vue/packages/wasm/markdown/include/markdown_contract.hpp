@@ -47,7 +47,8 @@ enum class syntax_kind : std::uint8_t {
   mermaid = 10,
   footnote = 11,
   explicit_paragraph = 12,
-  malformed = 13
+  embed = 13,
+  malformed = 14
 };
 
 struct syntax_node final {
