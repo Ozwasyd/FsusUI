@@ -130,6 +130,19 @@ export {
   type MarkdownHtmlImportTree,
 } from './markdown-html-import'
 export {
+  MARKDOWN_HTML_CONVERSION_BUDGET,
+  MARKDOWN_HTML_CONVERSION_MAP,
+  MARKDOWN_HTML_CONVERSION_VERSION,
+  convertMarkdownHtmlImportSnapshot,
+  convertMarkdownHtmlImportTree,
+  evaluateMarkdownHtmlConversionMutations,
+  type MarkdownHtmlAttachmentDescriptor,
+  type MarkdownHtmlConversionMutationKind,
+  type MarkdownHtmlConversionResult,
+  type MarkdownHtmlLoss,
+  type MarkdownHtmlLossKind,
+} from './markdown-html-convert'
+export {
   MARKDOWN_EMBED_BUDGET,
   commitMarkdownEmbedWalk,
   createMarkdownEmbedBudgetSession,

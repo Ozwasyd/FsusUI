@@ -23,6 +23,8 @@ export {
   evaluateMarkdownHtmlImportMutations,
   evaluateMarkdownUrlMutations,
   importMarkdownClipboardSnapshot,
+  convertMarkdownHtmlImportSnapshot,
+  convertMarkdownHtmlImportTree,
   sanitizeMarkdownHtmlImport,
   validateMarkdownUrl,
   evaluateMarkdownBlockAnchorMutations,
