@@ -188,6 +188,8 @@
     "dotnet:platform:verify": "node ./scripts/with-node-heap.mjs node ./scripts/dotnet-platform-verify.mjs",
     "dotnet:package:verify": "node ./scripts/with-node-heap.mjs node ./scripts/dotnet-package-verify.mjs",
     "dotnet:manifests:check": "node ./scripts/with-node-heap.mjs node ./scripts/check-dotnet-manifests.mjs",
+    "check:avalonia-aot-library": "node ./scripts/with-node-heap.mjs node ./scripts/check-avalonia-aot-library-contract.mjs",
+    "test:avalonia-aot-library": "node ./scripts/with-node-heap.mjs node ./scripts/test-avalonia-aot-library-contract.mjs",
     "dotnet:verify": "node ./scripts/with-node-heap.mjs run-s dotnet:platform:verify dotnet:package:verify",
     "verify": "node ./scripts/with-node-heap.mjs run-s verify:full",
     "verify:pr-fast": "run-s prepare:test-artifacts build:theme _verify:pr-fast:parallel",

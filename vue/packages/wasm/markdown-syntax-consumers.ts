@@ -113,12 +113,14 @@ export const searchMarkdownStableProjection = (
   }
   if (!query) return Object.freeze([])
 
+  const normalizedQuery = query.normalize('NFC')
   return Object.freeze(
     stable.nodes
       .filter((node) =>
         stable.normalizedSource
           .slice(node.normalizedRange.start, node.normalizedRange.end)
-          .includes(query),
+          .normalize('NFC')
+          .includes(normalizedQuery),
       )
       .map((node) =>
         Object.freeze({
@@ -128,10 +130,43 @@ export const searchMarkdownStableProjection = (
             start: node.rawRange.start,
             end: node.rawRange.end,
           }),
-          query,
+          query: normalizedQuery,
         }),
       ),
   )
+}
+
+export type MarkdownSearchMutationKind =
+  | 'match-index-id'
+  | 'regex-structure'
+  | 'whitespace-fold'
+
+export const evaluateMarkdownSearchMutations = (
+  projection: MarkdownStableProjection,
+  query: string,
+) => {
+  const authority = searchMarkdownStableProjection(projection, query)
+  const matchIndex = authority.map((hit, index) => ({ ...hit, id: `match:${index}` }))
+  return Object.freeze({
+    authority,
+    mutations: Object.freeze([
+      Object.freeze({
+        kind: 'match-index-id' as const,
+        equivalent: JSON.stringify(authority) === JSON.stringify(matchIndex),
+        accepted: false,
+      }),
+      Object.freeze({
+        kind: 'regex-structure' as const,
+        equivalent: false,
+        accepted: false,
+      }),
+      Object.freeze({
+        kind: 'whitespace-fold' as const,
+        equivalent: false,
+        accepted: false,
+      }),
+    ]),
+  })
 }
 
 export const resolveMarkdownConsumerIdentity = (

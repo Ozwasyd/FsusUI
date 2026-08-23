@@ -17,6 +17,12 @@ describe('markdown editor leftover locale/status metrics', () => {
     expect(metrics.byteCount).toBe(new TextEncoder().encode('你好 world').length)
     expect(calculateMarkdownEditorMetrics('').lineCount).toBe(1)
     expect(calculateMarkdownEditorMetrics('a\nb\nc').lineCount).toBe(3)
+    const caret = calculateMarkdownEditorMetrics('ab\r\ncd', {
+      selection: { start: 5, end: 5 },
+    })
+    expect(caret.caretLine).toBe(2)
+    expect(caret.caretColumn).toBe(2)
+    expect(caret.segmenter).toMatch(/intl|fallback/)
   })
 
   it('merges leftover localeText onto the default copy authority', () => {

@@ -7282,6 +7282,289 @@
       "methods": []
     },
     {
+      "name": "FsusUI.Avalonia.Controls.FsusMarkdownDocumentIdentity",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Epoch",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Id",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusMarkdownDocumentIdentity",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "Id",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "Epoch",
+              "type": "System.Int32\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusMarkdownEditor",
+      "kind": "class",
+      "baseType": "Avalonia.Controls.Primitives.TemplatedControl",
+      "isAbstract": false,
+      "isSealed": false,
+      "properties": [
+        {
+          "name": "CapabilityState",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Chrome",
+          "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorChrome",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Document",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "DocumentIdentity",
+          "type": "FsusUI.Avalonia.Controls.FsusMarkdownDocumentIdentity",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsReadOnly",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Locale",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Mode",
+          "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorMode",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Profile",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "StatusDensity",
+          "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorStatusDensity",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [
+        {
+          "name": "CapabilityState",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "Chrome",
+          "kind": "styled",
+          "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorChrome",
+          "nullable": false
+        },
+        {
+          "name": "Document",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "DocumentIdentity",
+          "kind": "styled",
+          "type": "FsusUI.Avalonia.Controls.FsusMarkdownDocumentIdentity",
+          "nullable": true
+        },
+        {
+          "name": "IsReadOnly",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "Locale",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "Mode",
+          "kind": "styled",
+          "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorMode",
+          "nullable": false
+        },
+        {
+          "name": "Profile",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "StatusDensity",
+          "kind": "styled",
+          "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorStatusDensity",
+          "nullable": false
+        }
+      ],
+      "events": [],
+      "methods": [
+        {
+          "name": "TryRunCommand",
+          "isStatic": false,
+          "returnType": "System.Boolean",
+          "parameters": [
+            {
+              "name": "commandKey",
+              "type": "System.String",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusMarkdownEditorChrome",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Framed",
+          "value": 0
+        },
+        {
+          "name": "Embedded",
+          "value": 1
+        },
+        {
+          "name": "Minimal",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusMarkdownEditorMode",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Source",
+          "value": 0
+        },
+        {
+          "name": "Live",
+          "value": 1
+        },
+        {
+          "name": "Split",
+          "value": 2
+        },
+        {
+          "name": "Preview",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusMarkdownEditorStatusDensity",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "None",
+          "value": 0
+        },
+        {
+          "name": "Minimal",
+          "value": 1
+        },
+        {
+          "name": "Detailed",
+          "value": 2
+        }
+      ]
+    },
+    {
       "name": "FsusUI.Avalonia.Controls.FsusMenu",
       "kind": "class",
       "baseType": "Avalonia.Controls.Menu",

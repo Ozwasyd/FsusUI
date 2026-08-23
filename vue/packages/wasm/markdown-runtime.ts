@@ -79,6 +79,36 @@ export {
   type MarkdownAnchorValidNode,
 } from './markdown-anchor-grammar'
 export {
+  MARKDOWN_URL_AUTHORITY_VERSION,
+  MARKDOWN_URL_STATES,
+  applyMarkdownUrlValidation,
+  classifyMarkdownUrl,
+  evaluateMarkdownUrlMutations,
+  isMarkdownUrlResultCurrent,
+  validateMarkdownUrl,
+  type MarkdownUrlIdentity,
+  type MarkdownUrlMutationKind,
+  type MarkdownUrlState,
+  type MarkdownUrlValidation,
+} from './markdown-url'
+export {
+  commitMarkdownEmbedResult,
+  createMarkdownEmbedRequest,
+  evaluateMarkdownEmbedProviderMutations,
+  isMarkdownEmbedResultCurrent,
+  type MarkdownEmbedProvider,
+  type MarkdownEmbedProviderMutationKind,
+  type MarkdownEmbedProviderStatus,
+  type MarkdownEmbedRequest,
+  type MarkdownEmbedResult,
+} from './markdown-embed-provider'
+export {
+  evaluateMarkdownHtmlImportMutations,
+  sanitizeMarkdownHtmlImport,
+  type MarkdownHtmlImportMutationKind,
+  type MarkdownHtmlImportResult,
+} from './markdown-html-import'
+export {
   MARKDOWN_EDITOR_PROJECTION_PARSER,
   MARKDOWN_EDITOR_REQUIRED_SYNTAX_KINDS,
   compareMarkdownEditorProjectionThreads,
@@ -167,6 +197,7 @@ export {
   createMarkdownTechnicalEntries,
   resolveMarkdownConsumerIdentity,
   searchMarkdownStableProjection,
+  evaluateMarkdownSearchMutations,
   type MarkdownIdentityConsumerEntry,
   type MarkdownOutlineEntry,
   type MarkdownPropertyEntry,

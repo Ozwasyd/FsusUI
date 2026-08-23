@@ -7,6 +7,7 @@ import {
   createMarkdownTableEntries,
   createMarkdownTechnicalEntries,
   resolveMarkdownConsumerIdentity,
+  evaluateMarkdownSearchMutations,
   searchMarkdownStableProjection,
   stabilizeMarkdownEditorProjection,
 } from '../markdown-runtime'
@@ -84,6 +85,15 @@ describe('markdown outline/table/search identity consumers', () => {
     expect(
       searchMarkdownStableProjection(afterDelete, 'Beta')[0]?.id,
     ).toBe(firstOutline[1]!.id)
+    const composed = 'cafe\u0301'
+    const unicode = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection(`# ${composed}\n`),
+      document,
+    )
+    const hits = searchMarkdownStableProjection(unicode, 'café')
+    expect(hits[0]?.id.startsWith('syn:')).toBe(true)
+    const report = evaluateMarkdownSearchMutations(unicode, 'café')
+    expect(report.mutations.every((mutation) => mutation.accepted === false)).toBe(true)
   })
 
   it('projects technical and property entries from the same syntax identities', () => {

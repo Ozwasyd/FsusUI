@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "ownerIssue": 358,
+  "allowFailure": false,
+  "packages": [
+    "FsusUI.Avalonia",
+    "FsusUI.Avalonia.Themes",
+    "FsusUI.Avalonia.Icons"
+  ],
+  "findings": []
+}
