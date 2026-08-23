@@ -63,10 +63,71 @@ public class FsusMarkdownEditor : TemplatedControl
   public static readonly StyledProperty<string> CapabilityStateProperty =
     AvaloniaProperty.Register<FsusMarkdownEditor, string>(nameof(CapabilityState), "partial");
 
+  private FsusMarkdownEditorTransactionStore store =
+    new(new FsusMarkdownDocumentIdentity("doc", 0));
+
   public FsusMarkdownEditor()
   {
     FsusComponentClasses.SetBaseClasses(this, "fsus-markdown-editor");
     Focusable = true;
+  }
+
+  public FsusMarkdownEditorTransactionStore TransactionStore => store;
+
+  public FsusMarkdownEditorDispatchResult Dispatch(FsusMarkdownEditorTransaction transaction)
+  {
+    EnsureStore();
+    var result = store.Dispatch(transaction);
+    if (result.Accepted && result.Value != Document)
+    {
+      SetValue(DocumentProperty, result.Value);
+    }
+    return result;
+  }
+
+  public FsusMarkdownEditorDispatchResult UndoDocument()
+  {
+    EnsureStore();
+    var result = store.Undo();
+    if (result.Accepted)
+    {
+      SetValue(DocumentProperty, result.Value);
+    }
+    return result;
+  }
+
+  public FsusMarkdownEditorDispatchResult RedoDocument()
+  {
+    EnsureStore();
+    var result = store.Redo();
+    if (result.Accepted)
+    {
+      SetValue(DocumentProperty, result.Value);
+    }
+    return result;
+  }
+
+  protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+  {
+    base.OnPropertyChanged(change);
+    if (change.Property == DocumentIdentityProperty)
+    {
+      var identity = DocumentIdentity ?? new FsusMarkdownDocumentIdentity("doc", 0);
+      store = new FsusMarkdownEditorTransactionStore(identity, Document);
+    }
+    else if (change.Property == DocumentProperty && store.Value != Document)
+    {
+      store.Reset(Document);
+    }
+  }
+
+  private void EnsureStore()
+  {
+    var identity = DocumentIdentity ?? new FsusMarkdownDocumentIdentity("doc", 0);
+    if (!store.Identity.Equals(identity))
+    {
+      store = new FsusMarkdownEditorTransactionStore(identity, Document);
+    }
   }
 
   public string Document

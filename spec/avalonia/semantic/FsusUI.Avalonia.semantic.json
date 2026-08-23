@@ -7411,6 +7411,14 @@
           "canRead": true,
           "canWrite": true,
           "isStatic": false
+        },
+        {
+          "name": "TransactionStore",
+          "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorTransactionStore",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
         }
       ],
       "avaloniaProperties": [
@@ -7472,6 +7480,24 @@
       "events": [],
       "methods": [
         {
+          "name": "Dispatch",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusMarkdownEditorDispatchResult",
+          "parameters": [
+            {
+              "name": "transaction",
+              "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorTransaction",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "RedoDocument",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusMarkdownEditorDispatchResult",
+          "parameters": []
+        },
+        {
           "name": "TryRunCommand",
           "isStatic": false,
           "returnType": "System.Boolean",
@@ -7482,6 +7508,12 @@
               "optional": false
             }
           ]
+        },
+        {
+          "name": "UndoDocument",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusMarkdownEditorDispatchResult",
+          "parameters": []
         }
       ]
     },
@@ -7572,6 +7604,123 @@
         {
           "name": "Minimal",
           "value": 2
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusMarkdownEditorDispatchResult",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Accepted",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "CanRedo",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "CanUndo",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Reason",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Revision",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Selection",
+          "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorSelection",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Value",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusMarkdownEditorDispatchResult",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "Accepted",
+              "type": "System.Boolean\u0026",
+              "optional": false
+            },
+            {
+              "name": "Value",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "Revision",
+              "type": "System.Int32\u0026",
+              "optional": false
+            },
+            {
+              "name": "Selection",
+              "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorSelection\u0026",
+              "optional": false
+            },
+            {
+              "name": "Reason",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "CanUndo",
+              "type": "System.Boolean\u0026",
+              "optional": false
+            },
+            {
+              "name": "CanRedo",
+              "type": "System.Boolean\u0026",
+              "optional": false
+            }
+          ]
         }
       ]
     },
@@ -7733,6 +7882,71 @@
       ]
     },
     {
+      "name": "FsusUI.Avalonia.Controls.FsusMarkdownEditorShellMutation",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Accepted",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Equivalent",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Kind",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusMarkdownEditorShellMutation",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "Kind",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "Equivalent",
+              "type": "System.Boolean\u0026",
+              "optional": false
+            },
+            {
+              "name": "Accepted",
+              "type": "System.Boolean\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "FsusUI.Avalonia.Controls.FsusMarkdownEditorStatusDensity",
       "kind": "enum",
       "baseType": "System.Enum",
@@ -7754,6 +7968,211 @@
         {
           "name": "Detailed",
           "value": 2
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusMarkdownEditorTransaction",
+      "kind": "record",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Changes",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CFsusUI.Avalonia.Controls.FsusMarkdownEditorChange\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ExpectedRevision",
+          "type": "System.Int32?",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "History",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Origin",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Selection",
+          "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorSelection",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "\u003CClone\u003E$",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusMarkdownEditorTransaction",
+          "parameters": []
+        },
+        {
+          "name": "Deconstruct",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "Changes",
+              "type": "System.Collections.Generic.IReadOnlyList\u00601[[FsusUI.Avalonia.Controls.FsusMarkdownEditorChange, FsusUI.Avalonia, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]\u0026",
+              "optional": false
+            },
+            {
+              "name": "History",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "Origin",
+              "type": "System.String\u0026",
+              "optional": false
+            },
+            {
+              "name": "ExpectedRevision",
+              "type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]\u0026",
+              "optional": false
+            },
+            {
+              "name": "Selection",
+              "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorSelection\u0026",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusMarkdownEditorTransactionStore",
+      "kind": "class",
+      "baseType": "System.Object",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Identity",
+          "type": "FsusUI.Avalonia.Controls.FsusMarkdownDocumentIdentity",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "RedoDepth",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Revision",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Selection",
+          "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorSelection",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "UndoDepth",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Value",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "Dispatch",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusMarkdownEditorDispatchResult",
+          "parameters": [
+            {
+              "name": "transaction",
+              "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorTransaction",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "EvaluateMutations",
+          "isStatic": true,
+          "returnType": "System.Collections.Generic.IReadOnlyList\u003CFsusUI.Avalonia.Controls.FsusMarkdownEditorShellMutation\u003E",
+          "parameters": [
+            {
+              "name": "first",
+              "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorTransactionStore",
+              "optional": false
+            },
+            {
+              "name": "second",
+              "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorTransactionStore",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "Redo",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusMarkdownEditorDispatchResult",
+          "parameters": []
+        },
+        {
+          "name": "Reset",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "value",
+              "type": "System.String",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "Undo",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusMarkdownEditorDispatchResult",
+          "parameters": []
         }
       ]
     },
