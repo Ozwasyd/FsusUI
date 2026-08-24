@@ -1,20 +1,12 @@
 {
   "classificationReceipt": {
-    "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v1",
+    "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
     "ownerRepository": "Ozwasyd/FsusUI",
     "affectedSurfaces": ["component-demo"],
     "uiDecisionClass": "prescribed",
     "verificationClass": "ux-path",
-    "requiredAuthorities": [
-      {
-        "id": "fsusui-design",
-        "path": "docs/design.md",
-        "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
-      }
-    ],
-    "requiredSkillDigests": [
-      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
-    ],
+    "requiredAuthorities": [{"id": "fsusui-design", "path": "docs/design.md", "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"}],
+    "requiredSkillDigests": ["bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"],
     "activeBaselineIdentity": {
       "repository": "Ozwasyd/FsusUI",
       "revision": "1111111111111111111111111111111111111111",
@@ -24,38 +16,22 @@
     },
     "candidateSha": "2222222222222222222222222222222222222222",
     "candidateDigest": "7777777777777777777777777777777777777777777777777777777777777777",
-    "stateEvidenceMatrix": [
-      {
-        "state": "default",
-        "viewport": "desktop",
-        "theme": "both",
-        "evidenceDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-      }
-    ],
+    "stateEvidenceMatrix": [{"state": "default", "viewport": "desktop", "theme": "both", "evidenceDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}],
     "inScope": ["one prescribed component state"],
     "outOfScope": ["component-family redesign"],
     "classificationEvidenceDigest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-    "routingPolicyDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "slicePolicyDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "domainPolicyDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     "status": "frozen",
     "receiptDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
   },
   "adjudicationClassificationReceipt": {
-    "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v1",
+    "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
     "ownerRepository": "Ozwasyd/FsusUI",
     "affectedSurfaces": ["shared-component-api"],
     "uiDecisionClass": "system-design-dispute",
     "verificationClass": "ux-system",
-    "requiredAuthorities": [
-      {
-        "id": "fsusui-design-governance",
-        "path": "docs/design/governance.md",
-        "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
-      }
-    ],
-    "requiredSkillDigests": [
-      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
-    ],
+    "requiredAuthorities": [{"id": "fsusui-design-governance", "path": "docs/design/governance.md", "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"}],
+    "requiredSkillDigests": ["bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"],
     "activeBaselineIdentity": {
       "repository": "Ozwasyd/FsusUI",
       "revision": "1111111111111111111111111111111111111111",
@@ -65,205 +41,57 @@
     },
     "candidateSha": "3333333333333333333333333333333333333333",
     "candidateDigest": "abababababababababababababababababababababababababababababababab",
-    "stateEvidenceMatrix": [
-      {
-        "state": "ownership-dispute",
-        "viewport": "all",
-        "theme": "not-applicable",
-        "evidenceDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-      }
-    ],
+    "stateEvidenceMatrix": [{"state": "ownership-dispute", "viewport": "all", "theme": "not-applicable", "evidenceDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"}],
     "inScope": ["component API ownership"],
     "outOfScope": ["new product direction"],
     "classificationEvidenceDigest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-    "routingPolicyDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "slicePolicyDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "domainPolicyDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     "status": "frozen",
     "receiptDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
   },
   "adjudicationReceipt": {
-    "schema": "fsusui-design-conformance.ui-system-adjudication-receipt.v1",
+    "schema": "fsusui-design-conformance.ui-system-adjudication-receipt.v2",
     "classificationReceiptDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     "ownerRepository": "Ozwasyd/FsusUI",
-    "authoritativeSkillDigests": [
-      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
-    ],
-    "authorityDigests": [
-      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
-    ],
+    "authoritativeSkillDigests": ["bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"],
+    "authorityDigests": ["cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"],
     "activeBaselineIdentityDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     "candidateSha": "3333333333333333333333333333333333333333",
     "candidateDigest": "abababababababababababababababababababababababababababababababab",
     "problemClassification": "component-api-ownership",
-    "routingProfile": "sol-high",
-    "actualModel": "gpt-5.6-sol",
-    "actualEffort": "high",
-    "freshContext": true,
-    "sandbox": "read-only",
-    "writeScope": "none",
+    "disposition": "fsusui-owned",
+    "allowedUiDecisionClass": "layout-judgment",
     "modifiedPaths": [],
-    "allowedImplementationClass": "sol-medium",
     "inScope": ["existing component API boundary"],
     "outOfScope": ["new component design"],
     "requiredConsumerOrLibraryIssue": null,
-    "requiredReslice": true,
-    "routingPolicyDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "slicePolicyDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "domainPolicyDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     "status": "adjudicated",
     "adjudicationDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
   },
-  "uiDispatch": {
-    "schema": "fsusui-design-conformance.ui-dispatch-contract.v1",
-    "stageRole": "ui-ux-implementer",
-    "implementationOwners": ["ui-ux-implementer"],
-    "domain": "ui-ux",
-    "uiDecisionClass": "prescribed",
-    "verificationClass": "ux-path",
-    "selectedProfile": "sol-low",
-    "actualModel": "gpt-5.6-sol",
-    "actualEffort": "low",
-    "targetWorktree": "/workspace/FsusUI",
-    "targetWorktreeDigest": "5656565656565656565656565656565656565656565656565656565656565656",
-    "implementationRunIdentityDigest": "1212121212121212121212121212121212121212121212121212121212121212",
-    "automaticPromotion": false,
-    "scopeClass": "coherent-slice",
-    "workShape": "atomic-edit",
-    "classificationReceiptDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "workPlanDigest": "1111111111111111111111111111111111111111111111111111111111111111",
-    "sliceDigest": "2222222222222222222222222222222222222222222222222222222222222222",
-    "compiledPromptDigest": "3333333333333333333333333333333333333333333333333333333333333333",
-    "checkpointPolicyDigest": "4444444444444444444444444444444444444444444444444444444444444444",
-    "executionRouteDigest": "5555555555555555555555555555555555555555555555555555555555555555",
-    "skillDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-    "authorityDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
-    "baselineDigest": "6666666666666666666666666666666666666666666666666666666666666666",
-    "candidateSha": "2222222222222222222222222222222222222222",
-    "candidateDigest": "7777777777777777777777777777777777777777777777777777777777777777",
-    "routingPolicyDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "slicePolicyDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "singleObjective": "Implement one prescribed visible component state.",
-    "firstRequiredAction": "Inspect the existing production fixture render.",
-    "firstReadTargets": ["vue/packages/components/example/src/example.vue"],
-    "firstWritablePath": "vue/packages/components/example/src/example.vue",
-    "stateViewportSubset": ["default@desktop"],
-    "requiredImplementationFiles": [
-      "vue/packages/components/example/src/example.vue"
-    ],
-    "requiredFocusedCommands": ["pnpm test:unit:components"],
-    "requiredRenderEvidence": ["production fixture screenshot"],
-    "explicitNonGoals": ["component-family redesign"],
-    "checkpointThresholds": {
-      "maxReadOnlyOperationsBeforeCheckpoint": 8,
-      "maxNoArtifactToolCalls": 4,
-      "activeDurationClass": "bounded"
-    },
-    "completionPredicate": "The prescribed state is rendered and focused checks pass.",
-    "continuationPredicate": "A verified checkpoint exists with one next action.",
-    "writeLease": {
-      "ownerRole": "ui-ux-implementer",
-      "writeScope": "implementation-only",
-      "modifiedPathClasses": ["implementation"]
-    },
-    "checkpoint": {
-      "kind": "implementation-progress",
-      "completedActions": [
-        "inspected production fixture",
-        "implemented prescribed state"
-      ],
-      "changedPaths": ["vue/packages/components/example/src/example.vue"],
-      "commands": ["pnpm test:unit:components"],
-      "diffDigest": "8888888888888888888888888888888888888888888888888888888888888888",
-      "nextRequiredAction": "Run the complete frozen stage matrix.",
-      "status": "verified",
-      "digest": "9999999999999999999999999999999999999999999999999999999999999999"
-    },
-    "sliceStatus": "slice-terminal",
-    "stageStatus": "implementing-self-testing",
-    "outcome": "slice-terminal",
-    "consumerWorkaround": false,
-    "memberIsolation": {
-      "inheritedProfile": false,
-      "inheritedBaseline": false,
-      "inheritedSlice": false
-    },
-    "recovery": {
-      "failureClass": null,
-      "retryBasis": null
-    }
-  },
   "uxAcceptanceReceipt": {
-    "schema": "fsusui-design-conformance.ux-acceptance-receipt.v1",
+    "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
     "classificationReceiptDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "dispatchReceiptDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     "candidateSha": "2222222222222222222222222222222222222222",
     "candidateDigest": "7777777777777777777777777777777777777777777777777777777777777777",
     "verificationClass": "ux-path",
-    "routingProfile": "sol-high",
-    "actualModel": "gpt-5.6-sol",
-    "actualEffort": "high",
-    "verifierRole": "ux-acceptance-verifier",
-    "implementationRunIdentityDigest": "1212121212121212121212121212121212121212121212121212121212121212",
-    "verifierRunIdentityDigest": "3434343434343434343434343434343434343434343434343434343434343434",
-    "requiredSkillDigests": [
-      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
-    ],
-    "authorityDigests": [
-      "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
-    ],
+    "requiredSkillDigests": ["bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"],
+    "authorityDigests": ["cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"],
     "activeBaselineIdentityDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "workPlanDigest": "1111111111111111111111111111111111111111111111111111111111111111",
-    "slicePlanDigest": "2222222222222222222222222222222222222222222222222222222222222222",
-    "compiledPromptDigest": "3333333333333333333333333333333333333333333333333333333333333333",
-    "executionRouteDigest": "5555555555555555555555555555555555555555555555555555555555555555",
-    "routingPolicyDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "slicePolicyDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    "freshContext": true,
-    "sandbox": "read-only",
-    "writeScope": "none",
+    "domainPolicyDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "independenceEvidenceDigest": "3434343434343434343434343434343434343434343434343434343434343434",
     "modifiedPaths": [],
     "productionFixture": true,
     "viewportStateMatrix": [
-      {
-        "viewport": "desktop",
-        "state": "default",
-        "theme": "light",
-        "inputModes": ["pointer", "keyboard", "zoom"],
-        "evidenceDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-      },
-      {
-        "viewport": "mobile",
-        "state": "interactive",
-        "theme": "dark",
-        "inputModes": ["touch", "screen-reader", "reduced-motion"],
-        "evidenceDigest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
-      }
+      {"viewport": "desktop", "state": "default", "theme": "light", "inputModes": ["pointer", "keyboard", "zoom"], "evidenceDigest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"},
+      {"viewport": "mobile", "state": "interactive", "theme": "dark", "inputModes": ["touch", "screen-reader", "reduced-motion"], "evidenceDigest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"}
     ],
     "inspectedRenderedArtifacts": [
-      {
-        "id": "component-state-light",
-        "kind": "screenshot",
-        "path": "artifacts/component-state-light.png",
-        "digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-        "inspected": true,
-        "fixtureClass": "production"
-      },
-      {
-        "id": "component-state-a11y",
-        "kind": "screen-reader-report",
-        "path": "artifacts/component-state-a11y.json",
-        "digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-        "inspected": true,
-        "fixtureClass": "production"
-      }
+      {"id": "component-state-light", "kind": "screenshot", "path": "artifacts/component-state-light.png", "digest": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "inspected": true, "fixtureClass": "production"},
+      {"id": "component-state-a11y", "kind": "screen-reader-report", "path": "artifacts/component-state-a11y.json", "digest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", "inspected": true, "fixtureClass": "production"}
     ],
     "blockers": [],
     "status": "accepted",
     "receiptDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-  },
-  "stageGates": {
-    "candidateGreen": true,
-    "behaviorGreen": true,
-    "uxAccepted": true,
-    "documentationStarted": true
   }
 }
