@@ -39,7 +39,6 @@ const paths = Object.freeze({
 })
 
 const HASH = /^[a-f0-9]{64}$/u
-const SHA = /^[a-f0-9]{40}$/u
 const clone = (value) => JSON.parse(JSON.stringify(value))
 
 export class FsusUIContractError extends Error {
@@ -115,9 +114,7 @@ export const loadFsusUIDesignConformanceAssets = async () => {
 }
 
 const compileSchemas = (schemas) => {
-  const ajv = new Ajv({
-    allErrors: true,
-  })
+  const ajv = new Ajv({ allErrors: true })
   return {
     ajv,
     validators: Object.fromEntries(
@@ -156,145 +153,122 @@ const authorityDigests = (classification) =>
 const baselineIdentityDigest = (classification) =>
   digestValue(classification.activeBaselineIdentity)
 
-const assertPolicyContract = (policy) => {
-  if (
-    !sameValues(policy.uiDecisionRoutes, {
-      prescribed: 'sol-low',
-      'bounded-composition': 'sol-low',
-      'layout-judgment': 'sol-medium',
-      'interaction-judgment': 'sol-medium',
-      'system-design-dispute': 'stop-and-adjudicate',
-    }) ||
-    !sameValues(policy.verificationRoutes, {
-      'ux-local': 'sol-medium',
-      'ux-path': 'sol-high',
-      'ux-system': 'sol-xhigh',
-    }) ||
-    !sameValues(policy.uiImplementationRuntime, {
-      actualModel: 'gpt-5.6-sol',
-      profileEfforts: {
-        'sol-low': 'low',
-        'sol-medium': 'medium',
-      },
-    }) ||
-    !sameValues(policy.writeLeaseOrder, [
-      'test-owner',
-      'ui-ux-implementer',
-      'documentation-writer',
-    ]) ||
-    !sameValues(policy.readOnlyStages, [
-      'behavior-verifier',
-      'ui-system-adjudicator',
-      'ux-acceptance-verifier',
-    ]) ||
-    !sameValues(policy.resliceWorkShapes, [
-      'context-heavy',
-      'high-tool-depth',
-      'long-horizon-cross-module',
-    ]) ||
-    !sameValues(policy.requiredDispatchIdentityFields, [
-      'actualModel',
-      'actualEffort',
-      'targetWorktree',
-      'candidateSha',
-    ]) ||
-    !sameValues(policy.requiredDispatchDigestFields, [
-      'classificationReceiptDigest',
-      'workPlanDigest',
-      'sliceDigest',
-      'compiledPromptDigest',
-      'checkpointPolicyDigest',
-      'executionRouteDigest',
-      'skillDigest',
-      'authorityDigest',
-      'baselineDigest',
-      'targetWorktreeDigest',
-      'implementationRunIdentityDigest',
-      'candidateDigest',
-    ])
-  ) {
-    fail('ui-policy-contract')
+const forbiddenPolicyKeys = new Set([
+  'roleProfiles',
+  'rolePermissions',
+  'writeLeaseOrder',
+  'readOnlyStages',
+  'stageOrder',
+  'uiDecisionRoutes',
+  'verificationRoutes',
+  'uiImplementationRuntime',
+  'implementationForbiddenProfiles',
+  'resliceWorkShapes',
+  'requiredDispatchDigestFields',
+  'requiredDispatchIdentityFields',
+  'allowedWriterOutcomes',
+  'outputMissingClasses',
+  'retryBases',
+  'routeCells',
+  'selectedProfile',
+  'routingProfile',
+  'actualModel',
+  'actualEffort',
+])
+
+const assertNoOrchestrationKeys = (value, path = 'policy') => {
+  if (Array.isArray(value)) {
+    value.forEach((item, index) =>
+      assertNoOrchestrationKeys(item, `${path}[${index}]`),
+    )
+    return
   }
-  const requiredProfiles = {
-    'root-scheduler': ['luna-low'],
-    'test-owner': ['sol-high', 'terra-max', 'sol-xhigh'],
-    'behavior-verifier': ['sol-high', 'terra-max', 'sol-xhigh'],
-    'ui-ux-implementer': ['sol-low', 'sol-medium'],
-    'ui-system-adjudicator': ['sol-high', 'sol-xhigh'],
-    'ux-acceptance-verifier': ['sol-medium', 'sol-high', 'sol-xhigh'],
-    'documentation-writer': ['luna-high', 'luna-max'],
-  }
-  const requiredPermissions = {
-    'test-owner': {
-      freshContext: false,
-      sandbox: 'workspace-write',
-      writeScope: 'tests-fixtures-probes-only',
-    },
-    'ui-ux-implementer': {
-      freshContext: false,
-      sandbox: 'workspace-write',
-      writeScope: 'implementation-only',
-    },
-    'behavior-verifier': {
-      freshContext: true,
-      sandbox: 'read-only',
-      writeScope: 'none',
-    },
-    'ui-system-adjudicator': {
-      freshContext: true,
-      sandbox: 'read-only',
-      writeScope: 'none',
-    },
-    'ux-acceptance-verifier': {
-      freshContext: true,
-      sandbox: 'read-only',
-      writeScope: 'none',
-    },
-    'documentation-writer': {
-      freshContext: false,
-      sandbox: 'workspace-write',
-      writeScope: 'documentation-only',
-    },
-  }
-  if (
-    !sameValues(policy.roleProfiles, requiredProfiles) ||
-    !sameValues(policy.rolePermissions, requiredPermissions)
-  ) {
-    fail('ui-role-lease-policy')
+  if (!value || typeof value !== 'object') return
+  for (const [key, child] of Object.entries(value)) {
+    if (forbiddenPolicyKeys.has(key)) {
+      fail('ui-orchestration-authority-leak', `${path}.${key}`)
+    }
+    assertNoOrchestrationKeys(child, `${path}.${key}`)
   }
 }
 
+const assertPolicyContract = (policy) => {
+  if (
+    policy.schema !== 'fsusui-design-conformance.ui-stage-policy.v2' ||
+    policy.policyVersion !== 'fsusui-ui-domain.v2' ||
+    policy.authorityScope !== 'repository-domain-and-acceptance-only' ||
+    policy.sharedOrchestrationAuthority !== 'external' ||
+    !sameValues(policy.uiDecisionClasses, [
+      'prescribed',
+      'bounded-composition',
+      'layout-judgment',
+      'interaction-judgment',
+      'system-design-dispute',
+    ]) ||
+    !sameValues(policy.verificationClasses, [
+      'ux-local',
+      'ux-path',
+      'ux-system',
+    ]) ||
+    policy.systemDesignDisputeClass !== 'system-design-dispute'
+  ) {
+    fail('ui-policy-contract')
+  }
+
+  if (
+    !sameValues(policy.implementationOwnership, {
+      allowedPathClass: 'implementation',
+      forbiddenPathClasses: [
+        'tests',
+        'fixtures',
+        'snapshots',
+        'acceptance-mapping',
+        'design-authorities',
+        'skill-contracts',
+      ],
+      acceptanceMayModifyImplementation: false,
+      adjudicationMayModifyImplementation: false,
+    }) ||
+    !sameValues(policy.acceptanceRequirements, {
+      requiresRenderedEvidence: true,
+      requiresProductionFixture: true,
+      acceptedReceiptRequiresZeroBlockers: true,
+      independentAcceptanceRequired: true,
+    })
+  ) {
+    fail('ui-domain-ownership-policy')
+  }
+
+  assertNoOrchestrationKeys(policy)
+}
+
 const assertSourceBindings = (assets) => {
-  const allWorkflowText = `${assets.sources.skill}\n${assets.sources.workflow}`
-  const normalizedWorkflowText = allWorkflowText.replace(/[-\s]+/gu, ' ')
+  const normativeText = [
+    assets.sources.skill,
+    assets.sources.workflow,
+    assets.sources.consumer,
+  ].join('\n')
+
   for (const fragment of [
-    'fsusui-design-conformance.ui-ux-classification-receipt.v1',
-    'fsusui-design-conformance.ui-system-adjudication-receipt.v1',
-    'fsusui-design-conformance.ux-acceptance-receipt.v1',
-    'test owner -> UI/UX implementer -> documentation writer',
-    'context-heavy',
-    'high-tool-depth',
-    'long-horizon-cross-module',
-    'slice-continuation-required',
-    'candidate-green',
-    'production',
+    'fsusui-design-conformance.ui-ux-classification-receipt.v2',
+    'fsusui-design-conformance.ui-system-adjudication-receipt.v2',
+    'fsusui-design-conformance.ux-acceptance-receipt.v2',
+    'shared orchestration authority',
+    'domainPolicyDigest',
     'screen reader',
-    'candidate SHA',
-    'target worktree',
-    'implementation run',
-    'verifier run',
   ]) {
-    if (!normalizedWorkflowText.includes(fragment.replace(/[-\s]+/gu, ' '))) {
+    if (!normativeText.includes(fragment)) {
       fail('ui-source-contract-drift', fragment)
     }
   }
-  if (
-    !assets.sources.consumer.includes(
-      'canonical Skill is a required procedural contract',
-    )
-  ) {
-    fail('ui-consumer-skill-load-ambiguity')
+
+  const forbiddenProfileLiteral =
+    /\b(?:luna|terra|sol)-(?:low|medium|high|xhigh|max)\b|gpt-5\.6-(?:sol|terra)/u
+  const match = normativeText.match(forbiddenProfileLiteral)
+  if (match) {
+    fail('ui-source-orchestration-authority-leak', match[0])
   }
+
   const scripts = assets.sources.packageManifest.scripts ?? {}
   if (
     scripts['check:fsusui-design-conformance'] !==
@@ -308,18 +282,22 @@ const assertSourceBindings = (assets) => {
 export const buildValidFsusUIContractBundle = async (assetsInput) => {
   const assets = assetsInput ?? (await loadFsusUIDesignConformanceAssets())
   const templates = clone(assets.validTemplates)
-  const bindPolicy = (receipt) => {
-    receipt.routingPolicyDigest = assets.policyDigest
-    receipt.slicePolicyDigest = assets.policyDigest
+
+  const bindClassification = (receipt) => {
+    receipt.domainPolicyDigest = assets.policyDigest
     receipt.activeBaselineIdentity.authorityDigest = digestValue(
       receipt.requiredAuthorities.map(({ digest }) => digest),
     )
     return sealReceipt(receipt, 'receiptDigest')
   }
-  const classificationReceipt = bindPolicy(templates.classificationReceipt)
-  const adjudicationClassificationReceipt = bindPolicy(
+
+  const classificationReceipt = bindClassification(
+    templates.classificationReceipt,
+  )
+  const adjudicationClassificationReceipt = bindClassification(
     templates.adjudicationClassificationReceipt,
   )
+
   const adjudicationReceipt = templates.adjudicationReceipt
   adjudicationReceipt.classificationReceiptDigest =
     adjudicationClassificationReceipt.receiptDigest
@@ -337,218 +315,50 @@ export const buildValidFsusUIContractBundle = async (assetsInput) => {
     adjudicationClassificationReceipt.candidateSha
   adjudicationReceipt.candidateDigest =
     adjudicationClassificationReceipt.candidateDigest
-  adjudicationReceipt.routingPolicyDigest = assets.policyDigest
-  adjudicationReceipt.slicePolicyDigest = assets.policyDigest
-
-  const uiDispatch = templates.uiDispatch
-  uiDispatch.classificationReceiptDigest = classificationReceipt.receiptDigest
-  uiDispatch.routingPolicyDigest = assets.policyDigest
-  uiDispatch.slicePolicyDigest = assets.policyDigest
-  uiDispatch.skillDigest =
-    classificationReceipt.activeBaselineIdentity.skillDigest
-  uiDispatch.authorityDigest =
-    classificationReceipt.activeBaselineIdentity.authorityDigest
-  uiDispatch.baselineDigest = baselineIdentityDigest(classificationReceipt)
-  uiDispatch.candidateSha = classificationReceipt.candidateSha
-  uiDispatch.candidateDigest = classificationReceipt.candidateDigest
+  adjudicationReceipt.domainPolicyDigest = assets.policyDigest
 
   const uxAcceptanceReceipt = templates.uxAcceptanceReceipt
   uxAcceptanceReceipt.classificationReceiptDigest =
     classificationReceipt.receiptDigest
-  uxAcceptanceReceipt.dispatchReceiptDigest = digestValue(uiDispatch)
+  uxAcceptanceReceipt.candidateSha = classificationReceipt.candidateSha
+  uxAcceptanceReceipt.candidateDigest = classificationReceipt.candidateDigest
+  uxAcceptanceReceipt.verificationClass =
+    classificationReceipt.verificationClass
   uxAcceptanceReceipt.requiredSkillDigests =
     classificationReceipt.requiredSkillDigests
   uxAcceptanceReceipt.authorityDigests = authorityDigests(classificationReceipt)
-  uxAcceptanceReceipt.activeBaselineIdentityDigest = baselineIdentityDigest(
-    classificationReceipt,
-  )
-  uxAcceptanceReceipt.workPlanDigest = uiDispatch.workPlanDigest
-  uxAcceptanceReceipt.slicePlanDigest = uiDispatch.sliceDigest
-  uxAcceptanceReceipt.compiledPromptDigest = uiDispatch.compiledPromptDigest
-  uxAcceptanceReceipt.executionRouteDigest = uiDispatch.executionRouteDigest
-  uxAcceptanceReceipt.implementationRunIdentityDigest =
-    uiDispatch.implementationRunIdentityDigest
-  uxAcceptanceReceipt.routingPolicyDigest = assets.policyDigest
-  uxAcceptanceReceipt.slicePolicyDigest = assets.policyDigest
-  uxAcceptanceReceipt.candidateSha = uiDispatch.candidateSha
-  uxAcceptanceReceipt.candidateDigest = uiDispatch.candidateDigest
+  uxAcceptanceReceipt.activeBaselineIdentityDigest =
+    baselineIdentityDigest(classificationReceipt)
+  uxAcceptanceReceipt.domainPolicyDigest = assets.policyDigest
 
   return {
     classificationReceipt,
     adjudicationClassificationReceipt,
-    adjudicationReceipt: sealReceipt(adjudicationReceipt, 'adjudicationDigest'),
-    uiDispatch,
-    uxAcceptanceReceipt: sealReceipt(uxAcceptanceReceipt, 'receiptDigest'),
-    stageGates: templates.stageGates,
+    adjudicationReceipt: sealReceipt(
+      adjudicationReceipt,
+      'adjudicationDigest',
+    ),
+    uxAcceptanceReceipt: sealReceipt(
+      uxAcceptanceReceipt,
+      'receiptDigest',
+    ),
   }
-}
-
-export const resolveUiImplementationRoute = (
-  policy,
-  classification,
-  workShape,
-) => {
-  if (classification === 'system-design-dispute') {
-    return 'stop-and-adjudicate'
-  }
-  if (policy.resliceWorkShapes.includes(workShape)) return 'reslice-required'
-  return policy.uiDecisionRoutes[classification]
-}
-
-export const validateUiDispatchContract = (
-  dispatch,
-  classification,
-  policy,
-) => {
-  if (
-    dispatch.stageRole !== 'ui-ux-implementer' ||
-    dispatch.domain !== 'ui-ux'
-  ) {
-    fail('ui-owner-role')
-  }
-  if (
-    !Array.isArray(dispatch.implementationOwners) ||
-    dispatch.implementationOwners.length !== 1 ||
-    dispatch.implementationOwners[0] !== 'ui-ux-implementer'
-  ) {
-    fail('ui-owner-count')
-  }
-  if (dispatch.scopeClass !== 'coherent-slice') fail('ui-slice-scope')
-  for (const field of [
-    'singleObjective',
-    'firstRequiredAction',
-    'firstWritablePath',
-    'completionPredicate',
-    'continuationPredicate',
-  ]) {
-    if (typeof dispatch[field] !== 'string' || !dispatch[field].trim()) {
-      fail('ui-prompt-incomplete')
-    }
-  }
-  for (const field of [
-    'firstReadTargets',
-    'stateViewportSubset',
-    'requiredImplementationFiles',
-    'requiredFocusedCommands',
-    'requiredRenderEvidence',
-    'explicitNonGoals',
-  ]) {
-    if (!Array.isArray(dispatch[field]) || dispatch[field].length === 0) {
-      fail('ui-prompt-incomplete')
-    }
-  }
-  if (dispatch.uiDecisionClass === 'system-design-dispute') {
-    fail('ui-adjudication-required')
-  }
-  const expectedProfile = resolveUiImplementationRoute(
-    policy,
-    dispatch.uiDecisionClass,
-    dispatch.workShape,
-  )
-  if (expectedProfile === 'reslice-required') fail('ui-reslice-required')
-  if (
-    policy.implementationForbiddenProfiles.includes(dispatch.selectedProfile)
-  ) {
-    fail('ui-profile-forbidden')
-  }
-  if (dispatch.selectedProfile !== expectedProfile) {
-    fail('ui-profile-selection')
-  }
-  const expectedEffort =
-    policy.uiImplementationRuntime.profileEfforts[dispatch.selectedProfile]
-  if (
-    dispatch.actualModel !== policy.uiImplementationRuntime.actualModel ||
-    dispatch.actualEffort !== expectedEffort ||
-    typeof dispatch.targetWorktree !== 'string' ||
-    !dispatch.targetWorktree.trim() ||
-    !SHA.test(dispatch.candidateSha ?? '')
-  ) {
-    fail('ui-runtime-identity')
-  }
-  if (dispatch.automaticPromotion !== false) fail('ui-automatic-promotion')
-  if (
-    dispatch.classificationReceiptDigest !== classification.receiptDigest ||
-    dispatch.uiDecisionClass !== classification.uiDecisionClass ||
-    dispatch.verificationClass !== classification.verificationClass ||
-    dispatch.candidateSha !== classification.candidateSha ||
-    dispatch.candidateDigest !== classification.candidateDigest
-  ) {
-    fail('ui-classification-binding')
-  }
-  for (const field of policy.requiredDispatchDigestFields) {
-    if (!HASH.test(dispatch[field] ?? '')) fail('ui-digest-binding')
-  }
-  if (
-    dispatch.routingPolicyDigest !== classification.routingPolicyDigest ||
-    dispatch.slicePolicyDigest !== classification.slicePolicyDigest ||
-    dispatch.skillDigest !==
-      classification.activeBaselineIdentity.skillDigest ||
-    dispatch.authorityDigest !==
-      classification.activeBaselineIdentity.authorityDigest ||
-    dispatch.baselineDigest !== baselineIdentityDigest(classification)
-  ) {
-    fail('ui-digest-binding')
-  }
-  const lease = dispatch.writeLease
-  if (
-    lease?.ownerRole !== 'ui-ux-implementer' ||
-    lease.writeScope !== 'implementation-only' ||
-    !sameValues(lease.modifiedPathClasses, ['implementation'])
-  ) {
-    fail('ui-write-scope')
-  }
-  const checkpoint = dispatch.checkpoint
-  if (
-    !checkpoint ||
-    checkpoint.status !== 'verified' ||
-    !Array.isArray(checkpoint.completedActions) ||
-    checkpoint.completedActions.length === 0 ||
-    !Array.isArray(checkpoint.commands) ||
-    checkpoint.commands.length === 0 ||
-    !HASH.test(checkpoint.diffDigest ?? '') ||
-    !HASH.test(checkpoint.digest ?? '') ||
-    typeof checkpoint.nextRequiredAction !== 'string' ||
-    !checkpoint.nextRequiredAction.trim()
-  ) {
-    fail('ui-checkpoint-evidence')
-  }
-  if (
-    dispatch.stageStatus === 'candidate-green' &&
-    dispatch.sliceStatus !== 'slice-terminal'
-  ) {
-    fail('ui-partial-candidate-green')
-  }
-  if (!policy.allowedWriterOutcomes.includes(dispatch.outcome)) {
-    fail('ui-writer-outcome')
-  }
-  if (dispatch.consumerWorkaround !== false) fail('ui-consumer-workaround')
-  if (Object.values(dispatch.memberIsolation ?? {}).some(Boolean)) {
-    fail('ui-member-isolation')
-  }
-  if (dispatch.recovery?.failureClass !== null) {
-    if (
-      !policy.outputMissingClasses.includes(dispatch.recovery.failureClass) ||
-      !policy.retryBases.includes(dispatch.recovery.retryBasis)
-    ) {
-      fail('ui-retry-authorization')
-    }
-  } else if (dispatch.recovery?.retryBasis !== null) {
-    fail('ui-retry-authorization')
-  }
-  return dispatch
 }
 
 const validateClassificationReceipt = (receipt, assets, compiled) => {
   assertSchema('classification', receipt, compiled)
-  assertReceiptDigest(receipt, 'receiptDigest', 'classification-receipt-digest')
+  assertReceiptDigest(
+    receipt,
+    'receiptDigest',
+    'classification-receipt-digest',
+  )
   if (
     !receipt.requiredSkillDigests.includes(
       receipt.activeBaselineIdentity.skillDigest,
     ) ||
     receipt.activeBaselineIdentity.authorityDigest !==
       digestValue(authorityDigests(receipt)) ||
-    receipt.routingPolicyDigest !== assets.policyDigest ||
-    receipt.slicePolicyDigest !== assets.policyDigest
+    receipt.domainPolicyDigest !== assets.policyDigest
   ) {
     fail('classification-receipt-binding')
   }
@@ -568,7 +378,8 @@ const validateAdjudicationReceipt = (
     'adjudication-receipt-digest',
   )
   if (
-    classification.uiDecisionClass !== 'system-design-dispute' ||
+    classification.uiDecisionClass !==
+      assets.policy.systemDesignDisputeClass ||
     receipt.classificationReceiptDigest !== classification.receiptDigest ||
     receipt.ownerRepository !== classification.ownerRepository ||
     !sameValues(
@@ -580,17 +391,9 @@ const validateAdjudicationReceipt = (
       baselineIdentityDigest(classification) ||
     receipt.candidateSha !== classification.candidateSha ||
     receipt.candidateDigest !== classification.candidateDigest ||
-    receipt.routingPolicyDigest !== assets.policyDigest ||
-    receipt.slicePolicyDigest !== assets.policyDigest
+    receipt.domainPolicyDigest !== assets.policyDigest
   ) {
     fail('adjudication-receipt-binding')
-  }
-  const expectedEffort = {
-    'sol-high': 'high',
-    'sol-xhigh': 'xhigh',
-  }[receipt.routingProfile]
-  if (receipt.actualEffort !== expectedEffort) {
-    fail('adjudication-runtime-profile')
   }
   return receipt
 }
@@ -598,26 +401,20 @@ const validateAdjudicationReceipt = (
 const validateUxAcceptanceReceipt = (
   receipt,
   classification,
-  dispatch,
   assets,
   compiled,
 ) => {
   assertSchema('uxAcceptance', receipt, compiled)
-  assertReceiptDigest(receipt, 'receiptDigest', 'ux-acceptance-receipt-digest')
-  const expectedProfile =
-    assets.policy.verificationRoutes[receipt.verificationClass]
-  const expectedEffort = expectedProfile.replace('sol-', '')
+  assertReceiptDigest(
+    receipt,
+    'receiptDigest',
+    'ux-acceptance-receipt-digest',
+  )
   if (
     receipt.classificationReceiptDigest !== classification.receiptDigest ||
-    receipt.dispatchReceiptDigest !== digestValue(dispatch) ||
     receipt.verificationClass !== classification.verificationClass ||
-    receipt.routingProfile !== expectedProfile ||
-    receipt.actualEffort !== expectedEffort ||
-    receipt.verifierRole !== 'ux-acceptance-verifier' ||
-    receipt.implementationRunIdentityDigest !==
-      dispatch.implementationRunIdentityDigest ||
-    receipt.implementationRunIdentityDigest ===
-      receipt.verifierRunIdentityDigest ||
+    receipt.candidateSha !== classification.candidateSha ||
+    receipt.candidateDigest !== classification.candidateDigest ||
     !sameValues(
       receipt.requiredSkillDigests,
       classification.requiredSkillDigests,
@@ -625,14 +422,7 @@ const validateUxAcceptanceReceipt = (
     !sameValues(receipt.authorityDigests, authorityDigests(classification)) ||
     receipt.activeBaselineIdentityDigest !==
       baselineIdentityDigest(classification) ||
-    receipt.workPlanDigest !== dispatch.workPlanDigest ||
-    receipt.slicePlanDigest !== dispatch.sliceDigest ||
-    receipt.compiledPromptDigest !== dispatch.compiledPromptDigest ||
-    receipt.executionRouteDigest !== dispatch.executionRouteDigest ||
-    receipt.routingPolicyDigest !== assets.policyDigest ||
-    receipt.slicePolicyDigest !== assets.policyDigest ||
-    receipt.candidateSha !== dispatch.candidateSha ||
-    receipt.candidateDigest !== dispatch.candidateDigest
+    receipt.domainPolicyDigest !== assets.policyDigest
   ) {
     fail('ux-acceptance-receipt-binding')
   }
@@ -642,15 +432,14 @@ const validateUxAcceptanceReceipt = (
 export const validateFsusUIContractBundle = async (bundle, assetsInput) => {
   const assets = assetsInput ?? (await loadFsusUIDesignConformanceAssets())
   assertSourceBindings(assets)
-  if (
-    assets.policy.schema !== 'fsusui-design-conformance.ui-stage-policy.v1' ||
-    assets.policy.policyVersion !== 'fsusui-ui-stage.v1'
-  ) {
-    fail('ui-policy-version')
-  }
   assertPolicyContract(assets.policy)
+
   const compiled = compileSchemas(assets.schemas)
-  validateClassificationReceipt(bundle.classificationReceipt, assets, compiled)
+  validateClassificationReceipt(
+    bundle.classificationReceipt,
+    assets,
+    compiled,
+  )
   validateClassificationReceipt(
     bundle.adjudicationClassificationReceipt,
     assets,
@@ -662,26 +451,12 @@ export const validateFsusUIContractBundle = async (bundle, assetsInput) => {
     assets,
     compiled,
   )
-  validateUiDispatchContract(
-    bundle.uiDispatch,
-    bundle.classificationReceipt,
-    assets.policy,
-  )
   validateUxAcceptanceReceipt(
     bundle.uxAcceptanceReceipt,
     bundle.classificationReceipt,
-    bundle.uiDispatch,
     assets,
     compiled,
   )
-  if (
-    bundle.stageGates.documentationStarted === true &&
-    (bundle.stageGates.behaviorGreen !== true ||
-      bundle.stageGates.uxAccepted !== true ||
-      bundle.uxAcceptanceReceipt.status !== 'accepted')
-  ) {
-    fail('documentation-before-ux-accepted')
-  }
   return bundle
 }
 
@@ -691,83 +466,65 @@ const reseal = (bundle, key, digestField) => {
 
 export const applyNegativeControl = (bundleInput, id) => {
   const bundle = clone(bundleInput)
-  const dispatch = bundle.uiDispatch
   switch (id) {
-    case 'N01-ordinary-code-owner-implements-ui':
-      dispatch.stageRole = 'code-implementer'
+    case 'N01-classification-skill-digest-missing':
+      bundle.classificationReceipt.requiredSkillDigests = []
       break
-    case 'N02-overlapping-ui-ux-owners':
-      dispatch.implementationOwners.push('ux-implementer')
+    case 'N02-classification-candidate-drift':
+      bundle.classificationReceipt.candidateSha =
+        '9999999999999999999999999999999999999999'
       break
-    case 'N03-full-component-system-unsliced':
-      dispatch.scopeClass = 'full-component-system'
+    case 'N03-classification-policy-drift':
+      bundle.classificationReceipt.domainPolicyDigest =
+        '9999999999999999999999999999999999999999999999999999999999999999'
+      reseal(bundle, 'classificationReceipt', 'receiptDigest')
       break
-    case 'N04-prompt-missing-first-action':
-      dispatch.firstRequiredAction = ''
-      dispatch.firstWritablePath = ''
-      dispatch.explicitNonGoals = []
+    case 'N04-system-dispute-without-matching-adjudication':
+      bundle.adjudicationReceipt.classificationReceiptDigest =
+        '9999999999999999999999999999999999999999999999999999999999999999'
+      reseal(bundle, 'adjudicationReceipt', 'adjudicationDigest')
       break
-    case 'N05-prescribed-promoted-to-medium':
-      dispatch.selectedProfile = 'sol-medium'
-      break
-    case 'N06-ui-implementer-uses-high':
-      dispatch.selectedProfile = 'sol-high'
-      break
-    case 'N07-output-missing-auto-promotes':
-      dispatch.automaticPromotion = true
-      dispatch.recovery = {
-        failureClass: 'agent-first-action-not-executed',
-        retryBasis: 'verified-profile-capability-mismatch',
-      }
-      break
-    case 'N08-long-horizon-not-resliced':
-      dispatch.workShape = 'long-horizon-cross-module'
-      break
-    case 'N09-system-dispute-directly-implemented':
-      dispatch.uiDecisionClass = 'system-design-dispute'
-      break
-    case 'N10-one-writer-mixes-implementation-tests-docs':
-      dispatch.writeLease.modifiedPathClasses = [
-        'implementation',
-        'tests',
-        'documentation',
+    case 'N05-adjudication-modifies-component':
+      bundle.adjudicationReceipt.modifiedPaths = [
+        'vue/packages/components/example/src/example.vue',
       ]
+      reseal(bundle, 'adjudicationReceipt', 'adjudicationDigest')
       break
-    case 'N11-implementer-updates-snapshot-fixture':
-      dispatch.writeLease.modifiedPathClasses = [
-        'implementation',
-        'fixture',
-        'snapshot',
+    case 'N06-adjudication-policy-drift':
+      bundle.adjudicationReceipt.domainPolicyDigest =
+        '9999999999999999999999999999999999999999999999999999999999999999'
+      reseal(bundle, 'adjudicationReceipt', 'adjudicationDigest')
+      break
+    case 'N07-ux-accepted-with-blocker':
+      bundle.uxAcceptanceReceipt.blockers = [
+        'Focus order violates the frozen UX contract.',
       ]
+      reseal(bundle, 'uxAcceptanceReceipt', 'receiptDigest')
       break
-    case 'N12-skill-claim-without-digest':
-      dispatch.skillDigest = null
+    case 'N08-ux-rejected-without-blocker':
+      bundle.uxAcceptanceReceipt.status = 'rejected'
+      bundle.uxAcceptanceReceipt.blockers = []
+      reseal(bundle, 'uxAcceptanceReceipt', 'receiptDigest')
       break
-    case 'N13-documentation-skips-ux-acceptance':
-      bundle.stageGates.uxAccepted = false
+    case 'N09-ux-verification-class-drift':
+      bundle.uxAcceptanceReceipt.verificationClass = 'ux-system'
+      reseal(bundle, 'uxAcceptanceReceipt', 'receiptDigest')
       break
-    case 'N14-ux-verifier-writes-component':
+    case 'N10-ux-candidate-drift':
+      bundle.uxAcceptanceReceipt.candidateSha =
+        '9999999999999999999999999999999999999999'
+      reseal(bundle, 'uxAcceptanceReceipt', 'receiptDigest')
+      break
+    case 'N11-ux-verifier-writes-component':
       bundle.uxAcceptanceReceipt.modifiedPaths = [
         'vue/packages/components/example/src/example.vue',
       ]
       reseal(bundle, 'uxAcceptanceReceipt', 'receiptDigest')
       break
-    case 'N15-consumer-private-workaround':
-      dispatch.consumerWorkaround = true
-      break
-    case 'N16-member-inherits-profile-baseline-slice':
-      dispatch.memberIsolation.inheritedProfile = true
-      dispatch.memberIsolation.inheritedBaseline = true
-      dispatch.memberIsolation.inheritedSlice = true
-      break
-    case 'N17-natural-language-plan-as-checkpoint':
-      dispatch.checkpoint.completedActions = []
-      dispatch.checkpoint.commands = []
-      break
-    case 'N18-partial-slice-claims-candidate-green':
-      dispatch.sliceStatus = 'slice-continuation-required'
-      dispatch.stageStatus = 'candidate-green'
-      dispatch.outcome = 'candidate-green'
+    case 'N12-ux-policy-drift':
+      bundle.uxAcceptanceReceipt.domainPolicyDigest =
+        '9999999999999999999999999999999999999999999999999999999999999999'
+      reseal(bundle, 'uxAcceptanceReceipt', 'receiptDigest')
       break
     default:
       fail('negative-control-unknown', id)
