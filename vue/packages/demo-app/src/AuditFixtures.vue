@@ -170,6 +170,11 @@
       <el-markdown-editor
         ref="markdownTransactionEditor"
         v-model="markdownTransactionValue"
+        v-bind="markdownPasteGateAttributes"
+        :default-mode="
+          markdownPasteGate === 'preview-only' ? 'preview' : 'source'
+        "
+        :disabled="markdownPasteGate === 'disabled'"
         :min-rows="6"
         :show-actions="false"
         :show-mode-switcher="false"
@@ -1848,6 +1853,13 @@ const markdownEditorTransactionFixture =
 const markdownEditorImeFixture =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('markdownEditorIme') === '1'
+const markdownPasteGate =
+  typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('markdownPasteGate')
+    : null
+const markdownPasteGateAttributes = computed(() =>
+  markdownPasteGate === 'readonly' ? { readonly: true } : {},
+)
 const markdownEditorDelayMount =
   typeof window !== 'undefined'
     ? Number(

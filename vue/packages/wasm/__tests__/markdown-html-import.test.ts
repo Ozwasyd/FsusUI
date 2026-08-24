@@ -44,13 +44,13 @@ describe('isolated markdown HTML clipboard import', () => {
       explicit: true,
     })
     expect(huge.ok).toBe(false)
-    if (!huge.ok) expect(huge.code).toBe('budget-bytes')
+    if (huge.ok === false) expect(huge.code).toBe('budget-bytes')
 
     let nested = 'text'
     for (let depth = 0; depth < 30; depth += 1) nested = `<div>${nested}</div>`
     const deep = importMarkdownClipboardSnapshot({ html: nested, explicit: true })
     expect(deep.ok).toBe(false)
-    if (!deep.ok) expect(deep.code).toBe('budget-depth')
+    if (deep.ok === false) expect(deep.code).toBe('budget-depth')
 
     const task = { cancelled: true }
     expect(importMarkdownClipboardSnapshot({ html: '<p>Hi</p>', explicit: true }, { task })).toMatchObject({
@@ -68,7 +68,7 @@ describe('isolated markdown HTML clipboard import', () => {
       })() },
     )
     expect(timed.ok).toBe(false)
-    if (!timed.ok) expect(timed.code).toBe('budget-time')
+    if (timed.ok === false) expect(timed.code).toBe('budget-time')
 
     const safe = importMarkdownClipboardSnapshot({
       html: '<p>Hi</p><img src="https://example.com/x.png" alt="">',

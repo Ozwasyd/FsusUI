@@ -359,10 +359,10 @@ export const convertMarkdownHtmlImportSnapshot = (
   } = {},
 ): MarkdownHtmlConversionResult => {
   const imported = importMarkdownClipboardSnapshot(snapshot, options)
-  if (!imported.ok || !imported.tree) {
+  if (imported.ok === false) {
     return Object.freeze({
       markdown: snapshot.plain ? `${snapshot.plain.trim()}\n` : '',
-      losses: Object.freeze([loss('removed', imported.ok ? 'empty' : imported.code)]),
+      losses: Object.freeze([loss('removed', imported.code)]),
       attachments: Object.freeze([]),
       mappingVersion: MARKDOWN_HTML_CONVERSION_VERSION,
       importerVersion: MARKDOWN_HTML_IMPORT_IMPORTER_VERSION,

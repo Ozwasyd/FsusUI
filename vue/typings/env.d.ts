@@ -23,6 +23,8 @@ interface FsusAuditAttributes {
   'data-audit-target'?: string | boolean
   'data-testid'?: string
   'data-markdown-editor-probe-id'?: string
+  'data-markdown-instance'?: string
+  'data-markdown-scroll-container'?: string
   'data-markdown-reveal-state'?: string | boolean
   'data-markdown-surface-owner'?: string | boolean
   'data-markdown-atomic-kind'?: string | boolean
@@ -52,6 +54,8 @@ declare module '@vue/runtime-dom' {
     'data-audit-target'?: string | boolean
     'data-testid'?: string
     'data-markdown-editor-probe-id'?: string
+    'data-markdown-instance'?: string
+    'data-markdown-scroll-container'?: string
     'data-markdown-reveal-state'?: string | boolean
     'data-markdown-surface-owner'?: string | boolean
     'data-markdown-atomic-kind'?: string | boolean

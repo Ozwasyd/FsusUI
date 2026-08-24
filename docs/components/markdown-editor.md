@@ -176,6 +176,35 @@ document epoch 变化、abort 或 anchor 删除后不得提交；consumer 负责
 组件展示错误，command 本身不调用 toast。Toolbar、keyboard、palette、slash 和
 selection presentation 共享同一 key、可用状态与 pending/result authority。
 
+## Paste as Markdown
+
+`Paste as Markdown` is an explicit command. It does not replace or reprioritize
+ordinary paste, so `Ctrl+V` / `Cmd+V` continues through the existing clipboard
+transaction path.
+
+The command freezes the available HTML, Markdown, and plain-text clipboard
+representations together with the current document identity, revision, source,
+and selection. It then opens a review dialog without mutating source or history.
+The dialog presents the converted Markdown, the source before/after diff, and
+typed removed, flattened, or unsupported conversion warnings. Keyboard, touch,
+and assistive-technology users receive the same three choices: paste plain text,
+import Markdown, or cancel.
+
+Confirmation creates one `history: 'separate'` command transaction, so one undo
+reverts the import. A changed document, revision, source, or selection makes the
+frozen anchor stale and the command fails without rebasing or inserting at a
+guessed position. Cancel, rejection, and successful confirmation restore editor
+focus and the applicable selection.
+
+Attachment descriptors are emitted only as an identity- and revision-bound
+provider intent through `upload-image`; the editor does not perform upload I/O or
+insert clipboard data URLs. The command blocks duplicate activation while
+reading the clipboard and fails closed during composition, when `readonly`,
+`disabled`, or `loading` is set, and in `preview` mode. Conversion and
+sanitization remain owned by
+[Markdown editor input](../api/markdown-editor-input.md) and the existing HTML
+import boundary.
+
 ## History and grouping
 
 History entry 保存 forward changes 与 inverse changes，不保存每键整文 snapshot。
@@ -241,6 +270,7 @@ commit 也不会越过当前受控值。
 | chrome            | 外围区域与根表面变体                        | `'framed' \| 'embedded' \| 'minimal'`     | `framed` |
 | placeholder       | 文本域占位文本                              | `string`                                  | `''`     |
 | commands          | toolbar command model                       | `MarkdownEditorCommand[]`                 | 内置命令 |
+| readonly          | Read-only; blocks input and mutation methods     | `boolean`                                 | `false`  |
 | disabled          | 禁用输入与全部 mutation method              | `boolean`                                 | `false`  |
 | loading           | 标记 busy 并冻结输入与全部 mutation method  | `boolean`                                 | `false`  |
 | preview-base-url  | preview renderer 的基础 URL                 | `string \| null`                          | `null`   |

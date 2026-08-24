@@ -86,6 +86,14 @@ export const planMarkdownEditorChromeSwitch = (
     scrollTop: before.scrollTop,
   })
 
+export const retainMarkdownEditorInstance = <
+  T extends Readonly<Record<string, unknown>>,
+>(
+  instance: T,
+  chrome: MarkdownEditorChromeVariant,
+  mode: MarkdownEditorModeVariant,
+) => Object.freeze({ ...instance, chrome, mode })
+
 export type MarkdownEditorChromeStabilityMutationKind =
   | 'root-vif-rebuild'
   | 'dual-scroll-container'

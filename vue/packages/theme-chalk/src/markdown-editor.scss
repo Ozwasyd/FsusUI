@@ -53,15 +53,23 @@
 
   @include e(command-more) {
     display: inline-flex;
+    position: sticky;
+    z-index: 1;
+    inset-inline-end: 0;
     align-items: center;
     gap: 6px;
     flex: 0 0 auto;
     min-height: 2.25rem;
 
     @include when(expanded) {
-      background: var(--fsus-state-selected-bg);
+      background: getCssVar('fill-color', 'light');
       border-color: var(--fsus-state-focus-border);
       color: getCssVar('text-color', 'primary');
+
+      &:hover,
+      &:focus-visible {
+        background: getCssVar('fill-color', 'light');
+      }
     }
   }
 
@@ -454,6 +462,230 @@
           display: none;
         }
       }
+    }
+  }
+
+  @include e(visually-hidden) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    padding: 0;
+    border: 0;
+    margin: -1px;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  @include e(paste-backdrop) {
+    box-sizing: border-box;
+    position: fixed;
+    z-index: var(--fsus-z-overlay-dialog);
+    display: grid;
+    width: 100%;
+    max-width: 100vw;
+    overflow: auto;
+    padding: var(--fsus-space-4, 16px);
+    background: var(--fsus-component-overlay-scrim);
+    inset: 0;
+    place-items: center;
+  }
+
+  @include e(paste-dialog) {
+    box-sizing: border-box;
+    display: grid;
+    min-width: 0;
+    width: min(56rem, 100%);
+    max-width: 100%;
+    max-height: calc(100dvh - var(--fsus-space-8, 32px));
+    overflow: auto;
+    border: 1px solid getCssVar('border-color');
+    border-radius: var(
+      --fsus-radius-panel,
+      var(--el-dialog-border-radius)
+    );
+    background: var(--fsus-surface-overlay, var(--el-bg-color-overlay));
+    box-shadow: var(--fsus-shadow-panel, none);
+    color: getCssVar('text-color', 'primary');
+  }
+
+  @include e(paste-header) {
+    display: grid;
+    min-width: 0;
+    gap: var(--fsus-space-2, 8px);
+    padding: var(--fsus-space-4, 16px) var(--fsus-space-6, 24px);
+    border-bottom: 1px solid getCssVar('border-color-lighter');
+
+    h2,
+    p {
+      margin: 0;
+    }
+
+    h2 {
+      font-size: 16px;
+      line-height: 1.4;
+    }
+
+    p {
+      color: getCssVar('text-color', 'secondary');
+      font-size: 14px;
+      line-height: 1.6;
+    }
+  }
+
+  @include e(paste-content) {
+    display: grid;
+    min-width: 0;
+    gap: var(--fsus-space-4, 16px);
+    padding: var(--fsus-space-4, 16px) var(--fsus-space-6, 24px);
+
+    h3,
+    h4,
+    p,
+    ul {
+      margin: 0;
+    }
+
+    h3 {
+      margin-bottom: var(--fsus-space-2, 8px);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    h4 {
+      margin-bottom: var(--fsus-space-1, 4px);
+      color: getCssVar('text-color', 'secondary');
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    pre {
+      box-sizing: border-box;
+      min-width: 0;
+      max-width: 100%;
+      max-height: 14rem;
+      overflow: auto;
+      padding: var(--fsus-space-3, 12px);
+      border: 1px solid getCssVar('border-color-lighter');
+      border-radius: var(
+        --fsus-radius-control,
+        var(--el-border-radius-base)
+      );
+      margin: 0;
+      background: getCssVar('fill-color', 'light');
+      color: getCssVar('text-color', 'primary');
+      font: inherit;
+      font-family:
+        ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        'Liberation Mono', 'Courier New', monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    [role='alert'] {
+      color: getCssVar('color', 'danger');
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  }
+
+  @include e(paste-diff-columns) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-width: 0;
+    gap: var(--fsus-space-3, 12px);
+
+    > * {
+      min-width: 0;
+    }
+  }
+
+  @include e(paste-warnings) {
+    min-width: 0;
+
+    ul {
+      display: grid;
+      gap: var(--fsus-space-1, 4px);
+      padding-inline-start: var(--fsus-space-5, 20px);
+      color: getCssVar('text-color', 'regular');
+      font-size: 12px;
+      line-height: 1.6;
+    }
+  }
+
+  @include e(paste-actions) {
+    box-sizing: border-box;
+    display: flex;
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--fsus-space-2, 8px);
+    padding: var(--fsus-space-4, 16px) var(--fsus-space-6, 24px);
+    border-top: 1px solid getCssVar('border-color-lighter');
+
+    button {
+      box-sizing: border-box;
+      min-width: 0;
+      max-width: 100%;
+      min-height: 44px;
+      padding: 0 var(--fsus-space-4, 16px);
+      border: 1px solid getCssVar('border-color');
+      border-radius: var(
+        --fsus-radius-control,
+        var(--el-border-radius-base)
+      );
+      background: getCssVar('fill-color', 'blank');
+      color: getCssVar('text-color', 'regular');
+      font: inherit;
+      font-size: 14px;
+      cursor: pointer;
+
+      &:hover {
+        border-color: var(--fsus-state-focus-border);
+        background: var(--fsus-state-hover-bg);
+        color: getCssVar('text-color', 'primary');
+      }
+
+      &:focus-visible {
+        @include a11y-focus-ring(
+          2px,
+          var(--fsus-radius-control, var(--el-border-radius-base))
+        );
+      }
+    }
+  }
+
+  @media (max-width: 40rem) {
+    @include e(paste-backdrop) {
+      align-items: end;
+      padding: var(--fsus-space-2, 8px);
+    }
+
+    @include e(paste-dialog) {
+      width: 100%;
+      max-height: calc(100dvh - var(--fsus-space-4, 16px));
+    }
+
+    @include e(paste-header) {
+      padding: var(--fsus-space-4, 16px);
+    }
+
+    @include e(paste-content) {
+      padding: var(--fsus-space-4, 16px);
+    }
+
+    @include e(paste-diff-columns) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    @include e(paste-actions) {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      width: 100%;
+      padding: var(--fsus-space-4, 16px);
     }
   }
 }

@@ -93,7 +93,7 @@ describe('MarkdownEditor', () => {
       wrapper
         .find('.el-markdown-editor__command-tray')
         .findAll('.el-markdown-editor__command'),
-    ).toHaveLength(1)
+    ).toHaveLength(2)
 
     await wrapper
       .find('.el-markdown-editor__command-tray .el-markdown-editor__command')
@@ -127,7 +127,7 @@ describe('MarkdownEditor', () => {
 
     const more = wrapper.find('.el-markdown-editor__command-more')
     expect(more.text()).toContain('更多格式')
-    expect(more.text()).toContain('5')
+    expect(more.text()).toContain('6')
     expect(more.attributes('aria-label')).toContain('更多格式')
     expect(
       wrapper.findAll('.el-markdown-editor__mode').map((item) => item.text()),
@@ -136,7 +136,7 @@ describe('MarkdownEditor', () => {
     await more.trigger('click')
     const tray = wrapper.find('.el-markdown-editor__command-tray')
     expect(more.attributes('aria-controls')).toBe(tray.attributes('id'))
-    expect(tray.findAll('.el-markdown-editor__command')).toHaveLength(5)
+    expect(tray.findAll('.el-markdown-editor__command')).toHaveLength(6)
   })
 
   it('can move selected actions into the command overflow tray', async () => {
@@ -153,7 +153,7 @@ describe('MarkdownEditor', () => {
 
     const more = wrapper.find('.el-markdown-editor__command-more')
     expect(more.exists()).toBe(true)
-    expect(more.text()).toContain('2')
+    expect(more.text()).toContain('3')
 
     await more.trigger('click')
     const trayButtons = wrapper

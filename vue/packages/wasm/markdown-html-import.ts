@@ -403,10 +403,10 @@ export interface MarkdownHtmlImportResult {
 
 export const sanitizeMarkdownHtmlImport = (html: string): MarkdownHtmlImportResult => {
   const outcome = importMarkdownClipboardSnapshot({ html, explicit: true })
-  if (!outcome.ok || !outcome.tree) {
+  if (outcome.ok === false) {
     return Object.freeze({
       html: '',
-      rejected: Object.freeze([outcome.ok ? 'empty' : outcome.code]),
+      rejected: Object.freeze([outcome.code]),
       findings: outcome.findings,
     })
   }

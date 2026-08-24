@@ -18,3 +18,29 @@ Maps the Vue markdown editor chrome/document/mode contract onto
 Native host, scroll, and content regions follow
 `docs/avalonia/platform-differences.md`. This control is not a WebView wrapper
 and is not an alias of `FsusTextEditor`.
+
+## Theme Tokens
+
+The native shell consumes the shared text-editor surface, text, border, spacing,
+control-border, and surface-radius resources from the generated Avalonia theme.
+
+## Minimal Avalonia Example
+
+```csharp
+using FsusUI.Avalonia.Controls;
+
+var editor = new FsusMarkdownEditor
+{
+  Document = "# Draft",
+  DocumentIdentity = new FsusMarkdownDocumentIdentity("draft", 1),
+  Mode = FsusMarkdownEditorMode.Source,
+  Chrome = FsusMarkdownEditorChrome.Framed,
+  StatusDensity = FsusMarkdownEditorStatusDensity.Minimal,
+};
+```
+
+## Known Limitations
+
+Live projection, IME integration, and AutomationPeer semantics remain partial.
+The Vue-only paste-as-Markdown review flow does not currently map to a native
+Avalonia command.
