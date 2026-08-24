@@ -157,3 +157,13 @@ The release-domain map is maintained in [docs/releases/](./docs/releases/README.
 - [Code of conduct](./CODE_OF_CONDUCT.md)
 - [Notice and attribution](./NOTICE)
 - [License](./LICENSE)
+## Avalonia trimming and AOT library boundary
+
+The supported Avalonia library packages are maintained for trimming and AOT-compatible library consumption. This is a library contract: it does not create or validate a final Native AOT application executable, RID-specific binary, or support guarantee for third-party plugins. Resource reachability (AXAML, themes, icons, and generated resources) and package metadata are part of that library-level contract.
+
+The contract applies only to the documented public Avalonia packages and their
+declared metadata. It does not extend to third-party plugin discovery, runtime
+assembly or type loading, runtime code generation, or other dynamic extension
+mechanisms. Consumers that introduce those mechanisms must evaluate their own
+trimming and AOT behavior; this library documentation does not claim that they
+are supported.
