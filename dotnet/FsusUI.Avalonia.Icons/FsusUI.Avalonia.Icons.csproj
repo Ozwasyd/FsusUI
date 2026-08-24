@@ -2,6 +2,9 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <EnableAotAnalyzer>true</EnableAotAnalyzer>
     <PackageId>FsusUI.Avalonia.Icons</PackageId>
     <Description>FsusUI Avalonia icon resources generated from the shared platform-neutral icon registry.</Description>
   </PropertyGroup>
