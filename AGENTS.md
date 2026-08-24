@@ -1,10 +1,10 @@
-# AGENTS.md — FsusUI
+# AGENTS.md - FsusUI
 
 FsusUI is a fork and compatibility-focused Vue 3 component library based on Element Plus, with a WASM-capable runtime, Markdown components, theme/motion tokens, icons, and an Avalonia/.NET cross-platform surface. It is in public preview; the public npm package is `@ozwasyd/element-plus`.
 
 This file keeps only repository-specific decision boundaries and entry points that code cannot express. It is not a map, a style guide, or a command index. Long-term facts live under [`docs/index.md`](docs/index.md) and follow [`docs/governance/documentation-architecture.md`](docs/governance/documentation-architecture.md).
 
-Write in English. The authoritative [`docs/index.md`](docs/index.md) and [`docs/design.md`](docs/design.md) are Chinese and `spec/` is English — link to them rather than restating their values.
+Write in English. The authoritative [`docs/index.md`](docs/index.md) and [`docs/design.md`](docs/design.md) are Chinese and `spec/` is English - link to them rather than restating their values.
 
 ## Working style
 
@@ -31,7 +31,7 @@ Write in English. The authoritative [`docs/index.md`](docs/index.md) and [`docs/
 - Public API is documented imports only. `es/*`, `lib/*`, wildcard exports, `packages/*`, `internal/*`, generated WASM, build scripts, and test fixtures are not public API. `@ozwasyd/element-plus` is the FsusUI compatibility build, never upstream Element Plus.
 - Documentation authority is fixed, high to low: `spec/` -> [`docs/design.md`](docs/design.md) (the sole human-readable visual contract) -> domain contracts -> governance/workflow -> guides -> records/archive. A lower layer may apply a higher layer, never redefine it. Do not add new root-level `docs/*.md` files; place documents in their domain and run `check:documentation-architecture`.
 - Do not copy token values, geometry, motion budgets, or design prohibitions into workflows, skills, or this file; link to the contract. Generated documents must identify their generator and must not be edited by hand.
-- UI/UX work routes through `.agents/skills/fsusui-design-conformance/SKILL.md` and its machine contracts. Roles and write leases are ordered and mutually exclusive; never self-promote a role, and never claim UX/visual acceptance without inspected rendered evidence.
+- UI/UX work uses `.agents/skills/fsusui-design-conformance/SKILL.md` only for FsusUI-specific ownership, design classification, evidence requirements, and UX acceptance semantics. The Skill and repository instructions must not choose shared Root/controller behavior, permanent actor roles, model/profile/effort, routes, runtime permission classes, leases/resources/capacity, shared stage order, checkpoint/continuation, retry/recovery, delivery, cleanup, or terminalization. Those belong to an external scheduler when one is present. Never claim UX/visual acceptance without inspected rendered evidence.
 - The design language is "The Intellectual Minimalist" ([`docs/design.md`](docs/design.md)). Preserve information architecture, primary focus, and existing restraint. Do not add decorative cards/badges/icons/copy, redesign adjacent components, mint new tokens/wrappers/variants, or use generic SaaS patterns as design evidence.
 - Runtime state boundaries ([`docs/runtime-state-boundaries.md`](docs/runtime-state-boundaries.md)): core components must not persist user data to `localStorage`, `sessionStorage`, IndexedDB, or cookies by default; durable persistence belongs to the consuming app, and library caches must be reconstructable from props/slots/injected config.
 - WASM changes must keep the JavaScript fallback intact and must not publish debug-only artifacts or source maps.
@@ -42,7 +42,7 @@ Write in English. The authoritative [`docs/index.md`](docs/index.md) and [`docs/
 ## Implement and verify
 
 1. Form a short change list: add, remove, rename, semantic, or parameter changes.
-2. Close the smallest loop inside the existing service/component/adapter boundary. When a contract crosses Web/Vue and Avalonia/.NET, sync every owner — no parallel implementation.
+2. Close the smallest loop inside the existing service/component/adapter boundary. When a contract crosses Web/Vue and Avalonia/.NET, sync every owner - no parallel implementation.
 3. Run focused checks first, then broaden by risk. Test tiers come from [`docs/visual-testing.md`](docs/visual-testing.md) and the root `package.json` scripts.
 4. For security or public-API changes, evaluate the affected runtime/consumer paths explicitly and report per-path results or a reason, not a blanket "all pass".
 5. Update the nearest current document when a public contract, visual contract, architecture, or security semantic changes. Do not create documents to pad count.
