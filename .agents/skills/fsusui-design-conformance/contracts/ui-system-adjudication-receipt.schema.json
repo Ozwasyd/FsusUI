@@ -1,166 +1,35 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://fsusui.dev/contracts/ui-system-adjudication-receipt.v1.schema.json",
-  "title": "FsusUI UI system adjudication receipt v1",
+  "$id": "https://fsusui.dev/contracts/ui-system-adjudication-receipt.v2.schema.json",
+  "title": "FsusUI UI system adjudication receipt v2",
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "schema",
-    "classificationReceiptDigest",
-    "ownerRepository",
-    "authoritativeSkillDigests",
-    "authorityDigests",
-    "activeBaselineIdentityDigest",
-    "candidateSha",
-    "candidateDigest",
-    "problemClassification",
-    "routingProfile",
-    "actualModel",
-    "actualEffort",
-    "freshContext",
-    "sandbox",
-    "writeScope",
-    "modifiedPaths",
-    "allowedImplementationClass",
-    "inScope",
-    "outOfScope",
-    "requiredConsumerOrLibraryIssue",
-    "requiredReslice",
-    "routingPolicyDigest",
-    "slicePolicyDigest",
-    "status",
-    "adjudicationDigest"
-  ],
+  "required": ["schema", "classificationReceiptDigest", "ownerRepository", "authoritativeSkillDigests", "authorityDigests", "activeBaselineIdentityDigest", "candidateSha", "candidateDigest", "problemClassification", "disposition", "allowedUiDecisionClass", "modifiedPaths", "inScope", "outOfScope", "requiredConsumerOrLibraryIssue", "domainPolicyDigest", "status", "adjudicationDigest"],
   "properties": {
-    "schema": {
-      "const": "fsusui-design-conformance.ui-system-adjudication-receipt.v1"
-    },
-    "classificationReceiptDigest": {
-      "$ref": "#/definitions/hash"
-    },
-    "ownerRepository": {
-      "$ref": "#/definitions/repository"
-    },
-    "authoritativeSkillDigests": {
-      "$ref": "#/definitions/hashes"
-    },
-    "authorityDigests": {
-      "$ref": "#/definitions/hashes"
-    },
-    "activeBaselineIdentityDigest": {
-      "$ref": "#/definitions/hash"
-    },
-    "candidateSha": {
-      "$ref": "#/definitions/sha"
-    },
-    "candidateDigest": {
-      "$ref": "#/definitions/hash"
-    },
-    "problemClassification": {
-      "enum": [
-        "owner-dispute",
-        "authority-dispute",
-        "component-api-ownership",
-        "design-system-capability-boundary"
-      ]
-    },
-    "routingProfile": {
-      "enum": ["sol-high", "sol-xhigh"]
-    },
-    "actualModel": {
-      "const": "gpt-5.6-sol"
-    },
-    "actualEffort": {
-      "enum": ["high", "xhigh"]
-    },
-    "freshContext": {
-      "const": true
-    },
-    "sandbox": {
-      "const": "read-only"
-    },
-    "writeScope": {
-      "const": "none"
-    },
-    "modifiedPaths": {
-      "type": "array",
-      "maxItems": 0
-    },
-    "allowedImplementationClass": {
-      "enum": ["sol-low", "sol-medium"]
-    },
-    "inScope": {
-      "$ref": "#/definitions/nonEmptyStrings"
-    },
-    "outOfScope": {
-      "$ref": "#/definitions/nonEmptyStrings"
-    },
-    "requiredConsumerOrLibraryIssue": {
-      "oneOf": [
-        {
-          "type": "null"
-        },
-        {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["repository", "issue"],
-          "properties": {
-            "repository": {
-              "$ref": "#/definitions/repository"
-            },
-            "issue": {
-              "type": "integer",
-              "minimum": 1
-            }
-          }
-        }
-      ]
-    },
-    "requiredReslice": {
-      "const": true
-    },
-    "routingPolicyDigest": {
-      "$ref": "#/definitions/hash"
-    },
-    "slicePolicyDigest": {
-      "$ref": "#/definitions/hash"
-    },
-    "status": {
-      "const": "adjudicated"
-    },
-    "adjudicationDigest": {
-      "$ref": "#/definitions/hash"
-    }
+    "schema": {"const": "fsusui-design-conformance.ui-system-adjudication-receipt.v2"},
+    "classificationReceiptDigest": {"$ref": "#/definitions/hash"},
+    "ownerRepository": {"$ref": "#/definitions/repository"},
+    "authoritativeSkillDigests": {"$ref": "#/definitions/hashes"},
+    "authorityDigests": {"$ref": "#/definitions/hashes"},
+    "activeBaselineIdentityDigest": {"$ref": "#/definitions/hash"},
+    "candidateSha": {"$ref": "#/definitions/sha"},
+    "candidateDigest": {"$ref": "#/definitions/hash"},
+    "problemClassification": {"enum": ["owner-dispute", "authority-dispute", "component-api-ownership", "design-system-capability-boundary"]},
+    "disposition": {"enum": ["fsusui-owned", "consumer-owned", "authority-clarified", "requires-authority-change"]},
+    "allowedUiDecisionClass": {"enum": ["prescribed", "bounded-composition", "layout-judgment", "interaction-judgment"]},
+    "modifiedPaths": {"type": "array", "maxItems": 0},
+    "inScope": {"$ref": "#/definitions/nonEmptyStrings"},
+    "outOfScope": {"$ref": "#/definitions/nonEmptyStrings"},
+    "requiredConsumerOrLibraryIssue": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["repository", "issue"], "properties": {"repository": {"$ref": "#/definitions/repository"}, "issue": {"type": "integer", "minimum": 1}}}]},
+    "domainPolicyDigest": {"$ref": "#/definitions/hash"},
+    "status": {"const": "adjudicated"},
+    "adjudicationDigest": {"$ref": "#/definitions/hash"}
   },
   "definitions": {
-    "hash": {
-      "type": "string",
-      "pattern": "^[a-f0-9]{64}$"
-    },
-    "hashes": {
-      "type": "array",
-      "minItems": 1,
-      "uniqueItems": true,
-      "items": {
-        "$ref": "#/definitions/hash"
-      }
-    },
-    "sha": {
-      "type": "string",
-      "pattern": "^[a-f0-9]{40}$"
-    },
-    "repository": {
-      "type": "string",
-      "pattern": "^[^/]+/[^/]+$"
-    },
-    "nonEmptyStrings": {
-      "type": "array",
-      "minItems": 1,
-      "uniqueItems": true,
-      "items": {
-        "type": "string",
-        "minLength": 1
-      }
-    }
+    "hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "hashes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/definitions/hash"}},
+    "sha": {"type": "string", "pattern": "^[a-f0-9]{40}$"},
+    "repository": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
+    "nonEmptyStrings": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
   }
 }

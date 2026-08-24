@@ -2,7 +2,7 @@
 
 > **Role:** Normative implementation and review workflow
 > **Applies to:** FsusUI component/theme/motion/layout changes and visual changes in applications that consume FsusUI
-> **Authority:** Executes the contracts in `spec/`, `docs/design.md`, domain documentation, and consumer rules. It cannot redefine them.
+> **Authority:** Executes the contracts in `spec/`, `docs/design.md`, domain documentation, and consumer rules. It cannot redefine them or claim shared orchestration authority.
 
 Use this workflow whenever rendered output, interaction states, visual geometry, theme behavior, motion, icons, responsive layout, documentation examples, or consumer composition changes.
 
@@ -25,55 +25,28 @@ Read only the relevant sources, but always include:
 
 Do not substitute a Skill summary, issue description, screenshot, or model preference for these sources.
 
-## 3. Classify and state the allowed change
+## 3. Classify the FsusUI domain decision
 
-Before editing, produce a machine-validated
-`fsusui-design-conformance.ui-ux-classification-receipt.v1` and record:
+Before editing, produce a machine-validated:
 
-- owner: specification, FsusUI Web/Vue, FsusUI Avalonia, platform override, or consumer;
-- surface and role;
+`fsusui-design-conformance.ui-ux-classification-receipt.v2`
+
+Record:
+
+- owner repository and affected surface;
 - public behavior and visual states affected;
 - files and adjacent areas explicitly out of scope;
-- whether the change alters design intent or only restores conformance.
-- `uiDecisionClass`: prescribed, bounded composition, layout judgment,
-  interaction judgment, or system design dispute;
-- `verificationClass`: UX local, path, or system;
-- current Skill, design-authority, baseline, routing-policy, slice-policy, and
-  classification-evidence digests.
-- candidate SHA and candidate identity digest.
+- whether the change alters design intent or only restores conformance;
+- `uiDecisionClass`: `prescribed`, `bounded-composition`, `layout-judgment`, `interaction-judgment`, or `system-design-dispute`;
+- `verificationClass`: `ux-local`, `ux-path`, or `ux-system`;
+- exact Skill, design-authority, active-baseline, candidate, and classification-evidence digests;
+- `domainPolicyDigest`.
 
 If the requested effect would require reclassifying the surface, adding a new token, or changing design intent, stop treating it as a local styling fix and follow the design-contract change process.
 
-The shared DAG proposal/validator freezes this receipt. A scheduler cannot
-rewrite it or hand-select a model.
+This classification is a repository/domain fact. It does not select an actor, model, profile, route, lease, retry path, checkpoint policy, or scheduler stage.
 
-## 4. Freeze a coherent executable slice
-
-Every UI writer dispatch must bind immutable work-plan, executable-slice,
-compiled-prompt, checkpoint-policy, execution-route, implementation-run
-identity, Skill, authority, baseline, classification, and candidate digests.
-
-The dispatch must also bind the actual Sol model/effort, exact target worktree
-and worktree digest, and candidate SHA. A requested or selected profile is not
-runtime evidence.
-
-The slice and prompt must state:
-
-- one coherent user-observable objective;
-- first required edit or render-inspection action;
-- first read targets and first writable component/demo path;
-- state and viewport subset;
-- required implementation files, focused commands, and render probes;
-- explicit non-goals;
-- checkpoint thresholds;
-- completion and continuation predicates.
-
-Do not submit an entire component family, unrelated interactions,
-design-system governance, and all rendered states as one slice. Do not split
-one behavior's necessary visual, interaction, state, or responsive support into
-non-runnable fragments.
-
-## 5. Inspect before changing
+## 4. Inspect before changing
 
 - Render and inspect the current state before changing observable output.
 - Use realistic content rather than placeholder-only data.
@@ -82,85 +55,59 @@ non-runnable fragments.
 
 Do not infer a visual problem solely from source code when rendered evidence is available.
 
-## 6. Separate roles and write leases
+## 5. Preserve ownership boundaries
 
-The versioned role/profile/permission contract is
-[`ui-stage-policy.json`](../../.agents/skills/fsusui-design-conformance/contracts/ui-stage-policy.json).
+Implementation must not rewrite frozen tests, fixtures, snapshots, acceptance mappings, design authorities, or the design Skill merely to make a candidate pass.
 
-The ordered writer leases are:
+UX acceptance and system-design adjudication are evidence-producing decisions. Their receipts must not include implementation modifications.
 
-```text
-test owner -> UI/UX implementer -> documentation writer
-```
+"Implementation, tests, fixtures, and documentation are all required for a complete issue" does not mean one execution context owns every path. The repository boundary is semantic: each artifact must remain owned by the source of truth that defines it.
 
-- Test owner writes tests, fixtures, probes, mutation controls, and acceptance
-  mapping only.
-- UI/UX implementer is the only UI and UX implementation owner and writes
-  implementation paths only.
-- Documentation writer starts only after behavior green and UX accepted and
-  writes documentation only.
-- Behavior verifier, UI system adjudicator, and UX acceptance verifier are
-  fresh and read-only/read-execute.
+How a shared scheduler enforces those boundaries is external to FsusUI.
 
-No implementer may alter frozen tests, fixture expectations, snapshots,
-thresholds, acceptance mappings, design authorities, or the design Skill.
-“Implementation, tests, fixtures, and documentation together” means that one
-issue and candidate closes all four responsibilities before delivery; it does
-not authorize one agent or one lease to edit all four.
-
-## 7. Route UI implementation deterministically
-
-```text
-prescribed/bounded + atomic or bounded multifile -> Sol/low
-layout/interaction + bounded multifile or iterative debug -> Sol/medium
-bounded render-probe-heavy -> Sol/medium
-context-heavy/high-tool-depth/long-horizon -> stop and re-slice
-system design dispute -> stop and fresh read-only adjudication
-```
-
-Ordinary code agents, Luna, Terra, and Sol high/xhigh/max cannot implement
-user-observable UI. Failure count, output-missing, UX rejection, cost, model
-self-report, or scheduler preference cannot promote the implementation route.
-
-## 8. Implement the smallest coherent fix
+## 6. Implement the smallest coherent fix
 
 - Change the owning source only.
 - Reuse canonical tokens and public primitives.
 - Preserve information architecture and adjacent visual behavior unless explicitly in scope.
-- Complete the current implementation slice without modifying assets owned by
-  another lease.
+- Keep all states needed for one user-observable behavior coherent.
 - Do not add a consumer compatibility layer for an FsusUI defect.
 - Do not weaken tests, thresholds, or checkers to accept the new output.
-- The implementer must not update snapshots or fixture expectations.
+- Do not update snapshots or fixture expectations instead of fixing implementation.
 
-Within one rollout, the implementer executes the first action, edits the
-current slice, runs frozen focused checks/render probes, diagnoses failures,
-changes only authorized implementation, and reruns to the completion
-predicate. Before investigation/no-artifact thresholds it must leave a
-filesystem/Git/command-backed checkpoint or a terminal receipt.
+If the work is too broad to remain coherent, report the domain boundaries that need to be separated. Work slicing, dispatch, continuation, and checkpoint mechanics belong to an external orchestrator when one is present.
 
-A continuation binds the same slice and verified checkpoint, including the
-next required action. A prose plan is not a checkpoint. Completing one slice
-does not authorize candidate-green; all slices and the complete frozen stage
-matrix must pass first.
+## 7. Resolve system-design disputes
 
-## 9. Resolve system disputes
+`system-design-dispute` means the design or ownership fact is unresolved and implementation must not proceed on an assumption.
 
-`system-design-dispute` stops implementation. A fresh read-only Sol high/xhigh
-adjudicator emits a valid
-`fsusui-design-conformance.ui-system-adjudication-receipt.v1`.
+Produce a valid:
 
-The receipt binds owner, classification, Skill and authority digests, baseline,
-candidate SHA/digest, actual profile, scope, allowed Sol low/medium
-implementation class, required consumer/library issue, routing/slice policies,
-and required re-slicing. The adjudicator cannot edit code, redesign, expand
-scope, or sign UX acceptance.
+`fsusui-design-conformance.ui-system-adjudication-receipt.v2`
 
-## 10. Select verification by impact
+The receipt binds:
 
-Use the repository-defined commands rather than inventing a parallel test path.
+- the classification receipt;
+- owner repository;
+- Skill and authority digests;
+- active FsusUI baseline;
+- candidate identity;
+- problem classification;
+- disposition;
+- allowed post-adjudication `uiDecisionClass`;
+- in-scope and out-of-scope boundaries;
+- any required consumer or library follow-up issue;
+- `domainPolicyDigest`.
 
-For FsusUI rendered changes, start with:
+The adjudication receipt determines design/ownership facts only. It cannot choose model/profile/effort, define an execution route, set runtime permissions, prescribe leases, choose retries, or control scheduler order.
+
+It cannot include implementation modifications.
+
+## 8. Select repository-local verification by impact
+
+Use repository-defined commands rather than inventing a parallel test path.
+
+For FsusUI rendered changes, start with the applicable checks from:
 
 ```bash
 pnpm run check:design-source-drift
@@ -174,7 +121,9 @@ Add focused type, unit, interaction, accessibility, motion, platform, package, o
 
 For a consumer, use its own tests and screenshot matrix while preserving the FsusUI baseline and public-contract checks.
 
-## 11. Inspect rendered evidence
+These commands are repository acceptance facts. They do not prescribe which model or actor executes them.
+
+## 9. Inspect rendered evidence
 
 Inspect, rather than merely generate, the affected evidence:
 
@@ -183,57 +132,44 @@ Inspect, rather than merely generate, the affected evidence:
 - relevant desktop and mobile viewports;
 - realistic short, long, empty, loading, error, and permission content;
 - supported locales and text expansion;
-- keyboard focus, touch, screen-reader behavior, zoom, overflow, and reduced
-  motion when applicable;
+- keyboard focus;
+- touch;
+- screen reader behavior;
+- zoom and overflow;
+- reduced motion;
 - Web/Avalonia or consumer comparisons when cross-platform or downstream behavior changes.
 
-Use production fixtures and record every inspected artifact, not only the
-generation command. Each applicable viewport/state/theme/input entry must bind
-evidence rather than rely on narration.
+Use production fixtures and record every inspected artifact, not only the generation command. Each applicable viewport/state/theme/input entry must bind evidence rather than rely on narration.
 
 A zero visual diff proves only that covered baselines did not change. It does not prove a new state that lacks a fixture.
 
-## 12. Verify behavior and UX independently
+## 10. Verify UX independently
 
-Candidate-green enters a fresh behavior verifier. Its self-test receipt cannot
-replace independent behavior evidence.
+Produce a valid:
 
-After behavior green, a fresh read-only UX verifier uses:
+`fsusui-design-conformance.ux-acceptance-receipt.v2`
 
-```text
-ux-local -> Sol/medium
-ux-path -> Sol/high
-ux-system -> Sol/xhigh
-```
+The receipt is bound to:
 
-It emits a valid `fsusui-design-conformance.ux-acceptance-receipt.v1` bound to
-the candidate, classification, dispatch, actual profile, Skill, authorities,
-baseline, work plan, slices, prompt, route, viewport/state matrix, inspected
-production rendered artifacts, blockers, status, and digest. An accepted
-receipt has no blockers. A rejected verifier has veto authority but cannot
-modify or redesign.
+- the frozen classification;
+- candidate identity;
+- `verificationClass`;
+- Skill and authority digests;
+- active baseline;
+- `domainPolicyDigest`;
+- independence evidence;
+- the viewport/state/theme/input matrix;
+- inspected production rendered artifacts;
+- blockers;
+- acceptance status.
 
-The acceptance receipt binds distinct implementation-run and verifier-run
-identity digests. Equal identities fail closed even if the receipt claims a
-fresh context.
+An accepted receipt has no blockers. A rejected receipt has at least one blocker. The receipt must not include implementation modifications.
 
-Documentation cannot start before behavior green and candidate-matching UX
-accepted. Each acceptance-group member repeats classification, slicing,
-routing, baseline selection, candidate, and fresh receipts independently.
+The UX receipt intentionally contains no actor name, model/profile/effort, route, sandbox, work plan, prompt, checkpoint, retry, or scheduler state. A shared scheduler may add its own execution receipts outside this FsusUI contract.
 
-## 13. Recover output-missing
+Documentation that claims conformance must not be finalized until the required behavior and UX evidence exists, but FsusUI does not prescribe the scheduler stage sequence used to obtain that evidence.
 
-Classify missing writer output as slice/prompt non-executable, runtime
-invocation failure, sandbox/cwd/worktree mismatch, first action not executed,
-or verified profile-capability mismatch. Do not retry by changing only the
-agent, attempt ID, wording, worktree, slice ID, or model.
-
-A retry requires a material re-slice, runtime/permission repair, or verified
-profile-capability mismatch with breaker-reset authority. A partial checkpoint
-cannot satisfy test-contract frozen, candidate-green, behavior-green, UX
-accepted, or documentation complete.
-
-## 14. Review against the design contract
+## 11. Review against the design contract
 
 Reject or revise the change when it:
 
@@ -246,7 +182,28 @@ Reject or revise the change when it:
 - passes only because a checker, threshold, or baseline was weakened;
 - looks correct only with placeholder content or one viewport.
 
-## 15. Completion evidence
+## 12. Shared orchestration authority boundary
+
+FsusUI owns design, product, component, consumer, and acceptance semantics. It does not own shared orchestration authority.
+
+A scheduler/orchestrator exclusively owns:
+
+```text
+root/controller behavior
+permanent actor roster and stage-role mapping
+model/profile/effort selection
+route selection
+runtime execution and permission classes
+lease/resource/capacity
+shared stage order
+checkpoint/continuation
+retry/recovery/failure routing
+delivery/cleanup/terminalization
+```
+
+Do not add these decisions to this workflow, the Skill, or FsusUI machine contracts.
+
+## 13. Completion evidence
 
 Report:
 
@@ -257,6 +214,7 @@ Report:
 5. viewports, themes, locales, states, and platforms inspected;
 6. screenshots, traces, reports, or failure evidence produced;
 7. remaining uncertainty and any verification not completed;
-8. confirmation that no parallel design system or compatibility layer was introduced.
+8. confirmation that no parallel design system or compatibility layer was introduced;
+9. confirmation that FsusUI domain evidence did not claim shared orchestration authority.
 
 Do not claim visual acceptance when rendered evidence was not inspected.

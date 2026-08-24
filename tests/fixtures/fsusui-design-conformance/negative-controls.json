@@ -1,74 +1,14 @@
 [
-  {
-    "id": "N01-ordinary-code-owner-implements-ui",
-    "expectedCode": "ui-owner-role"
-  },
-  {
-    "id": "N02-overlapping-ui-ux-owners",
-    "expectedCode": "ui-owner-count"
-  },
-  {
-    "id": "N03-full-component-system-unsliced",
-    "expectedCode": "ui-slice-scope"
-  },
-  {
-    "id": "N04-prompt-missing-first-action",
-    "expectedCode": "ui-prompt-incomplete"
-  },
-  {
-    "id": "N05-prescribed-promoted-to-medium",
-    "expectedCode": "ui-profile-selection"
-  },
-  {
-    "id": "N06-ui-implementer-uses-high",
-    "expectedCode": "ui-profile-forbidden"
-  },
-  {
-    "id": "N07-output-missing-auto-promotes",
-    "expectedCode": "ui-automatic-promotion"
-  },
-  {
-    "id": "N08-long-horizon-not-resliced",
-    "expectedCode": "ui-reslice-required"
-  },
-  {
-    "id": "N09-system-dispute-directly-implemented",
-    "expectedCode": "ui-adjudication-required"
-  },
-  {
-    "id": "N10-one-writer-mixes-implementation-tests-docs",
-    "expectedCode": "ui-write-scope"
-  },
-  {
-    "id": "N11-implementer-updates-snapshot-fixture",
-    "expectedCode": "ui-write-scope"
-  },
-  {
-    "id": "N12-skill-claim-without-digest",
-    "expectedCode": "ui-digest-binding"
-  },
-  {
-    "id": "N13-documentation-skips-ux-acceptance",
-    "expectedCode": "documentation-before-ux-accepted"
-  },
-  {
-    "id": "N14-ux-verifier-writes-component",
-    "expectedCode": "ux-acceptance-receipt-schema"
-  },
-  {
-    "id": "N15-consumer-private-workaround",
-    "expectedCode": "ui-consumer-workaround"
-  },
-  {
-    "id": "N16-member-inherits-profile-baseline-slice",
-    "expectedCode": "ui-member-isolation"
-  },
-  {
-    "id": "N17-natural-language-plan-as-checkpoint",
-    "expectedCode": "ui-checkpoint-evidence"
-  },
-  {
-    "id": "N18-partial-slice-claims-candidate-green",
-    "expectedCode": "ui-partial-candidate-green"
-  }
+  {"id": "N01-classification-skill-digest-missing", "expectedCode": "classification-receipt-schema"},
+  {"id": "N02-classification-candidate-drift", "expectedCode": "classification-receipt-digest"},
+  {"id": "N03-classification-policy-drift", "expectedCode": "classification-receipt-binding"},
+  {"id": "N04-system-dispute-without-matching-adjudication", "expectedCode": "adjudication-receipt-binding"},
+  {"id": "N05-adjudication-modifies-component", "expectedCode": "adjudication-receipt-schema"},
+  {"id": "N06-adjudication-policy-drift", "expectedCode": "adjudication-receipt-binding"},
+  {"id": "N07-ux-accepted-with-blocker", "expectedCode": "ux-acceptance-receipt-schema"},
+  {"id": "N08-ux-rejected-without-blocker", "expectedCode": "ux-acceptance-receipt-schema"},
+  {"id": "N09-ux-verification-class-drift", "expectedCode": "ux-acceptance-receipt-binding"},
+  {"id": "N10-ux-candidate-drift", "expectedCode": "ux-acceptance-receipt-binding"},
+  {"id": "N11-ux-verifier-writes-component", "expectedCode": "ux-acceptance-receipt-schema"},
+  {"id": "N12-ux-policy-drift", "expectedCode": "ux-acceptance-receipt-binding"}
 ]

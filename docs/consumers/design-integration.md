@@ -2,7 +2,7 @@
 
 > **Role:** Normative consumer-boundary contract
 > **Applies to:** Any application or library that imports, aliases, wraps, or embeds FsusUI
-> **Authority:** Applies FsusUI public contracts to consumers. It does not define consumer business logic or replace consumer-owned layout rules.
+> **Authority:** Applies FsusUI public contracts to consumers. It does not define consumer business logic, replace consumer-owned layout rules, or claim shared orchestration authority.
 
 A consumer inherits FsusUI public components, tokens, interaction semantics, accessibility behavior, and documented variants. It does not inherit a complete route-level product design for every public, marketing, reading, or business workflow.
 
@@ -44,11 +44,11 @@ ship a second viewport algorithm beside the FsusUI helpers.
 For a visual or UX change in a consumer:
 
 1. Identify the imported or aliased FsusUI version/baseline.
-2. Read [`docs/design.md`](../design.md), the relevant component docs, and the consumer’s own layout rules.
+2. Read [`docs/design.md`](../design.md), the relevant component docs, and the consumer's own layout rules.
 3. Classify the surface and owner using [`docs/design/change-classification.md`](../design/change-classification.md).
 4. Use public components, props, slots, tokens, and documented composition patterns.
 5. Keep product-specific layout and copy in the consumer.
-6. Validate the consumer’s realistic states, viewports, themes, locales, and content lengths.
+6. Validate the consumer's realistic states, viewports, themes, locales, and content lengths.
 7. If a reusable FsusUI defect is exposed, fix it in FsusUI and verify the consumer against the same FsusUI revision.
 
 ## 3. Prohibited integration patterns
@@ -106,7 +106,7 @@ The consumer MUST maintain explicit rules for page hierarchy, content width, res
 
 ### Marketing surfaces
 
-FsusUI does not provide a complete marketing system. The consumer owns hero, campaign, offer, CTA, and promotional composition. FsusUI’s prohibitions and public component contracts still apply where FsusUI components are used.
+FsusUI does not provide a complete marketing system. The consumer owns hero, campaign, offer, CTA, and promotional composition. FsusUI's prohibitions and public component contracts still apply where FsusUI components are used.
 
 ## 6. Defect routing
 
@@ -116,18 +116,19 @@ Treat a problem as a consumer defect when the primitive is used incorrectly, the
 
 Do not fix both sides by adding a compatibility layer. Use one owning implementation and one verified integration.
 
-## 7. Reusable Skill availability
+## 7. Reusable Skill availability and authority
 
-The canonical `fsusui-design-conformance` Skill lives in the FsusUI repository under `.agents/skills/`. It is discovered automatically when Codex runs in a workspace scope that exposes that directory. A separate consumer repository may expose the exact canonical Skill through its workspace configuration or a revision-pinned copy, but it must not fork the workflow or embed copied design values. The consumer must record which FsusUI revision supplies the Skill and documents.
+The canonical `fsusui-design-conformance` Skill lives in the FsusUI repository under `.agents/skills/`. It is discovered automatically when an agent workspace exposes that directory. A separate consumer repository may expose the exact canonical Skill through its workspace configuration or a revision-pinned copy, but it must not fork the domain contract or embed copied design values. The consumer must record which FsusUI revision supplies the Skill and documents.
 
-The Skill is optional assistance for direct human-led work; the documents and
-public contracts remain authoritative even when no agent workflow is active.
-For an orchestrated UI writer, adjudicator, or UX verifier, however, the
-canonical Skill is a required procedural contract: dispatch and acceptance must
-bind its exact digest and the active FsusUI baseline. Missing or unobservable
-Skill load fails that orchestration stage and cannot be replaced by a copied
-summary. This requirement does not raise the Skill above `spec/`,
-`docs/design.md`, or domain contracts.
+The Skill is optional assistance for direct human-led work. The documents and public contracts remain authoritative even when no agent workflow is active.
+
+When an external scheduler or orchestrator uses the Skill, the exact Skill digest and active FsusUI baseline may be bound as repository/domain evidence. The Skill supplies ownership classification, `uiDecisionClass`, `verificationClass`, design authority, rendered-evidence requirements, and UX acceptance semantics.
+
+The Skill does not supply shared orchestration authority. It must not define or select a Root/controller, permanent actor roster, model/profile/effort, execution route, runtime permission class, lease/resource/capacity policy, shared stage order, checkpoint/continuation behavior, retry/recovery policy, delivery, cleanup, or terminalization. Those decisions belong to the external scheduler.
+
+A scheduler may map FsusUI domain classifications into its own execution machinery, but that mapping is not part of the FsusUI Skill or its receipts. Missing FsusUI design authority cannot be replaced by a copied summary, and scheduler execution metadata cannot be promoted into FsusUI design truth.
+
+This requirement does not raise the Skill above `spec/`, `docs/design.md`, or domain contracts.
 
 ## 8. Consumer evidence
 
@@ -139,6 +140,7 @@ Consumer visual acceptance should cover the states relevant to the route, includ
 - light and dark themes;
 - narrow and wide viewports;
 - keyboard order, focus visibility, zoom, and overflow;
+- screen reader and touch behavior when applicable;
 - the exact FsusUI baseline used for acceptance.
 
 A passing FsusUI component fixture does not prove the consumer page composition, and a passing consumer screenshot does not authorize changing FsusUI defaults.

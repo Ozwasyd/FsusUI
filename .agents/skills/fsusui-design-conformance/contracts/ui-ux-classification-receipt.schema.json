@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://fsusui.dev/contracts/ui-ux-classification-receipt.v1.schema.json",
-  "title": "FsusUI UI/UX classification receipt v1",
+  "$id": "https://fsusui.dev/contracts/ui-ux-classification-receipt.v2.schema.json",
+  "title": "FsusUI UI/UX classification receipt v2",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -19,14 +19,13 @@
     "inScope",
     "outOfScope",
     "classificationEvidenceDigest",
-    "routingPolicyDigest",
-    "slicePolicyDigest",
+    "domainPolicyDigest",
     "status",
     "receiptDigest"
   ],
   "properties": {
     "schema": {
-      "const": "fsusui-design-conformance.ui-ux-classification-receipt.v1"
+      "const": "fsusui-design-conformance.ui-ux-classification-receipt.v2"
     },
     "ownerRepository": {
       "$ref": "#/definitions/repository"
@@ -44,7 +43,11 @@
       ]
     },
     "verificationClass": {
-      "enum": ["ux-local", "ux-path", "ux-system"]
+      "enum": [
+        "ux-local",
+        "ux-path",
+        "ux-system"
+      ]
     },
     "requiredAuthorities": {
       "type": "array",
@@ -52,7 +55,11 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "path", "digest"],
+        "required": [
+          "id",
+          "path",
+          "digest"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -111,7 +118,12 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["state", "viewport", "theme", "evidenceDigest"],
+        "required": [
+          "state",
+          "viewport",
+          "theme",
+          "evidenceDigest"
+        ],
         "properties": {
           "state": {
             "type": "string",
@@ -122,7 +134,12 @@
             "minLength": 1
           },
           "theme": {
-            "enum": ["light", "dark", "both", "not-applicable"]
+            "enum": [
+              "light",
+              "dark",
+              "both",
+              "not-applicable"
+            ]
           },
           "evidenceDigest": {
             "$ref": "#/definitions/hash"
@@ -139,10 +156,7 @@
     "classificationEvidenceDigest": {
       "$ref": "#/definitions/hash"
     },
-    "routingPolicyDigest": {
-      "$ref": "#/definitions/hash"
-    },
-    "slicePolicyDigest": {
+    "domainPolicyDigest": {
       "$ref": "#/definitions/hash"
     },
     "status": {
