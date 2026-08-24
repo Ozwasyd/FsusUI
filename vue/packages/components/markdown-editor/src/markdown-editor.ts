@@ -4,6 +4,8 @@ import { buildProps, definePropType } from '@element-plus/utils'
 import type { ExtractPropTypes, PropType } from 'vue'
 import type { MarkdownFeatureActivationFeatureOptions } from '@element-plus/wasm'
 import type MarkdownEditor from './markdown-editor.vue'
+import type { MarkdownAttachmentBatchIntent } from './markdown-editor-attachment'
+import type { MarkdownEditorMetricsOptions } from './markdown-editor-metrics'
 import type {
   MarkdownEditorHistoryState,
   MarkdownEditorDocumentIdentity,
@@ -408,6 +410,26 @@ export interface MarkdownEditorLocaleText {
   readonly modes: Readonly<Record<MarkdownEditorMode, string>>
   readonly commands: Readonly<Record<MarkdownEditorCommandIcon, string>>
   readonly actions: Readonly<Record<MarkdownEditorActionKey, string>>
+  readonly pasteAsMarkdown: Readonly<{
+    cancel: string
+    conversionWarnings: string
+    description: string
+    disabledDescriptions: Readonly<{
+      composition: string
+      disabled: string
+      loading: string
+      previewOnly: string
+      readonly: string
+    }>
+    importMarkdown: string
+    markdownPreview: string
+    pastePlainText: string
+    sourceAfter: string
+    sourceBefore: string
+    sourceDiff: string
+    stale: string
+    title: string
+  }>
   readonly overflow: string
   readonly overflowAria: (count: number) => string
   readonly editorAria: string
@@ -441,6 +463,27 @@ export const defaultMarkdownEditorLocaleText: MarkdownEditorLocaleText =
       save: '保存',
       submit: '提交',
     }),
+    pasteAsMarkdown: Object.freeze({
+      cancel: 'Cancel',
+      conversionWarnings: 'Conversion warnings',
+      description:
+        'Review the converted Markdown and source changes before importing.',
+      disabledDescriptions: Object.freeze({
+        composition: 'Unavailable while text composition is active.',
+        disabled: 'Unavailable while the editor is disabled.',
+        loading: 'Unavailable while the editor is loading.',
+        previewOnly: 'Unavailable in preview only mode.',
+        readonly: 'Unavailable while the editor is readonly.',
+      }),
+      importMarkdown: 'Import Markdown',
+      markdownPreview: 'Markdown preview',
+      pastePlainText: 'Paste plain text',
+      sourceAfter: 'After',
+      sourceBefore: 'Before',
+      sourceDiff: 'Source diff',
+      stale: 'The document or selection changed. Review the clipboard again.',
+      title: 'Paste as Markdown',
+    }),
     overflow: '格式工具',
     overflowAria: (count: number) => `格式工具，${count} 个工具`,
     editorAria: 'Markdown editor',
@@ -468,6 +511,14 @@ export const resolveMarkdownEditorLocaleText = (
   modes: {
     ...defaultMarkdownEditorLocaleText.modes,
     ...localeText?.modes,
+  },
+  pasteAsMarkdown: {
+    ...defaultMarkdownEditorLocaleText.pasteAsMarkdown,
+    ...localeText?.pasteAsMarkdown,
+    disabledDescriptions: {
+      ...defaultMarkdownEditorLocaleText.pasteAsMarkdown.disabledDescriptions,
+      ...localeText?.pasteAsMarkdown?.disabledDescriptions,
+    },
   },
   overflowAria:
     localeText?.overflowAria ?? defaultMarkdownEditorLocaleText.overflowAria,
@@ -669,6 +720,16 @@ export const defaultMarkdownEditorCommands: readonly MarkdownEditorCommand[] = [
         'alt',
       ) }),
   },
+  {
+    key: 'paste-as-markdown',
+    label: 'Paste as Markdown',
+    group: 'insert',
+    title: 'Paste as Markdown',
+    presentation: ['toolbar', 'palette'],
+    when: () => true,
+    enabled: () => true,
+    run: () => ({}),
+  },
 ]
 
 export const isMarkdownEditorCommandVisible = (
@@ -774,6 +835,7 @@ export const markdownEditorProps = buildProps({
     type: String,
     default: undefined,
   },
+  readonly: Boolean,
   disabled: Boolean,
   loading: Boolean,
   showModeSwitcher: {
@@ -855,7 +917,7 @@ export const markdownEditorEmits = {
     mode === 'source' || mode === 'live' || mode === 'split' || mode === 'preview',
   save: (value: string) => typeof value === 'string',
   submit: (value: string) => typeof value === 'string',
-  'upload-image': () => true,
+  'upload-image': (_batch?: MarkdownAttachmentBatchIntent) => true,
   'render-complete': (..._args: unknown[]) => true,
   'render-error': (..._args: unknown[]) => true,
   'features-activated': (..._args: unknown[]) => true,

@@ -10,12 +10,12 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "1ce0431889d30cec9f03954f5bc688efd6eda9c021accec8fc29ab7e394324e6",
+      "hash": "a31e2dcd9305f87221c9ca4fa256419d0ff7a2c9f0857e329fad45e5d32b8bbc",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "9c2e52a042c8f53df84c41bce8b43958008e28da1db2a77303720c72210daffa",
+      "hash": "1f3a47f192da55b3aaec99db8c410ceb7a549af7089186f08c749ee7f42928b4",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
@@ -47751,6 +47751,44 @@
           }
         },
         {
+          "name": "readonly",
+          "kind": "input",
+          "web": {
+            "member": "readonly",
+            "categories": [
+              "boolean"
+            ],
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "default": {
+              "kind": "missing"
+            },
+            "values": null,
+            "required": false,
+            "readonly": false
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "enumValues": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.input.readonly"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "saveActionLabel",
           "kind": "input",
           "web": {
@@ -48781,6 +48819,10 @@
             "kind": "derived"
           },
           {
+            "name": "readonly",
+            "kind": "derived"
+          },
+          {
             "name": "source",
             "kind": "derived-mode"
           },
@@ -49056,6 +49098,17 @@
         },
         {
           "member": "primaryCommandKeys",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "readonly",
           "kind": "input",
           "status": "missing",
           "governance": {
@@ -49422,6 +49475,19 @@
           ]
         },
         {
+          "member": "Dispatch",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.avalonia-extra.dispatch"
+          ]
+        },
+        {
           "member": "Document",
           "kind": "avalonia-extra",
           "governance": {
@@ -49487,6 +49553,32 @@
           ]
         },
         {
+          "member": "RedoDocument",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.avalonia-extra.redo-document"
+          ]
+        },
+        {
+          "member": "TransactionStore",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.avalonia-extra.transaction-store"
+          ]
+        },
+        {
           "member": "TryRunCommand",
           "kind": "avalonia-extra",
           "governance": {
@@ -49497,6 +49589,19 @@
           },
           "scenarioIds": [
             "scenario.v2.el-markdown-editor.avalonia-extra.try-run-command"
+          ]
+        },
+        {
+          "member": "UndoDocument",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.avalonia-extra.undo-document"
           ]
         }
       ],
@@ -49522,6 +49627,7 @@
         "scenario.v2.el-markdown-editor.input.preview-csp-nonce",
         "scenario.v2.el-markdown-editor.input.preview-features",
         "scenario.v2.el-markdown-editor.input.primary-command-keys",
+        "scenario.v2.el-markdown-editor.input.readonly",
         "scenario.v2.el-markdown-editor.input.save-action-label",
         "scenario.v2.el-markdown-editor.input.show-actions",
         "scenario.v2.el-markdown-editor.input.show-image-action",
@@ -49556,6 +49662,7 @@
         "scenario.v2.el-markdown-editor.state.default",
         "scenario.v2.el-markdown-editor.state.disabled",
         "scenario.v2.el-markdown-editor.state.loading",
+        "scenario.v2.el-markdown-editor.state.readonly",
         "scenario.v2.el-markdown-editor.state.source",
         "scenario.v2.el-markdown-editor.state.live",
         "scenario.v2.el-markdown-editor.state.split",
@@ -49571,12 +49678,12 @@
         "scenario.v2.el-markdown-editor.perf"
       ],
       "coverage": {
-        "total": 52,
+        "total": 53,
         "alignedCandidate": 0,
         "partial": 3,
-        "missing": 49,
+        "missing": 50,
         "webOnly": 0,
-        "mappedPercent": 5.8
+        "mappedPercent": 5.7
       },
       "markdownEditor": {
         "modes": [
@@ -134117,6 +134224,22 @@
       }
     },
     {
+      "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorDispatchResult",
+      "kind": "record",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 9,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-markdown-editor-dispatch-result"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
       "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorHistory",
       "kind": "class",
       "packageId": "avalonia",
@@ -134165,6 +134288,22 @@
       }
     },
     {
+      "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorShellMutation",
+      "kind": "record",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 5,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-markdown-editor-shell-mutation"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
       "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorStatusDensity",
       "kind": "enum",
       "packageId": "avalonia",
@@ -134172,6 +134311,38 @@
       "memberCount": 3,
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-markdown-editor-status-density"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorTransaction",
+      "kind": "record",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 7,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-markdown-editor-transaction"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusMarkdownEditorTransactionStore",
+      "kind": "class",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 11,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-markdown-editor-transaction-store"
       ],
       "governance": {
         "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
@@ -136440,9 +136611,9 @@
   "coverage": {
     "aligned-candidate": 49,
     "partial": 77,
-    "missing": 2030,
+    "missing": 2031,
     "web-only": 20,
-    "total": 2176,
+    "total": 2177,
     "mappedPercent": 5.8
   }
 }

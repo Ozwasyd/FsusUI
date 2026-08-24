@@ -95,6 +95,10 @@ Mappings are generated mechanically:
 Compatibility aliases such as `--el-color-primary` are allowed only when they
 point back to platform-neutral source tokens.
 
+Canonical eight-digit colors use CSS ordering, `#RRGGBBAA`. Web outputs preserve
+that representation. Avalonia outputs mechanically convert the same color to
+`#AARRGGBB`; platform files must not hand-author a second value.
+
 High-contrast behavior is not a canonical theme dimension. Operating-system
 accessibility behavior is registered as a reviewed platform override under
 `spec/platform-overrides/` instead of being emitted as a third Web theme preset.

@@ -2065,7 +2065,7 @@ describe('Select', () => {
     await nextTick()
 
     expect(filterIndicesSync).not.toHaveBeenCalled()
-    expect(selectVm.filteredOptions).toHaveLength(1)
+    await vi.waitFor(() => expect(selectVm.filteredOptions).toHaveLength(1))
     expect(selectVm.filteredOptions[0].label).toBe('Éclair')
   })
 

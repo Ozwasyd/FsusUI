@@ -18,7 +18,13 @@ export const MARKDOWN_SEARCH_BUDGET = Object.freeze({
   maxConcurrent: 1,
 })
 
-export type MarkdownSearchBudget = typeof MARKDOWN_SEARCH_BUDGET
+export interface MarkdownSearchBudget {
+  readonly maxRegexLength: number
+  readonly maxMs: number
+  readonly maxMatches: number
+  readonly maxSourceBytes: number
+  readonly maxConcurrent: number
+}
 
 export const createMarkdownSearchTask = (id: string, query: string): MarkdownSearchTask => ({
   id,
@@ -119,7 +125,7 @@ export const runMarkdownSearchTask = (input: {
       truncated: false,
     })
   }
-  if (!found.ok) {
+  if (found.ok === false) {
     return Object.freeze({
       requestId: input.requestId,
       status: 'rejected',

@@ -146,9 +146,9 @@ public static class FsusTokens
 
     public const string ColorSurfaceOverlayName = "color.surface.overlay";
     public const string ColorSurfaceOverlayResourceKey = "FsusColorSurfaceOverlay";
-    public const string ColorSurfaceOverlayValue = "#FFFFFFFA";
+    public const string ColorSurfaceOverlayValue = "#FAFFFFFF";
     public const string ColorSurfaceOverlayDarkResourceKey = "FsusColorSurfaceOverlayDark";
-    public const string ColorSurfaceOverlayDarkValue = "#121214FA";
+    public const string ColorSurfaceOverlayDarkValue = "#FA121214";
     public const string ColorSurfaceOverlayBrushResourceKey = "FsusColorSurfaceOverlayBrush";
     public static Color ColorSurfaceOverlayColor => Color.Parse(ColorSurfaceOverlayValue);
     public static SolidColorBrush ColorSurfaceOverlayBrush => new(ColorSurfaceOverlayColor);
@@ -674,36 +674,36 @@ public static class FsusTokens
 
     public const string ComponentStateSurfaceHoverBackgroundName = "component-state.surface.hover.background";
     public const string ComponentStateSurfaceHoverBackgroundResourceKey = "FsusComponentStateSurfaceHoverBackground";
-    public const string ComponentStateSurfaceHoverBackgroundValue = "#2A599C0E";
+    public const string ComponentStateSurfaceHoverBackgroundValue = "#0E2A599C";
     public const string ComponentStateSurfaceHoverBackgroundDarkResourceKey = "FsusComponentStateSurfaceHoverBackgroundDark";
-    public const string ComponentStateSurfaceHoverBackgroundDarkValue = "#4B79CC1F";
+    public const string ComponentStateSurfaceHoverBackgroundDarkValue = "#1F4B79CC";
     public const string ComponentStateSurfaceHoverBackgroundBrushResourceKey = "FsusComponentStateSurfaceHoverBackgroundBrush";
     public static Color ComponentStateSurfaceHoverBackgroundColor => Color.Parse(ComponentStateSurfaceHoverBackgroundValue);
     public static SolidColorBrush ComponentStateSurfaceHoverBackgroundBrush => new(ComponentStateSurfaceHoverBackgroundColor);
 
     public const string ComponentStateSurfaceSelectedBackgroundName = "component-state.surface.selected.background";
     public const string ComponentStateSurfaceSelectedBackgroundResourceKey = "FsusComponentStateSurfaceSelectedBackground";
-    public const string ComponentStateSurfaceSelectedBackgroundValue = "#2A599C0D";
+    public const string ComponentStateSurfaceSelectedBackgroundValue = "#0D2A599C";
     public const string ComponentStateSurfaceSelectedBackgroundDarkResourceKey = "FsusComponentStateSurfaceSelectedBackgroundDark";
-    public const string ComponentStateSurfaceSelectedBackgroundDarkValue = "#4B79CC1A";
+    public const string ComponentStateSurfaceSelectedBackgroundDarkValue = "#1A4B79CC";
     public const string ComponentStateSurfaceSelectedBackgroundBrushResourceKey = "FsusComponentStateSurfaceSelectedBackgroundBrush";
     public static Color ComponentStateSurfaceSelectedBackgroundColor => Color.Parse(ComponentStateSurfaceSelectedBackgroundValue);
     public static SolidColorBrush ComponentStateSurfaceSelectedBackgroundBrush => new(ComponentStateSurfaceSelectedBackgroundColor);
 
     public const string ComponentStateSurfaceEmphasisBackgroundName = "component-state.surface.emphasis.background";
     public const string ComponentStateSurfaceEmphasisBackgroundResourceKey = "FsusComponentStateSurfaceEmphasisBackground";
-    public const string ComponentStateSurfaceEmphasisBackgroundValue = "#2A599C14";
+    public const string ComponentStateSurfaceEmphasisBackgroundValue = "#142A599C";
     public const string ComponentStateSurfaceEmphasisBackgroundDarkResourceKey = "FsusComponentStateSurfaceEmphasisBackgroundDark";
-    public const string ComponentStateSurfaceEmphasisBackgroundDarkValue = "#4B79CC29";
+    public const string ComponentStateSurfaceEmphasisBackgroundDarkValue = "#294B79CC";
     public const string ComponentStateSurfaceEmphasisBackgroundBrushResourceKey = "FsusComponentStateSurfaceEmphasisBackgroundBrush";
     public static Color ComponentStateSurfaceEmphasisBackgroundColor => Color.Parse(ComponentStateSurfaceEmphasisBackgroundValue);
     public static SolidColorBrush ComponentStateSurfaceEmphasisBackgroundBrush => new(ComponentStateSurfaceEmphasisBackgroundColor);
 
     public const string ComponentStateSurfaceFocusBorderName = "component-state.surface.focus.border";
     public const string ComponentStateSurfaceFocusBorderResourceKey = "FsusComponentStateSurfaceFocusBorder";
-    public const string ComponentStateSurfaceFocusBorderValue = "#2A599C47";
+    public const string ComponentStateSurfaceFocusBorderValue = "#472A599C";
     public const string ComponentStateSurfaceFocusBorderDarkResourceKey = "FsusComponentStateSurfaceFocusBorderDark";
-    public const string ComponentStateSurfaceFocusBorderDarkValue = "#4B79CC5C";
+    public const string ComponentStateSurfaceFocusBorderDarkValue = "#5C4B79CC";
     public const string ComponentStateSurfaceFocusBorderBrushResourceKey = "FsusComponentStateSurfaceFocusBorderBrush";
     public static Color ComponentStateSurfaceFocusBorderColor => Color.Parse(ComponentStateSurfaceFocusBorderValue);
     public static SolidColorBrush ComponentStateSurfaceFocusBorderBrush => new(ComponentStateSurfaceFocusBorderColor);

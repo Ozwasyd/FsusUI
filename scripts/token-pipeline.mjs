@@ -421,6 +421,12 @@ const scssMapValue = (token, tokenMap) => {
 const csharpEscape = (value) =>
   String(value).replaceAll('\\', '\\\\').replaceAll('"', '\\"')
 
+export const toAvaloniaColorSyntax = (value) =>
+  String(value).replace(
+    /#([0-9A-Fa-f]{8})(?![0-9A-Fa-f])/gu,
+    (_, color) => `#${color.slice(6, 8)}${color.slice(0, 6)}`,
+  )
+
 const numericValue = (value) => {
   const number = Number(stripUnit(value))
   if (!Number.isFinite(number)) {
@@ -615,7 +621,9 @@ const renderAvaloniaXaml = (source, tokenMap) => {
 
   for (const token of source.tokens) {
     const key = pascalName(token.name)
-    const value = xmlEscape(resolveValue(token, tokenMap))
+    const value = xmlEscape(
+      toAvaloniaColorSyntax(resolveValue(token, tokenMap)),
+    )
     const kind = avaloniaResourceKindForToken(token)
 
     if (kind === 'color') {
@@ -624,7 +632,9 @@ const renderAvaloniaXaml = (source, tokenMap) => {
       for (const modeName of Object.keys(token.modeValues ?? {})) {
         const modeKey = `${key}${csharpName(modeName)}`
         const modeValue = xmlEscape(
-          resolveValue(token, tokenMap, new Set(), modeName),
+          toAvaloniaColorSyntax(
+            resolveValue(token, tokenMap, new Set(), modeName),
+          ),
         )
         lines.push(`  <Color x:Key="${modeKey}">${modeValue}</Color>`)
         lines.push(
@@ -706,7 +716,7 @@ const renderAvaloniaXaml = (source, tokenMap) => {
 
 const renderCsharpAccessorLines = (token, tokenMap) => {
   const name = csharpName(token.name)
-  const value = resolveValue(token, tokenMap)
+  const value = toAvaloniaColorSyntax(resolveValue(token, tokenMap))
   const kind = avaloniaResourceKindForToken(token)
   const escapedValue = csharpEscape(value)
 
@@ -818,14 +828,18 @@ const renderCsharp = (source, tokenMap) => {
   for (const token of source.tokens) {
     const name = csharpName(token.name)
     const resourceKey = pascalName(token.name)
-    const value = csharpEscape(resolveValue(token, tokenMap))
+    const value = csharpEscape(
+      toAvaloniaColorSyntax(resolveValue(token, tokenMap)),
+    )
     lines.push(`    public const string ${name}Name = "${token.name}";`)
     lines.push(`    public const string ${name}ResourceKey = "${resourceKey}";`)
     lines.push(`    public const string ${name}Value = "${value}";`)
     for (const modeName of Object.keys(token.modeValues ?? {})) {
       const suffix = csharpName(modeName)
       const modeValue = csharpEscape(
-        resolveValue(token, tokenMap, new Set(), modeName),
+        toAvaloniaColorSyntax(
+          resolveValue(token, tokenMap, new Set(), modeName),
+        ),
       )
       lines.push(
         `    public const string ${name}${suffix}ResourceKey = "${resourceKey}${suffix}";`,

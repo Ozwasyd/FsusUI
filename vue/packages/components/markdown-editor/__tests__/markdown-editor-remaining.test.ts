@@ -19,7 +19,7 @@ describe('markdown remaining leaf contracts', () => {
     expect(preview.markdown).toContain('Hello')
     expect(preview.loss).toContain('script')
     const tx = confirmPasteAsMarkdown('<p>Hi</p>', 0)
-    expect(tx.origin).toBe('paste')
+    expect(tx.origin).toBe('command')
     expect(tx.changes).toHaveLength(1)
   })
 

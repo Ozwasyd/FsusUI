@@ -37,14 +37,14 @@ describe('markdown embed budgets, cycle identity, and versioned cache', () => {
       providerVersion: 1,
     })
     expect(direct.ok).toBe(false)
-    if (!direct.ok) expect(direct.failure).toBe('cycle')
+    if (direct.ok === false) expect(direct.failure).toBe('cycle')
 
     const indirect = session.walk({
       root: node('a', { children: [node('b', { children: [node('a')] })] }),
       providerVersion: 1,
     })
     expect(indirect.ok).toBe(false)
-    if (!indirect.ok) expect(indirect.failure).toBe('cycle')
+    if (indirect.ok === false) expect(indirect.failure).toBe('cycle')
 
     const sameTokenDifferentIdentity = session.walk({
       root: node('a', {
@@ -81,7 +81,7 @@ describe('markdown embed budgets, cycle identity, and versioned cache', () => {
       providerVersion: 1,
     })
     expect(deep.ok).toBe(false)
-    if (!deep.ok) expect(deep.failure).toBe('depth-exceeded')
+    if (deep.ok === false) expect(deep.failure).toBe('depth-exceeded')
   })
 
   it('isolates cache by identity, version, mode, provider, theme, and locale', () => {
@@ -115,7 +115,7 @@ describe('markdown embed budgets, cycle identity, and versioned cache', () => {
       task,
     })
     expect(cancelled.ok).toBe(false)
-    if (!cancelled.ok) expect(cancelled.failure).toBe('cancelled')
+    if (cancelled.ok === false) expect(cancelled.failure).toBe('cancelled')
 
     const stale = commitMarkdownEmbedWalk(
       { documentId: 'doc', documentEpoch: 2 },
@@ -131,7 +131,7 @@ describe('markdown embed budgets, cycle identity, and versioned cache', () => {
       },
     )
     expect(stale.ok).toBe(false)
-    if (!stale.ok) expect(stale.failure).toBe('stale')
+    if (stale.ok === false) expect(stale.failure).toBe('stale')
 
     const children = Array.from({ length: 1000 }, (_, index) => node(`n${index}`, { bytes: 4 }))
     const thousand = session.walk({
@@ -139,7 +139,7 @@ describe('markdown embed budgets, cycle identity, and versioned cache', () => {
       providerVersion: 1,
     })
     expect(thousand.ok).toBe(false)
-    if (!thousand.ok) expect(thousand.failure).toBe('node-exceeded')
+    if (thousand.ok === false) expect(thousand.failure).toBe('node-exceeded')
 
     const within = session.walk({
       root: node('root', {

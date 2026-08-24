@@ -67,6 +67,18 @@ Language edits touch only the info range. Keyboard and clipboard stay on
 the #287 pipeline. Fences are not identified by regex and bodies are not
 executed.
 
+`Paste as Markdown` is the explicit-only #394 command boundary. It freezes one
+clipboard snapshot and one document/revision/selection anchor before showing
+Markdown, source-diff, and typed conversion-warning evidence. Plain-text import,
+Markdown import, and cancel are explicit choices; there is no source mutation
+before confirmation. A confirmed choice uses one separate-history transaction,
+while a stale anchor, composition, `readonly`, `disabled`, `loading`, or
+preview-only state fails closed and restores editor focus. Attachment
+descriptors leave the editor only as provider intent and never as data URLs.
+This command does not change normal paste MIME priority and does not redefine
+the existing sanitizer, converter, attachment provider, or upload-I/O
+boundaries.
+
 `planMarkdownMermaidPreview` is the #384 Mermaid preview contract. Requests
 reuse the #382 identity. Valid diagrams preview through the unique feature
 gateway. Invalid, large, abort, and stale results stay local and source-only.

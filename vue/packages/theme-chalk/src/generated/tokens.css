@@ -139,7 +139,7 @@
   --fsus-component-dialog-min-width: 360px;
   --fsus-component-dialog-min-height: 220px;
   --fsus-component-dialog-padding: 24px;
-  --fsus-component-overlay-scrim: #99000000;
+  --fsus-component-overlay-scrim: #00000099;
   --fsus-component-material-paper-blur: 0px;
   --fsus-backdrop-blur: var(--fsus-component-material-paper-blur);
   --fsus-component-material-paper-blur-soft: 0px;

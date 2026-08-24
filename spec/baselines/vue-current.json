@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "1fa7d8ead7239505f1a69d88bbdec223e93d7ca7",
+    "commitSha": "1d0391b477cc30916cca7649d8aab74f7bdc812d",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
-    "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
+    "tokenHash": "efedf2d7a3f11cbd9ecb583513d7f36c7e0068ef87e096d366b332eaac99e609",
     "iconHash": "d61254b1b1ff9addaf45293153df217b0c0d01ec69ec602081c44a01008b78de",
     "toolVersion": "avalonia-vue-public-api-baseline@1.0.0+vue-semantic-baseline@1.0.0",
-    "inputTreeHash": "1758938fbfc5c48eb8bbf013dfbb21bf6f7cbc9a62d1c1093057cbd5eac4dbbc",
+    "inputTreeHash": "f2a67e5ff55da8bdc0be8ea836363cb6b7847c20a97be0bcf6280eb898607ddd",
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "c5f19a98ef077446c05103f94a6f12e6be7774d68de48cc1c4ed67abd7102ec6"
+    "outputHash": "fb8999fe971a025e2c5e562a9888ffbe6d1b59a37c3845ff436cc83b241cfa2b"
   },
   "summary": {
     "componentModules": 93,
@@ -21,7 +21,7 @@
     "services": 4,
     "plugins": 7,
     "cssVariables": 483,
-    "deprecatedApis": 20,
+    "deprecatedApis": 21,
     "componentCountByClassification": {
       "portable": 126,
       "native-adapter": 73,
@@ -11005,6 +11005,7 @@
         "previewCspNonce",
         "previewFeatures",
         "primaryCommandKeys",
+        "readonly",
         "saveActionLabel",
         "showActions",
         "showImageAction",
@@ -11315,6 +11316,18 @@
             "readonly": false
           },
           {
+            "name": "readonly",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
             "name": "saveActionLabel",
             "runtimeType": "String",
             "semanticType": null,
@@ -11617,7 +11630,14 @@
           },
           {
             "name": "upload-image",
-            "payload": []
+            "payload": [
+              {
+                "name": "_batch",
+                "type": "MarkdownAttachmentBatchIntent",
+                "optional": true,
+                "rest": false
+              }
+            ]
           }
         ],
         "exposed": [
@@ -31046,6 +31066,7 @@
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/markdown-renderer.scss"
       ],
       "classification": "portable"
@@ -31270,7 +31291,10 @@
     },
     {
       "name": "--el-dialog-border-radius",
-      "files": ["vue/packages/theme-chalk/src/common/fsus-tokens.scss"],
+      "files": [
+        "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
+        "vue/packages/theme-chalk/src/markdown-editor.scss"
+      ],
       "classification": "portable"
     },
     {
@@ -32472,7 +32496,8 @@
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/common/var.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
-        "vue/packages/theme-chalk/src/generated/tokens.css"
+        "vue/packages/theme-chalk/src/generated/tokens.css",
+        "vue/packages/theme-chalk/src/markdown-editor.scss"
       ],
       "classification": "portable"
     },
@@ -34240,6 +34265,7 @@
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/menu.scss",
         "vue/packages/theme-chalk/src/message-box.scss",
         "vue/packages/theme-chalk/src/popover.scss",
@@ -34319,6 +34345,7 @@
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/descriptions.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/motion.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss",
@@ -34335,6 +34362,7 @@
         "vue/packages/theme-chalk/src/descriptions.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/markdown-renderer.scss",
         "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/motion.scss",
@@ -34351,6 +34379,7 @@
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/descriptions.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/markdown-renderer.scss",
         "vue/packages/theme-chalk/src/notification.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss"
@@ -34367,6 +34396,7 @@
         "vue/packages/theme-chalk/src/drawer.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/markdown-renderer.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss",
         "vue/packages/theme-chalk/src/task-page-header.scss"
@@ -34377,7 +34407,8 @@
       "name": "--fsus-space-5",
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
-        "vue/packages/theme-chalk/src/generated/tokens.css"
+        "vue/packages/theme-chalk/src/generated/tokens.css",
+        "vue/packages/theme-chalk/src/markdown-editor.scss"
       ],
       "classification": "portable"
     },
@@ -34389,6 +34420,7 @@
         "vue/packages/theme-chalk/src/descriptions.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/task-page-header.scss"
       ],
       "classification": "portable"
@@ -34397,7 +34429,8 @@
       "name": "--fsus-space-8",
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
-        "vue/packages/theme-chalk/src/generated/tokens.css"
+        "vue/packages/theme-chalk/src/generated/tokens.css",
+        "vue/packages/theme-chalk/src/markdown-editor.scss"
       ],
       "classification": "portable"
     },
@@ -34506,6 +34539,7 @@
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/loading.scss",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/public-shell-critical.scss",
         "vue/packages/theme-chalk/src/public-shell.scss"
       ],
@@ -34934,7 +34968,11 @@
     },
     {
       "name": "--fsus-z-overlay-dialog",
-      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
+      "files": [
+        "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
+        "vue/packages/theme-chalk/src/generated/tokens.css",
+        "vue/packages/theme-chalk/src/markdown-editor.scss"
+      ],
       "classification": "portable"
     }
   ],
@@ -34948,6 +34986,11 @@
       "file": "vue/packages/components/dialog/src/dialog-content.ts",
       "marker": "@deprecated will be removed in version 2.4.0, please use class",
       "target": "customClass: {"
+    },
+    {
+      "file": "vue/packages/components/markdown-editor/src/markdown-editor-attachment.ts",
+      "marker": "/** @deprecated Use MarkdownAttachmentSourceKind. */",
+      "target": "export type MarkdownAttachmentIntent = MarkdownAttachmentSourceKind"
     },
     {
       "file": "vue/packages/components/popper/src/arrow.ts",

@@ -1,5 +1,6 @@
 <template>
   <section
+    v-bind="$attrs"
     :class="[
       ns.b(),
       ns.m(currentMode),
@@ -26,12 +27,30 @@
           :key="command.key"
           type="button"
           :class="ns.e('command')"
-          :disabled="editingBlocked"
+          :disabled="isCommandDisabled(command)"
+          :aria-describedby="commandDescriptionId(command)"
           :aria-label="command.title || command.label"
           :title="command.title || command.label"
-          @click="runCommand(command)"
+          @click="activateCommand(command)"
         >
           {{ command.label }}
+        </button>
+        <button
+          v-if="gatedPasteAsMarkdownCommand"
+          type="button"
+          :class="ns.e('command')"
+          disabled
+          :aria-describedby="pasteAsMarkdownDescriptionId"
+          :aria-label="
+            gatedPasteAsMarkdownCommand.title ||
+            gatedPasteAsMarkdownCommand.label
+          "
+          :title="
+            gatedPasteAsMarkdownCommand.title ||
+            gatedPasteAsMarkdownCommand.label
+          "
+        >
+          {{ gatedPasteAsMarkdownCommand.label }}
         </button>
         <button
           v-if="overflowItemCount"
@@ -99,10 +118,11 @@
           :key="command.key"
           type="button"
           :class="ns.e('command')"
-          :disabled="editingBlocked"
+          :disabled="isCommandDisabled(command)"
+          :aria-describedby="commandDescriptionId(command)"
           :aria-label="command.title || command.label"
           :title="command.title || command.label"
-          @click="runOverflowCommand(command)"
+          @click="activateOverflowCommand(command)"
         >
           {{ command.label }}
         </button>
@@ -117,6 +137,13 @@
           {{ action.label }}
         </button>
       </div>
+      <span
+        v-if="pasteAsMarkdownGate"
+        :id="pasteAsMarkdownDescriptionId"
+        :class="ns.e('visually-hidden')"
+      >
+        {{ pasteAsMarkdownGateDescription }}
+      </span>
     </header>
 
     <div
@@ -137,7 +164,9 @@
         :aria-label="textareaAriaLabel"
         :aria-busy="loading || undefined"
         :aria-disabled="editingBlocked"
-        :disabled="editingBlocked"
+        :aria-readonly="props.readonly || undefined"
+        :disabled="inputDisabled"
+        :readonly="props.readonly"
         :hidden="!liveSurface.inputVisible || undefined"
         :name="textareaName"
         :placeholder="effectivePlaceholder"
@@ -206,6 +235,106 @@
         </span>
       </slot>
     </footer>
+
+    <Teleport to="body">
+      <div
+        v-if="pasteAsMarkdownSession"
+        :class="ns.e('paste-backdrop')"
+        @mousedown.self.prevent
+      >
+        <section
+          ref="pasteAsMarkdownDialogRef"
+          :class="ns.e('paste-dialog')"
+          role="dialog"
+          aria-modal="true"
+          :aria-labelledby="pasteAsMarkdownTitleId"
+          :aria-describedby="pasteAsMarkdownHelpId"
+          @keydown="handlePasteAsMarkdownDialogKeydown"
+        >
+          <header :class="ns.e('paste-header')">
+            <h2 :id="pasteAsMarkdownTitleId">
+              {{ localeText.pasteAsMarkdown.title }}
+            </h2>
+            <p :id="pasteAsMarkdownHelpId">
+              {{ localeText.pasteAsMarkdown.description }}
+            </p>
+          </header>
+
+          <div :class="ns.e('paste-content')">
+            <section
+              :class="ns.e('paste-preview')"
+              role="region"
+              :aria-label="localeText.pasteAsMarkdown.markdownPreview"
+            >
+              <h3>{{ localeText.pasteAsMarkdown.markdownPreview }}</h3>
+              <pre>{{ pasteAsMarkdownSession.preview.markdown }}</pre>
+            </section>
+
+            <section
+              :class="ns.e('paste-diff')"
+              role="region"
+              :aria-label="localeText.pasteAsMarkdown.sourceDiff"
+            >
+              <h3>{{ localeText.pasteAsMarkdown.sourceDiff }}</h3>
+              <div :class="ns.e('paste-diff-columns')">
+                <div>
+                  <h4>{{ localeText.pasteAsMarkdown.sourceBefore }}</h4>
+                  <pre>{{ pasteAsMarkdownSession.preview.diff.before }}</pre>
+                </div>
+                <div>
+                  <h4>{{ localeText.pasteAsMarkdown.sourceAfter }}</h4>
+                  <pre>{{ pasteAsMarkdownSession.preview.diff.after }}</pre>
+                </div>
+              </div>
+            </section>
+
+            <div
+              v-if="pasteAsMarkdownSession.preview.warnings.length"
+              :class="ns.e('paste-warnings')"
+              role="region"
+              :aria-label="localeText.pasteAsMarkdown.conversionWarnings"
+            >
+              <h3>{{ localeText.pasteAsMarkdown.conversionWarnings }}</h3>
+              <ul
+                :aria-label="localeText.pasteAsMarkdown.conversionWarnings"
+              >
+                <li
+                  v-for="warning in pasteAsMarkdownSession.preview.warnings"
+                  :key="`${warning.kind}:${warning.code}:${warning.detail || ''}`"
+                >
+                  <strong>{{ warning.kind }}</strong
+                  >: {{ warning.code
+                  }}<span v-if="warning.detail"> — {{ warning.detail }}</span>
+                </li>
+              </ul>
+            </div>
+
+            <p v-if="pasteAsMarkdownError" role="alert">
+              {{ pasteAsMarkdownError }}
+            </p>
+          </div>
+
+          <footer :class="ns.e('paste-actions')">
+            <button
+              type="button"
+              @click="confirmPasteAsMarkdownChoice('plain-text')"
+            >
+              {{ localeText.pasteAsMarkdown.pastePlainText }}
+            </button>
+            <button
+              ref="pasteAsMarkdownPrimaryActionRef"
+              type="button"
+              @click="confirmPasteAsMarkdownChoice('markdown-import')"
+            >
+              {{ localeText.pasteAsMarkdown.importMarkdown }}
+            </button>
+            <button type="button" @click="cancelPasteAsMarkdownSurface">
+              {{ localeText.pasteAsMarkdown.cancel }}
+            </button>
+          </footer>
+        </section>
+      </div>
+    </Teleport>
   </section>
 </template>
 
@@ -275,6 +404,13 @@ import {
   resolveMarkdownClipboardPaste,
   writeMarkdownClipboardPayload,
 } from './markdown-editor-clipboard'
+import {
+  cancelMarkdownPasteAsMarkdown,
+  confirmMarkdownPasteAsMarkdown,
+  openMarkdownPasteAsMarkdown,
+  type MarkdownPasteAsMarkdownChoice,
+  type MarkdownPasteAsMarkdownSession,
+} from './markdown-editor-paste-markdown'
 import { createMarkdownEditorNativeEventMachine } from './markdown-editor-native-event'
 import { createMarkdownLiveSurface } from './markdown-editor-live-surface'
 import {
@@ -298,8 +434,11 @@ import {
   type MarkdownLiveVirtualWindow,
 } from './markdown-editor-live-layout'
 
+import type { MarkdownHtmlImportSnapshot } from '../../../wasm/markdown-html-import'
+
 defineOptions({
   name: 'ElMarkdownEditor',
+  inheritAttrs: false,
 })
 
 const props = defineProps(markdownEditorProps)
@@ -308,9 +447,18 @@ const ns = useNamespace('markdown-editor')
 const modes: MarkdownEditorMode[] = ['source', 'live', 'split', 'preview']
 const commandTrayId = `${useId()}-command-tray`
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
+const pasteAsMarkdownDialogRef = ref<HTMLElement | null>(null)
+const pasteAsMarkdownPrimaryActionRef = ref<HTMLButtonElement | null>(null)
+const pasteAsMarkdownSession = ref<MarkdownPasteAsMarkdownSession | null>(null)
+const pasteAsMarkdownError = ref('')
+const pasteAsMarkdownBusy = ref(false)
+const pasteAsMarkdownDescriptionId = `${useId()}-paste-as-markdown-description`
+const pasteAsMarkdownTitleId = `${useId()}-paste-as-markdown-title`
+const pasteAsMarkdownHelpId = `${useId()}-paste-as-markdown-help`
 const commandsExpanded = ref(false)
 const visualViewportHeight = ref(0)
-const editingBlocked = computed(() => props.disabled || props.loading)
+const inputDisabled = computed(() => props.disabled || props.loading)
+const editingBlocked = computed(() => props.readonly || inputDisabled.value)
 const surfaceOptions = computed<Required<MarkdownEditorSurfaceOptions>>(() => ({
   commandPalette: props.surfaces.commandPalette ?? false,
   selectionToolbar: props.surfaces.selectionToolbar ?? false,
@@ -362,6 +510,16 @@ const liveReveal = ref(
   }),
 )
 const isComposing = ref(false)
+const pasteAsMarkdownGate = computed<
+  'composition' | 'readonly' | 'disabled' | 'loading' | 'previewOnly' | null
+>(() => {
+  if (isComposing.value) return 'composition'
+  if (props.readonly) return 'readonly'
+  if (props.loading) return 'loading'
+  if (props.disabled) return 'disabled'
+  if (currentMode.value === 'preview') return 'previewOnly'
+  return null
+})
 const atomicSession = ref<MarkdownAtomicNodeSession | null>(null)
 const liveAtomic = ref<MarkdownAtomicNodePlan | null>(null)
 const layoutGesture = ref<MarkdownLiveLayoutGesture | null>(null)
@@ -818,9 +976,35 @@ const commandContext = computed(() => ({
 const toolbarCommands = computed(() =>
   filterMarkdownEditorCommands(props.commands, commandContext.value, 'toolbar'),
 )
+const gatedPasteAsMarkdownCommand = computed(() =>
+  pasteAsMarkdownGate.value &&
+  !resolveMarkdownEditorPrimaryCommands(
+    toolbarCommands.value,
+    props.toolbarDensity,
+    props.primaryCommandKeys,
+  ).some((command) => command.key === 'paste-as-markdown')
+    ? toolbarCommands.value.find(
+        (command) => command.key === 'paste-as-markdown',
+      )
+    : undefined,
+)
 const localeText = computed(() =>
   resolveMarkdownEditorLocaleText(props.localeText),
 )
+const pasteAsMarkdownGateDescription = computed(() => {
+  const gate = pasteAsMarkdownGate.value
+  return gate ? localeText.value.pasteAsMarkdown.disabledDescriptions[gate] : ''
+})
+const isPasteAsMarkdownCommand = (command: MarkdownEditorCommand) =>
+  command.key === 'paste-as-markdown'
+const isCommandDisabled = (command: MarkdownEditorCommand) =>
+  editingBlocked.value ||
+  (isPasteAsMarkdownCommand(command) &&
+    (Boolean(pasteAsMarkdownGate.value) || pasteAsMarkdownBusy.value))
+const commandDescriptionId = (command: MarkdownEditorCommand) =>
+  isPasteAsMarkdownCommand(command) && pasteAsMarkdownGate.value
+    ? pasteAsMarkdownDescriptionId
+    : undefined
 const primaryCommands = computed(() =>
   resolveMarkdownEditorPrimaryCommands(
     toolbarCommands.value,
@@ -1246,6 +1430,162 @@ const handleBlur = () => {
   transactionStore.breakMergeGroup()
 }
 
+const readPasteAsMarkdownClipboard =
+  async (): Promise<MarkdownHtmlImportSnapshot> => {
+    const clipboard = navigator.clipboard
+    if (typeof clipboard?.read === 'function') {
+      const items = await clipboard.read()
+      const item = items[0]
+      if (!item) return Object.freeze({ explicit: true })
+      const types = new Set(item.types)
+      const readType = async (type: string) =>
+        types.has(type) ? (await item.getType(type)).text() : undefined
+      const [html, markdown, plain] = await Promise.all([
+        readType('text/html'),
+        readType('text/markdown'),
+        readType('text/plain'),
+      ])
+      return Object.freeze({
+        explicit: true,
+        html,
+        markdown,
+        plain,
+        sourceApplication: undefined,
+      })
+    }
+    if (typeof clipboard?.readText === 'function') {
+      return Object.freeze({
+        explicit: true,
+        plain: await clipboard.readText(),
+      })
+    }
+    throw new Error('Clipboard access is unavailable.')
+  }
+
+const restorePasteAsMarkdownFocus = (selection: MarkdownEditorSelection) => {
+  void restoreTextareaSelection(selection)
+}
+
+const openPasteAsMarkdownSurface = async () => {
+  if (pasteAsMarkdownGate.value || pasteAsMarkdownBusy.value) return
+  const anchor = Object.freeze({
+    documentIdentity,
+    revision: transactionStore.revision,
+    selection: Object.freeze({ ...captureSelection() }),
+    source: transactionStore.value,
+  })
+  pasteAsMarkdownBusy.value = true
+  pasteAsMarkdownError.value = ''
+  try {
+    const snapshot = await readPasteAsMarkdownClipboard()
+    const opened = openMarkdownPasteAsMarkdown({
+      anchor,
+      composition: isComposing.value,
+      disabled: props.disabled || props.loading,
+      explicit: true,
+      previewOnly: currentMode.value === 'preview',
+      readonly: props.readonly,
+      snapshot,
+    })
+    if (opened.ok === false) {
+      pasteAsMarkdownError.value =
+        pasteAsMarkdownGateDescription.value || opened.rejected
+      restorePasteAsMarkdownFocus(anchor.selection)
+      return
+    }
+    pasteAsMarkdownSession.value = opened.session
+    await nextTick()
+    pasteAsMarkdownPrimaryActionRef.value?.focus()
+  } catch (error) {
+    pasteAsMarkdownError.value =
+      error instanceof Error ? error.message : 'Clipboard access failed.'
+    restorePasteAsMarkdownFocus(anchor.selection)
+  } finally {
+    pasteAsMarkdownBusy.value = false
+  }
+}
+
+const closePasteAsMarkdownSurface = (selection: MarkdownEditorSelection) => {
+  pasteAsMarkdownSession.value = null
+  pasteAsMarkdownError.value = ''
+  restorePasteAsMarkdownFocus(selection)
+}
+
+const cancelPasteAsMarkdownSurface = () => {
+  const session = pasteAsMarkdownSession.value
+  if (!session) return
+  const cancelled = cancelMarkdownPasteAsMarkdown(session)
+  closePasteAsMarkdownSurface(cancelled.selection)
+}
+
+const confirmPasteAsMarkdownChoice = (
+  choice: Exclude<MarkdownPasteAsMarkdownChoice, 'cancel'>,
+) => {
+  const session = pasteAsMarkdownSession.value
+  if (!session) return
+  if (pasteAsMarkdownGate.value) {
+    pasteAsMarkdownError.value = pasteAsMarkdownGateDescription.value
+    return
+  }
+  const current = Object.freeze({
+    documentIdentity,
+    revision: transactionStore.revision,
+    selection: Object.freeze({ ...captureSelection(false) }),
+    source: transactionStore.value,
+  })
+  const confirmed = confirmMarkdownPasteAsMarkdown(session, choice, current)
+  if ('rejected' in confirmed) {
+    pasteAsMarkdownError.value = localeText.value.pasteAsMarkdown.stale
+    return
+  }
+  const result = dispatchTransaction(confirmed.transaction)
+  if (!result.accepted) {
+    pasteAsMarkdownError.value = localeText.value.pasteAsMarkdown.stale
+    return
+  }
+  if (confirmed.attachmentBatch) {
+    emit('upload-image', confirmed.attachmentBatch)
+  }
+  closePasteAsMarkdownSurface(result.selection)
+}
+
+const handlePasteAsMarkdownDialogKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    cancelPasteAsMarkdownSurface()
+    return
+  }
+  if (event.key !== 'Tab') return
+  const buttons = Array.from(
+    pasteAsMarkdownDialogRef.value?.querySelectorAll<HTMLButtonElement>(
+      'button:not(:disabled)',
+    ) ?? [],
+  )
+  if (!buttons.length) return
+  const first = buttons[0]!
+  const last = buttons[buttons.length - 1]!
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault()
+    last.focus()
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault()
+    first.focus()
+  }
+}
+
+const activateCommand = (command: MarkdownEditorCommand) => {
+  if (isPasteAsMarkdownCommand(command)) {
+    void openPasteAsMarkdownSurface()
+    return
+  }
+  void runCommand(command)
+}
+
+const activateOverflowCommand = (command: MarkdownEditorCommand) => {
+  activateCommand(command)
+  commandsExpanded.value = false
+}
+
 const runCommand = async (command: MarkdownEditorCommand) => {
   if (editingBlocked.value || nativeMachine.freezeSmartInput) return
   if (pendingCommandKeys.value.has(command.key)) return
@@ -1287,11 +1627,6 @@ const runCommand = async (command: MarkdownEditorCommand) => {
       pendingCommandKeys.value = pending
     }
   }
-}
-
-const runOverflowCommand = (command: MarkdownEditorCommand) => {
-  runCommand(command)
-  commandsExpanded.value = false
 }
 
 const runAction = (action: MarkdownEditorActionItem) => {
