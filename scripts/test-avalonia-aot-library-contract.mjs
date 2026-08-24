@@ -74,8 +74,23 @@ mutate(
       '    <NoWarn>IL2026;IL3050</NoWarn>\n  </PropertyGroup>',
     ),
 )
+mutate(
+  'dotnet/FsusUI.Avalonia/FsusUI.Avalonia.csproj',
+  (text) =>
+    text.replace(
+      '</PropertyGroup>',
+      '    <TrimmerRootAssembly>FsusUI.Avalonia</TrimmerRootAssembly>\n  </PropertyGroup>',
+    ),
+)
+mutate(
+  'dotnet/FsusUI.Avalonia.Icons/FsusUI.Avalonia.Icons.csproj',
+  (text) => text.replace(/\s*<IsAotCompatible>true<\/IsAotCompatible>/i, ''),
+)
 mutate('spec/avalonia/aot-library-findings.json', () =>
   JSON.stringify({ allowFailure: true, findings: [] }),
+)
+mutate('spec/avalonia/aot-library-findings.json', () =>
+  JSON.stringify({ ownerIssue: 358, findings: [{}] }),
 )
 
 console.log('Avalonia AOT library contract mutations failed closed.')
