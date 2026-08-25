@@ -5,6 +5,7 @@
     <IsTrimmable>true</IsTrimmable>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
     <EnableAotAnalyzer>true</EnableAotAnalyzer>
+    <EnableSingleFileAnalyzer>true</EnableSingleFileAnalyzer>
     <PackageId>FsusUI.Avalonia.Icons</PackageId>
     <Description>FsusUI Avalonia icon resources generated from the shared platform-neutral icon registry.</Description>
   </PropertyGroup>
