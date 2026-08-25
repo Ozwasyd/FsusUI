@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Threading;
 
 var options = SmokeOptions.Parse(args);
-var report = new SmokeReport();
+var report = new SmokeReport { SmokeRequested = options.Smoke };
 
 try
 {
@@ -55,6 +55,7 @@ sealed class SmokeOptions
 
 sealed class SmokeReport
 {
+  public bool SmokeRequested { get; set; }
   public bool TopLevelCreated { get; set; }
   public bool DispatcherReached { get; set; }
   public string? Error { get; set; }
