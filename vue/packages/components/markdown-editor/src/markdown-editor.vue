@@ -173,6 +173,8 @@
         :rows="minRows"
         :tabindex="liveSurface.inputVisible ? undefined : -1"
         :value="editorValue"
+        :spellcheck="languageCapability.spellcheck"
+        :lang="languageCapability.lang || undefined"
         @beforeinput="handleBeforeInput"
         @blur="handleBlur"
         @click="handlePointerReveal"
@@ -411,6 +413,7 @@ import {
   type MarkdownPasteAsMarkdownChoice,
   type MarkdownPasteAsMarkdownSession,
 } from './markdown-editor-paste-markdown'
+import { resolveMarkdownLanguageToolContextCapability } from './markdown-editor-language-tools'
 import { createMarkdownEditorNativeEventMachine } from './markdown-editor-native-event'
 import { createMarkdownLiveSurface } from './markdown-editor-live-surface'
 import {
@@ -506,6 +509,23 @@ const liveReveal = ref(
     documentIdentity,
     mode: currentMode.value,
     selection: transactionStore.selection,
+    source: editorValue.value,
+  }),
+)
+const languageCapability = computed(() =>
+  resolveMarkdownLanguageToolContextCapability({
+    config: {
+      lang: props.lang,
+      nativeWritingTools: props.nativeWritingTools,
+      spellcheck: props.spellcheck,
+    },
+    disabled: inputDisabled.value,
+    documentIdentity,
+    isComposing: nativeMachine.composing,
+    mode: currentMode.value,
+    offset: transactionStore.selection.start,
+    readonly: props.readonly,
+    revision: transactionStore.revision,
     source: editorValue.value,
   }),
 )
