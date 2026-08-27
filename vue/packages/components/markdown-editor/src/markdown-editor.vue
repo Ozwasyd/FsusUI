@@ -17,6 +17,136 @@
     data-markdown-scroll-container="body"
     :style="editorStyle"
   >
+    <div
+      v-if="searchUiState.open"
+      :class="[
+        ns.e('search-bar'),
+        ns.is('compact', true),
+        ns.is('replace', searchUiState.replaceOpen),
+      ]"
+      role="search"
+      :aria-label="searchUiState.aria.ariaLabel"
+    >
+      <div :class="ns.e('search-row')">
+        <input
+          ref="searchQueryInputRef"
+          v-model="searchQuery"
+          type="text"
+          :class="ns.e('search-input')"
+          placeholder="Find"
+          :aria-label="searchUiState.aria.queryAriaLabel"
+          data-testid="markdown-search-query"
+          @input="handleSearchQueryInput"
+          @keydown="handleSearchInputKeydown"
+        />
+        <span
+          :class="ns.e('search-count')"
+          role="status"
+          :aria-live="searchUiState.aria.statusAriaLive"
+          data-testid="markdown-search-count"
+        >
+          {{ searchUiState.statusText }}
+        </span>
+        <button
+          type="button"
+          :class="[ns.e('search-toggle'), ns.is('active', searchMode === 'plain-case')]"
+          aria-label="Match Case"
+          title="Match Case"
+          @click="toggleSearchMode('plain-case')"
+        >
+          Aa
+        </button>
+        <button
+          type="button"
+          :class="[ns.e('search-toggle'), ns.is('active', searchMode === 'whole-word')]"
+          aria-label="Match Whole Word"
+          title="Match Whole Word"
+          @click="toggleSearchMode('whole-word')"
+        >
+          &#92;b
+        </button>
+        <button
+          type="button"
+          :class="[ns.e('search-toggle'), ns.is('active', searchMode === 'regex')]"
+          aria-label="Use Regular Expression"
+          title="Use Regular Expression"
+          @click="toggleSearchMode('regex')"
+        >
+          .*
+        </button>
+        <button
+          type="button"
+          :class="ns.e('search-nav')"
+          :disabled="!searchMatches.length"
+          aria-label="Previous match"
+          title="Previous match"
+          data-testid="markdown-search-prev"
+          @click="searchNavigate('previous')"
+        >
+          ↑
+        </button>
+        <button
+          type="button"
+          :class="ns.e('search-nav')"
+          :disabled="!searchMatches.length"
+          aria-label="Next match"
+          title="Next match"
+          data-testid="markdown-search-next"
+          @click="searchNavigate('next')"
+        >
+          ↓
+        </button>
+        <button
+          type="button"
+          :class="[ns.e('search-toggle'), ns.is('active', searchUiState.replaceOpen)]"
+          aria-label="Toggle Replace"
+          title="Toggle Replace"
+          @click="toggleSearchReplace"
+        >
+          ⇄
+        </button>
+        <button
+          type="button"
+          :class="ns.e('search-close')"
+          aria-label="Close search"
+          title="Close search"
+          data-testid="markdown-search-close"
+          @click="closeSearch"
+        >
+          ×
+        </button>
+      </div>
+      <div v-if="searchUiState.replaceOpen" :class="ns.e('search-row')">
+        <input
+          ref="searchReplaceInputRef"
+          v-model="searchReplaceText"
+          type="text"
+          :class="ns.e('search-input')"
+          placeholder="Replace"
+          :aria-label="searchUiState.aria.replaceAriaLabel"
+          data-testid="markdown-search-replace"
+          @keydown="handleSearchReplaceKeydown"
+        />
+        <button
+          type="button"
+          :class="ns.e('search-action')"
+          :disabled="!searchMatches.length || props.readonly"
+          data-testid="markdown-search-replace-current"
+          @click="searchReplaceCurrent"
+        >
+          Replace
+        </button>
+        <button
+          type="button"
+          :class="ns.e('search-action')"
+          :disabled="!searchMatches.length || props.readonly"
+          data-testid="markdown-search-replace-all"
+          @click="searchReplaceAll"
+        >
+          Replace All
+        </button>
+      </div>
+    </div>
     <header
       v-if="chromeRegions.toolbar && surfaceOptions.toolbar"
       :class="ns.e('toolbar')"
@@ -435,6 +565,21 @@ import {
 } from './markdown-editor-live-layout'
 
 import type { MarkdownHtmlImportSnapshot } from '../../../wasm/markdown-html-import'
+import {
+  dispatchMarkdownSearchKeydown,
+  executeMarkdownSearchSession,
+  resolveMarkdownSearchNavigation,
+  resolveMarkdownSearchUi,
+  revealMarkdownSearchMatch,
+  type MarkdownSearchUiState,
+} from './markdown-editor-search-ui'
+import {
+  planMarkdownReplaceAll,
+  planMarkdownReplaceCurrentInSet,
+} from '../../../wasm/markdown-replace'
+import type { MarkdownSearchMatch, MarkdownSearchMode } from '../../../wasm/markdown-search-model'
+import type { MarkdownSearchTask } from '../../../wasm/markdown-search-worker'
+
 
 defineOptions({
   name: 'ElMarkdownEditor',
@@ -1722,9 +1867,241 @@ const emitRenderEvent = (
   emit('render-error', payload)
 }
 
+const searchUiState = ref<MarkdownSearchUiState>(resolveMarkdownSearchUi(false, '', 0))
+const searchQuery = ref('')
+const searchReplaceText = ref('')
+const searchMatches = ref<readonly MarkdownSearchMatch[]>([])
+const searchCurrentIndex = ref<number | null>(null)
+const searchMode = ref<MarkdownSearchMode>('plain')
+const searchTask = ref<MarkdownSearchTask | null>(null)
+const searchQueryInputRef = ref<HTMLInputElement | null>(null)
+const searchReplaceInputRef = ref<HTMLInputElement | null>(null)
+
+const updateSearchState = () => {
+  searchUiState.value = resolveMarkdownSearchUi(
+    searchUiState.value.open,
+    searchQuery.value,
+    searchMatches.value.length,
+    {
+      currentIndex: searchCurrentIndex.value,
+      mode: searchMode.value,
+      replaceOpen: searchUiState.value.replaceOpen,
+      replaceText: searchReplaceText.value,
+    },
+  )
+}
+
+const runSearch = () => {
+  if (!searchQuery.value) {
+    searchMatches.value = []
+    searchCurrentIndex.value = null
+    updateSearchState()
+    return
+  }
+  const session = executeMarkdownSearchSession({
+    documentEpoch: documentIdentity.epoch,
+    documentId: documentIdentity.id,
+    mode: searchMode.value,
+    previousTask: searchTask.value ?? undefined,
+    queryText: searchQuery.value,
+    revision: transactionStore.revision,
+    source: transactionStore.value,
+  })
+  searchTask.value = session.task
+  searchMatches.value = session.execution.matches
+  searchCurrentIndex.value = session.execution.matches.length > 0 ? 0 : null
+  updateSearchState()
+}
+
+const openSearch = (replace = false) => {
+  searchUiState.value = resolveMarkdownSearchUi(
+    true,
+    searchQuery.value,
+    searchMatches.value.length,
+    {
+      currentIndex: searchCurrentIndex.value,
+      mode: searchMode.value,
+      replaceOpen: replace,
+      replaceText: searchReplaceText.value,
+    },
+  )
+  if (searchQuery.value) {
+    runSearch()
+  }
+  nextTick(() => {
+    if (replace && searchReplaceInputRef.value) {
+      searchReplaceInputRef.value.focus()
+    } else if (searchQueryInputRef.value) {
+      searchQueryInputRef.value.focus()
+    }
+  })
+}
+
+const closeSearch = () => {
+  searchUiState.value = resolveMarkdownSearchUi(
+    false,
+    searchQuery.value,
+    searchMatches.value.length,
+    {
+      currentIndex: searchCurrentIndex.value,
+      mode: searchMode.value,
+      replaceOpen: false,
+      replaceText: searchReplaceText.value,
+    },
+  )
+  if (textareaRef.value) {
+    textareaRef.value.focus()
+  }
+}
+
+const toggleSearchMode = (mode: MarkdownSearchMode) => {
+  searchMode.value = searchMode.value === mode ? 'plain' : mode
+  runSearch()
+}
+
+const toggleSearchReplace = () => {
+  searchUiState.value = resolveMarkdownSearchUi(
+    searchUiState.value.open,
+    searchQuery.value,
+    searchMatches.value.length,
+    {
+      currentIndex: searchCurrentIndex.value,
+      mode: searchMode.value,
+      replaceOpen: !searchUiState.value.replaceOpen,
+      replaceText: searchReplaceText.value,
+    },
+  )
+}
+
+const searchNavigate = (direction: 'next' | 'previous') => {
+  const result = resolveMarkdownSearchNavigation(
+    searchMatches.value,
+    searchCurrentIndex.value,
+    direction,
+  )
+  if (result.match) {
+    searchCurrentIndex.value = result.nextIndex
+    updateSearchState()
+    revealMarkdownSearchMatch({
+      currentMode: currentMode.value,
+      documentIdentity,
+      match: result.match,
+      revision: transactionStore.revision,
+      source: transactionStore.value,
+    })
+    void restoreTextareaSelection({
+      direction: 'none',
+      end: result.match.range.end,
+      start: result.match.range.start,
+    })
+  }
+}
+
+const handleSearchQueryInput = () => {
+  runSearch()
+}
+
+const handleSearchInputKeydown = (event: KeyboardEvent) => {
+  const action = dispatchMarkdownSearchKeydown({
+    altKey: event.altKey,
+    ctrlKey: event.ctrlKey,
+    key: event.key,
+    metaKey: event.metaKey,
+    shiftKey: event.shiftKey,
+    targetIsInput: true,
+  })
+  if (action === 'next-match') {
+    event.preventDefault()
+    searchNavigate('next')
+  } else if (action === 'prev-match') {
+    event.preventDefault()
+    searchNavigate('previous')
+  } else if (action === 'close') {
+    event.preventDefault()
+    closeSearch()
+  }
+}
+
+const handleSearchReplaceKeydown = (event: KeyboardEvent) => {
+  const action = dispatchMarkdownSearchKeydown({
+    altKey: event.altKey,
+    ctrlKey: event.ctrlKey,
+    key: event.key,
+    metaKey: event.metaKey,
+    shiftKey: event.shiftKey,
+    targetIsReplaceInput: true,
+  })
+  if (action === 'replace-current') {
+    event.preventDefault()
+    searchReplaceCurrent()
+  } else if (action === 'replace-all') {
+    event.preventDefault()
+    searchReplaceAll()
+  } else if (action === 'close') {
+    event.preventDefault()
+    closeSearch()
+  }
+}
+
+const searchReplaceCurrent = () => {
+  if (searchCurrentIndex.value === null || !searchMatches.value.length) return
+  const plan = planMarkdownReplaceCurrentInSet(
+    {
+      documentEpoch: documentIdentity.epoch,
+      documentId: documentIdentity.id,
+      query: { mode: searchMode.value, queryVersion: 1, text: searchQuery.value },
+      revision: transactionStore.revision,
+      source: transactionStore.value,
+    },
+    searchMatches.value,
+    searchCurrentIndex.value,
+    searchReplaceText.value,
+  )
+  if ('changes' in plan) {
+    dispatchTransaction({
+      changes: [...plan.changes],
+      expectedRevision: transactionStore.revision,
+      history: 'separate',
+      origin: 'command',
+      selection: plan.selection,
+    })
+    runSearch()
+  }
+}
+
+const searchReplaceAll = () => {
+  if (!searchMatches.value.length) return
+  const plan = planMarkdownReplaceAll(
+    {
+      documentEpoch: documentIdentity.epoch,
+      documentId: documentIdentity.id,
+      query: { mode: searchMode.value, queryVersion: 1, text: searchQuery.value },
+      revision: transactionStore.revision,
+      source: transactionStore.value,
+    },
+    searchMatches.value,
+    searchReplaceText.value,
+  )
+  if ('changes' in plan) {
+    dispatchTransaction({
+      changes: [...plan.changes],
+      expectedRevision: transactionStore.revision,
+      history: 'separate',
+      origin: 'command',
+      selection: plan.selection,
+    })
+    runSearch()
+  }
+}
+
 const handleKeydown = (event: KeyboardEvent) => {
   if (editingBlocked.value || nativeMachine.freezeSmartInput) return
 
+  if (event.key === 'Escape' && searchUiState.value.open) {
+    event.preventDefault()
+    closeSearch()
+    return
+  }
   if (event.key === 'Escape' && currentMode.value === 'live') {
     if (atomicSession.value) {
       event.preventDefault()
@@ -1907,6 +2284,16 @@ const handleKeydown = (event: KeyboardEvent) => {
 
   if (!isMod) return
 
+  if (key === 'f') {
+    event.preventDefault()
+    openSearch(false)
+    return
+  }
+  if (key === 'h') {
+    event.preventDefault()
+    openSearch(true)
+    return
+  }
   if (key === 's') {
     event.preventDefault()
     emitSave()
@@ -1970,9 +2357,15 @@ const insertMarkdownAtCursor = (
 }
 
 defineExpose({
+  closeSearch,
   dispatchTransaction,
   insertMarkdownAtCursor,
+  openSearch,
   redo,
+  searchNavigate,
+  searchReplaceAll,
+  searchReplaceCurrent,
+  searchUi: searchUiState,
   undo,
 })
 </script>

@@ -8,6 +8,12 @@ export type MarkdownEmbedProviderStatus =
   | 'rejected'
   | 'stale'
   | 'forbidden'
+  | 'missing'
+  | 'cycle'
+  | 'depth-exceeded'
+  | 'size-exceeded'
+  | 'time-exceeded'
+  | 'mode-mismatch'
 
 export interface MarkdownEmbedRequest {
   readonly requestId: string
