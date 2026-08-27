@@ -1,12 +1,16 @@
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Themes.Fluent;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Themes;
 
@@ -288,24 +292,161 @@ public class FsusSettingsShellHeadlessTests
     Dispatcher.UIThread.RunJobs();
 
     foreach (var variant in new[] { FsusThemeVariant.Light, FsusThemeVariant.Dark })
-    foreach (var highContrast in new[] { false, true })
     {
-      manager.Apply(
-        window.Resources,
-        new FsusThemeOptions
-        {
-          Variant = variant,
-          HighContrast = highContrast,
-          Density = FsusDensity.Default,
-          MotionMode = FsusMotionMode.Reduced,
-        });
+      foreach (var highContrast in new[] { false, true })
+      {
+        manager.Apply(
+          window.Resources,
+          new FsusThemeOptions
+          {
+            Variant = variant,
+            HighContrast = highContrast,
+            Density = FsusDensity.Default,
+            MotionMode = FsusMotionMode.Reduced,
+          });
 
-      Dispatcher.UIThread.RunJobs();
+        Dispatcher.UIThread.RunJobs();
 
-      Assert.Contains("fsus-settings-shell", shell.Classes);
-      Assert.Contains("fsus-selected", shell.Categories[0].Classes);
-      Assert.NotNull(window.Resources[FsusThemeResourceKeys.BackgroundBrush]);
+        Assert.Contains("fsus-settings-shell", shell.Classes);
+        Assert.Contains("fsus-selected", shell.Categories[0].Classes);
+        Assert.NotNull(window.Resources[FsusThemeResourceKeys.BackgroundBrush]);
+      }
     }
+
+    window.Close();
+  }
+
+  [AvaloniaFact]
+  public void SearchAndActionSlotsKeepTheirOwnArrowAndSpaceKeyboardInput()
+  {
+    var window = CreateStyledWindow(950, 650);
+    var search = new TextBox { Text = "network" };
+    AutomationProperties.SetName(search, "Search settings");
+    var action = new Button
+    {
+      Content = "Save settings",
+    };
+    var shell = new FsusSettingsShell
+    {
+      SearchSlot = search,
+      ActionsSlot = action,
+    };
+    shell.Categories.Add(new FsusSettingsCategory { Key = "general", Header = "General" });
+    shell.Categories.Add(new FsusSettingsCategory { Key = "network", Header = "Network" });
+    window.Content = shell;
+    window.Show();
+    Dispatcher.UIThread.RunJobs();
+
+    Assert.True(search.Focus());
+    window.KeyPress(Key.Down, RawInputModifiers.None, PhysicalKey.ArrowDown, null);
+    Assert.Equal("general", shell.SelectedKey);
+
+    Assert.True(action.Focus());
+    window.KeyPress(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
+    Assert.Equal("general", shell.SelectedKey);
+
+    Assert.True(shell.Categories[0].Focus(NavigationMethod.Tab));
+    window.KeyPress(Key.Down, RawInputModifiers.None, PhysicalKey.ArrowDown, null);
+    Assert.Equal("network", shell.SelectedKey);
+    Assert.True(shell.Categories[1].IsFocused);
+
+    window.Close();
+  }
+
+  [AvaloniaFact]
+  public void AutomationSelectionProviderTracksMountedCategorySelection()
+  {
+    var window = CreateStyledWindow(950, 650);
+    var shell = new FsusSettingsShell { AccessibleName = "Application settings" };
+    var general = new FsusSettingsCategory { Key = "general", Header = "General" };
+    var disabled = new FsusSettingsCategory
+    {
+      Key = "security",
+      Header = "Security",
+      IsEnabled = false,
+    };
+    var about = new FsusSettingsCategory { Key = "about", Header = "About" };
+    shell.Categories.Add(general);
+    shell.Categories.Add(disabled);
+    shell.Categories.Add(about);
+    window.Content = shell;
+    window.Show();
+    Dispatcher.UIThread.RunJobs();
+
+    var shellProvider = Assert.IsAssignableFrom<ISelectionProvider>(
+      ControlAutomationPeer.CreatePeerForElement(shell));
+    var generalProvider = Assert.IsAssignableFrom<ISelectionItemProvider>(
+      ControlAutomationPeer.CreatePeerForElement(general));
+    var disabledProvider = Assert.IsAssignableFrom<ISelectionItemProvider>(
+      ControlAutomationPeer.CreatePeerForElement(disabled));
+    var aboutProvider = Assert.IsAssignableFrom<ISelectionItemProvider>(
+      ControlAutomationPeer.CreatePeerForElement(about));
+
+    Assert.True(shellProvider.IsSelectionRequired);
+    Assert.False(shellProvider.CanSelectMultiple);
+    Assert.True(generalProvider.IsSelected);
+    Assert.False(disabledProvider.IsSelected);
+    Assert.Single(shellProvider.GetSelection());
+
+    disabledProvider.Select();
+    Assert.Equal("general", shell.SelectedKey);
+    aboutProvider.Select();
+    Assert.Equal("about", shell.SelectedKey);
+    Assert.True(aboutProvider.IsSelected);
+    Assert.False(generalProvider.IsSelected);
+    Assert.Equal("selected", AutomationProperties.GetItemStatus(about));
+
+    window.Close();
+  }
+
+  [AvaloniaFact]
+  public void NarrowAndRightToLeftLayoutsRemainUsableWithoutContentOverflow()
+  {
+    var window = CreateStyledWindow(620, 650);
+    var shell = new FsusSettingsShell
+    {
+      NarrowRailWidth = 160,
+      FlowDirection = global::Avalonia.Media.FlowDirection.RightToLeft,
+      ActionsSlot = new Button { Content = "Save settings" },
+    };
+    for (var index = 0; index < 7; index++)
+    {
+      shell.Categories.Add(new FsusSettingsCategory
+      {
+        Key = $"category-{index}",
+        Header = $"Long category label {index + 1}",
+        Content = new TextBlock
+        {
+          Text = string.Join(" ", Enumerable.Repeat($"Preference {index + 1}", 80)),
+          TextWrapping = global::Avalonia.Media.TextWrapping.Wrap,
+        },
+      });
+    }
+    window.Content = shell;
+    window.Show();
+    Dispatcher.UIThread.RunJobs();
+
+    Assert.True(shell.IsNarrow);
+    Assert.Equal(global::Avalonia.Media.FlowDirection.RightToLeft, shell.FlowDirection);
+    Assert.False(shell.HasMirrorTransform);
+    Assert.Equal(620d, shell.Bounds.Width);
+    var rail = Assert.Single(
+      shell.GetVisualDescendants().OfType<Border>(),
+      (border) => border.Classes.Contains("fsus-settings-rail"));
+    var actions = Assert.Single(
+      shell.GetVisualDescendants().OfType<Border>(),
+      (border) => border.Classes.Contains("fsus-settings-actions"));
+    Assert.Equal(160d, rail.Bounds.Width);
+    var layoutRoot = Assert.IsType<Grid>(rail.Parent);
+    var railOrigin = Assert.NotNull(rail.TranslatePoint(default, layoutRoot));
+    var actionsOrigin = Assert.NotNull(actions.TranslatePoint(default, layoutRoot));
+    Assert.True(
+      railOrigin.X > actionsOrigin.X,
+      $"RTL rail origin {railOrigin.X} must be right of actions origin {actionsOrigin.X}.");
+    Assert.True(actions.Bounds.Width > 0);
+    Assert.True(shell.ContentScrollViewer.Bounds.Width > 0);
+    Assert.Equal(ScrollBarVisibility.Disabled, shell.ContentScrollViewer.HorizontalScrollBarVisibility);
+    Assert.All(shell.Categories, category => Assert.True(category.Bounds.Width > 0));
 
     window.Close();
   }

@@ -12926,7 +12926,7 @@
         },
         {
           "name": "Header",
-          "type": "System.Object",
+          "type": "System.String",
           "nullable": true,
           "canRead": true,
           "canWrite": true,
@@ -12973,7 +12973,7 @@
         {
           "name": "Header",
           "kind": "styled",
-          "type": "System.Object",
+          "type": "System.String",
           "nullable": true
         },
         {
@@ -13363,6 +13363,14 @@
           "isStatic": false
         },
         {
+          "name": "NarrowRailWidth",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "RailFooter",
           "type": "System.Object",
           "nullable": true,
@@ -13448,6 +13456,12 @@
         },
         {
           "name": "NarrowBreakpointWidth",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        },
+        {
+          "name": "NarrowRailWidth",
           "kind": "styled",
           "type": "System.Double",
           "nullable": false

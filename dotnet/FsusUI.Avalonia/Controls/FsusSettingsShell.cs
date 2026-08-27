@@ -1,12 +1,14 @@
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Input;
 using Avalonia.Layout;
+using Avalonia.Media;
 using Avalonia.Metadata;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -25,8 +27,8 @@ public class FsusSettingsCategory : ContentControl
   public static readonly StyledProperty<string> KeyProperty =
     AvaloniaProperty.Register<FsusSettingsCategory, string>(nameof(Key), string.Empty);
 
-  public static readonly StyledProperty<object?> HeaderProperty =
-    AvaloniaProperty.Register<FsusSettingsCategory, object?>(nameof(Header));
+  public static readonly StyledProperty<string> HeaderProperty =
+    AvaloniaProperty.Register<FsusSettingsCategory, string>(nameof(Header), string.Empty);
 
   public static readonly StyledProperty<object?> IconProperty =
     AvaloniaProperty.Register<FsusSettingsCategory, object?>(nameof(Icon));
@@ -42,8 +44,6 @@ public class FsusSettingsCategory : ContentControl
 
   internal FsusSettingsShell? ParentShell { get; set; }
 
-  internal bool IsFocusedWithinRail { get; set; }
-
   public FsusSettingsCategory()
   {
     FsusComponentClasses.SetBaseClasses(this, "fsus-settings-category");
@@ -58,7 +58,7 @@ public class FsusSettingsCategory : ContentControl
     set => SetValue(KeyProperty, value);
   }
 
-  public object? Header
+  public string Header
   {
     get => GetValue(HeaderProperty);
     set => SetValue(HeaderProperty, value);
@@ -119,6 +119,9 @@ public class FsusSettingsCategory : ContentControl
     base.OnKeyDown(e);
   }
 
+  protected override AutomationPeer OnCreateAutomationPeer() =>
+    new FsusSettingsCategoryAutomationPeer(this);
+
   protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
   {
     base.OnPropertyChanged(change);
@@ -130,9 +133,33 @@ public class FsusSettingsCategory : ContentControl
       change.Property == DescriptionProperty ||
       change.Property == IsSelectedProperty ||
       change.Property == IsEnabledProperty ||
-      change.Property == AccessibleNameProperty)
+      change.Property == AccessibleNameProperty ||
+      change.Property == IsKeyboardFocusWithinProperty)
     {
       SyncState();
+    }
+
+    if (change.Property == IsSelectedProperty &&
+        change.OldValue is bool oldSelection &&
+        change.NewValue is bool newSelection)
+    {
+      (ControlAutomationPeer.FromElement(this) as FsusSettingsCategoryAutomationPeer)
+        ?.RaiseSelectionChanged(oldSelection, newSelection);
+    }
+
+    if (change.Property == IsKeyboardFocusWithinProperty)
+    {
+      ParentShell?.SetFocusedCategory(this, IsKeyboardFocusWithin);
+    }
+
+    if (change.Property == IsEnabledProperty)
+    {
+      ParentShell?.NormalizeSelection();
+    }
+
+    if (change.Property == ContentProperty)
+    {
+      ParentShell?.RefreshSelectedContent(this);
     }
   }
 
@@ -140,9 +167,12 @@ public class FsusSettingsCategory : ContentControl
   {
     FsusComponentClasses.Ensure(this, "fsus-selected", IsSelected);
     FsusComponentClasses.Ensure(this, "fsus-disabled", !IsEnabled);
-    FsusComponentClasses.Ensure(this, "fsus-focused", IsFocusedWithinRail);
     FsusComponentClasses.Ensure(this, "fsus-has-icon", Icon is not null);
-    AutomationProperties.SetName(this, FsusComponentClasses.ResolveName(AccessibleName, Header ?? Key));
+    AutomationProperties.SetName(
+      this,
+      FsusComponentClasses.ResolveName(
+        AccessibleName,
+        string.IsNullOrWhiteSpace(Header) ? Key : Header));
     AutomationProperties.SetControlTypeOverride(this, AutomationControlType.TabItem);
     AutomationProperties.SetItemStatus(
       this,
@@ -166,25 +196,34 @@ public class FsusSettingsCategory : ContentControl
       border[!Border.CornerRadiusProperty] = category[!CornerRadiusProperty];
       border[!Border.PaddingProperty] = category[!PaddingProperty];
 
-      var panel = new StackPanel
+      var panel = new Grid
       {
-        Orientation = Orientation.Horizontal,
-        Spacing = 8,
+        ColumnSpacing = 8,
+        HorizontalAlignment = HorizontalAlignment.Stretch,
         VerticalAlignment = VerticalAlignment.Center,
       };
+      panel.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
+      panel.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
 
       var iconPresenter = new ContentPresenter
       {
         VerticalAlignment = VerticalAlignment.Center,
       };
+      iconPresenter.Classes.Add("fsus-settings-category-icon");
       iconPresenter[!ContentPresenter.ContentProperty] = category[!IconProperty];
 
-      var headerPresenter = new ContentPresenter
+      var headerPresenter = new TextBlock
       {
+        MaxLines = 1,
+        TextTrimming = TextTrimming.CharacterEllipsis,
         VerticalAlignment = VerticalAlignment.Center,
       };
-      headerPresenter[!ContentPresenter.ContentProperty] = category[!HeaderProperty];
+      headerPresenter.Classes.Add("fsus-settings-category-header");
+      headerPresenter[!TextBlock.TextProperty] = category[!HeaderProperty];
 
+      panel.Classes.Add("fsus-settings-category-content");
+      Grid.SetColumn(iconPresenter, 0);
+      Grid.SetColumn(headerPresenter, 1);
       panel.Children.Add(iconPresenter);
       panel.Children.Add(headerPresenter);
       border.Child = panel;
@@ -192,10 +231,45 @@ public class FsusSettingsCategory : ContentControl
       return border;
     });
   }
+
+  private sealed class FsusSettingsCategoryAutomationPeer(FsusSettingsCategory owner)
+    : ControlAutomationPeer(owner), ISelectionItemProvider
+  {
+    public bool IsSelected => owner.IsSelected;
+
+    public ISelectionProvider SelectionContainer =>
+      owner.ParentShell is null
+        ? null!
+        : (ISelectionProvider)CreatePeerForElement(owner.ParentShell);
+
+    public void AddToSelection() => Select();
+
+    public void RemoveFromSelection()
+    {
+      // Settings category selection is required while an enabled category
+      // exists. Removing the selected item without a replacement is invalid.
+    }
+
+    public void Select()
+    {
+      if (owner.IsEnabled)
+      {
+        owner.ParentShell?.SelectCategory(owner);
+      }
+    }
+
+    internal void RaiseSelectionChanged(bool oldValue, bool newValue) =>
+      RaisePropertyChangedEvent(
+        SelectionItemPatternIdentifiers.IsSelectedProperty,
+        oldValue,
+        newValue);
+  }
 }
 
 public class FsusSettingsShell : ContentControl
 {
+  protected override bool BypassFlowDirectionPolicies => true;
+
   public static readonly StyledProperty<string?> AccessibleNameProperty =
     AvaloniaProperty.Register<FsusSettingsShell, string?>(
       nameof(AccessibleName),
@@ -236,6 +310,11 @@ public class FsusSettingsShell : ContentControl
       nameof(NarrowBreakpointWidth),
       700d);
 
+  public static readonly StyledProperty<double> NarrowRailWidthProperty =
+    AvaloniaProperty.Register<FsusSettingsShell, double>(
+      nameof(NarrowRailWidth),
+      160d);
+
   public static readonly StyledProperty<FsusSettingsScrollResetBehavior> ScrollResetBehaviorProperty =
     AvaloniaProperty.Register<FsusSettingsShell, FsusSettingsScrollResetBehavior>(
       nameof(ScrollResetBehavior),
@@ -261,6 +340,7 @@ public class FsusSettingsShell : ContentControl
   private readonly ContentPresenter actionsPresenter = new();
 
   private Vector contentScrollOffset;
+  private string activeKey = string.Empty;
   private bool isUpdatingOffset;
   private bool isSelectingKey;
 
@@ -333,6 +413,12 @@ public class FsusSettingsShell : ContentControl
     set => SetValue(NarrowBreakpointWidthProperty, value);
   }
 
+  public double NarrowRailWidth
+  {
+    get => GetValue(NarrowRailWidthProperty);
+    set => SetValue(NarrowRailWidthProperty, value);
+  }
+
   public FsusSettingsScrollResetBehavior ScrollResetBehavior
   {
     get => GetValue(ScrollResetBehaviorProperty);
@@ -342,7 +428,7 @@ public class FsusSettingsShell : ContentControl
   public string FocusedKey { get; private set; } = string.Empty;
 
   public FsusSettingsCategory? SelectedCategory =>
-    categories.FirstOrDefault((cat) => cat.Key == SelectedKey);
+    categories.FirstOrDefault((cat) => cat.Key == activeKey);
 
   public ScrollViewer ContentScrollViewer => contentScrollViewer;
 
@@ -443,7 +529,7 @@ public class FsusSettingsShell : ContentControl
 
   protected override void OnKeyDown(KeyEventArgs e)
   {
-    if (HandleKey(e.Key))
+    if (ReferenceEquals(e.Source, this) && HandleKey(e.Key))
     {
       e.Handled = true;
       return;
@@ -456,12 +542,15 @@ public class FsusSettingsShell : ContentControl
   {
     base.OnSizeChanged(e);
 
-    if (!IsSet(IsNarrowProperty) && e.NewSize.Width > 0)
+    if (e.NewSize.Width > 0)
     {
-      IsNarrow = e.NewSize.Width < NarrowBreakpointWidth;
+      SetCurrentValue(IsNarrowProperty, e.NewSize.Width < NarrowBreakpointWidth);
       SyncNarrowState();
     }
   }
+
+  protected override AutomationPeer OnCreateAutomationPeer() =>
+    new FsusSettingsShellAutomationPeer(this);
 
   protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
   {
@@ -474,9 +563,21 @@ public class FsusSettingsShell : ContentControl
         SelectKeyCore(SelectedKey);
       }
     }
-    else if (change.Property == RailWidthProperty || change.Property == IsNarrowProperty)
+    else if (
+      change.Property == RailWidthProperty ||
+      change.Property == NarrowRailWidthProperty ||
+      change.Property == IsNarrowProperty)
     {
       SyncNarrowState();
+    }
+    else if (change.Property == NarrowBreakpointWidthProperty && Bounds.Width > 0)
+    {
+      SetCurrentValue(IsNarrowProperty, Bounds.Width < NarrowBreakpointWidth);
+      SyncNarrowState();
+    }
+    else if (change.Property == FlowDirectionProperty)
+    {
+      SyncFlowDirection();
     }
     else if (
       change.Property == AccessibleNameProperty ||
@@ -496,11 +597,23 @@ public class FsusSettingsShell : ContentControl
       return;
     }
 
-    var oldKey = SelectedKey;
-    if (oldKey == key && SelectedCategory is not null && contentHost.Content is not null)
+    var requestedCategory = categories.FirstOrDefault(
+      (category) => category.Key == key && category.IsEnabled);
+    if (requestedCategory is null)
     {
-      FocusedKey = key;
+      var currentCategory = categories.FirstOrDefault(
+        (category) => category.Key == activeKey && category.IsEnabled);
+      requestedCategory = currentCategory ?? categories.FirstOrDefault((category) => category.IsEnabled);
+    }
+
+    var normalizedKey = requestedCategory?.Key ?? string.Empty;
+    var oldKey = activeKey;
+    if (oldKey == normalizedKey)
+    {
+      SetCurrentValue(SelectedKeyProperty, normalizedKey);
+      contentHost.Content = requestedCategory?.Content;
       SyncCategoriesVisual();
+      SyncAutomation();
       return;
     }
 
@@ -512,14 +625,12 @@ public class FsusSettingsShell : ContentControl
         savedScrollOffsets[oldKey] = ContentScrollOffset;
       }
 
-      SetCurrentValue(SelectedKeyProperty, key);
-      FocusedKey = key;
-
-      var category = SelectedCategory;
-      contentHost.Content = category?.Content;
+      activeKey = normalizedKey;
+      SetCurrentValue(SelectedKeyProperty, normalizedKey);
+      contentHost.Content = requestedCategory?.Content;
 
       var targetOffset = ScrollResetBehavior == FsusSettingsScrollResetBehavior.Restore
-        ? savedScrollOffsets.GetValueOrDefault(key, new Vector(0, 0))
+        ? savedScrollOffsets.GetValueOrDefault(normalizedKey, new Vector(0, 0))
         : new Vector(0, 0);
 
       SetContentScrollOffset(targetOffset);
@@ -527,7 +638,7 @@ public class FsusSettingsShell : ContentControl
       SyncCategoriesVisual();
       SyncAutomation();
 
-      SelectionChanged?.Invoke(this, new FsusNavigationSelectionChangedEventArgs(key));
+      SelectionChanged?.Invoke(this, new FsusNavigationSelectionChangedEventArgs(normalizedKey));
     }
     finally
     {
@@ -626,7 +737,6 @@ public class FsusSettingsShell : ContentControl
       foreach (FsusSettingsCategory item in e.OldItems)
       {
         item.ParentShell = null;
-        item.PointerPressed -= OnCategoryPointerPressed;
         categoriesPanel.Children.Remove(item);
       }
     }
@@ -637,7 +747,6 @@ public class FsusSettingsShell : ContentControl
       foreach (FsusSettingsCategory item in e.NewItems)
       {
         item.ParentShell = this;
-        item.PointerPressed += OnCategoryPointerPressed;
         if (index <= categoriesPanel.Children.Count)
         {
           categoriesPanel.Children.Insert(index++, item);
@@ -649,35 +758,26 @@ public class FsusSettingsShell : ContentControl
       }
     }
 
-    if (string.IsNullOrEmpty(SelectedKey) || !categories.Any((c) => c.Key == SelectedKey))
+    if (e.Action == NotifyCollectionChangedAction.Reset)
     {
-      var firstEnabled = categories.FirstOrDefault((c) => c.IsEnabled);
-      if (firstEnabled is not null)
+      foreach (var category in categoriesPanel.Children.OfType<FsusSettingsCategory>())
       {
-        SelectKeyCore(firstEnabled.Key);
+        category.ParentShell = null;
       }
+      categoriesPanel.Children.Clear();
+      savedScrollOffsets.Clear();
     }
-    else
-    {
-      SyncCategoriesVisual();
-      SyncAutomation();
-    }
-  }
 
-  private void OnCategoryPointerPressed(object? sender, PointerPressedEventArgs e)
-  {
-    if (sender is FsusSettingsCategory category && category.IsEnabled)
-    {
-      SelectCategory(category);
-    }
+    NormalizeSelection();
+    (ControlAutomationPeer.FromElement(this) as FsusSettingsShellAutomationPeer)
+      ?.InvalidateOwnedChildren();
   }
 
   private void SyncCategoriesVisual()
   {
     foreach (var category in categories)
     {
-      category.IsSelected = category.Key == SelectedKey;
-      category.IsFocusedWithinRail = category.Key == FocusedKey;
+      category.IsSelected = category.Key == activeKey;
       category.SyncState();
     }
   }
@@ -685,7 +785,7 @@ public class FsusSettingsShell : ContentControl
   private void SyncNarrowState()
   {
     FsusComponentClasses.Ensure(this, "fsus-narrow", IsNarrow);
-    railBorder.Width = IsNarrow ? 64d : RailWidth;
+    railBorder.Width = IsNarrow ? NarrowRailWidth : RailWidth;
     foreach (var category in categories)
     {
       FsusComponentClasses.Ensure(category, "fsus-narrow", IsNarrow);
@@ -708,6 +808,7 @@ public class FsusSettingsShell : ContentControl
     actionsBorder.IsVisible = ActionsSlot is not null;
     FsusComponentClasses.Ensure(this, "fsus-has-actions", ActionsSlot is not null);
 
+    SyncFlowDirection();
     SyncNarrowState();
     SyncCategoriesVisual();
     SyncAutomation();
@@ -717,10 +818,84 @@ public class FsusSettingsShell : ContentControl
   {
     AutomationProperties.SetName(this, AccessibleName ?? "Settings shell");
     AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Group);
+    AutomationProperties.SetLiveSetting(this, AutomationLiveSetting.Polite);
     AutomationProperties.SetItemStatus(
       this,
-      string.IsNullOrWhiteSpace(SelectedKey)
+      string.IsNullOrWhiteSpace(activeKey)
         ? $"{categories.Count.ToString(CultureInfo.InvariantCulture)} categories"
-        : $"active {SelectedKey}, {categories.Count.ToString(CultureInfo.InvariantCulture)} categories");
+        : $"active {activeKey}, {categories.Count.ToString(CultureInfo.InvariantCulture)} categories");
+
+    for (var index = 0; index < categories.Count; index++)
+    {
+      AutomationProperties.SetPositionInSet(categories[index], index + 1);
+      AutomationProperties.SetSizeOfSet(categories[index], categories.Count);
+    }
+  }
+
+  internal void SetFocusedCategory(FsusSettingsCategory category, bool isFocused)
+  {
+    if (isFocused)
+    {
+      FocusedKey = category.Key;
+    }
+    else if (FocusedKey == category.Key)
+    {
+      FocusedKey = string.Empty;
+    }
+  }
+
+  internal void RefreshSelectedContent(FsusSettingsCategory category)
+  {
+    if (category.Key == activeKey)
+    {
+      contentHost.Content = category.Content;
+    }
+  }
+
+  internal void NormalizeSelection()
+  {
+    var current = categories.FirstOrDefault(
+      (category) => category.Key == activeKey && category.IsEnabled);
+    SelectKeyCore((current ?? categories.FirstOrDefault((category) => category.IsEnabled))?.Key ?? string.Empty);
+  }
+
+  private void SyncFlowDirection()
+  {
+    var isRightToLeft =
+      FlowDirection == global::Avalonia.Media.FlowDirection.RightToLeft;
+    FsusComponentClasses.Ensure(this, "fsus-rtl", isRightToLeft);
+
+    // Use a stable internal coordinate system and map shell flow direction to
+    // rail/content order explicitly. This avoids mirroring the entire visual
+    // subtree (including glyphs) while allowing slotted content to declare its
+    // own bidi direction.
+    rootGrid.FlowDirection = global::Avalonia.Media.FlowDirection.LeftToRight;
+    rootGrid.ColumnDefinitions[0].Width =
+      isRightToLeft ? GridLength.Star : GridLength.Auto;
+    rootGrid.ColumnDefinitions[1].Width =
+      isRightToLeft ? GridLength.Auto : GridLength.Star;
+    Grid.SetColumn(railBorder, isRightToLeft ? 1 : 0);
+    Grid.SetColumn(contentGrid, isRightToLeft ? 0 : 1);
+    railBorder.BorderThickness = isRightToLeft
+      ? new Thickness(1, 0, 0, 0)
+      : new Thickness(0, 0, 1, 0);
+  }
+
+  private sealed class FsusSettingsShellAutomationPeer(FsusSettingsShell owner)
+    : ControlAutomationPeer(owner), ISelectionProvider
+  {
+    public bool CanSelectMultiple => false;
+
+    public bool IsSelectionRequired => owner.categories.Any((category) => category.IsEnabled);
+
+    public IReadOnlyList<AutomationPeer> GetSelection()
+    {
+      var selected = owner.SelectedCategory;
+      return selected is null
+        ? []
+        : [CreatePeerForElement(selected)];
+    }
+
+    internal void InvalidateOwnedChildren() => InvalidateChildren();
   }
 }

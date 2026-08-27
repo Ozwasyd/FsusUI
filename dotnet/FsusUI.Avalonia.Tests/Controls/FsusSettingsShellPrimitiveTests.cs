@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Controls;
 using Avalonia.Input;
 using FsusUI.Avalonia.Controls;
@@ -299,7 +300,11 @@ public class FsusSettingsShellPrimitiveTests
   [Fact]
   public void NarrowViewportUpdatesIsNarrowAndClasses()
   {
-    var shell = new FsusSettingsShell { RailWidth = 240d };
+    var shell = new FsusSettingsShell
+    {
+      RailWidth = 240d,
+      NarrowRailWidth = 160d,
+    };
     shell.Categories.Add(new FsusSettingsCategory { Key = "gen", Header = "General" });
 
     shell.ApplyViewport(1024);
@@ -310,6 +315,91 @@ public class FsusSettingsShellPrimitiveTests
     shell.ApplyViewport(500);
     Assert.True(shell.IsNarrow);
     Assert.Contains("fsus-narrow", shell.Classes);
+
+    Assert.Equal(160d, shell.NarrowRailWidth);
+  }
+
+  [Fact]
+  public void SelectionNormalizesWhenCategoriesBecomeUnavailableOrAreCleared()
+  {
+    var shell = new FsusSettingsShell();
+    var first = new FsusSettingsCategory
+    {
+      Key = "general",
+      Header = "General",
+      Content = "General content",
+    };
+    var second = new FsusSettingsCategory
+    {
+      Key = "privacy",
+      Header = "Privacy",
+      Content = "Privacy content",
+    };
+    shell.Categories.Add(first);
+    shell.Categories.Add(second);
+
+    shell.SelectedKey = "missing";
+    Assert.Equal("general", shell.SelectedKey);
+    Assert.True(first.IsSelected);
+
+    first.IsEnabled = false;
+    Assert.Equal("privacy", shell.SelectedKey);
+    Assert.False(first.IsSelected);
+    Assert.True(second.IsSelected);
+
+    shell.Categories.Clear();
+    Assert.Empty(shell.Categories);
+    Assert.Equal(string.Empty, shell.SelectedKey);
+    Assert.Null(shell.SelectedCategory);
+    Assert.Equal("0 categories", AutomationProperties.GetItemStatus(shell));
+  }
+
+  [Fact]
+  public void AutomationProvidersExposeRequiredSingleSelection()
+  {
+    var shell = new FsusSettingsShell { AccessibleName = "Application settings" };
+    var first = new FsusSettingsCategory { Key = "general", Header = "General" };
+    var disabled = new FsusSettingsCategory
+    {
+      Key = "security",
+      Header = "Security",
+      IsEnabled = false,
+    };
+    var last = new FsusSettingsCategory { Key = "about", Header = "About" };
+    shell.Categories.Add(first);
+    shell.Categories.Add(disabled);
+    shell.Categories.Add(last);
+
+    var shellProvider = Assert.IsAssignableFrom<ISelectionProvider>(
+      ControlAutomationPeer.CreatePeerForElement(shell));
+    var firstProvider = Assert.IsAssignableFrom<ISelectionItemProvider>(
+      ControlAutomationPeer.CreatePeerForElement(first));
+    var disabledProvider = Assert.IsAssignableFrom<ISelectionItemProvider>(
+      ControlAutomationPeer.CreatePeerForElement(disabled));
+    var lastProvider = Assert.IsAssignableFrom<ISelectionItemProvider>(
+      ControlAutomationPeer.CreatePeerForElement(last));
+
+    Assert.False(shellProvider.CanSelectMultiple);
+    Assert.True(shellProvider.IsSelectionRequired);
+    Assert.True(firstProvider.IsSelected);
+    Assert.False(disabledProvider.IsSelected);
+    Assert.Same(shellProvider, firstProvider.SelectionContainer);
+    Assert.Single(shellProvider.GetSelection());
+    Assert.Equal(1, AutomationProperties.GetPositionInSet(first));
+    Assert.Equal(3, AutomationProperties.GetSizeOfSet(first));
+    Assert.Equal(2, AutomationProperties.GetPositionInSet(disabled));
+
+    disabledProvider.Select();
+    Assert.Equal("general", shell.SelectedKey);
+
+    lastProvider.Select();
+    Assert.Equal("about", shell.SelectedKey);
+    Assert.False(firstProvider.IsSelected);
+    Assert.True(lastProvider.IsSelected);
+    Assert.Single(shellProvider.GetSelection());
+
+    lastProvider.RemoveFromSelection();
+    Assert.True(lastProvider.IsSelected);
   }
 
   private sealed class KeyboardSettingsShell : FsusSettingsShell

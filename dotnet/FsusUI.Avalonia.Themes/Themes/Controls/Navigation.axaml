@@ -117,21 +117,26 @@
     <Setter Property="FontWeight" Value="SemiBold" />
   </Style>
 
-  <Style Selector="fsus|FsusSettingsCategory:focus-visible, fsus|FsusSettingsCategory.fsus-focused">
+  <Style Selector="fsus|FsusSettingsCategory:focus-visible">
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FsusThemeFocusBorderThickness}" />
   </Style>
 
   <Style Selector="fsus|FsusSettingsCategory:disabled, fsus|FsusSettingsCategory.fsus-disabled">
-    <Setter Property="Opacity" Value="{DynamicResource FsusThemeDisabledOpacity}" />
-  </Style>
-
-  <Style Selector="fsus|FsusSettingsShell.fsus-narrow Border.fsus-settings-rail">
-    <Setter Property="Width" Value="64" />
+    <Setter Property="Background" Value="{DynamicResource FsusThemeDisabledSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
   </Style>
 
   <Style Selector="fsus|FsusSettingsShell.fsus-narrow fsus|FsusSettingsCategory">
-    <Setter Property="Padding" Value="8,8" />
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
+  </Style>
+
+  <Style Selector="fsus|FsusSettingsCategory.fsus-narrow.fsus-has-icon Grid.fsus-settings-category-content">
     <Setter Property="HorizontalAlignment" Value="Center" />
+  </Style>
+
+  <Style Selector="fsus|FsusSettingsCategory.fsus-narrow.fsus-has-icon TextBlock.fsus-settings-category-header">
+    <Setter Property="IsVisible" Value="False" />
   </Style>
 </Styles>
