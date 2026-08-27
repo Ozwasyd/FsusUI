@@ -338,6 +338,28 @@ describe('markdown search UI and cross-mode highlight/reveal', () => {
     expect(wrapper.find('[role="search"]').exists()).toBe(false)
   })
 
+  it('refreshes production highlights when the document changes', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: { modelValue: 'alpha beta alpha' },
+    })
+    const vm = wrapper.vm as any
+    vm.openSearch()
+    await nextTick()
+    await wrapper
+      .find<HTMLInputElement>('[data-testid="markdown-search-query"]')
+      .setValue('alpha')
+    await nextTick()
+
+    expect(wrapper.findAll('.el-markdown-editor__search-highlight')).toHaveLength(2)
+    expect(vm.searchUi.hitCount).toBe(2)
+
+    await wrapper.setProps({ modelValue: 'beta alpha' })
+    await nextTick()
+    expect(wrapper.findAll('.el-markdown-editor__search-highlight')).toHaveLength(1)
+    expect(vm.searchUi.hitCount).toBe(1)
+    expect(vm.searchNavigate('next')).toBe('success')
+  })
+
   it('kills DOM highlight, layout shift, scroll stealing, and stale result mutations', () => {
     const report = evaluateMarkdownSearchUiMutations()
     expect(report.mutations.length).toBe(4)

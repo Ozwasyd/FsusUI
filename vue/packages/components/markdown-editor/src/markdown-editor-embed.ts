@@ -179,7 +179,7 @@ export const planMarkdownEmbedPresentation = (
     ? ['source-reveal', 'open-source', 'copy', 'select-node', 'delete']
     : isFailure
       ? ['source-reveal', 'retry', 'open-source', 'copy', 'select-node', 'delete']
-      : ['source-reveal', 'copy', 'select-node', 'delete']
+      : ['source-reveal', 'open-source', 'copy', 'select-node', 'delete']
 
   return Object.freeze({
     nodeId: `embed:${node.target}:${node.mode}`,

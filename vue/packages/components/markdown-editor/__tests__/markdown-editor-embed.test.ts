@@ -1,4 +1,8 @@
+import { mount } from '@vue/test-utils'
+import { nextTick } from 'vue'
 import { describe, expect, it } from 'vitest'
+
+import MarkdownEditor from '../src/markdown-editor.vue'
 
 import {
   collectMarkdownEmbedNodes,
@@ -266,5 +270,39 @@ describe('markdown embed safe presentation and atomic interaction', () => {
       expect(mutation.accepted).toBe(false)
       expect(mutation.equivalent).toBe(false)
     }
+  })
+
+  it('resolves and renders consumer embed results through the production component', async () => {
+    const source = 'Before\n\n::embed[target="safe-doc" mode="article"]\n\nAfter'
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        defaultMode: 'preview',
+        embedProvider: async (request) => ({
+          ...request,
+          excerpt: 'Safe summary <script>bad()</script>',
+          status: 'resolved',
+          title: 'Safe Document',
+        }),
+        modelValue: source,
+      },
+    })
+    await nextTick()
+    await nextTick()
+
+    const embed = wrapper.find('.el-markdown-embed')
+    expect(embed.exists()).toBe(true)
+    expect(embed.text()).toContain('Safe Document')
+    expect(embed.text()).toContain('Safe summary')
+    expect(embed.text()).not.toContain('bad()')
+    expect(wrapper.html()).not.toContain('<script>')
+    expect(embed.text()).toContain('Open Source')
+
+    const sourceReveal = embed
+      .findAll<HTMLButtonElement>('.el-markdown-embed__action')
+      .find((button) => button.text() === 'Source Reveal')
+    expect(sourceReveal).toBeTruthy()
+    await sourceReveal!.trigger('click')
+    await nextTick()
+    expect(wrapper.find('textarea').attributes('hidden')).toBeUndefined()
   })
 })

@@ -242,6 +242,34 @@ non-composition input 可继续编辑。窗口外仍会拒绝 `isComposing` 或
 `insertCompositionText` 标记的孤立旧 payload；迟到 `compositionend` 后的即时
 commit 也不会越过当前受控值。
 
+## Search and consumer-resolved embeds
+
+`Ctrl/Cmd+F` and `Ctrl/Cmd+H` open the editor-owned find or replace surface.
+The active query is rerun after every accepted transaction and controlled
+document reset. Match identity remains bound to the current document revision;
+stale or deleted reveal results trigger a fresh search instead of restoring an
+old source range. Source and Live use a non-interactive range overlay, while
+Live/Split/Preview renderer text uses the CSS Custom Highlight API when the
+browser supports it. Neither path wraps renderer HTML or changes Markdown
+source, selection ownership, line wrapping, body width, or scroll-container
+identity.
+
+`embed-provider` is the consumer-owned resolution boundary for valid
+`::embed[...]` projection nodes. The editor supplies an identity-, revision-,
+node-, target-, mode-, and version-bound request. It commits only a matching
+result and treats late or mismatched results as stale. Provider excerpts are
+rendered as escaped text, never `innerHTML`; the directive remains the only host
+source/history authority. Source mode displays the exact directive. Other modes
+interleave the normal Markdown renderer with read-only embed regions that expose
+source reveal, exact-Markdown copy, delete, open-source, and applicable retry
+actions without an iframe, nested editor, nested scroll surface, or permanent
+embed tab stop.
+
+`embed-open-source(target, mode)` and `embed-retry(target, mode)` leave target
+resolution, authorization, navigation, and retry policy with the consumer.
+Delete and source selection remain editor transactions/selections. Provider
+result height changes use the existing editor body as the only scroll owner.
+
 ## Events
 
 | 事件名             | 说明                                                         |
@@ -259,6 +287,8 @@ commit 也不会越过当前受控值。
 | render-complete    | preview renderer 完成                                        |
 | render-error       | preview renderer 失败                                        |
 | features-activated | preview feature activation 完成                              |
+| embed-open-source  | consumer 应打开指定 target/mode 的来源                       |
+| embed-retry        | consumer 应重新解析指定 target/mode                          |
 
 ## Attributes
 
@@ -276,6 +306,7 @@ commit 也不会越过当前受控值。
 | preview-base-url  | preview renderer 的基础 URL                 | `string \| null`                          | `null`   |
 | preview-csp-nonce | preview renderer 的 CSP nonce               | `string \| null`                          | `null`   |
 | preview-features  | preview renderer 的 feature activation 开关 | `MarkdownFeatureActivationFeatureOptions` | —        |
+| embed-provider    | consumer-owned、revision-bound embed resolver | `MarkdownEmbedProvider`                    | —        |
 | min-rows          | 编辑区最小行数                              | `number`                                  | `12`     |
 
 ## Migration

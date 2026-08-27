@@ -334,9 +334,70 @@
           :data-role="decoration.role"
         />
       </div>
+      <div
+        v-if="visibleSearchHighlights.length"
+        :class="ns.e('search-highlights')"
+        aria-hidden="true"
+      >
+        <span
+          v-for="highlight in visibleSearchHighlights"
+          :key="`search:${highlight.range.start}:${highlight.range.end}`"
+          :class="[
+            ns.e('search-highlight'),
+            ns.is('current', highlight.current),
+          ]"
+          :style="searchHighlightStyle(highlight.range)"
+        />
+      </div>
 
+      <div
+        v-if="liveSurface.rendererVisible && embedRenderSegments.length > 1"
+        ref="previewRendererRef"
+        :class="ns.e('preview')"
+      >
+        <template v-for="segment in embedRenderSegments" :key="segment.key">
+          <el-markdown-renderer
+            v-if="segment.kind === 'markdown' && segment.content"
+            :base-url="previewBaseUrl"
+            :content="segment.content"
+            :csp-nonce="previewCspNonce"
+            :features="previewFeatures"
+            mode="editor"
+            @features-activated="emitRenderEvent('features-activated', $event)"
+            @render-complete="handleRendererComplete($event)"
+            @render-error="emitRenderEvent('render-error', $event)"
+          />
+          <section
+            v-else-if="segment.kind === 'embed'"
+            class="el-markdown-embed"
+            :aria-label="segment.plan.accessibility.name"
+            role="region"
+          >
+            <header class="el-markdown-embed__header">
+              <span class="el-markdown-embed__target">{{ segment.plan.title }}</span>
+              <span class="el-markdown-embed__mode-tag">{{ segment.plan.mode }}</span>
+              <span class="el-markdown-embed__status" role="status">{{ segment.plan.status }}</span>
+            </header>
+            <p v-if="segment.plan.excerpt" class="el-markdown-embed__body">
+              {{ segment.plan.excerpt }}
+            </p>
+            <div class="el-markdown-embed__actions">
+              <button
+                v-for="action in segment.plan.allowedActions"
+                :key="action"
+                type="button"
+                class="el-markdown-embed__action"
+                @click="handleEmbedAction(segment, action)"
+              >
+                {{ embedActionLabel(action) }}
+              </button>
+            </div>
+          </section>
+        </template>
+      </div>
       <el-markdown-renderer
-        v-if="liveSurface.rendererVisible"
+        v-else-if="liveSurface.rendererVisible"
+        ref="previewRendererRef"
         :class="ns.e('preview')"
         :base-url="previewBaseUrl"
         :content="editorValue"
@@ -344,7 +405,7 @@
         :features="previewFeatures"
         mode="editor"
         @features-activated="emitRenderEvent('features-activated', $event)"
-        @render-complete="emitRenderEvent('render-complete', $event)"
+        @render-complete="handleRendererComplete($event)"
         @render-error="emitRenderEvent('render-error', $event)"
       />
     </div>
@@ -572,6 +633,7 @@ import {
   resolveMarkdownSearchUi,
   revealMarkdownSearchMatch,
   type MarkdownSearchUiState,
+  resolveMarkdownSearchHighlights,
 } from './markdown-editor-search-ui'
 import {
   planMarkdownReplaceAll,
@@ -579,6 +641,20 @@ import {
 } from '../../../wasm/markdown-replace'
 import type { MarkdownSearchMatch, MarkdownSearchMode } from '../../../wasm/markdown-search-model'
 import type { MarkdownSearchTask } from '../../../wasm/markdown-search-worker'
+import {
+  collectMarkdownEmbedNodes,
+  planMarkdownEmbedPresentation,
+  runMarkdownEmbedAction,
+  type MarkdownEmbedActionKind,
+  type MarkdownEmbedPresentationPlan,
+  type MarkdownEmbedValidNode,
+} from './markdown-editor-embed'
+import {
+  commitMarkdownEmbedResult,
+  createMarkdownEmbedRequest,
+  forgetMarkdownEmbedRequest,
+  type MarkdownEmbedResult,
+} from '../../../wasm/markdown-embed-provider'
 
 
 defineOptions({
@@ -639,6 +715,7 @@ const transactionStore = new MarkdownEditorTransactionStore(
   documentIdentity,
 )
 const editorValue = ref(transactionStore.value)
+const editorRevision = ref(transactionStore.revision)
 const liveSurface = computed(() =>
   createMarkdownLiveSurface({
     documentIdentity,
@@ -962,6 +1039,7 @@ const dispatchEditorOperation = (
         : transactionStore.redo()
 
   editorValue.value = result.value
+  editorRevision.value = result.revision
   emit('transaction', toMarkdownEditorTransactionEvent(transaction, result))
 
   if (
@@ -1268,6 +1346,11 @@ onMounted(() => {
 onBeforeUnmount(() => {
   abortPendingCommands()
   if (layoutGestureTimer) clearTimeout(layoutGestureTimer)
+  cssHighlightRegistry()?.delete('markdown-search-match')
+  cssHighlightRegistry()?.delete('markdown-search-current')
+  embedResolutionGeneration += 1
+  for (const requestId of pendingEmbedRequests) forgetMarkdownEmbedRequest(requestId)
+  pendingEmbedRequests.clear()
   if (typeof window === 'undefined') return
 
   window.visualViewport?.removeEventListener(
@@ -1867,6 +1950,11 @@ const emitRenderEvent = (
   emit('render-error', payload)
 }
 
+const handleRendererComplete = (payload: unknown) => {
+  emitRenderEvent('render-complete', payload)
+  void nextTick(syncRenderedSearchHighlights)
+}
+
 const searchUiState = ref<MarkdownSearchUiState>(resolveMarkdownSearchUi(false, '', 0))
 const searchQuery = ref('')
 const searchReplaceText = ref('')
@@ -1876,6 +1964,256 @@ const searchMode = ref<MarkdownSearchMode>('plain')
 const searchTask = ref<MarkdownSearchTask | null>(null)
 const searchQueryInputRef = ref<HTMLInputElement | null>(null)
 const searchReplaceInputRef = ref<HTMLInputElement | null>(null)
+const previewRendererRef = ref<HTMLElement | { $el?: HTMLElement } | null>(null)
+
+const searchHighlights = computed(() =>
+  resolveMarkdownSearchHighlights({
+    currentIndex: searchCurrentIndex.value,
+    matches: searchMatches.value,
+    mode: currentMode.value,
+    source: editorValue.value,
+  }),
+)
+const visibleSearchHighlights = computed(() =>
+  searchUiState.value.open && liveSurface.value.inputVisible
+    ? searchHighlights.value.items
+    : [],
+)
+
+const searchHighlightStyle = (range: { readonly start: number; readonly end: number }) => {
+  const source = editorValue.value
+  const lineStart = source.lastIndexOf('\n', Math.max(0, range.start - 1)) + 1
+  const line = source.slice(0, lineStart).split('\n').length - 1
+  const column = range.start - lineStart
+  const lineEnd = source.indexOf('\n', range.start)
+  const visibleEnd = lineEnd < 0 ? range.end : Math.min(range.end, lineEnd)
+  return {
+    '--markdown-search-column': String(column),
+    '--markdown-search-length': String(Math.max(1, visibleEnd - range.start)),
+    '--markdown-search-line': String(line),
+  }
+}
+
+type CssHighlightRegistry = {
+  delete(name: string): boolean
+  set(name: string, value: unknown): unknown
+}
+
+const cssHighlightRegistry = () =>
+  (globalThis.CSS as typeof CSS & { highlights?: CssHighlightRegistry } | undefined)
+    ?.highlights
+
+const renderedSearchRanges = (root: HTMLElement, needles: readonly string[]) => {
+  const owner = root.ownerDocument
+  const walker = owner.createTreeWalker(root, NodeFilter.SHOW_TEXT)
+  const textNodes: Text[] = []
+  let node = walker.nextNode()
+  while (node) {
+    if (node instanceof Text && node.data) textNodes.push(node)
+    node = walker.nextNode()
+  }
+  const nextOffsets = new Map<Text, number>()
+  const ranges: Array<Range | null> = []
+  for (const needle of needles) {
+    if (!needle || needle.includes('\n')) {
+      ranges.push(null)
+      continue
+    }
+    let matched: Range | null = null
+    for (const textNode of textNodes) {
+      const index = textNode.data.indexOf(needle, nextOffsets.get(textNode) ?? 0)
+      if (index < 0) continue
+      const range = owner.createRange()
+      range.setStart(textNode, index)
+      range.setEnd(textNode, index + needle.length)
+      nextOffsets.set(textNode, index + needle.length)
+      matched = range
+      break
+    }
+    ranges.push(matched)
+  }
+  return ranges
+}
+
+const syncRenderedSearchHighlights = () => {
+  const registry = cssHighlightRegistry()
+  if (!registry) return
+  registry.delete('markdown-search-match')
+  registry.delete('markdown-search-current')
+  if (!searchUiState.value.open || !searchMatches.value.length) return
+  const candidate = previewRendererRef.value
+  const root = candidate instanceof HTMLElement ? candidate : candidate?.$el
+  if (!(root instanceof HTMLElement)) return
+  const needles = searchMatches.value.map((match) =>
+    editorValue.value.slice(match.range.start, match.range.end),
+  )
+  const ranges = renderedSearchRanges(root, needles)
+  const HighlightCtor = (globalThis as typeof globalThis & {
+    Highlight?: new (...ranges: Range[]) => unknown
+  }).Highlight
+  const visibleRanges = ranges.filter((range): range is Range => Boolean(range))
+  if (!HighlightCtor || !visibleRanges.length) return
+  registry.set('markdown-search-match', new HighlightCtor(...visibleRanges))
+  const current = searchCurrentIndex.value
+  if (current !== null && ranges[current]) {
+    registry.set('markdown-search-current', new HighlightCtor(ranges[current]))
+  }
+}
+
+type MarkdownEmbedRenderSegment =
+  | { readonly content: string; readonly key: string; readonly kind: 'markdown' }
+  | {
+      readonly key: string
+      readonly kind: 'embed'
+      readonly node: MarkdownEmbedValidNode
+      readonly plan: MarkdownEmbedPresentationPlan
+      readonly result?: MarkdownEmbedResult
+    }
+
+const embedResults = ref<ReadonlyMap<string, MarkdownEmbedResult>>(new Map())
+let embedResolutionGeneration = 0
+const pendingEmbedRequests = new Set<string>()
+const embedRequestVersions = new Map<string, number>()
+const embedNodeId = (node: MarkdownEmbedValidNode) =>
+  `embed:${node.ranges.full.start}:${node.target}:${node.mode}`
+const embedNodes = computed(() =>
+  collectMarkdownEmbedNodes(editorValue.value).filter(
+    (node): node is MarkdownEmbedValidNode => node.ok,
+  ),
+)
+
+const resolveEmbedNode = async (
+  node: MarkdownEmbedValidNode,
+  generation: number,
+) => {
+  const provider = props.embedProvider
+  if (!provider) return
+  const nodeId = embedNodeId(node)
+  const version = (embedRequestVersions.get(nodeId) ?? 0) + 1
+  embedRequestVersions.set(nodeId, version)
+  const request = createMarkdownEmbedRequest({
+    documentIdentity,
+    mode: node.mode,
+    nodeId,
+    revision: transactionStore.revision,
+    target: node.target,
+    version,
+  })
+  pendingEmbedRequests.add(request.requestId)
+  const pending: MarkdownEmbedResult = Object.freeze({
+    ...request,
+    status: 'pending' as const,
+  })
+  embedResults.value = new Map(embedResults.value).set(nodeId, pending)
+  let result: MarkdownEmbedResult
+  try {
+    result = await provider(request)
+  } catch {
+    result = Object.freeze({ ...request, status: 'rejected' as const })
+  } finally {
+    pendingEmbedRequests.delete(request.requestId)
+    forgetMarkdownEmbedRequest(request.requestId)
+  }
+  if (generation !== embedResolutionGeneration) return
+  const committed = commitMarkdownEmbedResult(request, result)
+  embedResults.value = new Map(embedResults.value).set(nodeId, committed)
+}
+
+const refreshEmbedPresentations = () => {
+  const generation = ++embedResolutionGeneration
+  const activeIds = new Set(embedNodes.value.map(embedNodeId))
+  embedResults.value = new Map(
+    [...embedResults.value].filter(([nodeId]) => activeIds.has(nodeId)),
+  )
+  for (const nodeId of embedRequestVersions.keys()) {
+    if (!activeIds.has(nodeId)) embedRequestVersions.delete(nodeId)
+  }
+  for (const node of embedNodes.value) void resolveEmbedNode(node, generation)
+}
+
+const embedRenderSegments = computed<readonly MarkdownEmbedRenderSegment[]>(() => {
+  const segments: MarkdownEmbedRenderSegment[] = []
+  let offset = 0
+  for (const node of embedNodes.value) {
+    segments.push({
+      content: editorValue.value.slice(offset, node.ranges.full.start),
+      key: `markdown:${offset}`,
+      kind: 'markdown',
+    })
+    const result = embedResults.value.get(embedNodeId(node))
+    segments.push({
+      key: embedNodeId(node),
+      kind: 'embed',
+      node,
+      plan: planMarkdownEmbedPresentation(node, result),
+      result,
+    })
+    offset = node.ranges.full.end
+  }
+  if (!segments.length) {
+    return [{ content: editorValue.value, key: 'markdown:all', kind: 'markdown' }]
+  }
+  segments.push({
+    content: editorValue.value.slice(offset),
+    key: `markdown:${offset}`,
+    kind: 'markdown',
+  })
+  return Object.freeze(segments)
+})
+
+const embedActionLabel = (action: MarkdownEmbedActionKind) =>
+  action
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ')
+
+const markdownCommandContext = () => ({
+  dispatch: { dispatch: dispatchTransaction },
+  documentIdentity,
+  mode: currentMode.value,
+  readonly: editingBlocked.value,
+  revision: transactionStore.revision,
+  selection: captureSelection(false),
+  signal: new AbortController().signal,
+  value: transactionStore.value,
+})
+
+const handleEmbedAction = async (
+  segment: Extract<MarkdownEmbedRenderSegment, { readonly kind: 'embed' }>,
+  action: MarkdownEmbedActionKind,
+) => {
+  const result = runMarkdownEmbedAction(
+    markdownCommandContext(),
+    segment.node,
+    action,
+    segment.result,
+  )
+  if (result.action === 'delete') {
+    dispatchTransaction(result.transaction)
+    return
+  }
+  if (
+    result.action === 'source-reveal' ||
+    result.action === 'caret-before' ||
+    result.action === 'caret-after' ||
+    result.action === 'select-node'
+  ) {
+    if (currentMode.value === 'preview') setMode('source')
+    transactionStore.setSelection(result.selection, false)
+    await restoreTextareaSelection(result.selection)
+    return
+  }
+  if (result.action === 'copy') {
+    await navigator.clipboard?.writeText(result.exactMarkdown)
+    return
+  }
+  if (result.action === 'retry') {
+    emit('embed-retry', result.target, result.mode)
+    void resolveEmbedNode(segment.node, embedResolutionGeneration)
+    return
+  }
+  emit('embed-open-source', result.target, result.mode)
+}
 
 const updateSearchState = () => {
   searchUiState.value = resolveMarkdownSearchUi(
@@ -1980,21 +2318,31 @@ const searchNavigate = (direction: 'next' | 'previous') => {
     direction,
   )
   if (result.match) {
-    searchCurrentIndex.value = result.nextIndex
-    updateSearchState()
-    revealMarkdownSearchMatch({
+    const reveal = revealMarkdownSearchMatch({
       currentMode: currentMode.value,
       documentIdentity,
       match: result.match,
       revision: transactionStore.revision,
       source: transactionStore.value,
     })
-    void restoreTextareaSelection({
-      direction: 'none',
-      end: result.match.range.end,
-      start: result.match.range.start,
-    })
+    if (reveal.status === 'stale' || reveal.status === 'deleted') {
+      runSearch()
+      return reveal.status
+    }
+    if (reveal.status !== 'success') return reveal.status
+    searchCurrentIndex.value = result.nextIndex
+    updateSearchState()
+    if (!reveal.suspended && currentMode.value !== 'preview') {
+      void restoreTextareaSelection({
+        direction: 'none',
+        end: result.match.range.end,
+        start: result.match.range.start,
+      })
+    }
+    void nextTick(syncRenderedSearchHighlights)
+    return reveal.status
   }
+  return 'not-found' as const
 }
 
 const handleSearchQueryInput = () => {
@@ -2093,6 +2441,25 @@ const searchReplaceAll = () => {
     runSearch()
   }
 }
+
+watch(
+  [editorValue, editorRevision, () => props.embedProvider],
+  refreshEmbedPresentations,
+  { immediate: true },
+)
+
+watch(
+  [editorValue, editorRevision, currentMode],
+  () => {
+    if (searchUiState.value.open && searchQuery.value) runSearch()
+  },
+)
+
+watch(
+  [searchMatches, searchCurrentIndex, () => searchUiState.value.open, currentMode],
+  () => void nextTick(syncRenderedSearchHighlights),
+  { flush: 'post' },
+)
 
 const handleKeydown = (event: KeyboardEvent) => {
   if (editingBlocked.value || nativeMachine.freezeSmartInput) return

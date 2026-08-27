@@ -2,6 +2,7 @@
 @use 'common/var' as *;
 
 @include b(markdown-editor) {
+  position: relative;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   min-width: 0;
@@ -243,6 +244,29 @@
     height: 1px;
     overflow: hidden;
     clip: rect(0 0 0 0);
+  }
+
+  @include e(search-highlights) {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  @include e(search-highlight) {
+    position: absolute;
+    top: calc(16px + var(--markdown-search-line) * 1.6em);
+    inset-inline-start: calc(16px + var(--markdown-search-column) * 1ch);
+    width: calc(var(--markdown-search-length) * 1ch);
+    height: 1.6em;
+    background: color-mix(in srgb, var(--el-color-primary) 16%, transparent);
+    outline: 1px solid var(--el-color-primary-light-7);
+
+    @include when(current) {
+      background: color-mix(in srgb, var(--el-color-primary) 28%, transparent);
+      outline-color: var(--fsus-state-focus-border, var(--el-color-primary));
+    }
   }
 
   @include e(preview) {
@@ -716,6 +740,7 @@
     border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
     background: var(--fsus-surface-overlay, var(--el-bg-color-overlay));
     box-shadow: var(--fsus-shadow-subtle, 0 4px 12px rgb(0 0 0 / 8%));
+    width: min(100%, 640px);
     max-width: calc(100% - 16px);
   }
 
@@ -723,11 +748,13 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
   }
 
   @include e(search-input) {
-    height: 28px;
+    flex: 1 1 160px;
+    min-width: 120px;
+    height: var(--fsus-control-height-compact, 40px);
     padding: 0 8px;
     border: 1px solid getCssVar('border-color');
     border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
@@ -753,7 +780,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 28px;
+    min-width: var(--fsus-control-height-compact, 40px);
+    height: var(--fsus-control-height-compact, 40px);
     padding: 0 6px;
     border: 1px solid transparent;
     border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
@@ -795,6 +823,7 @@
 
   &__header {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 8px;
     font-size: 12px;
@@ -803,7 +832,7 @@
   &__mode-tag {
     font-size: 11px;
     padding: 1px 4px;
-    border-radius: 2px;
+    border-radius: var(--fsus-radius-control-small, 4px);
     background: getCssVar('fill-color', 'light');
     color: getCssVar('text-color', 'secondary');
     text-transform: uppercase;
@@ -828,6 +857,7 @@
 
   &__actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 6px;
     margin-top: 6px;
   }
@@ -835,7 +865,8 @@
   &__action {
     display: inline-flex;
     align-items: center;
-    height: 24px;
+    min-width: var(--fsus-control-height-compact, 40px);
+    min-height: var(--fsus-control-height-compact, 40px);
     padding: 0 8px;
     border: 1px solid getCssVar('border-color-lighter');
     border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
@@ -850,4 +881,13 @@
       color: getCssVar('text-color', 'primary');
     }
   }
+}
+
+::highlight(markdown-search-match) {
+  background: var(--el-color-primary-light-9);
+}
+
+::highlight(markdown-search-current) {
+  background: var(--el-color-primary-light-7);
+  text-decoration: underline var(--fsus-state-focus-border, var(--el-color-primary));
 }

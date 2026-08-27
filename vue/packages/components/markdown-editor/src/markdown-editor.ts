@@ -3,6 +3,7 @@ import { buildProps, definePropType } from '@element-plus/utils'
 
 import type { ExtractPropTypes, PropType } from 'vue'
 import type { MarkdownFeatureActivationFeatureOptions } from '@element-plus/wasm'
+import type { MarkdownEmbedProvider } from '../../../wasm/markdown-embed-provider'
 import type MarkdownEditor from './markdown-editor.vue'
 import type { MarkdownAttachmentBatchIntent } from './markdown-editor-attachment'
 import type { MarkdownEditorMetricsOptions } from './markdown-editor-metrics'
@@ -937,6 +938,10 @@ export const markdownEditorProps = buildProps({
     type: Object as PropType<MarkdownFeatureActivationFeatureOptions>,
     default: undefined,
   },
+  embedProvider: {
+    type: definePropType<MarkdownEmbedProvider>(Function),
+    default: undefined,
+  },
   minRows: {
     type: Number,
     default: 12,
@@ -955,6 +960,10 @@ export const markdownEditorEmits = {
   'render-complete': (..._args: unknown[]) => true,
   'render-error': (..._args: unknown[]) => true,
   'features-activated': (..._args: unknown[]) => true,
+  'embed-open-source': (target: string, mode: string) =>
+    typeof target === 'string' && typeof mode === 'string',
+  'embed-retry': (target: string, mode: string) =>
+    typeof target === 'string' && typeof mode === 'string',
   transaction: (event: MarkdownEditorTransactionEvent) =>
     typeof event?.accepted === 'boolean' &&
     typeof event.revision === 'number' &&

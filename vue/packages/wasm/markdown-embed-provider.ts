@@ -42,6 +42,10 @@ export type MarkdownEmbedProvider = (
   request: MarkdownEmbedRequest,
 ) => Promise<MarkdownEmbedResult> | MarkdownEmbedResult
 
+export const forgetMarkdownEmbedRequest = (requestId: string) => {
+  requests.delete(requestId)
+}
+
 const requests = new Map<string, MarkdownEmbedRequest>()
 
 export const createMarkdownEmbedRequest = (
