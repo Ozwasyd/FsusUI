@@ -8,6 +8,8 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.VisualTree;
 using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Themes;
@@ -249,6 +251,125 @@ public class FsusSwitchTemplateHeadlessTests
     window.Close();
   }
 
+  [AvaloniaTheory]
+  [InlineData(FsusThemeVariant.Light)]
+  [InlineData(FsusThemeVariant.Dark)]
+  public void RealHeadlessSkiaRenderProducesInspectableStateEvidence(
+    FsusThemeVariant variant)
+  {
+    ApplyTheme(variant, FsusMotionMode.Reduced);
+    var controls = new[]
+    {
+      new FsusSwitch
+      {
+        AccessibleName = "Notifications off",
+        Content = "Notifications off",
+      },
+      new FsusSwitch
+      {
+        AccessibleName = "Notifications on",
+        Content = "Notifications on",
+        IsChecked = true,
+      },
+      new FsusSwitch
+      {
+        AccessibleName = "Keyboard focus",
+        Content = "Keyboard focus",
+      },
+      new FsusSwitch
+      {
+        AccessibleName = "Loading preferences",
+        Content = "Loading preferences",
+        IsLoading = true,
+      },
+      new FsusSwitch
+      {
+        AccessibleName = "Disabled preference",
+        Content = "Disabled preference",
+        IsEnabled = false,
+      },
+      new FsusSwitch
+      {
+        AccessibleName = "Compact density",
+        Content = "Compact density",
+        Size = FsusComponentSize.Sm,
+      },
+      new FsusSwitch
+      {
+        AccessibleName = "Large density",
+        Content = "Large density",
+        IsChecked = true,
+        Size = FsusComponentSize.Lg,
+      },
+    };
+    var stack = new StackPanel
+    {
+      Margin = new Thickness(24),
+      Spacing = 8,
+    };
+    foreach (var control in controls)
+    {
+      stack.Children.Add(control);
+    }
+
+    var surface = new Border
+    {
+      Width = 640,
+      Padding = new Thickness(24),
+      Child = stack,
+    };
+    var window = new Window
+    {
+      Width = 640,
+      Height = 440,
+      Content = surface,
+      ShowInTaskbar = false,
+    };
+    AttachFsusTheme(window);
+    Assert.True(
+      window.TryFindResource(
+        FsusThemeResourceKeys.BackgroundBrush,
+        out var backgroundResource));
+    surface.Background = Assert.IsAssignableFrom<IBrush>(backgroundResource);
+
+    window.Show();
+    controls[2].Focus();
+    window.Measure(new Size(640, 440));
+    window.Arrange(new Rect(0, 0, 640, 440));
+    surface.Arrange(new Rect(0, 0, 640, 440));
+
+    var outputRoot = Path.Combine(
+      FindRepositoryRoot(),
+      "dotnet",
+      "FsusUI.Avalonia.HeadlessTests",
+      "TestResults",
+      "fsus-switch-rendered-evidence");
+    Directory.CreateDirectory(outputRoot);
+    var outputPath = Path.Combine(
+      outputRoot,
+      $"switch-state-matrix-{variant.ToString().ToLowerInvariant()}.png");
+    using var bitmap =
+      new RenderTargetBitmap(new PixelSize(640, 440), new Vector(96, 96));
+    bitmap.Render(surface);
+    using (var stream = File.Create(outputPath))
+    {
+      bitmap.Save(stream);
+    }
+
+    Assert.True(File.Exists(outputPath));
+    Assert.True(new FileInfo(outputPath).Length > 1_000);
+    Assert.All(controls, control =>
+    {
+      Assert.True(control.IsMeasureValid);
+      Assert.True(control.IsArrangeValid);
+      Assert.True(control.Bounds.Width > 0);
+      Assert.True(control.Bounds.Height > 0);
+      _ = RequirePart<Panel>(control, "PART_MovingKnobs");
+    });
+    Assert.Contains("fsus-focus-visible", controls[2].Classes);
+    window.Close();
+  }
+
   // Theme resources and styles are scoped to the windows this suite mounts so
   // the shared headless application (and other suites' tracked render
   // artifacts) never observe application-level FsusUI styling.
@@ -373,5 +494,24 @@ public class FsusSwitchTemplateHeadlessTests
     Assert.Equal(
       expectedItemStatus ?? (expected == ToggleState.On ? "checked" : "unchecked"),
       AutomationProperties.GetItemStatus(control));
+  }
+
+  private static string FindRepositoryRoot()
+  {
+    var directory = new DirectoryInfo(AppContext.BaseDirectory);
+    while (directory is not null)
+    {
+      if (
+        File.Exists(Path.Combine(directory.FullName, "package.json")) &&
+        Directory.Exists(Path.Combine(directory.FullName, "dotnet")))
+      {
+        return directory.FullName;
+      }
+
+      directory = directory.Parent;
+    }
+
+    throw new DirectoryNotFoundException(
+      "Could not find the FsusUI repository root.");
   }
 }
