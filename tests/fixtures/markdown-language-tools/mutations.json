@@ -138,5 +138,12 @@
     "find": "kind,\n        currentSelection,",
     "replace": "kind,\n        targetSelection,",
     "expectError": "must not replace current selection authority"
+  },
+  {
+    "name": "inferred-projection-revision",
+    "file": "web",
+    "find": "? options.projectionRevision\n    : undefined",
+    "replace": "? (options.projectionRevision ?? currentRevision)\n    : undefined",
+    "expectError": "must be supplied by the projection session owner"
   }
 ]

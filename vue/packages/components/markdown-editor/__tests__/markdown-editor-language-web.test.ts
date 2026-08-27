@@ -106,6 +106,7 @@ describe('markdown web language tools integration', () => {
     const controller = bindMarkdownWebLanguageTools(textarea, {
       documentIdentity,
       projection: projectionFixture(source, documentIdentity),
+      projectionRevision: 4,
       revision: 4,
       source,
     })
@@ -127,6 +128,30 @@ describe('markdown web language tools integration', () => {
       },
     })
     expect(controller.session).toBeNull()
+  })
+
+  it('does not infer projection freshness from the current editor revision', () => {
+    const source = 'Hello wrld'
+    const documentIdentity = { epoch: 1, id: 'projection-revision' }
+    const textarea = {
+      selectionDirection: 'none' as const,
+      selectionEnd: 10,
+      selectionStart: 6,
+      spellcheck: true,
+      value: source,
+    }
+    const controller = bindMarkdownWebLanguageTools(textarea, {
+      documentIdentity,
+      projection: projectionFixture(source, documentIdentity),
+      revision: 4,
+      source,
+    })
+
+    controller.createSession('spellcheck')
+    expect(controller.applyReplacement(6, 10, 'world')).toMatchObject({
+      accepted: false,
+      reason: 'stale-projection',
+    })
   })
 
   it('consumes rejected browser replacement events instead of retaining DOM mutation', () => {
@@ -222,6 +247,7 @@ describe('markdown web language tools integration', () => {
     const controller = bindMarkdownWebLanguageTools(textarea, {
       documentIdentity,
       projection: projectionFixture(source, documentIdentity),
+      projectionRevision: 1,
       revision: 1,
       source,
     })
@@ -260,6 +286,7 @@ describe('markdown web language tools integration', () => {
       config: { nativeWritingTools: 'disabled' },
       documentIdentity,
       projection: projectionFixture(source, documentIdentity),
+      projectionRevision: 1,
       revision: 1,
       source,
     })

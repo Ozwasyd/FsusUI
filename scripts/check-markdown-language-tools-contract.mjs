@@ -282,6 +282,14 @@ const inspectWebBoundary = (source, errors) => {
       `${fileName}: mapped replacement target must not replace current selection authority`,
     )
   }
+  if (
+    source.includes('options.projectionRevision ?? currentRevision') ||
+    source.includes('input.projectionRevision ?? input.revision')
+  ) {
+    errors.push(
+      `${fileName}: projection freshness must be supplied by the projection session owner`,
+    )
+  }
 }
 
 const inspectVuePublicSurface = (source, errors) => {

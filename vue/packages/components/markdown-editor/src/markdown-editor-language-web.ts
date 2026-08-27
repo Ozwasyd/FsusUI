@@ -167,7 +167,7 @@ export const bindMarkdownWebLanguageTools = (
   let currentMode: MarkdownEditorMode = options.mode ?? 'source'
   let currentProjection = options.projection
   let currentProjectionRevision = options.projection
-    ? (options.projectionRevision ?? currentRevision)
+    ? options.projectionRevision
     : undefined
   let currentCapability = resolveMarkdownLanguageToolCapability(currentConfig)
   let currentSession: MarkdownLanguageToolSession | null = null
@@ -357,7 +357,7 @@ export const bindMarkdownWebLanguageTools = (
       currentConfig = input.config ?? currentConfig
       currentProjection = input.projection
       currentProjectionRevision = input.projection
-        ? (input.projectionRevision ?? input.revision)
+        ? input.projectionRevision
         : undefined
       currentSession = null
       currentCapability = resolveMarkdownLanguageToolCapability(currentConfig)
