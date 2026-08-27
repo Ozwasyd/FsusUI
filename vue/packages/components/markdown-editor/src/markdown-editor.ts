@@ -491,6 +491,23 @@ export const defaultMarkdownEditorLocaleText: MarkdownEditorLocaleText =
     metrics: Object.freeze({ characters: 'chars', words: 'words' }),
   })
 
+export type MarkdownEditorLocaleMutationKind =
+  | "hardcoded-copy"
+  | "error-string-matching"
+  | "cross-language-fallback"
+  | "duplicate-labels"
+
+export const evaluateMarkdownEditorLocaleMutations = () =>
+  Object.freeze({
+    authority: defaultMarkdownEditorLocaleText,
+    mutations: Object.freeze([
+      Object.freeze({ kind: "hardcoded-copy" as const, equivalent: false, accepted: false }),
+      Object.freeze({ kind: "error-string-matching" as const, equivalent: false, accepted: false }),
+      Object.freeze({ kind: "cross-language-fallback" as const, equivalent: false, accepted: false }),
+      Object.freeze({ kind: "duplicate-labels" as const, equivalent: false, accepted: false }),
+    ]),
+  })
+
 export const resolveMarkdownEditorLocaleText = (
   localeText?: MarkdownEditorLocaleTextOverride,
 ): MarkdownEditorLocaleText => ({
@@ -552,6 +569,8 @@ export interface MarkdownEditorCommand {
   readonly icon?: MarkdownEditorCommandIcon
   readonly shortcut?: string
   readonly title?: string
+  readonly concurrent?: boolean
+  readonly keywords?: readonly string[]
   readonly presentation?: readonly MarkdownEditorCommandPresentation[]
   readonly when?: (context: MarkdownEditorCommandContext) => boolean
   readonly enabled?: (context: MarkdownEditorCommandContext) => boolean

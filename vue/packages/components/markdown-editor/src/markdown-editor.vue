@@ -228,6 +228,9 @@
         :characters="characterCount"
         :mode="currentMode"
         :words="wordCount"
+        :metrics="editorMetrics"
+        :state="statusResolution.slotPayload.state"
+        :capability="statusResolution.slotPayload.capability"
       >
         <span>{{ characterCount }} {{ localeText.metrics.characters }}</span>
         <span v-if="statusDensity === 'detailed'">
@@ -236,7 +239,91 @@
       </slot>
     </footer>
 
+    <div
+      v-if="statusDensity === 'none' && statusResolution.ariaLiveMessage"
+      :class="ns.e('visually-hidden')"
+      aria-live="polite"
+    >
+      {{ statusResolution.ariaLiveMessage }}
+    </div>
+
+    <div
+      v-if="surfaceOptions.selectionToolbar && selectionToolbarPlacement.visible && selectionToolbarCommands.length"
+      :class="ns.e('selection-toolbar')"
+      role="toolbar"
+      :aria-label="localeText.editorAria"
+      @keydown.esc.prevent.stop="closeSelectionToolbar"
+    >
+      <button
+        v-for="command in selectionToolbarCommands"
+        :key="command.key"
+        type="button"
+        :class="ns.e('command')"
+        :disabled="isCommandDisabled(command)"
+        :aria-label="command.title || command.label"
+        :title="command.title || command.label"
+        @click="activateCommand(command)"
+      >
+        {{ command.label }}
+      </button>
+    </div>
+
+    <div
+      v-if="surfaceOptions.slashMenu && slashTrigger && slashCommands.length"
+      :class="ns.e('slash-menu')"
+      role="menu"
+      @keydown.esc.prevent.stop="closeSlashMenu"
+    >
+      <button
+        v-for="(command, idx) in slashCommands"
+        :key="command.key"
+        type="button"
+        :class="[ns.e('command'), ns.is('active', idx === activeSlashIndex)]"
+        :disabled="isCommandDisabled(command)"
+        @click="executeSlashCommand(command)"
+      >
+        {{ command.title || command.label }}
+      </button>
+    </div>
+
     <Teleport to="body">
+      <div
+        v-if="surfaceOptions.commandPalette && commandPaletteOpen"
+        :class="ns.e('palette-backdrop')"
+        @mousedown.self.prevent="closeCommandPalette"
+      >
+        <section
+          :class="ns.e('palette-dialog')"
+          role="dialog"
+          aria-modal="true"
+          :aria-label="localeText.overflow || 'Command Palette'"
+          @keydown.esc.prevent.stop="closeCommandPalette"
+        >
+          <input
+            v-model="paletteQuery"
+            type="text"
+            :class="ns.e('palette-input')"
+            placeholder="Search commands..."
+            @keydown.down.prevent="selectNextPaletteItem"
+            @keydown.up.prevent="selectPreviousPaletteItem"
+            @keydown.enter.prevent="executeActivePaletteItem"
+          />
+          <div :class="ns.e('palette-list')" role="listbox">
+            <div
+              v-for="(command, idx) in paletteCommands"
+              :key="command.key"
+              :class="[ns.e('palette-item'), ns.is('active', idx === activePaletteIndex)]"
+              role="option"
+              :aria-selected="idx === activePaletteIndex"
+              @click="executePaletteCommand(command)"
+            >
+              <span>{{ command.title || command.label }}</span>
+              <kbd v-if="command.shortcut">{{ command.shortcut }}</kbd>
+            </div>
+          </div>
+        </section>
+      </div>
+
       <div
         v-if="pasteAsMarkdownSession"
         :class="ns.e('paste-backdrop')"
@@ -404,6 +491,12 @@ import {
   resolveMarkdownClipboardPaste,
   writeMarkdownClipboardPayload,
 } from './markdown-editor-clipboard'
+import { resolveMarkdownSelectionToolbarPlacement } from "./markdown-editor-selection-toolbar"
+import {
+  resolveMarkdownSlashTrigger,
+  searchMarkdownEditorCommands,
+} from "./markdown-editor-surfaces"
+import { resolveMarkdownEditorStatus } from "./markdown-editor-status"
 import {
   cancelMarkdownPasteAsMarkdown,
   confirmMarkdownPasteAsMarkdown,
@@ -964,6 +1057,118 @@ watch(
     })
   },
 )
+
+const liveCapabilities = computed(() => [liveSurface.value.capability.capability])
+
+const statusResolution = computed(() =>
+  resolveMarkdownEditorStatus(
+    editorValue.value,
+    props.statusDensity,
+    props.localeText,
+    transactionStore.selection,
+    liveCapabilities.value,
+    {
+      mode: currentMode.value,
+      readonly: editingBlocked.value,
+      disabled: props.disabled,
+      loading: props.loading,
+    },
+  ),
+)
+
+const selectionToolbarCommands = computed(() =>
+  filterMarkdownEditorCommands(props.commands, commandContext.value, "selection"),
+)
+const selectionToolbarPlacement = computed(() =>
+  resolveMarkdownSelectionToolbarPlacement(
+    transactionStore.selection,
+    transactionStore.revision,
+    transactionStore.revision,
+    {
+      documentEpoch: documentIdentity.epoch,
+      expectedEpoch: documentIdentity.epoch,
+    },
+  ),
+)
+const closeSelectionToolbar = () => {
+  textareaRef.value?.focus()
+}
+
+const slashTrigger = computed(() => {
+  if (!surfaceOptions.value.slashMenu || editingBlocked.value || isComposing.value)
+    return null
+  return resolveMarkdownSlashTrigger(
+    editorValue.value,
+    transactionStore.selection.start,
+    {
+      blockOnly: true,
+      isComposing: isComposing.value,
+    },
+  )
+})
+const slashCommands = computed(() => {
+  if (!slashTrigger.value) return []
+  return searchMarkdownEditorCommands(
+    props.commands,
+    commandContext.value,
+    slashTrigger.value.query,
+  )
+})
+const activeSlashIndex = ref(0)
+const closeSlashMenu = () => {
+  textareaRef.value?.focus()
+}
+const executeSlashCommand = (command: MarkdownEditorCommand) => {
+  if (!slashTrigger.value) return
+  const triggerRange = slashTrigger.value.range
+  activateCommand(command)
+  dispatchTransaction({
+    changes: [{ from: triggerRange.start, to: triggerRange.end, insert: "" }],
+    history: "separate",
+    origin: "command",
+  })
+}
+
+const commandPaletteOpen = ref(false)
+const paletteQuery = ref("")
+const activePaletteIndex = ref(0)
+const paletteCommands = computed(() =>
+  searchMarkdownEditorCommands(
+    props.commands,
+    commandContext.value,
+    paletteQuery.value,
+  ),
+)
+const openCommandPalette = () => {
+  commandPaletteOpen.value = true
+  paletteQuery.value = ""
+  activePaletteIndex.value = 0
+}
+const closeCommandPalette = () => {
+  commandPaletteOpen.value = false
+  textareaRef.value?.focus()
+}
+const selectNextPaletteItem = () => {
+  if (!paletteCommands.value.length) return
+  activePaletteIndex.value =
+    (activePaletteIndex.value + 1) % paletteCommands.value.length
+}
+const selectPreviousPaletteItem = () => {
+  if (!paletteCommands.value.length) return
+  activePaletteIndex.value =
+    (activePaletteIndex.value - 1 + paletteCommands.value.length) %
+    paletteCommands.value.length
+}
+const executeActivePaletteItem = () => {
+  const command = paletteCommands.value[activePaletteIndex.value]
+  if (command) {
+    executePaletteCommand(command)
+  }
+}
+const executePaletteCommand = (command: MarkdownEditorCommand) => {
+  closeCommandPalette()
+  activateCommand(command)
+}
 
 const editorMetrics = computed(() =>
   calculateMarkdownEditorMetrics(editorValue.value, props.metrics),
@@ -1970,8 +2175,10 @@ const insertMarkdownAtCursor = (
 }
 
 defineExpose({
+  closeCommandPalette,
   dispatchTransaction,
   insertMarkdownAtCursor,
+  openCommandPalette,
   redo,
   undo,
 })
