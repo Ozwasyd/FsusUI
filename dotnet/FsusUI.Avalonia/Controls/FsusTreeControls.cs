@@ -79,6 +79,59 @@ public delegate ValueTask<IReadOnlyList<FsusTreeNode>> FsusTreeChildrenLoader(
   FsusTreeNode node,
   CancellationToken cancellationToken);
 
+public enum FsusTreeInteractionSource
+{
+  Pointer,
+  Keyboard,
+}
+
+public enum FsusTreeLazyLoadState
+{
+  Started,
+  Completed,
+  Canceled,
+  Failed,
+}
+
+public sealed class FsusTreeNodeActivatedEventArgs(
+  string key,
+  FsusTreeInteractionSource source) : EventArgs
+{
+  public string Key { get; } = key;
+  public FsusTreeInteractionSource Source { get; } = source;
+  public bool Handled { get; set; }
+}
+
+public sealed class FsusTreeSelectionChangedEventArgs(
+  IReadOnlyList<string> addedKeys,
+  IReadOnlyList<string> removedKeys,
+  IReadOnlySet<string> selectedKeys) : EventArgs
+{
+  public IReadOnlyList<string> AddedKeys { get; } = addedKeys;
+  public IReadOnlyList<string> RemovedKeys { get; } = removedKeys;
+  public IReadOnlySet<string> SelectedKeys { get; } = selectedKeys;
+}
+
+public sealed class FsusTreeExpansionChangedEventArgs(
+  string key,
+  bool isExpanded,
+  FsusTreeInteractionSource source) : EventArgs
+{
+  public string Key { get; } = key;
+  public bool IsExpanded { get; } = isExpanded;
+  public FsusTreeInteractionSource Source { get; } = source;
+}
+
+public sealed class FsusTreeLazyLoadEventArgs(
+  string key,
+  FsusTreeLazyLoadState state,
+  Exception? exception = null) : EventArgs
+{
+  public string Key { get; } = key;
+  public FsusTreeLazyLoadState State { get; } = state;
+  public Exception? Exception { get; } = exception;
+}
+
 public class FsusTree : ContentControl
 {
   private readonly List<FsusTreeNodeView> flattenedNodes = [];
@@ -107,6 +160,11 @@ public class FsusTree : ContentControl
   public IReadOnlySet<string> ExpandedKeys => expandedKeys;
   public IReadOnlySet<string> SelectedKeys => selectedKeys;
   public IReadOnlySet<string> CheckedKeys => checkedKeys;
+
+  public event EventHandler<FsusTreeNodeActivatedEventArgs>? NodeActivated;
+  public event EventHandler<FsusTreeSelectionChangedEventArgs>? SelectionChanged;
+  public event EventHandler<FsusTreeExpansionChangedEventArgs>? ExpansionChanged;
+  public event EventHandler<FsusTreeLazyLoadEventArgs>? LazyLoadStateChanged;
 
   public virtual void RefreshView()
   {
@@ -162,18 +220,33 @@ public class FsusTree : ContentControl
       return false;
     }
 
+    var wasSelected = selectedKeys.Contains(key);
+    var added = new List<string>();
+    var removed = new List<string>();
+
     if (SelectionMode == FsusTreeSelectionMode.Single)
     {
+      removed.AddRange(selectedKeys.Where(existing => existing != key));
       selectedKeys.Clear();
       selectedKeys.Add(key);
+      if (!wasSelected)
+      {
+        added.Add(key);
+      }
     }
-    else if (!selectedKeys.Add(key))
+    else if (selectedKeys.Add(key))
+    {
+      added.Add(key);
+    }
+    else
     {
       selectedKeys.Remove(key);
+      removed.Add(key);
     }
 
     FocusedKey = key;
     SyncState();
+    RaiseSelectionChanged(added, removed);
     return true;
   }
 
@@ -206,6 +279,21 @@ public class FsusTree : ContentControl
     return true;
   }
 
+  public bool Activate(string key, FsusTreeInteractionSource source)
+  {
+    var node = FindNode(key);
+    if (node is null || node.IsDisabled)
+    {
+      return false;
+    }
+
+    FocusedKey = key;
+    SyncState();
+    var activation = new FsusTreeNodeActivatedEventArgs(key, source);
+    NodeActivated?.Invoke(this, activation);
+    return true;
+  }
+
   public async ValueTask<bool> LoadChildrenAsync(string key)
   {
     if (ChildrenLoader is null)
@@ -229,11 +317,13 @@ public class FsusTree : ContentControl
     loadCancellation = cancellation;
     var version = ++loadVersion;
 
+    RaiseLazyLoadState(key, FsusTreeLazyLoadState.Started);
     try
     {
       var children = await ChildrenLoader(node, cancellation.Token);
       if (cancellation.IsCancellationRequested || version != loadVersion)
       {
+        RaiseLazyLoadState(key, FsusTreeLazyLoadState.Canceled);
         return false;
       }
 
@@ -246,11 +336,18 @@ public class FsusTree : ContentControl
       node.HasLazyChildren = false;
       expandedKeys.Add(node.Key);
       RefreshView();
+      RaiseLazyLoadState(key, FsusTreeLazyLoadState.Completed);
       return true;
     }
     catch (OperationCanceledException)
     {
+      RaiseLazyLoadState(key, FsusTreeLazyLoadState.Canceled);
       return false;
+    }
+    catch (Exception exception)
+    {
+      RaiseLazyLoadState(key, FsusTreeLazyLoadState.Failed, exception);
+      throw;
     }
     finally
     {
@@ -298,10 +395,12 @@ public class FsusTree : ContentControl
         FocusedKey = flattenedNodes[Math.Max(0, index - 1)].Node.Key;
         SyncState();
         return ValueTask.FromResult(true);
+      case Key.Enter:
+        return ValueTask.FromResult(Activate(FocusedKey, FsusTreeInteractionSource.Keyboard));
       case Key.Right:
-        return ValueTask.FromResult(Expand(FocusedKey));
+        return ValueTask.FromResult(GestureExpand(FocusedKey));
       case Key.Left:
-        return ValueTask.FromResult(Collapse(FocusedKey));
+        return ValueTask.FromResult(GestureCollapse(FocusedKey));
       case Key.Space:
         return ValueTask.FromResult(ToggleSelection(FocusedKey));
       default:
@@ -310,6 +409,50 @@ public class FsusTree : ContentControl
   }
 
   protected FsusTreeNode? FindNode(string key) => FindNode(Nodes, key);
+
+  private bool GestureExpand(string key)
+  {
+    if (!Expand(key))
+    {
+      return false;
+    }
+
+    ExpansionChanged?.Invoke(this, new FsusTreeExpansionChangedEventArgs(
+      key,
+      true,
+      FsusTreeInteractionSource.Keyboard));
+    return true;
+  }
+
+  private bool GestureCollapse(string key)
+  {
+    if (!Collapse(key))
+    {
+      return false;
+    }
+
+    ExpansionChanged?.Invoke(this, new FsusTreeExpansionChangedEventArgs(
+      key,
+      false,
+      FsusTreeInteractionSource.Keyboard));
+    return true;
+  }
+
+  private void RaiseSelectionChanged(IReadOnlyList<string> added, IReadOnlyList<string> removed)
+  {
+    if (added.Count == 0 && removed.Count == 0)
+    {
+      return;
+    }
+
+    SelectionChanged?.Invoke(this, new FsusTreeSelectionChangedEventArgs(
+      added,
+      removed,
+      new HashSet<string>(selectedKeys, StringComparer.Ordinal)));
+  }
+
+  private void RaiseLazyLoadState(string key, FsusTreeLazyLoadState state, Exception? exception = null) =>
+    LazyLoadStateChanged?.Invoke(this, new FsusTreeLazyLoadEventArgs(key, state, exception));
 
   private FsusTreeNode? FindNode(IEnumerable<FsusTreeNode> nodes, string key)
   {
