@@ -25,8 +25,12 @@ test.afterEach(async ({ page }) => {
 })
 
 // CSS gate: no card surfaces on metric primitives
-test('production CSS has no card surfaces on metric primitives', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
+test('production CSS has no card surfaces on metric primitives', async ({
+  page,
+}, testInfo) => {
+  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
+    waitUntil: 'domcontentloaded',
+  })
   await stabilizePage(page)
   await expect(page.getByTestId('metric-visual-fixtures')).toBeVisible()
 
@@ -37,11 +41,22 @@ test('production CSS has no card surfaces on metric primitives', async ({ page }
   const banned: string[] = []
   for (const rule of rules) {
     const css = rule.cssText
-    if (rule.selectorText.includes('metric-list') && /border:\s*1px\s+solid/.test(css) && /\b12px\b/.test(css))
+    if (
+      rule.selectorText.includes('metric-list') &&
+      /border:\s*1px\s+solid/.test(css) &&
+      /\b12px\b/.test(css)
+    )
       banned.push('MetricList has card surface')
-    if (rule.selectorText.includes('key-value-grid') && /border:\s*1px\s+solid/.test(css))
+    if (
+      rule.selectorText.includes('key-value-grid') &&
+      /border:\s*1px\s+solid/.test(css)
+    )
       banned.push('KeyValueGrid has card surface')
-    if (rule.selectorText.includes('diagnostics-item') && /padding:\s*12px/.test(css) && /border:\s*1px/.test(css))
+    if (
+      rule.selectorText.includes('diagnostics-item') &&
+      /padding:\s*12px/.test(css) &&
+      /border:\s*1px/.test(css)
+    )
       banned.push('DiagnosticsItem has card surface')
   }
   expect(banned).toEqual([])
@@ -49,17 +64,25 @@ test('production CSS has no card surfaces on metric primitives', async ({ page }
 
 // Typography: 12/14/16px ladder
 test('KPI primary value uses 16px', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
+  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
+    waitUntil: 'domcontentloaded',
+  })
   await stabilizePage(page)
-  const primary = page.locator('[data-metric-variant="metric-default"] .el-metric-item__primary').first()
+  const primary = page
+    .locator('[data-metric-variant="metric-default"] .el-metric-item__primary')
+    .first()
   const fontSize = await primary.evaluate((el) => getComputedStyle(el).fontSize)
   expect(parseFloat(fontSize)).toBe(16)
 })
 
 test('KeyValue label uses 12px', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
+  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
+    waitUntil: 'domcontentloaded',
+  })
   await stabilizePage(page)
-  const label = page.locator('[data-metric-variant="kv-default"] .el-key-value-item__label').first()
+  const label = page
+    .locator('[data-metric-variant="kv-default"] .el-key-value-item__label')
+    .first()
   const fontSize = await label.evaluate((el) => getComputedStyle(el).fontSize)
   expect(parseFloat(fontSize)).toBe(12)
 })
@@ -163,8 +186,12 @@ test('CJK and RTL metric content preserve hierarchy and direction', async ({
   }
 })
 
-test('long and RTL metric content reflows at 200 percent zoom', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
+test('long and RTL metric content reflows at 200 percent zoom', async ({
+  page,
+}, testInfo) => {
+  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
+    waitUntil: 'domcontentloaded',
+  })
   await stabilizePage(page)
   await page.evaluate(() => {
     document.documentElement.style.zoom = '200%'
@@ -186,58 +213,245 @@ test('long and RTL metric content reflows at 200 percent zoom', async ({ page },
 
 // MetricList flat
 test('MetricList has no card surface', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
+  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
+    waitUntil: 'domcontentloaded',
+  })
   await stabilizePage(page)
-  const list = page.locator('[data-metric-variant="metric-default"] .el-metric-list')
-  const borderRadius = await list.evaluate((el) => getComputedStyle(el).borderRadius)
+  const list = page.locator(
+    '[data-metric-variant="metric-default"] .el-metric-list',
+  )
+  const borderRadius = await list.evaluate(
+    (el) => getComputedStyle(el).borderRadius,
+  )
   expect(borderRadius).toBe('0px')
 })
 
 // KeyValueGrid flat
 test('KeyValueGrid has no card surface', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
+  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
+    waitUntil: 'domcontentloaded',
+  })
   await stabilizePage(page)
-  const grid = page.locator('[data-metric-variant="kv-default"] .el-key-value-grid')
-  const borderRadius = await grid.evaluate((el) => getComputedStyle(el).borderRadius)
+  const grid = page.locator(
+    '[data-metric-variant="kv-default"] .el-key-value-grid',
+  )
+  const borderRadius = await grid.evaluate(
+    (el) => getComputedStyle(el).borderRadius,
+  )
   expect(borderRadius).toBe('0px')
 })
 
-// Diagnostics: 3px left border
-test('DiagnosticsItem warning uses 3px left border', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
+// Diagnostics: 3px logical inline-start border
+test('DiagnosticsItem warning uses 3px left border', async ({
+  page,
+}, testInfo) => {
+  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
+    waitUntil: 'domcontentloaded',
+  })
   await stabilizePage(page)
-  const item = page.locator('[data-metric-variant="diag-default"] .el-diagnostics-item.is-warning')
-  const borderLeft = await item.evaluate((el) => getComputedStyle(el).borderLeftWidth)
-  expect(parseFloat(borderLeft)).toBe(3)
+  const item = page.locator(
+    '[data-metric-variant="diag-mixed"] .el-diagnostics-item.is-warning',
+  )
+  const borderInlineStart = await item.evaluate(
+    (el) => getComputedStyle(el).borderInlineStartWidth,
+  )
+  expect(parseFloat(borderInlineStart)).toBe(3)
 })
 
 // CopyableDetail: 40px button
 test('CopyableDetail button min-height >= 40px', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
+  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
+    waitUntil: 'domcontentloaded',
+  })
   await stabilizePage(page)
-  const btn = page.locator('[data-metric-variant="copy-default"] .el-copyable-detail__button')
+  const btn = page.locator(
+    '[data-metric-variant="copy-default"] .el-copyable-detail__button',
+  )
   const minH = await btn.evaluate((el) => getComputedStyle(el).minHeight)
   expect(parseFloat(minH)).toBeGreaterThanOrEqual(40)
 })
 
 test('CopyableDetail focus uses inset ring', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
+  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
+    waitUntil: 'domcontentloaded',
+  })
   await stabilizePage(page)
-  const btn = page.locator('[data-metric-variant="copy-default"] .el-copyable-detail__button')
+  const btn = page.locator(
+    '[data-metric-variant="copy-default"] .el-copyable-detail__button',
+  )
   await btn.focus()
   const boxShadow = await btn.evaluate((el) => getComputedStyle(el).boxShadow)
   expect(boxShadow).toContain('inset')
 })
 
-// Full-page screenshot
-test('metric variants render without visual break', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
+test('inline action focus and disabled states use standard tokens without ancestor fading', async ({
+  page,
+}, testInfo) => {
+  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
+    waitUntil: 'domcontentloaded',
+  })
   await stabilizePage(page)
-  for (const v of ['metric-default','kpi-default','distribution-default','kv-default','status-default','diag-default','diag-danger','summary-success','summary-danger','diag-rtl','copy-default']) {
-    await expect(page.locator(`[data-metric-variant="${  v  }"]`)).toBeVisible()
+
+  for (const selector of [
+    '[data-metric-variant="copy-default"] .el-copyable-detail__button',
+    '[data-metric-variant="diag-mixed"] .el-diagnostics-item__detail-toggle',
+    '[data-metric-variant="summary-success"] .el-status-summary__actions > button',
+    '[data-metric-variant="diag-mixed"] .el-diagnostics-item__actions > button',
+    '[data-metric-variant="diag-mixed"] .el-diagnostics-item__actions > a[href]',
+  ]) {
+    const action = page.locator(selector).first()
+    await expect(action, selector).toBeVisible()
+    await action.focus()
+    const focusState = await action.evaluate((element) => ({
+      boxShadow: getComputedStyle(element).boxShadow,
+      outlineStyle: getComputedStyle(element).outlineStyle,
+    }))
+    expect(focusState.boxShadow, selector).toContain('inset')
+    expect(focusState.outlineStyle, selector).toBe('none')
   }
-  await page.evaluate(async () => { await document.fonts.ready })
-  await page.screenshot({ path: testInfo.outputPath('metric-all-variants.png'), fullPage: true })
+
+  for (const selector of [
+    '[data-metric-variant="diag-mixed"] .el-diagnostics-item__detail-toggle',
+    '[data-metric-variant="diag-mixed"] .el-diagnostics-item__actions > button',
+    '[data-metric-variant="diag-mixed"] .el-diagnostics-item__actions > a[href]',
+  ]) {
+    const action = page.locator(selector).first()
+    await action.hover()
+    const hoverState = await action.evaluate((element) => {
+      const probe = document.createElement('span')
+      probe.style.color = 'var(--fsus-scholarly-blue, var(--el-color-primary))'
+      document.body.append(probe)
+      const state = {
+        color: getComputedStyle(element).color,
+        expectedColor: getComputedStyle(probe).color,
+      }
+      probe.remove()
+      return state
+    })
+    expect(hoverState.color, selector).toBe(hoverState.expectedColor)
+  }
+
+  const disabled = page.locator(
+    '[data-metric-variant="copy-disabled"] .el-copyable-detail',
+  )
+  const disabledButton = disabled.locator('button')
+  await expect(disabledButton).toBeDisabled()
+  const disabledState = await disabled.evaluate((element) => {
+    const button = element.querySelector('button') as HTMLButtonElement
+    const style = getComputedStyle(button)
+    const probe = document.createElement('button')
+    probe.style.backgroundColor = 'var(--el-fill-color-light)'
+    probe.style.borderColor = 'var(--el-border-color-light)'
+    probe.style.color = 'var(--el-text-color-placeholder)'
+    document.body.append(probe)
+    const probeStyle = getComputedStyle(probe)
+    const state = {
+      ancestorOpacity: getComputedStyle(element).opacity,
+      controlOpacity: style.opacity,
+      backgroundColor: style.backgroundColor,
+      expectedBackgroundColor: probeStyle.backgroundColor,
+      borderColor: style.borderColor,
+      expectedBorderColor: probeStyle.borderColor,
+      color: style.color,
+      expectedColor: probeStyle.color,
+    }
+    probe.remove()
+    return state
+  })
+  expect(disabledState.ancestorOpacity).toBe('1')
+  expect(disabledState.controlOpacity).toBe('1')
+  expect(disabledState.backgroundColor).toBe(
+    disabledState.expectedBackgroundColor,
+  )
+  expect(disabledState.borderColor).toBe(disabledState.expectedBorderColor)
+  expect(disabledState.color).toBe(disabledState.expectedColor)
+})
+
+test('nested, mixed, empty, loading, long, RTL and zoom states remain stable', async ({
+  page,
+}, testInfo) => {
+  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
+    waitUntil: 'domcontentloaded',
+  })
+  await stabilizePage(page)
+
+  const mixed = page.locator(
+    '[data-metric-variant="diag-mixed"] > .el-diagnostics-list',
+  )
+  await expect(mixed.locator(':scope > .el-diagnostics-item')).toHaveCount(4)
+  const nested = page
+    .getByTestId('nested-diagnostics')
+    .locator(':scope > .el-diagnostics-list')
+  await expect(nested).toBeVisible()
+  await expect(nested.locator(':scope > .el-diagnostics-item')).toHaveCount(2)
+  await expect(
+    mixed.locator(':scope > .el-diagnostics-item details[open]'),
+  ).toBeVisible()
+  await expect(
+    page.locator('[data-metric-variant="diag-empty"] .el-empty-state'),
+  ).toBeVisible()
+  await expect(
+    page.locator('[data-metric-variant="diag-loading"]'),
+  ).toHaveAttribute('aria-busy', 'true')
+  await expect(
+    page.locator('[data-metric-variant="diag-rtl"] > div'),
+  ).toHaveAttribute('dir', 'rtl')
+
+  await page.evaluate(() => {
+    document.documentElement.style.zoom = '200%'
+  })
+
+  for (const selector of [
+    '[data-metric-variant="diag-mixed"]',
+    '[data-testid="nested-diagnostics"]',
+    '[data-metric-variant="diag-rtl"]',
+    '[data-metric-typography="long"]',
+  ]) {
+    const node = page.locator(selector).first()
+    await expect(node, selector).toBeVisible()
+    const geometry = await node.evaluate((element) => ({
+      clientWidth: element.clientWidth,
+      scrollWidth: element.scrollWidth,
+    }))
+    expect(geometry.scrollWidth, selector).toBeLessThanOrEqual(
+      geometry.clientWidth + 1,
+    )
+  }
+})
+
+// Full-page screenshot
+test('metric variants render without visual break', async ({
+  page,
+}, testInfo) => {
+  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
+    waitUntil: 'domcontentloaded',
+  })
+  await stabilizePage(page)
+  for (const v of [
+    'metric-default',
+    'kpi-default',
+    'distribution-default',
+    'kv-default',
+    'status-default',
+    'summary-success',
+    'summary-danger',
+    'summary-info',
+    'diag-mixed',
+    'diag-empty',
+    'diag-loading',
+    'diag-rtl',
+    'copy-default',
+    'copy-disabled',
+  ]) {
+    await expect(page.locator(`[data-metric-variant="${v}"]`)).toBeVisible()
+  }
+  await page.evaluate(async () => {
+    await document.fonts.ready
+  })
+  await page.screenshot({
+    path: testInfo.outputPath('metric-all-variants.png'),
+    fullPage: true,
+  })
 })
 
 // Shared in-page collectors for the rendered surface gates below.
@@ -253,7 +467,9 @@ const collectMetricSurfaceIssues = async (
   minTargetSide: number,
 ): Promise<MetricSurfaceIssues> =>
   page.evaluate((min) => {
-    const root = document.querySelector('[data-testid="metric-visual-fixtures"]')
+    const root = document.querySelector(
+      '[data-testid="metric-visual-fixtures"]',
+    )
     if (!root) throw new Error('metric fixtures not rendered')
     const px = (value: string) => Number.parseFloat(value) || 0
     const visible = (node: Element) => {
@@ -293,7 +509,16 @@ const collectMetricSurfaceIssues = async (
 
     const lowTargets: string[] = []
     const targetNodes = root.querySelectorAll<HTMLElement>(
-      '.el-copyable-detail__button, .el-status-summary__actions .el-button, .el-diagnostics-item__actions .el-button',
+      [
+        '.el-copyable-detail__button',
+        '.el-diagnostics-item__detail-toggle',
+        '.el-status-summary__actions > button',
+        '.el-status-summary__actions > a[href]',
+        '.el-status-summary__actions > [role="button"]',
+        '.el-diagnostics-item__actions > button',
+        '.el-diagnostics-item__actions > a[href]',
+        '.el-diagnostics-item__actions > [role="button"]',
+      ].join(','),
     )
     for (const target of targetNodes) {
       if (!visible(target)) continue
@@ -308,7 +533,23 @@ const collectMetricSurfaceIssues = async (
     }
 
     const fadedElements: string[] = []
-    for (const node of root.querySelectorAll<HTMLElement>('*')) {
+    for (const node of root.querySelectorAll<HTMLElement>(
+      [
+        '.el-metric-item',
+        '.el-key-value-item',
+        '.el-status-summary',
+        '.el-diagnostics-item',
+        '.el-copyable-detail',
+        '.el-copyable-detail__button',
+        '.el-diagnostics-item__detail-toggle',
+        '.el-status-summary__actions > button',
+        '.el-status-summary__actions > a[href]',
+        '.el-status-summary__actions > [role="button"]',
+        '.el-diagnostics-item__actions > button',
+        '.el-diagnostics-item__actions > a[href]',
+        '.el-diagnostics-item__actions > [role="button"]',
+      ].join(','),
+    )) {
       if (!visible(node)) continue
       if (Number(getComputedStyle(node).opacity) !== 1) {
         fadedElements.push(describe(node))
@@ -368,7 +609,9 @@ const openMetricFixtures = async (page: Page, projectName: string) => {
 
 // Row flatness: internal item rows stay transparent, square, and divider-only.
 // Kills "per-item panel" and "diagnostic card" regressions at rendered level.
-test('item rows stay flat without per-item panels', async ({ page }, testInfo) => {
+test('item rows stay flat without per-item panels', async ({
+  page,
+}, testInfo) => {
   await openMetricFixtures(page, testInfo.project.name)
   const issues = await collectMetricSurfaceIssues(page, 40)
   expect(issues.panelRows).toEqual([])
@@ -376,13 +619,15 @@ test('item rows stay flat without per-item panels', async ({ page }, testInfo) =
 
 // Tone semantics: narrow inline-start markers only (no large tinted border),
 // plus a non-color signal (visible status text) on every toned row.
-test('tone markers stay narrow and toned rows keep textual signals', async ({ page }, testInfo) => {
+test('tone markers stay narrow and toned rows keep textual signals', async ({
+  page,
+}, testInfo) => {
   await openMetricFixtures(page, testInfo.project.name)
   const issues = await collectMetricSurfaceIssues(page, 40)
   expect(issues.colorOnlyToneRows).toEqual([])
 
   const ltrItem = page.locator(
-    '[data-metric-variant="diag-default"] .el-diagnostics-item.is-warning',
+    '[data-metric-variant="diag-mixed"] > .el-diagnostics-list > .el-diagnostics-item.is-warning',
   )
   const markerSides = await ltrItem.evaluate((node) => {
     const style = getComputedStyle(node)
@@ -420,7 +665,9 @@ test('tone markers stay narrow and toned rows keep textual signals', async ({ pa
 })
 
 // Hit-area contract: desktop >= 40px, mobile >= 44px, stable under zoom.
-test('inline actions meet DOMRect hit targets across zoom', async ({ page }, testInfo) => {
+test('inline actions meet DOMRect hit targets across zoom', async ({
+  page,
+}, testInfo) => {
   const { compact } = resolveVisualVariant(testInfo.project.name)
   const minSide = compact ? 44 : 40
   await openMetricFixtures(page, testInfo.project.name)
@@ -428,7 +675,16 @@ test('inline actions meet DOMRect hit targets across zoom', async ({ page }, tes
   const measureTargets = () =>
     page.evaluate((min) => {
       const nodes = document.querySelectorAll<HTMLElement>(
-        '.el-copyable-detail__button, .el-status-summary__actions .el-button, .el-diagnostics-item__actions .el-button',
+        [
+          '.el-copyable-detail__button',
+          '.el-diagnostics-item__detail-toggle',
+          '.el-status-summary__actions > button',
+          '.el-status-summary__actions > a[href]',
+          '.el-status-summary__actions > [role="button"]',
+          '.el-diagnostics-item__actions > button',
+          '.el-diagnostics-item__actions > a[href]',
+          '.el-diagnostics-item__actions > [role="button"]',
+        ].join(','),
       )
       return [...nodes]
         .filter(
@@ -439,7 +695,8 @@ test('inline actions meet DOMRect hit targets across zoom', async ({ page }, tes
         .map((node) => {
           const rect = node.getBoundingClientRect()
           return {
-            label: node.getAttribute('aria-label') ?? node.textContent?.trim() ?? '',
+            label:
+              node.getAttribute('aria-label') ?? node.textContent?.trim() ?? '',
             width: Math.round(rect.width * 10) / 10,
             height: Math.round(rect.height * 10) / 10,
           }
@@ -447,7 +704,19 @@ test('inline actions meet DOMRect hit targets across zoom', async ({ page }, tes
         .filter((box) => box.width + 1 < min || box.height + 1 < min)
     }, minSide)
 
-  expect(await page.locator('.el-copyable-detail__button').count()).toBeGreaterThanOrEqual(2)
+  expect(
+    await page.locator('.el-copyable-detail__button').count(),
+  ).toBeGreaterThanOrEqual(3)
+  expect(
+    await page.locator('.el-diagnostics-item__detail-toggle').count(),
+  ).toBeGreaterThanOrEqual(2)
+  expect(
+    await page
+      .locator(
+        '.el-status-summary__actions > button, .el-diagnostics-item__actions > button, .el-diagnostics-item__actions > a[href]',
+      )
+      .count(),
+  ).toBeGreaterThanOrEqual(3)
   expect(await measureTargets()).toEqual([])
 
   // Browser-zoom surrogate: apply zoom to the document, then re-run the same
@@ -469,28 +738,36 @@ test('inline actions meet DOMRect hit targets across zoom', async ({ page }, tes
 
 // RTL: the inline-start marker flips to the physical right edge and the long
 // monospace detail stays wrapped inside the row.
-test('RTL diagnostics keep narrow markers and contained detail', async ({ page }, testInfo) => {
+test('RTL diagnostics keep narrow markers and contained detail', async ({
+  page,
+}, testInfo) => {
   await openMetricFixtures(page, testInfo.project.name)
 
   const rtlBlock = page.locator('[data-metric-variant="diag-rtl"] > div')
   await expect(rtlBlock).toHaveAttribute('dir', 'rtl')
 
-  const itemState = await rtlBlock.locator('.el-diagnostics-item.is-warning').evaluate((node) => {
-    const style = getComputedStyle(node)
-    return {
-      leftWidth: style.borderLeftWidth,
-      rightWidth: style.borderRightWidth,
-      paddingInlineStart: style.paddingInlineStart,
-      scrollWidth: node.scrollWidth,
-      clientWidth: node.clientWidth,
-    }
-  })
+  const itemState = await rtlBlock
+    .locator('.el-diagnostics-item.is-warning')
+    .evaluate((node) => {
+      const style = getComputedStyle(node)
+      return {
+        leftWidth: style.borderLeftWidth,
+        rightWidth: style.borderRightWidth,
+        paddingInlineStart: style.paddingInlineStart,
+        scrollWidth: node.scrollWidth,
+        clientWidth: node.clientWidth,
+      }
+    })
   expect(itemState.leftWidth).toBe('0px')
   expect(itemState.rightWidth).toBe('3px')
   expect(itemState.scrollWidth).toBeLessThanOrEqual(itemState.clientWidth + 1)
 
-  const rtlRow = page.locator('[data-metric-variant="diag-rtl"] .el-diagnostics-list')
-  await page.evaluate(async () => { await document.fonts.ready })
+  const rtlRow = page.locator(
+    '[data-metric-variant="diag-rtl"] .el-diagnostics-list',
+  )
+  await page.evaluate(async () => {
+    await document.fonts.ready
+  })
   await testInfo.attach(`metric-diag-rtl-${testInfo.project.name}`, {
     body: await rtlRow.screenshot({ animations: 'disabled' }),
     contentType: 'image/png',
@@ -499,10 +776,18 @@ test('RTL diagnostics keep narrow markers and contained detail', async ({ page }
 
 // Mutation probes: each documented regression from issue #467 must be caught
 // by one of the rendered gates above.
-test('surface gates kill documented regressions', async ({ page }, testInfo) => {
+test('surface gates kill documented regressions', async ({
+  page,
+}, testInfo) => {
   await openMetricFixtures(page, testInfo.project.name)
+  const { compact } = resolveVisualVariant(testInfo.project.name)
+  const minSide = compact ? 44 : 40
 
-  const findings: { id: string; expected: keyof MetricSurfaceIssues; issues: string[] }[] = []
+  const findings: {
+    id: string
+    expected: keyof MetricSurfaceIssues
+    issues: string[]
+  }[] = []
   const mutations = [
     {
       id: 'diagnostic-card',
@@ -517,7 +802,17 @@ test('surface gates kill documented regressions', async ({ page }, testInfo) => 
     {
       id: 'thirty-px-target',
       expected: 'lowTargets' as const,
-      css: '.el-copyable-detail__button{min-height:30px !important;height:30px !important;}',
+      css: `
+        .el-copyable-detail__button,
+        .el-diagnostics-item__detail-toggle,
+        .el-status-summary__actions > :is(button, a[href], [role="button"]),
+        .el-diagnostics-item__actions > :is(button, a[href], [role="button"]) {
+          min-width: 30px !important;
+          width: 30px !important;
+          min-height: 30px !important;
+          height: 30px !important;
+        }
+      `,
     },
     {
       id: 'color-only-status',
@@ -531,28 +826,31 @@ test('surface gates kill documented regressions', async ({ page }, testInfo) => 
     {
       id: 'ancestor-opacity',
       expected: 'fadedElements' as const,
-      css: '.el-metric-item, .el-diagnostics-item { opacity: 0.55; }',
+      css: '.el-copyable-detail.is-disabled { opacity: 0.55 !important; }',
     },
   ]
 
   for (const mutation of mutations) {
     const handle = await page.addStyleTag({ content: mutation.css })
     try {
-      const issues = await collectMetricSurfaceIssues(page, 40)
+      const issues = await collectMetricSurfaceIssues(page, minSide)
       findings.push({
         id: mutation.id,
         expected: mutation.expected,
         issues: issues[mutation.expected],
       })
       // A live regression of this category must never pass silently.
-      expect(issues[mutation.expected].length, `${mutation.id} went undetected`).toBeGreaterThan(0)
+      expect(
+        issues[mutation.expected].length,
+        `${mutation.id} went undetected`,
+      ).toBeGreaterThan(0)
     } finally {
       await handle.evaluate((style) => style.remove())
     }
   }
 
   // Restored state must be clean again across every gate.
-  const restored = await collectMetricSurfaceIssues(page, 40)
+  const restored = await collectMetricSurfaceIssues(page, minSide)
   expect(restored.panelRows).toEqual([])
   expect(restored.lowTargets).toEqual([])
   expect(restored.fadedElements).toEqual([])
@@ -563,5 +861,3 @@ test('surface gates kill documented regressions', async ({ page }, testInfo) => 
     contentType: 'application/json',
   })
 })
-
-
