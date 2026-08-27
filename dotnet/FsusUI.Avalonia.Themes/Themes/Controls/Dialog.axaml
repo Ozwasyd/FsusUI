@@ -16,15 +16,15 @@
     <Setter Property="Padding" Value="{DynamicResource FsusComponentDialogPadding}" />
   </Style>
 
-  <Style Selector="fsus|FsusDialog, fsus|FsusMessageBox">
+  <Style Selector="fsus|FsusDialog">
     <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
-    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
     <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
     <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusSurfaceMd}" />
     <Setter Property="Padding" Value="{DynamicResource FsusComponentDialogPadding}" />
-    <Setter Property="FontFamily" Value="{DynamicResource FsusTypographyFamilyBody}" />
-    <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodyMdSize}" />
+  </Style>
+
+  <Style Selector="fsus|FsusDialog.fsus-scrollable-body">
     <Setter Property="Template">
       <ControlTemplate>
         <Border
@@ -41,45 +41,55 @@
               FontWeight="SemiBold"
               FontSize="{DynamicResource FsusTypographyBodyMdSize}" />
             <ScrollViewer
-              Name="PART_ScrollViewer"
+              Name="PART_BodyScrollViewer"
               Grid.Row="1"
               HorizontalScrollBarVisibility="Disabled"
-              VerticalScrollBarVisibility="Disabled">
-              <ContentPresenter
-                Name="PART_BodyPresenter"
-                Content="{TemplateBinding EffectiveBodyContent}"
-                ContentTemplate="{TemplateBinding ContentTemplate}" />
+              VerticalScrollBarVisibility="Auto">
+              <Grid>
+                <ContentPresenter
+                  Name="PART_ContentPresenter"
+                  Content="{TemplateBinding Content}"
+                  ContentTemplate="{TemplateBinding ContentTemplate}" />
+                <ContentPresenter
+                  Name="PART_BodyPresenter"
+                  Content="{TemplateBinding BodyContent}"
+                  ContentTemplate="{TemplateBinding ContentTemplate}" />
+              </Grid>
             </ScrollViewer>
             <ContentPresenter
               Name="PART_FooterPresenter"
               Grid.Row="2"
-              Content="{TemplateBinding EffectiveFooterContent}" />
+              Content="{TemplateBinding FooterContent}" />
           </Grid>
         </Border>
       </ControlTemplate>
     </Setter>
   </Style>
 
-  <Style Selector="fsus|FsusDialog:not(.fsus-has-title) /template/ ContentPresenter#PART_HeaderPresenter, fsus|FsusMessageBox:not(.fsus-has-title) /template/ ContentPresenter#PART_HeaderPresenter">
+  <Style Selector="fsus|FsusDialog.fsus-scrollable-body:not(.fsus-has-title) /template/ ContentPresenter#PART_HeaderPresenter">
     <Setter Property="IsVisible" Value="False" />
   </Style>
 
-  <Style Selector="fsus|FsusDialog.fsus-has-title /template/ ContentPresenter#PART_HeaderPresenter, fsus|FsusMessageBox.fsus-has-title /template/ ContentPresenter#PART_HeaderPresenter">
+  <Style Selector="fsus|FsusDialog.fsus-scrollable-body.fsus-has-title /template/ ContentPresenter#PART_HeaderPresenter">
     <Setter Property="IsVisible" Value="True" />
     <Setter Property="Margin" Value="0,0,0,16" />
   </Style>
 
-  <Style Selector="fsus|FsusDialog:not(.fsus-has-footer) /template/ ContentPresenter#PART_FooterPresenter, fsus|FsusMessageBox:not(.fsus-has-footer) /template/ ContentPresenter#PART_FooterPresenter">
+  <Style Selector="fsus|FsusDialog.fsus-scrollable-body:not(.fsus-has-footer) /template/ ContentPresenter#PART_FooterPresenter">
     <Setter Property="IsVisible" Value="False" />
   </Style>
 
-  <Style Selector="fsus|FsusDialog.fsus-has-footer /template/ ContentPresenter#PART_FooterPresenter, fsus|FsusMessageBox.fsus-has-footer /template/ ContentPresenter#PART_FooterPresenter">
+  <Style Selector="fsus|FsusDialog.fsus-scrollable-body.fsus-has-footer /template/ ContentPresenter#PART_FooterPresenter">
     <Setter Property="IsVisible" Value="True" />
     <Setter Property="Margin" Value="0,16,0,0" />
   </Style>
 
-  <Style Selector="fsus|FsusDialog.fsus-scrollable-body /template/ ScrollViewer#PART_ScrollViewer, fsus|FsusMessageBox.fsus-scrollable-body /template/ ScrollViewer#PART_ScrollViewer">
-    <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+  <Style Selector="fsus|FsusDialog.fsus-scrollable-body.fsus-has-body-content /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <Style Selector="fsus|FsusDialog.fsus-scrollable-body:not(.fsus-has-body-content) /template/ ContentPresenter#PART_BodyPresenter">
+    <Setter Property="IsVisible" Value="False" />
   </Style>
 
   <Style Selector="Border.fsus-overlay">

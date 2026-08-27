@@ -197,41 +197,40 @@ public class FsusModalPrimitiveTests
   }
 
   [Fact]
-  public async Task DialogScrollableBodySupportsViewportConstraintAndKeyScrolling()
+  public void DialogScrollableBodyApiIsOptInAndScopedToDialog()
   {
-    var dialog = new KeyboardDialog
+    var dialog = new FsusDialog
     {
       Title = "Form Dialog",
       Content = "Fallback body text",
-      ConfirmContent = "Save",
-      CancelContent = "Cancel",
     };
+    var initialStatus = AutomationProperties.GetItemStatus(dialog);
 
     Assert.False(dialog.IsBodyScrollable);
     Assert.Equal(double.PositiveInfinity, dialog.MaxBodyHeight);
-    Assert.True(double.IsNaN(dialog.ViewportHeightConstraint));
-    Assert.Equal("Fallback body text", dialog.EffectiveBodyContent);
-    Assert.NotNull(dialog.EffectiveFooterContent);
-    Assert.DoesNotContain("scrollable", AutomationProperties.GetItemStatus(dialog));
     Assert.DoesNotContain("fsus-scrollable-body", dialog.Classes);
+    Assert.Equal("Fallback body text", dialog.Content);
+    Assert.Equal(initialStatus, AutomationProperties.GetItemStatus(dialog));
+    Assert.Equal(
+      typeof(FsusDialog),
+      typeof(FsusDialog).GetProperty(nameof(FsusDialog.IsBodyScrollable))?.DeclaringType);
+    Assert.Null(
+      typeof(FsusModalSurface).GetProperty(nameof(FsusDialog.IsBodyScrollable)));
+    Assert.Null(typeof(FsusDrawer).GetProperty(nameof(FsusDialog.IsBodyScrollable)));
 
     dialog.IsBodyScrollable = true;
-    dialog.ViewportHeightConstraint = 480;
     dialog.MaxBodyHeight = 240;
 
     Assert.True(dialog.IsBodyScrollable);
     Assert.Equal(240, dialog.MaxBodyHeight);
-    Assert.Equal(480, dialog.ViewportHeightConstraint);
-    Assert.Equal(480, dialog.ResolveMaxViewportHeight());
     Assert.Contains("fsus-scrollable-body", dialog.Classes);
-    Assert.Contains("scrollable", AutomationProperties.GetItemStatus(dialog));
+    Assert.Equal("Fallback body text", dialog.Content);
+    Assert.Equal(initialStatus, AutomationProperties.GetItemStatus(dialog));
 
-    dialog.Measure(new Size(500, double.PositiveInfinity));
-    Assert.True(dialog.DesiredSize.Height <= 480);
-
-    // Keyboard PageDown/PageUp handling
-    Assert.True(await dialog.PressAsync(Key.PageDown));
-    Assert.True(await dialog.PressAsync(Key.PageUp));
+    dialog.IsBodyScrollable = false;
+    Assert.DoesNotContain("fsus-scrollable-body", dialog.Classes);
+    Assert.Equal("Fallback body text", dialog.Content);
+    Assert.Equal(initialStatus, AutomationProperties.GetItemStatus(dialog));
   }
 
   private sealed class KeyboardDialog : FsusDialog

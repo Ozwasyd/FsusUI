@@ -8,7 +8,9 @@ Use `FsusDialog`, `FsusDrawer`, `FsusMessageBox`, `FsusMessageBoxService`,
 and `FsusOverlayHost` for modal surfaces, close policy, focus containment, and
 message-box flows. For long forms, enable `IsBodyScrollable` on `FsusDialog` to
 provide a scrollable content area with fixed title and action footer, bounded by
-`MaxBodyHeight` or `ViewportHeightConstraint`.
+the owner or overlay viewport and, when set, `MaxBodyHeight`. The opt-in mode
+supports `PageUp`/`PageDown` and scrolls newly focused body controls into view;
+the default dialog composition remains unchanged.
 
 ## Vue Contract Mapping
 
