@@ -4,6 +4,8 @@ import {
   type MarkdownEditorCommandContext,
 } from "./markdown-editor"
 import type { MarkdownEditorTransaction } from "./markdown-editor-transaction"
+import type { MarkdownStableProjection } from '../../../wasm/markdown-runtime'
+import { resolveMarkdownBlockInputContext } from './markdown-editor-input-intent'
 
 export interface MarkdownSlashTriggerResult {
   readonly query: string
@@ -14,6 +16,7 @@ export interface MarkdownSlashOptions {
   readonly isComposing?: boolean
   readonly syntaxContext?: string
   readonly blockOnly?: boolean
+  readonly projection?: MarkdownStableProjection
 }
 
 export const searchMarkdownEditorCommands = (
@@ -26,10 +29,9 @@ export const searchMarkdownEditorCommands = (
   if (!needle) return visible
 
   return visible.filter((command) => {
-    if (command.key.toLowerCase().includes(needle)) return true
     if (command.label.toLowerCase().includes(needle)) return true
-    if (command.title && command.title.toLowerCase().includes(needle)) return true
     if (command.description && command.description.toLowerCase().includes(needle)) return true
+    if (command.keywords?.some((keyword) => keyword.toLowerCase().includes(needle))) return true
     return false
   })
 }
@@ -52,6 +54,15 @@ export const resolveMarkdownSlashTrigger = (
   options?: MarkdownSlashOptions,
 ): MarkdownSlashTriggerResult | null => {
   if (options?.isComposing) return null
+
+  if (options?.projection) {
+    const context = resolveMarkdownBlockInputContext({
+      source: value,
+      offset: caret,
+      projection: options.projection,
+    })
+    if (context.kind === 'code' || context.kind === 'table') return null
+  }
 
   const before = value.slice(0, caret)
 
@@ -105,12 +116,40 @@ export const planMarkdownSlashCommit = (
     }
   }
 
+  const boundaryInsertions = commandTransaction.changes.filter(
+    (change) =>
+      change.from === change.to &&
+      (change.from === triggerRange.start || change.from === triggerRange.end),
+  )
+  const otherChanges = commandTransaction.changes.filter(
+    (change) => !boundaryInsertions.includes(change),
+  )
+  const overlapsTrigger = otherChanges.some(
+    (change) => change.from < triggerRange.end && change.to > triggerRange.start,
+  )
+  if (overlapsTrigger) {
+    return {
+      changes: [],
+      history: 'separate',
+      metadata: Object.freeze({ rejected: 'slash-trigger-overlap' }),
+      origin: 'command',
+    }
+  }
+
+  const changes = [
+    ...otherChanges.filter((change) => change.to <= triggerRange.start),
+    { from: triggerRange.start, to: triggerRange.end, insert: '' },
+    ...boundaryInsertions.map((change) => ({
+      ...change,
+      from: triggerRange.end,
+      to: triggerRange.end,
+    })),
+    ...otherChanges.filter((change) => change.from >= triggerRange.end),
+  ]
+
   return {
     ...commandTransaction,
-    changes: [
-      { from: triggerRange.start, to: triggerRange.end, insert: "" },
-      ...commandTransaction.changes,
-    ],
+    changes,
     history: "separate",
     origin: "command",
   }

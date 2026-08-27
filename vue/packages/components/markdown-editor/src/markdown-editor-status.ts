@@ -66,7 +66,10 @@ export const resolveMarkdownEditorStatus = (
 
   const ariaLiveMessage =
     density === "none"
-      ? ""
+      ? resolvedCapability
+          .filter((value) => value !== 'supported')
+          .map((value) => copy.capabilityAnnouncement(value))
+          .join(', ')
       : density === "minimal"
         ? `${metrics.graphemeCount} ${copy.metrics.characters}, ${metrics.wordCount} ${copy.metrics.words}`
         : `Line ${metrics.caretLine ?? 1}, Column ${metrics.caretColumn ?? 1}, ${metrics.lineCount} lines, ${metrics.graphemeCount} ${copy.metrics.characters}, ${metrics.wordCount} ${copy.metrics.words}`

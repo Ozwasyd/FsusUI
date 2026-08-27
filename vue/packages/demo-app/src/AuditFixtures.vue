@@ -197,12 +197,29 @@
         :min-rows="6"
         :show-actions="false"
         :show-mode-switcher="false"
+        :surfaces="
+          markdownCommandSurfacesFixture
+            ? {
+                commandPalette: true,
+                selectionToolbar: true,
+                slashMenu: true,
+              }
+            : undefined
+        "
         data-markdown-input-authority="transaction-store"
         @history-change="markdownTransactionHistory = $event"
         @selection-change="markdownTransactionSelection = $event"
         @transaction="recordMarkdownTransaction"
       />
       <div aria-label="Markdown transaction controls">
+        <button
+          v-if="markdownCommandSurfacesFixture"
+          type="button"
+          data-testid="markdown-open-command-palette"
+          @click="markdownTransactionEditor?.openCommandPalette()"
+        >
+          Open command palette
+        </button>
         <button
           type="button"
           data-testid="markdown-programmatic"
@@ -1980,6 +1997,10 @@ const markdownEditorTransactionFixture =
 const markdownEditorImeFixture =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('markdownEditorIme') === '1'
+const markdownCommandSurfacesFixture =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownCommandSurfaces') ===
+    '1'
 const markdownPasteGate =
   typeof window !== 'undefined'
     ? new URLSearchParams(window.location.search).get('markdownPasteGate')
@@ -2019,7 +2040,11 @@ if (markdownEditorDelayMount > 0) {
 }
 const markdownTransactionEditor = ref<MarkdownEditorInstance>()
 const markdownTransactionValue = ref(
-  markdownEditorImeFixture ? '' : 'A😀éאב\n- 列表',
+  markdownEditorImeFixture
+    ? ''
+    : markdownCommandSurfacesFixture
+      ? '/bol'
+      : 'A😀éאב\n- 列表',
 )
 const markdownTransactionHistory = ref<MarkdownEditorHistoryState>({
   canRedo: false,

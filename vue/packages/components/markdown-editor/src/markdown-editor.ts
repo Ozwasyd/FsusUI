@@ -430,6 +430,11 @@ export interface MarkdownEditorLocaleText {
     stale: string
     title: string
   }>
+  readonly commandPalette: Readonly<{
+    searchPlaceholder: string
+    title: string
+  }>
+  readonly capabilityAnnouncement: (capability: string) => string
   readonly overflow: string
   readonly overflowAria: (count: number) => string
   readonly editorAria: string
@@ -484,6 +489,12 @@ export const defaultMarkdownEditorLocaleText: MarkdownEditorLocaleText =
       stale: 'The document or selection changed. Review the clipboard again.',
       title: 'Paste as Markdown',
     }),
+    commandPalette: Object.freeze({
+      searchPlaceholder: 'Search commands',
+      title: 'Command palette',
+    }),
+    capabilityAnnouncement: (capability: string) =>
+      `Editor capability: ${capability}`,
     overflow: '格式工具',
     overflowAria: (count: number) => `格式工具，${count} 个工具`,
     editorAria: 'Markdown editor',
@@ -537,6 +548,13 @@ export const resolveMarkdownEditorLocaleText = (
       ...localeText?.pasteAsMarkdown?.disabledDescriptions,
     },
   },
+  commandPalette: {
+    ...defaultMarkdownEditorLocaleText.commandPalette,
+    ...localeText?.commandPalette,
+  },
+  capabilityAnnouncement:
+    localeText?.capabilityAnnouncement ??
+    defaultMarkdownEditorLocaleText.capabilityAnnouncement,
   overflowAria:
     localeText?.overflowAria ?? defaultMarkdownEditorLocaleText.overflowAria,
 })
@@ -663,6 +681,7 @@ export const defaultMarkdownEditorCommands: readonly MarkdownEditorCommand[] = [
     label: 'B',
     group: 'format',
     icon: 'bold',
+    keywords: ['bold'],
     shortcut: 'Mod+B',
     title: 'Bold',
     when: () => true,
@@ -674,6 +693,7 @@ export const defaultMarkdownEditorCommands: readonly MarkdownEditorCommand[] = [
     label: 'I',
     group: 'format',
     icon: 'italic',
+    keywords: ['italic'],
     shortcut: 'Mod+I',
     title: 'Italic',
     when: () => true,
@@ -685,6 +705,7 @@ export const defaultMarkdownEditorCommands: readonly MarkdownEditorCommand[] = [
     label: 'H',
     group: 'block',
     icon: 'heading',
+    keywords: ['heading'],
     shortcut: 'Mod+Alt+H',
     title: 'Heading',
     when: () => true,

@@ -248,7 +248,7 @@
     </div>
 
     <div
-      v-if="surfaceOptions.selectionToolbar && selectionToolbarPlacement.visible && selectionToolbarCommands.length"
+      v-if="surfaceOptions.selectionToolbar && selectionToolbarVisible && selectionToolbarCommands.length"
       :class="ns.e('selection-toolbar')"
       role="toolbar"
       :aria-label="localeText.editorAria"
@@ -269,7 +269,7 @@
     </div>
 
     <div
-      v-if="surfaceOptions.slashMenu && slashTrigger && slashCommands.length"
+      v-if="surfaceOptions.slashMenu && activeSlashTrigger && slashCommands.length"
       :class="ns.e('slash-menu')"
       role="menu"
       @keydown.esc.prevent.stop="closeSlashMenu"
@@ -296,14 +296,14 @@
           :class="ns.e('palette-dialog')"
           role="dialog"
           aria-modal="true"
-          :aria-label="localeText.overflow || 'Command Palette'"
+          :aria-label="localeText.commandPalette.title"
           @keydown.esc.prevent.stop="closeCommandPalette"
         >
           <input
             v-model="paletteQuery"
             type="text"
             :class="ns.e('palette-input')"
-            placeholder="Search commands..."
+            :placeholder="localeText.commandPalette.searchPlaceholder"
             @keydown.down.prevent="selectNextPaletteItem"
             @keydown.up.prevent="selectPreviousPaletteItem"
             @keydown.enter.prevent="executeActivePaletteItem"
@@ -440,6 +440,10 @@ import { ElMarkdownRenderer } from '@element-plus/components/markdown-renderer'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
 import { useNamespace } from '@element-plus/hooks'
 import {
+  createMarkdownEditorProjection,
+  stabilizeMarkdownEditorProjection,
+} from '../../../wasm/markdown-runtime'
+import {
   filterMarkdownEditorCommands,
   isMarkdownEditorCommandEnabled,
   isMarkdownEditorCommandVisible,
@@ -493,6 +497,14 @@ import {
 } from './markdown-editor-clipboard'
 import { resolveMarkdownSelectionToolbarPlacement } from "./markdown-editor-selection-toolbar"
 import {
+  abortMarkdownEditorCommandSessions,
+  createMarkdownEditorCommandSession,
+  rebaseMarkdownEditorCommandSession,
+  resolveMarkdownEditorCommandSession,
+  type MarkdownEditorCommandSession,
+} from './markdown-editor-command-async'
+import {
+  planMarkdownSlashCommit,
   resolveMarkdownSlashTrigger,
   searchMarkdownEditorCommands,
 } from "./markdown-editor-surfaces"
@@ -586,6 +598,8 @@ const transactionStore = new MarkdownEditorTransactionStore(
   initialSelection,
   documentIdentity,
 )
+const editorRevision = ref(transactionStore.revision)
+const editorSelection = ref(transactionStore.selection)
 const editorValue = ref(transactionStore.value)
 const liveSurface = computed(() =>
   createMarkdownLiveSurface({
@@ -594,6 +608,12 @@ const liveSurface = computed(() =>
     revision: transactionStore.revision,
     source: editorValue.value,
   }),
+)
+const editorProjection = computed(() =>
+  stabilizeMarkdownEditorProjection(
+    createMarkdownEditorProjection(editorValue.value),
+    documentIdentity,
+  ),
 )
 const liveReveal = ref(
   resolveMarkdownLiveSyntaxReveal({
@@ -773,14 +793,15 @@ const applyAtomicIntent = (
   refreshLiveReveal()
   return plan
 }
-const pendingCommandKeys = ref(new Set<string>())
-const commandControllers = new Map<string, AbortController>()
+const commandSessions = new Map<string, MarkdownEditorCommandSession>()
 const commandContextSignal = new AbortController().signal
 
 const abortPendingCommands = () => {
-  for (const controller of commandControllers.values()) controller.abort()
-  commandControllers.clear()
-  pendingCommandKeys.value = new Set()
+  for (const session of commandSessions.values()) {
+    session.abort.abort('editor-reset')
+  }
+  abortMarkdownEditorCommandSessions(commandSessions.values(), 'editor-reset')
+  commandSessions.clear()
 }
 
 type EditorOperation =
@@ -910,6 +931,8 @@ const dispatchEditorOperation = (
         : transactionStore.redo()
 
   editorValue.value = result.value
+  editorRevision.value = result.revision
+  editorSelection.value = result.selection
   emit('transaction', toMarkdownEditorTransactionEvent(transaction, result))
 
   if (
@@ -972,6 +995,7 @@ const captureSelection = (breakMerge = true) => {
     breakMerge,
   )
   const selection = transactionStore.selection
+  editorSelection.value = selection
   if (
     selection.start !== previous.start ||
     selection.end !== previous.end ||
@@ -1065,7 +1089,7 @@ const statusResolution = computed(() =>
     editorValue.value,
     props.statusDensity,
     props.localeText,
-    transactionStore.selection,
+    editorSelection.value,
     liveCapabilities.value,
     {
       mode: currentMode.value,
@@ -1081,16 +1105,23 @@ const selectionToolbarCommands = computed(() =>
 )
 const selectionToolbarPlacement = computed(() =>
   resolveMarkdownSelectionToolbarPlacement(
-    transactionStore.selection,
-    transactionStore.revision,
-    transactionStore.revision,
+    editorSelection.value,
+    editorRevision.value,
+    editorRevision.value,
     {
       documentEpoch: documentIdentity.epoch,
       expectedEpoch: documentIdentity.epoch,
     },
   ),
 )
+const dismissedSelectionRevision = ref<number | null>(null)
+const selectionToolbarVisible = computed(
+  () =>
+    selectionToolbarPlacement.value.visible &&
+    dismissedSelectionRevision.value !== editorRevision.value,
+)
 const closeSelectionToolbar = () => {
+  dismissedSelectionRevision.value = editorRevision.value
   textareaRef.value?.focus()
 }
 
@@ -1099,10 +1130,11 @@ const slashTrigger = computed(() => {
     return null
   return resolveMarkdownSlashTrigger(
     editorValue.value,
-    transactionStore.selection.start,
+    editorSelection.value.start,
     {
       blockOnly: true,
       isComposing: isComposing.value,
+      projection: editorProjection.value,
     },
   )
 })
@@ -1115,18 +1147,23 @@ const slashCommands = computed(() => {
   )
 })
 const activeSlashIndex = ref(0)
+const dismissedSlashTrigger = ref('')
+const activeSlashTrigger = computed(() => {
+  const trigger = slashTrigger.value
+  if (!trigger) return null
+  const identity = `${editorRevision.value}:${trigger.range.start}:${trigger.range.end}`
+  return dismissedSlashTrigger.value === identity ? null : trigger
+})
 const closeSlashMenu = () => {
+  const trigger = slashTrigger.value
+  if (trigger) {
+    dismissedSlashTrigger.value = `${editorRevision.value}:${trigger.range.start}:${trigger.range.end}`
+  }
   textareaRef.value?.focus()
 }
 const executeSlashCommand = (command: MarkdownEditorCommand) => {
-  if (!slashTrigger.value) return
-  const triggerRange = slashTrigger.value.range
-  activateCommand(command)
-  dispatchTransaction({
-    changes: [{ from: triggerRange.start, to: triggerRange.end, insert: "" }],
-    history: "separate",
-    origin: "command",
-  })
+  if (!activeSlashTrigger.value) return
+  void runCommand(command, activeSlashTrigger.value.range)
 }
 
 const commandPaletteOpen = ref(false)
@@ -1192,8 +1229,8 @@ const commandContext = computed(() => ({
   documentIdentity,
   mode: currentMode.value,
   readonly: editingBlocked.value,
-  revision: transactionStore.revision,
-  selection: transactionStore.selection,
+  revision: editorRevision.value,
+  selection: editorSelection.value,
   signal: commandContextSignal,
   value: transactionStore.value,
 }))
@@ -1810,45 +1847,73 @@ const activateOverflowCommand = (command: MarkdownEditorCommand) => {
   commandsExpanded.value = false
 }
 
-const runCommand = async (command: MarkdownEditorCommand) => {
+const runCommand = async (
+  command: MarkdownEditorCommand,
+  slashRange?: Readonly<{ start: number; end: number }>,
+) => {
   if (editingBlocked.value || nativeMachine.freezeSmartInput) return
-  if (pendingCommandKeys.value.has(command.key)) return
+  const activeSession = commandSessions.get(command.key)
+  if (activeSession?.state === 'pending' && !command.concurrent) return
 
   const selection = captureSelection()
-  const commandController = new AbortController()
-  commandControllers.set(command.key, commandController)
-  pendingCommandKeys.value = new Set(pendingCommandKeys.value).add(command.key)
-  const revision = transactionStore.revision
-  const value = transactionStore.value
+  const session = createMarkdownEditorCommandSession(
+    command.key,
+    commandContext.value,
+    {
+      activeSessions: commandSessions,
+      anchor: slashRange ?? selection,
+      concurrent: command.concurrent,
+    },
+  )
+  commandSessions.set(command.key, session)
   try {
     const context = {
       dispatch: { dispatch: dispatchTransaction },
       documentIdentity,
       mode: currentMode.value,
       readonly: editingBlocked.value,
-      revision,
+      revision: session.revision,
       selection,
-      signal: commandController.signal,
-      value,
+      signal: session.abort.signal,
+      value: transactionStore.value,
     }
     if (!isMarkdownEditorCommandVisible(command, context) || !isMarkdownEditorCommandEnabled(command, context)) return
     const result = await runMarkdownEditorCommand(command, context)
-    if (commandController.signal.aborted || commandControllers.get(command.key) !== commandController) return
+    if (commandSessions.get(command.key) !== session) return
+    const currentContext = commandContext.value
+    rebaseMarkdownEditorCommandSession(
+      session,
+      currentContext,
+    )
+    if (
+      resolveMarkdownEditorCommandSession(
+        session,
+        currentContext,
+        'resolved-current',
+      ) !== 'resolved-current'
+    ) return
     if (!result?.transaction) return
+    const transaction = slashRange
+      ? planMarkdownSlashCommit(slashRange, result.transaction)
+      : result.transaction
     const dispatchResult = dispatchTransaction({
-      ...result.transaction,
-      expectedRevision: revision,
-      history: result.transaction.history ?? 'separate',
+      ...transaction,
+      expectedRevision: session.revision,
+      history: transaction.history ?? 'separate',
       metadata: Object.freeze({ command: command.key }),
       origin: 'command',
     })
     if (dispatchResult.accepted) emit('command', command)
+  } catch (error) {
+    resolveMarkdownEditorCommandSession(
+      session,
+      commandContext.value,
+      'rejected',
+      error,
+    )
   } finally {
-    if (commandControllers.get(command.key) === commandController) {
-      commandControllers.delete(command.key)
-      const pending = new Set(pendingCommandKeys.value)
-      pending.delete(command.key)
-      pendingCommandKeys.value = pending
+    if (commandSessions.get(command.key) === session) {
+      commandSessions.delete(command.key)
     }
   }
 }

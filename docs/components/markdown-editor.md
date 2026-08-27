@@ -176,6 +176,20 @@ document epoch 变化、abort 或 anchor 删除后不得提交；consumer 负责
 组件展示错误，command 本身不调用 toast。Toolbar、keyboard、palette、slash 和
 selection presentation 共享同一 key、可用状态与 pending/result authority。
 
+`surfaces.commandPalette`、`surfaces.selectionToolbar` 与
+`surfaces.slashMenu` 是 opt-in presentation。Palette 搜索只读取 command 的
+`label`、`description` 与 `keywords`，显示文案来自
+`localeText.commandPalette`。Selection toolbar 与 slash menu 的 `Esc` 会关闭当前
+surface、恢复 source focus，并保留 source、selection 与 history。Slash trigger 由当前
+projection/input context 校验；执行时 trigger range 与 command result 合并为同一个
+revision-bound transaction，因此不会先删除 trigger 再提交 stale command result。
+
+Command pending/abort/stale 由 editor command session 统一管理。异步 result 仅在原
+document identity、epoch 与 revision 仍为 current 时提交；外部 reset 或组件卸载会 abort
+pending session。`statusDensity="none"` 只隐藏可见 footer，不会隐藏 degraded/fatal
+capability 的 `aria-live` announcement；该 announcement 通过
+`localeText.capabilityAnnouncement` 本地化。
+
 ## Paste as Markdown
 
 `Paste as Markdown` is an explicit command. It does not replace or reprioritize
