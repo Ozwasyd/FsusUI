@@ -1,0 +1,84 @@
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls">
+  <Style Selector="ToggleSwitch, fsus|FsusSwitch">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid ColumnDefinitions="Auto,*">
+          <Border
+            Name="PART_KnobTrack"
+            Width="38"
+            Height="24"
+            Padding="4"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Background="{TemplateBinding Background}"
+            BorderBrush="{TemplateBinding BorderBrush}"
+            BorderThickness="{TemplateBinding BorderThickness}"
+            CornerRadius="12">
+            <Canvas
+              Name="PART_SwitchKnob"
+              Width="14"
+              Height="14"
+              HorizontalAlignment="Left"
+              VerticalAlignment="Center">
+              <Grid Name="PART_MovingKnobs" Width="14" Height="14">
+                <Ellipse Fill="{TemplateBinding Foreground}" />
+              </Grid>
+            </Canvas>
+          </Border>
+          <ContentPresenter
+            Name="PART_Content"
+            Grid.Column="1"
+            Margin="{TemplateBinding Padding}"
+            VerticalAlignment="Center"
+            Content="{TemplateBinding Content}"
+            ContentTemplate="{TemplateBinding ContentTemplate}" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+    <Setter Property="KnobTransitions">
+      <Transitions>
+        <DoubleTransition
+          Property="Canvas.Left"
+          Duration="{DynamicResource FsusMotionDurationEffective}"
+          Easing="{DynamicResource FsusMotionEasingEffective}" />
+      </Transitions>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusSwitch.fsus-size-sm /template/ Border#PART_KnobTrack">
+    <Setter Property="Width" Value="32" />
+    <Setter Property="Height" Value="20" />
+    <Setter Property="Padding" Value="3" />
+    <Setter Property="CornerRadius" Value="10" />
+  </Style>
+
+  <Style Selector="fsus|FsusSwitch.fsus-size-sm /template/ Canvas#PART_SwitchKnob">
+    <Setter Property="Width" Value="12" />
+    <Setter Property="Height" Value="12" />
+  </Style>
+
+  <Style Selector="fsus|FsusSwitch.fsus-size-sm /template/ Grid#PART_MovingKnobs">
+    <Setter Property="Width" Value="12" />
+    <Setter Property="Height" Value="12" />
+  </Style>
+
+  <Style Selector="fsus|FsusSwitch.fsus-size-lg /template/ Border#PART_KnobTrack">
+    <Setter Property="Width" Value="48" />
+    <Setter Property="Height" Value="30" />
+    <Setter Property="Padding" Value="5" />
+    <Setter Property="CornerRadius" Value="15" />
+  </Style>
+
+  <Style Selector="fsus|FsusSwitch.fsus-size-lg /template/ Canvas#PART_SwitchKnob">
+    <Setter Property="Width" Value="18" />
+    <Setter Property="Height" Value="18" />
+  </Style>
+
+  <Style Selector="fsus|FsusSwitch.fsus-size-lg /template/ Grid#PART_MovingKnobs">
+    <Setter Property="Width" Value="18" />
+    <Setter Property="Height" Value="18" />
+  </Style>
+</Styles>

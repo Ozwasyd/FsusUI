@@ -7,6 +7,15 @@ Component ID: `selection`
 Use `FsusCheckbox`, `FsusCheckboxGroup`, `FsusRadio`, `FsusRadioGroup`, and
 `FsusSwitch` for boolean, three-state, grouped, and exclusive selection.
 
+`FsusSwitch` ships a native control template in
+`Themes/Controls/Switch.axaml` that resolves every template part
+`ToggleSwitch.OnApplyTemplate` requires (`PART_MovingKnobs`, plus the
+positioning part `PART_SwitchKnob`). Without such a template, opening any
+native window that lays out a switch throws
+`KeyNotFoundException: Could not find control 'PART_MovingKnobs'`. The
+template covers plain `ToggleSwitch` controls as well as `FsusSwitch`, with
+density sizing for `fsus-size-sm`, `fsus-size-md`, and `fsus-size-lg`.
+
 ## Vue Contract Mapping
 
 Vue checked values, radio groups, disabled items, loading state, and keyboard
