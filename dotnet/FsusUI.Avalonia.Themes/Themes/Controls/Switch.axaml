@@ -10,13 +10,13 @@
             Name="PART_KnobTrack"
             Width="38"
             Height="24"
-            Padding="4"
+            Padding="{DynamicResource FsusSpace1}"
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
             Background="{TemplateBinding Background}"
             BorderBrush="{TemplateBinding BorderBrush}"
             BorderThickness="{TemplateBinding BorderThickness}"
-            CornerRadius="12">
+            CornerRadius="{DynamicResource FsusRadiusPill}">
             <Canvas
               Name="PART_SwitchKnob"
               Width="14"
@@ -51,8 +51,8 @@
   <Style Selector="fsus|FsusSwitch.fsus-size-sm /template/ Border#PART_KnobTrack">
     <Setter Property="Width" Value="32" />
     <Setter Property="Height" Value="20" />
-    <Setter Property="Padding" Value="3" />
-    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace1}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusPill}" />
   </Style>
 
   <Style Selector="fsus|FsusSwitch.fsus-size-sm /template/ Canvas#PART_SwitchKnob">
@@ -68,8 +68,8 @@
   <Style Selector="fsus|FsusSwitch.fsus-size-lg /template/ Border#PART_KnobTrack">
     <Setter Property="Width" Value="48" />
     <Setter Property="Height" Value="30" />
-    <Setter Property="Padding" Value="5" />
-    <Setter Property="CornerRadius" Value="15" />
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace1}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusPill}" />
   </Style>
 
   <Style Selector="fsus|FsusSwitch.fsus-size-lg /template/ Canvas#PART_SwitchKnob">
