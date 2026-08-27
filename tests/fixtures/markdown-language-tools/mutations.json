@@ -47,5 +47,61 @@
     "find": "defineExpose({\n  dispatchTransaction,",
     "replace": "defineExpose({\n  textareaRef,\n  dispatchTransaction,",
     "expectError": "private editor or DOM refs must not be exposed"
+  },
+  {
+    "name": "stale-revision-commit",
+    "file": "core",
+    "find": "if (input.currentRevision !== input.revision) {",
+    "replace": "if (false) {",
+    "expectError": "stale revision rejection guard is required"
+  },
+  {
+    "name": "stale-projection-commit",
+    "file": "core",
+    "find": "if (input.projectionRevision !== input.currentRevision) {",
+    "replace": "if (false) {",
+    "expectError": "stale projection rejection guard is required"
+  },
+  {
+    "name": "stale-selection-commit",
+    "file": "core",
+    "find": "if (!sameSelection(input.currentSelection, input.session.selection)) {",
+    "replace": "if (false) {",
+    "expectError": "stale selection rejection guard is required"
+  },
+  {
+    "name": "session-kind-interleave",
+    "file": "core",
+    "find": "if (input.session.kind !== input.kind) {",
+    "replace": "if (false) {",
+    "expectError": "session kind conflict rejection guard is required"
+  },
+  {
+    "name": "ime-interleave",
+    "file": "core",
+    "find": "): MarkdownLanguageToolCommitResult => {\n  if (input.isComposing) {",
+    "replace": "): MarkdownLanguageToolCommitResult => {\n  if (false) {",
+    "expectError": "IME interleave rejection guard is required"
+  },
+  {
+    "name": "dom-html-authority",
+    "file": "core",
+    "find": "if (input.rawHtml !== undefined) {",
+    "replace": "if (false) {",
+    "expectError": "DOM authority rejection guard is required"
+  },
+  {
+    "name": "full-source-replacement",
+    "file": "core",
+    "find": "input.from === 0 &&",
+    "replace": "false &&",
+    "expectError": "unexplained full-source replacement rejection guard is required"
+  },
+  {
+    "name": "merged-native-history",
+    "file": "core",
+    "find": "history: 'separate' as const,",
+    "replace": "history: 'merge' as const,",
+    "expectError": "requires separate input history"
   }
 ]
