@@ -1,0 +1,418 @@
+{
+  "schema": "fsusui.markdown-editor-transaction-vectors.v1",
+  "scenarios": [
+    {
+      "id": "multiple-changes-forward-backward-undo-redo",
+      "identity": { "id": "alpha", "epoch": 1 },
+      "initialValue": "abcdef",
+      "initialSelection": { "start": 0, "end": 0, "direction": "none" },
+      "operations": [
+        {
+          "kind": "dispatch",
+          "changes": [
+            { "from": 1, "to": 2, "insert": "X" },
+            { "from": 4, "to": 6, "insert": "YZ" }
+          ],
+          "history": "separate",
+          "origin": "programmatic",
+          "selection": { "start": 1, "end": 6, "direction": "backward" }
+        },
+        { "kind": "undo" },
+        { "kind": "redo" }
+      ],
+      "expectedTrace": [
+        {
+          "accepted": true,
+          "value": "aXcdYZ",
+          "beforeRevision": 0,
+          "revision": 1,
+          "selection": { "start": 1, "end": 6, "direction": "backward" },
+          "undoDepth": 1,
+          "redoDepth": 0
+        },
+        {
+          "accepted": true,
+          "value": "abcdef",
+          "beforeRevision": 1,
+          "revision": 2,
+          "selection": { "start": 0, "end": 0, "direction": "none" },
+          "undoDepth": 0,
+          "redoDepth": 1
+        },
+        {
+          "accepted": true,
+          "value": "aXcdYZ",
+          "beforeRevision": 2,
+          "revision": 3,
+          "selection": { "start": 1, "end": 6, "direction": "backward" },
+          "undoDepth": 1,
+          "redoDepth": 0
+        }
+      ]
+    },
+    {
+      "id": "merge-group-is-one-history-step",
+      "identity": { "id": "merge", "epoch": 1 },
+      "initialValue": "",
+      "initialSelection": { "start": 0, "end": 0, "direction": "none" },
+      "operations": [
+        {
+          "kind": "dispatch",
+          "changes": [{ "from": 0, "to": 0, "insert": "你" }],
+          "history": "merge",
+          "origin": "input",
+          "selection": { "start": 1, "end": 1, "direction": "none" },
+          "mergeDirection": "forward",
+          "timestampMilliseconds": 0
+        },
+        {
+          "kind": "dispatch",
+          "changes": [{ "from": 1, "to": 1, "insert": "好" }],
+          "history": "merge",
+          "origin": "input",
+          "selection": { "start": 2, "end": 2, "direction": "none" },
+          "mergeDirection": "forward",
+          "timestampMilliseconds": 999
+        },
+        { "kind": "undo" }
+      ],
+      "expectedTrace": [
+        {
+          "accepted": true,
+          "value": "你",
+          "beforeRevision": 0,
+          "revision": 1,
+          "selection": { "start": 1, "end": 1, "direction": "none" },
+          "undoDepth": 1,
+          "redoDepth": 0
+        },
+        {
+          "accepted": true,
+          "value": "你好",
+          "beforeRevision": 1,
+          "revision": 2,
+          "selection": { "start": 2, "end": 2, "direction": "none" },
+          "undoDepth": 1,
+          "redoDepth": 0
+        },
+        {
+          "accepted": true,
+          "value": "",
+          "beforeRevision": 2,
+          "revision": 3,
+          "selection": { "start": 0, "end": 0, "direction": "none" },
+          "undoDepth": 0,
+          "redoDepth": 1
+        }
+      ]
+    },
+    {
+      "id": "external-reset-clears-history",
+      "identity": { "id": "reset", "epoch": 2 },
+      "initialValue": "draft",
+      "initialSelection": { "start": 5, "end": 5, "direction": "none" },
+      "operations": [
+        {
+          "kind": "dispatch",
+          "changes": [{ "from": 5, "to": 5, "insert": "!" }],
+          "history": "separate",
+          "origin": "programmatic",
+          "selection": { "start": 6, "end": 6, "direction": "none" }
+        },
+        {
+          "kind": "dispatch",
+          "changes": [{ "from": 0, "to": 6, "insert": "server" }],
+          "history": "skip",
+          "origin": "external",
+          "externalUpdate": "reset"
+        },
+        { "kind": "undo" }
+      ],
+      "expectedTrace": [
+        {
+          "accepted": true,
+          "value": "draft!",
+          "beforeRevision": 0,
+          "revision": 1,
+          "selection": { "start": 6, "end": 6, "direction": "none" },
+          "undoDepth": 1,
+          "redoDepth": 0
+        },
+        {
+          "accepted": true,
+          "value": "server",
+          "beforeRevision": 1,
+          "revision": 2,
+          "selection": { "start": 6, "end": 6, "direction": "none" },
+          "undoDepth": 0,
+          "redoDepth": 0
+        },
+        {
+          "accepted": false,
+          "reason": "no-history",
+          "value": "server",
+          "beforeRevision": 2,
+          "revision": 2,
+          "selection": { "start": 6, "end": 6, "direction": "none" },
+          "undoDepth": 0,
+          "redoDepth": 0
+        }
+      ]
+    },
+    {
+      "id": "same-value-external-reset-still-clears-history",
+      "identity": { "id": "same-reset", "epoch": 2 },
+      "initialValue": "draft",
+      "initialSelection": { "start": 5, "end": 5, "direction": "none" },
+      "operations": [
+        {
+          "kind": "dispatch",
+          "changes": [{ "from": 5, "to": 5, "insert": "!" }],
+          "history": "separate",
+          "origin": "programmatic",
+          "selection": { "start": 6, "end": 6, "direction": "none" }
+        },
+        {
+          "kind": "dispatch",
+          "changes": [],
+          "history": "skip",
+          "origin": "external",
+          "externalUpdate": "reset"
+        },
+        { "kind": "undo" }
+      ],
+      "expectedTrace": [
+        {
+          "accepted": true,
+          "value": "draft!",
+          "beforeRevision": 0,
+          "revision": 1,
+          "selection": { "start": 6, "end": 6, "direction": "none" },
+          "undoDepth": 1,
+          "redoDepth": 0
+        },
+        {
+          "accepted": true,
+          "value": "draft!",
+          "beforeRevision": 1,
+          "revision": 1,
+          "selection": { "start": 6, "end": 6, "direction": "none" },
+          "undoDepth": 0,
+          "redoDepth": 0
+        },
+        {
+          "accepted": false,
+          "reason": "no-history",
+          "value": "draft!",
+          "beforeRevision": 1,
+          "revision": 1,
+          "selection": { "start": 6, "end": 6, "direction": "none" },
+          "undoDepth": 0,
+          "redoDepth": 0
+        }
+      ]
+    },
+    {
+      "id": "external-rebase-maps-backward-selection",
+      "identity": { "id": "rebase", "epoch": 3 },
+      "initialValue": "abcd",
+      "initialSelection": { "start": 2, "end": 4, "direction": "backward" },
+      "operations": [
+        {
+          "kind": "dispatch",
+          "changes": [{ "from": 0, "to": 0, "insert": "X" }],
+          "history": "skip",
+          "origin": "external",
+          "externalUpdate": "rebase"
+        }
+      ],
+      "expectedTrace": [
+        {
+          "accepted": true,
+          "value": "Xabcd",
+          "beforeRevision": 0,
+          "revision": 1,
+          "selection": { "start": 3, "end": 5, "direction": "backward" },
+          "undoDepth": 0,
+          "redoDepth": 0
+        }
+      ]
+    },
+    {
+      "id": "stale-revision-fails-closed",
+      "identity": { "id": "stale", "epoch": 4 },
+      "initialValue": "A",
+      "initialSelection": { "start": 1, "end": 1, "direction": "none" },
+      "operations": [
+        {
+          "kind": "dispatch",
+          "changes": [{ "from": 1, "to": 1, "insert": "B" }],
+          "history": "separate",
+          "origin": "programmatic",
+          "selection": { "start": 2, "end": 2, "direction": "none" }
+        },
+        {
+          "kind": "dispatch",
+          "changes": [{ "from": 2, "to": 2, "insert": "!" }],
+          "history": "separate",
+          "origin": "programmatic",
+          "expectedRevision": 0,
+          "selection": { "start": 3, "end": 3, "direction": "none" }
+        }
+      ],
+      "expectedTrace": [
+        {
+          "accepted": true,
+          "value": "AB",
+          "beforeRevision": 0,
+          "revision": 1,
+          "selection": { "start": 2, "end": 2, "direction": "none" },
+          "undoDepth": 1,
+          "redoDepth": 0
+        },
+        {
+          "accepted": false,
+          "reason": "stale-revision",
+          "value": "AB",
+          "beforeRevision": 1,
+          "revision": 1,
+          "selection": { "start": 2, "end": 2, "direction": "none" },
+          "undoDepth": 1,
+          "redoDepth": 0
+        }
+      ]
+    },
+    {
+      "id": "same-source-document-switch-rejects-old-identity",
+      "identity": { "id": "doc-a", "epoch": 1 },
+      "initialValue": "same",
+      "initialSelection": { "start": 4, "end": 4, "direction": "none" },
+      "operations": [
+        {
+          "kind": "dispatch",
+          "changes": [{ "from": 4, "to": 4, "insert": "!" }],
+          "history": "separate",
+          "origin": "programmatic",
+          "selection": { "start": 5, "end": 5, "direction": "none" }
+        },
+        {
+          "kind": "switchDocument",
+          "identity": { "id": "doc-b", "epoch": 1 },
+          "value": "same",
+          "selection": { "start": 1, "end": 3, "direction": "forward" }
+        },
+        {
+          "kind": "dispatch",
+          "identity": { "id": "doc-a", "epoch": 1 },
+          "changes": [{ "from": 4, "to": 4, "insert": "?" }],
+          "history": "separate",
+          "origin": "programmatic",
+          "expectedRevision": 0,
+          "selection": { "start": 5, "end": 5, "direction": "none" }
+        }
+      ],
+      "expectedTrace": [
+        {
+          "accepted": true,
+          "value": "same!",
+          "beforeRevision": 0,
+          "revision": 1,
+          "selection": { "start": 5, "end": 5, "direction": "none" },
+          "undoDepth": 1,
+          "redoDepth": 0,
+          "identity": { "id": "doc-a", "epoch": 1 }
+        },
+        {
+          "accepted": true,
+          "reason": "document-switch",
+          "value": "same",
+          "beforeRevision": 0,
+          "revision": 0,
+          "selection": { "start": 1, "end": 3, "direction": "forward" },
+          "undoDepth": 0,
+          "redoDepth": 0,
+          "identity": { "id": "doc-b", "epoch": 1 }
+        },
+        {
+          "accepted": false,
+          "reason": "document-mismatch",
+          "value": "same",
+          "beforeRevision": 0,
+          "revision": 0,
+          "selection": { "start": 1, "end": 3, "direction": "forward" },
+          "undoDepth": 0,
+          "redoDepth": 0,
+          "identity": { "id": "doc-b", "epoch": 1 }
+        }
+      ]
+    }
+  ],
+  "positionMaps": [
+    {
+      "id": "insertion-affinity",
+      "changes": [{ "from": 2, "to": 2, "insert": "XX" }],
+      "points": [
+        { "offset": 2, "association": -1, "expected": 2 },
+        { "offset": 2, "association": 1, "expected": 4 },
+        { "offset": 4, "association": 1, "expected": 6 }
+      ]
+    },
+    {
+      "id": "partial-and-full-deletion",
+      "changes": [{ "from": 2, "to": 5, "insert": "Q" }],
+      "ranges": [
+        {
+          "start": 1,
+          "end": 4,
+          "expected": {
+            "range": { "start": 1, "end": 3 },
+            "deleted": false,
+            "partiallyDeleted": true
+          }
+        },
+        {
+          "start": 2,
+          "end": 5,
+          "expected": {
+            "deleted": true,
+            "partiallyDeleted": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "multiple-change-map",
+      "changes": [
+        { "from": 1, "to": 2, "insert": "XYZ" },
+        { "from": 5, "to": 7, "insert": "" }
+      ],
+      "points": [
+        { "offset": 0, "association": 1, "expected": 0 },
+        { "offset": 4, "association": 1, "expected": 6 },
+        { "offset": 8, "association": 1, "expected": 8 }
+      ]
+    },
+    {
+      "id": "same-offset-insertion-affinity",
+      "changes": [
+        { "from": 1, "to": 1, "insert": "X" },
+        { "from": 1, "to": 1, "insert": "Y" }
+      ],
+      "points": [
+        { "offset": 1, "association": -1, "expected": 1 },
+        { "offset": 1, "association": 1, "expected": 3 }
+      ],
+      "ranges": [
+        {
+          "start": 1,
+          "end": 1,
+          "expected": {
+            "range": { "start": 1, "end": 3 },
+            "deleted": false,
+            "partiallyDeleted": false
+          }
+        }
+      ]
+    }
+  ]
+}

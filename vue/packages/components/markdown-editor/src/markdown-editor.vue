@@ -487,11 +487,12 @@ const initialSelection: MarkdownEditorSelection = {
   end: props.modelValue.length,
   start: props.modelValue.length,
 }
+const documentIdentity = Object.freeze({ epoch: 0, id: commandTrayId })
 const transactionStore = new MarkdownEditorTransactionStore(
   props.modelValue,
   initialSelection,
+  documentIdentity,
 )
-const documentIdentity = Object.freeze({ epoch: 0, id: commandTrayId })
 const editorValue = ref(transactionStore.value)
 const liveSurface = computed(() =>
   createMarkdownLiveSurface({
@@ -731,6 +732,8 @@ const rejectedResult = (
 ): MarkdownEditorDispatchResult =>
   Object.freeze({
     accepted: false,
+    beforeRevision: transactionStore.revision,
+    documentIdentity: transactionStore.documentIdentity,
     history: transactionStore.history,
     reason,
     revision: transactionStore.revision,
@@ -775,7 +778,18 @@ const restoreTextareaSelection = async (
 const dispatchEditorOperation = (
   operation: EditorOperation,
 ): MarkdownEditorDispatchResult => {
-  const transaction = operationTransaction(operation)
+  const transaction = operationTransaction(
+    operation.kind === 'transaction'
+      ? {
+          ...operation,
+          transaction: Object.freeze({
+            ...operation.transaction,
+            documentIdentity:
+              operation.transaction.documentIdentity ?? documentIdentity,
+          }),
+        }
+      : operation,
+  )
   const blocked =
     operation.kind === 'transaction'
       ? !operation.allowBlocked && editingBlocked.value
@@ -794,7 +808,7 @@ const dispatchEditorOperation = (
   const previousHistory = transactionStore.history
   const result =
     operation.kind === 'transaction'
-      ? transactionStore.dispatch(operation.transaction, {
+      ? transactionStore.dispatch(transaction, {
           mergeDirection: operation.mergeDirection,
           now: Date.now(),
         })
@@ -938,9 +952,14 @@ watch(
           },
         ],
         history: 'skip',
+        externalUpdate: 'reset',
         metadata: Object.freeze({ kind: 'external-reset' }),
         origin: 'external',
-        selection: transactionStore.selection,
+        selection: {
+          direction: transactionStore.selection.direction,
+          end: value.length,
+          start: value.length,
+        },
       },
     })
   },

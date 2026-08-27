@@ -65,6 +65,7 @@ public class FsusMarkdownEditor : TemplatedControl
 
   private FsusMarkdownEditorTransactionStore store =
     new(new FsusMarkdownDocumentIdentity("doc", 0));
+  private bool synchronizingDocument;
 
   public FsusMarkdownEditor()
   {
@@ -74,37 +75,49 @@ public class FsusMarkdownEditor : TemplatedControl
 
   public FsusMarkdownEditorTransactionStore TransactionStore => store;
 
-  public FsusMarkdownEditorDispatchResult Dispatch(FsusMarkdownEditorTransaction transaction)
+  public event EventHandler<FsusMarkdownEditorTransactionEventArgs>? Transaction;
+
+  public event EventHandler<FsusMarkdownEditorSelectionChangedEventArgs>? SelectionChange;
+
+  public event EventHandler<FsusMarkdownEditorHistoryChangedEventArgs>? HistoryChange;
+
+  public FsusMarkdownEditorDispatchResult DispatchTransaction(
+    FsusMarkdownEditorTransaction transaction)
   {
     EnsureStore();
-    var result = store.Dispatch(transaction);
-    if (result.Accepted && result.Value != Document)
-    {
-      SetValue(DocumentProperty, result.Value);
-    }
-    return result;
+    var bound = transaction.DocumentIdentity is null
+      ? transaction with { DocumentIdentity = store.Identity }
+      : transaction;
+    return Execute(bound, () => store.Dispatch(bound));
+  }
+
+  public FsusMarkdownEditorDispatchResult Dispatch(FsusMarkdownEditorTransaction transaction)
+  {
+    return DispatchTransaction(transaction);
+  }
+
+  public FsusMarkdownEditorDispatchResult Undo()
+  {
+    EnsureStore();
+    var transaction = OperationTransaction("undo");
+    return Execute(transaction, store.Undo);
   }
 
   public FsusMarkdownEditorDispatchResult UndoDocument()
   {
+    return Undo();
+  }
+
+  public FsusMarkdownEditorDispatchResult Redo()
+  {
     EnsureStore();
-    var result = store.Undo();
-    if (result.Accepted)
-    {
-      SetValue(DocumentProperty, result.Value);
-    }
-    return result;
+    var transaction = OperationTransaction("redo");
+    return Execute(transaction, store.Redo);
   }
 
   public FsusMarkdownEditorDispatchResult RedoDocument()
   {
-    EnsureStore();
-    var result = store.Redo();
-    if (result.Accepted)
-    {
-      SetValue(DocumentProperty, result.Value);
-    }
-    return result;
+    return Redo();
   }
 
   protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -115,9 +128,20 @@ public class FsusMarkdownEditor : TemplatedControl
       var identity = DocumentIdentity ?? new FsusMarkdownDocumentIdentity("doc", 0);
       store = new FsusMarkdownEditorTransactionStore(identity, Document);
     }
-    else if (change.Property == DocumentProperty && store.Value != Document)
+    else if (change.Property == DocumentProperty && !synchronizingDocument && store.Value != Document)
     {
-      store.Reset(Document);
+      EnsureStore();
+      var transaction = new FsusMarkdownEditorTransaction(
+        [new FsusMarkdownEditorChange(0, store.Value.Length, Document)],
+        History: "skip",
+        Origin: "external",
+        DocumentIdentity: store.Identity,
+        ExternalUpdate: "reset");
+      _ = Execute(transaction, () => store.Dispatch(transaction));
+    }
+    else if (change.Property == ModeProperty)
+    {
+      store.BreakMergeGroup();
     }
   }
 
@@ -129,6 +153,46 @@ public class FsusMarkdownEditor : TemplatedControl
       store = new FsusMarkdownEditorTransactionStore(identity, Document);
     }
   }
+
+  private FsusMarkdownEditorDispatchResult Execute(
+    FsusMarkdownEditorTransaction transaction,
+    Func<FsusMarkdownEditorDispatchResult> operation)
+  {
+    var previousSelection = store.Selection;
+    var previousHistory = store.History;
+    var result = operation();
+    if (result.Accepted && result.Value != Document)
+    {
+      synchronizingDocument = true;
+      try
+      {
+        SetValue(DocumentProperty, result.Value);
+      }
+      finally
+      {
+        synchronizingDocument = false;
+      }
+    }
+
+    Transaction?.Invoke(this, new(transaction, result));
+    if (result.Accepted && result.Selection != previousSelection)
+    {
+      SelectionChange?.Invoke(this, new(result.Revision, result.Selection));
+    }
+    if (result.Accepted && result.History != previousHistory)
+    {
+      HistoryChange?.Invoke(this, new(result.History));
+    }
+    return result;
+  }
+
+  private FsusMarkdownEditorTransaction OperationTransaction(string operation) =>
+    new(
+      [],
+      History: "skip",
+      Origin: "command",
+      DocumentIdentity: store.Identity,
+      Metadata: new Dictionary<string, object?> { ["action"] = operation });
 
   public string Document
   {
