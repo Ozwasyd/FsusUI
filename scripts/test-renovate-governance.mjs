@@ -1,91 +1,167 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict'
+import { createRequire } from 'node:module'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { auditModels } from './check-update-surface.mjs'
+import { buildExpectedUpdateSurface } from './update-surface-lib.mjs'
 
+const require = createRequire(import.meta.url)
+const JSON5 = require('json5')
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const read = (relativePath) => readFileSync(path.join(root, relativePath), 'utf8')
+const read = (relative) =>
+  readFileSync(path.join(root, relative), 'utf8')
+const clone = (value) => structuredClone(value)
 
-const renovate = read('renovate.json5')
-const updateSurface = JSON.parse(read('config/dependencies/update-surface.json'))
-const updateSurfaceSchema = JSON.parse(
+const surface = JSON.parse(
+  read('config/dependencies/update-surface.json'),
+)
+const schema = JSON.parse(
   read('config/dependencies/update-surface.schema.json'),
 )
+const renovate = JSON5.parse(read('renovate.json5'))
+const expected = buildExpectedUpdateSurface(root)
 
-assert.match(renovate, /automerge\s*:\s*false/, 'Renovate automerge must remain disabled')
-assert.match(renovate, /minimumReleaseAge\s*:\s*0/, 'Renovate must not delay stable releases')
-assert.ok(
-  Array.isArray(updateSurface.items) || Array.isArray(updateSurface.surfaces),
-  'the update surface must enumerate governed dependency fields',
-)
-assert.equal(updateSurfaceSchema.type, 'object', 'the update surface must have a JSON schema')
-
-const items = updateSurface.items ?? updateSurface.surfaces
-assert.ok(items.length > 0, 'the update surface must not be empty')
-const ownershipByVersionField = new Map()
-for (const item of items) {
-  assert.equal(typeof item.id, 'string', 'each governed item must have an id')
-  assert.equal(typeof item.datasource, 'string', `${item.id} must declare a datasource`)
-  assert.equal(typeof item.packageName, 'string', `${item.id} must declare a package name`)
-  assert.ok(item.manager || item.customManager, `${item.id} must declare manager ownership`)
-  assert.ok(Array.isArray(item.files) && item.files.length > 0, `${item.id} must declare owned files`)
-  assert.equal(typeof item.versioning, 'string', `${item.id} must declare versioning`)
-  assert.equal(typeof item.group, 'string', `${item.id} must declare a semantic group`)
-  assert.equal(typeof item.stabilityPolicy, 'string', `${item.id} must declare a stability policy`)
-
-  for (const file of item.files) {
-    assert.equal(typeof file, 'string', `${item.id} must use repository-relative file paths`)
-    assert.ok(file.length > 0, `${item.id} must not declare an empty owned path`)
-
-    const versionField = `${file}:${item.packageName}`
-    assert.ok(
-      !ownershipByVersionField.has(versionField),
-      `${versionField} must have exactly one Renovate manager owner`,
-    )
-    ownershipByVersionField.set(versionField, item.id)
-  }
+function errorsFor(
+  nextSurface = surface,
+  nextRenovate = renovate,
+  nextExpected = expected,
+) {
+  return auditModels({
+    surface: nextSurface,
+    schema,
+    renovate: nextRenovate,
+    expected: nextExpected,
+    now: new Date('2026-08-27T00:00:00Z'),
+  })
 }
 
-assert.ok(
-  items.some((item) => item.files.includes('pnpm-lock.yaml')),
-  'the update surface must govern the pnpm lockfile projection',
+assert.deepEqual(errorsFor(), [], 'the unmodified governance model must pass')
+
+const mutations = [
+  {
+    name: 'permanent ignore',
+    mutate(next) {
+      next.renovate.ignorePaths = ['config/dependencies/**']
+    },
+    expected: /ignorePaths entry/u,
+  },
+  {
+    name: 'disabled update type',
+    mutate(next) {
+      next.renovate.packageRules.push({
+        matchUpdateTypes: ['major'],
+        enabled: false,
+      })
+    },
+    expected: /disabled update surface forbidden/u,
+  },
+  {
+    name: 'automerge',
+    mutate(next) {
+      next.renovate.automerge = true
+    },
+    expected: /automerge/u,
+  },
+  {
+    name: 'stale generated inventory',
+    mutate(next) {
+      next.surface.surfaces.pop()
+    },
+    expected: /is stale/u,
+  },
+  {
+    name: 'duplicate manager identity',
+    mutate(next) {
+      next.surface.surfaces.push(clone(next.surface.surfaces[0]))
+    },
+    expected: /duplicate surface id|duplicate package identity/u,
+  },
+  {
+    name: 'overlapping group',
+    mutate(next) {
+      const firstGroup = next.renovate.packageRules.find(
+        (rule) => rule.groupName === 'vue-build-toolchain',
+      )
+      const secondGroup = next.renovate.packageRules.find(
+        (rule) => rule.groupName === 'vue-runtime-dependencies',
+      )
+      secondGroup.matchPackageNames.push(firstGroup.matchPackageNames[0])
+    },
+    expected: /overlapping groups|must map exactly/u,
+  },
+]
+
+for (const mutation of mutations) {
+  const next = {
+    renovate: clone(renovate),
+    surface: clone(surface),
+  }
+  mutation.mutate(next)
+  const errors = errorsFor(next.surface, next.renovate)
+  assert.match(
+    errors.join('\n'),
+    mutation.expected,
+    `${mutation.name} mutation must fail closed`,
+  )
+}
+
+const fixture = JSON.parse(
+  read('tests/fixtures/dependencies/renovate-custom-managers.json'),
 )
-assert.ok(
-  items.some((item) => item.files.includes('dotnet/Directory.Packages.props')),
-  'the update surface must govern central NuGet versions',
-)
-assert.ok(
-  items.some((item) => item.files.includes('config/dependencies/npm-authority.json')),
-  'the update surface must govern the npm authority source',
-)
-assert.doesNotMatch(
-  renovate,
-  /(?:ignoreDeps\s*:\s*\[[\s\S]*?\]|enabled\s*:\s*false)/,
-  'Renovate must not permanently ignore dependency update surfaces',
-)
-assert.match(
-  renovate,
-  /schedule\s*:\s*\[[\s\S]*?(?:every\s+6\s+hours|\*\/6)[\s\S]*?\]/,
-  'Renovate must run at least every six hours',
-)
-assert.match(
-  renovate,
-  /lockFileMaintenance\s*:\s*\{[\s\S]*?enabled\s*:\s*true/,
-  'Renovate must keep daily lockfile maintenance enabled',
+const managers = new Map(
+  renovate.customManagers
+    .filter((manager) => manager.customType === 'regex')
+    .map((manager) => [manager.description, manager]),
 )
 
-console.log('Renovate governance contract assertions passed.')
-import ioAssert from 'node:assert/strict'
-import { readFileSync as ioReadFileSync } from 'node:fs'
-import ioPath from 'node:path'
-import { fileURLToPath as ioFileURLToPath } from 'node:url'
+function fileMatches(manager, relative) {
+  return manager.managerFilePatterns.some((pattern) =>
+    new RegExp(
+      pattern.startsWith('/') && pattern.endsWith('/')
+        ? pattern.slice(1, -1)
+        : pattern,
+      'u',
+    ).test(relative),
+  )
+}
 
-const ioTestRoot = ioPath.resolve(ioPath.dirname(ioFileURLToPath(import.meta.url)), '..')
-const ioPackageJson = JSON.parse(ioReadFileSync(ioPath.join(ioTestRoot, 'package.json'), 'utf8'))
-const ioRenovateConfig = ioReadFileSync(ioPath.join(ioTestRoot, 'renovate.json5'), 'utf8')
+function extractedValues(manager, text) {
+  const values = []
+  for (const pattern of manager.matchStrings) {
+    const expression = new RegExp(pattern, 'gmu')
+    for (const match of text.matchAll(expression)) {
+      if (match.groups?.currentValue) values.push(match.groups.currentValue)
+    }
+  }
+  return values
+}
 
-ioAssert.match(ioPackageJson.packageManager, /^pnpm@\d+/, 'packageManager must pin pnpm for Renovate-managed Node tooling')
-ioAssert.ok(ioPackageJson.engines?.node, 'engines.node must declare the supported Node runtime')
-ioAssert.match(ioRenovateConfig, /github-actions/, 'Renovate must manage GitHub Actions references')
-// Renovate governance contract: the frozen update-surface fixtures must remain covered.
+for (const candidate of fixture.positive) {
+  const manager = managers.get(candidate.manager)
+  assert.ok(manager, `fixture manager missing: ${candidate.manager}`)
+  assert.ok(
+    fileMatches(manager, candidate.file),
+    `${candidate.manager} must own ${candidate.file}`,
+  )
+  assert.deepEqual(
+    extractedValues(manager, candidate.text),
+    candidate.values,
+    `${candidate.manager} must extract the expected version`,
+  )
+}
+
+for (const candidate of fixture.negative) {
+  const manager = managers.get(candidate.manager)
+  assert.ok(manager, `fixture manager missing: ${candidate.manager}`)
+  assert.ok(
+    !fileMatches(manager, candidate.file) ||
+      extractedValues(manager, candidate.text).length === 0,
+    `${candidate.manager} must reject the negative fixture`,
+  )
+}
+
+console.log(
+  `Renovate governance mutation contract passed: mutations=${mutations.length} positive=${fixture.positive.length} negative=${fixture.negative.length}.`,
+)
