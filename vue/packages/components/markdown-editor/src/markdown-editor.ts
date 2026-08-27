@@ -6,6 +6,7 @@ import type { MarkdownFeatureActivationFeatureOptions } from '@element-plus/wasm
 import type MarkdownEditor from './markdown-editor.vue'
 import type { MarkdownAttachmentBatchIntent } from './markdown-editor-attachment'
 import type { MarkdownEditorMetricsOptions } from './markdown-editor-metrics'
+import type { MarkdownEditorWritingAidsOptions } from './markdown-editor-writing-aids'
 import type {
   MarkdownEditorHistoryState,
   MarkdownEditorDocumentIdentity,
@@ -270,11 +271,62 @@ export {
 } from './markdown-editor-chrome'
 export {
   createMarkdownOutlineModel,
+  createMarkdownOutlineTree,
   evaluateMarkdownOutlineMutations,
+  evaluateMarkdownOutlineRevealMutations,
   resolveMarkdownEditorOutline,
   revealHeading,
   revealSourceRange,
+  type MarkdownEditorOutlineItem,
+  type MarkdownEditorOutlineRange,
+  type MarkdownEditorRevealOptions,
+  type MarkdownEditorRevealResult,
+  type MarkdownOutlineDiagnostic,
+  type MarkdownOutlineMutationKind,
+  type MarkdownOutlineRevealMutationKind,
+  type MarkdownOutlineTreeNode,
 } from './markdown-editor-outline'
+export {
+  commitMarkdownOutlineActive,
+  evaluateMarkdownOutlineActiveMutations,
+  headingAtSourceOffset,
+  headingIndexAtSourceOffset,
+  planMarkdownOutlineReveal,
+  resolveMarkdownActiveHeading,
+  resolveMarkdownOutlineActive,
+  resolveMarkdownOutlineNavigationOwner,
+  type MarkdownOutlineActiveCause,
+  type MarkdownOutlineActiveInput,
+  type MarkdownOutlineActiveMutationKind,
+  type MarkdownOutlineActiveResult,
+  type MarkdownOutlineNavigationOwner,
+  type MarkdownOutlineRevealPlan,
+  type MarkdownOutlineRevealPlanOptions,
+  type MarkdownOutlineViewport,
+} from './markdown-editor-outline-active'
+export {
+  calculateTypewriterScrollTarget,
+  createWritingAidsController,
+  evaluateMarkdownFocusMutations,
+  evaluateMarkdownTypewriterMutations,
+  resolveFocusState,
+  resolveWritingAids,
+  type MarkdownEditorFocusBlock,
+  type MarkdownEditorFocusExemptions,
+  type MarkdownEditorFocusInput,
+  type MarkdownEditorFocusRange,
+  type MarkdownEditorFocusState,
+  type MarkdownEditorResolvedWritingAids,
+  type MarkdownEditorTypewriterAnchor,
+  type MarkdownEditorTypewriterScrollInput,
+  type MarkdownEditorTypewriterScrollResult,
+  type MarkdownEditorWritingAidsController,
+  type MarkdownEditorWritingAidsOptions,
+  type MarkdownEditorWritingAidsState,
+  type MarkdownEditorWritingAidsSuspendReason,
+  type MarkdownFocusMutationKind,
+  type MarkdownTypewriterMutationKind,
+} from './markdown-editor-writing-aids'
 export {
   collectMarkdownEmbedNodes,
   runMarkdownEmbedEdit,
@@ -808,6 +860,10 @@ export const markdownEditorProps = buildProps({
   surfaces: {
     type: definePropType<MarkdownEditorSurfaceOptions>(Object),
     default: () => ({ toolbar: true }),
+  },
+  writingAids: {
+    type: definePropType<MarkdownEditorWritingAidsOptions>(Object),
+    default: undefined,
   },
   placeholder: {
     type: String,

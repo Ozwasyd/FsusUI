@@ -426,6 +426,15 @@ import {
   type MarkdownLiveSelectionMotion,
 } from './markdown-editor-live-selection'
 import {
+  createWritingAidsController,
+  type MarkdownEditorWritingAidsController,
+} from './markdown-editor-writing-aids'
+import {
+  createMarkdownOutlineModel,
+  revealHeading as revealHeadingOutline,
+  revealSourceRange as revealSourceRangeOutline,
+} from './markdown-editor-outline'
+import {
   resolveMarkdownLiveLayoutStability,
   resolveMarkdownLiveVirtualWindow,
   type MarkdownLiveLayoutGesture,
@@ -1969,10 +1978,37 @@ const insertMarkdownAtCursor = (
   }).accepted
 }
 
+const writingAidsController = createWritingAidsController({
+  writingAids: props.writingAids,
+  editorProfile: props.editorProfile,
+  readonly: props.readonly,
+  disabled: props.disabled,
+  source: transactionStore.value,
+})
+
+const revealHeading = (nodeId: string, options?: Parameters<typeof revealHeadingOutline>[4]) => {
+  const model = createMarkdownOutlineModel(transactionStore.value, documentIdentity)
+  return revealHeadingOutline(
+    model.items,
+    nodeId,
+    { documentIdentity, revision: transactionStore.revision },
+    { documentIdentity, revision: transactionStore.revision },
+    options,
+  )
+}
+
+const revealSourceRange = (range: { start: number; end: number }, options?: Parameters<typeof revealSourceRangeOutline>[2]) => {
+  const model = createMarkdownOutlineModel(transactionStore.value, documentIdentity)
+  return revealSourceRangeOutline(model.items, range, options)
+}
+
 defineExpose({
   dispatchTransaction,
   insertMarkdownAtCursor,
   redo,
   undo,
+  revealHeading,
+  revealSourceRange,
+  writingAidsController,
 })
 </script>

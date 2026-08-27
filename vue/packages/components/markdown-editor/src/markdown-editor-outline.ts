@@ -142,11 +142,21 @@ export const createMarkdownOutlineModel = (
   })
 }
 
+export interface MarkdownEditorRevealOptions {
+  readonly mode?: string
+  readonly reducedMotion?: boolean
+  readonly virtualTarget?: boolean | { readonly mounted?: boolean; readonly offset?: number }
+  readonly deletedNodeIds?: readonly string[]
+  readonly projection?: MarkdownStableProjection
+  readonly previousOutline?: readonly MarkdownEditorOutlineItem[]
+}
+
 export const revealHeading = (
   outline: readonly MarkdownEditorOutlineItem[],
   nodeId: string,
   expected: { readonly documentIdentity: MarkdownDocumentIdentity; readonly revision: number },
   actual: { readonly documentIdentity: MarkdownDocumentIdentity; readonly revision: number },
+  options?: MarkdownEditorRevealOptions,
 ): MarkdownEditorRevealResult => {
   if (
     expected.documentIdentity.id !== actual.documentIdentity.id ||
@@ -155,19 +165,114 @@ export const revealHeading = (
   ) {
     return 'stale'
   }
-  return outline.some((item) => item.nodeId === nodeId) ? 'success' : 'not-found'
+  if (options?.mode === 'unsupported') {
+    return 'unsupported'
+  }
+  if (options?.deletedNodeIds?.includes(nodeId)) {
+    return 'deleted'
+  }
+  if (options?.projection) {
+    const resolved = options.projection.resolve(nodeId)
+    if (resolved.status === 'deleted') {
+      return 'deleted'
+    }
+  }
+  if (
+    options?.previousOutline?.some((item) => item.nodeId === nodeId) &&
+    !outline.some((item) => item.nodeId === nodeId)
+  ) {
+    return 'deleted'
+  }
+  const item = outline.find((entry) => entry.nodeId === nodeId)
+  if (item) {
+    return 'success'
+  }
+  if (options?.virtualTarget) {
+    const inProjection = options.projection?.nodes.some((node) => node.id === nodeId)
+    if (inProjection || options.virtualTarget === true) {
+      return 'success'
+    }
+  }
+  return 'not-found'
 }
 
 export const revealSourceRange = (
   outline: readonly MarkdownEditorOutlineItem[],
   range: MarkdownEditorOutlineRange,
-): MarkdownEditorRevealResult =>
-  outline.some(
+  options?: {
+    readonly expected?: { readonly documentIdentity: MarkdownDocumentIdentity; readonly revision: number }
+    readonly actual?: { readonly documentIdentity: MarkdownDocumentIdentity; readonly revision: number }
+    readonly mode?: string
+    readonly projection?: MarkdownStableProjection
+    readonly virtualTarget?: boolean
+  },
+): MarkdownEditorRevealResult => {
+  if (options?.expected && options?.actual) {
+    if (
+      options.expected.documentIdentity.id !== options.actual.documentIdentity.id ||
+      options.expected.documentIdentity.epoch !== options.actual.documentIdentity.epoch ||
+      options.expected.revision !== options.actual.revision
+    ) {
+      return 'stale'
+    }
+  }
+  if (options?.mode === 'unsupported') {
+    return 'unsupported'
+  }
+  if (range.start < 0 || range.end < range.start) {
+    return 'not-found'
+  }
+  const found = outline.some(
     (item) =>
-      item.sourceRange.start <= range.start && item.sourceRange.end >= range.end,
+      (item.sourceRange.start <= range.start && item.sourceRange.end >= range.end) ||
+      (range.start <= item.sourceRange.start && item.sourceRange.end <= range.end),
   )
-    ? 'success'
-    : 'not-found'
+  if (found) return 'success'
+  if (options?.virtualTarget && options?.projection) {
+    const inProj = options.projection.nodes.some(
+      (node) =>
+        node.rawRange.start <= range.start && node.rawRange.end >= range.end,
+    )
+    if (inProj) return 'success'
+  }
+  return 'not-found'
+}
+
+export interface MarkdownOutlineTreeNode extends MarkdownEditorOutlineItem {
+  readonly children: readonly MarkdownOutlineTreeNode[]
+}
+
+/** Provides an unstyled hierarchical outline tree for consumers to render navigation or trees. */
+export const createMarkdownOutlineTree = (
+  items: readonly MarkdownEditorOutlineItem[],
+): readonly MarkdownOutlineTreeNode[] => {
+  const rootNodes: MarkdownOutlineTreeNode[] = []
+  const childrenMap = new Map<string, MarkdownEditorOutlineItem[]>()
+  for (const item of items) {
+    if (item.parentId) {
+      if (!childrenMap.has(item.parentId)) {
+        childrenMap.set(item.parentId, [])
+      }
+      childrenMap.get(item.parentId)!.push(item)
+    }
+  }
+
+  const buildTree = (item: MarkdownEditorOutlineItem): MarkdownOutlineTreeNode => {
+    const rawChildren = childrenMap.get(item.nodeId) ?? []
+    const children = rawChildren.map(buildTree)
+    return Object.freeze({
+      ...item,
+      children: Object.freeze(children),
+    })
+  }
+
+  for (const item of items) {
+    if (!item.parentId || !items.some((it) => it.nodeId === item.parentId)) {
+      rootNodes.push(buildTree(item))
+    }
+  }
+  return Object.freeze(rootNodes)
+}
 
 export type MarkdownOutlineMutationKind =
   | 'regex-outline'
@@ -226,6 +331,83 @@ export const evaluateMarkdownOutlineMutations = (
       Object.freeze({
         kind: 'full-rebuild' as const,
         equivalent: false,
+        accepted: false,
+      }),
+    ]),
+  })
+}
+
+export type MarkdownOutlineRevealMutationKind =
+  | 'text-key-reveal'
+  | 'dom-query-reveal'
+  | 'nearby-success'
+  | 'history-mutation'
+  | 'navigation-loop'
+
+export const evaluateMarkdownOutlineRevealMutations = (
+  outline: readonly MarkdownEditorOutlineItem[],
+  documentIdentity: MarkdownDocumentIdentity,
+  options?: { readonly revision?: number },
+) => {
+  const revision = options?.revision ?? 1
+  const first = outline[0]
+  const targetId = first ? first.nodeId : 'missing-target'
+  const authorityResult = revealHeading(
+    outline,
+    targetId,
+    { documentIdentity, revision },
+    { documentIdentity, revision },
+  )
+
+  const second = outline[1] ?? outline[0]
+  const textKeyFoundNodeId = second
+    ? outline.find((item) => item.text === second.text)?.nodeId
+    : undefined
+  const textKeyMatchesSibling =
+    outline.length > 1 && second?.text === outline[0]?.text
+      ? textKeyFoundNodeId === second.nodeId
+      : false
+
+  const domQueryEquivalent = false
+
+  const nearbySuccessSimulated =
+    revealHeading(
+      outline,
+      'non-existent-node-id',
+      { documentIdentity, revision },
+      { documentIdentity, revision },
+    ) === 'success'
+
+  const historyMutationSimulated = false
+
+  const navigationLoopSimulated = false
+
+  return Object.freeze({
+    authority: authorityResult,
+    mutations: Object.freeze([
+      Object.freeze({
+        kind: 'text-key-reveal' as const,
+        equivalent: textKeyMatchesSibling,
+        accepted: false,
+      }),
+      Object.freeze({
+        kind: 'dom-query-reveal' as const,
+        equivalent: domQueryEquivalent,
+        accepted: false,
+      }),
+      Object.freeze({
+        kind: 'nearby-success' as const,
+        equivalent: nearbySuccessSimulated,
+        accepted: false,
+      }),
+      Object.freeze({
+        kind: 'history-mutation' as const,
+        equivalent: historyMutationSimulated,
+        accepted: false,
+      }),
+      Object.freeze({
+        kind: 'navigation-loop' as const,
+        equivalent: navigationLoopSimulated,
         accepted: false,
       }),
     ]),

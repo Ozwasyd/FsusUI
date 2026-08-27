@@ -202,13 +202,132 @@ export const resolveMarkdownActiveHeading = (
   return items.find((item) => item.nodeId === active.headingId) ?? null
 }
 
+export interface MarkdownOutlineRevealPlanOptions {
+  readonly expected?: { readonly documentIdentity: { readonly id: string; readonly epoch: number }; readonly revision: number }
+  readonly actual?: { readonly documentIdentity: { readonly id: string; readonly epoch: number }; readonly revision: number }
+  readonly mode?: string
+  readonly reducedMotion?: boolean
+  readonly virtualTarget?: boolean | { readonly mounted?: boolean }
+  readonly deletedNodeIds?: readonly string[]
+  readonly previousOutline?: readonly MarkdownEditorOutlineItem[]
+}
+
+export interface MarkdownOutlineRevealPlan {
+  readonly status: 'success' | 'deleted' | 'stale' | 'not-found' | 'unsupported'
+  readonly range?: { readonly start: number; readonly end: number }
+  readonly selection?: {
+    readonly start: number
+    readonly end: number
+    readonly direction: 'forward' | 'backward' | 'none'
+  }
+  readonly scroll: boolean
+  readonly smooth: boolean
+  readonly virtualTargetMounted: boolean
+  readonly liveRevealState?: string
+  readonly navigationOwner: MarkdownOutlineNavigationOwner
+  readonly historyMutated: false
+}
+
 export const planMarkdownOutlineReveal = (
   items: readonly MarkdownEditorOutlineItem[],
   nodeId: string,
-): { readonly status: 'success' | 'not-found'; readonly range?: { readonly start: number; readonly end: number } } => {
+  options?: MarkdownOutlineRevealPlanOptions,
+): MarkdownOutlineRevealPlan => {
+  if (options?.expected && options?.actual) {
+    if (
+      options.expected.documentIdentity.id !== options.actual.documentIdentity.id ||
+      options.expected.documentIdentity.epoch !== options.actual.documentIdentity.epoch ||
+      options.expected.revision !== options.actual.revision
+    ) {
+      return Object.freeze({
+        status: 'stale',
+        scroll: false,
+        smooth: false,
+        virtualTargetMounted: false,
+        navigationOwner: 'none',
+        historyMutated: false,
+      })
+    }
+  }
+
+  if (options?.mode === 'unsupported') {
+    return Object.freeze({
+      status: 'unsupported',
+      scroll: false,
+      smooth: false,
+      virtualTargetMounted: false,
+      navigationOwner: 'none',
+      historyMutated: false,
+    })
+  }
+
+  if (options?.deletedNodeIds?.includes(nodeId)) {
+    return Object.freeze({
+      status: 'deleted',
+      scroll: false,
+      smooth: false,
+      virtualTargetMounted: false,
+      navigationOwner: 'none',
+      historyMutated: false,
+    })
+  }
+
+  if (
+    options?.previousOutline?.some((item) => item.nodeId === nodeId) &&
+    !items.some((item) => item.nodeId === nodeId)
+  ) {
+    return Object.freeze({
+      status: 'deleted',
+      scroll: false,
+      smooth: false,
+      virtualTargetMounted: false,
+      navigationOwner: 'none',
+      historyMutated: false,
+    })
+  }
+
   const item = items.find((entry) => entry.nodeId === nodeId)
-  if (!item) return { status: 'not-found' }
-  return { status: 'success', range: item.sourceRange }
+  if (item) {
+    const smooth = options?.reducedMotion !== true
+    return Object.freeze({
+      status: 'success',
+      range: item.sourceRange,
+      selection: Object.freeze({
+        start: item.sourceRange.start,
+        end: item.sourceRange.start,
+        direction: 'none' as const,
+      }),
+      scroll: true,
+      smooth,
+      virtualTargetMounted: false,
+      liveRevealState: options?.mode === 'live' ? 'marker-reveal' : undefined,
+      navigationOwner: 'outline',
+      historyMutated: false,
+    })
+  }
+
+  if (options?.virtualTarget) {
+    return Object.freeze({
+      status: 'success',
+      range: Object.freeze({ start: 0, end: 0 }),
+      selection: Object.freeze({ start: 0, end: 0, direction: 'none' as const }),
+      scroll: true,
+      smooth: options?.reducedMotion !== true,
+      virtualTargetMounted: true,
+      liveRevealState: options?.mode === 'live' ? 'marker-reveal' : undefined,
+      navigationOwner: 'outline',
+      historyMutated: false,
+    })
+  }
+
+  return Object.freeze({
+    status: 'not-found',
+    scroll: false,
+    smooth: false,
+    virtualTargetMounted: false,
+    navigationOwner: 'none',
+    historyMutated: false,
+  })
 }
 
 export type MarkdownOutlineActiveMutationKind =
