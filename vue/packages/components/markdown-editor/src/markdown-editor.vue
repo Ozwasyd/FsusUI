@@ -297,9 +297,7 @@
               :aria-label="localeText.pasteAsMarkdown.conversionWarnings"
             >
               <h3>{{ localeText.pasteAsMarkdown.conversionWarnings }}</h3>
-              <ul
-                :aria-label="localeText.pasteAsMarkdown.conversionWarnings"
-              >
+              <ul :aria-label="localeText.pasteAsMarkdown.conversionWarnings">
                 <li
                   v-for="warning in pasteAsMarkdownSession.preview.warnings"
                   :key="`${warning.kind}:${warning.code}:${warning.detail || ''}`"
@@ -414,6 +412,10 @@ import {
   type MarkdownPasteAsMarkdownSession,
 } from './markdown-editor-paste-markdown'
 import { resolveMarkdownLanguageToolContextCapability } from './markdown-editor-language-tools'
+import {
+  bindMarkdownWebLanguageTools,
+  type MarkdownWebLanguageController,
+} from './markdown-editor-language-web'
 import { createMarkdownEditorNativeEventMachine } from './markdown-editor-native-event'
 import { createMarkdownLiveSurface } from './markdown-editor-live-surface'
 import {
@@ -450,6 +452,10 @@ const ns = useNamespace('markdown-editor')
 const modes: MarkdownEditorMode[] = ['source', 'live', 'split', 'preview']
 const commandTrayId = `${useId()}-command-tray`
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
+let languageToolsController: MarkdownWebLanguageController | null = null
+let languageToolsRevision = -1
+let languageToolsSource = ''
+let languageToolsConfigKey = ''
 const pasteAsMarkdownDialogRef = ref<HTMLElement | null>(null)
 const pasteAsMarkdownPrimaryActionRef = ref<HTMLButtonElement | null>(null)
 const pasteAsMarkdownSession = ref<MarkdownPasteAsMarkdownSession | null>(null)
@@ -475,7 +481,9 @@ const chromeRegions = computed(() =>
   }),
 )
 const textareaAriaLabel = computed(() =>
-  currentMode.value === 'live' ? 'Markdown editor live editing surface' : 'Markdown editor source',
+  currentMode.value === 'live'
+    ? 'Markdown editor live editing surface'
+    : 'Markdown editor source',
 )
 const compactMode = computed(() => props.mobileLayout === 'compact')
 const normalizeModeForLayout = (
@@ -529,6 +537,39 @@ const languageCapability = computed(() =>
     source: editorValue.value,
   }),
 )
+const languageToolsConfig = () => ({
+  lang: props.lang,
+  nativeWritingTools: props.nativeWritingTools,
+  spellcheck: props.spellcheck,
+})
+const syncLanguageToolsState = () => {
+  const controller = languageToolsController
+  if (!controller) return null
+  const config = languageToolsConfig()
+  const configKey = JSON.stringify(config)
+  if (
+    languageToolsRevision !== transactionStore.revision ||
+    languageToolsSource !== transactionStore.value ||
+    languageToolsConfigKey !== configKey
+  ) {
+    controller.updateState({
+      config,
+      revision: transactionStore.revision,
+      source: transactionStore.value,
+    })
+    languageToolsRevision = transactionStore.revision
+    languageToolsSource = transactionStore.value
+    languageToolsConfigKey = configKey
+  }
+  controller.switchMode(currentMode.value)
+  return controller.updateContext({
+    disabled: inputDisabled.value,
+    isComposing: nativeMachine.composing,
+    mode: currentMode.value,
+    readonly: props.readonly,
+    selection: transactionStore.selection,
+  })
+}
 const isComposing = ref(false)
 const pasteAsMarkdownGate = computed<
   'composition' | 'readonly' | 'disabled' | 'loading' | 'previewOnly' | null
@@ -834,6 +875,7 @@ const dispatchEditorOperation = (
     emit(CHANGE_EVENT, result.value)
     refreshLiveWindow('input')
   }
+  if (result.accepted) syncLanguageToolsState()
   if (
     result.accepted &&
     (result.selection.start !== previousSelection.start ||
@@ -924,7 +966,13 @@ watch(
   ([mode, defaultMode]) => {
     transactionStore.breakMergeGroup()
     currentMode.value = normalizeModeForLayout(mode ?? defaultMode)
+    syncLanguageToolsState()
   },
+)
+
+watch(
+  [() => props.lang, () => props.nativeWritingTools, () => props.spellcheck],
+  () => syncLanguageToolsState(),
 )
 
 watch(
@@ -1114,6 +1162,20 @@ const updateVisualViewportHeight = () => {
 }
 
 onMounted(() => {
+  const textarea = textareaRef.value
+  if (textarea) {
+    languageToolsController = bindMarkdownWebLanguageTools(textarea, {
+      config: languageToolsConfig(),
+      documentIdentity,
+      mode: currentMode.value,
+      revision: transactionStore.revision,
+      source: transactionStore.value,
+    })
+    languageToolsRevision = transactionStore.revision
+    languageToolsSource = transactionStore.value
+    languageToolsConfigKey = JSON.stringify(languageToolsConfig())
+    syncLanguageToolsState()
+  }
   refreshLiveWindow('initial')
   updateVisualViewportHeight()
   window.visualViewport?.addEventListener('resize', updateVisualViewportHeight)
@@ -1122,6 +1184,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  languageToolsController = null
   abortPendingCommands()
   if (layoutGestureTimer) clearTimeout(layoutGestureTimer)
   if (typeof window === 'undefined') return
@@ -1138,6 +1201,18 @@ onBeforeUnmount(() => {
 })
 
 const handleBeforeInput = (event: InputEvent) => {
+  syncLanguageToolsState()
+  if (event.inputType === 'insertReplacementText' && languageToolsController) {
+    languageToolsController.createSession('spellcheck')
+    const replacement = languageToolsController.handleBeforeInput(event)
+    if (replacement.handled && replacement.transaction) {
+      dispatchTransaction(replacement.transaction)
+      beforeInputSnapshot = undefined
+      pendingClipboardIdentity = undefined
+      pendingInputOrigin = undefined
+      return
+    }
+  }
   const plan = nativeMachine.apply({
     clipboardIdentity: pendingClipboardIdentity,
     data: event.data,
@@ -1189,7 +1264,11 @@ const handleInput = (event: Event) => {
   })
   syncNativeComposing()
   beforeInputSnapshot = undefined
-  if (plan.action === 'dedup' || plan.action === 'prevent' || plan.action === 'ignore') {
+  if (
+    plan.action === 'dedup' ||
+    plan.action === 'prevent' ||
+    plan.action === 'ignore'
+  ) {
     pendingClipboardIdentity = undefined
     pendingInputOrigin = undefined
     if (plan.restoreDisplay && target.value !== transactionStore.value) {
@@ -1278,15 +1357,15 @@ const handleCompositionEnd = (event: CompositionEvent) => {
       ? laggedSelection
       : readSelectionFrom(target),
     {
-    history: plan.history,
-    metadata: Object.freeze({
-      composition: true,
-      data: event.data,
-      identity: plan.identity,
-      inputType: 'insertCompositionText',
-    }),
-    origin: 'input',
-  },
+      history: plan.history,
+      metadata: Object.freeze({
+        composition: true,
+        data: event.data,
+        identity: plan.identity,
+        inputType: 'insertCompositionText',
+      }),
+      origin: 'input',
+    },
   )
   refreshLiveReveal()
 }
@@ -1358,7 +1437,10 @@ const handleDrop = (event: DragEvent) => {
 }
 
 const handleCopy = (event: ClipboardEvent) => {
-  if (currentMode.value === 'live' && atomicSession.value?.phase === 'selected') {
+  if (
+    currentMode.value === 'live' &&
+    atomicSession.value?.phase === 'selected'
+  ) {
     const atomic = applyAtomicIntent('copy-source')
     if (atomic.copy && 'payload' in atomic.copy) {
       event.preventDefault()
@@ -1384,7 +1466,10 @@ const handleCopy = (event: ClipboardEvent) => {
 }
 
 const handleCut = (event: ClipboardEvent) => {
-  if (currentMode.value === 'live' && atomicSession.value?.phase === 'selected') {
+  if (
+    currentMode.value === 'live' &&
+    atomicSession.value?.phase === 'selected'
+  ) {
     const atomic = applyAtomicIntent('cut')
     if (atomic.copy && 'payload' in atomic.copy) {
       event.preventDefault()
@@ -1393,7 +1478,10 @@ const handleCut = (event: ClipboardEvent) => {
     }
     if (atomic.copy && 'copy' in atomic.copy) {
       event.preventDefault()
-      writeMarkdownClipboardPayload(event.clipboardData, atomic.copy.copy.payload)
+      writeMarkdownClipboardPayload(
+        event.clipboardData,
+        atomic.copy.copy.payload,
+      )
       return
     }
   }
@@ -1418,6 +1506,7 @@ const handleCut = (event: ClipboardEvent) => {
 const handleSelectionMove = () => {
   if (restoringSelection || isComposing.value) return
   captureSelection()
+  syncLanguageToolsState()
   if (currentMode.value === 'live') {
     const selection = transactionStore.selection
     if (selection.start !== selection.end) {
@@ -1627,9 +1716,17 @@ const runCommand = async (command: MarkdownEditorCommand) => {
       signal: commandController.signal,
       value,
     }
-    if (!isMarkdownEditorCommandVisible(command, context) || !isMarkdownEditorCommandEnabled(command, context)) return
+    if (
+      !isMarkdownEditorCommandVisible(command, context) ||
+      !isMarkdownEditorCommandEnabled(command, context)
+    )
+      return
     const result = await runMarkdownEditorCommand(command, context)
-    if (commandController.signal.aborted || commandControllers.get(command.key) !== commandController) return
+    if (
+      commandController.signal.aborted ||
+      commandControllers.get(command.key) !== commandController
+    )
+      return
     if (!result?.transaction) return
     const dispatchResult = dispatchTransaction({
       ...result.transaction,
@@ -1763,7 +1860,12 @@ const handleKeydown = (event: KeyboardEvent) => {
       applyLiveSelectionMotion(motionKey, { shift: event.shiftKey })
       return
     }
-    if (event.key === 'Enter' && !event.altKey && !event.ctrlKey && !event.metaKey) {
+    if (
+      event.key === 'Enter' &&
+      !event.altKey &&
+      !event.ctrlKey &&
+      !event.metaKey
+    ) {
       const atomic = resolveMarkdownAtomicNodeIntent({
         action: 'caret-before',
         composing: isComposing.value,
@@ -1886,12 +1988,7 @@ const handleKeydown = (event: KeyboardEvent) => {
           : event.key === 'Delete'
             ? 'delete'
             : null
-  if (
-    blockKey &&
-    !event.altKey &&
-    !event.ctrlKey &&
-    !event.metaKey
-  ) {
+  if (blockKey && !event.altKey && !event.ctrlKey && !event.metaKey) {
     const plan = resolveMarkdownBlockInputIntent({
       source: transactionStore.value,
       selection: captureSelection(),

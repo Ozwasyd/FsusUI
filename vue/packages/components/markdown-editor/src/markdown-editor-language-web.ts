@@ -31,13 +31,14 @@ export type MarkdownWebLanguageBrowser =
 export interface MarkdownWebTextareaLike {
   autocapitalize?: string
   autocomplete?: string
-  autocorrect?: string
+  autocorrect?: boolean | string
   lang?: string
   selectionDirection?: 'backward' | 'forward' | 'none'
   selectionEnd?: number
   selectionStart?: number
   spellcheck?: boolean
   value?: string
+  setAttribute?(name: string, value: string): void
 }
 
 export interface MarkdownWebLanguageCoordinates {
@@ -58,8 +59,14 @@ export interface MarkdownWebLanguageController {
   readonly session: MarkdownLanguageToolSession | null
   readonly spellcheck: boolean
   readonly status: string
-  applyReplacement(from: number, to: number, insert: string): MarkdownEditorTransaction
-  createSession(kind?: MarkdownLanguageToolSessionKind): MarkdownLanguageToolSession
+  applyReplacement(
+    from: number,
+    to: number,
+    insert: string,
+  ): MarkdownEditorTransaction
+  createSession(
+    kind?: MarkdownLanguageToolSessionKind,
+  ): MarkdownLanguageToolSession
   handleBeforeInput(event: {
     readonly data?: string | null
     readonly getTargetRanges?: () => readonly unknown[]
@@ -72,6 +79,11 @@ export interface MarkdownWebLanguageController {
     readonly transaction?: MarkdownEditorTransaction
   }
   switchMode(nextMode: MarkdownEditorMode): MarkdownLanguageToolCapability
+  updateState(input: {
+    readonly config?: MarkdownLanguageToolConfig
+    readonly revision: number
+    readonly source: string
+  }): MarkdownLanguageToolCapability
   updateContext(input: {
     readonly disabled?: boolean
     readonly isComposing?: boolean
@@ -159,10 +171,19 @@ export const bindMarkdownWebLanguageTools = (
 ): MarkdownWebLanguageController & MarkdownLanguageToolCapability => {
   const documentIdentity =
     options.documentIdentity ?? Object.freeze({ epoch: 0, id: 'web-editor' })
-  const currentRevision = options.revision ?? 0
+  let currentRevision = options.revision ?? 0
+  let currentSource = options.source ?? textarea.value ?? ''
+  let currentConfig = options.config
   let currentMode: MarkdownEditorMode = options.mode ?? 'source'
-  let currentCapability = resolveMarkdownLanguageToolCapability(options.config)
+  let currentCapability = resolveMarkdownLanguageToolCapability(currentConfig)
   let currentSession: MarkdownLanguageToolSession | null = null
+  const baseCapability = () =>
+    resolveMarkdownLanguageToolCapability(currentConfig)
+  const applyAutocorrect = () => {
+    const value = currentCapability.autocorrect ? 'on' : 'off'
+    if (textarea.setAttribute) textarea.setAttribute('autocorrect', value)
+    else textarea.autocorrect = value
+  }
 
   textarea.spellcheck = currentCapability.spellcheck
   if (currentCapability.lang) {
@@ -170,7 +191,7 @@ export const bindMarkdownWebLanguageTools = (
   }
   textarea.autocapitalize = 'sentences'
   textarea.autocomplete = 'off'
-  textarea.autocorrect = currentCapability.autocorrect ? 'on' : 'off'
+  applyAutocorrect()
 
   return Object.freeze({
     get autocorrect() {
@@ -228,7 +249,24 @@ export const bindMarkdownWebLanguageTools = (
 
     switchMode(nextMode: MarkdownEditorMode) {
       currentMode = nextMode
+      textarea.spellcheck = baseCapability().spellcheck
+      return currentCapability
+    },
+
+    updateState(input: {
+      readonly config?: MarkdownLanguageToolConfig
+      readonly revision: number
+      readonly source: string
+    }) {
+      currentRevision = input.revision
+      currentSource = input.source
+      currentConfig = input.config ?? currentConfig
+      currentSession = null
+      currentCapability = resolveMarkdownLanguageToolCapability(currentConfig)
       textarea.spellcheck = currentCapability.spellcheck
+      if (currentCapability.lang) textarea.lang = currentCapability.lang
+      else textarea.lang = ''
+      applyAutocorrect()
       return currentCapability
     },
 
@@ -240,14 +278,11 @@ export const bindMarkdownWebLanguageTools = (
       readonly readonly?: boolean
       readonly selection?: MarkdownEditorSelection
     }) {
-      const source = textarea.value ?? options.source ?? ''
+      const source = currentSource
       const offset =
-        input.selection?.start ??
-        input.offset ??
-        textarea.selectionStart ??
-        0
+        input.selection?.start ?? input.offset ?? textarea.selectionStart ?? 0
       const nextCapability = resolveMarkdownLanguageToolContextCapability({
-        config: options.config,
+        config: currentConfig,
         disabled: input.disabled,
         documentIdentity,
         isComposing: input.isComposing,
@@ -259,7 +294,7 @@ export const bindMarkdownWebLanguageTools = (
         source,
       })
       currentCapability = nextCapability
-      textarea.spellcheck = nextCapability.spellcheck
+      textarea.spellcheck = baseCapability().spellcheck
       return currentCapability
     },
 
@@ -274,10 +309,16 @@ export const bindMarkdownWebLanguageTools = (
         return Object.freeze({ handled: false, reason: 'composition-active' })
       }
       if (event.inputType === 'insertReplacementText') {
+        if (!currentCapability.spellcheck) {
+          return Object.freeze({
+            handled: false,
+            reason: currentCapability.reason ?? 'unavailable',
+          })
+        }
         const from = textarea.selectionStart ?? 0
         const to = textarea.selectionEnd ?? from
         const insert = event.data ?? ''
-        const source = textarea.value ?? options.source ?? ''
+        const source = currentSource
         const commit = commitMarkdownLanguageToolMutation({
           currentDocumentIdentity: documentIdentity,
           currentRevision,
@@ -443,6 +484,7 @@ export const driveMarkdownWebLanguageTrace = (
   } else if (scenario === 'code-url-suppression') {
     const codeSource = '```js\nconst wrld = 1\n```\n'
     textarea.value = codeSource
+    controller.updateState({ revision: 1, source: codeSource })
     const codeCap = controller.updateContext({ offset: 12 })
     trace.push(
       Object.freeze({
@@ -457,6 +499,7 @@ export const driveMarkdownWebLanguageTrace = (
     )
     const proseSource = 'Hello wrld'
     textarea.value = proseSource
+    controller.updateState({ revision: 1, source: proseSource })
     const proseCap = controller.updateContext({ offset: 6 })
     trace.push(
       Object.freeze({
