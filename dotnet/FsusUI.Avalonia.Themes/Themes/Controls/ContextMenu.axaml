@@ -9,6 +9,18 @@
     <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusSurfaceMd}" />
     <Setter Property="Padding" Value="{DynamicResource FsusSpace1}" />
     <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodyMdSize}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border
+          Background="{TemplateBinding Background}"
+          BorderBrush="{TemplateBinding BorderBrush}"
+          BorderThickness="{TemplateBinding BorderThickness}"
+          CornerRadius="{TemplateBinding CornerRadius}"
+          Padding="{TemplateBinding Padding}">
+          <ContentPresenter Content="{TemplateBinding Content}" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
     <Setter Property="Transitions">
       <Transitions>
         <DoubleTransition
@@ -29,6 +41,32 @@
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
     <Setter Property="BorderBrush" Value="Transparent" />
     <Setter Property="BorderThickness" Value="2,0,0,0" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border
+          Background="{TemplateBinding Background}"
+          BorderBrush="{TemplateBinding BorderBrush}"
+          BorderThickness="{TemplateBinding BorderThickness}"
+          Padding="{TemplateBinding Padding}">
+          <Grid ColumnDefinitions="Auto,*,Auto">
+            <ContentPresenter
+              Grid.Column="0"
+              Content="{TemplateBinding IconContent}"
+              Margin="{DynamicResource FsusSpace1}"
+              VerticalAlignment="Center" />
+            <ContentPresenter
+              Grid.Column="1"
+              Content="{TemplateBinding Header}"
+              VerticalAlignment="Center" />
+            <TextBlock
+              Grid.Column="2"
+              Text="{TemplateBinding Accelerator}"
+              Foreground="{DynamicResource FsusThemeMutedTextBrush}"
+              VerticalAlignment="Center" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
     <Setter Property="Transitions">
       <Transitions>
         <DoubleTransition
@@ -39,8 +77,12 @@
     </Setter>
   </Style>
 
+  <Style Selector="fsus|FsusContextMenuItem:pointerover, fsus|FsusContextMenuItem.fsus-focused">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+  </Style>
+
   <Style Selector="fsus|FsusContextMenuItem.fsus-focused">
-    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
   </Style>
 
   <Style Selector="fsus|FsusContextMenuItem.fsus-dangerous">
@@ -55,5 +97,12 @@
     <Setter Property="MinHeight" Value="1" />
     <Setter Property="Padding" Value="0" />
     <Setter Property="Background" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border
+          MinHeight="{TemplateBinding MinHeight}"
+          Background="{TemplateBinding Background}" />
+      </ControlTemplate>
+    </Setter>
   </Style>
 </Styles>

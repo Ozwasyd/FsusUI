@@ -4,7 +4,10 @@ using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using FsusUI.Avalonia.Overlay;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Runtime.CompilerServices;
 
 namespace FsusUI.Avalonia.Controls;
@@ -25,7 +28,17 @@ public sealed class FsusContextMenuItemActivatedEventArgs(
 
 public abstract class FsusContextMenuEntry(string className) : ContentControl
 {
+  internal FsusContextMenu? OwnerMenu { get; set; }
+
   protected string BaseClassName { get; } = className;
+
+  protected override AutomationPeer OnCreateAutomationPeer() =>
+    new ControlAutomationPeer(this);
+
+  protected void InitializeEntry()
+  {
+    FsusComponentClasses.SetBaseClasses(this, BaseClassName);
+  }
 }
 
 public class FsusContextMenuItem : FsusContextMenuEntry
@@ -47,6 +60,7 @@ public class FsusContextMenuItem : FsusContextMenuEntry
 
   public FsusContextMenuItem() : base("fsus-context-menu-item")
   {
+    InitializeEntry();
     Focusable = true;
     SyncState();
   }
@@ -97,12 +111,50 @@ public class FsusContextMenuItem : FsusContextMenuEntry
     }
   }
 
+  protected override void OnPointerPressed(PointerPressedEventArgs e)
+  {
+    base.OnPointerPressed(e);
+    if (
+      e.Handled ||
+      !IsEnabled ||
+      !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed ||
+      OwnerMenu is null)
+    {
+      return;
+    }
+
+    e.Handled = true;
+    _ = OwnerMenu.ChooseAsync(Key);
+  }
+
+  protected override void OnKeyDown(KeyEventArgs e)
+  {
+    base.OnKeyDown(e);
+    if (
+      e.Handled ||
+      !IsEnabled ||
+      e.Key is not (global::Avalonia.Input.Key.Enter or global::Avalonia.Input.Key.Space) ||
+      OwnerMenu is null)
+    {
+      return;
+    }
+
+    e.Handled = true;
+    _ = OwnerMenu.ChooseAsync(Key);
+  }
+
   internal void SyncState()
   {
     FsusComponentClasses.Ensure(this, "fsus-dangerous", IsDangerous);
     FsusComponentClasses.Ensure(this, "fsus-disabled", !IsEnabled);
     AutomationProperties.SetName(this, FsusComponentClasses.ResolveName(null, Header));
-    AutomationProperties.SetItemStatus(this, IsEnabled ? "available" : "disabled");
+    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.MenuItem);
+    AutomationProperties.SetHelpText(this, Accelerator ?? string.Empty);
+    AutomationProperties.SetItemStatus(
+      this,
+      IsEnabled
+        ? IsDangerous ? "available, dangerous action" : "available"
+        : "disabled");
   }
 }
 
@@ -110,25 +162,45 @@ public class FsusContextMenuSeparator : FsusContextMenuEntry
 {
   public FsusContextMenuSeparator() : base("fsus-context-menu-separator")
   {
+    InitializeEntry();
     Focusable = false;
+    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Separator);
   }
 }
 
 public class FsusContextMenu : ContentControl, IFsusOverlayLifecycle
 {
-  private readonly List<FsusContextMenuEntry> items = [];
+  private readonly ObservableCollection<FsusContextMenuEntry> items = [];
+  private readonly StackPanel itemsPanel = new();
   private FsusOverlayHost? overlayHost;
+  private string? accessibleName;
 
   public FsusContextMenu()
   {
     FsusComponentClasses.SetBaseClasses(this, "fsus-context-menu");
     AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Menu);
+    items.CollectionChanged += OnItemsChanged;
+    Content = itemsPanel;
     SyncState();
   }
 
   public event EventHandler<FsusContextMenuItemActivatedEventArgs>? ItemActivated;
 
-  public string? AccessibleName { get; set; }
+  public string? AccessibleName
+  {
+    get => accessibleName;
+    set
+    {
+      if (accessibleName == value)
+      {
+        return;
+      }
+
+      accessibleName = value;
+      SyncState();
+    }
+  }
+
   public IList<FsusContextMenuEntry> Items => items;
   public Size OverlaySize { get; set; } = new(200, 240);
   public Rect ViewportBounds { get; set; } = new(0, 0, 1920, 1080);
@@ -150,13 +222,24 @@ public class FsusContextMenu : ContentControl, IFsusOverlayLifecycle
       throw new InvalidOperationException("Context menu is disabled.");
     }
 
-    if (IsOpen && OverlayEntry is not null)
+    if (
+      IsOpen &&
+      OverlayEntry is not null &&
+      TargetKey == request.TargetKey &&
+      ReferenceEquals(Invoker, request.Invoker) &&
+      OverlayEntry.Options.AnchorBounds == request.AnchorBounds)
     {
       return OverlayEntry;
     }
 
+    if (IsOpen)
+    {
+      CloseForRewire();
+    }
+
     TargetKey = request.TargetKey;
     Invoker = request.Invoker;
+    SelectedActionKey = string.Empty;
     return host.Open(this, new FsusOverlayOptions
     {
       IsModal = false,
@@ -167,6 +250,7 @@ public class FsusContextMenu : ContentControl, IFsusOverlayLifecycle
       OverlaySize = OverlaySize,
       ViewportBounds = ViewportBounds,
       Placement = FsusOverlayPlacement.BottomStart,
+      FocusScope = [.. SelectableItems()],
     });
   }
 
@@ -198,6 +282,12 @@ public class FsusContextMenu : ContentControl, IFsusOverlayLifecycle
       case Key.Up:
         MoveFocus(-1);
         return ValueTask.FromResult(true);
+      case Key.Home:
+        FocusFirst();
+        return ValueTask.FromResult(true);
+      case Key.End:
+        FocusLast();
+        return ValueTask.FromResult(true);
       case Key.Enter:
       case Key.Space:
         return ChooseFocusedAsync();
@@ -215,6 +305,18 @@ public class FsusContextMenu : ContentControl, IFsusOverlayLifecycle
     {
       FocusedKey = first.Key;
       SyncItems();
+      first.Focus();
+    }
+  }
+
+  public void FocusLast()
+  {
+    var last = SelectableItems().LastOrDefault();
+    if (last is not null)
+    {
+      FocusedKey = last.Key;
+      SyncItems();
+      last.Focus();
     }
   }
 
@@ -230,6 +332,40 @@ public class FsusContextMenu : ContentControl, IFsusOverlayLifecycle
     var next = index < 0 ? 0 : (index + direction + selectable.Count) % selectable.Count;
     FocusedKey = selectable[next].Key;
     SyncItems();
+    selectable[next].Focus();
+  }
+
+  protected override void OnKeyDown(KeyEventArgs e)
+  {
+    base.OnKeyDown(e);
+    if (!e.Handled)
+    {
+      e.Handled = HandleKeyAsync(e.Key).GetAwaiter().GetResult();
+    }
+  }
+
+  protected override void OnPointerPressed(PointerPressedEventArgs e)
+  {
+    base.OnPointerPressed(e);
+    if (
+      e.Handled ||
+      !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+    {
+      return;
+    }
+
+    var point = e.GetPosition(itemsPanel);
+    var item = items.OfType<FsusContextMenuItem>()
+      .FirstOrDefault(candidate =>
+        candidate.IsEnabled &&
+        candidate.Bounds.Contains(point));
+    if (item is null)
+    {
+      return;
+    }
+
+    e.Handled = true;
+    _ = ChooseAsync(item.Key);
   }
 
   public async ValueTask<bool> ChooseFocusedAsync() =>
@@ -259,6 +395,15 @@ public class FsusContextMenu : ContentControl, IFsusOverlayLifecycle
     IsOpen = true;
     EffectivePlacement = entry.Placement;
     FocusFirst();
+    Dispatcher.UIThread.Post(
+      () =>
+      {
+        if (IsOpen && TopLevel.GetTopLevel(this) is not null)
+        {
+          FocusFirst();
+        }
+      },
+      DispatcherPriority.Input);
     SyncState();
   }
 
@@ -267,11 +412,30 @@ public class FsusContextMenu : ContentControl, IFsusOverlayLifecycle
     OverlayEntry = null;
     overlayHost = null;
     IsOpen = false;
+    FocusedKey = string.Empty;
+    SyncItems();
     SyncState();
   }
 
   private IEnumerable<FsusContextMenuItem> SelectableItems() =>
     items.OfType<FsusContextMenuItem>().Where((item) => item.IsEnabled);
+
+  private void OnItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+  {
+    foreach (var existing in itemsPanel.Children.OfType<FsusContextMenuEntry>())
+    {
+      existing.OwnerMenu = null;
+    }
+
+    itemsPanel.Children.Clear();
+    foreach (var entry in items)
+    {
+      entry.OwnerMenu = this;
+      itemsPanel.Children.Add(entry);
+    }
+
+    SyncItems();
+  }
 
   private void SyncItems()
   {
@@ -407,7 +571,7 @@ public static class FsusContextMenuService
       Menu.Open(Host, new FsusContextMenuRequest(
         string.Empty,
         FsusTreeInteractionSource.Pointer,
-        new Rect(offset.X, offset.Y, Target.Bounds.Width, Target.Bounds.Height),
+        new Rect(offset, new Size(1, 1)),
         Target));
     }
 

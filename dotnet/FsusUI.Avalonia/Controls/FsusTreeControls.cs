@@ -152,6 +152,9 @@ public class FsusTree : ContentControl
   private readonly HashSet<string> expandedKeys = new(StringComparer.Ordinal);
   private readonly HashSet<string> selectedKeys = new(StringComparer.Ordinal);
   private readonly HashSet<string> checkedKeys = new(StringComparer.Ordinal);
+  private readonly Dictionary<string, Border> renderedRows = new(StringComparer.Ordinal);
+  private readonly Dictionary<string, FsusTreeLazyLoadState> lazyLoadStates = new(StringComparer.Ordinal);
+  private readonly StackPanel rowsPanel = new();
   private CancellationTokenSource? loadCancellation;
   private int loadVersion;
 
@@ -159,6 +162,7 @@ public class FsusTree : ContentControl
   {
     FsusComponentClasses.SetBaseClasses(this, "fsus-tree");
     Focusable = true;
+    Content = rowsPanel;
     SyncState();
   }
 
@@ -209,6 +213,7 @@ public class FsusTree : ContentControl
       FocusedKey = flattenedNodes[0].Node.Key;
     }
 
+    RefreshRows();
     SyncState();
   }
 
@@ -271,6 +276,7 @@ public class FsusTree : ContentControl
     }
 
     FocusedKey = key;
+    RefreshRows();
     SyncState();
     RaiseSelectionChanged(added, removed);
     return true;
@@ -289,6 +295,7 @@ public class FsusTree : ContentControl
     }
 
     FocusedKey = key;
+    RefreshRows();
     SyncState();
     return true;
   }
@@ -301,6 +308,7 @@ public class FsusTree : ContentControl
     }
 
     FocusedKey = key;
+    RefreshRows();
     SyncState();
     return true;
   }
@@ -314,6 +322,7 @@ public class FsusTree : ContentControl
     }
 
     FocusedKey = key;
+    RefreshRows();
     SyncState();
     var activation = new FsusTreeNodeActivatedEventArgs(key, source);
     NodeActivated?.Invoke(this, activation);
@@ -328,14 +337,14 @@ public class FsusTree : ContentControl
       return false;
     }
 
-    FocusedKey = key;
-    SyncState();
+    var anchorBounds = ResolveNodeAnchorBounds(key);
+    FocusNode(key);
     if (!selectedKeys.Contains(key))
     {
       ToggleSelection(key);
     }
 
-    RaiseEvent(new FsusTreeNodeContextEventArgs(key, node, source, ResolveNodeAnchorBounds(key)));
+    RaiseEvent(new FsusTreeNodeContextEventArgs(key, node, source, anchorBounds));
     return true;
   }
 
@@ -434,18 +443,24 @@ public class FsusTree : ContentControl
     {
       case Key.Down:
         FocusedKey = flattenedNodes[Math.Min(flattenedNodes.Count - 1, index + 1)].Node.Key;
+        RefreshRows();
         SyncState();
         return ValueTask.FromResult(true);
       case Key.Up:
         FocusedKey = flattenedNodes[Math.Max(0, index - 1)].Node.Key;
+        RefreshRows();
         SyncState();
         return ValueTask.FromResult(true);
       case Key.Enter:
         return ValueTask.FromResult(Activate(FocusedKey, FsusTreeInteractionSource.Keyboard));
       case Key.Right:
-        return ValueTask.FromResult(GestureExpand(FocusedKey));
+        return ValueTask.FromResult(GestureExpand(
+          FocusedKey,
+          FsusTreeInteractionSource.Keyboard));
       case Key.Left:
-        return ValueTask.FromResult(GestureCollapse(FocusedKey));
+        return ValueTask.FromResult(GestureCollapse(
+          FocusedKey,
+          FsusTreeInteractionSource.Keyboard));
       case Key.Space:
         return ValueTask.FromResult(ToggleSelection(FocusedKey));
       default:
@@ -474,13 +489,19 @@ public class FsusTree : ContentControl
       RequestNodeContext(FocusedKey, FsusTreeInteractionSource.Keyboard))
     {
       e.Handled = true;
+      return;
     }
+
+    e.Handled = HandleKeyAsync(e.Key).GetAwaiter().GetResult();
   }
 
   private Rect ResolveNodeAnchorBounds(string key) =>
-    NodeAnchorBoundsResolver?.Invoke(key) ?? new Rect(0, 0, 0, 0);
+    NodeAnchorBoundsResolver?.Invoke(key) ??
+    (renderedRows.TryGetValue(key, out var row)
+      ? new Rect(row.TranslatePoint(default, this) ?? default, row.Bounds.Size)
+      : new Rect(0, 0, 0, 0));
 
-  private bool GestureExpand(string key)
+  private bool GestureExpand(string key, FsusTreeInteractionSource source)
   {
     if (!Expand(key))
     {
@@ -490,11 +511,11 @@ public class FsusTree : ContentControl
     ExpansionChanged?.Invoke(this, new FsusTreeExpansionChangedEventArgs(
       key,
       true,
-      FsusTreeInteractionSource.Keyboard));
+      source));
     return true;
   }
 
-  private bool GestureCollapse(string key)
+  private bool GestureCollapse(string key, FsusTreeInteractionSource source)
   {
     if (!Collapse(key))
     {
@@ -504,8 +525,119 @@ public class FsusTree : ContentControl
     ExpansionChanged?.Invoke(this, new FsusTreeExpansionChangedEventArgs(
       key,
       false,
-      FsusTreeInteractionSource.Keyboard));
+      source));
     return true;
+  }
+
+  private bool GestureToggleExpansion(string key, FsusTreeInteractionSource source) =>
+    expandedKeys.Contains(key)
+      ? GestureCollapse(key, source)
+      : GestureExpand(key, source);
+
+  private void RefreshRows()
+  {
+    renderedRows.Clear();
+    rowsPanel.Children.Clear();
+    foreach (var view in flattenedNodes)
+    {
+      var node = view.Node;
+      var expandable = node.Children.Count > 0 || node.HasLazyChildren;
+      var statePrefix = expandable
+        ? expandedKeys.Contains(node.Key) ? "▾" : "▸"
+        : " ";
+      var label = new TextBlock
+      {
+        Text = $"{statePrefix} {node.Label}",
+        VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
+        TextTrimming = global::Avalonia.Media.TextTrimming.CharacterEllipsis,
+      };
+      var row = new Border
+      {
+        Child = label,
+        MinHeight =
+          Application.Current?.Resources[
+            global::FsusUI.Avalonia.FsusTokens.DensityControlDefaultYResourceKey] is double
+            currentDensityHeight
+              ? currentDensityHeight
+              : global::FsusUI.Avalonia.FsusTokens.DensityControlDefaultYDouble,
+        Padding = global::FsusUI.Avalonia.FsusTokens.Space2Thickness,
+        Margin = new Thickness(
+          Math.Max(0, view.Level - 1) *
+          global::FsusUI.Avalonia.FsusTokens.Space5Thickness.Left,
+          0,
+          0,
+          0),
+        Focusable = false,
+        IsEnabled = !node.IsDisabled,
+      };
+      FsusComponentClasses.SetBaseClasses(row, "fsus-tree-row");
+      FsusComponentClasses.Ensure(row, "fsus-selected", selectedKeys.Contains(node.Key));
+      FsusComponentClasses.Ensure(row, "fsus-focused", FocusedKey == node.Key);
+      FsusComponentClasses.Ensure(row, "fsus-disabled", node.IsDisabled);
+      FsusComponentClasses.Ensure(row, "fsus-expandable", expandable);
+      AutomationProperties.SetAutomationId(row, $"fsus-tree-node-{node.Key}");
+      AutomationProperties.SetName(row, node.Label);
+      AutomationProperties.SetControlTypeOverride(row, AutomationControlType.TreeItem);
+      AutomationProperties.SetPositionInSet(row, view.Position);
+      AutomationProperties.SetSizeOfSet(row, view.SetSize);
+      AutomationProperties.SetLiveSetting(row, AutomationLiveSetting.Polite);
+      var loadState = lazyLoadStates.TryGetValue(node.Key, out var currentLoadState)
+        ? currentLoadState.ToString().ToLowerInvariant()
+        : "idle";
+      AutomationProperties.SetItemStatus(
+        row,
+        $"{(selectedKeys.Contains(node.Key) ? "selected" : "not selected")}, " +
+        $"{(expandable ? expandedKeys.Contains(node.Key) ? "expanded" : "collapsed" : "leaf")}, " +
+        $"{loadState}, level {view.Level.ToString(CultureInfo.InvariantCulture)}");
+      row.PointerPressed += (_, e) => HandleRowPointerPressed(view, row, e);
+      renderedRows[node.Key] = row;
+      rowsPanel.Children.Add(row);
+    }
+  }
+
+  private void HandleRowPointerPressed(
+    FsusTreeNodeView view,
+    Border row,
+    PointerPressedEventArgs e)
+  {
+    if (e.Handled || view.Node.IsDisabled)
+    {
+      return;
+    }
+
+    var point = e.GetCurrentPoint(row);
+    if (point.Properties.IsRightButtonPressed)
+    {
+      Focus();
+      if (RequestNodeContext(view.Node.Key, FsusTreeInteractionSource.Pointer))
+      {
+        e.Handled = true;
+      }
+      return;
+    }
+
+    if (!point.Properties.IsLeftButtonPressed)
+    {
+      return;
+    }
+
+    Focus();
+    var expandable = view.Node.Children.Count > 0 || view.Node.HasLazyChildren;
+    if (
+      expandable &&
+      point.Position.X <= global::FsusUI.Avalonia.FsusTokens.Space6Thickness.Left)
+    {
+      e.Handled = GestureToggleExpansion(
+        view.Node.Key,
+        FsusTreeInteractionSource.Pointer);
+      return;
+    }
+
+    if (!selectedKeys.Contains(view.Node.Key))
+    {
+      ToggleSelection(view.Node.Key);
+    }
+    e.Handled = Activate(view.Node.Key, FsusTreeInteractionSource.Pointer);
   }
 
   private void RaiseSelectionChanged(IReadOnlyList<string> added, IReadOnlyList<string> removed)
@@ -521,8 +653,16 @@ public class FsusTree : ContentControl
       new HashSet<string>(selectedKeys, StringComparer.Ordinal)));
   }
 
-  private void RaiseLazyLoadState(string key, FsusTreeLazyLoadState state, Exception? exception = null) =>
+  private void RaiseLazyLoadState(
+    string key,
+    FsusTreeLazyLoadState state,
+    Exception? exception = null)
+  {
+    lazyLoadStates[key] = state;
+    RefreshRows();
+    SyncState();
     LazyLoadStateChanged?.Invoke(this, new FsusTreeLazyLoadEventArgs(key, state, exception));
+  }
 
   private FsusTreeNode? FindNode(IEnumerable<FsusTreeNode> nodes, string key)
   {

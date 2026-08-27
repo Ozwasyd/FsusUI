@@ -124,7 +124,7 @@ public class FsusContextMenuPrimitiveTests
   }
 
   [Fact]
-  public async Task ServiceGuardsDisableTargetDetachesAndReusesSingleOpenEntry()
+  public async Task ServiceGuardsDisableTargetDetachesAndRepositionsSingleOpenEntry()
   {
     var host = new FsusOverlayHost();
     var target = new Button { Content = "Panel", IsEnabled = false };
@@ -149,7 +149,10 @@ public class FsusContextMenuPrimitiveTests
       target,
       FsusTreeInteractionSource.Pointer,
       new Rect(8, 8, 4, 4)));
-    Assert.Same(current, menu.OverlayEntry);
+    Assert.NotSame(current, menu.OverlayEntry);
+    Assert.True(current!.IsClosed);
+    Assert.False(menu.OverlayEntry!.IsClosed);
+    Assert.Equal(new Rect(8, 12, 200, 240), menu.OverlayEntry.Bounds);
     Assert.Single(host.OpenOverlays);
 
     FsusContextMenuService.Attach(target, menu, host);

@@ -50,11 +50,19 @@ menu.ItemActivated += (_, args) => RunTreeAction(args.TargetKey, args.ActionKey)
 
 tree.NodeContextRequested += (_, args) =>
   menu.Open(host, new FsusContextMenuRequest(
-    args.Key, args.InteractionSource, args.AnchorBounds));
-tree.NodeAnchorBoundsResolver = key => nodeScreenBounds(key);
+    args.Key, args.InteractionSource, args.AnchorBounds, tree));
+tree.NodeAnchorBoundsResolver = key => nodeBoundsRelativeToHost(key);
 
-// Document tabs (or any control):
-FsusContextMenuService.Attach(docTab, menu, host);
+// Document tabs retain a stable target key without changing selection:
+tabs.PaneContextRequested += (_, args) =>
+  menu.Open(host, new FsusContextMenuRequest(
+    args.PaneKey,
+    args.InteractionSource,
+    boundsRelativeToHost(args.Pane),
+    tabs));
+
+// Any other control can use the shared pointer/keyboard positioning service:
+FsusContextMenuService.Attach(moreActionsButton, menu, host);
 ```
 
 Disabled nodes and panes do not request context menus. Choosing an enabled item
@@ -73,8 +81,9 @@ The `node-click` contract maps to `NodeActivated`; lazy loading maps to
 
 Automation tree semantics, indentation rendering, and platform differences for
 Enter/Space/arrow-key handling follow `docs/avalonia/platform-differences.md`.
-True screen-reader announcement of lifecycle states is not verifiable locally
-and remains covered by AutomationPeer item status only.
+Repository acceptance uses a reproducible local AutomationPeer and
+AutomationProperties simulation for screen-reader semantics; it is explicitly
+not evidence of a physical device or an OS screen-reader session.
 
 ## Theme Tokens
 
