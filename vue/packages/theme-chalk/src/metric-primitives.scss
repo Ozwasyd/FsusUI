@@ -164,7 +164,7 @@
   min-width: 0;
   min-height: 48px;
   padding: 9px 12px;
-  border-right: 1px solid getCssVar('border-color-lighter');
+  border-inline-end: 1px solid getCssVar('border-color-lighter');
   border-bottom: 1px solid getCssVar('border-color-lighter');
   background: transparent;
 
@@ -272,24 +272,25 @@
     gap: 8px;
   }
 
+  // Tone markers stay narrow (3px inline-start) so success/warning/danger
+  // never form a large tinted border or background; status text remains the
+  // non-color signal.
   @include m(success) {
-    border-color: color-mix(
-      in srgb,
-      getCssVar('color-success') 30%,
-      getCssVar('border-color-lighter')
-    );
+    border-inline-start: 3px solid
+      color-mix(in srgb, getCssVar("color-success") 34%, getCssVar("border-color-lighter"));
+    padding-inline-start: 9px;
   }
 
   @include m(warning) {
-    border-left: 3px solid
+    border-inline-start: 3px solid
       color-mix(in srgb, getCssVar("color-warning") 34%, getCssVar("border-color-lighter"));
-    padding-left: 9px;
+    padding-inline-start: 9px;
   }
 
   @include m(danger) {
-    border-left: 3px solid
+    border-inline-start: 3px solid
       color-mix(in srgb, getCssVar("color-danger") 34%, getCssVar("border-color-lighter"));
-    padding-left: 9px;
+    padding-inline-start: 9px;
   }
 }
 
@@ -377,15 +378,15 @@
   }
 
   @include m(warning) {
-    border-left: 3px solid
+    border-inline-start: 3px solid
       color-mix(in srgb, getCssVar("color-warning") 34%, getCssVar("border-color-lighter"));
-    padding-left: 9px;
+    padding-inline-start: 9px;
   }
 
   @include m(danger) {
-    border-left: 3px solid
+    border-inline-start: 3px solid
       color-mix(in srgb, getCssVar("color-danger") 34%, getCssVar("border-color-lighter"));
-    padding-left: 9px;
+    padding-inline-start: 9px;
   }
 }
 
@@ -414,7 +415,11 @@
   }
 
   @include e(button) {
-    min-height: 40px;
+    // Desktop inline-action contract: >= 40px visible target (40px compact
+    // control height). The mobile >= 44px floor lives in the shared media
+    // block below.
+    min-width: var(--fsus-control-height-compact, 40px);
+    min-height: var(--fsus-control-height-compact, 40px);
     padding: 0 10px;
     border: 1px solid getCssVar('border-color');
     border-radius: var(--fsus-radius-control-small, 6px);
@@ -466,5 +471,16 @@
 
   .#{$namespace}-distribution-bar-row__bar {
     grid-column: 1 / -1;
+  }
+
+  // Mobile inline-action contract: >= 44px targets for copy buttons and any
+  // inline action composed into metric actions regions. The doubled button
+  // class out-specifies the theme-layer `.is-text` / `.is-link` min-height
+  // reset, which loads after this sheet.
+  .#{$namespace}-copyable-detail__button,
+  .#{$namespace}-status-summary__actions .#{$namespace}-button.#{$namespace}-button,
+  .#{$namespace}-diagnostics-item__actions .#{$namespace}-button.#{$namespace}-button {
+    min-width: var(--fsus-control-height, 44px);
+    min-height: var(--fsus-control-height, 44px);
   }
 }

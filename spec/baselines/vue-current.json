@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "426c503dff1e82615887657cd975d38ddd831098",
+    "commitSha": "839c9ec396cc25f1d04970246badf8d5b9226b44",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "efedf2d7a3f11cbd9ecb583513d7f36c7e0068ef87e096d366b332eaac99e609",
@@ -11,7 +11,7 @@
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "63071e04b7e2c9a6664207341a8e9e1ae5aca28d3d5b9cf2046040fa070f4434"
+    "outputHash": "a676209f417e1749b24affc35ad28186d0f3089260d8d93c3d129a92bb2017ac"
   },
   "summary": {
     "componentModules": 93,
@@ -32590,6 +32590,7 @@
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/metric-primitives.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss",
         "vue/packages/theme-chalk/src/radio-button.scss",
         "vue/packages/theme-chalk/src/upload.scss"
@@ -32618,6 +32619,7 @@
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/metric-primitives.scss",
         "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss",
         "vue/packages/theme-chalk/src/upload.scss"
