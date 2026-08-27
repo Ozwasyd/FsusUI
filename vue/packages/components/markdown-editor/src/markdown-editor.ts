@@ -639,12 +639,6 @@ const prefixSelectedLines = (
   )
 }
 
-
-export * from './markdown-editor-table'
-export * from './markdown-editor-table-structure'
-export * from './markdown-editor-table-input'
-export * from './markdown-editor-table-acceptance'
-
 export const defaultMarkdownEditorCommands: readonly MarkdownEditorCommand[] = [
   {
     key: 'bold',

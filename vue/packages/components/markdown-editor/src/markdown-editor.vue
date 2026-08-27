@@ -193,20 +193,42 @@
 
       <div
         v-if="currentTableCell && !editingBlocked"
-        :class="ns.e('table-menu')"
-        role="toolbar"
-        aria-label="Table actions"
+        :class="ns.e('table-context')"
       >
         <button
-          v-for="action in tableContextActions"
-          :key="action.key"
+          ref="tableMenuTriggerRef"
           type="button"
-          :title="action.title"
-          :aria-label="action.title"
-          @click="runTableContextAction(action.key)"
+          :class="ns.e('table-menu-trigger')"
+          aria-haspopup="menu"
+          :aria-controls="tableMenuId"
+          :aria-expanded="tableMenuOpen"
+          aria-label="表格操作"
+          @click="toggleTableMenu"
         >
-          {{ action.label }}
+          表格操作
         </button>
+        <div
+          v-if="tableMenuOpen"
+          :id="tableMenuId"
+          ref="tableMenuRef"
+          :class="ns.e('table-menu')"
+          role="menu"
+          aria-label="表格操作"
+          @keydown="handleTableMenuKeydown"
+        >
+          <button
+            v-for="action in tableContextActions"
+            :key="action.key"
+            type="button"
+            role="menuitem"
+            :data-group="action.group"
+            :title="action.title"
+            :aria-label="action.title"
+            @click="runTableContextAction(action.key)"
+          >
+            {{ action.label }}
+          </button>
+        </div>
       </div>
       <span :class="ns.e('visually-hidden')" aria-live="polite">
         {{ tableAnnouncement }}
@@ -229,14 +251,16 @@
 
       <el-markdown-renderer
         v-if="liveSurface.rendererVisible"
+        ref="previewRef"
         :class="ns.e('preview')"
         :base-url="previewBaseUrl"
         :content="editorValue"
         :csp-nonce="previewCspNonce"
         :features="previewFeatures"
         mode="editor"
+        @scroll="handlePreviewScroll"
         @features-activated="emitRenderEvent('features-activated', $event)"
-        @render-complete="emitRenderEvent('render-complete', $event)"
+        @render-complete="handlePreviewRenderComplete"
         @render-error="emitRenderEvent('render-error', $event)"
       />
     </div>
@@ -493,7 +517,13 @@ const pasteAsMarkdownBusy = ref(false)
 const pasteAsMarkdownDescriptionId = `${useId()}-paste-as-markdown-description`
 const pasteAsMarkdownTitleId = `${useId()}-paste-as-markdown-title`
 const pasteAsMarkdownHelpId = `${useId()}-paste-as-markdown-help`
+const tableMenuId = `${useId()}-table-menu`
 const commandsExpanded = ref(false)
+const tableMenuOpen = ref(false)
+const tableMenuRef = ref<HTMLElement | null>(null)
+const tableMenuTriggerRef = ref<HTMLButtonElement | null>(null)
+const previewRef = ref<HTMLElement | { $el?: HTMLElement } | null>(null)
+const retainedPreviewScrollLeft = ref(0)
 const visualViewportHeight = ref(0)
 const inputDisabled = computed(() => props.disabled || props.loading)
 const editingBlocked = computed(() => props.readonly || inputDisabled.value)
@@ -649,6 +679,20 @@ const handleLayoutTouch = () => markLayoutGesture('touch')
 const handleLayoutScroll = () => {
   if (restoringSelection || restoringViewport) return
   markLayoutGesture('scrollbar')
+}
+const previewElement = () => {
+  const current = previewRef.value
+  if (!current) return null
+  return current instanceof HTMLElement ? current : (current.$el ?? null)
+}
+const handlePreviewScroll = () => {
+  retainedPreviewScrollLeft.value = previewElement()?.scrollLeft ?? 0
+}
+const restorePreviewScroll = () => {
+  void nextTick(() => {
+    const preview = previewElement()
+    if (preview) preview.scrollLeft = retainedPreviewScrollLeft.value
+  })
 }
 const refreshLiveReveal = (
   extras: {
@@ -941,12 +985,17 @@ const captureSelection = (breakMerge = true) => {
 }
 
 const refreshCurrentTableCell = (offset = transactionStore.selection.start) => {
-  currentTableCell.value = resolveMarkdownTableCellAtOffset(
+  const previousCellId = currentTableCell.value?.cellId
+  const nextCell = resolveMarkdownTableCellAtOffset(
     transactionStore.value,
     documentIdentity,
     offset,
   )
-  return currentTableCell.value
+  currentTableCell.value = nextCell
+  if (!nextCell || (previousCellId && nextCell.cellId !== previousCellId)) {
+    tableMenuOpen.value = false
+  }
+  return nextCell
 }
 
 const selectTableCell = async (cell: MarkdownTableCellIdentity) => {
@@ -1430,7 +1479,13 @@ const applyClipboardTransfer = (
 const handlePaste = (event: ClipboardEvent) => {
   const cell = refreshCurrentTableCell(captureSelection(false).start)
   const clipboard = event.clipboardData
-  if (cell && clipboard && !isComposing.value && !editingBlocked.value) {
+  if (
+    cell &&
+    clipboard &&
+    clipboard.files.length === 0 &&
+    !isComposing.value &&
+    !editingBlocked.value
+  ) {
     const tsv = clipboard.getData('text/tab-separated-values')
     const csv = clipboard.getData('text/csv')
     const plain = clipboard.getData('text/plain')
@@ -1564,6 +1619,61 @@ const handleTableContextMenu = (event: MouseEvent) => {
   if (!cell || editingBlocked.value) return
   event.preventDefault()
   tableAnnouncement.value = `Table row ${cell.row + 1}, column ${cell.column + 1}`
+  tableMenuOpen.value = true
+  void nextTick(() =>
+    tableMenuRef.value?.querySelector<HTMLButtonElement>('[role="menuitem"]')?.focus(),
+  )
+}
+
+const focusTableMenuItem = (index: number) => {
+  const items = Array.from(
+    tableMenuRef.value?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]') ?? [],
+  )
+  if (!items.length) return
+  items[(index + items.length) % items.length]?.focus()
+}
+
+const closeTableMenu = (restoreTrigger = false) => {
+  tableMenuOpen.value = false
+  if (restoreTrigger) {
+    void nextTick(() => tableMenuTriggerRef.value?.focus())
+  }
+}
+
+const toggleTableMenu = () => {
+  tableMenuOpen.value = !tableMenuOpen.value
+  if (tableMenuOpen.value) {
+    void nextTick(() => focusTableMenuItem(0))
+  }
+}
+
+const handleTableMenuKeydown = (event: KeyboardEvent) => {
+  const items = Array.from(
+    tableMenuRef.value?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]') ?? [],
+  )
+  const currentIndex = items.indexOf(document.activeElement as HTMLButtonElement)
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    closeTableMenu(true)
+    return
+  }
+  if (event.key === 'Tab') {
+    tableMenuOpen.value = false
+    return
+  }
+  const targetIndex =
+    event.key === 'Home'
+      ? 0
+      : event.key === 'End'
+        ? items.length - 1
+        : event.key === 'ArrowDown'
+          ? currentIndex + 1
+          : event.key === 'ArrowUp'
+            ? currentIndex - 1
+            : null
+  if (targetIndex === null) return
+  event.preventDefault()
+  focusTableMenuItem(targetIndex)
 }
 
 const runTableContextAction = (key: string) => {
@@ -1660,6 +1770,7 @@ const runTableContextAction = (key: string) => {
   tableAnnouncement.value = tableContextActions.value.find(
     (action) => action.key === key,
   )?.title ?? 'Table updated'
+  closeTableMenu()
   void selectTableCell(cell)
 }
 
@@ -1891,6 +2002,8 @@ const toggleCommands = () => {
 const setMode = (mode: MarkdownEditorMode) => {
   if (editingBlocked.value || isComposing.value) return
 
+  const preview = previewElement()
+  if (preview) retainedPreviewScrollLeft.value = preview.scrollLeft
   transactionStore.breakMergeGroup()
   const nextMode = normalizeModeForLayout(mode)
   const retained = retainMarkdownLiveSelection({
@@ -1906,6 +2019,7 @@ const setMode = (mode: MarkdownEditorMode) => {
   applyLiveLayout('mode-switch')
   refreshLiveWindow('mode-switch')
   refreshLiveReveal()
+  restorePreviewScroll()
 }
 
 const modeLabel = (mode: MarkdownEditorMode) => localeText.value.modes[mode]
@@ -1938,6 +2052,11 @@ const emitRenderEvent = (
     return
   }
   emit('render-error', payload)
+}
+
+const handlePreviewRenderComplete = (payload: unknown) => {
+  emitRenderEvent('render-complete', payload)
+  restorePreviewScroll()
 }
 
 const handleKeydown = (event: KeyboardEvent) => {

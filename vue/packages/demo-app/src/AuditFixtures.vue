@@ -190,13 +190,11 @@
         ref="markdownTransactionEditor"
         v-model="markdownTransactionValue"
         v-bind="markdownPasteGateAttributes"
-        :default-mode="
-          markdownPasteGate === 'preview-only' ? 'preview' : 'source'
-        "
+        :default-mode="markdownEditorDefaultMode"
         :disabled="markdownPasteGate === 'disabled'"
         :min-rows="6"
         :show-actions="false"
-        :show-mode-switcher="false"
+        :show-mode-switcher="markdownEditorModeMatrixFixture"
         data-markdown-input-authority="transaction-store"
         @history-change="markdownTransactionHistory = $event"
         @selection-change="markdownTransactionSelection = $event"
@@ -1983,6 +1981,20 @@ const markdownEditorImeFixture =
 const markdownEditorTableFixture =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('markdownEditorTable') === '1'
+const markdownEditorTableMatrixFixture =
+  typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get(
+        'markdownEditorTableMatrix',
+      )
+    : null
+const markdownEditorModeMatrixFixture =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownEditorModeMatrix') ===
+    '1'
+const markdownEditorRequestedMode =
+  typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('markdownEditorMode')
+    : null
 const markdownPasteGate =
   typeof window !== 'undefined'
     ? new URLSearchParams(window.location.search).get('markdownPasteGate')
@@ -2021,16 +2033,61 @@ if (markdownEditorDelayMount > 0) {
   }, markdownEditorDelayMount)
 }
 const markdownTransactionEditor = ref<MarkdownEditorInstance>()
+const markdownEditorDefaultMode =
+  markdownPasteGate === 'preview-only'
+    ? 'preview'
+    : markdownEditorRequestedMode === 'live' ||
+        markdownEditorRequestedMode === 'split' ||
+        markdownEditorRequestedMode === 'preview'
+      ? markdownEditorRequestedMode
+      : 'source'
+const markdownTableMatrix = (rows: number, columns: number) => {
+  const header = Array.from(
+    { length: columns },
+    (_, column) => `Column ${column + 1}`,
+  )
+  const separator = Array.from({ length: columns }, () => '---')
+  const body = Array.from({ length: rows }, (_, row) =>
+    Array.from(
+      { length: columns },
+      (_, column) => `r${row + 1}c${column + 1}`,
+    ),
+  )
+  return [header, separator, ...body]
+    .map((cells) => `| ${cells.join(' | ')} |`)
+    .join('\n')
+}
+const defaultMarkdownTable = [
+  '| Project | Owner | Status |',
+  '| --- | --- | --- |',
+  '| Documentation migration | Editorial systems | In review |',
+  '| Runtime projection | Platform team | Ready |',
+].join('\n')
+const markdownEditorTableValue =
+  markdownEditorTableMatrixFixture === '20x50'
+    ? markdownTableMatrix(50, 20)
+    : markdownEditorTableMatrixFixture === '1x1'
+      ? markdownTableMatrix(1, 1)
+      : markdownEditorTableMatrixFixture === 'large'
+        ? [
+            ...Array.from(
+              { length: 500 },
+              (_, index) => `Paragraph before table ${index + 1}.`,
+            ),
+            '',
+            defaultMarkdownTable,
+            '',
+            ...Array.from(
+              { length: 500 },
+              (_, index) => `Paragraph after table ${index + 1}.`,
+            ),
+          ].join('\n')
+        : defaultMarkdownTable
 const markdownTransactionValue = ref(
   markdownEditorImeFixture
     ? ''
     : markdownEditorTableFixture
-      ? [
-          '| Project | Owner | Status |',
-          '| --- | --- | --- |',
-          '| Documentation migration | Editorial systems | In review |',
-          '| Runtime projection | Platform team | Ready |',
-        ].join('\n')
+      ? markdownEditorTableValue
       : 'A😀éאב\n- 列表',
 )
 const markdownTransactionHistory = ref<MarkdownEditorHistoryState>({

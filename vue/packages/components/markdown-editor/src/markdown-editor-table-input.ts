@@ -11,6 +11,7 @@ import {
 import {
   planMarkdownTableInsertRow,
   resolveMarkdownTableEntry,
+  resolveMarkdownTableCellAtOffset,
   type MarkdownTableCellIdentity,
 } from './markdown-editor-table-structure'
 
@@ -518,12 +519,22 @@ export const resolveMarkdownTableInputIntent = (
 
 // ---------------- TSV / CSV Parsing & Paste (#372) ----------------
 
-export const parseMarkdownTableTsv = (payload: string) =>
-  payload
-    .replace(/\r\n/g, '\n')
-    .split('\n')
-    .filter((line) => line.length > 0)
-    .map((line) => line.split('\t'))
+export const MARKDOWN_TABLE_PASTE_BUDGET = Object.freeze({
+  cells: 20_000,
+  columns: 100,
+  rows: 1_000,
+  sourceUnits: 1_000_000,
+})
+
+export type MarkdownTableDataRejection =
+  | 'aborted'
+  | 'budget-exceeded'
+  | 'malformed'
+  | 'not-table'
+
+export interface MarkdownTableDataParseOptions {
+  readonly signal?: AbortSignal
+}
 
 export interface MarkdownTableParsedData {
   readonly rows: readonly (readonly string[])[]
@@ -534,26 +545,26 @@ export interface MarkdownTableParsedData {
 export const parseMarkdownTableData = (
   payload: string,
   mime?: string,
-): MarkdownTableParsedData | { readonly rejected: 'budget-exceeded' | 'not-table' } => {
+  options: MarkdownTableDataParseOptions = {},
+): MarkdownTableParsedData | { readonly rejected: MarkdownTableDataRejection } => {
+  if (options.signal?.aborted) return { rejected: 'aborted' }
   if (!payload || payload.trim().length === 0) {
     return { rejected: 'not-table' }
   }
-
-  // Budget limits
-  const MAX_ROWS = 1000
-  const MAX_COLUMNS = 100
-  const MAX_CELLS = 20000
+  if (payload.length > MARKDOWN_TABLE_PASTE_BUDGET.sourceUnits) {
+    return { rejected: 'budget-exceeded' }
+  }
 
   // Detect delimiter: TSV or CSV
   const isTsvMime = mime === 'text/tab-separated-values'
   const isCsvMime = mime === 'text/csv'
-  let delimiter: string
+  let delimiter: ',' | '\t'
   if (isTsvMime || (!isCsvMime && payload.includes('\t'))) {
     delimiter = '\t'
-  } else if (isCsvMime || payload.includes(',')) {
+  } else if (isCsvMime) {
     delimiter = ','
   } else {
-    // Single column plain text or no delimiter
+    // Plain text containing commas remains on the ordinary clipboard path.
     return { rejected: 'not-table' }
   }
 
@@ -561,34 +572,70 @@ export const parseMarkdownTableData = (
   let currentRow: string[] = []
   let currentCell = ''
   let inQuotes = false
+  let quoteClosed = false
+  let atFieldStart = true
+  let parsedCellCount = 0
   const len = payload.length
 
+  const finishCell = () => {
+    currentRow.push(currentCell)
+    parsedCellCount++
+    currentCell = ''
+    quoteClosed = false
+    atFieldStart = true
+    if (
+      currentRow.length > MARKDOWN_TABLE_PASTE_BUDGET.columns ||
+      parsedCellCount > MARKDOWN_TABLE_PASTE_BUDGET.cells
+    ) {
+      return false
+    }
+    return true
+  }
+
+  const finishRow = () => {
+    if (!finishCell()) return false
+    rows.push(currentRow)
+    currentRow = []
+    if (rows.length > MARKDOWN_TABLE_PASTE_BUDGET.rows) {
+      return false
+    }
+    return true
+  }
+
   for (let i = 0; i < len; i++) {
+    if ((i & 1023) === 0 && options.signal?.aborted) {
+      return { rejected: 'aborted' }
+    }
     const ch = payload[i]!
     if (ch === '"') {
-      if (inQuotes && i + 1 < len && payload[i + 1] === '"') {
+      if (inQuotes && payload[i + 1] === '"') {
         currentCell += '"'
-        i++ // skip escaped quote
-      } else {
-        inQuotes = !inQuotes
+        i++
+        atFieldStart = false
+        continue
       }
+      if (inQuotes) {
+        inQuotes = false
+        quoteClosed = true
+        continue
+      }
+      if (!atFieldStart || quoteClosed) return { rejected: 'malformed' }
+      inQuotes = true
+      atFieldStart = false
       continue
     }
+    if (quoteClosed && ch !== delimiter && ch !== '\n' && ch !== '\r') {
+      return { rejected: 'malformed' }
+    }
     if (!inQuotes && ch === delimiter) {
-      currentRow.push(currentCell.trim())
-      currentCell = ''
+      if (!finishCell()) return { rejected: 'budget-exceeded' }
       continue
     }
     if (!inQuotes && (ch === '\n' || ch === '\r')) {
       if (ch === '\r' && i + 1 < len && payload[i + 1] === '\n') {
         i++
       }
-      currentRow.push(currentCell.trim())
-      currentCell = ''
-      if (currentRow.some((c) => c.length > 0)) {
-        rows.push(currentRow)
-      }
-      currentRow = []
+      if (!finishRow()) return { rejected: 'budget-exceeded' }
       continue
     }
     if (inQuotes && (ch === '\n' || ch === '\r')) {
@@ -597,27 +644,30 @@ export const parseMarkdownTableData = (
         i++
       }
       currentCell += '<br>'
+      atFieldStart = false
       continue
     }
     currentCell += ch
+    atFieldStart = false
   }
-  if (currentCell.length > 0 || currentRow.length > 0) {
-    currentRow.push(currentCell.trim())
-    if (currentRow.some((c) => c.length > 0)) {
-      rows.push(currentRow)
-    }
+  if (inQuotes) return { rejected: 'malformed' }
+  const endedWithRecordSeparator = /(?:\r\n|\r|\n)$/u.test(payload)
+  if (!endedWithRecordSeparator || currentRow.length > 0 || currentCell.length > 0) {
+    if (!finishRow()) return { rejected: 'budget-exceeded' }
   }
 
   if (rows.length === 0) return { rejected: 'not-table' }
 
-  // Check budgets
-  if (rows.length > MAX_ROWS) return { rejected: 'budget-exceeded' }
   let maxCols = 0
   for (const r of rows) {
     maxCols = Math.max(maxCols, r.length)
   }
-  if (maxCols > MAX_COLUMNS) return { rejected: 'budget-exceeded' }
-  if (rows.length * maxCols > MAX_CELLS) return { rejected: 'budget-exceeded' }
+  if (
+    maxCols > MARKDOWN_TABLE_PASTE_BUDGET.columns ||
+    rows.length * maxCols > MARKDOWN_TABLE_PASTE_BUDGET.cells
+  ) {
+    return { rejected: 'budget-exceeded' }
+  }
 
   // Pad uneven rows
   const normalizedRows = rows.map((r) => {
@@ -633,6 +683,27 @@ export const parseMarkdownTableData = (
   }
 }
 
+export const parseMarkdownTableTsv = (payload: string) => {
+  const parsed = parseMarkdownTableData(payload, 'text/tab-separated-values')
+  return 'rows' in parsed ? parsed.rows.map((row) => [...row]) : []
+}
+
+const escapeMarkdownTableDataCell = (value: string) => {
+  let escaped = ''
+  let backslashes = 0
+  for (const character of value) {
+    if (character === '|') {
+      if (backslashes % 2 === 0) escaped += '\\'
+      escaped += character
+      backslashes = 0
+      continue
+    }
+    escaped += character
+    backslashes = character === '\\' ? backslashes + 1 : 0
+  }
+  return escaped
+}
+
 export const planMarkdownTablePaste = (
   source: string,
   documentIdentity: MarkdownDocumentIdentity,
@@ -641,15 +712,25 @@ export const planMarkdownTablePaste = (
   payload: string,
   mime?: string,
   expectedRevision?: number,
-): MarkdownEditorTransaction | { readonly rejected: 'budget-exceeded' | 'stale' | 'malformed' | 'missing' | 'not-table' } => {
+  options: MarkdownTableDataParseOptions = {},
+): MarkdownEditorTransaction | {
+  readonly rejected:
+    | MarkdownTableDataRejection
+    | 'stale'
+    | 'missing'
+} => {
   if (expectedRevision !== undefined && expectedRevision < 0) {
     return { rejected: 'stale' }
   }
-  if (documentIdentity.epoch < 1) {
+  if (
+    documentIdentity.epoch < 1 ||
+    currentCell.status !== 'current' ||
+    currentCell.tableId !== tableId
+  ) {
     return { rejected: 'stale' }
   }
 
-  const parsedData = parseMarkdownTableData(payload, mime)
+  const parsedData = parseMarkdownTableData(payload, mime, options)
   if ('rejected' in parsedData) {
     return { rejected: parsedData.rejected }
   }
@@ -699,7 +780,7 @@ export const planMarkdownTablePaste = (
     const dataRow = parsedData.rows[r]!
     const targetRowIdx = startRow + r
     for (let c = 0; c < parsedData.columns; c++) {
-      const cellVal = dataRow[c] ?? ''
+      const cellVal = escapeMarkdownTableDataCell(dataRow[c] ?? '')
       const targetColIdx = startCol + c
       if (targetRowIdx === 0) {
         nextHeader[targetColIdx] = cellVal
@@ -791,16 +872,102 @@ export type MarkdownTableInputMutationKind =
   | 'composition-switch'
   | 'auto-format'
 
-export const evaluateMarkdownTableInputMutations = () =>
-  Object.freeze({
+export const evaluateMarkdownTableInputMutations = () => {
+  const source = '| h1 | h2 |\n| --- | --- |\n| a | b |\n'
+  const documentIdentity = Object.freeze({ epoch: 1, id: 'table-input-mutations' })
+  const firstCell = resolveMarkdownTableCellAtOffset(
+    source,
+    documentIdentity,
+    source.indexOf('h1'),
+  )!
+  const lastCell: MarkdownTableCellIdentity = Object.freeze({
+    ...firstCell,
+    column: 1,
+    row: 1,
+  })
+  const selection = Object.freeze({
+    direction: 'none' as const,
+    end: source.indexOf('h1'),
+    start: source.indexOf('h1'),
+  })
+  const authority = resolveMarkdownTableInputIntent({
+    cell: firstCell,
+    documentIdentity,
+    key: 'Tab',
+    selection,
+    source,
+  })
+  const wrongTable = resolveMarkdownTableInputIntent({
+    cell: { ...firstCell, tableId: `${firstCell.tableId}:stale` },
+    documentIdentity,
+    key: 'Tab',
+    selection,
+    source,
+  })
+  const finalTab = resolveMarkdownTableInputIntent({
+    cell: lastCell,
+    documentIdentity,
+    key: 'Tab',
+    selection,
+    source,
+  })
+  const composing = resolveMarkdownTableInputIntent({
+    cell: firstCell,
+    compositionActive: true,
+    documentIdentity,
+    key: 'Tab',
+    selection,
+    source,
+  })
+  const ordinaryTyping = resolveMarkdownTableInputIntent({
+    cell: firstCell,
+    documentIdentity,
+    key: 'a',
+    selection,
+    source,
+  })
+
+  return Object.freeze({
+    authority,
     mutations: Object.freeze([
-      Object.freeze({ kind: 'local-keydown' as const, equivalent: false, accepted: false }),
-      Object.freeze({ kind: 'naked-index' as const, equivalent: false, accepted: false }),
-      Object.freeze({ kind: 'tab-trap' as const, equivalent: false, accepted: false }),
-      Object.freeze({ kind: 'composition-switch' as const, equivalent: false, accepted: false }),
-      Object.freeze({ kind: 'auto-format' as const, equivalent: false, accepted: false }),
+      Object.freeze({
+        kind: 'local-keydown' as const,
+        equivalent: authority.action === 'noop',
+        accepted: authority.action === 'noop' || authority.nextCell.column !== 1,
+        detail: 'Tab must be resolved by the shared input intent planner',
+      }),
+      Object.freeze({
+        kind: 'naked-index' as const,
+        equivalent: wrongTable.action === authority.action,
+        accepted: wrongTable.rejected !== 'missing',
+        detail: 'row/column coordinates cannot authorize a stale table identity',
+      }),
+      Object.freeze({
+        kind: 'tab-trap' as const,
+        equivalent: finalTab.action === 'noop',
+        accepted: finalTab.action !== 'append-row',
+        detail: 'Tab at the final cell must append a row instead of trapping focus',
+      }),
+      Object.freeze({
+        kind: 'composition-switch' as const,
+        equivalent:
+          composing.action === authority.action &&
+          composing.nextCell.column === authority.nextCell.column,
+        accepted:
+          composing.action !== 'composition' ||
+          composing.nextCell.cellId !== firstCell.cellId,
+        detail: 'composition-active freezes table cell navigation',
+      }),
+      Object.freeze({
+        kind: 'auto-format' as const,
+        equivalent: ordinaryTyping.transaction !== null,
+        accepted:
+          ordinaryTyping.action !== 'noop' || ordinaryTyping.transaction !== null,
+        detail: 'ordinary typing must not format or rewrite the table',
+      }),
     ]),
   })
+}
 
 export type MarkdownTablePasteFormatMutationKind =
   | 'per-cell-history'
@@ -809,13 +976,84 @@ export type MarkdownTablePasteFormatMutationKind =
   | 'stale-paste'
   | 'budget-bypass'
 
-export const evaluateMarkdownTablePasteFormatMutations = () =>
-  Object.freeze({
+export const evaluateMarkdownTablePasteFormatMutations = () => {
+  const source = '| h1 | h2 |\n| --- | --- |\n| a | b |\n'
+  const documentIdentity = Object.freeze({ epoch: 1, id: 'table-paste-mutations' })
+  const cell = resolveMarkdownTableCellAtOffset(
+    source,
+    documentIdentity,
+    source.indexOf('h1'),
+  )!
+  const authority = planMarkdownTablePaste(
+    source,
+    documentIdentity,
+    cell.tableId,
+    cell,
+    'c1\tc2\nv1\tv2',
+    'text/tab-separated-values',
+    1,
+  )
+  const ordinary = parseMarkdownTableData('ordinary,comma')
+  const html = parseMarkdownTableData(
+    '<table><tr><td>unsafe authority</td></tr></table>',
+    'text/html',
+  )
+  const stale = planMarkdownTablePaste(
+    source,
+    { ...documentIdentity, epoch: 0 },
+    cell.tableId,
+    cell,
+    'c1\tc2',
+    'text/tab-separated-values',
+    1,
+  )
+  const overBudget = parseMarkdownTableData(
+    Array.from(
+      { length: MARKDOWN_TABLE_PASTE_BUDGET.rows + 1 },
+      () => 'a\tb',
+    ).join('\n'),
+    'text/tab-separated-values',
+  )
+
+  return Object.freeze({
+    authority,
     mutations: Object.freeze([
-      Object.freeze({ kind: 'per-cell-history' as const, equivalent: false, accepted: false }),
-      Object.freeze({ kind: 'ordinary-auto-format' as const, equivalent: false, accepted: false }),
-      Object.freeze({ kind: 'html-round-trip' as const, equivalent: false, accepted: false }),
-      Object.freeze({ kind: 'stale-paste' as const, equivalent: false, accepted: false }),
-      Object.freeze({ kind: 'budget-bypass' as const, equivalent: false, accepted: false }),
+      Object.freeze({
+        kind: 'per-cell-history' as const,
+        equivalent: 'changes' in authority && authority.changes.length !== 1,
+        accepted:
+          !('changes' in authority) ||
+          authority.changes.length !== 1 ||
+          authority.history !== 'separate',
+        detail: 'a matrix paste must be one transaction and one history entry',
+      }),
+      Object.freeze({
+        kind: 'ordinary-auto-format' as const,
+        equivalent: 'rows' in ordinary,
+        accepted: 'rows' in ordinary,
+        detail: 'ordinary plain text must stay on the ordinary paste path',
+      }),
+      Object.freeze({
+        kind: 'html-round-trip' as const,
+        equivalent: 'rows' in html,
+        accepted: 'rows' in html,
+        detail: 'HTML clipboard data is not table-data authority',
+      }),
+      Object.freeze({
+        kind: 'stale-paste' as const,
+        equivalent: 'changes' in stale,
+        accepted: !('rejected' in stale && stale.rejected === 'stale'),
+        detail: 'stale document identity must reject the paste',
+      }),
+      Object.freeze({
+        kind: 'budget-bypass' as const,
+        equivalent: 'rows' in overBudget,
+        accepted: !(
+          'rejected' in overBudget &&
+          overBudget.rejected === 'budget-exceeded'
+        ),
+        detail: 'numeric row and cell budgets must reject oversized matrices',
+      }),
     ]),
   })
+}

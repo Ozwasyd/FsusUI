@@ -42,8 +42,6 @@ import {
   MARKDOWN_TABLE_ACCEPTANCE_VERSION,
   MARKDOWN_TABLE_TOUCH_TARGET_MIN,
   createMarkdownTableCommands,
-  evaluateMarkdownTableAcceptance,
-  evaluateMarkdownTableAcceptanceMutations,
   resolveMarkdownTableContextActions,
 } from '../src/markdown-editor-table-acceptance'
 import { defaultMarkdownEditorCommands } from '../src/markdown-editor'
@@ -357,6 +355,22 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
         expect(parsed.rows[2]![0]).toBe('with "quotes"')
       }
 
+      const spaces = parseMarkdownTableData('"  keep  ", value ', 'text/csv')
+      expect('rows' in spaces && spaces.rows[0]).toEqual(['  keep  ', ' value '])
+      expect(parseMarkdownTableData('"unterminated,value', 'text/csv')).toEqual({
+        rejected: 'malformed',
+      })
+      expect(parseMarkdownTableData('plain,comma')).toEqual({
+        rejected: 'not-table',
+      })
+      const controller = new AbortController()
+      controller.abort()
+      expect(
+        parseMarkdownTableData('a,b', 'text/csv', {
+          signal: controller.signal,
+        }),
+      ).toEqual({ rejected: 'aborted' })
+
       // Rejects exceeding budget
       const hugeData = Array.from({ length: 1001 }, () => 'a,b').join('\n')
       expect(parseMarkdownTableData(hugeData, 'text/csv')).toEqual({
@@ -378,7 +392,7 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
         doc,
         table.id,
         { tableId: table.id, row: 0, column: 0, status: 'current' },
-        'c1\tc2\tc3\nv1\tv2\tv3\nv4\tv5\tv6',
+        'c1\tc2\tc3\nv1|x\tv2\tv3\nv4\tv5\tv6',
         'text/tab-separated-values',
         1,
       )
@@ -390,6 +404,7 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
         expect(next.startsWith('before\n\n')).toBe(true)
         expect(next.endsWith('\n\nafter\n')).toBe(true)
         expect(next).toContain('c3')
+        expect(next).toContain('v1\\|x')
         expect(next).toContain('v6')
       }
     })
@@ -423,28 +438,13 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
       )
     })
 
-    it('evaluates complete acceptance suite across scales, modes, and accessibility', () => {
-      const report = evaluateMarkdownTableAcceptance({ documentIdentity: doc })
-      expect(report.version).toBe(MARKDOWN_TABLE_ACCEPTANCE_VERSION)
-      expect(report.accepted).toBe(true)
-      expect(report.scalePassed).toBe(true)
-      expect(report.structuralPassed).toBe(true)
-      expect(report.navigationPassed).toBe(true)
-      expect(report.pasteFormatPassed).toBe(true)
-      expect(report.a11yPassed).toBe(true)
-      expect(report.internalScrollPassed).toBe(true)
-      expect(report.staleRejected).toBe(true)
-      expect(report.malformedRejected).toBe(true)
-      expect(report.mutationsRejected).toBe(true)
-
+    it('publishes the matrix identifiers used by independent rendered acceptance', () => {
+      expect(MARKDOWN_TABLE_ACCEPTANCE_VERSION).toBe(
+        'markdown-table-acceptance@2026-08-27',
+      )
       expect(MARKDOWN_TABLE_ACCEPTANCE_SCALES).toEqual([1, 2, 20])
       expect(MARKDOWN_TABLE_ACCEPTANCE_MODES).toContain('live')
       expect(MARKDOWN_TABLE_ACCEPTANCE_MODES).toContain('split')
-    })
-
-    it('passes full acceptance mutation fixture killing card wall and consumer workaround', () => {
-      const report = evaluateMarkdownTableAcceptanceMutations()
-      expect(report.mutations.every((m) => m.accepted === false)).toBe(true)
     })
   })
 })

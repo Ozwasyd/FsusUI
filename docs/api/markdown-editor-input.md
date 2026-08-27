@@ -85,7 +85,12 @@ table identity and an exact source range; row/column coordinates alone are not a
 anchor. Table navigation, final-cell row append, contextual row/column/alignment
 commands, and TSV/CSV paste all carry the current revision and fail closed for a
 deleted, malformed, or stale table. Normal non-table paste and text editing retain
-the clipboard and beforeinput behavior defined above.
+the clipboard and beforeinput behavior defined above. CSV is entered only through
+`text/csv`; tab-delimited plain text or `text/tab-separated-values` uses TSV.
+Quoted fields preserve surrounding whitespace, escaped quotes, and embedded
+newlines (serialized as `<br>`), while unclosed quotes are rejected. HTML/file
+clipboard data never enters this path. Parsing enforces source-unit, row, column,
+and cell budgets and observes `AbortSignal`.
 
 `planMarkdownMermaidPreview` is the #384 Mermaid preview contract. Requests
 reuse the #382 identity. Valid diagrams preview through the unique feature

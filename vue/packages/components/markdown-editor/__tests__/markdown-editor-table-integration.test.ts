@@ -26,7 +26,8 @@ describe('MarkdownEditor table integration', () => {
     await textarea.setValue(source)
     const offset = source.indexOf('Column 1')
     await selectOffset(wrapper, offset)
-    expect(wrapper.find('[role="toolbar"][aria-label="Table actions"]').exists()).toBe(true)
+    expect(wrapper.find('button[aria-label="表格操作"]').exists()).toBe(true)
+    expect(wrapper.find('[role="menu"][aria-label="表格操作"]').exists()).toBe(false)
   })
 
   it('anchors the active cell with source identity and renders contextual actions', async () => {
@@ -42,7 +43,8 @@ describe('MarkdownEditor table integration', () => {
     expect(identity).toMatchObject({ row: 2, column: 0, status: 'current' })
     expect(identity?.cellId).toContain(':cell:')
     expect(identity?.anchor).toEqual(expect.objectContaining({ start: expect.any(Number) }))
-    expect(wrapper.find('[role="toolbar"][aria-label="Table actions"]').exists()).toBe(true)
+    expect(wrapper.find('button[aria-label="表格操作"]').exists()).toBe(true)
+    expect(wrapper.find('[role="menu"][aria-label="表格操作"]').exists()).toBe(false)
   })
 
   it('uses the selected row for contextual structure actions', async () => {
@@ -50,8 +52,9 @@ describe('MarkdownEditor table integration', () => {
     const offset = source.lastIndexOf('|  |  |') + 2
     await selectOffset(wrapper, offset)
 
+    await wrapper.get('button[aria-label="表格操作"]').trigger('click')
     const button = wrapper
-      .findAll('[role="toolbar"][aria-label="Table actions"] button')
+      .findAll('[role="menu"][aria-label="表格操作"] button')
       .find((item) => item.attributes('aria-label') === '在下方插入行')
     if (!button) throw new Error('missing insert-row action')
     await button.trigger('click')
@@ -84,5 +87,25 @@ describe('MarkdownEditor table integration', () => {
     const next = wrapper.emitted('update:modelValue')?.at(-1)?.[0] as string
     expect(next).toContain('| Column 1 | A | B |')
     expect(next).toContain('|  | C | D |')
+  })
+
+  it('does not treat file clipboard input as table-data authority', async () => {
+    const wrapper = mount(MarkdownEditor, { props: { modelValue: source } })
+    const textarea = await selectOffset(wrapper, source.indexOf('Column 1'))
+
+    await textarea.trigger('paste', {
+      clipboardData: {
+        files: [new File(['A\tB'], 'table.tsv', { type: 'text/tab-separated-values' })],
+        getData: (type: string) =>
+          type === 'text/tab-separated-values' ? 'A\tB\nC\tD' : '',
+        items: [],
+        types: ['Files', 'text/tab-separated-values'],
+      },
+    })
+
+    const values = (wrapper.emitted('update:modelValue') ?? []).map(
+      ([value]) => value as string,
+    )
+    expect(values.every((value) => !value.includes('| Column 1 | A | B |'))).toBe(true)
   })
 })
