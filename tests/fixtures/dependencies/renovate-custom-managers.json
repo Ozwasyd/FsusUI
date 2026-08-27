@@ -1,0 +1,61 @@
+{
+  "positive": [
+    {
+      "manager": "node-version-pins",
+      "file": ".nvmrc",
+      "text": "22.14.0\n",
+      "values": ["22.14.0"]
+    },
+    {
+      "manager": "node-version-pins",
+      "file": "package.json",
+      "text": "{\"engines\":{\"node\":\">= 22\"}}\n",
+      "values": ["22"]
+    },
+    {
+      "manager": "pnpm-package-manager",
+      "file": "vue/tests/consumer-install/template/package.json",
+      "text": "{\"packageManager\":\"pnpm@10.33.0\"}\n",
+      "values": ["10.33.0"]
+    },
+    {
+      "manager": "emsdk-version-input",
+      "file": ".github/workflows/_quality.yml",
+      "text": "- uses: emscripten-core/setup-emsdk@v15\n  with:\n    version: 5.0.4\n",
+      "values": ["5.0.4"]
+    },
+    {
+      "manager": "dotnet-target-framework",
+      "file": "dotnet/FsusUI.Avalonia.ApiTool/FsusUI.Avalonia.ApiTool.csproj",
+      "text": "<TargetFramework>net10.0</TargetFramework>\n",
+      "values": ["10.0"]
+    }
+  ],
+  "negative": [
+    {
+      "manager": "node-version-pins",
+      "file": "docs/example.md",
+      "text": "node-version: 99.0.0\n"
+    },
+    {
+      "manager": "node-version-pins",
+      "file": ".github/workflows/quality.yml",
+      "text": "steps:\n  - uses: actions/setup-node@v4\n    with:\n      node-version: 22.14.0\n"
+    },
+    {
+      "manager": "pnpm-package-manager",
+      "file": "package.json",
+      "text": "{\"packageManager\":\"npm@11.0.0\"}\n"
+    },
+    {
+      "manager": "emsdk-version-input",
+      "file": ".github/workflows/quality.yml",
+      "text": "- uses: actions/checkout@v4\n  with:\n    version: 5.0.4\n"
+    },
+    {
+      "manager": "dotnet-target-framework",
+      "file": "dotnet/FsusUI.Avalonia.FormGenerator/FsusUI.Avalonia.FormGenerator.csproj",
+      "text": "<TargetFramework>netstandard2.0</TargetFramework>\n"
+    }
+  ]
+}

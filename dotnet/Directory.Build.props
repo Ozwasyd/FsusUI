@@ -13,6 +13,7 @@
     <PackageTags>fsusui;avalonia;components;design-system;cross-platform</PackageTags>
     <PackageReleaseNotes>Stable Avalonia package candidate. Public API baselines, package metadata, symbol packages, dependency review, package content audit, and packed consumer verification guard stable NuGet readiness.</PackageReleaseNotes>
     <Deterministic>true</Deterministic>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
