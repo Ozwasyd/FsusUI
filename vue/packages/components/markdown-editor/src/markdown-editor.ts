@@ -1,3 +1,4 @@
+import { createMarkdownTableCommands } from './markdown-editor-table-acceptance'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
 import { buildProps, definePropType } from '@element-plus/utils'
 
@@ -638,6 +639,12 @@ const prefixSelectedLines = (
   )
 }
 
+
+export * from './markdown-editor-table'
+export * from './markdown-editor-table-structure'
+export * from './markdown-editor-table-input'
+export * from './markdown-editor-table-acceptance'
+
 export const defaultMarkdownEditorCommands: readonly MarkdownEditorCommand[] = [
   {
     key: 'bold',
@@ -730,6 +737,7 @@ export const defaultMarkdownEditorCommands: readonly MarkdownEditorCommand[] = [
     enabled: () => true,
     run: () => ({}),
   },
+  ...createMarkdownTableCommands(),
 ]
 
 export const isMarkdownEditorCommandVisible = (
