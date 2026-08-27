@@ -4,9 +4,9 @@ Component ID: `input`
 
 ## Avalonia API
 
-Use `FsusInput`, `FsusTextarea`, and `FsusInputNumber` for text entry,
-multiline entry, numeric entry, clear behavior, validation state, and IME
-composition guards.
+Use `FsusInput`, `FsusTextarea`, `FsusInputNumber`, and `FsusShortcutRecorder`
+for text entry, multiline entry, numeric entry, shortcut capture, clear
+behavior, validation state, and IME composition guards.
 
 ## Vue Contract Mapping
 

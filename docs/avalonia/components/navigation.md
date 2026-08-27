@@ -6,8 +6,9 @@ Component ID: `navigation`
 
 Use `FsusTabs`, `FsusTabPane`, `FsusMenu`, `FsusMenuItem`, `FsusSubMenu`,
 `FsusMenuItemGroup`, `FsusBreadcrumb`, `FsusBreadcrumbItem`, `FsusPageHeader`,
-`FsusSteps`, `FsusStep`, `FsusSettingsShell`, `FsusSettingsCategory`, and
-`FsusSettingsScrollResetBehavior`.
+`FsusSteps`, `FsusStep`, `FsusSettingsShell`, `FsusSettingsCategory`,
+`FsusSettingsScrollResetBehavior`, `FsusPlatformCommand`,
+`FsusNativeMenuItemModel`, and `FsusNativeMenuBuilder`.
 
 ## Vue Contract Mapping
 

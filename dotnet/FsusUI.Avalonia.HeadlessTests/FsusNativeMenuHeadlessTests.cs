@@ -1,0 +1,94 @@
+using Avalonia.Controls;
+using Avalonia.Headless.XUnit;
+using Avalonia.Input;
+using FsusUI.Avalonia.Controls;
+
+namespace FsusUI.Avalonia.HeadlessTests;
+
+public class FsusNativeMenuHeadlessTests
+{
+  [AvaloniaFact]
+  public void NativeMenuAttachesToWindowAndSynchronouslyReflectsCommandState()
+  {
+    var executed = false;
+    var saveCommand = new FsusPlatformCommand("doc.save", "Save", FsusPlatformRole.FileSave)
+    {
+      Gesture = new FsusShortcutGesture(Key.S, KeyModifiers.Control),
+      ExecuteAction = _ => executed = true,
+      IsEnabled = true,
+    };
+
+    var fileMenu = FsusNativeMenuItemModel.SubMenu(
+      "File",
+      FsusNativeMenuItemModel.Action(saveCommand));
+
+    var window = new Window();
+    using var builder = new FsusNativeMenuBuilder();
+    builder.AttachTo(window, [fileMenu], FsusShortcutPlatform.Windows);
+
+    var menu = NativeMenu.GetMenu(window);
+    Assert.NotNull(menu);
+
+    var fileItem = Assert.IsType<NativeMenuItem>(Assert.Single(menu.Items, i => i is NativeMenuItem m && m.Header == "File"));
+    Assert.NotNull(fileItem.Menu);
+    var saveItem = Assert.IsType<NativeMenuItem>(Assert.Single(fileItem.Menu.Items, i => i is NativeMenuItem m && m.Header == "Save"));
+
+    Assert.True(saveItem.IsEnabled);
+    Assert.NotNull(saveItem.Gesture);
+    Assert.Equal(Key.S, saveItem.Gesture.Key);
+
+    // Execute via command attached to item
+    Assert.NotNull(saveItem.Command);
+    saveItem.Command.Execute(null);
+    Assert.True(executed);
+
+    // Synchronous update on state change
+    saveCommand.IsEnabled = false;
+    Assert.False(saveItem.IsEnabled);
+
+    // Synchronous update on shortcut change
+    saveCommand.Gesture = new FsusShortcutGesture(Key.S, KeyModifiers.Control | KeyModifiers.Shift);
+    Assert.True(saveItem.Gesture.KeyModifiers.HasFlag(KeyModifiers.Shift));
+
+    window.Close();
+  }
+
+  [AvaloniaFact]
+  public void CommandPaletteIntegratesWithSharedCommandsInHeadless()
+  {
+    var undoInvoked = false;
+    var undoCommand = new FsusPlatformCommand("edit.undo", "Undo", FsusPlatformRole.EditUndo)
+    {
+      Category = "Edit",
+      Description = "Undo previous change",
+      Gesture = new FsusShortcutGesture(Key.Z, KeyModifiers.Control),
+      ExecuteAction = _ => undoInvoked = true,
+    };
+
+    var redoCommand = new FsusPlatformCommand("edit.redo", "Redo", FsusPlatformRole.EditRedo)
+    {
+      Category = "Edit",
+      Description = "Redo next change",
+      Gesture = new FsusShortcutGesture(Key.Y, KeyModifiers.Control),
+      IsEnabled = false,
+    };
+
+    var palette = new FsusCommandPaletteModel([undoCommand, redoCommand]);
+
+    // Search query
+    var results = palette.Search("und");
+    Assert.Single(results);
+    var result = results[0];
+    Assert.Equal("edit.undo", result.CommandId);
+    Assert.Equal("Undo", result.Label);
+    Assert.True(result.IsEnabled);
+    Assert.Equal("Ctrl+Z", result.DisplayShortcut);
+
+    result.Execute();
+    Assert.True(undoInvoked);
+
+    // Search empty query returns all
+    var all = palette.Search();
+    Assert.Equal(2, all.Count);
+  }
+}
