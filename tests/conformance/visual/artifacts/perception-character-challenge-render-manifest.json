@@ -22,14 +22,14 @@
     {
       "Id": "perception-character-challenge-conformance",
       "File": "tests/conformance/visual/artifacts/screenshots/avalonia/perception-character-challenge-conformance.png",
-      "Sha256": "42a991ce5a58d6b0843159860110e01b59a5f313c9bfac44d5bfd47bb1079f4d",
+      "Sha256": "e91364dd89fa48b8abf9a5a87ba49ea67dcf2e39ebf7de54cb339cddb5a8f5f6",
       "LogicalViewport": {
         "Width": 760,
-        "Height": 2718
+        "Height": 2639
       },
       "PixelSize": {
         "Width": 760,
-        "Height": 2718
+        "Height": 2639
       },
       "HighContrast": false,
       "ZoomEquivalentPercent": null,
@@ -48,79 +48,79 @@
           "X": 60,
           "Y": 16,
           "Width": 640,
-          "Height": 174,
+          "Height": 166,
           "Right": 700
         },
         {
           "X": 60,
-          "Y": 206,
+          "Y": 198,
           "Width": 640,
-          "Height": 437,
+          "Height": 427,
           "Right": 700
         },
         {
           "X": 60,
-          "Y": 659,
+          "Y": 641,
           "Width": 640,
-          "Height": 437,
+          "Height": 427,
           "Right": 700
         },
         {
           "X": 60,
-          "Y": 1112,
+          "Y": 1084,
           "Width": 640,
-          "Height": 483,
+          "Height": 468,
           "Right": 700
         },
         {
           "X": 60,
-          "Y": 1611,
+          "Y": 1568,
           "Width": 640,
-          "Height": 216,
+          "Height": 207,
           "Right": 700
         },
         {
           "X": 60,
-          "Y": 1843,
+          "Y": 1791,
           "Width": 640,
-          "Height": 216,
+          "Height": 207,
           "Right": 700
         },
         {
           "X": 60,
-          "Y": 2075,
+          "Y": 2014,
           "Width": 640,
-          "Height": 174,
+          "Height": 166,
           "Right": 700
         },
         {
           "X": 60,
-          "Y": 2265,
+          "Y": 2196,
           "Width": 640,
-          "Height": 437,
+          "Height": 427,
           "Right": 700
         }
       ],
-      "NonBackgroundPixelRatio": 0.216717,
+      "NonBackgroundPixelRatio": 0.212737,
       "ControlRegionNonBackgroundRatios": [
-        0.073375,
-        0.354058,
-        0.355692,
-        0.339321,
-        0.099139,
-        0.099826,
-        0.077694,
-        0.357358
+        0.061785,
+        0.351204,
+        0.352799,
+        0.336742,
+        0.087251,
+        0.087757,
+        0.065117,
+        0.354051
       ],
       "ControlBorderNonBackgroundRatios": [
-        0.958128,
-        0.968372,
-        0.968372,
-        0.973238,
-        0.960187,
-        0.964871,
-        0.958128,
-        0.968372
+        0.957711,
+        0.968075,
+        0.968075,
+        0.972875,
+        0.959763,
+        0.964497,
+        0.957711,
+        0.968075
       ],
       "CriticalControls": [
         {
@@ -128,7 +128,7 @@
           "AutomationId": "character-raster",
           "Bounds": {
             "X": 140,
-            "Y": 355,
+            "Y": 339,
             "Width": 480,
             "Height": 160,
             "Right": 620
@@ -143,67 +143,67 @@
           "AutomationId": "character-audio-alternative",
           "Bounds": {
             "X": 73,
-            "Y": 527,
-            "Width": 144,
-            "Height": 30,
-            "Right": 217
+            "Y": 511,
+            "Width": 137,
+            "Height": 29,
+            "Right": 210
           },
-          "RegionNonBackgroundRatio": 0.997222,
-          "BorderNonBackgroundRatio": 0.965116,
-          "QuantizedColorCount": 262,
-          "MinorityColorPixelRatio": 0.24375
+          "RegionNonBackgroundRatio": 0.99698,
+          "BorderNonBackgroundRatio": 0.963415,
+          "QuantizedColorCount": 177,
+          "MinorityColorPixelRatio": 0.213189
         },
         {
           "State": "ready",
           "AutomationId": "character-refresh",
           "Bounds": {
-            "X": 225,
-            "Y": 527,
-            "Width": 144,
-            "Height": 30,
-            "Right": 369
+            "X": 218,
+            "Y": 511,
+            "Width": 137,
+            "Height": 29,
+            "Right": 355
           },
-          "RegionNonBackgroundRatio": 0.997222,
-          "BorderNonBackgroundRatio": 0.965116,
-          "QuantizedColorCount": 261,
-          "MinorityColorPixelRatio": 0.256019
+          "RegionNonBackgroundRatio": 0.99698,
+          "BorderNonBackgroundRatio": 0.963415,
+          "QuantizedColorCount": 234,
+          "MinorityColorPixelRatio": 0.223257
         },
         {
           "State": "ready",
           "AutomationId": "character-response",
           "Bounds": {
             "X": 73,
-            "Y": 598,
-            "Width": 156,
+            "Y": 580,
+            "Width": 144,
             "Height": 32,
-            "Right": 229
+            "Right": 217
           },
-          "RegionNonBackgroundRatio": 0.180889,
-          "BorderNonBackgroundRatio": 0.989247,
-          "QuantizedColorCount": 133,
-          "MinorityColorPixelRatio": 0.210938
+          "RegionNonBackgroundRatio": 0.152344,
+          "BorderNonBackgroundRatio": 0.988506,
+          "QuantizedColorCount": 105,
+          "MinorityColorPixelRatio": 0.179253
         },
         {
           "State": "ready",
           "AutomationId": "character-submit",
           "Bounds": {
-            "X": 237,
-            "Y": 599,
-            "Width": 136,
-            "Height": 30,
-            "Right": 373
+            "X": 225,
+            "Y": 582,
+            "Width": 123,
+            "Height": 29,
+            "Right": 348
           },
-          "RegionNonBackgroundRatio": 0.997059,
-          "BorderNonBackgroundRatio": 0.963415,
-          "QuantizedColorCount": 150,
-          "MinorityColorPixelRatio": 0.231373
+          "RegionNonBackgroundRatio": 0.996636,
+          "BorderNonBackgroundRatio": 0.96,
+          "QuantizedColorCount": 123,
+          "MinorityColorPixelRatio": 0.208859
         },
         {
           "State": "verifying",
           "AutomationId": "character-raster",
           "Bounds": {
             "X": 140,
-            "Y": 808,
+            "Y": 782,
             "Width": 480,
             "Height": 160,
             "Right": 620
@@ -218,7 +218,7 @@
           "AutomationId": "character-raster",
           "Bounds": {
             "X": 140,
-            "Y": 1265,
+            "Y": 1225,
             "Width": 480,
             "Height": 160,
             "Right": 620
@@ -233,82 +233,82 @@
           "AutomationId": "character-audio-alternative",
           "Bounds": {
             "X": 73,
-            "Y": 1437,
-            "Width": 144,
-            "Height": 30,
-            "Right": 217
+            "Y": 1397,
+            "Width": 137,
+            "Height": 29,
+            "Right": 210
           },
-          "RegionNonBackgroundRatio": 0.997222,
-          "BorderNonBackgroundRatio": 0.965116,
-          "QuantizedColorCount": 262,
-          "MinorityColorPixelRatio": 0.24375
+          "RegionNonBackgroundRatio": 0.99698,
+          "BorderNonBackgroundRatio": 0.963415,
+          "QuantizedColorCount": 177,
+          "MinorityColorPixelRatio": 0.213189
         },
         {
           "State": "retryable",
           "AutomationId": "character-refresh",
           "Bounds": {
-            "X": 225,
-            "Y": 1437,
-            "Width": 144,
-            "Height": 30,
-            "Right": 369
+            "X": 218,
+            "Y": 1397,
+            "Width": 137,
+            "Height": 29,
+            "Right": 355
           },
-          "RegionNonBackgroundRatio": 0.997222,
-          "BorderNonBackgroundRatio": 0.965116,
-          "QuantizedColorCount": 261,
-          "MinorityColorPixelRatio": 0.256019
+          "RegionNonBackgroundRatio": 0.99698,
+          "BorderNonBackgroundRatio": 0.963415,
+          "QuantizedColorCount": 234,
+          "MinorityColorPixelRatio": 0.223257
         },
         {
           "State": "retryable",
           "AutomationId": "character-response",
           "Bounds": {
             "X": 73,
-            "Y": 1508,
+            "Y": 1466,
             "Width": 64,
             "Height": 32,
             "Right": 137
           },
-          "RegionNonBackgroundRatio": 0.18457,
+          "RegionNonBackgroundRatio": 0.166504,
           "BorderNonBackgroundRatio": 0.978723,
-          "QuantizedColorCount": 115,
-          "MinorityColorPixelRatio": 0.200195
+          "QuantizedColorCount": 119,
+          "MinorityColorPixelRatio": 0.178711
         },
         {
           "State": "retryable",
           "AutomationId": "character-submit",
           "Bounds": {
             "X": 145,
-            "Y": 1509,
-            "Width": 136,
-            "Height": 30,
-            "Right": 281
+            "Y": 1468,
+            "Width": 123,
+            "Height": 29,
+            "Right": 268
           },
-          "RegionNonBackgroundRatio": 0.997059,
-          "BorderNonBackgroundRatio": 0.963415,
-          "QuantizedColorCount": 288,
-          "MinorityColorPixelRatio": 0.248529
+          "RegionNonBackgroundRatio": 0.996636,
+          "BorderNonBackgroundRatio": 0.96,
+          "QuantizedColorCount": 221,
+          "MinorityColorPixelRatio": 0.216148
         },
         {
           "State": "retryable",
           "AutomationId": "character-retry",
           "Bounds": {
             "X": 73,
-            "Y": 1552,
-            "Width": 124,
-            "Height": 30,
-            "Right": 197
+            "Y": 1510,
+            "Width": 116,
+            "Height": 29,
+            "Right": 189
           },
-          "RegionNonBackgroundRatio": 0.996774,
-          "BorderNonBackgroundRatio": 0.960526,
-          "QuantizedColorCount": 260,
-          "MinorityColorPixelRatio": 0.243817
+          "RegionNonBackgroundRatio": 0.996433,
+          "BorderNonBackgroundRatio": 0.958042,
+          "QuantizedColorCount": 187,
+          "MinorityColorPixelRatio": 0.211356
         },
         {
           "State": "disabled",
           "AutomationId": "character-raster",
           "Bounds": {
             "X": 140,
-            "Y": 2414,
+            "Y": 2337,
             "Width": 480,
             "Height": 160,
             "Right": 620
@@ -323,14 +323,14 @@
     {
       "Id": "perception-character-challenge-high-contrast",
       "File": "tests/conformance/visual/artifacts/screenshots/avalonia/perception-character-challenge-high-contrast.png",
-      "Sha256": "e5f4ca9171b0882ace792700bdf8fac45c0be2530210e75c1344773b1cc3ba9b",
+      "Sha256": "568070c3770ac4a36feeb1d60623bc9a3a9cf9a8bd77d3327c2a530d352faafc",
       "LogicalViewport": {
         "Width": 760,
-        "Height": 2718
+        "Height": 2639
       },
       "PixelSize": {
         "Width": 760,
-        "Height": 2718
+        "Height": 2639
       },
       "HighContrast": true,
       "ZoomEquivalentPercent": null,
@@ -349,79 +349,79 @@
           "X": 60,
           "Y": 16,
           "Width": 640,
-          "Height": 174,
+          "Height": 166,
           "Right": 700
         },
         {
           "X": 60,
-          "Y": 206,
+          "Y": 198,
           "Width": 640,
-          "Height": 437,
+          "Height": 427,
           "Right": 700
         },
         {
           "X": 60,
-          "Y": 659,
+          "Y": 641,
           "Width": 640,
-          "Height": 437,
+          "Height": 427,
           "Right": 700
         },
         {
           "X": 60,
-          "Y": 1112,
+          "Y": 1084,
           "Width": 640,
-          "Height": 483,
+          "Height": 468,
           "Right": 700
         },
         {
           "X": 60,
-          "Y": 1611,
+          "Y": 1568,
           "Width": 640,
-          "Height": 216,
+          "Height": 207,
           "Right": 700
         },
         {
           "X": 60,
-          "Y": 1843,
+          "Y": 1791,
           "Width": 640,
-          "Height": 216,
+          "Height": 207,
           "Right": 700
         },
         {
           "X": 60,
-          "Y": 2075,
+          "Y": 2014,
           "Width": 640,
-          "Height": 174,
+          "Height": 166,
           "Right": 700
         },
         {
           "X": 60,
-          "Y": 2265,
+          "Y": 2196,
           "Width": 640,
-          "Height": 437,
+          "Height": 427,
           "Right": 700
         }
       ],
-      "NonBackgroundPixelRatio": 0.221863,
+      "NonBackgroundPixelRatio": 0.216057,
       "ControlRegionNonBackgroundRatios": [
-        0.084366,
-        0.359032,
-        0.360426,
-        0.3444,
-        0.108261,
-        0.108579,
-        0.089296,
-        0.362214
+        0.068656,
+        0.354497,
+        0.355855,
+        0.340218,
+        0.092957,
+        0.093335,
+        0.072468,
+        0.35726
       ],
       "ControlBorderNonBackgroundRatios": [
-        0.963054,
-        0.972093,
-        0.972093,
-        0.973238,
-        0.964871,
-        0.964871,
-        0.963054,
-        0.972093
+        0.962687,
+        0.971831,
+        0.971831,
+        0.972875,
+        0.964497,
+        0.964497,
+        0.962687,
+        0.971831
       ],
       "CriticalControls": [
         {
@@ -429,7 +429,7 @@
           "AutomationId": "character-raster",
           "Bounds": {
             "X": 140,
-            "Y": 355,
+            "Y": 339,
             "Width": 480,
             "Height": 160,
             "Right": 620
@@ -444,67 +444,67 @@
           "AutomationId": "character-audio-alternative",
           "Bounds": {
             "X": 73,
-            "Y": 527,
-            "Width": 144,
-            "Height": 30,
-            "Right": 217
+            "Y": 511,
+            "Width": 137,
+            "Height": 29,
+            "Right": 210
           },
-          "RegionNonBackgroundRatio": 0.997222,
-          "BorderNonBackgroundRatio": 0.965116,
-          "QuantizedColorCount": 241,
-          "MinorityColorPixelRatio": 0.253009
+          "RegionNonBackgroundRatio": 0.99698,
+          "BorderNonBackgroundRatio": 0.963415,
+          "QuantizedColorCount": 201,
+          "MinorityColorPixelRatio": 0.221998
         },
         {
           "State": "ready",
           "AutomationId": "character-refresh",
           "Bounds": {
-            "X": 225,
-            "Y": 527,
-            "Width": 144,
-            "Height": 30,
-            "Right": 369
+            "X": 218,
+            "Y": 511,
+            "Width": 137,
+            "Height": 29,
+            "Right": 355
           },
-          "RegionNonBackgroundRatio": 0.997222,
-          "BorderNonBackgroundRatio": 0.965116,
-          "QuantizedColorCount": 236,
-          "MinorityColorPixelRatio": 0.2625
+          "RegionNonBackgroundRatio": 0.99698,
+          "BorderNonBackgroundRatio": 0.963415,
+          "QuantizedColorCount": 255,
+          "MinorityColorPixelRatio": 0.234583
         },
         {
           "State": "ready",
           "AutomationId": "character-response",
           "Bounds": {
             "X": 73,
-            "Y": 598,
-            "Width": 156,
+            "Y": 580,
+            "Width": 144,
             "Height": 32,
-            "Right": 229
+            "Right": 217
           },
-          "RegionNonBackgroundRatio": 0.21855,
-          "BorderNonBackgroundRatio": 0.989247,
-          "QuantizedColorCount": 107,
-          "MinorityColorPixelRatio": 0.230168
+          "RegionNonBackgroundRatio": 0.184679,
+          "BorderNonBackgroundRatio": 0.988506,
+          "QuantizedColorCount": 102,
+          "MinorityColorPixelRatio": 0.193793
         },
         {
           "State": "ready",
           "AutomationId": "character-submit",
           "Bounds": {
-            "X": 237,
-            "Y": 599,
-            "Width": 136,
-            "Height": 30,
-            "Right": 373
+            "X": 225,
+            "Y": 582,
+            "Width": 123,
+            "Height": 29,
+            "Right": 348
           },
-          "RegionNonBackgroundRatio": 0.997059,
-          "BorderNonBackgroundRatio": 0.963415,
-          "QuantizedColorCount": 128,
-          "MinorityColorPixelRatio": 0.253676
+          "RegionNonBackgroundRatio": 0.996636,
+          "BorderNonBackgroundRatio": 0.96,
+          "QuantizedColorCount": 124,
+          "MinorityColorPixelRatio": 0.222876
         },
         {
           "State": "verifying",
           "AutomationId": "character-raster",
           "Bounds": {
             "X": 140,
-            "Y": 808,
+            "Y": 782,
             "Width": 480,
             "Height": 160,
             "Right": 620
@@ -519,7 +519,7 @@
           "AutomationId": "character-raster",
           "Bounds": {
             "X": 140,
-            "Y": 1265,
+            "Y": 1225,
             "Width": 480,
             "Height": 160,
             "Right": 620
@@ -534,82 +534,82 @@
           "AutomationId": "character-audio-alternative",
           "Bounds": {
             "X": 73,
-            "Y": 1437,
-            "Width": 144,
-            "Height": 30,
-            "Right": 217
+            "Y": 1397,
+            "Width": 137,
+            "Height": 29,
+            "Right": 210
           },
-          "RegionNonBackgroundRatio": 0.997222,
-          "BorderNonBackgroundRatio": 0.965116,
-          "QuantizedColorCount": 241,
-          "MinorityColorPixelRatio": 0.253009
+          "RegionNonBackgroundRatio": 0.99698,
+          "BorderNonBackgroundRatio": 0.963415,
+          "QuantizedColorCount": 201,
+          "MinorityColorPixelRatio": 0.221998
         },
         {
           "State": "retryable",
           "AutomationId": "character-refresh",
           "Bounds": {
-            "X": 225,
-            "Y": 1437,
-            "Width": 144,
-            "Height": 30,
-            "Right": 369
+            "X": 218,
+            "Y": 1397,
+            "Width": 137,
+            "Height": 29,
+            "Right": 355
           },
-          "RegionNonBackgroundRatio": 0.997222,
-          "BorderNonBackgroundRatio": 0.965116,
-          "QuantizedColorCount": 236,
-          "MinorityColorPixelRatio": 0.2625
+          "RegionNonBackgroundRatio": 0.99698,
+          "BorderNonBackgroundRatio": 0.963415,
+          "QuantizedColorCount": 255,
+          "MinorityColorPixelRatio": 0.234583
         },
         {
           "State": "retryable",
           "AutomationId": "character-response",
           "Bounds": {
             "X": 73,
-            "Y": 1508,
+            "Y": 1466,
             "Width": 64,
             "Height": 32,
             "Right": 137
           },
-          "RegionNonBackgroundRatio": 0.204102,
+          "RegionNonBackgroundRatio": 0.181152,
           "BorderNonBackgroundRatio": 0.978723,
-          "QuantizedColorCount": 126,
-          "MinorityColorPixelRatio": 0.205078
+          "QuantizedColorCount": 136,
+          "MinorityColorPixelRatio": 0.182129
         },
         {
           "State": "retryable",
           "AutomationId": "character-submit",
           "Bounds": {
             "X": 145,
-            "Y": 1509,
-            "Width": 136,
-            "Height": 30,
-            "Right": 281
+            "Y": 1468,
+            "Width": 123,
+            "Height": 29,
+            "Right": 268
           },
-          "RegionNonBackgroundRatio": 0.997059,
-          "BorderNonBackgroundRatio": 0.963415,
+          "RegionNonBackgroundRatio": 0.996636,
+          "BorderNonBackgroundRatio": 0.96,
           "QuantizedColorCount": 256,
-          "MinorityColorPixelRatio": 0.255637
+          "MinorityColorPixelRatio": 0.22596
         },
         {
           "State": "retryable",
           "AutomationId": "character-retry",
           "Bounds": {
             "X": 73,
-            "Y": 1552,
-            "Width": 124,
-            "Height": 30,
-            "Right": 197
+            "Y": 1510,
+            "Width": 116,
+            "Height": 29,
+            "Right": 189
           },
-          "RegionNonBackgroundRatio": 0.996774,
-          "BorderNonBackgroundRatio": 0.960526,
-          "QuantizedColorCount": 240,
-          "MinorityColorPixelRatio": 0.253495
+          "RegionNonBackgroundRatio": 0.996433,
+          "BorderNonBackgroundRatio": 0.958042,
+          "QuantizedColorCount": 209,
+          "MinorityColorPixelRatio": 0.222057
         },
         {
           "State": "disabled",
           "AutomationId": "character-raster",
           "Bounds": {
             "X": 140,
-            "Y": 2414,
+            "Y": 2337,
             "Width": 480,
             "Height": 160,
             "Right": 620
@@ -624,14 +624,14 @@
     {
       "Id": "perception-character-challenge-zoom-200",
       "File": "tests/conformance/visual/artifacts/screenshots/avalonia/perception-character-challenge-zoom-200.png",
-      "Sha256": "5720438114727bb35d128dbdd629c4276402caf60371aefa4557099ce3c23c06",
+      "Sha256": "cf1774c71ed4bbc7f4dc09319652b261e5ddb99a467628f4e4037e846fd2c2e8",
       "LogicalViewport": {
         "Width": 380,
-        "Height": 495
+        "Height": 479
       },
       "PixelSize": {
         "Width": 380,
-        "Height": 495
+        "Height": 479
       },
       "HighContrast": false,
       "ZoomEquivalentPercent": 200,
@@ -643,16 +643,16 @@
           "X": 16,
           "Y": 16,
           "Width": 348,
-          "Height": 463,
+          "Height": 447,
           "Right": 364
         }
       ],
-      "NonBackgroundPixelRatio": 0.329038,
+      "NonBackgroundPixelRatio": 0.318036,
       "ControlRegionNonBackgroundRatios": [
-        0.384127
+        0.372143
       ],
       "ControlBorderNonBackgroundRatios": [
-        0.962917
+        0.962169
       ],
       "CriticalControls": [
         {
@@ -660,7 +660,7 @@
           "AutomationId": "character-raster",
           "Bounds": {
             "X": 29,
-            "Y": 201,
+            "Y": 188,
             "Width": 322,
             "Height": 107.33,
             "Right": 351
@@ -675,89 +675,89 @@
           "AutomationId": "character-audio-alternative",
           "Bounds": {
             "X": 29,
-            "Y": 321,
-            "Width": 144,
-            "Height": 30,
-            "Right": 173
+            "Y": 308,
+            "Width": 137,
+            "Height": 29,
+            "Right": 166
           },
-          "RegionNonBackgroundRatio": 0.997222,
-          "BorderNonBackgroundRatio": 0.965116,
-          "QuantizedColorCount": 262,
-          "MinorityColorPixelRatio": 0.24375
+          "RegionNonBackgroundRatio": 0.99698,
+          "BorderNonBackgroundRatio": 0.963415,
+          "QuantizedColorCount": 177,
+          "MinorityColorPixelRatio": 0.213189
         },
         {
           "State": "retryable",
           "AutomationId": "character-refresh",
           "Bounds": {
-            "X": 181,
-            "Y": 321,
-            "Width": 144,
-            "Height": 30,
-            "Right": 325
+            "X": 174,
+            "Y": 308,
+            "Width": 137,
+            "Height": 29,
+            "Right": 311
           },
-          "RegionNonBackgroundRatio": 0.997222,
-          "BorderNonBackgroundRatio": 0.965116,
-          "QuantizedColorCount": 261,
-          "MinorityColorPixelRatio": 0.256019
+          "RegionNonBackgroundRatio": 0.99698,
+          "BorderNonBackgroundRatio": 0.963415,
+          "QuantizedColorCount": 234,
+          "MinorityColorPixelRatio": 0.223257
         },
         {
           "State": "retryable",
           "AutomationId": "character-response",
           "Bounds": {
             "X": 29,
-            "Y": 392,
+            "Y": 377,
             "Width": 64,
             "Height": 32,
             "Right": 93
           },
-          "RegionNonBackgroundRatio": 0.18457,
+          "RegionNonBackgroundRatio": 0.166504,
           "BorderNonBackgroundRatio": 0.978723,
-          "QuantizedColorCount": 115,
-          "MinorityColorPixelRatio": 0.200195
+          "QuantizedColorCount": 119,
+          "MinorityColorPixelRatio": 0.178711
         },
         {
           "State": "retryable",
           "AutomationId": "character-submit",
           "Bounds": {
             "X": 101,
-            "Y": 393,
-            "Width": 136,
-            "Height": 30,
-            "Right": 237
+            "Y": 379,
+            "Width": 123,
+            "Height": 29,
+            "Right": 224
           },
-          "RegionNonBackgroundRatio": 0.997059,
-          "BorderNonBackgroundRatio": 0.963415,
-          "QuantizedColorCount": 288,
-          "MinorityColorPixelRatio": 0.248529
+          "RegionNonBackgroundRatio": 0.996636,
+          "BorderNonBackgroundRatio": 0.96,
+          "QuantizedColorCount": 221,
+          "MinorityColorPixelRatio": 0.216148
         },
         {
           "State": "retryable",
           "AutomationId": "character-retry",
           "Bounds": {
             "X": 29,
-            "Y": 436,
-            "Width": 124,
-            "Height": 30,
-            "Right": 153
+            "Y": 421,
+            "Width": 116,
+            "Height": 29,
+            "Right": 145
           },
-          "RegionNonBackgroundRatio": 0.996774,
-          "BorderNonBackgroundRatio": 0.960526,
-          "QuantizedColorCount": 260,
-          "MinorityColorPixelRatio": 0.243817
+          "RegionNonBackgroundRatio": 0.996433,
+          "BorderNonBackgroundRatio": 0.958042,
+          "QuantizedColorCount": 187,
+          "MinorityColorPixelRatio": 0.211356
         }
       ]
     },
     {
       "Id": "perception-character-challenge-zoom-400",
       "File": "tests/conformance/visual/artifacts/screenshots/avalonia/perception-character-challenge-zoom-400.png",
-      "Sha256": "e68d3b7e696ca51e589d25db7ba28a988e6ca4327d9e49ef89f557a7525319a1",
+      "Sha256": "c9a50baf384d62f98d776965c7f68d6e184e886bf077c7a34c9325aebb6c239f",
       "LogicalViewport": {
         "Width": 190,
-        "Height": 693
+        "Height": 645
       },
       "PixelSize": {
         "Width": 190,
-        "Height": 693
+        "Height": 645
       },
       "HighContrast": false,
       "ZoomEquivalentPercent": 400,
@@ -769,16 +769,16 @@
           "X": 16,
           "Y": 16,
           "Width": 158,
-          "Height": 661,
+          "Height": 613,
           "Right": 174
         }
       ],
-      "NonBackgroundPixelRatio": 0.247224,
+      "NonBackgroundPixelRatio": 0.235447,
       "ControlRegionNonBackgroundRatios": [
-        0.311687
+        0.297912
       ],
       "ControlBorderNonBackgroundRatios": [
-        0.96328
+        0.960988
       ],
       "CriticalControls": [
         {
@@ -786,7 +786,7 @@
           "AutomationId": "character-raster",
           "Bounds": {
             "X": 29,
-            "Y": 339,
+            "Y": 312,
             "Width": 132,
             "Height": 44,
             "Right": 161
@@ -801,75 +801,75 @@
           "AutomationId": "character-audio-alternative",
           "Bounds": {
             "X": 29,
-            "Y": 395,
-            "Width": 92,
-            "Height": 46,
-            "Right": 121
+            "Y": 368,
+            "Width": 88,
+            "Height": 45,
+            "Right": 117
           },
-          "RegionNonBackgroundRatio": 0.997164,
-          "BorderNonBackgroundRatio": 0.955882,
-          "QuantizedColorCount": 260,
-          "MinorityColorPixelRatio": 0.232514
+          "RegionNonBackgroundRatio": 0.99697,
+          "BorderNonBackgroundRatio": 0.954198,
+          "QuantizedColorCount": 176,
+          "MinorityColorPixelRatio": 0.190152
         },
         {
           "State": "retryable",
           "AutomationId": "character-refresh",
           "Bounds": {
             "X": 29,
-            "Y": 449,
-            "Width": 86,
-            "Height": 46,
-            "Right": 115
+            "Y": 421,
+            "Width": 81,
+            "Height": 45,
+            "Right": 110
           },
-          "RegionNonBackgroundRatio": 0.996967,
-          "BorderNonBackgroundRatio": 0.953846,
-          "QuantizedColorCount": 269,
-          "MinorityColorPixelRatio": 0.25632
+          "RegionNonBackgroundRatio": 0.996708,
+          "BorderNonBackgroundRatio": 0.951613,
+          "QuantizedColorCount": 234,
+          "MinorityColorPixelRatio": 0.221399
         },
         {
           "State": "retryable",
           "AutomationId": "character-response",
           "Bounds": {
             "X": 29,
-            "Y": 536,
+            "Y": 506,
             "Width": 64,
             "Height": 32,
             "Right": 93
           },
-          "RegionNonBackgroundRatio": 0.18457,
+          "RegionNonBackgroundRatio": 0.166504,
           "BorderNonBackgroundRatio": 0.978723,
-          "QuantizedColorCount": 115,
-          "MinorityColorPixelRatio": 0.200195
+          "QuantizedColorCount": 119,
+          "MinorityColorPixelRatio": 0.178711
         },
         {
           "State": "retryable",
           "AutomationId": "character-submit",
           "Bounds": {
             "X": 29,
-            "Y": 576,
-            "Width": 82,
-            "Height": 46,
-            "Right": 111
+            "Y": 546,
+            "Width": 123,
+            "Height": 29,
+            "Right": 152
           },
-          "RegionNonBackgroundRatio": 0.996819,
-          "BorderNonBackgroundRatio": 0.952381,
-          "QuantizedColorCount": 288,
-          "MinorityColorPixelRatio": 0.248674
+          "RegionNonBackgroundRatio": 0.996636,
+          "BorderNonBackgroundRatio": 0.96,
+          "QuantizedColorCount": 221,
+          "MinorityColorPixelRatio": 0.216148
         },
         {
           "State": "retryable",
           "AutomationId": "character-retry",
           "Bounds": {
             "X": 29,
-            "Y": 634,
-            "Width": 124,
-            "Height": 30,
-            "Right": 153
+            "Y": 587,
+            "Width": 116,
+            "Height": 29,
+            "Right": 145
           },
-          "RegionNonBackgroundRatio": 0.996774,
-          "BorderNonBackgroundRatio": 0.960526,
-          "QuantizedColorCount": 260,
-          "MinorityColorPixelRatio": 0.243817
+          "RegionNonBackgroundRatio": 0.996433,
+          "BorderNonBackgroundRatio": 0.958042,
+          "QuantizedColorCount": 187,
+          "MinorityColorPixelRatio": 0.211356
         }
       ]
     }
