@@ -27,4 +27,5 @@
   <SolidColorBrush x:Key="FsusThemeLoadingBrush" Color="#1F2937" />
   <x:Double x:Key="FsusThemeDisabledOpacity">0.72</x:Double>
   <x:Double x:Key="FsusThemeFocusThickness">3</x:Double>
+  <Thickness x:Key="FsusThemeFocusBorderThickness">3</Thickness>
 </ResourceDictionary>

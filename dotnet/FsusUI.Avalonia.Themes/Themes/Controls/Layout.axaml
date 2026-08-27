@@ -80,7 +80,7 @@
 
   <Style Selector="fsus|FsusScrollbar:focus">
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
-    <Setter Property="BorderThickness" Value="{DynamicResource FsusThemeFocusThickness}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusThemeFocusBorderThickness}" />
   </Style>
 
   <Style Selector="fsus|FsusVisualHidden">
