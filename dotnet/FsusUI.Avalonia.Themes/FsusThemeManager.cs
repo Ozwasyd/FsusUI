@@ -74,6 +74,8 @@ public static class FsusThemeResourceKeys
 
 public sealed class FsusThemeManager
 {
+  private const string FocusBorderThicknessResourceKey = "FsusThemeFocusBorderThickness";
+
   private static readonly ThemePalette LightPalette =
     new(
       "#FFFFFF",
@@ -202,6 +204,7 @@ public sealed class FsusThemeManager
     SetBrush(resources, FsusThemeResourceKeys.LoadingBrush, palette.Loading);
     resources[FsusThemeResourceKeys.DisabledOpacity] = palette.DisabledOpacity;
     resources[FsusThemeResourceKeys.FocusThickness] = palette.FocusThickness;
+    resources[FocusBorderThicknessResourceKey] = new Thickness(palette.FocusThickness);
   }
 
   private static void ApplyAccent(IResourceDictionary resources, Color? accent)
