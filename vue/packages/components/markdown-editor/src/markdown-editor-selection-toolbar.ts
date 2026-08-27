@@ -59,12 +59,52 @@ export type MarkdownSelectionToolbarMutationKind =
   | "selection-lost"
   | "stale-epoch-surface"
 
-export const evaluateMarkdownSelectionToolbarMutations = () =>
-  Object.freeze({
+export const evaluateMarkdownSelectionToolbarMutations = () => {
+  const selection = Object.freeze({ start: 4, end: 12 })
+  const authority = resolveMarkdownSelectionToolbarPlacement(
+    selection,
+    3,
+    3,
+    { documentEpoch: 2, expectedEpoch: 2 },
+  )
+  const focusReturn = resolveMarkdownSelectionToolbarFocusReturn(selection)
+  const staleEpoch = resolveMarkdownSelectionToolbarPlacement(
+    selection,
+    3,
+    3,
+    { documentEpoch: 2, expectedEpoch: 3 },
+  )
+  const syntheticDomRange = Object.freeze({ start: 0, end: 0 })
+  const nakedViewportCoordinates = Object.freeze({ start: 20, end: 80 })
+
+  return Object.freeze({
+    authority,
     mutations: Object.freeze([
-      Object.freeze({ kind: "dom-placement" as const, equivalent: false, accepted: false }),
-      Object.freeze({ kind: "naked-coordinates" as const, equivalent: false, accepted: false }),
-      Object.freeze({ kind: "selection-lost" as const, equivalent: false, accepted: false }),
-      Object.freeze({ kind: "stale-epoch-surface" as const, equivalent: false, accepted: false }),
+      Object.freeze({
+        kind: "dom-placement" as const,
+        equivalent:
+          syntheticDomRange.start === authority.anchor.start &&
+          syntheticDomRange.end === authority.anchor.end,
+        accepted: false,
+      }),
+      Object.freeze({
+        kind: "naked-coordinates" as const,
+        equivalent:
+          nakedViewportCoordinates.start === authority.anchor.start &&
+          nakedViewportCoordinates.end === authority.anchor.end,
+        accepted: false,
+      }),
+      Object.freeze({
+        kind: "selection-lost" as const,
+        equivalent:
+          focusReturn.selection.start === focusReturn.selection.end,
+        accepted: false,
+      }),
+      Object.freeze({
+        kind: "stale-epoch-surface" as const,
+        equivalent: staleEpoch.visible,
+        accepted: false,
+      }),
     ]),
   })
+}

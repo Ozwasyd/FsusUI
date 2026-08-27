@@ -115,6 +115,44 @@ describe("Issue #430: Unified command registry, context, and presentation metada
     expect(report.mutations.every((m) => m.accepted === false)).toBe(true)
     expect(report.mutations.find((m) => m.kind === "duplicate-shortcut")?.equivalent).toBe(false)
   })
+
+  it("rejects malformed registry entries before a surface can render them", () => {
+    const ctx = makeContext()
+    const bold = defaultMarkdownEditorCommands[0]!
+    expect(() =>
+      createMarkdownEditorCommandSnapshot(
+        [bold, { ...bold, key: bold.key }],
+        ctx,
+      ),
+    ).toThrow(/duplicate command key/)
+    expect(() =>
+      createMarkdownEditorCommandSnapshot(
+        [{ ...bold, group: "" }],
+        ctx,
+      ),
+    ).toThrow(/group must not be empty/)
+    expect(() =>
+      createMarkdownEditorCommandSnapshot(
+        [{ ...bold, icon: "arbitrary" as never }],
+        ctx,
+      ),
+    ).toThrow(/unregistered icon/)
+    expect(() =>
+      createMarkdownEditorCommandSnapshot(
+        [{ ...bold, apply: bold.run } as MarkdownEditorCommand],
+        ctx,
+      ),
+    ).toThrow(/legacy apply/)
+    expect(() =>
+      resolveMarkdownEditorShortcut(
+        [
+          { ...bold, key: "normalized-1", shortcut: "Mod+B" },
+          { ...bold, key: "normalized-2", shortcut: "mod + b" },
+        ],
+        "MOD+B",
+      ),
+    ).toThrow(/shortcut conflict/)
+  })
 })
 
 describe("Issue #431: Async command cancellation, anchor rebase, and shared pending state", () => {
@@ -142,8 +180,27 @@ describe("Issue #431: Async command cancellation, anchor rebase, and shared pend
     const rebasedState = rebaseMarkdownEditorCommandSession(session, makeContext({ revision: 2 }), positionMap)
     expect(rebasedState).toBe("pending")
     expect(session.anchor?.start).toBe(5 + "PREFIX ".length)
+    expect(session.revision).toBe(2)
+    expect(
+      resolveMarkdownEditorCommandSession(
+        session,
+        makeContext({ revision: 2 }),
+        "resolved-current",
+      ),
+    ).toBe("resolved-current")
+
+    const unmapped = createMarkdownEditorCommandSession("unmapped", ctx, {
+      anchor: { start: 5, end: 10 },
+    })
+    expect(
+      rebaseMarkdownEditorCommandSession(
+        unmapped,
+        makeContext({ revision: 2 }),
+      ),
+    ).toBe("stale")
 
     // Rebase when anchor is deleted
+    session.state = "pending"
     const deleteMap = createMarkdownEditorPositionMap([
       { from: 0, to: 20, insert: "" },
     ])
@@ -206,6 +263,46 @@ describe("Issue #433: Locale authority, command/mode/capability, and zero write 
     expect("write" in defaultMarkdownEditorLocaleText.commands).toBe(false)
     expect("write" in merged.modes).toBe(false)
   })
+
+  it("keeps eight locale overrides and long-copy fixtures isolated", () => {
+    const locales = [
+      "ar",
+      "de",
+      "en",
+      "es",
+      "fr",
+      "ja",
+      "ko",
+      "zh",
+    ].map((locale) =>
+      resolveMarkdownEditorLocaleText({
+        editorAria: `${locale}-editor`,
+        modes: { source: `${locale}-source` },
+        commandPalette: {
+          empty: `${locale}-empty`,
+          searchPlaceholder: `${locale}-search`,
+          title: `${locale}-palette`,
+        },
+      }),
+    )
+    expect(new Set(locales.map((locale) => locale.editorAria)).size).toBe(8)
+    expect(new Set(locales.map((locale) => locale.modes.source)).size).toBe(8)
+    expect(
+      locales.every(
+        (locale) =>
+          locale.modes.preview === defaultMarkdownEditorLocaleText.modes.preview,
+      ),
+    ).toBe(true)
+
+    const longLocale = resolveMarkdownEditorLocaleText({
+      overflow: "L".repeat(120),
+      commandPalette: {
+        searchPlaceholder: "S".repeat(160),
+      },
+    })
+    expect(longLocale.overflow).toHaveLength(120)
+    expect(longLocale.commandPalette.searchPlaceholder).toHaveLength(160)
+  })
 })
 
 describe("Issue #435: Status density none/minimal/detailed and stable slot payload", () => {
@@ -217,14 +314,14 @@ describe("Issue #435: Status density none/minimal/detailed and stable slot paylo
 
     const minStatus = resolveMarkdownEditorStatus(text, "minimal")
     expect(minStatus.visible).toBe(true)
-    expect(minStatus.ariaLiveMessage).toContain("words")
+    expect(minStatus.ariaLiveMessage).toBe("")
 
     const detailedStatus = resolveMarkdownEditorStatus(text, "detailed", undefined, { start: 0, end: 5 }, ["synced-highlight"])
     expect(detailedStatus.visible).toBe(true)
     expect(detailedStatus.slotPayload.metrics.lineCount).toBe(3)
     expect(detailedStatus.slotPayload.state.mode).toBe("source")
     expect(detailedStatus.slotPayload.capability).toContain("synced-highlight")
-    expect(detailedStatus.ariaLiveMessage).toContain("Line")
+    expect(detailedStatus.ariaLiveMessage).toContain("编辑器能力")
   })
 
   it("passes status mutation evaluation", () => {
@@ -252,6 +349,28 @@ describe("Issue #366: Command toolbar density, grouping, and overflow", () => {
     const overflow = resolveMarkdownEditorOverflowCommands(cmds, "minimal")
     expect(primary.length).toBe(2)
     expect(overflow.length).toBe(cmds.length - 2)
+  })
+
+  it("sorts by priority and group independently of registration order at scale", () => {
+    const thousandCommands = Array.from({ length: 1000 }, (_, index) => ({
+      key: `command-${index}`,
+      group: index % 2 ? "insert" : "format",
+      priority: index,
+    }))
+    const forward = resolveMarkdownEditorPrimaryCommands(
+      thousandCommands,
+      "standard",
+    ).map((command) => command.key)
+    const reversed = resolveMarkdownEditorPrimaryCommands(
+      [...thousandCommands].reverse(),
+      "standard",
+    ).map((command) => command.key)
+    expect(reversed).toEqual(forward)
+    expect(forward[0]).toBe("command-999")
+    expect(resolveMarkdownEditorPrimaryCommands([], "full")).toEqual([])
+    expect(
+      resolveMarkdownEditorOverflowCommands(thousandCommands, "minimal"),
+    ).toHaveLength(998)
   })
 
   it("passes toolbar mutation evaluation", () => {

@@ -648,6 +648,40 @@ export class MarkdownEditorTransactionStore {
     this.#mergeBlocked = true
   }
 
+  reset(value: string, selection?: MarkdownEditorSelection): MarkdownEditorStoreMutation {
+    const beforeSelection = this.selection
+    const nextSelection =
+      normalizeMarkdownEditorSelection(
+        value,
+        selection ?? {
+          direction: 'none',
+          end: value.length,
+          start: value.length,
+        },
+      ) ?? {
+        direction: 'none' as const,
+        end: value.length,
+        start: value.length,
+      }
+    const historyChanged = this.#undo.length > 0 || this.#redo.length > 0
+    const selectionChanged = !selectionsEqual(beforeSelection, nextSelection)
+    const valueChanged = this.#value !== value
+
+    this.#value = value
+    this.#selection = nextSelection
+    this.#undo = []
+    this.#redo = []
+    this.#revision += 1
+    this.breakMergeGroup()
+
+    return Object.freeze({
+      ...this.#result(true),
+      historyChanged,
+      selectionChanged,
+      valueChanged,
+    })
+  }
+
   setSelection(selection: MarkdownEditorSelection, breakMerge = true) {
     const normalized = normalizeMarkdownEditorSelection(this.#value, selection)
     if (!normalized) return false

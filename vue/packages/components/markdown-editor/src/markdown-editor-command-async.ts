@@ -21,7 +21,7 @@ export interface MarkdownEditorCommandAnchor {
 export interface MarkdownEditorCommandSession {
   readonly key: string
   readonly attemptId: string
-  readonly revision: number
+  revision: number
   readonly documentId: string
   readonly epoch: number
   anchor?: MarkdownEditorCommandAnchor
@@ -89,29 +89,28 @@ export const rebaseMarkdownEditorCommandSession = (
     return session.state
   }
 
+  if (!positionMap) {
+    session.state = "stale"
+    return "stale"
+  }
+
   if (session.anchor) {
-    if (positionMap) {
-      const rebased = positionMap.rebase({
-        start: session.anchor.start,
-        end: session.anchor.end,
-      })
-      if (!rebased || rebased.end <= rebased.start) {
-        session.state = "deleted"
-        return "deleted"
-      }
-      session.anchor = {
-        start: rebased.start,
-        end: rebased.end,
-        nodeId: session.anchor.nodeId,
-      }
-    } else {
-      if (context.value.length < session.anchor.end) {
-        session.state = "deleted"
-        return "deleted"
-      }
+    const rebased = positionMap.rebase({
+      start: session.anchor.start,
+      end: session.anchor.end,
+    })
+    if (!rebased || rebased.end <= rebased.start) {
+      session.state = "deleted"
+      return "deleted"
+    }
+    session.anchor = {
+      start: rebased.start,
+      end: rebased.end,
+      nodeId: session.anchor.nodeId,
     }
   }
 
+  session.revision = context.revision
   return session.state
 }
 
@@ -166,54 +165,116 @@ export type MarkdownEditorCommandAsyncMutationKind =
 
 export const evaluateMarkdownEditorCommandAsyncMutations = (
   session?: MarkdownEditorCommandSession,
-  _context?: MarkdownEditorCommandContext,
+  suppliedContext?: MarkdownEditorCommandContext,
 ) => {
-  const activeSession = session ?? {
-    key: "bold",
-    attemptId: "bold-0-1-1",
+  const context: MarkdownEditorCommandContext = suppliedContext ?? {
+    dispatch: {
+      dispatch: () => ({
+        accepted: true,
+        history: {
+          canRedo: false,
+          canUndo: false,
+          redoDepth: 0,
+          retainedUnits: 0,
+          undoDepth: 0,
+        },
+        revision: 1,
+        selection: { direction: "none", end: 4, start: 0 },
+        value: "text",
+      }),
+    },
+    documentIdentity: { epoch: 0, id: "doc-1" },
+    mode: "source",
+    readonly: false,
     revision: 1,
-    documentId: "doc-1",
-    epoch: 0,
-    state: "pending" as const,
-    abort: new AbortController(),
+    selection: { end: 4, start: 0 },
+    signal: new AbortController().signal,
+    value: "text",
   }
+  const activeSession =
+    session ??
+    createMarkdownEditorCommandSession("bold", context, {
+      anchor: { end: 4, start: 0 },
+    })
+  const changedContext = { ...context, revision: context.revision + 1 }
+  const nakedOffset = createMarkdownEditorCommandSession("naked", context, {
+    anchor: { end: 4, start: 0 },
+  })
+  const nakedOffsetState = rebaseMarkdownEditorCommandSession(
+    nakedOffset,
+    changedContext,
+  )
+  const late = createMarkdownEditorCommandSession("late", context)
+  const lateState = resolveMarkdownEditorCommandSession(
+    late,
+    changedContext,
+    "resolved-current",
+  )
+  let duplicateGuarded = false
+  try {
+    createMarkdownEditorCommandSession("duplicate", context, {
+      activeSessions: new Map([
+        [
+          "duplicate",
+          createMarkdownEditorCommandSession("duplicate", context),
+        ],
+      ]),
+    })
+  } catch {
+    duplicateGuarded = true
+  }
+  const sharedState = new Map([[activeSession.key, activeSession]])
+  const staleDocument = createMarkdownEditorCommandSession("stale", context)
+  const staleDocumentState = resolveMarkdownEditorCommandSession(
+    staleDocument,
+    {
+      ...context,
+      documentIdentity: {
+        ...context.documentIdentity,
+        epoch: context.documentIdentity.epoch + 1,
+      },
+    },
+    "resolved-current",
+  )
+  const aborted = createMarkdownEditorCommandSession("cancel", context)
+  abortMarkdownEditorCommandSessions([aborted], "mutation")
 
   return Object.freeze({
     authority: activeSession,
     mutations: Object.freeze([
       Object.freeze({
         kind: "naked-offset" as const,
-        equivalent: false,
+        equivalent: nakedOffsetState !== "stale",
         accepted: false,
       }),
       Object.freeze({
         kind: "late-commit" as const,
-        equivalent: false,
+        equivalent: lateState === "resolved-current",
         accepted: false,
       }),
       Object.freeze({
         kind: "duplicate-submit" as const,
-        equivalent: false,
+        equivalent: !duplicateGuarded,
         accepted: false,
       }),
       Object.freeze({
         kind: "local-pending" as const,
-        equivalent: false,
+        equivalent: !sharedState.has(activeSession.key),
         accepted: false,
       }),
       Object.freeze({
         kind: "internal-toast" as const,
-        equivalent: false,
+        equivalent: "toast" in activeSession,
         accepted: false,
       }),
       Object.freeze({
         kind: "stale-commit" as const,
-        equivalent: false,
+        equivalent: staleDocumentState === "resolved-current",
         accepted: false,
       }),
       Object.freeze({
         kind: "uncancelled" as const,
-        equivalent: false,
+        equivalent: !aborted.abort.signal.aborted,
         accepted: false,
       }),
     ]),

@@ -8,7 +8,7 @@
       ns.m(`mobile-${mobileLayout}`),
       ns.m(`profile-${editorProfile}`),
       ns.m(`interaction-${interactionProfile}`),
-      ns.m(`toolbar-${toolbarDensity}`),
+      ns.m(`toolbar-${effectiveToolbarDensity}`),
       ns.is('commands-expanded', commandsExpanded),
     ]"
     role="region"
@@ -29,11 +29,11 @@
           :class="ns.e('command')"
           :disabled="isCommandDisabled(command)"
           :aria-describedby="commandDescriptionId(command)"
-          :aria-label="command.title || command.label"
-          :title="command.title || command.label"
+          :aria-label="commandName(command)"
+          :title="commandName(command)"
           @click="activateCommand(command)"
         >
-          {{ command.label }}
+          {{ commandName(command) }}
         </button>
         <button
           v-if="gatedPasteAsMarkdownCommand"
@@ -42,15 +42,13 @@
           disabled
           :aria-describedby="pasteAsMarkdownDescriptionId"
           :aria-label="
-            gatedPasteAsMarkdownCommand.title ||
-            gatedPasteAsMarkdownCommand.label
+            commandName(gatedPasteAsMarkdownCommand)
           "
           :title="
-            gatedPasteAsMarkdownCommand.title ||
-            gatedPasteAsMarkdownCommand.label
+            commandName(gatedPasteAsMarkdownCommand)
           "
         >
-          {{ gatedPasteAsMarkdownCommand.label }}
+          {{ commandName(gatedPasteAsMarkdownCommand) }}
         </button>
         <button
           v-if="overflowItemCount"
@@ -63,7 +61,7 @@
           :disabled="editingBlocked"
           @click="toggleCommands"
         >
-          <span>{{ commandOverflowLabel }}</span>
+          <span>{{ resolvedCommandOverflowLabel }}</span>
           <span :class="ns.e('command-more-count')">{{
             overflowItemCount
           }}</span>
@@ -120,11 +118,11 @@
           :class="ns.e('command')"
           :disabled="isCommandDisabled(command)"
           :aria-describedby="commandDescriptionId(command)"
-          :aria-label="command.title || command.label"
-          :title="command.title || command.label"
+          :aria-label="commandName(command)"
+          :title="commandName(command)"
           @click="activateOverflowCommand(command)"
         >
-          {{ command.label }}
+          {{ commandName(command) }}
         </button>
         <button
           v-for="action in overflowActions"
@@ -162,6 +160,13 @@
         :class="ns.e('textarea')"
         :aria-hidden="liveSurface.inputVisible ? undefined : 'true'"
         :aria-label="textareaAriaLabel"
+        :aria-controls="activeSlashTrigger ? slashMenuId : undefined"
+        :aria-activedescendant="
+          activeSlashTrigger && slashCommands[activeSlashIndex]
+            ? slashItemId(slashCommands[activeSlashIndex].key)
+            : undefined
+        "
+        :aria-haspopup="activeSlashTrigger ? 'menu' : undefined"
         :aria-busy="loading || undefined"
         :aria-disabled="editingBlocked"
         :aria-readonly="props.readonly || undefined"
@@ -225,17 +230,48 @@
     >
       <slot
         name="status"
-        :characters="characterCount"
-        :mode="currentMode"
-        :words="wordCount"
         :metrics="editorMetrics"
         :state="statusResolution.slotPayload.state"
         :capability="statusResolution.slotPayload.capability"
+        :payload="statusResolution.slotPayload"
       >
-        <span>{{ characterCount }} {{ localeText.metrics.characters }}</span>
-        <span v-if="statusDensity === 'detailed'">
-          {{ wordCount }} {{ localeText.metrics.words }}
-        </span>
+        <div
+          v-if="statusDensity === 'minimal'"
+          :class="ns.e('status-summary')"
+        >
+          <span>{{ characterCount }} {{ localeText.metrics.characters }}</span>
+          <span>{{ wordCount }} {{ localeText.metrics.words }}</span>
+        </div>
+        <dl v-else :class="ns.e('status-details')">
+          <div>
+            <dt>{{ localeText.metrics.line }}</dt>
+            <dd>{{ editorMetrics.caretLine }}</dd>
+          </div>
+          <div>
+            <dt>{{ localeText.metrics.column }}</dt>
+            <dd>{{ editorMetrics.caretColumn }}</dd>
+          </div>
+          <div>
+            <dt>{{ localeText.metrics.lines }}</dt>
+            <dd>{{ editorMetrics.lineCount }}</dd>
+          </div>
+          <div>
+            <dt>{{ localeText.metrics.characters }}</dt>
+            <dd>{{ editorMetrics.graphemeCount }}</dd>
+          </div>
+          <div>
+            <dt>{{ localeText.metrics.words }}</dt>
+            <dd>{{ editorMetrics.wordCount }}</dd>
+          </div>
+          <div>
+            <dt>{{ localeText.metrics.selected }}</dt>
+            <dd>{{ editorMetrics.graphemeSelectionLength }}</dd>
+          </div>
+          <div v-if="editorMetrics.byteCount !== undefined">
+            <dt>{{ localeText.metrics.bytes }}</dt>
+            <dd>{{ editorMetrics.byteCount }}</dd>
+          </div>
+        </dl>
       </slot>
     </footer>
 
@@ -247,11 +283,21 @@
       {{ statusResolution.ariaLiveMessage }}
     </div>
 
+    <span
+      v-for="item in commandSnapshot"
+      v-show="commandStateText(item)"
+      :id="commandStateId(item.key)"
+      :key="item.key"
+      :class="ns.e('visually-hidden')"
+    >
+      {{ commandStateText(item) }}
+    </span>
+
     <div
       v-if="surfaceOptions.selectionToolbar && selectionToolbarVisible && selectionToolbarCommands.length"
       :class="ns.e('selection-toolbar')"
       role="toolbar"
-      :aria-label="localeText.editorAria"
+      :aria-label="localeText.surfaces.selectionToolbar"
       @keydown.esc.prevent.stop="closeSelectionToolbar"
     >
       <button
@@ -260,29 +306,37 @@
         type="button"
         :class="ns.e('command')"
         :disabled="isCommandDisabled(command)"
-        :aria-label="command.title || command.label"
-        :title="command.title || command.label"
+        :aria-describedby="commandDescriptionId(command)"
+        :aria-label="commandName(command)"
+        :title="commandName(command)"
         @click="activateCommand(command)"
       >
-        {{ command.label }}
+        {{ commandName(command) }}
       </button>
     </div>
 
     <div
       v-if="surfaceOptions.slashMenu && activeSlashTrigger && slashCommands.length"
+      :id="slashMenuId"
       :class="ns.e('slash-menu')"
       role="menu"
+      :aria-label="localeText.surfaces.slashMenu"
       @keydown.esc.prevent.stop="closeSlashMenu"
     >
       <button
         v-for="(command, idx) in slashCommands"
+        :id="slashItemId(command.key)"
         :key="command.key"
         type="button"
+        role="menuitem"
         :class="[ns.e('command'), ns.is('active', idx === activeSlashIndex)]"
         :disabled="isCommandDisabled(command)"
+        :aria-describedby="commandDescriptionId(command)"
+        :aria-label="commandName(command)"
         @click="executeSlashCommand(command)"
+        @mouseenter="activeSlashIndex = idx"
       >
-        {{ command.title || command.label }}
+        {{ commandName(command) }}
       </button>
     </div>
 
@@ -297,30 +351,76 @@
           role="dialog"
           aria-modal="true"
           :aria-label="localeText.commandPalette.title"
-          @keydown.esc.prevent.stop="closeCommandPalette"
+          @keydown="handleCommandPaletteKeydown"
         >
           <input
+            ref="commandPaletteInputRef"
             v-model="paletteQuery"
             type="text"
             :class="ns.e('palette-input')"
             :placeholder="localeText.commandPalette.searchPlaceholder"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded="true"
+            :aria-controls="paletteListId"
+            :aria-activedescendant="
+              activePaletteCommand
+                ? paletteItemId(activePaletteCommand.key)
+                : undefined
+            "
             @keydown.down.prevent="selectNextPaletteItem"
             @keydown.up.prevent="selectPreviousPaletteItem"
             @keydown.enter.prevent="executeActivePaletteItem"
           />
-          <div :class="ns.e('palette-list')" role="listbox">
+          <div
+            :id="paletteListId"
+            :class="ns.e('palette-list')"
+            role="listbox"
+          >
             <div
-              v-for="(command, idx) in paletteCommands"
-              :key="command.key"
-              :class="[ns.e('palette-item'), ns.is('active', idx === activePaletteIndex)]"
-              role="option"
-              :aria-selected="idx === activePaletteIndex"
-              @click="executePaletteCommand(command)"
+              v-for="group in paletteCommandGroups"
+              :key="group.key"
+              :class="ns.e('palette-group')"
+              role="group"
+              :aria-label="group.key"
             >
-              <span>{{ command.title || command.label }}</span>
-              <kbd v-if="command.shortcut">{{ command.shortcut }}</kbd>
+              <div :class="ns.e('palette-group-label')">
+                {{ group.key }}
+              </div>
+              <button
+                v-for="item in group.commands"
+                :id="paletteItemId(item.key)"
+                :key="item.key"
+                type="button"
+                :class="[
+                  ns.e('palette-item'),
+                  ns.is(
+                    'active',
+                    paletteItemIndex(item.key) === activePaletteIndex,
+                  ),
+                ]"
+                role="option"
+                :aria-selected="
+                  paletteItemIndex(item.key) === activePaletteIndex
+                "
+                :aria-describedby="commandDescriptionId(item.command)"
+                :disabled="isCommandDisabled(item.command)"
+                @click="executePaletteCommand(item.command)"
+              >
+                <span>{{ commandName(item.command) }}</span>
+                <kbd v-if="item.shortcut">{{ item.shortcut }}</kbd>
+              </button>
             </div>
+            <p
+              v-if="!paletteCommands.length"
+              :class="ns.e('palette-empty')"
+            >
+              {{ localeText.commandPalette.empty }}
+            </p>
           </div>
+          <p :class="ns.e('visually-hidden')" aria-live="polite">
+            {{ localeText.commandPalette.results(paletteCommands.length) }}
+          </p>
         </section>
       </div>
 
@@ -431,6 +531,7 @@ import {
   nextTick,
   onBeforeUnmount,
   onMounted,
+  reactive,
   ref,
   triggerRef,
   useId,
@@ -444,18 +545,24 @@ import {
   stabilizeMarkdownEditorProjection,
 } from '../../../wasm/markdown-runtime'
 import {
-  filterMarkdownEditorCommands,
   isMarkdownEditorCommandEnabled,
   isMarkdownEditorCommandVisible,
   markdownEditorEmits,
   markdownEditorProps,
-  calculateMarkdownEditorMetrics,
+  createMarkdownEditorMetricsSession,
+  resolveMarkdownEditorCommandCopy,
   resolveMarkdownEditorLocaleText,
   resolveMarkdownEditorOverflowCommands,
   resolveMarkdownEditorPrimaryCommands,
   resolveMarkdownEditorShortcut,
   runMarkdownEditorCommand,
 } from './markdown-editor'
+import {
+  createMarkdownEditorCommandSnapshot,
+  selectMarkdownEditorCommandSnapshot,
+  type MarkdownEditorCommandSnapshotItem,
+  type MarkdownEditorCommandRuntimeState,
+} from './markdown-editor-command-snapshot'
 import { resolveMarkdownEditorChromeRegions } from './markdown-editor-chrome'
 import {
   deriveMarkdownEditorChange,
@@ -505,8 +612,9 @@ import {
 } from './markdown-editor-command-async'
 import {
   planMarkdownSlashCommit,
+  groupMarkdownEditorCommandSnapshot,
   resolveMarkdownSlashTrigger,
-  searchMarkdownEditorCommands,
+  searchMarkdownEditorCommandSnapshot,
 } from "./markdown-editor-surfaces"
 import { resolveMarkdownEditorStatus } from "./markdown-editor-status"
 import {
@@ -514,6 +622,7 @@ import {
   confirmMarkdownPasteAsMarkdown,
   openMarkdownPasteAsMarkdown,
   type MarkdownPasteAsMarkdownChoice,
+  type MarkdownPasteAsMarkdownRejection,
   type MarkdownPasteAsMarkdownSession,
 } from './markdown-editor-paste-markdown'
 import { createMarkdownEditorNativeEventMachine } from './markdown-editor-native-event'
@@ -552,6 +661,9 @@ const ns = useNamespace('markdown-editor')
 const modes: MarkdownEditorMode[] = ['source', 'live', 'split', 'preview']
 const commandTrayId = `${useId()}-command-tray`
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
+const commandPaletteInputRef = ref<HTMLInputElement | null>(null)
+const paletteListId = `${useId()}-command-palette-list`
+const slashMenuId = `${useId()}-slash-menu`
 const pasteAsMarkdownDialogRef = ref<HTMLElement | null>(null)
 const pasteAsMarkdownPrimaryActionRef = ref<HTMLButtonElement | null>(null)
 const pasteAsMarkdownSession = ref<MarkdownPasteAsMarkdownSession | null>(null)
@@ -577,9 +689,14 @@ const chromeRegions = computed(() =>
   }),
 )
 const textareaAriaLabel = computed(() =>
-  currentMode.value === 'live' ? 'Markdown editor live editing surface' : 'Markdown editor source',
+  currentMode.value === 'live'
+    ? localeText.value.textarea.live
+    : localeText.value.textarea.source,
 )
 const compactMode = computed(() => props.mobileLayout === 'compact')
+const effectiveToolbarDensity = computed(() =>
+  compactMode.value ? 'minimal' : props.toolbarDensity,
+)
 const normalizeModeForLayout = (
   mode: MarkdownEditorMode,
 ): MarkdownEditorMode =>
@@ -592,7 +709,10 @@ const initialSelection: MarkdownEditorSelection = {
   end: props.modelValue.length,
   start: props.modelValue.length,
 }
-const documentIdentity = Object.freeze({ epoch: 0, id: commandTrayId })
+const documentIdentity = reactive({
+  epoch: props.documentIdentity?.epoch ?? 0,
+  id: props.documentIdentity?.id ?? commandTrayId,
+})
 const transactionStore = new MarkdownEditorTransactionStore(
   props.modelValue,
   initialSelection,
@@ -794,14 +914,21 @@ const applyAtomicIntent = (
   return plan
 }
 const commandSessions = new Map<string, MarkdownEditorCommandSession>()
+const commandRuntimeStates = ref(
+  new Map<string, MarkdownEditorCommandRuntimeState>(),
+)
 const commandContextSignal = new AbortController().signal
 
 const abortPendingCommands = () => {
   for (const session of commandSessions.values()) {
     session.abort.abort('editor-reset')
+    commandRuntimeStates.value.set(session.key, {
+      state: 'aborted',
+    })
   }
   abortMarkdownEditorCommandSessions(commandSessions.values(), 'editor-reset')
   commandSessions.clear()
+  triggerRef(commandRuntimeStates)
 }
 
 type EditorOperation =
@@ -1082,6 +1209,40 @@ watch(
   },
 )
 
+const metricsSession = createMarkdownEditorMetricsSession(props.metrics)
+let metricsSource = editorValue.value
+const editorMetrics = ref(
+  metricsSession.calculate(metricsSource, {
+    ...props.metrics,
+    includeBytes: props.statusDensity === 'detailed',
+    selection: editorSelection.value,
+  }),
+)
+watch(
+  [
+    editorValue,
+    editorSelection,
+    () => props.metrics,
+    () => props.statusDensity,
+  ],
+  ([value, selection, options, density]) => {
+    const change =
+      deriveMarkdownEditorChange(metricsSource, value) ?? {
+        from: 0,
+        insert: '',
+        to: 0,
+      }
+    metricsSource = value
+    editorMetrics.value = metricsSession.calculate(value, {
+      ...options,
+      change,
+      includeBytes: density === 'detailed',
+      selection,
+    })
+  },
+  { deep: true },
+)
+
 const liveCapabilities = computed(() => [liveSurface.value.capability.capability])
 
 const statusResolution = computed(() =>
@@ -1097,11 +1258,15 @@ const statusResolution = computed(() =>
       disabled: props.disabled,
       loading: props.loading,
     },
+    editorMetrics.value,
   ),
 )
 
 const selectionToolbarCommands = computed(() =>
-  filterMarkdownEditorCommands(props.commands, commandContext.value, "selection"),
+  selectMarkdownEditorCommandSnapshot(
+    commandSnapshot.value,
+    'selection',
+  ).map((item) => item.command),
 )
 const selectionToolbarPlacement = computed(() =>
   resolveMarkdownSelectionToolbarPlacement(
@@ -1140,11 +1305,11 @@ const slashTrigger = computed(() => {
 })
 const slashCommands = computed(() => {
   if (!slashTrigger.value) return []
-  return searchMarkdownEditorCommands(
-    props.commands,
-    commandContext.value,
+  return searchMarkdownEditorCommandSnapshot(
+    commandSnapshot.value,
     slashTrigger.value.query,
-  )
+    'slash',
+  ).map((item) => item.command)
 })
 const activeSlashIndex = ref(0)
 const dismissedSlashTrigger = ref('')
@@ -1163,54 +1328,126 @@ const closeSlashMenu = () => {
 }
 const executeSlashCommand = (command: MarkdownEditorCommand) => {
   if (!activeSlashTrigger.value) return
+  if (isCommandDisabled(command)) return
   void runCommand(command, activeSlashTrigger.value.range)
 }
-
+const slashItemId = (key: string) =>
+  `${slashMenuId}-${key.replace(/[^a-zA-Z0-9_-]/gu, '-')}`
+const moveSlashIndex = (direction: 1 | -1) => {
+  if (!slashCommands.value.length) return
+  for (let step = 1; step <= slashCommands.value.length; step += 1) {
+    const candidate =
+      (activeSlashIndex.value +
+        direction * step +
+        slashCommands.value.length) %
+      slashCommands.value.length
+    const command = slashCommands.value[candidate]
+    if (command && !isCommandDisabled(command)) {
+      activeSlashIndex.value = candidate
+      return
+    }
+  }
+}
 const commandPaletteOpen = ref(false)
 const paletteQuery = ref("")
 const activePaletteIndex = ref(0)
-const paletteCommands = computed(() =>
-  searchMarkdownEditorCommands(
-    props.commands,
-    commandContext.value,
+const paletteRestoreSelection = ref<MarkdownEditorSelection | null>(null)
+const paletteCommandItems = computed(() =>
+  searchMarkdownEditorCommandSnapshot(
+    commandSnapshot.value,
     paletteQuery.value,
   ),
 )
+const paletteCommands = computed(() =>
+  paletteCommandItems.value.map((item) => item.command),
+)
+const paletteCommandGroups = computed(() =>
+  groupMarkdownEditorCommandSnapshot(paletteCommandItems.value),
+)
+const activePaletteCommand = computed(
+  () => paletteCommands.value[activePaletteIndex.value],
+)
+const paletteItemId = (key: string) =>
+  `${paletteListId}-${key.replace(/[^a-zA-Z0-9_-]/gu, '-')}`
+const paletteItemIndex = (key: string) =>
+  paletteCommands.value.findIndex((command) => command.key === key)
 const openCommandPalette = () => {
+  if (editingBlocked.value || isComposing.value) return
+  paletteRestoreSelection.value = captureSelection(false)
   commandPaletteOpen.value = true
   paletteQuery.value = ""
   activePaletteIndex.value = 0
+  void nextTick(() => commandPaletteInputRef.value?.focus())
 }
 const closeCommandPalette = () => {
   commandPaletteOpen.value = false
-  textareaRef.value?.focus()
+  const selection = paletteRestoreSelection.value
+  paletteRestoreSelection.value = null
+  if (selection) {
+    void restoreTextareaSelection(selection)
+  } else {
+    textareaRef.value?.focus()
+  }
 }
-const selectNextPaletteItem = () => {
+const movePaletteIndex = (direction: 1 | -1) => {
   if (!paletteCommands.value.length) return
-  activePaletteIndex.value =
-    (activePaletteIndex.value + 1) % paletteCommands.value.length
+  for (let step = 1; step <= paletteCommands.value.length; step += 1) {
+    const candidate =
+      (activePaletteIndex.value +
+        direction * step +
+        paletteCommands.value.length) %
+      paletteCommands.value.length
+    const command = paletteCommands.value[candidate]
+    if (command && !isCommandDisabled(command)) {
+      activePaletteIndex.value = candidate
+      return
+    }
+  }
 }
-const selectPreviousPaletteItem = () => {
-  if (!paletteCommands.value.length) return
-  activePaletteIndex.value =
-    (activePaletteIndex.value - 1 + paletteCommands.value.length) %
-    paletteCommands.value.length
-}
+const selectNextPaletteItem = () => movePaletteIndex(1)
+const selectPreviousPaletteItem = () => movePaletteIndex(-1)
 const executeActivePaletteItem = () => {
   const command = paletteCommands.value[activePaletteIndex.value]
-  if (command) {
+  if (command && !isCommandDisabled(command)) {
     executePaletteCommand(command)
   }
 }
 const executePaletteCommand = (command: MarkdownEditorCommand) => {
+  if (isCommandDisabled(command)) return
   closeCommandPalette()
   activateCommand(command)
 }
-
-const editorMetrics = computed(() =>
-  calculateMarkdownEditorMetrics(editorValue.value, props.metrics),
-)
-const characterCount = computed(() => editorMetrics.value.codeUnitLength)
+const handleCommandPaletteKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    event.stopPropagation()
+    closeCommandPalette()
+    return
+  }
+  if (event.key !== 'Tab') return
+  const controls = [
+    commandPaletteInputRef.value,
+    ...Array.from(
+      document
+        .getElementById(paletteListId)
+        ?.querySelectorAll<HTMLButtonElement>('button:not(:disabled)') ?? [],
+    ),
+  ].filter(
+    (
+      control,
+    ): control is HTMLInputElement | HTMLButtonElement => control !== null,
+  )
+  if (!controls.length) return
+  const currentIndex = controls.indexOf(
+    document.activeElement as HTMLInputElement | HTMLButtonElement,
+  )
+  const nextIndex = event.shiftKey
+    ? (currentIndex - 1 + controls.length) % controls.length
+    : (currentIndex + 1) % controls.length
+  event.preventDefault()
+  controls[nextIndex]?.focus()
+}
+const characterCount = computed(() => editorMetrics.value.graphemeCount)
 const effectivePlaceholder = computed(
   () => props.writingPlaceholder || props.placeholder,
 )
@@ -1234,14 +1471,23 @@ const commandContext = computed(() => ({
   signal: commandContextSignal,
   value: transactionStore.value,
 }))
+const commandSnapshot = computed(() =>
+  createMarkdownEditorCommandSnapshot(
+    props.commands,
+    commandContext.value,
+    commandRuntimeStates.value,
+  ),
+)
 const toolbarCommands = computed(() =>
-  filterMarkdownEditorCommands(props.commands, commandContext.value, 'toolbar'),
+  selectMarkdownEditorCommandSnapshot(commandSnapshot.value, 'toolbar').map(
+    (item) => item.command,
+  ),
 )
 const gatedPasteAsMarkdownCommand = computed(() =>
   pasteAsMarkdownGate.value &&
   !resolveMarkdownEditorPrimaryCommands(
     toolbarCommands.value,
-    props.toolbarDensity,
+    effectiveToolbarDensity.value,
     props.primaryCommandKeys,
   ).some((command) => command.key === 'paste-as-markdown')
     ? toolbarCommands.value.find(
@@ -1252,31 +1498,96 @@ const gatedPasteAsMarkdownCommand = computed(() =>
 const localeText = computed(() =>
   resolveMarkdownEditorLocaleText(props.localeText),
 )
+const commandCopy = (command: MarkdownEditorCommand) =>
+  resolveMarkdownEditorCommandCopy(command, localeText.value)
+const commandName = (command: MarkdownEditorCommand) =>
+  commandCopy(command).name
 const pasteAsMarkdownGateDescription = computed(() => {
   const gate = pasteAsMarkdownGate.value
   return gate ? localeText.value.pasteAsMarkdown.disabledDescriptions[gate] : ''
 })
+const pasteAsMarkdownRejectionText = (
+  rejection: MarkdownPasteAsMarkdownRejection,
+) => {
+  if (rejection === 'composition-active') {
+    return localeText.value.pasteAsMarkdown.disabledDescriptions.composition
+  }
+  if (rejection === 'readonly') {
+    return localeText.value.pasteAsMarkdown.disabledDescriptions.readonly
+  }
+  if (rejection === 'disabled') {
+    return localeText.value.pasteAsMarkdown.disabledDescriptions.disabled
+  }
+  if (rejection === 'preview-only') {
+    return localeText.value.pasteAsMarkdown.disabledDescriptions.previewOnly
+  }
+  return localeText.value.pasteAsMarkdown.stale
+}
 const isPasteAsMarkdownCommand = (command: MarkdownEditorCommand) =>
   command.key === 'paste-as-markdown'
-const isCommandDisabled = (command: MarkdownEditorCommand) =>
-  editingBlocked.value ||
-  (isPasteAsMarkdownCommand(command) &&
-    (Boolean(pasteAsMarkdownGate.value) || pasteAsMarkdownBusy.value))
-const commandDescriptionId = (command: MarkdownEditorCommand) =>
-  isPasteAsMarkdownCommand(command) && pasteAsMarkdownGate.value
-    ? pasteAsMarkdownDescriptionId
-    : undefined
+const commandSnapshotItem = (command: MarkdownEditorCommand) =>
+  commandSnapshot.value.find((item) => item.key === command.key)
+const isCommandDisabled = (command: MarkdownEditorCommand) => {
+  const item = commandSnapshotItem(command)
+  return (
+    editingBlocked.value ||
+    item?.enabled === false ||
+    (isPasteAsMarkdownCommand(command) &&
+      (Boolean(pasteAsMarkdownGate.value) || pasteAsMarkdownBusy.value))
+  )
+}
+watch(slashCommands, (commands) => {
+  if (!commands.length) {
+    activeSlashIndex.value = 0
+    return
+  }
+  if (
+    activeSlashIndex.value >= commands.length ||
+    isCommandDisabled(commands[activeSlashIndex.value]!)
+  ) {
+    activeSlashIndex.value = 0
+    if (isCommandDisabled(commands[0]!)) moveSlashIndex(1)
+  }
+})
+watch(paletteCommands, (commands) => {
+  if (!commands.length) {
+    activePaletteIndex.value = 0
+    return
+  }
+  if (
+    activePaletteIndex.value >= commands.length ||
+    isCommandDisabled(commands[activePaletteIndex.value]!)
+  ) {
+    activePaletteIndex.value = 0
+    if (isCommandDisabled(commands[0]!)) movePaletteIndex(1)
+  }
+})
+const commandStateId = (key: string) =>
+  `${commandTrayId}-command-state-${key.replace(/[^a-zA-Z0-9_-]/gu, '-')}`
+const commandStateText = (item: MarkdownEditorCommandSnapshotItem) =>
+  item.error
+    ? localeText.value.surfaces.commandRejected
+    : item.pending
+      ? localeText.value.surfaces.commandPending
+      : item.disabledReason || ''
+const commandDescriptionId = (command: MarkdownEditorCommand) => {
+  if (isPasteAsMarkdownCommand(command) && pasteAsMarkdownGate.value) {
+    return pasteAsMarkdownDescriptionId
+  }
+  const item = commandSnapshotItem(command)
+  return item && commandStateText(item) ? commandStateId(command.key) : undefined
+}
 const primaryCommands = computed(() =>
   resolveMarkdownEditorPrimaryCommands(
     toolbarCommands.value,
-    props.toolbarDensity,
+    effectiveToolbarDensity.value,
     props.primaryCommandKeys,
   ),
 )
 const overflowCommands = computed(() =>
   resolveMarkdownEditorOverflowCommands(
     toolbarCommands.value,
-    props.toolbarDensity,
+    effectiveToolbarDensity.value,
     props.primaryCommandKeys,
   ),
 )
@@ -1285,13 +1596,22 @@ const visibleActions = computed<MarkdownEditorActionItem[]>(() => {
 
   const actions: MarkdownEditorActionItem[] = []
   if (props.showImageAction) {
-    actions.push({ key: 'image', label: props.imageActionLabel })
+    actions.push({
+      key: 'image',
+      label: props.imageActionLabel ?? localeText.value.actions.image,
+    })
   }
   if (props.showSaveAction) {
-    actions.push({ key: 'save', label: props.saveActionLabel })
+    actions.push({
+      key: 'save',
+      label: props.saveActionLabel ?? localeText.value.actions.save,
+    })
   }
   if (props.showSubmitAction) {
-    actions.push({ key: 'submit', label: props.submitActionLabel })
+    actions.push({
+      key: 'submit',
+      label: props.submitActionLabel ?? localeText.value.actions.submit,
+    })
   }
   return actions
 })
@@ -1329,10 +1649,55 @@ watch([editingBlocked, overflowItemCount], ([blocked, itemCount]) => {
     triggerRef(editorValue)
   }
 })
+watch(
+  [() => props.documentIdentity?.id, () => props.documentIdentity?.epoch],
+  ([id, epoch], [previousId, previousEpoch]) => {
+    const nextId = id ?? commandTrayId
+    const nextEpoch = epoch ?? 0
+    if (nextId === previousId && nextEpoch === previousEpoch) return
+
+    const previousHistory = transactionStore.history
+    abortPendingCommands()
+    commandPaletteOpen.value = false
+    paletteRestoreSelection.value = null
+    commandsExpanded.value = false
+    dismissedSlashTrigger.value = ''
+    pasteAsMarkdownSession.value = null
+    pasteAsMarkdownError.value = ''
+    beforeInputSnapshot = undefined
+    pendingClipboardIdentity = undefined
+    pendingInputOrigin = undefined
+    atomicSession.value = null
+    liveAtomic.value = null
+
+    documentIdentity.id = nextId
+    documentIdentity.epoch = nextEpoch
+    nativeMachine.apply({
+      documentIdentity,
+      kind: 'external-reset',
+      revision: transactionStore.revision,
+      value: props.modelValue,
+    })
+    syncNativeComposing()
+
+    const result = transactionStore.reset(props.modelValue)
+    editorValue.value = result.value
+    editorRevision.value = result.revision
+    editorSelection.value = result.selection
+    refreshLiveWindow('input')
+    refreshLiveReveal()
+    if (!historiesEqual(previousHistory, result.history)) {
+      emit('history-change', result.history)
+    }
+  },
+)
+const resolvedCommandOverflowLabel = computed(
+  () => props.commandOverflowLabel ?? localeText.value.overflow,
+)
 const commandOverflowAriaLabel = computed(() =>
-  props.localeText?.overflowAria
-    ? props.localeText.overflowAria(overflowItemCount.value)
-    : `${props.commandOverflowLabel}，${overflowItemCount.value} 个工具`,
+  props.commandOverflowLabel
+    ? `${props.commandOverflowLabel} (${overflowItemCount.value})`
+    : localeText.value.overflowAria(overflowItemCount.value),
 )
 const visibleModes = computed(() =>
   compactMode.value
@@ -1691,6 +2056,8 @@ const handleBlur = () => {
   transactionStore.breakMergeGroup()
 }
 
+class MarkdownClipboardUnavailableError extends Error {}
+
 const readPasteAsMarkdownClipboard =
   async (): Promise<MarkdownHtmlImportSnapshot> => {
     const clipboard = navigator.clipboard
@@ -1720,7 +2087,7 @@ const readPasteAsMarkdownClipboard =
         plain: await clipboard.readText(),
       })
     }
-    throw new Error('Clipboard access is unavailable.')
+    throw new MarkdownClipboardUnavailableError()
   }
 
 const restorePasteAsMarkdownFocus = (selection: MarkdownEditorSelection) => {
@@ -1750,7 +2117,8 @@ const openPasteAsMarkdownSurface = async () => {
     })
     if (opened.ok === false) {
       pasteAsMarkdownError.value =
-        pasteAsMarkdownGateDescription.value || opened.rejected
+        pasteAsMarkdownGateDescription.value ||
+        pasteAsMarkdownRejectionText(opened.rejected)
       restorePasteAsMarkdownFocus(anchor.selection)
       return
     }
@@ -1759,7 +2127,9 @@ const openPasteAsMarkdownSurface = async () => {
     pasteAsMarkdownPrimaryActionRef.value?.focus()
   } catch (error) {
     pasteAsMarkdownError.value =
-      error instanceof Error ? error.message : 'Clipboard access failed.'
+      error instanceof MarkdownClipboardUnavailableError
+        ? localeText.value.pasteAsMarkdown.clipboardUnavailable
+        : localeText.value.pasteAsMarkdown.clipboardFailed
     restorePasteAsMarkdownFocus(anchor.selection)
   } finally {
     pasteAsMarkdownBusy.value = false
@@ -1866,6 +2236,8 @@ const runCommand = async (
     },
   )
   commandSessions.set(command.key, session)
+  commandRuntimeStates.value.set(command.key, { state: 'pending' })
+  triggerRef(commandRuntimeStates)
   try {
     const context = {
       dispatch: { dispatch: dispatchTransaction },
@@ -1881,18 +2253,30 @@ const runCommand = async (
     const result = await runMarkdownEditorCommand(command, context)
     if (commandSessions.get(command.key) !== session) return
     const currentContext = commandContext.value
-    rebaseMarkdownEditorCommandSession(
+    const rebasedState = rebaseMarkdownEditorCommandSession(
       session,
       currentContext,
+      undefined,
     )
-    if (
-      resolveMarkdownEditorCommandSession(
-        session,
-        currentContext,
-        'resolved-current',
-      ) !== 'resolved-current'
-    ) return
-    if (!result?.transaction) return
+    if (rebasedState !== 'pending') {
+      commandRuntimeStates.value.set(command.key, { state: rebasedState })
+      triggerRef(commandRuntimeStates)
+      return
+    }
+    const resolvedState = resolveMarkdownEditorCommandSession(
+      session,
+      currentContext,
+      'resolved-current',
+    )
+    commandRuntimeStates.value.set(command.key, { state: resolvedState })
+    triggerRef(commandRuntimeStates)
+    if (resolvedState !== 'resolved-current') return
+    if (!result?.transaction) {
+      if (result?.focus !== 'surface' && result?.focus !== 'none') {
+        await restoreTextareaSelection(selection)
+      }
+      return
+    }
     const transaction = slashRange
       ? planMarkdownSlashCommit(slashRange, result.transaction)
       : result.transaction
@@ -1904,13 +2288,23 @@ const runCommand = async (
       origin: 'command',
     })
     if (dispatchResult.accepted) emit('command', command)
+    if (
+      !dispatchResult.accepted &&
+      result.focus !== 'surface' &&
+      result.focus !== 'none'
+    ) {
+      await restoreTextareaSelection(selection)
+    }
   } catch (error) {
-    resolveMarkdownEditorCommandSession(
+    const state = resolveMarkdownEditorCommandSession(
       session,
       commandContext.value,
       'rejected',
       error,
     )
+    commandRuntimeStates.value.set(command.key, { error, state })
+    triggerRef(commandRuntimeStates)
+    await restoreTextareaSelection(selection)
   } finally {
     if (commandSessions.get(command.key) === session) {
       commandSessions.delete(command.key)
@@ -1994,6 +2388,27 @@ const emitRenderEvent = (
 
 const handleKeydown = (event: KeyboardEvent) => {
   if (editingBlocked.value || nativeMachine.freezeSmartInput) return
+
+  if (activeSlashTrigger.value && slashCommands.value.length) {
+    if (event.key === 'Escape') {
+      event.preventDefault()
+      closeSlashMenu()
+      return
+    }
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault()
+      moveSlashIndex(event.key === 'ArrowDown' ? 1 : -1)
+      return
+    }
+    if (event.key === 'Enter') {
+      const command = slashCommands.value[activeSlashIndex.value]
+      if (command) {
+        event.preventDefault()
+        executeSlashCommand(command)
+      }
+      return
+    }
+  }
 
   if (event.key === 'Escape' && currentMode.value === 'live') {
     if (atomicSession.value) {

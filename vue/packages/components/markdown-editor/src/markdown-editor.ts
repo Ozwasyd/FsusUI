@@ -334,8 +334,28 @@ export const resolveMarkdownEditorToolbarLimit = (
   return Math.min(6, commandCount)
 }
 
+const sortMarkdownEditorCommands = <
+  T extends {
+    readonly group?: string
+    readonly key: string
+    readonly priority?: number
+  },
+>(
+  commands: readonly T[],
+) =>
+  [...commands].sort(
+    (left, right) =>
+      (right.priority ?? 0) - (left.priority ?? 0) ||
+      (left.group ?? '').localeCompare(right.group ?? '') ||
+      left.key.localeCompare(right.key),
+  )
+
 export const resolveMarkdownEditorPrimaryCommands = <
-  T extends { readonly key: string },
+  T extends {
+    readonly group?: string
+    readonly key: string
+    readonly priority?: number
+  },
 >(
   commands: readonly T[],
   density: MarkdownEditorToolbarDensity,
@@ -344,7 +364,7 @@ export const resolveMarkdownEditorPrimaryCommands = <
   const keySet = primaryKeys?.length ? new Set(primaryKeys) : null
   const selected = keySet
     ? commands.filter((command) => keySet.has(command.key))
-    : [...commands]
+    : sortMarkdownEditorCommands(commands)
   return selected.slice(
     0,
     resolveMarkdownEditorToolbarLimit(density, selected.length),
@@ -352,7 +372,11 @@ export const resolveMarkdownEditorPrimaryCommands = <
 }
 
 export const resolveMarkdownEditorOverflowCommands = <
-  T extends { readonly key: string },
+  T extends {
+    readonly group?: string
+    readonly key: string
+    readonly priority?: number
+  },
 >(
   commands: readonly T[],
   density: MarkdownEditorToolbarDensity,
@@ -362,7 +386,7 @@ export const resolveMarkdownEditorOverflowCommands = <
   if (keySet) {
     return commands.filter((command) => !keySet.has(command.key))
   }
-  return commands.slice(
+  return sortMarkdownEditorCommands(commands).slice(
     resolveMarkdownEditorToolbarLimit(density, commands.length),
   )
 }
@@ -375,6 +399,7 @@ export interface MarkdownEditorActionItem {
 }
 
 export interface MarkdownEditorCommandResult {
+  readonly focus?: 'editor' | 'surface' | 'none'
   readonly transaction?: MarkdownEditorTransaction
 }
 
@@ -412,6 +437,8 @@ export interface MarkdownEditorLocaleText {
   readonly actions: Readonly<Record<MarkdownEditorActionKey, string>>
   readonly pasteAsMarkdown: Readonly<{
     cancel: string
+    clipboardFailed: string
+    clipboardUnavailable: string
     conversionWarnings: string
     description: string
     disabledDescriptions: Readonly<{
@@ -431,20 +458,75 @@ export interface MarkdownEditorLocaleText {
     title: string
   }>
   readonly commandPalette: Readonly<{
+    empty: string
+    results: (count: number) => string
     searchPlaceholder: string
     title: string
   }>
+  readonly surfaces: Readonly<{
+    selectionToolbar: string
+    slashMenu: string
+    commandPending: string
+    commandRejected: string
+  }>
+  readonly textarea: Readonly<{
+    live: string
+    source: string
+  }>
+  readonly states: Readonly<{
+    disabled: string
+    empty: string
+    loading: string
+    readonly: string
+  }>
+  readonly results: Readonly<
+    Record<
+      | 'pending'
+      | 'resolved-current'
+      | 'rejected'
+      | 'aborted'
+      | 'stale'
+      | 'deleted',
+      string
+    >
+  >
+  readonly capabilities: Readonly<
+    Record<
+      | 'supported'
+      | 'unsupported-platform'
+      | 'runtime-unavailable'
+      | 'projection-failed'
+      | 'feature-degraded'
+      | 'fatal',
+      string
+    >
+  >
   readonly capabilityAnnouncement: (capability: string) => string
   readonly overflow: string
   readonly overflowAria: (count: number) => string
   readonly editorAria: string
   readonly modeSwitcherAria: string
-  readonly metrics: Readonly<{ characters: string; words: string }>
+  readonly metrics: Readonly<{
+    bytes: string
+    characters: string
+    column: string
+    line: string
+    lines: string
+    selected: string
+    words: string
+  }>
 }
 
-export type MarkdownEditorLocaleTextOverride = {
-  readonly [K in keyof MarkdownEditorLocaleText]?: MarkdownEditorLocaleText[K]
-}
+type MarkdownEditorLocaleDeepPartial<T> = T extends (
+  ...args: infer _Args
+) => unknown
+  ? T
+  : T extends object
+    ? { readonly [K in keyof T]?: MarkdownEditorLocaleDeepPartial<T[K]> }
+    : T
+
+export type MarkdownEditorLocaleTextOverride =
+  MarkdownEditorLocaleDeepPartial<MarkdownEditorLocaleText>
 
 export const defaultMarkdownEditorLocaleText: MarkdownEditorLocaleText =
   Object.freeze({
@@ -455,13 +537,13 @@ export const defaultMarkdownEditorLocaleText: MarkdownEditorLocaleText =
       preview: '预览',
     }),
     commands: Object.freeze({
-      bold: 'Bold',
-      code: 'Code',
-      heading: 'Heading',
-      image: 'Insert image',
-      italic: 'Italic',
-      link: 'Link',
-      quote: 'Quote',
+      bold: '加粗',
+      code: '代码',
+      heading: '标题',
+      image: '插入图片',
+      italic: '斜体',
+      link: '链接',
+      quote: '引用',
     }),
     actions: Object.freeze({
       image: '上传图片',
@@ -469,37 +551,80 @@ export const defaultMarkdownEditorLocaleText: MarkdownEditorLocaleText =
       submit: '提交',
     }),
     pasteAsMarkdown: Object.freeze({
-      cancel: 'Cancel',
-      conversionWarnings: 'Conversion warnings',
-      description:
-        'Review the converted Markdown and source changes before importing.',
+      cancel: '取消',
+      clipboardFailed: '无法读取剪贴板。',
+      clipboardUnavailable: '当前环境无法访问剪贴板。',
+      conversionWarnings: '转换警告',
+      description: '导入前检查转换后的 Markdown 与源码变更。',
       disabledDescriptions: Object.freeze({
-        composition: 'Unavailable while text composition is active.',
-        disabled: 'Unavailable while the editor is disabled.',
-        loading: 'Unavailable while the editor is loading.',
-        previewOnly: 'Unavailable in preview only mode.',
-        readonly: 'Unavailable while the editor is readonly.',
+        composition: '文字组合输入期间不可用。',
+        disabled: '编辑器已禁用。',
+        loading: '编辑器加载期间不可用。',
+        previewOnly: '仅预览模式下不可用。',
+        readonly: '编辑器为只读状态。',
       }),
-      importMarkdown: 'Import Markdown',
-      markdownPreview: 'Markdown preview',
-      pastePlainText: 'Paste plain text',
-      sourceAfter: 'After',
-      sourceBefore: 'Before',
-      sourceDiff: 'Source diff',
-      stale: 'The document or selection changed. Review the clipboard again.',
-      title: 'Paste as Markdown',
+      importMarkdown: '导入 Markdown',
+      markdownPreview: 'Markdown 预览',
+      pastePlainText: '粘贴纯文本',
+      sourceAfter: '变更后',
+      sourceBefore: '变更前',
+      sourceDiff: '源码差异',
+      stale: '文档或选区已变化，请重新检查剪贴板。',
+      title: '粘贴为 Markdown',
     }),
     commandPalette: Object.freeze({
-      searchPlaceholder: 'Search commands',
-      title: 'Command palette',
+      empty: '没有匹配的命令',
+      results: (count: number) => `${count} 个命令`,
+      searchPlaceholder: '搜索命令',
+      title: '命令面板',
+    }),
+    surfaces: Object.freeze({
+      selectionToolbar: '选区工具',
+      slashMenu: '块插入命令',
+      commandPending: '命令执行中',
+      commandRejected: '命令执行失败',
+    }),
+    textarea: Object.freeze({
+      live: 'Markdown 实时编辑区',
+      source: 'Markdown 源码编辑区',
+    }),
+    states: Object.freeze({
+      disabled: '已禁用',
+      empty: '空文档',
+      loading: '加载中',
+      readonly: '只读',
+    }),
+    results: Object.freeze({
+      pending: '执行中',
+      'resolved-current': '已完成',
+      rejected: '执行失败',
+      aborted: '已取消',
+      stale: '结果已过期',
+      deleted: '目标已删除',
+    }),
+    capabilities: Object.freeze({
+      supported: '完整支持',
+      'unsupported-platform': '当前平台不支持',
+      'runtime-unavailable': '运行时不可用',
+      'projection-failed': '语法投影失败',
+      'feature-degraded': '部分功能降级',
+      fatal: '编辑器不可用',
     }),
     capabilityAnnouncement: (capability: string) =>
-      `Editor capability: ${capability}`,
+      `编辑器能力：${capability}`,
     overflow: '格式工具',
     overflowAria: (count: number) => `格式工具，${count} 个工具`,
-    editorAria: 'Markdown editor',
-    modeSwitcherAria: 'Markdown mode',
-    metrics: Object.freeze({ characters: 'chars', words: 'words' }),
+    editorAria: 'Markdown 编辑器',
+    modeSwitcherAria: 'Markdown 模式',
+    metrics: Object.freeze({
+      bytes: '字节',
+      characters: '字符',
+      column: '列',
+      line: '行',
+      lines: '行数',
+      selected: '已选',
+      words: '词',
+    }),
   })
 
 export type MarkdownEditorLocaleMutationKind =
@@ -507,17 +632,6 @@ export type MarkdownEditorLocaleMutationKind =
   | "error-string-matching"
   | "cross-language-fallback"
   | "duplicate-labels"
-
-export const evaluateMarkdownEditorLocaleMutations = () =>
-  Object.freeze({
-    authority: defaultMarkdownEditorLocaleText,
-    mutations: Object.freeze([
-      Object.freeze({ kind: "hardcoded-copy" as const, equivalent: false, accepted: false }),
-      Object.freeze({ kind: "error-string-matching" as const, equivalent: false, accepted: false }),
-      Object.freeze({ kind: "cross-language-fallback" as const, equivalent: false, accepted: false }),
-      Object.freeze({ kind: "duplicate-labels" as const, equivalent: false, accepted: false }),
-    ]),
-  })
 
 export const resolveMarkdownEditorLocaleText = (
   localeText?: MarkdownEditorLocaleTextOverride,
@@ -552,12 +666,105 @@ export const resolveMarkdownEditorLocaleText = (
     ...defaultMarkdownEditorLocaleText.commandPalette,
     ...localeText?.commandPalette,
   },
+  surfaces: {
+    ...defaultMarkdownEditorLocaleText.surfaces,
+    ...localeText?.surfaces,
+  },
+  textarea: {
+    ...defaultMarkdownEditorLocaleText.textarea,
+    ...localeText?.textarea,
+  },
+  states: {
+    ...defaultMarkdownEditorLocaleText.states,
+    ...localeText?.states,
+  },
+  results: {
+    ...defaultMarkdownEditorLocaleText.results,
+    ...localeText?.results,
+  },
+  capabilities: {
+    ...defaultMarkdownEditorLocaleText.capabilities,
+    ...localeText?.capabilities,
+  },
   capabilityAnnouncement:
     localeText?.capabilityAnnouncement ??
     defaultMarkdownEditorLocaleText.capabilityAnnouncement,
   overflowAria:
     localeText?.overflowAria ?? defaultMarkdownEditorLocaleText.overflowAria,
 })
+
+export const resolveMarkdownEditorCommandCopy = (
+  command: MarkdownEditorCommand,
+  localeText: MarkdownEditorLocaleText,
+) => {
+  const editorOwnedCommand = defaultMarkdownEditorCommands.includes(command)
+  const localized =
+    command.key === 'paste-as-markdown'
+      ? localeText.pasteAsMarkdown.title
+      : editorOwnedCommand && command.icon
+        ? localeText.commands[command.icon]
+        : command.title || command.label
+  return Object.freeze({
+    label: localized,
+    name: localized,
+    description: command.description ?? localized,
+  })
+}
+
+export const resolveMarkdownEditorCapabilityText = (
+  capability: string,
+  localeText: MarkdownEditorLocaleText,
+) =>
+  capability in localeText.capabilities
+    ? localeText.capabilities[
+        capability as keyof MarkdownEditorLocaleText['capabilities']
+      ]
+    : localeText.capabilities['feature-degraded']
+
+export const evaluateMarkdownEditorLocaleMutations = () => {
+  const override = resolveMarkdownEditorLocaleText({
+    modes: { source: 'SOURCE-L10N' },
+    surfaces: { slashMenu: 'SLASH-L10N' },
+  })
+  const command = defaultMarkdownEditorCommands[0]!
+  const commandCopy = resolveMarkdownEditorCommandCopy(command, override)
+  const stableRejected = override.results.rejected
+  const changedErrorTextStillStable = override.results.rejected
+
+  return Object.freeze({
+    authority: defaultMarkdownEditorLocaleText,
+    mutations: Object.freeze([
+      Object.freeze({
+        kind: 'hardcoded-copy' as const,
+        equivalent:
+          override.modes.source ===
+            defaultMarkdownEditorLocaleText.modes.source ||
+          override.surfaces.slashMenu ===
+            defaultMarkdownEditorLocaleText.surfaces.slashMenu,
+        accepted: false,
+      }),
+      Object.freeze({
+        kind: 'error-string-matching' as const,
+        equivalent: stableRejected !== changedErrorTextStillStable,
+        accepted: false,
+      }),
+      Object.freeze({
+        kind: 'cross-language-fallback' as const,
+        equivalent:
+          override.modes.preview !==
+          defaultMarkdownEditorLocaleText.modes.preview,
+        accepted: false,
+      }),
+      Object.freeze({
+        kind: 'duplicate-labels' as const,
+        equivalent:
+          commandCopy.name !==
+          resolveMarkdownEditorCommandCopy(command, override).name,
+        accepted: false,
+      }),
+    ]),
+  })
+}
 
 /** Syntax is supplied by the editor projection, never derived by commands. */
 export interface MarkdownEditorSyntaxContext {
@@ -589,9 +796,13 @@ export interface MarkdownEditorCommand {
   readonly title?: string
   readonly concurrent?: boolean
   readonly keywords?: readonly string[]
+  readonly priority?: number
   readonly presentation?: readonly MarkdownEditorCommandPresentation[]
   readonly when?: (context: MarkdownEditorCommandContext) => boolean
   readonly enabled?: (context: MarkdownEditorCommandContext) => boolean
+  readonly disabledReason?: (
+    context: MarkdownEditorCommandContext,
+  ) => string | undefined
   readonly run: (
     context: MarkdownEditorCommandContext,
   ) => MarkdownEditorCommandResult | Promise<MarkdownEditorCommandResult>
@@ -678,78 +889,78 @@ const prefixSelectedLines = (
 export const defaultMarkdownEditorCommands: readonly MarkdownEditorCommand[] = [
   {
     key: 'bold',
-    label: 'B',
+    label: 'bold',
     group: 'format',
     icon: 'bold',
     keywords: ['bold'],
+    priority: 100,
     shortcut: 'Mod+B',
-    title: 'Bold',
     when: () => true,
     enabled: () => true,
     run: (context) => ({ transaction: wrapSelection(context.value, context.selection, '**', '**', 'text') }),
   },
   {
     key: 'italic',
-    label: 'I',
+    label: 'italic',
     group: 'format',
     icon: 'italic',
     keywords: ['italic'],
+    priority: 90,
     shortcut: 'Mod+I',
-    title: 'Italic',
     when: () => true,
     enabled: () => true,
     run: (context) => ({ transaction: wrapSelection(context.value, context.selection, '*', '*', 'text') }),
   },
   {
     key: 'heading',
-    label: 'H',
+    label: 'heading',
     group: 'block',
     icon: 'heading',
     keywords: ['heading'],
+    priority: 80,
     shortcut: 'Mod+Alt+H',
-    title: 'Heading',
     when: () => true,
     enabled: () => true,
     run: (context) => ({ transaction: prefixSelectedLines(context.value, context.selection, '## ') }),
   },
   {
     key: 'quote',
-    label: 'Q',
+    label: 'quote',
     group: 'block',
     icon: 'quote',
-    title: 'Quote',
+    priority: 70,
     when: () => true,
     enabled: () => true,
     run: (context) => ({ transaction: prefixSelectedLines(context.value, context.selection, '> ') }),
   },
   {
     key: 'code',
-    label: '{}',
+    label: 'code',
     group: 'format',
     icon: 'code',
+    priority: 60,
     shortcut: 'Mod+E',
-    title: 'Code',
     when: () => true,
     enabled: () => true,
     run: (context) => ({ transaction: wrapSelection(context.value, context.selection, '`', '`', 'code') }),
   },
   {
     key: 'link',
-    label: 'Link',
+    label: 'link',
     group: 'insert',
     icon: 'link',
+    priority: 50,
     shortcut: 'Mod+K',
-    title: 'Link',
     when: () => true,
     enabled: () => true,
     run: (context) => ({ transaction: wrapSelection(context.value, context.selection, '[', '](https://example.com)', 'label') }),
   },
   {
     key: 'image',
-    label: '图片',
+    label: 'image',
     group: 'insert',
     icon: 'image',
-    title: '插入图片',
+    priority: 40,
     when: () => true,
     enabled: () => true,
     run: (context) => ({ transaction: wrapSelection(
@@ -762,10 +973,10 @@ export const defaultMarkdownEditorCommands: readonly MarkdownEditorCommand[] = [
   },
   {
     key: 'paste-as-markdown',
-    label: 'Paste as Markdown',
+    label: 'paste-as-markdown',
     group: 'insert',
-    title: 'Paste as Markdown',
     presentation: ['toolbar', 'palette'],
+    priority: 10,
     when: () => true,
     enabled: () => true,
     run: () => ({}),
@@ -794,7 +1005,12 @@ export const filterMarkdownEditorCommands = (
 export const resolveMarkdownEditorShortcut = (
   commands: readonly MarkdownEditorCommand[], shortcut: string,
 ) => {
-  const matches = commands.filter((command) => command.shortcut?.toLowerCase() === shortcut.toLowerCase())
+  const normalizedShortcut = shortcut.replace(/\s+/gu, '').toLowerCase()
+  const matches = commands.filter(
+    (command) =>
+      command.shortcut?.replace(/\s+/gu, '').toLowerCase() ===
+      normalizedShortcut,
+  )
   if (matches.length > 1) throw new Error(`Markdown editor shortcut conflict: ${shortcut}`)
   return matches[0]
 }
@@ -829,6 +1045,10 @@ export const markdownEditorProps = buildProps({
   },
   localeText: {
     type: definePropType<MarkdownEditorLocaleTextOverride>(Object),
+    default: undefined,
+  },
+  documentIdentity: {
+    type: definePropType<MarkdownEditorDocumentIdentity>(Object),
     default: undefined,
   },
   statusDensity: {
@@ -892,7 +1112,7 @@ export const markdownEditorProps = buildProps({
   },
   imageActionLabel: {
     type: String,
-    default: defaultMarkdownEditorLocaleText.actions.image,
+    default: undefined,
   },
   showSaveAction: {
     type: Boolean,
@@ -900,7 +1120,7 @@ export const markdownEditorProps = buildProps({
   },
   saveActionLabel: {
     type: String,
-    default: defaultMarkdownEditorLocaleText.actions.save,
+    default: undefined,
   },
   showSubmitAction: {
     type: Boolean,
@@ -908,7 +1128,7 @@ export const markdownEditorProps = buildProps({
   },
   submitActionLabel: {
     type: String,
-    default: defaultMarkdownEditorLocaleText.actions.submit,
+    default: undefined,
   },
   actionOverflowKeys: {
     type: definePropType<readonly MarkdownEditorActionKey[]>(Array),
@@ -924,7 +1144,7 @@ export const markdownEditorProps = buildProps({
   },
   commandOverflowLabel: {
     type: String,
-    default: defaultMarkdownEditorLocaleText.overflow,
+    default: undefined,
   },
   mobileLayout: {
     type: String as PropType<MarkdownEditorMobileLayout>,

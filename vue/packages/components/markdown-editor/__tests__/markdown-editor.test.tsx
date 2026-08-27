@@ -11,6 +11,7 @@ import {
   runMarkdownEditorCommand,
 } from '../src/markdown-editor'
 import type {
+  MarkdownEditorCommand,
   MarkdownEditorInstance,
   MarkdownEditorProps,
   MarkdownEditorSelection,
@@ -123,7 +124,7 @@ describe('MarkdownEditor', () => {
       wrapper
         .findAll('.el-markdown-editor__commands > .el-markdown-editor__command')
         .map((item) => item.text()),
-    ).toEqual(['H', 'Link'])
+    ).toEqual(['标题', '链接'])
 
     const more = wrapper.find('.el-markdown-editor__command-more')
     expect(more.text()).toContain('更多格式')
@@ -450,6 +451,63 @@ describe('MarkdownEditor', () => {
       reason: 'no-history',
       value: '外部重置',
     })
+  })
+
+  it('cancels pending commands and clears history when document identity changes', async () => {
+    let commandSignal: AbortSignal | undefined
+    let resolveCommand: (() => void) | undefined
+    const pending = new Promise<void>((resolvePromise) => {
+      resolveCommand = resolvePromise
+    })
+    const command: MarkdownEditorCommand = {
+      group: 'test',
+      key: 'pending-command',
+      label: 'Pending command',
+      presentation: ['toolbar'],
+      run: async (context) => {
+        commandSignal = context.signal
+        await pending
+        return {
+          transaction: {
+            changes: [{ from: 0, insert: 'late', to: 0 }],
+            history: 'separate',
+            origin: 'command',
+          },
+        }
+      },
+    }
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        commands: [command],
+        documentIdentity: { epoch: 1, id: 'document-a' },
+        modelValue: 'A',
+      },
+    })
+    ;(wrapper.find('textarea').element as HTMLTextAreaElement).setSelectionRange(
+      1,
+      1,
+    )
+    expect(wrapper.vm.insertMarkdownAtCursor('B')).toBe(true)
+    await wrapper.find('.el-markdown-editor__command').trigger('click')
+    expect(commandSignal?.aborted).toBe(false)
+
+    await wrapper.setProps({
+      documentIdentity: { epoch: 1, id: 'document-b' },
+      modelValue: 'A',
+    })
+    expect(commandSignal?.aborted).toBe(true)
+    expect(wrapper.vm.undo()).toMatchObject({
+      accepted: false,
+      reason: 'no-history',
+      value: 'A',
+    })
+
+    resolveCommand?.()
+    await nextTick()
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['AB'])
+    expect(
+      (wrapper.find('textarea').element as HTMLTextAreaElement).value,
+    ).toBe('A')
   })
 
   it('keeps public external transactions synchronized through v-model', async () => {
@@ -865,7 +923,7 @@ describe('MarkdownEditor', () => {
 
       expect(wrapper.classes()).toContain(`el-markdown-editor--chrome-${chrome}`)
       expect(wrapper.findAll('[role="region"]')).toHaveLength(1)
-      expect(wrapper.find('[aria-label="Markdown editor"]').exists()).toBe(true)
+      expect(wrapper.find('[aria-label="Markdown 编辑器"]').exists()).toBe(true)
 
       if (chrome === 'minimal') {
         expect(wrapper.find('.el-markdown-editor__toolbar').exists()).toBe(false)
@@ -899,11 +957,11 @@ describe('MarkdownEditor', () => {
 
       const root = wrapper.element
       expect(wrapper.classes()).toContain(`el-markdown-editor--${mode}`)
-      expect(wrapper.find('[aria-label="Markdown editor"]').exists()).toBe(true)
+      expect(wrapper.find('[aria-label="Markdown 编辑器"]').exists()).toBe(true)
 
       await wrapper.setProps({ chrome: 'minimal' })
       expect(wrapper.element).toBe(root)
-      expect(wrapper.find('[aria-label="Markdown editor"]').exists()).toBe(true)
+      expect(wrapper.find('[aria-label="Markdown 编辑器"]').exists()).toBe(true)
 
       const textarea = wrapper.find('textarea')
       expect(textarea.exists()).toBe(true)
@@ -1085,7 +1143,7 @@ describe('MarkdownEditor', () => {
         props: { chrome, modelValue: 'focus contract' },
       })
 
-      expect(wrapper.find('[aria-label="Markdown editor"]').exists()).toBe(true)
+      expect(wrapper.find('[aria-label="Markdown 编辑器"]').exists()).toBe(true)
       expect(wrapper.find('textarea').attributes('aria-label')).toBeTruthy()
       expect(wrapper.classes()).not.toContain('el-markdown-editor--surface-card')
     },

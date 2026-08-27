@@ -163,7 +163,13 @@ different-document 不得复用。unknown token、数字码、`write`/`ok` 别�
 所有 command surface 消费同一 `MarkdownEditorCommand` registry。Command 使用稳定
 `key`、`label`、`group`、受控 icon token、shortcut 和 presentation targets；
 `when(context)` 决定是否呈现，`enabled(context)` 决定是否可执行。Shortcut 冲突
-必须显式失败，不能由数组顺序决定。
+必须显式失败，不能由数组顺序决定。Registry 在任何 surface 渲染前拒绝重复/空
+key、空 group、未注册 icon、归一化后冲突的 shortcut，以及旧 `apply` 执行入口。
+
+`documentIdentity="{ id, epoch }"` 由 consumer 在文档切换时替换，即使新旧
+`modelValue` 相同也必须替换 identity。Identity 变化会取消 pending command、关闭
+临时 command surface、清除旧 undo/redo，并以当前受控 `modelValue` 开始新文档；
+迟到的旧文档异步结果不能提交。
 
 Command context 只公开 document identity、revision、selection、mode、read-only
 状态、syntax projection、position map、abort signal 与 transaction dispatcher。
@@ -189,6 +195,13 @@ document identity、epoch 与 revision 仍为 current 时提交；外部 reset �
 pending session。`statusDensity="none"` 只隐藏可见 footer，不会隐藏 degraded/fatal
 capability 的 `aria-live` announcement；该 announcement 通过
 `localeText.capabilityAnnouncement` 本地化。
+
+`localeText` 是 editor-owned 可见文案的唯一 override authority，包括 modes、
+内置 commands、actions、palette、selection/slash surface、textarea 名称、
+capability/result 状态与 status 指标标签。Extension command 的 `label`、
+`title`、`description` 仍由 extension 自己提供。`statusDensity="minimal"` 只显示
+字符与词数；`detailed` 使用 definition list 显示行/列、行数、字符、词、选区与
+可选字节数；普通输入不会把这些指标逐键写入 `aria-live`。
 
 ## Paste as Markdown
 
