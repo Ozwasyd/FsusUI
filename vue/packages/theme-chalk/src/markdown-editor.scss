@@ -12,6 +12,8 @@
 
   @include e(toolbar) {
     display: grid;
+    position: relative;
+    z-index: 2;
     grid-template-columns: minmax(0, 1fr) auto auto;
     gap: 8px;
     align-items: center;
@@ -87,7 +89,9 @@
 
   @include e(command-tray) {
     display: flex;
-    grid-column: 1 / -1;
+    position: absolute;
+    inset-block-start: calc(100% + var(--fsus-space-1, 4px));
+    inset-inline: var(--fsus-space-2, 8px);
     flex-wrap: wrap;
     gap: 6px;
     min-width: 0;

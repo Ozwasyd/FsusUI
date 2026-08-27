@@ -414,6 +414,7 @@ export type MarkdownEditorCommandLifecycleState =
   | 'rejected'
   | 'aborted'
   | 'stale'
+  | 'deleted'
 
 export type MarkdownEditorCommandIcon =
   | 'bold'
