@@ -180,6 +180,7 @@
         @compositionstart="handleCompositionStart"
         @copy="handleCopy"
         @cut="handleCut"
+        @dragover.prevent
         @drop="handleDrop"
         @input="handleInput"
         @keydown="handleKeydown"
@@ -365,6 +366,7 @@ import {
   resolveMarkdownEditorShortcut,
   runMarkdownEditorCommand,
 } from './markdown-editor'
+import { captureMarkdownAttachmentInput } from './markdown-editor-attachment'
 import { resolveMarkdownEditorChromeRegions } from './markdown-editor-chrome'
 import {
   deriveMarkdownEditorChange,
@@ -1341,6 +1343,34 @@ const applyClipboardTransfer = (
       origin,
       revision: transactionStore.revision,
     })
+    if (plan.action === 'attachment-intent') {
+      const rawFiles = Array.from(transfer.files ?? []).map((file) => ({
+        name: file.name,
+        mimeType: file.type,
+        byteLength: file.size,
+      }))
+      const captured = captureMarkdownAttachmentInput({
+        sourceKind: origin,
+        documentIdentity,
+        revision: transactionStore.revision,
+        anchor: {
+          range: captureSelection(),
+          nodeId: null,
+        },
+        files: rawFiles,
+        context: {
+          readonly: editingBlocked.value,
+          disabled: editingBlocked.value,
+          mode: currentMode.value,
+          isComposing: isComposing.value,
+          currentRevision: transactionStore.revision,
+        },
+        eventFingerprint: plan.identity,
+      })
+      if (captured.ok) {
+        emit('upload-image', captured.batch)
+      }
+    }
     if (plan.transaction) dispatchTransaction(plan.transaction)
     return
   }
@@ -1353,6 +1383,7 @@ const handlePaste = (event: ClipboardEvent) => {
 }
 
 const handleDrop = (event: DragEvent) => {
+  event.preventDefault()
   applyClipboardTransfer(event, 'drop', event.dataTransfer)
 }
 
@@ -1704,7 +1735,28 @@ const emitSubmit = () => {
 
 const emitUploadImage = () => {
   if (editingBlocked.value || isComposing.value) return
-  emit('upload-image')
+  const captured = captureMarkdownAttachmentInput({
+    sourceKind: 'pick',
+    documentIdentity,
+    revision: transactionStore.revision,
+    anchor: {
+      range: captureSelection(),
+      nodeId: null,
+    },
+    files: [{ name: 'attachment.png', mimeType: 'image/png', byteLength: 0, kind: 'image' }],
+    context: {
+      readonly: editingBlocked.value,
+      disabled: editingBlocked.value,
+      mode: currentMode.value,
+      isComposing: isComposing.value,
+      currentRevision: transactionStore.revision,
+    },
+  })
+  if (captured.ok) {
+    emit('upload-image', captured.batch)
+  } else {
+    emit('upload-image')
+  }
 }
 
 const emitRenderEvent = (
