@@ -7,6 +7,8 @@ import type {
 } from './markdown-editor-transaction'
 import type {
   MarkdownLanguageToolCapability,
+  MarkdownLanguageToolCommitInput,
+  MarkdownLanguageToolCommitResult,
   MarkdownLanguageToolConfig,
   MarkdownLanguageToolSession,
   MarkdownLanguageToolSessionKind,
@@ -14,19 +16,9 @@ import type {
 import {
   commitMarkdownLanguageToolMutation,
   createMarkdownLanguageToolSession,
-  planMarkdownLanguageToolReplacement,
   resolveMarkdownLanguageToolCapability,
   resolveMarkdownLanguageToolContextCapability,
 } from './markdown-editor-language-tools'
-
-export const MARKDOWN_WEB_LANGUAGE_BROWSERS = Object.freeze([
-  'chromium',
-  'firefox',
-  'webkit',
-] as const)
-
-export type MarkdownWebLanguageBrowser =
-  (typeof MARKDOWN_WEB_LANGUAGE_BROWSERS)[number]
 
 export interface MarkdownWebTextareaLike {
   autocapitalize?: string
@@ -47,7 +39,24 @@ export interface MarkdownWebLanguageCoordinates {
   readonly inMarker: boolean
   readonly inUrl: boolean
   readonly rawOffset: number
-  readonly visualOffset: number
+  readonly reason?: MarkdownLanguageToolCapability['reason']
+  /**
+   * The visual offset is deliberately absent until the editor owner supplies
+   * the canonical #325 anchor map. Raw offsets are never visual authority.
+   */
+  readonly visualOffset?: number
+}
+
+export interface MarkdownWebLanguageBeforeInput {
+  readonly data?: string | null
+  readonly inputType?: string
+  readonly isComposing?: boolean
+  readonly preventDefault?: () => void
+  /**
+   * The editor owner resolves browser target ranges through the canonical map.
+   * DOM ranges themselves are never accepted as source authority.
+   */
+  readonly rawTargetRange?: MarkdownEditorSelection
 }
 
 export interface MarkdownWebLanguageController {
@@ -55,25 +64,20 @@ export interface MarkdownWebLanguageController {
   readonly capability: MarkdownLanguageToolCapability
   readonly dictation: boolean
   readonly lang?: string
-  readonly nativeWritingTools: string
+  readonly nativeWritingTools: MarkdownLanguageToolCapability['nativeWritingTools']
   readonly session: MarkdownLanguageToolSession | null
   readonly spellcheck: boolean
-  readonly status: string
+  readonly status: MarkdownLanguageToolCapability['status']
   applyReplacement(
     from: number,
     to: number,
     insert: string,
-  ): MarkdownEditorTransaction
+    kind?: MarkdownLanguageToolSessionKind,
+  ): MarkdownLanguageToolCommitResult
   createSession(
     kind?: MarkdownLanguageToolSessionKind,
   ): MarkdownLanguageToolSession
-  handleBeforeInput(event: {
-    readonly data?: string | null
-    readonly getTargetRanges?: () => readonly unknown[]
-    readonly inputType?: string
-    readonly isComposing?: boolean
-    readonly preventDefault?: () => void
-  }): {
+  handleBeforeInput(event: MarkdownWebLanguageBeforeInput): {
     readonly handled: boolean
     readonly reason?: string
     readonly transaction?: MarkdownEditorTransaction
@@ -81,6 +85,8 @@ export interface MarkdownWebLanguageController {
   switchMode(nextMode: MarkdownEditorMode): MarkdownLanguageToolCapability
   updateState(input: {
     readonly config?: MarkdownLanguageToolConfig
+    readonly projection?: MarkdownStableProjection
+    readonly projectionRevision?: number
     readonly revision: number
     readonly source: string
   }): MarkdownLanguageToolCapability
@@ -94,30 +100,37 @@ export interface MarkdownWebLanguageController {
   }): MarkdownLanguageToolCapability
 }
 
-export const applyMarkdownSpellReplacement = (
-  from: number,
-  to: number,
-  insert: string,
-  options?: {
-    readonly documentIdentity?: MarkdownEditorDocumentIdentity
-    readonly revision?: number
-    readonly session?: MarkdownLanguageToolSession
-  },
-): MarkdownEditorTransaction =>
-  planMarkdownLanguageToolReplacement(from, to, insert, options)
+const selectionFrom = (
+  textarea: MarkdownWebTextareaLike,
+): MarkdownEditorSelection =>
+  Object.freeze({
+    direction: textarea.selectionDirection ?? 'none',
+    end: textarea.selectionEnd ?? 0,
+    start: textarea.selectionStart ?? 0,
+  })
+
+const rejected = (
+  reason: MarkdownLanguageToolCommitResult['reason'],
+): MarkdownLanguageToolCommitResult =>
+  Object.freeze({
+    accepted: false,
+    reason,
+  })
 
 export const resolveMarkdownWebLanguageCoordinates = (input: {
+  readonly documentIdentity?: MarkdownEditorDocumentIdentity
   readonly mode?: MarkdownEditorMode
   readonly offset: number
   readonly projection?: MarkdownStableProjection
   readonly source: string
 }): MarkdownWebLanguageCoordinates => {
-  const { offset, source, projection } = input
-  const clamped = Math.max(0, Math.min(source.length, offset))
+  const clamped = Math.max(0, Math.min(input.source.length, input.offset))
   const capability = resolveMarkdownLanguageToolContextCapability({
+    documentIdentity: input.documentIdentity,
+    mode: input.mode,
     offset: clamped,
-    projection,
-    source,
+    projection: input.projection,
+    source: input.source,
   })
 
   return Object.freeze({
@@ -126,38 +139,13 @@ export const resolveMarkdownWebLanguageCoordinates = (input: {
     inMarker: capability.reason === 'hidden-marker',
     inUrl: capability.reason === 'url',
     rawOffset: clamped,
-    visualOffset: clamped,
+    reason: capability.reason,
   })
 }
 
-export const planMarkdownWebReplacement = (input: {
-  readonly currentDocumentIdentity?: MarkdownEditorDocumentIdentity
-  readonly currentRevision?: number
-  readonly documentIdentity?: MarkdownEditorDocumentIdentity
-  readonly from: number
-  readonly insert: string
-  readonly isComposing?: boolean
-  readonly kind?: MarkdownLanguageToolSessionKind
-  readonly revision?: number
-  readonly session?: MarkdownLanguageToolSession
-  readonly source: string
-  readonly to: number
-}) => {
-  const documentIdentity = input.documentIdentity ?? { epoch: 0, id: 'web' }
-  return commitMarkdownLanguageToolMutation({
-    currentDocumentIdentity: input.currentDocumentIdentity ?? documentIdentity,
-    currentRevision: input.currentRevision,
-    documentIdentity,
-    from: input.from,
-    insert: input.insert,
-    isComposing: input.isComposing,
-    kind: input.kind,
-    revision: input.revision ?? 0,
-    session: input.session,
-    source: input.source,
-    to: input.to,
-  })
-}
+export const planMarkdownWebReplacement = (
+  input: MarkdownLanguageToolCommitInput,
+): MarkdownLanguageToolCommitResult => commitMarkdownLanguageToolMutation(input)
 
 export const bindMarkdownWebLanguageTools = (
   textarea: MarkdownWebTextareaLike,
@@ -165,6 +153,8 @@ export const bindMarkdownWebLanguageTools = (
     readonly config?: MarkdownLanguageToolConfig
     readonly documentIdentity?: MarkdownEditorDocumentIdentity
     readonly mode?: MarkdownEditorMode
+    readonly projection?: MarkdownStableProjection
+    readonly projectionRevision?: number
     readonly revision?: number
     readonly source?: string
   } = {},
@@ -175,23 +165,99 @@ export const bindMarkdownWebLanguageTools = (
   let currentSource = options.source ?? textarea.value ?? ''
   let currentConfig = options.config
   let currentMode: MarkdownEditorMode = options.mode ?? 'source'
+  let currentProjection = options.projection
+  let currentProjectionRevision = options.projection
+    ? (options.projectionRevision ?? currentRevision)
+    : undefined
   let currentCapability = resolveMarkdownLanguageToolCapability(currentConfig)
   let currentSession: MarkdownLanguageToolSession | null = null
+
   const baseCapability = () =>
     resolveMarkdownLanguageToolCapability(currentConfig)
-  const applyAutocorrect = () => {
-    const value = currentCapability.autocorrect ? 'on' : 'off'
-    if (textarea.setAttribute) textarea.setAttribute('autocorrect', value)
-    else textarea.autocorrect = value
+
+  const applyAttributes = () => {
+    const base = baseCapability()
+    textarea.spellcheck = base.spellcheck
+    textarea.lang = base.lang ?? ''
+    textarea.autocapitalize = 'sentences'
+    textarea.autocomplete = 'off'
+    const autocorrect = base.autocorrect ? 'on' : 'off'
+    if (textarea.setAttribute) {
+      textarea.setAttribute('autocorrect', autocorrect)
+      textarea.setAttribute(
+        'writingsuggestions',
+        base.nativeWritingTools === 'disabled' ? 'false' : 'true',
+      )
+    } else {
+      textarea.autocorrect = autocorrect
+    }
   }
 
-  textarea.spellcheck = currentCapability.spellcheck
-  if (currentCapability.lang) {
-    textarea.lang = currentCapability.lang
+  const localCapability = (input: {
+    readonly disabled?: boolean
+    readonly isComposing?: boolean
+    readonly mode?: MarkdownEditorMode
+    readonly offset?: number
+    readonly readonly?: boolean
+    readonly selection?: MarkdownEditorSelection
+  }) =>
+    resolveMarkdownLanguageToolContextCapability({
+      config: currentConfig,
+      disabled: input.disabled,
+      documentIdentity,
+      isComposing: input.isComposing,
+      mode: input.mode ?? currentMode,
+      offset: input.offset,
+      projection: currentProjection,
+      readonly: input.readonly,
+      revision: currentRevision,
+      selection: input.selection,
+      source: currentSource,
+    })
+
+  const createSession = (
+    kind: MarkdownLanguageToolSessionKind = 'spellcheck',
+    selection = selectionFrom(textarea),
+  ) => {
+    currentSession = createMarkdownLanguageToolSession({
+      documentIdentity,
+      kind,
+      revision: currentRevision,
+      selection,
+    })
+    return currentSession
   }
-  textarea.autocapitalize = 'sentences'
-  textarea.autocomplete = 'off'
-  applyAutocorrect()
+
+  const commit = (
+    from: number,
+    to: number,
+    insert: string,
+    kind: MarkdownLanguageToolSessionKind,
+    targetSelection = selectionFrom(textarea),
+  ): MarkdownLanguageToolCommitResult => {
+    if (!currentProjection) return rejected('projection-unavailable')
+    if (currentProjectionRevision === undefined) {
+      return rejected('stale-projection')
+    }
+    if (!currentSession) return rejected('session-required')
+    return planMarkdownWebReplacement({
+      currentDocumentIdentity: documentIdentity,
+      currentRevision,
+      currentSelection: targetSelection,
+      documentIdentity,
+      from,
+      insert,
+      kind,
+      projection: currentProjection,
+      projectionRevision: currentProjectionRevision,
+      revision: currentRevision,
+      session: currentSession,
+      source: currentSource,
+      to,
+    })
+  }
+
+  applyAttributes()
 
   return Object.freeze({
     get autocorrect() {
@@ -225,48 +291,47 @@ export const bindMarkdownWebLanguageTools = (
       return currentCapability.status
     },
 
-    createSession(kind: MarkdownLanguageToolSessionKind = 'spellcheck') {
-      currentSession = createMarkdownLanguageToolSession({
-        documentIdentity,
-        kind,
-        revision: currentRevision,
-        selection: {
-          direction: textarea.selectionDirection ?? 'none',
-          end: textarea.selectionEnd ?? 0,
-          start: textarea.selectionStart ?? 0,
-        },
-      })
-      return currentSession
-    },
+    createSession,
 
-    applyReplacement(from: number, to: number, insert: string) {
-      return planMarkdownLanguageToolReplacement(from, to, insert, {
-        documentIdentity,
-        revision: currentRevision,
-        session: currentSession ?? undefined,
-      })
+    applyReplacement(
+      from: number,
+      to: number,
+      insert: string,
+      kind: MarkdownLanguageToolSessionKind = currentSession?.kind ??
+        'spellcheck',
+    ) {
+      const result = commit(from, to, insert, kind)
+      currentSession = null
+      return result
     },
 
     switchMode(nextMode: MarkdownEditorMode) {
       currentMode = nextMode
-      textarea.spellcheck = baseCapability().spellcheck
+      currentCapability = localCapability({
+        mode: nextMode,
+        selection: selectionFrom(textarea),
+      })
+      applyAttributes()
       return currentCapability
     },
 
     updateState(input: {
       readonly config?: MarkdownLanguageToolConfig
+      readonly projection?: MarkdownStableProjection
+      readonly projectionRevision?: number
       readonly revision: number
       readonly source: string
     }) {
       currentRevision = input.revision
       currentSource = input.source
       currentConfig = input.config ?? currentConfig
+      currentProjection = input.projection
+      currentProjectionRevision = input.projection
+        ? (input.projectionRevision ?? input.revision)
+        : undefined
       currentSession = null
       currentCapability = resolveMarkdownLanguageToolCapability(currentConfig)
-      textarea.spellcheck = currentCapability.spellcheck
-      if (currentCapability.lang) textarea.lang = currentCapability.lang
-      else textarea.lang = ''
-      applyAutocorrect()
+      applyAttributes()
       return currentCapability
     },
 
@@ -278,331 +343,51 @@ export const bindMarkdownWebLanguageTools = (
       readonly readonly?: boolean
       readonly selection?: MarkdownEditorSelection
     }) {
-      const source = currentSource
-      const offset =
-        input.selection?.start ?? input.offset ?? textarea.selectionStart ?? 0
-      const nextCapability = resolveMarkdownLanguageToolContextCapability({
-        config: currentConfig,
-        disabled: input.disabled,
-        documentIdentity,
-        isComposing: input.isComposing,
-        mode: input.mode ?? currentMode,
-        offset,
-        readonly: input.readonly,
-        revision: currentRevision,
-        selection: input.selection,
-        source,
-      })
-      currentCapability = nextCapability
+      currentCapability = localCapability(input)
+      // Context suppression remains local; do not disable the textarea globally.
       textarea.spellcheck = baseCapability().spellcheck
       return currentCapability
     },
 
-    handleBeforeInput(event: {
-      readonly data?: string | null
-      readonly getTargetRanges?: () => readonly unknown[]
-      readonly inputType?: string
-      readonly isComposing?: boolean
-      readonly preventDefault?: () => void
-    }) {
+    handleBeforeInput(event: MarkdownWebLanguageBeforeInput) {
+      if (event.inputType !== 'insertReplacementText') {
+        return Object.freeze({ handled: false })
+      }
+
+      // Browser DOM mutation cannot fall through once classified as a native
+      // replacement. Rejected commits are still consumed at this boundary.
+      event.preventDefault?.()
       if (event.isComposing) {
-        return Object.freeze({ handled: false, reason: 'composition-active' })
-      }
-      if (event.inputType === 'insertReplacementText') {
-        if (!currentCapability.spellcheck) {
-          return Object.freeze({
-            handled: false,
-            reason: currentCapability.reason ?? 'unavailable',
-          })
-        }
-        const from = textarea.selectionStart ?? 0
-        const to = textarea.selectionEnd ?? from
-        const insert = event.data ?? ''
-        const source = currentSource
-        const commit = commitMarkdownLanguageToolMutation({
-          currentDocumentIdentity: documentIdentity,
-          currentRevision,
-          documentIdentity,
-          from,
-          insert,
-          revision: currentRevision,
-          selection: { direction: 'none', end: to, start: from },
-          session: currentSession ?? undefined,
-          source,
-          to,
-        })
-        if (commit.accepted && commit.transaction) {
-          event.preventDefault?.()
-          return Object.freeze({
-            handled: true,
-            transaction: commit.transaction,
-          })
-        }
+        currentSession = null
         return Object.freeze({
-          handled: false,
-          reason: commit.reason ?? 'rejected',
+          handled: true,
+          reason: 'composition-active',
         })
       }
-      return Object.freeze({ handled: false })
+      if (!currentCapability.spellcheck) {
+        currentSession = null
+        return Object.freeze({
+          handled: true,
+          reason: currentCapability.reason ?? 'unsupported-platform',
+        })
+      }
+
+      const targetSelection = event.rawTargetRange ?? selectionFrom(textarea)
+      const kind = currentSession?.kind ?? 'spellcheck'
+      if (!currentSession) createSession(kind, targetSelection)
+      const result = commit(
+        targetSelection.start,
+        targetSelection.end,
+        event.data ?? '',
+        kind,
+        targetSelection,
+      )
+      currentSession = null
+      return Object.freeze({
+        handled: true,
+        reason: result.reason,
+        transaction: result.transaction,
+      })
     },
   })
 }
-
-export interface MarkdownWebLanguageTraceEntry {
-  readonly accepted: boolean
-  readonly browser: MarkdownWebLanguageBrowser
-  readonly event: string
-  readonly handled: boolean
-  readonly inputType?: string
-  readonly reason?: string
-  readonly scenario: string
-  readonly transaction?: MarkdownEditorTransaction
-}
-
-export const driveMarkdownWebLanguageTrace = (
-  browser: MarkdownWebLanguageBrowser,
-  scenario:
-    | 'spellcheck-correction'
-    | 'autocorrect'
-    | 'dictation'
-    | 'context-menu'
-    | 'cjk-composition-spellcheck'
-    | 'mode-switch-source-live'
-    | 'code-url-suppression'
-    | 'stale-revision-rejected',
-  options: {
-    readonly initialValue?: string
-    readonly selection?: MarkdownEditorSelection
-  } = {},
-): readonly MarkdownWebLanguageTraceEntry[] => {
-  const initialValue = options.initialValue ?? 'Hello wrld this is a test'
-  const textarea: MarkdownWebTextareaLike = {
-    selectionDirection: 'none',
-    selectionEnd: options.selection?.end ?? 10,
-    selectionStart: options.selection?.start ?? 6,
-    spellcheck: true,
-    value: initialValue,
-  }
-  const documentIdentity = { epoch: 1, id: 'trace-doc' }
-  const controller = bindMarkdownWebLanguageTools(textarea, {
-    documentIdentity,
-    revision: 1,
-    source: initialValue,
-  })
-  const trace: MarkdownWebLanguageTraceEntry[] = []
-
-  if (scenario === 'spellcheck-correction' || scenario === 'context-menu') {
-    controller.createSession(
-      scenario === 'context-menu' ? 'context-menu' : 'spellcheck',
-    )
-    const beforeinput = controller.handleBeforeInput({
-      data: 'world',
-      inputType: 'insertReplacementText',
-      isComposing: false,
-    })
-    trace.push(
-      Object.freeze({
-        accepted: beforeinput.handled,
-        browser,
-        event: 'beforeinput',
-        handled: beforeinput.handled,
-        inputType: 'insertReplacementText',
-        scenario,
-        transaction: beforeinput.transaction,
-      }),
-    )
-  } else if (scenario === 'autocorrect') {
-    controller.createSession('autocorrect')
-    const beforeinput = controller.handleBeforeInput({
-      data: 'world',
-      inputType: 'insertReplacementText',
-      isComposing: false,
-    })
-    trace.push(
-      Object.freeze({
-        accepted: beforeinput.handled,
-        browser,
-        event: 'beforeinput',
-        handled: beforeinput.handled,
-        inputType: 'insertReplacementText',
-        scenario,
-        transaction: beforeinput.transaction,
-      }),
-    )
-  } else if (scenario === 'dictation') {
-    controller.createSession('dictation')
-    const tx = controller.applyReplacement(6, 10, 'world')
-    trace.push(
-      Object.freeze({
-        accepted: true,
-        browser,
-        event: 'dictation-commit',
-        handled: true,
-        inputType: 'insertText',
-        scenario,
-        transaction: tx,
-      }),
-    )
-  } else if (scenario === 'cjk-composition-spellcheck') {
-    const beforeinput = controller.handleBeforeInput({
-      data: 'world',
-      inputType: 'insertReplacementText',
-      isComposing: true,
-    })
-    trace.push(
-      Object.freeze({
-        accepted: beforeinput.handled,
-        browser,
-        event: 'beforeinput',
-        handled: beforeinput.handled,
-        inputType: 'insertReplacementText',
-        reason: beforeinput.reason,
-        scenario,
-      }),
-    )
-  } else if (scenario === 'mode-switch-source-live') {
-    const liveCap = controller.switchMode('live')
-    trace.push(
-      Object.freeze({
-        accepted: liveCap.spellcheck === true && textarea.spellcheck === true,
-        browser,
-        event: 'switch-live',
-        handled: true,
-        scenario,
-      }),
-    )
-    const sourceCap = controller.switchMode('source')
-    trace.push(
-      Object.freeze({
-        accepted: sourceCap.spellcheck === true && textarea.spellcheck === true,
-        browser,
-        event: 'switch-source',
-        handled: true,
-        scenario,
-      }),
-    )
-  } else if (scenario === 'code-url-suppression') {
-    const codeSource = '```js\nconst wrld = 1\n```\n'
-    textarea.value = codeSource
-    controller.updateState({ revision: 1, source: codeSource })
-    const codeCap = controller.updateContext({ offset: 12 })
-    trace.push(
-      Object.freeze({
-        accepted:
-          codeCap.status === 'degraded' && codeCap.reason === 'code-block',
-        browser,
-        event: 'context-code',
-        handled: true,
-        reason: codeCap.reason,
-        scenario,
-      }),
-    )
-    const proseSource = 'Hello wrld'
-    textarea.value = proseSource
-    controller.updateState({ revision: 1, source: proseSource })
-    const proseCap = controller.updateContext({ offset: 6 })
-    trace.push(
-      Object.freeze({
-        accepted:
-          proseCap.status === 'supported' && proseCap.spellcheck === true,
-        browser,
-        event: 'context-prose',
-        handled: true,
-        scenario,
-      }),
-    )
-  } else if (scenario === 'stale-revision-rejected') {
-    const commit = commitMarkdownLanguageToolMutation({
-      currentRevision: 2,
-      documentIdentity,
-      from: 6,
-      insert: 'world',
-      revision: 1,
-      source: initialValue,
-      to: 10,
-    })
-    trace.push(
-      Object.freeze({
-        accepted: commit.accepted,
-        browser,
-        event: 'stale-commit',
-        handled: false,
-        reason: commit.reason,
-        scenario,
-      }),
-    )
-  }
-
-  return Object.freeze(trace)
-}
-
-export type MarkdownWebLanguageMutationKind =
-  | 'global-spellcheck-disabled'
-  | 'dom-authority'
-  | 'private-ref-leakage'
-  | 'code-url-global-suppression'
-  | 'stale-commit'
-
-export interface MarkdownWebLanguageMutationResult {
-  readonly accepted: boolean
-  readonly detail: string
-  readonly kind: MarkdownWebLanguageMutationKind
-}
-
-export interface MarkdownWebLanguageMutationReport {
-  readonly mutations: readonly MarkdownWebLanguageMutationResult[]
-}
-
-export const evaluateMarkdownWebLanguageMutations =
-  (): MarkdownWebLanguageMutationReport => {
-    const textarea: MarkdownWebTextareaLike = {
-      spellcheck: true,
-      value: 'Hello wrld',
-    }
-    const controller = bindMarkdownWebLanguageTools(textarea)
-
-    controller.switchMode('live')
-    const globalDisabled = Object.freeze({
-      accepted: textarea.spellcheck === false,
-      detail: 'switching to Live mode must not globally disable spellcheck',
-      kind: 'global-spellcheck-disabled' as const,
-    })
-
-    const domAuthority = Object.freeze({
-      accepted: false,
-      detail: 'browser DOM mutations must never bypass transaction pipeline',
-      kind: 'dom-authority' as const,
-    })
-
-    const privateRef = Object.freeze({
-      accepted: false,
-      detail:
-        'private textarea/contenteditable ref must not be leaked to consumers',
-      kind: 'private-ref-leakage' as const,
-    })
-
-    controller.updateContext({ offset: 0 })
-    const codeGlobal = Object.freeze({
-      accepted: controller.capability.spellcheckMode === 'disabled',
-      detail:
-        'local suppression in code/URL must not permanently disable spellcheck globally',
-      kind: 'code-url-global-suppression' as const,
-    })
-
-    const staleCommit = Object.freeze({
-      accepted: false,
-      detail:
-        'late browser replacements must be rejected after document/revision change',
-      kind: 'stale-commit' as const,
-    })
-
-    return Object.freeze({
-      mutations: Object.freeze([
-        globalDisabled,
-        domAuthority,
-        privateRef,
-        codeGlobal,
-        staleCommit,
-      ]),
-    })
-  }

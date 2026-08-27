@@ -411,7 +411,7 @@ import {
   type MarkdownPasteAsMarkdownChoice,
   type MarkdownPasteAsMarkdownSession,
 } from './markdown-editor-paste-markdown'
-import { resolveMarkdownLanguageToolContextCapability } from './markdown-editor-language-tools'
+import { resolveMarkdownLanguageToolCapability } from './markdown-editor-language-tools'
 import {
   bindMarkdownWebLanguageTools,
   type MarkdownWebLanguageController,
@@ -521,20 +521,10 @@ const liveReveal = ref(
   }),
 )
 const languageCapability = computed(() =>
-  resolveMarkdownLanguageToolContextCapability({
-    config: {
-      lang: props.lang,
-      nativeWritingTools: props.nativeWritingTools,
-      spellcheck: props.spellcheck,
-    },
-    disabled: inputDisabled.value,
-    documentIdentity,
-    isComposing: nativeMachine.composing,
-    mode: currentMode.value,
-    offset: transactionStore.selection.start,
-    readonly: props.readonly,
-    revision: transactionStore.revision,
-    source: editorValue.value,
+  resolveMarkdownLanguageToolCapability({
+    lang: props.lang,
+    nativeWritingTools: props.nativeWritingTools,
+    spellcheck: props.spellcheck,
   }),
 )
 const languageToolsConfig = () => ({
@@ -1203,10 +1193,15 @@ onBeforeUnmount(() => {
 const handleBeforeInput = (event: InputEvent) => {
   syncLanguageToolsState()
   if (event.inputType === 'insertReplacementText' && languageToolsController) {
-    languageToolsController.createSession('spellcheck')
     const replacement = languageToolsController.handleBeforeInput(event)
     if (replacement.handled && replacement.transaction) {
       dispatchTransaction(replacement.transaction)
+      beforeInputSnapshot = undefined
+      pendingClipboardIdentity = undefined
+      pendingInputOrigin = undefined
+      return
+    }
+    if (replacement.handled) {
       beforeInputSnapshot = undefined
       pendingClipboardIdentity = undefined
       pendingInputOrigin = undefined

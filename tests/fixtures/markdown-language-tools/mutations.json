@@ -1,0 +1,51 @@
+[
+  {
+    "name": "cloud-fallback",
+    "file": "core",
+    "find": "export const commitMarkdownLanguageToolMutation = (",
+    "replace": "fetch('https://spell.example.invalid')\nexport const commitMarkdownLanguageToolMutation = (",
+    "expectError": "cloud or network fallback is forbidden"
+  },
+  {
+    "name": "consumer-owned-projection",
+    "file": "core",
+    "find": "import {",
+    "replace": "import { createMarkdownEditorProjection } from '../../../wasm/markdown-runtime'\nimport {",
+    "expectError": "consume caller-owned projection and anchor authority"
+  },
+  {
+    "name": "dom-value-authority",
+    "file": "web",
+    "find": "const applyAttributes = () => {",
+    "replace": "const applyAttributes = () => {\n    textarea.value = currentSource",
+    "expectError": "DOM value must not become authority"
+  },
+  {
+    "name": "global-spellcheck-disabled",
+    "file": "web",
+    "find": "textarea.spellcheck = base.spellcheck",
+    "replace": "textarea.spellcheck = false",
+    "expectError": "must not globally disable spellcheck"
+  },
+  {
+    "name": "raw-offset-as-visual-authority",
+    "file": "web",
+    "find": "rawOffset: clamped,",
+    "replace": "rawOffset: clamped,\n    visualOffset: clamped,",
+    "expectError": "raw offsets must not be reused as visual authority"
+  },
+  {
+    "name": "retained-browser-dom-mutation",
+    "file": "web",
+    "find": "event.preventDefault?.()",
+    "replace": "void event.preventDefault",
+    "expectError": "must prevent retained DOM mutation"
+  },
+  {
+    "name": "private-textarea-ref",
+    "file": "vue",
+    "find": "defineExpose({\n  dispatchTransaction,",
+    "replace": "defineExpose({\n  textareaRef,\n  dispatchTransaction,",
+    "expectError": "private editor or DOM refs must not be exposed"
+  }
+]

@@ -1,44 +1,45 @@
 import {
-  createMarkdownEditorProjection,
-  stabilizeMarkdownEditorProjection,
-  type MarkdownDocumentIdentity,
   type MarkdownStableProjection,
   type MarkdownStableSyntaxNode,
-} from "../../../wasm/markdown-runtime"
-import type { MarkdownEditorMode } from "./markdown-editor-live-contract"
+} from '../../../wasm/markdown-runtime'
+import type { MarkdownEditorMode } from './markdown-editor-live-contract'
 import type {
   MarkdownEditorDocumentIdentity,
   MarkdownEditorSelection,
   MarkdownEditorTransaction,
-} from "./markdown-editor-transaction"
+} from './markdown-editor-transaction'
 
-export type MarkdownSpellcheckMode = "auto" | "enabled" | "disabled"
+export type MarkdownSpellcheckMode = 'auto' | 'enabled' | 'disabled'
 
-export type MarkdownNativeWritingToolsMode = "auto" | "disabled"
+export type MarkdownNativeWritingToolsMode = 'auto' | 'disabled'
 
 export type MarkdownLanguageToolStatus =
-  | "supported"
-  | "degraded"
-  | "unavailable"
+  | 'supported'
+  | 'degraded'
+  | 'unavailable'
 
 export type MarkdownLanguageToolReason =
-  | "unsupported-platform"
-  | "disabled"
-  | "readonly"
-  | "preview"
-  | "composition-active"
-  | "code-block"
-  | "url"
-  | "atomic-node"
-  | "hidden-marker"
-  | "nested-syntax"
-  | "stale-document"
-  | "stale-revision"
-  | "stale-selection"
-  | "stale-session"
-  | "invalid-range"
-  | "dom-authority-rejected"
-  | "full-source-rejected"
+  | 'unsupported-platform'
+  | 'disabled'
+  | 'readonly'
+  | 'preview'
+  | 'composition-active'
+  | 'code-block'
+  | 'url'
+  | 'atomic-node'
+  | 'hidden-marker'
+  | 'nested-syntax'
+  | 'stale-document'
+  | 'stale-projection'
+  | 'stale-revision'
+  | 'stale-selection'
+  | 'stale-session'
+  | 'invalid-range'
+  | 'projection-unavailable'
+  | 'session-required'
+  | 'session-kind-conflict'
+  | 'dom-authority-rejected'
+  | 'full-source-rejected'
 
 export interface MarkdownLanguageToolConfig {
   readonly autocorrect?: boolean
@@ -60,11 +61,11 @@ export interface MarkdownLanguageToolCapability {
 }
 
 export type MarkdownLanguageToolSessionKind =
-  | "spellcheck"
-  | "autocorrect"
-  | "dictation"
-  | "writing-tools"
-  | "context-menu"
+  | 'spellcheck'
+  | 'autocorrect'
+  | 'dictation'
+  | 'writing-tools'
+  | 'context-menu'
 
 export interface MarkdownLanguageToolSession {
   readonly active: boolean
@@ -72,24 +73,24 @@ export interface MarkdownLanguageToolSession {
   readonly id: string
   readonly kind: MarkdownLanguageToolSessionKind
   readonly revision: number
-  readonly selection?: MarkdownEditorSelection
+  readonly selection: MarkdownEditorSelection
   readonly timestamp: number
 }
 
 export interface MarkdownLanguageToolCommitInput {
-  readonly currentDocumentIdentity?: MarkdownEditorDocumentIdentity
-  readonly currentRevision?: number
-  readonly currentSelection?: MarkdownEditorSelection
+  readonly currentDocumentIdentity: MarkdownEditorDocumentIdentity
+  readonly currentRevision: number
+  readonly currentSelection: MarkdownEditorSelection
   readonly documentIdentity: MarkdownEditorDocumentIdentity
   readonly from: number
   readonly insert: string
   readonly isComposing?: boolean
-  readonly kind?: MarkdownLanguageToolSessionKind
-  readonly projection?: MarkdownStableProjection
+  readonly kind: MarkdownLanguageToolSessionKind
+  readonly projection: MarkdownStableProjection
+  readonly projectionRevision: number
   readonly rawHtml?: string
   readonly revision: number
-  readonly selection?: MarkdownEditorSelection
-  readonly session?: MarkdownLanguageToolSession
+  readonly session: MarkdownLanguageToolSession
   readonly source: string
   readonly to: number
 }
@@ -101,94 +102,81 @@ export interface MarkdownLanguageToolCommitResult {
   readonly transaction?: MarkdownEditorTransaction
 }
 
-export type MarkdownLanguageToolMutationKind =
-  | "second-input-pipeline"
-  | "dom-rewrite"
-  | "dom-authority"
-  | "full-source-replacement"
-  | "stale-commit"
-  | "cloud-fallback"
-  | "ime-dictation-interleave"
-
-export interface MarkdownLanguageToolMutationResult {
-  readonly accepted: boolean
-  readonly detail: string
-  readonly equivalent?: boolean
-  readonly kind: MarkdownLanguageToolMutationKind
-}
-
-export interface MarkdownLanguageToolMutationReport {
-  readonly mutations: readonly MarkdownLanguageToolMutationResult[]
-}
-
 const ATOMIC_KINDS = new Set([
-  "latex",
-  "mermaid",
-  "image",
-  "embed",
-  "caption",
-  "anchor",
+  'latex',
+  'mermaid',
+  'image',
+  'embed',
+  'caption',
+  'anchor',
 ])
 
-const isInsideLinkUrl = (
-  source: string,
-  node: MarkdownStableSyntaxNode,
-  offset: number,
-): boolean => {
-  const text = source.slice(node.rawRange.start, node.rawRange.end)
-  if (text.startsWith("<") && text.endsWith(">")) {
-    return offset >= node.rawRange.start + 1 && offset <= node.rawRange.end - 1
-  }
-  const parenOpen = text.lastIndexOf("(")
-  const parenClose = text.lastIndexOf(")")
-  if (parenOpen !== -1 && parenClose !== -1 && parenClose > parenOpen) {
-    const urlStart = node.rawRange.start + parenOpen + 1
-    const urlEnd = node.rawRange.start + parenClose
-    return offset >= urlStart && offset <= urlEnd
-  }
-  return false
+interface MarkdownLanguageProjectionRange {
+  readonly end: number
+  readonly start: number
 }
 
-const isInsideMarker = (
-  source: string,
-  node: MarkdownStableSyntaxNode,
+type MarkdownLanguageProjectionNode = MarkdownStableSyntaxNode & {
+  readonly rawContentRanges?: readonly MarkdownLanguageProjectionRange[]
+  readonly rawMarkerRanges?: readonly MarkdownLanguageProjectionRange[]
+}
+
+const containsOffset = (
+  range: MarkdownLanguageProjectionRange,
   offset: number,
-): boolean => {
-  const start = node.rawRange.start
-  const end = node.rawRange.end
-  const text = source.slice(start, end)
-  if (node.kind === "heading") {
-    const match = /^(#{1,6}\s+)/.exec(text)
-    if (match && offset >= start && offset < start + match[1].length) {
-      return true
+  sourceLength: number,
+) =>
+  range.start <= offset &&
+  (offset < range.end || (offset === range.end && offset === sourceLength))
+
+const overlapsRange = (
+  range: MarkdownLanguageProjectionRange,
+  from: number,
+  to: number,
+) =>
+  from === to
+    ? range.start <= from && from < range.end
+    : range.start < to && from < range.end
+
+const markerRangesOf = (node: MarkdownStableSyntaxNode) =>
+  (node as MarkdownLanguageProjectionNode).rawMarkerRanges
+
+const contentRangesOf = (node: MarkdownStableSyntaxNode) =>
+  (node as MarkdownLanguageProjectionNode).rawContentRanges
+
+const protectedReasonForRange = (
+  projection: MarkdownStableProjection,
+  from: number,
+  to: number,
+): MarkdownLanguageToolReason | undefined => {
+  const overlapping = projection.nodes.filter((node) =>
+    overlapsRange(node.rawRange, from, to),
+  )
+  for (const node of overlapping) {
+    if (markerRangesOf(node)?.some((range) => overlapsRange(range, from, to))) {
+      return 'hidden-marker'
     }
   }
-  if (node.kind === "list" || node.kind === "task") {
-    const match = /^(\s*[-*+]\s+(\[[ xX]\]\s+)?|\s*\d+\.\s+)/.exec(text)
-    if (match && offset >= start && offset < start + match[1].length) {
-      return true
+  for (const node of overlapping) {
+    if (node.kind === 'code') return 'code-block'
+    if (node.presentation === 'live-atomic' || ATOMIC_KINDS.has(node.kind)) {
+      return 'atomic-node'
+    }
+    if (node.kind === 'link' || node.kind === 'image') {
+      const target = contentRangesOf(node)?.[1]
+      if (!target || overlapsRange(target, from, to)) return 'url'
     }
   }
-  if (node.kind === "quote") {
-    const match = /^(\s*>\s*)/.exec(text)
-    if (match && offset >= start && offset < start + match[1].length) {
-      return true
-    }
+  if (
+    from !== to &&
+    overlapping.length > 1 &&
+    !overlapping.some(
+      (node) => node.rawRange.start <= from && to <= node.rawRange.end,
+    )
+  ) {
+    return 'nested-syntax'
   }
-  if (node.kind === "link" || node.kind === "image") {
-    const rel = offset - start
-    const char = text[rel]
-    if (
-      char === "[" ||
-      char === "]" ||
-      char === "(" ||
-      char === ")" ||
-      char === "!"
-    ) {
-      return true
-    }
-  }
-  return false
+  return undefined
 }
 
 const smallestContainingNode = (
@@ -196,11 +184,8 @@ const smallestContainingNode = (
   offset: number,
   sourceLength: number,
 ): MarkdownStableSyntaxNode | null => {
-  const containing = nodes.filter(
-    (node) =>
-      node.rawRange.start <= offset &&
-      (offset < node.rawRange.end ||
-        (offset === node.rawRange.end && offset === sourceLength)),
+  const containing = nodes.filter((node) =>
+    containsOffset(node.rawRange, offset, sourceLength),
   )
   if (containing.length === 0) return null
   return [...containing].sort((left, right) => {
@@ -229,21 +214,21 @@ export const resolveMarkdownLanguageToolCapability = (
 ): MarkdownLanguageToolCapability => {
   const rawSpellcheck = input.spellcheck ?? 'auto'
   const spellcheckMode: MarkdownSpellcheckMode =
-    typeof rawSpellcheck === "boolean"
+    typeof rawSpellcheck === 'boolean'
       ? rawSpellcheck
-        ? "enabled"
-        : "disabled"
+        ? 'enabled'
+        : 'disabled'
       : rawSpellcheck
-  const spellcheck = spellcheckMode !== "disabled"
+  const spellcheck = spellcheckMode !== 'disabled'
   const nativeWritingTools: MarkdownNativeWritingToolsMode =
-    input.nativeWritingTools ?? "auto"
+    input.nativeWritingTools ?? 'auto'
   const status: MarkdownLanguageToolStatus =
-    input.status ?? (spellcheck ? "supported" : "unavailable")
-  const reason = input.reason ?? (spellcheck ? undefined : "disabled")
+    input.status ?? (spellcheck ? 'supported' : 'unavailable')
+  const reason = input.reason ?? (spellcheck ? undefined : 'disabled')
 
   return Object.freeze({
-    autocorrect: input.autocorrect ?? false,
-    dictation: input.dictation ?? false,
+    autocorrect: input.autocorrect ?? spellcheck,
+    dictation: input.dictation ?? spellcheck,
     lang: input.lang,
     nativeWritingTools,
     reason,
@@ -259,11 +244,11 @@ export const createMarkdownLanguageToolSession = (input: {
   readonly documentIdentity: MarkdownEditorDocumentIdentity
   readonly kind?: MarkdownLanguageToolSessionKind
   readonly revision: number
-  readonly selection?: MarkdownEditorSelection
+  readonly selection: MarkdownEditorSelection
   readonly timestamp?: number
 }): MarkdownLanguageToolSession => {
   sessionCounter += 1
-  const kind = input.kind ?? "spellcheck"
+  const kind = input.kind ?? 'spellcheck'
   const id = `lang-session:${input.documentIdentity.id}:${input.documentIdentity.epoch}:${input.revision}:${kind}:${sessionCounter}`
   return Object.freeze({
     active: true,
@@ -274,14 +259,16 @@ export const createMarkdownLanguageToolSession = (input: {
     id,
     kind,
     revision: input.revision,
-    selection: input.selection
-      ? Object.freeze({ ...input.selection })
-      : undefined,
+    selection: Object.freeze({
+      direction: input.selection.direction ?? 'none',
+      end: input.selection.end,
+      start: input.selection.start,
+    }),
     timestamp: input.timestamp ?? Date.now(),
   })
 }
 
-export const planMarkdownLanguageToolReplacement = (
+const planMarkdownLanguageToolReplacement = (
   from: number,
   to: number,
   insert: string,
@@ -295,16 +282,16 @@ export const planMarkdownLanguageToolReplacement = (
   Object.freeze({
     changes: Object.freeze([{ from, insert, to }]),
     expectedRevision: options?.revision ?? options?.session?.revision,
-    history: "separate" as const,
+    history: 'separate' as const,
     metadata: Object.freeze({
-      kind: options?.kind ?? options?.session?.kind ?? "spellcheck",
+      kind: options?.kind ?? options?.session?.kind ?? 'spellcheck',
       languageTool: true,
       sessionId: options?.session?.id,
       sessionKind: options?.session?.kind,
     }),
-    origin: "input" as const,
+    origin: 'input' as const,
     selection: Object.freeze({
-      direction: "none" as const,
+      direction: 'none' as const,
       end: from + insert.length,
       start: from + insert.length,
     }),
@@ -313,9 +300,7 @@ export const planMarkdownLanguageToolReplacement = (
 export const resolveMarkdownLanguageToolContextCapability = (input: {
   readonly config?: MarkdownLanguageToolConfig
   readonly disabled?: boolean
-  readonly documentIdentity?:
-    | MarkdownEditorDocumentIdentity
-    | MarkdownDocumentIdentity
+  readonly documentIdentity?: MarkdownEditorDocumentIdentity
   readonly isComposing?: boolean
   readonly mode?: MarkdownEditorMode
   readonly offset?: number
@@ -329,91 +314,104 @@ export const resolveMarkdownLanguageToolContextCapability = (input: {
   if (input.disabled) {
     return Object.freeze({
       ...base,
-      reason: "disabled",
+      reason: 'disabled',
       spellcheck: false,
-      status: "unavailable",
+      status: 'unavailable',
     })
   }
   if (input.readonly) {
     return Object.freeze({
       ...base,
-      reason: "readonly",
+      reason: 'readonly',
       spellcheck: false,
-      status: "unavailable",
+      status: 'unavailable',
     })
   }
-  if (input.mode === "preview") {
+  if (input.mode === 'preview') {
     return Object.freeze({
       ...base,
-      reason: "preview",
+      reason: 'preview',
       spellcheck: false,
-      status: "unavailable",
+      status: 'unavailable',
     })
   }
   if (input.isComposing) {
     return Object.freeze({
       ...base,
-      reason: "composition-active",
+      reason: 'composition-active',
       spellcheck: false,
-      status: "degraded",
+      status: 'degraded',
     })
   }
-  if (base.spellcheckMode === "disabled") {
+  if (base.spellcheckMode === 'disabled') {
     return Object.freeze({
       ...base,
-      reason: "disabled",
+      reason: 'disabled',
       spellcheck: false,
-      status: "unavailable",
+      status: 'unavailable',
     })
   }
 
   const offset = input.selection?.start ?? input.offset ?? 0
-  const identity: MarkdownDocumentIdentity = {
-    epoch: input.documentIdentity?.epoch ?? 0,
-    id: input.documentIdentity?.id ?? "editor",
+  const projection = input.projection
+  if (!projection) {
+    return Object.freeze({
+      ...base,
+      reason: 'projection-unavailable',
+      spellcheck: false,
+      status: 'degraded',
+    })
   }
-  const projection =
-    input.projection ??
-    stabilizeMarkdownEditorProjection(
-      createMarkdownEditorProjection(input.source),
-      identity,
-    )
+  if (
+    input.documentIdentity &&
+    (projection.documentIdentity.id !== input.documentIdentity.id ||
+      projection.documentIdentity.epoch !== input.documentIdentity.epoch)
+  ) {
+    return Object.freeze({
+      ...base,
+      reason: 'stale-document',
+      spellcheck: false,
+      status: 'unavailable',
+    })
+  }
 
-  const node = smallestContainingNode(projection.nodes, offset, input.source.length)
+  const node = smallestContainingNode(
+    projection.nodes,
+    offset,
+    input.source.length,
+  )
   if (node) {
-    if (node.kind === "code") {
+    const protectedReason = protectedReasonForRange(projection, offset, offset)
+    if (protectedReason === 'hidden-marker') {
       return Object.freeze({
         ...base,
-        reason: "code-block",
+        reason: protectedReason,
         spellcheck: false,
-        status: "degraded",
+        status: 'degraded',
+      })
+    }
+    if (node.kind === 'code') {
+      return Object.freeze({
+        ...base,
+        reason: 'code-block',
+        spellcheck: false,
+        status: 'degraded',
       })
     }
     if (ATOMIC_KINDS.has(node.kind)) {
       return Object.freeze({
         ...base,
-        reason: "atomic-node",
+        reason: 'atomic-node',
         spellcheck: false,
-        status: "degraded",
+        status: 'degraded',
       })
     }
-    if (
-      (node.kind === "link" || node.kind === "image") &&
-      isInsideLinkUrl(input.source, node, offset)
-    ) {
+    if (protectedReason) {
       return Object.freeze({
         ...base,
-        reason: "url",
+        reason: protectedReason,
         spellcheck: false,
-        status: "degraded",
-      })
-    }
-    if (isInsideMarker(input.source, node, offset)) {
-      return Object.freeze({
-        ...base,
-        reason: "hidden-marker",
-        spellcheck: false,
-        status: "degraded",
+        status: 'degraded',
       })
     }
   }
@@ -422,8 +420,30 @@ export const resolveMarkdownLanguageToolContextCapability = (input: {
     ...base,
     reason: undefined,
     spellcheck: true,
-    status: "supported",
+    status: 'supported',
   })
+}
+
+const sameDocumentIdentity = (
+  left: MarkdownEditorDocumentIdentity,
+  right: MarkdownEditorDocumentIdentity,
+) => left.id === right.id && left.epoch === right.epoch
+
+const sameSelection = (
+  left: MarkdownEditorSelection,
+  right: MarkdownEditorSelection,
+) =>
+  left.start === right.start &&
+  left.end === right.end &&
+  (left.direction ?? 'none') === (right.direction ?? 'none')
+
+const isSplitSurrogateBoundary = (source: string, offset: number) => {
+  if (offset <= 0 || offset >= source.length) return false
+  const previous = source.charCodeAt(offset - 1)
+  const next = source.charCodeAt(offset)
+  return (
+    previous >= 0xd800 && previous <= 0xdbff && next >= 0xdc00 && next <= 0xdfff
+  )
 }
 
 export const commitMarkdownLanguageToolMutation = (
@@ -432,14 +452,14 @@ export const commitMarkdownLanguageToolMutation = (
   if (input.isComposing) {
     return Object.freeze({
       accepted: false,
-      reason: "composition-active",
+      reason: 'composition-active',
     })
   }
 
   if (input.rawHtml !== undefined) {
     return Object.freeze({
       accepted: false,
-      reason: "dom-authority-rejected",
+      reason: 'dom-authority-rejected',
     })
   }
 
@@ -448,94 +468,95 @@ export const commitMarkdownLanguageToolMutation = (
     !Number.isInteger(input.to) ||
     input.from < 0 ||
     input.to < input.from ||
-    input.to > input.source.length
+    input.to > input.source.length ||
+    isSplitSurrogateBoundary(input.source, input.from) ||
+    isSplitSurrogateBoundary(input.source, input.to)
   ) {
     return Object.freeze({
       accepted: false,
-      reason: "invalid-range",
+      reason: 'invalid-range',
     })
   }
 
   if (
     input.from === 0 &&
     input.to === input.source.length &&
-    input.source.length > 20 &&
-    Math.abs(input.insert.length - input.source.length) > 10
+    input.source.length > 0 &&
+    (input.kind === 'spellcheck' ||
+      input.kind === 'autocorrect' ||
+      input.kind === 'context-menu')
   ) {
     return Object.freeze({
       accepted: false,
-      reason: "full-source-rejected",
+      reason: 'full-source-rejected',
     })
-  }
-
-  if (input.currentDocumentIdentity) {
-    if (
-      input.currentDocumentIdentity.id !== input.documentIdentity.id ||
-      input.currentDocumentIdentity.epoch !== input.documentIdentity.epoch
-    ) {
-      return Object.freeze({
-        accepted: false,
-        reason: "stale-document",
-      })
-    }
   }
 
   if (
-    input.currentRevision !== undefined &&
-    input.currentRevision !== input.revision
+    !sameDocumentIdentity(
+      input.currentDocumentIdentity,
+      input.documentIdentity,
+    ) ||
+    !sameDocumentIdentity(
+      input.session.documentIdentity,
+      input.documentIdentity,
+    ) ||
+    !sameDocumentIdentity(
+      input.projection.documentIdentity,
+      input.documentIdentity,
+    )
   ) {
     return Object.freeze({
       accepted: false,
-      reason: "stale-revision",
+      reason: 'stale-document',
     })
   }
 
-  if (input.session) {
-    if (
-      !input.session.active ||
-      input.session.documentIdentity.id !== input.documentIdentity.id ||
-      input.session.documentIdentity.epoch !== input.documentIdentity.epoch ||
-      input.session.revision !== input.revision
-    ) {
-      return Object.freeze({
-        accepted: false,
-        reason: "stale-session",
-      })
-    }
+  if (input.currentRevision !== input.revision) {
+    return Object.freeze({
+      accepted: false,
+      reason: 'stale-revision',
+    })
   }
 
-  if (input.currentSelection) {
-    const selStart = Math.min(
-      input.currentSelection.start,
-      input.currentSelection.end,
-    )
-    const selEnd = Math.max(
-      input.currentSelection.start,
-      input.currentSelection.end,
-    )
-    if (selEnd < input.from || selStart > input.to) {
-      return Object.freeze({
-        accepted: false,
-        reason: "stale-selection",
-      })
-    }
+  if (input.projectionRevision !== input.currentRevision) {
+    return Object.freeze({
+      accepted: false,
+      reason: 'stale-projection',
+    })
   }
 
-  if (input.projection) {
-    for (const node of input.projection.nodes) {
-      if (ATOMIC_KINDS.has(node.kind)) {
-        const nodeStart = node.rawRange.start
-        const nodeEnd = node.rawRange.end
-        const startsInside = input.from > nodeStart && input.from < nodeEnd
-        const endsInside = input.to > nodeStart && input.to < nodeEnd
-        if ((startsInside && !endsInside) || (!startsInside && endsInside)) {
-          return Object.freeze({
-            accepted: false,
-            reason: "atomic-node",
-          })
-        }
-      }
-    }
+  if (!input.session.active || input.session.revision !== input.revision) {
+    return Object.freeze({
+      accepted: false,
+      reason: 'stale-session',
+    })
+  }
+
+  if (input.session.kind !== input.kind) {
+    return Object.freeze({
+      accepted: false,
+      reason: 'session-kind-conflict',
+    })
+  }
+
+  if (!sameSelection(input.currentSelection, input.session.selection)) {
+    return Object.freeze({
+      accepted: false,
+      reason: 'stale-selection',
+    })
+  }
+
+  const protectedReason = protectedReasonForRange(
+    input.projection,
+    input.from,
+    input.to,
+  )
+  if (protectedReason) {
+    return Object.freeze({
+      accepted: false,
+      reason: protectedReason,
+    })
   }
 
   const transaction = planMarkdownLanguageToolReplacement(
@@ -556,110 +577,3 @@ export const commitMarkdownLanguageToolMutation = (
     transaction,
   })
 }
-
-export const evaluateMarkdownLanguageToolMutations =
-  (): MarkdownLanguageToolMutationReport => {
-    const identity = Object.freeze({ epoch: 1, id: "lang-doc" })
-    const source = "The quick bron fox jumps over the lazy dog."
-    const from = 10
-    const to = 14
-    const insert = "brown"
-
-    const secondPipeline = Object.freeze({
-      accepted: false,
-      detail:
-        "language tool replacement must emit a #268 transaction rather than a second pipeline",
-      equivalent: false,
-      kind: "second-input-pipeline" as const,
-    })
-
-    const domAuthorityResult = commitMarkdownLanguageToolMutation({
-      documentIdentity: identity,
-      from,
-      insert,
-      rawHtml: "<p>The quick brown fox</p>",
-      revision: 1,
-      source,
-      to,
-    })
-    const domAuthority = Object.freeze({
-      accepted: domAuthorityResult.accepted,
-      detail: "DOM HTML must never become authority for Markdown mutations",
-      equivalent: false,
-      kind: "dom-authority" as const,
-    })
-
-    const fullSourceResult = commitMarkdownLanguageToolMutation({
-      documentIdentity: identity,
-      from: 0,
-      insert: "The quick brown fox jumps over the lazy dog completely rewritten",
-      revision: 1,
-      source,
-      to: source.length,
-    })
-    const fullSource = Object.freeze({
-      accepted: fullSourceResult.accepted,
-      detail: "single word spellcheck must not commit full source replacement",
-      equivalent: false,
-      kind: "full-source-replacement" as const,
-    })
-
-    const staleResult = commitMarkdownLanguageToolMutation({
-      currentRevision: 2,
-      documentIdentity: identity,
-      from,
-      insert,
-      revision: 1,
-      source,
-      to,
-    })
-    const staleCommit = Object.freeze({
-      accepted: staleResult.accepted,
-      detail: "mutations with stale revision must be rejected",
-      equivalent: false,
-      kind: "stale-commit" as const,
-    })
-
-    const cloudFallback = Object.freeze({
-      accepted: false,
-      detail: "must not implement or rely on external cloud or LLM fallback",
-      equivalent: false,
-      kind: "cloud-fallback" as const,
-    })
-
-    const imeInterleaveResult = commitMarkdownLanguageToolMutation({
-      documentIdentity: identity,
-      from,
-      insert,
-      isComposing: true,
-      revision: 1,
-      source,
-      to,
-    })
-    const imeInterleave = Object.freeze({
-      accepted: imeInterleaveResult.accepted,
-      detail:
-        "language tools must not commit or interleave while IME composition is active",
-      equivalent: false,
-      kind: "ime-dictation-interleave" as const,
-    })
-
-    const domRewrite = Object.freeze({
-      accepted: false,
-      detail: "direct DOM rewriting is prohibited",
-      equivalent: false,
-      kind: "dom-rewrite" as const,
-    })
-
-    return Object.freeze({
-      mutations: Object.freeze([
-        secondPipeline,
-        domRewrite,
-        domAuthority,
-        fullSource,
-        staleCommit,
-        cloudFallback,
-        imeInterleave,
-      ]),
-    })
-  }
