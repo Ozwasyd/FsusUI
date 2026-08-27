@@ -15,7 +15,7 @@
 
   <Style Selector="TextBox:focus, fsus|FsusInput:focus, fsus|FsusTextarea:focus, fsus|FsusInputNumber:focus">
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
-    <Setter Property="BorderThickness" Value="{DynamicResource FsusThemeFocusThickness}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusThemeFocusBorderThickness}" />
   </Style>
 
   <Style Selector="TextBox:disabled, fsus|FsusInput:disabled, fsus|FsusTextarea:disabled, fsus|FsusInputNumber:disabled">

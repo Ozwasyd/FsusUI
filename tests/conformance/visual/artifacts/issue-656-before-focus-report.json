@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "baselineRevision": "839c9ec396cc25f1d04970246badf8d5b9226b44",
+  "runner": "Avalonia Headless Skia",
+  "results": [
+    {
+      "theme": "Light",
+      "expectedThicknessDip": 2,
+      "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-656-before-light-unfocused.png",
+      "screenshotSha256": "0dd02d177cef12d1b0fbccea8bb6383432fd1e2177f8f5a820342aa911331d9c",
+      "focusResult": "threw",
+      "exceptionType": "System.InvalidCastException",
+      "Message": "Unable to cast object of type \u0027System.Double\u0027 to type \u0027Avalonia.Thickness\u0027."
+    },
+    {
+      "theme": "Dark",
+      "expectedThicknessDip": 2,
+      "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-656-before-dark-unfocused.png",
+      "screenshotSha256": "e3d607ca84e26efe439a4fabebfc9cd5a476fdd15dc92fba3087739313bdace8",
+      "focusResult": "threw",
+      "exceptionType": "System.InvalidCastException",
+      "Message": "Unable to cast object of type \u0027System.Double\u0027 to type \u0027Avalonia.Thickness\u0027."
+    },
+    {
+      "theme": "HighContrast",
+      "expectedThicknessDip": 3,
+      "screenshot": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-656-before-highcontrast-unfocused.png",
+      "screenshotSha256": "d7dcf01554e346e4389f0d07e4405e25e4aaa7b57b2437e8fec53ca9eb3c47cd",
+      "focusResult": "threw",
+      "exceptionType": "System.InvalidCastException",
+      "Message": "Unable to cast object of type \u0027System.Double\u0027 to type \u0027Avalonia.Thickness\u0027."
+    }
+  ]
+}
