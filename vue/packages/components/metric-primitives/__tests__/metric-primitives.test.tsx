@@ -78,6 +78,28 @@ describe('metric primitives', () => {
     )
   })
 
+  test('keeps punctuation opt-in through the existing badge slot', () => {
+    const wrapper = mount(() => (
+      <ElKeyValueGrid>
+        <ElKeyValueItem label="Default" value="No motif" />
+        <ElKeyValueItem label="Authority" value="Runtime">
+          {{
+            badge: () => <span aria-label="Highlighted metric">·</span>,
+          }}
+        </ElKeyValueItem>
+      </ElKeyValueGrid>
+    ))
+
+    const items = wrapper.findAll('.el-key-value-item')
+    expect(items[0].find('.el-key-value-item__badge').exists()).toBe(false)
+    expect(items[1].find('.el-key-value-item__badge').text()).toBe('·')
+    expect(
+      items[1]
+        .find('.el-key-value-item__badge [aria-label="Highlighted metric"]')
+        .exists(),
+    ).toBe(true)
+  })
+
   test('renders status and diagnostics items with collapsible detail', () => {
     const wrapper = mount(() => (
       <div>

@@ -115,9 +115,9 @@
 
   @include e(value) {
     color: getCssVar('text-color', 'primary');
-    font-size: 12px;
+    font-size: 14px;
     font-variant-numeric: tabular-nums;
-    font-weight: 700;
+    font-weight: 500;
     line-height: 1.45;
     text-align: end;
     white-space: nowrap;
@@ -167,7 +167,6 @@
   border-right: 1px solid getCssVar('border-color-lighter');
   border-bottom: 1px solid getCssVar('border-color-lighter');
   background: transparent;
-  --fsus-key-value-dot-color: var(--fsus-dot-gray, #{getCssVar('text-color', 'placeholder')});
 
   @include e(label) {
     display: inline-flex;
@@ -176,19 +175,9 @@
     min-width: 0;
     color: getCssVar('text-color', 'secondary');
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 500;
     line-height: 1.45;
     overflow-wrap: anywhere;
-
-    &::before {
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: var(--fsus-key-value-dot-color);
-      content: '';
-      flex: 0 0 auto;
-      opacity: 0.42;
-    }
   }
 
   @include e(value) {
@@ -201,7 +190,7 @@
     color: getCssVar('text-color', 'primary');
     font-size: 14px;
     font-variant-numeric: tabular-nums;
-    font-weight: 700;
+    font-weight: 500;
     line-height: 1.45;
     overflow-wrap: anywhere;
 
@@ -212,6 +201,7 @@
 
   @include e(badge) {
     display: inline-flex;
+    color: var(--fsus-dot-gray, #{getCssVar('text-color', 'placeholder')});
   }
 
   @include when(monospace) {
@@ -220,21 +210,6 @@
     }
   }
 
-  @include m(success) {
-    --fsus-key-value-dot-color: #{getCssVar('color-success')};
-  }
-
-  @include m(warning) {
-    --fsus-key-value-dot-color: #{getCssVar('color-warning')};
-  }
-
-  @include m(danger) {
-    --fsus-key-value-dot-color: #{getCssVar('color-danger')};
-  }
-
-  @include m(info) {
-    --fsus-key-value-dot-color: var(--fsus-scholarly-blue, #{getCssVar('color-primary')});
-  }
 }
 
 @include b(status-summary) {
@@ -263,15 +238,15 @@
   @include e(label) {
     color: getCssVar('text-color', 'primary');
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 500;
     line-height: 1.4;
     overflow-wrap: anywhere;
   }
 
   @include e(status) {
     color: getCssVar('text-color', 'regular');
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 500;
     line-height: 1.4;
   }
 
@@ -387,7 +362,7 @@
     color: getCssVar('text-color', 'secondary');
     cursor: pointer;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 500;
     line-height: 1.45;
   }
 
@@ -448,7 +423,7 @@
     cursor: pointer;
     font: inherit;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 500;
 
     &:focus-visible {
       border-color: var(--fsus-scholarly-blue, getCssVar("color-primary"));

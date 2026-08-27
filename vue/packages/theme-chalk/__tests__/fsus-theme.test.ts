@@ -3572,8 +3572,14 @@ describe('Fsus theme visual baseline', () => {
       'min-width: 0;',
     ])
     expectCssRule(css, '.el-metric-item__primary', [
+      'font-size: 16px;',
+      'font-weight: 700;',
       'font-variant-numeric: tabular-nums;',
       'letter-spacing: 0;',
+    ])
+    expectCssRule(css, '.el-distribution-bar-row__value', [
+      'font-size: 14px;',
+      'font-weight: 500;',
     ])
     expectCssRule(css, '.el-distribution-bar-row__bar', [
       'grid-column: 2/-1;',
@@ -3586,6 +3592,25 @@ describe('Fsus theme visual baseline', () => {
       'display: grid;',
       'grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));',
     ])
+    expectCssRule(css, '.el-key-value-item__label', [
+      'font-size: 12px;',
+      'font-weight: 500;',
+    ])
+    expectCssRule(css, '.el-key-value-item__value', [
+      'font-size: 14px;',
+      'font-weight: 500;',
+    ])
+    expectCssRule(css, '.el-key-value-item__badge', [
+      'color: var(--fsus-dot-gray, var(--el-text-color-placeholder));',
+    ])
+    expectCssRule(css, '.el-status-summary__label', [
+      'font-size: 14px;',
+      'font-weight: 500;',
+    ])
+    expectCssRule(css, '.el-status-summary__status', [
+      'font-size: 14px;',
+      'font-weight: 500;',
+    ])
     expectCssRule(css, '.el-diagnostics-item__detail-body', [
       'font-family: var(--el-font-family-monospace, monospace);',
       'overflow-wrap: anywhere;',
@@ -3594,6 +3619,40 @@ describe('Fsus theme visual baseline', () => {
     expect(css).not.toMatch(
       /\.el-distribution-bar-row__bar-fill\s*\{[^}]*var\(--el-color-primary\)/s,
     )
+    expect(css).not.toMatch(/\.el-key-value-item__label::before/)
+    expect(css).not.toContain('--fsus-key-value-dot-color')
+    const fontSizes = [...css.matchAll(/font-size:\s*(\d+)px/g)].map((match) =>
+      Number(match[1]),
+    )
+    expect([...new Set(fontSizes)].sort((a, b) => a - b)).toEqual([12, 14, 16])
+    const mutationCases = [
+      {
+        id: '13-or-17-pixel-ladder',
+        pattern: /font-size:\s*(?:13|17)px/,
+      },
+      {
+        id: 'broad-ordinary-700-weight',
+        pattern:
+          /\.(?:el-distribution-bar-row__value|el-key-value-item__(?:label|value)|el-status-summary__(?:label|status)|el-diagnostics-item__detail-toggle|el-copyable-detail__button)[^{]*\{[^}]*font-weight:\s*700/,
+      },
+      {
+        id: 'default-key-label-dot',
+        pattern: /\.el-key-value-item__label::before/,
+      },
+      {
+        id: 'colored-dot-forest',
+        pattern:
+          /\.el-key-value-item--(?:success|warning|danger|info)[^{]*\{[^}]*(?:--fsus-key-value-dot-color|background):/,
+      },
+      {
+        id: 'private-metric-font-alias',
+        pattern:
+          /--fsus-(?:metric|key-value|status|diagnostics|copyable)[^:]*font/,
+      },
+    ]
+    for (const mutation of mutationCases) {
+      expect(css, mutation.id).not.toMatch(mutation.pattern)
+    }
     expect(css).not.toMatch(/gradient|backdrop-filter|blur\(/)
   })
 
