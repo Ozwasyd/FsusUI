@@ -153,7 +153,7 @@
     },
     {
       "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-light-rtl-100-rejected.png",
-      "Sha256": "23775352805bbc2090c38b175cc5c7fc5601ba92cdf0f6bc959417a65ef57d55",
+      "Sha256": "81085216269092480cd94c7151efe4465f1f88d759ad0f2539df6800b4660afd",
       "PixelSize": {
         "Width": 480,
         "Height": 160
@@ -363,7 +363,7 @@
     },
     {
       "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-dark-rtl-100-rejected.png",
-      "Sha256": "9fe53c0d315d1b2b5e175bfa908b3c5f3c3eac9516b8c5169495d8b34dded989",
+      "Sha256": "9109431731d7818cc74cc622da8193d2c9579dca6ed86741085a5fd32af59c01",
       "PixelSize": {
         "Width": 480,
         "Height": 160
@@ -573,7 +573,7 @@
     },
     {
       "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-highcontrast-rtl-100-rejected.png",
-      "Sha256": "81f41ca4593114e3ed44758ee21db71c6733b514d0e3542f735064e2edf94f14",
+      "Sha256": "d00ad1588c258e5b80b86fe52ac7e7df76d9b4d0281652872ca088be0b153c9e",
       "PixelSize": {
         "Width": 480,
         "Height": 160

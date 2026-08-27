@@ -196,6 +196,7 @@
                   IsVisible="{TemplateBinding FilterErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                   FontSize="{DynamicResource FsusTypographyBodySmSize}"
                   Foreground="{DynamicResource FsusThemeDangerBrush}"
+                  FlowDirection="LeftToRight"
                   HorizontalAlignment="Stretch"
                   VerticalAlignment="Center"
                   TextAlignment="Center"

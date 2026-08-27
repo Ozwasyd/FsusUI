@@ -626,6 +626,14 @@ public class FsusDropZoneHeadlessTests
 
     Dispatcher.UIThread.RunJobs();
 
+    if (flowDirection == FlowDirection.RightToLeft && state == "rejected")
+    {
+      var filterError = Assert.Single(
+        dropZone.GetVisualDescendants().OfType<TextBlock>(),
+        text => text.Name == "PART_FilterErrorText");
+      Assert.Equal(FlowDirection.LeftToRight, filterError.FlowDirection);
+    }
+
     window.Measure(new Size(480, 160));
     window.Arrange(new Rect(0, 0, 480, 160));
     surfaceRoot.Measure(new Size(480, 160));
