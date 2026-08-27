@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
+import type { Page } from '@playwright/test'
 
-const openFixture = async (page: import('@playwright/test').Page) => {
+const openFixture = async (page: Page) => {
   await page.goto('/?audit=ui-states&markdownEditorTransaction=1', {
     waitUntil: 'domcontentloaded',
   })
