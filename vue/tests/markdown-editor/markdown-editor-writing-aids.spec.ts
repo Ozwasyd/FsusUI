@@ -31,6 +31,13 @@ test('renders focus mode and reveals a source range on desktop and mobile', asyn
     '1072:success',
   )
   await expect(textarea).toBeFocused()
+  await expect
+    .poll(() =>
+      textarea.evaluate(
+        (element) => window.getComputedStyle(element).backgroundColor,
+      ),
+    )
+    .toBe('rgba(0, 0, 0, 0)')
   await expect(desktopEditor).toHaveAttribute(
     'data-markdown-writing-aids-state',
     'explicit-navigation',
@@ -52,6 +59,32 @@ test('renders focus mode and reveals a source range on desktop and mobile', asyn
       .locator('.el-markdown-editor__focus-layer span:not(.is-dimmed)')
       .filter({ hasText: '::embed[target="details" mode="block"]' }),
   ).toBeVisible()
+  await expect
+    .poll(async () => {
+      const layer = desktopEditor.locator('.el-markdown-editor__focus-layer')
+      const [textareaScrollTop, layerScrollTop] = await Promise.all([
+        textarea.evaluate((element) => element.scrollTop),
+        layer.evaluate((element) => element.scrollTop),
+      ])
+      return Math.abs(textareaScrollTop - layerScrollTop)
+    })
+    .toBeLessThanOrEqual(1)
+  await expect
+    .poll(async () => {
+      const layer = desktopEditor.locator('.el-markdown-editor__focus-layer')
+      const active = layer.locator('span:not(.is-dimmed)')
+      const [layerBox, activeBox] = await Promise.all([
+        layer.boundingBox(),
+        active.boundingBox(),
+      ])
+      return Boolean(
+        layerBox &&
+        activeBox &&
+        activeBox.y >= layerBox.y &&
+        activeBox.y + activeBox.height <= layerBox.y + layerBox.height,
+      )
+    })
+    .toBe(true)
   await desktop.screenshot({
     path: testInfo.outputPath('writing-aids-light-desktop.png'),
   })
@@ -62,6 +95,27 @@ test('renders focus mode and reveals a source range on desktop and mobile', asyn
   await expect(
     mobileEditor.locator('.el-markdown-editor__focus-layer'),
   ).toBeVisible()
+  await mobile.getByTestId('markdown-reveal-details').click()
+  await expect(mobile.getByTestId('markdown-reveal-status')).toHaveText(
+    '1072:success',
+  )
+  await expect(mobileEditor.locator('textarea')).toBeFocused()
+  await expect
+    .poll(async () => {
+      const layer = mobileEditor.locator('.el-markdown-editor__focus-layer')
+      const active = layer.locator('span:not(.is-dimmed)')
+      const [layerBox, activeBox] = await Promise.all([
+        layer.boundingBox(),
+        active.boundingBox(),
+      ])
+      return Boolean(
+        layerBox &&
+        activeBox &&
+        activeBox.y >= layerBox.y &&
+        activeBox.y + activeBox.height <= layerBox.y + layerBox.height,
+      )
+    })
+    .toBe(true)
   expect(
     await mobileEditor.evaluate(
       (element) => element.scrollWidth <= element.clientWidth,

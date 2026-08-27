@@ -248,12 +248,14 @@
   }
 
   @include e(focus-layer) {
+    position: absolute;
     z-index: 0;
+    inset: 0;
     grid-area: 1 / 1;
     min-width: 0;
     min-height: 100%;
     margin: 0;
-    overflow: visible;
+    overflow: hidden;
     padding: 16px;
     pointer-events: none;
     background: getCssVar('bg-color');
@@ -414,6 +416,14 @@
     @include e(status) {
       gap: 8px 14px;
       background: getCssVar('bg-color');
+    }
+  }
+
+  @include when(focus-mode) {
+    @include e(textarea) {
+      &:focus-visible {
+        background: transparent;
+      }
     }
   }
 

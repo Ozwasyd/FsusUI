@@ -716,6 +716,15 @@ const handleLayoutScroll = () => {
   writingAidsState.value = writingAidsController.state
   markLayoutGesture('scrollbar')
 }
+const resolveFocusAnchorScrollTop = () => {
+  const layer = focusLayerRef.value
+  const active = layer?.querySelector<HTMLElement>('span:not(.is-dimmed)')
+  if (!layer || !active) return undefined
+  const layerBox = layer.getBoundingClientRect()
+  const activeBox = active.getBoundingClientRect()
+  const activeContentTop = activeBox.top - layerBox.top + layer.scrollTop
+  return Math.max(0, activeContentTop - layer.clientHeight / 3)
+}
 const applyTypewriterScroll = (explicitNavigation = false) => {
   if (!resolvedWritingAids.value.typewriter || isComposing.value) return
   const textarea = textareaRef.value
@@ -734,10 +743,13 @@ const applyTypewriterScroll = (explicitNavigation = false) => {
     viewportHeight: textarea.clientHeight,
     visualViewportHeight: visualViewportHeight.value || undefined,
   })
+  const requestedScrollTop = explicitNavigation
+    ? (resolveFocusAnchorScrollTop() ?? target.scrollTop)
+    : target.scrollTop
   restoringTypewriter = true
   if (typeof textarea.scrollTo === 'function') {
     const scrollTop = Math.min(
-      target.scrollTop,
+      requestedScrollTop,
       Math.max(0, textarea.scrollHeight - textarea.clientHeight),
     )
     textarea.scrollTo({
@@ -748,8 +760,8 @@ const applyTypewriterScroll = (explicitNavigation = false) => {
       syncFocusLayerScroll(textarea.scrollTop)
     })
   } else {
-    textarea.scrollTop = target.scrollTop
-    syncFocusLayerScroll(target.scrollTop)
+    textarea.scrollTop = requestedScrollTop
+    syncFocusLayerScroll(requestedScrollTop)
   }
   queueMicrotask(() => {
     restoringTypewriter = false
