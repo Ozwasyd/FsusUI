@@ -43,6 +43,7 @@ import {
   planMarkdownSlashCommit,
   resolveMarkdownSlashQuery,
   resolveMarkdownSlashTrigger,
+  searchMarkdownEditorCommandSnapshot,
   searchMarkdownEditorCommands,
 } from "../src/markdown-editor-surfaces"
 import {
@@ -278,14 +279,14 @@ describe("Issue #433: Locale authority, command/mode/capability, and zero write 
 
   it("keeps eight locale overrides and long-copy fixtures isolated", () => {
     const locales = [
-      "ar",
-      "de",
+      "zh-CN",
+      "zh-TW",
       "en",
-      "es",
-      "fr",
       "ja",
       "ko",
-      "zh",
+      "ru",
+      "ar",
+      "de",
     ].map((locale) =>
       resolveMarkdownEditorLocaleText({
         editorAria: `${locale}-editor`,
@@ -457,16 +458,19 @@ describe("Issue #367: Selection toolbar source-anchored placement and focus life
 describe("Issue #368: Command palette search, grouping, and unified state", () => {
   it("searches and groups commands with high performance for 1000 items", () => {
     const ctx = makeContext()
-    const thousandCommands: MarkdownEditorCommand[] = Array.from({ length: 1000 }, (_, i) => ({
-      key: `cmd-${i}`,
-      label: `Command ${i}`,
-      group: i % 2 === 0 ? "formatting" : "insertion",
-      presentation: ["palette" as const],
-      run: () => ({}),
-    }))
+    const thousandCommands: MarkdownEditorCommand[] = Array.from(
+      { length: 1000 },
+      (_, i) => ({
+        key: `cmd-${i}`,
+        label: i === 999 ? "Markdown Bold" : `Command ${i}`,
+        group: i % 2 === 0 ? "formatting" : "insertion",
+        presentation: ["palette" as const],
+        run: () => ({}),
+      }),
+    )
 
     const start = performance.now()
-    const results = searchMarkdownEditorCommands(thousandCommands, ctx, "999")
+    const results = searchMarkdownEditorCommands(thousandCommands, ctx, "mnbd")
     const duration = performance.now() - start
     expect(results.length).toBe(1)
     expect(results[0]?.key).toBe("cmd-999")
@@ -475,6 +479,29 @@ describe("Issue #368: Command palette search, grouping, and unified state", () =
     const groups = groupMarkdownEditorCommands(thousandCommands.slice(0, 10))
     expect(groups.has("formatting")).toBe(true)
     expect(groups.has("insertion")).toBe(true)
+  })
+
+  it("limits fuzzy search to label, description, and keywords", () => {
+    const ctx = makeContext()
+    const snapshot = createMarkdownEditorCommandSnapshot(
+      [
+        {
+          group: "formatting",
+          key: "alpha",
+          keywords: ["secondary"],
+          label: "Alpha",
+          presentation: ["palette"],
+          run: () => ({}),
+          title: "Needle only in title",
+        },
+      ],
+      ctx,
+    )
+
+    expect(searchMarkdownEditorCommandSnapshot(snapshot, "scdy")).toHaveLength(1)
+    expect(searchMarkdownEditorCommandSnapshot(snapshot, "needle")).toHaveLength(
+      0,
+    )
   })
 
   it("passes command palette mutation evaluation", () => {

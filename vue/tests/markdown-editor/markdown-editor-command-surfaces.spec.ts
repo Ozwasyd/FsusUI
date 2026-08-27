@@ -49,7 +49,16 @@ test('renders and dismisses command surfaces without a stale slash commit', asyn
 test('renders locale authority, long copy, RTL, and status density without fallback copy', async ({
   page,
 }) => {
-  for (const locale of ['en', 'zh', 'ja', 'ko', 'de', 'fr', 'es', 'ar']) {
+  for (const locale of [
+    'zh-CN',
+    'zh-TW',
+    'en',
+    'ja',
+    'ko',
+    'ru',
+    'ar',
+    'de',
+  ]) {
     const prefix = locale.toUpperCase()
     await page.goto(
       `/?audit=ui-states&markdownEditorTransaction=1&markdownCommandSurfaces=1&markdownLocale=${locale}`,

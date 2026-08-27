@@ -22,21 +22,69 @@ export interface MarkdownSlashOptions {
   readonly projection?: MarkdownStableProjection
 }
 
+const scoreMarkdownCommandSearchValue = (
+  value: string | undefined,
+  query: string,
+): number | null => {
+  if (!value) return null
+  const candidate = value.toLocaleLowerCase()
+  const contiguous = candidate.indexOf(query)
+  if (contiguous !== -1) return contiguous
+
+  let candidateIndex = 0
+  let firstMatch = -1
+  let gapCount = 0
+  for (const character of query) {
+    const match = candidate.indexOf(character, candidateIndex)
+    if (match === -1) return null
+    if (firstMatch === -1) firstMatch = match
+    gapCount += match - candidateIndex
+    candidateIndex = match + character.length
+  }
+  return candidate.length + firstMatch + gapCount
+}
+
+const scoreMarkdownCommandSearchFields = (
+  values: readonly (string | undefined)[],
+  query: string,
+) => {
+  let best: number | null = null
+  for (const value of values) {
+    const score = scoreMarkdownCommandSearchValue(value, query)
+    if (score !== null && (best === null || score < best)) best = score
+  }
+  return best
+}
+
 export const searchMarkdownEditorCommands = (
   commands: readonly MarkdownEditorCommand[],
   context: MarkdownEditorCommandContext,
   query: string,
 ): readonly MarkdownEditorCommand[] => {
   const visible = filterMarkdownEditorCommands(commands, context, "palette")
-  const needle = query.trim().toLowerCase()
+  const needle = query.trim().toLocaleLowerCase()
   if (!needle) return visible
 
-  return visible.filter((command) => {
-    if (command.label.toLowerCase().includes(needle)) return true
-    if (command.description && command.description.toLowerCase().includes(needle)) return true
-    if (command.keywords?.some((keyword) => keyword.toLowerCase().includes(needle))) return true
-    return false
-  })
+  return visible
+    .map((command, index) => ({
+      command,
+      index,
+      score: scoreMarkdownCommandSearchFields(
+        [command.label, command.description, ...(command.keywords ?? [])],
+        needle,
+      ),
+    }))
+    .filter(
+      (
+        item,
+      ): item is {
+        command: MarkdownEditorCommand
+        index: number
+        score: number
+      } => item.score !== null,
+    )
+    .sort((left, right) => left.score - right.score || left.index - right.index)
+    .map(({ command }) => command)
 }
 
 export const searchMarkdownEditorCommandSnapshot = (
@@ -50,11 +98,26 @@ export const searchMarkdownEditorCommandSnapshot = (
   )
   if (!needle) return palette
 
-  return palette.filter((item) =>
-    [item.label, item.title, item.description, ...item.keywords].some((value) =>
-      value?.toLocaleLowerCase().includes(needle),
-    ),
-  )
+  return palette
+    .map((item, index) => ({
+      index,
+      item,
+      score: scoreMarkdownCommandSearchFields(
+        [item.label, item.description, ...item.keywords],
+        needle,
+      ),
+    }))
+    .filter(
+      (
+        entry,
+      ): entry is {
+        index: number
+        item: MarkdownEditorCommandSnapshotItem
+        score: number
+      } => entry.score !== null,
+    )
+    .sort((left, right) => left.score - right.score || left.index - right.index)
+    .map(({ item }) => item)
 }
 
 export const groupMarkdownEditorCommandSnapshot = (
