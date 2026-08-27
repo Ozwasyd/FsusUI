@@ -245,6 +245,48 @@ describe('markdown web language tools integration', () => {
     ).toMatchObject({ handled: true, reason: 'stale-selection' })
   })
 
+  it('enforces context and per-tool capability on direct and event commits', () => {
+    const source = 'Hello wrld'
+    const documentIdentity = { epoch: 1, id: 'capability-gate' }
+    const textarea = {
+      selectionDirection: 'none' as const,
+      selectionEnd: 10,
+      selectionStart: 6,
+      spellcheck: true,
+      value: source,
+    }
+    const controller = bindMarkdownWebLanguageTools(textarea, {
+      config: { nativeWritingTools: 'disabled' },
+      documentIdentity,
+      projection: projectionFixture(source, documentIdentity),
+      revision: 1,
+      source,
+    })
+
+    controller.createSession('spellcheck')
+    controller.updateContext({ readonly: true })
+    expect(controller.applyReplacement(6, 10, 'world')).toMatchObject({
+      accepted: false,
+      reason: 'readonly',
+    })
+
+    controller.updateContext({ isComposing: true })
+    controller.createSession('dictation')
+    expect(controller.applyReplacement(6, 10, 'world')).toMatchObject({
+      accepted: false,
+      reason: 'composition-active',
+    })
+
+    controller.updateContext({})
+    controller.createSession('writing-tools')
+    expect(
+      controller.handleBeforeInput({
+        data: 'world',
+        inputType: 'insertReplacementText',
+      }),
+    ).toMatchObject({ handled: true, reason: 'disabled' })
+  })
+
   it('does not equate raw offsets with visual offsets without the #325 map', () => {
     const source = '# Heading'
     const identity = { epoch: 1, id: 'coordinates' }

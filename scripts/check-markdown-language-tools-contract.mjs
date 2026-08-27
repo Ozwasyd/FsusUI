@@ -231,7 +231,16 @@ const inspectWebBoundary = (source, errors) => {
   const sourceFile = parse(source, fileName)
   let preventsReplacementDomMutation = false
   let commitsThroughAdapter = false
+  let controllerCommitBody
   visit(sourceFile, (node) => {
+    if (
+      ts.isVariableDeclaration(node) &&
+      identifierText(node.name) === 'commit' &&
+      (ts.isArrowFunction(node.initializer) ||
+        ts.isFunctionExpression(node.initializer))
+    ) {
+      controllerCommitBody = node.initializer.body
+    }
     if (
       ts.isCallExpression(node) &&
       ts.isPropertyAccessExpression(node.expression) &&
@@ -254,6 +263,15 @@ const inspectWebBoundary = (source, errors) => {
   if (!commitsThroughAdapter) {
     errors.push(
       `${fileName}: native replacement must use the language-tool transaction adapter`,
+    )
+  }
+  const commitText = controllerCommitBody?.getText(sourceFile) ?? ''
+  if (
+    !commitText.includes('if (unavailableReason)') ||
+    !commitText.includes('return rejected(unavailableReason)')
+  ) {
+    errors.push(
+      `${fileName}: direct replacement must enforce current context and tool capability`,
     )
   }
 }

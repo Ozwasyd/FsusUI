@@ -124,5 +124,12 @@
     "find": "commitMarkdownLanguageToolMutation(input)",
     "replace": "Object.freeze({ accepted: true })",
     "expectError": "must use the language-tool transaction adapter"
+  },
+  {
+    "name": "context-capability-bypass",
+    "file": "web",
+    "find": "if (unavailableReason) return rejected(unavailableReason)",
+    "replace": "if (false) return rejected(unavailableReason)",
+    "expectError": "must enforce current context and tool capability"
   }
 ]

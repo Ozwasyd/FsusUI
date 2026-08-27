@@ -228,6 +228,34 @@ export const bindMarkdownWebLanguageTools = (
     return currentSession
   }
 
+  const unavailableReasonFor = (
+    kind: MarkdownLanguageToolSessionKind,
+  ): MarkdownLanguageToolCommitResult['reason'] | undefined => {
+    if (
+      currentCapability.status !== 'supported' ||
+      currentCapability.reason !== undefined
+    ) {
+      return currentCapability.reason ?? 'unsupported-platform'
+    }
+    if (
+      kind === 'writing-tools' &&
+      currentCapability.nativeWritingTools === 'disabled'
+    ) {
+      return 'disabled'
+    }
+    if (kind === 'dictation' && !currentCapability.dictation) return 'disabled'
+    if (kind === 'autocorrect' && !currentCapability.autocorrect) {
+      return 'disabled'
+    }
+    if (
+      (kind === 'spellcheck' || kind === 'context-menu') &&
+      !currentCapability.spellcheck
+    ) {
+      return 'disabled'
+    }
+    return undefined
+  }
+
   const commit = (
     from: number,
     to: number,
@@ -235,6 +263,8 @@ export const bindMarkdownWebLanguageTools = (
     kind: MarkdownLanguageToolSessionKind,
     targetSelection = selectionFrom(textarea),
   ): MarkdownLanguageToolCommitResult => {
+    const unavailableReason = unavailableReasonFor(kind)
+    if (unavailableReason) return rejected(unavailableReason)
     if (!currentProjection) return rejected('projection-unavailable')
     if (currentProjectionRevision === undefined) {
       return rejected('stale-projection')
@@ -364,16 +394,17 @@ export const bindMarkdownWebLanguageTools = (
           reason: 'composition-active',
         })
       }
-      if (!currentCapability.spellcheck) {
+      const kind = currentSession?.kind ?? 'spellcheck'
+      const unavailableReason = unavailableReasonFor(kind)
+      if (unavailableReason) {
         currentSession = null
         return Object.freeze({
           handled: true,
-          reason: currentCapability.reason ?? 'unsupported-platform',
+          reason: unavailableReason,
         })
       }
 
       const targetSelection = event.rawTargetRange ?? selectionFrom(textarea)
-      const kind = currentSession?.kind ?? 'spellcheck'
       if (!currentSession) createSession(kind, targetSelection)
       const result = commit(
         targetSelection.start,
