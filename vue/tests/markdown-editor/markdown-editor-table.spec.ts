@@ -38,7 +38,7 @@ test('renders and operates the source-anchored table context surface', async ({
     .toBe(table.indexOf('Editorial systems') - 1)
 
   await toolbar.getByRole('button', { name: '在下方插入行' }).click()
-  await expect(textarea).toHaveValue(/\n\|  \|  \|  \|\n/)
+  await expect(textarea).toHaveValue(/\n\| {2}\| {2}\| {2}\|\n/)
 
   await fixture.screenshot({ path: testInfo.outputPath('table-context-light.png') })
 
