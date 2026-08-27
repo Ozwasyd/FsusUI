@@ -6,12 +6,14 @@ Component ID: `navigation`
 
 Use `FsusTabs`, `FsusTabPane`, `FsusMenu`, `FsusMenuItem`, `FsusSubMenu`,
 `FsusMenuItemGroup`, `FsusBreadcrumb`, `FsusBreadcrumbItem`, `FsusPageHeader`,
-`FsusSteps`, and `FsusStep`.
+`FsusSteps`, `FsusStep`, `FsusSettingsShell`, `FsusSettingsCategory`, and
+`FsusSettingsScrollResetBehavior`.
 
 ## Vue Contract Mapping
 
 Vue active keys, tab panes, menu item groups, breadcrumbs, page header actions,
-and step status map to typed controls, selected keys, and activation events.
+step status, and settings shell navigation map to typed controls, selected keys,
+and activation events.
 
 ## Supported Platform Differences
 
