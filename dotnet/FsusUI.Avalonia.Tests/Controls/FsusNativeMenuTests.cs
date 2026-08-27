@@ -1,6 +1,9 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using FsusUI.Avalonia.Controls;
+using System.Security.Cryptography;
+using System.Text.Json;
 
 namespace FsusUI.Avalonia.Tests.Controls;
 
@@ -257,5 +260,379 @@ public class FsusNativeMenuTests
     // Without active window (windowless launch)
     router.Route("app.newWindow", hasActiveWindow: false);
     Assert.True(windowlessInvoked);
+  }
+
+  [Fact]
+  public void PlatformSimulationBindsRolesAndCanonicalTopLevelOrder()
+  {
+    var appMenu = FsusNativeMenuItemModel.SubMenu(
+      "Application",
+      FsusPlatformRole.Application,
+      FsusNativeMenuItemModel.Action(
+        new FsusPlatformCommand(
+          "app.quit",
+          "Quit FsusUI",
+          FsusPlatformRole.Quit)),
+      FsusNativeMenuItemModel.Action(
+        new FsusPlatformCommand(
+          "app.services",
+          "Services",
+          FsusPlatformRole.Services)),
+      FsusNativeMenuItemModel.Action(
+        new FsusPlatformCommand(
+          "app.about",
+          "About FsusUI",
+          FsusPlatformRole.About)),
+      FsusNativeMenuItemModel.Action(
+        new FsusPlatformCommand(
+          "app.hideOthers",
+          "Hide Others",
+          FsusPlatformRole.HideOthers)),
+      FsusNativeMenuItemModel.Action(
+        new FsusPlatformCommand(
+          "app.preferences",
+          "Preferences",
+          FsusPlatformRole.Preferences)),
+      FsusNativeMenuItemModel.Action(
+        new FsusPlatformCommand(
+          "app.showAll",
+          "Show All",
+          FsusPlatformRole.ShowAll)),
+      FsusNativeMenuItemModel.Action(
+        new FsusPlatformCommand(
+          "app.hide",
+          "Hide FsusUI",
+          FsusPlatformRole.Hide)));
+    var roots = new[]
+    {
+      FsusNativeMenuItemModel.SubMenu("Help"),
+      FsusNativeMenuItemModel.SubMenu(
+        "Window",
+        FsusNativeMenuItemModel.Action(
+          new FsusPlatformCommand(
+            "window.bringAllToFront",
+            "Bring All to Front",
+            FsusPlatformRole.WindowBringAllToFront)),
+        FsusNativeMenuItemModel.Action(
+          new FsusPlatformCommand(
+            "window.zoom",
+            "Zoom",
+            FsusPlatformRole.WindowZoom)),
+        FsusNativeMenuItemModel.Action(
+          new FsusPlatformCommand(
+            "window.minimize",
+            "Minimize",
+            FsusPlatformRole.WindowMinimize))),
+      FsusNativeMenuItemModel.SubMenu("View"),
+      appMenu,
+      FsusNativeMenuItemModel.SubMenu("Edit"),
+      FsusNativeMenuItemModel.SubMenu("File"),
+    };
+
+    using var macBuilder = new FsusNativeMenuBuilder();
+    var mac = macBuilder.Build(roots, FsusShortcutPlatform.macOS);
+    Assert.Equal(
+      ["Application", "File", "Edit", "View", "Window", "Help"],
+      Headers(mac));
+
+    var macApplication = Assert.IsType<NativeMenuItem>(mac.Items[0]);
+    Assert.Equal(
+      FsusPlatformRole.Application,
+      FsusNativeMenuMetadata.GetRole(macApplication));
+    var macRoleOrder = macApplication.Menu!.Items
+      .OfType<NativeMenuItem>()
+      .Select(FsusNativeMenuMetadata.GetRole)
+      .Where(role => role != FsusPlatformRole.None)
+      .ToArray();
+    Assert.Equal(
+      [
+        FsusPlatformRole.About,
+        FsusPlatformRole.Preferences,
+        FsusPlatformRole.Services,
+        FsusPlatformRole.Hide,
+        FsusPlatformRole.HideOthers,
+        FsusPlatformRole.ShowAll,
+        FsusPlatformRole.Quit,
+      ],
+      macRoleOrder);
+    var servicesItem = macApplication.Menu.Items
+      .OfType<NativeMenuItem>()
+      .Single(item =>
+        FsusNativeMenuMetadata.GetRole(item) == FsusPlatformRole.Services);
+    Assert.NotNull(servicesItem.Menu);
+    var macWindow = Assert.IsType<NativeMenuItem>(mac.Items[4]);
+    Assert.Equal(
+      [
+        FsusPlatformRole.WindowMinimize,
+        FsusPlatformRole.WindowZoom,
+        FsusPlatformRole.WindowBringAllToFront,
+      ],
+      macWindow.Menu!.Items
+        .OfType<NativeMenuItem>()
+        .Select(FsusNativeMenuMetadata.GetRole)
+        .Where(role => role != FsusPlatformRole.None)
+        .ToArray());
+
+    foreach (var platform in new[]
+      {
+        FsusShortcutPlatform.Windows,
+        FsusShortcutPlatform.Linux,
+      })
+    {
+      using var builder = new FsusNativeMenuBuilder();
+      var menu = builder.Build(roots, platform);
+      Assert.Equal(
+        ["File", "Edit", "View", "Window", "Help"],
+        Headers(menu));
+      Assert.DoesNotContain(
+        EnumerateItems(menu),
+        item => FsusNativeMenuMetadata.GetRole(item) is
+          FsusPlatformRole.Services or
+          FsusPlatformRole.Hide or
+          FsusPlatformRole.HideOthers or
+          FsusPlatformRole.ShowAll or
+          FsusPlatformRole.WindowMinimize or
+          FsusPlatformRole.WindowZoom or
+          FsusPlatformRole.WindowClose or
+          FsusPlatformRole.WindowBringAllToFront);
+    }
+  }
+
+  [Fact]
+  public void RebuildAndDisposeDetachPreviousCommandListeners()
+  {
+    var command =
+      new FsusPlatformCommand("file.save", "Save", FsusPlatformRole.FileSave);
+    var root = FsusNativeMenuItemModel.SubMenu(
+      "File",
+      FsusNativeMenuItemModel.Action(command));
+    using var builder = new FsusNativeMenuBuilder();
+
+    var first = builder.Build([root], FsusShortcutPlatform.Windows);
+    var firstSave = FindItem(first, "Save");
+    var initialSubscriptionCount = builder.ActiveSubscriptionCount;
+    Assert.True(initialSubscriptionCount > 0);
+
+    var second = builder.Build([root], FsusShortcutPlatform.Windows);
+    var secondSave = FindItem(second, "Save");
+    Assert.Equal(initialSubscriptionCount, builder.ActiveSubscriptionCount);
+
+    command.Label = "Save Document";
+    Assert.Equal("Save", firstSave.Header);
+    Assert.Equal("Save Document", secondSave.Header);
+
+    builder.Dispose();
+    Assert.Equal(0, builder.ActiveSubscriptionCount);
+    command.Label = "Save Project";
+    Assert.Equal("Save Document", secondSave.Header);
+  }
+
+  [Fact]
+  public void RecentSubmenuRebuildAndDockAttachmentUseNeutralRoles()
+  {
+    var opened = new List<string>();
+    var cleared = false;
+    var recent = FsusNativeMenuItemModel.RecentGroup(
+      "Open Recent",
+      ["/work/draft.md", "/work/review.md"],
+      opened.Add,
+      () => cleared = true);
+    var file = FsusNativeMenuItemModel.SubMenu("File", recent);
+    using var builder = new FsusNativeMenuBuilder();
+
+    var first = builder.Build([file], FsusShortcutPlatform.macOS);
+    var openRecent = FindItem(first, "Open Recent");
+    Assert.Equal(
+      FsusPlatformRole.FileOpenRecent,
+      FsusNativeMenuMetadata.GetRole(openRecent));
+    var draft = Assert.IsType<NativeMenuItem>(openRecent.Menu!.Items[0]);
+    draft.Command!.Execute(null);
+    Assert.Equal(["/work/draft.md"], opened);
+    var clear = FindItem(openRecent.Menu, "Clear Recent");
+    clear.Command!.Execute(null);
+    Assert.True(cleared);
+
+    recent.RecentItems.Clear();
+    recent.RecentItems.Add("/work/final.md");
+    var rebuilt = builder.Build([file], FsusShortcutPlatform.macOS);
+    var rebuiltRecent = FindItem(rebuilt, "Open Recent");
+    Assert.Single(
+      rebuiltRecent.Menu!.Items.OfType<NativeMenuItem>(),
+      item =>
+        FsusNativeMenuMetadata.GetRole(item) ==
+        FsusPlatformRole.FileOpenRecent);
+    Assert.Equal(
+      "/work/final.md",
+      rebuiltRecent.Menu.Items
+        .OfType<NativeMenuItem>()
+        .Single(item =>
+          FsusNativeMenuMetadata.GetRole(item) ==
+          FsusPlatformRole.FileOpenRecent)
+        .Header);
+
+    var target = new AvaloniaObject();
+    var open = new FsusPlatformCommand(
+      "dock.open",
+      "Open",
+      FsusPlatformRole.DockOpen);
+    var dock = FsusDockMenuContract.AttachTo(
+      target,
+      ["/work/final.md"],
+      additionalCommands: [open],
+      platform: FsusShortcutPlatform.macOS);
+    Assert.Same(dock, NativeDock.GetMenu(target));
+    Assert.Contains(
+      dock!.Items.OfType<NativeMenuItem>(),
+      item => FsusNativeMenuMetadata.GetRole(item) ==
+              FsusPlatformRole.DockOpen);
+    Assert.Contains(
+      dock.Items.OfType<NativeMenuItem>(),
+      item => FsusNativeMenuMetadata.GetRole(item) ==
+              FsusPlatformRole.DockOpenRecent);
+  }
+
+  [Fact]
+  public void LocalPlatformSimulationProducesBoundEvidence()
+  {
+    var save =
+      new FsusPlatformCommand("file.save", "Save", FsusPlatformRole.FileSave)
+      {
+        Gesture = new FsusShortcutGesture(Key.S, KeyModifiers.Control),
+      };
+    var roots = new[]
+    {
+      FsusNativeMenuItemModel.SubMenu(
+        "Application",
+        FsusPlatformRole.Application,
+        FsusNativeMenuItemModel.Action(
+          new FsusPlatformCommand(
+            "app.about",
+            "About",
+            FsusPlatformRole.About)),
+        FsusNativeMenuItemModel.Action(
+          new FsusPlatformCommand(
+            "app.preferences",
+            "Preferences",
+            FsusPlatformRole.Preferences)),
+        FsusNativeMenuItemModel.Action(
+          new FsusPlatformCommand(
+            "app.services",
+            "Services",
+            FsusPlatformRole.Services)),
+        FsusNativeMenuItemModel.Action(
+          new FsusPlatformCommand(
+            "app.hide",
+            "Hide",
+            FsusPlatformRole.Hide)),
+        FsusNativeMenuItemModel.Action(
+          new FsusPlatformCommand(
+            "app.hideOthers",
+            "Hide Others",
+            FsusPlatformRole.HideOthers)),
+        FsusNativeMenuItemModel.Action(
+          new FsusPlatformCommand(
+            "app.showAll",
+            "Show All",
+            FsusPlatformRole.ShowAll)),
+        FsusNativeMenuItemModel.Action(
+          new FsusPlatformCommand(
+            "app.quit",
+            "Quit",
+            FsusPlatformRole.Quit))),
+      FsusNativeMenuItemModel.SubMenu(
+        "File",
+        FsusNativeMenuItemModel.Action(save)),
+      FsusNativeMenuItemModel.SubMenu("Edit"),
+      FsusNativeMenuItemModel.SubMenu("View"),
+      FsusNativeMenuItemModel.SubMenu("Window"),
+      FsusNativeMenuItemModel.SubMenu("Help"),
+    };
+    var platformEvidence = new List<object>();
+
+    foreach (var platform in new[]
+      {
+        FsusShortcutPlatform.macOS,
+        FsusShortcutPlatform.Windows,
+        FsusShortcutPlatform.Linux,
+      })
+    {
+      using var builder = new FsusNativeMenuBuilder();
+      var menu = builder.Build(roots, platform);
+      platformEvidence.Add(new
+      {
+        platform = platform.ToString(),
+        localSimulation = true,
+        physicalHardware = false,
+        topLevelOrder = Headers(menu),
+        roles = EnumerateItems(menu)
+          .Select(item => new
+          {
+            header = item.Header,
+            role = FsusNativeMenuMetadata.GetRole(item).ToString(),
+            commandId = FsusNativeMenuMetadata.GetCommandId(item),
+            automationName =
+              FsusNativeMenuMetadata.GetAutomationName(item),
+          })
+          .ToArray(),
+        activeSubscriptions = builder.ActiveSubscriptionCount,
+      });
+    }
+
+    var json = JsonSerializer.Serialize(
+      new
+      {
+        schemaVersion = 1,
+        issues = new[] { 648, 649 },
+        fixtureClass = "reproducible-local-platform-simulation",
+        hostPlatform = Environment.OSVersion.Platform.ToString(),
+        note =
+          "macOS and Windows native-menu roles are simulated locally; this is not a physical-hardware claim.",
+        platforms = platformEvidence,
+      },
+      new JsonSerializerOptions { WriteIndented = true }) + "\n";
+    var digest =
+      Convert.ToHexStringLower(SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(json)));
+    Assert.Equal(64, digest.Length);
+    Assert.Contains("\"macOS\"", json);
+    Assert.Contains("\"Windows\"", json);
+    Assert.Contains("\"Linux\"", json);
+
+    var outputRoot =
+      Environment.GetEnvironmentVariable("FSUS_PR675_PLATFORM_EVIDENCE_ROOT");
+    if (!string.IsNullOrWhiteSpace(outputRoot))
+    {
+      Directory.CreateDirectory(outputRoot);
+      File.WriteAllText(
+        Path.Combine(outputRoot, "native-menu-platform-simulation.json"),
+        json);
+      File.WriteAllText(
+        Path.Combine(outputRoot, "native-menu-platform-simulation.sha256"),
+        $"{digest}  native-menu-platform-simulation.json\n");
+    }
+  }
+
+  private static string[] Headers(NativeMenu menu) =>
+    menu.Items.OfType<NativeMenuItem>()
+      .Select(item => item.Header ?? string.Empty)
+      .ToArray();
+
+  private static NativeMenuItem FindItem(NativeMenu menu, string header) =>
+    EnumerateItems(menu).Single(item => item.Header == header);
+
+  private static IEnumerable<NativeMenuItem> EnumerateItems(NativeMenu menu)
+  {
+    foreach (var item in menu.Items.OfType<NativeMenuItem>())
+    {
+      yield return item;
+      if (item.Menu is null)
+      {
+        continue;
+      }
+
+      foreach (var child in EnumerateItems(item.Menu))
+      {
+        yield return child;
+      }
+    }
   }
 }

@@ -20,6 +20,8 @@ Every accepted override below is backed by `spec/platform-overrides/`.
 | avalonia-linux-window-shadow-001        | dialog            | Linux compositor shadows can differ; modality, focus trap, dismissal, and announced names stay equivalent.               |
 | avalonia-linux-font-rasterization-001   | text              | Linux font fallback and Skia rasterization can shift baselines within the typography threshold.                          |
 | avalonia-macos-text-smoothing-001       | text              | macOS smoothing can differ while content, wrapping, and accessible names stay equivalent.                                |
+| avalonia-macos-shortcut-display-001     | input             | macOS displays Command/Option for the stable platform-neutral shortcut semantics serialized as Ctrl/Alt.                  |
+| avalonia-macos-native-menu-role-001     | menu              | macOS application and Dock roles remain explicit in the neutral model and degrade deterministically elsewhere.            |
 | avalonia-windows-focus-ring-001         | focus-visible     | Windows high-contrast focus cues may override app brushes while keyboard focus state remains equivalent.                 |
 | avalonia-windows-font-rasterization-001 | text              | Windows DirectWrite fallback can shift glyph width within the typography threshold.                                      |
 | web-browser-font-baseline-001           | text              | Browser and Skia line metrics are compared by content order, wrapping intent, and accessible names.                      |

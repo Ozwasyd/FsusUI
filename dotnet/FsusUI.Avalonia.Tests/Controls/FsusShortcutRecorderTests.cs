@@ -55,15 +55,87 @@ public class FsusShortcutRecorderTests
   public void ShortcutGestureNormalizesOemKeys()
   {
     var plusGesture = new FsusShortcutGesture(Key.OemPlus, KeyModifiers.Control);
-    Assert.Equal("Ctrl++", plusGesture.ToString());
+    Assert.Equal("Ctrl+OemPlus", plusGesture.SerializedText);
     Assert.Equal("Command++", plusGesture.ToDisplayText(FsusShortcutPlatform.macOS));
+    Assert.Equal(
+      plusGesture,
+      FsusShortcutGesture.Parse(plusGesture.SerializedText));
 
     var minusGesture = new FsusShortcutGesture(Key.OemMinus, KeyModifiers.Control);
-    Assert.Equal("Ctrl+-", minusGesture.ToString());
+    Assert.Equal("Ctrl+OemMinus", minusGesture.SerializedText);
+    Assert.Equal("Ctrl+-", minusGesture.ToDisplayText(FsusShortcutPlatform.Windows));
+    Assert.Equal(
+      minusGesture,
+      FsusShortcutGesture.Parse(minusGesture.SerializedText));
 
     var commaGesture = new FsusShortcutGesture(Key.OemComma, KeyModifiers.Control);
-    Assert.Equal("Ctrl+,", commaGesture.ToString());
+    Assert.Equal("Ctrl+OemComma", commaGesture.SerializedText);
     Assert.Equal("Command+,", commaGesture.ToDisplayText(FsusShortcutPlatform.macOS));
+    Assert.Equal(
+      commaGesture,
+      FsusShortcutGesture.Parse(commaGesture.SerializedText));
+  }
+
+  [Theory]
+  [InlineData(Key.OemPeriod)]
+  [InlineData(Key.Oem1)]
+  [InlineData(Key.Oem2)]
+  [InlineData(Key.Oem3)]
+  [InlineData(Key.Oem4)]
+  [InlineData(Key.Oem5)]
+  [InlineData(Key.Oem6)]
+  [InlineData(Key.Oem7)]
+  public void CommonOemSerializationRoundTripsWithoutDelimiterAmbiguity(
+    Key key)
+  {
+    var gesture =
+      new FsusShortcutGesture(key, KeyModifiers.Control | KeyModifiers.Alt);
+
+    Assert.Equal(gesture, FsusShortcutGesture.Parse(gesture.SerializedText));
+    Assert.StartsWith("Ctrl+Alt+Oem", gesture.SerializedText);
+    Assert.DoesNotContain("Oem", gesture.ToDisplayText(FsusShortcutPlatform.Windows));
+  }
+
+  [Fact]
+  public void MacMetaAndWindowsControlNormalizeToTheSameStableGesture()
+  {
+    var mac =
+      FsusShortcutGesture.FromKey(
+        Key.P,
+        KeyModifiers.Meta | KeyModifiers.Shift,
+        FsusShortcutPlatform.macOS);
+    var windows =
+      FsusShortcutGesture.FromKey(
+        Key.P,
+        KeyModifiers.Control | KeyModifiers.Shift,
+        FsusShortcutPlatform.Windows);
+
+    Assert.Equal(windows, mac);
+    Assert.Equal("Ctrl+Shift+P", mac.SerializedText);
+    Assert.Equal(
+      "Command+Shift+P",
+      mac.ToDisplayText(FsusShortcutPlatform.macOS));
+  }
+
+  [Fact]
+  public void WindowsMetaRemainsDistinctAndRoundTrips()
+  {
+    var windows =
+      FsusShortcutGesture.FromKey(
+        Key.P,
+        KeyModifiers.Meta | KeyModifiers.Shift,
+        FsusShortcutPlatform.Windows);
+
+    Assert.Equal("Shift+Meta+P", windows.SerializedText);
+    Assert.Equal(
+      "Shift+Win+P",
+      windows.ToDisplayText(FsusShortcutPlatform.Windows));
+    Assert.Equal(
+      windows,
+      FsusShortcutGesture.Parse(windows.SerializedText));
+    Assert.Equal(
+      windows,
+      FsusShortcutGesture.Parse("Win+Shift+P"));
   }
 
   [Fact]
@@ -197,8 +269,62 @@ public class FsusShortcutRecorderTests
     Assert.Contains("reserved", AutomationProperties.GetItemStatus(recorder));
   }
 
+  [Fact]
+  public void InvalidBareKeyPreservesOriginalValueAndClearsStaleHelpAfterRecovery()
+  {
+    var initial = new FsusShortcutGesture(Key.S, KeyModifiers.Control);
+    var recorder = new TestShortcutRecorder
+    {
+      Value = initial,
+    };
+
+    recorder.StartRecording();
+    recorder.SimulateKeyDown(Key.P, KeyModifiers.None);
+
+    Assert.False(recorder.IsRecording);
+    Assert.Equal(initial, recorder.Value);
+    Assert.Equal(FsusShortcutValidationStatus.Invalid, recorder.Status);
+    Assert.Equal(
+      "Modifier key required (Ctrl, Alt, or Shift).",
+      AutomationProperties.GetHelpText(recorder));
+
+    recorder.StartRecording();
+    recorder.SimulateKeyDown(Key.K, KeyModifiers.Control);
+
+    Assert.Equal(FsusShortcutValidationStatus.Valid, recorder.Status);
+    Assert.Null(AutomationProperties.GetHelpText(recorder));
+    Assert.Equal("Ctrl+K", recorder.SerializedValue());
+  }
+
+  [Fact]
+  public void ClearabilityAndCommandAvailabilityTrackControlState()
+  {
+    var recorder = new TestShortcutRecorder
+    {
+      Value = new FsusShortcutGesture(Key.D, KeyModifiers.Control),
+      IsClearable = false,
+    };
+
+    Assert.False(recorder.ClearCommand.CanExecute(null));
+    recorder.SimulateKeyDown(Key.Delete, KeyModifiers.None);
+    Assert.NotNull(recorder.Value);
+
+    recorder.IsClearable = true;
+    Assert.True(recorder.ClearCommand.CanExecute(null));
+    recorder.SimulateKeyDown(Key.Delete, KeyModifiers.None);
+    Assert.Null(recorder.Value);
+    Assert.False(recorder.ClearCommand.CanExecute(null));
+
+    recorder.Status = FsusShortcutValidationStatus.Invalid;
+    recorder.StatusMessage = "Modifier key required.";
+    recorder.IsInvalid = true;
+    Assert.False(recorder.ClearCommand.CanExecute(null));
+  }
+
   private sealed class TestShortcutRecorder : FsusShortcutRecorder
   {
+    public string? SerializedValue() => Value?.SerializedText;
+
     public void SimulateKeyDown(Key key, KeyModifiers modifiers)
     {
       var rawModifiers = RawInputModifiers.None;

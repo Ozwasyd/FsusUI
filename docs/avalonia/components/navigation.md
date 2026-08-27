@@ -20,6 +20,19 @@ and activation events.
 
 Keyboard navigation and focus rings follow `docs/avalonia/platform-differences.md`.
 
+`FsusPlatformCommand` is the neutral command source for
+`FsusNativeMenuBuilder` and `FsusCommandPaletteModel`. A builder owns its
+subscriptions: dispose it or rebuild through the same instance so obsolete
+native items stop receiving state updates. `FsusNativeMenuMetadata.GetRole`
+and `GetCommandId` preserve platform role and command identity independently
+of localized labels.
+
+macOS application menus use explicit About, Preferences, Services, Hide,
+Hide Others, Show All, Quit, and Window roles. Windows and Linux omit
+macOS-only roles and order top-level menus as File, Edit, View, Window, Help.
+`FsusDockMenuContract.AttachTo` uses Avalonia `NativeDock`, while
+`FsusDockMenuRouter` supplies active-window and windowless command routes.
+
 ## Theme Tokens
 
 Navigation controls use focus, surface, border, text, muted text, density, and
@@ -88,10 +101,26 @@ void ShowSettings()
 ## Minimal Avalonia Example
 
 ```csharp
+using Avalonia.Controls;
+using Avalonia.Input;
 using FsusUI.Avalonia.Controls;
 
+var window = new Window();
 var tabs = new FsusTabs();
 tabs.Items.Add(new FsusTabPane { Header = "Overview", Content = "Ready" });
+
+var save = new FsusPlatformCommand(
+  "document.save",
+  "Save",
+  FsusPlatformRole.FileSave)
+{
+  Gesture = new FsusShortcutGesture(Key.S, KeyModifiers.Control),
+};
+var file = FsusNativeMenuItemModel.SubMenu(
+  "File",
+  FsusNativeMenuItemModel.Action(save));
+using var builder = new FsusNativeMenuBuilder();
+builder.AttachTo(window, [file], FsusShortcutPlatform.Auto);
 ```
 
 ## Known Limitations
@@ -99,4 +128,6 @@ tabs.Items.Add(new FsusTabPane { Header = "Overview", Content = "Ready" });
 Router integration belongs to the app shell; navigation controls do not own URL
 mutation. `FsusSettingsShell` does not filter categories when a search slot
 changes, persist category scroll offsets across control instances, or own native
-window lifetime; the consuming app supplies those behaviors.
+window lifetime; the consuming app supplies those behaviors. The repository
+verifies macOS/Windows role routing with local platform simulations; those
+fixtures do not claim execution on physical hardware.

@@ -22,20 +22,38 @@
           Padding="{TemplateBinding Padding}">
           <Grid ColumnDefinitions="*,Auto">
             <TextBlock
+              Name="PART_ValueText"
               Grid.Column="0"
               VerticalAlignment="Center"
               Text="{TemplateBinding DisplayText}" />
+            <TextBlock
+              Name="PART_PlaceholderText"
+              Grid.Column="0"
+              VerticalAlignment="Center"
+              Foreground="{DynamicResource FsusThemeMutedTextBrush}"
+              IsVisible="False"
+              Text="{TemplateBinding Placeholder}" />
             <Button
+              Name="PART_ClearButton"
               Grid.Column="1"
               Classes="fsus-input-clear"
               Command="{TemplateBinding ClearCommand}"
-              IsVisible="{TemplateBinding IsClearable}"
+              AutomationProperties.Name="Clear shortcut"
+              IsVisible="False"
               Content="✕"
               Margin="4,0,0,0" />
           </Grid>
         </Border>
       </ControlTemplate>
     </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusShortcutRecorder.fsus-empty /template/ TextBlock#PART_PlaceholderText">
+    <Setter Property="IsVisible" Value="True" />
+  </Style>
+
+  <Style Selector="fsus|FsusShortcutRecorder.fsus-can-clear /template/ Button#PART_ClearButton">
+    <Setter Property="IsVisible" Value="True" />
   </Style>
 
   <Style Selector="fsus|FsusShortcutRecorder:focus">
@@ -54,17 +72,18 @@
 
   <Style Selector="fsus|FsusShortcutRecorder:disabled">
     <Setter Property="Background" Value="{DynamicResource FsusThemeDisabledSurfaceBrush}" />
-    <Setter Property="Opacity" Value="{DynamicResource FsusThemeDisabledOpacity}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+    <Setter Property="Opacity" Value="1" />
   </Style>
 
   <Style Selector="fsus|FsusShortcutRecorder.fsus-size-sm">
     <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlCompactY}" />
     <Setter Property="Padding" Value="8,4" />
-    <Setter Property="FontSize" Value="12" />
+    <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodySmSize}" />
   </Style>
 
   <Style Selector="fsus|FsusShortcutRecorder.fsus-size-lg">
-    <Setter Property="MinHeight" Value="44" />
+    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
     <Setter Property="Padding" Value="12,8" />
   </Style>
 </Styles>

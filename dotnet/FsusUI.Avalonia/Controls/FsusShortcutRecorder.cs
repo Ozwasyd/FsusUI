@@ -42,6 +42,8 @@ public sealed class FsusShortcutGesture : IEquatable<FsusShortcutGesture>
 
   public string DisplayText => ToDisplayText(FsusShortcutPlatform.Auto);
 
+  public string SerializedText => ToString();
+
   public KeyGesture ToKeyGesture() => new(Key, Modifiers);
 
   public static FsusShortcutGesture FromKeyGesture(KeyGesture gesture)
@@ -111,7 +113,7 @@ public sealed class FsusShortcutGesture : IEquatable<FsusShortcutGesture>
       }
     }
 
-    parts.Add(FormatKey(Key));
+    parts.Add(FormatDisplayKey(Key));
     return string.Join("+", parts);
   }
 
@@ -135,7 +137,7 @@ public sealed class FsusShortcutGesture : IEquatable<FsusShortcutGesture>
       parts.Add("Meta");
     }
 
-    parts.Add(FormatKey(Key));
+    parts.Add(FormatSerializedKey(Key));
     return string.Join("+", parts);
   }
 
@@ -157,7 +159,9 @@ public sealed class FsusShortcutGesture : IEquatable<FsusShortcutGesture>
       return false;
     }
 
-    var tokens = text.Split('+', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+    var tokens = text.Split(
+      '+',
+      StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
     if (tokens.Length == 0)
     {
       return false;
@@ -178,11 +182,14 @@ public sealed class FsusShortcutGesture : IEquatable<FsusShortcutGesture>
         modifiers |= KeyModifiers.Control;
       }
       else if (token.Equals("Command", StringComparison.OrdinalIgnoreCase) ||
-               token.Equals("Cmd", StringComparison.OrdinalIgnoreCase) ||
-               token.Equals("Meta", StringComparison.OrdinalIgnoreCase) ||
-               token.Equals("Win", StringComparison.OrdinalIgnoreCase))
+               token.Equals("Cmd", StringComparison.OrdinalIgnoreCase))
       {
         modifiers |= KeyModifiers.Control;
+      }
+      else if (token.Equals("Meta", StringComparison.OrdinalIgnoreCase) ||
+               token.Equals("Win", StringComparison.OrdinalIgnoreCase))
+      {
+        modifiers |= KeyModifiers.Meta;
       }
       else if (token.Equals("Alt", StringComparison.OrdinalIgnoreCase) ||
                token.Equals("Option", StringComparison.OrdinalIgnoreCase) ||
@@ -259,7 +266,7 @@ public sealed class FsusShortcutGesture : IEquatable<FsusShortcutGesture>
   public static KeyModifiers NormalizeModifiers(KeyModifiers modifiers)
   {
     var normalized = KeyModifiers.None;
-    if (modifiers.HasFlag(KeyModifiers.Control) || modifiers.HasFlag(KeyModifiers.Meta))
+    if (modifiers.HasFlag(KeyModifiers.Control))
     {
       normalized |= KeyModifiers.Control;
     }
@@ -270,6 +277,10 @@ public sealed class FsusShortcutGesture : IEquatable<FsusShortcutGesture>
     if (modifiers.HasFlag(KeyModifiers.Shift))
     {
       normalized |= KeyModifiers.Shift;
+    }
+    if (modifiers.HasFlag(KeyModifiers.Meta))
+    {
+      normalized |= KeyModifiers.Meta;
     }
 
     return normalized;
@@ -295,7 +306,7 @@ public sealed class FsusShortcutGesture : IEquatable<FsusShortcutGesture>
     return FsusShortcutPlatform.Linux;
   }
 
-  private static string FormatKey(Key key) => key switch
+  private static string FormatDisplayKey(Key key) => key switch
   {
     Key.D0 => "0",
     Key.D1 => "1",
@@ -330,6 +341,25 @@ public sealed class FsusShortcutGesture : IEquatable<FsusShortcutGesture>
     Key.Oem7 => "'",
     Key.Return => "Enter",
     Key.Back => "Backspace",
+    _ => key.ToString(),
+  };
+
+  private static string FormatSerializedKey(Key key) => key switch
+  {
+    Key.D0 => "0",
+    Key.D1 => "1",
+    Key.D2 => "2",
+    Key.D3 => "3",
+    Key.D4 => "4",
+    Key.D5 => "5",
+    Key.D6 => "6",
+    Key.D7 => "7",
+    Key.D8 => "8",
+    Key.D9 => "9",
+    Key.Return => "Enter",
+    Key.Back => "Backspace",
+    Key.Delete => "Delete",
+    Key.Escape => "Escape",
     _ => key.ToString(),
   };
 
@@ -470,16 +500,23 @@ public class FsusShortcutRecorder : TemplatedControl
       nameof(AllowBareKeys),
       false);
 
-  private FsusShortcutGesture? preRecordingValue;
+  private readonly RelayCommand cancelRecordingCommand;
+  private readonly RelayCommand clearCommand;
+  private readonly RelayCommand startRecordingCommand;
 
   public FsusShortcutRecorder()
   {
     FsusComponentClasses.SetBaseClasses(this, "fsus-shortcut-recorder");
     Focusable = true;
 
-    StartRecordingCommand = new RelayCommand(_ => StartRecording(), _ => IsEnabled && !IsRecording);
-    CancelRecordingCommand = new RelayCommand(_ => CancelRecording(), _ => IsRecording);
-    ClearCommand = new RelayCommand(_ => Clear(), _ => CanClear());
+    startRecordingCommand =
+      new RelayCommand(_ => StartRecording(), _ => IsEnabled && !IsRecording);
+    cancelRecordingCommand =
+      new RelayCommand(_ => CancelRecording(), _ => IsRecording);
+    clearCommand = new RelayCommand(_ => Clear(), _ => CanClear());
+    StartRecordingCommand = startRecordingCommand;
+    CancelRecordingCommand = cancelRecordingCommand;
+    ClearCommand = clearCommand;
     LostFocus += (_, _) =>
     {
       if (IsRecording)
@@ -602,7 +639,6 @@ public class FsusShortcutRecorder : TemplatedControl
       return;
     }
 
-    preRecordingValue = Value;
     IsRecording = true;
   }
 
@@ -615,11 +651,12 @@ public class FsusShortcutRecorder : TemplatedControl
 
     IsRecording = false;
     SyncDisplayText();
+    Focus();
   }
 
   public void Clear()
   {
-    if (!IsEnabled)
+    if (!CanClear())
     {
       return;
     }
@@ -629,6 +666,7 @@ public class FsusShortcutRecorder : TemplatedControl
     Status = FsusShortcutValidationStatus.Valid;
     StatusMessage = null;
     IsInvalid = false;
+    Focus();
   }
 
   public void Validate()
@@ -636,6 +674,30 @@ public class FsusShortcutRecorder : TemplatedControl
     if (Value is null)
     {
       SetValidationState(FsusShortcutValidationStatus.Valid, null);
+      return;
+    }
+
+    if (Value.Key == Key.None || FsusShortcutGesture.IsModifierKey(Value.Key))
+    {
+      SetValidationState(
+        FsusShortcutValidationStatus.Invalid,
+        "Shortcut must include a non-modifier key.");
+      return;
+    }
+
+    var hasModifiers =
+      (Value.Modifiers &
+       (KeyModifiers.Control |
+        KeyModifiers.Alt |
+        KeyModifiers.Shift |
+        KeyModifiers.Meta)) != 0;
+    if (!AllowBareKeys &&
+        !hasModifiers &&
+        !FsusShortcutGesture.IsFunctionKey(Value.Key))
+    {
+      SetValidationState(
+        FsusShortcutValidationStatus.Invalid,
+        "Modifier key required (Ctrl, Alt, or Shift).");
       return;
     }
 
@@ -712,7 +774,15 @@ public class FsusShortcutRecorder : TemplatedControl
 
     if (e.Key is Key.Back or Key.Delete)
     {
-      Clear();
+      if (CanClear())
+      {
+        Clear();
+      }
+      else
+      {
+        IsRecording = false;
+        Focus();
+      }
       return;
     }
 
@@ -731,12 +801,14 @@ public class FsusShortcutRecorder : TemplatedControl
         FsusShortcutValidationStatus.Invalid,
         "Modifier key required (Ctrl, Alt, or Shift).");
       IsRecording = false;
+      Focus();
       return;
     }
 
     var recorded = FsusShortcutGesture.FromKey(e.Key, e.KeyModifiers, Platform);
     Value = recorded;
     IsRecording = false;
+    Focus();
   }
 
   protected override void OnKeyUp(KeyEventArgs e)
@@ -760,7 +832,9 @@ public class FsusShortcutRecorder : TemplatedControl
       Validate();
       SyncDisplayText();
       SyncAutomation();
+      SyncValueState(newValue, IsRecording);
       ValueChanged?.Invoke(this, new FsusShortcutValueChangedEventArgs(oldValue, newValue));
+      RaiseCommandStateChanged();
     }
     else if (change.Property == IsRecordingProperty)
     {
@@ -768,13 +842,22 @@ public class FsusShortcutRecorder : TemplatedControl
       SyncClasses();
       SyncDisplayText();
       SyncAutomation();
+      SyncValueState(Value, recording);
       RecordingStateChanged?.Invoke(this, recording);
+      RaiseCommandStateChanged();
     }
     else if (change.Property == StatusProperty || change.Property == StatusMessageProperty)
     {
       SyncClasses();
       SyncAutomation();
       ValidationStatusChanged?.Invoke(this, new FsusShortcutValidationChangedEventArgs(Status, StatusMessage));
+      RaiseCommandStateChanged();
+    }
+    else if (change.Property == IsInvalidProperty)
+    {
+      SyncClasses();
+      SyncAutomation();
+      RaiseCommandStateChanged();
     }
     else if (change.Property == SizeProperty)
     {
@@ -787,6 +870,23 @@ public class FsusShortcutRecorder : TemplatedControl
     else if (change.Property == ExistingShortcutsProperty || change.Property == ReservedShortcutsProperty)
     {
       Validate();
+    }
+    else if (change.Property == IsClearableProperty ||
+             change.Property == AllowBareKeysProperty)
+    {
+      Validate();
+      SyncClasses();
+      RaiseCommandStateChanged();
+    }
+    else if (change.Property == IsEnabledProperty)
+    {
+      SyncClasses();
+      SyncAutomation();
+      RaiseCommandStateChanged();
+    }
+    else if (change.Property == PlaceholderProperty)
+    {
+      SyncClasses();
     }
     else if (change.Property == AccessibleNameProperty)
     {
@@ -802,7 +902,7 @@ public class FsusShortcutRecorder : TemplatedControl
   }
 
   private bool CanClear() =>
-    IsEnabled && IsClearable && (Value is not null || Status != FsusShortcutValidationStatus.Valid);
+    IsEnabled && IsClearable && Value is not null;
 
   private void SyncDisplayText()
   {
@@ -875,6 +975,20 @@ public class FsusShortcutRecorder : TemplatedControl
     FsusComponentClasses.Ensure(this, "fsus-invalid", IsInvalid);
     FsusComponentClasses.Ensure(this, "fsus-duplicate", Status == FsusShortcutValidationStatus.Duplicate);
     FsusComponentClasses.Ensure(this, "fsus-reserved", Status == FsusShortcutValidationStatus.Reserved);
+    SyncValueState(Value, IsRecording);
+  }
+
+  private void SyncValueState(
+    FsusShortcutGesture? value,
+    bool recording)
+  {
+    var isEmpty = value is null && !recording;
+    var canClear =
+      IsEnabled &&
+      IsClearable &&
+      value is not null;
+    FsusComponentClasses.Ensure(this, "fsus-empty", isEmpty);
+    FsusComponentClasses.Ensure(this, "fsus-can-clear", canClear);
   }
 
   private void SyncAutomation()
@@ -883,6 +997,7 @@ public class FsusShortcutRecorder : TemplatedControl
       ? AccessibleName
       : "Shortcut recorder";
     AutomationProperties.SetName(this, name);
+    AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Edit);
 
     var statusText = Status switch
     {
@@ -893,10 +1008,14 @@ public class FsusShortcutRecorder : TemplatedControl
     };
     AutomationProperties.SetItemStatus(this, statusText);
 
-    if (StatusMessage is not null)
-    {
-      AutomationProperties.SetHelpText(this, StatusMessage);
-    }
+    AutomationProperties.SetHelpText(this, StatusMessage);
+  }
+
+  private void RaiseCommandStateChanged()
+  {
+    startRecordingCommand.RaiseCanExecuteChanged();
+    cancelRecordingCommand.RaiseCanExecuteChanged();
+    clearCommand.RaiseCanExecuteChanged();
   }
 
   private sealed class RelayCommand(Action<object?> execute, Func<object?, bool>? canExecute = null) : ICommand
