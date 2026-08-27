@@ -103,4 +103,72 @@ describe('Markdown editor command surface integration', () => {
       document.body.querySelectorAll('.el-markdown-editor__palette-item'),
     ).toHaveLength(1)
   })
+
+  it('traps palette focus, exposes disabled reason, and closes on document switch', async () => {
+    const disabledCommand: MarkdownEditorCommand = {
+      ...insertCommand,
+      disabledReason: () => 'Provider unavailable',
+      enabled: () => false,
+      key: 'disabled-token',
+      label: 'Disabled token',
+    }
+    const wrapper = mount(MarkdownEditor, {
+      attachTo: document.body,
+      props: {
+        commands: [insertCommand, disabledCommand],
+        documentIdentity: { epoch: 1, id: 'document-a' },
+        localeText: {
+          commandGroups: { insert: 'Insertions' },
+        },
+        modelValue: '',
+        surfaces: { commandPalette: true },
+      },
+    })
+
+    ;(wrapper.vm as unknown as { openCommandPalette: () => void }).openCommandPalette()
+    await nextTick()
+    const input = document.body.querySelector(
+      '.el-markdown-editor__palette-input',
+    ) as HTMLInputElement
+    const enabled = document.body.querySelector(
+      '.el-markdown-editor__palette-item:not(:disabled)',
+    ) as HTMLButtonElement
+    const disabled = document.body.querySelector(
+      '.el-markdown-editor__palette-item:disabled',
+    ) as HTMLButtonElement
+    const group = document.body.querySelector(
+      '.el-markdown-editor__palette-group',
+    ) as HTMLElement
+    expect(document.activeElement).toBe(input)
+    expect(group.getAttribute('aria-label')).toBe('Insertions')
+    expect(disabled.disabled).toBe(true)
+    const description = disabled.getAttribute('aria-describedby')
+    expect(description).toBeTruthy()
+    expect(document.getElementById(description!)?.textContent).toContain(
+      'Provider unavailable',
+    )
+
+    input.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        key: 'Tab',
+        shiftKey: true,
+      }),
+    )
+    expect(document.activeElement).toBe(enabled)
+    enabled.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, key: 'Tab' }),
+    )
+    expect(document.activeElement).toBe(input)
+
+    await wrapper.setProps({
+      documentIdentity: { epoch: 1, id: 'document-b' },
+    })
+    await nextTick()
+    expect(
+      document.body.querySelector('.el-markdown-editor__palette-dialog'),
+    ).toBeNull()
+    expect(document.activeElement).toBe(wrapper.find('textarea').element)
+    wrapper.unmount()
+  })
 })

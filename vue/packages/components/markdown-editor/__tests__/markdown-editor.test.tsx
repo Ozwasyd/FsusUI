@@ -488,14 +488,20 @@ describe('MarkdownEditor', () => {
       1,
     )
     expect(wrapper.vm.insertMarkdownAtCursor('B')).toBe(true)
-    await wrapper.find('.el-markdown-editor__command').trigger('click')
+    const commandButton = wrapper.find('.el-markdown-editor__command')
+    await commandButton.trigger('click')
     expect(commandSignal?.aborted).toBe(false)
+    expect(commandButton.attributes('disabled')).toBeDefined()
+    const pendingDescription = commandButton.attributes('aria-describedby')
+    expect(pendingDescription).toBeTruthy()
+    expect(wrapper.find(`#${pendingDescription}`).text()).toBe('执行中')
 
     await wrapper.setProps({
       documentIdentity: { epoch: 1, id: 'document-b' },
       modelValue: 'A',
     })
     expect(commandSignal?.aborted).toBe(true)
+    expect(wrapper.find(`#${pendingDescription}`).text()).toBe('已取消')
     expect(wrapper.vm.undo()).toMatchObject({
       accepted: false,
       reason: 'no-history',

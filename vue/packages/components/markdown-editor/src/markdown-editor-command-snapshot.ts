@@ -17,6 +17,13 @@ const MARKDOWN_EDITOR_COMMAND_ICONS = new Set<MarkdownEditorCommandIcon>([
   'link',
   'quote',
 ])
+const MARKDOWN_EDITOR_COMMAND_PRESENTATIONS =
+  new Set<MarkdownEditorCommandPresentation>([
+    'palette',
+    'selection',
+    'slash',
+    'toolbar',
+  ])
 
 const normalizedShortcut = (shortcut: string) =>
   shortcut.trim().replace(/\s+/gu, '').toLowerCase()
@@ -54,17 +61,22 @@ const validateMarkdownEditorCommands = (
   const shortcuts = new Map<string, string>()
 
   for (const command of commands) {
-    if (!command.key.trim()) {
-      throw new Error('Markdown editor command key must not be empty.')
+    if (!command.key.trim() || command.key !== command.key.trim()) {
+      throw new Error('Markdown editor command key must be non-empty and trimmed.')
     }
     if (keys.has(command.key)) {
       throw new Error(`Markdown editor duplicate command key: ${command.key}`)
     }
     keys.add(command.key)
 
-    if (!command.group.trim()) {
+    if (!command.label.trim()) {
       throw new Error(
-        `Markdown editor command "${command.key}" group must not be empty.`,
+        `Markdown editor command "${command.key}" label must not be empty.`,
+      )
+    }
+    if (!command.group.trim() || command.group !== command.group.trim()) {
+      throw new Error(
+        `Markdown editor command "${command.key}" group must be non-empty and trimmed.`,
       )
     }
     if (typeof command.run !== 'function') {
@@ -85,9 +97,34 @@ const validateMarkdownEditorCommands = (
         `Markdown editor command "${command.key}" uses an unregistered icon.`,
       )
     }
+    if (
+      command.priority !== undefined &&
+      !Number.isFinite(command.priority)
+    ) {
+      throw new Error(
+        `Markdown editor command "${command.key}" priority must be finite.`,
+      )
+    }
+    const presentations = command.presentation ?? []
+    if (
+      new Set(presentations).size !== presentations.length ||
+      presentations.some(
+        (presentation) =>
+          !MARKDOWN_EDITOR_COMMAND_PRESENTATIONS.has(presentation),
+      )
+    ) {
+      throw new Error(
+        `Markdown editor command "${command.key}" uses an invalid presentation.`,
+      )
+    }
 
     if (command.shortcut) {
       const normalized = normalizedShortcut(command.shortcut)
+      if (!normalized) {
+        throw new Error(
+          `Markdown editor command "${command.key}" shortcut must not be empty.`,
+        )
+      }
       const existing = shortcuts.get(normalized)
       if (existing) {
         throw new Error(

@@ -382,10 +382,10 @@
               :key="group.key"
               :class="ns.e('palette-group')"
               role="group"
-              :aria-label="group.key"
+              :aria-label="commandGroupName(group.key)"
             >
               <div :class="ns.e('palette-group-label')">
-                {{ group.key }}
+                {{ commandGroupName(group.key) }}
               </div>
               <button
                 v-for="item in group.commands"
@@ -1502,6 +1502,8 @@ const commandCopy = (command: MarkdownEditorCommand) =>
   resolveMarkdownEditorCommandCopy(command, localeText.value)
 const commandName = (command: MarkdownEditorCommand) =>
   commandCopy(command).name
+const commandGroupName = (group: string) =>
+  localeText.value.commandGroups[group] ?? group
 const pasteAsMarkdownGateDescription = computed(() => {
   const gate = pasteAsMarkdownGate.value
   return gate ? localeText.value.pasteAsMarkdown.disabledDescriptions[gate] : ''
@@ -1564,12 +1566,11 @@ watch(paletteCommands, (commands) => {
 })
 const commandStateId = (key: string) =>
   `${commandTrayId}-command-state-${key.replace(/[^a-zA-Z0-9_-]/gu, '-')}`
-const commandStateText = (item: MarkdownEditorCommandSnapshotItem) =>
-  item.error
-    ? localeText.value.surfaces.commandRejected
-    : item.pending
-      ? localeText.value.surfaces.commandPending
-      : item.disabledReason || ''
+const commandStateText = (item: MarkdownEditorCommandSnapshotItem) => {
+  if (item.disabledReason && item.state === 'idle') return item.disabledReason
+  if (item.state === 'idle') return ''
+  return localeText.value.results[item.state]
+}
 const commandDescriptionId = (command: MarkdownEditorCommand) => {
   if (isPasteAsMarkdownCommand(command) && pasteAsMarkdownGate.value) {
     return pasteAsMarkdownDescriptionId
@@ -1686,6 +1687,7 @@ watch(
     editorSelection.value = result.selection
     refreshLiveWindow('input')
     refreshLiveReveal()
+    void restoreTextareaSelection(result.selection)
     if (!historiesEqual(previousHistory, result.history)) {
       emit('history-change', result.history)
     }

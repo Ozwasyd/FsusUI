@@ -130,7 +130,7 @@ describe("Issue #430: Unified command registry, context, and presentation metada
         [{ ...bold, group: "" }],
         ctx,
       ),
-    ).toThrow(/group must not be empty/)
+    ).toThrow(/group must be non-empty and trimmed/)
     expect(() =>
       createMarkdownEditorCommandSnapshot(
         [{ ...bold, icon: "arbitrary" as never }],
@@ -143,6 +143,18 @@ describe("Issue #430: Unified command registry, context, and presentation metada
         ctx,
       ),
     ).toThrow(/legacy apply/)
+    expect(() =>
+      createMarkdownEditorCommandSnapshot(
+        [{ ...bold, presentation: ['toolbar', 'unknown' as never] }],
+        ctx,
+      ),
+    ).toThrow(/invalid presentation/)
+    expect(() =>
+      createMarkdownEditorCommandSnapshot(
+        [{ ...bold, priority: Number.NaN }],
+        ctx,
+      ),
+    ).toThrow(/priority must be finite/)
     expect(() =>
       resolveMarkdownEditorShortcut(
         [
@@ -283,10 +295,18 @@ describe("Issue #433: Locale authority, command/mode/capability, and zero write 
           searchPlaceholder: `${locale}-search`,
           title: `${locale}-palette`,
         },
+        commandGroups: {
+          block: `${locale}-block`,
+          format: `${locale}-format`,
+          insert: `${locale}-insert`,
+        },
       }),
     )
     expect(new Set(locales.map((locale) => locale.editorAria)).size).toBe(8)
     expect(new Set(locales.map((locale) => locale.modes.source)).size).toBe(8)
+    expect(new Set(locales.map((locale) => locale.commandGroups.format)).size).toBe(
+      8,
+    )
     expect(
       locales.every(
         (locale) =>
@@ -367,6 +387,13 @@ describe("Issue #366: Command toolbar density, grouping, and overflow", () => {
     ).map((command) => command.key)
     expect(reversed).toEqual(forward)
     expect(forward[0]).toBe("command-999")
+    expect(
+      resolveMarkdownEditorPrimaryCommands(
+        [...thousandCommands].reverse(),
+        "standard",
+        ["command-1", "command-999"],
+      ).map((command) => command.key),
+    ).toEqual(["command-999", "command-1"])
     expect(resolveMarkdownEditorPrimaryCommands([], "full")).toEqual([])
     expect(
       resolveMarkdownEditorOverflowCommands(thousandCommands, "minimal"),

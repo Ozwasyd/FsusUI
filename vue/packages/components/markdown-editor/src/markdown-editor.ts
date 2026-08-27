@@ -363,7 +363,9 @@ export const resolveMarkdownEditorPrimaryCommands = <
 ): T[] => {
   const keySet = primaryKeys?.length ? new Set(primaryKeys) : null
   const selected = keySet
-    ? commands.filter((command) => keySet.has(command.key))
+    ? sortMarkdownEditorCommands(
+        commands.filter((command) => keySet.has(command.key)),
+      )
     : sortMarkdownEditorCommands(commands)
   return selected.slice(
     0,
@@ -384,7 +386,9 @@ export const resolveMarkdownEditorOverflowCommands = <
 ): T[] => {
   const keySet = primaryKeys?.length ? new Set(primaryKeys) : null
   if (keySet) {
-    return commands.filter((command) => !keySet.has(command.key))
+    return sortMarkdownEditorCommands(
+      commands.filter((command) => !keySet.has(command.key)),
+    )
   }
   return sortMarkdownEditorCommands(commands).slice(
     resolveMarkdownEditorToolbarLimit(density, commands.length),
@@ -463,6 +467,7 @@ export interface MarkdownEditorLocaleText {
     searchPlaceholder: string
     title: string
   }>
+  readonly commandGroups: Readonly<Record<string, string>>
   readonly surfaces: Readonly<{
     selectionToolbar: string
     slashMenu: string
@@ -578,6 +583,11 @@ export const defaultMarkdownEditorLocaleText: MarkdownEditorLocaleText =
       searchPlaceholder: '搜索命令',
       title: '命令面板',
     }),
+    commandGroups: Object.freeze({
+      block: '块',
+      format: '格式',
+      insert: '插入',
+    }),
     surfaces: Object.freeze({
       selectionToolbar: '选区工具',
       slashMenu: '块插入命令',
@@ -665,6 +675,10 @@ export const resolveMarkdownEditorLocaleText = (
   commandPalette: {
     ...defaultMarkdownEditorLocaleText.commandPalette,
     ...localeText?.commandPalette,
+  },
+  commandGroups: {
+    ...defaultMarkdownEditorLocaleText.commandGroups,
+    ...localeText?.commandGroups,
   },
   surfaces: {
     ...defaultMarkdownEditorLocaleText.surfaces,

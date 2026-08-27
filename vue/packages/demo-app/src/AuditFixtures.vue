@@ -185,6 +185,7 @@
       v-if="markdownEditorTransactionFixture && markdownEditorMountReady"
       data-testid="markdown-editor-transaction-fixture"
       :data-markdown-editor-probe-id="markdownEditorProbeId"
+      :dir="markdownCommandDirection"
     >
       <el-markdown-editor
         ref="markdownTransactionEditor"
@@ -194,9 +195,12 @@
           markdownPasteGate === 'preview-only' ? 'preview' : 'source'
         "
         :disabled="markdownPasteGate === 'disabled'"
+        :locale-text="markdownCommandLocaleText"
         :min-rows="6"
+        :mobile-layout="markdownCommandMobileLayout"
         :show-actions="false"
         :show-mode-switcher="false"
+        :status-density="markdownCommandStatusDensity"
         :surfaces="
           markdownCommandSurfacesFixture
             ? {
@@ -1862,6 +1866,7 @@ import type {
   MarkdownEditorDispatchResult,
   MarkdownEditorHistoryState,
   MarkdownEditorInstance,
+  MarkdownEditorLocaleTextOverride,
   MarkdownEditorSelectionEvent,
   MarkdownEditorTransactionEvent,
 } from '../../element-plus'
@@ -2001,6 +2006,83 @@ const markdownCommandSurfacesFixture =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('markdownCommandSurfaces') ===
     '1'
+const markdownCommandLocale =
+  typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('markdownLocale')
+    : null
+const markdownCommandDirection =
+  markdownCommandLocale === 'ar' || markdownCommandLocale === 'he'
+    ? 'rtl'
+    : 'ltr'
+const markdownCommandStatusDensity =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownStatus') ===
+    'detailed'
+    ? 'detailed'
+    : typeof window !== 'undefined' &&
+        new URLSearchParams(window.location.search).get('markdownStatus') ===
+          'none'
+      ? 'none'
+      : 'minimal'
+const markdownCommandMobileLayout =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownMobile') ===
+    'compact'
+    ? 'compact'
+    : 'standard'
+const markdownCommandLocaleText =
+  computed<MarkdownEditorLocaleTextOverride | undefined>(() => {
+    if (!markdownCommandLocale) return undefined
+    const prefix =
+      markdownCommandLocale === 'long'
+        ? 'A deliberately extended localization fixture that preserves every semantic label'
+        : markdownCommandLocale.toUpperCase()
+    const label = (value: string) => `${prefix} ${value}`
+    return {
+      commandGroups: {
+        block: label('block'),
+        format: label('format'),
+        insert: label('insert'),
+      },
+      commandPalette: {
+        empty: label('empty'),
+        results: (count: number) => label(`${count} results`),
+        searchPlaceholder: label('search commands'),
+        title: label('command palette'),
+      },
+      commands: {
+        bold: label('bold'),
+        code: label('code'),
+        heading: label('heading'),
+        image: label('image'),
+        italic: label('italic'),
+        link: label('link'),
+        quote: label('quote'),
+      },
+      editorAria: label('Markdown editor'),
+      metrics: {
+        bytes: label('bytes'),
+        characters: label('characters'),
+        column: label('column'),
+        line: label('line'),
+        lines: label('lines'),
+        selected: label('selected'),
+        words: label('words'),
+      },
+      overflow: label('format tools'),
+      overflowAria: (count: number) => label(`${count} format tools`),
+      surfaces: {
+        commandPending: label('command pending'),
+        commandRejected: label('command rejected'),
+        selectionToolbar: label('selection toolbar'),
+        slashMenu: label('slash menu'),
+      },
+      textarea: {
+        live: label('live editor'),
+        source: label('source editor'),
+      },
+    }
+  })
 const markdownPasteGate =
   typeof window !== 'undefined'
     ? new URLSearchParams(window.location.search).get('markdownPasteGate')
