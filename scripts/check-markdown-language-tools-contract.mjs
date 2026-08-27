@@ -205,6 +205,11 @@ const inspectCommitGuards = (source, errors) => {
     'session kind conflict',
   )
   requireGuard(
+    ['input.session.active', 'input.session.revision'],
+    'stale-session',
+    'stale session',
+  )
+  requireGuard(
     ['sameSelection', 'input.currentSelection', 'input.session.selection'],
     'stale-selection',
     'stale selection',

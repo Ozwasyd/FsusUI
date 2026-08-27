@@ -103,5 +103,26 @@
     "find": "history: 'separate' as const,",
     "replace": "history: 'merge' as const,",
     "expectError": "requires separate input history"
+  },
+  {
+    "name": "stale-session-commit",
+    "file": "core",
+    "find": "if (!input.session.active || input.session.revision !== input.revision) {",
+    "replace": "if (false) {",
+    "expectError": "stale session rejection guard is required"
+  },
+  {
+    "name": "code-url-global-spellcheck-disabled",
+    "file": "web",
+    "find": "textarea.spellcheck = baseCapability().spellcheck",
+    "replace": "textarea.spellcheck = false",
+    "expectError": "must not globally disable spellcheck"
+  },
+  {
+    "name": "second-input-pipeline",
+    "file": "web",
+    "find": "commitMarkdownLanguageToolMutation(input)",
+    "replace": "Object.freeze({ accepted: true })",
+    "expectError": "must use the language-tool transaction adapter"
   }
 ]

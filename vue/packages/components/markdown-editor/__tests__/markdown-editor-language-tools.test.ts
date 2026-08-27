@@ -77,6 +77,7 @@ const commitFixture = (options?: {
   readonly projectionRevision?: number
   readonly rawHtml?: string
   readonly revision?: number
+  readonly sessionActive?: boolean
   readonly sessionKind?: 'spellcheck' | 'dictation' | 'writing-tools'
   readonly sessionSelection?: MarkdownEditorSelection
   readonly source?: string
@@ -116,7 +117,10 @@ const commitFixture = (options?: {
     projectionRevision: options?.projectionRevision ?? revision,
     rawHtml: options?.rawHtml,
     revision,
-    session,
+    session:
+      options?.sessionActive === false
+        ? Object.freeze({ ...session, active: false })
+        : session,
     source,
     to,
   })
@@ -310,6 +314,7 @@ describe('markdown language tool adapter', () => {
     expect(
       commitFixture({ kind: 'dictation', sessionKind: 'spellcheck' }).reason,
     ).toBe('session-kind-conflict')
+    expect(commitFixture({ sessionActive: false }).reason).toBe('stale-session')
     expect(
       commitFixture({
         currentSelection: { direction: 'none', end: 8, start: 8 },
@@ -453,5 +458,31 @@ describe('markdown language tool adapter', () => {
         to: 39,
       }).reason,
     ).toBe('atomic-node')
+
+    const nestedSource = 'abc def'
+    const nestedProjection = projectionFixture(nestedSource, identity, [
+      {
+        id: 'left',
+        kind: 'paragraph',
+        presentation: 'live-decorated',
+        rawRange: { end: 3, start: 0 },
+      },
+      {
+        id: 'right',
+        kind: 'paragraph',
+        presentation: 'live-decorated',
+        rawRange: { end: 7, start: 4 },
+      },
+    ])
+    expect(
+      commitFixture({
+        currentSelection: { direction: 'forward', end: 5, start: 2 },
+        from: 2,
+        projection: nestedProjection,
+        sessionSelection: { direction: 'forward', end: 5, start: 2 },
+        source: nestedSource,
+        to: 5,
+      }).reason,
+    ).toBe('nested-syntax')
   })
 })
