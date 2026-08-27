@@ -235,10 +235,25 @@ public class FsusTreeContextMenuHeadlessTests
       var fixture = CreateFixture(theme, width, density);
       fixture.Window.Show();
       Arrange(fixture.Root, width, height);
-      Assert.True(fixture.Tree.RequestNodeContext(
-        "service",
-        FsusTreeInteractionSource.Keyboard));
+      var serviceRow =
+        FindByAutomationId(fixture.Tree, "fsus-tree-node-service");
+      var serviceOrigin =
+        serviceRow.TranslatePoint(default, fixture.Window) ?? default;
+      var contextPoint = new Point(
+        serviceOrigin.X + Math.Max(1, serviceRow.Bounds.Width - 24),
+        serviceOrigin.Y + serviceRow.Bounds.Height / 2);
+      Click(fixture.Window, contextPoint, MouseButton.Right);
       Arrange(fixture.Root, width, height);
+      Assert.True(fixture.Menu.IsOpen);
+      Assert.Equal("service", fixture.Menu.TargetKey);
+      Assert.Equal("service", fixture.Tree.FocusedKey);
+      Assert.Contains("service", fixture.Tree.SelectedKeys);
+      Assert.Equal(
+        new Rect(
+          fixture.Window.TranslatePoint(contextPoint, fixture.Host) ??
+            contextPoint,
+          new Size(1, 1)),
+        fixture.Menu.OverlayEntry!.Options.AnchorBounds);
       var fileName =
         $"tree-context-menu-{theme.ToString().ToLowerInvariant()}-{density.ToString().ToLowerInvariant()}-zoom-{zoom}.png";
       var path = Path.Combine(outputRoot, fileName);
@@ -279,35 +294,89 @@ public class FsusTreeContextMenuHeadlessTests
         TimeSpan.FromMilliseconds(1),
         Assert.IsType<TimeSpan>(
           Application.Current!.Resources[FsusThemeResourceKeys.MotionDurationEffective]));
+      var menuBounds = fixture.Menu.Bounds;
+      var menuPlacement = fixture.Menu.EffectivePlacement.ToString();
+      var contextAnchorBounds = fixture.Menu.OverlayEntry.Options.AnchorBounds;
+      var treeRows = fixture.Tree.GetLogicalDescendants()
+        .OfType<Border>()
+        .Where(row => (AutomationProperties.GetAutomationId(row) ?? string.Empty)
+          .StartsWith("fsus-tree-node-", StringComparison.Ordinal))
+        .Select(row => new TreeRowCapture(
+          AutomationProperties.GetAutomationId(row) ?? string.Empty,
+          AutomationProperties.GetName(row) ?? string.Empty,
+          AutomationProperties.GetItemStatus(row) ?? string.Empty,
+          new Rect(
+            row.TranslatePoint(default, fixture.Root) ?? default,
+            row.Bounds.Size)))
+        .ToArray();
+      fixture.Window.KeyPress(
+        Key.Escape,
+        RawInputModifiers.None,
+        PhysicalKey.Escape,
+        null);
+      Arrange(fixture.Root, width, height);
+      Assert.False(fixture.Menu.IsOpen);
+      Assert.Same(fixture.Tree, fixture.Host.LastRestoredFocus);
       captures.Add(new RenderCapture(
         path,
         theme.ToString().ToLowerInvariant(),
         density.ToString().ToLowerInvariant(),
         zoom,
         Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(path))),
-        fixture.Menu.EffectivePlacement.ToString(),
-        fixture.Menu.Bounds,
+        menuPlacement,
+        menuBounds,
         expectedItemHeight,
-        items.Select(item => item.Bounds).ToArray()));
+        items.Select(item => item.Bounds).ToArray(),
+        contextAnchorBounds,
+        fixture.Menu.TargetKey,
+        fixture.Tree.FocusedKey,
+        fixture.Tree.SelectedKeys.ToArray(),
+        treeRows,
+        "Escape",
+        ReferenceEquals(fixture.Tree, fixture.Host.LastRestoredFocus)));
       fixture.Window.Close();
     }
 
     var collision = CreateFixture(FsusThemeVariant.Light, 450);
     collision.Menu.ViewportBounds = new Rect(0, 0, 450, 520);
     collision.Menu.OverlaySize = new Size(250, 240);
+    var collisionTarget = new Button
+    {
+      Content = "Bottom-edge target",
+      HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left,
+      VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Bottom,
+      Margin = new Thickness(180, 0, 0, 8),
+    };
+    collision.Root.Children.Insert(
+      collision.Root.Children.Count - 1,
+      collisionTarget);
+    FsusContextMenuService.Attach(collisionTarget, collision.Menu, collision.Host);
     collision.Window.Show();
     Arrange(collision.Root, 450, 520);
-    collision.Host.IsHitTestVisible = true;
-    collision.Menu.Open(
-      collision.Host,
-      new FsusContextMenuRequest(
-        "collision-target",
-        FsusTreeInteractionSource.Keyboard,
-        new Rect(180, 500, 20, 12),
-        collision.Tree));
+    Click(
+      collision.Window,
+      Center(collisionTarget, collision.Window),
+      MouseButton.Right);
     Arrange(collision.Root, 450, 520);
     Assert.Equal(FsusOverlayPlacement.TopStart, collision.Menu.EffectivePlacement);
     Assert.Equal(collision.Menu.OverlayEntry!.Bounds, collision.Menu.Bounds);
+    var collisionPath =
+      Path.Combine(
+        outputRoot,
+        "tree-context-menu-light-collision-top-start-zoom-100.png");
+    using (var collisionBitmap = new RenderTargetBitmap(
+      new PixelSize(450, 520),
+      new Vector(96, 96)))
+    {
+      collisionBitmap.Render(collision.Root);
+      using var stream = File.Create(collisionPath);
+      collisionBitmap.Save(stream);
+    }
+    var collisionDigest = Convert.ToHexStringLower(
+      SHA256.HashData(File.ReadAllBytes(collisionPath)));
+    var collisionAnchorBounds =
+      collision.Menu.OverlayEntry.Options.AnchorBounds;
+    var collisionBounds = collision.Menu.Bounds;
     collision.Window.Close();
 
     var screenReaderReportPath =
@@ -429,7 +498,13 @@ public class FsusTreeContextMenuHeadlessTests
       collision = new
       {
         placement = FsusOverlayPlacement.TopStart.ToString(),
-        bounds = collision.Menu.Bounds,
+        bounds = collisionBounds,
+        anchorBounds = collisionAnchorBounds,
+        artifact = new
+        {
+          path = collisionPath,
+          sha256 = collisionDigest,
+        },
       },
     };
     File.WriteAllText(
@@ -678,5 +753,18 @@ public class FsusTreeContextMenuHeadlessTests
     string Placement,
     Rect MenuBounds,
     double ExpectedItemHeight,
-    IReadOnlyList<Rect> ItemBounds);
+    IReadOnlyList<Rect> ItemBounds,
+    Rect ContextAnchorBounds,
+    string TargetKey,
+    string FocusedTreeKey,
+    IReadOnlyList<string> SelectedTreeKeys,
+    IReadOnlyList<TreeRowCapture> TreeRows,
+    string ClosedBy,
+    bool FocusRestored);
+
+  private sealed record TreeRowCapture(
+    string AutomationId,
+    string Name,
+    string Status,
+    Rect Bounds);
 }

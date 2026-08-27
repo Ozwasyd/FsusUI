@@ -331,20 +331,32 @@ public class FsusTree : ContentControl
 
   public bool RequestNodeContext(string key, FsusTreeInteractionSource source)
   {
+    return RequestNodeContext(key, source, anchorBounds: null);
+  }
+
+  private bool RequestNodeContext(
+    string key,
+    FsusTreeInteractionSource source,
+    Rect? anchorBounds)
+  {
     var node = FindNode(key);
     if (node is null || node.IsDisabled)
     {
       return false;
     }
 
-    var anchorBounds = ResolveNodeAnchorBounds(key);
+    var resolvedAnchorBounds = anchorBounds ?? ResolveNodeAnchorBounds(key);
     FocusNode(key);
     if (!selectedKeys.Contains(key))
     {
       ToggleSelection(key);
     }
 
-    RaiseEvent(new FsusTreeNodeContextEventArgs(key, node, source, anchorBounds));
+    RaiseEvent(new FsusTreeNodeContextEventArgs(
+      key,
+      node,
+      source,
+      resolvedAnchorBounds));
     return true;
   }
 
@@ -608,8 +620,17 @@ public class FsusTree : ContentControl
     var point = e.GetCurrentPoint(row);
     if (point.Properties.IsRightButtonPressed)
     {
+      var rowAnchor = ResolveNodeAnchorBounds(view.Node.Key);
+      var pointerAnchor = new Rect(
+        rowAnchor.X + point.Position.X,
+        rowAnchor.Y + point.Position.Y,
+        1,
+        1);
       Focus();
-      if (RequestNodeContext(view.Node.Key, FsusTreeInteractionSource.Pointer))
+      if (RequestNodeContext(
+        view.Node.Key,
+        FsusTreeInteractionSource.Pointer,
+        pointerAnchor))
       {
         e.Handled = true;
       }

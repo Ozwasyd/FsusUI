@@ -34,6 +34,8 @@ never fire `NodeActivated`, so opening a menu does not open the file.
 (`FsusTreeNodeContextEventArgs`: node key, node, pointer/keyboard source, anchor
 bounds) and exposes `RequestNodeContext(key, source)`; set
 `NodeAnchorBoundsResolver` so the overlay can place the menu at the node.
+Real pointer requests use the pointer position inside those resolved node
+bounds; keyboard and programmatic requests use the complete node bounds.
 `FsusTabs` raises `PaneContextRequested` (`FsusTabPaneContextEventArgs`) for tab
 headers via `RequestPaneContext`.
 
