@@ -1,7 +1,9 @@
+using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using FsusUI.Avalonia.Overlay;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -132,6 +134,18 @@ public sealed class FsusTreeLazyLoadEventArgs(
   public Exception? Exception { get; } = exception;
 }
 
+public sealed class FsusTreeNodeContextEventArgs(
+  string key,
+  FsusTreeNode node,
+  FsusTreeInteractionSource source,
+  Rect anchorBounds) : RoutedEventArgs(FsusTree.NodeContextRequestedEvent)
+{
+  public string Key { get; } = key;
+  public FsusTreeNode Node { get; } = node;
+  public FsusTreeInteractionSource InteractionSource { get; } = source;
+  public Rect AnchorBounds { get; } = anchorBounds;
+}
+
 public class FsusTree : ContentControl
 {
   private readonly List<FsusTreeNodeView> flattenedNodes = [];
@@ -154,6 +168,7 @@ public class FsusTree : ContentControl
   public bool Checkable { get; set; }
   public Func<FsusTreeNode, bool>? Filter { get; set; }
   public FsusTreeChildrenLoader? ChildrenLoader { get; set; }
+  public Func<string, Rect>? NodeAnchorBoundsResolver { get; set; }
   public string FocusedKey { get; private set; } = string.Empty;
   public bool LastLoadCanceled { get; private set; }
   public IReadOnlyList<FsusTreeNodeView> FlattenedNodes => flattenedNodes.AsReadOnly();
@@ -165,6 +180,17 @@ public class FsusTree : ContentControl
   public event EventHandler<FsusTreeSelectionChangedEventArgs>? SelectionChanged;
   public event EventHandler<FsusTreeExpansionChangedEventArgs>? ExpansionChanged;
   public event EventHandler<FsusTreeLazyLoadEventArgs>? LazyLoadStateChanged;
+
+  public static readonly RoutedEvent<FsusTreeNodeContextEventArgs> NodeContextRequestedEvent =
+    RoutedEvent.Register<FsusTree, FsusTreeNodeContextEventArgs>(
+      nameof(NodeContextRequested),
+      RoutingStrategies.Bubble);
+
+  public event EventHandler<FsusTreeNodeContextEventArgs>? NodeContextRequested
+  {
+    add => AddHandler(NodeContextRequestedEvent, value);
+    remove => RemoveHandler(NodeContextRequestedEvent, value);
+  }
 
   public virtual void RefreshView()
   {
@@ -294,6 +320,25 @@ public class FsusTree : ContentControl
     return true;
   }
 
+  public bool RequestNodeContext(string key, FsusTreeInteractionSource source)
+  {
+    var node = FindNode(key);
+    if (node is null || node.IsDisabled)
+    {
+      return false;
+    }
+
+    FocusedKey = key;
+    SyncState();
+    if (!selectedKeys.Contains(key))
+    {
+      ToggleSelection(key);
+    }
+
+    RaiseEvent(new FsusTreeNodeContextEventArgs(key, node, source, ResolveNodeAnchorBounds(key)));
+    return true;
+  }
+
   public async ValueTask<bool> LoadChildrenAsync(string key)
   {
     if (ChildrenLoader is null)
@@ -409,6 +454,31 @@ public class FsusTree : ContentControl
   }
 
   protected FsusTreeNode? FindNode(string key) => FindNode(Nodes, key);
+
+  protected override void OnKeyDown(KeyEventArgs e)
+  {
+    base.OnKeyDown(e);
+    if (e.Handled || flattenedNodes.Count == 0)
+    {
+      return;
+    }
+
+    var contextRequested = e.Key switch
+    {
+      Key.F10 when e.KeyModifiers.HasFlag(KeyModifiers.Shift) => true,
+      Key.Apps => true,
+      _ => false,
+    };
+
+    if (contextRequested &&
+      RequestNodeContext(FocusedKey, FsusTreeInteractionSource.Keyboard))
+    {
+      e.Handled = true;
+    }
+  }
+
+  private Rect ResolveNodeAnchorBounds(string key) =>
+    NodeAnchorBoundsResolver?.Invoke(key) ?? new Rect(0, 0, 0, 0);
 
   private bool GestureExpand(string key)
   {

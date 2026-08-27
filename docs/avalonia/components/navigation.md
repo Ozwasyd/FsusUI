@@ -8,6 +8,11 @@ Use `FsusTabs`, `FsusTabPane`, `FsusMenu`, `FsusMenuItem`, `FsusSubMenu`,
 `FsusMenuItemGroup`, `FsusBreadcrumb`, `FsusBreadcrumbItem`, `FsusPageHeader`,
 `FsusSteps`, and `FsusStep`.
 
+Tab headers raise the typed `PaneContextRequested` event
+(`FsusTabPaneContextEventArgs`) through right-click, `Shift+F10`/`Apps`, or
+`RequestPaneContext(key, source)` without changing the selected tab; compose it
+with the shared context-menu surface described in `tree.md`.
+
 ## Vue Contract Mapping
 
 Vue active keys, tab panes, menu item groups, breadcrumbs, page header actions,

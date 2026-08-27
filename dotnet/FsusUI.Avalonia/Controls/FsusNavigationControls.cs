@@ -3,6 +3,8 @@ using Avalonia.Automation;
 using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.VisualTree;
 using System.Globalization;
 
 namespace FsusUI.Avalonia.Controls;
@@ -15,6 +17,16 @@ public sealed class FsusNavigationSelectionChangedEventArgs(string selectedKey) 
 public sealed class FsusNavigationActivatedEventArgs(string key) : EventArgs
 {
   public string Key { get; } = key;
+}
+
+public sealed class FsusTabPaneContextEventArgs(
+  string paneKey,
+  FsusTabPane pane,
+  FsusTreeInteractionSource source) : RoutedEventArgs(FsusTabs.PaneContextRequestedEvent)
+{
+  public string PaneKey { get; } = paneKey;
+  public FsusTabPane Pane { get; } = pane;
+  public FsusTreeInteractionSource InteractionSource { get; } = source;
 }
 
 public enum FsusStepStatus
@@ -41,6 +53,17 @@ public class FsusTabs : TabControl
   }
 
   public new event EventHandler<FsusNavigationSelectionChangedEventArgs>? SelectionChanged;
+
+  public static readonly RoutedEvent<FsusTabPaneContextEventArgs> PaneContextRequestedEvent =
+    RoutedEvent.Register<FsusTabs, FsusTabPaneContextEventArgs>(
+      nameof(PaneContextRequested),
+      RoutingStrategies.Bubble);
+
+  public event EventHandler<FsusTabPaneContextEventArgs>? PaneContextRequested
+  {
+    add => AddHandler(PaneContextRequestedEvent, value);
+    remove => RemoveHandler(PaneContextRequestedEvent, value);
+  }
 
   public IList<FsusTabPane> Panes => panes;
 
@@ -90,6 +113,40 @@ public class FsusTabs : TabControl
     if (next is not null)
     {
       SelectKey(next.Key);
+    }
+  }
+
+  public bool RequestPaneContext(string key, FsusTreeInteractionSource source)
+  {
+    var pane = panes.FirstOrDefault((candidate) => candidate.Key == key);
+    if (pane is null || !pane.IsEnabled)
+    {
+      return false;
+    }
+
+    FocusedKey = pane.Key;
+    RaiseEvent(new FsusTabPaneContextEventArgs(pane.Key, pane, source));
+    return true;
+  }
+
+  protected override void OnKeyDown(KeyEventArgs e)
+  {
+    base.OnKeyDown(e);
+    if (e.Handled || panes.Count == 0)
+    {
+      return;
+    }
+
+    var contextRequested = e.Key switch
+    {
+      Key.F10 when e.KeyModifiers.HasFlag(KeyModifiers.Shift) => true,
+      Key.Apps => true,
+      _ => false,
+    };
+
+    if (contextRequested && RequestPaneContext(FocusedKey, FsusTreeInteractionSource.Keyboard))
+    {
+      e.Handled = true;
     }
   }
 
@@ -151,6 +208,40 @@ public class FsusTabPane : TabItem
   {
     get => GetValue(KeyProperty);
     set => SetValue(KeyProperty, value);
+  }
+
+  protected override void OnPointerPressed(PointerPressedEventArgs e)
+  {
+    base.OnPointerPressed(e);
+    if (string.IsNullOrEmpty(Key) ||
+      !e.GetCurrentPoint(this).Properties.IsRightButtonPressed)
+    {
+      return;
+    }
+
+    var owner = FindOwningTabs(this);
+    if (owner is null || !owner.RequestPaneContext(Key, FsusTreeInteractionSource.Pointer))
+    {
+      return;
+    }
+
+    e.Handled = true;
+  }
+
+  private static FsusTabs? FindOwningTabs(Visual visual)
+  {
+    var parent = visual.GetVisualParent();
+    while (parent is not null)
+    {
+      if (parent is FsusTabs tabs)
+      {
+        return tabs;
+      }
+
+      parent = parent.GetVisualParent();
+    }
+
+    return null;
   }
 
   protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)

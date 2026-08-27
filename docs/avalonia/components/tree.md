@@ -22,6 +22,46 @@ Space toggles selection and Right/Left expand/collapse; programmatic
 or expansion events (`SelectionChanged` reports every state change). A stale
 lazy-load request reports `Canceled` and never emits a stale `Completed`.
 
+## Context Menus
+
+Tree nodes and document tabs share the composable context-menu surface
+(`FsusContextMenu`, `FsusContextMenuItem`, `FsusContextMenuSeparator`, and the
+attachable `FsusContextMenuService`). Right-click and keyboard context requests
+(`Shift+F10`, `Apps`) synchronize selection and focus before the menu opens and
+never fire `NodeActivated`, so opening a menu does not open the file.
+
+`FsusTree` raises the typed `NodeContextRequested` event
+(`FsusTreeNodeContextEventArgs`: node key, node, pointer/keyboard source, anchor
+bounds) and exposes `RequestNodeContext(key, source)`; set
+`NodeAnchorBoundsResolver` so the overlay can place the menu at the node.
+`FsusTabs` raises `PaneContextRequested` (`FsusTabPaneContextEventArgs`) for tab
+headers via `RequestPaneContext`.
+
+```csharp
+using FsusUI.Avalonia.Controls;
+using FsusUI.Avalonia.Overlay;
+
+var host = new FsusOverlayHost();
+var menu = new FsusContextMenu { AccessibleName = "File actions" };
+menu.Items.Add(new FsusContextMenuItem { Key = "rename", Header = "Rename" });
+menu.Items.Add(new FsusContextMenuSeparator());
+menu.Items.Add(new FsusContextMenuItem { Key = "delete", Header = "Delete", IsDangerous = true });
+menu.ItemActivated += (_, args) => RunTreeAction(args.TargetKey, args.ActionKey);
+
+tree.NodeContextRequested += (_, args) =>
+  menu.Open(host, new FsusContextMenuRequest(
+    args.Key, args.InteractionSource, args.AnchorBounds));
+tree.NodeAnchorBoundsResolver = key => nodeScreenBounds(key);
+
+// Document tabs (or any control):
+FsusContextMenuService.Attach(docTab, menu, host);
+```
+
+Disabled nodes and panes do not request context menus. Choosing an enabled item
+raises a typed activation with the target and action keys and restores focus to
+the invoker; Escape, outside pointer presses, and viewport collision (flip to a
+top-start placement) are handled by the anchored overlay host.
+
 ## Vue Contract Mapping
 
 Vue tree, tree-v2, tree-select, and tree-table contracts map to node keys,
