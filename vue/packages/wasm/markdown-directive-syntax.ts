@@ -9,6 +9,7 @@ import type { MarkdownParserSyntaxNode } from './markdown-syntax-collect'
 export interface MarkdownDirectiveDiagnostic {
   readonly code: string
   readonly message: string
+  readonly normalizedRange: MarkdownParserSyntaxNode['contentRanges'][number]
 }
 
 export interface MarkdownDirectiveCollectResult {
@@ -75,6 +76,8 @@ export const mergeMarkdownDirectiveSyntax = (
     kind: string,
     lineStart: number,
     lineEnd: number,
+    contentRanges: readonly { readonly start: number; readonly end: number }[],
+    markerRanges: readonly { readonly start: number; readonly end: number }[],
     diagnostic?: { readonly code: string; readonly message: string },
   ) => {
     const start = utf16ToUtf8(normalizedSource, lineStart)
@@ -83,38 +86,103 @@ export const mergeMarkdownDirectiveSyntax = (
     const end = atLineStart
       ? exclusiveUtf8End(normalizedSource, lineStart, lineEnd)
       : utf16ToUtf8(normalizedSource, lineEnd)
-    extra.push({ kind, start, end })
-    if (diagnostic) diagnostics.push(Object.freeze(diagnostic))
+    const mapRanges = (
+      ranges: readonly { readonly start: number; readonly end: number }[],
+    ) =>
+      Object.freeze(
+        ranges.map((range) =>
+          Object.freeze({
+            start: utf16ToUtf8(normalizedSource, range.start),
+            end: utf16ToUtf8(normalizedSource, range.end),
+          }),
+        ),
+      )
+    extra.push({
+      kind,
+      start,
+      end,
+      status: diagnostic ? 'malformed' : 'valid',
+      diagnosticCode: diagnostic?.code ?? null,
+      contentRanges: mapRanges(contentRanges),
+      markerRanges: mapRanges(markerRanges),
+    })
+    if (diagnostic) {
+      diagnostics.push(
+        Object.freeze({
+          ...diagnostic,
+          normalizedRange: Object.freeze({ start, end }),
+        }),
+      )
+    }
   }
 
   for (const embed of embeds) {
     if ('ranges' in embed) {
-      pushDirective('embed', embed.ranges.full.start, embed.ranges.full.end)
+      pushDirective(
+        'embed',
+        embed.ranges.full.start,
+        embed.ranges.full.end,
+        [embed.ranges.target, embed.ranges.mode],
+        [embed.ranges.marker],
+      )
     } else {
-      pushDirective('malformed', embed.range.start, embed.range.end, {
-        code: embed.code,
-        message: embed.message,
-      })
+      pushDirective(
+        'malformed',
+        embed.range.start,
+        embed.range.end,
+        [embed.range],
+        [],
+        {
+          code: embed.code,
+          message: embed.message,
+        },
+      )
     }
   }
   for (const caption of captions) {
     if ('ranges' in caption) {
-      pushDirective('caption', caption.ranges.full.start, caption.ranges.full.end)
+      pushDirective(
+        'caption',
+        caption.ranges.full.start,
+        caption.ranges.full.end,
+        [caption.ranges.text],
+        [caption.ranges.marker],
+      )
     } else {
-      pushDirective('malformed', caption.range.start, caption.range.end, {
-        code: caption.code,
-        message: caption.message,
-      })
+      pushDirective(
+        'malformed',
+        caption.range.start,
+        caption.range.end,
+        [caption.range],
+        [],
+        {
+          code: caption.code,
+          message: caption.message,
+        },
+      )
     }
   }
   for (const anchor of anchors) {
     if ('ranges' in anchor) {
-      pushDirective('anchor', anchor.ranges.full.start, anchor.ranges.full.end)
+      pushDirective(
+        'anchor',
+        anchor.ranges.full.start,
+        anchor.ranges.full.end,
+        [anchor.ranges.id],
+        [anchor.ranges.marker],
+      )
     } else {
-      pushDirective('malformed', anchor.range.start, anchor.range.end, {
-        code: anchor.code,
-        message: anchor.message,
-      })
+      pushDirective(
+        'malformed',
+        anchor.range.start,
+        anchor.range.end,
+        [anchor.range],
+        [],
+        {
+          code: anchor.code,
+          message: anchor.message,
+        },
+      )
     }
   }
 

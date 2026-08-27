@@ -7,6 +7,7 @@
 namespace {
 
 std::string g_syntax_json;
+std::string g_syntax_kinds_json;
 
 void append_json_string(std::string& out, std::string_view value) {
   out.push_back('"');
@@ -17,6 +18,26 @@ void append_json_string(std::string& out, std::string_view value) {
     out.push_back(ch);
   }
   out.push_back('"');
+}
+
+void append_json_ranges(
+  std::string& out,
+  const std::vector<fsusblog::wasm::markdown::syntax_range>& ranges
+) {
+  out.push_back('[');
+  bool first = true;
+  for (const auto& range : ranges) {
+    if (!first) {
+      out.push_back(',');
+    }
+    first = false;
+    out.append("{\"start\":");
+    out.append(std::to_string(range.start_offset));
+    out.append(",\"end\":");
+    out.append(std::to_string(range.end_offset));
+    out.push_back('}');
+  }
+  out.push_back(']');
 }
 
 } // namespace
@@ -63,6 +84,23 @@ int markdown_syntax_collect(const char* source_ptr, int source_len) {
     g_syntax_json.append(std::to_string(node.start_offset));
     g_syntax_json.append(",\"end\":");
     g_syntax_json.append(std::to_string(node.end_offset));
+    g_syntax_json.append(",\"status\":");
+    append_json_string(
+      g_syntax_json,
+      node.status == fsusblog::wasm::markdown::syntax_status::malformed
+        ? "malformed"
+        : "valid"
+    );
+    g_syntax_json.append(",\"diagnosticCode\":");
+    if (node.diagnostic_code.empty()) {
+      g_syntax_json.append("null");
+    } else {
+      append_json_string(g_syntax_json, node.diagnostic_code);
+    }
+    g_syntax_json.append(",\"contentRanges\":");
+    append_json_ranges(g_syntax_json, node.content_ranges);
+    g_syntax_json.append(",\"markerRanges\":");
+    append_json_ranges(g_syntax_json, node.marker_ranges);
     if (node.parent_index < nodes.size()) {
       const auto& parent = nodes[node.parent_index];
       g_syntax_json.append(",\"parentStart\":");
@@ -89,6 +127,34 @@ int markdown_syntax_collect(const char* source_ptr, int source_len) {
   }
   g_syntax_json.push_back(']');
   return 1;
+}
+
+const char* markdown_syntax_kinds_json_ptr() {
+  if (g_syntax_kinds_json.empty()) {
+    g_syntax_kinds_json.push_back('[');
+    for (
+      std::uint8_t value = 0;
+      value < static_cast<std::uint8_t>(fsusblog::wasm::markdown::syntax_kind::count);
+      ++value
+    ) {
+      if (value > 0) {
+        g_syntax_kinds_json.push_back(',');
+      }
+      append_json_string(
+        g_syntax_kinds_json,
+        fsusblog::wasm::markdown::syntax_kind_name(
+          static_cast<fsusblog::wasm::markdown::syntax_kind>(value)
+        )
+      );
+    }
+    g_syntax_kinds_json.push_back(']');
+  }
+  return g_syntax_kinds_json.c_str();
+}
+
+int markdown_syntax_kinds_json_len() {
+  markdown_syntax_kinds_json_ptr();
+  return static_cast<int>(g_syntax_kinds_json.size());
 }
 
 const char* markdown_syntax_json_ptr() {
