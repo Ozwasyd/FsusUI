@@ -61,6 +61,126 @@ test('KeyValue label uses 12px', async ({ page }, testInfo) => {
   expect(parseFloat(fontSize)).toBe(12)
 })
 
+test('ordinary metric labels and values stay within the approved typography budget', async ({
+  page,
+}, testInfo) => {
+  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
+    waitUntil: 'domcontentloaded',
+  })
+  await stabilizePage(page)
+
+  const selectors = [
+    '.el-distribution-bar-row__value',
+    '.el-key-value-item__label',
+    '.el-key-value-item__value',
+    '.el-status-summary__label',
+    '.el-status-summary__status',
+    '.el-diagnostics-item__detail-toggle',
+    '.el-copyable-detail__button',
+  ]
+  for (const selector of selectors) {
+    await expect(page.locator(selector).first(), selector).toBeVisible()
+  }
+  const computed = await page
+    .locator(selectors.join(','))
+    .evaluateAll((elements) =>
+      elements.map((element) => {
+        const style = getComputedStyle(element)
+        return {
+          className: element.className,
+          fontSize: Number.parseFloat(style.fontSize),
+          fontWeight: Number.parseInt(style.fontWeight, 10),
+        }
+      }),
+    )
+
+  expect(computed.length).toBeGreaterThan(0)
+  for (const entry of computed) {
+    expect([12, 14, 16], entry.className).toContain(entry.fontSize)
+    expect(entry.fontWeight, entry.className).toBeLessThanOrEqual(500)
+  }
+})
+
+test('default key labels omit punctuation and the explicit motif remains decorative gray', async ({
+  page,
+}, testInfo) => {
+  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
+    waitUntil: 'domcontentloaded',
+  })
+  await stabilizePage(page)
+
+  const labels = page.locator('.el-key-value-item__label')
+  const pseudoContent = await labels.evaluateAll((elements) =>
+    elements.map((element) => getComputedStyle(element, '::before').content),
+  )
+  expect(
+    pseudoContent.every(
+      (content) => content === 'none' || content === 'normal',
+    ),
+  ).toBe(true)
+
+  const motif = page.locator(
+    '.el-key-value-item__badge [aria-label="Highlighted metric"]',
+  )
+  await expect(motif).toHaveText('·')
+  const colors = await motif.evaluate((element) => {
+    const probe = document.createElement('span')
+    probe.style.color = 'var(--fsus-dot-gray)'
+    document.body.append(probe)
+    const expected = getComputedStyle(probe).color
+    probe.remove()
+    return {
+      actual: getComputedStyle(element.parentElement as Element).color,
+      expected,
+    }
+  })
+  expect(colors.actual).toBe(colors.expected)
+})
+
+test('CJK and RTL metric content preserve hierarchy and direction', async ({
+  page,
+}, testInfo) => {
+  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
+    waitUntil: 'domcontentloaded',
+  })
+  await stabilizePage(page)
+
+  const cjk = page.locator('[data-metric-typography="cjk"]')
+  const rtl = page.locator('[data-metric-typography="rtl"]')
+  await expect(cjk.getByText('请求延迟')).toBeVisible()
+  await expect(rtl.getByText('زمن الاستجابة')).toBeVisible()
+  await expect(rtl).toHaveAttribute('dir', 'rtl')
+
+  for (const item of [cjk, rtl]) {
+    const geometry = await item.evaluate((element) => ({
+      clientWidth: element.clientWidth,
+      scrollWidth: element.scrollWidth,
+    }))
+    expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.clientWidth)
+  }
+})
+
+test('long and RTL metric content reflows at 200 percent zoom', async ({ page }, testInfo) => {
+  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
+  await stabilizePage(page)
+  await page.evaluate(() => {
+    document.documentElement.style.zoom = '200%'
+  })
+
+  for (const selector of [
+    '[data-metric-typography="long"]',
+    '[data-metric-typography="rtl"]',
+  ]) {
+    const item = page.locator(selector)
+    await expect(item).toBeVisible()
+    const geometry = await item.evaluate((element) => ({
+      clientWidth: element.clientWidth,
+      scrollWidth: element.scrollWidth,
+    }))
+    expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.clientWidth)
+  }
+})
+
 // MetricList flat
 test('MetricList has no card surface', async ({ page }, testInfo) => {
   await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
@@ -110,7 +230,7 @@ test('CopyableDetail focus uses inset ring', async ({ page }, testInfo) => {
 test('metric variants render without visual break', async ({ page }, testInfo) => {
   await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
   await stabilizePage(page)
-  for (const v of ['metric-default','kpi-default','kv-default','diag-default','diag-danger','copy-default']) {
+  for (const v of ['metric-default','kpi-default','distribution-default','kv-default','status-default','diag-default','diag-danger','copy-default']) {
     await expect(page.locator(`[data-metric-variant="${  v  }"]`)).toBeVisible()
   }
   await page.evaluate(async () => { await document.fonts.ready })

@@ -88,7 +88,7 @@
       "path": "vue/packages/theme-chalk/src/metric-primitives.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "f0b890cba11e5815250b8eede20c8828c076617048c1f2c295d0d45768b66d10"
+      "digest": "f0add0e061a47b08dca7def9ac00b0874cdcaaeec82d7f7020a4f92ff983bac6"
     },
     "implementation-08": {
       "path": "vue/packages/theme-chalk/src/tabs.scss",

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "1d0391b477cc30916cca7649d8aab74f7bdc812d",
+    "commitSha": "426c503dff1e82615887657cd975d38ddd831098",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "efedf2d7a3f11cbd9ecb583513d7f36c7e0068ef87e096d366b332eaac99e609",
@@ -11,7 +11,7 @@
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "fb8999fe971a025e2c5e562a9888ffbe6d1b59a37c3845ff436cc83b241cfa2b"
+    "outputHash": "63071e04b7e2c9a6664207341a8e9e1ae5aca28d3d5b9cf2046040fa070f4434"
   },
   "summary": {
     "componentModules": 93,
@@ -20,7 +20,7 @@
     "directives": 3,
     "services": 4,
     "plugins": 7,
-    "cssVariables": 483,
+    "cssVariables": 482,
     "deprecatedApis": 21,
     "componentCountByClassification": {
       "portable": 126,
@@ -33204,11 +33204,6 @@
         "vue/packages/theme-chalk/src/scrollbar.scss",
         "vue/packages/theme-chalk/src/virtual-list.scss"
       ],
-      "classification": "portable"
-    },
-    {
-      "name": "--fsus-key-value-dot-color",
-      "files": ["vue/packages/theme-chalk/src/metric-primitives.scss"],
       "classification": "portable"
     },
     {
