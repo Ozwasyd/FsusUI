@@ -57,9 +57,9 @@ describe('markdown projection worker transport', () => {
     expect(firstPlan.revision).toBe(1)
     expect(secondPlan.revision).toBe(2)
     expect(host.session.currentTask?.revision).toBe(2)
-    expect(posted.every((request) => isMarkdownProjectionWorkerRequest(request))).toBe(
-      true,
-    )
+    expect(
+      posted.every((request) => isMarkdownProjectionWorkerRequest(request)),
+    ).toBe(true)
     expect(posted[0]!.plan.invalidatedRanges.length).toBeGreaterThan(0)
 
     const late = projectMarkdownOnWorker(posted[0]!)
@@ -95,6 +95,31 @@ describe('markdown projection worker transport', () => {
     host.replaceDocument({ id: 'doc-2', epoch: 2 })
 
     expect(host.accept(reply)).toEqual({ ok: false, reason: 'document-switch' })
+  })
+
+  it('uses the source change to keep the surviving duplicate identity on the worker', () => {
+    const previousSource = '# Alpha\n\n# Alpha\n'
+    const previous = stabilize(previousSource)
+    const secondStart = previous.nodes[1]!.rawRange.start
+    const posted: MarkdownProjectionWorkerRequest[] = []
+    const host = createMarkdownProjectionWorkerHost({
+      documentIdentity: document,
+      port: { post: (request) => posted.push(request) },
+    })
+    const change = { from: 0, to: secondStart, insert: '' }
+
+    host.dispatch({
+      previous,
+      previousSource,
+      change,
+      source: applyChange(previousSource, change),
+    })
+    expect(posted[0]!.change).toEqual(change)
+    expect(posted[0]!.previous.identityState?.nextOrdinalByKind.heading).toBe(2)
+
+    const result = projectMarkdownOnWorker(posted[0]!)
+    expect(result.nodeIds).toEqual([previous.nodes[1]!.id])
+    expect(result.nodeIds).not.toContain(previous.nodes[0]!.id)
   })
 
   it('does not treat last-message-wins as a successful stale commit', () => {
