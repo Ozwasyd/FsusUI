@@ -342,7 +342,7 @@ test('inline action focus and disabled states use standard tokens without ancest
     const probe = document.createElement('button')
     probe.style.backgroundColor = 'var(--el-fill-color-light)'
     probe.style.borderColor = 'var(--el-border-color-light)'
-    probe.style.color = 'var(--el-text-color-placeholder)'
+    probe.style.color = 'var(--el-text-color-disabled)'
     document.body.append(probe)
     const probeStyle = getComputedStyle(probe)
     const state = {
