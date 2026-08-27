@@ -331,6 +331,9 @@ describe('markdown projection invalidation', () => {
     const previousSource = 'H'.repeat(sourceLength)
     const previous = {
       documentIdentity: document,
+      identityState: Object.freeze({
+        nextOrdinalByKind: Object.freeze({ heading: blockCount }),
+      }),
       normalizedSource: previousSource,
       nodes,
       resolve(id: string) {

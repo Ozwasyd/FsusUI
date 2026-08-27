@@ -18,6 +18,7 @@ import {
   type MarkdownDocumentIdentity,
   type MarkdownStableProjection,
   type MarkdownStableSyntaxNode,
+  type MarkdownSyntaxIdentityState,
 } from './markdown-syntax-identity'
 
 export const MARKDOWN_PROJECTION_WORKER_REQUEST = 'project' as const
@@ -32,6 +33,7 @@ export interface MarkdownProjectionWorkerSnapshotNode {
 
 export interface MarkdownProjectionWorkerSnapshot {
   readonly documentIdentity: MarkdownDocumentIdentity
+  readonly identityState?: MarkdownSyntaxIdentityState
   readonly normalizedSource: string
   readonly nodes: readonly MarkdownProjectionWorkerSnapshotNode[]
 }
@@ -42,6 +44,7 @@ export interface MarkdownProjectionWorkerRequest {
   readonly revision: number
   readonly documentIdentity: MarkdownDocumentIdentity
   readonly source: string
+  readonly change?: MarkdownProjectionChange
   readonly plan: Pick<
     MarkdownProjectionInvalidationPlan,
     | 'taskId'
@@ -128,6 +131,11 @@ export const snapshotMarkdownStableProjection = (
       id: projection.documentIdentity.id,
       epoch: projection.documentIdentity.epoch,
     }),
+    identityState: Object.freeze({
+      nextOrdinalByKind: Object.freeze({
+        ...projection.identityState.nextOrdinalByKind,
+      }),
+    }),
     normalizedSource: projection.normalizedSource,
     nodes: Object.freeze(
       projection.nodes.map((node) =>
@@ -175,8 +183,22 @@ export const reviveMarkdownStableProjection = (
     id: snapshot.documentIdentity.id,
     epoch: snapshot.documentIdentity.epoch,
   })
+  const nextOrdinalByKind = { ...snapshot.identityState?.nextOrdinalByKind }
+  for (const node of nodes) {
+    const parts = node.id.split(':')
+    const kind = parts[parts.length - 2]
+    const ordinal = Number(parts[parts.length - 1])
+    if (!kind || !Number.isInteger(ordinal) || ordinal < 0) continue
+    nextOrdinalByKind[kind] = Math.max(
+      nextOrdinalByKind[kind] ?? 0,
+      ordinal + 1,
+    )
+  }
   return Object.freeze({
     documentIdentity,
+    identityState: Object.freeze({
+      nextOrdinalByKind: Object.freeze(nextOrdinalByKind),
+    }),
     normalizedSource: snapshot.normalizedSource,
     nodes: Object.freeze(nodes),
     resolve(id: string) {
@@ -222,7 +244,12 @@ export const connectMarkdownProjectionWorker = (input: {
   readonly documentIdentity: MarkdownDocumentIdentity
   readonly revision?: number
   readonly worker: Pick<MarkdownProjectionWorkerScope, 'postMessage'> &
-    Partial<Pick<MarkdownProjectionWorkerScope, 'onmessage' | 'on' | 'addEventListener'>>
+    Partial<
+      Pick<
+        MarkdownProjectionWorkerScope,
+        'onmessage' | 'on' | 'addEventListener'
+      >
+    >
   readonly onCommit?: (
     result:
       | MarkdownProjectionTaskCommitOk<MarkdownProjectionWorkerResult>
@@ -255,13 +282,17 @@ export const projectMarkdownOnWorker = (
   request: MarkdownProjectionWorkerRequest,
 ): MarkdownProjectionWorkerResult => {
   if (!isMarkdownProjectionWorkerRequest(request)) {
-    throw new MarkdownRuntimeError('protocol', 'invalid projection worker request')
+    throw new MarkdownRuntimeError(
+      'protocol',
+      'invalid projection worker request',
+    )
   }
   const projection = createMarkdownEditorProjection(request.source)
   const stable = stabilizeMarkdownEditorProjection(
     projection,
     request.documentIdentity,
     reviveMarkdownStableProjection(request.previous),
+    request.change,
   )
   return Object.freeze({
     type: MARKDOWN_PROJECTION_WORKER_RESULT,
@@ -337,6 +368,7 @@ export const createMarkdownProjectionWorkerHost = (input: {
           revision: plan.revision,
           documentIdentity: plan.documentIdentity,
           source: payload.source,
+          change: Object.freeze({ ...payload.change }),
           plan: Object.freeze({
             taskId: plan.taskId,
             revision: plan.revision,
@@ -354,7 +386,10 @@ export const createMarkdownProjectionWorkerHost = (input: {
     },
     accept(reply) {
       if (!isMarkdownProjectionWorkerResult(reply)) {
-        return { ok: false as const, reason: 'aborted' as MarkdownProjectionTaskFailure }
+        return {
+          ok: false as const,
+          reason: 'aborted' as MarkdownProjectionTaskFailure,
+        }
       }
       if (!sameIdentity(reply.documentIdentity, session.documentIdentity)) {
         return { ok: false as const, reason: 'document-switch' as const }

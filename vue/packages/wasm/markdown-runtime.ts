@@ -245,6 +245,8 @@ export {
   type MarkdownDocumentIdentity,
   type MarkdownStableProjection,
   type MarkdownStableSyntaxNode,
+  type MarkdownSyntaxIdentityChange,
+  type MarkdownSyntaxIdentityState,
   type MarkdownSyntaxIdentityStatus,
 } from './markdown-syntax-identity'
 export {

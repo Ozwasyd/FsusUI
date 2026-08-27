@@ -116,6 +116,8 @@ export {
 
 export type {
   MarkdownDocumentIdentity,
+  MarkdownSyntaxIdentityChange,
+  MarkdownSyntaxIdentityState,
   MarkdownEditorPresentation,
   MarkdownEditorSyntaxStatus,
   MarkdownEditorProjectionDiagnostic,
