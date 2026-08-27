@@ -115,7 +115,7 @@ describe('Markdown editor command surface integration', () => {
     const wrapper = mount(MarkdownEditor, {
       attachTo: document.body,
       props: {
-        commands: [insertCommand, disabledCommand],
+        commands: [disabledCommand, insertCommand],
         documentIdentity: { epoch: 1, id: 'document-a' },
         localeText: {
           commandGroups: { insert: 'Insertions' },
@@ -142,6 +142,7 @@ describe('Markdown editor command surface integration', () => {
     expect(document.activeElement).toBe(input)
     expect(group.getAttribute('aria-label')).toBe('Insertions')
     expect(disabled.disabled).toBe(true)
+    expect(enabled.getAttribute('aria-selected')).toBe('true')
     const description = disabled.getAttribute('aria-describedby')
     expect(description).toBeTruthy()
     expect(document.getElementById(description!)?.textContent).toContain(

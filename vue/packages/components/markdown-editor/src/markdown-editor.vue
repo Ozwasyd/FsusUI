@@ -1376,7 +1376,12 @@ const openCommandPalette = () => {
   paletteRestoreSelection.value = captureSelection(false)
   commandPaletteOpen.value = true
   paletteQuery.value = ""
-  activePaletteIndex.value = 0
+  activePaletteIndex.value = Math.max(
+    0,
+    paletteCommands.value.findIndex(
+      (command) => !isCommandDisabled(command),
+    ),
+  )
   void nextTick(() => commandPaletteInputRef.value?.focus())
 }
 const closeCommandPalette = () => {
