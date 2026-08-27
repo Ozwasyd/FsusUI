@@ -84,7 +84,7 @@ export const commitMarkdownEmbedResult = (
   result: MarkdownEmbedResult,
 ): MarkdownEmbedResult => {
   if (!isMarkdownEmbedResultCurrent(request, result)) {
-    return Object.freeze({ ...result, status: 'stale' as const })
+    return Object.freeze({ ...request, status: 'stale' as const })
   }
   return result
 }

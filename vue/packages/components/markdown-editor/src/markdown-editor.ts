@@ -36,6 +36,12 @@ export type {
   MarkdownEditorTransactionOrigin,
   MarkdownEditorTransactionRejection,
 } from './markdown-editor-transaction'
+export type {
+  MarkdownEmbedProvider,
+  MarkdownEmbedProviderStatus,
+  MarkdownEmbedRequest,
+  MarkdownEmbedResult,
+} from '../../../wasm/markdown-embed-provider'
 
 import { type MarkdownEditorMode } from './markdown-editor-live-contract'
 

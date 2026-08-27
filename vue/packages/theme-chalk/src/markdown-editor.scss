@@ -728,6 +728,7 @@
 
 @include b(markdown-editor) {
   @include e(search-bar) {
+    box-sizing: border-box;
     position: absolute;
     top: 0;
     inset-inline-end: 0;
@@ -741,6 +742,7 @@
     background: var(--fsus-surface-overlay, var(--el-bg-color-overlay));
     box-shadow: var(--fsus-shadow-subtle, 0 4px 12px rgb(0 0 0 / 8%));
     width: min(100%, 640px);
+    min-width: 0;
     max-width: calc(100% - 16px);
   }
 
@@ -749,11 +751,14 @@
     align-items: center;
     gap: 4px;
     flex-wrap: wrap;
+    min-width: 0;
   }
 
   @include e(search-input) {
+    box-sizing: border-box;
     flex: 1 1 160px;
-    min-width: 120px;
+    min-width: min(120px, 100%);
+    max-width: 100%;
     height: var(--fsus-control-height-compact, 40px);
     padding: 0 8px;
     border: 1px solid getCssVar('border-color');
@@ -766,6 +771,10 @@
 
     &:focus-visible {
       border-color: var(--fsus-state-focus-border, var(--el-color-primary));
+      @include a11y-focus-ring(
+        2px,
+        var(--fsus-radius-control, var(--el-border-radius-base))
+      );
     }
   }
 
@@ -797,8 +806,17 @@
     }
 
     &:disabled {
-      opacity: 0.4;
+      border-color: getCssVar('disabled-border-color');
+      background: getCssVar('disabled-bg-color');
+      color: getCssVar('disabled-text-color');
       cursor: not-allowed;
+    }
+
+    &:focus-visible {
+      @include a11y-focus-ring(
+        2px,
+        var(--fsus-radius-control, var(--el-border-radius-base))
+      );
     }
 
     @include when(active) {
@@ -879,6 +897,13 @@
     &:hover {
       background: var(--fsus-state-hover-bg, var(--el-fill-color-light));
       color: getCssVar('text-color', 'primary');
+    }
+
+    &:focus-visible {
+      @include a11y-focus-ring(
+        2px,
+        var(--fsus-radius-control, var(--el-border-radius-base))
+      );
     }
   }
 }

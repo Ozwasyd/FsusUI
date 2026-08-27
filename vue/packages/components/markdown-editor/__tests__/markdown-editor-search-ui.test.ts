@@ -338,6 +338,35 @@ describe('markdown search UI and cross-mode highlight/reveal', () => {
     expect(wrapper.find('[role="search"]').exists()).toBe(false)
   })
 
+  it('keeps find available while readonly and keeps replacement blocked', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        modelValue: 'readonly alpha',
+        readonly: true,
+      },
+    })
+    await wrapper.find('textarea').trigger('keydown', {
+      ctrlKey: true,
+      key: 'f',
+    })
+    await nextTick()
+    expect(wrapper.find('[role="search"]').exists()).toBe(true)
+
+    const vm = wrapper.vm as any
+    vm.openSearch(true)
+    await nextTick()
+    await wrapper
+      .find<HTMLInputElement>('[data-testid="markdown-search-query"]')
+      .setValue('alpha')
+    expect(
+      wrapper
+        .find<HTMLButtonElement>(
+          '[data-testid="markdown-search-replace-current"]',
+        )
+        .element.disabled,
+    ).toBe(true)
+  })
+
   it('refreshes production highlights when the document changes', async () => {
     const wrapper = mount(MarkdownEditor, {
       props: { modelValue: 'alpha beta alpha' },

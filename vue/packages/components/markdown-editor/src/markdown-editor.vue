@@ -1,5 +1,6 @@
 <template>
   <section
+    ref="editorRootRef"
     v-bind="$attrs"
     :class="[
       ns.b(),
@@ -12,6 +13,7 @@
       ns.is('commands-expanded', commandsExpanded),
     ]"
     role="region"
+    tabindex="-1"
     :aria-label="localeText.editorAria"
     :data-markdown-instance="commandTrayId"
     data-markdown-scroll-container="body"
@@ -130,7 +132,7 @@
         <button
           type="button"
           :class="ns.e('search-action')"
-          :disabled="!searchMatches.length || props.readonly"
+          :disabled="!searchMatches.length || editingBlocked"
           data-testid="markdown-search-replace-current"
           @click="searchReplaceCurrent"
         >
@@ -139,7 +141,7 @@
         <button
           type="button"
           :class="ns.e('search-action')"
-          :disabled="!searchMatches.length || props.readonly"
+          :disabled="!searchMatches.length || editingBlocked"
           data-testid="markdown-search-replace-all"
           @click="searchReplaceAll"
         >
@@ -667,6 +669,7 @@ const emit = defineEmits(markdownEditorEmits)
 const ns = useNamespace('markdown-editor')
 const modes: MarkdownEditorMode[] = ['source', 'live', 'split', 'preview']
 const commandTrayId = `${useId()}-command-tray`
+const editorRootRef = ref<HTMLElement | null>(null)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const pasteAsMarkdownDialogRef = ref<HTMLElement | null>(null)
 const pasteAsMarkdownPrimaryActionRef = ref<HTMLButtonElement | null>(null)
@@ -1974,9 +1977,21 @@ const searchHighlights = computed(() =>
     source: editorValue.value,
   }),
 )
+const MAX_RENDERED_SEARCH_HIGHLIGHTS = 256
+const renderedSearchHighlights = computed(() => {
+  const items = searchHighlights.value.items
+  if (items.length <= MAX_RENDERED_SEARCH_HIGHLIGHTS) return items
+  const current = Math.max(0, searchCurrentIndex.value ?? 0)
+  const half = Math.floor(MAX_RENDERED_SEARCH_HIGHLIGHTS / 2)
+  const start = Math.min(
+    Math.max(0, current - half),
+    items.length - MAX_RENDERED_SEARCH_HIGHLIGHTS,
+  )
+  return items.slice(start, start + MAX_RENDERED_SEARCH_HIGHLIGHTS)
+})
 const visibleSearchHighlights = computed(() =>
   searchUiState.value.open && liveSurface.value.inputVisible
-    ? searchHighlights.value.items
+    ? renderedSearchHighlights.value
     : [],
 )
 
@@ -2044,7 +2059,8 @@ const syncRenderedSearchHighlights = () => {
   const candidate = previewRendererRef.value
   const root = candidate instanceof HTMLElement ? candidate : candidate?.$el
   if (!(root instanceof HTMLElement)) return
-  const needles = searchMatches.value.map((match) =>
+  const renderedItems = renderedSearchHighlights.value
+  const needles = renderedItems.map(({ match }) =>
     editorValue.value.slice(match.range.start, match.range.end),
   )
   const ranges = renderedSearchRanges(root, needles)
@@ -2054,8 +2070,8 @@ const syncRenderedSearchHighlights = () => {
   const visibleRanges = ranges.filter((range): range is Range => Boolean(range))
   if (!HighlightCtor || !visibleRanges.length) return
   registry.set('markdown-search-match', new HighlightCtor(...visibleRanges))
-  const current = searchCurrentIndex.value
-  if (current !== null && ranges[current]) {
+  const current = renderedItems.findIndex(({ current }) => current)
+  if (current >= 0 && ranges[current]) {
     registry.set('markdown-search-current', new HighlightCtor(ranges[current]))
   }
 }
@@ -2287,7 +2303,9 @@ const closeSearch = () => {
       replaceText: searchReplaceText.value,
     },
   )
-  if (textareaRef.value) {
+  if (currentMode.value === 'preview') {
+    editorRootRef.value?.focus()
+  } else if (textareaRef.value) {
     textareaRef.value.focus()
   }
 }
@@ -2462,13 +2480,23 @@ watch(
 )
 
 const handleKeydown = (event: KeyboardEvent) => {
-  if (editingBlocked.value || nativeMachine.freezeSmartInput) return
-
   if (event.key === 'Escape' && searchUiState.value.open) {
     event.preventDefault()
     closeSearch()
     return
   }
+  const searchAction = dispatchMarkdownSearchKeydown({
+    ctrlKey: event.ctrlKey,
+    key: event.key,
+    metaKey: event.metaKey,
+    shiftKey: event.shiftKey,
+  })
+  if (searchAction === 'open-find' || searchAction === 'open-replace') {
+    event.preventDefault()
+    openSearch(searchAction === 'open-replace')
+    return
+  }
+  if (editingBlocked.value || nativeMachine.freezeSmartInput) return
   if (event.key === 'Escape' && currentMode.value === 'live') {
     if (atomicSession.value) {
       event.preventDefault()
@@ -2651,16 +2679,6 @@ const handleKeydown = (event: KeyboardEvent) => {
 
   if (!isMod) return
 
-  if (key === 'f') {
-    event.preventDefault()
-    openSearch(false)
-    return
-  }
-  if (key === 'h') {
-    event.preventDefault()
-    openSearch(true)
-    return
-  }
   if (key === 's') {
     event.preventDefault()
     emitSave()
