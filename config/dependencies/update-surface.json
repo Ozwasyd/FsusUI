@@ -1786,8 +1786,6 @@
       "files": [
         "dotnet/Directory.Packages.props",
         "dotnet/FsusUI.Avalonia.Icons/FsusUI.Avalonia.Icons.csproj",
-        "dotnet/FsusUI.Avalonia.Icons/FsusUI.Avalonia.Icons/FsusUI.Avalonia.Icons.csproj",
-        "dotnet/FsusUI.Avalonia.Icons/FsusUI.Avalonia.Icons/packages.lock.json",
         "dotnet/FsusUI.Avalonia.Icons/packages.lock.json",
         "dotnet/FsusUI.Avalonia.Themes/FsusUI.Avalonia.Themes.csproj",
         "dotnet/FsusUI.Avalonia.Themes/packages.lock.json",
