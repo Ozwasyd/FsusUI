@@ -241,6 +241,7 @@ describe('markdown web language tools integration', () => {
       controller.handleBeforeInput({
         data: 'world',
         inputType: 'insertReplacementText',
+        rawTargetRange: { direction: 'none', end: 7, start: 3 },
       }),
     ).toMatchObject({ handled: true, reason: 'stale-selection' })
   })

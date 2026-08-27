@@ -404,14 +404,15 @@ export const bindMarkdownWebLanguageTools = (
         })
       }
 
-      const targetSelection = event.rawTargetRange ?? selectionFrom(textarea)
+      const currentSelection = selectionFrom(textarea)
+      const targetSelection = event.rawTargetRange ?? currentSelection
       if (!currentSession) createSession(kind, targetSelection)
       const result = commit(
         targetSelection.start,
         targetSelection.end,
         event.data ?? '',
         kind,
-        targetSelection,
+        currentSelection,
       )
       currentSession = null
       return Object.freeze({

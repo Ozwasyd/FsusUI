@@ -274,6 +274,14 @@ const inspectWebBoundary = (source, errors) => {
       `${fileName}: direct replacement must enforce current context and tool capability`,
     )
   }
+  if (
+    !source.includes('const currentSelection = selectionFrom(textarea)') ||
+    !source.includes('kind,\n        currentSelection,')
+  ) {
+    errors.push(
+      `${fileName}: mapped replacement target must not replace current selection authority`,
+    )
+  }
 }
 
 const inspectVuePublicSurface = (source, errors) => {

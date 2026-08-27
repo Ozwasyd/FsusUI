@@ -131,5 +131,12 @@
     "find": "if (unavailableReason) return rejected(unavailableReason)",
     "replace": "if (false) return rejected(unavailableReason)",
     "expectError": "must enforce current context and tool capability"
+  },
+  {
+    "name": "mapped-target-as-current-selection",
+    "file": "web",
+    "find": "kind,\n        currentSelection,",
+    "replace": "kind,\n        targetSelection,",
+    "expectError": "must not replace current selection authority"
   }
 ]
