@@ -15,11 +15,178 @@ import {
 
 export type { MarkdownTableAlignment }
 
+const createSourceTableEntries = (
+  source: string,
+  documentIdentity: MarkdownDocumentIdentity,
+) => {
+  const entries: Array<{ id: string; range: { start: number; end: number } }> = []
+  const linePattern = /.*(?:\r\n|\r|\n|$)/gu
+  const lines = source.match(linePattern)?.filter(Boolean) ?? []
+  let offset = 0
+  let index = 0
+  while (index < lines.length) {
+    const start = offset
+    const block: string[] = []
+    let lastValidEnd = -1
+    while (index < lines.length) {
+      const raw = lines[index]!
+      const line = raw.replace(/(?:\r\n|\r|\n)$/u, '')
+      if (!line.includes('|')) break
+      block.push(line)
+      offset += raw.length
+      index++
+      if (parseMarkdownTableBlock(block.join('\n'))) lastValidEnd = offset
+    }
+    if (lastValidEnd >= 0) {
+      entries.push({
+        id: `syn:${documentIdentity.id}:${documentIdentity.epoch}:table-source:${start}`,
+        range: { start, end: lastValidEnd },
+      })
+    }
+    if (offset === start) {
+      offset += lines[index]?.length ?? 0
+      index++
+    }
+  }
+  return entries
+}
+
+const createTableEntries = (
+  source: string,
+  documentIdentity: MarkdownDocumentIdentity,
+) => {
+  const stable = createMarkdownTableEntries(
+    stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection(source),
+      documentIdentity,
+    ),
+  )
+  return stable.length > 0
+    ? stable
+    : createSourceTableEntries(source, documentIdentity)
+}
+
+export const resolveMarkdownTableEntry = (
+  source: string,
+  documentIdentity: MarkdownDocumentIdentity,
+  tableId: string,
+) =>
+  createTableEntries(source, documentIdentity).find(
+    (entry) => entry.id === tableId,
+  ) ?? null
+
 export interface MarkdownTableCellIdentity {
   readonly tableId: string
+  /** Opaque identity retained while row/column coordinates are remapped. */
+  readonly cellId?: string
+  /** Exact source range used to validate and restore the current cell. */
+  readonly anchor?: Readonly<{ start: number; end: number }>
   readonly row: number // 0 is header, 1..N are body rows
   readonly column: number // 0..columnCount-1
   readonly status: 'current' | 'deleted' | 'invalid'
+}
+
+const scanCellRanges = (line: string, lineStart: number) => {
+  const ranges: Array<{ start: number; end: number }> = []
+  let cellStart = line.startsWith('|') ? 1 : 0
+  let escaped = false
+  let backtickRun = 0
+  for (let index = cellStart; index <= line.length; index++) {
+    const character = line[index]
+    if (index === line.length || (character === '|' && !escaped && backtickRun === 0)) {
+      ranges.push({ start: lineStart + cellStart, end: lineStart + index })
+      cellStart = index + 1
+      escaped = false
+      continue
+    }
+    if (escaped) {
+      escaped = false
+      continue
+    }
+    if (character === '\\') {
+      escaped = true
+      continue
+    }
+    if (character === '`') {
+      let run = 1
+      while (line[index + run] === '`') run++
+      backtickRun = backtickRun === run ? 0 : backtickRun === 0 ? run : backtickRun
+      index += run - 1
+    }
+  }
+  if (line.endsWith('|')) ranges.pop()
+  return ranges
+}
+
+export const resolveMarkdownTableCellAtOffset = (
+  source: string,
+  documentIdentity: MarkdownDocumentIdentity,
+  offset: number,
+): MarkdownTableCellIdentity | null => {
+  const table = createTableEntries(source, documentIdentity).find(
+    (entry) => offset >= entry.range.start && offset <= entry.range.end,
+  )
+  if (!table) return null
+  const slice = source.slice(table.range.start, table.range.end)
+  if (!parseMarkdownTableBlock(slice)) return null
+  const lines = slice.split(/\r\n|\r|\n/)
+  let relativeLineStart = 0
+  for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+    const line = lines[lineIndex]!
+    const lineEnd = relativeLineStart + line.length
+    if (offset <= table.range.start + lineEnd) {
+      if (lineIndex === 1) return null
+      const row = lineIndex === 0 ? 0 : lineIndex - 1
+      const ranges = scanCellRanges(line, table.range.start + relativeLineStart)
+      const column = ranges.findIndex(
+        (range) => offset >= range.start && offset <= range.end,
+      )
+      if (column < 0) return null
+      const anchor = Object.freeze(ranges[column]!)
+      return Object.freeze({
+        anchor,
+        cellId: `${table.id}:cell:${anchor.start}:${anchor.end}`,
+        column,
+        row,
+        status: 'current' as const,
+        tableId: table.id,
+      })
+    }
+    relativeLineStart = lineEnd + (slice.slice(lineEnd).startsWith('\r\n') ? 2 : 1)
+  }
+  return null
+}
+
+export const resolveMarkdownTableCellCoordinates = (
+  source: string,
+  documentIdentity: MarkdownDocumentIdentity,
+  tableId: string,
+  row: number,
+  column: number,
+  cellId?: string,
+): MarkdownTableCellIdentity | null => {
+  const table = resolveTableEntry(source, documentIdentity, tableId)
+  if (!table) return null
+  const slice = source.slice(table.range.start, table.range.end)
+  const lines = slice.split(/\r\n|\r|\n/)
+  const lineIndex = row === 0 ? 0 : row + 1
+  const line = lines[lineIndex]
+  if (line === undefined) return null
+  let lineStart = 0
+  for (let index = 0; index < lineIndex; index++) {
+    lineStart += lines[index]!.length
+    lineStart += slice.slice(lineStart).startsWith('\r\n') ? 2 : 1
+  }
+  const anchor = scanCellRanges(line, table.range.start + lineStart)[column]
+  if (!anchor) return null
+  return Object.freeze({
+    anchor: Object.freeze(anchor),
+    cellId: cellId ?? `${table.id}:cell:${anchor.start}:${anchor.end}`,
+    column,
+    row,
+    status: 'current' as const,
+    tableId: table.id,
+  })
 }
 
 export type MarkdownTableStructuralOp =
@@ -39,11 +206,7 @@ const resolveTableEntry = (
   tableId: string,
 ) => {
   if (documentIdentity.epoch < 1) return null
-  const projection = stabilizeMarkdownEditorProjection(
-    createMarkdownEditorProjection(source),
-    documentIdentity,
-  )
-  return createMarkdownTableEntries(projection).find((entry) => entry.id === tableId) ?? null
+  return resolveMarkdownTableEntry(source, documentIdentity, tableId)
 }
 
 const buildTransaction = (

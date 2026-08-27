@@ -1,9 +1,4 @@
-import {
-  createMarkdownEditorProjection,
-  createMarkdownTableEntries,
-  stabilizeMarkdownEditorProjection,
-  type MarkdownDocumentIdentity,
-} from '../../../wasm/markdown-runtime'
+import type { MarkdownDocumentIdentity } from '../../../wasm/markdown-runtime'
 import type {
   MarkdownEditorSelection,
   MarkdownEditorTransaction,
@@ -15,6 +10,7 @@ import {
 } from './markdown-editor-table'
 import {
   planMarkdownTableInsertRow,
+  resolveMarkdownTableEntry,
   type MarkdownTableCellIdentity,
 } from './markdown-editor-table-structure'
 
@@ -138,11 +134,7 @@ export const resolveMarkdownTableInputIntent = (
     }
   }
 
-  const projection = stabilizeMarkdownEditorProjection(
-    createMarkdownEditorProjection(source),
-    documentIdentity,
-  )
-  const table = createMarkdownTableEntries(projection).find((entry) => entry.id === cell.tableId)
+  const table = resolveMarkdownTableEntry(source, documentIdentity, cell.tableId)
   if (!table) {
     return {
       action: 'noop',
@@ -662,11 +654,7 @@ export const planMarkdownTablePaste = (
     return { rejected: parsedData.rejected }
   }
 
-  const projection = stabilizeMarkdownEditorProjection(
-    createMarkdownEditorProjection(source),
-    documentIdentity,
-  )
-  const table = createMarkdownTableEntries(projection).find((entry) => entry.id === tableId)
+  const table = resolveMarkdownTableEntry(source, documentIdentity, tableId)
   if (!table) return { rejected: 'missing' }
 
   const slice = source.slice(table.range.start, table.range.end)
@@ -766,11 +754,7 @@ export const planMarkdownTableFormat = (
     return { rejected: 'stale' }
   }
 
-  const projection = stabilizeMarkdownEditorProjection(
-    createMarkdownEditorProjection(source),
-    documentIdentity,
-  )
-  const table = createMarkdownTableEntries(projection).find((entry) => entry.id === tableId)
+  const table = resolveMarkdownTableEntry(source, documentIdentity, tableId)
   if (!table) return { rejected: 'missing' }
 
   const slice = source.slice(table.range.start, table.range.end)

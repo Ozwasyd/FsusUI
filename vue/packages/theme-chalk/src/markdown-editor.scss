@@ -722,6 +722,26 @@
     border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
     box-shadow: var(--fsus-shadow-subtle, 0 4px 12px rgb(0 0 0 / 8%));
 
+    button {
+      min-height: var(--fsus-control-height-compact, 40px);
+      padding-inline: var(--fsus-space-2, 8px);
+      color: getCssVar('text-color-regular');
+      background: getCssVar('bg-color');
+      border: 1px solid getCssVar('border-color');
+      border-radius: var(--fsus-radius-control-small, var(--el-border-radius-small));
+      cursor: pointer;
+
+      &:hover {
+        color: var(--fsus-scholarly-blue, getCssVar('color-primary'));
+        background: getCssVar('fill-color-light');
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--fsus-scholarly-blue, getCssVar('color-primary'));
+        outline-offset: 2px;
+      }
+    }
+
     @media (pointer: coarse), (max-width: 768px) {
       .el-button,
       button {

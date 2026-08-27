@@ -1980,6 +1980,9 @@ const markdownEditorTransactionFixture =
 const markdownEditorImeFixture =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('markdownEditorIme') === '1'
+const markdownEditorTableFixture =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownEditorTable') === '1'
 const markdownPasteGate =
   typeof window !== 'undefined'
     ? new URLSearchParams(window.location.search).get('markdownPasteGate')
@@ -2019,7 +2022,16 @@ if (markdownEditorDelayMount > 0) {
 }
 const markdownTransactionEditor = ref<MarkdownEditorInstance>()
 const markdownTransactionValue = ref(
-  markdownEditorImeFixture ? '' : 'A😀éאב\n- 列表',
+  markdownEditorImeFixture
+    ? ''
+    : markdownEditorTableFixture
+      ? [
+          '| Project | Owner | Status |',
+          '| --- | --- | --- |',
+          '| Documentation migration | Editorial systems | In review |',
+          '| Runtime projection | Platform team | Ready |',
+        ].join('\n')
+      : 'A😀éאב\n- 列表',
 )
 const markdownTransactionHistory = ref<MarkdownEditorHistoryState>({
   canRedo: false,

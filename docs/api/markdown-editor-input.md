@@ -79,6 +79,14 @@ This command does not change normal paste MIME priority and does not redefine
 the existing sanitizer, converter, attachment provider, or upload-I/O
 boundaries.
 
+Markdown table input uses the same native event and transaction authority.
+`resolveMarkdownTableCellAtOffset` binds an active cell to the stable projection
+table identity and an exact source range; row/column coordinates alone are not an
+anchor. Table navigation, final-cell row append, contextual row/column/alignment
+commands, and TSV/CSV paste all carry the current revision and fail closed for a
+deleted, malformed, or stale table. Normal non-table paste and text editing retain
+the clipboard and beforeinput behavior defined above.
+
 `planMarkdownMermaidPreview` is the #384 Mermaid preview contract. Requests
 reuse the #382 identity. Valid diagrams preview through the unique feature
 gateway. Invalid, large, abort, and stale results stay local and source-only.

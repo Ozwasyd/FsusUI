@@ -178,6 +178,7 @@
         @click="handlePointerReveal"
         @compositionend="handleCompositionEnd"
         @compositionstart="handleCompositionStart"
+        @contextmenu="handleTableContextMenu"
         @copy="handleCopy"
         @cut="handleCut"
         @drop="handleDrop"
@@ -189,6 +190,27 @@
         @touchmove="handleLayoutTouch"
         @wheel="handleLayoutWheel"
       />
+
+      <div
+        v-if="currentTableCell && !editingBlocked"
+        :class="ns.e('table-menu')"
+        role="toolbar"
+        aria-label="Table actions"
+      >
+        <button
+          v-for="action in tableContextActions"
+          :key="action.key"
+          type="button"
+          :title="action.title"
+          :aria-label="action.title"
+          @click="runTableContextAction(action.key)"
+        >
+          {{ action.label }}
+        </button>
+      </div>
+      <span :class="ns.e('visually-hidden')" aria-live="polite">
+        {{ tableAnnouncement }}
+      </span>
 
       <div
         v-if="liveDecorations.length"
@@ -433,6 +455,22 @@ import {
   type MarkdownLiveLayoutTrigger,
   type MarkdownLiveVirtualWindow,
 } from './markdown-editor-live-layout'
+import {
+  planMarkdownTableAlignColumn,
+  planMarkdownTableDeleteColumn,
+  planMarkdownTableDeleteRow,
+  planMarkdownTableInsertColumn,
+  planMarkdownTableInsertRow,
+  resolveMarkdownTableCellAtOffset,
+  resolveMarkdownTableCellCoordinates,
+  type MarkdownTableCellIdentity,
+} from './markdown-editor-table-structure'
+import {
+  planMarkdownTableFormat,
+  planMarkdownTablePaste,
+  resolveMarkdownTableInputIntent,
+} from './markdown-editor-table-input'
+import { resolveMarkdownTableContextActions } from './markdown-editor-table-acceptance'
 
 import type { MarkdownHtmlImportSnapshot } from '../../../wasm/markdown-html-import'
 
@@ -494,6 +532,13 @@ const transactionStore = new MarkdownEditorTransactionStore(
   documentIdentity,
 )
 const editorValue = ref(transactionStore.value)
+const currentTableCell = ref<MarkdownTableCellIdentity | null>(null)
+const tableAnnouncement = ref('')
+const tableContextActions = computed(() =>
+  resolveMarkdownTableContextActions().filter(
+    (action) => action.key !== 'delete-row' || currentTableCell.value?.row !== 0,
+  ),
+)
 const liveSurface = computed(() =>
   createMarkdownLiveSurface({
     documentIdentity,
@@ -893,6 +938,40 @@ const captureSelection = (breakMerge = true) => {
     )
   }
   return selection
+}
+
+const refreshCurrentTableCell = (offset = transactionStore.selection.start) => {
+  currentTableCell.value = resolveMarkdownTableCellAtOffset(
+    transactionStore.value,
+    documentIdentity,
+    offset,
+  )
+  return currentTableCell.value
+}
+
+const selectTableCell = async (cell: MarkdownTableCellIdentity) => {
+  const resolved = resolveMarkdownTableCellCoordinates(
+    transactionStore.value,
+    documentIdentity,
+    cell.tableId,
+    cell.row,
+    cell.column,
+    cell.cellId,
+  )
+  if (!resolved?.anchor) {
+    currentTableCell.value = null
+    return
+  }
+  currentTableCell.value = resolved
+  transactionStore.setSelection(
+    {
+      direction: 'none',
+      end: resolved.anchor.end,
+      start: resolved.anchor.start,
+    },
+    true,
+  )
+  await restoreTextareaSelection(transactionStore.selection)
 }
 
 const dispatchReplacement = (
@@ -1349,6 +1428,39 @@ const applyClipboardTransfer = (
 }
 
 const handlePaste = (event: ClipboardEvent) => {
+  const cell = refreshCurrentTableCell(captureSelection(false).start)
+  const clipboard = event.clipboardData
+  if (cell && clipboard && !isComposing.value && !editingBlocked.value) {
+    const tsv = clipboard.getData('text/tab-separated-values')
+    const csv = clipboard.getData('text/csv')
+    const plain = clipboard.getData('text/plain')
+    const payload = tsv || csv || plain
+    const mime = tsv
+      ? 'text/tab-separated-values'
+      : csv
+        ? 'text/csv'
+        : undefined
+    if (payload.includes('\t') || mime === 'text/csv') {
+      const plan = planMarkdownTablePaste(
+        transactionStore.value,
+        documentIdentity,
+        cell.tableId,
+        cell,
+        payload,
+        mime,
+        transactionStore.revision,
+      )
+      if ('changes' in plan) {
+        event.preventDefault()
+        const result = dispatchTransaction(plan)
+        if (result.accepted) {
+          tableAnnouncement.value = 'Pasted table data'
+          void selectTableCell(cell)
+        }
+        return
+      }
+    }
+  }
   applyClipboardTransfer(event, 'paste', event.clipboardData)
 }
 
@@ -1417,6 +1529,7 @@ const handleCut = (event: ClipboardEvent) => {
 const handleSelectionMove = () => {
   if (restoringSelection || isComposing.value) return
   captureSelection()
+  refreshCurrentTableCell()
   if (currentMode.value === 'live') {
     const selection = transactionStore.selection
     if (selection.start !== selection.end) {
@@ -1434,6 +1547,7 @@ const handleSelectionMove = () => {
 const handlePointerReveal = () => {
   if (restoringSelection || isComposing.value) return
   captureSelection()
+  refreshCurrentTableCell()
   if (currentMode.value === 'live') {
     applyLiveSelectionMotion('pointer-click', {
       pointerOffset: transactionStore.selection.start,
@@ -1443,6 +1557,110 @@ const handlePointerReveal = () => {
     intent: 'pointer',
     pointerOffset: transactionStore.selection.start,
   })
+}
+
+const handleTableContextMenu = (event: MouseEvent) => {
+  const cell = refreshCurrentTableCell(captureSelection(false).start)
+  if (!cell || editingBlocked.value) return
+  event.preventDefault()
+  tableAnnouncement.value = `Table row ${cell.row + 1}, column ${cell.column + 1}`
+}
+
+const runTableContextAction = (key: string) => {
+  const cell = currentTableCell.value
+  if (!cell || editingBlocked.value || isComposing.value) return
+  const source = transactionStore.value
+  const revision = transactionStore.revision
+  let plan: MarkdownEditorTransaction | { readonly rejected: string }
+  switch (key) {
+    case 'insert-row-above':
+      plan = planMarkdownTableInsertRow(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.row,
+        'above',
+        revision,
+      )
+      break
+    case 'insert-row-below':
+      plan = planMarkdownTableInsertRow(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.row,
+        'below',
+        revision,
+      )
+      break
+    case 'delete-row':
+      plan = planMarkdownTableDeleteRow(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.row,
+        revision,
+      )
+      break
+    case 'insert-col-left':
+      plan = planMarkdownTableInsertColumn(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.column,
+        'left',
+        revision,
+      )
+      break
+    case 'insert-col-right':
+      plan = planMarkdownTableInsertColumn(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.column,
+        'right',
+        revision,
+      )
+      break
+    case 'delete-col':
+      plan = planMarkdownTableDeleteColumn(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.column,
+        revision,
+      )
+      break
+    case 'align-left':
+    case 'align-center':
+    case 'align-right':
+      plan = planMarkdownTableAlignColumn(
+        source,
+        documentIdentity,
+        cell.tableId,
+        cell.column,
+        key.slice('align-'.length) as 'left' | 'center' | 'right',
+        revision,
+      )
+      break
+    case 'format-table':
+      plan = planMarkdownTableFormat(
+        source,
+        documentIdentity,
+        cell.tableId,
+        revision,
+      )
+      break
+    default:
+      return
+  }
+  if (!('changes' in plan)) return
+  const result = dispatchTransaction(plan)
+  if (!result.accepted) return
+  tableAnnouncement.value = tableContextActions.value.find(
+    (action) => action.key === key,
+  )?.title ?? 'Table updated'
+  void selectTableCell(cell)
 }
 
 const handleBlur = () => {
@@ -1724,6 +1942,48 @@ const emitRenderEvent = (
 
 const handleKeydown = (event: KeyboardEvent) => {
   if (editingBlocked.value || nativeMachine.freezeSmartInput) return
+
+  if (!event.altKey && !event.ctrlKey && !event.metaKey) {
+    const selection = captureSelection(false)
+    const cell = refreshCurrentTableCell(selection.start)
+    const tableKey =
+      event.key === 'Tab' && event.shiftKey
+        ? 'Shift+Tab'
+        : event.key === 'Enter' && event.shiftKey
+          ? 'Shift+Enter'
+          : event.key
+    if (cell?.anchor) {
+      const plan = resolveMarkdownTableInputIntent({
+        cell,
+        cellOffset: Math.max(0, selection.start - cell.anchor.start),
+        cellText: transactionStore.value.slice(cell.anchor.start, cell.anchor.end),
+        compositionActive: isComposing.value,
+        documentIdentity,
+        expectedRevision: transactionStore.revision,
+        key: tableKey,
+        selection,
+        source: transactionStore.value,
+      })
+      const moved =
+        plan.nextCell.row !== cell.row ||
+        plan.nextCell.column !== cell.column ||
+        plan.nextCell.status !== cell.status
+      if (plan.transaction || moved || tableKey === 'Tab' || tableKey === 'Shift+Tab') {
+        event.preventDefault()
+        if (plan.transaction) {
+          const result = dispatchTransaction(plan.transaction)
+          if (!result.accepted) return
+        }
+        tableAnnouncement.value = plan.screenReaderText
+        if (plan.nextCell.status === 'current') {
+          void selectTableCell(plan.nextCell)
+        } else {
+          currentTableCell.value = null
+        }
+        return
+      }
+    }
+  }
 
   if (event.key === 'Escape' && currentMode.value === 'live') {
     if (atomicSession.value) {

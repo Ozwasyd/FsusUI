@@ -20,6 +20,7 @@ import {
   planMarkdownTableInsert,
   planMarkdownTableInsertColumn,
   planMarkdownTableInsertRow,
+  resolveMarkdownTableCellAtOffset,
   type MarkdownTableCellIdentity,
 } from './markdown-editor-table-structure'
 import {
@@ -44,6 +45,13 @@ export const MARKDOWN_TABLE_ACCEPTANCE_SCALES = Object.freeze([
 
 export const MARKDOWN_TABLE_TOUCH_TARGET_MIN = 44
 
+export const resolveMarkdownTableScrollContract = (input: {
+  readonly containerClass: string
+  readonly overflowX: string
+}) =>
+  input.containerClass === 'el-markdown-editor__table-wrapper' &&
+  input.overflowX === 'auto'
+
 export interface MarkdownTableContextAction {
   readonly key: string
   readonly label: string
@@ -52,23 +60,12 @@ export interface MarkdownTableContextAction {
   readonly minTouchTarget: number
 }
 
-const findCurrentTable = (context: MarkdownEditorCommandContext) => {
-  if (context.syntax?.type === 'table' && context.syntax.nodeId) {
-    return { id: context.syntax.nodeId }
-  }
-  const projection = stabilizeMarkdownEditorProjection(
-    createMarkdownEditorProjection(context.value),
+const findCurrentCell = (context: MarkdownEditorCommandContext) =>
+  resolveMarkdownTableCellAtOffset(
+    context.value,
     context.documentIdentity,
+    context.selection.start,
   )
-  const tables = createMarkdownTableEntries(projection)
-  return (
-    tables.find(
-      (t) =>
-        context.selection.start >= t.range.start &&
-        context.selection.end <= t.range.end,
-    ) ?? null
-  )
-}
 
 export const createMarkdownTableCommands = (): readonly MarkdownEditorCommand[] =>
   Object.freeze([
@@ -77,7 +74,7 @@ export const createMarkdownTableCommands = (): readonly MarkdownEditorCommand[] 
       label: 'Table',
       group: 'insert',
       title: 'Insert table',
-      presentation: ['toolbar', 'palette', 'slash'],
+      presentation: ['palette', 'slash'],
       when: (context) => !context.readonly,
       enabled: (context) => !context.readonly,
       run: (context) => ({
@@ -95,16 +92,16 @@ export const createMarkdownTableCommands = (): readonly MarkdownEditorCommand[] 
       group: 'table',
       title: 'Insert row above current cell',
       presentation: ['palette'],
-      when: (context) => Boolean(findCurrentTable(context)),
-      enabled: (context) => Boolean(findCurrentTable(context)),
+      when: (context) => Boolean(findCurrentCell(context)),
+      enabled: (context) => Boolean(findCurrentCell(context)),
       run: (context) => {
-        const table = findCurrentTable(context)
-        if (!table) return {}
+        const cell = findCurrentCell(context)
+        if (!cell) return {}
         const plan = planMarkdownTableInsertRow(
           context.value,
           context.documentIdentity,
-          table.id,
-          1,
+          cell.tableId,
+          cell.row,
           'above',
           context.revision,
         )
@@ -117,16 +114,16 @@ export const createMarkdownTableCommands = (): readonly MarkdownEditorCommand[] 
       group: 'table',
       title: 'Insert row below current cell',
       presentation: ['palette'],
-      when: (context) => Boolean(findCurrentTable(context)),
-      enabled: (context) => Boolean(findCurrentTable(context)),
+      when: (context) => Boolean(findCurrentCell(context)),
+      enabled: (context) => Boolean(findCurrentCell(context)),
       run: (context) => {
-        const table = findCurrentTable(context)
-        if (!table) return {}
+        const cell = findCurrentCell(context)
+        if (!cell) return {}
         const plan = planMarkdownTableInsertRow(
           context.value,
           context.documentIdentity,
-          table.id,
-          1,
+          cell.tableId,
+          cell.row,
           'below',
           context.revision,
         )
@@ -139,16 +136,16 @@ export const createMarkdownTableCommands = (): readonly MarkdownEditorCommand[] 
       group: 'table',
       title: 'Delete current row',
       presentation: ['palette'],
-      when: (context) => Boolean(findCurrentTable(context)),
-      enabled: (context) => Boolean(findCurrentTable(context)),
+      when: (context) => Boolean(findCurrentCell(context) && findCurrentCell(context)!.row > 0),
+      enabled: (context) => Boolean(findCurrentCell(context) && findCurrentCell(context)!.row > 0),
       run: (context) => {
-        const table = findCurrentTable(context)
-        if (!table) return {}
+        const cell = findCurrentCell(context)
+        if (!cell || cell.row === 0) return {}
         const plan = planMarkdownTableDeleteRow(
           context.value,
           context.documentIdentity,
-          table.id,
-          1,
+          cell.tableId,
+          cell.row,
           context.revision,
         )
         return 'changes' in plan ? { transaction: plan } : {}
@@ -160,16 +157,16 @@ export const createMarkdownTableCommands = (): readonly MarkdownEditorCommand[] 
       group: 'table',
       title: 'Insert column left of current cell',
       presentation: ['palette'],
-      when: (context) => Boolean(findCurrentTable(context)),
-      enabled: (context) => Boolean(findCurrentTable(context)),
+      when: (context) => Boolean(findCurrentCell(context)),
+      enabled: (context) => Boolean(findCurrentCell(context)),
       run: (context) => {
-        const table = findCurrentTable(context)
-        if (!table) return {}
+        const cell = findCurrentCell(context)
+        if (!cell) return {}
         const plan = planMarkdownTableInsertColumn(
           context.value,
           context.documentIdentity,
-          table.id,
-          0,
+          cell.tableId,
+          cell.column,
           'left',
           context.revision,
         )
@@ -182,16 +179,16 @@ export const createMarkdownTableCommands = (): readonly MarkdownEditorCommand[] 
       group: 'table',
       title: 'Insert column right of current cell',
       presentation: ['palette'],
-      when: (context) => Boolean(findCurrentTable(context)),
-      enabled: (context) => Boolean(findCurrentTable(context)),
+      when: (context) => Boolean(findCurrentCell(context)),
+      enabled: (context) => Boolean(findCurrentCell(context)),
       run: (context) => {
-        const table = findCurrentTable(context)
-        if (!table) return {}
+        const cell = findCurrentCell(context)
+        if (!cell) return {}
         const plan = planMarkdownTableInsertColumn(
           context.value,
           context.documentIdentity,
-          table.id,
-          0,
+          cell.tableId,
+          cell.column,
           'right',
           context.revision,
         )
@@ -204,16 +201,16 @@ export const createMarkdownTableCommands = (): readonly MarkdownEditorCommand[] 
       group: 'table',
       title: 'Delete current column',
       presentation: ['palette'],
-      when: (context) => Boolean(findCurrentTable(context)),
-      enabled: (context) => Boolean(findCurrentTable(context)),
+      when: (context) => Boolean(findCurrentCell(context)),
+      enabled: (context) => Boolean(findCurrentCell(context)),
       run: (context) => {
-        const table = findCurrentTable(context)
-        if (!table) return {}
+        const cell = findCurrentCell(context)
+        if (!cell) return {}
         const plan = planMarkdownTableDeleteColumn(
           context.value,
           context.documentIdentity,
-          table.id,
-          0,
+          cell.tableId,
+          cell.column,
           context.revision,
         )
         return 'changes' in plan ? { transaction: plan } : {}
@@ -225,16 +222,16 @@ export const createMarkdownTableCommands = (): readonly MarkdownEditorCommand[] 
       group: 'table',
       title: 'Align column left',
       presentation: ['palette'],
-      when: (context) => Boolean(findCurrentTable(context)),
-      enabled: (context) => Boolean(findCurrentTable(context)),
+      when: (context) => Boolean(findCurrentCell(context)),
+      enabled: (context) => Boolean(findCurrentCell(context)),
       run: (context) => {
-        const table = findCurrentTable(context)
-        if (!table) return {}
+        const cell = findCurrentCell(context)
+        if (!cell) return {}
         const plan = planMarkdownTableAlignColumn(
           context.value,
           context.documentIdentity,
-          table.id,
-          0,
+          cell.tableId,
+          cell.column,
           'left',
           context.revision,
         )
@@ -247,16 +244,16 @@ export const createMarkdownTableCommands = (): readonly MarkdownEditorCommand[] 
       group: 'table',
       title: 'Align column center',
       presentation: ['palette'],
-      when: (context) => Boolean(findCurrentTable(context)),
-      enabled: (context) => Boolean(findCurrentTable(context)),
+      when: (context) => Boolean(findCurrentCell(context)),
+      enabled: (context) => Boolean(findCurrentCell(context)),
       run: (context) => {
-        const table = findCurrentTable(context)
-        if (!table) return {}
+        const cell = findCurrentCell(context)
+        if (!cell) return {}
         const plan = planMarkdownTableAlignColumn(
           context.value,
           context.documentIdentity,
-          table.id,
-          0,
+          cell.tableId,
+          cell.column,
           'center',
           context.revision,
         )
@@ -269,16 +266,16 @@ export const createMarkdownTableCommands = (): readonly MarkdownEditorCommand[] 
       group: 'table',
       title: 'Align column right',
       presentation: ['palette'],
-      when: (context) => Boolean(findCurrentTable(context)),
-      enabled: (context) => Boolean(findCurrentTable(context)),
+      when: (context) => Boolean(findCurrentCell(context)),
+      enabled: (context) => Boolean(findCurrentCell(context)),
       run: (context) => {
-        const table = findCurrentTable(context)
-        if (!table) return {}
+        const cell = findCurrentCell(context)
+        if (!cell) return {}
         const plan = planMarkdownTableAlignColumn(
           context.value,
           context.documentIdentity,
-          table.id,
-          0,
+          cell.tableId,
+          cell.column,
           'right',
           context.revision,
         )
@@ -290,16 +287,16 @@ export const createMarkdownTableCommands = (): readonly MarkdownEditorCommand[] 
       label: 'Format table',
       group: 'table',
       title: 'Format and align table cells',
-      presentation: ['toolbar', 'palette'],
-      when: (context) => Boolean(findCurrentTable(context)),
-      enabled: (context) => Boolean(findCurrentTable(context)),
+      presentation: ['palette'],
+      when: (context) => Boolean(findCurrentCell(context)),
+      enabled: (context) => Boolean(findCurrentCell(context)),
       run: (context) => {
-        const table = findCurrentTable(context)
-        if (!table) return {}
+        const cell = findCurrentCell(context)
+        if (!cell) return {}
         const plan = planMarkdownTableFormat(
           context.value,
           context.documentIdentity,
-          table.id,
+          cell.tableId,
           context.revision,
         )
         return 'changes' in plan ? { transaction: plan } : {}
@@ -311,15 +308,15 @@ export const createMarkdownTableCommands = (): readonly MarkdownEditorCommand[] 
       group: 'table',
       title: 'Delete current table',
       presentation: ['palette'],
-      when: (context) => Boolean(findCurrentTable(context)),
-      enabled: (context) => Boolean(findCurrentTable(context)),
+      when: (context) => Boolean(findCurrentCell(context)),
+      enabled: (context) => Boolean(findCurrentCell(context)),
       run: (context) => {
-        const table = findCurrentTable(context)
-        if (!table) return {}
+        const cell = findCurrentCell(context)
+        if (!cell) return {}
         const plan = planMarkdownTableDelete(
           context.value,
           context.documentIdentity,
-          table.id,
+          cell.tableId,
           context.revision,
         )
         return 'changes' in plan ? { transaction: plan } : {}
@@ -531,7 +528,10 @@ export const evaluateMarkdownTableAcceptance = (options?: {
 
   // 6. Internal scroll contract check
   // Container wrapper class for wide tables: el-markdown-editor__table-wrapper
-  const internalScrollPassed = true
+  const internalScrollPassed = resolveMarkdownTableScrollContract({
+    containerClass: 'el-markdown-editor__table-wrapper',
+    overflowX: 'auto',
+  })
 
   // 7. Stale rejection check
   const stalePlan = planMarkdownTableAlignColumn(
