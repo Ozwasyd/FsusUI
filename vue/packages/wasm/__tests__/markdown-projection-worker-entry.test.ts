@@ -9,6 +9,7 @@ import {
   createMarkdownEditorProjection,
   createMarkdownProjectionWorkerHost,
   handleMarkdownProjectionWorkerMessage,
+  markdownEditorProjectionsEquivalent,
   planMarkdownProjectionInvalidation,
   stabilizeMarkdownEditorProjection,
   type MarkdownProjectionWorkerRequest,
@@ -113,6 +114,7 @@ describe('markdown projection dedicated worker entry', () => {
     )
     expect(worker.threadId).not.toBe(threadId)
     const commits: Array<{ ok: boolean; reason?: string }> = []
+    const committedResults: MarkdownProjectionWorkerResult[] = []
     const workerErrors: unknown[] = []
     worker.on('error', (error) => {
       workerErrors.push(error)
@@ -131,6 +133,9 @@ describe('markdown projection dedicated worker entry', () => {
           },
         },
         onCommit(result) {
+          if (result.ok) {
+            committedResults.push(result.value)
+          }
           commits.push(
             'reason' in result
               ? { ok: false, reason: result.reason }
@@ -160,6 +165,23 @@ describe('markdown projection dedicated worker entry', () => {
       expect(workerErrors).toEqual([])
       expect(commits.length).toBeGreaterThanOrEqual(1)
       expect(commits.filter((commit) => commit.ok).length).toBe(1)
+      expect(committedResults).toHaveLength(1)
+      const acceptedSource = applyChange(previousSource, {
+        from: 5,
+        to: 5,
+        insert: 'xy',
+      })
+      const mainProjection = createMarkdownEditorProjection(acceptedSource)
+      expect(
+        markdownEditorProjectionsEquivalent(
+          mainProjection,
+          committedResults[0]!.projection,
+        ),
+      ).toBe(true)
+      expect(committedResults[0]!.projection.nodes).toEqual(mainProjection.nodes)
+      expect(committedResults[0]!.projection.diagnostics).toEqual(
+        mainProjection.diagnostics,
+      )
       expect(
         commits.some((commit) => commit.ok === false) || commits.length === 1,
       ).toBe(true)

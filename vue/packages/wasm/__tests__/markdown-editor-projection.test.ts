@@ -14,6 +14,7 @@ import {
   renderMarkdownHtmlWithRuntime,
   renderMarkdownResultWithRuntime,
   renderMarkdownSummaryWithRuntime,
+  validateMarkdownEditorSyntaxCoverage,
 } from '../markdown-runtime'
 import { resolveMarkdownSourceIdentity } from '../markdown'
 
@@ -38,6 +39,19 @@ describe('markdown editor projection contract', () => {
     expect(projection.syntaxCoverage.version).toBe(projection.identity.version)
     expect(projection.syntaxCoverage.kinds).toEqual(MARKDOWN_EDITOR_REQUIRED_SYNTAX_KINDS)
     expect(projection.nodes.map((node) => node.kind)).toEqual(['heading', 'paragraph'])
+    expect(new Set(projection.nodes.map((node) => node.blockIdentity)).size).toBe(
+      projection.nodes.length,
+    )
+    expect(
+      projection.nodes.every(
+        (node) =>
+          node.rawContentRanges.length > 0 &&
+          node.rawMarkerRanges.every(
+            (range) =>
+              range.start >= node.rawRange.start && range.end <= node.rawRange.end,
+          ),
+      ),
+    ).toBe(true)
   })
 
   it('projects heading, paragraph, list, and table nodes from the C++ parse pass', () => {
@@ -177,6 +191,125 @@ describe('markdown editor projection contract', () => {
     )
     expect(MARKDOWN_EDITOR_REQUIRED_SYNTAX_KINDS).toContain('heading')
     expect(presentationForSyntaxKind('heading')).toBe('live-decorated')
+    expect(() =>
+      validateMarkdownEditorSyntaxCoverage([
+        ...MARKDOWN_EDITOR_REQUIRED_SYNTAX_KINDS,
+        'new-parser-syntax',
+      ]),
+    ).toThrow(/unregistered=new-parser-syntax/)
+    expect(() =>
+      validateMarkdownEditorSyntaxCoverage(
+        MARKDOWN_EDITOR_REQUIRED_SYNTAX_KINDS.filter(
+          (kind) => kind !== 'malformed',
+        ),
+      ),
+    ).toThrow(/missing=malformed/)
+    expect(() =>
+      validateMarkdownEditorSyntaxCoverage([
+        ...MARKDOWN_EDITOR_REQUIRED_SYNTAX_KINDS,
+        'heading',
+      ]),
+    ).toThrow(/duplicate=heading/)
+  })
+
+  it('keeps complete parser-owned source, content, and marker ranges', () => {
+    const raw = [
+      '# Heading',
+      '',
+      '- [ ] task',
+      '',
+      '> quote',
+      '',
+      '[label](https://example.test)',
+      '',
+      '```ts',
+      'const value = 1',
+      '```',
+      '',
+      '$$',
+      'x^2',
+      '$$',
+      '',
+      '::p',
+      'explicit',
+      '::',
+    ].join('\r\n')
+    const projection = createMarkdownEditorProjection(raw)
+    for (const kind of [
+      'heading',
+      'task',
+      'quote',
+      'link',
+      'code',
+      'latex',
+      'explicit-paragraph',
+    ]) {
+      const node = projection.nodes.find((candidate) => candidate.kind === kind)
+      expect(node, kind).toBeDefined()
+      expect(node!.status).toBe('valid')
+      expect(node!.rawContentRanges.length, `${kind} content`).toBeGreaterThan(0)
+      expect(node!.rawMarkerRanges.length, `${kind} markers`).toBeGreaterThan(0)
+      for (const range of [
+        ...node!.rawContentRanges,
+        ...node!.rawMarkerRanges,
+      ]) {
+        expect(range.start).toBeGreaterThanOrEqual(node!.rawRange.start)
+        expect(range.end).toBeLessThanOrEqual(node!.rawRange.end)
+        expect(raw.slice(range.start, range.end).length).toBeGreaterThan(0)
+      }
+    }
+  })
+
+  it('keeps exact ranges for indented headings and inline LaTeX', () => {
+    const raw = '  ### Heading ###\n\nInline \\(x + 1\\).\n'
+    const projection = createMarkdownEditorProjection(raw)
+    const heading = projection.nodes.find((node) => node.kind === 'heading')
+    const latex = projection.nodes.find((node) => node.kind === 'latex')
+
+    expect(heading).toBeDefined()
+    expect(
+      heading!.rawContentRanges.map((range) =>
+        raw.slice(range.start, range.end),
+      ),
+    ).toEqual(['Heading'])
+    expect(
+      heading!.rawMarkerRanges.map((range) => raw.slice(range.start, range.end)),
+    ).toEqual(['### ', ' ###'])
+
+    expect(latex).toBeDefined()
+    expect(
+      latex!.rawContentRanges.map((range) => raw.slice(range.start, range.end)),
+    ).toEqual(['x + 1'])
+    expect(
+      latex!.rawMarkerRanges.map((range) => raw.slice(range.start, range.end)),
+    ).toEqual(['\\(', '\\)'])
+  })
+
+  it('classifies unclosed structures as malformed with exact raw ranges and reasons', () => {
+    const fixtures = [
+      { raw: '```ts\ncode', code: 'unclosed-code-fence' },
+      { raw: ':::mermaid\nflowchart LR', code: 'unclosed-mermaid' },
+      { raw: '$$\nx^2', code: 'unclosed-latex' },
+      { raw: '::p\nparagraph', code: 'unclosed-explicit-paragraph' },
+    ] as const
+    for (const fixture of fixtures) {
+      const projection = createMarkdownEditorProjection(fixture.raw)
+      const node = projection.nodes.find((candidate) => candidate.status === 'malformed')
+      expect(node, fixture.code).toBeDefined()
+      expect(node!.kind).toBe('malformed')
+      expect(node!.diagnosticCode).toBe(fixture.code)
+      expect(node!.presentation).toBe('unsupported-error')
+      expect(node!.rawRange).toEqual({ start: 0, end: fixture.raw.length })
+      expect(node!.rawMarkerRanges.length).toBeGreaterThan(0)
+      expect(node!.rawContentRanges.length).toBeGreaterThan(0)
+      expect(projection.diagnostics).toContainEqual(
+        expect.objectContaining({
+          blockIdentity: node!.blockIdentity,
+          code: fixture.code,
+          rawRange: node!.rawRange,
+        }),
+      )
+    }
   })
 
   it('matches projection identity to full WASM render payloads, not HTML', async () => {

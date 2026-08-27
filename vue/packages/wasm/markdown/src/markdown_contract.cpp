@@ -1778,6 +1778,312 @@ struct SourceLine {
   std::size_t end;
 };
 
+void append_syntax_range(
+  std::vector<syntax_range>& ranges,
+  std::size_t start,
+  std::size_t end
+) {
+  if (start < end) {
+    ranges.push_back({start, end});
+  }
+}
+
+std::size_t syntax_content_end(std::string_view source, std::size_t end) {
+  while (end > 0 && end <= source.size() && (source[end - 1] == '\n' || source[end - 1] == '\r')) {
+    --end;
+  }
+  return end;
+}
+
+void decorate_inline_syntax(std::string_view source, syntax_node& node) {
+  const std::size_t end = syntax_content_end(source, node.end_offset);
+  if (node.start_offset >= end) {
+    return;
+  }
+  const std::string_view text = source.substr(node.start_offset, end - node.start_offset);
+  if (node.kind == syntax_kind::latex && text.size() >= 4 && text[0] == '\\') {
+    append_syntax_range(node.marker_ranges, node.start_offset, node.start_offset + 2);
+    append_syntax_range(node.content_ranges, node.start_offset + 2, end - 2);
+    append_syntax_range(node.marker_ranges, end - 2, end);
+    return;
+  }
+  if (node.kind == syntax_kind::footnote && text.starts_with("[^")) {
+    const std::size_t close = text.find(']');
+    if (close != std::string_view::npos) {
+      append_syntax_range(node.marker_ranges, node.start_offset, node.start_offset + 2);
+      append_syntax_range(node.content_ranges, node.start_offset + 2, node.start_offset + close);
+      if (close + 1 < text.size() && text[close + 1] == ':') {
+        append_syntax_range(node.marker_ranges, node.start_offset + close, node.start_offset + close + 2);
+        std::size_t body = close + 2;
+        while (body < text.size() && (text[body] == ' ' || text[body] == '\t')) {
+          ++body;
+        }
+        append_syntax_range(node.content_ranges, node.start_offset + body, end);
+      } else {
+        append_syntax_range(node.marker_ranges, node.start_offset + close, node.start_offset + close + 1);
+      }
+      return;
+    }
+  }
+  if ((node.kind == syntax_kind::link || node.kind == syntax_kind::image) && text.front() == '<') {
+    append_syntax_range(node.marker_ranges, node.start_offset, node.start_offset + 1);
+    append_syntax_range(node.content_ranges, node.start_offset + 1, end - 1);
+    append_syntax_range(node.marker_ranges, end - 1, end);
+    return;
+  }
+  if (node.kind == syntax_kind::link || node.kind == syntax_kind::image) {
+    const bool image = node.kind == syntax_kind::image;
+    const std::size_t label_open = image ? 1 : 0;
+    const std::size_t label_end = text.find(']', label_open + 1);
+    if (image) {
+      append_syntax_range(node.marker_ranges, node.start_offset, node.start_offset + 2);
+    } else {
+      append_syntax_range(node.marker_ranges, node.start_offset, node.start_offset + 1);
+    }
+    if (label_end != std::string_view::npos) {
+      append_syntax_range(
+        node.content_ranges,
+        node.start_offset + label_open + 1,
+        node.start_offset + label_end
+      );
+      if (label_end + 1 < text.size() && (text[label_end + 1] == '(' || text[label_end + 1] == '[')) {
+        append_syntax_range(
+          node.marker_ranges,
+          node.start_offset + label_end,
+          node.start_offset + label_end + 2
+        );
+        append_syntax_range(
+          node.content_ranges,
+          node.start_offset + label_end + 2,
+          end - 1
+        );
+        append_syntax_range(node.marker_ranges, end - 1, end);
+      } else {
+        append_syntax_range(
+          node.marker_ranges,
+          node.start_offset + label_end,
+          node.start_offset + label_end + 1
+        );
+      }
+      return;
+    }
+  }
+  append_syntax_range(node.content_ranges, node.start_offset, end);
+}
+
+void decorate_line_syntax(std::string_view source, syntax_node& node) {
+  std::size_t line_start = node.start_offset;
+  while (line_start < node.end_offset) {
+    const std::size_t newline = source.find('\n', line_start);
+    const std::size_t line_end = std::min(
+      newline == std::string_view::npos ? source.size() : newline,
+      node.end_offset
+    );
+    const std::string_view line = source.substr(line_start, line_end - line_start);
+    std::size_t cursor = 0;
+    while (cursor < line.size() && (line[cursor] == ' ' || line[cursor] == '\t')) {
+      ++cursor;
+    }
+    if (node.kind == syntax_kind::quote && cursor < line.size() && line[cursor] == '>') {
+      std::size_t marker_end = cursor + 1;
+      if (marker_end < line.size() && line[marker_end] == ' ') {
+        ++marker_end;
+      }
+      append_syntax_range(node.marker_ranges, line_start + cursor, line_start + marker_end);
+      append_syntax_range(node.content_ranges, line_start + marker_end, line_end);
+    } else if (node.kind == syntax_kind::list || node.kind == syntax_kind::task) {
+      std::size_t marker_end = cursor;
+      if (marker_end < line.size() && (line[marker_end] == '-' || line[marker_end] == '*' || line[marker_end] == '+')) {
+        ++marker_end;
+      } else {
+        while (marker_end < line.size() && is_digit(line[marker_end])) {
+          ++marker_end;
+        }
+        if (marker_end < line.size() && (line[marker_end] == '.' || line[marker_end] == ')')) {
+          ++marker_end;
+        }
+      }
+      if (marker_end > cursor) {
+        while (marker_end < line.size() && line[marker_end] == ' ') {
+          ++marker_end;
+        }
+        if (
+          node.kind == syntax_kind::task &&
+          marker_end + 2 < line.size() &&
+          line[marker_end] == '[' &&
+          line[marker_end + 2] == ']'
+        ) {
+          marker_end += 3;
+          while (marker_end < line.size() && line[marker_end] == ' ') {
+            ++marker_end;
+          }
+        }
+        append_syntax_range(node.marker_ranges, line_start + cursor, line_start + marker_end);
+        append_syntax_range(node.content_ranges, line_start + marker_end, line_end);
+      } else {
+        append_syntax_range(node.content_ranges, line_start, line_end);
+      }
+    }
+    if (newline == std::string_view::npos || newline >= node.end_offset) {
+      break;
+    }
+    line_start = newline + 1;
+  }
+}
+
+void decorate_table_syntax(std::string_view source, syntax_node& node) {
+  std::size_t line_start = node.start_offset;
+  while (line_start < node.end_offset) {
+    const std::size_t newline = source.find('\n', line_start);
+    const std::size_t line_end = std::min(
+      newline == std::string_view::npos ? source.size() : newline,
+      node.end_offset
+    );
+    const std::string_view line = source.substr(line_start, line_end - line_start);
+    std::vector<table_alignment> alignments;
+    if (parse_table_separator_row(line, alignments)) {
+      const std::string_view trimmed = trim(line);
+      const std::size_t offset = line.find(trimmed);
+      append_syntax_range(node.marker_ranges, line_start + offset, line_start + offset + trimmed.size());
+    } else {
+      std::size_t cell_start = 0;
+      for (std::size_t index = 0; index <= line.size(); ++index) {
+        if (index < line.size() && line[index] != '|') {
+          continue;
+        }
+        std::size_t content_start = cell_start;
+        std::size_t content_end = index;
+        while (content_start < content_end && is_space(line[content_start])) {
+          ++content_start;
+        }
+        while (content_end > content_start && is_space(line[content_end - 1])) {
+          --content_end;
+        }
+        append_syntax_range(node.content_ranges, line_start + content_start, line_start + content_end);
+        if (index < line.size()) {
+          append_syntax_range(node.marker_ranges, line_start + index, line_start + index + 1);
+        }
+        cell_start = index + 1;
+      }
+    }
+    if (newline == std::string_view::npos || newline >= node.end_offset) {
+      break;
+    }
+    line_start = newline + 1;
+  }
+}
+
+void decorate_block_syntax(std::string_view source, syntax_node& node) {
+  const std::size_t end = syntax_content_end(source, node.end_offset);
+  if (node.start_offset >= end) {
+    return;
+  }
+  const std::string_view text = source.substr(node.start_offset, end - node.start_offset);
+  const std::size_t first_newline = text.find('\n');
+  if (node.kind == syntax_kind::heading) {
+    const std::string_view first_line = first_newline == std::string_view::npos
+      ? text
+      : text.substr(0, first_newline);
+    const std::string_view trimmed = trim_left(first_line);
+    const std::size_t indent = first_line.size() - trimmed.size();
+    if (!trimmed.empty() && trimmed.front() == '#') {
+      std::size_t marker_end = 0;
+      while (marker_end < trimmed.size() && trimmed[marker_end] == '#') {
+        ++marker_end;
+      }
+      while (marker_end < trimmed.size() && trimmed[marker_end] == ' ') {
+        ++marker_end;
+      }
+      append_syntax_range(
+        node.marker_ranges,
+        node.start_offset + indent,
+        node.start_offset + indent + marker_end
+      );
+      std::size_t content_end = trimmed.size();
+      while (content_end > marker_end && trimmed[content_end - 1] == ' ') {
+        --content_end;
+      }
+      std::size_t closing = content_end;
+      while (closing > marker_end && trimmed[closing - 1] == '#') {
+        --closing;
+      }
+      if (closing < content_end && closing > marker_end && trimmed[closing - 1] == ' ') {
+        append_syntax_range(
+          node.marker_ranges,
+          node.start_offset + indent + closing - 1,
+          node.start_offset + indent + content_end
+        );
+        content_end = closing - 1;
+      }
+      append_syntax_range(
+        node.content_ranges,
+        node.start_offset + indent + marker_end,
+        node.start_offset + indent + content_end
+      );
+      return;
+    }
+    if (first_newline != std::string_view::npos) {
+      append_syntax_range(node.content_ranges, node.start_offset, node.start_offset + first_newline);
+      append_syntax_range(node.marker_ranges, node.start_offset + first_newline + 1, end);
+      return;
+    }
+  }
+  if (node.kind == syntax_kind::list || node.kind == syntax_kind::task || node.kind == syntax_kind::quote) {
+    decorate_line_syntax(source, node);
+    return;
+  }
+  if (node.kind == syntax_kind::table) {
+    decorate_table_syntax(source, node);
+    return;
+  }
+  if (
+    node.kind == syntax_kind::latex &&
+    text.size() >= 4 &&
+    text.front() == '\\'
+  ) {
+    decorate_inline_syntax(source, node);
+    return;
+  }
+  if (
+    node.status == syntax_status::malformed &&
+    node.diagnostic_code.starts_with("unclosed-")
+  ) {
+    const std::size_t open_end = first_newline == std::string_view::npos
+      ? end
+      : node.start_offset + first_newline;
+    append_syntax_range(node.marker_ranges, node.start_offset, open_end);
+    append_syntax_range(
+      node.content_ranges,
+      std::min(end, open_end + 1),
+      end
+    );
+    return;
+  }
+  if (
+    node.kind == syntax_kind::code ||
+    node.kind == syntax_kind::mermaid ||
+    node.kind == syntax_kind::latex ||
+    node.kind == syntax_kind::explicit_paragraph
+  ) {
+    const std::size_t open_end = first_newline == std::string_view::npos ? end : node.start_offset + first_newline;
+    const std::size_t last_line_start = text.rfind('\n');
+    const std::size_t close_start = last_line_start == std::string_view::npos
+      ? end
+      : node.start_offset + last_line_start + 1;
+    append_syntax_range(node.marker_ranges, node.start_offset, open_end);
+    if (close_start > open_end) {
+      append_syntax_range(
+        node.content_ranges,
+        std::min(end, open_end + 1),
+        std::min(end, close_start)
+      );
+      append_syntax_range(node.marker_ranges, close_start, end);
+    }
+    return;
+  }
+  decorate_inline_syntax(source, node);
+}
+
 bool is_atx_heading_line(std::string_view line) {
   const std::string_view trimmed = trim_left(line);
   std::size_t level = 0;
@@ -2165,8 +2471,14 @@ std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
       nodes.push_back({
         syntax_kind::malformed,
         line.start,
-        exclusive_line_end(source, line),
+        source.size(),
+        static_cast<std::size_t>(-1),
+        {},
+        {},
+        syntax_status::malformed,
+        "unclosed-explicit-paragraph",
       });
+      index = lines.size();
       continue;
     }
 
@@ -2278,9 +2590,26 @@ std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
       while (mermaid_index < lines.size() && trim(lines[mermaid_index].text) != ":::") {
         ++mermaid_index;
       }
-      const SourceLine& last = mermaid_index < lines.size() ? lines[mermaid_index] : line;
-      nodes.push_back({syntax_kind::mermaid, line.start, exclusive_line_end(source, last)});
-      index = mermaid_index < lines.size() ? mermaid_index : index;
+      if (mermaid_index < lines.size()) {
+        nodes.push_back({
+          syntax_kind::mermaid,
+          line.start,
+          exclusive_line_end(source, lines[mermaid_index]),
+        });
+        index = mermaid_index;
+      } else {
+        nodes.push_back({
+          syntax_kind::malformed,
+          line.start,
+          source.size(),
+          static_cast<std::size_t>(-1),
+          {},
+          {},
+          syntax_status::malformed,
+          "unclosed-mermaid",
+        });
+        index = lines.size();
+      }
       continue;
     }
 
@@ -2348,13 +2677,27 @@ std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
 
   if (in_code_block) {
     nodes.push_back({
-      trim(fence_lang) == "mermaid" ? syntax_kind::mermaid : syntax_kind::code,
+      syntax_kind::malformed,
       code_start,
       source.size(),
+      static_cast<std::size_t>(-1),
+      {},
+      {},
+      syntax_status::malformed,
+      trim(fence_lang) == "mermaid" ? "unclosed-mermaid" : "unclosed-code-fence",
     });
   }
   if (in_latex_block) {
-    nodes.push_back({syntax_kind::latex, latex_start, source.size()});
+    nodes.push_back({
+      syntax_kind::malformed,
+      latex_start,
+      source.size(),
+      static_cast<std::size_t>(-1),
+      {},
+      {},
+      syntax_status::malformed,
+      "unclosed-latex",
+    });
   }
   flush_paragraph(source.size());
   flush_list();
@@ -2399,6 +2742,15 @@ std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
       }
     }
     nodes[index].parent_index = best;
+  }
+  for (auto& node : nodes) {
+    if (node.kind == syntax_kind::malformed) {
+      node.status = syntax_status::malformed;
+      if (node.diagnostic_code.empty()) {
+        node.diagnostic_code = "malformed-syntax";
+      }
+    }
+    decorate_block_syntax(source, node);
   }
   return nodes;
 }
@@ -2643,7 +2995,10 @@ std::string_view syntax_kind_name(syntax_kind kind) {
     case syntax_kind::footnote: return "footnote";
     case syntax_kind::explicit_paragraph: return "explicit-paragraph";
     case syntax_kind::embed: return "embed";
+    case syntax_kind::caption: return "caption";
+    case syntax_kind::anchor: return "anchor";
     case syntax_kind::malformed: return "malformed";
+    case syntax_kind::count: break;
   }
   return "malformed";
 }

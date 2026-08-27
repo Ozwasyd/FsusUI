@@ -45,6 +45,37 @@ A deleted heading, table, fence, link, or image must not be retargeted.
 
 Raw JavaScript UTF-16 offsets are the only edit/selection coordinates.
 
+## Projection node contract
+
+`MarkdownEditorSyntaxNode` is a read-only projection of the unique Markdown
+parser output. It does not expose the parser AST and is never a second content
+model. Each node provides:
+
+- `blockIdentity`, which is unique and deterministic inside one
+  parser/source/version projection. Cross-revision identity is owned by
+  `stabilizeMarkdownEditorProjection`.
+- whole-node `rawRange` / `normalizedRange`;
+- parser-owned `rawContentRanges` / `normalizedContentRanges`;
+- parser-owned `rawMarkerRanges` / `normalizedMarkerRanges`;
+- parent and child ranges;
+- `status`, `diagnosticCode`, and a presentation classification.
+
+Malformed and unclosed structures use `status: "malformed"`,
+`presentation: "unsupported-error"`, and an exact diagnostic range. They are
+not silently reclassified as a valid fence, math block, Mermaid block, or
+explicit paragraph.
+
+The syntax collector publishes its supported kinds. Projection creation fails
+closed if that parser-owned set and the presentation registry drift in either
+direction.
+
+## Worker equivalence
+
+The dedicated Worker returns the complete `MarkdownEditorProjectionResult`, not
+only node ids or rendered output. Main-thread and Worker results are compared
+on parser/source/version identity, block identity, source/content/marker
+ranges, parent/child ranges, diagnostics, presentation, and syntax coverage.
+
 ## Acceptance gate
 
 `evaluateMarkdownProjectionAcceptance` composes those APIs and rejects stale

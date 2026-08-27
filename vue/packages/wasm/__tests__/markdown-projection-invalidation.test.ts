@@ -311,10 +311,17 @@ describe('markdown projection invalidation', () => {
       const range = { start, end }
       return Object.freeze({
         id: `syn:doc-1:2:heading:${index}`,
+        blockIdentity: `block:doc-1:${index}`,
         kind: 'heading' as const,
+        status: 'valid' as const,
+        diagnosticCode: null,
         presentation: 'live-decorated' as const,
         rawRange: range,
         normalizedRange: range,
+        rawContentRanges: Object.freeze([range]),
+        normalizedContentRanges: Object.freeze([range]),
+        rawMarkerRanges: Object.freeze([]),
+        normalizedMarkerRanges: Object.freeze([]),
         parentRawRange: null,
         parentNormalizedRange: null,
         childRawRanges: Object.freeze([]),

@@ -1,4 +1,8 @@
-import { createMarkdownEditorProjection } from './markdown-editor-projection'
+import {
+  createMarkdownEditorProjection,
+  transferMarkdownEditorProjection,
+  type MarkdownEditorProjectionResult,
+} from './markdown-editor-projection'
 import {
   createMarkdownProjectionSession,
   type MarkdownProjectionChange,
@@ -63,6 +67,7 @@ export interface MarkdownProjectionWorkerResult {
   readonly nodeIds: readonly string[]
   readonly kinds: readonly string[]
   readonly retainedCurrentIds: readonly string[]
+  readonly projection: MarkdownEditorProjectionResult
 }
 
 export interface MarkdownProjectionWorkerPort {
@@ -111,6 +116,7 @@ export const isMarkdownProjectionWorkerResult = (
     Number.isInteger(result.revision) &&
     Boolean(result.documentIdentity?.id) &&
     Array.isArray(result.nodeIds)
+    && Object(result.projection) === result.projection
   )
 }
 
@@ -148,9 +154,16 @@ export const reviveMarkdownStableProjection = (
     Object.freeze({
       id: node.id,
       kind: node.kind,
+      blockIdentity: `worker-snapshot:${node.id}`,
+      status: 'valid',
+      diagnosticCode: null,
       presentation: 'live-decorated',
       normalizedRange: node.normalizedRange,
       rawRange: node.rawRange,
+      rawContentRanges: Object.freeze([node.rawRange]),
+      normalizedContentRanges: Object.freeze([node.normalizedRange]),
+      rawMarkerRanges: Object.freeze([]),
+      normalizedMarkerRanges: Object.freeze([]),
       parentRawRange: null,
       parentNormalizedRange: null,
       childRawRanges: Object.freeze([]),
@@ -268,6 +281,7 @@ export const projectMarkdownOnWorker = (
         (id) => stable.resolve(id).status === 'current',
       ),
     ),
+    projection: transferMarkdownEditorProjection(projection),
   })
 }
 
