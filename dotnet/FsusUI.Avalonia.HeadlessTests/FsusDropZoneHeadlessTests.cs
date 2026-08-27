@@ -1,15 +1,19 @@
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Platform.Storage;
 using Avalonia.Themes.Fluent;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Themes;
 using System.Security.Cryptography;
@@ -18,6 +22,10 @@ using System.Windows.Input;
 
 namespace FsusUI.Avalonia.HeadlessTests;
 
+[CollectionDefinition("FsusDropZoneTheme", DisableParallelization = true)]
+public sealed class FsusDropZoneThemeCollection;
+
+[Collection("FsusDropZoneTheme")]
 public class FsusDropZoneHeadlessTests
 {
   public static IEnumerable<object[]> ThemeAndDirectionVariants()
@@ -68,6 +76,13 @@ public class FsusDropZoneHeadlessTests
     Assert.Equal("Contract upload zone", AutomationProperties.GetName(dropZone));
     Assert.Equal("PDF or PNG format up to 25MB", AutomationProperties.GetHelpText(dropZone));
     Assert.Equal("ready", AutomationProperties.GetItemStatus(dropZone));
+    var expectedSurface = Assert.IsAssignableFrom<ISolidColorBrush>(
+      window.Resources[FsusThemeResourceKeys.SurfaceBrush]);
+    var defaultSurface = Assert.Single(
+      dropZone.GetVisualDescendants().OfType<Border>(),
+      border => border.Name == "PART_DefaultSurface");
+    var actualSurface = Assert.IsAssignableFrom<ISolidColorBrush>(defaultSurface.Background);
+    Assert.Equal(expectedSurface.Color, actualSurface.Color);
 
     // Render verification under specified DPI scaling
     var pixelScale = dpi / 96.0;
@@ -86,14 +101,12 @@ public class FsusDropZoneHeadlessTests
   }
 
   [AvaloniaFact]
-  public void DropZoneMaintainsZeroLayoutShiftAcrossPointerDragDropAndFocusStates()
+  public void DropZoneMaintainsZeroLayoutShiftAcrossFocusDropAndStatusStates()
   {
     var dropZone = new FsusDropZone
     {
       Width = 360,
-      Height = 110,
       Instruction = "Drop files here",
-      HelpText = "All formats accepted",
     };
 
     var window = CreateStyledWindow();
@@ -122,40 +135,40 @@ public class FsusDropZoneHeadlessTests
     Assert.Equal(expectedWidth, dropZone.Bounds.Width);
     Assert.Equal(expectedHeight, dropZone.Bounds.Height);
 
-    // 3. Pointerover / Hover state
-    dropZone.Classes.Add("fsus-pointerover");
-    Dispatcher.UIThread.RunJobs();
-    Assert.Equal(expectedWidth, dropZone.Bounds.Width);
-    Assert.Equal(expectedHeight, dropZone.Bounds.Height);
-    dropZone.Classes.Remove("fsus-pointerover");
-
-    // 4. DragOver state
-    dropZone.Classes.Add("fsus-dragover");
-    Dispatcher.UIThread.RunJobs();
-    Assert.Equal(expectedWidth, dropZone.Bounds.Width);
-    Assert.Equal(expectedHeight, dropZone.Bounds.Height);
-
-    // 5. Drop handling
+    // 3. Accepted drop feedback
     dropZone.HandleDrop(new[] { "payload.json" });
     Dispatcher.UIThread.RunJobs();
+    Assert.Contains("fsus-dropped", dropZone.Classes);
     Assert.Equal(expectedWidth, dropZone.Bounds.Width);
     Assert.Equal(expectedHeight, dropZone.Bounds.Height);
 
-    // 6. Filter error state
+    // 4. Filter error with realistic long feedback
     dropZone.Accepts = ".png";
-    dropZone.HandleDrop(new[] { "payload.json" });
+    dropZone.HandleDrop(new[] { "annual-contract-export-with-a-long-file-name.json" });
     Dispatcher.UIThread.RunJobs();
     Assert.True(dropZone.HasFilterError);
     Assert.Equal(expectedWidth, dropZone.Bounds.Width);
     Assert.Equal(expectedHeight, dropZone.Bounds.Height);
 
-    // 7. Loading state
+    // 5. Application error with realistic long feedback
+    dropZone.HasFilterError = false;
+    dropZone.FilterErrorMessage = null;
+    dropZone.IsError = true;
+    dropZone.ErrorMessage =
+      "Storage volume is unavailable while the consumer prepares the import.";
+    Dispatcher.UIThread.RunJobs();
+    Assert.Equal(expectedWidth, dropZone.Bounds.Width);
+    Assert.Equal(expectedHeight, dropZone.Bounds.Height);
+
+    // 6. Loading state
+    dropZone.IsError = false;
+    dropZone.ErrorMessage = null;
     dropZone.IsLoading = true;
     Dispatcher.UIThread.RunJobs();
     Assert.Equal(expectedWidth, dropZone.Bounds.Width);
     Assert.Equal(expectedHeight, dropZone.Bounds.Height);
 
-    // 8. Disabled state
+    // 7. Disabled state
     dropZone.IsLoading = false;
     dropZone.IsDisabled = true;
     Dispatcher.UIThread.RunJobs();
@@ -232,7 +245,121 @@ public class FsusDropZoneHeadlessTests
     Assert.Equal(2, browseRequestedCount);
     Assert.Equal(2, commandExecutedCount);
 
+    var center = dropZone.TranslatePoint(
+      new Point(dropZone.Bounds.Width / 2, dropZone.Bounds.Height / 2),
+      window);
+    Assert.NotNull(center);
+    window.MouseDown(center!.Value, MouseButton.Left);
+    window.MouseUp(center.Value, MouseButton.Left);
+    Dispatcher.UIThread.RunJobs();
+
+    Assert.Equal(3, browseRequestedCount);
+    Assert.Equal(3, commandExecutedCount);
+
+    var peer = Assert.IsAssignableFrom<AutomationPeer>(
+      ControlAutomationPeer.CreatePeerForElement(dropZone));
+    var invoke = Assert.IsAssignableFrom<IInvokeProvider>(peer);
+    invoke.Invoke();
+    Dispatcher.UIThread.RunJobs();
+
+    Assert.Equal(4, browseRequestedCount);
+    Assert.Equal(4, commandExecutedCount);
+    Assert.Equal(AutomationLiveSetting.Polite, AutomationProperties.GetLiveSetting(dropZone));
+
     window.Close();
+  }
+
+  [AvaloniaFact]
+  public void LocalRoutedDragSimulationCoversEnterLeaveTypedDropAndFiltering()
+  {
+    var dropZone = new FsusDropZone
+    {
+      Width = 360,
+      Instruction = "Drop contracts here",
+      Accepts = ".pdf",
+    };
+    var window = CreateStyledWindow();
+    ApplyTheme(window, nameof(FsusThemeVariant.Light), false);
+    window.Content = dropZone;
+    window.Show();
+    Dispatcher.UIThread.RunJobs();
+
+    var tempRoot = Path.Combine(Path.GetTempPath(), $"fsusui-drop-zone-{Guid.NewGuid():N}");
+    Directory.CreateDirectory(tempRoot);
+    var acceptedPath = Path.Combine(tempRoot, "contract.pdf");
+    var secondAcceptedPath = Path.Combine(tempRoot, "appendix.pdf");
+    var rejectedPath = Path.Combine(tempRoot, "notes.txt");
+    File.WriteAllText(acceptedPath, "local drag simulation fixture");
+    File.WriteAllText(secondAcceptedPath, "local drag simulation fixture");
+    File.WriteAllText(rejectedPath, "local drag simulation fixture");
+
+    try
+    {
+      using var acceptedFile = Assert.IsAssignableFrom<IStorageFile>(
+        window.StorageProvider.TryGetFileFromPathAsync(acceptedPath).GetAwaiter().GetResult());
+      using var secondAcceptedFile = Assert.IsAssignableFrom<IStorageFile>(
+        window.StorageProvider.TryGetFileFromPathAsync(secondAcceptedPath).GetAwaiter().GetResult());
+      using var rejectedFile = Assert.IsAssignableFrom<IStorageFile>(
+        window.StorageProvider.TryGetFileFromPathAsync(rejectedPath).GetAwaiter().GetResult());
+      var transfer = new DataTransfer();
+      transfer.Add(DataTransferItem.CreateFile(acceptedFile));
+      transfer.Add(DataTransferItem.CreateFile(rejectedFile));
+
+      var enter = RaiseDrag(dropZone, DragDrop.DragEnterEvent, transfer);
+      Assert.True(enter.Handled);
+      Assert.Equal(DragDropEffects.Copy, enter.DragEffects);
+      Assert.True(dropZone.IsDragOver);
+      Assert.Equal("dragover", AutomationProperties.GetItemStatus(dropZone));
+
+      var leave = RaiseDrag(dropZone, DragDrop.DragLeaveEvent, transfer);
+      Assert.False(dropZone.IsDragOver);
+      Assert.Equal("ready", AutomationProperties.GetItemStatus(dropZone));
+      Assert.False(leave.Handled);
+
+      FsusFileDropEventArgs? dropped = null;
+      FsusFileDropEventArgs? rejected = null;
+      dropZone.FilesDropped += (_, args) => dropped = args;
+      dropZone.FilesRejected += (_, args) => rejected = args;
+
+      RaiseDrag(dropZone, DragDrop.DragEnterEvent, transfer);
+      var drop = RaiseDrag(dropZone, DragDrop.DropEvent, transfer);
+
+      Assert.True(drop.Handled);
+      Assert.NotNull(dropped);
+      Assert.NotNull(rejected);
+      Assert.Same(acceptedFile, Assert.Single(dropped!.StorageItems));
+      Assert.Same(rejectedFile, Assert.Single(rejected!.RejectedItems));
+      Assert.True(dropZone.HasFilterError);
+      Assert.StartsWith("rejected:", AutomationProperties.GetItemStatus(dropZone));
+
+      var acceptedOnlyTransfer = new DataTransfer();
+      acceptedOnlyTransfer.Add(DataTransferItem.CreateFile(acceptedFile));
+      RaiseDrag(dropZone, DragDrop.DragEnterEvent, acceptedOnlyTransfer);
+      RaiseDrag(dropZone, DragDrop.DropEvent, acceptedOnlyTransfer);
+
+      Assert.False(dropZone.HasFilterError);
+      Assert.Contains("fsus-dropped", dropZone.Classes);
+      Assert.Equal("dropped: 1 accepted", AutomationProperties.GetItemStatus(dropZone));
+
+      dropZone.AllowMultiple = false;
+      dropped = null;
+      rejected = null;
+      var singleTransfer = new DataTransfer();
+      singleTransfer.Add(DataTransferItem.CreateFile(acceptedFile));
+      singleTransfer.Add(DataTransferItem.CreateFile(secondAcceptedFile));
+      RaiseDrag(dropZone, DragDrop.DragEnterEvent, singleTransfer);
+      RaiseDrag(dropZone, DragDrop.DropEvent, singleTransfer);
+
+      Assert.Same(acceptedFile, Assert.Single(dropped!.StorageItems));
+      Assert.Same(secondAcceptedFile, Assert.Single(rejected!.RejectedItems));
+      Assert.Equal("Only a single file is accepted.", dropZone.FilterErrorMessage);
+      Assert.StartsWith("rejected:", AutomationProperties.GetItemStatus(dropZone));
+    }
+    finally
+    {
+      window.Close();
+      Directory.Delete(tempRoot, true);
+    }
   }
 
   [AvaloniaFact]
@@ -322,20 +449,71 @@ public class FsusDropZoneHeadlessTests
         (Theme: "HighContrast", HighContrast: true),
       })
     {
-      foreach (var state in new[] { "ready", "dragover", "focus", "loading", "error", "rejected" })
+      foreach (var state in new[]
+        {
+          "ready",
+          "hover",
+          "dragover",
+          "dropped",
+          "focus",
+          "disabled",
+          "loading",
+          "error",
+          "rejected",
+        })
       {
-        captures.Add(RenderDropZoneState(outputRoot, themeName, highContrast, state));
+        captures.Add(
+          RenderDropZoneState(
+            outputRoot,
+            themeName,
+            highContrast,
+            state,
+            FlowDirection.LeftToRight,
+            96));
+      }
+
+      foreach (var (flowDirection, dpi) in new[]
+        {
+          (FlowDirection.RightToLeft, 96.0),
+          (FlowDirection.LeftToRight, 144.0),
+          (FlowDirection.LeftToRight, 192.0),
+        })
+      {
+        foreach (var state in new[] { "ready", "rejected" })
+        {
+          captures.Add(
+            RenderDropZoneState(
+              outputRoot,
+              themeName,
+              highContrast,
+              state,
+              flowDirection,
+              dpi));
+        }
       }
     }
 
-    Assert.Equal(18, captures.Count);
+    Assert.Equal(45, captures.Count);
     Assert.All(captures, capture =>
     {
       Assert.Equal(64, capture.Sha256.Length);
-      Assert.True(capture.PixelSize.Width > 0);
-      Assert.True(capture.PixelSize.Height > 0);
+      Assert.Equal(
+        (int)Math.Round(480 * capture.ZoomPercent / 100.0),
+        capture.PixelSize.Width);
+      Assert.Equal(
+        (int)Math.Round(160 * capture.ZoomPercent / 100.0),
+        capture.PixelSize.Height);
       Assert.True(File.Exists(Path.Combine(FindRepositoryRoot(), capture.File)));
     });
+    foreach (var themeCaptures in captures
+      .Where(capture =>
+        capture.FlowDirection == FlowDirection.LeftToRight.ToString() &&
+        capture.ZoomPercent == 100 &&
+        capture.State is "ready" or "disabled" or "loading" or "error" or "rejected")
+      .GroupBy(capture => capture.Theme))
+    {
+      Assert.Equal(5, themeCaptures.Select(capture => capture.Sha256).Distinct().Count());
+    }
 
     var manifestPath = Path.Combine(
       FindRepositoryRoot(),
@@ -349,7 +527,7 @@ public class FsusDropZoneHeadlessTests
       JsonSerializer.Serialize(
         new
         {
-          schemaVersion = 1,
+          schemaVersion = 2,
           generatedBy =
             "FsusDropZoneHeadlessTests.RealHeadlessSkiaRendersDropZoneVisualStatesAndSavesArtifacts",
           renderer = new
@@ -358,6 +536,9 @@ public class FsusDropZoneHeadlessTests
             runner = "headless-skia",
             drawingBackend = "Skia",
             avaloniaVersion = typeof(Application).Assembly.GetName().Version?.ToString(),
+            evidenceClass = "local-headless-render",
+            limitations =
+              "Pointer and drag visual-state captures use production classes; routed DataTransfer behavior is exercised separately by LocalRoutedDragSimulationCoversEnterLeaveTypedDropAndFiltering. No operating-system drag source or physical display is claimed.",
           },
           issue = 655,
           captures,
@@ -369,31 +550,53 @@ public class FsusDropZoneHeadlessTests
     string outputRoot,
     string themeName,
     bool highContrast,
-    string state)
+    string state,
+    FlowDirection flowDirection,
+    double dpi)
   {
     var dropZone = new FsusDropZone
     {
       Width = 400,
       Height = 110,
+      AccessibleName = "Attachment import",
       Instruction = "Drag files here or click to browse",
       HelpText = "Supported formats: PDF, PNG, CSV up to 15MB",
+      FlowDirection = flowDirection,
     };
 
+    var stateSetup = state;
     switch (state)
     {
+      case "hover":
+        dropZone.Classes.Add("fsus-pointerover");
+        stateSetup = "production visual class projection; pointer activation tested separately";
+        break;
       case "dragover":
         dropZone.Classes.Add("fsus-dragover");
+        stateSetup = "production visual class projection; routed DataTransfer tested separately";
+        break;
+      case "dropped":
+        dropZone.HandleDrop(new[] { "contract.pdf" });
+        stateSetup = "HandleDrop accepted-file simulation";
+        break;
+      case "disabled":
+        dropZone.IsDisabled = true;
+        stateSetup = "IsDisabled property";
         break;
       case "loading":
         dropZone.IsLoading = true;
+        stateSetup = "IsLoading property";
         break;
       case "error":
         dropZone.IsError = true;
-        dropZone.ErrorMessage = "Storage volume unavailable";
+        dropZone.ErrorMessage =
+          "Storage volume is unavailable while the consumer prepares the import.";
+        stateSetup = "IsError and ErrorMessage properties";
         break;
       case "rejected":
         dropZone.Accepts = ".pdf";
-        dropZone.HandleDrop(new[] { "script.sh" });
+        dropZone.HandleDrop(new[] { "annual-contract-export-with-a-long-file-name.sh" });
+        stateSetup = "HandleDrop rejected-file simulation";
         break;
     }
 
@@ -410,6 +613,7 @@ public class FsusDropZoneHeadlessTests
       Background = Assert.IsAssignableFrom<IBrush>(
         window.Resources[FsusThemeResourceKeys.BackgroundBrush]),
       Child = dropZone,
+      FlowDirection = flowDirection,
     };
 
     window.Content = surfaceRoot;
@@ -427,10 +631,19 @@ public class FsusDropZoneHeadlessTests
     surfaceRoot.Measure(new Size(480, 160));
     surfaceRoot.Arrange(new Rect(0, 0, 480, 160));
 
-    using var bitmap = new RenderTargetBitmap(new PixelSize(480, 160), new Vector(96, 96));
+    var pixelScale = dpi / 96;
+    var pixelSize = new PixelSize(
+      (int)Math.Round(480 * pixelScale),
+      (int)Math.Round(160 * pixelScale));
+    using var bitmap = new RenderTargetBitmap(pixelSize, new Vector(dpi, dpi));
     bitmap.Render(surfaceRoot);
 
-    var fileName = $"issue-655-dropzone-{themeName.ToLowerInvariant()}-{state}.png";
+    var zoomPercent = (int)Math.Round(pixelScale * 100);
+    var variantSuffix = flowDirection == FlowDirection.LeftToRight && zoomPercent == 100
+      ? string.Empty
+      : $"-{(flowDirection == FlowDirection.RightToLeft ? "rtl" : "ltr")}-{zoomPercent}";
+    var fileName =
+      $"issue-655-dropzone-{themeName.ToLowerInvariant()}{variantSuffix}-{state}.png";
     var outputPath = Path.Combine(outputRoot, fileName);
     using (var stream = File.Create(outputPath))
     {
@@ -444,7 +657,106 @@ public class FsusDropZoneHeadlessTests
       Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(outputPath))),
       new PixelDimension(bitmap.PixelSize.Width, bitmap.PixelSize.Height),
       themeName,
-      state);
+      state,
+      flowDirection.ToString(),
+      dpi,
+      zoomPercent,
+      stateSetup);
+  }
+
+  [AvaloniaFact]
+  public void LocalAutomationSimulationWritesInspectableReceipt()
+  {
+    var browseRequestedCount = 0;
+    var dropZone = new FsusDropZone
+    {
+      Width = 360,
+      Height = 100,
+      AccessibleName = "Attachment import",
+      Instruction = "Drag files here or click to browse",
+      HelpText = "PDF documents, up to 15MB",
+    };
+    dropZone.BrowseRequested += (_, _) => browseRequestedCount++;
+
+    var window = CreateStyledWindow();
+    ApplyTheme(window, nameof(FsusThemeVariant.Light), false);
+    window.Content = dropZone;
+    window.Show();
+    Dispatcher.UIThread.RunJobs();
+
+    var states = new List<object>();
+    void Capture(string state) =>
+      states.Add(new
+      {
+        state,
+        name = AutomationProperties.GetName(dropZone),
+        helpText = AutomationProperties.GetHelpText(dropZone),
+        itemStatus = AutomationProperties.GetItemStatus(dropZone),
+        liveSetting = AutomationProperties.GetLiveSetting(dropZone).ToString(),
+        isEnabled = !dropZone.IsDisabled && dropZone.IsEnabled && !dropZone.IsLoading,
+      });
+
+    Capture("ready");
+    dropZone.HandleDrop(new[] { "contract.pdf" });
+    Capture("dropped");
+    dropZone.Accepts = ".pdf";
+    dropZone.HandleDrop(new[] { "notes.txt" });
+    Capture("rejected");
+    dropZone.HasFilterError = false;
+    dropZone.FilterErrorMessage = null;
+    dropZone.IsError = true;
+    dropZone.ErrorMessage = "Storage volume unavailable";
+    Capture("error");
+    dropZone.IsError = false;
+    dropZone.ErrorMessage = null;
+    dropZone.IsLoading = true;
+    Capture("loading");
+    dropZone.IsLoading = false;
+    dropZone.IsDisabled = true;
+    Capture("disabled");
+    dropZone.IsDisabled = false;
+
+    var peer = Assert.IsAssignableFrom<AutomationPeer>(
+      ControlAutomationPeer.CreatePeerForElement(dropZone));
+    var invoke = Assert.IsAssignableFrom<IInvokeProvider>(peer);
+    invoke.Invoke();
+    Dispatcher.UIThread.RunJobs();
+    Assert.Equal(1, browseRequestedCount);
+
+    var reportPath = Path.Combine(
+      FindRepositoryRoot(),
+      "tests",
+      "conformance",
+      "visual",
+      "artifacts",
+      "issue-655-avalonia-drop-zone-automation-report.json");
+    File.WriteAllText(
+      reportPath,
+      JsonSerializer.Serialize(
+        new
+        {
+          schemaVersion = 1,
+          issue = 655,
+          generatedBy =
+            "FsusDropZoneHeadlessTests.LocalAutomationSimulationWritesInspectableReceipt",
+          evidenceClass = "local-headless-automation-simulation",
+          notRealOsScreenReader = true,
+          controlType = AutomationProperties.GetControlTypeOverride(dropZone).ToString(),
+          invokePattern = peer is IInvokeProvider,
+          browseRequestedCount,
+          states,
+          relatedInteractionTests = new[]
+          {
+            "KeyboardActivationTriggersConsumerSpecifiedBrowseAction",
+            "LocalRoutedDragSimulationCoversEnterLeaveTypedDropAndFiltering",
+          },
+          limitations =
+            "This receipt inspects Avalonia automation properties and the production automation peer in the headless backend. It does not claim a Windows UIA, macOS VoiceOver, Linux AT-SPI, or physical assistive-technology session.",
+        },
+        new JsonSerializerOptions { WriteIndented = true }) + "\n");
+
+    Assert.True(new FileInfo(reportPath).Length > 500);
+    window.Close();
   }
 
   private static Window CreateStyledWindow()
@@ -456,11 +768,27 @@ public class FsusDropZoneHeadlessTests
       ShowInTaskbar = false,
     };
     window.Styles.Add(new FluentTheme());
-    window.Styles.Add(new StyleInclude(new Uri("avares://FsusUI.Avalonia.Themes"))
+    window.Styles.Add(new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
     {
       Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
     });
     return window;
+  }
+
+  private static DragEventArgs RaiseDrag(
+    FsusDropZone dropZone,
+    global::Avalonia.Interactivity.RoutedEvent<DragEventArgs> routedEvent,
+    IDataTransfer transfer)
+  {
+    var args = new DragEventArgs(
+      routedEvent,
+      transfer,
+      dropZone,
+      new Point(12, 12),
+      KeyModifiers.None);
+    dropZone.RaiseEvent(args);
+    Dispatcher.UIThread.RunJobs();
+    return args;
   }
 
   private static void ApplyTheme(Window window, string themeName, bool highContrast)
@@ -512,5 +840,9 @@ public class FsusDropZoneHeadlessTests
     string Sha256,
     PixelDimension PixelSize,
     string Theme,
-    string State);
+    string State,
+    string FlowDirection,
+    double Dpi,
+    int ZoomPercent,
+    string StateSetup);
 }

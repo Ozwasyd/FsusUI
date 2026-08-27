@@ -6,4 +6,4 @@ Provide `FsusDropZone` file drop zone control and accessible states for Avalonia
 Supports drag-over, drag-leave, drop events with strongly typed `FsusFileDropEventArgs`,
 `Accepts` and validation predicates, single/multiple mode, disabled, loading, and error states,
 optional click and keyboard (Enter / Space) file browse activation without hardcoded IO,
-zero layout shift across states, and full screen reader automation support.
+zero layout shift across states, and accessible automation metadata with an Invoke pattern.

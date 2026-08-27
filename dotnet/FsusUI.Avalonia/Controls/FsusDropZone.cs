@@ -1,9 +1,9 @@
-using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Input;
@@ -72,9 +72,12 @@ public class FsusFileDropEventArgs : RoutedEventArgs
   public DragDropEffects DragEffects { get; }
 }
 
-[PseudoClasses(":dragover", ":disabled", ":loading", ":error")]
+[PseudoClasses(":dragover", ":dropped", ":disabled", ":loading", ":error")]
 public class FsusDropZone : ContentControl
 {
+  private bool hasDropFeedback;
+  private int lastAcceptedCount;
+
   public static readonly RoutedEvent<FsusFileDropEventArgs> FilesDroppedEvent =
     RoutedEvent.Register<FsusDropZone, FsusFileDropEventArgs>(
       nameof(FilesDropped),
@@ -335,6 +338,8 @@ public class FsusDropZone : ContentControl
       return;
     }
 
+    ResetDropResult();
+
     var accepted = new List<IStorageItem>();
     var rejected = new List<IStorageItem>();
 
@@ -382,11 +387,6 @@ public class FsusDropZone : ContentControl
         rejectedFiles);
       RaiseEvent(rejectedArgs);
     }
-    else
-    {
-      HasFilterError = false;
-      FilterErrorMessage = null;
-    }
 
     if (accepted.Count > 0)
     {
@@ -402,6 +402,7 @@ public class FsusDropZone : ContentControl
       RaiseEvent(dropArgs);
     }
 
+    SetDropResult(accepted.Count, rejected.Count);
     SyncClasses();
     SyncAutomation();
   }
@@ -420,6 +421,8 @@ public class FsusDropZone : ContentControl
     {
       return;
     }
+
+    ResetDropResult();
 
     var accepted = new List<string>();
     var rejected = new List<string>();
@@ -464,11 +467,6 @@ public class FsusDropZone : ContentControl
         rejected.AsReadOnly());
       RaiseEvent(rejectedArgs);
     }
-    else
-    {
-      HasFilterError = false;
-      FilterErrorMessage = null;
-    }
 
     if (accepted.Count > 0)
     {
@@ -480,6 +478,7 @@ public class FsusDropZone : ContentControl
       RaiseEvent(dropArgs);
     }
 
+    SetDropResult(accepted.Count, rejected.Count);
     SyncClasses();
     SyncAutomation();
   }
@@ -592,6 +591,9 @@ public class FsusDropZone : ContentControl
     }
   }
 
+  protected override AutomationPeer OnCreateAutomationPeer() =>
+    new DropZoneAutomationPeer(this);
+
   protected override void OnKeyDown(KeyEventArgs e)
   {
     base.OnKeyDown(e);
@@ -647,6 +649,7 @@ public class FsusDropZone : ContentControl
     var files = e.DataTransfer.TryGetFiles();
     if (files is not null && files.Length > 0)
     {
+      ResetDropResult();
       e.DragEffects = DragDropEffects.Copy;
       IsDragOver = true;
       SyncClasses();
@@ -723,14 +726,27 @@ public class FsusDropZone : ContentControl
 
   private bool IsItemAccepted(IStorageItem item)
   {
-    if (ValidationPredicate is not null && !ValidationPredicate(item))
+    if (item is not IStorageFile)
     {
       return false;
     }
 
     var localPath = GetStorageItemPath(item);
-    if (PathValidationPredicate is not null && !PathValidationPredicate(localPath))
+    try
     {
+      if (ValidationPredicate is not null && !ValidationPredicate(item))
+      {
+        return false;
+      }
+
+      if (PathValidationPredicate is not null && !PathValidationPredicate(localPath))
+      {
+        return false;
+      }
+    }
+    catch
+    {
+      FilterErrorMessage = "File validation failed.";
       return false;
     }
 
@@ -744,8 +760,16 @@ public class FsusDropZone : ContentControl
 
   private bool IsPathAccepted(string path)
   {
-    if (PathValidationPredicate is not null && !PathValidationPredicate(path))
+    try
     {
+      if (PathValidationPredicate is not null && !PathValidationPredicate(path))
+      {
+        return false;
+      }
+    }
+    catch
+    {
+      FilterErrorMessage = "File validation failed.";
       return false;
     }
 
@@ -796,6 +820,7 @@ public class FsusDropZone : ContentControl
     FsusComponentClasses.SyncSize(this, Size);
     FsusComponentClasses.Ensure(this, "fsus-dragover", IsDragOver);
     FsusComponentClasses.Ensure(this, "fsus-drag-over", IsDragOver);
+    FsusComponentClasses.Ensure(this, "fsus-dropped", hasDropFeedback);
     FsusComponentClasses.Ensure(this, "fsus-disabled", IsDisabled || !IsEnabled);
     FsusComponentClasses.Ensure(this, "fsus-loading", IsLoading);
     FsusComponentClasses.Ensure(this, "fsus-has-error", IsError || !string.IsNullOrWhiteSpace(ErrorMessage));
@@ -806,6 +831,7 @@ public class FsusDropZone : ContentControl
     FsusComponentClasses.Ensure(this, "fsus-has-help-content", HelpContent is not null);
 
     PseudoClasses.Set(":dragover", IsDragOver);
+    PseudoClasses.Set(":dropped", hasDropFeedback);
     PseudoClasses.Set(":loading", IsLoading);
     PseudoClasses.Set(":error", IsError || HasFilterError);
     PseudoClasses.Set(":disabled", IsDisabled || !IsEnabled);
@@ -814,6 +840,7 @@ public class FsusDropZone : ContentControl
   private void SyncAutomation()
   {
     AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Group);
+    AutomationProperties.SetLiveSetting(this, AutomationLiveSetting.Polite);
 
     var name = !string.IsNullOrWhiteSpace(AccessibleName)
       ? AccessibleName
@@ -843,7 +870,32 @@ public class FsusDropZone : ContentControl
             ? $"error: {ErrorMessage ?? "error"}"
             : IsDragOver
               ? "dragover"
-              : "ready";
+              : hasDropFeedback
+                ? $"dropped: {lastAcceptedCount.ToString(CultureInfo.InvariantCulture)} accepted"
+                : "ready";
     AutomationProperties.SetItemStatus(this, status);
+  }
+
+  private void ResetDropResult()
+  {
+    hasDropFeedback = false;
+    lastAcceptedCount = 0;
+    HasFilterError = false;
+    FilterErrorMessage = null;
+  }
+
+  private void SetDropResult(int acceptedCount, int rejectedCount)
+  {
+    lastAcceptedCount = acceptedCount;
+    hasDropFeedback = acceptedCount > 0 && rejectedCount == 0;
+  }
+
+  private sealed class DropZoneAutomationPeer(FsusDropZone owner)
+    : ControlAutomationPeer(owner), IInvokeProvider
+  {
+    protected override bool IsEnabledCore() =>
+      owner.IsEnabled && !owner.IsDisabled && !owner.IsLoading;
+
+    public void Invoke() => owner.RequestBrowse();
   }
 }

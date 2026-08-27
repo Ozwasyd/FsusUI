@@ -2,6 +2,7 @@ using System.Windows.Input;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using FsusUI.Avalonia.Controls;
@@ -60,7 +61,8 @@ public class FsusDropZoneTests
     Assert.Empty(dropArgs.RejectedFiles);
     Assert.False(dropZone.HasFilterError);
     Assert.Null(dropZone.FilterErrorMessage);
-    Assert.Equal("ready", AutomationProperties.GetItemStatus(dropZone));
+    Assert.Equal("dropped: 2 accepted", AutomationProperties.GetItemStatus(dropZone));
+    Assert.Contains("fsus-dropped", dropZone.Classes);
   }
 
   [Fact]
@@ -324,6 +326,51 @@ public class FsusDropZoneTests
     Assert.Equal(initialPadding, dropZone.Padding);
   }
 
+  [Fact]
+  public void DropZoneStorageValidationIsFailClosedAndRefreshesRejectionMessage()
+  {
+    var dropZone = new FsusDropZone
+    {
+      Accepts = ".png",
+    };
+    dropZone.HandleDrop(["first.pdf"]);
+    Assert.Contains("first.pdf", dropZone.FilterErrorMessage);
+
+    dropZone.HandleDrop(["second.zip"]);
+    Assert.Contains("second.zip", dropZone.FilterErrorMessage);
+    Assert.DoesNotContain("first.pdf", dropZone.FilterErrorMessage);
+
+    dropZone.PathValidationPredicate = _ => throw new InvalidOperationException("consumer failure");
+    dropZone.HandleDrop(["second.zip"]);
+    Assert.Equal("File validation failed.", dropZone.FilterErrorMessage);
+    Assert.StartsWith("rejected:", AutomationProperties.GetItemStatus(dropZone));
+  }
+
+  [Fact]
+  public void DropZoneAutomationPeerExposesConsumerBrowseInvokeSimulation()
+  {
+    var browseRequested = 0;
+    var dropZone = new FsusDropZone
+    {
+      AccessibleName = "Attachment picker",
+    };
+    dropZone.BrowseRequested += (_, _) => browseRequested++;
+
+    var peer = Assert.IsAssignableFrom<AutomationPeer>(
+      ControlAutomationPeer.CreatePeerForElement(dropZone));
+    var invoke = Assert.IsAssignableFrom<IInvokeProvider>(peer);
+
+    invoke.Invoke();
+
+    Assert.Equal(1, browseRequested);
+    Assert.Equal("Attachment picker", peer.GetName());
+    Assert.Equal(AutomationLiveSetting.Polite, AutomationProperties.GetLiveSetting(dropZone));
+
+    dropZone.IsDisabled = true;
+    invoke.Invoke();
+    Assert.Equal(1, browseRequested);
+  }
+
   private sealed class TestCommand(Action<object?> execute) : ICommand
   {
     public event EventHandler? CanExecuteChanged
@@ -335,4 +382,5 @@ public class FsusDropZoneTests
     public bool CanExecute(object? parameter) => true;
     public void Execute(object? parameter) => execute(parameter);
   }
+
 }

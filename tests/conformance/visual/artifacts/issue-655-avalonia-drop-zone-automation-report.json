@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "issue": 655,
+  "generatedBy": "FsusDropZoneHeadlessTests.LocalAutomationSimulationWritesInspectableReceipt",
+  "evidenceClass": "local-headless-automation-simulation",
+  "notRealOsScreenReader": true,
+  "controlType": "Group",
+  "invokePattern": true,
+  "browseRequestedCount": 1,
+  "states": [
+    {
+      "state": "ready",
+      "name": "Attachment import",
+      "helpText": "PDF documents, up to 15MB",
+      "itemStatus": "ready",
+      "liveSetting": "Polite",
+      "isEnabled": true
+    },
+    {
+      "state": "dropped",
+      "name": "Attachment import",
+      "helpText": "PDF documents, up to 15MB",
+      "itemStatus": "dropped: 1 accepted",
+      "liveSetting": "Polite",
+      "isEnabled": true
+    },
+    {
+      "state": "rejected",
+      "name": "Attachment import",
+      "helpText": "PDF documents, up to 15MB",
+      "itemStatus": "rejected: Files [notes.txt] were rejected. Accepted formats: .pdf.",
+      "liveSetting": "Polite",
+      "isEnabled": true
+    },
+    {
+      "state": "error",
+      "name": "Attachment import",
+      "helpText": "PDF documents, up to 15MB",
+      "itemStatus": "error: Storage volume unavailable",
+      "liveSetting": "Polite",
+      "isEnabled": true
+    },
+    {
+      "state": "loading",
+      "name": "Attachment import",
+      "helpText": "PDF documents, up to 15MB",
+      "itemStatus": "loading",
+      "liveSetting": "Polite",
+      "isEnabled": false
+    },
+    {
+      "state": "disabled",
+      "name": "Attachment import",
+      "helpText": "PDF documents, up to 15MB",
+      "itemStatus": "disabled",
+      "liveSetting": "Polite",
+      "isEnabled": false
+    }
+  ],
+  "relatedInteractionTests": [
+    "KeyboardActivationTriggersConsumerSpecifiedBrowseAction",
+    "LocalRoutedDragSimulationCoversEnterLeaveTypedDropAndFiltering"
+  ],
+  "limitations": "This receipt inspects Avalonia automation properties and the production automation peer in the headless backend. It does not claim a Windows UIA, macOS VoiceOver, Linux AT-SPI, or physical assistive-technology session."
+}
