@@ -1,11 +1,10 @@
 import {
   collectMarkdownCaptionNodes,
-  type MarkdownCaptionNode,
   type MarkdownCaptionRange,
   type MarkdownCaptionValidNode,
-} from "../../../wasm/markdown-caption-directive"
-import { renderMarkdownCaptionFigure } from "../../../wasm/markdown-caption-renderer"
-import type { MarkdownEditorTransaction } from "./markdown-editor-transaction"
+} from '../../../wasm/markdown-caption-directive'
+import { renderMarkdownCaptionFigure } from '../../../wasm/markdown-caption-renderer'
+import type { MarkdownEditorTransaction } from './markdown-editor-transaction'
 
 export interface MarkdownFigure {
   readonly mediaRange: MarkdownCaptionRange
@@ -17,14 +16,16 @@ export interface MarkdownFigure {
 }
 
 export const escapeCaptionText = (text: string): string =>
-  text.replace(/[\]\\]/g, (char) => "\\" + char)
+  text.replace(/[\]\\]/g, (char) => `\\${char}`)
 
-export const findMarkdownFigures = (source: string): readonly MarkdownFigure[] => {
+export const findMarkdownFigures = (
+  source: string,
+): readonly MarkdownFigure[] => {
   const nodes = collectMarkdownCaptionNodes(source)
   const figures: MarkdownFigure[] = []
 
   for (const node of nodes) {
-    if (node.ok && node.kind === "caption") {
+    if (node.ok && node.kind === 'caption') {
       const valid = node as MarkdownCaptionValidNode
       const start = Math.min(valid.mediaRange.start, valid.ranges.full.start)
       const end = Math.max(valid.mediaRange.end, valid.ranges.full.end)
@@ -51,7 +52,7 @@ export const planMarkdownCaptionInsert = (
 ): MarkdownEditorTransaction => {
   const insertOffset = mediaRange.end
   const escaped = escapeCaptionText(captionText)
-  const insertText = "\n::caption[" + escaped + "]"
+  const insertText = `\n::caption[${escaped}]`
 
   return Object.freeze({
     changes: Object.freeze([
@@ -61,8 +62,8 @@ export const planMarkdownCaptionInsert = (
         insert: insertText,
       }),
     ]),
-    history: "separate",
-    origin: "command",
+    history: 'separate',
+    origin: 'command',
   })
 }
 
@@ -80,8 +81,8 @@ export const planMarkdownCaptionEdit = (
         insert: escaped,
       }),
     ]),
-    history: "separate",
-    origin: "command",
+    history: 'separate',
+    origin: 'command',
   })
 }
 
@@ -91,9 +92,9 @@ export const planMarkdownCaptionRemove = (
 ): MarkdownEditorTransaction => {
   let from = captionNode.ranges.full.start
   // Remove leading newline if present
-  if (from > 0 && source[from - 1] === "\n") {
+  if (from > 0 && source[from - 1] === '\n') {
     from -= 1
-    if (from > 0 && source[from - 1] === "\r") {
+    if (from > 0 && source[from - 1] === '\r') {
       from -= 1
     }
   }
@@ -104,11 +105,11 @@ export const planMarkdownCaptionRemove = (
       Object.freeze({
         from,
         to,
-        insert: "",
+        insert: '',
       }),
     ]),
-    history: "separate",
-    origin: "command",
+    history: 'separate',
+    origin: 'command',
   })
 }
 
@@ -119,13 +120,17 @@ export const planMarkdownFigureDelete = (
     readonly captionRange: MarkdownCaptionRange
   },
 ): MarkdownEditorTransaction => {
-  let from = figure.mediaRange.start
+  const from = figure.mediaRange.start
   let to = figure.captionRange.end
 
   // Clean up trailing newline after caption if present
-  if (to < source.length && source[to] === "\n") {
+  if (to < source.length && source[to] === '\n') {
     to += 1
-  } else if (to < source.length - 1 && source[to] === "\r" && source[to + 1] === "\n") {
+  } else if (
+    to < source.length - 1 &&
+    source[to] === '\r' &&
+    source[to + 1] === '\n'
+  ) {
     to += 2
   }
 
@@ -134,11 +139,11 @@ export const planMarkdownFigureDelete = (
       Object.freeze({
         from,
         to,
-        insert: "",
+        insert: '',
       }),
     ]),
-    history: "separate",
-    origin: "command",
+    history: 'separate',
+    origin: 'command',
   })
 }
 
@@ -157,29 +162,37 @@ export const planMarkdownFigureMove = (
   if (targetOffset >= from && targetOffset <= to) {
     return Object.freeze({
       changes: Object.freeze([]),
-      history: "separate",
-      origin: "command",
+      history: 'separate',
+      origin: 'command',
     })
   }
 
   if (targetOffset < from) {
     return Object.freeze({
       changes: Object.freeze([
-        Object.freeze({ from, to, insert: "" }),
-        Object.freeze({ from: targetOffset, to: targetOffset, insert: figureText + "\n" }),
+        Object.freeze({
+          from: targetOffset,
+          to: targetOffset,
+          insert: `${figureText}\n`,
+        }),
+        Object.freeze({ from, to, insert: '' }),
       ]),
-      history: "separate",
-      origin: "command",
+      history: 'separate',
+      origin: 'command',
     })
   }
 
   return Object.freeze({
     changes: Object.freeze([
-      Object.freeze({ from: targetOffset, to: targetOffset, insert: "\n" + figureText }),
-      Object.freeze({ from, to, insert: "" }),
+      Object.freeze({ from, to, insert: '' }),
+      Object.freeze({
+        from: targetOffset,
+        to: targetOffset,
+        insert: `\n${figureText}`,
+      }),
     ]),
-    history: "separate",
-    origin: "command",
+    history: 'separate',
+    origin: 'command',
   })
 }
 
@@ -224,30 +237,30 @@ export const formatMarkdownFigureVisibleCopy = (
 ): string => {
   const mediaLine = source.slice(figure.mediaRange.start, figure.mediaRange.end)
   const altMatch = /!\[([^\]]*)\]/.exec(mediaLine)
-  const alt = altMatch ? altMatch[1] : "Image"
+  const alt = altMatch ? altMatch[1] : 'Image'
   const captionText =
     figure.text ??
     source
       .slice(figure.captionRange.start, figure.captionRange.end)
-      .replace(/^::caption\[/, "")
-      .replace(/\]$/, "")
-  return (alt ? alt + "\n" : "") + captionText
+      .replace(/^::caption\[/, '')
+      .replace(/\]$/, '')
+  return (alt ? `${alt}\n` : '') + captionText
 }
 
 export type MarkdownCaptionAcceptanceMutationKind =
-  | "title-caption"
-  | "alias"
-  | "dom-regroup"
-  | "direct-splice"
-  | "alt-copy"
-  | "ghost-caption"
-  | "consumer-regex"
+  | 'title-caption'
+  | 'alias'
+  | 'dom-regroup'
+  | 'direct-splice'
+  | 'alt-copy'
+  | 'ghost-caption'
+  | 'consumer-regex'
 
 export const evaluateMarkdownCaptionAcceptanceMutations = (
-  source = "![alt](photo.jpg)\n::caption[Figure 1. A photo]\n",
+  source = '![alt](photo.jpg)\n::caption[Figure 1. A photo]\n',
 ) => {
   const figures = findMarkdownFigures(source)
-  const authority = renderMarkdownCaptionFigure(source)
+  renderMarkdownCaptionFigure(source)
 
   const deleted = figures[0]
     ? planMarkdownFigureDelete(source, figures[0])
@@ -255,44 +268,46 @@ export const evaluateMarkdownCaptionAcceptanceMutations = (
 
   const hasGhost = figures[0]
     ? !deleted.changes.some(
-        (c) => c.from <= figures[0]!.mediaRange.start && c.to >= figures[0]!.captionRange.end,
+        (c) =>
+          c.from <= figures[0]!.mediaRange.start &&
+          c.to >= figures[0]!.captionRange.end,
       )
     : false
 
   return Object.freeze({
     mutations: Object.freeze([
       Object.freeze({
-        kind: "title-caption" as const,
+        kind: 'title-caption' as const,
         equivalent: false,
         accepted: false,
       }),
       Object.freeze({
-        kind: "alias" as const,
+        kind: 'alias' as const,
         equivalent: false,
         accepted: false,
       }),
       Object.freeze({
-        kind: "dom-regroup" as const,
+        kind: 'dom-regroup' as const,
         equivalent: false,
         accepted: false,
       }),
       Object.freeze({
-        kind: "direct-splice" as const,
+        kind: 'direct-splice' as const,
         equivalent: false,
         accepted: false,
       }),
       Object.freeze({
-        kind: "alt-copy" as const,
+        kind: 'alt-copy' as const,
         equivalent: false,
         accepted: false,
       }),
       Object.freeze({
-        kind: "ghost-caption" as const,
+        kind: 'ghost-caption' as const,
         equivalent: hasGhost,
         accepted: false,
       }),
       Object.freeze({
-        kind: "consumer-regex" as const,
+        kind: 'consumer-regex' as const,
         equivalent: false,
         accepted: false,
       }),
@@ -316,23 +331,24 @@ export interface MarkdownCaptionAcceptanceReport {
   readonly mutationsKilled: boolean
 }
 
-export const evaluateMarkdownCaptionAcceptance = (): MarkdownCaptionAcceptanceReport => {
-  const mutations = evaluateMarkdownCaptionAcceptanceMutations()
-  const mutationsKilled = mutations.mutations.every((m) => !m.accepted)
+export const evaluateMarkdownCaptionAcceptance =
+  (): MarkdownCaptionAcceptanceReport => {
+    const mutations = evaluateMarkdownCaptionAcceptanceMutations()
+    const mutationsKilled = mutations.mutations.every((m) => !m.accepted)
 
-  return Object.freeze({
-    accepted: mutationsKilled,
-    version: "markdown-caption-acceptance@2026-08-16",
-    unicodeAndImeMatrix: Object.freeze({
-      crlf: true,
-      bom: true,
-      cjk: true,
-      emoji: true,
-      rtl: true,
-      ime: true,
-    }),
-    figureOwnershipClean: true,
-    accessibilityTabBudget: true,
-    mutationsKilled,
-  })
-}
+    return Object.freeze({
+      accepted: mutationsKilled,
+      version: 'markdown-caption-acceptance@2026-08-16',
+      unicodeAndImeMatrix: Object.freeze({
+        crlf: true,
+        bom: true,
+        cjk: true,
+        emoji: true,
+        rtl: true,
+        ime: true,
+      }),
+      figureOwnershipClean: true,
+      accessibilityTabBudget: true,
+      mutationsKilled,
+    })
+  }

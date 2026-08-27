@@ -5,6 +5,7 @@ import {
   commitMarkdownAttachmentResult,
   createMarkdownAttachmentAtomicPresentation,
   createMarkdownAttachmentBatch,
+  createMarkdownAttachmentCaptureSession,
   createMarkdownAttachmentRequest,
   createMarkdownAttachmentSession,
   evaluateMarkdownAttachmentAcceptance,
@@ -45,7 +46,9 @@ describe('markdown attachment provider contract', () => {
     expect(request.requestId).toContain('doc')
     expect(request.intent).toBe('paste')
     const report = evaluateMarkdownAttachmentMutations(request)
-    expect(report.mutations.every((mutation) => mutation.accepted === false)).toBe(true)
+    expect(
+      report.mutations.every((mutation) => mutation.accepted === false),
+    ).toBe(true)
     const job = createMarkdownAttachmentJob('att-1')
     progressMarkdownAttachmentJob(job, 40)
     expect(job.phase).toBe('progress')
@@ -72,15 +75,21 @@ describe('markdown attachment provider contract', () => {
       `${batch.batchId}:1`,
       `${batch.batchId}:2`,
     ])
-    expect(batch.items.map((item) => item.kind)).toEqual(['file', 'image', 'audio'])
+    expect(batch.items.map((item) => item.kind)).toEqual([
+      'file',
+      'image',
+      'audio',
+    ])
     expect(batch.anchor.nodeId).toBe('syn:doc:2:para:0')
     expect('files' in batch).toBe(false)
-    expect(markdownFromAttachmentPayload({
-      markdownKind: 'file',
-      href: 'https://cdn.example/spec.pdf',
-      mimeType: 'application/pdf',
-      name: 'spec.pdf',
-    })).toBe('[spec.pdf](https://cdn.example/spec.pdf)')
+    expect(
+      markdownFromAttachmentPayload({
+        markdownKind: 'file',
+        href: 'https://cdn.example/spec.pdf',
+        mimeType: 'application/pdf',
+        name: 'spec.pdf',
+      }),
+    ).toBe('[spec.pdf](https://cdn.example/spec.pdf)')
   })
 
   it('rejects stale, deleted, other-document, and unsafe provider results', () => {
@@ -224,6 +233,7 @@ describe('attachment input capture and deduplication (#375)', () => {
       anchor: { range: { start: 0, end: 0 } },
       files: [{ name: 'photo.jpg', mimeType: 'image/jpeg', byteLength: 1000 }],
       eventFingerprint: 'event-drop-unique-99',
+      session: createMarkdownAttachmentCaptureSession(),
     }
 
     const first = captureMarkdownAttachmentInput(input)
@@ -232,7 +242,9 @@ describe('attachment input capture and deduplication (#375)', () => {
     const duplicate = captureMarkdownAttachmentInput(input)
     expect(duplicate.ok).toBe(false)
     if (!duplicate.ok) {
-      expect((duplicate as { rejected?: string }).rejected).toBe('duplicate-event')
+      expect((duplicate as { rejected?: string }).rejected).toBe(
+        'duplicate-event',
+      )
     }
   })
 
@@ -245,27 +257,45 @@ describe('attachment input capture and deduplication (#375)', () => {
       files: [{ name: 'a.png', mimeType: 'image/png', byteLength: 100 }],
     }
 
-    expect(captureMarkdownAttachmentInput({ ...base, context: { readonly: true } })).toMatchObject({
+    expect(
+      captureMarkdownAttachmentInput({ ...base, context: { readonly: true } }),
+    ).toMatchObject({
       ok: false,
       rejected: 'readonly',
     })
-    expect(captureMarkdownAttachmentInput({ ...base, context: { disabled: true } })).toMatchObject({
+    expect(
+      captureMarkdownAttachmentInput({ ...base, context: { disabled: true } }),
+    ).toMatchObject({
       ok: false,
       rejected: 'disabled',
     })
-    expect(captureMarkdownAttachmentInput({ ...base, context: { mode: 'preview' } })).toMatchObject({
+    expect(
+      captureMarkdownAttachmentInput({ ...base, context: { mode: 'preview' } }),
+    ).toMatchObject({
       ok: false,
       rejected: 'preview',
     })
-    expect(captureMarkdownAttachmentInput({ ...base, context: { isComposing: true } })).toMatchObject({
+    expect(
+      captureMarkdownAttachmentInput({
+        ...base,
+        context: { isComposing: true },
+      }),
+    ).toMatchObject({
       ok: false,
       rejected: 'composition-active',
     })
-    expect(captureMarkdownAttachmentInput({ ...base, context: { currentRevision: 5 } })).toMatchObject({
+    expect(
+      captureMarkdownAttachmentInput({
+        ...base,
+        context: { currentRevision: 5 },
+      }),
+    ).toMatchObject({
       ok: false,
       rejected: 'stale-document',
     })
-    expect(captureMarkdownAttachmentInput({ ...base, files: [] })).toMatchObject({
+    expect(
+      captureMarkdownAttachmentInput({ ...base, files: [] }),
+    ).toMatchObject({
       ok: false,
       rejected: 'empty-files',
     })
@@ -294,12 +324,26 @@ describe('attachment lifecycle, transactions, and undo (#376)', () => {
       revision: 1,
       range: { start: 5, end: 5 },
       items: [
-        { name: 'chart.png', mimeType: 'image/png', byteLength: 300, kind: 'image' },
-        { name: 'data.csv', mimeType: 'text/csv', byteLength: 100, kind: 'file' },
+        {
+          name: 'chart.png',
+          mimeType: 'image/png',
+          byteLength: 300,
+          kind: 'image',
+        },
+        {
+          name: 'data.csv',
+          mimeType: 'text/csv',
+          byteLength: 100,
+          kind: 'file',
+        },
       ],
     })
 
-    const plan = planMarkdownAttachmentInsert('hello world', batch.anchor, batch)
+    const plan = planMarkdownAttachmentInsert(
+      'hello world',
+      batch.anchor,
+      batch,
+    )
     expect(plan.transaction.changes).toHaveLength(1)
     const inserted = plan.transaction.changes[0]!.insert
     expect(inserted).toContain('![Uploading chart.png...]()')
@@ -317,7 +361,9 @@ describe('attachment lifecycle, transactions, and undo (#376)', () => {
       range: { start: 10, end: 35 },
     })
 
-    rebaseMarkdownAttachmentJob(job, [{ from: 0, to: 5, insert: 'longer text' }])
+    rebaseMarkdownAttachmentJob(job, [
+      { from: 0, to: 5, insert: 'longer text' },
+    ])
     expect(job.range).toEqual({ start: 16, end: 41 })
     expect(job.phase).toBe('pending')
 
@@ -347,10 +393,16 @@ describe('attachment lifecycle, transactions, and undo (#376)', () => {
       },
     }
 
-    const resolvePlan = planMarkdownAttachmentResolve('source', job, resolveResult)
+    const resolvePlan = planMarkdownAttachmentResolve(
+      'source',
+      job,
+      resolveResult,
+    )
     expect(resolvePlan.accepted).toBe(true)
     expect(resolvePlan.status).toBe('resolved')
-    expect(resolvePlan.transaction?.changes[0]?.insert).toBe('![final image](https://cdn.example/final.png)')
+    expect(resolvePlan.transaction?.changes[0]?.insert).toBe(
+      '![final image](https://cdn.example/final.png)',
+    )
     expect(job.phase).toBe('resolved')
 
     // Deleted job will NOT resurrect
@@ -361,7 +413,11 @@ describe('attachment lifecycle, transactions, and undo (#376)', () => {
       range: { start: 5, end: 30 },
     })
     deletedJob.phase = 'deleted'
-    const rejectedResolve = planMarkdownAttachmentResolve('source', deletedJob, resolveResult)
+    const rejectedResolve = planMarkdownAttachmentResolve(
+      'source',
+      deletedJob,
+      resolveResult,
+    )
     expect(rejectedResolve.accepted).toBe(false)
     expect(rejectedResolve.status).toBe('deleted')
     expect(rejectedResolve.transaction).toBeUndefined()
@@ -375,7 +431,11 @@ describe('attachment lifecycle, transactions, and undo (#376)', () => {
     })
     cancelMarkdownAttachmentJob(cancelledJob)
     expect(cancelledJob.phase).toBe('cancelled')
-    const cancelledResolve = planMarkdownAttachmentResolve('source', cancelledJob, resolveResult)
+    const cancelledResolve = planMarkdownAttachmentResolve(
+      'source',
+      cancelledJob,
+      resolveResult,
+    )
     expect(cancelledResolve.accepted).toBe(false)
     expect(cancelledResolve.status).toBe('cancelled')
 
@@ -414,10 +474,16 @@ describe('attachment atomic presentation and total acceptance (#377)', () => {
     expect(pendingPresentation.compact).toBe(true)
     expect(pendingPresentation.isLargeCard).toBe(false)
     expect(pendingPresentation.hasGradientOrGlow).toBe(false)
-    expect(pendingPresentation.actions.some((a) => a.key === 'cancel')).toBe(true)
-    expect(pendingPresentation.actions.every((a) => a.minTouchTargetPx >= 44)).toBe(true)
+    expect(pendingPresentation.actions.some((a) => a.key === 'cancel')).toBe(
+      true,
+    )
+    expect(
+      pendingPresentation.actions.every((a) => a.minTouchTargetPx >= 44),
+    ).toBe(true)
     expect(pendingPresentation.statusAriaLive).toBe('polite')
-    expect(pendingPresentation.progressAriaText).toBe('diagram.svg: 50% uploaded')
+    expect(pendingPresentation.progressAriaText).toBe(
+      'diagram.svg: 50% uploaded',
+    )
 
     const failedPresentation = createMarkdownAttachmentAtomicPresentation({
       itemId: 'item:2',
@@ -427,7 +493,9 @@ describe('attachment atomic presentation and total acceptance (#377)', () => {
       progress: 0,
     })
     expect(failedPresentation.actions.some((a) => a.key === 'retry')).toBe(true)
-    expect(failedPresentation.actions.some((a) => a.key === 'remove')).toBe(true)
+    expect(failedPresentation.actions.some((a) => a.key === 'remove')).toBe(
+      true,
+    )
     expect(failedPresentation.progressAriaText).toBe('report.pdf upload failed')
   })
 

@@ -5,7 +5,12 @@ export type MarkdownAttachmentSourceKind = 'pick' | 'paste' | 'drop'
 /** @deprecated Use MarkdownAttachmentSourceKind. */
 export type MarkdownAttachmentIntent = MarkdownAttachmentSourceKind
 
-export type MarkdownAttachmentItemKind = 'image' | 'file' | 'audio' | 'video' | 'unknown'
+export type MarkdownAttachmentItemKind =
+  | 'image'
+  | 'file'
+  | 'audio'
+  | 'video'
+  | 'unknown'
 
 export type MarkdownAttachmentMarkdownKind = 'image' | 'link' | 'file'
 
@@ -73,7 +78,10 @@ export type MarkdownAttachmentProviderResult =
       readonly payload: MarkdownAttachmentResolvedPayload
     }
   | {
-      readonly status: Exclude<MarkdownAttachmentProviderStatus, 'resolved' | 'pending'>
+      readonly status: Exclude<
+        MarkdownAttachmentProviderStatus,
+        'resolved' | 'pending'
+      >
       readonly batchId: string
       readonly itemId?: string
       readonly documentIdentity?: MarkdownDocumentIdentity
@@ -85,7 +93,9 @@ export type MarkdownAttachmentProviderResult =
 export type MarkdownAttachmentProvider = (input: {
   readonly batch: MarkdownAttachmentBatchIntent
   readonly item: MarkdownAttachmentItemIntent
-}) => Promise<MarkdownAttachmentProviderResult> | MarkdownAttachmentProviderResult
+}) =>
+  | Promise<MarkdownAttachmentProviderResult>
+  | MarkdownAttachmentProviderResult
 
 export interface MarkdownAttachmentQueryState {
   readonly batchId: string
@@ -205,7 +215,9 @@ export const createMarkdownAttachmentRequest = (
   })
 }
 
-export const markdownFromAttachmentPayload = (payload: MarkdownAttachmentResolvedPayload) => {
+export const markdownFromAttachmentPayload = (
+  payload: MarkdownAttachmentResolvedPayload,
+) => {
   if (unsafeHref(payload.href)) return null
   if (payload.markdownKind === 'image') {
     return `![${payload.alt ?? ''}](${payload.href})`
@@ -227,16 +239,28 @@ export const commitMarkdownAttachmentResult = (input: {
     (result.documentIdentity.id !== input.documentIdentity.id ||
       result.documentIdentity.epoch !== input.documentIdentity.epoch)
   ) {
-    return Object.freeze({ accepted: false as const, status: 'document-abort' as const })
+    return Object.freeze({
+      accepted: false as const,
+      status: 'document-abort' as const,
+    })
   }
   if (result.status === 'document-abort') {
-    return Object.freeze({ accepted: false as const, status: 'document-abort' as const })
+    return Object.freeze({
+      accepted: false as const,
+      status: 'document-abort' as const,
+    })
   }
-  if (typeof result.revision === 'number' && result.revision !== input.revision) {
+  if (
+    typeof result.revision === 'number' &&
+    result.revision !== input.revision
+  ) {
     return Object.freeze({ accepted: false as const, status: 'stale' as const })
   }
   if (input.nodeStatus === 'deleted' || input.nodeStatus === 'invalid') {
-    return Object.freeze({ accepted: false as const, status: 'deleted' as const })
+    return Object.freeze({
+      accepted: false as const,
+      status: 'deleted' as const,
+    })
   }
   if (result.status !== 'resolved') {
     return Object.freeze({ accepted: false as const, status: result.status })
@@ -247,11 +271,19 @@ export const commitMarkdownAttachmentResult = (input: {
     readonly files?: unknown
   }
   if (extra.html || extra.source || extra.files) {
-    return Object.freeze({ accepted: false as const, status: 'unsafe' as const, code: 'non-markdown-result' })
+    return Object.freeze({
+      accepted: false as const,
+      status: 'unsafe' as const,
+      code: 'non-markdown-result',
+    })
   }
   const markdown = markdownFromAttachmentPayload(result.payload)
   if (!markdown || /<[a-z]/i.test(markdown)) {
-    return Object.freeze({ accepted: false as const, status: 'unsafe' as const, code: 'unsafe-payload' })
+    return Object.freeze({
+      accepted: false as const,
+      status: 'unsafe' as const,
+      code: 'unsafe-payload',
+    })
   }
   return Object.freeze({
     accepted: true as const,
@@ -287,14 +319,20 @@ export const createMarkdownAttachmentSession = () => {
         batchId: result.batchId,
         itemId,
         status: result.status === 'progress' ? 'progress' : result.status,
-        progress: result.status === 'progress' ? (result.ratio ?? 0) : previous?.progress ?? 0,
-        ...(result.status !== 'resolved' && result.status !== 'progress' && result.code
+        progress:
+          result.status === 'progress'
+            ? (result.ratio ?? 0)
+            : (previous?.progress ?? 0),
+        ...(result.status !== 'resolved' &&
+        result.status !== 'progress' &&
+        result.code
           ? { code: result.code }
           : {}),
       }),
     )
   }
-  const query = (itemId: string): MarkdownAttachmentQueryState | undefined => states.get(itemId)
+  const query = (itemId: string): MarkdownAttachmentQueryState | undefined =>
+    states.get(itemId)
   const abortDocument = (identity: MarkdownDocumentIdentity) => {
     for (const [id, state] of states) {
       if (id.startsWith(`${identity.id}:`)) {
@@ -380,7 +418,8 @@ export const evaluateMarkdownAttachmentMutations = (
     mutations: Object.freeze([
       Object.freeze({
         kind: 'file-array-half-migration' as const,
-        equivalent: filesField || Array.isArray((batch as { files?: unknown }).files),
+        equivalent:
+          filesField || Array.isArray((batch as { files?: unknown }).files),
         accepted: false,
       }),
       Object.freeze({
@@ -395,7 +434,9 @@ export const evaluateMarkdownAttachmentMutations = (
       }),
       Object.freeze({
         kind: 'bare-offset' as const,
-        equivalent: Boolean(bare && !batch.anchor.nodeId && batch.anchor.range === undefined),
+        equivalent: Boolean(
+          bare && !batch.anchor.nodeId && batch.anchor.range === undefined,
+        ),
         accepted: false,
       }),
     ]),
@@ -431,16 +472,43 @@ export interface MarkdownAttachmentCaptureInput {
   readonly files: readonly MarkdownAttachmentInputFile[]
   readonly context?: MarkdownAttachmentCaptureContext
   readonly eventFingerprint?: string
+  readonly session?: MarkdownAttachmentCaptureSession
+}
+
+export interface MarkdownAttachmentCaptureSession {
+  claim(eventFingerprint: string): boolean
+  clear(): void
+}
+
+export const createMarkdownAttachmentCaptureSession = (
+  maxFingerprints = 64,
+): MarkdownAttachmentCaptureSession => {
+  const fingerprints = new Set<string>()
+  return Object.freeze({
+    claim(eventFingerprint: string) {
+      if (fingerprints.has(eventFingerprint)) return false
+      fingerprints.add(eventFingerprint)
+      while (fingerprints.size > Math.max(1, maxFingerprints)) {
+        const oldest = fingerprints.values().next().value
+        if (oldest === undefined) break
+        fingerprints.delete(oldest)
+      }
+      return true
+    },
+    clear() {
+      fingerprints.clear()
+    },
+  })
 }
 
 export type MarkdownAttachmentCaptureRejection =
-  | "readonly"
-  | "disabled"
-  | "preview"
-  | "composition-active"
-  | "stale-document"
-  | "duplicate-event"
-  | "empty-files"
+  | 'readonly'
+  | 'disabled'
+  | 'preview'
+  | 'composition-active'
+  | 'stale-document'
+  | 'duplicate-event'
+  | 'empty-files'
 
 export type MarkdownAttachmentCaptureResult =
   | {
@@ -454,73 +522,71 @@ export type MarkdownAttachmentCaptureResult =
       readonly message: string
     }
 
-const seenEventFingerprints = new Set<string>()
-
 export const captureMarkdownAttachmentInput = (
   input: MarkdownAttachmentCaptureInput,
 ): MarkdownAttachmentCaptureResult => {
   if (input.context?.readonly) {
     return Object.freeze({
       ok: false,
-      rejected: "readonly" as const,
-      message: "Attachment input rejected: editor is readonly",
+      rejected: 'readonly' as const,
+      message: 'Attachment input rejected: editor is readonly',
     })
   }
   if (input.context?.disabled) {
     return Object.freeze({
       ok: false,
-      rejected: "disabled" as const,
-      message: "Attachment input rejected: editor is disabled",
+      rejected: 'disabled' as const,
+      message: 'Attachment input rejected: editor is disabled',
     })
   }
-  if (input.context?.mode === "preview") {
+  if (input.context?.mode === 'preview') {
     return Object.freeze({
       ok: false,
-      rejected: "preview" as const,
-      message: "Attachment input rejected: preview mode does not accept attachments",
+      rejected: 'preview' as const,
+      message:
+        'Attachment input rejected: preview mode does not accept attachments',
     })
   }
   if (input.context?.isComposing) {
     return Object.freeze({
       ok: false,
-      rejected: "composition-active" as const,
-      message: "Attachment input rejected: IME composition active",
+      rejected: 'composition-active' as const,
+      message: 'Attachment input rejected: IME composition active',
     })
   }
   if (
-    typeof input.context?.currentRevision === "number" &&
+    typeof input.context?.currentRevision === 'number' &&
     input.context.currentRevision !== input.revision
   ) {
     return Object.freeze({
       ok: false,
-      rejected: "stale-document" as const,
-      message: "Attachment input rejected: stale document revision",
+      rejected: 'stale-document' as const,
+      message: 'Attachment input rejected: stale document revision',
     })
   }
 
-  if (input.eventFingerprint) {
-    if (seenEventFingerprints.has(input.eventFingerprint)) {
+  if (input.eventFingerprint && input.session) {
+    if (!input.session.claim(input.eventFingerprint)) {
       return Object.freeze({
         ok: false,
-        rejected: "duplicate-event" as const,
-        message: "Attachment input rejected: duplicate event detected",
+        rejected: 'duplicate-event' as const,
+        message: 'Attachment input rejected: duplicate event detected',
       })
     }
-    seenEventFingerprints.add(input.eventFingerprint)
   }
 
   const rawFiles = input.files ?? []
   if (rawFiles.length === 0) {
     return Object.freeze({
       ok: false,
-      rejected: "empty-files" as const,
-      message: "Attachment input rejected: empty files list",
+      rejected: 'empty-files' as const,
+      message: 'Attachment input rejected: empty files list',
     })
   }
 
   const normalizedItems = rawFiles.map((file, order) => {
-    const mimeType = file.mimeType || file.type || "application/octet-stream"
-    const name = file.name || "attachment-" + (order + 1)
+    const mimeType = file.mimeType || file.type || 'application/octet-stream'
+    const name = file.name || `attachment-${order + 1}`
     const byteLength = file.byteLength ?? file.size ?? 0
     const kind = file.kind ?? kindFromMime(mimeType)
     return Object.freeze({
@@ -532,12 +598,14 @@ export const captureMarkdownAttachmentInput = (
     })
   })
 
-  const allEmpty = normalizedItems.every((item) => item.byteLength === 0 && !item.name)
+  const allEmpty = normalizedItems.every(
+    (item) => item.byteLength === 0 && !item.name,
+  )
   if (allEmpty) {
     return Object.freeze({
       ok: false,
-      rejected: "empty-files" as const,
-      message: "Attachment input rejected: all files are empty",
+      rejected: 'empty-files' as const,
+      message: 'Attachment input rejected: all files are empty',
     })
   }
 
@@ -558,10 +626,10 @@ export const captureMarkdownAttachmentInput = (
 }
 
 export type MarkdownAttachmentCaptureMutationKind =
-  | "dom-positioning"
-  | "duplicate-events"
-  | "data-url"
-  | "stale-capture"
+  | 'dom-positioning'
+  | 'duplicate-events'
+  | 'data-url'
+  | 'stale-capture'
 
 export const evaluateMarkdownAttachmentCaptureMutations = (
   input?: MarkdownAttachmentCaptureInput,
@@ -569,21 +637,22 @@ export const evaluateMarkdownAttachmentCaptureMutations = (
   const sampleInput =
     input ??
     ({
-      sourceKind: "drop" as const,
-      documentIdentity: { id: "doc", epoch: 1 },
+      sourceKind: 'drop' as const,
+      documentIdentity: { id: 'doc', epoch: 1 },
       revision: 1,
       anchor: { range: { start: 0, end: 0 } },
-      files: [{ name: "file.png", mimeType: "image/png", byteLength: 100 }],
+      files: [{ name: 'file.png', mimeType: 'image/png', byteLength: 100 }],
     } as MarkdownAttachmentCaptureInput)
 
-  const capture1 = captureMarkdownAttachmentInput(sampleInput)
+  const session = createMarkdownAttachmentCaptureSession()
+  const captureInput = { ...sampleInput, session }
+  const capture1 = captureMarkdownAttachmentInput(captureInput)
   const captureDuplicate = sampleInput.eventFingerprint
-    ? captureMarkdownAttachmentInput(sampleInput)
+    ? captureMarkdownAttachmentInput(captureInput)
     : { ok: false }
 
   const hasDataUrl =
-    capture1.ok &&
-    JSON.stringify(capture1.batch).includes("data:")
+    capture1.ok && JSON.stringify(capture1.batch).includes('data:')
 
   const staleResult = captureMarkdownAttachmentInput({
     ...sampleInput,
@@ -593,22 +662,22 @@ export const evaluateMarkdownAttachmentCaptureMutations = (
   return Object.freeze({
     mutations: Object.freeze([
       Object.freeze({
-        kind: "dom-positioning" as const,
+        kind: 'dom-positioning' as const,
         equivalent: false,
         accepted: false,
       }),
       Object.freeze({
-        kind: "duplicate-events" as const,
+        kind: 'duplicate-events' as const,
         equivalent: captureDuplicate.ok === true,
         accepted: false,
       }),
       Object.freeze({
-        kind: "data-url" as const,
+        kind: 'data-url' as const,
         equivalent: Boolean(hasDataUrl),
         accepted: false,
       }),
       Object.freeze({
-        kind: "stale-capture" as const,
+        kind: 'stale-capture' as const,
         equivalent: staleResult.ok === true,
         accepted: false,
       }),
@@ -617,7 +686,7 @@ export const evaluateMarkdownAttachmentCaptureMutations = (
 }
 
 export interface MarkdownAttachmentAtomicAction {
-  readonly key: "cancel" | "retry" | "remove"
+  readonly key: 'cancel' | 'retry' | 'remove'
   readonly label: string
   readonly minTouchTargetPx: 44
   readonly disabled: boolean
@@ -630,7 +699,7 @@ export interface MarkdownAttachmentAtomicPresentation {
   readonly status: MarkdownAttachmentProviderStatus
   readonly progress: number
   readonly progressAriaText: string
-  readonly statusAriaLive: "polite"
+  readonly statusAriaLive: 'polite'
   readonly actions: readonly MarkdownAttachmentAtomicAction[]
   readonly compact: true
   readonly isLargeCard: false
@@ -646,38 +715,38 @@ export const createMarkdownAttachmentAtomicPresentation = (input: {
 }): MarkdownAttachmentAtomicPresentation => {
   const percent = Math.min(100, Math.max(0, Math.round(input.progress)))
   const progressAriaText =
-    input.status === "resolved"
-      ? input.name + " upload complete"
-      : input.status === "rejected"
-        ? input.name + " upload failed"
-        : input.status === "cancelled"
-          ? input.name + " upload cancelled"
-          : input.name + ": " + (Math.round(percent / 25) * 25) + "% uploaded"
+    input.status === 'resolved'
+      ? `${input.name} upload complete`
+      : input.status === 'rejected'
+        ? `${input.name} upload failed`
+        : input.status === 'cancelled'
+          ? `${input.name} upload cancelled`
+          : `${input.name}: ${Math.round(percent / 25) * 25}% uploaded`
 
   const actions: MarkdownAttachmentAtomicAction[] = []
-  if (input.status === "pending" || input.status === "progress") {
+  if (input.status === 'pending' || input.status === 'progress') {
     actions.push(
       Object.freeze({
-        key: "cancel" as const,
-        label: "Cancel",
+        key: 'cancel' as const,
+        label: 'Cancel',
         minTouchTargetPx: 44,
         disabled: false,
       }),
     )
   }
-  if (input.status === "rejected" || input.status === "cancelled") {
+  if (input.status === 'rejected' || input.status === 'cancelled') {
     actions.push(
       Object.freeze({
-        key: "retry" as const,
-        label: "Retry",
+        key: 'retry' as const,
+        label: 'Retry',
         minTouchTargetPx: 44,
         disabled: false,
       }),
     )
     actions.push(
       Object.freeze({
-        key: "remove" as const,
-        label: "Remove",
+        key: 'remove' as const,
+        label: 'Remove',
         minTouchTargetPx: 44,
         disabled: false,
       }),
@@ -687,11 +756,11 @@ export const createMarkdownAttachmentAtomicPresentation = (input: {
   return Object.freeze({
     itemId: input.itemId,
     name: input.name,
-    kind: input.kind ?? "file",
+    kind: input.kind ?? 'file',
     status: input.status,
     progress: percent,
     progressAriaText,
-    statusAriaLive: "polite" as const,
+    statusAriaLive: 'polite' as const,
     actions: Object.freeze(actions),
     compact: true as const,
     isLargeCard: false as const,
@@ -700,14 +769,25 @@ export const createMarkdownAttachmentAtomicPresentation = (input: {
 }
 
 export const queryMarkdownAttachmentUnfinishedCount = (
-  states: readonly (MarkdownAttachmentQueryState | { readonly status: MarkdownAttachmentProviderStatus })[],
-): { readonly pendingCount: number; readonly failedCount: number; readonly totalCount: number } => {
+  states: readonly (
+    | MarkdownAttachmentQueryState
+    | { readonly status: MarkdownAttachmentProviderStatus }
+  )[],
+): {
+  readonly pendingCount: number
+  readonly failedCount: number
+  readonly totalCount: number
+} => {
   let pendingCount = 0
   let failedCount = 0
   for (const item of states) {
-    if (item.status === "pending" || item.status === "progress" || item.status === "retry") {
+    if (
+      item.status === 'pending' ||
+      item.status === 'progress' ||
+      item.status === 'retry'
+    ) {
       pendingCount += 1
-    } else if (item.status === "rejected") {
+    } else if (item.status === 'rejected') {
       failedCount += 1
     }
   }
@@ -719,30 +799,34 @@ export const queryMarkdownAttachmentUnfinishedCount = (
 }
 
 export const validateMarkdownAttachmentPrepublish = (
-  states: readonly (MarkdownAttachmentQueryState | { readonly status: MarkdownAttachmentProviderStatus })[],
+  states: readonly (
+    | MarkdownAttachmentQueryState
+    | { readonly status: MarkdownAttachmentProviderStatus }
+  )[],
 ): { readonly canPrepublish: boolean; readonly reason?: string } => {
-  const { pendingCount, failedCount } = queryMarkdownAttachmentUnfinishedCount(states)
+  const { pendingCount, failedCount } =
+    queryMarkdownAttachmentUnfinishedCount(states)
   if (pendingCount > 0) {
     return Object.freeze({
       canPrepublish: false,
-      reason: pendingCount + " attachment(s) are still uploading",
+      reason: `${pendingCount} attachment(s) are still uploading`,
     })
   }
   if (failedCount > 0) {
     return Object.freeze({
       canPrepublish: false,
-      reason: failedCount + " attachment(s) failed to upload",
+      reason: `${failedCount} attachment(s) failed to upload`,
     })
   }
   return Object.freeze({ canPrepublish: true })
 }
 
 export type MarkdownAttachmentPresentationMutationKind =
-  | "protocol-leak"
-  | "hover-only"
-  | "large-card"
-  | "scroll-jump"
-  | "private-dom"
+  | 'protocol-leak'
+  | 'hover-only'
+  | 'large-card'
+  | 'scroll-jump'
+  | 'private-dom'
 
 export const evaluateMarkdownAttachmentPresentationMutations = (
   presentation?: MarkdownAttachmentAtomicPresentation,
@@ -750,37 +834,37 @@ export const evaluateMarkdownAttachmentPresentationMutations = (
   const sample =
     presentation ??
     createMarkdownAttachmentAtomicPresentation({
-      itemId: "test:0",
-      name: "test.png",
-      kind: "image",
-      status: "progress",
+      itemId: 'test:0',
+      name: 'test.png',
+      kind: 'image',
+      status: 'progress',
       progress: 50,
     })
 
   return Object.freeze({
     mutations: Object.freeze([
       Object.freeze({
-        kind: "protocol-leak" as const,
+        kind: 'protocol-leak' as const,
         equivalent: false,
         accepted: false,
       }),
       Object.freeze({
-        kind: "hover-only" as const,
+        kind: 'hover-only' as const,
         equivalent: sample.actions.some((a) => a.minTouchTargetPx < 44),
         accepted: false,
       }),
       Object.freeze({
-        kind: "large-card" as const,
+        kind: 'large-card' as const,
         equivalent: sample.isLargeCard || sample.hasGradientOrGlow,
         accepted: false,
       }),
       Object.freeze({
-        kind: "scroll-jump" as const,
+        kind: 'scroll-jump' as const,
         equivalent: false,
         accepted: false,
       }),
       Object.freeze({
-        kind: "private-dom" as const,
+        kind: 'private-dom' as const,
         equivalent: false,
         accepted: false,
       }),
@@ -792,9 +876,19 @@ export interface MarkdownAttachmentAcceptanceReport {
   readonly accepted: boolean
   readonly version: string
   readonly matrix: {
-    readonly inputs: readonly ["pick", "paste", "drop"]
-    readonly lifecycle: readonly ["pending", "progress", "resolved", "rejected", "cancelled", "retry", "stale", "deleted", "document-abort"]
-    readonly surfaces: readonly ["source", "live", "split"]
+    readonly inputs: readonly ['pick', 'paste', 'drop']
+    readonly lifecycle: readonly [
+      'pending',
+      'progress',
+      'resolved',
+      'rejected',
+      'cancelled',
+      'retry',
+      'stale',
+      'deleted',
+      'document-abort',
+    ]
+    readonly surfaces: readonly ['source', 'live', 'split']
     readonly accessibility: {
       readonly screenReaderNonFlooding: boolean
       readonly touchTargetMeetsBudget: boolean
@@ -804,36 +898,50 @@ export interface MarkdownAttachmentAcceptanceReport {
   readonly mutationsKilled: boolean
 }
 
-export const evaluateMarkdownAttachmentAcceptance = (): MarkdownAttachmentAcceptanceReport => {
-  const presMutations = evaluateMarkdownAttachmentPresentationMutations()
-  const capMutations = evaluateMarkdownAttachmentCaptureMutations()
-  const allMutationsKilled =
-    presMutations.mutations.every((m) => !m.accepted) &&
-    capMutations.mutations.every((m) => !m.accepted)
+export const evaluateMarkdownAttachmentAcceptance =
+  (): MarkdownAttachmentAcceptanceReport => {
+    const presMutations = evaluateMarkdownAttachmentPresentationMutations()
+    const capMutations = evaluateMarkdownAttachmentCaptureMutations()
+    const allMutationsKilled =
+      presMutations.mutations.every((m) => !m.accepted) &&
+      capMutations.mutations.every((m) => !m.accepted)
+    const accessibilitySample = createMarkdownAttachmentAtomicPresentation({
+      itemId: 'acceptance:0',
+      name: 'acceptance.png',
+      kind: 'image',
+      status: 'progress',
+      progress: 51,
+    })
+    const accessibility = Object.freeze({
+      screenReaderNonFlooding:
+        accessibilitySample.statusAriaLive === 'polite' &&
+        accessibilitySample.progressAriaText.endsWith('50% uploaded'),
+      touchTargetMeetsBudget: accessibilitySample.actions.every(
+        (action) => action.minTouchTargetPx >= 44,
+      ),
+      nonHoverOnly: accessibilitySample.actions.length > 0,
+    })
+    const accessibilityAccepted = Object.values(accessibility).every(Boolean)
 
-  return Object.freeze({
-    accepted: allMutationsKilled,
-    version: "markdown-attachment-acceptance@2026-08-16",
-    matrix: Object.freeze({
-      inputs: Object.freeze(["pick", "paste", "drop"] as const),
-      lifecycle: Object.freeze([
-        "pending",
-        "progress",
-        "resolved",
-        "rejected",
-        "cancelled",
-        "retry",
-        "stale",
-        "deleted",
-        "document-abort",
-      ] as const),
-      surfaces: Object.freeze(["source", "live", "split"] as const),
-      accessibility: Object.freeze({
-        screenReaderNonFlooding: true,
-        touchTargetMeetsBudget: true,
-        nonHoverOnly: true,
+    return Object.freeze({
+      accepted: allMutationsKilled && accessibilityAccepted,
+      version: 'markdown-attachment-acceptance@2026-08-16',
+      matrix: Object.freeze({
+        inputs: Object.freeze(['pick', 'paste', 'drop'] as const),
+        lifecycle: Object.freeze([
+          'pending',
+          'progress',
+          'resolved',
+          'rejected',
+          'cancelled',
+          'retry',
+          'stale',
+          'deleted',
+          'document-abort',
+        ] as const),
+        surfaces: Object.freeze(['source', 'live', 'split'] as const),
+        accessibility,
       }),
-    }),
-    mutationsKilled: allMutationsKilled,
-  })
-}
+      mutationsKilled: allMutationsKilled,
+    })
+  }

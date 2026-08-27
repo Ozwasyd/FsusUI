@@ -14,6 +14,7 @@ import {
   planMarkdownFigureDelete,
   planMarkdownFigureMove,
 } from '../src/markdown-editor-caption'
+import { MarkdownEditorTransactionStore } from '../src/markdown-editor-transaction'
 
 describe('markdown caption editor commands and figure atomic transactions (#478)', () => {
   it('inserts, edits, and removes captions using #268 transactions', () => {
@@ -21,7 +22,11 @@ describe('markdown caption editor commands and figure atomic transactions (#478)
     const mediaRange = { start: 0, end: source.indexOf('\n') }
 
     // Insert caption
-    const insertTx = planMarkdownCaptionInsert(source, mediaRange, 'Sunset over the bay')
+    const insertTx = planMarkdownCaptionInsert(
+      source,
+      mediaRange,
+      'Sunset over the bay',
+    )
     expect(insertTx.changes).toHaveLength(1)
     expect(insertTx.changes[0]?.from).toBe(mediaRange.end)
     expect(insertTx.changes[0]?.insert).toBe('\n::caption[Sunset over the bay]')
@@ -31,7 +36,11 @@ describe('markdown caption editor commands and figure atomic transactions (#478)
     const figures = findMarkdownFigures(withCaption)
     expect(figures).toHaveLength(1)
     const captionNode = figures[0]!.captionNode
-    const editTx = planMarkdownCaptionEdit(withCaption, captionNode, 'Updated caption [escaped]')
+    const editTx = planMarkdownCaptionEdit(
+      withCaption,
+      captionNode,
+      'Updated caption [escaped]',
+    )
     expect(editTx.changes).toHaveLength(1)
     expect(editTx.changes[0]?.from).toBe(captionNode.ranges.text.start)
     expect(editTx.changes[0]?.to).toBe(captionNode.ranges.text.end)
@@ -45,7 +54,8 @@ describe('markdown caption editor commands and figure atomic transactions (#478)
   })
 
   it('deletes, moves, and cuts image+caption figures atomically without ghost captions', () => {
-    const source = 'Header\n\n![diagram](diag.png)\n::caption[Figure 1. Flowchart]\n\nFooter'
+    const source =
+      'Header\n\n![diagram](diag.png)\n::caption[Figure 1. Flowchart]\n\nFooter'
     const figures = findMarkdownFigures(source)
     expect(figures).toHaveLength(1)
     const figure = figures[0]!
@@ -54,12 +64,25 @@ describe('markdown caption editor commands and figure atomic transactions (#478)
     const deleteTx = planMarkdownFigureDelete(source, figure)
     expect(deleteTx.changes).toHaveLength(1)
     expect(deleteTx.changes[0]?.from).toBe(figure.mediaRange.start)
-    expect(deleteTx.changes[0]?.to).toBeGreaterThanOrEqual(figure.captionRange.end)
+    expect(deleteTx.changes[0]?.to).toBeGreaterThanOrEqual(
+      figure.captionRange.end,
+    )
     expect(deleteTx.changes[0]?.insert).toBe('')
 
     // Atomic move
     const moveTx = planMarkdownFigureMove(source, figure, 0)
     expect(moveTx.changes).toHaveLength(2)
+    expect(moveTx.changes.map((change) => change.from)).toEqual(
+      [...moveTx.changes.map((change) => change.from)].sort(
+        (left, right) => left - right,
+      ),
+    )
+    expect(
+      new MarkdownEditorTransactionStore(source, {
+        start: 0,
+        end: 0,
+      }).dispatch(moveTx).accepted,
+    ).toBe(true)
     const movedInsert = moveTx.changes.find((c) => c.insert.length > 0)
     expect(movedInsert?.insert).toContain('![diagram](diag.png)')
     expect(movedInsert?.insert).toContain('::caption[Figure 1. Flowchart]')
@@ -78,7 +101,9 @@ describe('markdown caption editor commands and figure atomic transactions (#478)
     const figure = figures[0]!
 
     const exactCopy = formatMarkdownFigureExactCopy(source, figure)
-    expect(exactCopy).toBe('![alt text](diagram.png)\n::caption[A useful diagram]')
+    expect(exactCopy).toBe(
+      '![alt text](diagram.png)\n::caption[A useful diagram]',
+    )
 
     const visibleCopy = formatMarkdownFigureVisibleCopy(source, figure)
     expect(visibleCopy).toContain('A useful diagram')
@@ -86,7 +111,8 @@ describe('markdown caption editor commands and figure atomic transactions (#478)
   })
 
   it('supports Unicode, CRLF, BOM, CJK, emoji, and RTL captions without drift', () => {
-    const unicodeSource = '\uFEFF![图注](img.png)\r\n::caption[图 1. 结构与 emoji 🚀 and RTL עִברִית]\r\n'
+    const unicodeSource =
+      '\uFEFF![图注](img.png)\r\n::caption[图 1. 结构与 emoji 🚀 and RTL עִברִית]\r\n'
     const figures = findMarkdownFigures(unicodeSource)
     expect(figures).toHaveLength(1)
     expect(figures[0]?.text).toBe('图 1. 结构与 emoji 🚀 and RTL עִברִית')

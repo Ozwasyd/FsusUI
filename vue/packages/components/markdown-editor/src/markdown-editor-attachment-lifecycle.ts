@@ -1,30 +1,27 @@
-import type { MarkdownDocumentIdentity } from "../../../wasm/markdown-runtime"
+import type { MarkdownDocumentIdentity } from '../../../wasm/markdown-runtime'
 import type {
   MarkdownAttachmentAnchor,
   MarkdownAttachmentBatchIntent,
   MarkdownAttachmentItemIntent,
   MarkdownAttachmentProviderResult,
   MarkdownAttachmentRange,
-} from "./markdown-editor-attachment"
-import {
-  commitMarkdownAttachmentResult,
-  markdownFromAttachmentPayload,
-} from "./markdown-editor-attachment"
+} from './markdown-editor-attachment'
+import { commitMarkdownAttachmentResult } from './markdown-editor-attachment'
 import type {
   MarkdownEditorChange,
   MarkdownEditorTransaction,
-} from "./markdown-editor-transaction"
+} from './markdown-editor-transaction'
 
 export type MarkdownAttachmentPhase =
-  | "idle"
-  | "pending"
-  | "progress"
-  | "resolved"
-  | "rejected"
-  | "cancelled"
-  | "stale"
-  | "deleted"
-  | "document-abort"
+  | 'idle'
+  | 'pending'
+  | 'progress'
+  | 'resolved'
+  | 'rejected'
+  | 'cancelled'
+  | 'stale'
+  | 'deleted'
+  | 'document-abort'
 
 export interface MarkdownAttachmentJob {
   readonly id: string
@@ -59,7 +56,7 @@ export const createMarkdownAttachmentJob = (
   documentIdentity: options?.documentIdentity,
   revision: options?.revision,
   attempt: options?.attempt ?? 1,
-  phase: "pending",
+  phase: 'pending',
   progress: 0,
   range: options?.range ? { ...options.range } : undefined,
   signalController: options?.signalController,
@@ -68,10 +65,10 @@ export const createMarkdownAttachmentJob = (
 export const formatMarkdownAttachmentPendingSource = (
   item: MarkdownAttachmentItemIntent,
 ): string => {
-  if (item.kind === "image") {
-    return "![Uploading " + item.name + "...]()"
+  if (item.kind === 'image') {
+    return `![Uploading ${item.name}...]()`
   }
-  return "[Uploading " + item.name + "...]()"
+  return `[Uploading ${item.name}...]()`
 }
 
 export const planMarkdownAttachmentInsert = (
@@ -89,7 +86,7 @@ export const planMarkdownAttachmentInsert = (
   for (let index = 0; index < batch.items.length; index += 1) {
     const item = batch.items[index]!
     const formatted = formatMarkdownAttachmentPendingSource(item)
-    const suffix = index < batch.items.length - 1 ? "\n" : ""
+    const suffix = index < batch.items.length - 1 ? '\n' : ''
     const fullText = formatted + suffix
     const itemRange: MarkdownAttachmentRange = Object.freeze({
       start: currentOffset,
@@ -110,7 +107,7 @@ export const planMarkdownAttachmentInsert = (
     )
   }
 
-  const inserted = pieces.join("")
+  const inserted = pieces.join('')
   const transaction: MarkdownEditorTransaction = Object.freeze({
     changes: Object.freeze([
       Object.freeze({
@@ -119,8 +116,8 @@ export const planMarkdownAttachmentInsert = (
         insert: inserted,
       }),
     ]),
-    history: "separate",
-    origin: "command",
+    history: 'separate',
+    origin: 'command',
   })
 
   return Object.freeze({
@@ -142,7 +139,7 @@ export const rebaseMarkdownAttachmentJob = (
     const diff = insertLen - changeLen
 
     if (change.from <= start && change.to >= end) {
-      job.phase = "deleted"
+      job.phase = 'deleted'
       job.range = Object.freeze({ start: change.from, end: change.from })
       return job
     }
@@ -154,7 +151,11 @@ export const rebaseMarkdownAttachmentJob = (
       // after the range, no position shift for this job
     } else {
       // Partial overlap: if the range is wiped or corrupted, mark deleted
-      if (change.insert.length === 0 && change.from <= start && change.to >= start) {
+      if (
+        change.insert.length === 0 &&
+        change.from <= start &&
+        change.to >= start
+      ) {
         start = change.from
         end = Math.max(change.from, end + diff)
       } else {
@@ -164,7 +165,7 @@ export const rebaseMarkdownAttachmentJob = (
   }
 
   if (start >= end) {
-    job.phase = "deleted"
+    job.phase = 'deleted'
   }
   job.range = Object.freeze({ start, end })
   return job
@@ -186,41 +187,41 @@ export const planMarkdownAttachmentResolve = (
     (result.documentIdentity.id !== job.documentIdentity.id ||
       result.documentIdentity.epoch !== job.documentIdentity.epoch)
   ) {
-    job.phase = "document-abort"
-    return Object.freeze({ accepted: false, status: "document-abort" as const })
+    job.phase = 'document-abort'
+    return Object.freeze({ accepted: false, status: 'document-abort' as const })
   }
 
-  if (job.phase === "deleted") {
-    return Object.freeze({ accepted: false, status: "deleted" as const })
+  if (job.phase === 'deleted') {
+    return Object.freeze({ accepted: false, status: 'deleted' as const })
   }
 
-  if (job.phase === "cancelled") {
-    return Object.freeze({ accepted: false, status: "cancelled" as const })
+  if (job.phase === 'cancelled') {
+    return Object.freeze({ accepted: false, status: 'cancelled' as const })
   }
 
-  if (result.status !== "resolved") {
+  if (result.status !== 'resolved') {
     job.phase = result.status as MarkdownAttachmentPhase
-    if ("code" in result && result.code) {
+    if ('code' in result && result.code) {
       job.code = result.code
     }
     return Object.freeze({ accepted: false, status: job.phase })
   }
 
   const committed = commitMarkdownAttachmentResult({
-    documentIdentity: job.documentIdentity ?? { id: "doc", epoch: 1 },
+    documentIdentity: job.documentIdentity ?? { id: 'doc', epoch: 1 },
     revision: job.revision ?? 1,
     result,
   })
 
   if (!committed.accepted || !committed.markdown) {
-    job.phase = "rejected"
-    job.code = "unsafe-payload"
-    return Object.freeze({ accepted: false, status: "rejected" as const })
+    job.phase = 'rejected'
+    job.code = 'unsafe-payload'
+    return Object.freeze({ accepted: false, status: 'rejected' as const })
   }
 
   if (!job.range) {
-    job.phase = "deleted"
-    return Object.freeze({ accepted: false, status: "deleted" as const })
+    job.phase = 'deleted'
+    return Object.freeze({ accepted: false, status: 'deleted' as const })
   }
 
   const transaction: MarkdownEditorTransaction = Object.freeze({
@@ -231,11 +232,11 @@ export const planMarkdownAttachmentResolve = (
         insert: committed.markdown,
       }),
     ]),
-    history: "separate",
-    origin: "command",
+    history: 'separate',
+    origin: 'command',
   })
 
-  job.phase = "resolved"
+  job.phase = 'resolved'
   job.progress = 100
   const markdownLen = committed.markdown.length
   job.range = Object.freeze({
@@ -245,7 +246,7 @@ export const planMarkdownAttachmentResolve = (
 
   return Object.freeze({
     accepted: true,
-    status: "resolved" as const,
+    status: 'resolved' as const,
     transaction,
     markdown: committed.markdown,
   })
@@ -259,7 +260,7 @@ export const planMarkdownAttachmentRemove = (
 } => {
   const from = job.range ? job.range.start : 0
   const to = job.range ? job.range.end : 0
-  job.phase = "deleted"
+  job.phase = 'deleted'
   job.range = Object.freeze({ start: from, end: from })
 
   return Object.freeze({
@@ -268,11 +269,11 @@ export const planMarkdownAttachmentRemove = (
         Object.freeze({
           from,
           to,
-          insert: "",
+          insert: '',
         }),
       ]),
-      history: "separate",
-      origin: "command",
+      history: 'separate',
+      origin: 'command',
     }),
   })
 }
@@ -281,14 +282,14 @@ export const progressMarkdownAttachmentJob = (
   job: MarkdownAttachmentJob,
   progress: number,
 ) => {
-  if (job.phase === "cancelled" || job.phase === "deleted") return job
-  job.phase = "progress"
+  if (job.phase === 'cancelled' || job.phase === 'deleted') return job
+  job.phase = 'progress'
   job.progress = Math.min(100, Math.max(0, progress))
   return job
 }
 
 export const cancelMarkdownAttachmentJob = (job: MarkdownAttachmentJob) => {
-  job.phase = "cancelled"
+  job.phase = 'cancelled'
   if (job.signalController) {
     job.signalController.abort()
   }
@@ -296,7 +297,7 @@ export const cancelMarkdownAttachmentJob = (job: MarkdownAttachmentJob) => {
 }
 
 export const retryMarkdownAttachmentJob = (job: MarkdownAttachmentJob) => {
-  job.phase = "pending"
+  job.phase = 'pending'
   job.progress = 0
   job.attempt += 1
   job.code = undefined
@@ -305,67 +306,67 @@ export const retryMarkdownAttachmentJob = (job: MarkdownAttachmentJob) => {
 }
 
 export type MarkdownAttachmentLifecycleMutationKind =
-  | "library-owned-store"
-  | "stale-completion"
-  | "undo-resurrection"
-  | "consumer-scheme"
-  | "duplicate-attempt"
+  | 'library-owned-store'
+  | 'stale-completion'
+  | 'undo-resurrection'
+  | 'consumer-scheme'
+  | 'duplicate-attempt'
 
 export const evaluateMarkdownAttachmentLifecycleMutations = () => {
-  const job = createMarkdownAttachmentJob("sample-item", {
-    batchId: "batch:1",
-    documentIdentity: { id: "doc", epoch: 1 },
+  const job = createMarkdownAttachmentJob('sample-item', {
+    batchId: 'batch:1',
+    documentIdentity: { id: 'doc', epoch: 1 },
     revision: 1,
     range: { start: 0, end: 10 },
   })
 
   // 1. deleted job cannot resurrect
-  job.phase = "deleted"
-  const deletedResolve = planMarkdownAttachmentResolve("source", job, {
-    status: "resolved",
-    batchId: "batch:1",
-    itemId: "sample-item",
-    documentIdentity: { id: "doc", epoch: 1 },
+  job.phase = 'deleted'
+  const deletedResolve = planMarkdownAttachmentResolve('source', job, {
+    status: 'resolved',
+    batchId: 'batch:1',
+    itemId: 'sample-item',
+    documentIdentity: { id: 'doc', epoch: 1 },
     revision: 1,
     payload: {
-      markdownKind: "image",
-      href: "https://cdn.example/img.png",
-      mimeType: "image/png",
+      markdownKind: 'image',
+      href: 'https://cdn.example/img.png',
+      mimeType: 'image/png',
     },
   })
 
   // 2. consumer scheme
   const schemeResult = commitMarkdownAttachmentResult({
-    documentIdentity: { id: "doc", epoch: 1 },
+    documentIdentity: { id: 'doc', epoch: 1 },
     revision: 1,
     result: {
-      status: "resolved",
-      batchId: "batch:1",
-      itemId: "sample-item",
-      documentIdentity: { id: "doc", epoch: 1 },
+      status: 'resolved',
+      batchId: 'batch:1',
+      itemId: 'sample-item',
+      documentIdentity: { id: 'doc', epoch: 1 },
       revision: 1,
       payload: {
-        markdownKind: "image",
-        href: "fsusblog://asset/123",
-        mimeType: "image/png",
+        markdownKind: 'image',
+        href: 'fsusblog://asset/123',
+        mimeType: 'image/png',
       },
     },
   })
 
   // 3. stale revision
   const staleResolve = commitMarkdownAttachmentResult({
-    documentIdentity: { id: "doc", epoch: 1 },
+    documentIdentity: { id: 'doc', epoch: 1 },
     revision: 1,
     result: {
-      status: "resolved",
-      batchId: "batch:1",
-      itemId: "sample-item",
-      documentIdentity: { id: "doc", epoch: 1 },
+      status: 'resolved',
+      batchId: 'batch:1',
+      itemId: 'sample-item',
+      documentIdentity: { id: 'doc', epoch: 1 },
       revision: 99,
       payload: {
-        markdownKind: "file",
-        href: "https://cdn.example/a.pdf",
-        mimeType: "application/pdf",
+        markdownKind: 'file',
+        href: 'https://cdn.example/a.pdf',
+        mimeType: 'application/pdf',
       },
     },
   })
@@ -373,27 +374,27 @@ export const evaluateMarkdownAttachmentLifecycleMutations = () => {
   return Object.freeze({
     mutations: Object.freeze([
       Object.freeze({
-        kind: "library-owned-store" as const,
+        kind: 'library-owned-store' as const,
         equivalent: false,
         accepted: false,
       }),
       Object.freeze({
-        kind: "stale-completion" as const,
+        kind: 'stale-completion' as const,
         equivalent: staleResolve.accepted === true,
         accepted: false,
       }),
       Object.freeze({
-        kind: "undo-resurrection" as const,
+        kind: 'undo-resurrection' as const,
         equivalent: deletedResolve.accepted === true,
         accepted: false,
       }),
       Object.freeze({
-        kind: "consumer-scheme" as const,
+        kind: 'consumer-scheme' as const,
         equivalent: schemeResult.accepted === true,
         accepted: false,
       }),
       Object.freeze({
-        kind: "duplicate-attempt" as const,
+        kind: 'duplicate-attempt' as const,
         equivalent: false,
         accepted: false,
       }),

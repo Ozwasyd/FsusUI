@@ -1,11 +1,14 @@
-import { validateMarkdownUrl, type MarkdownUrlIdentity } from "../../../wasm/markdown-url"
-import type { MarkdownDocumentIdentity } from "../../../wasm/markdown-runtime"
-import type { MarkdownEditorTransaction } from "./markdown-editor-transaction"
+import {
+  validateMarkdownUrl,
+  type MarkdownUrlIdentity,
+} from '../../../wasm/markdown-url'
+import type { MarkdownDocumentIdentity } from '../../../wasm/markdown-runtime'
+import type { MarkdownEditorTransaction } from './markdown-editor-transaction'
 import {
   createMarkdownAttachmentBatch,
   type MarkdownAttachmentBatchIntent,
   type MarkdownAttachmentInputFile,
-} from "./markdown-editor-attachment"
+} from './markdown-editor-attachment'
 
 export interface DecomposedMarkdownImageSubrange {
   readonly start: number
@@ -15,15 +18,23 @@ export interface DecomposedMarkdownImageSubrange {
 export interface DecomposedMarkdownImageNode {
   readonly full: DecomposedMarkdownImageSubrange
   readonly marker: DecomposedMarkdownImageSubrange
-  readonly alt: DecomposedMarkdownImageSubrange & { readonly value: string; readonly raw: string }
-  readonly destination: DecomposedMarkdownImageSubrange & { readonly value: string }
+  readonly alt: DecomposedMarkdownImageSubrange & {
+    readonly value: string
+    readonly raw: string
+  }
+  readonly destination: DecomposedMarkdownImageSubrange & {
+    readonly value: string
+  }
   readonly title:
-    | (DecomposedMarkdownImageSubrange & { readonly value: string; readonly quote: string })
+    | (DecomposedMarkdownImageSubrange & {
+        readonly value: string
+        readonly quote: string
+      })
     | null
 }
 
 const escapeAltText = (text: string) =>
-  text.replace(/[\\]/g, "\\\\").replace(/\]/g, "\\]")
+  text.replace(/[\\]/g, '\\\\').replace(/\]/g, '\\]')
 
 export const decomposeMarkdownImageNode = (
   source: string,
@@ -31,30 +42,30 @@ export const decomposeMarkdownImageNode = (
 ): DecomposedMarkdownImageNode | null => {
   const { start, end } = range
   if (start < 0 || end > source.length || end - start < 4) return null
-  if (source[start] !== "!" || source[start + 1] !== "[") return null
+  if (source[start] !== '!' || source[start + 1] !== '[') return null
 
   let index = start + 2
-  let altRaw = ""
+  let altRaw = ''
   while (index < end) {
     const char = source[index]
-    if (char === "\\" && index + 1 < end) {
+    if (char === '\\' && index + 1 < end) {
       altRaw += source.slice(index, index + 2)
       index += 2
       continue
     }
-    if (char === "]") {
+    if (char === ']') {
       break
     }
     altRaw += char
     index += 1
   }
 
-  if (index >= end || source[index] !== "]") return null
+  if (index >= end || source[index] !== ']') return null
   const altEnd = index
   index += 1 // skip "]"
 
   // expect "("
-  if (index >= end || source[index] !== "(") return null
+  if (index >= end || source[index] !== '(') return null
   index += 1 // skip "("
 
   // skip whitespace before destination
@@ -64,7 +75,7 @@ export const decomposeMarkdownImageNode = (
   const destStart = index
 
   // find destination end (space, quote, or ")")
-  while (index < end && !/\s/.test(source[index]!) && source[index] !== ")") {
+  while (index < end && !/\s/.test(source[index]!) && source[index] !== ')') {
     index += 1
   }
   const destEnd = index
@@ -76,16 +87,19 @@ export const decomposeMarkdownImageNode = (
   }
 
   let titleData:
-    | (DecomposedMarkdownImageSubrange & { readonly value: string; readonly quote: string })
+    | (DecomposedMarkdownImageSubrange & {
+        readonly value: string
+        readonly quote: string
+      })
     | null = null
 
-  if (index < end && (source[index] === "\"" || source[index] === "'")) {
+  if (index < end && (source[index] === '"' || source[index] === "'")) {
     const quote = source[index]!
     const titleStart = index
     index += 1
-    let titleVal = ""
+    let titleVal = ''
     while (index < end && source[index] !== quote) {
-      if (source[index] === "\\" && index + 1 < end) {
+      if (source[index] === '\\' && index + 1 < end) {
         titleVal += source[index + 1]
         index += 2
         continue
@@ -116,7 +130,7 @@ export const decomposeMarkdownImageNode = (
       start: start + 2,
       end: altEnd,
       raw: altRaw,
-      value: altRaw.replace(/\\([\]\\])/g, "$1"),
+      value: altRaw.replace(/\\([\]\\])/g, '$1'),
     }),
     destination: Object.freeze({
       start: destStart,
@@ -137,8 +151,8 @@ export const planMarkdownLinkUnwrap = (
   const insert = match ? match[1]! : slice
   return Object.freeze({
     changes: Object.freeze([{ from: start, to: end, insert }]),
-    history: "separate",
-    origin: "command",
+    history: 'separate',
+    origin: 'command',
   })
 }
 
@@ -149,7 +163,12 @@ export const planMarkdownImageAltEdit = (
 ): MarkdownEditorTransaction => {
   const decomposed = decomposeMarkdownImageNode(source, imageRange)
   if (!decomposed) {
-    return planMarkdownImageAltChange(source, imageRange.start, imageRange.end, newAlt)
+    return planMarkdownImageAltChange(
+      source,
+      imageRange.start,
+      imageRange.end,
+      newAlt,
+    )
   }
   return Object.freeze({
     changes: Object.freeze([
@@ -159,8 +178,8 @@ export const planMarkdownImageAltEdit = (
         insert: escapeAltText(newAlt),
       }),
     ]),
-    history: "separate",
-    origin: "command",
+    history: 'separate',
+    origin: 'command',
   })
 }
 
@@ -172,11 +191,11 @@ export const planMarkdownImageAltChange = (
 ): MarkdownEditorTransaction => {
   const slice = source.slice(start, end)
   const match = /^!\[([^\]]*)\]\(([^)]+)\)$/.exec(slice)
-  const insert = match ? "![" + alt + "](" + match[2] + ")" : slice
+  const insert = match ? `![${alt}](${match[2]})` : slice
   return Object.freeze({
     changes: Object.freeze([{ from: start, to: end, insert }]),
-    history: "separate",
-    origin: "command",
+    history: 'separate',
+    origin: 'command',
   })
 }
 
@@ -189,8 +208,8 @@ export const planMarkdownImageDestinationEdit = (
   if (!decomposed) {
     return Object.freeze({
       changes: Object.freeze([]),
-      history: "separate",
-      origin: "command",
+      history: 'separate',
+      origin: 'command',
     })
   }
   return Object.freeze({
@@ -201,8 +220,8 @@ export const planMarkdownImageDestinationEdit = (
         insert: newDestination,
       }),
     ]),
-    history: "separate",
-    origin: "command",
+    history: 'separate',
+    origin: 'command',
   })
 }
 
@@ -215,8 +234,8 @@ export const planMarkdownImageTitleEdit = (
   if (!decomposed) {
     return Object.freeze({
       changes: Object.freeze([]),
-      history: "separate",
-      origin: "command",
+      history: 'separate',
+      origin: 'command',
     })
   }
 
@@ -224,7 +243,10 @@ export const planMarkdownImageTitleEdit = (
     if (newTitle === null) {
       // remove title and preceding space
       let removeStart = decomposed.title.start
-      while (removeStart > decomposed.destination.end && /\s/.test(source[removeStart - 1]!)) {
+      while (
+        removeStart > decomposed.destination.end &&
+        /\s/.test(source[removeStart - 1]!)
+      ) {
         removeStart -= 1
       }
       return Object.freeze({
@@ -232,11 +254,11 @@ export const planMarkdownImageTitleEdit = (
           Object.freeze({
             from: removeStart,
             to: decomposed.title.end,
-            insert: "",
+            insert: '',
           }),
         ]),
-        history: "separate",
-        origin: "command",
+        history: 'separate',
+        origin: 'command',
       })
     }
     return Object.freeze({
@@ -244,11 +266,11 @@ export const planMarkdownImageTitleEdit = (
         Object.freeze({
           from: decomposed.title.start,
           to: decomposed.title.end,
-          insert: "\"" + newTitle.replace(/"/g, "\\\"") + "\"",
+          insert: `"${newTitle.replace(/"/g, '\\"')}"`,
         }),
       ]),
-      history: "separate",
-      origin: "command",
+      history: 'separate',
+      origin: 'command',
     })
   }
 
@@ -260,18 +282,18 @@ export const planMarkdownImageTitleEdit = (
         Object.freeze({
           from: insertPos,
           to: insertPos,
-          insert: " \"" + newTitle.replace(/"/g, "\\\"") + "\"",
+          insert: ` "${newTitle.replace(/"/g, '\\"')}"`,
         }),
       ]),
-      history: "separate",
-      origin: "command",
+      history: 'separate',
+      origin: 'command',
     })
   }
 
   return Object.freeze({
     changes: Object.freeze([]),
-    history: "separate",
-    origin: "command",
+    history: 'separate',
+    origin: 'command',
   })
 }
 
@@ -281,7 +303,7 @@ export const planMarkdownImageRemove = (
   options?: { readonly keepAltText?: boolean },
 ): MarkdownEditorTransaction => {
   const decomposed = decomposeMarkdownImageNode(source, imageRange)
-  const insert = options?.keepAltText && decomposed ? decomposed.alt.value : ""
+  const insert = options?.keepAltText && decomposed ? decomposed.alt.value : ''
   return Object.freeze({
     changes: Object.freeze([
       Object.freeze({
@@ -290,8 +312,8 @@ export const planMarkdownImageRemove = (
         insert,
       }),
     ]),
-    history: "separate",
-    origin: "command",
+    history: 'separate',
+    origin: 'command',
   })
 }
 
@@ -303,16 +325,16 @@ export const planMarkdownImageAttachmentReplace = (input: {
   readonly file: MarkdownAttachmentInputFile
 }): MarkdownAttachmentBatchIntent => {
   return createMarkdownAttachmentBatch({
-    sourceKind: "pick",
+    sourceKind: 'pick',
     documentIdentity: input.documentIdentity,
     revision: input.revision,
     range: input.imageRange,
     items: [
       {
-        mimeType: input.file.mimeType || input.file.type || "image/png",
-        name: input.file.name || "replacement.png",
+        mimeType: input.file.mimeType || input.file.type || 'image/png',
+        name: input.file.name || 'replacement.png',
         byteLength: input.file.byteLength ?? input.file.size ?? 0,
-        kind: "image",
+        kind: 'image',
         signal: input.file.signal,
       },
     ],
@@ -325,28 +347,28 @@ export const validateMarkdownPropertyUrl = (
 ) => validateMarkdownUrl(value, identity)
 
 export type MarkdownImagePropertyMutationKind =
-  | "dom-attributes"
-  | "ai-alt"
-  | "unsafe-preview"
-  | "whole-node-rewrite"
-  | "attachment-resurrection"
+  | 'dom-attributes'
+  | 'ai-alt'
+  | 'unsafe-preview'
+  | 'whole-node-rewrite'
+  | 'attachment-resurrection'
 
 export const evaluateMarkdownImagePropertyMutations = (
-  source = "![initial alt](https://cdn.example/initial.png \"initial title\")",
+  source = '![initial alt](https://cdn.example/initial.png "initial title")',
 ) => {
   const range = { start: 0, end: source.length }
   const decomposed = decomposeMarkdownImageNode(source, range)
-  const altEdit = planMarkdownImageAltEdit(source, range, "new alt")
+  const altEdit = planMarkdownImageAltEdit(source, range, 'new alt')
   const isWholeNodeRewrite =
     altEdit.changes.length === 1 &&
     altEdit.changes[0]!.from === range.start &&
     altEdit.changes[0]!.to === range.end
 
-  const unsafeUrl = validateMarkdownPropertyUrl("javascript:alert(1)", {
+  const unsafeUrl = validateMarkdownPropertyUrl('javascript:alert(1)', {
     documentEpoch: 1,
     revision: 1,
-    nodeId: "node:1",
-    value: "javascript:alert(1)",
+    nodeId: 'node:1',
+    value: 'javascript:alert(1)',
     version: 1,
   })
 
@@ -354,27 +376,27 @@ export const evaluateMarkdownImagePropertyMutations = (
     decomposed,
     mutations: Object.freeze([
       Object.freeze({
-        kind: "dom-attributes" as const,
+        kind: 'dom-attributes' as const,
         equivalent: false,
         accepted: false,
       }),
       Object.freeze({
-        kind: "ai-alt" as const,
+        kind: 'ai-alt' as const,
         equivalent: false,
         accepted: false,
       }),
       Object.freeze({
-        kind: "unsafe-preview" as const,
-        equivalent: unsafeUrl.state === "valid-external",
+        kind: 'unsafe-preview' as const,
+        equivalent: unsafeUrl.state === 'valid-external',
         accepted: false,
       }),
       Object.freeze({
-        kind: "whole-node-rewrite" as const,
+        kind: 'whole-node-rewrite' as const,
         equivalent: isWholeNodeRewrite,
         accepted: false,
       }),
       Object.freeze({
-        kind: "attachment-resurrection" as const,
+        kind: 'attachment-resurrection' as const,
         equivalent: false,
         accepted: false,
       }),
@@ -385,7 +407,15 @@ export const evaluateMarkdownImagePropertyMutations = (
 export const evaluateMarkdownPropertyMutations = () =>
   Object.freeze({
     mutations: Object.freeze([
-      Object.freeze({ kind: "stale-property" as const, equivalent: false, accepted: false }),
-      Object.freeze({ kind: "unsafe-url" as const, equivalent: false, accepted: false }),
+      Object.freeze({
+        kind: 'stale-property' as const,
+        equivalent: false,
+        accepted: false,
+      }),
+      Object.freeze({
+        kind: 'unsafe-url' as const,
+        equivalent: false,
+        accepted: false,
+      }),
     ]),
   })

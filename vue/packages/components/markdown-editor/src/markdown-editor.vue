@@ -191,6 +191,47 @@
         @wheel="handleLayoutWheel"
       />
 
+      <input
+        ref="attachmentInputRef"
+        type="file"
+        multiple
+        :class="ns.e('attachment-picker')"
+        tabindex="-1"
+        aria-hidden="true"
+        @change="handleAttachmentPickerChange"
+      />
+
+      <ul
+        v-if="attachmentPresentations.length"
+        :class="ns.e('attachments')"
+        aria-label="Attachments"
+      >
+        <li
+          v-for="attachment in attachmentPresentations"
+          :key="attachment.itemId"
+          :class="ns.e('attachment')"
+        >
+          <span :class="ns.e('attachment-name')">{{ attachment.name }}</span>
+          <span
+            :class="ns.e('attachment-status')"
+            :aria-live="attachment.statusAriaLive"
+          >
+            {{ attachment.progressAriaText }}
+          </span>
+          <div :class="ns.e('attachment-actions')">
+            <button
+              v-for="action in attachment.actions"
+              :key="action.key"
+              type="button"
+              :disabled="action.disabled"
+              @click="runAttachmentAction(attachment.itemId, action.key)"
+            >
+              {{ action.label }}
+            </button>
+          </div>
+        </li>
+      </ul>
+
       <div
         v-if="liveDecorations.length"
         :class="ns.e('live-decorations')"
@@ -296,9 +337,7 @@
               :aria-label="localeText.pasteAsMarkdown.conversionWarnings"
             >
               <h3>{{ localeText.pasteAsMarkdown.conversionWarnings }}</h3>
-              <ul
-                :aria-label="localeText.pasteAsMarkdown.conversionWarnings"
-              >
+              <ul :aria-label="localeText.pasteAsMarkdown.conversionWarnings">
                 <li
                   v-for="warning in pasteAsMarkdownSession.preview.warnings"
                   :key="`${warning.kind}:${warning.code}:${warning.detail || ''}`"
@@ -366,7 +405,24 @@ import {
   resolveMarkdownEditorShortcut,
   runMarkdownEditorCommand,
 } from './markdown-editor'
-import { captureMarkdownAttachmentInput } from './markdown-editor-attachment'
+import {
+  captureMarkdownAttachmentInput,
+  createMarkdownAttachmentAtomicPresentation,
+  createMarkdownAttachmentCaptureSession,
+  type MarkdownAttachmentBatchIntent,
+  type MarkdownAttachmentProviderResult,
+  type MarkdownAttachmentSourceKind,
+} from './markdown-editor-attachment'
+import {
+  cancelMarkdownAttachmentJob,
+  planMarkdownAttachmentInsert,
+  planMarkdownAttachmentRemove,
+  planMarkdownAttachmentResolve,
+  progressMarkdownAttachmentJob,
+  rebaseMarkdownAttachmentJob,
+  retryMarkdownAttachmentJob,
+  type MarkdownAttachmentJob,
+} from './markdown-editor-attachment-lifecycle'
 import { resolveMarkdownEditorChromeRegions } from './markdown-editor-chrome'
 import {
   deriveMarkdownEditorChange,
@@ -437,6 +493,7 @@ import {
 } from './markdown-editor-live-layout'
 
 import type { MarkdownHtmlImportSnapshot } from '../../../wasm/markdown-html-import'
+import { createMarkdownAnchorMap } from '../../../wasm/markdown-anchor-map'
 
 defineOptions({
   name: 'ElMarkdownEditor',
@@ -449,6 +506,7 @@ const ns = useNamespace('markdown-editor')
 const modes: MarkdownEditorMode[] = ['source', 'live', 'split', 'preview']
 const commandTrayId = `${useId()}-command-tray`
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
+const attachmentInputRef = ref<HTMLInputElement | null>(null)
 const pasteAsMarkdownDialogRef = ref<HTMLElement | null>(null)
 const pasteAsMarkdownPrimaryActionRef = ref<HTMLButtonElement | null>(null)
 const pasteAsMarkdownSession = ref<MarkdownPasteAsMarkdownSession | null>(null)
@@ -474,7 +532,9 @@ const chromeRegions = computed(() =>
   }),
 )
 const textareaAriaLabel = computed(() =>
-  currentMode.value === 'live' ? 'Markdown editor live editing surface' : 'Markdown editor source',
+  currentMode.value === 'live'
+    ? 'Markdown editor live editing surface'
+    : 'Markdown editor source',
 )
 const compactMode = computed(() => props.mobileLayout === 'compact')
 const normalizeModeForLayout = (
@@ -496,6 +556,27 @@ const transactionStore = new MarkdownEditorTransactionStore(
   documentIdentity,
 )
 const editorValue = ref(transactionStore.value)
+const attachmentCaptureSession = createMarkdownAttachmentCaptureSession()
+const attachmentJobs = ref<MarkdownAttachmentJob[]>([])
+const attachmentBatches = new Map<string, MarkdownAttachmentBatchIntent>()
+const attachmentItems = new Map<
+  string,
+  MarkdownAttachmentBatchIntent['items'][number]
+>()
+const attachmentPresentations = computed(() =>
+  attachmentJobs.value
+    .filter((job) => job.phase !== 'deleted')
+    .map((job) => {
+      const item = attachmentItems.get(job.itemId ?? job.id)
+      return createMarkdownAttachmentAtomicPresentation({
+        itemId: job.itemId ?? job.id,
+        name: item?.name ?? 'Attachment',
+        kind: item?.kind,
+        status: job.phase === 'idle' ? 'pending' : job.phase,
+        progress: job.progress,
+      })
+    }),
+)
 const liveSurface = computed(() =>
   createMarkdownLiveSurface({
     documentIdentity,
@@ -821,6 +902,28 @@ const dispatchEditorOperation = (
   editorValue.value = result.value
   emit('transaction', toMarkdownEditorTransactionEvent(transaction, result))
 
+  if (result.accepted && result.value !== previousValue) {
+    const appliedChanges =
+      operation.kind === 'transaction'
+        ? operation.transaction.changes
+        : (() => {
+            const change = deriveMarkdownEditorChange(
+              previousValue,
+              result.value,
+            )
+            return change ? [change] : []
+          })()
+    const ownedItemId =
+      operation.kind === 'transaction'
+        ? operation.transaction.metadata?.attachmentItemId
+        : undefined
+    for (const job of attachmentJobs.value) {
+      if (job.itemId === ownedItemId || job.phase === 'deleted') continue
+      rebaseMarkdownAttachmentJob(job, appliedChanges)
+    }
+    triggerRef(attachmentJobs)
+  }
+
   if (
     result.accepted &&
     result.value !== previousValue &&
@@ -895,6 +998,92 @@ const captureSelection = (breakMerge = true) => {
     )
   }
   return selection
+}
+
+const captureAttachmentFiles = (
+  sourceKind: MarkdownAttachmentSourceKind,
+  files: readonly File[],
+  selection: MarkdownEditorSelection,
+  eventFingerprint?: string,
+) => {
+  const captured = captureMarkdownAttachmentInput({
+    sourceKind,
+    documentIdentity,
+    revision: transactionStore.revision,
+    anchor: { range: selection, nodeId: null },
+    files: files.map((file) => ({
+      name: file.name,
+      mimeType: file.type,
+      byteLength: file.size,
+    })),
+    context: {
+      readonly: props.readonly,
+      disabled: inputDisabled.value,
+      mode: currentMode.value,
+      isComposing: isComposing.value,
+      currentRevision: transactionStore.revision,
+    },
+    eventFingerprint,
+    session: attachmentCaptureSession,
+  })
+  if (!captured.ok) return captured
+
+  const planned = planMarkdownAttachmentInsert(
+    transactionStore.value,
+    captured.batch.anchor,
+    captured.batch,
+  )
+  const dispatched = dispatchTransaction(planned.transaction)
+  if (!dispatched.accepted) return captured
+
+  attachmentBatches.set(captured.batch.batchId, captured.batch)
+  for (const item of captured.batch.items)
+    attachmentItems.set(item.itemId, item)
+  attachmentJobs.value = [...attachmentJobs.value, ...planned.jobs]
+  emit('upload-image', captured.batch)
+  return captured
+}
+
+const resolveDropSelection = (
+  event: DragEvent,
+): MarkdownEditorSelection | null => {
+  const textarea = textareaRef.value
+  if (!textarea || typeof document === 'undefined') return null
+  const caretDocument = document as Document & {
+    caretPositionFromPoint?: (
+      x: number,
+      y: number,
+    ) => { readonly offset: number; readonly offsetNode: Node } | null
+    caretRangeFromPoint?: (x: number, y: number) => Range | null
+  }
+  const position = caretDocument.caretPositionFromPoint?.(
+    event.clientX,
+    event.clientY,
+  )
+  const range = position
+    ? null
+    : caretDocument.caretRangeFromPoint?.(event.clientX, event.clientY)
+  const offset =
+    position?.offsetNode === textarea
+      ? position.offset
+      : range?.startContainer === textarea
+        ? range.startOffset
+        : null
+  if (offset === null) return null
+
+  const bounded = Math.max(0, Math.min(transactionStore.value.length, offset))
+  const anchorMap = createMarkdownAnchorMap({
+    identity: documentIdentity,
+    source: transactionStore.value,
+  })
+  const mapped = anchorMap.visualAnchorToSourceSelection(
+    anchorMap.sourceRangeToVisual({ start: bounded, end: bounded }),
+  )
+  return Object.freeze({
+    direction: 'none' as const,
+    start: mapped.anchor,
+    end: mapped.focus,
+  })
 }
 
 const dispatchReplacement = (
@@ -1124,6 +1313,9 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   abortPendingCommands()
+  attachmentCaptureSession.clear()
+  attachmentBatches.clear()
+  attachmentItems.clear()
   if (layoutGestureTimer) clearTimeout(layoutGestureTimer)
   if (typeof window === 'undefined') return
 
@@ -1190,7 +1382,11 @@ const handleInput = (event: Event) => {
   })
   syncNativeComposing()
   beforeInputSnapshot = undefined
-  if (plan.action === 'dedup' || plan.action === 'prevent' || plan.action === 'ignore') {
+  if (
+    plan.action === 'dedup' ||
+    plan.action === 'prevent' ||
+    plan.action === 'ignore'
+  ) {
     pendingClipboardIdentity = undefined
     pendingInputOrigin = undefined
     if (plan.restoreDisplay && target.value !== transactionStore.value) {
@@ -1279,15 +1475,15 @@ const handleCompositionEnd = (event: CompositionEvent) => {
       ? laggedSelection
       : readSelectionFrom(target),
     {
-    history: plan.history,
-    metadata: Object.freeze({
-      composition: true,
-      data: event.data,
-      identity: plan.identity,
-      inputType: 'insertCompositionText',
-    }),
-    origin: 'input',
-  },
+      history: plan.history,
+      metadata: Object.freeze({
+        composition: true,
+        data: event.data,
+        identity: plan.identity,
+        inputType: 'insertCompositionText',
+      }),
+      origin: 'input',
+    },
   )
   refreshLiveReveal()
 }
@@ -1296,6 +1492,7 @@ const applyClipboardTransfer = (
   event: { preventDefault(): void; dataTransfer?: DataTransfer | null },
   origin: 'paste' | 'drop',
   data: DataTransfer | null | undefined,
+  attachmentSelection?: MarkdownEditorSelection | null,
 ) => {
   const transfer = markdownClipboardItemsFromDataTransfer(data ?? null)
   const hasTransfer = transfer.items.length > 0 || transfer.files.length > 0
@@ -1315,7 +1512,7 @@ const applyClipboardTransfer = (
     mode: currentMode.value,
     origin,
     revision: transactionStore.revision,
-    selection: captureSelection(),
+    selection: attachmentSelection ?? captureSelection(),
     source: transactionStore.value,
   })
 
@@ -1344,32 +1541,13 @@ const applyClipboardTransfer = (
       revision: transactionStore.revision,
     })
     if (plan.action === 'attachment-intent') {
-      const rawFiles = Array.from(transfer.files ?? []).map((file) => ({
-        name: file.name,
-        mimeType: file.type,
-        byteLength: file.size,
-      }))
-      const captured = captureMarkdownAttachmentInput({
-        sourceKind: origin,
-        documentIdentity,
-        revision: transactionStore.revision,
-        anchor: {
-          range: captureSelection(),
-          nodeId: null,
-        },
-        files: rawFiles,
-        context: {
-          readonly: editingBlocked.value,
-          disabled: editingBlocked.value,
-          mode: currentMode.value,
-          isComposing: isComposing.value,
-          currentRevision: transactionStore.revision,
-        },
-        eventFingerprint: plan.identity,
-      })
-      if (captured.ok) {
-        emit('upload-image', captured.batch)
-      }
+      if (origin === 'drop' && !attachmentSelection) return
+      captureAttachmentFiles(
+        origin,
+        Array.from(data?.files ?? []),
+        attachmentSelection ?? captureSelection(),
+        plan.identity,
+      )
     }
     if (plan.transaction) dispatchTransaction(plan.transaction)
     return
@@ -1384,11 +1562,19 @@ const handlePaste = (event: ClipboardEvent) => {
 
 const handleDrop = (event: DragEvent) => {
   event.preventDefault()
-  applyClipboardTransfer(event, 'drop', event.dataTransfer)
+  applyClipboardTransfer(
+    event,
+    'drop',
+    event.dataTransfer,
+    resolveDropSelection(event),
+  )
 }
 
 const handleCopy = (event: ClipboardEvent) => {
-  if (currentMode.value === 'live' && atomicSession.value?.phase === 'selected') {
+  if (
+    currentMode.value === 'live' &&
+    atomicSession.value?.phase === 'selected'
+  ) {
     const atomic = applyAtomicIntent('copy-source')
     if (atomic.copy && 'payload' in atomic.copy) {
       event.preventDefault()
@@ -1414,7 +1600,10 @@ const handleCopy = (event: ClipboardEvent) => {
 }
 
 const handleCut = (event: ClipboardEvent) => {
-  if (currentMode.value === 'live' && atomicSession.value?.phase === 'selected') {
+  if (
+    currentMode.value === 'live' &&
+    atomicSession.value?.phase === 'selected'
+  ) {
     const atomic = applyAtomicIntent('cut')
     if (atomic.copy && 'payload' in atomic.copy) {
       event.preventDefault()
@@ -1423,7 +1612,10 @@ const handleCut = (event: ClipboardEvent) => {
     }
     if (atomic.copy && 'copy' in atomic.copy) {
       event.preventDefault()
-      writeMarkdownClipboardPayload(event.clipboardData, atomic.copy.copy.payload)
+      writeMarkdownClipboardPayload(
+        event.clipboardData,
+        atomic.copy.copy.payload,
+      )
       return
     }
   }
@@ -1657,9 +1849,17 @@ const runCommand = async (command: MarkdownEditorCommand) => {
       signal: commandController.signal,
       value,
     }
-    if (!isMarkdownEditorCommandVisible(command, context) || !isMarkdownEditorCommandEnabled(command, context)) return
+    if (
+      !isMarkdownEditorCommandVisible(command, context) ||
+      !isMarkdownEditorCommandEnabled(command, context)
+    )
+      return
     const result = await runMarkdownEditorCommand(command, context)
-    if (commandController.signal.aborted || commandControllers.get(command.key) !== commandController) return
+    if (
+      commandController.signal.aborted ||
+      commandControllers.get(command.key) !== commandController
+    )
+      return
     if (!result?.transaction) return
     const dispatchResult = dispatchTransaction({
       ...result.transaction,
@@ -1735,28 +1935,78 @@ const emitSubmit = () => {
 
 const emitUploadImage = () => {
   if (editingBlocked.value || isComposing.value) return
-  const captured = captureMarkdownAttachmentInput({
-    sourceKind: 'pick',
-    documentIdentity,
-    revision: transactionStore.revision,
-    anchor: {
-      range: captureSelection(),
-      nodeId: null,
-    },
-    files: [{ name: 'attachment.png', mimeType: 'image/png', byteLength: 0, kind: 'image' }],
-    context: {
-      readonly: editingBlocked.value,
-      disabled: editingBlocked.value,
-      mode: currentMode.value,
-      isComposing: isComposing.value,
-      currentRevision: transactionStore.revision,
-    },
-  })
-  if (captured.ok) {
-    emit('upload-image', captured.batch)
-  } else {
-    emit('upload-image')
+  attachmentInputRef.value?.click()
+}
+
+const handleAttachmentPickerChange = (event: Event) => {
+  const input = event.currentTarget
+  if (!(input instanceof HTMLInputElement)) return
+  const files = Array.from(input.files ?? [])
+  if (files.length > 0) {
+    captureAttachmentFiles(
+      'pick',
+      files,
+      captureSelection(),
+      `pick:${event.timeStamp}:${files.map((file) => `${file.name}:${file.size}:${file.lastModified}`).join('|')}`,
+    )
   }
+  input.value = ''
+}
+
+const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
+  const job = attachmentJobs.value.find(
+    (candidate) => candidate.itemId === result.itemId,
+  )
+  if (!job) return false
+  if (result.status === 'progress') {
+    const ratio = result.ratio ?? 0
+    progressMarkdownAttachmentJob(job, ratio <= 1 ? ratio * 100 : ratio)
+    triggerRef(attachmentJobs)
+    return true
+  }
+
+  const planned = planMarkdownAttachmentResolve(
+    transactionStore.value,
+    job,
+    result,
+  )
+  triggerRef(attachmentJobs)
+  if (!planned.transaction) return planned.accepted
+  return dispatchTransaction({
+    ...planned.transaction,
+    metadata: Object.freeze({ attachmentItemId: job.itemId }),
+  }).accepted
+}
+
+const runAttachmentAction = (
+  itemId: string,
+  action: 'cancel' | 'retry' | 'remove',
+) => {
+  const job = attachmentJobs.value.find(
+    (candidate) => candidate.itemId === itemId,
+  )
+  if (!job) return
+  if (action === 'cancel') {
+    cancelMarkdownAttachmentJob(job)
+  } else if (action === 'retry') {
+    retryMarkdownAttachmentJob(job)
+    const batch = job.batchId ? attachmentBatches.get(job.batchId) : undefined
+    const item = attachmentItems.get(itemId)
+    if (batch && item) {
+      emit(
+        'upload-image',
+        Object.freeze({ ...batch, items: Object.freeze([item]) }),
+      )
+    }
+  } else {
+    const planned = planMarkdownAttachmentRemove(transactionStore.value, job)
+    dispatchTransaction({
+      ...planned.transaction,
+      metadata: Object.freeze({ attachmentItemId: job.itemId }),
+    })
+  }
+  triggerRef(attachmentJobs)
+  applyLiveLayout('block-height-change')
 }
 
 const emitRenderEvent = (
@@ -1814,7 +2064,12 @@ const handleKeydown = (event: KeyboardEvent) => {
       applyLiveSelectionMotion(motionKey, { shift: event.shiftKey })
       return
     }
-    if (event.key === 'Enter' && !event.altKey && !event.ctrlKey && !event.metaKey) {
+    if (
+      event.key === 'Enter' &&
+      !event.altKey &&
+      !event.ctrlKey &&
+      !event.metaKey
+    ) {
       const atomic = resolveMarkdownAtomicNodeIntent({
         action: 'caret-before',
         composing: isComposing.value,
@@ -1937,12 +2192,7 @@ const handleKeydown = (event: KeyboardEvent) => {
           : event.key === 'Delete'
             ? 'delete'
             : null
-  if (
-    blockKey &&
-    !event.altKey &&
-    !event.ctrlKey &&
-    !event.metaKey
-  ) {
+  if (blockKey && !event.altKey && !event.ctrlKey && !event.metaKey) {
     const plan = resolveMarkdownBlockInputIntent({
       source: transactionStore.value,
       selection: captureSelection(),
@@ -2022,6 +2272,7 @@ const insertMarkdownAtCursor = (
 }
 
 defineExpose({
+  applyAttachmentResult,
   dispatchTransaction,
   insertMarkdownAtCursor,
   redo,
