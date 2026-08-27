@@ -28,10 +28,26 @@ test('renders and dismisses command surfaces without a stale slash commit', asyn
 
   const body = editor.locator('.el-markdown-editor__body')
   const bodyBeforeOverflow = await body.boundingBox()
+  const selectionBeforeOverflow = await textarea.evaluate((element) => ({
+    end: element.selectionEnd,
+    start: element.selectionStart,
+  }))
+  const revisionBeforeOverflow = await page
+    .getByTestId('markdown-editor-revision')
+    .textContent()
   await editor.locator('.el-markdown-editor__command-more').click()
   await expect(editor.locator('.el-markdown-editor__command-tray')).toBeVisible()
   const bodyAfterOverflow = await body.boundingBox()
   expect(bodyAfterOverflow).toEqual(bodyBeforeOverflow)
+  expect(
+    await textarea.evaluate((element) => ({
+      end: element.selectionEnd,
+      start: element.selectionStart,
+    })),
+  ).toEqual(selectionBeforeOverflow)
+  await expect(page.getByTestId('markdown-editor-revision')).toHaveText(
+    revisionBeforeOverflow ?? '',
+  )
   await editor.locator('.el-markdown-editor__command-tray').press('Escape')
   await expect(editor.locator('.el-markdown-editor__command-tray')).toBeHidden()
   await expect(textarea).toHaveValue('**text**')
