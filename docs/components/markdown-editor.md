@@ -118,11 +118,11 @@ command transform；`applyMarkdownEditorCommand` 仅用于同步旧调用迁移�
 `chrome` 只控制编辑器外围区域，不改变 mode、Markdown source、selection、history、
 transaction、renderer、事件或 editor identity：
 
-| Chrome | 使用场景 | Toolbar 与 status | 根表面 |
-| --- | --- | --- | --- |
-| `framed` | 表单、设置和独立编辑器 | 默认显示 | 完整公共 token frame |
-| `embedded` | 已有 document/task surface | 保留，避免丢失 command 与状态 | 不重复根边框、圆角或 material |
-| `minimal` | consumer 自行组合 command/status | 不渲染空 toolbar/footer | 仅内容表面与必要语义 |
+| Chrome     | 使用场景                         | Toolbar 与 status             | 根表面                        |
+| ---------- | -------------------------------- | ----------------------------- | ----------------------------- |
+| `framed`   | 表单、设置和独立编辑器           | 默认显示                      | 完整公共 token frame          |
+| `embedded` | 已有 document/task surface       | 保留，避免丢失 command 与状态 | 不重复根边框、圆角或 material |
+| `minimal`  | consumer 自行组合 command/status | 不渲染空 toolbar/footer       | 仅内容表面与必要语义          |
 
 三个 chrome 变体共享同一语义区域结构，并适用于全部公共 mode。隐藏外围区域不得留下
 空 separator、不可达控件或保留高度；`embedded` 与 `minimal` 的 focus-visible
@@ -136,12 +136,12 @@ Toolbar/command surface 与 status surface 由各自的默认内容或对应 slo
 preview region，`split` 才同时呈现编辑 pane 和 renderer pane，`preview` 则只呈现
 renderer surface。
 
-| Mode | 编辑表面 | 渲染表面 | 可修改 |
-| --- | --- | --- | --- |
-| `source` | 精确源码 | 无 | 是 |
-| `live` | 同一渐进渲染编辑表面 | 内嵌于编辑表面 | 是 |
-| `split` | 编辑 pane | renderer pane | 是 |
-| `preview` | 无 | renderer surface | 否 |
+| Mode      | 编辑表面             | 渲染表面         | 可修改 |
+| --------- | -------------------- | ---------------- | ------ |
+| `source`  | 精确源码             | 无               | 是     |
+| `live`    | 同一渐进渲染编辑表面 | 内嵌于编辑表面   | 是     |
+| `split`   | 编辑 pane            | renderer pane    | 是     |
+| `preview` | 无                   | renderer surface | 否     |
 
 `live` 不是 source textarea 上覆盖第二个 preview chrome。`split` 的 separator
 只表达真实 pane 边界；`preview` 即使没有编辑表面，仍保留可访问名称和
@@ -290,21 +290,21 @@ commit 也不会越过当前受控值。
 
 ## Attributes
 
-| 属性名            | 说明                                        | 类型                                      | 默认值   |
-| ----------------- | ------------------------------------------- | ----------------------------------------- | -------- |
-| model-value       | 唯一公开 Markdown 内容 authority            | `string`                                  | `''`     |
-| default-mode      | 初始编辑模式                                | `'source' \| 'live' \| 'split' \| 'preview'` | `source` |
-| mode              | 受控编辑模式                                | `'source' \| 'live' \| 'split' \| 'preview'` | — |
-| chrome            | 外围区域与根表面变体                        | `'framed' \| 'embedded' \| 'minimal'`     | `framed` |
-| placeholder       | 文本域占位文本                              | `string`                                  | `''`     |
-| commands          | toolbar command model                       | `MarkdownEditorCommand[]`                 | 内置命令 |
-| readonly          | Read-only; blocks input and mutation methods     | `boolean`                                 | `false`  |
-| disabled          | 禁用输入与全部 mutation method              | `boolean`                                 | `false`  |
-| loading           | 标记 busy 并冻结输入与全部 mutation method  | `boolean`                                 | `false`  |
-| preview-base-url  | preview renderer 的基础 URL                 | `string \| null`                          | `null`   |
-| preview-csp-nonce | preview renderer 的 CSP nonce               | `string \| null`                          | `null`   |
-| preview-features  | preview renderer 的 feature activation 开关 | `MarkdownFeatureActivationFeatureOptions` | —        |
-| min-rows          | 编辑区最小行数                              | `number`                                  | `12`     |
+| 属性名            | 说明                                         | 类型                                         | 默认值   |
+| ----------------- | -------------------------------------------- | -------------------------------------------- | -------- |
+| model-value       | 唯一公开 Markdown 内容 authority             | `string`                                     | `''`     |
+| default-mode      | 初始编辑模式                                 | `'source' \| 'live' \| 'split' \| 'preview'` | `source` |
+| mode              | 受控编辑模式                                 | `'source' \| 'live' \| 'split' \| 'preview'` | —        |
+| chrome            | 外围区域与根表面变体                         | `'framed' \| 'embedded' \| 'minimal'`        | `framed` |
+| placeholder       | 文本域占位文本                               | `string`                                     | `''`     |
+| commands          | toolbar command model                        | `MarkdownEditorCommand[]`                    | 内置命令 |
+| readonly          | Read-only; blocks input and mutation methods | `boolean`                                    | `false`  |
+| disabled          | 禁用输入与全部 mutation method               | `boolean`                                    | `false`  |
+| loading           | 标记 busy 并冻结输入与全部 mutation method   | `boolean`                                    | `false`  |
+| preview-base-url  | preview renderer 的基础 URL                  | `string \| null`                             | `null`   |
+| preview-csp-nonce | preview renderer 的 CSP nonce                | `string \| null`                             | `null`   |
+| preview-features  | preview renderer 的 feature activation 开关  | `MarkdownFeatureActivationFeatureOptions`    | —        |
+| min-rows          | 编辑区最小行数                               | `number`                                     | `12`     |
 
 ## Migration
 
