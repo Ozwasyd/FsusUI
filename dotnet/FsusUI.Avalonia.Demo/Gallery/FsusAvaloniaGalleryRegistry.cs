@@ -152,6 +152,19 @@ public static class FsusAvaloniaGalleryRegistry
       case "perception-challenge":
         AddPerceptionCharacterStates(panel);
         break;
+      case "upload-transfer":
+        var upload = new FsusUpload { AccessibleName = "Gallery upload" };
+        upload.AddItem("sample.pdf", 2048, "application/pdf");
+        var dropZone = new FsusDropZone
+        {
+          AccessibleName = "Gallery drop zone",
+          Instruction = "拖放文件或点击选择 / Drag files here or click to browse",
+          HelpText = "PDF, PNG, CSV up to 25MB",
+          Accepts = ".pdf, .png, .csv",
+        };
+        panel.Children.Add(upload);
+        panel.Children.Add(dropZone);
+        break;
       case "locale-formatting":
         var provider = FsusAvaloniaLocaleProvider.CreateDefault();
         provider.SetCulture("zh-cn");

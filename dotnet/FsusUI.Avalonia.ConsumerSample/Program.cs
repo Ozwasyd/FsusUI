@@ -43,18 +43,28 @@ public static class ConsumerSampleSmoke
       Size = FsusComponentSize.Md,
     };
 
+    var dropZone = new FsusDropZone
+    {
+      AccessibleName = "Document import zone",
+      Instruction = "Drop files here",
+      Accepts = ".pdf, .png",
+    };
+
     var page = new StackPanel();
     page.Children.Add(action);
     page.Children.Add(input);
     page.Children.Add(icon);
+    page.Children.Add(dropZone);
 
     var manager = new FsusThemeManager();
 
     return manager is not null &&
       themeOptions.Density == FsusDensity.Default &&
-      page.Children.Count == 3 &&
+      page.Children.Count == 4 &&
       action.AccessibleName == "Save settings" &&
       input.Text == "FsusUI" &&
-      icon.IconKey == FsusIconKeys.Search;
+      icon.IconKey == FsusIconKeys.Search &&
+      dropZone.AccessibleName == "Document import zone" &&
+      dropZone.Accepts == ".pdf, .png";
   }
 }

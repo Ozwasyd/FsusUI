@@ -1,0 +1,193 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "FsusDropZoneHeadlessTests.RealHeadlessSkiaRendersDropZoneVisualStatesAndSavesArtifacts",
+  "renderer": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "drawingBackend": "Skia",
+    "avaloniaVersion": "12.0.4.0"
+  },
+  "issue": 655,
+  "captures": [
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-light-ready.png",
+      "Sha256": "0241a42cc6772a106e25e09402996f6f3b0ebb00d023ba9dfd506a3dcbdaa217",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Light",
+      "State": "ready"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-light-dragover.png",
+      "Sha256": "9d2d7032117ee07538c28248ea8c8a8a0df4084074dcc6522ba85425e05267c1",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Light",
+      "State": "dragover"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-light-focus.png",
+      "Sha256": "0241a42cc6772a106e25e09402996f6f3b0ebb00d023ba9dfd506a3dcbdaa217",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Light",
+      "State": "focus"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-light-loading.png",
+      "Sha256": "75625b0a1c2d43d3c3612bbc2fabef6a0fcb3880f96e3337fab0fa8ae5651d44",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Light",
+      "State": "loading"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-light-error.png",
+      "Sha256": "480f91c1a2f191a1ef4d1a4d26c0b2a2883e69f6c7329c576b66c89718891955",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Light",
+      "State": "error"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-light-rejected.png",
+      "Sha256": "0b0d593f314fd0412e98563b91fd11dca6c34aa9c258830fbcbc2f243cc0ac3e",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Light",
+      "State": "rejected"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-dark-ready.png",
+      "Sha256": "2eb36b4d04e833f32f1377070578b339ac08b4ac8042b26d20da5f4b771acb4f",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Dark",
+      "State": "ready"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-dark-dragover.png",
+      "Sha256": "8abdd119a73296967476d92ccd228aea00b547169f6ada9ca30185ec41bb738f",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Dark",
+      "State": "dragover"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-dark-focus.png",
+      "Sha256": "a6e02c349b3db3072bafca4da026060f27185e163660fa5c736872e534bb358f",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Dark",
+      "State": "focus"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-dark-loading.png",
+      "Sha256": "b2660f6830123d50febaee7b20e6d9ae0a330174e3fc19b2712c9608c1278d31",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Dark",
+      "State": "loading"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-dark-error.png",
+      "Sha256": "e5994d80cf4a162e08d00ac7a239e2a2fb36e20e6c9bdf6a01a84f277d753978",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Dark",
+      "State": "error"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-dark-rejected.png",
+      "Sha256": "17d7a30686dd33a575de32bd9bb5193710eb6ea85d9eccb4c28e3c20c235e1c9",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Dark",
+      "State": "rejected"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-highcontrast-ready.png",
+      "Sha256": "931b91a106fd4f5025499dd8431188abb480c3b371077aa45ad74895dd624172",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "HighContrast",
+      "State": "ready"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-highcontrast-dragover.png",
+      "Sha256": "90ac141cc1c12a66e9c17a0ff164686f81d0ac6d860e1fa4e4a2cbae8a21da51",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "HighContrast",
+      "State": "dragover"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-highcontrast-focus.png",
+      "Sha256": "ce08473778a21e0cf47431d68f43c7b9e04f4d10c8577c01147c3b5aedd5e677",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "HighContrast",
+      "State": "focus"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-highcontrast-loading.png",
+      "Sha256": "1cdeae2d120e68655a81744f5460bd242310fdc328e9bd342aa21ffaff01e7dc",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "HighContrast",
+      "State": "loading"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-highcontrast-error.png",
+      "Sha256": "ed19f51249a24fd97da173e9d6ade0e866fcc06b430fec550d8ab9a8280b7666",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "HighContrast",
+      "State": "error"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-highcontrast-rejected.png",
+      "Sha256": "e953bce34b78d962e86ee108fa94a308d87d2ad0ad6a194386f8af97cbb61128",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "HighContrast",
+      "State": "rejected"
+    }
+  ]
+}
