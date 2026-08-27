@@ -78,8 +78,20 @@ const decodeBase64 = (value: string): Uint8Array => {
 
 let cachedEmbeddedWasmBytes: Uint8Array | undefined
 
+const isMissingNodeWasmBinary = (error: unknown): boolean =>
+  typeof error === 'object' &&
+  error !== null &&
+  (error as { code?: unknown }).code === 'ENOENT'
+
 const readSyntaxCollectWasmBytes = (wasmUrl: string): Uint8Array => {
-  const nodeBytes = readNodeWasmBinary(wasmUrl)
+  let nodeBytes: Uint8Array | undefined
+  try {
+    nodeBytes = readNodeWasmBinary(wasmUrl)
+  } catch (error) {
+    if (!isMissingNodeWasmBinary(error)) {
+      throw error
+    }
+  }
   if (nodeBytes) {
     return nodeBytes
   }
