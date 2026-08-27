@@ -390,13 +390,6 @@ public class FsusSwitchTemplateHeadlessTests
   {
     var resources = new ResourceDictionary();
     new FsusThemeManager().Apply(resources, themeOptions);
-
-    // Issue Ozwasyd/FsusUI#656 territory: the shared focus styles consume
-    // FsusThemeFocusThickness as a Thickness, while the light/dark palettes
-    // currently publish it as a Double. Repointing that resource belongs to
-    // the parallel focus contract branch, so this harness publishes the
-    // intended uniform thickness here to keep switch scenarios exercisable.
-    resources[FsusThemeResourceKeys.FocusThickness] = new Thickness(2);
     window.Resources.MergedDictionaries.Add(resources);
     window.Styles.Add(
       new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
