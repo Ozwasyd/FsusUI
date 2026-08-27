@@ -104,6 +104,31 @@ describe('Markdown editor command surface integration', () => {
     ).toHaveLength(1)
   })
 
+  it('passes editor locale loading copy to the renderer layer', () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        defaultMode: 'preview',
+        localeText: {
+          states: { loading: 'Chargement du Markdown' },
+        },
+        modelValue: '# Localized',
+      },
+      global: {
+        stubs: {
+          ElMarkdownRenderer: {
+            props: ['loadingText'],
+            template:
+              '<div data-renderer-loading-copy>{{ loadingText }}</div>',
+          },
+        },
+      },
+    })
+
+    expect(wrapper.get('[data-renderer-loading-copy]').text()).toBe(
+      'Chargement du Markdown',
+    )
+  })
+
   it('traps palette focus, exposes disabled reason, and closes on document switch', async () => {
     const disabledCommand: MarkdownEditorCommand = {
       ...insertCommand,

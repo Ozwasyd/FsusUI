@@ -2069,6 +2069,12 @@ const markdownCommandLocaleText =
         selected: label('selected'),
         words: label('words'),
       },
+      states: {
+        disabled: label('disabled'),
+        empty: label('empty'),
+        loading: label('loading'),
+        readonly: label('readonly'),
+      },
       overflow: label('format tools'),
       overflowAria: (count: number) => label(`${count} format tools`),
       surfaces: {

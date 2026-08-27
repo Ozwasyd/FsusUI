@@ -184,6 +184,7 @@ chunk 边界由 WASM 渲染流程产出，类型包括 `heading`、`paragraph`�
 | -------------------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------- | --------- |
 | content                    | Markdown 源文本                                                                         | `string`                                        | `''`      |
 | content-version            | 可选稳定内容版本；大文档提供后可跳过主线程完整哈希，并参与 generation/cache fingerprint | `string \| number \| null`                      | `null`    |
+| loading-text               | 初次异步渲染期间 `role="status"` 使用的可见文案                                         | `string`                                        | `Rendering markdown...` |
 | initial-render             | 同源同版本且持有 runtime authority 的安全结果，用于 SSR 或可信缓存首显                  | `MarkdownSafeRenderResult \| null`              | `null`    |
 | trusted-html-factory       | 将安全 HTML 转为宿主 policy 的 `TrustedHTML`；不承担清洗职责                            | `(html: MarkdownSafeHtml) => object`            | —         |
 | trusted-script-url-factory | 将 Markdown worker URL 转为宿主 policy 的 `TrustedScriptURL`                            | `(url: URL) => unknown`                         | —         |

@@ -218,6 +218,7 @@
         :content="editorValue"
         :csp-nonce="previewCspNonce"
         :features="previewFeatures"
+        :loading-text="localeText.states.loading"
         mode="editor"
         @features-activated="emitRenderEvent('features-activated', $event)"
         @render-complete="emitRenderEvent('render-complete', $event)"
