@@ -2888,6 +2888,12 @@
           "parameters": []
         },
         {
+          "name": "FocusLast",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": []
+        },
+        {
           "name": "HandleKeyAsync",
           "isStatic": false,
           "returnType": "System.Threading.Tasks.ValueTask\u003CSystem.Boolean\u003E",
