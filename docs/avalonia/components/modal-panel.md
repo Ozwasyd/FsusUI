@@ -6,7 +6,9 @@ Component ID: `modal-panel`
 
 Use `FsusDialog`, `FsusDrawer`, `FsusMessageBox`, `FsusMessageBoxService`,
 and `FsusOverlayHost` for modal surfaces, close policy, focus containment, and
-message-box flows.
+message-box flows. For long forms, enable `IsBodyScrollable` on `FsusDialog` to
+provide a scrollable content area with fixed title and action footer, bounded by
+`MaxBodyHeight` or `ViewportHeightConstraint`.
 
 ## Vue Contract Mapping
 

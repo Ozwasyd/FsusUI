@@ -196,6 +196,44 @@ public class FsusModalPrimitiveTests
     Assert.Contains("\"id\": \"message-box\"", accessibilityContracts);
   }
 
+  [Fact]
+  public async Task DialogScrollableBodySupportsViewportConstraintAndKeyScrolling()
+  {
+    var dialog = new KeyboardDialog
+    {
+      Title = "Form Dialog",
+      Content = "Fallback body text",
+      ConfirmContent = "Save",
+      CancelContent = "Cancel",
+    };
+
+    Assert.False(dialog.IsBodyScrollable);
+    Assert.Equal(double.PositiveInfinity, dialog.MaxBodyHeight);
+    Assert.True(double.IsNaN(dialog.ViewportHeightConstraint));
+    Assert.Equal("Fallback body text", dialog.EffectiveBodyContent);
+    Assert.NotNull(dialog.EffectiveFooterContent);
+    Assert.DoesNotContain("scrollable", AutomationProperties.GetItemStatus(dialog));
+    Assert.DoesNotContain("fsus-scrollable-body", dialog.Classes);
+
+    dialog.IsBodyScrollable = true;
+    dialog.ViewportHeightConstraint = 480;
+    dialog.MaxBodyHeight = 240;
+
+    Assert.True(dialog.IsBodyScrollable);
+    Assert.Equal(240, dialog.MaxBodyHeight);
+    Assert.Equal(480, dialog.ViewportHeightConstraint);
+    Assert.Equal(480, dialog.ResolveMaxViewportHeight());
+    Assert.Contains("fsus-scrollable-body", dialog.Classes);
+    Assert.Contains("scrollable", AutomationProperties.GetItemStatus(dialog));
+
+    dialog.Measure(new Size(500, double.PositiveInfinity));
+    Assert.True(dialog.DesiredSize.Height <= 480);
+
+    // Keyboard PageDown/PageUp handling
+    Assert.True(await dialog.PressAsync(Key.PageDown));
+    Assert.True(await dialog.PressAsync(Key.PageUp));
+  }
+
   private sealed class KeyboardDialog : FsusDialog
   {
     public ValueTask<bool> PressAsync(Key key) => HandleKeyAsync(key);

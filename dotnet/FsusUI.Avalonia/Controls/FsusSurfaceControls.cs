@@ -2,7 +2,14 @@ using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
+using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Templates;
 using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Layout;
+using Avalonia.Media;
+using Avalonia.VisualTree;
 using FsusUI.Avalonia.Overlay;
 
 namespace FsusUI.Avalonia.Controls;
@@ -237,14 +244,44 @@ public abstract class FsusModalSurface : ContentControl, IFsusOverlayLifecycle
   public static readonly StyledProperty<object?> CancelContentProperty =
     AvaloniaProperty.Register<FsusModalSurface, object?>(nameof(CancelContent));
 
+  public static readonly StyledProperty<bool> IsBodyScrollableProperty =
+    AvaloniaProperty.Register<FsusModalSurface, bool>(nameof(IsBodyScrollable));
+
+  public static readonly StyledProperty<double> MaxBodyHeightProperty =
+    AvaloniaProperty.Register<FsusModalSurface, double>(
+      nameof(MaxBodyHeight),
+      double.PositiveInfinity);
+
+  public static readonly StyledProperty<double> ViewportHeightConstraintProperty =
+    AvaloniaProperty.Register<FsusModalSurface, double>(
+      nameof(ViewportHeightConstraint),
+      double.NaN);
+
+  public static readonly StyledProperty<object?> EffectiveBodyContentProperty =
+    AvaloniaProperty.Register<FsusModalSurface, object?>(nameof(EffectiveBodyContent));
+
+  public static readonly StyledProperty<object?> EffectiveFooterContentProperty =
+    AvaloniaProperty.Register<FsusModalSurface, object?>(nameof(EffectiveFooterContent));
+
   private readonly List<Control> focusScope = [];
   private FsusOverlayHost? overlayHost;
   private FsusModalCloseReason? pendingCloseReason;
+  private ScrollViewer? bodyScrollViewer;
+  private Control? headerPresenter;
+  private Control? footerPresenter;
+  private Control? bodyPresenter;
+
+  static FsusModalSurface()
+  {
+    TemplateProperty.OverrideDefaultValue<FsusModalSurface>(CreateDefaultTemplate());
+  }
 
   protected FsusModalSurface(string baseClass)
   {
     FsusComponentClasses.SetBaseClasses(this, baseClass);
     MotionState = FsusPanelMotionState.Hidden;
+    AddHandler(InputElement.GotFocusEvent, OnChildGotFocus, RoutingStrategies.Bubble);
+    UpdateEffectiveContent();
     SyncState();
   }
 
@@ -318,6 +355,38 @@ public abstract class FsusModalSurface : ContentControl, IFsusOverlayLifecycle
     get => GetValue(CancelContentProperty);
     set => SetValue(CancelContentProperty, value);
   }
+
+  public bool IsBodyScrollable
+  {
+    get => GetValue(IsBodyScrollableProperty);
+    set => SetValue(IsBodyScrollableProperty, value);
+  }
+
+  public double MaxBodyHeight
+  {
+    get => GetValue(MaxBodyHeightProperty);
+    set => SetValue(MaxBodyHeightProperty, value);
+  }
+
+  public double ViewportHeightConstraint
+  {
+    get => GetValue(ViewportHeightConstraintProperty);
+    set => SetValue(ViewportHeightConstraintProperty, value);
+  }
+
+  public object? EffectiveBodyContent
+  {
+    get => GetValue(EffectiveBodyContentProperty);
+    private set => SetValue(EffectiveBodyContentProperty, value);
+  }
+
+  public object? EffectiveFooterContent
+  {
+    get => GetValue(EffectiveFooterContentProperty);
+    private set => SetValue(EffectiveFooterContentProperty, value);
+  }
+
+  public ScrollViewer? BodyScrollViewer => bodyScrollViewer;
 
   public Control? RestoreFocusTo { get; set; }
 
@@ -397,10 +466,131 @@ public abstract class FsusModalSurface : ContentControl, IFsusOverlayLifecycle
     }
   }
 
-  protected ValueTask<bool> HandleKeyAsync(Key key) =>
-    key == Key.Escape && CloseOnEscape
-      ? RequestCloseAsync(FsusModalCloseReason.Keyboard)
-      : ValueTask.FromResult(false);
+  protected ValueTask<bool> HandleKeyAsync(Key key)
+  {
+    if (key == Key.Escape && CloseOnEscape)
+    {
+      return RequestCloseAsync(FsusModalCloseReason.Keyboard);
+    }
+
+    if (IsBodyScrollable && bodyScrollViewer is not null)
+    {
+      if (key == Key.PageDown)
+      {
+        ScrollPage(1);
+        return ValueTask.FromResult(true);
+      }
+      if (key == Key.PageUp)
+      {
+        ScrollPage(-1);
+        return ValueTask.FromResult(true);
+      }
+    }
+
+    return ValueTask.FromResult(false);
+  }
+
+  protected override void OnKeyDown(KeyEventArgs e)
+  {
+    base.OnKeyDown(e);
+
+    if (e.Handled)
+    {
+      return;
+    }
+
+    if (e.Key == Key.Escape && CloseOnEscape && AllowsPassiveClose())
+    {
+      e.Handled = true;
+      _ = RequestCloseAsync(FsusModalCloseReason.Keyboard);
+      return;
+    }
+
+    if (IsBodyScrollable && bodyScrollViewer is not null)
+    {
+      if (e.Key == Key.PageDown)
+      {
+        ScrollPage(1);
+        e.Handled = true;
+      }
+      else if (e.Key == Key.PageUp)
+      {
+        ScrollPage(-1);
+        e.Handled = true;
+      }
+    }
+  }
+
+  protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+  {
+    base.OnApplyTemplate(e);
+
+    bodyScrollViewer = e.NameScope.Find<ScrollViewer>("PART_ScrollViewer");
+    headerPresenter = e.NameScope.Find<Control>("PART_HeaderPresenter");
+    footerPresenter = e.NameScope.Find<Control>("PART_FooterPresenter");
+    bodyPresenter = e.NameScope.Find<Control>("PART_BodyPresenter");
+
+    SyncState();
+  }
+
+  protected override Size MeasureOverride(Size availableSize)
+  {
+    if (!IsBodyScrollable)
+    {
+      return base.MeasureOverride(availableSize);
+    }
+
+    var maxViewportHeight = ResolveMaxViewportHeight();
+    var constrainedAvailableSize = availableSize;
+
+    if (!double.IsInfinity(maxViewportHeight) && maxViewportHeight > 0)
+    {
+      var maxAllowedDialogHeight = Math.Max(
+        !double.IsNaN(MinHeight) && MinHeight > 0 ? MinHeight : 100,
+        maxViewportHeight - 32);
+
+      if (!double.IsNaN(MaxHeight) && MaxHeight > 0 && MaxHeight < maxAllowedDialogHeight)
+      {
+        maxAllowedDialogHeight = MaxHeight;
+      }
+
+      if (double.IsInfinity(constrainedAvailableSize.Height) || constrainedAvailableSize.Height > maxAllowedDialogHeight)
+      {
+        constrainedAvailableSize = new Size(constrainedAvailableSize.Width, maxAllowedDialogHeight);
+      }
+    }
+
+    if (bodyScrollViewer is not null)
+    {
+      if (!double.IsInfinity(MaxBodyHeight) && MaxBodyHeight > 0)
+      {
+        bodyScrollViewer.MaxHeight = MaxBodyHeight;
+      }
+      else if (!double.IsInfinity(constrainedAvailableSize.Height))
+      {
+        var nonBodyHeight = Padding.Top + Padding.Bottom;
+        if (headerPresenter is not null && headerPresenter.IsVisible)
+        {
+          headerPresenter.Measure(new Size(constrainedAvailableSize.Width, double.PositiveInfinity));
+          nonBodyHeight += headerPresenter.DesiredSize.Height + headerPresenter.Margin.Top + headerPresenter.Margin.Bottom;
+        }
+        if (footerPresenter is not null && footerPresenter.IsVisible)
+        {
+          footerPresenter.Measure(new Size(constrainedAvailableSize.Width, double.PositiveInfinity));
+          nonBodyHeight += footerPresenter.DesiredSize.Height + footerPresenter.Margin.Top + footerPresenter.Margin.Bottom;
+        }
+
+        var maxBodyAllowed = Math.Max(40, constrainedAvailableSize.Height - nonBodyHeight);
+        bodyScrollViewer.MaxHeight = maxBodyAllowed;
+      }
+      else
+      {
+        bodyScrollViewer.MaxHeight = double.PositiveInfinity;
+      }
+    }
+
+    return base.MeasureOverride(constrainedAvailableSize);
+  }
 
   internal FsusOverlayOptions CreateOverlayOptions(FsusOverlayOptions? options = null)
   {
@@ -457,8 +647,12 @@ public abstract class FsusModalSurface : ContentControl, IFsusOverlayLifecycle
       change.Property == FooterContentProperty ||
       change.Property == ConfirmContentProperty ||
       change.Property == CancelContentProperty ||
-      change.Property == ContentProperty)
+      change.Property == ContentProperty ||
+      change.Property == IsBodyScrollableProperty ||
+      change.Property == MaxBodyHeightProperty ||
+      change.Property == ViewportHeightConstraintProperty)
     {
+      UpdateEffectiveContent();
       SyncState();
     }
   }
@@ -473,15 +667,257 @@ public abstract class FsusModalSurface : ContentControl, IFsusOverlayLifecycle
     FsusComponentClasses.Ensure(this, "fsus-entering", MotionState == FsusPanelMotionState.Entering);
     FsusComponentClasses.Ensure(this, "fsus-leaving", MotionState == FsusPanelMotionState.Leaving);
     FsusComponentClasses.Ensure(this, "fsus-has-title", !string.IsNullOrWhiteSpace(Title));
-    FsusComponentClasses.Ensure(this, "fsus-has-footer", FooterContent is not null);
+    FsusComponentClasses.Ensure(this, "fsus-has-footer", EffectiveFooterContent is not null);
     FsusComponentClasses.Ensure(this, "fsus-has-confirm", ConfirmContent is not null);
     FsusComponentClasses.Ensure(this, "fsus-has-cancel", CancelContent is not null);
-    AutomationProperties.SetName(this, FsusComponentClasses.ResolveName(Title, Content));
-    AutomationProperties.SetHelpText(this, BodyContent?.ToString() ?? string.Empty);
+    FsusComponentClasses.Ensure(this, "fsus-scrollable-body", IsBodyScrollable);
+    AutomationProperties.SetName(this, FsusComponentClasses.ResolveName(Title, Content ?? BodyContent));
+    AutomationProperties.SetHelpText(this, (BodyContent ?? Content)?.ToString() ?? string.Empty);
     AutomationProperties.SetControlTypeOverride(this, AutomationControlType.Group);
     AutomationProperties.SetClassNameOverride(this, "Dialog");
     AutomationProperties.SetItemStatus(this, ModalStatus());
+
+    if (bodyScrollViewer is not null)
+    {
+      bodyScrollViewer.VerticalScrollBarVisibility =
+        IsBodyScrollable ? ScrollBarVisibility.Auto : ScrollBarVisibility.Disabled;
+      bodyScrollViewer.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
+    }
+
+    if (headerPresenter is not null)
+    {
+      headerPresenter.IsVisible = !string.IsNullOrWhiteSpace(Title);
+      headerPresenter.Margin = headerPresenter.IsVisible ? new Thickness(0, 0, 0, 16) : new Thickness(0);
+    }
+
+    if (footerPresenter is not null)
+    {
+      footerPresenter.IsVisible = EffectiveFooterContent is not null;
+      footerPresenter.Margin = footerPresenter.IsVisible ? new Thickness(0, 16, 0, 0) : new Thickness(0);
+    }
   }
+
+  public void ScrollBodyIntoView(Control control)
+  {
+    ArgumentNullException.ThrowIfNull(control);
+
+    if (bodyScrollViewer is null)
+    {
+      control.BringIntoView();
+      return;
+    }
+
+    control.BringIntoView();
+
+    var contentVisual = (bodyScrollViewer.Content as Visual) ?? bodyPresenter ?? (Visual)bodyScrollViewer;
+    var transform = control.TransformToVisual(contentVisual);
+    if (transform.HasValue)
+    {
+      var localBounds = new Rect(0, 0, control.Bounds.Width, control.Bounds.Height);
+      var contentBounds = localBounds.TransformToAABB(transform.Value);
+      var currentY = bodyScrollViewer.Offset.Y;
+      var viewportHeight = bodyScrollViewer.Viewport.Height;
+      var maxY = Math.Max(0, bodyScrollViewer.Extent.Height - viewportHeight);
+
+      if (viewportHeight > 0)
+      {
+        if (contentBounds.Top < currentY)
+        {
+          var targetY = Math.Max(0, contentBounds.Top);
+          bodyScrollViewer.Offset = new Vector(bodyScrollViewer.Offset.X, Math.Min(maxY, targetY));
+        }
+        else if (contentBounds.Bottom > currentY + viewportHeight)
+        {
+          var targetY = Math.Max(0, contentBounds.Bottom - viewportHeight);
+          bodyScrollViewer.Offset = new Vector(bodyScrollViewer.Offset.X, Math.Min(maxY, targetY));
+        }
+      }
+    }
+  }
+
+  public void ScrollBodyBy(double deltaY)
+  {
+    if (bodyScrollViewer is null)
+    {
+      return;
+    }
+
+    var currentY = bodyScrollViewer.Offset.Y;
+    var maxY = Math.Max(0, bodyScrollViewer.Extent.Height - bodyScrollViewer.Viewport.Height);
+    var targetY = Math.Clamp(currentY + deltaY, 0, maxY);
+    bodyScrollViewer.Offset = new Vector(bodyScrollViewer.Offset.X, targetY);
+  }
+
+  public void ScrollPage(int direction)
+  {
+    if (bodyScrollViewer is null)
+    {
+      return;
+    }
+
+    var step = Math.Max(20, bodyScrollViewer.Viewport.Height - 20);
+    ScrollBodyBy(step * direction);
+  }
+
+  public double ResolveMaxViewportHeight()
+  {
+    if (!double.IsNaN(ViewportHeightConstraint) && ViewportHeightConstraint > 0)
+    {
+      return ViewportHeightConstraint;
+    }
+
+    if (OverlayEntry is not null && OverlayEntry.Options.ViewportBounds.Height > 0)
+    {
+      return OverlayEntry.Options.ViewportBounds.Height;
+    }
+
+    var topLevel = TopLevel.GetTopLevel(this);
+    if (topLevel is not null && topLevel.ClientSize.Height > 0)
+    {
+      return topLevel.ClientSize.Height;
+    }
+
+    if (Parent is Visual parentVisual && parentVisual.Bounds.Height > 0)
+    {
+      return parentVisual.Bounds.Height;
+    }
+
+    return double.PositiveInfinity;
+  }
+
+  private void OnChildGotFocus(object? sender, RoutedEventArgs e)
+  {
+    if (!IsBodyScrollable || bodyScrollViewer is null)
+    {
+      return;
+    }
+
+    if (e.Source is Control control && IsDescendantOf(control, bodyScrollViewer))
+    {
+      ScrollBodyIntoView(control);
+    }
+  }
+
+  private static bool IsDescendantOf(Visual child, Visual parent)
+  {
+    var current = child.GetVisualParent();
+    while (current is not null)
+    {
+      if (ReferenceEquals(current, parent))
+      {
+        return true;
+      }
+      current = current.GetVisualParent();
+    }
+    return false;
+  }
+
+  private void UpdateEffectiveContent()
+  {
+    EffectiveBodyContent = BodyContent ?? Content;
+    EffectiveFooterContent = FooterContent ?? CreateDefaultFooterContent();
+  }
+
+  private object? CreateDefaultFooterContent()
+  {
+    if (ConfirmContent is null && CancelContent is null)
+    {
+      return null;
+    }
+
+    var panel = new StackPanel
+    {
+      Orientation = Orientation.Horizontal,
+      Spacing = 8,
+      HorizontalAlignment = HorizontalAlignment.Right,
+    };
+
+    if (CancelContent is not null)
+    {
+      var cancelButton = new Button
+      {
+        Content = CancelContent,
+      };
+      cancelButton.Classes.Add("fsus-button");
+      cancelButton.Click += async (_, _) => await CancelAsync();
+      panel.Children.Add(cancelButton);
+    }
+
+    if (ConfirmContent is not null)
+    {
+      var confirmButton = new Button
+      {
+        Content = ConfirmContent,
+      };
+      confirmButton.Classes.Add("fsus-button");
+      confirmButton.Classes.Add(IsDangerous ? "fsus-danger" : "fsus-primary");
+      confirmButton.Click += async (_, _) => await ConfirmAsync();
+      panel.Children.Add(confirmButton);
+    }
+
+    return panel;
+  }
+
+  private static IControlTemplate CreateDefaultTemplate() =>
+    new FuncControlTemplate<FsusModalSurface>((control, nameScope) =>
+    {
+      var border = new Border
+      {
+        [!Border.BackgroundProperty] = control[!BackgroundProperty],
+        [!Border.BorderBrushProperty] = control[!BorderBrushProperty],
+        [!Border.BorderThicknessProperty] = control[!BorderThicknessProperty],
+        [!Border.CornerRadiusProperty] = control[!CornerRadiusProperty],
+        [!Border.PaddingProperty] = control[!PaddingProperty],
+      };
+
+      var grid = new Grid
+      {
+        RowDefinitions = new RowDefinitions("Auto,*,Auto"),
+      };
+
+      var header = new ContentPresenter
+      {
+        Name = "PART_HeaderPresenter",
+        [!ContentPresenter.ContentProperty] = control[!TitleProperty],
+        FontWeight = FontWeight.SemiBold,
+      };
+      Grid.SetRow(header, 0);
+      nameScope.Register("PART_HeaderPresenter", header);
+
+      var scrollViewer = new ScrollViewer
+      {
+        Name = "PART_ScrollViewer",
+        HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+        VerticalScrollBarVisibility = control.IsBodyScrollable
+          ? ScrollBarVisibility.Auto
+          : ScrollBarVisibility.Disabled,
+      };
+      Grid.SetRow(scrollViewer, 1);
+      nameScope.Register("PART_ScrollViewer", scrollViewer);
+
+      var body = new ContentPresenter
+      {
+        Name = "PART_BodyPresenter",
+        [!ContentPresenter.ContentProperty] = control[!EffectiveBodyContentProperty],
+        [!ContentPresenter.ContentTemplateProperty] = control[!ContentTemplateProperty],
+      };
+      nameScope.Register("PART_BodyPresenter", body);
+      scrollViewer.Content = body;
+
+      var footer = new ContentPresenter
+      {
+        Name = "PART_FooterPresenter",
+        [!ContentPresenter.ContentProperty] = control[!EffectiveFooterContentProperty],
+      };
+      Grid.SetRow(footer, 2);
+      nameScope.Register("PART_FooterPresenter", footer);
+
+      grid.Children.Add(header);
+      grid.Children.Add(scrollViewer);
+      grid.Children.Add(footer);
+      border.Child = grid;
+      return border;
+    });
 
   protected void AddClass(string className) =>
     FsusComponentClasses.Ensure(this, className, true);
@@ -538,6 +974,10 @@ public abstract class FsusModalSurface : ContentControl, IFsusOverlayLifecycle
     if (IsLoading)
     {
       parts.Add("loading");
+    }
+    if (IsBodyScrollable)
+    {
+      parts.Add("scrollable");
     }
     return string.Join(' ', parts);
   }

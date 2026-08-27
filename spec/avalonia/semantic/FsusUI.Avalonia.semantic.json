@@ -9888,6 +9888,14 @@
           "isStatic": false
         },
         {
+          "name": "BodyScrollViewer",
+          "type": "Avalonia.Controls.ScrollViewer",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
           "name": "CancelContent",
           "type": "System.Object",
           "nullable": true,
@@ -9928,6 +9936,22 @@
           "isStatic": false
         },
         {
+          "name": "EffectiveBodyContent",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "EffectiveFooterContent",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "FocusScope",
           "type": "System.Collections.Generic.IList\u003CAvalonia.Controls.Control\u003E",
           "nullable": true,
@@ -9939,6 +9963,14 @@
           "name": "FooterContent",
           "type": "System.Object",
           "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsBodyScrollable",
+          "type": "System.Boolean",
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -9976,6 +10008,14 @@
           "isStatic": false
         },
         {
+          "name": "MaxBodyHeight",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "MotionState",
           "type": "FsusUI.Avalonia.Controls.FsusPanelMotionState",
           "nullable": false,
@@ -10003,6 +10043,14 @@
           "name": "Title",
           "type": "System.String",
           "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ViewportHeightConstraint",
+          "type": "System.Double",
+          "nullable": false,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -10046,10 +10094,28 @@
           "nullable": true
         },
         {
+          "name": "EffectiveBodyContent",
+          "kind": "styled",
+          "type": "System.Object",
+          "nullable": true
+        },
+        {
+          "name": "EffectiveFooterContent",
+          "kind": "styled",
+          "type": "System.Object",
+          "nullable": true
+        },
+        {
           "name": "FooterContent",
           "kind": "styled",
           "type": "System.Object",
           "nullable": true
+        },
+        {
+          "name": "IsBodyScrollable",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
         },
         {
           "name": "IsDangerous",
@@ -10070,10 +10136,22 @@
           "nullable": false
         },
         {
+          "name": "MaxBodyHeight",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        },
+        {
           "name": "Title",
           "kind": "styled",
           "type": "System.String",
           "nullable": true
+        },
+        {
+          "name": "ViewportHeightConstraint",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
         }
       ],
       "events": [
@@ -10182,6 +10260,48 @@
               "name": "cancellationToken",
               "type": "System.Threading.CancellationToken",
               "optional": true
+            }
+          ]
+        },
+        {
+          "name": "ResolveMaxViewportHeight",
+          "isStatic": false,
+          "returnType": "System.Double",
+          "parameters": []
+        },
+        {
+          "name": "ScrollBodyBy",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "deltaY",
+              "type": "System.Double",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "ScrollBodyIntoView",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "control",
+              "type": "Avalonia.Controls.Control",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "ScrollPage",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "direction",
+              "type": "System.Int32",
+              "optional": false
             }
           ]
         }
