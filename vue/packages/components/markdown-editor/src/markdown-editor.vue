@@ -1,6 +1,6 @@
 <template>
   <section
-    v-bind="$attrs"
+    v-bind="rootAttrs"
     :class="[
       ns.b(),
       ns.m(currentMode),
@@ -10,6 +10,8 @@
       ns.m(`interaction-${interactionProfile}`),
       ns.m(`toolbar-${toolbarDensity}`),
       ns.is('commands-expanded', commandsExpanded),
+      ns.is('focus-mode', writingAidsFocusState.enabled),
+      ns.is('typewriter-mode', resolvedWritingAids.typewriter),
     ]"
     role="region"
     :aria-label="localeText.editorAria"
@@ -156,6 +158,16 @@
       :data-markdown-layout-action="liveLayout.action"
       :data-markdown-layout-smooth="liveLayout.smooth ? 'true' : 'false'"
     >
+      <pre
+        v-if="writingAidsFocusState.enabled"
+        ref="focusLayerRef"
+        :class="ns.e('focus-layer')"
+        aria-hidden="true"
+      ><span
+          v-for="segment in focusSegments"
+          :key="segment.key"
+          :class="ns.is('dimmed', segment.dimmed)"
+        >{{ segment.text }}</span></pre>
       <textarea
         :id="textareaId"
         ref="textareaRef"
@@ -184,6 +196,8 @@
         @input="handleInput"
         @keydown="handleKeydown"
         @paste="handlePaste"
+        @pointerdown="handleSelectionDragStart"
+        @pointerup="handleSelectionDragEnd"
         @scroll="handleLayoutScroll"
         @select="handleSelectionMove"
         @touchmove="handleLayoutTouch"
@@ -295,9 +309,7 @@
               :aria-label="localeText.pasteAsMarkdown.conversionWarnings"
             >
               <h3>{{ localeText.pasteAsMarkdown.conversionWarnings }}</h3>
-              <ul
-                :aria-label="localeText.pasteAsMarkdown.conversionWarnings"
-              >
+              <ul :aria-label="localeText.pasteAsMarkdown.conversionWarnings">
                 <li
                   v-for="warning in pasteAsMarkdownSession.preview.warnings"
                   :key="`${warning.kind}:${warning.code}:${warning.detail || ''}`"
@@ -346,6 +358,7 @@ import {
   onMounted,
   ref,
   triggerRef,
+  useAttrs,
   useId,
   watch,
 } from 'vue'
@@ -434,6 +447,7 @@ import {
   revealHeading as revealHeadingOutline,
   revealSourceRange as revealSourceRangeOutline,
 } from './markdown-editor-outline'
+import { planMarkdownOutlineReveal } from './markdown-editor-outline-active'
 import {
   resolveMarkdownLiveLayoutStability,
   resolveMarkdownLiveVirtualWindow,
@@ -444,6 +458,10 @@ import {
 } from './markdown-editor-live-layout'
 
 import type { MarkdownHtmlImportSnapshot } from '../../../wasm/markdown-html-import'
+import {
+  createMarkdownEditorProjection,
+  stabilizeMarkdownEditorProjection,
+} from '../../../wasm/markdown-runtime'
 
 defineOptions({
   name: 'ElMarkdownEditor',
@@ -453,6 +471,7 @@ defineOptions({
 const props = defineProps(markdownEditorProps)
 const emit = defineEmits(markdownEditorEmits)
 const ns = useNamespace('markdown-editor')
+const attrs = useAttrs()
 const modes: MarkdownEditorMode[] = ['source', 'live', 'split', 'preview']
 const commandTrayId = `${useId()}-command-tray`
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
@@ -481,7 +500,9 @@ const chromeRegions = computed(() =>
   }),
 )
 const textareaAriaLabel = computed(() =>
-  currentMode.value === 'live' ? 'Markdown editor live editing surface' : 'Markdown editor source',
+  currentMode.value === 'live'
+    ? 'Markdown editor live editing surface'
+    : 'Markdown editor source',
 )
 const compactMode = computed(() => props.mobileLayout === 'compact')
 const normalizeModeForLayout = (
@@ -503,6 +524,82 @@ const transactionStore = new MarkdownEditorTransactionStore(
   documentIdentity,
 )
 const editorValue = ref(transactionStore.value)
+const writingAidsController: MarkdownEditorWritingAidsController =
+  createWritingAidsController({
+    writingAids: props.writingAids,
+    editorProfile: props.editorProfile,
+    readonly: props.readonly,
+    disabled: props.disabled,
+    source: transactionStore.value,
+    selection: transactionStore.selection,
+  })
+const resolvedWritingAids = computed(() => writingAidsController.options)
+const writingAidsState = ref(writingAidsController.state)
+const writingAidsFocusState = ref(writingAidsController.focusState!)
+const writingAidsDataAttrs = computed(() => ({
+  'data-markdown-focus-active-block':
+    writingAidsFocusState.value.activeBlockId || undefined,
+  'data-markdown-focus-enabled': writingAidsFocusState.value.enabled
+    ? 'true'
+    : 'false',
+  'data-markdown-writing-aids-state': writingAidsState.value,
+}))
+const rootAttrs = computed(() => ({ ...attrs, ...writingAidsDataAttrs.value }))
+const focusLayerRef = ref<HTMLElement | null>(null)
+const syncFocusLayerScroll = (scrollTop: number) => {
+  if (focusLayerRef.value) focusLayerRef.value.scrollTop = scrollTop
+}
+const focusSegments = computed(() => {
+  const source = editorValue.value
+  const range = writingAidsFocusState.value.activeRange
+  if (!range) return [{ key: 'document', text: source, dimmed: false }]
+  return [
+    { key: 'before', text: source.slice(0, range.start), dimmed: true },
+    {
+      key: writingAidsFocusState.value.activeBlockId ?? 'active',
+      text: source.slice(range.start, range.end),
+      dimmed: false,
+    },
+    { key: 'after', text: source.slice(range.end), dimmed: true },
+  ].filter((segment) => segment.text.length > 0)
+})
+const refreshWritingAidsDocument = () => {
+  let projection:
+    | ReturnType<typeof stabilizeMarkdownEditorProjection>
+    | undefined
+  try {
+    projection = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection(transactionStore.value),
+      documentIdentity,
+    )
+  } catch {
+    projection = undefined
+  }
+  const selection = transactionStore.selection
+  const caret =
+    selection.direction === 'backward' ? selection.start : selection.end
+  const currentBlock = projection?.nodes.find(
+    (node) => node.rawRange.start <= caret && caret <= node.rawRange.end,
+  )
+  writingAidsController.updateDocument({
+    currentBlock,
+    caretAnchor: currentBlock
+      ? Object.freeze({ blockId: currentBlock.id, sourceOffset: caret })
+      : null,
+    disabled: props.disabled,
+    documentEpoch: documentIdentity.epoch,
+    documentIdentity: documentIdentity.id,
+    editorProfile: props.editorProfile,
+    projection,
+    readonly: props.readonly,
+    revision: transactionStore.revision,
+    selection,
+    source: transactionStore.value,
+  })
+  writingAidsFocusState.value = writingAidsController.focusState!
+  writingAidsState.value = writingAidsController.state
+  writingAidsController.handleProjectionChange()
+}
 const liveSurface = computed(() =>
   createMarkdownLiveSurface({
     documentIdentity,
@@ -545,6 +642,7 @@ const liveLayout = ref<MarkdownLiveLayoutPlan>(
 )
 let layoutGestureTimer: ReturnType<typeof setTimeout> | undefined
 let restoringViewport = false
+let restoringTypewriter = false
 const liveDecorations = computed(() => {
   const decorations = liveSurface.value.decorations
   if (currentMode.value !== 'live' || !liveWindow.value) return decorations
@@ -611,8 +709,51 @@ const markLayoutGesture = (gesture: MarkdownLiveLayoutGesture) => {
 const handleLayoutWheel = () => markLayoutGesture('wheel')
 const handleLayoutTouch = () => markLayoutGesture('touch')
 const handleLayoutScroll = () => {
-  if (restoringSelection || restoringViewport) return
+  const textarea = textareaRef.value
+  if (textarea) syncFocusLayerScroll(textarea.scrollTop)
+  if (restoringSelection || restoringViewport || restoringTypewriter) return
+  writingAidsController.handleUserScroll()
+  writingAidsState.value = writingAidsController.state
   markLayoutGesture('scrollbar')
+}
+const applyTypewriterScroll = (explicitNavigation = false) => {
+  if (!resolvedWritingAids.value.typewriter || isComposing.value) return
+  const textarea = textareaRef.value
+  if (!textarea) return
+  const response = explicitNavigation
+    ? writingAidsController.handleExplicitNavigation()
+    : writingAidsController.handleInput()
+  writingAidsState.value = writingAidsController.state
+  if (response.scroll !== true) return
+  const lineHeight =
+    Number.parseFloat(window.getComputedStyle(textarea).lineHeight) || 20
+  const target = writingAidsController.calculateScroll({
+    caretSourceOffset: transactionStore.selection.end,
+    lineHeight,
+    source: transactionStore.value,
+    viewportHeight: textarea.clientHeight,
+    visualViewportHeight: visualViewportHeight.value || undefined,
+  })
+  restoringTypewriter = true
+  if (typeof textarea.scrollTo === 'function') {
+    const scrollTop = Math.min(
+      target.scrollTop,
+      Math.max(0, textarea.scrollHeight - textarea.clientHeight),
+    )
+    textarea.scrollTo({
+      behavior: target.smooth ? 'smooth' : 'auto',
+      top: scrollTop,
+    })
+    requestAnimationFrame(() => {
+      syncFocusLayerScroll(textarea.scrollTop)
+    })
+  } else {
+    textarea.scrollTop = target.scrollTop
+    syncFocusLayerScroll(target.scrollTop)
+  }
+  queueMicrotask(() => {
+    restoringTypewriter = false
+  })
 }
 const refreshLiveReveal = (
   extras: {
@@ -837,6 +978,10 @@ const dispatchEditorOperation = (
     emit(CHANGE_EVENT, result.value)
     refreshLiveWindow('input')
   }
+  if (result.accepted) {
+    refreshWritingAidsDocument()
+    if (result.value !== previousValue) applyTypewriterScroll()
+  }
   if (
     result.accepted &&
     (result.selection.start !== previousSelection.start ||
@@ -972,6 +1117,17 @@ watch(
       },
     })
   },
+)
+
+watch(
+  [
+    () => props.writingAids,
+    () => props.editorProfile,
+    () => props.readonly,
+    () => props.disabled,
+  ],
+  () => refreshWritingAidsDocument(),
+  { deep: true },
 )
 
 const editorMetrics = computed(() =>
@@ -1123,6 +1279,7 @@ const updateVisualViewportHeight = () => {
 
 onMounted(() => {
   refreshLiveWindow('initial')
+  refreshWritingAidsDocument()
   updateVisualViewportHeight()
   window.visualViewport?.addEventListener('resize', updateVisualViewportHeight)
   window.visualViewport?.addEventListener('scroll', updateVisualViewportHeight)
@@ -1197,7 +1354,11 @@ const handleInput = (event: Event) => {
   })
   syncNativeComposing()
   beforeInputSnapshot = undefined
-  if (plan.action === 'dedup' || plan.action === 'prevent' || plan.action === 'ignore') {
+  if (
+    plan.action === 'dedup' ||
+    plan.action === 'prevent' ||
+    plan.action === 'ignore'
+  ) {
     pendingClipboardIdentity = undefined
     pendingInputOrigin = undefined
     if (plan.restoreDisplay && target.value !== transactionStore.value) {
@@ -1242,6 +1403,8 @@ const handleCompositionStart = () => {
   })
   syncNativeComposing()
   if (editingBlocked.value || !nativeMachine.composing) return
+  writingAidsController.handleCompositionStart()
+  writingAidsState.value = writingAidsController.state
   transactionStore.breakMergeGroup()
   captureSelection()
   beforeInputSnapshot = undefined
@@ -1264,6 +1427,8 @@ const handleCompositionEnd = (event: CompositionEvent) => {
     value: target.value,
   })
   syncNativeComposing()
+  writingAidsController.handleCompositionEnd()
+  writingAidsState.value = writingAidsController.state
   beforeInputSnapshot = undefined
   pendingClipboardIdentity = undefined
   pendingInputOrigin = undefined
@@ -1286,15 +1451,15 @@ const handleCompositionEnd = (event: CompositionEvent) => {
       ? laggedSelection
       : readSelectionFrom(target),
     {
-    history: plan.history,
-    metadata: Object.freeze({
-      composition: true,
-      data: event.data,
-      identity: plan.identity,
-      inputType: 'insertCompositionText',
-    }),
-    origin: 'input',
-  },
+      history: plan.history,
+      metadata: Object.freeze({
+        composition: true,
+        data: event.data,
+        identity: plan.identity,
+        inputType: 'insertCompositionText',
+      }),
+      origin: 'input',
+    },
   )
   refreshLiveReveal()
 }
@@ -1366,7 +1531,10 @@ const handleDrop = (event: DragEvent) => {
 }
 
 const handleCopy = (event: ClipboardEvent) => {
-  if (currentMode.value === 'live' && atomicSession.value?.phase === 'selected') {
+  if (
+    currentMode.value === 'live' &&
+    atomicSession.value?.phase === 'selected'
+  ) {
     const atomic = applyAtomicIntent('copy-source')
     if (atomic.copy && 'payload' in atomic.copy) {
       event.preventDefault()
@@ -1392,7 +1560,10 @@ const handleCopy = (event: ClipboardEvent) => {
 }
 
 const handleCut = (event: ClipboardEvent) => {
-  if (currentMode.value === 'live' && atomicSession.value?.phase === 'selected') {
+  if (
+    currentMode.value === 'live' &&
+    atomicSession.value?.phase === 'selected'
+  ) {
     const atomic = applyAtomicIntent('cut')
     if (atomic.copy && 'payload' in atomic.copy) {
       event.preventDefault()
@@ -1401,7 +1572,10 @@ const handleCut = (event: ClipboardEvent) => {
     }
     if (atomic.copy && 'copy' in atomic.copy) {
       event.preventDefault()
-      writeMarkdownClipboardPayload(event.clipboardData, atomic.copy.copy.payload)
+      writeMarkdownClipboardPayload(
+        event.clipboardData,
+        atomic.copy.copy.payload,
+      )
       return
     }
   }
@@ -1426,6 +1600,9 @@ const handleCut = (event: ClipboardEvent) => {
 const handleSelectionMove = () => {
   if (restoringSelection || isComposing.value) return
   captureSelection()
+  refreshWritingAidsDocument()
+  writingAidsController.handleSelectionChange()
+  writingAidsState.value = writingAidsController.state
   if (currentMode.value === 'live') {
     const selection = transactionStore.selection
     if (selection.start !== selection.end) {
@@ -1440,9 +1617,21 @@ const handleSelectionMove = () => {
   refreshLiveReveal()
 }
 
+const handleSelectionDragStart = () => {
+  if (isComposing.value) return
+  writingAidsController.handleSelectionDragStart()
+  writingAidsState.value = writingAidsController.state
+}
+
+const handleSelectionDragEnd = () => {
+  writingAidsController.handleSelectionDragEnd()
+  writingAidsState.value = writingAidsController.state
+}
+
 const handlePointerReveal = () => {
   if (restoringSelection || isComposing.value) return
   captureSelection()
+  refreshWritingAidsDocument()
   if (currentMode.value === 'live') {
     applyLiveSelectionMotion('pointer-click', {
       pointerOffset: transactionStore.selection.start,
@@ -1635,9 +1824,17 @@ const runCommand = async (command: MarkdownEditorCommand) => {
       signal: commandController.signal,
       value,
     }
-    if (!isMarkdownEditorCommandVisible(command, context) || !isMarkdownEditorCommandEnabled(command, context)) return
+    if (
+      !isMarkdownEditorCommandVisible(command, context) ||
+      !isMarkdownEditorCommandEnabled(command, context)
+    )
+      return
     const result = await runMarkdownEditorCommand(command, context)
-    if (commandController.signal.aborted || commandControllers.get(command.key) !== commandController) return
+    if (
+      commandController.signal.aborted ||
+      commandControllers.get(command.key) !== commandController
+    )
+      return
     if (!result?.transaction) return
     const dispatchResult = dispatchTransaction({
       ...result.transaction,
@@ -1771,7 +1968,12 @@ const handleKeydown = (event: KeyboardEvent) => {
       applyLiveSelectionMotion(motionKey, { shift: event.shiftKey })
       return
     }
-    if (event.key === 'Enter' && !event.altKey && !event.ctrlKey && !event.metaKey) {
+    if (
+      event.key === 'Enter' &&
+      !event.altKey &&
+      !event.ctrlKey &&
+      !event.metaKey
+    ) {
       const atomic = resolveMarkdownAtomicNodeIntent({
         action: 'caret-before',
         composing: isComposing.value,
@@ -1894,12 +2096,7 @@ const handleKeydown = (event: KeyboardEvent) => {
           : event.key === 'Delete'
             ? 'delete'
             : null
-  if (
-    blockKey &&
-    !event.altKey &&
-    !event.ctrlKey &&
-    !event.metaKey
-  ) {
+  if (blockKey && !event.altKey && !event.ctrlKey && !event.metaKey) {
     const plan = resolveMarkdownBlockInputIntent({
       source: transactionStore.value,
       selection: captureSelection(),
@@ -1978,28 +2175,89 @@ const insertMarkdownAtCursor = (
   }).accepted
 }
 
-const writingAidsController = createWritingAidsController({
-  writingAids: props.writingAids,
-  editorProfile: props.editorProfile,
-  readonly: props.readonly,
-  disabled: props.disabled,
-  source: transactionStore.value,
-})
+const commitRevealSelection = async (
+  range: { start: number; end: number },
+  smooth: boolean,
+) => {
+  const selection = Object.freeze({
+    direction: 'none' as const,
+    end: range.start,
+    start: range.start,
+  })
+  transactionStore.setSelection(selection, true)
+  refreshLiveWindow('feature')
+  refreshWritingAidsDocument()
+  await restoreTextareaSelection(selection)
+  const textarea = textareaRef.value
+  if (!textarea) return
+  const lineHeight =
+    Number.parseFloat(window.getComputedStyle(textarea).lineHeight) || 20
+  const line =
+    transactionStore.value.slice(0, range.start).split('\n').length - 1
+  const top = Math.max(0, line * lineHeight - textarea.clientHeight / 3)
+  if (typeof textarea.scrollTo === 'function') {
+    const scrollTop = Math.min(
+      top,
+      Math.max(0, textarea.scrollHeight - textarea.clientHeight),
+    )
+    textarea.scrollTo({ behavior: smooth ? 'smooth' : 'auto', top: scrollTop })
+    requestAnimationFrame(() => {
+      syncFocusLayerScroll(textarea.scrollTop)
+    })
+  } else {
+    textarea.scrollTop = top
+    syncFocusLayerScroll(top)
+  }
+  textarea.focus()
+  applyTypewriterScroll(true)
+}
 
-const revealHeading = (nodeId: string, options?: Parameters<typeof revealHeadingOutline>[4]) => {
-  const model = createMarkdownOutlineModel(transactionStore.value, documentIdentity)
-  return revealHeadingOutline(
+const revealHeading = (
+  nodeId: string,
+  options?: Parameters<typeof revealHeadingOutline>[4],
+) => {
+  const model = createMarkdownOutlineModel(
+    transactionStore.value,
+    documentIdentity,
+  )
+  const status = revealHeadingOutline(
     model.items,
     nodeId,
     { documentIdentity, revision: transactionStore.revision },
     { documentIdentity, revision: transactionStore.revision },
     options,
   )
+  if (status !== 'success') return status
+  const plan = planMarkdownOutlineReveal(model.items, nodeId, {
+    ...options,
+    actual: { documentIdentity, revision: transactionStore.revision },
+    expected: { documentIdentity, revision: transactionStore.revision },
+    mode: currentMode.value,
+  })
+  if (plan.status !== 'success' || !plan.range) return plan.status
+  void commitRevealSelection(plan.range, plan.smooth)
+  return 'success'
 }
 
-const revealSourceRange = (range: { start: number; end: number }, options?: Parameters<typeof revealSourceRangeOutline>[2]) => {
-  const model = createMarkdownOutlineModel(transactionStore.value, documentIdentity)
-  return revealSourceRangeOutline(model.items, range, options)
+const revealSourceRange = (
+  range: { start: number; end: number },
+  options?: Parameters<typeof revealSourceRangeOutline>[2],
+) => {
+  if (
+    range.start < 0 ||
+    range.end < range.start ||
+    range.end > transactionStore.value.length
+  ) {
+    return 'not-found'
+  }
+  const model = createMarkdownOutlineModel(
+    transactionStore.value,
+    documentIdentity,
+  )
+  const guarded = revealSourceRangeOutline(model.items, range, options)
+  if (guarded === 'stale' || guarded === 'unsupported') return guarded
+  void commitRevealSelection(range, true)
+  return 'success'
 }
 
 defineExpose({

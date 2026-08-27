@@ -20,8 +20,9 @@ describe('markdown-editor writing aids contract', () => {
       typewriter: true,
       typewriterAnchor: 'upper-third',
     })
-    expect(resolveWritingAids({ typewriter: true, typewriterAnchor: 'center' }))
-      .toMatchObject({ typewriterAnchor: 'center' })
+    expect(
+      resolveWritingAids({ typewriter: true, typewriterAnchor: 'center' }),
+    ).toMatchObject({ typewriterAnchor: 'center' })
   })
 
   it('derives the active block from the projection identity and invalidates stale epochs', () => {
@@ -38,9 +39,24 @@ describe('markdown-editor writing aids contract', () => {
     expect(controller.currentBlock).toMatchObject({ id: 'block-a' })
     expect(controller.caretAnchor).toMatchObject({ blockId: 'block-a' })
 
-    controller.updateDocument({ documentIdentity: 'document-b', documentEpoch: 2, revision: 4 })
+    controller.updateDocument({
+      documentIdentity: 'document-b',
+      documentEpoch: 2,
+      revision: 4,
+    })
     expect(controller.currentBlock).toBeNull()
     expect(controller.caretAnchor).toBeNull()
+
+    controller.updateDocument({
+      documentIdentity: 'document-b',
+      documentEpoch: 2,
+      revision: 5,
+      source: '# Updated',
+      currentBlock: { id: 'block-b', sourceRange: [0, 9] },
+      caretAnchor: { blockId: 'block-b', sourceOffset: 4 },
+    })
+    expect(controller.currentBlock).toMatchObject({ id: 'block-b' })
+    expect(controller.caretAnchor).toMatchObject({ blockId: 'block-b' })
   })
 
   it('suspends after manual scrolling and only restores positioning after later input or explicit navigation', () => {
@@ -54,10 +70,18 @@ describe('markdown-editor writing aids contract', () => {
       },
     })
 
-    expect(controller.handleUserScroll()).toMatchObject({ state: 'user-scroll-suspended' })
+    expect(controller.handleUserScroll()).toMatchObject({
+      state: 'user-scroll-suspended',
+    })
     expect(controller.handleSelectionChange()).toMatchObject({ scroll: false })
-    expect(controller.handleInput()).toMatchObject({ state: 'restoring', scroll: true })
-    expect(controller.handleNavigation()).toMatchObject({ state: 'explicit-navigation', scroll: true })
+    expect(controller.handleInput()).toMatchObject({
+      state: 'restoring',
+      scroll: true,
+    })
+    expect(controller.handleNavigation()).toMatchObject({
+      state: 'explicit-navigation',
+      scroll: true,
+    })
   })
 
   it('does not scroll during composition or selection dragging and disables smooth motion when reduced motion is requested', () => {
@@ -72,10 +96,16 @@ describe('markdown-editor writing aids contract', () => {
       },
     })
 
-    expect(controller.handleCompositionStart()).toMatchObject({ state: 'composition-suspended', scroll: false })
+    expect(controller.handleCompositionStart()).toMatchObject({
+      state: 'composition-suspended',
+      scroll: false,
+    })
     expect(controller.handleProjectionChange()).toMatchObject({ scroll: false })
     expect(controller.handleCompositionEnd()).toMatchObject({ smooth: false })
-    expect(controller.handleSelectionDragStart()).toMatchObject({ state: 'selection-drag-suspended', scroll: false })
+    expect(controller.handleSelectionDragStart()).toMatchObject({
+      state: 'selection-drag-suspended',
+      scroll: false,
+    })
   })
 })
 
@@ -86,7 +116,8 @@ describe('focus mode current-block presentation and accessibility (#439)', () =>
     { id: 'paragraph:2', kind: 'paragraph', rawRange: { start: 37, end: 60 } },
     { id: 'code:3', kind: 'code', rawRange: { start: 62, end: 85 } },
   ]
-  const sampleSource = '# Heading\n\nFirst paragraph text.\n\nSecond paragraph text.\n\n```ts\ncode block\n```\n'
+  const sampleSource =
+    '# Heading\n\nFirst paragraph text.\n\nSecond paragraph text.\n\n```ts\ncode block\n```\n'
 
   it('remains disabled by default and only activates in editable prose scenarios', () => {
     // Default disabled
@@ -290,7 +321,10 @@ describe('upper-third typewriter scrolling state machine (#440)', () => {
     const defaultAids = resolveWritingAids({ typewriter: true })
     expect(defaultAids.typewriterAnchor).toBe('upper-third')
 
-    const centerAids = resolveWritingAids({ typewriter: true, typewriterAnchor: 'center' })
+    const centerAids = resolveWritingAids({
+      typewriter: true,
+      typewriterAnchor: 'center',
+    })
     expect(centerAids.typewriterAnchor).toBe('center')
   })
 
@@ -304,36 +338,57 @@ describe('upper-third typewriter scrolling state machine (#440)', () => {
     expect(controller.state).toBe('idle')
 
     // 2. Input drives input-driven state
-    expect(controller.handleInput()).toMatchObject({ state: 'input-driven', scroll: true })
+    expect(controller.handleInput()).toMatchObject({
+      state: 'input-driven',
+      scroll: true,
+    })
 
     // 3. Selection change alone does NOT trigger scroll
     expect(controller.handleSelectionChange()).toMatchObject({ scroll: false })
     expect(controller.state).toBe('input-driven')
 
     // 4. User scroll suspends positioning
-    expect(controller.handleUserScroll()).toMatchObject({ state: 'user-scroll-suspended', scroll: false })
+    expect(controller.handleUserScroll()).toMatchObject({
+      state: 'user-scroll-suspended',
+      scroll: false,
+    })
     expect(controller.suspendReason).toBe('user-scroll')
 
     // 5. Subsequent input restores positioning
-    expect(controller.handleInput()).toMatchObject({ state: 'restoring', scroll: true })
+    expect(controller.handleInput()).toMatchObject({
+      state: 'restoring',
+      scroll: true,
+    })
     expect(controller.suspendReason).toBeUndefined()
 
     // 6. Explicit navigation transitions to explicit-navigation
-    expect(controller.handleExplicitNavigation()).toMatchObject({ state: 'explicit-navigation', scroll: true })
+    expect(controller.handleExplicitNavigation()).toMatchObject({
+      state: 'explicit-navigation',
+      scroll: true,
+    })
 
     // 7. Selection drag suspends positioning
-    expect(controller.handleSelectionDragStart()).toMatchObject({ state: 'selection-drag-suspended', scroll: false })
+    expect(controller.handleSelectionDragStart()).toMatchObject({
+      state: 'selection-drag-suspended',
+      scroll: false,
+    })
     expect(controller.handleSelectionDragEnd()).toMatchObject({ scroll: false })
     expect(controller.state).toBe('idle')
 
     // 8. IME composition suspends positioning
-    expect(controller.handleCompositionStart()).toMatchObject({ state: 'composition-suspended', scroll: false })
+    expect(controller.handleCompositionStart()).toMatchObject({
+      state: 'composition-suspended',
+      scroll: false,
+    })
     expect(controller.handleCompositionEnd()).toMatchObject({ scroll: false })
     expect(controller.state).toBe('idle')
   })
 
   it('calculates upper-third (1/3) and center (1/2) scroll targets with sticky toolbar, safe area, and visual viewport', () => {
-    const multilineSource = Array.from({ length: 50 }, (_, i) => `Line ${i}`).join('\n')
+    const multilineSource = Array.from(
+      { length: 50 },
+      (_, i) => `Line ${i}`,
+    ).join('\n')
 
     // Upper-third calculation
     const upperThirdTarget = calculateTypewriterScrollTarget({
@@ -409,7 +464,8 @@ describe('upper-third typewriter scrolling state machine (#440)', () => {
     expect(targetBefore.caretLine).toBe(2)
 
     // Content expands below the anchor
-    const expandedSource = 'Header\n\nPara 1\n\n[Async Attachment Image Rendered]\n\nPara 2\n'
+    const expandedSource =
+      'Header\n\nPara 1\n\n[Async Attachment Image Rendered]\n\nPara 2\n'
     const targetAfter = calculateTypewriterScrollTarget({
       anchor: 'upper-third',
       caretSourceOffset: 10,

@@ -106,7 +106,10 @@
     align-items: center;
     justify-content: center;
     border: 1px solid getCssVar('border-color');
-    border-radius: var(--fsus-radius-control-small, var(--el-border-radius-small));
+    border-radius: var(
+      --fsus-radius-control-small,
+      var(--el-border-radius-small)
+    );
     background: getCssVar('fill-color', 'blank');
     color: getCssVar('text-color', 'regular');
     font: inherit;
@@ -136,7 +139,10 @@
 
   @include e(mode) {
     border: 0;
-    border-radius: var(--fsus-radius-control-small, var(--el-border-radius-small));
+    border-radius: var(
+      --fsus-radius-control-small,
+      var(--el-border-radius-small)
+    );
 
     @include when(active) {
       background: var(--fsus-state-selected-bg);
@@ -187,8 +193,10 @@
 
   @include e(body) {
     display: grid;
+    position: relative;
     grid-template-columns: minmax(0, 1fr);
     min-height: 0;
+    overflow: hidden;
   }
 
   @include m(split) {
@@ -218,6 +226,9 @@
   }
 
   @include e(textarea) {
+    position: relative;
+    z-index: 1;
+    grid-area: 1 / 1;
     min-width: 0;
     resize: vertical;
     border: 0;
@@ -233,6 +244,46 @@
 
     &:focus-visible {
       @include a11y-focus-ring(2px);
+    }
+  }
+
+  @include e(focus-layer) {
+    z-index: 0;
+    grid-area: 1 / 1;
+    min-width: 0;
+    min-height: 100%;
+    margin: 0;
+    overflow: visible;
+    padding: 16px;
+    pointer-events: none;
+    background: getCssVar('bg-color');
+    color: getCssVar('text-color', 'primary');
+    font: inherit;
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+      'Courier New', monospace;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+
+    @include when(dimmed) {
+      opacity: 0.72;
+    }
+  }
+
+  @include when(focus-mode) {
+    @include e(textarea) {
+      background: transparent;
+      color: transparent;
+
+      &::placeholder {
+        color: getCssVar('text-color', 'placeholder');
+      }
+
+      &::selection {
+        background: var(--fsus-state-selected-bg);
+        color: getCssVar('text-color', 'primary');
+      }
     }
   }
 
@@ -304,8 +355,7 @@
         calc(var(--el-markdown-editor-visual-viewport-height, 100vh) - 18rem),
         68rem
       );
-      padding: clamp(1.35rem, 3vw, 2.75rem)
-        clamp(1.1rem, 4vw, 3rem);
+      padding: clamp(1.35rem, 3vw, 2.75rem) clamp(1.1rem, 4vw, 3rem);
       resize: vertical;
       background: getCssVar('fill-color', 'blank');
       font-family:
@@ -333,6 +383,27 @@
           inset 0 0 0 1px var(--fsus-state-focus-border),
           0 12px 36px rgb(0 0 0 / 4%);
       }
+    }
+
+    @include e(focus-layer) {
+      justify-self: center;
+      width: min(100%, 74ch);
+      min-height: clamp(
+        30rem,
+        calc(var(--el-markdown-editor-visual-viewport-height, 100vh) - 18rem),
+        68rem
+      );
+      padding: clamp(1.35rem, 3vw, 2.75rem) clamp(1.1rem, 4vw, 3rem);
+      background: getCssVar('fill-color', 'blank');
+      font-family:
+        getCssVar('font-family'),
+        -apple-system,
+        BlinkMacSystemFont,
+        'Segoe UI',
+        sans-serif;
+      font-size: 18px;
+      line-height: 1.84;
+      letter-spacing: 0;
     }
 
     @include e(preview) {
@@ -429,6 +500,18 @@
         font-size: 17px;
         line-height: 1.78;
       }
+
+      @include e(focus-layer) {
+        width: 100%;
+        min-height: clamp(
+          24rem,
+          calc(var(--el-markdown-editor-visual-viewport-height, 100vh) - 15rem),
+          52rem
+        );
+        padding: 1.25rem 1rem 1.75rem;
+        font-size: 17px;
+        line-height: 1.78;
+      }
     }
 
     @include e(status) {
@@ -500,10 +583,7 @@
     max-height: calc(100dvh - var(--fsus-space-8, 32px));
     overflow: auto;
     border: 1px solid getCssVar('border-color');
-    border-radius: var(
-      --fsus-radius-panel,
-      var(--el-dialog-border-radius)
-    );
+    border-radius: var(--fsus-radius-panel, var(--el-dialog-border-radius));
     background: var(--fsus-surface-overlay, var(--el-bg-color-overlay));
     box-shadow: var(--fsus-shadow-panel, none);
     color: getCssVar('text-color', 'primary');
@@ -567,10 +647,7 @@
       overflow: auto;
       padding: var(--fsus-space-3, 12px);
       border: 1px solid getCssVar('border-color-lighter');
-      border-radius: var(
-        --fsus-radius-control,
-        var(--el-border-radius-base)
-      );
+      border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
       margin: 0;
       background: getCssVar('fill-color', 'light');
       color: getCssVar('text-color', 'primary');
@@ -633,10 +710,7 @@
       min-height: 44px;
       padding: 0 var(--fsus-space-4, 16px);
       border: 1px solid getCssVar('border-color');
-      border-radius: var(
-        --fsus-radius-control,
-        var(--el-border-radius-base)
-      );
+      border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
       background: getCssVar('fill-color', 'blank');
       color: getCssVar('text-color', 'regular');
       font: inherit;

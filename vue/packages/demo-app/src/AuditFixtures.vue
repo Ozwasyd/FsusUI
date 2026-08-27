@@ -277,6 +277,31 @@
       </output>
     </section>
 
+    <section
+      v-if="markdownWritingAidsFixture"
+      data-testid="markdown-writing-aids-fixture"
+    >
+      <el-markdown-editor
+        ref="markdownWritingAidsEditor"
+        v-model="markdownWritingAidsValue"
+        editor-profile="prose"
+        :min-rows="12"
+        :show-actions="false"
+        :show-mode-switcher="false"
+        :writing-aids="{ focus: true, typewriter: true }"
+      />
+      <button
+        type="button"
+        data-testid="markdown-reveal-details"
+        @click="revealMarkdownDetails"
+      >
+        Reveal details
+      </button>
+      <output data-testid="markdown-reveal-status">{{
+        markdownRevealStatus
+      }}</output>
+    </section>
+
     <div class="audit-grid">
       <AuditCard name="FixedSizeList" :state="auditState">
         <div class="audit-virtual-frame audit-virtual-frame--list">
@@ -1770,9 +1795,7 @@
       <AuditCard name="ElUpload" :state="auditState">
         <el-upload action="#" :auto-upload="false" drag>
           <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
-          <div class="el-upload__text">
-            Drop a file here or <em>browse</em>
-          </div>
+          <div class="el-upload__text">Drop a file here or <em>browse</em></div>
           <p data-upload-help>PNG/JPG, max 10 MB</p>
         </el-upload>
       </AuditCard>
@@ -1977,6 +2000,9 @@ const markdownEditorTransactionFixture =
   new URLSearchParams(window.location.search).get(
     'markdownEditorTransaction',
   ) === '1'
+const markdownWritingAidsFixture =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownWritingAids') === '1'
 const markdownEditorImeFixture =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('markdownEditorIme') === '1'
@@ -2018,6 +2044,30 @@ if (markdownEditorDelayMount > 0) {
   }, markdownEditorDelayMount)
 }
 const markdownTransactionEditor = ref<MarkdownEditorInstance>()
+const markdownWritingAidsEditor = ref<MarkdownEditorInstance>()
+const markdownWritingAidsValue = ref(
+  [
+    '# Writing session',
+    ...Array.from(
+      { length: 18 },
+      (_, index) =>
+        `Paragraph ${index + 1} keeps the document realistic and scrollable.`,
+    ),
+    '::embed[target="details" mode="block"]',
+    'The selected section remains readable while surrounding blocks stay present.',
+  ].join('\n\n'),
+)
+const markdownRevealStatus = ref('idle')
+const revealMarkdownDetails = () => {
+  const marker = '::embed[target="details" mode="block"]'
+  const start = markdownWritingAidsValue.value.indexOf(marker)
+  const status =
+    markdownWritingAidsEditor.value?.revealSourceRange({
+      start,
+      end: start + marker.length,
+    }) ?? 'missing-method'
+  markdownRevealStatus.value = `${start}:${status}`
+}
 const markdownTransactionValue = ref(
   markdownEditorImeFixture ? '' : 'A😀éאב\n- 列表',
 )

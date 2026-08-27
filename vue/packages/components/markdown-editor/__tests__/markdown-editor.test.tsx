@@ -4,6 +4,7 @@ import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import MarkdownEditor from '../src/markdown-editor.vue'
+import { createMarkdownOutlineModel } from '../src/markdown-editor-outline'
 import {
   defaultMarkdownEditorCommands,
   markdownLiveCapabilities,
@@ -34,17 +35,23 @@ describe('MarkdownEditor', () => {
     )
     if (!bold) throw new Error('missing bold command')
 
-    await expect(runMarkdownEditorCommand(bold, {
-      dispatch: { dispatch: () => { throw new Error('not expected in command construction') } },
-      documentIdentity: { epoch: 1, id: 'test-document' },
-      mode: 'source',
-      readonly: false,
-      revision: 1,
-      selection: { direction: 'forward', start: 5, end: 13 },
-      signal: new AbortController().signal,
-      syntax: { range: { start: 5, end: 13 }, type: 'paragraph' },
-      value: 'edit markdown',
-    })).resolves.toEqual({
+    await expect(
+      runMarkdownEditorCommand(bold, {
+        dispatch: {
+          dispatch: () => {
+            throw new Error('not expected in command construction')
+          },
+        },
+        documentIdentity: { epoch: 1, id: 'test-document' },
+        mode: 'source',
+        readonly: false,
+        revision: 1,
+        selection: { direction: 'forward', start: 5, end: 13 },
+        signal: new AbortController().signal,
+        syntax: { range: { start: 5, end: 13 }, type: 'paragraph' },
+        value: 'edit markdown',
+      }),
+    ).resolves.toEqual({
       transaction: expect.objectContaining({
         expectedRevision: undefined,
         selection: { direction: 'forward', start: 7, end: 15 },
@@ -816,7 +823,9 @@ describe('MarkdownEditor', () => {
       ?.map(([event]) => event as MarkdownEditorTransactionEvent)
       .filter((event) => event.accepted)
     expect(accepted?.map((event) => event.value)).toEqual(['plain'])
-    expect(accepted?.map((event) => event.transaction.origin)).toEqual(['paste'])
+    expect(accepted?.map((event) => event.transaction.origin)).toEqual([
+      'paste',
+    ])
   })
 
   it('rejects public mutations while loading without changing the optimistic value', async () => {
@@ -863,17 +872,23 @@ describe('MarkdownEditor', () => {
         },
       })
 
-      expect(wrapper.classes()).toContain(`el-markdown-editor--chrome-${chrome}`)
+      expect(wrapper.classes()).toContain(
+        `el-markdown-editor--chrome-${chrome}`,
+      )
       expect(wrapper.findAll('[role="region"]')).toHaveLength(1)
       expect(wrapper.find('[aria-label="Markdown editor"]').exists()).toBe(true)
 
       if (chrome === 'minimal') {
-        expect(wrapper.find('.el-markdown-editor__toolbar').exists()).toBe(false)
+        expect(wrapper.find('.el-markdown-editor__toolbar').exists()).toBe(
+          false,
+        )
         expect(wrapper.find('.el-markdown-editor__status').exists()).toBe(false)
       }
 
       if (chrome === 'embedded') {
-        expect(wrapper.classes()).not.toContain('el-markdown-editor--surface-card')
+        expect(wrapper.classes()).not.toContain(
+          'el-markdown-editor--surface-card',
+        )
       }
     },
   )
@@ -909,7 +924,9 @@ describe('MarkdownEditor', () => {
       expect(textarea.exists()).toBe(true)
       if (mode === 'preview') {
         expect(textarea.isVisible()).toBe(false)
-        expect(wrapper.find('[data-stub-markdown-renderer]').exists()).toBe(true)
+        expect(wrapper.find('[data-stub-markdown-renderer]').exists()).toBe(
+          true,
+        )
       } else {
         expect(textarea.isVisible()).toBe(true)
         expect(wrapper.find('[data-stub-markdown-renderer]').exists()).toBe(
@@ -947,9 +964,11 @@ describe('MarkdownEditor', () => {
     for (const mode of ['live', 'split', 'preview', 'source'] as const) {
       await wrapper.setProps({ mode })
       expect(wrapper.find('textarea').element).toBe(textarea)
-      expect(wrapper.find('[data-markdown-surface-owner]').attributes(
-        'data-markdown-surface-owner',
-      )).toBe('source-textarea')
+      expect(
+        wrapper
+          .find('[data-markdown-surface-owner]')
+          .attributes('data-markdown-surface-owner'),
+      ).toBe('source-textarea')
     }
 
     expect(wrapper.vm.undo()).toMatchObject({
@@ -957,7 +976,9 @@ describe('MarkdownEditor', () => {
       value: '# Stable',
     })
     expect(revision).toBeGreaterThan(0)
-    expect(wrapper.find('[data-markdown-live-decorations]').exists()).toBe(false)
+    expect(wrapper.find('[data-markdown-live-decorations]').exists()).toBe(
+      false,
+    )
     await wrapper.setProps({ mode: 'live' })
     expect(wrapper.find('[data-stub-markdown-renderer]').exists()).toBe(false)
     expect(wrapper.find('textarea').isVisible()).toBe(true)
@@ -975,14 +996,18 @@ describe('MarkdownEditor', () => {
     const caret = 'intro ***nested*** tail'.indexOf('nested')
     element.setSelectionRange(caret, caret)
     await textarea.trigger('select')
-    expect(wrapper.find('[data-markdown-reveal-state]').attributes(
-      'data-markdown-reveal-state',
-    )).toBe('caret-inside')
+    expect(
+      wrapper
+        .find('[data-markdown-reveal-state]')
+        .attributes('data-markdown-reveal-state'),
+    ).toBe('caret-inside')
     const before = wrapper.emitted('update:modelValue')?.length ?? 0
     await textarea.trigger('keydown', { key: 'Escape' })
-    expect(wrapper.find('[data-markdown-reveal-state]').attributes(
-      'data-markdown-reveal-state',
-    )).toBe('inactive')
+    expect(
+      wrapper
+        .find('[data-markdown-reveal-state]')
+        .attributes('data-markdown-reveal-state'),
+    ).toBe('inactive')
     expect(wrapper.emitted('update:modelValue')?.length ?? 0).toBe(before)
     expect(element.value).toBe('intro ***nested*** tail')
   })
@@ -1000,9 +1025,11 @@ describe('MarkdownEditor', () => {
     element.setSelectionRange(image, image)
     await textarea.trigger('keydown', { key: 'ArrowRight' })
     expect(element.selectionStart).toBe('go ![alt](img.png)'.length)
-    expect(wrapper.find('[data-markdown-atomic-kind]').attributes(
-      'data-markdown-atomic-kind',
-    )).toBe('image')
+    expect(
+      wrapper
+        .find('[data-markdown-atomic-kind]')
+        .attributes('data-markdown-atomic-kind'),
+    ).toBe('image')
     await textarea.trigger('keydown', { key: 'Backspace' })
     expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe('go  on')
   })
@@ -1019,15 +1046,17 @@ describe('MarkdownEditor', () => {
       },
     })
     await nextTick()
-    const decorations = wrapper.findAll('[data-markdown-live-decorations] [data-node-id]')
+    const decorations = wrapper.findAll(
+      '[data-markdown-live-decorations] [data-node-id]',
+    )
     expect(decorations.length).toBeGreaterThan(0)
     expect(decorations.length).toBeLessThanOrEqual(96)
     const textarea = wrapper.find('textarea')
     await textarea.trigger('wheel')
     expect(
-      wrapper.find('[data-markdown-layout-action]').attributes(
-        'data-markdown-layout-action',
-      ),
+      wrapper
+        .find('[data-markdown-layout-action]')
+        .attributes('data-markdown-layout-action'),
     ).toBe('yield')
   })
 
@@ -1087,7 +1116,9 @@ describe('MarkdownEditor', () => {
 
       expect(wrapper.find('[aria-label="Markdown editor"]').exists()).toBe(true)
       expect(wrapper.find('textarea').attributes('aria-label')).toBeTruthy()
-      expect(wrapper.classes()).not.toContain('el-markdown-editor--surface-card')
+      expect(wrapper.classes()).not.toContain(
+        'el-markdown-editor--surface-card',
+      )
     },
   )
 })
@@ -1095,7 +1126,10 @@ describe('MarkdownEditor', () => {
 describe('MarkdownEditor command contract migration', () => {
   it('does not retain the legacy apply(value, selection) command execution path', () => {
     const source = readFileSync(
-      resolve(process.cwd(), 'vue/packages/components/markdown-editor/src/markdown-editor.ts'),
+      resolve(
+        process.cwd(),
+        'vue/packages/components/markdown-editor/src/markdown-editor.ts',
+      ),
       'utf8',
     )
 
@@ -1105,11 +1139,17 @@ describe('MarkdownEditor command contract migration', () => {
 
   it('removes the write mode alias from the public component contract', () => {
     const component = readFileSync(
-      resolve(process.cwd(), 'vue/packages/components/markdown-editor/src/markdown-editor.vue'),
+      resolve(
+        process.cwd(),
+        'vue/packages/components/markdown-editor/src/markdown-editor.vue',
+      ),
       'utf8',
     )
     const model = readFileSync(
-      resolve(process.cwd(), 'vue/packages/components/markdown-editor/src/markdown-editor.ts'),
+      resolve(
+        process.cwd(),
+        'vue/packages/components/markdown-editor/src/markdown-editor.ts',
+      ),
       'utf8',
     )
     const liveContract = readFileSync(
@@ -1123,7 +1163,9 @@ describe('MarkdownEditor command contract migration', () => {
     expect(component).not.toMatch(/mode-write|--write|is-write/)
     expect(model).not.toMatch(/['\"]write['\"]/)
     expect(liveContract).not.toMatch(/['\"]write['\"]/)
-    expect(liveContract).toMatch(/['\"]source['\"]\s*\|\s*['\"]live['\"]\s*\|\s*['\"]split['\"]\s*\|\s*['\"]preview['\"]/)
+    expect(liveContract).toMatch(
+      /['\"]source['\"]\s*\|\s*['\"]live['\"]\s*\|\s*['\"]split['\"]\s*\|\s*['\"]preview['\"]/,
+    )
   })
 
   it('resolves only the six frozen live capability tokens with document identity', () => {
@@ -1158,5 +1200,80 @@ describe('MarkdownEditor command contract migration', () => {
         revision: 4,
       }),
     ).toThrow(/missing identity/i)
+  })
+})
+
+describe('MarkdownEditor writing-aids integration', () => {
+  it('renders focus presentation and makes outline reveal select, focus, and scroll the textarea', async () => {
+    const source =
+      '# Intro\n\nFirst paragraph.\n\n## Details\n\nSecond paragraph.\n'
+    const wrapper = mount(MarkdownEditor, {
+      attachTo: document.body,
+      props: {
+        editorProfile: 'prose',
+        modelValue: source,
+        writingAids: { focus: true, typewriter: true },
+      },
+    })
+    const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
+    const scrollTo = vi.fn()
+    Object.defineProperty(textarea, 'clientHeight', {
+      configurable: true,
+      value: 320,
+    })
+    Object.defineProperty(textarea, 'scrollTo', {
+      configurable: true,
+      value: scrollTo,
+    })
+
+    await nextTick()
+    expect(wrapper.find('.el-markdown-editor__focus-layer').exists()).toBe(true)
+    expect(wrapper.findAll('.is-dimmed').length).toBeGreaterThan(0)
+    expect(wrapper.attributes('data-markdown-focus-enabled')).toBe('true')
+
+    const model = createMarkdownOutlineModel(source, {
+      epoch: 0,
+      id: wrapper.attributes('data-markdown-instance'),
+    })
+    const target = model.items[1]!
+    expect(
+      (wrapper.vm as MarkdownEditorInstance).revealHeading(target.nodeId),
+    ).toBe('success')
+    await nextTick()
+    await nextTick()
+
+    expect(textarea.selectionStart).toBe(target.sourceRange.start)
+    expect(document.activeElement).toBe(textarea)
+    expect(scrollTo).toHaveBeenCalled()
+    expect(wrapper.attributes('data-markdown-focus-active-block')).toBe(
+      target.nodeId,
+    )
+
+    wrapper.unmount()
+  })
+
+  it('wires manual scroll and composition into the public writing-aids controller', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        editorProfile: 'prose',
+        modelValue: 'line one\nline two',
+        writingAids: { typewriter: true },
+      },
+    })
+    const textarea = wrapper.find('textarea')
+
+    await nextTick()
+    await Promise.resolve()
+    await textarea.trigger('scroll')
+    expect(wrapper.attributes('data-markdown-writing-aids-state')).toBe(
+      'user-scroll-suspended',
+    )
+
+    await textarea.trigger('compositionstart')
+    expect(wrapper.attributes('data-markdown-writing-aids-state')).toBe(
+      'composition-suspended',
+    )
+    await textarea.trigger('compositionend', { data: '' })
+    expect(wrapper.attributes('data-markdown-writing-aids-state')).toBe('idle')
   })
 })

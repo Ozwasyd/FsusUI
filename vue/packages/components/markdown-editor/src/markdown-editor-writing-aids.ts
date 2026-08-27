@@ -38,19 +38,24 @@ export const resolveWritingAids = (
     | MarkdownEditorWritingAidsOptions
     | (MarkdownEditorWritingAidsOptions & Readonly<Record<string, unknown>>),
 ): MarkdownEditorResolvedWritingAids => {
-  const nested = (options as Readonly<Record<string, unknown>> | undefined)?.writingAids as
-    | MarkdownEditorWritingAidsOptions
-    | undefined
+  const nested = (options as Readonly<Record<string, unknown>> | undefined)
+    ?.writingAids as MarkdownEditorWritingAidsOptions | undefined
   return Object.freeze({
     focus: nested?.focus === true || options?.focus === true,
     typewriter: nested?.typewriter === true || options?.typewriter === true,
     typewriterAnchor:
-      nested?.typewriterAnchor ?? options?.typewriterAnchor ?? defaults.typewriterAnchor,
+      nested?.typewriterAnchor ??
+      options?.typewriterAnchor ??
+      defaults.typewriterAnchor,
   })
 }
 
 export interface MarkdownEditorFocusExemptions {
-  readonly searchMatches?: readonly (number | readonly [number, number] | string)[]
+  readonly searchMatches?: readonly (
+    | number
+    | readonly [number, number]
+    | string
+  )[]
   readonly diagnostics?: readonly string[]
   readonly propertyEditorNodeId?: string | null
   readonly pendingAttachmentIds?: readonly string[]
@@ -147,15 +152,16 @@ export const resolveFocusState = (
   }
 
   const rawNodes = input.projection?.nodes ?? []
-  const nodes = rawNodes.length > 0
-    ? rawNodes
-    : [
-        {
-          id: 'block:0',
-          kind: 'paragraph',
-          rawRange: { start: 0, end: input.source.length },
-        },
-      ]
+  const nodes =
+    rawNodes.length > 0
+      ? rawNodes
+      : [
+          {
+            id: 'block:0',
+            kind: 'paragraph',
+            rawRange: { start: 0, end: input.source.length },
+          },
+        ]
 
   const sel = input.selection ?? {
     start: input.caret ?? 0,
@@ -207,7 +213,8 @@ export const resolveFocusState = (
   const ex = input.exemptions
   if (ex) {
     if (ex.propertyEditorNodeId) exemptNodeIds.push(ex.propertyEditorNodeId)
-    if (ex.screenReaderBrowseTargetId) exemptNodeIds.push(ex.screenReaderBrowseTargetId)
+    if (ex.screenReaderBrowseTargetId)
+      exemptNodeIds.push(ex.screenReaderBrowseTargetId)
     if (ex.diagnostics) {
       for (const d of ex.diagnostics) exemptNodeIds.push(d)
     }
@@ -247,7 +254,10 @@ export const resolveFocusState = (
     return Object.freeze({
       id: node.id,
       kind: node.kind,
-      sourceRange: Object.freeze([node.rawRange.start, node.rawRange.end] as const),
+      sourceRange: Object.freeze([
+        node.rawRange.start,
+        node.rawRange.end,
+      ] as const),
       active,
       dimmed,
       exempt,
@@ -300,7 +310,9 @@ export const evaluateMarkdownFocusMutations = (
     const selStart = Math.min(input.selection.start, input.selection.end)
     const selEnd = Math.max(input.selection.start, input.selection.end)
     for (const b of authority.blocks) {
-      const intersects = !(b.sourceRange[1] < selStart || b.sourceRange[0] > selEnd)
+      const intersects = !(
+        b.sourceRange[1] < selStart || b.sourceRange[0] > selEnd
+      )
       if (intersects && b.dimmed) {
         selectionPartialDimEquivalent = true
         break
@@ -312,7 +324,8 @@ export const evaluateMarkdownFocusMutations = (
     ...input,
     editorProfile: 'markdown',
   })
-  const ordinaryProfileObserverEquivalent = ordinaryProfileState.enabled === true
+  const ordinaryProfileObserverEquivalent =
+    ordinaryProfileState.enabled === true
 
   return Object.freeze({
     authority,
@@ -371,14 +384,18 @@ export const calculateTypewriterScrollTarget = (
   const caretY = caretLine * input.lineHeight
 
   const effectiveViewportHeight =
-    input.visualViewportHeight && input.visualViewportHeight < input.viewportHeight
+    input.visualViewportHeight &&
+    input.visualViewportHeight < input.viewportHeight
       ? input.visualViewportHeight
       : input.viewportHeight
 
   const toolbar = input.stickyToolbarHeight ?? 0
   const safeTop = input.safeAreaInsetTop ?? 0
   const safeBottom = input.safeAreaInsetBottom ?? 0
-  const usableHeight = Math.max(100, effectiveViewportHeight - toolbar - safeTop - safeBottom)
+  const usableHeight = Math.max(
+    100,
+    effectiveViewportHeight - toolbar - safeTop - safeBottom,
+  )
 
   const anchorRatio = input.anchor === 'center' ? 0.5 : 1 / 3
   const targetOffsetInViewport = toolbar + safeTop + usableHeight * anchorRatio
@@ -412,7 +429,8 @@ export const evaluateMarkdownTypewriterMutations = (
   const centerDefaultEquivalent = defaultResolved.typewriterAnchor === 'center'
 
   const selResult = controller.handleSelectionChange()
-  const selectionChangeRecenterEquivalent = (selResult as { scroll?: boolean }).scroll === true
+  const selectionChangeRecenterEquivalent =
+    (selResult as { scroll?: boolean }).scroll === true
 
   const domAnchorEquivalent = false
 
@@ -425,7 +443,8 @@ export const evaluateMarkdownTypewriterMutations = (
     reducedMotion: true,
   } as MarkdownEditorWritingAidsOptions & Readonly<Record<string, unknown>>)
   const reducedResult = reducedController.handleInput()
-  const reducedSmoothMotionEquivalent = (reducedResult as { smooth?: boolean }).smooth === true
+  const reducedSmoothMotionEquivalent =
+    (reducedResult as { smooth?: boolean }).smooth === true
 
   return Object.freeze({
     resolved,
@@ -466,11 +485,15 @@ export interface MarkdownEditorWritingAidsController {
   input(): MarkdownEditorWritingAidsState
   navigate(): MarkdownEditorWritingAidsState
   resume(): MarkdownEditorWritingAidsState
-  suspend(reason: MarkdownEditorWritingAidsSuspendReason): MarkdownEditorWritingAidsState
+  suspend(
+    reason: MarkdownEditorWritingAidsSuspendReason,
+  ): MarkdownEditorWritingAidsState
   readonly currentBlock?: Readonly<Record<string, unknown>> | null
   readonly caretAnchor?: Readonly<Record<string, unknown>> | null
   readonly focusState?: MarkdownEditorFocusState
-  calculateScroll(input: MarkdownEditorTypewriterScrollInput): MarkdownEditorTypewriterScrollResult
+  calculateScroll(
+    input: MarkdownEditorTypewriterScrollInput,
+  ): MarkdownEditorTypewriterScrollResult
   handleUserScroll(): Readonly<Record<string, unknown>>
   handleSelectionChange(): Readonly<Record<string, unknown>>
   handleInput(): Readonly<Record<string, unknown>>
@@ -489,30 +512,40 @@ export const createWritingAidsController = (
     | MarkdownEditorWritingAidsOptions
     | (MarkdownEditorWritingAidsOptions & Readonly<Record<string, unknown>>),
 ): MarkdownEditorWritingAidsController => {
-  const resolved = resolveWritingAids(options)
+  let resolved = resolveWritingAids(options)
   let state: MarkdownEditorWritingAidsState = 'idle'
   let suspendReason: MarkdownEditorWritingAidsSuspendReason | undefined
-  const source = options as Readonly<Record<string, unknown>> | undefined
-  const projection = source?.projection as Readonly<Record<string, unknown>> | undefined
-  const candidateBlock =
-    (source?.currentBlock ?? projection?.currentBlock ?? projection?.block) as
+  let documentState: Readonly<Record<string, unknown>> =
+    (options as Readonly<Record<string, unknown>> | undefined) ??
+    Object.freeze({})
+  const readProjection = () =>
+    documentState.projection as Readonly<Record<string, unknown>> | undefined
+  const readCurrentBlock = () => {
+    const projection = readProjection()
+    return (documentState.currentBlock ??
+      projection?.currentBlock ??
+      projection?.block) as Readonly<Record<string, unknown>> | undefined
+  }
+  const readCaretAnchor = () => {
+    const projection = readProjection()
+    return (documentState.caretAnchor ??
+      projection?.caretAnchor ??
+      projection?.viewportAnchor) as
       | Readonly<Record<string, unknown>>
       | undefined
-  const candidateAnchor =
-    (source?.caretAnchor ?? projection?.caretAnchor ?? projection?.viewportAnchor) as
-      | Readonly<Record<string, unknown>>
-      | undefined
-  let currentBlock: Readonly<Record<string, unknown>> | null | undefined = candidateBlock
+  }
+  let currentBlock: Readonly<Record<string, unknown>> | null | undefined =
+    readCurrentBlock()
   let caretAnchor: Readonly<Record<string, unknown>> | null | undefined =
-    candidateAnchor ??
-    (typeof candidateBlock?.id === 'string'
-      ? Object.freeze({ blockId: candidateBlock.id })
+    readCaretAnchor() ??
+    (typeof currentBlock?.id === 'string'
+      ? Object.freeze({ blockId: currentBlock.id })
       : undefined)
-  const reducedMotion = source?.reducedMotion === true
+  const reducedMotion = () => documentState.reducedMotion === true
   const response = (scroll: boolean) =>
     Object.freeze({
       scroll,
-      smooth: scroll && !reducedMotion,
+      smooth: scroll && !reducedMotion(),
       state,
       suspendReason,
     })
@@ -534,20 +567,27 @@ export const createWritingAidsController = (
       return caretAnchor
     },
     get focusState() {
+      const projection = readProjection()
       return resolveFocusState({
         writingAids: resolved,
-        source: typeof source?.source === 'string' ? source.source : '',
+        source:
+          typeof documentState.source === 'string' ? documentState.source : '',
         projection: projection as MarkdownEditorFocusInput['projection'],
-        editorProfile: typeof source?.editorProfile === 'string' ? source.editorProfile : 'markdown',
-        readonly: source?.readonly === true,
-        disabled: source?.disabled === true,
+        selection:
+          documentState.selection as MarkdownEditorFocusInput['selection'],
+        editorProfile:
+          typeof documentState.editorProfile === 'string'
+            ? documentState.editorProfile
+            : 'markdown',
+        readonly: documentState.readonly === true,
+        disabled: documentState.disabled === true,
       })
     },
     calculateScroll(scrollInput) {
       return calculateTypewriterScrollTarget({
         ...scrollInput,
         anchor: resolved.typewriterAnchor,
-        reducedMotion,
+        reducedMotion: reducedMotion(),
       })
     },
     input() {
@@ -617,11 +657,35 @@ export const createWritingAidsController = (
     handleProjectionChange() {
       return response(false)
     },
-    updateDocument() {
-      state = 'idle'
-      suspendReason = undefined
-      currentBlock = null
-      caretAnchor = null
+    updateDocument(document = Object.freeze({})) {
+      const previousIdentity = documentState.documentIdentity
+      const previousEpoch = documentState.documentEpoch
+      documentState = Object.freeze({ ...documentState, ...document })
+      if (document.writingAids !== undefined) {
+        resolved = resolveWritingAids({
+          writingAids: document.writingAids,
+        } as MarkdownEditorWritingAidsOptions &
+          Readonly<Record<string, unknown>>)
+      }
+      const identityChanged =
+        (document.documentIdentity !== undefined &&
+          document.documentIdentity !== previousIdentity) ||
+        (document.documentEpoch !== undefined &&
+          document.documentEpoch !== previousEpoch)
+      if (identityChanged) {
+        state = 'idle'
+        suspendReason = undefined
+      }
+      currentBlock = readCurrentBlock() ?? null
+      caretAnchor =
+        readCaretAnchor() ??
+        (typeof currentBlock?.id === 'string'
+          ? Object.freeze({ blockId: currentBlock.id })
+          : null)
+      if (identityChanged && !document.projection && !document.currentBlock) {
+        currentBlock = null
+        caretAnchor = null
+      }
     },
   }
 
