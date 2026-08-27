@@ -76,6 +76,7 @@ describe('MarkdownEditor', () => {
 
   it('keeps secondary commands inside an expandable overflow menu', async () => {
     const wrapper = mount(MarkdownEditor, {
+      attachTo: document.body,
       props: {
         modelValue: 'initial',
       },
@@ -96,6 +97,17 @@ describe('MarkdownEditor', () => {
         .findAll('.el-markdown-editor__command'),
     ).toHaveLength(2)
 
+    const firstOverflowCommand = wrapper.find(
+      '.el-markdown-editor__command-tray .el-markdown-editor__command',
+    )
+    ;(firstOverflowCommand.element as HTMLButtonElement).focus()
+    await wrapper
+      .find('.el-markdown-editor__command-tray')
+      .trigger('keydown', { key: 'Escape' })
+    await nextTick()
+    expect(document.activeElement).toBe(more.element)
+
+    await more.trigger('click')
     await wrapper
       .find('.el-markdown-editor__command-tray .el-markdown-editor__command')
       .trigger('click')
@@ -105,6 +117,7 @@ describe('MarkdownEditor', () => {
     expect(wrapper.find('.el-markdown-editor__command-tray').exists()).toBe(
       false,
     )
+    wrapper.unmount()
   })
 
   it('lets consumers choose primary commands and compact mobile behavior', async () => {

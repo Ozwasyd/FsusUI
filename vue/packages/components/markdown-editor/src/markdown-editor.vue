@@ -52,6 +52,7 @@
         </button>
         <button
           v-if="overflowItemCount"
+          ref="commandOverflowRef"
           type="button"
           :class="[ns.e('command-more'), ns.is('expanded', commandsExpanded)]"
           :aria-expanded="commandsExpanded"
@@ -109,7 +110,7 @@
         v-if="overflowItemCount && commandsExpanded"
         :id="commandTrayId"
         :class="ns.e('command-tray')"
-        @keydown.esc.prevent.stop="commandsExpanded = false"
+        @keydown.esc.prevent.stop="closeCommandOverflow(true)"
       >
         <button
           v-for="command in overflowCommands"
@@ -661,6 +662,7 @@ const ns = useNamespace('markdown-editor')
 const modes: MarkdownEditorMode[] = ['source', 'live', 'split', 'preview']
 const commandTrayId = `${useId()}-command-tray`
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
+const commandOverflowRef = ref<HTMLButtonElement | null>(null)
 const commandPaletteInputRef = ref<HTMLInputElement | null>(null)
 const paletteListId = `${useId()}-command-palette-list`
 const slashMenuId = `${useId()}-slash-menu`
@@ -2334,6 +2336,11 @@ const runAction = (action: MarkdownEditorActionItem) => {
 const runOverflowAction = (action: MarkdownEditorActionItem) => {
   runAction(action)
   commandsExpanded.value = false
+}
+
+const closeCommandOverflow = (restoreFocus = false) => {
+  commandsExpanded.value = false
+  if (restoreFocus) void nextTick(() => commandOverflowRef.value?.focus())
 }
 
 const toggleCommands = () => {
