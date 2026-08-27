@@ -2,7 +2,10 @@ import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
 import { collectCssRules } from '../support/css-scan'
-import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
+import {
+  buildVisualUrl,
+  resolveVisualVariant,
+} from '../../../scripts/visual-variant.mjs'
 
 const diagnostics = new WeakMap<Page, string[]>()
 
@@ -230,9 +233,335 @@ test('CopyableDetail focus uses inset ring', async ({ page }, testInfo) => {
 test('metric variants render without visual break', async ({ page }, testInfo) => {
   await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
   await stabilizePage(page)
-  for (const v of ['metric-default','kpi-default','distribution-default','kv-default','status-default','diag-default','diag-danger','copy-default']) {
+  for (const v of ['metric-default','kpi-default','distribution-default','kv-default','status-default','diag-default','diag-danger','summary-success','summary-danger','diag-rtl','copy-default']) {
     await expect(page.locator(`[data-metric-variant="${  v  }"]`)).toBeVisible()
   }
   await page.evaluate(async () => { await document.fonts.ready })
   await page.screenshot({ path: testInfo.outputPath('metric-all-variants.png'), fullPage: true })
 })
+
+// Shared in-page collectors for the rendered surface gates below.
+type MetricSurfaceIssues = {
+  panelRows: string[]
+  lowTargets: string[]
+  fadedElements: string[]
+  colorOnlyToneRows: string[]
+}
+
+const collectMetricSurfaceIssues = async (
+  page: Page,
+  minTargetSide: number,
+): Promise<MetricSurfaceIssues> =>
+  page.evaluate((min) => {
+    const root = document.querySelector('[data-testid="metric-visual-fixtures"]')
+    if (!root) throw new Error('metric fixtures not rendered')
+    const px = (value: string) => Number.parseFloat(value) || 0
+    const visible = (node: Element) => {
+      const style = getComputedStyle(node)
+      const rect = node.getBoundingClientRect()
+      return (
+        style.display !== 'none' &&
+        style.visibility !== 'hidden' &&
+        Number(style.opacity) > 0 &&
+        rect.width > 1 &&
+        rect.height > 1
+      )
+    }
+    const describe = (node: Element, extra = '') =>
+      `${node.tagName.toLowerCase()}.${[...node.classList].join('.')}${extra}`
+
+    const panelRows: string[] = []
+    for (const row of root.querySelectorAll<HTMLElement>(
+      '.el-metric-item, .el-key-value-item, .el-diagnostics-item',
+    )) {
+      if (!visible(row)) continue
+      const style = getComputedStyle(row)
+      const sides = [
+        style.borderTopWidth,
+        style.borderRightWidth,
+        style.borderBottomWidth,
+        style.borderLeftWidth,
+      ].filter((width) => px(width) > 0)
+      const hasBackground =
+        style.backgroundColor !== 'rgba(0, 0, 0, 0)' &&
+        style.backgroundColor !== 'transparent'
+      const radius = px(style.borderRadius)
+      if (radius > 0 || hasBackground || sides.length === 4) {
+        panelRows.push(describe(row))
+      }
+    }
+
+    const lowTargets: string[] = []
+    const targetNodes = root.querySelectorAll<HTMLElement>(
+      '.el-copyable-detail__button, .el-status-summary__actions .el-button, .el-diagnostics-item__actions .el-button',
+    )
+    for (const target of targetNodes) {
+      if (!visible(target)) continue
+      const rect = target.getBoundingClientRect()
+      // Same fixed floor as the shared geometry contract: browser zoom may
+      // scale rendered pixels but never lowers the usable target size.
+      if (rect.width + 1 < min || rect.height + 1 < min) {
+        lowTargets.push(
+          `${describe(target)} ${Math.round(rect.width)}x${Math.round(rect.height)} < ${min}`,
+        )
+      }
+    }
+
+    const fadedElements: string[] = []
+    for (const node of root.querySelectorAll<HTMLElement>('*')) {
+      if (!visible(node)) continue
+      if (Number(getComputedStyle(node).opacity) !== 1) {
+        fadedElements.push(describe(node))
+      }
+    }
+
+    const colorOnlyToneRows: string[] = []
+    const toneRowSelector =
+      '.is-warning, .is-danger, .is-success, [class*="--success"], [class*="--warning"], [class*="--danger"]'
+    for (const row of root.querySelectorAll<HTMLElement>(toneRowSelector)) {
+      if (!visible(row)) continue
+      if (
+        !['ARTICLE', 'DIV'].includes(row.tagName) ||
+        row.classList.contains('el-tag') ||
+        row.classList.contains('el-button')
+      ) {
+        continue
+      }
+      const style = getComputedStyle(row)
+      const markerWidth = Math.max(
+        px(style.borderInlineStartWidth),
+        px(style.borderInlineEndWidth),
+      )
+      const structuralCue = markerWidth >= 3
+      let textualSignal = false
+      for (const candidate of [
+        row,
+        ...row.querySelectorAll<HTMLElement>(
+          'span, strong, p, code, button, a, dt, dd',
+        ),
+      ]) {
+        if (!visible(candidate)) continue
+        const ownText = [...candidate.childNodes]
+          .filter((child) => child.nodeType === Node.TEXT_NODE)
+          .map((child) => child.textContent?.trim() ?? '')
+          .join(' ')
+          .trim()
+        if (ownText) {
+          textualSignal = true
+          break
+        }
+      }
+      if (!structuralCue && !textualSignal) {
+        colorOnlyToneRows.push(describe(row))
+      }
+    }
+
+    return { panelRows, lowTargets, fadedElements, colorOnlyToneRows }
+  }, minTargetSide)
+
+const openMetricFixtures = async (page: Page, projectName: string) => {
+  await page.goto(buildVisualUrl('metric-visual', projectName), {
+    waitUntil: 'domcontentloaded',
+  })
+  await stabilizePage(page)
+}
+
+// Row flatness: internal item rows stay transparent, square, and divider-only.
+// Kills "per-item panel" and "diagnostic card" regressions at rendered level.
+test('item rows stay flat without per-item panels', async ({ page }, testInfo) => {
+  await openMetricFixtures(page, testInfo.project.name)
+  const issues = await collectMetricSurfaceIssues(page, 40)
+  expect(issues.panelRows).toEqual([])
+})
+
+// Tone semantics: narrow inline-start markers only (no large tinted border),
+// plus a non-color signal (visible status text) on every toned row.
+test('tone markers stay narrow and toned rows keep textual signals', async ({ page }, testInfo) => {
+  await openMetricFixtures(page, testInfo.project.name)
+  const issues = await collectMetricSurfaceIssues(page, 40)
+  expect(issues.colorOnlyToneRows).toEqual([])
+
+  const ltrItem = page.locator(
+    '[data-metric-variant="diag-default"] .el-diagnostics-item.is-warning',
+  )
+  const markerSides = await ltrItem.evaluate((node) => {
+    const style = getComputedStyle(node)
+    return {
+      top: Number.parseFloat(style.borderTopWidth),
+      inlineStart: Number.parseFloat(style.borderInlineStartWidth),
+      inlineEnd: Number.parseFloat(style.borderInlineEndWidth),
+      bottom: Number.parseFloat(style.borderBottomWidth),
+    }
+  })
+  expect(markerSides.top).toBe(0)
+  expect(markerSides.inlineStart).toBe(3)
+  expect(markerSides.inlineEnd).toBe(0)
+  expect(markerSides.bottom).toBe(0)
+  const successSummary = page.locator(
+    '[data-metric-variant="summary-success"] .el-status-summary',
+  )
+  // The aggregate keeps its single neutral panel; only the left edge carries
+  // the tone marker.
+  const summaryBorders = await successSummary.evaluate((node) => {
+    const style = getComputedStyle(node)
+    return {
+      neutral: Number.parseFloat(style.borderTopWidth),
+      inlineStart: Number.parseFloat(style.borderInlineStartWidth),
+      inlineEnd: Number.parseFloat(style.borderInlineEndWidth),
+      bottom: Number.parseFloat(style.borderBottomWidth),
+    }
+  })
+  // One neutral 1px panel outline; only the inline-start edge widens to the
+  // 3px tone marker (ratio-based so device-pixel rounding stays irrelevant).
+  expect(summaryBorders.neutral).toBeGreaterThan(0)
+  expect(summaryBorders.inlineStart / summaryBorders.neutral).toBeCloseTo(3, 5)
+  expect(summaryBorders.inlineEnd).toBeCloseTo(summaryBorders.neutral, 5)
+  expect(summaryBorders.bottom).toBeCloseTo(summaryBorders.neutral, 5)
+})
+
+// Hit-area contract: desktop >= 40px, mobile >= 44px, stable under zoom.
+test('inline actions meet DOMRect hit targets across zoom', async ({ page }, testInfo) => {
+  const { compact } = resolveVisualVariant(testInfo.project.name)
+  const minSide = compact ? 44 : 40
+  await openMetricFixtures(page, testInfo.project.name)
+
+  const measureTargets = () =>
+    page.evaluate((min) => {
+      const nodes = document.querySelectorAll<HTMLElement>(
+        '.el-copyable-detail__button, .el-status-summary__actions .el-button, .el-diagnostics-item__actions .el-button',
+      )
+      return [...nodes]
+        .filter(
+          (node) =>
+            getComputedStyle(node).display !== 'none' &&
+            node.getBoundingClientRect().width > 0,
+        )
+        .map((node) => {
+          const rect = node.getBoundingClientRect()
+          return {
+            label: node.getAttribute('aria-label') ?? node.textContent?.trim() ?? '',
+            width: Math.round(rect.width * 10) / 10,
+            height: Math.round(rect.height * 10) / 10,
+          }
+        })
+        .filter((box) => box.width + 1 < min || box.height + 1 < min)
+    }, minSide)
+
+  expect(await page.locator('.el-copyable-detail__button').count()).toBeGreaterThanOrEqual(2)
+  expect(await measureTargets()).toEqual([])
+
+  // Browser-zoom surrogate: apply zoom to the document, then re-run the same
+  // fixed-floor assertion at 150%.
+  await page.evaluate(() => {
+    document.documentElement.style.zoom = '1.5'
+  })
+  await page.evaluate(async () => {
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+    })
+  })
+  const zoomedFailures = await measureTargets()
+  await page.evaluate(() => {
+    document.documentElement.style.zoom = ''
+  })
+  expect(zoomedFailures).toEqual([])
+})
+
+// RTL: the inline-start marker flips to the physical right edge and the long
+// monospace detail stays wrapped inside the row.
+test('RTL diagnostics keep narrow markers and contained detail', async ({ page }, testInfo) => {
+  await openMetricFixtures(page, testInfo.project.name)
+
+  const rtlBlock = page.locator('[data-metric-variant="diag-rtl"] > div')
+  await expect(rtlBlock).toHaveAttribute('dir', 'rtl')
+
+  const itemState = await rtlBlock.locator('.el-diagnostics-item.is-warning').evaluate((node) => {
+    const style = getComputedStyle(node)
+    return {
+      leftWidth: style.borderLeftWidth,
+      rightWidth: style.borderRightWidth,
+      paddingInlineStart: style.paddingInlineStart,
+      scrollWidth: node.scrollWidth,
+      clientWidth: node.clientWidth,
+    }
+  })
+  expect(itemState.leftWidth).toBe('0px')
+  expect(itemState.rightWidth).toBe('3px')
+  expect(itemState.scrollWidth).toBeLessThanOrEqual(itemState.clientWidth + 1)
+
+  const rtlRow = page.locator('[data-metric-variant="diag-rtl"] .el-diagnostics-list')
+  await page.evaluate(async () => { await document.fonts.ready })
+  await testInfo.attach(`metric-diag-rtl-${testInfo.project.name}`, {
+    body: await rtlRow.screenshot({ animations: 'disabled' }),
+    contentType: 'image/png',
+  })
+})
+
+// Mutation probes: each documented regression from issue #467 must be caught
+// by one of the rendered gates above.
+test('surface gates kill documented regressions', async ({ page }, testInfo) => {
+  await openMetricFixtures(page, testInfo.project.name)
+
+  const findings: { id: string; expected: keyof MetricSurfaceIssues; issues: string[] }[] = []
+  const mutations = [
+    {
+      id: 'diagnostic-card',
+      expected: 'panelRows' as const,
+      css: '.el-diagnostics-item{padding:12px;border:1px solid var(--el-border-color-lighter);border-radius:12px;background:var(--el-bg-color);}',
+    },
+    {
+      id: 'per-item-panel',
+      expected: 'panelRows' as const,
+      css: '.el-metric-item{border:1px solid var(--el-border-color-lighter);border-radius:12px;background:var(--el-bg-color);}',
+    },
+    {
+      id: 'thirty-px-target',
+      expected: 'lowTargets' as const,
+      css: '.el-copyable-detail__button{min-height:30px !important;height:30px !important;}',
+    },
+    {
+      id: 'color-only-status',
+      expected: 'colorOnlyToneRows' as const,
+      css: `
+        .el-diagnostics-item.is-warning > *, .el-key-value-item--success > *, .el-status-summary--success > * { visibility: hidden !important; }
+        .el-diagnostics-item.is-warning, .el-status-summary--success { border-inline-start-width: 0 !important; }
+        [class*="--danger"] { border-inline-start-width: 0 !important; }
+      `,
+    },
+    {
+      id: 'ancestor-opacity',
+      expected: 'fadedElements' as const,
+      css: '.el-metric-item, .el-diagnostics-item { opacity: 0.55; }',
+    },
+  ]
+
+  for (const mutation of mutations) {
+    const handle = await page.addStyleTag({ content: mutation.css })
+    try {
+      const issues = await collectMetricSurfaceIssues(page, 40)
+      findings.push({
+        id: mutation.id,
+        expected: mutation.expected,
+        issues: issues[mutation.expected],
+      })
+      // A live regression of this category must never pass silently.
+      expect(issues[mutation.expected].length, `${mutation.id} went undetected`).toBeGreaterThan(0)
+    } finally {
+      await handle.evaluate((style) => style.remove())
+    }
+  }
+
+  // Restored state must be clean again across every gate.
+  const restored = await collectMetricSurfaceIssues(page, 40)
+  expect(restored.panelRows).toEqual([])
+  expect(restored.lowTargets).toEqual([])
+  expect(restored.fadedElements).toEqual([])
+  expect(restored.colorOnlyToneRows).toEqual([])
+
+  await testInfo.attach('mutation-probe-findings', {
+    body: Buffer.from(`${JSON.stringify(findings, null, 2)}\n`),
+    contentType: 'application/json',
+  })
+})
+
+

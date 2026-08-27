@@ -106,6 +106,26 @@
           <template #detail>Production checks completed successfully.</template>
         </ElStatusSummary>
       </div>
+      <div class="metric-fixture-row" data-metric-variant="summary-success">
+        <ElStatusSummary
+          label="Deployment sync"
+          status="Healthy"
+          updated-at="2026-06-14 20:30"
+          tone="success"
+        >
+          <template #actions>
+            <el-button text size="small">Inspect</el-button>
+          </template>
+        </ElStatusSummary>
+      </div>
+      <div class="metric-fixture-row" data-metric-variant="summary-danger">
+        <ElStatusSummary
+          label="Quota watchdog"
+          status="Over limit"
+          updated-at="2026-06-15 02:12"
+          tone="danger"
+        />
+      </div>
     </div>
 
     <!-- DiagnosticsList -->
@@ -124,6 +144,32 @@
             <template #detail>98% full — immediate action required</template>
           </ElDiagnosticsItem>
         </ElDiagnosticsList>
+      </div>
+    </div>
+
+    <!-- RTL diagnostics with long detail and an inline action -->
+    <div class="demo-block" data-metric-fixture="diagnostics-rtl">
+      <h3>DiagnosticsList (RTL)</h3>
+      <div class="metric-fixture-row" data-metric-variant="diag-rtl">
+        <div dir="rtl">
+          <ElDiagnosticsList>
+            <ElDiagnosticsItem
+              title="diagnostic.event"
+              message="Recent event summary supplied by the product."
+              meta="warning - 17:48:11 - 3 times"
+              detail="diagnostic-node:runCheck:sample-0001 diagnostic-node:runCheck:sample-0002 diagnostic-node:runCheck:sample-0003 diagnostic-node:runCheck:sample-0004 diagnostic-node:runCheck:sample-0005 diagnostic-node:runCheck:sample-0006"
+              tone="warning"
+            >
+              <template #actions>
+                <ElCopyableDetail
+                  value="diagnostic-node:runCheck:sample-0001"
+                  label="Copy detail"
+                  inline
+                />
+              </template>
+            </ElDiagnosticsItem>
+          </ElDiagnosticsList>
+        </div>
       </div>
     </div>
 
