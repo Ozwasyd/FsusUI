@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest"
 import {
   defaultMarkdownEditorCommands,
   defaultMarkdownEditorLocaleText,
+  evaluateMarkdownEditorLocaleMutations,
   filterMarkdownEditorCommands,
   isMarkdownEditorCommandEnabled,
   isMarkdownEditorCommandVisible,
@@ -323,6 +324,18 @@ describe("Issue #433: Locale authority, command/mode/capability, and zero write 
     })
     expect(longLocale.overflow).toHaveLength(120)
     expect(longLocale.commandPalette.searchPlaceholder).toHaveLength(160)
+  })
+
+  it("kills locale authority mutations with behavior-derived differences", () => {
+    const report = evaluateMarkdownEditorLocaleMutations()
+    expect(report.mutations.map(({ kind }) => kind)).toEqual([
+      "hardcoded-copy",
+      "error-string-matching",
+      "cross-language-fallback",
+      "duplicate-labels",
+    ])
+    expect(report.mutations.every(({ equivalent }) => !equivalent)).toBe(true)
+    expect(report.mutations.every(({ accepted }) => !accepted)).toBe(true)
   })
 })
 

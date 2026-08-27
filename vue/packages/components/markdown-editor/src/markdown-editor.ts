@@ -738,13 +738,26 @@ export const resolveMarkdownEditorCapabilityText = (
 
 export const evaluateMarkdownEditorLocaleMutations = () => {
   const override = resolveMarkdownEditorLocaleText({
+    commands: { bold: 'BOLD-L10N' },
     modes: { source: 'SOURCE-L10N' },
+    results: {
+      aborted: 'ABORTED-L10N',
+      rejected: 'REJECTED-L10N',
+    },
     surfaces: { slashMenu: 'SLASH-L10N' },
   })
   const command = defaultMarkdownEditorCommands[0]!
   const commandCopy = resolveMarkdownEditorCommandCopy(command, override)
   const stableRejected = override.results.rejected
-  const changedErrorTextStillStable = override.results.rejected
+  const errorStringMutation = /cancel/iu.test(
+    'provider cancelled after returning an error',
+  )
+    ? override.results.aborted
+    : override.results.rejected
+  const duplicateLabelsMutation = Object.freeze({
+    label: commandCopy.label,
+    name: command.label,
+  })
 
   return Object.freeze({
     authority: defaultMarkdownEditorLocaleText,
@@ -760,7 +773,7 @@ export const evaluateMarkdownEditorLocaleMutations = () => {
       }),
       Object.freeze({
         kind: 'error-string-matching' as const,
-        equivalent: stableRejected !== changedErrorTextStillStable,
+        equivalent: errorStringMutation === stableRejected,
         accepted: false,
       }),
       Object.freeze({
@@ -773,8 +786,7 @@ export const evaluateMarkdownEditorLocaleMutations = () => {
       Object.freeze({
         kind: 'duplicate-labels' as const,
         equivalent:
-          commandCopy.name !==
-          resolveMarkdownEditorCommandCopy(command, override).name,
+          duplicateLabelsMutation.label === duplicateLabelsMutation.name,
         accepted: false,
       }),
     ]),
