@@ -216,6 +216,17 @@ sanitization remain owned by
 [Markdown editor input](../api/markdown-editor-input.md) and the existing HTML
 import boundary.
 
+When the shared projection identifies the current selection as an image, the
+editor exposes one compact property surface for alternative text, destination,
+title, and the adjacent `::caption[...]` text. Apply, source reveal, safe open,
+exact/visible copy, attachment replace, caption removal, and atomic figure
+removal are visible keyboard and touch actions with a minimum 44px target. Each
+edit uses the projection-owned raw subrange and the transaction dispatcher;
+unsafe destinations are rejected by the Markdown URL authority. The surface
+does not inspect rendered `<img>` attributes, regroup DOM, synthesize alt from
+title/caption, or provide a parser fallback when the projection has no image
+node.
+
 ## History and grouping
 
 History entry 保存 forward changes 与 inverse changes，不保存每键整文 snapshot。

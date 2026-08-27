@@ -6,6 +6,7 @@ import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import MarkdownEditor from '../src/markdown-editor.vue'
 import {
   defaultMarkdownEditorCommands,
+  markdownEditorEmits,
   markdownLiveCapabilities,
   resolveMarkdownLiveCapability,
   runMarkdownEditorCommand,
@@ -26,6 +27,10 @@ describe('MarkdownEditor', () => {
   it('does not expose the removed raw HTML preview prop', () => {
     const removedCapability = `allow${'Html'}` as const
     expectTypeOf<MarkdownEditorProps>().not.toHaveProperty(removedCapability)
+  })
+
+  it('requires an attachment batch for every upload-image emission', () => {
+    expect(markdownEditorEmits['upload-image'].length).toBe(1)
   })
 
   it('runs built-in selection commands through the public context contract', async () => {
@@ -380,6 +385,55 @@ describe('MarkdownEditor', () => {
     expect(wrapper.find('.el-markdown-editor__attachment-status').text()).toBe(
       'report.pdf upload complete',
     )
+  })
+
+  it('edits active image and caption subranges through the compact property surface', async () => {
+    const source =
+      '![初始 alt](/old.png "old title")\n::caption[说明 😀 RTL אב]'
+    const wrapper = mount(MarkdownEditor, {
+      props: { modelValue: 'seed' },
+    })
+    await wrapper.setProps({ modelValue: source })
+    await nextTick()
+    const textarea = wrapper.find('textarea')
+    ;(textarea.element as HTMLTextAreaElement).setSelectionRange(5, 5)
+    await textarea.trigger('select')
+    await nextTick()
+
+    const properties = wrapper.find('.el-markdown-editor__media-properties')
+    expect(properties.exists()).toBe(true)
+    const field = (label: string) => {
+      const owner = properties
+        .findAll('label')
+        .find((candidate) => candidate.text().startsWith(label))
+      if (!owner) throw new Error(`missing ${label} image property`)
+      return owner.find('input')
+    }
+
+    await field('Destination').setValue('javascript:alert(1)')
+    await properties.find('button[type="submit"]').trigger('submit')
+    expect(properties.find('[role="alert"]').text()).toContain('blocked-scheme')
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+
+    await field('Alternative text').setValue('可访问 alt 😀')
+    await field('Destination').setValue('/safe/new.png')
+    await field('Title').setValue('updated title')
+    await field('Caption').setValue('更新说明 😀 RTL אב')
+    await properties.find('button[type="submit"]').trigger('submit')
+    await nextTick()
+    const edited =
+      '![可访问 alt 😀](/safe/new.png "updated title")\n::caption[更新说明 😀 RTL אב]'
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe(edited)
+
+    const removeImage = properties
+      .findAll('button')
+      .find((button) => button.text() === 'Remove image')
+    if (!removeImage) throw new Error('missing remove image action')
+    await removeImage.trigger('click')
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe('')
+    wrapper.vm.undo()
+    await nextTick()
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe(edited)
   })
 
   it('supports controlled mode, action visibility, disabled state, and cursor insertion', async () => {

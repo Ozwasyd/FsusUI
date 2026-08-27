@@ -11,6 +11,7 @@ import type {
   MarkdownEditorChange,
   MarkdownEditorTransaction,
 } from './markdown-editor-transaction'
+import { createMarkdownEditorPositionMap } from './markdown-editor-transaction'
 
 export type MarkdownAttachmentPhase =
   | 'idle'
@@ -131,43 +132,16 @@ export const rebaseMarkdownAttachmentJob = (
   changes: readonly MarkdownEditorChange[],
 ): MarkdownAttachmentJob => {
   if (!job.range) return job
-  let { start, end } = job.range
-
-  for (const change of changes) {
-    const changeLen = change.to - change.from
-    const insertLen = change.insert.length
-    const diff = insertLen - changeLen
-
-    if (change.from <= start && change.to >= end) {
-      job.phase = 'deleted'
-      job.range = Object.freeze({ start: change.from, end: change.from })
-      return job
-    }
-
-    if (change.to <= start) {
-      start += diff
-      end += diff
-    } else if (change.from >= end) {
-      // after the range, no position shift for this job
-    } else {
-      // Partial overlap: if the range is wiped or corrupted, mark deleted
-      if (
-        change.insert.length === 0 &&
-        change.from <= start &&
-        change.to >= start
-      ) {
-        start = change.from
-        end = Math.max(change.from, end + diff)
-      } else {
-        end += diff
-      }
-    }
-  }
-
-  if (start >= end) {
+  const rebased = createMarkdownEditorPositionMap(changes).rebase(job.range)
+  if (!rebased || rebased.start >= rebased.end) {
     job.phase = 'deleted'
+    job.range = Object.freeze({
+      start: rebased?.start ?? job.range.start,
+      end: rebased?.end ?? job.range.start,
+    })
+    return job
   }
-  job.range = Object.freeze({ start, end })
+  job.range = Object.freeze(rebased)
   return job
 }
 

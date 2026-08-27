@@ -232,6 +232,86 @@
         </li>
       </ul>
 
+      <form
+        v-if="activeImage"
+        :class="ns.e('media-properties')"
+        aria-label="Image properties"
+        @submit.prevent="applyImageProperties"
+      >
+        <label>
+          <span>Alternative text</span>
+          <input v-model="imageAltDraft" :disabled="editingBlocked" />
+        </label>
+        <label>
+          <span>Destination</span>
+          <input
+            v-model="imageDestinationDraft"
+            :aria-invalid="imagePropertyError ? 'true' : undefined"
+            :disabled="editingBlocked"
+          />
+        </label>
+        <label>
+          <span>Title</span>
+          <input v-model="imageTitleDraft" :disabled="editingBlocked" />
+        </label>
+        <label>
+          <span>Caption</span>
+          <input v-model="imageCaptionDraft" :disabled="editingBlocked" />
+        </label>
+        <p v-if="imagePropertyError" role="alert">
+          {{ imagePropertyError }}
+        </p>
+        <div :class="ns.e('media-actions')">
+          <button type="submit" :disabled="editingBlocked">Apply</button>
+          <button
+            type="button"
+            :disabled="editingBlocked"
+            @click="revealActiveImageSource"
+          >
+            Source
+          </button>
+          <button
+            type="button"
+            :disabled="!activeImageOpenAllowed"
+            @click="openActiveImage"
+          >
+            Open
+          </button>
+          <button type="button" @click="copyActiveFigure('exact')">
+            Copy source
+          </button>
+          <button
+            v-if="activeImage.figure"
+            type="button"
+            @click="copyActiveFigure('visible')"
+          >
+            Copy visible
+          </button>
+          <button
+            type="button"
+            :disabled="editingBlocked"
+            @click="openActiveImageReplacement"
+          >
+            Replace
+          </button>
+          <button
+            v-if="activeImage.figure"
+            type="button"
+            :disabled="editingBlocked"
+            @click="removeActiveCaption"
+          >
+            Remove caption
+          </button>
+          <button
+            type="button"
+            :disabled="editingBlocked"
+            @click="removeActiveImage"
+          >
+            Remove image
+          </button>
+        </div>
+      </form>
+
       <div
         v-if="liveDecorations.length"
         :class="ns.e('live-decorations')"
@@ -423,6 +503,23 @@ import {
   retryMarkdownAttachmentJob,
   type MarkdownAttachmentJob,
 } from './markdown-editor-attachment-lifecycle'
+import {
+  decomposeMarkdownImageNode,
+  planMarkdownImageAltEdit,
+  planMarkdownImageDestinationEdit,
+  planMarkdownImageRemove,
+  planMarkdownImageTitleEdit,
+  validateMarkdownPropertyUrl,
+} from './markdown-editor-link-image'
+import {
+  findMarkdownFigures,
+  formatMarkdownFigureExactCopy,
+  formatMarkdownFigureVisibleCopy,
+  planMarkdownCaptionEdit,
+  planMarkdownCaptionInsert,
+  planMarkdownCaptionRemove,
+  planMarkdownFigureDelete,
+} from './markdown-editor-caption'
 import { resolveMarkdownEditorChromeRegions } from './markdown-editor-chrome'
 import {
   deriveMarkdownEditorChange,
@@ -494,6 +591,7 @@ import {
 
 import type { MarkdownHtmlImportSnapshot } from '../../../wasm/markdown-html-import'
 import { createMarkdownAnchorMap } from '../../../wasm/markdown-anchor-map'
+import { createMarkdownEditorProjection } from '../../../wasm/markdown-editor-projection'
 
 defineOptions({
   name: 'ElMarkdownEditor',
@@ -507,6 +605,11 @@ const modes: MarkdownEditorMode[] = ['source', 'live', 'split', 'preview']
 const commandTrayId = `${useId()}-command-tray`
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const attachmentInputRef = ref<HTMLInputElement | null>(null)
+const attachmentReplaceRange = ref<{
+  readonly nodeId: string
+  readonly start: number
+  readonly end: number
+} | null>(null)
 const pasteAsMarkdownDialogRef = ref<HTMLElement | null>(null)
 const pasteAsMarkdownPrimaryActionRef = ref<HTMLButtonElement | null>(null)
 const pasteAsMarkdownSession = ref<MarkdownPasteAsMarkdownSession | null>(null)
@@ -576,6 +679,85 @@ const attachmentPresentations = computed(() =>
         progress: job.progress,
       })
     }),
+)
+const selectionTick = ref(0)
+const activeImage = computed(() => {
+  void selectionTick.value
+  if (currentMode.value === 'preview') return null
+  const selection = transactionStore.selection
+  const projection = createMarkdownEditorProjection(editorValue.value)
+  const imageNode = projection.nodes
+    .filter(
+      (node) =>
+        node.kind === 'image' &&
+        selection.start >= node.rawRange.start &&
+        selection.end <= node.rawRange.end,
+    )
+    .sort(
+      (left, right) =>
+        left.rawRange.end -
+        left.rawRange.start -
+        (right.rawRange.end - right.rawRange.start),
+    )[0]
+  if (!imageNode) return null
+  const image = decomposeMarkdownImageNode(
+    editorValue.value,
+    imageNode.rawRange,
+  )
+  if (!image) return null
+  const figure =
+    findMarkdownFigures(editorValue.value).find(
+      (candidate) =>
+        candidate.mediaRange.start === imageNode.rawRange.start &&
+        candidate.mediaRange.end === imageNode.rawRange.end,
+    ) ?? null
+  return Object.freeze({
+    figure,
+    image,
+    nodeId: `image:${imageNode.rawRange.start}:${imageNode.rawRange.end}`,
+    range: imageNode.rawRange,
+  })
+})
+const imageAltDraft = ref('')
+const imageDestinationDraft = ref('')
+const imageTitleDraft = ref('')
+const imageCaptionDraft = ref('')
+const imagePropertyError = ref('')
+watch(
+  () => {
+    const active = activeImage.value
+    if (!active) return null
+    return [
+      active.nodeId,
+      active.image.alt.value,
+      active.image.destination.value,
+      active.image.title?.value ?? '',
+      active.figure?.text ?? '',
+    ].join('\u0000')
+  },
+  () => {
+    const active = activeImage.value
+    imageAltDraft.value = active?.image.alt.value ?? ''
+    imageDestinationDraft.value = active?.image.destination.value ?? ''
+    imageTitleDraft.value = active?.image.title?.value ?? ''
+    imageCaptionDraft.value = active?.figure?.text ?? ''
+    imagePropertyError.value = ''
+  },
+  { immediate: true },
+)
+const activeImageUrlValidation = computed(() => {
+  const active = activeImage.value
+  if (!active) return null
+  return validateMarkdownPropertyUrl(active.image.destination.value, {
+    documentEpoch: documentIdentity.epoch,
+    nodeId: active.nodeId,
+    revision: transactionStore.revision,
+    value: active.image.destination.value,
+    version: 1,
+  })
+})
+const activeImageOpenAllowed = computed(
+  () => activeImageUrlValidation.value?.open.allowed === true,
 )
 const liveSurface = computed(() =>
   createMarkdownLiveSurface({
@@ -997,6 +1179,7 @@ const captureSelection = (breakMerge = true) => {
       }),
     )
   }
+  selectionTick.value += 1
   return selection
 }
 
@@ -1005,12 +1188,13 @@ const captureAttachmentFiles = (
   files: readonly File[],
   selection: MarkdownEditorSelection,
   eventFingerprint?: string,
+  nodeId: string | null = null,
 ) => {
   const captured = captureMarkdownAttachmentInput({
     sourceKind,
     documentIdentity,
     revision: transactionStore.revision,
-    anchor: { range: selection, nodeId: null },
+    anchor: { range: selection, nodeId },
     files: files.map((file) => ({
       name: file.name,
       mimeType: file.type,
@@ -1943,13 +2127,22 @@ const handleAttachmentPickerChange = (event: Event) => {
   if (!(input instanceof HTMLInputElement)) return
   const files = Array.from(input.files ?? [])
   if (files.length > 0) {
+    const replacement = attachmentReplaceRange.value
     captureAttachmentFiles(
       'pick',
       files,
-      captureSelection(),
+      replacement
+        ? {
+            direction: 'none',
+            end: replacement.end,
+            start: replacement.start,
+          }
+        : captureSelection(),
       `pick:${event.timeStamp}:${files.map((file) => `${file.name}:${file.size}:${file.lastModified}`).join('|')}`,
+      replacement?.nodeId ?? null,
     )
   }
+  attachmentReplaceRange.value = null
   input.value = ''
 }
 
@@ -2228,18 +2421,172 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 }
 
-const dispatchTransaction = (transaction: MarkdownEditorTransaction) =>
-  dispatchEditorOperation({
+const dispatchTransaction = (transaction: MarkdownEditorTransaction) => {
+  const result = dispatchEditorOperation({
     kind: 'transaction',
     transaction,
   })
+  selectionTick.value += 1
+  return result
+}
+
+const applyImageProperties = () => {
+  const active = activeImage.value
+  if (!active || editingBlocked.value || isComposing.value) return
+  const source = transactionStore.value
+  const destinationValidation = validateMarkdownPropertyUrl(
+    imageDestinationDraft.value,
+    {
+      documentEpoch: documentIdentity.epoch,
+      nodeId: active.nodeId,
+      revision: transactionStore.revision,
+      value: imageDestinationDraft.value,
+      version: 1,
+    },
+  )
+  if (!destinationValidation.open.allowed) {
+    imagePropertyError.value = `Destination rejected: ${destinationValidation.state}`
+    return
+  }
+
+  const transactions: MarkdownEditorTransaction[] = []
+  if (imageAltDraft.value !== active.image.alt.value) {
+    transactions.push(
+      planMarkdownImageAltEdit(source, active.range, imageAltDraft.value),
+    )
+  }
+  if (imageDestinationDraft.value !== active.image.destination.value) {
+    transactions.push(
+      planMarkdownImageDestinationEdit(
+        source,
+        active.range,
+        imageDestinationDraft.value,
+      ),
+    )
+  }
+  if (imageTitleDraft.value !== (active.image.title?.value ?? '')) {
+    transactions.push(
+      planMarkdownImageTitleEdit(
+        source,
+        active.range,
+        imageTitleDraft.value || null,
+      ),
+    )
+  }
+  if (active.figure) {
+    if (imageCaptionDraft.value !== active.figure.text) {
+      transactions.push(
+        imageCaptionDraft.value
+          ? planMarkdownCaptionEdit(
+              source,
+              active.figure.captionNode,
+              imageCaptionDraft.value,
+            )
+          : planMarkdownCaptionRemove(source, active.figure.captionNode),
+      )
+    }
+  } else if (imageCaptionDraft.value) {
+    transactions.push(
+      planMarkdownCaptionInsert(source, active.range, imageCaptionDraft.value),
+    )
+  }
+
+  const changes = transactions
+    .flatMap((transaction) => transaction.changes)
+    .filter((change) => source.slice(change.from, change.to) !== change.insert)
+    .sort((left, right) => left.from - right.from || left.to - right.to)
+  if (!changes.length) {
+    imagePropertyError.value = ''
+    return
+  }
+  const result = dispatchTransaction({
+    changes: Object.freeze(changes),
+    history: 'separate',
+    origin: 'command',
+  })
+  imagePropertyError.value = result.accepted
+    ? ''
+    : `Image properties rejected: ${result.reason ?? 'invalid-change'}`
+}
+
+const revealActiveImageSource = () => {
+  const active = activeImage.value
+  if (!active) return
+  const range = active.figure?.captionRange ?? active.range
+  setMode('source')
+  transactionStore.setSelection(
+    { direction: 'none', end: range.end, start: range.start },
+    false,
+  )
+  selectionTick.value += 1
+  void restoreTextareaSelection(transactionStore.selection)
+}
+
+const openActiveImage = () => {
+  const validated = activeImageUrlValidation.value
+  if (!validated?.open.allowed || typeof window === 'undefined') return
+  window.open(
+    validated.open.href,
+    validated.open.target,
+    validated.open.rel ? 'noopener,noreferrer' : undefined,
+  )
+}
+
+const copyActiveFigure = async (mode: 'exact' | 'visible') => {
+  const active = activeImage.value
+  if (!active || typeof navigator === 'undefined') return
+  const source = transactionStore.value
+  const payload =
+    active.figure && mode === 'visible'
+      ? formatMarkdownFigureVisibleCopy(source, active.figure)
+      : active.figure
+        ? formatMarkdownFigureExactCopy(source, active.figure)
+        : source.slice(active.range.start, active.range.end)
+  await navigator.clipboard?.writeText(payload)
+}
+
+const openActiveImageReplacement = () => {
+  const active = activeImage.value
+  if (!active || editingBlocked.value || isComposing.value) return
+  attachmentReplaceRange.value = Object.freeze({
+    end: active.range.end,
+    nodeId: active.nodeId,
+    start: active.range.start,
+  })
+  attachmentInputRef.value?.click()
+}
+
+const removeActiveCaption = () => {
+  const active = activeImage.value
+  if (!active?.figure || editingBlocked.value || isComposing.value) return
+  dispatchTransaction(
+    planMarkdownCaptionRemove(
+      transactionStore.value,
+      active.figure.captionNode,
+    ),
+  )
+}
+
+const removeActiveImage = () => {
+  const active = activeImage.value
+  if (!active || editingBlocked.value || isComposing.value) return
+  dispatchTransaction(
+    active.figure
+      ? planMarkdownFigureDelete(transactionStore.value, active.figure)
+      : planMarkdownImageRemove(transactionStore.value, active.range),
+  )
+}
 
 function undo() {
-  return dispatchEditorOperation({ kind: 'undo' })
+  const result = dispatchEditorOperation({ kind: 'undo' })
+  selectionTick.value += 1
+  return result
 }
 
 function redo() {
-  return dispatchEditorOperation({ kind: 'redo' })
+  const result = dispatchEditorOperation({ kind: 'redo' })
+  selectionTick.value += 1
+  return result
 }
 
 const insertMarkdownAtCursor = (

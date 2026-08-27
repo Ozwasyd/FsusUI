@@ -1067,7 +1067,7 @@ export const markdownEditorEmits = {
     mode === 'preview',
   save: (value: string) => typeof value === 'string',
   submit: (value: string) => typeof value === 'string',
-  'upload-image': (_batch?: MarkdownAttachmentBatchIntent) => true,
+  'upload-image': (_batch: MarkdownAttachmentBatchIntent) => true,
   'render-complete': (..._args: unknown[]) => true,
   'render-error': (..._args: unknown[]) => true,
   'features-activated': (..._args: unknown[]) => true,

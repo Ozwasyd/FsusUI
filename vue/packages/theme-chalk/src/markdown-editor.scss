@@ -108,9 +108,87 @@
     }
   }
 
+  @include e(media-properties) {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--fsus-space-2, 8px);
+    padding: var(--fsus-space-2, 8px);
+    border-top: 1px solid getCssVar('border-color-lighter');
+    background: getCssVar('fill-color', 'blank');
+
+    label {
+      display: grid;
+      gap: var(--fsus-space-1, 4px);
+      min-width: 0;
+      color: getCssVar('text-color', 'regular');
+      font-size: 12px;
+    }
+
+    input {
+      min-width: 0;
+      min-height: 44px;
+      padding-inline: var(--fsus-space-2, 8px);
+      border: 1px solid getCssVar('border-color');
+      border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
+      background: getCssVar('fill-color', 'blank');
+      color: getCssVar('text-color', 'primary');
+      font: inherit;
+
+      &:focus-visible {
+        @include a11y-focus-ring(
+          2px,
+          var(--fsus-radius-control, var(--el-border-radius-base))
+        );
+      }
+    }
+
+    [role='alert'] {
+      grid-column: 1 / -1;
+      margin: 0;
+      color: getCssVar('color-danger');
+      font-size: 12px;
+    }
+  }
+
+  @include e(media-actions) {
+    display: flex;
+    grid-column: 1 / -1;
+    flex-wrap: wrap;
+    gap: var(--fsus-space-1, 4px);
+
+    button {
+      min-width: 44px;
+      min-height: 44px;
+      padding-inline: var(--fsus-space-2, 8px);
+      border: 1px solid getCssVar('border-color');
+      border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
+      background: getCssVar('fill-color', 'blank');
+      color: getCssVar('text-color', 'regular');
+      font: inherit;
+
+      &:focus-visible {
+        @include a11y-focus-ring(
+          2px,
+          var(--fsus-radius-control, var(--el-border-radius-base))
+        );
+      }
+    }
+  }
+
   @include e((command, command-more)) {
     min-inline-size: 2rem;
     white-space: nowrap;
+  }
+
+  @media (max-width: 767px) {
+    @include e(media-properties) {
+      grid-template-columns: 1fr;
+      max-block-size: min(
+        70vh,
+        var(--el-markdown-editor-visual-viewport-height, 70vh)
+      );
+      overflow-y: auto;
+    }
   }
 
   @include e(command-more) {
