@@ -183,8 +183,13 @@ describe('Markdown editor command surface integration', () => {
     const input = document.body.querySelector(
       '.el-markdown-editor__palette-input',
     ) as HTMLInputElement
+    const searchLabel = document.body.querySelector(
+      '.el-markdown-editor__palette-search-label',
+    ) as HTMLLabelElement
     expect(input.placeholder).toBe('查找命令')
     expect(input.getAttribute('aria-label')).toBe('查找命令')
+    expect(searchLabel.textContent?.trim()).toBe('查找命令')
+    expect(searchLabel.htmlFor).toBe(input.id)
     input.value = 'token-alias'
     input.dispatchEvent(new Event('input'))
     await nextTick()

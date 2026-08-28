@@ -456,7 +456,14 @@
           :aria-label="localeText.commandPalette.title"
           @keydown="handleCommandPaletteKeydown"
         >
+          <label
+            :for="`${paletteListId}-search`"
+            :class="[ns.e('palette-group-label'), ns.e('palette-search-label')]"
+          >
+            {{ localeText.commandPalette.searchPlaceholder }}
+          </label>
           <input
+            :id="`${paletteListId}-search`"
             ref="commandPaletteInputRef"
             v-model="paletteQuery"
             type="text"

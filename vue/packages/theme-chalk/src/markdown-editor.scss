@@ -893,6 +893,10 @@
     }
   }
 
+  @include e(palette-search-label) {
+    display: none;
+  }
+
   @include e(palette-list) {
     max-height: 320px;
     overflow-y: auto;
@@ -1030,6 +1034,16 @@
             16px
           )
       );
+    }
+
+    @include e(palette-search-label) {
+      display: block;
+    }
+
+    @include e(palette-input) {
+      &::placeholder {
+        color: transparent;
+      }
     }
 
     @include e(palette-list) {

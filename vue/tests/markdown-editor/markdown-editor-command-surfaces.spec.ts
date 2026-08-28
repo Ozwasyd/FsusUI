@@ -257,7 +257,9 @@ test('renders locale authority, long copy, RTL, and status density without fallb
     if (locale === 'ar') {
       await expect(fixture).toHaveAttribute('dir', 'rtl')
       expect(
-        await palette.evaluate((element) => getComputedStyle(element).direction),
+        await palette.evaluate(
+          (element) => getComputedStyle(element).direction,
+        ),
       ).toBe('rtl')
     }
     await palette.press('Escape')
@@ -276,8 +278,15 @@ test('renders locale authority, long copy, RTL, and status density without fallb
   await page.getByTestId('markdown-open-command-palette').click()
   const palette = page.locator('.el-markdown-editor__palette-dialog')
   const paletteInput = palette.locator('.el-markdown-editor__palette-input')
+  const paletteSearchLabel = palette.locator(
+    '.el-markdown-editor__palette-search-label',
+  )
   expect(await paletteInput.getAttribute('aria-label')).toBe(
     await paletteInput.getAttribute('placeholder'),
+  )
+  await expect(paletteSearchLabel).toBeVisible()
+  await expect(paletteSearchLabel).toHaveText(
+    await paletteInput.getAttribute('placeholder')!,
   )
   const paletteBox = await palette.boundingBox()
   expect(paletteBox).not.toBeNull()
@@ -285,10 +294,22 @@ test('renders locale authority, long copy, RTL, and status density without fallb
   expect(paletteBox!.x + paletteBox!.width).toBeLessThanOrEqual(375)
   expect(paletteBox!.y + paletteBox!.height).toBeLessThanOrEqual(812)
   expect(
-    await palette.evaluate((element) => element.scrollWidth <= element.clientWidth),
+    await palette.evaluate(
+      (element) => element.scrollWidth <= element.clientWidth,
+    ),
   ).toBe(true)
-  const optionLayouts = await palette.getByRole('option').evaluateAll(
-    (options) =>
+  expect(
+    await paletteSearchLabel.evaluate(
+      (element) =>
+        element.scrollWidth <= element.clientWidth &&
+        element.getBoundingClientRect().height /
+          Number.parseFloat(getComputedStyle(element).fontSize) >
+          1.5,
+    ),
+  ).toBe(true)
+  const optionLayouts = await palette
+    .getByRole('option')
+    .evaluateAll((options) =>
       options.map((option) => {
         const label = option.querySelector('span')
         if (!(label instanceof HTMLElement)) {
@@ -302,7 +323,7 @@ test('renders locale authority, long copy, RTL, and status density without fallb
             label.scrollWidth <= label.clientWidth,
         }
       }),
-  )
+    )
   expect(optionLayouts.every(({ overflowFree }) => overflowFree)).toBe(true)
   expect(optionLayouts.some(({ labelLines }) => labelLines > 1.5)).toBe(true)
 
