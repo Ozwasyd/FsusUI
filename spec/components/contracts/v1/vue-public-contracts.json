@@ -5,9 +5,9 @@
   "owner": "FsusUI Core",
   "baseline": {
     "path": "spec/baselines/vue-current.json",
-    "hash": "6a1d39118081ea8e8f68f649a7b36bd104bbcf18176a908dbd3f1edf49fa893f",
+    "hash": "186177aaa0fc5765d44112c2227446d9a1b99704d0ede242a47add40d8c11630",
     "packageVersion": "1.5.1",
-    "tokenHash": "b30c177f23fa05c21e5bce68376bf4b346910927c3de413c17d84e7c216da079",
+    "tokenHash": "efedf2d7a3f11cbd9ecb583513d7f36c7e0068ef87e096d366b332eaac99e609",
     "iconHash": "d61254b1b1ff9addaf45293153df217b0c0d01ec69ec602081c44a01008b78de"
   },
   "changeClassifications": [
@@ -9819,6 +9819,12 @@
         },
         {
           "name": "primaryCommandKeys",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "readonly",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
