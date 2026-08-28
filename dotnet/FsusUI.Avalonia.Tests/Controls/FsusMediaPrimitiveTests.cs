@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
+using Avalonia.Controls;
 using Avalonia.Input;
 using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Overlay;
@@ -167,6 +168,275 @@ public class FsusMediaPrimitiveTests
       "accessibility",
       "automation-snapshots.json"));
     Assert.Contains("media-decorative-stable32", accessibilityEvidence);
+  }
+
+  [Fact]
+  public async Task ImageViewerRendersActiveSourceThroughImageLoaderAndUpdatesOnIndexChange()
+  {
+    var viewer = new FsusImageViewer
+    {
+      Sources = { "cat.png", "dog.svg", "data:image/png;base64,AAA" },
+      ImageLoader = (source, _) => Task.FromResult<object?>(new TextBlock { Text = $"rendered:{source}" }),
+    };
+
+    Assert.Equal("cat.png", viewer.ActiveSource);
+    Assert.True(await viewer.LoadActiveSourceAsync());
+    Assert.Equal(FsusImageStatus.Loaded, viewer.Status);
+    Assert.Contains("fsus-loaded", viewer.Classes);
+    var content1 = Assert.IsType<TextBlock>(viewer.Content);
+    Assert.Equal("rendered:cat.png", content1.Text);
+    Assert.Same(content1, viewer.LoadedContent);
+
+    viewer.ActiveIndex = 1;
+    Assert.Equal("dog.svg", viewer.ActiveSource);
+    Assert.NotNull(viewer.CurrentLoadTask);
+    Assert.True(await viewer.CurrentLoadTask!);
+    Assert.Equal(FsusImageStatus.Loaded, viewer.Status);
+    var content2 = Assert.IsType<TextBlock>(viewer.Content);
+    Assert.Equal("rendered:dog.svg", content2.Text);
+
+    viewer.ActiveIndex = 2;
+    Assert.Equal("data:image/png;base64,AAA", viewer.ActiveSource);
+    Assert.NotNull(viewer.CurrentLoadTask);
+    Assert.True(await viewer.CurrentLoadTask!);
+    var content3 = Assert.IsType<TextBlock>(viewer.Content);
+    Assert.Equal("rendered:data:image/png;base64,AAA", content3.Text);
+  }
+
+  [Fact]
+  public async Task ImageViewerExposesLoadingLoadedAndErrorStatesWithClassNames()
+  {
+    var tcs = new TaskCompletionSource<object?>(TaskCreationOptions.RunContinuationsAsynchronously);
+    var viewer = new FsusImageViewer
+    {
+      Sources = { "pending.png" },
+      ImageLoader = (_, _) => tcs.Task,
+    };
+
+    var loadTask = viewer.LoadActiveSourceAsync();
+    Assert.Equal(FsusImageStatus.Loading, viewer.Status);
+    Assert.Contains("fsus-loading", viewer.Classes);
+    Assert.DoesNotContain("fsus-loaded", viewer.Classes);
+    Assert.DoesNotContain("fsus-error", viewer.Classes);
+    Assert.DoesNotContain("fsus-idle", viewer.Classes);
+
+    tcs.SetResult(new TextBlock { Text = "done" });
+    Assert.True(await loadTask);
+    Assert.Equal(FsusImageStatus.Loaded, viewer.Status);
+    Assert.Contains("fsus-loaded", viewer.Classes);
+    Assert.DoesNotContain("fsus-loading", viewer.Classes);
+    Assert.Null(viewer.ErrorMessage);
+
+    viewer.ImageLoader = (_, _) => throw new InvalidOperationException("Failed to decode image stream.");
+    Assert.False(await viewer.RefreshAsync());
+    Assert.Equal(FsusImageStatus.Error, viewer.Status);
+    Assert.Contains("fsus-error", viewer.Classes);
+    Assert.DoesNotContain("fsus-loading", viewer.Classes);
+    Assert.DoesNotContain("fsus-loaded", viewer.Classes);
+    Assert.Equal("Failed to decode image stream.", viewer.ErrorMessage);
+    Assert.Null(viewer.LoadedContent);
+  }
+
+  [Fact]
+  public async Task ImageViewerCancelsStaleInFlightLoadsAndDisposesReplacedContent()
+  {
+    var disposable1 = new DisposableControl("first");
+    var disposable2 = new DisposableControl("second");
+    var disposableStale = new DisposableControl("stale");
+
+    var viewer = new FsusImageViewer
+    {
+      Sources = { "first.png", "second.png", "slow.png", "fast.png" },
+    };
+
+    viewer.ImageLoader = (source, _) =>
+    {
+      return source switch
+      {
+        "first.png" => Task.FromResult<object?>(disposable1),
+        "second.png" => Task.FromResult<object?>(disposable2),
+        _ => Task.FromResult<object?>(null),
+      };
+    };
+
+    Assert.True(await viewer.LoadActiveSourceAsync());
+    Assert.Same(disposable1, viewer.LoadedContent);
+    Assert.False(disposable1.IsDisposed);
+
+    // Navigating to second replaces and disposes first
+    viewer.ActiveIndex = 1;
+    Assert.True(await viewer.CurrentLoadTask!);
+    Assert.Same(disposable2, viewer.LoadedContent);
+    Assert.True(disposable1.IsDisposed, "Replaced content must be disposed.");
+    Assert.False(disposable2.IsDisposed);
+
+    // Stale in-flight load cancellation:
+    var slowStarted = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+    var slowTcs = new TaskCompletionSource<object?>(TaskCreationOptions.RunContinuationsAsynchronously);
+    CancellationToken observedToken = default;
+
+    viewer.ImageLoader = (source, token) =>
+    {
+      if (source == "slow.png")
+      {
+        observedToken = token;
+        slowStarted.SetResult(true);
+        return slowTcs.Task;
+      }
+
+      return Task.FromResult<object?>(new TextBlock { Text = source });
+    };
+
+    viewer.ActiveIndex = 2; // slow.png
+    await slowStarted.Task;
+    Assert.False(observedToken.IsCancellationRequested);
+    var slowTask = viewer.CurrentLoadTask;
+
+    // Immediately switch to fast.png before slow completes
+    viewer.ActiveIndex = 3; // fast.png
+    Assert.True(observedToken.IsCancellationRequested, "Stale load token must be cancelled.");
+    Assert.True(await viewer.CurrentLoadTask!);
+    var fastContent = Assert.IsType<TextBlock>(viewer.LoadedContent);
+    Assert.Equal("fast.png", fastContent.Text);
+    Assert.True(disposable2.IsDisposed, "Replaced second item must be disposed.");
+
+    // Even if the stale task finishes afterwards, its disposable content must be disposed and not applied
+    slowTcs.SetResult(disposableStale);
+    if (slowTask is not null)
+    {
+      await slowTask;
+    }
+    Assert.True(disposableStale.IsDisposed, "Cancelled in-flight result must be disposed.");
+    Assert.Same(fastContent, viewer.LoadedContent);
+
+    // Explicit Dispose on viewer disposes active content
+    var disposableFinal = new DisposableControl("final");
+    viewer.ImageLoader = (_, _) => Task.FromResult<object?>(disposableFinal);
+    Assert.True(await viewer.RefreshAsync());
+    Assert.Same(disposableFinal, viewer.LoadedContent);
+    Assert.False(disposableFinal.IsDisposed);
+
+    viewer.Dispose();
+    Assert.True(disposableFinal.IsDisposed, "Viewer Dispose must dispose active content.");
+    Assert.Null(viewer.LoadedContent);
+  }
+
+  [Fact]
+  public async Task ImageViewerPreservesNavigationFocusRestorationAndAccessibilityState()
+  {
+    var host = new FsusOverlayHost();
+    var restoreTarget = new Button { Content = "Trigger button" };
+    var events = new List<(string Source, int Index)>();
+
+    var viewer = new KeyboardImageViewer
+    {
+      AccessibleName = "Document gallery",
+      Sources = { "doc1.png", "doc2.png", "doc3.png" },
+      ImageLoader = (source, _) => Task.FromResult<object?>(new TextBlock { Text = source }),
+    };
+    viewer.ActiveSourceChanged += (_, e) => events.Add((e.Source, e.Index));
+
+    var entry = viewer.Open(host, restoreTarget);
+    Assert.Same(entry, viewer.OverlayEntry);
+    Assert.True(viewer.IsOpen);
+    Assert.Contains("fsus-open", viewer.Classes);
+    Assert.Equal("Document gallery", AutomationProperties.GetName(viewer));
+    Assert.Equal(AutomationControlType.Image, AutomationProperties.GetControlTypeOverride(viewer));
+    Assert.Equal("image 1 of 3", AutomationProperties.GetItemStatus(viewer));
+
+    // Right navigation
+    Assert.True(await viewer.PressAsync(Key.Right));
+    Assert.Equal(1, viewer.ActiveIndex);
+    Assert.Equal("doc2.png", viewer.ActiveSource);
+    Assert.Equal("image 2 of 3", AutomationProperties.GetItemStatus(viewer));
+
+    // Left navigation
+    Assert.True(await viewer.PressAsync(Key.Left));
+    Assert.Equal(0, viewer.ActiveIndex);
+    Assert.Equal("doc1.png", viewer.ActiveSource);
+    Assert.Equal("image 1 of 3", AutomationProperties.GetItemStatus(viewer));
+
+    // Escape closes overlay and restores focus
+    Assert.True(await viewer.PressAsync(Key.Escape));
+    Assert.False(viewer.IsOpen);
+    Assert.DoesNotContain("fsus-open", viewer.Classes);
+    Assert.Empty(host.OpenOverlays);
+    Assert.Same(restoreTarget, host.LastRestoredFocus);
+
+    // Verify ActiveSourceChanged fired for each navigation
+    Assert.Equal(2, events.Count);
+    Assert.Equal(("doc2.png", 1), events[0]);
+    Assert.Equal(("doc1.png", 0), events[1]);
+  }
+
+  [Fact]
+  public async Task ImageViewerSupportsCustomSourceLoaderAndImageOpenPreviewIntegration()
+  {
+    var customLoader = new CustomImageLoader();
+    var viewer = new FsusImageViewer
+    {
+      Sources = { "vector.svg", "encoded.data", "normal.png" },
+      SourceLoader = customLoader,
+    };
+
+    Assert.True(await viewer.LoadActiveSourceAsync());
+    var svg = Assert.IsType<Border>(viewer.LoadedContent);
+    Assert.Equal("svg-vector", svg.Tag);
+
+    viewer.ActiveIndex = 1;
+    Assert.True(await viewer.CurrentLoadTask!);
+    var data = Assert.IsType<TextBlock>(viewer.LoadedContent);
+    Assert.Equal("data-decoded:encoded.data", data.Text);
+
+    // Test ContentFactory fallback
+    var factoryViewer = new FsusImageViewer
+    {
+      Sources = { "factory-item" },
+      ContentFactory = src => new TextBlock { Text = $"factory:{src}" },
+    };
+    Assert.True(await factoryViewer.LoadActiveSourceAsync());
+    var factoryContent = Assert.IsType<TextBlock>(factoryViewer.LoadedContent);
+    Assert.Equal("factory:factory-item", factoryContent.Text);
+
+    // Test FsusImage.OpenPreview with PreviewLoader
+    var host = new FsusOverlayHost();
+    var image = new FsusImage
+    {
+      Source = "preview-target.png",
+      PreviewLoader = (src, _) => Task.FromResult<object?>(new TextBlock { Text = $"preview:{src}" }),
+    };
+
+    var previewViewer = image.OpenPreview(host);
+    Assert.NotNull(previewViewer);
+    Assert.NotNull(previewViewer!.ImageLoader);
+    Assert.True(await previewViewer.CurrentLoadTask!);
+    var previewContent = Assert.IsType<TextBlock>(previewViewer.LoadedContent);
+    Assert.Equal("preview:preview-target.png", previewContent.Text);
+  }
+
+  private sealed class DisposableControl(string tag) : Control, IDisposable
+  {
+    public string TagName { get; } = tag;
+    public bool IsDisposed { get; private set; }
+    public void Dispose() => IsDisposed = true;
+  }
+
+  private sealed class CustomImageLoader : IFsusImageLoader
+  {
+    public Task<object?> LoadAsync(string source, CancellationToken cancellationToken)
+    {
+      if (source.EndsWith(".svg", StringComparison.Ordinal))
+      {
+        return Task.FromResult<object?>(new Border { Tag = "svg-vector" });
+      }
+
+      if (source.EndsWith(".data", StringComparison.Ordinal))
+      {
+        return Task.FromResult<object?>(new TextBlock { Text = $"data-decoded:{source}" });
+      }
+
+      return Task.FromResult<object?>(new TextBlock { Text = $"raster:{source}" });
+    }
   }
 
   private sealed class KeyboardImageViewer : FsusImageViewer

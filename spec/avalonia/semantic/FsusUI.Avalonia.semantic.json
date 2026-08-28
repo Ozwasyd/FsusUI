@@ -7,6 +7,34 @@
   },
   "semanticTypes": [
     {
+      "name": "FsusUI.Avalonia.Controls.FsusActiveSourceChangedEventArgs",
+      "kind": "class",
+      "baseType": "System.EventArgs",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [
+        {
+          "name": "Index",
+          "type": "System.Int32",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Source",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": []
+    },
+    {
       "name": "FsusUI.Avalonia.Controls.FsusAffix",
       "kind": "class",
       "baseType": "Avalonia.Controls.ContentControl",
@@ -6791,6 +6819,14 @@
           "isStatic": false
         },
         {
+          "name": "PreviewLoader",
+          "type": "System.Func\u003CSystem.String, System.Threading.CancellationToken, System.Threading.Tasks.Task\u003CSystem.Object\u003E\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "Source",
           "type": "System.String",
           "nullable": true,
@@ -6830,6 +6866,23 @@
             {
               "name": "host",
               "type": "FsusUI.Avalonia.Overlay.FsusOverlayHost",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "OpenPreview",
+          "isStatic": false,
+          "returnType": "FsusUI.Avalonia.Controls.FsusImageViewer",
+          "parameters": [
+            {
+              "name": "host",
+              "type": "FsusUI.Avalonia.Overlay.FsusOverlayHost",
+              "optional": false
+            },
+            {
+              "name": "previewLoader",
+              "type": "System.Func\u003CSystem.String, System.Threading.CancellationToken, System.Threading.Tasks.Task\u003CSystem.Object\u003E\u003E",
               "optional": false
             }
           ]
@@ -7105,9 +7158,57 @@
           "isStatic": false
         },
         {
+          "name": "ContentFactory",
+          "type": "System.Func\u003CSystem.String, System.Object\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "CurrentLoadTask",
+          "type": "System.Threading.Tasks.Task\u003CSystem.Boolean\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "ErrorMessage",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "HasLoader",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "ImageLoader",
+          "type": "System.Func\u003CSystem.String, System.Threading.CancellationToken, System.Threading.Tasks.Task\u003CSystem.Object\u003E\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "IsOpen",
           "type": "System.Boolean",
           "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "LoadedContent",
+          "type": "System.Object",
+          "nullable": true,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
@@ -7121,19 +7222,66 @@
           "isStatic": false
         },
         {
+          "name": "SourceLoader",
+          "type": "FsusUI.Avalonia.Controls.IFsusImageLoader",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "Sources",
           "type": "System.Collections.ObjectModel.Collection\u003CSystem.String\u003E",
           "nullable": true,
           "canRead": true,
           "canWrite": true,
           "isStatic": false
+        },
+        {
+          "name": "Status",
+          "type": "FsusUI.Avalonia.Controls.FsusImageStatus",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
         }
       ],
       "avaloniaProperties": [],
-      "events": [],
+      "events": [
+        {
+          "name": "ActiveSourceChanged",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusActiveSourceChangedEventArgs\u003E",
+          "isStatic": false
+        }
+      ],
       "methods": [
         {
           "name": "CloseAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.ValueTask\u003CSystem.Boolean\u003E",
+          "parameters": []
+        },
+        {
+          "name": "Dispose",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": []
+        },
+        {
+          "name": "LoadActiveSourceAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.Task\u003CSystem.Boolean\u003E",
+          "parameters": [
+            {
+              "name": "cancellationToken",
+              "type": "System.Threading.CancellationToken",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "NextAsync",
           "isStatic": false,
           "returnType": "System.Threading.Tasks.ValueTask\u003CSystem.Boolean\u003E",
           "parameters": []
@@ -7175,6 +7323,24 @@
             {
               "name": "restoreFocusTo",
               "type": "Avalonia.Controls.Control",
+              "optional": true
+            }
+          ]
+        },
+        {
+          "name": "PreviousAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.ValueTask\u003CSystem.Boolean\u003E",
+          "parameters": []
+        },
+        {
+          "name": "RefreshAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.Task\u003CSystem.Boolean\u003E",
+          "parameters": [
+            {
+              "name": "cancellationToken",
+              "type": "System.Threading.CancellationToken",
               "optional": true
             }
           ]
@@ -22954,6 +23120,34 @@
             {
               "name": "value",
               "type": "System.Object",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.IFsusImageLoader",
+      "kind": "interface",
+      "isAbstract": true,
+      "isSealed": false,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [
+        {
+          "name": "LoadAsync",
+          "isStatic": false,
+          "returnType": "System.Threading.Tasks.Task\u003CSystem.Object\u003E",
+          "parameters": [
+            {
+              "name": "source",
+              "type": "System.String",
+              "optional": false
+            },
+            {
+              "name": "cancellationToken",
+              "type": "System.Threading.CancellationToken",
               "optional": false
             }
           ]
