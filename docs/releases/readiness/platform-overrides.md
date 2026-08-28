@@ -16,6 +16,8 @@ active override id appears here.
 | `avalonia-layout-panel-measure-001`       | layout primitives     | avalonia         | medium           | layout-geometry-threshold          | 2026-09-01   |
 | `avalonia-linux-window-shadow-001`        | dialog                | avalonia-linux   | medium           | visual-threshold                   | 2026-09-01   |
 | `avalonia-linux-font-rasterization-001`   | text                  | avalonia-linux   | medium           | typography-baseline-threshold      | 2026-09-01   |
+| `avalonia-macos-native-menu-role-001`     | menu                  | avalonia-macos   | low              | local-platform-role-simulation-and-native-menu-contract | 2026-11-01   |
+| `avalonia-macos-shortcut-display-001`     | input                 | avalonia-macos   | low              | headless-interaction-and-local-platform-simulation | 2026-11-01   |
 | `avalonia-macos-text-smoothing-001`       | text                  | avalonia-macos   | medium           | visual-threshold                   | 2026-09-01   |
 | `avalonia-windows-font-rasterization-001` | text                  | avalonia-windows | medium           | typography-baseline-threshold      | 2026-09-01   |
 | `avalonia-windows-focus-ring-001`         | button, input         | avalonia-windows | low              | accessibility-and-visual-threshold | 2026-09-01   |

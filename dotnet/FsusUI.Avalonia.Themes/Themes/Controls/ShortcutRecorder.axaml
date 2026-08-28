@@ -1,0 +1,89 @@
+<Styles
+  xmlns="https://github.com/avaloniaui"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls">
+  <Style Selector="fsus|FsusShortcutRecorder">
+    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
+    <Setter Property="Padding" Value="10,6" />
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusSurfaceSm}" />
+    <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodyMdSize}" />
+    <Setter Property="FontFamily" Value="{DynamicResource FsusTypographyFamilyBody}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border
+          Name="PART_Border"
+          Background="{TemplateBinding Background}"
+          BorderBrush="{TemplateBinding BorderBrush}"
+          BorderThickness="{TemplateBinding BorderThickness}"
+          CornerRadius="{TemplateBinding CornerRadius}"
+          Padding="{TemplateBinding Padding}">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock
+              Name="PART_ValueText"
+              Grid.Column="0"
+              VerticalAlignment="Center"
+              Text="{TemplateBinding DisplayText}" />
+            <TextBlock
+              Name="PART_PlaceholderText"
+              Grid.Column="0"
+              VerticalAlignment="Center"
+              Foreground="{DynamicResource FsusThemeMutedTextBrush}"
+              IsVisible="False"
+              Text="{TemplateBinding Placeholder}" />
+            <Button
+              Name="PART_ClearButton"
+              Grid.Column="1"
+              Classes="fsus-input-clear"
+              Command="{TemplateBinding ClearCommand}"
+              AutomationProperties.Name="Clear shortcut"
+              IsVisible="False"
+              Content="✕"
+              Margin="4,0,0,0" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusShortcutRecorder.fsus-empty /template/ TextBlock#PART_PlaceholderText">
+    <Setter Property="IsVisible" Value="True" />
+  </Style>
+
+  <Style Selector="fsus|FsusShortcutRecorder.fsus-can-clear /template/ Button#PART_ClearButton">
+    <Setter Property="IsVisible" Value="True" />
+  </Style>
+
+  <Style Selector="fsus|FsusShortcutRecorder:focus">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusThemeFocusBorderThickness}" />
+  </Style>
+
+  <Style Selector="fsus|FsusShortcutRecorder.fsus-recording">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusShortcutRecorder.fsus-invalid, fsus|FsusShortcutRecorder.fsus-duplicate, fsus|FsusShortcutRecorder.fsus-reserved">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeDangerBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusShortcutRecorder:disabled">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeDisabledSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+    <Setter Property="Opacity" Value="1" />
+  </Style>
+
+  <Style Selector="fsus|FsusShortcutRecorder.fsus-size-sm">
+    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlCompactY}" />
+    <Setter Property="Padding" Value="8,4" />
+    <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodySmSize}" />
+  </Style>
+
+  <Style Selector="fsus|FsusShortcutRecorder.fsus-size-lg">
+    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
+    <Setter Property="Padding" Value="12,8" />
+  </Style>
+</Styles>
