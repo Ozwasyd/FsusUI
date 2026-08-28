@@ -254,6 +254,10 @@ test('renders locale authority, long copy, RTL, and status density without fallb
     await expect(palette.getByRole('group').first()).toHaveAccessibleName(
       `${prefix} format`,
     )
+    await expect(
+      palette.getByRole('option', { name: `${prefix} paste as Markdown` }),
+    ).toBeVisible()
+    await expect(palette).not.toContainText('粘贴为 Markdown')
     if (locale === 'ar') {
       await expect(fixture).toHaveAttribute('dir', 'rtl')
       expect(

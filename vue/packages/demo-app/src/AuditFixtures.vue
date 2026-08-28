@@ -2102,6 +2102,9 @@ const markdownCommandLocaleText = computed<
     },
     overflow: label('format tools'),
     overflowAria: (count: number) => label(`${count} format tools`),
+    pasteAsMarkdown: {
+      title: label('paste as Markdown'),
+    },
     surfaces: {
       commandPending: label('command pending'),
       commandRejected: label('command rejected'),
