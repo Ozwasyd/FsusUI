@@ -21,6 +21,7 @@
   >
     <header
       v-if="chromeRegions.toolbar && surfaceOptions.toolbar"
+      ref="toolbarRef"
       :class="ns.e('toolbar')"
     >
       <div :class="ns.e('commands')">
@@ -166,7 +167,11 @@
       ><span
           v-for="segment in focusSegments"
           :key="segment.key"
-          :class="ns.is('dimmed', segment.dimmed)"
+          :class="[
+            ns.is('dimmed', segment.dimmed),
+            ns.is('exempt', segment.exempt),
+          ]"
+          :data-node-id="segment.nodeId"
         >{{ segment.text }}</span></pre>
       <textarea
         :id="textareaId"
@@ -439,11 +444,12 @@ import {
   type MarkdownLiveSelectionMotion,
 } from './markdown-editor-live-selection'
 import {
+  createMarkdownFocusSegments,
   createWritingAidsController,
   type MarkdownEditorWritingAidsController,
 } from './markdown-editor-writing-aids'
 import {
-  createMarkdownOutlineModel,
+  createMarkdownOutlineModelFromProjection,
   revealHeading as revealHeadingOutline,
   revealSourceRange as revealSourceRangeOutline,
 } from './markdown-editor-outline'
@@ -459,8 +465,10 @@ import {
 
 import type { MarkdownHtmlImportSnapshot } from '../../../wasm/markdown-html-import'
 import {
+  createMarkdownAnchorMap,
   createMarkdownEditorProjection,
   stabilizeMarkdownEditorProjection,
+  type MarkdownStableProjection,
 } from '../../../wasm/markdown-runtime'
 
 defineOptions({
@@ -485,6 +493,8 @@ const pasteAsMarkdownTitleId = `${useId()}-paste-as-markdown-title`
 const pasteAsMarkdownHelpId = `${useId()}-paste-as-markdown-help`
 const commandsExpanded = ref(false)
 const visualViewportHeight = ref(0)
+const visualViewportOffsetTop = ref(0)
+const toolbarRef = ref<HTMLElement | null>(null)
 const inputDisabled = computed(() => props.disabled || props.loading)
 const editingBlocked = computed(() => props.readonly || inputDisabled.value)
 const surfaceOptions = computed<Required<MarkdownEditorSurfaceOptions>>(() => ({
@@ -550,30 +560,40 @@ const syncFocusLayerScroll = (scrollTop: number) => {
   if (focusLayerRef.value) focusLayerRef.value.scrollTop = scrollTop
 }
 const focusSegments = computed(() => {
-  const source = editorValue.value
-  const range = writingAidsFocusState.value.activeRange
-  if (!range) return [{ key: 'document', text: source, dimmed: false }]
-  return [
-    { key: 'before', text: source.slice(0, range.start), dimmed: true },
-    {
-      key: writingAidsFocusState.value.activeBlockId ?? 'active',
-      text: source.slice(range.start, range.end),
-      dimmed: false,
-    },
-    { key: 'after', text: source.slice(range.end), dimmed: true },
-  ].filter((segment) => segment.text.length > 0)
+  return createMarkdownFocusSegments(
+    editorValue.value,
+    writingAidsFocusState.value,
+  )
 })
+let cachedProjectionSource = ''
+let cachedProjection: MarkdownStableProjection | undefined
+const getStableProjection = () => {
+  const source = transactionStore.value
+  if (cachedProjection && cachedProjectionSource === source) {
+    return cachedProjection
+  }
+  cachedProjection = stabilizeMarkdownEditorProjection(
+    createMarkdownEditorProjection(source),
+    documentIdentity,
+    cachedProjection,
+  )
+  cachedProjectionSource = source
+  return cachedProjection
+}
 const refreshWritingAidsDocument = () => {
-  let projection:
-    | ReturnType<typeof stabilizeMarkdownEditorProjection>
-    | undefined
-  try {
-    projection = stabilizeMarkdownEditorProjection(
-      createMarkdownEditorProjection(transactionStore.value),
-      documentIdentity,
-    )
-  } catch {
-    projection = undefined
+  let projection: MarkdownStableProjection | undefined
+  const focusNeedsProjection =
+    props.writingAids?.focus === true &&
+    props.editorProfile === 'prose' &&
+    !props.readonly &&
+    !props.disabled &&
+    currentMode.value !== 'preview'
+  if (focusNeedsProjection) {
+    try {
+      projection = getStableProjection()
+    } catch {
+      projection = undefined
+    }
   }
   const selection = transactionStore.selection
   const caret =
@@ -588,13 +608,16 @@ const refreshWritingAidsDocument = () => {
       : null,
     disabled: props.disabled,
     documentEpoch: documentIdentity.epoch,
-    documentIdentity: documentIdentity.id,
+    documentIdentity,
     editorProfile: props.editorProfile,
+    focusExemptions: props.focusExemptions,
+    mode: currentMode.value,
     projection,
     readonly: props.readonly,
     revision: transactionStore.revision,
     selection,
     source: transactionStore.value,
+    writingAids: props.writingAids,
   })
   writingAidsFocusState.value = writingAidsController.focusState!
   writingAidsState.value = writingAidsController.state
@@ -706,32 +729,43 @@ const markLayoutGesture = (gesture: MarkdownLiveLayoutGesture) => {
     layoutGesture.value = null
   }, 200)
 }
-const handleLayoutWheel = () => markLayoutGesture('wheel')
-const handleLayoutTouch = () => markLayoutGesture('touch')
+const suspendTypewriterForUserScroll = () => {
+  writingAidsController.handleUserScroll()
+  writingAidsState.value = writingAidsController.state
+}
+const handleLayoutWheel = () => {
+  suspendTypewriterForUserScroll()
+  markLayoutGesture('wheel')
+}
+const handleLayoutTouch = () => {
+  suspendTypewriterForUserScroll()
+  markLayoutGesture('touch')
+}
 const handleLayoutScroll = () => {
   const textarea = textareaRef.value
   if (textarea) syncFocusLayerScroll(textarea.scrollTop)
   if (restoringSelection || restoringViewport || restoringTypewriter) return
-  writingAidsController.handleUserScroll()
-  writingAidsState.value = writingAidsController.state
+  suspendTypewriterForUserScroll()
   markLayoutGesture('scrollbar')
 }
-const resolveFocusAnchorScrollTop = () => {
-  const layer = focusLayerRef.value
-  const active = layer?.querySelector<HTMLElement>('span:not(.is-dimmed)')
-  if (!layer || !active) return undefined
-  const layerBox = layer.getBoundingClientRect()
-  const activeBox = active.getBoundingClientRect()
-  const activeContentTop = activeBox.top - layerBox.top + layer.scrollTop
-  return Math.max(0, activeContentTop - layer.clientHeight / 3)
+const cssLength = (element: HTMLElement, property: string) => {
+  const value = Number.parseFloat(
+    window.getComputedStyle(element).getPropertyValue(property),
+  )
+  return Number.isFinite(value) ? value : 0
 }
-const applyTypewriterScroll = (explicitNavigation = false) => {
+const applyTypewriterScroll = (
+  trigger: 'input' | 'explicit-navigation' | 'async-layout' = 'input',
+) => {
   if (!resolvedWritingAids.value.typewriter || isComposing.value) return
   const textarea = textareaRef.value
   if (!textarea) return
-  const response = explicitNavigation
-    ? writingAidsController.handleExplicitNavigation()
-    : writingAidsController.handleInput()
+  const response =
+    trigger === 'explicit-navigation'
+      ? writingAidsController.handleExplicitNavigation()
+      : trigger === 'async-layout'
+        ? writingAidsController.handleAsyncLayoutChange()
+        : writingAidsController.handleInput()
   writingAidsState.value = writingAidsController.state
   if (response.scroll !== true) return
   const lineHeight =
@@ -740,16 +774,24 @@ const applyTypewriterScroll = (explicitNavigation = false) => {
     caretSourceOffset: transactionStore.selection.end,
     lineHeight,
     source: transactionStore.value,
+    stickyToolbarHeight: toolbarRef.value?.getBoundingClientRect().height,
+    safeAreaInsetBottom: cssLength(
+      textarea,
+      '--el-markdown-editor-safe-area-inset-bottom',
+    ),
+    safeAreaInsetTop: cssLength(
+      textarea,
+      '--el-markdown-editor-safe-area-inset-top',
+    ),
+    reducedMotion: reducedMotionRequested(),
     viewportHeight: textarea.clientHeight,
     visualViewportHeight: visualViewportHeight.value || undefined,
+    visualViewportOffsetTop: visualViewportOffsetTop.value || undefined,
   })
-  const requestedScrollTop = explicitNavigation
-    ? (resolveFocusAnchorScrollTop() ?? target.scrollTop)
-    : target.scrollTop
   restoringTypewriter = true
   if (typeof textarea.scrollTo === 'function') {
     const scrollTop = Math.min(
-      requestedScrollTop,
+      target.scrollTop,
       Math.max(0, textarea.scrollHeight - textarea.clientHeight),
     )
     textarea.scrollTo({
@@ -760,8 +802,8 @@ const applyTypewriterScroll = (explicitNavigation = false) => {
       syncFocusLayerScroll(textarea.scrollTop)
     })
   } else {
-    textarea.scrollTop = requestedScrollTop
-    syncFocusLayerScroll(requestedScrollTop)
+    textarea.scrollTop = target.scrollTop
+    syncFocusLayerScroll(target.scrollTop)
   }
   queueMicrotask(() => {
     restoringTypewriter = false
@@ -1084,6 +1126,7 @@ watch(
   ([mode, defaultMode]) => {
     transactionStore.breakMergeGroup()
     currentMode.value = normalizeModeForLayout(mode ?? defaultMode)
+    refreshWritingAidsDocument()
   },
 )
 
@@ -1135,6 +1178,7 @@ watch(
   [
     () => props.writingAids,
     () => props.editorProfile,
+    () => props.focusExemptions,
     () => props.readonly,
     () => props.disabled,
   ],
@@ -1282,11 +1326,13 @@ const updateVisualViewportHeight = () => {
   const previous = visualViewportHeight.value
   visualViewportHeight.value =
     window.visualViewport?.height || window.innerHeight || 0
+  visualViewportOffsetTop.value = window.visualViewport?.offsetTop || 0
   const trigger =
     previous > 0 && visualViewportHeight.value + 80 < previous
       ? 'soft-keyboard'
       : 'visual-viewport'
   applyLiveLayout(trigger)
+  applyTypewriterScroll('async-layout')
 }
 
 onMounted(() => {
@@ -1901,6 +1947,7 @@ const setMode = (mode: MarkdownEditorMode) => {
   })
   transactionStore.setSelection(retained.selection, false)
   currentMode.value = nextMode
+  refreshWritingAidsDocument()
   emit('mode-change', nextMode)
   void restoreTextareaSelection(retained.selection, false)
   applyLiveLayout('mode-switch')
@@ -1931,10 +1978,12 @@ const emitRenderEvent = (
 ) => {
   if (event === 'features-activated') {
     emit('features-activated', payload)
+    applyTypewriterScroll('async-layout')
     return
   }
   if (event === 'render-complete') {
     emit('render-complete', payload)
+    applyTypewriterScroll('async-layout')
     return
   }
   emit('render-error', payload)
@@ -1942,6 +1991,10 @@ const emitRenderEvent = (
 
 const handleKeydown = (event: KeyboardEvent) => {
   if (editingBlocked.value || nativeMachine.freezeSmartInput) return
+
+  if (event.key === 'PageUp' || event.key === 'PageDown') {
+    suspendTypewriterForUserScroll()
+  }
 
   if (event.key === 'Escape' && currentMode.value === 'live') {
     if (atomicSession.value) {
@@ -2202,6 +2255,11 @@ const commitRevealSelection = async (
   await restoreTextareaSelection(selection)
   const textarea = textareaRef.value
   if (!textarea) return
+  textarea.focus()
+  if (resolvedWritingAids.value.typewriter) {
+    applyTypewriterScroll('explicit-navigation')
+    return
+  }
   const lineHeight =
     Number.parseFloat(window.getComputedStyle(textarea).lineHeight) || 20
   const line =
@@ -2220,31 +2278,50 @@ const commitRevealSelection = async (
     textarea.scrollTop = top
     syncFocusLayerScroll(top)
   }
-  textarea.focus()
-  applyTypewriterScroll(true)
 }
+
+const currentOutlineContext = () => {
+  const projection = getStableProjection()
+  return {
+    anchorMap: createMarkdownAnchorMap({
+      identity: documentIdentity,
+      projection,
+      source: transactionStore.value,
+    }),
+    model: createMarkdownOutlineModelFromProjection(
+      transactionStore.value,
+      projection,
+    ),
+  }
+}
+
+const reducedMotionRequested = () =>
+  typeof window !== 'undefined' &&
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
 
 const revealHeading = (
   nodeId: string,
   options?: Parameters<typeof revealHeadingOutline>[4],
 ) => {
-  const model = createMarkdownOutlineModel(
-    transactionStore.value,
+  const { anchorMap, model } = currentOutlineContext()
+  const actual = {
     documentIdentity,
-  )
-  const status = revealHeadingOutline(
-    model.items,
-    nodeId,
-    { documentIdentity, revision: transactionStore.revision },
-    { documentIdentity, revision: transactionStore.revision },
-    options,
-  )
+    revision: transactionStore.revision,
+  }
+  const expected = options?.expected ?? actual
+  const status = revealHeadingOutline(model.items, nodeId, expected, actual, {
+    ...options,
+    anchorMap,
+    projection: model.projection,
+  })
   if (status !== 'success') return status
   const plan = planMarkdownOutlineReveal(model.items, nodeId, {
     ...options,
-    actual: { documentIdentity, revision: transactionStore.revision },
-    expected: { documentIdentity, revision: transactionStore.revision },
+    actual,
+    anchorMap,
+    expected,
     mode: currentMode.value,
+    reducedMotion: options?.reducedMotion ?? reducedMotionRequested(),
   })
   if (plan.status !== 'success' || !plan.range) return plan.status
   void commitRevealSelection(plan.range, plan.smooth)
@@ -2262,13 +2339,22 @@ const revealSourceRange = (
   ) {
     return 'not-found'
   }
-  const model = createMarkdownOutlineModel(
-    transactionStore.value,
+  const { anchorMap, model } = currentOutlineContext()
+  const actual = {
     documentIdentity,
-  )
-  const guarded = revealSourceRangeOutline(model.items, range, options)
-  if (guarded === 'stale' || guarded === 'unsupported') return guarded
-  void commitRevealSelection(range, true)
+    revision: transactionStore.revision,
+  }
+  const guarded = revealSourceRangeOutline(model.items, range, {
+    ...options,
+    actual,
+    anchorMap,
+    expected: options?.expected ?? actual,
+    mode: options?.mode ?? currentMode.value,
+    sourceLength: transactionStore.value.length,
+  })
+  if (guarded !== 'success') return guarded
+  const smooth = !(options?.reducedMotion ?? reducedMotionRequested())
+  void commitRevealSelection(range, smooth)
   return 'success'
 }
 

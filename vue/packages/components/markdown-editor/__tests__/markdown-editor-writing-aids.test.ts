@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   calculateTypewriterScrollTarget,
+  createMarkdownFocusSegments,
   createWritingAidsController,
   evaluateMarkdownFocusMutations,
   evaluateMarkdownTypewriterMutations,
@@ -76,6 +77,10 @@ describe('markdown-editor writing aids contract', () => {
     expect(controller.handleSelectionChange()).toMatchObject({ scroll: false })
     expect(controller.handleInput()).toMatchObject({
       state: 'restoring',
+      scroll: false,
+    })
+    expect(controller.handleInput()).toMatchObject({
+      state: 'input-driven',
       scroll: true,
     })
     expect(controller.handleNavigation()).toMatchObject({
@@ -263,6 +268,56 @@ describe('focus mode current-block presentation and accessibility (#439)', () =>
     const codeBlock = exempted.blocks.find((b) => b.id === 'code:3')!
     expect(codeBlock.exempt).toBe(true)
     expect(codeBlock.dimmed).toBe(false)
+
+    const segments = createMarkdownFocusSegments(sampleSource, exempted)
+    expect(
+      segments.find((segment) => segment.nodeId === 'paragraph:1'),
+    ).toMatchObject({ dimmed: false, exempt: true })
+    expect(
+      segments.find((segment) => segment.nodeId === 'paragraph:2'),
+    ).toMatchObject({ dimmed: false, exempt: true })
+    expect(
+      segments.find((segment) => segment.nodeId === 'code:3'),
+    ).toMatchObject({ dimmed: false, exempt: true })
+    expect(segments.map((segment) => segment.text).join('')).toBe(sampleSource)
+  })
+
+  it('uses only top-level source blocks and disables presentation in preview mode', () => {
+    const source = '# [Title](https://example.test)\n'
+    const state = resolveFocusState({
+      focus: true,
+      editorProfile: 'prose',
+      mode: 'source',
+      source,
+      projection: {
+        nodes: [
+          {
+            id: 'heading',
+            kind: 'heading',
+            parentRawRange: null,
+            rawRange: { start: 0, end: source.length },
+          },
+          {
+            id: 'link',
+            kind: 'link',
+            parentRawRange: { start: 0, end: source.length },
+            rawRange: { start: 2, end: source.length - 1 },
+          },
+        ],
+      },
+      caret: 4,
+    })
+    expect(state.blocks.map((block) => block.id)).toEqual(['heading'])
+
+    expect(
+      resolveFocusState({
+        ...state,
+        focus: true,
+        editorProfile: 'prose',
+        mode: 'preview',
+        source,
+      } as never).enabled,
+    ).toBe(false)
   })
 
   it('preserves readable WCAG contrast without blur, hide, mask, or glow', () => {
@@ -357,9 +412,13 @@ describe('upper-third typewriter scrolling state machine (#440)', () => {
     // 5. Subsequent input restores positioning
     expect(controller.handleInput()).toMatchObject({
       state: 'restoring',
-      scroll: true,
+      scroll: false,
     })
     expect(controller.suspendReason).toBeUndefined()
+    expect(controller.handleInput()).toMatchObject({
+      state: 'input-driven',
+      scroll: true,
+    })
 
     // 6. Explicit navigation transitions to explicit-navigation
     expect(controller.handleExplicitNavigation()).toMatchObject({
@@ -430,11 +489,14 @@ describe('upper-third typewriter scrolling state machine (#440)', () => {
       source: multilineSource,
       viewportHeight: 600,
       visualViewportHeight: 350,
+      visualViewportOffsetTop: 24,
       lineHeight: 20,
       stickyToolbarHeight: 40,
     })
     // Usable height: 350 - 40 = 310. Target in viewport: 40 + 310 * (1/3) = 143.
-    expect(keyboardTarget.targetOffsetInViewport).toBe(Math.round(40 + 310 / 3))
+    expect(keyboardTarget.targetOffsetInViewport).toBe(
+      Math.round(24 + 40 + 310 / 3),
+    )
   })
 
   it('cancels smooth motion when reduced motion is enabled but preserves scroll target', () => {
@@ -475,6 +537,22 @@ describe('upper-third typewriter scrolling state machine (#440)', () => {
     })
     expect(targetAfter.caretLine).toBe(2)
     expect(targetAfter.scrollTop).toBe(targetBefore.scrollTop)
+
+    const controller = createWritingAidsController({ typewriter: true })
+    expect(controller.handleAsyncLayoutChange()).toMatchObject({
+      scroll: false,
+      state: 'idle',
+    })
+    controller.handleInput()
+    expect(controller.handleAsyncLayoutChange()).toMatchObject({
+      scroll: true,
+      state: 'input-driven',
+    })
+    controller.handleUserScroll()
+    expect(controller.handleAsyncLayoutChange()).toMatchObject({
+      scroll: false,
+      state: 'user-scroll-suspended',
+    })
   })
 
   it('kills center default, selection change recentering, DOM anchor, scroll stealing, and reduced smooth motion mutations', () => {

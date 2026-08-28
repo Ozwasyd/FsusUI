@@ -229,6 +229,8 @@
     position: relative;
     z-index: 1;
     grid-area: 1 / 1;
+    box-sizing: border-box;
+    max-width: 100%;
     min-width: 0;
     resize: vertical;
     border: 0;

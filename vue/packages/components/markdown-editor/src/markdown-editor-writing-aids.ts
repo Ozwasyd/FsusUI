@@ -96,6 +96,7 @@ export interface MarkdownEditorFocusInput {
   readonly writingAids?: MarkdownEditorWritingAidsOptions
   readonly focus?: boolean
   readonly editorProfile?: 'markdown' | 'prose' | string
+  readonly mode?: 'source' | 'live' | 'split' | 'preview' | string
   readonly readonly?: boolean
   readonly disabled?: boolean
   readonly source: string
@@ -104,6 +105,10 @@ export interface MarkdownEditorFocusInput {
       readonly id: string
       readonly kind: string
       readonly rawRange: { readonly start: number; readonly end: number }
+      readonly parentRawRange?: {
+        readonly start: number
+        readonly end: number
+      } | null
     }[]
   } | null
   readonly selection?: {
@@ -126,6 +131,7 @@ export const resolveFocusState = (
     input.writingAids?.focus === true || input.focus === true
   const isProse = input.editorProfile === 'prose'
   const isEditable = !input.readonly && !input.disabled
+  const isEditableMode = input.mode !== 'preview'
   const isSameDoc =
     (!input.previousDocumentId ||
       !input.currentDocumentId ||
@@ -134,7 +140,13 @@ export const resolveFocusState = (
       !input.currentEpoch ||
       input.previousEpoch === input.currentEpoch)
 
-  if (!isFocusOption || !isProse || !isEditable || !isSameDoc) {
+  if (
+    !isFocusOption ||
+    !isProse ||
+    !isEditable ||
+    !isEditableMode ||
+    !isSameDoc
+  ) {
     return Object.freeze({
       enabled: false,
       activeBlockId: null,
@@ -151,7 +163,9 @@ export const resolveFocusState = (
     })
   }
 
-  const rawNodes = input.projection?.nodes ?? []
+  const rawNodes = (input.projection?.nodes ?? []).filter(
+    (node) => node.parentRawRange == null,
+  )
   const nodes =
     rawNodes.length > 0
       ? rawNodes
@@ -280,6 +294,80 @@ export const resolveFocusState = (
   })
 }
 
+export interface MarkdownEditorFocusSegment {
+  readonly key: string
+  readonly nodeId?: string
+  readonly text: string
+  readonly dimmed: boolean
+  readonly exempt: boolean
+}
+
+/**
+ * Projects Focus presentation over the source without changing the editor's
+ * reading order, selection owner, or underlying value.
+ */
+export const createMarkdownFocusSegments = (
+  source: string,
+  state: MarkdownEditorFocusState,
+): readonly MarkdownEditorFocusSegment[] => {
+  if (!state.enabled || state.blocks.length === 0) {
+    return Object.freeze([
+      Object.freeze({
+        key: 'document',
+        text: source,
+        dimmed: false,
+        exempt: false,
+      }),
+    ])
+  }
+
+  const segments: MarkdownEditorFocusSegment[] = []
+  const ordered = [...state.blocks].sort(
+    (left, right) => left.sourceRange[0] - right.sourceRange[0],
+  )
+  let offset = 0
+  for (const block of ordered) {
+    const start = Math.max(
+      offset,
+      Math.min(source.length, block.sourceRange[0]),
+    )
+    const end = Math.max(start, Math.min(source.length, block.sourceRange[1]))
+    if (start > offset) {
+      segments.push(
+        Object.freeze({
+          key: `gap:${offset}:${start}`,
+          text: source.slice(offset, start),
+          dimmed: false,
+          exempt: true,
+        }),
+      )
+    }
+    if (end > start) {
+      segments.push(
+        Object.freeze({
+          key: block.id,
+          nodeId: block.id,
+          text: source.slice(start, end),
+          dimmed: block.dimmed,
+          exempt: block.exempt,
+        }),
+      )
+    }
+    offset = Math.max(offset, end)
+  }
+  if (offset < source.length) {
+    segments.push(
+      Object.freeze({
+        key: `gap:${offset}:${source.length}`,
+        text: source.slice(offset),
+        dimmed: false,
+        exempt: true,
+      }),
+    )
+  }
+  return Object.freeze(segments)
+}
+
 export type MarkdownFocusMutationKind =
   | 'blur-hide'
   | 'dom-current-block'
@@ -290,66 +378,72 @@ export const evaluateMarkdownFocusMutations = (
   input: MarkdownEditorFocusInput,
 ) => {
   const authority = resolveFocusState(input)
-
-  const presentation = authority.presentation as {
-    blur?: boolean
-    hidden?: boolean
-    mask?: boolean
-    dimmedOpacity: number
-  }
-  const blurHideEquivalent =
-    presentation.blur === true ||
-    presentation.hidden === true ||
-    presentation.mask === true ||
-    presentation.dimmedOpacity < 0.4
-
-  const domCurrentBlockEquivalent = false
-
-  let selectionPartialDimEquivalent = false
-  if (input.selection && input.selection.start !== input.selection.end) {
-    const selStart = Math.min(input.selection.start, input.selection.end)
-    const selEnd = Math.max(input.selection.start, input.selection.end)
-    for (const b of authority.blocks) {
-      const intersects = !(
-        b.sourceRange[1] < selStart || b.sourceRange[0] > selEnd
-      )
-      if (intersects && b.dimmed) {
-        selectionPartialDimEquivalent = true
-        break
-      }
-    }
-  }
-
-  const ordinaryProfileState = resolveFocusState({
+  const same = (left: unknown, right: unknown) =>
+    JSON.stringify(left) === JSON.stringify(right)
+  const blurHideMutation = Object.freeze({
+    ...authority,
+    presentation: Object.freeze({
+      dimmedOpacity: 0,
+      blur: true,
+      hidden: true,
+      mask: true,
+    }),
+  })
+  const firstBlock = authority.blocks[0]
+  const domCurrentBlockMutation = Object.freeze({
+    ...authority,
+    activeBlockId: firstBlock?.id ?? null,
+    activeBlockIds: Object.freeze(firstBlock ? [firstBlock.id] : []),
+    blocks: Object.freeze(
+      authority.blocks.map((block) =>
+        Object.freeze({
+          ...block,
+          active: block.id === firstBlock?.id,
+          dimmed: block.id !== firstBlock?.id && !block.exempt,
+        }),
+      ),
+    ),
+  })
+  const selectionAnchor =
+    input.selection?.direction === 'backward'
+      ? input.selection.end
+      : input.selection?.start
+  const selectionPartialDimMutation =
+    selectionAnchor === undefined
+      ? authority
+      : resolveFocusState({
+          ...input,
+          selection: {
+            start: selectionAnchor,
+            end: selectionAnchor,
+            direction: 'none',
+          },
+        })
+  const ordinaryProfileAuthority = resolveFocusState({
     ...input,
     editorProfile: 'markdown',
   })
-  const ordinaryProfileObserverEquivalent =
-    ordinaryProfileState.enabled === true
+  const ordinaryProfileObserverMutation = Object.freeze({
+    ...ordinaryProfileAuthority,
+    enabled: true,
+    observerAttached: true,
+  })
+  const results = [
+    ['blur-hide', same(authority, blurHideMutation)],
+    ['dom-current-block', same(authority, domCurrentBlockMutation)],
+    ['selection-partial-dim', same(authority, selectionPartialDimMutation)],
+    [
+      'ordinary-profile-observer',
+      same(ordinaryProfileAuthority, ordinaryProfileObserverMutation),
+    ],
+  ] as const
 
   return Object.freeze({
     authority,
     mutations: Object.freeze([
-      Object.freeze({
-        kind: 'blur-hide' as const,
-        equivalent: blurHideEquivalent,
-        accepted: false,
-      }),
-      Object.freeze({
-        kind: 'dom-current-block' as const,
-        equivalent: domCurrentBlockEquivalent,
-        accepted: false,
-      }),
-      Object.freeze({
-        kind: 'selection-partial-dim' as const,
-        equivalent: selectionPartialDimEquivalent,
-        accepted: false,
-      }),
-      Object.freeze({
-        kind: 'ordinary-profile-observer' as const,
-        equivalent: ordinaryProfileObserverEquivalent,
-        accepted: false,
-      }),
+      ...results.map(([kind, equivalent]) =>
+        Object.freeze({ kind, equivalent, accepted: equivalent }),
+      ),
     ]),
   })
 }
@@ -365,6 +459,7 @@ export interface MarkdownEditorTypewriterScrollInput {
   readonly safeAreaInsetBottom?: number
   readonly visualViewportHeight?: number
   readonly visualViewportOffsetTop?: number
+  readonly sourceAnchorY?: number
   readonly reducedMotion?: boolean
 }
 
@@ -381,7 +476,7 @@ export const calculateTypewriterScrollTarget = (
 ): MarkdownEditorTypewriterScrollResult => {
   const textBefore = input.source.slice(0, input.caretSourceOffset)
   const caretLine = (textBefore.match(/\n/g) || []).length
-  const caretY = caretLine * input.lineHeight
+  const caretY = input.sourceAnchorY ?? caretLine * input.lineHeight
 
   const effectiveViewportHeight =
     input.visualViewportHeight &&
@@ -390,6 +485,7 @@ export const calculateTypewriterScrollTarget = (
       : input.viewportHeight
 
   const toolbar = input.stickyToolbarHeight ?? 0
+  const viewportOffset = input.visualViewportOffsetTop ?? 0
   const safeTop = input.safeAreaInsetTop ?? 0
   const safeBottom = input.safeAreaInsetBottom ?? 0
   const usableHeight = Math.max(
@@ -398,7 +494,8 @@ export const calculateTypewriterScrollTarget = (
   )
 
   const anchorRatio = input.anchor === 'center' ? 0.5 : 1 / 3
-  const targetOffsetInViewport = toolbar + safeTop + usableHeight * anchorRatio
+  const targetOffsetInViewport =
+    viewportOffset + toolbar + safeTop + usableHeight * anchorRatio
 
   const scrollTop = Math.max(0, Math.round(caretY - targetOffsetInViewport))
   const smooth = input.reducedMotion !== true
@@ -432,7 +529,23 @@ export const evaluateMarkdownTypewriterMutations = (
   const selectionChangeRecenterEquivalent =
     (selResult as { scroll?: boolean }).scroll === true
 
-  const domAnchorEquivalent = false
+  const sourceAnchor = calculateTypewriterScrollTarget({
+    anchor: resolved.typewriterAnchor,
+    caretSourceOffset: 12,
+    lineHeight: 20,
+    source: 'first\nsecond\nthird',
+    viewportHeight: 600,
+  })
+  const domAnchorMutation = calculateTypewriterScrollTarget({
+    anchor: resolved.typewriterAnchor,
+    caretSourceOffset: 12,
+    lineHeight: 20,
+    source: 'first\nsecond\nthird',
+    sourceAnchorY: 480,
+    viewportHeight: 600,
+  })
+  const domAnchorEquivalent =
+    JSON.stringify(sourceAnchor) === JSON.stringify(domAnchorMutation)
 
   controller.handleUserScroll()
   const suspendedState = controller.state
@@ -452,27 +565,27 @@ export const evaluateMarkdownTypewriterMutations = (
       Object.freeze({
         kind: 'center-default' as const,
         equivalent: centerDefaultEquivalent,
-        accepted: false,
+        accepted: centerDefaultEquivalent,
       }),
       Object.freeze({
         kind: 'selection-change-recenter' as const,
         equivalent: selectionChangeRecenterEquivalent,
-        accepted: false,
+        accepted: selectionChangeRecenterEquivalent,
       }),
       Object.freeze({
         kind: 'dom-anchor' as const,
         equivalent: domAnchorEquivalent,
-        accepted: false,
+        accepted: domAnchorEquivalent,
       }),
       Object.freeze({
         kind: 'scroll-stealing' as const,
         equivalent: scrollStealingEquivalent,
-        accepted: false,
+        accepted: scrollStealingEquivalent,
       }),
       Object.freeze({
         kind: 'reduced-smooth-motion' as const,
         equivalent: reducedSmoothMotionEquivalent,
-        accepted: false,
+        accepted: reducedSmoothMotionEquivalent,
       }),
     ]),
   })
@@ -504,7 +617,18 @@ export interface MarkdownEditorWritingAidsController {
   handleSelectionDragStart(): Readonly<Record<string, unknown>>
   handleSelectionDragEnd(): Readonly<Record<string, unknown>>
   handleProjectionChange(): Readonly<Record<string, unknown>>
+  handleAsyncLayoutChange(): Readonly<Record<string, unknown>>
   updateDocument(document?: Readonly<Record<string, unknown>>): void
+}
+
+const sameDocumentValue = (left: unknown, right: unknown) => {
+  if (left === right) return true
+  if (left && right && typeof left === 'object' && typeof right === 'object') {
+    const a = left as Readonly<Record<string, unknown>>
+    const b = right as Readonly<Record<string, unknown>>
+    return a.id === b.id && a.epoch === b.epoch
+  }
+  return false
 }
 
 export const createWritingAidsController = (
@@ -581,13 +705,20 @@ export const createWritingAidsController = (
             : 'markdown',
         readonly: documentState.readonly === true,
         disabled: documentState.disabled === true,
+        mode:
+          typeof documentState.mode === 'string'
+            ? documentState.mode
+            : undefined,
+        exemptions: documentState.focusExemptions as
+          | MarkdownEditorFocusExemptions
+          | undefined,
       })
     },
     calculateScroll(scrollInput) {
       return calculateTypewriterScrollTarget({
         ...scrollInput,
         anchor: resolved.typewriterAnchor,
-        reducedMotion: reducedMotion(),
+        reducedMotion: scrollInput.reducedMotion ?? reducedMotion(),
       })
     },
     input() {
@@ -618,8 +749,12 @@ export const createWritingAidsController = (
       return response(false)
     },
     handleInput() {
-      state = suspendReason ? 'restoring' : 'input-driven'
-      suspendReason = undefined
+      if (suspendReason) {
+        state = 'restoring'
+        suspendReason = undefined
+        return response(false)
+      }
+      state = 'input-driven'
       return response(true)
     },
     handleExplicitNavigation() {
@@ -657,6 +792,14 @@ export const createWritingAidsController = (
     handleProjectionChange() {
       return response(false)
     },
+    handleAsyncLayoutChange() {
+      const mayRestore =
+        resolved.typewriter &&
+        !suspendReason &&
+        (state === 'input-driven' ||
+          state === 'explicit-navigation')
+      return response(mayRestore)
+    },
     updateDocument(document = Object.freeze({})) {
       const previousIdentity = documentState.documentIdentity
       const previousEpoch = documentState.documentEpoch
@@ -669,7 +812,7 @@ export const createWritingAidsController = (
       }
       const identityChanged =
         (document.documentIdentity !== undefined &&
-          document.documentIdentity !== previousIdentity) ||
+          !sameDocumentValue(document.documentIdentity, previousIdentity)) ||
         (document.documentEpoch !== undefined &&
           document.documentEpoch !== previousEpoch)
       if (identityChanged) {

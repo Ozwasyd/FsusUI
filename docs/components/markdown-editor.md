@@ -276,7 +276,8 @@ unsupported 或 missing target 不移动 selection、focus、scroll 或 history�
 - `typewriter` 只在普通 input 或显式 outline/search navigation 后定位；selection
   change 本身不滚动。wheel、touch、scrollbar、selection drag 与 composition 会暂停
   自动定位，后续 input 或显式 navigation 才恢复。默认 anchor 是 upper-third；
-  `typewriter-anchor="center"` 必须显式选择。Reduced motion 保留定位但禁用平滑滚动。
+  `writingAids.typewriterAnchor = 'center'` 必须显式选择。Reduced motion 保留定位但
+  禁用平滑滚动。
 
 Focus layer 是 `aria-hidden` 的 presentation，textarea 继续单独拥有 input、selection、
 clipboard、focus 與 IME。两个 writing aid 都不修改 Markdown source 或 history。
@@ -292,6 +293,7 @@ clipboard、focus 與 IME。两个 writing aid 都不修改 Markdown source 或 
 | placeholder       | 文本域占位文本                               | `string`                                     | `''`     |
 | commands          | toolbar command model                        | `MarkdownEditorCommand[]`                    | 内置命令 |
 | writing-aids      | prose focus 与 typewriter opt-in             | `MarkdownEditorWritingAidsOptions`           | —        |
+| focus-exemptions  | Focus mode 中保持清晰的 source node 状态      | `MarkdownEditorFocusExemptions`               | —        |
 | editor-profile    | markdown 或 prose 写作表面                   | `'markdown' \| 'prose'`                      | markdown |
 | readonly          | Read-only; blocks input and mutation methods | `boolean`                                    | `false`  |
 | disabled          | 禁用输入与全部 mutation method               | `boolean`                                    | `false`  |

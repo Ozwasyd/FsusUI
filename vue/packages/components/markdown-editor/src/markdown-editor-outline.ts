@@ -2,7 +2,9 @@ import {
   createMarkdownEditorProjection,
   createMarkdownOutlineEntries,
   stabilizeMarkdownEditorProjection,
+  type MarkdownAnchorMap,
   type MarkdownDocumentIdentity,
+  type MarkdownRevealTarget,
   type MarkdownStableProjection,
 } from '../../../wasm/markdown-runtime'
 
@@ -52,7 +54,10 @@ const headingTitleOf = (source: string, range: MarkdownEditorOutlineRange) => {
   }
   const setext = /^(.*)\n(=+|-+)\s*$/u.exec(slice.trimEnd())
   if (setext) {
-    return { level: setext[2]!.startsWith('=') ? 1 : 2, text: setext[1]!.trim() }
+    return {
+      level: setext[2]!.startsWith('=') ? 1 : 2,
+      text: setext[1]!.trim(),
+    }
   }
   return { level: 1, text: slice.trim() }
 }
@@ -86,19 +91,13 @@ export const resolveMarkdownEditorOutline = (
       }),
   )
 
-export const createMarkdownOutlineModel = (
+export const createMarkdownOutlineModelFromProjection = (
   source: string,
-  documentIdentity: MarkdownDocumentIdentity,
-  previous?: MarkdownStableProjection,
+  projection: MarkdownStableProjection,
 ): {
   readonly projection: MarkdownStableProjection
   readonly items: readonly MarkdownEditorOutlineItem[]
 } => {
-  const projection = stabilizeMarkdownEditorProjection(
-    createMarkdownEditorProjection(source),
-    documentIdentity,
-    previous,
-  )
   const entries = createMarkdownOutlineEntries(projection)
   const stack: MarkdownEditorOutlineItem[] = []
   const items: MarkdownEditorOutlineItem[] = []
@@ -110,7 +109,7 @@ export const createMarkdownOutlineModel = (
     }
     const parent = stack[stack.length - 1]
     const diagnostics: MarkdownOutlineDiagnostic[] = []
-    if (heading.level === 1 && seenTitles.get('#') ) {
+    if (heading.level === 1 && seenTitles.get('#')) {
       diagnostics.push({ code: 'duplicate-h1', nodeId: entry.id })
     }
     if (heading.level > 1 && !parent) {
@@ -119,7 +118,10 @@ export const createMarkdownOutlineModel = (
     if (parent && heading.level > parent.depth + 1) {
       diagnostics.push({ code: 'heading-layer-jump', nodeId: entry.id })
     }
-    seenTitles.set('#', (seenTitles.get('#') ?? 0) + (heading.level === 1 ? 1 : 0))
+    seenTitles.set(
+      '#',
+      (seenTitles.get('#') ?? 0) + (heading.level === 1 ? 1 : 0),
+    )
     const item: MarkdownEditorOutlineItem = Object.freeze({
       id: entry.id,
       nodeId: entry.id,
@@ -142,25 +144,64 @@ export const createMarkdownOutlineModel = (
   })
 }
 
+export const createMarkdownOutlineModel = (
+  source: string,
+  documentIdentity: MarkdownDocumentIdentity,
+  previous?: MarkdownStableProjection,
+) =>
+  createMarkdownOutlineModelFromProjection(
+    source,
+    stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection(source),
+      documentIdentity,
+      previous,
+    ),
+  )
+
 export interface MarkdownEditorRevealOptions {
   readonly mode?: string
   readonly reducedMotion?: boolean
-  readonly virtualTarget?: boolean | { readonly mounted?: boolean; readonly offset?: number }
+  readonly expected?: {
+    readonly documentIdentity: MarkdownDocumentIdentity
+    readonly revision: number
+  }
+  readonly anchorMap?: MarkdownAnchorMap
+  readonly virtualTarget?: MarkdownRevealTarget
   readonly deletedNodeIds?: readonly string[]
   readonly projection?: MarkdownStableProjection
   readonly previousOutline?: readonly MarkdownEditorOutlineItem[]
 }
 
+const sameDocumentIdentity = (
+  left: MarkdownDocumentIdentity,
+  right: MarkdownDocumentIdentity,
+) => left.id === right.id && left.epoch === right.epoch
+
+const virtualTargetMatches = (
+  target: MarkdownRevealTarget | undefined,
+  nodeId: string,
+  actual: { readonly documentIdentity: MarkdownDocumentIdentity },
+) =>
+  target?.virtual === true &&
+  target.anchorId === nodeId &&
+  target.identity === actual.documentIdentity.id &&
+  sameDocumentIdentity(target.documentIdentity, actual.documentIdentity)
+
 export const revealHeading = (
   outline: readonly MarkdownEditorOutlineItem[],
   nodeId: string,
-  expected: { readonly documentIdentity: MarkdownDocumentIdentity; readonly revision: number },
-  actual: { readonly documentIdentity: MarkdownDocumentIdentity; readonly revision: number },
+  expected: {
+    readonly documentIdentity: MarkdownDocumentIdentity
+    readonly revision: number
+  },
+  actual: {
+    readonly documentIdentity: MarkdownDocumentIdentity
+    readonly revision: number
+  },
   options?: MarkdownEditorRevealOptions,
 ): MarkdownEditorRevealResult => {
   if (
-    expected.documentIdentity.id !== actual.documentIdentity.id ||
-    expected.documentIdentity.epoch !== actual.documentIdentity.epoch ||
+    !sameDocumentIdentity(expected.documentIdentity, actual.documentIdentity) ||
     expected.revision !== actual.revision
   ) {
     return 'stale'
@@ -187,9 +228,31 @@ export const revealHeading = (
   if (item) {
     return 'success'
   }
-  if (options?.virtualTarget) {
-    const inProjection = options.projection?.nodes.some((node) => node.id === nodeId)
-    if (inProjection || options.virtualTarget === true) {
+  if (options?.anchorMap) {
+    try {
+      const target = options.anchorMap.reveal({ anchorId: nodeId })
+      if (
+        sameDocumentIdentity(target.documentIdentity, actual.documentIdentity)
+      ) {
+        return 'success'
+      }
+    } catch {
+      // Unknown identities fail closed below.
+    }
+  }
+  const virtualTarget = options?.virtualTarget
+  if (
+    virtualTarget &&
+    virtualTargetMatches(virtualTarget, nodeId, actual)
+  ) {
+    const { start, end } = virtualTarget.range
+    if (
+      Number.isInteger(start) &&
+      Number.isInteger(end) &&
+      start >= 0 &&
+      end >= start &&
+      end <= (options?.anchorMap?.source.length ?? end)
+    ) {
       return 'success'
     }
   }
@@ -200,17 +263,27 @@ export const revealSourceRange = (
   outline: readonly MarkdownEditorOutlineItem[],
   range: MarkdownEditorOutlineRange,
   options?: {
-    readonly expected?: { readonly documentIdentity: MarkdownDocumentIdentity; readonly revision: number }
-    readonly actual?: { readonly documentIdentity: MarkdownDocumentIdentity; readonly revision: number }
+    readonly expected?: {
+      readonly documentIdentity: MarkdownDocumentIdentity
+      readonly revision: number
+    }
+    readonly actual?: {
+      readonly documentIdentity: MarkdownDocumentIdentity
+      readonly revision: number
+    }
     readonly mode?: string
+    readonly reducedMotion?: boolean
+    readonly sourceLength?: number
+    readonly anchorMap?: MarkdownAnchorMap
     readonly projection?: MarkdownStableProjection
-    readonly virtualTarget?: boolean
   },
 ): MarkdownEditorRevealResult => {
   if (options?.expected && options?.actual) {
     if (
-      options.expected.documentIdentity.id !== options.actual.documentIdentity.id ||
-      options.expected.documentIdentity.epoch !== options.actual.documentIdentity.epoch ||
+      !sameDocumentIdentity(
+        options.expected.documentIdentity,
+        options.actual.documentIdentity,
+      ) ||
       options.expected.revision !== options.actual.revision
     ) {
       return 'stale'
@@ -219,22 +292,38 @@ export const revealSourceRange = (
   if (options?.mode === 'unsupported') {
     return 'unsupported'
   }
-  if (range.start < 0 || range.end < range.start) {
+  if (
+    !Number.isInteger(range.start) ||
+    !Number.isInteger(range.end) ||
+    range.start < 0 ||
+    range.end < range.start ||
+    (options?.sourceLength !== undefined && range.end > options.sourceLength)
+  ) {
     return 'not-found'
   }
+  if (options?.anchorMap) {
+    try {
+      const reveal = options.anchorMap.sourceRangeToReveal(range)
+      return reveal.identity === options.anchorMap.identity &&
+        sameDocumentIdentity(
+          reveal.documentIdentity,
+          options.anchorMap.documentIdentity,
+        )
+        ? 'success'
+        : 'not-found'
+    } catch {
+      return 'not-found'
+    }
+  }
+  if (options?.sourceLength !== undefined) return 'success'
   const found = outline.some(
     (item) =>
-      (item.sourceRange.start <= range.start && item.sourceRange.end >= range.end) ||
-      (range.start <= item.sourceRange.start && item.sourceRange.end <= range.end),
+      (item.sourceRange.start <= range.start &&
+        item.sourceRange.end >= range.end) ||
+      (range.start <= item.sourceRange.start &&
+        item.sourceRange.end <= range.end),
   )
   if (found) return 'success'
-  if (options?.virtualTarget && options?.projection) {
-    const inProj = options.projection.nodes.some(
-      (node) =>
-        node.rawRange.start <= range.start && node.rawRange.end >= range.end,
-    )
-    if (inProj) return 'success'
-  }
   return 'not-found'
 }
 
@@ -257,7 +346,9 @@ export const createMarkdownOutlineTree = (
     }
   }
 
-  const buildTree = (item: MarkdownEditorOutlineItem): MarkdownOutlineTreeNode => {
+  const buildTree = (
+    item: MarkdownEditorOutlineItem,
+  ): MarkdownOutlineTreeNode => {
     const rawChildren = childrenMap.get(item.nodeId) ?? []
     const children = rawChildren.map(buildTree)
     return Object.freeze({
@@ -286,10 +377,12 @@ export const evaluateMarkdownOutlineMutations = (
   documentIdentity: MarkdownDocumentIdentity,
 ) => {
   const authority = createMarkdownOutlineModel(source, documentIdentity)
-  const regexOutline = [...source.matchAll(/^#{1,6} .+$/gm)].map((match, index) => ({
-    id: `heading:${index}`,
-    text: match[0],
-  }))
+  const regexOutline = [...source.matchAll(/^#{1,6} .+$/gm)].map(
+    (match, index) => ({
+      id: `heading:${index}`,
+      text: match[0],
+    }),
+  )
   const textKey = authority.items.map((item) => ({ id: `hash:${item.text}` }))
   const offsetKey = authority.items.map((item) => ({
     id: `heading:${item.sourceRange.start}`,
@@ -344,14 +437,39 @@ export type MarkdownOutlineRevealMutationKind =
   | 'history-mutation'
   | 'navigation-loop'
 
+interface MarkdownOutlineRevealMutationPlan {
+  readonly status: MarkdownEditorRevealResult
+  readonly range?: MarkdownEditorOutlineRange
+  readonly navigationOwner: 'none' | 'outline' | 'typewriter'
+  readonly historyMutated: boolean
+}
+
+const planRevealMutationResult = (
+  status: MarkdownEditorRevealResult,
+  range: MarkdownEditorOutlineRange | undefined,
+  navigationOwner: MarkdownOutlineRevealMutationPlan['navigationOwner'],
+  historyMutated: boolean,
+): MarkdownOutlineRevealMutationPlan =>
+  Object.freeze({
+    status,
+    ...(range ? { range: Object.freeze({ ...range }) } : {}),
+    navigationOwner,
+    historyMutated,
+  })
+
+const revealMutationPlansEqual = (
+  left: MarkdownOutlineRevealMutationPlan,
+  right: MarkdownOutlineRevealMutationPlan,
+) => JSON.stringify(left) === JSON.stringify(right)
+
 export const evaluateMarkdownOutlineRevealMutations = (
   outline: readonly MarkdownEditorOutlineItem[],
   documentIdentity: MarkdownDocumentIdentity,
   options?: { readonly revision?: number },
 ) => {
   const revision = options?.revision ?? 1
-  const first = outline[0]
-  const targetId = first ? first.nodeId : 'missing-target'
+  const target = outline[1] ?? outline[0]
+  const targetId = target?.nodeId ?? 'missing-target'
   const authorityResult = revealHeading(
     outline,
     targetId,
@@ -359,57 +477,79 @@ export const evaluateMarkdownOutlineRevealMutations = (
     { documentIdentity, revision },
   )
 
-  const second = outline[1] ?? outline[0]
-  const textKeyFoundNodeId = second
-    ? outline.find((item) => item.text === second.text)?.nodeId
+  const authorityPlan = planRevealMutationResult(
+    authorityResult,
+    target?.sourceRange,
+    'outline',
+    false,
+  )
+  const textKeyTarget = target
+    ? outline.find((item) => item.text === target.text)
     : undefined
-  const textKeyMatchesSibling =
-    outline.length > 1 && second?.text === outline[0]?.text
-      ? textKeyFoundNodeId === second.nodeId
-      : false
+  const textKeyPlan = planRevealMutationResult(
+    textKeyTarget ? 'success' : 'not-found',
+    textKeyTarget?.sourceRange,
+    'outline',
+    false,
+  )
+  const domTarget = outline[0]
+  const domQueryPlan = planRevealMutationResult(
+    domTarget ? 'success' : 'not-found',
+    domTarget?.sourceRange,
+    'outline',
+    false,
+  )
+  const missingAuthority = revealHeading(
+    outline,
+    'non-existent-node-id',
+    { documentIdentity, revision },
+    { documentIdentity, revision },
+  )
+  const nearbyPlan = planRevealMutationResult(
+    missingAuthority === 'not-found' ? 'success' : missingAuthority,
+    outline[0]?.sourceRange,
+    'outline',
+    false,
+  )
+  const missingPlan = planRevealMutationResult(
+    missingAuthority,
+    undefined,
+    'none',
+    false,
+  )
+  const historyMutationPlan = planRevealMutationResult(
+    authorityResult,
+    target?.sourceRange,
+    'outline',
+    true,
+  )
+  const navigationLoopPlan = planRevealMutationResult(
+    authorityResult,
+    target?.sourceRange,
+    'typewriter',
+    false,
+  )
 
-  const domQueryEquivalent = false
-
-  const nearbySuccessSimulated =
-    revealHeading(
-      outline,
-      'non-existent-node-id',
-      { documentIdentity, revision },
-      { documentIdentity, revision },
-    ) === 'success'
-
-  const historyMutationSimulated = false
-
-  const navigationLoopSimulated = false
+  const mutations = [
+    ['text-key-reveal', revealMutationPlansEqual(authorityPlan, textKeyPlan)],
+    ['dom-query-reveal', revealMutationPlansEqual(authorityPlan, domQueryPlan)],
+    ['nearby-success', revealMutationPlansEqual(missingPlan, nearbyPlan)],
+    [
+      'history-mutation',
+      revealMutationPlansEqual(authorityPlan, historyMutationPlan),
+    ],
+    [
+      'navigation-loop',
+      revealMutationPlansEqual(authorityPlan, navigationLoopPlan),
+    ],
+  ] as const
 
   return Object.freeze({
     authority: authorityResult,
-    mutations: Object.freeze([
-      Object.freeze({
-        kind: 'text-key-reveal' as const,
-        equivalent: textKeyMatchesSibling,
-        accepted: false,
-      }),
-      Object.freeze({
-        kind: 'dom-query-reveal' as const,
-        equivalent: domQueryEquivalent,
-        accepted: false,
-      }),
-      Object.freeze({
-        kind: 'nearby-success' as const,
-        equivalent: nearbySuccessSimulated,
-        accepted: false,
-      }),
-      Object.freeze({
-        kind: 'history-mutation' as const,
-        equivalent: historyMutationSimulated,
-        accepted: false,
-      }),
-      Object.freeze({
-        kind: 'navigation-loop' as const,
-        equivalent: navigationLoopSimulated,
-        accepted: false,
-      }),
-    ]),
+    mutations: Object.freeze(
+      mutations.map(([kind, equivalent]) =>
+        Object.freeze({ kind, equivalent, accepted: equivalent }),
+      ),
+    ),
   })
 }
