@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "component": "ElMarkdownEditor",
   "blocked": true,
-  "blockedBy": [339, 340, 341, 342, 343],
+  "blockedBy": [340, 341, 342, 343],
   "requiredStatus": "partial",
-  "reason": "FsusMarkdownEditor public shell exists; transaction, live projection, IME, and AutomationPeer remain partial/blocked."
+  "reason": "FsusMarkdownEditor transaction, selection, history, and position mapping are implemented; live projection, IME, and AutomationPeer remain partial/blocked."
 }

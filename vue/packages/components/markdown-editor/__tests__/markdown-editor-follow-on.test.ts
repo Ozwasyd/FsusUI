@@ -29,6 +29,8 @@ const context = (revision = 1): MarkdownEditorCommandContext => ({
   dispatch: {
     dispatch: () => ({
       accepted: true,
+      beforeRevision: Math.max(0, revision - 1),
+      documentIdentity: { epoch: 1, id: 'doc' },
       history: {
         canRedo: false,
         canUndo: false,

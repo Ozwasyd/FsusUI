@@ -10,6 +10,8 @@ const context = (): MarkdownEditorCommandContext => ({
   dispatch: {
     dispatch: () => ({
       accepted: true,
+      beforeRevision: 0,
+      documentIdentity: { epoch: 1, id: 'doc' },
       history: {
         canRedo: false,
         canUndo: false,
