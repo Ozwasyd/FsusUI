@@ -520,13 +520,15 @@ describe('MarkdownEditor', () => {
       reason: 'no-history',
       value: 'A',
     })
+    expect(wrapper.vm.insertMarkdownAtCursor('C')).toBe(true)
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['AC'])
 
     resolveCommand?.()
     await nextTick()
-    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['AB'])
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['AC'])
     expect(
       (wrapper.find('textarea').element as HTMLTextAreaElement).value,
-    ).toBe('A')
+    ).toBe('AC')
   })
 
   it('keeps public external transactions synchronized through v-model', async () => {

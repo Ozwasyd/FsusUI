@@ -66,7 +66,10 @@ import {
   planMarkdownBlockMove,
   planMarkdownBlockSplit,
 } from '../src/markdown-editor-anchor-commands'
-import { createMarkdownEditorPositionMap } from '../src/markdown-editor-transaction'
+import {
+  composeMarkdownEditorPositionMapInstances,
+  createMarkdownEditorPositionMap,
+} from '../src/markdown-editor-transaction'
 import {
   createMarkdownEditorProjection,
   stabilizeMarkdownEditorProjection,
@@ -241,6 +244,23 @@ describe('Issue #431: Async command cancellation, anchor rebase, and shared pend
     expect(rebasedState).toBe('pending')
     expect(session.anchor?.start).toBe(5 + 'PREFIX '.length)
     expect(session.revision).toBe(2)
+    const composedMap = composeMarkdownEditorPositionMapInstances([
+      positionMap,
+      createMarkdownEditorPositionMap([{ from: 0, to: 0, insert: '>' }], {
+        source: 'PREFIX Sample markdown text',
+      }),
+    ])
+    expect(composedMap.map(5, -1)).toBe(13)
+    expect(composedMap.mapRange({ start: 5, end: 10 })).toEqual({
+      deleted: false,
+      partiallyDeleted: false,
+      range: { start: 13, end: 18 },
+    })
+    expect(composedMap.rebase({ start: 5, end: 10 })).toEqual({
+      start: 13,
+      end: 18,
+      status: 'mapped',
+    })
     expect(
       resolveMarkdownEditorCommandSession(
         session,

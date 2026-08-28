@@ -670,6 +670,7 @@ import {
 } from './markdown-editor-command-snapshot'
 import { resolveMarkdownEditorChromeRegions } from './markdown-editor-chrome'
 import {
+  composeMarkdownEditorPositionMapInstances,
   createMarkdownEditorPositionMap,
   deriveMarkdownEditorChange,
   MarkdownEditorTransactionStore,
@@ -690,7 +691,6 @@ import type {
   MarkdownEditorHistoryState,
   MarkdownEditorInputMergeDirection,
   MarkdownEditorPositionMap,
-  MarkdownEditorRebasedAnchor,
   MarkdownEditorSelection,
   MarkdownEditorTransaction,
   MarkdownEditorTransactionRejection,
@@ -896,26 +896,7 @@ const positionMapFromRevision = (
     if (!map) return undefined
     maps.push(map)
   }
-  return Object.freeze({
-    rebase(anchor) {
-      let current: MarkdownEditorRebasedAnchor = {
-        ...anchor,
-        status: 'mapped',
-      }
-      let partial = false
-      for (const map of maps) {
-        if (current.status === 'deleted') return current
-        current = map.rebase(current)
-        if (current.status === 'partial') partial = true
-      }
-      if (current.status === 'deleted') return current
-      return Object.freeze({
-        start: current.start,
-        end: current.end,
-        status: partial ? ('partial' as const) : ('mapped' as const),
-      })
-    },
-  })
+  return composeMarkdownEditorPositionMapInstances(maps)
 }
 const liveReveal = ref(
   resolveMarkdownLiveSyntaxReveal({
@@ -2134,7 +2115,13 @@ watch(
     })
     syncNativeComposing()
 
-    const result = transactionStore.reset(props.modelValue)
+    transactionStore.switchDocument(documentIdentity, props.modelValue)
+    const result = {
+      history: transactionStore.history,
+      revision: transactionStore.revision,
+      selection: transactionStore.selection,
+      value: transactionStore.value,
+    }
     editorProjection.value = stabilizeMarkdownEditorProjection(
       createMarkdownEditorProjection(result.value),
       documentIdentity,

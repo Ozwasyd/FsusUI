@@ -258,15 +258,13 @@ export const createMarkdownEditorPositionMap = (
   })
 }
 
-export const composeMarkdownEditorPositionMaps = (
-  stages: readonly (readonly MarkdownEditorChange[])[],
+export const composeMarkdownEditorPositionMapInstances = (
+  maps: readonly MarkdownEditorPositionMap[],
 ): MarkdownEditorPositionMap => {
-  const maps = Object.freeze(
-    stages.map((changes) => createMarkdownEditorPositionMap(changes)),
-  )
+  const frozenMaps = Object.freeze([...maps])
   return Object.freeze({
     map(offset: number, association: MarkdownEditorPositionAssociation) {
-      return maps.reduce(
+      return frozenMaps.reduce(
         (mapped, positionMap) => positionMap.map(mapped, association),
         offset,
       )
@@ -277,7 +275,7 @@ export const composeMarkdownEditorPositionMaps = (
         partiallyDeleted: false,
         range: Object.freeze({ ...range }),
       })
-      for (const positionMap of maps) {
+      for (const positionMap of frozenMaps) {
         if (!mapped.range) return mapped
         const next = positionMap.mapRange(mapped.range)
         mapped = Object.freeze({
@@ -294,7 +292,7 @@ export const composeMarkdownEditorPositionMaps = (
         status: 'mapped',
       }
       let partial = false
-      for (const positionMap of maps) {
+      for (const positionMap of frozenMaps) {
         if (current.status === 'deleted') return current
         current = positionMap.rebase(current)
         if (current.status === 'partial') partial = true
@@ -308,6 +306,13 @@ export const composeMarkdownEditorPositionMaps = (
     },
   })
 }
+
+export const composeMarkdownEditorPositionMaps = (
+  stages: readonly (readonly MarkdownEditorChange[])[],
+): MarkdownEditorPositionMap =>
+  composeMarkdownEditorPositionMapInstances(
+    stages.map((changes) => createMarkdownEditorPositionMap(changes)),
+  )
 
 export interface MarkdownEditorTransactionDispatcher {
   dispatch(transaction: MarkdownEditorTransaction): MarkdownEditorDispatchResult
@@ -816,6 +821,10 @@ export class MarkdownEditorTransactionStore {
     if (!applied) return this.#result(false, 'invalid-change', beforeRevision)
     const positionMap = createMarkdownEditorPositionMap(
       frozenTransaction.changes,
+      {
+        documentIdentity: this.#documentIdentity,
+        source: this.#value,
+      },
     )
 
     const nextSelection = frozenTransaction.selection
