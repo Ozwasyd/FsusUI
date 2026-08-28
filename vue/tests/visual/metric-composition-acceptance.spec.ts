@@ -342,6 +342,7 @@ test('inline action focus, hover, selected and disabled states use standard toke
   const selectedState = await selectedAction.evaluate((element) => {
     const probe = document.createElement('button')
     probe.style.backgroundColor = 'var(--el-fill-color-light)'
+    probe.style.borderColor = 'var(--el-color-primary)'
     probe.style.color = 'var(--fsus-scholarly-blue, var(--el-color-primary))'
     document.body.append(probe)
     const probeStyle = getComputedStyle(probe)
@@ -349,6 +350,8 @@ test('inline action focus, hover, selected and disabled states use standard toke
       opacity: getComputedStyle(element).opacity,
       backgroundColor: getComputedStyle(element).backgroundColor,
       expectedBackgroundColor: probeStyle.backgroundColor,
+      borderColor: getComputedStyle(element).borderColor,
+      expectedBorderColor: probeStyle.borderColor,
       color: getComputedStyle(element).color,
       expectedColor: probeStyle.color,
     }
@@ -359,6 +362,7 @@ test('inline action focus, hover, selected and disabled states use standard toke
   expect(selectedState.backgroundColor).toBe(
     selectedState.expectedBackgroundColor,
   )
+  expect(selectedState.borderColor).toBe(selectedState.expectedBorderColor)
   expect(selectedState.color).toBe(selectedState.expectedColor)
 
   const disabled = page.locator(
