@@ -4620,8 +4620,38 @@
       "baseType": "FsusUI.Avalonia.Controls.FsusModalSurface",
       "isAbstract": false,
       "isSealed": false,
-      "properties": [],
-      "avaloniaProperties": [],
+      "properties": [
+        {
+          "name": "IsBodyScrollable",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "MaxBodyHeight",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [
+        {
+          "name": "IsBodyScrollable",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "MaxBodyHeight",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        }
+      ],
       "events": [],
       "methods": []
     },

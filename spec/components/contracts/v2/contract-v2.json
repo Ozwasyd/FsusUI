@@ -10,12 +10,12 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "6bfa913cf99b20b8085296656a819d5c6dde71dd8a30513b73863992511fe5e1",
+      "hash": "4468d7ba67a3aed0671eef286e9135ad216274345c998c6b30edb3e5e5a1eaa1",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "0f0d498b1b5e5ff67b6e6937ecddcce23659086a36f902cd64f8226e5035558c",
+      "hash": "e7f66f3abd8ce6ff7ece191d2433d7a23e40db7abb7da8f637324af94dde473f",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
@@ -30426,7 +30426,34 @@
           }
         }
       ],
-      "avaloniaExtras": [],
+      "avaloniaExtras": [
+        {
+          "member": "IsBodyScrollable",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-dialog.avalonia-extra.is-body-scrollable"
+          ]
+        },
+        {
+          "member": "MaxBodyHeight",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-dialog.avalonia-extra.max-body-height"
+          ]
+        }
+      ],
       "scenarioIds": [
         "scenario.v2.el-dialog.input.append-to",
         "scenario.v2.el-dialog.input.append-to-body",

@@ -196,6 +196,43 @@ public class FsusModalPrimitiveTests
     Assert.Contains("\"id\": \"message-box\"", accessibilityContracts);
   }
 
+  [Fact]
+  public void DialogScrollableBodyApiIsOptInAndScopedToDialog()
+  {
+    var dialog = new FsusDialog
+    {
+      Title = "Form Dialog",
+      Content = "Fallback body text",
+    };
+    var initialStatus = AutomationProperties.GetItemStatus(dialog);
+
+    Assert.False(dialog.IsBodyScrollable);
+    Assert.Equal(double.PositiveInfinity, dialog.MaxBodyHeight);
+    Assert.DoesNotContain("fsus-scrollable-body", dialog.Classes);
+    Assert.Equal("Fallback body text", dialog.Content);
+    Assert.Equal(initialStatus, AutomationProperties.GetItemStatus(dialog));
+    Assert.Equal(
+      typeof(FsusDialog),
+      typeof(FsusDialog).GetProperty(nameof(FsusDialog.IsBodyScrollable))?.DeclaringType);
+    Assert.Null(
+      typeof(FsusModalSurface).GetProperty(nameof(FsusDialog.IsBodyScrollable)));
+    Assert.Null(typeof(FsusDrawer).GetProperty(nameof(FsusDialog.IsBodyScrollable)));
+
+    dialog.IsBodyScrollable = true;
+    dialog.MaxBodyHeight = 240;
+
+    Assert.True(dialog.IsBodyScrollable);
+    Assert.Equal(240, dialog.MaxBodyHeight);
+    Assert.Contains("fsus-scrollable-body", dialog.Classes);
+    Assert.Equal("Fallback body text", dialog.Content);
+    Assert.Equal(initialStatus, AutomationProperties.GetItemStatus(dialog));
+
+    dialog.IsBodyScrollable = false;
+    Assert.DoesNotContain("fsus-scrollable-body", dialog.Classes);
+    Assert.Equal("Fallback body text", dialog.Content);
+    Assert.Equal(initialStatus, AutomationProperties.GetItemStatus(dialog));
+  }
+
   private sealed class KeyboardDialog : FsusDialog
   {
     public ValueTask<bool> PressAsync(Key key) => HandleKeyAsync(key);
