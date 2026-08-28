@@ -128,16 +128,30 @@ public static class FsusAvaloniaGalleryRegistry
         panel.Children.Add(new FsusTextEditor { AccessibleName = "Gallery editor" });
         break;
       case "markdown-editor":
-        panel.Children.Add(
-          new FsusMarkdownEditor
-          {
-            Document = "# Gallery\n\n中文 markdown editor shell",
-            DocumentIdentity = new FsusMarkdownDocumentIdentity("gallery-doc", 1),
-            Mode = FsusMarkdownEditorMode.Source,
-            Chrome = FsusMarkdownEditorChrome.Framed,
-            StatusDensity = FsusMarkdownEditorStatusDensity.Minimal,
-            CapabilityState = "partial",
-          });
+        const string galleryMarkdown = "# Gallery\n\n中文 markdown editor";
+        var markdownEditor = new FsusMarkdownEditor
+        {
+          Document = galleryMarkdown,
+          DocumentIdentity = new FsusMarkdownDocumentIdentity("gallery-doc", 1),
+          Mode = FsusMarkdownEditorMode.Live,
+          Chrome = FsusMarkdownEditorChrome.Framed,
+          StatusDensity = FsusMarkdownEditorStatusDensity.Minimal,
+        };
+        _ = markdownEditor.CommitProjection(new(
+          markdownEditor.DocumentIdentity,
+          0,
+          galleryMarkdown,
+          [
+            new("gallery-heading-marker", new(0, 2), FsusMarkdownProjectionSpanKind.HiddenMarker, ""),
+            new("gallery-heading", new(2, 9), FsusMarkdownProjectionSpanKind.Text, "Gallery", "heading"),
+            new(
+              "gallery-paragraph",
+              new(9, galleryMarkdown.Length),
+              FsusMarkdownProjectionSpanKind.Text,
+              "\n\n中文 markdown editor",
+              "paragraph"),
+          ]));
+        panel.Children.Add(markdownEditor);
         break;
       case "public-shell":
         var shell = new FsusPublicShell { Brand = "Fsus", ActiveNav = "home" };
