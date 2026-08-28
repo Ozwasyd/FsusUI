@@ -668,6 +668,7 @@ let layoutGestureTimer: ReturnType<typeof setTimeout> | undefined
 let restoringViewport = false
 let restoringTypewriter = false
 let typewriterLayoutAdjustment = false
+let typewriterLayoutFrame: number | undefined
 let textareaLayoutHeight = 0
 let textareaLayoutWidth = 0
 const liveDecorations = computed(() => {
@@ -737,6 +738,32 @@ const suspendTypewriterForUserScroll = () => {
   writingAidsController.handleUserScroll()
   writingAidsState.value = writingAidsController.state
 }
+const settleTypewriterLayout = () => {
+  if (typewriterLayoutFrame !== undefined) {
+    cancelAnimationFrame(typewriterLayoutFrame)
+  }
+  typewriterLayoutAdjustment = true
+  let remainingFrames = 3
+  const settle = () => {
+    const textarea = textareaRef.value
+    if (!textarea || !resolvedWritingAids.value.typewriter) {
+      typewriterLayoutAdjustment = false
+      typewriterLayoutFrame = undefined
+      return
+    }
+    textareaLayoutHeight = textarea.clientHeight
+    textareaLayoutWidth = textarea.clientWidth
+    applyTypewriterScroll('async-layout')
+    remainingFrames -= 1
+    if (remainingFrames > 0) {
+      typewriterLayoutFrame = requestAnimationFrame(settle)
+      return
+    }
+    typewriterLayoutAdjustment = false
+    typewriterLayoutFrame = undefined
+  }
+  typewriterLayoutFrame = requestAnimationFrame(settle)
+}
 const handleLayoutWheel = () => {
   suspendTypewriterForUserScroll()
   markLayoutGesture('wheel')
@@ -756,7 +783,7 @@ const handleLayoutScroll = () => {
   ) {
     textareaLayoutHeight = textarea.clientHeight
     textareaLayoutWidth = textarea.clientWidth
-    applyTypewriterScroll('async-layout')
+    settleTypewriterLayout()
     return
   }
   if (typewriterLayoutAdjustment) return
@@ -837,7 +864,8 @@ const applyTypewriterScroll = (
       Math.max(0, textarea.scrollHeight - textarea.clientHeight),
     )
     textarea.scrollTo({
-      behavior: target.smooth ? 'smooth' : 'auto',
+      behavior:
+        trigger === 'async-layout' ? 'auto' : target.smooth ? 'smooth' : 'auto',
       top: scrollTop,
     })
     requestAnimationFrame(() => {
@@ -1393,11 +1421,8 @@ const refreshTypewriterResizeObserver = () => {
   typewriterResizeObserver = new ResizeObserver(() => {
     textareaLayoutHeight = textarea.clientHeight
     textareaLayoutWidth = textarea.clientWidth
-    typewriterLayoutAdjustment = true
     applyTypewriterScroll('async-layout')
-    requestAnimationFrame(() => {
-      typewriterLayoutAdjustment = false
-    })
+    settleTypewriterLayout()
   })
   typewriterResizeObserver.observe(textarea)
 }
@@ -1415,6 +1440,9 @@ onMounted(() => {
 onBeforeUnmount(() => {
   abortPendingCommands()
   if (layoutGestureTimer) clearTimeout(layoutGestureTimer)
+  if (typewriterLayoutFrame !== undefined) {
+    cancelAnimationFrame(typewriterLayoutFrame)
+  }
   typewriterResizeObserver?.disconnect()
   if (typeof window === 'undefined') return
 
