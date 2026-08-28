@@ -1,9 +1,9 @@
 {
   "schema": "fsusui-design-conformance.independent-ux-review.v1",
   "ownerRepository": "Ozwasyd/FsusUI",
-  "candidateSha": "61d5af85610c385c4dd50d000a60e2e89c86c7d4",
-  "baselineRevision": "a0ee1be0efd13f62769a9f7fca80fedf8a3ad0ab",
-  "classificationReceiptDigest": "da496efe7b79173ce92d11e2e21577a221c79c33fef002bea58b376b906d3f97",
+  "candidateSha": "8f376089accc817663152c8d825b41b4de3d944d",
+  "baselineRevision": "080e18500da5ad46cf825baa8f5827de3dc88bc9",
+  "classificationReceiptDigest": "f008d52c2e7cd5935ec0f5ef9be0acf982eaa49a960a5cbb88d4d3feab34feb2",
   "verificationClass": "ux-path",
   "status": "accepted",
   "inspectedAtOriginalResolution": true,

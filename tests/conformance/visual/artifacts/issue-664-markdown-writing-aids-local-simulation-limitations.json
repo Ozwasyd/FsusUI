@@ -1,6 +1,6 @@
 {
   "schema": "fsusui-design-conformance.local-simulation-limitations.v1",
-  "candidateSha": "61d5af85610c385c4dd50d000a60e2e89c86c7d4",
+  "candidateSha": "8f376089accc817663152c8d825b41b4de3d944d",
   "productionFixture": true,
   "actualBrowser": "Chromium",
   "actualInputs": [
