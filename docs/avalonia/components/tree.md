@@ -97,7 +97,11 @@ resources.
 ```csharp
 using FsusUI.Avalonia.Controls;
 
-var tree = new FsusTree { AccessibleName = "Workspace files", ChildrenLoader = LoadFolderAsync };
+var tree = new FsusTree
+{
+  AccessibleName = "Workspace files",
+  ChildrenLoader = LoadFolderAsync,
+};
 tree.NodeActivated += (_, args) =>
 {
   args.Handled = true;
@@ -105,7 +109,9 @@ tree.NodeActivated += (_, args) =>
 };
 tree.LazyLoadStateChanged += (_, args) => ShowLoadState(args.State);
 
-bool LoadFolderAsync(FsusTreeNode node, CancellationToken token);
+ValueTask<IReadOnlyList<FsusTreeNode>> LoadFolderAsync(
+  FsusTreeNode node,
+  CancellationToken token);
 void OpenFile(string key);
 void ShowLoadState(FsusTreeLazyLoadState state);
 ```
