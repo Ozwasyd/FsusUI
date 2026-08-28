@@ -1,5 +1,6 @@
 <template>
   <section
+    ref="editorRootRef"
     v-bind="$attrs"
     :class="[
       ns.b(),
@@ -445,6 +446,7 @@
       <div
         v-if="surfaceOptions.commandPalette && commandPaletteOpen"
         :class="ns.e('palette-backdrop')"
+        :dir="commandPaletteDirection"
         @mousedown.self.prevent="closeCommandPalette"
       >
         <section
@@ -773,6 +775,7 @@ const emit = defineEmits(markdownEditorEmits)
 const ns = useNamespace('markdown-editor')
 const modes: MarkdownEditorMode[] = ['source', 'live', 'split', 'preview']
 const commandTrayId = `${useId()}-command-tray`
+const editorRootRef = ref<HTMLElement | null>(null)
 const commandTrayRef = ref<HTMLElement | null>(null)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const commandOverflowRef = ref<HTMLButtonElement | null>(null)
@@ -1763,6 +1766,7 @@ const moveSlashIndex = (direction: 1 | -1) => {
   }
 }
 const commandPaletteOpen = ref(false)
+const commandPaletteDirection = ref<'ltr' | 'rtl'>('ltr')
 const paletteQuery = ref('')
 const activePaletteIndex = ref(0)
 const paletteRestoreSelection = ref<MarkdownEditorSelection | null>(null)
@@ -1787,6 +1791,16 @@ const paletteItemIndex = (key: string) =>
   paletteCommands.value.findIndex((command) => command.key === key)
 const openCommandPalette = () => {
   if (editingBlocked.value || isComposing.value) return
+  const directionOwner = editorRootRef.value
+  const declaredDirection =
+    directionOwner?.closest<HTMLElement>('[dir]')?.dir ?? ''
+  commandPaletteDirection.value =
+    declaredDirection === 'rtl' ||
+    (declaredDirection !== 'ltr' &&
+      directionOwner &&
+      getComputedStyle(directionOwner).direction === 'rtl')
+      ? 'rtl'
+      : 'ltr'
   paletteRestoreSelection.value = captureSelection(false)
   commandPaletteOpen.value = true
   paletteQuery.value = ''

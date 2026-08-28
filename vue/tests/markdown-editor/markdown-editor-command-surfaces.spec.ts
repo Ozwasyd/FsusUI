@@ -254,10 +254,13 @@ test('renders locale authority, long copy, RTL, and status density without fallb
     await expect(palette.getByRole('group').first()).toHaveAccessibleName(
       `${prefix} format`,
     )
-    await palette.press('Escape')
     if (locale === 'ar') {
       await expect(fixture).toHaveAttribute('dir', 'rtl')
+      expect(
+        await palette.evaluate((element) => getComputedStyle(element).direction),
+      ).toBe('rtl')
     }
+    await palette.press('Escape')
   }
 
   await page.setViewportSize({ height: 812, width: 375 })

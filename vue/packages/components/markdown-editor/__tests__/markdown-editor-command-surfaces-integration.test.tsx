@@ -150,7 +150,11 @@ describe('Markdown editor command surface integration', () => {
   })
 
   it('uses locale copy and keyword search for the command palette', async () => {
+    const directionOwner = document.createElement('div')
+    directionOwner.dir = 'rtl'
+    document.body.append(directionOwner)
     const wrapper = mount(MarkdownEditor, {
+      attachTo: directionOwner,
       props: {
         commands: [insertCommand],
         localeText: {
@@ -172,6 +176,10 @@ describe('Markdown editor command surface integration', () => {
       '.el-markdown-editor__palette-dialog',
     ) as HTMLElement
     expect(dialog.getAttribute('aria-label')).toBe('命令面板')
+    const backdrop = document.body.querySelector(
+      '.el-markdown-editor__palette-backdrop',
+    ) as HTMLElement
+    expect(backdrop.dir).toBe('rtl')
     const input = document.body.querySelector(
       '.el-markdown-editor__palette-input',
     ) as HTMLInputElement
@@ -182,6 +190,8 @@ describe('Markdown editor command surface integration', () => {
     expect(
       document.body.querySelectorAll('.el-markdown-editor__palette-item'),
     ).toHaveLength(1)
+    wrapper.unmount()
+    directionOwner.remove()
   })
 
   it('passes editor locale loading copy to the renderer layer', () => {
