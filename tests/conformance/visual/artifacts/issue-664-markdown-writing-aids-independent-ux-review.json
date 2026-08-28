@@ -1,16 +1,16 @@
 {
   "schema": "fsusui-design-conformance.independent-ux-review.v1",
   "ownerRepository": "Ozwasyd/FsusUI",
-  "candidateSha": "4ba4f4580c3b8149155146de8e42fef6517f42e8",
-  "baselineRevision": "c0f6cc2c7be0114651fc8c4ae9041de35575c2aa",
-  "classificationReceiptDigest": "b3a699931bde2aa527b2acc0276a65ce6600b615f2648bdf507b12370c7a5d19",
+  "candidateSha": "61d5af85610c385c4dd50d000a60e2e89c86c7d4",
+  "baselineRevision": "a0ee1be0efd13f62769a9f7fca80fedf8a3ad0ab",
+  "classificationReceiptDigest": "da496efe7b79173ce92d11e2e21577a221c79c33fef002bea58b376b906d3f97",
   "verificationClass": "ux-path",
   "status": "accepted",
   "inspectedAtOriginalResolution": true,
   "inspectedArtifacts": [
     {
       "path": "tests/conformance/visual/artifacts/screenshots/web/issue-664-writing-aids-light-desktop.png",
-      "digest": "e4c892f31c40f8a18a42b229add1ae351630eb90acea971c5d2f060fae825189",
+      "digest": "4052ef50689c81e3359f4238b15c9d0ee46feab112c0273f2f91119aa53acce9",
       "finding": "The exact revealed raw range is focused and visible while surrounding prose remains available."
     },
     {
