@@ -91,6 +91,8 @@ source bytes match.
 - An exact syntax slice keeps its id when it moves. On split, the first matching
   slice keeps the original id and other slices receive new ids. On merge, the
   left node keeps its id and the other merged ids become deleted.
+- Editing a node in place keeps its id when its syntax kind and raw range stay
+  the same; this does not allocate or recycle an ordinal.
 - Wrap and unwrap keep the enclosed node id when the supported wrapper changes
   its syntax kind without changing its payload.
 - A deleted id resolves as `deleted` and is never assigned to a later node in

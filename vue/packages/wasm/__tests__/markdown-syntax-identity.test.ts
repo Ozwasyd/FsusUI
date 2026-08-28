@@ -72,6 +72,23 @@ describe('markdown syntax stable identity', () => {
     expect(second.resolve('not-an-id').status).toBe('invalid')
   })
 
+  it('keeps an in-place content edit on the same syntax node identity', () => {
+    const document = { id: 'doc-1', epoch: 4 }
+    const first = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('# One\n\n# Two\n'),
+      document,
+    )
+    const renamed = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('# Uno\n\n# Two\n'),
+      document,
+      first,
+    )
+
+    expect(renamed.nodes[0]!.id).toBe(first.nodes[0]!.id)
+    expect(renamed.nodes[1]!.id).toBe(first.nodes[1]!.id)
+    expect(renamed.identityState).toEqual(first.identityState)
+  })
+
   it('does not reuse identities for another document with the same source and epoch', () => {
     const source = '# Title\n'
     const first = stabilizeMarkdownEditorProjection(

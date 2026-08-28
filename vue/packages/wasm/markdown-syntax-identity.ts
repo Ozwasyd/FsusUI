@@ -393,6 +393,20 @@ const assignIdentities = (
 
     for (const nextIndex of leftoverNext) {
       if (assigned[nextIndex] !== undefined) continue
+      const nextNode = projection.nodes[nextIndex]
+      const editedInPlace = leftoverPrevious.find((previousIndex) => {
+        if (usedPrevious.has(previousIndex)) return false
+        const previousNode = previous.nodes[previousIndex]
+        return (
+          previousNode?.rawRange.start === nextNode?.rawRange.start &&
+          previousNode.rawRange.end === nextNode.rawRange.end
+        )
+      })
+      if (editedInPlace !== undefined) claim(nextIndex, editedInPlace)
+    }
+
+    for (const nextIndex of leftoverNext) {
+      if (assigned[nextIndex] !== undefined) continue
       const nextText = sliceOf(
         nextSource,
         projection.nodes[nextIndex] as MarkdownEditorSyntaxNode,
