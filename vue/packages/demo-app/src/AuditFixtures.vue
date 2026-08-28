@@ -196,7 +196,7 @@
         :disabled="markdownPasteGate === 'disabled'"
         :min-rows="6"
         :show-actions="false"
-        :show-mode-switcher="false"
+        :show-mode-switcher="markdownLanguageToolsFixture"
         data-markdown-input-authority="transaction-store"
         @history-change="markdownTransactionHistory = $event"
         @selection-change="markdownTransactionSelection = $event"
@@ -1770,9 +1770,7 @@
       <AuditCard name="ElUpload" :state="auditState">
         <el-upload action="#" :auto-upload="false" drag>
           <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
-          <div class="el-upload__text">
-            Drop a file here or <em>browse</em>
-          </div>
+          <div class="el-upload__text">Drop a file here or <em>browse</em></div>
           <p data-upload-help>PNG/JPG, max 10 MB</p>
         </el-upload>
       </AuditCard>
@@ -1977,6 +1975,10 @@ const markdownEditorTransactionFixture =
   new URLSearchParams(window.location.search).get(
     'markdownEditorTransaction',
   ) === '1'
+const markdownLanguageToolsFixture =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownLanguageTools') ===
+    '1'
 const markdownEditorImeFixture =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('markdownEditorIme') === '1'

@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "ff7e7aafd398bd907e17f41ba28199b9c5d0ea79",
+    "commitSha": "3df8be66b399b43b6bfbe778bd394c787a1d6bb8",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "efedf2d7a3f11cbd9ecb583513d7f36c7e0068ef87e096d366b332eaac99e609",
     "iconHash": "d61254b1b1ff9addaf45293153df217b0c0d01ec69ec602081c44a01008b78de",
     "toolVersion": "avalonia-vue-public-api-baseline@1.0.0+vue-semantic-baseline@1.0.0",
-    "inputTreeHash": "0f7fb1eeacad418bffce171581278709c792c8adf1602bee4c6a3e5122fddac1",
+    "inputTreeHash": "95d12bd3956816e0094428b1ecb6479137994f0538a86c7d06c9aa60c8192ccf",
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "7934f776cbbbfd4d512f39ac9693bd10ec884fb11f1323b21a1d1f223c8dad41"
+    "outputHash": "7500dc875bf6194cf72e802d23834825d0e687f08ee3e6e616fb215e1c47acde"
   },
   "summary": {
     "componentModules": 93,
@@ -10993,6 +10993,7 @@
         "editorProfile",
         "imageActionLabel",
         "interactionProfile",
+        "lang",
         "loading",
         "localeText",
         "metrics",
@@ -11000,6 +11001,7 @@
         "mobileLayout",
         "mode",
         "modelValue",
+        "nativeWritingTools",
         "placeholder",
         "previewBaseUrl",
         "previewCspNonce",
@@ -11012,6 +11014,7 @@
         "showModeSwitcher",
         "showSaveAction",
         "showSubmitAction",
+        "spellcheck",
         "statusDensity",
         "submitActionLabel",
         "surfaces",
@@ -11166,6 +11169,18 @@
             "readonly": false
           },
           {
+            "name": "lang",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "undefined"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
             "name": "loading",
             "runtimeType": "Boolean",
             "semanticType": null,
@@ -11248,6 +11263,19 @@
             "default": {
               "kind": "literal",
               "value": ""
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "nativeWritingTools",
+            "runtimeType": "String",
+            "semanticType": "PropType<MarkdownNativeWritingToolsMode>",
+            "nullable": false,
+            "values": ["auto", "disabled"],
+            "default": {
+              "kind": "literal",
+              "value": "auto"
             },
             "required": false,
             "readonly": false
@@ -11401,6 +11429,19 @@
             "default": {
               "kind": "literal",
               "value": true
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "spellcheck",
+            "runtimeType": "Array",
+            "semanticType": "PropType<MarkdownSpellcheckMode | boolean>",
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "literal",
+              "value": "auto"
             },
             "required": false,
             "readonly": false

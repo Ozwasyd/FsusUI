@@ -200,6 +200,11 @@ const inspectCommitGuards = (source, errors) => {
     'stale projection',
   )
   requireGuard(
+    ['input.anchorMap.source !== input.source'],
+    'stale-projection',
+    'stale anchor map',
+  )
+  requireGuard(
     ['input.session.kind !== input.kind'],
     'session-kind-conflict',
     'session kind conflict',
@@ -214,6 +219,16 @@ const inspectCommitGuards = (source, errors) => {
     'stale-selection',
     'stale selection',
   )
+  const commitText = commitBody.getText(sourceFile)
+  if (
+    !commitText.includes('input.anchorMap.documentIdentity') ||
+    !commitText.includes('input.anchorMap.sourceSelectionToVisual') ||
+    !commitText.includes('input.anchorMap.visualAnchorToSourceSelection')
+  ) {
+    errors.push(
+      `${fileName}: native mutation must consume the canonical anchor map`,
+    )
+  }
 
   const plannerText = plannerBody?.getText(sourceFile) ?? ''
   if (

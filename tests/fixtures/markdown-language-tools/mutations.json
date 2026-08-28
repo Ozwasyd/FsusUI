@@ -145,5 +145,19 @@
     "find": "? options.projectionRevision\n    : undefined",
     "replace": "? (options.projectionRevision ?? currentRevision)\n    : undefined",
     "expectError": "must be supplied by the projection session owner"
+  },
+  {
+    "name": "stale-anchor-map-source",
+    "file": "core",
+    "find": "if (input.anchorMap.source !== input.source) {",
+    "replace": "if (false) {",
+    "expectError": "stale anchor map rejection guard is required"
+  },
+  {
+    "name": "anchor-map-round-trip-bypass",
+    "file": "core",
+    "find": "input.anchorMap.visualAnchorToSourceSelection(visual)",
+    "replace": "({ anchor: input.from, focus: input.to })",
+    "expectError": "must consume the canonical anchor map"
   }
 ]

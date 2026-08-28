@@ -258,10 +258,18 @@ transaction。每次 editor revision 或 source 更新都会刷新 Web adapter �
 atomic context 的 suppression 是局部 capability，切换 Source/Live 不会通过全局关闭
 spellcheck 规避映射。
 
-Playwright Chromium、Firefox 与 WebKit 测试覆盖真实 browser DOM 中的 replacement
-event routing、revision refresh 与 composition interlock；合成 browser events 不等同
-于 native OS spellchecker、context-menu、dictation、screen-reader 或真实 IME 设备证据。
-这些 native host/assistive-technology cell 仍需单独验收。
+raw range、hidden marker、nested syntax、atomic node 与 visual point 均消费
+`@ozwasyd/element-plus/markdown-runtime` 的稳定 projection 与 anchor map；language
+tool adapter 不解析 Markdown，也不把 raw offset 当作 visual offset。map、projection
+或 source 不属于当前 document/revision 时 replacement 会 fail closed。
+
+Playwright Chromium、Firefox 与 WebKit 测试覆盖 production fixture 中的 replacement
+event routing、revision/session refresh、Source/Live 切换、composition interlock、
+touch 与 accessibility semantics。dictation、writing-tools、context-menu、screen-reader
+和 IME 的自动化均为可重复的本地事件/输入模拟；它验证 editor 内部
+session/selection/transaction/map 语义，但不等同于 native OS spellchecker、真实
+context menu、语音服务、辅助技术或 OS IME 设备证据。完整 native host/device matrix
+归独立验收，不由这些模拟替代。
 
 ## Events
 
@@ -283,24 +291,24 @@ event routing、revision refresh 与 composition interlock；合成 browser even
 
 ## Attributes
 
-| 属性名            | 说明                                         | 类型                                         | 默认值   |
-| ----------------- | -------------------------------------------- | -------------------------------------------- | -------- |
-| model-value       | 唯一公开 Markdown 内容 authority             | `string`                                     | `''`     |
-| default-mode      | 初始编辑模式                                 | `'source' \| 'live' \| 'split' \| 'preview'` | `source` |
-| mode              | 受控编辑模式                                 | `'source' \| 'live' \| 'split' \| 'preview'` | —        |
-| chrome            | 外围区域与根表面变体                         | `'framed' \| 'embedded' \| 'minimal'`        | `framed` |
-| placeholder       | 文本域占位文本                               | `string`                                     | `''`     |
-| commands          | toolbar command model                        | `MarkdownEditorCommand[]`                    | 内置命令 |
-| readonly          | Read-only; blocks input and mutation methods | `boolean`                                    | `false`  |
-| disabled          | 禁用输入与全部 mutation method               | `boolean`                                    | `false`  |
-| loading           | 标记 busy 并冻结输入与全部 mutation method   | `boolean`                                    | `false`  |
-| preview-base-url  | preview renderer 的基础 URL                  | `string \| null`                             | `null`   |
-| preview-csp-nonce | preview renderer 的 CSP nonce                | `string \| null`                             | `null`   |
-| preview-features  | preview renderer 的 feature activation 开关  | `MarkdownFeatureActivationFeatureOptions`    | —        |
-| min-rows          | 编辑区最小行数                               | `number`                                     | `12`     |
-| spellcheck        | Browser spellcheck capability                | `'auto' \| 'enabled' \| 'disabled' \| boolean` | `auto`   |
-| lang              | Optional BCP-47 language hint                 | `string`                                     | —        |
-| native-writing-tools | Browser native writing-tools capability   | `'auto' \| 'disabled'`                       | `auto`   |
+| 属性名               | 说明                                         | 类型                                           | 默认值   |
+| -------------------- | -------------------------------------------- | ---------------------------------------------- | -------- |
+| model-value          | 唯一公开 Markdown 内容 authority             | `string`                                       | `''`     |
+| default-mode         | 初始编辑模式                                 | `'source' \| 'live' \| 'split' \| 'preview'`   | `source` |
+| mode                 | 受控编辑模式                                 | `'source' \| 'live' \| 'split' \| 'preview'`   | —        |
+| chrome               | 外围区域与根表面变体                         | `'framed' \| 'embedded' \| 'minimal'`          | `framed` |
+| placeholder          | 文本域占位文本                               | `string`                                       | `''`     |
+| commands             | toolbar command model                        | `MarkdownEditorCommand[]`                      | 内置命令 |
+| readonly             | Read-only; blocks input and mutation methods | `boolean`                                      | `false`  |
+| disabled             | 禁用输入与全部 mutation method               | `boolean`                                      | `false`  |
+| loading              | 标记 busy 并冻结输入与全部 mutation method   | `boolean`                                      | `false`  |
+| preview-base-url     | preview renderer 的基础 URL                  | `string \| null`                               | `null`   |
+| preview-csp-nonce    | preview renderer 的 CSP nonce                | `string \| null`                               | `null`   |
+| preview-features     | preview renderer 的 feature activation 开关  | `MarkdownFeatureActivationFeatureOptions`      | —        |
+| min-rows             | 编辑区最小行数                               | `number`                                       | `12`     |
+| spellcheck           | Browser spellcheck capability                | `'auto' \| 'enabled' \| 'disabled' \| boolean` | `auto`   |
+| lang                 | Optional BCP-47 language hint                | `string`                                       | —        |
+| native-writing-tools | Browser native writing-tools capability      | `'auto' \| 'disabled'`                         | `auto`   |
 
 ## Migration
 

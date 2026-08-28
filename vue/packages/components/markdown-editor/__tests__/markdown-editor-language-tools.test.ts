@@ -1,84 +1,59 @@
 import { describe, expect, it } from 'vitest'
 
-import type { MarkdownStableProjection } from '../../../wasm/markdown-runtime'
+import {
+  createMarkdownAnchorMap,
+  createMarkdownEditorProjection,
+  stabilizeMarkdownEditorProjection,
+  type MarkdownAnchorMap,
+  type MarkdownStableProjection,
+} from '../../../wasm/markdown-runtime'
 import type { MarkdownEditorSelection } from '../src/markdown-editor-transaction'
 import {
   commitMarkdownLanguageToolMutation,
   createMarkdownLanguageToolSession,
   resolveMarkdownLanguageToolCapability,
   resolveMarkdownLanguageToolContextCapability,
+  type MarkdownLanguageToolSessionKind,
 } from '../src/markdown-editor-language-tools'
-
-interface FixtureRange {
-  readonly end: number
-  readonly start: number
-}
-
-interface FixtureNode {
-  readonly id: string
-  readonly kind: string
-  readonly presentation:
-    | 'live-decorated'
-    | 'live-atomic'
-    | 'source-only-with-reason'
-    | 'unsupported-error'
-  readonly rawContentRanges?: readonly FixtureRange[]
-  readonly rawMarkerRanges?: readonly FixtureRange[]
-  readonly rawRange: FixtureRange
-}
 
 const projectionFixture = (
   source: string,
   documentIdentity: { readonly epoch: number; readonly id: string },
-  nodes: readonly FixtureNode[] = [],
-): MarkdownStableProjection => {
-  const stableNodes = nodes.map((node) =>
-    Object.freeze({
-      childNormalizedRanges: Object.freeze([]),
-      childRawRanges: Object.freeze([]),
-      id: node.id,
-      kind: node.kind,
-      normalizedContentRanges: node.rawContentRanges,
-      normalizedMarkerRanges: node.rawMarkerRanges,
-      normalizedRange: node.rawRange,
-      parentNormalizedRange: null,
-      parentRawRange: null,
-      presentation: node.presentation,
-      rawContentRanges: node.rawContentRanges,
-      rawMarkerRanges: node.rawMarkerRanges,
-      rawRange: node.rawRange,
-    }),
+): MarkdownStableProjection =>
+  stabilizeMarkdownEditorProjection(
+    createMarkdownEditorProjection(source),
+    documentIdentity,
   )
-  return Object.freeze({
-    documentIdentity: Object.freeze(documentIdentity),
-    nodes: Object.freeze(stableNodes),
-    normalizedSource: source,
-    resolve(id: string) {
-      const node = stableNodes.find((candidate) => candidate.id === id)
-      return node
-        ? Object.freeze({ node, status: 'current' as const })
-        : Object.freeze({ status: 'invalid' as const })
-    },
-  }) as MarkdownStableProjection
-}
+
+const anchorMapFixture = (
+  source: string,
+  documentIdentity: { readonly epoch: number; readonly id: string },
+  projection: MarkdownStableProjection,
+) =>
+  createMarkdownAnchorMap({
+    identity: documentIdentity,
+    projection,
+    source,
+  })
 
 const commitFixture = (options?: {
   readonly currentDocumentIdentity?: {
     readonly epoch: number
     readonly id: string
   }
+  readonly anchorMap?: MarkdownAnchorMap
   readonly currentRevision?: number
   readonly currentSelection?: MarkdownEditorSelection
   readonly documentIdentity?: { readonly epoch: number; readonly id: string }
   readonly from?: number
   readonly isComposing?: boolean
-  readonly kind?: 'spellcheck' | 'dictation' | 'writing-tools'
+  readonly kind?: MarkdownLanguageToolSessionKind
   readonly projection?: MarkdownStableProjection
   readonly projectionRevision?: number
   readonly rawHtml?: string
   readonly revision?: number
   readonly sessionActive?: boolean
-  readonly sessionKind?: 'spellcheck' | 'dictation' | 'writing-tools'
+  readonly sessionKind?: MarkdownLanguageToolSessionKind
   readonly sessionSelection?: MarkdownEditorSelection
   readonly source?: string
   readonly to?: number
@@ -102,7 +77,12 @@ const commitFixture = (options?: {
     revision,
     selection,
   })
+  const projection =
+    options?.projection ?? projectionFixture(source, documentIdentity)
   return commitMarkdownLanguageToolMutation({
+    anchorMap:
+      options?.anchorMap ??
+      anchorMapFixture(source, documentIdentity, projection),
     currentDocumentIdentity:
       options?.currentDocumentIdentity ?? documentIdentity,
     currentRevision: options?.currentRevision ?? revision,
@@ -112,8 +92,7 @@ const commitFixture = (options?: {
     insert: 'world',
     isComposing: options?.isComposing,
     kind: options?.kind ?? 'spellcheck',
-    projection:
-      options?.projection ?? projectionFixture(source, documentIdentity),
+    projection,
     projectionRevision: options?.projectionRevision ?? revision,
     rawHtml: options?.rawHtml,
     revision,
@@ -166,47 +145,7 @@ describe('markdown language tool adapter', () => {
     const targetStart = source.indexOf('https://')
     const targetEnd = source.indexOf(')', targetStart)
     const mathStart = source.indexOf('$$x$$')
-    const projection = projectionFixture(source, identity, [
-      {
-        id: 'heading',
-        kind: 'heading',
-        presentation: 'live-decorated',
-        rawMarkerRanges: [{ end: markerEnd, start: 0 }],
-        rawRange: { end: source.indexOf('\n'), start: 0 },
-      },
-      {
-        id: 'code',
-        kind: 'code',
-        presentation: 'source-only-with-reason',
-        rawContentRanges: [{ end: codeEnd - 3, start: codeStart + 6 }],
-        rawMarkerRanges: [
-          { end: codeStart + 6, start: codeStart },
-          { end: codeEnd, start: codeEnd - 3 },
-        ],
-        rawRange: { end: codeEnd, start: codeStart },
-      },
-      {
-        id: 'link',
-        kind: 'link',
-        presentation: 'live-decorated',
-        rawContentRanges: [
-          { end: labelEnd, start: labelStart },
-          { end: targetEnd, start: targetStart },
-        ],
-        rawRange: { end: linkEnd, start: linkStart },
-      },
-      {
-        id: 'math',
-        kind: 'latex',
-        presentation: 'live-atomic',
-        rawContentRanges: [{ end: mathStart + 3, start: mathStart + 2 }],
-        rawMarkerRanges: [
-          { end: mathStart + 2, start: mathStart },
-          { end: mathStart + 5, start: mathStart + 3 },
-        ],
-        rawRange: { end: mathStart + 5, start: mathStart },
-      },
-    ])
+    const projection = projectionFixture(source, identity)
 
     expect(
       resolveMarkdownLanguageToolContextCapability({
@@ -296,7 +235,28 @@ describe('markdown language tool adapter', () => {
     })
   })
 
-  it('rejects stale document, revision, selection, and session kind', () => {
+  it.each([
+    'spellcheck',
+    'autocorrect',
+    'dictation',
+    'writing-tools',
+    'context-menu',
+  ] satisfies readonly MarkdownLanguageToolSessionKind[])(
+    'keeps one separate transaction for a simulated %s session',
+    (kind) => {
+      const result = commitFixture({ kind, sessionKind: kind })
+      expect(result).toMatchObject({
+        accepted: true,
+        transaction: {
+          history: 'separate',
+          metadata: { kind, sessionKind: kind },
+          origin: 'input',
+        },
+      })
+    },
+  )
+
+  it('rejects stale document, map, revision, selection, and session kind', () => {
     expect(
       commitFixture({
         currentDocumentIdentity: { epoch: 2, id: 'commit-doc' },
@@ -306,6 +266,14 @@ describe('markdown language tool adapter', () => {
     expect(commitFixture({ projectionRevision: 2 }).reason).toBe(
       'stale-projection',
     )
+    const staleSource = 'Different wrld'
+    const identity = { epoch: 1, id: 'commit-doc' }
+    const staleProjection = projectionFixture(staleSource, identity)
+    expect(
+      commitFixture({
+        anchorMap: anchorMapFixture(staleSource, identity, staleProjection),
+      }).reason,
+    ).toBe('stale-projection')
     expect(
       commitFixture({
         currentSelection: { direction: 'none', end: 9, start: 6 },
@@ -376,47 +344,11 @@ describe('markdown language tool adapter', () => {
   })
 
   it('rejects edits that overlap marker, URL, code, or atomic authority', () => {
-    const source = '[wrld](https://example.dev) `wrld` $$x$$'
+    const source = '[wrld](https://example.dev)\n```text\nwrld\n```\n$$x$$'
     const identity = { epoch: 1, id: 'commit-doc' }
-    const projection = projectionFixture(source, identity, [
-      {
-        id: 'link',
-        kind: 'link',
-        presentation: 'live-decorated',
-        rawContentRanges: [
-          { end: 5, start: 1 },
-          { end: 26, start: 7 },
-        ],
-        rawMarkerRanges: [
-          { end: 1, start: 0 },
-          { end: 7, start: 5 },
-          { end: 27, start: 26 },
-        ],
-        rawRange: { end: 27, start: 0 },
-      },
-      {
-        id: 'code',
-        kind: 'code',
-        presentation: 'source-only-with-reason',
-        rawContentRanges: [{ end: 34, start: 30 }],
-        rawMarkerRanges: [
-          { end: 30, start: 29 },
-          { end: 35, start: 34 },
-        ],
-        rawRange: { end: 35, start: 29 },
-      },
-      {
-        id: 'math',
-        kind: 'latex',
-        presentation: 'live-atomic',
-        rawContentRanges: [{ end: 39, start: 38 }],
-        rawMarkerRanges: [
-          { end: 38, start: 36 },
-          { end: 41, start: 39 },
-        ],
-        rawRange: { end: 41, start: 36 },
-      },
-    ])
+    const projection = projectionFixture(source, identity)
+    const codeStart = source.indexOf('wrld', source.indexOf('```text'))
+    const mathStart = source.indexOf('$$x$$')
 
     expect(
       commitFixture({
@@ -440,48 +372,51 @@ describe('markdown language tool adapter', () => {
     ).toBe('url')
     expect(
       commitFixture({
-        currentSelection: { direction: 'none', end: 34, start: 30 },
-        from: 30,
+        currentSelection: {
+          direction: 'none',
+          end: codeStart + 4,
+          start: codeStart,
+        },
+        from: codeStart,
         projection,
-        sessionSelection: { direction: 'none', end: 34, start: 30 },
+        sessionSelection: {
+          direction: 'none',
+          end: codeStart + 4,
+          start: codeStart,
+        },
         source,
-        to: 34,
+        to: codeStart + 4,
       }).reason,
     ).toBe('code-block')
     expect(
       commitFixture({
-        currentSelection: { direction: 'none', end: 39, start: 38 },
-        from: 38,
+        currentSelection: {
+          direction: 'none',
+          end: mathStart + 3,
+          start: mathStart + 2,
+        },
+        from: mathStart + 2,
         projection,
-        sessionSelection: { direction: 'none', end: 39, start: 38 },
+        sessionSelection: {
+          direction: 'none',
+          end: mathStart + 3,
+          start: mathStart + 2,
+        },
         source,
-        to: 39,
+        to: mathStart + 3,
       }).reason,
     ).toBe('atomic-node')
 
-    const nestedSource = 'abc def'
-    const nestedProjection = projectionFixture(nestedSource, identity, [
-      {
-        id: 'left',
-        kind: 'paragraph',
-        presentation: 'live-decorated',
-        rawRange: { end: 3, start: 0 },
-      },
-      {
-        id: 'right',
-        kind: 'paragraph',
-        presentation: 'live-decorated',
-        rawRange: { end: 7, start: 4 },
-      },
-    ])
+    const nestedSource = 'abc\n\ndef'
+    const nestedProjection = projectionFixture(nestedSource, identity)
     expect(
       commitFixture({
-        currentSelection: { direction: 'forward', end: 5, start: 2 },
+        currentSelection: { direction: 'forward', end: 6, start: 2 },
         from: 2,
         projection: nestedProjection,
-        sessionSelection: { direction: 'forward', end: 5, start: 2 },
+        sessionSelection: { direction: 'forward', end: 6, start: 2 },
         source: nestedSource,
-        to: 5,
+        to: 6,
       }).reason,
     ).toBe('nested-syntax')
   })

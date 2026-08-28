@@ -1,4 +1,5 @@
 import {
+  type MarkdownAnchorMap,
   type MarkdownStableProjection,
   type MarkdownStableSyntaxNode,
 } from '../../../wasm/markdown-runtime'
@@ -78,6 +79,7 @@ export interface MarkdownLanguageToolSession {
 }
 
 export interface MarkdownLanguageToolCommitInput {
+  readonly anchorMap: MarkdownAnchorMap
   readonly currentDocumentIdentity: MarkdownEditorDocumentIdentity
   readonly currentRevision: number
   readonly currentSelection: MarkdownEditorSelection
@@ -153,15 +155,17 @@ const protectedReasonForRange = (
     overlapsRange(node.rawRange, from, to),
   )
   for (const node of overlapping) {
+    if (node.presentation === 'live-atomic' || ATOMIC_KINDS.has(node.kind)) {
+      return 'atomic-node'
+    }
+  }
+  for (const node of overlapping) {
     if (markerRangesOf(node)?.some((range) => overlapsRange(range, from, to))) {
       return 'hidden-marker'
     }
   }
   for (const node of overlapping) {
     if (node.kind === 'code') return 'code-block'
-    if (node.presentation === 'live-atomic' || ATOMIC_KINDS.has(node.kind)) {
-      return 'atomic-node'
-    }
     if (node.kind === 'link' || node.kind === 'image') {
       const target = contentRangesOf(node)?.[1]
       if (!target || overlapsRange(target, from, to)) return 'url'
@@ -504,6 +508,10 @@ export const commitMarkdownLanguageToolMutation = (
     !sameDocumentIdentity(
       input.projection.documentIdentity,
       input.documentIdentity,
+    ) ||
+    !sameDocumentIdentity(
+      input.anchorMap.documentIdentity,
+      input.documentIdentity,
     )
   ) {
     return Object.freeze({
@@ -520,6 +528,13 @@ export const commitMarkdownLanguageToolMutation = (
   }
 
   if (input.projectionRevision !== input.currentRevision) {
+    return Object.freeze({
+      accepted: false,
+      reason: 'stale-projection',
+    })
+  }
+
+  if (input.anchorMap.source !== input.source) {
     return Object.freeze({
       accepted: false,
       reason: 'stale-projection',
@@ -544,6 +559,25 @@ export const commitMarkdownLanguageToolMutation = (
     return Object.freeze({
       accepted: false,
       reason: 'stale-selection',
+    })
+  }
+
+  try {
+    const visual = input.anchorMap.sourceSelectionToVisual({
+      anchor: input.from,
+      focus: input.to,
+    })
+    const roundTrip = input.anchorMap.visualAnchorToSourceSelection(visual)
+    if (roundTrip.anchor !== input.from || roundTrip.focus !== input.to) {
+      return Object.freeze({
+        accepted: false,
+        reason: 'invalid-range',
+      })
+    }
+  } catch {
+    return Object.freeze({
+      accepted: false,
+      reason: 'invalid-range',
     })
   }
 

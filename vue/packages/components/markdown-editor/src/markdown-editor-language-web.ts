@@ -1,4 +1,8 @@
-import type { MarkdownStableProjection } from '../../../wasm/markdown-runtime'
+import type {
+  MarkdownAnchorMap,
+  MarkdownStableProjection,
+  MarkdownVisualPoint,
+} from '../../../wasm/markdown-runtime'
 import type { MarkdownEditorMode } from './markdown-editor-live-contract'
 import type {
   MarkdownEditorDocumentIdentity,
@@ -40,11 +44,7 @@ export interface MarkdownWebLanguageCoordinates {
   readonly inUrl: boolean
   readonly rawOffset: number
   readonly reason?: MarkdownLanguageToolCapability['reason']
-  /**
-   * The visual offset is deliberately absent until the editor owner supplies
-   * the canonical #325 anchor map. Raw offsets are never visual authority.
-   */
-  readonly visualOffset?: number
+  readonly visualPoint?: MarkdownVisualPoint
 }
 
 export interface MarkdownWebLanguageBeforeInput {
@@ -84,6 +84,7 @@ export interface MarkdownWebLanguageController {
   }
   switchMode(nextMode: MarkdownEditorMode): MarkdownLanguageToolCapability
   updateState(input: {
+    readonly anchorMap?: MarkdownAnchorMap
     readonly config?: MarkdownLanguageToolConfig
     readonly projection?: MarkdownStableProjection
     readonly projectionRevision?: number
@@ -118,6 +119,7 @@ const rejected = (
   })
 
 export const resolveMarkdownWebLanguageCoordinates = (input: {
+  readonly anchorMap?: MarkdownAnchorMap
   readonly documentIdentity?: MarkdownEditorDocumentIdentity
   readonly mode?: MarkdownEditorMode
   readonly offset: number
@@ -132,6 +134,24 @@ export const resolveMarkdownWebLanguageCoordinates = (input: {
     projection: input.projection,
     source: input.source,
   })
+  let visualPoint: MarkdownVisualPoint | undefined
+  if (
+    input.anchorMap &&
+    input.anchorMap.source === input.source &&
+    (!input.documentIdentity ||
+      (input.anchorMap.documentIdentity.id === input.documentIdentity.id &&
+        input.anchorMap.documentIdentity.epoch ===
+          input.documentIdentity.epoch))
+  ) {
+    try {
+      visualPoint = input.anchorMap.sourcePositionToVisual({
+        affinity: 'before',
+        offset: clamped,
+      })
+    } catch {
+      visualPoint = undefined
+    }
+  }
 
   return Object.freeze({
     inAtomic: capability.reason === 'atomic-node',
@@ -140,6 +160,7 @@ export const resolveMarkdownWebLanguageCoordinates = (input: {
     inUrl: capability.reason === 'url',
     rawOffset: clamped,
     reason: capability.reason,
+    visualPoint,
   })
 }
 
@@ -150,6 +171,7 @@ export const planMarkdownWebReplacement = (
 export const bindMarkdownWebLanguageTools = (
   textarea: MarkdownWebTextareaLike,
   options: {
+    readonly anchorMap?: MarkdownAnchorMap
     readonly config?: MarkdownLanguageToolConfig
     readonly documentIdentity?: MarkdownEditorDocumentIdentity
     readonly mode?: MarkdownEditorMode
@@ -165,6 +187,7 @@ export const bindMarkdownWebLanguageTools = (
   let currentSource = options.source ?? textarea.value ?? ''
   let currentConfig = options.config
   let currentMode: MarkdownEditorMode = options.mode ?? 'source'
+  let currentAnchorMap = options.anchorMap
   let currentProjection = options.projection
   let currentProjectionRevision = options.projection
     ? options.projectionRevision
@@ -265,12 +288,15 @@ export const bindMarkdownWebLanguageTools = (
   ): MarkdownLanguageToolCommitResult => {
     const unavailableReason = unavailableReasonFor(kind)
     if (unavailableReason) return rejected(unavailableReason)
-    if (!currentProjection) return rejected('projection-unavailable')
+    if (!currentProjection || !currentAnchorMap) {
+      return rejected('projection-unavailable')
+    }
     if (currentProjectionRevision === undefined) {
       return rejected('stale-projection')
     }
     if (!currentSession) return rejected('session-required')
     return planMarkdownWebReplacement({
+      anchorMap: currentAnchorMap,
       currentDocumentIdentity: documentIdentity,
       currentRevision,
       currentSelection: targetSelection,
@@ -346,6 +372,7 @@ export const bindMarkdownWebLanguageTools = (
     },
 
     updateState(input: {
+      readonly anchorMap?: MarkdownAnchorMap
       readonly config?: MarkdownLanguageToolConfig
       readonly projection?: MarkdownStableProjection
       readonly projectionRevision?: number
@@ -355,6 +382,7 @@ export const bindMarkdownWebLanguageTools = (
       currentRevision = input.revision
       currentSource = input.source
       currentConfig = input.config ?? currentConfig
+      currentAnchorMap = input.anchorMap
       currentProjection = input.projection
       currentProjectionRevision = input.projection
         ? input.projectionRevision

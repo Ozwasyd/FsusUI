@@ -1,7 +1,12 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 
-import type { MarkdownStableProjection } from '../../../wasm/markdown-runtime'
+import {
+  createMarkdownAnchorMap,
+  createMarkdownEditorProjection,
+  stabilizeMarkdownEditorProjection,
+  type MarkdownStableProjection,
+} from '../../../wasm/markdown-runtime'
 import MarkdownEditor from '../src/markdown-editor.vue'
 import {
   bindMarkdownWebLanguageTools,
@@ -11,54 +16,37 @@ import {
 const projectionFixture = (
   source: string,
   documentIdentity: { readonly epoch: number; readonly id: string },
-  nodes: readonly {
-    readonly id: string
-    readonly kind: string
-    readonly presentation:
-      | 'live-decorated'
-      | 'live-atomic'
-      | 'source-only-with-reason'
-      | 'unsupported-error'
-    readonly rawContentRanges?: readonly {
-      readonly end: number
-      readonly start: number
-    }[]
-    readonly rawMarkerRanges?: readonly {
-      readonly end: number
-      readonly start: number
-    }[]
-    readonly rawRange: { readonly end: number; readonly start: number }
-  }[] = [],
-): MarkdownStableProjection => {
-  const stableNodes = nodes.map((node) =>
-    Object.freeze({
-      childNormalizedRanges: Object.freeze([]),
-      childRawRanges: Object.freeze([]),
-      id: node.id,
-      kind: node.kind,
-      normalizedContentRanges: node.rawContentRanges,
-      normalizedMarkerRanges: node.rawMarkerRanges,
-      normalizedRange: node.rawRange,
-      parentNormalizedRange: null,
-      parentRawRange: null,
-      presentation: node.presentation,
-      rawContentRanges: node.rawContentRanges,
-      rawMarkerRanges: node.rawMarkerRanges,
-      rawRange: node.rawRange,
-    }),
+): MarkdownStableProjection =>
+  stabilizeMarkdownEditorProjection(
+    createMarkdownEditorProjection(source),
+    documentIdentity,
   )
-  return Object.freeze({
-    documentIdentity: Object.freeze(documentIdentity),
-    nodes: Object.freeze(stableNodes),
-    normalizedSource: source,
-    resolve(id: string) {
-      const node = stableNodes.find((candidate) => candidate.id === id)
-      return node
-        ? Object.freeze({ node, status: 'current' as const })
-        : Object.freeze({ status: 'invalid' as const })
-    },
-  }) as MarkdownStableProjection
-}
+
+const anchorMapFixture = (
+  source: string,
+  documentIdentity: { readonly epoch: number; readonly id: string },
+  projection: MarkdownStableProjection,
+) =>
+  createMarkdownAnchorMap({
+    identity: documentIdentity,
+    projection,
+    source,
+    syntax: projection.nodes.flatMap((node) => [
+      {
+        atomic: node.presentation === 'live-atomic',
+        id: node.id,
+        projectionId: node.id,
+        range: node.rawRange,
+      },
+      ...node.rawMarkerRanges.map((range, index) => ({
+        hidden: true,
+        id: `${node.id}:marker:${index}`,
+        parentId: node.id,
+        projectionId: node.id,
+        range,
+      })),
+    ]),
+  })
 
 describe('markdown web language tools integration', () => {
   it('binds global native attributes without creating another text authority', () => {
@@ -103,9 +91,11 @@ describe('markdown web language tools integration', () => {
       spellcheck: true,
       value: source,
     }
+    const projection = projectionFixture(source, documentIdentity)
     const controller = bindMarkdownWebLanguageTools(textarea, {
+      anchorMap: anchorMapFixture(source, documentIdentity, projection),
       documentIdentity,
-      projection: projectionFixture(source, documentIdentity),
+      projection,
       projectionRevision: 4,
       revision: 4,
       source,
@@ -140,9 +130,11 @@ describe('markdown web language tools integration', () => {
       spellcheck: true,
       value: source,
     }
+    const projection = projectionFixture(source, documentIdentity)
     const controller = bindMarkdownWebLanguageTools(textarea, {
+      anchorMap: anchorMapFixture(source, documentIdentity, projection),
       documentIdentity,
-      projection: projectionFixture(source, documentIdentity),
+      projection,
       revision: 4,
       source,
     })
@@ -185,44 +177,26 @@ describe('markdown web language tools integration', () => {
   })
 
   it('keeps code and URL suppression local while global spellcheck stays enabled', () => {
-    const source = '`wrld` [site](https://fsusui.dev)'
+    const source = '```text\nwrld\n```\n[site](https://fsusui.dev)'
     const documentIdentity = { epoch: 1, id: 'local-policy' }
-    const projection = projectionFixture(source, documentIdentity, [
-      {
-        id: 'code',
-        kind: 'code',
-        presentation: 'source-only-with-reason',
-        rawContentRanges: [{ end: 5, start: 1 }],
-        rawMarkerRanges: [
-          { end: 1, start: 0 },
-          { end: 6, start: 5 },
-        ],
-        rawRange: { end: 6, start: 0 },
-      },
-      {
-        id: 'link',
-        kind: 'link',
-        presentation: 'live-decorated',
-        rawContentRanges: [
-          { end: 12, start: 8 },
-          { end: 33, start: 14 },
-        ],
-        rawRange: { end: 34, start: 7 },
-      },
-    ])
+    const projection = projectionFixture(source, documentIdentity)
+    const codeOffset = source.indexOf('wrld')
+    const urlOffset = source.indexOf('https://')
     const textarea = {
-      selectionEnd: 5,
-      selectionStart: 1,
+      selectionEnd: codeOffset + 4,
+      selectionStart: codeOffset,
       spellcheck: true,
       value: source,
     }
     const controller = bindMarkdownWebLanguageTools(textarea, {
+      anchorMap: anchorMapFixture(source, documentIdentity, projection),
       documentIdentity,
       projection,
+      projectionRevision: 0,
       source,
     })
 
-    expect(controller.updateContext({ offset: 2 })).toMatchObject({
+    expect(controller.updateContext({ offset: codeOffset })).toMatchObject({
       reason: 'code-block',
       spellcheck: false,
       status: 'degraded',
@@ -230,7 +204,7 @@ describe('markdown web language tools integration', () => {
     expect(textarea.spellcheck).toBe(true)
     expect(controller.switchMode('live').spellcheck).toBe(false)
     expect(textarea.spellcheck).toBe(true)
-    expect(controller.updateContext({ offset: 20 }).reason).toBe('url')
+    expect(controller.updateContext({ offset: urlOffset }).reason).toBe('url')
     expect(textarea.spellcheck).toBe(true)
   })
 
@@ -244,9 +218,11 @@ describe('markdown web language tools integration', () => {
       spellcheck: true,
       value: source,
     }
+    const projection = projectionFixture(source, documentIdentity)
     const controller = bindMarkdownWebLanguageTools(textarea, {
+      anchorMap: anchorMapFixture(source, documentIdentity, projection),
       documentIdentity,
-      projection: projectionFixture(source, documentIdentity),
+      projection,
       projectionRevision: 1,
       revision: 1,
       source,
@@ -282,10 +258,12 @@ describe('markdown web language tools integration', () => {
       spellcheck: true,
       value: source,
     }
+    const projection = projectionFixture(source, documentIdentity)
     const controller = bindMarkdownWebLanguageTools(textarea, {
+      anchorMap: anchorMapFixture(source, documentIdentity, projection),
       config: { nativeWritingTools: 'disabled' },
       documentIdentity,
-      projection: projectionFixture(source, documentIdentity),
+      projection,
       projectionRevision: 1,
       revision: 1,
       source,
@@ -318,29 +296,28 @@ describe('markdown web language tools integration', () => {
   it('does not equate raw offsets with visual offsets without the #325 map', () => {
     const source = '# Heading'
     const identity = { epoch: 1, id: 'coordinates' }
+    const projection = projectionFixture(source, identity)
+    const anchorMap = anchorMapFixture(source, identity, projection)
     const coordinates = resolveMarkdownWebLanguageCoordinates({
+      anchorMap,
       documentIdentity: identity,
       offset: 0,
-      projection: projectionFixture(source, identity, [
-        {
-          id: 'heading',
-          kind: 'heading',
-          presentation: 'live-decorated',
-          rawMarkerRanges: [{ end: 2, start: 0 }],
-          rawRange: { end: source.length, start: 0 },
-        },
-      ]),
+      projection,
       source,
     })
     expect(coordinates).toMatchObject({
       inMarker: true,
       rawOffset: 0,
       reason: 'hidden-marker',
+      visualPoint: {
+        hidden: true,
+        kind: 'hidden',
+        sourceOffset: 0,
+      },
     })
-    expect(coordinates.visualOffset).toBeUndefined()
   })
 
-  it('keeps the component fail-closed and does not expose a private textarea ref', async () => {
+  it('routes the component replacement and does not expose a private textarea ref', async () => {
     const wrapper = mount(MarkdownEditor, {
       props: { modelValue: 'Hello wrld', showActions: false },
     })
@@ -356,7 +333,7 @@ describe('markdown web language tools integration', () => {
     await wrapper.vm.$nextTick()
 
     expect(replacement.defaultPrevented).toBe(true)
-    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    expect(wrapper.emitted('update:modelValue')).toEqual([['Hello world']])
     expect(wrapper.props('modelValue')).toBe('Hello wrld')
     const publicSurface = (
       wrapper.vm as unknown as {

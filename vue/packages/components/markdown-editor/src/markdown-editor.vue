@@ -417,7 +417,7 @@ import {
   type MarkdownWebLanguageController,
 } from './markdown-editor-language-web'
 import { createMarkdownEditorNativeEventMachine } from './markdown-editor-native-event'
-import { createMarkdownLiveSurface } from './markdown-editor-live-surface'
+import { resolveMarkdownLiveSurface } from './markdown-editor-live-surface'
 import {
   resolveMarkdownLiveSyntaxReveal,
   type MarkdownLiveRevealIntent,
@@ -440,6 +440,12 @@ import {
 } from './markdown-editor-live-layout'
 
 import type { MarkdownHtmlImportSnapshot } from '../../../wasm/markdown-html-import'
+import {
+  createMarkdownAnchorMap,
+  createMarkdownEditorProjection,
+  stabilizeMarkdownEditorProjection,
+  type MarkdownStableProjection,
+} from '../../../wasm/markdown-runtime'
 
 defineOptions({
   name: 'ElMarkdownEditor',
@@ -504,10 +510,62 @@ const transactionStore = new MarkdownEditorTransactionStore(
 )
 const documentIdentity = Object.freeze({ epoch: 0, id: commandTrayId })
 const editorValue = ref(transactionStore.value)
+let previousEditorProjection: MarkdownStableProjection | undefined
+let previousEditorProjectionSource = ''
+const editorProjection = computed(() => {
+  const source = editorValue.value
+  try {
+    const change = previousEditorProjection
+      ? deriveMarkdownEditorChange(previousEditorProjectionSource, source)
+      : undefined
+    const projection = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection(source),
+      documentIdentity,
+      previousEditorProjection,
+      change ?? undefined,
+    )
+    previousEditorProjection = projection
+    previousEditorProjectionSource = source
+    return projection
+  } catch {
+    return undefined
+  }
+})
+const editorAnchorMap = computed(() => {
+  const projection = editorProjection.value
+  if (!projection) return undefined
+  try {
+    const syntax = projection.nodes.flatMap((node) => [
+      {
+        atomic: node.presentation === 'live-atomic',
+        id: node.id,
+        projectionId: node.id,
+        range: node.rawRange,
+      },
+      ...node.rawMarkerRanges.map((range, index) => ({
+        hidden: true,
+        id: `${node.id}:marker:${index}`,
+        parentId: node.id,
+        projectionId: node.id,
+        range,
+      })),
+    ])
+    return createMarkdownAnchorMap({
+      identity: documentIdentity,
+      projection,
+      source: editorValue.value,
+      syntax,
+    })
+  } catch {
+    return undefined
+  }
+})
 const liveSurface = computed(() =>
-  createMarkdownLiveSurface({
+  resolveMarkdownLiveSurface({
     documentIdentity,
     mode: currentMode.value,
+    projection: editorProjection.value,
+    projectionError: !editorProjection.value,
     revision: transactionStore.revision,
     source: editorValue.value,
   }),
@@ -543,7 +601,10 @@ const syncLanguageToolsState = () => {
     languageToolsConfigKey !== configKey
   ) {
     controller.updateState({
+      anchorMap: editorAnchorMap.value,
       config,
+      projection: editorProjection.value,
+      projectionRevision: transactionStore.revision,
       revision: transactionStore.revision,
       source: transactionStore.value,
     })
@@ -1155,9 +1216,12 @@ onMounted(() => {
   const textarea = textareaRef.value
   if (textarea) {
     languageToolsController = bindMarkdownWebLanguageTools(textarea, {
+      anchorMap: editorAnchorMap.value,
       config: languageToolsConfig(),
       documentIdentity,
       mode: currentMode.value,
+      projection: editorProjection.value,
+      projectionRevision: transactionStore.revision,
       revision: transactionStore.revision,
       source: transactionStore.value,
     })
