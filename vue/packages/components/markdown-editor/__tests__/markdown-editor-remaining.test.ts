@@ -11,7 +11,7 @@ import {
   currentMarkdownAnchors,
   planMarkdownAnchorInsert,
 } from '../src/markdown-editor-anchor-commands'
-import { presentMarkdownEmbed } from '../../../wasm/markdown-embed-presentation'
+import { resolveMarkdownEmbedPresentation } from '../../../wasm/markdown-embed-presentation'
 
 describe('markdown remaining leaf contracts', () => {
   it('previews and confirms paste as markdown in one transaction', () => {
@@ -50,18 +50,37 @@ describe('markdown remaining leaf contracts', () => {
   })
 
   it('presents resolved embed results without card chrome', () => {
-    const presented = presentMarkdownEmbed({
-      requestId: 'r1',
-      status: 'resolved',
-      target: 'note',
-      mode: 'article',
-      version: 1,
-      documentIdentity: { id: 'doc', epoch: 1 },
-      revision: 1,
-      nodeId: 'syn:embed:0',
-      title: 'Note',
-    })
-    expect(presented.visible).toBe(true)
-    expect(presented.card).toBe(false)
+    const presented = resolveMarkdownEmbedPresentation(
+      {
+        kind: 'valid',
+        node: {
+          ok: true,
+          kind: 'embed',
+          target: 'note',
+          mode: 'article',
+          ranges: {
+            full: { start: 0, end: 34 },
+            marker: { start: 0, end: 7 },
+            target: { start: 15, end: 19 },
+            mode: { start: 26, end: 33 },
+          },
+        },
+        result: {
+          requestId: 'r1',
+          status: 'resolved',
+          target: 'note',
+          mode: 'article',
+          version: 1,
+          documentIdentity: { id: 'doc', epoch: 1 },
+          revision: 1,
+          nodeId: 'syn:embed:0',
+          title: 'Note',
+        },
+      },
+      'live',
+    )
+    expect(presented.state).toBe('resolved')
+    expect(presented.content.title).toBe('Note')
+    expect(presented.layout.modeAsVisualVariant).toBe(false)
   })
 })

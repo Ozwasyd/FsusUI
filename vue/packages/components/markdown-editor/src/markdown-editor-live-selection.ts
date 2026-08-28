@@ -31,6 +31,7 @@ export const MARKDOWN_ATOMIC_NODE_KINDS = Object.freeze([
   'mermaid',
   'footnote',
   'attachment',
+  'embed',
 ] as const)
 
 export type MarkdownAtomicNodeKind = (typeof MARKDOWN_ATOMIC_NODE_KINDS)[number]
