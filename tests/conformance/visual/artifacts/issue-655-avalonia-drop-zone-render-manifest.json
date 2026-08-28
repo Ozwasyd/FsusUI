@@ -1,0 +1,645 @@
+{
+  "schemaVersion": 2,
+  "generatedBy": "FsusDropZoneHeadlessTests.RealHeadlessSkiaRendersDropZoneVisualStatesAndSavesArtifacts",
+  "renderer": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "drawingBackend": "Skia",
+    "avaloniaVersion": "12.0.4.0",
+    "evidenceClass": "local-headless-render",
+    "limitations": "Pointer and drag visual-state captures use production classes; routed DataTransfer behavior is exercised separately by LocalRoutedDragSimulationCoversEnterLeaveTypedDropAndFiltering. No operating-system drag source or physical display is claimed."
+  },
+  "issue": 655,
+  "captures": [
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-light-ready.png",
+      "Sha256": "25998158873dd58917d76c431991f299e06035d5ab880a54a6aa96b3e1386e96",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Light",
+      "State": "ready",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "ready"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-light-hover.png",
+      "Sha256": "13f90f68256354e77a8922272bcc40357eae7c0f73fdcf99d0f58bb2ed8db0c4",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Light",
+      "State": "hover",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "production visual class projection; pointer activation tested separately"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-light-dragover.png",
+      "Sha256": "6d07f2177907337df332e6c64f85aafb97c511739e699ad4736b77273f798e0e",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Light",
+      "State": "dragover",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "production visual class projection; routed DataTransfer tested separately"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-light-dropped.png",
+      "Sha256": "13f90f68256354e77a8922272bcc40357eae7c0f73fdcf99d0f58bb2ed8db0c4",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Light",
+      "State": "dropped",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "HandleDrop accepted-file simulation"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-light-focus.png",
+      "Sha256": "13f90f68256354e77a8922272bcc40357eae7c0f73fdcf99d0f58bb2ed8db0c4",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Light",
+      "State": "focus",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "focus"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-light-disabled.png",
+      "Sha256": "8e41ebeccdf4315f60f5a15fa0c95deecf4e590fb5be085985ae2492dea80624",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Light",
+      "State": "disabled",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "IsDisabled property"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-light-loading.png",
+      "Sha256": "0b98f3e0a577348f8bf915c63970264e38f5c1bba10ec516cc38a22289a3e40c",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Light",
+      "State": "loading",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "IsLoading property"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-light-error.png",
+      "Sha256": "27555f86fbb9376a52d2e6931464d7f2adf8f07d2e51abb63ead6a361ba5a47f",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Light",
+      "State": "error",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "IsError and ErrorMessage properties"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-light-rejected.png",
+      "Sha256": "bbb43d8dce3c444a798da6bb2d27cbd25a35a17b22329cb6e2e4eb65b90f7502",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Light",
+      "State": "rejected",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "HandleDrop rejected-file simulation"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-light-rtl-100-ready.png",
+      "Sha256": "1e1231f440b02711d1066d5d08a5af9385ae3e022f1f0078a7145b0a32c90a4d",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Light",
+      "State": "ready",
+      "FlowDirection": "RightToLeft",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "ready"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-light-rtl-100-rejected.png",
+      "Sha256": "81085216269092480cd94c7151efe4465f1f88d759ad0f2539df6800b4660afd",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Light",
+      "State": "rejected",
+      "FlowDirection": "RightToLeft",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "HandleDrop rejected-file simulation"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-light-ltr-150-ready.png",
+      "Sha256": "3e7daa7bdb42c249dc5c56331341743acc0d7cd736c91a1159d932669b3caa96",
+      "PixelSize": {
+        "Width": 720,
+        "Height": 240
+      },
+      "Theme": "Light",
+      "State": "ready",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 144,
+      "ZoomPercent": 150,
+      "StateSetup": "ready"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-light-ltr-150-rejected.png",
+      "Sha256": "e76da6f21d6b5274384624e1e9480a5c04f7e7508514c52a8d70ce3e72946f22",
+      "PixelSize": {
+        "Width": 720,
+        "Height": 240
+      },
+      "Theme": "Light",
+      "State": "rejected",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 144,
+      "ZoomPercent": 150,
+      "StateSetup": "HandleDrop rejected-file simulation"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-light-ltr-200-ready.png",
+      "Sha256": "997d838586a0e7874026c9186058814824d42a1173340db62fdff8d0d3fe717c",
+      "PixelSize": {
+        "Width": 960,
+        "Height": 320
+      },
+      "Theme": "Light",
+      "State": "ready",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 192,
+      "ZoomPercent": 200,
+      "StateSetup": "ready"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-light-ltr-200-rejected.png",
+      "Sha256": "dc04000a5b3ec9d6ec175a3d50e9eaba6b1248c23b61c4d50c14b9385f7b7306",
+      "PixelSize": {
+        "Width": 960,
+        "Height": 320
+      },
+      "Theme": "Light",
+      "State": "rejected",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 192,
+      "ZoomPercent": 200,
+      "StateSetup": "HandleDrop rejected-file simulation"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-dark-ready.png",
+      "Sha256": "e9c11f166dc5f09c78355b14d8603c5d068187c623a6b1a9b424231022700c76",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Dark",
+      "State": "ready",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "ready"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-dark-hover.png",
+      "Sha256": "5c29ce4334e9f55e48b5f9d956db0438bb50b3ed81e0f8052a11dccd3add6ad7",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Dark",
+      "State": "hover",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "production visual class projection; pointer activation tested separately"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-dark-dragover.png",
+      "Sha256": "d47693f49e58723f772f0dfdd5c9d789144079e6160a95c2fad89d116eb82ab0",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Dark",
+      "State": "dragover",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "production visual class projection; routed DataTransfer tested separately"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-dark-dropped.png",
+      "Sha256": "5c29ce4334e9f55e48b5f9d956db0438bb50b3ed81e0f8052a11dccd3add6ad7",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Dark",
+      "State": "dropped",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "HandleDrop accepted-file simulation"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-dark-focus.png",
+      "Sha256": "5fde922d461e72e1cc1cc9beb1670edb614099be9ce95665baf0cdf39a132344",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Dark",
+      "State": "focus",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "focus"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-dark-disabled.png",
+      "Sha256": "4e47141d04f37b7765cbc57605530e7a94a44c860d18d04ada70640101c0a374",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Dark",
+      "State": "disabled",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "IsDisabled property"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-dark-loading.png",
+      "Sha256": "7e26ba27957772f642a95b4b00131794bfe164a572ce606d1dd60c8ab64dba22",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Dark",
+      "State": "loading",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "IsLoading property"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-dark-error.png",
+      "Sha256": "73877e47237440c425a42cfdc7be6fbc3247f9e4ef0926607001bcd6d0e61951",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Dark",
+      "State": "error",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "IsError and ErrorMessage properties"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-dark-rejected.png",
+      "Sha256": "1f749bd3acff418225c8f5c638f0d31bf07fd4e2dccbba2f94570c2397ddf291",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Dark",
+      "State": "rejected",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "HandleDrop rejected-file simulation"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-dark-rtl-100-ready.png",
+      "Sha256": "4c04e3949cc79b333e291abfa42cbaef3aceea80e6fabb8f48beab812d0fc3a7",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Dark",
+      "State": "ready",
+      "FlowDirection": "RightToLeft",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "ready"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-dark-rtl-100-rejected.png",
+      "Sha256": "9109431731d7818cc74cc622da8193d2c9579dca6ed86741085a5fd32af59c01",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "Dark",
+      "State": "rejected",
+      "FlowDirection": "RightToLeft",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "HandleDrop rejected-file simulation"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-dark-ltr-150-ready.png",
+      "Sha256": "03ec83b02ed5d1743628c536cacae64f916c9138087b0df87e1baf71c9ad9cdb",
+      "PixelSize": {
+        "Width": 720,
+        "Height": 240
+      },
+      "Theme": "Dark",
+      "State": "ready",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 144,
+      "ZoomPercent": 150,
+      "StateSetup": "ready"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-dark-ltr-150-rejected.png",
+      "Sha256": "c5970f78e618d11ebaf1a173a8cba3798b8239939ca17e346e8b63b3d458e6e5",
+      "PixelSize": {
+        "Width": 720,
+        "Height": 240
+      },
+      "Theme": "Dark",
+      "State": "rejected",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 144,
+      "ZoomPercent": 150,
+      "StateSetup": "HandleDrop rejected-file simulation"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-dark-ltr-200-ready.png",
+      "Sha256": "b594a8d45441433121e9b864e3d252a06f8a4d43036fcc8d0bffbe07aaf2d637",
+      "PixelSize": {
+        "Width": 960,
+        "Height": 320
+      },
+      "Theme": "Dark",
+      "State": "ready",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 192,
+      "ZoomPercent": 200,
+      "StateSetup": "ready"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-dark-ltr-200-rejected.png",
+      "Sha256": "8d34e0a200424e901e8438a9c7a8f6a4bd8e94ae70a306f7be66bff6729490b0",
+      "PixelSize": {
+        "Width": 960,
+        "Height": 320
+      },
+      "Theme": "Dark",
+      "State": "rejected",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 192,
+      "ZoomPercent": 200,
+      "StateSetup": "HandleDrop rejected-file simulation"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-highcontrast-ready.png",
+      "Sha256": "520315cd20e43b6471a92f5fb09b52df00ad3d19739a636848a36a3a0930882c",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "HighContrast",
+      "State": "ready",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "ready"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-highcontrast-hover.png",
+      "Sha256": "71dd6a973ea9146cae32fc45331e93903c4075a99a03995df0c9df3cf3b88502",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "HighContrast",
+      "State": "hover",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "production visual class projection; pointer activation tested separately"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-highcontrast-dragover.png",
+      "Sha256": "d6d554302e309b11e7d5db1ab1c7e4bc0a61990403b04dbaeb4ca866c2636ac4",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "HighContrast",
+      "State": "dragover",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "production visual class projection; routed DataTransfer tested separately"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-highcontrast-dropped.png",
+      "Sha256": "71dd6a973ea9146cae32fc45331e93903c4075a99a03995df0c9df3cf3b88502",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "HighContrast",
+      "State": "dropped",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "HandleDrop accepted-file simulation"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-highcontrast-focus.png",
+      "Sha256": "10d5cd04feeca3069a873ee040709d8e8aa8d185df7a8095f330afdb39280ed4",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "HighContrast",
+      "State": "focus",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "focus"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-highcontrast-disabled.png",
+      "Sha256": "922f73373fc5ba205914d924816af2d55ffc1e1633ee4432d5f47209fb6e5d52",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "HighContrast",
+      "State": "disabled",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "IsDisabled property"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-highcontrast-loading.png",
+      "Sha256": "685f4327cbcd930729f62ec7eedb34d4f3ffb2b49972dabacf228a5aff92e5bb",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "HighContrast",
+      "State": "loading",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "IsLoading property"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-highcontrast-error.png",
+      "Sha256": "0dca697bb47bb34b62acbb2cef8f0fffe2e9a4f6cdd0e549647efc1bb665fa50",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "HighContrast",
+      "State": "error",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "IsError and ErrorMessage properties"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-highcontrast-rejected.png",
+      "Sha256": "5329fa39f8268de84214624550a4c6a11821938f9e04898389e727656cfbd8c4",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "HighContrast",
+      "State": "rejected",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "HandleDrop rejected-file simulation"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-highcontrast-rtl-100-ready.png",
+      "Sha256": "aa5f6be5129887ed152faf00ff38746815ac2e2cb7b56c31e0a08cb1cf9cd17f",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "HighContrast",
+      "State": "ready",
+      "FlowDirection": "RightToLeft",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "ready"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-highcontrast-rtl-100-rejected.png",
+      "Sha256": "d00ad1588c258e5b80b86fe52ac7e7df76d9b4d0281652872ca088be0b153c9e",
+      "PixelSize": {
+        "Width": 480,
+        "Height": 160
+      },
+      "Theme": "HighContrast",
+      "State": "rejected",
+      "FlowDirection": "RightToLeft",
+      "Dpi": 96,
+      "ZoomPercent": 100,
+      "StateSetup": "HandleDrop rejected-file simulation"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-highcontrast-ltr-150-ready.png",
+      "Sha256": "5a74d4881b8187495b0fdc55903581e9042cb3882f78f29b63c27b04ee5bc74d",
+      "PixelSize": {
+        "Width": 720,
+        "Height": 240
+      },
+      "Theme": "HighContrast",
+      "State": "ready",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 144,
+      "ZoomPercent": 150,
+      "StateSetup": "ready"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-highcontrast-ltr-150-rejected.png",
+      "Sha256": "abef16876c73cb0c6e8f0ec0d4c2e88bc8a3b35f82d5297c598146d599904516",
+      "PixelSize": {
+        "Width": 720,
+        "Height": 240
+      },
+      "Theme": "HighContrast",
+      "State": "rejected",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 144,
+      "ZoomPercent": 150,
+      "StateSetup": "HandleDrop rejected-file simulation"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-highcontrast-ltr-200-ready.png",
+      "Sha256": "a92741f296a3463891f22b0026b2e1a3e94651d94208e6fab12137eeaab073f6",
+      "PixelSize": {
+        "Width": 960,
+        "Height": 320
+      },
+      "Theme": "HighContrast",
+      "State": "ready",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 192,
+      "ZoomPercent": 200,
+      "StateSetup": "ready"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-655-dropzone-highcontrast-ltr-200-rejected.png",
+      "Sha256": "bed9d02c9be664e2eefd3ebeb1ca3a9e96c39a477d6310c9602c1df2c0e5e3e8",
+      "PixelSize": {
+        "Width": 960,
+        "Height": 320
+      },
+      "Theme": "HighContrast",
+      "State": "rejected",
+      "FlowDirection": "LeftToRight",
+      "Dpi": 192,
+      "ZoomPercent": 200,
+      "StateSetup": "HandleDrop rejected-file simulation"
+    }
+  ]
+}

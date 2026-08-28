@@ -4712,6 +4712,383 @@
       ]
     },
     {
+      "name": "FsusUI.Avalonia.Controls.FsusDropZone",
+      "kind": "class",
+      "baseType": "Avalonia.Controls.ContentControl",
+      "isAbstract": false,
+      "isSealed": false,
+      "properties": [
+        {
+          "name": "Accepts",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "AccessibleName",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "AllowMultiple",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "BrowseCommand",
+          "type": "System.Windows.Input.ICommand",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "BrowseCommandParameter",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ErrorMessage",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "FilterErrorMessage",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "HasFilterError",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "HelpContent",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "HelpText",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Instruction",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "InstructionContent",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsBrowseEnabled",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsDisabled",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsDragOver",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsError",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsLoading",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "PathValidationPredicate",
+          "type": "System.Func\u003CSystem.String, System.Boolean\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Size",
+          "type": "FsusUI.Avalonia.Controls.FsusComponentSize",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ValidationPredicate",
+          "type": "System.Func\u003CAvalonia.Platform.Storage.IStorageItem, System.Boolean\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [
+        {
+          "name": "Accepts",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "AccessibleName",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "AllowMultiple",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "BrowseCommand",
+          "kind": "styled",
+          "type": "System.Windows.Input.ICommand",
+          "nullable": true
+        },
+        {
+          "name": "BrowseCommandParameter",
+          "kind": "styled",
+          "type": "System.Object",
+          "nullable": true
+        },
+        {
+          "name": "ErrorMessage",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "FilterErrorMessage",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "HasFilterError",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "HelpContent",
+          "kind": "styled",
+          "type": "System.Object",
+          "nullable": true
+        },
+        {
+          "name": "HelpText",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "Instruction",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "InstructionContent",
+          "kind": "styled",
+          "type": "System.Object",
+          "nullable": true
+        },
+        {
+          "name": "IsBrowseEnabled",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "IsDisabled",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "IsDragOver",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "IsError",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "IsLoading",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "PathValidationPredicate",
+          "kind": "styled",
+          "type": "System.Func\u003CSystem.String, System.Boolean\u003E",
+          "nullable": true
+        },
+        {
+          "name": "Size",
+          "kind": "styled",
+          "type": "FsusUI.Avalonia.Controls.FsusComponentSize",
+          "nullable": false
+        },
+        {
+          "name": "ValidationPredicate",
+          "kind": "styled",
+          "type": "System.Func\u003CAvalonia.Platform.Storage.IStorageItem, System.Boolean\u003E",
+          "nullable": true
+        }
+      ],
+      "events": [
+        {
+          "name": "BrowseRequested",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CAvalonia.Interactivity.RoutedEventArgs\u003E",
+          "isStatic": false
+        },
+        {
+          "name": "FilesDropped",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusFileDropEventArgs\u003E",
+          "isStatic": false
+        },
+        {
+          "name": "FilesRejected",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusFileDropEventArgs\u003E",
+          "isStatic": false
+        }
+      ],
+      "methods": [
+        {
+          "name": "GetStorageItemPath",
+          "isStatic": true,
+          "returnType": "System.String",
+          "parameters": [
+            {
+              "name": "item",
+              "type": "Avalonia.Platform.Storage.IStorageItem",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "HandleDrop",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "items",
+              "type": "System.Collections.Generic.IEnumerable\u003CAvalonia.Platform.Storage.IStorageItem\u003E",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "HandleDrop",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "filePaths",
+              "type": "System.Collections.Generic.IEnumerable\u003CSystem.String\u003E",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "MatchesAccept",
+          "isStatic": true,
+          "returnType": "System.Boolean",
+          "parameters": [
+            {
+              "name": "fileName",
+              "type": "System.String",
+              "optional": false
+            },
+            {
+              "name": "filePath",
+              "type": "System.String",
+              "optional": false
+            },
+            {
+              "name": "acceptRule",
+              "type": "System.String",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "RequestBrowse",
+          "isStatic": false,
+          "returnType": "System.Boolean",
+          "parameters": []
+        }
+      ]
+    },
+    {
       "name": "FsusUI.Avalonia.Controls.FsusDropdown",
       "kind": "class",
       "baseType": "FsusUI.Avalonia.Controls.FsusAnchoredOverlaySurface",
@@ -4922,6 +5299,58 @@
           "nullable": true
         }
       ],
+      "events": [],
+      "methods": []
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusFileDropEventArgs",
+      "kind": "class",
+      "baseType": "Avalonia.Interactivity.RoutedEventArgs",
+      "isAbstract": false,
+      "isSealed": false,
+      "properties": [
+        {
+          "name": "DragEffects",
+          "type": "Avalonia.Input.DragDropEffects",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "Files",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CSystem.String\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "RejectedFiles",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CSystem.String\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "RejectedItems",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CAvalonia.Platform.Storage.IStorageItem\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "StorageItems",
+          "type": "System.Collections.Generic.IReadOnlyList\u003CAvalonia.Platform.Storage.IStorageItem\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [],
       "events": [],
       "methods": []
     },
