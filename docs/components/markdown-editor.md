@@ -259,11 +259,12 @@ identity.
 node-, target-, mode-, and version-bound request. It commits only a matching
 result and treats late or mismatched results as stale. Provider excerpts are
 rendered as escaped text, never `innerHTML`; the directive remains the only host
-source/history authority. Source mode displays the exact directive. Other modes
-interleave the normal Markdown renderer with read-only embed regions that expose
-source reveal, exact-Markdown copy, delete, open-source, and applicable retry
-actions without an iframe, nested editor, nested scroll surface, or permanent
-embed tab stop.
+source/history authority. Source mode displays the exact directive. Live keeps
+the textarea as its only input surface and places the controlled read-only embed
+regions below it; Split and Preview interleave those regions with the normal
+Markdown renderer. The regions expose source reveal, exact-Markdown copy, delete,
+open-source, and applicable retry actions without an iframe, nested editor,
+nested scroll surface, or permanent embed tab stop.
 
 `embed-open-source(target, mode)` and `embed-retry(target, mode)` leave target
 resolution, authorization, navigation, and retry policy with the consumer.
