@@ -3,6 +3,8 @@ import {
   createMarkdownTableEntries,
   stabilizeMarkdownEditorProjection,
   type MarkdownDocumentIdentity,
+  type MarkdownStableSyntaxNode,
+  type MarkdownEditorTableSyntaxRow,
 } from '../../../wasm/markdown-runtime'
 import type { MarkdownEditorTransaction } from './markdown-editor-transaction'
 import {
@@ -15,65 +17,56 @@ import {
 
 export type { MarkdownTableAlignment }
 
-const createSourceTableEntries = (
+const createStableTableProjection = (
   source: string,
   documentIdentity: MarkdownDocumentIdentity,
-) => {
-  const entries: Array<{ id: string; range: { start: number; end: number } }> = []
-  const linePattern = /.*(?:\r\n|\r|\n|$)/gu
-  const lines = source.match(linePattern)?.filter(Boolean) ?? []
-  let offset = 0
-  let index = 0
-  while (index < lines.length) {
-    const start = offset
-    const block: string[] = []
-    let lastValidEnd = -1
-    while (index < lines.length) {
-      const raw = lines[index]!
-      const line = raw.replace(/(?:\r\n|\r|\n)$/u, '')
-      if (!line.includes('|')) break
-      block.push(line)
-      offset += raw.length
-      index++
-      if (parseMarkdownTableBlock(block.join('\n'))) lastValidEnd = offset
-    }
-    if (lastValidEnd >= 0) {
-      entries.push({
-        id: `syn:${documentIdentity.id}:${documentIdentity.epoch}:table-source:${start}`,
-        range: { start, end: lastValidEnd },
-      })
-    }
-    if (offset === start) {
-      offset += lines[index]?.length ?? 0
-      index++
-    }
-  }
-  return entries
-}
-
-const createTableEntries = (
-  source: string,
-  documentIdentity: MarkdownDocumentIdentity,
-) => {
-  const stable = createMarkdownTableEntries(
-    stabilizeMarkdownEditorProjection(
-      createMarkdownEditorProjection(source),
-      documentIdentity,
-    ),
+) =>
+  stabilizeMarkdownEditorProjection(
+    createMarkdownEditorProjection(source),
+    documentIdentity,
   )
-  return stable.length > 0
-    ? stable
-    : createSourceTableEntries(source, documentIdentity)
-}
+
+const createTableAuthorities = (
+  source: string,
+  documentIdentity: MarkdownDocumentIdentity,
+) =>
+  createStableTableProjection(source, documentIdentity).nodes.filter(
+    (node) =>
+      node.kind === 'table' &&
+      node.status === 'valid' &&
+      node.table !== undefined,
+  )
+
+const resolveTableAuthority = (
+  source: string,
+  documentIdentity: MarkdownDocumentIdentity,
+  tableId: string,
+) =>
+  createTableAuthorities(source, documentIdentity).find(
+    (node) => node.id === tableId,
+  ) ?? null
 
 export const resolveMarkdownTableEntry = (
   source: string,
   documentIdentity: MarkdownDocumentIdentity,
   tableId: string,
 ) =>
-  createTableEntries(source, documentIdentity).find(
-    (entry) => entry.id === tableId,
-  ) ?? null
+  (() => {
+    const node = resolveTableAuthority(source, documentIdentity, tableId)
+    return node
+      ? Object.freeze({
+          id: node.id,
+          kind: 'table' as const,
+          range: Object.freeze({ ...node.rawRange }),
+        })
+      : null
+  })()
+
+export const resolveMarkdownTableIdentityStatus = (
+  source: string,
+  documentIdentity: MarkdownDocumentIdentity,
+  tableId: string,
+) => createStableTableProjection(source, documentIdentity).resolve(tableId).status
 
 export interface MarkdownTableCellIdentity {
   readonly tableId: string
@@ -86,36 +79,66 @@ export interface MarkdownTableCellIdentity {
   readonly status: 'current' | 'deleted' | 'invalid'
 }
 
-const scanCellRanges = (line: string, lineStart: number) => {
-  const ranges: Array<{ start: number; end: number }> = []
-  let cellStart = line.startsWith('|') ? 1 : 0
-  let escaped = false
-  let backtickRun = 0
-  for (let index = cellStart; index <= line.length; index++) {
-    const character = line[index]
-    if (index === line.length || (character === '|' && !escaped && backtickRun === 0)) {
-      ranges.push({ start: lineStart + cellStart, end: lineStart + index })
-      cellStart = index + 1
-      escaped = false
-      continue
-    }
-    if (escaped) {
-      escaped = false
-      continue
-    }
-    if (character === '\\') {
-      escaped = true
-      continue
-    }
-    if (character === '`') {
-      let run = 1
-      while (line[index + run] === '`') run++
-      backtickRun = backtickRun === run ? 0 : backtickRun === 0 ? run : backtickRun
-      index += run - 1
-    }
+const editableTableRows = (node: MarkdownStableSyntaxNode) =>
+  node.table?.rows.filter(
+    (_, index) => index !== node.table!.separatorRow,
+  ) ?? []
+
+const semanticHash = (value: string) => {
+  let hash = 0x811c9dc5
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index)
+    hash = Math.imul(hash, 0x01000193)
   }
-  if (line.endsWith('|')) ranges.pop()
-  return ranges
+  return (hash >>> 0).toString(36)
+}
+
+const createCellId = (
+  source: string,
+  table: MarkdownStableSyntaxNode,
+  row: MarkdownEditorTableSyntaxRow,
+  column: number,
+) => {
+  const rowText = row.rawCellRanges
+    .map((range) => source.slice(range.start, range.end))
+    .join('\u001f')
+  const matchingRows = editableTableRows(table).filter(
+    (candidate) =>
+      candidate.rawRange.end <= row.rawRange.start &&
+      candidate.rawCellRanges
+        .map((range) => source.slice(range.start, range.end))
+        .join('\u001f') === rowText,
+  ).length
+  const cellText = source.slice(
+    row.rawCellRanges[column]!.start,
+    row.rawCellRanges[column]!.end,
+  )
+  const matchingCells = row.rawCellRanges
+    .slice(0, column)
+    .filter((range) => source.slice(range.start, range.end) === cellText).length
+  return `${table.id}:cell:${semanticHash(
+    [rowText, matchingRows, cellText, matchingCells].join('\u001e'),
+  )}`
+}
+
+const cellIdentity = (
+  source: string,
+  table: MarkdownStableSyntaxNode,
+  row: number,
+  column: number,
+  retainedCellId?: string,
+): MarkdownTableCellIdentity | null => {
+  const semanticRow = editableTableRows(table)[row]
+  const anchor = semanticRow?.rawCellRanges[column]
+  if (!semanticRow || !anchor) return null
+  return Object.freeze({
+    anchor: Object.freeze({ ...anchor }),
+    cellId: retainedCellId ?? createCellId(source, table, semanticRow, column),
+    column,
+    row,
+    status: 'current' as const,
+    tableId: table.id,
+  })
 }
 
 export const resolveMarkdownTableCellAtOffset = (
@@ -123,38 +146,33 @@ export const resolveMarkdownTableCellAtOffset = (
   documentIdentity: MarkdownDocumentIdentity,
   offset: number,
 ): MarkdownTableCellIdentity | null => {
-  const table = createTableEntries(source, documentIdentity).find(
-    (entry) => offset >= entry.range.start && offset <= entry.range.end,
+  const table = createTableAuthorities(source, documentIdentity).find(
+    (node) => offset > node.rawRange.start && offset < node.rawRange.end,
   )
   if (!table) return null
-  const slice = source.slice(table.range.start, table.range.end)
-  if (!parseMarkdownTableBlock(slice)) return null
-  const lines = slice.split(/\r\n|\r|\n/)
-  let relativeLineStart = 0
-  for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
-    const line = lines[lineIndex]!
-    const lineEnd = relativeLineStart + line.length
-    if (offset <= table.range.start + lineEnd) {
-      if (lineIndex === 1) return null
-      const row = lineIndex === 0 ? 0 : lineIndex - 1
-      const ranges = scanCellRanges(line, table.range.start + relativeLineStart)
-      const column = ranges.findIndex(
-        (range) => offset >= range.start && offset <= range.end,
-      )
-      if (column < 0) return null
-      const anchor = Object.freeze(ranges[column]!)
-      return Object.freeze({
-        anchor,
-        cellId: `${table.id}:cell:${anchor.start}:${anchor.end}`,
-        column,
-        row,
-        status: 'current' as const,
-        tableId: table.id,
-      })
-    }
-    relativeLineStart = lineEnd + (slice.slice(lineEnd).startsWith('\r\n') ? 2 : 1)
-  }
-  return null
+  const rows = editableTableRows(table)
+  const row = rows.findIndex(
+    (candidate) =>
+      offset >= candidate.rawRange.start && offset <= candidate.rawRange.end,
+  )
+  if (row < 0) return null
+  const ranges = rows[row]!.rawCellRanges
+  const exactColumn = ranges.findIndex(
+    (range) => offset >= range.start && offset <= range.end,
+  )
+  const column =
+    exactColumn >= 0
+      ? exactColumn
+      : ranges
+          .map((range, index) => ({
+            distance: Math.min(
+              Math.abs(offset - range.start),
+              Math.abs(offset - range.end),
+            ),
+            index,
+          }))
+          .sort((left, right) => left.distance - right.distance)[0]?.index ?? -1
+  return column < 0 ? null : cellIdentity(source, table, row, column)
 }
 
 export const resolveMarkdownTableCellCoordinates = (
@@ -165,28 +183,9 @@ export const resolveMarkdownTableCellCoordinates = (
   column: number,
   cellId?: string,
 ): MarkdownTableCellIdentity | null => {
-  const table = resolveTableEntry(source, documentIdentity, tableId)
+  const table = resolveTableAuthority(source, documentIdentity, tableId)
   if (!table) return null
-  const slice = source.slice(table.range.start, table.range.end)
-  const lines = slice.split(/\r\n|\r|\n/)
-  const lineIndex = row === 0 ? 0 : row + 1
-  const line = lines[lineIndex]
-  if (line === undefined) return null
-  let lineStart = 0
-  for (let index = 0; index < lineIndex; index++) {
-    lineStart += lines[index]!.length
-    lineStart += slice.slice(lineStart).startsWith('\r\n') ? 2 : 1
-  }
-  const anchor = scanCellRanges(line, table.range.start + lineStart)[column]
-  if (!anchor) return null
-  return Object.freeze({
-    anchor: Object.freeze(anchor),
-    cellId: cellId ?? `${table.id}:cell:${anchor.start}:${anchor.end}`,
-    column,
-    row,
-    status: 'current' as const,
-    tableId: table.id,
-  })
+  return cellIdentity(source, table, row, column, cellId)
 }
 
 export type MarkdownTableStructuralOp =
@@ -205,7 +204,6 @@ const resolveTableEntry = (
   documentIdentity: MarkdownDocumentIdentity,
   tableId: string,
 ) => {
-  if (documentIdentity.epoch < 1) return null
   return resolveMarkdownTableEntry(source, documentIdentity, tableId)
 }
 
@@ -215,6 +213,7 @@ const buildTransaction = (
   parsed: ParsedMarkdownTable,
   expectedRevision?: number,
   pad = false,
+  targetCell?: Readonly<{ row: number; column: number }>,
 ): MarkdownEditorTransaction => {
   let serialized = serializeMarkdownTable(parsed, pad)
   if (slice.endsWith('\n') && !serialized.endsWith('\n')) {
@@ -222,6 +221,21 @@ const buildTransaction = (
   } else if (!slice.endsWith('\n') && serialized.endsWith('\n')) {
     serialized = serialized.slice(0, -1)
   }
+  const projectedTable = createMarkdownEditorProjection(serialized).nodes.find(
+    (node) =>
+      node.kind === 'table' &&
+      node.status === 'valid' &&
+      node.table !== undefined,
+  )
+  const targetRow =
+    targetCell && projectedTable?.table
+      ? projectedTable.table.rows.filter(
+          (_, index) => index !== projectedTable.table!.separatorRow,
+        )[targetCell.row]
+      : undefined
+  const targetRange = targetCell
+    ? targetRow?.rawCellRanges[targetCell.column]
+    : undefined
   return {
     changes: [
       {
@@ -232,7 +246,22 @@ const buildTransaction = (
     ],
     expectedRevision,
     history: 'separate',
+    metadata: Object.freeze({
+      markdownTable: Object.freeze({
+        range: Object.freeze({ ...tableRange }),
+        ...(targetCell ? { targetCell: Object.freeze({ ...targetCell }) } : {}),
+      }),
+    }),
     origin: 'command',
+    ...(targetRange
+      ? {
+          selection: Object.freeze({
+            direction: 'none' as const,
+            end: tableRange.start + targetRange.end,
+            start: tableRange.start + targetRange.start,
+          }),
+        }
+      : {}),
   }
 }
 
@@ -259,6 +288,7 @@ export const planMarkdownTableInsertRow = (
   rowIndex: number,
   position: 'above' | 'below',
   expectedRevision?: number,
+  currentColumn = 0,
 ): MarkdownEditorTransaction | { readonly rejected: MarkdownTableRejection } => {
   if (expectedRevision !== undefined && expectedRevision < 0) {
     return { rejected: 'stale' }
@@ -292,7 +322,10 @@ export const planMarkdownTableInsertRow = (
     ...parsed,
     rows: Object.freeze(nextRows.map((r) => Object.freeze(r))),
   }
-  return buildTransaction(table.range, slice, nextTable, expectedRevision)
+  return buildTransaction(table.range, slice, nextTable, expectedRevision, false, {
+    row: insertAtBodyIndex + 1,
+    column: currentColumn,
+  })
 }
 
 export const planMarkdownTableDeleteRow = (
@@ -301,6 +334,7 @@ export const planMarkdownTableDeleteRow = (
   tableId: string,
   rowIndex: number,
   expectedRevision?: number,
+  currentColumn = 0,
 ): MarkdownEditorTransaction | { readonly rejected: MarkdownTableRejection } => {
   if (expectedRevision !== undefined && expectedRevision < 0) {
     return { rejected: 'stale' }
@@ -328,7 +362,10 @@ export const planMarkdownTableDeleteRow = (
     ...parsed,
     rows: Object.freeze(nextRows.map((r) => Object.freeze(r))),
   }
-  return buildTransaction(table.range, slice, nextTable, expectedRevision)
+  return buildTransaction(table.range, slice, nextTable, expectedRevision, false, {
+    row: Math.min(rowIndex, nextRows.length),
+    column: currentColumn,
+  })
 }
 
 export const planMarkdownTableMoveRow = (
@@ -338,6 +375,7 @@ export const planMarkdownTableMoveRow = (
   rowIndex: number,
   direction: 'up' | 'down',
   expectedRevision?: number,
+  currentColumn = 0,
 ): MarkdownEditorTransaction | { readonly rejected: MarkdownTableRejection } => {
   if (expectedRevision !== undefined && expectedRevision < 0) {
     return { rejected: 'stale' }
@@ -365,7 +403,10 @@ export const planMarkdownTableMoveRow = (
     ...parsed,
     rows: Object.freeze(nextRows.map((r) => Object.freeze(r))),
   }
-  return buildTransaction(table.range, slice, nextTable, expectedRevision)
+  return buildTransaction(table.range, slice, nextTable, expectedRevision, false, {
+    row: targetIndex + 1,
+    column: currentColumn,
+  })
 }
 
 export const planMarkdownTableInsertColumn = (
@@ -375,6 +416,7 @@ export const planMarkdownTableInsertColumn = (
   columnIndex: number,
   position: 'left' | 'right',
   expectedRevision?: number,
+  currentRow = 0,
 ): MarkdownEditorTransaction | { readonly rejected: MarkdownTableRejection } => {
   if (expectedRevision !== undefined && expectedRevision < 0) {
     return { rejected: 'stale' }
@@ -414,7 +456,10 @@ export const planMarkdownTableInsertColumn = (
     columnCount: parsed.columnCount + 1,
     newline: parsed.newline,
   }
-  return buildTransaction(table.range, slice, nextTable, expectedRevision)
+  return buildTransaction(table.range, slice, nextTable, expectedRevision, false, {
+    row: currentRow,
+    column: insertIndex,
+  })
 }
 
 export const planMarkdownTableDeleteColumn = (
@@ -423,6 +468,7 @@ export const planMarkdownTableDeleteColumn = (
   tableId: string,
   columnIndex: number,
   expectedRevision?: number,
+  currentRow = 0,
 ): MarkdownEditorTransaction | { readonly rejected: MarkdownTableRejection } => {
   if (expectedRevision !== undefined && expectedRevision < 0) {
     return { rejected: 'stale' }
@@ -458,7 +504,10 @@ export const planMarkdownTableDeleteColumn = (
     columnCount: parsed.columnCount - 1,
     newline: parsed.newline,
   }
-  return buildTransaction(table.range, slice, nextTable, expectedRevision)
+  return buildTransaction(table.range, slice, nextTable, expectedRevision, false, {
+    row: currentRow,
+    column: Math.min(columnIndex, nextTable.columnCount - 1),
+  })
 }
 
 export const planMarkdownTableMoveColumn = (
@@ -468,6 +517,7 @@ export const planMarkdownTableMoveColumn = (
   columnIndex: number,
   direction: 'left' | 'right',
   expectedRevision?: number,
+  currentRow = 0,
 ): MarkdownEditorTransaction | { readonly rejected: MarkdownTableRejection } => {
   if (expectedRevision !== undefined && expectedRevision < 0) {
     return { rejected: 'stale' }
@@ -511,7 +561,10 @@ export const planMarkdownTableMoveColumn = (
     columnCount: parsed.columnCount,
     newline: parsed.newline,
   }
-  return buildTransaction(table.range, slice, nextTable, expectedRevision)
+  return buildTransaction(table.range, slice, nextTable, expectedRevision, false, {
+    row: currentRow,
+    column: targetIndex,
+  })
 }
 
 export const planMarkdownTableAlignColumn = (
@@ -521,6 +574,7 @@ export const planMarkdownTableAlignColumn = (
   column: number,
   alignment: MarkdownTableAlignment,
   expectedRevision?: number,
+  currentRow = 0,
 ): MarkdownEditorTransaction | { readonly rejected: MarkdownTableRejection } => {
   if (expectedRevision !== undefined && expectedRevision < 0) {
     return { rejected: 'stale' }
@@ -543,7 +597,10 @@ export const planMarkdownTableAlignColumn = (
     ...parsed,
     alignments: Object.freeze(nextAlignments),
   }
-  return buildTransaction(table.range, slice, nextTable, expectedRevision)
+  return buildTransaction(table.range, slice, nextTable, expectedRevision, false, {
+    row: currentRow,
+    column,
+  })
 }
 
 export const planMarkdownTableDelete = (
@@ -581,10 +638,14 @@ export const resolveMarkdownTableCell = (
   if (previous.status === 'deleted' || previous.status === 'invalid') {
     return previous
   }
-  const table = resolveTableEntry(source, documentIdentity, previous.tableId)
+  const table = resolveTableAuthority(
+    source,
+    documentIdentity,
+    previous.tableId,
+  )
   if (!table) return { ...previous, status: 'deleted' }
 
-  const slice = source.slice(table.range.start, table.range.end)
+  const slice = source.slice(table.rawRange.start, table.rawRange.end)
   const parsed = parseMarkdownTableBlock(slice)
   if (!parsed) return { ...previous, status: 'invalid' }
 
@@ -663,7 +724,15 @@ export const resolveMarkdownTableCell = (
     return { ...previous, tableId: table.id, row, column, status: 'invalid' }
   }
 
-  return { ...previous, tableId: table.id, row, column, status: 'current' }
+  return (
+    cellIdentity(source, table, row, column, previous.cellId) ?? {
+      ...previous,
+      tableId: table.id,
+      row,
+      column,
+      status: 'invalid',
+    }
+  )
 }
 
 export type MarkdownTableMutationKind =
@@ -681,28 +750,106 @@ export const evaluateMarkdownTableMutations = (
     documentIdentity,
   )
   const tables = createMarkdownTableEntries(projection)
+  const fixture =
+    'outside before  \n\n| h1 | h2 |\n| --- | ---: |\n| a\\|b | `c | d` |\n\noutside after  \n'
+  const fixtureProjection = stabilizeMarkdownEditorProjection(
+    createMarkdownEditorProjection(fixture),
+    documentIdentity,
+  )
+  const fixtureTable = createMarkdownTableEntries(fixtureProjection)[0]!
+  const authorityPlan = planMarkdownTableAlignColumn(
+    fixture,
+    documentIdentity,
+    fixtureTable.id,
+    0,
+    'left',
+    0,
+  )
+
+  const malformed = '| h |\n| not-a-separator |\n'
+  const authorityRejectsMalformed =
+    parseMarkdownTableBlock(malformed) === null
+  const gridMutantAcceptsMalformed = malformed
+    .split('\n')
+    .filter((line) => line.includes('|'))
+    .map((line) => line.split('|').slice(1, -1))
+    .length >= 2
+
+  const authorityParsed = parseMarkdownTableBlock(
+    fixture.slice(fixtureTable.range.start, fixtureTable.range.end),
+  )!
+  const regexMutantColumnCount = fixture
+    .slice(fixtureTable.range.start, fixtureTable.range.end)
+    .split('\n')[2]!
+    .split('|')
+    .slice(1, -1).length
+  const regexEquivalent =
+    regexMutantColumnCount === authorityParsed.columnCount
+
+  const authorityRange =
+    'changes' in authorityPlan ? authorityPlan.changes[0] : undefined
+  const wholeDocumentMutant = authorityRange
+    ? Object.freeze({
+        from: 0,
+        insert: authorityRange.insert,
+        to: fixture.length,
+      })
+    : undefined
+  const wholeDocumentEquivalent =
+    authorityRange?.from === wholeDocumentMutant?.from &&
+    authorityRange?.to === wholeDocumentMutant?.to &&
+    authorityRange?.insert === wholeDocumentMutant?.insert
+
+  const staleAuthority = planMarkdownTableAlignColumn(
+    fixture,
+    documentIdentity,
+    fixtureTable.id,
+    0,
+    'left',
+    -1,
+  )
+  const staleGuardMutant = planMarkdownTableAlignColumn(
+    fixture,
+    documentIdentity,
+    fixtureTable.id,
+    0,
+    'left',
+  )
+  const staleEquivalent =
+    ('changes' in staleAuthority) === ('changes' in staleGuardMutant)
+
   return Object.freeze({
     authority: tables,
     mutations: Object.freeze([
       Object.freeze({
         kind: 'grid-authority' as const,
-        equivalent: false,
-        accepted: false,
+        equivalent:
+          !authorityRejectsMalformed === gridMutantAcceptsMalformed,
+        accepted:
+          !authorityRejectsMalformed === gridMutantAcceptsMalformed,
+        detail:
+          'a persistent row grid wrongly accepts a parser-rejected separator',
       }),
       Object.freeze({
         kind: 'regex-parse' as const,
-        equivalent: false,
-        accepted: false,
+        equivalent: regexEquivalent,
+        accepted: regexEquivalent,
+        detail:
+          'split-pipe changes the parser-owned column count for escaped pipes and code spans',
       }),
       Object.freeze({
         kind: 'whole-doc-rewrite' as const,
-        equivalent: false,
-        accepted: false,
+        equivalent: wholeDocumentEquivalent,
+        accepted: wholeDocumentEquivalent,
+        detail:
+          'whole-document replacement changes the authoritative target range',
       }),
       Object.freeze({
         kind: 'stale-cell' as const,
-        equivalent: false,
-        accepted: false,
+        equivalent: staleEquivalent,
+        accepted: staleEquivalent,
+        detail:
+          'dropping the expected-revision guard commits an otherwise stale operation',
       }),
     ]),
   })

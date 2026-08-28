@@ -4,7 +4,7 @@
     :class="{ 'is-compact': compact, 'is-boundary': boundary }"
     v-bind="auditRootDataAttributes"
   >
-    <header class="audit-page__header">
+    <header v-if="!markdownEditorTableEvidenceFixture" class="audit-page__header">
       <h1>{{ auditTitle }}</h1>
       <p>{{ auditComponentNames.length }} components · {{ auditState }}</p>
     </header>
@@ -14,7 +14,11 @@
       No modal-class geometry patches, no test-only forks, no selector overrides.
       Profile overrides are applied by tests via #260 CSS variables on :root.
     -->
-    <section class="audit-safe-area-lab" v-bind="safeAreaDataAttributes.lab">
+    <section
+      v-if="!markdownEditorTableEvidenceFixture"
+      class="audit-safe-area-lab"
+      v-bind="safeAreaDataAttributes.lab"
+    >
       <h2 class="audit-safe-area-lab__title">Safe-area surfaces</h2>
       <div class="audit-safe-area-lab__controls">
         <el-button
@@ -200,7 +204,10 @@
         @selection-change="markdownTransactionSelection = $event"
         @transaction="recordMarkdownTransaction"
       />
-      <div aria-label="Markdown transaction controls">
+      <div
+        v-if="!markdownEditorTableEvidenceFixture"
+        aria-label="Markdown transaction controls"
+      >
         <button
           type="button"
           data-testid="markdown-programmatic"
@@ -258,24 +265,39 @@
           Load 100k document
         </button>
       </div>
-      <output data-testid="markdown-editor-value">
+      <output
+        v-if="!markdownEditorTableEvidenceFixture"
+        data-testid="markdown-editor-value"
+      >
         {{ markdownTransactionValue.length }}
       </output>
-      <output data-testid="markdown-editor-revision">
+      <output
+        v-if="!markdownEditorTableEvidenceFixture"
+        data-testid="markdown-editor-revision"
+      >
         {{ markdownTransactionRevision }}
       </output>
-      <output data-testid="markdown-editor-history">
+      <output
+        v-if="!markdownEditorTableEvidenceFixture"
+        data-testid="markdown-editor-history"
+      >
         {{ JSON.stringify(markdownTransactionHistory) }}
       </output>
-      <output data-testid="markdown-editor-last-transaction">
+      <output
+        v-if="!markdownEditorTableEvidenceFixture"
+        data-testid="markdown-editor-last-transaction"
+      >
         {{ JSON.stringify(markdownLastTransaction) }}
       </output>
-      <output data-testid="markdown-editor-selection">
+      <output
+        v-if="!markdownEditorTableEvidenceFixture"
+        data-testid="markdown-editor-selection"
+      >
         {{ JSON.stringify(markdownTransactionSelection) }}
       </output>
     </section>
 
-    <div class="audit-grid">
+    <div v-if="!markdownEditorTableEvidenceFixture" class="audit-grid">
       <AuditCard name="FixedSizeList" :state="auditState">
         <div class="audit-virtual-frame audit-virtual-frame--list">
           <fixed-size-list
@@ -1981,6 +2003,11 @@ const markdownEditorImeFixture =
 const markdownEditorTableFixture =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('markdownEditorTable') === '1'
+const markdownEditorTableEvidenceFixture =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get(
+    'markdownEditorTableEvidence',
+  ) === '1'
 const markdownEditorTableMatrixFixture =
   typeof window !== 'undefined'
     ? new URLSearchParams(window.location.search).get(

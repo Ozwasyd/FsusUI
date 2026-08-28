@@ -72,7 +72,7 @@ describe('MarkdownEditor table integration', () => {
     await textarea.trigger('keydown', { key: 'Tab' })
     await nextTick()
     expect((textarea.element as HTMLTextAreaElement).selectionStart).toBe(
-      source.indexOf('Column 2') - 1,
+      source.indexOf('Column 2'),
     )
 
     await textarea.trigger('paste', {
@@ -87,6 +87,20 @@ describe('MarkdownEditor table integration', () => {
     const next = wrapper.emitted('update:modelValue')?.at(-1)?.[0] as string
     expect(next).toContain('| Column 1 | A | B |')
     expect(next).toContain('|  | C | D |')
+
+    const emittedCount = wrapper.emitted('update:modelValue')?.length ?? 0
+    await textarea.trigger('beforeinput', {
+      data: 'A\tB\nC\tD',
+      inputType: 'insertFromPaste',
+    })
+    ;(textarea.element as HTMLTextAreaElement).value = `${next}A\tB\nC\tD`
+    await textarea.trigger('input', {
+      data: 'A\tB\nC\tD',
+      inputType: 'insertFromPaste',
+    })
+    await nextTick()
+    expect(wrapper.emitted('update:modelValue')?.length ?? 0).toBe(emittedCount)
+    expect((textarea.element as HTMLTextAreaElement).value).toBe(next)
   })
 
   it('does not treat file clipboard input as table-data authority', async () => {
@@ -107,5 +121,63 @@ describe('MarkdownEditor table integration', () => {
       ([value]) => value as string,
     )
     expect(values.every((value) => !value.includes('| Column 1 | A | B |'))).toBe(true)
+  })
+
+  it('does not infer table-data authority from HTML clipboard fallback text', async () => {
+    const wrapper = mount(MarkdownEditor, { props: { modelValue: source } })
+    const textarea = await selectOffset(wrapper, source.indexOf('Column 1'))
+
+    await textarea.trigger('paste', {
+      clipboardData: {
+        files: [],
+        getData: (type: string) =>
+          type === 'text/html'
+            ? '<table><tr><td>A</td><td>B</td></tr></table>'
+            : type === 'text/plain'
+              ? 'A\tB'
+              : '',
+        items: [],
+        types: ['text/html', 'text/plain'],
+      },
+    })
+
+    const values = (wrapper.emitted('update:modelValue') ?? []).map(
+      ([value]) => value as string,
+    )
+    expect(values.every((value) => !value.includes('| Column 1 | A | B |'))).toBe(true)
+  })
+
+  it('invalidates the active table cell on an external document reset', async () => {
+    const wrapper = mount(MarkdownEditor, { props: { modelValue: source } })
+    await selectOffset(wrapper, source.indexOf('Column 1'))
+    expect(wrapper.find('button[aria-label="表格操作"]').exists()).toBe(true)
+
+    await wrapper.setProps({
+      modelValue: '| replacement |\n| --- |\n| document |\n',
+    })
+    await nextTick()
+    expect(wrapper.find('button[aria-label="表格操作"]').exists()).toBe(false)
+  })
+
+  it('retains the same table cell selection through source, live, and split modes', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: { mode: 'source', modelValue: source },
+    })
+    const offset = source.indexOf('Column 2')
+    const textarea = await selectOffset(wrapper, offset)
+    const initial = {
+      end: (textarea.element as HTMLTextAreaElement).selectionEnd,
+      start: (textarea.element as HTMLTextAreaElement).selectionStart,
+    }
+
+    for (const mode of ['live', 'split', 'source'] as const) {
+      await wrapper.setProps({ mode })
+      await nextTick()
+      const current = wrapper.get('textarea').element as HTMLTextAreaElement
+      expect({ end: current.selectionEnd, start: current.selectionStart }).toEqual(
+        initial,
+      )
+      expect(wrapper.find('button[aria-label="表格操作"]').exists()).toBe(true)
+    }
   })
 })

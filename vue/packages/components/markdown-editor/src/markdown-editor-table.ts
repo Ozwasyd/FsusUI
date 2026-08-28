@@ -1,3 +1,5 @@
+import { createMarkdownEditorProjection } from '../../../wasm/markdown-runtime'
+
 export interface MarkdownEditorTableInsert {
   readonly rows: number
   readonly columns: number
@@ -30,89 +32,6 @@ export const insertMarkdownTable = ({
   return [header, divider, ...body].join('\n')
 }
 
-export const scanMarkdownTableCells = (line: string): string[] => {
-  const trimmed = line.trim()
-  if (!trimmed.includes('|')) return []
-
-  let start = 0
-  let end = trimmed.length
-  if (trimmed.startsWith('|')) {
-    start = 1
-  }
-  if (trimmed.endsWith('|') && end > start && (end < 2 || trimmed[end - 2] !== '\\')) {
-    end -= 1
-  }
-  const content = trimmed.slice(start, end)
-  const cells: string[] = []
-  let current = ''
-  let escaped = false
-  let inBackticks = 0
-
-  for (let i = 0; i < content.length; i++) {
-    const ch = content[i]!
-    if (escaped) {
-      current += ch
-      escaped = false
-      continue
-    }
-    if (ch === '\\') {
-      current += ch
-      escaped = true
-      continue
-    }
-    if (ch === '`') {
-      let run = 1
-      while (i + 1 < content.length && content[i + 1] === '`') {
-        run++
-        i++
-      }
-      current += '`'.repeat(run)
-      if (inBackticks === 0) {
-        inBackticks = run
-      } else if (inBackticks === run) {
-        inBackticks = 0
-      }
-      continue
-    }
-    if (ch === '|' && inBackticks === 0) {
-      cells.push(current.trim())
-      current = ''
-      continue
-    }
-    current += ch
-  }
-  cells.push(current.trim())
-  return cells
-}
-
-export const isMarkdownTableAlignmentCell = (cell: string): boolean => {
-  const trimmed = cell.replace(/\s/g, '')
-  if (trimmed.length === 0) return false
-  let i = 0
-  if (trimmed[i] === ':') i++
-  let hyphens = 0
-  while (i < trimmed.length && trimmed[i] === '-') {
-    hyphens++
-    i++
-  }
-  if (hyphens === 0) return false
-  if (i < trimmed.length && trimmed[i] === ':') i++
-  return i === trimmed.length
-}
-
-export const getMarkdownTableAlignment = (
-  cell: string,
-): MarkdownTableAlignment | null => {
-  const trimmed = cell.replace(/\s/g, '')
-  if (!isMarkdownTableAlignmentCell(trimmed)) return null
-  const left = trimmed.startsWith(':')
-  const right = trimmed.endsWith(':')
-  if (left && right) return 'center'
-  if (right) return 'right'
-  if (left) return 'left'
-  return null
-}
-
 export const formatMarkdownTableAlignmentCell = (
   alignment?: MarkdownTableAlignment | null,
   minWidth = 3,
@@ -137,42 +56,52 @@ export const parseMarkdownTableBlock = (
   tableText: string,
 ): ParsedMarkdownTable | null => {
   const newline = tableText.includes('\r\n') ? '\r\n' : '\n'
-  const rawLines = tableText.split(/\r\n|\r|\n/)
-  const lines = rawLines.filter(
-    (l, idx) => idx < rawLines.length - 1 || l.trim().length > 0,
+  const projection = createMarkdownEditorProjection(tableText)
+  const tables = projection.nodes.filter(
+    (node) => node.kind === 'table' && node.status === 'valid' && node.table,
   )
-  if (lines.length < 2) return null
-
-  const headerCells = scanMarkdownTableCells(lines[0]!)
-  if (headerCells.length === 0) return null
-
-  const separatorCells = scanMarkdownTableCells(lines[1]!)
-  if (separatorCells.length === 0) return null
-  if (separatorCells.length !== headerCells.length) return null
-  if (!separatorCells.every((cell) => isMarkdownTableAlignmentCell(cell))) {
+  if (tables.length !== 1) return null
+  const node = tables[0]!
+  const trailing = tableText.slice(node.rawRange.end)
+  const trailingIsOnlyLineEndings = [...trailing].every(
+    (character) => character === '\r' || character === '\n',
+  )
+  if (node.rawRange.start !== 0 || !trailingIsOnlyLineEndings) {
     return null
   }
-
-  const columnCount = headerCells.length
-  const alignments = separatorCells.map((cell) => getMarkdownTableAlignment(cell))
-
-  const rows: string[][] = []
-  for (let i = 2; i < lines.length; i++) {
-    const line = lines[i]!
-    if (line.trim().length === 0) continue
-    const cells = scanMarkdownTableCells(line)
-    if (cells.length === 0) return null
-    const normalizedRow: string[] = []
-    for (let c = 0; c < columnCount; c++) {
-      normalizedRow.push(cells[c] ?? '')
-    }
-    rows.push(normalizedRow)
+  const semantic = node.table!
+  if (semantic.separatorRow !== 1 || semantic.rows.length < 2) return null
+  const headerRow = semantic.rows[0]!
+  const separatorRow = semantic.rows[semantic.separatorRow]!
+  const columnCount = headerRow.rawCellRanges.length
+  if (
+    columnCount === 0 ||
+    separatorRow.rawCellRanges.length !== columnCount ||
+    semantic.alignments.length !== columnCount
+  ) {
+    return null
   }
+  const readCells = (ranges: readonly { start: number; end: number }[]) =>
+    ranges.map((range) => tableText.slice(range.start, range.end))
+  const headerCells = readCells(headerRow.rawCellRanges)
+  const alignments = semantic.alignments.map((alignment) =>
+    alignment === 'none' ? null : alignment,
+  )
+  const rows = semantic.rows
+    .filter((_, index) => index !== semantic.separatorRow && index !== 0)
+    .map((row) => {
+      const cells = readCells(row.rawCellRanges)
+      if (cells.length > columnCount) return null
+      return Array.from({ length: columnCount }, (_, index) => cells[index] ?? '')
+    })
+  if (rows.some((row) => row === null)) return null
 
   return {
     header: Object.freeze(headerCells),
     alignments: Object.freeze(alignments),
-    rows: Object.freeze(rows.map((r) => Object.freeze(r))),
+    rows: Object.freeze(
+      rows.map((row) => Object.freeze(row as readonly string[])),
+    ),
     columnCount,
     newline,
   }
@@ -266,38 +195,22 @@ export const formatMarkdownTableBlock = (
 }
 
 export const formatMarkdownTable = (source: string): string => {
-  const lines = source.split(/\r\n|\r|\n/)
-  const formattedLines: string[] = []
-  let tableBuffer: string[] = []
-
-  const flushTable = () => {
-    if (tableBuffer.length === 0) return
-    const block = tableBuffer.join('\n')
+  const tables = createMarkdownEditorProjection(source).nodes
+    .filter(
+      (node) =>
+        node.kind === 'table' && node.status === 'valid' && node.table !== undefined,
+    )
+    .sort((left, right) => right.rawRange.start - left.rawRange.start)
+  let formattedSource = source
+  for (const table of tables) {
+    const block = source.slice(table.rawRange.start, table.rawRange.end)
     const formatted = formatMarkdownTableBlock(block, false)
     if (formatted !== null) {
-      formattedLines.push(...formatted.trimEnd().split('\n'))
-    } else {
-      formattedLines.push(...tableBuffer)
+      formattedSource =
+        formattedSource.slice(0, table.rawRange.start) +
+        formatted +
+        formattedSource.slice(table.rawRange.end)
     }
-    tableBuffer = []
   }
-
-  for (const line of lines) {
-    if (line.trim().startsWith('|') || line.includes('|')) {
-      const cells = scanMarkdownTableCells(line)
-      if (cells.length > 0) {
-        tableBuffer.push(line)
-        continue
-      }
-    }
-    flushTable()
-    formattedLines.push(line)
-  }
-  flushTable()
-
-  const newline = source.includes('\r\n') ? '\r\n' : '\n'
-  const result = formattedLines.join(newline)
-  return source.endsWith(newline) && !result.endsWith(newline)
-    ? `${result}${newline}`
-    : result
+  return formattedSource
 }

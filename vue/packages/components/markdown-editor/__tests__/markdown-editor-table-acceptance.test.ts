@@ -10,7 +10,6 @@ import {
   formatMarkdownTableBlock,
   insertMarkdownTable,
   parseMarkdownTableBlock,
-  scanMarkdownTableCells,
   serializeMarkdownTable,
 } from '../src/markdown-editor-table'
 import {
@@ -25,6 +24,7 @@ import {
   planMarkdownTableMoveColumn,
   planMarkdownTableMoveRow,
   resolveMarkdownTableCell,
+  resolveMarkdownTableCellAtOffset,
   type MarkdownTableCellIdentity,
 } from '../src/markdown-editor-table-structure'
 import {
@@ -45,6 +45,7 @@ import {
   resolveMarkdownTableContextActions,
 } from '../src/markdown-editor-table-acceptance'
 import { defaultMarkdownEditorCommands } from '../src/markdown-editor'
+import { MarkdownEditorTransactionStore } from '../src/markdown-editor-transaction'
 
 const doc = { id: 'test-doc', epoch: 1 }
 
@@ -63,9 +64,10 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
       expect(p20!.columnCount).toBe(20)
       expect(p20!.rows).toHaveLength(50)
 
-      // Cell scanner handles escaped pipe and code spans without regex split pipe
-      const scanned = scanMarkdownTableCells('| a\\|b | `c | d` | normal |')
-      expect(scanned).toEqual(['a\\|b', '`c | d`', 'normal'])
+      const escaped = parseMarkdownTableBlock(
+        '| a\\|b | `c | d` | normal |\n| --- | --- | --- |\n',
+      )
+      expect(escaped?.header).toEqual(['a\\|b', '`c | d`', 'normal'])
     })
 
     it('performs row insert above/below, delete, and move operations', () => {
@@ -211,7 +213,19 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
       expect(staleRes).toEqual({ rejected: 'stale' })
 
       const report = evaluateMarkdownTableMutations('| h |\n| --- |\n| c |\n', doc)
-      expect(report.mutations.every((m) => m.accepted === false)).toBe(true)
+      expect(
+        Object.fromEntries(
+          report.mutations.map(({ accepted, equivalent, kind }) => [
+            kind,
+            { accepted, equivalent },
+          ]),
+        ),
+      ).toEqual({
+        'grid-authority': { accepted: false, equivalent: false },
+        'regex-parse': { accepted: false, equivalent: false },
+        'stale-cell': { accepted: false, equivalent: false },
+        'whole-doc-rewrite': { accepted: false, equivalent: false },
+      })
     })
   })
 
@@ -261,6 +275,15 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
       expect(res3.transaction).not.toBeNull()
       expect(res3.nextCell.row).toBe(2)
       expect(res3.nextCell.column).toBe(0)
+      const store = new MarkdownEditorTransactionStore(source, {
+        start: source.indexOf('Column 2'),
+        end: source.indexOf('Column 2'),
+      })
+      const appended = store.dispatch(res3.transaction!)
+      expect(appended.accepted).toBe(true)
+      expect(appended.history.undoDepth).toBe(1)
+      expect(appended.value).not.toBe(source)
+      expect(store.undo().value).toBe(source)
     })
 
     it('handles Shift+Tab backward navigation and exits backward at (0,0)', () => {
@@ -314,6 +337,14 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
       })
       expect(breakRes.action).toBe('insert-line-break')
       expect(breakRes.transaction?.changes[0]?.insert).toBe('<br>')
+      const store = new MarkdownEditorTransactionStore(source, {
+        start: 10,
+        end: 10,
+      })
+      const insertedBreak = store.dispatch(breakRes.transaction!)
+      expect(insertedBreak.accepted).toBe(true)
+      expect(insertedBreak.history.undoDepth).toBe(1)
+      expect(store.undo().value).toBe(source)
 
       // Esc exits table
       const escRes = resolveMarkdownTableInputIntent({
@@ -324,6 +355,90 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
         key: 'Escape',
       })
       expect(escRes.nextCell.status).toBe('invalid')
+      expect(escRes.transaction?.selection).toEqual({
+        start: table.range.end,
+        end: table.range.end,
+        direction: 'none',
+      })
+      expect(
+        resolveMarkdownTableCellAtOffset(source, doc, table.range.end),
+      ).toBeNull()
+    })
+
+    it('handles empty cells and explicit row/column/table selections atomically', () => {
+      const source = '| h1 | h2 |\n| --- | --- |\n|  | value |\n'
+      const table = createMarkdownTableEntries(
+        stabilizeMarkdownEditorProjection(
+          createMarkdownEditorProjection(source),
+          doc,
+        ),
+      )[0]!
+      const empty = resolveMarkdownTableCellAtOffset(
+        source,
+        doc,
+        source.indexOf('|  |') + 2,
+      )!
+      const selection = {
+        start: empty.anchor!.start,
+        end: empty.anchor!.start,
+        direction: 'none' as const,
+      }
+
+      const backspace = resolveMarkdownTableInputIntent({
+        source,
+        selection,
+        documentIdentity: doc,
+        cell: empty,
+        cellText: '',
+        key: 'Backspace',
+      })
+      expect(backspace.action).toBe('navigate')
+      expect(backspace.nextCell.row).toBe(0)
+
+      const deleteColumn = resolveMarkdownTableInputIntent({
+        source,
+        selection,
+        documentIdentity: doc,
+        cell: empty,
+        key: 'Delete',
+        structuredSelection: { kind: 'column', index: 0 },
+        expectedRevision: 0,
+      })
+      expect(deleteColumn.action).toBe('delete-column')
+      expect(deleteColumn.transaction?.changes).toHaveLength(1)
+      expect(deleteColumn.screenReaderText).toBe('Deleted column 1')
+
+      const deleteRow = resolveMarkdownTableInputIntent({
+        source,
+        selection,
+        documentIdentity: doc,
+        cell: empty,
+        key: 'Delete',
+        structuredSelection: { kind: 'row', index: 1 },
+        expectedRevision: 0,
+      })
+      expect(deleteRow.action).toBe('delete-row')
+      expect(deleteRow.nextCell.status).toBe('deleted')
+
+      const deleteTable = resolveMarkdownTableInputIntent({
+        source,
+        selection: {
+          start: table.range.start,
+          end: table.range.end,
+          direction: 'forward',
+        },
+        documentIdentity: doc,
+        cell: empty,
+        key: 'Delete',
+        structuredSelection: { kind: 'table' },
+        expectedRevision: 0,
+      })
+      expect(deleteTable.action).toBe('delete-table')
+      expect(deleteTable.transaction?.selection).toEqual({
+        start: table.range.start,
+        end: table.range.start,
+        direction: 'none',
+      })
     })
 
     it('prevents cell switching during CJK IME composition and passes input mutations fixture', () => {
@@ -339,7 +454,20 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
       expect(res.transaction).toBeNull()
 
       const report = evaluateMarkdownTableInputMutations()
-      expect(report.mutations.every((m) => m.accepted === false)).toBe(true)
+      expect(
+        Object.fromEntries(
+          report.mutations.map(({ accepted, equivalent, kind }) => [
+            kind,
+            { accepted, equivalent },
+          ]),
+        ),
+      ).toEqual({
+        'auto-format': { accepted: false, equivalent: false },
+        'composition-switch': { accepted: false, equivalent: false },
+        'local-keydown': { accepted: false, equivalent: false },
+        'naked-index': { accepted: false, equivalent: false },
+        'tab-trap': { accepted: false, equivalent: false },
+      })
     })
   })
 
@@ -386,12 +514,17 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
         doc,
       )
       const table = createMarkdownTableEntries(proj)[0]!
+      const currentCell = resolveMarkdownTableCellAtOffset(
+        source,
+        doc,
+        source.indexOf('Column 1'),
+      )!
 
       const pasteRes = planMarkdownTablePaste(
         source,
         doc,
         table.id,
-        { tableId: table.id, row: 0, column: 0, status: 'current' },
+        currentCell,
         'c1\tc2\tc3\nv1|x\tv2\tv3\nv4\tv5\tv6',
         'text/tab-separated-values',
         1,
@@ -420,7 +553,22 @@ describe('Markdown Table Chain Acceptance (#370, #371, #372, #373)', () => {
       expect('changes' in plan || 'rejected' in plan).toBe(true)
 
       const mutationsReport = evaluateMarkdownTablePasteFormatMutations()
-      expect(mutationsReport.mutations.every((m) => m.accepted === false)).toBe(true)
+      expect(
+        Object.fromEntries(
+          mutationsReport.mutations.map(
+            ({ accepted, equivalent, kind }) => [
+              kind,
+              { accepted, equivalent },
+            ],
+          ),
+        ),
+      ).toEqual({
+        'budget-bypass': { accepted: false, equivalent: false },
+        'html-round-trip': { accepted: false, equivalent: false },
+        'ordinary-auto-format': { accepted: false, equivalent: false },
+        'per-cell-history': { accepted: false, equivalent: false },
+        'stale-paste': { accepted: false, equivalent: false },
+      })
     })
   })
 

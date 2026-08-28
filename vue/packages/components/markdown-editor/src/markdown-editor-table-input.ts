@@ -1,4 +1,7 @@
-import type { MarkdownDocumentIdentity } from '../../../wasm/markdown-runtime'
+import {
+  createMarkdownEditorProjection,
+  type MarkdownDocumentIdentity,
+} from '../../../wasm/markdown-runtime'
 import type {
   MarkdownEditorSelection,
   MarkdownEditorTransaction,
@@ -9,9 +12,14 @@ import {
   type ParsedMarkdownTable,
 } from './markdown-editor-table'
 import {
+  planMarkdownTableDelete,
+  planMarkdownTableDeleteColumn,
+  planMarkdownTableDeleteRow,
   planMarkdownTableInsertRow,
   resolveMarkdownTableEntry,
+  resolveMarkdownTableIdentityStatus,
   resolveMarkdownTableCellAtOffset,
+  resolveMarkdownTableCellCoordinates,
   type MarkdownTableCellIdentity,
 } from './markdown-editor-table-structure'
 
@@ -37,6 +45,9 @@ export type MarkdownTableInputAction =
   | 'exit-backward'
   | 'insert-line-break'
   | 'delete-content'
+  | 'delete-row'
+  | 'delete-column'
+  | 'delete-table'
   | 'composition'
   | 'noop'
 
@@ -50,6 +61,10 @@ export interface MarkdownTableInputContext {
   readonly expectedRevision?: number
   readonly cellText?: string
   readonly cellOffset?: number
+  readonly structuredSelection?: Readonly<{
+    kind: 'row' | 'column' | 'table'
+    index?: number
+  }>
 }
 
 export interface MarkdownTableInputResult {
@@ -103,6 +118,7 @@ export const resolveMarkdownTableInputIntent = (
     expectedRevision,
     cellText = '',
     cellOffset = 0,
+    structuredSelection,
   } = context
 
   if (compositionActive) {
@@ -125,11 +141,26 @@ export const resolveMarkdownTableInputIntent = (
     }
   }
 
-  if (documentIdentity.epoch < 1 || (expectedRevision !== undefined && expectedRevision < 0)) {
+  if (expectedRevision !== undefined && expectedRevision < 0) {
     return {
       action: 'noop',
       transaction: null,
       nextCell: cell,
+      screenReaderText: '',
+      rejected: 'stale',
+    }
+  }
+
+  const tableIdentityStatus = resolveMarkdownTableIdentityStatus(
+    source,
+    documentIdentity,
+    cell.tableId,
+  )
+  if (tableIdentityStatus !== 'current') {
+    return {
+      action: 'noop',
+      transaction: null,
+      nextCell: { ...cell, status: 'deleted' },
       screenReaderText: '',
       rejected: 'stale',
     }
@@ -162,6 +193,36 @@ export const resolveMarkdownTableInputIntent = (
   const totalColumns = parsed.columnCount
   const r = cell.row
   const c = cell.column
+  const collapsed = context.selection.start === context.selection.end
+  const beforeSelection = {
+    start: table.range.start,
+    end: table.range.start,
+    direction: 'none' as const,
+  }
+  const afterSelection = {
+    start: table.range.end,
+    end: table.range.end,
+    direction: 'none' as const,
+  }
+  const exitPlan = (
+    action: 'exit-backward' | 'exit-forward',
+    message: string,
+  ): MarkdownTableInputResult => {
+    const selection = action === 'exit-backward' ? beforeSelection : afterSelection
+    return {
+      action,
+      transaction: {
+        changes: [],
+        expectedRevision,
+        history: 'skip',
+        metadata: { markdownTable: 'source-exit' },
+        origin: 'programmatic',
+        selection,
+      },
+      nextCell: { ...cell, status: 'invalid' },
+      screenReaderText: message,
+    }
+  }
 
   // Accessibility helper
   const cellAria = (rowIdx: number, colIdx: number) =>
@@ -244,19 +305,7 @@ export const resolveMarkdownTableInputIntent = (
         }
       }
       // Top-left cell: exit backward
-      const nextCell: MarkdownTableCellIdentity = { ...cell, status: 'invalid' }
-      return {
-        action: 'exit-backward',
-        transaction: {
-          changes: [],
-          expectedRevision,
-          history: 'separate',
-          origin: 'programmatic',
-          selection: { start: table.range.start, end: table.range.start, direction: 'none' },
-        },
-        nextCell,
-        screenReaderText: 'Exited table backward',
-      }
+      return exitPlan('exit-backward', 'Exited table backward')
     }
 
     case 'Enter': {
@@ -327,19 +376,7 @@ export const resolveMarkdownTableInputIntent = (
           screenReaderText: cellAria(r - 1, c),
         }
       }
-      const nextCell: MarkdownTableCellIdentity = { ...cell, status: 'invalid' }
-      return {
-        action: 'exit-backward',
-        transaction: {
-          changes: [],
-          expectedRevision,
-          history: 'separate',
-          origin: 'programmatic',
-          selection: { start: table.range.start, end: table.range.start, direction: 'none' },
-        },
-        nextCell,
-        screenReaderText: 'Exited table upward',
-      }
+      return exitPlan('exit-backward', 'Exited table upward')
     }
 
     case 'ArrowDown': {
@@ -352,19 +389,7 @@ export const resolveMarkdownTableInputIntent = (
           screenReaderText: cellAria(r + 1, c),
         }
       }
-      const nextCell: MarkdownTableCellIdentity = { ...cell, status: 'invalid' }
-      return {
-        action: 'exit-forward',
-        transaction: {
-          changes: [],
-          expectedRevision,
-          history: 'separate',
-          origin: 'programmatic',
-          selection: { start: table.range.end, end: table.range.end, direction: 'none' },
-        },
-        nextCell,
-        screenReaderText: 'Exited table downward',
-      }
+      return exitPlan('exit-forward', 'Exited table downward')
     }
 
     case 'ArrowLeft': {
@@ -398,19 +423,7 @@ export const resolveMarkdownTableInputIntent = (
           screenReaderText: cellAria(r - 1, totalColumns - 1),
         }
       }
-      const nextCell: MarkdownTableCellIdentity = { ...cell, status: 'invalid' }
-      return {
-        action: 'exit-backward',
-        transaction: {
-          changes: [],
-          expectedRevision,
-          history: 'separate',
-          origin: 'programmatic',
-          selection: { start: table.range.start, end: table.range.start, direction: 'none' },
-        },
-        nextCell,
-        screenReaderText: 'Exited table backward',
-      }
+      return exitPlan('exit-backward', 'Exited table backward')
     }
 
     case 'ArrowRight': {
@@ -440,19 +453,7 @@ export const resolveMarkdownTableInputIntent = (
           screenReaderText: cellAria(r + 1, 0),
         }
       }
-      const nextCell: MarkdownTableCellIdentity = { ...cell, status: 'invalid' }
-      return {
-        action: 'exit-forward',
-        transaction: {
-          changes: [],
-          expectedRevision,
-          history: 'separate',
-          origin: 'programmatic',
-          selection: { start: table.range.end, end: table.range.end, direction: 'none' },
-        },
-        nextCell,
-        screenReaderText: 'Exited table forward',
-      }
+      return exitPlan('exit-forward', 'Exited table forward')
     }
 
     case 'Home': {
@@ -482,23 +483,145 @@ export const resolveMarkdownTableInputIntent = (
     }
 
     case 'Escape': {
-      const nextCell: MarkdownTableCellIdentity = { ...cell, status: 'invalid' }
-      return {
-        action: 'exit-forward',
-        transaction: {
-          changes: [],
+      return exitPlan('exit-forward', 'Exited table')
+    }
+
+    case 'Delete': {
+      if (
+        structuredSelection?.kind === 'table' ||
+        (context.selection.start === table.range.start &&
+          context.selection.end === table.range.end)
+      ) {
+        const plan = planMarkdownTableDelete(
+          source,
+          documentIdentity,
+          cell.tableId,
           expectedRevision,
-          history: 'separate',
-          origin: 'programmatic',
-          selection: { start: table.range.start, end: table.range.start, direction: 'none' },
-        },
-        nextCell,
-        screenReaderText: 'Exited table',
+        )
+        return 'changes' in plan
+          ? {
+              action: 'delete-table',
+              transaction: {
+                ...plan,
+                selection: beforeSelection,
+              },
+              nextCell: { ...cell, status: 'deleted' },
+              screenReaderText: 'Deleted table',
+            }
+          : {
+              action: 'noop',
+              transaction: null,
+              nextCell: cell,
+              screenReaderText: '',
+              rejected: plan.rejected,
+            }
+      }
+      if (structuredSelection?.kind === 'row') {
+        const selectedRow = structuredSelection.index ?? r
+        const plan = planMarkdownTableDeleteRow(
+          source,
+          documentIdentity,
+          cell.tableId,
+          selectedRow,
+          expectedRevision,
+        )
+        return 'changes' in plan
+          ? {
+              action: 'delete-row',
+              transaction: plan,
+              nextCell: { ...cell, status: 'deleted' },
+              screenReaderText: `Deleted row ${selectedRow + 1}`,
+            }
+          : {
+              action: 'noop',
+              transaction: null,
+              nextCell: cell,
+              screenReaderText: '',
+              rejected: plan.rejected,
+            }
+      }
+      if (structuredSelection?.kind === 'column') {
+        const selectedColumn = structuredSelection.index ?? c
+        const plan = planMarkdownTableDeleteColumn(
+          source,
+          documentIdentity,
+          cell.tableId,
+          selectedColumn,
+          expectedRevision,
+        )
+        return 'changes' in plan
+          ? {
+              action: 'delete-column',
+              transaction: plan,
+              nextCell: { ...cell, status: 'deleted' },
+              screenReaderText: `Deleted column ${selectedColumn + 1}`,
+            }
+          : {
+              action: 'noop',
+              transaction: null,
+              nextCell: cell,
+              screenReaderText: '',
+              rejected: plan.rejected,
+            }
+      }
+      if (collapsed && cellText.length === 0) {
+        if (c + 1 < totalColumns) {
+          return {
+            action: 'navigate',
+            transaction: null,
+            nextCell: { ...cell, column: c + 1 },
+            screenReaderText: cellAria(r, c + 1),
+          }
+        }
+        if (r + 1 < totalRows) {
+          return {
+            action: 'navigate',
+            transaction: null,
+            nextCell: { ...cell, row: r + 1, column: 0 },
+            screenReaderText: cellAria(r + 1, 0),
+          }
+        }
+        return exitPlan('exit-forward', 'Exited empty final table cell')
+      }
+      return {
+        action: 'delete-content',
+        transaction: null,
+        nextCell: cell,
+        screenReaderText: '',
       }
     }
 
-    case 'Backspace':
-    case 'Delete': {
+    case 'Backspace': {
+      if (
+        structuredSelection ||
+        (context.selection.start === table.range.start &&
+          context.selection.end === table.range.end)
+      ) {
+        return resolveMarkdownTableInputIntent({ ...context, key: 'Delete' })
+      }
+      if (collapsed && cellText.length === 0) {
+        if (c > 0) {
+          return {
+            action: 'navigate',
+            transaction: null,
+            nextCell: { ...cell, column: c - 1 },
+            screenReaderText: cellAria(r, c - 1),
+          }
+        }
+        if (r > 0) {
+          return {
+            action: 'navigate',
+            transaction: null,
+            nextCell: {
+              ...cell,
+              row: r - 1,
+              column: totalColumns - 1,
+            },
+            screenReaderText: cellAria(r - 1, totalColumns - 1),
+          }
+        }
+        return exitPlan('exit-backward', 'Exited empty first table cell')
+      }
       return {
         action: 'delete-content',
         transaction: null,
@@ -704,6 +827,31 @@ const escapeMarkdownTableDataCell = (value: string) => {
   return escaped
 }
 
+const tableCellSelection = (
+  serialized: string,
+  tableStart: number,
+  row: number,
+  column: number,
+) => {
+  const table = createMarkdownEditorProjection(serialized).nodes.find(
+    (node) =>
+      node.kind === 'table' &&
+      node.status === 'valid' &&
+      node.table !== undefined,
+  )?.table
+  const editableRows = table?.rows.filter(
+    (_, index) => index !== table.separatorRow,
+  )
+  const range = editableRows?.[row]?.rawCellRanges[column]
+  return range
+    ? Object.freeze({
+        direction: 'none' as const,
+        end: tableStart + range.end,
+        start: tableStart + range.start,
+      })
+    : undefined
+}
+
 export const planMarkdownTablePaste = (
   source: string,
   documentIdentity: MarkdownDocumentIdentity,
@@ -723,7 +871,6 @@ export const planMarkdownTablePaste = (
     return { rejected: 'stale' }
   }
   if (
-    documentIdentity.epoch < 1 ||
     currentCell.status !== 'current' ||
     currentCell.tableId !== tableId
   ) {
@@ -735,8 +882,33 @@ export const planMarkdownTablePaste = (
     return { rejected: parsedData.rejected }
   }
 
+  if (
+    resolveMarkdownTableIdentityStatus(
+      source,
+      documentIdentity,
+      tableId,
+    ) !== 'current'
+  ) {
+    return { rejected: 'stale' }
+  }
   const table = resolveMarkdownTableEntry(source, documentIdentity, tableId)
   if (!table) return { rejected: 'missing' }
+  const resolvedCell = resolveMarkdownTableCellCoordinates(
+    source,
+    documentIdentity,
+    tableId,
+    currentCell.row,
+    currentCell.column,
+  )
+  if (
+    !currentCell.cellId ||
+    !currentCell.anchor ||
+    resolvedCell?.cellId !== currentCell.cellId ||
+    resolvedCell.anchor?.start !== currentCell.anchor.start ||
+    resolvedCell.anchor.end !== currentCell.anchor.end
+  ) {
+    return { rejected: 'stale' }
+  }
 
   const slice = source.slice(table.range.start, table.range.end)
   const parsedTable = parseMarkdownTableBlock(slice)
@@ -818,7 +990,29 @@ export const planMarkdownTablePaste = (
     ],
     expectedRevision,
     history: 'separate',
+    metadata: Object.freeze({
+      markdownTable: Object.freeze({
+        action: 'paste-matrix',
+        cellId: currentCell.cellId,
+        tableId,
+      }),
+    }),
     origin: 'paste',
+    ...(tableCellSelection(
+      serialized,
+      table.range.start,
+      currentCell.row,
+      currentCell.column,
+    )
+      ? {
+          selection: tableCellSelection(
+            serialized,
+            table.range.start,
+            currentCell.row,
+            currentCell.column,
+          ),
+        }
+      : {}),
   }
 }
 
@@ -827,16 +1021,42 @@ export const planMarkdownTableFormat = (
   documentIdentity: MarkdownDocumentIdentity,
   tableId: string,
   expectedRevision?: number,
+  currentCell?: MarkdownTableCellIdentity,
 ): MarkdownEditorTransaction | { readonly rejected: 'stale' | 'malformed' | 'missing' } => {
   if (expectedRevision !== undefined && expectedRevision < 0) {
     return { rejected: 'stale' }
   }
-  if (documentIdentity.epoch < 1) {
+  if (
+    resolveMarkdownTableIdentityStatus(
+      source,
+      documentIdentity,
+      tableId,
+    ) !== 'current'
+  ) {
     return { rejected: 'stale' }
   }
 
   const table = resolveMarkdownTableEntry(source, documentIdentity, tableId)
   if (!table) return { rejected: 'missing' }
+  if (currentCell) {
+    const resolvedCell = resolveMarkdownTableCellCoordinates(
+      source,
+      documentIdentity,
+      tableId,
+      currentCell.row,
+      currentCell.column,
+    )
+    if (
+      currentCell.tableId !== tableId ||
+      !currentCell.cellId ||
+      !currentCell.anchor ||
+      resolvedCell?.cellId !== currentCell.cellId ||
+      resolvedCell.anchor?.start !== currentCell.anchor.start ||
+      resolvedCell.anchor.end !== currentCell.anchor.end
+    ) {
+      return { rejected: 'stale' }
+    }
+  }
 
   const slice = source.slice(table.range.start, table.range.end)
   const parsed = parseMarkdownTableBlock(slice)
@@ -859,7 +1079,24 @@ export const planMarkdownTableFormat = (
     ],
     expectedRevision,
     history: 'separate',
+    metadata: Object.freeze({
+      markdownTable: Object.freeze({
+        action: 'format',
+        tableId,
+        ...(currentCell?.cellId ? { cellId: currentCell.cellId } : {}),
+      }),
+    }),
     origin: 'command',
+    ...(currentCell
+      ? {
+          selection: tableCellSelection(
+            formatted,
+            table.range.start,
+            currentCell.row,
+            currentCell.column,
+          ),
+        }
+      : {}),
   }
 }
 
@@ -939,7 +1176,10 @@ export const evaluateMarkdownTableInputMutations = () => {
       Object.freeze({
         kind: 'naked-index' as const,
         equivalent: wrongTable.action === authority.action,
-        accepted: wrongTable.rejected !== 'missing',
+        accepted:
+          wrongTable.action !== 'noop' ||
+          (wrongTable.rejected !== 'missing' &&
+            wrongTable.rejected !== 'stale'),
         detail: 'row/column coordinates cannot authorize a stale table identity',
       }),
       Object.freeze({

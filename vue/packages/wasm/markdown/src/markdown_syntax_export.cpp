@@ -40,6 +40,23 @@ void append_json_ranges(
   out.push_back(']');
 }
 
+std::string_view table_alignment_name(
+  fsusblog::wasm::markdown::syntax_table_alignment alignment
+) {
+  using fsusblog::wasm::markdown::syntax_table_alignment;
+  switch (alignment) {
+    case syntax_table_alignment::left:
+      return "left";
+    case syntax_table_alignment::center:
+      return "center";
+    case syntax_table_alignment::right:
+      return "right";
+    case syntax_table_alignment::none:
+      return "none";
+  }
+  return "none";
+}
+
 } // namespace
 
 extern "C" {
@@ -101,6 +118,44 @@ int markdown_syntax_collect(const char* source_ptr, int source_len) {
     append_json_ranges(g_syntax_json, node.content_ranges);
     g_syntax_json.append(",\"markerRanges\":");
     append_json_ranges(g_syntax_json, node.marker_ranges);
+    if (!node.table_row_ranges.empty()) {
+      g_syntax_json.append(",\"tableRows\":[");
+      for (
+        std::size_t row_index = 0;
+        row_index < node.table_row_ranges.size();
+        ++row_index
+      ) {
+        if (row_index > 0) {
+          g_syntax_json.push_back(',');
+        }
+        const auto& row = node.table_row_ranges[row_index];
+        g_syntax_json.append("{\"start\":");
+        g_syntax_json.append(std::to_string(row.start_offset));
+        g_syntax_json.append(",\"end\":");
+        g_syntax_json.append(std::to_string(row.end_offset));
+        g_syntax_json.append(",\"cells\":");
+        append_json_ranges(g_syntax_json, node.table_cell_ranges[row_index]);
+        g_syntax_json.push_back('}');
+      }
+      g_syntax_json.push_back(']');
+      g_syntax_json.append(",\"tableSeparatorRow\":");
+      g_syntax_json.append(std::to_string(node.table_separator_row));
+      g_syntax_json.append(",\"tableAlignments\":[");
+      for (
+        std::size_t alignment_index = 0;
+        alignment_index < node.table_alignments.size();
+        ++alignment_index
+      ) {
+        if (alignment_index > 0) {
+          g_syntax_json.push_back(',');
+        }
+        append_json_string(
+          g_syntax_json,
+          table_alignment_name(node.table_alignments[alignment_index])
+        );
+      }
+      g_syntax_json.push_back(']');
+    }
     if (node.parent_index < nodes.size()) {
       const auto& parent = nodes[node.parent_index];
       g_syntax_json.append(",\"parentStart\":");

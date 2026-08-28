@@ -1065,7 +1065,7 @@ watch(
     beforeInputSnapshot = undefined
     pendingClipboardIdentity = undefined
     pendingInputOrigin = undefined
-    dispatchEditorOperation({
+    const result = dispatchEditorOperation({
       allowBlocked: true,
       emitValue: false,
       internalPropReset: true,
@@ -1090,6 +1090,10 @@ watch(
         },
       },
     })
+    if (result.accepted) {
+      currentTableCell.value = null
+      tableMenuOpen.value = false
+    }
   },
 )
 
@@ -1489,13 +1493,27 @@ const handlePaste = (event: ClipboardEvent) => {
     const tsv = clipboard.getData('text/tab-separated-values')
     const csv = clipboard.getData('text/csv')
     const plain = clipboard.getData('text/plain')
-    const payload = tsv || csv || plain
+    const carriesHtml = Array.from(clipboard.types).includes('text/html')
+    const payload = tsv || csv || (carriesHtml ? '' : plain)
     const mime = tsv
       ? 'text/tab-separated-values'
       : csv
         ? 'text/csv'
         : undefined
     if (payload.includes('\t') || mime === 'text/csv') {
+      const transfer = markdownClipboardItemsFromDataTransfer(clipboard)
+      const clipboardPlan = resolveMarkdownClipboardPaste({
+        composing: isComposing.value,
+        disabled: editingBlocked.value,
+        documentIdentity,
+        files: transfer.files,
+        items: transfer.items,
+        mode: currentMode.value,
+        origin: 'paste',
+        revision: transactionStore.revision,
+        selection: transactionStore.selection,
+        source: transactionStore.value,
+      })
       const plan = planMarkdownTablePaste(
         transactionStore.value,
         documentIdentity,
@@ -1507,6 +1525,15 @@ const handlePaste = (event: ClipboardEvent) => {
       )
       if ('changes' in plan) {
         event.preventDefault()
+        pendingClipboardIdentity = clipboardPlan.identity
+        pendingInputOrigin = 'paste'
+        nativeMachine.apply({
+          clipboardIdentity: clipboardPlan.identity,
+          documentIdentity,
+          kind: 'paste',
+          origin: 'paste',
+          revision: transactionStore.revision,
+        })
         const result = dispatchTransaction(plan)
         if (result.accepted) {
           tableAnnouncement.value = 'Pasted table data'
@@ -1691,6 +1718,7 @@ const runTableContextAction = (key: string) => {
         cell.row,
         'above',
         revision,
+        cell.column,
       )
       break
     case 'insert-row-below':
@@ -1701,6 +1729,7 @@ const runTableContextAction = (key: string) => {
         cell.row,
         'below',
         revision,
+        cell.column,
       )
       break
     case 'delete-row':
@@ -1710,6 +1739,7 @@ const runTableContextAction = (key: string) => {
         cell.tableId,
         cell.row,
         revision,
+        cell.column,
       )
       break
     case 'insert-col-left':
@@ -1720,6 +1750,7 @@ const runTableContextAction = (key: string) => {
         cell.column,
         'left',
         revision,
+        cell.row,
       )
       break
     case 'insert-col-right':
@@ -1730,6 +1761,7 @@ const runTableContextAction = (key: string) => {
         cell.column,
         'right',
         revision,
+        cell.row,
       )
       break
     case 'delete-col':
@@ -1739,6 +1771,7 @@ const runTableContextAction = (key: string) => {
         cell.tableId,
         cell.column,
         revision,
+        cell.row,
       )
       break
     case 'align-left':
@@ -1751,6 +1784,7 @@ const runTableContextAction = (key: string) => {
         cell.column,
         key.slice('align-'.length) as 'left' | 'center' | 'right',
         revision,
+        cell.row,
       )
       break
     case 'format-table':
@@ -1759,6 +1793,7 @@ const runTableContextAction = (key: string) => {
         documentIdentity,
         cell.tableId,
         revision,
+        cell,
       )
       break
     default:

@@ -1,5 +1,7 @@
+import { writeFile } from 'node:fs/promises'
+
 import { expect, test } from '@playwright/test'
-import type { Locator } from '@playwright/test'
+import type { Locator, TestInfo } from '@playwright/test'
 
 const table = [
   '| Project | Owner | Status |',
@@ -31,7 +33,7 @@ const expectContainedByEditor = async (editor: Locator, overlay: Locator) => {
   ])
   expect(editorBox).not.toBeNull()
   expect(overlayBox).not.toBeNull()
-  if (!editorBox || !overlayBox) return
+  if (!editorBox || !overlayBox) return null
 
   expect(overlayBox.x).toBeGreaterThanOrEqual(editorBox.x - 1)
   expect(overlayBox.y).toBeGreaterThanOrEqual(editorBox.y - 1)
@@ -41,13 +43,56 @@ const expectContainedByEditor = async (editor: Locator, overlay: Locator) => {
   expect(overlayBox.y + overlayBox.height).toBeLessThanOrEqual(
     editorBox.y + editorBox.height + 1,
   )
+  return {
+    editor: {
+      bottom: editorBox.y + editorBox.height,
+      left: editorBox.x,
+      right: editorBox.x + editorBox.width,
+      top: editorBox.y,
+    },
+    overlay: {
+      bottom: overlayBox.y + overlayBox.height,
+      left: overlayBox.x,
+      right: overlayBox.x + overlayBox.width,
+      top: overlayBox.y,
+    },
+    tolerancePx: 1,
+  }
+}
+
+const attachContainmentEvidence = async (
+  testInfo: TestInfo,
+  name: string,
+  evidence: Awaited<ReturnType<typeof expectContainedByEditor>>,
+  viewport: { height: number; width: number } | null,
+) => {
+  expect(evidence).not.toBeNull()
+  const path = testInfo.outputPath(`${name}.json`)
+  const body = JSON.stringify(
+    {
+      ...evidence,
+      input: name.includes('touch') ? 'simulated-touch' : 'keyboard',
+      limitation: name.includes('touch')
+        ? 'Deterministic browser simulation; no physical touch hardware was used.'
+        : undefined,
+      name,
+      viewport,
+    },
+    null,
+    2,
+  )
+  await writeFile(path, body)
+  await testInfo.attach(`${name}.json`, {
+    path,
+    contentType: 'application/json',
+  })
 }
 
 test('renders and operates the source-anchored table context surface', async ({
   page,
 }, testInfo) => {
   await page.goto(
-    '/?audit=ui-states&markdownEditorTransaction=1&markdownEditorTable=1',
+    '/?audit=ui-states&markdownEditorTransaction=1&markdownEditorTable=1&markdownEditorTableEvidence=1',
     {
       waitUntil: 'domcontentloaded',
     },
@@ -70,7 +115,10 @@ test('renders and operates the source-anchored table context surface', async ({
     .poll(() =>
       textarea.evaluate((element) => (element as HTMLTextAreaElement).selectionStart),
     )
-    .toBe(table.indexOf('Editorial systems') - 1)
+    .toBe(table.indexOf('Editorial systems'))
+  await expect(editor.locator('[aria-live="polite"]')).toHaveText(
+    'Row 2, Column 2',
+  )
 
   await trigger.click()
   await expect(trigger).toHaveAttribute('aria-expanded', 'true')
@@ -79,8 +127,13 @@ test('renders and operates the source-anchored table context surface', async ({
   await expect(menu.getByRole('menuitem', { name: '在上方插入行' })).toBeFocused()
   await page.keyboard.press('ArrowDown')
   await expect(menu.getByRole('menuitem', { name: '在下方插入行' })).toBeFocused()
-  await expectContainedByEditor(editor, menu)
-  await editor.screenshot({
+  await attachContainmentEvidence(
+    testInfo,
+    'desktop-keyboard-containment',
+    await expectContainedByEditor(editor, menu),
+    page.viewportSize(),
+  )
+  await fixture.screenshot({
     path: testInfo.outputPath('table-context-keyboard-focus.png'),
   })
   await page.keyboard.press('End')
@@ -99,7 +152,7 @@ test('renders and operates the source-anchored table context surface', async ({
   await expect(textarea).toHaveValue(/\n\| {2}\| {2}\| {2}\|\n/)
   await expect(menu).toBeHidden()
 
-  await editor.screenshot({ path: testInfo.outputPath('table-context-light.png') })
+  await fixture.screenshot({ path: testInfo.outputPath('table-context-light.png') })
 
   await page.setViewportSize({ width: 390, height: 844 })
   await selectTableCell(textarea, await textarea.inputValue(), 'Documentation migration')
@@ -113,15 +166,119 @@ test('renders and operates the source-anchored table context surface', async ({
     .toBe(true)
   await page.keyboard.press('End')
   await expect(menu.getByRole('menuitem', { name: '格式化表格' })).toBeVisible()
-  await expectContainedByEditor(editor, menu)
-  await editor.screenshot({
+  await attachContainmentEvidence(
+    testInfo,
+    'mobile-touch-target-containment',
+    await expectContainedByEditor(editor, menu),
+    page.viewportSize(),
+  )
+  await fixture.screenshot({
     path: testInfo.outputPath('table-context-mobile-compact.png'),
   })
 })
 
+test('freezes table navigation during deterministic IME simulation', async ({
+  page,
+}) => {
+  await page.goto(
+    '/?audit=ui-states&markdownEditorTransaction=1&markdownEditorTable=1&markdownEditorTableEvidence=1',
+    { waitUntil: 'domcontentloaded' },
+  )
+  const fixture = page.getByTestId('markdown-editor-transaction-fixture')
+  const editor = fixture.locator('.el-markdown-editor')
+  const textarea = editor.locator('textarea')
+  await expect(textarea).toHaveValue(table)
+  await selectTableCell(textarea, table, 'Documentation migration')
+  const initialSelection = await textarea.evaluate((element) => {
+    const target = element as HTMLTextAreaElement
+    return { end: target.selectionEnd, start: target.selectionStart }
+  })
+
+  await textarea.dispatchEvent('compositionstart', { data: '编' })
+  await textarea.dispatchEvent('keydown', {
+    bubbles: true,
+    cancelable: true,
+    isComposing: true,
+    key: 'Tab',
+  })
+  await expect
+    .poll(() =>
+      textarea.evaluate((element) => {
+        const target = element as HTMLTextAreaElement
+        return { end: target.selectionEnd, start: target.selectionStart }
+      }),
+    )
+    .toEqual(initialSelection)
+  await expect(editor.locator('[aria-live="polite"]')).toHaveText('')
+
+  await textarea.evaluate((element) => {
+    const target = element as HTMLTextAreaElement
+    const insertAt = target.selectionStart
+    target.value = `${target.value.slice(0, insertAt)}编${target.value.slice(insertAt)}`
+    target.setSelectionRange(insertAt + 1, insertAt + 1)
+  })
+  await textarea.dispatchEvent('compositionend', { data: '编' })
+  await expect(textarea).toHaveValue(/编Documentation migration/)
+  await textarea.press('Tab')
+  await expect
+    .poll(() =>
+      textarea.evaluate((element) => (element as HTMLTextAreaElement).selectionStart),
+    )
+    .toBe(table.indexOf('Editorial systems') + 1)
+  await expect(editor.locator('[aria-live="polite"]')).toHaveText(
+    'Row 2, Column 2',
+  )
+})
+
+test('pastes one table transaction, undoes once, and exits to source caret', async ({
+  page,
+}) => {
+  await page.goto(
+    '/?audit=ui-states&markdownEditorTransaction=1&markdownEditorTable=1',
+    { waitUntil: 'domcontentloaded' },
+  )
+  const fixture = page.getByTestId('markdown-editor-transaction-fixture')
+  const editor = fixture.locator('.el-markdown-editor')
+  const textarea = editor.locator('textarea')
+  await expect(textarea).toHaveValue(table)
+  await selectTableCell(textarea, table, 'Runtime projection')
+
+  await textarea.evaluate((element) => {
+    const transfer = new DataTransfer()
+    transfer.setData('text/tab-separated-values', 'A\tB\nC\tD')
+    element.dispatchEvent(
+      new ClipboardEvent('paste', {
+        bubbles: true,
+        cancelable: true,
+        clipboardData: transfer,
+      }),
+    )
+  })
+  await expect(textarea).toHaveValue(/\| A \| B \| Ready \|/)
+  await expect(textarea).toHaveValue(/\| C \| D \| {2}\|/)
+  await expect(fixture.getByTestId('markdown-editor-history')).toContainText(
+    '"undoDepth":1',
+  )
+
+  await fixture.getByTestId('markdown-undo').click()
+  await expect(textarea).toHaveValue(table)
+
+  await selectTableCell(textarea, table, 'Project')
+  await textarea.press('Shift+Tab')
+  await expect
+    .poll(() =>
+      textarea.evaluate((element) => (element as HTMLTextAreaElement).selectionStart),
+    )
+    .toBe(0)
+  await expect(fixture.getByRole('button', { name: '表格操作' })).toBeHidden()
+  await expect(editor.locator('[aria-live="polite"]')).toHaveText(
+    'Exited table backward',
+  )
+})
+
 test('renders the table context surface in dark theme', async ({ page }, testInfo) => {
   await page.goto(
-    '/?audit=ui-states&theme=dark&markdownEditorTransaction=1&markdownEditorTable=1',
+    '/?audit=ui-states&theme=dark&markdownEditorTransaction=1&markdownEditorTable=1&markdownEditorTableEvidence=1',
     { waitUntil: 'domcontentloaded' },
   )
   const fixture = page.getByTestId('markdown-editor-transaction-fixture')
@@ -134,8 +291,13 @@ test('renders the table context surface in dark theme', async ({ page }, testInf
   await trigger.click()
   const menu = fixture.getByRole('menu', { name: '表格操作' })
   await expect(menu).toBeVisible()
-  await expectContainedByEditor(editor, menu)
-  await editor.screenshot({ path: testInfo.outputPath('table-context-dark.png') })
+  await attachContainmentEvidence(
+    testInfo,
+    'dark-keyboard-containment',
+    await expectContainedByEditor(editor, menu),
+    page.viewportSize(),
+  )
+  await fixture.screenshot({ path: testInfo.outputPath('table-context-dark.png') })
 })
 
 test('keeps the compact menu usable in RTL, zoom and simulated touch input', async ({
@@ -143,7 +305,7 @@ test('keeps the compact menu usable in RTL, zoom and simulated touch input', asy
 }, testInfo) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto(
-    '/?audit=ui-states&markdownEditorTransaction=1&markdownEditorTable=1',
+    '/?audit=ui-states&markdownEditorTransaction=1&markdownEditorTable=1&markdownEditorTableEvidence=1',
     { waitUntil: 'domcontentloaded' },
   )
   const fixture = page.getByTestId('markdown-editor-transaction-fixture')
@@ -174,8 +336,13 @@ test('keeps the compact menu usable in RTL, zoom and simulated touch input', asy
   const fixtureWidth = await fixture.evaluate((element) => element.getBoundingClientRect().width)
   const bodyWidth = await page.evaluate(() => document.documentElement.clientWidth)
   expect(fixtureWidth).toBeLessThanOrEqual(bodyWidth)
-  await expectContainedByEditor(editor, menu)
-  await editor.screenshot({
+  await attachContainmentEvidence(
+    testInfo,
+    'rtl-200pct-simulated-touch-containment',
+    await expectContainedByEditor(editor, menu),
+    page.viewportSize(),
+  )
+  await fixture.screenshot({
     path: testInfo.outputPath('table-context-rtl-zoom-touch-simulation.png'),
   })
 })
@@ -184,7 +351,7 @@ test('contains a 20 by 50 table and restores selection and scroll across modes',
   page,
 }, testInfo) => {
   await page.goto(
-    '/?audit=ui-states&markdownEditorTransaction=1&markdownEditorTable=1&markdownEditorTableMatrix=20x50&markdownEditorModeMatrix=1&markdownEditorMode=split',
+    '/?audit=ui-states&markdownEditorTransaction=1&markdownEditorTable=1&markdownEditorTableEvidence=1&markdownEditorTableMatrix=20x50&markdownEditorModeMatrix=1&markdownEditorMode=split',
     { waitUntil: 'domcontentloaded' },
   )
   const fixture = page.getByTestId('markdown-editor-transaction-fixture')
@@ -235,7 +402,7 @@ test('contains a 20 by 50 table and restores selection and scroll across modes',
     .toBe(scroll.left)
   await expect(fixture.getByRole('button', { name: '表格操作' })).toBeVisible()
 
-  await editor.screenshot({
+  await fixture.screenshot({
     path: testInfo.outputPath('table-20x50-split-scroll.png'),
   })
 })
@@ -244,7 +411,7 @@ test('keeps 1 by 1 and large-document table transactions scoped', async ({
   page,
 }) => {
   await page.goto(
-    '/?audit=ui-states&markdownEditorTransaction=1&markdownEditorTable=1&markdownEditorTableMatrix=1x1',
+    '/?audit=ui-states&markdownEditorTransaction=1&markdownEditorTable=1&markdownEditorTableEvidence=1&markdownEditorTableMatrix=1x1',
     { waitUntil: 'domcontentloaded' },
   )
   const fixture = page.getByTestId('markdown-editor-transaction-fixture')
@@ -257,7 +424,7 @@ test('keeps 1 by 1 and large-document table transactions scoped', async ({
   await expect(fixture.getByRole('button', { name: '表格操作' })).toBeVisible()
 
   await page.goto(
-    '/?audit=ui-states&markdownEditorTransaction=1&markdownEditorTable=1&markdownEditorTableMatrix=large',
+    '/?audit=ui-states&markdownEditorTransaction=1&markdownEditorTable=1&markdownEditorTableEvidence=1&markdownEditorTableMatrix=large',
     { waitUntil: 'domcontentloaded' },
   )
   const largeFixture = page.getByTestId('markdown-editor-transaction-fixture')
