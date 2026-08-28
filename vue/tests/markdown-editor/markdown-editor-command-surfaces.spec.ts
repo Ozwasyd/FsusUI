@@ -294,9 +294,9 @@ test('renders locale authority, long copy, RTL, and status density without fallb
         if (!(label instanceof HTMLElement)) {
           return { labelLines: 0, overflowFree: false }
         }
-        const lineHeight = Number.parseFloat(getComputedStyle(label).lineHeight)
+        const fontSize = Number.parseFloat(getComputedStyle(label).fontSize)
         return {
-          labelLines: label.getBoundingClientRect().height / lineHeight,
+          labelLines: label.getBoundingClientRect().height / fontSize,
           overflowFree:
             option.scrollWidth <= option.clientWidth &&
             label.scrollWidth <= label.clientWidth,
