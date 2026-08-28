@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "3547edcdea0b0b812a659d44dac4a402eb773331",
+    "commitSha": "77973d6f63dc67c791dc95526c997b917ddbe5dd",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "efedf2d7a3f11cbd9ecb583513d7f36c7e0068ef87e096d366b332eaac99e609",
     "iconHash": "d61254b1b1ff9addaf45293153df217b0c0d01ec69ec602081c44a01008b78de",
     "toolVersion": "avalonia-vue-public-api-baseline@1.0.0+vue-semantic-baseline@1.0.0",
-    "inputTreeHash": "b2de56d7156c8cd53c50d12871924fca10d5696542674b7dce0c9f3e38545219",
+    "inputTreeHash": "cb3885d4aab0363af9235002859514dedf5ea890cfa7d16d432cf8468f7b5ba5",
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "0e704fbe00cc2883e1b911fe399c2ee72067bda25646a2f078f094ae3982078e"
+    "outputHash": "c193cdb1b6be320fb3169f749d2ff7948ff48ac9b4262324fae00f5c91ac6a62"
   },
   "summary": {
     "componentModules": 93,
@@ -11042,6 +11042,7 @@
         }
       ],
       "exposed": [
+        "applyAttachmentResult",
         "dispatchTransaction",
         "insertMarkdownAtCursor",
         "redo",
@@ -11634,13 +11635,25 @@
               {
                 "name": "_batch",
                 "type": "MarkdownAttachmentBatchIntent",
-                "optional": true,
+                "optional": false,
                 "rest": false
               }
             ]
           }
         ],
         "exposed": [
+          {
+            "name": "applyAttachmentResult",
+            "parameters": [
+              {
+                "name": "result",
+                "type": "MarkdownAttachmentProviderResult",
+                "optional": false,
+                "rest": false
+              }
+            ],
+            "returnType": null
+          },
           {
             "name": "dispatchTransaction",
             "parameters": [
@@ -31602,6 +31615,7 @@
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss"
       ],
       "classification": "portable"
@@ -32405,6 +32419,7 @@
         "vue/packages/theme-chalk/src/descriptions.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/input.scss",
+        "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss"
       ],
       "classification": "portable"
