@@ -165,6 +165,30 @@ export {
   type MarkdownEmbedWalkSuccess,
 } from './markdown-embed-budget'
 export {
+  MARKDOWN_EMBED_PRESENTATION_MODES,
+  MARKDOWN_EMBED_PRESENTATION_VERSION,
+  evaluateMarkdownEmbedPresentationMutations,
+  resolveMarkdownEmbedPresentation,
+  type MarkdownEmbedLocalFailure,
+  type MarkdownEmbedPresentation,
+  type MarkdownEmbedPresentationAccessibility,
+  type MarkdownEmbedPresentationActions,
+  type MarkdownEmbedPresentationContent,
+  type MarkdownEmbedPresentationInput,
+  type MarkdownEmbedPresentationLayout,
+  type MarkdownEmbedPresentationMode,
+  type MarkdownEmbedPresentationMutationKind,
+  type MarkdownEmbedPresentationMutationResult,
+  type MarkdownEmbedPresentationState,
+} from './markdown-embed-presentation'
+export {
+  MARKDOWN_EMBED_ACCEPTANCE_VERSION,
+  evaluateMarkdownEmbedAcceptance,
+  MARKDOWN_EMBED_SECURITY_CORPUS,
+  type MarkdownEmbedAcceptanceReport,
+  type MarkdownEmbedSecurityCorpusEntry,
+} from './markdown-embed-acceptance'
+export {
   assertMarkdownInteractionTrace,
   createMarkdownInteractionTrace,
   evaluateMarkdownInteractionTraceMutations,
