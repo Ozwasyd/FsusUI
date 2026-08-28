@@ -364,7 +364,9 @@ public sealed class FsusMarkdownEditorTransactionStore
     return Accept(beforeRevision, FsusMarkdownEditorPositionMap.Compose(stages));
   }
 
-  public static IReadOnlyList<FsusMarkdownEditorShellMutation> EvaluateMutations()
+  public static IReadOnlyList<FsusMarkdownEditorShellMutation> EvaluateMutations(
+    FsusMarkdownEditorTransactionStore? first = null,
+    FsusMarkdownEditorTransactionStore? second = null)
   {
     var identity = new FsusMarkdownDocumentIdentity("doc-a", 1);
 
@@ -383,19 +385,20 @@ public sealed class FsusMarkdownEditorTransactionStore
         ExpectedRevision: 0,
         DocumentIdentity: identity)).Accepted;
 
-    var crossDocumentStore = new FsusMarkdownEditorTransactionStore(identity, "ab");
-    crossDocumentStore.SwitchDocument(new FsusMarkdownDocumentIdentity("doc-b", 1), "ab");
+    var crossDocumentStore = second ??
+      new FsusMarkdownEditorTransactionStore(new FsusMarkdownDocumentIdentity("doc-b", 1), "ab");
     var crossed = crossDocumentStore.Dispatch(
       new FsusMarkdownEditorTransaction(
         [new FsusMarkdownEditorChange(2, 2, "!")],
         ExpectedRevision: 0,
-        DocumentIdentity: identity)).Accepted;
+        DocumentIdentity: first?.Identity ?? identity)).Accepted;
 
     return
     [
       new("native-undo-dual-authority", nativeDual, nativeDual),
       new("bare-offset", bareOffset, bareOffset),
       new("cross-document", crossed, crossed),
+      .. FsusMarkdownProjectionArchitecture.EvaluateMutations(),
     ];
   }
 
