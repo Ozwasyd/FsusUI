@@ -116,7 +116,9 @@ public class AvaloniaGalleryRegistryTests
       .OfType<FsusMarkdownEditor>()
       .ToArray();
     Assert.Single(editors);
-    Assert.Equal("partial", editors[0].CapabilityState);
+    Assert.Equal(FsusMarkdownEditorMode.Live, editors[0].Mode);
+    Assert.Equal("aligned", editors[0].CapabilityState);
+    Assert.NotNull(editors[0].ProjectionMap);
     Assert.Equal(typeof(FsusMarkdownEditor), editors[0].GetType());
   }
 
