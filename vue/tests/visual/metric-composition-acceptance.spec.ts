@@ -37,7 +37,11 @@ test('production CSS has no card surfaces on metric primitives', async ({
   // Selector-scoped gate: a card surface only counts when a rule that targets
   // the primitive itself carries the card pattern (joined whole-sheet text
   // would match unrelated rules in the same stylesheet).
-  const rules = await collectCssRules(page)
+  const rules = await collectCssRules(page, [
+    'metric-list',
+    'key-value-grid',
+    'diagnostics-item',
+  ])
   const banned: string[] = []
   for (const rule of rules) {
     const css = rule.cssText
