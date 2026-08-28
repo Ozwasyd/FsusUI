@@ -45,6 +45,12 @@ A deleted heading, table, fence, link, or image must not be retargeted.
 5. Plan incremental work with `planMarkdownProjectionInvalidation`.
 
 Raw JavaScript UTF-16 offsets are the only edit/selection coordinates.
+Supplemental hidden, nested, atomic, or virtual anchors bind to a stable
+projection node through `projectionId`; an anchor range outside that projection
+fails closed. Visual selections round-trip only when the document id and epoch,
+current anchor id, anchor-local offset, raw source offset, and direction agree.
+An old epoch, deleted anchor, DOM path, or naked offset is not accepted as a
+visual anchor.
 
 ## Projection node contract
 
@@ -106,7 +112,8 @@ does not persist source or parser nodes as a second content model.
 ## Acceptance gate
 
 `evaluateMarkdownProjectionAcceptance` composes those APIs and rejects stale
-commits, document switches, deleted anchors, and HTML/identity/bidi mutations.
+commits, document switches, deleted anchors, and DOM-path, HTML-offset,
+naked-offset, nearby-reveal, identity, and bidi mutations.
 
 `recordMarkdownProjectionAcceptanceScale` measures a fixture with at least
 100000 characters, 3000 blocks, and 10000 headings. The record is versioned by

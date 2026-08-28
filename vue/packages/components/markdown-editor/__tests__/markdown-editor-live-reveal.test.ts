@@ -113,7 +113,9 @@ describe('markdown live syntax reveal', () => {
     const fence = '```js\nconst x\n'
     const fencePlan = reveal(fence, 4, { intent: 'property-editor', field: 'language' })
     expect(fencePlan.state).toBe('property-editor-open')
-    expect(fencePlan.target?.revealedRanges.some((range) => range.role === 'language' || range.role === 'source-escape')).toBe(
+    expect(fencePlan.target?.markerKind).toBe('fence')
+    expect(fencePlan.target?.field).toBe('language')
+    expect(fencePlan.target?.revealedRanges.some((range) => range.role === 'language')).toBe(
       true,
     )
 

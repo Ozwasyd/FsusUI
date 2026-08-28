@@ -36,15 +36,21 @@ describe('markdown editor anchor map contract', () => {
       syntax: [{ id: 'atom', range: [3, 6], atomic: true, virtual: true }],
     })
 
-    expect(map.sourcePositionToVisual({ offset: 3, affinity: 'before' })).toMatchObject({
+    expect(
+      map.sourcePositionToVisual({ offset: 3, affinity: 'before' }),
+    ).toMatchObject({
       kind: 'atomic',
       side: 'before',
     })
-    expect(map.sourcePositionToVisual({ offset: 3, affinity: 'after' })).toMatchObject({
+    expect(
+      map.sourcePositionToVisual({ offset: 3, affinity: 'after' }),
+    ).toMatchObject({
       kind: 'atomic',
       side: 'after',
     })
-    expect(map.visualPointToSource({ anchorId: 'atom', point: 'inside-source' })).toMatchObject({
+    expect(
+      map.visualPointToSource({ anchorId: 'atom', point: 'inside-source' }),
+    ).toMatchObject({
       offset: 3,
     })
     expect(map.reveal({ anchorId: 'atom' })).toMatchObject({ virtual: true })
@@ -52,8 +58,42 @@ describe('markdown editor anchor map contract', () => {
     expect(map.remapRange({ start: 1, end: 4 }, { delete: [1, 4] })).toEqual({
       status: 'deleted',
     })
-    expect(map.remapRange({ start: 1, end: 6 }, { delete: [3, 5] })).toMatchObject({
+    expect(
+      map.remapRange({ start: 1, end: 6 }, { delete: [3, 5] }),
+    ).toMatchObject({
       status: 'partial',
     })
+  })
+
+  it('exhaustively round-trips raw UTF-16 selections across the Unicode matrix', () => {
+    const sources = [
+      '\uFEFF第一行\r\n第二行\n',
+      '繁體中文 日本語 한국어',
+      'emoji 👩‍💻 family 👨‍👩‍👧‍👦',
+      'combining e\u0301 a\u0308',
+      'LTR שלום مرحبا RTL',
+      'line one\r\nline two\rline three\n',
+    ] as const
+
+    for (const [sourceIndex, source] of sources.entries()) {
+      const map = createMarkdownAnchorMap({
+        identity: { id: `property-${sourceIndex}`, epoch: 1 },
+        source,
+      })
+      for (let anchor = 0; anchor <= source.length; anchor += 1) {
+        for (let focus = 0; focus <= source.length; focus += 1) {
+          const selection = { anchor, focus }
+          const visual = map.sourceSelectionToVisual(selection)
+          expect(map.visualAnchorToSourceSelection(visual)).toEqual(selection)
+          expect(visual.direction).toBe(
+            anchor === focus
+              ? 'collapsed'
+              : focus > anchor
+                ? 'forward'
+                : 'backward',
+          )
+        }
+      }
+    }
   })
 })

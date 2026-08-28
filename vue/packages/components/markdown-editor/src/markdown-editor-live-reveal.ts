@@ -487,7 +487,13 @@ const collectCandidates = (
       candidates.push(partitionHeading(slice, node))
     } else if (node.kind === 'list' || node.kind === 'task') {
       candidates.push(partitionList(slice, node))
-    } else if (node.kind === 'code' || node.kind === 'mermaid' || node.kind === 'latex') {
+    } else if (
+      node.kind === 'code' ||
+      node.kind === 'mermaid' ||
+      node.kind === 'latex' ||
+      (node.kind === 'malformed' &&
+        node.diagnosticCode === 'unclosed-code-fence')
+    ) {
       candidates.push(partitionFence(slice, node))
     } else if (node.kind === 'explicit-paragraph') {
       candidates.push(partitionExplicit(node, slice))
