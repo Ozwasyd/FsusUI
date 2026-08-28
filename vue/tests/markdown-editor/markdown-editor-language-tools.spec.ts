@@ -152,7 +152,9 @@ test('preserves the shared input authority across Source and Live interaction si
   await expect(textarea).toHaveAttribute('spellcheck', 'true')
   await expect(textarea).toHaveValue('中文 wrld')
 
-  await textarea.dispatchEvent('touchmove')
+  await textarea.evaluate((element) => {
+    element.dispatchEvent(new Event('touchmove', { bubbles: true }))
+  })
   await textarea.dispatchEvent('contextmenu')
   expect(
     await dispatchReplacement(textarea, {
