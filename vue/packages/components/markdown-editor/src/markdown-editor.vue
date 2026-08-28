@@ -105,6 +105,7 @@
       <div
         v-if="overflowItemCount && commandsExpanded"
         :id="commandTrayId"
+        ref="commandTrayRef"
         :class="ns.e('command-tray')"
         @keydown.esc.prevent.stop="closeCommandOverflow(true)"
       >
@@ -772,6 +773,7 @@ const emit = defineEmits(markdownEditorEmits)
 const ns = useNamespace('markdown-editor')
 const modes: MarkdownEditorMode[] = ['source', 'live', 'split', 'preview']
 const commandTrayId = `${useId()}-command-tray`
+const commandTrayRef = ref<HTMLElement | null>(null)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const commandOverflowRef = ref<HTMLButtonElement | null>(null)
 const commandPaletteInputRef = ref<HTMLInputElement | null>(null)
@@ -2850,9 +2852,14 @@ const closeCommandOverflow = (restoreFocus = false) => {
   if (restoreFocus) void nextTick(() => commandOverflowRef.value?.focus())
 }
 
-const toggleCommands = () => {
+const toggleCommands = async () => {
   if (editingBlocked.value || isComposing.value) return
   commandsExpanded.value = !commandsExpanded.value
+  if (!commandsExpanded.value) return
+  await nextTick()
+  commandTrayRef.value
+    ?.querySelector<HTMLButtonElement>('button:not(:disabled)')
+    ?.focus()
 }
 
 const setMode = (mode: MarkdownEditorMode) => {
