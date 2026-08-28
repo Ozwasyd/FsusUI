@@ -275,11 +275,36 @@ test('renders locale authority, long copy, RTL, and status density without fallb
   ).toBeVisible()
   await page.getByTestId('markdown-open-command-palette').click()
   const palette = page.locator('.el-markdown-editor__palette-dialog')
+  const paletteInput = palette.locator('.el-markdown-editor__palette-input')
+  expect(await paletteInput.getAttribute('aria-label')).toBe(
+    await paletteInput.getAttribute('placeholder'),
+  )
   const paletteBox = await palette.boundingBox()
   expect(paletteBox).not.toBeNull()
   expect(paletteBox!.x).toBeGreaterThanOrEqual(0)
   expect(paletteBox!.x + paletteBox!.width).toBeLessThanOrEqual(375)
   expect(paletteBox!.y + paletteBox!.height).toBeLessThanOrEqual(812)
+  expect(
+    await palette.evaluate((element) => element.scrollWidth <= element.clientWidth),
+  ).toBe(true)
+  const optionLayouts = await palette.getByRole('option').evaluateAll(
+    (options) =>
+      options.map((option) => {
+        const label = option.querySelector('span')
+        if (!(label instanceof HTMLElement)) {
+          return { labelLines: 0, overflowFree: false }
+        }
+        const lineHeight = Number.parseFloat(getComputedStyle(label).lineHeight)
+        return {
+          labelLines: label.getBoundingClientRect().height / lineHeight,
+          overflowFree:
+            option.scrollWidth <= option.clientWidth &&
+            label.scrollWidth <= label.clientWidth,
+        }
+      }),
+  )
+  expect(optionLayouts.every(({ overflowFree }) => overflowFree)).toBe(true)
+  expect(optionLayouts.some(({ labelLines }) => labelLines > 1.5)).toBe(true)
 
   await page.goto(
     '/?audit=ui-states&markdownEditorTransaction=1&markdownCommandSurfaces=1&markdownLocale=en&markdownStatus=none',

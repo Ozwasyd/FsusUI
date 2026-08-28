@@ -461,6 +461,7 @@
             v-model="paletteQuery"
             type="text"
             :class="ns.e('palette-input')"
+            :aria-label="localeText.commandPalette.searchPlaceholder"
             :placeholder="localeText.commandPalette.searchPlaceholder"
             role="combobox"
             aria-autocomplete="list"

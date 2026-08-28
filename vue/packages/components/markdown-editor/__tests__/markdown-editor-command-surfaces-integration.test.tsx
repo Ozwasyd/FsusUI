@@ -184,6 +184,7 @@ describe('Markdown editor command surface integration', () => {
       '.el-markdown-editor__palette-input',
     ) as HTMLInputElement
     expect(input.placeholder).toBe('查找命令')
+    expect(input.getAttribute('aria-label')).toBe('查找命令')
     input.value = 'token-alias'
     input.dispatchEvent(new Event('input'))
     await nextTick()
