@@ -3641,6 +3641,9 @@ describe('Fsus theme visual baseline', () => {
       /\.el-(?:status-summary|diagnostics-item)__actions\s*>\s*\.el-button\.el-button[^{]*\{[^}]*min-width:\s*var\(--fsus-control-height-compact,\s*40px\);[^}]*min-height:\s*var\(--fsus-control-height-compact,\s*40px\);/s,
     )
     expect(css).toMatch(
+      /\[aria-pressed=true\][^{]*\{[^}]*background:\s*var\(--el-fill-color-light\);[^}]*color:\s*var\(--fsus-scholarly-blue,\s*var\(--el-color-primary\)\);[^}]*opacity:\s*1;/s,
+    )
+    expect(css).toMatch(
       /@media \(max-width:\s*640px\)[\s\S]*\.el-copyable-detail__button[\s\S]*min-width:\s*var\(--fsus-control-height,\s*44px\);[\s\S]*min-height:\s*var\(--fsus-control-height,\s*44px\);/,
     )
     expect(css).toContain('@media (max-width: 640px)')

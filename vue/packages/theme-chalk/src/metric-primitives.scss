@@ -288,6 +288,12 @@
         cursor: not-allowed;
         opacity: 1;
       }
+
+      &:where([aria-pressed='true'], [aria-selected='true']) {
+        background: getCssVar('fill-color', 'light');
+        color: var(--fsus-scholarly-blue, getCssVar('color-primary'));
+        opacity: 1;
+      }
     }
 
     > .#{$namespace}-button.#{$namespace}-button {
@@ -426,6 +432,12 @@
 
       &:where(:disabled, [aria-disabled='true'], .is-disabled) {
         cursor: not-allowed;
+        opacity: 1;
+      }
+
+      &:where([aria-pressed='true'], [aria-selected='true']) {
+        background: getCssVar('fill-color', 'light');
+        color: var(--fsus-scholarly-blue, getCssVar('color-primary'));
         opacity: 1;
       }
     }
