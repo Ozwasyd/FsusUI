@@ -288,7 +288,7 @@ test('CopyableDetail focus uses inset ring', async ({ page }, testInfo) => {
   expect(boxShadow).toContain('inset')
 })
 
-test('inline action focus and disabled states use standard tokens without ancestor fading', async ({
+test('inline action focus, hover, selected and disabled states use standard tokens without ancestor fading', async ({
   page,
 }, testInfo) => {
   await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
@@ -334,6 +334,32 @@ test('inline action focus and disabled states use standard tokens without ancest
     })
     expect(hoverState.color, selector).toBe(hoverState.expectedColor)
   }
+
+  const selectedAction = page.locator(
+    '[data-metric-variant="summary-success"] .el-status-summary__actions > [aria-pressed="true"]',
+  )
+  await expect(selectedAction).toBeVisible()
+  const selectedState = await selectedAction.evaluate((element) => {
+    const probe = document.createElement('button')
+    probe.style.backgroundColor = 'var(--el-fill-color-light)'
+    probe.style.color = 'var(--fsus-scholarly-blue, var(--el-color-primary))'
+    document.body.append(probe)
+    const probeStyle = getComputedStyle(probe)
+    const state = {
+      opacity: getComputedStyle(element).opacity,
+      backgroundColor: getComputedStyle(element).backgroundColor,
+      expectedBackgroundColor: probeStyle.backgroundColor,
+      color: getComputedStyle(element).color,
+      expectedColor: probeStyle.color,
+    }
+    probe.remove()
+    return state
+  })
+  expect(selectedState.opacity).toBe('1')
+  expect(selectedState.backgroundColor).toBe(
+    selectedState.expectedBackgroundColor,
+  )
+  expect(selectedState.color).toBe(selectedState.expectedColor)
 
   const disabled = page.locator(
     '[data-metric-variant="copy-disabled"] .el-copyable-detail',

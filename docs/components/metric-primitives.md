@@ -89,7 +89,9 @@ toggle remains keyboard reachable.
 
 Inline actions use at least a 40×40px desktop target and a 44×44px mobile target.
 `FsusCopyableDetail` accepts `disabled`; the native button remains at full
-opacity while disabled colors and cursor tokens communicate the state.
+opacity while disabled colors and cursor tokens communicate the state. Inline
+actions that expose `aria-pressed="true"` or `aria-selected="true"` use the
+standard selected fill and accent tokens.
 
 ## Empty States
 

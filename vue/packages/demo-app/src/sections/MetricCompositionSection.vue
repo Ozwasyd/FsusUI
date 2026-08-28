@@ -116,6 +116,7 @@
           <template #actions>
             <el-button text size="small">Inspect</el-button>
             <a href="#deployment-history" role="button">History</a>
+            <button type="button" aria-pressed="true">Pinned</button>
           </template>
         </ElStatusSummary>
       </div>
