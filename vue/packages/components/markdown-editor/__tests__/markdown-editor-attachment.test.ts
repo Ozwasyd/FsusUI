@@ -28,6 +28,7 @@ import {
   rebaseMarkdownAttachmentJob,
   retryMarkdownAttachmentJob,
 } from '../src/markdown-editor-attachment-lifecycle'
+import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
 
 const identity = { id: 'doc', epoch: 2 }
 
@@ -150,7 +151,7 @@ describe('markdown attachment provider contract', () => {
           ...resolved,
           payload: {
             markdownKind: 'image',
-            href: 'javascript:alert(1)',
+            href: getMarkdownXssSourceUrl('mxss-url-javascript-link'),
             mimeType: 'image/png',
           },
         },

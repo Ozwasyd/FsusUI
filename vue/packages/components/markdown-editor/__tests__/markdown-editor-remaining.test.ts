@@ -12,10 +12,14 @@ import {
   planMarkdownAnchorInsert,
 } from '../src/markdown-editor-anchor-commands'
 import { presentMarkdownEmbed } from '../../../wasm/markdown-embed-presentation'
+import { getMarkdownXssSourceAttackFragment } from '../../../../tests/support/markdown-xss-corpus'
 
 describe('markdown remaining leaf contracts', () => {
   it('previews and confirms paste as markdown in one transaction', () => {
-    const preview = previewPasteAsMarkdown('<p>Hello</p><script>x()</script>')
+    const scriptAttack = getMarkdownXssSourceAttackFragment(
+      'mxss-raw-script-basic',
+    )
+    const preview = previewPasteAsMarkdown(`<p>Hello</p>${scriptAttack}`)
     expect(preview.markdown).toContain('Hello')
     expect(preview.loss).toContain('script')
     const tx = confirmPasteAsMarkdown('<p>Hi</p>', 0)

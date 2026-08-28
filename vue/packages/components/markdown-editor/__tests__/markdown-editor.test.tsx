@@ -17,6 +17,7 @@ import type {
   MarkdownEditorSelection,
   MarkdownEditorTransactionEvent,
 } from '../src/markdown-editor'
+import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
 
 describe('MarkdownEditor', () => {
   // Synthetic composition events in this suite are not native-IME evidence.
@@ -410,7 +411,9 @@ describe('MarkdownEditor', () => {
       return owner.find('input')
     }
 
-    await field('Destination').setValue('javascript:alert(1)')
+    await field('Destination').setValue(
+      getMarkdownXssSourceUrl('mxss-url-javascript-link'),
+    )
     await properties.find('button[type="submit"]').trigger('submit')
     expect(properties.find('[role="alert"]').text()).toContain('blocked-scheme')
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()

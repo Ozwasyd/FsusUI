@@ -10,6 +10,7 @@ import {
   planMarkdownImageTitleEdit,
   validateMarkdownPropertyUrl,
 } from '../src/markdown-editor-link-image'
+import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
 
 const sampleIdentity = { id: 'doc-img', epoch: 1 }
 
@@ -120,11 +121,14 @@ describe('markdown image property transactions and attachment replace (#444)', (
     })
     expect(safe.state).toBe('valid-external')
 
-    const dangerous = validateMarkdownPropertyUrl('javascript:alert(1)', {
+    const javascriptUrl = getMarkdownXssSourceUrl(
+      'mxss-url-javascript-link',
+    )
+    const dangerous = validateMarkdownPropertyUrl(javascriptUrl, {
       documentEpoch: 1,
       revision: 1,
       nodeId: 'node:1',
-      value: 'javascript:alert(1)',
+      value: javascriptUrl,
       version: 1,
     })
     expect(dangerous.state).toBe('blocked-scheme')
