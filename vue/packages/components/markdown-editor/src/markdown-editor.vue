@@ -444,6 +444,7 @@ import {
   type MarkdownLiveSelectionMotion,
 } from './markdown-editor-live-selection'
 import {
+  calculateMarkdownSourceAnchorY,
   createMarkdownFocusSegments,
   createWritingAidsController,
   type MarkdownEditorWritingAidsController,
@@ -666,6 +667,9 @@ const liveLayout = ref<MarkdownLiveLayoutPlan>(
 let layoutGestureTimer: ReturnType<typeof setTimeout> | undefined
 let restoringViewport = false
 let restoringTypewriter = false
+let typewriterLayoutAdjustment = false
+let textareaLayoutHeight = 0
+let textareaLayoutWidth = 0
 const liveDecorations = computed(() => {
   const decorations = liveSurface.value.decorations
   if (currentMode.value !== 'live' || !liveWindow.value) return decorations
@@ -745,6 +749,17 @@ const handleLayoutScroll = () => {
   const textarea = textareaRef.value
   if (textarea) syncFocusLayerScroll(textarea.scrollTop)
   if (restoringSelection || restoringViewport || restoringTypewriter) return
+  if (
+    textarea &&
+    (textarea.clientHeight !== textareaLayoutHeight ||
+      textarea.clientWidth !== textareaLayoutWidth)
+  ) {
+    textareaLayoutHeight = textarea.clientHeight
+    textareaLayoutWidth = textarea.clientWidth
+    applyTypewriterScroll('async-layout')
+    return
+  }
+  if (typewriterLayoutAdjustment) return
   suspendTypewriterForUserScroll()
   markLayoutGesture('scrollbar')
 }
@@ -753,6 +768,32 @@ const cssLength = (element: HTMLElement, property: string) => {
     window.getComputedStyle(element).getPropertyValue(property),
   )
   return Number.isFinite(value) ? value : 0
+}
+let typewriterTextContext:
+  | OffscreenCanvasRenderingContext2D
+  | null
+  | undefined
+const sourceAnchorY = (textarea: HTMLTextAreaElement, lineHeight: number) => {
+  if (typeof OffscreenCanvas === 'undefined') return undefined
+  if (typewriterTextContext === undefined) {
+    typewriterTextContext = new OffscreenCanvas(1, 1).getContext('2d')
+  }
+  if (!typewriterTextContext) return undefined
+  const style = window.getComputedStyle(textarea)
+  typewriterTextContext.font = style.font
+  const inlineSize =
+    textarea.clientWidth -
+    cssLength(textarea, 'padding-inline-start') -
+    cssLength(textarea, 'padding-inline-end')
+  return calculateMarkdownSourceAnchorY({
+    caretSourceOffset: transactionStore.selection.end,
+    inlineSize,
+    lineHeight,
+    measureTextWidth: (text) =>
+      typewriterTextContext?.measureText(text).width ?? 0,
+    paddingBlockStart: cssLength(textarea, 'padding-block-start'),
+    source: transactionStore.value,
+  })
 }
 const applyTypewriterScroll = (
   trigger: 'input' | 'explicit-navigation' | 'async-layout' = 'input',
@@ -783,6 +824,7 @@ const applyTypewriterScroll = (
       textarea,
       '--el-markdown-editor-safe-area-inset-top',
     ),
+    sourceAnchorY: sourceAnchorY(textarea, lineHeight),
     reducedMotion: reducedMotionRequested(),
     viewportHeight: textarea.clientHeight,
     visualViewportHeight: visualViewportHeight.value || undefined,
@@ -805,7 +847,7 @@ const applyTypewriterScroll = (
     textarea.scrollTop = target.scrollTop
     syncFocusLayerScroll(target.scrollTop)
   }
-  queueMicrotask(() => {
+  requestAnimationFrame(() => {
     restoringTypewriter = false
   })
 }
@@ -1335,10 +1377,36 @@ const updateVisualViewportHeight = () => {
   applyTypewriterScroll('async-layout')
 }
 
+let typewriterResizeObserver: ResizeObserver | undefined
+const refreshTypewriterResizeObserver = () => {
+  typewriterResizeObserver?.disconnect()
+  typewriterResizeObserver = undefined
+  const textarea = textareaRef.value
+  if (
+    props.writingAids?.typewriter !== true ||
+    !textarea ||
+    typeof ResizeObserver === 'undefined'
+  )
+    return
+  textareaLayoutHeight = textarea.clientHeight
+  textareaLayoutWidth = textarea.clientWidth
+  typewriterResizeObserver = new ResizeObserver(() => {
+    textareaLayoutHeight = textarea.clientHeight
+    textareaLayoutWidth = textarea.clientWidth
+    typewriterLayoutAdjustment = true
+    applyTypewriterScroll('async-layout')
+    requestAnimationFrame(() => {
+      typewriterLayoutAdjustment = false
+    })
+  })
+  typewriterResizeObserver.observe(textarea)
+}
+
 onMounted(() => {
   refreshLiveWindow('initial')
   refreshWritingAidsDocument()
   updateVisualViewportHeight()
+  refreshTypewriterResizeObserver()
   window.visualViewport?.addEventListener('resize', updateVisualViewportHeight)
   window.visualViewport?.addEventListener('scroll', updateVisualViewportHeight)
   window.addEventListener('resize', updateVisualViewportHeight)
@@ -1347,6 +1415,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   abortPendingCommands()
   if (layoutGestureTimer) clearTimeout(layoutGestureTimer)
+  typewriterResizeObserver?.disconnect()
   if (typeof window === 'undefined') return
 
   window.visualViewport?.removeEventListener(
@@ -1359,6 +1428,11 @@ onBeforeUnmount(() => {
   )
   window.removeEventListener('resize', updateVisualViewportHeight)
 })
+
+watch(
+  () => props.writingAids?.typewriter,
+  () => refreshTypewriterResizeObserver(),
+)
 
 const handleBeforeInput = (event: InputEvent) => {
   const plan = nativeMachine.apply({
@@ -1990,11 +2064,13 @@ const emitRenderEvent = (
 }
 
 const handleKeydown = (event: KeyboardEvent) => {
-  if (editingBlocked.value || nativeMachine.freezeSmartInput) return
+  if (editingBlocked.value) return
 
   if (event.key === 'PageUp' || event.key === 'PageDown') {
     suspendTypewriterForUserScroll()
   }
+
+  if (nativeMachine.freezeSmartInput) return
 
   if (event.key === 'Escape' && currentMode.value === 'live') {
     if (atomicSession.value) {

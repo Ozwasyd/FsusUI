@@ -463,6 +463,69 @@ export interface MarkdownEditorTypewriterScrollInput {
   readonly reducedMotion?: boolean
 }
 
+export interface MarkdownEditorSourceAnchorLayoutInput {
+  readonly caretSourceOffset: number
+  readonly inlineSize: number
+  readonly lineHeight: number
+  readonly measureTextWidth: (text: string) => number
+  readonly paddingBlockStart?: number
+  readonly source: string
+}
+
+const segmentText = (text: string, granularity: 'grapheme' | 'word') =>
+  typeof Intl !== 'undefined' && typeof Intl.Segmenter === 'function'
+    ? [
+        ...new Intl.Segmenter(undefined, { granularity }).segment(text),
+      ].map(({ segment }) => segment)
+    : Array.from(text)
+
+const wrappedSourceLineCount = (
+  line: string,
+  inlineSize: number,
+  measureTextWidth: (text: string) => number,
+) => {
+  if (!line) return 1
+  let lines = 1
+  let occupied = 0
+  const append = (text: string) => {
+    const width = measureTextWidth(text)
+    if (occupied > 0 && occupied + width > inlineSize) {
+      lines += 1
+      occupied = /^\s+$/u.test(text) ? 0 : width
+      return
+    }
+    occupied += width
+  }
+  for (const word of segmentText(line, 'word')) {
+    if (measureTextWidth(word) <= inlineSize) {
+      append(word)
+      continue
+    }
+    for (const grapheme of segmentText(word, 'grapheme')) append(grapheme)
+  }
+  return lines
+}
+
+export const calculateMarkdownSourceAnchorY = (
+  input: MarkdownEditorSourceAnchorLayoutInput,
+) => {
+  const inlineSize = Math.max(1, input.inlineSize)
+  const sourceBeforeCaret = input.source.slice(
+    0,
+    Math.max(0, Math.min(input.caretSourceOffset, input.source.length)),
+  )
+  const logicalLines = sourceBeforeCaret.split('\n')
+  const visualLine = logicalLines.reduce((count, line, index) => {
+    const wrapped = wrappedSourceLineCount(
+      line,
+      inlineSize,
+      input.measureTextWidth,
+    )
+    return count + (index === logicalLines.length - 1 ? wrapped - 1 : wrapped)
+  }, 0)
+  return (input.paddingBlockStart ?? 0) + visualLine * input.lineHeight
+}
+
 export interface MarkdownEditorTypewriterScrollResult {
   readonly scrollTop: number
   readonly anchorRatio: number

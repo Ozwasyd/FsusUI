@@ -238,6 +238,7 @@
     padding: 16px;
     background: getCssVar('bg-color');
     color: getCssVar('text-color', 'primary');
+    scrollbar-gutter: stable;
     font: inherit;
     font-family:
       ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
@@ -256,12 +257,16 @@
     grid-area: 1 / 1;
     min-width: 0;
     min-height: 100%;
+    box-sizing: border-box;
     margin: 0;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: scroll;
     padding: 16px;
     pointer-events: none;
     background: getCssVar('bg-color');
     color: getCssVar('text-color', 'primary');
+    scrollbar-color: transparent transparent;
+    scrollbar-gutter: stable;
     font: inherit;
     font-family:
       ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
@@ -269,6 +274,12 @@
     line-height: 1.6;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
+
+    &::-webkit-scrollbar,
+    &::-webkit-scrollbar-thumb,
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
 
     @include when(dimmed) {
       opacity: 0.72;

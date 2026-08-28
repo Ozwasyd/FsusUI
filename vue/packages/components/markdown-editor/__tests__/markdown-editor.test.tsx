@@ -1275,6 +1275,11 @@ describe('MarkdownEditor writing-aids integration', () => {
     )
     await textarea.trigger('compositionend', { data: '' })
     expect(wrapper.attributes('data-markdown-writing-aids-state')).toBe('idle')
+
+    await textarea.trigger('keydown', { key: 'PageDown' })
+    expect(wrapper.attributes('data-markdown-writing-aids-state')).toBe(
+      'user-scroll-suspended',
+    )
   })
 
   it('fails closed without moving selection, focus, scroll, or history for missing and stale reveals', async () => {

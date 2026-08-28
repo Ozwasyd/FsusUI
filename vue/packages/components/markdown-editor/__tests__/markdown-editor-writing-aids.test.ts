@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  calculateMarkdownSourceAnchorY,
   calculateTypewriterScrollTarget,
   createMarkdownFocusSegments,
   createWritingAidsController,
@@ -372,6 +373,19 @@ describe('focus mode current-block presentation and accessibility (#439)', () =>
 })
 
 describe('upper-third typewriter scrolling state machine (#440)', () => {
+  it('derives a wrapped source anchor from source offsets without DOM identity', () => {
+    expect(
+      calculateMarkdownSourceAnchorY({
+        caretSourceOffset: 18,
+        inlineSize: 50,
+        lineHeight: 20,
+        measureTextWidth: (text) => text.length * 10,
+        paddingBlockStart: 4,
+        source: '1234567890\n\nabcde',
+      }),
+    ).toBe(64)
+  })
+
   it('strictly defaults anchor to upper-third and requires explicit opt-in for center', () => {
     const defaultAids = resolveWritingAids({ typewriter: true })
     expect(defaultAids.typewriterAnchor).toBe('upper-third')
