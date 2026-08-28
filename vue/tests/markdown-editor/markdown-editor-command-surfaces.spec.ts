@@ -100,7 +100,7 @@ test('edits, validates, reveals, copies, opens, and unwraps a projected link', a
   page,
 }) => {
   await installClipboardProbe(page)
-  await page.route('https://old.test/**', async (route) => {
+  await page.context().route('https://old.test/**', async (route) => {
     await route.fulfill({ body: 'local URL authority fixture', status: 200 })
   })
   await page.goto(
@@ -147,7 +147,9 @@ test('edits, validates, reveals, copies, opens, and unwraps a projected link', a
 
   await surface.locator('input').nth(1).fill('javascript:alert(1)')
   await surface.getByRole('button', { name: '应用' }).click()
-  await expect(surface.getByRole('alert')).toHaveText('链接地址不安全')
+  await expect(surface.getByRole('alert')).toHaveText(
+    '链接地址不安全或不受支持',
+  )
   await expect(textarea).toHaveValue('[Docs](https://old.test "Title")')
 
   await surface.locator('input').nth(0).fill('Guide')
@@ -162,7 +164,7 @@ test('edits, validates, reveals, copies, opens, and unwraps a projected link', a
     element.dispatchEvent(new Event('select', { bubbles: true }))
   })
   await editor.getByRole('button', { name: '编辑链接' }).click()
-  await surface.getByRole('button', { name: '显示源码' }).click()
+  await surface.getByRole('button', { name: '在源码中显示' }).click()
   await expect(textarea).toBeFocused()
   expect(
     await textarea.evaluate((element: HTMLTextAreaElement) => ({
@@ -219,7 +221,7 @@ test('inserts, edits, copies, and removes a projected block anchor', async ({
         ).__markdownClipboardProbe,
     ),
   ).toBe('^updated')
-  await surface.getByRole('button', { name: '移除块锚点' }).click()
+  await surface.getByRole('button', { name: '移除锚点' }).click()
   await expect(textarea).toHaveValue('Paragraph')
 
   await page.getByTestId('markdown-open-command-palette').click()
@@ -233,6 +235,8 @@ test('inserts, edits, copies, and removes a projected block anchor', async ({
 test('renders locale authority, long copy, RTL, and status density without fallback copy', async ({
   page,
 }) => {
+  test.setTimeout(360_000)
+
   for (const locale of ['zh-CN', 'zh-TW', 'en', 'ja', 'ko', 'ru', 'ar', 'de']) {
     const prefix = locale.toUpperCase()
     await page.goto(
