@@ -116,6 +116,12 @@ export const resolveDemoRoot = async (
   const themeMode = normalizeThemeMode(searchParams.get('theme'), 'system')
   const visualMode = searchParams.get('visual') || ''
 
+  if (searchParams.get('interactionTrace') === '1') {
+    const { default: InteractionTraceFixture } =
+      await import('./InteractionTraceFixture.vue')
+    return { component: InteractionTraceFixture, themeMode }
+  }
+
   if (visualMode === 'view-transitions') {
     const { default: ViewTransitionSection } =
       await import('./sections/ViewTransitionSection.vue')

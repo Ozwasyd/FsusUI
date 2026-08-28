@@ -165,9 +165,19 @@ export {
   type MarkdownEmbedWalkSuccess,
 } from './markdown-embed-budget'
 export {
+  assertMarkdownInteractionTrace,
   createMarkdownInteractionTrace,
   evaluateMarkdownInteractionTraceMutations,
+  validateMarkdownInteractionTrace,
+  type MarkdownInteractionAction,
+  type MarkdownInteractionBrowser,
+  type MarkdownInteractionBrowserIdentity,
+  type MarkdownInteractionRuntime,
+  type MarkdownInteractionStep,
   type MarkdownInteractionTrace,
+  type MarkdownInteractionTraceInput,
+  type MarkdownInteractionTraceMutationKind,
+  type MarkdownInteractionTraceValidation,
 } from './markdown-interaction-trace'
 export {
   MARKDOWN_EDITOR_PROJECTION_PARSER,
