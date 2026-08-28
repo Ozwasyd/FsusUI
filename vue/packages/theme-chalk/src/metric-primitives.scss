@@ -291,6 +291,7 @@
 
       &:where([aria-pressed='true'], [aria-selected='true']) {
         background: getCssVar('fill-color', 'light');
+        border-color: getCssVar('color-primary');
         color: var(--fsus-scholarly-blue, getCssVar('color-primary'));
         opacity: 1;
       }
@@ -437,6 +438,7 @@
 
       &:where([aria-pressed='true'], [aria-selected='true']) {
         background: getCssVar('fill-color', 'light');
+        border-color: getCssVar('color-primary');
         color: var(--fsus-scholarly-blue, getCssVar('color-primary'));
         opacity: 1;
       }
