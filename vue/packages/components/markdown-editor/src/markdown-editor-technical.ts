@@ -117,6 +117,19 @@ export type MarkdownTechnicalMutationKind =
 
 const TECHNICAL_KIND_SET = new Set<string>(MARKDOWN_TECHNICAL_NODE_KINDS)
 
+const technicalKindOf = (
+  node: MarkdownStableSyntaxNode,
+): MarkdownTechnicalNodeKind | null => {
+  if (TECHNICAL_KIND_SET.has(node.kind)) {
+    return node.kind as MarkdownTechnicalNodeKind
+  }
+  return node.kind === 'malformed' &&
+    node.status === 'malformed' &&
+    node.diagnosticCode === 'unclosed-code-fence'
+    ? 'code'
+    : null
+}
+
 const sameDocument = (
   left?: MarkdownDocumentIdentity,
   right?: MarkdownDocumentIdentity,
@@ -221,11 +234,15 @@ const coveringTechnical = (
   kind?: string,
 ): MarkdownStableSyntaxNode | null => {
   const covering = projection.nodes.filter(
-    (node) =>
-      TECHNICAL_KIND_SET.has(node.kind) &&
-      (!kind || node.kind === kind) &&
-      node.rawRange.start <= offset &&
-      offset <= node.rawRange.end,
+    (node) => {
+      const technicalKind = technicalKindOf(node)
+      return (
+        technicalKind !== null &&
+        (!kind || technicalKind === kind) &&
+        node.rawRange.start <= offset &&
+        offset <= node.rawRange.end
+      )
+    },
   )
   if (covering.length > 0) {
     return [...covering].sort((left, right) => {
@@ -238,9 +255,13 @@ const coveringTechnical = (
     })[0]!
   }
   if (kind) {
-    return projection.nodes.find((node) => node.kind === kind) ?? null
+    return (
+      projection.nodes.find((node) => technicalKindOf(node) === kind) ?? null
+    )
   }
-  return projection.nodes.find((node) => TECHNICAL_KIND_SET.has(node.kind)) ?? null
+  return (
+    projection.nodes.find((node) => technicalKindOf(node) !== null) ?? null
+  )
 }
 
 const partitionRanges = (
@@ -365,11 +386,13 @@ export const resolveMarkdownTechnicalNode = (input: {
           input.selection?.start ?? 0,
           input.kind,
         )
-  if (!located || !TECHNICAL_KIND_SET.has(located.kind)) return null
+  if (!located) return null
+  const kind = technicalKindOf(located)
+  if (!kind) return null
   const coordinates = createMarkdownSourceCoordinateMap(input.source)
   return Object.freeze({
     documentIdentity: identity,
-    kind: located.kind as MarkdownTechnicalNodeKind,
+    kind,
     nodeId: located.id,
     ranges: partitionRanges(input.source, located, coordinates),
     rawRange: Object.freeze({
