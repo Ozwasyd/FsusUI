@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "8ef650dbae6b90d539bdebcb0e34f97d6cabecc6c202805f3dab3c80114dba51",
-  "candidateSha": "ada2a64cea75faaac294e30d896b2bf36b22ce68",
-  "candidateDigest": "703532dede72bc635663cd41a48e055bcb3477e70e84d778912cf2d47a1052ec",
+  "classificationReceiptDigest": "b3a699931bde2aa527b2acc0276a65ce6600b615f2648bdf507b12370c7a5d19",
+  "candidateSha": "4ba4f4580c3b8149155146de8e42fef6517f42e8",
+  "candidateDigest": "66f54b1bc891ef8a48dd75789a24a9397e8c9057fb69e658b78e5b3b0b247f3a",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -14,9 +14,9 @@
     "9c2978edf8798844fbe50cdac75f647e4d2568ed6bce396c3c09e2b296cfab9e",
     "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4"
   ],
-  "activeBaselineIdentityDigest": "6258239e7be8e02bf46c78b61494649bd98d0d47c85ac97b2427cfc004667738",
+  "activeBaselineIdentityDigest": "fb983f9f468c67f09355962913a79a04c7c7fb80c09e761515659f8f69c3cb56",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
-  "independenceEvidenceDigest": "350d0e6c6364add246ce7bab267e641729eeb5a07fc042042db11589f4343427",
+  "independenceEvidenceDigest": "c2107df026aab4489cf422d20b1fe7921e28e3d8c66dcae9b601ef72de52cf8c",
   "modifiedPaths": [],
   "productionFixture": true,
   "viewportStateMatrix": [
@@ -29,7 +29,7 @@
         "keyboard",
         "zoom"
       ],
-      "evidenceDigest": "4052ef50689c81e3359f4238b15c9d0ee46feab112c0273f2f91119aa53acce9"
+      "evidenceDigest": "e4c892f31c40f8a18a42b229add1ae351630eb90acea971c5d2f060fae825189"
     },
     {
       "viewport": "390x844 RTL Chromium simulation",
@@ -49,7 +49,7 @@
       "id": "issue-664-writing-aids-light-desktop",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/screenshots/web/issue-664-writing-aids-light-desktop.png",
-      "digest": "4052ef50689c81e3359f4238b15c9d0ee46feab112c0273f2f91119aa53acce9",
+      "digest": "e4c892f31c40f8a18a42b229add1ae351630eb90acea971c5d2f060fae825189",
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -73,12 +73,12 @@
       "id": "issue-664-local-simulation-limitations",
       "kind": "screen-reader-report",
       "path": "tests/conformance/visual/artifacts/issue-664-markdown-writing-aids-local-simulation-limitations.json",
-      "digest": "f33aba4e288e54c8adcb1dcc59a60301953cc6736da4780a0d84256534050459",
+      "digest": "fe0e91d532741fbf00b000bd4a2487ed4c1ddca089508d9904bcd3265845bad9",
       "inspected": true,
       "fixtureClass": "production"
     }
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "fd2b834abe87ef3dce9ad98281577f52d7b01747e4543e88de1099b510964e78"
+  "receiptDigest": "3fa188259a752a94df6db02e4d9d28d1af07d48a71823bcd5a5c25074fc598fe"
 }

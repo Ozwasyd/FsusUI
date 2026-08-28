@@ -40,19 +40,19 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "c80a2f942abc50f0b550b8f3899467831011cab1",
+    "revision": "c0f6cc2c7be0114651fc8c4ae9041de35575c2aa",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
     "authorityDigest": "d1bdfd98f887edd4924f9be64de7091542fa67dad9feead04eb5978fa0694bcf",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "ada2a64cea75faaac294e30d896b2bf36b22ce68",
-  "candidateDigest": "703532dede72bc635663cd41a48e055bcb3477e70e84d778912cf2d47a1052ec",
+  "candidateSha": "4ba4f4580c3b8149155146de8e42fef6517f42e8",
+  "candidateDigest": "66f54b1bc891ef8a48dd75789a24a9397e8c9057fb69e658b78e5b3b0b247f3a",
   "stateEvidenceMatrix": [
     {
       "state": "source reveal and focus presentation",
       "viewport": "desktop",
       "theme": "light",
-      "evidenceDigest": "4052ef50689c81e3359f4238b15c9d0ee46feab112c0273f2f91119aa53acce9"
+      "evidenceDigest": "e4c892f31c40f8a18a42b229add1ae351630eb90acea971c5d2f060fae825189"
     },
     {
       "state": "RTL reveal and typewriter restoration at 200 percent zoom",
@@ -81,5 +81,5 @@
   "classificationEvidenceDigest": "bbb6af932bf41252e254cf284f17633c36367c0494e226d7775f99a530af6fd1",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "8ef650dbae6b90d539bdebcb0e34f97d6cabecc6c202805f3dab3c80114dba51"
+  "receiptDigest": "b3a699931bde2aa527b2acc0276a65ce6600b615f2648bdf507b12370c7a5d19"
 }
