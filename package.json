@@ -53,7 +53,7 @@
     "test:dom-layout": "node ./scripts/with-node-heap.mjs playwright test --config=vue/playwright.dom-layout.config.ts",
     "test:geometry:smoke": "node ./scripts/with-node-heap.mjs playwright test --config=vue/playwright.geometry.config.ts",
     "test:motion:ssr": "node ./scripts/with-node-heap.mjs playwright test --config=vue/playwright.motion-ssr.config.ts",
-    "test:markdown-editor:interaction": "node ./scripts/with-node-heap.mjs playwright test --config=vue/playwright.markdown-editor.config.ts --project=chromium --project=firefox",
+    "test:markdown-editor:interaction": "node ./scripts/with-node-heap.mjs playwright test --config=vue/playwright.markdown-editor.config.ts --project=chromium --project=firefox --project=webkit",
     "audit:visual-boundaries": "node ./scripts/with-node-heap.mjs playwright test --config=vue/playwright.boundary-audit.config.ts",
     "audit:templates": "node ./scripts/with-node-heap.mjs node ./scripts/audit-template-dom.mjs",
     "perf:wasm": "node ./scripts/with-node-heap.mjs run-s ensure:wasm _perf:wasm",
