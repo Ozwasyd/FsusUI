@@ -68,4 +68,75 @@
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeDangerBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeDangerBrush}" />
   </Style>
+
+  <Style Selector="fsus|FsusSettingsShell">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+  </Style>
+
+  <Style Selector="Border.fsus-settings-rail">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="0,0,1,0" />
+  </Style>
+
+  <Style Selector="Border.fsus-settings-actions">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="0,1,0,0" />
+  </Style>
+
+  <Style Selector="fsus|FsusSettingsCategory">
+    <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
+    <Setter Property="Padding" Value="12,8" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusControlMd}" />
+    <Setter Property="FontFamily" Value="{DynamicResource FsusTypographyFamilyBody}" />
+    <Setter Property="FontSize" Value="{DynamicResource FsusTypographyBodyMdSize}" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition
+          Property="Opacity"
+          Duration="{DynamicResource FsusMotionDurationEffective}"
+          Easing="{DynamicResource FsusMotionEasingEffective}" />
+      </Transitions>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusSettingsCategory:pointerover, fsus|FsusSettingsCategory.fsus-hover">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusSettingsCategory.fsus-selected">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusColorActionPrimaryBrush}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+
+  <Style Selector="fsus|FsusSettingsCategory:focus-visible">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusThemeFocusBorderThickness}" />
+  </Style>
+
+  <Style Selector="fsus|FsusSettingsCategory:disabled, fsus|FsusSettingsCategory.fsus-disabled">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeDisabledSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusSettingsShell.fsus-narrow fsus|FsusSettingsCategory">
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
+  </Style>
+
+  <Style Selector="fsus|FsusSettingsCategory.fsus-narrow.fsus-has-icon Grid.fsus-settings-category-content">
+    <Setter Property="HorizontalAlignment" Value="Center" />
+  </Style>
+
+  <Style Selector="fsus|FsusSettingsCategory.fsus-narrow.fsus-has-icon TextBlock.fsus-settings-category-header">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
 </Styles>

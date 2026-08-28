@@ -12894,6 +12894,111 @@
       ]
     },
     {
+      "name": "FsusUI.Avalonia.Controls.FsusSettingsCategory",
+      "kind": "class",
+      "baseType": "Avalonia.Controls.ContentControl",
+      "isAbstract": false,
+      "isSealed": false,
+      "properties": [
+        {
+          "name": "AccessibleName",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Content",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Description",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Header",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Icon",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "IsSelected",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Key",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [
+        {
+          "name": "AccessibleName",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "Description",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "Header",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "Icon",
+          "kind": "styled",
+          "type": "System.Object",
+          "nullable": true
+        },
+        {
+          "name": "IsSelected",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "Key",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        }
+      ],
+      "events": [],
+      "methods": []
+    },
+    {
       "name": "FsusUI.Avalonia.Controls.FsusSettingsFormSection",
       "kind": "class",
       "baseType": "FsusUI.Avalonia.Controls.FsusSettingsSection",
@@ -13070,6 +13175,27 @@
       "methods": []
     },
     {
+      "name": "FsusUI.Avalonia.Controls.FsusSettingsScrollResetBehavior",
+      "kind": "enum",
+      "baseType": "System.Enum",
+      "isAbstract": false,
+      "isSealed": true,
+      "properties": [],
+      "avaloniaProperties": [],
+      "events": [],
+      "methods": [],
+      "enumMembers": [
+        {
+          "name": "Reset",
+          "value": 0
+        },
+        {
+          "name": "Restore",
+          "value": 1
+        }
+      ]
+    },
+    {
       "name": "FsusUI.Avalonia.Controls.FsusSettingsSection",
       "kind": "class",
       "baseType": "FsusUI.Avalonia.Controls.FsusProductPrimitiveControl",
@@ -13143,6 +13269,323 @@
             {
               "name": "key",
               "type": "System.String",
+              "optional": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FsusUI.Avalonia.Controls.FsusSettingsShell",
+      "kind": "class",
+      "baseType": "Avalonia.Controls.ContentControl",
+      "isAbstract": false,
+      "isSealed": false,
+      "properties": [
+        {
+          "name": "AccessibleName",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ActionsSlot",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "Categories",
+          "type": "System.Collections.ObjectModel.ObservableCollection\u003CFsusUI.Avalonia.Controls.FsusSettingsCategory\u003E",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "ContentScrollOffset",
+          "type": "Avalonia.Vector",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "ContentScrollViewer",
+          "type": "Avalonia.Controls.ScrollViewer",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "FocusedKey",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "HasActionsSlot",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "HasSearchSlot",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "IsNarrow",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "NarrowBreakpointWidth",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "NarrowRailWidth",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "RailFooter",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "RailHeader",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "RailScrollViewer",
+          "type": "Avalonia.Controls.ScrollViewer",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "RailWidth",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "ScrollResetBehavior",
+          "type": "FsusUI.Avalonia.Controls.FsusSettingsScrollResetBehavior",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "SearchSlot",
+          "type": "System.Object",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
+          "name": "SelectedCategory",
+          "type": "FsusUI.Avalonia.Controls.FsusSettingsCategory",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": false
+        },
+        {
+          "name": "SelectedKey",
+          "type": "System.String",
+          "nullable": true,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        }
+      ],
+      "avaloniaProperties": [
+        {
+          "name": "AccessibleName",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        },
+        {
+          "name": "ActionsSlot",
+          "kind": "styled",
+          "type": "System.Object",
+          "nullable": true
+        },
+        {
+          "name": "IsNarrow",
+          "kind": "styled",
+          "type": "System.Boolean",
+          "nullable": false
+        },
+        {
+          "name": "NarrowBreakpointWidth",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        },
+        {
+          "name": "NarrowRailWidth",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        },
+        {
+          "name": "RailFooter",
+          "kind": "styled",
+          "type": "System.Object",
+          "nullable": true
+        },
+        {
+          "name": "RailHeader",
+          "kind": "styled",
+          "type": "System.Object",
+          "nullable": true
+        },
+        {
+          "name": "RailWidth",
+          "kind": "styled",
+          "type": "System.Double",
+          "nullable": false
+        },
+        {
+          "name": "ScrollResetBehavior",
+          "kind": "styled",
+          "type": "FsusUI.Avalonia.Controls.FsusSettingsScrollResetBehavior",
+          "nullable": false
+        },
+        {
+          "name": "SearchSlot",
+          "kind": "styled",
+          "type": "System.Object",
+          "nullable": true
+        },
+        {
+          "name": "SelectedKey",
+          "kind": "styled",
+          "type": "System.String",
+          "nullable": true
+        }
+      ],
+      "events": [
+        {
+          "name": "SelectionChanged",
+          "kind": "clr",
+          "argsType": "System.EventHandler\u003CFsusUI.Avalonia.Controls.FsusNavigationSelectionChangedEventArgs\u003E",
+          "isStatic": false
+        }
+      ],
+      "methods": [
+        {
+          "name": "ApplyViewport",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "viewportWidth",
+              "type": "System.Double",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "GetCategoryScrollOffset",
+          "isStatic": false,
+          "returnType": "Avalonia.Vector",
+          "parameters": [
+            {
+              "name": "key",
+              "type": "System.String",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "HandleKey",
+          "isStatic": false,
+          "returnType": "System.Boolean",
+          "parameters": [
+            {
+              "name": "key",
+              "type": "Avalonia.Input.Key",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "ResetScroll",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": []
+        },
+        {
+          "name": "SelectCategory",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "category",
+              "type": "FsusUI.Avalonia.Controls.FsusSettingsCategory",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "SelectKey",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "key",
+              "type": "System.String",
+              "optional": false
+            }
+          ]
+        },
+        {
+          "name": "SetContentScrollOffset",
+          "isStatic": false,
+          "returnType": "System.Void",
+          "parameters": [
+            {
+              "name": "offset",
+              "type": "Avalonia.Vector",
               "optional": false
             }
           ]

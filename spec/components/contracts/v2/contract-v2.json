@@ -15,7 +15,7 @@
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "1f3a47f192da55b3aaec99db8c410ceb7a549af7089186f08c749ee7f42928b4",
+      "hash": "b9a3c6c9ecc866dee7996e0fd3cfe9732691e5c3c9a8ff5260594c1d74b99d06",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
@@ -135104,6 +135104,22 @@
       }
     },
     {
+      "type": "FsusUI.Avalonia.Controls.FsusSettingsCategory",
+      "kind": "class",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 13,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-settings-category"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
       "type": "FsusUI.Avalonia.Controls.FsusSettingsFormSection",
       "kind": "class",
       "packageId": "avalonia",
@@ -135184,6 +135200,22 @@
       }
     },
     {
+      "type": "FsusUI.Avalonia.Controls.FsusSettingsScrollResetBehavior",
+      "kind": "enum",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 2,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-settings-scroll-reset-behavior"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
       "type": "FsusUI.Avalonia.Controls.FsusSettingsSectionHeader",
       "kind": "class",
       "packageId": "avalonia",
@@ -135207,6 +135239,22 @@
       "memberCount": 4,
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-settings-section-nav"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.FsusSettingsShell",
+      "kind": "class",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 38,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-settings-shell"
       ],
       "governance": {
         "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
