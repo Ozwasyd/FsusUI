@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
   "policy": "no-growth-ratchet",
-  "provenance": "2026-08-16 consumer baseline refreshed on Node v24.16.0. Startup raw/gzip are byte-identical to the 2026-08-09 baseline (143893/46296); brotli 41498->41520 is encoder drift on identical content. Markdown hydration raw 81771->81881 comes from restoring the required parser/rawSource fields on the authorized broker result (MarkdownSafeRenderResult contract fix), with the remainder from the same brotli encoder drift.",
+  "provenance": "2026-08-28 consumer baseline refreshed on Node v24.18.0. Startup raw +126 / gzip +61 / brotli +34 and Markdown hydration raw +124 / gzip +60 / brotli -4 bytes come from rewriting the bundled @element-plus/icons-vue self-references to the artifact's own icons-vue module tree: the bare unpublished specifier previously resolved only inside this repository, so clean consumer installs could not resolve the root entry at all (prepare-npm-package bundled-workspace fix).",
   "startup": {
-    "raw": 143893,
-    "gzip": 46296,
-    "brotli": 41520
+    "raw": 144019,
+    "gzip": 46357,
+    "brotli": 41554
   },
   "markdownHydration": {
-    "raw": 81881,
-    "gzip": 29241,
-    "brotli": 26555
+    "raw": 82005,
+    "gzip": 29301,
+    "brotli": 26551
   }
 }
