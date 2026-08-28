@@ -337,6 +337,46 @@
         />
       </div>
       <div
+        v-if="currentMode === 'live' && embedPresentationSegments.length"
+        :class="ns.e('live-embeds')"
+        aria-label="Embedded content"
+        role="region"
+      >
+        <section
+          v-for="segment in embedPresentationSegments"
+          :key="`live:${segment.key}`"
+          class="el-markdown-embed"
+          :aria-label="segment.plan.accessibility.name"
+          role="region"
+        >
+          <header class="el-markdown-embed__header">
+            <span class="el-markdown-embed__target">{{
+              segment.plan.title
+            }}</span>
+            <span class="el-markdown-embed__mode-tag">{{
+              segment.plan.mode
+            }}</span>
+            <span class="el-markdown-embed__status" role="status">{{
+              segment.plan.status
+            }}</span>
+          </header>
+          <p v-if="segment.plan.excerpt" class="el-markdown-embed__body">
+            {{ segment.plan.excerpt }}
+          </p>
+          <div class="el-markdown-embed__actions">
+            <button
+              v-for="action in segment.plan.allowedActions"
+              :key="action"
+              type="button"
+              class="el-markdown-embed__action"
+              @click="handleEmbedAction(segment, action)"
+            >
+              {{ embedActionLabel(action) }}
+            </button>
+          </div>
+        </section>
+      </div>
+      <div
         v-if="visibleSearchHighlights.length"
         :class="ns.e('search-highlights')"
         aria-hidden="true"
@@ -2176,6 +2216,16 @@ const embedRenderSegments = computed<readonly MarkdownEmbedRenderSegment[]>(() =
   })
   return Object.freeze(segments)
 })
+const embedPresentationSegments = computed(() =>
+  embedRenderSegments.value.filter(
+    (
+      segment,
+    ): segment is Extract<
+      MarkdownEmbedRenderSegment,
+      { readonly kind: 'embed' }
+    > => segment.kind === 'embed',
+  ),
+)
 
 const embedActionLabel = (action: MarkdownEmbedActionKind) =>
   action

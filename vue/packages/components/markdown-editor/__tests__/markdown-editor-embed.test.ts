@@ -305,4 +305,32 @@ describe('markdown embed safe presentation and atomic interaction', () => {
     await nextTick()
     expect(wrapper.find('textarea').attributes('hidden')).toBeUndefined()
   })
+
+  it('keeps live mode on the single input surface while exposing controlled embed presentation', async () => {
+    const source =
+      'Before\n\n::embed[target="safe-doc" mode="article"]\n\nAfter'
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        defaultMode: 'live',
+        embedProvider: async (request) => ({
+          ...request,
+          excerpt: 'Safe live summary',
+          status: 'resolved',
+          title: 'Safe Live Document',
+        }),
+        modelValue: source,
+      },
+    })
+    await nextTick()
+    await nextTick()
+
+    expect(wrapper.find('textarea').isVisible()).toBe(true)
+    expect(wrapper.find('.el-markdown-editor__preview').exists()).toBe(false)
+    expect(wrapper.find('.el-markdown-editor__live-embeds').exists()).toBe(true)
+    const embed = wrapper.find('.el-markdown-embed')
+    expect(embed.text()).toContain('Safe Live Document')
+    expect(embed.text()).toContain('Safe live summary')
+    expect(embed.find('.el-markdown-editor').exists()).toBe(false)
+    expect(embed.attributes('tabindex')).toBeUndefined()
+  })
 })

@@ -122,9 +122,13 @@ test('keeps search identity, ranges, geometry, and focus stable across all four 
     expect(await sourceValue(fixture)).toBe(sourceBefore)
     if (mode === 'source' || mode === 'live') {
       await expect(root.locator('.el-markdown-editor__preview')).toHaveCount(0)
+    }
+    if (mode === 'source') {
       await expect(root.locator('.el-markdown-embed')).toHaveCount(0)
     } else {
-      await expect(root.locator('.el-markdown-editor__preview')).toBeVisible()
+      if (mode !== 'live') {
+        await expect(root.locator('.el-markdown-editor__preview')).toBeVisible()
+      }
       await expect(root.locator('.el-markdown-embed')).toHaveCount(8)
     }
     if (mode === 'preview') {
@@ -272,6 +276,19 @@ test('renders controlled embed states through the consumer-owned provider', asyn
     theme: 'dark',
   })
   const sourceBefore = await sourceValue(fixture)
+  await fixture.getByTestId('markdown-search-embed-mode-live').click()
+  await expect(root.locator('.el-markdown-editor__preview')).toHaveCount(0)
+  await expect(root.locator('.el-markdown-editor__live-embeds')).toBeVisible()
+  await expect(root.locator('.el-markdown-embed')).toHaveCount(8)
+  if (testInfo.project.name === 'chromium') {
+    await mkdir(artifactRoot, { recursive: true })
+    await root.screenshot({
+      path: resolve(
+        artifactRoot,
+        'candidate-live-embed-states-desktop-dark.png',
+      ),
+    })
+  }
   await fixture.getByTestId('markdown-search-embed-mode-preview').click()
   const embeds = root.locator('.el-markdown-embed')
   await expect(embeds).toHaveCount(8)

@@ -246,6 +246,15 @@
     clip: rect(0 0 0 0);
   }
 
+  @include e(live-embeds) {
+    display: grid;
+    min-width: 0;
+    gap: var(--fsus-space-3, 12px);
+    padding: var(--fsus-space-4, 16px);
+    border-top: 1px solid getCssVar('border-color-lighter');
+    background: getCssVar('bg-color');
+  }
+
   @include e(search-highlights) {
     position: absolute;
     inset: 0;
