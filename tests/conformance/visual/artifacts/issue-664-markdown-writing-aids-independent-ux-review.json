@@ -1,0 +1,43 @@
+{
+  "schema": "fsusui-design-conformance.independent-ux-review.v1",
+  "ownerRepository": "Ozwasyd/FsusUI",
+  "candidateSha": "ada2a64cea75faaac294e30d896b2bf36b22ce68",
+  "baselineRevision": "c80a2f942abc50f0b550b8f3899467831011cab1",
+  "classificationReceiptDigest": "8ef650dbae6b90d539bdebcb0e34f97d6cabecc6c202805f3dab3c80114dba51",
+  "verificationClass": "ux-path",
+  "status": "accepted",
+  "inspectedAtOriginalResolution": true,
+  "inspectedArtifacts": [
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-664-writing-aids-light-desktop.png",
+      "digest": "4052ef50689c81e3359f4238b15c9d0ee46feab112c0273f2f91119aa53acce9",
+      "finding": "The exact revealed raw range is focused and visible while surrounding prose remains available."
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/screenshots/web/issue-664-writing-aids-dark-mobile-zoom-200.png",
+      "digest": "ab72dbeac040bf41970d4015a524bb547368dd8767786e082b202553cd2331fd",
+      "finding": "The 390x844 RTL dark 200 percent zoom state keeps the active embed and selected section readable within the focus layer."
+    },
+    {
+      "path": "tests/conformance/accessibility/artifacts/automation/issue-664-markdown-writing-aids-tree.txt",
+      "digest": "f2c435879591f1517d29592d8bde1dc8bda9e05d6b376eac0b4ab1db49b14bcd",
+      "finding": "The accessibility tree exposes one Markdown source textbox plus explicit reveal controls and status."
+    }
+  ],
+  "acceptedCoverage": [
+    "actual Chromium pointer input",
+    "actual Chromium keyboard input",
+    "actual Chromium zoom",
+    "deterministic viewport simulation",
+    "deterministic touch-event simulation",
+    "deterministic reduced-motion simulation",
+    "deterministic Chromium accessibility-tree inspection"
+  ],
+  "limitations": [
+    "physical touch hardware",
+    "real mobile browser chrome or virtual keyboard",
+    "NVDA, JAWS, VoiceOver, TalkBack or another external screen reader"
+  ],
+  "implementationModifiedPaths": [],
+  "blockers": []
+}

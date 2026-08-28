@@ -1,0 +1,20 @@
+- region "Markdown editor":
+  - button "Bold": B
+  - button "Italic": I
+  - button "Heading": H
+  - button "Quote": Q
+  - button "Code": "{}"
+  - button "Link"
+  - button "格式工具，2 个工具": 格式工具 2
+  - textbox "Markdown editor source":
+    - /placeholder: ""
+    - text: "# Writing session Paragraph 1 keeps the document realistic and scrollable. Paragraph 2 keeps the document realistic and scrollable. Paragraph 3 keeps the document realistic and scrollable. Paragraph 4 keeps the document realistic and scrollable. Paragraph 5 keeps the document realistic and scrollable. Paragraph 6 keeps the document realistic and scrollable. Paragraph 7 keeps the document realistic and scrollable. Paragraph 8 keeps the document realistic and scrollable. Paragraph 9 keeps the document realistic and scrollable. Paragraph 10 keeps the document realistic and scrollable. Paragraph 11 keeps the document realistic and scrollable. Paragraph 12 keeps the document realistic and scrollable. Paragraph 13 keeps the document realistic and scrollable. Paragraph 14 keeps the document realistic and scrollable. Paragraph 15 keeps the document realistic and scrollable. Paragraph 16 keeps the document realistic and scrollable. Paragraph 17 keeps the document realistic and scrollable. Paragraph 18 keeps the document realistic and scrollable. ::embed[target=\"details\" mode=\"block\"] The selected section remains readable while surrounding blocks stay present."
+  - text: 1188 chars
+- button "Reveal details"
+- button "Reveal virtual details"
+- button "Reveal missing heading"
+- button "source"
+- button "live"
+- button "split"
+- button "preview"
+- status: virtual:success
