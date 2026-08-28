@@ -191,6 +191,10 @@
         ref="markdownTransactionEditor"
         v-model="markdownTransactionValue"
         v-bind="markdownPasteGateAttributes"
+        :document-identity="{
+          epoch: 1,
+          id: `markdown-command-${markdownContextualSurface ?? 'default'}`,
+        }"
         :default-mode="
           markdownPasteGate === 'preview-only' ? 'preview' : 'source'
         "
@@ -1791,9 +1795,7 @@
       <AuditCard name="ElUpload" :state="auditState">
         <el-upload action="#" :auto-upload="false" drag>
           <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
-          <div class="el-upload__text">
-            Drop a file here or <em>browse</em>
-          </div>
+          <div class="el-upload__text">Drop a file here or <em>browse</em></div>
           <p data-upload-help>PNG/JPG, max 10 MB</p>
         </el-upload>
       </AuditCard>
@@ -2006,6 +2008,10 @@ const markdownCommandSurfacesFixture =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('markdownCommandSurfaces') ===
     '1'
+const markdownContextualSurface =
+  typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('markdownContextual')
+    : null
 const markdownCommandLocale =
   typeof window !== 'undefined'
     ? new URLSearchParams(window.location.search).get('markdownLocale')
@@ -2030,65 +2036,84 @@ const markdownCommandMobileLayout =
     'compact'
     ? 'compact'
     : 'standard'
-const markdownCommandLocaleText =
-  computed<MarkdownEditorLocaleTextOverride | undefined>(() => {
-    if (!markdownCommandLocale) return undefined
-    const prefix =
-      markdownCommandLocale === 'long'
-        ? 'A deliberately extended localization fixture that preserves every semantic label'
-        : markdownCommandLocale.toUpperCase()
-    const label = (value: string) => `${prefix} ${value}`
-    return {
-      commandGroups: {
-        block: label('block'),
-        format: label('format'),
-        insert: label('insert'),
-      },
-      commandPalette: {
-        empty: label('empty'),
-        results: (count: number) => label(`${count} results`),
-        searchPlaceholder: label('search commands'),
-        title: label('command palette'),
-      },
-      commands: {
-        bold: label('bold'),
-        code: label('code'),
-        heading: label('heading'),
-        image: label('image'),
-        italic: label('italic'),
-        link: label('link'),
-        quote: label('quote'),
-      },
-      editorAria: label('Markdown editor'),
-      metrics: {
-        bytes: label('bytes'),
-        characters: label('characters'),
-        column: label('column'),
-        line: label('line'),
-        lines: label('lines'),
-        selected: label('selected'),
-        words: label('words'),
-      },
-      states: {
-        disabled: label('disabled'),
-        empty: label('empty'),
-        loading: label('loading'),
-        readonly: label('readonly'),
-      },
-      overflow: label('format tools'),
-      overflowAria: (count: number) => label(`${count} format tools`),
-      surfaces: {
-        commandPending: label('command pending'),
-        commandRejected: label('command rejected'),
-        selectionToolbar: label('selection toolbar'),
-        slashMenu: label('slash menu'),
-      },
-      textarea: {
-        live: label('live editor'),
-        source: label('source editor'),
-      },
-    }
-  })
+const markdownCommandLocaleText = computed<
+  MarkdownEditorLocaleTextOverride | undefined
+>(() => {
+  if (!markdownCommandLocale) return undefined
+  const prefix =
+    markdownCommandLocale === 'long'
+      ? 'A deliberately extended localization fixture that preserves every semantic label'
+      : markdownCommandLocale.toUpperCase()
+  const label = (value: string) => `${prefix} ${value}`
+  return {
+    commandGroups: {
+      block: label('block'),
+      format: label('format'),
+      insert: label('insert'),
+    },
+    commandPalette: {
+      empty: label('empty'),
+      results: (count: number) => label(`${count} results`),
+      searchPlaceholder: label('search commands'),
+      title: label('command palette'),
+    },
+    commands: {
+      bold: label('bold'),
+      code: label('code'),
+      heading: label('heading'),
+      image: label('image'),
+      italic: label('italic'),
+      link: label('link'),
+      quote: label('quote'),
+    },
+    contextual: {
+      anchorId: label('anchor ID'),
+      apply: label('apply'),
+      cancel: label('cancel'),
+      copy: label('copy'),
+      destination: label('destination'),
+      editAnchor: label('edit anchor'),
+      editLink: label('edit link'),
+      invalidAnchor: label('invalid anchor'),
+      insertAnchor: label('insert anchor'),
+      label: label('label'),
+      open: label('open'),
+      removeAnchor: label('remove anchor'),
+      removeLink: label('remove link'),
+      sourceReveal: label('reveal source'),
+      title: label('title'),
+      unsafeUrl: label('unsafe URL'),
+    },
+    editorAria: label('Markdown editor'),
+    metrics: {
+      bytes: label('bytes'),
+      characters: label('characters'),
+      column: label('column'),
+      line: label('line'),
+      lines: label('lines'),
+      selected: label('selected'),
+      words: label('words'),
+    },
+    states: {
+      disabled: label('disabled'),
+      empty: label('empty'),
+      loading: label('loading'),
+      readonly: label('readonly'),
+    },
+    overflow: label('format tools'),
+    overflowAria: (count: number) => label(`${count} format tools`),
+    surfaces: {
+      commandPending: label('command pending'),
+      commandRejected: label('command rejected'),
+      selectionToolbar: label('selection toolbar'),
+      slashMenu: label('slash menu'),
+    },
+    textarea: {
+      live: label('live editor'),
+      source: label('source editor'),
+    },
+  }
+})
 const markdownPasteGate =
   typeof window !== 'undefined'
     ? new URLSearchParams(window.location.search).get('markdownPasteGate')
@@ -2130,9 +2155,13 @@ const markdownTransactionEditor = ref<MarkdownEditorInstance>()
 const markdownTransactionValue = ref(
   markdownEditorImeFixture
     ? ''
-    : markdownCommandSurfacesFixture
-      ? '/bol'
-      : 'A😀éאב\n- 列表',
+    : markdownContextualSurface === 'link'
+      ? '[Docs](https://old.test "Title")'
+      : markdownContextualSurface === 'anchor'
+        ? 'Paragraph ^intro'
+        : markdownCommandSurfacesFixture
+          ? '/bol'
+          : 'A😀éאב\n- 列表',
 )
 const markdownTransactionHistory = ref<MarkdownEditorHistoryState>({
   canRedo: false,

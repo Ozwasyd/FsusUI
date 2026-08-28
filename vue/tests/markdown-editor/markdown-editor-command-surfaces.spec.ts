@@ -1,4 +1,21 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
+
+const installClipboardProbe = async (page: Page) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: async (value: string) => {
+          ;(
+            globalThis as typeof globalThis & {
+              __markdownClipboardProbe?: string
+            }
+          ).__markdownClipboardProbe = value
+        },
+      },
+    })
+  })
+}
 
 test('renders and dismisses command surfaces without a stale slash commit', async ({
   page,
@@ -36,7 +53,9 @@ test('renders and dismisses command surfaces without a stale slash commit', asyn
     .getByTestId('markdown-editor-revision')
     .textContent()
   await editor.locator('.el-markdown-editor__command-more').click()
-  await expect(editor.locator('.el-markdown-editor__command-tray')).toBeVisible()
+  await expect(
+    editor.locator('.el-markdown-editor__command-tray'),
+  ).toBeVisible()
   const bodyAfterOverflow = await body.boundingBox()
   expect(bodyAfterOverflow).toEqual(bodyBeforeOverflow)
   expect(
@@ -72,19 +91,144 @@ test('renders and dismisses command surfaces without a stale slash commit', asyn
   expect(mobileBox!.y + mobileBox!.height).toBeLessThanOrEqual(812)
 })
 
+test('edits, validates, reveals, copies, opens, and unwraps a projected link', async ({
+  page,
+}) => {
+  await installClipboardProbe(page)
+  await page.route('https://old.test/**', async (route) => {
+    await route.fulfill({ body: 'local URL authority fixture', status: 200 })
+  })
+  await page.goto(
+    '/?audit=ui-states&markdownEditorTransaction=1&markdownCommandSurfaces=1&markdownContextual=link',
+    { waitUntil: 'domcontentloaded' },
+  )
+  const fixture = page.getByTestId('markdown-editor-transaction-fixture')
+  const editor = fixture.locator('.el-markdown-editor')
+  const textarea = editor.locator('textarea')
+  const body = editor.locator('.el-markdown-editor__body')
+  const bodyBefore = await body.boundingBox()
+  await textarea.evaluate((element: HTMLTextAreaElement) => {
+    element.setSelectionRange(1, 5)
+    element.dispatchEvent(new Event('select', { bubbles: true }))
+  })
+  await editor.getByRole('button', { name: '编辑链接' }).click()
+
+  const surface = editor.locator('.el-markdown-editor__property-surface')
+  await expect(surface).toBeVisible()
+  await expect(surface).toHaveAttribute(
+    'data-markdown-anchor-id',
+    /^syn:markdown-command-link:1:link:/,
+  )
+  await expect(surface.locator('input').first()).toBeFocused()
+  expect(await body.boundingBox()).toEqual(bodyBefore)
+
+  await surface.getByRole('button', { name: '复制' }).click()
+  expect(
+    await page.evaluate(
+      () =>
+        (
+          globalThis as typeof globalThis & {
+            __markdownClipboardProbe?: string
+          }
+        ).__markdownClipboardProbe,
+    ),
+  ).toBe('https://old.test')
+
+  const popupPromise = page.waitForEvent('popup')
+  await surface.getByRole('button', { name: '打开' }).click()
+  const popup = await popupPromise
+  await expect(popup).toHaveURL(/^https:\/\/old\.test\/?$/)
+  await popup.close()
+
+  await surface.locator('input').nth(1).fill('javascript:alert(1)')
+  await surface.getByRole('button', { name: '应用' }).click()
+  await expect(surface.getByRole('alert')).toHaveText('链接地址不安全')
+  await expect(textarea).toHaveValue('[Docs](https://old.test "Title")')
+
+  await surface.locator('input').nth(0).fill('Guide')
+  await surface.locator('input').nth(1).fill('https://next.test')
+  await surface.locator('input').nth(2).fill('Next')
+  await surface.getByRole('button', { name: '应用' }).click()
+  await expect(textarea).toHaveValue('[Guide](https://next.test "Next")')
+  await expect(surface).toBeHidden()
+
+  await textarea.evaluate((element: HTMLTextAreaElement) => {
+    element.setSelectionRange(1, 6)
+    element.dispatchEvent(new Event('select', { bubbles: true }))
+  })
+  await editor.getByRole('button', { name: '编辑链接' }).click()
+  await surface.getByRole('button', { name: '显示源码' }).click()
+  await expect(textarea).toBeFocused()
+  expect(
+    await textarea.evaluate((element: HTMLTextAreaElement) => ({
+      end: element.selectionEnd,
+      start: element.selectionStart,
+    })),
+  ).toEqual({ end: 33, start: 0 })
+
+  await editor.getByRole('button', { name: '编辑链接' }).click()
+  await surface.getByRole('button', { name: '移除链接' }).click()
+  await expect(textarea).toHaveValue('Guide')
+  await page.getByTestId('markdown-undo').click()
+  await expect(textarea).toHaveValue('[Guide](https://next.test "Next")')
+})
+
+test('inserts, edits, copies, and removes a projected block anchor', async ({
+  page,
+}) => {
+  await installClipboardProbe(page)
+  await page.goto(
+    '/?audit=ui-states&markdownEditorTransaction=1&markdownCommandSurfaces=1&markdownContextual=anchor',
+    { waitUntil: 'domcontentloaded' },
+  )
+  const fixture = page.getByTestId('markdown-editor-transaction-fixture')
+  const editor = fixture.locator('.el-markdown-editor')
+  const textarea = editor.locator('textarea')
+  await textarea.evaluate((element: HTMLTextAreaElement) => {
+    element.setSelectionRange(12, 14)
+    element.dispatchEvent(new Event('select', { bubbles: true }))
+  })
+  await editor.getByRole('button', { name: '编辑块锚点' }).click()
+  const surface = editor.locator('.el-markdown-editor__property-surface')
+  await expect(surface).toHaveAttribute(
+    'data-markdown-anchor-id',
+    /^syn:markdown-command-anchor:1:anchor:/,
+  )
+  await surface.locator('input').fill('updated')
+  await surface.getByRole('button', { name: '应用' }).click()
+  await expect(textarea).toHaveValue('Paragraph ^updated')
+
+  await textarea.evaluate((element: HTMLTextAreaElement) => {
+    element.setSelectionRange(12, 15)
+    element.dispatchEvent(new Event('select', { bubbles: true }))
+  })
+  await editor.getByRole('button', { name: '编辑块锚点' }).click()
+  await surface.getByRole('button', { name: '复制' }).click()
+  expect(
+    await page.evaluate(
+      () =>
+        (
+          globalThis as typeof globalThis & {
+            __markdownClipboardProbe?: string
+          }
+        ).__markdownClipboardProbe,
+    ),
+  ).toBe('^updated')
+  await surface.getByRole('button', { name: '移除块锚点' }).click()
+  await expect(textarea).toHaveValue('Paragraph')
+
+  await page.getByTestId('markdown-open-command-palette').click()
+  const palette = page.locator('.el-markdown-editor__palette-dialog')
+  await palette.getByRole('option', { name: '插入块锚点' }).click()
+  await surface.locator('input').fill('explicit')
+  await surface.getByRole('button', { name: '应用' }).click()
+  await expect(textarea).toHaveValue('Paragraph ^explicit')
+})
+
 test('renders locale authority, long copy, RTL, and status density without fallback copy', async ({
   page,
 }) => {
-  for (const locale of [
-    'zh-CN',
-    'zh-TW',
-    'en',
-    'ja',
-    'ko',
-    'ru',
-    'ar',
-    'de',
-  ]) {
+  for (const locale of ['zh-CN', 'zh-TW', 'en', 'ja', 'ko', 'ru', 'ar', 'de']) {
     const prefix = locale.toUpperCase()
     await page.goto(
       `/?audit=ui-states&markdownEditorTransaction=1&markdownCommandSurfaces=1&markdownLocale=${locale}`,
@@ -114,7 +258,9 @@ test('renders locale authority, long copy, RTL, and status density without fallb
   )
   const fixture = page.getByTestId('markdown-editor-transaction-fixture')
   const editor = fixture.locator('.el-markdown-editor')
-  await expect(editor.locator('.el-markdown-editor__status-details')).toBeVisible()
+  await expect(
+    editor.locator('.el-markdown-editor__status-details'),
+  ).toBeVisible()
   await page.getByTestId('markdown-open-command-palette').click()
   const palette = page.locator('.el-markdown-editor__palette-dialog')
   const paletteBox = await palette.boundingBox()

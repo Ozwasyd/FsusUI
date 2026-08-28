@@ -27,6 +27,17 @@ const insertCommand: MarkdownEditorCommand = {
 }
 
 describe('Markdown editor command surface integration', () => {
+  const selectRange = async (
+    wrapper: ReturnType<typeof mount>,
+    start: number,
+    end: number,
+  ) => {
+    const textarea = wrapper.find('textarea')
+    ;(textarea.element as HTMLTextAreaElement).setSelectionRange(start, end)
+    await textarea.trigger('select')
+    await nextTick()
+  }
+
   it('commits a slash command and removes its trigger in one revision', async () => {
     const wrapper = mount(MarkdownEditor, {
       props: {
@@ -36,12 +47,77 @@ describe('Markdown editor command surface integration', () => {
       },
     })
 
-    await wrapper.find('.el-markdown-editor__slash-menu button').trigger('click')
+    await wrapper
+      .find('.el-markdown-editor__slash-menu button')
+      .trigger('click')
     await flushPromises()
 
-    expect(wrapper.emitted('update:modelValue')?.map(([value]) => value)).toEqual([
-      'TOKEN',
-    ])
+    expect(
+      wrapper.emitted('update:modelValue')?.map(([value]) => value),
+    ).toEqual(['TOKEN'])
+    expect(wrapper.emitted('command')).toHaveLength(1)
+  })
+
+  it('rebases an async command result through intervening editor transactions', async () => {
+    let resolveCommand: (
+      result: Awaited<ReturnType<NonNullable<MarkdownEditorCommand['run']>>>,
+    ) => void = () => undefined
+    const asyncCommand: MarkdownEditorCommand = {
+      group: 'format',
+      key: 'async-replace',
+      label: 'Async replace',
+      presentation: ['selection'],
+      run: (context) =>
+        new Promise((resolve) => {
+          resolveCommand = resolve
+        }).then(() => ({
+          transaction: {
+            changes: [
+              {
+                from: context.selection.start,
+                insert: 'DONE',
+                to: context.selection.end,
+              },
+            ],
+            history: 'separate',
+            origin: 'command',
+          },
+        })),
+    }
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        commands: [asyncCommand],
+        documentIdentity: { epoch: 1, id: 'async-document' },
+        modelValue: '[Docs](https://safe.test)',
+        surfaces: { selectionToolbar: true },
+      },
+    })
+    await selectRange(wrapper, 1, 5)
+    await wrapper
+      .get('.el-markdown-editor__selection-toolbar button')
+      .trigger('click')
+    const dispatch = (
+      wrapper.vm as unknown as {
+        dispatchTransaction: (transaction: {
+          changes: { from: number; insert: string; to: number }[]
+          history: 'separate'
+          origin: 'input'
+        }) => { accepted: boolean }
+      }
+    ).dispatchTransaction
+    expect(
+      dispatch({
+        changes: [{ from: 0, insert: ' ', to: 0 }],
+        history: 'separate',
+        origin: 'input',
+      }).accepted,
+    ).toBe(true)
+
+    resolveCommand(undefined)
+    await flushPromises()
+    expect(
+      wrapper.emitted('update:modelValue')?.map(([value]) => value),
+    ).toEqual([' [Docs](https://safe.test)', ' [DONE](https://safe.test)'])
     expect(wrapper.emitted('command')).toHaveLength(1)
   })
 
@@ -67,7 +143,9 @@ describe('Markdown editor command surface integration', () => {
     const selection = wrapper.find('.el-markdown-editor__selection-toolbar')
     expect(selection.exists()).toBe(true)
     await selection.trigger('keydown', { key: 'Escape' })
-    expect(wrapper.find('.el-markdown-editor__selection-toolbar').exists()).toBe(false)
+    expect(
+      wrapper.find('.el-markdown-editor__selection-toolbar').exists(),
+    ).toBe(false)
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
   })
 
@@ -86,7 +164,9 @@ describe('Markdown editor command surface integration', () => {
       },
     })
 
-    ;(wrapper.vm as unknown as { openCommandPalette: () => void }).openCommandPalette()
+    ;(
+      wrapper.vm as unknown as { openCommandPalette: () => void }
+    ).openCommandPalette()
     await nextTick()
     const dialog = document.body.querySelector(
       '.el-markdown-editor__palette-dialog',
@@ -117,8 +197,7 @@ describe('Markdown editor command surface integration', () => {
         stubs: {
           ElMarkdownRenderer: {
             props: ['loadingText'],
-            template:
-              '<div data-renderer-loading-copy>{{ loadingText }}</div>',
+            template: '<div data-renderer-loading-copy>{{ loadingText }}</div>',
           },
         },
       },
@@ -127,6 +206,188 @@ describe('Markdown editor command surface integration', () => {
     expect(wrapper.get('[data-renderer-loading-copy]').text()).toBe(
       'Chargement du Markdown',
     )
+  })
+
+  it('edits projection-owned link subranges from the contextual surface', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        documentIdentity: { epoch: 3, id: 'link-document' },
+        modelValue: '[Docs](https://old.test)',
+        surfaces: { selectionToolbar: true },
+      },
+    })
+    await selectRange(wrapper, 1, 5)
+    const edit = wrapper
+      .findAll('.el-markdown-editor__selection-toolbar button')
+      .find((button) => button.text() === '编辑链接')
+    expect(edit).toBeDefined()
+    await edit!.trigger('click')
+    await flushPromises()
+
+    const surface = wrapper.get('.el-markdown-editor__property-surface')
+    expect(surface.attributes('data-markdown-anchor-id')).toMatch(
+      /^syn:link-document:3:link:/,
+    )
+    const inputs = surface.findAll('input')
+    await inputs[0]!.setValue('Guide')
+    await inputs[1]!.setValue('https://next.test')
+    await surface.trigger('submit')
+    await flushPromises()
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe(
+      '[Guide](https://next.test)',
+    )
+  })
+
+  it('edits a stable projected block anchor without sidecar state', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        documentIdentity: { epoch: 2, id: 'anchor-document' },
+        modelValue: 'Paragraph ^intro',
+        surfaces: { selectionToolbar: true },
+      },
+    })
+    await selectRange(wrapper, 12, 14)
+    const edit = wrapper
+      .findAll('.el-markdown-editor__selection-toolbar button')
+      .find((button) => button.text() === '编辑块锚点')
+    expect(edit).toBeDefined()
+    await edit!.trigger('click')
+    await flushPromises()
+
+    const surface = wrapper.get('.el-markdown-editor__property-surface')
+    expect(surface.attributes('data-markdown-anchor-id')).toMatch(
+      /^syn:anchor-document:2:anchor:/,
+    )
+    await surface.get('input').setValue('updated')
+    await surface.trigger('submit')
+    await flushPromises()
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe(
+      'Paragraph ^updated',
+    )
+  })
+
+  it('rejects unsafe link edits with localized copy and no transaction', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        documentIdentity: { epoch: 1, id: 'unsafe-link-document' },
+        localeText: {
+          contextual: { unsafeUrl: 'URL-BLOCKED-L10N' },
+        },
+        modelValue: '[Docs](https://safe.test)',
+        surfaces: { selectionToolbar: true },
+      },
+    })
+    await selectRange(wrapper, 1, 5)
+    const edit = wrapper
+      .findAll('.el-markdown-editor__selection-toolbar button')
+      .find((button) => button.text() === '编辑链接')
+    await edit!.trigger('click')
+    await flushPromises()
+
+    const surface = wrapper.get('.el-markdown-editor__property-surface')
+    await surface.findAll('input')[1]!.setValue('javascript:alert(1)')
+    await surface.trigger('submit')
+    await flushPromises()
+
+    expect(surface.get('[role="alert"]').text()).toBe('URL-BLOCKED-L10N')
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+  })
+
+  it('closes a contextual surface for a same-source document switch', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        documentIdentity: { epoch: 1, id: 'document-a' },
+        modelValue: '[Docs](https://safe.test)',
+        surfaces: { selectionToolbar: true },
+      },
+    })
+    await selectRange(wrapper, 1, 5)
+    const edit = wrapper
+      .findAll('.el-markdown-editor__selection-toolbar button')
+      .find((button) => button.text() === '编辑链接')
+    await edit!.trigger('click')
+    await flushPromises()
+    expect(wrapper.find('.el-markdown-editor__property-surface').exists()).toBe(
+      true,
+    )
+
+    await wrapper.setProps({
+      documentIdentity: { epoch: 1, id: 'document-b' },
+    })
+    await nextTick()
+    expect(wrapper.find('.el-markdown-editor__property-surface').exists()).toBe(
+      false,
+    )
+  })
+
+  it('uses distinct localized insert and edit anchor commands', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      attachTo: document.body,
+      props: {
+        documentIdentity: { epoch: 1, id: 'anchor-insert-document' },
+        localeText: {
+          contextual: {
+            editAnchor: 'EDIT-ANCHOR-L10N',
+            insertAnchor: 'INSERT-ANCHOR-L10N',
+          },
+        },
+        modelValue: 'Paragraph',
+        surfaces: { commandPalette: true },
+      },
+    })
+    ;(
+      wrapper.vm as unknown as { openCommandPalette: () => void }
+    ).openCommandPalette()
+    await nextTick()
+
+    const labels = Array.from(
+      document.body.querySelectorAll<HTMLButtonElement>(
+        '.el-markdown-editor__palette-item',
+      ),
+      (button) => button.textContent?.trim(),
+    )
+    expect(labels).toContain('INSERT-ANCHOR-L10N')
+    expect(labels).not.toContain('EDIT-ANCHOR-L10N')
+    wrapper.unmount()
+  })
+
+  it('rejects a duplicate inserted anchor without sidecar or source mutation', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      attachTo: document.body,
+      props: {
+        documentIdentity: { epoch: 1, id: 'anchor-duplicate-document' },
+        localeText: {
+          contextual: {
+            insertAnchor: 'INSERT-ANCHOR-L10N',
+            invalidAnchor: 'ANCHOR-INVALID-L10N',
+          },
+        },
+        modelValue: 'First ^duplicate\nSecond',
+        surfaces: { commandPalette: true },
+      },
+    })
+    await selectRange(wrapper, 23, 23)
+    ;(
+      wrapper.vm as unknown as { openCommandPalette: () => void }
+    ).openCommandPalette()
+    await nextTick()
+    const insert = Array.from(
+      document.body.querySelectorAll<HTMLButtonElement>(
+        '.el-markdown-editor__palette-item',
+      ),
+    ).find((button) => button.textContent?.trim() === 'INSERT-ANCHOR-L10N')
+    expect(insert).toBeDefined()
+    insert!.click()
+    await flushPromises()
+
+    const surface = wrapper.get('.el-markdown-editor__property-surface')
+    await surface.get('input').setValue('duplicate')
+    await surface.trigger('submit')
+    await flushPromises()
+
+    expect(surface.get('[role="alert"]').text()).toBe('ANCHOR-INVALID-L10N')
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    wrapper.unmount()
   })
 
   it('traps palette focus, exposes disabled reason, and closes on document switch', async () => {
@@ -150,7 +411,9 @@ describe('Markdown editor command surface integration', () => {
       },
     })
 
-    ;(wrapper.vm as unknown as { openCommandPalette: () => void }).openCommandPalette()
+    ;(
+      wrapper.vm as unknown as { openCommandPalette: () => void }
+    ).openCommandPalette()
     await nextTick()
     const input = document.body.querySelector(
       '.el-markdown-editor__palette-input',

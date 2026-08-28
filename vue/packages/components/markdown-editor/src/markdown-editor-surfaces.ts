@@ -4,22 +4,31 @@ import {
   resolveMarkdownEditorPrimaryCommands,
   type MarkdownEditorCommand,
   type MarkdownEditorCommandContext,
-} from "./markdown-editor"
-import type { MarkdownEditorTransaction } from "./markdown-editor-transaction"
+} from './markdown-editor'
+import type { MarkdownEditorTransaction } from './markdown-editor-transaction'
 import type { MarkdownEditorCommandSnapshotItem } from './markdown-editor-command-snapshot'
-import type { MarkdownStableProjection } from '../../../wasm/markdown-runtime'
+import {
+  createMarkdownEditorProjection,
+  stabilizeMarkdownEditorProjection,
+  type MarkdownStableProjection,
+} from '../../../wasm/markdown-runtime'
 import { resolveMarkdownBlockInputContext } from './markdown-editor-input-intent'
 
 export interface MarkdownSlashTriggerResult {
+  readonly documentEpoch: number
+  readonly nodeId: string | null
   readonly query: string
   readonly range: { readonly start: number; readonly end: number }
+  readonly revision: number
 }
 
 export interface MarkdownSlashOptions {
   readonly isComposing?: boolean
   readonly syntaxContext?: string
   readonly blockOnly?: boolean
+  readonly documentEpoch?: number
   readonly projection?: MarkdownStableProjection
+  readonly revision?: number
 }
 
 const scoreMarkdownCommandSearchValue = (
@@ -27,7 +36,7 @@ const scoreMarkdownCommandSearchValue = (
   query: string,
 ): number | null => {
   if (!value) return null
-  const candidate = value.toLocaleLowerCase()
+  const candidate = value.toLowerCase()
   const contiguous = candidate.indexOf(query)
   if (contiguous !== -1) return contiguous
 
@@ -61,8 +70,8 @@ export const searchMarkdownEditorCommands = (
   context: MarkdownEditorCommandContext,
   query: string,
 ): readonly MarkdownEditorCommand[] => {
-  const visible = filterMarkdownEditorCommands(commands, context, "palette")
-  const needle = query.trim().toLocaleLowerCase()
+  const visible = filterMarkdownEditorCommands(commands, context, 'palette')
+  const needle = query.trim().toLowerCase()
   if (!needle) return visible
 
   return visible
@@ -92,7 +101,7 @@ export const searchMarkdownEditorCommandSnapshot = (
   query: string,
   presentation: 'palette' | 'slash' = 'palette',
 ): readonly MarkdownEditorCommandSnapshotItem[] => {
-  const needle = query.trim().toLocaleLowerCase()
+  const needle = query.trim().toLowerCase()
   const palette = snapshot.filter(
     (item) => item.visible && item.presentation.includes(presentation),
   )
@@ -151,45 +160,81 @@ export const resolveMarkdownSlashTrigger = (
   caret: number,
   options?: MarkdownSlashOptions,
 ): MarkdownSlashTriggerResult | null => {
-  if (options?.isComposing) return null
+  if (
+    options?.isComposing ||
+    !options?.projection ||
+    !Number.isInteger(caret) ||
+    caret < 0 ||
+    caret > value.length
+  )
+    return null
 
-  if (options?.projection) {
-    const context = resolveMarkdownBlockInputContext({
-      source: value,
-      offset: caret,
-      projection: options.projection,
+  const context = resolveMarkdownBlockInputContext({
+    source: value,
+    offset: caret,
+    projection: options.projection,
+  })
+  if (context.kind !== 'ordinary' && context.kind !== 'paragraph') return null
+
+  const covering = options.projection.nodes
+    .filter(
+      (node) => node.rawRange.start <= caret && node.rawRange.end >= caret,
+    )
+    .sort((left, right) => {
+      const span =
+        left.rawRange.end -
+        left.rawRange.start -
+        (right.rawRange.end - right.rawRange.start)
+      return span || left.id.localeCompare(right.id)
     })
-    if (context.kind === 'code' || context.kind === 'table') return null
+  const syntax = covering[0]
+  if (
+    syntax &&
+    syntax.kind !== 'paragraph' &&
+    syntax.kind !== 'explicit-paragraph'
+  )
+    return null
+
+  const lineStart = value.lastIndexOf('\n', Math.max(0, caret - 1)) + 1
+  let slashIndex = lineStart
+  while (
+    slashIndex < caret &&
+    (value[slashIndex] === ' ' || value[slashIndex] === '\t')
+  ) {
+    slashIndex += 1
+  }
+  if (value[slashIndex] !== '/') return null
+  if (slashIndex > lineStart && value[slashIndex - 1] === '\\') return null
+
+  const query = value.slice(slashIndex + 1, caret)
+  for (const character of query) {
+    if (
+      character === '/' ||
+      character === '\n' ||
+      character === '\r' ||
+      character === '\t' ||
+      character === ' '
+    )
+      return null
+    const point = character.codePointAt(0) ?? 0
+    if (
+      (point >= 0x0590 && point <= 0x08ff) ||
+      (point >= 0xfb1d && point <= 0xfdff) ||
+      (point >= 0xfe70 && point <= 0xfefc)
+    )
+      return null
   }
 
-  const before = value.slice(0, caret)
-
-  // Disallow inside code fence, mermaid, or inline code
-  if (/[`][^`]*$/.test(before)) return null
-  // Disallow inside math / latex
-  if (/\$[^$]*$/.test(before)) return null
-  // Disallow URL context
-  if (/https?:\/\/[^\s]*$/.test(before) || before.endsWith("://")) return null
-  // Disallow escaped slash
-  if (/\\\/([a-zA-Z0-9_-]*)$/.test(before)) return null
-  // Disallow RTL
-  if (/[\u0590-\u08FF]\/[^\s]*$/.test(before)) return null
-
-  const match = (options?.blockOnly ?? false)
-    ? /(?:^|\n)[ \t]*\/([^\s/]*)$/.exec(before)
-    : /(?:^|\s)\/([^\s/]*)$/.exec(before)
-
-  if (!match || match.index === undefined) return null
-
-  const slashIndex = before.lastIndexOf("/")
-  if (slashIndex === -1) return null
-
   return {
-    query: match[1] ?? "",
+    documentEpoch:
+      options.documentEpoch ?? options.projection.documentIdentity.epoch,
+    nodeId: syntax?.id ?? null,
+    query,
     range: {
       start: slashIndex,
       end: caret,
     },
+    revision: options.revision ?? 0,
   }
 }
 
@@ -208,9 +253,9 @@ export const planMarkdownSlashCommit = (
 ): MarkdownEditorTransaction => {
   if (!commandTransaction || !commandTransaction.changes.length) {
     return {
-      changes: [{ from: triggerRange.start, to: triggerRange.end, insert: "" }],
-      history: "separate",
-      origin: "command",
+      changes: [{ from: triggerRange.start, to: triggerRange.end, insert: '' }],
+      history: 'separate',
+      origin: 'command',
     }
   }
 
@@ -223,7 +268,8 @@ export const planMarkdownSlashCommit = (
     (change) => !boundaryInsertions.includes(change),
   )
   const overlapsTrigger = otherChanges.some(
-    (change) => change.from < triggerRange.end && change.to > triggerRange.start,
+    (change) =>
+      change.from < triggerRange.end && change.to > triggerRange.start,
   )
   if (overlapsTrigger) {
     return {
@@ -248,16 +294,16 @@ export const planMarkdownSlashCommit = (
   return {
     ...commandTransaction,
     changes,
-    history: "separate",
-    origin: "command",
+    history: 'separate',
+    origin: 'command',
   }
 }
 
 export type MarkdownEditorToolbarMutationKind =
-  | "local-array"
-  | "order-grouping"
-  | "selection-lost"
-  | "mobile-button-wall"
+  | 'local-array'
+  | 'order-grouping'
+  | 'selection-lost'
+  | 'mobile-button-wall'
 
 export const evaluateMarkdownEditorToolbarMutations = () => {
   const commands = [
@@ -278,8 +324,9 @@ export const evaluateMarkdownEditorToolbarMutations = () => {
   const overflow = resolveMarkdownEditorOverflowCommands(commands, 'minimal')
   const retainedSelection: Readonly<{ start: number; end: number }> =
     Object.freeze({ start: 2, end: 7 })
-  const lostSelection: Readonly<{ start: number; end: number }> =
-    Object.freeze({ start: 0, end: 0 })
+  const lostSelection: Readonly<{ start: number; end: number }> = Object.freeze(
+    { start: 0, end: 0 },
+  )
 
   return Object.freeze({
     authority: Object.freeze({
@@ -288,28 +335,28 @@ export const evaluateMarkdownEditorToolbarMutations = () => {
     }),
     mutations: Object.freeze([
       Object.freeze({
-        kind: "local-array" as const,
+        kind: 'local-array' as const,
         equivalent:
           JSON.stringify(localPrimary.map(({ key }) => key)) ===
           JSON.stringify(authority.map(({ key }) => key)),
         accepted: false,
       }),
       Object.freeze({
-        kind: "order-grouping" as const,
+        kind: 'order-grouping' as const,
         equivalent:
           JSON.stringify(reversedAuthority.map(({ key }) => key)) !==
           JSON.stringify(authority.map(({ key }) => key)),
         accepted: false,
       }),
       Object.freeze({
-        kind: "selection-lost" as const,
+        kind: 'selection-lost' as const,
         equivalent:
           retainedSelection.start === lostSelection.start &&
           retainedSelection.end === lostSelection.end,
         accepted: false,
       }),
       Object.freeze({
-        kind: "mobile-button-wall" as const,
+        kind: 'mobile-button-wall' as const,
         equivalent:
           resolveMarkdownEditorPrimaryCommands(commands, 'minimal').length > 2,
         accepted: false,
@@ -319,10 +366,10 @@ export const evaluateMarkdownEditorToolbarMutations = () => {
 }
 
 export type MarkdownCommandPaletteMutationKind =
-  | "local-command-list"
-  | "body-search"
-  | "stale-state"
-  | "card-wall"
+  | 'local-command-list'
+  | 'body-search'
+  | 'stale-state'
+  | 'card-wall'
 
 export const evaluateMarkdownCommandPaletteMutations = () => {
   const context: MarkdownEditorCommandContext = {
@@ -381,24 +428,24 @@ export const evaluateMarkdownCommandPaletteMutations = () => {
     authority: Object.freeze({ groups, results: authority }),
     mutations: Object.freeze([
       Object.freeze({
-        kind: "local-command-list" as const,
+        kind: 'local-command-list' as const,
         equivalent:
           JSON.stringify(localList.map(({ key }) => key)) ===
           JSON.stringify(authority.map(({ key }) => key)),
         accepted: false,
       }),
       Object.freeze({
-        kind: "body-search" as const,
+        kind: 'body-search' as const,
         equivalent: bodySearch.length > 0,
         accepted: false,
       }),
       Object.freeze({
-        kind: "stale-state" as const,
+        kind: 'stale-state' as const,
         equivalent: authorityIdentity === staleIdentity,
         accepted: false,
       }),
       Object.freeze({
-        kind: "card-wall" as const,
+        kind: 'card-wall' as const,
         equivalent: groups.size !== 2,
         accepted: false,
       }),
@@ -407,16 +454,28 @@ export const evaluateMarkdownCommandPaletteMutations = () => {
 }
 
 export type MarkdownSlashMenuMutationKind =
-  | "keydown-fork"
-  | "dom-context"
-  | "slash-hijack"
-  | "stale-execution"
+  | 'keydown-fork'
+  | 'dom-context'
+  | 'slash-hijack'
+  | 'stale-execution'
 
 export const evaluateMarkdownSlashMenuMutations = () => {
-  const trigger = resolveMarkdownSlashTrigger('/head', 5, { blockOnly: true })
+  const project = (source: string) =>
+    stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection(source),
+      { id: 'slash-mutation', epoch: 1 },
+    )
+  const trigger = resolveMarkdownSlashTrigger('/head', 5, {
+    blockOnly: true,
+    documentEpoch: 1,
+    projection: project('/head'),
+    revision: 3,
+  })
   const authorityCommit = trigger
     ? planMarkdownSlashCommit(trigger.range, {
-        changes: [{ from: trigger.range.end, insert: '# ', to: trigger.range.end }],
+        changes: [
+          { from: trigger.range.end, insert: '# ', to: trigger.range.end },
+        ],
         history: 'separate',
         origin: 'command',
       })
@@ -426,11 +485,19 @@ export const evaluateMarkdownSlashMenuMutations = () => {
   })
   const inlineCodeAuthority = resolveMarkdownSlashTrigger('`/code', 6, {
     blockOnly: true,
+    documentEpoch: 1,
+    projection: project('`/code'),
+    revision: 3,
   })
   const urlAuthority = resolveMarkdownSlashTrigger(
     'https://example.test/',
     21,
-    { blockOnly: true },
+    {
+      blockOnly: true,
+      documentEpoch: 1,
+      projection: project('https://example.test/'),
+      revision: 3,
+    },
   )
   const staleCommit = planMarkdownSlashCommit(
     { end: 5, start: 0 },
@@ -445,26 +512,25 @@ export const evaluateMarkdownSlashMenuMutations = () => {
     authority: Object.freeze({ commit: authorityCommit, trigger }),
     mutations: Object.freeze([
       Object.freeze({
-        kind: "keydown-fork" as const,
+        kind: 'keydown-fork' as const,
         equivalent:
           JSON.stringify(keydownFork.changes) ===
           JSON.stringify(authorityCommit?.changes),
         accepted: false,
       }),
       Object.freeze({
-        kind: "dom-context" as const,
+        kind: 'dom-context' as const,
         equivalent: inlineCodeAuthority !== null,
         accepted: false,
       }),
       Object.freeze({
-        kind: "slash-hijack" as const,
+        kind: 'slash-hijack' as const,
         equivalent: urlAuthority !== null,
         accepted: false,
       }),
       Object.freeze({
-        kind: "stale-execution" as const,
-        equivalent:
-          staleCommit.metadata?.rejected !== 'slash-trigger-overlap',
+        kind: 'stale-execution' as const,
+        equivalent: staleCommit.metadata?.rejected !== 'slash-trigger-overlap',
         accepted: false,
       }),
     ]),
@@ -473,14 +539,21 @@ export const evaluateMarkdownSlashMenuMutations = () => {
 
 export const evaluateMarkdownEditorSurfaceMutations = () => {
   const toolbarReport = evaluateMarkdownEditorToolbarMutations()
+  const url = 'https://example.test/'
   const urlTrigger = resolveMarkdownSlashTrigger('https://example.test/', 21, {
     blockOnly: true,
+    documentEpoch: 1,
+    projection: stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection(url),
+      { id: 'surface-mutation', epoch: 1 },
+    ),
+    revision: 1,
   })
   return Object.freeze({
     authority: toolbarReport.authority,
     mutations: Object.freeze([
       Object.freeze({
-        kind: "local-command-list" as const,
+        kind: 'local-command-list' as const,
         equivalent:
           toolbarReport.mutations.find(
             (mutation) => mutation.kind === 'local-array',
@@ -488,7 +561,7 @@ export const evaluateMarkdownEditorSurfaceMutations = () => {
         accepted: false,
       }),
       Object.freeze({
-        kind: "slash-url-hijack" as const,
+        kind: 'slash-url-hijack' as const,
         equivalent: urlTrigger !== null,
         accepted: false,
       }),
