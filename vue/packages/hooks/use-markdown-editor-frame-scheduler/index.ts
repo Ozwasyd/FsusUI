@@ -287,9 +287,11 @@ export const createMarkdownEditorFrameScheduler = (
 
   return Object.freeze({
     schedule,
-    scheduleMeasure: (key, run, guard) => schedule({ guard, key, measure: run }),
-    scheduleMutate: (key, run, guard) => schedule({ guard, key, mutate: run }),
-    schedulePostPaint: (key, run, guard) =>
+    scheduleMeasure: (key: string, run: () => void, guard?: () => boolean) =>
+      schedule({ guard, key, measure: run }),
+    scheduleMutate: (key: string, run: () => void, guard?: () => boolean) =>
+      schedule({ guard, key, mutate: run }),
+    schedulePostPaint: (key: string, run: () => void, guard?: () => boolean) =>
       schedule({ guard, key, postPaint: run }),
     cancel,
     cancelAll,

@@ -57,6 +57,7 @@ test.describe('markdown editor frame scheduler evidence (#640)', () => {
       .not.toBeNull()
 
     const layoutBefore = await readLayoutCount(page)
+    const metricsBefore = await readFrameMetrics(editor)
     const ORDINARY_INPUTS = 12
     for (let index = 0; index < ORDINARY_INPUTS; index += 1) {
       await textarea.pressSequentially('字')
@@ -73,7 +74,8 @@ test.describe('markdown editor frame scheduler evidence (#640)', () => {
       fixture: 'markdownEditorTransaction=1',
       layoutGrowth,
       ordinaryInputs: ORDINARY_INPUTS,
-      scheduler: metrics,
+      schedulerAfter: metrics,
+      schedulerBefore: metricsBefore,
     }
     await testInfo.attach('frame-scheduler-ordinary-input.json', {
       body: JSON.stringify(evidence, null, 2),
@@ -83,7 +85,9 @@ test.describe('markdown editor frame scheduler evidence (#640)', () => {
     // No editor-owned read-after-write loop: every layout-affecting read is
     // scheduled in the measure phase, so layout invalidations stay linear in
     // the number of inputs instead of looping per feature per keystroke.
-    expect(metrics.violations).toBe(0)
+    // The lifetime violation counter may already include the one mount-time
+    // visual-viewport settle, so input must not add new violations.
+    expect(metrics.violations).toBe(metricsBefore.violations)
     expect(layoutGrowth).toBeLessThanOrEqual(ORDINARY_INPUTS * 4 + 24)
   })
 
