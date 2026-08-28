@@ -1,17 +1,17 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "3547edcdea0b0b812a659d44dac4a402eb773331",
+    "commitSha": "4e6f0c1a905111314b551634d9a5cd055de89db9",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "efedf2d7a3f11cbd9ecb583513d7f36c7e0068ef87e096d366b332eaac99e609",
     "iconHash": "d61254b1b1ff9addaf45293153df217b0c0d01ec69ec602081c44a01008b78de",
     "toolVersion": "avalonia-vue-public-api-baseline@1.0.0+vue-semantic-baseline@1.0.0",
-    "inputTreeHash": "b2de56d7156c8cd53c50d12871924fca10d5696542674b7dce0c9f3e38545219",
+    "inputTreeHash": "b30fc7c973a72b9441576c1f4e606b26f88b66a4a461c066c83862bf2bf2ac0d",
     "compilerOptionsHash": "d9b524c09f45aaa35ccad9f0656a37ec2382b7fcf5ca53ac0150ecf4d471865a",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "0e704fbe00cc2883e1b911fe399c2ee72067bda25646a2f078f094ae3982078e"
+    "outputHash": "a2b721f7a9b39a5e6c9327dedf70fef287d64b472eb740a00f948b8d492d4a4e"
   },
   "summary": {
     "componentModules": 93,
@@ -5594,6 +5594,7 @@
       "classification": "portable",
       "props": [
         "copiedLabel",
+        "disabled",
         "errorLabel",
         "inline",
         "label",
@@ -5627,6 +5628,18 @@
             "default": {
               "kind": "literal",
               "value": "Copied"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "disabled",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
             },
             "required": false,
             "readonly": false
@@ -25345,6 +25358,7 @@
       "classification": "portable",
       "props": [
         "copiedLabel",
+        "disabled",
         "errorLabel",
         "inline",
         "label",
@@ -25378,6 +25392,18 @@
             "default": {
               "kind": "literal",
               "value": "Copied"
+            },
+            "required": false,
+            "readonly": false
+          },
+          {
+            "name": "disabled",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "default": {
+              "kind": "missing"
             },
             "required": false,
             "readonly": false
@@ -32590,6 +32616,7 @@
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/metric-primitives.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss",
         "vue/packages/theme-chalk/src/radio-button.scss",
         "vue/packages/theme-chalk/src/upload.scss"
@@ -32618,6 +32645,7 @@
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/metric-primitives.scss",
         "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss",
         "vue/packages/theme-chalk/src/upload.scss"
