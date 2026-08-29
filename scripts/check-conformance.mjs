@@ -216,7 +216,26 @@ const checkVisual = () => {
     baseline.viewport === '0 0 1024 1024',
     'icon baseline viewport mismatch',
   )
-  for (const icon of ['search', 'settings', 'warning', 'chevron-right']) {
+  for (const icon of [
+    'search',
+    'settings',
+    'warning',
+    'chevron-right',
+    'folder',
+    'outline',
+    'save-all',
+    'close-all',
+    'file',
+    'file-text',
+    'file-markdown',
+    'file-code',
+    'file-data',
+    'file-image',
+    'file-archive',
+    'file-document',
+    'confirm',
+    'file-import',
+  ]) {
     assertIncludes(icons, icon, 'tests/conformance/visual/icon-alignment.md')
     const baselineIcon = baseline.icons?.find((entry) => entry.id === icon)
     assert(baselineIcon, `icon baseline must include ${icon}`)

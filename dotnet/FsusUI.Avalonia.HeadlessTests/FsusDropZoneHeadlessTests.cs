@@ -783,6 +783,80 @@ public class FsusDropZoneHeadlessTests
     return window;
   }
 
+  [AvaloniaFact]
+  public void WindowLevelDragRoutingThroughExternalProxyDrivesVisualStateWithoutDropEvents()
+  {
+    var window = CreateStyledWindow();
+    var root = new Panel();
+    var contentHost = new Border();
+    var dropZone = new FsusDropZone
+    {
+      Width = 220,
+      Height = 90,
+      IsHitTestVisible = false,
+      AccessibleName = "Overlay drop surface",
+    };
+    root.Children.Add(contentHost);
+    root.Children.Add(dropZone);
+    window.Content = root;
+    window.Show();
+    Dispatcher.UIThread.RunJobs();
+
+    var raisedEvents = 0;
+    dropZone.FilesDropped += (_, _) => raisedEvents++;
+    dropZone.FilesRejected += (_, _) => raisedEvents++;
+    dropZone.BrowseRequested += (_, _) => raisedEvents++;
+
+    // Desktop-shell proxy pattern: only the window root receives the routed
+    // drag events and drives the overlay zone state through the public
+    // external-drag contract.
+    root.AddHandler(
+      DragDrop.DragEnterEvent,
+      (_, _) => dropZone.SetExternalDragOver(true));
+    root.AddHandler(
+      DragDrop.DragLeaveEvent,
+      (_, _) => dropZone.SetExternalDragOver(false));
+
+    var enterArgs = new DragEventArgs(
+      DragDrop.DragEnterEvent,
+      new DataTransfer(),
+      contentHost,
+      new Point(10, 10),
+      KeyModifiers.None);
+    contentHost.RaiseEvent(enterArgs);
+    Dispatcher.UIThread.RunJobs();
+
+    Assert.True(dropZone.IsDragOver);
+    Assert.Contains("fsus-dragover", dropZone.Classes);
+    Assert.Contains(":dragover", dropZone.Classes);
+    Assert.Equal("dragover", AutomationProperties.GetItemStatus(dropZone));
+    Assert.Equal(0, raisedEvents);
+
+    var leaveArgs = new DragEventArgs(
+      DragDrop.DragLeaveEvent,
+      new DataTransfer(),
+      contentHost,
+      new Point(10, 10),
+      KeyModifiers.None);
+    contentHost.RaiseEvent(leaveArgs);
+    Dispatcher.UIThread.RunJobs();
+
+    Assert.False(dropZone.IsDragOver);
+    Assert.DoesNotContain("fsus-dragover", dropZone.Classes);
+    Assert.Equal("ready", AutomationProperties.GetItemStatus(dropZone));
+    Assert.Equal(0, raisedEvents);
+
+    // The external state resets when the proxy overlay detaches.
+    Assert.True(dropZone.SetExternalDragOver(true));
+    root.Children.Remove(dropZone);
+    Dispatcher.UIThread.RunJobs();
+    Assert.False(dropZone.IsDragOver);
+    Assert.Equal("ready", AutomationProperties.GetItemStatus(dropZone));
+    Assert.Equal(0, raisedEvents);
+
+    window.Close();
+  }
+
   private static DragEventArgs RaiseDrag(
     FsusDropZone dropZone,
     global::Avalonia.Interactivity.RoutedEvent<DragEventArgs> routedEvent,
