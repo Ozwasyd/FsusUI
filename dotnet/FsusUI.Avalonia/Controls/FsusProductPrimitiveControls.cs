@@ -444,13 +444,36 @@ public class FsusCopyableDetail : FsusProductPrimitiveControl
   public string Label { get; set; } = string.Empty;
   public string Value { get; set; } = string.Empty;
   public bool WasCopied { get; private set; }
+  public bool IsDisabled
+  {
+    get => !IsEnabled;
+    set
+    {
+      IsEnabled = !value;
+      SyncState();
+    }
+  }
 
   public string Copy()
   {
+    if (IsDisabled)
+    {
+      return string.Empty;
+    }
+
     WasCopied = true;
     SyncState();
     return Value;
   }
+
+  protected override void SyncState()
+  {
+    base.SyncState();
+    FsusComponentClasses.Ensure(this, "fsus-disabled", IsDisabled);
+  }
+
+  protected override string BuildStatus() =>
+    $"{base.BuildStatus()}, {(IsDisabled ? "disabled" : "available")}";
 }
 
 public class FsusInboxLayout : FsusProductPrimitiveControl

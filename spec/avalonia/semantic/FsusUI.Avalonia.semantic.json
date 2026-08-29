@@ -3095,6 +3095,14 @@
       "isSealed": false,
       "properties": [
         {
+          "name": "IsDisabled",
+          "type": "System.Boolean",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": true,
+          "isStatic": false
+        },
+        {
           "name": "Label",
           "type": "System.String",
           "nullable": true,
