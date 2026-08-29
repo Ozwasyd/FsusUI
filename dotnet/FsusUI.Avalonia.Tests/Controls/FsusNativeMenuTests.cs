@@ -4,6 +4,7 @@ using Avalonia.Input;
 using FsusUI.Avalonia.Controls;
 using System.Security.Cryptography;
 using System.Text.Json;
+using System.Windows.Input;
 
 namespace FsusUI.Avalonia.Tests.Controls;
 
@@ -207,6 +208,69 @@ public class FsusNativeMenuTests
   }
 
   [Fact]
+  public void InitiallyDisabledCommandStaysDisabledAfterBuildAndReflectsNestedState()
+  {
+    var executed = false;
+    var saveCommand = new FsusPlatformCommand("file.save", "Save", FsusPlatformRole.FileSave)
+    {
+      IsEnabled = false,
+      ExecuteAction = _ => executed = true,
+    };
+
+    var fileMenu = FsusNativeMenuItemModel.SubMenu(
+      "File",
+      FsusNativeMenuItemModel.Action(saveCommand));
+
+    using var builder = new FsusNativeMenuBuilder();
+    var menu = builder.Build([fileMenu], FsusShortcutPlatform.Windows);
+
+    var fileMenuItem = (NativeMenuItem)menu.Items.First(i => i is NativeMenuItem m && m.Header == "File");
+    var saveMenuItem = (NativeMenuItem)fileMenuItem.Menu!.Items.First(i => i is NativeMenuItem m && m.Header == "Save");
+
+    // Item disabled before the first Build must not be coerced back to enabled
+    // by assigning the generated command.
+    Assert.False(saveMenuItem.IsEnabled);
+    Assert.NotNull(saveMenuItem.Command);
+    Assert.False(saveMenuItem.Command!.CanExecute(null));
+
+    // The execution guard still blocks a disabled command.
+    saveMenuItem.Command.Execute(null);
+    Assert.False(executed);
+
+    // CanExecuteChanged fires when the source command state changes.
+    var canExecuteChangedCount = 0;
+    saveMenuItem.Command.CanExecuteChanged += (_, _) => canExecuteChangedCount++;
+
+    saveCommand.IsEnabled = true;
+    Assert.True(saveMenuItem.IsEnabled);
+    Assert.True(saveMenuItem.Command.CanExecute(null));
+    Assert.Equal(1, canExecuteChangedCount);
+
+    // Nested command state participates in CanExecute like the execute guard.
+    // FsusPlatformCommand.Command changes carry no change notification, so the
+    // generated CanExecute reflects the live state without moving IsEnabled.
+    saveCommand.Command = new DelegateICommand(_ => { }, canExecute: false);
+    Assert.False(saveMenuItem.Command.CanExecute(null));
+
+    saveCommand.Command = new DelegateICommand(_ => { }, canExecute: true);
+    Assert.True(saveMenuItem.Command.CanExecute(null));
+    Assert.True(saveMenuItem.IsEnabled);
+  }
+
+  private sealed class DelegateICommand(Action<object?> execute, bool canExecute) : ICommand
+  {
+    public event EventHandler? CanExecuteChanged
+    {
+      add { }
+      remove { }
+    }
+
+    public bool CanExecute(object? parameter) => canExecute;
+
+    public void Execute(object? parameter) => execute(parameter);
+  }
+
+  [Fact]
   public void DockMenuContractAndWindowlessRoutingFallbackWorks()
   {
     Assert.True(FsusDockMenuContract.IsSupported(FsusShortcutPlatform.macOS));
@@ -243,6 +307,24 @@ public class FsusNativeMenuTests
       recentFiles,
       platform: FsusShortcutPlatform.Windows);
     Assert.Null(winDock);
+
+    // A dock command that starts disabled keeps its disabled state.
+    var disabledDockCommand = new FsusPlatformCommand(
+      "dock.disabled",
+      "Disabled Action",
+      FsusPlatformRole.DockOpen)
+    {
+      IsEnabled = false,
+    };
+    var dockWithDisabled = FsusDockMenuContract.BuildDockMenu(
+      [],
+      additionalCommands: [disabledDockCommand],
+      platform: FsusShortcutPlatform.macOS);
+    Assert.NotNull(dockWithDisabled);
+    var dockDisabledItem = (NativeMenuItem)dockWithDisabled.Items.Single(
+      i => i is NativeMenuItem m && m.Header == "Disabled Action");
+    Assert.False(dockDisabledItem.IsEnabled);
+    Assert.False(dockDisabledItem.Command!.CanExecute(null));
 
     // Dock menu windowless router
     var router = new FsusDockMenuRouter();

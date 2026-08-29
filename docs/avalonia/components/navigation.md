@@ -23,7 +23,11 @@ Keyboard navigation and focus rings follow `docs/avalonia/platform-differences.m
 `FsusPlatformCommand` is the neutral command source for
 `FsusNativeMenuBuilder` and `FsusCommandPaletteModel`. A builder owns its
 subscriptions: dispose it or rebuild through the same instance so obsolete
-native items stop receiving state updates. `FsusNativeMenuMetadata.GetRole`
+native items stop receiving state updates. The generated menu-item command
+reflects `FsusPlatformCommand.IsEnabled` and any nested `Command` state, so an
+item whose command starts disabled renders disabled from the first `Build`,
+stays synchronized on `StateChanged` and `CanExecuteChanged`, and never
+executes while disabled. `FsusNativeMenuMetadata.GetRole`
 and `GetCommandId` preserve platform role and command identity independently
 of localized labels.
 

@@ -479,7 +479,11 @@ public sealed class FsusNativeMenuBuilder : IDisposable
     if (model.Command is not null)
     {
       var cmd = model.Command;
-      item.Command = new ActionCommand(_ => cmd.Execute());
+      var itemCommand = new ActionCommand(
+        () => cmd.IsEnabled &&
+          (cmd.Command?.CanExecute(cmd.CommandParameter) ?? true),
+        _ => cmd.Execute());
+      item.Command = itemCommand;
       FsusNativeMenuMetadata.Set(
         item,
         cmd.Role != FsusPlatformRole.None ? cmd.Role : model.Role,
@@ -488,6 +492,7 @@ public sealed class FsusNativeMenuBuilder : IDisposable
 
       EventHandler onStateChanged = (_, _) =>
       {
+        itemCommand.RaiseCanExecuteChanged();
         item.Header = cmd.Label;
         item.IsEnabled = cmd.IsEnabled;
         item.IsChecked = cmd.IsChecked;
@@ -539,7 +544,7 @@ public sealed class FsusNativeMenuBuilder : IDisposable
         {
           Header = recentPath,
           ToolTip = $"Open recent item {recentPath}",
-          Command = new ActionCommand(_ => model.OpenRecentAction?.Invoke(recentPath)),
+          Command = new ActionCommand(() => true, _ => model.OpenRecentAction?.Invoke(recentPath)),
         };
         FsusNativeMenuMetadata.Set(
           recentItem,
@@ -556,7 +561,7 @@ public sealed class FsusNativeMenuBuilder : IDisposable
         {
           Header = "Clear Recent",
           ToolTip = "Clear the recent items list",
-          Command = new ActionCommand(_ => model.ClearRecentAction.Invoke()),
+          Command = new ActionCommand(() => true, _ => model.ClearRecentAction.Invoke()),
         };
         FsusNativeMenuMetadata.Set(
           clearItem,
@@ -1210,17 +1215,17 @@ public sealed class FsusNativeMenuBuilder : IDisposable
     return FsusShortcutPlatform.Linux;
   }
 
-  private sealed class ActionCommand(Action<object?> action) : ICommand
+  private sealed class ActionCommand(Func<bool> canExecute, Action<object?> action)
+    : ICommand
   {
-    public event EventHandler? CanExecuteChanged
-    {
-      add { }
-      remove { }
-    }
+    public event EventHandler? CanExecuteChanged;
 
-    public bool CanExecute(object? parameter) => true;
+    public bool CanExecute(object? parameter) => canExecute();
 
     public void Execute(object? parameter) => action(parameter);
+
+    public void RaiseCanExecuteChanged() =>
+      CanExecuteChanged?.Invoke(this, EventArgs.Empty);
   }
 }
 
@@ -1260,7 +1265,7 @@ public sealed class FsusDockMenuContract
         {
           Header = path,
           ToolTip = $"Open recent item {path}",
-          Command = new ActionCommand(_ => openRecentAction?.Invoke(path)),
+          Command = new ActionCommand(() => true, _ => openRecentAction?.Invoke(path)),
         };
         FsusNativeMenuMetadata.Set(
           recentItem,
@@ -1277,7 +1282,7 @@ public sealed class FsusDockMenuContract
         {
           Header = "Clear Recent",
           ToolTip = "Clear the recent items list",
-          Command = new ActionCommand(_ => clearRecentAction()),
+          Command = new ActionCommand(() => true, _ => clearRecentAction()),
         };
         FsusNativeMenuMetadata.Set(
           clearItem,
@@ -1305,7 +1310,10 @@ public sealed class FsusDockMenuContract
           ToggleType = (MenuItemToggleType)(int)cmd.ToggleType,
           Gesture = cmd.Gesture?.ToKeyGesture(),
           ToolTip = cmd.Description,
-          Command = new ActionCommand(_ => cmd.Execute()),
+          Command = new ActionCommand(
+            () => cmd.IsEnabled &&
+              (cmd.Command?.CanExecute(cmd.CommandParameter) ?? true),
+            _ => cmd.Execute()),
         };
         FsusNativeMenuMetadata.Set(
           item,
@@ -1343,7 +1351,8 @@ public sealed class FsusDockMenuContract
     return menu;
   }
 
-  private sealed class ActionCommand(Action<object?> action) : ICommand
+  private sealed class ActionCommand(Func<bool> canExecute, Action<object?> action)
+    : ICommand
   {
     public event EventHandler? CanExecuteChanged
     {
@@ -1351,7 +1360,7 @@ public sealed class FsusDockMenuContract
       remove { }
     }
 
-    public bool CanExecute(object? parameter) => true;
+    public bool CanExecute(object? parameter) => canExecute();
 
     public void Execute(object? parameter) => action(parameter);
   }
