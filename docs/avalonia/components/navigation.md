@@ -10,6 +10,11 @@ Use `FsusTabs`, `FsusTabPane`, `FsusMenu`, `FsusMenuItem`, `FsusSubMenu`,
 `FsusSettingsScrollResetBehavior`, `FsusPlatformCommand`,
 `FsusNativeMenuItemModel`, and `FsusNativeMenuBuilder`.
 
+Tab headers raise the typed `PaneContextRequested` event
+(`FsusTabPaneContextEventArgs`) through right-click, `Shift+F10`/`Apps`, or
+`RequestPaneContext(key, source)` without changing the selected tab; compose it
+with the shared context-menu surface described in `tree.md`.
+
 ## Vue Contract Mapping
 
 Vue active keys, tab panes, menu item groups, breadcrumbs, page header actions,
@@ -23,7 +28,11 @@ Keyboard navigation and focus rings follow `docs/avalonia/platform-differences.m
 `FsusPlatformCommand` is the neutral command source for
 `FsusNativeMenuBuilder` and `FsusCommandPaletteModel`. A builder owns its
 subscriptions: dispose it or rebuild through the same instance so obsolete
-native items stop receiving state updates. `FsusNativeMenuMetadata.GetRole`
+native items stop receiving state updates. The generated menu-item command
+reflects `FsusPlatformCommand.IsEnabled` and any nested `Command` state, so an
+item whose command starts disabled renders disabled from the first `Build`,
+stays synchronized on `StateChanged` and `CanExecuteChanged`, and never
+executes while disabled. `FsusNativeMenuMetadata.GetRole`
 and `GetCommandId` preserve platform role and command identity independently
 of localized labels.
 
