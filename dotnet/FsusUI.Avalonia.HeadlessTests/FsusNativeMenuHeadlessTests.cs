@@ -132,7 +132,10 @@ public class FsusNativeMenuHeadlessTests
     Assert.NotNull(menu);
     Assert.Equal(
       ["Edit", "Help"],
-      menu.Items.OfType<NativeMenuItem>().Select(item => item.Header).ToArray());
+      menu.Items
+        .OfType<NativeMenuItem>()
+        .Select(item => item.Header ?? string.Empty)
+        .ToArray());
 
     var editItem = Assert.IsType<NativeMenuItem>(menu.Items[0]);
     var lockItem = Assert.IsType<NativeMenuItem>(Assert.Single(editItem.Menu!.Items));
