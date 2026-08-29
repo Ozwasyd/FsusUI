@@ -10,7 +10,7 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "bc7098812f49f58b18fc927f6a9fb305605c1264501b3703b3da94257ef4d7cd",
+      "hash": "5d998b2ea7ded7fec25c11ea6cfc9cd09c0af316ed60c78350cfff4c2d50bfc5",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
@@ -25,7 +25,7 @@
     },
     "avaloniaIcons": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.Icons.semantic.json",
-      "hash": "97e6f6498f0bb1a74020420a9b93abd09c3b5819cb02abb0d3d476bd34b8ee6c",
+      "hash": "91197870de59bfaca06208569de4e470352e6991debbd55d1086c034b91b66da",
       "packageId": "FsusUI.Avalonia.Icons"
     },
     "markdownEditorGate": {
@@ -137658,6 +137658,22 @@
       "memberCount": 145,
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-tokens"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Icons.FsusFileTypeIcon",
+      "kind": "class",
+      "packageId": "avaloniaIcons",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.Icons.semantic.json",
+      "memberCount": 2,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-file-type-icon"
       ],
       "governance": {
         "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
