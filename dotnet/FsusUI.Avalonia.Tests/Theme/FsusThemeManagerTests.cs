@@ -33,6 +33,7 @@ public class FsusThemeManagerTests
     Assert.Equal(FsusDensity.Compact, resolved.Density);
     Assert.Equal(FsusMotionMode.Disabled, resolved.MotionMode);
     AssertBrush(resources, FsusThemeResourceKeys.BackgroundBrush, "#000000");
+    AssertBrush(resources, "FsusThemeTreeSurfaceBrush", "#000000");
     AssertBrush(resources, FsusThemeResourceKeys.FocusBrush, "#FF00AA");
     AssertBrush(
       resources,
@@ -49,6 +50,19 @@ public class FsusThemeManagerTests
       TimeSpan.FromMilliseconds(1),
       resources[FsusThemeResourceKeys.MotionDurationEffective]
     );
+  }
+
+  [Fact]
+  public void ApplyUpdatesTreeSurfaceForRuntimeDarkThemeChanges()
+  {
+    var resources = new ResourceDictionary();
+    var manager = new FsusThemeManager();
+
+    manager.Apply(
+      resources,
+      new FsusThemeOptions { Variant = FsusThemeVariant.Dark });
+
+    AssertBrush(resources, "FsusThemeTreeSurfaceBrush", "#1B2433");
   }
 
   [Fact]

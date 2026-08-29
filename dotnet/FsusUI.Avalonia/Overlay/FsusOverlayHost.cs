@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using FsusUI.Avalonia.Controls;
 
 namespace FsusUI.Avalonia.Overlay;
@@ -267,11 +268,88 @@ public sealed class FsusOverlayHost : Panel
     return target?.MoveFocus(direction) ?? false;
   }
 
+  protected override void OnPointerPressed(PointerPressedEventArgs e)
+  {
+    base.OnPointerPressed(e);
+    if (e.Handled)
+    {
+      return;
+    }
+
+    var pending = DismissPointerOutsideAsync(e.GetPosition(this));
+    if (pending.IsCompleted)
+    {
+      e.Handled = pending.Result;
+      return;
+    }
+
+    _ = CompletePointerDismissAsync(pending, e);
+  }
+
+  protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+  {
+    foreach (var entry in entries.ToArray())
+    {
+      var pending = CloseAsync(entry, FsusOverlayCloseReason.HostDetached);
+      if (!pending.IsCompletedSuccessfully)
+      {
+        _ = pending.AsTask();
+      }
+    }
+
+    base.OnDetachedFromVisualTree(e);
+  }
+
+  protected override Size MeasureOverride(Size availableSize)
+  {
+    var requiredWidth = 0d;
+    var requiredHeight = 0d;
+    foreach (var child in Children)
+    {
+      var entry = entries.FirstOrDefault((candidate) =>
+        ReferenceEquals(candidate.Content, child));
+      var constraint = entry?.Bounds.Size ?? availableSize;
+      child.Measure(constraint);
+      if (entry is not null)
+      {
+        requiredWidth = Math.Max(requiredWidth, entry.Bounds.Right);
+        requiredHeight = Math.Max(requiredHeight, entry.Bounds.Bottom);
+      }
+      else
+      {
+        requiredWidth = Math.Max(requiredWidth, child.DesiredSize.Width);
+        requiredHeight = Math.Max(requiredHeight, child.DesiredSize.Height);
+      }
+    }
+
+    return new Size(
+      double.IsFinite(availableSize.Width) ? availableSize.Width : requiredWidth,
+      double.IsFinite(availableSize.Height) ? availableSize.Height : requiredHeight);
+  }
+
+  protected override Size ArrangeOverride(Size finalSize)
+  {
+    foreach (var child in Children)
+    {
+      var entry = entries.FirstOrDefault((candidate) =>
+        ReferenceEquals(candidate.Content, child));
+      child.Arrange(entry?.Bounds ?? new Rect(finalSize));
+    }
+
+    return finalSize;
+  }
+
   private void RestoreFocus(FsusOverlayEntry entry)
   {
     LastRestoredFocus = entry.Options.RestoreFocusTo ?? LastFocusedElement;
     LastFocusedElement = LastRestoredFocus;
+    LastRestoredFocus?.Focus();
   }
+
+  private static async Task CompletePointerDismissAsync(
+    ValueTask<bool> pending,
+    PointerPressedEventArgs e) =>
+    e.Handled = await pending;
 
   private static (Rect Bounds, FsusOverlayPlacement Placement) ResolveBounds(
     FsusOverlayOptions options)
