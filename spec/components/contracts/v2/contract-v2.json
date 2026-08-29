@@ -10,12 +10,12 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "face58226569a9d327295fbfe053d8d2dfec2c5779f5290674d3ecea806795b0",
+      "hash": "4a29e669ad310fc77dc7e0774b928374616963fb1aabc760bf91f81e197d0f87",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "5aa6c456a25d7f2f0c4de3ea7f4e109b87b28d09488326d18285c8e19123edd5",
+      "hash": "4002ed742e18387b3d6d79f9cc22cd906a478a8a9ceb08c427010271587e00a5",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
@@ -39036,6 +39036,32 @@
           ]
         },
         {
+          "member": "OpenPreview",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image.avalonia-extra.open-preview"
+          ]
+        },
+        {
+          "member": "PreviewLoader",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image.avalonia-extra.preview-loader"
+          ]
+        },
+        {
           "member": "Source",
           "kind": "avalonia-extra",
           "governance": {
@@ -39903,6 +39929,19 @@
           ]
         },
         {
+          "member": "ActiveSourceChanged",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.avalonia-extra.active-source-changed"
+          ]
+        },
+        {
           "member": "CloseAsync",
           "kind": "avalonia-extra",
           "governance": {
@@ -39916,6 +39955,84 @@
           ]
         },
         {
+          "member": "ContentFactory",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.avalonia-extra.content-factory"
+          ]
+        },
+        {
+          "member": "CurrentLoadTask",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.avalonia-extra.current-load-task"
+          ]
+        },
+        {
+          "member": "Dispose",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.avalonia-extra.dispose"
+          ]
+        },
+        {
+          "member": "ErrorMessage",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.avalonia-extra.error-message"
+          ]
+        },
+        {
+          "member": "HasLoader",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.avalonia-extra.has-loader"
+          ]
+        },
+        {
+          "member": "ImageLoader",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.avalonia-extra.image-loader"
+          ]
+        },
+        {
           "member": "IsOpen",
           "kind": "avalonia-extra",
           "governance": {
@@ -39926,6 +40043,45 @@
           },
           "scenarioIds": [
             "scenario.v2.el-image-viewer.avalonia-extra.is-open"
+          ]
+        },
+        {
+          "member": "LoadActiveSourceAsync",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.avalonia-extra.load-active-source-async"
+          ]
+        },
+        {
+          "member": "LoadedContent",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.avalonia-extra.loaded-content"
+          ]
+        },
+        {
+          "member": "NextAsync",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.avalonia-extra.next-async"
           ]
         },
         {
@@ -39981,6 +40137,45 @@
           ]
         },
         {
+          "member": "PreviousAsync",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.avalonia-extra.previous-async"
+          ]
+        },
+        {
+          "member": "RefreshAsync",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.avalonia-extra.refresh-async"
+          ]
+        },
+        {
+          "member": "SourceLoader",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.avalonia-extra.source-loader"
+          ]
+        },
+        {
           "member": "Sources",
           "kind": "avalonia-extra",
           "governance": {
@@ -39991,6 +40186,19 @@
           },
           "scenarioIds": [
             "scenario.v2.el-image-viewer.avalonia-extra.sources"
+          ]
+        },
+        {
+          "member": "Status",
+          "kind": "avalonia-extra",
+          "governance": {
+            "reason": "Avalonia-only public member explicitly registered; no Vue counterpart exists in the baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          },
+          "scenarioIds": [
+            "scenario.v2.el-image-viewer.avalonia-extra.status"
           ]
         }
       ],
@@ -133298,6 +133506,22 @@
   ],
   "avaloniaOnlyTypes": [
     {
+      "type": "FsusUI.Avalonia.Controls.FsusActiveSourceChangedEventArgs",
+      "kind": "class",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 2,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.fsus-active-source-changed-event-args"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
       "type": "FsusUI.Avalonia.Controls.FsusAffixChangedEventArgs",
       "kind": "class",
       "packageId": "avalonia",
@@ -136729,6 +136953,22 @@
       "memberCount": 6,
       "scenarioIds": [
         "scenario.v2.avalonia-only.i-fsus-form-field-adapter"
+      ],
+      "governance": {
+        "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",
+        "owner": "FsusUI Core",
+        "testPolicy": "contract",
+        "reviewPolicy": "pr-review"
+      }
+    },
+    {
+      "type": "FsusUI.Avalonia.Controls.IFsusImageLoader",
+      "kind": "interface",
+      "packageId": "avalonia",
+      "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
+      "memberCount": 1,
+      "scenarioIds": [
+        "scenario.v2.avalonia-only.i-fsus-image-loader"
       ],
       "governance": {
         "reason": "Avalonia-only public type explicitly registered; no Vue component counterpart exists in the baseline.",

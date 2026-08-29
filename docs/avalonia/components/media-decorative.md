@@ -26,12 +26,20 @@ motion resources.
 ## Minimal Avalonia Example
 
 ```csharp
+using System.Threading;
+using System.Threading.Tasks;
+using Avalonia.Controls;
 using FsusUI.Avalonia.Controls;
 
-var image = new FsusImage
+var viewer = new FsusImageViewer
 {
-  AccessibleName = "Invoice preview",
-  Fit = FsusImageFit.Contain,
+  AccessibleName = "Document gallery",
+  Sources = { "invoice-1.png", "diagram.svg" },
+  ImageLoader = async (source, cancellationToken) =>
+  {
+    // App-provided loader renders raster images, SVGs, data URIs, or custom controls
+    return new TextBlock { Text = $"Preview: {source}" };
+  },
 };
 ```
 

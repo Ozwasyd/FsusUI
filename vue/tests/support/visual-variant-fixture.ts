@@ -16,6 +16,10 @@ const visualViewports = {
   'transfer-390': { width: 390, height: 1400 },
   'transfer-768': { width: 768, height: 1400 },
   'transfer-1440': { width: 1440, height: 1400 },
+  'markdown-editor-375': { width: 375, height: 900 },
+  'markdown-editor-768': { width: 768, height: 900 },
+  'markdown-editor-1366': { width: 1366, height: 900 },
+  'markdown-editor-1440': { width: 1440, height: 900 },
 } as const
 
 export type VisualViewportName = keyof typeof visualViewports
