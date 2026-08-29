@@ -196,6 +196,10 @@ public sealed class FsusThemeManager
       resources,
       FsusTokens.ComponentStateButtonPrimaryBackgroundHoverResourceKey,
       palette.PrimaryHover);
+    SetBrush(
+      resources,
+      FsusTokens.ColorActionPrimaryBrushResourceKey,
+      palette.PrimaryHover);
     SetBrush(resources, FsusThemeResourceKeys.DangerBrush, palette.Danger);
     SetBrush(
       resources,

@@ -36,6 +36,11 @@ public class FsusThemeManagerTests
     AssertBrush(resources, FsusThemeResourceKeys.FocusBrush, "#FF00AA");
     AssertBrush(
       resources,
+      FsusTokens.ColorActionPrimaryBrushResourceKey,
+      "#FF00AA"
+    );
+    AssertBrush(
+      resources,
       FsusTokens.ComponentStateButtonPrimaryBackgroundDefaultResourceKey,
       "#FFFFFF"
     );
@@ -49,6 +54,30 @@ public class FsusThemeManagerTests
       TimeSpan.FromMilliseconds(1),
       resources[FsusThemeResourceKeys.MotionDurationEffective]
     );
+  }
+
+  [Fact]
+  public void ApplyRefreshesColorActionPrimaryBrushForVariantPalettes()
+  {
+    var resources = new ResourceDictionary();
+    var manager = new FsusThemeManager();
+
+    manager.Apply(resources, new FsusThemeOptions { Variant = FsusThemeVariant.Light });
+
+    AssertBrush(resources, FsusTokens.ColorActionPrimaryBrushResourceKey, "#2A599C");
+
+    manager.Apply(resources, new FsusThemeOptions { Variant = FsusThemeVariant.Dark });
+
+    AssertBrush(resources, FsusTokens.ColorActionPrimaryBrushResourceKey, "#4B79CC");
+    AssertBrush(
+      resources,
+      FsusTokens.ComponentStateButtonPrimaryBackgroundHoverResourceKey,
+      "#4B79CC"
+    );
+
+    manager.Apply(resources, new FsusThemeOptions { HighContrast = true });
+
+    AssertBrush(resources, FsusTokens.ColorActionPrimaryBrushResourceKey, "#FFFF00");
   }
 
   [Fact]
