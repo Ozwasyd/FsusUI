@@ -15,7 +15,8 @@ activation through the command or the control's `ActionActivated` event.
 Activation stays distinct from dismissal, so timeouts, the dismiss control,
 `CloseOnClick`, and programmatic `CloseAsync` never invoke the action. By
 default a notification stays open until it is dismissed or closed; set
-`Duration` to opt into auto-close after the given span.
+`Duration` to opt into auto-close after the given span. Pointer presence pauses
+the pending timer, and pointer exit restarts a fresh full-duration interval.
 
 ## Vue Contract Mapping
 

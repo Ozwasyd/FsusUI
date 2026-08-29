@@ -325,6 +325,7 @@ public class FsusNotification : ContentControl
   private DispatcherTimer? timeoutTimer;
   private Button? actionButton;
   private Button? dismissButton;
+  private bool isPointerOver;
 
   public string Title
   {
@@ -411,13 +412,39 @@ public class FsusNotification : ContentControl
   protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
   {
     base.OnAttachedToVisualTree(e);
+    isPointerOver = IsPointerOver;
     ArmTimeout();
   }
 
   protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
   {
     base.OnDetachedFromVisualTree(e);
+    isPointerOver = false;
     StopTimeout();
+  }
+
+  protected override void OnPointerEntered(PointerEventArgs e)
+  {
+    base.OnPointerEntered(e);
+    isPointerOver = true;
+    StopTimeout();
+  }
+
+  protected override void OnPointerExited(PointerEventArgs e)
+  {
+    base.OnPointerExited(e);
+    isPointerOver = false;
+    ArmTimeout();
+  }
+
+  protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
+  {
+    base.OnPointerCaptureLost(e);
+    if (!IsPointerOver)
+    {
+      isPointerOver = false;
+      ArmTimeout();
+    }
   }
 
   protected override void OnPointerPressed(PointerPressedEventArgs e)
@@ -477,7 +504,7 @@ public class FsusNotification : ContentControl
 
   private void ArmTimeout()
   {
-    if (Duration <= TimeSpan.Zero || IsClosed)
+    if (Duration <= TimeSpan.Zero || IsClosed || isPointerOver)
     {
       return;
     }

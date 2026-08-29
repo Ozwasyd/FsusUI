@@ -103,6 +103,7 @@ public class FsusNotificationHeadlessTests
   {
     var (window, _, service) = CreateStyledService(nameof(ThemeVariant.Light));
     var commandExecuted = 0;
+    MovePointerAway(window);
 
     var handle = await service.ShowAsync(new FsusNotificationOptions
     {
@@ -141,18 +142,68 @@ public class FsusNotificationHeadlessTests
       Duration = TimeSpan.FromMilliseconds(50),
       ActionLabel = "Details",
       ActionCommand = new TestCommand(_ => commandExecuted++),
+      Placement = FsusServicePlacement.TopLeft,
     });
     Assert.NotNull(handle);
     var notification = handle!.Control;
     window.UpdateLayout();
     Dispatcher.UIThread.RunJobs();
-    Assert.False(handle.IsClosed);
+
+    Assert.False(notification.IsPointerOver);
 
     await Task.Delay(300);
     Dispatcher.UIThread.RunJobs();
 
     Assert.True(handle.IsClosed);
     Assert.True(notification.IsClosed);
+    Assert.Equal(0, commandExecuted);
+
+    window.Close();
+  }
+
+  [AvaloniaFact]
+  public async Task HoverPausesTimeoutAndPointerExitRestartsFullDuration()
+  {
+    var (window, _, service) = CreateStyledService(nameof(ThemeVariant.Light));
+    var commandExecuted = 0;
+    MovePointerAway(window);
+
+    var handle = await service.ShowAsync(new FsusNotificationOptions
+    {
+      Title = "Connection lost",
+      Message = "Reconnect to continue syncing.",
+      Duration = TimeSpan.FromMilliseconds(150),
+      ActionLabel = "Settings",
+      ActionCommand = new TestCommand(_ => commandExecuted++),
+      Placement = FsusServicePlacement.TopLeft,
+    });
+    Assert.NotNull(handle);
+    var notification = handle!.Control;
+    window.UpdateLayout();
+    Dispatcher.UIThread.RunJobs();
+
+    var center = notification.TransformToVisual(window)!.Value.Transform(new Point());
+    center += new Point(notification.Bounds.Width / 2, notification.Bounds.Height / 2);
+    window.MouseMove(center);
+    Dispatcher.UIThread.RunJobs();
+    Assert.True(notification.IsPointerOver);
+
+    await Task.Delay(350);
+    Dispatcher.UIThread.RunJobs();
+    Assert.False(handle.IsClosed);
+
+    MovePointerAway(window);
+    window.UpdateLayout();
+    Dispatcher.UIThread.RunJobs();
+    Assert.False(handle.IsClosed);
+    Assert.False(notification.IsPointerOver);
+    await Task.Delay(75);
+    Dispatcher.UIThread.RunJobs();
+    Assert.False(handle.IsClosed);
+
+    await Task.Delay(200);
+    Dispatcher.UIThread.RunJobs();
+    Assert.True(handle.IsClosed);
     Assert.Equal(0, commandExecuted);
 
     window.Close();
@@ -217,6 +268,12 @@ public class FsusNotificationHeadlessTests
     var offset = new Point(control.Bounds.Width / 2, control.Bounds.Height / 2);
     window.MouseDown(center + offset, MouseButton.Left);
     window.MouseUp(center + offset, MouseButton.Left);
+    Dispatcher.UIThread.RunJobs();
+  }
+
+  private static void MovePointerAway(Window window)
+  {
+    window.MouseMove(new Point(2, 2));
     Dispatcher.UIThread.RunJobs();
   }
 
