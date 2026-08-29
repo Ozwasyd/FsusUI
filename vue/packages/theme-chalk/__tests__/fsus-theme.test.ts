@@ -3615,6 +3615,37 @@ describe('Fsus theme visual baseline', () => {
       'font-family: var(--el-font-family-monospace, monospace);',
       'overflow-wrap: anywhere;',
     ])
+    expectCssRule(css, '.el-diagnostics-item__detail-toggle', [
+      'min-width: var(--fsus-control-height-compact, 40px);',
+      'min-height: var(--fsus-control-height-compact, 40px);',
+      'opacity: 1;',
+    ])
+    expectCssRule(css, '.el-diagnostics-item__detail-toggle:focus-visible', [
+      'box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px) var(--fsus-scholarly-blue, var(--el-color-primary));',
+      'outline: none;',
+    ])
+    expectCssRule(css, '.el-copyable-detail__button', [
+      'min-width: var(--fsus-control-height-compact, 40px);',
+      'min-height: var(--fsus-control-height-compact, 40px);',
+      'opacity: 1;',
+    ])
+    expectCssRule(css, '.el-copyable-detail__button:disabled', [
+      'cursor: not-allowed;',
+      'opacity: 1;',
+    ])
+    expectCssRule(css, '.el-copyable-detail.is-disabled', ['opacity: 1;'])
+    expect(css).toMatch(
+      /\.el-(?:status-summary|diagnostics-item)__actions\s*>\s*:where\(button,\s*a\[href\],\s*\[role=button\]\)[^{]*\{[^}]*min-width:\s*var\(--fsus-control-height-compact,\s*40px\);[^}]*min-height:\s*var\(--fsus-control-height-compact,\s*40px\);/s,
+    )
+    expect(css).toMatch(
+      /\.el-(?:status-summary|diagnostics-item)__actions\s*>\s*\.el-button\.el-button[^{]*\{[^}]*min-width:\s*var\(--fsus-control-height-compact,\s*40px\);[^}]*min-height:\s*var\(--fsus-control-height-compact,\s*40px\);/s,
+    )
+    expect(css).toMatch(
+      /\[aria-pressed=true\][^{]*\{[^}]*background:\s*var\(--el-fill-color-light\);[^}]*border-color:\s*var\(--el-color-primary\);[^}]*color:\s*var\(--fsus-scholarly-blue,\s*var\(--el-color-primary\)\);[^}]*opacity:\s*1;/s,
+    )
+    expect(css).toMatch(
+      /@media \(max-width:\s*640px\)[\s\S]*\.el-copyable-detail__button[\s\S]*min-width:\s*var\(--fsus-control-height,\s*44px\);[\s\S]*min-height:\s*var\(--fsus-control-height,\s*44px\);/,
+    )
     expect(css).toContain('@media (max-width: 640px)')
     expect(css).not.toMatch(
       /\.el-distribution-bar-row__bar-fill\s*\{[^}]*var\(--el-color-primary\)/s,
@@ -3648,6 +3679,16 @@ describe('Fsus theme visual baseline', () => {
         id: 'private-metric-font-alias',
         pattern:
           /--fsus-(?:metric|key-value|status|diagnostics|copyable)[^:]*font/,
+      },
+      {
+        id: '30px-inline-target',
+        pattern:
+          /\.(?:el-copyable-detail__button|el-diagnostics-item__detail-toggle)[^{]*\{[^}]*min-height:\s*30px/,
+      },
+      {
+        id: 'ancestor-disabled-opacity',
+        pattern:
+          /\.el-(?:copyable-detail|status-summary|diagnostics-item)\.is-disabled\s*\{[^}]*opacity:\s*(?:0|0?\.[0-9]+)/,
       },
     ]
     for (const mutation of mutationCases) {

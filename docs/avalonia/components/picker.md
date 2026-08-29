@@ -28,7 +28,14 @@ motion resources.
 using FsusUI.Avalonia.Controls;
 
 var select = new FsusSelect { AccessibleName = "Region" };
-select.Items.Add(new FsusOption { Value = "us", Content = "United States" });
+select.Options.Add(new FsusOption { Value = "us", Content = "United States" });
+
+var autocomplete = new FsusAutocomplete
+{
+  AccessibleName = "System Font",
+  ItemsSource = new[] { "Arial", "Cascadia Code", "Courier New", "Inter", "Segoe UI" },
+  SelectedValue = "Inter",
+};
 ```
 
 ## Known Limitations
