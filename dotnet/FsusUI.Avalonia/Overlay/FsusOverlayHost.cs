@@ -1,6 +1,10 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Layout;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using FsusUI.Avalonia.Controls;
 
 namespace FsusUI.Avalonia.Overlay;
@@ -15,6 +19,7 @@ public enum FsusOverlayPlacement
   LeftEnd,
   RightStart,
   RightEnd,
+  Center,
 }
 
 public enum FsusOverlayCloseReason
@@ -87,6 +92,7 @@ public sealed class FsusOverlayEntry
   public FsusOverlayPlacement Placement { get; }
   public double RenderScaling => Options.RenderScaling;
   public Control? FocusedElement { get; private set; }
+  internal Border? Scrim { get; set; }
 
   internal void MarkClosed()
   {
@@ -155,11 +161,19 @@ public sealed class FsusOverlayHost : Panel
       placement);
 
     entries.Add(entry);
+    if (entry.IsModal)
+    {
+      var scrim = new Border();
+      scrim.Classes.Add("fsus-overlay");
+      entry.Scrim = scrim;
+      Children.Add(scrim);
+    }
     Children.Add(content);
     if (content is IFsusOverlayLifecycle lifecycle)
     {
       lifecycle.OnOverlayOpened(entry);
     }
+    FocusEntryAfterLayout(entry);
     return entry;
   }
 
@@ -169,7 +183,10 @@ public sealed class FsusOverlayHost : Panel
   {
     ArgumentNullException.ThrowIfNull(dialog);
 
-    var resolvedOptions = dialog.CreateOverlayOptions(options);
+    var resolvedOptions = dialog
+      .CreateOverlayOptions(options)
+      with
+      { Placement = FsusOverlayPlacement.Center };
     return Open(dialog, resolvedOptions);
   }
 
@@ -226,6 +243,11 @@ public sealed class FsusOverlayHost : Panel
     }
 
     entries.Remove(entry);
+    if (entry.Scrim is { } scrim)
+    {
+      Children.Remove(scrim);
+      entry.Scrim = null;
+    }
     Children.Remove(entry.Content);
     entry.MarkClosed();
     if (entry.Content is IFsusOverlayLifecycle lifecycle)
@@ -268,88 +290,140 @@ public sealed class FsusOverlayHost : Panel
     return target?.MoveFocus(direction) ?? false;
   }
 
-  protected override void OnPointerPressed(PointerPressedEventArgs e)
+  protected override Size ArrangeOverride(Size finalSize)
   {
-    base.OnPointerPressed(e);
-    if (e.Handled)
+    var arranged = new HashSet<Visual>();
+    foreach (var entry in entries)
     {
-      return;
+      if (entry.Scrim is { } scrim)
+      {
+        scrim.Arrange(new Rect(default, finalSize));
+        arranged.Add(scrim);
+      }
+
+      if (
+        entry.Placement == FsusOverlayPlacement.Center &&
+        entry.Content is Layoutable centeredContent
+      )
+      {
+        var desired = centeredContent.DesiredSize;
+        var width = Math.Min(desired.Width, finalSize.Width);
+        var height = Math.Min(desired.Height, finalSize.Height);
+        var origin = new Point(
+          Math.Max(0, (finalSize.Width - width) / 2),
+          Math.Max(0, (finalSize.Height - height) / 2));
+        centeredContent.Arrange(new Rect(origin, new Size(width, height)));
+        arranged.Add(centeredContent);
+      }
+      else if (entry.Content is Layoutable content)
+      {
+        content.Arrange(entry.Bounds);
+        arranged.Add(content);
+      }
     }
 
-    var pending = DismissPointerOutsideAsync(e.GetPosition(this));
-    if (pending.IsCompleted)
+    foreach (var child in Children)
     {
-      e.Handled = pending.Result;
-      return;
+      if (!arranged.Contains(child))
+      {
+        child.Arrange(new Rect(default, finalSize));
+      }
     }
 
-    _ = CompletePointerDismissAsync(pending, e);
+    return finalSize;
+  }
+
+  protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+  {
+    base.OnAttachedToVisualTree(e);
+    AddHandler(
+      InputElement.KeyDownEvent,
+      OnHostKeyDown,
+      RoutingStrategies.Bubble);
+    AddHandler(
+      InputElement.PointerPressedEvent,
+      OnHostPointerPressed,
+      RoutingStrategies.Bubble);
   }
 
   protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
   {
-    foreach (var entry in entries.ToArray())
-    {
-      var pending = CloseAsync(entry, FsusOverlayCloseReason.HostDetached);
-      if (!pending.IsCompletedSuccessfully)
-      {
-        _ = pending.AsTask();
-      }
-    }
-
     base.OnDetachedFromVisualTree(e);
+    RemoveHandler(InputElement.KeyDownEvent, OnHostKeyDown);
+    RemoveHandler(InputElement.PointerPressedEvent, OnHostPointerPressed);
   }
 
-  protected override Size MeasureOverride(Size availableSize)
+  private void OnHostKeyDown(object? sender, KeyEventArgs e)
   {
-    var requiredWidth = 0d;
-    var requiredHeight = 0d;
-    foreach (var child in Children)
+    if (e.Key != Key.Escape || entries.Count == 0)
     {
-      var entry = entries.FirstOrDefault((candidate) =>
-        ReferenceEquals(candidate.Content, child));
-      var constraint = entry?.Bounds.Size ?? availableSize;
-      child.Measure(constraint);
-      if (entry is not null)
-      {
-        requiredWidth = Math.Max(requiredWidth, entry.Bounds.Right);
-        requiredHeight = Math.Max(requiredHeight, entry.Bounds.Bottom);
-      }
-      else
-      {
-        requiredWidth = Math.Max(requiredWidth, child.DesiredSize.Width);
-        requiredHeight = Math.Max(requiredHeight, child.DesiredSize.Height);
-      }
+      return;
     }
 
-    return new Size(
-      double.IsFinite(availableSize.Width) ? availableSize.Width : requiredWidth,
-      double.IsFinite(availableSize.Height) ? availableSize.Height : requiredHeight);
+    DismissKeyboardAsync()
+      .AsTask()
+      .ContinueWith(
+        (task) => _ = task.Exception,
+        TaskContinuationOptions.OnlyOnFaulted);
   }
 
-  protected override Size ArrangeOverride(Size finalSize)
+  private void OnHostPointerPressed(object? sender, PointerPressedEventArgs e)
   {
-    foreach (var child in Children)
+    var topmost = Topmost;
+    if (topmost is null || !topmost.Options.CloseOnPointerOutside)
     {
-      var entry = entries.FirstOrDefault((candidate) =>
-        ReferenceEquals(candidate.Content, child));
-      child.Arrange(entry?.Bounds ?? new Rect(finalSize));
+      return;
     }
 
-    return finalSize;
+    var point = e.GetPosition(this);
+    if (topmost.Bounds.Contains(point))
+    {
+      return;
+    }
+
+    DismissPointerOutsideAsync(point)
+      .AsTask()
+      .ContinueWith(
+        (task) => _ = task.Exception,
+        TaskContinuationOptions.OnlyOnFaulted);
+  }
+
+  private static void TryFocus(Control? control)
+  {
+    if (control is { Focusable: true } && TopLevel.GetTopLevel(control) is not null)
+    {
+      control.Focus();
+    }
+  }
+
+  private void FocusEntryAfterLayout(FsusOverlayEntry entry)
+  {
+    // Logical hosts outside a visual tree have nothing to focus, and the
+    // dispatcher may not exist there. Focus assigned synchronously would be
+    // cleared again when the content's template applies during the first
+    // layout pass, so move focus into the modal once it is loaded.
+    if (entry.Content is not Control content || TopLevel.GetTopLevel(content) is null)
+    {
+      return;
+    }
+
+    Dispatcher.UIThread.Post(
+      () =>
+      {
+        if (!entry.IsClosed)
+        {
+          TryFocus(entry.FocusedElement ?? content);
+        }
+      },
+      DispatcherPriority.Loaded);
   }
 
   private void RestoreFocus(FsusOverlayEntry entry)
   {
     LastRestoredFocus = entry.Options.RestoreFocusTo ?? LastFocusedElement;
     LastFocusedElement = LastRestoredFocus;
-    LastRestoredFocus?.Focus();
+    TryFocus(LastRestoredFocus);
   }
-
-  private static async Task CompletePointerDismissAsync(
-    ValueTask<bool> pending,
-    PointerPressedEventArgs e) =>
-    e.Handled = await pending;
 
   private static (Rect Bounds, FsusOverlayPlacement Placement) ResolveBounds(
     FsusOverlayOptions options)
@@ -358,7 +432,7 @@ public sealed class FsusOverlayHost : Panel
     var size = options.OverlaySize;
     var viewport = options.ViewportBounds;
     var anchor = options.AnchorBounds;
-    var (x, y) = ResolveOrigin(placement, anchor, size);
+    var (x, y) = ResolveOrigin(placement, anchor, size, viewport);
 
     if (
       IsBottomPlacement(placement) &&
@@ -417,7 +491,8 @@ public sealed class FsusOverlayHost : Panel
   private static (double X, double Y) ResolveOrigin(
     FsusOverlayPlacement placement,
     Rect anchor,
-    Size size) =>
+    Size size,
+    Rect viewport) =>
     placement switch
     {
       FsusOverlayPlacement.TopEnd => (anchor.Right - size.Width, anchor.Top - size.Height),
@@ -427,6 +502,9 @@ public sealed class FsusOverlayHost : Panel
       FsusOverlayPlacement.RightStart => (anchor.Right, anchor.Top),
       FsusOverlayPlacement.RightEnd => (anchor.Right, anchor.Bottom - size.Height),
       FsusOverlayPlacement.TopStart => (anchor.Left, anchor.Top - size.Height),
+      FsusOverlayPlacement.Center => (
+        viewport.Left + (viewport.Width - size.Width) / 2,
+        viewport.Top + (viewport.Height - size.Height) / 2),
       _ => (anchor.Left, anchor.Bottom),
     };
 

@@ -15,7 +15,7 @@
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "0d4382bac98178fb481190d43bde42a69d11c0888eca102bfad375532974fa79",
+      "hash": "4493e3ad2ec056919cccfce2e8890a6f4599f31e810b960e7b244fa93b37d4c5",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
@@ -137927,7 +137927,7 @@
       "kind": "enum",
       "packageId": "avalonia",
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "memberCount": 8,
+      "memberCount": 9,
       "scenarioIds": [
         "scenario.v2.avalonia-only.fsus-overlay-placement"
       ],
