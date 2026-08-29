@@ -271,6 +271,128 @@ public class FsusNativeMenuTests
   }
 
   [Fact]
+  public void PreserveRootsProfileReturnsExactlySuppliedRootsWithMetadataAndCommandState()
+  {
+    var aboutCommand =
+      new FsusPlatformCommand("app.about", "About FsusUI", FsusPlatformRole.About);
+    var lockCommand = new FsusPlatformCommand("edit.lockSession", "Lock Session")
+    {
+      IsEnabled = false,
+    };
+    var roots = new[]
+    {
+      FsusNativeMenuItemModel.SubMenu(
+        "Application",
+        FsusPlatformRole.Application,
+        FsusNativeMenuItemModel.Action(aboutCommand)),
+      FsusNativeMenuItemModel.SubMenu(
+        "Edit",
+        FsusPlatformRole.Edit,
+        FsusNativeMenuItemModel.Action(lockCommand)),
+      FsusNativeMenuItemModel.SubMenu("Help", FsusPlatformRole.Help),
+    };
+    var options = new FsusNativeMenuOptions
+    {
+      Profile = FsusNativeMenuProfile.PreserveRoots,
+    };
+
+    using var builder = new FsusNativeMenuBuilder();
+    var macMenu = builder.Build(roots, options, FsusShortcutPlatform.macOS);
+
+    Assert.Equal(["Application", "Edit", "Help"], Headers(macMenu));
+    var applicationItem = Assert.IsType<NativeMenuItem>(macMenu.Items[0]);
+    Assert.Equal(
+      FsusPlatformRole.Application,
+      FsusNativeMenuMetadata.GetRole(applicationItem));
+    var aboutItem = Assert.IsType<NativeMenuItem>(Assert.Single(applicationItem.Menu!.Items));
+    Assert.Equal(
+      FsusPlatformRole.About,
+      FsusNativeMenuMetadata.GetRole(aboutItem));
+    Assert.Equal("app.about", FsusNativeMenuMetadata.GetCommandId(aboutItem));
+
+    var editItem = Assert.IsType<NativeMenuItem>(macMenu.Items[1]);
+    var lockItem = Assert.IsType<NativeMenuItem>(Assert.Single(editItem.Menu!.Items));
+    Assert.False(lockItem.IsEnabled);
+    Assert.Equal("edit.lockSession", FsusNativeMenuMetadata.GetCommandId(lockItem));
+    lockCommand.IsEnabled = true;
+    Assert.True(lockItem.IsEnabled);
+
+    var winMenu = builder.Build(roots, options, FsusShortcutPlatform.Windows);
+    Assert.Equal(["Application", "Edit", "Help"], Headers(winMenu));
+
+    var app = new Application();
+    builder.AttachTo(app, roots, options, FsusShortcutPlatform.Windows);
+    Assert.Equal(
+      ["Application", "Edit", "Help"],
+      Headers(NativeMenu.GetMenu(app)!));
+  }
+
+  [Fact]
+  public void SynthesizedRootsOptionGatesMissingRequiredRoots()
+  {
+    var newCommand = new FsusPlatformCommand("file.new", "New", FsusPlatformRole.FileNew);
+    var quitCommand =
+      new FsusPlatformCommand("app.quit", "Quit FsusUI", FsusPlatformRole.Quit);
+    var suppliedRoots = new[]
+    {
+      FsusNativeMenuItemModel.SubMenu(
+        "File",
+        FsusPlatformRole.File,
+        FsusNativeMenuItemModel.Action(newCommand)),
+      FsusNativeMenuItemModel.SubMenu("Edit", FsusPlatformRole.Edit),
+      FsusNativeMenuItemModel.SubMenu("Help", FsusPlatformRole.Help),
+    };
+
+    using var builder = new FsusNativeMenuBuilder();
+    var defaultMac = builder.Build(suppliedRoots, FsusShortcutPlatform.macOS);
+    Assert.Contains("Application", Headers(defaultMac));
+    Assert.Contains("Window", Headers(defaultMac));
+
+    var constrainedMac = builder.Build(
+      suppliedRoots,
+      new FsusNativeMenuOptions
+      {
+        SynthesizedRoots = FsusNativeMenuSynthesizedRoots.File |
+          FsusNativeMenuSynthesizedRoots.Help,
+      },
+      FsusShortcutPlatform.macOS);
+    Assert.Equal(["File", "Edit", "Help"], Headers(constrainedMac));
+
+    var editOnly = new[]
+    {
+      FsusNativeMenuItemModel.SubMenu("Edit", FsusPlatformRole.Edit),
+    };
+    var defaultWin = builder.Build(editOnly, FsusShortcutPlatform.Windows);
+    Assert.Equal(["File", "Edit", "Help"], Headers(defaultWin));
+    var constrainedWin = builder.Build(
+      editOnly,
+      new FsusNativeMenuOptions
+      {
+        SynthesizedRoots = FsusNativeMenuSynthesizedRoots.None,
+      },
+      FsusShortcutPlatform.Windows);
+    Assert.Equal(["Edit"], Headers(constrainedWin));
+
+    var appWithQuit = FsusNativeMenuItemModel.SubMenu(
+      "Application",
+      FsusPlatformRole.Application,
+      FsusNativeMenuItemModel.Action(quitCommand));
+    var constrainedWithApplication = builder.Build(
+      [appWithQuit, .. editOnly],
+      new FsusNativeMenuOptions
+      {
+        SynthesizedRoots = FsusNativeMenuSynthesizedRoots.None,
+      },
+      FsusShortcutPlatform.Windows);
+    Assert.Equal(["Application", "Edit"], Headers(constrainedWithApplication));
+    var applicationItem =
+      Assert.IsType<NativeMenuItem>(constrainedWithApplication.Items[0]);
+    Assert.Contains(
+      applicationItem.Menu!.Items.OfType<NativeMenuItem>(),
+      item => item.Header == "Quit FsusUI");
+  }
+
+  [Fact]
   public void DockMenuContractAndWindowlessRoutingFallbackWorks()
   {
     Assert.True(FsusDockMenuContract.IsSupported(FsusShortcutPlatform.macOS));

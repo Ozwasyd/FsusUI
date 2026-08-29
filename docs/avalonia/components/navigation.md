@@ -8,7 +8,8 @@ Use `FsusTabs`, `FsusTabPane`, `FsusMenu`, `FsusMenuItem`, `FsusSubMenu`,
 `FsusMenuItemGroup`, `FsusBreadcrumb`, `FsusBreadcrumbItem`, `FsusPageHeader`,
 `FsusSteps`, `FsusStep`, `FsusSettingsShell`, `FsusSettingsCategory`,
 `FsusSettingsScrollResetBehavior`, `FsusPlatformCommand`,
-`FsusNativeMenuItemModel`, and `FsusNativeMenuBuilder`.
+`FsusNativeMenuItemModel`, `FsusNativeMenuBuilder`, `FsusNativeMenuOptions`,
+`FsusNativeMenuProfile`, and `FsusNativeMenuSynthesizedRoots`.
 
 Tab headers raise the typed `PaneContextRequested` event
 (`FsusTabPaneContextEventArgs`) through right-click, `Shift+F10`/`Apps`, or
@@ -39,6 +40,15 @@ of localized labels.
 macOS application menus use explicit About, Preferences, Services, Hide,
 Hide Others, Show All, Quit, and Window roles. Windows and Linux omit
 macOS-only roles and order top-level menus as File, Edit, View, Window, Help.
+`FsusNativeMenuOptions` selects the build profile for `Build` and both
+`AttachTo` overloads: `StandardDocumentWindow` (default) keeps the platform
+normalization above, while `PreserveRoots` returns exactly the supplied roots
+on every platform and still applies role metadata, gestures, and reactive
+command state. `SynthesizedRoots` limits which missing required roots
+standard mode may synthesize (`Application`, `File`, `Window`, `Help`); on
+Windows and Linux, role relocation into File/Help happens only when both
+destinations exist or may be synthesized, and otherwise supplied roots are
+kept in place with macOS-only roles removed.
 `FsusDockMenuContract.AttachTo` uses Avalonia `NativeDock`, while
 `FsusDockMenuRouter` supplies active-window and windowless command routes.
 
