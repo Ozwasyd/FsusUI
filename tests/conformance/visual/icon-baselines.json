@@ -78,6 +78,38 @@
       "fill": "icon.fill.default",
       "decorativeByDefault": true,
       "aliases": ["next"]
+    },
+    {
+      "id": "folder",
+      "source": "vue/packages/icons-svg/folder.svg",
+      "vueComponent": "Folder",
+      "avaloniaResourceKey": "FsusIconFolder",
+      "sourcePathHash": "e5ea4fc8f778083a97f7a4dab3748be3967d233da76d48c60264f8bc9fdb92a0",
+      "viewBox": "0 0 1024 1024",
+      "strokeWidth": 112,
+      "strokeLineCap": "round",
+      "strokeLineJoin": "round",
+      "defaultSize": "icon.size.md",
+      "stroke": "icon.stroke.md",
+      "fill": "icon.fill.default",
+      "decorativeByDefault": true,
+      "aliases": []
+    },
+    {
+      "id": "outline",
+      "source": "vue/packages/icons-svg/memo.svg",
+      "vueComponent": "Memo",
+      "avaloniaResourceKey": "FsusIconOutline",
+      "sourcePathHash": "6af6d58f2a9662040b3d06b2ac5d9f72f581d5828cf110b852806eb18a1889b6",
+      "viewBox": "0 0 1024 1024",
+      "strokeWidth": 112,
+      "strokeLineCap": "round",
+      "strokeLineJoin": "round",
+      "defaultSize": "icon.size.md",
+      "stroke": "icon.stroke.md",
+      "fill": "icon.fill.default",
+      "decorativeByDefault": true,
+      "aliases": []
     }
   ]
 }

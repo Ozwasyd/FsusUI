@@ -1,0 +1,142 @@
+[
+  {
+    "Name": "icon-catalog-light",
+    "File": "tests/conformance/visual/artifacts/screenshots/avalonia/icon-catalog-light.png",
+    "Sha256": "bca6127e9e7d9d27ce09044c51b3fc687b506e1e9050fe54ddf294652ce604db",
+    "PixelWidth": 360,
+    "PixelHeight": 200,
+    "IconSize": 16,
+    "HighContrast": false,
+    "Icons": [
+      {
+        "IconKey": "FsusIconFolder",
+        "NonBackgroundRatio": 0.560554,
+        "ForegroundMatchRatio": 0.691358,
+        "ExpectsForegroundMatch": true
+      },
+      {
+        "IconKey": "FsusIconOutline",
+        "NonBackgroundRatio": 0.861592,
+        "ForegroundMatchRatio": 0.767068,
+        "ExpectsForegroundMatch": true
+      },
+      {
+        "IconKey": "FsusIconFolder-disabled",
+        "NonBackgroundRatio": 0.560554,
+        "ForegroundMatchRatio": 0,
+        "ExpectsForegroundMatch": false
+      },
+      {
+        "IconKey": "FsusIconFolder-icon-button",
+        "NonBackgroundRatio": 0.512111,
+        "ForegroundMatchRatio": 0.689189,
+        "ExpectsForegroundMatch": true
+      }
+    ]
+  },
+  {
+    "Name": "icon-catalog-dark",
+    "File": "tests/conformance/visual/artifacts/screenshots/avalonia/icon-catalog-dark.png",
+    "Sha256": "39a42d0f0dd5c5d87bba7a90109fb984e6b40579395a0f41caf615861ad5c082",
+    "PixelWidth": 360,
+    "PixelHeight": 200,
+    "IconSize": 16,
+    "HighContrast": false,
+    "Icons": [
+      {
+        "IconKey": "FsusIconFolder",
+        "NonBackgroundRatio": 0.560554,
+        "ForegroundMatchRatio": 0.691358,
+        "ExpectsForegroundMatch": true
+      },
+      {
+        "IconKey": "FsusIconOutline",
+        "NonBackgroundRatio": 0.861592,
+        "ForegroundMatchRatio": 0.767068,
+        "ExpectsForegroundMatch": true
+      },
+      {
+        "IconKey": "FsusIconFolder-disabled",
+        "NonBackgroundRatio": 0.560554,
+        "ForegroundMatchRatio": 0,
+        "ExpectsForegroundMatch": false
+      },
+      {
+        "IconKey": "FsusIconFolder-icon-button",
+        "NonBackgroundRatio": 0.512111,
+        "ForegroundMatchRatio": 0.689189,
+        "ExpectsForegroundMatch": true
+      }
+    ]
+  },
+  {
+    "Name": "icon-catalog-high-contrast",
+    "File": "tests/conformance/visual/artifacts/screenshots/avalonia/icon-catalog-high-contrast.png",
+    "Sha256": "b8c8a0edc2748f1169d230f7fa42fe77bd33d3ac879e9da0a59226583fed4c99",
+    "PixelWidth": 360,
+    "PixelHeight": 200,
+    "IconSize": 16,
+    "HighContrast": true,
+    "Icons": [
+      {
+        "IconKey": "FsusIconFolder",
+        "NonBackgroundRatio": 0.560554,
+        "ForegroundMatchRatio": 0.691358,
+        "ExpectsForegroundMatch": true
+      },
+      {
+        "IconKey": "FsusIconOutline",
+        "NonBackgroundRatio": 0.861592,
+        "ForegroundMatchRatio": 0.767068,
+        "ExpectsForegroundMatch": true
+      },
+      {
+        "IconKey": "FsusIconFolder-disabled",
+        "NonBackgroundRatio": 0.560554,
+        "ForegroundMatchRatio": 0.185185,
+        "ExpectsForegroundMatch": false
+      },
+      {
+        "IconKey": "FsusIconFolder-icon-button",
+        "NonBackgroundRatio": 0.512111,
+        "ForegroundMatchRatio": 0.689189,
+        "ExpectsForegroundMatch": true
+      }
+    ]
+  },
+  {
+    "Name": "icon-catalog-zoom-200",
+    "File": "tests/conformance/visual/artifacts/screenshots/avalonia/icon-catalog-zoom-200.png",
+    "Sha256": "76eb5dd7a5f4613f9f0f45788a6e35568edd1ee6ceed34a8e5e917eaeab1262e",
+    "PixelWidth": 360,
+    "PixelHeight": 200,
+    "IconSize": 32,
+    "HighContrast": false,
+    "Icons": [
+      {
+        "IconKey": "FsusIconFolder",
+        "NonBackgroundRatio": 0.443526,
+        "ForegroundMatchRatio": 0.703934,
+        "ExpectsForegroundMatch": true
+      },
+      {
+        "IconKey": "FsusIconOutline",
+        "NonBackgroundRatio": 0.686869,
+        "ForegroundMatchRatio": 0.744652,
+        "ExpectsForegroundMatch": true
+      },
+      {
+        "IconKey": "FsusIconFolder-disabled",
+        "NonBackgroundRatio": 0.443526,
+        "ForegroundMatchRatio": 0,
+        "ExpectsForegroundMatch": false
+      },
+      {
+        "IconKey": "FsusIconFolder-icon-button",
+        "NonBackgroundRatio": 0.512111,
+        "ForegroundMatchRatio": 0.689189,
+        "ExpectsForegroundMatch": true
+      }
+    ]
+  }
+]

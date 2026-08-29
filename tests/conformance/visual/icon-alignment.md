@@ -10,6 +10,10 @@ Required representative checks:
 - `warning`: status icon, non-decorative by default, md size token.
 - `chevron-right`: navigation glyph, RTL-mirroring reviewed before use in
   directional controls.
+- `folder`: Files / workspace explorer navigation glyph, folder-shaped, md
+  size token, md stroke token.
+- `outline`: document outline / table-of-contents navigation glyph, memo- or
+  list-shaped, md size token, md stroke token.
 - line icons: shared viewport, `currentColor`, `stroke-linecap="round"`,
   `stroke-linejoin="round"`, and the md stroke token.
 - solid icons: shared viewport and `currentColor` fill. Solid icons may keep

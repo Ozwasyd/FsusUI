@@ -8,4 +8,6 @@ public static class FsusIconKeys
   public const string Settings = "FsusIconSettings";
   public const string Warning = "FsusIconWarning";
   public const string ChevronRight = "FsusIconChevronRight";
+  public const string Folder = "FsusIconFolder";
+  public const string Outline = "FsusIconOutline";
 }
