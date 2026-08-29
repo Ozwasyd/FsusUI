@@ -5,7 +5,10 @@ import {
   resolveMarkdownSourceIdentity,
 } from './markdown'
 import { mergeMarkdownDirectiveSyntax } from './markdown-directive-syntax'
-import { collectMarkdownSyntaxNodesFromParser } from './markdown-syntax-collect'
+import {
+  collectMarkdownSyntaxNodesFromParser,
+  readMarkdownParserSyntaxKinds,
+} from './markdown-syntax-collect'
 import { createMarkdownSourceCoordinateMap } from './markdown-source-coordinate-map'
 
 export const MARKDOWN_EDITOR_PROJECTION_PARSER = MARKDOWN_RENDER_PARSER
@@ -15,6 +18,8 @@ export type MarkdownEditorPresentation =
   | 'live-atomic'
   | 'source-only-with-reason'
   | 'unsupported-error'
+
+export type MarkdownEditorSyntaxStatus = 'valid' | 'malformed'
 
 export const MARKDOWN_EDITOR_REQUIRED_SYNTAX_KINDS = Object.freeze([
   'heading',
@@ -73,10 +78,17 @@ export interface MarkdownEditorSourceRange {
 }
 
 export interface MarkdownEditorSyntaxNode {
+  readonly blockIdentity: string
   readonly kind: string
+  readonly status: MarkdownEditorSyntaxStatus
+  readonly diagnosticCode: string | null
   readonly presentation: MarkdownEditorPresentation
   readonly rawRange: MarkdownEditorSourceRange
   readonly normalizedRange: MarkdownEditorSourceRange
+  readonly rawContentRanges: readonly MarkdownEditorSourceRange[]
+  readonly normalizedContentRanges: readonly MarkdownEditorSourceRange[]
+  readonly rawMarkerRanges: readonly MarkdownEditorSourceRange[]
+  readonly normalizedMarkerRanges: readonly MarkdownEditorSourceRange[]
   readonly parentRawRange: MarkdownEditorSourceRange | null
   readonly parentNormalizedRange: MarkdownEditorSourceRange | null
   readonly childRawRanges: readonly MarkdownEditorSourceRange[]
@@ -86,6 +98,9 @@ export interface MarkdownEditorSyntaxNode {
 export interface MarkdownEditorProjectionDiagnostic {
   readonly code: string
   readonly message: string
+  readonly blockIdentity: string
+  readonly rawRange: MarkdownEditorSourceRange
+  readonly normalizedRange: MarkdownEditorSourceRange
 }
 
 export interface MarkdownEditorSyntaxCoverage {
@@ -181,6 +196,26 @@ export const presentationForSyntaxKind = (
   throw new Error(`unregistered markdown editor projection kind: ${kind}`)
 }
 
+export const validateMarkdownEditorSyntaxCoverage = (
+  parserKinds: readonly string[] = readMarkdownParserSyntaxKinds(),
+): true => {
+  const registered = new Set<string>(MARKDOWN_EDITOR_REQUIRED_SYNTAX_KINDS)
+  const supported = new Set(parserKinds)
+  const duplicate = parserKinds.filter(
+    (kind, index) => parserKinds.indexOf(kind) !== index,
+  )
+  const missing = MARKDOWN_EDITOR_REQUIRED_SYNTAX_KINDS.filter(
+    (kind) => !supported.has(kind),
+  )
+  const unregistered = parserKinds.filter((kind) => !registered.has(kind))
+  if (missing.length > 0 || unregistered.length > 0 || duplicate.length > 0) {
+    throw new Error(
+      `markdown projection syntax coverage drift: missing=${missing.join(',')}; unregistered=${unregistered.join(',')}; duplicate=${duplicate.join(',')}`,
+    )
+  }
+  return true
+}
+
 const utf8OffsetToNormalizedUtf16 = (normalized: string) => {
   const table = new Map<number, number>()
   let utf8Offset = 0
@@ -215,6 +250,7 @@ const utf8OffsetToNormalizedUtf16 = (normalized: string) => {
 export const createMarkdownEditorProjection = (
   rawSource: string,
 ): MarkdownEditorProjectionResult => {
+  validateMarkdownEditorSyntaxCoverage()
   const coordinates = createMarkdownSourceCoordinateMap(rawSource)
   const normalizedSource = normalizeMarkdownSource(rawSource)
   if (coordinates.normalizedSource !== normalizedSource) {
@@ -224,8 +260,13 @@ export const createMarkdownEditorProjection = (
   const sourceIdentity = resolveMarkdownSourceIdentity(rawSource)
   const parserNodes = collectMarkdownSyntaxNodesFromParser(rawSource)
   const directed = mergeMarkdownDirectiveSyntax(normalizedSource, parserNodes)
+  const parserProjectionNodes = [...directed.nodes].sort((left, right) => {
+    if (left.start !== right.start) return left.start - right.start
+    if (left.end !== right.end) return right.end - left.end
+    return left.kind.localeCompare(right.kind)
+  })
   const nodes: MarkdownEditorSyntaxNode[] = []
-  const diagnostics: MarkdownEditorProjectionDiagnostic[] = [...directed.diagnostics]
+  const diagnostics: MarkdownEditorProjectionDiagnostic[] = []
   const toUtf16 = utf8OffsetToNormalizedUtf16(normalizedSource)
 
   const toNormalizedRange = (start: number, end: number) =>
@@ -233,9 +274,17 @@ export const createMarkdownEditorProjection = (
   const toRawRange = (start: number, end: number) =>
     Object.freeze(coordinates.toRawRange(toNormalizedRange(start, end)))
 
-  for (const node of directed.nodes) {
+  const mapNormalizedRanges = (
+    ranges: readonly { readonly start: number; readonly end: number }[],
+  ) => Object.freeze(ranges.map((range) => toNormalizedRange(range.start, range.end)))
+  const mapRawRanges = (
+    ranges: readonly { readonly start: number; readonly end: number }[],
+  ) => Object.freeze(ranges.map((range) => toRawRange(range.start, range.end)))
+
+  for (const [index, node] of parserProjectionNodes.entries()) {
     const hasParent =
       Number.isInteger(node.parentStart) && Number.isInteger(node.parentEnd)
+    const blockIdentity = `block:${sourceIdentity}:${index}`
     const childNormalizedRanges = Object.freeze(
       (node.children ?? []).map((child) =>
         toNormalizedRange(child.start, child.end),
@@ -246,10 +295,20 @@ export const createMarkdownEditorProjection = (
     )
     nodes.push(
       Object.freeze({
+        blockIdentity,
         kind: node.kind,
-        presentation: presentationForSyntaxKind(node.kind),
+        status: node.status,
+        diagnosticCode: node.diagnosticCode,
+        presentation:
+          node.status === 'malformed'
+            ? 'unsupported-error'
+            : presentationForSyntaxKind(node.kind),
         normalizedRange: toNormalizedRange(node.start, node.end),
         rawRange: toRawRange(node.start, node.end),
+        normalizedContentRanges: mapNormalizedRanges(node.contentRanges),
+        rawContentRanges: mapRawRanges(node.contentRanges),
+        normalizedMarkerRanges: mapNormalizedRanges(node.markerRanges),
+        rawMarkerRanges: mapRawRanges(node.markerRanges),
         parentNormalizedRange: hasParent
           ? toNormalizedRange(node.parentStart as number, node.parentEnd as number)
           : null,
@@ -260,6 +319,58 @@ export const createMarkdownEditorProjection = (
         childRawRanges,
       }),
     )
+    if (node.status === 'malformed') {
+      const normalizedRange = toNormalizedRange(node.start, node.end)
+      const parserDiagnostic = directed.diagnostics.find(
+        (diagnostic) =>
+          diagnostic.code === node.diagnosticCode &&
+          diagnostic.normalizedRange.start === node.start &&
+          diagnostic.normalizedRange.end === node.end,
+      )
+      diagnostics.push(
+        Object.freeze({
+          code: node.diagnosticCode ?? 'malformed-syntax',
+          message:
+            parserDiagnostic?.message ??
+            `malformed markdown syntax: ${
+              node.diagnosticCode ?? 'malformed-syntax'
+            }`,
+          blockIdentity,
+          normalizedRange,
+          rawRange: toRawRange(node.start, node.end),
+        }),
+      )
+    }
+  }
+  for (const diagnostic of directed.diagnostics) {
+    const normalizedRange = toNormalizedRange(
+      diagnostic.normalizedRange.start,
+      diagnostic.normalizedRange.end,
+    )
+    const node =
+      nodes.find(
+        (candidate) =>
+          candidate.normalizedRange.start === normalizedRange.start &&
+          candidate.normalizedRange.end === normalizedRange.end,
+      ) ?? nodes.find((candidate) => candidate.status === 'malformed')
+    if (
+      node &&
+      !diagnostics.some(
+        (candidate) =>
+          candidate.code === diagnostic.code &&
+          candidate.blockIdentity === node.blockIdentity,
+      )
+    ) {
+      diagnostics.push(
+        Object.freeze({
+          code: diagnostic.code,
+          message: diagnostic.message,
+          blockIdentity: node.blockIdentity,
+          normalizedRange,
+          rawRange: Object.freeze(coordinates.toRawRange(normalizedRange)),
+        }),
+      )
+    }
   }
 
   return Object.freeze({
@@ -296,6 +407,23 @@ const sameRangeList = (
   left.length === right.length &&
   left.every((range, index) => sameRange(range, right[index] ?? null))
 
+const diagnosticsEquivalent = (
+  left: readonly MarkdownEditorProjectionDiagnostic[],
+  right: readonly MarkdownEditorProjectionDiagnostic[],
+) =>
+  left.length === right.length &&
+  left.every((diagnostic, index) => {
+    const other = right[index]
+    return (
+      other !== undefined &&
+      diagnostic.code === other.code &&
+      diagnostic.message === other.message &&
+      diagnostic.blockIdentity === other.blockIdentity &&
+      sameRange(diagnostic.rawRange, other.rawRange) &&
+      sameRange(diagnostic.normalizedRange, other.normalizedRange)
+    )
+  })
+
 export const transferMarkdownEditorProjection = (
   projection: MarkdownEditorProjectionResult,
 ): MarkdownEditorProjectionResult =>
@@ -323,16 +451,23 @@ export const markdownEditorProjectionsEquivalent = (
   ) {
     return false
   }
-  if (left.diagnostics.length !== right.diagnostics.length) return false
+  if (!diagnosticsEquivalent(left.diagnostics, right.diagnostics)) return false
   if (left.nodes.length !== right.nodes.length) return false
   return left.nodes.every((node, index) => {
     const other = right.nodes[index]
     if (!other) return false
     return (
+      node.blockIdentity === other.blockIdentity &&
       node.kind === other.kind &&
+      node.status === other.status &&
+      node.diagnosticCode === other.diagnosticCode &&
       node.presentation === other.presentation &&
       sameRange(node.rawRange, other.rawRange) &&
       sameRange(node.normalizedRange, other.normalizedRange) &&
+      sameRangeList(node.rawContentRanges, other.rawContentRanges) &&
+      sameRangeList(node.normalizedContentRanges, other.normalizedContentRanges) &&
+      sameRangeList(node.rawMarkerRanges, other.rawMarkerRanges) &&
+      sameRangeList(node.normalizedMarkerRanges, other.normalizedMarkerRanges) &&
       sameRange(node.parentRawRange, other.parentRawRange) &&
       sameRange(node.parentNormalizedRange, other.parentNormalizedRange) &&
       sameRangeList(node.childRawRanges, other.childRawRanges) &&

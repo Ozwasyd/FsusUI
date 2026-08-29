@@ -39,7 +39,8 @@ export const MARKDOWN_POINTER_PLATFORMS = Object.freeze([
   'preview',
 ] as const)
 
-export type MarkdownPointerPlatform = (typeof MARKDOWN_POINTER_PLATFORMS)[number]
+export type MarkdownPointerPlatform =
+  (typeof MARKDOWN_POINTER_PLATFORMS)[number]
 
 export type MarkdownHiddenTraversalDirection = 'forward' | 'backward'
 
@@ -92,6 +93,7 @@ export type MarkdownAnchorSyntaxRange =
 export interface MarkdownAnchorSyntaxInput {
   readonly id: string
   readonly range: MarkdownAnchorSyntaxRange
+  readonly projectionId?: string
   readonly hidden?: boolean
   readonly parentId?: string
   readonly atomic?: boolean
@@ -169,6 +171,7 @@ export type MarkdownRemappedRange =
 
 export interface MarkdownAnchorSyntaxNode {
   readonly id: string
+  readonly projectionId: string
   readonly start: number
   readonly end: number
   readonly hidden: boolean
@@ -184,7 +187,9 @@ export interface MarkdownAnchorMap {
   readonly coordinates: MarkdownSourceCoordinateMap
   readonly syntax: readonly MarkdownAnchorSyntaxNode[]
   sourceSelectionToVisual(selection: SourceSelection): MarkdownVisualSelection
-  visualAnchorToSourceSelection(visual: MarkdownVisualSelection): SourceSelection
+  visualAnchorToSourceSelection(
+    visual: MarkdownVisualSelection,
+  ): SourceSelection
   sourcePositionToVisual(position: MarkdownSourcePosition): MarkdownVisualPoint
   visualPointToSource(query: MarkdownVisualPointQuery): {
     readonly offset: number
@@ -211,15 +216,24 @@ const documentIdentityOf = (
 ): MarkdownDocumentIdentity => {
   if (typeof identity === 'string') {
     if (!identity) {
-      throw new MarkdownRuntimeError('protocol', 'anchor map requires a document identity')
+      throw new MarkdownRuntimeError(
+        'protocol',
+        'anchor map requires a document identity',
+      )
     }
     return Object.freeze({ id: identity, epoch: 0 })
   }
   if (!identity?.id) {
-    throw new MarkdownRuntimeError('protocol', 'anchor map requires a document identity')
+    throw new MarkdownRuntimeError(
+      'protocol',
+      'anchor map requires a document identity',
+    )
   }
   if (!Number.isInteger(identity.epoch)) {
-    throw new MarkdownRuntimeError('protocol', 'anchor map requires a document epoch')
+    throw new MarkdownRuntimeError(
+      'protocol',
+      'anchor map requires a document epoch',
+    )
   }
   return Object.freeze({ id: identity.id, epoch: identity.epoch })
 }
@@ -251,6 +265,8 @@ const smallestNode = (nodes: readonly MarkdownAnchorSyntaxNode[]) =>
   [...nodes].sort((left, right) => {
     const span = rangeLength(left) - rangeLength(right)
     if (span !== 0) return span
+    const start = left.start - right.start
+    if (start !== 0) return start
     return left.id.localeCompare(right.id)
   })[0] as MarkdownAnchorSyntaxNode
 
@@ -259,6 +275,7 @@ const syntaxFromProjection = (
 ): MarkdownAnchorSyntaxInput[] =>
   projection.nodes.map((node) => ({
     id: node.id,
+    projectionId: node.id,
     range: node.rawRange,
     atomic: node.presentation === 'live-atomic',
   }))
@@ -270,7 +287,9 @@ const freezePoint = (point: MarkdownVisualPoint): MarkdownVisualPoint =>
     sourceOffset: point.sourceOffset,
     ...(point.side === undefined ? {} : { side: point.side }),
     ...(point.point === undefined ? {} : { point: point.point }),
-    ...(point.localOffset === undefined ? {} : { localOffset: point.localOffset }),
+    ...(point.localOffset === undefined
+      ? {}
+      : { localOffset: point.localOffset }),
     ...(point.hidden === undefined ? {} : { hidden: point.hidden }),
     ...(point.parentId === undefined ? {} : { parentId: point.parentId }),
     ...(point.virtual === undefined ? {} : { virtual: point.virtual }),
@@ -280,7 +299,10 @@ export const createMarkdownAnchorMap = (
   input: MarkdownAnchorMapInput,
 ): MarkdownAnchorMap => {
   if (!input || typeof input.source !== 'string') {
-    throw new MarkdownRuntimeError('protocol', 'anchor map requires a source string')
+    throw new MarkdownRuntimeError(
+      'protocol',
+      'anchor map requires a source string',
+    )
   }
 
   const documentIdentity = documentIdentityOf(input.identity)
@@ -288,18 +310,33 @@ export const createMarkdownAnchorMap = (
   const coordinates = createMarkdownSourceCoordinateMap(input.source)
   const source = coordinates.rawSource
   const documentAnchorId = `doc:${documentIdentity.id}:${documentIdentity.epoch}`
+  const projection =
+    input.projection ??
+    stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection(source),
+      documentIdentity,
+    )
 
-  const syntaxInput =
-    input.syntax ??
-    (input.projection
-      ? syntaxFromProjection(input.projection)
-      : syntaxFromProjection(
-          stabilizeMarkdownEditorProjection(
-            createMarkdownEditorProjection(source),
-            documentIdentity,
-          ),
-        ))
+  if (
+    projection.documentIdentity.id !== documentIdentity.id ||
+    projection.documentIdentity.epoch !== documentIdentity.epoch
+  ) {
+    throw new MarkdownRuntimeError(
+      'protocol',
+      'anchor projection identity does not match the map',
+    )
+  }
+  if (projection.normalizedSource !== coordinates.normalizedSource) {
+    throw new MarkdownRuntimeError(
+      'protocol',
+      'anchor projection source does not match the map',
+    )
+  }
 
+  const syntaxInput = input.syntax ?? syntaxFromProjection(projection)
+  const projectionById = new Map(
+    projection.nodes.map((node) => [node.id, node]),
+  )
   const seen = new Set<string>()
   const syntax: MarkdownAnchorSyntaxNode[] = syntaxInput.map((entry) => {
     if (!entry.id) {
@@ -321,8 +358,40 @@ export const createMarkdownAnchorMap = (
         `syntax range ${entry.id} is inverted`,
       )
     }
+    const projectionNode = entry.projectionId
+      ? projectionById.get(entry.projectionId)
+      : projection.nodes
+          .filter(
+            (node) =>
+              node.rawRange.start <= range.start &&
+              node.rawRange.end >= range.end,
+          )
+          .sort((left, right) => {
+            const span =
+              left.rawRange.end -
+              left.rawRange.start -
+              (right.rawRange.end - right.rawRange.start)
+            if (span !== 0) return span
+            return left.id.localeCompare(right.id)
+          })[0]
+    if (!projectionNode) {
+      throw new MarkdownRuntimeError(
+        'protocol',
+        `anchor syntax ${entry.id} is not bound to the projection`,
+      )
+    }
+    if (
+      projectionNode.rawRange.start > range.start ||
+      projectionNode.rawRange.end < range.end
+    ) {
+      throw new MarkdownRuntimeError(
+        'protocol',
+        `anchor syntax ${entry.id} escapes projection ${projectionNode.id}`,
+      )
+    }
     return Object.freeze({
       id: entry.id,
+      projectionId: projectionNode.id,
       start: range.start,
       end: range.end,
       hidden: entry.hidden === true,
@@ -337,6 +406,16 @@ export const createMarkdownAnchorMap = (
       throw new MarkdownRuntimeError(
         'protocol',
         `syntax parent ${node.parentId} is missing`,
+      )
+    }
+    if (
+      node.parentId !== undefined &&
+      syntax.find((candidate) => candidate.id === node.parentId)
+        ?.projectionId !== node.projectionId
+    ) {
+      throw new MarkdownRuntimeError(
+        'protocol',
+        `anchor syntax ${node.id} crosses projection identity`,
       )
     }
   }
@@ -394,7 +473,13 @@ export const createMarkdownAnchorMap = (
       const point: MarkdownVisualPointName =
         offset === node.start ? 'start' : offset === node.end ? 'end' : 'caret'
       return freezePoint({
-        kind: node.hidden ? 'hidden' : node.virtual ? 'virtual' : 'text',
+        kind: node.atomic
+          ? 'atomic'
+          : node.hidden
+            ? 'hidden'
+            : node.virtual
+              ? 'virtual'
+              : 'text',
         anchorId: node.id,
         point,
         localOffset,
@@ -416,24 +501,76 @@ export const createMarkdownAnchorMap = (
   }
 
   const resolvePoint = (point: MarkdownVisualPoint) => {
-    if (Number.isInteger(point.sourceOffset)) {
-      assertIntegerInRange(point.sourceOffset, 'visual source offset', source.length)
-      return point.sourceOffset
-    }
-    if (point.anchorId === documentAnchorId && Number.isInteger(point.localOffset)) {
-      assertIntegerInRange(point.localOffset as number, 'visual local offset', source.length)
+    assertIntegerInRange(
+      point.sourceOffset,
+      'visual source offset',
+      source.length,
+    )
+    if (point.anchorId === documentAnchorId) {
+      if (point.kind !== 'text' || !Number.isInteger(point.localOffset)) {
+        throw new MarkdownRuntimeError(
+          'protocol',
+          'document visual point is not resolvable',
+        )
+      }
+      assertIntegerInRange(
+        point.localOffset as number,
+        'visual local offset',
+        source.length,
+      )
+      if (point.sourceOffset !== point.localOffset) {
+        throw new MarkdownRuntimeError(
+          'protocol',
+          'document visual point does not match its source offset',
+        )
+      }
       return point.localOffset as number
     }
+
     const node = requireNode(point.anchorId)
-    if (point.point === 'start' || point.point === 'before') return node.start
-    if (point.point === 'end' || point.point === 'after') return node.end
-    if (point.point === 'inside-source') return node.start
-    if (Number.isInteger(point.localOffset)) {
-      const offset = node.start + (point.localOffset as number)
-      assertIntegerInRange(offset, 'visual local offset', source.length)
-      return offset
+    const expectedKind: MarkdownVisualKind = node.atomic
+      ? 'atomic'
+      : node.hidden
+        ? 'hidden'
+        : node.virtual
+          ? 'virtual'
+          : 'text'
+    if (point.kind !== expectedKind) {
+      throw new MarkdownRuntimeError(
+        'protocol',
+        `visual point kind does not match anchor ${point.anchorId}`,
+      )
     }
-    throw new MarkdownRuntimeError('protocol', 'visual point is not resolvable')
+
+    let offset: number
+    if (Number.isInteger(point.localOffset)) {
+      const localOffset = point.localOffset as number
+      if (localOffset < 0 || localOffset > rangeLength(node)) {
+        throw new MarkdownRuntimeError(
+          'protocol',
+          'visual local offset is outside the anchor',
+        )
+      }
+      offset = node.start + localOffset
+    } else if (point.point === 'start' || point.point === 'before') {
+      offset = node.start
+    } else if (point.point === 'end' || point.point === 'after') {
+      offset = node.end
+    } else if (point.point === 'inside-source') {
+      offset = node.start
+    } else {
+      throw new MarkdownRuntimeError(
+        'protocol',
+        'visual point is not resolvable',
+      )
+    }
+    if (point.sourceOffset !== offset) {
+      throw new MarkdownRuntimeError(
+        'protocol',
+        `visual point does not match anchor ${point.anchorId}`,
+      )
+    }
+    return offset
   }
 
   const sourceSelectionToVisual = (selection: SourceSelection) => {
@@ -459,21 +596,35 @@ export const createMarkdownAnchorMap = (
   }
 
   const visualAnchorToSourceSelection = (visual: MarkdownVisualSelection) => {
-    if (visual.identity !== identity) {
+    if (
+      visual.identity !== identity ||
+      visual.documentIdentity.id !== documentIdentity.id ||
+      visual.documentIdentity.epoch !== documentIdentity.epoch
+    ) {
       throw new MarkdownRuntimeError(
         'protocol',
         'visual selection identity does not match the map',
       )
     }
-    return Object.freeze({
-      anchor: resolvePoint(visual.anchor),
-      focus: resolvePoint(visual.focus),
-    })
+    const anchor = resolvePoint(visual.anchor)
+    const focus = resolvePoint(visual.focus)
+    const direction: MarkdownSelectionDirection =
+      anchor === focus ? 'collapsed' : focus > anchor ? 'forward' : 'backward'
+    if (visual.direction !== direction) {
+      throw new MarkdownRuntimeError(
+        'protocol',
+        'visual selection direction does not match its anchors',
+      )
+    }
+    return Object.freeze({ anchor, focus })
   }
 
   const sourcePositionToVisual = (position: MarkdownSourcePosition) => {
     if (position.affinity !== 'before' && position.affinity !== 'after') {
-      throw new MarkdownRuntimeError('protocol', 'source position requires affinity')
+      throw new MarkdownRuntimeError(
+        'protocol',
+        'source position requires affinity',
+      )
     }
     return locate(position.offset, position.affinity)
   }
@@ -519,7 +670,8 @@ export const createMarkdownAnchorMap = (
       const fullyCovered =
         start >= deleteStart &&
         end <= deleteEnd &&
-        (start < end || (start === end && start >= deleteStart && start < deleteEnd))
+        (start < end ||
+          (start === end && start >= deleteStart && start < deleteEnd))
       if (fullyCovered) {
         return Object.freeze({ status: 'deleted' as const })
       }
@@ -527,7 +679,8 @@ export const createMarkdownAnchorMap = (
       const overlaps = start < deleteEnd && end > deleteStart
       if (overlaps) {
         const nextStart = start < deleteStart ? start : deleteStart
-        const nextEnd = end > deleteEnd ? end - (deleteEnd - deleteStart) : deleteStart
+        const nextEnd =
+          end > deleteEnd ? end - (deleteEnd - deleteStart) : deleteStart
         return Object.freeze({
           status: 'partial' as const,
           range: Object.freeze({
@@ -548,12 +701,14 @@ export const createMarkdownAnchorMap = (
       const at = mutation.insert.at
       const length =
         mutation.insert.length ??
-        (typeof mutation.insert.text === 'string' ? mutation.insert.text.length : 0)
+        (typeof mutation.insert.text === 'string'
+          ? mutation.insert.text.length
+          : 0)
       assertIntegerInRange(at, 'insert at', source.length)
       if (!Number.isInteger(length) || length < 0) {
         throw new MarkdownRuntimeError('protocol', 'insert length is invalid')
       }
-      if (at < start) {
+      if (at <= start) {
         start += length
         end += length
       } else if (at < end) {
@@ -571,7 +726,10 @@ export const createMarkdownAnchorMap = (
   const sourceRangeToVisual = (range: MarkdownSourceRange) =>
     sourceSelectionToVisual({ anchor: range.start, focus: range.end })
 
-  const resolveHitOffset = (hit: MarkdownPointerHit, node: MarkdownAnchorSyntaxNode) => {
+  const resolveHitOffset = (
+    hit: MarkdownPointerHit,
+    node: MarkdownAnchorSyntaxNode,
+  ) => {
     if (Number.isInteger(hit.localOffset)) {
       const raw = node.start + (hit.localOffset as number)
       assertIntegerInRange(raw, 'pointer local offset', source.length)
@@ -637,7 +795,10 @@ export const createMarkdownAnchorMap = (
   ): MarkdownHiddenTraversal => {
     const node = requireNode(query.anchorId)
     if (query.direction !== 'forward' && query.direction !== 'backward') {
-      throw new MarkdownRuntimeError('protocol', 'hidden traversal requires a direction')
+      throw new MarkdownRuntimeError(
+        'protocol',
+        'hidden traversal requires a direction',
+      )
     }
     if (query.direction === 'forward') {
       const next = nodeAtBoundary(node.end, 'start', true)
@@ -657,12 +818,18 @@ export const createMarkdownAnchorMap = (
     })
   }
 
-  const sourceRangeToReveal = (range: MarkdownSourceRange): MarkdownSourceReveal => {
+  const sourceRangeToReveal = (
+    range: MarkdownSourceRange,
+  ): MarkdownSourceReveal => {
     assertIntegerInRange(range.start, 'reveal start', source.length)
     assertIntegerInRange(range.end, 'reveal end', source.length)
     const start = Math.min(range.start, range.end)
     const end = Math.max(range.start, range.end)
-    const overlapping = syntax.filter((node) => node.start < end && node.end > start)
+    const overlapping = syntax.filter((node) =>
+      start === end
+        ? node.start <= start && node.end >= end
+        : node.start < end && node.end > start,
+    )
     const highlights = overlapping.map((node) =>
       Object.freeze({
         anchorId: node.id,
@@ -671,8 +838,15 @@ export const createMarkdownAnchorMap = (
         range: Object.freeze({ start: node.start, end: node.end }),
       }),
     )
+    const exact = overlapping.filter(
+      (node) => node.start === start && node.end === end,
+    )
     const revealNode =
-      overlapping.find((node) => node.hidden || node.virtual) ?? overlapping[0]
+      exact.length > 0
+        ? smallestNode(exact)
+        : overlapping.length > 0
+          ? smallestNode(overlapping)
+          : undefined
     return Object.freeze({
       identity,
       documentIdentity,

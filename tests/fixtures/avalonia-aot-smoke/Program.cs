@@ -1,62 +1,214 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Platform;
 using Avalonia.Threading;
+using FsusUI.Avalonia.Controls;
+using FsusUI.Avalonia.Icons;
+using FsusUI.Avalonia.Themes;
 
-var options = SmokeOptions.Parse(args);
-var report = new SmokeReport { SmokeRequested = options.Smoke };
-
-try
+internal static class Program
 {
-  var window = new Window
+  private static SmokeOptions options = new();
+  private static SmokeReport report = new();
+
+  [STAThread]
+  public static int Main(string[] args)
   {
-    Content = new TextBlock { Text = "FsusUI Avalonia Native AOT smoke" },
-  };
+    try
+    {
+      options = SmokeOptions.Parse(args);
+      report = new SmokeReport
+      {
+        SmokeRequested = options.Smoke,
+        ProcessArchitecture = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString(),
+      };
+      if (!options.Smoke || options.ReportPath is null)
+      {
+        throw new ArgumentException("Usage: --smoke --report <path>");
+      }
 
-  Dispatcher.UIThread.Invoke(() =>
+      BuildAvaloniaApp().StartWithClassicDesktopLifetime(
+        args,
+        ShutdownMode.OnExplicitShutdown
+      );
+      return report.ExitCode;
+    }
+    catch (Exception error)
+    {
+      if (report.FailureKind is not null)
+      {
+        return report.ExitCode;
+      }
+      return Fail("loader", error);
+    }
+  }
+
+  private static AppBuilder BuildAvaloniaApp() =>
+    AppBuilder.Configure<SmokeApplication>().UsePlatformDetect().LogToTrace();
+
+  internal static void RunSmoke(IClassicDesktopStyleApplicationLifetime desktop)
   {
-    report.TopLevelCreated = window is TopLevel;
-    report.DispatcherReached = true;
-  });
+    try
+    {
+      if (options.Failure == "resource")
+      {
+        using var _ = AssetLoader.Open(
+          new Uri("avares://FsusUI.Avalonia.Themes/Themes/Controls/DefinitelyMissing.axaml")
+        );
+      }
 
-  if (!options.Smoke || !report.TopLevelCreated || !report.DispatcherReached)
-    throw new InvalidOperationException("Native AOT smoke did not create a top-level on the dispatcher.");
+      var button = new FsusButton
+      {
+        Content = "Native AOT smoke",
+        AccessibleName = "Native AOT smoke",
+      };
+      var icon = new FsusIcon
+      {
+        IconKey = FsusIconKeys.Settings,
+        IsDecorative = true,
+      };
+      var panel = new StackPanel();
+      panel.Children.Add(button);
+      panel.Children.Add(icon);
 
-  if (options.ReportPath is not null)
-    File.WriteAllText(options.ReportPath, JsonSerializer.Serialize(report));
+      var window = new Window
+      {
+        Width = 320,
+        Height = 160,
+        ShowInTaskbar = false,
+        Content = panel,
+      };
+      desktop.MainWindow = window;
+      window.Opened += (_, _) =>
+        Dispatcher.UIThread.Post(
+          () =>
+          {
+            try
+            {
+              report.TopLevelCreated = window is TopLevel;
+              report.DispatcherReached = Dispatcher.UIThread.CheckAccess();
+              report.PlatformHandleCreated = window.TryGetPlatformHandle() is not null;
+              report.PackageControlCount = panel.Children.Count;
+              report.ThemeDensity = FsusThemeOptions.Default.Density.ToString();
+              report.ExitCode =
+                report.TopLevelCreated &&
+                report.DispatcherReached &&
+                report.PlatformHandleCreated &&
+                report.PackageControlCount == 2
+                  ? 0
+                  : 1;
+              if (report.ExitCode != 0)
+              {
+                report.FailureKind = "top-level";
+                report.Error = "Avalonia top-level or dispatcher initialization was incomplete.";
+              }
+              WriteReport();
+            }
+            catch (Exception error)
+            {
+              report.ExitCode = 1;
+              report.FailureKind = "report";
+              report.Error = error.ToString();
+              WriteReport();
+            }
+            finally
+            {
+              window.Close();
+              desktop.Shutdown(report.ExitCode);
+            }
+          },
+          DispatcherPriority.Loaded
+        );
+      window.Show();
+    }
+    catch (Exception error)
+    {
+      Fail("resource", error);
+      desktop.Shutdown(report.ExitCode);
+    }
+  }
 
-  return 0;
+  private static int Fail(string kind, Exception error)
+  {
+    report.ExitCode = 1;
+    report.FailureKind = kind;
+    report.Error = error.ToString();
+    Console.Error.WriteLine($"FsusUI Native AOT smoke {kind} failure: {error}");
+    WriteReport();
+    return report.ExitCode;
+  }
+
+  private static void WriteReport()
+  {
+    if (options.ReportPath is null)
+    {
+      return;
+    }
+    var parent = Path.GetDirectoryName(Path.GetFullPath(options.ReportPath));
+    if (parent is not null)
+    {
+      Directory.CreateDirectory(parent);
+    }
+    File.WriteAllText(
+      options.ReportPath,
+      JsonSerializer.Serialize(report, SmokeJsonContext.Default.SmokeReport)
+    );
+  }
 }
-catch (Exception error)
+
+internal sealed class SmokeApplication : Application
 {
-  report.Error = error.Message;
-  if (options.ReportPath is not null)
-    File.WriteAllText(options.ReportPath, JsonSerializer.Serialize(report));
-  Console.Error.WriteLine(error.Message);
-  return 1;
+  public override void OnFrameworkInitializationCompleted()
+  {
+    if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+    {
+      Program.RunSmoke(desktop);
+    }
+    base.OnFrameworkInitializationCompleted();
+  }
 }
 
-sealed class SmokeOptions
+internal sealed record SmokeOptions
 {
-  public bool Smoke { get; private init; }
-  public string? ReportPath { get; private init; }
+  public bool Smoke { get; init; }
+  public string? ReportPath { get; init; }
+  public string? Failure { get; init; }
 
   public static SmokeOptions Parse(string[] arguments)
   {
-    var reportIndex = Array.IndexOf(arguments, "--report");
+    string? ValueAfter(string name)
+    {
+      var index = Array.IndexOf(arguments, name);
+      return index >= 0 && index + 1 < arguments.Length
+        ? arguments[index + 1]
+        : null;
+    }
+
     return new SmokeOptions
     {
       Smoke = arguments.Contains("--smoke", StringComparer.Ordinal),
-      ReportPath = reportIndex >= 0 && reportIndex + 1 < arguments.Length
-        ? arguments[reportIndex + 1]
-        : null,
+      ReportPath = ValueAfter("--report"),
+      Failure = ValueAfter("--fail"),
     };
   }
 }
 
-sealed class SmokeReport
+internal sealed record SmokeReport
 {
-  public bool SmokeRequested { get; set; }
+  public bool SmokeRequested { get; init; }
   public bool TopLevelCreated { get; set; }
   public bool DispatcherReached { get; set; }
+  public bool PlatformHandleCreated { get; set; }
+  public int PackageControlCount { get; set; }
+  public string? ThemeDensity { get; set; }
+  public string? ProcessArchitecture { get; init; }
+  public int ExitCode { get; set; } = 1;
+  public string? FailureKind { get; set; }
   public string? Error { get; set; }
 }
+
+[JsonSerializable(typeof(SmokeReport))]
+internal sealed partial class SmokeJsonContext : JsonSerializerContext;

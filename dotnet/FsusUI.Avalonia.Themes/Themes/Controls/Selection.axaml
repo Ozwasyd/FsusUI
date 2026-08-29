@@ -41,7 +41,7 @@
 
   <Style Selector="CheckBox:focus, RadioButton:focus, ToggleSwitch:focus, fsus|FsusCheckbox:focus, fsus|FsusRadio:focus, fsus|FsusSwitch:focus, fsus|FsusCheckbox.fsus-focus-visible, fsus|FsusRadio.fsus-focus-visible, fsus|FsusSwitch.fsus-focus-visible">
     <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
-    <Setter Property="BorderThickness" Value="{DynamicResource FsusThemeFocusThickness}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusThemeFocusBorderThickness}" />
   </Style>
 
   <Style Selector="fsus|FsusCheckbox.fsus-size-sm, fsus|FsusRadio.fsus-size-sm, fsus|FsusSwitch.fsus-size-sm">

@@ -48,7 +48,20 @@ enum class syntax_kind : std::uint8_t {
   footnote = 11,
   explicit_paragraph = 12,
   embed = 13,
-  malformed = 14
+  caption = 14,
+  anchor = 15,
+  malformed = 16,
+  count = 17
+};
+
+enum class syntax_status : std::uint8_t {
+  valid = 0,
+  malformed = 1
+};
+
+struct syntax_range final {
+  std::size_t start_offset{0};
+  std::size_t end_offset{0};
 };
 
 struct syntax_node final {
@@ -56,6 +69,10 @@ struct syntax_node final {
   std::size_t start_offset{0};
   std::size_t end_offset{0};
   std::size_t parent_index{static_cast<std::size_t>(-1)};
+  std::vector<syntax_range> content_ranges;
+  std::vector<syntax_range> marker_ranges;
+  syntax_status status{syntax_status::valid};
+  std::string diagnostic_code;
 };
 
 struct placeholder final {

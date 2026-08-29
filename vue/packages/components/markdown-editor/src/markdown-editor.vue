@@ -1,6 +1,7 @@
 <template>
   <section
     v-bind="$attrs"
+    ref="rootElementRef"
     :class="[
       ns.b(),
       ns.m(currentMode),
@@ -351,7 +352,11 @@ import {
 } from 'vue'
 import { ElMarkdownRenderer } from '@element-plus/components/markdown-renderer'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
-import { useNamespace } from '@element-plus/hooks'
+import {
+  provideMarkdownEditorFrameScheduler,
+  useMarkdownEditorFrameScheduler,
+  useNamespace,
+} from '@element-plus/hooks'
 import {
   filterMarkdownEditorCommands,
   isMarkdownEditorCommandEnabled,
@@ -444,6 +449,25 @@ defineOptions({
 const props = defineProps(markdownEditorProps)
 const emit = defineEmits(markdownEditorEmits)
 const ns = useNamespace('markdown-editor')
+const rootElementRef = ref<HTMLElement | null>(null)
+const frameScheduler = useMarkdownEditorFrameScheduler({
+  onFrameEnd: (metrics) => {
+    const target = rootElementRef.value
+    if (!target) return
+    const next = JSON.stringify({
+      coalesced: metrics.coalescedTasks,
+      executed: metrics.executed,
+      frame: metrics.frameId,
+      pending: metrics.pendingTasks,
+      stale: metrics.staleTasks,
+      violations: metrics.readAfterWriteViolations,
+    })
+    if (target.dataset.markdownFrameMetrics !== next) {
+      target.dataset.markdownFrameMetrics = next
+    }
+  },
+})
+provideMarkdownEditorFrameScheduler(frameScheduler)
 const modes: MarkdownEditorMode[] = ['source', 'live', 'split', 'preview']
 const commandTrayId = `${useId()}-command-tray`
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
@@ -487,11 +511,12 @@ const initialSelection: MarkdownEditorSelection = {
   end: props.modelValue.length,
   start: props.modelValue.length,
 }
+const documentIdentity = Object.freeze({ epoch: 0, id: commandTrayId })
 const transactionStore = new MarkdownEditorTransactionStore(
   props.modelValue,
   initialSelection,
+  documentIdentity,
 )
-const documentIdentity = Object.freeze({ epoch: 0, id: commandTrayId })
 const editorValue = ref(transactionStore.value)
 const liveSurface = computed(() =>
   createMarkdownLiveSurface({
@@ -535,6 +560,8 @@ const liveLayout = ref<MarkdownLiveLayoutPlan>(
 )
 let layoutGestureTimer: ReturnType<typeof setTimeout> | undefined
 let restoringViewport = false
+let viewportRestoreCurrentScrollTop = 0
+let viewportRestoreNextScrollTop: number | null = null
 const liveDecorations = computed(() => {
   const decorations = liveSurface.value.decorations
   if (currentMode.value !== 'live' || !liveWindow.value) return decorations
@@ -544,17 +571,47 @@ const liveDecorations = computed(() => {
 const restoreTextareaViewport = (plan: MarkdownLiveLayoutPlan) => {
   const textarea = textareaRef.value
   if (!textarea || plan.action !== 'restore' || !plan.anchor) return
+  const anchor = plan.anchor
   const line =
-    transactionStore.value.slice(0, plan.anchor.sourceOffset).split('\n')
-      .length - 1
-  const lineHeight =
-    Number.parseFloat(window.getComputedStyle(textarea).lineHeight) || 20
-  const next = Math.max(0, line * lineHeight - textarea.clientHeight / 3)
-  if (Math.abs(textarea.scrollTop - next) <= 1) return
-  restoringViewport = true
-  textarea.scrollTop = next
-  queueMicrotask(() => {
-    restoringViewport = false
+    transactionStore.value.slice(0, anchor.sourceOffset).split('\n').length - 1
+  frameScheduler.schedule({
+    // Same-frame supersede: a newer layout plan (or a user gesture yield)
+    // replaces or cancels this restore before the frame commits it.
+    guard: () => liveLayout.value === plan,
+    key: 'viewport-restore',
+    measure: () => {
+      const target = textareaRef.value
+      if (!target) {
+        viewportRestoreNextScrollTop = null
+        return
+      }
+      const lineHeight =
+        Number.parseFloat(window.getComputedStyle(target).lineHeight) || 20
+      viewportRestoreNextScrollTop = Math.max(
+        0,
+        line * lineHeight - target.clientHeight / 3,
+      )
+      viewportRestoreCurrentScrollTop = target.scrollTop
+    },
+    mutate: () => {
+      const target = textareaRef.value
+      if (
+        !target ||
+        viewportRestoreNextScrollTop === null ||
+        Math.abs(
+          viewportRestoreCurrentScrollTop - viewportRestoreNextScrollTop,
+        ) <= 1
+      ) {
+        viewportRestoreNextScrollTop = null
+        return
+      }
+      restoringViewport = true
+      target.scrollTop = viewportRestoreNextScrollTop
+      viewportRestoreNextScrollTop = null
+      queueMicrotask(() => {
+        restoringViewport = false
+      })
+    },
   })
 }
 const applyLiveLayout = (
@@ -579,15 +636,28 @@ const applyLiveLayout = (
   if (plan.action === 'restore') restoreTextareaViewport(plan)
   return plan
 }
+let virtualWindowNext: MarkdownLiveVirtualWindow | null = null
 const refreshLiveWindow = (
   origin: 'input' | 'document-switch' | 'mode-switch' | 'feature' | 'initial',
 ) => {
-  liveWindow.value = resolveMarkdownLiveVirtualWindow({
-    documentIdentity,
-    origin,
-    previousMountedNodeIds: liveWindow.value?.mountedNodeIds,
-    selection: transactionStore.selection,
-    source: transactionStore.value,
+  frameScheduler.schedule({
+    key: 'virtual-window',
+    // The window plan is pure data (projection + selection distance); it is
+    // recomputed in the measure phase so rapid input always commits the
+    // freshest window, and the mount/unmount commit lands in the mutate phase.
+    measure: () => {
+      virtualWindowNext = resolveMarkdownLiveVirtualWindow({
+        documentIdentity,
+        origin,
+        previousMountedNodeIds: liveWindow.value?.mountedNodeIds,
+        selection: transactionStore.selection,
+        source: transactionStore.value,
+      })
+    },
+    mutate: () => {
+      if (virtualWindowNext) liveWindow.value = virtualWindowNext
+      virtualWindowNext = null
+    },
   })
 }
 const markLayoutGesture = (gesture: MarkdownLiveLayoutGesture) => {
@@ -731,6 +801,8 @@ const rejectedResult = (
 ): MarkdownEditorDispatchResult =>
   Object.freeze({
     accepted: false,
+    beforeRevision: transactionStore.revision,
+    documentIdentity: transactionStore.documentIdentity,
     history: transactionStore.history,
     reason,
     revision: transactionStore.revision,
@@ -775,7 +847,18 @@ const restoreTextareaSelection = async (
 const dispatchEditorOperation = (
   operation: EditorOperation,
 ): MarkdownEditorDispatchResult => {
-  const transaction = operationTransaction(operation)
+  const transaction = operationTransaction(
+    operation.kind === 'transaction'
+      ? {
+          ...operation,
+          transaction: Object.freeze({
+            ...operation.transaction,
+            documentIdentity:
+              operation.transaction.documentIdentity ?? documentIdentity,
+          }),
+        }
+      : operation,
+  )
   const blocked =
     operation.kind === 'transaction'
       ? !operation.allowBlocked && editingBlocked.value
@@ -794,7 +877,7 @@ const dispatchEditorOperation = (
   const previousHistory = transactionStore.history
   const result =
     operation.kind === 'transaction'
-      ? transactionStore.dispatch(operation.transaction, {
+      ? transactionStore.dispatch(transaction, {
           mergeDirection: operation.mergeDirection,
           now: Date.now(),
         })
@@ -913,6 +996,12 @@ watch(
     if (value === transactionStore.value) return
 
     abortPendingCommands()
+    // Document switch: pending frame tasks from the previous document must
+    // not commit geometry into the new document (#640 stale cancellation).
+    frameScheduler.cancelAll()
+    // One settle frame samples the scheduler so evidence can observe that no
+    // stale task survived the document switch.
+    frameScheduler.schedulePostPaint('frame-metrics-settle', () => undefined)
     nativeMachine.apply({
       documentIdentity,
       kind: 'external-reset',
@@ -938,9 +1027,14 @@ watch(
           },
         ],
         history: 'skip',
+        externalUpdate: 'reset',
         metadata: Object.freeze({ kind: 'external-reset' }),
         origin: 'external',
-        selection: transactionStore.selection,
+        selection: {
+          direction: transactionStore.selection.direction,
+          end: value.length,
+          start: value.length,
+        },
       },
     })
   },
@@ -1080,17 +1174,35 @@ const visibleModes = computed(() =>
 )
 const wordCount = computed(() => editorMetrics.value.wordCount)
 
+let viewportHeightNext: number | null = null
+let viewportTrigger: MarkdownLiveLayoutTrigger | null = null
 const updateVisualViewportHeight = () => {
   if (typeof window === 'undefined') return
 
-  const previous = visualViewportHeight.value
-  visualViewportHeight.value =
-    window.visualViewport?.height || window.innerHeight || 0
-  const trigger =
-    previous > 0 && visualViewportHeight.value + 80 < previous
-      ? 'soft-keyboard'
-      : 'visual-viewport'
-  applyLiveLayout(trigger)
+  frameScheduler.schedule({
+    key: 'visual-viewport-read',
+    measure: () => {
+      const height =
+        window.visualViewport?.height || window.innerHeight || 0
+      const previous = visualViewportHeight.value
+      viewportHeightNext = height
+      viewportTrigger =
+        previous > 0 && height + 80 < previous
+          ? 'soft-keyboard'
+          : 'visual-viewport'
+    },
+    mutate: () => {
+      if (viewportHeightNext === null) return
+      visualViewportHeight.value = viewportHeightNext
+      const trigger = viewportTrigger ?? 'visual-viewport'
+      viewportHeightNext = null
+      viewportTrigger = null
+      // Applies the (already planned) layout response; a resulting scroll
+      // restore is measured in the next frame because this mutate phase has
+      // already begun — the read-after-write violation counter records it.
+      applyLiveLayout(trigger)
+    },
+  })
 }
 
 onMounted(() => {

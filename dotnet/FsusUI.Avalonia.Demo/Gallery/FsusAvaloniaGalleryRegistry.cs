@@ -128,16 +128,30 @@ public static class FsusAvaloniaGalleryRegistry
         panel.Children.Add(new FsusTextEditor { AccessibleName = "Gallery editor" });
         break;
       case "markdown-editor":
-        panel.Children.Add(
-          new FsusMarkdownEditor
-          {
-            Document = "# Gallery\n\n中文 markdown editor shell",
-            DocumentIdentity = new FsusMarkdownDocumentIdentity("gallery-doc", 1),
-            Mode = FsusMarkdownEditorMode.Source,
-            Chrome = FsusMarkdownEditorChrome.Framed,
-            StatusDensity = FsusMarkdownEditorStatusDensity.Minimal,
-            CapabilityState = "partial",
-          });
+        const string galleryMarkdown = "# Gallery\n\n中文 markdown editor";
+        var markdownEditor = new FsusMarkdownEditor
+        {
+          Document = galleryMarkdown,
+          DocumentIdentity = new FsusMarkdownDocumentIdentity("gallery-doc", 1),
+          Mode = FsusMarkdownEditorMode.Live,
+          Chrome = FsusMarkdownEditorChrome.Framed,
+          StatusDensity = FsusMarkdownEditorStatusDensity.Minimal,
+        };
+        _ = markdownEditor.CommitProjection(new(
+          markdownEditor.DocumentIdentity,
+          0,
+          galleryMarkdown,
+          [
+            new("gallery-heading-marker", new(0, 2), FsusMarkdownProjectionSpanKind.HiddenMarker, ""),
+            new("gallery-heading", new(2, 9), FsusMarkdownProjectionSpanKind.Text, "Gallery", "heading"),
+            new(
+              "gallery-paragraph",
+              new(9, galleryMarkdown.Length),
+              FsusMarkdownProjectionSpanKind.Text,
+              "\n\n中文 markdown editor",
+              "paragraph"),
+          ]));
+        panel.Children.Add(markdownEditor);
         break;
       case "public-shell":
         var shell = new FsusPublicShell { Brand = "Fsus", ActiveNav = "home" };
@@ -151,6 +165,19 @@ public static class FsusAvaloniaGalleryRegistry
         break;
       case "perception-challenge":
         AddPerceptionCharacterStates(panel);
+        break;
+      case "upload-transfer":
+        var upload = new FsusUpload { AccessibleName = "Gallery upload" };
+        upload.AddItem("sample.pdf", 2048, "application/pdf");
+        var dropZone = new FsusDropZone
+        {
+          AccessibleName = "Gallery drop zone",
+          Instruction = "拖放文件或点击选择 / Drag files here or click to browse",
+          HelpText = "PDF, PNG, CSV up to 25MB",
+          Accepts = ".pdf, .png, .csv",
+        };
+        panel.Children.Add(upload);
+        panel.Children.Add(dropZone);
         break;
       case "locale-formatting":
         var provider = FsusAvaloniaLocaleProvider.CreateDefault();

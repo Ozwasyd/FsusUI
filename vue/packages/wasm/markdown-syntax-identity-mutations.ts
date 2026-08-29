@@ -8,8 +8,10 @@ import {
 import type { MarkdownEditorSyntaxNode } from './markdown-editor-projection'
 
 export type MarkdownSyntaxIdentityMutationKind =
+  | 'kind-offset'
   | 'content-hash-only'
-  | 'offset-only-kind-change'
+  | 'full-document-reid'
+  | 'cross-document-reuse'
 
 export interface MarkdownSyntaxIdentityMutationResult {
   readonly kind: MarkdownSyntaxIdentityMutationKind
@@ -95,17 +97,26 @@ const rematchByContentHash = (
   return fillRemainingIds(next.nodes, documentIdentity, assigned)
 }
 
-const rematchByOffsetOnly = (
-  previous: MarkdownStableProjection,
+const identifyByKindOffset = (
   nextSource: string,
   documentIdentity: MarkdownDocumentIdentity,
 ): readonly string[] => {
   const next = createMarkdownEditorProjection(nextSource)
-  const assigned: Array<string | undefined> = next.nodes.map((_, index) => {
-    const previousNode = previous.nodes[index]
-    return previousNode?.id
-  })
-  return fillRemainingIds(next.nodes, documentIdentity, assigned)
+  return next.nodes.map(
+    (node) =>
+      `syn:${documentIdentity.id}:${documentIdentity.epoch}:${node.kind}:${node.rawRange.start}`,
+  )
+}
+
+const reidentifyWholeDocument = (
+  nextSource: string,
+  documentIdentity: MarkdownDocumentIdentity,
+): readonly string[] => {
+  const next = createMarkdownEditorProjection(nextSource)
+  return next.nodes.map(
+    (node, index) =>
+      `syn:${documentIdentity.id}:${documentIdentity.epoch}:${node.kind}:${index + next.nodes.length}`,
+  )
 }
 
 const sameIds = (
@@ -134,29 +145,59 @@ export const evaluateMarkdownSyntaxIdentityMutations = (input: {
     input.nextSource,
     input.documentIdentity,
   )
-  const offsetIds = rematchByOffsetOnly(
-    previous,
+  const kindOffsetIds = identifyByKindOffset(
     input.nextSource,
     input.documentIdentity,
   )
+  const fullDocumentIds = reidentifyWholeDocument(
+    input.nextSource,
+    input.documentIdentity,
+  )
+  const otherDocumentIdentity = Object.freeze({
+    id: `${input.documentIdentity.id}-other`,
+    epoch: input.documentIdentity.epoch,
+  })
+  const otherDocument = stabilizeMarkdownEditorProjection(
+    createMarkdownEditorProjection(input.previousSource),
+    otherDocumentIdentity,
+    previous,
+  )
   const hashEquivalent = sameIds(authority.nodes, hashIds)
-  const offsetEquivalent = sameIds(authority.nodes, offsetIds)
+  const kindOffsetEquivalent = sameIds(authority.nodes, kindOffsetIds)
+  const fullDocumentEquivalent = sameIds(authority.nodes, fullDocumentIds)
+  const crossDocumentEquivalent = sameIds(
+    otherDocument.nodes,
+    previous.nodes.map((node) => node.id),
+  )
 
   return Object.freeze({
     previous,
     authority,
     mutations: Object.freeze([
       Object.freeze({
+        kind: 'kind-offset' as const,
+        equivalent: kindOffsetEquivalent,
+        accepted: kindOffsetEquivalent,
+        detail: 'kind plus raw offset must not define syntax identity',
+      }),
+      Object.freeze({
         kind: 'content-hash-only' as const,
         equivalent: hashEquivalent,
         accepted: hashEquivalent,
-        detail: 'visible-text hash rematch must not steal an identity on insert',
+        detail:
+          'visible-text hash rematch must not steal an identity on insert',
       }),
       Object.freeze({
-        kind: 'offset-only-kind-change' as const,
-        equivalent: offsetEquivalent,
-        accepted: offsetEquivalent,
-        detail: 'same-slot offset rematch must not keep an id after kind and content change',
+        kind: 'full-document-reid' as const,
+        equivalent: fullDocumentEquivalent,
+        accepted: fullDocumentEquivalent,
+        detail: 'ordinary edits must not replace every current syntax identity',
+      }),
+      Object.freeze({
+        kind: 'cross-document-reuse' as const,
+        equivalent: crossDocumentEquivalent,
+        accepted: crossDocumentEquivalent,
+        detail: 'a different document identity must not reuse prior syntax ids',
       }),
     ]),
   })

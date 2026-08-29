@@ -290,10 +290,21 @@ const reverseProjectFromRegex = (
     const start = match.index ?? 0
     nodes.push(
       Object.freeze({
+        blockIdentity: `mutation:heading:${nodes.length}`,
         kind: 'heading',
+        status: 'valid',
+        diagnosticCode: null,
         presentation: presentationForSyntaxKind('heading'),
         rawRange: Object.freeze({ start, end: start + match[0].length }),
         normalizedRange: Object.freeze({ start, end: start + match[0].length }),
+        rawContentRanges: Object.freeze([
+          { start, end: start + match[0].length },
+        ]),
+        normalizedContentRanges: Object.freeze([
+          { start, end: start + match[0].length },
+        ]),
+        rawMarkerRanges: Object.freeze([]),
+        normalizedMarkerRanges: Object.freeze([]),
         parentRawRange: null,
         parentNormalizedRange: null,
         childRawRanges: Object.freeze([]),
@@ -307,10 +318,21 @@ const reverseProjectFromRegex = (
     const kind = match[0].startsWith('!') ? 'image' : 'link'
     nodes.push(
       Object.freeze({
+        blockIdentity: `mutation:${kind}:${nodes.length}`,
         kind,
+        status: 'valid',
+        diagnosticCode: null,
         presentation: presentationForSyntaxKind(kind),
         rawRange: Object.freeze({ start, end: start + match[0].length }),
         normalizedRange: Object.freeze({ start, end: start + match[0].length }),
+        rawContentRanges: Object.freeze([
+          { start, end: start + match[0].length },
+        ]),
+        normalizedContentRanges: Object.freeze([
+          { start, end: start + match[0].length },
+        ]),
+        rawMarkerRanges: Object.freeze([]),
+        normalizedMarkerRanges: Object.freeze([]),
         parentRawRange: null,
         parentNormalizedRange: null,
         childRawRanges: Object.freeze([]),

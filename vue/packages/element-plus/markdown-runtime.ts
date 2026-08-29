@@ -52,6 +52,7 @@ export {
   markdownProjectionHasCompleteCoverage,
   markdownRenderIdentitiesEqual,
   presentationForSyntaxKind,
+  validateMarkdownEditorSyntaxCoverage,
   readMarkdownRenderIdentity,
   transferMarkdownEditorProjection,
   createMarkdownOutlineEntries,
@@ -115,7 +116,10 @@ export {
 
 export type {
   MarkdownDocumentIdentity,
+  MarkdownSyntaxIdentityChange,
+  MarkdownSyntaxIdentityState,
   MarkdownEditorPresentation,
+  MarkdownEditorSyntaxStatus,
   MarkdownEditorProjectionDiagnostic,
   MarkdownEditorProjectionIdentity,
   MarkdownEditorProjectionResult,

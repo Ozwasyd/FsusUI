@@ -1,11 +1,40 @@
 {
   "schemaVersion": 1,
   "id": "markdown-runtime-projection",
-  "version": "markdown-projection-acceptance@2026-08-15",
+  "version": "markdown-projection-acceptance@2026-08-27",
   "exportPath": "./markdown-runtime",
   "package": "@ozwasyd/element-plus/markdown-runtime",
   "classification": "native-adapter",
   "authority": "unique-projection",
+  "projectionNode": {
+    "identity": "revision-local-block-identity",
+    "sourceRanges": [
+      "rawRange",
+      "normalizedRange"
+    ],
+    "contentRanges": [
+      "rawContentRanges",
+      "normalizedContentRanges"
+    ],
+    "markerRanges": [
+      "rawMarkerRanges",
+      "normalizedMarkerRanges"
+    ],
+    "hierarchy": [
+      "parentRawRange",
+      "parentNormalizedRange",
+      "childRawRanges",
+      "childNormalizedRanges"
+    ],
+    "malformed": [
+      "status",
+      "diagnosticCode"
+    ]
+  },
+  "worker": {
+    "payload": "complete-projection-result",
+    "semanticEquivalence": true
+  },
   "scale": {
     "minSourceChars": 100000,
     "minBlocks": 3000,
@@ -46,7 +75,10 @@
     "second-parser",
     "regex-scan",
     "dom-query",
+    "dom-path",
     "html-offset",
+    "bare-offset",
+    "nearby-reveal",
     "title-hash-identity",
     "normalized-offset-as-raw"
   ]

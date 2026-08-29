@@ -4,14 +4,78 @@ Component ID: `markdown-editor`
 
 ## Avalonia API
 
-Use `FsusMarkdownEditor` for the public native shell. Document, identity, mode,
-chrome, locale, status density, and a command entry exist; live projection,
-IME, and AutomationPeer remain partial.
+Use `FsusMarkdownEditor` for the public native Source and Live surface.
+Document, identity, mode, chrome, locale, status density, transaction commands,
+and canonical projection commits share one native input and selection owner.
+Split/Preview, complete platform IME acceptance, and AutomationPeer remain
+partial.
+
+## Native Source and Live projection
+
+Source mode keeps the authoritative raw source in one native `TextBox` as the
+only text input, selection, composition, and undo-command owner. Source and Live
+present through the same native Avalonia `TextLayout` viewport; Source uses an
+identity source map, while Live uses the canonical projection map. Live
+decorations never become document authority.
+
+The canonical Markdown runtime supplies a parser-neutral
+`FsusMarkdownProjectionSnapshot` through `CommitProjection`. Each snapshot is
+bound to the document identity, transaction revision, raw source, and feature
+revision. A stale document, revision, source, or feature snapshot is rejected
+without replacing the current source. `ProjectionRequested` identifies the
+exact state for which a new projection is needed.
+
+Projection spans use raw UTF-16 source ranges and stable node identities.
+`Text`, `HiddenMarker`, `Atomic`, and `SourceFallback` presentations support
+ordinary text, hidden Markdown syntax, atomic before/after caret placement, and
+localized source fallback without introducing a second Markdown parser.
+`FsusMarkdownProjectionMap` maps caret/pointer positions bidirectionally, and
+`FsusMarkdownSourceCoordinateMap` preserves the raw/normalized relationship for
+BOM, CRLF/CR, CJK, emoji, and RTL text.
+
+After an ordinary transaction, unaffected spans are remapped through the
+transaction position map and retain their identities. Invalidated gaps render
+the current raw source until the canonical owner commits the next snapshot; the
+control does not rebuild a parallel parse tree.
+
+Source/Live mode changes preserve the source line at the top of the viewport,
+then resolve its new pixel position through the active source/presentation map.
+The viewport snaps to the mapped line boundary so hidden markers and atomic
+presentations cannot introduce clipped leading glyphs or a different logical
+scroll context.
+
+## Transaction contract
+
+`DispatchTransaction`, `Undo`, and `Redo` use the same FsusUI-owned transaction
+store. Successful results carry the document identity, before/new revision,
+selection, history state, and a position map. `Transaction`,
+`SelectionChange`, and `HistoryChange` expose those changes without leaking an
+Avalonia text-control implementation.
+
+Every expected-revision operation should also carry the corresponding
+`FsusMarkdownDocumentIdentity`. A document identity or epoch change isolates
+selection, undo/redo, merge state, and stale work even when the Markdown source
+is byte-for-byte identical.
+
+External updates use an explicit policy:
+
+- `reset` replaces the source, moves selection to the end unless an explicit
+  selection is supplied, and clears history.
+- `rebase` applies the supplied changes, maps the current selection, and clears
+  history so old undo entries cannot mutate externally updated content.
+
+The Web and Avalonia implementations consume the same scenarios from
+`spec/avalonia/markdown-editor-transaction-vectors.json`. Those vectors cover
+multiple changes, selection direction, merge groups, undo/redo, external
+reset/rebase, stale revisions, document switching, affinity, and partial/full
+deletion.
 
 ## Vue Contract Mapping
 
 Maps the Vue markdown editor chrome/document/mode contract onto
-`FsusMarkdownEditor`. Unimplemented live/IME semantics stay `partial`.
+`FsusMarkdownEditor`. The projection snapshot is a native transport for the
+same parser-owned source ranges and stable identities; it is not an Avalonia
+Markdown parser.
 
 ## Supported Platform Differences
 
@@ -31,16 +95,36 @@ using FsusUI.Avalonia.Controls;
 
 var editor = new FsusMarkdownEditor
 {
-  Document = "# Draft",
+  Document = "**Draft**",
   DocumentIdentity = new FsusMarkdownDocumentIdentity("draft", 1),
-  Mode = FsusMarkdownEditorMode.Source,
   Chrome = FsusMarkdownEditorChrome.Framed,
   StatusDensity = FsusMarkdownEditorStatusDensity.Minimal,
 };
+
+editor.ProjectionRequested += (_, request) =>
+{
+  // Resolve spans from the canonical FsusUI Markdown projection owner.
+};
+
+editor.Mode = FsusMarkdownEditorMode.Live;
+editor.CommitProjection(new FsusMarkdownProjectionSnapshot(
+  editor.DocumentIdentity,
+  editor.TransactionStore.Revision,
+  editor.Document,
+  [
+    new("open", new(0, 2), FsusMarkdownProjectionSpanKind.HiddenMarker, ""),
+    new("text", new(2, 7), FsusMarkdownProjectionSpanKind.Text, "Draft", "strong"),
+    new("close", new(7, 9), FsusMarkdownProjectionSpanKind.HiddenMarker, ""),
+  ],
+  editor.ProjectionFeatureRevision));
 ```
 
 ## Known Limitations
 
-Live projection, IME integration, and AutomationPeer semantics remain partial.
+Split/Preview presentation, complete syntax-specific input behavior, real
+native IME matrix acceptance, AutomationPeer semantics, and final AOT
+acceptance remain partial. When no current canonical snapshot exists, Live
+mode intentionally presents localized/current raw source fallback and reports
+`source-fallback`.
 The Vue-only paste-as-Markdown review flow does not currently map to a native
 Avalonia command.

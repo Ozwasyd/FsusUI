@@ -1,110 +1,2076 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
+  "generatedBy": "node scripts/generate-update-surface.mjs",
   "surfaces": [
     {
-      "id": "npm-workspace-root",
-      "datasource": "npm",
-      "packageName": "root package.json dependencies",
-      "manager": "npm",
-      "files": ["package.json", "pnpm-lock.yaml"],
-      "versioning": "semver",
-      "group": "npm-release-tooling"
+      "id": "dotnet-runtime-target-framework",
+      "datasource": "dotnet-version",
+      "packageName": "dotnet-runtime",
+      "manager": "custom.regex",
+      "customManager": "dotnet-target-framework",
+      "files": [
+        "dotnet/Directory.Build.props",
+        "dotnet/FsusUI.Avalonia.ApiTool/FsusUI.Avalonia.ApiTool.csproj"
+      ],
+      "versioning": "loose",
+      "group": "node-dotnet-sdk-images",
+      "stabilityPolicy": "stable-only"
     },
     {
-      "id": "npm-vue-runtime",
-      "datasource": "npm",
-      "packageName": "@vue/* runtime packages",
-      "manager": "npm",
-      "files": ["vue/packages/element-plus/package.json", "pnpm-lock.yaml"],
-      "versioning": "semver",
-      "group": "vue-runtime-dependencies"
+      "id": "dotnet-sdk",
+      "datasource": "dotnet-version",
+      "packageName": "dotnet-sdk",
+      "manager": "nuget",
+      "files": [
+        "dotnet/global.json"
+      ],
+      "versioning": "loose",
+      "group": "node-dotnet-sdk-images",
+      "stabilityPolicy": "stable-only"
     },
     {
-      "id": "npm-vue-build",
-      "datasource": "npm",
-      "packageName": "vite/rollup/sass build toolchain",
-      "manager": "npm",
-      "files": ["package.json", "vue/packages/*/package.json", "pnpm-lock.yaml"],
-      "versioning": "semver",
-      "group": "vue-build-toolchain"
+      "id": "emsdk-toolchain",
+      "datasource": "github-releases",
+      "packageName": "emscripten-core/emsdk",
+      "manager": "custom.regex",
+      "customManager": "emsdk-version-input",
+      "files": [
+        ".github/workflows/_quality-playwright.yml",
+        ".github/workflows/_quality.yml",
+        ".github/workflows/quality.yml"
+      ],
+      "versioning": "semver-coerced",
+      "group": "wasm-toolchain",
+      "stabilityPolicy": "stable-only"
     },
     {
-      "id": "npm-js-test",
+      "id": "github-action-actions-cache",
+      "datasource": "github-tags",
+      "packageName": "actions/cache",
+      "manager": "github-actions",
+      "files": [
+        ".github/workflows/_quality-playwright.yml",
+        ".github/workflows/_quality.yml",
+        ".github/workflows/quality.yml"
+      ],
+      "versioning": "docker",
+      "group": "github-actions",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "github-action-actions-checkout",
+      "datasource": "github-tags",
+      "packageName": "actions/checkout",
+      "manager": "github-actions",
+      "files": [
+        ".github/workflows/_quality-playwright.yml",
+        ".github/workflows/_quality.yml",
+        ".github/workflows/publish-npm.yml",
+        ".github/workflows/quality.yml",
+        ".github/workflows/recover-npm-dist-tag.yml"
+      ],
+      "versioning": "docker",
+      "group": "github-actions",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "github-action-actions-download-artifact",
+      "datasource": "github-tags",
+      "packageName": "actions/download-artifact",
+      "manager": "github-actions",
+      "files": [
+        ".github/workflows/_quality-playwright.yml",
+        ".github/workflows/_quality.yml",
+        ".github/workflows/publish-npm.yml"
+      ],
+      "versioning": "docker",
+      "group": "github-actions",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "github-action-actions-setup-dotnet",
+      "datasource": "github-tags",
+      "packageName": "actions/setup-dotnet",
+      "manager": "github-actions",
+      "files": [
+        ".github/workflows/_quality.yml",
+        ".github/workflows/quality.yml"
+      ],
+      "versioning": "docker",
+      "group": "github-actions",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "github-action-actions-setup-node",
+      "datasource": "github-tags",
+      "packageName": "actions/setup-node",
+      "manager": "github-actions",
+      "files": [
+        ".github/workflows/_quality-playwright.yml",
+        ".github/workflows/_quality.yml",
+        ".github/workflows/publish-npm.yml",
+        ".github/workflows/quality.yml",
+        ".github/workflows/recover-npm-dist-tag.yml"
+      ],
+      "versioning": "docker",
+      "group": "github-actions",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "github-action-actions-upload-artifact",
+      "datasource": "github-tags",
+      "packageName": "actions/upload-artifact",
+      "manager": "github-actions",
+      "files": [
+        ".github/actions/readiness-manifest/action.yml",
+        ".github/workflows/_quality-playwright.yml",
+        ".github/workflows/_quality.yml",
+        ".github/workflows/quality.yml"
+      ],
+      "versioning": "docker",
+      "group": "github-actions",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "github-action-emscripten-core-setup-emsdk",
+      "datasource": "github-tags",
+      "packageName": "emscripten-core/setup-emsdk",
+      "manager": "github-actions",
+      "files": [
+        ".github/workflows/_quality-playwright.yml",
+        ".github/workflows/_quality.yml",
+        ".github/workflows/quality.yml"
+      ],
+      "versioning": "docker",
+      "group": "wasm-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "github-action-pnpm-action-setup",
+      "datasource": "github-tags",
+      "packageName": "pnpm/action-setup",
+      "manager": "github-actions",
+      "files": [
+        ".github/workflows/_quality-playwright.yml",
+        ".github/workflows/_quality.yml",
+        ".github/workflows/publish-npm.yml",
+        ".github/workflows/quality.yml",
+        ".github/workflows/recover-npm-dist-tag.yml"
+      ],
+      "versioning": "docker",
+      "group": "github-actions",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "github-actions-node-runtime",
+      "datasource": "node-version",
+      "packageName": "actions/node-versions",
+      "manager": "github-actions",
+      "files": [
+        ".github/workflows/_quality-playwright.yml",
+        ".github/workflows/_quality.yml",
+        ".github/workflows/publish-npm.yml",
+        ".github/workflows/quality.yml",
+        ".github/workflows/recover-npm-dist-tag.yml"
+      ],
+      "versioning": "node",
+      "group": "node-dotnet-sdk-images",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "node-runtime",
+      "datasource": "node-version",
+      "packageName": "node",
+      "manager": "custom.regex",
+      "customManager": "node-version-pins",
+      "files": [
+        ".nvmrc",
+        "package.json"
+      ],
+      "versioning": "node",
+      "group": "node-dotnet-sdk-images",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-ajv",
       "datasource": "npm",
-      "packageName": "vitest/playwright/eslint test tooling",
-      "manager": "npm",
-      "files": ["package.json", "pnpm-lock.yaml"],
-      "versioning": "semver",
-      "group": "js-test-quality-tooling"
+      "packageName": "ajv",
+      "authorityKey": "ajv",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "versioning": "npm",
+      "group": "npm-release-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-async-validator",
+      "datasource": "npm",
+      "packageName": "async-validator",
+      "authorityKey": "async-validator",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/packages/element-plus/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-runtime-dependencies",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-camelcase",
+      "datasource": "npm",
+      "packageName": "camelcase",
+      "authorityKey": "camelcase",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/packages/icons-vue/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-chalk",
+      "datasource": "npm",
+      "packageName": "chalk",
+      "authorityKey": "chalk",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build/package.json",
+        "vue/internal/metadata/package.json",
+        "vue/packages/theme-chalk/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-changesets-cli",
+      "datasource": "npm",
+      "packageName": "@changesets/cli",
+      "authorityKey": "@changesets/cli",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "versioning": "npm",
+      "group": "npm-release-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-components-helper",
+      "datasource": "npm",
+      "packageName": "components-helper",
+      "authorityKey": "components-helper",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-concurrently",
+      "datasource": "npm",
+      "packageName": "concurrently",
+      "authorityKey": "concurrently",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "versioning": "npm",
+      "group": "npm-release-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-consola",
+      "datasource": "npm",
+      "packageName": "consola",
+      "authorityKey": "consola",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build-utils/package.json",
+        "vue/internal/build/package.json",
+        "vue/internal/metadata/package.json",
+        "vue/packages/icons-vue/package.json",
+        "vue/packages/theme-chalk/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-csstype",
+      "datasource": "npm",
+      "packageName": "csstype",
+      "authorityKey": "csstype",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/packages/element-plus/package.json"
+      ],
+      "versioning": "npm",
+      "group": "js-test-quality-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-ctrl-tinycolor",
+      "datasource": "npm",
+      "packageName": "@ctrl/tinycolor",
+      "authorityKey": "@ctrl/tinycolor",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/packages/element-plus/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-runtime-dependencies",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-dayjs",
+      "datasource": "npm",
+      "packageName": "dayjs",
+      "authorityKey": "dayjs",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/packages/element-plus/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-runtime-dependencies",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-esbuild",
+      "datasource": "npm",
+      "packageName": "esbuild",
+      "authorityKey": "esbuild",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build/package.json",
+        "vue/packages/icons-vue/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-esbuild-kit-cjs-loader",
+      "datasource": "npm",
+      "packageName": "@esbuild-kit/cjs-loader",
+      "authorityKey": "@esbuild-kit/cjs-loader",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/packages/theme-chalk/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-esbuild-plugin-globals",
+      "datasource": "npm",
+      "packageName": "esbuild-plugin-globals",
+      "authorityKey": "esbuild-plugin-globals",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/packages/icons-vue/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-escape-html",
+      "datasource": "npm",
+      "packageName": "escape-html",
+      "authorityKey": "escape-html",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/packages/element-plus/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-runtime-dependencies",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-eslint",
+      "datasource": "npm",
+      "packageName": "eslint",
+      "authorityKey": "eslint",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/eslint-config/package.json"
+      ],
+      "versioning": "npm",
+      "group": "js-test-quality-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-eslint-js",
+      "datasource": "npm",
+      "packageName": "@eslint/js",
+      "authorityKey": "@eslint/js",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/eslint-config/package.json"
+      ],
+      "versioning": "npm",
+      "group": "js-test-quality-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-eslint-plugin-unicorn",
+      "datasource": "npm",
+      "packageName": "eslint-plugin-unicorn",
+      "authorityKey": "eslint-plugin-unicorn",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/eslint-config/package.json"
+      ],
+      "versioning": "npm",
+      "group": "js-test-quality-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-eslint-plugin-vue",
+      "datasource": "npm",
+      "packageName": "eslint-plugin-vue",
+      "authorityKey": "eslint-plugin-vue",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/eslint-config/package.json"
+      ],
+      "versioning": "npm",
+      "group": "js-test-quality-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-expect-type",
+      "datasource": "npm",
+      "packageName": "expect-type",
+      "authorityKey": "expect-type",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "versioning": "npm",
+      "group": "js-test-quality-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-fast-glob",
+      "datasource": "npm",
+      "packageName": "fast-glob",
+      "authorityKey": "fast-glob",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build/package.json",
+        "vue/internal/metadata/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-floating-ui-dom",
+      "datasource": "npm",
+      "packageName": "@floating-ui/dom",
+      "authorityKey": "@floating-ui/dom",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/packages/element-plus/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-runtime-dependencies",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-fontsource-google-sans",
+      "datasource": "npm",
+      "packageName": "@fontsource/google-sans",
+      "authorityKey": "@fontsource/google-sans",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/packages/demo-app/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-fontsource-noto-sans-sc",
+      "datasource": "npm",
+      "packageName": "@fontsource/noto-sans-sc",
+      "authorityKey": "@fontsource/noto-sans-sc",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/packages/demo-app/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-fs-extra",
+      "datasource": "npm",
+      "packageName": "fs-extra",
+      "authorityKey": "fs-extra",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-gsap",
+      "datasource": "npm",
+      "packageName": "gsap",
+      "authorityKey": "gsap",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/packages/element-plus/package.json",
+        "vue/packages/motion/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-runtime-dependencies",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-gulp",
+      "datasource": "npm",
+      "packageName": "gulp",
+      "authorityKey": "gulp",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-gulp-autoprefixer",
+      "datasource": "npm",
+      "packageName": "gulp-autoprefixer",
+      "authorityKey": "gulp-autoprefixer",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/packages/theme-chalk/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-gulp-clean-css",
+      "datasource": "npm",
+      "packageName": "gulp-clean-css",
+      "authorityKey": "gulp-clean-css",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/packages/theme-chalk/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-gulp-rename",
+      "datasource": "npm",
+      "packageName": "gulp-rename",
+      "authorityKey": "gulp-rename",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/packages/theme-chalk/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-gulp-sass",
+      "datasource": "npm",
+      "packageName": "gulp-sass",
+      "authorityKey": "gulp-sass",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/packages/theme-chalk/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-husky",
+      "datasource": "npm",
+      "packageName": "husky",
+      "authorityKey": "husky",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "versioning": "npm",
+      "group": "js-test-quality-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-jsdom",
+      "datasource": "npm",
+      "packageName": "jsdom",
+      "authorityKey": "jsdom",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "versioning": "npm",
+      "group": "js-test-quality-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-katex",
+      "datasource": "npm",
+      "packageName": "katex",
+      "authorityKey": "katex",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/packages/element-plus/package.json",
+        "vue/packages/wasm/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-runtime-dependencies",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-lint-staged",
+      "datasource": "npm",
+      "packageName": "lint-staged",
+      "authorityKey": "lint-staged",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "versioning": "npm",
+      "group": "js-test-quality-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-localtunnel",
+      "datasource": "npm",
+      "packageName": "localtunnel",
+      "authorityKey": "localtunnel",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/packages/demo-app/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-lodash",
+      "datasource": "npm",
+      "packageName": "lodash",
+      "authorityKey": "lodash",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/packages/element-plus/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-runtime-dependencies",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-lodash-es",
+      "datasource": "npm",
+      "packageName": "lodash-es",
+      "authorityKey": "lodash-es",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build/package.json",
+        "vue/internal/metadata/package.json",
+        "vue/packages/element-plus/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-runtime-dependencies",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-lodash-unified",
+      "datasource": "npm",
+      "packageName": "lodash-unified",
+      "authorityKey": "lodash-unified",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/packages/element-plus/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-runtime-dependencies",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-memoize-one",
+      "datasource": "npm",
+      "packageName": "memoize-one",
+      "authorityKey": "memoize-one",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/packages/element-plus/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-runtime-dependencies",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-mermaid",
+      "datasource": "npm",
+      "packageName": "mermaid",
+      "authorityKey": "mermaid",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/packages/element-plus/package.json",
+        "vue/packages/wasm/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-runtime-dependencies",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-motion-dom",
+      "datasource": "npm",
+      "packageName": "motion-dom",
+      "authorityKey": "motion-dom",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/packages/element-plus/package.json",
+        "vue/packages/hooks/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-runtime-dependencies",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-normalize-wheel-es",
+      "datasource": "npm",
+      "packageName": "normalize-wheel-es",
+      "authorityKey": "normalize-wheel-es",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/packages/element-plus/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-runtime-dependencies",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-npm-run-all",
+      "datasource": "npm",
+      "packageName": "npm-run-all",
+      "authorityKey": "npm-run-all",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/metadata/package.json",
+        "vue/packages/icons-vue/package.json"
+      ],
+      "versioning": "npm",
+      "group": "npm-release-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-octokit",
+      "datasource": "npm",
+      "packageName": "octokit",
+      "authorityKey": "octokit",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/internal/metadata/package.json"
+      ],
+      "versioning": "npm",
+      "group": "npm-release-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-playwright-test",
+      "datasource": "npm",
+      "packageName": "@playwright/test",
+      "authorityKey": "@playwright/test",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "versioning": "npm",
+      "group": "js-test-quality-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-pnpm-find-workspace-packages",
+      "datasource": "npm",
+      "packageName": "@pnpm/find-workspace-packages",
+      "authorityKey": "@pnpm/find-workspace-packages",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build-utils/package.json",
+        "vue/internal/build/package.json"
+      ],
+      "versioning": "npm",
+      "group": "npm-release-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-pnpm-logger",
+      "datasource": "npm",
+      "packageName": "@pnpm/logger",
+      "authorityKey": "@pnpm/logger",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build-utils/package.json",
+        "vue/internal/build/package.json"
+      ],
+      "versioning": "npm",
+      "group": "npm-release-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-pnpm-types",
+      "datasource": "npm",
+      "packageName": "@pnpm/types",
+      "authorityKey": "@pnpm/types",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build/package.json"
+      ],
+      "versioning": "npm",
+      "group": "npm-release-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-popperjs-core",
+      "datasource": "npm",
+      "packageName": "@sxzz/popperjs-es",
+      "authorityKey": "@popperjs/core",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/packages/element-plus/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-runtime-dependencies",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-prettier",
+      "datasource": "npm",
+      "packageName": "prettier",
+      "authorityKey": "prettier",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/eslint-config/package.json",
+        "vue/packages/icons-vue/package.json"
+      ],
+      "versioning": "npm",
+      "group": "js-test-quality-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-resize-observer-polyfill",
+      "datasource": "npm",
+      "packageName": "resize-observer-polyfill",
+      "authorityKey": "resize-observer-polyfill",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "versioning": "npm",
+      "group": "js-test-quality-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-rimraf",
+      "datasource": "npm",
+      "packageName": "rimraf",
+      "authorityKey": "rimraf",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/packages/wasm/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-rollup",
+      "datasource": "npm",
+      "packageName": "rollup",
+      "authorityKey": "rollup",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-rollup-plugin-commonjs",
+      "datasource": "npm",
+      "packageName": "@rollup/plugin-commonjs",
+      "authorityKey": "@rollup/plugin-commonjs",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-rollup-plugin-esbuild",
+      "datasource": "npm",
+      "packageName": "rollup-plugin-esbuild",
+      "authorityKey": "rollup-plugin-esbuild",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-rollup-plugin-json",
+      "datasource": "npm",
+      "packageName": "@rollup/plugin-json",
+      "authorityKey": "@rollup/plugin-json",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-rollup-plugin-node-resolve",
+      "datasource": "npm",
+      "packageName": "@rollup/plugin-node-resolve",
+      "authorityKey": "@rollup/plugin-node-resolve",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-sass",
+      "datasource": "npm",
+      "packageName": "sass",
+      "authorityKey": "sass",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/packages/demo-app/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-shiki",
+      "datasource": "npm",
+      "packageName": "shiki",
+      "authorityKey": "shiki",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/packages/element-plus/package.json",
+        "vue/packages/wasm/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-runtime-dependencies",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-svgo",
+      "datasource": "npm",
+      "packageName": "svgo",
+      "authorityKey": "svgo",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/packages/icons-svg/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-tinyglobby",
+      "datasource": "npm",
+      "packageName": "tinyglobby",
+      "authorityKey": "tinyglobby",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/packages/icons-vue/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-ts-morph",
+      "datasource": "npm",
+      "packageName": "ts-morph",
+      "authorityKey": "ts-morph",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-tsx",
+      "datasource": "npm",
+      "packageName": "tsx",
+      "authorityKey": "tsx",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build/package.json",
+        "vue/internal/metadata/package.json",
+        "vue/packages/icons-vue/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-type-fest",
+      "datasource": "npm",
+      "packageName": "type-fest",
+      "authorityKey": "type-fest",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "versioning": "npm",
+      "group": "npm-release-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-types-fs-extra",
+      "datasource": "npm",
+      "packageName": "@types/fs-extra",
+      "authorityKey": "@types/fs-extra",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "versioning": "npm",
+      "group": "js-test-quality-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-types-gulp",
+      "datasource": "npm",
+      "packageName": "@types/gulp",
+      "authorityKey": "@types/gulp",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-types-gulp-autoprefixer",
+      "datasource": "npm",
+      "packageName": "@types/gulp-autoprefixer",
+      "authorityKey": "@types/gulp-autoprefixer",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/packages/theme-chalk/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-types-gulp-clean-css",
+      "datasource": "npm",
+      "packageName": "@types/gulp-clean-css",
+      "authorityKey": "@types/gulp-clean-css",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/packages/theme-chalk/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-types-gulp-rename",
+      "datasource": "npm",
+      "packageName": "@types/gulp-rename",
+      "authorityKey": "@types/gulp-rename",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/packages/theme-chalk/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-types-gulp-sass",
+      "datasource": "npm",
+      "packageName": "@types/gulp-sass",
+      "authorityKey": "@types/gulp-sass",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/packages/theme-chalk/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-types-jsdom",
+      "datasource": "npm",
+      "packageName": "@types/jsdom",
+      "authorityKey": "@types/jsdom",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "versioning": "npm",
+      "group": "js-test-quality-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-types-lodash",
+      "datasource": "npm",
+      "packageName": "@types/lodash",
+      "authorityKey": "@types/lodash",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/packages/element-plus/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-runtime-dependencies",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-types-lodash-es",
+      "datasource": "npm",
+      "packageName": "@types/lodash-es",
+      "authorityKey": "@types/lodash-es",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/metadata/package.json",
+        "vue/packages/element-plus/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-runtime-dependencies",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-types-node",
+      "datasource": "npm",
+      "packageName": "@types/node",
+      "authorityKey": "@types/node",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/packages/element-plus/package.json",
+        "vue/packages/icons-vue/package.json"
+      ],
+      "versioning": "npm",
+      "group": "js-test-quality-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-types-sass",
+      "datasource": "npm",
+      "packageName": "@types/sass",
+      "authorityKey": "@types/sass",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-typescript",
+      "datasource": "npm",
+      "packageName": "typescript",
+      "authorityKey": "typescript",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/packages/demo-app/package.json",
+        "vue/packages/icons-vue/package.json",
+        "vue/tests/consumer-install/template/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-typescript-eslint",
+      "datasource": "npm",
+      "packageName": "typescript-eslint",
+      "authorityKey": "typescript-eslint",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/eslint-config/package.json"
+      ],
+      "versioning": "npm",
+      "group": "js-test-quality-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-unbuild",
+      "datasource": "npm",
+      "packageName": "unbuild",
+      "authorityKey": "unbuild",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build-constants/package.json",
+        "vue/internal/build-utils/package.json",
+        "vue/internal/build/package.json",
+        "vue/packages/wasm/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-unplugin-vue",
+      "datasource": "npm",
+      "packageName": "unplugin-vue",
+      "authorityKey": "unplugin-vue",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "pnpm-lock.yaml",
+        "vue/packages/icons-vue/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-unplugin-vue-macros",
+      "datasource": "npm",
+      "packageName": "unplugin-vue-macros",
+      "authorityKey": "unplugin-vue-macros",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-vite",
+      "datasource": "npm",
+      "packageName": "vite",
+      "authorityKey": "vite",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/packages/demo-app/package.json",
+        "vue/tests/consumer-install/template/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-vitejs-plugin-vue",
+      "datasource": "npm",
+      "packageName": "@vitejs/plugin-vue",
+      "authorityKey": "@vitejs/plugin-vue",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build/package.json",
+        "vue/packages/demo-app/package.json",
+        "vue/tests/consumer-install/template/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-vitejs-plugin-vue-jsx",
+      "datasource": "npm",
+      "packageName": "@vitejs/plugin-vue-jsx",
+      "authorityKey": "@vitejs/plugin-vue-jsx",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build/package.json",
+        "vue/packages/demo-app/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-vitest",
+      "datasource": "npm",
+      "packageName": "vitest",
+      "authorityKey": "vitest",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "versioning": "npm",
+      "group": "js-test-quality-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-vitest-coverage-v8",
+      "datasource": "npm",
+      "packageName": "@vitest/coverage-v8",
+      "authorityKey": "@vitest/coverage-v8",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "versioning": "npm",
+      "group": "js-test-quality-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-vitest-ui",
+      "datasource": "npm",
+      "packageName": "@vitest/ui",
+      "authorityKey": "@vitest/ui",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "versioning": "npm",
+      "group": "js-test-quality-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-vue",
+      "datasource": "npm",
+      "packageName": "vue",
+      "authorityKey": "vue",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build/package.json",
+        "vue/packages/components/package.json",
+        "vue/packages/demo-app/package.json",
+        "vue/packages/directives/package.json",
+        "vue/packages/element-plus/package.json",
+        "vue/packages/hooks/package.json",
+        "vue/packages/icons-vue/package.json",
+        "vue/packages/motion/package.json",
+        "vue/packages/utils/package.json",
+        "vue/tests/consumer-install/template/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-vue-eslint-parser",
+      "datasource": "npm",
+      "packageName": "vue-eslint-parser",
+      "authorityKey": "vue-eslint-parser",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/eslint-config/package.json"
+      ],
+      "versioning": "npm",
+      "group": "js-test-quality-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-vue-router",
+      "datasource": "npm",
+      "packageName": "vue-router",
+      "authorityKey": "vue-router",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/packages/element-plus/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-vue-shared",
+      "datasource": "npm",
+      "packageName": "@vue/shared",
+      "authorityKey": "@vue/shared",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-vue-test-utils",
+      "datasource": "npm",
+      "packageName": "@vue/test-utils",
+      "authorityKey": "@vue/test-utils",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "versioning": "npm",
+      "group": "js-test-quality-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-vue-tsc",
+      "datasource": "npm",
+      "packageName": "vue-tsc",
+      "authorityKey": "vue-tsc",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/packages/demo-app/package.json",
+        "vue/packages/icons-vue/package.json",
+        "vue/tests/consumer-install/template/package.json"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "npm-vue-tsconfig",
+      "datasource": "npm",
+      "packageName": "@vue/tsconfig",
+      "authorityKey": "@vue/tsconfig",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "versioning": "npm",
+      "group": "vue-build-toolchain",
+      "stabilityPolicy": "stable-only"
     },
     {
       "id": "nuget-avalonia",
       "datasource": "nuget",
       "packageName": "Avalonia",
       "manager": "nuget",
-      "files": ["dotnet/Directory.Packages.props"],
+      "files": [
+        "dotnet/Directory.Packages.props",
+        "dotnet/FsusUI.Avalonia.Icons/FsusUI.Avalonia.Icons.csproj",
+        "dotnet/FsusUI.Avalonia.Icons/packages.lock.json",
+        "dotnet/FsusUI.Avalonia.Themes/FsusUI.Avalonia.Themes.csproj",
+        "dotnet/FsusUI.Avalonia.Themes/packages.lock.json",
+        "dotnet/FsusUI.Avalonia/FsusUI.Avalonia.csproj",
+        "dotnet/FsusUI.Avalonia/packages.lock.json"
+      ],
       "versioning": "nuget",
-      "group": "avalonia-platform"
+      "group": "avalonia-platform",
+      "stabilityPolicy": "stable-only"
     },
     {
-      "id": "nuget-dotnet-test",
+      "id": "nuget-avalonia-desktop",
       "datasource": "nuget",
-      "packageName": "xunit/coverlet/Microsoft.NET.Test.Sdk",
+      "packageName": "Avalonia.Desktop",
       "manager": "nuget",
-      "files": ["dotnet/Directory.Packages.props"],
+      "files": [
+        "dotnet/Directory.Packages.props",
+        "dotnet/FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj",
+        "dotnet/FsusUI.Avalonia.Demo/packages.lock.json",
+        "dotnet/FsusUI.Avalonia.Themes.Smoke/FsusUI.Avalonia.Themes.Smoke.csproj",
+        "dotnet/FsusUI.Avalonia.Themes.Smoke/packages.lock.json"
+      ],
       "versioning": "nuget",
-      "group": "dotnet-test-performance"
+      "group": "avalonia-platform",
+      "stabilityPolicy": "stable-only"
     },
     {
-      "id": "dotnet-sdk",
-      "datasource": "dotnet-version",
-      "packageName": "dotnet-sdk",
-      "manager": "dotnet-version",
-      "files": ["dotnet/global.json"],
-      "versioning": "loose",
-      "group": "node-dotnet-sdk-images"
+      "id": "nuget-avalonia-headless-xunit",
+      "datasource": "nuget",
+      "packageName": "Avalonia.Headless.XUnit",
+      "manager": "nuget",
+      "files": [
+        "dotnet/Directory.Packages.props",
+        "dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+        "dotnet/FsusUI.Avalonia.HeadlessTests/packages.lock.json"
+      ],
+      "versioning": "nuget",
+      "group": "avalonia-platform",
+      "stabilityPolicy": "stable-only"
     },
     {
-      "id": "node-runtime",
-      "datasource": "node-version",
-      "packageName": "node",
-      "manager": "regex",
-      "customManager": "Node.js runtime version from CI setup-node action",
-      "files": [".github/workflows/quality.yml", ".github/workflows/_quality.yml"],
-      "versioning": "node",
-      "group": "node-dotnet-sdk-images"
+      "id": "nuget-avalonia-themes-fluent",
+      "datasource": "nuget",
+      "packageName": "Avalonia.Themes.Fluent",
+      "manager": "nuget",
+      "files": [
+        "dotnet/Directory.Packages.props",
+        "dotnet/FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj",
+        "dotnet/FsusUI.Avalonia.Demo/packages.lock.json",
+        "dotnet/FsusUI.Avalonia.Themes.Smoke/FsusUI.Avalonia.Themes.Smoke.csproj",
+        "dotnet/FsusUI.Avalonia.Themes.Smoke/packages.lock.json"
+      ],
+      "versioning": "nuget",
+      "group": "avalonia-platform",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "nuget-coverlet-collector",
+      "datasource": "nuget",
+      "packageName": "coverlet.collector",
+      "manager": "nuget",
+      "files": [
+        "dotnet/Directory.Packages.props",
+        "dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj",
+        "dotnet/FsusUI.Avalonia.Tests/packages.lock.json"
+      ],
+      "versioning": "nuget",
+      "group": "dotnet-test-performance",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "nuget-microsoft-codeanalysis-csharp",
+      "datasource": "nuget",
+      "packageName": "Microsoft.CodeAnalysis.CSharp",
+      "manager": "nuget",
+      "files": [
+        "dotnet/Directory.Packages.props",
+        "dotnet/FsusUI.Avalonia.FormGenerator.Tests/FsusUI.Avalonia.FormGenerator.Tests.csproj",
+        "dotnet/FsusUI.Avalonia.FormGenerator.Tests/packages.lock.json",
+        "dotnet/FsusUI.Avalonia.FormGenerator/FsusUI.Avalonia.FormGenerator.csproj",
+        "dotnet/FsusUI.Avalonia.FormGenerator/packages.lock.json"
+      ],
+      "versioning": "nuget",
+      "group": "dotnet-build-toolchain",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "nuget-microsoft-net-test-sdk",
+      "datasource": "nuget",
+      "packageName": "Microsoft.NET.Test.Sdk",
+      "manager": "nuget",
+      "files": [
+        "dotnet/Directory.Packages.props",
+        "dotnet/FsusUI.Avalonia.FormGenerator.Tests/FsusUI.Avalonia.FormGenerator.Tests.csproj",
+        "dotnet/FsusUI.Avalonia.FormGenerator.Tests/packages.lock.json",
+        "dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+        "dotnet/FsusUI.Avalonia.HeadlessTests/packages.lock.json",
+        "dotnet/FsusUI.Avalonia.PerformanceTests/FsusUI.Avalonia.PerformanceTests.csproj",
+        "dotnet/FsusUI.Avalonia.PerformanceTests/packages.lock.json",
+        "dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj",
+        "dotnet/FsusUI.Avalonia.Tests/packages.lock.json"
+      ],
+      "versioning": "nuget",
+      "group": "dotnet-test-performance",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "nuget-xunit",
+      "datasource": "nuget",
+      "packageName": "xunit",
+      "manager": "nuget",
+      "files": [
+        "dotnet/Directory.Packages.props",
+        "dotnet/FsusUI.Avalonia.FormGenerator.Tests/FsusUI.Avalonia.FormGenerator.Tests.csproj",
+        "dotnet/FsusUI.Avalonia.FormGenerator.Tests/packages.lock.json",
+        "dotnet/FsusUI.Avalonia.PerformanceTests/FsusUI.Avalonia.PerformanceTests.csproj",
+        "dotnet/FsusUI.Avalonia.PerformanceTests/packages.lock.json",
+        "dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj",
+        "dotnet/FsusUI.Avalonia.Tests/packages.lock.json"
+      ],
+      "versioning": "nuget",
+      "group": "dotnet-test-performance",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "nuget-xunit-runner-visualstudio",
+      "datasource": "nuget",
+      "packageName": "xunit.runner.visualstudio",
+      "manager": "nuget",
+      "files": [
+        "dotnet/Directory.Packages.props",
+        "dotnet/FsusUI.Avalonia.FormGenerator.Tests/FsusUI.Avalonia.FormGenerator.Tests.csproj",
+        "dotnet/FsusUI.Avalonia.FormGenerator.Tests/packages.lock.json",
+        "dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+        "dotnet/FsusUI.Avalonia.HeadlessTests/packages.lock.json",
+        "dotnet/FsusUI.Avalonia.PerformanceTests/FsusUI.Avalonia.PerformanceTests.csproj",
+        "dotnet/FsusUI.Avalonia.PerformanceTests/packages.lock.json",
+        "dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj",
+        "dotnet/FsusUI.Avalonia.Tests/packages.lock.json"
+      ],
+      "versioning": "nuget",
+      "group": "dotnet-test-performance",
+      "stabilityPolicy": "stable-only"
+    },
+    {
+      "id": "nuget-xunit-v3",
+      "datasource": "nuget",
+      "packageName": "xunit.v3",
+      "manager": "nuget",
+      "files": [
+        "dotnet/Directory.Packages.props",
+        "dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+        "dotnet/FsusUI.Avalonia.HeadlessTests/packages.lock.json"
+      ],
+      "versioning": "nuget",
+      "group": "dotnet-test-performance",
+      "stabilityPolicy": "stable-only"
     },
     {
       "id": "pnpm-package-manager",
       "datasource": "npm",
       "packageName": "pnpm",
-      "manager": "regex",
-      "customManager": "pnpm package manager version from package.json",
-      "files": ["package.json"],
-      "versioning": "semver",
-      "group": "vue-build-toolchain"
-    },
-    {
-      "id": "emsdk-toolchain",
-      "datasource": "github-releases",
-      "packageName": "emscripten-core/emsdk",
-      "manager": "regex",
-      "customManager": "Emscripten SDK version from CI setup-emsdk action",
-      "files": [".github/workflows/quality.yml"],
-      "versioning": "semver-coerced",
-      "group": "wasm-toolchain"
-    },
-    {
-      "id": "github-actions",
-      "datasource": "github-releases",
-      "packageName": "GitHub Actions",
-      "manager": "github-actions",
-      "files": [".github/workflows/*.yml"],
-      "versioning": "semver",
-      "group": "github-actions"
+      "manager": "custom.regex",
+      "customManager": "pnpm-package-manager",
+      "files": [
+        "package.json",
+        "vue/tests/consumer-install/template/package.json"
+      ],
+      "versioning": "npm",
+      "group": "npm-release-tooling",
+      "stabilityPolicy": "stable-only"
     }
   ],
-  "exclusions": [],
+  "exclusions": [
+    {
+      "id": "generated-npm-authority-inventory",
+      "path": "config/dependencies/npm-authority.inventory.json",
+      "field": "*",
+      "reason": "Generated evidence projected from npm-authority.json; the generator output is not an update target.",
+      "owner": "dependency-governance",
+      "createdAt": "2026-08-27",
+      "reviewAfter": "2027-02-28",
+      "removalCondition": "Remove when the generated inventory is replaced by direct runtime discovery."
+    },
+    {
+      "id": "frozen-npm-migration-baseline",
+      "path": "config/dependencies/migration-baseline.json",
+      "field": "*",
+      "reason": "Frozen zero-version-change migration evidence; current versions remain owned by npm-authority.json.",
+      "owner": "dependency-governance",
+      "createdAt": "2026-08-27",
+      "reviewAfter": "2027-02-28",
+      "removalCondition": "Remove after the migration baseline retention requirement expires."
+    },
+    {
+      "id": "vue-public-api-package-fixture",
+      "path": "tests/fixtures/vue-public-api-baseline/vue/packages/element-plus/package.json",
+      "field": "*",
+      "reason": "Frozen input fixture for public API baseline mutation tests, not a consumable manifest.",
+      "owner": "api-governance",
+      "createdAt": "2026-08-27",
+      "reviewAfter": "2027-02-28",
+      "removalCondition": "Remove if the fixture stops embedding an intentionally frozen package manifest."
+    },
+    {
+      "id": "renovate-custom-manager-negative-fixture",
+      "path": "tests/fixtures/dependencies/renovate-custom-managers.json",
+      "field": "negative",
+      "reason": "Intentional malformed and documentation-like examples used to prove custom managers do not over-match.",
+      "owner": "dependency-governance",
+      "createdAt": "2026-08-27",
+      "reviewAfter": "2027-02-28",
+      "removalCondition": "Remove with the custom manager mutation suite."
+    },
+    {
+      "id": "npm-authority-documentation-examples",
+      "path": "docs/ci/npm-authority.md",
+      "field": "code-fences",
+      "reason": "Documentation examples explain the authority contract and are not executable version fields.",
+      "owner": "dependency-governance",
+      "createdAt": "2026-08-27",
+      "reviewAfter": "2027-02-28",
+      "removalCondition": "Remove if the document no longer contains dependency-version examples."
+    },
+    {
+      "id": "form-generator-netstandard-contract",
+      "path": "dotnet/FsusUI.Avalonia.FormGenerator/FsusUI.Avalonia.FormGenerator.csproj",
+      "field": "TargetFramework",
+      "reason": "netstandard2.0 is the frozen public analyzer compatibility target, not a floating runtime pin.",
+      "owner": "avalonia-maintainers",
+      "createdAt": "2026-08-27",
+      "reviewAfter": "2027-02-28",
+      "removalCondition": "Remove only with an explicitly reviewed breaking analyzer compatibility change."
+    },
+    {
+      "id": "avalonia-aot-smoke-project-fixture",
+      "path": "tests/fixtures/avalonia-aot-smoke/FsusUI.Avalonia.AotSmoke.csproj",
+      "field": "*",
+      "reason": "Local packed-package smoke input whose package sources and versions are controlled by the fixture test.",
+      "owner": "avalonia-maintainers",
+      "createdAt": "2026-08-27",
+      "reviewAfter": "2027-02-28",
+      "removalCondition": "Remove if the fixture becomes a production-restored project."
+    },
+    {
+      "id": "avalonia-nuget-accidental-publication-fixture",
+      "path": "tests/fixtures/avalonia-nuget-stable/accidental-demo-publication.csproj",
+      "field": "*",
+      "reason": "Intentionally invalid NuGet publication fixture used by negative governance tests.",
+      "owner": "avalonia-maintainers",
+      "createdAt": "2026-08-27",
+      "reviewAfter": "2027-02-28",
+      "removalCondition": "Remove with the negative NuGet publication fixture."
+    },
+    {
+      "id": "avalonia-nuget-missing-metadata-fixture",
+      "path": "tests/fixtures/avalonia-nuget-stable/missing-package-metadata.csproj",
+      "field": "*",
+      "reason": "Intentionally invalid missing-metadata fixture used by negative NuGet tests.",
+      "owner": "avalonia-maintainers",
+      "createdAt": "2026-08-27",
+      "reviewAfter": "2027-02-28",
+      "removalCondition": "Remove with the negative NuGet metadata fixture."
+    },
+    {
+      "id": "avalonia-nuget-stale-notes-fixture",
+      "path": "tests/fixtures/avalonia-nuget-stable/stale-release-notes.props",
+      "field": "*",
+      "reason": "Intentionally stale release-note fixture used by negative NuGet tests.",
+      "owner": "avalonia-maintainers",
+      "createdAt": "2026-08-27",
+      "reviewAfter": "2027-02-28",
+      "removalCondition": "Remove with the stale release-note negative fixture."
+    },
+    {
+      "id": "avalonia-packed-consumer-project-fixture",
+      "path": "tests/fixtures/avalonia-packed-consumer/FsusUI.Avalonia.PackedConsumerSample.csproj",
+      "field": "*",
+      "reason": "Local packed-package consumer input whose package versions are supplied by the fixture runner.",
+      "owner": "avalonia-maintainers",
+      "createdAt": "2026-08-27",
+      "reviewAfter": "2027-02-28",
+      "removalCondition": "Remove if the fixture becomes a production-restored project."
+    }
+  ],
   "governance": {
     "automerge": false,
     "majorEnabled": true,

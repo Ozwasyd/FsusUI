@@ -163,6 +163,25 @@
     </section>
 
     <section
+      v-if="markdownProjectionFixture"
+      data-testid="markdown-projection-production-fixture"
+    >
+      <el-markdown-editor
+        v-model="markdownProjectionSource"
+        default-mode="live"
+        :min-rows="4"
+        :show-actions="false"
+        :show-mode-switcher="false"
+      />
+      <output data-testid="markdown-projection-main">
+        {{ JSON.stringify(markdownProjectionMainSummary) }}
+      </output>
+      <output data-testid="markdown-projection-worker">
+        {{ JSON.stringify(markdownProjectionWorkerSummary) }}
+      </output>
+    </section>
+
+    <section
       v-if="markdownEditorTransactionFixture && markdownEditorMountReady"
       data-testid="markdown-editor-transaction-fixture"
       :data-markdown-editor-probe-id="markdownEditorProbeId"
@@ -1768,8 +1787,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, onUnmounted, reactive, ref, watch } from 'vue'
 import * as Icons from '@element-plus/icons-vue'
+import {
+  MARKDOWN_PROJECTION_WORKER_REQUEST,
+  createMarkdownEditorProjection,
+  isMarkdownProjectionWorkerResult,
+  markdownEditorProjectionsEquivalent,
+  type MarkdownEditorProjectionResult,
+  type MarkdownProjectionWorkerRequest,
+} from '../../wasm/markdown-runtime'
 import {
   ElCollectionSummary,
   ElCollectionToolbar,
@@ -1829,6 +1856,106 @@ import {
 } from './ui-audit-manifest'
 
 const { ArrowDown, ArrowLeft, ArrowRight, Search, UploadFilled } = Icons
+
+const markdownProjectionSource = ref(
+  '![初始 alt](/old.png "old title")\n::caption[说明 😀 RTL אב]',
+)
+const markdownProjectionFixture =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownProjection') === '1'
+const summarizeMarkdownProjection = (
+  projection: MarkdownEditorProjectionResult,
+) =>
+  Object.freeze({
+    identity: projection.identity,
+    kinds: projection.nodes.map((node) => node.kind),
+    nodes: projection.nodes
+      .filter((node) => node.kind === 'image' || node.kind === 'caption')
+      .map((node) => ({
+        blockIdentity: node.blockIdentity,
+        kind: node.kind,
+        normalizedContentRanges: node.normalizedContentRanges,
+        normalizedMarkerRanges: node.normalizedMarkerRanges,
+        normalizedRange: node.normalizedRange,
+        presentation: node.presentation,
+        rawContentRanges: node.rawContentRanges,
+        rawMarkerRanges: node.rawMarkerRanges,
+        rawRange: node.rawRange,
+        status: node.status,
+      })),
+  })
+const markdownProjectionMain = markdownProjectionFixture
+  ? createMarkdownEditorProjection(markdownProjectionSource.value)
+  : null
+const markdownProjectionMainSummary = markdownProjectionMain
+  ? summarizeMarkdownProjection(markdownProjectionMain)
+  : null
+const markdownProjectionWorkerSummary = ref<
+  | (ReturnType<typeof summarizeMarkdownProjection> & {
+      readonly equivalent: boolean
+    })
+  | { readonly error: string }
+  | { readonly status: 'pending' }
+>({ status: 'pending' })
+let markdownProjectionWorker: Worker | null = null
+
+if (markdownProjectionFixture && markdownProjectionMain) {
+  const documentIdentity = Object.freeze({
+    epoch: 1,
+    id: 'built-demo-projection',
+  })
+  const request: MarkdownProjectionWorkerRequest = {
+    type: MARKDOWN_PROJECTION_WORKER_REQUEST,
+    taskId: 'built-demo-projection:1',
+    revision: 1,
+    documentIdentity,
+    source: markdownProjectionSource.value,
+    plan: {
+      taskId: 'built-demo-projection:1',
+      revision: 1,
+      documentIdentity,
+      expanded: true,
+      reason: 'expanded-unsafe',
+      invalidatedRanges: [],
+      invalidatedNodeIds: [],
+      retainedNodeIds: [],
+    },
+    previous: {
+      documentIdentity,
+      normalizedSource: '',
+      nodes: [],
+    },
+  }
+  markdownProjectionWorker = new Worker(
+    new URL('../../wasm/markdown-projection.worker.ts', import.meta.url),
+    { type: 'module' },
+  )
+  markdownProjectionWorker.addEventListener('message', ({ data }) => {
+    if (!isMarkdownProjectionWorkerResult(data)) {
+      markdownProjectionWorkerSummary.value = {
+        error: 'invalid projection worker result',
+      }
+      return
+    }
+    markdownProjectionWorkerSummary.value = {
+      ...summarizeMarkdownProjection(data.projection),
+      equivalent: markdownEditorProjectionsEquivalent(
+        markdownProjectionMain,
+        data.projection,
+      ),
+    }
+  })
+  markdownProjectionWorker.addEventListener('error', ({ message }) => {
+    markdownProjectionWorkerSummary.value = {
+      error: message || 'projection worker failed',
+    }
+  })
+  markdownProjectionWorker.postMessage(request)
+}
+
+onUnmounted(() => {
+  markdownProjectionWorker?.terminate()
+})
 
 const props = withDefaults(
   defineProps<{

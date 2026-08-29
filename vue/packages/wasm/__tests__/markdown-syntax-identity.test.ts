@@ -20,6 +20,7 @@ describe('markdown syntax stable identity', () => {
     const afterPrefix = stabilizeMarkdownEditorProjection(
       createMarkdownEditorProjection('intro text\n\n# Alpha\n\n# Alpha\n'),
       document,
+      first,
     )
     expect(afterPrefix.nodes.map((node) => node.kind)).toEqual([
       'paragraph',
@@ -28,7 +29,31 @@ describe('markdown syntax stable identity', () => {
     ])
     expect(afterPrefix.nodes[1].id).toBe(first.nodes[0].id)
     expect(afterPrefix.nodes[2].id).toBe(first.nodes[1].id)
-    expect(afterPrefix.nodes[1].rawRange.start).not.toBe(first.nodes[0].rawRange.start)
+    expect(afterPrefix.nodes[1].rawRange.start).not.toBe(
+      first.nodes[0].rawRange.start,
+    )
+  })
+
+  it('gives repeated headings, paragraphs, code blocks, and links distinct identities', () => {
+    const source =
+      '# Same\n\n# Same\n\nSame paragraph.\n\nSame paragraph.\n\n```\nsame\n```\n\n```\nsame\n```\n\n[same](x) [same](x)\n'
+    const stable = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection(source),
+      { id: 'duplicates', epoch: 1 },
+    )
+
+    for (const [kind, count] of [
+      ['heading', 2],
+      ['paragraph', 3],
+      ['code', 2],
+      ['link', 2],
+    ] as const) {
+      const ids = stable.nodes
+        .filter((node) => node.kind === kind)
+        .map((node) => node.id)
+      expect(ids).toHaveLength(count)
+      expect(new Set(ids).size).toBe(count)
+    }
   })
 
   it('does not reuse identities across document epochs even when source matches', () => {
@@ -45,6 +70,38 @@ describe('markdown syntax stable identity', () => {
     expect(second.resolve(first.nodes[0].id).status).toBe('deleted')
     expect(second.resolve(second.nodes[0].id).status).toBe('current')
     expect(second.resolve('not-an-id').status).toBe('invalid')
+  })
+
+  it('keeps an in-place content edit on the same syntax node identity', () => {
+    const document = { id: 'doc-1', epoch: 4 }
+    const first = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('# One\n\n# Two\n'),
+      document,
+    )
+    const renamed = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('# Uno\n\n# Two\n'),
+      document,
+      first,
+    )
+
+    expect(renamed.nodes[0]!.id).toBe(first.nodes[0]!.id)
+    expect(renamed.nodes[1]!.id).toBe(first.nodes[1]!.id)
+    expect(renamed.identityState).toEqual(first.identityState)
+  })
+
+  it('does not reuse identities for another document with the same source and epoch', () => {
+    const source = '# Title\n'
+    const first = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection(source),
+      { id: 'doc-a', epoch: 1 },
+    )
+    const second = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection(source),
+      { id: 'doc-b', epoch: 1 },
+      first,
+    )
+    expect(second.nodes[0].id).not.toBe(first.nodes[0].id)
+    expect(second.resolve(first.nodes[0].id).status).toBe('invalid')
   })
 
   it('keeps identities across move, split, and merge and does not retarget a deleted neighbor', () => {
@@ -103,6 +160,44 @@ describe('markdown syntax stable identity', () => {
     expect(afterDelete.nodes[1].id).not.toBe(twins.nodes[0].id)
   })
 
+  it('uses the source change to preserve an identical survivor and never revives deleted ids', () => {
+    const document = { id: 'doc-1', epoch: 4 }
+    const source = '# Alpha\n\n# Alpha\n'
+    const twins = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection(source),
+      document,
+    )
+    const secondStart = twins.nodes[1]!.rawRange.start
+    const survivorSource = source.slice(secondStart)
+    const survivor = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection(survivorSource),
+      document,
+      twins,
+      { from: 0, to: secondStart, insert: '' },
+    )
+    expect(survivor.nodes[0]!.id).toBe(twins.nodes[1]!.id)
+    expect(survivor.resolve(twins.nodes[0]!.id).status).toBe('deleted')
+
+    const empty = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection(''),
+      document,
+      survivor,
+      { from: 0, to: survivorSource.length, insert: '' },
+    )
+    expect(empty.resolve(twins.nodes[1]!.id).status).toBe('deleted')
+
+    const recreated = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection('# Alpha\n'),
+      document,
+      empty,
+      { from: 0, to: 0, insert: '# Alpha\n' },
+    )
+    expect(recreated.nodes[0]!.id).not.toBe(twins.nodes[0]!.id)
+    expect(recreated.nodes[0]!.id).not.toBe(twins.nodes[1]!.id)
+    expect(recreated.resolve(twins.nodes[0]!.id).status).toBe('deleted')
+    expect(recreated.resolve(twins.nodes[1]!.id).status).toBe('deleted')
+  })
+
   it('keeps identity when a node is wrapped or unwrapped into another syntax kind', () => {
     const document = { id: 'doc-1', epoch: 4 }
     const paragraph = stabilizeMarkdownEditorProjection(
@@ -157,7 +252,10 @@ describe('markdown syntax stable identity', () => {
       document,
       pair,
     )
-    expect(wrapFirst.nodes.map((node) => node.kind)).toEqual(['quote', 'paragraph'])
+    expect(wrapFirst.nodes.map((node) => node.kind)).toEqual([
+      'quote',
+      'paragraph',
+    ])
     expect(wrapFirst.nodes[0].id).toBe(pair.nodes[0].id)
     expect(wrapFirst.nodes[1].id).toBe(pair.nodes[1].id)
 
@@ -217,7 +315,10 @@ describe('markdown syntax stable identity', () => {
       document,
       pair,
     )
-    expect(wrapFirstTask.nodes.map((node) => node.kind)).toEqual(['task', 'paragraph'])
+    expect(wrapFirstTask.nodes.map((node) => node.kind)).toEqual([
+      'task',
+      'paragraph',
+    ])
     expect(wrapFirstTask.nodes[0]!.id).toBe(pair.nodes[0]!.id)
     expect(wrapFirstTask.nodes[1]!.id).toBe(pair.nodes[1]!.id)
   })
@@ -233,7 +334,10 @@ describe('markdown syntax stable identity', () => {
       document,
       heading,
     )
-    expect(inserted.nodes.map((node) => node.kind)).toEqual(['paragraph', 'heading'])
+    expect(inserted.nodes.map((node) => node.kind)).toEqual([
+      'paragraph',
+      'heading',
+    ])
     expect(inserted.nodes[1]!.id).toBe(heading.nodes[0]!.id)
     expect(inserted.nodes[0]!.id).not.toBe(heading.nodes[0]!.id)
     expect(inserted.resolve(heading.nodes[0]!.id).node?.kind).toBe('heading')

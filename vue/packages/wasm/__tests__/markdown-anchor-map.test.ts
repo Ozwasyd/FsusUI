@@ -74,11 +74,11 @@ describe('markdown source/syntax/visual anchor map', () => {
     expect(map.remapRange({ start: 1, end: 4 }, { delete: [1, 4] })).toEqual({
       status: 'deleted',
     })
-    expect(map.remapRange({ start: 1, end: 6 }, { delete: [3, 5] })).toMatchObject(
-      {
-        status: 'partial',
-      },
-    )
+    expect(
+      map.remapRange({ start: 1, end: 6 }, { delete: [3, 5] }),
+    ).toMatchObject({
+      status: 'partial',
+    })
   })
 
   it('keeps hidden markers and nested syntax on the source map, not rendered text', () => {
@@ -130,6 +130,93 @@ describe('markdown source/syntax/visual anchor map', () => {
     }
   })
 
+  it('rejects stale epochs, unknown anchors, naked offsets, and mismatched directions', () => {
+    const source = '# Title\n'
+    const first = createMarkdownAnchorMap({
+      identity: { id: 'doc-shared', epoch: 1 },
+      source,
+    })
+    const next = createMarkdownAnchorMap({
+      identity: { id: 'doc-shared', epoch: 2 },
+      source,
+    })
+    const visual = first.sourceSelectionToVisual({ anchor: 0, focus: 4 })
+
+    expect(() => next.visualAnchorToSourceSelection(visual)).toThrow(
+      /identity does not match/,
+    )
+    expect(() =>
+      first.visualAnchorToSourceSelection({
+        ...visual,
+        anchor: {
+          anchorId: 'missing-anchor',
+          kind: 'text',
+          sourceOffset: 0,
+        },
+      }),
+    ).toThrow(/unknown visual anchor/)
+    expect(() =>
+      first.visualAnchorToSourceSelection({
+        ...visual,
+        direction: 'backward',
+      }),
+    ).toThrow(/direction does not match/)
+  })
+
+  it('binds supplemental hidden and virtual anchors to the stable projection', () => {
+    const source = 'A **bold** word'
+    const identity = { id: 'projection-bound', epoch: 3 }
+    const projection = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection(source),
+      identity,
+    )
+    const paragraph = projection.nodes.find((node) => node.kind === 'paragraph')
+    expect(paragraph).toBeDefined()
+    const map = createMarkdownAnchorMap({
+      identity,
+      projection,
+      source,
+      syntax: [
+        {
+          id: 'marker-open',
+          projectionId: paragraph!.id,
+          range: [2, 4],
+          hidden: true,
+        },
+        {
+          id: 'nested',
+          parentId: 'marker-open',
+          projectionId: paragraph!.id,
+          range: [4, 8],
+          virtual: true,
+        },
+      ],
+    })
+
+    expect(map.syntax.map((node) => node.projectionId)).toEqual([
+      paragraph!.id,
+      paragraph!.id,
+    ])
+    expect(map.reveal({ anchorId: 'nested' })).toMatchObject({
+      anchorId: 'nested',
+      virtual: true,
+    })
+    expect(() =>
+      createMarkdownAnchorMap({
+        identity,
+        projection,
+        source,
+        syntax: [
+          {
+            id: 'unbound',
+            projectionId: 'missing-projection',
+            range: [2, 4],
+          },
+        ],
+      }),
+    ).toThrow(/not bound to the projection/)
+  })
+
   it('consumes #321 coordinates and #323 identities instead of HTML or naked text search', () => {
     const raw = '\uFEFF# Title\r\n\n# Title\n'
     const document = { id: 'doc-1', epoch: 3 }
@@ -166,7 +253,10 @@ describe('markdown source/syntax/visual anchor map', () => {
     })
     expect(deleted).toEqual({ status: 'deleted' })
 
-    const remainingText = raw.slice(second!.rawRange.start, second!.rawRange.end)
+    const remainingText = raw.slice(
+      second!.rawRange.start,
+      second!.rawRange.end,
+    )
     expect(remainingText).toContain('# Title')
     expect(raw.slice(first!.rawRange.start, first!.rawRange.end)).toContain(
       '# Title',
@@ -214,9 +304,29 @@ describe('markdown source/syntax/visual anchor map', () => {
       status: 'mapped',
       range: { start: 1, end: 6 },
     })
-    expect(map.remapRange({ start: 6, end: 11 }, { insert: { at: 0, text: 'xx' } })).toEqual({
+    expect(
+      map.remapRange({ start: 6, end: 11 }, { insert: { at: 0, text: 'xx' } }),
+    ).toEqual({
       status: 'mapped',
       range: { start: 8, end: 13 },
+    })
+    expect(
+      map.remapRange({ start: 6, end: 11 }, { insert: { at: 6, text: 'xx' } }),
+    ).toEqual({
+      status: 'mapped',
+      range: { start: 8, end: 13 },
+    })
+    expect(
+      map.remapRange({ start: 6, end: 11 }, { insert: { at: 8, text: 'xx' } }),
+    ).toEqual({
+      status: 'partial',
+      range: { start: 6, end: 13 },
+    })
+    expect(
+      map.remapRange({ start: 6, end: 11 }, { insert: { at: 11, text: 'xx' } }),
+    ).toEqual({
+      status: 'mapped',
+      range: { start: 6, end: 11 },
     })
   })
 
@@ -286,6 +396,42 @@ describe('markdown source/syntax/visual anchor map', () => {
     expect(source.slice(2, 10)).not.toBe('bold')
   })
 
+  it('simulates equivalent pointer adapter hits on every supported platform', () => {
+    const sources = [
+      '中文 **组合e\u0301**',
+      'emoji 👩‍💻 marker',
+      '\uFEFFRTL שלום\r\nمرحبا',
+    ] as const
+    for (const [index, source] of sources.entries()) {
+      const map = createMarkdownAnchorMap({
+        identity: { id: `pointer-${index}`, epoch: 1 },
+        source,
+        syntax: [{ id: 'content', range: [0, source.length] }],
+      })
+      const rawOffset = Math.max(0, Math.floor(source.length / 2))
+      const hits = MARKDOWN_POINTER_PLATFORMS.map((platform) =>
+        map.pointerHitToSource(
+          {
+            anchorId: 'content',
+            localOffset: rawOffset,
+            point: 'caret',
+          },
+          { platform },
+        ),
+      )
+      expect(new Set(hits.map((hit) => hit.offset))).toHaveLength(1)
+      expect(hits.map((hit) => hit.platform)).toEqual(
+        MARKDOWN_POINTER_PLATFORMS,
+      )
+      const boundary = map.coordinates.graphemeBoundaryAt(rawOffset)
+      expect(hits[0]!.offset).toBe(
+        rawOffset > boundary.start && rawOffset < boundary.end
+          ? boundary.start
+          : rawOffset,
+      )
+    }
+  })
+
   it('snaps pointer hits to graphemes and does not reveal a nearby identical neighbor', () => {
     const raw = '\uFEFF# Title\r\n\n# Title\n'
     const document = { id: 'doc-1', epoch: 3 }
@@ -307,7 +453,9 @@ describe('markdown source/syntax/visual anchor map', () => {
         { platform },
       ),
     )
-    expect(new Set(platforms.map((hit) => `${hit.offset}:${hit.anchorId}`)).size).toBe(1)
+    expect(
+      new Set(platforms.map((hit) => `${hit.offset}:${hit.anchorId}`)).size,
+    ).toBe(1)
     expect(platforms[0]!.offset).toBe(second!.rawRange.start)
     expect(platforms[0]!.offset).not.toBe(raw.indexOf('# Title'))
 
@@ -323,9 +471,10 @@ describe('markdown source/syntax/visual anchor map', () => {
     })
     const emoji = emojiSource.indexOf('👩')
     const midEmoji = emoji + 1
-    const boundary = createMarkdownSourceCoordinateMap(emojiSource).graphemeBoundaryAt(
-      midEmoji,
-    )
+    const boundary =
+      createMarkdownSourceCoordinateMap(emojiSource).graphemeBoundaryAt(
+        midEmoji,
+      )
     const snapped = emojiMap.pointerHitToSource({
       anchorId: 'line',
       point: 'caret',
@@ -336,7 +485,8 @@ describe('markdown source/syntax/visual anchor map', () => {
   })
 
   it('round-trips mixed LTR/RTL selections in source order, not bidi display order', () => {
-    const source = 'Hello \u05e9\u05dc\u05d5\u05dd (world) \u0645\u0631\u062d\u0628\u0627'
+    const source =
+      'Hello \u05e9\u05dc\u05d5\u05dd (world) \u0645\u0631\u062d\u0628\u0627'
     const map = createMarkdownAnchorMap({
       identity: 'rtl-doc',
       source,

@@ -8,6 +8,16 @@ export interface MarkdownDocumentIdentity {
   readonly epoch: number
 }
 
+export interface MarkdownSyntaxIdentityChange {
+  readonly from: number
+  readonly to: number
+  readonly insert: string
+}
+
+export interface MarkdownSyntaxIdentityState {
+  readonly nextOrdinalByKind: Readonly<Record<string, number>>
+}
+
 export type MarkdownSyntaxIdentityStatus = 'current' | 'deleted' | 'invalid'
 
 export interface MarkdownStableSyntaxNode extends MarkdownEditorSyntaxNode {
@@ -16,6 +26,7 @@ export interface MarkdownStableSyntaxNode extends MarkdownEditorSyntaxNode {
 
 export interface MarkdownStableProjection {
   readonly documentIdentity: MarkdownDocumentIdentity
+  readonly identityState: MarkdownSyntaxIdentityState
   readonly normalizedSource: string
   readonly nodes: readonly MarkdownStableSyntaxNode[]
   resolve(id: string): {
@@ -40,16 +51,58 @@ const ordinalFromIdentity = (id: string) => {
   return Number(parts[parts.length - 1])
 }
 
+const kindFromIdentity = (id: string) => {
+  const parts = id.split(':')
+  return parts[parts.length - 2]
+}
+
+const identityStateFrom = (
+  previous: MarkdownStableProjection | undefined,
+): Map<string, number> => {
+  const nextOrdinalByKind = new Map<string, number>()
+  for (const [kind, ordinal] of Object.entries(
+    previous?.identityState?.nextOrdinalByKind ?? {},
+  )) {
+    if (Number.isInteger(ordinal) && ordinal >= 0) {
+      nextOrdinalByKind.set(kind, ordinal)
+    }
+  }
+  for (const node of previous?.nodes ?? []) {
+    const kind = kindFromIdentity(node.id)
+    const ordinal = ordinalFromIdentity(node.id)
+    if (!kind || !Number.isInteger(ordinal) || ordinal < 0) continue
+    nextOrdinalByKind.set(
+      kind,
+      Math.max(nextOrdinalByKind.get(kind) ?? 0, ordinal + 1),
+    )
+  }
+  return nextOrdinalByKind
+}
+
+const freezeIdentityState = (
+  nextOrdinalByKind: ReadonlyMap<string, number>,
+): MarkdownSyntaxIdentityState =>
+  Object.freeze({
+    nextOrdinalByKind: Object.freeze(Object.fromEntries(nextOrdinalByKind)),
+  })
+
 const sliceOf = (source: string, node: MarkdownEditorSyntaxNode) =>
   source.slice(node.normalizedRange.start, node.normalizedRange.end)
 
-const alignEqualSequences = (previous: readonly string[], next: readonly string[]) => {
+const alignEqualSequences = (
+  previous: readonly string[],
+  next: readonly string[],
+) => {
   const previousCount = previous.length
   const nextCount = next.length
   const table: number[][] = Array.from({ length: previousCount + 1 }, () =>
     Array.from({ length: nextCount + 1 }, () => 0),
   )
-  for (let previousIndex = previousCount - 1; previousIndex >= 0; previousIndex -= 1) {
+  for (
+    let previousIndex = previousCount - 1;
+    previousIndex >= 0;
+    previousIndex -= 1
+  ) {
     for (let nextIndex = nextCount - 1; nextIndex >= 0; nextIndex -= 1) {
       table[previousIndex]![nextIndex] =
         previous[previousIndex] === next[nextIndex]
@@ -116,9 +169,7 @@ const unwrapOnce = (text: string) => {
     lines.some((line) => /^\|/.test(line))
   ) {
     const cells = lines
-      .filter(
-        (line) => /^\|/.test(line) && !/^\|[\s:|-]+\|$/.test(line.trim()),
-      )
+      .filter((line) => /^\|/.test(line) && !/^\|[\s:|-]+\|$/.test(line.trim()))
       .flatMap((line) =>
         line
           .split('|')
@@ -162,25 +213,52 @@ const payloadOf = (text: string) => {
   return current
 }
 
+const remapUnchangedRange = (
+  range: MarkdownEditorSyntaxNode['rawRange'],
+  change: MarkdownSyntaxIdentityChange,
+) => {
+  if (range.end <= change.from) return range
+  if (range.start >= change.to) {
+    const delta = change.insert.length - (change.to - change.from)
+    return Object.freeze({
+      start: range.start + delta,
+      end: range.end + delta,
+    })
+  }
+  return undefined
+}
+
 const assignIdentities = (
   projection: MarkdownEditorProjectionResult,
   documentIdentity: MarkdownDocumentIdentity,
   previous: MarkdownStableProjection | undefined,
+  change: MarkdownSyntaxIdentityChange | undefined,
 ) => {
+  const nextOrdinalByKind = sameDocument(
+    previous?.documentIdentity ?? documentIdentity,
+    documentIdentity,
+  )
+    ? identityStateFrom(previous)
+    : new Map<string, number>()
+  const allocate = (kind: string) => {
+    const ordinal = nextOrdinalByKind.get(kind) ?? 0
+    nextOrdinalByKind.set(kind, ordinal + 1)
+    return identityFor(documentIdentity, kind, ordinal)
+  }
+
   if (!previous || !sameDocument(previous.documentIdentity, documentIdentity)) {
-    const seen = new Map<string, number>()
-    return projection.nodes.map((node) => {
-      const ordinal = seen.get(node.kind) ?? 0
-      seen.set(node.kind, ordinal + 1)
-      return identityFor(documentIdentity, node.kind, ordinal)
-    })
+    return {
+      identities: projection.nodes.map((node) => allocate(node.kind)),
+      identityState: freezeIdentityState(nextOrdinalByKind),
+    }
   }
 
   const nextSource = projection.identity.normalizedSource
   const previousSource = previous.normalizedSource
-  const assigned: Array<string | undefined> = projection.nodes.map(() => undefined)
+  const assigned: Array<string | undefined> = projection.nodes.map(
+    () => undefined,
+  )
   const usedPrevious = new Set<number>()
-  const usedOrdinals = new Map<string, Set<number>>()
 
   const claim = (nextIndex: number, previousIndex: number) => {
     const previousNode = previous.nodes[previousIndex]
@@ -188,9 +266,6 @@ const assignIdentities = (
     if (assigned[nextIndex] !== undefined) return
     assigned[nextIndex] = previousNode.id
     usedPrevious.add(previousIndex)
-    const ordinals = usedOrdinals.get(previousNode.kind) ?? new Set<number>()
-    ordinals.add(ordinalFromIdentity(previousNode.id))
-    usedOrdinals.set(previousNode.kind, ordinals)
   }
 
   const leftoverPreviousIndexes = () =>
@@ -201,6 +276,21 @@ const assignIdentities = (
     projection.nodes
       .map((_, index) => index)
       .filter((index) => assigned[index] === undefined)
+
+  if (change) {
+    previous.nodes.forEach((previousNode, previousIndex) => {
+      const mapped = remapUnchangedRange(previousNode.rawRange, change)
+      if (!mapped) return
+      const nextIndex = projection.nodes.findIndex(
+        (nextNode, index) =>
+          assigned[index] === undefined &&
+          nextNode.kind === previousNode.kind &&
+          nextNode.rawRange.start === mapped.start &&
+          nextNode.rawRange.end === mapped.end,
+      )
+      if (nextIndex >= 0) claim(nextIndex, previousIndex)
+    })
+  }
 
   const kindTextKey = (kind: string, text: string) => `${kind}\0${text}`
   const previousKindTextCount = new Map<string, number>()
@@ -276,7 +366,10 @@ const assignIdentities = (
       )
       .filter((index) => index >= 0)
     const previousTexts = previousIndexes.map((index) =>
-      sliceOf(previousSource, previous.nodes[index] as MarkdownEditorSyntaxNode),
+      sliceOf(
+        previousSource,
+        previous.nodes[index] as MarkdownEditorSyntaxNode,
+      ),
     )
     const nextTexts = nextIndexes.map((index) =>
       sliceOf(nextSource, projection.nodes[index] as MarkdownEditorSyntaxNode),
@@ -285,27 +378,56 @@ const assignIdentities = (
     const aligned = alignEqualSequences(previousTexts, nextTexts)
     aligned.forEach((previousLocal, nextLocal) => {
       if (previousLocal === undefined) return
-      claim(nextIndexes[nextLocal] as number, previousIndexes[previousLocal] as number)
+      claim(
+        nextIndexes[nextLocal] as number,
+        previousIndexes[previousLocal] as number,
+      )
     })
 
-    const leftoverPrevious = previousIndexes.filter((index) => !usedPrevious.has(index))
-    const leftoverNext = nextIndexes.filter((index) => assigned[index] === undefined)
+    const leftoverPrevious = previousIndexes.filter(
+      (index) => !usedPrevious.has(index),
+    )
+    const leftoverNext = nextIndexes.filter(
+      (index) => assigned[index] === undefined,
+    )
 
     for (const nextIndex of leftoverNext) {
       if (assigned[nextIndex] !== undefined) continue
-      const nextText = sliceOf(nextSource, projection.nodes[nextIndex] as MarkdownEditorSyntaxNode)
+      const nextNode = projection.nodes[nextIndex]
+      const editedInPlace = leftoverPrevious.find((previousIndex) => {
+        if (usedPrevious.has(previousIndex)) return false
+        const previousNode = previous.nodes[previousIndex]
+        return (
+          previousNode?.rawRange.start === nextNode?.rawRange.start &&
+          previousNode.rawRange.end === nextNode.rawRange.end
+        )
+      })
+      if (editedInPlace !== undefined) claim(nextIndex, editedInPlace)
+    }
+
+    for (const nextIndex of leftoverNext) {
+      if (assigned[nextIndex] !== undefined) continue
+      const nextText = sliceOf(
+        nextSource,
+        projection.nodes[nextIndex] as MarkdownEditorSyntaxNode,
+      )
       const moved = leftoverPrevious.find(
         (previousIndex) =>
           !usedPrevious.has(previousIndex) &&
-          sliceOf(previousSource, previous.nodes[previousIndex] as MarkdownEditorSyntaxNode) ===
-            nextText,
+          sliceOf(
+            previousSource,
+            previous.nodes[previousIndex] as MarkdownEditorSyntaxNode,
+          ) === nextText,
       )
       if (moved !== undefined) claim(nextIndex, moved)
     }
 
     for (const nextIndex of leftoverNext) {
       if (assigned[nextIndex] !== undefined) continue
-      const nextText = sliceOf(nextSource, projection.nodes[nextIndex] as MarkdownEditorSyntaxNode)
+      const nextText = sliceOf(
+        nextSource,
+        projection.nodes[nextIndex] as MarkdownEditorSyntaxNode,
+      )
       const split = leftoverPrevious.find((previousIndex) => {
         if (usedPrevious.has(previousIndex)) return false
         const previousText = sliceOf(
@@ -324,7 +446,10 @@ const assignIdentities = (
 
     for (const nextIndex of leftoverNext) {
       if (assigned[nextIndex] !== undefined) continue
-      const nextText = sliceOf(nextSource, projection.nodes[nextIndex] as MarkdownEditorSyntaxNode)
+      const nextText = sliceOf(
+        nextSource,
+        projection.nodes[nextIndex] as MarkdownEditorSyntaxNode,
+      )
       let mergedLeft: number | undefined
       for (let index = 0; index < leftoverPrevious.length - 1; index += 1) {
         const left = leftoverPrevious[index] as number
@@ -332,8 +457,14 @@ const assignIdentities = (
         if (usedPrevious.has(left) || usedPrevious.has(right)) continue
         if (
           canMergeSlices(
-            sliceOf(previousSource, previous.nodes[left] as MarkdownEditorSyntaxNode),
-            sliceOf(previousSource, previous.nodes[right] as MarkdownEditorSyntaxNode),
+            sliceOf(
+              previousSource,
+              previous.nodes[left] as MarkdownEditorSyntaxNode,
+            ),
+            sliceOf(
+              previousSource,
+              previous.nodes[right] as MarkdownEditorSyntaxNode,
+            ),
             nextText,
           )
         ) {
@@ -346,22 +477,22 @@ const assignIdentities = (
     }
   }
 
-  return projection.nodes.map((node, index) => {
+  const identities = projection.nodes.map((node, index) => {
     const existing = assigned[index]
     if (existing) return existing
-    const ordinals = usedOrdinals.get(node.kind) ?? new Set<number>()
-    let ordinal = 0
-    while (ordinals.has(ordinal)) ordinal += 1
-    ordinals.add(ordinal)
-    usedOrdinals.set(node.kind, ordinals)
-    return identityFor(documentIdentity, node.kind, ordinal)
+    return allocate(node.kind)
   })
+  return {
+    identities,
+    identityState: freezeIdentityState(nextOrdinalByKind),
+  }
 }
 
 export const stabilizeMarkdownEditorProjection = (
   projection: MarkdownEditorProjectionResult,
   documentIdentity: MarkdownDocumentIdentity,
   previous?: MarkdownStableProjection,
+  change?: MarkdownSyntaxIdentityChange,
 ): MarkdownStableProjection => {
   if (!documentIdentity.id) {
     throw new Error('stable syntax identity requires a document id')
@@ -370,7 +501,12 @@ export const stabilizeMarkdownEditorProjection = (
     throw new Error('stable syntax identity requires a document epoch')
   }
 
-  const identities = assignIdentities(projection, documentIdentity, previous)
+  const { identities, identityState } = assignIdentities(
+    projection,
+    documentIdentity,
+    previous,
+    change,
+  )
   const nodes = projection.nodes.map((node, index) =>
     Object.freeze({
       ...node,
@@ -381,7 +517,11 @@ export const stabilizeMarkdownEditorProjection = (
   const byId = new Map(nodes.map((node) => [node.id, node]))
 
   return Object.freeze({
-    documentIdentity,
+    documentIdentity: Object.freeze({
+      id: documentIdentity.id,
+      epoch: documentIdentity.epoch,
+    }),
+    identityState,
     normalizedSource: projection.identity.normalizedSource,
     nodes: Object.freeze(nodes),
     resolve(id: string) {

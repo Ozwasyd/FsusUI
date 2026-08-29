@@ -72,8 +72,8 @@ import {
 import { useGlobalConfig } from '@element-plus/components/config-provider'
 import {
   resolveFsusRenderPipelineUnitAttrs,
+  useEmbeddedMarkdownEditorFrameScheduler,
   useFsusRenderPipelineRuntime,
-  useFsusRenderScheduler,
   useFsusVirtualWindow,
 } from '@element-plus/hooks'
 import {
@@ -214,7 +214,6 @@ const getChunkUnitAttrs = (
 
 let currentTaskId = 0
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
-let measurementWarmupCancel: (() => void) | null = null
 let activationController: AbortController | null = null
 let activationObserver: IntersectionObserver | null = null
 let activeChunkResult: MarkdownRuntimeChunkResult | null = null
@@ -240,6 +239,21 @@ const afterFrame = () =>
       ? requestAnimationFrame(() => resolve())
       : resolve(),
   )
+
+// Live-surface layout corrections share the editor-owned frame scheduler
+// (#640): embedded in ElMarkdownEditor this is the editor instance provided
+// via inject; standalone renders create an equivalent local instance.
+const frameScheduler = useEmbeddedMarkdownEditorFrameScheduler()
+let renderAnchorDelta: number | null = null
+
+const settleRenderViewport = (key: string) =>
+  new Promise<void>((resolve) => {
+    frameScheduler.schedule({
+      key,
+      measure: () => virtualWindow.readViewport(),
+      postPaint: resolve,
+    })
+  })
 
 const readPerformanceNow = () =>
   typeof performance === 'undefined' ? Date.now() : performance.now()
@@ -358,27 +372,40 @@ const captureRenderAnchor = (): RenderAnchor | null => {
 const restoreRenderAnchor = async (anchor: RenderAnchor | null) => {
   if (!anchor) return
 
-  await nextTick()
-  await afterFrame()
+  // Measure and mutate share one scheduler frame: the reads run in the
+  // measure phase (DOM already patched — microtasks flush before the frame),
+  // the scroll correction commits in the mutate phase, and same-frame
+  // restores from the editor coalesce under one scheduling authority.
+  await new Promise<void>((resolve) => {
+    frameScheduler.schedule({
+      key: 'markdown-render-anchor-restore',
+      measure: () => {
+        renderAnchorDelta = null
+        const root = rootEl.value
+        if (!root || !document.contains(anchor.scrollContainer)) return
 
-  const root = rootEl.value
-  if (!root || !document.contains(anchor.scrollContainer)) return
+        const nextAnchor =
+          (anchor.unitKey
+            ? root.querySelector(
+                `.markdown-renderer__virtual-unit[data-fsus-render-unit-key="${escapeCssAttributeValue(anchor.unitKey)}"]`,
+              )
+            : null) ?? resolveElementPath(root, anchor.path)
+        if (!nextAnchor) return
 
-  const nextAnchor =
-    (anchor.unitKey
-      ? root.querySelector(
-          `.markdown-renderer__virtual-unit[data-fsus-render-unit-key="${escapeCssAttributeValue(anchor.unitKey)}"]`,
-        )
-      : null) ?? resolveElementPath(root, anchor.path)
-  if (!nextAnchor) return
-
-  const containerTop = anchor.scrollContainer.getBoundingClientRect().top
-  const nextOffset = nextAnchor.getBoundingClientRect().top - containerTop
-  const delta = nextOffset - anchor.offset
-
-  if (Math.abs(delta) > 0.5) {
-    anchor.scrollContainer.scrollTop += delta
-  }
+        const containerTop = anchor.scrollContainer.getBoundingClientRect().top
+        const nextOffset =
+          nextAnchor.getBoundingClientRect().top - containerTop
+        renderAnchorDelta = nextOffset - anchor.offset
+      },
+      mutate: () => {
+        if (renderAnchorDelta !== null && Math.abs(renderAnchorDelta) > 0.5) {
+          anchor.scrollContainer.scrollTop += renderAnchorDelta
+        }
+        renderAnchorDelta = null
+      },
+      postPaint: resolve,
+    })
+  })
 }
 
 const commitRenderedContent = async (
@@ -680,19 +707,13 @@ const renderPipelineRuntime = useFsusRenderPipelineRuntime<
 })
 
 const resolvedRenderPipelineConfig = renderPipelineRuntime.config
-const renderScheduler = useFsusRenderScheduler(
-  computed(() => resolvedRenderPipelineConfig.value.budget),
-)
 
 const scheduleMeasurementWarmup = () => {
-  measurementWarmupCancel?.()
-  measurementWarmupCancel = renderScheduler.schedule(
-    () => {
-      virtualWindow.readViewport()
-      measurementWarmupCancel = null
-    },
-    { priority: 'background' },
-  )
+  // The viewport warmup read joins the shared frame scheduler's measure
+  // phase; the scheduler key coalesces repeated warmups into one frame.
+  frameScheduler.scheduleMeasure('markdown-render-viewport-warmup', () => {
+    virtualWindow.readViewport()
+  })
 }
 
 const resolveMarkdownFeatureOptions = () => ({
@@ -859,7 +880,7 @@ const performRender = async () => {
       })
       emit('placeholders-ready', resolvedResult.placeholders, resolvedResult)
       await nextTick()
-      virtualWindow.readViewport()
+      await settleRenderViewport('markdown-render-settle-initial')
       await afterFrame()
       if (initialCount < resolvedUnits.length) {
         if (taskId !== currentTaskId) return
@@ -867,7 +888,7 @@ const performRender = async () => {
         if (taskId !== currentTaskId) return
         chunkUnits.value = resolvedUnits
         await nextTick()
-        virtualWindow.readViewport()
+        await settleRenderViewport('markdown-render-settle-full')
       }
       recordCommitDuration(commitStartedAt)
       emit('render-complete', resolvedResult)
@@ -955,8 +976,6 @@ onBeforeUnmount(() => {
     clearTimeout(debounceTimer)
     debounceTimer = null
   }
-  measurementWarmupCancel?.()
-  measurementWarmupCancel = null
   activationController?.abort()
   activationController = null
   activationObserver?.disconnect()

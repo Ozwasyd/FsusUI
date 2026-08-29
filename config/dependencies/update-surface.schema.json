@@ -2,89 +2,254 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "config/dependencies/update-surface.schema.json",
   "title": "FsusUI Renovate Update Surface Inventory",
-  "description": "Maps every real version field to exactly one manager/group for governance verification (#415).",
+  "description": "Generated ownership map from every supported external version field to exactly one Renovate manager and semantic group.",
   "type": "object",
-  "required": ["schemaVersion", "surfaces", "exclusions", "governance"],
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "generatedBy",
+    "surfaces",
+    "exclusions",
+    "governance"
+  ],
   "properties": {
-    "schemaVersion": { "const": 1 },
+    "schemaVersion": {
+      "const": 2
+    },
+    "generatedBy": {
+      "const": "node scripts/generate-update-surface.mjs"
+    },
     "surfaces": {
       "type": "array",
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["id", "datasource", "packageName", "manager", "files", "versioning", "group"],
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "datasource",
+          "packageName",
+          "manager",
+          "files",
+          "versioning",
+          "group",
+          "stabilityPolicy"
+        ],
         "properties": {
           "id": {
             "type": "string",
-            "description": "Unique stable identity. Must be unique across all surfaces.",
-            "pattern": "^[a-z][a-z0-9._-]*$"
+            "pattern": "^[a-z][a-z0-9-]*$"
           },
           "datasource": {
             "type": "string",
-            "enum": ["npm", "nuget", "github-releases", "node-version", "dotnet-version"]
+            "enum": [
+              "docker",
+              "dotnet-version",
+              "github-releases",
+              "github-tags",
+              "node-version",
+              "npm",
+              "nuget"
+            ]
           },
           "packageName": {
             "type": "string",
-            "description": "Package or action name as Renovate sees it."
+            "minLength": 1
+          },
+          "authorityKey": {
+            "type": "string",
+            "minLength": 1
           },
           "manager": {
             "type": "string",
-            "description": "Renovate manager name: npm, nuget, github-actions, dotnet-version, or regex."
+            "enum": [
+              "custom.jsonata",
+              "custom.regex",
+              "dockerfile",
+              "github-actions",
+              "nuget"
+            ]
           },
           "customManager": {
             "type": "string",
-            "description": "Description of the custom regex manager (only when manager=regex)."
+            "minLength": 1
           },
           "files": {
             "type": "array",
             "minItems": 1,
-            "items": { "type": "string" },
-            "description": "File paths containing the version reference."
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "not": {
+                "pattern": "^(?:/|\\.\\./)"
+              }
+            }
           },
           "versioning": {
             "type": "string",
-            "enum": ["semver", "semver-coerced", "node", "nuget", "loose"]
+            "enum": [
+              "docker",
+              "loose",
+              "node",
+              "npm",
+              "nuget",
+              "semver",
+              "semver-coerced"
+            ]
           },
           "group": {
             "type": "string",
-            "description": "groupName from renovate.json5 packageRules."
+            "pattern": "^[a-z][a-z0-9-]*$"
           },
           "stabilityPolicy": {
-            "type": "string",
-            "enum": ["stable-only", "include-rc", "include-beta"],
-            "default": "stable-only"
+            "const": "stable-only"
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "manager": {
+                  "type": "string",
+                  "pattern": "^custom\\."
+                }
+              },
+              "required": [
+                "manager"
+              ]
+            },
+            "then": {
+              "properties": {
+                "customManager": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "customManager"
+              ]
+            },
+            "else": {
+              "not": {
+                "required": [
+                  "customManager"
+                ]
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "manager": {
+                  "type": "string",
+                  "const": "custom.jsonata"
+                }
+              },
+              "required": [
+                "manager"
+              ]
+            },
+            "then": {
+              "properties": {
+                "authorityKey": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "authorityKey"
+              ]
+            }
+          }
+        ]
       }
     },
     "exclusions": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "reason", "owner", "createdAt", "reviewAfter", "removalCondition"],
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "path",
+          "field",
+          "reason",
+          "owner",
+          "createdAt",
+          "reviewAfter",
+          "removalCondition"
+        ],
         "properties": {
-          "id": { "type": "string" },
-          "path": { "type": "string" },
-          "field": { "type": "string" },
-          "reason": { "type": "string" },
-          "owner": { "type": "string" },
-          "createdAt": { "type": "string"},
-          "reviewAfter": { "type": "string"},
-          "removalCondition": { "type": "string" }
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "field": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "owner": {
+            "type": "string",
+            "minLength": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "reviewAfter": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "removalCondition": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       }
     },
     "governance": {
       "type": "object",
-      "required": ["automerge", "majorEnabled", "minorEnabled", "patchEnabled", "digestEnabled", "lockfileMaintenanceEnabled", "permanentIgnoreCount"],
+      "additionalProperties": false,
+      "required": [
+        "automerge",
+        "majorEnabled",
+        "minorEnabled",
+        "patchEnabled",
+        "digestEnabled",
+        "lockfileMaintenanceEnabled",
+        "permanentIgnoreCount"
+      ],
       "properties": {
-        "automerge": { "const": false },
-        "majorEnabled": { "const": true },
-        "minorEnabled": { "const": true },
-        "patchEnabled": { "const": true },
-        "digestEnabled": { "const": true },
-        "lockfileMaintenanceEnabled": { "const": true },
-        "permanentIgnoreCount": { "const": 0 }
+        "automerge": {
+          "const": false
+        },
+        "majorEnabled": {
+          "const": true
+        },
+        "minorEnabled": {
+          "const": true
+        },
+        "patchEnabled": {
+          "const": true
+        },
+        "digestEnabled": {
+          "const": true
+        },
+        "lockfileMaintenanceEnabled": {
+          "const": true
+        },
+        "permanentIgnoreCount": {
+          "const": 0
+        }
       }
     }
   }

@@ -13,6 +13,7 @@ import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { brotliCompressSync, constants, gzipSync } from 'node:zlib'
 import { resolvePackageContract } from './npm-package-contract.mjs'
+import { packedMarkdownRuntimeProjectionProbe } from './packed-markdown-runtime-probe.mjs'
 import {
   candidateTarballName,
   readCandidatePackageJson,
@@ -472,6 +473,15 @@ try {
     }
     console.log(`Consumer verification resumed from ${fixtureRoot}.`)
   }
+  run(
+    'node',
+    [
+      '--input-type=module',
+      '--eval',
+      packedMarkdownRuntimeProjectionProbe(packageName),
+    ],
+    { cwd: fixtureRoot },
+  )
   run(
     'node',
     [

@@ -1,6 +1,8 @@
 <Styles
   xmlns="https://github.com/avaloniaui"
-  xmlns:fsus="using:FsusUI.Avalonia.Controls">
+  xmlns:core="using:FsusUI.Avalonia"
+  xmlns:fsus="using:FsusUI.Avalonia.Controls"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <Style Selector="fsus|FsusUpload, fsus|FsusTransfer">
     <Setter Property="MinHeight" Value="{DynamicResource FsusDensityControlDefaultY}" />
     <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
@@ -38,5 +40,245 @@
 
   <Style Selector="fsus|FsusTransfer.fsus-has-target">
     <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropZone">
+    <Setter Property="MinHeight" Value="88" />
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace4}" />
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusSurfaceMd}" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="ClipToBounds" Value="True" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition
+          Property="Opacity"
+          Duration="{DynamicResource FsusMotionDurationEffective}"
+          Easing="{DynamicResource FsusMotionEasingEffective}" />
+        <BrushTransition
+          Property="BorderBrush"
+          Duration="{DynamicResource FsusMotionDurationEffective}"
+          Easing="{DynamicResource FsusMotionEasingEffective}" />
+        <BrushTransition
+          Property="Background"
+          Duration="{DynamicResource FsusMotionDurationEffective}"
+          Easing="{DynamicResource FsusMotionEasingEffective}" />
+      </Transitions>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid>
+          <Border
+            Name="PART_DefaultSurface"
+            Background="{DynamicResource FsusThemeSurfaceBrush}"
+            BorderBrush="{DynamicResource FsusThemeBorderBrush}"
+            BorderThickness="{DynamicResource FsusBorderControlWidth}"
+            CornerRadius="{TemplateBinding CornerRadius}"
+            IsHitTestVisible="False" />
+          <Border
+            Name="PART_CustomSurface"
+            Background="{TemplateBinding Background}"
+            BorderBrush="{TemplateBinding BorderBrush}"
+            BorderThickness="{TemplateBinding BorderThickness}"
+            CornerRadius="{TemplateBinding CornerRadius}"
+            IsHitTestVisible="False" />
+          <Border
+            Name="PART_HoverSurface"
+            BorderBrush="{DynamicResource FsusColorActionPrimaryBrush}"
+            BorderThickness="{DynamicResource FsusBorderControlWidth}"
+            CornerRadius="{TemplateBinding CornerRadius}"
+            IsHitTestVisible="False"
+            IsVisible="False" />
+          <Border
+            Name="PART_DroppedSurface"
+            BorderBrush="{DynamicResource FsusColorActionPrimaryBrush}"
+            BorderThickness="{DynamicResource FsusBorderControlWidth}"
+            CornerRadius="{TemplateBinding CornerRadius}"
+            IsHitTestVisible="False"
+            IsVisible="False" />
+          <Border
+            Name="PART_DragOverSurface"
+            Background="{DynamicResource FsusThemeSurfaceRaisedBrush}"
+            BorderBrush="{DynamicResource FsusColorActionPrimaryBrush}"
+            BorderThickness="{DynamicResource FsusBorderControlWidth}"
+            CornerRadius="{TemplateBinding CornerRadius}"
+            IsHitTestVisible="False"
+            IsVisible="False" />
+          <Border
+            Name="PART_FocusSurface"
+            BorderBrush="{DynamicResource FsusThemeFocusBrush}"
+            BorderThickness="{DynamicResource FsusBorderControlWidth}"
+            CornerRadius="{TemplateBinding CornerRadius}"
+            IsHitTestVisible="False"
+            IsVisible="False" />
+          <Border
+            Name="PART_LoadingSurface"
+            BorderBrush="{DynamicResource FsusColorActionPrimaryBrush}"
+            BorderThickness="{DynamicResource FsusBorderControlWidth}"
+            CornerRadius="{TemplateBinding CornerRadius}"
+            IsHitTestVisible="False"
+            IsVisible="False" />
+          <Border
+            Name="PART_ErrorSurface"
+            BorderBrush="{DynamicResource FsusThemeDangerBrush}"
+            BorderThickness="{DynamicResource FsusBorderControlWidth}"
+            CornerRadius="{TemplateBinding CornerRadius}"
+            IsHitTestVisible="False"
+            IsVisible="False" />
+          <Border
+            Name="PART_DisabledSurface"
+            Background="{DynamicResource FsusThemeDisabledSurfaceBrush}"
+            BorderBrush="{DynamicResource FsusThemeBorderBrush}"
+            BorderThickness="{DynamicResource FsusBorderControlWidth}"
+            CornerRadius="{TemplateBinding CornerRadius}"
+            IsHitTestVisible="False"
+            IsVisible="False" />
+          <Border
+            Background="Transparent"
+            Padding="{TemplateBinding Padding}">
+            <StackPanel
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+              Spacing="4">
+              <ContentPresenter
+                Name="PART_ContentPresenter"
+                Content="{TemplateBinding Content}"
+                ContentTemplate="{TemplateBinding ContentTemplate}"
+                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+              <ContentPresenter
+                Name="PART_InstructionPresenter"
+                Content="{TemplateBinding InstructionContent}"
+                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+              <TextBlock
+                Name="PART_InstructionText"
+                Text="{TemplateBinding Instruction}"
+                IsVisible="{TemplateBinding Instruction, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                FontSize="{DynamicResource FsusTypographyBodyMdSize}"
+                Foreground="{TemplateBinding Foreground}"
+                HorizontalAlignment="Stretch"
+                TextAlignment="Center"
+                TextWrapping="Wrap" />
+              <ContentPresenter
+                Name="PART_HelpPresenter"
+                Content="{TemplateBinding HelpContent}"
+                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+              <Grid Height="{Binding Top, Source={x:Static core:FsusTokens.Space6Thickness}}">
+                <TextBlock
+                  Name="PART_HelpText"
+                  Text="{TemplateBinding HelpText}"
+                  IsVisible="{TemplateBinding HelpText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                  FontSize="{DynamicResource FsusTypographyBodySmSize}"
+                  Foreground="{DynamicResource FsusThemeMutedTextBrush}"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Center"
+                  TextAlignment="Center"
+                  TextTrimming="CharacterEllipsis"
+                  TextWrapping="NoWrap" />
+                <TextBlock
+                  Name="PART_ErrorText"
+                  Text="{TemplateBinding ErrorMessage}"
+                  IsVisible="{TemplateBinding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                  FontSize="{DynamicResource FsusTypographyBodySmSize}"
+                  Foreground="{DynamicResource FsusThemeDangerBrush}"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Center"
+                  TextAlignment="Center"
+                  TextTrimming="CharacterEllipsis"
+                  TextWrapping="NoWrap" />
+                <TextBlock
+                  Name="PART_FilterErrorText"
+                  Text="{TemplateBinding FilterErrorMessage}"
+                  IsVisible="{TemplateBinding FilterErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                  FontSize="{DynamicResource FsusTypographyBodySmSize}"
+                  Foreground="{DynamicResource FsusThemeDangerBrush}"
+                  FlowDirection="LeftToRight"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Center"
+                  TextAlignment="Center"
+                  TextTrimming="CharacterEllipsis"
+                  TextWrapping="NoWrap" />
+              </Grid>
+            </StackPanel>
+          </Border>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="fsus|FsusDropZone.fsus-size-sm">
+    <Setter Property="MinHeight" Value="64" />
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace2}" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropZone.fsus-size-md">
+    <Setter Property="MinHeight" Value="88" />
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace4}" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropZone.fsus-size-lg">
+    <Setter Property="MinHeight" Value="120" />
+    <Setter Property="Padding" Value="{DynamicResource FsusSpace6}" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropZone:pointerover /template/ Border#PART_HoverSurface, fsus|FsusDropZone.fsus-pointerover /template/ Border#PART_HoverSurface">
+    <Setter Property="IsVisible" Value="True" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropZone:focus /template/ Border#PART_FocusSurface, fsus|FsusDropZone:focus-visible /template/ Border#PART_FocusSurface">
+    <Setter Property="IsVisible" Value="True" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropZone.fsus-dragover /template/ Border#PART_DragOverSurface, fsus|FsusDropZone.fsus-drag-over /template/ Border#PART_DragOverSurface, fsus|FsusDropZone:dragover /template/ Border#PART_DragOverSurface">
+    <Setter Property="IsVisible" Value="True" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropZone.fsus-dropped /template/ Border#PART_DroppedSurface, fsus|FsusDropZone:dropped /template/ Border#PART_DroppedSurface">
+    <Setter Property="IsVisible" Value="True" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropZone.fsus-loading /template/ Border#PART_LoadingSurface, fsus|FsusDropZone:loading /template/ Border#PART_LoadingSurface">
+    <Setter Property="IsVisible" Value="True" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropZone.fsus-loading, fsus|FsusDropZone:loading">
+    <Setter Property="Opacity" Value="0.7" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropZone.fsus-has-error /template/ Border#PART_ErrorSurface">
+    <Setter Property="IsVisible" Value="True" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropZone.fsus-filter-error /template/ Border#PART_ErrorSurface, fsus|FsusDropZone:error /template/ Border#PART_ErrorSurface">
+    <Setter Property="IsVisible" Value="True" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropZone.fsus-disabled /template/ Border#PART_DisabledSurface, fsus|FsusDropZone:disabled /template/ Border#PART_DisabledSurface">
+    <Setter Property="IsVisible" Value="True" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropZone.fsus-disabled, fsus|FsusDropZone:disabled">
+    <Setter Property="Foreground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+    <Setter Property="Cursor" Value="No" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropZone.fsus-has-instruction-content /template/ TextBlock#PART_InstructionText">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropZone.fsus-has-help-content /template/ TextBlock#PART_HelpText">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropZone.fsus-has-error /template/ TextBlock#PART_HelpText, fsus|FsusDropZone.fsus-filter-error /template/ TextBlock#PART_HelpText">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <Style Selector="fsus|FsusDropZone.fsus-filter-error /template/ TextBlock#PART_ErrorText">
+    <Setter Property="IsVisible" Value="False" />
   </Style>
 </Styles>

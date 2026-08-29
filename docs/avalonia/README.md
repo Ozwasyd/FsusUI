@@ -48,3 +48,16 @@ Run the documentation gate before publishing adoption changes:
 node scripts/check-avalonia-docs.mjs
 dotnet run --project dotnet/FsusUI.Avalonia.ConsumerSample/FsusUI.Avalonia.ConsumerSample.csproj -- --smoke
 ```
+
+Maintainers can verify the separate packed-package Native AOT consumer on the
+current Linux host with:
+
+```bash
+pnpm run test:avalonia-aot-smoke-contract
+pnpm run test:avalonia-aot-smoke
+```
+
+The second command packs the three FsusUI packages, restores the consumer from
+an isolated local-only source, publishes a self-contained RID-specific native
+executable, and runs that executable directly against a real Avalonia window
+and dispatcher. It does not define the component scenario registry.

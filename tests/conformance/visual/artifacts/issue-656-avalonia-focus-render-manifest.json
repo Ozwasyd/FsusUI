@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "FsusInputFocusThicknessHeadlessTests.RealHeadlessSkiaRenderCapturesInputSelectionAndScrollbarFocusStates",
+  "renderer": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "drawingBackend": "Skia",
+    "avaloniaVersion": "12.0.4.0"
+  },
+  "issue": 656,
+  "captures": [
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-656-focus-light-input.png",
+      "Sha256": "dc1cd355b551034ee6ecdf5edca42f7925838aca757b57a7ab22bfb58804280c",
+      "PixelSize": {
+        "Width": 520,
+        "Height": 180
+      },
+      "Theme": "Light",
+      "Surface": "input",
+      "ThicknessDip": 2,
+      "Control": "TextBox",
+      "InputMode": "keyboard"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-656-focus-light-selection.png",
+      "Sha256": "c758c9afbc9dd5b8b408a6c86babbffcfe04bc230e72a4ee650c647fd2dc1c3d",
+      "PixelSize": {
+        "Width": 520,
+        "Height": 180
+      },
+      "Theme": "Light",
+      "Surface": "selection",
+      "ThicknessDip": 2,
+      "Control": "FsusCheckbox",
+      "InputMode": "keyboard"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-656-focus-light-scrollbar.png",
+      "Sha256": "3131723ceb697f1518b0bdfcaec59d913e7b0a3f770c85794cc627ce2e9743ac",
+      "PixelSize": {
+        "Width": 520,
+        "Height": 180
+      },
+      "Theme": "Light",
+      "Surface": "scrollbar",
+      "ThicknessDip": 2,
+      "Control": "FsusScrollbar",
+      "InputMode": "keyboard"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-656-focus-dark-input.png",
+      "Sha256": "6b07745cbbd158c391861c256215c77355f08ecdb6bf1c63b041bc0aa972dd7b",
+      "PixelSize": {
+        "Width": 520,
+        "Height": 180
+      },
+      "Theme": "Dark",
+      "Surface": "input",
+      "ThicknessDip": 2,
+      "Control": "TextBox",
+      "InputMode": "keyboard"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-656-focus-dark-selection.png",
+      "Sha256": "a51703bc7bd73634c92ef563711be98213e99de2ba86cde2c6e7bc30946f4630",
+      "PixelSize": {
+        "Width": 520,
+        "Height": 180
+      },
+      "Theme": "Dark",
+      "Surface": "selection",
+      "ThicknessDip": 2,
+      "Control": "FsusCheckbox",
+      "InputMode": "keyboard"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-656-focus-dark-scrollbar.png",
+      "Sha256": "0c8e4ab3ae6c6d347e033017901a2f26cf03561181378cef2d5029386b31d2e9",
+      "PixelSize": {
+        "Width": 520,
+        "Height": 180
+      },
+      "Theme": "Dark",
+      "Surface": "scrollbar",
+      "ThicknessDip": 2,
+      "Control": "FsusScrollbar",
+      "InputMode": "keyboard"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-656-focus-highcontrast-input.png",
+      "Sha256": "71c978f9c5182e21b29df011621dad70434e0b74d5a723eb6fa7357281c68b66",
+      "PixelSize": {
+        "Width": 520,
+        "Height": 180
+      },
+      "Theme": "HighContrast",
+      "Surface": "input",
+      "ThicknessDip": 3,
+      "Control": "TextBox",
+      "InputMode": "keyboard"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-656-focus-highcontrast-selection.png",
+      "Sha256": "d4c2200879eb9624e29115e529b2e010ba84d969407c4d0f8e4d6be96c53b828",
+      "PixelSize": {
+        "Width": 520,
+        "Height": 180
+      },
+      "Theme": "HighContrast",
+      "Surface": "selection",
+      "ThicknessDip": 3,
+      "Control": "FsusCheckbox",
+      "InputMode": "keyboard"
+    },
+    {
+      "File": "tests/conformance/visual/artifacts/screenshots/avalonia/issue-656-focus-highcontrast-scrollbar.png",
+      "Sha256": "eeecd7ff22dc2d3fc0ef698ac9699b9b34f9e08c328387b75b3cf0a6a3147380",
+      "PixelSize": {
+        "Width": 520,
+        "Height": 180
+      },
+      "Theme": "HighContrast",
+      "Surface": "scrollbar",
+      "ThicknessDip": 3,
+      "Control": "FsusScrollbar",
+      "InputMode": "keyboard"
+    }
+  ]
+}

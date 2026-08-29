@@ -11,6 +11,10 @@ import {
   resolveMarkdownTechnicalNode,
 } from '../src/markdown-editor-technical'
 import { applyMarkdownEditorChanges } from '../src/markdown-editor-transaction'
+import {
+  createMarkdownEditorProjection,
+  stabilizeMarkdownEditorProjection,
+} from '../../../wasm/markdown-runtime'
 
 const identity = { epoch: 1, id: 'tech' }
 
@@ -128,9 +132,21 @@ describe('markdown technical node contract', () => {
 
   it('reveals an exact source range for unclosed and failed technical nodes', () => {
     const source = '```js\nconst x = 1\n'
+    const projection = stabilizeMarkdownEditorProjection(
+      createMarkdownEditorProjection(source),
+      identity,
+    )
+    expect(projection.nodes).toContainEqual(
+      expect.objectContaining({
+        diagnosticCode: 'unclosed-code-fence',
+        kind: 'malformed',
+        status: 'malformed',
+      }),
+    )
     const diagnostic = resolveMarkdownTechnicalDiagnostic({
       documentIdentity: identity,
       kind: 'code',
+      projection,
       source,
     })
     expect(diagnostic?.code).toBe('unclosed-fence')

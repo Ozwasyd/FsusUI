@@ -20,7 +20,7 @@ import {
 } from './markdown-syntax-identity'
 
 export const MARKDOWN_PROJECTION_ACCEPTANCE_VERSION =
-  'markdown-projection-acceptance@2026-08-15'
+  'markdown-projection-acceptance@2026-08-27'
 
 export const MARKDOWN_PROJECTION_ACCEPTANCE_SCALE = Object.freeze({
   minSourceChars: 100_000,
@@ -84,8 +84,8 @@ export const evaluateMarkdownProjectionAcceptance = (input?: {
   readonly documentIdentity?: MarkdownDocumentIdentity
 }): MarkdownProjectionAcceptanceReport => {
   const source = input?.source ?? defaultSource
-  const documentIdentity = input?.documentIdentity ??
-    Object.freeze({ id: 'acceptance-doc', epoch: 1 })
+  const documentIdentity =
+    input?.documentIdentity ?? Object.freeze({ id: 'acceptance-doc', epoch: 1 })
 
   const threads = compareMarkdownEditorProjectionThreads(source)
   const coordinates = compareMarkdownSourceCoordinateMapThreads(source)
@@ -94,7 +94,9 @@ export const evaluateMarkdownProjectionAcceptance = (input?: {
     documentIdentity,
   )
   const paragraph = stable.nodes.find((node) => node.kind === 'paragraph')
-  const from = paragraph ? paragraph.rawRange.start + 1 : Math.min(2, source.length)
+  const from = paragraph
+    ? paragraph.rawRange.start + 1
+    : Math.min(2, source.length)
   const keystrokes = evaluateMarkdownProjectionKeystrokeMutations({
     source,
     documentIdentity,
@@ -200,7 +202,8 @@ export const evaluateMarkdownProjectionAcceptance = (input?: {
     budgets: Object.freeze({
       version: MARKDOWN_PROJECTION_ACCEPTANCE_VERSION,
       maxScannedBytes: MARKDOWN_PROJECTION_INVALIDATION_BUDGET.maxScannedBytes,
-      maxExaminedNodes: MARKDOWN_PROJECTION_INVALIDATION_BUDGET.maxExaminedNodes,
+      maxExaminedNodes:
+        MARKDOWN_PROJECTION_INVALIDATION_BUDGET.maxExaminedNodes,
     }),
   })
 }
@@ -228,9 +231,10 @@ export const recordMarkdownProjectionAcceptanceScale = (input?: {
   readonly source?: string
   readonly documentIdentity?: MarkdownDocumentIdentity
 }): MarkdownProjectionAcceptanceScaleRecord => {
-  const source = input?.source ?? createMarkdownProjectionAcceptanceScaleSource()
-  const documentIdentity = input?.documentIdentity ??
-    Object.freeze({ id: 'scale-doc', epoch: 1 })
+  const source =
+    input?.source ?? createMarkdownProjectionAcceptanceScaleSource()
+  const documentIdentity =
+    input?.documentIdentity ?? Object.freeze({ id: 'scale-doc', epoch: 1 })
   const heapUsedBefore = heapUsed()
   const parseStarted = performance.now()
   const projection = createMarkdownEditorProjection(source)

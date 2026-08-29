@@ -1,28 +1,83 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
+import {
+  cpSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
+import { tmpdir } from 'node:os'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { spawnSync } from 'node:child_process'
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const fixtureRoot = path.join(root, 'tests/fixtures/avalonia-aot-smoke')
-const readFixture = (name) => readFileSync(path.join(fixtureRoot, name), 'utf8')
+const root = path.resolve(import.meta.dirname, '..')
+const checker = path.join(root, 'scripts/check-avalonia-aot-smoke-contract.mjs')
+const paths = [
+  'scripts/test-avalonia-aot-smoke.mjs',
+  'tests/fixtures/avalonia-aot-smoke/FsusUI.Avalonia.AotSmoke.csproj',
+  'tests/fixtures/avalonia-aot-smoke/NuGet.Config',
+  'tests/fixtures/avalonia-aot-smoke/Program.cs',
+]
+const run = (cwd) =>
+  spawnSync(process.execPath, [checker], {
+    cwd,
+    encoding: 'utf8',
+    env: { ...process.env, FSUSUI_AOT_SMOKE_ROOT: cwd },
+  })
 
-const project = readFixture('FsusUI.Avalonia.AotSmoke.csproj')
-const nugetConfig = readFixture('NuGet.Config')
-const program = readFixture('Program.cs')
+const green = run(root)
+assert.equal(green.status, 0, green.stderr || green.stdout)
 
-assert.match(project, /<PublishAot>true<\/PublishAot>/u)
-assert.match(project, /<PackageReference Include="FsusUI\.Avalonia"/u)
-assert.match(project, /<PackageReference Include="FsusUI\.Avalonia\.Themes"/u)
-assert.match(project, /<PackageReference Include="FsusUI\.Avalonia\.Icons"/u)
-assert.doesNotMatch(project, /<ProjectReference\b/u)
-assert.match(nugetConfig, /<clear\s*\/>/u)
-assert.match(nugetConfig, /dotnet\/artifacts\/nuget/u)
-assert.match(program, /--smoke/u)
-assert.match(program, /--report/u)
-assert.match(program, /Dispatcher/u)
-assert.match(program, /TopLevel|Window/u)
-assert.match(program, /JsonSerializer/u)
+const mutate = (relative, rewrite, label) => {
+  const temporaryRoot = mkdtempSync(path.join(tmpdir(), 'fsusui-aot-contract-'))
+  try {
+    for (const item of paths) {
+      const target = path.join(temporaryRoot, item)
+      mkdirSync(path.dirname(target), { recursive: true })
+      cpSync(path.join(root, item), target)
+    }
+    const target = path.join(temporaryRoot, relative)
+    writeFileSync(target, rewrite(readFileSync(target, 'utf8')))
+    const result = run(temporaryRoot)
+    assert.notEqual(result.status, 0, `${label} mutation must fail`)
+  } finally {
+    rmSync(temporaryRoot, { recursive: true, force: true })
+  }
+}
 
-console.log('Avalonia Native AOT smoke fixture contract is defined.')
+const project =
+  'tests/fixtures/avalonia-aot-smoke/FsusUI.Avalonia.AotSmoke.csproj'
+mutate(
+  project,
+  (text) =>
+    text.replace(
+      '</Project>',
+      '<ItemGroup><ProjectReference Include="../../../dotnet/FsusUI.Avalonia/FsusUI.Avalonia.csproj" /></ItemGroup></Project>',
+    ),
+  'ProjectReference',
+)
+mutate(
+  'scripts/test-avalonia-aot-smoke.mjs',
+  (text) => text.replace("'publish', consumerProject", "'run', consumerProject"),
+  'JIT run',
+)
+mutate(
+  'tests/fixtures/avalonia-aot-smoke/NuGet.Config',
+  (text) =>
+    text.replace(
+      '</packageSources>',
+      '<add key="nuget.org" value="https://api.nuget.org/v3/index.json" /></packageSources>',
+    ),
+  'external network source',
+)
+mutate(
+  project,
+  (text) => text.replace('<SelfContained>true</SelfContained>', '<SelfContained>false</SelfContained>'),
+  'runtime dependency',
+)
+
+console.log(
+  'Avalonia Native AOT smoke mutations killed: ProjectReference, JIT run, external network, runtime dependency.',
+)
