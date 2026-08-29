@@ -337,6 +337,48 @@
       "vueComponent": "Document",
       "vueComponentPath": "vue/packages/icons-vue/src/components/document.vue",
       "resourceKey": "FsusIconFileDocument"
+    },
+    {
+      "id": "confirm",
+      "displayName": "Confirm",
+      "category": "action",
+      "source": "vue/packages/icons-svg/check.svg",
+      "path": "M406.656 706.944 195.84 496.256a32 32 0 1 0-45.248 45.248l256 256 512-512a32 32 0 0 0-45.248-45.248L406.592 706.944z",
+      "defaultSize": "icon.size.md",
+      "stroke": "icon.stroke.md",
+      "fill": "icon.fill.default",
+      "mode": "stroke",
+      "decorativeByDefault": true,
+      "aliases": [],
+      "viewBox": "0 0 1024 1024",
+      "sourcePathHash": "230e2849991c8bb723de9fd4e5cc3bee9a86c8606243252158d0cccc0699a2bb",
+      "strokeWidth": 112,
+      "strokeLineCap": "round",
+      "strokeLineJoin": "round",
+      "vueComponent": "Check",
+      "vueComponentPath": "vue/packages/icons-vue/src/components/check.vue",
+      "resourceKey": "FsusIconConfirm"
+    },
+    {
+      "id": "file-import",
+      "displayName": "File Import",
+      "category": "action",
+      "source": "vue/packages/icons-svg/file-import.svg",
+      "path": "M160 64 H640 L896 320 V928 a32 32 0 0 1 -32 32 H160 a32 32 0 0 1 -32 -32 V96 a32 32 0 0 1 32 -32 Z M832 384 H576 V128 H192 V896 H832 Z M805.504 320 L640 154.496 V320 Z M544 536 L682 398 L728 444 L512 660 L296 444 L342 398 L480 536 L480 256 L544 256 Z",
+      "defaultSize": "icon.size.md",
+      "stroke": "icon.stroke.md",
+      "fill": "icon.fill.default",
+      "mode": "stroke",
+      "decorativeByDefault": true,
+      "aliases": [],
+      "viewBox": "0 0 1024 1024",
+      "sourcePathHash": "8475e51f40d1473ad474378325145999ed3397599347773c305d92f87c79798d",
+      "strokeWidth": 112,
+      "strokeLineCap": "round",
+      "strokeLineJoin": "round",
+      "vueComponent": "FileImport",
+      "vueComponentPath": "vue/packages/icons-vue/src/components/file-import.vue",
+      "resourceKey": "FsusIconFileImport"
     }
   ]
 }

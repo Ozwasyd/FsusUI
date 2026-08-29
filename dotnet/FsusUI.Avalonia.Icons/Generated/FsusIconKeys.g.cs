@@ -20,4 +20,6 @@ public static class FsusIconKeys
   public const string FileImage = "FsusIconFileImage";
   public const string FileArchive = "FsusIconFileArchive";
   public const string FileDocument = "FsusIconFileDocument";
+  public const string Confirm = "FsusIconConfirm";
+  public const string FileImport = "FsusIconFileImport";
 }

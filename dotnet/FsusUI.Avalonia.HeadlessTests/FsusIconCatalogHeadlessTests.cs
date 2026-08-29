@@ -28,6 +28,8 @@ public class FsusIconCatalogHeadlessTests
     FsusIconKeys.Outline,
     FsusIconKeys.SaveAll,
     FsusIconKeys.CloseAll,
+    FsusIconKeys.Confirm,
+    FsusIconKeys.FileImport,
   ];
 
   private static readonly string[] FileTypeSampleNames =
@@ -46,6 +48,8 @@ public class FsusIconCatalogHeadlessTests
   [InlineData(FsusIconKeys.Outline, "FsusIconOutline")]
   [InlineData(FsusIconKeys.SaveAll, "FsusIconSaveAll")]
   [InlineData(FsusIconKeys.CloseAll, "FsusIconCloseAll")]
+  [InlineData(FsusIconKeys.Confirm, "FsusIconConfirm")]
+  [InlineData(FsusIconKeys.FileImport, "FsusIconFileImport")]
   public void GeneratedCatalogKeysResolveStreamGeometry(
     string iconKey,
     string expectedResourceKey)
@@ -231,15 +235,15 @@ public class FsusIconCatalogHeadlessTests
       .ToList();
     var disabledIcon = new FsusIcon
     {
-      IconKey = CatalogIconKeys[0],
+      IconKey = FsusIconKeys.Confirm,
       Width = iconSize,
       Height = iconSize,
       IsEnabled = false,
     };
     var button = new FsusIconButton
     {
-      AccessibleName = "Files",
-      Content = new FsusIcon { IconKey = CatalogIconKeys[0] },
+      AccessibleName = "Confirm",
+      Content = new FsusIcon { IconKey = FsusIconKeys.Confirm },
       VerticalAlignment = VerticalAlignment.Center,
     };
 
@@ -256,6 +260,21 @@ public class FsusIconCatalogHeadlessTests
     catalogRow.Children.Add(disabledIcon);
     catalogRow.Children.Add(button);
 
+    var dropZoneIcon = new FsusIcon
+    {
+      IconKey = FsusIconKeys.FileImport,
+      Width = iconSize,
+      Height = iconSize,
+    };
+    var dropZone = new FsusDropZone
+    {
+      Content = dropZoneIcon,
+      Width = Math.Max(64, iconSize * 3),
+      Height = Math.Max(64, iconSize * 3),
+      VerticalAlignment = VerticalAlignment.Center,
+    };
+    fileRow.Children.Add(dropZone);
+
     var surface = new Border
     {
       Padding = new Thickness(24),
@@ -265,8 +284,8 @@ public class FsusIconCatalogHeadlessTests
     };
     var window = new Window
     {
-      Width = 440,
-      Height = 240,
+      Width = 560,
+      Height = 260,
       Content = surface,
       ShowInTaskbar = false,
     };
@@ -274,7 +293,7 @@ public class FsusIconCatalogHeadlessTests
     window.Show();
 
     using var bitmap = new RenderTargetBitmap(
-      new PixelSize(440, 240),
+      new PixelSize(560, 260),
       new Vector(96, 96));
     bitmap.Render(surface);
 
@@ -316,6 +335,11 @@ public class FsusIconCatalogHeadlessTests
       CaptureBounds(buttonIcon, surface),
       expectedForeground,
       expectsForegroundMatch: true);
+    var dropZoneEvidence = AnalyzeRegion(
+      bitmap,
+      CaptureBounds(dropZoneIcon, surface),
+      expectedForeground,
+      expectsForegroundMatch: true);
 
     var fileName = $"{variant.Name}.png";
     var filePath = Path.Combine(outputRoot, fileName);
@@ -336,12 +360,17 @@ public class FsusIconCatalogHeadlessTests
         item.Evidence.ExpectsForegroundMatch))
       .ToList();
     icons.Add(new IconPixelEvidence(
-      $"{CatalogIconKeys[0]}-disabled",
+      $"{FsusIconKeys.Confirm}-disabled",
       disabledEvidence.NonBackgroundRatio,
       disabledEvidence.ForegroundMatchRatio,
       disabledEvidence.ExpectsForegroundMatch));
     icons.Add(new IconPixelEvidence(
-      $"{CatalogIconKeys[0]}-icon-button",
+      $"{FsusIconKeys.FileImport}-drop-zone",
+      dropZoneEvidence.NonBackgroundRatio,
+      dropZoneEvidence.ForegroundMatchRatio,
+      dropZoneEvidence.ExpectsForegroundMatch));
+    icons.Add(new IconPixelEvidence(
+      $"{FsusIconKeys.Confirm}-icon-button",
       buttonEvidence.NonBackgroundRatio,
       buttonEvidence.ForegroundMatchRatio,
       buttonEvidence.ExpectsForegroundMatch));

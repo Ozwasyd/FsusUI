@@ -18,6 +18,12 @@ Required representative checks:
   size token, md stroke token.
 - `close-all`: stacked-window action glyph with an X knockout for close-all
   document headers, md size token, md stroke token.
+- `confirm`: check/confirm/apply action glyph sourced from the shared check
+  geometry, decorative by default inside named icon-only buttons, md size
+  token, md stroke token.
+- `file-import`: import-document glyph (page with a down arrow into the
+  document) for icon-only actions and centered drop-zone empty states, md
+  size token, md stroke token.
 - `file` family (`file`, `file-text`, `file-markdown`, `file-code`,
   `file-data`, `file-image`, `file-archive`, `file-document`): shared page
   silhouette with folded corner, type-specific interior glyph, stable

@@ -270,6 +270,38 @@
       "fill": "icon.fill.default",
       "decorativeByDefault": true,
       "aliases": []
+    },
+    {
+      "id": "confirm",
+      "source": "vue/packages/icons-svg/check.svg",
+      "vueComponent": "Check",
+      "avaloniaResourceKey": "FsusIconConfirm",
+      "sourcePathHash": "230e2849991c8bb723de9fd4e5cc3bee9a86c8606243252158d0cccc0699a2bb",
+      "viewBox": "0 0 1024 1024",
+      "strokeWidth": 112,
+      "strokeLineCap": "round",
+      "strokeLineJoin": "round",
+      "defaultSize": "icon.size.md",
+      "stroke": "icon.stroke.md",
+      "fill": "icon.fill.default",
+      "decorativeByDefault": true,
+      "aliases": []
+    },
+    {
+      "id": "file-import",
+      "source": "vue/packages/icons-svg/file-import.svg",
+      "vueComponent": "FileImport",
+      "avaloniaResourceKey": "FsusIconFileImport",
+      "sourcePathHash": "8475e51f40d1473ad474378325145999ed3397599347773c305d92f87c79798d",
+      "viewBox": "0 0 1024 1024",
+      "strokeWidth": 112,
+      "strokeLineCap": "round",
+      "strokeLineJoin": "round",
+      "defaultSize": "icon.size.md",
+      "stroke": "icon.stroke.md",
+      "fill": "icon.fill.default",
+      "decorativeByDefault": true,
+      "aliases": []
     }
   ]
 }
